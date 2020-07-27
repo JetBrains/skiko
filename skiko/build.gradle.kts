@@ -5,6 +5,8 @@ plugins {
 group = "org.jetbrains.skiko"
 version = "1.0-SNAPSHOT"
 
+val skiaDir = System.getenv("SKIA_DIR")
+
 repositories {
     mavenCentral()
     maven {
@@ -56,27 +58,58 @@ kotlin {
     }
 }
 
-// We'd delombok ahead of time now.
-
-/*
-dependencies {
-    "kapt"("org.projectlombok:lombok:1.18.12")
-}
-*/
-
 tasks.withType(CppCompile::class.java).configureEach {
     val jdkHome = System.getenv("JAVA_HOME")
-    val skiaDir = System.getenv("SKIA_DIR")
     compilerArgs.addAll(listOf(
+        "-std=c++14",
         "-I$jdkHome/include",
         "-I$jdkHome/include/darwin",
-        "-I$skiaDir/include"
-        ))
+        "-I$skiaDir",
+        "-I$skiaDir/include",
+        "-I$skiaDir/include/core",
+        "-I$skiaDir/include/gpu",
+        "-I$skiaDir/include/effects",
+        "-I$skiaDir/include/pathops",
+        "-I$skiaDir/modules/skparagraph/include",
+        "-I$skiaDir/modules/skshaper/include",
+        "-I$skiaDir/third_party/externals/harfbuzz/src",
+        "-DSK_ALLOW_STATIC_GLOBAL_INITIALIZERS=1",
+        "-DSK_BUILD_FOR_MAC",
+        "-DSK_FORCE_DISTANCE_FIELD_TEXT=0",
+        "-DSK_GAMMA_APPLY_TO_A8",
+        "-DSK_GAMMA_SRGB",
+        "-DSK_INTERNAL",
+        "-DSK_SCALAR_TO_FLOAT_EXCLUDED",
+        "-DSK_SUPPORT_GPU=1",
+        "-DSK_SUPPORT_OPENCL=0",
+        "-Dskija_EXPORTS",
+        "-O3",
+        "-DNDEBUG"
+    ))
 }
 
-extensions.configure<CppLibrary> {
+tasks.withType(LinkSharedLibrary::class.java).configureEach {
+    linkerArgs.addAll(listOf(
+        "-framework", "CoreFoundation",
+        "-framework", "CoreGraphics",
+        "-framework", "CoreServices",
+        "-framework", "CoreText"
+    ))
 }
 
 library {
-    targetMachines.add(machines.macOS.x86_64)
+    linkage.addAll(listOf(Linkage.SHARED))
+    targetMachines.addAll(listOf(machines.macOS.x86_64, machines.linux.x86_64))
+    baseName.set("skiko")
+
+    dependencies {
+        implementation(fileTree("$skiaDir/out/Release-x64").matching {
+            include("**.a")
+        })
+    }
+}
+
+tasks.register<Jar>("skiko") {
+    archiveBaseName.set("skiko")
+    from(kotlin.jvm().compilations["main"].output.allOutputs)
 }
