@@ -42,6 +42,7 @@ kotlin {
         val jvmMain by getting {
             dependencies {
                 implementation(kotlin("stdlib-jdk8"))
+                compileOnly("org.projectlombok:lombok:1.18.12")
                 compileOnly("org.jetbrains:annotations:19.0.0")
             }
         }

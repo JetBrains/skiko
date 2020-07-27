@@ -6,7 +6,7 @@ else
  cd ./skija && git pull
 fi
 
-java -jar lombok.jar delombok skija/src/main/java -d skiko/src/jvmMain/java --classpath=./annotations-19.0.0.jar:./lombok.jar
+java -jar ./libs/lombok.jar delombok skija/src/main/java -d skiko/src/jvmMain/java --classpath=./libs/annotations-19.0.0.jar:./libs/lombok.jar
 mkdir -p skiko/src/main
 rsync -r skija/src/main/cc/ skiko/src/main/cpp
 
