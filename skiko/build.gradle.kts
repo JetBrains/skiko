@@ -1,11 +1,19 @@
 plugins {
     kotlin("multiplatform") version "1.4-M3"
     `cpp-library`
+    `maven-publish`
 }
 group = "org.jetbrains.skiko"
-version = "1.0-SNAPSHOT"
+version = "0.1-SNAPSHOT"
 
-val skiaDir = System.getenv("SKIA_DIR")
+val skiaDir = System.getenv("SKIA_DIR") ?: throw Error("Set SKIA_DIR env variable!")
+val hostOs = System.getProperty("os.name")
+val target =  when {
+    hostOs == "Mac OS X" -> "macos"
+    hostOs == "Linux" -> "linux"
+    hostOs.startsWith("Win") -> "windows"
+    else -> throw Error("Unknown os $hostOs")
+}
 
 repositories {
     mavenCentral()
@@ -20,7 +28,7 @@ kotlin {
         }
         withJava()
     }
-    val hostOs = System.getProperty("os.name")
+
     val isMingwX64 = hostOs.startsWith("Windows")
     val nativeTarget = when {
         hostOs == "Mac OS X" -> macosX64("native")
@@ -58,12 +66,14 @@ kotlin {
     }
 }
 
+// See https://docs.gradle.org/current/userguide/cpp_library_plugin.html.
 tasks.withType(CppCompile::class.java).configureEach {
     val jdkHome = System.getenv("JAVA_HOME")
     compilerArgs.addAll(listOf(
         "-std=c++14",
+        "-fvisibility=hidden",
+        "-fvisibility-inlines-hidden",
         "-I$jdkHome/include",
-        "-I$jdkHome/include/darwin",
         "-I$skiaDir",
         "-I$skiaDir/include",
         "-I$skiaDir/include/core",
@@ -74,7 +84,6 @@ tasks.withType(CppCompile::class.java).configureEach {
         "-I$skiaDir/modules/skshaper/include",
         "-I$skiaDir/third_party/externals/harfbuzz/src",
         "-DSK_ALLOW_STATIC_GLOBAL_INITIALIZERS=1",
-        "-DSK_BUILD_FOR_MAC",
         "-DSK_FORCE_DISTANCE_FIELD_TEXT=0",
         "-DSK_GAMMA_APPLY_TO_A8",
         "-DSK_GAMMA_SRGB",
@@ -86,20 +95,35 @@ tasks.withType(CppCompile::class.java).configureEach {
         "-O3",
         "-DNDEBUG"
     ))
+    when (target) {
+        "macos" -> {
+            compilerArgs.addAll(
+                listOf(
+                    "-I$jdkHome/include/darwin",
+                    "-DSK_BUILD_FOR_MAC"
+                )
+            )
+        }
+    }
 }
 
 tasks.withType(LinkSharedLibrary::class.java).configureEach {
-    linkerArgs.addAll(listOf(
-        "-framework", "CoreFoundation",
-        "-framework", "CoreGraphics",
-        "-framework", "CoreServices",
-        "-framework", "CoreText"
-    ))
+    when (target) {
+        "macos" -> {
+            linkerArgs.addAll(listOf(
+                "-dead_strip",
+                "-framework", "CoreFoundation",
+                "-framework", "CoreGraphics",
+                "-framework", "CoreServices",
+                "-framework", "CoreText"
+            ))
+        }
+    }
 }
 
 library {
     linkage.addAll(listOf(Linkage.SHARED))
-    targetMachines.addAll(listOf(machines.macOS.x86_64, machines.linux.x86_64))
+    targetMachines.addAll(listOf(machines.macOS.x86_64, machines.linux.x86_64, machines.windows.x86_64))
     baseName.set("skiko")
 
     dependencies {
@@ -108,8 +132,37 @@ library {
         })
     }
 }
-
-tasks.register<Jar>("skiko") {
-    archiveBaseName.set("skiko")
+val skikoJarFile = "$buildDir/skiko-$target.jar"
+project.tasks.register<Jar>("skikoJar") {
+    archiveBaseName.set("skiko-$target")
+    archiveFileName.set(skikoJarFile)
     from(kotlin.jvm().compilations["main"].output.allOutputs)
+    from(project.tasks.named("linkReleaseMacos").get().outputs.files.filter { it.isFile })
+}
+
+val skikoArtifact = artifacts.add("archives", file(skikoJarFile)) {
+    type = "jar"
+    group = "skiko"
+    builtBy("skikoJar")
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("skiko") {
+            groupId = "org.jetbrains.skiko"
+            artifactId = "skiko"
+            artifact(skikoArtifact)
+            pom {
+                name.set("Skiko")
+                description.set("Kotlin Skia bindings")
+                url.set("http://www.github.com/JetBrains/skiko")
+                licenses {
+                    license {
+                        name.set("The Apache License, Version 2.0")
+                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                    }
+                }
+            }
+        }
+    }
 }

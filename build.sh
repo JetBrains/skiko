@@ -10,4 +10,4 @@ java -jar ./libs/lombok.jar delombok skija/src/main/java -d skiko/src/jvmMain/ja
 mkdir -p skiko/src/main
 rsync -r skija/src/main/cc/ skiko/src/main/cpp
 
-cd skiko && ./gradlew jar
+cd skiko && ./gradlew publishSkikoPublicationToMavenLocal
