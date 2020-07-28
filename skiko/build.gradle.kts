@@ -6,7 +6,8 @@ plugins {
 group = "org.jetbrains.skiko"
 version = "0.1-SNAPSHOT"
 
-val skiaDir = System.getenv("SKIA_DIR") ?: throw Error("Set SKIA_DIR env variable!")
+
+val skiaDir = System.getenv("SKIA_DIR") ?: "/Users/igotti/compose/skija/third_party/skia"
 val hostOs = System.getProperty("os.name")
 val target =  when {
     hostOs == "Mac OS X" -> "macos"
@@ -145,6 +146,13 @@ val skikoArtifact = artifacts.add("archives", file(skikoJarFile)) {
     group = "skiko"
     builtBy("skikoJar")
 }
+
+project.tasks.register<JavaExec>("run") {
+    dependsOn("skikoJar")
+    main = "org.jetbrains.skiko.MainKt"
+    classpath = files(skikoJarFile)
+}
+
 
 publishing {
     publications {
