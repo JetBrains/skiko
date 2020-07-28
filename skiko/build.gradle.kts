@@ -11,7 +11,7 @@ version = "0.1-SNAPSHOT"
 
 val skiaDir = System.getenv("SKIA_DIR") ?: "/Users/igotti/compose/skija/third_party/skia"
 val hostOs = System.getProperty("os.name")
-val target =  when {
+val target = when {
     hostOs == "Mac OS X" -> "macos"
     hostOs == "Linux" -> "linux"
     hostOs.startsWith("Win") -> "windows"
@@ -79,9 +79,6 @@ tasks.withType(CppCompile::class.java).configureEach {
     )
     val jdkHome = System.getenv("JAVA_HOME")
     compilerArgs.addAll(listOf(
-        "-std=c++14",
-        "-fvisibility=hidden",
-        "-fvisibility-inlines-hidden",
         "-I$jdkHome/include",
         "-I$skiaDir",
         "-I$skiaDir/include",
@@ -101,13 +98,16 @@ tasks.withType(CppCompile::class.java).configureEach {
         "-DSK_SUPPORT_GPU=1",
         "-DSK_SUPPORT_OPENCL=0",
         "-Dskija_EXPORTS",
-        "-O3",
         "-DNDEBUG"
     ))
     when (target) {
         "macos" -> {
             compilerArgs.addAll(
                 listOf(
+                    "-std=c++14",
+                    "-O3",
+                    "-fvisibility=hidden",
+                    "-fvisibility-inlines-hidden",
                     "-I$jdkHome/include/darwin",
                     "-DSK_BUILD_FOR_MAC"
                 )
@@ -116,9 +116,21 @@ tasks.withType(CppCompile::class.java).configureEach {
         "linux" -> {
             compilerArgs.addAll(
                 listOf(
+                    "-std=c++14",
+                    "-O3",
+                    "-fvisibility=hidden",
+                    "-fvisibility-inlines-hidden",
                     "-I$jdkHome/include/linux",
                     "-DSK_BUILD_FOR_LINUX",
                     "-DSK_R32_SHIFT=16"
+                )
+            )
+        }
+        "windows" -> {
+            compilerArgs.addAll(
+                listOf(
+                    "-I$jdkHome/include/win32",
+                    "-DSK_BUILD_FOR_WIN"
                 )
             )
         }

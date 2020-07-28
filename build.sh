@@ -6,6 +6,12 @@ else
  pushd ./skija && git pull && popd
 fi
 
-java -jar ./libs/lombok.jar delombok skija/src/main/java -d  skija/java_delombok --classpath=./libs/annotations-19.0.0.jar:./libs/lombok.jar
+SEP=:
+if [ `uname -o` == "Msys" ]; then
+  SEP=\;
+fi
+
+java -jar ./libs/lombok.jar delombok skija/src/main/java -d skija/java_delombok \
+   --classpath=./libs/annotations-19.0.0.jar${SEP}./libs/lombok.jar
 
 cd skiko && ./gradlew publishSkikoPublicationToMavenLocal
