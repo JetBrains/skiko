@@ -184,7 +184,7 @@ publishing {
     publications {
         create<MavenPublication>("skiko") {
             groupId = "org.jetbrains.skiko"
-            artifactId = "skiko"
+            artifactId = "skiko-$target"
             artifact(skikoArtifact)
             pom {
                 name.set("Skiko")
