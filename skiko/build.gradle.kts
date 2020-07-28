@@ -1,3 +1,5 @@
+import kotlin.text.capitalize
+
 plugins {
     kotlin("multiplatform") version "1.4-M3"
     `cpp-library`
@@ -51,11 +53,13 @@ kotlin {
             }
         }
         val jvmMain by getting {
+            //kotlin.srcDirs.add(file("$projectDir/../skija/java_delombok"))
             dependencies {
                 implementation(kotlin("stdlib-jdk8"))
                 compileOnly("org.projectlombok:lombok:1.18.12")
                 compileOnly("org.jetbrains:annotations:19.0.0")
             }
+
         }
         val jvmTest by getting {
             dependencies {
@@ -69,6 +73,10 @@ kotlin {
 
 // See https://docs.gradle.org/current/userguide/cpp_library_plugin.html.
 tasks.withType(CppCompile::class.java).configureEach {
+    source.from(
+            fileTree("$projectDir/../skija/src/main/cc"),
+            fileTree("$projectDir/src/jvmMain/cpp")
+    )
     val jdkHome = System.getenv("JAVA_HOME")
     compilerArgs.addAll(listOf(
         "-std=c++14",
@@ -105,19 +113,37 @@ tasks.withType(CppCompile::class.java).configureEach {
                 )
             )
         }
+        "linux" -> {
+            compilerArgs.addAll(
+                listOf(
+                    "-I$jdkHome/include/linux",
+                    "-DSK_BUILD_FOR_LINUX",
+                    "-DSK_R32_SHIFT=16"
+                )
+            )
+        }
     }
 }
 
 tasks.withType(LinkSharedLibrary::class.java).configureEach {
     when (target) {
         "macos" -> {
-            linkerArgs.addAll(listOf(
-                "-dead_strip",
-                "-framework", "CoreFoundation",
-                "-framework", "CoreGraphics",
-                "-framework", "CoreServices",
-                "-framework", "CoreText"
-            ))
+            linkerArgs.addAll(
+                listOf(
+                    "-dead_strip",
+                    "-framework", "CoreFoundation",
+                    "-framework", "CoreGraphics",
+                    "-framework", "CoreServices",
+                    "-framework", "CoreText"
+                )
+            )
+        }
+        "linux" -> {
+            linkerArgs.addAll(
+                listOf(
+                    "-lfontconfig"
+                )
+            )
         }
     }
 }
@@ -138,7 +164,7 @@ project.tasks.register<Jar>("skikoJar") {
     archiveBaseName.set("skiko-$target")
     archiveFileName.set(skikoJarFile)
     from(kotlin.jvm().compilations["main"].output.allOutputs)
-    from(project.tasks.named("linkReleaseMacos").get().outputs.files.filter { it.isFile })
+    from(project.tasks.named("linkRelease${target.capitalize()}").get().outputs.files.filter { it.isFile })
 }
 
 val skikoArtifact = artifacts.add("archives", file(skikoJarFile)) {
