@@ -157,6 +157,14 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
                 )
             )
         }
+        "windows" -> {
+            linkerArgs.addAll(
+                listOf(
+                    "user32.lib",
+                    "opengl32.lib"
+                )
+            )
+        }
     }
 }
 
@@ -167,7 +175,10 @@ library {
 
     dependencies {
         implementation(fileTree("$skiaDir/out/Release-x64").matching {
-            include("**.a")
+            if (target == "windows")
+                include("**.lib")
+            else
+                include("**.a")
         })
     }
 }
