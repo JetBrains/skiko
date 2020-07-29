@@ -7,7 +7,7 @@ else
 fi
 
 SEP=:
-if [ `uname -o` == "Msys" ]; then
+if [ `uname` == "Msys" ]; then
   SEP=\;
 fi
 
