@@ -93,7 +93,6 @@ tasks.withType(CppCompile::class.java).configureEach {
         "-DSK_FORCE_DISTANCE_FIELD_TEXT=0",
         "-DSK_GAMMA_APPLY_TO_A8",
         "-DSK_GAMMA_SRGB",
-        "-DSK_INTERNAL",
         "-DSK_SCALAR_TO_FLOAT_EXCLUDED",
         "-DSK_SUPPORT_GPU=1",
         "-DSK_SUPPORT_OPENCL=0",
@@ -130,8 +129,16 @@ tasks.withType(CppCompile::class.java).configureEach {
             compilerArgs.addAll(
                 listOf(
                     "-I$jdkHome/include/win32",
-                    "-DSK_BUILD_FOR_WIN"
-                )
+                    "-DSK_BUILD_FOR_WIN",
+                    "-D_CRT_SECURE_NO_WARNINGS",
+                    "-D_HAS_EXCEPTIONS=0",
+                    "-DWIN32_LEAN_AND_MEAN",
+                    "-DNOMINMAX",
+                    "-DSK_GAMMA_APPLY_TO_A8",
+                    "/utf-8",
+                    "/O2",
+                    "/GR-" // no-RTTI.
+            )
             )
         }
     }
