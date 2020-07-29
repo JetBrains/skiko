@@ -7,5 +7,5 @@
    * Set JAVA_HOME to location of JDK, at least version 11
    * Run `build.sh` at least once to properly set up Skija
    * If Skija repo is updated - run `build.sh` again
-   * `cd skiko && ./gradlew publishSkikoPublicationToMavenLocal` will build the artefact and publish it to local Maven repo
+   * `cd skiko && ./gradlew publishToMavenLocal` will build the artefact and publish it to local Maven repo
   
