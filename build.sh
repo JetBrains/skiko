@@ -11,7 +11,7 @@ if [ `uname -o` == "Msys" ]; then
   SEP=\;
 fi
 
-java -jar ./libs/lombok.jar delombok skija/src/main/java -d skija/java_delombok \
+java -jar ./libs/lombok.jar delombok skija/src/main/java -d skiko/src/jvmMain/java \
    --classpath=./libs/annotations-19.0.0.jar${SEP}./libs/lombok.jar
 
 cd skiko && ./gradlew publishSkikoPublicationToMavenLocal
