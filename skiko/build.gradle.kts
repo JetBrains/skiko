@@ -150,6 +150,11 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
             linkerArgs.addAll(
                 listOf(
                     "-dead_strip",
+                    // "-framework", "OpenGL",
+                    // "-framework", "Cocoa",
+                    // "-framework", "Foundation",
+                    // "-framework", "QuartzCore"
+                    "-framework", "CoreGraphics",
                     "-framework", "CoreFoundation",
                     "-framework", "CoreGraphics",
                     "-framework", "CoreServices",
