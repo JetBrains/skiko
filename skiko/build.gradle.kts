@@ -76,7 +76,13 @@ tasks.withType(CppCompile::class.java).configureEach {
             fileTree("$projectDir/../skija/src/main/cc"),
             fileTree("$projectDir/src/jvmMain/cpp")
     )
-    val jdkHome = System.getenv("JAVA_HOME")
+    // Prefer 'java.home' system property to simplify overriding from Intellij.
+    // When used from command-line, it is effectively equal to JAVA_HOME.
+    if (JavaVersion.current() < JavaVersion.VERSION_11) {
+        error("JDK 11+ is required, but Gradle JVM is ${JavaVersion.current()}. " +
+                "Check JAVA_HOME (CLI) or Gradle settings (Intellij).")
+    }
+    val jdkHome = System.getProperty("java.home") ?: error("'java.home' is null")
     compilerArgs.addAll(listOf(
         "-I$jdkHome/include",
         "-I$skiaDir",
