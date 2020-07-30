@@ -5,8 +5,13 @@ plugins {
     `cpp-library`
     `maven-publish`
 }
+
+val isCIBuild = project.hasProperty("teamcity")
 group = "org.jetbrains.skiko"
-version = project.property("deploy.version") as String
+version = when {
+    isCIBuild -> project.property("deploy.ci.version") as String
+    else -> project.property("deploy.version") as String
+}
 
 val skiaDir = System.getenv("SKIA_DIR") ?: "/Users/igotti/compose/skija/third_party/skia"
 val hostOs = System.getProperty("os.name")
