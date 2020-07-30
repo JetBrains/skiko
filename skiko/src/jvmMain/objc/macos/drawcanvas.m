@@ -46,7 +46,6 @@ JavaVM *jvm;
 {
     if (self.isDrawing) return;
     self.isDrawing = YES;
-
     CGLSetCurrentContext(ctx);
 
     if (self.jvm != NULL) {
@@ -197,9 +196,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_Components_Window_updateLayer(J
         layersSet.glLayer.contentsScale = scaleFactor;
         
         jobject windowRef = (*env)->NewGlobalRef(env, window);
-        if (windowRef == 0) {
-            NSLog(@"Cannot create global reference!");
-        }
+
         [layersSet.glLayer setJvm: jvm];
         [layersSet.glLayer setWindowRef: windowRef];
         [layersSet setWindowRef: windowRef];        
