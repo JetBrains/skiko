@@ -75,8 +75,9 @@ kotlin {
 tasks.withType(CppCompile::class.java).configureEach {
     source.from(
             fileTree("$projectDir/../skija/src/main/cc"),
-            fileTree("$projectDir/src/jvmMain/cpp")
-    )
+            fileTree("$projectDir/src/jvmMain/cpp/common"),
+            fileTree("$projectDir/src/jvmMain/cpp/$target")
+        )
     val jdkHome = System.getenv("JAVA_HOME")
     compilerArgs.addAll(listOf(
         "-I$jdkHome/include",
@@ -144,19 +145,25 @@ tasks.withType(CppCompile::class.java).configureEach {
     }
 }
 
+tasks.withType(ObjectiveCCompile::class.java).configureEach {
+    source.from(
+        fileTree("$projectDir/src/jvmMain/objc")
+    )
+    val jdkHome = System.getenv("JAVA_HOME")
+    compilerArgs.addAll(listOf(
+        "-I$jdkHome/include",
+        "-I$jdkHome/include/darwin"
+    ))
+}
+
 tasks.withType(LinkSharedLibrary::class.java).configureEach {
     when (target) {
         "macos" -> {
             linkerArgs.addAll(
                 listOf(
                     "-dead_strip",
-                    // "-framework", "OpenGL",
-                    // "-framework", "Cocoa",
-                    // "-framework", "Foundation",
-                    // "-framework", "QuartzCore"
                     "-framework", "CoreGraphics",
                     "-framework", "CoreFoundation",
-                    "-framework", "CoreGraphics",
                     "-framework", "CoreServices",
                     "-framework", "CoreText"
                 )

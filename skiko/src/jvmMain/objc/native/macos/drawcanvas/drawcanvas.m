@@ -169,8 +169,8 @@ JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_Components_Window_updateLayer(J
         LayersSet *layer = findByObject(env, window);
         if (layer != NULL) {
             if (layer.caLayer == NULL && layer.glLayer == NULL) {
-                layer.windowRef = NULL;
                 (*env)->DeleteGlobalRef(env, layer.windowRef);
+                layer.windowRef = NULL;
                 [windowsSet removeObject: layer];
                 return;
             }
