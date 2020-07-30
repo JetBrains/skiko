@@ -5,9 +5,13 @@ plugins {
     `cpp-library`
     `maven-publish`
 }
-group = "org.jetbrains.skiko"
-version = "0.1-SNAPSHOT"
 
+val isCIBuild = project.hasProperty("teamcity")
+group = "org.jetbrains.skiko"
+version = when {
+    isCIBuild -> project.property("deploy.ci.version") as String
+    else -> project.property("deploy.version") as String
+}
 
 val skiaDir = System.getenv("SKIA_DIR") ?: "/Users/igotti/compose/skija/third_party/skia"
 val hostOs = System.getProperty("os.name")
@@ -75,9 +79,16 @@ kotlin {
 tasks.withType(CppCompile::class.java).configureEach {
     source.from(
             fileTree("$projectDir/../skija/src/main/cc"),
-            fileTree("$projectDir/src/jvmMain/cpp")
+            fileTree("$projectDir/src/jvmMain/cpp/common"),
+            fileTree("$projectDir/src/jvmMain/cpp/$target")
     )
-    val jdkHome = System.getenv("JAVA_HOME")
+    // Prefer 'java.home' system property to simplify overriding from Intellij.
+    // When used from command-line, it is effectively equal to JAVA_HOME.
+    if (JavaVersion.current() < JavaVersion.VERSION_11) {
+        error("JDK 11+ is required, but Gradle JVM is ${JavaVersion.current()}. " +
+                "Check JAVA_HOME (CLI) or Gradle settings (Intellij).")
+    }
+    val jdkHome = System.getProperty("java.home") ?: error("'java.home' is null")
     compilerArgs.addAll(listOf(
         "-I$jdkHome/include",
         "-I$skiaDir",
@@ -189,33 +200,98 @@ library {
         })
     }
 }
-val skikoJarFile = "$buildDir/skiko-$target.jar"
-project.tasks.register<Jar>("skikoJar") {
-    archiveBaseName.set("skiko-$target")
-    archiveFileName.set(skikoJarFile)
+
+val skikoJvmJar: Provider<Jar> by tasks.registering(Jar::class) {
+    archiveBaseName.set("skiko-jvm")
     from(kotlin.jvm().compilations["main"].output.allOutputs)
-    from(project.tasks.named("linkRelease${target.capitalize()}").get().outputs.files.filter { it.isFile })
 }
 
-val skikoArtifact = artifacts.add("archives", file(skikoJarFile)) {
-    type = "jar"
-    group = "skiko"
-    builtBy("skikoJar")
+val skikoJvmRuntimeJar by project.tasks.registering(Jar::class) {
+    archiveBaseName.set("skiko-$target")
+    from(skikoJvmJar.map { zipTree(it.archiveFile) })
+    from(project.tasks.named("linkRelease${target.capitalize()}").map { it.outputs.files.filter { it.isFile }})
 }
 
 project.tasks.register<JavaExec>("run") {
-    dependsOn("skikoJar")
     main = "org.jetbrains.skiko.MainKt"
-    classpath = files(skikoJarFile)
+    classpath = files(skikoJvmRuntimeJar.map { it.archiveFile })
 }
 
 
+
+// disable unexpected native publications (default C++ publications are failing)
+tasks.withType<AbstractPublishToMaven>().configureEach {
+    doFirst {
+        if (!publication.name.startsWith("skiko")) {
+            throw StopExecutionException("Publication '${publication.name}' is disabled")
+        }
+    }
+}
+
+fun Publication.isSkikoPublication() =
+    (this as? MavenPublication)?.name?.startsWith("skiko") == true
+
+fun Task.disable() {
+    enabled = false
+    group = "Disabled tasks"
+}
+
+afterEvaluate {
+    tasks.configureEach {
+        if (group == "publishing") {
+            // There are many intermediate tasks in 'publishing' group.
+            // There are a lot of them and they have verbose names.
+            // To decrease noise in './gradlew tasks' output and Intellij Gradle tool window,
+            // group verbose tasks in a separate group 'other publishing'.
+            val allRepositories = publishing.repositories.map { it.name } + "MavenLocal"
+            val publishToTasks = allRepositories.map { "publishTo$it" }
+            if (name != "publish" && name !in publishToTasks) {
+                group = "other publishing"
+            }
+        }
+    }
+
+    // Disable publishing Gradle Metadata, because it seems unnecessary at the moment.
+    // Also generating metadata for default C++ publications fails
+    tasks.withType(GenerateModuleMetadata::class).configureEach {
+        disable()
+    }
+
+    // Disable publishing for default publications, because
+    // publishing for default C++ publications fails
+    tasks.withType<AbstractPublishToMaven>().configureEach {
+        if (!publication.isSkikoPublication()) {
+            disable()
+        }
+    }
+}
+
 publishing {
+    repositories {
+        configureEach {
+            val repoName = name
+            tasks.register("publishTo${repoName}") {
+                group = "publishing"
+                dependsOn(tasks.named("publishAllPublicationsTo${repoName}Repository"))
+            }
+        }
+        maven {
+            name = "BuildRepo"
+            url = uri("${rootProject.buildDir}/repo")
+        }
+        maven {
+            name = "Space"
+            url = uri("https://packages.jetbrains.team/maven/p/ui/dev")
+            credentials {
+                username = System.getenv("SKIKO_SPACE_USERNAME")
+                password = System.getenv("SKIKO_SPACE_KEY")
+            }
+        }
+    }
     publications {
-        create<MavenPublication>("skiko") {
+        configureEach {
+            this as MavenPublication
             groupId = "org.jetbrains.skiko"
-            artifactId = "skiko-$target"
-            artifact(skikoArtifact)
             pom {
                 name.set("Skiko")
                 description.set("Kotlin Skia bindings")
@@ -226,6 +302,18 @@ publishing {
                         url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
                     }
                 }
+            }
+        }
+        create<MavenPublication>("skikoJvm") {
+            artifactId = "skiko-jvm"
+            afterEvaluate {
+                artifact(skikoJvmJar.map { it.archiveFile.get() })
+            }
+        }
+        create<MavenPublication>("skikoJvmRuntime") {
+            artifactId = "skiko-jvm-runtime-$target"
+            afterEvaluate {
+                artifact(skikoJvmRuntimeJar.map { it.archiveFile.get() })
             }
         }
     }
