@@ -2,12 +2,15 @@
 
 if [ ! -d ./skija ]; then
  git clone https://github.com/JetBrains/skija.git
+  pushd ./skija
 else
- pushd ./skija && git pull && popd
+ pushd ./skija && git pull
 fi
+git checkout 82b8c697643ae8f2d6a315c27bd47601533b0397
+popd
 
 SEP=:
-if [ `uname` == "Msys" ]; then
+if [ ! -z `uname | grep MINGW` ]; then
   SEP=\;
 fi
 
