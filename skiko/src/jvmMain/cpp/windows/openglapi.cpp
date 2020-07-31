@@ -3,7 +3,7 @@
 
 #include "stdafx.h"
 #include "openglapi.h"
-#include <gl\GL.h>
+#include <gl/GL.h>
 
 JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_DriverApi_OpenGLApi_glViewport(JNIEnv * env, jobject object, jint x, jint y, jint w, jint h) {
 	glViewport(x, y, w, h);
