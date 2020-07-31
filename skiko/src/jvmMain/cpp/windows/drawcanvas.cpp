@@ -1,7 +1,6 @@
 // drawcanvas.cpp : Defines the exported functions for the DLL application.
 
 #include "stdafx.h"
-#include <Windows.h>
 #include <Wingdi.h>
 #include <Shellscalingapi.h>
 #include "drawcanvas.h"
@@ -106,6 +105,7 @@ float getScaleFloatFromEnum(DEVICE_SCALE_FACTOR scaleFactor) {
     	case DEVICE_SCALE_FACTOR_INVALID:
     		return 1.0f;
     }
+	return 1.0f;
 }
 
 JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_Components_Window_updateLayer(JNIEnv *env, jobject window)
