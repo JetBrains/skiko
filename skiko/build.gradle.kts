@@ -21,6 +21,7 @@ val target = when {
     hostOs.startsWith("Win") -> "windows"
     else -> throw Error("Unknown os $hostOs")
 }
+val jdkHome = System.getProperty("java.home") ?: error("'java.home' is null")
 
 repositories {
     mavenCentral()
@@ -88,7 +89,6 @@ tasks.withType(CppCompile::class.java).configureEach {
         error("JDK 11+ is required, but Gradle JVM is ${JavaVersion.current()}. " +
                 "Check JAVA_HOME (CLI) or Gradle settings (Intellij).")
     }
-    val jdkHome = System.getProperty("java.home") ?: error("'java.home' is null")
     compilerArgs.addAll(listOf(
         "-I$jdkHome/include",
         "-I$skiaDir",
@@ -171,6 +171,9 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
         "linux" -> {
             linkerArgs.addAll(
                 listOf(
+                    "-L$jdkHome/lib",
+                    "-ljawt",
+                    "-lGL",
                     "-lfontconfig"
                 )
             )
