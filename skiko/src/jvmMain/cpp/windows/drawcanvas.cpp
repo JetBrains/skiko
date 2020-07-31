@@ -1,13 +1,13 @@
 // drawcanvas.cpp : Defines the exported functions for the DLL application.
 
 #include "stdafx.h"
-#include <Wingdi.h>
-#include <Shellscalingapi.h>
 #include "drawcanvas.h"
-#include <jawt_md.h>
 #include <gl/GL.h>
+#include <jawt_md.h>
+#include <set>
+#include <Shellscalingapi.h>
 #include <stdio.h>
-#include<set>
+#include <Wingdi.h>
 
 using namespace std;
 
