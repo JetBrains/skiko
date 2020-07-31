@@ -3,6 +3,7 @@ import kotlin.text.capitalize
 plugins {
     kotlin("multiplatform") version "1.4-M3"
     `cpp-library`
+    `objective-c`
     `maven-publish`
 }
 
@@ -83,6 +84,7 @@ tasks.withType(CppCompile::class.java).configureEach {
             fileTree("$projectDir/src/jvmMain/cpp/common"),
             fileTree("$projectDir/src/jvmMain/cpp/$target")
     )
+
     // Prefer 'java.home' system property to simplify overriding from Intellij.
     // When used from command-line, it is effectively equal to JAVA_HOME.
     if (JavaVersion.current() < JavaVersion.VERSION_11) {
@@ -155,9 +157,38 @@ tasks.withType(CppCompile::class.java).configureEach {
     }
 }
 
+/*
+project.tasks.register<ObjectiveCCompile>("objcCompile") {
+    source.from(fileTree("$projectDir/src/jvmMain/objectiveC"))
+    compilerArgs.addAll(listOf(
+            "-I$jdkHome/include",
+            "-I$jdkHome/darwin"
+    ))
+    toolChain.set(object : Clang {
+        override fun getPath(): MutableList<File> {
+            return mutableListOf(file("/usr/bin"))
+        }
+    })
+    doFirst {
+        println("Exec!")
+    }
+}
+
+project.tasks.register<Exec>("objcCompile") {
+    commandLine = listOf("clang",
+            "-c",
+            "$projectDir/src/jvmMain/objectiveC/macos/drawcanvas.m",
+            "$projectDir/src/jvmMain/objectiveC/macos/openglapi.m",
+            "-o",
+            "$buildDir/objc/"
+    )
+}*/
+
+// See https://docs.gradle.org/current/userguide/cpp_library_plugin.html.
 tasks.withType(LinkSharedLibrary::class.java).configureEach {
     when (target) {
         "macos" -> {
+            // dependsOn(tasks.withType(ObjectiveCCompile::class.java))
             linkerArgs.addAll(
                 listOf(
                     "-dead_strip",
@@ -219,8 +250,6 @@ project.tasks.register<JavaExec>("run") {
     main = "org.jetbrains.skiko.MainKt"
     classpath = files(skikoJvmRuntimeJar.map { it.archiveFile })
 }
-
-
 
 // disable unexpected native publications (default C++ publications are failing)
 tasks.withType<AbstractPublishToMaven>().configureEach {
