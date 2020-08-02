@@ -3,7 +3,6 @@ import kotlin.text.capitalize
 plugins {
     kotlin("multiplatform") version "1.4-M3"
     `cpp-library`
-    `objective-c`
     `maven-publish`
 }
 
@@ -79,12 +78,6 @@ kotlin {
 
 // See https://docs.gradle.org/current/userguide/cpp_library_plugin.html.
 tasks.withType(CppCompile::class.java).configureEach {
-    source.from(
-            fileTree("$projectDir/../skija/src/main/cc"),
-            fileTree("$projectDir/src/jvmMain/cpp/common"),
-            fileTree("$projectDir/src/jvmMain/cpp/$target")
-    )
-
     // Prefer 'java.home' system property to simplify overriding from Intellij.
     // When used from command-line, it is effectively equal to JAVA_HOME.
     if (JavaVersion.current() < JavaVersion.VERSION_11) {
@@ -157,45 +150,44 @@ tasks.withType(CppCompile::class.java).configureEach {
     }
 }
 
-/*
-project.tasks.register<ObjectiveCCompile>("objcCompile") {
-    source.from(fileTree("$projectDir/src/jvmMain/objectiveC"))
-    compilerArgs.addAll(listOf(
-            "-I$jdkHome/include",
-            "-I$jdkHome/darwin"
-    ))
-    toolChain.set(object : Clang {
-        override fun getPath(): MutableList<File> {
-            return mutableListOf(file("/usr/bin"))
-        }
-    })
-    doFirst {
-        println("Exec!")
-    }
-}
-
+// Very hacky way to compile Objective-C sources and add the
+// resulting object files into the final library.
 project.tasks.register<Exec>("objcCompile") {
-    commandLine = listOf("clang",
+    val inputDir = "$projectDir/src/jvmMain/objectiveC/$target"
+    val outDir = "$buildDir/objc/$target"
+    val objcSrc = "drawcanvas"
+    commandLine = listOf(
+            "clang",
+            "-I$jdkHome/include",
+            "-I$jdkHome/include/darwin",
             "-c",
-            "$projectDir/src/jvmMain/objectiveC/macos/drawcanvas.m",
-            "$projectDir/src/jvmMain/objectiveC/macos/openglapi.m",
+            "$inputDir/$objcSrc.m",
             "-o",
-            "$buildDir/objc/"
+            "$outDir/$objcSrc.o"
     )
-}*/
+    file(outDir).mkdirs()
+    inputs.files("$inputDir/$objcSrc.m")
+    outputs.files("$outDir/$objcSrc.o")
+}
 
 // See https://docs.gradle.org/current/userguide/cpp_library_plugin.html.
 tasks.withType(LinkSharedLibrary::class.java).configureEach {
     when (target) {
         "macos" -> {
-            // dependsOn(tasks.withType(ObjectiveCCompile::class.java))
+            dependsOn(project.tasks.named("objcCompile"))
             linkerArgs.addAll(
                 listOf(
                     "-dead_strip",
+                    "-framework", "AppKit",
                     "-framework", "CoreFoundation",
                     "-framework", "CoreGraphics",
                     "-framework", "CoreServices",
-                    "-framework", "CoreText"
+                    "-framework", "CoreText",
+                    "-framework", "Foundation",
+                    "-framework", "OpenGL",
+                    "-framework", "QuartzCore", // for CoreAnimation
+                    "-L$jdkHome/lib",
+                    "-ljawt"
                 )
             )
         }
@@ -220,6 +212,15 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
     }
 }
 
+extensions.configure<CppLibrary> {
+    source.from(
+            fileTree("$projectDir/../skija/src/main/cc"),
+            fileTree("$projectDir/src/jvmMain/cpp/common"),
+            fileTree("$projectDir/src/jvmMain/cpp/$target"),
+            fileTree("$projectDir/src/jvmMain/objectiveC/$target")
+    )
+}
+
 library {
     linkage.addAll(listOf(Linkage.SHARED))
     targetMachines.addAll(listOf(machines.macOS.x86_64, machines.linux.x86_64, machines.windows.x86_64))
@@ -231,6 +232,9 @@ library {
                 include("**.lib")
             else
                 include("**.a")
+        })
+        implementation(fileTree("$buildDir/objc/$target").matching {
+            include("**.o")
         })
     }
 }
