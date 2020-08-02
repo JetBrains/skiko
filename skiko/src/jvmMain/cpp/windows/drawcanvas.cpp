@@ -47,7 +47,7 @@ private:
 			jmethodID drawMethod = env->GetMethodID(wndClass, "draw", "()V");
 			if (NULL == drawMethod) {
 				fprintf(stderr, "The method Window.draw() not found!\n");
-					return;
+				return;
 			}
 			env->CallVoidMethod(windowRef, drawMethod);
 		}
@@ -69,7 +69,7 @@ LayersSet *findByObject(JNIEnv *env, jobject object) {
 }
 
 float getScaleFloatFromEnum(DEVICE_SCALE_FACTOR scaleFactor) {
-	switch (scaleFactor) {
+    switch (scaleFactor) {
     	case SCALE_100_PERCENT:
     		return 1.0f;
     	case SCALE_120_PERCENT:
@@ -108,6 +108,8 @@ float getScaleFloatFromEnum(DEVICE_SCALE_FACTOR scaleFactor) {
 	return 1.0f;
 }
 
+extern "C" jboolean Skiko_GetAWT(JNIEnv* env, JAWT* awt);
+
 JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_Components_Window_updateLayer(JNIEnv *env, jobject window)
 {
 	if (windowsSet != NULL) {
@@ -136,7 +138,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_Components_Window_updateLayer(J
 	JAWT_Win32DrawingSurfaceInfo* dsi_win;
 
 	awt.version = (jint)JAWT_VERSION_9;
-	result = JAWT_GetAWT(env, &awt);
+	result = Skiko_GetAWT(env, &awt);
 
 	if (result == JNI_FALSE) {
 		fprintf(stderr, "JAWT_GetAWT failed! Result is JNI_FALSE\n");
