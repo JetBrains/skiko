@@ -82,6 +82,8 @@ LayersSet *findByObject(JNIEnv *env, jobject object)
 	return NULL;
 }
 
+extern "C" jboolean Skiko_GetAWT(JNIEnv* env, JAWT* awt);
+
 JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_Components_Window_updateLayer(JNIEnv *env, jobject window)
 {
 	if (windowsSet != NULL)
@@ -113,7 +115,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_Components_Window_updateLayer(J
 	JAWT_X11DrawingSurfaceInfo *dsi_x11;
 
 	awt.version = (jint)JAWT_VERSION_9;
-	result = JAWT_GetAWT(env, &awt);
+	result = Skiko_GetAWT(env, &awt);
 
 	if (result == JNI_FALSE)
 	{

@@ -185,17 +185,13 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
                     "-framework", "CoreText",
                     "-framework", "Foundation",
                     "-framework", "OpenGL",
-                    "-framework", "QuartzCore", // for CoreAnimation
-                    "-L$jdkHome/lib",
-                    "-ljawt"
+                    "-framework", "QuartzCore" // for CoreAnimation
                 )
             )
         }
         "linux" -> {
             linkerArgs.addAll(
                 listOf(
-                    "-L$jdkHome/lib",
-                    "-ljawt",
                     "-lGL",
                     "-lfontconfig"
                 )
