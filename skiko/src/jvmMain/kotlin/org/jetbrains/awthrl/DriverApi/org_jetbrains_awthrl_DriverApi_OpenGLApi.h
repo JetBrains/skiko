@@ -12,56 +12,60 @@ extern "C" {
  * Method:    glViewport
  * Signature: (IIII)V
  */
-JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_DriverApi_OpenGLApi_glViewport
-  (JNIEnv *, jobject, jint, jint, jint, jint);
+JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_DriverApi_OpenGLApi_glViewport(
+    JNIEnv *, jobject, jint, jint, jint, jint);
 
 /*
  * Class:     org_jetbrains_awthrl_DriverApi_OpenGLApi
  * Method:    glClearColor
  * Signature: (FFFF)V
  */
-JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_DriverApi_OpenGLApi_glClearColor
-  (JNIEnv *, jobject, jfloat, jfloat, jfloat, jfloat);
+JNIEXPORT void JNICALL
+Java_org_jetbrains_awthrl_DriverApi_OpenGLApi_glClearColor(JNIEnv *, jobject,
+                                                           jfloat, jfloat,
+                                                           jfloat, jfloat);
 
 /*
  * Class:     org_jetbrains_awthrl_DriverApi_OpenGLApi
  * Method:    glClear
  * Signature: (I)V
  */
-JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_DriverApi_OpenGLApi_glClear
-  (JNIEnv *, jobject, jint);
+JNIEXPORT void JNICALL
+Java_org_jetbrains_awthrl_DriverApi_OpenGLApi_glClear(JNIEnv *, jobject, jint);
 
 /*
  * Class:     org_jetbrains_awthrl_DriverApi_OpenGLApi
  * Method:    glFinish
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_DriverApi_OpenGLApi_glFinish
-  (JNIEnv *, jobject);
+JNIEXPORT void JNICALL
+Java_org_jetbrains_awthrl_DriverApi_OpenGLApi_glFinish(JNIEnv *, jobject);
 
 /*
  * Class:     org_jetbrains_awthrl_DriverApi_OpenGLApi
  * Method:    glEnable
  * Signature: (I)V
  */
-JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_DriverApi_OpenGLApi_glEnable
-  (JNIEnv *, jobject, jint);
+JNIEXPORT void JNICALL
+Java_org_jetbrains_awthrl_DriverApi_OpenGLApi_glEnable(JNIEnv *, jobject, jint);
 
 /*
  * Class:     org_jetbrains_awthrl_DriverApi_OpenGLApi
  * Method:    glBindTexture
  * Signature: (II)V
  */
-JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_DriverApi_OpenGLApi_glBindTexture
-  (JNIEnv *, jobject, jint, jint);
+JNIEXPORT void JNICALL
+Java_org_jetbrains_awthrl_DriverApi_OpenGLApi_glBindTexture(JNIEnv *, jobject,
+                                                            jint, jint);
 
 /*
  * Class:     org_jetbrains_awthrl_DriverApi_OpenGLApi
  * Method:    glGetIntegerv
  * Signature: (I)I
  */
-JNIEXPORT jint JNICALL Java_org_jetbrains_awthrl_DriverApi_OpenGLApi_glGetIntegerv
-  (JNIEnv *, jobject, jint);
+JNIEXPORT jint JNICALL
+Java_org_jetbrains_awthrl_DriverApi_OpenGLApi_glGetIntegerv(JNIEnv *, jobject,
+                                                            jint);
 
 #ifdef __cplusplus
 }
