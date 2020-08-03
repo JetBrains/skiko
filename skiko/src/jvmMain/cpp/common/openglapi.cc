@@ -2,7 +2,7 @@
 #include <SDKDDKVer.h>
 #include <windows.h>
 #endif
-#include <gl/GL.h>
+#include <GL/gl.h>
 #include <jni.h>
 
 extern "C" {
