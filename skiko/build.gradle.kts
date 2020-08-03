@@ -200,8 +200,10 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
         "windows" -> {
             linkerArgs.addAll(
                 listOf(
-                    "user32.lib",
-                    "opengl32.lib"
+                    "gdi32.lib",
+                    "opengl32.lib",
+                    "shcore.lib",
+                    "user32.lib"
                 )
             )
         }
