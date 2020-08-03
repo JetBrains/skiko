@@ -1,0 +1,32 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.4-M3'
+    id 'application'
+}
+
+repositories {
+    mavenLocal()
+    jcenter()
+    maven {
+       url 'https://dl.bintray.com/kotlin/kotlin-eap'
+    }
+}
+
+def os = System.getProperty("os.name")
+def target = "linux"
+if (os == "Mac OS X") {
+   target = "macos"
+} else if (os.startsWith("Win")) {
+    target = "windows"
+}
+
+dependencies {
+    implementation platform('org.jetbrains.kotlin:kotlin-bom')
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+    implementation "org.jetbrains.skiko:skiko-jvm-runtime-$target:0.1-SNAPSHOT"
+    testImplementation 'org.jetbrains.kotlin:kotlin-test'
+    testImplementation 'org.jetbrains.kotlin:kotlin-test-junit'
+}
+
+application {
+    mainClassName = 'SkijaInjectSample.AppKt'
+}
