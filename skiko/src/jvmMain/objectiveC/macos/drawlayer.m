@@ -191,7 +191,8 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv
 
         layersSet.glLayer = [AWTGLLayer new];
         [layersSet.caLayer addSublayer: layersSet.glLayer];
-        layersSet.glLayer.backgroundColor = CGColorCreateSRGB(1.0f, 1.0f, 1.0f, 1.0f);
+        CGFloat white[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+        layersSet.glLayer.backgroundColor = CGColorCreate(CGColorSpaceCreateDeviceRGB(), white);
         layersSet.glLayer.contentsScale = scaleFactor;
         
         jobject windowRef = (*env)->NewGlobalRef(env, window);
