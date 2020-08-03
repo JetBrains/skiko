@@ -1,7 +1,7 @@
 // drawcanvas.cpp : Defines the exported functions for the DLL application.
 
 #include "stdafx.h"
-#include "drawcanvas.h"
+//#include "drawlayer.h"
 #include <gl/GL.h>
 #include <jawt_md.h>
 #include <set>
@@ -12,6 +12,7 @@
 using namespace std;
 
 JavaVM *jvm = NULL;
+extern "C" jboolean Skiko_GetAWT(JNIEnv *env, JAWT *awt);
 
 class LayersSet {
 public:
