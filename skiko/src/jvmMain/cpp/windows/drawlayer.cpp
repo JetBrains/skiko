@@ -108,7 +108,7 @@ float getScaleFloatFromEnum(DEVICE_SCALE_FACTOR scaleFactor) {
 	return 1.0f;
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_Components_Window_updateLayer(JNIEnv *env, jobject window)
+JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_Components_HardwareLayer_updateLayer(JNIEnv *env, jobject window)
 {
 	if (windowsSet != NULL) {
 		LayersSet *layer = findByObject(env, window);
@@ -189,21 +189,21 @@ JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_Components_Window_updateLayer(J
 	awt.FreeDrawingSurface(ds);
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_Components_Window_redrawLayer(JNIEnv *env, jobject window) {
+JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_Components_HardwareLayer_redrawLayer(JNIEnv *env, jobject window) {
 	LayersSet *layer = findByObject(env, window);
 	if (layer != NULL) {
 		layer->update();
 	}
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_Components_Window_disposeLayer(JNIEnv *env, jobject window) {
+JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_Components_HardwareLayer_disposeLayer(JNIEnv *env, jobject window) {
 	LayersSet *layer = findByObject(env, window);
 	if (layer != NULL) {
 		layer->dispose();
 	}
 }
 
-JNIEXPORT jfloat JNICALL Java_org_jetbrains_awthrl_Components_Window_getContentScale(JNIEnv *env, jobject window) {
+JNIEXPORT jfloat JNICALL Java_org_jetbrains_awthrl_Components_HardwareLayer_getContentScale(JNIEnv *env, jobject window) {
 	LayersSet *layer = findByObject(env, window);
 	if (layer != NULL) {
 		// get scale dpi factor of current monitor

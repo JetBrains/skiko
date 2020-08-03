@@ -155,7 +155,7 @@ tasks.withType(CppCompile::class.java).configureEach {
 project.tasks.register<Exec>("objcCompile") {
     val inputDir = "$projectDir/src/jvmMain/objectiveC/$target"
     val outDir = "$buildDir/objc/$target"
-    val objcSrc = "drawcanvas"
+    val objcSrc = "drawlayer"
     commandLine = listOf(
             "clang",
             "-I$jdkHome/include",

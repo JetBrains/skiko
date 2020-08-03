@@ -2,10 +2,10 @@ package org.jetbrains.awthrl.Components
 
 import org.jetbrains.awthrl.DriverApi.Engine
 import java.awt.Graphics
-import javax.swing.JFrame
+import java.awt.Canvas
 
 
-open class Window : JFrame(), Drawable {
+open class HardwareLayer : Canvas(), Drawable {
     override fun paint(g: Graphics) {
         Engine.get().render(this)
     }

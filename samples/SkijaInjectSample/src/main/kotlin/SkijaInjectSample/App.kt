@@ -1,21 +1,20 @@
 package SkijaInjectSample
 
-import org.jetbrains.awthrl.Components.Window
 import org.jetbrains.awthrl.DriverApi.OpenGLApi
 import org.jetbrains.awthrl.DriverApi.Engine
+import org.jetbrains.skiko.SkiaWindow
 
 import java.awt.event.MouseEvent
 import javax.swing.WindowConstants
 import javax.swing.event.MouseInputAdapter
-
 import org.jetbrains.skija.*
+import org.jetbrains.skiko.SkiaRenderer
 import java.awt.event.MouseMotionAdapter
 import kotlin.math.cos
 import kotlin.math.sin
 
 fun main(args: Array<String>) {
     createWindow("First window");
-    // createWindow("Second window");
 }
 
 fun createWindow(title: String) {
@@ -24,33 +23,30 @@ fun createWindow(title: String) {
     var mouseX = 0
     var mouseY = 0
 
-    val window: SkijaWindow = SkijaWindow()
-    window.defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
+    val window = SkiaWindow()
+    window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
 
     val state = State()
     state.text = title
 
-    window.drawer = Drawer {
-        drawer, w, h -> displayScene(drawer, w, h, mouseX, mouseY, state)
+    window.layer.renderer = Renderer {
+        renderer, w, h -> displayScene(renderer, w, h, mouseX, mouseY, state)
     }
 
-    window.addMouseMotionListener(object : MouseMotionAdapter() {
+    window.layer.addMouseMotionListener(object : MouseMotionAdapter() {
         override fun mouseMoved(event: MouseEvent) {
             mouseX = event.x
             mouseY = event.y
-            engine.render(window)
+            engine.render(window.layer)
         }
     })
 
-    window.setLayout(null);
     window.setVisible(true);
     // MANDATORY: set window size after calling setVisible(true)
     window.setSize(800, 600);
-
-    engine.render(window)
 }
 
-class Drawer(val displayScene: (Drawer, Int, Int) -> Unit): SkiaRenderer {
+class Renderer(val displayScene: (Renderer, Int, Int) -> Unit): SkiaRenderer {
     val typeface = Typeface.makeFromFile("fonts/JetBrainsMono-Regular.ttf")
     val font = Font(typeface, 40f)
     val paint = Paint().apply {
@@ -81,7 +77,7 @@ class State {
     var text: String = "Hello Skija"
 }
 
-fun displayScene(renderer: Drawer, width: Int, height: Int, xpos: Int, ypos: Int, state: State) {
+fun displayScene(renderer: Renderer, width: Int, height: Int, xpos: Int, ypos: Int, state: State) {
     val canvas = renderer.canvas!!
     val watchFill = Paint().setColor(0xFFFFFFFF.toInt())
     val watchStroke = Paint().setColor(0xFF000000.toInt()).setMode(PaintMode.STROKE).setStrokeWidth(1f).setAntiAlias(false)

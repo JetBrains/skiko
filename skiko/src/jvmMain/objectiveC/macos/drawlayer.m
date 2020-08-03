@@ -26,7 +26,6 @@ JavaVM *jvm;
 
     if (self)
     {
-        // self.autoresizingMask = kCALayerWidthSizable | kCALayerHeightSizable;
         self.needsDisplayOnBoundsChange = YES;
         self.asynchronous = NO;
         self.windowRef = NULL;
@@ -133,7 +132,7 @@ LayersSet * findByObject(JNIEnv *env, jobject object) {
 
 extern jboolean Skiko_GetAWT(JNIEnv* env, JAWT* awt);
 
-JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_Components_Window_updateLayer(JNIEnv *env, jobject window)
+JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_Components_HardwareLayer_updateLayer(JNIEnv *env, jobject window)
 {
     if (windowsSet != nil) {
         LayersSet *layer = findByObject(env, window);
@@ -209,21 +208,21 @@ JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_Components_Window_updateLayer(J
     }
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_Components_Window_redrawLayer(JNIEnv *env, jobject window) {
+JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_Components_HardwareLayer_redrawLayer(JNIEnv *env, jobject window) {
     LayersSet *layer = findByObject(env, window);
     if (layer != NULL) {
         [layer update];
     }
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_Components_Window_disposeLayer(JNIEnv *env, jobject window) {
+JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_Components_HardwareLayer_disposeLayer(JNIEnv *env, jobject window) {
     LayersSet *layer = findByObject(env, window);
     if (layer != NULL) {
         [layer dispose];
     }
 }
 
-JNIEXPORT jfloat JNICALL Java_org_jetbrains_awthrl_Components_Window_getContentScale(JNIEnv *env, jobject window) {
+JNIEXPORT jfloat JNICALL Java_org_jetbrains_awthrl_Components_HardwareLayer_getContentScale(JNIEnv *env, jobject window) {
     LayersSet *layer = findByObject(env, window);
     if (layer != NULL) {
         return [layer.glLayer contentsScale];
