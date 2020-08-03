@@ -1,4 +1,4 @@
-package org.jetbrains.awthrl.Components
+package org.jetbrains.skiko
 
 interface Drawable {
     fun redrawLayer()

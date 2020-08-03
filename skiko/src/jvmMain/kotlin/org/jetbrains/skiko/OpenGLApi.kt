@@ -1,4 +1,4 @@
-package org.jetbrains.awthrl.DriverApi
+package org.jetbrains.skiko
 
 /**
  * The minimum required OpenGL constants and functions for Skia to work.

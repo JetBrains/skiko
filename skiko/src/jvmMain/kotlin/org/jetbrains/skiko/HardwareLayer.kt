@@ -1,7 +1,5 @@
-package org.jetbrains.awthrl.Components
+package org.jetbrains.skiko
 
-import org.jetbrains.awthrl.DriverApi.Engine
-import org.jetbrains.skiko.Library
 import java.awt.Graphics
 import java.awt.Canvas
 

@@ -1,7 +1,7 @@
 package SkijaInjectSample
 
-import org.jetbrains.awthrl.DriverApi.OpenGLApi
-import org.jetbrains.awthrl.DriverApi.Engine
+import org.jetbrains.skiko.OpenGLApi
+import org.jetbrains.skiko.Engine
 import org.jetbrains.skiko.SkiaWindow
 
 import java.awt.event.MouseEvent

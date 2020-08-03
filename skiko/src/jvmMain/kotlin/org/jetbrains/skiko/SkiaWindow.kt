@@ -3,9 +3,6 @@ package org.jetbrains.skiko
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import javax.swing.JFrame
-import org.jetbrains.awthrl.Components.HardwareLayer
-import org.jetbrains.awthrl.DriverApi.Engine
-import org.jetbrains.awthrl.DriverApi.OpenGLApi
 import org.jetbrains.skija.BackendRenderTarget
 import org.jetbrains.skija.Canvas
 import org.jetbrains.skija.ColorSpace

@@ -1,4 +1,4 @@
-package org.jetbrains.awthrl.Common
+package org.jetbrains.skiko
 
 enum class OSType {
     MAC_OS, LINUX, WINDOWS, UNKNOWN;

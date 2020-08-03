@@ -132,7 +132,7 @@ LayersSet * findByObject(JNIEnv *env, jobject object) {
 
 extern jboolean Skiko_GetAWT(JNIEnv* env, JAWT* awt);
 
-JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_Components_HardwareLayer_updateLayer(JNIEnv *env, jobject window)
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv *env, jobject window)
 {
     if (windowsSet != nil) {
         LayersSet *layer = findByObject(env, window);
@@ -215,48 +215,17 @@ JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_Components_HardwareLayer_redraw
     }
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_Components_HardwareLayer_disposeLayer(JNIEnv *env, jobject window) {
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_disposeLayer(JNIEnv *env, jobject window) {
     LayersSet *layer = findByObject(env, window);
     if (layer != NULL) {
         [layer dispose];
     }
 }
 
-JNIEXPORT jfloat JNICALL Java_org_jetbrains_awthrl_Components_HardwareLayer_getContentScale(JNIEnv *env, jobject window) {
+JNIEXPORT jfloat JNICALL Java_org_jetbrains_skiko_HardwareLayer_getContentScale(JNIEnv *env, jobject window) {
     LayersSet *layer = findByObject(env, window);
     if (layer != NULL) {
         return [layer.glLayer contentsScale];
     }
     return 1.0f;
-}
-
-//// Open GL API starts here.
-JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_DriverApi_OpenGLApi_glViewport(JNIEnv * env, jobject object, jint x, jint y, jint w, jint h) {
-    glViewport(x, y, w, h);
-}
-
-JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_DriverApi_OpenGLApi_glClearColor(JNIEnv * env, jobject object, jfloat r, jfloat g, jfloat b, jfloat a) {
-    glClearColor(r, g, b, a);
-}
-
-JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_DriverApi_OpenGLApi_glClear(JNIEnv * env, jobject object, jint mask) {
-    glClear(mask);
-}
-
-JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_DriverApi_OpenGLApi_glFinish(JNIEnv * env, jobject object) {
-    glFinish();
-}
-
-JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_DriverApi_OpenGLApi_glEnable(JNIEnv * env, jobject object, jint cap) {
-    glEnable(cap);
-}
-
-JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_DriverApi_OpenGLApi_glBindTexture(JNIEnv * env, jobject object, jint target, jint texture) {
-    glBindTexture(target, texture);
-}
-
-JNIEXPORT jint JNICALL Java_org_jetbrains_awthrl_DriverApi_OpenGLApi_glGetIntegerv(JNIEnv * env, jobject object, jint pname) {
-    GLint data;
-    glGetIntegerv(pname, &data);
-    return (jint)data;
 }

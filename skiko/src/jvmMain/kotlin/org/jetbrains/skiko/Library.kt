@@ -28,7 +28,7 @@ object Library {
                 }
             }
         }
-        println("Loading $url from ${libFile.absolutePath}")
+        //println("Loading $url from ${libFile.absolutePath}")
         System.load(libFile.absolutePath)
         loaded = true
     }

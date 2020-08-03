@@ -111,7 +111,9 @@ LayersSet *findByObject(JNIEnv *env, jobject object)
     return NULL;
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_Components_HardwareLayer_updateLayer(JNIEnv *env, jobject canvas)
+extern "C" {
+
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv *env, jobject canvas)
 {
     if (windowsSet != NULL)
     {
@@ -181,7 +183,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_Components_HardwareLayer_update
     awt.FreeDrawingSurface(ds);
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_Components_HardwareLayer_redrawLayer(JNIEnv *env, jobject canvas)
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_redrawLayer(JNIEnv *env, jobject canvas)
 {
     LayersSet *layer = findByObject(env, canvas);
     if (layer != NULL)
@@ -190,7 +192,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_Components_HardwareLayer_redraw
     }
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_Components_HardwareLayer_disposeLayer(JNIEnv *env, jobject canvas)
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_disposeLayer(JNIEnv *env, jobject canvas)
 {
     LayersSet *layer = findByObject(env, canvas);
     if (layer != NULL)
@@ -199,7 +201,9 @@ JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_Components_HardwareLayer_dispos
     }
 }
 
-JNIEXPORT jfloat JNICALL Java_org_jetbrains_awthrl_Components_HardwareLayer_getContentScale(JNIEnv *env, jobject canvas)
+JNIEXPORT jfloat JNICALL Java_org_jetbrains_skiko_HardwareLayer_getContentScale(JNIEnv *env, jobject canvas)
 {
     return 1.0f;
 }
+
+} // extern "C"
