@@ -16,19 +16,19 @@ object Library {
 
         val libFileName = "$libPrefix$name$libExtension"
         val url = Library::class.java.getResource(resourcePath + libFileName)
-        // println("Loading " + url);
         val libFile = when {
             url == null -> error("Library $libFileName is not found in $resourcePath")
             url.protocol == "file" -> File(url.toURI())
             else -> url.openStream().use { input ->
                 val tempRoot = File(System.getProperty("java.io.tmpdir"))
-                val tempDir = tempRoot.resolve("skija_" + System.nanoTime()).apply { mkdirs() }
+                val tempDir = tempRoot.resolve("skiko_" + System.nanoTime()).apply { mkdirs() }
                 File(tempDir, libFileName).also {
                     it.deleteOnExit()
                     Files.copy(input, it.toPath(), StandardCopyOption.REPLACE_EXISTING)
                 }
             }
         }
+        println("Loading $url from ${libFile.absolutePath}")
         System.load(libFile.absolutePath)
         loaded = true
     }

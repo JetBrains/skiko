@@ -2,6 +2,7 @@ package org.jetbrains.awthrl.DriverApi
 
 import org.jetbrains.awthrl.Components.Drawable
 import org.jetbrains.awthrl.Common.OSType
+import org.jetbrains.skiko.Library
 
 class Engine private constructor() {
     private var api = GraphicsApi.UNKNOWN

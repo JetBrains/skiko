@@ -1,7 +1,9 @@
 // drawcanvas.cpp : Defines the exported functions for the DLL application.
 
-#include "stdafx.h"
-//#include "drawlayer.h"
+#include <SDKDDKVer.h>
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+
 #include <gl/GL.h>
 #include <jawt_md.h>
 #include <set>

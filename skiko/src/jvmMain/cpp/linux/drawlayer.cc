@@ -1,5 +1,4 @@
 // drawcanvas.cpp : Defines the exported functions for the DLL application.
-#include "drawlayer.h"
 #include <jawt_md.h>
 #include <GL/gl.h>
 #include <GL/glx.h>

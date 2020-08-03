@@ -1,9 +1,10 @@
-// openglapi.cpp : Defines the exported functions for the DLL application.
-//
-
-#include "stdafx.h"
-#include "openglapi.h"
+#if !SK_BUILD_FOR_MAC
+#if SK_BUILD_FOR_WIN
+#include <SDKDDKVer.h>
+#include <windows.h>
+#endif
 #include <gl/GL.h>
+#include <jni.h>
 
 JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_DriverApi_OpenGLApi_glViewport(JNIEnv * env, jobject object, jint x, jint y, jint w, jint h) {
 	glViewport(x, y, w, h);
@@ -34,4 +35,4 @@ JNIEXPORT jint JNICALL Java_org_jetbrains_awthrl_DriverApi_OpenGLApi_glGetIntege
 	glGetIntegerv(pname, &data);
 	return (jint)data;
 }
-
+#endif
