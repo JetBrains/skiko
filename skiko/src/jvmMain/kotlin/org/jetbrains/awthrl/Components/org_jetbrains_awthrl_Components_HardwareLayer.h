@@ -8,9 +8,11 @@
 extern "C" {
 #endif
 #undef org_jetbrains_awthrl_Components_HardwareLayer_FOCUS_TRAVERSABLE_UNKNOWN
-#define org_jetbrains_awthrl_Components_HardwareLayer_FOCUS_TRAVERSABLE_UNKNOWN 0L
+#define org_jetbrains_awthrl_Components_HardwareLayer_FOCUS_TRAVERSABLE_UNKNOWN \
+  0L
 #undef org_jetbrains_awthrl_Components_HardwareLayer_FOCUS_TRAVERSABLE_DEFAULT
-#define org_jetbrains_awthrl_Components_HardwareLayer_FOCUS_TRAVERSABLE_DEFAULT 1L
+#define org_jetbrains_awthrl_Components_HardwareLayer_FOCUS_TRAVERSABLE_DEFAULT \
+  1L
 #undef org_jetbrains_awthrl_Components_HardwareLayer_FOCUS_TRAVERSABLE_SET
 #define org_jetbrains_awthrl_Components_HardwareLayer_FOCUS_TRAVERSABLE_SET 2L
 #undef org_jetbrains_awthrl_Components_HardwareLayer_TOP_ALIGNMENT
@@ -24,40 +26,46 @@ extern "C" {
 #undef org_jetbrains_awthrl_Components_HardwareLayer_RIGHT_ALIGNMENT
 #define org_jetbrains_awthrl_Components_HardwareLayer_RIGHT_ALIGNMENT 1.0f
 #undef org_jetbrains_awthrl_Components_HardwareLayer_serialVersionUID
-#define org_jetbrains_awthrl_Components_HardwareLayer_serialVersionUID -7644114512714619750LL
+#define org_jetbrains_awthrl_Components_HardwareLayer_serialVersionUID         \
+  -7644114512714619750LL
 #undef org_jetbrains_awthrl_Components_HardwareLayer_serialVersionUID
-#define org_jetbrains_awthrl_Components_HardwareLayer_serialVersionUID -2284879212465893870LL
+#define org_jetbrains_awthrl_Components_HardwareLayer_serialVersionUID         \
+  -2284879212465893870LL
 /*
  * Class:     org_jetbrains_awthrl_Components_HardwareLayer
  * Method:    redrawLayer
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_Components_HardwareLayer_redrawLayer
-  (JNIEnv *, jobject);
+JNIEXPORT void JNICALL
+Java_org_jetbrains_awthrl_Components_HardwareLayer_redrawLayer(JNIEnv *,
+                                                               jobject);
 
 /*
  * Class:     org_jetbrains_awthrl_Components_HardwareLayer
  * Method:    updateLayer
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_Components_HardwareLayer_updateLayer
-  (JNIEnv *, jobject);
+JNIEXPORT void JNICALL
+Java_org_jetbrains_awthrl_Components_HardwareLayer_updateLayer(JNIEnv *,
+                                                               jobject);
 
 /*
  * Class:     org_jetbrains_awthrl_Components_HardwareLayer
  * Method:    disposeLayer
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_Components_HardwareLayer_disposeLayer
-  (JNIEnv *, jobject);
+JNIEXPORT void JNICALL
+Java_org_jetbrains_awthrl_Components_HardwareLayer_disposeLayer(JNIEnv *,
+                                                                jobject);
 
 /*
  * Class:     org_jetbrains_awthrl_Components_HardwareLayer
  * Method:    getContentScale
  * Signature: ()V
  */
-JNIEXPORT jfloat JNICALL Java_org_jetbrains_awthrl_Components_HardwareLayer_getContentScale
-  (JNIEnv *, jobject);
+JNIEXPORT jfloat JNICALL
+Java_org_jetbrains_awthrl_Components_HardwareLayer_getContentScale(JNIEnv *,
+                                                                   jobject);
 
 #ifdef __cplusplus
 }
