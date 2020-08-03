@@ -2,7 +2,11 @@
 #include <SDKDDKVer.h>
 #include <windows.h>
 #endif
+#if SK_BUILD_FOR_MAC
+#import <OpenGL/gl3.h>
+#else
 #include <GL/gl.h>
+#endif
 #include <jni.h>
 
 extern "C" {

@@ -208,7 +208,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv
     }
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_awthrl_Components_HardwareLayer_redrawLayer(JNIEnv *env, jobject window) {
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_redrawLayer(JNIEnv *env, jobject window) {
     LayersSet *layer = findByObject(env, window);
     if (layer != NULL) {
         [layer update];
