@@ -22,6 +22,8 @@ val target = when {
     else -> throw Error("Unknown os $hostOs")
 }
 
+val jdkHome = System.getProperty("java.home") ?: error("'java.home' is null")
+
 repositories {
     mavenCentral()
     maven {
@@ -77,10 +79,6 @@ kotlin {
 
 // See https://docs.gradle.org/current/userguide/cpp_library_plugin.html.
 tasks.withType(CppCompile::class.java).configureEach {
-    source.from(
-            fileTree("$projectDir/../skija/src/main/cc"),
-            fileTree("$projectDir/src/jvmMain/cpp")
-    )
     // Prefer 'java.home' system property to simplify overriding from Intellij.
     // When used from command-line, it is effectively equal to JAVA_HOME.
     if (JavaVersion.current() < JavaVersion.VERSION_11) {
@@ -154,22 +152,49 @@ tasks.withType(CppCompile::class.java).configureEach {
     }
 }
 
+// Very hacky way to compile Objective-C sources and add the
+// resulting object files into the final library.
+project.tasks.register<Exec>("objcCompile") {
+    val inputDir = "$projectDir/src/jvmMain/objectiveC/$target"
+    val outDir = "$buildDir/objc/$target"
+    val objcSrc = "drawlayer"
+    commandLine = listOf(
+        "clang",
+        "-I$jdkHome/include",
+        "-I$jdkHome/include/darwin",
+        "-c",
+        "$inputDir/$objcSrc.m",
+        "-o",
+        "$outDir/$objcSrc.o"
+    )
+    file(outDir).mkdirs()
+    inputs.files("$inputDir/$objcSrc.m")
+    outputs.files("$outDir/$objcSrc.o")
+}
+
+
 tasks.withType(LinkSharedLibrary::class.java).configureEach {
     when (target) {
         "macos" -> {
+            dependsOn(project.tasks.named("objcCompile"))
             linkerArgs.addAll(
                 listOf(
                     "-dead_strip",
+                    "-framework", "AppKit",
                     "-framework", "CoreFoundation",
                     "-framework", "CoreGraphics",
                     "-framework", "CoreServices",
-                    "-framework", "CoreText"
+                    "-framework", "CoreText",
+                    "-framework", "Foundation",
+                    "-framework", "OpenGL",
+                    "-framework", "QuartzCore" // for CoreAnimation
                 )
             )
         }
         "linux" -> {
             linkerArgs.addAll(
                 listOf(
+                    "-lGL",
                     "-lfontconfig"
                 )
             )
@@ -177,12 +202,22 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
         "windows" -> {
             linkerArgs.addAll(
                 listOf(
-                    "user32.lib",
-                    "opengl32.lib"
+                    "gdi32.lib",
+                    "opengl32.lib",
+                    "shcore.lib",
+                    "user32.lib"
                 )
             )
         }
     }
+}
+
+extensions.configure<CppLibrary> {
+    source.from(
+        fileTree("$projectDir/../skija/src/main/cc"),
+        fileTree("$projectDir/src/jvmMain/cpp/common"),
+        fileTree("$projectDir/src/jvmMain/cpp/$target")
+    )
 }
 
 library {
@@ -196,6 +231,9 @@ library {
                 include("**.lib")
             else
                 include("**.a")
+        })
+        implementation(fileTree("$buildDir/objc/$target").matching {
+             include("**.o")
         })
     }
 }

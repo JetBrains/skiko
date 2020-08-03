@@ -1,2 +1,7 @@
 skija
+build
+.gradle
+local.properties
+.DS_Store
+run.sh
 .idea
