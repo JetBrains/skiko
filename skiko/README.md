@@ -16,6 +16,8 @@ Set up environment variables `SKIKO_SPACE_USERNAME` and `SKIKO_SPACE_KEY`.
 ./gradlew publishToSpace
 ```
 
+See https://jetbrains.team/p/ui/packages/dev for published packages.
+
 ##### Publish to all repositories
 ```
 ./gradlew publish
