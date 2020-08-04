@@ -1,7 +1,7 @@
 import kotlin.text.capitalize
 
 plugins {
-    kotlin("multiplatform") version "1.4-M3"
+    kotlin("multiplatform") version "1.3.72"
     `cpp-library`
     `maven-publish`
 }
