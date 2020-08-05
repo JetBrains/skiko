@@ -2,10 +2,7 @@
 
 ## Building JVM bindings
 
-   * Download or build Skia for your target platform (see https://bintray.com/beta/#/jetbrains/skija/Skia?tab=files)
-   * Set SKIA_DIR to location of Skia
-   * Set JAVA_HOME to location of JDK, at least version 11
-   * Run `build.sh` at least once to properly set up Skija
-   * If Skija repo is updated - run `build.sh` again
-   * `cd skiko && ./gradlew publishToMavenLocal` will build the artefact and publish it to local Maven repo
-  
+* (Optional) Set SKIA_DIR to location of Skia (binaries can be downloaded 
+[here](https://bintray.com/beta/#/jetbrains/skija/Skia?tab=files))
+* Set JAVA_HOME to location of JDK, at least version 11
+* `cd skiko && ./gradlew publishToMavenLocal` will build the artefact and publish it to local Maven repo
