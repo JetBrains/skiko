@@ -137,6 +137,7 @@ extern jboolean Skiko_GetAWT(JNIEnv* env, JAWT* awt);
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv *env, jobject window)
 {
+    fprintf(stderr, "updateLayer\n");
     if (windowsSet != nil) {
         LayersSet *layer = findByObject(env, window);
         if (layer != NULL) {
@@ -213,6 +214,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv
 }
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_redrawLayer(JNIEnv *env, jobject window) {
+    fprintf(stderr, "redrawLayer\n");
     LayersSet *layer = findByObject(env, window);
     if (layer != NULL) {
         [layer update];
