@@ -24,7 +24,7 @@ fun createWindow(title: String) {
     var mouseY = 0
 
     val window = SkiaWindow()
-    window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+    window.defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
 
     val state = State()
     state.text = title

@@ -32,19 +32,28 @@ interface SkiaRenderer {
 }
 
 open class SkiaLayer : HardwareLayer() {
-
     var renderer: SkiaRenderer? = null
+
     private val skijaState = SkijaState()
-    var init: Boolean = false
+    protected var inited: Boolean = false
+
+    fun reinit() {
+        inited = false
+    }
+
+    override fun disposeLayer() {
+        renderer?.onDispose()
+    }
 
     override fun draw() {
-        if (!init) {
+        if (!inited) {
             if (skijaState.context == null) {
                 skijaState.context = Context.makeGL()
             }
             initSkija()
             renderer?.onInit()
-            init = true
+            inited = true
+            renderer?.onReshape(width, height)
         }
 
         skijaState.apply {
@@ -100,7 +109,7 @@ open class SkiaWindow : JFrame() {
 
         addComponentListener(object : ComponentAdapter() {
             override fun componentResized(e: ComponentEvent) {
-                layer.init = false
+                layer.reinit()
                 layer.setSize(width, height)
                 Engine.get().render(layer)
             }
