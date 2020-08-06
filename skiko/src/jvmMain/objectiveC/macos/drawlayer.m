@@ -46,11 +46,14 @@ JavaVM *jvm;
     CGLSetCurrentContext(ctx);
 
     if (self.jvm != NULL) {
+        // TODO: cache wndClass and drawMethod.
         JNIEnv *env;
         (*self.jvm)->AttachCurrentThread(self.jvm, (void **)&env, NULL);
 
-        jclass wndClass = (*env)->GetObjectClass(env, self.windowRef);
-        jmethodID drawMethod = (*env)->GetMethodID(env, wndClass, "draw", "()V");
+        static jclass wndClass = NULL;
+        if (!wndClass) wndClass = (*env)->GetObjectClass(env, self.windowRef);
+        static jmethodID drawMethod = NULL;
+        if (!drawMethod) drawMethod = (*env)->GetMethodID(env, wndClass, "draw", "()V");
         if (NULL == drawMethod) {
             NSLog(@"The method Window.draw() not found!");
             return;

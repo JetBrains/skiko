@@ -4,25 +4,16 @@ enum class OSType {
     MAC_OS, LINUX, WINDOWS, UNKNOWN;
 
     companion object {
-        private lateinit var currentOSType: OSType
-        fun getCurrent(): OSType {
-                if (!this::currentOSType.isInitialized) {
-                    currentOSType = defineOsType()
-                }
-                return currentOSType
-        }
+        val currentOs = defineOsType()
 
         private fun defineOsType(): OSType {
             val osName = System.getProperty("os.name").toLowerCase()
-            if (isWindows(osName)) {
-                return WINDOWS
+            return when {
+                isWindows(osName) -> WINDOWS
+                isMac(osName) -> MAC_OS
+                isUnix(osName) -> LINUX
+                else -> UNKNOWN
             }
-            if (isMac(osName)) {
-                return MAC_OS
-            }
-            return if (isUnix(osName)) {
-                LINUX
-            } else UNKNOWN
         }
 
         private fun isWindows(name: String): Boolean {

@@ -5,9 +5,12 @@ import java.awt.Canvas
 
 open class HardwareLayer : Canvas(), Drawable {
     override fun paint(g: Graphics) {
-        Engine.get().render(this)
+        display()
     }
-
+    open fun display() {
+        this.updateLayer()
+        this.redrawLayer()
+    }
     open fun draw() {}
     external override fun redrawLayer()
     external override fun updateLayer()

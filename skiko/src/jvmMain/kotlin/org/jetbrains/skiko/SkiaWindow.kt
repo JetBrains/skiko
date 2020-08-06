@@ -57,7 +57,7 @@ open class SkiaLayer : HardwareLayer() {
         }
 
         skijaState.apply {
-            val gl = OpenGLApi.get()
+            val gl = OpenGLApi.instance
             gl.glClearColor(1.0f, 1.0f, 1.0f, 1.0f)
             gl.glClear(gl.GL_COLOR_BUFFER_BIT)
 
@@ -72,7 +72,7 @@ open class SkiaLayer : HardwareLayer() {
     private fun initSkija() {
         val dpi = contentScale
         skijaState.clear()
-        val gl: OpenGLApi = OpenGLApi.get()
+        val gl: OpenGLApi = OpenGLApi.instance
         val fbId = gl.glGetIntegerv(gl.GL_DRAW_FRAMEBUFFER_BINDING)
         skijaState.renderTarget = BackendRenderTarget.makeGL(
             (width * dpi).toInt(),
@@ -111,8 +111,12 @@ open class SkiaWindow : JFrame() {
             override fun componentResized(e: ComponentEvent) {
                 layer.reinit()
                 layer.setSize(width, height)
-                Engine.get().render(layer)
+                display()
             }
         })
     }
+
+    fun display() {
+        layer.display()
+        }
 }

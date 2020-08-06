@@ -22,12 +22,6 @@ class OpenGLApi private constructor() {
     external fun glGetIntegerv(pname: Int): Int
 
     companion object {
-        private lateinit var instance: OpenGLApi
-        fun get(): OpenGLApi {
-            if (!this::instance.isInitialized) {
-                instance = OpenGLApi()
-            }
-            return instance
-        }
+        val instance = OpenGLApi()
     }
 }

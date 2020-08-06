@@ -14,7 +14,7 @@ object Library {
     fun load(resourcePath: String, name: String) {
         if (loaded) return
 
-        val libFileName = "$libPrefix$name$libExtension"
+        val libFileName = System.mapLibraryName(name)
         val url = Library::class.java.getResource(resourcePath + libFileName)
         val libFile = when {
             url == null -> error("Library $libFileName is not found in $resourcePath")
@@ -28,33 +28,7 @@ object Library {
                 }
             }
         }
-        //println("Loading $url from ${libFile.absolutePath}")
         System.load(libFile.absolutePath)
         loaded = true
-    }
-
-    private val libPrefix: String
-        get() = if (currentOS == OS.Windows) "" else "lib"
-
-    private val libExtension: String
-        get() = when (currentOS) {
-            OS.Mac -> ".dylib"
-            OS.Linux -> ".so"
-            OS.Windows -> ".dll"
-        }
-
-    private val currentOS by lazy {
-        val osName = System.getProperty("os.name") ?: error("Unknown OS: 'os.name' is null")
-        val os = osName.toLowerCase(Locale.ROOT)
-        when {
-            os.contains("mac") || os.contains("darwin") -> OS.Mac
-            os.contains("win") -> OS.Windows
-            os.contains("nux") -> OS.Linux
-            else -> error("Unknown OS: $osName")
-        }
-    }
-
-    private enum class OS {
-        Linux, Mac, Windows
     }
 }

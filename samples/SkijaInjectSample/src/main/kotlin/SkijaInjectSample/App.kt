@@ -1,7 +1,5 @@
 package SkijaInjectSample
 
-import org.jetbrains.skiko.OpenGLApi
-import org.jetbrains.skiko.Engine
 import org.jetbrains.skiko.SkiaWindow
 
 import java.awt.event.MouseEvent
@@ -18,7 +16,6 @@ fun main(args: Array<String>) {
 }
 
 fun createWindow(title: String) {
-    val engine: Engine = Engine.get()
 
     var mouseX = 0
     var mouseY = 0
@@ -37,7 +34,7 @@ fun createWindow(title: String) {
         override fun mouseMoved(event: MouseEvent) {
             mouseX = event.x
             mouseY = event.y
-            engine.render(window.layer)
+            window.display()
         }
     })
 
