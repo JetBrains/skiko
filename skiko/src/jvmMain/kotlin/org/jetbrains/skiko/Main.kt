@@ -1,6 +1,5 @@
 package org.jetbrains.skiko
 
-import org.jetbrains.skija.Library
 import org.jetbrains.skija.Surface
 
 fun main() {

@@ -6,7 +6,7 @@ if [ ! -d ./skija ]; then
 else
   pushd ./skija && git pull
 fi
-git checkout 82b8c697643ae8f2d6a315c27bd47601533b0397
+git checkout c3faf18878a0ad3244e4119a69b555b5b77a21d0
 popd
 
 SEP=:
