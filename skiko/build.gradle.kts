@@ -77,6 +77,10 @@ kotlin {
     }
 }
 
+tasks.withType(JavaCompile::class.java).configureEach {
+    this.getOptions().compilerArgs.addAll(listOf("-source", "11", "-target", "11"))
+}
+
 // See https://docs.gradle.org/current/userguide/cpp_library_plugin.html.
 tasks.withType(CppCompile::class.java).configureEach {
     // Prefer 'java.home' system property to simplify overriding from Intellij.
@@ -172,7 +176,6 @@ project.tasks.register<Exec>("objcCompile") {
     outputs.files("$outDir/$objcSrc.o")
 }
 
-
 tasks.withType(LinkSharedLibrary::class.java).configureEach {
     when (target) {
         "macos" -> {
@@ -253,8 +256,6 @@ project.tasks.register<JavaExec>("run") {
     main = "org.jetbrains.skiko.MainKt"
     classpath = files(skikoJvmRuntimeJar.map { it.archiveFile })
 }
-
-
 
 // disable unexpected native publications (default C++ publications are failing)
 tasks.withType<AbstractPublishToMaven>().configureEach {

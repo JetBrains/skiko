@@ -117,6 +117,6 @@ open class SkiaWindow : JFrame() {
     }
 
     fun display() {
-        layer.display()
-        }
+        layer.redrawLayer()
+    }
 }
