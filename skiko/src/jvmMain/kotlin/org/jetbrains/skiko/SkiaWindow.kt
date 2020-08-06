@@ -31,18 +31,19 @@ interface SkiaRenderer {
     fun onDispose()
 }
 
-class SkiaLayer() : HardwareLayer() {
+open class SkiaLayer : HardwareLayer() {
 
     var renderer: SkiaRenderer? = null
     private val skijaState = SkijaState()
     var init: Boolean = false
 
-    public override fun draw() {
+    override fun draw() {
         if (!init) {
             if (skijaState.context == null) {
                 skijaState.context = Context.makeGL()
             }
             initSkija()
+            renderer?.onInit()
             init = true
         }
 
@@ -51,8 +52,8 @@ class SkiaLayer() : HardwareLayer() {
             gl.glClearColor(1.0f, 1.0f, 1.0f, 1.0f)
             gl.glClear(gl.GL_COLOR_BUFFER_BIT)
 
-            canvas!!.clear(0xFFFFFFF)
-            renderer!!.onRender(canvas!!, width, height)
+            canvas!!.clear(-1)
+            renderer?.onRender(canvas!!, width, height)
             context!!.flush()
 
             gl.glFinish()
@@ -84,22 +85,21 @@ class SkiaLayer() : HardwareLayer() {
     }
 }
 
-class SkiaWindow() : JFrame() {
+open class SkiaWindow : JFrame() {
     companion object {
         init {
             Library.load("/", "skiko")
         }
     }
 
-    val layer: SkiaLayer
+    val layer: SkiaLayer = SkiaLayer()
 
     init {
-        layer = SkiaLayer()
-        setLayout(null);
+        setLayout(null)
         add(layer)
 
         addComponentListener(object : ComponentAdapter() {
-            public override fun componentResized(e: ComponentEvent) {
+            override fun componentResized(e: ComponentEvent) {
                 layer.init = false
                 layer.setSize(width, height)
                 Engine.get().render(layer)

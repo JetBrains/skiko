@@ -15,11 +15,15 @@ repositories {
 }
 
 def os = System.getProperty("os.name")
-def target = "linux"
+def target = ""
 if (os == "Mac OS X") {
-   target = "macos"
+    target = "macos"
 } else if (os.startsWith("Win")) {
     target = "windows"
+} else if (os.startsWith("Linux")) {
+    target = "linux"
+} else {
+    throw Error("Unsupported OS: $target")
 }
 
 def version = "0.1-SNAPSHOT"
