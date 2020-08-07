@@ -7,18 +7,17 @@
 #import <QuartzCore/QuartzCore.h>
 #import <OpenGL/gl3.h>
 
+JavaVM *jvm = NULL;
+
 @interface AWTGLLayer : CAOpenGLLayer
 
 @property jobject windowRef;
-@property JavaVM *jvm;
-@property bool isDrawing;
 
 @end
 
 @implementation AWTGLLayer
 
 jobject windowRef;
-JavaVM *jvm;
 
 - (id)init
 {
@@ -26,11 +25,11 @@ JavaVM *jvm;
 
     if (self)
     {
-        self.needsDisplayOnBoundsChange = YES;
-        self.asynchronous = NO;
+        [self removeAllAnimations];
+        [self setAutoresizingMask: (kCALayerWidthSizable|kCALayerHeightSizable)];
+        [self setNeedsDisplayOnBoundsChange: YES];
+
         self.windowRef = NULL;
-        self.jvm = NULL;
-        self.isDrawing = NO;
     }
 
     return self;
@@ -41,14 +40,12 @@ JavaVM *jvm;
             forLayerTime:(CFTimeInterval)t 
             displayTime:(const CVTimeStamp *)ts
 {
-    if (self.isDrawing) return;
-    self.isDrawing = YES;
     CGLSetCurrentContext(ctx);
 
-    if (self.jvm != NULL) {
+    if (jvm != NULL) {
         // TODO: cache wndClass and drawMethod.
         JNIEnv *env;
-        (*self.jvm)->AttachCurrentThread(self.jvm, (void **)&env, NULL);
+        (*jvm)->AttachCurrentThread(jvm, (void **)&env, NULL);
 
         static jclass wndClass = NULL;
         if (!wndClass) wndClass = (*env)->GetObjectClass(env, self.windowRef);
@@ -62,13 +59,11 @@ JavaVM *jvm;
     }
 
     [super drawInCGLContext:ctx pixelFormat:pf forLayerTime:t displayTime:ts];
-    self.isDrawing = NO;
 }
 
 - (void) dispose
 {
     self.windowRef = NULL;
-    self.jvm = NULL;
 }
 
 @end
@@ -110,7 +105,6 @@ AWTGLLayer *glLayer;
 - (void) update
 {
     [self.glLayer performSelectorOnMainThread:@selector(setNeedsDisplay) withObject:0 waitUntilDone:NO];
-    [self.glLayer performSelectorOnMainThread:@selector(displayIfNeeded) withObject:0 waitUntilDone:NO];
 }
 
 - (void) dispose
@@ -137,7 +131,6 @@ extern jboolean Skiko_GetAWT(JNIEnv* env, JAWT* awt);
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv *env, jobject window)
 {
-    fprintf(stderr, "updateLayer\n");
     if (windowsSet != nil) {
         LayersSet *layer = findByObject(env, window);
         if (layer != NULL) {
@@ -168,7 +161,6 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv
     result = Skiko_GetAWT(env, &awt);
     assert(result != JNI_FALSE);
 
-    JavaVM *jvm;
     (*env)->GetJavaVM(env, &jvm);
 
     ds = awt.GetDrawingSurface(env, window);
@@ -187,6 +179,9 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv
         [windowsSet addObject: layersSet];
 
         layersSet.caLayer = [dsi_mac windowLayer];
+        [layersSet.caLayer removeAllAnimations];
+        [layersSet.caLayer setAutoresizingMask: (kCALayerWidthSizable|kCALayerHeightSizable)];
+        [layersSet.caLayer setNeedsDisplayOnBoundsChange: YES];
 
         NSScreen *screen = [NSScreen mainScreen];
         float scaleFactor = screen.backingScaleFactor;
@@ -201,20 +196,18 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv
         
         jobject windowRef = (*env)->NewGlobalRef(env, window);
 
-        [layersSet.glLayer setJvm: jvm];
         [layersSet.glLayer setWindowRef: windowRef];
-        [layersSet setWindowRef: windowRef];        
+        [layersSet setWindowRef: windowRef];
+        [layersSet syncSize];
 
-        ds->FreeDrawingSurfaceInfo(dsi);
-
-        ds->Unlock(ds);
-
-        awt.FreeDrawingSurface(ds);
     }
+
+    ds->FreeDrawingSurfaceInfo(dsi);
+    ds->Unlock(ds);
+    awt.FreeDrawingSurface(ds);
 }
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_redrawLayer(JNIEnv *env, jobject window) {
-    fprintf(stderr, "redrawLayer\n");
     LayersSet *layer = findByObject(env, window);
     if (layer != NULL) {
         [layer update];

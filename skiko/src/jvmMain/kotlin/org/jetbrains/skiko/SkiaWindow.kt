@@ -104,15 +104,11 @@ open class SkiaWindow : JFrame() {
     val layer: SkiaLayer = SkiaLayer()
 
     init {
-        setLayout(null)
-        add(layer)
+        contentPane.add(layer)
 
         addComponentListener(object : ComponentAdapter() {
             override fun componentResized(e: ComponentEvent) {
-                println("resize")
                 layer.reinit()
-                layer.setSize(width, height)
-                display()
             }
         })
     }
