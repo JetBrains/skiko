@@ -59,6 +59,7 @@ extern "C" jboolean Skiko_GetAWT(JNIEnv *env, JAWT *awt) {
       fprintf(stderr, "Cannot find JAWT_GetAWT in %s\n", path);
       abort();
     }
+  }
 #else
     if (!func) {
         char jdkHome[FILENAME_MAX];
@@ -81,7 +82,7 @@ extern "C" jboolean Skiko_GetAWT(JNIEnv *env, JAWT *awt) {
             fprintf(stderr, "Cannot find JAWT_GetAWT in %s\n", path);
             abort();
         }
-  }
+    }
 #endif
-  return func(env, awt);
+    return func(env, awt);
 }
