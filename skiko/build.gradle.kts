@@ -13,9 +13,9 @@ plugins {
 val properties = SkikoProperties(rootProject)
 
 group = "org.jetbrains.skiko"
-version = when {
-    properties.isCIBuild -> properties.deployCIVersion
-    else -> properties.deployVersion
+version = run {
+    val suffix = if (properties.isRelease) "" else "-SNAPSHOT"
+    properties.deployVersion + suffix
 }
 
 val providedSkiaDir = (System.getenv("SKIA_DIR") ?: System.getProperty("skia.dir"))?.let { File(it) } ?: error("PLEASE_SET_SKIA_DIR")
@@ -454,8 +454,8 @@ class SkikoProperties(private val myProject: Project) {
     val deployVersion: String
         get() = myProject.property("deploy.version") as String
 
-    val deployCIVersion: String
-        get() = myProject.property("deploy.ci.version") as String
+    val isRelease: Boolean
+        get() = myProject.findProperty("deploy.release") == "true"
 
     val skijaCommitHash: String
         get() = myProject.property("dependencies.skija.git.commit") as String
