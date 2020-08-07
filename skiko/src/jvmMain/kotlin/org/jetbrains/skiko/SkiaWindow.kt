@@ -109,7 +109,6 @@ open class SkiaWindow : JFrame() {
 
         addComponentListener(object : ComponentAdapter() {
             override fun componentResized(e: ComponentEvent) {
-                println("resize")
                 layer.reinit()
                 layer.setSize(width, height)
                 display()
