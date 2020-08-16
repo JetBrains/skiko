@@ -313,6 +313,16 @@ library {
              include("**.o")
         })
     }
+
+    toolChains {
+        withType(VisualCpp::class.java) {
+            // In some cases Gradle is unable to find VC++ toolchain
+            // https://github.com/gradle/gradle-native/issues/617
+            properties.visualStudioBuildToolsDir?.let {
+                setInstallDir(it)
+            }
+        }
+    }
 }
 
 val skikoJvmJar: Provider<Jar> by tasks.registering(Jar::class) {
@@ -463,6 +473,9 @@ class SkikoProperties(private val myProject: Project) {
     val skiaReleaseForCurrentOS: String
         get() = (myProject.property("dependencies.skia.release.pattern") as String)
                 .replace("<TARGET_OS>", target)
+
+    val visualStudioBuildToolsDir: File?
+        get() = System.getenv()["SKIKO_VSBT_PATH"]?.let { File(it) }?.takeIf { it.isDirectory }
 
     val dependenciesDir: File
         get() = myProject.rootProject.projectDir.resolve("dependencies")
