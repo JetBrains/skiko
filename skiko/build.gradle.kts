@@ -234,7 +234,7 @@ tasks.withType(CppCompile::class.java).configureEach {
                     "/utf-8",
                     "/O2",
                     "/GR-" // no-RTTI.
-            )
+                )
             )
         }
     }
