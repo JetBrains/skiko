@@ -57,15 +57,9 @@ open class SkiaLayer : HardwareLayer() {
         }
 
         skijaState.apply {
-            val gl = OpenGLApi.instance
-            gl.glClearColor(1.0f, 1.0f, 1.0f, 1.0f)
-            gl.glClear(gl.GL_COLOR_BUFFER_BIT)
-
             canvas!!.clear(-1)
             renderer?.onRender(canvas!!, width, height)
             context!!.flush()
-
-            gl.glFinish()
         }
     }
 
@@ -98,6 +92,8 @@ open class SkiaWindow : JFrame() {
     companion object {
         init {
             Library.load("/", "skiko")
+            // we have to set this property to avoid render flickering.
+            System.setProperty("sun.awt.noerasebackground", "true")
         }
     }
 
