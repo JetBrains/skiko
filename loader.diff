@@ -1,0 +1,15 @@
+diff --git a/third_party/icu/SkLoadICU.cpp b/third_party/icu/SkLoadICU.cpp
+index ac7ba0c15d..2b445e286e 100644
+--- a/third_party/icu/SkLoadICU.cpp
++++ b/third_party/icu/SkLoadICU.cpp
+@@ -69,7 +69,9 @@ static bool init_icu(void* addr) {
+ }
+ 
+ static std::string executable_directory() {
+-    HMODULE hModule = GetModuleHandleA(NULL);
++    HMODULE hModule = NULL;
++    GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS,
++        reinterpret_cast<LPCSTR>(&executable_directory), &hModule);
+     char path[MAX_PATH];
+     GetModuleFileNameA(hModule, path, MAX_PATH);
+     const char* end = strrchr(path, '\\');
