@@ -7,6 +7,13 @@
 * Set JAVA_HOME to location of JDK, at least version 11
 * `cd skiko && ./gradlew publishToMavenLocal` will build the artefact and publish it to local Maven repo
 
+#### Working with Skia or Skija sources
+
+Gradle build downloads the necessary version of Skia & Skija by default.
+However, if downloaded sources are modified, changes are discarded (Gradle
+re-evaluates tasks, when outputs are changed).
+To use custom version of the dependencies, specify `SKIA_DIR` or `SKIJA_DIR` environment variable
+respectively.
 
 #### Building on Windows
 

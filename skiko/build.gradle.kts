@@ -18,7 +18,6 @@ version = run {
     properties.deployVersion + suffix
 }
 
-val providedSkiaDir = (System.getenv("SKIA_DIR") ?: System.getProperty("skia.dir"))?.let { File(it) } ?: error("PLEASE_SET_SKIA_DIR")
 val hostOs = System.getProperty("os.name")
 val target = when {
     hostOs == "Mac OS X" -> "macos"
@@ -41,7 +40,7 @@ val skiaZip = run {
     val zipFile = properties.dependenciesDir.resolve("skia/$zipName")
 
     tasks.register("downloadSkia", Download::class) {
-        onlyIf { providedSkiaDir == null && !zipFile.exists() }
+        onlyIf { properties.skiaDir == null && !zipFile.exists() }
         inputs.property("skia.release.for.current.os", properties.skiaReleaseForCurrentOS)
         src("https://bintray.com/api/ui/download/jetbrains/skija/$zipName")
         dest(zipFile)
@@ -49,20 +48,25 @@ val skiaZip = run {
     }.map { zipFile }
 }
 
-val unzippedSkia = run {
-    val targetDir = providedSkiaDir ?:  properties.dependenciesDir.resolve("skia/unzipped")
-    tasks.register("unzipSkia", Copy::class) {
-        onlyIf { providedSkiaDir == null }
-        from(skiaZip.map { zipTree(it) })
-        into(targetDir)
-    }.map { targetDir }
+val skiaDir = run {
+    if (properties.skiaDir != null) {
+        tasks.register("unzipSkia", Copy::class) {
+            enabled = false
+        }.map { properties.skiaDir!! }
+    } else {
+        val targetDir = properties.dependenciesDir.resolve("skia/skia")
+        tasks.register("unzipSkia", Copy::class) {
+            from(skiaZip.map { zipTree(it) })
+            into(targetDir)
+        }.map { targetDir }
+    }
 }
 
 val skijaZip = run {
     val zipFile = properties.dependenciesDir.resolve("skija/${properties.skijaCommitHash}.zip")
 
     tasks.register("downloadSkija", Download::class) {
-        onlyIf { !zipFile.exists() }
+        onlyIf { properties.skijaDir == null && !zipFile.exists() }
         inputs.property("skija.commit.hash", properties.skijaCommitHash)
         src("https://github.com/JetBrains/skija/archive/${properties.skijaCommitHash}.zip")
         dest(zipFile)
@@ -71,18 +75,24 @@ val skijaZip = run {
 }
 
 val skijaDir = run {
-    val unzipDest = properties.dependenciesDir.resolve("skija/unzipped").apply { mkdirs() }
-    tasks.register("unzipSkija", Copy::class) {
-        from(skijaZip.map { zipTree(it) }) {
-            include("skija-${properties.skijaCommitHash}/**")
-            eachFile {
-                // drop skija-<COMMIT> subdir
-                relativePath = RelativePath(true, *relativePath.segments.drop(1).toTypedArray())
+    if (properties.skijaDir != null) {
+        tasks.register("unzipSkija", Copy::class) {
+            enabled = false
+        }.map { properties.skijaDir!! }
+    } else {
+        val skijaDest = properties.dependenciesDir.resolve("skija/skija").apply { mkdirs() }
+        tasks.register("unzipSkija", Copy::class) {
+            from(skijaZip.map { zipTree(it) }) {
+                include("skija-${properties.skijaCommitHash}/**")
+                eachFile {
+                    // drop skija-<COMMIT> subdir
+                    relativePath = RelativePath(true, *relativePath.segments.drop(1).toTypedArray())
+                }
+                includeEmptyDirs = false
             }
-            includeEmptyDirs = false
-        }
-        into(unzipDest)
-    }.map { unzipDest }
+            into(skijaDest)
+        }.map { skijaDest }
+    }
 }
 
 val lombok by configurations.creating
@@ -162,8 +172,8 @@ tasks.withType(CppCompile::class.java).configureEach {
                 "Check JAVA_HOME (CLI) or Gradle settings (Intellij).")
     }
     val jdkHome = System.getProperty("java.home") ?: error("'java.home' is null")
-    dependsOn(unzippedSkia)
-    val skiaDir = unzippedSkia.get().absolutePath
+    dependsOn(skiaDir)
+    val skiaDir = skiaDir.get().absolutePath
     compilerArgs.addAll(listOf(
         "-I$jdkHome/include",
         "-I$skiaDir",
@@ -304,7 +314,7 @@ library {
 
     dependencies {
         implementation(
-            unzippedSkia.map {
+            skiaDir.map {
                 fileTree(it.resolve("out/Release-x64"))
                     .matching { include(if (target == "windows") "**.lib" else "**.a") }
             }
@@ -476,6 +486,12 @@ class SkikoProperties(private val myProject: Project) {
 
     val visualStudioBuildToolsDir: File?
         get() = System.getenv()["SKIKO_VSBT_PATH"]?.let { File(it) }?.takeIf { it.isDirectory }
+
+    val skijaDir: File?
+        get() = System.getenv()["SKIJA_DIR"]?.let { File(it) }?.takeIf { it.isDirectory }
+
+    val skiaDir: File?
+        get() = (System.getenv()["SKIA_DIR"] ?: System.getProperty("skia.dir"))?.let { File(it) }?.takeIf { it.isDirectory }
 
     val dependenciesDir: File
         get() = myProject.rootProject.projectDir.resolve("dependencies")
