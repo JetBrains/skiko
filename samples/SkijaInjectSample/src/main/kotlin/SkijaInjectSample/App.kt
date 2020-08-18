@@ -81,7 +81,7 @@ class State {
 fun displayScene(renderer: Renderer, width: Int, height: Int, xpos: Int, ypos: Int, state: State) {
     val canvas = renderer.canvas!!
     val watchFill = Paint().setColor(0xFFFFFFFF.toInt())
-    val watchStroke = Paint().setColor(0xFF000000.toInt()).setMode(PaintMode.STROKE).setStrokeWidth(1f).setAntiAlias(false)
+    val watchStroke = Paint().setColor(0xFF000000.toInt()).setMode(PaintMode.STROKE).setStrokeWidth(1f)
     val watchStrokeAA = Paint().setColor(0xFF000000.toInt()).setMode(PaintMode.STROKE).setStrokeWidth(1f)
     val watchFillHover = Paint().setColor(0xFFE4FF01.toInt())
     for (x in 0 .. (width - 50) step 50) {
