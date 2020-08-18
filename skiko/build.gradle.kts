@@ -48,18 +48,53 @@ val skiaZip = run {
     }.map { zipFile }
 }
 
+fun String.insertAfterFirst(substring: String, stringToInsert: String): String =
+    let { orig ->
+        buildString {
+            var i = orig.indexOf(substring)
+            if (i < 0) return orig
+
+            i += substring.length
+
+            append(orig.substring(0, i))
+            append(stringToInsert)
+            append(orig.substring(i))
+        }
+    }
+
+fun AbstractCopyTask.configureSkiaCopy(targetDir: File) {
+    into(targetDir)
+    if (target == "windows") {
+        doLast {
+            // temporary hack
+            // todo: remove after https://github.com/google/skia/commit/0d6f81593b1fa222e8e4afb56cc961ce8c9be375 is included
+            // in used version of skia
+            val skPathRef = targetDir.resolve("include/private/SkPathRef.h")
+            val skPathRefContent = skPathRef.readText()
+            if ("#include <tuple>" !in skPathRefContent) {
+                val includeToInsertAfter = "#include <limits>"
+                check(includeToInsertAfter in skPathRefContent) { "Substring not found: '${includeToInsertAfter}' in $skPathRef" }
+                val newContent = skPathRefContent.insertAfterFirst(includeToInsertAfter, "\n#include <tuple>")
+                skPathRef.writeText(newContent)
+            }
+        }
+    }
+}
+
 val skiaDir = run {
-    if (properties.skiaDir != null) {
-        tasks.register("unzipSkia", Copy::class) {
-            enabled = false
-        }.map { properties.skiaDir!! }
+    val targetDir = properties.dependenciesDir.resolve("skia/skia")
+    val taskProvider = if (properties.skiaDir != null) {
+        tasks.register("syncSkia", Sync::class) {
+            from(properties.skiaDir!!.absoluteFile)
+            configureSkiaCopy(targetDir)
+        }
     } else {
-        val targetDir = properties.dependenciesDir.resolve("skia/skia")
         tasks.register("unzipSkia", Copy::class) {
             from(skiaZip.map { zipTree(it) })
-            into(targetDir)
-        }.map { targetDir }
+            configureSkiaCopy(targetDir)
+        }
     }
+    taskProvider.map { targetDir }
 }
 
 val skijaZip = run {
