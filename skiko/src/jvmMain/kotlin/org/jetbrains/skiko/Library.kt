@@ -30,5 +30,8 @@ object Library {
         }
         System.load(libFile.absolutePath)
         loaded = true
+
+        // we have to set this property to avoid render flickering.
+        System.setProperty("sun.awt.noerasebackground", "true")
     }
 }

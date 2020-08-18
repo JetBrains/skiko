@@ -92,8 +92,6 @@ open class SkiaWindow : JFrame() {
     companion object {
         init {
             Library.load("/", "skiko")
-            // we have to set this property to avoid render flickering.
-            System.setProperty("sun.awt.noerasebackground", "true")
         }
     }
 
