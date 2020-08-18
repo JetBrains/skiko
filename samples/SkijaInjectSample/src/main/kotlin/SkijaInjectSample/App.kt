@@ -10,6 +10,10 @@ import org.jetbrains.skiko.SkiaRenderer
 import java.awt.event.MouseMotionAdapter
 import kotlin.math.cos
 import kotlin.math.sin
+import org.jetbrains.skija.paragraph.FontCollection
+import org.jetbrains.skija.paragraph.ParagraphBuilder
+import org.jetbrains.skija.paragraph.ParagraphStyle
+import org.jetbrains.skija.paragraph.TextStyle
 
 fun main(args: Array<String>) {
     createWindow("First window");
@@ -117,4 +121,15 @@ fun displayScene(renderer: Renderer, width: Int, height: Int, xpos: Int, ypos: I
     }
     val text = "${state.text} ${state.frame++}!"
     canvas.drawString(text, xpos.toFloat(), ypos.toFloat(), renderer.font, renderer.paint)
+
+    val fontCollection = FontCollection()
+            .setDefaultFontManager(FontMgr.getDefault())
+    val style = ParagraphStyle()
+    val paragraph = ParagraphBuilder(style, fontCollection)
+            .pushStyle(TextStyle().setColor(0xFF000000.toInt()))
+            .addText("Text")
+            .popStyle()
+            .build()
+    paragraph.layout(Float.POSITIVE_INFINITY)
+    paragraph.paint(canvas, 0f, 0f)
 }

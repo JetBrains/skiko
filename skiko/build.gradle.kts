@@ -13,7 +13,7 @@ version = when {
     else -> project.property("deploy.version") as String
 }
 
-val skiaDir = System.getenv("SKIA_DIR") ?: "/Users/igotti/compose/skija/third_party/skia"
+val skiaDir = System.getenv("SKIA_DIR") ?: System.getProperty("skia.dir") ?: "PLEASE_SET_SKIA_DIR"
 val hostOs = System.getProperty("os.name")
 val target = when {
     hostOs == "Mac OS X" -> "macos"
@@ -249,7 +249,12 @@ val skikoJvmJar: Provider<Jar> by tasks.registering(Jar::class) {
 val skikoJvmRuntimeJar by project.tasks.registering(Jar::class) {
     archiveBaseName.set("skiko-$target")
     from(skikoJvmJar.map { zipTree(it.archiveFile) })
-    from(project.tasks.named("linkRelease${target.capitalize()}").map { it.outputs.files.filter { it.isFile }})
+    from(project.tasks.named("linkRelease${target.capitalize()}").map {
+        it.outputs.files.filter { it.isFile }
+    })
+    if (target == "windows") {
+        from(files("$skiaDir/out/Release-x64/icudtl.dat"))
+    }
 }
 
 project.tasks.register<JavaExec>("run") {
