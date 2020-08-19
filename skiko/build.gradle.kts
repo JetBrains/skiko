@@ -1,9 +1,11 @@
 import kotlin.text.capitalize
+import org.gradle.crypto.checksum.Checksum
 
 plugins {
     kotlin("multiplatform") version "1.3.72"
     `cpp-library`
     `maven-publish`
+    id("org.gradle.crypto.checksum") version "1.1.0"
 }
 
 val isCIBuild = project.hasProperty("teamcity")
@@ -246,8 +248,18 @@ val skikoJvmJar: Provider<Jar> by tasks.registering(Jar::class) {
     from(kotlin.jvm().compilations["main"].output.allOutputs)
 }
 
+val createChecksums by project.tasks.registering(org.gradle.crypto.checksum.Checksum::class) {
+    val linkTask = project.tasks.named("linkRelease${target.capitalize()}")
+    dependsOn(linkTask)
+    files = linkTask.get().outputs.files.filter { it.isFile } +
+            if (target == "windows") files("$skiaDir/out/Release-x64/icudtl.dat") else files()
+    algorithm = Checksum.Algorithm.SHA256
+    outputDir = file("$buildDir/checksums")
+}
+
 val skikoJvmRuntimeJar by project.tasks.registering(Jar::class) {
     archiveBaseName.set("skiko-$target")
+    dependsOn(createChecksums)
     from(skikoJvmJar.map { zipTree(it.archiveFile) })
     from(project.tasks.named("linkRelease${target.capitalize()}").map {
         it.outputs.files.filter { it.isFile }
@@ -255,6 +267,7 @@ val skikoJvmRuntimeJar by project.tasks.registering(Jar::class) {
     if (target == "windows") {
         from(files("$skiaDir/out/Release-x64/icudtl.dat"))
     }
+    from(createChecksums.get().outputs.files)
 }
 
 project.tasks.register<JavaExec>("run") {
