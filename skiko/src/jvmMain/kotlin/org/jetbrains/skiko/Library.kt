@@ -13,12 +13,13 @@ object Library {
 
     private fun loadOrGet(path: String, resource: String, isLibrary: Boolean) {
         File(cacheDir).mkdirs()
+        
         val resourceName = if (isLibrary) System.mapLibraryName(resource) else resource
         val hash = Library::class.java.getResourceAsStream("$path$resourceName.sha256").use {
             BufferedReader(InputStreamReader(it)).lines().toArray()[0] as String
         }
 
-        val fileName = if (isLibrary) System.mapLibraryName(hash) else hash
+        val fileName = if (isLibrary) System.mapLibraryName(hash) else resource
         val file = File(cacheDir, fileName)
         // TODO: small race change when multiple Compose apps are started first time, can handle with atomic rename.
         if (!file.exists()) {
