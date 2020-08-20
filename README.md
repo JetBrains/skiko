@@ -36,3 +36,14 @@ or by running `cmd` as administrator:
 ```
 setx /M SKIKO_VSBT_PATH "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools"
 ```
+
+#### Releasing new version of Skiko
+
+0. Check all necessary changes are published to the repository.
+1. Trigger a new deployment in [Publish release](https://teamcity.jetbrains.com/buildConfiguration/JetBrainsPublicProjects_Skija_Skiko_PublishRelease)
+build configuration.
+    1. Click "Deploy" button.
+    2. Specify the desired version in "Skiko Release Version" text field on the "Parameters" tab.
+    3. Choose the desired branch and commit on the "Changes" tab.
+    4. Optionally you can check "Put the build to the queue top" option in the "General" tab to speed up a deployment
+    (please be mindful about it!).
