@@ -379,7 +379,7 @@ val createChecksums by project.tasks.registering(org.gradle.crypto.checksum.Chec
     val linkTask = project.tasks.named("linkRelease${target.capitalize()}")
     dependsOn(linkTask)
     files = linkTask.get().outputs.files.filter { it.isFile } +
-            if (target == "windows") files("$skiaDir/out/Release-x64/icudtl.dat") else files()
+            if (target == "windows") files(skiaDir.map { it.resolve("out/Release-x64/icudtl.dat") }) else files()
     algorithm = Checksum.Algorithm.SHA256
     outputDir = file("$buildDir/checksums")
 }
@@ -392,7 +392,7 @@ val skikoJvmRuntimeJar by project.tasks.registering(Jar::class) {
         it.outputs.files.filter { it.isFile }
     })
     if (target == "windows") {
-        from(files("$skiaDir/out/Release-x64/icudtl.dat"))
+        from(files(skiaDir.map { it.resolve("out/Release-x64/icudtl.dat") }))
     }
     from(createChecksums.get().outputs.files)
 }
@@ -516,8 +516,7 @@ class SkikoProperties(private val myProject: Project) {
         get() = myProject.property("dependencies.skija.git.commit") as String
 
     val skiaReleaseForCurrentOS: String
-        get() = (myProject.property("dependencies.skia.release.pattern") as String)
-                .replace("<TARGET_OS>", target)
+        get() = (myProject.property("dependencies.skia.$target") as String)
 
     val visualStudioBuildToolsDir: File?
         get() = System.getenv()["SKIKO_VSBT_PATH"]?.let { File(it) }?.takeIf { it.isDirectory }
