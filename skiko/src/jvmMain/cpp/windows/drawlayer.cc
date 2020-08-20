@@ -22,7 +22,6 @@ public:
     jobject windowRef;
     HGLRC context;
     HWND handler;
-    HDC device;
 
     void update()
     {
@@ -33,7 +32,6 @@ public:
     {
         context = NULL;
         handler = NULL;
-        device = NULL;
     }
 
 private:
@@ -43,19 +41,47 @@ private:
         {
             JNIEnv *env;
             jvm->GetEnv((void **)&env, JNI_VERSION_10);
-
-            wglMakeCurrent(device, context);
-            jclass wndClass = env->GetObjectClass(windowRef);
-            jmethodID drawMethod = env->GetMethodID(wndClass, "draw", "()V");
-            if (NULL == drawMethod)
+            JAWT awt;
+            JAWT_DrawingSurface *ds = NULL;
+            JAWT_DrawingSurfaceInfo *dsi = NULL;
+            jboolean result = JNI_FALSE;
+            jint lock = 0;
+            JAWT_Win32DrawingSurfaceInfo *dsi_win;
+            awt.version = (jint)JAWT_VERSION_9;
+            result = Skiko_GetAWT(env, &awt);
+            if (result == JNI_FALSE)
             {
-                fprintf(stderr, "The method Window.draw() not found!\n");
+                fprintf(stderr, "JAWT_GetAWT failed! Result is JNI_FALSE\n");
                 return;
             }
-            env->CallVoidMethod(windowRef, drawMethod);
-            glFinish();
-            wglMakeCurrent(device, NULL);
-            SwapBuffers(device);
+
+            ds = awt.GetDrawingSurface(env, windowRef);
+            lock = ds->Lock(ds);
+            dsi = ds->GetDrawingSurfaceInfo(ds);
+            dsi_win = (JAWT_Win32DrawingSurfaceInfo *)dsi->platformInfo;
+
+            HWND hwnd = dsi_win->hwnd;
+            HDC hdc = GetDC(hwnd);
+            if (dsi != NULL)
+            {
+                jvm->AttachCurrentThread((void **)&env, NULL);
+
+                wglMakeCurrent(hdc, context);
+
+                jclass wndClass = env->GetObjectClass(windowRef);
+                jmethodID drawMethod = env->GetMethodID(wndClass, "draw", "()V");
+                if (NULL == drawMethod)
+                {
+                    fprintf(stderr, "The method Window.draw() not found!\n");
+                    return;
+                }
+                env->CallVoidMethod(windowRef, drawMethod);
+                glFinish();
+                SwapBuffers(hdc);
+            }
+            ds->FreeDrawingSurfaceInfo(dsi);
+            ds->Unlock(ds);
+            awt.FreeDrawingSurface(ds);
         }
     }
 };
@@ -171,7 +197,7 @@ extern "C"
         dsi_win = (JAWT_Win32DrawingSurfaceInfo *)dsi->platformInfo;
 
         HWND hwnd = dsi_win->hwnd;
-        HDC device = GetDC(hwnd);
+        HDC wndHandler = GetDC(hwnd);
 
         if (dsi != NULL)
         {
@@ -182,10 +208,10 @@ extern "C"
 
             pixFormatDscr.iPixelType = PFD_TYPE_RGBA;
             pixFormatDscr.cColorBits = 32;
-            int iPixelFormat = ChoosePixelFormat(device, &pixFormatDscr);
-            SetPixelFormat(device, iPixelFormat, &pixFormatDscr);
-            DescribePixelFormat(device, iPixelFormat, sizeof(PIXELFORMATDESCRIPTOR), &pixFormatDscr);
-            context = wglCreateContext(device);
+            int iPixelFormat = ChoosePixelFormat(wndHandler, &pixFormatDscr);
+            SetPixelFormat(wndHandler, iPixelFormat, &pixFormatDscr);
+            DescribePixelFormat(wndHandler, iPixelFormat, sizeof(PIXELFORMATDESCRIPTOR), &pixFormatDscr);
+            context = wglCreateContext(wndHandler);
 
             LayersSet *layer = new LayersSet();
             windowsSet->insert(layer);
@@ -195,7 +221,6 @@ extern "C"
             layer->windowRef = windowRef;
             layer->context = context;
             layer->handler = hwnd;
-            layer->device = device;
         }
 
         ds->FreeDrawingSurfaceInfo(dsi);
