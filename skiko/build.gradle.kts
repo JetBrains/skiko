@@ -82,19 +82,21 @@ fun AbstractCopyTask.configureSkiaCopy(targetDir: File) {
 }
 
 val skiaDir = run {
-    val targetDir = properties.dependenciesDir.resolve("skia/skia")
-    val taskProvider = if (properties.skiaDir != null) {
-        tasks.register("syncSkia", Sync::class) {
-            from(properties.skiaDir!!.absoluteFile)
-            configureSkiaCopy(targetDir)
-        }
+    if (properties.skiaDir != null) {
+        tasks.register("skiaDir", DefaultTask::class) {
+            // dummy task to simplify usage of the resulting provider (see `else` branch)
+            // if a file provider is not created from a task provider,
+            // then it cannot be used instead of a task in `dependsOn` clauses of other tasks.
+            // e.g. the resulting `skiaDir` could not be used in `dependsOn` of CppCompile configuration
+            enabled = false
+        }.map { properties.skiaDir!! }
     } else {
+        val targetDir = properties.dependenciesDir.resolve("skia/skia")
         tasks.register("unzipSkia", Copy::class) {
             from(skiaZip.map { zipTree(it) })
             configureSkiaCopy(targetDir)
-        }
+        }.map { targetDir }
     }
-    taskProvider.map { targetDir }
 }
 
 val skijaZip = run {
@@ -111,7 +113,7 @@ val skijaZip = run {
 
 val skijaDir = run {
     if (properties.skijaDir != null) {
-        tasks.register("unzipSkija", Copy::class) {
+        tasks.register("skijaDir", DefaultTask::class) {
             enabled = false
         }.map { properties.skijaDir!! }
     } else {
