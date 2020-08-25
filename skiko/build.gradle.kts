@@ -1,3 +1,4 @@
+import de.undercouch.gradle.tasks.download.Download
 import kotlin.text.capitalize
 import org.gradle.crypto.checksum.Checksum
 
@@ -6,16 +7,17 @@ plugins {
     `cpp-library`
     `maven-publish`
     id("org.gradle.crypto.checksum") version "1.1.0"
+    id("de.undercouch.download") version "4.1.1"
 }
 
-val isCIBuild = project.hasProperty("teamcity")
+val properties = SkikoProperties(rootProject)
+
 group = "org.jetbrains.skiko"
-version = when {
-    isCIBuild -> project.property("deploy.ci.version") as String
-    else -> project.property("deploy.version") as String
+version = run {
+    val suffix = if (properties.isRelease) "" else "-SNAPSHOT"
+    properties.deployVersion + suffix
 }
 
-val skiaDir = System.getenv("SKIA_DIR") ?: System.getProperty("skia.dir") ?: "PLEASE_SET_SKIA_DIR"
 val hostOs = System.getProperty("os.name")
 val target = when {
     hostOs == "Mac OS X" -> "macos"
@@ -32,6 +34,121 @@ repositories {
         url = uri("https://dl.bintray.com/kotlin/kotlin-eap")
     }
 }
+
+val skiaZip = run {
+    val zipName = properties.skiaReleaseForCurrentOS + ".zip"
+    val zipFile = properties.dependenciesDir.resolve("skia/$zipName")
+
+    tasks.register("downloadSkia", Download::class) {
+        onlyIf { properties.skiaDir == null && !zipFile.exists() }
+        inputs.property("skia.release.for.current.os", properties.skiaReleaseForCurrentOS)
+        src("https://bintray.com/api/ui/download/jetbrains/skija/$zipName")
+        dest(zipFile)
+        onlyIfModified(true)
+    }.map { zipFile }
+}
+
+fun String.insertAfterFirst(substring: String, stringToInsert: String): String =
+    let { orig ->
+        buildString {
+            var i = orig.indexOf(substring)
+            if (i < 0) return orig
+
+            i += substring.length
+
+            append(orig.substring(0, i))
+            append(stringToInsert)
+            append(orig.substring(i))
+        }
+    }
+
+fun AbstractCopyTask.configureSkiaCopy(targetDir: File) {
+    into(targetDir)
+    if (target == "windows") {
+        doLast {
+            // temporary hack
+            // todo: remove after https://github.com/google/skia/commit/0d6f81593b1fa222e8e4afb56cc961ce8c9be375 is included
+            // in used version of skia
+            val skPathRef = targetDir.resolve("include/private/SkPathRef.h")
+            val skPathRefContent = skPathRef.readText()
+            if ("#include <tuple>" !in skPathRefContent) {
+                val includeToInsertAfter = "#include <limits>"
+                check(includeToInsertAfter in skPathRefContent) { "Substring not found: '${includeToInsertAfter}' in $skPathRef" }
+                val newContent = skPathRefContent.insertAfterFirst(includeToInsertAfter, "\n#include <tuple>")
+                skPathRef.writeText(newContent)
+            }
+        }
+    }
+}
+
+val skiaDir = run {
+    if (properties.skiaDir != null) {
+        tasks.register("skiaDir", DefaultTask::class) {
+            // dummy task to simplify usage of the resulting provider (see `else` branch)
+            // if a file provider is not created from a task provider,
+            // then it cannot be used instead of a task in `dependsOn` clauses of other tasks.
+            // e.g. the resulting `skiaDir` could not be used in `dependsOn` of CppCompile configuration
+            enabled = false
+        }.map { properties.skiaDir!! }
+    } else {
+        val targetDir = properties.dependenciesDir.resolve("skia/skia")
+        tasks.register("unzipSkia", Copy::class) {
+            from(skiaZip.map { zipTree(it) })
+            configureSkiaCopy(targetDir)
+        }.map { targetDir }
+    }
+}
+
+val skijaZip = run {
+    val zipFile = properties.dependenciesDir.resolve("skija/${properties.skijaCommitHash}.zip")
+
+    tasks.register("downloadSkija", Download::class) {
+        onlyIf { properties.skijaDir == null && !zipFile.exists() }
+        inputs.property("skija.commit.hash", properties.skijaCommitHash)
+        src("https://github.com/JetBrains/skija/archive/${properties.skijaCommitHash}.zip")
+        dest(zipFile)
+        onlyIfModified(true)
+    }.map { zipFile }
+}
+
+val skijaDir = run {
+    if (properties.skijaDir != null) {
+        tasks.register("skijaDir", DefaultTask::class) {
+            enabled = false
+        }.map { properties.skijaDir!! }
+    } else {
+        val skijaDest = properties.dependenciesDir.resolve("skija/skija").apply { mkdirs() }
+        tasks.register("unzipSkija", Copy::class) {
+            from(skijaZip.map { zipTree(it) }) {
+                include("skija-${properties.skijaCommitHash}/**")
+                eachFile {
+                    // drop skija-<COMMIT> subdir
+                    relativePath = RelativePath(true, *relativePath.segments.drop(1).toTypedArray())
+                }
+                includeEmptyDirs = false
+            }
+            into(skijaDest)
+        }.map { skijaDest }
+    }
+}
+
+val lombok by configurations.creating
+val jetbrainsAnnotations by configurations.creating
+dependencies {
+    lombok("org.projectlombok:lombok:1.18.12")
+    jetbrainsAnnotations("org.jetbrains:annotations:19.0.0")
+}
+val skijaSrcDir = run {
+    val delombokSkijaSrcDir = project.file("src/jvmMain/java")
+    tasks.register("delombokSkija", JavaExec::class) {
+        classpath = lombok + jetbrainsAnnotations
+        main = "lombok.launch.Main"
+        args("delombok", skijaDir.get().resolve("src/main/java"), "-d", delombokSkijaSrcDir)
+        inputs.dir(skijaDir)
+        outputs.dirs(delombokSkijaSrcDir)
+    }.map { delombokSkijaSrcDir }
+}
+
 kotlin {
     jvm {
         compilations.all {
@@ -61,11 +178,11 @@ kotlin {
             }
         }
         val jvmMain by getting {
-            //kotlin.srcDirs.add(file("$projectDir/../skija/java_delombok"))
+            kotlin.srcDirs(skijaSrcDir)
             dependencies {
                 implementation(kotlin("stdlib-jdk8"))
-                compileOnly("org.projectlombok:lombok:1.18.12")
-                compileOnly("org.jetbrains:annotations:19.0.0")
+                compileOnly(lombok)
+                compileOnly(jetbrainsAnnotations)
             }
 
         }
@@ -92,6 +209,8 @@ tasks.withType(CppCompile::class.java).configureEach {
                 "Check JAVA_HOME (CLI) or Gradle settings (Intellij).")
     }
     val jdkHome = System.getProperty("java.home") ?: error("'java.home' is null")
+    dependsOn(skiaDir)
+    val skiaDir = skiaDir.get().absolutePath
     compilerArgs.addAll(listOf(
         "-I$jdkHome/include",
         "-I$skiaDir",
@@ -152,7 +271,7 @@ tasks.withType(CppCompile::class.java).configureEach {
                     "/utf-8",
                     "/O2",
                     "/GR-" // no-RTTI.
-            )
+                )
             )
         }
     }
@@ -219,7 +338,7 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
 
 extensions.configure<CppLibrary> {
     source.from(
-        fileTree("$projectDir/../skija/src/main/cc"),
+        skijaDir.map { fileTree(it.resolve("src/main/cc")) },
         fileTree("$projectDir/src/jvmMain/cpp/common"),
         fileTree("$projectDir/src/jvmMain/cpp/$target")
     )
@@ -231,15 +350,25 @@ library {
     baseName.set("skiko")
 
     dependencies {
-        implementation(fileTree("$skiaDir/out/Release-x64").matching {
-            if (target == "windows")
-                include("**.lib")
-            else
-                include("**.a")
-        })
+        implementation(
+            skiaDir.map {
+                fileTree(it.resolve("out/Release-x64"))
+                    .matching { include(if (target == "windows") "**.lib" else "**.a") }
+            }
+        )
         implementation(fileTree("$buildDir/objc/$target").matching {
              include("**.o")
         })
+    }
+
+    toolChains {
+        withType(VisualCpp::class.java) {
+            // In some cases Gradle is unable to find VC++ toolchain
+            // https://github.com/gradle/gradle-native/issues/617
+            properties.visualStudioBuildToolsDir?.let {
+                setInstallDir(it)
+            }
+        }
     }
 }
 
@@ -252,7 +381,7 @@ val createChecksums by project.tasks.registering(org.gradle.crypto.checksum.Chec
     val linkTask = project.tasks.named("linkRelease${target.capitalize()}")
     dependsOn(linkTask)
     files = linkTask.get().outputs.files.filter { it.isFile } +
-            if (target == "windows") files("$skiaDir/out/Release-x64/icudtl.dat") else files()
+            if (target == "windows") files(skiaDir.map { it.resolve("out/Release-x64/icudtl.dat") }) else files()
     algorithm = Checksum.Algorithm.SHA256
     outputDir = file("$buildDir/checksums")
 }
@@ -265,7 +394,7 @@ val skikoJvmRuntimeJar by project.tasks.registering(Jar::class) {
         it.outputs.files.filter { it.isFile }
     })
     if (target == "windows") {
-        from(files("$skiaDir/out/Release-x64/icudtl.dat"))
+        from(files(skiaDir.map { it.resolve("out/Release-x64/icudtl.dat") }))
     }
     from(createChecksums.get().outputs.files)
 }
@@ -373,4 +502,33 @@ publishing {
             }
         }
     }
+}
+
+class SkikoProperties(private val myProject: Project) {
+    val isCIBuild: Boolean
+        get() = myProject.hasProperty("teamcity")
+
+    val deployVersion: String
+        get() = myProject.property("deploy.version") as String
+
+    val isRelease: Boolean
+        get() = myProject.findProperty("deploy.release") == "true"
+
+    val skijaCommitHash: String
+        get() = myProject.property("dependencies.skija.git.commit") as String
+
+    val skiaReleaseForCurrentOS: String
+        get() = (myProject.property("dependencies.skia.$target") as String)
+
+    val visualStudioBuildToolsDir: File?
+        get() = System.getenv()["SKIKO_VSBT_PATH"]?.let { File(it) }?.takeIf { it.isDirectory }
+
+    val skijaDir: File?
+        get() = System.getenv()["SKIJA_DIR"]?.let { File(it) }?.takeIf { it.isDirectory }
+
+    val skiaDir: File?
+        get() = (System.getenv()["SKIA_DIR"] ?: System.getProperty("skia.dir"))?.let { File(it) }?.takeIf { it.isDirectory }
+
+    val dependenciesDir: File
+        get() = myProject.rootProject.projectDir.resolve("dependencies")
 }
