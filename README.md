@@ -4,7 +4,7 @@
 
 Skiko (short for Skia for Kotlin) is the graphical library exposing significant part
 of [Skia library](https://skia.org) APIs to Kotlin, along with the gluing code for rendering context.
-At the moment, Linux x86_64, Windows x86_64 and macOS x86_64 builds for Kotlin/JVM ara available.
+At the moment, Linux(x86_64), Windows(x86_64) and macOS(x86_64) builds for Kotlin/JVM are available.
 Using the library from Kotlin is as simple as:
 ```kotlin
 fun main(args: Array<String>) {
@@ -50,15 +50,12 @@ if (os == "Mac OS X") {
 }
 
 dependencies {
-    implementation platform('org.jetbrains.kotlin:kotlin-bom')
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
     implementation "org.jetbrains.skiko:skiko-jvm-runtime-$target:0.1.5"
-    testImplementation 'org.jetbrains.kotlin:kotlin-test'
-    testImplementation 'org.jetbrains.kotlin:kotlin-test-junit'
 }
 
 application {
-    mainClassName = 'SkijaInjectSample.AppKt'
+    mainClassName = 'AppKt'
 }
 ```
 
