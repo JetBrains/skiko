@@ -1,4 +1,66 @@
-# Kotlin Multiplatform bindings to Skia
+[![official project](http://jb.gg/badges/official.svg)](https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub)
+[![version](https://img.shields.io/badge/dynamic/json.svg?color=orange&label=latest%20version&query=%24.tag_name&url=https%3A%2F%2Fgithub.com%2FJetBrains%2Fskiko%2Freleases%2Flatest)](https://github.com/JetBrains/skiko/releases/latest)
+# Kotlin Multiplatform bindings to Skia #
+
+Skiko (short for Skia for Kotlin) is the graphical library exposing significant part
+of [Skia library](https://skia.org) APIs to Kotlin, along with the gluing code for rendering context.
+At the moment, Linux x86_64, Windows x86_64 and macOS x86_64 builds for Kotlin/JVM ara available.
+Using the library from Kotlin is as simple as:
+```kotlin
+fun main(args: Array<String>) {
+    SkiaWindow().apply {
+        layer.renderer = Renderer { renderer, w, h ->
+            val canvas = renderer.canvas!!
+            val paint1 = Paint().setColor(0xffff0000.toInt()) // ARGB
+            canvas.drawRRect(RRect.makeLTRB(10f, 10f, w - 10f, h - 10f, 5f), paint1)
+            val paint2 = Paint().setColor(0xff00ff00.toInt()) // ARGB
+            canvas.drawRRect(RRect.makeLTRB(30f, 30f, w - 30f, h - 30f, 10f), paint2)
+
+        }
+        setVisible(true)
+        setSize(800, 600)
+    }
+}
+```
+With the following `build.gradle`:
+```groovy
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.3.72'
+    id 'application'
+}
+
+repositories {
+    mavenLocal()
+    jcenter()
+    maven {
+       url 'https://packages.jetbrains.team/maven/p/ui/dev'
+    }
+}
+
+def os = System.getProperty("os.name")
+def target = ""
+if (os == "Mac OS X") {
+    target = "macos"
+} else if (os.startsWith("Win")) {
+    target = "windows"
+} else if (os.startsWith("Linux")) {
+    target = "linux"
+} else {
+    throw Error("Unsupported OS: $target")
+}
+
+dependencies {
+    implementation platform('org.jetbrains.kotlin:kotlin-bom')
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+    implementation "org.jetbrains.skiko:skiko-jvm-runtime-$target:0.1.5"
+    testImplementation 'org.jetbrains.kotlin:kotlin-test'
+    testImplementation 'org.jetbrains.kotlin:kotlin-test-junit'
+}
+
+application {
+    mainClassName = 'SkijaInjectSample.AppKt'
+}
+```
 
 ## Building JVM bindings
 
@@ -36,14 +98,3 @@ or by running `cmd` as administrator:
 ```
 setx /M SKIKO_VSBT_PATH "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools"
 ```
-
-#### Releasing new version of Skiko
-
-0. Check all necessary changes are published to the repository.
-1. Trigger a new deployment in [Publish release](https://teamcity.jetbrains.com/buildConfiguration/JetBrainsPublicProjects_Skija_Skiko_PublishRelease)
-build configuration.
-    1. Click "Deploy" button.
-    2. Specify the desired version in "Skiko Release Version" text field on the "Parameters" tab.
-    3. Choose the desired branch and commit on the "Changes" tab.
-    4. Optionally you can check "Put the build to the queue top" option in the "General" tab to speed up a deployment
-    (please be mindful about it!).

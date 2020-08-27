@@ -15,8 +15,23 @@ import org.jetbrains.skija.paragraph.ParagraphBuilder
 import org.jetbrains.skija.paragraph.ParagraphStyle
 import org.jetbrains.skija.paragraph.TextStyle
 
-fun main(args: Array<String>) {
+fun main2(args: Array<String>) {
     createWindow("First window");
+}
+
+fun main(args: Array<String>) {
+    SkiaWindow().apply {
+        layer.renderer = Renderer { renderer, w, h ->
+            val canvas = renderer.canvas!!
+            val paint1 = Paint().setColor(0xffff0000.toInt()) // ARGB
+            canvas.drawRRect(RRect.makeLTRB(10f, 10f, w - 10f, h - 10f, 5f), paint1)
+            val paint2 = Paint().setColor(0xff00ff00.toInt()) // ARGB
+            canvas.drawRRect(RRect.makeLTRB(30f, 30f, w - 30f, h - 30f, 10f), paint2)
+
+        }
+        setVisible(true)
+        setSize(800, 600)
+    }
 }
 
 fun createWindow(title: String) {
@@ -42,9 +57,9 @@ fun createWindow(title: String) {
         }
     })
 
-    window.setVisible(true);
+    window.setVisible(true)
     // MANDATORY: set window size after calling setVisible(true)
-    window.setSize(800, 600);
+    window.setSize(800, 600)
 }
 
 class Renderer(val displayScene: (Renderer, Int, Int) -> Unit): SkiaRenderer {
