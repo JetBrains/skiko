@@ -14,39 +14,50 @@ import org.jetbrains.skija.paragraph.FontCollection
 import org.jetbrains.skija.paragraph.ParagraphBuilder
 import org.jetbrains.skija.paragraph.ParagraphStyle
 import org.jetbrains.skija.paragraph.TextStyle
+import javax.swing.JOptionPane
 
-fun main2(args: Array<String>) {
+import java.awt.event.ActionEvent
+import java.awt.event.ActionListener
+import java.awt.event.KeyEvent
+import javax.swing.JFrame
+import javax.swing.JMenu
+import javax.swing.JMenuBar
+import javax.swing.JMenuItem
+import javax.swing.KeyStroke
+import java.awt.Toolkit
+
+fun main(args: Array<String>) {
     createWindow("First window");
 }
 
-fun main(args: Array<String>) {
-    SkiaWindow().apply {
-        layer.renderer = Renderer { renderer, w, h ->
-            val canvas = renderer.canvas!!
-            val paint1 = Paint().setColor(0xffff0000.toInt()) // ARGB
-            canvas.drawRRect(RRect.makeLTRB(10f, 10f, w - 10f, h - 10f, 5f), paint1)
-            val paint2 = Paint().setColor(0xff00ff00.toInt()) // ARGB
-            canvas.drawRRect(RRect.makeLTRB(30f, 30f, w - 30f, h - 30f, 10f), paint2)
-
-        }
-        setVisible(true)
-        setSize(800, 600)
-    }
-}
-
 fun createWindow(title: String) {
-
     var mouseX = 0
     var mouseY = 0
 
     val window = SkiaWindow()
     window.defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
 
+    // Create menu.
+    val menuBar = JMenuBar()
+    val menu = JMenu("File")
+    menuBar.add(menu)
+    val menuItem = JMenuItem("Say Hello")
+    val ctrlJ = KeyStroke.getKeyStroke(KeyEvent.VK_J, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
+    menuItem.setAccelerator(ctrlJ)
+    menuItem.addActionListener(object : ActionListener {
+        override fun actionPerformed(actionEvent: ActionEvent?) {
+            println("Hello, World")
+        }
+    })
+
+    menu.add(menuItem)
+    window.setJMenuBar(menuBar)
+    java.awt.Desktop.getDesktop().setDefaultMenuBar(menuBar)
+
     val state = State()
     state.text = title
 
-    window.layer.renderer = Renderer {
-        renderer, w, h -> displayScene(renderer, w, h, mouseX, mouseY, state)
+    window.layer.renderer = Renderer { renderer, w, h -> displayScene(renderer, w, h, mouseX, mouseY, state)
     }
 
     window.layer.addMouseMotionListener(object : MouseMotionAdapter() {
