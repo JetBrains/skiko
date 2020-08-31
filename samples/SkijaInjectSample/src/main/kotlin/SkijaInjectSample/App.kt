@@ -52,8 +52,11 @@ fun createWindow(title: String) {
 
     menu.add(menuItem)
     window.setJMenuBar(menuBar)
-    java.awt.Desktop.getDesktop().setDefaultMenuBar(menuBar)
-
+    try {
+        java.awt.Desktop.getDesktop().setDefaultMenuBar(menuBar)
+    } catch (e: UnsupportedOperationException) {
+        // Not all platforms allow this.
+    }
     val state = State()
     state.text = title
 
