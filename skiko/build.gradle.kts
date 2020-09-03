@@ -228,6 +228,7 @@ tasks.withType(CppCompile::class.java).configureEach {
         "-DSK_GAMMA_SRGB",
         "-DSK_SCALAR_TO_FLOAT_EXCLUDED",
         "-DSK_SUPPORT_GPU=1",
+        "-DSK_GL",
         "-DSK_SUPPORT_OPENCL=0",
         "-Dskija_EXPORTS",
         "-DNDEBUG"
