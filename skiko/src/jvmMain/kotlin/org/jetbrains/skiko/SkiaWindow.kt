@@ -42,6 +42,7 @@ open class SkiaLayer : HardwareLayer() {
     }
 
     override fun disposeLayer() {
+        super.disposeLayer()
         renderer?.onDispose()
     }
 
