@@ -3,6 +3,8 @@
 
 #define GL_SILENCE_DEPRECATION
 
+#define kNullWindowHandle NULL
+
 #import <Cocoa/Cocoa.h>
 #import <QuartzCore/QuartzCore.h>
 #import <OpenGL/gl3.h>
@@ -227,4 +229,8 @@ JNIEXPORT jfloat JNICALL Java_org_jetbrains_skiko_HardwareLayer_getContentScale(
         return [layer.glLayer contentsScale];
     }
     return 1.0f;
+}
+
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getWindowHandle(JNIEnv *env, jobject window) {
+    return (jlong)kNullWindowHandle;
 }

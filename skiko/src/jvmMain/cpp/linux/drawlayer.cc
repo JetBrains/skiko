@@ -195,4 +195,42 @@ extern "C"
     {
         return 1.0f;
     }
+
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getWindowHandle(JNIEnv *env, jobject canvas)
+    {
+        JAWT awt;
+        JAWT_DrawingSurface *ds = NULL;
+        JAWT_DrawingSurfaceInfo *dsi = NULL;
+
+        jboolean result = JNI_FALSE;
+        jint lock = 0;
+        JAWT_X11DrawingSurfaceInfo *dsi_x11;
+
+        awt.version = (jint)JAWT_VERSION_9;
+        result = Skiko_GetAWT(env, &awt);
+
+        if (result == JNI_FALSE)
+        {
+            fprintf(stderr, "JAWT_GetAWT failed! Result is JNI_FALSE\n");
+            return;
+        }
+
+        if (jvm == NULL)
+        {
+            env->GetJavaVM(&jvm);
+        }
+
+        ds = awt.GetDrawingSurface(env, canvas);
+        lock = ds->Lock(ds);
+        dsi = ds->GetDrawingSurfaceInfo(ds);
+        dsi_x11 = (JAWT_X11DrawingSurfaceInfo *)dsi->platformInfo;
+
+        Window window = dsi_x11->drawable;
+
+        ds->FreeDrawingSurfaceInfo(dsi);
+        ds->Unlock(ds);
+        awt.FreeDrawingSurface(ds);
+
+        return (jlong)window;
+    }
 } // extern "C"

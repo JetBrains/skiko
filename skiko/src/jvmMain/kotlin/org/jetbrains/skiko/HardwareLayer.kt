@@ -15,6 +15,8 @@ open class HardwareLayer : Canvas(), Drawable {
     external override fun redrawLayer()
     external override fun updateLayer()
     external override fun disposeLayer()
+    override val windowHandle: Int
+        external get
     override val contentScale: Float
         external get
 }
