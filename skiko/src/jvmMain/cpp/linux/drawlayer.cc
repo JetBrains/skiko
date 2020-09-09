@@ -212,7 +212,7 @@ extern "C"
         if (result == JNI_FALSE)
         {
             fprintf(stderr, "JAWT_GetAWT failed! Result is JNI_FALSE\n");
-            return;
+            return -1;
         }
 
         if (jvm == NULL)
