@@ -18,16 +18,6 @@ version = run {
     properties.deployVersion + suffix
 }
 
-val hostOs = System.getProperty("os.name")
-val target = when {
-    hostOs == "Mac OS X" -> "macos"
-    hostOs == "Linux" -> "linux"
-    hostOs.startsWith("Win") -> "windows"
-    else -> throw Error("Unknown os $hostOs")
-}
-
-val jdkHome = System.getProperty("java.home") ?: error("'java.home' is null")
-
 repositories {
     mavenCentral()
     maven {
@@ -131,6 +121,8 @@ val skijaDir = run {
         }.map { skijaDest }
     }
 }
+
+
 
 val lombok by configurations.creating
 val jetbrainsAnnotations by configurations.creating
@@ -503,33 +495,4 @@ publishing {
             }
         }
     }
-}
-
-class SkikoProperties(private val myProject: Project) {
-    val isCIBuild: Boolean
-        get() = myProject.hasProperty("teamcity")
-
-    val deployVersion: String
-        get() = myProject.property("deploy.version") as String
-
-    val isRelease: Boolean
-        get() = myProject.findProperty("deploy.release") == "true"
-
-    val skijaCommitHash: String
-        get() = myProject.property("dependencies.skija.git.commit") as String
-
-    val skiaReleaseForCurrentOS: String
-        get() = (myProject.property("dependencies.skia.$target") as String)
-
-    val visualStudioBuildToolsDir: File?
-        get() = System.getenv()["SKIKO_VSBT_PATH"]?.let { File(it) }?.takeIf { it.isDirectory }
-
-    val skijaDir: File?
-        get() = System.getenv()["SKIJA_DIR"]?.let { File(it) }?.takeIf { it.isDirectory }
-
-    val skiaDir: File?
-        get() = (System.getenv()["SKIA_DIR"] ?: System.getProperty("skia.dir"))?.let { File(it) }?.takeIf { it.isDirectory }
-
-    val dependenciesDir: File
-        get() = myProject.rootProject.projectDir.resolve("dependencies")
 }
