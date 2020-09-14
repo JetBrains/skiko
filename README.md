@@ -23,8 +23,6 @@ fun main(args: Array<String>) {
 }
 
 class Renderer(val displayScene: (Renderer, Int, Int) -> Unit): SkiaRenderer {
-    val typeface = Typeface.makeFromFile("fonts/JetBrainsMono-Regular.ttf")
-    val font = Font(typeface, 40f)
     val paint = Paint().apply {
             setColor(0xff9BC730L.toInt())
             setMode(PaintMode.FILL)
