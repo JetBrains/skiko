@@ -10,12 +10,20 @@ plugins {
     id("de.undercouch.download") version "4.1.1"
 }
 
-val properties = SkikoProperties(rootProject)
+buildscript {
+    dependencies {
+        classpath("org.kohsuke:github-api:1.116")
+    }
+    repositories {
+        mavenCentral()
+    }
+}
 
-group = "org.jetbrains.skiko"
-version = run {
-    val suffix = if (properties.isRelease) "" else "-SNAPSHOT"
-    properties.deployVersion + suffix
+val skiko = SkikoProperties(rootProject)
+
+allprojects {
+    group = "org.jetbrains.skiko"
+    version = skiko.deployVersion
 }
 
 repositories {
@@ -26,12 +34,12 @@ repositories {
 }
 
 val skiaZip = run {
-    val zipName = properties.skiaReleaseForCurrentOS + ".zip"
-    val zipFile = properties.dependenciesDir.resolve("skia/$zipName")
+    val zipName = skiko.skiaReleaseForCurrentOS + ".zip"
+    val zipFile = skiko.dependenciesDir.resolve("skia/$zipName")
 
     tasks.register("downloadSkia", Download::class) {
-        onlyIf { properties.skiaDir == null && !zipFile.exists() }
-        inputs.property("skia.release.for.current.os", properties.skiaReleaseForCurrentOS)
+        onlyIf { skiko.skiaDir == null && !zipFile.exists() }
+        inputs.property("skia.release.for.current.os", skiko.skiaReleaseForCurrentOS)
         src("https://bintray.com/api/ui/download/jetbrains/skija/$zipName")
         dest(zipFile)
         onlyIfModified(true)
@@ -72,16 +80,16 @@ fun AbstractCopyTask.configureSkiaCopy(targetDir: File) {
 }
 
 val skiaDir = run {
-    if (properties.skiaDir != null) {
+    if (skiko.skiaDir != null) {
         tasks.register("skiaDir", DefaultTask::class) {
             // dummy task to simplify usage of the resulting provider (see `else` branch)
             // if a file provider is not created from a task provider,
             // then it cannot be used instead of a task in `dependsOn` clauses of other tasks.
             // e.g. the resulting `skiaDir` could not be used in `dependsOn` of CppCompile configuration
             enabled = false
-        }.map { properties.skiaDir!! }
+        }.map { skiko.skiaDir!! }
     } else {
-        val targetDir = properties.dependenciesDir.resolve("skia/skia")
+        val targetDir = skiko.dependenciesDir.resolve("skia/skia")
         tasks.register("unzipSkia", Copy::class) {
             from(skiaZip.map { zipTree(it) })
             configureSkiaCopy(targetDir)
@@ -90,27 +98,27 @@ val skiaDir = run {
 }
 
 val skijaZip = run {
-    val zipFile = properties.dependenciesDir.resolve("skija/${properties.skijaCommitHash}.zip")
+    val zipFile = skiko.dependenciesDir.resolve("skija/${skiko.skijaCommitHash}.zip")
 
     tasks.register("downloadSkija", Download::class) {
-        onlyIf { properties.skijaDir == null && !zipFile.exists() }
-        inputs.property("skija.commit.hash", properties.skijaCommitHash)
-        src("https://github.com/JetBrains/skija/archive/${properties.skijaCommitHash}.zip")
+        onlyIf { skiko.skijaDir == null && !zipFile.exists() }
+        inputs.property("skija.commit.hash", skiko.skijaCommitHash)
+        src("https://github.com/JetBrains/skija/archive/${skiko.skijaCommitHash}.zip")
         dest(zipFile)
         onlyIfModified(true)
     }.map { zipFile }
 }
 
 val skijaDir = run {
-    if (properties.skijaDir != null) {
+    if (skiko.skijaDir != null) {
         tasks.register("skijaDir", DefaultTask::class) {
             enabled = false
-        }.map { properties.skijaDir!! }
+        }.map { skiko.skijaDir!! }
     } else {
-        val skijaDest = properties.dependenciesDir.resolve("skija/skija").apply { mkdirs() }
+        val skijaDest = skiko.dependenciesDir.resolve("skija/skija").apply { mkdirs() }
         tasks.register("unzipSkija", Copy::class) {
             from(skijaZip.map { zipTree(it) }) {
-                include("skija-${properties.skijaCommitHash}/**")
+                include("skija-${skiko.skijaCommitHash}/**")
                 eachFile {
                     // drop skija-<COMMIT> subdir
                     relativePath = RelativePath(true, *relativePath.segments.drop(1).toTypedArray())
@@ -358,7 +366,7 @@ library {
         withType(VisualCpp::class.java) {
             // In some cases Gradle is unable to find VC++ toolchain
             // https://github.com/gradle/gradle-native/issues/617
-            properties.visualStudioBuildToolsDir?.let {
+            skiko.visualStudioBuildToolsDir?.let {
                 setInstallDir(it)
             }
         }

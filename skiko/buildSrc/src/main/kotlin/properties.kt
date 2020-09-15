@@ -15,7 +15,10 @@ class SkikoProperties(private val myProject: Project) {
         get() = myProject.hasProperty("teamcity")
 
     val deployVersion: String
-        get() = myProject.property("deploy.version") as String
+        get() {
+            val version = myProject.property("deploy.version") as String
+            return if (isRelease) version else "$version-SNAPSHOT"
+        }
 
     val isRelease: Boolean
         get() = myProject.findProperty("deploy.release") == "true"
@@ -25,6 +28,12 @@ class SkikoProperties(private val myProject: Project) {
 
     val skiaReleaseForCurrentOS: String
         get() = (myProject.property("dependencies.skia.$target") as String)
+
+    val releaseGithubVersion: String
+        get() = (myProject.property("release.github.version") as String)
+
+    val releaseGithubCommit: String
+        get() = (myProject.property("release.github.commit") as String)
 
     val visualStudioBuildToolsDir: File?
         get() = System.getenv()["SKIKO_VSBT_PATH"]?.let { File(it) }?.takeIf { it.isDirectory }
