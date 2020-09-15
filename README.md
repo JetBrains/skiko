@@ -21,6 +21,30 @@ fun main(args: Array<String>) {
         setSize(800, 600)
     }
 }
+
+class Renderer(val displayScene: (Renderer, Int, Int) -> Unit): SkiaRenderer {
+    val paint = Paint().apply {
+            setColor(0xff9BC730L.toInt())
+            setMode(PaintMode.FILL)
+            setStrokeWidth(1f)
+    }
+
+    var canvas: Canvas? = null
+
+    override fun onInit() {
+    }
+
+    override fun onDispose() {
+    }
+
+    override fun onReshape(width: Int, height: Int) {
+    }
+
+    override fun onRender(canvas: Canvas, width: Int, height: Int) {
+        this.canvas = canvas
+        displayScene(this, width, height)
+    }
+}
 ```
 With the following `build.gradle`:
 ```groovy
