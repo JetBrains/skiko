@@ -9,3 +9,4 @@ pluginManagement {
     
 }
 rootProject.name = "skiko"
+include("ci")
