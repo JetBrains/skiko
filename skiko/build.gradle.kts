@@ -466,11 +466,11 @@ publishing {
             url = uri("${rootProject.buildDir}/repo")
         }
         maven {
-            name = "Space"
-            url = uri("https://packages.jetbrains.team/maven/p/ui/dev")
+            name = "ComposeRepo"
+            url = uri(skiko.composeRepoUrl)
             credentials {
-                username = System.getenv("SKIKO_SPACE_USERNAME")
-                password = System.getenv("SKIKO_SPACE_KEY")
+                username = skiko.composeRepoUserName
+                password = skiko.composeRepoKey
             }
         }
     }

@@ -44,6 +44,15 @@ class SkikoProperties(private val myProject: Project) {
     val skiaDir: File?
         get() = (System.getenv()["SKIA_DIR"] ?: System.getProperty("skia.dir"))?.let { File(it) }?.takeIf { it.isDirectory }
 
+    val composeRepoUrl: String
+        get() = System.getenv("COMPOSE_REPO_URL") ?: "https://maven.pkg.jetbrains.space/public/p/compose/dev"
+
+    val composeRepoUserName: String
+        get() = System.getenv("COMPOSE_REPO_USERNAME")
+
+    val composeRepoKey: String
+        get() = System.getenv("COMPOSE_REPO_KEY")
+
     val dependenciesDir: File
         get() = myProject.rootProject.projectDir.resolve("dependencies")
 }

@@ -29,13 +29,11 @@ build configuration.
 ./gradlew publishToBuildRepo
 ```
 
-##### Publish to Space
-Set up environment variables `SKIKO_SPACE_USERNAME` and `SKIKO_SPACE_KEY`.
+##### Publish to Compose repo
+Set up environment variables `COMPOSE_REPO_USERNAME` and `COMPOSE_REPO_KEY`.
 ```
-./gradlew publishToSpace
+./gradlew publishToComposeRepo
 ```
-
-See https://jetbrains.team/p/ui/packages/dev for published packages.
 
 ##### Publish to all repositories
 ```
