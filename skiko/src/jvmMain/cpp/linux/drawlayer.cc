@@ -96,7 +96,7 @@ LayersSet *findByObject(JNIEnv *env, jobject object)
             return layer;
         }
     }
-    fprintf(stderr, "The set does not contain this window.\n");
+
     return NULL;
 }
 

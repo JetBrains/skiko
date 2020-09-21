@@ -66,26 +66,44 @@ open class SkiaLayer : HardwareLayer() {
 
     private fun initSkija() {
         val dpi = contentScale
-        skijaState.clear()
-        val gl: OpenGLApi = OpenGLApi.instance
-        val fbId = gl.glGetIntegerv(gl.GL_DRAW_FRAMEBUFFER_BINDING)
-        skijaState.renderTarget = BackendRenderTarget.makeGL(
-            (width * dpi).toInt(),
-            (height * dpi).toInt(),
-            0,
-            8,
-            fbId,
-            FramebufferFormat.GR_GL_RGBA8
-        )
-        skijaState.surface = Surface.makeFromBackendRenderTarget(
-            skijaState.context,
-            skijaState.renderTarget,
-            SurfaceOrigin.BOTTOM_LEFT,
-            SurfaceColorFormat.RGBA_8888,
-            ColorSpace.getSRGB()
-        )
-        skijaState.canvas = skijaState.surface!!.canvas
-        skijaState.canvas!!.scale(dpi, dpi)
+        initRenderTarget(dpi)
+        initSurface()
+        scaleCanvas(dpi)
+    }
+
+    private fun initRenderTarget(dpi: Float) {
+        skijaState.apply {
+            clear()
+            val gl: OpenGLApi = OpenGLApi.instance
+            val fbId = gl.glGetIntegerv(gl.GL_DRAW_FRAMEBUFFER_BINDING)
+            renderTarget = BackendRenderTarget.makeGL(
+                (width * dpi).toInt(),
+                (height * dpi).toInt(),
+                0,
+                8,
+                fbId,
+                FramebufferFormat.GR_GL_RGBA8
+            )
+        }
+    }
+
+    private fun initSurface() {
+        skijaState.apply {
+            surface = Surface.makeFromBackendRenderTarget(
+                context,
+                renderTarget,
+                SurfaceOrigin.BOTTOM_LEFT,
+                SurfaceColorFormat.RGBA_8888,
+                ColorSpace.getSRGB()
+            )
+            canvas = surface!!.canvas
+        }
+    }
+
+    protected open fun scaleCanvas(dpi: Float) {
+        skijaState.apply {
+            canvas!!.scale(dpi, dpi)
+        }
     }
 }
 
