@@ -9,7 +9,7 @@ fun connectToGitHub() =
 
 
 repositories {
-    maven("https://packages.jetbrains.team/maven/p/ui/dev")
+    maven(skiko.composeRepoUrl)
 }
 
 val skikoArtifacts by configurations.creating
