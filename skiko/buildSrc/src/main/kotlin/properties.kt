@@ -48,10 +48,10 @@ class SkikoProperties(private val myProject: Project) {
         get() = System.getenv("COMPOSE_REPO_URL") ?: "https://maven.pkg.jetbrains.space/public/p/compose/dev"
 
     val composeRepoUserName: String
-        get() = System.getenv("COMPOSE_REPO_USERNAME")
+        get() = System.getenv("COMPOSE_REPO_USERNAME") ?: ""
 
     val composeRepoKey: String
-        get() = System.getenv("COMPOSE_REPO_KEY")
+        get() = System.getenv("COMPOSE_REPO_KEY") ?: ""
 
     val dependenciesDir: File
         get() = myProject.rootProject.projectDir.resolve("dependencies")
