@@ -45,7 +45,6 @@ jobject windowRef;
     CGLSetCurrentContext(ctx);
 
     if (jvm != NULL) {
-        // TODO: cache wndClass and drawMethod.
         JNIEnv *env;
         (*jvm)->AttachCurrentThread(jvm, (void **)&env, NULL);
 

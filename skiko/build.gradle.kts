@@ -219,6 +219,7 @@ tasks.withType(CppCompile::class.java).configureEach {
         "-I$skiaDir/include/gpu",
         "-I$skiaDir/include/effects",
         "-I$skiaDir/include/pathops",
+        "-I$skiaDir/include/utils",
         "-I$skiaDir/modules/skparagraph/include",
         "-I$skiaDir/modules/skshaper/include",
         "-I$skiaDir/third_party/externals/harfbuzz/src",
