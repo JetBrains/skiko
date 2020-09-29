@@ -39,10 +39,16 @@ fun createWindow(title: String) {
 
     // Create menu.
     val menuBar = JMenuBar()
+    try {
+        System.setProperty("apple.laf.useScreenMenuBar", "true")
+        java.awt.Desktop.getDesktop().setDefaultMenuBar(menuBar)
+    } catch (e: UnsupportedOperationException) {
+        // Not all platforms allow this.
+    }
     val menu = JMenu("File")
     menuBar.add(menu)
     val menuItem = JMenuItem("Say Hello")
-    val ctrlJ = KeyStroke.getKeyStroke(KeyEvent.VK_J, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
+    val ctrlJ = KeyStroke.getKeyStroke(KeyEvent.VK_J, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx())
     menuItem.setAccelerator(ctrlJ)
     menuItem.addActionListener(object : ActionListener {
         override fun actionPerformed(actionEvent: ActionEvent?) {
@@ -52,11 +58,7 @@ fun createWindow(title: String) {
 
     menu.add(menuItem)
     window.setJMenuBar(menuBar)
-    try {
-        java.awt.Desktop.getDesktop().setDefaultMenuBar(menuBar)
-    } catch (e: UnsupportedOperationException) {
-        // Not all platforms allow this.
-    }
+
     val state = State()
     state.text = title
 

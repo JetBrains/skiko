@@ -51,12 +51,11 @@ open class SkiaLayer : HardwareLayer() {
             if (skijaState.context == null) {
                 skijaState.context = Context.makeGL()
             }
-            initSkija()
             renderer?.onInit()
             inited = true
             renderer?.onReshape(width, height)
         }
-
+        initSkija()
         skijaState.apply {
             canvas!!.clear(-1)
             renderer?.onRender(canvas!!, width, height)
