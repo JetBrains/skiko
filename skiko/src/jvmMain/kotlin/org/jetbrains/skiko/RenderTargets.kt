@@ -11,7 +11,6 @@ internal fun makeGLRenderTarget(width: Int, height: Int, sampleCnt: Int, stencil
     makeGLRenderTargetNative(width, height, sampleCnt, stencilBits, fbId, fbFormat)
 )
 
-@Suppress("UNUSED_PARAMETER")
 internal fun makeMetalRenderTarget(width: Int, height: Int, sampleCnt: Int) = BackendRenderTarget(
     makeMetalRenderTargetNative(width, height, sampleCnt).also { if (it == 0L) TODO("not yet supported") }
 )
