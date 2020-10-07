@@ -8,6 +8,8 @@
 #import <Cocoa/Cocoa.h>
 #import <QuartzCore/QuartzCore.h>
 #import <OpenGL/gl3.h>
+#import <Metal/Metal.h>
+#import <QuartzCore/CAMetalLayer.h>
 
 JavaVM *jvm = NULL;
 
@@ -251,4 +253,11 @@ JNIEXPORT jfloat JNICALL Java_org_jetbrains_skiko_HardwareLayer_getContentScale(
 
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getWindowHandle(JNIEnv *env, jobject window) {
     return (jlong)kNullWindowHandle;
+}
+
+void getMetalDeviceAndQueue(void** device, void** queue) {
+    id<MTLDevice> fDevice = MTLCreateSystemDefaultDevice();
+    id<MTLCommandQueue> fQueue = [fDevice newCommandQueue];
+    *device = (__bridge void*)fDevice;
+    *queue = (__bridge void*)fQueue;
 }
