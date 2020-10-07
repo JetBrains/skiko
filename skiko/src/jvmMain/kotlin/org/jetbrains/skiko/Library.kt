@@ -37,7 +37,7 @@ object Library {
         if (loaded) return
 
         loadOrGet(resourcePath, name, true)
-        val loadIcu = System.getProperty("os.name").toLowerCase().startsWith("win")
+        val loadIcu = OSType.currentOs == OSType.WINDOWS
         if (loadIcu) {
             loadOrGet(resourcePath, "icudtl.dat", false)
         }

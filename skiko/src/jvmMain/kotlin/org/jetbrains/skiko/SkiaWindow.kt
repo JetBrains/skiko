@@ -31,7 +31,9 @@ interface SkiaRenderer {
     fun onDispose()
 }
 
-open class SkiaLayer : HardwareLayer() {
+open class SkiaLayer() : HardwareLayer() {
+    open val api: GraphicsApi = GraphicsApi.OPENGL
+
     var renderer: SkiaRenderer? = null
 
     private val skijaState = SkijaState()
@@ -49,7 +51,11 @@ open class SkiaLayer : HardwareLayer() {
     override fun draw() {
         if (!inited) {
             if (skijaState.context == null) {
-                skijaState.context = Context.makeGL()
+                skijaState.context = when (api) {
+                    GraphicsApi.OPENGL -> makeGLContext()
+                    GraphicsApi.METAL -> makeMetalContext()
+                    else -> TODO("Unsupported yet")
+                }
             }
             renderer?.onInit()
             inited = true
@@ -73,16 +79,26 @@ open class SkiaLayer : HardwareLayer() {
     private fun initRenderTarget(dpi: Float) {
         skijaState.apply {
             clear()
-            val gl: OpenGLApi = OpenGLApi.instance
-            val fbId = gl.glGetIntegerv(gl.GL_DRAW_FRAMEBUFFER_BINDING)
-            renderTarget = BackendRenderTarget.makeGL(
-                (width * dpi).toInt(),
-                (height * dpi).toInt(),
-                0,
-                8,
-                fbId,
-                FramebufferFormat.GR_GL_RGBA8
-            )
+            renderTarget = when (api) {
+                GraphicsApi.OPENGL -> {
+                    val gl = OpenGLApi.instance
+                    val fbId = gl.glGetIntegerv(gl.GL_DRAW_FRAMEBUFFER_BINDING)
+                    makeGLRenderTarget(
+                        (width * dpi).toInt(),
+                        (height * dpi).toInt(),
+                        0,
+                        8,
+                        fbId,
+                        FramebufferFormat.GR_GL_RGBA8
+                    )
+                }
+                GraphicsApi.METAL -> makeMetalRenderTarget(
+                    (width * dpi).toInt(),
+                    (height * dpi).toInt(),
+                    0
+                )
+                else -> TODO("Unsupported yet")
+            }
         }
     }
 

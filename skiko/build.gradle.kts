@@ -243,7 +243,8 @@ tasks.withType(CppCompile::class.java).configureEach {
                     "-fvisibility=hidden",
                     "-fvisibility-inlines-hidden",
                     "-I$jdkHome/include/darwin",
-                    "-DSK_BUILD_FOR_MAC"
+                    "-DSK_BUILD_FOR_MAC",
+                    "-DSK_METAL"
                 )
             )
         }
@@ -312,6 +313,7 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
                     "-framework", "CoreServices",
                     "-framework", "CoreText",
                     "-framework", "Foundation",
+                    "-framework", "Metal",
                     "-framework", "OpenGL",
                     "-framework", "QuartzCore" // for CoreAnimation
                 )
