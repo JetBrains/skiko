@@ -70,7 +70,7 @@ open class SkiaLayer() : HardwareLayer() {
     }
 
     private fun initSkija() {
-        val dpi = contentScale
+        val dpi = graphicsConfiguration.defaultTransform.scaleX.toFloat()
         initRenderTarget(dpi)
         initSurface()
         scaleCanvas(dpi)

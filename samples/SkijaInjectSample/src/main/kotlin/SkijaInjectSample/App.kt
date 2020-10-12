@@ -36,6 +36,7 @@ fun createWindow(title: String) {
 
     val window = SkiaWindow()
     window.defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
+    window.title = title
 
     // Create menu.
     val menuBar = JMenuBar()
@@ -73,9 +74,9 @@ fun createWindow(title: String) {
         }
     })
 
-    window.setVisible(true)
-    // MANDATORY: set window size after calling setVisible(true)
+    // MANDATORY: set window size before calling setVisible(true)
     window.setSize(800, 600)
+    window.setVisible(true)
 }
 
 class Renderer(val displayScene: (Renderer, Int, Int) -> Unit): SkiaRenderer {
