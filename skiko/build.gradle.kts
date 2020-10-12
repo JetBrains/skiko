@@ -35,12 +35,12 @@ repositories {
 
 val skiaZip = run {
     val zipName = skiko.skiaReleaseForCurrentOS + ".zip"
-    val zipFile = skiko.dependenciesDir.resolve("skia/$zipName")
+    val zipFile = skiko.dependenciesDir.resolve("skia/${zipName.substringAfterLast('/')}")
 
     tasks.register("downloadSkia", Download::class) {
         onlyIf { skiko.skiaDir == null && !zipFile.exists() }
         inputs.property("skia.release.for.current.os", skiko.skiaReleaseForCurrentOS)
-        src("https://bintray.com/api/ui/download/jetbrains/skija/$zipName")
+        src("https://github.com/JetBrains/skia-build/releases/download/$zipName")
         dest(zipFile)
         onlyIfModified(true)
     }.map { zipFile }
