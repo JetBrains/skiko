@@ -40,12 +40,6 @@ fun createWindow(title: String) {
 
     // Create menu.
     val menuBar = JMenuBar()
-    try {
-        System.setProperty("apple.laf.useScreenMenuBar", "true")
-        java.awt.Desktop.getDesktop().setDefaultMenuBar(menuBar)
-    } catch (e: UnsupportedOperationException) {
-        // Not all platforms allow this.
-    }
     val menu = JMenu("File")
     menuBar.add(menu)
     val menuItem = JMenuItem("Say Hello")
