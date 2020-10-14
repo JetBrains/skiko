@@ -230,6 +230,7 @@ tasks.withType(CppCompile::class.java).configureEach {
         "-DSK_SCALAR_TO_FLOAT_EXCLUDED",
         "-DSK_SUPPORT_GPU=1",
         "-DSK_GL",
+        "-DSK_SHAPER_HARFBUZZ_AVAILABLE",
         "-DSK_SUPPORT_OPENCL=0",
         "-Dskija_EXPORTS",
         "-DNDEBUG"
@@ -243,6 +244,7 @@ tasks.withType(CppCompile::class.java).configureEach {
                     "-fvisibility=hidden",
                     "-fvisibility-inlines-hidden",
                     "-I$jdkHome/include/darwin",
+                    "-DSK_SHAPER_CORETEXT_AVAILABLE",
                     "-DSK_BUILD_FOR_MAC",
                     "-DSK_METAL"
                 )
