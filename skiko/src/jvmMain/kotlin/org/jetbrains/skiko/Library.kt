@@ -19,7 +19,7 @@ object Library {
             Library::class.java.getResourceAsStream("$path$resourceName").use { input ->
                 Files.copy(input, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
             }
-            Files.move(tempFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING)
+            Files.move(tempFile.toPath(), file.toPath(), StandardCopyOption.ATOMIC_MOVE)
         }
         if (isLibrary) {
             System.load(file.absolutePath)
