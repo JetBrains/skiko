@@ -10,40 +10,49 @@ import javax.swing.UIManager
 object Library {
     private var loaded = false
 
-    private val cacheDir = "${System.getProperty("user.home")}/.skiko/"
+    private val cacheRoot = "${System.getProperty("user.home")}/.skiko/"
 
-    private fun loadOrGet(path: String, resource: String, isLibrary: Boolean) {
-        File(cacheDir).mkdirs()
-        
-        val resourceName = if (isLibrary) System.mapLibraryName(resource) else resource
-        val hash = Library::class.java.getResourceAsStream("$path$resourceName.sha256").use {
-            BufferedReader(InputStreamReader(it)).lines().toArray()[0] as String
-        }
-
-        val fileName = if (isLibrary) System.mapLibraryName(hash) else resource
-        val file = File(cacheDir, fileName)
-        // TODO: small race change when multiple Compose apps are started first time, can handle with atomic rename.
+    private fun loadOrGet(cacheDir: File, path: String, resourceName: String, isLibrary: Boolean) {
+        val file = File(cacheDir, resourceName)
         if (!file.exists()) {
+            val tempFile = File.createTempFile("skiko", "", cacheDir)
             Library::class.java.getResourceAsStream("$path$resourceName").use { input ->
-                Files.copy(input, file.toPath(), StandardCopyOption.REPLACE_EXISTING)
+                Files.copy(input, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
             }
+            Files.move(tempFile.toPath(), file.toPath(), StandardCopyOption.ATOMIC_MOVE)
         }
         if (isLibrary) {
             System.load(file.absolutePath)
         }
     }
 
+    // This function does the following: on request to load given resource,
+    // it checks if resource with given name is found in content-derived directory
+    // in Skiko's home, and if not - unpacks it. Also, it could load additional
+    // localization resource on platforms wher it is needed.
     @Synchronized
     fun load(resourcePath: String, name: String) {
         if (loaded) return
 
-        loadOrGet(resourcePath, name, true)
+        val platformName = System.mapLibraryName(name)
+
+        val hash = Library::class.java.getResourceAsStream("$resourcePath$platformName.sha256").use {
+            BufferedReader(InputStreamReader(it)).lines().toArray()[0] as String
+        }
+        val cacheDir = File("$cacheRoot/$hash")
+        cacheDir.mkdirs()
+        loadOrGet(cacheDir, resourcePath, platformName, true)
         val loadIcu = OSType.currentOs == OSType.WINDOWS
         if (loadIcu) {
-            loadOrGet(resourcePath, "icudtl.dat", false)
+            loadOrGet(cacheDir, resourcePath, "icudtl.dat", false)
         }
-        loaded = true
 
+        miscSystemInit()
+        loaded = true
+    }
+
+    // This function doesn't actually belong to this file.
+    private fun miscSystemInit() {
         // we have to set this property to avoid render flickering.
         System.setProperty("sun.awt.noerasebackground", "true")
 
