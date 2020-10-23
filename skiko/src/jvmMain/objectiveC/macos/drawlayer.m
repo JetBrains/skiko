@@ -103,11 +103,15 @@ AWTGLLayer *glLayer;
 
 - (void) syncSize
 {
-    float scaleFactor = [[self.window screen] backingScaleFactor];
-    self.caLayer.contentsScale = scaleFactor;
-    self.glLayer.contentsScale = scaleFactor;
     self.glLayer.bounds = self.caLayer.bounds;
     self.glLayer.frame = self.caLayer.frame;
+
+    float scaleFactor = [[self.window screen] backingScaleFactor];
+    if (scaleFactor == 0) {
+        return;
+    }
+    self.caLayer.contentsScale = scaleFactor;
+    self.glLayer.contentsScale = scaleFactor;
 }
 
 - (void) update
@@ -141,7 +145,7 @@ extern jboolean Skiko_GetAWT(JNIEnv* env, JAWT* awt);
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv *env, jobject window)
 {
-    if (windowsSet != nil) {
+    if (windowsSet != nil || [windowsSet count] > 0) {
         LayersSet *layer = findByObject(env, window);
         if (layer != NULL) {
             if (layer.caLayer == NULL && layer.glLayer == NULL) {
@@ -221,7 +225,13 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv
 
         [layersSet.glLayer setWindowRef: windowRef];
         [layersSet setWindowRef: windowRef];
-        [layersSet syncSize];
+
+        NSScreen *screen = [NSScreen mainScreen];
+        float scaleFactor = screen.backingScaleFactor;
+        layersSet.caLayer.contentsScale = scaleFactor;
+        layersSet.glLayer.contentsScale = scaleFactor;
+        layersSet.glLayer.bounds = layersSet.caLayer.bounds;
+        layersSet.glLayer.frame = layersSet.caLayer.frame;
     }
 
     ds->FreeDrawingSurfaceInfo(dsi);
