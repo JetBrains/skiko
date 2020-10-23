@@ -15,13 +15,11 @@ JavaVM *jvm = NULL;
 
 @interface AWTGLLayer : CAOpenGLLayer
 
-@property jobject windowRef;
+@property jobject canvasGlobalRef;
 
 @end
 
 @implementation AWTGLLayer
-
-jobject windowRef;
 
 - (id)init
 {
@@ -33,7 +31,7 @@ jobject windowRef;
         [self setAutoresizingMask: (kCALayerWidthSizable|kCALayerHeightSizable)];
         [self setNeedsDisplayOnBoundsChange: YES];
 
-        self.windowRef = NULL;
+        self.canvasGlobalRef = NULL;
     }
 
     return self;
@@ -51,40 +49,30 @@ jobject windowRef;
         (*jvm)->AttachCurrentThread(jvm, (void **)&env, NULL);
 
         static jclass wndClass = NULL;
-        if (!wndClass) wndClass = (*env)->GetObjectClass(env, self.windowRef);
+        if (!wndClass) wndClass = (*env)->GetObjectClass(env, self.canvasGlobalRef);
         static jmethodID drawMethod = NULL;
         if (!drawMethod) drawMethod = (*env)->GetMethodID(env, wndClass, "draw", "()V");
-        if (NULL == drawMethod) {
+        if (NULL == drawMethod)
+        {
             NSLog(@"The method Window.draw() not found!");
             return;
         }
-        (*env)->CallVoidMethod(env, self.windowRef, drawMethod);
+        (*env)->CallVoidMethod(env, self.canvasGlobalRef, drawMethod);
     }
 
     [super drawInCGLContext:ctx pixelFormat:pf forLayerTime:t displayTime:ts];
 }
 
-- (void) dispose
-{
-    self.windowRef = NULL;
-}
-
 @end
 
-@interface LayersSet : NSObject
+@interface LayerHandler : NSObject
 
-@property jobject windowRef;
-@property (retain, strong) CALayer *caLayer;
+@property (retain, strong) CALayer *container;
 @property (retain, strong) AWTGLLayer *glLayer;
-@property (retain, strong) NSWindow *window;
 
 @end
 
-@implementation LayersSet
-
-jobject windowRef;
-CALayer *caLayer;
-AWTGLLayer *glLayer;
+@implementation LayerHandler
 
 - (id) init
 {
@@ -92,49 +80,66 @@ AWTGLLayer *glLayer;
 
     if (self)
     {
-        self.windowRef = NULL;
-        self.caLayer = NULL;
+        self.container = NULL;
         self.glLayer = NULL;
-        self.window = NULL;
     }
 
     return self;
 }
 
-- (void) syncSize
+- (void) syncLayersSize
 {
-    self.glLayer.bounds = self.caLayer.bounds;
-    self.glLayer.frame = self.caLayer.frame;
+    self.glLayer.bounds = self.container.bounds;
+    self.glLayer.frame = self.container.frame;
 
-    float scaleFactor = [[self.window screen] backingScaleFactor];
-    if (scaleFactor == 0) {
-        return;
+    if (jvm != NULL) {
+        JNIEnv *env;
+        (*jvm)->AttachCurrentThread(jvm, (void **)&env, NULL);
+        static jclass wndClass = NULL;
+        if (!wndClass)
+        {
+            wndClass = (*env)->GetObjectClass(env, self.glLayer.canvasGlobalRef);
+        }
+        static jmethodID contentScaleMethod = NULL;
+        if (!contentScaleMethod)
+        {
+            contentScaleMethod = (*env)->GetMethodID(env, wndClass, "getContentScale", "()F");
+        }
+        if (NULL == contentScaleMethod)
+        {
+            NSLog(@"The method Window.getContentScale() not found!");
+            return;
+        }
+        float scaleFactor = (*env)->CallFloatMethod(env, self.glLayer.canvasGlobalRef, contentScaleMethod);
+        assert(scaleFactor != 0);
+        self.container.contentsScale = scaleFactor;
+        self.glLayer.contentsScale = scaleFactor;
     }
-    self.caLayer.contentsScale = scaleFactor;
-    self.glLayer.contentsScale = scaleFactor;
 }
 
-- (void) update
+- (void) updateLayerContent
 {
     [self.glLayer performSelectorOnMainThread:@selector(setNeedsDisplay) withObject:0 waitUntilDone:NO];
 }
 
-- (void) dispose
+- (void) disposeLayer:(JNIEnv *) env
 {
-    [self.glLayer dispose];
+    (*env)->DeleteGlobalRef(env, self.glLayer.canvasGlobalRef);
+    self.glLayer.canvasGlobalRef = NULL;
     self.glLayer = NULL;
-    self.caLayer = NULL;
-    self.window = NULL;
+    self.container = NULL;
 }
 
 @end
 
-NSMutableArray *unknownWindows = nil;
-NSMutableSet *windowsSet = nil;
-LayersSet * findByObject(JNIEnv *env, jobject object) {
-    for (LayersSet* value in windowsSet) {
-        if ((*env)->IsSameObject(env, object, value.windowRef) == JNI_TRUE) {
-            return value;
+NSMutableSet *layerStorage = nil;
+LayerHandler * findByObject(JNIEnv *env, jobject object)
+{
+    for (LayerHandler* layer in layerStorage)
+    {
+        if ((*env)->IsSameObject(env, object, layer.glLayer.canvasGlobalRef) == JNI_TRUE)
+        {
+            return layer;
         }
     }
 
@@ -143,22 +148,25 @@ LayersSet * findByObject(JNIEnv *env, jobject object) {
 
 extern jboolean Skiko_GetAWT(JNIEnv* env, JAWT* awt);
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv *env, jobject window)
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv *env, jobject canvas)
 {
-    if (windowsSet != nil || [windowsSet count] > 0) {
-        LayersSet *layer = findByObject(env, window);
-        if (layer != NULL) {
-            if (layer.caLayer == NULL && layer.glLayer == NULL) {
-                (*env)->DeleteGlobalRef(env, layer.windowRef);
-                layer.windowRef = NULL;
-                [windowsSet removeObject: layer];
+    if (layerStorage != nil || [layerStorage count] > 0)
+    {
+        LayerHandler *layer = findByObject(env, canvas);
+        if (layer != NULL)
+        {
+            if (layer.container == NULL && layer.glLayer == NULL)
+            {
+                [layerStorage removeObject: layer];
                 return;
             }
-            [layer syncSize];
+            [layer syncLayersSize];
             return;
         }
-    } else {
-        windowsSet = [[NSMutableSet alloc] init];
+    }
+    else
+    {
+        layerStorage = [[NSMutableSet alloc] init];
     }
 
     JAWT awt;
@@ -177,7 +185,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv
 
     (*env)->GetJavaVM(env, &jvm);
 
-    ds = awt.GetDrawingSurface(env, window);
+    ds = awt.GetDrawingSurface(env, canvas);
     assert(ds != NULL);
 
     lock = ds->Lock(ds);
@@ -189,49 +197,24 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv
     {
         dsi_mac = ( __bridge NSObject<JAWT_SurfaceLayers> *) dsi->platformInfo;
 
-        LayersSet *layersSet = [[LayersSet alloc] init];
-        [windowsSet addObject: layersSet];
+        LayerHandler *layersSet = [[LayerHandler alloc] init];
+        [layerStorage addObject: layersSet];
 
-        NSMutableArray<NSWindow *> *windows = [NSMutableArray arrayWithArray: [[NSApplication sharedApplication] windows]];
-        if ([windowsSet count] == 1)
-        {
-            NSWindow *mainWindow = [[NSApplication sharedApplication] mainWindow];
-            layersSet.window = mainWindow;
-            [windows removeObject: mainWindow];
-            unknownWindows = windows;
-        }
-        else
-        {
-            for (NSWindow* value in unknownWindows) {
-                [windows removeObject: value];
-            }
-            for (LayersSet* value in windowsSet) {
-                [windows removeObject: value.window];
-            }
-            layersSet.window = [windows firstObject];
-        }
-
-        layersSet.caLayer = [dsi_mac windowLayer];
-        [layersSet.caLayer removeAllAnimations];
-        [layersSet.caLayer setAutoresizingMask: (kCALayerWidthSizable|kCALayerHeightSizable)];
-        [layersSet.caLayer setNeedsDisplayOnBoundsChange: YES];
+        layersSet.container = [dsi_mac windowLayer];
+        [layersSet.container removeAllAnimations];
+        [layersSet.container setAutoresizingMask: (kCALayerWidthSizable|kCALayerHeightSizable)];
+        [layersSet.container setNeedsDisplayOnBoundsChange: YES];
 
         layersSet.glLayer = [AWTGLLayer new];
-        [layersSet.caLayer addSublayer: layersSet.glLayer];
+        [layersSet.container addSublayer: layersSet.glLayer];
         CGFloat white[] = { 1.0f, 1.0f, 1.0f, 1.0f };
         layersSet.glLayer.backgroundColor = CGColorCreate(CGColorSpaceCreateDeviceRGB(), white);
         
-        jobject windowRef = (*env)->NewGlobalRef(env, window);
+        jobject canvasGlobalRef = (*env)->NewGlobalRef(env, canvas);
 
-        [layersSet.glLayer setWindowRef: windowRef];
-        [layersSet setWindowRef: windowRef];
+        [layersSet.glLayer setCanvasGlobalRef: canvasGlobalRef];
 
-        NSScreen *screen = [NSScreen mainScreen];
-        float scaleFactor = screen.backingScaleFactor;
-        layersSet.caLayer.contentsScale = scaleFactor;
-        layersSet.glLayer.contentsScale = scaleFactor;
-        layersSet.glLayer.bounds = layersSet.caLayer.bounds;
-        layersSet.glLayer.frame = layersSet.caLayer.frame;
+        [layersSet syncLayersSize];
     }
 
     ds->FreeDrawingSurfaceInfo(dsi);
@@ -239,33 +222,31 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv
     awt.FreeDrawingSurface(ds);
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_redrawLayer(JNIEnv *env, jobject window) {
-    LayersSet *layer = findByObject(env, window);
-    if (layer != NULL) {
-        [layer update];
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_redrawLayer(JNIEnv *env, jobject canvas)
+{
+    LayerHandler *layer = findByObject(env, canvas);
+    if (layer != NULL)
+    {
+        [layer updateLayerContent];
     }
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_disposeLayer(JNIEnv *env, jobject window) {
-    LayersSet *layer = findByObject(env, window);
-    if (layer != NULL) {
-        [layer dispose];
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_disposeLayer(JNIEnv *env, jobject canvas)
+{
+    LayerHandler *layer = findByObject(env, canvas);
+    if (layer != NULL)
+    {
+        [layer disposeLayer: env];
     }
 }
 
-JNIEXPORT jfloat JNICALL Java_org_jetbrains_skiko_HardwareLayer_getContentScale(JNIEnv *env, jobject window) {
-    LayersSet *layer = findByObject(env, window);
-    if (layer != NULL) {
-        return layer.caLayer.contentsScale;
-    }
-    return 1.0f;
-}
-
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getWindowHandle(JNIEnv *env, jobject window) {
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getWindowHandle(JNIEnv *env, jobject canvas)
+{
     return (jlong)kNullWindowHandle;
 }
 
-void getMetalDeviceAndQueue(void** device, void** queue) {
+void getMetalDeviceAndQueue(void** device, void** queue)
+{
     id<MTLDevice> fDevice = MTLCreateSystemDefaultDevice();
     id<MTLCommandQueue> fQueue = [fDevice newCommandQueue];
     *device = (__bridge void*)fDevice;

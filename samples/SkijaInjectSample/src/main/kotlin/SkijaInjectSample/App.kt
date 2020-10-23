@@ -27,7 +27,7 @@ import javax.swing.KeyStroke
 import java.awt.Toolkit
 
 fun main(args: Array<String>) {
-    createWindow("First window");
+    createWindow("First window")
 }
 
 fun createWindow(title: String) {

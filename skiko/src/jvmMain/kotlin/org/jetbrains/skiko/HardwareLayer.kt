@@ -18,5 +18,5 @@ open class HardwareLayer : Canvas(), Drawable {
     override val windowHandle: Long
         external get
     override val contentScale: Float
-        external get
+        get() = graphicsConfiguration.defaultTransform.scaleX.toFloat()
 }

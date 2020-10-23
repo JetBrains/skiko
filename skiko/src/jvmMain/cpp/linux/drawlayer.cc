@@ -16,19 +16,21 @@ extern "C" jboolean Skiko_GetAWT(JNIEnv *env, JAWT *awt);
 
 JavaVM *jvm = NULL;
 
-class LayersSet
+class LayerHandler
 {
 public:
-    jobject canvasRef;
+    jobject canvasGlobalRef;
     GLXContext context;
 
-    void update()
+    void updateLayerContent()
     {
         draw();
     }
 
-    void dispose()
+    void disposeLayer(JNIEnv *env)
     {
+        env->DeleteGlobalRef(canvasGlobalRef);
+        canvasGlobalRef = NULL;
         context = NULL;
     }
 
@@ -56,7 +58,7 @@ private:
                 return;
             }
 
-            ds = awt.GetDrawingSurface(env, canvasRef);
+            ds = awt.GetDrawingSurface(env, canvasGlobalRef);
             lock = ds->Lock(ds);
             dsi = ds->GetDrawingSurfaceInfo(ds);
             dsi_x11 = (JAWT_X11DrawingSurfaceInfo *)dsi->platformInfo;
@@ -68,14 +70,16 @@ private:
 
                 glXMakeCurrent(display, window, context);
 
-                jclass wndClass = env->GetObjectClass(canvasRef);
-                jmethodID drawMethod = env->GetMethodID(wndClass, "draw", "()V");
+                static jclass wndClass = NULL;
+                if (!wndClass) wndClass = env->GetObjectClass(canvasGlobalRef);
+                static jmethodID drawMethod = NULL;
+                if (!drawMethod) drawMethod = env->GetMethodID(wndClass, "draw", "()V");
                 if (NULL == drawMethod)
                 {
                     fprintf(stderr, "The method Window.draw() not found!\n");
                     return;
                 }
-                env->CallVoidMethod(canvasRef, drawMethod);
+                env->CallVoidMethod(canvasGlobalRef, drawMethod);
                 glFinish();
                 glXSwapBuffers(display, window);
             }
@@ -86,12 +90,12 @@ private:
     }
 };
 
-set<LayersSet *> *windowsSet = NULL;
-LayersSet *findByObject(JNIEnv *env, jobject object)
+set<LayerHandler *> *layerStorage = NULL;
+LayerHandler *findByObject(JNIEnv *env, jobject object)
 {
-    for (auto &layer : *windowsSet)
+    for (auto &layer : *layerStorage)
     {
-        if (env->IsSameObject(object, layer->canvasRef) == JNI_TRUE)
+        if (env->IsSameObject(object, layer->canvasGlobalRef) == JNI_TRUE)
         {
             return layer;
         }
@@ -102,19 +106,16 @@ LayersSet *findByObject(JNIEnv *env, jobject object)
 
 extern "C"
 {
-
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv *env, jobject canvas)
     {
-        if (windowsSet != NULL)
+        if (layerStorage != NULL)
         {
-            LayersSet *layer = findByObject(env, canvas);
+            LayerHandler *layer = findByObject(env, canvas);
             if (layer != NULL)
             {
                 if (layer->context == NULL)
                 {
-                    env->DeleteGlobalRef(layer->canvasRef);
-                    layer->canvasRef = NULL;
-                    windowsSet->erase(layer);
+                    layerStorage->erase(layer);
                     delete layer;
                 }
                 return;
@@ -122,7 +123,7 @@ extern "C"
         }
         else
         {
-            windowsSet = new set<LayersSet *>();
+            layerStorage = new set<LayerHandler *>();
         }
 
         if (jvm == NULL)
@@ -160,12 +161,12 @@ extern "C"
             XVisualInfo *vi = glXChooseVisual(display, 0, att);
             GLXContext context = glXCreateContext(display, vi, NULL, GL_TRUE);
 
-            LayersSet *layer = new LayersSet();
-            windowsSet->insert(layer);
+            LayerHandler *layer = new LayerHandler();
+            layerStorage->insert(layer);
 
             jobject canvasRef = env->NewGlobalRef(canvas);
 
-            layer->canvasRef = canvasRef;
+            layer->canvasGlobalRef = canvasRef;
             layer->context = context;
         }
         ds->FreeDrawingSurfaceInfo(dsi);
@@ -175,25 +176,20 @@ extern "C"
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_redrawLayer(JNIEnv *env, jobject canvas)
     {
-        LayersSet *layer = findByObject(env, canvas);
+        LayerHandler *layer = findByObject(env, canvas);
         if (layer != NULL)
         {
-            layer->update();
+            layer->updateLayerContent();
         }
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_disposeLayer(JNIEnv *env, jobject canvas)
     {
-        LayersSet *layer = findByObject(env, canvas);
+        LayerHandler *layer = findByObject(env, canvas);
         if (layer != NULL)
         {
-            layer->dispose();
+            layer->disposeLayer(env);
         }
-    }
-
-    JNIEXPORT jfloat JNICALL Java_org_jetbrains_skiko_HardwareLayer_getContentScale(JNIEnv *env, jobject canvas)
-    {
-        return 1.0f;
     }
 
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getWindowHandle(JNIEnv *env, jobject canvas)
