@@ -10,6 +10,7 @@
 #import <OpenGL/gl3.h>
 #import <Metal/Metal.h>
 #import <QuartzCore/CAMetalLayer.h>
+#import <pthread.h>
 
 JavaVM *jvm = NULL;
 
@@ -133,6 +134,16 @@ JavaVM *jvm = NULL;
 @end
 
 NSMutableSet *layerStorage = nil;
+pthread_mutex_t layerStorageMutex = { 0 };
+
+void lockLayers() {
+    pthread_mutex_lock(&layerStorageMutex);
+}
+
+void unlockLayers() {
+    pthread_mutex_unlock(&layerStorageMutex);
+}
+
 LayerHandler * findByObject(JNIEnv *env, jobject object)
 {
     for (LayerHandler* layer in layerStorage)
@@ -142,7 +153,6 @@ LayerHandler * findByObject(JNIEnv *env, jobject object)
             return layer;
         }
     }
-
     return NULL;
 }
 
@@ -150,6 +160,8 @@ extern jboolean Skiko_GetAWT(JNIEnv* env, JAWT* awt);
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv *env, jobject canvas)
 {
+
+    lockLayers();
     if (layerStorage != nil || [layerStorage count] > 0)
     {
         LayerHandler *layer = findByObject(env, canvas);
@@ -158,9 +170,11 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv
             if (layer.container == NULL && layer.glLayer == NULL)
             {
                 [layerStorage removeObject: layer];
+                unlockLayers();
                 return;
             }
             [layer syncLayersSize];
+            unlockLayers();
             return;
         }
     }
@@ -168,6 +182,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv
     {
         layerStorage = [[NSMutableSet alloc] init];
     }
+    unlockLayers();
 
     JAWT awt;
     JAWT_DrawingSurface *ds = NULL;
@@ -198,7 +213,9 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv
         dsi_mac = ( __bridge NSObject<JAWT_SurfaceLayers> *) dsi->platformInfo;
 
         LayerHandler *layersSet = [[LayerHandler alloc] init];
+        lockLayers();
         [layerStorage addObject: layersSet];
+        unlockLayers();
 
         layersSet.container = [dsi_mac windowLayer];
         [layersSet.container removeAllAnimations];
@@ -224,7 +241,9 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_redrawLayer(JNIEnv *env, jobject canvas)
 {
+    lockLayers();
     LayerHandler *layer = findByObject(env, canvas);
+    unlockLayers();
     if (layer != NULL)
     {
         [layer updateLayerContent];
@@ -233,7 +252,9 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_redrawLayer(JNIEnv
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_disposeLayer(JNIEnv *env, jobject canvas)
 {
+    lockLayers();
     LayerHandler *layer = findByObject(env, canvas);
+    unlockLayers();
     if (layer != NULL)
     {
         [layer disposeLayer: env];
