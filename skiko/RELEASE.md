@@ -40,7 +40,7 @@ Set up environment variables `COMPOSE_REPO_USERNAME` and `COMPOSE_REPO_KEY`.
 ./gradlew publish
 ```
 
-##### Customize version
+##### Publish local version
 ```
-./gradlew <PUBLISH_TASK> -Pdeploy.version=0.1.2
+./gradlew <PUBLISH_TASK> -Pdeploy.version=0.1.2 -Pdeploy.release=true
 ```
