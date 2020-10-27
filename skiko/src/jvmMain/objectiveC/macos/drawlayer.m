@@ -160,7 +160,6 @@ extern jboolean Skiko_GetAWT(JNIEnv* env, JAWT* awt);
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv *env, jobject canvas)
 {
-
     lockLayers();
     if (layerStorage != nil)
     {
@@ -182,7 +181,6 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv
     {
         layerStorage = [[NSMutableSet alloc] init];
     }
-    unlockLayers();
 
     JAWT awt;
     JAWT_DrawingSurface *ds = NULL;
@@ -237,6 +235,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv
     ds->FreeDrawingSurfaceInfo(dsi);
     ds->Unlock(ds);
     awt.FreeDrawingSurface(ds);
+    unlockLayers();
 }
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_redrawLayer(JNIEnv *env, jobject canvas)
