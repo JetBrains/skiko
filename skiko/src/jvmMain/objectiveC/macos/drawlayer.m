@@ -162,7 +162,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv
 {
 
     lockLayers();
-    if (layerStorage != nil || [layerStorage count] > 0)
+    if (layerStorage != nil)
     {
         LayerHandler *layer = findByObject(env, canvas);
         if (layer != NULL)
