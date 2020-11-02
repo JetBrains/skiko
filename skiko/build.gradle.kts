@@ -290,6 +290,7 @@ project.tasks.register<Exec>("objcCompile") {
     val objcSrc = "drawlayer"
     commandLine = listOf(
         "clang",
+        "-mmacosx-version-min=10.14",
         "-I$jdkHome/include",
         "-I$jdkHome/include/darwin",
         "-c",
