@@ -233,6 +233,7 @@ tasks.withType(CppCompile::class.java).configureEach {
         "-DSK_SHAPER_HARFBUZZ_AVAILABLE",
         "-DSK_SUPPORT_OPENCL=0",
         "-Dskija_EXPORTS",
+        "-DSK_UNICODE_AVAILABLE",
         "-DNDEBUG"
     ))
     when (target) {
@@ -290,7 +291,7 @@ project.tasks.register<Exec>("objcCompile") {
     val objcSrc = "drawlayer"
     commandLine = listOf(
         "clang",
-        "-mmacosx-version-min=10.14",
+        "-mmacosx-version-min=10.13",
         "-I$jdkHome/include",
         "-I$jdkHome/include/darwin",
         "-c",
