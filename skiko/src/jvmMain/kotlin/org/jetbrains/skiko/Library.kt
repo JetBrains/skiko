@@ -55,6 +55,7 @@ object Library {
     private fun miscSystemInit() {
         // we have to set this property to avoid render flickering.
         System.setProperty("sun.awt.noerasebackground", "true")
+        System.setProperty("skija.staticLoad", "false")
 
         // setup menu look and feel
         try {
