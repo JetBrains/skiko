@@ -55,7 +55,7 @@ JavaVM *jvm = NULL;
         if (!drawMethod) drawMethod = (*env)->GetMethodID(env, wndClass, "draw", "()V");
         if (NULL == drawMethod)
         {
-            NSLog(@"The method Window.draw() not found!");
+            NSLog(@"The method HardwareLayer.draw() not found!");
             return;
         }
         (*env)->CallVoidMethod(env, self.canvasGlobalRef, drawMethod);
@@ -101,6 +101,8 @@ JavaVM *jvm = NULL;
         {
             wndClass = (*env)->GetObjectClass(env, self.glLayer.canvasGlobalRef);
         }
+
+        // scale factor
         static jmethodID contentScaleMethod = NULL;
         if (!contentScaleMethod)
         {
@@ -108,13 +110,66 @@ JavaVM *jvm = NULL;
         }
         if (NULL == contentScaleMethod)
         {
-            NSLog(@"The method Window.getContentScale() not found!");
+            NSLog(@"The method HardwareLayer.getContentScale() not found!");
             return;
         }
         float scaleFactor = (*env)->CallFloatMethod(env, self.glLayer.canvasGlobalRef, contentScaleMethod);
         assert(scaleFactor != 0);
         self.container.contentsScale = scaleFactor;
         self.glLayer.contentsScale = scaleFactor;
+
+        // size & position
+        static jmethodID getXMethod = NULL;
+        if (!getXMethod)
+        {
+            getXMethod = (*env)->GetMethodID(env, wndClass, "getX", "()I");
+        }
+        if (NULL == getXMethod)
+        {
+            NSLog(@"The method HardwareLayer.getX() not found!");
+            return;
+        }
+
+        static jmethodID getYMethod = NULL;
+        if (!getYMethod)
+        {
+            getYMethod = (*env)->GetMethodID(env, wndClass, "getY", "()I");
+        }
+        if (NULL == getYMethod)
+        {
+            NSLog(@"The method HardwareLayer.getY() not found!");
+            return;
+        }
+
+        static jmethodID getWidthMethod = NULL;
+        if (!getWidthMethod)
+        {
+            getWidthMethod = (*env)->GetMethodID(env, wndClass, "getWidth", "()I");
+        }
+        if (NULL == getWidthMethod)
+        {
+            NSLog(@"The method HardwareLayer.getWidth() not found!");
+            return;
+        }
+        static jmethodID getHeightMethod = NULL;
+        if (!getHeightMethod)
+        {
+            getHeightMethod = (*env)->GetMethodID(env, wndClass, "getHeight", "()I");
+        }
+        if (NULL == getHeightMethod)
+        {
+            NSLog(@"The method HardwareLayer.getHeight() not found!");
+            return;
+        }
+        int x = (*env)->CallIntMethod(env, self.glLayer.canvasGlobalRef, getXMethod);
+        int y = (*env)->CallIntMethod(env, self.glLayer.canvasGlobalRef, getYMethod);
+        int w = (*env)->CallIntMethod(env, self.glLayer.canvasGlobalRef, getWidthMethod);
+        int h = (*env)->CallIntMethod(env, self.glLayer.canvasGlobalRef, getHeightMethod);
+
+        y = (int)self.container.frame.size.height - y - h;
+
+        CGRect boundsRect = CGRectMake(x, y, w, h);
+        self.glLayer.frame = boundsRect;
     }
 }
 
@@ -222,8 +277,6 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv
 
         layersSet.glLayer = [AWTGLLayer new];
         [layersSet.container addSublayer: layersSet.glLayer];
-        CGFloat white[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-        layersSet.glLayer.backgroundColor = CGColorCreate(CGColorSpaceCreateDeviceRGB(), white);
         
         jobject canvasGlobalRef = (*env)->NewGlobalRef(env, canvas);
 
