@@ -2,6 +2,8 @@ package org.jetbrains.skiko
 
 import java.awt.Graphics
 import java.awt.Canvas
+import javax.swing.SwingUtilities.convertPoint
+import javax.swing.SwingUtilities.getRootPane
 
 open class HardwareLayer : Canvas(), Drawable {
     override fun paint(g: Graphics) {
@@ -19,4 +21,8 @@ open class HardwareLayer : Canvas(), Drawable {
         external get
     override val contentScale: Float
         get() = graphicsConfiguration.defaultTransform.scaleX.toFloat()
+    val absoluteX: Int
+        get() = convertPoint(this, x, y, getRootPane(this)).x
+    val absoluteY: Int
+        get() = convertPoint(this, x, y, getRootPane(this)).y
 }

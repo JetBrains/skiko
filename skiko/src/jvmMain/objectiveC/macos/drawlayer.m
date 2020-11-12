@@ -90,9 +90,6 @@ JavaVM *jvm = NULL;
 
 - (void) syncLayersSize
 {
-    self.glLayer.bounds = self.container.bounds;
-    self.glLayer.frame = self.container.frame;
-
     if (jvm != NULL) {
         JNIEnv *env;
         (*jvm)->AttachCurrentThread(jvm, (void **)&env, NULL);
@@ -122,22 +119,22 @@ JavaVM *jvm = NULL;
         static jmethodID getXMethod = NULL;
         if (!getXMethod)
         {
-            getXMethod = (*env)->GetMethodID(env, wndClass, "getX", "()I");
+            getXMethod = (*env)->GetMethodID(env, wndClass, "getAbsoluteX", "()I");
         }
         if (NULL == getXMethod)
         {
-            NSLog(@"The method HardwareLayer.getX() not found!");
+            NSLog(@"The method HardwareLayer.getAbsoluteX() not found!");
             return;
         }
 
         static jmethodID getYMethod = NULL;
         if (!getYMethod)
         {
-            getYMethod = (*env)->GetMethodID(env, wndClass, "getY", "()I");
+            getYMethod = (*env)->GetMethodID(env, wndClass, "getAbsoluteY", "()I");
         }
         if (NULL == getYMethod)
         {
-            NSLog(@"The method HardwareLayer.getY() not found!");
+            NSLog(@"The method HardwareLayer.getAbsoluteY() not found!");
             return;
         }
 
