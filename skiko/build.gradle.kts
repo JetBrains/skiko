@@ -62,21 +62,6 @@ fun String.insertAfterFirst(substring: String, stringToInsert: String): String =
 
 fun AbstractCopyTask.configureSkiaCopy(targetDir: File) {
     into(targetDir)
-    if (target == "windows") {
-        doLast {
-            // temporary hack
-            // todo: remove after https://github.com/google/skia/commit/0d6f81593b1fa222e8e4afb56cc961ce8c9be375 is included
-            // in used version of skia
-            val skPathRef = targetDir.resolve("include/private/SkPathRef.h")
-            val skPathRefContent = skPathRef.readText()
-            if ("#include <tuple>" !in skPathRefContent) {
-                val includeToInsertAfter = "#include <limits>"
-                check(includeToInsertAfter in skPathRefContent) { "Substring not found: '${includeToInsertAfter}' in $skPathRef" }
-                val newContent = skPathRefContent.insertAfterFirst(includeToInsertAfter, "\n#include <tuple>")
-                skPathRef.writeText(newContent)
-            }
-        }
-    }
 }
 
 val skiaDir = run {
@@ -143,7 +128,7 @@ val skijaSrcDir = run {
     tasks.register("delombokSkija", JavaExec::class) {
         classpath = lombok + jetbrainsAnnotations
         main = "lombok.launch.Main"
-        args("delombok", skijaDir.get().resolve("src/main/java"), "-d", delombokSkijaSrcDir)
+        args("delombok", skijaDir.get().resolve("shared/src/main/java"), "-d", delombokSkijaSrcDir)
         inputs.dir(skijaDir)
         outputs.dirs(delombokSkijaSrcDir)
     }.map { delombokSkijaSrcDir }
@@ -233,7 +218,7 @@ tasks.withType(CppCompile::class.java).configureEach {
         "-DSK_SHAPER_HARFBUZZ_AVAILABLE",
         "-DSK_SUPPORT_OPENCL=0",
         "-Dskija_EXPORTS",
-        // "-DSK_UNICODE_AVAILABLE",
+        "-DSK_UNICODE_AVAILABLE",
         "-DNDEBUG"
     ))
     when (target) {
@@ -346,7 +331,7 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
 
 extensions.configure<CppLibrary> {
     source.from(
-        skijaDir.map { fileTree(it.resolve("src/main/cc")) },
+        skijaDir.map { fileTree(it.resolve("native/src")) },
         fileTree("$projectDir/src/jvmMain/cpp/common"),
         fileTree("$projectDir/src/jvmMain/cpp/$target")
     )

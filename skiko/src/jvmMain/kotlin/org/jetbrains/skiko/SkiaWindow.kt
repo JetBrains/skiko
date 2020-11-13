@@ -125,7 +125,7 @@ open class SkiaLayer() : HardwareLayer() {
 open class SkiaWindow : JFrame() {
     companion object {
         init {
-            Library.load("/", "skiko")
+            Library.load()
         }
     }
 

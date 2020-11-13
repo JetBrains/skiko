@@ -11,7 +11,7 @@ fun main() {
 private class SkiaLibraryTester {
     companion object {
         init {
-          Library.load("/", "skiko")
+          Library.load()
         }
     }
 

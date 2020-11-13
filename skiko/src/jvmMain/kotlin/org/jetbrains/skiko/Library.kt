@@ -31,7 +31,8 @@ object Library {
     // in Skiko's home, and if not - unpacks it. Also, it could load additional
     // localization resource on platforms wher it is needed.
     @Synchronized
-    fun load(resourcePath: String, name: String) {
+    fun load(resourcePath: String = "/", name: String = "skiko") {
+        // TODO: remove arguments.
         if (loaded) return
 
         val platformName = System.mapLibraryName(name)
@@ -55,7 +56,7 @@ object Library {
     private fun miscSystemInit() {
         // we have to set this property to avoid render flickering.
         System.setProperty("sun.awt.noerasebackground", "true")
-        // System.setProperty("skija.staticLoad", "false")
+        System.setProperty("skija.staticLoad", "false")
 
         // setup menu look and feel
         try {
