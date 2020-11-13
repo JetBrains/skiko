@@ -177,6 +177,7 @@ JavaVM *jvm = NULL;
 
 - (void) disposeLayer:(JNIEnv *) env
 {
+    [self.glLayer removeFromSuperlayer];
     (*env)->DeleteGlobalRef(env, self.glLayer.canvasGlobalRef);
     self.glLayer.canvasGlobalRef = NULL;
     self.glLayer = NULL;
@@ -218,12 +219,6 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv
         LayerHandler *layer = findByObject(env, canvas);
         if (layer != NULL)
         {
-            if (layer.container == NULL && layer.glLayer == NULL)
-            {
-                [layerStorage removeObject: layer];
-                unlockLayers();
-                return;
-            }
             [layer syncLayersSize];
             unlockLayers();
             return;
@@ -306,6 +301,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_disposeLayer(JNIEn
     unlockLayers();
     if (layer != NULL)
     {
+        [layerStorage removeObject: layer];
         [layer disposeLayer: env];
     }
 }

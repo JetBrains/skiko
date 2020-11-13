@@ -84,11 +84,6 @@ extern "C"
             LayerHandler *layer = findByObject(env, canvas);
             if (layer != NULL)
             {
-                if (layer->context == NULL)
-                {
-                    layerStorage->erase(layer);
-                    delete layer;
-                }
                 return;
             }
         }
@@ -172,7 +167,9 @@ extern "C"
         LayerHandler *layer = findByObject(env, canvas);
         if (layer != NULL)
         {
+            layerStorage->erase(layer);
             layer->disposeLayer(env);
+            delete layer;
         }
     }
 
