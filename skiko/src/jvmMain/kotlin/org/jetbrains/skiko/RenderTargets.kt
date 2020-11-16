@@ -1,9 +1,9 @@
 package org.jetbrains.skiko
 
 import org.jetbrains.skija.BackendRenderTarget
-import org.jetbrains.skija.Context
+import org.jetbrains.skija.DirectContext
 
-internal fun makeGLContext() = Context(
+internal fun makeGLContext() = DirectContext(
     makeGLContextNative()
 )
 
@@ -15,7 +15,7 @@ internal fun makeMetalRenderTarget(width: Int, height: Int, sampleCnt: Int) = Ba
     makeMetalRenderTargetNative(width, height, sampleCnt).also { if (it == 0L) TODO("not yet supported") }
 )
 
-internal fun makeMetalContext() = Context(
+internal fun makeMetalContext() = DirectContext(
     makeMetalContextNative().also { if (it == 0L) TODO("not yet supported") }
 )
 
