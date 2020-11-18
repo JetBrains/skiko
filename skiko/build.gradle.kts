@@ -345,8 +345,7 @@ library {
     dependencies {
         implementation(
             skiaDir.map {
-                // TODO: macOS ARM handled as if it was x64 atm.
-                fileTree(it.resolve("out/Release-x64"))
+                fileTree(it.resolve("out/Release-${targetArch.id}"))
                     .matching { include(if (targetOs.isWindows) "**.lib" else "**.a") }
             }
         )
