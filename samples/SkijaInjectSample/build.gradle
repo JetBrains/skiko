@@ -29,7 +29,7 @@ def osArch = System.getProperty("os.arch")
 def targetArch = ""
 if (osArch == "x86_64") {
     targetArch = "x64"
-} else if (arch == "arm64") {
+} else if (arch == "aarch64") {
     targetArch = "arm64"
 } else {
     throw Error("Unsupported arch: $osArch")
