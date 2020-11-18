@@ -142,11 +142,11 @@ kotlin {
         withJava()
     }
 
-    val isMingwX64 = hostOs.startsWith("Windows")
-    val nativeTarget = when {
-        hostOs == "Mac OS X" -> macosX64("native")
-        hostOs == "Linux" -> linuxX64("native")
-        isMingwX64 -> mingwX64("native")
+    val nativeTarget = when (targetOs) {
+        // TODO: not entirely correct for macOS ARM.
+        OS.MacOS -> macosX64("native")
+        OS.Linux -> linuxX64("native")
+        OS.Windows -> mingwX64("native")
         else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
     }
 
@@ -221,8 +221,8 @@ tasks.withType(CppCompile::class.java).configureEach {
         "-DSK_UNICODE_AVAILABLE",
         "-DNDEBUG"
     ))
-    when (target) {
-        "macos" -> {
+    when (targetOs) {
+        OS.MacOS -> {
             compilerArgs.addAll(
                 listOf(
                     "-std=c++14",
@@ -236,7 +236,7 @@ tasks.withType(CppCompile::class.java).configureEach {
                 )
             )
         }
-        "linux" -> {
+        OS.Linux -> {
             compilerArgs.addAll(
                 listOf(
                     "-std=c++14",
@@ -249,7 +249,7 @@ tasks.withType(CppCompile::class.java).configureEach {
                 )
             )
         }
-        "windows" -> {
+        OS.Windows -> {
             compilerArgs.addAll(
                 listOf(
                     "-I$jdkHome/include/win32",
@@ -271,7 +271,7 @@ tasks.withType(CppCompile::class.java).configureEach {
 // Very hacky way to compile Objective-C sources and add the
 // resulting object files into the final library.
 project.tasks.register<Exec>("objcCompile") {
-    val inputDir = "$projectDir/src/jvmMain/objectiveC/$target"
+    val inputDir = "$projectDir/src/jvmMain/objectiveC/${targetOs.id}"
     val outDir = "$buildDir/objc/$target"
     val objcSrc = "drawlayer"
     commandLine = listOf(
@@ -290,8 +290,8 @@ project.tasks.register<Exec>("objcCompile") {
 }
 
 tasks.withType(LinkSharedLibrary::class.java).configureEach {
-    when (target) {
-        "macos" -> {
+    when (targetOs) {
+        OS.MacOS -> {
             dependsOn(project.tasks.named("objcCompile"))
             linkerArgs.addAll(
                 listOf(
@@ -308,7 +308,7 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
                 )
             )
         }
-        "linux" -> {
+        OS.Linux -> {
             linkerArgs.addAll(
                 listOf(
                     "-lGL",
@@ -316,7 +316,7 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
                 )
             )
         }
-        "windows" -> {
+        OS.Windows -> {
             linkerArgs.addAll(
                 listOf(
                     "gdi32.lib",
@@ -333,7 +333,7 @@ extensions.configure<CppLibrary> {
     source.from(
         skijaDir.map { fileTree(it.resolve("native/src")) },
         fileTree("$projectDir/src/jvmMain/cpp/common"),
-        fileTree("$projectDir/src/jvmMain/cpp/$target")
+        fileTree("$projectDir/src/jvmMain/cpp/${targetOs.id}")
     )
 }
 
@@ -345,8 +345,8 @@ library {
     dependencies {
         implementation(
             skiaDir.map {
-                fileTree(it.resolve("out/Release-x64"))
-                    .matching { include(if (target == "windows") "**.lib" else "**.a") }
+                fileTree(it.resolve("out/Release-${targetArch.id}"))
+                    .matching { include(if (targetOs.isWindows) "**.lib" else "**.a") }
             }
         )
         implementation(fileTree("$buildDir/objc/$target").matching {
@@ -371,10 +371,10 @@ val skikoJvmJar: Provider<Jar> by tasks.registering(Jar::class) {
 }
 
 val createChecksums by project.tasks.registering(org.gradle.crypto.checksum.Checksum::class) {
-    val linkTask = project.tasks.named("linkRelease${target.capitalize()}")
+    val linkTask = project.tasks.named("linkRelease${targetOs.id.capitalize()}")
     dependsOn(linkTask)
     files = linkTask.get().outputs.files.filter { it.isFile } +
-            if (target == "windows") files(skiaDir.map { it.resolve("out/Release-x64/icudtl.dat") }) else files()
+            if (targetOs.isWindows) files(skiaDir.map { it.resolve("out/Release-x64/icudtl.dat") }) else files()
     algorithm = Checksum.Algorithm.SHA256
     outputDir = file("$buildDir/checksums")
 }
@@ -383,10 +383,10 @@ val skikoJvmRuntimeJar by project.tasks.registering(Jar::class) {
     archiveBaseName.set("skiko-$target")
     dependsOn(createChecksums)
     from(skikoJvmJar.map { zipTree(it.archiveFile) })
-    from(project.tasks.named("linkRelease${target.capitalize()}").map {
+    from(project.tasks.named("linkRelease${targetOs.id.capitalize()}").map {
         it.outputs.files.filter { it.isFile }
     })
-    if (target == "windows") {
+    if (targetOs.isWindows) {
         from(files(skiaDir.map { it.resolve("out/Release-x64/icudtl.dat") }))
     }
     from(createChecksums.get().outputs.files)

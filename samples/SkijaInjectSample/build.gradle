@@ -14,17 +14,27 @@ repositories {
     }
 }
 
-def os = System.getProperty("os.name")
-def target = ""
-if (os == "Mac OS X") {
-    target = "macos"
-} else if (os.startsWith("Win")) {
-    target = "windows"
-} else if (os.startsWith("Linux")) {
-    target = "linux"
+def osName = System.getProperty("os.name")
+def targetOs = ""
+if (osName == "Mac OS X") {
+    targetOs = "macos"
+} else if (osName.startsWith("Win")) {
+    targetOs = "windows"
+} else if (osName.startsWith("Linux")) {
+    targetOs = "linux"
 } else {
-    throw Error("Unsupported OS: $target")
+    throw Error("Unsupported OS: $os")
 }
+def osArch = System.getProperty("os.arch")
+def targetArch = ""
+if (osArch == "x86_64") {
+    targetArch = "x64"
+} else if (osArch == "aarch64") {
+    targetArch = "arm64"
+} else {
+    throw Error("Unsupported arch: $osArch")
+}
+def target = "${targetOs}_${targetArch}"
 
 def version = "0.1-SNAPSHOT"
 if (project.hasProperty('skiko.version')) {
