@@ -23,7 +23,7 @@ if (osName == "Mac OS X") {
 } else if (osName.startsWith("Linux")) {
     targetOs = "linux"
 } else {
-    throw Error("Unsupported OS: $os")
+    throw Error("Unsupported OS: $osName")
 }
 def osArch = System.getProperty("os.arch")
 def targetArch = ""

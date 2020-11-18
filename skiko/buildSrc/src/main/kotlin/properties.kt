@@ -27,11 +27,9 @@ val hostOs by lazy {
 }
 
 val hostArch by lazy {
-    val osArch = System.getProperty("os.arch").also {
-        println("arch is $it")
-    }
+    val osArch = System.getProperty("os.arch")
     when (osArch) {
-        "x86_64" -> Arch.X64
+        "x86_64", "amd64" -> Arch.X64
         "aarch64" -> Arch.Arm64
         else -> throw Error("Unknown arch $osArch")
     }
