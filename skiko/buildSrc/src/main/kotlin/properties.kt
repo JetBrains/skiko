@@ -38,7 +38,7 @@ val hostArch by lazy {
 val targetOs = hostOs
 val targetArch = hostArch
 
-val target = "${targetOs.id}_${targetArch.id}"
+val target = "${targetOs.id}-${targetArch.id}"
 
 val jdkHome = System.getProperty("java.home") ?: error("'java.home' is null")
 
