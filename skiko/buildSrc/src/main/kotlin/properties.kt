@@ -32,7 +32,7 @@ val hostArch by lazy {
     }
     when (osArch) {
         "x86_64" -> Arch.X64
-        "arm64" -> Arch.Arm64
+        "aarch64" -> Arch.Arm64
         else -> throw Error("Unknown arch $osArch")
     }
 }
