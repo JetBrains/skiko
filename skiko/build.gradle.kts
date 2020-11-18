@@ -130,7 +130,12 @@ val skijaSrcDir = run {
         main = "lombok.launch.Main"
         args("delombok", skijaDir.get().resolve("shared/src/main/java"), "-d", delombokSkijaSrcDir)
         inputs.dir(skijaDir)
-        outputs.dirs(delombokSkijaSrcDir)
+        outputs.dir(delombokSkijaSrcDir)
+
+        doFirst {
+            delombokSkijaSrcDir.deleteRecursively()
+            delombokSkijaSrcDir.mkdirs()
+        }
     }.map { delombokSkijaSrcDir }
 }
 
