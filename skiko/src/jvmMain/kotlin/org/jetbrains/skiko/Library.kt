@@ -49,6 +49,13 @@ object Library {
         }
 
         miscSystemInit()
+
+        try {
+            // Init code executed after library was loaded.
+            org.jetbrains.skija.impl.Library._nAfterLoad()
+        } catch (t: Throwable) {
+            t.printStackTrace()
+        }
         loaded = true
     }
 
