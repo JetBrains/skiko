@@ -21,9 +21,9 @@ dependencies {
     }
 
     skikoDep("skiko-jvm")
-    skikoDep("skiko-jvm-runtime-windows_x64")
-    skikoDep("skiko-jvm-runtime-linux_x64")
-    skikoDep("skiko-jvm-runtime-macos_x64")
+    skikoDep("skiko-jvm-runtime-windows-x64")
+    skikoDep("skiko-jvm-runtime-linux-x64")
+    skikoDep("skiko-jvm-runtime-macos-x64")
 }
 
 val createGithubRelease by tasks.registering {
