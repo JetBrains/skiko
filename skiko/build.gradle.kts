@@ -147,7 +147,7 @@ kotlin {
         withJava()
     }
 
-    val nativeTarget = when (targetOs) {
+    val nativeTarget = when (target.os) {
         // TODO: not entirely correct for macOS ARM.
         OS.MacOS -> macosX64("native")
         OS.Linux -> linuxX64("native")
@@ -226,7 +226,7 @@ tasks.withType(CppCompile::class.java).configureEach {
         "-DSK_UNICODE_AVAILABLE",
         "-DNDEBUG"
     ))
-    when (targetOs) {
+    when (target.os) {
         OS.MacOS -> {
             compilerArgs.addAll(
                 listOf(
@@ -276,8 +276,8 @@ tasks.withType(CppCompile::class.java).configureEach {
 // Very hacky way to compile Objective-C sources and add the
 // resulting object files into the final library.
 project.tasks.register<Exec>("objcCompile") {
-    val inputDir = "$projectDir/src/jvmMain/objectiveC/${targetOs.id}"
-    val outDir = "$buildDir/objc/$target"
+    val inputDir = "$projectDir/src/jvmMain/objectiveC/${target.os.id}"
+    val outDir = "$buildDir/objc/${target.id}"
     val objcSrc = "drawlayer"
     commandLine = listOf(
         "clang",
@@ -295,7 +295,7 @@ project.tasks.register<Exec>("objcCompile") {
 }
 
 tasks.withType(LinkSharedLibrary::class.java).configureEach {
-    when (targetOs) {
+    when (target.os) {
         OS.MacOS -> {
             dependsOn(project.tasks.named("objcCompile"))
             linkerArgs.addAll(
@@ -338,7 +338,7 @@ extensions.configure<CppLibrary> {
     source.from(
         skijaDir.map { fileTree(it.resolve("native/src")) },
         fileTree("$projectDir/src/jvmMain/cpp/common"),
-        fileTree("$projectDir/src/jvmMain/cpp/${targetOs.id}")
+        fileTree("$projectDir/src/jvmMain/cpp/${target.os.id}")
     )
 }
 
@@ -350,11 +350,11 @@ library {
     dependencies {
         implementation(
             skiaDir.map {
-                fileTree(it.resolve("out/Release-${targetArch.id}"))
-                    .matching { include(if (targetOs.isWindows) "**.lib" else "**.a") }
+                fileTree(it.resolve("out/Release-${target.arch.id}"))
+                    .matching { include(if (target.os.isWindows) "**.lib" else "**.a") }
             }
         )
-        implementation(fileTree("$buildDir/objc/$target").matching {
+        implementation(fileTree("$buildDir/objc/${target.id}").matching {
              include("**.o")
         })
     }
@@ -371,27 +371,27 @@ library {
 }
 
 val skikoJvmJar: Provider<Jar> by tasks.registering(Jar::class) {
-    archiveBaseName.set("skiko-jvm")
+    archiveBaseName.set(SkikoArtifacts.commonArtifactId)
     from(kotlin.jvm().compilations["main"].output.allOutputs)
 }
 
 val createChecksums by project.tasks.registering(org.gradle.crypto.checksum.Checksum::class) {
-    val linkTask = project.tasks.named("linkRelease${targetOs.id.capitalize()}")
+    val linkTask = project.tasks.named("linkRelease${target.os.id.capitalize()}")
     dependsOn(linkTask)
     files = linkTask.get().outputs.files.filter { it.isFile } +
-            if (targetOs.isWindows) files(skiaDir.map { it.resolve("out/Release-x64/icudtl.dat") }) else files()
+            if (target.os.isWindows) files(skiaDir.map { it.resolve("out/Release-x64/icudtl.dat") }) else files()
     algorithm = Checksum.Algorithm.SHA256
     outputDir = file("$buildDir/checksums")
 }
 
 val skikoJvmRuntimeJar by project.tasks.registering(Jar::class) {
-    archiveBaseName.set("skiko-$target")
+    archiveBaseName.set(SkikoArtifacts.runtimeArtifactIdFor(target))
     dependsOn(createChecksums)
     from(skikoJvmJar.map { zipTree(it.archiveFile) })
-    from(project.tasks.named("linkRelease${targetOs.id.capitalize()}").map {
+    from(project.tasks.named("linkRelease${target.os.id.capitalize()}").map {
         it.outputs.files.filter { it.isFile }
     })
-    if (targetOs.isWindows) {
+    if (target.os.isWindows) {
         from(files(skiaDir.map { it.resolve("out/Release-x64/icudtl.dat") }))
     }
     from(createChecksums.get().outputs.files)
@@ -488,13 +488,15 @@ publishing {
             }
         }
         create<MavenPublication>("skikoJvm") {
-            artifactId = "skiko-jvm"
+            // when changing artifacts names, don't forget to update ci/build.gradle.kts
+            artifactId = SkikoArtifacts.commonArtifactId
             afterEvaluate {
                 artifact(skikoJvmJar.map { it.archiveFile.get() })
             }
         }
         create<MavenPublication>("skikoJvmRuntime") {
-            artifactId = "skiko-jvm-runtime-$target"
+            // when changing artifacts names, don't forget to update ci/build.gradle.kts
+            artifactId = SkikoArtifacts.runtimeArtifactIdFor(target)
             afterEvaluate {
                 artifact(skikoJvmRuntimeJar.map { it.archiveFile.get() })
             }

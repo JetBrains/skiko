@@ -20,10 +20,10 @@ dependencies {
         }
     }
 
-    skikoDep("skiko-jvm")
-    skikoDep("skiko-jvm-runtime-windows-x64")
-    skikoDep("skiko-jvm-runtime-linux-x64")
-    skikoDep("skiko-jvm-runtime-macos-x64")
+    skikoDep(SkikoArtifacts.commonArtifactId)
+    skikoDep(SkikoArtifacts.runtimeArtifactIdFor(Target(OS.Windows, Arch.X64)))
+    skikoDep(SkikoArtifacts.runtimeArtifactIdFor(Target(OS.Linux, Arch.X64)))
+    skikoDep(SkikoArtifacts.runtimeArtifactIdFor(Target(OS.MacOS, Arch.X64)))
 }
 
 val createGithubRelease by tasks.registering {

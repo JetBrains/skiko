@@ -1,6 +1,10 @@
 import org.gradle.api.Project
 import java.io.File
 
+val target by lazy {
+    Target(hostOs, hostArch)
+}
+
 enum class OS(val id: String) {
     Linux("linux"),
     Windows("windows"),
@@ -16,7 +20,14 @@ enum class Arch(val id: String) {
     Arm64("arm64")
 }
 
-val hostOs by lazy {
+data class Target(val os: OS, val arch: Arch) {
+    val id: String
+        get() = "${os.id}-${arch.id}"
+
+    override fun toString(): String = id
+}
+
+private val hostOs by lazy {
     val osName = System.getProperty("os.name")
     when {
         osName == "Mac OS X" -> OS.MacOS
@@ -26,7 +37,7 @@ val hostOs by lazy {
     }
 }
 
-val hostArch by lazy {
+private val hostArch by lazy {
     val osArch = System.getProperty("os.arch")
     when (osArch) {
         "x86_64", "amd64" -> Arch.X64
@@ -34,11 +45,6 @@ val hostArch by lazy {
         else -> throw Error("Unknown arch $osArch")
     }
 }
-
-val targetOs = hostOs
-val targetArch = hostArch
-
-val target = "${targetOs.id}-${targetArch.id}"
 
 val jdkHome = System.getProperty("java.home") ?: error("'java.home' is null")
 
@@ -88,4 +94,10 @@ class SkikoProperties(private val myProject: Project) {
 
     val dependenciesDir: File
         get() = myProject.rootProject.projectDir.resolve("dependencies")
+}
+
+object SkikoArtifacts {
+    // names are also used in samples, e.g. samples/SkijaInjectSample/build.gradle
+    val commonArtifactId = "skiko-jvm"
+    fun runtimeArtifactIdFor(target: Target) = "skiko-jvm-runtime-${target.id}"
 }
