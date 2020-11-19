@@ -34,7 +34,7 @@ if (osArch == "x86_64") {
 } else {
     throw Error("Unsupported arch: $osArch")
 }
-def target = "${targetOs}_${targetArch}"
+def target = "${targetOs}-${targetArch}"
 
 def version = "0.1-SNAPSHOT"
 if (project.hasProperty('skiko.version')) {
