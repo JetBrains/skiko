@@ -488,13 +488,13 @@ publishing {
             }
         }
         create<MavenPublication>("skikoJvm") {
-            artifactId = "skiko-jvm"
+            artifactId = SkikoArtifacts.commonArtifactId
             afterEvaluate {
                 artifact(skikoJvmJar.map { it.archiveFile.get() })
             }
         }
         create<MavenPublication>("skikoJvmRuntime") {
-            artifactId = "skiko-jvm-runtime-$target"
+            artifactId = SkikoArtifacts.runtimeArtifactIdFor(hostOs, hostArch)
             afterEvaluate {
                 artifact(skikoJvmRuntimeJar.map { it.archiveFile.get() })
             }

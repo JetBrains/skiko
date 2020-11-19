@@ -38,7 +38,10 @@ val hostArch by lazy {
 val targetOs = hostOs
 val targetArch = hostArch
 
-val target = "${targetOs.id}-${targetArch.id}"
+val target = targetId(targetOs, targetArch)
+
+fun targetId(os: OS, arch: Arch) =
+    "${os.id}-${arch.id}"
 
 val jdkHome = System.getProperty("java.home") ?: error("'java.home' is null")
 
@@ -88,4 +91,11 @@ class SkikoProperties(private val myProject: Project) {
 
     val dependenciesDir: File
         get() = myProject.rootProject.projectDir.resolve("dependencies")
+}
+
+object SkikoArtifacts {
+    // names are also used in samples, e.g. samples/SkijaInjectSample/build.gradle
+    val commonArtifactId = "skiko-jvm"
+    fun runtimeArtifactIdFor(os: OS, arch: Arch) =
+        "skiko-jvm-runtime-${targetId(os, arch)}"
 }
