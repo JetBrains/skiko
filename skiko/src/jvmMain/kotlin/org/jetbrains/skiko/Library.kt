@@ -7,7 +7,7 @@ import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import javax.swing.UIManager
 
-object Library : Runnable {
+object Library {
     private var loaded = false
 
     private val cacheRoot = "${System.getProperty("user.home")}/.skiko/"
@@ -31,7 +31,7 @@ object Library : Runnable {
     // in Skiko's home, and if not - unpacks it. Also, it could load additional
     // localization resource on platforms wher it is needed.
     @Synchronized
-    private fun load() {
+    fun load() {
         if (loaded) return
 
         val resourcePath = "/"
@@ -73,9 +73,5 @@ object Library : Runnable {
         } catch (e: UnsupportedOperationException) {
             // Not all platforms allow this.
         }
-    }
-
-    override fun run() {
-        load()
     }
 }
