@@ -9,7 +9,6 @@ import javax.swing.JFrame
 import javax.swing.JButton
 import javax.swing.event.MouseInputAdapter
 import javax.swing.WindowConstants
-import org.jetbrains.skiko.Library
 import org.jetbrains.skiko.SkiaLayer
 
 fun Button(text: String): JButton {
@@ -19,7 +18,6 @@ fun Button(text: String): JButton {
 }
 
 fun SwingSkia() {
-    Library.load("/", "skiko")
 
     val window = JFrame()
     window.defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
