@@ -6,6 +6,12 @@ import javax.swing.SwingUtilities.convertPoint
 import javax.swing.SwingUtilities.getRootPane
 
 open class HardwareLayer : Canvas(), Drawable {
+    companion object {
+        init {
+            Library.load()
+        }
+    }
+
     override fun paint(g: Graphics) {
         display()
     }

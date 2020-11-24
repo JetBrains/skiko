@@ -22,6 +22,9 @@ class OpenGLApi private constructor() {
     external fun glGetIntegerv(pname: Int): Int
 
     companion object {
+        init {
+            Library.load()
+        }
         val instance = OpenGLApi()
     }
 }
