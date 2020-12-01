@@ -27,7 +27,7 @@ if (osName == "Mac OS X") {
 }
 def osArch = System.getProperty("os.arch")
 def targetArch = ""
-if (osArch == "x86_64") {
+if (osArch == "x86_64" || osArch == "amd64") {
     targetArch = "x64"
 } else if (osArch == "aarch64") {
     targetArch = "arm64"
