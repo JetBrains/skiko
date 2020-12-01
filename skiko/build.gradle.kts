@@ -212,6 +212,7 @@ tasks.withType(CppCompile::class.java).configureEach {
         "-I$skiaDir/include/utils",
         "-I$skiaDir/modules/skparagraph/include",
         "-I$skiaDir/modules/skshaper/include",
+        "-I$skiaDir/modules/svg/include",
         "-I$skiaDir/third_party/externals/harfbuzz/src",
         "-DSK_ALLOW_STATIC_GLOBAL_INITIALIZERS=1",
         "-DSK_FORCE_DISTANCE_FIELD_TEXT=0",
