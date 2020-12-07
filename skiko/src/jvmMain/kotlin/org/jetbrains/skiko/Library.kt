@@ -35,7 +35,7 @@ object Library {
         if (loaded) return
 
         val resourcePath = "/"
-        val name = "skiko"
+        val name = "skiko-$hostId"
         val platformName = System.mapLibraryName(name)
 
         val hash = Library::class.java.getResourceAsStream("$resourcePath$platformName.sha256").use {
@@ -44,7 +44,7 @@ object Library {
         val cacheDir = File("$cacheRoot/$hash")
         cacheDir.mkdirs()
         loadOrGet(cacheDir, resourcePath, platformName, true)
-        val loadIcu = OSType.currentOs == OSType.WINDOWS
+        val loadIcu = hostOs.isWindows
         if (loadIcu) {
             loadOrGet(cacheDir, resourcePath, "icudtl.dat", false)
         }
