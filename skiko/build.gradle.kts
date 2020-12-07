@@ -346,7 +346,7 @@ extensions.configure<CppLibrary> {
 library {
     linkage.addAll(listOf(Linkage.SHARED))
     targetMachines.addAll(listOf(machines.macOS.x86_64, machines.linux.x86_64, machines.windows.x86_64))
-    baseName.set("skiko")
+    baseName.set("skiko-$target")
 
     dependencies {
         implementation(
