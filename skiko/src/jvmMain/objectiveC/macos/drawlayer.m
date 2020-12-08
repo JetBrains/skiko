@@ -70,6 +70,7 @@ JavaVM *jvm = NULL;
 
 @property (retain, strong) CALayer *container;
 @property (retain, strong) AWTGLLayer *glLayer;
+@property (retain, strong) NSWindow *window;
 
 @end
 
@@ -83,6 +84,7 @@ JavaVM *jvm = NULL;
     {
         self.container = NULL;
         self.glLayer = NULL;
+        self.window = NULL;
     }
 
     return self;
@@ -182,9 +184,32 @@ JavaVM *jvm = NULL;
     self.glLayer.canvasGlobalRef = NULL;
     self.glLayer = NULL;
     self.container = NULL;
+    self.window = NULL;
+}
+
+- (BOOL) isFullScreen {
+    NSUInteger masks = [self.window styleMask];
+    if (masks & NSWindowStyleMaskFullScreen) {
+        return true;
+    }
+    return false;
+}
+
+- (void) makeFullscreen: (BOOL) value
+{
+    if (value && !self.isFullScreen)
+    {
+        [self.window performSelectorOnMainThread:@selector(toggleFullScreen:) withObject:nil waitUntilDone:NO];
+    }
+    else if (!value && self.isFullScreen)
+    {
+        [self.window performSelectorOnMainThread:@selector(toggleFullScreen:) withObject:nil waitUntilDone:NO];
+    }
 }
 
 @end
+
+NSMutableArray *unknownWindows = nil;
 
 NSMutableSet *layerStorage = nil;
 pthread_mutex_t layerStorageMutex = { 0 };
@@ -199,6 +224,10 @@ void unlockLayers() {
 
 LayerHandler * findByObject(JNIEnv *env, jobject object)
 {
+    if (layerStorage == nil)
+    {
+        return NULL;
+    }
     for (LayerHandler* layer in layerStorage)
     {
         if ((*env)->IsSameObject(env, object, layer.glLayer.canvasGlobalRef) == JNI_TRUE)
@@ -211,7 +240,7 @@ LayerHandler * findByObject(JNIEnv *env, jobject object)
 
 extern jboolean Skiko_GetAWT(JNIEnv* env, JAWT* awt);
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv *env, jobject canvas)
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_layer_HardwareLayer_updateLayer(JNIEnv *env, jobject canvas)
 {
     lockLayers();
     if (layerStorage != nil)
@@ -275,6 +304,28 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv
         [layersSet.glLayer setCanvasGlobalRef: canvasGlobalRef];
 
         [layersSet syncLayersSize];
+
+        if (unknownWindows == nil)
+        {
+            NSMutableArray<NSWindow *> *windows = [NSMutableArray arrayWithArray: [[NSApplication sharedApplication] windows]];
+            NSWindow *mainWindow = [[NSApplication sharedApplication] mainWindow];
+            layersSet.window = mainWindow;
+            [windows removeObject: mainWindow];
+            unknownWindows = windows;
+        }
+        else
+        {
+            NSMutableArray<NSWindow *> *windows = [NSMutableArray arrayWithArray: [[NSApplication sharedApplication] windows]];
+            for (NSWindow* value in unknownWindows)
+            {
+                [windows removeObject: value];
+            }
+            for (LayerHandler* value in layerStorage)
+            {
+                [windows removeObject: value.window];
+            }
+            layersSet.window = [windows firstObject];
+        }
     }
 
     ds->FreeDrawingSurfaceInfo(dsi);
@@ -283,7 +334,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv
     unlockLayers();
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_redrawLayer(JNIEnv *env, jobject canvas)
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_layer_HardwareLayer_redrawLayer(JNIEnv *env, jobject canvas)
 {
     lockLayers();
     LayerHandler *layer = findByObject(env, canvas);
@@ -294,7 +345,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_redrawLayer(JNIEnv
     }
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_disposeLayer(JNIEnv *env, jobject canvas)
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_layer_HardwareLayer_disposeLayer(JNIEnv *env, jobject canvas)
 {
     lockLayers();
     LayerHandler *layer = findByObject(env, canvas);
@@ -306,9 +357,32 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_disposeLayer(JNIEn
     }
 }
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getWindowHandle(JNIEnv *env, jobject canvas)
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_layer_HardwareLayer_getWindowHandle(JNIEnv *env, jobject canvas)
 {
     return (jlong)kNullWindowHandle;
+}
+
+JNIEXPORT jboolean JNICALL Java_org_jetbrains_skiko_properties_MacOSProperties_isFullscreen(JNIEnv *env, jobject properties, jobject component)
+{
+    lockLayers();
+    LayerHandler *layer = findByObject(env, component);
+    unlockLayers();
+    if (layer != NULL)
+    {
+        return [layer isFullScreen];
+    }
+    return false;
+}
+
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_properties_MacOSProperties_makeFullscreen(JNIEnv *env, jobject properties, jobject component, jboolean value)
+{
+    lockLayers();
+    LayerHandler *layer = findByObject(env, component);
+    unlockLayers();
+    if (layer != NULL)
+    {
+        [layer makeFullscreen:value];
+    }
 }
 
 void getMetalDeviceAndQueue(void** device, void** queue)

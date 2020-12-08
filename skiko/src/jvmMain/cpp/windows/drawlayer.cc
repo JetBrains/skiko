@@ -64,6 +64,10 @@ private:
 set<LayerHandler *> *layerStorage = NULL;
 LayerHandler *findByObject(JNIEnv *env, jobject object)
 {
+    if (layerStorage == NULL)
+    {
+        return NULL;
+    }
     for (auto &layer : *layerStorage)
     {
         if (env->IsSameObject(object, layer->canvasGlobalRef) == JNI_TRUE)
@@ -77,7 +81,7 @@ LayerHandler *findByObject(JNIEnv *env, jobject object)
 
 extern "C"
 {
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv *env, jobject canvas)
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_layer_HardwareLayer_updateLayer(JNIEnv *env, jobject canvas)
     {
         if (layerStorage != NULL)
         {
@@ -153,7 +157,7 @@ extern "C"
         awt.FreeDrawingSurface(ds);
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_redrawLayer(JNIEnv *env, jobject canvas)
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_layer_HardwareLayer_redrawLayer(JNIEnv *env, jobject canvas)
     {
         LayerHandler *layer = findByObject(env, canvas);
         if (layer != NULL)
@@ -162,7 +166,7 @@ extern "C"
         }
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_disposeLayer(JNIEnv *env, jobject canvas)
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_layer_HardwareLayer_disposeLayer(JNIEnv *env, jobject canvas)
     {
         LayerHandler *layer = findByObject(env, canvas);
         if (layer != NULL)
@@ -173,7 +177,7 @@ extern "C"
         }
     }
 
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getWindowHandle(JNIEnv *env, jobject canvas)
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_layer_HardwareLayer_getWindowHandle(JNIEnv *env, jobject canvas)
     {
         JAWT awt;
         JAWT_DrawingSurface *ds = NULL;
