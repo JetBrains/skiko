@@ -9,9 +9,9 @@ internal interface PlatformOperations {
     fun setFullscreen(component: Component, value: Boolean)
 }
 
-internal fun getPlatformOperations(): PlatformOperations {
+internal val platformOperations: PlatformOperations by lazy {
     when (hostOs) {
-        OS.MacOS -> return object: PlatformOperations {
+        OS.MacOS -> object: PlatformOperations {
                 override fun isFullscreen(component: Component): Boolean {
                     return osxIsFullscreenNative(component)
                 }
@@ -21,7 +21,7 @@ internal fun getPlatformOperations(): PlatformOperations {
                 }
         }
         else -> {
-            return object: PlatformOperations {
+            object: PlatformOperations {
                 override fun isFullscreen(component: Component): Boolean {
                     val window = SwingUtilities.getRoot(component) as Window
                     val device = window.graphicsConfiguration.device

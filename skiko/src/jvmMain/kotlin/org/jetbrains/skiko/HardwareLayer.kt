@@ -17,8 +17,6 @@ abstract class HardwareLayer : Canvas(), Drawable {
         display()
     }
 
-    private val platformOperations by lazy { getPlatformOperations() }
-
     open fun display() {
         this.updateLayer()
         this.redrawLayer()
