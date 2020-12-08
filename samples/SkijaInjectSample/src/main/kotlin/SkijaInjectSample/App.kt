@@ -6,7 +6,8 @@ import java.awt.event.MouseEvent
 import javax.swing.WindowConstants
 import javax.swing.event.MouseInputAdapter
 import org.jetbrains.skija.*
-import org.jetbrains.skiko.SkiaRenderer
+import org.jetbrains.skiko.layer.SkiaLayer
+import org.jetbrains.skiko.render.SkiaRenderer
 import java.awt.event.MouseMotionAdapter
 import kotlin.math.cos
 import kotlin.math.sin
@@ -15,19 +16,22 @@ import org.jetbrains.skija.paragraph.ParagraphBuilder
 import org.jetbrains.skija.paragraph.ParagraphStyle
 import org.jetbrains.skija.paragraph.TextStyle
 import javax.swing.JOptionPane
-
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import java.awt.event.KeyEvent
+import java.awt.Toolkit
 import javax.swing.JFrame
 import javax.swing.JMenu
 import javax.swing.JMenuBar
 import javax.swing.JMenuItem
 import javax.swing.KeyStroke
-import java.awt.Toolkit
+import javax.swing.SwingUtilities.invokeLater
 
 fun main(args: Array<String>) {
-    createWindow("First window")
+    invokeLater {
+        createWindow("First window")
+        SwingSkia()
+    }
 }
 
 fun createWindow(title: String) {
@@ -42,22 +46,35 @@ fun createWindow(title: String) {
     val menuBar = JMenuBar()
     val menu = JMenu("File")
     menuBar.add(menu)
-    val menuItem = JMenuItem("Say Hello")
-    val ctrlJ = KeyStroke.getKeyStroke(KeyEvent.VK_J, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx())
-    menuItem.setAccelerator(ctrlJ)
-    menuItem.addActionListener(object : ActionListener {
+
+    val miFullscreenState = JMenuItem("Is fullscreen mode")
+    val ctrlI = KeyStroke.getKeyStroke(KeyEvent.VK_I, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx())
+    miFullscreenState.setAccelerator(ctrlI)
+    miFullscreenState.addActionListener(object : ActionListener {
         override fun actionPerformed(actionEvent: ActionEvent?) {
-            println("Hello, World")
+            println("${window.title} is in fullscreen mode: ${window.layer.isFullscreen}")
         }
     })
 
-    menu.add(menuItem)
+    val miToggleFullscreen = JMenuItem("Toggle fullscreen")
+    val ctrlF = KeyStroke.getKeyStroke(KeyEvent.VK_F, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx())
+    miToggleFullscreen.setAccelerator(ctrlF)
+    miToggleFullscreen.addActionListener(object : ActionListener {
+        override fun actionPerformed(actionEvent: ActionEvent?) {
+            window.layer.makeFullscreen(!window.layer.isFullscreen)
+        }
+    })
+
+    menu.add(miToggleFullscreen)
+    menu.add(miFullscreenState)
+
     window.setJMenuBar(menuBar)
 
     val state = State()
     state.text = title
 
-    window.layer.renderer = Renderer { renderer, w, h -> displayScene(renderer, w, h, mouseX, mouseY, state)
+    window.layer.renderer = Renderer {
+        renderer, w, h -> displayScene(renderer, w, h, mouseX, mouseY, state)
     }
 
     window.layer.addMouseMotionListener(object : MouseMotionAdapter() {

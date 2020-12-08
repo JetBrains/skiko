@@ -1,4 +1,4 @@
-package org.jetbrains.skiko
+package org.jetbrains.skiko.layer
 
 interface Drawable {
     fun redrawLayer()
