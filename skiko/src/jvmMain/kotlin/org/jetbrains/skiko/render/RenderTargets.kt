@@ -1,4 +1,4 @@
-package org.jetbrains.skiko
+package org.jetbrains.skiko.render
 
 import org.jetbrains.skija.BackendRenderTarget
 import org.jetbrains.skija.DirectContext
