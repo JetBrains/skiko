@@ -189,10 +189,7 @@ JavaVM *jvm = NULL;
 
 - (BOOL) isFullScreen {
     NSUInteger masks = [self.window styleMask];
-    if ((masks & NSWindowStyleMaskFullScreen) != 0) {
-        return true;
-    }
-    return false;
+    return (masks & NSWindowStyleMaskFullScreen) != 0;
 }
 
 - (void) makeFullscreen: (BOOL) value
