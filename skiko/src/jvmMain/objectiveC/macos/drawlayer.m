@@ -237,7 +237,7 @@ LayerHandler * findByObject(JNIEnv *env, jobject object)
 
 extern jboolean Skiko_GetAWT(JNIEnv* env, JAWT* awt);
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_layer_HardwareLayer_updateLayer(JNIEnv *env, jobject canvas)
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv *env, jobject canvas)
 {
     lockLayers();
     if (layerStorage != nil)
@@ -331,7 +331,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_layer_HardwareLayer_updateLayer(
     unlockLayers();
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_layer_HardwareLayer_redrawLayer(JNIEnv *env, jobject canvas)
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_redrawLayer(JNIEnv *env, jobject canvas)
 {
     lockLayers();
     LayerHandler *layer = findByObject(env, canvas);
@@ -342,7 +342,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_layer_HardwareLayer_redrawLayer(
     }
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_layer_HardwareLayer_disposeLayer(JNIEnv *env, jobject canvas)
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_disposeLayer(JNIEnv *env, jobject canvas)
 {
     lockLayers();
     LayerHandler *layer = findByObject(env, canvas);
@@ -354,7 +354,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_layer_HardwareLayer_disposeLayer
     }
 }
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_layer_HardwareLayer_getWindowHandle(JNIEnv *env, jobject canvas)
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getWindowHandle(JNIEnv *env, jobject canvas)
 {
     return (jlong)kNullWindowHandle;
 }

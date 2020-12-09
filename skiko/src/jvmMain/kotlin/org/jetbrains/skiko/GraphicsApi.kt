@@ -1,4 +1,4 @@
-package org.jetbrains.skiko.render
+package org.jetbrains.skiko
 
 enum class GraphicsApi {
     UNKNOWN, OPENGL, VULKAN, METAL
