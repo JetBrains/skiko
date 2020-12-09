@@ -3,7 +3,6 @@ package org.jetbrains.skiko
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import javax.swing.JFrame
-import org.jetbrains.skiko.layer.SkiaLayer
 
 open class SkiaWindow : JFrame() {
     val layer: SkiaLayer = SkiaLayer()

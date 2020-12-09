@@ -9,7 +9,7 @@ import javax.swing.JFrame
 import javax.swing.JButton
 import javax.swing.event.MouseInputAdapter
 import javax.swing.WindowConstants
-import org.jetbrains.skiko.layer.SkiaLayer
+import org.jetbrains.skiko.SkiaLayer
 
 fun Button(text: String): JButton {
     val btn = JButton(text)
