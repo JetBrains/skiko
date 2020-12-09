@@ -6,9 +6,6 @@ import javax.swing.SwingUtilities.convertPoint
 import javax.swing.SwingUtilities.getRootPane
 
 abstract class HardwareLayer : Canvas(), Drawable {
-
-abstract class HardwareLayer : Canvas(), Drawable {
-
     companion object {
         init {
             Library.load()
