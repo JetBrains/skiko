@@ -64,6 +64,10 @@ private:
 set<LayerHandler *> *layerStorage = NULL;
 LayerHandler *findByObject(JNIEnv *env, jobject object)
 {
+    if (layerStorage == NULL)
+    {
+        return NULL;
+    }
     for (auto &layer : *layerStorage)
     {
         if (env->IsSameObject(object, layer->canvasGlobalRef) == JNI_TRUE)
