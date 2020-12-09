@@ -189,7 +189,7 @@ JavaVM *jvm = NULL;
 
 - (BOOL) isFullScreen {
     NSUInteger masks = [self.window styleMask];
-    if (masks & NSWindowStyleMaskFullScreen) {
+    if ((masks & NSWindowStyleMaskFullScreen) != 0) {
         return true;
     }
     return false;
@@ -240,7 +240,7 @@ LayerHandler * findByObject(JNIEnv *env, jobject object)
 
 extern jboolean Skiko_GetAWT(JNIEnv* env, JAWT* awt);
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_layer_HardwareLayer_updateLayer(JNIEnv *env, jobject canvas)
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv *env, jobject canvas)
 {
     lockLayers();
     if (layerStorage != nil)
@@ -334,7 +334,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_layer_HardwareLayer_updateLayer(
     unlockLayers();
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_layer_HardwareLayer_redrawLayer(JNIEnv *env, jobject canvas)
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_redrawLayer(JNIEnv *env, jobject canvas)
 {
     lockLayers();
     LayerHandler *layer = findByObject(env, canvas);
@@ -345,7 +345,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_layer_HardwareLayer_redrawLayer(
     }
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_layer_HardwareLayer_disposeLayer(JNIEnv *env, jobject canvas)
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_disposeLayer(JNIEnv *env, jobject canvas)
 {
     lockLayers();
     LayerHandler *layer = findByObject(env, canvas);
@@ -357,12 +357,12 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_layer_HardwareLayer_disposeLayer
     }
 }
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_layer_HardwareLayer_getWindowHandle(JNIEnv *env, jobject canvas)
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getWindowHandle(JNIEnv *env, jobject canvas)
 {
     return (jlong)kNullWindowHandle;
 }
 
-JNIEXPORT jboolean JNICALL Java_org_jetbrains_skiko_properties_MacOSProperties_isFullscreen(JNIEnv *env, jobject properties, jobject component)
+JNIEXPORT jboolean JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_osxIsFullscreenNative(JNIEnv *env, jobject properties, jobject component)
 {
     lockLayers();
     LayerHandler *layer = findByObject(env, component);
@@ -374,7 +374,7 @@ JNIEXPORT jboolean JNICALL Java_org_jetbrains_skiko_properties_MacOSProperties_i
     return false;
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_properties_MacOSProperties_makeFullscreen(JNIEnv *env, jobject properties, jobject component, jboolean value)
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_osxSetFullscreenNative(JNIEnv *env, jobject properties, jobject component, jboolean value)
 {
     lockLayers();
     LayerHandler *layer = findByObject(env, component);

@@ -4,7 +4,7 @@
 
 extern "C" {
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_render_RenderTargetsKt_makeGLRenderTargetNative(
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_RenderTargetsKt_makeGLRenderTargetNative(
     JNIEnv * env, jclass jclass, 
     jint width, jint height, 
     jint sampleCnt, jint stencilBits, 
@@ -15,13 +15,13 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_render_RenderTargetsKt_makeGLRe
     return reinterpret_cast<jlong>(obj);
 }
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_render_RenderTargetsKt_makeGLContextNative(JNIEnv* env, jclass jclass) {
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_RenderTargetsKt_makeGLContextNative(JNIEnv* env, jclass jclass) {
     return reinterpret_cast<jlong>(GrDirectContext::MakeGL().release());
 }
 
 extern void getMetalDeviceAndQueue(void** device, void** queue);
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_render_RenderTargetsKt_makeMetalRenderTargetNative(
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_RenderTargetsKt_makeMetalRenderTargetNative(
     JNIEnv * env, jclass jclass, jint width, jint height, jint sampleCnt) {
 #ifdef SK_METAL
     // TODO: create properly.
@@ -33,7 +33,7 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_render_RenderTargetsKt_makeMeta
 #endif
 }
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_render_RenderTargetsKt_makeMetalContextNative(JNIEnv* env, jclass jclass) {
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_RenderTargetsKt_makeMetalContextNative(JNIEnv* env, jclass jclass) {
 #ifdef SK_METAL
     void* device = nullptr;
     void* queue = nullptr;

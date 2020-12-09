@@ -6,8 +6,8 @@ import java.awt.event.MouseEvent
 import javax.swing.WindowConstants
 import javax.swing.event.MouseInputAdapter
 import org.jetbrains.skija.*
-import org.jetbrains.skiko.layer.SkiaLayer
-import org.jetbrains.skiko.render.SkiaRenderer
+import org.jetbrains.skiko.SkiaLayer
+import org.jetbrains.skiko.SkiaRenderer
 import java.awt.event.MouseMotionAdapter
 import kotlin.math.cos
 import kotlin.math.sin
@@ -30,7 +30,6 @@ import javax.swing.SwingUtilities.invokeLater
 fun main(args: Array<String>) {
     invokeLater {
         createWindow("First window")
-        SwingSkia()
     }
 }
 
@@ -52,7 +51,7 @@ fun createWindow(title: String) {
     miFullscreenState.setAccelerator(ctrlI)
     miFullscreenState.addActionListener(object : ActionListener {
         override fun actionPerformed(actionEvent: ActionEvent?) {
-            println("${window.title} is in fullscreen mode: ${window.layer.isFullscreen}")
+            println("${window.title} is in fullscreen mode: ${window.layer.fullscreen}")
         }
     })
 
@@ -61,7 +60,7 @@ fun createWindow(title: String) {
     miToggleFullscreen.setAccelerator(ctrlF)
     miToggleFullscreen.addActionListener(object : ActionListener {
         override fun actionPerformed(actionEvent: ActionEvent?) {
-            window.layer.makeFullscreen(!window.layer.isFullscreen)
+            window.layer.fullscreen = !window.layer.fullscreen
         }
     })
 
