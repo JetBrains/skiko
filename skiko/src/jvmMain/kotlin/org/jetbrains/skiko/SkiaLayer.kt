@@ -1,4 +1,4 @@
-package org.jetbrains.skiko.layer
+package org.jetbrains.skiko
 
 import org.jetbrains.skija.BackendRenderTarget
 import org.jetbrains.skija.Canvas
@@ -8,13 +8,6 @@ import org.jetbrains.skija.FramebufferFormat
 import org.jetbrains.skija.Surface
 import org.jetbrains.skija.SurfaceColorFormat
 import org.jetbrains.skija.SurfaceOrigin
-import org.jetbrains.skiko.render.GraphicsApi
-import org.jetbrains.skiko.render.OpenGLApi
-import org.jetbrains.skiko.render.makeGLContext
-import org.jetbrains.skiko.render.makeMetalContext
-import org.jetbrains.skiko.render.makeGLRenderTarget
-import org.jetbrains.skiko.render.makeMetalRenderTarget
-import org.jetbrains.skiko.render.SkiaRenderer
 
 private class SkijaState {
     var context: DirectContext? = null
@@ -26,6 +19,13 @@ private class SkijaState {
         surface?.close()
         renderTarget?.close()
     }
+}
+
+interface SkiaRenderer {
+    fun onInit()
+    fun onRender(canvas: Canvas, width: Int, height: Int)
+    fun onReshape(width: Int, height: Int)
+    fun onDispose()
 }
 
 open class SkiaLayer() : HardwareLayer() {
