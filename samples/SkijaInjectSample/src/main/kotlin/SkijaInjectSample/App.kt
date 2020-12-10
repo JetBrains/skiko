@@ -14,17 +14,16 @@ import org.jetbrains.skija.paragraph.FontCollection
 import org.jetbrains.skija.paragraph.ParagraphBuilder
 import org.jetbrains.skija.paragraph.ParagraphStyle
 import org.jetbrains.skija.paragraph.TextStyle
-import javax.swing.JOptionPane
-
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import java.awt.event.KeyEvent
+import java.awt.Toolkit
 import javax.swing.JFrame
 import javax.swing.JMenu
 import javax.swing.JMenuBar
 import javax.swing.JMenuItem
+import javax.swing.JOptionPane
 import javax.swing.KeyStroke
-import java.awt.Toolkit
 
 fun main(args: Array<String>) {
     createWindow("First window")
@@ -42,22 +41,35 @@ fun createWindow(title: String) {
     val menuBar = JMenuBar()
     val menu = JMenu("File")
     menuBar.add(menu)
-    val menuItem = JMenuItem("Say Hello")
-    val ctrlJ = KeyStroke.getKeyStroke(KeyEvent.VK_J, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx())
-    menuItem.setAccelerator(ctrlJ)
-    menuItem.addActionListener(object : ActionListener {
+
+    val miFullscreenState = JMenuItem("Is fullscreen mode")
+    val ctrlI = KeyStroke.getKeyStroke(KeyEvent.VK_I, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx())
+    miFullscreenState.setAccelerator(ctrlI)
+    miFullscreenState.addActionListener(object : ActionListener {
         override fun actionPerformed(actionEvent: ActionEvent?) {
-            println("Hello, World")
+            println("${window.title} is in fullscreen mode: ${window.layer.fullscreen}")
         }
     })
 
-    menu.add(menuItem)
+    val miToggleFullscreen = JMenuItem("Toggle fullscreen")
+    val ctrlF = KeyStroke.getKeyStroke(KeyEvent.VK_F, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx())
+    miToggleFullscreen.setAccelerator(ctrlF)
+    miToggleFullscreen.addActionListener(object : ActionListener {
+        override fun actionPerformed(actionEvent: ActionEvent?) {
+            window.layer.fullscreen = !window.layer.fullscreen
+        }
+    })
+
+    menu.add(miToggleFullscreen)
+    menu.add(miFullscreenState)
+
     window.setJMenuBar(menuBar)
 
     val state = State()
     state.text = title
 
-    window.layer.renderer = Renderer { renderer, w, h -> displayScene(renderer, w, h, mouseX, mouseY, state)
+    window.layer.renderer = Renderer {
+        renderer, w, h -> displayScene(renderer, w, h, mouseX, mouseY, state)
     }
 
     window.layer.addMouseMotionListener(object : MouseMotionAdapter() {
