@@ -136,6 +136,10 @@ val skijaSrcDir = run {
             delombokSkijaSrcDir.deleteRecursively()
             delombokSkijaSrcDir.mkdirs()
         }
+        doLast {
+            // Remove Library.java from Skija.
+            file(delombokSkijaSrcDir.path + "/org/jetbrains/skija/impl/Library.java").delete()
+        }
     }.map { delombokSkijaSrcDir }
 }
 
