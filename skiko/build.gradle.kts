@@ -20,6 +20,8 @@ buildscript {
 }
 
 val skiko = SkikoProperties(rootProject)
+val debug = false
+val buildType = if (debug) "Debug" else "Release"
 
 allprojects {
     group = "org.jetbrains.skiko"
@@ -355,7 +357,7 @@ library {
     dependencies {
         implementation(
             skiaDir.map {
-                fileTree(it.resolve("out/Release-${targetArch.id}"))
+                fileTree(it.resolve("out/$buildType-${targetArch.id}"))
                     .matching { include(if (targetOs.isWindows) "**.lib" else "**.a") }
             }
         )
@@ -381,10 +383,10 @@ val skikoJvmJar: Provider<Jar> by tasks.registering(Jar::class) {
 }
 
 val createChecksums by project.tasks.registering(org.gradle.crypto.checksum.Checksum::class) {
-    val linkTask = project.tasks.named("linkRelease${targetOs.id.capitalize()}")
+    val linkTask = project.tasks.named("link$buildType${targetOs.id.capitalize()}")
     dependsOn(linkTask)
     files = linkTask.get().outputs.files.filter { it.isFile } +
-            if (targetOs.isWindows) files(skiaDir.map { it.resolve("out/Release-x64/icudtl.dat") }) else files()
+            if (targetOs.isWindows) files(skiaDir.map { it.resolve("out/$buildType-x64/icudtl.dat") }) else files()
     algorithm = Checksum.Algorithm.SHA256
     outputDir = file("$buildDir/checksums")
 }
@@ -393,11 +395,11 @@ val skikoJvmRuntimeJar by project.tasks.registering(Jar::class) {
     archiveBaseName.set("skiko-$target")
     dependsOn(createChecksums)
     from(skikoJvmJar.map { zipTree(it.archiveFile) })
-    from(project.tasks.named("linkRelease${targetOs.id.capitalize()}").map {
+    from(project.tasks.named("link$buildType${targetOs.id.capitalize()}").map {
         it.outputs.files.filter { it.isFile }
     })
     if (targetOs.isWindows) {
-        from(files(skiaDir.map { it.resolve("out/Release-x64/icudtl.dat") }))
+        from(files(skiaDir.map { it.resolve("out/$buildType-x64/icudtl.dat") }))
     }
     from(createChecksums.get().outputs.files)
 }
