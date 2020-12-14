@@ -20,9 +20,4 @@ open class SkiaWindow : JFrame() {
     fun display() {
         layer.display()
     }
-
-    override fun setVisible(value: Boolean) {
-        super.setVisible(value)
-        display()
-    }
 }
