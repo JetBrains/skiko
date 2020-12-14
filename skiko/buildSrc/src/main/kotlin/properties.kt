@@ -13,7 +13,19 @@ enum class OS(val id: String) {
 
 enum class Arch(val id: String) {
     X64("x64"),
-    Arm64("arm64")
+    Arm64("arm64"),
+}
+
+enum class SkiaBuildType(
+    val id: String,
+    val flags: Array<String>,
+    val clangFlags: Array<String>,
+    val msvcFlags: Array<String>
+) {
+    DEBUG("Debug", arrayOf("-DSK_DEBUG"), arrayOf("-std=c++14", "-g"), emptyArray()),
+    RELEASE("Release", arrayOf("-DNDEBUG"), arrayOf("-std=c++14", "-O3"), arrayOf("/O2"))
+    ;
+    override fun toString() = id
 }
 
 val hostOs by lazy {

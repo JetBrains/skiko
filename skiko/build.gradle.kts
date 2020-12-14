@@ -21,7 +21,7 @@ buildscript {
 
 val skiko = SkikoProperties(rootProject)
 val debug = false
-val buildType = if (debug) "Debug" else "Release"
+val buildType = if (debug) SkiaBuildType.DEBUG else SkiaBuildType.RELEASE
 
 allprojects {
     group = "org.jetbrains.skiko"
@@ -231,33 +231,31 @@ tasks.withType(CppCompile::class.java).configureEach {
         "-DSK_SUPPORT_OPENCL=0",
         "-Dskija_EXPORTS",
         "-DSK_UNICODE_AVAILABLE",
-        "-DNDEBUG"
+        *buildType.flags
     ))
     when (targetOs) {
         OS.MacOS -> {
             compilerArgs.addAll(
                 listOf(
-                    "-std=c++14",
-                    "-O3",
                     "-fvisibility=hidden",
                     "-fvisibility-inlines-hidden",
                     "-I$jdkHome/include/darwin",
                     "-DSK_SHAPER_CORETEXT_AVAILABLE",
                     "-DSK_BUILD_FOR_MAC",
-                    "-DSK_METAL"
+                    "-DSK_METAL",
+                    *buildType.clangFlags
                 )
             )
         }
         OS.Linux -> {
             compilerArgs.addAll(
                 listOf(
-                    "-std=c++14",
-                    "-O3",
                     "-fvisibility=hidden",
                     "-fvisibility-inlines-hidden",
                     "-I$jdkHome/include/linux",
                     "-DSK_BUILD_FOR_LINUX",
-                    "-DSK_R32_SHIFT=16"
+                    "-DSK_R32_SHIFT=16",
+                    *buildType.clangFlags
                 )
             )
         }
@@ -272,9 +270,9 @@ tasks.withType(CppCompile::class.java).configureEach {
                     "-DNOMINMAX",
                     "-DSK_GAMMA_APPLY_TO_A8",
                     "/utf-8",
-                    "/O2",
-                    "/GR-" // no-RTTI.
-                )
+                    "/GR-", // no-RTTI.
+                    *buildType.msvcFlags
+                    )
             )
         }
     }
@@ -357,7 +355,7 @@ library {
     dependencies {
         implementation(
             skiaDir.map {
-                fileTree(it.resolve("out/$buildType-${targetArch.id}"))
+                fileTree(it.resolve("out/${buildType.id}-${targetArch.id}"))
                     .matching { include(if (targetOs.isWindows) "**.lib" else "**.a") }
             }
         )
@@ -383,10 +381,10 @@ val skikoJvmJar: Provider<Jar> by tasks.registering(Jar::class) {
 }
 
 val createChecksums by project.tasks.registering(org.gradle.crypto.checksum.Checksum::class) {
-    val linkTask = project.tasks.named("link$buildType${targetOs.id.capitalize()}")
+    val linkTask = project.tasks.named("link${buildType.id}${targetOs.id.capitalize()}")
     dependsOn(linkTask)
     files = linkTask.get().outputs.files.filter { it.isFile } +
-            if (targetOs.isWindows) files(skiaDir.map { it.resolve("out/$buildType-x64/icudtl.dat") }) else files()
+            if (targetOs.isWindows) files(skiaDir.map { it.resolve("out/${buildType.id}-x64/icudtl.dat") }) else files()
     algorithm = Checksum.Algorithm.SHA256
     outputDir = file("$buildDir/checksums")
 }
@@ -395,11 +393,11 @@ val skikoJvmRuntimeJar by project.tasks.registering(Jar::class) {
     archiveBaseName.set("skiko-$target")
     dependsOn(createChecksums)
     from(skikoJvmJar.map { zipTree(it.archiveFile) })
-    from(project.tasks.named("link$buildType${targetOs.id.capitalize()}").map {
+    from(project.tasks.named("link${buildType.id}${targetOs.id.capitalize()}").map {
         it.outputs.files.filter { it.isFile }
     })
     if (targetOs.isWindows) {
-        from(files(skiaDir.map { it.resolve("out/$buildType-x64/icudtl.dat") }))
+        from(files(skiaDir.map { it.resolve("out/${buildType.id}-x64/icudtl.dat") }))
     }
     from(createChecksums.get().outputs.files)
 }
