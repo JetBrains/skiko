@@ -13,13 +13,7 @@ import org.jetbrains.skija.SurfaceOrigin
 import org.jetbrains.skija.ClipMode
 
 private class SkijaState {
-    val canvasBleach: () -> Unit
-    init {
-        when (hostOs) {
-            OS.MacOS -> canvasBleach = { canvas?.clear(0) }
-            else -> canvasBleach = { canvas?.clear(-1) }
-        }
-    }
+    val bleachConstant = if (hostOs == OS.MacOS) 0 else -1
     var context: DirectContext? = null
     var renderTarget: BackendRenderTarget? = null
     var surface: Surface? = null
@@ -71,7 +65,7 @@ open class SkiaLayer() : HardwareLayer() {
         }
         initSkija()
         skijaState.apply {
-            canvasBleach.invoke()
+            canvas!!.clear(bleachConstant)
             
             // cliping
             for (component in clipComponets) {

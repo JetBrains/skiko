@@ -255,23 +255,43 @@ extern "C"
         return 1;
     }
 
-    double getDpiScale()
+    JNIEXPORT jfloat JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_linuxGetDpiScaleNative(JNIEnv *env, jobject properties, jobject component)
     {
-        Display *display = XOpenDisplay(nullptr);
-        if (display != nullptr)
-        {
-            double result = getDpiScaleByDisplay(display);
-            XCloseDisplay(display);
-            return result;
-        }
-        else
-        {
-            return 1;
-        }
-    }
+        JAWT awt;
+        JAWT_DrawingSurface *ds = NULL;
+        JAWT_DrawingSurfaceInfo *dsi = NULL;
 
-    JNIEXPORT jfloat JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_linuxGetDpiScaleNative(JNIEnv *env, jobject properties)
-    {
-        return (float)getDpiScale();
+        jboolean result = JNI_FALSE;
+        jint lock = 0;
+        JAWT_X11DrawingSurfaceInfo *dsi_x11;
+
+        awt.version = (jint)JAWT_VERSION_9;
+        result = Skiko_GetAWT(env, &awt);
+
+        if (result == JNI_FALSE)
+        {
+            fprintf(stderr, "JAWT_GetAWT failed! Result is JNI_FALSE\n");
+            return -1;
+        }
+
+        if (jvm == NULL)
+        {
+            env->GetJavaVM(&jvm);
+        }
+
+        ds = awt.GetDrawingSurface(env, component);
+        lock = ds->Lock(ds);
+        dsi = ds->GetDrawingSurfaceInfo(ds);
+        dsi_x11 = (JAWT_X11DrawingSurfaceInfo *)dsi->platformInfo;
+
+        Display *display = dsi_x11->display;
+
+        float dpi = (float)getDpiScaleByDisplay(display);
+
+        ds->FreeDrawingSurfaceInfo(dsi);
+        ds->Unlock(ds);
+        awt.FreeDrawingSurface(ds);
+
+        return dpi;
     }
 } // extern "C"

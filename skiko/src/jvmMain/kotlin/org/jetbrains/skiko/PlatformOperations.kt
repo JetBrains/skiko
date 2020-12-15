@@ -59,7 +59,7 @@ internal val platformOperations: PlatformOperations by lazy {
                 }
 
                 override fun getDpiScale(component: Component): Float {
-                    return linuxGetDpiScaleNative()
+                    return linuxGetDpiScaleNative(component)
                 }
             }
         }
@@ -71,4 +71,4 @@ external private fun osxIsFullscreenNative(component: Component): Boolean
 external private fun osxSetFullscreenNative(component: Component, value: Boolean)
 
 // Linux
-external private fun linuxGetDpiScaleNative(): Float
+external private fun linuxGetDpiScaleNative(component: Component): Float
