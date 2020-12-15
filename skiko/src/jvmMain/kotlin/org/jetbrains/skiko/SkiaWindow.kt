@@ -5,7 +5,7 @@ import java.awt.event.ComponentEvent
 import javax.swing.JFrame
 
 open class SkiaWindow : JFrame() {
-    val layer: SkiaLayer = SkiaLayer()
+    val layer = SkiaLayer()
 
     init {
         contentPane.add(layer)

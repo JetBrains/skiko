@@ -1,5 +1,6 @@
 package SkijaInjectSample
 
+import java.awt.Color
 import java.awt.Dimension
 import java.awt.BorderLayout
 import java.awt.event.KeyEvent
@@ -7,9 +8,11 @@ import java.awt.event.MouseEvent
 import java.awt.event.MouseMotionAdapter
 import javax.swing.JFrame
 import javax.swing.JButton
+import javax.swing.JLayeredPane
+import javax.swing.JPanel
 import javax.swing.event.MouseInputAdapter
 import javax.swing.WindowConstants
-import org.jetbrains.skiko.SkiaLayer
+import org.jetbrains.skiko.SkiaPanel
 
 fun Button(text: String): JButton {
     val btn = JButton(text)
@@ -23,13 +26,25 @@ fun SwingSkia() {
     window.defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
     window.title = "SwingSkiaWindow"
 
-    val layer = SkiaLayer()
+    val panel = SkiaPanel()
 
     window.contentPane.add(Button("North"), BorderLayout.NORTH)
     window.contentPane.add(Button("West"), BorderLayout.WEST)
     window.contentPane.add(Button("East"), BorderLayout.EAST)
     window.contentPane.add(Button("South"), BorderLayout.SOUTH)
-    window.contentPane.add(layer, BorderLayout.CENTER)
+    window.contentPane.add(panel, BorderLayout.CENTER)
+
+    val btnPanelOK = JPanel()
+    btnPanelOK.setLayout(BorderLayout(0, 0))
+    btnPanelOK.setBounds(50, 50, 200, 40)
+    btnPanelOK.setBackground(Color.white)
+    btnPanelOK.add(JButton("OK"))
+
+    val btnCancel = JButton("Cancel")
+    btnCancel.setBounds(300, 50, 200, 40)
+
+    panel.add(btnPanelOK)
+    panel.add(btnCancel)
 
     val state = State()
     state.text = window.title
@@ -37,13 +52,13 @@ fun SwingSkia() {
     var mouseX = 0
     var mouseY = 0
 
-    layer.renderer = Renderer { renderer, w, h -> displayScene(renderer, w, h, mouseX, mouseY, state) }
+    panel.layer.renderer = Renderer { renderer, w, h -> displayScene(renderer, w, h, mouseX, mouseY, state) }
 
-    layer.addMouseMotionListener(object : MouseMotionAdapter() {
+    panel.layer.addMouseMotionListener(object : MouseMotionAdapter() {
         override fun mouseMoved(event: MouseEvent) {
             mouseX = event.x
             mouseY = event.y
-            layer.display()
+            panel.layer.display()
         }
     })
 

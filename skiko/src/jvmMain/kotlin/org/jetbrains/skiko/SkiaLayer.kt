@@ -1,15 +1,25 @@
 package org.jetbrains.skiko
 
+import java.awt.Component
 import org.jetbrains.skija.BackendRenderTarget
 import org.jetbrains.skija.Canvas
 import org.jetbrains.skija.ColorSpace
 import org.jetbrains.skija.DirectContext
 import org.jetbrains.skija.FramebufferFormat
+import org.jetbrains.skija.Rect
 import org.jetbrains.skija.Surface
 import org.jetbrains.skija.SurfaceColorFormat
 import org.jetbrains.skija.SurfaceOrigin
+import org.jetbrains.skija.ClipMode
 
 private class SkijaState {
+    val canvasBleach: () -> Unit
+    init {
+        when (hostOs) {
+            OS.MacOS -> canvasBleach = { canvas?.clear(0) }
+            else -> canvasBleach = { canvas?.clear(-1) }
+        }
+    }
     var context: DirectContext? = null
     var renderTarget: BackendRenderTarget? = null
     var surface: Surface? = null
@@ -32,6 +42,7 @@ open class SkiaLayer() : HardwareLayer() {
     open val api: GraphicsApi = GraphicsApi.OPENGL
 
     var renderer: SkiaRenderer? = null
+    val clipComponets = mutableListOf<Component>()
 
     private val skijaState = SkijaState()
     protected var inited: Boolean = false
@@ -60,9 +71,30 @@ open class SkiaLayer() : HardwareLayer() {
         }
         initSkija()
         skijaState.apply {
-            canvas!!.clear(-1)
+            canvasBleach.invoke()
+            
+            // cliping
+            for (component in clipComponets) {
+                clipRectBy(component)
+            }
+
             renderer?.onRender(canvas!!, width, height)
             context!!.flush()
+        }
+    }
+
+    private fun clipRectBy(component: Component) {
+        skijaState.apply {
+            canvas!!.clipRect(
+                Rect.makeLTRB(
+                    component.x.toFloat(),
+                    component.y.toFloat(),
+                    component.x.toFloat() + component.width.toFloat(),
+                    component.y.toFloat() + component.height.toFloat()
+                ),
+                ClipMode.DIFFERENCE,
+                true
+            )
         }
     }
 
