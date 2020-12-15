@@ -7,6 +7,7 @@ import javax.swing.SwingUtilities
 internal interface PlatformOperations {
     fun isFullscreen(component: Component): Boolean
     fun setFullscreen(component: Component, value: Boolean)
+    fun getDpiScale(component: Component): Float
 }
 
 internal val platformOperations: PlatformOperations by lazy {
@@ -19,8 +20,12 @@ internal val platformOperations: PlatformOperations by lazy {
                 override fun setFullscreen(component: Component, value: Boolean) {
                     osxSetFullscreenNative(component, value)
                 }
+
+                override fun getDpiScale(component: Component): Float {
+                    return component.graphicsConfiguration.defaultTransform.scaleX.toFloat()
+                }
         }
-        else -> {
+        OS.Windows -> {
             object: PlatformOperations {
                 override fun isFullscreen(component: Component): Boolean {
                     val window = SwingUtilities.getRoot(component) as Window
@@ -33,10 +38,37 @@ internal val platformOperations: PlatformOperations by lazy {
                     val device = window.graphicsConfiguration.device
                     device.setFullScreenWindow(if (value) window else null)
                 }
+
+                override fun getDpiScale(component: Component): Float {
+                    return component.graphicsConfiguration.defaultTransform.scaleX.toFloat()
+                }
+            }
+        }
+        OS.Linux -> {
+            object: PlatformOperations {
+                override fun isFullscreen(component: Component): Boolean {
+                    val window = SwingUtilities.getRoot(component) as Window
+                    val device = window.graphicsConfiguration.device
+                    return device.getFullScreenWindow() == window
+                }
+
+                override fun setFullscreen(component: Component, value: Boolean) {
+                    val window = SwingUtilities.getRoot(component) as Window
+                    val device = window.graphicsConfiguration.device
+                    device.setFullScreenWindow(if (value) window else null)
+                }
+
+                override fun getDpiScale(component: Component): Float {
+                    return linuxGetDpiScaleNative()
+                }
             }
         }
     }
 }
 
+// OSX
 external private fun osxIsFullscreenNative(component: Component): Boolean
 external private fun osxSetFullscreenNative(component: Component, value: Boolean)
+
+// Linux
+external private fun linuxGetDpiScaleNative(): Float

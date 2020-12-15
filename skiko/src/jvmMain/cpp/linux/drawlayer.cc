@@ -4,6 +4,8 @@
 #include <GL/glx.h>
 #include <X11/X.h>
 #include <X11/Xlib.h>
+#include <X11/Xresource.h>
+#include <cstdlib>
 #include <unistd.h>
 #include <stdio.h>
 #include <set>
@@ -229,5 +231,47 @@ extern "C"
         awt.FreeDrawingSurface(ds);
 
         return (jlong)window;
+    }
+
+    double getDpiScaleByDisplay(Display *display)
+    {
+        char *resourceManager = XResourceManagerString(display);
+        if (resourceManager != nullptr)
+        {
+            XrmDatabase db = XrmGetStringDatabase(resourceManager);
+            if (db != nullptr)
+            {
+                XrmValue value;
+
+                char *type;
+                XrmGetResource(db, "Xft.dpi", "Xft.dpi", &type, &value);
+
+                if (value.addr != nullptr)
+                {
+                    return atof(value.addr) / 96.0;
+                }
+            }
+        }
+        return 1;
+    }
+
+    double getDpiScale()
+    {
+        Display *display = XOpenDisplay(nullptr);
+        if (display != nullptr)
+        {
+            double result = getDpiScaleByDisplay(display);
+            XCloseDisplay(display);
+            return result;
+        }
+        else
+        {
+            return 1;
+        }
+    }
+
+    JNIEXPORT jfloat JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_linuxGetDpiScaleNative(JNIEnv *env, jobject properties)
+    {
+        return (float)getDpiScale();
     }
 } // extern "C"

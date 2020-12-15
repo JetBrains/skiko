@@ -34,7 +34,7 @@ abstract class HardwareLayer : Canvas(), Drawable {
         external get
 
     override val contentScale: Float
-        get() = graphicsConfiguration.defaultTransform.scaleX.toFloat()
+        get() = platformOperations.getDpiScale(this)
 
     val absoluteX: Int
         get() = convertPoint(this, x, y, getRootPane(this)).x
