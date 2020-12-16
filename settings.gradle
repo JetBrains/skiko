@@ -1,0 +1,3 @@
+rootProject.name = "skiko-all"
+includeBuild("samples/SkijaInjectSample")
+includeBuild("skiko")
