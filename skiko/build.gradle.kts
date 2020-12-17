@@ -122,7 +122,7 @@ val skijaDir = run {
 val lombok by configurations.creating
 val jetbrainsAnnotations by configurations.creating
 dependencies {
-    lombok("org.projectlombok:lombok:1.18.12")
+    lombok("org.projectlombok:lombok:1.18.16")
     jetbrainsAnnotations("org.jetbrains:annotations:19.0.0")
 }
 val skijaSrcDir = run {
