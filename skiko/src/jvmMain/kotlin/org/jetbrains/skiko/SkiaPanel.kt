@@ -16,7 +16,7 @@ open class SkiaPanel: JLayeredPane {
     }
 
     override fun add(component: Component): Component {
-        layer.clipComponets.add(component)
+        layer.clipComponets.add(ClipComponent(component))
         return super.add(component, Integer.valueOf(0))
     }
 

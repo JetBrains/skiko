@@ -284,9 +284,6 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv
         dsi_mac = ( __bridge NSObject<JAWT_SurfaceLayers> *) dsi->platformInfo;
 
         LayerHandler *layersSet = [[LayerHandler alloc] init];
-        lockLayers();
-        [layerStorage addObject: layersSet];
-        unlockLayers();
 
         layersSet.container = [dsi_mac windowLayer];
         [layersSet.container removeAllAnimations];
@@ -319,10 +316,19 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv
             }
             for (LayerHandler* value in layerStorage)
             {
+                if (layersSet.container == value.container)
+                {
+                    layersSet.window = value.window;
+                }
                 [windows removeObject: value.window];
             }
-            layersSet.window = [windows firstObject];
+            if (layersSet.window == NULL)
+            {
+                layersSet.window = [windows firstObject];
+            }
         }
+
+        [layerStorage addObject: layersSet];
     }
 
     ds->FreeDrawingSurfaceInfo(dsi);

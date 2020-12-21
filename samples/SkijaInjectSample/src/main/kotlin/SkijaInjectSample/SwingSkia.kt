@@ -1,8 +1,10 @@
 package SkijaInjectSample
 
+import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
-import java.awt.BorderLayout
+import java.awt.event.ComponentAdapter
+import java.awt.event.ComponentEvent
 import java.awt.event.KeyEvent
 import java.awt.event.MouseEvent
 import java.awt.event.MouseMotionAdapter
@@ -13,6 +15,7 @@ import javax.swing.JPanel
 import javax.swing.event.MouseInputAdapter
 import javax.swing.WindowConstants
 import org.jetbrains.skiko.SkiaPanel
+
 
 fun Button(text: String): JButton {
     val btn = JButton(text)
@@ -36,12 +39,10 @@ fun SwingSkia() {
 
     val btnPanelOK = JPanel()
     btnPanelOK.setLayout(BorderLayout(0, 0))
-    btnPanelOK.setBounds(50, 50, 200, 40)
     btnPanelOK.setBackground(Color.white)
     btnPanelOK.add(JButton("OK"))
 
     val btnCancel = JButton("Cancel")
-    btnCancel.setBounds(300, 50, 200, 40)
 
     panel.add(btnPanelOK)
     panel.add(btnCancel)
@@ -51,6 +52,16 @@ fun SwingSkia() {
 
     var mouseX = 0
     var mouseY = 0
+
+    panel.addComponentListener(object : ComponentAdapter() {
+        override fun componentResized(e: ComponentEvent) {
+            btnPanelOK.setBounds(panel.width - 200, panel.height - 100, 200, 40)
+            btnCancel.setBounds(panel.width - 200, panel.height - 50, 200, 40)
+            panel.invalidate()
+            panel.validate()
+            panel.repaint()
+        }
+    })
 
     panel.layer.renderer = Renderer { renderer, w, h -> displayScene(renderer, w, h, mouseX, mouseY, state) }
 

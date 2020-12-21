@@ -36,7 +36,7 @@ open class SkiaLayer() : HardwareLayer() {
     open val api: GraphicsApi = GraphicsApi.OPENGL
 
     var renderer: SkiaRenderer? = null
-    val clipComponets = mutableListOf<Component>()
+    val clipComponets = mutableListOf<ClipRectangle>()
 
     private val skijaState = SkijaState()
     protected var inited: Boolean = false
@@ -77,14 +77,14 @@ open class SkiaLayer() : HardwareLayer() {
         }
     }
 
-    private fun clipRectBy(component: Component) {
+    private fun clipRectBy(rectangle: ClipRectangle) {
         skijaState.apply {
             canvas!!.clipRect(
                 Rect.makeLTRB(
-                    component.x.toFloat(),
-                    component.y.toFloat(),
-                    component.x.toFloat() + component.width.toFloat(),
-                    component.y.toFloat() + component.height.toFloat()
+                    rectangle.x,
+                    rectangle.y,
+                    rectangle.x + rectangle.width,
+                    rectangle.y + rectangle.height
                 ),
                 ClipMode.DIFFERENCE,
                 true
