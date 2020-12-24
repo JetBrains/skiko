@@ -302,9 +302,8 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv
         if (unknownWindows == nil)
         {
             NSMutableArray<NSWindow *> *windows = [NSMutableArray arrayWithArray: [[NSApplication sharedApplication] windows]];
-            NSWindow *mainWindow = [[NSApplication sharedApplication] mainWindow];
-            layersSet.window = mainWindow;
-            [windows removeObject: mainWindow];
+            layersSet.window = [windows lastObject];
+            [windows removeObject: layersSet.window];
             unknownWindows = windows;
         }
         else
@@ -320,11 +319,10 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv
                 {
                     layersSet.window = value.window;
                 }
-                [windows removeObject: value.window];
             }
             if (layersSet.window == NULL)
             {
-                layersSet.window = [windows firstObject];
+                layersSet.window = [windows lastObject];
             }
         }
 
