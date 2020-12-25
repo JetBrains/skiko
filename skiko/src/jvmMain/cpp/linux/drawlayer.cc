@@ -175,7 +175,7 @@ extern "C"
             return;
         }
         int renderApi = env->CallIntMethod(canvas, renderApiMethod);
-        layer.renderApi = renderApi;
+        layer->renderApi = renderApi;
 
         if (renderApi == RASTER)
         {
