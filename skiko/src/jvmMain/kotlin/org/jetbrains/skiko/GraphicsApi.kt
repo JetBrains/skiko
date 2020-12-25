@@ -1,5 +1,9 @@
 package org.jetbrains.skiko
 
-enum class GraphicsApi {
-    UNKNOWN, OPENGL, VULKAN, METAL
+object GraphicsApi {
+    val UNKNOWN = 0
+    val RASTER = 1
+    val OPENGL = 2
+    val VULKAN = 3
+    val METAL = 4
 }

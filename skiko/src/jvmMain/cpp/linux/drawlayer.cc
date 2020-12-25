@@ -17,12 +17,16 @@ typedef GLXContext (*glXCreateContextAttribsARBProc)(Display *, GLXFBConfig, GLX
 extern "C" jboolean Skiko_GetAWT(JNIEnv *env, JAWT *awt);
 
 JavaVM *jvm = NULL;
+static const int RASTER = 1;
+static const int OPENGL = 2;
+static const int VULKAN = 3;
 
 class LayerHandler
 {
 public:
     jobject canvasGlobalRef;
     GLXContext context;
+    int renderApi = OPENGL;
 
     void updateLayerContent()
     {
@@ -155,15 +159,35 @@ extern "C"
         dsi_x11 = (JAWT_X11DrawingSurfaceInfo *)dsi->platformInfo;
         Display *display = dsi_x11->display;
         Window window = dsi_x11->drawable;
+
+        LayerHandler *layer = new LayerHandler();
+        layerStorage->insert(layer);
+
+        jclass canvasClass = env->GetObjectClass(canvas);
+        static jmethodID renderApiMethod = NULL;
+        if (!renderApiMethod)
+        {
+            renderApiMethod = env->GetMethodID(canvasClass, "getApi", "()I");
+        }
+        if (NULL == renderApiMethod)
+        {
+            fprintf(stderr, "The method HardwareLayer.getApi() not found!");
+            return;
+        }
+        int renderApi = env->CallIntMethod(canvas, renderApiMethod);
+        layer.renderApi = renderApi;
+
+        if (renderApi == RASTER)
+        {
+            return;
+        }
+
         if (dsi != NULL)
         {
             GLint att[] = {GLX_RGBA, GLX_DOUBLEBUFFER, True, None};
 
             XVisualInfo *vi = glXChooseVisual(display, 0, att);
             GLXContext context = glXCreateContext(display, vi, NULL, GL_TRUE);
-
-            LayerHandler *layer = new LayerHandler();
-            layerStorage->insert(layer);
 
             jobject canvasRef = env->NewGlobalRef(canvas);
 

@@ -7,6 +7,8 @@ import javax.swing.SwingUtilities.getRootPane
 
 abstract class HardwareLayer : Canvas(), Drawable {
 
+    val api: Int = renderApi
+
     companion object {
         init {
             Library.load()

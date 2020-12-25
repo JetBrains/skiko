@@ -66,6 +66,27 @@ internal val platformOperations: PlatformOperations by lazy {
     }
 }
 
+internal val renderApi: Int = getPlatformRenderApi()
+
+internal fun getPlatformRenderApi(): Int {
+        val environment = System.getenv("SKIKO_RENDER_API")
+        val property = System.getProperty("skiko.renderApi")
+        if (environment != null) {
+            return parseRenderApi(environment)
+        }
+        return parseRenderApi(property)
+}
+
+private fun parseRenderApi(text: String): Int {
+    when(text) {
+        "RASTER" -> return GraphicsApi.RASTER
+        "OPENGL" -> return GraphicsApi.OPENGL
+        "VULKAN" -> return GraphicsApi.VULKAN
+        "METAL" -> return GraphicsApi.METAL
+        else -> return GraphicsApi.OPENGL
+    }
+}
+
 // OSX
 external private fun osxIsFullscreenNative(component: Component): Boolean
 external private fun osxSetFullscreenNative(component: Component, value: Boolean)

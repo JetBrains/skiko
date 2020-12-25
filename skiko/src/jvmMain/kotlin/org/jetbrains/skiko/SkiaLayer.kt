@@ -1,6 +1,9 @@
 package org.jetbrains.skiko
 
 import java.awt.Component
+import java.awt.image.BufferedImage
+import java.io.ByteArrayInputStream
+import javax.imageio.ImageIO
 import org.jetbrains.skija.BackendRenderTarget
 import org.jetbrains.skija.Canvas
 import org.jetbrains.skija.ColorSpace
@@ -13,7 +16,7 @@ import org.jetbrains.skija.SurfaceOrigin
 import org.jetbrains.skija.ClipMode
 
 private class SkijaState {
-    val bleachConstant = if (hostOs == OS.MacOS) 0 else -1
+    val bleachConstant = if (hostOs == OS.MacOS) -1 else -1
     var context: DirectContext? = null
     var renderTarget: BackendRenderTarget? = null
     var surface: Surface? = null
@@ -33,8 +36,6 @@ interface SkiaRenderer {
 }
 
 open class SkiaLayer() : HardwareLayer() {
-    open val api: GraphicsApi = GraphicsApi.OPENGL
-
     var renderer: SkiaRenderer? = null
     val clipComponets = mutableListOf<ClipRectangle>()
 
@@ -50,12 +51,22 @@ open class SkiaLayer() : HardwareLayer() {
         renderer?.onDispose()
     }
 
+    override fun display() {
+        if (api == GraphicsApi.RASTER) {
+            updateLayer()
+            draw()
+        } else {
+            super.display()
+        }
+    }
+
     override fun draw() {
         if (!inited) {
             if (skijaState.context == null) {
                 skijaState.context = when (api) {
                     GraphicsApi.OPENGL -> makeGLContext()
                     GraphicsApi.METAL -> makeMetalContext()
+                    GraphicsApi.RASTER -> null
                     else -> TODO("Unsupported yet")
                 }
             }
@@ -73,7 +84,19 @@ open class SkiaLayer() : HardwareLayer() {
             }
 
             renderer?.onRender(canvas!!, width, height)
-            context!!.flush()
+
+            if (api == GraphicsApi.RASTER) {
+                var img: BufferedImage?
+                val bais = ByteArrayInputStream(surface!!.makeImageSnapshot().encodeToData()!!.bytes)
+                try {
+                    img = ImageIO.read(bais)
+                } catch (e: Exception) {
+                    throw RuntimeException(e)
+                }
+                getGraphics().drawImage(img!!, 0, 0, width, height, null)
+            } else {
+                context!!.flush()
+            }
         }
     }
 
@@ -95,7 +118,7 @@ open class SkiaLayer() : HardwareLayer() {
     private fun initSkija() {
         val dpi = contentScale
         initRenderTarget(dpi)
-        initSurface()
+        initSurface(dpi)
         scaleCanvas(dpi)
     }
 
@@ -120,20 +143,29 @@ open class SkiaLayer() : HardwareLayer() {
                     (height * dpi).toInt(),
                     0
                 )
+                GraphicsApi.RASTER -> null
                 else -> TODO("Unsupported yet")
             }
         }
     }
 
-    private fun initSurface() {
+    private fun initSurface(dpi: Float) {
         skijaState.apply {
-            surface = Surface.makeFromBackendRenderTarget(
-                context,
-                renderTarget,
-                SurfaceOrigin.BOTTOM_LEFT,
-                SurfaceColorFormat.RGBA_8888,
-                ColorSpace.getSRGB()
-            )
+            surface = when (api) {
+                GraphicsApi.OPENGL -> Surface.makeFromBackendRenderTarget(
+                    context,
+                    renderTarget,
+                    SurfaceOrigin.BOTTOM_LEFT,
+                    SurfaceColorFormat.RGBA_8888,
+                    ColorSpace.getSRGB()
+                )
+                GraphicsApi.RASTER -> Surface.makeRasterN32Premul(
+                    (width * dpi).toInt(),
+                    (height * dpi).toInt()
+                )
+                else -> TODO("Unsupported yet")
+            }
+            
             canvas = surface!!.canvas
         }
     }

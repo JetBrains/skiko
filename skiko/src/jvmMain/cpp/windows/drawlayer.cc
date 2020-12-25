@@ -13,6 +13,10 @@
 using namespace std;
 
 JavaVM *jvm = NULL;
+static const int RASTER = 1;
+static const int OPENGL = 2;
+static const int VULKAN = 3;
+
 extern "C" jboolean Skiko_GetAWT(JNIEnv *env, JAWT *awt);
 
 class LayerHandler
@@ -21,6 +25,7 @@ public:
     jobject canvasGlobalRef;
     HGLRC context;
     HDC device;
+    int renderApi = OPENGL;
 
     void updateLayerContent()
     {
@@ -83,6 +88,7 @@ extern "C"
 {
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv *env, jobject canvas)
     {
+
         if (layerStorage != NULL)
         {
             LayerHandler *layer = findByObject(env, canvas);
@@ -128,6 +134,28 @@ extern "C"
         HWND hwnd = dsi_win->hwnd;
         HDC device = GetDC(hwnd);
 
+        LayerHandler *layer = new LayerHandler();
+        layerStorage->insert(layer);
+
+        jclass canvasClass = env->GetObjectClass(canvas);
+        static jmethodID renderApiMethod = NULL;
+        if (!renderApiMethod)
+        {
+            renderApiMethod = env->GetMethodID(canvasClass, "getApi", "()I");
+        }
+        if (NULL == renderApiMethod)
+        {
+            fprintf(stderr, "The method HardwareLayer.getApi() not found!");
+            return;
+        }
+        int renderApi = env->CallIntMethod(canvas, renderApiMethod);
+        layer.renderApi = renderApi;
+
+        if (renderApi == RASTER)
+        {
+            return;
+        }
+
         if (dsi != NULL)
         {
             memset(&pixFormatDscr, 0, sizeof(PIXELFORMATDESCRIPTOR));
@@ -142,8 +170,6 @@ extern "C"
             DescribePixelFormat(device, iPixelFormat, sizeof(PIXELFORMATDESCRIPTOR), &pixFormatDscr);
             context = wglCreateContext(device);
 
-            LayerHandler *layer = new LayerHandler();
-            layerStorage->insert(layer);
 
             jobject canvasRef = env->NewGlobalRef(canvas);
 

@@ -14,6 +14,10 @@
 
 JavaVM *jvm = NULL;
 
+static const int RASTER = 1;
+static const int OPENGL = 2;
+static const int METAL = 4;
+
 @interface AWTGLLayer : CAOpenGLLayer
 
 @property jobject canvasGlobalRef;
@@ -71,6 +75,7 @@ JavaVM *jvm = NULL;
 @property (retain, strong) CALayer *container;
 @property (retain, strong) AWTGLLayer *glLayer;
 @property (retain, strong) NSWindow *window;
+@property int renderApi;
 
 @end
 
@@ -85,6 +90,7 @@ JavaVM *jvm = NULL;
         self.container = NULL;
         self.glLayer = NULL;
         self.window = NULL;
+        self.renderApi = OPENGL;
     }
 
     return self;
@@ -92,6 +98,11 @@ JavaVM *jvm = NULL;
 
 - (void) syncLayersSize
 {
+    if (self.renderApi != OPENGL)
+    {
+        return;
+    }
+
     if (jvm != NULL) {
         JNIEnv *env;
         (*jvm)->AttachCurrentThread(jvm, (void **)&env, NULL);
@@ -179,9 +190,12 @@ JavaVM *jvm = NULL;
 
 - (void) disposeLayer:(JNIEnv *) env
 {
-    [self.glLayer removeFromSuperlayer];
-    (*env)->DeleteGlobalRef(env, self.glLayer.canvasGlobalRef);
-    self.glLayer.canvasGlobalRef = NULL;
+    if (self.glLayer != NULL)
+    {
+        [self.glLayer removeFromSuperlayer];
+        (*env)->DeleteGlobalRef(env, self.glLayer.canvasGlobalRef);
+        self.glLayer.canvasGlobalRef = NULL;
+    }
     self.glLayer = NULL;
     self.container = NULL;
     self.window = NULL;
@@ -285,19 +299,34 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv
 
         LayerHandler *layersSet = [[LayerHandler alloc] init];
 
+        // render api
+        jclass canvasClass = (*env)->GetObjectClass(env, canvas);
+        static jmethodID renderApiMethod = NULL;
+        if (!renderApiMethod)
+        {
+            renderApiMethod = (*env)->GetMethodID(env, canvasClass, "getApi", "()I");
+        }
+        if (NULL == renderApiMethod)
+        {
+            NSLog(@"The method HardwareLayer.getApi() not found!");
+            return;
+        }
+        int renderApi = (*env)->CallIntMethod(env, canvas, renderApiMethod);
+        layersSet.renderApi = renderApi;
+
         layersSet.container = [dsi_mac windowLayer];
         [layersSet.container removeAllAnimations];
         [layersSet.container setAutoresizingMask: (kCALayerWidthSizable|kCALayerHeightSizable)];
         [layersSet.container setNeedsDisplayOnBoundsChange: YES];
 
-        layersSet.glLayer = [AWTGLLayer new];
-        [layersSet.container addSublayer: layersSet.glLayer];
-        
         jobject canvasGlobalRef = (*env)->NewGlobalRef(env, canvas);
 
-        [layersSet.glLayer setCanvasGlobalRef: canvasGlobalRef];
-
-        [layersSet syncLayersSize];
+        if (renderApi == OPENGL) {
+            layersSet.glLayer = [AWTGLLayer new];
+            [layersSet.container addSublayer: layersSet.glLayer];
+            [layersSet.glLayer setCanvasGlobalRef: canvasGlobalRef];
+            [layersSet syncLayersSize];
+        }
 
         if (unknownWindows == nil)
         {
