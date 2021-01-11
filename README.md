@@ -57,7 +57,7 @@ repositories {
     mavenLocal()
     jcenter()
     maven {
-       url 'https://packages.jetbrains.team/maven/p/ui/dev'
+       url 'https://maven.pkg.jetbrains.space/public/p/compose/dev'
     }
 }
 
@@ -75,7 +75,7 @@ if (os == "Mac OS X") {
 
 dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
-    implementation "org.jetbrains.skiko:skiko-jvm-runtime-$target-x86:0.1.21"
+    implementation "org.jetbrains.skiko:skiko-jvm-runtime-$target-x64:0.1.21"
 }
 
 application {
