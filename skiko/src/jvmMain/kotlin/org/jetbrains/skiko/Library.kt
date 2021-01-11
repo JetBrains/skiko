@@ -38,9 +38,8 @@ object Library {
         val platformName = System.mapLibraryName(name)
 
         val hashResourceStream = Library::class.java.getResourceAsStream(
-            "$resourcePath$platformName.sha256"
-        ) ?: throw Error(
-            "Missing $platformName, use `implementation(compose.desktop.currentOs)`"
+            "$resourcePath$platformName.sha256") ?: throw LibraryLoadException(
+            "Cannot find $platformName.sha256, proper native dependency missing."
         )
         val hash = hashResourceStream.use {
             BufferedReader(InputStreamReader(it)).lines().toArray()[0] as String
