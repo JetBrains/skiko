@@ -5,7 +5,6 @@ import java.io.InputStreamReader
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
-import javax.swing.UIManager
 
 object Library {
     private var loaded = false
@@ -38,7 +37,12 @@ object Library {
         val name = "skiko-$hostId"
         val platformName = System.mapLibraryName(name)
 
-        val hash = Library::class.java.getResourceAsStream("$resourcePath$platformName.sha256").use {
+        val hashResourceStream = Library::class.java.getResourceAsStream(
+            "$resourcePath$platformName.sha256"
+        ) ?: throw Error(
+            "Missing $platformName, use `implementation(compose.desktop.currentOs)`"
+        )
+        val hash = hashResourceStream.use {
             BufferedReader(InputStreamReader(it)).lines().toArray()[0] as String
         }
         val cacheDir = File("$cacheRoot/$hash")
@@ -49,7 +53,10 @@ object Library {
             loadOrGet(cacheDir, resourcePath, "icudtl.dat", false)
         }
 
-        miscSystemInit()
+        Setup.init(
+            System.getProperty("skiko.rendering.laf.global") == "true",
+            System.getProperty("skiko.rendering.noerasebackground") != "false"
+        )
 
         try {
             // Init code executed after library was loaded.
@@ -60,18 +67,5 @@ object Library {
         loaded = true
     }
 
-    // This function doesn't actually belong to this file.
-    private fun miscSystemInit() {
-        // we have to set this property to avoid render flickering.
-        System.setProperty("sun.awt.noerasebackground", "true")
-        System.setProperty("skija.staticLoad", "false")
 
-        // setup menu look and feel
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
-            System.setProperty("apple.laf.useScreenMenuBar", "true")
-        } catch (e: UnsupportedOperationException) {
-            // Not all platforms allow this.
-        }
-    }
 }
