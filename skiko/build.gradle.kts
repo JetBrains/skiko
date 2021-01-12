@@ -334,7 +334,7 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
         (project.properties["signer"] as String?)?.let { signer ->
             outputs.files.files.singleOrNull { it.name.endsWith(".dylib") }?.let { lib ->
                 println("Signing $lib as $signer")
-                val proc = ProcessBuilder("codesign", "-s", signer, lib.absolutePath)
+                val proc = ProcessBuilder("codesign", "-f", "-s", signer, lib.absolutePath)
                     .redirectOutput(ProcessBuilder.Redirect.PIPE)
                     .redirectError(ProcessBuilder.Redirect.PIPE)
                     .start()
