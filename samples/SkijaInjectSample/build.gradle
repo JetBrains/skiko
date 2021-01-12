@@ -10,7 +10,7 @@ repositories {
        url 'https://dl.bintray.com/kotlin/kotlin-eap'
     }
     maven {
-       url 'https://packages.jetbrains.team/maven/p/ui/dev'
+       url 'https://maven.pkg.jetbrains.space/public/p/compose/dev'
     }
 }
 
