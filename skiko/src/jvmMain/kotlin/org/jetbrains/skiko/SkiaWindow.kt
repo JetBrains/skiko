@@ -9,12 +9,6 @@ open class SkiaWindow : JFrame() {
 
     init {
         contentPane.add(layer)
-
-        addComponentListener(object : ComponentAdapter() {
-            override fun componentResized(e: ComponentEvent) {
-                layer.reinit()
-            }
-        })
     }
 
     fun display() {

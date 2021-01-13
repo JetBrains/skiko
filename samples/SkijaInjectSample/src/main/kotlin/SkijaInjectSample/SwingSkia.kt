@@ -63,7 +63,7 @@ fun SwingSkia() {
         }
     })
 
-    panel.layer.renderer = Renderer { renderer, w, h -> displayScene(renderer, w, h, mouseX, mouseY, state) }
+    panel.layer.renderer = Renderer(panel.layer) { renderer, w, h, nanoTime -> displayScene(renderer, w, h, nanoTime, mouseX, mouseY, state) }
 
     panel.layer.addMouseMotionListener(object : MouseMotionAdapter() {
         override fun mouseMoved(event: MouseEvent) {
