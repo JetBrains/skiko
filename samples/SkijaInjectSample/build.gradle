@@ -53,3 +53,7 @@ dependencies {
 application {
     mainClassName = 'SkijaInjectSample.AppKt'
 }
+
+run {
+    systemProperty("skiko.fps.enabled", "true")
+}

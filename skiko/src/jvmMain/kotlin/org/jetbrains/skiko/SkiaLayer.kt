@@ -50,7 +50,16 @@ open class SkiaLayer() : HardwareLayer() {
         renderer?.onDispose()
     }
 
+    private val fpsCounter = FPSCounter(
+        count = System.getProperty("skiko.fps.count")?.toInt() ?: 500,
+        probability = System.getProperty("skiko.fps.probability")?.toDouble() ?: 0.97
+    )
+
     override fun draw() {
+        if (System.getProperty("skiko.fps.enabled") == "true") {
+            fpsCounter.tick()
+        }
+
         if (!inited) {
             if (skijaState.context == null) {
                 skijaState.context = when (api) {
