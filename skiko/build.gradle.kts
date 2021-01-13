@@ -277,20 +277,21 @@ tasks.withType(CppCompile::class.java).configureEach {
 project.tasks.register<Exec>("objcCompile") {
     val inputDir = "$projectDir/src/jvmMain/objectiveC/${targetOs.id}"
     val outDir = "$buildDir/objc/$target"
-    val objcSrc = "drawlayer"
+    val names = File(inputDir).listFiles()!!.map { it.name.removeSuffix(".m") }
+    val srcs = names.map { "$inputDir/$it.m" }.toTypedArray()
+    val outs = names.map { "$outDir/$it.o" }.toTypedArray()
+    workingDir = File(outDir)
     commandLine = listOf(
         "clang",
         "-mmacosx-version-min=10.13",
         "-I$jdkHome/include",
         "-I$jdkHome/include/darwin",
         "-c",
-        "$inputDir/$objcSrc.m",
-        "-o",
-        "$outDir/$objcSrc.o"
+        *srcs
     )
     file(outDir).mkdirs()
-    inputs.files("$inputDir/$objcSrc.m")
-    outputs.files("$outDir/$objcSrc.o")
+    inputs.files(srcs)
+    outputs.files(outs)
 }
 
 fun localSign(signer: String, lib: File) {
