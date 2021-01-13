@@ -153,14 +153,6 @@ kotlin {
         withJava()
     }
 
-    val nativeTarget = when (targetOs) {
-        // TODO: not entirely correct for macOS ARM.
-        OS.MacOS -> macosX64("native")
-        OS.Linux -> linuxX64("native")
-        OS.Windows -> mingwX64("native")
-        else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
-    }
-
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -187,8 +179,6 @@ kotlin {
                 implementation(kotlin("test-junit"))
             }
         }
-        val nativeMain by getting
-        val nativeTest by getting
     }
 }
 
@@ -337,6 +327,26 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
                     "user32.lib"
                 )
             )
+        }
+    }
+
+    doLast {
+        (project.properties["signer"] as String?)?.let { signer ->
+            outputs.files.files.singleOrNull { it.name.endsWith(".dylib") }?.let { lib ->
+                println("Signing $lib as $signer")
+                val proc = ProcessBuilder("codesign", "-f", "-s", signer, lib.absolutePath)
+                    .redirectOutput(ProcessBuilder.Redirect.PIPE)
+                    .redirectError(ProcessBuilder.Redirect.PIPE)
+                    .start()
+                proc.waitFor(5, TimeUnit.MINUTES)
+                if (proc.exitValue() != 0) {
+                    val out = proc.inputStream.bufferedReader().readText()
+                    val err = proc.errorStream.bufferedReader().readText()
+                    println(out)
+                    println(err)
+                    throw GradleException("Cannot sign $lib: $err")
+                }
+            }
         }
     }
 }

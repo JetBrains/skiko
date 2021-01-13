@@ -44,3 +44,13 @@ Set up environment variables `COMPOSE_REPO_USERNAME` and `COMPOSE_REPO_KEY`.
 ```
 ./gradlew <PUBLISH_TASK> -Pdeploy.version=0.1.2 -Pdeploy.release=true
 ```
+
+##### Code signing
+
+macOS for Apple Silicon builds aimed for distribution require mandatory code signing,
+so use command like
+```
+./gradlew -Psigner="Apple Distribution: Nikolay Igotti (N462MKSJ7M)" <PUBLISH_TASK>
+```
+to codesign the JNI library.
+Use `security find-identity -v -p codesigning` to find valid signing identities.
