@@ -1,9 +1,8 @@
 import de.undercouch.gradle.tasks.download.Download
-import kotlin.text.capitalize
 import org.gradle.crypto.checksum.Checksum
 
 plugins {
-    kotlin("multiplatform") version "1.3.72"
+    kotlin("multiplatform") version "1.4.21"
     `cpp-library`
     `maven-publish`
     id("org.gradle.crypto.checksum") version "1.1.0"
@@ -169,6 +168,7 @@ kotlin {
             kotlin.srcDirs(skijaSrcDir)
             dependencies {
                 implementation(kotlin("stdlib-jdk8"))
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.4.1")
                 compileOnly(lombok)
                 compileOnly(jetbrainsAnnotations)
             }
