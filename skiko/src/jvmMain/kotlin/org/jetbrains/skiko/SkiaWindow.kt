@@ -10,8 +10,4 @@ open class SkiaWindow : JFrame() {
     init {
         contentPane.add(layer)
     }
-
-    fun display() {
-        layer.display()
-    }
 }

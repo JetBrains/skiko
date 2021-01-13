@@ -3,10 +3,8 @@ package org.jetbrains.skiko
 import java.awt.Canvas
 import java.awt.Graphics
 import java.awt.event.HierarchyEvent
-import javax.swing.SwingUtilities.convertPoint
-import javax.swing.SwingUtilities.getRootPane
 
-abstract class HardwareLayer : Canvas(), Drawable {
+abstract class HardwareLayer : Canvas() {
     companion object {
         init {
             Library.load()
@@ -29,9 +27,13 @@ abstract class HardwareLayer : Canvas(), Drawable {
     private fun checkIsShowing() {
         if (!isInit && isShowing) {
             _contentScale = platformOperations.getDpiScale(this)
+            init()
             isInit = true
         }
     }
+
+    protected open external fun init()
+    open external fun dispose()
 
     protected open fun contentScaleChanged() = Unit
 
@@ -41,33 +43,19 @@ abstract class HardwareLayer : Canvas(), Drawable {
             _contentScale = contentScale
             contentScaleChanged()
         }
-        display()
     }
 
-    open fun display() {
-        this.updateLayer()
-        this.redrawLayer()
-    }
+    // Should be called in Swing thread
+    internal abstract suspend fun update(nanoTime: Long)
 
-    open fun draw() {}
+    // Should be called in the OpenGL thread, and only once after update
+    internal abstract fun draw()
 
-    external override fun redrawLayer()
-
-    external override fun updateLayer()
-
-    external override fun disposeLayer()
-
-    override val windowHandle: Long
+    val windowHandle: Long
         external get
 
-    override val contentScale: Float
+    val contentScale: Float
         get() = _contentScale!!
-
-    val absoluteX: Int
-        get() = convertPoint(this, x, y, getRootPane(this)).x
-
-    val absoluteY: Int
-        get() = convertPoint(this, x, y, getRootPane(this)).y
 
     var fullscreen: Boolean
         get() = platformOperations.isFullscreen(this)

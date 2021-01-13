@@ -1,7 +1,8 @@
 package org.jetbrains.skiko
 
-import kotlinx.coroutines.runBlocking
 import org.jetbrains.skija.*
+import org.jetbrains.skiko.redrawer.Redrawer
+import java.awt.Graphics
 import javax.swing.SwingUtilities.isEventDispatchThread
 
 private class SkijaState {
@@ -33,19 +34,40 @@ open class SkiaLayer : HardwareLayer() {
 
     @Volatile
     private var isDisposed = false
+    private var redrawer: Redrawer? = null
 
     @Volatile
     private var picture: PictureHolder? = null
     private val pictureRecorder = PictureRecorder()
     private val pictureLock = Any()
 
-    override fun disposeLayer() {
+    override fun init() {
+        redrawer = platformOperations.createHardwareRedrawer(this)
+        redrawer?.syncSize()
+        needRedraw()
+    }
+
+    override fun dispose() {
         check(!isDisposed)
         check(isEventDispatchThread())
+        redrawer?.dispose()
         picture?.instance?.close()
         pictureRecorder.close()
         isDisposed = true
-        super.disposeLayer()
+        super.dispose()
+    }
+
+    override fun paint(g: Graphics) {
+        super.paint(g)
+        // we don't have to call it in setBounds method, because paint will always be called after setBounds
+        redrawer?.syncSize()
+        needRedraw()
+    }
+
+    fun needRedraw() {
+        check(!isDisposed)
+        check(isEventDispatchThread())
+        redrawer?.needRedraw()
     }
 
     private val fpsCounter = FPSCounter(
@@ -53,16 +75,9 @@ open class SkiaLayer : HardwareLayer() {
         probability = System.getProperty("skiko.fps.probability")?.toDouble() ?: 0.97
     )
 
-    override fun draw() {
-        runBlocking {
-            performUpdate(System.nanoTime())
-        }
-        performDraw()
-    }
-
-    private suspend fun performUpdate(nanoTime: Long) {
+    override suspend fun update(nanoTime: Long) {
         check(!isDisposed)
-        //check(isEventDispatchThread()) // TODO run from AWT Thread
+        check(isEventDispatchThread())
 
         if (System.getProperty("skiko.fps.enabled") == "true") {
             fpsCounter.tick()
@@ -88,7 +103,7 @@ open class SkiaLayer : HardwareLayer() {
         }
     }
 
-    private fun performDraw() {
+    override fun draw() {
         check(!isDisposed)
 
         if (skijaState.context == null) {

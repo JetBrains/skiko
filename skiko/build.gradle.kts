@@ -370,6 +370,7 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
             linkerArgs.addAll(
                 listOf(
                     "gdi32.lib",
+                    "Dwmapi.lib",
                     "opengl32.lib",
                     "shcore.lib",
                     "user32.lib"

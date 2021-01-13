@@ -1,5 +1,9 @@
 package org.jetbrains.skiko
 
+import org.jetbrains.skiko.redrawer.LinuxRedrawer
+import org.jetbrains.skiko.redrawer.MacOsRedrawer
+import org.jetbrains.skiko.redrawer.Redrawer
+import org.jetbrains.skiko.redrawer.WindowsRedrawer
 import java.awt.Component
 import java.awt.Window
 import javax.swing.SwingUtilities
@@ -8,6 +12,7 @@ internal interface PlatformOperations {
     fun isFullscreen(component: Component): Boolean
     fun setFullscreen(component: Component, value: Boolean)
     fun getDpiScale(component: Component): Float
+    fun createHardwareRedrawer(layer: HardwareLayer): Redrawer
 }
 
 internal val platformOperations: PlatformOperations by lazy {
@@ -24,6 +29,8 @@ internal val platformOperations: PlatformOperations by lazy {
                 override fun getDpiScale(component: Component): Float {
                     return component.graphicsConfiguration.defaultTransform.scaleX.toFloat()
                 }
+
+                override fun createHardwareRedrawer(layer: HardwareLayer) = MacOsRedrawer(layer)
         }
         OS.Windows -> {
             object: PlatformOperations {
@@ -42,6 +49,8 @@ internal val platformOperations: PlatformOperations by lazy {
                 override fun getDpiScale(component: Component): Float {
                     return component.graphicsConfiguration.defaultTransform.scaleX.toFloat()
                 }
+
+                override fun createHardwareRedrawer(layer: HardwareLayer) = WindowsRedrawer(layer)
             }
         }
         OS.Linux -> {
@@ -61,6 +70,8 @@ internal val platformOperations: PlatformOperations by lazy {
                 override fun getDpiScale(component: Component): Float {
                     return linuxGetDpiScaleNative(component)
                 }
+
+                override fun createHardwareRedrawer(layer: HardwareLayer) = LinuxRedrawer(layer)
             }
         }
     }

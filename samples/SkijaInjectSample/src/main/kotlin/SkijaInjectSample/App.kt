@@ -15,7 +15,9 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 fun main(args: Array<String>) {
-    createWindow("First window")
+    repeat(1) {
+        createWindow("window $it")
+    }
 }
 
 fun createWindow(title: String) = SwingUtilities.invokeLater {
@@ -65,7 +67,6 @@ fun createWindow(title: String) = SwingUtilities.invokeLater {
         override fun mouseMoved(event: MouseEvent) {
             mouseX = event.x
             mouseY = event.y
-            window.display()
         }
     })
 
@@ -93,6 +94,7 @@ class Renderer(
         val contentScale = layer.contentScale
         canvas.scale(contentScale, contentScale)
         displayScene(this, (width / contentScale).toInt(), (height / contentScale).toInt(), nanoTime)
+        layer.needRedraw()
     }
 }
 

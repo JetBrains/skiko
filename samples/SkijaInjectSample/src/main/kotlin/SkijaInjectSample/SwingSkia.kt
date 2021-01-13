@@ -69,7 +69,6 @@ fun SwingSkia() {
         override fun mouseMoved(event: MouseEvent) {
             mouseX = event.x
             mouseY = event.y
-            panel.layer.display()
         }
     })
 
