@@ -291,6 +291,51 @@ project.tasks.register<Exec>("objcCompile") {
     outputs.files("$outDir/$objcSrc.o")
 }
 
+fun localSign(signer: String, lib: File) {
+    println("Local signing $lib as $signer")
+    val proc = ProcessBuilder("codesign", "-f", "-s", signer, lib.absolutePath)
+        .redirectOutput(ProcessBuilder.Redirect.PIPE)
+        .redirectError(ProcessBuilder.Redirect.PIPE)
+        .start()
+    proc.waitFor(5, TimeUnit.MINUTES)
+    if (proc.exitValue() != 0) {
+        val out = proc.inputStream.bufferedReader().readText()
+        val err = proc.errorStream.bufferedReader().readText()
+        println(out)
+        println(err)
+        throw GradleException("Cannot sign $lib: $err")
+    }
+}
+
+fun remoteSign(sign_host: String, lib: File) {
+    println("Remote signing $lib on $sign_host")
+    val user = project.properties["sign_host_user"] as String
+    val token = project.properties["sign_host_token"] as String
+    val out = file("${lib.absolutePath}.signed")
+    val cmd = """
+        TOKEN=`curl -fsSL --user $user:$token --url "$sign_host/auth" | grep token | cut -d '"' -f4` \
+        && curl --no-keepalive --data-binary @${lib.absolutePath} \
+        -H "Authorization: Bearer ${'$'}TOKEN" \
+        -H "Content-Type:application/x-mac-app-bin" \
+        "$sign_host/sign?name=${lib.name}" -o "${out.absolutePath}"
+    """.trimIndent()
+    val proc = ProcessBuilder("bash", "-c", cmd)
+        .redirectOutput(ProcessBuilder.Redirect.PIPE)
+        .redirectError(ProcessBuilder.Redirect.PIPE)
+        .start()
+    proc.waitFor(5, TimeUnit.MINUTES)
+    if (proc.exitValue() != 0) {
+        val out = proc.inputStream.bufferedReader().readText()
+        val err = proc.errorStream.bufferedReader().readText()
+        println(out)
+        println(err)
+        throw GradleException("Cannot sign $lib: $err")
+    } else {
+        lib.delete()
+        out.renameTo(lib)
+    }
+}
+
 tasks.withType(LinkSharedLibrary::class.java).configureEach {
     when (targetOs) {
         OS.MacOS -> {
@@ -331,21 +376,15 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
     }
 
     doLast {
+        val dylib = outputs.files.files.singleOrNull { it.name.endsWith(".dylib") }
         (project.properties["signer"] as String?)?.let { signer ->
-            outputs.files.files.singleOrNull { it.name.endsWith(".dylib") }?.let { lib ->
-                println("Signing $lib as $signer")
-                val proc = ProcessBuilder("codesign", "-f", "-s", signer, lib.absolutePath)
-                    .redirectOutput(ProcessBuilder.Redirect.PIPE)
-                    .redirectError(ProcessBuilder.Redirect.PIPE)
-                    .start()
-                proc.waitFor(5, TimeUnit.MINUTES)
-                if (proc.exitValue() != 0) {
-                    val out = proc.inputStream.bufferedReader().readText()
-                    val err = proc.errorStream.bufferedReader().readText()
-                    println(out)
-                    println(err)
-                    throw GradleException("Cannot sign $lib: $err")
-                }
+            dylib?.let { lib ->
+                localSign(signer, lib)
+            }
+        }
+        (project.properties["sign_host"] as String?)?.let { sign_host ->
+            dylib?.let { lib ->
+                remoteSign(sign_host, lib)
             }
         }
     }
