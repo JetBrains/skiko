@@ -1,5 +1,7 @@
-package org.jetbrains.skiko
+package SkijaInjectSample
 
+import org.jetbrains.skiko.ClipComponent
+import org.jetbrains.skiko.SkiaLayer
 import java.awt.Color
 import java.awt.Component
 import java.awt.event.ComponentAdapter
