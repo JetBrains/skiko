@@ -47,8 +47,21 @@ val hostArch by lazy {
     }
 }
 
-val targetOs = hostOs
-val targetArch = hostArch
+fun findTargetOs() = when (System.getProperty("skiko.target.os.name")) {
+        "linux" -> OS.Linux
+        "macos" -> OS.MacOS
+        "windows" -> OS.Windows
+        else -> null
+    }
+
+fun findTargetArch() = when (System.getProperty("skiko.target.os.arch")) {
+    "x64" -> Arch.X64
+    "arm64" -> Arch.Arm64
+    else -> null
+}
+
+val targetOs = findTargetOs() ?: hostOs
+val targetArch = findTargetArch() ?: hostArch
 
 val target = targetId(targetOs, targetArch)
 
@@ -73,7 +86,7 @@ class SkikoProperties(private val myProject: Project) {
     val skijaCommitHash: String
         get() = myProject.property("dependencies.skija.git.commit") as String
 
-    val skiaReleaseForCurrentOS: String
+    val skiaReleaseForTargetOS: String
         get() = (myProject.property("dependencies.skia.$target") as String)
 
     val releaseGithubVersion: String

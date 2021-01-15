@@ -36,12 +36,12 @@ repositories {
 }
 
 val skiaZip = run {
-    val zipName = skiko.skiaReleaseForCurrentOS + ".zip"
+    val zipName = skiko.skiaReleaseForTargetOS + ".zip"
     val zipFile = skiko.dependenciesDir.resolve("skia/${zipName.substringAfterLast('/')}")
 
     tasks.register("downloadSkia", Download::class) {
         onlyIf { skiko.skiaDir == null && !zipFile.exists() }
-        inputs.property("skia.release.for.current.os", skiko.skiaReleaseForCurrentOS)
+        inputs.property("skia.release.for.target.os", skiko.skiaReleaseForTargetOS)
         src("https://github.com/JetBrains/skia-build/releases/download/$zipName")
         dest(zipFile)
         onlyIfModified(true)
@@ -116,8 +116,6 @@ val skijaDir = run {
         }.map { skijaDest }
     }
 }
-
-
 
 val lombok by configurations.creating
 val jetbrainsAnnotations by configurations.creating
@@ -432,9 +430,9 @@ val skikoJvmJar: Provider<Jar> by tasks.registering(Jar::class) {
 }
 
 val createChecksums by project.tasks.registering(org.gradle.crypto.checksum.Checksum::class) {
-    val linkTask = project.tasks.named("link${buildType.id}${targetOs.id.capitalize()}")
+    val linkTask = project.tasks.withType(LinkSharedLibrary::class.java).single { it.name.contains(buildType.id) }
     dependsOn(linkTask)
-    files = linkTask.get().outputs.files.filter { it.isFile } +
+    files = linkTask.outputs.files.filter { it.isFile } +
             if (targetOs.isWindows) files(skiaDir.map { it.resolve("out/${buildType.id}-x64/icudtl.dat") }) else files()
     algorithm = Checksum.Algorithm.SHA256
     outputDir = file("$buildDir/checksums")
@@ -444,9 +442,8 @@ val skikoJvmRuntimeJar by project.tasks.registering(Jar::class) {
     archiveBaseName.set("skiko-$target")
     dependsOn(createChecksums)
     from(skikoJvmJar.map { zipTree(it.archiveFile) })
-    from(project.tasks.named("link${buildType.id}${targetOs.id.capitalize()}").map {
-        it.outputs.files.filter { it.isFile }
-    })
+    val linkTask = project.tasks.withType(LinkSharedLibrary::class.java).single { it.name.contains(buildType.id) }
+    from(linkTask).outputs.files.filter { it.isFile }
     if (targetOs.isWindows) {
         from(files(skiaDir.map { it.resolve("out/${buildType.id}-x64/icudtl.dat") }))
     }
@@ -550,7 +547,7 @@ publishing {
             }
         }
         create<MavenPublication>("skikoJvmRuntime") {
-            artifactId = SkikoArtifacts.runtimeArtifactIdFor(hostOs, hostArch)
+            artifactId = SkikoArtifacts.runtimeArtifactIdFor(targetOs, targetArch)
             afterEvaluate {
                 artifact(skikoJvmRuntimeJar.map { it.archiveFile.get() })
             }
