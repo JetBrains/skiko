@@ -1,14 +1,25 @@
 package org.jetbrains.skiko
 
 import java.awt.Component
+import java.awt.GraphicsEnvironment
+import java.awt.Transparency
+import java.awt.image.ComponentColorModel
 import java.awt.image.BufferedImage
+import java.awt.image.DataBuffer
+import java.awt.image.DataBufferByte
+import java.awt.image.WritableRaster
+import java.awt.image.Raster
+import java.awt.image.SampleModel
 import java.io.ByteArrayInputStream
 import javax.imageio.ImageIO
+import org.jetbrains.skija.Bitmap
 import org.jetbrains.skija.BackendRenderTarget
 import org.jetbrains.skija.Canvas
 import org.jetbrains.skija.ColorSpace
+import org.jetbrains.skija.ColorAlphaType
 import org.jetbrains.skija.DirectContext
 import org.jetbrains.skija.FramebufferFormat
+import org.jetbrains.skija.ImageInfo
 import org.jetbrains.skija.Rect
 import org.jetbrains.skija.Surface
 import org.jetbrains.skija.SurfaceColorFormat
@@ -38,6 +49,11 @@ interface SkiaRenderer {
 open class SkiaLayer() : HardwareLayer() {
     var renderer: SkiaRenderer? = null
     val clipComponets = mutableListOf<ClipRectangle>()
+    private val colorModel = ComponentColorModel(java.awt.color.ColorSpace.getInstance(java.awt.color.ColorSpace.CS_sRGB), true, false, Transparency.TRANSLUCENT, DataBuffer.TYPE_BYTE)
+    val storage = Bitmap()
+    var image: BufferedImage? = null
+    var imageData: ByteArray? = null
+    var raster: WritableRaster? = null
 
     private val skijaState = SkijaState()
     protected var inited: Boolean = false
@@ -61,6 +77,10 @@ open class SkiaLayer() : HardwareLayer() {
     }
 
     override fun draw() {
+        val dpi = contentScale
+        val actualWidth = (width * dpi).toInt()
+        val actualHeight = (height * dpi).toInt()
+
         if (!inited) {
             if (skijaState.context == null) {
                 skijaState.context = when (api) {
@@ -74,7 +94,10 @@ open class SkiaLayer() : HardwareLayer() {
             inited = true
             renderer?.onReshape(width, height)
         }
-        initSkija()
+        
+        val frameTime = System.nanoTime()
+
+        initSkija(dpi)
         skijaState.apply {
             canvas!!.clear(bleachConstant)
             
@@ -83,21 +106,36 @@ open class SkiaLayer() : HardwareLayer() {
                 clipRectBy(component)
             }
 
+            val renderTime = System.nanoTime()
             renderer?.onRender(canvas!!, width, height)
+            print("skia rendering: ${(System.nanoTime() - renderTime) / 1000000}ms : ")
 
             if (api == GraphicsApi.RASTER) {
-                var img: BufferedImage?
-                val bais = ByteArrayInputStream(surface!!.makeImageSnapshot().encodeToData()!!.bytes)
-                try {
-                    img = ImageIO.read(bais)
-                } catch (e: Exception) {
-                    throw RuntimeException(e)
+                val readingTime = System.nanoTime()
+                val bytes = storage.readPixels(storage.getImageInfo(), (actualWidth * 4).toLong(), 0, 0)
+                print("reading bytes: ${(System.nanoTime() - readingTime) / 1000000}ms : ")
+
+                if (bytes != null) {
+                    val drawTime = System.nanoTime()
+                    val buffer = DataBufferByte(bytes, bytes.size)
+                    raster = Raster.createInterleavedRaster(
+                        buffer,
+                        actualWidth,
+                        actualHeight,
+                        actualWidth * 4, 4,
+                        intArrayOf(2, 1, 0, 3), // BGRA order
+                        null
+                    )
+                    image = BufferedImage(colorModel, raster!!, colorModel.isAlphaPremultiplied(), null)
+                    getGraphics().drawImage(image!!, 0, 0, width, height, null)
+                    print("awt drawing: ${(System.nanoTime() - drawTime) / 1000000}ms : ")
                 }
-                getGraphics().drawImage(img!!, 0, 0, width, height, null)
             } else {
                 context!!.flush()
             }
         }
+
+        println("total: ${(System.nanoTime() - frameTime) / 1000000}ms")
     }
 
     private fun clipRectBy(rectangle: ClipRectangle) {
@@ -115,8 +153,7 @@ open class SkiaLayer() : HardwareLayer() {
         }
     }
 
-    private fun initSkija() {
-        val dpi = contentScale
+    private fun initSkija(dpi: Float) {
         initRenderTarget(dpi)
         initSurface(dpi)
         scaleCanvas(dpi)
@@ -151,22 +188,27 @@ open class SkiaLayer() : HardwareLayer() {
 
     private fun initSurface(dpi: Float) {
         skijaState.apply {
-            surface = when (api) {
-                GraphicsApi.OPENGL -> Surface.makeFromBackendRenderTarget(
-                    context,
-                    renderTarget,
-                    SurfaceOrigin.BOTTOM_LEFT,
-                    SurfaceColorFormat.RGBA_8888,
-                    ColorSpace.getSRGB()
-                )
-                GraphicsApi.RASTER -> Surface.makeRasterN32Premul(
-                    (width * dpi).toInt(),
-                    (height * dpi).toInt()
-                )
+            when (api) {
+                GraphicsApi.OPENGL -> {
+                    surface = Surface.makeFromBackendRenderTarget(
+                        context,
+                        renderTarget,
+                        SurfaceOrigin.BOTTOM_LEFT,
+                        SurfaceColorFormat.RGBA_8888,
+                        ColorSpace.getSRGB()
+                    )
+                    canvas = surface!!.canvas
+                }
+                GraphicsApi.RASTER -> {
+                    val actualWidth = (width * dpi).toInt()
+                    val actualHeight = (height * dpi).toInt()
+                    if (storage.getWidth() != actualWidth || storage.getHeight() != actualHeight) {
+                        storage.allocPixelsFlags(ImageInfo.makeS32(actualWidth, actualHeight, ColorAlphaType.PREMUL), false)
+                    }
+                    canvas = Canvas(storage)
+                }
                 else -> TODO("Unsupported yet")
             }
-            
-            canvas = surface!!.canvas
         }
     }
 

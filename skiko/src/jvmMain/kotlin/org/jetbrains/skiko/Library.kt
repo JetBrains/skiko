@@ -65,7 +65,7 @@ object Library {
         // we have to set this property to avoid render flickering.
         System.setProperty("sun.awt.noerasebackground", "false")
         System.setProperty("skija.staticLoad", "false")
-        System.setProperty("skiko.renderApi", "OPENGL")
+        System.setProperty("skiko.renderApi", "RASTER")
 
         // setup menu look and feel
         try {
