@@ -244,6 +244,8 @@ tasks.withType(CppCompile::class.java).configureEach {
                 listOf(
                     "-fvisibility=hidden",
                     "-fvisibility-inlines-hidden",
+                    "-static-libstdc++",
+                    "-static-libgcc",
                     "-I$jdkHome/include/linux",
                     "-DSK_BUILD_FOR_LINUX",
                     "-DSK_R32_SHIFT=16",
