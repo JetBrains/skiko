@@ -132,12 +132,13 @@ open class SkiaLayer : HardwareLayer() {
     }
 
     private fun Canvas.clipRectBy(rectangle: ClipRectangle) {
+        val dpi = contentScale
         clipRect(
             Rect.makeLTRB(
-                rectangle.x,
-                rectangle.y,
-                rectangle.x + rectangle.width,
-                rectangle.y + rectangle.height
+                rectangle.x * dpi,
+                rectangle.y * dpi,
+                (rectangle.x + rectangle.width) * dpi,
+                (rectangle.y + rectangle.height) * dpi
             ),
             ClipMode.DIFFERENCE,
             true
