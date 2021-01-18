@@ -1,6 +1,8 @@
 package org.jetbrains.skiko.redrawer
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
 import org.jetbrains.skiko.FrameDispatcher
@@ -13,6 +15,7 @@ internal class WindowsRedrawer(
     private val device = getDevice(layer)
     private val context = createContext(device)
     private var isDisposed = false
+    private val job = Job()
 
     init {
         makeCurrent()
@@ -27,11 +30,23 @@ internal class WindowsRedrawer(
         check(!isDisposed)
         deleteContext(context)
         isDisposed = true
+        job.cancel()
     }
 
     override fun needRedraw() {
+        check(!isDisposed)
         toRedraw.add(this)
         frameDispatcher.scheduleFrame()
+    }
+
+    private suspend fun update(nanoTime: Long) {
+        withContext(job) {
+            layer.update(nanoTime)
+        }
+    }
+
+    private fun draw() {
+        layer.draw()
     }
 
     private fun makeCurrent() = makeCurrent(device, context)
@@ -50,12 +65,16 @@ internal class WindowsRedrawer(
             val nanoTime = System.nanoTime()
 
             for (redrawer in toRedrawAlive) {
-                redrawer.layer.update(nanoTime)
+                try {
+                    redrawer.update(nanoTime)
+                } catch (e: CancellationException) {
+                    // continue
+                }
             }
 
             for (redrawer in toRedrawAlive) {
                 redrawer.makeCurrent()
-                redrawer.layer.draw()
+                redrawer.draw()
             }
 
             for (redrawer in toRedrawAlive) {

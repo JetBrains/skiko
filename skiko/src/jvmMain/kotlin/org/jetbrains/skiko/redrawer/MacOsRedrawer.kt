@@ -89,7 +89,6 @@ internal class MacOsRedrawer(
     override fun needRedraw() {
         frameDispatcher.scheduleFrame()
     }
-
 }
 
 private open class AWTGLLayer(private val containerPtr: Long) {

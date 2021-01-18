@@ -96,6 +96,8 @@ open class SkiaLayer : HardwareLayer() {
 
         renderer?.onRender(canvas, pictureWidth, pictureHeight, nanoTime)
 
+        check(!isDisposed)
+
         synchronized(pictureLock) {
             picture?.instance?.close()
             val picture = pictureRecorder.finishRecordingAsPicture()

@@ -1,7 +1,10 @@
 package org.jetbrains.skiko.redrawer
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.swing.Swing
+import kotlinx.coroutines.withContext
 import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.HardwareLayer
 import org.jetbrains.skiko.OpenGLApi
@@ -16,6 +19,7 @@ internal class LinuxRedrawer(
         context
     }
     private var isDisposed = false
+    private val job = Job()
 
     override fun dispose() {
         check(!isDisposed)
@@ -23,11 +27,23 @@ internal class LinuxRedrawer(
             it.destroyContext(context)
         }
         isDisposed = true
+        job.cancel()
     }
 
     override fun needRedraw() {
+        check(!isDisposed)
         toRedraw.add(this)
         frameDispatcher.scheduleFrame()
+    }
+
+    private suspend fun update(nanoTime: Long) {
+        withContext(job) {
+            layer.update(nanoTime)
+        }
+    }
+
+    private fun draw() {
+        layer.draw()
     }
 
     companion object {
@@ -43,14 +59,18 @@ internal class LinuxRedrawer(
             val nanoTime = System.nanoTime()
 
             for (redrawer in toRedrawAlive) {
-                redrawer.layer.update(nanoTime)
+                try {
+                    redrawer.update(nanoTime)
+                } catch (e: CancellationException) {
+                    // continue
+                }
             }
 
             val drawingSurfaces = toRedrawAlive.map { lockDrawingSurface(it.layer) }.toList()
             try {
                 toRedrawAlive.forEachIndexed { index, redrawer ->
                     drawingSurfaces[index].makeCurrent(redrawer.context)
-                    redrawer.layer.draw()
+                    redrawer.draw()
                 }
 
                 toRedrawAlive.forEachIndexed { index, _ ->
