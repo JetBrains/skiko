@@ -15,9 +15,8 @@ internal class FPSCounter(
      * [value] 0.0 - min, 1.0 - max, 0.5 - median
      */
     private fun MutableList<Double>.quantile(value: Double) : Double {
-        sort()
         val index = (value * (size - 1)).toInt()
-        return this[index]
+        return sorted()[index]
     }
 
     fun tick() {

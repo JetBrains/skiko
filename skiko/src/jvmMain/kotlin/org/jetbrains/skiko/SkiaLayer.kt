@@ -42,6 +42,7 @@ open class SkiaLayer : HardwareLayer() {
     private val pictureLock = Any()
 
     override fun init() {
+        super.init()
         redrawer = platformOperations.createHardwareRedrawer(this)
         redrawer?.syncSize()
         needRedraw()

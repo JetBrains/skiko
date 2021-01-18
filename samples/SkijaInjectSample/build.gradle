@@ -61,7 +61,7 @@ run {
 test {
     systemProperty("skiko.test.screenshots.dir", new File(project.projectDir, "src/test/screenshots").absolutePath)
 
-    // Tests should be determined, so disable scaling.
+    // Tests should be deterministic, so disable scaling.
     // On MacOs we need the actual scale, otherwise we will have aliased screenshots because of scaling.
     if (System.getProperty("os.name") != "Mac OS X") {
         systemProperty("sun.java2d.dpiaware", "false")

@@ -8,7 +8,10 @@ import java.awt.Robot
 import java.io.File
 import javax.imageio.ImageIO
 
-// TODO macOs has wrong colors. Only white, black, red and green are correct
+// WARNING!!!
+// macOS has wrong colors ([128, 128, 128] isn't [128, 128, 128] on screenshot). Only white, black, red and green are correct.
+// So use only these color for cross-platform screenshots tests.
+// TODO fix colors on macOS
 class ScreenshotTestRule(private val robot: Robot) : TestRule {
     private lateinit var testIdentifier: String
     private val screenshotsDir = File(System.getProperty("skiko.test.screenshots.dir")!!)

@@ -7,10 +7,7 @@ import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import java.awt.event.MouseEvent
 import java.awt.event.MouseMotionAdapter
-import javax.swing.JButton
-import javax.swing.JFrame
-import javax.swing.JPanel
-import javax.swing.WindowConstants
+import javax.swing.*
 
 
 fun Button(text: String): JButton {
@@ -19,7 +16,7 @@ fun Button(text: String): JButton {
     return btn
 }
 
-fun SwingSkia() {
+fun SwingSkia() = SwingUtilities.invokeLater {
 
     val window = JFrame()
     window.defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE

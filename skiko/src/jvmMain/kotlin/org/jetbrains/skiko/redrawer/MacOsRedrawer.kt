@@ -18,9 +18,9 @@ internal class MacOsRedrawer(
         override fun draw() = layer.draw()
     }
 
-    // use separate layer for vsync, because with single layer we cannot asynchronously update layer
+    // use a separate layer for vsync, because with single layer we cannot asynchronously update layer
     // `update` is suspend, and runBlocking(Dispatchers.Swing) causes dead lock with AppKit Thread.
-    // AWT has internal method to avoid dead locks but it is internal (sun.lwawt.macosx.LWCToolkit.invokeAndWait)
+    // AWT has a method to avoid dead locks but it is internal (sun.lwawt.macosx.LWCToolkit.invokeAndWait)
     private val vsyncLayer = object : AWTGLLayer(containerLayerPtr) {
         @Volatile
         private var needDraw: CompletableDeferred<Unit>? = null

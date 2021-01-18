@@ -26,7 +26,7 @@ abstract class HardwareLayer : Canvas() {
 
     private fun checkIsShowing() {
         if (!isInit && isShowing) {
-            _contentScale = platformOperations.getDpiScale(this)
+            _contentScale = getDpiScale()
             init()
             isInit = true
         }
@@ -38,11 +38,17 @@ abstract class HardwareLayer : Canvas() {
     protected open fun contentScaleChanged() = Unit
 
     override fun paint(g: Graphics) {
-        val contentScale = platformOperations.getDpiScale(this)
+        val contentScale = getDpiScale()
         if (contentScale != _contentScale) {
             _contentScale = contentScale
             contentScaleChanged()
         }
+    }
+
+    private fun getDpiScale(): Float {
+        val scale = platformOperations.getDpiScale(this)
+        check(scale > 0) { "HardwareLayer.contentScale isn't positive: $contentScale"}
+        return scale
     }
 
     // Should be called in Swing thread
