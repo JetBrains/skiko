@@ -27,7 +27,6 @@ JavaVM *jvm = NULL;
 
     [self removeAllAnimations];
     [self setAutoresizingMask: (kCALayerWidthSizable|kCALayerHeightSizable)];
-    [self setNeedsDisplayOnBoundsChange: YES];
 
     return self;
 }
@@ -109,12 +108,13 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MacOsRedrawerKt_setCont
     layer.contentsScale = contentScale;
 }
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MacOsRedrawerKt_initAWTGLLayer(JNIEnv *env, jobject obj, jlong containerPtr, jobject layer)
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MacOsRedrawerKt_initAWTGLLayer(JNIEnv *env, jobject obj, jlong containerPtr, jobject layer, jboolean setNeedsDisplayOnBoundsChange)
 {
     CALayer *container = (CALayer *) containerPtr;
 
     AWTGLLayer *glLayer = [AWTGLLayer new];
     glLayer.javaRef = (*env)->NewGlobalRef(env, layer);
+    [glLayer setNeedsDisplayOnBoundsChange: setNeedsDisplayOnBoundsChange];
     [container addSublayer: glLayer];
 
     return (jlong) glLayer;

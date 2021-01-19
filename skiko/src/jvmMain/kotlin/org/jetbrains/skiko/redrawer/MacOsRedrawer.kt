@@ -14,14 +14,14 @@ internal class MacOsRedrawer(
 ) : Redrawer {
     private val containerLayerPtr = initContainer(layer)
 
-    private val drawLayer = object : AWTGLLayer(containerLayerPtr) {
+    private val drawLayer = object : AWTGLLayer(containerLayerPtr, setNeedsDisplayOnBoundsChange = true) {
         override fun draw() = layer.draw()
     }
 
     // use a separate layer for vsync, because with single layer we cannot asynchronously update layer
     // `update` is suspend, and runBlocking(Dispatchers.Swing) causes dead lock with AppKit Thread.
     // AWT has a method to avoid dead locks but it is internal (sun.lwawt.macosx.LWCToolkit.invokeAndWait)
-    private val vsyncLayer = object : AWTGLLayer(containerLayerPtr) {
+    private val vsyncLayer = object : AWTGLLayer(containerLayerPtr, setNeedsDisplayOnBoundsChange = false) {
         @Volatile
         private var needDraw: CompletableDeferred<Unit>? = null
 
@@ -34,7 +34,7 @@ internal class MacOsRedrawer(
             val opengl = OpenGLApi.instance
             opengl.glClearColor(0f, 0f, 0f, 0f)
             opengl.glClear(opengl.GL_COLOR_BUFFER_BIT)
-            needDraw!!.complete(Unit)
+            needDraw?.complete(Unit)
         }
 
         override fun canDraw(): Boolean {
@@ -83,7 +83,12 @@ internal class MacOsRedrawer(
         val globalPosition = convertPoint(layer, layer.x, layer.y, getRootPane(layer))
         setContentScale(containerLayerPtr, layer.contentScale)
         setContentScale(drawLayer.ptr, layer.contentScale)
-        drawLayer.setFrame(globalPosition.x, globalPosition.y, layer.width, layer.height)
+        drawLayer.setFrame(
+            globalPosition.x,
+            globalPosition.y,
+            layer.width.coerceAtLeast(0),
+            layer.height.coerceAtLeast(0)
+        )
     }
 
     override fun needRedraw() {
@@ -91,9 +96,9 @@ internal class MacOsRedrawer(
     }
 }
 
-private open class AWTGLLayer(private val containerPtr: Long) {
+private open class AWTGLLayer(private val containerPtr: Long, setNeedsDisplayOnBoundsChange: Boolean) {
     @Suppress("LeakingThis")
-    val ptr = initAWTGLLayer(containerPtr, this)
+    val ptr = initAWTGLLayer(containerPtr, this, setNeedsDisplayOnBoundsChange)
 
     fun setFrame(x: Int, y: Int, width: Int, height: Int) {
         setFrame(containerPtr, ptr, x.toFloat(), y.toFloat(), width.toFloat(), height.toFloat())
@@ -111,7 +116,7 @@ private open class AWTGLLayer(private val containerPtr: Long) {
     // Called in AppKit Thread
     protected open fun canDraw() = true
 
-    // Called in AppKit Thread, shouldn't be called if canDraw returned false
+    // Called in AppKit Thread
     protected open fun draw() = Unit
 
     private external fun isAsynchronous(ptr: Long): Boolean
@@ -122,5 +127,5 @@ private open class AWTGLLayer(private val containerPtr: Long) {
 
 private external fun initContainer(layer: HardwareLayer): Long
 private external fun setContentScale(layerNativePtr: Long, contentScale: Float)
-private external fun initAWTGLLayer(containerPtr: Long, layer: AWTGLLayer): Long
+private external fun initAWTGLLayer(containerPtr: Long, layer: AWTGLLayer, setNeedsDisplayOnBoundsChange: Boolean): Long
 private external fun disposeAWTGLLayer(ptr: Long)

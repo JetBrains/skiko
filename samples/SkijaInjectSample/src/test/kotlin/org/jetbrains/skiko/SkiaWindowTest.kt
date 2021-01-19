@@ -51,6 +51,7 @@ class SkiaWindowTest {
     fun `render single window`() = swingTest {
         val window = SkiaWindow()
         try {
+            window.setLocation(200, 200)
             window.setSize(400, 200)
             window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
             val renderer = RectRenderer(window.layer, 200, 100, Color.RED)
@@ -74,6 +75,7 @@ class SkiaWindowTest {
     fun `resize window`() = swingTest {
         val window = SkiaWindow()
         try {
+            window.setLocation(200, 200)
             window.setSize(40, 20)
             window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
             window.layer.renderer = RectRenderer(window.layer, 20, 10, Color.RED)
@@ -93,6 +95,7 @@ class SkiaWindowTest {
     @Test
     fun `render three windows`() = swingTest {
         fun window(color: Color) = SkiaWindow().apply {
+            setLocation(200,200)
             setSize(400, 200)
             defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
             layer.renderer = RectRenderer(layer, 200, 100, color)
@@ -131,6 +134,7 @@ class SkiaWindowTest {
 
         val window = SkiaWindow()
         try {
+            window.setLocation(200, 200)
             window.setSize(40, 20)
             window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
             window.layer.renderer = object : SkiaRenderer {
@@ -161,6 +165,7 @@ class SkiaWindowTest {
     @Test
     fun `open windows stress test`() = swingTest {
         fun window(isAnimated: Boolean) = SkiaWindow().apply {
+            setLocation(200,200)
             setSize(40, 20)
             defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
             layer.renderer = if (isAnimated) {
@@ -219,6 +224,7 @@ class SkiaWindowTest {
 
         val window = SkiaWindow()
         try {
+            window.setLocation(200, 200)
             window.setSize(400, 200)
             window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
 

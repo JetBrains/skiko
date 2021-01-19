@@ -58,9 +58,14 @@ open class SkiaLayer : HardwareLayer() {
         super.dispose()
     }
 
+    override fun setBounds(x: Int, y: Int, width: Int, height: Int) {
+        super.setBounds(x, y, width, height)
+        redrawer?.syncSize()
+        needRedraw()
+    }
+
     override fun paint(g: Graphics) {
         super.paint(g)
-        // we don't have to call it in setBounds method, because paint will always be called after setBounds
         redrawer?.syncSize()
         needRedraw()
     }

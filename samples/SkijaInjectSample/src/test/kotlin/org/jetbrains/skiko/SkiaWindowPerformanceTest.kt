@@ -69,6 +69,7 @@ native crash in SkiaWindowTest "render single window"
             }
 
             init {
+                setLocation(200,200)
                 setSize(width, height)
                 defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
                 layer.renderer = object : SkiaRenderer {
@@ -208,6 +209,7 @@ j  org.jetbrains.skiko.redrawer.MacOsRedrawer$drawLayer$1.draw()V+7
 
         val window = SkiaWindow()
         try {
+            window.setLocation(200, 200)
             window.setSize(400, 400)
             window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
             window.isUndecorated = true
