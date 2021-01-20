@@ -53,8 +53,8 @@ object Library {
         }
 
         Setup.init(
-            System.getProperty("skiko.rendering.laf.global") == "true",
             System.getProperty("skiko.rendering.noerasebackground") != "false",
+            System.getProperty("skiko.rendering.laf.global") == "true",
             System.getProperty("skiko.rendering.useScreenMenuBar") != "false"
         )
 
