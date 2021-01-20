@@ -1,46 +1,67 @@
 package org.jetbrains.skiko
 
-import java.awt.Graphics
 import java.awt.Canvas
-import javax.swing.SwingUtilities.convertPoint
-import javax.swing.SwingUtilities.getRootPane
+import java.awt.Graphics
+import java.awt.event.HierarchyEvent
 
-abstract class HardwareLayer : Canvas(), Drawable {
-
+abstract class HardwareLayer : Canvas() {
     companion object {
         init {
             Library.load()
         }
     }
 
+    // getDpiScale is expensive operation on some platforms, so we cache it
+    private var _contentScale: Float? = null
+    private var isInit = false
+
+    init {
+        @Suppress("LeakingThis")
+        addHierarchyListener {
+            if (it.changeFlags and HierarchyEvent.SHOWING_CHANGED.toLong() != 0L) {
+                checkIsShowing()
+            }
+        }
+    }
+
+    private fun checkIsShowing() {
+        if (!isInit && isShowing) {
+            _contentScale = getDpiScale()
+            init()
+            isInit = true
+        }
+    }
+
+    protected open external fun init()
+    open external fun dispose()
+
+    protected open fun contentScaleChanged() = Unit
+
     override fun paint(g: Graphics) {
-        display()
+        val contentScale = getDpiScale()
+        if (contentScale != _contentScale) {
+            _contentScale = contentScale
+            contentScaleChanged()
+        }
     }
 
-    open fun display() {
-        this.updateLayer()
-        this.redrawLayer()
+    private fun getDpiScale(): Float {
+        val scale = platformOperations.getDpiScale(this)
+        check(scale > 0) { "HardwareLayer.contentScale isn't positive: $contentScale"}
+        return scale
     }
 
-    open fun draw() {}
+    // Should be called in Swing thread
+    internal abstract suspend fun update(nanoTime: Long)
 
-    external override fun redrawLayer()
+    // Should be called in the OpenGL thread, and only once after update
+    internal abstract fun draw()
 
-    external override fun updateLayer()
-
-    external override fun disposeLayer()
-
-    override val windowHandle: Long
+    val windowHandle: Long
         external get
 
-    override val contentScale: Float
-        get() = platformOperations.getDpiScale(this)
-
-    val absoluteX: Int
-        get() = convertPoint(this, x, y, getRootPane(this)).x
-
-    val absoluteY: Int
-        get() = convertPoint(this, x, y, getRootPane(this)).y
+    val contentScale: Float
+        get() = _contentScale!!
 
     var fullscreen: Boolean
         get() = platformOperations.isFullscreen(this)

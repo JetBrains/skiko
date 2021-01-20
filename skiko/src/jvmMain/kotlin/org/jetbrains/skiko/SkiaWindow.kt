@@ -1,7 +1,5 @@
 package org.jetbrains.skiko
 
-import java.awt.event.ComponentAdapter
-import java.awt.event.ComponentEvent
 import javax.swing.JFrame
 
 open class SkiaWindow : JFrame() {
@@ -9,15 +7,10 @@ open class SkiaWindow : JFrame() {
 
     init {
         contentPane.add(layer)
-
-        addComponentListener(object : ComponentAdapter() {
-            override fun componentResized(e: ComponentEvent) {
-                layer.reinit()
-            }
-        })
     }
 
-    fun display() {
-        layer.display()
+    override fun dispose() {
+        layer.dispose()
+        super.dispose()
     }
 }

@@ -1,11 +1,12 @@
-package org.jetbrains.skiko
+package SkijaInjectSample
 
+import org.jetbrains.skiko.ClipComponent
+import org.jetbrains.skiko.SkiaLayer
 import java.awt.Color
 import java.awt.Component
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import javax.swing.JLayeredPane
-import org.jetbrains.skija.Rect
 
 open class SkiaPanel: JLayeredPane {
     val layer = SkiaLayer()
@@ -16,7 +17,7 @@ open class SkiaPanel: JLayeredPane {
     }
 
     override fun add(component: Component): Component {
-        layer.clipComponets.add(ClipComponent(component))
+        layer.clipComponents.add(ClipComponent(component))
         return super.add(component, Integer.valueOf(0))
     }
 
@@ -26,7 +27,6 @@ open class SkiaPanel: JLayeredPane {
 
         addComponentListener(object : ComponentAdapter() {
             override fun componentResized(e: ComponentEvent) {
-                layer.reinit()
                 layer.setSize(width, height)
             }
         })

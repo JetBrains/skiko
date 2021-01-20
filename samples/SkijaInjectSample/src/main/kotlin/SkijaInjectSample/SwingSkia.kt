@@ -5,16 +5,9 @@ import java.awt.Color
 import java.awt.Dimension
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
-import java.awt.event.KeyEvent
 import java.awt.event.MouseEvent
 import java.awt.event.MouseMotionAdapter
-import javax.swing.JFrame
-import javax.swing.JButton
-import javax.swing.JLayeredPane
-import javax.swing.JPanel
-import javax.swing.event.MouseInputAdapter
-import javax.swing.WindowConstants
-import org.jetbrains.skiko.SkiaPanel
+import javax.swing.*
 
 
 fun Button(text: String): JButton {
@@ -23,10 +16,10 @@ fun Button(text: String): JButton {
     return btn
 }
 
-fun SwingSkia() {
+fun SwingSkia() = SwingUtilities.invokeLater {
 
     val window = JFrame()
-    window.defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
+    window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
     window.title = "SwingSkiaWindow"
 
     val panel = SkiaPanel()
@@ -63,13 +56,12 @@ fun SwingSkia() {
         }
     })
 
-    panel.layer.renderer = Renderer { renderer, w, h -> displayScene(renderer, w, h, mouseX, mouseY, state) }
+    panel.layer.renderer = Renderer(panel.layer) { renderer, w, h, nanoTime -> displayScene(renderer, w, h, nanoTime, mouseX, mouseY, state) }
 
     panel.layer.addMouseMotionListener(object : MouseMotionAdapter() {
         override fun mouseMoved(event: MouseEvent) {
             mouseX = event.x
             mouseY = event.y
-            panel.layer.display()
         }
     })
 

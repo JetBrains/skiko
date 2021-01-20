@@ -7,69 +7,13 @@
 
 #import <Cocoa/Cocoa.h>
 #import <QuartzCore/QuartzCore.h>
-#import <OpenGL/gl3.h>
 #import <Metal/Metal.h>
 #import <QuartzCore/CAMetalLayer.h>
-#import <pthread.h>
-
-JavaVM *jvm = NULL;
-
-@interface AWTGLLayer : CAOpenGLLayer
-
-@property jobject canvasGlobalRef;
-
-@end
-
-@implementation AWTGLLayer
-
-- (id)init
-{
-    self = [super init];
-
-    if (self)
-    {
-        [self removeAllAnimations];
-        [self setAutoresizingMask: (kCALayerWidthSizable|kCALayerHeightSizable)];
-        [self setNeedsDisplayOnBoundsChange: YES];
-
-        self.canvasGlobalRef = NULL;
-    }
-
-    return self;
-}
-
--(void)drawInCGLContext:(CGLContextObj)ctx 
-            pixelFormat:(CGLPixelFormatObj)pf 
-            forLayerTime:(CFTimeInterval)t 
-            displayTime:(const CVTimeStamp *)ts
-{
-    CGLSetCurrentContext(ctx);
-
-    if (jvm != NULL) {
-        JNIEnv *env;
-        (*jvm)->AttachCurrentThread(jvm, (void **)&env, NULL);
-
-        static jclass wndClass = NULL;
-        if (!wndClass) wndClass = (*env)->GetObjectClass(env, self.canvasGlobalRef);
-        static jmethodID drawMethod = NULL;
-        if (!drawMethod) drawMethod = (*env)->GetMethodID(env, wndClass, "draw", "()V");
-        if (NULL == drawMethod)
-        {
-            NSLog(@"The method HardwareLayer.draw() not found!");
-            return;
-        }
-        (*env)->CallVoidMethod(env, self.canvasGlobalRef, drawMethod);
-    }
-
-    [super drawInCGLContext:ctx pixelFormat:pf forLayerTime:t displayTime:ts];
-}
-
-@end
 
 @interface LayerHandler : NSObject
 
+@property jobject canvasGlobalRef;
 @property (retain, strong) CALayer *container;
-@property (retain, strong) AWTGLLayer *glLayer;
 @property (retain, strong) NSWindow *window;
 
 @end
@@ -82,107 +26,18 @@ JavaVM *jvm = NULL;
 
     if (self)
     {
+        self.canvasGlobalRef = NULL;
         self.container = NULL;
-        self.glLayer = NULL;
         self.window = NULL;
     }
 
     return self;
 }
 
-- (void) syncLayersSize
-{
-    if (jvm != NULL) {
-        JNIEnv *env;
-        (*jvm)->AttachCurrentThread(jvm, (void **)&env, NULL);
-        static jclass wndClass = NULL;
-        if (!wndClass)
-        {
-            wndClass = (*env)->GetObjectClass(env, self.glLayer.canvasGlobalRef);
-        }
-
-        // scale factor
-        static jmethodID contentScaleMethod = NULL;
-        if (!contentScaleMethod)
-        {
-            contentScaleMethod = (*env)->GetMethodID(env, wndClass, "getContentScale", "()F");
-        }
-        if (NULL == contentScaleMethod)
-        {
-            NSLog(@"The method HardwareLayer.getContentScale() not found!");
-            return;
-        }
-        float scaleFactor = (*env)->CallFloatMethod(env, self.glLayer.canvasGlobalRef, contentScaleMethod);
-        assert(scaleFactor != 0);
-        self.container.contentsScale = scaleFactor;
-        self.glLayer.contentsScale = scaleFactor;
-
-        // size & position
-        static jmethodID getXMethod = NULL;
-        if (!getXMethod)
-        {
-            getXMethod = (*env)->GetMethodID(env, wndClass, "getAbsoluteX", "()I");
-        }
-        if (NULL == getXMethod)
-        {
-            NSLog(@"The method HardwareLayer.getAbsoluteX() not found!");
-            return;
-        }
-
-        static jmethodID getYMethod = NULL;
-        if (!getYMethod)
-        {
-            getYMethod = (*env)->GetMethodID(env, wndClass, "getAbsoluteY", "()I");
-        }
-        if (NULL == getYMethod)
-        {
-            NSLog(@"The method HardwareLayer.getAbsoluteY() not found!");
-            return;
-        }
-
-        static jmethodID getWidthMethod = NULL;
-        if (!getWidthMethod)
-        {
-            getWidthMethod = (*env)->GetMethodID(env, wndClass, "getWidth", "()I");
-        }
-        if (NULL == getWidthMethod)
-        {
-            NSLog(@"The method HardwareLayer.getWidth() not found!");
-            return;
-        }
-        static jmethodID getHeightMethod = NULL;
-        if (!getHeightMethod)
-        {
-            getHeightMethod = (*env)->GetMethodID(env, wndClass, "getHeight", "()I");
-        }
-        if (NULL == getHeightMethod)
-        {
-            NSLog(@"The method HardwareLayer.getHeight() not found!");
-            return;
-        }
-        int x = (*env)->CallIntMethod(env, self.glLayer.canvasGlobalRef, getXMethod);
-        int y = (*env)->CallIntMethod(env, self.glLayer.canvasGlobalRef, getYMethod);
-        int w = (*env)->CallIntMethod(env, self.glLayer.canvasGlobalRef, getWidthMethod);
-        int h = (*env)->CallIntMethod(env, self.glLayer.canvasGlobalRef, getHeightMethod);
-
-        y = (int)self.container.frame.size.height - y - h;
-
-        CGRect boundsRect = CGRectMake(x, y, w, h);
-        self.glLayer.frame = boundsRect;
-    }
-}
-
-- (void) updateLayerContent
-{
-    [self.glLayer performSelectorOnMainThread:@selector(setNeedsDisplay) withObject:0 waitUntilDone:NO];
-}
-
 - (void) disposeLayer:(JNIEnv *) env
 {
-    [self.glLayer removeFromSuperlayer];
-    (*env)->DeleteGlobalRef(env, self.glLayer.canvasGlobalRef);
-    self.glLayer.canvasGlobalRef = NULL;
-    self.glLayer = NULL;
+    (*env)->DeleteGlobalRef(env, self.canvasGlobalRef);
+    self.canvasGlobalRef = NULL;
     self.container = NULL;
     self.window = NULL;
 }
@@ -206,18 +61,7 @@ JavaVM *jvm = NULL;
 
 @end
 
-NSMutableArray *unknownWindows = nil;
-
 NSMutableSet *layerStorage = nil;
-pthread_mutex_t layerStorageMutex = { 0 };
-
-void lockLayers() {
-    pthread_mutex_lock(&layerStorageMutex);
-}
-
-void unlockLayers() {
-    pthread_mutex_unlock(&layerStorageMutex);
-}
 
 LayerHandler * findByObject(JNIEnv *env, jobject object)
 {
@@ -227,7 +71,7 @@ LayerHandler * findByObject(JNIEnv *env, jobject object)
     }
     for (LayerHandler* layer in layerStorage)
     {
-        if ((*env)->IsSameObject(env, object, layer.glLayer.canvasGlobalRef) == JNI_TRUE)
+        if ((*env)->IsSameObject(env, object, layer.canvasGlobalRef) == JNI_TRUE)
         {
             return layer;
         }
@@ -237,20 +81,9 @@ LayerHandler * findByObject(JNIEnv *env, jobject object)
 
 extern jboolean Skiko_GetAWT(JNIEnv* env, JAWT* awt);
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv *env, jobject canvas)
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_init(JNIEnv *env, jobject canvas)
 {
-    lockLayers();
-    if (layerStorage != nil)
-    {
-        LayerHandler *layer = findByObject(env, canvas);
-        if (layer != NULL)
-        {
-            [layer syncLayersSize];
-            unlockLayers();
-            return;
-        }
-    }
-    else
+    if (layerStorage == nil)
     {
         layerStorage = [[NSMutableSet alloc] init];
     }
@@ -258,8 +91,6 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv
     JAWT awt;
     JAWT_DrawingSurface *ds = NULL;
     JAWT_DrawingSurfaceInfo *dsi = NULL;
-    CGLPixelFormatObj pixFormatObj = NULL;
-    CGLContextObj context;
 
     jboolean result = JNI_FALSE;
     jint lock = 0;
@@ -268,8 +99,6 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv
     awt.version = JAWT_VERSION_9 /* | JAWT_MACOSX_USE_CALAYER */;
     result = Skiko_GetAWT(env, &awt);
     assert(result != JNI_FALSE);
-
-    (*env)->GetJavaVM(env, &jvm);
 
     ds = awt.GetDrawingSurface(env, canvas);
     assert(ds != NULL);
@@ -286,44 +115,22 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv
         LayerHandler *layersSet = [[LayerHandler alloc] init];
 
         layersSet.container = [dsi_mac windowLayer];
-        [layersSet.container removeAllAnimations];
-        [layersSet.container setAutoresizingMask: (kCALayerWidthSizable|kCALayerHeightSizable)];
-        [layersSet.container setNeedsDisplayOnBoundsChange: YES];
-
-        layersSet.glLayer = [AWTGLLayer new];
-        [layersSet.container addSublayer: layersSet.glLayer];
-        
         jobject canvasGlobalRef = (*env)->NewGlobalRef(env, canvas);
+        [layersSet setCanvasGlobalRef: canvasGlobalRef];
 
-        [layersSet.glLayer setCanvasGlobalRef: canvasGlobalRef];
+        NSMutableArray<NSWindow *> *windows = [NSMutableArray arrayWithArray: [[NSApplication sharedApplication] windows]];
 
-        [layersSet syncLayersSize];
-
-        if (unknownWindows == nil)
+        for (LayerHandler* value in layerStorage)
         {
-            NSMutableArray<NSWindow *> *windows = [NSMutableArray arrayWithArray: [[NSApplication sharedApplication] windows]];
-            layersSet.window = [windows lastObject];
-            [windows removeObject: layersSet.window];
-            unknownWindows = windows;
+            if (layersSet.container == value.container)
+            {
+                layersSet.window = value.window;
+            }
         }
-        else
+
+        if (layersSet.window == NULL)
         {
-            NSMutableArray<NSWindow *> *windows = [NSMutableArray arrayWithArray: [[NSApplication sharedApplication] windows]];
-            for (NSWindow* value in unknownWindows)
-            {
-                [windows removeObject: value];
-            }
-            for (LayerHandler* value in layerStorage)
-            {
-                if (layersSet.container == value.container)
-                {
-                    layersSet.window = value.window;
-                }
-            }
-            if (layersSet.window == NULL)
-            {
-                layersSet.window = [windows lastObject];
-            }
+            layersSet.window = [windows lastObject];
         }
 
         [layerStorage addObject: layersSet];
@@ -332,25 +139,11 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_updateLayer(JNIEnv
     ds->FreeDrawingSurfaceInfo(dsi);
     ds->Unlock(ds);
     awt.FreeDrawingSurface(ds);
-    unlockLayers();
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_redrawLayer(JNIEnv *env, jobject canvas)
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_dispose(JNIEnv *env, jobject canvas)
 {
-    lockLayers();
     LayerHandler *layer = findByObject(env, canvas);
-    unlockLayers();
-    if (layer != NULL)
-    {
-        [layer updateLayerContent];
-    }
-}
-
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_disposeLayer(JNIEnv *env, jobject canvas)
-{
-    lockLayers();
-    LayerHandler *layer = findByObject(env, canvas);
-    unlockLayers();
     if (layer != NULL)
     {
         [layerStorage removeObject: layer];
@@ -365,9 +158,7 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getWindowHandle(J
 
 JNIEXPORT jboolean JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_osxIsFullscreenNative(JNIEnv *env, jobject properties, jobject component)
 {
-    lockLayers();
     LayerHandler *layer = findByObject(env, component);
-    unlockLayers();
     if (layer != NULL)
     {
         return [layer isFullScreen];
@@ -377,9 +168,7 @@ JNIEXPORT jboolean JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_osxIsFu
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_osxSetFullscreenNative(JNIEnv *env, jobject properties, jobject component, jboolean value)
 {
-    lockLayers();
     LayerHandler *layer = findByObject(env, component);
-    unlockLayers();
     if (layer != NULL)
     {
         [layer makeFullscreen:value];

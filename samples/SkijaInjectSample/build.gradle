@@ -44,6 +44,7 @@ if (project.hasProperty('skiko.version')) {
 dependencies {
     implementation platform('org.jetbrains.kotlin:kotlin-bom')
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.4.1'
     implementation "org.jetbrains.skiko:skiko-jvm-runtime-$target:$version"
     testImplementation 'org.jetbrains.kotlin:kotlin-test'
     testImplementation 'org.jetbrains.kotlin:kotlin-test-junit'
@@ -51,4 +52,19 @@ dependencies {
 
 application {
     mainClassName = 'SkijaInjectSample.AppKt'
+}
+
+run {
+    systemProperty("skiko.fps.enabled", "true")
+}
+
+test {
+    systemProperty("skiko.test.screenshots.dir", new File(project.projectDir, "src/test/screenshots").absolutePath)
+
+    // Tests should be deterministic, so disable scaling.
+    // On MacOs we need the actual scale, otherwise we will have aliased screenshots because of scaling.
+    if (System.getProperty("os.name") != "Mac OS X") {
+        systemProperty("sun.java2d.dpiaware", "false")
+        systemProperty("sun.java2d.uiScale", "1")
+    }
 }
