@@ -37,7 +37,16 @@ abstract class HardwareLayer : Canvas() {
 
     protected open fun contentScaleChanged() = Unit
 
+    override fun setBounds(x: Int, y: Int, width: Int, height: Int) {
+        super.setBounds(x, y, width, height)
+        checkContentScale()
+    }
+
     override fun paint(g: Graphics) {
+        checkContentScale()
+    }
+
+    private fun checkContentScale() {
         val contentScale = getDpiScale()
         if (contentScale != _contentScale) {
             _contentScale = contentScale
