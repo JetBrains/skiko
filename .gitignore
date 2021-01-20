@@ -5,4 +5,4 @@ local.properties
 run.sh
 .idea
 deploy.sh
-skiko/src/jvmMain/java/
+skiko/src/jvmMain/java-generated/
