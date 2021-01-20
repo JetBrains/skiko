@@ -61,8 +61,6 @@
 
 @end
 
-NSMutableArray *unknownWindows = nil;
-
 NSMutableSet *layerStorage = nil;
 
 LayerHandler * findByObject(JNIEnv *env, jobject object)
@@ -120,31 +118,19 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_init(JNIEnv *env, 
         jobject canvasGlobalRef = (*env)->NewGlobalRef(env, canvas);
         [layersSet setCanvasGlobalRef: canvasGlobalRef];
 
-        if (unknownWindows == nil)
+        NSMutableArray<NSWindow *> *windows = [NSMutableArray arrayWithArray: [[NSApplication sharedApplication] windows]];
+
+        for (LayerHandler* value in layerStorage)
         {
-            NSMutableArray<NSWindow *> *windows = [NSMutableArray arrayWithArray: [[NSApplication sharedApplication] windows]];
-            layersSet.window = [windows lastObject];
-            [windows removeObject: layersSet.window];
-            unknownWindows = windows;
+            if (layersSet.container == value.container)
+            {
+                layersSet.window = value.window;
+            }
         }
-        else
+
+        if (layersSet.window == NULL)
         {
-            NSMutableArray<NSWindow *> *windows = [NSMutableArray arrayWithArray: [[NSApplication sharedApplication] windows]];
-            for (NSWindow* value in unknownWindows)
-            {
-                [windows removeObject: value];
-            }
-            for (LayerHandler* value in layerStorage)
-            {
-                if (layersSet.container == value.container)
-                {
-                    layersSet.window = value.window;
-                }
-            }
-            if (layersSet.window == NULL)
-            {
-                layersSet.window = [windows lastObject];
-            }
+            layersSet.window = [windows lastObject];
         }
 
         [layerStorage addObject: layersSet];

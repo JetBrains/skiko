@@ -19,7 +19,7 @@ fun Button(text: String): JButton {
 fun SwingSkia() = SwingUtilities.invokeLater {
 
     val window = JFrame()
-    window.defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
+    window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
     window.title = "SwingSkiaWindow"
 
     val panel = SkiaPanel()

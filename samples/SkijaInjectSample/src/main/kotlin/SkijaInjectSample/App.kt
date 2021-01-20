@@ -25,7 +25,7 @@ fun createWindow(title: String) = SwingUtilities.invokeLater {
     var mouseY = 0
 
     val window = SkiaWindow()
-    window.defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
+    window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
     window.title = title
 
     // Create menu.
