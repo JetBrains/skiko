@@ -504,6 +504,12 @@ afterEvaluate {
             disable()
         }
     }
+
+    tasks.named("clean").configure {
+        doLast {
+            delete(skiko.dependenciesDir)
+        }
+    }
 }
 
 publishing {
