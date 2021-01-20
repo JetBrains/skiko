@@ -123,7 +123,7 @@ dependencies {
     jetbrainsAnnotations("org.jetbrains:annotations:19.0.0")
 }
 val skijaSrcDir = run {
-    val delombokSkijaSrcDir = project.file("src/jvmMain/java")
+    val delombokSkijaSrcDir = project.file("src/jvmMain/java-generated")
     tasks.register("delombokSkija", JavaExec::class) {
         classpath = lombok + jetbrainsAnnotations
         main = "lombok.launch.Main"
@@ -508,6 +508,7 @@ afterEvaluate {
     tasks.named("clean").configure {
         doLast {
             delete(skiko.dependenciesDir)
+            delete(project.file("src/jvmMain/java-generated"))
         }
     }
 }
