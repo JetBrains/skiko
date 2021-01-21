@@ -14,10 +14,13 @@ internal class MacOsRedrawer(
 ) : Redrawer {
     private val containerLayerPtr = initContainer(layer)
     private val drawLock = Any()
+    private var isDisposed = false
 
     private val drawLayer = object : AWTGLLayer(containerLayerPtr, setNeedsDisplayOnBoundsChange = true) {
         override fun draw() = synchronized(drawLock) {
-            layer.draw()
+            if (!isDisposed) {
+                layer.draw()
+            }
         }
     }
 
@@ -80,6 +83,7 @@ internal class MacOsRedrawer(
         frameDispatcher.cancel()
         vsyncLayer.dispose()
         drawLayer.dispose()
+        isDisposed = true
     }
 
     override fun syncSize() {
