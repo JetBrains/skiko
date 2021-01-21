@@ -92,7 +92,7 @@ open class SkiaLayer : HardwareLayer() {
         val pictureWidth = (width * contentScale).toInt().coerceAtLeast(0)
         val pictureHeight = (height * contentScale).toInt().coerceAtLeast(0)
 
-        val bounds = Rect.makeWH(pictureWidth.toFloat(), pictureHeight.toFloat())!!
+        val bounds = Rect.makeWH(pictureWidth.toFloat(), pictureHeight.toFloat())
         val canvas = pictureRecorder.beginRecording(bounds)!!
 
         // clipping

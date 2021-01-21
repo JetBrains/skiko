@@ -36,7 +36,7 @@ if (osArch == "x86_64" || osArch == "amd64") {
 }
 def target = "${targetOs}-${targetArch}"
 
-def version = "0.1-SNAPSHOT"
+def version = "0.0.0-SNAPSHOT"
 if (project.hasProperty('skiko.version')) {
   version = project.properties['skiko.version']
 }
