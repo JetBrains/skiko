@@ -75,7 +75,7 @@ if (os == "Mac OS X") {
 
 dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
-    implementation "org.jetbrains.skiko:skiko-jvm-runtime-$target-x64:0.1.21"
+    implementation "org.jetbrains.skiko:skiko-jvm-runtime-$target-x64:0.2.0"
 }
 
 application {
