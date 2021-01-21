@@ -447,7 +447,7 @@ val skikoJvmRuntimeJar by project.tasks.registering(Jar::class) {
     dependsOn(createChecksums)
     from(skikoJvmJar.map { zipTree(it.archiveFile) })
     val linkTask = project.tasks.withType(LinkSharedLibrary::class.java).single { it.name.contains(buildType.id) }
-    from(linkTask).outputs.files.filter { it.isFile }
+    from(linkTask.outputs.files.filter { it.isFile })
     if (targetOs.isWindows) {
         from(files(skiaDir.map { it.resolve("out/${buildType.id}-x64/icudtl.dat") }))
     }
