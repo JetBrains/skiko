@@ -13,9 +13,12 @@ internal class MacOsRedrawer(
     private val layer: HardwareLayer
 ) : Redrawer {
     private val containerLayerPtr = initContainer(layer)
+    private val drawLock = Any()
 
     private val drawLayer = object : AWTGLLayer(containerLayerPtr, setNeedsDisplayOnBoundsChange = true) {
-        override fun draw() = layer.draw()
+        override fun draw() = synchronized(drawLock) {
+            layer.draw()
+        }
     }
 
     // use a separate layer for vsync, because with single layer we cannot asynchronously update layer
@@ -73,7 +76,7 @@ internal class MacOsRedrawer(
         vsyncLayer.sync()
     }
 
-    override fun dispose() {
+    override fun dispose() = synchronized(drawLock) {
         frameDispatcher.cancel()
         vsyncLayer.dispose()
         drawLayer.dispose()
