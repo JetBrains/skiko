@@ -358,7 +358,9 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
             linkerArgs.addAll(
                 listOf(
                     "-lGL",
-                    "-lfontconfig"
+                    "-lfontconfig",
+                    // Hack to fix problem with linker not always finding certain declarations.
+                    skiaDir.get().absolutePath + "/out/${buildType.id}-${targetArch.id}/libsksg.a"
                 )
             )
         }
@@ -413,12 +415,6 @@ library {
         implementation(fileTree("$buildDir/objc/$target").matching {
              include("**.o")
         })
-        // Hack to fix problems with linker not always finding certain declarations.
-        if (targetOs == OS.Linux)
-            skiaDir.map {
-                fileTree(it.resolve("out/${buildType.id}-${targetArch.id}"))
-                    .matching { include("libsksg.lib") }
-            }
     }
 
     toolChains {
