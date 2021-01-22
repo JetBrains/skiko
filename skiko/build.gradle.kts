@@ -242,8 +242,6 @@ tasks.withType(CppCompile::class.java).configureEach {
                 listOf(
                     "-fvisibility=hidden",
                     "-fvisibility-inlines-hidden",
-                    "-static-libstdc++",
-                    "-static-libgcc",
                     "-I$jdkHome/include/linux",
                     "-DSK_BUILD_FOR_LINUX",
                     "-DSK_R32_SHIFT=16",
@@ -415,6 +413,12 @@ library {
         implementation(fileTree("$buildDir/objc/$target").matching {
              include("**.o")
         })
+        // Hack to fix problems with linker not always finding certain declarations.
+        if (targetOs == OS.Linux)
+            skiaDir.map {
+                fileTree(it.resolve("out/${buildType.id}-${targetArch.id}"))
+                    .matching { include("libsksg.lib") }
+            }
     }
 
     toolChains {
