@@ -46,6 +46,7 @@ abstract class HardwareLayer : Canvas() {
         checkContentScale()
     }
 
+    // TODO checkContentScale is called before init. it is ok, but when we fix getDpiScale on Linux we should check [isInit]
     private fun checkContentScale() {
         val contentScale = getDpiScale()
         if (contentScale != _contentScale) {

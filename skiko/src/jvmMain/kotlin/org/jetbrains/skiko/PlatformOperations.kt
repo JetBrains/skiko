@@ -78,6 +78,8 @@ internal val platformOperations: PlatformOperations by lazy {
                     // (it is not good, because on different platform windows will have different size.
                     // Maybe we will apply contentScale manually on all platforms?)
 
+                    // see also comment for HardwareLayer.checkContentScale
+
                     // return linuxGetDpiScaleNative(component)
                 }
 
