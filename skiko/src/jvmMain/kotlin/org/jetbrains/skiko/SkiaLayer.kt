@@ -187,8 +187,8 @@ open class SkiaLayer : HardwareLayer() {
     private fun initSurface() {
         skijaState.apply {
             surface = Surface.makeFromBackendRenderTarget(
-                context,
-                renderTarget,
+                context!!,
+                renderTarget!!,
                 SurfaceOrigin.BOTTOM_LEFT,
                 SurfaceColorFormat.RGBA_8888,
                 ColorSpace.getSRGB()
