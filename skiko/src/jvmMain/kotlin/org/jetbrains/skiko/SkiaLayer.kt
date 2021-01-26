@@ -102,12 +102,13 @@ open class SkiaLayer : HardwareLayer() {
 
         renderer?.onRender(canvas, pictureWidth, pictureHeight, nanoTime)
 
-        check(!isDisposed)
-
-        synchronized(pictureLock) {
-            picture?.instance?.close()
-            val picture = pictureRecorder.finishRecordingAsPicture()
-            this.picture = PictureHolder(picture, pictureWidth, pictureHeight)
+        // we can dispose layer during onRender
+        if (!isDisposed) {
+            synchronized(pictureLock) {
+                picture?.instance?.close()
+                val picture = pictureRecorder.finishRecordingAsPicture()
+                this.picture = PictureHolder(picture, pictureWidth, pictureHeight)
+            }
         }
     }
 
