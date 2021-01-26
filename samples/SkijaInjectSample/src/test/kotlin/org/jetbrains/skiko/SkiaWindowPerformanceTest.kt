@@ -4,6 +4,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.swing.Swing
 import org.jetbrains.skija.*
 import org.junit.Test
+import java.awt.Point
 import java.awt.event.WindowEvent
 import java.util.*
 import javax.swing.JFrame
@@ -69,7 +70,6 @@ native crash in SkiaWindowTest "render single window"
             }
 
             init {
-                setLocation(200,200)
                 setSize(width, height)
                 defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
                 layer.renderer = object : SkiaRenderer {
@@ -132,8 +132,10 @@ native crash in SkiaWindowTest "render single window"
             }
         }
 
-        val windows = (1..3).map {
-            TestWindow(width = 40, height = 20, frameCount = 300, deviatedTerminalCount = 10)
+        val windows = (1..3).map { index ->
+            TestWindow(width = 40, height = 20, frameCount = 300, deviatedTerminalCount = 10).apply {
+                location = Point((index + 1) * 200, 200)
+            }
         }
         delay(1000)
         windows.forEach(TestWindow::startCollect)
