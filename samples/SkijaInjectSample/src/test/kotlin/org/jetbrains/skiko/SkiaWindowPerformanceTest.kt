@@ -138,10 +138,13 @@ native crash in SkiaWindowTest "render single window"
             }
         }
         delay(1000)
-        windows.forEach(TestWindow::startCollect)
-        awaitFrameCollection(windows)
-        windows.forEach(TestWindow::printInfo)
-        windows.forEach(TestWindow::close)
+        try {
+            windows.forEach(TestWindow::startCollect)
+            awaitFrameCollection(windows)
+            windows.forEach(TestWindow::printInfo)
+        } finally {
+            windows.forEach(TestWindow::close)
+        }
     }
 
     // TODO fix native crash on macOs in previous test if this test is performed before it
