@@ -2,21 +2,9 @@ package org.jetbrains.skiko
 
 import org.jetbrains.skija.*
 import org.jetbrains.skiko.redrawer.Redrawer
+import org.jetbrains.skiko.context.createContextHandler
 import java.awt.Graphics
 import javax.swing.SwingUtilities.isEventDispatchThread
-
-private class SkijaState {
-    val bleachConstant = if (hostOs == OS.MacOS) 0 else -1
-    var context: DirectContext? = null
-    var renderTarget: BackendRenderTarget? = null
-    var surface: Surface? = null
-    var canvas: Canvas? = null
-
-    fun clear() {
-        surface?.close()
-        renderTarget?.close()
-    }
-}
 
 interface SkiaRenderer {
     suspend fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long)
@@ -25,12 +13,10 @@ interface SkiaRenderer {
 private class PictureHolder(val instance: Picture, val width: Int, val height: Int)
 
 open class SkiaLayer : HardwareLayer() {
-    open val api: GraphicsApi = GraphicsApi.OPENGL
-
     var renderer: SkiaRenderer? = null
     val clipComponents = mutableListOf<ClipRectangle>()
 
-    private val skijaState = SkijaState()
+    private val skijaState = createContextHandler(this)
 
     @Volatile
     private var isDisposed = false
@@ -114,26 +100,17 @@ open class SkiaLayer : HardwareLayer() {
 
     override fun draw() {
         check(!isDisposed)
-
-        if (skijaState.context == null) {
-            skijaState.context = when (api) {
-                GraphicsApi.OPENGL -> makeGLContext()
-                GraphicsApi.METAL -> makeMetalContext()
-                else -> TODO("Unsupported yet")
-            }
-        }
-
-        initSkija()
-
         skijaState.apply {
-            canvas!!.clear(bleachConstant)
+            initContext()
+            initCanvas()
+            clearCanvas()
             synchronized(pictureLock) {
                 val picture = picture
                 if (picture != null) {
-                    canvas!!.drawPicture(picture.instance)
+                    drawOnCanvas(picture.instance)
                 }
             }
-            context!!.flush()
+            flush()
         }
     }
 
@@ -149,52 +126,5 @@ open class SkiaLayer : HardwareLayer() {
             ClipMode.DIFFERENCE,
             true
         )
-    }
-
-    private fun initSkija() {
-        initRenderTarget()
-        initSurface()
-    }
-
-    private fun initRenderTarget() {
-        skijaState.apply {
-            clear()
-            val dpi = contentScale
-            val width = (width * dpi).toInt().coerceAtLeast(0)
-            val height = (height * dpi).toInt().coerceAtLeast(0)
-            renderTarget = when (api) {
-                GraphicsApi.OPENGL -> {
-                    val gl = OpenGLApi.instance
-                    val fbId = gl.glGetIntegerv(gl.GL_DRAW_FRAMEBUFFER_BINDING)
-                    makeGLRenderTarget(
-                        width,
-                        height,
-                        0,
-                        8,
-                        fbId,
-                        FramebufferFormat.GR_GL_RGBA8
-                    )
-                }
-                GraphicsApi.METAL -> makeMetalRenderTarget(
-                    width,
-                    height,
-                    0
-                )
-                else -> TODO("Unsupported yet")
-            }
-        }
-    }
-
-    private fun initSurface() {
-        skijaState.apply {
-            surface = Surface.makeFromBackendRenderTarget(
-                context!!,
-                renderTarget!!,
-                SurfaceOrigin.BOTTOM_LEFT,
-                SurfaceColorFormat.RGBA_8888,
-                ColorSpace.getSRGB()
-            )
-            canvas = surface!!.canvas
-        }
     }
 }

@@ -1,5 +1,5 @@
 package org.jetbrains.skiko
 
 enum class GraphicsApi {
-    UNKNOWN, OPENGL, VULKAN, METAL
+    UNKNOWN, RASTER, OPENGL, D3D, VULKAN, METAL
 }

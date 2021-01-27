@@ -1,7 +1,10 @@
 package org.jetbrains.skiko
 
+import org.jetbrains.skiko.GraphicsApi
+import org.jetbrains.skiko.context.renderApi
 import org.jetbrains.skiko.redrawer.LinuxRedrawer
 import org.jetbrains.skiko.redrawer.MacOsRedrawer
+import org.jetbrains.skiko.redrawer.RasterRedrawer
 import org.jetbrains.skiko.redrawer.Redrawer
 import org.jetbrains.skiko.redrawer.WindowsRedrawer
 import java.awt.Component
@@ -30,7 +33,10 @@ internal val platformOperations: PlatformOperations by lazy {
                     return component.graphicsConfiguration.defaultTransform.scaleX.toFloat()
                 }
 
-                override fun createHardwareRedrawer(layer: HardwareLayer) = MacOsRedrawer(layer)
+                override fun createHardwareRedrawer(layer: HardwareLayer) = when(renderApi) {
+                    GraphicsApi.RASTER -> RasterRedrawer(layer)
+                    else -> MacOsRedrawer(layer)
+                }
         }
         OS.Windows -> {
             object: PlatformOperations {
@@ -50,7 +56,10 @@ internal val platformOperations: PlatformOperations by lazy {
                     return component.graphicsConfiguration.defaultTransform.scaleX.toFloat()
                 }
 
-                override fun createHardwareRedrawer(layer: HardwareLayer) = WindowsRedrawer(layer)
+                override fun createHardwareRedrawer(layer: HardwareLayer) = when(renderApi) {
+                    GraphicsApi.RASTER -> RasterRedrawer(layer)
+                    else -> WindowsRedrawer(layer)
+                }
             }
         }
         OS.Linux -> {
@@ -83,7 +92,10 @@ internal val platformOperations: PlatformOperations by lazy {
                     // return linuxGetDpiScaleNative(component)
                 }
 
-                override fun createHardwareRedrawer(layer: HardwareLayer) = LinuxRedrawer(layer)
+                override fun createHardwareRedrawer(layer: HardwareLayer) = when(renderApi) {
+                    GraphicsApi.RASTER -> RasterRedrawer(layer)
+                    else -> LinuxRedrawer(layer)
+                }
             }
         }
     }
