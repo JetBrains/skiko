@@ -2,7 +2,9 @@ package org.jetbrains.skiko
 
 import org.jetbrains.skija.*
 import org.jetbrains.skiko.redrawer.Redrawer
+import org.jetbrains.skiko.redrawer.RasterRedrawer
 import org.jetbrains.skiko.context.createContextHandler
+import org.jetbrains.skiko.context.RasterContextHandler
 import java.awt.Graphics
 import javax.swing.SwingUtilities.isEventDispatchThread
 
@@ -16,7 +18,7 @@ open class SkiaLayer : HardwareLayer() {
     var renderer: SkiaRenderer? = null
     val clipComponents = mutableListOf<ClipRectangle>()
 
-    private val skijaState = createContextHandler(this)
+    internal var skijaState = createContextHandler(this)
 
     @Volatile
     private var isDisposed = false
@@ -101,7 +103,10 @@ open class SkiaLayer : HardwareLayer() {
     override fun draw() {
         check(!isDisposed)
         skijaState.apply {
-            initContext()
+            if (!initContext()) {
+                fallbackToRaster()
+                return
+            }
             initCanvas()
             clearCanvas()
             synchronized(pictureLock) {
@@ -126,5 +131,12 @@ open class SkiaLayer : HardwareLayer() {
             ClipMode.DIFFERENCE,
             true
         )
+    }
+
+    private fun fallbackToRaster() {
+        println("Falling back to software rendering...")
+        skijaState = RasterContextHandler(this)
+        redrawer = RasterRedrawer(this)
+        needRedraw()
     }
 }

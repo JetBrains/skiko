@@ -10,10 +10,16 @@ import org.jetbrains.skiko.makeMetalContext
 import org.jetbrains.skiko.makeMetalRenderTarget
 
 internal class MetalContextHandler(layer: HardwareLayer) : ContextHandler(layer) {
-    override fun initContext() {
-        if (context == null) {
-            context = makeMetalContext()
+    override fun initContext(): Boolean {
+        try {
+            if (context == null) {
+                context = makeMetalContext()
+            }
+        } catch (e: Exception) {
+            println("Failed to create Skia Metal context!")
+            return false
         }
+        return true
     }
 
     override fun initCanvas() {

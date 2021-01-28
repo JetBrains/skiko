@@ -12,10 +12,16 @@ import org.jetbrains.skiko.makeGLRenderTarget
 import org.jetbrains.skiko.OpenGLApi
 
 internal class OpenGLContextHandler(layer: HardwareLayer) : ContextHandler(layer) {
-    override fun initContext() {
-        if (context == null) {
-            context = makeGLContext()
+    override fun initContext(): Boolean {
+        try {
+            if (context == null) {
+                context = makeGLContext()
+            }
+        } catch (e: Exception) {
+            println("Failed to create Skia OpenGL context!")
+            return false
         }
+        return true
     }
 
     override fun initCanvas() {

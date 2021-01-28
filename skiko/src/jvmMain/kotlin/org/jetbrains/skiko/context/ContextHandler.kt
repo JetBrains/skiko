@@ -46,7 +46,7 @@ internal abstract class ContextHandler(val layer: HardwareLayer) {
     var surface: Surface? = null
     var canvas: Canvas? = null
 
-    abstract fun initContext()
+    abstract fun initContext(): Boolean
 
     abstract fun initCanvas()
 

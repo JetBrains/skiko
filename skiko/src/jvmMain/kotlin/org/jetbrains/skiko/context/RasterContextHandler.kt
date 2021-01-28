@@ -33,8 +33,9 @@ internal class RasterContextHandler(layer: HardwareLayer) : ContextHandler(layer
     var imageData: ByteArray? = null
     var raster: WritableRaster? = null
 
-    override fun initContext() {
+    override fun initContext(): Boolean {
         // Raster does not need context
+        return true
     }
 
     override fun initCanvas() {
