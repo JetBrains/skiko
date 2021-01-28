@@ -2,6 +2,8 @@ package org.jetbrains.skiko
 
 @Suppress("SameParameterValue")
 internal object SkikoProperties {
+    val vsyncEnabled: Boolean by property("skiko.vsync.enabled", default = true)
+
     val fpsEnabled: Boolean by property("skiko.fps.enabled", default = false)
     val fpsCount: Int by property("skiko.fps.count", default = 300)
     val fpsProbability: Double by property("skiko.fps.probability", default = 0.97)

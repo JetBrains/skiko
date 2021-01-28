@@ -8,6 +8,7 @@ import kotlinx.coroutines.withContext
 import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.HardwareLayer
 import org.jetbrains.skiko.OpenGLApi
+import org.jetbrains.skiko.SkikoProperties
 
 internal class WindowsRedrawer(
     private val layer: HardwareLayer
@@ -86,8 +87,10 @@ internal class WindowsRedrawer(
                 OpenGLApi.instance.glFinish()
             }
 
-            withContext(Dispatchers.IO) {
-                dwmFlush() // wait for vsync
+            if (SkikoProperties.vsyncEnabled) {
+                withContext(Dispatchers.IO) {
+                    dwmFlush() // wait for vsync
+                }
             }
         }
     }
