@@ -24,8 +24,6 @@ private fun parseRenderApi(text: String?): GraphicsApi {
     when(text) {
         "RASTER" -> return GraphicsApi.RASTER
         "OPENGL" -> return GraphicsApi.OPENGL
-        "VULKAN" -> return GraphicsApi.VULKAN
-        "METAL" -> return GraphicsApi.METAL
         else -> return GraphicsApi.OPENGL
     }
 }
@@ -34,7 +32,6 @@ internal fun createContextHandler(layer: HardwareLayer): ContextHandler {
     return when (renderApi) {
         GraphicsApi.RASTER -> RasterContextHandler(layer)
         GraphicsApi.OPENGL -> OpenGLContextHandler(layer)
-        GraphicsApi.METAL -> MetalContextHandler(layer)
         else -> TODO("Unsupported yet")
     }
 }

@@ -31,7 +31,7 @@ open class SkiaLayer : HardwareLayer() {
 
     override fun init() {
         super.init()
-        redrawer = platformOperations.createHardwareRedrawer(this)
+        redrawer = platformOperations.createRedrawer(this)
         redrawer?.syncSize()
         needRedraw()
     }
@@ -135,6 +135,7 @@ open class SkiaLayer : HardwareLayer() {
 
     private fun fallbackToRaster() {
         println("Falling back to software rendering...")
+        redrawer?.dispose()
         skijaState = RasterContextHandler(this)
         redrawer = RasterRedrawer(this)
         needRedraw()

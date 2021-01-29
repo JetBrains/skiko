@@ -33,7 +33,7 @@ open class SkiaPanel: JLayeredPane {
     }
 
      override fun removeNotify() {
-        super.removeNotify()
         layer.dispose()
+        super.removeNotify()
      }
 }

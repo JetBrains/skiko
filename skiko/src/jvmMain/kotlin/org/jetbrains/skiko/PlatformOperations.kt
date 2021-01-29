@@ -15,7 +15,7 @@ internal interface PlatformOperations {
     fun isFullscreen(component: Component): Boolean
     fun setFullscreen(component: Component, value: Boolean)
     fun getDpiScale(component: Component): Float
-    fun createHardwareRedrawer(layer: HardwareLayer): Redrawer
+    fun createRedrawer(layer: HardwareLayer): Redrawer
 }
 
 internal val platformOperations: PlatformOperations by lazy {
@@ -33,7 +33,7 @@ internal val platformOperations: PlatformOperations by lazy {
                     return component.graphicsConfiguration.defaultTransform.scaleX.toFloat()
                 }
 
-                override fun createHardwareRedrawer(layer: HardwareLayer) = when(renderApi) {
+                override fun createRedrawer(layer: HardwareLayer) = when(renderApi) {
                     GraphicsApi.RASTER -> RasterRedrawer(layer)
                     else -> MacOsRedrawer(layer)
                 }
@@ -56,7 +56,7 @@ internal val platformOperations: PlatformOperations by lazy {
                     return component.graphicsConfiguration.defaultTransform.scaleX.toFloat()
                 }
 
-                override fun createHardwareRedrawer(layer: HardwareLayer) = when(renderApi) {
+                override fun createRedrawer(layer: HardwareLayer) = when(renderApi) {
                     GraphicsApi.RASTER -> RasterRedrawer(layer)
                     else -> WindowsRedrawer(layer)
                 }
@@ -92,7 +92,7 @@ internal val platformOperations: PlatformOperations by lazy {
                     // return linuxGetDpiScaleNative(component)
                 }
 
-                override fun createHardwareRedrawer(layer: HardwareLayer) = when(renderApi) {
+                override fun createRedrawer(layer: HardwareLayer) = when(renderApi) {
                     GraphicsApi.RASTER -> RasterRedrawer(layer)
                     else -> LinuxRedrawer(layer)
                 }
