@@ -77,15 +77,15 @@ open class SkiaLayer : HardwareLayer() {
     }
 
     private val fpsCounter = FPSCounter(
-        count = System.getProperty("skiko.fps.count")?.toInt() ?: 500,
-        probability = System.getProperty("skiko.fps.probability")?.toDouble() ?: 0.97
+        count = SkikoProperties.fpsCount,
+        probability = SkikoProperties.fpsProbability
     )
 
     override suspend fun update(nanoTime: Long) {
         check(!isDisposed)
         check(isEventDispatchThread())
 
-        if (System.getProperty("skiko.fps.enabled") == "true") {
+        if (SkikoProperties.fpsEnabled) {
             fpsCounter.tick()
         }
 

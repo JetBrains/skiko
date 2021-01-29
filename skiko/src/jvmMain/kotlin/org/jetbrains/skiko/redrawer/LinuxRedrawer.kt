@@ -8,6 +8,7 @@ import kotlinx.coroutines.withContext
 import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.HardwareLayer
 import org.jetbrains.skiko.OpenGLApi
+import org.jetbrains.skiko.SkikoProperties
 
 internal class LinuxRedrawer(
     private val layer: HardwareLayer
@@ -15,7 +16,7 @@ internal class LinuxRedrawer(
     private val context = layer.lockDrawingSurface {
         val context = it.createContext()
         it.makeCurrent(context)
-        it.setSwapInterval(1)
+        it.setSwapInterval(if (SkikoProperties.vsyncEnabled) 1 else 0)
         context
     }
     private var isDisposed = false

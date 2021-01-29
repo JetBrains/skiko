@@ -1,8 +1,8 @@
 package org.jetbrains.skiko
 
 import java.io.BufferedReader
-import java.io.InputStreamReader
 import java.io.File
+import java.io.InputStreamReader
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 
@@ -52,6 +52,7 @@ object Library {
             loadOrGet(cacheDir, resourcePath, "icudtl.dat", false)
         }
 
+        // TODO move properties to SkikoProperties
         Setup.init(
             System.getProperty("skiko.rendering.noerasebackground") != "false",
             System.getProperty("skiko.rendering.laf.global") == "true",

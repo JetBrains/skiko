@@ -6,6 +6,7 @@ import kotlinx.coroutines.swing.Swing
 import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.HardwareLayer
 import org.jetbrains.skiko.OpenGLApi
+import org.jetbrains.skiko.SkikoProperties
 import javax.swing.SwingUtilities.convertPoint
 import javax.swing.SwingUtilities.getRootPane
 
@@ -76,7 +77,9 @@ internal class MacOsRedrawer(
     private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
         layer.update(System.nanoTime())
         drawLayer.setNeedsDisplay()
-        vsyncLayer.sync()
+        if (SkikoProperties.vsyncEnabled) {
+            vsyncLayer.sync()
+        }
     }
 
     override fun dispose() = synchronized(drawLock) {
