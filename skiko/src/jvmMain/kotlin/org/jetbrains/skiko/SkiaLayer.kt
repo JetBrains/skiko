@@ -1,10 +1,14 @@
 package org.jetbrains.skiko
 
-import org.jetbrains.skija.*
-import org.jetbrains.skiko.redrawer.Redrawer
-import org.jetbrains.skiko.redrawer.RasterRedrawer
-import org.jetbrains.skiko.context.createContextHandler
+import org.jetbrains.skija.Canvas
+import org.jetbrains.skija.ClipMode
+import org.jetbrains.skija.Picture
+import org.jetbrains.skija.PictureRecorder
+import org.jetbrains.skija.Rect
 import org.jetbrains.skiko.context.SoftwareContextHandler
+import org.jetbrains.skiko.context.createContextHandler
+import org.jetbrains.skiko.redrawer.RasterRedrawer
+import org.jetbrains.skiko.redrawer.Redrawer
 import java.awt.Graphics
 import javax.swing.SwingUtilities.isEventDispatchThread
 
@@ -64,18 +68,14 @@ open class SkiaLayer : HardwareLayer() {
         redrawer?.needRedraw()
     }
 
-    private val fpsCounter = FPSCounter(
-        count = SkikoProperties.fpsCount,
-        probability = SkikoProperties.fpsProbability
-    )
+    @Suppress("LeakingThis")
+    private val fpsCounter = defaultFPSCounter(this)
 
     override fun update(nanoTime: Long) {
         check(!isDisposed)
         check(isEventDispatchThread())
 
-        if (SkikoProperties.fpsEnabled) {
-            fpsCounter.tick()
-        }
+        fpsCounter?.tick()
 
         val pictureWidth = (width * contentScale).toInt().coerceAtLeast(0)
         val pictureHeight = (height * contentScale).toInt().coerceAtLeast(0)
