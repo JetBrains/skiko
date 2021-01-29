@@ -62,7 +62,7 @@ abstract class HardwareLayer : Canvas() {
     }
 
     // Should be called in Swing thread
-    internal abstract suspend fun update(nanoTime: Long)
+    internal abstract fun update(nanoTime: Long)
 
     // Should be called in the OpenGL thread, and only once after update
     internal abstract fun draw()

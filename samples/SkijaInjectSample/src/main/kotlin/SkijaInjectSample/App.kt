@@ -89,7 +89,7 @@ class Renderer(
 
     var canvas: Canvas? = null
 
-    override suspend fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+    override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
         this.canvas = canvas
         val contentScale = layer.contentScale
         canvas.scale(contentScale, contentScale)

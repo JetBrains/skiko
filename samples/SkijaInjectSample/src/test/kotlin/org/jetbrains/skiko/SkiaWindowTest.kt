@@ -138,7 +138,7 @@ class SkiaWindowTest {
             window.setSize(40, 20)
             window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
             window.layer.renderer = object : SkiaRenderer {
-                override suspend fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+                override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
                     renderCount++
                 }
             }
@@ -231,7 +231,7 @@ class SkiaWindowTest {
             val paragraph by lazy { paragraph(window.layer.contentScale * 40, "=-+Нп") }
 
             window.layer.renderer = object : SkiaRenderer {
-                override suspend fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+                override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
                     paragraph.layout(Float.POSITIVE_INFINITY)
                     paragraph.paint(canvas, 0f, 0f)
                 }
@@ -259,7 +259,7 @@ class SkiaWindowTest {
         var rectHeight: Int,
         private val rectColor: Color
     ) : SkiaRenderer {
-        override suspend fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+        override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
             val dpi = layer.contentScale
             canvas.drawRect(Rect(0f, 0f, width.toFloat(), height.toFloat()), Paint().apply {
                 color = Color.WHITE.rgb
@@ -278,7 +278,7 @@ class SkiaWindowTest {
         private var oldNanoTime = Long.MAX_VALUE
         private var x = 0.0
 
-        override suspend fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+        override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
             canvas.clear(Color.WHITE.rgb)
 
             val dt = (nanoTime - oldNanoTime).coerceAtLeast(0) / 1E9
