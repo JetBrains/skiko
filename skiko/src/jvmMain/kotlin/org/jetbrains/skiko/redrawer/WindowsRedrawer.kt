@@ -37,6 +37,15 @@ internal class WindowsRedrawer(
         frameDispatcher.scheduleFrame()
     }
 
+    override fun redrawImmediately() {
+        check(!isDisposed)
+        update(System.nanoTime())
+        makeCurrent()
+        draw()
+        swapBuffers()
+        OpenGLApi.instance.glFinish()
+    }
+
     private fun update(nanoTime: Long) {
         layer.update(nanoTime)
     }

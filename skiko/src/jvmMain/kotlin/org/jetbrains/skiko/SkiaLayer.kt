@@ -33,7 +33,7 @@ open class SkiaLayer : HardwareLayer() {
         super.init()
         redrawer = platformOperations.createRedrawer(this)
         redrawer?.syncSize()
-        needRedraw()
+        redrawer?.redrawImmediately()
     }
 
     override fun dispose() {
@@ -49,7 +49,7 @@ open class SkiaLayer : HardwareLayer() {
     override fun setBounds(x: Int, y: Int, width: Int, height: Int) {
         super.setBounds(x, y, width, height)
         redrawer?.syncSize()
-        needRedraw()
+        redrawer?.redrawImmediately()
     }
 
     override fun paint(g: Graphics) {

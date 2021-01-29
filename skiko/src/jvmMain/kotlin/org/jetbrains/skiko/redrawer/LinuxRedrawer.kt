@@ -12,10 +12,7 @@ internal class LinuxRedrawer(
     private val layer: HardwareLayer
 ) : Redrawer {
     private val context = layer.lockDrawingSurface {
-        val context = it.createContext()
-        it.makeCurrent(context)
-        it.setSwapInterval(if (SkikoProperties.vsyncEnabled) 1 else 0)
-        context
+        it.createContext()
     }
     private var isDisposed = false
 
@@ -31,6 +28,16 @@ internal class LinuxRedrawer(
         check(!isDisposed)
         toRedraw.add(this)
         frameDispatcher.scheduleFrame()
+    }
+
+    override fun redrawImmediately() = layer.lockDrawingSurface {
+        check(!isDisposed)
+        update(System.nanoTime())
+        it.makeCurrent(context)
+        draw()
+        it.setSwapInterval(0)
+        it.swapBuffers()
+        OpenGLApi.instance.glFinish()
     }
 
     private fun update(nanoTime: Long) {
@@ -69,6 +76,8 @@ internal class LinuxRedrawer(
                 }
 
                 toRedrawAlive.forEachIndexed { index, _ ->
+                    // it is ok to set swap interval every frame, there is no performance overhead
+                    drawingSurfaces[index].setSwapInterval(if (SkikoProperties.vsyncEnabled) 1 else 0)
                     drawingSurfaces[index].swapBuffers()
                 }
 

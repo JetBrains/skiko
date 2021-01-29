@@ -104,6 +104,11 @@ internal class MacOsRedrawer(
     override fun needRedraw() {
         frameDispatcher.scheduleFrame()
     }
+
+    override fun redrawImmediately() {
+        layer.update(System.nanoTime())
+        drawLayer.setNeedsDisplay()
+    }
 }
 
 private open class AWTGLLayer(private val containerPtr: Long, setNeedsDisplayOnBoundsChange: Boolean) {
