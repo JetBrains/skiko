@@ -2,7 +2,6 @@ package org.jetbrains.skiko.redrawer
 
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
 import org.jetbrains.skiko.FrameDispatcher
@@ -10,13 +9,12 @@ import org.jetbrains.skiko.HardwareLayer
 import org.jetbrains.skiko.OpenGLApi
 import org.jetbrains.skiko.SkikoProperties
 
-internal class WindowsRedrawer(
+internal class WindowsOpenGLRedrawer(
     private val layer: HardwareLayer
 ) : Redrawer {
     private val device = getDevice(layer)
     private val context = createContext(device)
     private var isDisposed = false
-    private val job = Job()
 
     init {
         makeCurrent()
@@ -31,7 +29,6 @@ internal class WindowsRedrawer(
         check(!isDisposed)
         deleteContext(context)
         isDisposed = true
-        job.cancel()
     }
 
     override fun needRedraw() {
@@ -40,10 +37,17 @@ internal class WindowsRedrawer(
         frameDispatcher.scheduleFrame()
     }
 
-    private suspend fun update(nanoTime: Long) {
-        withContext(job) {
-            layer.update(nanoTime)
-        }
+    override fun redrawImmediately() {
+        check(!isDisposed)
+        update(System.nanoTime())
+        makeCurrent()
+        draw()
+        swapBuffers()
+        OpenGLApi.instance.glFinish()
+    }
+
+    private fun update(nanoTime: Long) {
+        layer.update(nanoTime)
     }
 
     private fun draw() {
@@ -54,9 +58,9 @@ internal class WindowsRedrawer(
     private fun swapBuffers() = swapBuffers(device)
 
     companion object {
-        private val toRedraw = mutableSetOf<WindowsRedrawer>()
-        private val toRedrawCopy = mutableSetOf<WindowsRedrawer>()
-        private val toRedrawAlive = toRedrawCopy.asSequence().filterNot(WindowsRedrawer::isDisposed)
+        private val toRedraw = mutableSetOf<WindowsOpenGLRedrawer>()
+        private val toRedrawCopy = mutableSetOf<WindowsOpenGLRedrawer>()
+        private val toRedrawAlive = toRedrawCopy.asSequence().filterNot(WindowsOpenGLRedrawer::isDisposed)
 
         private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
             toRedrawCopy.clear()

@@ -7,29 +7,12 @@ import org.jetbrains.skija.Picture
 import org.jetbrains.skija.Surface
 import org.jetbrains.skiko.GraphicsApi
 import org.jetbrains.skiko.HardwareLayer
-import org.jetbrains.skiko.hostOs
 import org.jetbrains.skiko.OS
-
-internal val renderApi: GraphicsApi by lazy {
-    val environment = System.getenv("SKIKO_RENDER_API")
-    val property = System.getProperty("skiko.renderApi")
-    if (environment != null) {
-        parseRenderApi(environment)
-    } else {
-        parseRenderApi(property)
-    }
-}
-
-private fun parseRenderApi(text: String?): GraphicsApi {
-    when(text) {
-        "SOFTWARE" -> return GraphicsApi.SOFTWARE
-        "OPENGL" -> return GraphicsApi.OPENGL
-        else -> return GraphicsApi.OPENGL
-    }
-}
+import org.jetbrains.skiko.SkikoProperties
+import org.jetbrains.skiko.hostOs
 
 internal fun createContextHandler(layer: HardwareLayer): ContextHandler {
-    return when (renderApi) {
+    return when (SkikoProperties.renderApi) {
         GraphicsApi.SOFTWARE -> SoftwareContextHandler(layer)
         GraphicsApi.OPENGL -> OpenGLContextHandler(layer)
         else -> TODO("Unsupported yet")

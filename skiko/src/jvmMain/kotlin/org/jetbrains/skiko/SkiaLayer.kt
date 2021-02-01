@@ -9,7 +9,7 @@ import java.awt.Graphics
 import javax.swing.SwingUtilities.isEventDispatchThread
 
 interface SkiaRenderer {
-    suspend fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long)
+    fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long)
 }
 
 private class PictureHolder(val instance: Picture, val width: Int, val height: Int)
@@ -33,7 +33,7 @@ open class SkiaLayer : HardwareLayer() {
         super.init()
         redrawer = platformOperations.createRedrawer(this)
         redrawer?.syncSize()
-        needRedraw()
+        redrawer?.redrawImmediately()
     }
 
     override fun dispose() {
@@ -49,7 +49,7 @@ open class SkiaLayer : HardwareLayer() {
     override fun setBounds(x: Int, y: Int, width: Int, height: Int) {
         super.setBounds(x, y, width, height)
         redrawer?.syncSize()
-        needRedraw()
+        redrawer?.redrawImmediately()
     }
 
     override fun paint(g: Graphics) {
@@ -69,7 +69,7 @@ open class SkiaLayer : HardwareLayer() {
         probability = SkikoProperties.fpsProbability
     )
 
-    override suspend fun update(nanoTime: Long) {
+    override fun update(nanoTime: Long) {
         check(!isDisposed)
         check(isEventDispatchThread())
 

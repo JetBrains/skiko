@@ -73,7 +73,7 @@ native crash in SkiaWindowTest "render single window"
                 setSize(width, height)
                 defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
                 layer.renderer = object : SkiaRenderer {
-                    override suspend fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+                    override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
                         if (canCollect && frameTimes.size < frameCount) {
                             frameTimes.add(System.nanoTime()) // we check the real time, not the time provided by the argument
                         }
@@ -183,7 +183,7 @@ j  org.jetbrains.skiko.redrawer.MacOsRedrawer$drawLayer$1.draw()V+7
             var t1 = Long.MAX_VALUE
             val refreshRate = window.graphicsConfiguration.device.displayMode.refreshRate
 
-            override suspend fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+            override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
                 val t2 = System.nanoTime()
                 val frameTime = (t2 - t1).coerceAtLeast(0)
                 t1 = t2

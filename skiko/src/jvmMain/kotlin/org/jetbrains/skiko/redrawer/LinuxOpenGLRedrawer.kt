@@ -2,25 +2,19 @@ package org.jetbrains.skiko.redrawer
 
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.swing.Swing
-import kotlinx.coroutines.withContext
 import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.HardwareLayer
 import org.jetbrains.skiko.OpenGLApi
 import org.jetbrains.skiko.SkikoProperties
 
-internal class LinuxRedrawer(
+internal class LinuxOpenGLRedrawer(
     private val layer: HardwareLayer
 ) : Redrawer {
     private val context = layer.lockDrawingSurface {
-        val context = it.createContext()
-        it.makeCurrent(context)
-        it.setSwapInterval(if (SkikoProperties.vsyncEnabled) 1 else 0)
-        context
+        it.createContext()
     }
     private var isDisposed = false
-    private val job = Job()
 
     override fun dispose() {
         check(!isDisposed)
@@ -28,7 +22,6 @@ internal class LinuxRedrawer(
             it.destroyContext(context)
         }
         isDisposed = true
-        job.cancel()
     }
 
     override fun needRedraw() {
@@ -37,10 +30,18 @@ internal class LinuxRedrawer(
         frameDispatcher.scheduleFrame()
     }
 
-    private suspend fun update(nanoTime: Long) {
-        withContext(job) {
-            layer.update(nanoTime)
-        }
+    override fun redrawImmediately() = layer.lockDrawingSurface {
+        check(!isDisposed)
+        update(System.nanoTime())
+        it.makeCurrent(context)
+        draw()
+        it.setSwapInterval(0)
+        it.swapBuffers()
+        OpenGLApi.instance.glFinish()
+    }
+
+    private fun update(nanoTime: Long) {
+        layer.update(nanoTime)
     }
 
     private fun draw() {
@@ -48,9 +49,9 @@ internal class LinuxRedrawer(
     }
 
     companion object {
-        private val toRedraw = mutableSetOf<LinuxRedrawer>()
-        private val toRedrawCopy = mutableSetOf<LinuxRedrawer>()
-        private val toRedrawAlive = toRedrawCopy.asSequence().filterNot(LinuxRedrawer::isDisposed)
+        private val toRedraw = mutableSetOf<LinuxOpenGLRedrawer>()
+        private val toRedrawCopy = mutableSetOf<LinuxOpenGLRedrawer>()
+        private val toRedrawAlive = toRedrawCopy.asSequence().filterNot(LinuxOpenGLRedrawer::isDisposed)
 
         private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
             toRedrawCopy.clear()
@@ -75,6 +76,8 @@ internal class LinuxRedrawer(
                 }
 
                 toRedrawAlive.forEachIndexed { index, _ ->
+                    // it is ok to set swap interval every frame, there is no performance overhead
+                    drawingSurfaces[index].setSwapInterval(if (SkikoProperties.vsyncEnabled) 1 else 0)
                     drawingSurfaces[index].swapBuffers()
                 }
 

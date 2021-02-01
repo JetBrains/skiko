@@ -69,7 +69,7 @@ JavaVM *jvm = NULL;
 
 @end
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MacOsRedrawerKt_initContainer(JNIEnv *env, jobject redrawer, jobject layer)
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MacOsOpenGLRedrawerKt_initContainer(JNIEnv *env, jobject redrawer, jobject layer)
 {
     JAWT awt;
     awt.version = JAWT_VERSION_9;
@@ -101,14 +101,14 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MacOsRedrawerKt_initCo
     return (jlong) container;
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MacOsRedrawerKt_setContentScale(JNIEnv *env, jobject obj, jlong layerPtr, jfloat contentScale)
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MacOsOpenGLRedrawerKt_setContentScale(JNIEnv *env, jobject obj, jlong layerPtr, jfloat contentScale)
 {
     CALayer *layer = (CALayer *) layerPtr;
     assert(contentScale != 0);
     layer.contentsScale = contentScale;
 }
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MacOsRedrawerKt_initAWTGLLayer(JNIEnv *env, jobject obj, jlong containerPtr, jobject layer, jboolean setNeedsDisplayOnBoundsChange)
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MacOsOpenGLRedrawerKt_initAWTGLLayer(JNIEnv *env, jobject obj, jlong containerPtr, jobject layer, jboolean setNeedsDisplayOnBoundsChange)
 {
     CALayer *container = (CALayer *) containerPtr;
 
@@ -120,7 +120,7 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MacOsRedrawerKt_initAW
     return (jlong) glLayer;
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MacOsRedrawerKt_disposeAWTGLLayer(JNIEnv *env, jobject obj, jlong ptr)
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MacOsOpenGLRedrawerKt_disposeAWTGLLayer(JNIEnv *env, jobject obj, jlong ptr)
 {
     AWTGLLayer *glLayer = (AWTGLLayer *) ptr;
     [glLayer removeFromSuperlayer];

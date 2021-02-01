@@ -10,7 +10,7 @@ import org.jetbrains.skiko.SkikoProperties
 import javax.swing.SwingUtilities.convertPoint
 import javax.swing.SwingUtilities.getRootPane
 
-internal class MacOsRedrawer(
+internal class MacOsOpenGLRedrawer(
     private val layer: HardwareLayer
 ) : Redrawer {
     private val containerLayerPtr = initContainer(layer)
@@ -103,6 +103,11 @@ internal class MacOsRedrawer(
 
     override fun needRedraw() {
         frameDispatcher.scheduleFrame()
+    }
+
+    override fun redrawImmediately() {
+        layer.update(System.nanoTime())
+        drawLayer.setNeedsDisplay()
     }
 }
 

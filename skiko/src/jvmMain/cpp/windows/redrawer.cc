@@ -8,7 +8,7 @@ extern "C" jboolean Skiko_GetAWT(JNIEnv *env, JAWT *awt);
 
 extern "C"
 {
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_WindowsRedrawerKt_getDevice(JNIEnv *env, jobject redrawer, jobject layer)
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt_getDevice(JNIEnv *env, jobject redrawer, jobject layer)
     {
         JAWT awt;
         awt.version = (jint)JAWT_VERSION_9;
@@ -48,7 +48,7 @@ extern "C"
         return static_cast<jlong>(reinterpret_cast<uintptr_t>(device));
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_WindowsRedrawerKt_setSwapInterval(JNIEnv *env, jobject redrawer, jint interval)
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt_setSwapInterval(JNIEnv *env, jobject redrawer, jint interval)
     {
         typedef BOOL (WINAPI *PFNWGLSWAPINTERVALEXTPROC)(int interval);
         // according to [https://opengl.gpuinfo.org/listreports.php?extension=WGL_EXT_swap_control&option=not] (filter by OS=windows)
@@ -60,32 +60,32 @@ extern "C"
         }
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_WindowsRedrawerKt_swapBuffers(JNIEnv *env, jobject redrawer, jlong devicePtr)
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt_swapBuffers(JNIEnv *env, jobject redrawer, jlong devicePtr)
     {
         HDC device = reinterpret_cast<HDC>(static_cast<uintptr_t>(devicePtr));
         SwapBuffers(device);
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_WindowsRedrawerKt_makeCurrent(JNIEnv *env, jobject redrawer, jlong devicePtr, jlong contextPtr)
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt_makeCurrent(JNIEnv *env, jobject redrawer, jlong devicePtr, jlong contextPtr)
     {
         HDC device = reinterpret_cast<HDC>(static_cast<uintptr_t>(devicePtr));
         HGLRC context = reinterpret_cast<HGLRC>(static_cast<uintptr_t>(contextPtr));
         wglMakeCurrent(device, context);
     }
 
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_WindowsRedrawerKt_createContext(JNIEnv *env, jobject redrawer, jlong devicePtr)
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt_createContext(JNIEnv *env, jobject redrawer, jlong devicePtr)
     {
         HDC device = reinterpret_cast<HDC>(static_cast<uintptr_t>(devicePtr));
         return static_cast<jlong>(reinterpret_cast<uintptr_t>(wglCreateContext(device)));
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_WindowsRedrawerKt_deleteContext(JNIEnv *env, jobject redrawer, jlong contextPtr)
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt_deleteContext(JNIEnv *env, jobject redrawer, jlong contextPtr)
     {
         HGLRC context = reinterpret_cast<HGLRC>(static_cast<uintptr_t>(contextPtr));
         wglDeleteContext(context);
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_WindowsRedrawerKt_dwmFlush(JNIEnv *env, jobject redrawer)
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt_dwmFlush(JNIEnv *env, jobject redrawer)
     {
         DwmFlush();
     }

@@ -14,7 +14,7 @@ extern "C" jboolean Skiko_GetAWT(JNIEnv *env, JAWT *awt);
 
 extern "C"
 {
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_LinuxRedrawerKt_lockDrawingSurfaceNative(JNIEnv *env, jobject redrawer, jobject layer)
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_lockDrawingSurfaceNative(JNIEnv *env, jobject redrawer, jobject layer)
     {
         JAWT awt;
         awt.version = (jint)JAWT_VERSION_9;
@@ -30,7 +30,7 @@ extern "C"
         return static_cast<jlong>(reinterpret_cast<uintptr_t>(ds));
     }
 
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_LinuxRedrawerKt_unlockDrawingSurfaceNative(JNIEnv *env, jobject redrawer, jlong drawingSurfacePtr)
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_unlockDrawingSurfaceNative(JNIEnv *env, jobject redrawer, jlong drawingSurfacePtr)
     {
         JAWT_DrawingSurface *ds = reinterpret_cast<JAWT_DrawingSurface *>(static_cast<uintptr_t>(drawingSurfacePtr));
         JAWT awt;
@@ -47,7 +47,7 @@ extern "C"
         return static_cast<jlong>(reinterpret_cast<uintptr_t>(ds));
     }
 
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_LinuxRedrawerKt_getDisplay(JNIEnv *env, jobject redrawer, jlong drawingSurfacePtr)
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_getDisplay(JNIEnv *env, jobject redrawer, jlong drawingSurfacePtr)
     {
         JAWT_DrawingSurface *ds = reinterpret_cast<JAWT_DrawingSurface *>(static_cast<uintptr_t>(drawingSurfacePtr));
         JAWT_DrawingSurfaceInfo *dsi = ds->GetDrawingSurfaceInfo(ds);
@@ -59,7 +59,7 @@ extern "C"
         return static_cast<jlong>(reinterpret_cast<uintptr_t>(display));
     }
 
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_LinuxRedrawerKt_getWindow(JNIEnv *env, jobject redrawer, jlong drawingSurfacePtr)
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_getWindow(JNIEnv *env, jobject redrawer, jlong drawingSurfacePtr)
     {
         JAWT_DrawingSurface *ds = reinterpret_cast<JAWT_DrawingSurface *>(static_cast<uintptr_t>(drawingSurfacePtr));
         JAWT_DrawingSurfaceInfo *dsi = ds->GetDrawingSurfaceInfo(ds);
@@ -71,7 +71,7 @@ extern "C"
         return static_cast<jlong>(reinterpret_cast<uintptr_t>(window));
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_LinuxRedrawerKt_setSwapInterval(JNIEnv *env, jobject redrawer, jlong displayPtr, jlong windowPtr, jint interval)
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_setSwapInterval(JNIEnv *env, jobject redrawer, jlong displayPtr, jlong windowPtr, jint interval)
     {
         Display *display = reinterpret_cast<Display *>(static_cast<uintptr_t>(displayPtr));
         Window window = reinterpret_cast<Window>(static_cast<uintptr_t>(windowPtr));
@@ -104,7 +104,7 @@ extern "C"
         }
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_LinuxRedrawerKt_swapBuffers(JNIEnv *env, jobject redrawer, jlong displayPtr, jlong windowPtr)
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_swapBuffers(JNIEnv *env, jobject redrawer, jlong displayPtr, jlong windowPtr)
     {
         Display *display = reinterpret_cast<Display *>(static_cast<uintptr_t>(displayPtr));
         Window window = reinterpret_cast<Window>(static_cast<uintptr_t>(windowPtr));
@@ -112,7 +112,7 @@ extern "C"
         glXSwapBuffers(display, window);
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_LinuxRedrawerKt_makeCurrent(JNIEnv *env, jobject redrawer, jlong displayPtr, jlong windowPtr, jlong contextPtr)
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_makeCurrent(JNIEnv *env, jobject redrawer, jlong displayPtr, jlong windowPtr, jlong contextPtr)
     {
         Display *display = reinterpret_cast<Display *>(static_cast<uintptr_t>(displayPtr));
         Window window = reinterpret_cast<Window>(static_cast<uintptr_t>(windowPtr));
@@ -121,7 +121,7 @@ extern "C"
         glXMakeCurrent(display, window, *context);
     }
 
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_LinuxRedrawerKt_createContext(JNIEnv *env, jobject redrawer, jlong displayPtr)
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_createContext(JNIEnv *env, jobject redrawer, jlong displayPtr)
     {
         Display *display = reinterpret_cast<Display *>(static_cast<uintptr_t>(displayPtr));
         GLint att[] = {GLX_RGBA, GLX_DOUBLEBUFFER, True, None};
@@ -131,7 +131,7 @@ extern "C"
         return static_cast<jlong>(reinterpret_cast<uintptr_t>(context));
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_LinuxRedrawerKt_destroyContext(JNIEnv *env, jobject redrawer, jlong displayPtr, jlong contextPtr)
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_destroyContext(JNIEnv *env, jobject redrawer, jlong displayPtr, jlong contextPtr)
     {
         Display *display = reinterpret_cast<Display *>(static_cast<uintptr_t>(displayPtr));
         GLXContext *context = reinterpret_cast<GLXContext *>(static_cast<uintptr_t>(contextPtr));
