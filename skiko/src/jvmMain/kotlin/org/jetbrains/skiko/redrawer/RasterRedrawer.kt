@@ -21,4 +21,9 @@ internal class RasterRedrawer(
     override fun needRedraw() {
         frameDispatcher.scheduleFrame()
     }
+
+    override fun redrawImmediately() {
+        layer.update(System.nanoTime())
+        layer.draw()
+    }
 }
