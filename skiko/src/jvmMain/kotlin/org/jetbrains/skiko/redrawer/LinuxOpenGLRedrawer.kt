@@ -8,7 +8,7 @@ import org.jetbrains.skiko.HardwareLayer
 import org.jetbrains.skiko.OpenGLApi
 import org.jetbrains.skiko.SkikoProperties
 
-internal class LinuxRedrawer(
+internal class LinuxOpenGLRedrawer(
     private val layer: HardwareLayer
 ) : Redrawer {
     private val context = layer.lockDrawingSurface {
@@ -49,9 +49,9 @@ internal class LinuxRedrawer(
     }
 
     companion object {
-        private val toRedraw = mutableSetOf<LinuxRedrawer>()
-        private val toRedrawCopy = mutableSetOf<LinuxRedrawer>()
-        private val toRedrawAlive = toRedrawCopy.asSequence().filterNot(LinuxRedrawer::isDisposed)
+        private val toRedraw = mutableSetOf<LinuxOpenGLRedrawer>()
+        private val toRedrawCopy = mutableSetOf<LinuxOpenGLRedrawer>()
+        private val toRedrawAlive = toRedrawCopy.asSequence().filterNot(LinuxOpenGLRedrawer::isDisposed)
 
         private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
             toRedrawCopy.clear()
