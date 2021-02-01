@@ -1,22 +1,20 @@
 package org.jetbrains.skiko.context
 
-import java.awt.AlphaComposite
-import java.awt.color.ColorSpace
-import java.awt.Color
-import java.awt.Graphics2D
-import java.awt.Transparency
-import java.awt.image.ComponentColorModel
-import java.awt.image.BufferedImage
-import java.awt.image.DataBuffer
-import java.awt.image.DataBufferByte
-import java.awt.image.WritableRaster
-import java.awt.image.Raster
 import org.jetbrains.skija.Bitmap
-import org.jetbrains.skija.ColorAlphaType
 import org.jetbrains.skija.Canvas
-import org.jetbrains.skiko.HardwareLayer
+import org.jetbrains.skija.ColorAlphaType
 import org.jetbrains.skija.ImageInfo
 import org.jetbrains.skija.Picture
+import org.jetbrains.skiko.HardwareLayer
+import org.jetbrains.skiko.actualAWTDimension
+import java.awt.Transparency
+import java.awt.color.ColorSpace
+import java.awt.image.BufferedImage
+import java.awt.image.ComponentColorModel
+import java.awt.image.DataBuffer
+import java.awt.image.DataBufferByte
+import java.awt.image.Raster
+import java.awt.image.WritableRaster
 
 internal class SoftwareContextHandler(layer: HardwareLayer) : ContextHandler(layer) {
     override val bleachConstant = -1 // it looks like java.awt.Canvas doesn't support transparency
@@ -42,8 +40,8 @@ internal class SoftwareContextHandler(layer: HardwareLayer) : ContextHandler(lay
         dispose()
         
         val scale = layer.contentScale
-        val w = (layer.width * scale).toInt().coerceAtLeast(0)
-        val h = (layer.height * scale).toInt().coerceAtLeast(0)
+        val w = actualAWTDimension(layer.width, scale)
+        val h = actualAWTDimension(layer.height, scale)
         
         if (storage.getWidth() != w || storage.getHeight() != h) {
             storage.allocPixelsFlags(ImageInfo.makeS32(w, h, ColorAlphaType.PREMUL), false)
@@ -56,9 +54,8 @@ internal class SoftwareContextHandler(layer: HardwareLayer) : ContextHandler(lay
         super.drawOnCanvas(picture)
 
         val scale = layer.contentScale
-        val w = (layer.width * scale).toInt().coerceAtLeast(0)
-        val h = (layer.height * scale).toInt().coerceAtLeast(0)
-
+        val w = actualAWTDimension(layer.width, scale)
+        val h = actualAWTDimension(layer.height, scale)
 
         val bytes = storage.readPixels(storage.getImageInfo(), (w * 4).toLong(), 0, 0)
         if (bytes != null) {

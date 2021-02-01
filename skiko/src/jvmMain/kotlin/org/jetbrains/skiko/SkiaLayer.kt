@@ -1,10 +1,14 @@
 package org.jetbrains.skiko
 
-import org.jetbrains.skija.*
-import org.jetbrains.skiko.redrawer.Redrawer
-import org.jetbrains.skiko.redrawer.RasterRedrawer
-import org.jetbrains.skiko.context.createContextHandler
+import org.jetbrains.skija.Canvas
+import org.jetbrains.skija.ClipMode
+import org.jetbrains.skija.Picture
+import org.jetbrains.skija.PictureRecorder
+import org.jetbrains.skija.Rect
 import org.jetbrains.skiko.context.SoftwareContextHandler
+import org.jetbrains.skiko.context.createContextHandler
+import org.jetbrains.skiko.redrawer.RasterRedrawer
+import org.jetbrains.skiko.redrawer.Redrawer
 import java.awt.Graphics
 import javax.swing.SwingUtilities.isEventDispatchThread
 
@@ -77,8 +81,8 @@ open class SkiaLayer : HardwareLayer() {
             fpsCounter.tick()
         }
 
-        val pictureWidth = (width * contentScale).toInt().coerceAtLeast(0)
-        val pictureHeight = (height * contentScale).toInt().coerceAtLeast(0)
+        val pictureWidth = actualAWTDimension(width, contentScale)
+        val pictureHeight = actualAWTDimension(height, contentScale)
 
         val bounds = Rect.makeWH(pictureWidth.toFloat(), pictureHeight.toFloat())
         val canvas = pictureRecorder.beginRecording(bounds)!!
