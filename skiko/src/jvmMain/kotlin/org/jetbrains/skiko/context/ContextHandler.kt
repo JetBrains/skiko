@@ -22,7 +22,7 @@ internal val renderApi: GraphicsApi by lazy {
 
 private fun parseRenderApi(text: String?): GraphicsApi {
     when(text) {
-        "RASTER" -> return GraphicsApi.RASTER
+        "SOFTWARE" -> return GraphicsApi.SOFTWARE
         "OPENGL" -> return GraphicsApi.OPENGL
         else -> return GraphicsApi.OPENGL
     }
@@ -30,7 +30,7 @@ private fun parseRenderApi(text: String?): GraphicsApi {
 
 internal fun createContextHandler(layer: HardwareLayer): ContextHandler {
     return when (renderApi) {
-        GraphicsApi.RASTER -> RasterContextHandler(layer)
+        GraphicsApi.SOFTWARE -> SoftwareContextHandler(layer)
         GraphicsApi.OPENGL -> OpenGLContextHandler(layer)
         else -> TODO("Unsupported yet")
     }

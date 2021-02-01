@@ -34,7 +34,7 @@ internal val platformOperations: PlatformOperations by lazy {
                 }
 
                 override fun createRedrawer(layer: HardwareLayer) = when(renderApi) {
-                    GraphicsApi.RASTER -> RasterRedrawer(layer)
+                    GraphicsApi.SOFTWARE -> RasterRedrawer(layer)
                     else -> MacOsRedrawer(layer)
                 }
         }
@@ -57,7 +57,7 @@ internal val platformOperations: PlatformOperations by lazy {
                 }
 
                 override fun createRedrawer(layer: HardwareLayer) = when(renderApi) {
-                    GraphicsApi.RASTER -> RasterRedrawer(layer)
+                    GraphicsApi.SOFTWARE -> RasterRedrawer(layer)
                     else -> WindowsRedrawer(layer)
                 }
             }
@@ -93,7 +93,7 @@ internal val platformOperations: PlatformOperations by lazy {
                 }
 
                 override fun createRedrawer(layer: HardwareLayer) = when(renderApi) {
-                    GraphicsApi.RASTER -> RasterRedrawer(layer)
+                    GraphicsApi.SOFTWARE -> RasterRedrawer(layer)
                     else -> LinuxRedrawer(layer)
                 }
             }

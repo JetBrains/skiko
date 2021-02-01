@@ -15,7 +15,6 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 fun main(args: Array<String>) {
-    // System.setProperty("skiko.renderApi", "RASTER")
     repeat(1) {
         createWindow("window $it")
     }

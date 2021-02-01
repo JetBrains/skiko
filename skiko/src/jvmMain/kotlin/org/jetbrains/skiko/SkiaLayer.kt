@@ -4,7 +4,7 @@ import org.jetbrains.skija.*
 import org.jetbrains.skiko.redrawer.Redrawer
 import org.jetbrains.skiko.redrawer.RasterRedrawer
 import org.jetbrains.skiko.context.createContextHandler
-import org.jetbrains.skiko.context.RasterContextHandler
+import org.jetbrains.skiko.context.SoftwareContextHandler
 import java.awt.Graphics
 import javax.swing.SwingUtilities.isEventDispatchThread
 
@@ -136,7 +136,7 @@ open class SkiaLayer : HardwareLayer() {
     private fun fallbackToRaster() {
         println("Falling back to software rendering...")
         redrawer?.dispose()
-        skijaState = RasterContextHandler(this)
+        skijaState = SoftwareContextHandler(this)
         redrawer = RasterRedrawer(this)
         needRedraw()
     }

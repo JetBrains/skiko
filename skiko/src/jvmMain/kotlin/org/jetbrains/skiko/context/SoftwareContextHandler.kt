@@ -18,7 +18,7 @@ import org.jetbrains.skiko.HardwareLayer
 import org.jetbrains.skija.ImageInfo
 import org.jetbrains.skija.Picture
 
-internal class RasterContextHandler(layer: HardwareLayer) : ContextHandler(layer) {
+internal class SoftwareContextHandler(layer: HardwareLayer) : ContextHandler(layer) {
     override val bleachConstant = -1 // it looks like java.awt.Canvas doesn't support transparency
 
     val colorModel = ComponentColorModel(
