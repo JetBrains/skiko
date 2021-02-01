@@ -1,6 +1,6 @@
 package org.jetbrains.skiko
 
-import org.jetbrains.skiko.context.renderApi
+import org.jetbrains.skiko.SkikoProperties.renderApi
 import org.jetbrains.skiko.redrawer.LinuxOpenGLRedrawer
 import org.jetbrains.skiko.redrawer.MacOsOpenGLRedrawer
 import org.jetbrains.skiko.redrawer.RasterRedrawer
