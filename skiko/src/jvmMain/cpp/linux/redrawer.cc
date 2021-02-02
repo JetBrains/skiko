@@ -14,60 +14,17 @@ extern "C" jboolean Skiko_GetAWT(JNIEnv *env, JAWT *awt);
 
 extern "C"
 {
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_lockDrawingSurfaceNative(JNIEnv *env, jobject redrawer, jobject layer)
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_getDisplay(JNIEnv *env, jobject redrawer, jlong platformInfoPtr)
     {
-        JAWT awt;
-        awt.version = (jint)JAWT_VERSION_9;
-        if (!Skiko_GetAWT(env, &awt))
-        {
-            fprintf(stderr, "JAWT_GetAWT failed! Result is JNI_FALSE\n");
-            return 0;
-        }
-
-        JAWT_DrawingSurface *ds = awt.GetDrawingSurface(env, layer);
-        ds->Lock(ds);
-
-        return static_cast<jlong>(reinterpret_cast<uintptr_t>(ds));
-    }
-
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_unlockDrawingSurfaceNative(JNIEnv *env, jobject redrawer, jlong drawingSurfacePtr)
-    {
-        JAWT_DrawingSurface *ds = reinterpret_cast<JAWT_DrawingSurface *>(static_cast<uintptr_t>(drawingSurfacePtr));
-        JAWT awt;
-        awt.version = (jint)JAWT_VERSION_9;
-        if (!Skiko_GetAWT(env, &awt))
-        {
-            fprintf(stderr, "JAWT_GetAWT failed! Result is JNI_FALSE\n");
-            return 0;
-        }
-
-        ds->Unlock(ds);
-        awt.FreeDrawingSurface(ds);
-
-        return static_cast<jlong>(reinterpret_cast<uintptr_t>(ds));
-    }
-
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_getDisplay(JNIEnv *env, jobject redrawer, jlong drawingSurfacePtr)
-    {
-        JAWT_DrawingSurface *ds = reinterpret_cast<JAWT_DrawingSurface *>(static_cast<uintptr_t>(drawingSurfacePtr));
-        JAWT_DrawingSurfaceInfo *dsi = ds->GetDrawingSurfaceInfo(ds);
-        JAWT_X11DrawingSurfaceInfo *dsi_x11 = (JAWT_X11DrawingSurfaceInfo *)dsi->platformInfo;
-
+        JAWT_X11DrawingSurfaceInfo *dsi_x11 = reinterpret_cast<JAWT_X11DrawingSurfaceInfo *>(static_cast<uintptr_t>(platformInfoPtr));
         Display *display = dsi_x11->display;
-
-        ds->FreeDrawingSurfaceInfo(dsi);
         return static_cast<jlong>(reinterpret_cast<uintptr_t>(display));
     }
 
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_getWindow(JNIEnv *env, jobject redrawer, jlong drawingSurfacePtr)
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_getWindow(JNIEnv *env, jobject redrawer, jlong platformInfoPtr)
     {
-        JAWT_DrawingSurface *ds = reinterpret_cast<JAWT_DrawingSurface *>(static_cast<uintptr_t>(drawingSurfacePtr));
-        JAWT_DrawingSurfaceInfo *dsi = ds->GetDrawingSurfaceInfo(ds);
-        JAWT_X11DrawingSurfaceInfo *dsi_x11 = (JAWT_X11DrawingSurfaceInfo *)dsi->platformInfo;
-
+        JAWT_X11DrawingSurfaceInfo *dsi_x11 = reinterpret_cast<JAWT_X11DrawingSurfaceInfo *>(static_cast<uintptr_t>(platformInfoPtr));
         Window window = dsi_x11->drawable;
-
-        ds->FreeDrawingSurfaceInfo(dsi);
         return static_cast<jlong>(reinterpret_cast<uintptr_t>(window));
     }
 

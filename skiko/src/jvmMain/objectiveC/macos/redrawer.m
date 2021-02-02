@@ -69,34 +69,16 @@ JavaVM *jvm = NULL;
 
 @end
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MacOsOpenGLRedrawerKt_initContainer(JNIEnv *env, jobject redrawer, jobject layer)
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MacOsOpenGLRedrawerKt_initContainer(JNIEnv *env, jobject redrawer, jlong platformInfoPtr)
 {
-    JAWT awt;
-    awt.version = JAWT_VERSION_9;
-    jboolean result = Skiko_GetAWT(env, &awt);
-    assert(result != JNI_FALSE);
-
     (*env)->GetJavaVM(env, &jvm);
 
-    JAWT_DrawingSurface *ds = awt.GetDrawingSurface(env, layer);
-    assert(ds != NULL);
-
-    jint lock = ds->Lock(ds);
-    assert((lock & JAWT_LOCK_ERROR) == 0);
-
-    JAWT_DrawingSurfaceInfo *dsi = ds->GetDrawingSurfaceInfo(ds);
-    assert(dsi != NULL);
-
-    NSObject<JAWT_SurfaceLayers>* dsi_mac = (__bridge NSObject<JAWT_SurfaceLayers> *) dsi->platformInfo;
+    NSObject<JAWT_SurfaceLayers>* dsi_mac = (__bridge NSObject<JAWT_SurfaceLayers> *) platformInfoPtr;
 
     CALayer *container = [dsi_mac windowLayer];
     [container removeAllAnimations];
     [container setAutoresizingMask: (kCALayerWidthSizable|kCALayerHeightSizable)];
     [container setNeedsDisplayOnBoundsChange: YES];
-
-    ds->FreeDrawingSurfaceInfo(dsi);
-    ds->Unlock(ds);
-    awt.FreeDrawingSurface(ds);
 
     return (jlong) container;
 }

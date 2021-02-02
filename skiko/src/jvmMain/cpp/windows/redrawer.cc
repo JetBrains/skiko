@@ -8,42 +8,24 @@ extern "C" jboolean Skiko_GetAWT(JNIEnv *env, JAWT *awt);
 
 extern "C"
 {
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt_getDevice(JNIEnv *env, jobject redrawer, jobject layer)
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt_getDevice(JNIEnv *env, jobject redrawer, jlong platformInfoPtr)
     {
-        JAWT awt;
-        awt.version = (jint)JAWT_VERSION_9;
-        if (!Skiko_GetAWT(env, &awt))
-        {
-            fprintf(stderr, "JAWT_GetAWT failed! Result is JNI_FALSE\n");
-            return 0;
-        }
-
-        JAWT_DrawingSurface *ds = awt.GetDrawingSurface(env, layer);
-        ds->Lock(ds);
-        JAWT_DrawingSurfaceInfo *dsi = ds->GetDrawingSurfaceInfo(ds);
-        JAWT_Win32DrawingSurfaceInfo *dsi_win = (JAWT_Win32DrawingSurfaceInfo *)dsi->platformInfo;
+        JAWT_Win32DrawingSurfaceInfo* dsi_win = reinterpret_cast<JAWT_Win32DrawingSurfaceInfo *>(static_cast<uintptr_t>(platformInfoPtr));
 
         HWND hwnd = dsi_win->hwnd;
         HDC device = GetDC(hwnd);
 
-        if (dsi != NULL)
-        {
-            PIXELFORMATDESCRIPTOR pixFormatDscr;
-            memset(&pixFormatDscr, 0, sizeof(PIXELFORMATDESCRIPTOR));
-            pixFormatDscr.nSize = sizeof(PIXELFORMATDESCRIPTOR);
-            pixFormatDscr.nVersion = 1;
-            pixFormatDscr.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
+        PIXELFORMATDESCRIPTOR pixFormatDscr;
+        memset(&pixFormatDscr, 0, sizeof(PIXELFORMATDESCRIPTOR));
+        pixFormatDscr.nSize = sizeof(PIXELFORMATDESCRIPTOR);
+        pixFormatDscr.nVersion = 1;
+        pixFormatDscr.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
 
-            pixFormatDscr.iPixelType = PFD_TYPE_RGBA;
-            pixFormatDscr.cColorBits = 32;
-            int iPixelFormat = ChoosePixelFormat(device, &pixFormatDscr);
-            SetPixelFormat(device, iPixelFormat, &pixFormatDscr);
-            DescribePixelFormat(device, iPixelFormat, sizeof(PIXELFORMATDESCRIPTOR), &pixFormatDscr);
-        }
-
-        ds->FreeDrawingSurfaceInfo(dsi);
-        ds->Unlock(ds);
-        awt.FreeDrawingSurface(ds);
+        pixFormatDscr.iPixelType = PFD_TYPE_RGBA;
+        pixFormatDscr.cColorBits = 32;
+        int iPixelFormat = ChoosePixelFormat(device, &pixFormatDscr);
+        SetPixelFormat(device, iPixelFormat, &pixFormatDscr);
+        DescribePixelFormat(device, iPixelFormat, sizeof(PIXELFORMATDESCRIPTOR), &pixFormatDscr);
 
         return static_cast<jlong>(reinterpret_cast<uintptr_t>(device));
     }

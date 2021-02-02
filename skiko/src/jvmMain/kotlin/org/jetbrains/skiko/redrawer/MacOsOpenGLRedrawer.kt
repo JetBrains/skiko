@@ -7,13 +7,14 @@ import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.HardwareLayer
 import org.jetbrains.skiko.OpenGLApi
 import org.jetbrains.skiko.SkikoProperties
+import org.jetbrains.skiko.useDrawingSurfacePlatformInfo
 import javax.swing.SwingUtilities.convertPoint
 import javax.swing.SwingUtilities.getRootPane
 
 internal class MacOsOpenGLRedrawer(
     private val layer: HardwareLayer
 ) : Redrawer {
-    private val containerLayerPtr = initContainer(layer)
+    private val containerLayerPtr = layer.useDrawingSurfacePlatformInfo(::initContainer)
     private val drawLock = Any()
     private var isDisposed = false
 
@@ -140,7 +141,7 @@ private open class AWTGLLayer(private val containerPtr: Long, setNeedsDisplayOnB
     protected external fun setFrame(containerPtr: Long, ptr: Long, x: Float, y: Float, width: Float, height: Float)
 }
 
-private external fun initContainer(layer: HardwareLayer): Long
+private external fun initContainer(platformInfo: Long): Long
 private external fun setContentScale(layerNativePtr: Long, contentScale: Float)
 private external fun initAWTGLLayer(containerPtr: Long, layer: AWTGLLayer, setNeedsDisplayOnBoundsChange: Boolean): Long
 private external fun disposeAWTGLLayer(ptr: Long)
