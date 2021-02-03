@@ -79,66 +79,37 @@ LayerHandler * findByObject(JNIEnv *env, jobject object)
     return NULL;
 }
 
-extern jboolean Skiko_GetAWT(JNIEnv* env, JAWT* awt);
-
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_init(JNIEnv *env, jobject canvas)
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_nativeInit(JNIEnv *env, jobject canvas, jlong platformInfoPtr)
 {
     if (layerStorage == nil)
     {
         layerStorage = [[NSMutableSet alloc] init];
     }
 
-    JAWT awt;
-    JAWT_DrawingSurface *ds = NULL;
-    JAWT_DrawingSurfaceInfo *dsi = NULL;
+    NSObject<JAWT_SurfaceLayers>* dsi_mac = (__bridge NSObject<JAWT_SurfaceLayers> *) platformInfoPtr;
 
-    jboolean result = JNI_FALSE;
-    jint lock = 0;
-    NSObject<JAWT_SurfaceLayers>* dsi_mac = NULL;
+    LayerHandler *layersSet = [[LayerHandler alloc] init];
 
-    awt.version = JAWT_VERSION_9 /* | JAWT_MACOSX_USE_CALAYER */;
-    result = Skiko_GetAWT(env, &awt);
-    assert(result != JNI_FALSE);
+    layersSet.container = [dsi_mac windowLayer];
+    jobject canvasGlobalRef = (*env)->NewGlobalRef(env, canvas);
+    [layersSet setCanvasGlobalRef: canvasGlobalRef];
 
-    ds = awt.GetDrawingSurface(env, canvas);
-    assert(ds != NULL);
+    NSMutableArray<NSWindow *> *windows = [NSMutableArray arrayWithArray: [[NSApplication sharedApplication] windows]];
 
-    lock = ds->Lock(ds);
-    assert((lock & JAWT_LOCK_ERROR) == 0);
-
-    dsi = ds->GetDrawingSurfaceInfo(ds);
-
-    if (dsi != NULL)
+    for (LayerHandler* value in layerStorage)
     {
-        dsi_mac = ( __bridge NSObject<JAWT_SurfaceLayers> *) dsi->platformInfo;
-
-        LayerHandler *layersSet = [[LayerHandler alloc] init];
-
-        layersSet.container = [dsi_mac windowLayer];
-        jobject canvasGlobalRef = (*env)->NewGlobalRef(env, canvas);
-        [layersSet setCanvasGlobalRef: canvasGlobalRef];
-
-        NSMutableArray<NSWindow *> *windows = [NSMutableArray arrayWithArray: [[NSApplication sharedApplication] windows]];
-
-        for (LayerHandler* value in layerStorage)
+        if (layersSet.container == value.container)
         {
-            if (layersSet.container == value.container)
-            {
-                layersSet.window = value.window;
-            }
+            layersSet.window = value.window;
         }
-
-        if (layersSet.window == NULL)
-        {
-            layersSet.window = [windows lastObject];
-        }
-
-        [layerStorage addObject: layersSet];
     }
 
-    ds->FreeDrawingSurfaceInfo(dsi);
-    ds->Unlock(ds);
-    awt.FreeDrawingSurface(ds);
+    if (layersSet.window == NULL)
+    {
+        layersSet.window = [windows lastObject];
+    }
+
+    [layerStorage addObject: layersSet];
 }
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_dispose(JNIEnv *env, jobject canvas)

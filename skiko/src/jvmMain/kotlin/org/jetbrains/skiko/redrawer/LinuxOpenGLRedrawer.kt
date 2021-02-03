@@ -3,10 +3,12 @@ package org.jetbrains.skiko.redrawer
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
+import org.jetbrains.skiko.DrawingSurface
 import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.HardwareLayer
 import org.jetbrains.skiko.OpenGLApi
 import org.jetbrains.skiko.SkikoProperties
+import org.jetbrains.skiko.getDrawingSurface
 
 internal class LinuxOpenGLRedrawer(
     private val layer: HardwareLayer
@@ -92,7 +94,7 @@ internal class LinuxOpenGLRedrawer(
     }
 }
 
-private inline fun <T> HardwareLayer.lockDrawingSurface(action: (DrawingSurface) -> T): T {
+private inline fun <T> HardwareLayer.lockDrawingSurface(action: (LinuxDrawingSurface) -> T): T {
     val drawingSurface = lockDrawingSurface(this)
     try {
         return action(drawingSurface)
@@ -101,17 +103,21 @@ private inline fun <T> HardwareLayer.lockDrawingSurface(action: (DrawingSurface)
     }
 }
 
-private fun lockDrawingSurface(layer: HardwareLayer): DrawingSurface {
-    val ptr = lockDrawingSurfaceNative(layer)
-    return DrawingSurface(ptr, getDisplay(ptr), getWindow(ptr))
+private fun lockDrawingSurface(layer: HardwareLayer): LinuxDrawingSurface {
+    val drawingSurface = layer.getDrawingSurface()
+    drawingSurface.lock()
+    return drawingSurface.getInfo().use {
+        LinuxDrawingSurface(drawingSurface, getDisplay(it.platformInfo), getWindow(it.platformInfo))
+    }
 }
 
-private fun unlockDrawingSurface(drawingSurface: DrawingSurface) {
-    unlockDrawingSurfaceNative(drawingSurface.ptr)
+private fun unlockDrawingSurface(drawingSurface: LinuxDrawingSurface) {
+    drawingSurface.common.unlock()
+    drawingSurface.common.close()
 }
 
-private class DrawingSurface(
-    val ptr: Long,
+private class LinuxDrawingSurface(
+    val common: DrawingSurface,
     val display: Long,
     val window: Long
 ) {
@@ -122,10 +128,8 @@ private class DrawingSurface(
     fun setSwapInterval(interval: Int) = setSwapInterval(display, window, interval)
 }
 
-private external fun lockDrawingSurfaceNative(layer: HardwareLayer): Long
-private external fun unlockDrawingSurfaceNative(drawingSurface: Long)
-private external fun getDisplay(drawingSurface: Long): Long
-private external fun getWindow(drawingSurface: Long): Long
+private external fun getDisplay(platformInfo: Long): Long
+private external fun getWindow(platformInfo: Long): Long
 
 private external fun makeCurrent(display: Long, window: Long, context: Long)
 private external fun createContext(display: Long): Long

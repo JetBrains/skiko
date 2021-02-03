@@ -88,7 +88,7 @@ internal val platformOperations: PlatformOperations by lazy {
 
                     // see also comment for HardwareLayer.checkContentScale
 
-                    // return linuxGetDpiScaleNative(component)
+//                    return component.useDrawingSurfacePlatformInfo(::linuxGetDpiScaleNative)
                 }
 
                 override fun createRedrawer(layer: HardwareLayer) = when(renderApi) {
@@ -105,4 +105,4 @@ external private fun osxIsFullscreenNative(component: Component): Boolean
 external private fun osxSetFullscreenNative(component: Component, value: Boolean)
 
 // Linux
-external private fun linuxGetDpiScaleNative(component: Component): Float
+external private fun linuxGetDpiScaleNative(platformInfo: Long): Float

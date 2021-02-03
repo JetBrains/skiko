@@ -8,11 +8,12 @@ import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.HardwareLayer
 import org.jetbrains.skiko.OpenGLApi
 import org.jetbrains.skiko.SkikoProperties
+import org.jetbrains.skiko.useDrawingSurfacePlatformInfo
 
 internal class WindowsOpenGLRedrawer(
     private val layer: HardwareLayer
 ) : Redrawer {
-    private val device = getDevice(layer)
+    private val device = layer.useDrawingSurfacePlatformInfo(::getDevice)
     private val context = createContext(device)
     private var isDisposed = false
 
@@ -101,7 +102,7 @@ internal class WindowsOpenGLRedrawer(
 }
 
 private external fun makeCurrent(device: Long, context: Long)
-private external fun getDevice(layer: HardwareLayer): Long
+private external fun getDevice(platformInfo: Long): Long
 private external fun createContext(device: Long): Long
 private external fun deleteContext(context: Long)
 private external fun setSwapInterval(interval: Int)

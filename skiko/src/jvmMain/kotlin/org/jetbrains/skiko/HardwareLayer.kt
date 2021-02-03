@@ -32,7 +32,13 @@ abstract class HardwareLayer : Canvas() {
         }
     }
 
-    protected open external fun init()
+
+    protected open fun init() {
+        useDrawingSurfacePlatformInfo(::nativeInit)
+    }
+
+    protected open external fun nativeInit(platformInfo: Long)
+
     open external fun dispose()
 
     protected open fun contentScaleChanged() = Unit
@@ -68,7 +74,7 @@ abstract class HardwareLayer : Canvas() {
     internal abstract fun draw()
 
     val windowHandle: Long
-        external get
+        get() = useDrawingSurfacePlatformInfo(::getWindowHandle)
 
     val contentScale: Float
         get() = _contentScale!!
@@ -76,4 +82,6 @@ abstract class HardwareLayer : Canvas() {
     var fullscreen: Boolean
         get() = platformOperations.isFullscreen(this)
         set(value) = platformOperations.setFullscreen(this, value)
+
+    private external fun getWindowHandle(platformInfo: Long): Long
 }
