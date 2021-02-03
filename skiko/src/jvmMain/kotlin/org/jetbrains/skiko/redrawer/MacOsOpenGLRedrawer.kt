@@ -30,7 +30,7 @@ internal class MacOsOpenGLRedrawer(
     // AWT has a method to avoid dead locks but it is internal (sun.lwawt.macosx.LWCToolkit.invokeAndWait)
     private val vsyncLayer = object : AWTGLLayer(containerLayerPtr, setNeedsDisplayOnBoundsChange = false) {
         @Volatile
-        private var needDraw: CompletableDeferred<Unit>? = null
+        private var canDraw = false
 
         init {
             setFrame(0, 0, 1, 1) // if frame has zero size then it will be not drawn at all
@@ -41,21 +41,17 @@ internal class MacOsOpenGLRedrawer(
             val opengl = OpenGLApi.instance
             opengl.glClearColor(0f, 0f, 0f, 0f)
             opengl.glClear(opengl.GL_COLOR_BUFFER_BIT)
-            needDraw?.complete(Unit)
         }
 
         override fun canDraw(): Boolean {
-            val canDraw = needDraw != null
+            val canDraw = canDraw
             if (!canDraw) {
                 isAsynchronous = false // stop asynchronous mode so we don't waste CPU cycles
             }
             return canDraw
         }
 
-        suspend fun sync() {
-            check(needDraw == null)
-            needDraw = CompletableDeferred()
-
+        override fun setNeedsDisplay() {
             // Use asynchronous mode instead of just setNeedsDisplay,
             // so Core Animation will wait for the next frame in vsync signal
             //
@@ -68,17 +64,26 @@ internal class MacOsOpenGLRedrawer(
                 isAsynchronous = true
                 super.setNeedsDisplay()
             }
+        }
 
-            needDraw!!.await()
-            needDraw = null
+        suspend fun sync() {
+            canDraw = true
+            display()
+            canDraw = false
         }
     }
 
     private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
-        layer.update(System.nanoTime())
-        drawLayer.setNeedsDisplay()
+        synchronized(drawLock) {
+            layer.update(System.nanoTime())
+        }
         if (SkikoProperties.vsyncEnabled) {
+            drawLayer.setNeedsDisplay()
             vsyncLayer.sync()
+        } else {
+            // If vsync is disabled we should await the drawing to end.
+            // Otherwise we will call 'update' multiple times.
+            drawLayer.display()
         }
     }
 
@@ -115,6 +120,9 @@ private abstract class AWTGLLayer(private val containerPtr: Long, setNeedsDispla
     @Suppress("LeakingThis")
     val ptr = initAWTGLLayer(containerPtr, this, setNeedsDisplayOnBoundsChange)
 
+    @Volatile
+    private var onDraw: CompletableDeferred<Unit>? = null
+
     fun setFrame(x: Int, y: Int, width: Int, height: Int) {
         setFrame(containerPtr, ptr, x.toFloat(), y.toFloat(), width.toFloat(), height.toFloat())
     }
@@ -128,6 +136,14 @@ private abstract class AWTGLLayer(private val containerPtr: Long, setNeedsDispla
 
     open fun setNeedsDisplay() = setNeedsDisplayOnMainThread(ptr)
 
+    suspend fun display() {
+        check(onDraw == null)
+        onDraw = CompletableDeferred()
+        setNeedsDisplay()
+        onDraw!!.await()
+        onDraw = null
+    }
+
     // Called in AppKit Thread
     protected open fun canDraw() = true
 
@@ -138,6 +154,7 @@ private abstract class AWTGLLayer(private val containerPtr: Long, setNeedsDispla
         } catch (e: Throwable) {
             e.printStackTrace()
         }
+        onDraw?.complete(Unit)
     }
 
     // Called in AppKit Thread
