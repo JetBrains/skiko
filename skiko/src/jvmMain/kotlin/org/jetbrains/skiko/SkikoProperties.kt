@@ -6,11 +6,13 @@ internal object SkikoProperties {
 
     val fpsEnabled: Boolean by property("skiko.fps.enabled", default = false)
     val fpsPeriodSeconds: Double by property("skiko.fps.periodSeconds", default = 2.0)
-    val fpsLongFramesShow: Boolean by property("skiko.fps.longFrames.show", default = false)
 
     /**
-     * If the property isn't defined, but skiko.fps.longFrames.show is true, this property will be 1.5 * (1000 / displayRefreshRate)
+     * Show long frames which is longer than [fpsLongFramesMillis].
+     * If [fpsLongFramesMillis] isn't defined will show frames longer than 1.5 * (1000 / displayRefreshRate)
      */
+    val fpsLongFramesShow: Boolean by property("skiko.fps.longFrames.show", default = false)
+
     val fpsLongFramesMillis: Double? by property("skiko.fps.longFrames.millis", default = null)
 
     val renderApi: GraphicsApi by lazy {
