@@ -120,8 +120,7 @@ private abstract class AWTGLLayer(private val containerPtr: Long, setNeedsDispla
     @Suppress("LeakingThis")
     val ptr = initAWTGLLayer(containerPtr, this, setNeedsDisplayOnBoundsChange)
 
-    @Volatile
-    private var onDraw: CompletableDeferred<Unit>? = null
+    private val display = Task()
 
     fun setFrame(x: Int, y: Int, width: Int, height: Int) {
         setFrame(containerPtr, ptr, x.toFloat(), y.toFloat(), width.toFloat(), height.toFloat())
@@ -136,12 +135,8 @@ private abstract class AWTGLLayer(private val containerPtr: Long, setNeedsDispla
 
     open fun setNeedsDisplay() = setNeedsDisplayOnMainThread(ptr)
 
-    suspend fun display() {
-        check(onDraw == null)
-        onDraw = CompletableDeferred()
+    suspend fun display() = display.runAndAwait {
         setNeedsDisplay()
-        onDraw!!.await()
-        onDraw = null
     }
 
     // Called in AppKit Thread
@@ -154,7 +149,7 @@ private abstract class AWTGLLayer(private val containerPtr: Long, setNeedsDispla
         } catch (e: Throwable) {
             e.printStackTrace()
         }
-        onDraw?.complete(Unit)
+        display.finish()
     }
 
     // Called in AppKit Thread
@@ -170,3 +165,26 @@ private external fun initContainer(layer: HardwareLayer): Long
 private external fun setContentScale(layerNativePtr: Long, contentScale: Float)
 private external fun initAWTGLLayer(containerPtr: Long, layer: AWTGLLayer, setNeedsDisplayOnBoundsChange: Boolean): Long
 private external fun disposeAWTGLLayer(ptr: Long)
+
+internal class Task {
+    @Volatile
+    private var onFinish: CompletableDeferred<Unit>? = null
+
+    /**
+     * Run task and await its finishing (i.e. calling of [finish])
+     */
+    suspend fun runAndAwait(run: suspend () -> Unit) {
+        check(onFinish == null)
+        onFinish = CompletableDeferred()
+        run()
+        onFinish!!.await()
+        onFinish = null
+    }
+
+    /**
+     * Finish running task. If there is no running task, do nothing.
+     */
+    fun finish() {
+        onFinish?.complete(Unit)
+    }
+}
