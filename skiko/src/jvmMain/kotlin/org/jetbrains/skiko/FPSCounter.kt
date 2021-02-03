@@ -51,12 +51,9 @@ internal fun defaultFPSCounter(
 
     FPSCounter(
         periodSeconds = fpsPeriodSeconds,
-        showLongFrames = fpsLongFramesShow
-    ) {
-        when {
-            fpsLongFramesShow && fpsLongFramesMillis != null -> fpsLongFramesMillis!!
-            fpsLongFramesShow -> 1.5 * 1000 / refreshRate
-            else -> 0.0
+        showLongFrames = fpsLongFramesShow,
+        getLongFrameMillis = {
+            fpsLongFramesMillis ?: 1.5 * 1000 / refreshRate
         }
-    }
+    )
 }
