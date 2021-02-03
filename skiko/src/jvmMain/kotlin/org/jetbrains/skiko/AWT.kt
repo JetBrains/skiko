@@ -25,9 +25,11 @@ internal fun Component.getDrawingSurface() = DrawingSurface(this)
 internal class DrawingSurface(
     component: Component
 ) : AutoCloseable {
-    val ptr = getDrawingSurface(awt, component).also {
-        check(it != 0L)
-    }
+    var ptr =
+        getDrawingSurface(awt, component).also {
+            check(it != 0L)
+        }
+        private set
 
     fun lock() = lockDrawingSurface(ptr)
 
@@ -46,20 +48,24 @@ internal class DrawingSurface(
 
     override fun close() {
         freeDrawingSurface(awt, ptr)
+        ptr = 0
     }
 }
 
 internal class DrawingSurfaceInfo(
     private val drawingSurface: Long
 ) : AutoCloseable {
-    val ptr = getDrawingSurfaceInfo(drawingSurface).also {
-        check(it != 0L)
-    }
+    var ptr =
+        getDrawingSurfaceInfo(drawingSurface).also {
+            check(it != 0L)
+        }
+        private set
 
     val platformInfo: Long get() = getPlatformInfo(ptr)
 
     override fun close() {
         freeDrawingSurfaceInfo(drawingSurface, ptr)
+        ptr = 0
     }
 }
 

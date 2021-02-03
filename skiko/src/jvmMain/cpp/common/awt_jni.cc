@@ -14,7 +14,9 @@ extern "C"
         if (result == JNI_FALSE)
         {
             return 0;
-        } else {
+        }
+        else
+        {
             return static_cast<jlong>(reinterpret_cast<uintptr_t>(awt));
         }
     }
