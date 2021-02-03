@@ -61,7 +61,7 @@ JavaVM *jvm = NULL;
     static jclass cls = NULL;
     static jmethodID method = NULL;
     if (!cls) cls = (*env)->GetObjectClass(env, self.javaRef);
-    if (!method) method = (*env)->GetMethodID(env, cls, "draw", "()V");
+    if (!method) method = (*env)->GetMethodID(env, cls, "performDraw", "()V");
     (*env)->CallVoidMethod(env, self.javaRef, method);
 
     [super drawInCGLContext:ctx pixelFormat:pf forLayerTime:t displayTime:ts];

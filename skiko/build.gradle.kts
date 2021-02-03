@@ -1,5 +1,7 @@
 import de.undercouch.gradle.tasks.download.Download
 import org.gradle.crypto.checksum.Checksum
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.tasks.KotlinTest
 
 plugins {
     kotlin("multiplatform") version "1.3.72"
@@ -8,6 +10,8 @@ plugins {
     id("org.gradle.crypto.checksum") version "1.1.0"
     id("de.undercouch.download") version "4.1.1"
 }
+
+val coroutinesVersion = "1.4.1"
 
 buildscript {
     dependencies {
@@ -166,7 +170,7 @@ kotlin {
             kotlin.srcDirs(skijaSrcDir)
             dependencies {
                 implementation(kotlin("stdlib-jdk8"))
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.4.1")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:$coroutinesVersion")
                 compileOnly(lombok)
                 compileOnly(jetbrainsAnnotations)
             }
@@ -174,6 +178,7 @@ kotlin {
         }
         val jvmTest by getting {
             dependencies {
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
                 implementation(kotlin("test-junit"))
             }
         }
@@ -563,5 +568,11 @@ publishing {
                 artifact(skikoJvmRuntimeJar.map { it.archiveFile.get() })
             }
         }
+    }
+}
+
+tasks.withType<KotlinCompile>().configureEach {
+    if (name == "compileTestKotlinJvm") {
+        kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
     }
 }
