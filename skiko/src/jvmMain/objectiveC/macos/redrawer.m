@@ -7,8 +7,6 @@
 #import <QuartzCore/QuartzCore.h>
 #import <OpenGL/gl3.h>
 
-extern jboolean Skiko_GetAWT(JNIEnv* env, JAWT* awt);
-
 JavaVM *jvm = NULL;
 
 @interface AWTGLLayer : CAOpenGLLayer

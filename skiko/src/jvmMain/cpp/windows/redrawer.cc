@@ -3,14 +3,13 @@
 #include <gl/GL.h>
 #include <jawt_md.h>
 #include <dwmapi.h>
-
-extern "C" jboolean Skiko_GetAWT(JNIEnv *env, JAWT *awt);
+#include "../common/jni_helpers.h"
 
 extern "C"
 {
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt_getDevice(JNIEnv *env, jobject redrawer, jlong platformInfoPtr)
     {
-        JAWT_Win32DrawingSurfaceInfo* dsi_win = reinterpret_cast<JAWT_Win32DrawingSurfaceInfo *>(static_cast<uintptr_t>(platformInfoPtr));
+        JAWT_Win32DrawingSurfaceInfo* dsi_win = fromJavaPointer<JAWT_Win32DrawingSurfaceInfo *>(platformInfoPtr);
 
         HWND hwnd = dsi_win->hwnd;
         HDC device = GetDC(hwnd);
@@ -27,7 +26,7 @@ extern "C"
         SetPixelFormat(device, iPixelFormat, &pixFormatDscr);
         DescribePixelFormat(device, iPixelFormat, sizeof(PIXELFORMATDESCRIPTOR), &pixFormatDscr);
 
-        return static_cast<jlong>(reinterpret_cast<uintptr_t>(device));
+        return toJavaPointer(device);
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt_setSwapInterval(JNIEnv *env, jobject redrawer, jint interval)
@@ -44,26 +43,26 @@ extern "C"
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt_swapBuffers(JNIEnv *env, jobject redrawer, jlong devicePtr)
     {
-        HDC device = reinterpret_cast<HDC>(static_cast<uintptr_t>(devicePtr));
+        HDC device = fromJavaPointer<HDC>(devicePtr);
         SwapBuffers(device);
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt_makeCurrent(JNIEnv *env, jobject redrawer, jlong devicePtr, jlong contextPtr)
     {
-        HDC device = reinterpret_cast<HDC>(static_cast<uintptr_t>(devicePtr));
-        HGLRC context = reinterpret_cast<HGLRC>(static_cast<uintptr_t>(contextPtr));
+        HDC device = fromJavaPointer<HDC>(devicePtr);
+        HGLRC context = fromJavaPointer<HGLRC>(contextPtr);
         wglMakeCurrent(device, context);
     }
 
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt_createContext(JNIEnv *env, jobject redrawer, jlong devicePtr)
     {
-        HDC device = reinterpret_cast<HDC>(static_cast<uintptr_t>(devicePtr));
-        return static_cast<jlong>(reinterpret_cast<uintptr_t>(wglCreateContext(device)));
+        HDC device = fromJavaPointer<HDC>(devicePtr);
+        return toJavaPointer(wglCreateContext(device));
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt_deleteContext(JNIEnv *env, jobject redrawer, jlong contextPtr)
     {
-        HGLRC context = reinterpret_cast<HGLRC>(static_cast<uintptr_t>(contextPtr));
+        HGLRC context = fromJavaPointer<HGLRC>(contextPtr);
         wglDeleteContext(context);
     }
 

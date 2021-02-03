@@ -7,10 +7,9 @@
 #include <cstdlib>
 #include <unistd.h>
 #include <stdio.h>
+#include "../common/jni_helpers.h"
 
 typedef GLXContext (*glXCreateContextAttribsARBProc)(Display *, GLXFBConfig, GLXContext, Bool, const int *);
-
-extern "C" jboolean Skiko_GetAWT(JNIEnv *env, JAWT *awt);
 
 extern "C"
 {
@@ -24,7 +23,7 @@ extern "C"
 
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getWindowHandle(JNIEnv *env, jobject canvas, jlong platformInfoPtr)
     {
-        JAWT_X11DrawingSurfaceInfo *dsi_x11 = reinterpret_cast<JAWT_X11DrawingSurfaceInfo *>(static_cast<uintptr_t>(platformInfoPtr));
+        JAWT_X11DrawingSurfaceInfo *dsi_x11 = fromJavaPointer<JAWT_X11DrawingSurfaceInfo *>(platformInfoPtr);
         return (jlong) dsi_x11->drawable;
     }
 
@@ -52,7 +51,7 @@ extern "C"
 
     JNIEXPORT jfloat JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_linuxGetDpiScaleNative(JNIEnv *env, jobject properties, jlong platformInfoPtr)
     {
-        JAWT_X11DrawingSurfaceInfo *dsi_x11 = reinterpret_cast<JAWT_X11DrawingSurfaceInfo *>(static_cast<uintptr_t>(platformInfoPtr));
+        JAWT_X11DrawingSurfaceInfo *dsi_x11 = fromJavaPointer<JAWT_X11DrawingSurfaceInfo *>(platformInfoPtr);
         return (float) getDpiScaleByDisplay(dsi_x11->display);
     }
 } // extern "C"

@@ -79,8 +79,6 @@ LayerHandler * findByObject(JNIEnv *env, jobject object)
     return NULL;
 }
 
-extern jboolean Skiko_GetAWT(JNIEnv* env, JAWT* awt);
-
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_nativeInit(JNIEnv *env, jobject canvas, jlong platformInfoPtr)
 {
     if (layerStorage == nil)

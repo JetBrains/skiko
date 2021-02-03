@@ -7,31 +7,30 @@
 #include <cstdlib>
 #include <unistd.h>
 #include <stdio.h>
+#include "../common/jni_helpers.h"
 
 typedef GLXContext (*glXCreateContextAttribsARBProc)(Display *, GLXFBConfig, GLXContext, Bool, const int *);
-
-extern "C" jboolean Skiko_GetAWT(JNIEnv *env, JAWT *awt);
 
 extern "C"
 {
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_getDisplay(JNIEnv *env, jobject redrawer, jlong platformInfoPtr)
     {
-        JAWT_X11DrawingSurfaceInfo *dsi_x11 = reinterpret_cast<JAWT_X11DrawingSurfaceInfo *>(static_cast<uintptr_t>(platformInfoPtr));
+        JAWT_X11DrawingSurfaceInfo *dsi_x11 = fromJavaPointer<JAWT_X11DrawingSurfaceInfo *>(platformInfoPtr);
         Display *display = dsi_x11->display;
-        return static_cast<jlong>(reinterpret_cast<uintptr_t>(display));
+        return toJavaPointer(display);
     }
 
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_getWindow(JNIEnv *env, jobject redrawer, jlong platformInfoPtr)
     {
-        JAWT_X11DrawingSurfaceInfo *dsi_x11 = reinterpret_cast<JAWT_X11DrawingSurfaceInfo *>(static_cast<uintptr_t>(platformInfoPtr));
+        JAWT_X11DrawingSurfaceInfo *dsi_x11 = fromJavaPointer<JAWT_X11DrawingSurfaceInfo *>(platformInfoPtr);
         Window window = dsi_x11->drawable;
-        return static_cast<jlong>(reinterpret_cast<uintptr_t>(window));
+        return toJavaPointer(window);
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_setSwapInterval(JNIEnv *env, jobject redrawer, jlong displayPtr, jlong windowPtr, jint interval)
     {
-        Display *display = reinterpret_cast<Display *>(static_cast<uintptr_t>(displayPtr));
-        Window window = reinterpret_cast<Window>(static_cast<uintptr_t>(windowPtr));
+        Display *display = fromJavaPointer<Display *>(displayPtr);
+        Window window = fromJavaPointer<Window>(windowPtr);
 
         // according to:
         // https://opengl.gpuinfo.org/listreports.php?extension=GLX_EXT_swap_control
@@ -63,35 +62,35 @@ extern "C"
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_swapBuffers(JNIEnv *env, jobject redrawer, jlong displayPtr, jlong windowPtr)
     {
-        Display *display = reinterpret_cast<Display *>(static_cast<uintptr_t>(displayPtr));
-        Window window = reinterpret_cast<Window>(static_cast<uintptr_t>(windowPtr));
+        Display *display = fromJavaPointer<Display *>(displayPtr);
+        Window window = fromJavaPointer<Window>(windowPtr);
 
         glXSwapBuffers(display, window);
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_makeCurrent(JNIEnv *env, jobject redrawer, jlong displayPtr, jlong windowPtr, jlong contextPtr)
     {
-        Display *display = reinterpret_cast<Display *>(static_cast<uintptr_t>(displayPtr));
-        Window window = reinterpret_cast<Window>(static_cast<uintptr_t>(windowPtr));
-        GLXContext *context = reinterpret_cast<GLXContext *>(static_cast<uintptr_t>(contextPtr));
+        Display *display = fromJavaPointer<Display *>(displayPtr);
+        Window window = fromJavaPointer<Window>(windowPtr);
+        GLXContext *context = fromJavaPointer<GLXContext *>(contextPtr);
 
         glXMakeCurrent(display, window, *context);
     }
 
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_createContext(JNIEnv *env, jobject redrawer, jlong displayPtr)
     {
-        Display *display = reinterpret_cast<Display *>(static_cast<uintptr_t>(displayPtr));
+        Display *display = fromJavaPointer<Display *>(displayPtr);
         GLint att[] = {GLX_RGBA, GLX_DOUBLEBUFFER, True, None};
         XVisualInfo *vi = glXChooseVisual(display, 0, att);
 
         GLXContext *context = new GLXContext(glXCreateContext(display, vi, NULL, GL_TRUE));
-        return static_cast<jlong>(reinterpret_cast<uintptr_t>(context));
+        return toJavaPointer(context);
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_destroyContext(JNIEnv *env, jobject redrawer, jlong displayPtr, jlong contextPtr)
     {
-        Display *display = reinterpret_cast<Display *>(static_cast<uintptr_t>(displayPtr));
-        GLXContext *context = reinterpret_cast<GLXContext *>(static_cast<uintptr_t>(contextPtr));
+        Display *display = fromJavaPointer<Display *>(displayPtr);
+        GLXContext *context = fromJavaPointer<GLXContext *>(contextPtr);
 
         glXDestroyContext(display, *context);
         delete context;
