@@ -142,7 +142,7 @@ private abstract class AWTGLLayer(private val containerPtr: Long, setNeedsDispla
     // Called in AppKit Thread
     protected open fun canDraw() = true
 
-    @Suppress("unused")
+    @Suppress("unused") // called from native code
     private fun performDraw() {
         try {
             draw()
