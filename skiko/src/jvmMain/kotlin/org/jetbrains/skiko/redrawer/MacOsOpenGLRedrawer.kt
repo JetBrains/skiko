@@ -111,7 +111,7 @@ internal class MacOsOpenGLRedrawer(
     }
 }
 
-private open class AWTGLLayer(private val containerPtr: Long, setNeedsDisplayOnBoundsChange: Boolean) {
+private abstract class AWTGLLayer(private val containerPtr: Long, setNeedsDisplayOnBoundsChange: Boolean) {
     @Suppress("LeakingThis")
     val ptr = initAWTGLLayer(containerPtr, this, setNeedsDisplayOnBoundsChange)
 
@@ -131,8 +131,17 @@ private open class AWTGLLayer(private val containerPtr: Long, setNeedsDisplayOnB
     // Called in AppKit Thread
     protected open fun canDraw() = true
 
+    @Suppress("unused")
+    private fun performDraw() {
+        try {
+            draw()
+        } catch (e: Throwable) {
+            e.printStackTrace()
+        }
+    }
+
     // Called in AppKit Thread
-    protected open fun draw() = Unit
+    protected abstract fun draw()
 
     private external fun isAsynchronous(ptr: Long): Boolean
     private external fun setAsynchronous(ptr: Long, isAsynchronous: Boolean)
