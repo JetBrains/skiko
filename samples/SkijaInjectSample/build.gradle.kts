@@ -45,7 +45,9 @@ application {
     mainClass.set("SkijaInjectSample.AppKt")
 }
 
-tasks.named<JavaExec>("run") {
+val additionalArguments = mutableMapOf<String, String>()
+
+val casualRun = tasks.named<JavaExec>("run") {
     systemProperty("skiko.fps.enabled", "true")
     System.getProperties().entries
         .associate {
@@ -53,6 +55,12 @@ tasks.named<JavaExec>("run") {
         }
         .filterKeys { it.startsWith("skiko.") }
         .forEach { systemProperty(it.key, it.value) }
+    additionalArguments.forEach { systemProperty(it.key, it.value) }
+}
+
+tasks.register("runSoftware") {
+    additionalArguments += mapOf("skiko.renderApi" to "SOFTWARE")
+    dependsOn(casualRun)
 }
 
 tasks.withType<Test> {
