@@ -1,6 +1,5 @@
 package org.jetbrains.skiko.redrawer
 
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import org.jetbrains.skiko.FrameDispatcher
@@ -8,6 +7,7 @@ import org.jetbrains.skiko.HardwareLayer
 import org.jetbrains.skiko.OpenGLApi
 import org.jetbrains.skiko.SkikoProperties
 import org.jetbrains.skiko.useDrawingSurfacePlatformInfo
+import org.jetbrains.skiko.Task
 import javax.swing.SwingUtilities.convertPoint
 import javax.swing.SwingUtilities.getRootPane
 
@@ -31,7 +31,7 @@ internal class MacOsOpenGLRedrawer(
     // AWT has a method to avoid dead locks but it is internal (sun.lwawt.macosx.LWCToolkit.invokeAndWait)
     private val vsyncLayer = object : AWTGLLayer(containerLayerPtr, setNeedsDisplayOnBoundsChange = false) {
         @Volatile
-        private var needDraw: CompletableDeferred<Unit>? = null
+        private var canDraw = false
 
         init {
             setFrame(0, 0, 1, 1) // if frame has zero size then it will be not drawn at all
@@ -42,21 +42,17 @@ internal class MacOsOpenGLRedrawer(
             val opengl = OpenGLApi.instance
             opengl.glClearColor(0f, 0f, 0f, 0f)
             opengl.glClear(opengl.GL_COLOR_BUFFER_BIT)
-            needDraw?.complete(Unit)
         }
 
         override fun canDraw(): Boolean {
-            val canDraw = needDraw != null
+            val canDraw = canDraw
             if (!canDraw) {
                 isAsynchronous = false // stop asynchronous mode so we don't waste CPU cycles
             }
             return canDraw
         }
 
-        suspend fun sync() {
-            check(needDraw == null)
-            needDraw = CompletableDeferred()
-
+        override fun setNeedsDisplay() {
             // Use asynchronous mode instead of just setNeedsDisplay,
             // so Core Animation will wait for the next frame in vsync signal
             //
@@ -69,17 +65,26 @@ internal class MacOsOpenGLRedrawer(
                 isAsynchronous = true
                 super.setNeedsDisplay()
             }
+        }
 
-            needDraw!!.await()
-            needDraw = null
+        suspend fun sync() {
+            canDraw = true
+            display()
+            canDraw = false
         }
     }
 
     private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
-        layer.update(System.nanoTime())
-        drawLayer.setNeedsDisplay()
+        synchronized(drawLock) {
+            layer.update(System.nanoTime())
+        }
         if (SkikoProperties.vsyncEnabled) {
+            drawLayer.setNeedsDisplay()
             vsyncLayer.sync()
+        } else {
+            // If vsync is disabled we should await the drawing to end.
+            // Otherwise we will call 'update' multiple times.
+            drawLayer.display()
         }
     }
 
@@ -112,9 +117,11 @@ internal class MacOsOpenGLRedrawer(
     }
 }
 
-private open class AWTGLLayer(private val containerPtr: Long, setNeedsDisplayOnBoundsChange: Boolean) {
+private abstract class AWTGLLayer(private val containerPtr: Long, setNeedsDisplayOnBoundsChange: Boolean) {
     @Suppress("LeakingThis")
     val ptr = initAWTGLLayer(containerPtr, this, setNeedsDisplayOnBoundsChange)
+
+    private val display = Task()
 
     fun setFrame(x: Int, y: Int, width: Int, height: Int) {
         setFrame(containerPtr, ptr, x.toFloat(), y.toFloat(), width.toFloat(), height.toFloat())
@@ -129,11 +136,25 @@ private open class AWTGLLayer(private val containerPtr: Long, setNeedsDisplayOnB
 
     open fun setNeedsDisplay() = setNeedsDisplayOnMainThread(ptr)
 
+    suspend fun display() = display.runAndAwait {
+        setNeedsDisplay()
+    }
+
     // Called in AppKit Thread
     protected open fun canDraw() = true
 
+    @Suppress("unused") // called from native code
+    private fun performDraw() {
+        try {
+            draw()
+        } catch (e: Throwable) {
+            e.printStackTrace()
+        }
+        display.finish()
+    }
+
     // Called in AppKit Thread
-    protected open fun draw() = Unit
+    protected abstract fun draw()
 
     private external fun isAsynchronous(ptr: Long): Boolean
     private external fun setAsynchronous(ptr: Long, isAsynchronous: Boolean)
