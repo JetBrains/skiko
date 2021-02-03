@@ -1,12 +1,12 @@
 package org.jetbrains.skiko.redrawer
 
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.HardwareLayer
 import org.jetbrains.skiko.OpenGLApi
 import org.jetbrains.skiko.SkikoProperties
+import org.jetbrains.skiko.Task
 import javax.swing.SwingUtilities.convertPoint
 import javax.swing.SwingUtilities.getRootPane
 
@@ -165,26 +165,3 @@ private external fun initContainer(layer: HardwareLayer): Long
 private external fun setContentScale(layerNativePtr: Long, contentScale: Float)
 private external fun initAWTGLLayer(containerPtr: Long, layer: AWTGLLayer, setNeedsDisplayOnBoundsChange: Boolean): Long
 private external fun disposeAWTGLLayer(ptr: Long)
-
-internal class Task {
-    @Volatile
-    private var onFinish: CompletableDeferred<Unit>? = null
-
-    /**
-     * Run task and await its finishing (i.e. calling of [finish])
-     */
-    suspend fun runAndAwait(run: suspend () -> Unit) {
-        check(onFinish == null)
-        onFinish = CompletableDeferred()
-        run()
-        onFinish!!.await()
-        onFinish = null
-    }
-
-    /**
-     * Finish running task. If there is no running task, do nothing.
-     */
-    fun finish() {
-        onFinish?.complete(Unit)
-    }
-}
