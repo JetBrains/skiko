@@ -81,8 +81,8 @@ open class SkiaLayer : HardwareLayer() {
             fpsCounter.tick()
         }
 
-        val pictureWidth = actualAWTDimension(width, contentScale)
-        val pictureHeight = actualAWTDimension(height, contentScale)
+        val pictureWidth = unscaledAWTDimension(width, contentScale)
+        val pictureHeight = unscaledAWTDimension(height, contentScale)
 
         val bounds = Rect.makeWH(pictureWidth.toFloat(), pictureHeight.toFloat())
         val canvas = pictureRecorder.beginRecording(bounds)!!

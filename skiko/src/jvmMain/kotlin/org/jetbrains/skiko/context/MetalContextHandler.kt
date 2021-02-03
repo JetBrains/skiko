@@ -5,7 +5,7 @@ import org.jetbrains.skija.Surface
 import org.jetbrains.skija.SurfaceColorFormat
 import org.jetbrains.skija.SurfaceOrigin
 import org.jetbrains.skiko.HardwareLayer
-import org.jetbrains.skiko.actualAWTDimension
+import org.jetbrains.skiko.unscaledAWTDimension
 import org.jetbrains.skiko.makeMetalContext
 import org.jetbrains.skiko.makeMetalRenderTarget
 
@@ -26,8 +26,8 @@ internal class MetalContextHandler(layer: HardwareLayer) : ContextHandler(layer)
         dispose()
 
         val scale = layer.contentScale
-        val w = actualAWTDimension(layer.width, scale)
-        val h = actualAWTDimension(layer.height, scale)
+        val w = unscaledAWTDimension(layer.width, scale)
+        val h = unscaledAWTDimension(layer.height, scale)
 
         renderTarget = makeMetalRenderTarget(w, h, 0)
 

@@ -12,7 +12,7 @@ import kotlin.math.roundToInt
  * If we use just toInt() or roundToInt() we will have artifacts on resize on Windows with fractional DPI
  * (it is wrongly stretched with software render, and translated with hardware render).
  */
-internal fun actualAWTDimension(
+internal fun unscaledAWTDimension(
     scaledValue: Int,
     contentScale: Float
 ) = (scaledValue * contentScale).nextDown().roundToInt().coerceAtLeast(0)

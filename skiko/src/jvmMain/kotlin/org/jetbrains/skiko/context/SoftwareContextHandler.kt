@@ -6,7 +6,7 @@ import org.jetbrains.skija.ColorAlphaType
 import org.jetbrains.skija.ImageInfo
 import org.jetbrains.skija.Picture
 import org.jetbrains.skiko.HardwareLayer
-import org.jetbrains.skiko.actualAWTDimension
+import org.jetbrains.skiko.unscaledAWTDimension
 import java.awt.Transparency
 import java.awt.color.ColorSpace
 import java.awt.image.BufferedImage
@@ -40,8 +40,8 @@ internal class SoftwareContextHandler(layer: HardwareLayer) : ContextHandler(lay
         dispose()
         
         val scale = layer.contentScale
-        val w = actualAWTDimension(layer.width, scale)
-        val h = actualAWTDimension(layer.height, scale)
+        val w = unscaledAWTDimension(layer.width, scale)
+        val h = unscaledAWTDimension(layer.height, scale)
         
         if (storage.getWidth() != w || storage.getHeight() != h) {
             storage.allocPixelsFlags(ImageInfo.makeS32(w, h, ColorAlphaType.PREMUL), false)
@@ -54,8 +54,8 @@ internal class SoftwareContextHandler(layer: HardwareLayer) : ContextHandler(lay
         super.drawOnCanvas(picture)
 
         val scale = layer.contentScale
-        val w = actualAWTDimension(layer.width, scale)
-        val h = actualAWTDimension(layer.height, scale)
+        val w = unscaledAWTDimension(layer.width, scale)
+        val h = unscaledAWTDimension(layer.height, scale)
 
         val bytes = storage.readPixels(storage.getImageInfo(), (w * 4).toLong(), 0, 0)
         if (bytes != null) {
