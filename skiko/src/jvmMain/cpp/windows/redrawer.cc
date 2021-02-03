@@ -3,7 +3,7 @@
 #include <gl/GL.h>
 #include <jawt_md.h>
 #include <dwmapi.h>
-#include "../common/jni_helpers.h"
+#include "jni_helpers.h"
 
 extern "C"
 {

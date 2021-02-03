@@ -1,6 +1,6 @@
 #define WIN32_LEAN_AND_MEAN
 #include <jawt_md.h>
-#include "../common/jni_helpers.h"
+#include "jni_helpers.h"
 
 extern "C"
 {

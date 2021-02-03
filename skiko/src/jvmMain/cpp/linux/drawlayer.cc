@@ -7,7 +7,7 @@
 #include <cstdlib>
 #include <unistd.h>
 #include <stdio.h>
-#include "../common/jni_helpers.h"
+#include "jni_helpers.h"
 
 typedef GLXContext (*glXCreateContextAttribsARBProc)(Display *, GLXFBConfig, GLXContext, Bool, const int *);
 

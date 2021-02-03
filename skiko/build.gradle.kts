@@ -228,6 +228,7 @@ tasks.withType(CppCompile::class.java).configureEach {
         "-DSK_UNICODE_AVAILABLE",
         *buildType.flags
     ))
+    val includeDir = "$projectDir/src/jvmMain/cpp/include"
     when (targetOs) {
         OS.MacOS -> {
             compilerArgs.addAll(
@@ -235,6 +236,7 @@ tasks.withType(CppCompile::class.java).configureEach {
                     "-fvisibility=hidden",
                     "-fvisibility-inlines-hidden",
                     "-I$jdkHome/include/darwin",
+                    "-I$includeDir",
                     "-DSK_SHAPER_CORETEXT_AVAILABLE",
                     "-DSK_BUILD_FOR_MAC",
                     "-DSK_METAL",
@@ -248,6 +250,7 @@ tasks.withType(CppCompile::class.java).configureEach {
                     "-fvisibility=hidden",
                     "-fvisibility-inlines-hidden",
                     "-I$jdkHome/include/linux",
+                    "-I$includeDir",
                     "-DSK_BUILD_FOR_LINUX",
                     "-DSK_R32_SHIFT=16",
                     *buildType.clangFlags
@@ -258,6 +261,7 @@ tasks.withType(CppCompile::class.java).configureEach {
             compilerArgs.addAll(
                 listOf(
                     "-I$jdkHome/include/win32",
+                    "-I$includeDir",
                     "-DSK_BUILD_FOR_WIN",
                     "-D_CRT_SECURE_NO_WARNINGS",
                     "-D_HAS_EXCEPTIONS=0",
