@@ -29,7 +29,21 @@ internal object SkikoProperties {
         when(text) {
             "SOFTWARE" -> return GraphicsApi.SOFTWARE
             "OPENGL" -> return GraphicsApi.OPENGL
-            else -> return GraphicsApi.OPENGL
+            "DIRECT3D" -> {
+                return if (hostOs == OS.Windows) GraphicsApi.DIRECT3D else bestRenderApiForCurrentOS()
+            }
+            "METAL" -> {
+                return if (hostOs == OS.MacOS) GraphicsApi.METAL else bestRenderApiForCurrentOS()
+            }
+            else -> return bestRenderApiForCurrentOS()
+        }
+    }
+
+    private fun bestRenderApiForCurrentOS(): GraphicsApi {
+        when(hostOs) {
+            OS.MacOS -> return GraphicsApi.OPENGL
+            OS.Linux -> return GraphicsApi.OPENGL
+            OS.Windows -> return GraphicsApi.DIRECT3D
         }
     }
 

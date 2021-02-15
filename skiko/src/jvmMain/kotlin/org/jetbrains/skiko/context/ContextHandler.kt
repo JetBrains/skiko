@@ -10,11 +10,13 @@ import org.jetbrains.skiko.HardwareLayer
 import org.jetbrains.skiko.OS
 import org.jetbrains.skiko.SkikoProperties
 import org.jetbrains.skiko.hostOs
+import org.jetbrains.skiko.redrawer.Redrawer
 
 internal fun createContextHandler(layer: HardwareLayer): ContextHandler {
     return when (SkikoProperties.renderApi) {
         GraphicsApi.SOFTWARE -> SoftwareContextHandler(layer)
         GraphicsApi.OPENGL -> OpenGLContextHandler(layer)
+        GraphicsApi.DIRECT3D -> Direct3DContextHandler(layer)
         else -> TODO("Unsupported yet")
     }
 }
@@ -26,7 +28,7 @@ internal abstract class ContextHandler(val layer: HardwareLayer) {
     var surface: Surface? = null
     var canvas: Canvas? = null
 
-    abstract fun initContext(): Boolean
+    abstract fun initContext(redrawer: Redrawer): Boolean
 
     abstract fun initCanvas()
 

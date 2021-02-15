@@ -10,9 +10,10 @@ import org.jetbrains.skiko.HardwareLayer
 import org.jetbrains.skiko.makeGLContext
 import org.jetbrains.skiko.makeGLRenderTarget
 import org.jetbrains.skiko.OpenGLApi
+import org.jetbrains.skiko.redrawer.Redrawer
 
 internal class OpenGLContextHandler(layer: HardwareLayer) : ContextHandler(layer) {
-    override fun initContext(): Boolean {
+    override fun initContext(redrawer: Redrawer): Boolean {
         try {
             if (context == null) {
                 context = makeGLContext()

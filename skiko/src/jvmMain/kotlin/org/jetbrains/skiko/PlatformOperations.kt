@@ -3,9 +3,10 @@ package org.jetbrains.skiko
 import org.jetbrains.skiko.SkikoProperties.renderApi
 import org.jetbrains.skiko.redrawer.LinuxOpenGLRedrawer
 import org.jetbrains.skiko.redrawer.MacOsOpenGLRedrawer
-import org.jetbrains.skiko.redrawer.RasterRedrawer
+import org.jetbrains.skiko.redrawer.SoftwareRedrawer
 import org.jetbrains.skiko.redrawer.Redrawer
 import org.jetbrains.skiko.redrawer.WindowsOpenGLRedrawer
+import org.jetbrains.skiko.redrawer.Direct3DRedrawer
 import java.awt.Component
 import java.awt.Window
 import javax.swing.SwingUtilities
@@ -33,7 +34,7 @@ internal val platformOperations: PlatformOperations by lazy {
                 }
 
                 override fun createRedrawer(layer: HardwareLayer) = when(renderApi) {
-                    GraphicsApi.SOFTWARE -> RasterRedrawer(layer)
+                    GraphicsApi.SOFTWARE -> SoftwareRedrawer(layer)
                     else -> MacOsOpenGLRedrawer(layer)
                 }
         }
@@ -56,7 +57,8 @@ internal val platformOperations: PlatformOperations by lazy {
                 }
 
                 override fun createRedrawer(layer: HardwareLayer) = when(renderApi) {
-                    GraphicsApi.SOFTWARE -> RasterRedrawer(layer)
+                    GraphicsApi.SOFTWARE -> SoftwareRedrawer(layer)
+                    GraphicsApi.DIRECT3D -> Direct3DRedrawer(layer)
                     else -> WindowsOpenGLRedrawer(layer)
                 }
             }
@@ -92,7 +94,7 @@ internal val platformOperations: PlatformOperations by lazy {
                 }
 
                 override fun createRedrawer(layer: HardwareLayer) = when(renderApi) {
-                    GraphicsApi.SOFTWARE -> RasterRedrawer(layer)
+                    GraphicsApi.SOFTWARE -> SoftwareRedrawer(layer)
                     else -> LinuxOpenGLRedrawer(layer)
                 }
             }

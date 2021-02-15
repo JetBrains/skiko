@@ -8,9 +8,10 @@ import org.jetbrains.skiko.GraphicsApi
 import org.jetbrains.skiko.HardwareLayer
 import org.jetbrains.skiko.makeMetalContext
 import org.jetbrains.skiko.makeMetalRenderTarget
+import org.jetbrains.skiko.redrawer.Redrawer
 
 internal class MetalContextHandler(layer: HardwareLayer) : ContextHandler(layer) {
-    override fun initContext(): Boolean {
+    override fun initContext(redrawer: Redrawer): Boolean {
         try {
             if (context == null) {
                 context = makeMetalContext()
