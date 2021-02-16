@@ -5,13 +5,13 @@ import org.jetbrains.skija.Surface
 import org.jetbrains.skija.SurfaceColorFormat
 import org.jetbrains.skija.SurfaceOrigin
 import org.jetbrains.skiko.GraphicsApi
-import org.jetbrains.skiko.HardwareLayer
+import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.makeMetalContext
 import org.jetbrains.skiko.makeMetalRenderTarget
 import org.jetbrains.skiko.redrawer.Redrawer
 
-internal class MetalContextHandler(layer: HardwareLayer) : ContextHandler(layer) {
-    override fun initContext(redrawer: Redrawer): Boolean {
+internal class MetalContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
+    override fun initContext(): Boolean {
         try {
             if (context == null) {
                 context = makeMetalContext()

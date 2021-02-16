@@ -14,12 +14,12 @@ import java.awt.image.Raster
 import org.jetbrains.skija.Bitmap
 import org.jetbrains.skija.ColorAlphaType
 import org.jetbrains.skija.Canvas
-import org.jetbrains.skiko.HardwareLayer
+import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skija.ImageInfo
 import org.jetbrains.skija.Picture
 import org.jetbrains.skiko.redrawer.Redrawer
 
-internal class SoftwareContextHandler(layer: HardwareLayer) : ContextHandler(layer) {
+internal class SoftwareContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
     override val bleachConstant = -1 // it looks like java.awt.Canvas doesn't support transparency
 
     val colorModel = ComponentColorModel(
@@ -34,7 +34,7 @@ internal class SoftwareContextHandler(layer: HardwareLayer) : ContextHandler(lay
     var imageData: ByteArray? = null
     var raster: WritableRaster? = null
 
-    override fun initContext(redrawer: Redrawer): Boolean {
+    override fun initContext(): Boolean {
         // Raster does not need context
         return true
     }

@@ -1,6 +1,8 @@
 #ifdef SK_DIRECT3D
 #include <windows.h>
 #include <jawt_md.h>
+#include "jni_helpers.h"
+
 #include "GrBackendSurface.h"
 #include "GrDirectContext.h"
 #include "SkSurface.h"
@@ -10,6 +12,7 @@
 #include "d3d/GrD3DBackendContext.h"
 #include <d3d12.h>
 #include <dxgi1_4.h>
+
 
 #define GR_D3D_CALL_ERRCHECK(X)                                        \
     do                                                                 \
@@ -22,7 +25,7 @@
         }                                                              \
     } while (false)
 
-extern "C" jboolean Skiko_GetAWT(JNIEnv *env, JAWT *awt);
+const int BuffersCount = 2;
 
 class DirectXDevice
 {
@@ -49,15 +52,15 @@ extern "C"
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_makeDirectXContext(
         JNIEnv* env, jobject redrawer, jlong devicePtr)
     {
-        DirectXDevice *d3dDevice = reinterpret_cast<DirectXDevice *>(static_cast<uintptr_t>(devicePtr));
+        DirectXDevice *d3dDevice = fromJavaPointer<DirectXDevice*>(devicePtr);
         GrD3DBackendContext backendContext = d3dDevice->backendContext;
-        return reinterpret_cast<jlong>(GrDirectContext::MakeDirect3D(backendContext).release());
+        return toJavaPointer(GrDirectContext::MakeDirect3D(backendContext).release());
     }
 
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_makeDirectXRenderTarget(
         JNIEnv * env, jobject redrawer, jlong devicePtr, jint width, jint height)
     {
-        DirectXDevice *d3dDevice = reinterpret_cast<DirectXDevice *>(static_cast<uintptr_t>(devicePtr));
+        DirectXDevice *d3dDevice = fromJavaPointer<DirectXDevice*>(devicePtr);
         d3dDevice->bufferIndex = d3dDevice->swapChain->GetCurrentBackBufferIndex();
         ID3D12Resource* buffer;
         GR_D3D_CALL_ERRCHECK(d3dDevice->swapChain->GetBuffer(d3dDevice->bufferIndex, IID_PPV_ARGS(&buffer)));
@@ -69,7 +72,7 @@ extern "C"
                                       1,
                                       0);
         GrBackendRenderTarget* renderTarget = new GrBackendRenderTarget(width, height, info);
-        return reinterpret_cast<jlong>(renderTarget);
+        return toJavaPointer(renderTarget);
     }
 
     void defineHardwareAdapter(IDXGIFactory4 *pFactory, IDXGIAdapter1 **ppAdapter)
@@ -127,13 +130,13 @@ extern "C"
         d3dDevice->device = device;
         d3dDevice->queue = queue;
 
-        return reinterpret_cast<jlong>(d3dDevice);
+        return toJavaPointer(d3dDevice);
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_createSwapChain(
         JNIEnv *env, jobject redrawer, jlong windowHandle, jlong devicePtr)
     {
-        DirectXDevice *d3dDevice = reinterpret_cast<DirectXDevice *>(static_cast<uintptr_t>(devicePtr));
+        DirectXDevice *d3dDevice = fromJavaPointer<DirectXDevice*>(devicePtr);
 
         // Make the swapchain
         HWND fWindow = (HWND)windowHandle;
@@ -142,7 +145,7 @@ extern "C"
         GR_D3D_CALL_ERRCHECK(CreateDXGIFactory2(0, IID_PPV_ARGS(&factory)));
 
         DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
-        swapChainDesc.BufferCount = 2;
+        swapChainDesc.BufferCount = BuffersCount;
         swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
         swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
         swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
@@ -161,10 +164,10 @@ extern "C"
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_resizeBuffers(
         JNIEnv *env, jobject redrawer, jlong devicePtr, jint width, jint height)
     {
-        DirectXDevice *d3dDevice = reinterpret_cast<DirectXDevice *>(static_cast<uintptr_t>(devicePtr));
+        DirectXDevice *d3dDevice = fromJavaPointer<DirectXDevice*>(devicePtr);
         if (!d3dDevice->isSizeEqualTo(width, height))
         {
-            GR_D3D_CALL_ERRCHECK(d3dDevice->swapChain->ResizeBuffers(2, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 0));
+            GR_D3D_CALL_ERRCHECK(d3dDevice->swapChain->ResizeBuffers(BuffersCount, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 0));
             d3dDevice->bufferWidth = width;
             d3dDevice->bufferHeight = height;
         }
@@ -173,11 +176,11 @@ extern "C"
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_finishFrame(
         JNIEnv *env, jobject redrawer, jlong devicePtr, jlong contextPtr, jlong surfacePtr)
     {
-        DirectXDevice *d3dDevice = reinterpret_cast<DirectXDevice *>(static_cast<uintptr_t>(devicePtr));
+        DirectXDevice *d3dDevice = fromJavaPointer<DirectXDevice*>(devicePtr);
 
-        SkSurface *surface = reinterpret_cast<SkSurface *>(static_cast<uintptr_t>(surfacePtr));
+        SkSurface *surface = fromJavaPointer<SkSurface*>(surfacePtr);
         surface->flushAndSubmit();
-        GrDirectContext *fContext = reinterpret_cast<GrDirectContext *>(static_cast<uintptr_t>(contextPtr));
+        GrDirectContext *fContext = fromJavaPointer<GrDirectContext*>(contextPtr);
         surface->flush(SkSurface::BackendSurfaceAccess::kPresent, GrFlushInfo());
         fContext->flush({});
         fContext->submit(true);

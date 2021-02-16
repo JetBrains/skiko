@@ -7,19 +7,17 @@ import org.jetbrains.skija.Surface
 import org.jetbrains.skija.SurfaceColorFormat
 import org.jetbrains.skija.SurfaceOrigin
 import org.jetbrains.skija.impl.Native
-import org.jetbrains.skiko.HardwareLayer
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.redrawer.Direct3DRedrawer
 import org.jetbrains.skiko.redrawer.Redrawer
 
-internal class Direct3DContextHandler(layer: HardwareLayer) : ContextHandler(layer) {
-    lateinit var directXRedrawer: Direct3DRedrawer
+internal class Direct3DContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
+    val directXRedrawer: Direct3DRedrawer
+        get() = layer.redrawer!! as Direct3DRedrawer
+
     var device: Long = 0
-    override fun initContext(redrawer: Redrawer): Boolean {
+    override fun initContext(): Boolean {
         try {
-            if (!this::directXRedrawer.isInitialized) {
-                directXRedrawer = redrawer as Direct3DRedrawer
-            }
             if (context == null) {
                 device = directXRedrawer.createDevice()
                 directXRedrawer.createSwapChain(layer.windowHandle, device)

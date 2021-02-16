@@ -26,7 +26,7 @@ open class SkiaLayer : HardwareLayer() {
 
     @Volatile
     private var isDisposed = false
-    private var redrawer: Redrawer? = null
+    internal var redrawer: Redrawer? = null
 
     @Volatile
     private var picture: PictureHolder? = null
@@ -103,7 +103,7 @@ open class SkiaLayer : HardwareLayer() {
     override fun draw() {
         check(!isDisposed)
         contextHandler.apply {
-            if (!initContext(redrawer!!)) {
+            if (!initContext()) {
                 fallbackToRaster()
                 return
             }

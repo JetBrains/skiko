@@ -30,10 +30,12 @@ internal object SkikoProperties {
             "SOFTWARE" -> return GraphicsApi.SOFTWARE
             "OPENGL" -> return GraphicsApi.OPENGL
             "DIRECT3D" -> {
-                return if (hostOs == OS.Windows) GraphicsApi.DIRECT3D else bestRenderApiForCurrentOS()
+                return if (hostOs == OS.Windows) GraphicsApi.DIRECT3D
+                    else throw Exception("$hostOs does not support DirectX rendering API.")
             }
             "METAL" -> {
-                return if (hostOs == OS.MacOS) GraphicsApi.METAL else bestRenderApiForCurrentOS()
+                return if (hostOs == OS.MacOS) GraphicsApi.METAL
+                    else throw Exception("$hostOs does not support Metal rendering API.")
             }
             else -> return bestRenderApiForCurrentOS()
         }

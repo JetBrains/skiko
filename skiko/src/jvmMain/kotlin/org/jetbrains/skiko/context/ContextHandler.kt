@@ -6,13 +6,13 @@ import org.jetbrains.skija.DirectContext
 import org.jetbrains.skija.Picture
 import org.jetbrains.skija.Surface
 import org.jetbrains.skiko.GraphicsApi
-import org.jetbrains.skiko.HardwareLayer
+import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.OS
 import org.jetbrains.skiko.SkikoProperties
 import org.jetbrains.skiko.hostOs
 import org.jetbrains.skiko.redrawer.Redrawer
 
-internal fun createContextHandler(layer: HardwareLayer): ContextHandler {
+internal fun createContextHandler(layer: SkiaLayer): ContextHandler {
     return when (SkikoProperties.renderApi) {
         GraphicsApi.SOFTWARE -> SoftwareContextHandler(layer)
         GraphicsApi.OPENGL -> OpenGLContextHandler(layer)
@@ -21,14 +21,14 @@ internal fun createContextHandler(layer: HardwareLayer): ContextHandler {
     }
 }
 
-internal abstract class ContextHandler(val layer: HardwareLayer) {
+internal abstract class ContextHandler(val layer: SkiaLayer) {
     open val bleachConstant = if (hostOs == OS.MacOS) 0 else -1
     var context: DirectContext? = null
     var renderTarget: BackendRenderTarget? = null
     var surface: Surface? = null
     var canvas: Canvas? = null
 
-    abstract fun initContext(redrawer: Redrawer): Boolean
+    abstract fun initContext(): Boolean
 
     abstract fun initCanvas()
 
