@@ -5,14 +5,15 @@ import kotlinx.coroutines.swing.Swing
 import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.HardwareLayer
 import org.jetbrains.skiko.OpenGLApi
-import org.jetbrains.skiko.SkikoProperties
-import org.jetbrains.skiko.useDrawingSurfacePlatformInfo
+import org.jetbrains.skiko.SkiaLayerProperties
 import org.jetbrains.skiko.Task
+import org.jetbrains.skiko.useDrawingSurfacePlatformInfo
 import javax.swing.SwingUtilities.convertPoint
 import javax.swing.SwingUtilities.getRootPane
 
 internal class MacOsOpenGLRedrawer(
-    private val layer: HardwareLayer
+    private val layer: HardwareLayer,
+    private val properties: SkiaLayerProperties
 ) : Redrawer {
     private val containerLayerPtr = layer.useDrawingSurfacePlatformInfo(::initContainer)
     private val drawLock = Any()
@@ -78,7 +79,7 @@ internal class MacOsOpenGLRedrawer(
         synchronized(drawLock) {
             layer.update(System.nanoTime())
         }
-        if (SkikoProperties.vsyncEnabled) {
+        if (properties.isVsyncEnabled) {
             drawLayer.setNeedsDisplay()
             vsyncLayer.sync()
         } else {
