@@ -1,5 +1,6 @@
 package org.jetbrains.skiko.context
 
+import java.lang.ref.Reference
 import org.jetbrains.skija.ColorSpace
 import org.jetbrains.skija.FramebufferFormat
 import org.jetbrains.skija.Picture
@@ -30,8 +31,6 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextHandler(layer) 
         return true
     }
 
-    
-
     override fun initCanvas() {
         dispose()
 
@@ -55,10 +54,15 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextHandler(layer) 
     }
 
     override fun flush() {
-        directXRedrawer.finishFrame(
-            device,
-            Native.getPtr(context!!),
-            Native.getPtr(surface!!)
-        );
+        try {
+            directXRedrawer.finishFrame(
+                device,
+                Native.getPtr(context!!),
+                Native.getPtr(surface!!)
+            )
+        } finally {
+            Reference.reachabilityFence(context!!)
+            Reference.reachabilityFence(surface!!)
+        }
     }
 }
