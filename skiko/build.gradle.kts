@@ -382,7 +382,6 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
                     "opengl32.lib",
                     "shcore.lib",
                     "user32.lib",
-                    "dxgi.lib",
                     "d3dcompiler.lib"
                 )
             )

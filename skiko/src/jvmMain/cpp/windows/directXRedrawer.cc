@@ -97,6 +97,48 @@ HRESULT D3D12SerializeRootSignature(
     return impl(pRootSignature, Version, ppBlob, ppErrorBlob);
 }
 
+HRESULT CreateDXGIFactory1(
+  REFIID riid,
+  void   **ppFactory
+) {
+    typedef HRESULT (*CreateDXGIFactory1_t)(
+        REFIID riid,
+        void   **ppFactory
+    );
+    static CreateDXGIFactory1_t impl = nullptr;
+    if (!impl) {
+        auto dxgidll = LoadLibrary(TEXT("Dxgi.dll"));
+        if (!dxgidll)
+            return E_NOTIMPL;
+        impl = (CreateDXGIFactory1_t)GetProcAddress(dxgidll, "CreateDXGIFactory1");
+        if (!impl)
+            return E_NOTIMPL;
+    }
+    return impl(riid, ppFactory);
+}
+
+HRESULT CreateDXGIFactory2(
+  UINT   Flags,
+  REFIID riid,
+  void   **ppFactory
+) {
+    typedef HRESULT (*CreateDXGIFactory2_t)(
+        UINT   Flags,
+        REFIID riid,
+        void   **ppFactory
+    );
+    static CreateDXGIFactory2_t impl = nullptr;
+    if (!impl) {
+        auto dxgidll = LoadLibrary(TEXT("Dxgi.dll"));
+        if (!dxgidll)
+            return E_NOTIMPL;
+        impl = (CreateDXGIFactory2_t)GetProcAddress(dxgidll, "CreateDXGIFactory2");
+        if (!impl)
+            return E_NOTIMPL;
+    }
+    return impl(Flags, riid, ppFactory);
+}
+
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_makeDirectXContext(
         JNIEnv* env, jobject redrawer, jlong devicePtr)
     {
