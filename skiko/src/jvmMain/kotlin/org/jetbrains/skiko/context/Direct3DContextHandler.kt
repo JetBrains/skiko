@@ -20,8 +20,8 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextHandler(layer) 
     override fun initContext(): Boolean {
         try {
             if (context == null) {
-                device = directXRedrawer.createDevice()
-                directXRedrawer.createSwapChain(layer.windowHandle, device)
+                device = directXRedrawer.createDevice(layer.windowHandle)
+                if (device == 0L) return false
                 context = directXRedrawer.makeContext(device)
             }
         } catch (e: Exception) {

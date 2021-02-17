@@ -37,10 +37,9 @@ internal class Direct3DRedrawer(
         makeDirectXRenderTarget(device, width, height)
     )
 
-    external fun createDevice(): Long
+    external fun createDevice(windowHandle: Long): Long
     external fun makeDirectXContext(device: Long): Long
     external fun makeDirectXRenderTarget(device: Long, width: Int, height: Int): Long
-    external fun createSwapChain(windowHandle: Long, device: Long)
     external fun resizeBuffers(device: Long, width: Int, height: Int)
     external fun finishFrame(device: Long, context: Long, surface: Long)
 }

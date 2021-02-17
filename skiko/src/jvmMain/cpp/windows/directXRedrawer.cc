@@ -185,21 +185,21 @@ HRESULT CreateDXGIFactory2(
     }
 
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_createDevice(
-        JNIEnv *env, jobject redrawer)
+        JNIEnv *env, jobject redrawer, jlong windowHandle)
     {
         DirectXDevice *d3dDevice = new DirectXDevice();
 
-        gr_cp<IDXGIFactory4> factory;
-        if (!SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&factory))))
+        gr_cp<IDXGIFactory4> deviceFactory;
+        if (!SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&deviceFactory))))
         {
-            return false;
+            return 0;
         }
         gr_cp<IDXGIAdapter1> hardwareAdapter;
-        defineHardwareAdapter(factory.get(), &hardwareAdapter);
+        defineHardwareAdapter(deviceFactory.get(), &hardwareAdapter);
         gr_cp<ID3D12Device> device;
         if (!SUCCEEDED(D3D12CreateDevice(hardwareAdapter.get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&device))))
         {
-            return false;
+            return 0;
         }
 
         // Create the command queue
@@ -210,7 +210,7 @@ HRESULT CreateDXGIFactory2(
 
         if (!SUCCEEDED(device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&queue))))
         {
-            return false;
+            return 0;
         }
 
         d3dDevice->backendContext.fAdapter = hardwareAdapter;
@@ -220,19 +220,11 @@ HRESULT CreateDXGIFactory2(
         d3dDevice->device = device;
         d3dDevice->queue = queue;
 
-        return toJavaPointer(d3dDevice);
-    }
-
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_createSwapChain(
-        JNIEnv *env, jobject redrawer, jlong windowHandle, jlong devicePtr)
-    {
-        DirectXDevice *d3dDevice = fromJavaPointer<DirectXDevice*>(devicePtr);
-
         // Make the swapchain
         HWND fWindow = (HWND)windowHandle;
 
-        gr_cp<IDXGIFactory4> factory;
-        GR_D3D_CALL_ERRCHECK(CreateDXGIFactory2(0, IID_PPV_ARGS(&factory)));
+        gr_cp<IDXGIFactory4> swapChainFactory;
+        GR_D3D_CALL_ERRCHECK(CreateDXGIFactory2(0, IID_PPV_ARGS(&swapChainFactory)));
 
         DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
         swapChainDesc.BufferCount = BuffersCount;
@@ -245,10 +237,12 @@ HRESULT CreateDXGIFactory2(
         swapChainFSDesc.Windowed = TRUE;
 
         gr_cp<IDXGISwapChain1> swapChain;
-        GR_D3D_CALL_ERRCHECK(factory->CreateSwapChainForHwnd(d3dDevice->queue.get(), fWindow, &swapChainDesc, &swapChainFSDesc, nullptr, &swapChain));
+        GR_D3D_CALL_ERRCHECK(swapChainFactory->CreateSwapChainForHwnd(d3dDevice->queue.get(), fWindow, &swapChainDesc, &swapChainFSDesc, nullptr, &swapChain));
         GR_D3D_CALL_ERRCHECK(swapChain->QueryInterface(IID_PPV_ARGS(&d3dDevice->swapChain)));
         GR_D3D_CALL_ERRCHECK(d3dDevice->device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&d3dDevice->fence)));
         d3dDevice->fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+
+        return toJavaPointer(d3dDevice);
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_resizeBuffers(
