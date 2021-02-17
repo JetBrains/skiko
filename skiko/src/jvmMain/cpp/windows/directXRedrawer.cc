@@ -184,7 +184,7 @@ HRESULT CreateDXGIFactory2(
         }
     }
 
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_createDevice(
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_createDirectXDevice(
         JNIEnv *env, jobject redrawer, jlong windowHandle)
     {
         DirectXDevice *d3dDevice = new DirectXDevice();
@@ -278,6 +278,13 @@ HRESULT CreateDXGIFactory2(
             GR_D3D_CALL_ERRCHECK(d3dDevice->fence->SetEventOnCompletion(fence, d3dDevice->fenceEvent));
             WaitForSingleObjectEx(d3dDevice->fenceEvent, INFINITE, FALSE);
         }
+    }
+
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_disposeDevice(
+        JNIEnv *env, jobject redrawer, jlong devicePtr)
+    {
+        DirectXDevice *d3dDevice = fromJavaPointer<DirectXDevice*>(devicePtr);
+        delete d3dDevice;
     }
 }
 

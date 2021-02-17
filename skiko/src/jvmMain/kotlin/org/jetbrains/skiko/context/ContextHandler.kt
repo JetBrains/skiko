@@ -12,8 +12,8 @@ import org.jetbrains.skiko.SkikoProperties
 import org.jetbrains.skiko.hostOs
 import org.jetbrains.skiko.redrawer.Redrawer
 
-internal fun createContextHandler(layer: SkiaLayer): ContextHandler {
-    return when (SkikoProperties.renderApi) {
+internal fun createContextHandler(layer: SkiaLayer, renderApi: GraphicsApi): ContextHandler {
+    return when (renderApi) {
         GraphicsApi.SOFTWARE -> SoftwareContextHandler(layer)
         GraphicsApi.OPENGL -> OpenGLContextHandler(layer)
         GraphicsApi.DIRECT3D -> Direct3DContextHandler(layer)

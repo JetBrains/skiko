@@ -49,6 +49,14 @@ internal object SkikoProperties {
         }
     }
 
+    val fallbackRenderApiQueue : List<GraphicsApi> by lazy {
+        when (hostOs) {
+            OS.MacOS -> listOf(GraphicsApi.SOFTWARE)
+            OS.Linux -> listOf(GraphicsApi.SOFTWARE)
+            OS.Windows -> listOf(GraphicsApi.OPENGL, GraphicsApi.SOFTWARE)
+        }
+    }
+
     private fun property(name: String, default: Boolean) = lazy {
         System.getProperty(name)?.toBoolean() ?: default
     }

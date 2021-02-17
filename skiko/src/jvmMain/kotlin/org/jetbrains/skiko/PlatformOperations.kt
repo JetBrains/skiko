@@ -1,6 +1,5 @@
 package org.jetbrains.skiko
 
-import org.jetbrains.skiko.SkikoProperties.renderApi
 import org.jetbrains.skiko.redrawer.LinuxOpenGLRedrawer
 import org.jetbrains.skiko.redrawer.MacOsOpenGLRedrawer
 import org.jetbrains.skiko.redrawer.SoftwareRedrawer
@@ -15,7 +14,7 @@ internal interface PlatformOperations {
     fun isFullscreen(component: Component): Boolean
     fun setFullscreen(component: Component, value: Boolean)
     fun getDpiScale(component: Component): Float
-    fun createRedrawer(layer: HardwareLayer): Redrawer
+    fun createRedrawer(layer: HardwareLayer, renderApi: GraphicsApi): Redrawer
 }
 
 internal val platformOperations: PlatformOperations by lazy {
@@ -33,7 +32,7 @@ internal val platformOperations: PlatformOperations by lazy {
                     return component.graphicsConfiguration.defaultTransform.scaleX.toFloat()
                 }
 
-                override fun createRedrawer(layer: HardwareLayer) = when(renderApi) {
+                override fun createRedrawer(layer: HardwareLayer, renderApi: GraphicsApi) = when (renderApi) {
                     GraphicsApi.SOFTWARE -> SoftwareRedrawer(layer)
                     else -> MacOsOpenGLRedrawer(layer)
                 }
@@ -56,7 +55,7 @@ internal val platformOperations: PlatformOperations by lazy {
                     return component.graphicsConfiguration.defaultTransform.scaleX.toFloat()
                 }
 
-                override fun createRedrawer(layer: HardwareLayer) = when(renderApi) {
+                override fun createRedrawer(layer: HardwareLayer, renderApi: GraphicsApi) = when (renderApi) {
                     GraphicsApi.SOFTWARE -> SoftwareRedrawer(layer)
                     GraphicsApi.DIRECT3D -> Direct3DRedrawer(layer)
                     else -> WindowsOpenGLRedrawer(layer)
@@ -93,7 +92,7 @@ internal val platformOperations: PlatformOperations by lazy {
 //                    return component.useDrawingSurfacePlatformInfo(::linuxGetDpiScaleNative)
                 }
 
-                override fun createRedrawer(layer: HardwareLayer) = when(renderApi) {
+                override fun createRedrawer(layer: HardwareLayer, renderApi: GraphicsApi) = when (renderApi) {
                     GraphicsApi.SOFTWARE -> SoftwareRedrawer(layer)
                     else -> LinuxOpenGLRedrawer(layer)
                 }

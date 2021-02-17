@@ -11,6 +11,8 @@ internal class Direct3DRedrawer(
     private val layer: HardwareLayer
 ) : Redrawer {
 
+    private var device: Long = 0
+
     private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
         layer.update(System.nanoTime())
         layer.draw()
@@ -18,6 +20,7 @@ internal class Direct3DRedrawer(
 
     override fun dispose() {
         frameDispatcher.cancel()
+        disposeDevice(device)
     }
 
     override fun needRedraw() {
@@ -37,9 +40,15 @@ internal class Direct3DRedrawer(
         makeDirectXRenderTarget(device, width, height)
     )
 
-    external fun createDevice(windowHandle: Long): Long
+    fun createDevice(): Long {
+        device = createDirectXDevice(layer.windowHandle)
+        return device
+    }
+
+    external fun createDirectXDevice(windowHandle: Long): Long
     external fun makeDirectXContext(device: Long): Long
     external fun makeDirectXRenderTarget(device: Long, width: Int, height: Int): Long
     external fun resizeBuffers(device: Long, width: Int, height: Int)
     external fun finishFrame(device: Long, context: Long, surface: Long)
+    external fun disposeDevice(device: Long)
 }

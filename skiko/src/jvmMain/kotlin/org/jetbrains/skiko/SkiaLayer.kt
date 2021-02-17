@@ -11,6 +11,8 @@ import org.jetbrains.skiko.redrawer.SoftwareRedrawer
 import org.jetbrains.skiko.redrawer.Redrawer
 import java.awt.Graphics
 import javax.swing.SwingUtilities.isEventDispatchThread
+import kotlin.collections.MutableList
+import kotlin.collections.toMutableList
 
 interface SkiaRenderer {
     fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long)
@@ -19,10 +21,11 @@ interface SkiaRenderer {
 private class PictureHolder(val instance: Picture, val width: Int, val height: Int)
 
 open class SkiaLayer : HardwareLayer() {
+    val fallbackRenderApiQueue = SkikoProperties.fallbackRenderApiQueue.toMutableList()
     var renderer: SkiaRenderer? = null
     val clipComponents = mutableListOf<ClipRectangle>()
 
-    private var contextHandler = createContextHandler(this)
+    private var contextHandler = createContextHandler(this, SkikoProperties.renderApi)
 
     @Volatile
     private var isDisposed = false
@@ -35,7 +38,7 @@ open class SkiaLayer : HardwareLayer() {
 
     override fun init() {
         super.init()
-        redrawer = platformOperations.createRedrawer(this)
+        redrawer = platformOperations.createRedrawer(this, SkikoProperties.renderApi)
         redrawer?.syncSize()
         redrawer?.redrawImmediately()
     }
@@ -43,6 +46,7 @@ open class SkiaLayer : HardwareLayer() {
     override fun dispose() {
         check(!isDisposed)
         check(isEventDispatchThread())
+        contextHandler.dispose()
         redrawer?.dispose()
         picture?.instance?.close()
         pictureRecorder.close()
@@ -104,7 +108,7 @@ open class SkiaLayer : HardwareLayer() {
         check(!isDisposed)
         contextHandler.apply {
             if (!initContext()) {
-                fallbackToRaster()
+                fallbackToNextApi()
                 return
             }
             initCanvas()
@@ -133,11 +137,12 @@ open class SkiaLayer : HardwareLayer() {
         )
     }
 
-    private fun fallbackToRaster() {
-        println("Falling back to software rendering...")
+    private fun fallbackToNextApi() {
+        val nextApi = fallbackRenderApiQueue.removeAt(0)
+        println("Falling back to $nextApi rendering...")
         redrawer?.dispose()
-        contextHandler = SoftwareContextHandler(this)
-        redrawer = SoftwareRedrawer(this)
+        contextHandler = createContextHandler(this, nextApi)
+        redrawer = platformOperations.createRedrawer(this, nextApi)
         needRedraw()
     }
 }

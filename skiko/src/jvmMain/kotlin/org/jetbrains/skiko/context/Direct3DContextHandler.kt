@@ -20,12 +20,14 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextHandler(layer) 
     override fun initContext(): Boolean {
         try {
             if (context == null) {
-                device = directXRedrawer.createDevice(layer.windowHandle)
-                if (device == 0L) return false
+                device = directXRedrawer.createDevice()
+                if (device == 0L) {
+                    throw Exception("Failed to create DirectX12 device.")
+                }
                 context = directXRedrawer.makeContext(device)
             }
         } catch (e: Exception) {
-            println("Failed to create Skia Direct3D context!\n ${e.stackTrace}")
+            println("${e.message}\nFailed to create Skia Direct3D context!")
             return false
         }
         return true
