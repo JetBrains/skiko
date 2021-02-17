@@ -1,18 +1,28 @@
 package org.jetbrains.skiko.redrawer
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.swing.Swing
 import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.HardwareLayer
 import org.jetbrains.skiko.OpenGLApi
-import org.jetbrains.skiko.SkikoProperties
-import org.jetbrains.skiko.useDrawingSurfacePlatformInfo
+import org.jetbrains.skiko.SkiaLayerProperties
 import org.jetbrains.skiko.Task
+import org.jetbrains.skiko.useDrawingSurfacePlatformInfo
 import javax.swing.SwingUtilities.convertPoint
 import javax.swing.SwingUtilities.getRootPane
+import kotlin.system.measureNanoTime
+
+// Current implementation is fragile (it works in all tested cases, but we can't test everything)
+//
+// We should investigate can we implement our own CAOpenGLLayer, without its restrictions.
+// (see, for example https://github.com/gnustep/libs-gui/blob/master/Source/NSOpenGLView.m)
+//
+// P.S. MacOsOpenGLRedrawer will not be used by default in the future, because we will support Metal.
 
 internal class MacOsOpenGLRedrawer(
-    private val layer: HardwareLayer
+    private val layer: HardwareLayer,
+    private val properties: SkiaLayerProperties
 ) : Redrawer {
     private val containerLayerPtr = layer.useDrawingSurfacePlatformInfo(::initContainer)
     private val drawLock = Any()
@@ -24,6 +34,8 @@ internal class MacOsOpenGLRedrawer(
                 layer.draw()
             }
         }
+
+        suspend fun display() = display(::setNeedsDisplay)
     }
 
     // use a separate layer for vsync, because with single layer we cannot asynchronously update layer
@@ -52,7 +64,7 @@ internal class MacOsOpenGLRedrawer(
             return canDraw
         }
 
-        override fun setNeedsDisplay() {
+        private fun requestAsyncDisplay() {
             // Use asynchronous mode instead of just setNeedsDisplay,
             // so Core Animation will wait for the next frame in vsync signal
             //
@@ -63,13 +75,13 @@ internal class MacOsOpenGLRedrawer(
             // https://chromium.googlesource.com/chromium/chromium/+/0489078bf98350b00876070cf2fdce230905f47e/content/browser/renderer_host/compositing_iosurface_layer_mac.mm#57
             if (!isAsynchronous) {
                 isAsynchronous = true
-                super.setNeedsDisplay()
+                setNeedsDisplay()
             }
         }
 
         suspend fun sync() {
             canDraw = true
-            display()
+            display(::requestAsyncDisplay)
             canDraw = false
         }
     }
@@ -78,13 +90,11 @@ internal class MacOsOpenGLRedrawer(
         synchronized(drawLock) {
             layer.update(System.nanoTime())
         }
-        if (SkikoProperties.vsyncEnabled) {
+        if (properties.isVsyncEnabled) {
             drawLayer.setNeedsDisplay()
             vsyncLayer.sync()
         } else {
-            // If vsync is disabled we should await the drawing to end.
-            // Otherwise we will call 'update' multiple times.
-            drawLayer.display()
+            error("Drawing without vsync isn't supported on macOs with OpenGL")
         }
     }
 
@@ -113,7 +123,16 @@ internal class MacOsOpenGLRedrawer(
 
     override fun redrawImmediately() {
         layer.update(System.nanoTime())
-        drawLayer.setNeedsDisplay()
+
+        // macOs will call 'draw' itself because of 'setNeedsDisplayOnBoundsChange=true'.
+        // But we schedule new frame after vsync anyway.
+        // Because 'redrawImmediately' can be called after 'draw',
+        // and we need at least one 'draw' after 'redrawImmediately'.
+        //
+        // We don't use setNeedsDisplay, because frequent calls of it are unreliable.
+        // 'setNeedsDisplayOnBoundsChange=true' with combination of 'scheduleFrame' is enough
+        // to not see the white bars on resize.
+        frameDispatcher.scheduleFrame()
     }
 }
 
@@ -134,15 +153,32 @@ private abstract class AWTGLLayer(private val containerPtr: Long, setNeedsDispla
         get() = isAsynchronous(ptr)
         set(value) = setAsynchronous(ptr, value)
 
-    open fun setNeedsDisplay() = setNeedsDisplayOnMainThread(ptr)
+    /**
+     * Schedule next [draw] as soon as possible (not waiting for vsync)
+     *
+     * WARNING!!!
+     *
+     * CAOpenGLLayer will not call [draw] if we call [setNeedsDisplay] too often.
+     *
+     * Experimentally we found out that after 15 draw's between two vsync's (900 FPS on 60 Hz display) will cause
+     * setNeedsDisplay to not schedule the next draw at all.
+     *
+     * Only after the next vsync, [setNeedsDisplay] will be working again.
+     */
+    fun setNeedsDisplay() {
+        setNeedsDisplayOnMainThread(ptr)
+    }
 
-    suspend fun display() = display.runAndAwait {
-        setNeedsDisplay()
+    protected suspend fun display(
+        startDisplay: () -> Unit
+    ) = display.runAndAwait {
+        startDisplay()
     }
 
     // Called in AppKit Thread
     protected open fun canDraw() = true
 
+    // Called in AppKit Thread
     @Suppress("unused") // called from native code
     private fun performDraw() {
         try {

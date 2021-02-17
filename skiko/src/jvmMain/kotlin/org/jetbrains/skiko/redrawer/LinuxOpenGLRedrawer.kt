@@ -7,11 +7,12 @@ import org.jetbrains.skiko.DrawingSurface
 import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.HardwareLayer
 import org.jetbrains.skiko.OpenGLApi
-import org.jetbrains.skiko.SkikoProperties
+import org.jetbrains.skiko.SkiaLayerProperties
 import org.jetbrains.skiko.getDrawingSurface
 
 internal class LinuxOpenGLRedrawer(
-    private val layer: HardwareLayer
+    private val layer: HardwareLayer,
+    private val properties: SkiaLayerProperties
 ) : Redrawer {
     private val context = layer.lockDrawingSurface {
         it.createContext()
@@ -70,6 +71,8 @@ internal class LinuxOpenGLRedrawer(
                 }
             }
 
+            val isVsyncEnabled = toRedrawAlive.all { it.properties.isVsyncEnabled }
+
             val drawingSurfaces = toRedrawAlive.map { lockDrawingSurface(it.layer) }.toList()
             try {
                 toRedrawAlive.forEachIndexed { index, redrawer ->
@@ -79,7 +82,7 @@ internal class LinuxOpenGLRedrawer(
 
                 toRedrawAlive.forEachIndexed { index, _ ->
                     // it is ok to set swap interval every frame, there is no performance overhead
-                    drawingSurfaces[index].setSwapInterval(if (SkikoProperties.vsyncEnabled) 1 else 0)
+                    drawingSurfaces[index].setSwapInterval(if (isVsyncEnabled) 1 else 0)
                     drawingSurfaces[index].swapBuffers()
                 }
 

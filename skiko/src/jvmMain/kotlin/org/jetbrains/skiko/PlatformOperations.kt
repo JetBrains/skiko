@@ -14,7 +14,7 @@ internal interface PlatformOperations {
     fun isFullscreen(component: Component): Boolean
     fun setFullscreen(component: Component, value: Boolean)
     fun getDpiScale(component: Component): Float
-    fun createRedrawer(layer: HardwareLayer): Redrawer
+    fun createRedrawer(layer: HardwareLayer, properties: SkiaLayerProperties): Redrawer
 }
 
 internal val platformOperations: PlatformOperations by lazy {
@@ -32,9 +32,9 @@ internal val platformOperations: PlatformOperations by lazy {
                     return component.graphicsConfiguration.defaultTransform.scaleX.toFloat()
                 }
 
-                override fun createRedrawer(layer: HardwareLayer) = when(renderApi) {
+                override fun createRedrawer(layer: HardwareLayer, properties: SkiaLayerProperties) = when(renderApi) {
                     GraphicsApi.SOFTWARE -> RasterRedrawer(layer)
-                    else -> MacOsOpenGLRedrawer(layer)
+                    else -> MacOsOpenGLRedrawer(layer, properties)
                 }
         }
         OS.Windows -> {
@@ -55,9 +55,9 @@ internal val platformOperations: PlatformOperations by lazy {
                     return component.graphicsConfiguration.defaultTransform.scaleX.toFloat()
                 }
 
-                override fun createRedrawer(layer: HardwareLayer) = when(renderApi) {
+                override fun createRedrawer(layer: HardwareLayer, properties: SkiaLayerProperties) = when(renderApi) {
                     GraphicsApi.SOFTWARE -> RasterRedrawer(layer)
-                    else -> WindowsOpenGLRedrawer(layer)
+                    else -> WindowsOpenGLRedrawer(layer, properties)
                 }
             }
         }
@@ -91,9 +91,9 @@ internal val platformOperations: PlatformOperations by lazy {
 //                    return component.useDrawingSurfacePlatformInfo(::linuxGetDpiScaleNative)
                 }
 
-                override fun createRedrawer(layer: HardwareLayer) = when(renderApi) {
+                override fun createRedrawer(layer: HardwareLayer, properties: SkiaLayerProperties) = when(renderApi) {
                     GraphicsApi.SOFTWARE -> RasterRedrawer(layer)
-                    else -> LinuxOpenGLRedrawer(layer)
+                    else -> LinuxOpenGLRedrawer(layer, properties)
                 }
             }
         }

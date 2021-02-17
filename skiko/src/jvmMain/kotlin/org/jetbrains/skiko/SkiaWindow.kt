@@ -2,8 +2,10 @@ package org.jetbrains.skiko
 
 import javax.swing.JFrame
 
-open class SkiaWindow : JFrame() {
-    val layer = SkiaLayer()
+open class SkiaWindow(
+    properties: SkiaLayerProperties = SkiaLayerProperties()
+) : JFrame() {
+    val layer = SkiaLayer(properties)
 
     init {
         contentPane.add(layer)
