@@ -13,7 +13,6 @@
 #include <d3d12.h>
 #include <dxgi1_4.h>
 
-
 #define GR_D3D_CALL_ERRCHECK(X)                                        \
     do                                                                 \
     {                                                                  \
@@ -49,6 +48,55 @@ public:
 
 extern "C"
 {
+
+HRESULT D3D12CreateDevice(
+  IUnknown          *pAdapter,
+  D3D_FEATURE_LEVEL MinimumFeatureLevel,
+  REFIID            riid,
+  void              **ppDevice
+) {
+    typedef HRESULT (*D3D12CreateDevice_t)(
+        IUnknown          *pAdapter,
+        D3D_FEATURE_LEVEL MinimumFeatureLevel,
+        REFIID            riid,
+        void              **ppDevice
+    );
+    static D3D12CreateDevice_t impl = nullptr;
+    if (!impl) {
+        auto d3d12dll = LoadLibrary(TEXT("D3D12.dll"));
+        if (!d3d12dll)
+            return E_NOTIMPL;
+        impl = (D3D12CreateDevice_t)GetProcAddress(d3d12dll, "D3D12CreateDevice");
+        if (!impl)
+            return E_NOTIMPL;
+    }
+    return impl(pAdapter, MinimumFeatureLevel, riid, ppDevice);
+}
+
+HRESULT D3D12SerializeRootSignature(
+  const D3D12_ROOT_SIGNATURE_DESC *pRootSignature,
+  D3D_ROOT_SIGNATURE_VERSION      Version,
+  ID3DBlob                        **ppBlob,
+  ID3DBlob                        **ppErrorBlob
+) {
+    typedef HRESULT (*D3D12SerializeRootSignature_t)(
+              const D3D12_ROOT_SIGNATURE_DESC *pRootSignature,
+              D3D_ROOT_SIGNATURE_VERSION      Version,
+              ID3DBlob                        **ppBlob,
+              ID3DBlob                        **ppErrorBlob
+    );
+    static D3D12SerializeRootSignature_t impl = nullptr;
+    if (!impl) {
+        auto d3d12dll = LoadLibrary(TEXT("D3D12.dll"));
+        if (!d3d12dll)
+            return E_NOTIMPL;
+        impl = (D3D12SerializeRootSignature_t)GetProcAddress(d3d12dll, "D3D12SerializeRootSignature");
+        if (!impl)
+            return E_NOTIMPL;
+    }
+    return impl(pRootSignature, Version, ppBlob, ppErrorBlob);
+}
+
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_makeDirectXContext(
         JNIEnv* env, jobject redrawer, jlong devicePtr)
     {
