@@ -369,7 +369,8 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
                     "-lGL",
                     "-lfontconfig",
                     // Hack to fix problem with linker not always finding certain declarations.
-                    skiaDir.get().absolutePath + "/out/${buildType.id}-${targetArch.id}/libsksg.a"
+                    skiaDir.get().absolutePath + "/out/${buildType.id}-${targetArch.id}/libsksg.a",
+                    skiaDir.get().absolutePath + "/out/${buildType.id}-${targetArch.id}/libskia.a"
                 )
             )
         }
