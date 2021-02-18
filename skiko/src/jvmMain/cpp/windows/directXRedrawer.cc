@@ -139,6 +139,44 @@ HRESULT CreateDXGIFactory2(
     return impl(Flags, riid, ppFactory);
 }
 
+HRESULT D3DCompile(
+  LPCVOID                pSrcData,
+  SIZE_T                 SrcDataSize,
+  LPCSTR                 pSourceName,
+  const D3D_SHADER_MACRO *pDefines,
+  ID3DInclude            *pInclude,
+  LPCSTR                 pEntrypoint,
+  LPCSTR                 pTarget,
+  UINT                   Flags1,
+  UINT                   Flags2,
+  ID3DBlob               **ppCode,
+  ID3DBlob               **ppErrorMsgs
+) {
+    typedef HRESULT (*D3DCompile_t)(
+              LPCVOID                pSrcData,
+              SIZE_T                 SrcDataSize,
+              LPCSTR                 pSourceName,
+              const D3D_SHADER_MACRO *pDefines,
+              ID3DInclude            *pInclude,
+              LPCSTR                 pEntrypoint,
+              LPCSTR                 pTarget,
+              UINT                   Flags1,
+              UINT                   Flags2,
+              ID3DBlob               **ppCode,
+              ID3DBlob               **ppErrorMsgs
+    );
+    static D3DCompile_t impl = nullptr;
+    if (!impl) {
+        auto d3dcompilerdll = LoadLibrary(TEXT("d3dcompiler_47.dll"));
+        if (!d3dcompilerdll)
+            return E_NOTIMPL;
+        impl = (D3DCompile_t)GetProcAddress(d3dcompilerdll, "D3DCompile");
+        if (!impl)
+            return E_NOTIMPL;
+    }
+    return impl(pSrcData, SrcDataSize, pSourceName, pDefines, pInclude, pEntrypoint, pTarget, Flags1, Flags2, ppCode, ppErrorMsgs);
+}
+
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_makeDirectXContext(
         JNIEnv* env, jobject redrawer, jlong devicePtr)
     {
