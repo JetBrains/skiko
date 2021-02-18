@@ -21,7 +21,9 @@ interface SkiaRenderer {
 
 private class PictureHolder(val instance: Picture, val width: Int, val height: Int)
 
-open class SkiaLayer : HardwareLayer() {
+open class SkiaLayer(
+    private val properties: SkiaLayerProperties = SkiaLayerProperties()
+) : HardwareLayer() {
     var renderer: SkiaRenderer? = null
     val clipComponents = mutableListOf<ClipRectangle>()
 
@@ -41,7 +43,7 @@ open class SkiaLayer : HardwareLayer() {
         super.init()
         val initialRenderApi = fallbackRenderApiQueue.removeAt(0)
         contextHandler = createContextHandler(this, initialRenderApi)
-        redrawer = platformOperations.createRedrawer(this, initialRenderApi)
+        redrawer = platformOperations.createRedrawer(this, initialRenderApi, properties)
         redrawer?.syncSize()
         redrawer?.redrawImmediately()
     }

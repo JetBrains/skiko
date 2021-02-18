@@ -14,7 +14,7 @@ internal interface PlatformOperations {
     fun isFullscreen(component: Component): Boolean
     fun setFullscreen(component: Component, value: Boolean)
     fun getDpiScale(component: Component): Float
-    fun createRedrawer(layer: HardwareLayer, renderApi: GraphicsApi): Redrawer
+    fun createRedrawer(layer: HardwareLayer, renderApi: GraphicsApi, properties: SkiaLayerProperties): Redrawer
 }
 
 internal val platformOperations: PlatformOperations by lazy {
@@ -32,9 +32,9 @@ internal val platformOperations: PlatformOperations by lazy {
                     return component.graphicsConfiguration.defaultTransform.scaleX.toFloat()
                 }
 
-                override fun createRedrawer(layer: HardwareLayer, renderApi: GraphicsApi) = when (renderApi) {
+                override fun createRedrawer(layer: HardwareLayer, renderApi: GraphicsApi, properties: SkiaLayerProperties) = when(renderApi) {
                     GraphicsApi.SOFTWARE -> SoftwareRedrawer(layer)
-                    else -> MacOsOpenGLRedrawer(layer)
+                    else -> MacOsOpenGLRedrawer(layer, properties)
                 }
         }
         OS.Windows -> {
@@ -55,10 +55,10 @@ internal val platformOperations: PlatformOperations by lazy {
                     return component.graphicsConfiguration.defaultTransform.scaleX.toFloat()
                 }
 
-                override fun createRedrawer(layer: HardwareLayer, renderApi: GraphicsApi) = when (renderApi) {
+                override fun createRedrawer(layer: HardwareLayer, renderApi: GraphicsApi, properties: SkiaLayerProperties) = when(renderApi) {
                     GraphicsApi.SOFTWARE -> SoftwareRedrawer(layer)
                     GraphicsApi.DIRECT3D -> Direct3DRedrawer(layer)
-                    else -> WindowsOpenGLRedrawer(layer)
+                    else -> WindowsOpenGLRedrawer(layer, properties)
                 }
             }
         }
@@ -92,9 +92,9 @@ internal val platformOperations: PlatformOperations by lazy {
 //                    return component.useDrawingSurfacePlatformInfo(::linuxGetDpiScaleNative)
                 }
 
-                override fun createRedrawer(layer: HardwareLayer, renderApi: GraphicsApi) = when (renderApi) {
+                override fun createRedrawer(layer: HardwareLayer, renderApi: GraphicsApi, properties: SkiaLayerProperties) = when(renderApi) {
                     GraphicsApi.SOFTWARE -> SoftwareRedrawer(layer)
-                    else -> LinuxOpenGLRedrawer(layer)
+                    else -> LinuxOpenGLRedrawer(layer, properties)
                 }
             }
         }

@@ -7,11 +7,12 @@ import kotlinx.coroutines.withContext
 import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.HardwareLayer
 import org.jetbrains.skiko.OpenGLApi
-import org.jetbrains.skiko.SkikoProperties
+import org.jetbrains.skiko.SkiaLayerProperties
 import org.jetbrains.skiko.useDrawingSurfacePlatformInfo
 
 internal class WindowsOpenGLRedrawer(
-    private val layer: HardwareLayer
+    private val layer: HardwareLayer,
+    private val properties: SkiaLayerProperties
 ) : Redrawer {
     private val device = layer.useDrawingSurfacePlatformInfo(::getDevice)
     private val context = createContext(device)
@@ -92,7 +93,8 @@ internal class WindowsOpenGLRedrawer(
                 OpenGLApi.instance.glFinish()
             }
 
-            if (SkikoProperties.vsyncEnabled) {
+            val isVsyncEnabled = toRedrawAlive.all { it.properties.isVsyncEnabled }
+            if (isVsyncEnabled) {
                 withContext(Dispatchers.IO) {
                     dwmFlush() // wait for vsync
                 }

@@ -1,5 +1,6 @@
 package org.jetbrains.skiko
 
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -202,6 +203,44 @@ class SkiaWindowTest {
         openedWindows.forEach(JFrame::close)
 
         delay(5000)
+    }
+
+    @Test(timeout = 20000)
+    fun `render continuously empty content without vsync`() = swingTest {
+        assumeTrue(hostOs != OS.MacOS) // TODO remove when we will support drawing without vsync on macOs
+
+        val targetDrawCount = 500
+        var drawCount = 0
+        val onDrawCompleted = CompletableDeferred<Unit>()
+
+        val window = SkiaWindow(
+            properties = SkiaLayerProperties(
+                isVsyncEnabled = false
+            )
+        )
+
+        try {
+            window.setLocation(200, 200)
+            window.setSize(400, 200)
+            window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+            window.layer.renderer = object : SkiaRenderer {
+                override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+                    drawCount++
+
+                    if (drawCount < targetDrawCount) {
+                        window.layer.needRedraw()
+                    } else {
+                        onDrawCompleted.complete(Unit)
+                    }
+                }
+            }
+            window.isUndecorated = true
+            window.isVisible = true
+
+            onDrawCompleted.await()
+        } finally {
+            window.close()
+        }
     }
 
     @Test
