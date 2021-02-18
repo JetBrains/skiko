@@ -11,24 +11,36 @@ internal class Direct3DRedrawer(
     private val layer: HardwareLayer
 ) : Redrawer {
 
+    private var isDisposed = false
     private var device: Long = 0
 
     private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
-        layer.update(System.nanoTime())
-        layer.draw()
+        update(System.nanoTime())
+        draw()
     }
 
     override fun dispose() {
         frameDispatcher.cancel()
         disposeDevice(device)
+        isDisposed = true
     }
 
     override fun needRedraw() {
+        check(!isDisposed)
         frameDispatcher.scheduleFrame()
     }
 
     override fun redrawImmediately() {
-        layer.update(System.nanoTime())
+        check(!isDisposed)
+        update(System.nanoTime())
+        draw()
+    }
+
+    private fun update(nanoTime: Long) {
+        layer.update(nanoTime)
+    }
+
+    private fun draw() {
         layer.draw()
     }
 
