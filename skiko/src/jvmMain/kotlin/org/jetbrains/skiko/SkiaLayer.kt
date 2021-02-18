@@ -5,8 +5,9 @@ import org.jetbrains.skija.ClipMode
 import org.jetbrains.skija.Picture
 import org.jetbrains.skija.PictureRecorder
 import org.jetbrains.skija.Rect
-import org.jetbrains.skiko.context.SoftwareContextHandler
+import org.jetbrains.skiko.context.ContextHandler
 import org.jetbrains.skiko.context.createContextHandler
+import org.jetbrains.skiko.context.SoftwareContextHandler
 import org.jetbrains.skiko.redrawer.SoftwareRedrawer
 import org.jetbrains.skiko.redrawer.Redrawer
 import java.awt.Graphics
@@ -21,15 +22,15 @@ interface SkiaRenderer {
 private class PictureHolder(val instance: Picture, val width: Int, val height: Int)
 
 open class SkiaLayer : HardwareLayer() {
-    val fallbackRenderApiQueue = SkikoProperties.fallbackRenderApiQueue.toMutableList()
     var renderer: SkiaRenderer? = null
     val clipComponents = mutableListOf<ClipRectangle>()
 
-    private var contextHandler = createContextHandler(this, SkikoProperties.renderApi)
 
     @Volatile
     private var isDisposed = false
     internal var redrawer: Redrawer? = null
+    private var contextHandler: ContextHandler? = null
+    private val fallbackRenderApiQueue = SkikoProperties.fallbackRenderApiQueue.toMutableList()
 
     @Volatile
     private var picture: PictureHolder? = null
@@ -38,7 +39,9 @@ open class SkiaLayer : HardwareLayer() {
 
     override fun init() {
         super.init()
-        redrawer = platformOperations.createRedrawer(this, SkikoProperties.renderApi)
+        val initialRenderApi = fallbackRenderApiQueue.removeAt(0)
+        contextHandler = createContextHandler(this, initialRenderApi)
+        redrawer = platformOperations.createRedrawer(this, initialRenderApi)
         redrawer?.syncSize()
         redrawer?.redrawImmediately()
     }
@@ -46,7 +49,7 @@ open class SkiaLayer : HardwareLayer() {
     override fun dispose() {
         check(!isDisposed)
         check(isEventDispatchThread())
-        contextHandler.dispose()
+        contextHandler?.dispose()
         redrawer?.dispose()
         picture?.instance?.close()
         pictureRecorder.close()
@@ -106,7 +109,7 @@ open class SkiaLayer : HardwareLayer() {
 
     override fun draw() {
         check(!isDisposed)
-        contextHandler.apply {
+        contextHandler?.apply {
             if (!initContext()) {
                 fallbackToNextApi()
                 return

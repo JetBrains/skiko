@@ -50,11 +50,17 @@ internal object SkikoProperties {
     }
 
     val fallbackRenderApiQueue : List<GraphicsApi> by lazy {
+        val head = renderApi
+        var renderApiList = mutableListOf<GraphicsApi>()
+
         when (hostOs) {
-            OS.MacOS -> listOf(GraphicsApi.SOFTWARE)
-            OS.Linux -> listOf(GraphicsApi.SOFTWARE)
-            OS.Windows -> listOf(GraphicsApi.OPENGL, GraphicsApi.SOFTWARE)
+            OS.MacOS -> renderApiList = mutableListOf(GraphicsApi.OPENGL, GraphicsApi.SOFTWARE)
+            OS.Linux -> renderApiList = mutableListOf(GraphicsApi.OPENGL, GraphicsApi.SOFTWARE)
+            OS.Windows -> renderApiList = mutableListOf(GraphicsApi.DIRECT3D, GraphicsApi.OPENGL, GraphicsApi.SOFTWARE)
         }
+        renderApiList.remove(head)
+
+        listOf(head) + renderApiList
     }
 
     private fun property(name: String, default: Boolean) = lazy {
