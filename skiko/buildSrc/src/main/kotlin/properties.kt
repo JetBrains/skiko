@@ -114,6 +114,18 @@ class SkikoProperties(private val myProject: Project) {
     val composeRepoKey: String
         get() = System.getenv("COMPOSE_REPO_KEY") ?: ""
 
+    val signHost: String?
+        get() = System.getenv("JB_SIGN_HOST")
+            ?: (myProject.findProperty("sign_host") as? String)
+
+    val signUser: String?
+        get() = System.getenv("JB_SIGN_USER")
+            ?: (myProject.findProperty("sign_host_user") as? String)
+
+    val signToken: String?
+        get() = System.getenv("JB_SIGN_TOKEN")
+            ?: (myProject.findProperty("sign_host_token") as? String)
+
     val dependenciesDir: File
         get() = myProject.rootProject.projectDir.resolve("dependencies")
 }
