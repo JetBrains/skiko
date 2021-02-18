@@ -147,7 +147,7 @@ open class SkiaLayer(
         println("Falling back to $nextApi rendering...")
         redrawer?.dispose()
         contextHandler = createContextHandler(this, nextApi)
-        redrawer = platformOperations.createRedrawer(this, nextApi)
+        redrawer = platformOperations.createRedrawer(this, nextApi, properties)
         needRedraw()
     }
 }
