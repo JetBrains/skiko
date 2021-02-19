@@ -316,11 +316,10 @@ fun localSign(signer: String, lib: File): File {
     return lib
 }
 
-fun remoteSign(signHost: String, lib: File): File {
+fun remoteSign(signHost: String, lib: File, out: File) {
     println("Remote signing $lib on $signHost")
     val user = skiko.signUser ?: error("signUser is null")
     val token = skiko.signToken ?: error("signToken is null")
-    val out = file("${lib.absolutePath}.signed")
     val cmd = """
         TOKEN=`curl -fsSL --user $user:$token --url "$signHost/auth" | grep token | cut -d '"' -f4` \
         && curl --no-keepalive --http1.1 --data-binary @${lib.absolutePath} \
@@ -339,8 +338,6 @@ fun remoteSign(signHost: String, lib: File): File {
         println(out)
         println(err)
         throw GradleException("Cannot sign $lib: $err")
-    } else {
-        return out
     }
 }
 
@@ -431,10 +428,27 @@ val skikoJvmJar: Provider<Jar> by tasks.registering(Jar::class) {
     from(kotlin.jvm().compilations["main"].output.allOutputs)
 }
 
-val createChecksums by project.tasks.registering(org.gradle.crypto.checksum.Checksum::class) {
+val maybeSign by project.tasks.registering {
     val linkTask = project.tasks.withType(LinkSharedLibrary::class.java).single { it.name.contains(buildType.id) }
     dependsOn(linkTask)
-    files = linkTask.outputs.files.filter { it.isFile } +
+    val lib = linkTask.outputs.files.single { it.name.endsWith(".dll") ||  it.name.endsWith(".dylib") ||  it.name.endsWith(".so") }
+    inputs.files(lib)
+    val output = file(lib.absolutePath + ".maybesigned")
+    outputs.files(output)
+
+    doLast {
+        if (skiko.signHost != null) {
+            remoteSign(skiko.signHost!!, lib, output)
+        } else {
+            lib.copyTo(output, overwrite = true)
+        }
+
+    }
+}
+
+val createChecksums by project.tasks.registering(org.gradle.crypto.checksum.Checksum::class) {
+    dependsOn(maybeSign)
+    files = maybeSign.get().outputs.files +
             if (targetOs.isWindows) files(skiaDir.map { it.resolve("out/${buildType.id}-x64/icudtl.dat") }) else files()
     algorithm = Checksum.Algorithm.SHA256
     outputDir = file("$buildDir/checksums")
@@ -442,20 +456,12 @@ val createChecksums by project.tasks.registering(org.gradle.crypto.checksum.Chec
 
 val skikoJvmRuntimeJar by project.tasks.registering(Jar::class) {
     archiveBaseName.set("skiko-$target")
-    dependsOn(createChecksums)
     from(skikoJvmJar.map { zipTree(it.archiveFile) })
-    val linkTask = project.tasks.withType(LinkSharedLibrary::class.java).single { it.name.contains(buildType.id) }
-    val lib = linkTask.outputs.files.single { it.isFile }
-    val maybeSigned = if (lib.name.endsWith(".dylib")) {
-        println("Resulting dylib: $lib")
-        skiko.signHost?.let { signHost ->
-            remoteSign(signHost, lib)
-        } ?: lib
-    } else {
-        lib
+    from(maybeSign.get().outputs.files)
+    rename {
+        // Not just suffix, as could be in middle of SHA256.
+        it.replace(".maybesigned", "")
     }
-    from(maybeSigned)
-    rename("${lib.name}.signed", lib.name)
     if (targetOs.isWindows) {
         from(files(skiaDir.map { it.resolve("out/${buildType.id}-x64/icudtl.dat") }))
     }
