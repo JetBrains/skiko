@@ -1,4 +1,5 @@
 #ifdef SK_DIRECT3D
+#include <stdexcept>
 #include <windows.h>
 #include <jawt_md.h>
 #include "jni_helpers.h"
@@ -21,6 +22,7 @@
         if (!SUCCEEDED(result))                                        \
         {                                                              \
             SkDebugf("Failed Direct3D call. Error: 0x%08x\n", result); \
+            throw std::exception("ERROR");                      \
         }                                                              \
     } while (false)
 
@@ -189,6 +191,14 @@ HRESULT D3DCompile(
         JNIEnv * env, jobject redrawer, jlong devicePtr, jint width, jint height)
     {
         DirectXDevice *d3dDevice = fromJavaPointer<DirectXDevice*>(devicePtr);
+
+        if (!d3dDevice->isSizeEqualTo(width, height))
+        {
+            GR_D3D_CALL_ERRCHECK(d3dDevice->swapChain->ResizeBuffers(BuffersCount, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 0));
+            d3dDevice->bufferWidth = width;
+            d3dDevice->bufferHeight = height;
+        }
+
         d3dDevice->bufferIndex = d3dDevice->swapChain->GetCurrentBackBufferIndex();
         ID3D12Resource* buffer;
         GR_D3D_CALL_ERRCHECK(d3dDevice->swapChain->GetBuffer(d3dDevice->bufferIndex, IID_PPV_ARGS(&buffer)));
@@ -268,8 +278,9 @@ HRESULT D3DCompile(
         swapChainDesc.BufferCount = BuffersCount;
         swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
         swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-        swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+        swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
         swapChainDesc.SampleDesc.Count = 1;
+        swapChainDesc.SampleDesc.Quality = 0;
         swapChainDesc.Scaling = DXGI_SCALING_NONE;
 
         DXGI_SWAP_CHAIN_FULLSCREEN_DESC swapChainFSDesc = {};
@@ -307,6 +318,8 @@ HRESULT D3DCompile(
         surface->flush(SkSurface::BackendSurfaceAccess::kPresent, GrFlushInfo());
         fContext->flush({});
         fContext->submit(true);
+
+        // 1 value in [Present(1, 0)] enables vblank wait so this is how vertical sync works in DirectX.
         GR_D3D_CALL_ERRCHECK(d3dDevice->swapChain->Present(1, 0));
 
         const UINT64 fence = d3dDevice->fenceValue;

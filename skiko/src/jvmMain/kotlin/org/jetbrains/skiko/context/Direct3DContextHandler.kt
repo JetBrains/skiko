@@ -40,8 +40,6 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextHandler(layer) 
         val w = (layer.width * scale).toInt().coerceAtLeast(0)
         val h = (layer.height * scale).toInt().coerceAtLeast(0)
 
-        directXRedrawer.resizeBuffers(device, w, h)
-
         renderTarget = directXRedrawer.makeRenderTarget(device, w, h)
 
         surface = Surface.makeFromBackendRenderTarget(
