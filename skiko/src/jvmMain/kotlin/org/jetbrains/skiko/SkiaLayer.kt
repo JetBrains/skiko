@@ -45,7 +45,7 @@ open class SkiaLayer(
         contextHandler = createContextHandler(this, initialRenderApi)
         redrawer = platformOperations.createRedrawer(this, initialRenderApi, properties)
         redrawer?.syncSize()
-        draw(isBlank = true)
+        redrawer?.redrawImmediately()
     }
 
     override fun dispose() {
@@ -109,26 +109,22 @@ open class SkiaLayer(
         }
     }
 
-    override fun draw() = draw(isBlank = false)
-
-    fun draw(isBlank: Boolean) {
+    override fun draw() {
         check(!isDisposed)
         contextHandler?.apply {
             if (!initContext()) {
                 fallbackToNextApi()
                 return
             }
-            if (!isBlank) {
-                initCanvas()
-                clearCanvas()
-                synchronized(pictureLock) {
-                    val picture = picture
-                    if (picture != null) {
-                        drawOnCanvas(picture.instance)
-                    }
+            initCanvas()
+            clearCanvas()
+            synchronized(pictureLock) {
+                val picture = picture
+                if (picture != null) {
+                    drawOnCanvas(picture.instance)
                 }
-                flush()
             }
+            flush()
         }
     }
 
