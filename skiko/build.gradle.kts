@@ -322,7 +322,7 @@ fun remoteSign(signHost: String, lib: File) {
     val out = file("${lib.absolutePath}.signed")
     val cmd = """
         TOKEN=`curl -fsSL --user $user:$token --url "$signHost/auth" | grep token | cut -d '"' -f4` \
-        && curl --no-keepalive --data-binary @${lib.absolutePath} \
+        && curl --no-keepalive --http1.1 --data-binary @${lib.absolutePath} \
         -H "Authorization: Bearer ${'$'}TOKEN" \
         -H "Content-Type:application/x-mac-app-bin" \
         "$signHost/sign?name=${lib.name}" -o "${out.absolutePath}"
