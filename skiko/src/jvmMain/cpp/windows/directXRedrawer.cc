@@ -1,6 +1,6 @@
 #ifdef SK_DIRECT3D
 #include <stdexcept>
-#include <windows.h>
+#include <Windows.h>
 #include <jawt_md.h>
 #include "jni_helpers.h"
 
@@ -45,6 +45,11 @@ public:
     bool isSizeEqualTo(unsigned int width, unsigned int height)
     {
         return width == bufferWidth && height == bufferHeight;
+    }
+
+    ~DirectXDevice()
+    {
+        CloseHandle(fenceEvent);
     }
 };
 
