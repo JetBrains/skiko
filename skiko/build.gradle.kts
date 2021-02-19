@@ -366,6 +366,8 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
         OS.Linux -> {
             linkerArgs.addAll(
                 listOf(
+                    "-Wl,-Bstatic", "-lstdc++", "-lgcc", "-Wl,-Bdynamic",
+                    "-static-libgcc",
                     "-lGL",
                     "-lfontconfig",
                     // Hack to fix problem with linker not always finding certain declarations.
