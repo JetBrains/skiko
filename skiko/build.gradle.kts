@@ -315,17 +315,17 @@ fun localSign(signer: String, lib: File) {
     }
 }
 
-fun remoteSign(sign_host: String, lib: File) {
-    println("Remote signing $lib on $sign_host")
-    val user = project.properties["sign_host_user"] as String
-    val token = project.properties["sign_host_token"] as String
+fun remoteSign(signHost: String, lib: File) {
+    println("Remote signing $lib on $signHost")
+    val user = skiko.signUser ?: error("signUser is null")
+    val token = skiko.signToken ?: error("signToken is null")
     val out = file("${lib.absolutePath}.signed")
     val cmd = """
-        TOKEN=`curl -fsSL --user $user:$token --url "$sign_host/auth" | grep token | cut -d '"' -f4` \
+        TOKEN=`curl -fsSL --user $user:$token --url "$signHost/auth" | grep token | cut -d '"' -f4` \
         && curl --no-keepalive --http1.1 --data-binary @${lib.absolutePath} \
         -H "Authorization: Bearer ${'$'}TOKEN" \
         -H "Content-Type:application/x-mac-app-bin" \
-        "$sign_host/sign?name=${lib.name}" -o "${out.absolutePath}"
+        "$signHost/sign?name=${lib.name}" -o "${out.absolutePath}"
     """.trimIndent()
     val proc = ProcessBuilder("bash", "-c", cmd)
         .redirectOutput(ProcessBuilder.Redirect.PIPE)
@@ -389,14 +389,14 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
 
     doLast {
         val dylib = outputs.files.files.singleOrNull { it.name.endsWith(".dylib") }
-        (project.properties["signer"] as String?)?.let { signer ->
-            dylib?.let { lib ->
-                localSign(signer, lib)
+        logger.info("Resulting dylib: $dylib")
+        if (dylib != null) {
+            (project.properties["signer"] as String?)?.let { signer ->
+                localSign(signer, dylib)
             }
-        }
-        (project.properties["sign_host"] as String?)?.let { sign_host ->
-            dylib?.let { lib ->
-                remoteSign(sign_host, lib)
+
+            skiko.signHost?.let { signHost ->
+                remoteSign(signHost, dylib)
             }
         }
     }
