@@ -299,7 +299,7 @@ project.tasks.register<Exec>("objcCompile") {
     outputs.files(outs)
 }
 
-fun localSign(signer: String, lib: File) {
+fun localSign(signer: String, lib: File): File {
     println("Local signing $lib as $signer")
     val proc = ProcessBuilder("codesign", "-f", "-s", signer, lib.absolutePath)
         .redirectOutput(ProcessBuilder.Redirect.PIPE)
@@ -313,9 +313,10 @@ fun localSign(signer: String, lib: File) {
         println(err)
         throw GradleException("Cannot sign $lib: $err")
     }
+    return lib
 }
 
-fun remoteSign(signHost: String, lib: File) {
+fun remoteSign(signHost: String, lib: File): File {
     println("Remote signing $lib on $signHost")
     val user = skiko.signUser ?: error("signUser is null")
     val token = skiko.signToken ?: error("signToken is null")
@@ -339,8 +340,7 @@ fun remoteSign(signHost: String, lib: File) {
         println(err)
         throw GradleException("Cannot sign $lib: $err")
     } else {
-        lib.delete()
-        out.renameTo(lib)
+        return out
     }
 }
 
@@ -386,20 +386,6 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
                     "user32.lib"
                 )
             )
-        }
-    }
-
-    doLast {
-        val dylib = outputs.files.files.singleOrNull { it.name.endsWith(".dylib") }
-        logger.info("Resulting dylib: $dylib")
-        if (dylib != null) {
-            (project.properties["signer"] as String?)?.let { signer ->
-                localSign(signer, dylib)
-            }
-
-            skiko.signHost?.let { signHost ->
-                remoteSign(signHost, dylib)
-            }
         }
     }
 }
@@ -459,7 +445,17 @@ val skikoJvmRuntimeJar by project.tasks.registering(Jar::class) {
     dependsOn(createChecksums)
     from(skikoJvmJar.map { zipTree(it.archiveFile) })
     val linkTask = project.tasks.withType(LinkSharedLibrary::class.java).single { it.name.contains(buildType.id) }
-    from(linkTask.outputs.files.filter { it.isFile })
+    val lib = linkTask.outputs.files.single { it.isFile }
+    val maybeSigned = if (lib.name.endsWith(".dylib")) {
+        println("Resulting dylib: $lib")
+        skiko.signHost?.let { signHost ->
+            remoteSign(signHost, lib)
+        } ?: lib
+    } else {
+        lib
+    }
+    from(maybeSigned)
+    rename("${lib.name}.signed", lib.name)
     if (targetOs.isWindows) {
         from(files(skiaDir.map { it.resolve("out/${buildType.id}-x64/icudtl.dat") }))
     }
