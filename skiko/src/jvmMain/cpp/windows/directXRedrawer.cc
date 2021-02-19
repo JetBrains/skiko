@@ -299,6 +299,9 @@ HRESULT D3DCompile(
 
         gr_cp<IDXGISwapChain1> swapChain;
         GR_D3D_CALL_ERRCHECK(swapChainFactory->CreateSwapChainForHwnd(d3dDevice->queue.get(), fWindow, &swapChainDesc, &swapChainFSDesc, nullptr, &swapChain));
+        DXGI_RGBA background = {1.0f, 1.0f, 1.0f, 1.0f};
+        swapChain->SetBackgroundColor(&background);
+
         GR_D3D_CALL_ERRCHECK(swapChain->QueryInterface(IID_PPV_ARGS(&d3dDevice->swapChain)));
         GR_D3D_CALL_ERRCHECK(d3dDevice->device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&d3dDevice->fence)));
         d3dDevice->fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);

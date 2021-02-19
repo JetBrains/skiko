@@ -24,6 +24,10 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextHandler(layer) 
                 if (device == 0L) {
                     throw Exception("Failed to create DirectX12 device.")
                 }
+                val scale = layer.contentScale
+                val w = (layer.width * scale).toInt().coerceAtLeast(0)
+                val h = (layer.height * scale).toInt().coerceAtLeast(0)
+                directXRedrawer.resizeBuffers(device, w, h)
                 context = directXRedrawer.makeContext(device)
             }
         } catch (e: Exception) {
