@@ -236,8 +236,6 @@ HRESULT D3DCompile(
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_createDirectXDevice(
         JNIEnv *env, jobject redrawer, jlong windowHandle)
     {
-        DirectXDevice *d3dDevice = new DirectXDevice();
-
         gr_cp<IDXGIFactory4> deviceFactory;
         if (!SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&deviceFactory))))
         {
@@ -265,6 +263,7 @@ HRESULT D3DCompile(
             return 0;
         }
 
+        DirectXDevice *d3dDevice = new DirectXDevice();
         d3dDevice->backendContext.fAdapter = hardwareAdapter;
         d3dDevice->backendContext.fDevice = device;
         d3dDevice->backendContext.fQueue = queue;
