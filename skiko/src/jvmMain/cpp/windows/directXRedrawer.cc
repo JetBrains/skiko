@@ -36,7 +36,7 @@ public:
     gr_cp<IDXGISwapChain3> swapChain;
     gr_cp<ID3D12CommandQueue> queue;
     gr_cp<ID3D12Fence> fence;
-    HANDLE fenceEvent;
+    HANDLE fenceEvent = NULL;
     uint64_t fenceValue;
     unsigned int bufferIndex = 1;
     unsigned int bufferWidth = 0;
@@ -49,7 +49,10 @@ public:
 
     ~DirectXDevice()
     {
-        CloseHandle(fenceEvent);
+        if (fenceEvent != NULL)
+        {
+            CloseHandle(fenceEvent);
+        }
     }
 };
 
