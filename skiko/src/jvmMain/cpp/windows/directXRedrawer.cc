@@ -311,7 +311,7 @@ HRESULT D3DCompile(
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_finishFrame(
-        JNIEnv *env, jobject redrawer, jlong devicePtr, jlong contextPtr, jlong surfacePtr)
+        JNIEnv *env, jobject redrawer, jlong devicePtr, jlong contextPtr, jlong surfacePtr, jboolean isVsyncEnabled)
     {
         DirectXDevice *d3dDevice = fromJavaPointer<DirectXDevice*>(devicePtr);
 
@@ -323,7 +323,7 @@ HRESULT D3DCompile(
         fContext->submit(true);
 
         // 1 value in [Present(1, 0)] enables vblank wait so this is how vertical sync works in DirectX.
-        GR_D3D_CALL_ERRCHECK(d3dDevice->swapChain->Present(1, 0));
+        GR_D3D_CALL_ERRCHECK(d3dDevice->swapChain->Present((int)isVsyncEnabled, 0));
 
         const UINT64 fence = d3dDevice->fenceValue;
         GR_D3D_CALL_ERRCHECK(d3dDevice->queue->Signal(d3dDevice->fence.get(), fence));

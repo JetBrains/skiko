@@ -6,9 +6,11 @@ import org.jetbrains.skija.BackendRenderTarget
 import org.jetbrains.skija.DirectContext
 import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.HardwareLayer
+import org.jetbrains.skiko.SkiaLayerProperties
 
 internal class Direct3DRedrawer(
-    private val layer: HardwareLayer
+    private val layer: HardwareLayer,
+    private val properties: SkiaLayerProperties
 ) : Redrawer {
 
     private var isDisposed = false
@@ -57,9 +59,13 @@ internal class Direct3DRedrawer(
         return device
     }
 
+    fun finishFrame(device: Long, context: Long, surface: Long) {
+        finishFrame(device, context, surface, properties.isVsyncEnabled)
+    }
+
     external fun createDirectXDevice(windowHandle: Long): Long
     external fun makeDirectXContext(device: Long): Long
     external fun makeDirectXRenderTarget(device: Long, width: Int, height: Int): Long
-    external fun finishFrame(device: Long, context: Long, surface: Long)
+    private external fun finishFrame(device: Long, context: Long, surface: Long, isVsyncEnabled: Boolean)
     external fun disposeDevice(device: Long)
 }
