@@ -213,7 +213,7 @@ HRESULT D3DCompile(
         return toJavaPointer(renderTarget);
     }
 
-    void defineHardwareAdapter(IDXGIFactory4 *pFactory, IDXGIAdapter1 **ppAdapter)
+    bool defineHardwareAdapter(IDXGIFactory4 *pFactory, IDXGIAdapter1 **ppAdapter)
     {
         *ppAdapter = nullptr;
         for (UINT adapterIndex = 0;; ++adapterIndex)
@@ -226,10 +226,11 @@ HRESULT D3DCompile(
             if (SUCCEEDED(D3D12CreateDevice(pAdapter, D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), nullptr)))
             {
                 *ppAdapter = pAdapter;
-                return;
+                return true;
             }
             pAdapter->Release();
         }
+        return false;
     }
 
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_createDirectXDevice(
@@ -243,7 +244,10 @@ HRESULT D3DCompile(
             return 0;
         }
         gr_cp<IDXGIAdapter1> hardwareAdapter;
-        defineHardwareAdapter(deviceFactory.get(), &hardwareAdapter);
+        if (!defineHardwareAdapter(deviceFactory.get(), &hardwareAdapter))
+        {
+            return 0;
+        }
         gr_cp<ID3D12Device> device;
         if (!SUCCEEDED(D3D12CreateDevice(hardwareAdapter.get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&device))))
         {
