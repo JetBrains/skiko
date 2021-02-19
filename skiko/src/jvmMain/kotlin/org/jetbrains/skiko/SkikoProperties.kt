@@ -29,8 +29,38 @@ internal object SkikoProperties {
         when(text) {
             "SOFTWARE" -> return GraphicsApi.SOFTWARE
             "OPENGL" -> return GraphicsApi.OPENGL
-            else -> return GraphicsApi.OPENGL
+            "DIRECT3D" -> {
+                return if (hostOs == OS.Windows) GraphicsApi.DIRECT3D
+                    else throw Exception("$hostOs does not support DirectX rendering API.")
+            }
+            "METAL" -> {
+                return if (hostOs == OS.MacOS) GraphicsApi.METAL
+                    else throw Exception("$hostOs does not support Metal rendering API.")
+            }
+            else -> return bestRenderApiForCurrentOS()
         }
+    }
+
+    private fun bestRenderApiForCurrentOS(): GraphicsApi {
+        when(hostOs) {
+            OS.MacOS -> return GraphicsApi.OPENGL
+            OS.Linux -> return GraphicsApi.OPENGL
+            OS.Windows -> return GraphicsApi.DIRECT3D
+        }
+    }
+
+    val fallbackRenderApiQueue : List<GraphicsApi> by lazy {
+        val head = renderApi
+        var renderApiList = mutableListOf<GraphicsApi>()
+
+        when (hostOs) {
+            OS.MacOS -> renderApiList = mutableListOf(GraphicsApi.OPENGL, GraphicsApi.SOFTWARE)
+            OS.Linux -> renderApiList = mutableListOf(GraphicsApi.OPENGL, GraphicsApi.SOFTWARE)
+            OS.Windows -> renderApiList = mutableListOf(GraphicsApi.DIRECT3D, GraphicsApi.OPENGL, GraphicsApi.SOFTWARE)
+        }
+        renderApiList.remove(head)
+
+        listOf(head) + renderApiList
     }
 
     private fun property(name: String, default: Boolean) = lazy {

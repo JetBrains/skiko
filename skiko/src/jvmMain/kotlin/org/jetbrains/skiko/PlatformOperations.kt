@@ -1,11 +1,11 @@
 package org.jetbrains.skiko
 
-import org.jetbrains.skiko.SkikoProperties.renderApi
 import org.jetbrains.skiko.redrawer.LinuxOpenGLRedrawer
 import org.jetbrains.skiko.redrawer.MacOsOpenGLRedrawer
-import org.jetbrains.skiko.redrawer.RasterRedrawer
+import org.jetbrains.skiko.redrawer.SoftwareRedrawer
 import org.jetbrains.skiko.redrawer.Redrawer
 import org.jetbrains.skiko.redrawer.WindowsOpenGLRedrawer
+import org.jetbrains.skiko.redrawer.Direct3DRedrawer
 import java.awt.Component
 import java.awt.Window
 import javax.swing.SwingUtilities
@@ -14,7 +14,7 @@ internal interface PlatformOperations {
     fun isFullscreen(component: Component): Boolean
     fun setFullscreen(component: Component, value: Boolean)
     fun getDpiScale(component: Component): Float
-    fun createRedrawer(layer: HardwareLayer, properties: SkiaLayerProperties): Redrawer
+    fun createRedrawer(layer: HardwareLayer, renderApi: GraphicsApi, properties: SkiaLayerProperties): Redrawer
 }
 
 internal val platformOperations: PlatformOperations by lazy {
@@ -32,8 +32,12 @@ internal val platformOperations: PlatformOperations by lazy {
                     return component.graphicsConfiguration.defaultTransform.scaleX.toFloat()
                 }
 
-                override fun createRedrawer(layer: HardwareLayer, properties: SkiaLayerProperties) = when(renderApi) {
-                    GraphicsApi.SOFTWARE -> RasterRedrawer(layer)
+                override fun createRedrawer(
+                    layer: HardwareLayer,
+                    renderApi: GraphicsApi,
+                    properties: SkiaLayerProperties
+                ) = when(renderApi) {
+                    GraphicsApi.SOFTWARE -> SoftwareRedrawer(layer)
                     else -> MacOsOpenGLRedrawer(layer, properties)
                 }
         }
@@ -55,8 +59,13 @@ internal val platformOperations: PlatformOperations by lazy {
                     return component.graphicsConfiguration.defaultTransform.scaleX.toFloat()
                 }
 
-                override fun createRedrawer(layer: HardwareLayer, properties: SkiaLayerProperties) = when(renderApi) {
-                    GraphicsApi.SOFTWARE -> RasterRedrawer(layer)
+                override fun createRedrawer(
+                    layer: HardwareLayer,
+                    renderApi: GraphicsApi,
+                    properties: SkiaLayerProperties
+                ) = when(renderApi) {
+                    GraphicsApi.SOFTWARE -> SoftwareRedrawer(layer)
+                    GraphicsApi.DIRECT3D -> Direct3DRedrawer(layer, properties)
                     else -> WindowsOpenGLRedrawer(layer, properties)
                 }
             }
@@ -80,19 +89,23 @@ internal val platformOperations: PlatformOperations by lazy {
                     // TODO doesn't work well because java doesn't scale windows (content has offset with 200% scale)
                     //
                     // Two solutions:
-                    // 1. dynamically change sun.java2d.uiScale (it is global property, so we have to be careful) and update all windows
+                    // 1. dynamically change sun.java2d.uiScale (it is global property,
+                    // so we have to be careful) and update all windows
                     //
                     // 2. apply contentScale manually to all windows
                     // (it is not good, because on different platform windows will have different size.
                     // Maybe we will apply contentScale manually on all platforms?)
 
                     // see also comment for HardwareLayer.checkContentScale
-
-//                    return component.useDrawingSurfacePlatformInfo(::linuxGetDpiScaleNative)
+                    // return component.useDrawingSurfacePlatformInfo(::linuxGetDpiScaleNative)
                 }
 
-                override fun createRedrawer(layer: HardwareLayer, properties: SkiaLayerProperties) = when(renderApi) {
-                    GraphicsApi.SOFTWARE -> RasterRedrawer(layer)
+                override fun createRedrawer(
+                    layer: HardwareLayer,
+                    renderApi: GraphicsApi,
+                    properties: SkiaLayerProperties
+                ) = when(renderApi) {
+                    GraphicsApi.SOFTWARE -> SoftwareRedrawer(layer)
                     else -> LinuxOpenGLRedrawer(layer, properties)
                 }
             }

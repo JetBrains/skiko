@@ -268,6 +268,7 @@ tasks.withType(CppCompile::class.java).configureEach {
                     "-DWIN32_LEAN_AND_MEAN",
                     "-DNOMINMAX",
                     "-DSK_GAMMA_APPLY_TO_A8",
+                    "-DSK_DIRECT3D",
                     "/utf-8",
                     "/GR-", // no-RTTI.
                     *buildType.msvcFlags

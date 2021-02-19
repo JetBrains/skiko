@@ -5,7 +5,7 @@ import kotlinx.coroutines.swing.Swing
 import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.HardwareLayer
 
-internal class RasterRedrawer(
+internal class SoftwareRedrawer(
     private val layer: HardwareLayer
 ) : Redrawer {
 

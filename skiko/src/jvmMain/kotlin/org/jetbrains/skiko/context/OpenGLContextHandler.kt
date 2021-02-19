@@ -6,12 +6,13 @@ import org.jetbrains.skija.Picture
 import org.jetbrains.skija.Surface
 import org.jetbrains.skija.SurfaceColorFormat
 import org.jetbrains.skija.SurfaceOrigin
-import org.jetbrains.skiko.HardwareLayer
+import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.makeGLContext
 import org.jetbrains.skiko.makeGLRenderTarget
 import org.jetbrains.skiko.OpenGLApi
+import org.jetbrains.skiko.redrawer.Redrawer
 
-internal class OpenGLContextHandler(layer: HardwareLayer) : ContextHandler(layer) {
+internal class OpenGLContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
     override fun initContext(): Boolean {
         try {
             if (context == null) {

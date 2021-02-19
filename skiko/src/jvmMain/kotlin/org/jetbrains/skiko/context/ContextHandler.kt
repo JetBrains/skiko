@@ -6,20 +6,22 @@ import org.jetbrains.skija.DirectContext
 import org.jetbrains.skija.Picture
 import org.jetbrains.skija.Surface
 import org.jetbrains.skiko.GraphicsApi
-import org.jetbrains.skiko.HardwareLayer
+import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.OS
 import org.jetbrains.skiko.SkikoProperties
 import org.jetbrains.skiko.hostOs
+import org.jetbrains.skiko.redrawer.Redrawer
 
-internal fun createContextHandler(layer: HardwareLayer): ContextHandler {
-    return when (SkikoProperties.renderApi) {
+internal fun createContextHandler(layer: SkiaLayer, renderApi: GraphicsApi): ContextHandler {
+    return when (renderApi) {
         GraphicsApi.SOFTWARE -> SoftwareContextHandler(layer)
         GraphicsApi.OPENGL -> OpenGLContextHandler(layer)
-        else -> TODO("Unsupported yet")
+        GraphicsApi.DIRECT3D -> Direct3DContextHandler(layer)
+        else -> TODO("Unsupported yet.")
     }
 }
 
-internal abstract class ContextHandler(val layer: HardwareLayer) {
+internal abstract class ContextHandler(val layer: SkiaLayer) {
     open val bleachConstant = if (hostOs == OS.MacOS) 0 else -1
     var context: DirectContext? = null
     var renderTarget: BackendRenderTarget? = null
