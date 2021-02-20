@@ -7,13 +7,10 @@ import org.jetbrains.skija.PictureRecorder
 import org.jetbrains.skija.Rect
 import org.jetbrains.skiko.context.ContextHandler
 import org.jetbrains.skiko.context.createContextHandler
-import org.jetbrains.skiko.context.SoftwareContextHandler
-import org.jetbrains.skiko.redrawer.SoftwareRedrawer
 import org.jetbrains.skiko.redrawer.Redrawer
 import java.awt.Graphics
+import javax.swing.SwingUtilities.invokeLater
 import javax.swing.SwingUtilities.isEventDispatchThread
-import kotlin.collections.MutableList
-import kotlin.collections.toMutableList
 
 interface SkiaRenderer {
     fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long)
@@ -45,7 +42,7 @@ open class SkiaLayer(
         contextHandler = createContextHandler(this, initialRenderApi)
         redrawer = platformOperations.createRedrawer(this, initialRenderApi, properties)
         redrawer?.syncSize()
-        redrawer?.redrawImmediately()
+        redraw()
     }
 
     override fun dispose() {
@@ -62,15 +59,35 @@ open class SkiaLayer(
     override fun setBounds(x: Int, y: Int, width: Int, height: Int) {
         super.setBounds(x, y, width, height)
         redrawer?.syncSize()
-        redrawer?.redrawImmediately()
+        redraw()
     }
 
     override fun paint(g: Graphics) {
         super.paint(g)
         redrawer?.syncSize()
-        needRedraw()
+        redrawer?.redrawImmediately()
     }
 
+    private var redrawScheduled = false
+
+    /**
+     * Redraw as soon as possible (but not right now)
+     */
+    fun redraw() {
+        if (!redrawScheduled) {
+            redrawScheduled = true
+            invokeLater {
+                redrawScheduled = false
+                if (!isDisposed) {
+                    redrawer?.redrawImmediately()
+                }
+            }
+        }
+    }
+
+    /**
+     * Redraw on the next animation Frame (on vsync signal if vsync is enabled).
+     */
     fun needRedraw() {
         check(!isDisposed)
         check(isEventDispatchThread())
