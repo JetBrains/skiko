@@ -2,9 +2,11 @@ import de.undercouch.gradle.tasks.download.Download
 import org.gradle.crypto.checksum.Checksum
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinTest
+import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
+import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 
 plugins {
-    kotlin("multiplatform") version "1.3.72"
+    kotlin("multiplatform") version "1.4.30"
     `cpp-library`
     `maven-publish`
     id("org.gradle.crypto.checksum") version "1.1.0"
@@ -146,12 +148,44 @@ val skijaSrcDir = run {
     }.map { delombokSkijaSrcDir }
 }
 
+val Project.supportNative: Boolean
+   get() = properties.get("skiko.native.enabled") == "true"
+
 kotlin {
     jvm {
         compilations.all {
             kotlinOptions.jvmTarget = "11"
         }
         withJava()
+    }
+
+    if (supportNative) {
+        val nativeTarget = when (target) {
+            "macos-x64" -> macosX64()
+                // "linux-x64" -> linuxX64()
+                // "windows-x64" -> mingwX64()
+                else -> null
+        }
+        nativeTarget?.apply {
+            compilations.getByName("main") {
+                val skia by cinterops.creating {
+                    defFile("src/nativeInterop/cinterop/skia.def")
+
+                        val skiaDir = skiaDir.get().absolutePath
+                        val kotlinNativeDataPath = System.getenv("KONAN_DATA_DIR")?.let { File(it) }
+                    ?: File(System.getProperty("user.home")).resolve(".konan")
+
+                        compilerOpts(
+                                // TODO: Why do we need `include/c++/v1`?
+                                "-I$kotlinNativeDataPath/dependencies/clang-llvm-apple-8.0.0-darwin-macos//include/c++/v1",
+                                "-I$skiaDir"
+                                )
+
+                        extraOpts("-staticLibrary", "libskia.a")
+                        extraOpts("-libraryPath", "$skiaDir/out/${buildType.id}-${targetArch.id}")
+                }
+            }
+        }
     }
 
     sourceSets {
@@ -182,7 +216,16 @@ kotlin {
                 implementation(kotlin("test-junit"))
             }
         }
+        if (supportNative) {
+            val macosX64Main by getting {
+
+            }
+        }
     }
+}
+
+tasks.withType(CInteropProcess::class.java).forEach {
+    it.dependsOn(skiaDir)
 }
 
 tasks.withType(JavaCompile::class.java).configureEach {
@@ -614,6 +657,23 @@ publishing {
             artifactId = SkikoArtifacts.runtimeArtifactIdFor(targetOs, targetArch)
             afterEvaluate {
                 artifact(skikoJvmRuntimeJar.map { it.archiveFile.get() })
+            }
+        }
+        if (supportNative) {
+            create<MavenPublication>("skikoNativeSkiaInterop") {
+                artifactId = SkikoArtifacts.nativeSkiaInteropArtifactIdFor(targetOs, targetArch)
+                    afterEvaluate {
+                        artifact(project.tasks.withType(CInteropProcess::class.java).single().outputs.getFiles().single())
+                    }
+            }
+            create<MavenPublication>("skikoNativeRuntime") {
+                artifactId = SkikoArtifacts.nativeRuntimeArtifactIdFor(targetOs, targetArch)
+                    afterEvaluate {
+                        artifact(project.tasks.withType(KotlinNativeCompile::class.java)
+                                .single { it.name.startsWith("compileKotlin") } // Exclude compileTestKotlin.
+                                .outputs.getFiles().single { it.name.endsWith(".klib") }
+                                )
+                    }
             }
         }
     }
