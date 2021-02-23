@@ -364,7 +364,7 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
         OS.Linux -> {
             linkerArgs.addAll(
                 listOf(
-                    "-Wl,-Bstatic", "-lstdc++", "-lgcc", "-Wl,-Bdynamic",
+                    "-static-libstdc++",
                     "-static-libgcc",
                     "-lGL",
                     "-lfontconfig",
