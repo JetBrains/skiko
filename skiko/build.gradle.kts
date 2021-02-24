@@ -368,6 +368,13 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
                     "-static-libgcc",
                     "-lGL",
                     "-lfontconfig",
+                    // A fix for https://github.com/JetBrains/compose-jb/issues/413.
+                    // Dynamic position independent linking uses PLT thunks relying on jump targets in GOT (Global Offsets Table).
+                    // GOT entries marked as (for example) R_X86_64_JUMP_SLOT in the relocation table. So, if there's code loading
+                    // platform libstdc++.so, lazy resolve code will resolve GOT entries to platform libstdc++.so on first invocation,
+                    // and so further execution will break, as those two libstdc++ are not compatible.
+                    // To fix it we enforce resolve of all GOT entries at library load time, and make it read-only afterwards.
+                    "-Wl,-z,relro,-z,now",
                     // Hack to fix problem with linker not always finding certain declarations.
                     skiaDir.get().absolutePath + "/out/${buildType.id}-${targetArch.id}/libsksg.a",
                     skiaDir.get().absolutePath + "/out/${buildType.id}-${targetArch.id}/libskia.a"
