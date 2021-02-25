@@ -317,6 +317,21 @@ fun localSign(signer: String, lib: File): File {
     return lib
 }
 
+// See https://github.com/olonho/sealer.
+fun sealBinary(sealer: String, lib: File) {
+    println("Sealing $lib by $sealer")
+    val proc = ProcessBuilder(sealer, "-f", lib.absolutePath, "-p", "Java_")
+        .redirectOutput(ProcessBuilder.Redirect.INHERIT)
+        .redirectError(ProcessBuilder.Redirect.INHERIT)
+        .start()
+    proc.waitFor(2, TimeUnit.MINUTES)
+    if (proc.exitValue() != 0) {
+        throw GradleException("Cannot seal $lib")
+    }
+    println("Sealed!")
+}
+
+
 fun remoteSign(signHost: String, lib: File, out: File) {
     println("Remote signing $lib on $signHost")
     val user = skiko.signUser ?: error("signUser is null")
@@ -445,12 +460,16 @@ val maybeSign by project.tasks.registering {
     outputs.files(output)
 
     doLast {
+        if (targetOs == OS.Linux) {
+            // Linux requires additional sealing to run on wider set of platforms.
+            val sealer = "$projectDir/tools/sealer"
+            sealBinary(sealer, lib)
+        }
         if (skiko.signHost != null) {
             remoteSign(skiko.signHost!!, lib, output)
         } else {
             lib.copyTo(output, overwrite = true)
         }
-
     }
 }
 
