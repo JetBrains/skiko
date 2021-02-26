@@ -24,6 +24,7 @@ dependencies {
     skikoDep(SkikoArtifacts.runtimeArtifactIdFor(OS.Windows, Arch.X64))
     skikoDep(SkikoArtifacts.runtimeArtifactIdFor(OS.Linux, Arch.X64))
     skikoDep(SkikoArtifacts.runtimeArtifactIdFor(OS.MacOS, Arch.X64))
+    skikoDep(SkikoArtifacts.runtimeArtifactIdFor(OS.MacOS, Arch.Arm64))
 }
 
 val createGithubRelease by tasks.registering {
