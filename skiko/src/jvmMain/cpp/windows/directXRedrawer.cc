@@ -27,6 +27,11 @@
     } while (false)
 
 const int BuffersCount = 2;
+const std::vector<std::wstring> adapterBlacklist {
+    L"Intel(R) HD Graphics 520",
+    L"Intel(R) HD Graphics 530",
+    L"NVIDIA GeForce GTX 750 Ti",
+    L"NVIDIA Quadro M2000M" };
 
 class DirectXDevice
 {
@@ -38,7 +43,7 @@ public:
     gr_cp<ID3D12Fence> fence;
     HANDLE fenceEvent = NULL;
     uint64_t fenceValue;
-    unsigned int bufferIndex = 1;
+    unsigned int bufferIndex = 0;
     unsigned int bufferWidth = 0;
     unsigned int bufferHeight = 0;
 
@@ -241,6 +246,21 @@ HRESULT D3DCompile(
         return false;
     }
 
+    bool isBlacklisted(IDXGIAdapter1* hardwareAdapter)
+    {
+        DXGI_ADAPTER_DESC1 desc;
+        hardwareAdapter->GetDesc1(&desc);
+        std::wstring currentAdapterName(desc.Description);
+        for (std::wstring name : adapterBlacklist) {
+            if (currentAdapterName == name)
+            {
+                fwprintf(stderr, L"Graphics card: %s is blacklisted.\n", name.c_str());
+                return true;
+            }
+        }
+        return false;
+    }
+
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_createDirectXDevice(
         JNIEnv *env, jobject redrawer, jlong windowHandle)
     {
@@ -251,6 +271,10 @@ HRESULT D3DCompile(
         }
         gr_cp<IDXGIAdapter1> hardwareAdapter;
         if (!defineHardwareAdapter(deviceFactory.get(), &hardwareAdapter))
+        {
+            return 0;
+        }
+        if (isBlacklisted(hardwareAdapter.get()))
         {
             return 0;
         }
@@ -325,10 +349,10 @@ HRESULT D3DCompile(
         JNIEnv *env, jobject redrawer, jlong devicePtr, jlong contextPtr, jlong surfacePtr, jboolean isVsyncEnabled)
     {
         DirectXDevice *d3dDevice = fromJavaPointer<DirectXDevice*>(devicePtr);
-
         SkSurface *surface = fromJavaPointer<SkSurface*>(surfacePtr);
-        surface->flushAndSubmit();
         GrDirectContext *fContext = fromJavaPointer<GrDirectContext*>(contextPtr);
+
+        surface->flushAndSubmit();
         surface->flush(SkSurface::BackendSurfaceAccess::kPresent, GrFlushInfo());
         fContext->flush({});
         fContext->submit(true);

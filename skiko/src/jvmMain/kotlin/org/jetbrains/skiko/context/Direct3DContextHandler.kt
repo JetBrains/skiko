@@ -54,6 +54,7 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextHandler(layer) 
     }
 
     override fun flush() {
+        super.flush()
         try {
             directXRedrawer.finishFrame(
                 device,
