@@ -226,26 +226,6 @@ HRESULT D3DCompile(
         return toJavaPointer(renderTarget);
     }
 
-    bool defineHardwareAdapter(IDXGIFactory4 *pFactory, IDXGIAdapter1 **ppAdapter)
-    {
-        *ppAdapter = nullptr;
-        for (UINT adapterIndex = 0;; ++adapterIndex)
-        {
-            IDXGIAdapter1 *pAdapter = nullptr;
-            if (DXGI_ERROR_NOT_FOUND == pFactory->EnumAdapters1(adapterIndex, &pAdapter))
-            {
-                break;
-            }
-            if (SUCCEEDED(D3D12CreateDevice(pAdapter, D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), nullptr)))
-            {
-                *ppAdapter = pAdapter;
-                return true;
-            }
-            pAdapter->Release();
-        }
-        return false;
-    }
-
     bool isBlacklisted(IDXGIAdapter1* hardwareAdapter)
     {
         DXGI_ADAPTER_DESC1 desc;
@@ -261,6 +241,30 @@ HRESULT D3DCompile(
         return false;
     }
 
+    bool defineHardwareAdapter(IDXGIFactory4 *pFactory, IDXGIAdapter1 **ppAdapter)
+    {
+        *ppAdapter = nullptr;
+        for (UINT adapterIndex = 0;; ++adapterIndex)
+        {
+            IDXGIAdapter1 *pAdapter = nullptr;
+            if (DXGI_ERROR_NOT_FOUND == pFactory->EnumAdapters1(adapterIndex, &pAdapter))
+            {
+                break;
+            }
+            if (SUCCEEDED(D3D12CreateDevice(pAdapter, D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), nullptr)))
+            {
+                if (isBlacklisted(pAdapter))
+                {
+                    continue;
+                }
+                *ppAdapter = pAdapter;
+                return true;
+            }
+            pAdapter->Release();
+        }
+        return false;
+    }
+
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_createDirectXDevice(
         JNIEnv *env, jobject redrawer, jlong windowHandle)
     {
@@ -271,10 +275,6 @@ HRESULT D3DCompile(
         }
         gr_cp<IDXGIAdapter1> hardwareAdapter;
         if (!defineHardwareAdapter(deviceFactory.get(), &hardwareAdapter))
-        {
-            return 0;
-        }
-        if (isBlacklisted(hardwareAdapter.get()))
         {
             return 0;
         }
