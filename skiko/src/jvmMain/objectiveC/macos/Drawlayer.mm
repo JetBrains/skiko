@@ -36,7 +36,7 @@
 
 - (void) disposeLayer:(JNIEnv *) env
 {
-    (*env)->DeleteGlobalRef(env, self.canvasGlobalRef);
+    env->DeleteGlobalRef(self.canvasGlobalRef);
     self.canvasGlobalRef = NULL;
     self.container = NULL;
     self.window = NULL;
@@ -71,13 +71,16 @@ LayerHandler * findByObject(JNIEnv *env, jobject object)
     }
     for (LayerHandler* layer in layerStorage)
     {
-        if ((*env)->IsSameObject(env, object, layer.canvasGlobalRef) == JNI_TRUE)
+        if (env->IsSameObject(object, layer.canvasGlobalRef) == JNI_TRUE)
         {
             return layer;
         }
     }
     return NULL;
 }
+
+extern "C"
+{
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_nativeInit(JNIEnv *env, jobject canvas, jlong platformInfoPtr)
 {
@@ -91,7 +94,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_nativeInit(JNIEnv 
     LayerHandler *layersSet = [[LayerHandler alloc] init];
 
     layersSet.container = [dsi_mac windowLayer];
-    jobject canvasGlobalRef = (*env)->NewGlobalRef(env, canvas);
+    jobject canvasGlobalRef = env->NewGlobalRef(canvas);
     [layersSet setCanvasGlobalRef: canvasGlobalRef];
 
     NSMutableArray<NSWindow *> *windows = [NSMutableArray arrayWithArray: [[NSApplication sharedApplication] windows]];
@@ -153,3 +156,5 @@ void getMetalDeviceAndQueue(void** device, void** queue)
     *device = (__bridge void*)fDevice;
     *queue = (__bridge void*)fQueue;
 }
+
+} // extern C

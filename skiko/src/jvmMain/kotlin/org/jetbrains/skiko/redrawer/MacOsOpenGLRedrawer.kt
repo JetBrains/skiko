@@ -106,6 +106,7 @@ internal class MacOsOpenGLRedrawer(
     }
 
     override fun syncSize() {
+        println("syncsize")
         val globalPosition = convertPoint(layer, layer.x, layer.y, getRootPane(layer))
         setContentScale(containerLayerPtr, layer.contentScale)
         setContentScale(drawLayer.ptr, layer.contentScale)

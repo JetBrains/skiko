@@ -283,15 +283,21 @@ tasks.withType(CppCompile::class.java).configureEach {
 project.tasks.register<Exec>("objcCompile") {
     val inputDir = "$projectDir/src/jvmMain/objectiveC/${targetOs.id}"
     val outDir = "$buildDir/objc/$target"
-    val names = File(inputDir).listFiles()!!.map { it.name.removeSuffix(".m") }
-    val srcs = names.map { "$inputDir/$it.m" }.toTypedArray()
+    val names = File(inputDir).listFiles()!!.map { it.name.removeSuffix(".mm") }
+    val srcs = names.map { "$inputDir/$it.mm" }.toTypedArray()
     val outs = names.map { "$outDir/$it.o" }.toTypedArray()
     workingDir = File(outDir)
+    val skiaDir = skiaDir.get().absolutePath
     commandLine = listOf(
         "clang",
         "-mmacosx-version-min=10.13",
         "-I$jdkHome/include",
         "-I$jdkHome/include/darwin",
+        "-I$skiaDir",
+        "-I$skiaDir/include",
+        "-I$skiaDir/include/gpu",
+        "-DSK_METAL",
+        "-std=c++17",
         "-c",
         *srcs
     )
