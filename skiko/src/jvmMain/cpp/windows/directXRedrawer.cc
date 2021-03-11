@@ -27,6 +27,11 @@
     } while (false)
 
 const int BuffersCount = 2;
+
+// This is a blacklist of graphics cards that have rendering issues (black screen, flickering)
+// with the current Swing/Skia integration. 
+// If PC has other graphics cards suitable for DirectX12, one of them will be used. Otherwise, 
+// rendering will falls back to OpenGL.
 const std::vector<std::wstring> adapterBlacklist {
     L"Intel(R) HD Graphics 520",
     L"Intel(R) HD Graphics 530",
