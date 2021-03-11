@@ -16,7 +16,7 @@ internal class MetalRedrawer(
     private val properties: SkiaLayerProperties
 ) : Redrawer {
     private var isDisposed = false
-    private var device: Long = 0
+    private val device = layer.useDrawingSurfacePlatformInfo(::createMetalDevice)
 
     private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
         update(System.nanoTime())
@@ -49,7 +49,6 @@ internal class MetalRedrawer(
     }
 
     override fun syncSize() {
-        println("syncsize")
         val globalPosition = convertPoint(layer, layer.x, layer.y, getRootPane(layer))
         setContentScale(device, layer.contentScale)
         resizeLayers(device,
@@ -60,24 +59,21 @@ internal class MetalRedrawer(
         )
     }
 
-    fun makeContext(device: Long) = DirectContext(
+    fun makeContext() = DirectContext(
         makeMetalContext(device)
     )
 
-    fun makeRenderTarget(device: Long, width: Int, height: Int) = BackendRenderTarget(
+    fun makeRenderTarget(width: Int, height: Int) = BackendRenderTarget(
         makeMetalRenderTarget(device, width, height)
     )
-
-    fun createDevice(): Long {
-        device = layer.useDrawingSurfacePlatformInfo(::createMetalDevice)
-        return device
-    }
+    
+    fun finishFrame() = finishFrame(device)
 
     private external fun createMetalDevice(platformInfo: Long): Long
     private external fun makeMetalContext(device: Long): Long
     private external fun makeMetalRenderTarget(device: Long, width: Int, height: Int): Long
     private external fun disposeDevice(device: Long)
-    external fun finishFrame(device: Long)
-    external fun resizeLayers(device: Long, x: Int, y: Int, width: Int, height: Int)
-    external fun setContentScale(device: Long, contentScale: Float)
+    private external fun finishFrame(device: Long)
+    private external fun resizeLayers(device: Long, x: Int, y: Int, width: Int, height: Int)
+    private external fun setContentScale(device: Long, contentScale: Float)
 }

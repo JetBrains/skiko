@@ -13,8 +13,6 @@
 #import <mtl/GrMtlBackendContext.h>
 #import <mtl/GrMtlTypes.h>
 
-JavaVM *jvmMetal = NULL;
-
 @interface AWTMetalLayer : CAMetalLayer
 
 @property jobject javaRef;
@@ -102,7 +100,6 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
     JNIEnv *env, jobject redrawer, jlong platformInfoPtr)
 {
     MetalDevice *device = [MetalDevice new];
-    env->GetJavaVM(&jvmMetal);
 
     NSObject<JAWT_SurfaceLayers>* dsi_mac = (__bridge NSObject<JAWT_SurfaceLayers> *) platformInfoPtr;
 
@@ -143,15 +140,18 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_resizeLay
     [CATransaction setValue:(id)kCFBooleanTrue forKey:kCATransactionDisableActions];
     device.layer.frame = CGRectMake(x, y, width, height);
     [CATransaction commit];
-    [device.layer performSelectorOnMainThread:@selector(setNeedsDisplay) withObject:0 waitUntilDone:NO];
+    [CATransaction flush];
 }
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_setContentScale(JNIEnv *env, jobject obj, jlong devicePtr, jfloat contentScale)
 {
     MetalDevice *device = (MetalDevice *) devicePtr;
+    [CATransaction begin];
+    [CATransaction setValue:(id)kCFBooleanTrue forKey:kCATransactionDisableActions];
     assert(contentScale != 0);
     device.layer.contentsScale = contentScale;
-    device.container.contentsScale = contentScale;
+    [CATransaction commit];
+    [CATransaction flush];
 }
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_finishFrame(

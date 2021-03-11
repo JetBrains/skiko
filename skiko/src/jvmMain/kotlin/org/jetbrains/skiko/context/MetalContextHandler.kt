@@ -1,30 +1,20 @@
 package org.jetbrains.skiko.context
 
-import java.lang.ref.Reference
 import org.jetbrains.skija.ColorSpace
-import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.Surface
 import org.jetbrains.skija.SurfaceColorFormat
 import org.jetbrains.skija.SurfaceOrigin
-import org.jetbrains.skiko.GraphicsApi
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.redrawer.MetalRedrawer
-import javax.swing.SwingUtilities.convertPoint
-import javax.swing.SwingUtilities.getRootPane
 
 internal class MetalContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
     val metalRedrawer: MetalRedrawer
         get() = layer.redrawer!! as MetalRedrawer
-    var device: Long = 0
 
     override fun initContext(): Boolean {
         try {
             if (context == null) {
-                device = metalRedrawer.createDevice()
-                if (device == 0L) {
-                    throw Exception("Failed to create Metal device.")
-                }
-                context = metalRedrawer.makeContext(device)
+                context = metalRedrawer.makeContext()
             }
         } catch (e: Exception) {
             println("${e.message}\nFailed to create Skia Metal context!")
@@ -40,7 +30,7 @@ internal class MetalContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
         val w = (layer.width * scale).toInt().coerceAtLeast(0)
         val h = (layer.height * scale).toInt().coerceAtLeast(0)
 
-        renderTarget = metalRedrawer.makeRenderTarget(device, w, h)
+        renderTarget = metalRedrawer.makeRenderTarget(w, h)
 
         surface = Surface.makeFromBackendRenderTarget(
             context!!,
@@ -56,6 +46,6 @@ internal class MetalContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
     override fun flush() {
         super.flush()
         surface!!.flushAndSubmit()
-        metalRedrawer.finishFrame(device)
+        metalRedrawer.finishFrame()
     }
 }

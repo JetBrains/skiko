@@ -41,7 +41,6 @@ open class SkiaLayer(
         val initialRenderApi = fallbackRenderApiQueue.removeAt(0)
         contextHandler = createContextHandler(this, initialRenderApi)
         redrawer = platformOperations.createRedrawer(this, initialRenderApi, properties)
-        println("init ${redrawer == null}")
         redrawer?.syncSize()
         redraw()
     }
@@ -58,14 +57,12 @@ open class SkiaLayer(
     }
 
     override fun setBounds(x: Int, y: Int, width: Int, height: Int) {
-        println("setBounds: $x $y $width $height ${redrawer == null}")
         super.setBounds(x, y, width, height)
         redrawer?.syncSize()
         redraw()
     }
 
     override fun paint(g: Graphics) {
-        println("paint ${redrawer == null}")
         super.paint(g)
         redrawer?.syncSize()
         redrawer?.redrawImmediately()
