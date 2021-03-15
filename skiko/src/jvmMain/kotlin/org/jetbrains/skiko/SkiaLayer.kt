@@ -36,8 +36,8 @@ open class SkiaLayer(
     private val pictureRecorder = PictureRecorder()
     private val pictureLock = Any()
 
-    override fun init() {
-        super.init()
+    override fun onInit() {
+        super.onInit()
         val initialRenderApi = fallbackRenderApiQueue.removeAt(0)
         contextHandler = createContextHandler(this, initialRenderApi)
         redrawer = platformOperations.createRedrawer(this, initialRenderApi, properties)
@@ -45,15 +45,15 @@ open class SkiaLayer(
         redraw()
     }
 
-    override fun dispose() {
+    override fun onDispose() {
         check(!isDisposed)
         check(isEventDispatchThread())
+        redrawer?.dispose()  // we should dispose redrawer first (to cancel `draw` in rendering thread)
         contextHandler?.dispose()
-        redrawer?.dispose()
         picture?.instance?.close()
         pictureRecorder.close()
         isDisposed = true
-        super.dispose()
+        super.onDispose()
     }
 
     override fun setBounds(x: Int, y: Int, width: Int, height: Int) {
