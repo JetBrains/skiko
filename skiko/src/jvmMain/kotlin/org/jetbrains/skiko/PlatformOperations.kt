@@ -15,7 +15,7 @@ internal interface PlatformOperations {
     fun isFullscreen(component: Component): Boolean
     fun setFullscreen(component: Component, value: Boolean)
     fun getDpiScale(component: Component): Float
-    fun createRedrawer(layer: HardwareLayer, renderApi: GraphicsApi, properties: SkiaLayerProperties): Redrawer
+    fun createRedrawer(layer: SkiaLayer, renderApi: GraphicsApi, properties: SkiaLayerProperties): Redrawer
 }
 
 internal val platformOperations: PlatformOperations by lazy {
@@ -34,7 +34,7 @@ internal val platformOperations: PlatformOperations by lazy {
                 }
 
                 override fun createRedrawer(
-                    layer: HardwareLayer,
+                    layer: SkiaLayer,
                     renderApi: GraphicsApi,
                     properties: SkiaLayerProperties
                 ) = when(renderApi) {
@@ -62,7 +62,7 @@ internal val platformOperations: PlatformOperations by lazy {
                 }
 
                 override fun createRedrawer(
-                    layer: HardwareLayer,
+                    layer: SkiaLayer,
                     renderApi: GraphicsApi,
                     properties: SkiaLayerProperties
                 ) = when(renderApi) {
@@ -103,7 +103,7 @@ internal val platformOperations: PlatformOperations by lazy {
                 }
 
                 override fun createRedrawer(
-                    layer: HardwareLayer,
+                    layer: SkiaLayer,
                     renderApi: GraphicsApi,
                     properties: SkiaLayerProperties
                 ) = when(renderApi) {

@@ -5,18 +5,18 @@ import kotlinx.coroutines.swing.Swing
 import org.jetbrains.skija.BackendRenderTarget
 import org.jetbrains.skija.DirectContext
 import org.jetbrains.skiko.FrameDispatcher
-import org.jetbrains.skiko.HardwareLayer
+import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaLayerProperties
 import org.jetbrains.skiko.useDrawingSurfacePlatformInfo
 import javax.swing.SwingUtilities.convertPoint
 import javax.swing.SwingUtilities.getRootPane
 
 internal class MetalRedrawer(
-    private val layer: HardwareLayer,
+    private val layer: SkiaLayer,
     private val properties: SkiaLayerProperties
 ) : Redrawer {
     private var isDisposed = false
-    private val device = layer.useDrawingSurfacePlatformInfo(::createMetalDevice)
+    private val device = layer.backedLayer.useDrawingSurfacePlatformInfo(::createMetalDevice)
 
     private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
         update(System.nanoTime())

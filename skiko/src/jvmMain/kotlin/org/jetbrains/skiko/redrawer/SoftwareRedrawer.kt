@@ -3,10 +3,10 @@ package org.jetbrains.skiko.redrawer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import org.jetbrains.skiko.FrameDispatcher
-import org.jetbrains.skiko.HardwareLayer
+import org.jetbrains.skiko.SkiaLayer
 
 internal class SoftwareRedrawer(
-    private val layer: HardwareLayer
+    private val layer: SkiaLayer
 ) : Redrawer {
 
     private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
