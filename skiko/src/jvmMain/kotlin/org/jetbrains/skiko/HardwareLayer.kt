@@ -35,11 +35,21 @@ abstract class HardwareLayer : Canvas() {
 
     protected open fun init() {
         useDrawingSurfacePlatformInfo(::nativeInit)
+        onInit()
     }
 
-    protected open external fun nativeInit(platformInfo: Long)
+    fun dispose() {
+        if (isInit) {
+            onDispose()
+            nativeDispose()
+        }
+    }
 
-    open external fun dispose()
+    protected open fun onInit() = Unit
+    protected open fun onDispose() = Unit
+
+    private external fun nativeInit(platformInfo: Long)
+    private external fun nativeDispose()
 
     protected open fun contentScaleChanged() = Unit
 
