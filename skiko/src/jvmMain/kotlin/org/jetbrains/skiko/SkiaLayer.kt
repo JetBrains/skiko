@@ -38,7 +38,7 @@ open class SkiaLayer(
         backedLayer = object : HardwareLayer() { }
         add(backedLayer)
         @Suppress("LeakingThis")
-        addHierarchyListener {
+        backedLayer.addHierarchyListener {
             if (it.changeFlags and HierarchyEvent.SHOWING_CHANGED.toLong() != 0L) {
                 checkIsShowing()
             }
