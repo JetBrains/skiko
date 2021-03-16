@@ -8,6 +8,11 @@ import org.jetbrains.skija.Rect
 import org.jetbrains.skiko.context.ContextHandler
 import org.jetbrains.skiko.context.createContextHandler
 import org.jetbrains.skiko.redrawer.Redrawer
+import java.awt.event.InputMethodListener
+import java.awt.event.KeyListener
+import java.awt.event.MouseListener
+import java.awt.event.MouseMotionListener
+import java.awt.event.MouseWheelListener
 import java.awt.Graphics
 import java.awt.event.HierarchyEvent
 import java.awt.GridLayout
@@ -102,6 +107,7 @@ open class SkiaLayer(
         }
         redrawer?.syncSize()
         redraw()
+        revalidate()
     }
 
     override fun paint(g: Graphics) {
@@ -111,6 +117,26 @@ open class SkiaLayer(
         }
         redrawer?.syncSize()
         redrawer?.redrawImmediately()
+    }
+
+    override fun addInputMethodListener(l: InputMethodListener) {
+        backedLayer.addInputMethodListener(l)
+    }
+
+    override fun addMouseListener(l: MouseListener) {
+        backedLayer.addMouseListener(l)
+    }
+
+    override fun addMouseMotionListener(l: MouseMotionListener) {
+        backedLayer.addMouseMotionListener(l)
+    }
+
+    override fun addMouseWheelListener(l: MouseWheelListener) {
+        backedLayer.addMouseWheelListener(l)
+    }
+
+    override fun addKeyListener(l: KeyListener) {
+        backedLayer.addKeyListener(l)
     }
 
     private var redrawScheduled = false
