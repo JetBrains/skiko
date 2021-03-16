@@ -18,6 +18,7 @@ abstract class HardwareLayer : Canvas() {
         _contentScale = getDpiScale()
     }
 
+    override fun paint(g: Graphics) {}
 
     internal open fun init() {
         useDrawingSurfacePlatformInfo(::nativeInit)

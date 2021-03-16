@@ -15,7 +15,6 @@ import java.awt.event.MouseMotionListener
 import java.awt.event.MouseWheelListener
 import java.awt.Graphics
 import java.awt.event.HierarchyEvent
-import java.awt.GridLayout
 import javax.swing.JPanel
 import javax.swing.SwingUtilities.invokeLater
 import javax.swing.SwingUtilities.isEventDispatchThread
@@ -34,7 +33,7 @@ open class SkiaLayer(
 
     init {
         setOpaque(false)
-        layout = GridLayout(1, 1)
+        layout = null
         backedLayer = object : HardwareLayer() { }
         add(backedLayer)
         @Suppress("LeakingThis")
@@ -102,6 +101,7 @@ open class SkiaLayer(
 
     override fun setBounds(x: Int, y: Int, width: Int, height: Int) {
         super.setBounds(x, y, width, height)
+        backedLayer.setSize(width, height)
         if (backedLayer.checkContentScale()) {
             contentScaleChanged()
         }

@@ -73,7 +73,7 @@ internal class SoftwareContextHandler(layer: SkiaLayer) : ContextHandler(layer) 
                 null
             )
             image = BufferedImage(colorModel, raster!!, false, null)
-            layer.getGraphics()?.drawImage(image!!, 0, 0, layer.width, layer.height, null)
+            layer.backedLayer.getGraphics()?.drawImage(image!!, 0, 0, layer.width, layer.height, null)
         }
     }
 
