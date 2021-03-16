@@ -10,6 +10,7 @@ import org.jetbrains.skiko.context.createContextHandler
 import org.jetbrains.skiko.redrawer.Redrawer
 import java.awt.Graphics
 import java.awt.event.HierarchyEvent
+import java.awt.GridLayout
 import javax.swing.JPanel
 import javax.swing.SwingUtilities.invokeLater
 import javax.swing.SwingUtilities.isEventDispatchThread
@@ -28,6 +29,7 @@ open class SkiaLayer(
 
     init {
         setOpaque(false)
+        layout = GridLayout(1, 1)
         backedLayer = object : HardwareLayer() { }
         add(backedLayer)
         @Suppress("LeakingThis")
