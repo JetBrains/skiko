@@ -24,7 +24,12 @@ abstract class HardwareLayer : Canvas() {
         useDrawingSurfacePlatformInfo(::nativeInit)
     }
 
-    protected open external fun nativeInit(platformInfo: Long)
+    internal fun dispose() {
+        nativeDispose()
+    }
+
+    private external fun nativeInit(platformInfo: Long)
+    private external fun nativeDispose()
 
     // TODO checkContentScale is called before init. it is ok, but when we fix getDpiScale on Linux we should check [isInit]
     internal fun checkContentScale(): Boolean {

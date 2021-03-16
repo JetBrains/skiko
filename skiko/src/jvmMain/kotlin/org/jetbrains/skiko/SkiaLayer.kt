@@ -92,11 +92,14 @@ open class SkiaLayer(
     open fun dispose() {
         check(!isDisposed)
         check(isEventDispatchThread())
+        redrawer?.dispose()  // we should dispose redrawer first (to cancel `draw` in rendering thread)
         contextHandler?.dispose()
-        redrawer?.dispose()
         picture?.instance?.close()
         pictureRecorder.close()
         isDisposed = true
+        if (isInited) {
+            backedLayer.dispose()
+        }
     }
 
     override fun setBounds(x: Int, y: Int, width: Int, height: Int) {

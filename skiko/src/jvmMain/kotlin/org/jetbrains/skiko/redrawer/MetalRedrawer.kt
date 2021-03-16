@@ -37,7 +37,7 @@ internal class MetalRedrawer(
     override fun redrawImmediately() {
         check(!isDisposed)
         update(System.nanoTime())
-        frameDispatcher.scheduleFrame()
+        draw()
     }
 
     private fun update(nanoTime: Long) {
