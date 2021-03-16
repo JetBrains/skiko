@@ -45,13 +45,13 @@ open class SkiaLayer(
         }
     }
 
-    private var isInit = false
+    private var isInited = false
 
     private fun checkIsShowing() {
-        if (!isInit && isShowing) {
+        if (!isInited && isShowing) {
             backedLayer.defineContentScale()
             init()
-            isInit = true
+            isInited = true
         }
     }
 
