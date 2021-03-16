@@ -5,23 +5,24 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import org.jetbrains.skiko.DrawingSurface
 import org.jetbrains.skiko.FrameDispatcher
+import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.HardwareLayer
 import org.jetbrains.skiko.OpenGLApi
 import org.jetbrains.skiko.SkiaLayerProperties
 import org.jetbrains.skiko.getDrawingSurface
 
 internal class LinuxOpenGLRedrawer(
-    private val layer: HardwareLayer,
+    private val layer: SkiaLayer,
     private val properties: SkiaLayerProperties
 ) : Redrawer {
-    private val context = layer.lockDrawingSurface {
+    private val context = layer.backedLayer.lockDrawingSurface {
         it.createContext()
     }
     private var isDisposed = false
 
     override fun dispose() {
         check(!isDisposed)
-        layer.lockDrawingSurface {
+        layer.backedLayer.lockDrawingSurface {
             it.destroyContext(context)
         }
         isDisposed = true
@@ -33,7 +34,7 @@ internal class LinuxOpenGLRedrawer(
         frameDispatcher.scheduleFrame()
     }
 
-    override fun redrawImmediately() = layer.lockDrawingSurface {
+    override fun redrawImmediately() = layer.backedLayer.lockDrawingSurface {
         check(!isDisposed)
         update(System.nanoTime())
         it.makeCurrent(context)
@@ -73,7 +74,7 @@ internal class LinuxOpenGLRedrawer(
 
             val isVsyncEnabled = toRedrawAlive.all { it.properties.isVsyncEnabled }
 
-            val drawingSurfaces = toRedrawAlive.map { lockDrawingSurface(it.layer) }.toList()
+            val drawingSurfaces = toRedrawAlive.map { lockDrawingSurface(it.layer.backedLayer) }.toList()
             try {
                 toRedrawAlive.forEachIndexed { index, redrawer ->
                     drawingSurfaces[index].makeCurrent(redrawer.context)

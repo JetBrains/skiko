@@ -13,62 +13,32 @@ abstract class HardwareLayer : Canvas() {
 
     // getDpiScale is expensive operation on some platforms, so we cache it
     private var _contentScale: Float? = null
-    private var isInit = false
 
-    init {
-        @Suppress("LeakingThis")
-        addHierarchyListener {
-            if (it.changeFlags and HierarchyEvent.SHOWING_CHANGED.toLong() != 0L) {
-                checkIsShowing()
-            }
-        }
+    internal fun defineContentScale() {
+        _contentScale = getDpiScale()
     }
 
-    private fun checkIsShowing() {
-        if (!isInit && isShowing) {
-            _contentScale = getDpiScale()
-            init()
-            isInit = true
-        }
-    }
+    override fun paint(g: Graphics) {}
 
-
-    protected open fun init() {
+    internal open fun init() {
         useDrawingSurfacePlatformInfo(::nativeInit)
-        onInit()
     }
 
-    fun dispose() {
-        if (isInit) {
-            onDispose()
-            nativeDispose()
-        }
+    internal fun dispose() {
+        nativeDispose()
     }
-
-    protected open fun onInit() = Unit
-    protected open fun onDispose() = Unit
 
     private external fun nativeInit(platformInfo: Long)
     private external fun nativeDispose()
 
-    protected open fun contentScaleChanged() = Unit
-
-    override fun setBounds(x: Int, y: Int, width: Int, height: Int) {
-        super.setBounds(x, y, width, height)
-        checkContentScale()
-    }
-
-    override fun paint(g: Graphics) {
-        checkContentScale()
-    }
-
     // TODO checkContentScale is called before init. it is ok, but when we fix getDpiScale on Linux we should check [isInit]
-    private fun checkContentScale() {
+    internal fun checkContentScale(): Boolean {
         val contentScale = getDpiScale()
         if (contentScale != _contentScale) {
             _contentScale = contentScale
-            contentScaleChanged()
+            return true
         }
+        return false
     }
 
     private fun getDpiScale(): Float {
@@ -76,12 +46,6 @@ abstract class HardwareLayer : Canvas() {
         check(scale > 0) { "HardwareLayer.contentScale isn't positive: $contentScale"}
         return scale
     }
-
-    // Should be called in Swing thread
-    internal abstract fun update(nanoTime: Long)
-
-    // Should be called in the OpenGL thread, and only once after update
-    internal abstract fun draw()
 
     val windowHandle: Long
         get() = useDrawingSurfacePlatformInfo(::getWindowHandle)

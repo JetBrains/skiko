@@ -5,16 +5,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
 import org.jetbrains.skiko.FrameDispatcher
-import org.jetbrains.skiko.HardwareLayer
+import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.OpenGLApi
 import org.jetbrains.skiko.SkiaLayerProperties
 import org.jetbrains.skiko.useDrawingSurfacePlatformInfo
 
 internal class WindowsOpenGLRedrawer(
-    private val layer: HardwareLayer,
+    private val layer: SkiaLayer,
     private val properties: SkiaLayerProperties
 ) : Redrawer {
-    private val device = layer.useDrawingSurfacePlatformInfo(::getDevice)
+    private val device = layer.backedLayer.useDrawingSurfacePlatformInfo(::getDevice)
     private val context = createContext(device)
     private var isDisposed = false
 

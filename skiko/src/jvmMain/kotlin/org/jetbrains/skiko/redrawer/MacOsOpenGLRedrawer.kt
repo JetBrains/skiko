@@ -4,7 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.swing.Swing
 import org.jetbrains.skiko.FrameDispatcher
-import org.jetbrains.skiko.HardwareLayer
+import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.OpenGLApi
 import org.jetbrains.skiko.SkiaLayerProperties
 import org.jetbrains.skiko.Task
@@ -21,10 +21,10 @@ import kotlin.system.measureNanoTime
 // P.S. MacOsOpenGLRedrawer will not be used by default in the future, because we will support Metal.
 
 internal class MacOsOpenGLRedrawer(
-    private val layer: HardwareLayer,
+    private val layer: SkiaLayer,
     private val properties: SkiaLayerProperties
 ) : Redrawer {
-    private val containerLayerPtr = layer.useDrawingSurfacePlatformInfo(::initContainer)
+    private val containerLayerPtr = layer.backedLayer.useDrawingSurfacePlatformInfo(::initContainer)
     private val drawLock = Any()
     private var isDisposed = false
 

@@ -8,7 +8,14 @@ import org.jetbrains.skija.Rect
 import org.jetbrains.skiko.context.ContextHandler
 import org.jetbrains.skiko.context.createContextHandler
 import org.jetbrains.skiko.redrawer.Redrawer
+import java.awt.event.InputMethodListener
+import java.awt.event.KeyListener
+import java.awt.event.MouseListener
+import java.awt.event.MouseMotionListener
+import java.awt.event.MouseWheelListener
 import java.awt.Graphics
+import java.awt.event.HierarchyEvent
+import javax.swing.JPanel
 import javax.swing.SwingUtilities.invokeLater
 import javax.swing.SwingUtilities.isEventDispatchThread
 
@@ -20,10 +27,47 @@ private class PictureHolder(val instance: Picture, val width: Int, val height: I
 
 open class SkiaLayer(
     private val properties: SkiaLayerProperties = SkiaLayerProperties()
-) : HardwareLayer() {
+) : JPanel() {
+
+    val backedLayer : HardwareLayer
+
+    init {
+        setOpaque(false)
+        layout = null
+        backedLayer = object : HardwareLayer() { }
+        add(backedLayer)
+        @Suppress("LeakingThis")
+        backedLayer.addHierarchyListener {
+            if (it.changeFlags and HierarchyEvent.SHOWING_CHANGED.toLong() != 0L) {
+                checkIsShowing()
+            }
+        }
+    }
+
+    private var isInited = false
+
+    private fun checkIsShowing() {
+        if (!isInited && isShowing) {
+            backedLayer.defineContentScale()
+            init()
+            isInited = true
+        }
+    }
+
+    val contentScale: Float
+        get() = backedLayer.contentScale
+
+    val windowHandle: Long
+        get() = backedLayer.windowHandle
+
+    var fullscreen: Boolean
+        get() = backedLayer.fullscreen
+        set(value) { backedLayer.fullscreen = value }
+
+    protected open fun contentScaleChanged() = Unit
+
     var renderer: SkiaRenderer? = null
     val clipComponents = mutableListOf<ClipRectangle>()
-
 
     @Volatile
     private var isDisposed = false
@@ -36,8 +80,8 @@ open class SkiaLayer(
     private val pictureRecorder = PictureRecorder()
     private val pictureLock = Any()
 
-    override fun onInit() {
-        super.onInit()
+    open fun init() {
+        backedLayer.init()
         val initialRenderApi = fallbackRenderApiQueue.removeAt(0)
         contextHandler = createContextHandler(this, initialRenderApi)
         redrawer = platformOperations.createRedrawer(this, initialRenderApi, properties)
@@ -45,7 +89,7 @@ open class SkiaLayer(
         redraw()
     }
 
-    override fun onDispose() {
+    open fun dispose() {
         check(!isDisposed)
         check(isEventDispatchThread())
         redrawer?.dispose()  // we should dispose redrawer first (to cancel `draw` in rendering thread)
@@ -53,19 +97,49 @@ open class SkiaLayer(
         picture?.instance?.close()
         pictureRecorder.close()
         isDisposed = true
-        super.onDispose()
+        if (isInited) {
+            backedLayer.dispose()
+        }
     }
 
     override fun setBounds(x: Int, y: Int, width: Int, height: Int) {
         super.setBounds(x, y, width, height)
+        backedLayer.setSize(width, height)
+        if (backedLayer.checkContentScale()) {
+            contentScaleChanged()
+        }
         redrawer?.syncSize()
         redraw()
+        revalidate()
     }
 
     override fun paint(g: Graphics) {
         super.paint(g)
+        if (backedLayer.checkContentScale()) {
+            contentScaleChanged()
+        }
         redrawer?.syncSize()
         redrawer?.redrawImmediately()
+    }
+
+    override fun addInputMethodListener(l: InputMethodListener) {
+        backedLayer.addInputMethodListener(l)
+    }
+
+    override fun addMouseListener(l: MouseListener) {
+        backedLayer.addMouseListener(l)
+    }
+
+    override fun addMouseMotionListener(l: MouseMotionListener) {
+        backedLayer.addMouseMotionListener(l)
+    }
+
+    override fun addMouseWheelListener(l: MouseWheelListener) {
+        backedLayer.addMouseWheelListener(l)
+    }
+
+    override fun addKeyListener(l: KeyListener) {
+        backedLayer.addKeyListener(l)
     }
 
     private var redrawScheduled = false
@@ -97,7 +171,7 @@ open class SkiaLayer(
     @Suppress("LeakingThis")
     private val fpsCounter = defaultFPSCounter(this)
 
-    override fun update(nanoTime: Long) {
+    open fun update(nanoTime: Long) {
         check(!isDisposed)
         check(isEventDispatchThread())
 
@@ -126,7 +200,7 @@ open class SkiaLayer(
         }
     }
 
-    override fun draw() {
+    open fun draw() {
         check(!isDisposed)
         contextHandler?.apply {
             if (!initContext()) {

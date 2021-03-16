@@ -6,6 +6,7 @@ import org.jetbrains.skiko.redrawer.SoftwareRedrawer
 import org.jetbrains.skiko.redrawer.Redrawer
 import org.jetbrains.skiko.redrawer.WindowsOpenGLRedrawer
 import org.jetbrains.skiko.redrawer.Direct3DRedrawer
+import org.jetbrains.skiko.redrawer.MetalRedrawer
 import java.awt.Component
 import java.awt.Window
 import javax.swing.SwingUtilities
@@ -14,7 +15,7 @@ internal interface PlatformOperations {
     fun isFullscreen(component: Component): Boolean
     fun setFullscreen(component: Component, value: Boolean)
     fun getDpiScale(component: Component): Float
-    fun createRedrawer(layer: HardwareLayer, renderApi: GraphicsApi, properties: SkiaLayerProperties): Redrawer
+    fun createRedrawer(layer: SkiaLayer, renderApi: GraphicsApi, properties: SkiaLayerProperties): Redrawer
 }
 
 internal val platformOperations: PlatformOperations by lazy {
@@ -33,11 +34,12 @@ internal val platformOperations: PlatformOperations by lazy {
                 }
 
                 override fun createRedrawer(
-                    layer: HardwareLayer,
+                    layer: SkiaLayer,
                     renderApi: GraphicsApi,
                     properties: SkiaLayerProperties
                 ) = when(renderApi) {
                     GraphicsApi.SOFTWARE -> SoftwareRedrawer(layer)
+                    GraphicsApi.METAL -> MetalRedrawer(layer, properties)
                     else -> MacOsOpenGLRedrawer(layer, properties)
                 }
         }
@@ -60,7 +62,7 @@ internal val platformOperations: PlatformOperations by lazy {
                 }
 
                 override fun createRedrawer(
-                    layer: HardwareLayer,
+                    layer: SkiaLayer,
                     renderApi: GraphicsApi,
                     properties: SkiaLayerProperties
                 ) = when(renderApi) {
@@ -101,7 +103,7 @@ internal val platformOperations: PlatformOperations by lazy {
                 }
 
                 override fun createRedrawer(
-                    layer: HardwareLayer,
+                    layer: SkiaLayer,
                     renderApi: GraphicsApi,
                     properties: SkiaLayerProperties
                 ) = when(renderApi) {

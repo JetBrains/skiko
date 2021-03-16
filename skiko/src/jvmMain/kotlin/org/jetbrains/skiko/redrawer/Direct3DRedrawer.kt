@@ -5,11 +5,11 @@ import kotlinx.coroutines.swing.Swing
 import org.jetbrains.skija.BackendRenderTarget
 import org.jetbrains.skija.DirectContext
 import org.jetbrains.skiko.FrameDispatcher
-import org.jetbrains.skiko.HardwareLayer
+import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaLayerProperties
 
 internal class Direct3DRedrawer(
-    private val layer: HardwareLayer,
+    private val layer: SkiaLayer,
     private val properties: SkiaLayerProperties
 ) : Redrawer {
 

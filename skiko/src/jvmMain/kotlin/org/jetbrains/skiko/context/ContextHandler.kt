@@ -17,6 +17,7 @@ internal fun createContextHandler(layer: SkiaLayer, renderApi: GraphicsApi): Con
         GraphicsApi.SOFTWARE -> SoftwareContextHandler(layer)
         GraphicsApi.OPENGL -> OpenGLContextHandler(layer)
         GraphicsApi.DIRECT3D -> Direct3DContextHandler(layer)
+        GraphicsApi.METAL -> MetalContextHandler(layer)
         else -> TODO("Unsupported yet.")
     }
 }

@@ -36,13 +36,13 @@ JavaVM *jvm = NULL;
 {
     assert(jvm != NULL);
     JNIEnv *env;
-    (*jvm)->AttachCurrentThread(jvm, (void **)&env, NULL);
+    jvm->AttachCurrentThread((void **)&env, NULL);
 
     static jclass cls = NULL;
     static jmethodID method = NULL;
-    if (!cls) cls = (*env)->GetObjectClass(env, self.javaRef);
-    if (!method) method = (*env)->GetMethodID(env, cls, "canDraw", "()Z");
-    return (*env)->CallBooleanMethod(env, self.javaRef, method);
+    if (!cls) cls = env->GetObjectClass(self.javaRef);
+    if (!method) method = env->GetMethodID(cls, "canDraw", "()Z");
+    return env->CallBooleanMethod(self.javaRef, method);
 }
 
 -(void)drawInCGLContext:(CGLContextObj)ctx
@@ -54,22 +54,25 @@ JavaVM *jvm = NULL;
 
     assert(jvm != NULL);
     JNIEnv *env;
-    (*jvm)->AttachCurrentThread(jvm, (void **)&env, NULL);
+    jvm->AttachCurrentThread((void **)&env, NULL);
 
     static jclass cls = NULL;
     static jmethodID method = NULL;
-    if (!cls) cls = (*env)->GetObjectClass(env, self.javaRef);
-    if (!method) method = (*env)->GetMethodID(env, cls, "performDraw", "()V");
-    (*env)->CallVoidMethod(env, self.javaRef, method);
+    if (!cls) cls = env->GetObjectClass(self.javaRef);
+    if (!method) method = env->GetMethodID(cls, "performDraw", "()V");
+    env->CallVoidMethod(self.javaRef, method);
 
     [super drawInCGLContext:ctx pixelFormat:pf forLayerTime:t displayTime:ts];
 }
 
 @end
 
+extern "C"
+{
+
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MacOsOpenGLRedrawerKt_initContainer(JNIEnv *env, jobject redrawer, jlong platformInfoPtr)
 {
-    (*env)->GetJavaVM(env, &jvm);
+    env->GetJavaVM(&jvm);
 
     NSObject<JAWT_SurfaceLayers>* dsi_mac = (__bridge NSObject<JAWT_SurfaceLayers> *) platformInfoPtr;
 
@@ -93,7 +96,7 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MacOsOpenGLRedrawerKt_
     CALayer *container = (CALayer *) containerPtr;
 
     AWTGLLayer *glLayer = [AWTGLLayer new];
-    glLayer.javaRef = (*env)->NewGlobalRef(env, layer);
+    glLayer.javaRef = env->NewGlobalRef(layer);
     [glLayer setNeedsDisplayOnBoundsChange: setNeedsDisplayOnBoundsChange];
     [container addSublayer: glLayer];
 
@@ -104,7 +107,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MacOsOpenGLRedrawerKt_d
 {
     AWTGLLayer *glLayer = (AWTGLLayer *) ptr;
     [glLayer removeFromSuperlayer];
-    (*env)->DeleteGlobalRef(env, glLayer.javaRef);
+    env->DeleteGlobalRef(glLayer.javaRef);
     [glLayer release];
 }
 
@@ -139,3 +142,5 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_AWTGLLayer_setFrame(JNI
     glLayer.frame = CGRectMake(x, y, width, height);
     [CATransaction commit];
 }
+
+} // extern C
