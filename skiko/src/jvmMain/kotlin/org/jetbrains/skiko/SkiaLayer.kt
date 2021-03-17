@@ -50,7 +50,6 @@ open class SkiaLayer(
         if (!isInited && isShowing) {
             backedLayer.defineContentScale()
             init()
-            isInited = true
         }
     }
 
@@ -86,19 +85,22 @@ open class SkiaLayer(
         contextHandler = createContextHandler(this, initialRenderApi)
         redrawer = platformOperations.createRedrawer(this, initialRenderApi, properties)
         redrawer?.syncSize()
+        isInited = true
+
         redraw()
     }
 
     open fun dispose() {
         check(!isDisposed)
         check(isEventDispatchThread())
-        redrawer?.dispose()  // we should dispose redrawer first (to cancel `draw` in rendering thread)
-        contextHandler?.dispose()
-        picture?.instance?.close()
-        pictureRecorder.close()
-        isDisposed = true
+
         if (isInited) {
+            redrawer?.dispose()  // we should dispose redrawer first (to cancel `draw` in rendering thread)
+            contextHandler?.dispose()
+            picture?.instance?.close()
+            pictureRecorder.close()
             backedLayer.dispose()
+            isDisposed = true
         }
     }
 
