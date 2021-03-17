@@ -84,10 +84,7 @@ open class SkiaLayer(
         val initialRenderApi = fallbackRenderApiQueue.removeAt(0)
         contextHandler = createContextHandler(this, initialRenderApi)
         redrawer = platformOperations.createRedrawer(this, initialRenderApi, properties)
-        redrawer?.syncSize()
         isInited = true
-
-        redraw()
     }
 
     open fun dispose() {
@@ -107,12 +104,6 @@ open class SkiaLayer(
     override fun setBounds(x: Int, y: Int, width: Int, height: Int) {
         super.setBounds(x, y, width, height)
         backedLayer.setSize(width, height)
-        if (backedLayer.checkContentScale()) {
-            contentScaleChanged()
-        }
-        redrawer?.syncSize()
-        redraw()
-        revalidate()
     }
 
     override fun paint(g: Graphics) {
@@ -145,21 +136,6 @@ open class SkiaLayer(
     }
 
     private var redrawScheduled = false
-
-    /**
-     * Redraw as soon as possible (but not right now)
-     */
-    fun redraw() {
-        if (!redrawScheduled) {
-            redrawScheduled = true
-            invokeLater {
-                redrawScheduled = false
-                if (!isDisposed) {
-                    redrawer?.redrawImmediately()
-                }
-            }
-        }
-    }
 
     /**
      * Redraw on the next animation Frame (on vsync signal if vsync is enabled).
