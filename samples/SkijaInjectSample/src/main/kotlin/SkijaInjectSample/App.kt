@@ -113,7 +113,7 @@ fun displayScene(renderer: Renderer, width: Int, height: Int, nanoTime: Long, xp
     val watchStrokeAA = Paint().setColor(0xFF000000.toInt()).setMode(PaintMode.STROKE).setStrokeWidth(1f)
     val watchFillHover = Paint().setColor(0xFFE4FF01.toInt())
     for (x in 0 .. (width - 50) step 50) {
-        for (y in 0 .. (height - 50) step 50) {
+        for (y in 20 .. (height - 50) step 50) {
             val hover = xpos > x + 0 && xpos < x + 50 && ypos > y + 0 && ypos < y + 50
             val fill = if (hover) watchFillHover else watchFill
             val stroke = if (x > width / 2) watchStrokeAA else watchStroke
@@ -153,9 +153,9 @@ fun displayScene(renderer: Renderer, width: Int, height: Int, nanoTime: Long, xp
     val style = ParagraphStyle()
     val paragraph = ParagraphBuilder(style, fontCollection)
             .pushStyle(TextStyle().setColor(0xFF000000.toInt()))
-            .addText("Text")
+            .addText("Graphics API: ${renderer.layer.renderApi}")
             .popStyle()
             .build()
     paragraph.layout(Float.POSITIVE_INFINITY)
-    paragraph.paint(canvas, 0f, 0f)
+    paragraph.paint(canvas, 5f, 5f)
 }

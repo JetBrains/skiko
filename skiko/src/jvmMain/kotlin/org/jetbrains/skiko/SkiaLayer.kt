@@ -73,17 +73,20 @@ open class SkiaLayer(
     internal var redrawer: Redrawer? = null
     private var contextHandler: ContextHandler? = null
     private val fallbackRenderApiQueue = SkikoProperties.fallbackRenderApiQueue.toMutableList()
+    var renderApi: GraphicsApi = fallbackRenderApiQueue[0]
+        private set
 
     @Volatile
     private var picture: PictureHolder? = null
     private val pictureRecorder = PictureRecorder()
     private val pictureLock = Any()
 
+
     open fun init() {
         backedLayer.init()
-        val initialRenderApi = fallbackRenderApiQueue.removeAt(0)
-        contextHandler = createContextHandler(this, initialRenderApi)
-        redrawer = platformOperations.createRedrawer(this, initialRenderApi, properties)
+        renderApi = fallbackRenderApiQueue.removeAt(0)
+        contextHandler = createContextHandler(this, renderApi)
+        redrawer = platformOperations.createRedrawer(this, renderApi, properties)
         isInited = true
     }
 
@@ -212,12 +215,12 @@ open class SkiaLayer(
     }
 
     private fun fallbackToNextApi() {
-        val nextApi = fallbackRenderApiQueue.removeAt(0)
-        println("Falling back to $nextApi rendering...")
+        renderApi = fallbackRenderApiQueue.removeAt(0)
+        println("Falling back to $renderApi rendering...")
         contextHandler?.dispose()
         redrawer?.dispose()
-        contextHandler = createContextHandler(this, nextApi)
-        redrawer = platformOperations.createRedrawer(this, nextApi, properties)
-        needRedraw()
+        contextHandler = createContextHandler(this, renderApi)
+        redrawer = platformOperations.createRedrawer(this, renderApi, properties)
+        repaint()
     }
 }
