@@ -82,15 +82,10 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_makeMeta
     JNIEnv * env, jobject redrawer, jlong devicePtr, jint width, jint height)
 {
     MetalDevice *device = (MetalDevice *) devicePtr;
-    device.layer.drawableSize = CGRectMake(0, 0, width, height).size;
-
     id<CAMetalDrawable> currentDrawable = [device.layer nextDrawable];
-
     GrMtlTextureInfo info;
     info.fTexture.retain(currentDrawable.texture);
-
     GrBackendRenderTarget* renderTarget = new GrBackendRenderTarget(width, height, 0, info);
-
     device.drawableHandle = currentDrawable;
 
     return (jlong) renderTarget;
@@ -135,10 +130,13 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_resizeLay
     JNIEnv *env, jobject redrawer, jlong devicePtr, jint x, jint y, jint width, jint height)
 {
     MetalDevice *device = (MetalDevice *) devicePtr;
-    y = (int)device.container.frame.size.height - y - height;
+    float scale = device.layer.contentsScale;
+    CGRect frame = CGRectMake(x, y, width, height);
+    CGSize drawableSize = CGSizeMake(width * scale, height * scale);
     [CATransaction begin];
     [CATransaction setValue:(id)kCFBooleanTrue forKey:kCATransactionDisableActions];
-    device.layer.frame = CGRectMake(x, y, width, height);
+    device.layer.frame = frame;
+    device.layer.drawableSize = drawableSize;
     [CATransaction commit];
     [CATransaction flush];
 }
@@ -146,9 +144,13 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_resizeLay
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_setContentScale(JNIEnv *env, jobject obj, jlong devicePtr, jfloat contentScale)
 {
     MetalDevice *device = (MetalDevice *) devicePtr;
+    if (device.layer.contentsScale == contentScale) {
+        return;
+    }
     [CATransaction begin];
     [CATransaction setValue:(id)kCFBooleanTrue forKey:kCATransactionDisableActions];
     assert(contentScale != 0);
+    device.container.contentsScale = contentScale;
     device.layer.contentsScale = contentScale;
     [CATransaction commit];
     [CATransaction flush];

@@ -49,11 +49,12 @@ internal class MetalRedrawer(
     }
 
     override fun syncSize() {
-        val globalPosition = convertPoint(layer, layer.x, layer.y, getRootPane(layer))
+        val rootPane = getRootPane(layer)
+        val globalPosition = convertPoint(layer, layer.x, layer.y, rootPane)
         setContentScale(device, layer.contentScale)
         resizeLayers(device,
             globalPosition.x,
-            globalPosition.y,
+            rootPane.height - globalPosition.y - layer.height,
             layer.width.coerceAtLeast(0),
             layer.height.coerceAtLeast(0)
         )
