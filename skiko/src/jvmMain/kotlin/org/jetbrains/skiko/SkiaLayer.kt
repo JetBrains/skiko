@@ -24,7 +24,18 @@ open class SkiaLayer(
     init {
         setOpaque(false)
         layout = null
-        backedLayer = object : HardwareLayer() { }
+        backedLayer = object : HardwareLayer() {
+            override fun paint(g: Graphics) {
+                // 1. JPanel.paint is not always called (in rare cases).
+                //    For example if we call 'jframe.isResizable = false` on Ubuntu
+                //
+                // 2. HardwareLayer.paint is also not always called.
+                //    For example, on macOs when we resize window or change DPI
+                //
+                // 3. to avoid double paint in one single frame, use needRedraw instead of redrawImmediately
+                redrawer?.needRedraw()
+            }
+        }
         add(backedLayer)
         @Suppress("LeakingThis")
         backedLayer.addHierarchyListener {
