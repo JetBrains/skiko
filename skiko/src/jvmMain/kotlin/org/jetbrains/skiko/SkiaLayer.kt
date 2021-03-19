@@ -1,22 +1,12 @@
 package org.jetbrains.skiko
 
-import org.jetbrains.skija.Canvas
-import org.jetbrains.skija.ClipMode
-import org.jetbrains.skija.Picture
-import org.jetbrains.skija.PictureRecorder
-import org.jetbrains.skija.Rect
+import org.jetbrains.skija.*
 import org.jetbrains.skiko.context.ContextHandler
 import org.jetbrains.skiko.context.createContextHandler
 import org.jetbrains.skiko.redrawer.Redrawer
-import java.awt.event.InputMethodListener
-import java.awt.event.KeyListener
-import java.awt.event.MouseListener
-import java.awt.event.MouseMotionListener
-import java.awt.event.MouseWheelListener
 import java.awt.Graphics
-import java.awt.event.HierarchyEvent
+import java.awt.event.*
 import javax.swing.JPanel
-import javax.swing.SwingUtilities.invokeLater
 import javax.swing.SwingUtilities.isEventDispatchThread
 
 interface SkiaRenderer {
@@ -29,12 +19,23 @@ open class SkiaLayer(
     private val properties: SkiaLayerProperties = SkiaLayerProperties()
 ) : JPanel() {
 
-    val backedLayer : HardwareLayer
+    internal val backedLayer : HardwareLayer
 
     init {
         setOpaque(false)
         layout = null
-        backedLayer = object : HardwareLayer() { }
+        backedLayer = object : HardwareLayer() {
+            override fun paint(g: Graphics) {
+                // 1. JPanel.paint is not always called (in rare cases).
+                //    For example if we call 'jframe.isResizable = false` on Ubuntu
+                //
+                // 2. HardwareLayer.paint is also not always called.
+                //    For example, on macOs when we resize window or change DPI
+                //
+                // 3. to avoid double paint in one single frame, use needRedraw instead of redrawImmediately
+                redrawer?.needRedraw()
+            }
+        }
         add(backedLayer)
         @Suppress("LeakingThis")
         backedLayer.addHierarchyListener {
@@ -45,6 +46,7 @@ open class SkiaLayer(
     }
 
     private var isInited = false
+    private var isRendering = false
 
     private fun checkIsShowing() {
         if (!isInited && isShowing) {
@@ -115,7 +117,18 @@ open class SkiaLayer(
             contentScaleChanged()
         }
         redrawer?.syncSize()
-        redrawer?.redrawImmediately()
+
+        // `paint` can be called when we already inside `draw` method.
+        //
+        // For example if we call some AWT function inside renderer.onRender,
+        // such as `jframe.isEnabled = false` on Linux
+        //
+        // To avoid recursive call of `draw` (we don't support recursive calls) we just schedule redrawing.
+        if (isRendering) {
+            redrawer?.needRedraw()
+        } else {
+            redrawer?.redrawImmediately()
+        }
     }
 
     override fun addInputMethodListener(l: InputMethodListener) {
@@ -169,7 +182,12 @@ open class SkiaLayer(
             canvas.clipRectBy(component)
         }
 
-        renderer?.onRender(canvas, pictureWidth, pictureHeight, nanoTime)
+        try {
+            isRendering = true
+            renderer?.onRender(canvas, pictureWidth, pictureHeight, nanoTime)
+        } finally {
+            isRendering = false
+        }
 
         // we can dispose layer during onRender
         if (!isDisposed) {

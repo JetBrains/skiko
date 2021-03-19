@@ -2,9 +2,8 @@ package org.jetbrains.skiko
 
 import java.awt.Canvas
 import java.awt.Graphics
-import java.awt.event.HierarchyEvent
 
-abstract class HardwareLayer : Canvas() {
+internal open class HardwareLayer : Canvas() {
     companion object {
         init {
             Library.load()
@@ -14,17 +13,17 @@ abstract class HardwareLayer : Canvas() {
     // getDpiScale is expensive operation on some platforms, so we cache it
     private var _contentScale: Float? = null
 
-    internal fun defineContentScale() {
+    fun defineContentScale() {
         _contentScale = getDpiScale()
     }
 
     override fun paint(g: Graphics) {}
 
-    internal open fun init() {
+    open fun init() {
         useDrawingSurfacePlatformInfo(::nativeInit)
     }
 
-    internal fun dispose() {
+    fun dispose() {
         nativeDispose()
     }
 
@@ -32,7 +31,7 @@ abstract class HardwareLayer : Canvas() {
     private external fun nativeDispose()
 
     // TODO checkContentScale is called before init. it is ok, but when we fix getDpiScale on Linux we should check [isInit]
-    internal fun checkContentScale(): Boolean {
+    fun checkContentScale(): Boolean {
         val contentScale = getDpiScale()
         if (contentScale != _contentScale) {
             _contentScale = contentScale
