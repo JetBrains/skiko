@@ -19,7 +19,7 @@ open class SkiaLayer(
     private val properties: SkiaLayerProperties = SkiaLayerProperties()
 ) : JPanel() {
 
-    val backedLayer : HardwareLayer
+    internal val backedLayer : HardwareLayer
 
     init {
         setOpaque(false)
