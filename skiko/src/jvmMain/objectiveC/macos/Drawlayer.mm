@@ -122,6 +122,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_nativeDispose(JNIE
     {
         [layerStorage removeObject: layer];
         [layer disposeLayer: env];
+        [layer release];
     }
 }
 

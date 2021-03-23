@@ -63,6 +63,16 @@
     return self;
 }
 
+-(void)dealloc {
+    NSLog(@"dealock");
+    [self.layer removeFromSuperlayer];
+    [self.layer release];
+    [self.device release];
+    [self.queue release];
+    [self.drawableHandle release];
+    [super dealloc];
+}
+
 @end
 
 extern "C"
@@ -82,6 +92,7 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_makeMeta
     JNIEnv * env, jobject redrawer, jlong devicePtr, jint width, jint height)
 {
     MetalDevice *device = (MetalDevice *) devicePtr;
+    [device.drawableHandle release];
     id<CAMetalDrawable> currentDrawable = [device.layer nextDrawable];
     GrMtlTextureInfo info;
     info.fTexture.retain(currentDrawable.texture);
@@ -173,9 +184,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_disposeDe
     JNIEnv *env, jobject redrawer, jlong devicePtr)
 {
     MetalDevice *device = (MetalDevice *) devicePtr;
-    [device.layer removeFromSuperlayer];
     env->DeleteGlobalRef(device.layer.javaRef);
-    [device.layer release];
     [device release];
 }
 
