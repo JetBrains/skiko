@@ -52,6 +52,7 @@ val additionalArguments = mutableMapOf<String, String>()
 
 val casualRun = tasks.named<JavaExec>("run") {
     systemProperty("skiko.fps.enabled", "true")
+    // Use systemProperty("skiko.library.path", "/tmp") to test loader.
     System.getProperties().entries
         .associate {
             (it.key as String) to (it.value as String)

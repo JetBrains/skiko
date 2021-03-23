@@ -9,6 +9,7 @@ import java.nio.file.StandardCopyOption
 object Library {
     private var loaded = false
 
+    private val skikoLibraryPath = System.getProperty("skiko.library.path")
     private val cacheRoot = "${System.getProperty("user.home")}/.skiko/"
 
     private fun loadOrGet(cacheDir: File, path: String, resourceName: String, isLibrary: Boolean) {
@@ -33,23 +34,29 @@ object Library {
     fun load() {
         if (loaded) return
 
-        val resourcePath = "/"
         val name = "skiko-$hostId"
         val platformName = System.mapLibraryName(name)
 
-        val hashResourceStream = Library::class.java.getResourceAsStream(
-            "$resourcePath$platformName.sha256") ?: throw LibraryLoadException(
-            "Cannot find $platformName.sha256, proper native dependency missing."
-        )
-        val hash = hashResourceStream.use {
-            BufferedReader(InputStreamReader(it)).lines().toArray()[0] as String
-        }
-        val cacheDir = File("$cacheRoot/$hash")
-        cacheDir.mkdirs()
-        loadOrGet(cacheDir, resourcePath, platformName, true)
-        val loadIcu = hostOs.isWindows
-        if (loadIcu) {
-            loadOrGet(cacheDir, resourcePath, "icudtl.dat", false)
+        if (skikoLibraryPath != null) {
+            val library = File(File(skikoLibraryPath), platformName)
+            System.load(library.absolutePath)
+        } else {
+            val resourcePath = "/"
+            val hashResourceStream = Library::class.java.getResourceAsStream(
+                "$resourcePath$platformName.sha256"
+            ) ?: throw LibraryLoadException(
+                "Cannot find $platformName.sha256, proper native dependency missing."
+            )
+            val hash = hashResourceStream.use {
+                BufferedReader(InputStreamReader(it)).lines().toArray()[0] as String
+            }
+            val cacheDir = File(File(cacheRoot), hash)
+            cacheDir.mkdirs()
+            loadOrGet(cacheDir, resourcePath, platformName, true)
+            val loadIcu = hostOs.isWindows
+            if (loadIcu) {
+                loadOrGet(cacheDir, resourcePath, "icudtl.dat", false)
+            }
         }
 
         // TODO move properties to SkikoProperties
