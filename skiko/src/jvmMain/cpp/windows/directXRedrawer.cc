@@ -64,6 +64,10 @@ public:
         {
             CloseHandle(fenceEvent);
         }
+        fence.reset(nullptr);
+        swapChain.reset(nullptr);
+        queue.reset(nullptr);
+        device.reset(nullptr);
     }
 };
 
@@ -289,6 +293,7 @@ HRESULT D3DCompile(
         {
             return 0;
         }
+        deviceFactory.reset(nullptr);
 
         // Create the command queue
         gr_cp<ID3D12CommandQueue> queue;
@@ -332,6 +337,8 @@ HRESULT D3DCompile(
         GR_D3D_CALL_ERRCHECK(swapChain->QueryInterface(IID_PPV_ARGS(&d3dDevice->swapChain)));
         GR_D3D_CALL_ERRCHECK(d3dDevice->device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&d3dDevice->fence)));
         d3dDevice->fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+
+        swapChainFactory.reset(nullptr);
 
         return toJavaPointer(d3dDevice);
     }

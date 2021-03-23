@@ -30,7 +30,6 @@ internal abstract class ContextHandler(val layer: SkiaLayer) {
     var canvas: Canvas? = null
 
     abstract fun initContext(): Boolean
-
     abstract fun initCanvas()
 
     fun clearCanvas() {
@@ -49,4 +48,6 @@ internal abstract class ContextHandler(val layer: SkiaLayer) {
         surface?.close()
         renderTarget?.close()
     }
+
+    open fun destroyContext() = Unit
 }

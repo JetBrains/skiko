@@ -11,6 +11,7 @@ import org.jetbrains.skija.impl.Native
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.redrawer.Direct3DRedrawer
 import org.jetbrains.skiko.redrawer.Redrawer
+import org.jetbrains.skiko.destroyContext
 
 internal class Direct3DContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
     val directXRedrawer: Direct3DRedrawer
@@ -65,5 +66,9 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextHandler(layer) 
             Reference.reachabilityFence(context!!)
             Reference.reachabilityFence(surface!!)
         }
+    }
+
+    override fun destroyContext() {
+        destroyContext(Native.getPtr(context!!))
     }
 }

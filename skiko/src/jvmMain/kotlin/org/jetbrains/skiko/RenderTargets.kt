@@ -24,3 +24,5 @@ external private fun makeGLContextNative(): Long
 
 external private fun makeMetalRenderTargetNative(width: Int, height: Int, sampleCnt: Int): Long
 external private fun makeMetalContextNative(): Long
+
+external internal fun destroyContext(context: Long)

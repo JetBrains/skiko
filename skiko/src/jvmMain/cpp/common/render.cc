@@ -1,4 +1,5 @@
 #include <jni.h>
+#include "jni_helpers.h"
 #include "GrBackendSurface.h"
 #include "GrDirectContext.h"
 
@@ -17,6 +18,12 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_RenderTargetsKt_makeGLRenderTar
 
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_RenderTargetsKt_makeGLContextNative(JNIEnv* env, jclass jclass) {
     return reinterpret_cast<jlong>(GrDirectContext::MakeGL().release());
+}
+
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_RenderTargetsKt_destroyContext(JNIEnv *env, jobject object, jlong contextPtr)
+{
+    GrDirectContext *context = fromJavaPointer<GrDirectContext*>(contextPtr);
+    delete context;
 }
 
 extern void getMetalDeviceAndQueue(void** device, void** queue);

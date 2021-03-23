@@ -99,6 +99,7 @@ open class SkiaLayer(
         if (isInited) {
             redrawer?.dispose()  // we should dispose redrawer first (to cancel `draw` in rendering thread)
             contextHandler?.dispose()
+            contextHandler?.destroyContext()
             picture?.instance?.close()
             pictureRecorder.close()
             backedLayer.dispose()
