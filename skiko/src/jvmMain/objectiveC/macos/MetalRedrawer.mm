@@ -64,7 +64,6 @@
 }
 
 -(void)dealloc {
-    NSLog(@"dealock");
     [self.layer removeFromSuperlayer];
     [self.layer release];
     [self.device release];
