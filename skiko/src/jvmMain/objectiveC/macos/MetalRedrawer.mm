@@ -91,7 +91,6 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_makeMeta
     JNIEnv * env, jobject redrawer, jlong devicePtr, jint width, jint height)
 {
     MetalDevice *device = (MetalDevice *) devicePtr;
-    [device.drawableHandle release];
     id<CAMetalDrawable> currentDrawable = [device.layer nextDrawable];
     GrMtlTextureInfo info;
     info.fTexture.retain(currentDrawable.texture);
