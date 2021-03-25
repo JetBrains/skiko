@@ -1,4 +1,9 @@
 #include <jni.h>
+
+#if SK_BUILD_FOR_LINUX
+    #include <stdint.h>
+#endif
+
 #include "jni_helpers.h"
 #include "GrBackendSurface.h"
 #include "GrDirectContext.h"
