@@ -128,6 +128,11 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_nativeDispose(JNIE
 
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getWindowHandle(JNIEnv *env, jobject canvas)
 {
+    LayerHandler *layer = findByObject(env, canvas);
+    if (layer != NULL)
+    {
+        return (jlong)[layer window];
+    }
     return (jlong)kNullWindowHandle;
 }
 
