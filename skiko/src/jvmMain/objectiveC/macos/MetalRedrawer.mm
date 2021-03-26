@@ -100,7 +100,7 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_makeMeta
     return (jlong) renderTarget;
 }
 
-id<MTLDevice> MTLCreateInegratedDevice() {
+id<MTLDevice> MTLCreateIntegratedDevice() {
     NSArray<id<MTLDevice>> *devices = MTLCopyAllDevices();
 
     id<MTLDevice> gpu = nil;
@@ -135,7 +135,7 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
     [container addSublayer: layer];
     layer.javaRef = env->NewGlobalRef(redrawer);
 
-    id<MTLDevice> fDevice = MTLCreateInegratedDevice();
+    id<MTLDevice> fDevice = MTLCreateIntegratedDevice();
     id<MTLCommandQueue> fQueue = [fDevice newCommandQueue];
 
     device.container = container;
