@@ -381,6 +381,7 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
                     "-framework", "CoreServices",
                     "-framework", "CoreText",
                     "-framework", "Foundation",
+                    "-framework", "IOKit",
                     "-framework", "Metal",
                     "-framework", "OpenGL",
                     "-framework", "QuartzCore" // for CoreAnimation
