@@ -27,7 +27,7 @@ extern "C"
 {
     EGLDisplay getAngleEGLDisplay(HDC hdc) {
         PFNEGLGETPLATFORMDISPLAYEXTPROC eglGetPlatformDisplayEXT;
-        eglGetPlatformDisplayEXT = (PFNEGLGETPLATFORMDISPLAYEXTPROC)eglGetProcAddress("eglGetPlatformDisplayEXT");
+        eglGetPlatformDisplayEXT = (PFNEGLGETPLATFORMDISPLAYEXTPROC)GetProcAddress(GetModuleHandle(NULL), "eglGetPlatformDisplayEXT");
         // We expect ANGLE to support this extension
         if (!eglGetPlatformDisplayEXT) {
             return EGL_NO_DISPLAY;
