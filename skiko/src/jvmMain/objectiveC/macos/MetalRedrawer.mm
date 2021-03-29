@@ -117,10 +117,10 @@ BOOL isUsingIntegratedGPU() {
     io_connect_t switcherConnect;
     
     kernResult = IOServiceOpen(service, mach_task_self(), 0, &switcherConnect);
-    assert(kernResult == KERN_SUCCESS);
+    if (kernResult != KERN_SUCCESS) return 0;
     
     kernResult = IOConnectCallScalarMethod(switcherConnect, kOpen, NULL, 0, NULL, NULL);
-    assert(kernResult == KERN_SUCCESS);
+    if (kernResult != KERN_SUCCESS) return 0;
 
     uint64_t output;
     uint32_t outputCount = 1;
@@ -132,6 +132,7 @@ BOOL isUsingIntegratedGPU() {
                                            2,
                                            &output,
                                            &outputCount);
+    if (kernResult != KERN_SUCCESS) return 0;
     return output != 0;
 }
 
