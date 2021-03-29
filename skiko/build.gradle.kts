@@ -219,6 +219,8 @@ tasks.withType(CppCompile::class.java).configureEach {
         "-I$skiaDir/third_party/externals/harfbuzz/src",
         "-I$skiaDir/third_party/icu",
         "-I$skiaDir/third_party/externals/icu/source/common",
+        // "-lEGL",
+        // "-lGLESv2",
         "-DSK_ALLOW_STATIC_GLOBAL_INITIALIZERS=1",
         "-DSK_FORCE_DISTANCE_FIELD_TEXT=0",
         "-DSK_GAMMA_APPLY_TO_A8",
@@ -267,6 +269,8 @@ tasks.withType(CppCompile::class.java).configureEach {
                 listOf(
                     "-I$jdkHome/include/win32",
                     "-I$includeDir",
+                    "-I$skiaDir/third_party/externals/angle2/include",
+                    "-I$skiaDir/src/gpu",
                     "-DSK_BUILD_FOR_WIN",
                     "-D_CRT_SECURE_NO_WARNINGS",
                     "-D_HAS_EXCEPTIONS=0",
@@ -274,6 +278,7 @@ tasks.withType(CppCompile::class.java).configureEach {
                     "-DNOMINMAX",
                     "-DSK_GAMMA_APPLY_TO_A8",
                     "-DSK_DIRECT3D",
+                    "-DSK_ANGLE",
                     "/utf-8",
                     "/GR-", // no-RTTI.
                     *buildType.msvcFlags

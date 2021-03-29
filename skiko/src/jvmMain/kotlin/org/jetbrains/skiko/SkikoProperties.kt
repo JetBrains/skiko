@@ -33,6 +33,10 @@ internal object SkikoProperties {
                 return if (hostOs == OS.Windows) GraphicsApi.DIRECT3D
                     else throw Exception("$hostOs does not support DirectX rendering API.")
             }
+            "ANGLE" -> {
+                return if (hostOs == OS.Windows) GraphicsApi.ANGLE
+                    else throw Exception("$hostOs does not support DirectX rendering API.")
+            }
             "METAL" -> {
                 return if (hostOs == OS.MacOS) GraphicsApi.METAL
                     else throw Exception("$hostOs does not support Metal rendering API.")
@@ -45,7 +49,7 @@ internal object SkikoProperties {
         when(hostOs) {
             OS.MacOS -> return GraphicsApi.METAL
             OS.Linux -> return GraphicsApi.OPENGL
-            OS.Windows -> return GraphicsApi.DIRECT3D
+            OS.Windows -> return GraphicsApi.ANGLE
         }
     }
 
@@ -56,7 +60,7 @@ internal object SkikoProperties {
         when (hostOs) {
             OS.Linux -> renderApiList = mutableListOf(GraphicsApi.OPENGL, GraphicsApi.SOFTWARE)
             OS.MacOS -> renderApiList = mutableListOf(GraphicsApi.METAL, GraphicsApi.OPENGL, GraphicsApi.SOFTWARE)
-            OS.Windows -> renderApiList = mutableListOf(GraphicsApi.DIRECT3D, GraphicsApi.OPENGL, GraphicsApi.SOFTWARE)
+            OS.Windows -> renderApiList = mutableListOf(GraphicsApi.ANGLE, GraphicsApi.DIRECT3D, GraphicsApi.OPENGL, GraphicsApi.SOFTWARE)
         }
         renderApiList.remove(head)
 
