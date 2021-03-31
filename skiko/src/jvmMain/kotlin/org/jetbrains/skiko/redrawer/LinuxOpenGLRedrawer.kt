@@ -49,7 +49,9 @@ internal class LinuxOpenGLRedrawer(
     }
 
     private fun draw() {
-        layer.draw()
+        if (layer.prepareDrawContext()) {
+            layer.draw()
+        }
     }
 
     companion object {

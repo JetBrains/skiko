@@ -2,6 +2,7 @@ package org.jetbrains.skiko.redrawer
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
+import kotlinx.coroutines.withContext
 import org.jetbrains.skija.BackendRenderTarget
 import org.jetbrains.skija.DirectContext
 import org.jetbrains.skiko.FrameDispatcher
@@ -16,6 +17,7 @@ internal class MetalRedrawer(
     private val properties: SkiaLayerProperties
 ) : Redrawer {
     private var isDisposed = false
+    private var disposeLock = Any()
     private val device = layer.backedLayer.useDrawingSurfacePlatformInfo(::createMetalDevice)
 
     private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
@@ -23,7 +25,7 @@ internal class MetalRedrawer(
         draw()
     }
 
-    override fun dispose() {
+    override fun dispose() = synchronized(disposeLock) {
         frameDispatcher.cancel()
         disposeDevice(device)
         isDisposed = true
@@ -36,16 +38,37 @@ internal class MetalRedrawer(
 
     override fun redrawImmediately() {
         check(!isDisposed)
-        update(System.nanoTime())
-        draw()
+        // TODO now we wait until previous layer.draw is finished. it ends only on the next vsync.
+        //  because of that we lose one frame on resize and can theoretically see very small white bars on the sides of the window
+        //  to avoid this we should be able to draw in two modes: with vsync and without.
+        frameDispatcher.scheduleFrame()
     }
 
     private fun update(nanoTime: Long) {
         layer.update(nanoTime)
     }
 
-    private fun draw() {
-        layer.draw()
+    private suspend fun draw() {
+        if (layer.prepareDrawContext()) {
+            // 2,3 GHz 8-Core Intel Core i9
+            //
+            // Test1. 8 windows, multiple clocks, 800x600
+            //
+            // Executors.newSingleThreadExecutor().asCoroutineDispatcher(): 20 FPS, 130% CPU
+            // Dispatchers.IO: 58 FPS, 460% CPU
+            //
+            // Test2. 60 windows, single clock, 800x600
+            //
+            // Executors.newSingleThreadExecutor().asCoroutineDispatcher(): 50 FPS, 150% CPU
+            // Dispatchers.IO: 50 FPS, 200% CPU
+            withContext(Dispatchers.IO) {
+                synchronized(disposeLock) {
+                    if (!isDisposed) {
+                        layer.draw()
+                    }
+                }
+            }
+        }
     }
 
     override fun syncSize() {
