@@ -25,7 +25,7 @@ internal class AngleContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
                 if (device == 0L) {
                     throw Exception("Failed to create Angle device.")
                 }
-                context = angleRedrawer.makeContext(device)
+                context = angleRedrawer.makeContext()
             }
         } catch (e: Exception) {
             println("${e.message}\nFailed to create Skia Angle context!")
@@ -41,12 +41,12 @@ internal class AngleContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
         val w = (layer.width * scale).toInt().coerceAtLeast(0)
         val h = (layer.height * scale).toInt().coerceAtLeast(0)
 
-        renderTarget = angleRedrawer.makeRenderTarget(device, w, h)
+        renderTarget = angleRedrawer.makeRenderTarget(w, h)
 
         surface = Surface.makeFromBackendRenderTarget(
             context!!,
             renderTarget!!,
-            SurfaceOrigin.TOP_LEFT,
+            SurfaceOrigin.BOTTOM_LEFT,
             SurfaceColorFormat.RGBA_8888,
             ColorSpace.getSRGB()
         )
@@ -56,19 +56,6 @@ internal class AngleContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
 
     override fun flush() {
         super.flush()
-        try {
-            angleRedrawer.finishFrame(
-                device,
-                Native.getPtr(context!!),
-                Native.getPtr(surface!!)
-            )
-        } finally {
-            Reference.reachabilityFence(context!!)
-            Reference.reachabilityFence(surface!!)
-        }
-    }
-
-    override fun destroyContext() {
-        destroyContext(Native.getPtr(context!!))
+        angleRedrawer.finishFrame()
     }
 }

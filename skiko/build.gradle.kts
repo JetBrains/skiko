@@ -219,8 +219,6 @@ tasks.withType(CppCompile::class.java).configureEach {
         "-I$skiaDir/third_party/externals/harfbuzz/src",
         "-I$skiaDir/third_party/icu",
         "-I$skiaDir/third_party/externals/icu/source/common",
-        // "-lEGL",
-        // "-lGLESv2",
         "-DSK_ALLOW_STATIC_GLOBAL_INITIALIZERS=1",
         "-DSK_FORCE_DISTANCE_FIELD_TEXT=0",
         "-DSK_GAMMA_APPLY_TO_A8",

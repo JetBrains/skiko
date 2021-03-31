@@ -46,27 +46,25 @@ internal class AngleRedrawer(
         layer.draw()
     }
 
-    fun makeContext(device: Long) = DirectContext(
-        makeAngleContext(device)
-    )
-
-    fun makeRenderTarget(device: Long, width: Int, height: Int) = BackendRenderTarget(
-        makeAngleRenderTarget(device, width, height)
-    )
-
     fun createDevice(): Long {
         device = createAngleDevice(layer.windowHandle)
         return device
     }
 
-    fun finishFrame(device: Long, context: Long, surface: Long) {
-        finishFrame(device, context, surface, properties.isVsyncEnabled)
-    }
+    fun makeContext() = DirectContext(
+        makeAngleContext(device)
+    )
+
+    fun makeRenderTarget(width: Int, height: Int) = BackendRenderTarget(
+        makeAngleRenderTarget(device, width, height)
+    )
+
+    fun finishFrame() = finishFrame(device, properties.isVsyncEnabled)
 
     external fun createAngleDevice(windowHandle: Long): Long
     external fun makeAngleContext(device: Long): Long
     external fun makeAngleRenderTarget(device: Long, width: Int, height: Int): Long
     external fun resizeBuffers(device: Long, width: Int, height: Int)
-    external fun finishFrame(device: Long, context: Long, surface: Long, isVsyncEnabled: Boolean)
+    external fun finishFrame(device: Long, isVsyncEnabled: Boolean)
     external fun disposeDevice(device: Long)
 }
