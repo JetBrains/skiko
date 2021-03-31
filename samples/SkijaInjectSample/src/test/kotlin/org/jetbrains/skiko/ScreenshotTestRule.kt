@@ -14,7 +14,8 @@ import javax.imageio.ImageIO
 // TODO fix colors on macOS
 class ScreenshotTestRule(private val robot: Robot) : TestRule {
     private lateinit var testIdentifier: String
-    private val screenshotsDir = File(System.getProperty("skiko.test.screenshots.dir")!!)
+    private val subDir = if (hostOs == OS.MacOS) "macos" else "windows_linux"
+    private val screenshotsDir = File(System.getProperty("skiko.test.screenshots.dir")!!).resolve(subDir)
 
     override fun apply(base: Statement, description: Description): Statement {
         return object : Statement() {
