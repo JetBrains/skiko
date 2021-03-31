@@ -44,94 +44,94 @@ native crash in SkiaWindowTest "render single window"
 //            .popStyle()
 //            .build()
 
+    private class TestWindow(
+        width: Int,
+        height: Int,
+        private val frameCount: Int,
+        private val deviatedTerminalCount: Int
+    ) : SkiaWindow() {
+        private val expectedDeviatePercent1 = 0.05
+        private val expectedDeviatePercent2 = 0.15
+        private val expectedDeviatePercent3 = 0.30
+        private val expectedDeviatePercentTerminal = 0.50
+
+        private val expectedFrameNanos = 1E9 / graphicsConfiguration.device.displayMode.refreshRate
+        private val frameTimes = mutableListOf<Long>()
+        private var canCollect = false
+
+        val frameTimeDeltas get() = frameTimes.zipWithNext { a, b -> b - a }
+
+        val isCollected get() = frameTimes.size >= frameCount
+
+        private fun deviated(deviatePercent: Double) = frameTimeDeltas.filter {
+            abs(log2(it / expectedFrameNanos)) > log2(1 + deviatePercent)
+        }
+
+        init {
+            setSize(width, height)
+            defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+            layer.renderer = object : SkiaRenderer {
+                override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+                    if (canCollect && frameTimes.size < frameCount) {
+                        frameTimes.add(System.nanoTime()) // we check the real time, not the time provided by the argument
+                    }
+                    layer.needRedraw()
+                }
+            }
+            isUndecorated = true
+            isVisible = true
+        }
+
+        fun startCollect() {
+            canCollect = true
+        }
+
+        fun printInfo() {
+            println("[Window frame times ($frameCount frames)]")
+            val millis = frameTimeDeltas.map { it / 1E6 }
+            println("Deltas " + millis.map { String.format("%.1f", it) })
+            println("Average %.2f".format(millis.average()))
+            println("Standard deviation %.2f".format(millis.stddev()))
+
+            fun deviateMessage(percent: Double, deviated: List<Long>): String {
+                val deviatedStr = deviated.map { String.format("%.1f", it / 1E6) }
+                val percentTStr = (percent * 100).roundToInt()
+                return "$deviatedStr deviate by $percentTStr%"
+            }
+
+            val deviated1 = deviated(expectedDeviatePercent1)
+            val deviated2 = deviated(expectedDeviatePercent2)
+            val deviated3 = deviated(expectedDeviatePercent3)
+            val deviatedTerminal = deviated(expectedDeviatePercentTerminal)
+
+            println(deviateMessage(expectedDeviatePercent1, deviated1 - deviated2 - deviated3 - deviatedTerminal))
+            println(deviateMessage(expectedDeviatePercent2, deviated2 - deviated3 - deviatedTerminal))
+            println(deviateMessage(expectedDeviatePercent3, deviated3 - deviatedTerminal))
+
+            if (deviatedTerminal.size > deviatedTerminalCount) {
+                throw AssertionError(deviateMessage(expectedDeviatePercentTerminal, deviatedTerminal))
+            } else {
+                println(deviateMessage(expectedDeviatePercentTerminal, deviatedTerminal))
+            }
+
+            println()
+        }
+
+        private fun List<Double>.stddev(): Double {
+            val average = average()
+            fun f(x: Double) = (x - average) * (x - average)
+            return sqrt(map(::f).average())
+        }
+    }
+
+    private suspend fun awaitFrameCollection(windows: List<TestWindow>) {
+        while (!windows.all(TestWindow::isCollected)) {
+            delay(100)
+        }
+    }
+
     @Test
     fun `FPS is near display refresh rate (multiple windows)`() = swingTest {
-        class TestWindow(
-            width: Int,
-            height: Int,
-            private val frameCount: Int,
-            private val deviatedTerminalCount: Int
-        ) : SkiaWindow() {
-            private val expectedDeviatePercent1 = 0.05
-            private val expectedDeviatePercent2 = 0.15
-            private val expectedDeviatePercent3 = 0.30
-            private val expectedDeviatePercentTerminal = 0.50
-
-            private val expectedFrameNanos = 1E9 / graphicsConfiguration.device.displayMode.refreshRate
-            private val frameTimes = mutableListOf<Long>()
-            private var canCollect = false
-
-            val frameTimeDeltas get() = frameTimes.zipWithNext { a, b -> b - a }
-
-            val isCollected get() = frameTimes.size >= frameCount
-
-            private fun deviated(deviatePercent: Double) = frameTimeDeltas.filter {
-                abs(log2(it / expectedFrameNanos)) > log2(1 + deviatePercent)
-            }
-
-            init {
-                setSize(width, height)
-                defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
-                layer.renderer = object : SkiaRenderer {
-                    override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
-                        if (canCollect && frameTimes.size < frameCount) {
-                            frameTimes.add(System.nanoTime()) // we check the real time, not the time provided by the argument
-                        }
-                        layer.needRedraw()
-                    }
-                }
-                isUndecorated = true
-                isVisible = true
-            }
-
-            fun startCollect() {
-                canCollect = true
-            }
-
-            fun printInfo() {
-                println("[Window frame times ($frameCount frames)]")
-                val millis = frameTimeDeltas.map { it / 1E6 }
-                println("Deltas " + millis.map { String.format("%.1f", it) })
-                println("Average %.2f".format(millis.average()))
-                println("Standard deviation %.2f".format(millis.stddev()))
-
-                fun deviateMessage(percent: Double, deviated: List<Long>): String {
-                    val deviatedStr = deviated.map { String.format("%.1f", it / 1E6) }
-                    val percentTStr = (percent * 100).roundToInt()
-                    return "$deviatedStr deviate by $percentTStr%"
-                }
-
-                val deviated1 = deviated(expectedDeviatePercent1)
-                val deviated2 = deviated(expectedDeviatePercent2)
-                val deviated3 = deviated(expectedDeviatePercent3)
-                val deviatedTerminal = deviated(expectedDeviatePercentTerminal)
-
-                println(deviateMessage(expectedDeviatePercent1, deviated1 - deviated2 - deviated3 - deviatedTerminal))
-                println(deviateMessage(expectedDeviatePercent2, deviated2 - deviated3 - deviatedTerminal))
-                println(deviateMessage(expectedDeviatePercent3, deviated3 - deviatedTerminal))
-
-                if (deviatedTerminal.size > deviatedTerminalCount) {
-                    throw AssertionError(deviateMessage(expectedDeviatePercentTerminal, deviatedTerminal))
-                } else {
-                    println(deviateMessage(expectedDeviatePercentTerminal, deviatedTerminal))
-                }
-
-                println()
-            }
-
-            private fun List<Double>.stddev(): Double {
-                val average = average()
-                fun f(x: Double) = (x - average) * (x - average)
-                return sqrt(map(::f).average())
-            }
-        }
-
-        suspend fun awaitFrameCollection(windows: List<TestWindow>) {
-            while (!windows.all(TestWindow::isCollected)) {
-                delay(100)
-            }
-        }
-
         val windows = (1..3).map { index ->
             TestWindow(width = 40, height = 20, frameCount = 300, deviatedTerminalCount = 10).apply {
                 location = Point((index + 1) * 200, 200)
