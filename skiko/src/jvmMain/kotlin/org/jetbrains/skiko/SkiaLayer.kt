@@ -240,6 +240,6 @@ open class SkiaLayer(
         redrawer?.dispose()
         contextHandler = createContextHandler(this, renderApi)
         redrawer = platformOperations.createRedrawer(this, renderApi, properties)
-        repaint()
+        redrawer!!.redrawImmediately()
     }
 }
