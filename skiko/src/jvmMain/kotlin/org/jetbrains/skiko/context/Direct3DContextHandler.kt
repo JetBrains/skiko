@@ -69,5 +69,8 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextHandler(layer) 
         if (context != null) {
             destroyContext(Native.getPtr(context!!))
         }
+        if (device != 0L) {
+            directXRedrawer.disposeDevice(device)
+        }
     }
 }
