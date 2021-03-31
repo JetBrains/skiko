@@ -2,15 +2,13 @@ package org.jetbrains.skiko.context
 
 import org.jetbrains.skija.ColorSpace
 import org.jetbrains.skija.FramebufferFormat
-import org.jetbrains.skija.Picture
 import org.jetbrains.skija.Surface
 import org.jetbrains.skija.SurfaceColorFormat
 import org.jetbrains.skija.SurfaceOrigin
+import org.jetbrains.skiko.OpenGLApi
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.makeGLContext
 import org.jetbrains.skiko.makeGLRenderTarget
-import org.jetbrains.skiko.OpenGLApi
-import org.jetbrains.skiko.redrawer.Redrawer
 
 internal class OpenGLContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
     override fun initContext(): Boolean {
@@ -26,7 +24,7 @@ internal class OpenGLContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
     }
 
     override fun initCanvas() {
-        dispose()
+        disposeCanvas()
 
         val scale = layer.contentScale
         val w = (layer.width * scale).toInt().coerceAtLeast(0)

@@ -1,17 +1,14 @@
 package org.jetbrains.skiko.context
 
-import java.lang.ref.Reference
 import org.jetbrains.skija.ColorSpace
-import org.jetbrains.skija.FramebufferFormat
-import org.jetbrains.skija.Picture
 import org.jetbrains.skija.Surface
 import org.jetbrains.skija.SurfaceColorFormat
 import org.jetbrains.skija.SurfaceOrigin
 import org.jetbrains.skija.impl.Native
 import org.jetbrains.skiko.SkiaLayer
-import org.jetbrains.skiko.redrawer.Direct3DRedrawer
-import org.jetbrains.skiko.redrawer.Redrawer
 import org.jetbrains.skiko.destroyContext
+import org.jetbrains.skiko.redrawer.Direct3DRedrawer
+import java.lang.ref.Reference
 
 internal class Direct3DContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
     val directXRedrawer: Direct3DRedrawer
@@ -35,7 +32,7 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextHandler(layer) 
     }
 
     override fun initCanvas() {
-        dispose()
+        disposeCanvas()
 
         val scale = layer.contentScale
         val w = (layer.width * scale).toInt().coerceAtLeast(0)
@@ -69,6 +66,8 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextHandler(layer) 
     }
 
     override fun destroyContext() {
-        destroyContext(Native.getPtr(context!!))
+        if (context != null) {
+            destroyContext(Native.getPtr(context!!))
+        }
     }
 }

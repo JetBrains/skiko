@@ -6,11 +6,9 @@ import org.jetbrains.skija.DirectContext
 import org.jetbrains.skija.Picture
 import org.jetbrains.skija.Surface
 import org.jetbrains.skiko.GraphicsApi
-import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.OS
-import org.jetbrains.skiko.SkikoProperties
+import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.hostOs
-import org.jetbrains.skiko.redrawer.Redrawer
 
 internal fun createContextHandler(layer: SkiaLayer, renderApi: GraphicsApi): ContextHandler {
     return when (renderApi) {
@@ -45,9 +43,14 @@ internal abstract class ContextHandler(val layer: SkiaLayer) {
     }
 
     fun dispose() {
+        disposeCanvas()
+        destroyContext()
+    }
+
+    fun disposeCanvas() {
         surface?.close()
         renderTarget?.close()
     }
 
-    open fun destroyContext() = Unit
+    protected open fun destroyContext() = Unit
 }
