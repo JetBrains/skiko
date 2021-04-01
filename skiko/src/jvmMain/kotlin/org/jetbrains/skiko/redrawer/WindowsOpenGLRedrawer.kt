@@ -53,7 +53,9 @@ internal class WindowsOpenGLRedrawer(
     }
 
     private fun draw() {
-        layer.draw()
+        if (layer.prepareDrawContext()) {
+            layer.draw()
+        }
     }
 
     private fun makeCurrent() = makeCurrent(device, context)

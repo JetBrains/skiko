@@ -1,7 +1,6 @@
 package org.jetbrains.skiko.redrawer
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.swing.Swing
 import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.SkiaLayer
@@ -11,7 +10,6 @@ import org.jetbrains.skiko.Task
 import org.jetbrains.skiko.useDrawingSurfacePlatformInfo
 import javax.swing.SwingUtilities.convertPoint
 import javax.swing.SwingUtilities.getRootPane
-import kotlin.system.measureNanoTime
 
 // Current implementation is fragile (it works in all tested cases, but we can't test everything)
 //
@@ -31,7 +29,9 @@ internal class MacOsOpenGLRedrawer(
     private val drawLayer = object : AWTGLLayer(containerLayerPtr, setNeedsDisplayOnBoundsChange = true) {
         override fun draw() = synchronized(drawLock) {
             if (!isDisposed) {
-                layer.draw()
+                if (layer.prepareDrawContext()) {
+                    layer.draw()
+                }
             }
         }
 

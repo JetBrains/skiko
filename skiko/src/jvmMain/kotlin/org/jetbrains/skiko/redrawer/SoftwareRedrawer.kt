@@ -11,7 +11,9 @@ internal class SoftwareRedrawer(
 
     private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
         layer.update(System.nanoTime())
-        layer.draw()
+        if (layer.prepareDrawContext()) {
+            layer.draw()
+        }
     }
 
     override fun dispose() {
@@ -24,6 +26,8 @@ internal class SoftwareRedrawer(
 
     override fun redrawImmediately() {
         layer.update(System.nanoTime())
-        layer.draw()
+        if (layer.prepareDrawContext()) {
+            layer.draw()
+        }
     }
 }

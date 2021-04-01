@@ -174,7 +174,7 @@ open class SkiaLayer(
     @Suppress("LeakingThis")
     private val fpsCounter = defaultFPSCounter(this)
 
-    open fun update(nanoTime: Long) {
+    internal fun update(nanoTime: Long) {
         check(!isDisposed)
         check(isEventDispatchThread())
 
@@ -208,14 +208,21 @@ open class SkiaLayer(
         }
     }
 
-    open fun draw() {
+    internal fun prepareDrawContext(): Boolean {
         check(!isDisposed)
         contextHandler?.apply {
             if (!initContext()) {
                 fallbackToNextApi()
-                return
+                return false
             }
             initCanvas()
+        }
+        return true
+    }
+
+    internal fun draw() {
+        check(!isDisposed)
+        contextHandler?.apply {
             clearCanvas()
             synchronized(pictureLock) {
                 val picture = picture
@@ -248,6 +255,6 @@ open class SkiaLayer(
         redrawer?.dispose()
         contextHandler = createContextHandler(this, renderApi)
         redrawer = platformOperations.createRedrawer(this, renderApi, properties)
-        repaint()
+        redrawer!!.redrawImmediately()
     }
 }

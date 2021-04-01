@@ -2,6 +2,7 @@ package org.jetbrains.skiko.redrawer
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
+import kotlinx.coroutines.withContext
 import org.jetbrains.skija.BackendRenderTarget
 import org.jetbrains.skija.DirectContext
 import org.jetbrains.skiko.FrameDispatcher
@@ -14,13 +15,14 @@ internal class Direct3DRedrawer(
 ) : Redrawer {
 
     private var isDisposed = false
+    private var disposeLock = Any()
 
     private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
         update(System.nanoTime())
         draw()
     }
 
-    override fun dispose() {
+    override fun dispose() = synchronized(disposeLock) {
         frameDispatcher.cancel()
         isDisposed = true
     }
@@ -32,16 +34,26 @@ internal class Direct3DRedrawer(
 
     override fun redrawImmediately() {
         check(!isDisposed)
-        update(System.nanoTime())
-        draw()
+        // TODO now we wait until previous layer.draw is finished. it ends only on the next vsync.
+        //  because of that we lose one frame on resize and can theoretically see very small white bars on the sides of the window
+        //  to avoid this we should be able to draw in two modes: with vsync and without.
+        frameDispatcher.scheduleFrame()
     }
 
     private fun update(nanoTime: Long) {
         layer.update(nanoTime)
     }
 
-    private fun draw() {
-        layer.draw()
+    private suspend fun draw() {
+        if (layer.prepareDrawContext()) {
+            withContext(Dispatchers.IO) {
+                synchronized(disposeLock) {
+                    if (!isDisposed) {
+                        layer.draw()
+                    }
+                }
+            }
+        }
     }
 
     fun makeContext(device: Long) = DirectContext(

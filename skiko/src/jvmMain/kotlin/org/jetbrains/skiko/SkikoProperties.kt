@@ -55,7 +55,7 @@ internal object SkikoProperties {
 
         when (hostOs) {
             OS.Linux -> renderApiList = mutableListOf(GraphicsApi.OPENGL, GraphicsApi.SOFTWARE)
-            OS.MacOS -> renderApiList = mutableListOf(GraphicsApi.METAL, GraphicsApi.OPENGL, GraphicsApi.SOFTWARE)
+            OS.MacOS -> renderApiList = mutableListOf(GraphicsApi.METAL, GraphicsApi.SOFTWARE)
             OS.Windows -> renderApiList = mutableListOf(GraphicsApi.DIRECT3D, GraphicsApi.OPENGL, GraphicsApi.SOFTWARE)
         }
         renderApiList.remove(head)
