@@ -6,7 +6,6 @@ import org.jetbrains.skija.SurfaceColorFormat
 import org.jetbrains.skija.SurfaceOrigin
 import org.jetbrains.skija.impl.Native
 import org.jetbrains.skiko.SkiaLayer
-import org.jetbrains.skiko.destroyContext
 import org.jetbrains.skiko.redrawer.Direct3DRedrawer
 import java.lang.ref.Reference
 
@@ -66,9 +65,7 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextHandler(layer) 
     }
 
     override fun destroyContext() {
-        if (context != null) {
-            destroyContext(Native.getPtr(context!!))
-        }
+        context?.close()
         if (device != 0L) {
             directXRedrawer.disposeDevice(device)
         }

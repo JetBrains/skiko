@@ -6,7 +6,6 @@ import org.jetbrains.skija.SurfaceColorFormat
 import org.jetbrains.skija.SurfaceOrigin
 import org.jetbrains.skija.impl.Native
 import org.jetbrains.skiko.SkiaLayer
-import org.jetbrains.skiko.destroyContext
 import org.jetbrains.skiko.redrawer.MetalRedrawer
 
 internal class MetalContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
@@ -52,8 +51,6 @@ internal class MetalContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
     }
 
     override fun destroyContext() {
-        if (context != null) {
-            destroyContext(Native.getPtr(context!!))
-        }
+        context?.close()
     }
 }
