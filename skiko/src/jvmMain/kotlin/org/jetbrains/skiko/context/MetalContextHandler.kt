@@ -4,10 +4,9 @@ import org.jetbrains.skija.ColorSpace
 import org.jetbrains.skija.Surface
 import org.jetbrains.skija.SurfaceColorFormat
 import org.jetbrains.skija.SurfaceOrigin
+import org.jetbrains.skija.impl.Native
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.redrawer.MetalRedrawer
-import org.jetbrains.skija.impl.Native
-import org.jetbrains.skiko.destroyContext
 
 internal class MetalContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
     val metalRedrawer: MetalRedrawer
@@ -26,7 +25,7 @@ internal class MetalContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
     }
 
     override fun initCanvas() {
-        dispose()
+        disposeCanvas()
 
         val scale = layer.contentScale
         val w = (layer.width * scale).toInt().coerceAtLeast(0)
@@ -52,6 +51,6 @@ internal class MetalContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
     }
 
     override fun destroyContext() {
-        destroyContext(Native.getPtr(context!!))
+        context?.close()
     }
 }

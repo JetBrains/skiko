@@ -1,11 +1,20 @@
 package org.jetbrains.skiko
 
-import org.jetbrains.skija.*
+import org.jetbrains.skija.Canvas
+import org.jetbrains.skija.ClipMode
+import org.jetbrains.skija.Picture
+import org.jetbrains.skija.PictureRecorder
+import org.jetbrains.skija.Rect
 import org.jetbrains.skiko.context.ContextHandler
 import org.jetbrains.skiko.context.createContextHandler
 import org.jetbrains.skiko.redrawer.Redrawer
 import java.awt.Graphics
-import java.awt.event.*
+import java.awt.event.HierarchyEvent
+import java.awt.event.InputMethodListener
+import java.awt.event.KeyListener
+import java.awt.event.MouseListener
+import java.awt.event.MouseMotionListener
+import java.awt.event.MouseWheelListener
 import javax.swing.JPanel
 import javax.swing.SwingUtilities.isEventDispatchThread
 
@@ -99,7 +108,6 @@ open class SkiaLayer(
         if (isInited) {
             redrawer?.dispose()  // we should dispose redrawer first (to cancel `draw` in rendering thread)
             contextHandler?.dispose()
-            contextHandler?.destroyContext()
             picture?.instance?.close()
             pictureRecorder.close()
             backedLayer.dispose()

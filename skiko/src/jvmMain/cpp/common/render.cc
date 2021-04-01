@@ -25,12 +25,6 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_RenderTargetsKt_makeGLContextNa
     return reinterpret_cast<jlong>(GrDirectContext::MakeGL().release());
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_RenderTargetsKt_destroyContext(JNIEnv *env, jobject object, jlong contextPtr)
-{
-    GrDirectContext *context = fromJavaPointer<GrDirectContext*>(contextPtr);
-    delete context;
-}
-
 extern void getMetalDeviceAndQueue(void** device, void** queue);
 
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_RenderTargetsKt_makeMetalRenderTargetNative(

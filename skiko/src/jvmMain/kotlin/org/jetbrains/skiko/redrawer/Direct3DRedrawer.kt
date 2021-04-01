@@ -14,7 +14,6 @@ internal class Direct3DRedrawer(
 ) : Redrawer {
 
     private var isDisposed = false
-    private var device: Long = 0
 
     private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
         update(System.nanoTime())
@@ -23,7 +22,6 @@ internal class Direct3DRedrawer(
 
     override fun dispose() {
         frameDispatcher.cancel()
-        disposeDevice(device)
         isDisposed = true
     }
 
@@ -54,10 +52,7 @@ internal class Direct3DRedrawer(
         makeDirectXRenderTarget(device, width, height)
     )
 
-    fun createDevice(): Long {
-        device = createDirectXDevice(layer.windowHandle)
-        return device
-    }
+    fun createDevice(): Long = createDirectXDevice(layer.windowHandle)
 
     fun finishFrame(device: Long, context: Long, surface: Long) {
         finishFrame(device, context, surface, properties.isVsyncEnabled)
