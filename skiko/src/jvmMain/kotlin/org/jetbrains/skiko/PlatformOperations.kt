@@ -5,7 +5,6 @@ import org.jetbrains.skiko.redrawer.MacOsOpenGLRedrawer
 import org.jetbrains.skiko.redrawer.SoftwareRedrawer
 import org.jetbrains.skiko.redrawer.Redrawer
 import org.jetbrains.skiko.redrawer.WindowsOpenGLRedrawer
-import org.jetbrains.skiko.redrawer.AngleRedrawer
 import org.jetbrains.skiko.redrawer.Direct3DRedrawer
 import org.jetbrains.skiko.redrawer.MetalRedrawer
 import java.awt.Component
@@ -69,7 +68,6 @@ internal val platformOperations: PlatformOperations by lazy {
                 ) = when(renderApi) {
                     GraphicsApi.SOFTWARE -> SoftwareRedrawer(layer)
                     GraphicsApi.DIRECT3D -> Direct3DRedrawer(layer, properties)
-                    GraphicsApi.ANGLE -> AngleRedrawer(layer, properties)
                     else -> WindowsOpenGLRedrawer(layer, properties)
                 }
             }

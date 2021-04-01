@@ -18,7 +18,6 @@ internal fun createContextHandler(layer: SkiaLayer, renderApi: GraphicsApi): Con
         GraphicsApi.OPENGL -> OpenGLContextHandler(layer)
         GraphicsApi.DIRECT3D -> Direct3DContextHandler(layer)
         GraphicsApi.METAL -> MetalContextHandler(layer)
-        GraphicsApi.ANGLE -> AngleContextHandler(layer)
         else -> TODO("Unsupported yet.")
     }
 }

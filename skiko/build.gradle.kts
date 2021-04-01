@@ -267,8 +267,6 @@ tasks.withType(CppCompile::class.java).configureEach {
                 listOf(
                     "-I$jdkHome/include/win32",
                     "-I$includeDir",
-                    "-I$skiaDir/third_party/externals/angle2/include",
-                    "-I$skiaDir/src/gpu",
                     "-DSK_BUILD_FOR_WIN",
                     "-D_CRT_SECURE_NO_WARNINGS",
                     "-D_HAS_EXCEPTIONS=0",
@@ -276,9 +274,12 @@ tasks.withType(CppCompile::class.java).configureEach {
                     "-DNOMINMAX",
                     "-DSK_GAMMA_APPLY_TO_A8",
                     "-DSK_DIRECT3D",
-                    "-DSK_ANGLE",
                     "/utf-8",
                     "/GR-", // no-RTTI.
+                    // LATER. Ange rendering arguments:
+                    // "-I$skiaDir/third_party/externals/angle2/include",
+                    // "-I$skiaDir/src/gpu",
+                    // "-DSK_ANGLE",
                     *buildType.msvcFlags
                     )
             )
