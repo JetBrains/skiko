@@ -1,8 +1,7 @@
 package org.jetbrains.skiko.redrawer
 
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.swing.Swing
-import kotlinx.coroutines.withContext
 import org.jetbrains.skija.BackendRenderTarget
 import org.jetbrains.skija.DirectContext
 import org.jetbrains.skiko.FrameDispatcher
@@ -19,6 +18,7 @@ internal class MetalRedrawer(
     private var isDisposed = false
     private var disposeLock = Any()
     private val device = layer.backedLayer.useDrawingSurfacePlatformInfo(::createMetalDevice)
+    private val windowHandle = layer.windowHandle
 
     private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
         update(System.nanoTime())
@@ -38,9 +38,9 @@ internal class MetalRedrawer(
 
     override fun redrawImmediately() {
         check(!isDisposed)
-        // TODO now we wait until previous layer.draw is finished. it ends only on the next vsync.
-        //  because of that we lose one frame on resize and can theoretically see very small white bars on the sides of the window
-        //  to avoid this we should be able to draw in two modes: with vsync and without.
+        // TODO: now we wait until previous `layer.draw` is finished. it ends only on the next vsync.
+        //  Because of that we lose one frame on resize and can theoretically see very small white bars on the sides
+        //  of the window to avoid this we should be able to draw in two modes: with vsync and without.
         frameDispatcher.scheduleFrame()
     }
 
@@ -68,6 +68,11 @@ internal class MetalRedrawer(
                     }
                 }
             }
+            // When window is not visible - it doesn't make sense to redraw fast to avoid battery drain.
+            // In theory, we could be more precise, and just suspend rendering in
+            // `NSWindowDidChangeOcclusionStateNotification`, but current approach seems to work as well in practise.
+            if (isOccluded(windowHandle))
+                delay(300)
         }
     }
 
@@ -100,4 +105,5 @@ internal class MetalRedrawer(
     private external fun finishFrame(device: Long)
     private external fun resizeLayers(device: Long, x: Int, y: Int, width: Int, height: Int)
     private external fun setContentScale(device: Long, contentScale: Float)
+    private external fun isOccluded(window: Long): Boolean
 }

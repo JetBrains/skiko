@@ -241,5 +241,11 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_disposeDe
     [device release];
 }
 
+JNIEXPORT jboolean JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_isOccluded(
+    JNIEnv *env, jobject redrawer, jlong windowPtr) {
+    NSWindow* window = (NSWindow*)windowPtr;
+    return ([window occlusionState] & NSWindowOcclusionStateVisible) == 0;
+}
+
 } // extern C
 #endif
