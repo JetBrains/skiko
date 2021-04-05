@@ -2,6 +2,7 @@ package org.jetbrains.skiko
 
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
 import kotlin.coroutines.CoroutineContext
@@ -23,14 +24,15 @@ class FrameDispatcher(
         onFrame
     )
 
-    private var needFrame = CompletableDeferred<Unit>()
+    private var needFrame = false
+    private val channel = Channel<Unit>(Channel.CONFLATED)
 
     private val job = scope.launch {
         while (true) {
-            needFrame.await()
-            needFrame = CompletableDeferred()
+            if (!needFrame)
+                channel.receive()
+            needFrame = false
             onFrame()
-            yield()
         }
     }
 
@@ -47,6 +49,7 @@ class FrameDispatcher(
      * will schedule next single onFrame after the current one.
      */
     fun scheduleFrame() {
-        needFrame.complete(Unit)
+        needFrame = true
+        channel.offer(Unit)
     }
 }

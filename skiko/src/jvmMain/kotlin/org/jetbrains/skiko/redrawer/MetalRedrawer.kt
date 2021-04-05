@@ -38,9 +38,9 @@ internal class MetalRedrawer(
 
     override fun redrawImmediately() {
         check(!isDisposed)
-        // TODO now we wait until previous layer.draw is finished. it ends only on the next vsync.
-        //  because of that we lose one frame on resize and can theoretically see very small white bars on the sides of the window
-        //  to avoid this we should be able to draw in two modes: with vsync and without.
+        // TODO: now we wait until previous `layer.draw` is finished. it ends only on the next vsync.
+        //  Because of that we lose one frame on resize and can theoretically see very small white bars on the sides
+        //  of the window to avoid this we should be able to draw in two modes: with vsync and without.
         frameDispatcher.scheduleFrame()
     }
 
