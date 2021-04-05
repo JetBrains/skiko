@@ -5,6 +5,7 @@ import kotlinx.coroutines.test.TestCoroutineScope
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import java.util.concurrent.Executors
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class FrameDispatcherTest {
@@ -152,6 +153,40 @@ class FrameDispatcherTest {
 
         advanceUntilIdle()
         assertEquals(3, frameCount)
+    }
+
+    @Suppress("JoinDeclarationAndAssignment")
+    @Test
+    fun `perform tasks scheduled in the frame after the frame`() {
+        val dispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
+        val history = mutableListOf<String>()
+
+        runBlocking(dispatcher) {
+            val job = launch {
+                val scope = this
+
+                lateinit var frameDispatcher: FrameDispatcher
+                frameDispatcher = FrameDispatcher(scope = scope) {
+                    history.add("frame$frameCount")
+                    if (frameCount == 0) {
+                        scope.launch {
+                            history.add("task")
+                        }
+                        frameDispatcher.scheduleFrame()
+                    }
+                    frameCount++
+                }
+                frameDispatcher.scheduleFrame()
+            }
+
+            repeat(20) {
+                yield()
+            }
+
+            job.cancel()
+        }
+
+        assertEquals(listOf("frame0", "task", "frame1"), history)
     }
 
     private fun test(
