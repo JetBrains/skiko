@@ -20,6 +20,7 @@ internal class MetalRedrawer(
     private var isDisposed = false
     private var disposeLock = Any()
     private val device = layer.backedLayer.useDrawingSurfacePlatformInfo(::createMetalDevice)
+    private val windowHandle = layer.windowHandle
 
     private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
         update(System.nanoTime())
@@ -72,7 +73,7 @@ internal class MetalRedrawer(
             // When window is not visible - it doesn't make sense to redraw fast to avoid battery drain.
             // In theory, we could be more precise, and just suspend rendering in
             // `NSWindowDidChangeOcclusionStateNotification`, but current approach seems to work as well in practise.
-            if (isOccluded(layer.windowHandle))
+            if (isOccluded(windowHandle))
                 delay(500)
         }
     }
