@@ -24,10 +24,12 @@ class FrameDispatcher(
     )
 
     private val frameChannel = Channel<Unit>(Channel.CONFLATED)
+    private var frameScheduled = false
 
     private val job = scope.launch {
         while (true) {
             frameChannel.receive()
+            frameScheduled = false
             onFrame()
             // As per `yield()` documentation:
             //
@@ -52,6 +54,9 @@ class FrameDispatcher(
      * will schedule next single `onFrame` after the current one.
      */
     fun scheduleFrame() {
-        frameChannel.offer(Unit)
+        if (!frameScheduled) {
+            frameScheduled = true
+            frameChannel.offer(Unit)
+        }
     }
 }

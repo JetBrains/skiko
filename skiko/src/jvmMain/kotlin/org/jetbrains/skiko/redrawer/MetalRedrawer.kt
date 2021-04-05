@@ -72,7 +72,7 @@ internal class MetalRedrawer(
             // In theory, we could be more precise, and just suspend rendering in
             // `NSWindowDidChangeOcclusionStateNotification`, but current approach seems to work as well in practise.
             if (isOccluded(windowHandle))
-                delay(500)
+                delay(300)
         }
     }
 
