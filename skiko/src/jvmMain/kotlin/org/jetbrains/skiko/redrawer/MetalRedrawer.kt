@@ -1,6 +1,7 @@
 package org.jetbrains.skiko.redrawer
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
 import org.jetbrains.skija.BackendRenderTarget
@@ -68,6 +69,9 @@ internal class MetalRedrawer(
                     }
                 }
             }
+            // When window is not visible - it doesn't make sense to redraw fast to avoid battery drain.
+            if (isOccluded(layer.windowHandle))
+                delay(500)
         }
     }
 
@@ -100,4 +104,5 @@ internal class MetalRedrawer(
     private external fun finishFrame(device: Long)
     private external fun resizeLayers(device: Long, x: Int, y: Int, width: Int, height: Int)
     private external fun setContentScale(device: Long, contentScale: Float)
+    private external fun isOccluded(window: Long): Boolean
 }
