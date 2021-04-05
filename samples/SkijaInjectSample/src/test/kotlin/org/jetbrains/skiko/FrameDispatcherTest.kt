@@ -78,7 +78,6 @@ class FrameDispatcherTest {
         assertEquals(2, frameCount)
     }
 
-    @Suppress("JoinDeclarationAndAssignment")
     @Test
     fun `scheduleFrame during onFrame`() = test {
         lateinit var frameDispatcher: FrameDispatcher
@@ -101,7 +100,6 @@ class FrameDispatcherTest {
         assertEquals(4, frameCount)
     }
 
-    @Suppress("JoinDeclarationAndAssignment")
     @Test
     fun `scheduleFrame multiple times during onFrame`() = test {
         lateinit var frameDispatcher: FrameDispatcher
@@ -126,7 +124,6 @@ class FrameDispatcherTest {
         assertEquals(4, frameCount)
     }
 
-    @Suppress("JoinDeclarationAndAssignment")
     @Test
     fun `cancel coroutine scope`() = test {
         val scope = CoroutineScope(coroutineContext)
@@ -155,7 +152,6 @@ class FrameDispatcherTest {
         assertEquals(3, frameCount)
     }
 
-    @Suppress("JoinDeclarationAndAssignment")
     @Test
     fun `perform tasks scheduled in the frame after the frame`() {
         val dispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()

@@ -3,6 +3,7 @@ package org.jetbrains.skiko
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.yield
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -22,15 +23,19 @@ class FrameDispatcher(
         onFrame
     )
 
-    private var needFrame = false
-    private val channel = Channel<Unit>(Channel.CONFLATED)
+    private val frameChannel = Channel<Unit>(Channel.CONFLATED)
 
     private val job = scope.launch {
         while (true) {
-            if (!needFrame)
-                channel.receive()
-            needFrame = false
+            frameChannel.receive()
             onFrame()
+            // As per `yield()` documentation:
+            //
+            // For other dispatchers (not == Unconfined) , this function calls [CoroutineDispatcher.dispatch] and
+            // always suspends to be resumed later regardless of the result of [CoroutineDispatcher.isDispatchNeeded].
+            //
+            // What means for Swing dispatcher we'll process all pending events and resume renderer.
+            yield()
         }
     }
 
@@ -47,7 +52,6 @@ class FrameDispatcher(
      * will schedule next single `onFrame` after the current one.
      */
     fun scheduleFrame() {
-        needFrame = true
-        channel.offer(Unit)
+        frameChannel.offer(Unit)
     }
 }
