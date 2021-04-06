@@ -82,7 +82,7 @@ LayerHandler * findByObject(JNIEnv *env, jobject object)
 extern "C"
 {
 
-NSWindow *recoursiveSearch(NSView *rootView, CALayer *layer) {
+NSWindow *recursiveWindowSearch(NSView *rootView, CALayer *layer) {
     if (rootView.subviews == nil || rootView.subviews.count == 0) {
         return nil;
     }
@@ -90,7 +90,7 @@ NSWindow *recoursiveSearch(NSView *rootView, CALayer *layer) {
         if (child.layer == layer) {
             return rootView.window;
         }
-        NSWindow* recOut = recoursiveSearch(child, layer);
+        NSWindow* recOut = recursiveWindowSearch(child, layer);
         if (recOut != nil) {
             return recOut;
         }
@@ -102,7 +102,7 @@ NSWindow *findCALayerWindow(NSView *rootView, CALayer *layer) {
     if (rootView.layer == layer) {
         return rootView.window;
     }
-    return recoursiveSearch(rootView, layer);
+    return recursiveWindowSearch(rootView, layer);
 }
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_nativeInit(JNIEnv *env, jobject canvas, jlong platformInfoPtr)
