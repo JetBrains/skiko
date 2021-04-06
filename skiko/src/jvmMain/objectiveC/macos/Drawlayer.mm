@@ -82,6 +82,29 @@ LayerHandler * findByObject(JNIEnv *env, jobject object)
 extern "C"
 {
 
+NSWindow *recoursiveSearch(NSView *rootView, CALayer *layer) {
+    if (rootView.subviews == nil || rootView.subviews.count == 0) {
+        return nil;
+    }
+    for (NSView* child in rootView.subviews) {
+        if (child.layer == layer) {
+            return rootView.window;
+        }
+        NSWindow* recOut = recoursiveSearch(child, layer);
+        if (recOut != nil) {
+            return recOut;
+        }
+    }
+    return nil;
+}
+
+NSWindow *findCALayerWindow(NSView *rootView, CALayer *layer) {
+    if (rootView.layer == layer) {
+        return rootView.window;
+    }
+    return recoursiveSearch(rootView, layer);
+}
+
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_nativeInit(JNIEnv *env, jobject canvas, jlong platformInfoPtr)
 {
     if (layerStorage == nil)
@@ -98,18 +121,11 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_nativeInit(JNIEnv 
     [layersSet setCanvasGlobalRef: canvasGlobalRef];
 
     NSMutableArray<NSWindow *> *windows = [NSMutableArray arrayWithArray: [[NSApplication sharedApplication] windows]];
-
-    for (LayerHandler* value in layerStorage)
-    {
-        if (layersSet.container == value.container)
-        {
-            layersSet.window = value.window;
+    for (NSWindow* window in windows) {
+        layersSet.window = findCALayerWindow(window.contentView, layersSet.container);
+        if (layersSet.window != nil) {
+            break;
         }
-    }
-
-    if (layersSet.window == NULL)
-    {
-        layersSet.window = [windows lastObject];
     }
 
     [layerStorage addObject: layersSet];
