@@ -208,7 +208,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_resizeLay
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_setContentScale(JNIEnv *env, jobject obj, jlong devicePtr, jfloat contentScale)
 {
     MetalDevice *device = (MetalDevice *) devicePtr;
-    if (device.layer.contentsScale == contentScale) {
+    if (!device || !device.layer || device.layer.contentsScale == contentScale) {
         return;
     }
     [CATransaction begin];
