@@ -160,6 +160,26 @@ open class SkiaLayer(
         backedLayer.addKeyListener(l)
     }
 
+    override fun removeInputMethodListener(l: InputMethodListener) {
+        backedLayer.removeInputMethodListener(l)
+    }
+
+    override fun removeMouseListener(l: MouseListener) {
+        backedLayer.removeMouseListener(l)
+    }
+
+    override fun removeMouseMotionListener(l: MouseMotionListener) {
+        backedLayer.removeMouseMotionListener(l)
+    }
+
+    override fun removeMouseWheelListener(l: MouseWheelListener) {
+        backedLayer.removeMouseWheelListener(l)
+    }
+
+    override fun removeKeyListener(l: KeyListener) {
+        backedLayer.removeKeyListener(l)
+    }
+
     private var redrawScheduled = false
 
     /**
