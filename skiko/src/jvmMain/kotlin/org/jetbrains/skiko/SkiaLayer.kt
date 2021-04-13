@@ -116,8 +116,8 @@ open class SkiaLayer(
     }
 
     override fun setBounds(x: Int, y: Int, width: Int, height: Int) {
-        var roundedWidth = 0
-        var roundedHeight = 0
+        var roundedWidth = width
+        var roundedHeight = height
         if (isInited) {
             roundedWidth = roundSize(width)
             roundedHeight = roundSize(height)
