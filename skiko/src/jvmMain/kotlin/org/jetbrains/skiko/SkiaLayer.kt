@@ -122,8 +122,8 @@ open class SkiaLayer(
             roundedWidth = roundSize(width)
             roundedHeight = roundSize(height)
         }
-        backedLayer.setSize(roundedWidth, roundedHeight)
         super.setBounds(x, y, roundedWidth, roundedHeight)
+        backedLayer.setSize(roundedWidth, roundedHeight)
     }
 
     override fun paint(g: Graphics) {
