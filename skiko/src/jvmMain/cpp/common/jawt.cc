@@ -4,6 +4,7 @@
 
 #if SK_BUILD_FOR_WIN
 #include <windows.h>
+#include <strsafe.h>
 #else
 #include <dlfcn.h>
 #endif
@@ -42,7 +43,7 @@ void findJdkHome(JNIEnv* env, char* path, int pathLength) {
     jstring propertyString = (jstring) env->CallStaticObjectMethod(systemClass, getPropertyMethod, javaHomeString);
 #if SK_BUILD_FOR_WIN
     const jchar* propertyChars = env->GetStringChars(propertyString, 0);
-    wsnprintf(path, pathLength, "%ls", propertyChars);
+    StringCchPrintfW(path, pathLength, L"%ls", propertyChars);
     env->ReleaseStringChars(propertyString, propertyChars);
 #else
     const char* propertyChars = env->GetStringUTFChars(propertyString, 0);
@@ -58,7 +59,7 @@ extern "C" jboolean Skiko_GetAWT(JNIEnv *env, JAWT *awt) {
     wchar_t jdkHome[FILENAME_MAX];
     findJdkHome(env, jdkHome, sizeof(jdkHome));
     wchar_t path[FILENAME_MAX];
-    wsnprintf(path, sizeof(path), "%ls\\bin\\jawt.dll", jdkHome);
+    StringCchPrintfW(path, sizeof(path), L"%ls\\bin\\jawt.dll", jdkHome);
     HMODULE lib = LoadLibraryW(path);
     if (!lib) {
       fprintf(stderr, "Cannot open %ls\n", path);
