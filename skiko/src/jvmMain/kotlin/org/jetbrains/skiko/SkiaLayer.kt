@@ -116,8 +116,14 @@ open class SkiaLayer(
     }
 
     override fun setBounds(x: Int, y: Int, width: Int, height: Int) {
-        super.setBounds(x, y, width, height)
-        backedLayer.setSize(width, height)
+        var roundedWidth = width
+        var roundedHeight = height
+        if (isInited) {
+            roundedWidth = roundSize(width)
+            roundedHeight = roundSize(height)
+        }
+        super.setBounds(x, y, roundedWidth, roundedHeight)
+        backedLayer.setSize(roundedWidth, roundedHeight)
     }
 
     override fun paint(g: Graphics) {
@@ -277,4 +283,16 @@ open class SkiaLayer(
         redrawer = platformOperations.createRedrawer(this, renderApi, properties)
         redrawer!!.redrawImmediately()
     }
+
+    private fun roundSize(value: Int): Int {
+        var rounded = value * contentScale
+        val diff = rounded - rounded.toInt()
+        // We check values close to 0.5 and edit the size to avoid white lines glitch
+        if (diff > 0.4f && diff < 0.6f) {
+            rounded = value + 1f
+        } else {
+            rounded = value.toFloat()
+        }
+        return rounded.toInt()
+    } 
 }

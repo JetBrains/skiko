@@ -6,4 +6,5 @@ local.properties
 run.sh
 .idea
 deploy.sh
+deploy.bat
 skiko/src/jvmMain/java
