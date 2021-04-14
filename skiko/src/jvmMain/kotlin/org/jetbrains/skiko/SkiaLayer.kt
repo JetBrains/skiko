@@ -288,7 +288,7 @@ open class SkiaLayer(
         var rounded = value * contentScale
         val diff = rounded - rounded.toInt()
         // We check values close to 0.5 and edit the size to avoid white lines glitch
-        if (diff >= 0.4f && diff <= 0.6f) {
+        if (diff > 0.4f && diff < 0.6f) {
             rounded = value + 1f
         } else {
             rounded = value.toFloat()
