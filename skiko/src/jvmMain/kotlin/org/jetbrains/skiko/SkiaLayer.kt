@@ -9,12 +9,14 @@ import org.jetbrains.skiko.context.ContextHandler
 import org.jetbrains.skiko.context.createContextHandler
 import org.jetbrains.skiko.redrawer.Redrawer
 import java.awt.Graphics
+import java.awt.event.FocusEvent
 import java.awt.event.HierarchyEvent
 import java.awt.event.InputMethodListener
 import java.awt.event.KeyListener
 import java.awt.event.MouseListener
 import java.awt.event.MouseMotionListener
 import java.awt.event.MouseWheelListener
+import java.awt.im.InputMethodRequests
 import javax.swing.JPanel
 import javax.swing.SwingUtilities.isEventDispatchThread
 
@@ -43,6 +45,10 @@ open class SkiaLayer(
                 //
                 // 3. to avoid double paint in one single frame, use needRedraw instead of redrawImmediately
                 redrawer?.needRedraw()
+            }
+
+            override fun getInputMethodRequests(): InputMethodRequests? {
+                return this@SkiaLayer.inputMethodRequests
             }
         }
         add(backedLayer)
@@ -146,6 +152,25 @@ open class SkiaLayer(
         }
     }
 
+    // We need to delegate all event listeners to the Canvas (so and focus/input)
+    // Canvas is heavyweight AWT component, JPanel is lightweight Swing component
+    // Event handling doesn't properly work when we mix heavyweight and lightweight components.
+    // For example, Canvas will eat all mouse events
+    // (see "mouse events on a heavyweight component do not fall through to its parent",
+    // https://www.comp.nus.edu.sg/~cs3283/ftp/Java/swingConnect/archive/tech_topics_arch/mixing/mixing.html)
+
+    override fun enableInputMethods(enable: Boolean) {
+        backedLayer.enableInputMethods(enable)
+    }
+
+    override fun requestFocus() {
+        backedLayer.requestFocus()
+    }
+
+    override fun requestFocus(cause: FocusEvent.Cause?) {
+        backedLayer.requestFocus(cause)
+    }
+
     override fun addInputMethodListener(l: InputMethodListener) {
         backedLayer.addInputMethodListener(l)
     }
@@ -185,8 +210,6 @@ open class SkiaLayer(
     override fun removeKeyListener(l: KeyListener) {
         backedLayer.removeKeyListener(l)
     }
-
-    private var redrawScheduled = false
 
     /**
      * Redraw on the next animation Frame (on vsync signal if vsync is enabled).
