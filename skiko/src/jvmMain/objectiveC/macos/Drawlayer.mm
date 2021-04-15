@@ -27,19 +27,18 @@
     if (self)
     {
         self.canvasGlobalRef = NULL;
-        self.container = NULL;
-        self.window = NULL;
+        self.container = nil;
+        self.window = nil;
     }
 
     return self;
 }
 
-- (void) disposeLayer:(JNIEnv *) env
-{
-    env->DeleteGlobalRef(self.canvasGlobalRef);
+-(void) dealloc {
     self.canvasGlobalRef = NULL;
-    self.container = NULL;
-    self.window = NULL;
+    [self.container release];
+    [self.window release];
+    [super dealloc];
 }
 
 - (BOOL) isFullScreen {
@@ -137,7 +136,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_nativeDispose(JNIE
     if (layer != NULL)
     {
         [layerStorage removeObject: layer];
-        [layer disposeLayer: env];
+        env->DeleteGlobalRef(layer.canvasGlobalRef);
         [layer release];
     }
 }

@@ -45,9 +45,7 @@ fun SwingSkia() = SwingUtilities.invokeLater {
         Button(
             text = "Fullscreen",
             action = {
-                if (panel != null) {
-                    panel.layer.fullscreen = !panel.layer.fullscreen
-                }
+                panel.layer.fullscreen = !panel.layer.fullscreen
             }
         ),
         BorderLayout.NORTH
