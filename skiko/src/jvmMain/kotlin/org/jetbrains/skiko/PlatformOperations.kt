@@ -14,6 +14,7 @@ import javax.swing.SwingUtilities
 internal interface PlatformOperations {
     fun isFullscreen(component: Component): Boolean
     fun setFullscreen(component: Component, value: Boolean)
+    fun disableTitleBar(platformInfo: Long)
     fun getDpiScale(component: Component): Float
     fun createRedrawer(layer: SkiaLayer, renderApi: GraphicsApi, properties: SkiaLayerProperties): Redrawer
 }
@@ -31,6 +32,10 @@ internal val platformOperations: PlatformOperations by lazy {
 
                 override fun getDpiScale(component: Component): Float {
                     return component.graphicsConfiguration.defaultTransform.scaleX.toFloat()
+                }
+
+                override fun disableTitleBar(platformInfo: Long) {
+                    osxDisableTitleBar(platformInfo)
                 }
 
                 override fun createRedrawer(
@@ -55,6 +60,9 @@ internal val platformOperations: PlatformOperations by lazy {
                     val window = SwingUtilities.getRoot(component) as Window
                     val device = window.graphicsConfiguration.device
                     device.setFullScreenWindow(if (value) window else null)
+                }
+
+                override fun disableTitleBar(platformInfo: Long) {
                 }
 
                 override fun getDpiScale(component: Component): Float {
@@ -84,6 +92,9 @@ internal val platformOperations: PlatformOperations by lazy {
                     val window = SwingUtilities.getRoot(component) as Window
                     val device = window.graphicsConfiguration.device
                     device.setFullScreenWindow(if (value) window else null)
+                }
+
+                override fun disableTitleBar(platformInfo: Long) {
                 }
 
                 override fun getDpiScale(component: Component): Float {
@@ -118,6 +129,7 @@ internal val platformOperations: PlatformOperations by lazy {
 // OSX
 external private fun osxIsFullscreenNative(component: Component): Boolean
 external private fun osxSetFullscreenNative(component: Component, value: Boolean)
+external private fun osxDisableTitleBar(platformInfo: Long)
 
 // Linux
 external private fun linuxGetDpiScaleNative(platformInfo: Long): Float

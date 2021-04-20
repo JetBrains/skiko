@@ -15,4 +15,10 @@ open class SkiaWindow(
         layer.dispose()
         super.dispose()
     }
+
+    fun disableTitleBar() {
+        useDrawingSurfacePlatformInfo {
+            platformOperations.disableTitleBar(it)
+        }
+    }
 }

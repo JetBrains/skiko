@@ -170,6 +170,36 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_osxSetFulls
     }
 }
 
+NSWindow *findWindow(jlong platformInfoPtr)
+{
+    NSObject<JAWT_SurfaceLayers>* dsi_mac = (__bridge NSObject<JAWT_SurfaceLayers> *) platformInfoPtr;
+    CALayer* ca_layer = [dsi_mac windowLayer];
+
+    NSWindow* target_window = nil;
+
+    NSMutableArray<NSWindow *> *windows = [NSMutableArray arrayWithArray: [[NSApplication sharedApplication] windows]];
+    for (NSWindow* window in windows)
+    {
+        target_window = findCALayerWindow(window.contentView, ca_layer);
+        if (target_window != nil) break;
+    }
+    return target_window;
+}
+
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_osxDisableTitleBar(JNIEnv *env, jobject properties, jlong platformInfoPtr)
+{
+    NSWindow* window = findWindow(platformInfoPtr);
+    if (window == nil) return;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [window setTitlebarAppearsTransparent:YES];
+        [window setTitleVisibility:NSWindowTitleHidden];
+        [window setStyleMask:[window styleMask]|NSFullSizeContentViewWindowMask];
+        // always show `fullscreen` green traffic light button instead of `maximize/zoom` button
+        [window setCollectionBehavior:[window collectionBehavior]|NSWindowCollectionBehaviorFullScreenPrimary];
+        [window setMovable:NO];
+    });
+}
+
 void getMetalDeviceAndQueue(void** device, void** queue)
 {
     id<MTLDevice> fDevice = MTLCreateSystemDefaultDevice();
