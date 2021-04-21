@@ -9,13 +9,7 @@ import org.jetbrains.skiko.context.ContextHandler
 import org.jetbrains.skiko.context.createContextHandler
 import org.jetbrains.skiko.redrawer.Redrawer
 import java.awt.Graphics
-import java.awt.event.FocusEvent
-import java.awt.event.HierarchyEvent
-import java.awt.event.InputMethodListener
-import java.awt.event.KeyListener
-import java.awt.event.MouseListener
-import java.awt.event.MouseMotionListener
-import java.awt.event.MouseWheelListener
+import java.awt.event.*
 import java.awt.im.InputMethodRequests
 import javax.swing.JPanel
 import javax.swing.SwingUtilities.isEventDispatchThread
@@ -163,6 +157,14 @@ open class SkiaLayer(
         backedLayer.enableInputMethods(enable)
     }
 
+    override fun getInputMethodListeners(): Array<InputMethodListener> {
+        return backedLayer.getInputMethodListeners()
+    }
+
+    override fun processInputMethodEvent(e: InputMethodEvent?) {
+        backedLayer.doProcessInputMethodEvent(e)
+    }
+
     override fun requestFocus() {
         backedLayer.requestFocus()
     }
@@ -172,6 +174,7 @@ open class SkiaLayer(
     }
 
     override fun addInputMethodListener(l: InputMethodListener) {
+        super.addInputMethodListener(l)
         backedLayer.addInputMethodListener(l)
     }
 
@@ -192,6 +195,7 @@ open class SkiaLayer(
     }
 
     override fun removeInputMethodListener(l: InputMethodListener) {
+        super.removeInputMethodListener(l)
         backedLayer.removeInputMethodListener(l)
     }
 
