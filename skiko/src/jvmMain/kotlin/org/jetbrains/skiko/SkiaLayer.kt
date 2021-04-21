@@ -175,6 +175,7 @@ open class SkiaLayer(
     }
 
     override fun addInputMethodListener(l: InputMethodListener) {
+        super.addInputMethodListener(l)
         backedLayer.addInputMethodListener(l)
     }
 
