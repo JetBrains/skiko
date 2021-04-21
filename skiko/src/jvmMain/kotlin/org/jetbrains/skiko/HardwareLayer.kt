@@ -2,7 +2,6 @@ package org.jetbrains.skiko
 
 import java.awt.Canvas
 import java.awt.Graphics
-import java.awt.event.InputEvent
 import java.awt.event.InputMethodEvent
 
 internal open class HardwareLayer : Canvas() {
@@ -29,7 +28,7 @@ internal open class HardwareLayer : Canvas() {
         nativeDispose()
     }
 
-    fun doProcessInputMethodEvent(e: InputMethodEvent) {
+    fun doProcessInputMethodEvent(e: InputMethodEvent?) {
         processInputMethodEvent(e)
     }
 

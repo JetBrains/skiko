@@ -162,8 +162,7 @@ open class SkiaLayer(
     }
 
     override fun processInputMethodEvent(e: InputMethodEvent?) {
-        if (e != null)
-          backedLayer.doProcessInputMethodEvent(e)
+        backedLayer.doProcessInputMethodEvent(e)
     }
 
     override fun requestFocus() {
@@ -196,6 +195,7 @@ open class SkiaLayer(
     }
 
     override fun removeInputMethodListener(l: InputMethodListener) {
+        super.removeInputMethodListener(l)
         backedLayer.removeInputMethodListener(l)
     }
 
