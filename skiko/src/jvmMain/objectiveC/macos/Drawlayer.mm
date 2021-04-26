@@ -141,16 +141,6 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_nativeDispose(JNIE
     }
 }
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getWindowHandle(JNIEnv *env, jobject canvas)
-{
-    LayerHandler *layer = findByObject(env, canvas);
-    if (layer != NULL)
-    {
-        return (jlong)[layer window];
-    }
-    return (jlong)kNullWindowHandle;
-}
-
 JNIEXPORT jboolean JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_osxIsFullscreenNative(JNIEnv *env, jobject properties, jobject component)
 {
     LayerHandler *layer = findByObject(env, component);
@@ -184,6 +174,12 @@ NSWindow *findWindow(jlong platformInfoPtr)
         if (target_window != nil) break;
     }
     return target_window;
+}
+
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getWindowHandle(JNIEnv *env, jobject canvas, jlong platformInfoPtr)
+{
+    NSWindow* window = findWindow(platformInfoPtr);
+    return (jlong)window;
 }
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_osxDisableTitleBar(JNIEnv *env, jobject properties, jlong platformInfoPtr)
