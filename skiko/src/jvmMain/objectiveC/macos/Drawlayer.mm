@@ -104,6 +104,22 @@ NSWindow *findCALayerWindow(NSView *rootView, CALayer *layer) {
     return recursiveWindowSearch(rootView, layer);
 }
 
+NSWindow *findWindow(jlong platformInfoPtr)
+{
+    NSObject<JAWT_SurfaceLayers>* dsi_mac = (__bridge NSObject<JAWT_SurfaceLayers> *) platformInfoPtr;
+    CALayer* ca_layer = [dsi_mac windowLayer];
+
+    NSWindow* target_window = nil;
+
+    NSMutableArray<NSWindow *> *windows = [NSMutableArray arrayWithArray: [[NSApplication sharedApplication] windows]];
+    for (NSWindow* window in windows)
+    {
+        target_window = findCALayerWindow(window.contentView, ca_layer);
+        if (target_window != nil) break;
+    }
+    return target_window;
+}
+
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_nativeInit(JNIEnv *env, jobject canvas, jlong platformInfoPtr)
 {
     if (layerStorage == nil)
@@ -111,21 +127,12 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_nativeInit(JNIEnv 
         layerStorage = [[NSMutableSet alloc] init];
     }
 
-    NSObject<JAWT_SurfaceLayers>* dsi_mac = (__bridge NSObject<JAWT_SurfaceLayers> *) platformInfoPtr;
-
     LayerHandler *layersSet = [[LayerHandler alloc] init];
-
+    NSObject<JAWT_SurfaceLayers>* dsi_mac = (__bridge NSObject<JAWT_SurfaceLayers> *) platformInfoPtr;
     layersSet.container = [dsi_mac windowLayer];
     jobject canvasGlobalRef = env->NewGlobalRef(canvas);
     [layersSet setCanvasGlobalRef: canvasGlobalRef];
-
-    NSMutableArray<NSWindow *> *windows = [NSMutableArray arrayWithArray: [[NSApplication sharedApplication] windows]];
-    for (NSWindow* window in windows) {
-        layersSet.window = findCALayerWindow(window.contentView, layersSet.container);
-        if (layersSet.window != nil) {
-            break;
-        }
-    }
+    layersSet.window = findWindow(platformInfoPtr);
 
     [layerStorage addObject: layersSet];
 }
@@ -139,16 +146,6 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_nativeDispose(JNIE
         env->DeleteGlobalRef(layer.canvasGlobalRef);
         [layer release];
     }
-}
-
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getWindowHandle(JNIEnv *env, jobject canvas)
-{
-    LayerHandler *layer = findByObject(env, canvas);
-    if (layer != NULL)
-    {
-        return (jlong)[layer window];
-    }
-    return (jlong)kNullWindowHandle;
 }
 
 JNIEXPORT jboolean JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_osxIsFullscreenNative(JNIEnv *env, jobject properties, jobject component)
@@ -168,6 +165,26 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_osxSetFulls
     {
         [layer makeFullscreen:value];
     }
+}
+
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getWindowHandle(JNIEnv *env, jobject canvas, jlong platformInfoPtr)
+{
+    NSWindow* window = findWindow(platformInfoPtr);
+    return (jlong)window;
+}
+
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_osxDisableTitleBar(JNIEnv *env, jobject properties, jlong platformInfoPtr)
+{
+    NSWindow* window = findWindow(platformInfoPtr);
+    if (window == nil) return;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [window setTitlebarAppearsTransparent:YES];
+        [window setTitleVisibility:NSWindowTitleHidden];
+        [window setStyleMask:[window styleMask]|NSWindowStyleMaskFullSizeContentView];
+        // always show `fullscreen` green traffic light button instead of `maximize/zoom` button
+        [window setCollectionBehavior:[window collectionBehavior]|NSWindowCollectionBehaviorFullScreenPrimary];
+        [window setMovable:NO];
+    });
 }
 
 void getMetalDeviceAndQueue(void** device, void** queue)

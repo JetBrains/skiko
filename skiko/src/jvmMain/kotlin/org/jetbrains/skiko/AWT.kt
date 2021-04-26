@@ -31,7 +31,7 @@ internal class DrawingSurface(
         }
         private set
 
-    fun lock() = lockDrawingSurface(ptr)
+    fun lock() = lockDrawingSurface(ptr).also { check(it == 0) }
 
     fun unlock() = unlockDrawingSurface(ptr)
 
@@ -74,7 +74,7 @@ private external fun getAWT(): Long
 private external fun getDrawingSurface(awt: Long, layer: Component): Long
 private external fun freeDrawingSurface(awt: Long, drawingSurface: Long)
 
-private external fun lockDrawingSurface(drawingSurface: Long)
+private external fun lockDrawingSurface(drawingSurface: Long): Int
 private external fun unlockDrawingSurface(drawingSurface: Long)
 
 private external fun getDrawingSurfaceInfo(drawingSurface: Long): Long
