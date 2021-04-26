@@ -8,7 +8,6 @@ import org.jetbrains.skija.paragraph.TextStyle
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaRenderer
 import org.jetbrains.skiko.SkiaWindow
-import java.awt.Dimension
 import java.awt.Toolkit
 import java.awt.event.*
 import javax.swing.*
@@ -72,11 +71,7 @@ fun createWindow(title: String) = SwingUtilities.invokeLater {
     })
 
     // MANDATORY: set window size before calling setVisible(true)
-//    window.setSize(800, 600)
-
-    window.preferredSize = Dimension(800, 600)
-    window.pack()
-    window.disableTitleBar()
+    window.setSize(800, 600)
     window.setVisible(true)
 }
 
