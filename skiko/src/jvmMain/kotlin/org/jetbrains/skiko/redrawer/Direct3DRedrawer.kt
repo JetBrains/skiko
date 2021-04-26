@@ -76,4 +76,6 @@ internal class Direct3DRedrawer(
     external fun resizeBuffers(device: Long, width: Int, height: Int)
     private external fun finishFrame(device: Long, context: Long, surface: Long, isVsyncEnabled: Boolean)
     external fun disposeDevice(device: Long)
+    external fun getAdapterName(device: Long): String
+    external fun getAdapterMemorySize(device: Long): Long
 }
