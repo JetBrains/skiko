@@ -98,6 +98,9 @@ internal class MetalRedrawer(
     
     fun finishFrame() = finishFrame(device)
 
+    fun getAdapterName(): String = getAdapterName(device)
+    fun getAdapterMemorySize(): Long = getAdapterMemorySize(device)
+
     private external fun createMetalDevice(platformInfo: Long): Long
     private external fun makeMetalContext(device: Long): Long
     private external fun makeMetalRenderTarget(device: Long, width: Int, height: Int): Long
@@ -106,4 +109,6 @@ internal class MetalRedrawer(
     private external fun resizeLayers(device: Long, x: Int, y: Int, width: Int, height: Int)
     private external fun setContentScale(device: Long, contentScale: Float)
     private external fun isOccluded(window: Long): Boolean
+    private external fun getAdapterName(device: Long): String
+    private external fun getAdapterMemorySize(device: Long): Long
 }

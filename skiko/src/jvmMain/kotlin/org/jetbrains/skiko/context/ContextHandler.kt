@@ -52,5 +52,7 @@ internal abstract class ContextHandler(val layer: SkiaLayer) {
         renderTarget?.close()
     }
 
+    open fun hardwareInfo(): String = ""
+
     protected open fun destroyContext() = Unit
 }

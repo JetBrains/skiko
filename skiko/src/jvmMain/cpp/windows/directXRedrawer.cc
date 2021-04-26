@@ -1,5 +1,6 @@
 #ifdef SK_DIRECT3D
 #include <stdexcept>
+#include <locale>
 #include <Windows.h>
 #include <jawt_md.h>
 #include "jni_helpers.h"
@@ -386,6 +387,26 @@ HRESULT D3DCompile(
     {
         DirectXDevice *d3dDevice = fromJavaPointer<DirectXDevice*>(devicePtr);
         delete d3dDevice;
+    }
+
+    JNIEXPORT jstring JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_getAdapterName(JNIEnv * env, jobject redrawer, jlong devicePtr) {
+        DirectXDevice *d3dDevice = fromJavaPointer<DirectXDevice*>(devicePtr);
+
+        DXGI_ADAPTER_DESC1 desc;
+        d3dDevice->backendContext.fAdapter->GetDesc1(&desc);
+        std::wstring w_tmp(desc.Description);
+        std::string currentAdapterName(w_tmp.begin(), w_tmp.end());
+        jstring result = env->NewStringUTF(currentAdapterName.c_str());
+        return result;
+    }
+
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_getAdapterMemorySize(JNIEnv * env, jobject redrawer, jlong devicePtr) {
+        DirectXDevice *d3dDevice = fromJavaPointer<DirectXDevice*>(devicePtr);
+
+        DXGI_ADAPTER_DESC1 desc;
+        d3dDevice->backendContext.fAdapter->GetDesc1(&desc);
+        __int64 result = desc.DedicatedVideoMemory;
+        return (jlong)result;
     }
 }
 

@@ -241,6 +241,23 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_disposeDe
     [device release];
 }
 
+JNIEXPORT jstring JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_getAdapterName(
+    JNIEnv *env, jobject redrawer, jlong devicePtr)
+{
+    MetalDevice *device = (MetalDevice *) devicePtr;
+    const char *currentAdapterName = [[device.device name] cStringUsingEncoding:NSASCIIStringEncoding];
+    jstring result = env->NewStringUTF(currentAdapterName);
+    return result;
+}
+
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_getAdapterMemorySize(
+    JNIEnv *env, jobject redrawer, jlong devicePtr)
+{
+    MetalDevice *device = (MetalDevice *) devicePtr;
+    uint64_t totalMemory = [device.device recommendedMaxWorkingSetSize];
+    return (jlong)totalMemory;
+}
+
 JNIEXPORT jboolean JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_isOccluded(
     JNIEnv *env, jobject redrawer, jlong windowPtr) {
     NSWindow* window = (NSWindow*)windowPtr;

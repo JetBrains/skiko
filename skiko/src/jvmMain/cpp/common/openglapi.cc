@@ -41,4 +41,10 @@ JNIEXPORT jint JNICALL Java_org_jetbrains_skiko_OpenGLApi_glGetIntegerv(JNIEnv *
 	return (jint)data;
 }
 
+JNIEXPORT jstring JNICALL Java_org_jetbrains_skiko_OpenGLApi_glGetString(JNIEnv * env, jobject object, jint value) {
+	const char *content = reinterpret_cast<const char *>(glGetString(value));
+    jstring result = env->NewStringUTF(content);
+    return result;
+}
+
 }
