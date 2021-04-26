@@ -15,7 +15,9 @@ internal class OpenGLContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
         try {
             if (context == null) {
                 context = makeGLContext()
-                println(hardwareInfo())
+                if (System.getProperty("skiko.hardwareInfo.enabled") == "true") {
+                    println(hardwareInfo())
+                }
             }
         } catch (e: Exception) {
             println("Failed to create Skia OpenGL context!")
@@ -55,7 +57,7 @@ internal class OpenGLContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
 
     override fun hardwareInfo(): String {
         val gl = OpenGLApi.instance
-        return  "OpenGL is running on:\n" +
+        return  "OPENGL hardware info:\n" +
             "Vendor: ${gl.glGetString(gl.GL_VENDOR)}\n" +
             "Model: ${gl.glGetString(gl.GL_RENDERER)}\n" +
             "Total memory: ${gl.glGetIntegerv(gl.GL_TOTAL_MEMORY) / 1024} MB\n"

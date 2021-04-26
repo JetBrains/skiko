@@ -22,7 +22,10 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextHandler(layer) 
                     throw Exception("Failed to create DirectX12 device.")
                 }
                 context = directXRedrawer.makeContext(device)
-                println(hardwareInfo())
+                val printDeviceEnabled = System.getProperty("skiko.hardwareInfo.enabled") == "true"
+                if (System.getProperty("skiko.hardwareInfo.enabled") == "true") {
+                    println(hardwareInfo())
+                }
             }
         } catch (e: Exception) {
             println("${e.message}\nFailed to create Skia Direct3D context!")
@@ -71,7 +74,7 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextHandler(layer) 
     }
 
     override fun hardwareInfo(): String {
-        return "DirectX 12 is running on:\n" +
+        return "DIRECT3D (dx12) hardware info:\n" +
             "Video card: ${directXRedrawer.getAdapterName(device)}\n" +
             "Total memory: ${directXRedrawer.getAdapterMemorySize(device) / 1024 / 1024} MB\n"
     }

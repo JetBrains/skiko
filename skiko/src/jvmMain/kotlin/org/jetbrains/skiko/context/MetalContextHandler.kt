@@ -16,6 +16,9 @@ internal class MetalContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
         try {
             if (context == null) {
                 context = metalRedrawer.makeContext()
+                if (System.getProperty("skiko.hardwareInfo.enabled") == "true") {
+                    println(hardwareInfo())
+                }
             }
         } catch (e: Exception) {
             println("${e.message}\nFailed to create Skia Metal context!")
@@ -52,5 +55,11 @@ internal class MetalContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
 
     override fun destroyContext() {
         context?.close()
+    }
+
+    override fun hardwareInfo(): String {
+        return "METAL hardware info:\n" +
+            "Video card: ${metalRedrawer.getAdapterName()}\n" +
+            "Total memory: ${metalRedrawer.getAdapterMemorySize() / 1024 / 1024} MB\n"
     }
 }
