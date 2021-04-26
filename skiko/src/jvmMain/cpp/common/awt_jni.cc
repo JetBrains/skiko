@@ -39,7 +39,7 @@ extern "C"
     JNIEXPORT jint JNICALL Java_org_jetbrains_skiko_AWTKt_lockDrawingSurface(JNIEnv *env, jobject obj, jlong drawingSurfacePtr)
     {
         JAWT_DrawingSurface *ds = fromJavaPointer<JAWT_DrawingSurface *>(drawingSurfacePtr);
-        return ds->Lock(ds) & JAWT_LOCK_ERROR;
+        return (ds->Lock(ds) & JAWT_LOCK_ERROR) != 0;
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_AWTKt_unlockDrawingSurface(JNIEnv *env, jobject obj, jlong drawingSurfacePtr)

@@ -189,7 +189,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_osxDisableT
     dispatch_async(dispatch_get_main_queue(), ^{
         [window setTitlebarAppearsTransparent:YES];
         [window setTitleVisibility:NSWindowTitleHidden];
-        [window setStyleMask:[window styleMask]|NSFullSizeContentViewWindowMask];
+        [window setStyleMask:[window styleMask]|NSWindowStyleMaskFullSizeContentView];
         // always show `fullscreen` green traffic light button instead of `maximize/zoom` button
         [window setCollectionBehavior:[window collectionBehavior]|NSWindowCollectionBehaviorFullScreenPrimary];
         [window setMovable:NO];
