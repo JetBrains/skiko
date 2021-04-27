@@ -90,11 +90,31 @@ class Renderer(
     var canvas: Canvas? = null
 
     override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
-        this.canvas = canvas
-        val contentScale = layer.contentScale
-        canvas.scale(contentScale, contentScale)
-        displayScene(this, (width / contentScale).toInt(), (height / contentScale).toInt(), nanoTime)
-        layer.needRedraw()
+        // this.canvas = canvas
+        // val contentScale = layer.contentScale
+        // canvas.scale(contentScale, contentScale)
+        // displayScene(this, (width / contentScale).toInt(), (height / contentScale).toInt(), nanoTime)
+        // layer.needRedraw()
+
+//////////////////////////////////////////////////
+        val pictureRecorder = PictureRecorder()
+        val pictureCanvas = pictureRecorder.beginRecording(
+            Rect.makeLTRB(
+                0f,
+                0f,
+                100f,
+                100f
+            )
+        )
+        pictureCanvas.drawLine(0f, 0f, 100f, 100f, Paint())
+        val picture = pictureRecorder.finishRecordingAsPicture()
+        canvas.drawPicture(
+            picture,
+            null,
+            Paint() // if we replace it by null, everything will be normal
+        )
+        canvas.drawLine(100f, 0f, 0f, 100f, Paint())
+//////////////////////////////////////////////////
     }
 }
 

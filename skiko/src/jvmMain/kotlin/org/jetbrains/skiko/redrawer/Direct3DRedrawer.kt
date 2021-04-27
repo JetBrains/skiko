@@ -3,7 +3,7 @@ package org.jetbrains.skiko.redrawer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
-import org.jetbrains.skija.BackendRenderTarget
+import org.jetbrains.skija.Surface
 import org.jetbrains.skija.DirectContext
 import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.SkiaLayer
@@ -60,8 +60,8 @@ internal class Direct3DRedrawer(
         makeDirectXContext(device)
     )
 
-    fun makeRenderTarget(device: Long, width: Int, height: Int) = BackendRenderTarget(
-        makeDirectXRenderTarget(device, width, height)
+    fun makeSurface(device: Long, context: Long, width: Int, height: Int, index: Int) = Surface(
+        makeDirectXSurface(device, context, width, height, index)
     )
 
     fun createDevice(): Long = createDirectXDevice(layer.windowHandle)
@@ -72,10 +72,13 @@ internal class Direct3DRedrawer(
 
     external fun createDirectXDevice(windowHandle: Long): Long
     external fun makeDirectXContext(device: Long): Long
-    external fun makeDirectXRenderTarget(device: Long, width: Int, height: Int): Long
+    external fun makeDirectXSurface(device: Long, context: Long, width: Int, height: Int, index: Int): Long
     external fun resizeBuffers(device: Long, width: Int, height: Int)
     private external fun finishFrame(device: Long, context: Long, surface: Long, isVsyncEnabled: Boolean)
-    external fun disposeDevice(device: Long)
+    external fun disposeDevice(device: Long, context: Long)
+    external fun getBufferIndex(device: Long): Int
+    external fun initSwapChain(device: Long)
+    external fun initFence(device: Long)
     external fun getAdapterName(device: Long): String
     external fun getAdapterMemorySize(device: Long): Long
 }

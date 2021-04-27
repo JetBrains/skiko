@@ -47,7 +47,7 @@ internal abstract class ContextHandler(val layer: SkiaLayer) {
         destroyContext()
     }
 
-    fun disposeCanvas() {
+    open fun disposeCanvas() {
         surface?.close()
         renderTarget?.close()
     }
