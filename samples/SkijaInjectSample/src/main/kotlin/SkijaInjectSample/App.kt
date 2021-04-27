@@ -15,6 +15,7 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 fun main(args: Array<String>) {
+    System.setProperty("skiko.renderApi", "OPENGL")
     repeat(1) {
         createWindow("window $it")
     }
@@ -90,31 +91,26 @@ class Renderer(
     var canvas: Canvas? = null
 
     override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
-        // this.canvas = canvas
-        // val contentScale = layer.contentScale
-        // canvas.scale(contentScale, contentScale)
-        // displayScene(this, (width / contentScale).toInt(), (height / contentScale).toInt(), nanoTime)
-        // layer.needRedraw()
+        this.canvas = canvas
+        val contentScale = layer.contentScale
+        canvas.scale(contentScale, contentScale)
+        displayScene(this, (width / contentScale).toInt(), (height / contentScale).toInt(), nanoTime)
 
-//////////////////////////////////////////////////
+        // Alpha layers test
+        val rectW = 100f
+        val rectH = 100f
+        val left = (width - rectW) / 2f
+        val top = (height - rectH) / 2f
         val pictureRecorder = PictureRecorder()
         val pictureCanvas = pictureRecorder.beginRecording(
-            Rect.makeLTRB(
-                0f,
-                0f,
-                100f,
-                100f
-            )
+            Rect.makeLTRB(left, top, left + rectW, top + rectH)
         )
-        pictureCanvas.drawLine(0f, 0f, 100f, 100f, Paint())
+        pictureCanvas.drawLine(left, top, left + rectW, top + rectH, Paint())
         val picture = pictureRecorder.finishRecordingAsPicture()
-        canvas.drawPicture(
-            picture,
-            null,
-            Paint() // if we replace it by null, everything will be normal
-        )
-        canvas.drawLine(100f, 0f, 0f, 100f, Paint())
-//////////////////////////////////////////////////
+        canvas.drawPicture(picture, null, Paint())
+        canvas.drawLine(left, top + rectH, left + rectW, top, Paint())
+
+        layer.needRedraw()
     }
 }
 

@@ -26,31 +26,42 @@ internal class OpenGLContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
         return true
     }
 
-    override fun initCanvas() {
-        disposeCanvas()
+    private var currentWidth = 0
+    private var currentHeight = 0
+    private fun isSizeChanged(width: Int, height: Int): Boolean {
+        if (width != currentWidth || height != currentHeight) {
+            currentWidth = width
+            currentHeight = height
+            return true
+        }
+        return false
+    }
 
+    override fun initCanvas() {
         val scale = layer.contentScale
         val w = (layer.width * scale).toInt().coerceAtLeast(0)
         val h = (layer.height * scale).toInt().coerceAtLeast(0)
 
-        val gl = OpenGLApi.instance
-        val fbId = gl.glGetIntegerv(gl.GL_DRAW_FRAMEBUFFER_BINDING)
-        renderTarget = makeGLRenderTarget(
-            w,
-            h,
-            0,
-            8,
-            fbId,
-            FramebufferFormat.GR_GL_RGBA8
-        )
-
-        surface = Surface.makeFromBackendRenderTarget(
-            context!!,
-            renderTarget!!,
-            SurfaceOrigin.BOTTOM_LEFT,
-            SurfaceColorFormat.RGBA_8888,
-            ColorSpace.getSRGB()
-        )
+        if (isSizeChanged(w, h)) {
+            disposeCanvas()
+            val gl = OpenGLApi.instance
+            val fbId = gl.glGetIntegerv(gl.GL_DRAW_FRAMEBUFFER_BINDING)
+            renderTarget = makeGLRenderTarget(
+                w,
+                h,
+                0,
+                8,
+                fbId,
+                FramebufferFormat.GR_GL_RGBA8
+            )
+            surface = Surface.makeFromBackendRenderTarget(
+                context!!,
+                renderTarget!!,
+                SurfaceOrigin.BOTTOM_LEFT,
+                SurfaceColorFormat.RGBA_8888,
+                ColorSpace.getSRGB()
+            )
+        }
 
         canvas = surface!!.canvas
     }
