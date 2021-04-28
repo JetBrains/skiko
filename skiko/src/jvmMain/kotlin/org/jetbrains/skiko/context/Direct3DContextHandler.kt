@@ -10,6 +10,9 @@ import org.jetbrains.skiko.redrawer.Direct3DRedrawer
 import java.lang.ref.Reference
 
 internal class Direct3DContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
+    private val bufferCount = 2
+    private var surfaces: Array<Surface?> = arrayOfNulls(bufferCount)
+
     val directXRedrawer: Direct3DRedrawer
         get() = layer.redrawer!! as Direct3DRedrawer
 
@@ -22,7 +25,6 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextHandler(layer) 
                     throw Exception("Failed to create DirectX12 device.")
                 }
                 context = directXRedrawer.makeContext(device)
-                val printDeviceEnabled = System.getProperty("skiko.hardwareInfo.enabled") == "true"
                 if (System.getProperty("skiko.hardwareInfo.enabled") == "true") {
                     println(hardwareInfo())
                 }
@@ -34,28 +36,51 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextHandler(layer) 
         return true
     }
 
-    override fun initCanvas() {
-        disposeCanvas()
+    private var currentWidth = 0
+    private var currentHeight = 0
+    private fun isSizeChanged(width: Int, height: Int): Boolean {
+        if (width != currentWidth || height != currentHeight) {
+            currentWidth = width
+            currentHeight = height
+            return true
+        }
+        return false
+    }
+    private var isD3DInited = false
 
+    override fun initCanvas() {
         val scale = layer.contentScale
         val w = (layer.width * scale).toInt().coerceAtLeast(0)
         val h = (layer.height * scale).toInt().coerceAtLeast(0)
 
-        renderTarget = directXRedrawer.makeRenderTarget(device, w, h)
+        if (isSizeChanged(w, h)) {
+            disposeCanvas()
+            context?.flush()
+            
+            if (!isD3DInited) {
+                directXRedrawer.initSwapChain(device)
+            } else {
+                directXRedrawer.resizeBuffers(device, w, h)
+            }
+            
+            try {
+                for (bufferIndex in 0..bufferCount - 1) {
+                    surfaces[bufferIndex] = directXRedrawer.makeSurface(device, Native.getPtr(context!!), w, h, bufferIndex)
+                }
+            } finally {
+                Reference.reachabilityFence(context!!)
+            }
 
-        surface = Surface.makeFromBackendRenderTarget(
-            context!!,
-            renderTarget!!,
-            SurfaceOrigin.TOP_LEFT,
-            SurfaceColorFormat.RGBA_8888,
-            ColorSpace.getSRGB()
-        )
-
+            if (!isD3DInited) {
+                isD3DInited = true
+                directXRedrawer.initFence(device)
+            }
+        }
+        surface = surfaces[directXRedrawer.getBufferIndex(device)]
         canvas = surface!!.canvas
     }
 
     override fun flush() {
-        super.flush()
         try {
             directXRedrawer.finishFrame(
                 device,
@@ -69,8 +94,18 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextHandler(layer) 
     }
 
     override fun destroyContext() {
+        try {
+            directXRedrawer.disposeDevice(device, Native.getPtr(context!!))
+        } finally {
+            Reference.reachabilityFence(context!!)
+        }
         context?.close()
-        directXRedrawer.disposeDevice(device)
+    }
+
+    override fun disposeCanvas() {
+        for (bufferIndex in 0..bufferCount - 1) {
+            surfaces[bufferIndex]?.close()
+        }
     }
 
     override fun hardwareInfo(): String {
