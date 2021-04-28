@@ -15,7 +15,6 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 fun main(args: Array<String>) {
-    System.setProperty("skiko.renderApi", "OPENGL")
     repeat(1) {
         createWindow("window $it")
     }
