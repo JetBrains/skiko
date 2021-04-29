@@ -6,6 +6,9 @@ import org.jetbrains.skija.SurfaceColorFormat
 import org.jetbrains.skija.SurfaceOrigin
 import org.jetbrains.skija.impl.Native
 import org.jetbrains.skiko.SkiaLayer
+import org.jetbrains.skiko.hostFullName
+import org.jetbrains.skiko.javaLocation
+import org.jetbrains.skiko.javaVendor
 import org.jetbrains.skiko.redrawer.Direct3DRedrawer
 import java.lang.ref.Reference
 
@@ -109,8 +112,11 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextHandler(layer) 
     }
 
     override fun hardwareInfo(): String {
-        return "DIRECT3D (dx12) hardware info:\n" +
+        return "DIRECT3D (dx12) rendering info:\n" +
+            "OS: $hostFullName\n" +
+            "Java: $javaVendor\n" +
+            "Java location: $javaLocation\n" +
             "Video card: ${directXRedrawer.getAdapterName(device)}\n" +
-            "Total memory: ${directXRedrawer.getAdapterMemorySize(device) / 1024 / 1024} MB\n"
+            "Total VRAM: ${directXRedrawer.getAdapterMemorySize(device) / 1024 / 1024} MB\n"
     }
 }

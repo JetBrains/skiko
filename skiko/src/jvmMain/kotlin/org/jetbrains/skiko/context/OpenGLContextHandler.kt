@@ -8,6 +8,9 @@ import org.jetbrains.skija.SurfaceOrigin
 import org.jetbrains.skiko.OpenGLApi
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.makeGLContext
+import org.jetbrains.skiko.hostFullName
+import org.jetbrains.skiko.javaLocation
+import org.jetbrains.skiko.javaVendor
 import org.jetbrains.skiko.makeGLRenderTarget
 
 internal class OpenGLContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
@@ -68,9 +71,12 @@ internal class OpenGLContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
 
     override fun hardwareInfo(): String {
         val gl = OpenGLApi.instance
-        return  "OPENGL hardware info:\n" +
+        return  "OPENGL rendering info:\n" +
+            "OS: $hostFullName\n" +
+            "Java: $javaVendor\n" +
+            "Java location: $javaLocation\n" +
             "Vendor: ${gl.glGetString(gl.GL_VENDOR)}\n" +
             "Model: ${gl.glGetString(gl.GL_RENDERER)}\n" +
-            "Total memory: ${gl.glGetIntegerv(gl.GL_TOTAL_MEMORY) / 1024} MB\n"
+            "Total VRAM: ${gl.glGetIntegerv(gl.GL_TOTAL_MEMORY) / 1024} MB\n"
     }
 }

@@ -76,4 +76,11 @@ internal class SoftwareContextHandler(layer: SkiaLayer) : ContextHandler(layer) 
     override fun flush() {
         // Raster does not need to flush canvas
     }
+
+    override fun hardwareInfo(): String {
+        return "SOFTWARE rendering info:\n" +
+            "OS: $hostFullName\n" +
+            "Java: $javaVendor\n" +
+            "Java location: $javaLocation\n"
+    }
 }
