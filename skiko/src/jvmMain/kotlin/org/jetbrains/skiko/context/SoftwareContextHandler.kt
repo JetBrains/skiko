@@ -6,9 +6,6 @@ import org.jetbrains.skija.ColorAlphaType
 import org.jetbrains.skija.ImageInfo
 import org.jetbrains.skija.Picture
 import org.jetbrains.skiko.SkiaLayer
-import org.jetbrains.skiko.hostFullName
-import org.jetbrains.skiko.javaLocation
-import org.jetbrains.skiko.javaVendor
 import java.awt.Transparency
 import java.awt.color.ColorSpace
 import java.awt.image.BufferedImage
@@ -32,10 +29,17 @@ internal class SoftwareContextHandler(layer: SkiaLayer) : ContextHandler(layer) 
     var image: BufferedImage? = null
     var imageData: ByteArray? = null
     var raster: WritableRaster? = null
+    var isInited = false
 
     override fun initContext(): Boolean {
         // Raster does not need context
-        return true
+        if (!isInited) {
+            if (System.getProperty("skiko.hardwareInfo.enabled") == "true") {
+                println(rendererInfo())
+            }
+            isInited = true
+        }
+        return isInited
     }
 
     override fun initCanvas() {
@@ -78,12 +82,5 @@ internal class SoftwareContextHandler(layer: SkiaLayer) : ContextHandler(layer) 
 
     override fun flush() {
         // Raster does not need to flush canvas
-    }
-
-    override fun hardwareInfo(): String {
-        return "SOFTWARE rendering info:\n" +
-            "OS: $hostFullName\n" +
-            "Java: $javaVendor\n" +
-            "Java location: $javaLocation\n"
     }
 }

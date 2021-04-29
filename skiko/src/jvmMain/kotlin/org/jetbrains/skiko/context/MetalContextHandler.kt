@@ -6,9 +6,6 @@ import org.jetbrains.skija.SurfaceColorFormat
 import org.jetbrains.skija.SurfaceOrigin
 import org.jetbrains.skija.impl.Native
 import org.jetbrains.skiko.SkiaLayer
-import org.jetbrains.skiko.hostFullName
-import org.jetbrains.skiko.javaLocation
-import org.jetbrains.skiko.javaVendor
 import org.jetbrains.skiko.redrawer.MetalRedrawer
 
 internal class MetalContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
@@ -20,7 +17,7 @@ internal class MetalContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
             if (context == null) {
                 context = metalRedrawer.makeContext()
                 if (System.getProperty("skiko.hardwareInfo.enabled") == "true") {
-                    println(hardwareInfo())
+                    println(rendererInfo())
                 }
             }
         } catch (e: Exception) {
@@ -60,11 +57,8 @@ internal class MetalContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
         context?.close()
     }
 
-    override fun hardwareInfo(): String {
-        return "METAL rendering info:\n" +
-            "OS: $hostFullName\n" +
-            "Java: $javaVendor\n" +
-            "Java location: $javaLocation\n" +
+    override fun rendererInfo(): String {
+        return super.rendererInfo() +
             "Video card: ${metalRedrawer.getAdapterName()}\n" +
             "Total VRAM: ${metalRedrawer.getAdapterMemorySize() / 1024 / 1024} MB\n"
     }
