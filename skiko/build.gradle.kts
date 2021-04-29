@@ -319,6 +319,10 @@ tasks.withType(CppCompile::class.java).configureEach {
                     "-DSK_DIRECT3D",
                     "/utf-8",
                     "/GR-", // no-RTTI.
+                    // LATER. Ange rendering arguments:
+                    // "-I$skiaDir/third_party/externals/angle2/include",
+                    // "-I$skiaDir/src/gpu",
+                    // "-DSK_ANGLE",
                     *buildType.msvcFlags
                     )
             )
