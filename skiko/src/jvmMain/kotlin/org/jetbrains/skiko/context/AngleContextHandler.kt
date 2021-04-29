@@ -11,7 +11,6 @@ import org.jetbrains.skija.impl.Native
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.redrawer.AngleRedrawer
 import org.jetbrains.skiko.redrawer.Redrawer
-import org.jetbrains.skiko.destroyContext
 
 internal class AngleContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
     val angleRedrawer: AngleRedrawer
