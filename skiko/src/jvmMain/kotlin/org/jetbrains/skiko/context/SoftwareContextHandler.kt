@@ -6,6 +6,9 @@ import org.jetbrains.skija.ColorAlphaType
 import org.jetbrains.skija.ImageInfo
 import org.jetbrains.skija.Picture
 import org.jetbrains.skiko.SkiaLayer
+import org.jetbrains.skiko.hostFullName
+import org.jetbrains.skiko.javaLocation
+import org.jetbrains.skiko.javaVendor
 import java.awt.Transparency
 import java.awt.color.ColorSpace
 import java.awt.image.BufferedImage
