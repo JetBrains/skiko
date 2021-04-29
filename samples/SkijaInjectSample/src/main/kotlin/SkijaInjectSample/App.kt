@@ -98,8 +98,8 @@ class Renderer(
         // Alpha layers test
         val rectW = 100f
         val rectH = 100f
-        val left = (width - rectW) / 2f
-        val top = (height - rectH) / 2f
+        val left = (width / layer.contentScale - rectW) / 2f
+        val top = (height / layer.contentScale - rectH) / 2f
         val pictureRecorder = PictureRecorder()
         val pictureCanvas = pictureRecorder.beginRecording(
             Rect.makeLTRB(left, top, left + rectW, top + rectH)
