@@ -27,15 +27,14 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: '11'
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+      - shell: bash
         run: |
           cd $GITHUB_WORKSPACE/skiko
           ./gradlew publishToMavenLocal
           ./gradlew -Pskiko.native.enabled=true publishToMavenLocal
    linux:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-16.04
+    # Shall be ubuntu-16.04, but clang is incompatible
+    runs-on: ubuntu-20.04
     
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
