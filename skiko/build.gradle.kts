@@ -176,8 +176,6 @@ kotlin {
                     ?: File(System.getProperty("user.home")).resolve(".konan")
 
                         compilerOpts(
-                                // TODO: Why do we need `include/c++/v1`?
-                                "-I$kotlinNativeDataPath/dependencies/clang-llvm-apple-8.0.0-darwin-macos//include/c++/v1",
                                 "-I$skiaDir"
                                 )
 
