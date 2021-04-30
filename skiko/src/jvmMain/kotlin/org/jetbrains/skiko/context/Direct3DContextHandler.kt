@@ -26,7 +26,7 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextHandler(layer) 
                 }
                 context = directXRedrawer.makeContext(device)
                 if (System.getProperty("skiko.hardwareInfo.enabled") == "true") {
-                    println(hardwareInfo())
+                    println(rendererInfo())
                 }
             }
         } catch (e: Exception) {
@@ -108,9 +108,9 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextHandler(layer) 
         }
     }
 
-    override fun hardwareInfo(): String {
-        return "DIRECT3D (dx12) hardware info:\n" +
+    protected override fun rendererInfo(): String {
+        return super.rendererInfo() +
             "Video card: ${directXRedrawer.getAdapterName(device)}\n" +
-            "Total memory: ${directXRedrawer.getAdapterMemorySize(device) / 1024 / 1024} MB\n"
+            "Total VRAM: ${directXRedrawer.getAdapterMemorySize(device) / 1024 / 1024} MB\n"
     }
 }

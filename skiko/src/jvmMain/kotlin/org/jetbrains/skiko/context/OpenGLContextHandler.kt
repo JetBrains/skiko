@@ -16,7 +16,7 @@ internal class OpenGLContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
             if (context == null) {
                 context = makeGLContext()
                 if (System.getProperty("skiko.hardwareInfo.enabled") == "true") {
-                    println(hardwareInfo())
+                    println(rendererInfo())
                 }
             }
         } catch (e: Exception) {
@@ -66,11 +66,11 @@ internal class OpenGLContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
         canvas = surface!!.canvas
     }
 
-    override fun hardwareInfo(): String {
+    override fun rendererInfo(): String {
         val gl = OpenGLApi.instance
-        return  "OPENGL hardware info:\n" +
+       return super.rendererInfo() +
             "Vendor: ${gl.glGetString(gl.GL_VENDOR)}\n" +
             "Model: ${gl.glGetString(gl.GL_RENDERER)}\n" +
-            "Total memory: ${gl.glGetIntegerv(gl.GL_TOTAL_MEMORY) / 1024} MB\n"
+            "Total VRAM: ${gl.glGetIntegerv(gl.GL_TOTAL_MEMORY) / 1024} MB\n"
     }
 }

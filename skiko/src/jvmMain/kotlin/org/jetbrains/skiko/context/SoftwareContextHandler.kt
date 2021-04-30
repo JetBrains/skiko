@@ -29,10 +29,17 @@ internal class SoftwareContextHandler(layer: SkiaLayer) : ContextHandler(layer) 
     var image: BufferedImage? = null
     var imageData: ByteArray? = null
     var raster: WritableRaster? = null
+    var isInited = false
 
     override fun initContext(): Boolean {
         // Raster does not need context
-        return true
+        if (!isInited) {
+            if (System.getProperty("skiko.hardwareInfo.enabled") == "true") {
+                println(rendererInfo())
+            }
+            isInited = true
+        }
+        return isInited
     }
 
     override fun initCanvas() {

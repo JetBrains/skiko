@@ -9,6 +9,9 @@ import org.jetbrains.skiko.GraphicsApi
 import org.jetbrains.skiko.OS
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.hostOs
+import org.jetbrains.skiko.hostFullName
+import org.jetbrains.skiko.javaLocation
+import org.jetbrains.skiko.javaVendor
 
 internal fun createContextHandler(layer: SkiaLayer, renderApi: GraphicsApi): ContextHandler {
     return when (renderApi) {
@@ -52,7 +55,12 @@ internal abstract class ContextHandler(val layer: SkiaLayer) {
         renderTarget?.close()
     }
 
-    open fun hardwareInfo(): String = ""
+    protected open fun rendererInfo(): String {
+        return "${layer.renderApi} rendering info:\n" +
+            "OS: $hostFullName\n" +
+            "Java: $javaVendor\n" +
+            "Java location: $javaLocation\n"
+    }
 
     protected open fun destroyContext() = Unit
 }
