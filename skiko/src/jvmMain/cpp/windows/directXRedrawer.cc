@@ -37,6 +37,7 @@ const std::vector<std::wstring> adapterBlacklist{
     L"Microsoft Basic Render Driver",
     L"Intel(R) HD Graphics 520",
     L"Intel(R) HD Graphics 530",
+    L"Intel(R) HD Graphics 4400",
     L"NVIDIA GeForce GTX 750 Ti",
     L"NVIDIA GeForce GTX 960M",
     L"NVIDIA Quadro M2000M"};
