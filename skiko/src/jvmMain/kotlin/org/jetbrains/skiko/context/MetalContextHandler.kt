@@ -16,6 +16,7 @@ internal class MetalContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
         try {
             if (context == null) {
                 context = metalRedrawer.makeContext()
+                metalRedrawer.syncSize()
                 if (System.getProperty("skiko.hardwareInfo.enabled") == "true") {
                     println(rendererInfo())
                 }
