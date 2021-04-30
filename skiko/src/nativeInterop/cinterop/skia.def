@@ -1,6 +1,6 @@
 package = org.jetbrains.skiko.skia.native
 language = C++
-plugin = org.jetbrains.kotlin.native.cinterop.plugin.skia
+plugin = org.jetbrains.kotlin.native.interop.skia
 compilerOpts.osx = -x c++ -std=c++14 \
     -DSK_GL \
     -DSK_SUPPORT_GPU=1 \
