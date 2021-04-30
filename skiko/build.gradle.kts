@@ -161,7 +161,7 @@ kotlin {
 
     if (supportNative) {
         val nativeTarget = when (target) {
-            "macos-x64" -> macosX64()
+            "macos-x64", "macos-arm64" -> macosX64()
                 // "linux-x64" -> linuxX64()
                 // "windows-x64" -> mingwX64()
                 else -> null
@@ -176,7 +176,8 @@ kotlin {
                     ?: File(System.getProperty("user.home")).resolve(".konan")
 
                         compilerOpts(
-                                "-I$skiaDir"
+                                "-I$skiaDir",
+                                "--include-with-prefix-after=$kotlinNativeDataPath/dependencies/clang-llvm-apple-8.0.0-darwin-macos/include/c++/v1"
                                 )
 
                         extraOpts("-staticLibrary", "libskia.a")
