@@ -87,7 +87,7 @@ open class SkiaLayer(
     internal var redrawer: Redrawer? = null
     private var contextHandler: ContextHandler? = null
     private val fallbackRenderApiQueue = SkikoProperties.fallbackRenderApiQueue.toMutableList()
-    var renderApi_ = fallbackRenderApiQueue[0]
+    private var renderApi_ = fallbackRenderApiQueue[0]
     var renderApi: GraphicsApi
         get() = renderApi_
         private set(value) {
