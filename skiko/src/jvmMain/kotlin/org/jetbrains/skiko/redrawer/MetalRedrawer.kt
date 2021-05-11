@@ -17,7 +17,9 @@ internal class MetalRedrawer(
 ) : Redrawer {
     private var isDisposed = false
     private var disposeLock = Any()
-    private val device = layer.backedLayer.useDrawingSurfacePlatformInfo(::createMetalDevice)
+    private val device = layer.backedLayer.useDrawingSurfacePlatformInfo {
+        createMetalDevice(getAdapterPriority(), it)
+    }
     private val windowHandle = layer.windowHandle
 
     private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
@@ -98,10 +100,20 @@ internal class MetalRedrawer(
     
     fun finishFrame() = finishFrame(device)
 
+    fun getAdapterPriority(): Int {
+        val adapterPriority = System.getProperty("skiko.metal.gpu.priority")
+        return when (adapterPriority) {
+            "auto" -> 0
+            "integrated" -> 1
+            "discrete" -> 2
+            else -> 0
+        }
+    }
+
     fun getAdapterName(): String = getAdapterName(device)
     fun getAdapterMemorySize(): Long = getAdapterMemorySize(device)
 
-    private external fun createMetalDevice(platformInfo: Long): Long
+    private external fun createMetalDevice(adapterPriority: Int, platformInfo: Long): Long
     private external fun makeMetalContext(device: Long): Long
     private external fun makeMetalRenderTarget(device: Long, width: Int, height: Int): Long
     private external fun disposeDevice(device: Long)

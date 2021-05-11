@@ -17,6 +17,9 @@
 #define kOpen 0
 #define kGetMuxState 3
 #define kDriverClassName "AppleGraphicsControl"
+#define AdpapterPriorityAuto 0
+#define AdpapterPriorityIntegrated 1
+#define AdpapterPriorityDiscrete 2
 
 @interface AWTMetalLayer : CAMetalLayer
 
@@ -136,8 +139,15 @@ BOOL isUsingIntegratedGPU() {
     return output != 0;
 }
 
-id<MTLDevice> MTLCreateIntegratedDevice() {
-    BOOL isIntegratedGPU = isUsingIntegratedGPU();
+id<MTLDevice> MTLCreateIntegratedDevice(int adpapterPriority) {
+    BOOL isIntegratedGPU = NO;
+
+    if (adpapterPriority == AdpapterPriorityAuto) {
+        isIntegratedGPU = isUsingIntegratedGPU();
+    } else if (adpapterPriority == AdpapterPriorityIntegrated) {
+        isIntegratedGPU = YES;
+    }
+
     id<MTLDevice> gpu = nil;
 
     if (isIntegratedGPU) {
@@ -156,7 +166,7 @@ id<MTLDevice> MTLCreateIntegratedDevice() {
 }
 
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMetalDevice(
-    JNIEnv *env, jobject redrawer, jlong platformInfoPtr)
+    JNIEnv *env, jobject redrawer, jint adpapterPriority, jlong platformInfoPtr)
 {
     MetalDevice *device = [MetalDevice new];
 
@@ -171,7 +181,7 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
     [container addSublayer: layer];
     layer.javaRef = env->NewGlobalRef(redrawer);
 
-    id<MTLDevice> fDevice = MTLCreateIntegratedDevice();
+    id<MTLDevice> fDevice = MTLCreateIntegratedDevice(adpapterPriority);
     id<MTLCommandQueue> fQueue = [fDevice newCommandQueue];
 
     device.container = container;
