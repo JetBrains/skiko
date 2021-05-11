@@ -26,7 +26,7 @@ open class SkiaLayer(
 
     enum class PropertyKind {
         Renderer,
-        Scale,
+        ContentScale,
     }
 
     internal val backedLayer : HardwareLayer
@@ -78,8 +78,6 @@ open class SkiaLayer(
     var fullscreen: Boolean
         get() = backedLayer.fullscreen
         set(value) { backedLayer.fullscreen = value }
-
-    protected open fun contentScaleChanged() = Unit
 
     var renderer: SkiaRenderer? = null
     val clipComponents = mutableListOf<ClipRectangle>()
@@ -151,8 +149,7 @@ open class SkiaLayer(
     override fun paint(g: Graphics) {
         super.paint(g)
         if (backedLayer.checkContentScale()) {
-            contentScaleChanged()
-            notifyChange(PropertyKind.Scale)
+            notifyChange(PropertyKind.ContentScale)
         }
         redrawer?.syncSize()
 
