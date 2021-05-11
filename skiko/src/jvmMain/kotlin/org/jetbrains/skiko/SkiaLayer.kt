@@ -24,6 +24,11 @@ open class SkiaLayer(
     private val properties: SkiaLayerProperties = SkiaLayerProperties()
 ) : JPanel() {
 
+    enum class PropertyKind {
+        Renderer,
+        Scale,
+    }
+
     internal val backedLayer : HardwareLayer
 
     init {
@@ -84,14 +89,18 @@ open class SkiaLayer(
     internal var redrawer: Redrawer? = null
     private var contextHandler: ContextHandler? = null
     private val fallbackRenderApiQueue = SkikoProperties.fallbackRenderApiQueue.toMutableList()
-    var renderApi: GraphicsApi = fallbackRenderApiQueue[0]
-        private set
+    var renderApi_ = fallbackRenderApiQueue[0]
+    var renderApi: GraphicsApi
+        get() = renderApi_
+        private set(value) {
+            this.renderApi_ = value
+            notifyChange(PropertyKind.Renderer)
+        }
 
     @Volatile
     private var picture: PictureHolder? = null
     private val pictureRecorder = PictureRecorder()
     private val pictureLock = Any()
-
 
     open fun init() {
         backedLayer.init()
@@ -99,6 +108,19 @@ open class SkiaLayer(
         contextHandler = createContextHandler(this, renderApi)
         redrawer = platformOperations.createRedrawer(this, renderApi, properties)
         isInited = true
+    }
+
+    private val stateHandlers =
+            mutableMapOf<PropertyKind, MutableList<(SkiaLayer) -> Unit>>()
+
+    fun onStateChanged(kind: PropertyKind, handler: (SkiaLayer) -> Unit) {
+        stateHandlers.getOrPut( kind, { mutableListOf() }) += handler
+    }
+
+    private fun notifyChange(kind: PropertyKind) {
+        stateHandlers.get(kind)?.let { handlers ->
+            handlers.forEach { it(this) }
+        }
     }
 
     open fun dispose() {
@@ -130,6 +152,7 @@ open class SkiaLayer(
         super.paint(g)
         if (backedLayer.checkContentScale()) {
             contentScaleChanged()
+            notifyChange(PropertyKind.Scale)
         }
         redrawer?.syncSize()
 

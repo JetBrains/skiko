@@ -59,6 +59,10 @@ fun createWindow(title: String) = SwingUtilities.invokeLater {
     val state = State()
     state.text = title
 
+    window.layer.onStateChanged(SkiaLayer.PropertyKind.Renderer) { layer ->
+        println("Changed renderer for $layer: new value is ${layer.renderApi}")
+    }
+
     window.layer.renderer = Renderer(window.layer) {
         renderer, w, h, nanoTime -> displayScene(renderer, w, h, nanoTime, mouseX, mouseY, state)
     }
