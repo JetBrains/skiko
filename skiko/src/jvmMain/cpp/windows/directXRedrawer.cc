@@ -281,7 +281,7 @@ extern "C"
     }
 
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_createDirectXDevice(
-        JNIEnv *env, jobject redrawer, jint adapterPriority, jlong windowHandle)
+        JNIEnv *env, jobject redrawer, jint adapterPriority, jlong contentHandle)
     {
         gr_cp<IDXGIFactory4> deviceFactory;
         if (!SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&deviceFactory))))
@@ -319,7 +319,7 @@ extern "C"
 
         d3dDevice->device = device;
         d3dDevice->queue = queue;
-        d3dDevice->window = (HWND)windowHandle;
+        d3dDevice->window = (HWND)contentHandle;
 
         return toJavaPointer(d3dDevice);
     }

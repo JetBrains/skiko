@@ -1,5 +1,6 @@
 #define WIN32_LEAN_AND_MEAN
 #include <jawt_md.h>
+#include <Windows.h>
 #include "jni_helpers.h"
 
 extern "C"
@@ -16,5 +17,11 @@ extern "C"
     {
         JAWT_Win32DrawingSurfaceInfo* dsi_win = fromJavaPointer<JAWT_Win32DrawingSurfaceInfo *>(platformInfoPtr);
         return (jlong) dsi_win->hwnd;
+    }
+
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getContentHandle(JNIEnv *env, jobject canvas, jlong platformInfoPtr)
+    {
+        JAWT_Win32DrawingSurfaceInfo* dsi_win = fromJavaPointer<JAWT_Win32DrawingSurfaceInfo *>(platformInfoPtr);
+        return (jlong) GetAncestor(dsi_win->hwnd, GA_PARENT);
     }
 } // extern "C"

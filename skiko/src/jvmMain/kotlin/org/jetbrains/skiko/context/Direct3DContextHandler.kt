@@ -108,7 +108,7 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextHandler(layer) 
         }
     }
 
-    protected override fun rendererInfo(): String {
+    override fun rendererInfo(): String {
         return super.rendererInfo() +
             "Video card: ${directXRedrawer.getAdapterName(device)}\n" +
             "Total VRAM: ${directXRedrawer.getAdapterMemorySize(device) / 1024 / 1024} MB\n"

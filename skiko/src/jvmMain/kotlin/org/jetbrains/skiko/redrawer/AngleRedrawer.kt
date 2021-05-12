@@ -47,7 +47,7 @@ internal class AngleRedrawer(
     }
 
     fun createDevice(): Long {
-        device = createAngleDevice(layer.windowHandle)
+        device = createAngleDevice(layer.contentHandle)
         return device
     }
 
@@ -61,7 +61,7 @@ internal class AngleRedrawer(
 
     fun finishFrame() = finishFrame(device, properties.isVsyncEnabled)
 
-    external fun createAngleDevice(windowHandle: Long): Long
+    external fun createAngleDevice(contentHandle: Long): Long
     external fun makeAngleContext(device: Long): Long
     external fun makeAngleRenderTarget(device: Long, width: Int, height: Int): Long
     external fun resizeBuffers(device: Long, width: Int, height: Int)
