@@ -16,12 +16,12 @@ extern "C"
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getWindowHandle(JNIEnv *env, jobject canvas, jlong platformInfoPtr)
     {
         JAWT_Win32DrawingSurfaceInfo* dsi_win = fromJavaPointer<JAWT_Win32DrawingSurfaceInfo *>(platformInfoPtr);
-        return (jlong) dsi_win->hwnd;
+        return (jlong) GetAncestor(dsi_win->hwnd, GA_PARENT);
     }
 
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getContentHandle(JNIEnv *env, jobject canvas, jlong platformInfoPtr)
     {
         JAWT_Win32DrawingSurfaceInfo* dsi_win = fromJavaPointer<JAWT_Win32DrawingSurfaceInfo *>(platformInfoPtr);
-        return (jlong) GetAncestor(dsi_win->hwnd, GA_PARENT);
+        return (jlong) dsi_win->hwnd;
     }
 } // extern "C"
