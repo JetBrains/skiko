@@ -272,6 +272,7 @@ tasks.withType(CppCompile::class.java).configureEach {
         "-DSK_SUPPORT_OPENCL=0",
         "-DSK_UNICODE_AVAILABLE",
         "-DU_DISABLE_RENAMING",
+        "-DSK_USING_THIRD_PARTY_ICU",
         *buildType.flags
     ))
     val includeDir = "$projectDir/src/jvmMain/cpp/include"
