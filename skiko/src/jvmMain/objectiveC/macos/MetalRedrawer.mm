@@ -166,7 +166,7 @@ id<MTLDevice> MTLCreateIntegratedDevice(int adpapterPriority) {
 }
 
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMetalDevice(
-    JNIEnv *env, jobject redrawer, jint adpapterPriority, jlong platformInfoPtr)
+    JNIEnv *env, jobject redrawer, jint adapterPriority, jlong platformInfoPtr)
 {
     MetalDevice *device = [MetalDevice new];
 
@@ -181,7 +181,7 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
     [container addSublayer: layer];
     layer.javaRef = env->NewGlobalRef(redrawer);
 
-    id<MTLDevice> fDevice = MTLCreateIntegratedDevice(adpapterPriority);
+    id<MTLDevice> fDevice = MTLCreateIntegratedDevice(adapterPriority);
     id<MTLCommandQueue> fQueue = [fDevice newCommandQueue];
 
     device.container = container;
