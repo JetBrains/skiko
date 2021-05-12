@@ -7,8 +7,6 @@ import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 
 object Library {
-    private var loaded = false
-
     private val skikoLibraryPath = System.getProperty("skiko.library.path")
     private val cacheRoot = "${System.getProperty("user.home")}/.skiko/"
 
@@ -32,8 +30,6 @@ object Library {
     // localization resource on platforms wher it is needed.
     @Synchronized
     fun load() {
-        if (loaded) return
-
         val name = "skiko-$hostId"
         val platformName = System.mapLibraryName(name)
 
@@ -55,6 +51,7 @@ object Library {
             loadOrGet(cacheDir, resourcePath, platformName, true)
             val loadIcu = hostOs.isWindows
             if (loadIcu) {
+                println("Loading ICU")
                 loadOrGet(cacheDir, resourcePath, "icudtl.dat", false)
             }
         }
@@ -69,11 +66,9 @@ object Library {
         try {
             // Init code executed after library was loaded.
             org.jetbrains.skija.impl.Library._nAfterLoad()
+            println("after load called")
         } catch (t: Throwable) {
             t.printStackTrace()
         }
-        loaded = true
     }
-
-
 }

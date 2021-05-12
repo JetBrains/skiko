@@ -1,12 +1,16 @@
 package org.jetbrains.skija.impl
 
 import org.jetbrains.skiko.Library
+import java.util.concurrent.atomic.AtomicBoolean
 
 class Library {
     companion object {
+        var loaded = AtomicBoolean(false)
         @JvmStatic
         fun staticLoad() {
-            Library.load()
+            if (!loaded.compareAndExchange(false, true)) {
+              Library.load()
+            }
         }
 
         @JvmStatic
