@@ -298,6 +298,7 @@ tasks.withType(CppCompile::class.java).configureEach {
                     "-I$jdkHome/include/linux",
                     "-I$includeDir",
                     "-DSK_BUILD_FOR_LINUX",
+                    "-D_GLIBCXX_USE_CXX11_ABI=0",
                     "-DSK_R32_SHIFT=16",
                     *buildType.clangFlags
                 )
