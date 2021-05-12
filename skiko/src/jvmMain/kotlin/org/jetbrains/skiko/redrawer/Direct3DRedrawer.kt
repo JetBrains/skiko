@@ -6,6 +6,7 @@ import kotlinx.coroutines.withContext
 import org.jetbrains.skija.Surface
 import org.jetbrains.skija.DirectContext
 import org.jetbrains.skiko.FrameDispatcher
+import org.jetbrains.skiko.GpuPriority
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaLayerProperties
 
@@ -64,13 +65,23 @@ internal class Direct3DRedrawer(
         makeDirectXSurface(device, context, width, height, index)
     )
 
-    fun createDevice(): Long = createDirectXDevice(layer.windowHandle)
+    fun createDevice(): Long = createDirectXDevice(getAdapterPriority(), layer.windowHandle)
 
     fun finishFrame(device: Long, context: Long, surface: Long) {
         finishFrame(device, context, surface, properties.isVsyncEnabled)
     }
 
-    external fun createDirectXDevice(windowHandle: Long): Long
+    fun getAdapterPriority(): Int {
+        val adapterPriority = GpuPriority.parse(System.getProperty("skiko.directx.gpu.priority"))
+        return when (adapterPriority) {
+            GpuPriority.Auto -> 0
+            GpuPriority.Integrated -> 1
+            GpuPriority.Discrete -> 2
+            else -> 0
+        }
+    }
+
+    external fun createDirectXDevice(adapterPriority: Int, windowHandle: Long): Long
     external fun makeDirectXContext(device: Long): Long
     external fun makeDirectXSurface(device: Long, context: Long, width: Int, height: Int, index: Int): Long
     external fun resizeBuffers(device: Long, width: Int, height: Int)

@@ -5,6 +5,7 @@ import kotlinx.coroutines.swing.Swing
 import org.jetbrains.skija.BackendRenderTarget
 import org.jetbrains.skija.DirectContext
 import org.jetbrains.skiko.FrameDispatcher
+import org.jetbrains.skiko.GpuPriority
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaLayerProperties
 import org.jetbrains.skiko.useDrawingSurfacePlatformInfo
@@ -17,7 +18,9 @@ internal class MetalRedrawer(
 ) : Redrawer {
     private var isDisposed = false
     private var disposeLock = Any()
-    private val device = layer.backedLayer.useDrawingSurfacePlatformInfo(::createMetalDevice)
+    private val device = layer.backedLayer.useDrawingSurfacePlatformInfo {
+        createMetalDevice(getAdapterPriority(), it)
+    }
     private val windowHandle = layer.windowHandle
 
     private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
@@ -98,10 +101,20 @@ internal class MetalRedrawer(
     
     fun finishFrame() = finishFrame(device)
 
+    fun getAdapterPriority(): Int {
+        val adapterPriority = GpuPriority.parse(System.getProperty("skiko.metal.gpu.priority"))
+        return when (adapterPriority) {
+            GpuPriority.Auto -> 0
+            GpuPriority.Integrated -> 1
+            GpuPriority.Discrete -> 2
+            else -> 0
+        }
+    }
+
     fun getAdapterName(): String = getAdapterName(device)
     fun getAdapterMemorySize(): Long = getAdapterMemorySize(device)
 
-    private external fun createMetalDevice(platformInfo: Long): Long
+    private external fun createMetalDevice(adapterPriority: Int, platformInfo: Long): Long
     private external fun makeMetalContext(device: Long): Long
     private external fun makeMetalRenderTarget(device: Long, width: Int, height: Int): Long
     private external fun disposeDevice(device: Long)
