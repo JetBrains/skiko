@@ -15,16 +15,6 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 fun main(args: Array<String>) {
-    // METAL
-    // System.setProperty("skiko.metal.gpu.priority", "auto")
-    // System.setProperty("skiko.metal.gpu.priority", "integrated")
-    // System.setProperty("skiko.metal.gpu.priority", "discrete")
-
-    // DIRECTX
-    // System.setProperty("skiko.directx.gpu.priority", "auto")
-    // System.setProperty("skiko.directx.gpu.priority", "integrated")
-    // System.setProperty("skiko.directx.gpu.priority", "discrete")
-
     repeat(1) {
         createWindow("window $it")
     }

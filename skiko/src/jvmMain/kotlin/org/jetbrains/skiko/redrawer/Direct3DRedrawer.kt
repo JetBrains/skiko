@@ -6,6 +6,7 @@ import kotlinx.coroutines.withContext
 import org.jetbrains.skija.Surface
 import org.jetbrains.skija.DirectContext
 import org.jetbrains.skiko.FrameDispatcher
+import org.jetbrains.skiko.GpuPriority
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaLayerProperties
 
@@ -71,11 +72,11 @@ internal class Direct3DRedrawer(
     }
 
     fun getAdapterPriority(): Int {
-        val adapterPriority = System.getProperty("skiko.directx.gpu.priority")
+        val adapterPriority = GpuPriority.parse(System.getProperty("skiko.directx.gpu.priority"))
         return when (adapterPriority) {
-            "auto" -> 0
-            "integrated" -> 1
-            "discrete" -> 2
+            GpuPriority.Auto -> 0
+            GpuPriority.Integrated -> 1
+            GpuPriority.Discrete -> 2
             else -> 0
         }
     }

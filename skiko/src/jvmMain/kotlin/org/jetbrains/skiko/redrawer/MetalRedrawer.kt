@@ -5,6 +5,7 @@ import kotlinx.coroutines.swing.Swing
 import org.jetbrains.skija.BackendRenderTarget
 import org.jetbrains.skija.DirectContext
 import org.jetbrains.skiko.FrameDispatcher
+import org.jetbrains.skiko.GpuPriority
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaLayerProperties
 import org.jetbrains.skiko.useDrawingSurfacePlatformInfo
@@ -101,11 +102,11 @@ internal class MetalRedrawer(
     fun finishFrame() = finishFrame(device)
 
     fun getAdapterPriority(): Int {
-        val adapterPriority = System.getProperty("skiko.metal.gpu.priority")
+        val adapterPriority = GpuPriority.parse(System.getProperty("skiko.metal.gpu.priority"))
         return when (adapterPriority) {
-            "auto" -> 0
-            "integrated" -> 1
-            "discrete" -> 2
+            GpuPriority.Auto -> 0
+            GpuPriority.Integrated -> 1
+            GpuPriority.Discrete -> 2
             else -> 0
         }
     }

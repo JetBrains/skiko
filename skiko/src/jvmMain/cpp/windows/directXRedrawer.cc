@@ -209,7 +209,7 @@ extern "C"
     {
         DXGI_ADAPTER_DESC1 desc;
         hardwareAdapter->GetDesc1(&desc);
-        if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
+        if ((desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) != 0)
         {
             return true;
         }
@@ -240,16 +240,11 @@ extern "C"
                 {
                     break;
                 }
-
-                DXGI_ADAPTER_DESC1 desc;
-                pAdapter->GetDesc1(&desc);
-                std::wstring currentAdapterName(desc.Description);
-                fwprintf(stderr, L"Adapter #%d: %s  %d\n", adapterIndex, currentAdapterName.c_str(), adapterPriority);
-
                 if (SUCCEEDED(D3D12CreateDevice(pAdapter, D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), nullptr)))
                 {
                     if (isBlacklisted(pAdapter))
                     {
+                        pAdapter->Release();
                         continue;
                     }
                     *ppAdapter = pAdapter;
@@ -273,6 +268,7 @@ extern "C"
                 {
                     if (isBlacklisted(pAdapter))
                     {
+                        pAdapter->Release();
                         continue;
                     }
                     *ppAdapter = pAdapter;
