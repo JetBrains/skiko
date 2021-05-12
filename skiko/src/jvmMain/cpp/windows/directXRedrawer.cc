@@ -14,6 +14,7 @@
 #include "d3d/GrD3DBackendContext.h"
 #include <d3d12.h>
 #include <dxgi1_4.h>
+#include <dxgi1_6.h>
 
 #define GR_D3D_CALL_ERRCHECK(X)                                        \
     do                                                                 \
@@ -208,6 +209,10 @@ extern "C"
     {
         DXGI_ADAPTER_DESC1 desc;
         hardwareAdapter->GetDesc1(&desc);
+        if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
+        {
+            return true;
+        }
         std::wstring currentAdapterName(desc.Description);
         for (std::wstring name : adapterBlacklist)
         {
@@ -220,32 +225,67 @@ extern "C"
         return false;
     }
 
-    bool defineHardwareAdapter(IDXGIFactory4 *pFactory, IDXGIAdapter1 **ppAdapter)
+    bool defineHardwareAdapter(DXGI_GPU_PREFERENCE adapterPriority, IDXGIFactory4 *pFactory, IDXGIAdapter1 **ppAdapter)
     {
         *ppAdapter = nullptr;
-        for (UINT adapterIndex = 0;; ++adapterIndex)
+
+#if defined(__dxgi1_6_h__) && defined(NTDDI_WIN10_RS4)
+        gr_cp<IDXGIFactory6> factory6;
+        if (SUCCEEDED(pFactory->QueryInterface(IID_PPV_ARGS(&factory6))))
         {
-            IDXGIAdapter1 *pAdapter = nullptr;
-            if (DXGI_ERROR_NOT_FOUND == pFactory->EnumAdapters1(adapterIndex, &pAdapter))
+            for (UINT adapterIndex = 0;; ++adapterIndex)
             {
-                break;
-            }
-            if (SUCCEEDED(D3D12CreateDevice(pAdapter, D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), nullptr)))
-            {
-                if (isBlacklisted(pAdapter))
+                IDXGIAdapter1 *pAdapter = nullptr;
+                if (!SUCCEEDED(factory6->EnumAdapterByGpuPreference(adapterIndex, adapterPriority, IID_PPV_ARGS(&pAdapter))))
                 {
-                    continue;
+                    break;
                 }
-                *ppAdapter = pAdapter;
-                return true;
+
+                DXGI_ADAPTER_DESC1 desc;
+                pAdapter->GetDesc1(&desc);
+                std::wstring currentAdapterName(desc.Description);
+                fwprintf(stderr, L"Adapter #%d: %s  %d\n", adapterIndex, currentAdapterName.c_str(), adapterPriority);
+
+                if (SUCCEEDED(D3D12CreateDevice(pAdapter, D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), nullptr)))
+                {
+                    if (isBlacklisted(pAdapter))
+                    {
+                        continue;
+                    }
+                    *ppAdapter = pAdapter;
+                    return true;
+                }
+                pAdapter->Release();
             }
-            pAdapter->Release();
+        }
+#endif
+
+        if (*ppAdapter == nullptr)
+        {
+            for (UINT adapterIndex = 0;; ++adapterIndex)
+            {
+                IDXGIAdapter1 *pAdapter = nullptr;
+                if (DXGI_ERROR_NOT_FOUND == pFactory->EnumAdapters1(adapterIndex, &pAdapter))
+                {
+                    break;
+                }
+                if (SUCCEEDED(D3D12CreateDevice(pAdapter, D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), nullptr)))
+                {
+                    if (isBlacklisted(pAdapter))
+                    {
+                        continue;
+                    }
+                    *ppAdapter = pAdapter;
+                    return true;
+                }
+                pAdapter->Release();
+            }
         }
         return false;
     }
 
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_createDirectXDevice(
-        JNIEnv *env, jobject redrawer, jlong windowHandle)
+        JNIEnv *env, jobject redrawer, jint adapterPriority, jlong windowHandle)
     {
         gr_cp<IDXGIFactory4> deviceFactory;
         if (!SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&deviceFactory))))
@@ -253,7 +293,7 @@ extern "C"
             return 0;
         }
         gr_cp<IDXGIAdapter1> hardwareAdapter;
-        if (!defineHardwareAdapter(deviceFactory.get(), &hardwareAdapter))
+        if (!defineHardwareAdapter((DXGI_GPU_PREFERENCE) adapterPriority, deviceFactory.get(), &hardwareAdapter))
         {
             return 0;
         }

@@ -64,13 +64,23 @@ internal class Direct3DRedrawer(
         makeDirectXSurface(device, context, width, height, index)
     )
 
-    fun createDevice(): Long = createDirectXDevice(layer.windowHandle)
+    fun createDevice(): Long = createDirectXDevice(getAdapterPriority(), layer.windowHandle)
 
     fun finishFrame(device: Long, context: Long, surface: Long) {
         finishFrame(device, context, surface, properties.isVsyncEnabled)
     }
 
-    external fun createDirectXDevice(windowHandle: Long): Long
+    fun getAdapterPriority(): Int {
+        val adapterPriority = System.getProperty("skiko.directx.gpu.priority")
+        return when (adapterPriority) {
+            "auto" -> 0
+            "integrated" -> 1
+            "discrete" -> 2
+            else -> 0
+        }
+    }
+
+    external fun createDirectXDevice(adapterPriority: Int, windowHandle: Long): Long
     external fun makeDirectXContext(device: Long): Long
     external fun makeDirectXSurface(device: Long, context: Long, width: Int, height: Int, index: Int): Long
     external fun resizeBuffers(device: Long, width: Int, height: Int)
