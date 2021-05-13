@@ -57,10 +57,10 @@ extern "C"
     }
 
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_AngleRedrawer_createAngleDevice(
-        JNIEnv *env, jobject redrawer, jlong windowHandle)
+        JNIEnv *env, jobject redrawer, jlong contentHandle)
     {
         AngleDevice *angleDevice = new AngleDevice();
-        angleDevice->window = (HWND)windowHandle;
+        angleDevice->window = (HWND)contentHandle;
         angleDevice->device = GetDC(angleDevice->window);
         angleDevice->display = getAngleEGLDisplay(angleDevice->device);
         if (EGL_NO_DISPLAY == angleDevice->display)

@@ -55,8 +55,8 @@ internal abstract class ContextHandler(val layer: SkiaLayer) {
         renderTarget?.close()
     }
 
-    protected open fun rendererInfo(): String {
-        return "${layer.renderApi} rendering info:\n" +
+    open fun rendererInfo(): String {
+        return "GraphicsApi: ${layer.renderApi}\n" +
             "OS: $hostFullName\n" +
             "Java: $javaVendor\n" +
             "Java location: $javaLocation\n"

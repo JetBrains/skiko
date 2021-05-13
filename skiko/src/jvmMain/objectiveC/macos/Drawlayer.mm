@@ -3,8 +3,6 @@
 
 #define GL_SILENCE_DEPRECATION
 
-#define kNullWindowHandle NULL
-
 #import <Cocoa/Cocoa.h>
 #import <QuartzCore/QuartzCore.h>
 #import <Metal/Metal.h>
@@ -168,6 +166,12 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_osxSetFulls
 }
 
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getWindowHandle(JNIEnv *env, jobject canvas, jlong platformInfoPtr)
+{
+    NSWindow* window = findWindow(platformInfoPtr);
+    return (jlong)window;
+}
+
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getContentHandle(JNIEnv *env, jobject canvas, jlong platformInfoPtr)
 {
     NSWindow* window = findWindow(platformInfoPtr);
     return (jlong)window;

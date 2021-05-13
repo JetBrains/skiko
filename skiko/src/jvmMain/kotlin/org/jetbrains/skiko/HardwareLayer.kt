@@ -51,6 +51,9 @@ internal open class HardwareLayer : Canvas() {
         return scale
     }
 
+    val contentHandle: Long
+        get() = useDrawingSurfacePlatformInfo(::getContentHandle)
+
     val windowHandle: Long
         get() = useDrawingSurfacePlatformInfo(::getWindowHandle)
 
@@ -61,5 +64,6 @@ internal open class HardwareLayer : Canvas() {
         get() = platformOperations.isFullscreen(this)
         set(value) = platformOperations.setFullscreen(this, value)
 
+    private external fun getContentHandle(platformInfo: Long): Long
     private external fun getWindowHandle(platformInfo: Long): Long
 }

@@ -65,7 +65,7 @@ internal class Direct3DRedrawer(
         makeDirectXSurface(device, context, width, height, index)
     )
 
-    fun createDevice(): Long = createDirectXDevice(getAdapterPriority(), layer.windowHandle)
+    fun createDevice(): Long = createDirectXDevice(getAdapterPriority(), layer.contentHandle)
 
     fun finishFrame(device: Long, context: Long, surface: Long) {
         finishFrame(device, context, surface, properties.isVsyncEnabled)
@@ -81,7 +81,7 @@ internal class Direct3DRedrawer(
         }
     }
 
-    external fun createDirectXDevice(adapterPriority: Int, windowHandle: Long): Long
+    external fun createDirectXDevice(adapterPriority: Int, contentHandle: Long): Long
     external fun makeDirectXContext(device: Long): Long
     external fun makeDirectXSurface(device: Long, context: Long, width: Int, height: Int, index: Int): Long
     external fun resizeBuffers(device: Long, width: Int, height: Int)

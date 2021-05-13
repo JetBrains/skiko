@@ -72,6 +72,9 @@ open class SkiaLayer(
     val contentScale: Float
         get() = backedLayer.contentScale
 
+    val contentHandle: Long
+        get() = backedLayer.contentHandle
+
     val windowHandle: Long
         get() = backedLayer.windowHandle
 
@@ -94,6 +97,11 @@ open class SkiaLayer(
             this.renderApi_ = value
             notifyChange(PropertyKind.Renderer)
         }
+    val renderInfo: String
+        get() = if (contextHandler?.context == null)
+            "ContextHandler hasn't been initialized yet."
+        else
+            contextHandler!!.rendererInfo()
 
     @Volatile
     private var picture: PictureHolder? = null
