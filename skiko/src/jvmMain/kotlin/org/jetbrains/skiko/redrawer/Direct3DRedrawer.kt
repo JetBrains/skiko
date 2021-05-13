@@ -86,7 +86,7 @@ internal class Direct3DRedrawer(
     external fun makeDirectXSurface(device: Long, context: Long, width: Int, height: Int, index: Int): Long
     external fun resizeBuffers(device: Long, width: Int, height: Int)
     private external fun finishFrame(device: Long, context: Long, surface: Long, isVsyncEnabled: Boolean)
-    external fun disposeDevice(device: Long, context: Long)
+    external fun disposeDevice(device: Long)
     external fun getBufferIndex(device: Long): Int
     external fun initSwapChain(device: Long)
     external fun initFence(device: Long)

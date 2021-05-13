@@ -94,11 +94,7 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextHandler(layer) 
     }
 
     override fun destroyContext() {
-        try {
-            directXRedrawer.disposeDevice(device, Native.getPtr(context!!))
-        } finally {
-            Reference.reachabilityFence(context!!)
-        }
+        directXRedrawer.disposeDevice(device)
         context?.close()
     }
 

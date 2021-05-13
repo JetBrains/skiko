@@ -438,23 +438,9 @@ extern "C"
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_disposeDevice(
-        JNIEnv *env, jobject redrawer, jlong devicePtr, jlong contextPtr)
+        JNIEnv *env, jobject redrawer, jlong devicePtr)
     {
         DirectXDevice *d3dDevice = fromJavaPointer<DirectXDevice *>(devicePtr);
-        GrDirectContext *context = fromJavaPointer<GrDirectContext *>(contextPtr);
-
-        context->flush({});
-        context->submit(true);
-
-        for (int i = 0; i < BuffersCount; i++)
-        {
-            if (d3dDevice->fence->GetCompletedValue() < d3dDevice->fenceValues[i])
-            {
-                GR_D3D_CALL_ERRCHECK(d3dDevice->fence->SetEventOnCompletion(d3dDevice->fenceValues[i], d3dDevice->fenceEvent));
-                WaitForSingleObjectEx(d3dDevice->fenceEvent, INFINITE, FALSE);
-            }
-        }
-
         delete d3dDevice;
     }
 
