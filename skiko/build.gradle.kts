@@ -568,6 +568,13 @@ tasks.withType<AbstractPublishToMaven>().configureEach {
     }
 }
 
+tasks.withType<Test>().configureEach {
+    options {
+        systemProperty("skiko.library.path",
+            "${buildDir.absolutePath}/lib/main/${buildType.id.toLowerCase()}/${targetOs.id.toLowerCase()}")
+    }
+}
+
 fun Publication.isSkikoPublication() =
     (this as? MavenPublication)?.name?.startsWith("skiko") == true
 
