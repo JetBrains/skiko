@@ -5,9 +5,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import org.jetbrains.skiko.DrawingSurface
 import org.jetbrains.skiko.FrameDispatcher
-import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.HardwareLayer
 import org.jetbrains.skiko.OpenGLApi
+import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaLayerProperties
 import org.jetbrains.skiko.getDrawingSurface
 
@@ -32,6 +32,10 @@ internal class LinuxOpenGLRedrawer(
         check(!isDisposed)
         toRedraw.add(this)
         frameDispatcher.scheduleFrame()
+    }
+
+    override suspend fun awaitRedraw(): Boolean {
+        return frameDispatcher.awaitFrame()
     }
 
     override fun redrawImmediately() = layer.backedLayer.lockDrawingSurface {

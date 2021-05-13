@@ -3,8 +3,8 @@ package org.jetbrains.skiko.redrawer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
-import org.jetbrains.skija.Surface
 import org.jetbrains.skija.DirectContext
+import org.jetbrains.skija.Surface
 import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.GpuPriority
 import org.jetbrains.skiko.SkiaLayer
@@ -31,6 +31,10 @@ internal class Direct3DRedrawer(
     override fun needRedraw() {
         check(!isDisposed)
         frameDispatcher.scheduleFrame()
+    }
+
+    override suspend fun awaitRedraw(): Boolean {
+        return frameDispatcher.awaitFrame()
     }
 
     override fun redrawImmediately() {

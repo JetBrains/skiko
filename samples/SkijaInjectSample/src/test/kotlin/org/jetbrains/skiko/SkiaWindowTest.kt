@@ -18,6 +18,7 @@ import org.junit.Assume.assumeTrue
 import org.junit.Rule
 import org.junit.Test
 import java.awt.Color
+import java.awt.Dimension
 import java.awt.Robot
 import java.awt.event.WindowEvent
 import javax.swing.JFrame
@@ -58,6 +59,32 @@ class SkiaWindowTest {
             val renderer = RectRenderer(window.layer, 200, 100, Color.RED)
             window.layer.renderer = renderer
             window.isUndecorated = true
+            window.isVisible = true
+
+            delay(1000)
+            screenshots.assert(window.bounds, "frame1")
+
+            renderer.rectWidth = 100
+            window.layer.needRedraw()
+            delay(1000)
+            screenshots.assert(window.bounds, "frame2")
+        } finally {
+            window.close()
+        }
+    }
+
+    @Test
+    fun `render single window before window show`() = swingTest {
+        val window = SkiaWindow()
+        try {
+            window.setLocation(200, 200)
+            window.preferredSize = Dimension(400, 200)
+            window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+            val renderer = RectRenderer(window.layer, 200, 100, Color.RED)
+            window.layer.renderer = renderer
+            window.isUndecorated = true
+            window.pack()
+            window.layer.awaitRedraw()
             window.isVisible = true
 
             delay(1000)

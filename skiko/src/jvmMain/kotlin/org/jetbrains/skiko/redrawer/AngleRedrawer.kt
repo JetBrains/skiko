@@ -32,6 +32,10 @@ internal class AngleRedrawer(
         frameDispatcher.scheduleFrame()
     }
 
+    override suspend fun awaitRedraw(): Boolean {
+        return frameDispatcher.awaitFrame()
+    }
+
     override fun redrawImmediately() {
         check(!isDisposed)
         update(System.nanoTime())
