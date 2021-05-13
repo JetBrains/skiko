@@ -1,5 +1,9 @@
 package org.jetbrains.skiko
 
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.swing.Swing
+import kotlinx.coroutines.withContext
 import org.jetbrains.skija.Canvas
 import org.jetbrains.skija.ClipMode
 import org.jetbrains.skija.Picture
@@ -53,17 +57,18 @@ open class SkiaLayer(
         add(backedLayer)
         @Suppress("LeakingThis")
         backedLayer.addHierarchyListener {
-            if (it.changeFlags and HierarchyEvent.SHOWING_CHANGED.toLong() != 0L) {
-                checkIsShowing()
+            if (it.changeFlags and HierarchyEvent.DISPLAYABILITY_CHANGED.toLong() != 0L) {
+                checkInit()
             }
         }
     }
 
-    private var isInited = false
+    private val onInit = CompletableDeferred<Unit>()
+    private val isInited get() = onInit.isCompleted
     private var isRendering = false
 
-    private fun checkIsShowing() {
-        if (!isInited && isShowing) {
+    private fun checkInit() {
+        if (!isInited && isDisplayable) {
             backedLayer.defineContentScale()
             init()
         }
@@ -113,7 +118,7 @@ open class SkiaLayer(
         renderApi = fallbackRenderApiQueue.removeAt(0)
         contextHandler = createContextHandler(this, renderApi)
         redrawer = platformOperations.createRedrawer(this, renderApi, properties)
-        isInited = true
+        onInit.complete(Unit)
     }
 
     private val stateHandlers =
@@ -250,6 +255,20 @@ open class SkiaLayer(
         check(!isDisposed)
         check(isEventDispatchThread())
         redrawer?.needRedraw()
+    }
+
+    /**
+     * Redraw on the next animation Frame (on vsync signal if vsync is enabled),
+     * and wait the frame to finish.
+     *
+     * @return true if frame was rendered, false if rendering loop was completed (cancelled or there was an exception inside it)
+     */
+    suspend fun awaitRedraw(): Boolean {
+        return withContext(Dispatchers.Swing) {
+            check(!isDisposed)
+            onInit.await()
+            redrawer!!.awaitRedraw()
+        }
     }
 
     @Suppress("LeakingThis")

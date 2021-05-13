@@ -24,6 +24,10 @@ internal class SoftwareRedrawer(
         frameDispatcher.scheduleFrame()
     }
 
+    override suspend fun awaitRedraw(): Boolean {
+        return frameDispatcher.awaitFrame()
+    }
+
     override fun redrawImmediately() {
         layer.update(System.nanoTime())
         if (layer.prepareDrawContext()) {

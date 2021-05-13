@@ -1,5 +1,9 @@
 package SkijaInjectSample
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.swing.Swing
+import kotlinx.coroutines.yield
 import org.jetbrains.skija.*
 import org.jetbrains.skija.paragraph.FontCollection
 import org.jetbrains.skija.paragraph.ParagraphBuilder
@@ -8,6 +12,7 @@ import org.jetbrains.skija.paragraph.TextStyle
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaRenderer
 import org.jetbrains.skiko.SkiaWindow
+import java.awt.Dimension
 import java.awt.Toolkit
 import java.awt.event.*
 import javax.swing.*
@@ -20,7 +25,7 @@ fun main(args: Array<String>) {
     }
 }
 
-fun createWindow(title: String) = SwingUtilities.invokeLater {
+fun createWindow(title: String) = runBlocking(Dispatchers.Swing) {
     var mouseX = 0
     var mouseY = 0
 
@@ -74,9 +79,11 @@ fun createWindow(title: String) = SwingUtilities.invokeLater {
         }
     })
 
-    // MANDATORY: set window size before calling setVisible(true)
-    window.setSize(800, 600)
-    window.setVisible(true)
+    // MANDATORY: set window preferred size before calling pack()
+    window.preferredSize = Dimension(800, 600)
+    window.pack()
+    window.layer.awaitRedraw()
+    window.isVisible = true
 }
 
 class Renderer(
