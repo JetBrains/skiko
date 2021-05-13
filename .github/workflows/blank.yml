@@ -30,6 +30,7 @@ jobs:
       - shell: bash
         run: |
           cd $GITHUB_WORKSPACE/skiko
+          ./gradlew test
           ./gradlew publishToMavenLocal
           ./gradlew -Pskiko.native.enabled=true publishToMavenLocal
    linux:
@@ -58,6 +59,7 @@ jobs:
           sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 60 --slave /usr/bin/g++ g++ /usr/bin/g++-9
           sudo update-alternatives --config gcc 
           sudo apt-get install ninja-build fontconfig libfontconfig1-dev libglu1-mesa-dev zip -y          
+          ./gradlew test
           ./gradlew publishToMavenLocal
    windows:
     runs-on: windows-2019
@@ -72,4 +74,5 @@ jobs:
       - shell: bash
         run: |
           cd ./skiko
+          ./gradlew test
           ./gradlew publishToMavenLocal

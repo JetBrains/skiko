@@ -510,6 +510,14 @@ val skikoJvmJar: Provider<Jar> by tasks.registering(Jar::class) {
     from(kotlin.jvm().compilations["main"].output.allOutputs)
 }
 
+val skikoNativeLib: File
+    get() {
+        val linkTask = project.tasks.withType(LinkSharedLibrary::class.java).single { it.name.contains(buildType.id) }
+        val lib =
+            linkTask.outputs.files.single { it.name.endsWith(".dll") || it.name.endsWith(".dylib") || it.name.endsWith(".so") }
+        return lib
+    }
+
 val maybeSign by project.tasks.registering {
     val linkTask = project.tasks.withType(LinkSharedLibrary::class.java).single { it.name.contains(buildType.id) }
     dependsOn(linkTask)
@@ -565,6 +573,14 @@ tasks.withType<AbstractPublishToMaven>().configureEach {
         if (!publication.name.startsWith("skiko")) {
             throw StopExecutionException("Publication '${publication.name}' is disabled")
         }
+    }
+}
+
+tasks.withType<Test>().configureEach {
+    dependsOn(project.tasks.withType(LinkSharedLibrary::class.java).single { it.name.contains(buildType.id) })
+    options {
+        val dir = skikoNativeLib.parentFile.absolutePath
+        systemProperty("skiko.library.path", dir)
     }
 }
 
