@@ -577,6 +577,7 @@ tasks.withType<AbstractPublishToMaven>().configureEach {
 }
 
 tasks.withType<Test>().configureEach {
+    dependsOn(project.tasks.withType(LinkSharedLibrary::class.java).single { it.name.contains(buildType.id) })
     options {
         val dir = skikoNativeLib.parentFile.absolutePath
         systemProperty("skiko.library.path", dir)
