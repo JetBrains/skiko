@@ -10,6 +10,7 @@ import org.jetbrains.skija.paragraph.TextStyle
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaRenderer
 import org.jetbrains.skiko.SkiaWindow
+import org.jetbrains.skiko.toBufferedImage
 import java.awt.Dimension
 import java.awt.Toolkit
 import java.awt.event.*
@@ -32,15 +33,6 @@ import javax.imageio.ImageIO
 fun main(args: Array<String>) {
     repeat(1) {
         createWindow("window $it")
-    }
-}
-
-class DirectDataBuffer(val backing: ByteBuffer): DataBuffer(TYPE_BYTE, backing.limit()) {
-    override fun getElem(bank: Int, index: Int): Int {
-        return backing[index].toInt()
-    }
-    override fun setElem(bank: Int, index: Int, value: Int) {
-        throw UnsupportedOperationException("no write access")
     }
 }
 
@@ -84,24 +76,7 @@ fun createWindow(title: String) = runBlocking(Dispatchers.Swing) {
         override fun actionPerformed(actionEvent: ActionEvent?) {
             val screenshot = window.layer.screenshot()!!
             GlobalScope.launch(Dispatchers.IO) {
-                val pixels = screenshot.peekPixels()
-                val raster = Raster.createInterleavedRaster(
-                    DirectDataBuffer(pixels!!),
-                    screenshot.width,
-                    screenshot.height,
-                    screenshot.width * 4,
-                    4,
-                    intArrayOf(2, 1, 0, 3), // BGRA order
-                    null
-                )
-                val colorModel = ComponentColorModel(
-                    ColorSpace.getInstance(ColorSpace.CS_sRGB),
-                    true,
-                    false,
-                    Transparency.TRANSLUCENT,
-                    DataBuffer.TYPE_BYTE
-                )
-                val image = BufferedImage(colorModel, raster!!, false, null)
+                val image = screenshot.toBufferedImage()
                 ImageIO.write(image, "png", File(defaultScreenshotPath))
                 println("Saved to $defaultScreenshotPath")
             }
