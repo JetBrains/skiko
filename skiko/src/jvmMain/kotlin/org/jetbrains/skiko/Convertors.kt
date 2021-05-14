@@ -1,6 +1,7 @@
 package org.jetbrains.skiko
 
 import org.jetbrains.skija.Bitmap
+import org.jetbrains.skija.ColorType
 import java.awt.Transparency
 import java.awt.color.ColorSpace
 import java.awt.image.BufferedImage
@@ -20,13 +21,18 @@ private class DirectDataBuffer(val backing: ByteBuffer): DataBuffer(TYPE_BYTE, b
 
 fun Bitmap.toBufferedImage(): BufferedImage {
     val pixels = this.peekPixels()
+    val order = when (this.colorInfo.colorType) {
+        ColorType.RGB_888X -> intArrayOf(0, 1, 2, 3)
+        ColorType.BGRA_8888 -> intArrayOf(2, 1, 0, 3)
+        else -> throw UnsupportedOperationException("unsupported color type ${this.colorInfo.colorType}")
+    }
     val raster = Raster.createInterleavedRaster(
         DirectDataBuffer(pixels!!),
         this.width,
         this.height,
         this.width * 4,
         4,
-        intArrayOf(2, 1, 0, 3), // BGRA order
+        order,
         null
     )
     val colorModel = ComponentColorModel(
