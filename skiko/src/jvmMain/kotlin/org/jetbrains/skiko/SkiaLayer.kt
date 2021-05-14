@@ -343,6 +343,7 @@ open class SkiaLayer(
                     store.allocN32Pixels(picture.width, picture.height)
                     val canvas = Canvas(store)
                     canvas.drawPicture(picture.instance)
+                    store.setImmutable()
                     store
                 } else {
                     null

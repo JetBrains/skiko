@@ -25,6 +25,7 @@ import java.awt.image.DataBuffer
 import java.awt.image.Raster
 import java.io.File
 import java.nio.ByteBuffer
+import java.nio.file.Files
 import javax.imageio.ImageIO
 
 
@@ -74,7 +75,8 @@ fun createWindow(title: String) = runBlocking(Dispatchers.Swing) {
         }
     })
 
-    val defaultScreenshotPath = "/tmp/compose.png"
+    val defaultScreenshotPath =
+        Files.createTempFile("compose_", ".png").toAbsolutePath().toString()
     val miTakeScreenshot = JMenuItem("Take screenshot to $defaultScreenshotPath")
     val ctrlS = KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx())
     miTakeScreenshot.setAccelerator(ctrlS)
