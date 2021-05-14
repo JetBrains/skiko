@@ -14,21 +14,12 @@ import org.jetbrains.skiko.toBufferedImage
 import java.awt.Dimension
 import java.awt.Toolkit
 import java.awt.event.*
-import java.awt.image.BufferedImage
 import javax.swing.*
 import kotlin.math.cos
 import kotlin.math.sin
-import java.awt.Graphics2D
-import java.awt.Transparency
-import java.awt.color.ColorSpace
-import java.awt.image.ComponentColorModel
-import java.awt.image.DataBuffer
-import java.awt.image.Raster
 import java.io.File
-import java.nio.ByteBuffer
 import java.nio.file.Files
 import javax.imageio.ImageIO
-
 
 fun main(args: Array<String>) {
     repeat(1) {
