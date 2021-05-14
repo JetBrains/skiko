@@ -1,9 +1,7 @@
 package SkijaInjectSample
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import kotlinx.coroutines.swing.Swing
-import kotlinx.coroutines.yield
 import org.jetbrains.skija.*
 import org.jetbrains.skija.paragraph.FontCollection
 import org.jetbrains.skija.paragraph.ParagraphBuilder
@@ -15,13 +13,33 @@ import org.jetbrains.skiko.SkiaWindow
 import java.awt.Dimension
 import java.awt.Toolkit
 import java.awt.event.*
+import java.awt.image.BufferedImage
 import javax.swing.*
 import kotlin.math.cos
 import kotlin.math.sin
+import java.awt.Graphics2D
+import java.awt.Transparency
+import java.awt.color.ColorSpace
+import java.awt.image.ComponentColorModel
+import java.awt.image.DataBuffer
+import java.awt.image.Raster
+import java.io.File
+import java.nio.ByteBuffer
+import javax.imageio.ImageIO
+
 
 fun main(args: Array<String>) {
     repeat(1) {
         createWindow("window $it")
+    }
+}
+
+class DirectDataBuffer(val backing: ByteBuffer): DataBuffer(TYPE_BYTE, backing.limit()) {
+    override fun getElem(bank: Int, index: Int): Int {
+        return backing[index].toInt()
+    }
+    override fun setElem(bank: Int, index: Int, value: Int) {
+        throw UnsupportedOperationException("no write access")
     }
 }
 
@@ -56,8 +74,41 @@ fun createWindow(title: String) = runBlocking(Dispatchers.Swing) {
         }
     })
 
+    val defaultScreenshotPath = "/tmp/compose.png"
+    val miTakeScreenshot = JMenuItem("Take screenshot to $defaultScreenshotPath")
+    val ctrlS = KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx())
+    miTakeScreenshot.setAccelerator(ctrlS)
+    miTakeScreenshot.addActionListener(object : ActionListener {
+        override fun actionPerformed(actionEvent: ActionEvent?) {
+            val screenshot = window.layer.screenshot()!!
+            GlobalScope.launch(Dispatchers.IO) {
+                val pixels = screenshot.peekPixels()
+                val raster = Raster.createInterleavedRaster(
+                    DirectDataBuffer(pixels!!),
+                    screenshot.width,
+                    screenshot.height,
+                    screenshot.width * 4,
+                    4,
+                    intArrayOf(2, 1, 0, 3), // BGRA order
+                    null
+                )
+                val colorModel = ComponentColorModel(
+                    ColorSpace.getInstance(ColorSpace.CS_sRGB),
+                    true,
+                    false,
+                    Transparency.TRANSLUCENT,
+                    DataBuffer.TYPE_BYTE
+                )
+                val image = BufferedImage(colorModel, raster!!, false, null)
+                ImageIO.write(image, "png", File(defaultScreenshotPath))
+                println("Saved to $defaultScreenshotPath")
+            }
+        }
+    })
+
     menu.add(miToggleFullscreen)
     menu.add(miFullscreenState)
+    menu.add(miTakeScreenshot)
 
     window.setJMenuBar(menuBar)
 
