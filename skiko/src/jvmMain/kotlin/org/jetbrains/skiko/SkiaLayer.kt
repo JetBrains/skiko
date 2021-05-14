@@ -4,11 +4,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
-import org.jetbrains.skija.Canvas
-import org.jetbrains.skija.ClipMode
-import org.jetbrains.skija.Picture
-import org.jetbrains.skija.PictureRecorder
-import org.jetbrains.skija.Rect
+import org.jetbrains.skija.*
 import org.jetbrains.skiko.context.ContextHandler
 import org.jetbrains.skiko.context.createContextHandler
 import org.jetbrains.skiko.redrawer.Redrawer
@@ -331,6 +327,28 @@ open class SkiaLayer(
                 }
             }
             flush()
+        }
+    }
+
+    // Captures current layer as bitmap.
+    fun screenshot(): Bitmap? {
+        return contextHandler?.let {
+            synchronized(pictureLock) {
+                val picture = picture
+                if (picture != null) {
+                    val store = Bitmap()
+                    val ci = ColorInfo(
+                        ColorType.BGRA_8888, ColorAlphaType.OPAQUE, ColorSpace.getSRGBLinear())
+                    store.imageInfo = ImageInfo(ci, picture.width, picture.height)
+                    store.allocN32Pixels(picture.width, picture.height)
+                    val canvas = Canvas(store)
+                    canvas.drawPicture(picture.instance)
+                    store.setImmutable()
+                    store
+                } else {
+                    null
+                }
+            }
         }
     }
 

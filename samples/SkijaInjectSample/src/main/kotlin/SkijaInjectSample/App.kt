@@ -1,9 +1,7 @@
 package SkijaInjectSample
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import kotlinx.coroutines.swing.Swing
-import kotlinx.coroutines.yield
 import org.jetbrains.skija.*
 import org.jetbrains.skija.paragraph.FontCollection
 import org.jetbrains.skija.paragraph.ParagraphBuilder
@@ -12,12 +10,16 @@ import org.jetbrains.skija.paragraph.TextStyle
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaRenderer
 import org.jetbrains.skiko.SkiaWindow
+import org.jetbrains.skiko.toBufferedImage
 import java.awt.Dimension
 import java.awt.Toolkit
 import java.awt.event.*
 import javax.swing.*
 import kotlin.math.cos
 import kotlin.math.sin
+import java.io.File
+import java.nio.file.Files
+import javax.imageio.ImageIO
 
 fun main(args: Array<String>) {
     repeat(1) {
@@ -56,8 +58,25 @@ fun createWindow(title: String) = runBlocking(Dispatchers.Swing) {
         }
     })
 
+    val defaultScreenshotPath =
+        Files.createTempFile("compose_", ".png").toAbsolutePath().toString()
+    val miTakeScreenshot = JMenuItem("Take screenshot to $defaultScreenshotPath")
+    val ctrlS = KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx())
+    miTakeScreenshot.setAccelerator(ctrlS)
+    miTakeScreenshot.addActionListener(object : ActionListener {
+        override fun actionPerformed(actionEvent: ActionEvent?) {
+            val screenshot = window.layer.screenshot()!!
+            GlobalScope.launch(Dispatchers.IO) {
+                val image = screenshot.toBufferedImage()
+                ImageIO.write(image, "png", File(defaultScreenshotPath))
+                println("Saved to $defaultScreenshotPath")
+            }
+        }
+    })
+
     menu.add(miToggleFullscreen)
     menu.add(miFullscreenState)
+    menu.add(miTakeScreenshot)
 
     window.setJMenuBar(menuBar)
 
