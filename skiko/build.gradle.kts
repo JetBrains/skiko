@@ -47,7 +47,7 @@ val skiaZip = run {
     tasks.register("downloadSkia", Download::class) {
         onlyIf { skiko.skiaDir == null && !zipFile.exists() }
         inputs.property("skia.release.for.target.os", skiko.skiaReleaseForTargetOS)
-        src("https://github.com/olonho/skia-build/releases/download/$zipName")
+        src("https://github.com/JetBrains/skia-pack/releases/download/$zipName")
         dest(zipFile)
         onlyIfModified(true)
     }.map { zipFile }

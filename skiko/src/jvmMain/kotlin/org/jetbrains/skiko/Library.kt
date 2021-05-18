@@ -66,7 +66,6 @@ object Library {
         try {
             // Init code executed after library was loaded.
             org.jetbrains.skija.impl.Library._nAfterLoad()
-            println("after load called")
         } catch (t: Throwable) {
             t.printStackTrace()
         }
