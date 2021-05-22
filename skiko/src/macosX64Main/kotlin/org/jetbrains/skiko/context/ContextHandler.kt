@@ -18,10 +18,10 @@ internal abstract class ContextHandler(val layer: HardwareLayer) {
     // TODO: hostOs is all written in jdk kotlin.
     // open val bleachConstant = if (hostOs == OS.MacOS) 0 else -1
     open val bleachConstant = 0U
-    var context: GrDirectContext? = null
-    var renderTarget: GrBackendRenderTarget? = null
-    var surface: SkSurface? = null
-    var canvas: SkCanvas? = null
+    var context: DirectContext? = null
+    var renderTarget: BackendRenderTarget? = null
+    var surface: Surface? = null
+    var canvas: Canvas? = null
 
     abstract fun initContext(): Boolean
 
@@ -32,9 +32,9 @@ internal abstract class ContextHandler(val layer: HardwareLayer) {
         canvas?.clear(bleachConstant)
     }
 
-    open fun drawOnCanvas(picture: SkPicture) {
+    open fun drawOnCanvas(picture: Picture) {
         println("ContextHandler::drawOnCanvas")
-        canvas?.drawPicture(picture.ptr)
+        canvas?.drawPicture(picture)
     }
 
     open fun flush() {

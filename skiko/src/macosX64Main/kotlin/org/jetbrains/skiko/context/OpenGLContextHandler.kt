@@ -14,7 +14,7 @@ internal class OpenGLContextHandler(layer: HardwareLayer) : ContextHandler(layer
         println("OpenGLContextHandler::initContext")
         try {
             if (context == null) {
-                context = GrDirectContext.MakeGL()
+                context = DirectContext.MakeGL()
             }
         } catch (e: Exception) {
             println("Failed to create Skia OpenGL context!")
@@ -51,22 +51,23 @@ internal class OpenGLContextHandler(layer: HardwareLayer) : ContextHandler(layer
             val glInfo: GrGLFramebufferInfo = alloc<GrGLFramebufferInfo>()
             glInfo.fFBOID = fbId
             glInfo.fFormat = GL_RGBA8.toUInt()
-            renderTarget = GrBackendRenderTarget(w, h, 0, 8, glInfo.readValue())
+            renderTarget = BackendRenderTarget(w, h, 0, 8, glInfo.readValue())
         }
 
-        surface = SkSurface.MakeFromBackendRenderTarget(
+        surface = Surface.MakeFromBackendRenderTarget(
             // TODO: C++ interop knows nothing about inheritance.
-            context!!.ptr.reinterpret<GrRecordingContext>(),
-            renderTarget!!.ptr,
+            // As a bare minimum have an extension function for such conversions.
+            RecordingContext(context!!.cpp.ptr.reinterpret<GrRecordingContext>().pointed, managed = false),
+            renderTarget!!,
             GrSurfaceOrigin.kBottomLeft_GrSurfaceOrigin,
             colorType = kRGBA_8888_SkColorType,
-            colorSpace = SkColorSpace.MakeSRGB(),
+            colorSpace = ColorSpace.MakeSRGB(),
             surfaceProps = null,
             releaseProc = null,
             releaseContext = null
-        ) ?: error("Could not obtain SkSurface")
+        ) ?: error("Could not obtain Surface")
 
-        canvas = surface!!.getCanvas()?.pointed
-            ?: error("Could not obtain SkCanvas from SkSurface")
+        canvas = surface!!.getCanvas()
+            ?: error("Could not obtain Canvas from Surface")
     }
 }
