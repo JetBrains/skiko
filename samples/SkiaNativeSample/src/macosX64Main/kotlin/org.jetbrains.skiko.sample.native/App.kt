@@ -11,6 +11,9 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 fun main(args: Array<String>) {
+    // TODO: Remove me! This is to run all cleaners before main() exits.
+    kotlin.native.internal.Debugging.forceCheckedShutdown = true
+
     NSApplication.sharedApplication()
     createWindow("Skia/Native macos sample")
     NSApp?.run()
@@ -32,9 +35,9 @@ class Renderer(
     val layer: SkiaLayer,
     val displayScene: (Renderer, Int, Int, Long) -> Unit
 ): SkiaRenderer {
-    var canvas: SkCanvas? = null
+    var canvas: Canvas? = null
 
-    override fun onRender(canvas: SkCanvas, width: Int, height: Int, nanoTime: Long) {
+    override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
         this.canvas = canvas
         val contentScale = layer.contentScale
         canvas.scale(contentScale, contentScale)
@@ -46,7 +49,7 @@ class Renderer(
 fun displayScene(renderer: Renderer, nanoTime: Long) {
     val canvas = renderer.canvas!!
 
-    val paint = SkPaint()
+    val paint = Paint()
     paint.setColor(SK_ColorGREEN)
 
     canvas.clear(SK_ColorRED);
@@ -55,9 +58,7 @@ fun displayScene(renderer: Renderer, nanoTime: Long) {
     canvas.translate(128.0f, 128.0f)
     canvas.rotate(nanoTime.toFloat() / 1e7f)
     val rect = SkRect.MakeXYWH(-90.5f, -90.5f, 181.0f, 181.0f)
-    canvas.drawRect(rect, paint.ptr)
+    canvas.drawRect(rect, paint)
     canvas.restore();
-
-    // TODO: need memory management.
-    // nativeHeap.free(paint)
 }
+

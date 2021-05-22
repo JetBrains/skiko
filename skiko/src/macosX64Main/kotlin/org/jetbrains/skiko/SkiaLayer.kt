@@ -7,11 +7,11 @@ import org.jetbrains.skiko.native.redrawer.*
 import org.jetbrains.skiko.skia.native.*
 
 interface SkiaRenderer {
-    fun onRender(canvas: SkCanvas, width: Int, height: Int, nanoTime: Long)
+    fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long)
 }
 
 // TODO: this is exact copy of jvm counterpart. Commonize!
-private class PictureHolder(val instance: SkPicture, val width: Int, val height: Int)
+private class PictureHolder(val instance: Picture, val width: Int, val height: Int)
 
 open class SkiaLayer(
     private val properties: SkiaLayerProperties = SkiaLayerProperties()
@@ -25,7 +25,7 @@ open class SkiaLayer(
     private var redrawer: Redrawer? = null
 
     private var picture: PictureHolder? = null
-    private val pictureRecorder = SkPictureRecorder()
+    private val pictureRecorder = PictureRecorder()
     private val pictureLock = Any()
 
     override fun init() {
@@ -56,8 +56,7 @@ open class SkiaLayer(
         val bounds = SkRect.MakeWH(pictureWidth.toFloat(), pictureHeight.toFloat())
         val canvas = pictureRecorder.beginRecording(bounds, null)!!
 
-        // TODO: get rid of .pointed?
-        renderer?.onRender(canvas.pointed, pictureWidth.toInt(), pictureHeight.toInt(), nanoTime)
+        renderer?.onRender(canvas, pictureWidth.toInt(), pictureHeight.toInt(), nanoTime)
 
         val picture = pictureRecorder.finishRecordingAsPicture()!!
         this.picture = PictureHolder(picture, pictureWidth.toInt(), pictureHeight.toInt())
