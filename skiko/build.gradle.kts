@@ -412,6 +412,11 @@ fun remoteSign(signHost: String, lib: File, out: File) {
         println(out)
         println(err)
         throw GradleException("Cannot sign $lib: $err")
+    } else {
+        val outSize = out.length()
+        if (outSize < 200 * 1024) {
+            throw GradleException("Output is too short: $outSize")
+        }
     }
 }
 
