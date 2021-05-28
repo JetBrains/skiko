@@ -244,6 +244,10 @@ open class SkiaLayer(
         backedLayer.removeKeyListener(l)
     }
 
+    override fun setFocusTraversalKeysEnabled(focusTraversalKeysEnabled: Boolean) {
+        backedLayer.focusTraversalKeysEnabled = focusTraversalKeysEnabled
+    }
+
     /**
      * Redraw on the next animation Frame (on vsync signal if vsync is enabled).
      */
