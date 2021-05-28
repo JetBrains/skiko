@@ -198,7 +198,7 @@ fun displayScene(renderer: Renderer, width: Int, height: Int, nanoTime: Long, xp
     val style = ParagraphStyle()
     val paragraph = ParagraphBuilder(style, fontCollection)
             .pushStyle(TextStyle().setColor(0xFF000000.toInt()))
-            .addText("Graphics API: ${renderer.layer.renderApi}")
+            .addText("Graphics API: ${renderer.layer.renderApi} ✿ﾟ")
             .popStyle()
             .build()
     paragraph.layout(Float.POSITIVE_INFINITY)

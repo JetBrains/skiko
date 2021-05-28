@@ -51,7 +51,6 @@ object Library {
             loadOrGet(cacheDir, resourcePath, platformName, true)
             val loadIcu = hostOs.isWindows
             if (loadIcu) {
-                println("Loading ICU")
                 loadOrGet(cacheDir, resourcePath, "icudtl.dat", false)
             }
         }

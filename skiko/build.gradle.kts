@@ -170,17 +170,10 @@ kotlin {
             compilations.getByName("main") {
                 val skia by cinterops.creating {
                     defFile("src/nativeInterop/cinterop/skia.def")
-
-                        val skiaDir = skiaDir.get().absolutePath
-                        val kotlinNativeDataPath = System.getenv("KONAN_DATA_DIR")?.let { File(it) }
-                    ?: File(System.getProperty("user.home")).resolve(".konan")
-
-                        compilerOpts(
-                                "-I$skiaDir"
-                                )
-
-                        extraOpts("-staticLibrary", "libskia.a")
-                        extraOpts("-libraryPath", "$skiaDir/out/${buildType.id}-${targetArch.id}")
+                    val skiaDir = skiaDir.get().absolutePath
+                    compilerOpts("-I$skiaDir")
+                    extraOpts("-staticLibrary", "libskia.a")
+                    extraOpts("-libraryPath", "$skiaDir/out/${buildType.id}-${targetArch.id}")
                 }
             }
         }
@@ -492,7 +485,7 @@ library {
     dependencies {
         implementation(
             skiaDir.map {
-                fileTree(it.resolve("out/${buildType.id}-${targetArch.id}"))
+                fileTree(it.resolve("out/${buildType.id}-${targetOs.id}-${targetArch.id}"))
                     .matching { include(if (targetOs.isWindows) "**.lib" else "**.a") }
             }
         )
