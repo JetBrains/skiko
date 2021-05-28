@@ -8,6 +8,7 @@ import org.jetbrains.skija.*
 import org.jetbrains.skiko.context.ContextHandler
 import org.jetbrains.skiko.context.createContextHandler
 import org.jetbrains.skiko.redrawer.Redrawer
+import java.awt.AWTKeyStroke
 import java.awt.Graphics
 import java.awt.event.*
 import java.awt.im.InputMethodRequests
@@ -242,6 +243,10 @@ open class SkiaLayer(
 
     override fun removeKeyListener(l: KeyListener) {
         backedLayer.removeKeyListener(l)
+    }
+
+    override fun setFocusTraversalKeysEnabled(focusTraversalKeysEnabled: Boolean) {
+        backedLayer.focusTraversalKeysEnabled = focusTraversalKeysEnabled
     }
 
     /**
