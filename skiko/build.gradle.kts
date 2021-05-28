@@ -148,6 +148,8 @@ val skijaSrcDir = run {
     }.map { delombokSkijaSrcDir }
 }
 
+val skiaBinSubdir = "out/${buildType.id}-${targetOs.id}-${targetArch.id}"
+
 val Project.supportNative: Boolean
    get() = properties.get("skiko.native.enabled") == "true"
 
@@ -173,7 +175,7 @@ kotlin {
                     val skiaDir = skiaDir.get().absolutePath
                     compilerOpts("-I$skiaDir")
                     extraOpts("-staticLibrary", "libskia.a")
-                    extraOpts("-libraryPath", "$skiaDir/out/${buildType.id}-${targetArch.id}")
+                    extraOpts("-libraryPath", "$skiaDir/$skiaBinSubdir")
                 }
             }
         }
@@ -450,8 +452,8 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
                     // To fix it we enforce resolve of all GOT entries at library load time, and make it read-only afterwards.
                     "-Wl,-z,relro,-z,now",
                     // Hack to fix problem with linker not always finding certain declarations.
-                    skiaDir.get().absolutePath + "/out/${buildType.id}-${targetArch.id}/libsksg.a",
-                    skiaDir.get().absolutePath + "/out/${buildType.id}-${targetArch.id}/libskia.a"
+                    skiaDir.get().absolutePath + "/$skiaBinSubdir/libsksg.a",
+                    skiaDir.get().absolutePath + "/$skiaBinSubdir/libskia.a"
                 )
             )
         }
@@ -485,7 +487,7 @@ library {
     dependencies {
         implementation(
             skiaDir.map {
-                fileTree(it.resolve("out/${buildType.id}-${targetOs.id}-${targetArch.id}"))
+                fileTree(it.resolve(skiaBinSubdir))
                     .matching { include(if (targetOs.isWindows) "**.lib" else "**.a") }
             }
         )
@@ -543,7 +545,7 @@ val maybeSign by project.tasks.registering {
 val createChecksums by project.tasks.registering(org.gradle.crypto.checksum.Checksum::class) {
     dependsOn(maybeSign)
     files = maybeSign.get().outputs.files +
-            if (targetOs.isWindows) files(skiaDir.map { it.resolve("out/${buildType.id}-x64/icudtl.dat") }) else files()
+            if (targetOs.isWindows) files(skiaDir.map { it.resolve("${skiaBinSubdir}/icudtl.dat") }) else files()
     algorithm = Checksum.Algorithm.SHA256
     outputDir = file("$buildDir/checksums")
 }
@@ -557,7 +559,7 @@ val skikoJvmRuntimeJar by project.tasks.registering(Jar::class) {
         it.replace(".maybesigned", "")
     }
     if (targetOs.isWindows) {
-        from(files(skiaDir.map { it.resolve("out/${buildType.id}-x64/icudtl.dat") }))
+        from(files(skiaDir.map { it.resolve("${skiaBinSubdir}/icudtl.dat") }))
     }
     from(createChecksums.get().outputs.files)
 }
