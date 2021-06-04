@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.3.72"
+    kotlin("jvm") version "1.5.10"
     application
 }
 
@@ -66,6 +66,11 @@ val casualRun = tasks.named<JavaExec>("run") {
 
 tasks.register("runSoftware") {
     additionalArguments += mapOf("skiko.renderApi" to "SOFTWARE")
+    dependsOn(casualRun)
+}
+
+tasks.register("runReparent") {
+    additionalArguments += mapOf("skiko.reparent" to "server")
     dependsOn(casualRun)
 }
 

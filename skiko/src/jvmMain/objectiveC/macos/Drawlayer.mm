@@ -4,6 +4,7 @@
 #define GL_SILENCE_DEPRECATION
 
 #import <Cocoa/Cocoa.h>
+#import <CoreGraphics/CGWindow.h>
 #import <QuartzCore/QuartzCore.h>
 #import <Metal/Metal.h>
 #import <QuartzCore/CAMetalLayer.h>
@@ -104,12 +105,13 @@ NSWindow *findCALayerWindow(NSView *rootView, CALayer *layer) {
 
 NSWindow *findWindow(jlong platformInfoPtr)
 {
-    NSObject<JAWT_SurfaceLayers>* dsi_mac = (__bridge NSObject<JAWT_SurfaceLayers> *) platformInfoPtr;
+    if (platformInfoPtr == 0) return nil;
+    NSObject<JAWT_SurfaceLayers>* dsi_mac = (NSObject<JAWT_SurfaceLayers> *) platformInfoPtr;
     CALayer* ca_layer = [dsi_mac windowLayer];
 
     NSWindow* target_window = nil;
-
     NSMutableArray<NSWindow *> *windows = [NSMutableArray arrayWithArray: [[NSApplication sharedApplication] windows]];
+
     for (NSWindow* window in windows)
     {
         target_window = findCALayerWindow(window.contentView, ca_layer);
@@ -126,7 +128,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_nativeInit(JNIEnv 
     }
 
     LayerHandler *layersSet = [[LayerHandler alloc] init];
-    NSObject<JAWT_SurfaceLayers>* dsi_mac = (__bridge NSObject<JAWT_SurfaceLayers> *) platformInfoPtr;
+    NSObject<JAWT_SurfaceLayers>* dsi_mac = (NSObject<JAWT_SurfaceLayers> *) platformInfoPtr;
     layersSet.container = [dsi_mac windowLayer];
     jobject canvasGlobalRef = env->NewGlobalRef(canvas);
     [layersSet setCanvasGlobalRef: canvasGlobalRef];
@@ -165,6 +167,126 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_osxSetFulls
     }
 }
 
+bool cfStringEqual(CFStringRef notification, CFStringRef notifType) {
+    return CFStringCompare(notification, notifType, 0) == 0;
+}
+
+void AnAXObserverCallback(AXObserverRef observer, AXUIElementRef element,
+                          CFStringRef notificationName, void* contextData)
+{
+    fprintf(stderr, "AnAXObserverCallback: %s\n", CFStringGetCStringPtr(notificationName, kCFStringEncodingMacRoman));
+    NSWindow* window = (NSWindow*)contextData;
+    //CFArrayRef attrNames = NULL;
+    //AXUIElementCopyAttributeNames(element, &attrNames);
+    //NSArray* attrs = (NSArray*)(attrNames);
+    //NSLog(@"%@", attrs);
+    AXValueRef positionValue = NULL;
+    AXUIElementCopyAttributeValue(element, CFSTR("AXPosition"), (CFTypeRef *)&positionValue);
+    CGPoint position;
+    AXValueGetValue(positionValue, (AXValueType)kAXValueCGPointType, &position);
+
+    AXValueRef sizeValue = NULL;
+    AXUIElementCopyAttributeValue(element, CFSTR("AXSize"), (CFTypeRef*)&sizeValue);
+    CGSize size;
+    AXValueGetValue(sizeValue, (AXValueType)kAXValueCGSizeType, &size);
+
+    CFRelease(positionValue);
+    CFRelease(sizeValue);
+
+    fprintf(stderr, "we are at (%f, %f): size is (%f, %f)\n", position.x, position.y, size.width, size.height);
+
+    if (cfStringEqual(notificationName, kAXWindowResizedNotification)) {
+        fprintf(stderr, "resize %p\n", element);
+    } else if (cfStringEqual(notificationName, kAXWindowMovedNotification)) {
+        fprintf(stderr, "move %p\n", element);
+    }
+    NSRect screenSize = [[NSScreen mainScreen] frame];
+    NSRect newFrame = NSMakeRect(position.x, screenSize.size.height - position.y - size.height, size.width, size.height - 25.0f);
+    [window setFrame:newFrame display:YES animate:NO];
+}
+
+jboolean listenForChanges(jlong parentPid, jlong platformInfoPtr) {
+    AXUIElementRef app = AXUIElementCreateApplication(parentPid);
+    if (!app) {
+        fprintf(stderr, "AXUIElementCreateApplication failed\n");
+        return JNI_FALSE;
+    }
+    AXObserverRef observer = NULL;
+    AXError err = AXObserverCreate(parentPid, AnAXObserverCallback, &observer);
+    if (err != kAXErrorSuccess) {
+        fprintf(stderr, "AXObserverCreate failed: %d\n", err);
+        return JNI_FALSE;
+    }
+    NSWindow* me = findWindow(platformInfoPtr);
+    err = AXObserverAddNotification(observer, app, kAXWindowCreatedNotification, me);
+    if (err != kAXErrorSuccess) {
+        if (err == kAXErrorAPIDisabled) {
+            fprintf(stderr, "ERROR: enable assistive API in preferences!!!\n");
+        } else {
+            fprintf(stderr, "AXObserverAddNotification failed: %d\n", err);
+        }
+        return JNI_FALSE;
+    }
+    err = AXObserverAddNotification(observer, app, kAXWindowMovedNotification, me);
+    if (err != kAXErrorSuccess) {
+        fprintf(stderr, "AXObserverAddNotification failed: %d\n", err);
+        return JNI_FALSE;
+    }
+    err = AXObserverAddNotification(observer, app, kAXWindowResizedNotification, me);
+    if (err != kAXErrorSuccess) {
+        fprintf(stderr, "AXObserverAddNotification failed: %d\n", err);
+        return JNI_FALSE;
+    }
+    err = AXObserverAddNotification(observer, app, kAXWindowMiniaturizedNotification, me);
+    if (err != kAXErrorSuccess) {
+        fprintf(stderr, "AXObserverAddNotification failed: %d\n", err);
+        return JNI_FALSE;
+    }
+    err = AXObserverAddNotification(observer, app, kAXFocusedWindowChangedNotification, me);
+    if (err != kAXErrorSuccess) {
+        fprintf(stderr, "AXObserverAddNotification failed: %d\n", err);
+        return JNI_FALSE;
+    }
+    err = AXObserverAddNotification(observer, app, kAXWindowDeminiaturizedNotification, me);
+    if (err != kAXErrorSuccess) {
+        fprintf(stderr, "AXObserverAddNotification failed\n");
+        return JNI_FALSE;
+    }
+    err = AXObserverAddNotification(observer, app, kAXApplicationHiddenNotification, me);
+    if (err != kAXErrorSuccess) {
+        fprintf(stderr, "AXObserverAddNotification failed\n");
+        return JNI_FALSE;
+    }
+    err = AXObserverAddNotification(observer, app, kAXApplicationShownNotification, me);
+    if (err != kAXErrorSuccess) {
+       fprintf(stderr, "AXObserverAddNotification failed: %d\n", err);
+       return JNI_FALSE;
+    }
+    err = AXObserverAddNotification(observer, app, kAXFocusedWindowChangedNotification, me);
+    if (err != kAXErrorSuccess) {
+        fprintf(stderr, "AXObserverAddNotification failed: %d\n", err);
+        return JNI_FALSE;
+    }
+    CFRunLoopAddSource([[NSRunLoop currentRunLoop] getCFRunLoop],
+                        AXObserverGetRunLoopSource(observer),
+                        kCFRunLoopDefaultMode);
+}
+
+JNIEXPORT jboolean JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_osxReparentTo(
+    JNIEnv *env, jobject fileObject, jlong platformInfoPtr, jlong parentPid, jlong parentWinId)
+{
+    fprintf(stderr, "Java_org_jetbrains_skiko_PlatformOperationsKt_osxReparentTo %lld %lld\n",
+        parentPid, parentWinId);
+    if (!AXAPIEnabled()) {
+        fprintf(stderr, "Accessibility API is disabled\n");
+        return JNI_FALSE;
+    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        listenForChanges(parentPid, platformInfoPtr);
+    });
+    return JNI_TRUE;
+}
+
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getWindowHandle(JNIEnv *env, jobject canvas, jlong platformInfoPtr)
 {
     NSWindow* window = findWindow(platformInfoPtr);
@@ -175,6 +297,13 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getContentHandle(
 {
     NSWindow* window = findWindow(platformInfoPtr);
     return (jlong)window;
+}
+
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_ConvertorsKt_getWindowNumber(JNIEnv *env, jobject fileLevel, jlong platformInfoPtr)
+{
+    NSWindow* window = findWindow(platformInfoPtr);
+    //[window  setSharingType:NSWindowSharingReadWrite];
+    return window != nil ? (jlong)[window windowNumber] : 0;
 }
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_osxDisableTitleBar(JNIEnv *env, jobject properties, jlong platformInfoPtr)

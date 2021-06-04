@@ -1,6 +1,7 @@
 package org.jetbrains.skiko
 
 import java.awt.Canvas
+import java.awt.Component
 import java.awt.Graphics
 import java.awt.event.InputMethodEvent
 
@@ -64,6 +65,6 @@ internal open class HardwareLayer : Canvas() {
         get() = platformOperations.isFullscreen(this)
         set(value) = platformOperations.setFullscreen(this, value)
 
-    private external fun getContentHandle(platformInfo: Long): Long
     private external fun getWindowHandle(platformInfo: Long): Long
+    private external fun getContentHandle(platformInfo: Long): Long
 }

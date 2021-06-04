@@ -21,4 +21,10 @@ open class SkiaWindow(
             platformOperations.disableTitleBar(it)
         }
     }
+
+    fun reparentTo(pid: Long, winId: Long) {
+        useDrawingSurfacePlatformInfo {
+            platformOperations.reparentTo(it, pid, winId)
+        }
+    }
 }

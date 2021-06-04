@@ -8,9 +8,12 @@ import org.jetbrains.skija.*
 import org.jetbrains.skiko.context.ContextHandler
 import org.jetbrains.skiko.context.createContextHandler
 import org.jetbrains.skiko.redrawer.Redrawer
+import java.awt.Component
 import java.awt.Graphics
 import java.awt.event.*
 import java.awt.im.InputMethodRequests
+import javax.swing.JComponent
+import javax.swing.JFrame
 import javax.swing.JPanel
 import javax.swing.SwingUtilities.isEventDispatchThread
 
@@ -390,5 +393,5 @@ open class SkiaLayer(
             rounded = value.toFloat()
         }
         return rounded.toInt()
-    } 
+    }
 }

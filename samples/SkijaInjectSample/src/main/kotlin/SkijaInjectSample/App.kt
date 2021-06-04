@@ -7,10 +7,7 @@ import org.jetbrains.skija.paragraph.FontCollection
 import org.jetbrains.skija.paragraph.ParagraphBuilder
 import org.jetbrains.skija.paragraph.ParagraphStyle
 import org.jetbrains.skija.paragraph.TextStyle
-import org.jetbrains.skiko.SkiaLayer
-import org.jetbrains.skiko.SkiaRenderer
-import org.jetbrains.skiko.SkiaWindow
-import org.jetbrains.skiko.toBufferedImage
+import org.jetbrains.skiko.*
 import java.awt.Dimension
 import java.awt.Toolkit
 import java.awt.event.*
@@ -21,7 +18,11 @@ import java.io.File
 import java.nio.file.Files
 import javax.imageio.ImageIO
 
-fun main(args: Array<String>) {
+fun main() {
+    System.getProperty("skiko.reparent")?.let {
+        mainReparent(it)
+        return
+    }
     repeat(1) {
         createWindow("window $it")
     }
@@ -103,6 +104,7 @@ fun createWindow(title: String) = runBlocking(Dispatchers.Swing) {
     window.pack()
     window.layer.awaitRedraw()
     window.isVisible = true
+
 }
 
 class Renderer(

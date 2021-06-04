@@ -2,6 +2,7 @@ package org.jetbrains.skiko
 
 import org.jetbrains.skija.Bitmap
 import org.jetbrains.skija.ColorType
+import java.awt.Component
 import java.awt.Transparency
 import java.awt.color.ColorSpace
 import java.awt.image.BufferedImage
@@ -44,3 +45,8 @@ fun Bitmap.toBufferedImage(): BufferedImage {
     )
    return BufferedImage(colorModel, raster!!, false, null)
 }
+
+val Component.windowNumber: Long
+    get() = this.useDrawingSurfacePlatformInfo(::getWindowNumber)
+
+internal external fun getWindowNumber(platformInfo: Long): Long
