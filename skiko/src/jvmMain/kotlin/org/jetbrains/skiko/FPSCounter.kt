@@ -26,8 +26,8 @@ internal class FPSCounter(
 
         if ((time - lastLogTime) > periodSeconds.secondsToNanos()) {
             val average = (nanosPerSecond / times.average()).roundToInt()
-            val min = (nanosPerSecond / times.max()!!).roundToInt()
-            val max = (nanosPerSecond / times.min()!!).roundToInt()
+            val min = (nanosPerSecond / times.maxOrNull()!!).roundToInt()
+            val max = (nanosPerSecond / times.minOrNull()!!).roundToInt()
             println("[$timestamp] FPS $average ($min-$max)")
             times.clear()
             lastLogTime = time

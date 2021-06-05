@@ -289,13 +289,14 @@ tasks.withType(CppCompile::class.java).configureEach {
         OS.Linux -> {
             compilerArgs.addAll(
                 listOf(
+                    "-fno-rtti",
+                    "-fno-exceptions",
                     "-fvisibility=hidden",
                     "-fvisibility-inlines-hidden",
                     "-I$jdkHome/include/linux",
                     "-I$includeDir",
                     "-DSK_BUILD_FOR_LINUX",
                     "-D_GLIBCXX_USE_CXX11_ABI=0",
-                    "-DSK_R32_SHIFT=16",
                     *buildType.clangFlags
                 )
             )
@@ -454,7 +455,7 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
                     // Hack to fix problem with linker not always finding certain declarations.
                     skiaDir.get().absolutePath + "/$skiaBinSubdir/libsksg.a",
                     skiaDir.get().absolutePath + "/$skiaBinSubdir/libskia.a"
-                )
+                    )
             )
         }
         OS.Windows -> {
@@ -531,7 +532,7 @@ val maybeSign by project.tasks.registering {
     doLast {
         if (targetOs == OS.Linux) {
             // Linux requires additional sealing to run on wider set of platforms.
-            val sealer = "$projectDir/tools/sealer"
+            val sealer = "$projectDir/tools/sealer-${hostArch.id}"
             sealBinary(sealer, lib)
         }
         if (skiko.signHost != null) {
