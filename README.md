@@ -1,6 +1,6 @@
 [![official project](http://jb.gg/badges/official.svg)](https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub)
 [![version](https://img.shields.io/badge/dynamic/json.svg?color=orange&label=latest%20version&query=%24.tag_name&url=https%3A%2F%2Fgithub.com%2FJetBrains%2Fskiko%2Freleases%2Flatest)](https://github.com/JetBrains/skiko/releases/latest)
-# Kotlin Multiplatform bindings to Skia #
+# Kotlin Multiplatform library for Skia and window management #
 
 Skiko (short for Skia for Kotlin) is the graphical library exposing significant part
 of [Skia library](https://skia.org) APIs to Kotlin, along with the gluing code for rendering context.
