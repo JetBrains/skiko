@@ -461,6 +461,7 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
         OS.Windows -> {
             linkerArgs.addAll(
                 listOf(
+                    "Advapi32.lib",
                     "gdi32.lib",
                     "Dwmapi.lib",
                     "opengl32.lib",
