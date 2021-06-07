@@ -262,14 +262,10 @@ jboolean listenForChanges(jlong parentPid, jlong platformInfoPtr) {
        fprintf(stderr, "AXObserverAddNotification failed: %d\n", err);
        return JNI_FALSE;
     }
-    err = AXObserverAddNotification(observer, app, kAXFocusedWindowChangedNotification, me);
-    if (err != kAXErrorSuccess) {
-        fprintf(stderr, "AXObserverAddNotification failed: %d\n", err);
-        return JNI_FALSE;
-    }
     CFRunLoopAddSource([[NSRunLoop currentRunLoop] getCFRunLoop],
                         AXObserverGetRunLoopSource(observer),
                         kCFRunLoopDefaultMode);
+     return JNI_TRUE;
 }
 
 JNIEXPORT jboolean JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_osxReparentTo(
@@ -277,14 +273,13 @@ JNIEXPORT jboolean JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_osxRepa
 {
     fprintf(stderr, "Java_org_jetbrains_skiko_PlatformOperationsKt_osxReparentTo %lld %lld\n",
         parentPid, parentWinId);
-    if (!AXAPIEnabled()) {
-        fprintf(stderr, "Accessibility API is disabled\n");
-        return JNI_FALSE;
-    }
-    dispatch_async(dispatch_get_main_queue(), ^{
-        listenForChanges(parentPid, platformInfoPtr);
+    jboolean __block result = JNI_FALSE;
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        NSDictionary *options = @{(id)kAXTrustedCheckOptionPrompt: @YES};
+        BOOL accessibilityEnabled = AXIsProcessTrustedWithOptions((CFDictionaryRef)options);
+        result = listenForChanges(parentPid, platformInfoPtr);
     });
-    return JNI_TRUE;
+    return result;
 }
 
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getWindowHandle(JNIEnv *env, jobject canvas, jlong platformInfoPtr)
