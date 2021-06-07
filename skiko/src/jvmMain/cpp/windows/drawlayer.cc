@@ -27,4 +27,34 @@ extern "C"
         JAWT_Win32DrawingSurfaceInfo* dsi_win = fromJavaPointer<JAWT_Win32DrawingSurfaceInfo *>(platformInfoPtr);
         return (jlong) dsi_win->hwnd;
     }
+
+    JNIEXPORT jint JNICALL Java_org_jetbrains_skiko_SystemThemeKt_getCurrentSystemTheme(JNIEnv *env, jobject topLevel)
+    {
+        auto subkey = L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize";
+        auto name = L"AppsUseLightTheme";
+        DWORD result;
+        DWORD result_length = sizeof(result);
+        auto status = RegGetValueW(
+                HKEY_CURRENT_USER,
+                subkey,
+                name,
+                RRF_RT_DWORD,
+                NULL,
+                &result,
+                &result_length
+        );
+        switch (status) {
+            case ERROR_SUCCESS:
+                if (result) {
+                    // Light.
+                    return 0;
+                } else {
+                    // Dark.
+                    return 1;
+                }
+             default:
+                // Unknown.
+                return 2;
+         }
+    }
 } // extern "C"

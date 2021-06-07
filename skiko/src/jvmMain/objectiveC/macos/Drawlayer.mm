@@ -191,6 +191,18 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_osxDisableT
     });
 }
 
+JNIEXPORT jint JNICALL Java_org_jetbrains_skiko_SystemThemeKt_getCurrentSystemTheme(JNIEnv *env, jobject topLevel)
+{
+    NSString *osxMode = [[NSUserDefaults standardUserDefaults] stringForKey:@"AppleInterfaceStyle"];
+    if ([@"Dark" isEqualToString:osxMode]) {
+        // Dark.
+        return 1;
+    } else {
+        // Light.
+        return 0;
+    }
+}
+
 void getMetalDeviceAndQueue(void** device, void** queue)
 {
     id<MTLDevice> fDevice = MTLCreateSystemDefaultDevice();
@@ -198,5 +210,7 @@ void getMetalDeviceAndQueue(void** device, void** queue)
     *device = (__bridge void*)fDevice;
     *queue = (__bridge void*)fQueue;
 }
+
+
 
 } // extern C

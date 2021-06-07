@@ -7,10 +7,7 @@ import org.jetbrains.skija.paragraph.FontCollection
 import org.jetbrains.skija.paragraph.ParagraphBuilder
 import org.jetbrains.skija.paragraph.ParagraphStyle
 import org.jetbrains.skija.paragraph.TextStyle
-import org.jetbrains.skiko.SkiaLayer
-import org.jetbrains.skiko.SkiaRenderer
-import org.jetbrains.skiko.SkiaWindow
-import org.jetbrains.skiko.toBufferedImage
+import org.jetbrains.skiko.*
 import java.awt.Dimension
 import java.awt.Toolkit
 import java.awt.event.*
@@ -198,7 +195,7 @@ fun displayScene(renderer: Renderer, width: Int, height: Int, nanoTime: Long, xp
     val style = ParagraphStyle()
     val paragraph = ParagraphBuilder(style, fontCollection)
             .pushStyle(TextStyle().setColor(0xFF000000.toInt()))
-            .addText("Graphics API: ${renderer.layer.renderApi} ✿ﾟ")
+            .addText("Graphics API: ${renderer.layer.renderApi} ✿ﾟ ${currentSystemTheme}")
             .popStyle()
             .build()
     paragraph.layout(Float.POSITIVE_INFINITY)

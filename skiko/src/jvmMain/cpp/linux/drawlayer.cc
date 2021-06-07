@@ -60,4 +60,11 @@ extern "C"
         JAWT_X11DrawingSurfaceInfo *dsi_x11 = fromJavaPointer<JAWT_X11DrawingSurfaceInfo *>(platformInfoPtr);
         return (float) getDpiScaleByDisplay(dsi_x11->display);
     }
+
+     JNIEXPORT jint JNICALL Java_org_jetbrains_skiko_SystemThemeKt_getCurrentSystemTheme(JNIEnv *env, jobject topLevel)
+     {
+        // Unknown.
+        return 2;
+     }
+
 } // extern "C"
