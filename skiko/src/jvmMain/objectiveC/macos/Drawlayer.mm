@@ -171,11 +171,20 @@ bool cfStringEqual(CFStringRef notification, CFStringRef notifType) {
     return CFStringCompare(notification, notifType, 0) == 0;
 }
 
+struct ContextData {
+    NSWindow* window;
+    int x_relative;
+    int y_relative;
+    int width;
+    int height;
+};
+
 void AnAXObserverCallback(AXObserverRef observer, AXUIElementRef element,
                           CFStringRef notificationName, void* contextData)
 {
     fprintf(stderr, "AnAXObserverCallback: %s\n", CFStringGetCStringPtr(notificationName, kCFStringEncodingMacRoman));
-    NSWindow* window = (NSWindow*)contextData;
+    ContextData* context = (ContextData*)contextData;
+    NSWindow* window = context->window;
     //CFArrayRef attrNames = NULL;
     //AXUIElementCopyAttributeNames(element, &attrNames);
     //NSArray* attrs = (NSArray*)(attrNames);
@@ -191,21 +200,33 @@ void AnAXObserverCallback(AXObserverRef observer, AXUIElementRef element,
     AXValueGetValue(sizeValue, (AXValueType)kAXValueCGSizeType, &size);
 
     CFRelease(positionValue);
-    CFRelease(sizeValue);
+    //CFRelease(sizeValue);
 
-    fprintf(stderr, "we are at (%f, %f): size is (%f, %f)\n", position.x, position.y, size.width, size.height);
+    //fprintf(stderr, "we are at (%f, %f): size is (%f, %f)\n", position.x, position.y, size.width, size.height);
 
     if (cfStringEqual(notificationName, kAXWindowResizedNotification)) {
         fprintf(stderr, "resize %p\n", element);
     } else if (cfStringEqual(notificationName, kAXWindowMovedNotification)) {
         fprintf(stderr, "move %p\n", element);
+
+        NSRect screenSize = [[NSScreen mainScreen] frame];
+        /*NSRect newFrame = NSMakeRect(
+            position.x + context->x_relative,
+            screenSize.size.height - (position.y - context->y_relative) - size.height,
+            context->width,
+            context->height);
+        [window setFrame:newFrame display:YES animate:NO];
+        */
+        NSPoint topLeft = NSMakePoint(
+            position.x + context->x_relative,
+            screenSize.size.height - (position.y + context->y_relative)
+        );
+        [window setFrameTopLeftPoint:topLeft];
     }
-    NSRect screenSize = [[NSScreen mainScreen] frame];
-    NSRect newFrame = NSMakeRect(position.x, screenSize.size.height - position.y - size.height, size.width, size.height - 25.0f);
-    [window setFrame:newFrame display:YES animate:NO];
 }
 
-jboolean listenForChanges(jlong parentPid, jlong platformInfoPtr) {
+jboolean listenForChanges(jlong parentPid, jlong platformInfoPtr,
+                          int x_relative, int y_relative, int width, int height) {
     AXUIElementRef app = AXUIElementCreateApplication(parentPid);
     if (!app) {
         fprintf(stderr, "AXUIElementCreateApplication failed\n");
@@ -218,7 +239,13 @@ jboolean listenForChanges(jlong parentPid, jlong platformInfoPtr) {
         return JNI_FALSE;
     }
     NSWindow* me = findWindow(platformInfoPtr);
-    err = AXObserverAddNotification(observer, app, kAXWindowCreatedNotification, me);
+    ContextData* data = new ContextData();
+    data->window = me;
+    data->x_relative = x_relative;
+    data->y_relative = y_relative;
+    data->width = width;
+    data->height = height;
+    err = AXObserverAddNotification(observer, app, kAXWindowCreatedNotification, data);
     if (err != kAXErrorSuccess) {
         if (err == kAXErrorAPIDisabled) {
             fprintf(stderr, "ERROR: enable assistive API in preferences!!!\n");
@@ -227,37 +254,37 @@ jboolean listenForChanges(jlong parentPid, jlong platformInfoPtr) {
         }
         return JNI_FALSE;
     }
-    err = AXObserverAddNotification(observer, app, kAXWindowMovedNotification, me);
+    err = AXObserverAddNotification(observer, app, kAXWindowMovedNotification, data);
     if (err != kAXErrorSuccess) {
         fprintf(stderr, "AXObserverAddNotification failed: %d\n", err);
         return JNI_FALSE;
     }
-    err = AXObserverAddNotification(observer, app, kAXWindowResizedNotification, me);
+    err = AXObserverAddNotification(observer, app, kAXWindowResizedNotification, data);
     if (err != kAXErrorSuccess) {
         fprintf(stderr, "AXObserverAddNotification failed: %d\n", err);
         return JNI_FALSE;
     }
-    err = AXObserverAddNotification(observer, app, kAXWindowMiniaturizedNotification, me);
+    err = AXObserverAddNotification(observer, app, kAXWindowMiniaturizedNotification, data);
     if (err != kAXErrorSuccess) {
         fprintf(stderr, "AXObserverAddNotification failed: %d\n", err);
         return JNI_FALSE;
     }
-    err = AXObserverAddNotification(observer, app, kAXFocusedWindowChangedNotification, me);
+    err = AXObserverAddNotification(observer, app, kAXFocusedWindowChangedNotification, data);
     if (err != kAXErrorSuccess) {
         fprintf(stderr, "AXObserverAddNotification failed: %d\n", err);
         return JNI_FALSE;
     }
-    err = AXObserverAddNotification(observer, app, kAXWindowDeminiaturizedNotification, me);
+    err = AXObserverAddNotification(observer, app, kAXWindowDeminiaturizedNotification, data);
     if (err != kAXErrorSuccess) {
         fprintf(stderr, "AXObserverAddNotification failed\n");
         return JNI_FALSE;
     }
-    err = AXObserverAddNotification(observer, app, kAXApplicationHiddenNotification, me);
+    err = AXObserverAddNotification(observer, app, kAXApplicationHiddenNotification, data);
     if (err != kAXErrorSuccess) {
         fprintf(stderr, "AXObserverAddNotification failed\n");
         return JNI_FALSE;
     }
-    err = AXObserverAddNotification(observer, app, kAXApplicationShownNotification, me);
+    err = AXObserverAddNotification(observer, app, kAXApplicationShownNotification, data);
     if (err != kAXErrorSuccess) {
        fprintf(stderr, "AXObserverAddNotification failed: %d\n", err);
        return JNI_FALSE;
@@ -265,11 +292,12 @@ jboolean listenForChanges(jlong parentPid, jlong platformInfoPtr) {
     CFRunLoopAddSource([[NSRunLoop currentRunLoop] getCFRunLoop],
                         AXObserverGetRunLoopSource(observer),
                         kCFRunLoopDefaultMode);
-     return JNI_TRUE;
+    return JNI_TRUE;
 }
 
 JNIEXPORT jboolean JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_osxReparentTo(
-    JNIEnv *env, jobject fileObject, jlong platformInfoPtr, jlong parentPid, jlong parentWinId)
+    JNIEnv *env, jobject fileObject, jlong platformInfoPtr, jlong parentPid, jlong parentWinId,
+    jint xRelative, jint yRelative, jint width, jint height)
 {
     fprintf(stderr, "Java_org_jetbrains_skiko_PlatformOperationsKt_osxReparentTo %lld %lld\n",
         parentPid, parentWinId);
@@ -277,7 +305,7 @@ JNIEXPORT jboolean JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_osxRepa
     dispatch_sync(dispatch_get_main_queue(), ^{
         NSDictionary *options = @{(id)kAXTrustedCheckOptionPrompt: @YES};
         BOOL accessibilityEnabled = AXIsProcessTrustedWithOptions((CFDictionaryRef)options);
-        result = listenForChanges(parentPid, platformInfoPtr);
+        result = listenForChanges(parentPid, platformInfoPtr, xRelative, yRelative, width, height);
     });
     return result;
 }
@@ -297,7 +325,6 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getContentHandle(
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_ConvertorsKt_getWindowNumber(JNIEnv *env, jobject fileLevel, jlong platformInfoPtr)
 {
     NSWindow* window = findWindow(platformInfoPtr);
-    //[window  setSharingType:NSWindowSharingReadWrite];
     return window != nil ? (jlong)[window windowNumber] : 0;
 }
 

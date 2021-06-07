@@ -2,6 +2,7 @@ package org.jetbrains.skiko
 
 import org.jetbrains.skija.Bitmap
 import org.jetbrains.skija.ColorType
+import java.awt.Canvas
 import java.awt.Component
 import java.awt.Transparency
 import java.awt.color.ColorSpace
@@ -46,7 +47,8 @@ fun Bitmap.toBufferedImage(): BufferedImage {
    return BufferedImage(colorModel, raster!!, false, null)
 }
 
-val Component.windowNumber: Long
+// TODO: make it JFrame extension instead.
+val Canvas.windowNumber: Long
     get() = this.useDrawingSurfacePlatformInfo(::getWindowNumber)
 
 internal external fun getWindowNumber(platformInfo: Long): Long

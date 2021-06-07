@@ -18,7 +18,8 @@ internal interface PlatformOperations {
     fun disableTitleBar(platformInfo: Long)
     fun getDpiScale(component: Component): Float
     fun createRedrawer(layer: SkiaLayer, renderApi: GraphicsApi, properties: SkiaLayerProperties): Redrawer
-    fun reparentTo(platformInfo: Long, pid: Long, winId: Long)
+    fun reparentTo(platformInfo: Long, pid: Long, winId: Long,
+                   xRelative: Int, yRelative: Int, width: Int, height: Int)
 }
 
 internal val platformOperations: PlatformOperations by lazy {
@@ -40,8 +41,9 @@ internal val platformOperations: PlatformOperations by lazy {
                     osxDisableTitleBar(platformInfo)
                 }
 
-                override fun reparentTo(platformInfo: Long, pid: Long, winId: Long) {
-                    if (!osxReparentTo(platformInfo, pid, winId))
+                override fun reparentTo(platformInfo: Long, pid: Long, winId: Long,
+                                        xRelative: Int, yRelative: Int, width: Int, height: Int) {
+                    if (!osxReparentTo(platformInfo, pid, winId, xRelative, yRelative, width, height))
                         throw RuntimeException("Cannot reparent, maybe accessibility disabled")
                 }
 
@@ -72,7 +74,8 @@ internal val platformOperations: PlatformOperations by lazy {
                 override fun disableTitleBar(platformInfo: Long) {
                 }
 
-                override fun reparentTo(platformInfo: Long, pid: Long, winId: Long) {
+                override fun reparentTo(platformInfo: Long, pid: Long, winId: Long,
+                                        xRelative: Int, yRelative: Int, width: Int, height: Int) {
                     TODO("Implement me")
                 }
 
@@ -108,7 +111,8 @@ internal val platformOperations: PlatformOperations by lazy {
                 override fun disableTitleBar(platformInfo: Long) {
                 }
 
-                override fun reparentTo(platformInfo: Long, pid: Long, winId: Long) {
+                override fun reparentTo(platformInfo: Long, pid: Long, winId: Long,
+                                        xRelative: Int, yRelative: Int, width: Int, height: Int) {
                     TODO("Implement me")
                 }
 
@@ -145,7 +149,8 @@ internal val platformOperations: PlatformOperations by lazy {
 external private fun osxIsFullscreenNative(component: Component): Boolean
 external private fun osxSetFullscreenNative(component: Component, value: Boolean)
 external private fun osxDisableTitleBar(platformInfo: Long)
-external private fun osxReparentTo(platformInfo: Long, pid: Long, winId: Long): Boolean
+external private fun osxReparentTo(platformInfo: Long, pid: Long, winId: Long,
+                                   xRelative: Int, yRelative: Int, width: Int, height: Int): Boolean
 
 // Linux
 external private fun linuxGetDpiScaleNative(platformInfo: Long): Float

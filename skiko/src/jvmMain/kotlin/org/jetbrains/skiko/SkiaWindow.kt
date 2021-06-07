@@ -22,9 +22,9 @@ open class SkiaWindow(
         }
     }
 
-    fun reparentTo(pid: Long, winId: Long) {
+    fun reparentTo(pid: Long, winId: Long, xRelative: Int, yRelative: Int, width: Int, height: Int) {
         useDrawingSurfacePlatformInfo {
-            platformOperations.reparentTo(it, pid, winId)
+            platformOperations.reparentTo(it, pid, winId, xRelative, yRelative, width, height)
         }
     }
 }

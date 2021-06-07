@@ -87,10 +87,11 @@ fun mainReparent(kind: String) {
 fun mainReparentServer() {
     val frame = JFrame("Reparent Server")
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
-    frame.preferredSize = Dimension(400, 200)
+    frame.preferredSize = Dimension(1000, 600)
 
+    // It's critical that we use AWT Canvas to get Window handle, our APIs only work for such case.
     val panel = Canvas()
-    panel.size = Dimension(200, 100)
+    panel.size = Dimension(900, 600)
     frame.contentPane.add(panel)
 
     frame.pack()
@@ -107,7 +108,7 @@ fun mainReparentServer() {
         if (words.isNotEmpty()) {
             when (words[0]) {
                 "ATTACH" -> {
-                    "${ProcessHandle.current().pid()} ${panel.windowNumber} ${frame.location.x} ${frame.location.y + 25} ${panel.width} ${panel.height}"
+                    "${ProcessHandle.current().pid()} ${panel.windowNumber} ${frame.location.x} ${frame.location.y} 70 50 300 100"
                 }
                 "PING" -> {
                     "OK"
@@ -162,15 +163,17 @@ fun mainReparentClient(port: Int) = runBlocking(Dispatchers.Swing) {
         val words = response.split(" ")
         val pid = words[0].toLong()
         val winId = words[1].toLong()
-        val x = words[2].toInt()
-        val y = words[3].toInt()
-        val w = words[4].toInt()
-        val h = words[5].toInt()
+        val x_global = words[2].toInt()
+        val y_global = words[3].toInt()
+        val x_relative = words[4].toInt()
+        val y_relative = words[5].toInt()
+        val w = words[6].toInt()
+        val h = words[7].toInt()
         println("would reparent to $pid $winId")
         SwingUtilities.invokeLater {
-            skiaWindow.location = Point(x, y)
+            skiaWindow.location = Point(x_global + x_relative, y_global + y_relative)
             skiaWindow.size = Dimension(w, h)
-            skiaWindow.reparentTo(pid, winId)
+            skiaWindow.reparentTo(pid, winId, x_relative, y_relative, w, h)
         }
     }
     thread {
