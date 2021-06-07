@@ -36,13 +36,13 @@ extern "C"
         DWORD result_length = sizeof(result);
         auto status = RegGetValueW(
                 HKEY_CURRENT_USER,
-                subkey.c_str(),
-                name.c_str(),
+                subkey,
+                name,
                 RRF_RT_DWORD,
                 NULL,
                 &result,
                 &result_length
-            );
+        );
         switch (status) {
             case ERROR_SUCCESS:
                 if (result) {
