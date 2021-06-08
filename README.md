@@ -4,7 +4,42 @@
 
 Skiko (short for Skia for Kotlin) is the graphical library exposing significant part
 of [Skia library](https://skia.org) APIs to Kotlin, along with the gluing code for rendering context.
-At the moment, Linux(x86_64), Windows(x86_64) and macOS(x86_64 and arm64) builds for Kotlin/JVM are available.
+At the moment, Linux(x86_64 and arm64), Windows(x86_64) and macOS(x86_64 and arm64) builds for Kotlin/JVM are available.
+
+## Using as dependency
+
+To use in build scripts one has to compute appropriate target platform and version,
+i.e. something like this
+
+```kotlin
+    repositories {
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    }
+
+    val osName = System.getProperty("os.name")
+    val targetOs = when {
+        osName == "Mac OS X" -> "macos"
+        osName.startsWith("Win") -> "windows"
+        osName.startsWith("Linux") -> "linux"
+        else -> error("Unsupported OS: $osName")
+    }
+
+    val osArch = System.getProperty("os.arch")
+    var targetArch = when (osArch) {
+        "x86_64", "amd64" -> "x64"
+        "aarch64" -> "arm64"
+        else -> error("Unsupported arch: $osArch")
+    }
+
+    val version = "0.3.0"
+    val target = "${targetOs}-${targetArch}"
+    dependencies {
+        implementation("org.jetbrains.skiko:skiko-jvm-runtime-$target:$version")
+    }
+```
+
+To use latest development snapshot use version `0.0.0-SNAPSHOT`.
+
 
 ## Building JVM bindings
 
