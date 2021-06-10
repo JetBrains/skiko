@@ -17,8 +17,6 @@ import javax.swing.SwingUtilities
 import javax.swing.WindowConstants
 import kotlin.concurrent.thread
 import kotlin.system.exitProcess
-import java.awt.image.BufferedImage.TYPE_INT_RGB
-import java.awt.FlowLayout
 
 private fun OutputStream.sendCommand(command: String) {
     val data = command.toByteArray()
@@ -39,7 +37,6 @@ private fun InputStream.receiveCommand(): String? {
             assert(size < 128)
             val bytes = ByteArray(size)
             this.read(bytes)
-            System.err.println("${ProcessHandle.current().pid()} got $size: ${bytes.toString(Charsets.UTF_8)}")
             bytes.toString(Charsets.UTF_8)
         }
     } catch (e: IOException) {
@@ -69,7 +66,6 @@ class RemoterServer(val onClose: () -> Unit, val processor: (String, InputStream
                             outputStream.sendCommand(result)
                         }
                     } while (line != null)
-                    System.err.println("server connection closed")
                 } catch (e: IOException) {}
                 inputStream.close()
                 outputStream.close()
@@ -114,20 +110,16 @@ fun mainReparent(kind: String) {
 fun mainReparentServer() {
     val frame = JFrame("Reparent Server")
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
-    frame.preferredSize = Dimension(1000, 600)
+    frame.size = Dimension(1000, 600)
 
     // It's critical that we use AWT Canvas to get Window handle, our APIs only work for such case.
     val canvas = Canvas()
     canvas.size = Dimension(900, 600)
-    val g2 = BufferedImage(200, 200, TYPE_INT_RGB).createGraphics()
-    g2.drawString("ZZZZ", 10, 10)
-    canvas.printAll(g2)
-    frame.contentPane.add(canvas)
-    canvas.isVisible = true
+    frame.add(canvas)
 
     frame.pack()
     frame.isVisible = true
-    frame.layout = FlowLayout()
+
 
     println("Start server ${canvas.windowNumber}")
     var frameData = ByteArray(1)
@@ -139,7 +131,7 @@ fun mainReparentServer() {
         if (words.isNotEmpty()) {
             when (words[0]) {
                 "ATTACH" -> {
-                    "${ProcessHandle.current().pid()} ${canvas.windowNumber} ${frame.location.x} ${frame.location.y} 70 50 300 100"
+                    "${ProcessHandle.current().pid()} ${canvas.windowNumber} 800 300"
                 }
                 "FRAME" -> {
                     val width = words[1].toInt()
@@ -150,8 +142,12 @@ fun mainReparentServer() {
                     println("SERVER: READING FRAME OF $size")
                     if (frameData.size != size)
                         frameData = ByteArray(size)
-                    input.read(frameData)
-                    println("SERVER: GOT FRAME")
+                    var index = 0
+                    while (index < frameData.size) {
+                        val r = input.read(frameData, index, minOf(8192, frameData.size - index))
+                        index += r
+                    }
+                    println("SERVER: GOT FRAME: ${frameData.size}")
                     val raster = Raster.createInterleavedRaster(
                             DataBufferByte(frameData, frameData.size),
                             width,
@@ -169,15 +165,12 @@ fun mainReparentServer() {
                             DataBuffer.TYPE_BYTE
                     )
                     val image = BufferedImage(colorModel, raster!!, false, null)
-                    println("created $image")
                     SwingUtilities.invokeAndWait {
-                        println("DRAW!")
-                        //val g2 = image.createGraphics()
-                        val g2 = BufferedImage(width, height, TYPE_INT_RGB).createGraphics()
-                        g2.drawString("XXXXX", 10, 10)
-                        canvas.printAll(g2)
-                        g2.dispose()
-                        frame.repaint()
+                        val density = 2 // for Retina displays, otherwise 1.
+                        val g = canvas.getGraphics()
+                        g.color = Color.WHITE
+                        g.fillRect(0, 0, width / density, height / density)
+                        g.drawImage(image, 0, 0, width / density, height / density, null)
                     }
                     "OK"
                 }
@@ -192,7 +185,7 @@ fun mainReparentServer() {
     thread {
         val jvm = "${System.getProperty("java.home")}/bin/java"
         val cp = System.getProperty("java.class.path")
-        val proc = ProcessBuilder(jvm, "-Dskiko.reparent=client_${server.port}", "-cp", cp, "SkijaInjectSample.AppKt")
+        val proc = ProcessBuilder(jvm, "-Dskiko.reparent=client_${server.port}", "-ea", "-cp", cp, "SkijaInjectSample.AppKt")
             .redirectOutput(ProcessBuilder.Redirect.PIPE)
             .redirectError(ProcessBuilder.Redirect.PIPE)
             .start()
@@ -205,19 +198,19 @@ fun mainReparentServer() {
     }
 }
 
-fun mainReparentClient(port: Int) = runBlocking(Dispatchers.Swing) {
+fun mainReparentClient(port: Int) = runBlocking(Dispatchers.Main) {
     val remoter = RemoterClient(port)
     val skiaWindow = SkiaWindow(SkiaLayerProperties(isInvisible = true))
     skiaWindow.apply {
         defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
         title = "Reparent Client"
-        isUndecorated = true
+        //isUndecorated = true
         //isAlwaysOnTop = true
         preferredSize = Dimension(400, 200)
         location = Point(300, 300)
         pack()
         layer.awaitRedraw()
-        //isVisible = true
+        isVisible = true
         layer.renderer = Renderer(layer) { renderer, w, h, nanoTime ->
             val canvas = renderer.canvas!!
             canvas.drawString("$nanoTime", (w/3).toFloat(), (h/2).toFloat(), renderer.font, renderer.paint)
@@ -225,50 +218,55 @@ fun mainReparentClient(port: Int) = runBlocking(Dispatchers.Swing) {
     }
 
     thread {
-        remoter.sendCommand("ATTACH", onClose = {
-            System.err.println("Closing client")
-            exitProcess(0)
-        }) { response ->
-            val words = response.split(" ")
-            val pid = words[0].toLong()
-            val winId = words[1].toLong()
-            val x_global = words[2].toInt()
-            val y_global = words[3].toInt()
-            val x_relative = words[4].toInt()
-            val y_relative = words[5].toInt()
-            val w = words[6].toInt()
-            val h = words[7].toInt()
-            System.err.println("would reparent to $pid $winId")
-            SwingUtilities.invokeAndWait() {
-                //skiaWindow.location = Point(x_global + x_relative, y_global + y_relative)
-                skiaWindow.size = Dimension(w, h)
-                //skiaWindow.reparentTo(pid, winId, x_relative, y_relative, w, h)
-            }
-        }
-
-        // Frame stream.
-        while (true) {
-            val bitmap = skiaWindow.layer.screenshot()
-            if (bitmap != null) {
-                assert(bitmap.colorInfo.colorType == ColorType.BGRA_8888)
-                val pixels = bitmap.readPixels()!!
-                val command = "FRAME ${bitmap.width} ${bitmap.height} ${pixels.size}"
-                System.err.println("CLIENT: SEND $command")
-                remoter.output.sendCommand(command)
-                remoter.output.write(pixels)
-                remoter.output.flush()
-                System.err.println("CLIENT: SENT FRAME")
-                val line = remoter.input.receiveCommand()
-                if (line != null) {
-                    System.err.println("CLIENT: GOT $line")
-                } else {
-                    System.err.println("CLIENT: CLOSED")
-                    remoter.input.close()
-                    remoter.output.close()
-                    exitProcess(0)
+        try {
+            remoter.sendCommand("ATTACH", onClose = {
+                System.err.println("Closing client")
+                exitProcess(0)
+            }) { response ->
+                val words = response.split(" ")
+                val pid = words[0].toLong()
+                val winId = words[1].toLong()
+                val w = words[2].toInt()
+                val h = words[3].toInt()
+                System.err.println("would reparent to $pid $winId")
+                SwingUtilities.invokeAndWait() {
+                    //skiaWindow.location = Point(x_global + x_relative, y_global + y_relative)
+                    skiaWindow.size = Dimension(w, h)
+                    //skiaWindow.reparentTo(pid, winId, x_relative, y_relative, w, h)
                 }
             }
-            Thread.sleep(1000)
+
+            // Frame stream.
+            while (true) {
+                val bitmap = skiaWindow.layer.screenshot()
+                if (bitmap != null) {
+                    assert(bitmap.colorInfo.colorType == ColorType.BGRA_8888)
+                    val pixels = bitmap.readPixels()!!
+                    val command = "FRAME ${bitmap.width} ${bitmap.height} ${pixels.size}"
+                    System.err.println("CLIENT: SEND $command")
+                    remoter.output.sendCommand(command)
+                    var index = 0
+                    while (index < pixels.size) {
+                        remoter.output.write(pixels, index, minOf(8192, pixels.size - index))
+                        index += 8192
+                    }
+                    remoter.output.flush()
+                    System.err.println("CLIENT: SENT FRAME")
+                    val line = remoter.input.receiveCommand()
+                    if (line != null) {
+                        System.err.println("CLIENT: GOT $line")
+                    } else {
+                        System.err.println("CLIENT: CLOSED")
+                        remoter.input.close()
+                        remoter.output.close()
+                        exitProcess(0)
+                    }
+                }
+                Thread.sleep(1000)
+            }
+        } catch (e: Throwable) {
+            e.printStackTrace(System.err)
+            exitProcess(0)
         }
     }
 }
