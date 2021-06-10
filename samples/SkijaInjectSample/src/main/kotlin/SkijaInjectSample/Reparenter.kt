@@ -20,8 +20,32 @@ import kotlin.system.exitProcess
 import java.awt.image.BufferedImage.TYPE_INT_RGB
 import java.awt.FlowLayout
 
+private fun OutputStream.sendCommand(command: String) {
+    val data = command.toByteArray()
+    System.err.println("send ${data.size}")
+    // TODO: lift if needed
+    assert(data.size < 128)
+    this.write(data.size)
+    this.write(data)
+    this.flush()
+}
 
-
+private fun InputStream.receiveCommand(): String? {
+    return try {
+        val size = this.read()
+        if (size == -1) {
+            null
+        } else {
+            assert(size < 128)
+            val bytes = ByteArray(size)
+            this.read(bytes)
+            System.err.println("${ProcessHandle.current().pid()} got $size: ${bytes.toString(Charsets.UTF_8)}")
+            bytes.toString(Charsets.UTF_8)
+        }
+    } catch (e: IOException) {
+        null
+    }
+}
 
 
 class RemoterServer(val onClose: () -> Unit, val processor: (String, InputStream, OutputStream) -> String) {
@@ -34,21 +58,21 @@ class RemoterServer(val onClose: () -> Unit, val processor: (String, InputStream
             while (true) {
                 val socket = serverSocket.accept()
                 val inputStream = socket.getInputStream()
-                val reader = BufferedReader(InputStreamReader(inputStream))
                 val outputStream = socket.getOutputStream()
-                val writer = PrintStream(outputStream)
-                do {
-                    val line = reader.readLine()
-                    if (line != null) {
-                        var result = ""
-                        println("SERVER: $line")
-                        result = processor(line, inputStream, outputStream)
-                        println("SERVER response: $result")
-                        writer.println(result)
-                    }
-                } while (line != null)
-                reader.close()
-                writer.close()
+                try {
+                    do {
+                        val line = inputStream.receiveCommand()
+                        if (line != null) {
+                            println("SERVER: $line")
+                            val result = processor(line, inputStream, outputStream)
+                            println("SERVER response: $result")
+                            outputStream.sendCommand(result)
+                        }
+                    } while (line != null)
+                    System.err.println("server connection closed")
+                } catch (e: IOException) {}
+                inputStream.close()
+                outputStream.close()
                 socket.close()
                 serverSocket.close()
                 onClose()
@@ -60,23 +84,20 @@ class RemoterServer(val onClose: () -> Unit, val processor: (String, InputStream
 class RemoterClient(port: Int) {
     private val socket = Socket("localhost", port)
     val input = socket.getInputStream()
-    val reader = BufferedReader(InputStreamReader(input))
     val output = socket.getOutputStream()
-    val writer = PrintStream(output)
 
     @Synchronized
     fun sendCommand(command: String, onClose: () -> Unit, onResult: (String) -> Unit) {
-        println("CLIENT: SEND $command")
-        writer.println(command)
-        writer.flush()
-        val line = reader.readLine()
+        System.err.println("CLIENT: SEND $command")
+        output.sendCommand(command)
+        val line = input.receiveCommand()
         if (line != null) {
-            println("CLIENT: GOT $line")
+            System.err.println("CLIENT: GOT $line")
             onResult(line)
         } else {
-            println("CLIENT: CLOSED")
-            writer.close()
-            reader.close()
+            System.err.println("CLIENT: CLOSED")
+            input.close()
+            output.close()
             onClose()
         }
     }
@@ -109,6 +130,7 @@ fun mainReparentServer() {
     frame.layout = FlowLayout()
 
     println("Start server ${canvas.windowNumber}")
+    var frameData = ByteArray(1)
     val server = RemoterServer(onClose = {
         println("Close server")
         exitProcess(0)
@@ -126,11 +148,12 @@ fun mainReparentServer() {
 
                     // TODO: reuse
                     println("SERVER: READING FRAME OF $size")
-                    val bytes = ByteArray(size)
-                    input.read(bytes)
+                    if (frameData.size != size)
+                        frameData = ByteArray(size)
+                    input.read(frameData)
                     println("SERVER: GOT FRAME")
                     val raster = Raster.createInterleavedRaster(
-                            DataBufferByte(bytes, bytes.size),
+                            DataBufferByte(frameData, frameData.size),
                             width,
                             height,
                             width * 4,
@@ -201,27 +224,28 @@ fun mainReparentClient(port: Int) = runBlocking(Dispatchers.Swing) {
         }
     }
 
-    remoter.sendCommand("ATTACH", onClose = {
-        println("Closing client")
-        exitProcess(0)
-    }) { response ->
-        val words = response.split(" ")
-        val pid = words[0].toLong()
-        val winId = words[1].toLong()
-        val x_global = words[2].toInt()
-        val y_global = words[3].toInt()
-        val x_relative = words[4].toInt()
-        val y_relative = words[5].toInt()
-        val w = words[6].toInt()
-        val h = words[7].toInt()
-        System.err.println("would reparent to $pid $winId")
-        SwingUtilities.invokeLater {
-            //skiaWindow.location = Point(x_global + x_relative, y_global + y_relative)
-            skiaWindow.size = Dimension(w, h)
-            //skiaWindow.reparentTo(pid, winId, x_relative, y_relative, w, h)
-        }
-    }
     thread {
+        remoter.sendCommand("ATTACH", onClose = {
+            System.err.println("Closing client")
+            exitProcess(0)
+        }) { response ->
+            val words = response.split(" ")
+            val pid = words[0].toLong()
+            val winId = words[1].toLong()
+            val x_global = words[2].toInt()
+            val y_global = words[3].toInt()
+            val x_relative = words[4].toInt()
+            val y_relative = words[5].toInt()
+            val w = words[6].toInt()
+            val h = words[7].toInt()
+            System.err.println("would reparent to $pid $winId")
+            SwingUtilities.invokeAndWait() {
+                //skiaWindow.location = Point(x_global + x_relative, y_global + y_relative)
+                skiaWindow.size = Dimension(w, h)
+                //skiaWindow.reparentTo(pid, winId, x_relative, y_relative, w, h)
+            }
+        }
+
         // Frame stream.
         while (true) {
             val bitmap = skiaWindow.layer.screenshot()
@@ -230,17 +254,17 @@ fun mainReparentClient(port: Int) = runBlocking(Dispatchers.Swing) {
                 val pixels = bitmap.readPixels()!!
                 val command = "FRAME ${bitmap.width} ${bitmap.height} ${pixels.size}"
                 System.err.println("CLIENT: SEND $command")
-                remoter.writer.println(command)
-                remoter.writer.flush()
+                remoter.output.sendCommand(command)
                 remoter.output.write(pixels)
+                remoter.output.flush()
                 System.err.println("CLIENT: SENT FRAME")
-                val line = remoter.reader.readLine()
+                val line = remoter.input.receiveCommand()
                 if (line != null) {
                     System.err.println("CLIENT: GOT $line")
                 } else {
                     System.err.println("CLIENT: CLOSED")
-                    remoter.writer.close()
-                    remoter.reader.close()
+                    remoter.input.close()
+                    remoter.output.close()
                     exitProcess(0)
                 }
             }
