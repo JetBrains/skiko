@@ -9,19 +9,39 @@ import java.nio.file.StandardCopyOption
 object Library {
     private val skikoLibraryPath = System.getProperty("skiko.library.path")
     private val cacheRoot = "${System.getProperty("user.home")}/.skiko/"
+    private var copyDir: File? = null
 
-    private fun loadOrGet(cacheDir: File, path: String, resourceName: String, isLibrary: Boolean) {
-        val file = File(cacheDir, resourceName)
+    // Same native library cannot be loaded in several classloaders, so we have to clone
+    // native library to allow Skiko loading to work properly in complex cases, i.e.
+    // several IDEA plugins.
+    private fun loadLibraryOrCopy(library: File) {
+        try {
+            System.load(library.absolutePath)
+        } catch (e: UnsatisfiedLinkError) {
+            if (e.message?.contains("already loaded in another classloader") == true) {
+                val tempFile = File.createTempFile("skiko", if (hostOs.isWindows) ".dll" else "")
+                copyDir = tempFile.parentFile
+                Files.copy(library.toPath(), tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
+                tempFile.deleteOnExit()
+                System.load(tempFile.absolutePath)
+            } else {
+                throw e
+            }
+        }
+    }
+
+    private fun unpackIfNeeded(dest: File, resourceName: String, deleteOnExit: Boolean): File {
+        val file = File(dest, resourceName)
         if (!file.exists()) {
-            val tempFile = File.createTempFile("skiko", "", cacheDir)
-            Library::class.java.getResourceAsStream("$path$resourceName").use { input ->
+            val tempFile = File.createTempFile("skiko", "", dest)
+            if (deleteOnExit)
+                file.deleteOnExit()
+            Library::class.java.getResourceAsStream("/$resourceName").use { input ->
                 Files.copy(input, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
             }
             Files.move(tempFile.toPath(), file.toPath(), StandardCopyOption.ATOMIC_MOVE)
         }
-        if (isLibrary) {
-            System.load(file.absolutePath)
-        }
+        return file
     }
 
     // This function does the following: on request to load given resource,
@@ -32,14 +52,17 @@ object Library {
     fun load() {
         val name = "skiko-$hostId"
         val platformName = System.mapLibraryName(name)
+        val icu = if (hostOs.isWindows) "icudtl.dat" else null
 
         if (skikoLibraryPath != null) {
             val library = File(File(skikoLibraryPath), platformName)
-            System.load(library.absolutePath)
+            loadLibraryOrCopy(library)
+            if (icu != null && copyDir != null) {
+                unpackIfNeeded(copyDir!!, icu, true)
+            }
         } else {
-            val resourcePath = "/"
             val hashResourceStream = Library::class.java.getResourceAsStream(
-                "$resourcePath$platformName.sha256"
+                "/$platformName.sha256"
             ) ?: throw LibraryLoadException(
                 "Cannot find $platformName.sha256, proper native dependency missing."
             )
@@ -48,10 +71,10 @@ object Library {
             }
             val cacheDir = File(File(cacheRoot), hash)
             cacheDir.mkdirs()
-            loadOrGet(cacheDir, resourcePath, platformName, true)
-            val loadIcu = hostOs.isWindows
-            if (loadIcu) {
-                loadOrGet(cacheDir, resourcePath, "icudtl.dat", false)
+            val library = unpackIfNeeded(cacheDir, platformName, false)
+            loadLibraryOrCopy(library)
+            if (icu != null) {
+                unpackIfNeeded(cacheDir, icu, false)
             }
         }
 
@@ -68,5 +91,13 @@ object Library {
         } catch (t: Throwable) {
             t.printStackTrace()
         }
+    }
+}
+
+// We have to keep this tiny class in Skiko for testing purposes.
+internal class LibraryTestImpl() {
+    fun run(): Long {
+        val bitmap = org.jetbrains.skija.Bitmap()
+        return bitmap._ptr
     }
 }
