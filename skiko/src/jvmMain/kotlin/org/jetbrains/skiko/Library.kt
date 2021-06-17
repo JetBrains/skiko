@@ -19,7 +19,7 @@ object Library {
             System.load(library.absolutePath)
         } catch (e: UnsatisfiedLinkError) {
             if (e.message?.contains("already loaded in another classloader") == true) {
-                val tempFile = File.createTempFile("skiko", "")
+                val tempFile = File.createTempFile("skiko", if (hostOs.isWindows) "dll" else "")
                 copyDir = tempFile.parentFile
                 Files.copy(library.toPath(), tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
                 tempFile.deleteOnExit()
