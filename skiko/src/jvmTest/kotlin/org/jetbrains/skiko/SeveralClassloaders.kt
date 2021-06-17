@@ -64,7 +64,10 @@ class SeveralClassloaders {
         val stdlibClass = Class.forName("kotlin.jvm.internal.Intrinsics")
         val stdLibJar = stdlibClass.protectionDomain.codeSource.location
         val urls = listOf(Paths.get(jar).toUri().toURL(), stdLibJar)
-        val loaders = arrayOf(PlatformAndURLClassLoader(urls), PlatformAndURLClassLoader(urls))
+        val loaders = mutableListOf<ClassLoader>()
+        repeat(4) {
+            loaders += PlatformAndURLClassLoader(urls)
+        }
         if (threaded) {
             val threads = mutableListOf<Thread>()
             loaders.forEach { classloader ->
