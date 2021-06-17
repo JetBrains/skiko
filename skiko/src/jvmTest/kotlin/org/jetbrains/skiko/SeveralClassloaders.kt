@@ -62,7 +62,7 @@ class SeveralClassloaders {
         val jar = System.getProperty("skiko.jar.path")
         val stdlibClass = Class.forName("kotlin.jvm.internal.Intrinsics")
         val stdLibJar = stdlibClass.protectionDomain.codeSource.location
-        val urls = listOf(URL("file:/$jar"), stdLibJar)
+        val urls = listOf(URL("file:/${if (hostOs.isWindows) "" else "/"}$jar"), stdLibJar)
         val loaders = arrayOf(PlatformAndURLClassLoader(urls), PlatformAndURLClassLoader(urls))
         if (threaded) {
             val threads = mutableListOf<Thread>()
