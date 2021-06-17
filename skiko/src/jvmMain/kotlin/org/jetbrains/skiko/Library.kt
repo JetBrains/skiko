@@ -90,7 +90,7 @@ object Library {
 }
 
 // We have to keep this tiny class in Skiko for testing purposes.
-class LibraryTestImpl() {
+internal class LibraryTestImpl() {
     fun run(): Long {
         val bitmap = org.jetbrains.skija.Bitmap()
         return bitmap._ptr
