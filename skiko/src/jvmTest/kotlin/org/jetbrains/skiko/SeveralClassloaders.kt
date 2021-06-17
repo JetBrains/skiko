@@ -3,6 +3,7 @@ package org.jetbrains.skiko
 import org.junit.Test
 import java.net.URL
 import java.net.URLClassLoader
+import java.nio.file.Paths
 import kotlin.concurrent.thread
 
 private class PlatformAndURLClassLoader(classpath: List<URL>) :
@@ -62,7 +63,7 @@ class SeveralClassloaders {
         val jar = System.getProperty("skiko.jar.path")
         val stdlibClass = Class.forName("kotlin.jvm.internal.Intrinsics")
         val stdLibJar = stdlibClass.protectionDomain.codeSource.location
-        val urls = listOf(URL("file:/${if (hostOs.isWindows) "" else "/"}$jar"), stdLibJar)
+        val urls = listOf(Paths.get(jar).toUri().toURL(), stdLibJar)
         val loaders = arrayOf(PlatformAndURLClassLoader(urls), PlatformAndURLClassLoader(urls))
         if (threaded) {
             val threads = mutableListOf<Thread>()

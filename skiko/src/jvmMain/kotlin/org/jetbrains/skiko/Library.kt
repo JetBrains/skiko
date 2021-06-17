@@ -58,7 +58,6 @@ object Library {
             val library = File(File(skikoLibraryPath), platformName)
             loadLibraryOrCopy(library)
             if (icu != null && copyDir != null) {
-                println("load ICU from $copyDir")
                 unpackIfNeeded(copyDir!!, icu, true)
             }
         } else {
