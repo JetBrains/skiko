@@ -10,6 +10,24 @@ object Library {
     private val skikoLibraryPath = System.getProperty("skiko.library.path")
     private val cacheRoot = "${System.getProperty("user.home")}/.skiko/"
 
+    // Same native library cannot be loaded in several classloaders, so we have to clone
+    // native library to allow Skiko loading to work properly in complex cases, i.e.
+    // several IDEA plugins.
+    private fun loadLibraryOrCopy(library: File) {
+        try {
+            System.load(library.absolutePath)
+        } catch (e: UnsatisfiedLinkError) {
+            if (e.message?.contains("already loaded in another classloader") == true) {
+                val tempFile = File.createTempFile("skiko", "")
+                Files.copy(library.toPath(), tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
+                tempFile.deleteOnExit()
+                System.load(tempFile.absolutePath)
+            } else {
+                throw e
+            }
+        }
+    }
+
     private fun loadOrGet(cacheDir: File, path: String, resourceName: String, isLibrary: Boolean) {
         val file = File(cacheDir, resourceName)
         if (!file.exists()) {
@@ -20,7 +38,7 @@ object Library {
             Files.move(tempFile.toPath(), file.toPath(), StandardCopyOption.ATOMIC_MOVE)
         }
         if (isLibrary) {
-            System.load(file.absolutePath)
+            loadLibraryOrCopy(file)
         }
     }
 
@@ -35,7 +53,7 @@ object Library {
 
         if (skikoLibraryPath != null) {
             val library = File(File(skikoLibraryPath), platformName)
-            System.load(library.absolutePath)
+            loadLibraryOrCopy(library)
         } else {
             val resourcePath = "/"
             val hashResourceStream = Library::class.java.getResourceAsStream(
@@ -68,5 +86,13 @@ object Library {
         } catch (t: Throwable) {
             t.printStackTrace()
         }
+    }
+}
+
+// We have to keep this tiny class in Skiko for testing purposes.
+class LibraryTestImpl() {
+    fun run(): Long {
+        val bitmap = org.jetbrains.skija.Bitmap()
+        return bitmap._ptr
     }
 }
