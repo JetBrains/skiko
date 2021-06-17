@@ -9,6 +9,7 @@ import java.nio.file.StandardCopyOption
 object Library {
     private val skikoLibraryPath = System.getProperty("skiko.library.path")
     private val cacheRoot = "${System.getProperty("user.home")}/.skiko/"
+    private var copyDir: File? = null
 
     // Same native library cannot be loaded in several classloaders, so we have to clone
     // native library to allow Skiko loading to work properly in complex cases, i.e.
@@ -19,6 +20,7 @@ object Library {
         } catch (e: UnsatisfiedLinkError) {
             if (e.message?.contains("already loaded in another classloader") == true) {
                 val tempFile = File.createTempFile("skiko", "")
+                copyDir = tempFile.parentFile
                 Files.copy(library.toPath(), tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
                 tempFile.deleteOnExit()
                 System.load(tempFile.absolutePath)
@@ -28,18 +30,18 @@ object Library {
         }
     }
 
-    private fun loadOrGet(cacheDir: File, path: String, resourceName: String, isLibrary: Boolean) {
-        val file = File(cacheDir, resourceName)
+    private fun unpackIfNeeded(dest: File, resourceName: String, deleteOnExit: Boolean): File {
+        val file = File(dest, resourceName)
         if (!file.exists()) {
-            val tempFile = File.createTempFile("skiko", "", cacheDir)
-            Library::class.java.getResourceAsStream("$path$resourceName").use { input ->
+            val tempFile = File.createTempFile("skiko", "", dest)
+            if (deleteOnExit)
+                file.deleteOnExit()
+            Library::class.java.getResourceAsStream("/$resourceName").use { input ->
                 Files.copy(input, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
             }
             Files.move(tempFile.toPath(), file.toPath(), StandardCopyOption.ATOMIC_MOVE)
         }
-        if (isLibrary) {
-            loadLibraryOrCopy(file)
-        }
+        return file
     }
 
     // This function does the following: on request to load given resource,
@@ -50,12 +52,16 @@ object Library {
     fun load() {
         val name = "skiko-$hostId"
         val platformName = System.mapLibraryName(name)
+        val loadIcu = hostOs.isWindows
+        val resourcePath = "/"
 
         if (skikoLibraryPath != null) {
             val library = File(File(skikoLibraryPath), platformName)
             loadLibraryOrCopy(library)
+            if (loadIcu && copyDir != null) {
+                unpackIfNeeded(copyDir!!, "icudtl.dat", true)
+            }
         } else {
-            val resourcePath = "/"
             val hashResourceStream = Library::class.java.getResourceAsStream(
                 "$resourcePath$platformName.sha256"
             ) ?: throw LibraryLoadException(
@@ -66,10 +72,10 @@ object Library {
             }
             val cacheDir = File(File(cacheRoot), hash)
             cacheDir.mkdirs()
-            loadOrGet(cacheDir, resourcePath, platformName, true)
-            val loadIcu = hostOs.isWindows
+            val library = unpackIfNeeded(cacheDir, platformName, false)
+            loadLibraryOrCopy(library)
             if (loadIcu) {
-                loadOrGet(cacheDir, resourcePath, "icudtl.dat", false)
+                unpackIfNeeded(cacheDir, "icudtl.dat", false)
             }
         }
 
