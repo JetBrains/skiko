@@ -52,18 +52,18 @@ object Library {
     fun load() {
         val name = "skiko-$hostId"
         val platformName = System.mapLibraryName(name)
-        val loadIcu = hostOs.isWindows
-        val resourcePath = "/"
+        val icu = if (hostOs.isWindows) "icudtl.dat" else null
 
         if (skikoLibraryPath != null) {
             val library = File(File(skikoLibraryPath), platformName)
             loadLibraryOrCopy(library)
-            if (loadIcu && copyDir != null) {
-                unpackIfNeeded(copyDir!!, "icudtl.dat", true)
+            if (icu != null && copyDir != null) {
+                println("load ICU from $copyDir")
+                unpackIfNeeded(copyDir!!, icu, true)
             }
         } else {
             val hashResourceStream = Library::class.java.getResourceAsStream(
-                "$resourcePath$platformName.sha256"
+                "/$platformName.sha256"
             ) ?: throw LibraryLoadException(
                 "Cannot find $platformName.sha256, proper native dependency missing."
             )
@@ -74,8 +74,8 @@ object Library {
             cacheDir.mkdirs()
             val library = unpackIfNeeded(cacheDir, platformName, false)
             loadLibraryOrCopy(library)
-            if (loadIcu) {
-                unpackIfNeeded(cacheDir, "icudtl.dat", false)
+            if (icu != null) {
+                unpackIfNeeded(cacheDir, icu, false)
             }
         }
 
