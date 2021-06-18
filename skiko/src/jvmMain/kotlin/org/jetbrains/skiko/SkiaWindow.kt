@@ -23,3 +23,7 @@ open class SkiaWindow(
         }
     }
 }
+
+fun orderEmojiAndSymbolsPopup() {
+    platformOperations.orderEmojiAndSymbolsPopup()
+}
