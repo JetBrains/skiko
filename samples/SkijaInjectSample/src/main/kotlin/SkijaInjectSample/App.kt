@@ -19,17 +19,19 @@ import java.nio.file.Files
 import javax.imageio.ImageIO
 
 fun main(args: Array<String>) {
-    repeat(1) {
-        createWindow("window $it")
+    val windows = 1
+    repeat(windows) {
+        createWindow("window $it", windows == 1)
     }
 }
 
-fun createWindow(title: String) = runBlocking(Dispatchers.Swing) {
+fun createWindow(title: String, exitOnClose: Boolean) = runBlocking(Dispatchers.Swing) {
     var mouseX = 0
     var mouseY = 0
 
     val window = SkiaWindow()
-    window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+    window.defaultCloseOperation =
+        if (exitOnClose) WindowConstants.EXIT_ON_CLOSE else WindowConstants.DISPOSE_ON_CLOSE
     window.title = title
 
     // Create menu.

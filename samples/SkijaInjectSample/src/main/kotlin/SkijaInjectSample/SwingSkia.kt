@@ -75,7 +75,7 @@ fun SwingSkia() = SwingUtilities.invokeLater {
         Button(
             text = "New Window",
             action = {
-                createWindow("ComposeWindow")
+                createWindow("ComposeWindow", false)
             }
         ),
         BorderLayout.SOUTH
