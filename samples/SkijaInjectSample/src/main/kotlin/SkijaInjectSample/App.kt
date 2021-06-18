@@ -36,8 +36,8 @@ fun createWindow(title: String, exitOnClose: Boolean) = runBlocking(Dispatchers.
 
     // Create menu.
     val menuBar = JMenuBar()
-    val menu = JMenu("File")
-    menuBar.add(menu)
+    val fileMenu = JMenu("File")
+    menuBar.add(fileMenu)
 
     val miFullscreenState = JMenuItem("Is fullscreen mode")
     val ctrlI = KeyStroke.getKeyStroke(KeyEvent.VK_I, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx())
@@ -73,9 +73,23 @@ fun createWindow(title: String, exitOnClose: Boolean) = runBlocking(Dispatchers.
         }
     })
 
-    menu.add(miToggleFullscreen)
-    menu.add(miFullscreenState)
-    menu.add(miTakeScreenshot)
+    fileMenu.add(miToggleFullscreen)
+    fileMenu.add(miFullscreenState)
+    fileMenu.add(miTakeScreenshot)
+
+    val editMenu = JMenu("Edit")
+    menuBar.add(editMenu)
+
+    val miEmojiAndSymbols = JMenuItem("Emoji & Symbols")
+    miEmojiAndSymbols.setAccelerator(KeyStroke.getKeyStroke("ctrl meta SPACE"))
+    miEmojiAndSymbols.addActionListener(object : ActionListener {
+        override fun actionPerformed(actionEvent: ActionEvent?) {
+            orderEmojiAndSymbolsPopup()
+        }
+    })
+
+    editMenu.add(miEmojiAndSymbols)
+
 
     window.setJMenuBar(menuBar)
 
