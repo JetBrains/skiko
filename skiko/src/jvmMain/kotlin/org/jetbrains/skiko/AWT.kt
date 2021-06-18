@@ -1,16 +1,17 @@
 package org.jetbrains.skiko
 
+import java.awt.Canvas
 import java.awt.Component
 
 private val awt = getAWT().also {
     check(it != 0L)
 }
 
-internal fun <T> Component.useDrawingSurfacePlatformInfo(
+internal fun <T> Canvas.useDrawingSurfacePlatformInfo(
     block: (Long) -> T
 ) = useDrawingSurfaceInfo { block(it.platformInfo) }
 
-internal fun <T> Component.useDrawingSurfaceInfo(
+internal fun <T> Canvas.useDrawingSurfaceInfo(
     block: (DrawingSurfaceInfo) -> T
 ): T = getDrawingSurface().use { drawingSurface ->
     drawingSurface.withLock {

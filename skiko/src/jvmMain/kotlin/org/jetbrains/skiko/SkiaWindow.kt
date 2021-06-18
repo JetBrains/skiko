@@ -17,7 +17,7 @@ open class SkiaWindow(
     }
 
     fun disableTitleBar() {
-        useDrawingSurfacePlatformInfo {
+        layer.backedLayer.useDrawingSurfacePlatformInfo {
             platformOperations.disableTitleBar(it)
         }
     }
