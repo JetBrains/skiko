@@ -138,6 +138,8 @@ val skijaSrcDir = run {
         outputs.dir(delombokSkijaSrcDir)
 
         doFirst {
+            // We don't need module info.
+            skijaDir.get().resolve("shared/java/module-info.java").delete()
             delombokSkijaSrcDir.deleteRecursively()
             delombokSkijaSrcDir.mkdirs()
         }
