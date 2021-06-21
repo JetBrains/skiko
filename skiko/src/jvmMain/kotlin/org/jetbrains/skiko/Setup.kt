@@ -8,11 +8,6 @@ object Setup {
         globalLAF: Boolean = false,
         useScreenMenuBar: Boolean = true
     ) {
-        if (hostOs == OS.Linux) {
-            val scale = linuxGetSystemDpiScale()
-            System.setProperty("sun.java2d.uiScale.enabled", "true")
-            System.setProperty("sun.java2d.uiScale", "$scale")
-        }
         if (noEraseBackground) {
             // we have to set this property to avoid render flickering.
             System.setProperty("sun.awt.noerasebackground", "true")
@@ -31,4 +26,12 @@ object Setup {
     }
 }
 
-external fun linuxGetSystemDpiScale(): Float
+fun tryEnableUIScaling() {
+    if (hostOs == OS.Linux) {
+        val scale = linuxGetSystemDpiScale()
+        System.setProperty("sun.java2d.uiScale.enabled", "true")
+        System.setProperty("sun.java2d.uiScale", "$scale")
+    }
+}
+
+private external fun linuxGetSystemDpiScale(): Float

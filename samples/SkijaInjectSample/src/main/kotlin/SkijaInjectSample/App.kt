@@ -19,6 +19,7 @@ import java.nio.file.Files
 import javax.imageio.ImageIO
 
 fun main(args: Array<String>) {
+    tryEnableUIScaling()
     val windows = 1
     repeat(windows) {
         createWindow("window $it", windows == 1)

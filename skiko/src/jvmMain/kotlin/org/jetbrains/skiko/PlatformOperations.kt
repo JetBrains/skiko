@@ -98,7 +98,7 @@ internal val platformOperations: PlatformOperations by lazy {
                 }
 
                 override fun getDpiScale(component: Component): Float {
-                    // return component.graphicsConfiguration.defaultTransform.scaleX.toFloat()
+                    return component.graphicsConfiguration.defaultTransform.scaleX.toFloat()
                     // TODO doesn't work well because java doesn't scale windows (content has offset with 200% scale)
                     //
                     // Two solutions:
@@ -110,7 +110,7 @@ internal val platformOperations: PlatformOperations by lazy {
                     // Maybe we will apply contentScale manually on all platforms?)
 
                     // see also comment for HardwareLayer.checkContentScale
-                    return (component as HardwareLayer).useDrawingSurfacePlatformInfo(::linuxGetDpiScaleNative)
+                    // return (component as HardwareLayer).useDrawingSurfacePlatformInfo(::linuxGetDpiScaleNative)
                 }
 
                 override fun createRedrawer(
