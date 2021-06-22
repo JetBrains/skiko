@@ -31,6 +31,9 @@ open class SkiaLayer(
 
     internal val backedLayer : HardwareLayer
 
+    val canvas: java.awt.Canvas
+        get() = backedLayer
+
     init {
         setOpaque(false)
         layout = null
