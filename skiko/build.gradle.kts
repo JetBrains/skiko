@@ -129,21 +129,25 @@ dependencies {
     jetbrainsAnnotations("org.jetbrains:annotations:19.0.0")
 }
 val skijaSrcDir = run {
-    val delombokSkijaSrcDir = project.file("src/jvmMain/java")
+    val delombokSkijaSrcDir = project.file("src/jvmMain/java/org/jetbrains/skija")
     tasks.register("delombokSkija", JavaExec::class) {
         classpath = lombok + jetbrainsAnnotations
         main = "lombok.launch.Main"
-        args("delombok", skijaDir.get().resolve("shared/src/main/java"), "-d", delombokSkijaSrcDir)
+        args("delombok", skijaDir.get().resolve("shared/java"), "-d", delombokSkijaSrcDir)
         inputs.dir(skijaDir)
         outputs.dir(delombokSkijaSrcDir)
 
         doFirst {
+            // We don't need module info.
+            skijaDir.get().resolve("shared/java/module-info.java").delete()
             delombokSkijaSrcDir.deleteRecursively()
             delombokSkijaSrcDir.mkdirs()
         }
         doLast {
             // Remove Library.java from Skija.
-            file(delombokSkijaSrcDir.path + "/org/jetbrains/skija/impl/Library.java").delete()
+            file(delombokSkijaSrcDir.path + "/impl/Library.java").delete()
+            // We don't need module info.
+            file(delombokSkijaSrcDir.path + "/module-info.java").delete()
         }
     }.map { delombokSkijaSrcDir }
 }
@@ -475,7 +479,7 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
 
 extensions.configure<CppLibrary> {
     source.from(
-        skijaDir.map { fileTree(it.resolve("native/src")) },
+        skijaDir.map { fileTree(it.resolve("platform/cc")) },
         fileTree("$projectDir/src/jvmMain/cpp/common"),
         fileTree("$projectDir/src/jvmMain/cpp/${targetOs.id}")
     )
