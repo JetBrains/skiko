@@ -312,7 +312,15 @@ open class SkiaLayer(
         check(!isDisposed)
         contextHandler?.apply {
             if (!initContext()) {
-                fallbackToNextApi()
+                var thrown: Boolean
+                do {
+		    thrown = false
+                    try {
+                        fallbackToNextApi()
+                    } catch (e: IllegalArgumentException) {
+                        thrown = true
+		    }
+                } while (!thrown)
                 return false
             }
             initCanvas()

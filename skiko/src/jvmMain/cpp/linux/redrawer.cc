@@ -83,6 +83,8 @@ extern "C"
         GLint att[] = {GLX_RGBA, GLX_DOUBLEBUFFER, True, None};
         XVisualInfo *vi = glXChooseVisual(display, 0, att);
 
+        if (!display || !vi) return 0;
+
         GLXContext *context = new GLXContext(glXCreateContext(display, vi, NULL, GL_TRUE));
         return toJavaPointer(context);
     }
@@ -92,7 +94,9 @@ extern "C"
         Display *display = fromJavaPointer<Display *>(displayPtr);
         GLXContext *context = fromJavaPointer<GLXContext *>(contextPtr);
 
-        glXDestroyContext(display, *context);
-        delete context;
+        if (display && context) {
+            glXDestroyContext(display, *context);
+            delete context;
+	}
     }
 }
