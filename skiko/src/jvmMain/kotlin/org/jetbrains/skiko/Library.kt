@@ -79,11 +79,7 @@ object Library {
         }
 
         // TODO move properties to SkikoProperties
-        Setup.init(
-            System.getProperty("skiko.rendering.noerasebackground") != "false",
-            System.getProperty("skiko.rendering.laf.global") == "true",
-            System.getProperty("skiko.rendering.useScreenMenuBar") != "false"
-        )
+        Setup.init()
 
         try {
             // Init code executed after library was loaded.

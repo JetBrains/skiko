@@ -3,11 +3,18 @@ package org.jetbrains.skiko
 import javax.swing.UIManager
 
 object Setup {
+    private var isInited = false
     fun init(
-        noEraseBackground: Boolean = true,
-        globalLAF: Boolean = false,
-        useScreenMenuBar: Boolean = true
+        noEraseBackground: Boolean = System.getProperty("skiko.rendering.noerasebackground") != "false",
+        globalLAF: Boolean = System.getProperty("skiko.rendering.laf.global") == "true",
+        useScreenMenuBar: Boolean = System.getProperty("skiko.rendering.useScreenMenuBar") != "false",
+        autoLinuxDpi: Boolean = System.getProperty("skiko.linux.autodpi") == "true"
     ) {
+        if (hostOs == OS.Linux && autoLinuxDpi) {
+            val scale = linuxGetSystemDpiScale()
+            System.setProperty("sun.java2d.uiScale.enabled", "true")
+            System.setProperty("sun.java2d.uiScale", "$scale")
+        }
         if (noEraseBackground) {
             // we have to set this property to avoid render flickering.
             System.setProperty("sun.awt.noerasebackground", "true")
@@ -23,14 +30,7 @@ object Setup {
         } catch (e: UnsupportedOperationException) {
             // Not all platforms allow this.
         }
-    }
-}
-
-fun tryEnableUIScaling() {
-    if (hostOs == OS.Linux) {
-        val scale = linuxGetSystemDpiScale()
-        System.setProperty("sun.java2d.uiScale.enabled", "true")
-        System.setProperty("sun.java2d.uiScale", "$scale")
+        isInited = true
     }
 }
 
