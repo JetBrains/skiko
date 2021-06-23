@@ -99,18 +99,6 @@ internal val platformOperations: PlatformOperations by lazy {
 
                 override fun getDpiScale(component: Component): Float {
                     return component.graphicsConfiguration.defaultTransform.scaleX.toFloat()
-                    // TODO doesn't work well because java doesn't scale windows (content has offset with 200% scale)
-                    //
-                    // Two solutions:
-                    // 1. dynamically change sun.java2d.uiScale (it is global property,
-                    // so we have to be careful) and update all windows
-                    //
-                    // 2. apply contentScale manually to all windows
-                    // (it is not good, because on different platform windows will have different size.
-                    // Maybe we will apply contentScale manually on all platforms?)
-
-                    // see also comment for HardwareLayer.checkContentScale
-                    // return (component as HardwareLayer).useDrawingSurfacePlatformInfo(::linuxGetDpiScaleNative)
                 }
 
                 override fun createRedrawer(

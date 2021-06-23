@@ -3,7 +3,6 @@ package org.jetbrains.skiko
 import javax.swing.UIManager
 
 object Setup {
-    private var isInited = false
     fun init(
         noEraseBackground: Boolean = System.getProperty("skiko.rendering.noerasebackground") != "false",
         globalLAF: Boolean = System.getProperty("skiko.rendering.laf.global") == "true",
@@ -30,7 +29,6 @@ object Setup {
         } catch (e: UnsupportedOperationException) {
             // Not all platforms allow this.
         }
-        isInited = true
     }
 }
 
