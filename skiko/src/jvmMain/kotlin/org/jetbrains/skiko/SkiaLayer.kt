@@ -112,11 +112,27 @@ open class SkiaLayer(
     private val pictureRecorder = PictureRecorder()
     private val pictureLock = Any()
 
+    private fun findNextWorkingRenderApi(redraw: Boolean) {
+        var thrown: Boolean
+        do {
+            thrown = false
+            try {
+	        renderApi = fallbackRenderApiQueue.removeAt(0)
+                println("Trying $renderApi rendering...")
+                contextHandler?.dispose()
+                redrawer?.dispose()
+                contextHandler = createContextHandler(this, renderApi)
+                redrawer = platformOperations.createRedrawer(this, renderApi, properties)
+                if (redraw) redrawer!!.redrawImmediately()
+            } catch (e: IllegalArgumentException) {
+                 thrown = true
+            }
+        } while (thrown)
+    }
+
     open fun init() {
         backedLayer.init()
-        renderApi = fallbackRenderApiQueue.removeAt(0)
-        contextHandler = createContextHandler(this, renderApi)
-        redrawer = platformOperations.createRedrawer(this, renderApi, properties)
+        findNextWorkingRenderApi(false)
         onInit.complete(Unit)
     }
 
@@ -270,7 +286,7 @@ open class SkiaLayer(
         return withContext(Dispatchers.Swing) {
             check(!isDisposed)
             onInit.await()
-            redrawer!!.awaitRedraw()
+            redrawer?.awaitRedraw() != false
         }
     }
 
@@ -315,7 +331,7 @@ open class SkiaLayer(
         check(!isDisposed)
         contextHandler?.apply {
             if (!initContext()) {
-                fallbackToNextApi()
+                findNextWorkingRenderApi(true)
                 return false
             }
             initCanvas()
@@ -371,16 +387,6 @@ open class SkiaLayer(
             ClipMode.DIFFERENCE,
             true
         )
-    }
-
-    private fun fallbackToNextApi() {
-        renderApi = fallbackRenderApiQueue.removeAt(0)
-        println("Falling back to $renderApi rendering...")
-        contextHandler?.dispose()
-        redrawer?.dispose()
-        contextHandler = createContextHandler(this, renderApi)
-        redrawer = platformOperations.createRedrawer(this, renderApi, properties)
-        redrawer!!.redrawImmediately()
     }
 
     private fun roundSize(value: Int): Int {
