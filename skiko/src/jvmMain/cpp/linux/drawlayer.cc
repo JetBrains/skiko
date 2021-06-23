@@ -55,16 +55,33 @@ extern "C"
         return 1;
     }
 
+    double getDpiScale() {
+        Display *display = XOpenDisplay(nullptr);
+        if (display != nullptr) {
+            double result = getDpiScaleByDisplay(display);
+            XCloseDisplay(display);
+            return result;
+        } else {
+            return 1;
+        }
+    }
+
     JNIEXPORT jfloat JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_linuxGetDpiScaleNative(JNIEnv *env, jobject properties, jlong platformInfoPtr)
     {
         JAWT_X11DrawingSurfaceInfo *dsi_x11 = fromJavaPointer<JAWT_X11DrawingSurfaceInfo *>(platformInfoPtr);
         return (float) getDpiScaleByDisplay(dsi_x11->display);
     }
 
-     JNIEXPORT jint JNICALL Java_org_jetbrains_skiko_SystemThemeKt_getCurrentSystemTheme(JNIEnv *env, jobject topLevel)
-     {
-        // Unknown.
-        return 2;
-     }
+    JNIEXPORT jint JNICALL Java_org_jetbrains_skiko_SystemThemeKt_getCurrentSystemTheme(JNIEnv *env, jobject topLevel)
+    {
+       // Unknown.
+       return 2;
+    }
+
+
+    JNIEXPORT jfloat JNICALL Java_org_jetbrains_skiko_SetupKt_linuxGetSystemDpiScale(JNIEnv *env, jobject layer)
+    {
+        return (float) getDpiScale();
+    }
 
 } // extern "C"

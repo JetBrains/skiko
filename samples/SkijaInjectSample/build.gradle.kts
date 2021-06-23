@@ -52,6 +52,7 @@ val additionalArguments = mutableMapOf<String, String>()
 
 val casualRun = tasks.named<JavaExec>("run") {
     systemProperty("skiko.fps.enabled", "true")
+    systemProperty("skiko.linux.autodpi", "true")
     systemProperty("skiko.hardwareInfo.enabled", "true")
     jvmArgs?.add("-ea")
     // Use systemProperty("skiko.library.path", "/tmp") to test loader.

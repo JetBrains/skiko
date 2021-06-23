@@ -4,10 +4,16 @@ import javax.swing.UIManager
 
 object Setup {
     fun init(
-        noEraseBackground: Boolean = true,
-        globalLAF: Boolean = false,
-        useScreenMenuBar: Boolean = true
+        noEraseBackground: Boolean = System.getProperty("skiko.rendering.noerasebackground") != "false",
+        globalLAF: Boolean = System.getProperty("skiko.rendering.laf.global") == "true",
+        useScreenMenuBar: Boolean = System.getProperty("skiko.rendering.useScreenMenuBar") != "false",
+        autoLinuxDpi: Boolean = System.getProperty("skiko.linux.autodpi") == "true"
     ) {
+        if (hostOs == OS.Linux && autoLinuxDpi) {
+            val scale = linuxGetSystemDpiScale()
+            System.setProperty("sun.java2d.uiScale.enabled", "true")
+            System.setProperty("sun.java2d.uiScale", "$scale")
+        }
         if (noEraseBackground) {
             // we have to set this property to avoid render flickering.
             System.setProperty("sun.awt.noerasebackground", "true")
@@ -25,3 +31,5 @@ object Setup {
         }
     }
 }
+
+private external fun linuxGetSystemDpiScale(): Float
