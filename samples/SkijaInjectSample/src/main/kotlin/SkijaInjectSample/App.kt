@@ -18,7 +18,7 @@ import java.io.File
 import java.nio.file.Files
 import javax.imageio.ImageIO
 
-fun main(args: Array<String>) {
+fun main() {
     val windows = 1
     repeat(windows) {
         createWindow("window $it", windows == 1)

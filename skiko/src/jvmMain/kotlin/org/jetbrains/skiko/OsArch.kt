@@ -39,7 +39,7 @@ val hostId by lazy {
 }
 
 internal val hostFullName by lazy {
-    "${System.getProperty("os.name")}, ${System.getProperty("os.version")}, ${hostArch.toString().toLowerCase()}"
+    "${System.getProperty("os.name")}, ${System.getProperty("os.version")}, ${hostArch.id}"
 }
 
 internal val javaVendor by lazy {

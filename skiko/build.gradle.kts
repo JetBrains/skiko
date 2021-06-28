@@ -6,7 +6,7 @@ import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 
 plugins {
-    kotlin("multiplatform") version "1.4.30"
+    kotlin("multiplatform") version "1.5.10"
     `cpp-library`
     `maven-publish`
     id("org.gradle.crypto.checksum") version "1.1.0"
@@ -286,6 +286,7 @@ tasks.withType(CppCompile::class.java).configureEach {
                     "-DSK_SHAPER_CORETEXT_AVAILABLE",
                     "-DSK_BUILD_FOR_MAC",
                     "-DSK_METAL",
+                    *targetArch.clangFlags,
                     *buildType.clangFlags
                 )
             )
@@ -342,6 +343,7 @@ project.tasks.register<Exec>("objcCompile") {
     val skiaDir = skiaDir.get().absolutePath
     commandLine = listOf(
         "clang",
+        *targetArch.clangFlags,
         "-mmacosx-version-min=10.13",
         "-I$jdkHome/include",
         "-I$jdkHome/include/darwin",
@@ -428,6 +430,7 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
             dependsOn(project.tasks.named("objcCompile"))
             linkerArgs.addAll(
                 listOf(
+                    *targetArch.clangFlags,
                     "-dead_strip",
                     "-framework", "AppKit",
                     "-framework", "CoreFoundation",

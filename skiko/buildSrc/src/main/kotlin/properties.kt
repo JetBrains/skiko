@@ -11,9 +11,9 @@ enum class OS(val id: String) {
         get() = this == Windows
 }
 
-enum class Arch(val id: String) {
-    X64("x64"),
-    Arm64("arm64"),
+enum class Arch(val id: String, val clangFlags: Array<String>) {
+    X64("x64", arrayOf("-arch", "x86_64")),
+    Arm64("arm64", arrayOf("-arch", "arm64"))
 }
 
 enum class SkiaBuildType(
