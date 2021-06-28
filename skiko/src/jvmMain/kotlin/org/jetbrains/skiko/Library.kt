@@ -5,6 +5,7 @@ import java.io.File
 import java.io.InputStreamReader
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
+import java.util.concurrent.atomic.AtomicBoolean
 
 object Library {
     private val skikoLibraryPath = System.getProperty("skiko.library.path")
@@ -44,12 +45,15 @@ object Library {
         return file
     }
 
+    private var loaded = AtomicBoolean(false)
+
     // This function does the following: on request to load given resource,
     // it checks if resource with given name is found in content-derived directory
     // in Skiko's home, and if not - unpacks it. Also, it could load additional
     // localization resource on platforms wher it is needed.
     @Synchronized
     fun load() {
+        if (loaded.compareAndExchange(false, true)) return
         val name = "skiko-$hostId"
         val platformName = System.mapLibraryName(name)
         val icu = if (hostOs.isWindows) "icudtl.dat" else null
