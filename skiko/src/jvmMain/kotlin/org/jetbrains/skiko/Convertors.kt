@@ -2,13 +2,16 @@ package org.jetbrains.skiko
 
 import org.jetbrains.skija.Bitmap
 import org.jetbrains.skija.ColorType
+import org.jetbrains.skija.Image
 import java.awt.Transparency
 import java.awt.color.ColorSpace
 import java.awt.image.BufferedImage
 import java.awt.image.ComponentColorModel
 import java.awt.image.DataBuffer
 import java.awt.image.Raster
+import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
+import javax.imageio.ImageIO
 
 private class DirectDataBuffer(val backing: ByteBuffer): DataBuffer(TYPE_BYTE, backing.limit()) {
     override fun getElem(bank: Int, index: Int): Int {
@@ -43,4 +46,15 @@ fun Bitmap.toBufferedImage(): BufferedImage {
         DataBuffer.TYPE_BYTE
     )
    return BufferedImage(colorModel, raster!!, false, null)
+}
+
+fun BufferedImage.toBitmap(): Bitmap {
+    return Bitmap.makeFromImage(this.toImage())
+}
+
+fun BufferedImage.toImage(): Image {
+    val bos = ByteArrayOutputStream()
+    ImageIO.write(this, "png", bos)
+    val data = bos.toByteArray()
+    return Image.makeFromEncoded(data)
 }

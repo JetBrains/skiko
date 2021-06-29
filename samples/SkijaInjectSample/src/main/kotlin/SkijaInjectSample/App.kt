@@ -90,7 +90,6 @@ fun createWindow(title: String, exitOnClose: Boolean) = runBlocking(Dispatchers.
 
     editMenu.add(miEmojiAndSymbols)
 
-
     window.setJMenuBar(menuBar)
 
     val state = State()
