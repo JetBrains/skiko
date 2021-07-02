@@ -118,7 +118,6 @@ open class SkiaLayer(
             thrown = false
             try {
 	        renderApi = fallbackRenderApiQueue.removeAt(0)
-                println("Trying $renderApi rendering...")
                 contextHandler?.dispose()
                 redrawer?.dispose()
                 contextHandler = createContextHandler(this, renderApi)
