@@ -587,11 +587,21 @@ tasks.withType<AbstractPublishToMaven>().configureEach {
     }
 }
 
+val skikoRuntimeDirForTests by project.tasks.registering(Copy::class) {
+    dependsOn(skikoJvmRuntimeJar)
+    from(zipTree(skikoJvmRuntimeJar.flatMap { it.archiveFile })) {
+        include("*.so")
+        include("*.dylib")
+        include("*.dll")
+        include("icudtl.dat")
+    }
+    destinationDir = project.buildDir.resolve("skiko-runtime-for-tests")
+}
 tasks.withType<Test>().configureEach {
-    dependsOn(project.tasks.withType(LinkSharedLibrary::class.java).single { it.name.contains(buildType.id) })
+    dependsOn(skikoRuntimeDirForTests)
     dependsOn(skikoJvmRuntimeJar)
     options {
-        val dir = skikoNativeLib.parentFile.absolutePath
+        val dir = skikoRuntimeDirForTests.map { it.destinationDir }.get()
         systemProperty("skiko.library.path", dir)
         val jar = skikoJvmRuntimeJar.get().outputs.files.files.single { it.name.endsWith(".jar")}
         systemProperty("skiko.jar.path", jar.absolutePath)

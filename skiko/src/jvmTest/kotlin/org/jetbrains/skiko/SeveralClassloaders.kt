@@ -54,11 +54,49 @@ private fun testSkikoLoad(loader: ClassLoader) {
     val tester = clazz.getDeclaredConstructor().newInstance()
     val ptr = clazz.getMethod("run").invoke(tester) as Long
     assert(ptr != 0L)
+
+    val paragraphPackage = "org.jetbrains.skija.paragraph"
+    val paragraphStyle = newInstance(loader, "$paragraphPackage.ParagraphStyle")
+    val fontCollection = newInstance(loader, "$paragraphPackage.FontCollection")
+    newInstance(loader, "$paragraphPackage.ParagraphBuilder", paragraphStyle, fontCollection)
+}
+
+private fun newInstance(loader: ClassLoader, fqName: String, vararg args: Any): Any {
+    val argsClasses = args.map { it.javaClass }.toTypedArray()
+    return loader.loadClass(fqName)
+        .getDeclaredConstructor(*argsClasses)
+        .newInstance(*args)
 }
 
 class SeveralClassloaders {
     @Test
-    fun `load skiko in several classloaders`()  {
+    fun `load skiko in several classloaders (with skiko path)`()  {
+        check(skikoLibraryPath != null)
+        doTest()
+    }
+
+    @Test
+    fun `load skiko in several classloaders (without skiko path)`()  {
+        val oldValue = skikoLibraryPath!!
+        skikoLibraryPath = null
+        try {
+            doTest()
+        } finally {
+            skikoLibraryPath = oldValue
+        }
+    }
+
+    private var skikoLibraryPath: String?
+        get() = System.getProperty(Library.SKIKO_LIBRARY_PATH_PROPERTY)
+        set(value) {
+            if (value != null) {
+                System.setProperty(Library.SKIKO_LIBRARY_PATH_PROPERTY, value)
+            } else {
+                System.clearProperty(Library.SKIKO_LIBRARY_PATH_PROPERTY)
+            }
+        }
+
+    private fun doTest() {
         val threaded = false
         val jar = System.getProperty("skiko.jar.path")
         val stdlibClass = Class.forName("kotlin.jvm.internal.Intrinsics")
