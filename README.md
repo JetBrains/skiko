@@ -48,6 +48,8 @@ To use latest development snapshot use version `0.0.0-SNAPSHOT`.
 * Set JAVA_HOME to location of JDK, at least version 11
 * `cd skiko && ./gradlew publishToMavenLocal` will build the artefact and publish it to local Maven repo
 
+To build with debug symbols and debug Skia build use `-Pskiko.debug=true` Gradle argument.
+
 #### Working with Skia or Skija sources
 
 Gradle build downloads the necessary version of Skia & Skija by default.
