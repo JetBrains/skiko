@@ -8,7 +8,8 @@ import java.nio.file.StandardCopyOption
 import java.util.concurrent.atomic.AtomicBoolean
 
 object Library {
-    private val skikoLibraryPath = System.getProperty("skiko.library.path")
+    internal const val SKIKO_LIBRARY_PATH_PROPERTY = "skiko.library.path"
+    private val skikoLibraryPath = System.getProperty(SKIKO_LIBRARY_PATH_PROPERTY)
     private val cacheRoot = "${System.getProperty("user.home")}/.skiko/"
     private var copyDir: File? = null
 
@@ -20,8 +21,8 @@ object Library {
             System.load(library.absolutePath)
         } catch (e: UnsatisfiedLinkError) {
             if (e.message?.contains("already loaded in another classloader") == true) {
-                val tempFile = File.createTempFile("skiko", if (hostOs.isWindows) ".dll" else "")
-                copyDir = tempFile.parentFile
+                copyDir = Files.createTempDirectory("skiko").toFile()
+                val tempFile = copyDir!!.resolve(library.name)
                 Files.copy(library.toPath(), tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
                 tempFile.deleteOnExit()
                 System.load(tempFile.absolutePath)
@@ -78,7 +79,11 @@ object Library {
             val library = unpackIfNeeded(cacheDir, platformName, false)
             loadLibraryOrCopy(library)
             if (icu != null) {
-                unpackIfNeeded(cacheDir, icu, false)
+                if (copyDir != null) {
+                    unpackIfNeeded(copyDir!!, icu, true)
+                } else {
+                    unpackIfNeeded(cacheDir, icu, false)
+                }
             }
         }
 
