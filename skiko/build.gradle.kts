@@ -25,8 +25,7 @@ buildscript {
 }
 
 val skiko = SkikoProperties(rootProject)
-val debug = false
-val buildType = if (debug) SkiaBuildType.DEBUG else SkiaBuildType.RELEASE
+val buildType = skiko.buildType
 
 allprojects {
     group = "org.jetbrains.skiko"
