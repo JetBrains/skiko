@@ -92,7 +92,12 @@ class SkikoProperties(private val myProject: Project) {
     val skiaReleaseForTargetOS: String
         get() {
             val tag = myProject.property("dependencies.skia.$target") as String
-            return "${tag}/Skia-${tag}-${targetOs.id}-${buildType.id}-${targetArch.id}"
+            val suffix = if (targetOs == OS.Linux && targetArch == Arch.X64) {
+                "-ubuntu14"
+            } else {
+                ""
+            }
+            return "${tag}/Skia-${tag}-${targetOs.id}-${buildType.id}-${targetArch.id}$suffix"
         }
 
     val releaseGithubVersion: String
