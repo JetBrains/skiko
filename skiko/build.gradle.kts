@@ -34,9 +34,6 @@ allprojects {
 
 repositories {
     mavenCentral()
-    maven {
-        url = uri("https://dl.bintray.com/kotlin/kotlin-eap")
-    }
 }
 
 val skiaZip = run {
