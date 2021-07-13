@@ -53,6 +53,7 @@ class MacosGLLayer(val layer: HardwareLayer, setNeedsDisplayOnBoundsChange: Bool
         this.setNeedsDisplayOnBoundsChange(setNeedsDisplayOnBoundsChange)
         this.removeAllAnimations()
         this.setAutoresizingMask(kCALayerWidthSizable or kCALayerHeightSizable )
+        this.setAsynchronous(true)
         container.layer = this
         container.wantsLayer = true
     }
