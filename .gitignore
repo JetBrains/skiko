@@ -3,7 +3,6 @@ build
 .project
 local.properties
 .DS_Store
-run.sh
 .idea
 deploy.sh
 deploy.bat
