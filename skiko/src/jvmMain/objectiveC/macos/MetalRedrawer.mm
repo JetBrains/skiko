@@ -99,12 +99,16 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_makeMeta
     JNIEnv * env, jobject redrawer, jlong devicePtr, jint width, jint height)
 {
     MetalDevice *device = (MetalDevice *) devicePtr;
-    id<CAMetalDrawable> currentDrawable = [device.layer nextDrawable];
-    GrMtlTextureInfo info;
-    info.fTexture.retain(currentDrawable.texture);
-    GrBackendRenderTarget* renderTarget = new GrBackendRenderTarget(width, height, 0, info);
-    device.drawableHandle = currentDrawable;
+    GrBackendRenderTarget* renderTarget = NULL;
 
+    @autoreleasepool {
+        id<CAMetalDrawable> currentDrawable = [device.layer nextDrawable];
+        if (!currentDrawable) return 0;
+        device.drawableHandle = currentDrawable;
+        GrMtlTextureInfo info;
+        info.fTexture.retain(currentDrawable.texture);
+        renderTarget = new GrBackendRenderTarget(width, height, 0, info);
+    }
     return (jlong) renderTarget;
 }
 
@@ -139,12 +143,12 @@ BOOL isUsingIntegratedGPU() {
     return output != 0;
 }
 
-id<MTLDevice> MTLCreateIntegratedDevice(int adpapterPriority) {
+id<MTLDevice> MTLCreateIntegratedDevice(int adapterPriority) {
     BOOL isIntegratedGPU = NO;
 
-    if (adpapterPriority == AdpapterPriorityAuto) {
+    if (adapterPriority == AdpapterPriorityAuto) {
         isIntegratedGPU = isUsingIntegratedGPU();
-    } else if (adpapterPriority == AdpapterPriorityIntegrated) {
+    } else if (adapterPriority == AdpapterPriorityIntegrated) {
         isIntegratedGPU = YES;
     }
 
@@ -234,13 +238,21 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_finishFra
     JNIEnv *env, jobject redrawer, jlong devicePtr)
 {
     MetalDevice *device = (MetalDevice *) devicePtr;
+
     id<CAMetalDrawable> currentDrawable = device.drawableHandle;
 
     id<MTLCommandBuffer> commandBuffer = [device.queue commandBuffer];
     commandBuffer.label = @"Present";
 
+    [currentDrawable addPresentedHandler:^(id<MTLDrawable> dr) {
+         CFRelease(currentDrawable);
+    }];
     [commandBuffer presentDrawable:currentDrawable];
     [commandBuffer commit];
+
+    device.drawableHandle = nil;
+
+    currentDrawable = nil;
 }
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_disposeDevice(
