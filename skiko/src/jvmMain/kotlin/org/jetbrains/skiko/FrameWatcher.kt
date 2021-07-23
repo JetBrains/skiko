@@ -12,14 +12,20 @@ import java.util.concurrent.atomic.AtomicInteger
  * making sure that we'll have memory consumption under control.
  */
 internal object FrameWatcher {
+    var gcDelayMillis = 30_000L
+    var minFramesToRenderer = 1_000
+
     fun start() {
         // We initiate GC on IO threads, so that rendering is not blocked in
         // cases of concurrent collectors.
         @OptIn(DelicateCoroutinesApi::class)
         GlobalScope.launch(Dispatchers.IO) {
             while (true) {
-                delay(5000L)
-                if (frameCounter.get() > 1000) {
+                // Wait some time between collection attempts.
+                delay(gcDelayMillis)
+                // Ensure that certain number of frames were rendered, as we allocate Skia
+                // garbage when rendering.
+                if (frameCounter.get() > minFramesToRenderer) {
                     System.gc()
                     frameCounter.set(0)
                 }
