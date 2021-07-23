@@ -60,23 +60,22 @@ internal class MetalRedrawer(
     private suspend fun draw() {
         withContext(Dispatchers.IO) {
             val handle = startRendering()
-            if (layer.prepareDrawContext()) {
-                // 2,3 GHz 8-Core Intel Core i9
-                //
-                // Test1. 8 windows, multiple clocks, 800x600
-                //
-                // Executors.newSingleThreadExecutor().asCoroutineDispatcher(): 20 FPS, 130% CPU
-                // Dispatchers.IO: 58 FPS, 460% CPU
-                //
-                // Test2. 60 windows, single clock, 800x600
-                //
-                // Executors.newSingleThreadExecutor().asCoroutineDispatcher(): 50 FPS, 150% CPU
-                // Dispatchers.IO: 50 FPS, 200% CPU
-                synchronized(disposeLock) {
-                    if (!isDisposed) {
+            synchronized(disposeLock) {
+                if (!isDisposed)
+                    if (layer.prepareDrawContext()) {
+                        // 2,3 GHz 8-Core Intel Core i9
+                        //
+                        // Test1. 8 windows, multiple clocks, 800x600
+                        //
+                        // Executors.newSingleThreadExecutor().asCoroutineDispatcher(): 20 FPS, 130% CPU
+                        // Dispatchers.IO: 58 FPS, 460% CPU
+                        //
+                        // Test2. 60 windows, single clock, 800x600
+                        //
+                        // Executors.newSingleThreadExecutor().asCoroutineDispatcher(): 50 FPS, 150% CPU
+                        // Dispatchers.IO: 50 FPS, 200% CPU
                         layer.draw()
                     }
-                }
             }
             endRendering(handle)
         }
