@@ -16,12 +16,18 @@ compilerOpts.osx = -x c++ -std=c++14 \
     -DSK_SUPPORT_OPENCL=0 \
     -DSK_UNICODE_AVAILABLE
 
-headers = modules/skparagraph/include/Paragraph.h modules/skparagraph/include/FontCollection.h modules/skparagraph/include/Metrics.h modules/skparagraph/include/ParagraphStyle.h modules/skparagraph/include/TextStyle.h include/core/SkFilterQuality.h include/core/SkCanvas.h include/core/SkData.h include/core/SkImage.h include/core/SkMath.h include/core/SkStream.h include/core/SkSurface.h include/core/SkSurfaceProps.h include/core/SkTypes.h include/core/SkPaint.h include/core/SkPictureRecorder.h include/core/SkPoint3.h include/core/SkImageInfo.h include/core/SkColor.h include/core/SkColorSpace.h include/utils/SkShadowUtils.h include/gpu/GrDirectContext.h include/gpu/GrBackendSurface.h include/gpu/GrConfig.h include/gpu/gl/GrGLInterface.h
+headers = modules/skparagraph/include/ParagraphBuilder.h modules/skparagraph/include/TypefaceFontProvider.h modules/skparagraph/include/Paragraph.h modules/skparagraph/include/FontCollection.h modules/skparagraph/include/Metrics.h modules/skparagraph/include/ParagraphStyle.h modules/skparagraph/include/TextStyle.h include/core/SkFontMgr.h include/core/SkFilterQuality.h include/core/SkCanvas.h include/core/SkData.h include/core/SkImage.h include/core/SkMath.h include/core/SkStream.h include/core/SkSurface.h include/core/SkSurfaceProps.h include/core/SkTypes.h include/core/SkPaint.h include/core/SkPictureRecorder.h include/core/SkPoint3.h include/core/SkImageInfo.h include/core/SkColor.h include/core/SkColorSpace.h include/utils/SkShadowUtils.h include/gpu/GrDirectContext.h include/gpu/GrBackendSurface.h include/gpu/GrConfig.h include/gpu/gl/GrGLInterface.h
 
-headerFilter = modules/skparagraph/include/Paragraph.h modules/skparagraph/include/FontCollection.h modules/skparagraph/include/Metrics.h modules/skparagraph/include/ParagraphStyle.h modules/skparagraph/include/TextStyle.h include/core/SkFilterQuality.h include/core/SkCanvas.h include/core/SkData.h include/core/SkImage.h include/core/SkMath.h include/core/SkStream.h include/core/SkSurface.h include/core/SkSurfaceProps.h include/core/SkTypes.h include/core/SkPaint.h include/core/SkPictureRecorder.h include/core/SkPoint3.h include/core/SkImageInfo.h include/core/SkColor.h include/core/SkColorSpace.h include/utils/SkShadowUtils.h include/gpu/GrDirectContext.h include/gpu/GrBackendSurface.h include/gpu/GrConfig.h include/gpu/gl/GrGLInterface.h
+headerFilter = modules/skparagraph/include/ParagraphBuilder.h modules/skparagraph/include/TypefaceFontProvider.h modules/skparagraph/include/Paragraph.h modules/skparagraph/include/FontCollection.h modules/skparagraph/include/Metrics.h modules/skparagraph/include/ParagraphStyle.h modules/skparagraph/include/TextStyle.h include/core/SkFontMgr.h include/core/SkFilterQuality.h include/core/SkCanvas.h include/core/SkData.h include/core/SkImage.h include/core/SkMath.h include/core/SkStream.h include/core/SkSurface.h include/core/SkSurfaceProps.h include/core/SkTypes.h include/core/SkPaint.h include/core/SkPictureRecorder.h include/core/SkPoint3.h include/core/SkImageInfo.h include/core/SkColor.h include/core/SkColorSpace.h include/utils/SkShadowUtils.h include/gpu/GrDirectContext.h include/gpu/GrBackendSurface.h include/gpu/GrConfig.h include/gpu/gl/GrGLInterface.h
 
 # const overloads are not supported yet
 excludedFunctions = mapRect ptr priv
 
 linkerOpts.osx = -framework CoreServices -framework CoreText -framework CoreGraphics -framework Metal
+
+---
+
+static inline skia::textlayout::Paragraph* __ParagraphBuilder__Build(skia::textlayout::ParagraphBuilder* paragraphBuilder) {
+    return paragraphBuilder->Build().release();
+}
 
