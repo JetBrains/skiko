@@ -2,12 +2,13 @@ package org.jetbrains.skiko
 
 import javax.swing.UIManager
 
-object Setup {
+internal object Setup {
     fun init(
         noEraseBackground: Boolean = System.getProperty("skiko.rendering.noerasebackground") != "false",
         globalLAF: Boolean = System.getProperty("skiko.rendering.laf.global") == "true",
         useScreenMenuBar: Boolean = System.getProperty("skiko.rendering.useScreenMenuBar") != "false",
-        autoLinuxDpi: Boolean = System.getProperty("skiko.linux.autodpi") == "true"
+        autoLinuxDpi: Boolean = System.getProperty("skiko.linux.autodpi") == "true",
+        automateGC: Boolean = System.getProperty("skiko.gc.auto") != "false"
     ) {
         if (hostOs == OS.Linux && autoLinuxDpi) {
             val scale = linuxGetSystemDpiScale()
@@ -28,6 +29,10 @@ object Setup {
             }
         } catch (e: UnsupportedOperationException) {
             // Not all platforms allow this.
+        }
+
+        if (automateGC) {
+           FrameWatcher.start()
         }
     }
 }

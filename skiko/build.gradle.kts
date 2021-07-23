@@ -13,7 +13,7 @@ plugins {
     id("de.undercouch.download") version "4.1.1"
 }
 
-val coroutinesVersion = "1.4.1"
+val coroutinesVersion = "1.5.0"
 
 buildscript {
     dependencies {
