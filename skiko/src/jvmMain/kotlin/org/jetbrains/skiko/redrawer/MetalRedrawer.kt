@@ -16,7 +16,7 @@ import javax.swing.SwingUtilities.getRootPane
 
 internal class MetalRedrawer(
     private val layer: SkiaLayer,
-    private val properties: SkiaLayerProperties
+    properties: SkiaLayerProperties
 ) : Redrawer {
     private var isDisposed = false
     private var disposeLock = Any()
@@ -58,38 +58,41 @@ internal class MetalRedrawer(
     }
 
     private suspend fun draw() {
-        if (layer.prepareDrawContext()) {
-            // 2,3 GHz 8-Core Intel Core i9
-            //
-            // Test1. 8 windows, multiple clocks, 800x600
-            //
-            // Executors.newSingleThreadExecutor().asCoroutineDispatcher(): 20 FPS, 130% CPU
-            // Dispatchers.IO: 58 FPS, 460% CPU
-            //
-            // Test2. 60 windows, single clock, 800x600
-            //
-            // Executors.newSingleThreadExecutor().asCoroutineDispatcher(): 50 FPS, 150% CPU
-            // Dispatchers.IO: 50 FPS, 200% CPU
-            withContext(Dispatchers.IO) {
+        withContext(Dispatchers.IO) {
+            val handle = startRendering()
+            if (layer.prepareDrawContext()) {
+                // 2,3 GHz 8-Core Intel Core i9
+                //
+                // Test1. 8 windows, multiple clocks, 800x600
+                //
+                // Executors.newSingleThreadExecutor().asCoroutineDispatcher(): 20 FPS, 130% CPU
+                // Dispatchers.IO: 58 FPS, 460% CPU
+                //
+                // Test2. 60 windows, single clock, 800x600
+                //
+                // Executors.newSingleThreadExecutor().asCoroutineDispatcher(): 50 FPS, 150% CPU
+                // Dispatchers.IO: 50 FPS, 200% CPU
                 synchronized(disposeLock) {
                     if (!isDisposed) {
                         layer.draw()
                     }
                 }
             }
-            // When window is not visible - it doesn't make sense to redraw fast to avoid battery drain.
-            // In theory, we could be more precise, and just suspend rendering in
-            // `NSWindowDidChangeOcclusionStateNotification`, but current approach seems to work as well in practise.
-            if (isOccluded(windowHandle))
-                delay(300)
+            endRendering(handle)
         }
+        // When window is not visible - it doesn't make sense to redraw fast to avoid battery drain.
+        // In theory, we could be more precise, and just suspend rendering in
+        // `NSWindowDidChangeOcclusionStateNotification`, but current approach seems to work as well in practise.
+        if (isOccluded(windowHandle))
+            delay(300)
     }
 
     override fun syncSize() {
         val rootPane = getRootPane(layer)
         val globalPosition = convertPoint(layer, layer.x, layer.y, rootPane)
         setContentScale(device, layer.contentScale)
-        resizeLayers(device,
+        resizeLayers(
+            device,
             globalPosition.x,
             rootPane.height - globalPosition.y - layer.height,
             layer.width.coerceAtLeast(0),
@@ -104,7 +107,7 @@ internal class MetalRedrawer(
     fun makeRenderTarget(width: Int, height: Int) = BackendRenderTarget(
         makeMetalRenderTarget(device, width, height)
     )
-    
+
     fun finishFrame() = finishFrame(device)
 
     fun getAdapterPriority(): Int {
@@ -130,4 +133,6 @@ internal class MetalRedrawer(
     private external fun isOccluded(window: Long): Boolean
     private external fun getAdapterName(device: Long): String
     private external fun getAdapterMemorySize(device: Long): Long
+    private external fun startRendering(): Long
+    private external fun endRendering(handle: Long)
 }
