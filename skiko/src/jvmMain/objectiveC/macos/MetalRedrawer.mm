@@ -101,15 +101,28 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_makeMeta
     MetalDevice *device = (MetalDevice *) devicePtr;
     GrBackendRenderTarget* renderTarget = NULL;
 
-    @autoreleasepool {
-        id<CAMetalDrawable> currentDrawable = [device.layer nextDrawable];
-        if (!currentDrawable) return 0;
-        device.drawableHandle = currentDrawable;
-        GrMtlTextureInfo info;
-        info.fTexture.retain(currentDrawable.texture);
-        renderTarget = new GrBackendRenderTarget(width, height, 0, info);
-    }
+    id<CAMetalDrawable> currentDrawable = [device.layer nextDrawable];
+    if (!currentDrawable) return 0;
+    device.drawableHandle = currentDrawable;
+    GrMtlTextureInfo info;
+    info.fTexture.retain(currentDrawable.texture);
+    renderTarget = new GrBackendRenderTarget(width, height, 0, info);
     return (jlong) renderTarget;
+}
+
+extern "C" void* objc_autoreleasePoolPush(void);
+extern "C" void objc_autoreleasePoolPop(void*);
+
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_startRendering(
+    JNIEnv * env, jobject redrawer)
+{
+    return (jlong)objc_autoreleasePoolPush();
+}
+
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_endRendering(
+    JNIEnv * env, jobject redrawer, jlong handle)
+{
+    objc_autoreleasePoolPop((void*)handle);
 }
 
 BOOL isUsingIntegratedGPU() {
@@ -241,18 +254,13 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_finishFra
 
     id<CAMetalDrawable> currentDrawable = device.drawableHandle;
 
-    id<MTLCommandBuffer> commandBuffer = [device.queue commandBuffer];
-    commandBuffer.label = @"Present";
-
-    [currentDrawable addPresentedHandler:^(id<MTLDrawable> dr) {
-         CFRelease(currentDrawable);
-    }];
-    [commandBuffer presentDrawable:currentDrawable];
-    [commandBuffer commit];
-
-    device.drawableHandle = nil;
-
-    currentDrawable = nil;
+    if (currentDrawable) {
+        id<MTLCommandBuffer> commandBuffer = [device.queue commandBuffer];
+        commandBuffer.label = @"Present";
+        [commandBuffer presentDrawable:currentDrawable];
+        [commandBuffer commit];
+        device.drawableHandle = nil;
+    }
 }
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_disposeDevice(
