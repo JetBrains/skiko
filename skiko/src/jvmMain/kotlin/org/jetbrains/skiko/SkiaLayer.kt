@@ -350,6 +350,7 @@ open class SkiaLayer(
             }
             flush()
         }
+        FrameWatcher.nextFrame()
     }
 
     // Captures current layer as bitmap.

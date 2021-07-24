@@ -13,7 +13,7 @@ plugins {
     id("de.undercouch.download") version "4.1.1"
 }
 
-val coroutinesVersion = "1.4.1"
+val coroutinesVersion = "1.5.0"
 
 buildscript {
     dependencies {
@@ -556,6 +556,7 @@ val createChecksums by project.tasks.registering(org.gradle.crypto.checksum.Chec
 }
 
 val skikoJvmRuntimeJar by project.tasks.registering(Jar::class) {
+    dependsOn(createChecksums)
     archiveBaseName.set("skiko-$target")
     from(skikoJvmJar.map { zipTree(it.archiveFile) })
     from(maybeSign.get().outputs.files)
