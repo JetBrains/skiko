@@ -101,7 +101,9 @@ class SeveralClassloaders {
         val jar = System.getProperty("skiko.jar.path")
         val stdlibClass = Class.forName("kotlin.jvm.internal.Intrinsics")
         val stdLibJar = stdlibClass.protectionDomain.codeSource.location
-        val urls = listOf(Paths.get(jar).toUri().toURL(), stdLibJar)
+        val coroutinesClass = Class.forName("kotlinx.coroutines.CoroutineDispatcher")
+        val coroutinesJar = coroutinesClass.protectionDomain.codeSource.location
+        val urls = listOf(Paths.get(jar).toUri().toURL(), stdLibJar, coroutinesJar)
         val loaders = mutableListOf<ClassLoader>()
         repeat(4) {
             loaders += PlatformAndURLClassLoader(urls)

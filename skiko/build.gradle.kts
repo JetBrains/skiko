@@ -556,6 +556,7 @@ val createChecksums by project.tasks.registering(org.gradle.crypto.checksum.Chec
 }
 
 val skikoJvmRuntimeJar by project.tasks.registering(Jar::class) {
+    dependsOn(createChecksums)
     archiveBaseName.set("skiko-$target")
     from(skikoJvmJar.map { zipTree(it.archiveFile) })
     from(maybeSign.get().outputs.files)
