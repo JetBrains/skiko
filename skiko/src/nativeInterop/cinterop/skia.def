@@ -31,3 +31,8 @@ static inline skia::textlayout::Paragraph* __ParagraphBuilder__Build(skia::textl
     return paragraphBuilder->Build().release();
 }
 
+// This is to wrokaround skia interop's inability to pass c++ classes by value
+static inline void __TextStyle__setFontStyle(skia::textlayout::TextStyle* textStyle, SkFontStyle& fontStyle) {
+    textStyle->setFontStyle(fontStyle)
+}
+
