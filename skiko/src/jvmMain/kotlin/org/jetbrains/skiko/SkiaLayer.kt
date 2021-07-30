@@ -23,6 +23,11 @@ private class PictureHolder(val instance: Picture, val width: Int, val height: I
 open class SkiaLayer(
     private val properties: SkiaLayerProperties = SkiaLayerProperties()
 ) : JPanel() {
+    companion object {
+        init {
+            Library.load()
+        }
+    }
 
     enum class PropertyKind {
         Renderer,
