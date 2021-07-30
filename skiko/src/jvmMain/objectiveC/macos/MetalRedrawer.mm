@@ -3,9 +3,6 @@
 #import <jawt.h>
 #import <jawt_md.h>
 
-
-#include <dlfcn.h>
-
 #import <Cocoa/Cocoa.h>
 #import <QuartzCore/QuartzCore.h>
 #import <Metal/Metal.h>
@@ -113,32 +110,18 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_makeMeta
     return (jlong) renderTarget;
 }
 
-static void* objc_library() {
-    void* result = dlopen("/usr/lib/libobjc.dylib", RTLD_LAZY | RTLD_LOCAL);
-    return result != NULL ? result : RTLD_DEFAULT;
-}
+extern "C" void* objc_autoreleasePoolPush(void);
+extern "C" void objc_autoreleasePoolPop(void*);
 
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_startRendering(
     JNIEnv * env, jobject redrawer)
 {
-    typedef void* (*objc_autoreleasePoolPush_t)(void);
-    static objc_autoreleasePoolPush_t objc_autoreleasePoolPush = NULL;
-    if (objc_autoreleasePoolPush == NULL) {
-        objc_autoreleasePoolPush = (objc_autoreleasePoolPush_t)dlsym(objc_library(), "objc_autoreleasePoolPush");
-        assert(objc_autoreleasePoolPush != NULL);
-    }
     return (jlong)objc_autoreleasePoolPush();
 }
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_endRendering(
     JNIEnv * env, jobject redrawer, jlong handle)
 {
-    typedef void (*objc_autoreleasePoolPop_t)(void*);
-    static objc_autoreleasePoolPop_t objc_autoreleasePoolPop = NULL;
-    if (objc_autoreleasePoolPop == NULL) {
-        objc_autoreleasePoolPop = (objc_autoreleasePoolPop_t)dlsym(objc_library(), "objc_autoreleasePoolPop");
-        assert(objc_autoreleasePoolPop != NULL);
-    }
     objc_autoreleasePoolPop((void*)handle);
 }
 
