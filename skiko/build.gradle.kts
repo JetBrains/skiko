@@ -428,6 +428,7 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
                 listOf(
                     *targetArch.clangFlags,
                     "-dead_strip",
+                    "-lobjc",
                     "-framework", "AppKit",
                     "-framework", "CoreFoundation",
                     "-framework", "CoreGraphics",
