@@ -6,10 +6,7 @@ import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
 import org.jetbrains.skija.BackendRenderTarget
 import org.jetbrains.skija.DirectContext
-import org.jetbrains.skiko.FrameDispatcher
-import org.jetbrains.skiko.GpuPriority
-import org.jetbrains.skiko.SkiaLayer
-import org.jetbrains.skiko.SkiaLayerProperties
+import org.jetbrains.skiko.*
 import org.jetbrains.skiko.useDrawingSurfacePlatformInfo
 import javax.swing.SwingUtilities.convertPoint
 import javax.swing.SwingUtilities.getRootPane
@@ -18,6 +15,12 @@ internal class MetalRedrawer(
     private val layer: SkiaLayer,
     properties: SkiaLayerProperties
 ) : Redrawer {
+    init {
+        // We use native code inside concurrent code, so make sure native library is loaded
+        // before init.
+        Library.load()
+    }
+
     private var isDisposed = false
     private var disposeLock = Any()
     private val device = layer.backedLayer.useDrawingSurfacePlatformInfo {
