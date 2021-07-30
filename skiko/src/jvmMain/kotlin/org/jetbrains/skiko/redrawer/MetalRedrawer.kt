@@ -15,12 +15,11 @@ internal class MetalRedrawer(
     private val layer: SkiaLayer,
     properties: SkiaLayerProperties
 ) : Redrawer {
-    init {
-        // We use native code inside concurrent code, so make sure native library is loaded
-        // before init.
-        Library.load()
+    companion object {
+        init {
+            Library.load()
+        }
     }
-
     private var isDisposed = false
     private var disposeLock = Any()
     private val device = layer.backedLayer.useDrawingSurfacePlatformInfo {
