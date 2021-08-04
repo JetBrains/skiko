@@ -15,7 +15,13 @@ internal class WindowsOpenGLRedrawer(
     private val properties: SkiaLayerProperties
 ) : Redrawer {
     private val device = layer.backedLayer.useDrawingSurfacePlatformInfo(::getDevice)
-    private val context = createContext(device)
+    private val context = createContext(device).also {
+        val gl = OpenGLApi.instance
+        makeCurrent(device, it)
+        if (it == 0L || gl.isCurrentAdapterBlacklisted()) {
+            throw IllegalArgumentException("Cannot create Windows GL context")
+        }
+    }
     private var isDisposed = false
 
     init {

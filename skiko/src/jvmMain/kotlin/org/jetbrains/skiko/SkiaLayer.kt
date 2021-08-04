@@ -129,6 +129,7 @@ open class SkiaLayer(
                 redrawer = platformOperations.createRedrawer(this, renderApi, properties)
                 if (redraw) redrawer!!.redrawImmediately()
             } catch (e: IllegalArgumentException) {
+                println(e.message)
                  thrown = true
             }
         } while (thrown)

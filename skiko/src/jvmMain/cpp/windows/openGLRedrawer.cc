@@ -1,9 +1,15 @@
 #define WIN32_LEAN_AND_MEAN
+#include <vector>
+#include <string>
 #include <windows.h>
+#include <wingdi.h>
 #include <gl/GL.h>
 #include <jawt_md.h>
 #include <dwmapi.h>
 #include "jni_helpers.h"
+
+const std::vector<std::string> vendorBlacklist{ "VMware, Inc." };
+const std::vector<std::string> adapterBlacklist{ "llvmpipe (LLVM 5.0, 256 bits)" };
 
 extern "C"
 {
