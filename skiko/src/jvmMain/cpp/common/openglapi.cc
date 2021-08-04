@@ -12,7 +12,10 @@
 #include <vector>
 
 const std::vector<std::string> vendorBlacklist{ "VMware, Inc." };
-const std::vector<std::string> adapterBlacklist{ "llvmpipe (LLVM 5.0, 256 bits)" };
+const std::vector<std::string> adapterBlacklist{
+    "llvmpipe (LLVM 5.0, 256 bits)",
+    "Intel(R) HD Graphics 2000",
+};
 
 extern "C" {
 
