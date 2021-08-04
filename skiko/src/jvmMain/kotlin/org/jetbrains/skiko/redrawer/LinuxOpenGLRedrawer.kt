@@ -16,7 +16,13 @@ internal class LinuxOpenGLRedrawer(
     private val properties: SkiaLayerProperties
 ) : Redrawer {
     private val context = layer.backedLayer.lockDrawingSurface {
-        it.createContext().also { if (it == 0L) throw IllegalArgumentException("Cannot create Linux GL context") }
+        val result = it.createContext()
+        val gl = OpenGLApi.instance
+        it.makeCurrent(result)
+        if (result == 0L || gl.isCurrentAdapterBlacklisted()) {
+            throw IllegalArgumentException("Cannot create Linux GL context")
+        }
+        result
     }
     private var isDisposed = false
 

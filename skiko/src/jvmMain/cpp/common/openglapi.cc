@@ -38,7 +38,7 @@ JNIEXPORT jboolean JNICALL Java_org_jetbrains_skiko_OpenGLApi_isCurrentAdapterBl
             return true;
         }
     }
-    return true;
+    return false;
 }
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_OpenGLApi_glViewport(JNIEnv * env, jobject object, jint x, jint y, jint w, jint h) {
