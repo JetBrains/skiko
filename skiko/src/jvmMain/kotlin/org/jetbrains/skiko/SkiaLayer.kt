@@ -122,7 +122,7 @@ open class SkiaLayer(
         do {
             thrown = false
             try {
-	        renderApi = fallbackRenderApiQueue.removeAt(0)
+	            renderApi = fallbackRenderApiQueue.removeAt(0)
                 contextHandler?.dispose()
                 redrawer?.dispose()
                 contextHandler = createContextHandler(this, renderApi)
@@ -130,7 +130,7 @@ open class SkiaLayer(
                 if (redraw) redrawer!!.redrawImmediately()
             } catch (e: IllegalArgumentException) {
                 println(e.message)
-                 thrown = true
+                thrown = true
             }
         } while (thrown)
     }
