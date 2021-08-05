@@ -1,4 +1,4 @@
-package org.jetbrains.skiko
+package org.jetbrains.skiko.util
 
 import java.awt.image.BufferedImage
 

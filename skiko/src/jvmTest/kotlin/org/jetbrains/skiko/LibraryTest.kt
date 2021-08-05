@@ -3,7 +3,7 @@ package org.jetbrains.skiko
 import org.jetbrains.skija.Bitmap
 import org.junit.Test
 
-internal class BaseTest {
+internal class LibraryTest {
     @Test
     fun `load library`() {
         Library.load()

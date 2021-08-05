@@ -1,8 +1,9 @@
 package org.jetbrains.skiko
 
-import kotlinx.coroutines.*
-import kotlinx.coroutines.swing.Swing
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.delay
 import org.jetbrains.skija.*
+import org.jetbrains.skiko.util.swingTest
 import org.junit.Test
 import java.awt.Point
 import java.awt.event.WindowEvent
@@ -260,12 +261,6 @@ j  org.jetbrains.skiko.redrawer.MacOsRedrawer$drawLayer$1.draw()V+7
         //paragraph.paint(this, 0f, 0f)
 
         restore()
-    }
-
-    private fun swingTest(block: suspend CoroutineScope.() -> Unit) {
-        runBlocking(Dispatchers.Swing) {
-            block()
-        }
     }
 
     private class FPSCounter(

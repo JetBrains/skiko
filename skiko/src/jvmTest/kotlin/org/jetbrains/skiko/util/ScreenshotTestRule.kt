@@ -1,5 +1,7 @@
-package org.jetbrains.skiko
+package org.jetbrains.skiko.util
 
+import org.jetbrains.skiko.OS
+import org.jetbrains.skiko.hostOs
 import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runners.model.Statement

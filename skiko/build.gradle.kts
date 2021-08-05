@@ -1,8 +1,7 @@
 import de.undercouch.gradle.tasks.download.Download
 import org.gradle.crypto.checksum.Checksum
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.jetbrains.kotlin.gradle.tasks.KotlinTest
 import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 
 plugins {
@@ -603,6 +602,15 @@ tasks.withType<Test>().configureEach {
         systemProperty("skiko.library.path", dir)
         val jar = skikoJvmRuntimeJar.get().outputs.files.files.single { it.name.endsWith(".jar")}
         systemProperty("skiko.jar.path", jar.absolutePath)
+
+        systemProperty("skiko.test.screenshots.dir", File(project.projectDir, "src/jvmTest/screenshots").absolutePath)
+
+        // Tests should be deterministic, so disable scaling.
+        // On MacOs we need the actual scale, otherwise we will have aliased screenshots because of scaling.
+        if (System.getProperty("os.name") != "Mac OS X") {
+            systemProperty("sun.java2d.dpiaware", "false")
+            systemProperty("sun.java2d.uiScale", "1")
+        }
     }
 }
 
