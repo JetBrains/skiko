@@ -5,6 +5,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
 import org.jetbrains.skiko.FrameDispatcher
+import org.jetbrains.skiko.isVideoCardSupported
 import org.jetbrains.skiko.OpenGLApi
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaLayerProperties
@@ -15,7 +16,12 @@ internal class WindowsOpenGLRedrawer(
     private val properties: SkiaLayerProperties
 ) : Redrawer {
     private val device = layer.backedLayer.useDrawingSurfacePlatformInfo(::getDevice)
-    private val context = createContext(device)
+    private val context = createContext(device).also {
+        makeCurrent(device, it)
+        if (it == 0L || !isVideoCardSupported(layer.renderApi)) {
+            throw IllegalArgumentException("Cannot create Windows GL context")
+        }
+    }
     private var isDisposed = false
 
     init {

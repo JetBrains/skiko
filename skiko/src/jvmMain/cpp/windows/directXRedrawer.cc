@@ -30,12 +30,11 @@
 
 const int BuffersCount = 2;
 
-// This is a blacklist of graphics cards that have rendering issues (black screen, flickering)
+// This is a list of not supported graphics cards that have rendering issues (black screen, flickering)
 // with the current Swing/Skia integration.
 // If PC has other graphics cards suitable for DirectX12, one of them will be used. Otherwise,
 // rendering will falls back to OpenGL.
-const std::vector<std::wstring> adapterBlacklist{
-    L"Microsoft Basic Render Driver",
+const std::vector<std::wstring> notSupportedAdapters{
     L"Intel(R) HD Graphics 520",
     L"Intel(R) HD Graphics 530",
     L"Intel(R) HD Graphics 4400",
@@ -205,7 +204,7 @@ extern "C"
         return impl(pSrcData, SrcDataSize, pSourceName, pDefines, pInclude, pEntrypoint, pTarget, Flags1, Flags2, ppCode, ppErrorMsgs);
     }
 
-    bool isBlacklisted(IDXGIAdapter1 *hardwareAdapter)
+    bool isNotSupported(IDXGIAdapter1 *hardwareAdapter)
     {
         DXGI_ADAPTER_DESC1 desc;
         hardwareAdapter->GetDesc1(&desc);
@@ -214,11 +213,11 @@ extern "C"
             return true;
         }
         std::wstring currentAdapterName(desc.Description);
-        for (std::wstring name : adapterBlacklist)
+        for (std::wstring name : notSupportedAdapters)
         {
             if (currentAdapterName == name)
             {
-                fwprintf(stderr, L"Graphics card: %s is blacklisted.\n", name.c_str());
+                fwprintf(stderr, L"Graphics card %s is not supported.\n", name.c_str());
                 return true;
             }
         }
@@ -242,7 +241,7 @@ extern "C"
                 }
                 if (SUCCEEDED(D3D12CreateDevice(pAdapter, D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), nullptr)))
                 {
-                    if (isBlacklisted(pAdapter))
+                    if (isNotSupported(pAdapter))
                     {
                         pAdapter->Release();
                         continue;
@@ -266,7 +265,7 @@ extern "C"
                 }
                 if (SUCCEEDED(D3D12CreateDevice(pAdapter, D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), nullptr)))
                 {
-                    if (isBlacklisted(pAdapter))
+                    if (isNotSupported(pAdapter))
                     {
                         pAdapter->Release();
                         continue;

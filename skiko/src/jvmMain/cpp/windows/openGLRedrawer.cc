@@ -1,5 +1,8 @@
 #define WIN32_LEAN_AND_MEAN
+#include <vector>
+#include <string>
 #include <windows.h>
+#include <wingdi.h>
 #include <gl/GL.h>
 #include <jawt_md.h>
 #include <dwmapi.h>

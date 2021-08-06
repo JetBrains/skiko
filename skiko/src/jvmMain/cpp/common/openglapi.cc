@@ -8,6 +8,8 @@
 #include <GL/gl.h>
 #endif
 #include <jni.h>
+#include <string>
+#include <vector>
 
 extern "C" {
 
