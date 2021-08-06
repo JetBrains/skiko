@@ -31,14 +31,19 @@ internal fun isVideoCardSupported(renderApi: GraphicsApi): Boolean {
             var index = 0
             var adapter = getNextDirectXAdapter(index++)
             while (adapter != null) {
-                adaptersList.forEach {
+                var isFound = true
+                adaptersList.forEach checkList@{
                     if (adapter!!.startsWith(it)) {
-                        return false
+                        isFound = false
+                        return@checkList
                     }
+                }
+                if (isFound) {
+                    break
                 }
                 adapter = getNextDirectXAdapter(index++)
             }
-            true
+            (adapter != null)
         }
         GraphicsApi.OPENGL -> {
             val gl = OpenGLApi.instance
