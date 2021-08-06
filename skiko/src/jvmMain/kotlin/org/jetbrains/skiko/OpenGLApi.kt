@@ -25,9 +25,6 @@ class OpenGLApi private constructor() {
     external fun glGetIntegerv(pname: Int): Int
     external fun glGetString(value: Int): String
 
-    // System functions
-    external fun isCurrentAdapterBlacklisted(): Boolean
-
     companion object {
         init {
             Library.load()

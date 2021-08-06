@@ -10,6 +10,7 @@ import org.jetbrains.skiko.OpenGLApi
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaLayerProperties
 import org.jetbrains.skiko.getDrawingSurface
+import org.jetbrains.skiko.isVideoCardSupported
 
 internal class LinuxOpenGLRedrawer(
     private val layer: SkiaLayer,
@@ -17,9 +18,8 @@ internal class LinuxOpenGLRedrawer(
 ) : Redrawer {
     private val context = layer.backedLayer.lockDrawingSurface {
         val result = it.createContext()
-        val gl = OpenGLApi.instance
         it.makeCurrent(result)
-        if (result == 0L || gl.isCurrentAdapterBlacklisted()) {
+        if (result == 0L || !isVideoCardSupported(layer.renderApi)) {
             throw IllegalArgumentException("Cannot create Linux GL context")
         }
         result

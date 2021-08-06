@@ -8,6 +8,7 @@ import org.jetbrains.skija.impl.Native
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.redrawer.Direct3DRedrawer
 import java.lang.ref.Reference
+import org.jetbrains.skiko.isVideoCardSupported
 
 internal class Direct3DContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
     private val bufferCount = 2
@@ -20,6 +21,9 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextHandler(layer) 
     override fun initContext(): Boolean {
         try {
             if (context == null) {
+                if (!isVideoCardSupported(layer.renderApi)) {
+                    throw Exception("Failed to create DirectX12 device.")
+                }
                 device = directXRedrawer.createDevice()
                 if (device == 0L) {
                     throw Exception("Failed to create DirectX12 device.")
