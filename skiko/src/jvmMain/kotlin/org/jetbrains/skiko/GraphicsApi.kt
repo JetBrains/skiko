@@ -27,14 +27,16 @@ internal fun isVideoCardSupported(renderApi: GraphicsApi): Boolean {
             val adaptersList = notSupportedAdapters.filter { it.startsWith("directx:") }.map {
                 it.replace("directx:", "")
             }
-            var adapter = getNextDirectXAdapter()
+
+            var index = 0
+            var adapter = getNextDirectXAdapter(index++)
             while (adapter != null) {
                 adaptersList.forEach {
                     if (adapter!!.startsWith(it)) {
                         return false
                     }
                 }
-                adapter = getNextDirectXAdapter()
+                adapter = getNextDirectXAdapter(index++)
             }
             true
         }
@@ -55,4 +57,4 @@ internal fun isVideoCardSupported(renderApi: GraphicsApi): Boolean {
     }
 }
 
-private external fun getNextDirectXAdapter(): String?
+private external fun getNextDirectXAdapter(index: Int = 0): String?

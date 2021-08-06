@@ -20,18 +20,16 @@ UINT adapterIndex = 0;
 extern "C"
 {
 
-bool defineAdapter(IDXGIFactory4 *pFactory, IDXGIAdapter1 **ppAdapter)
+bool defineAdapter(IDXGIFactory4 *pFactory, IDXGIAdapter1 **ppAdapter, int adapterIndex)
 {
     *ppAdapter = nullptr;
     IDXGIAdapter1 *pAdapter = nullptr;
     if (DXGI_ERROR_NOT_FOUND == pFactory->EnumAdapters1(adapterIndex, &pAdapter))
     {
-        adapterIndex = 0;
         return false;
     }
     if (SUCCEEDED(D3D12CreateDevice(pAdapter, D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), nullptr)))
     {
-        adapterIndex++;
         *ppAdapter = pAdapter;
         return true;
     }
@@ -40,7 +38,7 @@ bool defineAdapter(IDXGIFactory4 *pFactory, IDXGIAdapter1 **ppAdapter)
 }
 
 JNIEXPORT jstring JNICALL Java_org_jetbrains_skiko_GraphicsApiKt_getNextDirectXAdapter(
-    JNIEnv *env, jclass jclass)
+    JNIEnv *env, jclass jclass, jint index)
 {
     gr_cp<IDXGIFactory4> deviceFactory;
     if (!SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&deviceFactory))))
@@ -48,7 +46,7 @@ JNIEXPORT jstring JNICALL Java_org_jetbrains_skiko_GraphicsApiKt_getNextDirectXA
         return NULL;
     }
     gr_cp<IDXGIAdapter1> hardwareAdapter;
-    if (!defineAdapter(deviceFactory.get(), &hardwareAdapter))
+    if (!defineAdapter(deviceFactory.get(), &hardwareAdapter, index))
     {
         return NULL;
     }
