@@ -1,11 +1,7 @@
 package org.jetbrains.skiko
 
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.swing.Swing
 import org.jetbrains.skija.Canvas
 import org.jetbrains.skija.FontMgr
 import org.jetbrains.skija.Paint
@@ -14,12 +10,13 @@ import org.jetbrains.skija.paragraph.FontCollection
 import org.jetbrains.skija.paragraph.ParagraphBuilder
 import org.jetbrains.skija.paragraph.ParagraphStyle
 import org.jetbrains.skija.paragraph.TextStyle
+import org.jetbrains.skiko.util.ScreenshotTestRule
+import org.jetbrains.skiko.util.swingTest
 import org.junit.Assume.assumeTrue
 import org.junit.Rule
 import org.junit.Test
 import java.awt.Color
 import java.awt.Dimension
-import java.awt.Robot
 import java.awt.event.WindowEvent
 import javax.swing.JFrame
 import javax.swing.WindowConstants
@@ -29,8 +26,6 @@ import kotlin.test.assertTrue
 
 @Suppress("BlockingMethodInNonBlockingContext", "SameParameterValue")
 class SkiaWindowTest {
-    private val robot = Robot()
-
     private val fontManager = FontMgr.getDefault()
     private val fontCollection = FontCollection()
         .setDefaultFontManager(fontManager)
@@ -47,7 +42,7 @@ class SkiaWindowTest {
             .build()
 
     @get:Rule
-    val screenshots = ScreenshotTestRule(robot)
+    val screenshots = ScreenshotTestRule()
 
     @Test
     fun `render single window`() = swingTest {
@@ -310,12 +305,6 @@ class SkiaWindowTest {
             screenshots.assert(window.bounds)
         } finally {
             window.close()
-        }
-    }
-
-    private fun swingTest(block: suspend CoroutineScope.() -> Unit) {
-        runBlocking(Dispatchers.Swing) {
-            block()
         }
     }
 

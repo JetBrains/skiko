@@ -1,5 +1,7 @@
-package org.jetbrains.skiko
+package org.jetbrains.skiko.util
 
+import org.jetbrains.skiko.OS
+import org.jetbrains.skiko.hostOs
 import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
@@ -12,7 +14,9 @@ import javax.imageio.ImageIO
 // macOS has wrong colors ([128, 128, 128] isn't [128, 128, 128] on screenshot). Only white, black, red and green are correct.
 // So use only these color for cross-platform screenshots tests.
 // TODO fix colors on macOS
-class ScreenshotTestRule(private val robot: Robot) : TestRule {
+class ScreenshotTestRule : TestRule {
+    private val robot by lazy { Robot() }
+
     private lateinit var testIdentifier: String
     private val subDir = if (hostOs == OS.MacOS) "macos" else "windows_linux"
     private val screenshotsDir = File(System.getProperty("skiko.test.screenshots.dir")!!).resolve(subDir)
