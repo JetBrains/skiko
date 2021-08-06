@@ -18,12 +18,19 @@ internal class Direct3DRedrawer(
     private var isDisposed = false
     private var disposeLock = Any()
 
+    private val device = createDirectXDevice(getAdapterPriority(), layer.contentHandle).also {
+        if (it == 0L) {
+            throw Exception("Failed to create DirectX12 device.")
+        }
+    }
+
     private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
         update(System.nanoTime())
         draw()
     }
 
     override fun dispose() = synchronized(disposeLock) {
+        disposeDevice(device)
         frameDispatcher.cancel()
         isDisposed = true
     }
@@ -61,21 +68,19 @@ internal class Direct3DRedrawer(
         }
     }
 
-    fun makeContext(device: Long) = DirectContext(
+    fun makeContext() = DirectContext(
         makeDirectXContext(device)
     )
 
-    fun makeSurface(device: Long, context: Long, width: Int, height: Int, index: Int) = Surface(
+    fun makeSurface(context: Long, width: Int, height: Int, index: Int) = Surface(
         makeDirectXSurface(device, context, width, height, index)
     )
 
-    fun createDevice(): Long = createDirectXDevice(getAdapterPriority(), layer.contentHandle)
-
-    fun finishFrame(device: Long, context: Long, surface: Long) {
+    fun finishFrame(context: Long, surface: Long) {
         finishFrame(device, context, surface, properties.isVsyncEnabled)
     }
 
-    fun getAdapterPriority(): Int {
+    private fun getAdapterPriority(): Int {
         val adapterPriority = GpuPriority.parse(System.getProperty("skiko.directx.gpu.priority"))
         return when (adapterPriority) {
             GpuPriority.Auto -> 0
@@ -85,15 +90,23 @@ internal class Direct3DRedrawer(
         }
     }
 
-    external fun createDirectXDevice(adapterPriority: Int, contentHandle: Long): Long
-    external fun makeDirectXContext(device: Long): Long
-    external fun makeDirectXSurface(device: Long, context: Long, width: Int, height: Int, index: Int): Long
-    external fun resizeBuffers(device: Long, width: Int, height: Int)
+    fun resizeBuffers(width: Int, height: Int) = resizeBuffers(device, width, height)
+
+    fun getBufferIndex() = getBufferIndex(device)
+    fun initSwapChain() = initSwapChain(device)
+    fun initFence() = initFence(device)
+    fun getAdapterName() = getAdapterName(device)
+    fun getAdapterMemorySize() = getAdapterMemorySize(device)
+
+    private external fun createDirectXDevice(adapterPriority: Int, contentHandle: Long): Long
+    private external fun makeDirectXContext(device: Long): Long
+    private external fun makeDirectXSurface(device: Long, context: Long, width: Int, height: Int, index: Int): Long
+    private external fun resizeBuffers(device: Long, width: Int, height: Int)
     private external fun finishFrame(device: Long, context: Long, surface: Long, isVsyncEnabled: Boolean)
-    external fun disposeDevice(device: Long)
-    external fun getBufferIndex(device: Long): Int
-    external fun initSwapChain(device: Long)
-    external fun initFence(device: Long)
-    external fun getAdapterName(device: Long): String
-    external fun getAdapterMemorySize(device: Long): Long
+    private external fun disposeDevice(device: Long)
+    private external fun getBufferIndex(device: Long): Int
+    private external fun initSwapChain(device: Long)
+    private external fun initFence(device: Long)
+    private external fun getAdapterName(device: Long): String
+    private external fun getAdapterMemorySize(device: Long): Long
 }
