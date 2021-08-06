@@ -35,7 +35,6 @@ const int BuffersCount = 2;
 // If PC has other graphics cards suitable for DirectX12, one of them will be used. Otherwise,
 // rendering will falls back to OpenGL.
 const std::vector<std::wstring> adapterBlacklist{
-    L"Microsoft Basic Render Driver",
     L"Intel(R) HD Graphics 520",
     L"Intel(R) HD Graphics 530",
     L"Intel(R) HD Graphics 4400",
