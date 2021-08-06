@@ -24,26 +24,7 @@ private val notSupportedAdapters by lazy {
 internal fun isVideoCardSupported(renderApi: GraphicsApi): Boolean {
     return when (renderApi) {
         GraphicsApi.DIRECT3D -> {
-            val adaptersList = notSupportedAdapters.filter { it.startsWith("directx:") }.map {
-                it.replace("directx:", "")
-            }
-
-            var index = 0
-            var adapter = getNextDirectXAdapter(index++)
-            while (adapter != null) {
-                var isFound = true
-                adaptersList.forEach checkList@{
-                    if (adapter!!.startsWith(it)) {
-                        isFound = false
-                        return@checkList
-                    }
-                }
-                if (isFound) {
-                    break
-                }
-                adapter = getNextDirectXAdapter(index++)
-            }
-            (adapter != null)
+            true
         }
         GraphicsApi.OPENGL -> {
             val gl = OpenGLApi.instance

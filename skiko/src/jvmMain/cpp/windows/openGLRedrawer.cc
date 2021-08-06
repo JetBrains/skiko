@@ -8,9 +8,6 @@
 #include <dwmapi.h>
 #include "jni_helpers.h"
 
-const std::vector<std::string> vendorBlacklist{ "VMware, Inc." };
-const std::vector<std::string> adapterBlacklist{ "llvmpipe (LLVM 5.0, 256 bits)" };
-
 extern "C"
 {
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt_getDevice(JNIEnv *env, jobject redrawer, jlong platformInfoPtr)
