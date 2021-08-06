@@ -175,6 +175,8 @@ kotlin {
                     val skiaDir = skiaDir.get().absolutePath
                     compilerOpts("-I$skiaDir")
                     extraOpts("-staticLibrary", "libskia.a")
+                    extraOpts("-staticLibrary", "libskshaper.a")
+                    extraOpts("-staticLibrary", "libskparagraph.a")
                     extraOpts("-libraryPath", "$skiaDir/$skiaBinSubdir")
                 }
             }
