@@ -30,18 +30,6 @@
 
 const int BuffersCount = 2;
 
-// This is a blacklist of graphics cards that have rendering issues (black screen, flickering)
-// with the current Swing/Skia integration.
-// If PC has other graphics cards suitable for DirectX12, one of them will be used. Otherwise,
-// rendering will falls back to OpenGL.
-const std::vector<std::wstring> notSupportedAdapters{
-    L"Intel(R) HD Graphics 520",
-    L"Intel(R) HD Graphics 530",
-    L"Intel(R) HD Graphics 4400",
-    L"NVIDIA GeForce GTX 750 Ti",
-    L"NVIDIA GeForce GTX 960M",
-    L"NVIDIA Quadro M2000M"};
-
 class DirectXDevice
 {
 public:
@@ -211,15 +199,6 @@ extern "C"
         if ((desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) != 0)
         {
             return false;
-        }
-        std::wstring currentAdapterName(desc.Description);
-        for (std::wstring name : notSupportedAdapters)
-        {
-            if (currentAdapterName == name)
-            {
-                fwprintf(stderr, L"Graphics card: %s is not supported.\n", name.c_str());
-                return false;
-            }
         }
         return true;
     }
