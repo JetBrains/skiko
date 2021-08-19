@@ -28,7 +28,7 @@ internal class AngleRedrawer(
     }
 
     override fun needRedraw() {
-        check(!isDisposed)
+        check(!isDisposed) { "AngleRedrawer is disposed" }
         frameDispatcher.scheduleFrame()
     }
 
@@ -37,7 +37,7 @@ internal class AngleRedrawer(
     }
 
     override fun redrawImmediately() {
-        check(!isDisposed)
+        check(!isDisposed) { "AngleRedrawer is disposed" }
         update(System.nanoTime())
         draw()
     }

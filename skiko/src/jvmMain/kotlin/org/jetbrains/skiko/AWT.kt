@@ -4,7 +4,7 @@ import java.awt.Canvas
 import java.awt.Component
 
 private val awt = getAWT().also {
-    check(it != 0L)
+    check(it != 0L) { "Can't get AWT" }
 }
 
 internal fun <T> Canvas.useDrawingSurfacePlatformInfo(
@@ -28,11 +28,11 @@ internal class DrawingSurface(
 ) : AutoCloseable {
     var ptr =
         getDrawingSurface(awt, component).also {
-            check(it != 0L)
+            check(it != 0L) { "Can't get DrawingSurface" }
         }
         private set
 
-    fun lock() = lockDrawingSurface(ptr).also { check(it == 0) }
+    fun lock() = lockDrawingSurface(ptr).also { check(it == 0) { "Can't lock DrawingSurface" } }
 
     fun unlock() = unlockDrawingSurface(ptr)
 
@@ -58,7 +58,7 @@ internal class DrawingSurfaceInfo(
 ) : AutoCloseable {
     var ptr =
         getDrawingSurfaceInfo(drawingSurface).also {
-            check(it != 0L)
+            check(it != 0L) { "Can't get DrawingSurfaceInfo" }
         }
         private set
 

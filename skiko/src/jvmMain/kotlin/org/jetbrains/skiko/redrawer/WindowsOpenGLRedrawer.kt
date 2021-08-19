@@ -34,13 +34,13 @@ internal class WindowsOpenGLRedrawer(
     }
 
     override fun dispose() {
-        check(!isDisposed)
+        check(!isDisposed) { "WindowsOpenGLRedrawer is disposed" }
         deleteContext(context)
         isDisposed = true
     }
 
     override fun needRedraw() {
-        check(!isDisposed)
+        check(!isDisposed) { "WindowsOpenGLRedrawer is disposed" }
         toRedraw.add(this)
         frameDispatcher.scheduleFrame()
     }
@@ -50,7 +50,7 @@ internal class WindowsOpenGLRedrawer(
     }
 
     override fun redrawImmediately() {
-        check(!isDisposed)
+        check(!isDisposed) { "WindowsOpenGLRedrawer is disposed" }
         update(System.nanoTime())
         makeCurrent()
         draw()

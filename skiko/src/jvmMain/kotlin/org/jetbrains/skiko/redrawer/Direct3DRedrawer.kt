@@ -29,7 +29,7 @@ internal class Direct3DRedrawer(
     }
 
     override fun needRedraw() {
-        check(!isDisposed)
+        check(!isDisposed) { "Direct3DRedrawer is disposed" }
         frameDispatcher.scheduleFrame()
     }
 
@@ -38,7 +38,7 @@ internal class Direct3DRedrawer(
     }
 
     override fun redrawImmediately() {
-        check(!isDisposed)
+        check(!isDisposed) { "Direct3DRedrawer is disposed" }
         // TODO now we wait until previous layer.draw is finished. it ends only on the next vsync.
         //  because of that we lose one frame on resize and can theoretically see very small white bars on the sides of the window
         //  to avoid this we should be able to draw in two modes: with vsync and without.

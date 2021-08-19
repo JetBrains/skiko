@@ -27,7 +27,7 @@ internal class LinuxOpenGLRedrawer(
     private var isDisposed = false
 
     override fun dispose() {
-        check(!isDisposed)
+        check(!isDisposed) { "LinuxOpenGLRedrawer is disposed" }
         layer.backedLayer.lockDrawingSurface {
             it.destroyContext(context)
         }
@@ -35,7 +35,7 @@ internal class LinuxOpenGLRedrawer(
     }
 
     override fun needRedraw() {
-        check(!isDisposed)
+        check(!isDisposed) { "LinuxOpenGLRedrawer is disposed" }
         toRedraw.add(this)
         frameDispatcher.scheduleFrame()
     }
@@ -45,7 +45,7 @@ internal class LinuxOpenGLRedrawer(
     }
 
     override fun redrawImmediately() = layer.backedLayer.lockDrawingSurface {
-        check(!isDisposed)
+        check(!isDisposed) { "LinuxOpenGLRedrawer is disposed" }
         update(System.nanoTime())
         it.makeCurrent(context)
         draw()

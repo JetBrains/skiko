@@ -155,8 +155,8 @@ open class SkiaLayer(
     }
 
     open fun dispose() {
-        check(!isDisposed)
-        check(isEventDispatchThread())
+        check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
+        check(!isDisposed) { "SkiaLayer is disposed" }
 
         if (isInited) {
             redrawer?.dispose()  // we should dispose redrawer first (to cancel `draw` in rendering thread)
@@ -276,8 +276,8 @@ open class SkiaLayer(
      * Redraw on the next animation Frame (on vsync signal if vsync is enabled).
      */
     fun needRedraw() {
-        check(!isDisposed)
-        check(isEventDispatchThread())
+        check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
+        check(!isDisposed) { "SkiaLayer is disposed" }
         redrawer?.needRedraw()
     }
 
@@ -289,7 +289,7 @@ open class SkiaLayer(
      */
     suspend fun awaitRedraw(): Boolean {
         return withContext(Dispatchers.Swing) {
-            check(!isDisposed)
+            check(!isDisposed) { "SkiaLayer is disposed" }
             onInit.await()
             redrawer?.awaitRedraw() != false
         }
@@ -299,8 +299,8 @@ open class SkiaLayer(
     private val fpsCounter = defaultFPSCounter(this)
 
     internal fun update(nanoTime: Long) {
-        check(!isDisposed)
-        check(isEventDispatchThread())
+        check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
+        check(!isDisposed) { "SkiaLayer is disposed" }
 
         fpsCounter?.tick()
 
@@ -333,7 +333,7 @@ open class SkiaLayer(
     }
 
     internal fun prepareDrawContext(): Boolean {
-        check(!isDisposed)
+        check(!isDisposed) { "SkiaLayer is disposed" }
         contextHandler?.apply {
             if (!initContext()) {
                 findNextWorkingRenderApi(true)
@@ -345,7 +345,7 @@ open class SkiaLayer(
     }
 
     internal fun draw() {
-        check(!isDisposed)
+        check(!isDisposed) { "SkiaLayer is disposed" }
         contextHandler?.apply {
             clearCanvas()
             synchronized(pictureLock) {
