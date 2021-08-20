@@ -1,12 +1,12 @@
 package org.jetbrains.skiko
 
+import org.jetbrains.skiko.redrawer.Direct3DRedrawer
 import org.jetbrains.skiko.redrawer.LinuxOpenGLRedrawer
 import org.jetbrains.skiko.redrawer.MacOsOpenGLRedrawer
-import org.jetbrains.skiko.redrawer.SoftwareRedrawer
-import org.jetbrains.skiko.redrawer.Redrawer
-import org.jetbrains.skiko.redrawer.WindowsOpenGLRedrawer
-import org.jetbrains.skiko.redrawer.Direct3DRedrawer
 import org.jetbrains.skiko.redrawer.MetalRedrawer
+import org.jetbrains.skiko.redrawer.Redrawer
+import org.jetbrains.skiko.redrawer.SoftwareRedrawer
+import org.jetbrains.skiko.redrawer.WindowsOpenGLRedrawer
 import java.awt.Component
 import java.awt.Window
 import javax.swing.SwingUtilities
@@ -48,7 +48,7 @@ internal val platformOperations: PlatformOperations by lazy {
                     renderApi: GraphicsApi,
                     properties: SkiaLayerProperties
                 ) = when(renderApi) {
-                    GraphicsApi.SOFTWARE -> SoftwareRedrawer(layer)
+                    GraphicsApi.SOFTWARE -> SoftwareRedrawer(layer, properties)
                     GraphicsApi.METAL -> MetalRedrawer(layer, properties)
                     else -> MacOsOpenGLRedrawer(layer, properties)
                 }
@@ -82,7 +82,7 @@ internal val platformOperations: PlatformOperations by lazy {
                     renderApi: GraphicsApi,
                     properties: SkiaLayerProperties
                 ) = when(renderApi) {
-                    GraphicsApi.SOFTWARE -> SoftwareRedrawer(layer)
+                    GraphicsApi.SOFTWARE -> SoftwareRedrawer(layer, properties)
                     GraphicsApi.DIRECT3D -> Direct3DRedrawer(layer, properties)
                     else -> WindowsOpenGLRedrawer(layer, properties)
                 }
@@ -117,7 +117,7 @@ internal val platformOperations: PlatformOperations by lazy {
                     renderApi: GraphicsApi,
                     properties: SkiaLayerProperties
                 ) = when(renderApi) {
-                    GraphicsApi.SOFTWARE -> SoftwareRedrawer(layer)
+                    GraphicsApi.SOFTWARE -> SoftwareRedrawer(layer, properties)
                     else -> LinuxOpenGLRedrawer(layer, properties)
                 }
             }

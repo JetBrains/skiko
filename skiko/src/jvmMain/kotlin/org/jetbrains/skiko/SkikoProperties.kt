@@ -1,8 +1,17 @@
 package org.jetbrains.skiko
 
+// TODO maybe we can get rid of global properties, and pass SkiaLayerProperties to Window -> ComposeWindow -> SkiaLayer
 @Suppress("SameParameterValue")
 internal object SkikoProperties {
     val vsyncEnabled: Boolean by property("skiko.vsync.enabled", default = true)
+
+    /**
+     * If vsync is enabled, but platform can't support it (Software renderer, Linux with uninstalled drivers),
+     * we enable frame limit by the display refresh rate.
+     */
+    val vsyncFramelimitFallbackEnabled: Boolean by property(
+        "skiko.vsync.framelimit.fallback.enabled", default = true
+    )
 
     val fpsEnabled: Boolean by property("skiko.fps.enabled", default = false)
     val fpsPeriodSeconds: Double by property("skiko.fps.periodSeconds", default = 2.0)
