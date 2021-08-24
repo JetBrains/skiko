@@ -9,7 +9,6 @@ import org.jetbrains.skia.DirectContext
 import org.jetbrains.skiko.*
 import javax.swing.SwingUtilities.convertPoint
 import javax.swing.SwingUtilities.getRootPane
-import kotlin.time.ExperimentalTime
 
 internal class MetalRedrawer(
     private val layer: SkiaLayer,
@@ -32,8 +31,10 @@ internal class MetalRedrawer(
     }
 
     private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
-        update(System.nanoTime())
-        draw()
+        if (layer.isShowing) {
+            update(System.nanoTime())
+            draw()
+        }
     }
 
     override fun dispose() = synchronized(drawLock) {

@@ -30,13 +30,13 @@ open class SkiaLayer(
         ContentScale,
     }
 
-    internal val backedLayer : HardwareLayer
+    internal val backedLayer: HardwareLayer
 
     val canvas: java.awt.Canvas
         get() = backedLayer
 
     init {
-        setOpaque(false)
+        isOpaque = false
         layout = null
         backedLayer = object : HardwareLayer() {
             override fun paint(g: Graphics) {
@@ -54,9 +54,12 @@ open class SkiaLayer(
                 return this@SkiaLayer.inputMethodRequests
             }
         }
-        add(backedLayer)
         @Suppress("LeakingThis")
+        add(backedLayer)
         backedLayer.addHierarchyListener {
+            if (it.changeFlags and HierarchyEvent.SHOWING_CHANGED.toLong() != 0L) {
+                checkShowing()
+            }
             if (it.changeFlags and HierarchyEvent.DISPLAYABILITY_CHANGED.toLong() != 0L) {
                 checkInit()
             }
@@ -69,8 +72,22 @@ open class SkiaLayer(
     private fun checkInit() {
         if (!isInited && isDisplayable) {
             backedLayer.defineContentScale()
+            checkShowing()
             init()
         }
+    }
+
+    private fun checkShowing() {
+        isShowingCached = super.isShowing()
+        if (isShowing) {
+            repaint()
+        }
+    }
+
+    private var isShowingCached = false
+
+    override fun isShowing(): Boolean {
+        return isShowingCached
     }
 
     val contentScale: Float
@@ -84,7 +101,9 @@ open class SkiaLayer(
 
     var fullscreen: Boolean
         get() = backedLayer.fullscreen
-        set(value) { backedLayer.fullscreen = value }
+        set(value) {
+            backedLayer.fullscreen = value
+        }
 
     var renderer: SkiaRenderer? = null
     val clipComponents = mutableListOf<ClipRectangle>()
@@ -117,7 +136,7 @@ open class SkiaLayer(
         do {
             thrown = false
             try {
-	            renderApi = fallbackRenderApiQueue.removeAt(0)
+                renderApi = fallbackRenderApiQueue.removeAt(0)
                 contextHandler?.dispose()
                 redrawer?.dispose()
                 contextHandler = createContextHandler(this, renderApi)
@@ -137,10 +156,10 @@ open class SkiaLayer(
     }
 
     private val stateHandlers =
-            mutableMapOf<PropertyKind, MutableList<(SkiaLayer) -> Unit>>()
+        mutableMapOf<PropertyKind, MutableList<(SkiaLayer) -> Unit>>()
 
     fun onStateChanged(kind: PropertyKind, handler: (SkiaLayer) -> Unit) {
-        stateHandlers.getOrPut( kind, { mutableListOf() }) += handler
+        stateHandlers.getOrPut(kind, { mutableListOf() }) += handler
     }
 
     private fun notifyChange(kind: PropertyKind) {
@@ -386,5 +405,5 @@ open class SkiaLayer(
             rounded = value.toFloat()
         }
         return rounded.toInt()
-    } 
+    }
 }

@@ -19,9 +19,11 @@ internal class SoftwareRedrawer(
             frameLimiter.awaitNextFrame()
         }
 
-        layer.update(System.nanoTime())
-        if (layer.prepareDrawContext()) {
-            layer.draw()
+        if (layer.isShowing) {
+            layer.update(System.nanoTime())
+            if (layer.prepareDrawContext()) {
+                layer.draw()
+            }
         }
     }
 

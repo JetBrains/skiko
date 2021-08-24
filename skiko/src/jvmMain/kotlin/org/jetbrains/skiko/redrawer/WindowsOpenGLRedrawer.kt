@@ -65,7 +65,10 @@ internal class WindowsOpenGLRedrawer(
     companion object {
         private val toRedraw = mutableSetOf<WindowsOpenGLRedrawer>()
         private val toRedrawCopy = mutableSetOf<WindowsOpenGLRedrawer>()
-        private val toRedrawAlive = toRedrawCopy.asSequence().filterNot(WindowsOpenGLRedrawer::isDisposed)
+        private val toRedrawVisible = toRedrawCopy
+            .asSequence()
+            .filterNot(WindowsOpenGLRedrawer::isDisposed)
+            .filter { it.layer.isShowing }
 
         private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
             toRedrawCopy.clear()
@@ -74,7 +77,7 @@ internal class WindowsOpenGLRedrawer(
 
             val nanoTime = System.nanoTime()
 
-            for (redrawer in toRedrawAlive) {
+            for (redrawer in toRedrawVisible) {
                 try {
                     redrawer.update(nanoTime)
                 } catch (e: CancellationException) {
@@ -82,21 +85,21 @@ internal class WindowsOpenGLRedrawer(
                 }
             }
 
-            for (redrawer in toRedrawAlive) {
+            for (redrawer in toRedrawVisible) {
                 redrawer.makeCurrent()
                 redrawer.draw()
             }
 
-            for (redrawer in toRedrawAlive) {
+            for (redrawer in toRedrawVisible) {
                 redrawer.swapBuffers()
             }
 
-            for (redrawer in toRedrawAlive) {
+            for (redrawer in toRedrawVisible) {
                 redrawer.makeCurrent()
                 OpenGLApi.instance.glFinish()
             }
 
-            val isVsyncEnabled = toRedrawAlive.all { it.properties.isVsyncEnabled }
+            val isVsyncEnabled = toRedrawVisible.all { it.properties.isVsyncEnabled }
             if (isVsyncEnabled) {
                 withContext(Dispatchers.IO) {
                     dwmFlush() // wait for vsync
