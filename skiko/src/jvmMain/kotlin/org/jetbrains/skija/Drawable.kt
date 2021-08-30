@@ -1,0 +1,151 @@
+package org.jetbrains.skija
+
+import org.jetbrains.skija.impl.Library.Companion.staticLoad
+import org.jetbrains.annotations.ApiStatus
+import org.jetbrains.skija.impl.RefCnt
+import org.jetbrains.annotations.ApiStatus.OverrideOnly
+import org.jetbrains.annotations.ApiStatus.NonExtendable
+import org.jetbrains.skija.impl.Native
+import org.jetbrains.skija.impl.Stats
+import java.lang.ref.Reference
+
+/**
+ *
+ * Base class for objects that draw into Canvas.
+ *
+ *
+ * The object has a generation id, which is guaranteed to be unique across all drawables. To
+ * allow for clients of the drawable that may want to cache the results, the drawable must
+ * change its generation id whenever its internal state changes such that it will draw differently.
+ */
+abstract class Drawable : RefCnt(_nMake()) {
+    companion object {
+        @ApiStatus.Internal
+        external fun _nMake(): Long
+        @ApiStatus.Internal
+        external fun _nDraw(ptr: Long, canvasPtr: Long, matrix: FloatArray?)
+        @ApiStatus.Internal
+        external fun _nMakePictureSnapshot(ptr: Long): Long
+        @ApiStatus.Internal
+        external fun _nGetGenerationId(ptr: Long): Int
+        @ApiStatus.Internal
+        external fun _nNotifyDrawingChanged(ptr: Long)
+
+        init {
+            staticLoad()
+        }
+    }
+
+    @ApiStatus.Internal
+    var _bounds: Rect? = null
+
+    /**
+     * Draws into the specified content. The drawing sequence will be balanced upon return
+     * (i.e. the saveLevel() on the canvas will match what it was when draw() was called,
+     * and the current matrix and clip settings will not be changed.
+     */
+    @NonExtendable
+    fun draw(canvas: Canvas?): Drawable {
+        return draw(canvas, null)
+    }
+
+    /**
+     * Draws into the specified content. The drawing sequence will be balanced upon return
+     * (i.e. the saveLevel() on the canvas will match what it was when draw() was called,
+     * and the current matrix and clip settings will not be changed.
+     */
+    @NonExtendable
+    fun draw(canvas: Canvas?, x: Float, y: Float): Drawable {
+        return draw(canvas, Matrix33.Companion.makeTranslate(x, y))
+    }
+
+    /**
+     * Draws into the specified content. The drawing sequence will be balanced upon return
+     * (i.e. the saveLevel() on the canvas will match what it was when draw() was called,
+     * and the current matrix and clip settings will not be changed.
+     */
+    @NonExtendable
+    fun draw(canvas: Canvas?, matrix: Matrix33?): Drawable {
+        return try {
+            Stats.onNativeCall()
+            _nDraw(
+                _ptr,
+                Native.Companion.getPtr(canvas),
+                matrix?.mat
+            )
+            this
+        } finally {
+            Reference.reachabilityFence(canvas)
+        }
+    }
+
+    @NonExtendable
+    fun makePictureSnapshot(): Picture {
+        return try {
+            Stats.onNativeCall()
+            Picture(_nMakePictureSnapshot(_ptr))
+        } finally {
+            Reference.reachabilityFence(this)
+        }
+    }
+
+    /**
+     *
+     * Return a unique value for this instance. If two calls to this return the same value,
+     * it is presumed that calling the draw() method will render the same thing as well.
+     *
+     *
+     * Subclasses that change their state should call notifyDrawingChanged() to ensure that
+     * a new value will be returned the next time it is called.
+     */
+    val generationId: Int
+        get() = try {
+            Stats.onNativeCall()
+            _nGetGenerationId(_ptr)
+        } finally {
+            Reference.reachabilityFence(this)
+        }
+
+    /**
+     * Return the (conservative) bounds of what the drawable will draw. If the drawable can
+     * change what it draws (e.g. animation or in response to some external change), then this
+     * must return a bounds that is always valid for all possible states.
+     */
+    @get:NonExtendable
+    val bounds: Rect
+        get() {
+            if (_bounds == null) _bounds = onGetBounds()
+            return _bounds!!
+        }
+
+    /**
+     * Calling this invalidates the previous generation ID, and causes a new one to be computed
+     * the next time getGenerationId() is called. Typically this is called by the object itself,
+     * in response to its internal state changing.
+     */
+    @NonExtendable
+    fun notifyDrawingChanged(): Drawable {
+        Stats.onNativeCall()
+        _nNotifyDrawingChanged(_ptr)
+        _bounds = null
+        return this
+    }
+
+    @OverrideOnly
+    abstract fun onDraw(canvas: Canvas?)
+    @OverrideOnly
+    abstract fun onGetBounds(): Rect
+    @ApiStatus.Internal
+    fun _onDraw(canvasPtr: Long) {
+        onDraw(org.jetbrains.skija.Canvas(canvasPtr, false, this))
+    }
+
+    @ApiStatus.Internal
+    external fun _nInit(ptr: Long)
+
+    init {
+        Stats.onNativeCall()
+        Stats.onNativeCall()
+        _nInit(_ptr)
+    }
+}

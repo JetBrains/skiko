@@ -84,67 +84,9 @@ val skiaDir = run {
     }
 }
 
-val skijaZip = run {
-    val zipFile = skiko.dependenciesDir.resolve("skija/${skiko.skijaCommitHash}.zip")
-
-    tasks.register("downloadSkija", Download::class) {
-        onlyIf { skiko.skijaDir == null && !zipFile.exists() }
-        inputs.property("skija.commit.hash", skiko.skijaCommitHash)
-        src("https://github.com/JetBrains/skija/archive/${skiko.skijaCommitHash}.zip")
-        dest(zipFile)
-        onlyIfModified(true)
-    }.map { zipFile }
-}
-
-val skijaDir = run {
-    if (skiko.skijaDir != null) {
-        tasks.register("skijaDir", DefaultTask::class) {
-            enabled = false
-        }.map { skiko.skijaDir!! }
-    } else {
-        val skijaDest = skiko.dependenciesDir.resolve("skija/skija").apply { mkdirs() }
-        tasks.register("unzipSkija", Copy::class) {
-            from(skijaZip.map { zipTree(it) }) {
-                include("skija-${skiko.skijaCommitHash}/**")
-                eachFile {
-                    // drop skija-<COMMIT> subdir
-                    relativePath = RelativePath(true, *relativePath.segments.drop(1).toTypedArray())
-                }
-                includeEmptyDirs = false
-            }
-            into(skijaDest)
-        }.map { skijaDest }
-    }
-}
-
-val lombok by configurations.creating
 val jetbrainsAnnotations by configurations.creating
 dependencies {
-    lombok("org.projectlombok:lombok:1.18.16")
     jetbrainsAnnotations("org.jetbrains:annotations:19.0.0")
-}
-val skijaSrcDir = run {
-    val delombokSkijaSrcDir = project.file("src/jvmMain/java/org/jetbrains/skija")
-    tasks.register("delombokSkija", JavaExec::class) {
-        classpath = lombok + jetbrainsAnnotations
-        main = "lombok.launch.Main"
-        args("delombok", skijaDir.get().resolve("shared/java"), "-d", delombokSkijaSrcDir)
-        inputs.dir(skijaDir)
-        outputs.dir(delombokSkijaSrcDir)
-
-        doFirst {
-            // We don't need module info.
-            skijaDir.get().resolve("shared/java/module-info.java").delete()
-            delombokSkijaSrcDir.deleteRecursively()
-            delombokSkijaSrcDir.mkdirs()
-        }
-        doLast {
-            // Remove Library.java from Skija.
-            file(delombokSkijaSrcDir.path + "/impl/Library.java").delete()
-            // We don't need module info.
-            file(delombokSkijaSrcDir.path + "/module-info.java").delete()
-        }
-    }.map { delombokSkijaSrcDir }
 }
 
 val skiaBinSubdir = "out/${buildType.id}-${targetOs.id}-${targetArch.id}"
@@ -157,7 +99,6 @@ kotlin {
         compilations.all {
             kotlinOptions.jvmTarget = "11"
         }
-        withJava()
     }
 
     if (supportNative) {
@@ -195,11 +136,9 @@ kotlin {
             }
         }
         val jvmMain by getting {
-            kotlin.srcDirs(skijaSrcDir)
             dependencies {
                 implementation(kotlin("stdlib-jdk8"))
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:$coroutinesVersion")
-                compileOnly(lombok)
                 compileOnly(jetbrainsAnnotations)
             }
 
@@ -480,7 +419,6 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
 
 extensions.configure<CppLibrary> {
     source.from(
-        skijaDir.map { fileTree(it.resolve("platform/cc")) },
         fileTree("$projectDir/src/jvmMain/cpp/common"),
         fileTree("$projectDir/src/jvmMain/cpp/${targetOs.id}")
     )

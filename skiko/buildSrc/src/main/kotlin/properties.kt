@@ -86,9 +86,6 @@ class SkikoProperties(private val myProject: Project) {
     val buildType: SkiaBuildType
         get() = if (myProject.findProperty("skiko.debug") == "true") SkiaBuildType.DEBUG else SkiaBuildType.RELEASE
 
-    val skijaCommitHash: String
-        get() = myProject.property("dependencies.skija.git.commit") as String
-
     val skiaReleaseForTargetOS: String
         get() {
             val tag = myProject.property("dependencies.skia.$target") as String
@@ -108,9 +105,6 @@ class SkikoProperties(private val myProject: Project) {
 
     val visualStudioBuildToolsDir: File?
         get() = System.getenv()["SKIKO_VSBT_PATH"]?.let { File(it) }?.takeIf { it.isDirectory }
-
-    val skijaDir: File?
-        get() = System.getenv()["SKIJA_DIR"]?.let { File(it) }?.takeIf { it.isDirectory }
 
     val skiaDir: File?
         get() = (System.getenv()["SKIA_DIR"] ?: System.getProperty("skia.dir"))?.let { File(it) }
