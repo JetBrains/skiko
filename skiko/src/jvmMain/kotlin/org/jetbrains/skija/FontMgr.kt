@@ -26,6 +26,8 @@ open class FontMgr : RefCnt {
         init {
             staticLoad()
         }
+
+        val default = FontMgr(_nDefault(), false)
     }
 
     val familiesCount: Int
@@ -163,17 +165,6 @@ open class FontMgr : RefCnt {
         } finally {
             Reference.reachabilityFence(this)
             Reference.reachabilityFence(data)
-        }
-    }
-
-    object _DefaultHolder {
-        /**
-         * Return the default fontmgr.
-         */
-        val default = FontMgr(_nDefault(), false)
-
-        init {
-            Stats.onNativeCall()
         }
     }
 
