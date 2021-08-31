@@ -1,7 +1,6 @@
 package org.jetbrains.skija.shaper
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
-import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.skija.*
 import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.impl.Stats
@@ -12,10 +11,8 @@ class FontMgrRunIterator(text: ManagedString?, manageText: Boolean, font: Font?,
         _nMake(Native.getPtr(text), Native.getPtr(font), opts), text, manageText
     ) {
     companion object {
-        @ApiStatus.Internal
-        external fun _nMake(textPtr: Long, fontPtr: Long, opts: ShapingOptions?): Long
-        @ApiStatus.Internal
-        external fun _nGetCurrentFont(ptr: Long): Long
+        @JvmStatic external fun _nMake(textPtr: Long, fontPtr: Long, opts: ShapingOptions?): Long
+        @JvmStatic external fun _nGetCurrentFont(ptr: Long): Long
 
         init {
             staticLoad()

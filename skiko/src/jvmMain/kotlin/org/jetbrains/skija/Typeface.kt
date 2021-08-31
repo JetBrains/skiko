@@ -1,13 +1,11 @@
 package org.jetbrains.skija
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
-import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.skija.impl.RefCnt
 import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.impl.Stats
 import java.lang.ref.Reference
 import java.util.*
-import java.util.function.IntFunction
 import kotlin.streams.toList
 
 class Typeface internal constructor(ptr: Long) : RefCnt(ptr) {
@@ -169,7 +167,6 @@ class Typeface internal constructor(ptr: Long) : RefCnt(ptr) {
     /**
      * @return  true if the two typefaces reference the same underlying font, treating null as the default font
      */
-    @ApiStatus.Internal
     override fun _nativeEquals(other: Native?): Boolean {
         return try {
             _nEquals(_ptr, Native.Companion.getPtr(other))

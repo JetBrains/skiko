@@ -1,67 +1,45 @@
 package org.jetbrains.skija
 
-import org.jetbrains.annotations.ApiStatus
-import org.jetbrains.annotations.Contract
 import org.jetbrains.skija.impl.Library
 import org.jetbrains.skija.impl.Managed
 import org.jetbrains.skija.impl.Stats
 import org.jetbrains.skija.shaper.*
 import java.lang.ref.Reference
 
-class TextLine @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
+class TextLine internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
-        @Contract("_, _ -> new")
         fun make(text: String?, font: Font?): TextLine {
             return make(text, font, ShapingOptions.DEFAULT)
         }
 
-        @Contract("_, _, _, _ -> new")
         fun make(text: String?, font: Font?, opts: ShapingOptions?): TextLine {
             Shaper.makeShapeDontWrapOrReorder().use { shaper -> return shaper.shapeLine(text, font, opts!!) }
         }
 
-        @ApiStatus.Internal
-        external fun _nGetFinalizer(): Long
-        @ApiStatus.Internal
-        external fun _nGetAscent(ptr: Long): Float
-        @ApiStatus.Internal
-        external fun _nGetCapHeight(ptr: Long): Float
-        @ApiStatus.Internal
-        external fun _nGetXHeight(ptr: Long): Float
-        @ApiStatus.Internal
-        external fun _nGetDescent(ptr: Long): Float
-        @ApiStatus.Internal
-        external fun _nGetLeading(ptr: Long): Float
-        @ApiStatus.Internal
-        external fun _nGetWidth(ptr: Long): Float
-        @ApiStatus.Internal
-        external fun _nGetHeight(ptr: Long): Float
-        @ApiStatus.Internal
-        external fun _nGetTextBlob(ptr: Long): Long
-        @ApiStatus.Internal
-        external fun _nGetGlyphs(ptr: Long): ShortArray
-        @ApiStatus.Internal
-        external fun _nGetPositions(ptr: Long): FloatArray
-        @ApiStatus.Internal
-        external fun _nGetRunPositions(ptr: Long): FloatArray?
-        @ApiStatus.Internal
-        external fun _nGetBreakPositions(ptr: Long): FloatArray?
-        @ApiStatus.Internal
-        external fun _nGetBreakOffsets(ptr: Long): IntArray?
-        @ApiStatus.Internal
-        external fun _nGetOffsetAtCoord(ptr: Long, x: Float): Int
-        @ApiStatus.Internal
-        external fun _nGetLeftOffsetAtCoord(ptr: Long, x: Float): Int
-        @ApiStatus.Internal
-        external fun _nGetCoordAtOffset(ptr: Long, offset: Int): Float
+        @JvmStatic external fun _nGetFinalizer(): Long
+        @JvmStatic external fun _nGetAscent(ptr: Long): Float
+        @JvmStatic external fun _nGetCapHeight(ptr: Long): Float
+        @JvmStatic external fun _nGetXHeight(ptr: Long): Float
+        @JvmStatic external fun _nGetDescent(ptr: Long): Float
+        @JvmStatic external fun _nGetLeading(ptr: Long): Float
+        @JvmStatic external fun _nGetWidth(ptr: Long): Float
+        @JvmStatic external fun _nGetHeight(ptr: Long): Float
+        @JvmStatic external fun _nGetTextBlob(ptr: Long): Long
+        @JvmStatic external fun _nGetGlyphs(ptr: Long): ShortArray
+        @JvmStatic external fun _nGetPositions(ptr: Long): FloatArray
+        @JvmStatic external fun _nGetRunPositions(ptr: Long): FloatArray?
+        @JvmStatic external fun _nGetBreakPositions(ptr: Long): FloatArray?
+        @JvmStatic external fun _nGetBreakOffsets(ptr: Long): IntArray?
+        @JvmStatic external fun _nGetOffsetAtCoord(ptr: Long, x: Float): Int
+        @JvmStatic external fun _nGetLeftOffsetAtCoord(ptr: Long, x: Float): Int
+        @JvmStatic external fun _nGetCoordAtOffset(ptr: Long, offset: Int): Float
 
         init {
             Library.staticLoad()
         }
     }
 
-    @ApiStatus.Internal
-    object _FinalizerHolder {
+    private object _FinalizerHolder {
         val PTR = _nGetFinalizer()
     }
 

@@ -1,12 +1,11 @@
 package org.jetbrains.skija
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
-import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.skija.impl.RefCnt
 import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.impl.Stats
 
-class RuntimeEffect @ApiStatus.Internal constructor(ptr: Long) : RefCnt(ptr) {
+class RuntimeEffect internal constructor(ptr: Long) : RefCnt(ptr) {
     companion object {
         fun makeForShader(sksl: String?): RuntimeEffect {
             Stats.onNativeCall()
@@ -18,13 +17,13 @@ class RuntimeEffect @ApiStatus.Internal constructor(ptr: Long) : RefCnt(ptr) {
             return RuntimeEffect(_nMakeForColorFilter(sksl))
         }
 
-        external fun _nMakeShader(
+        @JvmStatic external fun _nMakeShader(
             runtimeEffectPtr: Long, uniformPtr: Long, childrenPtrs: LongArray?,
             localMatrix: FloatArray?, isOpaque: Boolean
         ): Long
 
-        external fun _nMakeForShader(sksl: String?): Long
-        external fun _nMakeForColorFilter(sksl: String?): Long
+        @JvmStatic external fun _nMakeForShader(sksl: String?): Long
+        @JvmStatic external fun _nMakeForColorFilter(sksl: String?): Long
 
         init {
             staticLoad()

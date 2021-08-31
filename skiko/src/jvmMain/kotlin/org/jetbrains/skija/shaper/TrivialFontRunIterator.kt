@@ -1,6 +1,5 @@
 package org.jetbrains.skija.shaper
 
-import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.skija.*
 
 class TrivialFontRunIterator(text: String, font: Font) : MutableIterator<FontRun?> {

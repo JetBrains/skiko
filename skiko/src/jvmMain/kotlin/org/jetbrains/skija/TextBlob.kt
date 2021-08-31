@@ -1,14 +1,13 @@
 package org.jetbrains.skija
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
-import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.skija.impl.Managed
 import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.impl.Stats
 import java.lang.IllegalArgumentException
 import java.lang.ref.Reference
 
-class TextBlob @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
+class TextBlob internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
         /**
          * Returns a TextBlob built from a single run of text with x-positions and a single y value.
@@ -94,38 +93,22 @@ class TextBlob @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _Finali
             }
         }
 
-        @ApiStatus.Internal
-        external fun _nGetFinalizer(): Long
-        @ApiStatus.Internal
-        external fun _nBounds(ptr: Long): Rect
-        @ApiStatus.Internal
-        external fun _nGetUniqueId(ptr: Long): Int
-        @ApiStatus.Internal
-        external fun _nGetIntercepts(ptr: Long, lower: Float, upper: Float, paintPtr: Long): FloatArray?
-        @ApiStatus.Internal
-        external fun _nMakeFromPosH(glyphs: ShortArray?, xpos: FloatArray?, ypos: Float, fontPtr: Long): Long
-        @ApiStatus.Internal
-        external fun _nMakeFromPos(glyphs: ShortArray?, pos: FloatArray?, fontPtr: Long): Long
-        @ApiStatus.Internal
-        external fun _nMakeFromRSXform(glyphs: ShortArray?, xform: FloatArray?, fontPtr: Long): Long
-        @ApiStatus.Internal
-        external fun _nSerializeToData(ptr: Long /*, SkSerialProcs */): Long
-        @ApiStatus.Internal
-        external fun _nMakeFromData(dataPtr: Long /*, SkDeserialProcs */): Long
-        @ApiStatus.Internal
-        external fun _nGetGlyphs(ptr: Long): ShortArray
-        @ApiStatus.Internal
-        external fun _nGetPositions(ptr: Long): FloatArray
-        @ApiStatus.Internal
-        external fun _nGetClusters(ptr: Long): IntArray
-        @ApiStatus.Internal
-        external fun _nGetTightBounds(ptr: Long): Rect
-        @ApiStatus.Internal
-        external fun _nGetBlockBounds(ptr: Long): Rect
-        @ApiStatus.Internal
-        external fun _nGetFirstBaseline(ptr: Long): Float
-        @ApiStatus.Internal
-        external fun _nGetLastBaseline(ptr: Long): Float
+        @JvmStatic external fun _nGetFinalizer(): Long
+        @JvmStatic external fun _nBounds(ptr: Long): Rect
+        @JvmStatic external fun _nGetUniqueId(ptr: Long): Int
+        @JvmStatic external fun _nGetIntercepts(ptr: Long, lower: Float, upper: Float, paintPtr: Long): FloatArray?
+        @JvmStatic external fun _nMakeFromPosH(glyphs: ShortArray?, xpos: FloatArray?, ypos: Float, fontPtr: Long): Long
+        @JvmStatic external fun _nMakeFromPos(glyphs: ShortArray?, pos: FloatArray?, fontPtr: Long): Long
+        @JvmStatic external fun _nMakeFromRSXform(glyphs: ShortArray?, xform: FloatArray?, fontPtr: Long): Long
+        @JvmStatic external fun _nSerializeToData(ptr: Long /*, SkSerialProcs */): Long
+        @JvmStatic external fun _nMakeFromData(dataPtr: Long /*, SkDeserialProcs */): Long
+        @JvmStatic external fun _nGetGlyphs(ptr: Long): ShortArray
+        @JvmStatic external fun _nGetPositions(ptr: Long): FloatArray
+        @JvmStatic external fun _nGetClusters(ptr: Long): IntArray
+        @JvmStatic external fun _nGetTightBounds(ptr: Long): Rect
+        @JvmStatic external fun _nGetBlockBounds(ptr: Long): Rect
+        @JvmStatic external fun _nGetFirstBaseline(ptr: Long): Float
+        @JvmStatic external fun _nGetLastBaseline(ptr: Long): Float
 
         init {
             staticLoad()
@@ -325,8 +308,7 @@ class TextBlob @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _Finali
             Reference.reachabilityFence(this)
         }
 
-    @ApiStatus.Internal
-    object _FinalizerHolder {
+    private object _FinalizerHolder {
         val PTR = _nGetFinalizer()
     }
 }

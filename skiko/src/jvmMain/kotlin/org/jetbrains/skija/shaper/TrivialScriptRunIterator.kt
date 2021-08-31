@@ -1,7 +1,5 @@
 package org.jetbrains.skija.shaper
 
-import org.jetbrains.annotations.ApiStatus
-
 class TrivialScriptRunIterator(text: String, script: String) : MutableIterator<ScriptRun?> {
     internal val _length: Int
 

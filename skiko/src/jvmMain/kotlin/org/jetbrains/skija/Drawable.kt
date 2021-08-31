@@ -118,7 +118,7 @@ abstract class Drawable : RefCnt(_nMake()) {
 
     abstract fun onDraw(canvas: Canvas?)
     abstract fun onGetBounds(): Rect
-    internal fun _onDraw(canvasPtr: Long) {
+    fun _onDraw(canvasPtr: Long) {
         onDraw(Canvas(canvasPtr, false, this))
     }
 

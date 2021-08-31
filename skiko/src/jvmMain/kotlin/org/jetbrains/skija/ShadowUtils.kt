@@ -1,7 +1,6 @@
 package org.jetbrains.skija
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
-import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.impl.Stats
 
@@ -79,8 +78,7 @@ object ShadowUtils {
         return _nComputeTonalSpotColor(ambientColor, spotColor)
     }
 
-    @ApiStatus.Internal
-    external fun _nDrawShadow(
+    @JvmStatic external fun _nDrawShadow(
         canvasPtr: Long,
         pathPtr: Long,
         zPlaneX: Float,
@@ -95,10 +93,8 @@ object ShadowUtils {
         flags: Int
     )
 
-    @ApiStatus.Internal
-    external fun _nComputeTonalAmbientColor(ambientColor: Int, spotColor: Int): Int
-    @ApiStatus.Internal
-    external fun _nComputeTonalSpotColor(ambientColor: Int, spotColor: Int): Int
+    @JvmStatic external fun _nComputeTonalAmbientColor(ambientColor: Int, spotColor: Int): Int
+    @JvmStatic external fun _nComputeTonalSpotColor(ambientColor: Int, spotColor: Int): Int
 
     init {
         staticLoad()

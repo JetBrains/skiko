@@ -1,16 +1,12 @@
 package org.jetbrains.skija
 
-import org.jetbrains.annotations.ApiStatus
-import org.jetbrains.annotations.Contract
-
-open class Rect @ApiStatus.Internal constructor(val left: Float, val top: Float, val right: Float, val bottom: Float) {
+open class Rect internal constructor(val left: Float, val top: Float, val right: Float, val bottom: Float) {
     val width: Float
         get() = right - left
     val height: Float
         get() = bottom - top
 
     fun intersect(other: Rect): Rect? {
-        assert(other != null) { "Rect::intersect expected other != null" }
         return if (right <= other.left || other.right <= left || bottom <= other.top || other.bottom <= top) null else Rect(
             Math.max(
                 left, other.left
@@ -33,11 +29,9 @@ open class Rect @ApiStatus.Internal constructor(val left: Float, val top: Float,
     }
 
     fun offset(vec: Point): Rect {
-        assert(vec != null) { "Rect::offset expected vec != null" }
         return offset(vec.x, vec.y)
     }
 
-    @Contract("-> new")
     fun toIRect(): IRect {
         return IRect(left.toInt(), top.toInt(), right.toInt(), bottom.toInt())
     }
@@ -103,7 +97,6 @@ open class Rect @ApiStatus.Internal constructor(val left: Float, val top: Float,
 
         @JvmStatic
         fun makeWH(size: Point): Rect {
-            assert(size != null) { "Rect::makeWH expected size != null" }
             return makeWH(size.x, size.y)
         }
 

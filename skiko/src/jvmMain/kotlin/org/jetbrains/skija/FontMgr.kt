@@ -1,7 +1,6 @@
 package org.jetbrains.skija
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
-import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.skija.impl.RefCnt
 import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.impl.Stats
@@ -178,11 +177,7 @@ open class FontMgr : RefCnt {
         }
     }
 
-    @ApiStatus.Internal
-    constructor(ptr: Long) : super(ptr) {
-    }
+    internal constructor(ptr: Long) : super(ptr)
 
-    @ApiStatus.Internal
-    constructor(ptr: Long, allowClose: Boolean) : super(ptr, allowClose) {
-    }
+    internal constructor(ptr: Long, allowClose: Boolean) : super(ptr, allowClose)
 }

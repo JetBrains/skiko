@@ -1,8 +1,6 @@
 package org.jetbrains.skija.shaper
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
-import org.jetbrains.annotations.ApiStatus
-import org.jetbrains.annotations.Contract
 import org.jetbrains.skija.*
 import org.jetbrains.skija.impl.Managed
 import org.jetbrains.skija.impl.Native
@@ -18,18 +16,15 @@ import java.util.*
  */
 class Shaper internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
-        @Contract("-> new")
         fun makePrimitive(): Shaper {
             Stats.onNativeCall()
             return Shaper(_nMakePrimitive())
         }
 
-        @Contract("-> new")
         fun makeShaperDrivenWrapper(): Shaper {
             return makeShaperDrivenWrapper(null)
         }
 
-        @Contract("_ -> new")
         fun makeShaperDrivenWrapper(fontMgr: FontMgr?): Shaper {
             return try {
                 Stats.onNativeCall()
@@ -39,12 +34,10 @@ class Shaper internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR
             }
         }
 
-        @Contract("-> new")
         fun makeShapeThenWrap(): Shaper {
             return makeShapeThenWrap(null)
         }
 
-        @Contract("_ -> new")
         fun makeShapeThenWrap(fontMgr: FontMgr?): Shaper {
             return try {
                 Stats.onNativeCall()
@@ -54,12 +47,10 @@ class Shaper internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR
             }
         }
 
-        @Contract("-> new")
         fun makeShapeDontWrapOrReorder(): Shaper {
             return makeShapeDontWrapOrReorder(null)
         }
 
-        @Contract("_ -> new")
         fun makeShapeDontWrapOrReorder(fontMgr: FontMgr?): Shaper {
             return try {
                 Stats.onNativeCall()
@@ -78,7 +69,6 @@ class Shaper internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR
          *
          * @return  Shaper on macOS, throws UnsupportedOperationException elsewhere
          */
-        @Contract("-> new")
         fun makeCoreText(): Shaper {
             Stats.onNativeCall()
             val ptr = _nMakeCoreText()
@@ -86,12 +76,10 @@ class Shaper internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR
             return Shaper(ptr)
         }
 
-        @Contract("-> new")
         fun make(): Shaper {
             return make(null)
         }
 
-        @Contract("_ -> new")
         fun make(fontMgr: FontMgr?): Shaper {
             return try {
                 Stats.onNativeCall()
@@ -101,14 +89,22 @@ class Shaper internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR
             }
         }
 
-        @JvmStatic external fun _nGetFinalizer(): Long
-        @JvmStatic external fun _nMakePrimitive(): Long
-        @JvmStatic external fun _nMakeShaperDrivenWrapper(fontMgrPtr: Long): Long
-        @JvmStatic external fun _nMakeShapeThenWrap(fontMgrPtr: Long): Long
-        @JvmStatic external fun _nMakeShapeDontWrapOrReorder(fontMgrPtr: Long): Long
-        @JvmStatic external fun _nMakeCoreText(): Long
-        @JvmStatic external fun _nMake(fontMgrPtr: Long): Long
-        @JvmStatic external fun _nShapeBlob(
+        @JvmStatic
+        external fun _nGetFinalizer(): Long
+        @JvmStatic
+        external fun _nMakePrimitive(): Long
+        @JvmStatic
+        external fun _nMakeShaperDrivenWrapper(fontMgrPtr: Long): Long
+        @JvmStatic
+        external fun _nMakeShapeThenWrap(fontMgrPtr: Long): Long
+        @JvmStatic
+        external fun _nMakeShapeDontWrapOrReorder(fontMgrPtr: Long): Long
+        @JvmStatic
+        external fun _nMakeCoreText(): Long
+        @JvmStatic
+        external fun _nMake(fontMgrPtr: Long): Long
+        @JvmStatic
+        external fun _nShapeBlob(
             ptr: Long,
             text: String?,
             fontPtr: Long,
@@ -118,8 +114,10 @@ class Shaper internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR
             offsetY: Float
         ): Long
 
-        @JvmStatic external fun _nShapeLine(ptr: Long, text: String?, fontPtr: Long, opts: ShapingOptions?): Long
-        @JvmStatic external fun _nShape(
+        @JvmStatic
+        external fun _nShapeLine(ptr: Long, text: String?, fontPtr: Long, opts: ShapingOptions?): Long
+        @JvmStatic
+        external fun _nShape(
             ptr: Long,
             textPtr: Long,
             fontIter: Iterator<FontRun?>?,
@@ -136,22 +134,18 @@ class Shaper internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR
         }
     }
 
-    @Contract("_, _ -> new")
     fun shape(text: String?, font: Font?): TextBlob? {
         return shape(text, font, ShapingOptions.DEFAULT, Float.POSITIVE_INFINITY, Point.Companion.ZERO)
     }
 
-    @Contract("_, _, _ -> new")
     fun shape(text: String?, font: Font?, width: Float): TextBlob? {
         return shape(text, font, ShapingOptions.DEFAULT, width, Point.Companion.ZERO)
     }
 
-    @Contract("_, _, _, _ -> new")
     fun shape(text: String?, font: Font?, width: Float, offset: Point): TextBlob? {
         return shape(text, font, ShapingOptions.DEFAULT, width, offset)
     }
 
-    @Contract("_, _, _, _, _ -> new")
     fun shape(text: String?, font: Font?, opts: ShapingOptions, width: Float, offset: Point): TextBlob? {
         return try {
             assert(opts != null) { "Can’t Shaper::shape with opts == null" }
@@ -172,7 +166,6 @@ class Shaper internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR
         }
     }
 
-    @Contract("_, _, _, _, _ -> this")
     fun shape(
         text: String,
         font: Font?,
@@ -197,7 +190,6 @@ class Shaper internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR
         }
     }
 
-    @Contract("_, _, _, _, _, _, _ -> this")
     fun shape(
         text: String,
         fontIter: Iterator<FontRun?>,
@@ -222,7 +214,6 @@ class Shaper internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR
         }
     }
 
-    @Contract("_, _, _, _, _, _, _ -> this")
     fun shape(
         textUtf8: ManagedString,
         fontIter: Iterator<FontRun?>,
@@ -253,7 +244,6 @@ class Shaper internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR
         return this
     }
 
-    @Contract("_, _, _ -> new")
     fun shapeLine(text: String?, font: Font?, opts: ShapingOptions): TextLine {
         return try {
             assert(opts != null) { "Can’t Shaper::shapeLine with opts == null" }
@@ -272,13 +262,11 @@ class Shaper internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR
         }
     }
 
-    @Contract("_, _, _ -> new")
     fun shapeLine(text: String?, font: Font?): TextLine {
         return shapeLine(text, font, ShapingOptions.DEFAULT)
     }
 
-    @ApiStatus.Internal
-    object _FinalizerHolder {
+    private object _FinalizerHolder {
         val PTR = _nGetFinalizer()
     }
 }

@@ -7,7 +7,6 @@ class IRect internal constructor(val left: Int, val top: Int, val right: Int, va
         get() = bottom - top
 
     fun intersect(other: IRect): IRect? {
-        assert(other != null) { "IRect::intersect expected other != null" }
         return if (right <= other.left || other.right <= left || bottom <= other.top || other.bottom <= top) null else IRect(
             Math.max(left, other.left), Math.max(top, other.top), Math.min(
                 right, other.right
@@ -20,12 +19,11 @@ class IRect internal constructor(val left: Int, val top: Int, val right: Int, va
     }
 
     fun offset(vec: IPoint): IRect {
-        assert(vec != null) { "IRect::offset expected vec != null" }
         return offset(vec.x, vec.y)
     }
 
     fun toRect(): Rect {
-        return org.jetbrains.skija.Rect(left.toFloat(), top.toFloat(), right.toFloat(), bottom.toFloat())
+        return Rect(left.toFloat(), top.toFloat(), right.toFloat(), bottom.toFloat())
     }
 
     override fun equals(o: Any?): Boolean {

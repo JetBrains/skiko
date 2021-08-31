@@ -1,7 +1,5 @@
 package org.jetbrains.skija
 
-import org.jetbrains.annotations.ApiStatus
-
 class FontStyle {
     val _value: Int
 
@@ -9,8 +7,7 @@ class FontStyle {
         _value = weight and 65535 or (width and 255 shl 16) or (slant.ordinal shl 24)
     }
 
-    @ApiStatus.Internal
-    constructor(value: Int) {
+    internal constructor(value: Int) {
         _value = value
     }
 

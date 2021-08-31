@@ -1,6 +1,5 @@
 package org.jetbrains.skija.shaper
 
-import org.jetbrains.annotations.ApiStatus
 import java.text.Bidi
 
 class JavaTextBidiRunIterator @JvmOverloads constructor(

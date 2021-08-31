@@ -1,14 +1,11 @@
 package org.jetbrains.skija
 
-import org.jetbrains.annotations.ApiStatus
-
 /**
  * @see org.jetbrains.skija.FilterMipmap
  *
  * @see org.jetbrains.skija.CubicResampler
  */
 interface SamplingMode {
-    @ApiStatus.Internal
     fun _pack(): Long
 
     companion object {

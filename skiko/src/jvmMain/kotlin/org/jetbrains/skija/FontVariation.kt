@@ -1,11 +1,10 @@
 package org.jetbrains.skija
 
-import org.jetbrains.annotations.ApiStatus
 import java.util.regex.Pattern
 
 class FontVariation(val _tag: Int, val value: Float) {
 
-    constructor(feature: String, value: Float) : this(FourByteTag.Companion.fromString(feature), value) {}
+    constructor(feature: String, value: Float) : this(FourByteTag.fromString(feature), value) {}
 
     val tag: String
         get() = FourByteTag.toString(_tag)
@@ -41,11 +40,9 @@ class FontVariation(val _tag: Int, val value: Float) {
     companion object {
         val EMPTY = arrayOfNulls<FontVariation>(0)
 
-        @ApiStatus.Internal
-        val _splitPattern = Pattern.compile("\\s+")
+        internal val _splitPattern = Pattern.compile("\\s+")
 
-        @ApiStatus.Internal
-        val _variationPattern = Pattern.compile("(?<tag>[a-z0-9]{4})=(?<value>\\d+)")
+        internal val _variationPattern = Pattern.compile("(?<tag>[a-z0-9]{4})=(?<value>\\d+)")
         fun parseOne(s: String): FontVariation {
             val m = _variationPattern.matcher(s)
             require(m.matches()) { "Can’t parse FontVariation: $s" }

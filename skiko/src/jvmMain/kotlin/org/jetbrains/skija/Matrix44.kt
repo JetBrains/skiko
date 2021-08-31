@@ -1,6 +1,5 @@
 package org.jetbrains.skija
 
-import org.jetbrains.annotations.ApiStatus
 import java.util.*
 
 /**
@@ -19,8 +18,7 @@ class Matrix44(vararg mat: Float) {
     /**
      * Matrix elements are in row-major order.
      */
-    @ApiStatus.Internal
-    val mat: FloatArray
+    internal val mat: FloatArray
 
     /**
      *

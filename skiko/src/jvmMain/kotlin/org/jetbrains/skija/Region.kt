@@ -1,7 +1,6 @@
 package org.jetbrains.skija
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
-import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.skija.impl.Managed
 import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.impl.Stats
@@ -9,32 +8,32 @@ import java.lang.ref.Reference
 
 class Region : Managed(_nMake(), _FinalizerHolder.PTR) {
     companion object {
-        external fun _nMake(): Long
-        external fun _nGetFinalizer(): Long
-        external fun _nSet(ptr: Long, regoinPtr: Long): Boolean
-        external fun _nIsEmpty(ptr: Long): Boolean
-        external fun _nIsRect(ptr: Long): Boolean
-        external fun _nIsComplex(ptr: Long): Boolean
-        external fun _nGetBounds(ptr: Long): IRect
-        external fun _nComputeRegionComplexity(ptr: Long): Int
-        external fun _nGetBoundaryPath(ptr: Long, pathPtr: Long): Boolean
-        external fun _nSetEmpty(ptr: Long): Boolean
-        external fun _nSetRect(ptr: Long, left: Int, top: Int, right: Int, bottom: Int): Boolean
-        external fun _nSetRects(ptr: Long, rects: IntArray?): Boolean
-        external fun _nSetRegion(ptr: Long, regionPtr: Long): Boolean
-        external fun _nSetPath(ptr: Long, pathPtr: Long, regionPtr: Long): Boolean
-        external fun _nIntersectsIRect(ptr: Long, left: Int, top: Int, right: Int, bottom: Int): Boolean
-        external fun _nIntersectsRegion(ptr: Long, regionPtr: Long): Boolean
-        external fun _nContainsIPoint(ptr: Long, x: Int, y: Int): Boolean
-        external fun _nContainsIRect(ptr: Long, left: Int, top: Int, right: Int, bottom: Int): Boolean
-        external fun _nContainsRegion(ptr: Long, regionPtr: Long): Boolean
-        external fun _nQuickContains(ptr: Long, left: Int, top: Int, right: Int, bottom: Int): Boolean
-        external fun _nQuickRejectIRect(ptr: Long, left: Int, top: Int, right: Int, bottom: Int): Boolean
-        external fun _nQuickRejectRegion(ptr: Long, regionPtr: Long): Boolean
-        external fun _nTranslate(ptr: Long, dx: Int, dy: Int)
-        external fun _nOpIRect(ptr: Long, left: Int, top: Int, right: Int, bottom: Int, op: Int): Boolean
-        external fun _nOpRegion(ptr: Long, regionPtr: Long, op: Int): Boolean
-        external fun _nOpIRectRegion(
+        @JvmStatic external fun _nMake(): Long
+        @JvmStatic external fun _nGetFinalizer(): Long
+        @JvmStatic external fun _nSet(ptr: Long, regoinPtr: Long): Boolean
+        @JvmStatic external fun _nIsEmpty(ptr: Long): Boolean
+        @JvmStatic external fun _nIsRect(ptr: Long): Boolean
+        @JvmStatic external fun _nIsComplex(ptr: Long): Boolean
+        @JvmStatic external fun _nGetBounds(ptr: Long): IRect
+        @JvmStatic external fun _nComputeRegionComplexity(ptr: Long): Int
+        @JvmStatic external fun _nGetBoundaryPath(ptr: Long, pathPtr: Long): Boolean
+        @JvmStatic external fun _nSetEmpty(ptr: Long): Boolean
+        @JvmStatic external fun _nSetRect(ptr: Long, left: Int, top: Int, right: Int, bottom: Int): Boolean
+        @JvmStatic external fun _nSetRects(ptr: Long, rects: IntArray?): Boolean
+        @JvmStatic external fun _nSetRegion(ptr: Long, regionPtr: Long): Boolean
+        @JvmStatic external fun _nSetPath(ptr: Long, pathPtr: Long, regionPtr: Long): Boolean
+        @JvmStatic external fun _nIntersectsIRect(ptr: Long, left: Int, top: Int, right: Int, bottom: Int): Boolean
+        @JvmStatic external fun _nIntersectsRegion(ptr: Long, regionPtr: Long): Boolean
+        @JvmStatic external fun _nContainsIPoint(ptr: Long, x: Int, y: Int): Boolean
+        @JvmStatic external fun _nContainsIRect(ptr: Long, left: Int, top: Int, right: Int, bottom: Int): Boolean
+        @JvmStatic external fun _nContainsRegion(ptr: Long, regionPtr: Long): Boolean
+        @JvmStatic external fun _nQuickContains(ptr: Long, left: Int, top: Int, right: Int, bottom: Int): Boolean
+        @JvmStatic external fun _nQuickRejectIRect(ptr: Long, left: Int, top: Int, right: Int, bottom: Int): Boolean
+        @JvmStatic external fun _nQuickRejectRegion(ptr: Long, regionPtr: Long): Boolean
+        @JvmStatic external fun _nTranslate(ptr: Long, dx: Int, dy: Int)
+        @JvmStatic external fun _nOpIRect(ptr: Long, left: Int, top: Int, right: Int, bottom: Int, op: Int): Boolean
+        @JvmStatic external fun _nOpRegion(ptr: Long, regionPtr: Long, op: Int): Boolean
+        @JvmStatic external fun _nOpIRectRegion(
             ptr: Long,
             left: Int,
             top: Int,
@@ -44,7 +43,7 @@ class Region : Managed(_nMake(), _FinalizerHolder.PTR) {
             op: Int
         ): Boolean
 
-        external fun _nOpRegionIRect(
+        @JvmStatic external fun _nOpRegionIRect(
             ptr: Long,
             regionPtr: Long,
             left: Int,
@@ -54,7 +53,7 @@ class Region : Managed(_nMake(), _FinalizerHolder.PTR) {
             op: Int
         ): Boolean
 
-        external fun _nOpRegionRegion(ptr: Long, regionPtrA: Long, regionPtrB: Long, op: Int): Boolean
+        @JvmStatic external fun _nOpRegionRegion(ptr: Long, regionPtrA: Long, regionPtrB: Long, op: Int): Boolean
 
         init {
             staticLoad()
@@ -65,8 +64,7 @@ class Region : Managed(_nMake(), _FinalizerHolder.PTR) {
         DIFFERENCE, INTERSECT, UNION, XOR, REVERSE_DIFFERENCE, REPLACE;
 
         companion object {
-            @ApiStatus.Internal
-            val _values = values()
+            internal val _values = values()
         }
     }
 
@@ -362,8 +360,7 @@ class Region : Managed(_nMake(), _FinalizerHolder.PTR) {
         }
     }
 
-    @ApiStatus.Internal
-    object _FinalizerHolder {
+    private object _FinalizerHolder {
         val PTR = _nGetFinalizer()
     }
 

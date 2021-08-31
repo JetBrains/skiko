@@ -1,7 +1,5 @@
 package org.jetbrains.skija
 
-import org.jetbrains.annotations.ApiStatus
-
 enum class GLBackendState(internal val _bit: Int) {
     RENDER_TARGET(1 shl 0),
 
@@ -19,7 +17,6 @@ enum class GLBackendState(internal val _bit: Int) {
     FIXED_FUNCTION(1 shl 9), MISC(1 shl 10), PATH_RENDERING(1 shl 11);
 
     companion object {
-        @ApiStatus.Internal
-        val _values = values()
+        internal val _values = values()
     }
 }

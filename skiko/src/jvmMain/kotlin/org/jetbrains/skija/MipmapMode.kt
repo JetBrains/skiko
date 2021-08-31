@@ -1,6 +1,5 @@
 package org.jetbrains.skija
 
-import org.jetbrains.annotations.ApiStatus
 
 enum class MipmapMode {
     /**
@@ -19,7 +18,6 @@ enum class MipmapMode {
     LINEAR;
 
     companion object {
-        @ApiStatus.Internal
-        val _values = values()
+        internal val _values = values()
     }
 }

@@ -1,14 +1,13 @@
 package org.jetbrains.skija
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
-import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.skija.impl.RefCnt
 import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.impl.Stats
 import java.lang.ref.Reference
 import java.util.*
 
-class ImageFilter @ApiStatus.Internal constructor(ptr: Long) : RefCnt(ptr) {
+class ImageFilter internal constructor(ptr: Long) : RefCnt(ptr) {
     companion object {
         fun makeAlphaThreshold(
             r: Region?,
@@ -614,7 +613,7 @@ class ImageFilter @ApiStatus.Internal constructor(ptr: Long) : RefCnt(ptr) {
             }
         }
 
-        external fun _nMakeAlphaThreshold(
+        @JvmStatic external fun _nMakeAlphaThreshold(
             regionPtr: Long,
             innerMin: Float,
             outerMax: Float,
@@ -622,7 +621,7 @@ class ImageFilter @ApiStatus.Internal constructor(ptr: Long) : RefCnt(ptr) {
             crop: IRect?
         ): Long
 
-        external fun _nMakeArithmetic(
+        @JvmStatic external fun _nMakeArithmetic(
             k1: Float,
             k2: Float,
             k3: Float,
@@ -633,11 +632,11 @@ class ImageFilter @ApiStatus.Internal constructor(ptr: Long) : RefCnt(ptr) {
             crop: IRect?
         ): Long
 
-        external fun _nMakeBlend(blendMode: Int, bg: Long, fg: Long, crop: IRect?): Long
-        external fun _nMakeBlur(sigmaX: Float, sigmaY: Float, tileMode: Int, input: Long, crop: IRect?): Long
-        external fun _nMakeColorFilter(colorFilterPtr: Long, input: Long, crop: IRect?): Long
-        external fun _nMakeCompose(outer: Long, inner: Long): Long
-        external fun _nMakeDisplacementMap(
+        @JvmStatic external fun _nMakeBlend(blendMode: Int, bg: Long, fg: Long, crop: IRect?): Long
+        @JvmStatic external fun _nMakeBlur(sigmaX: Float, sigmaY: Float, tileMode: Int, input: Long, crop: IRect?): Long
+        @JvmStatic external fun _nMakeColorFilter(colorFilterPtr: Long, input: Long, crop: IRect?): Long
+        @JvmStatic external fun _nMakeCompose(outer: Long, inner: Long): Long
+        @JvmStatic external fun _nMakeDisplacementMap(
             xChan: Int,
             yChan: Int,
             scale: Float,
@@ -646,7 +645,7 @@ class ImageFilter @ApiStatus.Internal constructor(ptr: Long) : RefCnt(ptr) {
             crop: IRect?
         ): Long
 
-        external fun _nMakeDropShadow(
+        @JvmStatic external fun _nMakeDropShadow(
             dx: Float,
             dy: Float,
             sigmaX: Float,
@@ -656,7 +655,7 @@ class ImageFilter @ApiStatus.Internal constructor(ptr: Long) : RefCnt(ptr) {
             crop: IRect?
         ): Long
 
-        external fun _nMakeDropShadowOnly(
+        @JvmStatic external fun _nMakeDropShadowOnly(
             dx: Float,
             dy: Float,
             sigmaX: Float,
@@ -666,7 +665,7 @@ class ImageFilter @ApiStatus.Internal constructor(ptr: Long) : RefCnt(ptr) {
             crop: IRect?
         ): Long
 
-        external fun _nMakeImage(
+        @JvmStatic external fun _nMakeImage(
             image: Long,
             l0: Float,
             t0: Float,
@@ -679,7 +678,7 @@ class ImageFilter @ApiStatus.Internal constructor(ptr: Long) : RefCnt(ptr) {
             samplingMode: Long
         ): Long
 
-        external fun _nMakeMagnifier(
+        @JvmStatic external fun _nMakeMagnifier(
             l: Float,
             t: Float,
             r: Float,
@@ -689,7 +688,7 @@ class ImageFilter @ApiStatus.Internal constructor(ptr: Long) : RefCnt(ptr) {
             crop: IRect?
         ): Long
 
-        external fun _nMakeMatrixConvolution(
+        @JvmStatic external fun _nMakeMatrixConvolution(
             kernelW: Int,
             kernelH: Int,
             kernel: FloatArray?,
@@ -703,12 +702,12 @@ class ImageFilter @ApiStatus.Internal constructor(ptr: Long) : RefCnt(ptr) {
             crop: IRect?
         ): Long
 
-        external fun _nMakeMatrixTransform(matrix: FloatArray?, samplingMode: Long, input: Long): Long
-        external fun _nMakeMerge(filters: LongArray?, crop: IRect?): Long
-        external fun _nMakeOffset(dx: Float, dy: Float, input: Long, crop: IRect?): Long
-        external fun _nMakePaint(paint: Long, crop: IRect?): Long
-        external fun _nMakePicture(picture: Long, l: Float, t: Float, r: Float, b: Float): Long
-        external fun _nMakeTile(
+        @JvmStatic external fun _nMakeMatrixTransform(matrix: FloatArray?, samplingMode: Long, input: Long): Long
+        @JvmStatic external fun _nMakeMerge(filters: LongArray?, crop: IRect?): Long
+        @JvmStatic external fun _nMakeOffset(dx: Float, dy: Float, input: Long, crop: IRect?): Long
+        @JvmStatic external fun _nMakePaint(paint: Long, crop: IRect?): Long
+        @JvmStatic external fun _nMakePicture(picture: Long, l: Float, t: Float, r: Float, b: Float): Long
+        @JvmStatic external fun _nMakeTile(
             l0: Float,
             t0: Float,
             r0: Float,
@@ -720,9 +719,9 @@ class ImageFilter @ApiStatus.Internal constructor(ptr: Long) : RefCnt(ptr) {
             input: Long
         ): Long
 
-        external fun _nMakeDilate(rx: Float, ry: Float, input: Long, crop: IRect?): Long
-        external fun _nMakeErode(rx: Float, ry: Float, input: Long, crop: IRect?): Long
-        external fun _nMakeDistantLitDiffuse(
+        @JvmStatic external fun _nMakeDilate(rx: Float, ry: Float, input: Long, crop: IRect?): Long
+        @JvmStatic external fun _nMakeErode(rx: Float, ry: Float, input: Long, crop: IRect?): Long
+        @JvmStatic external fun _nMakeDistantLitDiffuse(
             x: Float,
             y: Float,
             z: Float,
@@ -733,7 +732,7 @@ class ImageFilter @ApiStatus.Internal constructor(ptr: Long) : RefCnt(ptr) {
             crop: IRect?
         ): Long
 
-        external fun _nMakePointLitDiffuse(
+        @JvmStatic external fun _nMakePointLitDiffuse(
             x: Float,
             y: Float,
             z: Float,
@@ -744,7 +743,7 @@ class ImageFilter @ApiStatus.Internal constructor(ptr: Long) : RefCnt(ptr) {
             crop: IRect?
         ): Long
 
-        external fun _nMakeSpotLitDiffuse(
+        @JvmStatic external fun _nMakeSpotLitDiffuse(
             x0: Float,
             y0: Float,
             z0: Float,
@@ -760,7 +759,7 @@ class ImageFilter @ApiStatus.Internal constructor(ptr: Long) : RefCnt(ptr) {
             crop: IRect?
         ): Long
 
-        external fun _nMakeDistantLitSpecular(
+        @JvmStatic external fun _nMakeDistantLitSpecular(
             x: Float,
             y: Float,
             z: Float,
@@ -772,7 +771,7 @@ class ImageFilter @ApiStatus.Internal constructor(ptr: Long) : RefCnt(ptr) {
             crop: IRect?
         ): Long
 
-        external fun _nMakePointLitSpecular(
+        @JvmStatic external fun _nMakePointLitSpecular(
             x: Float,
             y: Float,
             z: Float,
@@ -784,7 +783,7 @@ class ImageFilter @ApiStatus.Internal constructor(ptr: Long) : RefCnt(ptr) {
             crop: IRect?
         ): Long
 
-        external fun _nMakeSpotLitSpecular(
+        @JvmStatic external fun _nMakeSpotLitSpecular(
             x0: Float,
             y0: Float,
             z0: Float,

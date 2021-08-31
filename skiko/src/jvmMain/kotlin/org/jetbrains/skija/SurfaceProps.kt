@@ -1,6 +1,5 @@
 package org.jetbrains.skija
 
-import org.jetbrains.annotations.ApiStatus
 
 class SurfaceProps @JvmOverloads constructor(
     internal val isDeviceIndependentFonts: Boolean = false,
@@ -9,13 +8,11 @@ class SurfaceProps @JvmOverloads constructor(
 
     constructor(geo: PixelGeometry) : this(false, geo) {}
 
-    @ApiStatus.Internal
     fun _getFlags(): Int {
         return 0 or if (isDeviceIndependentFonts) 1 else 0
     }
 
-    @ApiStatus.Internal
-    fun _getPixelGeometryOrdinal(): Int {
+    private fun _getPixelGeometryOrdinal(): Int {
         return pixelGeometry.ordinal
     }
 

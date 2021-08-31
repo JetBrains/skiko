@@ -1,12 +1,11 @@
 package org.jetbrains.skija.paragraph
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
-import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.impl.Stats
 import java.lang.ref.Reference
 
-class ParagraphCache @ApiStatus.Internal constructor(owner: FontCollection, ptr: Long) : Native(ptr) {
+class ParagraphCache internal constructor(owner: FontCollection, ptr: Long) : Native(ptr) {
     companion object {
         @JvmStatic external fun _nAbandon(ptr: Long)
         @JvmStatic external fun _nReset(ptr: Long)
@@ -92,12 +91,10 @@ class ParagraphCache @ApiStatus.Internal constructor(owner: FontCollection, ptr:
             Reference.reachabilityFence(this)
         }
 
-    @ApiStatus.Internal
-    val _owner: FontCollection
-    @ApiStatus.Internal
-    fun _validate() {
+    internal val _owner: FontCollection
+    internal fun _validate() {
         try {
-            check(Native.Companion.getPtr(_owner) != 0L) { "ParagraphCache needs owning FontCollection to be alive" }
+            check(Native.getPtr(_owner) != 0L) { "ParagraphCache needs owning FontCollection to be alive" }
         } finally {
             Reference.reachabilityFence(_owner)
         }

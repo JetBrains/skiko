@@ -1,13 +1,12 @@
 package org.jetbrains.skija
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
-import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.skija.impl.RefCnt
 import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.impl.Stats
 import java.lang.ref.Reference
 
-class Shader @ApiStatus.Internal constructor(ptr: Long) : RefCnt(ptr) {
+class Shader internal constructor(ptr: Long) : RefCnt(ptr) {
     companion object {
         // Linear
         fun makeLinearGradient(p0: Point, p1: Point, colors: IntArray): Shader {
@@ -447,8 +446,8 @@ class Shader @ApiStatus.Internal constructor(ptr: Long) : RefCnt(ptr) {
             }
         }
 
-        external fun _nMakeWithColorFilter(ptr: Long, colorFilterPtr: Long): Long
-        external fun _nMakeLinearGradient(
+        @JvmStatic external fun _nMakeWithColorFilter(ptr: Long, colorFilterPtr: Long): Long
+        @JvmStatic external fun _nMakeLinearGradient(
             x0: Float,
             y0: Float,
             x1: Float,
@@ -460,7 +459,7 @@ class Shader @ApiStatus.Internal constructor(ptr: Long) : RefCnt(ptr) {
             matrix: FloatArray?
         ): Long
 
-        external fun _nMakeLinearGradientCS(
+        @JvmStatic external fun _nMakeLinearGradientCS(
             x0: Float,
             y0: Float,
             x1: Float,
@@ -473,7 +472,7 @@ class Shader @ApiStatus.Internal constructor(ptr: Long) : RefCnt(ptr) {
             matrix: FloatArray?
         ): Long
 
-        external fun _nMakeRadialGradient(
+        @JvmStatic external fun _nMakeRadialGradient(
             x: Float,
             y: Float,
             r: Float,
@@ -484,7 +483,7 @@ class Shader @ApiStatus.Internal constructor(ptr: Long) : RefCnt(ptr) {
             matrix: FloatArray?
         ): Long
 
-        external fun _nMakeRadialGradientCS(
+        @JvmStatic external fun _nMakeRadialGradientCS(
             x: Float,
             y: Float,
             r: Float,
@@ -496,7 +495,7 @@ class Shader @ApiStatus.Internal constructor(ptr: Long) : RefCnt(ptr) {
             matrix: FloatArray?
         ): Long
 
-        external fun _nMakeTwoPointConicalGradient(
+        @JvmStatic external fun _nMakeTwoPointConicalGradient(
             x0: Float,
             y0: Float,
             r0: Float,
@@ -510,7 +509,7 @@ class Shader @ApiStatus.Internal constructor(ptr: Long) : RefCnt(ptr) {
             matrix: FloatArray?
         ): Long
 
-        external fun _nMakeTwoPointConicalGradientCS(
+        @JvmStatic external fun _nMakeTwoPointConicalGradientCS(
             x0: Float,
             y0: Float,
             r0: Float,
@@ -525,7 +524,7 @@ class Shader @ApiStatus.Internal constructor(ptr: Long) : RefCnt(ptr) {
             matrix: FloatArray?
         ): Long
 
-        external fun _nMakeSweepGradient(
+        @JvmStatic external fun _nMakeSweepGradient(
             x: Float,
             y: Float,
             startAngle: Float,
@@ -537,7 +536,7 @@ class Shader @ApiStatus.Internal constructor(ptr: Long) : RefCnt(ptr) {
             matrix: FloatArray?
         ): Long
 
-        external fun _nMakeSweepGradientCS(
+        @JvmStatic external fun _nMakeSweepGradientCS(
             x: Float,
             y: Float,
             startAngle: Float,
@@ -550,10 +549,10 @@ class Shader @ApiStatus.Internal constructor(ptr: Long) : RefCnt(ptr) {
             matrix: FloatArray?
         ): Long
 
-        external fun _nMakeEmpty(): Long
-        external fun _nMakeColor(color: Int): Long
-        external fun _nMakeColorCS(r: Float, g: Float, b: Float, a: Float, colorSpacePtr: Long): Long
-        external fun _nMakeBlend(blendMode: Int, dst: Long, src: Long): Long
+        @JvmStatic external fun _nMakeEmpty(): Long
+        @JvmStatic external fun _nMakeColor(color: Int): Long
+        @JvmStatic external fun _nMakeColorCS(r: Float, g: Float, b: Float, a: Float, colorSpacePtr: Long): Long
+        @JvmStatic external fun _nMakeBlend(blendMode: Int, dst: Long, src: Long): Long
 
         init {
             staticLoad()

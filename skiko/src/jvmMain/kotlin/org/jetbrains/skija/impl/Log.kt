@@ -1,6 +1,5 @@
 package org.jetbrains.skija.impl
 
-import org.jetbrains.annotations.ApiStatus
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter

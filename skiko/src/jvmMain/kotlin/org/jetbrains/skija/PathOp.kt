@@ -1,7 +1,5 @@
 package org.jetbrains.skija
 
-import org.jetbrains.annotations.ApiStatus
-
 /**
  * The logical operations that can be performed when combining two paths.
  */
@@ -22,7 +20,6 @@ enum class PathOp {
     REVERSE_DIFFERENCE;
 
     companion object {
-        @ApiStatus.Internal
-        val _values = values()
+        internal val _values = values()
     }
 }

@@ -1,7 +1,6 @@
 package org.jetbrains.skija.shaper
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
-import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.skija.ManagedString
 import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.impl.Stats

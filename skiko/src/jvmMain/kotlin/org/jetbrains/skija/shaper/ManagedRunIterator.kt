@@ -1,7 +1,6 @@
 package org.jetbrains.skija.shaper
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
-import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.skija.ManagedString
 import org.jetbrains.skija.impl.Managed
 import org.jetbrains.skija.impl.Native
@@ -23,15 +22,13 @@ abstract class ManagedRunIterator<T> internal constructor(
         }
     }
 
-    @ApiStatus.Internal
-    val _text: ManagedString?
+    internal val _text: ManagedString?
     override fun close() {
         super.close()
         _text?.close()
     }
 
-    @ApiStatus.Internal
-    fun _getEndOfCurrentRun(): Int {
+    internal fun _getEndOfCurrentRun(): Int {
         return try {
             _nGetEndOfCurrentRun(_ptr, Native.Companion.getPtr(_text))
         } finally {

@@ -1,16 +1,14 @@
 package org.jetbrains.skija
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
-import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.skija.impl.RefCnt
-import org.jetbrains.annotations.Contract
 import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.impl.Stats
 import java.lang.RuntimeException
 import java.lang.ref.Reference
 import java.nio.ByteBuffer
 
-class Image @ApiStatus.Internal constructor(ptr: Long) : RefCnt(ptr), IHasImageInfo {
+class Image internal constructor(ptr: Long) : RefCnt(ptr), IHasImageInfo {
     companion object {
         /**
          *
@@ -112,7 +110,6 @@ class Image @ApiStatus.Internal constructor(ptr: Long) : RefCnt(ptr), IHasImageI
          *
          * @see [https://fiddle.skia.org/c/@Image_MakeFromBitmap](https://fiddle.skia.org/c/@Image_MakeFromBitmap)
          */
-        @Contract("_ -> new")
         fun makeFromBitmap(bitmap: Bitmap): Image {
             return try {
                 assert(bitmap != null) { "Can’t makeFromBitmap with bitmap == null" }
@@ -126,7 +123,6 @@ class Image @ApiStatus.Internal constructor(ptr: Long) : RefCnt(ptr), IHasImageI
             }
         }
 
-        @Contract("_ -> new")
         fun makeFromPixmap(pixmap: Pixmap): Image {
             return try {
                 assert(pixmap != null) { "Can’t makeFromPixmap with pixmap == null" }
@@ -140,7 +136,6 @@ class Image @ApiStatus.Internal constructor(ptr: Long) : RefCnt(ptr), IHasImageI
             }
         }
 
-        @Contract("_ -> new")
         fun makeFromEncoded(bytes: ByteArray?): Image {
             Stats.onNativeCall()
             val ptr = _nMakeFromEncoded(bytes)
@@ -148,8 +143,7 @@ class Image @ApiStatus.Internal constructor(ptr: Long) : RefCnt(ptr), IHasImageI
             return Image(ptr)
         }
 
-        @ApiStatus.Internal
-        external fun _nMakeRaster(
+        @JvmStatic external fun _nMakeRaster(
             width: Int,
             height: Int,
             colorType: Int,
@@ -159,8 +153,7 @@ class Image @ApiStatus.Internal constructor(ptr: Long) : RefCnt(ptr), IHasImageI
             rowBytes: Long
         ): Long
 
-        @ApiStatus.Internal
-        external fun _nMakeRasterData(
+        @JvmStatic external fun _nMakeRasterData(
             width: Int,
             height: Int,
             colorType: Int,
@@ -170,26 +163,16 @@ class Image @ApiStatus.Internal constructor(ptr: Long) : RefCnt(ptr), IHasImageI
             rowBytes: Long
         ): Long
 
-        @ApiStatus.Internal
-        external fun _nMakeFromBitmap(bitmapPtr: Long): Long
-        @ApiStatus.Internal
-        external fun _nMakeFromPixmap(pixmapPtr: Long): Long
-        @ApiStatus.Internal
-        external fun _nMakeFromEncoded(bytes: ByteArray?): Long
-        @ApiStatus.Internal
-        external fun _nGetImageInfo(ptr: Long): ImageInfo?
-        @ApiStatus.Internal
-        external fun _nEncodeToData(ptr: Long, format: Int, quality: Int): Long
-        @ApiStatus.Internal
-        external fun _nMakeShader(ptr: Long, tmx: Int, tmy: Int, samplingMode: Long, localMatrix: FloatArray?): Long
-        @ApiStatus.Internal
-        external fun _nPeekPixels(ptr: Long): ByteBuffer?
-        @ApiStatus.Internal
-        external fun _nPeekPixelsToPixmap(ptr: Long, pixmapPtr: Long): Boolean
-        @ApiStatus.Internal
-        external fun _nScalePixels(ptr: Long, pixmapPtr: Long, samplingOptions: Long, cache: Boolean): Boolean
-        @ApiStatus.Internal
-        external fun _nReadPixelsBitmap(
+        @JvmStatic external fun _nMakeFromBitmap(bitmapPtr: Long): Long
+        @JvmStatic external fun _nMakeFromPixmap(pixmapPtr: Long): Long
+        @JvmStatic external fun _nMakeFromEncoded(bytes: ByteArray?): Long
+        @JvmStatic external fun _nGetImageInfo(ptr: Long): ImageInfo?
+        @JvmStatic external fun _nEncodeToData(ptr: Long, format: Int, quality: Int): Long
+        @JvmStatic external fun _nMakeShader(ptr: Long, tmx: Int, tmy: Int, samplingMode: Long, localMatrix: FloatArray?): Long
+        @JvmStatic external fun _nPeekPixels(ptr: Long): ByteBuffer?
+        @JvmStatic external fun _nPeekPixelsToPixmap(ptr: Long, pixmapPtr: Long): Boolean
+        @JvmStatic external fun _nScalePixels(ptr: Long, pixmapPtr: Long, samplingOptions: Long, cache: Boolean): Boolean
+        @JvmStatic external fun _nReadPixelsBitmap(
             ptr: Long,
             contextPtr: Long,
             bitmapPtr: Long,
@@ -198,16 +181,14 @@ class Image @ApiStatus.Internal constructor(ptr: Long) : RefCnt(ptr), IHasImageI
             cache: Boolean
         ): Boolean
 
-        @ApiStatus.Internal
-        external fun _nReadPixelsPixmap(ptr: Long, pixmapPtr: Long, srcX: Int, srcY: Int, cache: Boolean): Boolean
+        @JvmStatic external fun _nReadPixelsPixmap(ptr: Long, pixmapPtr: Long, srcX: Int, srcY: Int, cache: Boolean): Boolean
 
         init {
             staticLoad()
         }
     }
 
-    @ApiStatus.Internal
-    var _imageInfo: ImageInfo? = null
+    internal var _imageInfo: ImageInfo? = null
 
     /**
      * Returns a ImageInfo describing the width, height, color type, alpha type, and color space

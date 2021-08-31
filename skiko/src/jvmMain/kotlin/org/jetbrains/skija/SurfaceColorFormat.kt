@@ -1,7 +1,5 @@
 package org.jetbrains.skija
 
-import org.jetbrains.annotations.ApiStatus
-
 enum class SurfaceColorFormat {
     UNKNOWN,  //!< uninitialized
     ALPHA_8,  //!< pixel with alpha in 8-bit byte
@@ -27,7 +25,6 @@ enum class SurfaceColorFormat {
 
     companion object {
         //<! pixel with a little endian uint16_t for red, green, blue, and alpha
-        @ApiStatus.Internal
-        val _values = values()
+        internal val _values = values()
     }
 }

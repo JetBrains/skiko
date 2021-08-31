@@ -1,12 +1,11 @@
 package org.jetbrains.skija
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
-import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.skija.impl.Managed
 import org.jetbrains.skija.impl.Stats
 import java.lang.ref.Reference
 
-class ManagedString @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
+class ManagedString internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
         @JvmStatic external fun _nMake(s: String?): Long
         @JvmStatic external fun _nGetFinalizer(): Long

@@ -1,7 +1,6 @@
 package org.jetbrains.skija
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
-import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.skija.impl.Managed
 import org.jetbrains.skija.impl.Stats
 import java.lang.ref.Reference
@@ -49,8 +48,7 @@ class PictureRecorder internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
         Stats.onNativeCall()
     }
 
-    @ApiStatus.Internal
-    object _FinalizerHolder {
+    private object _FinalizerHolder {
         val PTR = _nGetFinalizer()
     }
 

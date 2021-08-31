@@ -1,8 +1,5 @@
 package org.jetbrains.skija
 
-import org.jetbrains.annotations.ApiStatus
-import org.jetbrains.annotations.Contract
-
 /**
  *
  * Describes pixel dimensions and encoding. Bitmap, Image, Pixmap, and Surface
@@ -35,8 +32,7 @@ class ImageInfo(val colorInfo: ColorInfo, val width: Int, val height: Int) {
     ) : this(ColorInfo(colorType, alphaType, colorSpace), width, height) {
     }
 
-    @ApiStatus.Internal
-    constructor(width: Int, height: Int, colorType: Int, alphaType: Int, colorSpace: Long) : this(
+    internal constructor(width: Int, height: Int, colorType: Int, alphaType: Int, colorSpace: Long) : this(
         width,
         height,
         ColorType.Companion._values.get(colorType),
@@ -239,7 +235,6 @@ class ImageInfo(val colorInfo: ColorInfo, val width: Int, val height: Int) {
         /**
          * @return  ImageInfo with [ColorType.N32]
          */
-        @Contract("_, _, _ -> new")
         fun makeN32(width: Int, height: Int, alphaType: ColorAlphaType): ImageInfo {
             return ImageInfo(ColorInfo(ColorType.Companion.N32, alphaType, null), width, height)
         }
@@ -247,7 +242,6 @@ class ImageInfo(val colorInfo: ColorInfo, val width: Int, val height: Int) {
         /**
          * @return  ImageInfo with [ColorType.N32]
          */
-        @Contract("_, _, _, _ -> new")
         fun makeN32(width: Int, height: Int, alphaType: ColorAlphaType, colorSpace: ColorSpace?): ImageInfo {
             return ImageInfo(ColorInfo(ColorType.Companion.N32, alphaType, colorSpace), width, height)
         }
@@ -257,7 +251,6 @@ class ImageInfo(val colorInfo: ColorInfo, val width: Int, val height: Int) {
          *
          * @see [https://fiddle.skia.org/c/@ImageInfo_MakeS32](https://fiddle.skia.org/c/@ImageInfo_MakeS32)
          */
-        @Contract("_, _, _ -> new")
         fun makeS32(width: Int, height: Int, alphaType: ColorAlphaType): ImageInfo {
             return ImageInfo(
                 ColorInfo(ColorType.N32, alphaType, ColorSpace._SRGBHolder.sRGB),
@@ -269,7 +262,6 @@ class ImageInfo(val colorInfo: ColorInfo, val width: Int, val height: Int) {
         /**
          * @return  ImageInfo with [ColorType.N32] and [ColorAlphaType.PREMUL]
          */
-        @Contract("_, _ -> new")
         fun makeN32Premul(width: Int, height: Int): ImageInfo {
             return ImageInfo(ColorInfo(ColorType.Companion.N32, ColorAlphaType.PREMUL, null), width, height)
         }
@@ -277,7 +269,6 @@ class ImageInfo(val colorInfo: ColorInfo, val width: Int, val height: Int) {
         /**
          * @return  ImageInfo with [ColorType.N32] and [ColorAlphaType.PREMUL]
          */
-        @Contract("_, _, _ -> new")
         fun makeN32Premul(width: Int, height: Int, colorSpace: ColorSpace?): ImageInfo {
             return ImageInfo(ColorInfo(ColorType.Companion.N32, ColorAlphaType.PREMUL, colorSpace), width, height)
         }
@@ -285,7 +276,6 @@ class ImageInfo(val colorInfo: ColorInfo, val width: Int, val height: Int) {
         /**
          * @return  ImageInfo with [ColorType.ALPHA_8] and [ColorAlphaType.PREMUL]
          */
-        @Contract("_, _ -> new")
         fun makeA8(width: Int, height: Int): ImageInfo {
             return ImageInfo(ColorInfo(ColorType.ALPHA_8, ColorAlphaType.PREMUL, null), width, height)
         }
@@ -293,7 +283,6 @@ class ImageInfo(val colorInfo: ColorInfo, val width: Int, val height: Int) {
         /**
          * @return  ImageInfo with [ColorType.UNKNOWN] and [ColorAlphaType.UNKNOWN]
          */
-        @Contract("_, _ -> new")
         fun makeUnknown(width: Int, height: Int): ImageInfo {
             return ImageInfo(ColorInfo(ColorType.UNKNOWN, ColorAlphaType.UNKNOWN, null), width, height)
         }

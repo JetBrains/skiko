@@ -1,14 +1,11 @@
 package org.jetbrains.skija.shaper
 
-import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.skija.*
 import org.jetbrains.skija.impl.Native
 import java.lang.ref.Reference
 
 class FontRun(internal val end: Int, internal val font: Font) {
-
-    @ApiStatus.Internal
-    fun _getFontPtr(): Long {
+    private fun _getFontPtr(): Long {
         return try {
             Native.Companion.getPtr(font)
         } finally {

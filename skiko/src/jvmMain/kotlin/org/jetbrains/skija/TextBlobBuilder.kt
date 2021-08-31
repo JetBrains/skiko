@@ -1,24 +1,18 @@
 package org.jetbrains.skija
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
-import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.skija.impl.Managed
 import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.impl.Stats
 import java.lang.ref.Reference
 
-class TextBlobBuilder @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
+class TextBlobBuilder internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
-        @ApiStatus.Internal
-        external fun _nGetFinalizer(): Long
-        @ApiStatus.Internal
-        external fun _nMake(): Long
-        @ApiStatus.Internal
-        external fun _nBuild(ptr: Long): Long
-        @ApiStatus.Internal
-        external fun _nAppendRun(ptr: Long, fontPtr: Long, glyphs: ShortArray?, x: Float, y: Float, bounds: Rect?)
-        @ApiStatus.Internal
-        external fun _nAppendRunPosH(
+        @JvmStatic external fun _nGetFinalizer(): Long
+        @JvmStatic external fun _nMake(): Long
+        @JvmStatic external fun _nBuild(ptr: Long): Long
+        @JvmStatic external fun _nAppendRun(ptr: Long, fontPtr: Long, glyphs: ShortArray?, x: Float, y: Float, bounds: Rect?)
+        @JvmStatic external fun _nAppendRunPosH(
             ptr: Long,
             fontPtr: Long,
             glyphs: ShortArray?,
@@ -27,10 +21,8 @@ class TextBlobBuilder @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, 
             bounds: Rect?
         )
 
-        @ApiStatus.Internal
-        external fun _nAppendRunPos(ptr: Long, fontPtr: Long, glyphs: ShortArray?, pos: FloatArray?, bounds: Rect?)
-        @ApiStatus.Internal
-        external fun _nAppendRunRSXform(ptr: Long, fontPtr: Long, glyphs: ShortArray?, xform: FloatArray?)
+        @JvmStatic external fun _nAppendRunPos(ptr: Long, fontPtr: Long, glyphs: ShortArray?, pos: FloatArray?, bounds: Rect?)
+        @JvmStatic external fun _nAppendRunRSXform(ptr: Long, fontPtr: Long, glyphs: ShortArray?, xform: FloatArray?)
 
         init {
             staticLoad()
@@ -258,8 +250,7 @@ class TextBlobBuilder @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, 
         }
     }
 
-    @ApiStatus.Internal
-    object _FinalizerHolder {
+    private object _FinalizerHolder {
         val PTR = _nGetFinalizer()
     }
 }

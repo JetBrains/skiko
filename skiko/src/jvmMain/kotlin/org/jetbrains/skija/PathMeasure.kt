@@ -1,34 +1,23 @@
 package org.jetbrains.skija
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
-import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.skija.impl.Managed
 import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.impl.Stats
 import java.lang.ref.Reference
 
-class PathMeasure @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
+class PathMeasure internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
-        @ApiStatus.Internal
-        external fun _nGetFinalizer(): Long
-        @ApiStatus.Internal
-        external fun _nMake(): Long
-        @ApiStatus.Internal
-        external fun _nMakePath(pathPtr: Long, forceClosed: Boolean, resScale: Float): Long
-        @ApiStatus.Internal
-        external fun _nSetPath(ptr: Long, pathPtr: Long, forceClosed: Boolean)
-        @ApiStatus.Internal
-        external fun _nGetLength(ptr: Long): Float
-        @ApiStatus.Internal
-        external fun _nGetPosition(ptr: Long, distance: Float): Point?
-        @ApiStatus.Internal
-        external fun _nGetTangent(ptr: Long, distance: Float): Point?
-        @ApiStatus.Internal
-        external fun _nGetRSXform(ptr: Long, distance: Float): RSXform?
-        @ApiStatus.Internal
-        external fun _nGetMatrix(ptr: Long, distance: Float, getPosition: Boolean, getTangent: Boolean): FloatArray?
-        @ApiStatus.Internal
-        external fun _nGetSegment(
+        @JvmStatic external fun _nGetFinalizer(): Long
+        @JvmStatic external fun _nMake(): Long
+        @JvmStatic external fun _nMakePath(pathPtr: Long, forceClosed: Boolean, resScale: Float): Long
+        @JvmStatic external fun _nSetPath(ptr: Long, pathPtr: Long, forceClosed: Boolean)
+        @JvmStatic external fun _nGetLength(ptr: Long): Float
+        @JvmStatic external fun _nGetPosition(ptr: Long, distance: Float): Point?
+        @JvmStatic external fun _nGetTangent(ptr: Long, distance: Float): Point?
+        @JvmStatic external fun _nGetRSXform(ptr: Long, distance: Float): RSXform?
+        @JvmStatic external fun _nGetMatrix(ptr: Long, distance: Float, getPosition: Boolean, getTangent: Boolean): FloatArray?
+        @JvmStatic external fun _nGetSegment(
             ptr: Long,
             startD: Float,
             endD: Float,
@@ -36,10 +25,8 @@ class PathMeasure @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _Fin
             startWithMoveTo: Boolean
         ): Boolean
 
-        @ApiStatus.Internal
-        external fun _nIsClosed(ptr: Long): Boolean
-        @ApiStatus.Internal
-        external fun _nNextContour(ptr: Long): Boolean
+        @JvmStatic external fun _nIsClosed(ptr: Long): Boolean
+        @JvmStatic external fun _nNextContour(ptr: Long): Boolean
 
         init {
             staticLoad()
@@ -210,8 +197,7 @@ class PathMeasure @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _Fin
         }
     }
 
-    @ApiStatus.Internal
-    object _FinalizerHolder {
+    internal object _FinalizerHolder {
         val PTR = _nGetFinalizer()
     }
 }

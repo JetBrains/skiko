@@ -1,7 +1,6 @@
 package org.jetbrains.skija
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
-import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.skija.impl.Managed
 import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.impl.Stats
@@ -32,7 +31,7 @@ import java.lang.ref.Reference
  * Internally, Path lazily computes metrics likes bounds and convexity. Call
  * [.updateBoundsCache] to make Path thread safe.
  */
-class Path @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR), Iterable<PathSegment?> {
+class Path internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR), Iterable<PathSegment?> {
     companion object {
         fun makeFromSVGString(svg: String): Path {
             val res = _nMakeFromSVGString(svg)
@@ -200,26 +199,26 @@ class Path @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
             return Path(_nMakeFromBytes(data))
         }
 
-        external fun _nGetFinalizer(): Long
-        external fun _nMake(): Long
-        external fun _nMakeFromSVGString(s: String?): Long
-        external fun _nEquals(aPtr: Long, bPtr: Long): Boolean
-        external fun _nIsInterpolatable(ptr: Long, comparePtr: Long): Boolean
-        external fun _nMakeLerp(ptr: Long, endingPtr: Long, weight: Float): Long
-        external fun _nGetFillMode(ptr: Long): Int
-        external fun _nSetFillMode(ptr: Long, fillMode: Int)
-        external fun _nIsConvex(ptr: Long): Boolean
-        external fun _nIsOval(ptr: Long): Rect
-        external fun _nIsRRect(ptr: Long): RRect
-        external fun _nReset(ptr: Long)
-        external fun _nRewind(ptr: Long)
-        external fun _nIsEmpty(ptr: Long): Boolean
-        external fun _nIsLastContourClosed(ptr: Long): Boolean
-        external fun _nIsFinite(ptr: Long): Boolean
-        external fun _nIsVolatile(ptr: Long): Boolean
-        external fun _nSetVolatile(ptr: Long, isVolatile: Boolean)
-        external fun _nIsLineDegenerate(x0: Float, y0: Float, x1: Float, y1: Float, exact: Boolean): Boolean
-        external fun _nIsQuadDegenerate(
+        @JvmStatic external fun _nGetFinalizer(): Long
+        @JvmStatic external fun _nMake(): Long
+        @JvmStatic external fun _nMakeFromSVGString(s: String?): Long
+        @JvmStatic external fun _nEquals(aPtr: Long, bPtr: Long): Boolean
+        @JvmStatic external fun _nIsInterpolatable(ptr: Long, comparePtr: Long): Boolean
+        @JvmStatic external fun _nMakeLerp(ptr: Long, endingPtr: Long, weight: Float): Long
+        @JvmStatic external fun _nGetFillMode(ptr: Long): Int
+        @JvmStatic external fun _nSetFillMode(ptr: Long, fillMode: Int)
+        @JvmStatic external fun _nIsConvex(ptr: Long): Boolean
+        @JvmStatic external fun _nIsOval(ptr: Long): Rect
+        @JvmStatic external fun _nIsRRect(ptr: Long): RRect
+        @JvmStatic external fun _nReset(ptr: Long)
+        @JvmStatic external fun _nRewind(ptr: Long)
+        @JvmStatic external fun _nIsEmpty(ptr: Long): Boolean
+        @JvmStatic external fun _nIsLastContourClosed(ptr: Long): Boolean
+        @JvmStatic external fun _nIsFinite(ptr: Long): Boolean
+        @JvmStatic external fun _nIsVolatile(ptr: Long): Boolean
+        @JvmStatic external fun _nSetVolatile(ptr: Long, isVolatile: Boolean)
+        @JvmStatic external fun _nIsLineDegenerate(x0: Float, y0: Float, x1: Float, y1: Float, exact: Boolean): Boolean
+        @JvmStatic external fun _nIsQuadDegenerate(
             x0: Float,
             y0: Float,
             x1: Float,
@@ -229,7 +228,7 @@ class Path @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
             exact: Boolean
         ): Boolean
 
-        external fun _nIsCubicDegenerate(
+        @JvmStatic external fun _nIsCubicDegenerate(
             x0: Float,
             y0: Float,
             x1: Float,
@@ -241,30 +240,30 @@ class Path @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
             exact: Boolean
         ): Boolean
 
-        external fun _nMaybeGetAsLine(ptr: Long): Array<Point>
-        external fun _nGetPointsCount(ptr: Long): Int
-        external fun _nGetPoint(ptr: Long, index: Int): Point
-        external fun _nGetPoints(ptr: Long, points: Array<Point?>?, max: Int): Int
-        external fun _nCountVerbs(ptr: Long): Int
-        external fun _nGetVerbs(ptr: Long, verbs: ByteArray?, max: Int): Int
-        external fun _nApproximateBytesUsed(ptr: Long): Long
-        external fun _nSwap(ptr: Long, otherPtr: Long)
-        external fun _nGetBounds(ptr: Long): Rect
-        external fun _nUpdateBoundsCache(ptr: Long)
-        external fun _nComputeTightBounds(ptr: Long): Rect
-        external fun _nConservativelyContainsRect(ptr: Long, l: Float, t: Float, r: Float, b: Float): Boolean
-        external fun _nIncReserve(ptr: Long, extraPtCount: Int)
-        external fun _nMoveTo(ptr: Long, x: Float, y: Float)
-        external fun _nRMoveTo(ptr: Long, dx: Float, dy: Float)
-        external fun _nLineTo(ptr: Long, x: Float, y: Float)
-        external fun _nRLineTo(ptr: Long, dx: Float, dy: Float)
-        external fun _nQuadTo(ptr: Long, x1: Float, y1: Float, x2: Float, y2: Float)
-        external fun _nRQuadTo(ptr: Long, dx1: Float, dy1: Float, dx2: Float, dy2: Float)
-        external fun _nConicTo(ptr: Long, x1: Float, y1: Float, x2: Float, y2: Float, w: Float)
-        external fun _nRConicTo(ptr: Long, dx1: Float, dy1: Float, dx2: Float, dy2: Float, w: Float)
-        external fun _nCubicTo(ptr: Long, x1: Float, y1: Float, x2: Float, y2: Float, x3: Float, y3: Float)
-        external fun _nRCubicTo(ptr: Long, dx1: Float, dy1: Float, dx2: Float, dy2: Float, dx3: Float, dy3: Float)
-        external fun _nArcTo(
+        @JvmStatic external fun _nMaybeGetAsLine(ptr: Long): Array<Point>
+        @JvmStatic external fun _nGetPointsCount(ptr: Long): Int
+        @JvmStatic external fun _nGetPoint(ptr: Long, index: Int): Point
+        @JvmStatic external fun _nGetPoints(ptr: Long, points: Array<Point?>?, max: Int): Int
+        @JvmStatic external fun _nCountVerbs(ptr: Long): Int
+        @JvmStatic external fun _nGetVerbs(ptr: Long, verbs: ByteArray?, max: Int): Int
+        @JvmStatic external fun _nApproximateBytesUsed(ptr: Long): Long
+        @JvmStatic external fun _nSwap(ptr: Long, otherPtr: Long)
+        @JvmStatic external fun _nGetBounds(ptr: Long): Rect
+        @JvmStatic external fun _nUpdateBoundsCache(ptr: Long)
+        @JvmStatic external fun _nComputeTightBounds(ptr: Long): Rect
+        @JvmStatic external fun _nConservativelyContainsRect(ptr: Long, l: Float, t: Float, r: Float, b: Float): Boolean
+        @JvmStatic external fun _nIncReserve(ptr: Long, extraPtCount: Int)
+        @JvmStatic external fun _nMoveTo(ptr: Long, x: Float, y: Float)
+        @JvmStatic external fun _nRMoveTo(ptr: Long, dx: Float, dy: Float)
+        @JvmStatic external fun _nLineTo(ptr: Long, x: Float, y: Float)
+        @JvmStatic external fun _nRLineTo(ptr: Long, dx: Float, dy: Float)
+        @JvmStatic external fun _nQuadTo(ptr: Long, x1: Float, y1: Float, x2: Float, y2: Float)
+        @JvmStatic external fun _nRQuadTo(ptr: Long, dx1: Float, dy1: Float, dx2: Float, dy2: Float)
+        @JvmStatic external fun _nConicTo(ptr: Long, x1: Float, y1: Float, x2: Float, y2: Float, w: Float)
+        @JvmStatic external fun _nRConicTo(ptr: Long, dx1: Float, dy1: Float, dx2: Float, dy2: Float, w: Float)
+        @JvmStatic external fun _nCubicTo(ptr: Long, x1: Float, y1: Float, x2: Float, y2: Float, x3: Float, y3: Float)
+        @JvmStatic external fun _nRCubicTo(ptr: Long, dx1: Float, dy1: Float, dx2: Float, dy2: Float, dx3: Float, dy3: Float)
+        @JvmStatic external fun _nArcTo(
             ptr: Long,
             left: Float,
             top: Float,
@@ -275,8 +274,8 @@ class Path @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
             forceMoveTo: Boolean
         )
 
-        external fun _nTangentArcTo(ptr: Long, x1: Float, y1: Float, x2: Float, y2: Float, radius: Float)
-        external fun _nEllipticalArcTo(
+        @JvmStatic external fun _nTangentArcTo(ptr: Long, x1: Float, y1: Float, x2: Float, y2: Float, radius: Float)
+        @JvmStatic external fun _nEllipticalArcTo(
             ptr: Long,
             rx: Float,
             ry: Float,
@@ -287,7 +286,7 @@ class Path @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
             y: Float
         )
 
-        external fun _nREllipticalArcTo(
+        @JvmStatic external fun _nREllipticalArcTo(
             ptr: Long,
             rx: Float,
             ry: Float,
@@ -298,8 +297,8 @@ class Path @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
             dy: Float
         )
 
-        external fun _nClosePath(ptr: Long)
-        external fun _nConvertConicToQuads(
+        @JvmStatic external fun _nClosePath(ptr: Long)
+        @JvmStatic external fun _nConvertConicToQuads(
             x0: Float,
             y0: Float,
             x1: Float,
@@ -310,12 +309,12 @@ class Path @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
             pow2: Int
         ): Array<Point>
 
-        external fun _nIsRect(ptr: Long): Rect
-        external fun _nAddRect(ptr: Long, l: Float, t: Float, r: Float, b: Float, dir: Int, start: Int)
-        external fun _nAddOval(ptr: Long, l: Float, t: Float, r: Float, b: Float, dir: Int, start: Int)
-        external fun _nAddCircle(ptr: Long, x: Float, y: Float, r: Float, dir: Int)
-        external fun _nAddArc(ptr: Long, l: Float, t: Float, r: Float, b: Float, startAngle: Float, sweepAngle: Float)
-        external fun _nAddRRect(
+        @JvmStatic external fun _nIsRect(ptr: Long): Rect
+        @JvmStatic external fun _nAddRect(ptr: Long, l: Float, t: Float, r: Float, b: Float, dir: Int, start: Int)
+        @JvmStatic external fun _nAddOval(ptr: Long, l: Float, t: Float, r: Float, b: Float, dir: Int, start: Int)
+        @JvmStatic external fun _nAddCircle(ptr: Long, x: Float, y: Float, r: Float, dir: Int)
+        @JvmStatic external fun _nAddArc(ptr: Long, l: Float, t: Float, r: Float, b: Float, startAngle: Float, sweepAngle: Float)
+        @JvmStatic external fun _nAddRRect(
             ptr: Long,
             l: Float,
             t: Float,
@@ -326,32 +325,31 @@ class Path @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
             start: Int
         )
 
-        external fun _nAddPoly(ptr: Long, coords: FloatArray?, close: Boolean)
-        external fun _nAddPath(ptr: Long, srcPtr: Long, extend: Boolean)
-        external fun _nAddPathOffset(ptr: Long, srcPtr: Long, dx: Float, dy: Float, extend: Boolean)
-        external fun _nAddPathTransform(ptr: Long, srcPtr: Long, matrix: FloatArray?, extend: Boolean)
-        external fun _nReverseAddPath(ptr: Long, srcPtr: Long)
-        external fun _nOffset(ptr: Long, dx: Float, dy: Float, dst: Long)
-        external fun _nTransform(ptr: Long, matrix: FloatArray?, dst: Long, applyPerspectiveClip: Boolean)
-        external fun _nGetLastPt(ptr: Long): Point
-        external fun _nSetLastPt(ptr: Long, x: Float, y: Float)
-        external fun _nGetSegmentMasks(ptr: Long): Int
-        external fun _nContains(ptr: Long, x: Float, y: Float): Boolean
-        external fun _nDump(ptr: Long)
-        external fun _nDumpHex(ptr: Long)
-        external fun _nSerializeToBytes(ptr: Long): ByteArray
-        external fun _nMakeCombining(onePtr: Long, twoPtr: Long, op: Int): Long
-        external fun _nMakeFromBytes(data: ByteArray?): Long
-        external fun _nGetGenerationId(ptr: Long): Int
-        external fun _nIsValid(ptr: Long): Boolean
+        @JvmStatic external fun _nAddPoly(ptr: Long, coords: FloatArray?, close: Boolean)
+        @JvmStatic external fun _nAddPath(ptr: Long, srcPtr: Long, extend: Boolean)
+        @JvmStatic external fun _nAddPathOffset(ptr: Long, srcPtr: Long, dx: Float, dy: Float, extend: Boolean)
+        @JvmStatic external fun _nAddPathTransform(ptr: Long, srcPtr: Long, matrix: FloatArray?, extend: Boolean)
+        @JvmStatic external fun _nReverseAddPath(ptr: Long, srcPtr: Long)
+        @JvmStatic external fun _nOffset(ptr: Long, dx: Float, dy: Float, dst: Long)
+        @JvmStatic external fun _nTransform(ptr: Long, matrix: FloatArray?, dst: Long, applyPerspectiveClip: Boolean)
+        @JvmStatic external fun _nGetLastPt(ptr: Long): Point
+        @JvmStatic external fun _nSetLastPt(ptr: Long, x: Float, y: Float)
+        @JvmStatic external fun _nGetSegmentMasks(ptr: Long): Int
+        @JvmStatic external fun _nContains(ptr: Long, x: Float, y: Float): Boolean
+        @JvmStatic external fun _nDump(ptr: Long)
+        @JvmStatic external fun _nDumpHex(ptr: Long)
+        @JvmStatic external fun _nSerializeToBytes(ptr: Long): ByteArray
+        @JvmStatic external fun _nMakeCombining(onePtr: Long, twoPtr: Long, op: Int): Long
+        @JvmStatic external fun _nMakeFromBytes(data: ByteArray?): Long
+        @JvmStatic external fun _nGetGenerationId(ptr: Long): Int
+        @JvmStatic external fun _nIsValid(ptr: Long): Boolean
 
         init {
             staticLoad()
         }
     }
 
-    @ApiStatus.Internal
-    object _FinalizerHolder {
+    internal object _FinalizerHolder {
         val PTR = _nGetFinalizer()
     }
 
@@ -370,8 +368,7 @@ class Path @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
      * @param other  Path to compare
      * @return   true if this and Path are equivalent
      */
-    @ApiStatus.Internal
-    override fun _nativeEquals(other: Native?): Boolean {
+        override fun _nativeEquals(other: Native?): Boolean {
         return try {
             _nEquals(_ptr, Native.Companion.getPtr(other))
         } finally {

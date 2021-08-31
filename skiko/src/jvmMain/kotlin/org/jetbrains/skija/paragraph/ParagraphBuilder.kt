@@ -1,7 +1,6 @@
 package org.jetbrains.skija.paragraph
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
-import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.skija.ManagedString
 import org.jetbrains.skija.impl.Managed
 import org.jetbrains.skija.impl.Native
@@ -73,7 +72,7 @@ class ParagraphBuilder(style: ParagraphStyle?, fc: FontCollection?) :
     fun setParagraphStyle(style: ParagraphStyle?): ParagraphBuilder {
         return try {
             Stats.onNativeCall()
-            _nSetParagraphStyle(_ptr, Native.Companion.getPtr(style))
+            _nSetParagraphStyle(_ptr, Native.getPtr(style))
             this
         } finally {
             Reference.reachabilityFence(style)

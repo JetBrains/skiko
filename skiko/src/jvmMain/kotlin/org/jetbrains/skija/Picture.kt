@@ -1,14 +1,13 @@
 package org.jetbrains.skija
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
-import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.skija.impl.RefCnt
 import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.impl.Stats
 import java.lang.ref.Reference
 import java.util.function.BooleanSupplier
 
-class Picture @ApiStatus.Internal constructor(ptr: Long) : RefCnt(ptr) {
+class Picture internal constructor(ptr: Long) : RefCnt(ptr) {
     companion object {
         /**
          * Recreates Picture that was serialized into data. Returns constructed Picture
@@ -18,7 +17,7 @@ class Picture @ApiStatus.Internal constructor(ptr: Long) : RefCnt(ptr) {
         fun makeFromData(data: Data?): Picture? {
             return try {
                 Stats.onNativeCall()
-                val ptr = _nMakeFromData(Native.Companion.getPtr(data))
+                val ptr = _nMakeFromData(Native.getPtr(data))
                 if (ptr == 0L) null else Picture(ptr)
             } finally {
                 Reference.reachabilityFence(data)
@@ -45,24 +44,15 @@ class Picture @ApiStatus.Internal constructor(ptr: Long) : RefCnt(ptr) {
             return Picture(_nMakePlaceholder(cull.left, cull.top, cull.right, cull.bottom))
         }
 
-        @ApiStatus.Internal
-        external fun _nMakeFromData(dataPtr: Long /*, SkDeserialProcs */): Long
-        @ApiStatus.Internal
-        external fun _nPlayback(ptr: Long, canvasPtr: Long, abort: BooleanSupplier?)
-        @ApiStatus.Internal
-        external fun _nGetCullRect(ptr: Long): Rect
-        @ApiStatus.Internal
-        external fun _nGetUniqueId(ptr: Long): Int
-        @ApiStatus.Internal
-        external fun _nSerializeToData(ptr: Long /*, SkSerialProcs */): Long
-        @ApiStatus.Internal
-        external fun _nMakePlaceholder(left: Float, top: Float, right: Float, bottom: Float): Long
-        @ApiStatus.Internal
-        external fun _nGetApproximateOpCount(ptr: Long): Int
-        @ApiStatus.Internal
-        external fun _nGetApproximateBytesUsed(ptr: Long): Long
-        @ApiStatus.Internal
-        external fun _nMakeShader(
+        @JvmStatic external fun _nMakeFromData(dataPtr: Long /*, SkDeserialProcs */): Long
+        @JvmStatic external fun _nPlayback(ptr: Long, canvasPtr: Long, abort: BooleanSupplier?)
+        @JvmStatic external fun _nGetCullRect(ptr: Long): Rect
+        @JvmStatic external fun _nGetUniqueId(ptr: Long): Int
+        @JvmStatic external fun _nSerializeToData(ptr: Long /*, SkSerialProcs */): Long
+        @JvmStatic external fun _nMakePlaceholder(left: Float, top: Float, right: Float, bottom: Float): Long
+        @JvmStatic external fun _nGetApproximateOpCount(ptr: Long): Int
+        @JvmStatic external fun _nGetApproximateBytesUsed(ptr: Long): Long
+        @JvmStatic external fun _nMakeShader(
             ptr: Long,
             tmx: Int,
             tmy: Int,

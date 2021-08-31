@@ -1,11 +1,10 @@
 package org.jetbrains.skija
 
-import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.skija.impl.*
 import java.lang.ref.Reference
 import java.nio.ByteBuffer
 
-class Pixmap @ApiStatus.Internal constructor(ptr: Long, managed: Boolean) :
+class Pixmap internal constructor(ptr: Long, managed: Boolean) :
     Managed(ptr, _FinalizerHolder.PTR, managed) {
     constructor() : this(_nMakeNull(), true) {
         Stats.onNativeCall()
@@ -246,8 +245,7 @@ class Pixmap @ApiStatus.Internal constructor(ptr: Long, managed: Boolean) :
     val buffer: ByteBuffer?
         get() = BufferUtil.getByteBufferFromPointer(addr, computeByteSize())
 
-    @ApiStatus.Internal
-    object _FinalizerHolder {
+    private object _FinalizerHolder {
         val PTR = _nGetFinalizer()
     }
 
@@ -271,9 +269,9 @@ class Pixmap @ApiStatus.Internal constructor(ptr: Long, managed: Boolean) :
             }
         }
 
-        external fun _nGetFinalizer(): Long
-        external fun _nMakeNull(): Long
-        external fun _nMake(
+        @JvmStatic external fun _nGetFinalizer(): Long
+        @JvmStatic external fun _nMakeNull(): Long
+        @JvmStatic external fun _nMake(
             width: Int,
             height: Int,
             colorType: Int,
@@ -283,8 +281,8 @@ class Pixmap @ApiStatus.Internal constructor(ptr: Long, managed: Boolean) :
             rowBytes: Int
         ): Long
 
-        external fun _nReset(ptr: Long)
-        external fun _nResetWithInfo(
+        @JvmStatic external fun _nReset(ptr: Long)
+        @JvmStatic external fun _nResetWithInfo(
             ptr: Long,
             width: Int,
             height: Int,
@@ -295,24 +293,24 @@ class Pixmap @ApiStatus.Internal constructor(ptr: Long, managed: Boolean) :
             rowBytes: Int
         )
 
-        external fun _nSetColorSpace(ptr: Long, colorSpacePtr: Long)
-        external fun _nExtractSubset(ptr: Long, subsetPtr: Long, l: Int, t: Int, r: Int, b: Int): Boolean
-        external fun _nGetInfo(ptr: Long): ImageInfo
-        external fun _nGetRowBytes(ptr: Long): Int
-        external fun _nGetAddr(ptr: Long): Long
+        @JvmStatic external fun _nSetColorSpace(ptr: Long, colorSpacePtr: Long)
+        @JvmStatic external fun _nExtractSubset(ptr: Long, subsetPtr: Long, l: Int, t: Int, r: Int, b: Int): Boolean
+        @JvmStatic external fun _nGetInfo(ptr: Long): ImageInfo
+        @JvmStatic external fun _nGetRowBytes(ptr: Long): Int
+        @JvmStatic external fun _nGetAddr(ptr: Long): Long
 
         // TODO methods flattening ImageInfo not included yet - use GetInfo() instead.
-        external fun _nGetRowBytesAsPixels(ptr: Long): Int
+        @JvmStatic external fun _nGetRowBytesAsPixels(ptr: Long): Int
 
         // TODO shiftPerPixel
-        external fun _nComputeByteSize(ptr: Long): Int
-        external fun _nComputeIsOpaque(ptr: Long): Boolean
-        external fun _nGetColor(ptr: Long, x: Int, y: Int): Int
-        external fun _nGetAlphaF(ptr: Long, x: Int, y: Int): Float
-        external fun _nGetAddrAt(ptr: Long, x: Int, y: Int): Long
+        @JvmStatic external fun _nComputeByteSize(ptr: Long): Int
+        @JvmStatic external fun _nComputeIsOpaque(ptr: Long): Boolean
+        @JvmStatic external fun _nGetColor(ptr: Long, x: Int, y: Int): Int
+        @JvmStatic external fun _nGetAlphaF(ptr: Long, x: Int, y: Int): Float
+        @JvmStatic external fun _nGetAddrAt(ptr: Long, x: Int, y: Int): Long
 
         // methods related to C++ types(addr8/16/32/64, writable_addr8/16/32/64) not included - not needed
-        external fun _nReadPixels(
+        @JvmStatic external fun _nReadPixels(
             ptr: Long,
             width: Int,
             height: Int,
@@ -323,7 +321,7 @@ class Pixmap @ApiStatus.Internal constructor(ptr: Long, managed: Boolean) :
             dstRowBytes: Int
         ): Boolean
 
-        external fun _nReadPixelsFromPoint(
+        @JvmStatic external fun _nReadPixelsFromPoint(
             ptr: Long,
             width: Int,
             height: Int,
@@ -336,11 +334,11 @@ class Pixmap @ApiStatus.Internal constructor(ptr: Long, managed: Boolean) :
             srcY: Int
         ): Boolean
 
-        external fun _nReadPixelsToPixmap(ptr: Long, dstPixmapPtr: Long): Boolean
-        external fun _nReadPixelsToPixmapFromPoint(ptr: Long, dstPixmapPtr: Long, srcX: Int, srcY: Int): Boolean
-        external fun _nScalePixels(ptr: Long, dstPixmapPtr: Long, samplingOptions: Long): Boolean
-        external fun _nErase(ptr: Long, color: Int): Boolean
-        external fun _nEraseSubset(
+        @JvmStatic external fun _nReadPixelsToPixmap(ptr: Long, dstPixmapPtr: Long): Boolean
+        @JvmStatic external fun _nReadPixelsToPixmapFromPoint(ptr: Long, dstPixmapPtr: Long, srcX: Int, srcY: Int): Boolean
+        @JvmStatic external fun _nScalePixels(ptr: Long, dstPixmapPtr: Long, samplingOptions: Long): Boolean
+        @JvmStatic external fun _nErase(ptr: Long, color: Int): Boolean
+        @JvmStatic external fun _nEraseSubset(
             ptr: Long,
             color: Int,
             l: Int,

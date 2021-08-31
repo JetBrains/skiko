@@ -1,6 +1,5 @@
 package org.jetbrains.skija
 
-import org.jetbrains.annotations.ApiStatus
 
 class IRange(internal val start: Int, internal val end: Int) {
 
@@ -30,8 +29,7 @@ class IRange(internal val start: Int, internal val end: Int) {
     }
 
     companion object {
-        @ApiStatus.Internal
-        fun _makeFromLong(l: Long): IRange {
+        internal fun _makeFromLong(l: Long): IRange {
             return IRange((l ushr 32).toInt(), (l and -1).toInt())
         }
     }

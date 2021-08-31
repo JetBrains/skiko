@@ -1,7 +1,6 @@
 package org.jetbrains.skija.paragraph
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
-import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.skija.*
 import org.jetbrains.skija.impl.Managed
 import org.jetbrains.skija.impl.Native
@@ -281,8 +280,7 @@ class Paragraph internal constructor(ptr: Long, text: ManagedString?) : Managed(
         }
     }
 
-    @ApiStatus.Internal
-    object _FinalizerHolder {
+    private object _FinalizerHolder {
         val PTR = _nGetFinalizer()
     }
 

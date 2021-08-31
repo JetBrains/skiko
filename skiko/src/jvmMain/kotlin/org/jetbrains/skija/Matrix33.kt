@@ -1,7 +1,5 @@
 package org.jetbrains.skija
 
-import org.jetbrains.annotations.ApiStatus
-import org.jetbrains.annotations.Contract
 import java.util.*
 
 /**
@@ -37,7 +35,6 @@ class Matrix33(vararg mat: Float) {
      * | persp0  persp1  persp2 |
     `</pre> *
      */
-    @ApiStatus.Internal
     val mat: FloatArray
     fun makePreScale(sx: Float, sy: Float): Matrix33 {
         return Matrix33(
@@ -161,7 +158,6 @@ class Matrix33(vararg mat: Float) {
          * @param dy  vertical translation
          * @return    Matrix33 with translation
          */
-        @Contract("_, _ -> new")
         fun makeTranslate(dx: Float, dy: Float): Matrix33 {
             return Matrix33(*floatArrayOf(1f, 0f, dx, 0f, 1f, dy, 0f, 0f, 1f))
         }

@@ -1,7 +1,6 @@
 package org.jetbrains.skija.shaper
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
-import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.skija.ManagedString
 import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.impl.Stats
@@ -9,14 +8,12 @@ import java.lang.ref.Reference
 
 class HbIcuScriptRunIterator(text: ManagedString?, manageText: Boolean) : ManagedRunIterator<ScriptRun?>(
     _nMake(
-        Native.Companion.getPtr(text)
+        Native.getPtr(text)
     ), text, manageText
 ) {
     companion object {
-        @ApiStatus.Internal
-        external fun _nMake(textPtr: Long): Long
-        @ApiStatus.Internal
-        external fun _nGetCurrentScriptTag(ptr: Long): Int
+        @JvmStatic external fun _nMake(textPtr: Long): Long
+        @JvmStatic external fun _nGetCurrentScriptTag(ptr: Long): Int
 
         init {
             staticLoad()

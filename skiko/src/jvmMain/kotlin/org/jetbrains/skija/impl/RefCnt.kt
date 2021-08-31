@@ -1,6 +1,5 @@
 package org.jetbrains.skija.impl
 
-import org.jetbrains.annotations.ApiStatus
 import java.lang.ref.Reference
 
 abstract class RefCnt : Managed {
@@ -20,8 +19,7 @@ abstract class RefCnt : Managed {
         return s.substring(0, s.length - 1) + ", refCount=" + refCount + ")"
     }
 
-    @ApiStatus.Internal
-    object _FinalizerHolder {
+    private object _FinalizerHolder {
         val PTR = _nGetFinalizer()
     }
 

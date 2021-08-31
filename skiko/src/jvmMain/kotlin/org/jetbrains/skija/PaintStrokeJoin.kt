@@ -1,7 +1,5 @@
 package org.jetbrains.skija
 
-import org.jetbrains.annotations.ApiStatus
-
 /**
  *
  * Join specifies how corners are drawn when a shape is stroked. Join
@@ -35,7 +33,6 @@ enum class PaintStrokeJoin {
     BEVEL;
 
     companion object {
-        @ApiStatus.Internal
-        val _values = values()
+        internal val _values = values()
     }
 }

@@ -1,8 +1,6 @@
 package org.jetbrains.skija
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
-import org.jetbrains.annotations.ApiStatus
-import org.jetbrains.annotations.Contract
 import org.jetbrains.skija.impl.Managed
 import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.impl.Stats
@@ -10,31 +8,56 @@ import java.lang.ref.Reference
 
 class Paint : Managed {
     companion object {
-        @JvmStatic external fun _nGetFinalizer(): Long
-        @JvmStatic external fun _nMake(): Long
-        @JvmStatic external fun _nMakeClone(ptr: Long): Long
-        @JvmStatic external fun _nEquals(ptr: Long, otherPtr: Long): Boolean
-        @JvmStatic external fun _nReset(ptr: Long)
-        @JvmStatic external fun _nIsAntiAlias(ptr: Long): Boolean
-        @JvmStatic external fun _nSetAntiAlias(ptr: Long, value: Boolean)
-        @JvmStatic external fun _nIsDither(ptr: Long): Boolean
-        @JvmStatic external fun _nSetDither(ptr: Long, value: Boolean)
-        @JvmStatic external fun _nGetMode(ptr: Long): Int
-        @JvmStatic external fun _nSetMode(ptr: Long, value: Int)
-        @JvmStatic external fun _nGetColor(ptr: Long): Int
-        @JvmStatic external fun _nGetColor4f(ptr: Long): Color4f
-        @JvmStatic external fun _nSetColor(ptr: Long, argb: Int)
-        @JvmStatic external fun _nSetColor4f(ptr: Long, r: Float, g: Float, b: Float, a: Float, colorSpacePtr: Long)
-        @JvmStatic external fun _nGetStrokeWidth(ptr: Long): Float
-        @JvmStatic external fun _nSetStrokeWidth(ptr: Long, value: Float)
-        @JvmStatic external fun _nGetStrokeMiter(ptr: Long): Float
-        @JvmStatic external fun _nSetStrokeMiter(ptr: Long, value: Float)
-        @JvmStatic external fun _nGetStrokeCap(ptr: Long): Int
-        @JvmStatic external fun _nSetStrokeCap(ptr: Long, value: Int)
-        @JvmStatic external fun _nGetStrokeJoin(ptr: Long): Int
-        @JvmStatic external fun _nSetStrokeJoin(ptr: Long, value: Int)
-        @JvmStatic external fun _nGetFillPath(ptr: Long, path: Long, resScale: Float): Long
-        @JvmStatic external fun _nGetFillPathCull(
+        @JvmStatic
+        external fun _nGetFinalizer(): Long
+        @JvmStatic
+        external fun _nMake(): Long
+        @JvmStatic
+        external fun _nMakeClone(ptr: Long): Long
+        @JvmStatic
+        external fun _nEquals(ptr: Long, otherPtr: Long): Boolean
+        @JvmStatic
+        external fun _nReset(ptr: Long)
+        @JvmStatic
+        external fun _nIsAntiAlias(ptr: Long): Boolean
+        @JvmStatic
+        external fun _nSetAntiAlias(ptr: Long, value: Boolean)
+        @JvmStatic
+        external fun _nIsDither(ptr: Long): Boolean
+        @JvmStatic
+        external fun _nSetDither(ptr: Long, value: Boolean)
+        @JvmStatic
+        external fun _nGetMode(ptr: Long): Int
+        @JvmStatic
+        external fun _nSetMode(ptr: Long, value: Int)
+        @JvmStatic
+        external fun _nGetColor(ptr: Long): Int
+        @JvmStatic
+        external fun _nGetColor4f(ptr: Long): Color4f
+        @JvmStatic
+        external fun _nSetColor(ptr: Long, argb: Int)
+        @JvmStatic
+        external fun _nSetColor4f(ptr: Long, r: Float, g: Float, b: Float, a: Float, colorSpacePtr: Long)
+        @JvmStatic
+        external fun _nGetStrokeWidth(ptr: Long): Float
+        @JvmStatic
+        external fun _nSetStrokeWidth(ptr: Long, value: Float)
+        @JvmStatic
+        external fun _nGetStrokeMiter(ptr: Long): Float
+        @JvmStatic
+        external fun _nSetStrokeMiter(ptr: Long, value: Float)
+        @JvmStatic
+        external fun _nGetStrokeCap(ptr: Long): Int
+        @JvmStatic
+        external fun _nSetStrokeCap(ptr: Long, value: Int)
+        @JvmStatic
+        external fun _nGetStrokeJoin(ptr: Long): Int
+        @JvmStatic
+        external fun _nSetStrokeJoin(ptr: Long, value: Int)
+        @JvmStatic
+        external fun _nGetFillPath(ptr: Long, path: Long, resScale: Float): Long
+        @JvmStatic
+        external fun _nGetFillPathCull(
             ptr: Long,
             path: Long,
             left: Float,
@@ -44,33 +67,43 @@ class Paint : Managed {
             resScale: Float
         ): Long
 
-        @JvmStatic external fun _nGetShader(ptr: Long): Long
-        @JvmStatic external fun _nSetShader(ptr: Long, shaderPtr: Long)
-        @JvmStatic external fun _nGetColorFilter(ptr: Long): Long
-        @JvmStatic external fun _nSetColorFilter(ptr: Long, colorFilterPtr: Long)
-        @JvmStatic external fun _nGetBlendMode(ptr: Long): Int
-        @JvmStatic external fun _nSetBlendMode(ptr: Long, mode: Int)
-        @JvmStatic external fun _nGetPathEffect(ptr: Long): Long
-        @JvmStatic external fun _nSetPathEffect(ptr: Long, pathEffectPtr: Long)
-        @JvmStatic external fun _nGetMaskFilter(ptr: Long): Long
-        @JvmStatic external fun _nSetMaskFilter(ptr: Long, filterPtr: Long)
-        @JvmStatic external fun _nGetImageFilter(ptr: Long): Long
-        @JvmStatic external fun _nSetImageFilter(ptr: Long, filterPtr: Long)
-        @JvmStatic external fun _nHasNothingToDraw(ptr: Long): Boolean
+        @JvmStatic
+        external fun _nGetShader(ptr: Long): Long
+        @JvmStatic
+        external fun _nSetShader(ptr: Long, shaderPtr: Long)
+        @JvmStatic
+        external fun _nGetColorFilter(ptr: Long): Long
+        @JvmStatic
+        external fun _nSetColorFilter(ptr: Long, colorFilterPtr: Long)
+        @JvmStatic
+        external fun _nGetBlendMode(ptr: Long): Int
+        @JvmStatic
+        external fun _nSetBlendMode(ptr: Long, mode: Int)
+        @JvmStatic
+        external fun _nGetPathEffect(ptr: Long): Long
+        @JvmStatic
+        external fun _nSetPathEffect(ptr: Long, pathEffectPtr: Long)
+        @JvmStatic
+        external fun _nGetMaskFilter(ptr: Long): Long
+        @JvmStatic
+        external fun _nSetMaskFilter(ptr: Long, filterPtr: Long)
+        @JvmStatic
+        external fun _nGetImageFilter(ptr: Long): Long
+        @JvmStatic
+        external fun _nSetImageFilter(ptr: Long, filterPtr: Long)
+        @JvmStatic
+        external fun _nHasNothingToDraw(ptr: Long): Boolean
 
         init {
             staticLoad()
         }
     }
 
-    @ApiStatus.Internal
-    object _FinalizerHolder {
+    internal object _FinalizerHolder {
         val PTR = _nGetFinalizer()
     }
 
-    @ApiStatus.Internal
-    constructor(ptr: Long, managed: Boolean) : super(ptr, _FinalizerHolder.PTR, managed) {
-    }
+    internal constructor(ptr: Long, managed: Boolean) : super(ptr, _FinalizerHolder.PTR, managed)
 
     /**
      * Constructs SkPaint with default values.
@@ -119,7 +152,6 @@ class Paint : Managed {
      *
      * @see [https://fiddle.skia.org/c/@Paint_reset](https://fiddle.skia.org/c/@Paint_reset)
      */
-    @Contract("-> this")
     fun reset(): Paint {
         Stats.onNativeCall()
         _nReset(_ptr)
@@ -170,7 +202,6 @@ class Paint : Managed {
      * @param value  setting for ditering
      * @return       this
      */
-    @Contract("_ -> this")
     fun setDither(value: Boolean): Paint {
         Stats.onNativeCall()
         _nSetDither(_ptr, value)
@@ -198,7 +229,6 @@ class Paint : Managed {
      *
      * @see [https://fiddle.skia.org/c/@Stroke_Width](https://fiddle.skia.org/c/@Stroke_Width)
      */
-    @Contract("!null -> this; null -> fail")
     fun setMode(style: PaintMode): Paint {
         assert(style != null) { "Paint::setMode expected style != null" }
         Stats.onNativeCall()
@@ -212,7 +242,6 @@ class Paint : Managed {
      * @param value  stroke or fill
      * @return       this
      */
-    @Contract("_ -> this")
     fun setStroke(value: Boolean): Paint {
         return setMode(if (value) PaintMode.STROKE else PaintMode.FILL)
     }
@@ -260,7 +289,6 @@ class Paint : Managed {
      *
      * @see [https://fiddle.skia.org/c/@Paint_setColor](https://fiddle.skia.org/c/@Paint_setColor)
      */
-    @Contract("_ -> this")
     fun setColor(color: Int): Paint {
         Stats.onNativeCall()
         _nSetColor(_ptr, color)
@@ -274,7 +302,6 @@ class Paint : Managed {
      * @param color       unpremultiplied RGBA
      * @return            this
      */
-    @Contract("!null -> this; null -> fail")
     fun setColor4f(color: Color4f): Paint {
         return setColor4f(color, null)
     }
@@ -289,7 +316,6 @@ class Paint : Managed {
      * @param colorSpace  SkColorSpace describing the encoding of color
      * @return            this
      */
-    @Contract("!null, _ -> this; null, _ -> fail")
     fun setColor4f(color: Color4f, colorSpace: ColorSpace?): Paint {
         return try {
             assert(color != null) { "Paint::setColor4f expected color != null" }
@@ -336,7 +362,6 @@ class Paint : Managed {
      * @param a  alpha component of color
      * @return   this
      */
-    @Contract("_ -> this")
     fun setAlphaf(a: Float): Paint {
         return setColor4f(color4f.withA(a))
     }
@@ -353,7 +378,6 @@ class Paint : Managed {
      * @param a  alpha component of color
      * @return   this
      */
-    @Contract("_ -> this")
     fun setAlpha(a: Int): Paint {
         return setAlphaf(a / 255f)
     }
@@ -369,7 +393,6 @@ class Paint : Managed {
      *
      * @see [https://fiddle.skia.org/c/@Paint_setARGB](https://fiddle.skia.org/c/@Paint_setARGB)
      */
-    @Contract("_, _, _, _ -> this")
     fun setARGB(a: Int, r: Int, g: Int, b: Int): Paint {
         Stats.onNativeCall()
         _nSetColor4f(_ptr, r / 255f, g / 255f, b / 255f, a / 255f, 0)
@@ -404,7 +427,6 @@ class Paint : Managed {
      *
      * @see [https://fiddle.skia.org/c/@Paint_setStrokeWidth](https://fiddle.skia.org/c/@Paint_setStrokeWidth)
      */
-    @Contract("_ -> this")
     fun setStrokeWidth(width: Float): Paint {
         Stats.onNativeCall()
         _nSetStrokeWidth(_ptr, width)
@@ -434,7 +456,6 @@ class Paint : Managed {
      *
      * @see [https://fiddle.skia.org/c/@Paint_setStrokeMiter](https://fiddle.skia.org/c/@Paint_setStrokeMiter)
      */
-    @Contract("_ -> this")
     fun setStrokeMiter(miter: Float): Paint {
         Stats.onNativeCall()
         _nSetStrokeMiter(_ptr, miter)
@@ -444,7 +465,6 @@ class Paint : Managed {
     /**
      * @return  the geometry drawn at the beginning and end of strokes.
      */
-    @get:Contract("-> this")
     val strokeCap: PaintStrokeCap
         get() = try {
             Stats.onNativeCall()
@@ -462,7 +482,6 @@ class Paint : Managed {
      *
      * @see [https://fiddle.skia.org/c/@Paint_setStrokeCap_b](https://fiddle.skia.org/c/@Paint_setStrokeCap_b)
      */
-    @Contract("!null -> this; null -> fail")
     fun setStrokeCap(cap: PaintStrokeCap): Paint {
         assert(cap != null) { "Paint::setStrokeCap expected cap != null" }
         Stats.onNativeCall()
@@ -473,7 +492,6 @@ class Paint : Managed {
     /**
      * @return  the geometry drawn at the corners of strokes.
      */
-    @get:Contract("-> this")
     val strokeJoin: PaintStrokeJoin
         get() = try {
             Stats.onNativeCall()
@@ -489,7 +507,6 @@ class Paint : Managed {
      *
      * @see [https://fiddle.skia.org/c/@Paint_setStrokeJoin](https://fiddle.skia.org/c/@Paint_setStrokeJoin)
      */
-    @Contract("!null -> this; null -> fail")
     fun setStrokeJoin(join: PaintStrokeJoin): Paint {
         assert(join != null) { "Paint::setStrokeJoin expected join != null" }
         Stats.onNativeCall()
@@ -503,7 +520,6 @@ class Paint : Managed {
      * @param src       Path read to create a filled version
      * @return          resulting Path
      */
-    @Contract("!null -> new; null -> fail")
     fun getFillPath(src: Path): Path {
         return getFillPath(src, null, 1f)
     }
@@ -517,7 +533,6 @@ class Paint : Managed {
      * to favor speed and size
      * @return          resulting Path
      */
-    @Contract("!null, _, _ -> new; null, _, _ -> fail")
     fun getFillPath(src: Path, cull: Rect?, resScale: Float): Path {
         return try {
             assert(src != null) { "Paint::getFillPath expected src != null" }
@@ -565,7 +580,6 @@ class Paint : Managed {
      *
      * @see [https://fiddle.skia.org/c/@Paint_setShader](https://fiddle.skia.org/c/@Paint_setShader)
      */
-    @Contract("_ -> this")
     fun setShader(shader: Shader?): Paint {
         return try {
             Stats.onNativeCall()
@@ -596,7 +610,6 @@ class Paint : Managed {
      *
      * @see [https://fiddle.skia.org/c/@Paint_setColorFilter](https://fiddle.skia.org/c/@Paint_setColorFilter)
      */
-    @Contract("_ -> this")
     fun setColorFilter(colorFilter: ColorFilter?): Paint {
         return try {
             Stats.onNativeCall()
@@ -635,7 +648,6 @@ class Paint : Managed {
      * @param mode  BlendMode used to combine source color and destination
      * @return      this
      */
-    @Contract("!null -> this; null -> fail")
     fun setBlendMode(mode: BlendMode): Paint {
         assert(mode != null) { "Paint::setBlendMode expected mode != null" }
         Stats.onNativeCall()
@@ -663,7 +675,6 @@ class Paint : Managed {
      *
      * @see [https://fiddle.skia.org/c/@Paint_setPathEffect](https://fiddle.skia.org/c/@Paint_setPathEffect)
      */
-    @Contract("_ -> this")
     fun setPathEffect(p: PathEffect?): Paint {
         return try {
             Stats.onNativeCall()
@@ -695,7 +706,6 @@ class Paint : Managed {
      *
      * @see [https://fiddle.skia.org/c/@Typeface_Methods](https://fiddle.skia.org/c/@Typeface_Methods)
      */
-    @Contract("_ -> this")
     fun setMaskFilter(maskFilter: MaskFilter?): Paint {
         return try {
             Stats.onNativeCall()
@@ -729,7 +739,6 @@ class Paint : Managed {
      *
      * @see [https://fiddle.skia.org/c/@Paint_setImageFilter](https://fiddle.skia.org/c/@Paint_setImageFilter)
      */
-    @Contract("_ -> this")
     fun setImageFilter(imageFilter: ImageFilter?): Paint {
         return try {
             Stats.onNativeCall()

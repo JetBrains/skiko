@@ -1,7 +1,6 @@
 package org.jetbrains.skija.paragraph
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
-import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.skija.*
 import org.jetbrains.skija.impl.Managed
 import org.jetbrains.skija.impl.Native
@@ -69,7 +68,6 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
         Stats.onNativeCall()
     }
 
-    @ApiStatus.Internal
     override fun _nativeEquals(other: Native?): Boolean {
         return try {
             Stats.onNativeCall()

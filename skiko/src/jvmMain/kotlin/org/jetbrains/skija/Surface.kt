@@ -1,9 +1,7 @@
 package org.jetbrains.skija
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
-import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.skija.impl.RefCnt
-import org.jetbrains.annotations.Contract
 import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.impl.Stats
 import java.lang.IllegalArgumentException
@@ -672,11 +670,9 @@ class Surface : RefCnt {
         }
     }
 
-    @ApiStatus.Internal
-    val _context: DirectContext?
+    internal val _context: DirectContext?
 
-    @ApiStatus.Internal
-    val _renderTarget: BackendRenderTarget?
+    internal val _renderTarget: BackendRenderTarget?
 
     /**
      *
@@ -1114,20 +1110,17 @@ class Surface : RefCnt {
             Reference.reachabilityFence(this)
         }
 
-    @ApiStatus.Internal
-    constructor(ptr: Long) : super(ptr) {
+    internal constructor(ptr: Long) : super(ptr) {
         _context = null
         _renderTarget = null
     }
 
-    @ApiStatus.Internal
-    constructor(ptr: Long, context: DirectContext?) : super(ptr) {
+    internal constructor(ptr: Long, context: DirectContext?) : super(ptr) {
         _context = context
         _renderTarget = null
     }
 
-    @ApiStatus.Internal
-    constructor(ptr: Long, context: DirectContext?, renderTarget: BackendRenderTarget?) : super(ptr) {
+    internal constructor(ptr: Long, context: DirectContext?, renderTarget: BackendRenderTarget?) : super(ptr) {
         _context = context
         _renderTarget = renderTarget
     }

@@ -1,20 +1,16 @@
 package org.jetbrains.skija
 
-import org.jetbrains.annotations.ApiStatus
-
 class GradientStyle(
     internal val tileMode: FilterTileMode,
     internal val isPremul: Boolean,
     internal val localMatrix: Matrix33?
 ) {
 
-    @ApiStatus.Internal
-    fun _getFlags(): Int {
+    internal fun _getFlags(): Int {
         return 0 or if (isPremul) _INTERPOLATE_PREMUL else 0
     }
 
-    @ApiStatus.Internal
-    fun _getMatrixArray(): FloatArray? {
+    internal fun _getMatrixArray(): FloatArray? {
         return if (localMatrix == null) null else localMatrix.mat
     }
 
@@ -64,8 +60,7 @@ class GradientStyle(
     }
 
     companion object {
-        @ApiStatus.Internal
-        val _INTERPOLATE_PREMUL = 1
+        internal val _INTERPOLATE_PREMUL = 1
         var DEFAULT = GradientStyle(FilterTileMode.CLAMP, true, null)
     }
 }

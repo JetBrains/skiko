@@ -1,7 +1,5 @@
 package org.jetbrains.skija
 
-import org.jetbrains.annotations.ApiStatus
-
 /**
  * Cap draws at the beginning and end of an open path contour.
  */
@@ -22,7 +20,6 @@ enum class PaintStrokeCap {
     SQUARE;
 
     companion object {
-        @ApiStatus.Internal
-        val _values = values()
+        internal val _values = values()
     }
 }

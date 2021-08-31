@@ -1,9 +1,7 @@
 package org.jetbrains.skija.skottie
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
-import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.skija.sksg.InvalidationController
-import org.jetbrains.annotations.Contract
 import org.jetbrains.skija.*
 import org.jetbrains.skija.impl.Managed
 import org.jetbrains.skija.impl.Native
@@ -13,7 +11,6 @@ import java.lang.ref.Reference
 class Animation internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
         fun makeFromString(data: String): Animation {
-            assert(data != null) { "Can’t Animation::makeFromString with data == null" }
             Stats.onNativeCall()
             val ptr = _nMakeFromString(data)
             require(ptr != 0L) { "Failed to create Animation from string=\"$data\"" }
@@ -21,7 +18,6 @@ class Animation internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
         }
 
         fun makeFromFile(path: String): Animation {
-            assert(path != null) { "Can’t Animation::makeFromFile with path == null" }
             Stats.onNativeCall()
             val ptr = _nMakeFromFile(path)
             require(ptr != 0L) { "Failed to create Animation from path=\"$path\"" }
@@ -29,7 +25,6 @@ class Animation internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
         }
 
         fun makeFromData(data: Data): Animation {
-            assert(data != null) { "Can’t Animation::makeFromData with data == null" }
             Stats.onNativeCall()
             val ptr = _nMakeFromData(Native.Companion.getPtr(data))
             require(ptr != 0L) { "Failed to create Animation from data." }
@@ -97,7 +92,6 @@ class Animation internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
      * @return        this
      */
     fun render(canvas: Canvas, offset: Point): Animation {
-        assert(offset != null) { "Can’t Animation::render with offset == null" }
         return render(canvas, offset.x, offset.y)
     }
 
@@ -152,7 +146,6 @@ class Animation internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
      * @param t   normalized [0..1] frame selector (0 → first frame, 1 → final frame)
      * @return    this
      */
-    @Contract("_ -> this")
     fun seek(t: Float): Animation {
         return seek(t, null)
     }
@@ -204,7 +197,6 @@ class Animation internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
      * @param ic  invalidation controller (dirty region tracking)
      * @return    this
      */
-    @Contract("_, _ -> this")
     fun seekFrame(t: Float, ic: InvalidationController?): Animation {
         return try {
             Stats.onNativeCall()
