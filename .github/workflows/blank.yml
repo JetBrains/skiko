@@ -62,7 +62,7 @@ jobs:
           ./gradlew jvmTest
           ./gradlew publishToMavenLocal
    windows:
-    runs-on: windows-201
+    runs-on: windows-2019
     steps:
       - uses: actions/checkout@v2
       - uses: microsoft/setup-msbuild@v1
