@@ -170,7 +170,7 @@ class FrameLimiterTest {
             val scope = CoroutineScope(coroutineContext + Job())
             val limiter = FrameLimiter(
                 this,
-                frameMillis = frameLimitMillis,
+                frameMillis = { frameLimitMillis },
                 nanoTime = { currentTime * 1_000_000 }
             )
             block(limiter)

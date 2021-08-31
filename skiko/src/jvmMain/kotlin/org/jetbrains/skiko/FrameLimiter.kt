@@ -6,22 +6,28 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.awt.Component
 import java.awt.GraphicsEnvironment
-import java.lang.Long.max
 
 private const val NanosecondsPerMillisecond = 1_000_000L
 
 private const val MinMainstreamMonitorRefreshRate = 60
 
+@Volatile
+private var maxGlobalRefreshRate = MinMainstreamMonitorRefreshRate
+
 private val SwingGlobalFrameLimiter by lazy {
-    val maxGlobalRefreshRate = GraphicsEnvironment
-        .getLocalGraphicsEnvironment()
-        .screenDevices
-        .maxOf { it.displayMode.refreshRate }
-        .coerceAtLeast(MinMainstreamMonitorRefreshRate)
+    val scope = CoroutineScope(Dispatchers.IO)
+
+    scope.launch {
+        maxGlobalRefreshRate = GraphicsEnvironment
+            .getLocalGraphicsEnvironment()
+            .screenDevices
+            .maxOf { it.displayMode.refreshRate }
+            .coerceAtLeast(MinMainstreamMonitorRefreshRate)
+    }
 
     FrameLimiter(
-        CoroutineScope(Dispatchers.IO),
-        1000L / maxGlobalRefreshRate
+        scope,
+        { 1000L / maxGlobalRefreshRate }
     )
 }
 
@@ -38,7 +44,7 @@ internal fun FrameLimiter(component: Component) = SwingGlobalFrameLimiter
  */
 class FrameLimiter(
     coroutineScope: CoroutineScope,
-    private val frameMillis: Long,
+    private val frameMillis: () -> Long,
     private val nanoTime: () -> Long = System::nanoTime
 ) {
     private val channel = RendezvousBroadcastChannel<Unit>()
@@ -47,23 +53,21 @@ class FrameLimiter(
         coroutineScope.launch {
             while (true) {
                 channel.sendAll(Unit)
-                preciseDelay(frameMillis)
+                preciseDelay(frameMillis())
             }
         }
     }
 
     private suspend fun preciseDelay(millis: Long) {
-        var t = nanoTime()
-        val startNanos = t
+        val start = nanoTime()
         // delay aren't precise, so we should measure what is the actual precision of delay is,
         // so we don't wait longer than we need
-        var maxOverDelay = 0L
-        while (t < startNanos + millis * NanosecondsPerMillisecond - maxOverDelay) {
+        var actual1msDelay = 1L
+
+        while (nanoTime() - start <= millis * NanosecondsPerMillisecond - actual1msDelay) {
+            val beforeDelay = nanoTime()
             delay(1) // TODO do multiple delays instead of the single one consume more energy? Test it
-            val time = nanoTime()
-            val overDelay = (time - t) - 1
-            maxOverDelay = max(maxOverDelay, overDelay)
-            t = time
+            actual1msDelay = maxOf(actual1msDelay, nanoTime() - beforeDelay)
         }
     }
 

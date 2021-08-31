@@ -3,15 +3,7 @@ package org.jetbrains.skiko.redrawer
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
-import org.jetbrains.skiko.DrawingSurface
-import org.jetbrains.skiko.FrameDispatcher
-import org.jetbrains.skiko.FrameLimiter
-import org.jetbrains.skiko.HardwareLayer
-import org.jetbrains.skiko.OpenGLApi
-import org.jetbrains.skiko.SkiaLayer
-import org.jetbrains.skiko.SkiaLayerProperties
-import org.jetbrains.skiko.getDrawingSurface
-import org.jetbrains.skiko.isVideoCardSupported
+import org.jetbrains.skiko.*
 
 internal class LinuxOpenGLRedrawer(
     private val layer: SkiaLayer,
@@ -20,12 +12,11 @@ internal class LinuxOpenGLRedrawer(
     private var isDisposed = false
     private var context = 0L
     private val swapInterval = if (properties.isVsyncEnabled) 1 else 0
-
-    private var vsyncIsNotSupported = false
     private val frameLimiter by lazy { FrameLimiter(layer) }
 
     private suspend fun limitFramesIfNeeded() {
-        if (vsyncIsNotSupported && properties.isVsyncFramelimitFallbackEnabled) {
+        // Some Linuxes don't turn vsync on, so we apply additional frame limit (which should be no longer than enabled vsync)
+        if (properties.isVsyncEnabled) {
             frameLimiter.awaitNextFrame()
         }
     }
@@ -38,7 +29,6 @@ internal class LinuxOpenGLRedrawer(
                 throw IllegalArgumentException("Cannot create Linux GL context")
             }
             it.setSwapInterval(swapInterval)
-            vsyncIsNotSupported = properties.isVsyncEnabled && it.getSwapInterval() != 1
         }
     }
     
@@ -159,7 +149,6 @@ private class LinuxDrawingSurface(
     fun destroyContext(context: Long) = destroyContext(display, context)
     fun makeCurrent(context: Long) = makeCurrent(display, window, context)
     fun swapBuffers() = swapBuffers(display, window)
-    fun getSwapInterval() = getSwapInterval(display, window)
     fun setSwapInterval(interval: Int) = setSwapInterval(display, window, interval)
 }
 
@@ -169,6 +158,5 @@ private external fun getWindow(platformInfo: Long): Long
 private external fun makeCurrent(display: Long, window: Long, context: Long)
 private external fun createContext(display: Long): Long
 private external fun destroyContext(display: Long, context: Long)
-private external fun getSwapInterval(display: Long, window: Long): Int
 private external fun setSwapInterval(display: Long, window: Long, interval: Int)
 private external fun swapBuffers(display: Long, window: Long)

@@ -24,7 +24,7 @@ internal class RendezvousBroadcastChannel<T> {
      * Wait when the producer will send a value and return it.
      */
     suspend fun receive(): T {
-        onRequest.offer(Unit)
+        onRequest.trySend(Unit)
         return onResult.get().await()
     }
 }

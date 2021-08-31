@@ -60,26 +60,6 @@ extern "C"
         }
     }
 
-    JNIEXPORT jint JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_getSwapInterval(JNIEnv *env, jobject redrawer, jlong displayPtr, jlong windowPtr)
-    {
-        Display *display = fromJavaPointer<Display *>(displayPtr);
-        Window window = fromJavaPointer<Window>(windowPtr);
-
-        unsigned int interval = -1;
-            
-        static PFNGLXQUERYDRAWABLEPROC glXQueryDrawable = (PFNGLXQUERYDRAWABLEPROC) glXGetProcAddress((const GLubyte*)"glXQueryDrawable");
-        if (glXQueryDrawable != NULL) {
-            glXQueryDrawable(display, window, GLX_SWAP_INTERVAL_EXT, &interval);
-        } else {
-            static PFNGLXGETSWAPINTERVALMESAPROC glXGetSwapIntervalMESA = (PFNGLXGETSWAPINTERVALMESAPROC) glXGetProcAddress((const GLubyte*)"glXGetSwapIntervalMESA");
-            if (glXGetSwapIntervalMESA != NULL) {
-                interval = glXGetSwapIntervalMESA();
-            }
-        }
-        
-        return interval;
-    }
-
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_swapBuffers(JNIEnv *env, jobject redrawer, jlong displayPtr, jlong windowPtr)
     {
         Display *display = fromJavaPointer<Display *>(displayPtr);
