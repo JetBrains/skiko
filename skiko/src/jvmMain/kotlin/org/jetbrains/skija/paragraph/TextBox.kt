@@ -7,7 +7,7 @@ class TextBox(val rect: Rect, direction: Direction) {
 
     constructor(l: Float, t: Float, r: Float, b: Float, direction: Int) : this(
         Rect.makeLTRB(l, t, r, b),
-        Direction._values.get(direction)
+        Direction.values().get(direction)
     )
 
     val direction: org.jetbrains.skija.paragraph.Direction

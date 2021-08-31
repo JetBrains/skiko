@@ -15,12 +15,12 @@ class PathSegment @JvmOverloads constructor(
 ) {
 
     constructor(verbOrdinal: Int, x0: Float, y0: Float, isClosedContour: Boolean) : this(
-        PathVerb.Companion._values.get(
+        PathVerb.values().get(
             verbOrdinal
         ), org.jetbrains.skija.Point(x0, y0), null, null, null, 0.0f, false, isClosedContour
     ) {
         assert(verbOrdinal == PathVerb.MOVE.ordinal || verbOrdinal == PathVerb.CLOSE.ordinal) {
-            "Expected MOVE or CLOSE, got " + PathVerb.Companion._values.get(
+            "Expected MOVE or CLOSE, got " + PathVerb.values().get(
                 verbOrdinal
             )
         }

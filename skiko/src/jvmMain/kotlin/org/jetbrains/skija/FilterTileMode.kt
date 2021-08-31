@@ -12,8 +12,4 @@ enum class FilterTileMode {
 
     /** Only draw within the original domain, return transparent-black everywhere else.  */
     DECAL;
-
-    companion object {
-        internal val _values = values()
-    }
 }

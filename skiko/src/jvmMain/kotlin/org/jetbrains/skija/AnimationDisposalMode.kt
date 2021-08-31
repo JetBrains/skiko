@@ -36,8 +36,4 @@ enum class AnimationDisposalMode {
      * In a GIF, a value of 4 is also treated as RestorePrevious.
      */
     RESTORE_PREVIOUS;
-
-    companion object {
-        internal val _values = values()
-    }
 }

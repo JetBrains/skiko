@@ -286,7 +286,7 @@ class Font : Managed {
     val edging: FontEdging
         get() = try {
             Stats.onNativeCall()
-            FontEdging.Companion._values.get(_nGetEdging(_ptr))
+            FontEdging.values().get(_nGetEdging(_ptr))
         } finally {
             Reference.reachabilityFence(this)
         }
@@ -307,7 +307,7 @@ class Font : Managed {
     val hinting: FontHinting
         get() = try {
             Stats.onNativeCall()
-            FontHinting.Companion._values.get(_nGetHinting(_ptr))
+            FontHinting.values().get(_nGetHinting(_ptr))
         } finally {
             Reference.reachabilityFence(this)
         }
@@ -644,7 +644,7 @@ class Font : Managed {
             Reference.reachabilityFence(this)
         }
 
-    internal object _FinalizerHolder {
+    private object _FinalizerHolder {
         val PTR = _nGetFinalizer()
     }
 }

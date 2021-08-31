@@ -14,8 +14,4 @@ enum class AnimationBuilderFlag(internal val _flag: Int) {
      * normally used as fallback) over native Skia typefaces.
      */
     PREFER_EMBEDDED_FONTS(0x02);
-
-    companion object {
-        internal val _values = values()
-    }
 }

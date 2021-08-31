@@ -7,7 +7,7 @@ class SVGPreserveAspectRatio(align: SVGPreserveAspectRatioAlign, scale: SVGPrese
 
     internal constructor(align: Int, scale: Int) : this(
         SVGPreserveAspectRatioAlign.valueOf(align),
-        SVGPreserveAspectRatioScale._values.get(scale)
+        SVGPreserveAspectRatioScale.values().get(scale)
     )
 
     constructor() : this(SVGPreserveAspectRatioAlign.XMID_YMID, SVGPreserveAspectRatioScale.MEET) {}

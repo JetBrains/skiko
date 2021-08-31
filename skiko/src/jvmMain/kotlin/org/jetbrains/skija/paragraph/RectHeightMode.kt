@@ -26,8 +26,4 @@ enum class RectHeightMode {
 
     /** The line spacing will be added to the bottom of the rect.  */
     INCLUDE_LINE_SPACING_BOTTOM, STRUT;
-
-    companion object {
-        internal val _values = values()
-    }
 }

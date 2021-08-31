@@ -103,12 +103,6 @@ class ColorInfo(colorType: ColorType, alphaType: ColorAlphaType, colorSpace: Col
     }
 
     init {
-        if (colorType == null) {
-            throw NullPointerException("colorType is marked non-null but is null")
-        }
-        if (alphaType == null) {
-            throw NullPointerException("alphaType is marked non-null but is null")
-        }
         this.colorType = colorType
         this.alphaType = alphaType
         this.colorSpace = colorSpace

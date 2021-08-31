@@ -6,7 +6,7 @@ class FilterMipmap @JvmOverloads constructor(
 ) : SamplingMode {
 
     override fun _pack(): Long {
-        return 9223372036854775807L and (filterMode.ordinal.toLong() shl 32 or mipmapMode.ordinal.toLong())
+        return filterMode.ordinal.toLong() shl 32 or mipmapMode.ordinal.toLong()
     }
 
     override fun equals(o: Any?): Boolean {

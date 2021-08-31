@@ -326,8 +326,6 @@ enum class ColorType {
     }
 
     companion object {
-        internal val _values = values()
-
         /**
          * Native ARGB 32-bit encoding
          */

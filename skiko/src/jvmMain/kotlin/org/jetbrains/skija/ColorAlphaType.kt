@@ -39,8 +39,4 @@ enum class ColorAlphaType {
      * pixel components are independent of alpha
      */
     UNPREMUL;
-
-    companion object {
-        internal val _values = values()
-    }
 }

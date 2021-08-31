@@ -23,8 +23,4 @@ enum class FontHinting {
      * modifies glyph outlines for maximum constrast
      */
     FULL;
-
-    companion object {
-        internal val _values = values()
-    }
 }

@@ -79,10 +79,10 @@ class AnimationFrameInfo(
         requiredFrame,
         duration,
         fullyReceived,
-        ColorAlphaType.Companion._values.get(alphaTypeOrdinal),
+        ColorAlphaType.values().get(alphaTypeOrdinal),
         hasAlphaWithinBounds,
-        AnimationDisposalMode._values[disposalMethodOrdinal],
-        BlendMode.Companion._values.get(blendModeOrdinal),
+        AnimationDisposalMode.values()[disposalMethodOrdinal],
+        BlendMode.values().get(blendModeOrdinal),
         frameRect
     )
     /**

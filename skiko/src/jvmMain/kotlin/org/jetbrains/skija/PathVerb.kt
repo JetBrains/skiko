@@ -25,8 +25,4 @@ enum class PathVerb {
 
     /** iter.next returns 0 points  */
     DONE;
-
-    companion object {
-        internal val _values = values()
-    }
 }

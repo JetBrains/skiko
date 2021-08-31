@@ -214,7 +214,7 @@ class Paint : Managed {
     var mode: PaintMode
         get() = try {
             Stats.onNativeCall()
-            PaintMode.Companion._values.get(_nGetMode(_ptr))
+            PaintMode.values().get(_nGetMode(_ptr))
         } finally {
             Reference.reachabilityFence(this)
         }
@@ -468,7 +468,7 @@ class Paint : Managed {
     val strokeCap: PaintStrokeCap
         get() = try {
             Stats.onNativeCall()
-            PaintStrokeCap.Companion._values.get(_nGetStrokeCap(_ptr))
+            PaintStrokeCap.values().get(_nGetStrokeCap(_ptr))
         } finally {
             Reference.reachabilityFence(this)
         }
@@ -495,7 +495,7 @@ class Paint : Managed {
     val strokeJoin: PaintStrokeJoin
         get() = try {
             Stats.onNativeCall()
-            PaintStrokeJoin.Companion._values.get(_nGetStrokeJoin(_ptr))
+            PaintStrokeJoin.values().get(_nGetStrokeJoin(_ptr))
         } finally {
             Reference.reachabilityFence(this)
         }
@@ -631,7 +631,7 @@ class Paint : Managed {
     val blendMode: BlendMode?
         get() = try {
             Stats.onNativeCall()
-            BlendMode.Companion._values.get(_nGetBlendMode(_ptr))
+            BlendMode.values().get(_nGetBlendMode(_ptr))
         } finally {
             Reference.reachabilityFence(this)
         }

@@ -13,7 +13,4 @@ enum class FilterQuality {
     /** slowest but highest quality, typically bicubic or bett  */
     HIGH;
 
-    companion object {
-        internal val _values = values()
-    }
 }

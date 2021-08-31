@@ -87,8 +87,4 @@ enum class BlendMode {
 
     /** Luminosity of source with hue and saturation of destination.  */
     LUMINOSITY;
-
-    companion object {
-        internal val _values = values()
-    }
 }

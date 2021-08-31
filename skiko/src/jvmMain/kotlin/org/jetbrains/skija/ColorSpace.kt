@@ -114,7 +114,7 @@ class ColorSpace : Managed {
             Reference.reachabilityFence(this)
         }
 
-    internal object _FinalizerHolder {
+    private object _FinalizerHolder {
         val PTR = _nGetFinalizer()
     }
 }

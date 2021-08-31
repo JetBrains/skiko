@@ -65,7 +65,7 @@ class BackendRenderTarget internal constructor(ptr: Long) : Managed(ptr, _Finali
         }
     }
 
-    internal object _FinalizerHolder {
+    private object _FinalizerHolder {
         val PTR = _nGetFinalizer()
     }
 }

@@ -450,7 +450,7 @@ class Path internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR),
     val fillMode: PathFillMode
         get() = try {
             Stats.onNativeCall()
-            PathFillMode.Companion._values.get(_nGetFillMode(_ptr))
+            PathFillMode.values().get(_nGetFillMode(_ptr))
         } finally {
             Reference.reachabilityFence(this)
         }
@@ -769,7 +769,7 @@ class Path internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR),
             Stats.onNativeCall()
             val out = if (verbs == null) null else ByteArray(max)
             val count = _nGetVerbs(_ptr, out, max)
-            if (verbs != null) for (i in 0 until Math.min(count, max)) verbs[i] = PathVerb.Companion._values.get(
+            if (verbs != null) for (i in 0 until Math.min(count, max)) verbs[i] = PathVerb.values().get(
                 out!![i].toInt()
             )
             count

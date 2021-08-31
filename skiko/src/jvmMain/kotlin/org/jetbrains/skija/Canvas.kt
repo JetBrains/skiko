@@ -1579,7 +1579,7 @@ open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val
         return this
     }
 
-    internal object _FinalizerHolder {
+    private object _FinalizerHolder {
         val PTR = _nGetFinalizer()
     }
 }

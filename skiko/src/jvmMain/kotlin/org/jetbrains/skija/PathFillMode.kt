@@ -39,8 +39,4 @@ enum class PathFillMode {
             else -> throw RuntimeException("Unreachable")
         }
     }
-
-    companion object {
-        internal val _values = values()
-    }
 }

@@ -41,8 +41,4 @@ enum class PlaceholderAlignment {
      * the top and bottom of the line.
      */
     MIDDLE;
-
-    companion object {
-        internal val _values = values()
-    }
 }

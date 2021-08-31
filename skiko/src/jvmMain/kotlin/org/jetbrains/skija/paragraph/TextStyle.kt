@@ -353,7 +353,7 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
     val baselineMode: org.jetbrains.skija.paragraph.BaselineMode
         get() = try {
             Stats.onNativeCall()
-            BaselineMode._values.get(_nGetBaselineMode(_ptr))
+            BaselineMode.values().get(_nGetBaselineMode(_ptr))
         } finally {
             Reference.reachabilityFence(this)
         }

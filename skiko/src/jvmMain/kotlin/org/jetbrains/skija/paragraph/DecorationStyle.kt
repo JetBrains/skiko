@@ -26,7 +26,7 @@ class DecorationStyle(
         lineThrough,
         gaps,
         color,
-        DecorationLineStyle._values.get(lineStyle),
+        DecorationLineStyle.values().get(lineStyle),
         thicknessMultiplier
     ) {
     }

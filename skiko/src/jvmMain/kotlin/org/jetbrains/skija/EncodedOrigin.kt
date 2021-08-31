@@ -74,8 +74,4 @@ enum class EncodedOrigin {
             else -> false
         }
     }
-
-    companion object {
-        internal val _values = values()
-    }
 }

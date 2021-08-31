@@ -6,8 +6,4 @@ enum class PathDirection {
 
     /** Counter-clockwise direction for adding closed contours.  */
     COUNTER_CLOCKWISE;
-
-    companion object {
-        internal val _values = values()
-    }
 }

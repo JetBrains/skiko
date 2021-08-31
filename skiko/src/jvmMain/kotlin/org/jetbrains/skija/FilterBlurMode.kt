@@ -12,8 +12,4 @@ enum class FilterBlurMode {
 
     /** fuzzy inside, nothing outside  */
     INNER;
-
-    companion object {
-        internal val _values = values()
-    }
 }

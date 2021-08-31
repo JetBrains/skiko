@@ -16,8 +16,4 @@ enum class MipmapMode {
      * interpolate between the two nearest levels
      */
     LINEAR;
-
-    companion object {
-        internal val _values = values()
-    }
 }

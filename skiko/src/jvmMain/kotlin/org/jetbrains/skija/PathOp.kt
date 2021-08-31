@@ -18,8 +18,4 @@ enum class PathOp {
 
     /** subtract the first path from the op path  */
     REVERSE_DIFFERENCE;
-
-    companion object {
-        internal val _values = values()
-    }
 }

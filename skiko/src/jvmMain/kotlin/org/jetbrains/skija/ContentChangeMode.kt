@@ -6,8 +6,4 @@ enum class ContentChangeMode {
 
     /** Preserves surface on change.  */
     RETAIN;
-
-    companion object {
-        internal val _values = values()
-    }
 }

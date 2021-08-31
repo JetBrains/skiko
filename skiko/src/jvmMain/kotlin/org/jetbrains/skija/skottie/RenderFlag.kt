@@ -14,8 +14,4 @@ enum class RenderFlag(internal val _flag: Int) {
      * then the animation can draw outside of the bounds.
      */
     DISABLE_TOP_LEVEL_CLIPPING(0x02);
-
-    companion object {
-        internal val _values = values()
-    }
 }

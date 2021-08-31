@@ -35,8 +35,8 @@ class ImageInfo(val colorInfo: ColorInfo, val width: Int, val height: Int) {
     internal constructor(width: Int, height: Int, colorType: Int, alphaType: Int, colorSpace: Long) : this(
         width,
         height,
-        ColorType.Companion._values.get(colorType),
-        ColorAlphaType.Companion._values.get(alphaType),
+        ColorType.values().get(colorType),
+        ColorAlphaType.values().get(alphaType),
         if (colorSpace == 0L) null else org.jetbrains.skija.ColorSpace(colorSpace)
     ) {
     }
@@ -45,21 +45,21 @@ class ImageInfo(val colorInfo: ColorInfo, val width: Int, val height: Int) {
         get() = colorInfo.colorType
 
     fun withColorType(colorType: ColorType): ImageInfo {
-        return withColorInfo(colorInfo!!.withColorType(colorType))
+        return withColorInfo(colorInfo.withColorType(colorType))
     }
 
     val colorAlphaType: ColorAlphaType
         get() = colorInfo.alphaType
 
     fun withColorAlphaType(alphaType: ColorAlphaType): ImageInfo {
-        return withColorInfo(colorInfo!!.withAlphaType(alphaType))
+        return withColorInfo(colorInfo.withAlphaType(alphaType))
     }
 
     val colorSpace: ColorSpace?
         get() = colorInfo.colorSpace
 
     fun withColorSpace(colorSpace: ColorSpace): ImageInfo {
-        return withColorInfo(colorInfo!!.withColorSpace(colorSpace))
+        return withColorInfo(colorInfo.withColorSpace(colorSpace))
     }
 
     /**

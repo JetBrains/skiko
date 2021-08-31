@@ -18,8 +18,4 @@ enum class FontEdging {
      * glyph positioned in pixel using transparency
      */
     SUBPIXEL_ANTI_ALIAS;
-
-    companion object {
-        internal val _values = values()
-    }
 }

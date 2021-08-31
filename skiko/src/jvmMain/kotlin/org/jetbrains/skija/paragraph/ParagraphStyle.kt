@@ -85,7 +85,7 @@ class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
     val direction: org.jetbrains.skija.paragraph.Direction
         get() = try {
             Stats.onNativeCall()
-            Direction._values.get(_nGetDirection(_ptr))
+            Direction.values().get(_nGetDirection(_ptr))
         } finally {
             Reference.reachabilityFence(this)
         }
@@ -155,7 +155,7 @@ class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
     val heightMode: org.jetbrains.skija.paragraph.HeightMode
         get() = try {
             Stats.onNativeCall()
-            HeightMode._values.get(_nGetHeightMode(_ptr))
+            HeightMode.values().get(_nGetHeightMode(_ptr))
         } finally {
             Reference.reachabilityFence(this)
         }

@@ -10,8 +10,4 @@ enum class FilterMode {
      * interporate between 2x2 sample points (bilinear interpolation)
      */
     LINEAR;
-
-    companion object {
-        internal val _values = values()
-    }
 }

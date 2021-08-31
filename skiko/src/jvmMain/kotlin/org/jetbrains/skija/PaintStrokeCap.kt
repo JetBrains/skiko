@@ -18,8 +18,4 @@ enum class PaintStrokeCap {
      * adds square
      */
     SQUARE;
-
-    companion object {
-        internal val _values = values()
-    }
 }

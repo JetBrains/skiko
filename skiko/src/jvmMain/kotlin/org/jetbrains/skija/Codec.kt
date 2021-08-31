@@ -80,14 +80,14 @@ class Codec internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR)
     val encodedOrigin: EncodedOrigin
         get() = try {
             Stats.onNativeCall()
-            EncodedOrigin.Companion._values.get(_nGetEncodedOrigin(_ptr))
+            EncodedOrigin.values().get(_nGetEncodedOrigin(_ptr))
         } finally {
             Reference.reachabilityFence(this)
         }
     val encodedImageFormat: EncodedImageFormat
         get() = try {
             Stats.onNativeCall()
-            EncodedImageFormat.Companion._values.get(_nGetEncodedImageFormat(_ptr))
+            EncodedImageFormat.values().get(_nGetEncodedImageFormat(_ptr))
         } finally {
             Reference.reachabilityFence(this)
         }

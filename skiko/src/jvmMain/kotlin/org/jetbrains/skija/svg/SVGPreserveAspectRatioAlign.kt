@@ -11,7 +11,6 @@ enum class SVGPreserveAspectRatioAlign constructor(internal val _value: Int) {
     XMAX_YMAX(0x0a), NONE(0x10);
 
     companion object {
-        internal val _values = values()
         internal fun valueOf(value: Int): SVGPreserveAspectRatioAlign {
             return when (value) {
                 0x00 -> XMIN_YMIN

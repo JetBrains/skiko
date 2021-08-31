@@ -7,8 +7,4 @@ enum class PathEllipseArc {
 
     /** Larger of arc pair.  */
     LARGER;
-
-    companion object {
-        internal val _values = values()
-    }
 }

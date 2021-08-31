@@ -81,10 +81,6 @@ class PathEffect internal constructor(ptr: Long) : RefCnt(ptr) {
 
         /** transform each point, and turn lines into curves  */
         MORPH;
-
-        companion object {
-            internal val _values = values()
-        }
     }
 
     fun makeSum(second: PathEffect?): PathEffect {

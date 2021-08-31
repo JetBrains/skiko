@@ -115,7 +115,7 @@ class Data internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) 
         }
     }
 
-    internal object _FinalizerHolder {
+    private object _FinalizerHolder {
         val PTR = _nGetFinalizer()
     }
 }

@@ -31,8 +31,4 @@ enum class PaintStrokeJoin {
      * connects outside edges
      */
     BEVEL;
-
-    companion object {
-        internal val _values = values()
-    }
 }
