@@ -1,14 +1,13 @@
 package org.jetbrains.skija
 
-import org.jetbrains.annotations.ApiStatus
 import java.util.*
 
-class RRect @ApiStatus.Internal constructor(l: Float, t: Float, r: Float, b: Float, val _radii: FloatArray) :
+class RRect internal constructor(l: Float, t: Float, r: Float, b: Float, val radii: FloatArray) :
     Rect(l, t, r, b) {
     override fun inflate(spread: Float): Rect {
         var becomesRect = true
-        for (i in _radii.indices) {
-            if (_radii[i] + spread >= 0) {
+        for (i in radii.indices) {
+            if (radii[i] + spread >= 0) {
                 becomesRect = false
                 break
             }
@@ -19,7 +18,7 @@ class RRect @ApiStatus.Internal constructor(l: Float, t: Float, r: Float, b: Flo
             Math.max(left - spread, right + spread),
             Math.max(top - spread, bottom + spread)
         ) else {
-            val radii = Arrays.copyOf(_radii, _radii.size)
+            val radii = Arrays.copyOf(radii, radii.size)
             for (i in radii.indices) radii[i] = Math.max(0.0f, radii[i] + spread)
             RRect(
                 left - spread,
@@ -33,7 +32,7 @@ class RRect @ApiStatus.Internal constructor(l: Float, t: Float, r: Float, b: Flo
 
     override fun toString(): String {
         return "RRect(_left=" + left + ", _top=" + top + ", _right=" + right + ", _bottom=" + bottom + ", _radii=" + Arrays.toString(
-            _radii
+            radii
         ) + ")"
     }
 
@@ -43,7 +42,7 @@ class RRect @ApiStatus.Internal constructor(l: Float, t: Float, r: Float, b: Flo
         val other = o
         if (!other.canEqual(this as Any)) return false
         if (!super.equals(o)) return false
-        return if (!Arrays.equals(_radii, other._radii)) false else true
+        return if (!Arrays.equals(radii, other.radii)) false else true
     }
 
     override fun canEqual(other: Any?): Boolean {
@@ -53,19 +52,22 @@ class RRect @ApiStatus.Internal constructor(l: Float, t: Float, r: Float, b: Flo
     override fun hashCode(): Int {
         val PRIME = 59
         var result = super.hashCode()
-        result = result * PRIME + Arrays.hashCode(_radii)
+        result = result * PRIME + Arrays.hashCode(radii)
         return result
     }
 
     companion object {
+        @JvmStatic
         fun makeLTRB(l: Float, t: Float, r: Float, b: Float, radius: Float): RRect {
             return RRect(l, t, r, b, floatArrayOf(radius))
         }
 
+        @JvmStatic
         fun makeLTRB(l: Float, t: Float, r: Float, b: Float, xRad: Float, yRad: Float): RRect {
             return RRect(l, t, r, b, floatArrayOf(xRad, yRad))
         }
 
+        @JvmStatic
         fun makeLTRB(
             l: Float,
             t: Float,
@@ -79,6 +81,7 @@ class RRect @ApiStatus.Internal constructor(l: Float, t: Float, r: Float, b: Flo
             return RRect(l, t, r, b, floatArrayOf(tlRad, trRad, brRad, blRad))
         }
 
+        @JvmStatic
         fun makeNinePatchLTRB(
             l: Float,
             t: Float,
@@ -92,6 +95,7 @@ class RRect @ApiStatus.Internal constructor(l: Float, t: Float, r: Float, b: Flo
             return RRect(l, t, r, b, floatArrayOf(lRad, tRad, rRad, tRad, rRad, bRad, lRad, bRad))
         }
 
+        @JvmStatic
         fun makeComplexLTRB(l: Float, t: Float, r: Float, b: Float, radii: FloatArray): RRect {
             return RRect(l, t, r, b, radii)
         }

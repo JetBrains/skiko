@@ -8,10 +8,10 @@ class FontVariation(val _tag: Int, val value: Float) {
     constructor(feature: String, value: Float) : this(FourByteTag.Companion.fromString(feature), value) {}
 
     val tag: String
-        get() = FourByteTag.Companion.toString(_tag)
+        get() = FourByteTag.toString(_tag)
 
     override fun toString(): String {
-        return _tag + "=" + value
+        return "$tag=$value"
     }
 
     override fun equals(o: Any?): Boolean {

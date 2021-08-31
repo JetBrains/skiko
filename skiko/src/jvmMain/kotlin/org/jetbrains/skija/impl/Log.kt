@@ -7,8 +7,7 @@ import java.time.format.DateTimeFormatter
 import java.util.function.Supplier
 
 object Log {
-    @ApiStatus.Internal
-    val _level = 0
+    private var _level = 0
     fun trace(s: String) {
         _log(1, "[TRACE]", s)
     }
@@ -63,13 +62,15 @@ object Log {
 
     init {
         val property = System.getProperty("skija.logLevel")
-        if ("ALL" == org.jetbrains.skija.impl.property) _level =
-            0 else if ("TRACE" == org.jetbrains.skija.impl.property) _level =
-            1 else if ("DEBUG" == org.jetbrains.skija.impl.property) _level =
-            2 else if ("INFO" == org.jetbrains.skija.impl.property) _level =
-            3 else if (null == org.jetbrains.skija.impl.property || "WARN" == org.jetbrains.skija.impl.property) _level =
-            4 else if ("ERROR" == org.jetbrains.skija.impl.property) _level =
-            5 else if ("NONE" == org.jetbrains.skija.impl.property) _level =
-            6 else throw IllegalArgumentException("Unknown log level: " + org.jetbrains.skija.impl.property)
+        _level =
+            if ("ALL" == property)
+                0 else if ("TRACE" == property)
+                    1 else if ("DEBUG" == property)
+                        2 else if ("INFO" == property)
+                            3 else if (null == property || "WARN" == property)
+                                4 else if ("ERROR" == property)
+                                    5 else if ("NONE" == property)
+                                        6 else
+                                            throw IllegalArgumentException("Unknown log level: " + property)
     }
 }

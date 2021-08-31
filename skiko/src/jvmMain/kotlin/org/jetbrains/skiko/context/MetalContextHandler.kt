@@ -42,7 +42,7 @@ internal class MetalContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
             renderTarget!!,
             SurfaceOrigin.TOP_LEFT,
             SurfaceColorFormat.BGRA_8888,
-            ColorSpace.getSRGB()
+            ColorSpace._SRGBHolder.sRGB
         )
 
         canvas = surface!!.canvas

@@ -13,7 +13,6 @@ class Library {
             }
         }
 
-        @JvmStatic
-        external fun _nAfterLoad()
+        @JvmStatic external fun _nAfterLoad()
     }
 }

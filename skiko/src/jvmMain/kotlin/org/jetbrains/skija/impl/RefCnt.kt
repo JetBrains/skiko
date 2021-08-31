@@ -26,7 +26,9 @@ abstract class RefCnt : Managed {
     }
 
     companion object {
+        @JvmStatic
         external fun _nGetFinalizer(): Long
+        @JvmStatic
         external fun _nGetRefCount(ptr: Long): Int
     }
 }

@@ -2,64 +2,7 @@ package org.jetbrains.skija.paragraph
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
 import org.jetbrains.annotations.ApiStatus
-import org.jetbrains.skija.impl.RefCnt
-import org.jetbrains.skija.impl.Managed.CleanerThunk
-import org.jetbrains.skija.paragraph.Shadow
-import org.jetbrains.skija.paragraph.TextBox
-import org.jetbrains.skija.paragraph.Affinity
-import org.jetbrains.skija.paragraph.Paragraph
-import org.jetbrains.skija.paragraph.HeightMode
-import org.jetbrains.skija.paragraph.StrutStyle
-import org.jetbrains.skija.paragraph.BaselineMode
-import org.jetbrains.skija.paragraph.RectWidthMode
-import org.jetbrains.skija.paragraph.FontCollection
-import org.jetbrains.skija.paragraph.ParagraphCache
-import org.jetbrains.skija.paragraph.ParagraphStyle
-import org.jetbrains.skija.paragraph.RectHeightMode
-import org.jetbrains.skija.paragraph.DecorationStyle
-import org.jetbrains.skija.paragraph.ParagraphBuilder
-import org.jetbrains.skija.paragraph.PlaceholderStyle
-import org.jetbrains.skija.paragraph.TextStyleAttribute
-import org.jetbrains.skija.paragraph.DecorationLineStyle
-import org.jetbrains.skija.paragraph.PlaceholderAlignment
-import org.jetbrains.skija.paragraph.PositionWithAffinity
-import org.jetbrains.skija.paragraph.TypefaceFontProvider
-import org.jetbrains.skija.shaper.Shaper
-import org.jetbrains.skija.shaper.FontRun
-import org.jetbrains.skija.shaper.LanguageRun
-import org.jetbrains.skija.shaper.ShapingOptions
-import org.jetbrains.skija.shaper.FontMgrRunIterator
-import org.jetbrains.skija.shaper.IcuBidiRunIterator
-import org.jetbrains.skija.shaper.ManagedRunIterator
-import org.jetbrains.skija.shaper.HbIcuScriptRunIterator
-import org.jetbrains.skija.shaper.TextBlobBuilderRunHandler
-import org.jetbrains.annotations.ApiStatus.OverrideOnly
-import org.jetbrains.skija.skottie.Animation
-import org.jetbrains.skija.sksg.InvalidationController
-import org.jetbrains.skija.skottie.RenderFlag
-import org.jetbrains.skija.skottie.AnimationBuilder
-import org.jetbrains.skija.skottie.AnimationBuilderFlag
-import org.jetbrains.skija.svg.SVGDOM
-import org.jetbrains.skija.svg.SVGSVG
-import org.jetbrains.skija.svg.SVGTag
-import org.jetbrains.skija.svg.SVGNode
-import org.jetbrains.skija.svg.SVGCanvas
-import org.jetbrains.skija.svg.SVGLength
-import org.jetbrains.skija.svg.SVGLengthType
-import org.jetbrains.skija.svg.SVGLengthUnit
-import org.jetbrains.skija.svg.SVGLengthContext
-import org.jetbrains.skija.svg.SVGPreserveAspectRatio
-import org.jetbrains.skija.svg.SVGPreserveAspectRatioAlign
-import org.jetbrains.skija.svg.SVGPreserveAspectRatioScale
-import org.jetbrains.skija.ColorFilter._LinearToSRGBGammaHolder
-import org.jetbrains.skija.ColorFilter._SRGBToLinearGammaHolder
-import org.jetbrains.skija.ColorFilter._LumaHolder
-import org.jetbrains.skija.ColorSpace._SRGBHolder
-import org.jetbrains.skija.ColorSpace._SRGBLinearHolder
-import org.jetbrains.skija.ColorSpace._DisplayP3Holder
-import org.jetbrains.annotations.ApiStatus.NonExtendable
 import org.jetbrains.skija.*
-import org.jetbrains.skija.FontMgr._DefaultHolder
 import org.jetbrains.skija.impl.Managed
 import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.impl.Stats
@@ -67,18 +10,18 @@ import java.lang.ref.Reference
 
 class Paragraph @ApiStatus.Internal constructor(ptr: Long, text: ManagedString?) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
-        external fun _nGetFinalizer(): Long
-        external fun _nGetMaxWidth(ptr: Long): Float
-        external fun _nGetHeight(ptr: Long): Float
-        external fun _nGetMinIntrinsicWidth(ptr: Long): Float
-        external fun _nGetMaxIntrinsicWidth(ptr: Long): Float
-        external fun _nGetAlphabeticBaseline(ptr: Long): Float
-        external fun _nGetIdeographicBaseline(ptr: Long): Float
-        external fun _nGetLongestLine(ptr: Long): Float
-        external fun _nDidExceedMaxLines(ptr: Long): Boolean
-        external fun _nLayout(ptr: Long, width: Float)
-        external fun _nPaint(ptr: Long, canvasPtr: Long, x: Float, y: Float): Long
-        external fun _nGetRectsForRange(
+        @JvmStatic external fun _nGetFinalizer(): Long
+        @JvmStatic external fun _nGetMaxWidth(ptr: Long): Float
+        @JvmStatic external fun _nGetHeight(ptr: Long): Float
+        @JvmStatic external fun _nGetMinIntrinsicWidth(ptr: Long): Float
+        @JvmStatic external fun _nGetMaxIntrinsicWidth(ptr: Long): Float
+        @JvmStatic external fun _nGetAlphabeticBaseline(ptr: Long): Float
+        @JvmStatic external fun _nGetIdeographicBaseline(ptr: Long): Float
+        @JvmStatic external fun _nGetLongestLine(ptr: Long): Float
+        @JvmStatic external fun _nDidExceedMaxLines(ptr: Long): Boolean
+        @JvmStatic external fun _nLayout(ptr: Long, width: Float)
+        @JvmStatic external fun _nPaint(ptr: Long, canvasPtr: Long, x: Float, y: Float): Long
+        @JvmStatic external fun _nGetRectsForRange(
             ptr: Long,
             start: Int,
             end: Int,
@@ -86,19 +29,18 @@ class Paragraph @ApiStatus.Internal constructor(ptr: Long, text: ManagedString?)
             rectWidthMode: Int
         ): Array<TextBox>
 
-        external fun _nGetRectsForPlaceholders(ptr: Long): Array<TextBox>
-        external fun _nGetGlyphPositionAtCoordinate(ptr: Long, dx: Float, dy: Float): Int
-        external fun _nGetWordBoundary(ptr: Long, offset: Int): Long
-        external fun _nGetLineMetrics(ptr: Long, textPtr: Long): Array<LineMetrics?>
-        external fun _nGetLineNumber(ptr: Long): Long
-        external fun _nMarkDirty(ptr: Long)
-        external fun _nGetUnresolvedGlyphsCount(ptr: Long): Int
-        external fun _nUpdateAlignment(ptr: Long, Align: Int)
+        @JvmStatic external fun _nGetRectsForPlaceholders(ptr: Long): Array<TextBox>
+        @JvmStatic external fun _nGetGlyphPositionAtCoordinate(ptr: Long, dx: Float, dy: Float): Int
+        @JvmStatic external fun _nGetWordBoundary(ptr: Long, offset: Int): Long
+        @JvmStatic external fun _nGetLineMetrics(ptr: Long, textPtr: Long): Array<LineMetrics?>
+        @JvmStatic external fun _nGetLineNumber(ptr: Long): Long
+        @JvmStatic external fun _nMarkDirty(ptr: Long)
+        @JvmStatic external fun _nGetUnresolvedGlyphsCount(ptr: Long): Int
+        @JvmStatic external fun _nUpdateAlignment(ptr: Long, Align: Int)
 
-        // public static native void  _nUpdateText(long ptr, int from, String text);
-        external fun _nUpdateFontSize(ptr: Long, from: Int, to: Int, size: Float, textPtr: Long)
-        external fun _nUpdateForegroundPaint(ptr: Long, from: Int, to: Int, paintPtr: Long, textPtr: Long)
-        external fun _nUpdateBackgroundPaint(ptr: Long, from: Int, to: Int, paintPtr: Long, textPtr: Long)
+        @JvmStatic external fun _nUpdateFontSize(ptr: Long, from: Int, to: Int, size: Float, textPtr: Long)
+        @JvmStatic external fun _nUpdateForegroundPaint(ptr: Long, from: Int, to: Int, paintPtr: Long, textPtr: Long)
+        @JvmStatic external fun _nUpdateBackgroundPaint(ptr: Long, from: Int, to: Int, paintPtr: Long, textPtr: Long)
 
         init {
             staticLoad()
@@ -202,7 +144,7 @@ class Paragraph @ApiStatus.Internal constructor(ptr: Long, text: ManagedString?)
     ): Array<TextBox> {
         return try {
             Stats.onNativeCall()
-            _nGetRectsForRange(_ptr, start, end, rectHeightMode.ordinal(), rectWidthMode.ordinal())
+            _nGetRectsForRange(_ptr, start, end, rectHeightMode.ordinal, rectWidthMode.ordinal)
         } finally {
             Reference.reachabilityFence(this)
         }
@@ -238,11 +180,14 @@ class Paragraph @ApiStatus.Internal constructor(ptr: Long, text: ManagedString?)
         }
     }
 
-    val lineMetrics: Array<org.jetbrains.skija.paragraph.LineMetrics?>
+    val lineMetrics: Array<LineMetrics?>
         get() = try {
-            if (_text == null) return arrayOfNulls<LineMetrics>(0)
-            Stats.onNativeCall()
-            _nGetLineMetrics(_ptr, Native.Companion.getPtr(_text))
+            if (_text == null) {
+                arrayOfNulls(0)
+            } else {
+                Stats.onNativeCall()
+                _nGetLineMetrics(_ptr, Native.Companion.getPtr(_text))
+            }
         } finally {
             Reference.reachabilityFence(this)
             Reference.reachabilityFence(_text)
@@ -271,7 +216,7 @@ class Paragraph @ApiStatus.Internal constructor(ptr: Long, text: ManagedString?)
 
     fun updateAlignment(alignment: Alignment): Paragraph {
         Stats.onNativeCall()
-        _nUpdateAlignment(_ptr, alignment.ordinal())
+        _nUpdateAlignment(_ptr, alignment.ordinal)
         return this
     }
 

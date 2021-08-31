@@ -25,4 +25,8 @@ class TrivialBidiRunIterator(text: String, level: Int) : MutableIterator<BidiRun
         _level = level
         _atEnd = _length == 0
     }
+
+    override fun remove() {
+        TODO("Not yet implemented")
+    }
 }

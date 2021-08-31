@@ -9,14 +9,14 @@ import java.lang.ref.Reference
 
 class ColorSpace : Managed {
     companion object {
-        external fun _nGetFinalizer(): Long
-        external fun _nMakeSRGB(): Long
-        external fun _nMakeDisplayP3(): Long
-        external fun _nMakeSRGBLinear(): Long
-        external fun _nConvert(fromPtr: Long, toPtr: Long, r: Float, g: Float, b: Float, a: Float): FloatArray
-        external fun _nIsGammaCloseToSRGB(ptr: Long): Boolean
-        external fun _nIsGammaLinear(ptr: Long): Boolean
-        external fun _nIsSRGB(ptr: Long): Boolean
+        @JvmStatic external fun _nGetFinalizer(): Long
+        @JvmStatic external fun _nMakeSRGB(): Long
+        @JvmStatic external fun _nMakeDisplayP3(): Long
+        @JvmStatic external fun _nMakeSRGBLinear(): Long
+        @JvmStatic external fun _nConvert(fromPtr: Long, toPtr: Long, r: Float, g: Float, b: Float, a: Float): FloatArray
+        @JvmStatic external fun _nIsGammaCloseToSRGB(ptr: Long): Boolean
+        @JvmStatic external fun _nIsGammaLinear(ptr: Long): Boolean
+        @JvmStatic external fun _nIsSRGB(ptr: Long): Boolean
 
         init {
             staticLoad()
@@ -68,12 +68,10 @@ class ColorSpace : Managed {
     }
 
     @ApiStatus.Internal
-    constructor(ptr: Long) : super(ptr, _FinalizerHolder.PTR, true) {
-    }
+    constructor(ptr: Long) : super(ptr, _FinalizerHolder.PTR, true)
 
     @ApiStatus.Internal
-    constructor(ptr: Long, managed: Boolean) : super(ptr, _FinalizerHolder.PTR, managed) {
-    }
+    constructor(ptr: Long, managed: Boolean) : super(ptr, _FinalizerHolder.PTR, managed)
 
     /**
      * @return  true if the color space gamma is near enough to be approximated as sRGB

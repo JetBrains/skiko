@@ -9,21 +9,20 @@ import java.lang.ref.Reference
 
 open class FontMgr : RefCnt {
     companion object {
-        external fun _nGetFamiliesCount(ptr: Long): Int
-        external fun _nGetFamilyName(ptr: Long, index: Int): String
-        external fun _nMakeStyleSet(ptr: Long, index: Int): Long
-        external fun _nMatchFamily(ptr: Long, familyName: String?): Long
-        external fun _nMatchFamilyStyle(ptr: Long, familyName: String?, fontStyle: Int): Long
-        external fun _nMatchFamilyStyleCharacter(
+        @JvmStatic external fun _nGetFamiliesCount(ptr: Long): Int
+        @JvmStatic external fun _nGetFamilyName(ptr: Long, index: Int): String
+        @JvmStatic external fun _nMakeStyleSet(ptr: Long, index: Int): Long
+        @JvmStatic external fun _nMatchFamily(ptr: Long, familyName: String?): Long
+        @JvmStatic external fun _nMatchFamilyStyle(ptr: Long, familyName: String?, fontStyle: Int): Long
+        @JvmStatic external fun _nMatchFamilyStyleCharacter(
             ptr: Long,
             familyName: String?,
             fontStyle: Int,
             bcp47: Array<String?>?,
             character: Int
         ): Long
-
-        external fun _nMakeFromData(ptr: Long, dataPtr: Long, ttcIndex: Int): Long
-        external fun _nDefault(): Long
+        @JvmStatic external fun _nMakeFromData(ptr: Long, dataPtr: Long, ttcIndex: Int): Long
+        @JvmStatic external fun _nDefault(): Long
 
         init {
             staticLoad()

@@ -1,12 +1,10 @@
 package org.jetbrains.skija.impl
 
-import org.jetbrains.annotations.ApiStatus
 import java.lang.ref.Cleaner
 
 abstract class Managed @JvmOverloads constructor(ptr: Long, finalizer: Long, managed: Boolean = true) : Native(ptr),
     AutoCloseable {
-    @ApiStatus.Internal
-    var _cleanable: Cleaner.Cleanable? = null
+    private var _cleanable: Cleaner.Cleanable? = null
     override fun close() {
         if (0L == _ptr) throw RuntimeException("Object already closed: $javaClass, _ptr=$_ptr") else if (null == _cleanable) throw RuntimeException(
             "Object is not managed in JVM, can't close(): $javaClass, _ptr=$_ptr"
@@ -31,7 +29,7 @@ abstract class Managed @JvmOverloads constructor(ptr: Long, finalizer: Long, man
 
     companion object {
         var _cleaner = Cleaner.create()
-        external fun _nInvokeFinalizer(finalizer: Long, ptr: Long)
+        @JvmStatic external fun _nInvokeFinalizer(finalizer: Long, ptr: Long)
     }
 
     init {

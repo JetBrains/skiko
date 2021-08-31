@@ -1,5 +1,6 @@
 package org.jetbrains.skija
 
+import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.annotations.Contract
 import org.jetbrains.skija.impl.Library
 import org.jetbrains.skija.impl.Managed

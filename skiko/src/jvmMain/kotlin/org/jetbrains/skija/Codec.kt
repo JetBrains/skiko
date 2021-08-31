@@ -21,7 +21,7 @@ class Codec @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _Finalizer
             return try {
                 Stats.onNativeCall()
                 val ptr =
-                    _nMakeFromData(Native.Companion.getPtr(data))
+                    _nMakeFromData(Native.getPtr(data))
                 require(ptr != 0L) { "Unsupported format" }
                 Codec(ptr)
             } finally {

@@ -15,98 +15,52 @@ class Font : Managed {
             return Font(_nMakeClone(ptr))
         }
 
-        @ApiStatus.Internal
-        external fun _nGetFinalizer(): Long
-        @ApiStatus.Internal
-        external fun _nMakeDefault(): Long
-        @ApiStatus.Internal
-        external fun _nMakeTypeface(typefacePtr: Long): Long
-        @ApiStatus.Internal
-        external fun _nMakeTypefaceSize(typefacePtr: Long, size: Float): Long
-        @ApiStatus.Internal
-        external fun _nMakeTypefaceSizeScaleSkew(typefacePtr: Long, size: Float, scaleX: Float, skewX: Float): Long
-        @ApiStatus.Internal
-        external fun _nMakeClone(ptr: Long): Long
-        @ApiStatus.Internal
-        external fun _nEquals(ptr: Long, otherPtr: Long): Boolean
-        @ApiStatus.Internal
-        external fun _nIsAutoHintingForced(ptr: Long): Boolean
-        @ApiStatus.Internal
-        external fun _nAreBitmapsEmbedded(ptr: Long): Boolean
-        @ApiStatus.Internal
-        external fun _nIsSubpixel(ptr: Long): Boolean
-        @ApiStatus.Internal
-        external fun _nAreMetricsLinear(ptr: Long): Boolean
-        @ApiStatus.Internal
-        external fun _nIsEmboldened(ptr: Long): Boolean
-        @ApiStatus.Internal
-        external fun _nIsBaselineSnapped(ptr: Long): Boolean
-        @ApiStatus.Internal
-        external fun _nSetAutoHintingForced(ptr: Long, value: Boolean)
-        @ApiStatus.Internal
-        external fun _nSetBitmapsEmbedded(ptr: Long, value: Boolean)
-        @ApiStatus.Internal
-        external fun _nSetSubpixel(ptr: Long, value: Boolean)
-        @ApiStatus.Internal
-        external fun _nSetMetricsLinear(ptr: Long, value: Boolean)
-        @ApiStatus.Internal
-        external fun _nSetEmboldened(ptr: Long, value: Boolean)
-        @ApiStatus.Internal
-        external fun _nSetBaselineSnapped(ptr: Long, value: Boolean)
-        @ApiStatus.Internal
-        external fun _nGetEdging(ptr: Long): Int
-        @ApiStatus.Internal
-        external fun _nSetEdging(ptr: Long, value: Int)
-        @ApiStatus.Internal
-        external fun _nGetHinting(ptr: Long): Int
-        @ApiStatus.Internal
-        external fun _nSetHinting(ptr: Long, value: Int)
-        @ApiStatus.Internal
-        external fun _nGetTypeface(ptr: Long): Long
-        @ApiStatus.Internal
-        external fun _nGetTypefaceOrDefault(ptr: Long): Long
-        @ApiStatus.Internal
-        external fun _nGetSize(ptr: Long): Float
-        @ApiStatus.Internal
-        external fun _nGetScaleX(ptr: Long): Float
-        @ApiStatus.Internal
-        external fun _nGetSkewX(ptr: Long): Float
-        @ApiStatus.Internal
-        external fun _nSetTypeface(ptr: Long, typefacePtr: Long)
-        @ApiStatus.Internal
-        external fun _nSetSize(ptr: Long, value: Float)
-        @ApiStatus.Internal
-        external fun _nSetScaleX(ptr: Long, value: Float)
-        @ApiStatus.Internal
-        external fun _nSetSkewX(ptr: Long, value: Float)
-        @ApiStatus.Internal
-        external fun _nGetStringGlyphs(ptr: Long, str: String?): ShortArray?
-        @ApiStatus.Internal
-        external fun _nGetUTF32Glyph(ptr: Long, uni: Int): Short
-        @ApiStatus.Internal
-        external fun _nGetUTF32Glyphs(ptr: Long, uni: IntArray?): ShortArray
-        @ApiStatus.Internal
-        external fun _nGetStringGlyphsCount(ptr: Long, str: String?): Int
-        @ApiStatus.Internal
-        external fun _nMeasureText(ptr: Long, str: String?, paintPtr: Long): Rect
-        @ApiStatus.Internal
-        external fun _nMeasureTextWidth(ptr: Long, str: String?, paintPtr: Long): Float
-        @ApiStatus.Internal
-        external fun _nGetWidths(ptr: Long, glyphs: ShortArray?): FloatArray
-        @ApiStatus.Internal
-        external fun _nGetBounds(ptr: Long, glyphs: ShortArray?, paintPtr: Long): Array<Rect>
-        @ApiStatus.Internal
-        external fun _nGetPositions(ptr: Long, glyphs: ShortArray?, x: Float, y: Float): Array<Point>
-        @ApiStatus.Internal
-        external fun _nGetXPositions(ptr: Long, glyphs: ShortArray?, x: Float): FloatArray
-        @ApiStatus.Internal
-        external fun _nGetPath(ptr: Long, glyph: Short): Long
-        @ApiStatus.Internal
-        external fun _nGetPaths(ptr: Long, glyphs: ShortArray?): Array<Path>
-        @ApiStatus.Internal
-        external fun _nGetMetrics(ptr: Long): FontMetrics
-        @ApiStatus.Internal
-        external fun _nGetSpacing(ptr: Long): Float
+        @JvmStatic external fun _nGetFinalizer(): Long
+        @JvmStatic external fun _nMakeDefault(): Long
+        @JvmStatic external fun _nMakeTypeface(typefacePtr: Long): Long
+        @JvmStatic external fun _nMakeTypefaceSize(typefacePtr: Long, size: Float): Long
+        @JvmStatic external fun _nMakeTypefaceSizeScaleSkew(typefacePtr: Long, size: Float, scaleX: Float, skewX: Float): Long
+        @JvmStatic external fun _nMakeClone(ptr: Long): Long
+        @JvmStatic external fun _nEquals(ptr: Long, otherPtr: Long): Boolean
+        @JvmStatic external fun _nIsAutoHintingForced(ptr: Long): Boolean
+        @JvmStatic external fun _nAreBitmapsEmbedded(ptr: Long): Boolean
+        @JvmStatic external fun _nIsSubpixel(ptr: Long): Boolean
+        @JvmStatic external fun _nAreMetricsLinear(ptr: Long): Boolean
+        @JvmStatic external fun _nIsEmboldened(ptr: Long): Boolean
+        @JvmStatic external fun _nIsBaselineSnapped(ptr: Long): Boolean
+        @JvmStatic external fun _nSetAutoHintingForced(ptr: Long, value: Boolean)
+        @JvmStatic external fun _nSetBitmapsEmbedded(ptr: Long, value: Boolean)
+        @JvmStatic external fun _nSetSubpixel(ptr: Long, value: Boolean)
+        @JvmStatic external fun _nSetMetricsLinear(ptr: Long, value: Boolean)
+        @JvmStatic external fun _nSetEmboldened(ptr: Long, value: Boolean)
+        @JvmStatic external fun _nSetBaselineSnapped(ptr: Long, value: Boolean)
+        @JvmStatic external fun _nGetEdging(ptr: Long): Int
+        @JvmStatic external fun _nSetEdging(ptr: Long, value: Int)
+        @JvmStatic external fun _nGetHinting(ptr: Long): Int
+        @JvmStatic external fun _nSetHinting(ptr: Long, value: Int)
+        @JvmStatic external fun _nGetTypeface(ptr: Long): Long
+        @JvmStatic external fun _nGetTypefaceOrDefault(ptr: Long): Long
+        @JvmStatic external fun _nGetSize(ptr: Long): Float
+        @JvmStatic external fun _nGetScaleX(ptr: Long): Float
+        @JvmStatic external fun _nGetSkewX(ptr: Long): Float
+        @JvmStatic external fun _nSetTypeface(ptr: Long, typefacePtr: Long)
+        @JvmStatic external fun _nSetSize(ptr: Long, value: Float)
+        @JvmStatic external fun _nSetScaleX(ptr: Long, value: Float)
+        @JvmStatic external fun _nSetSkewX(ptr: Long, value: Float)
+        @JvmStatic external fun _nGetStringGlyphs(ptr: Long, str: String?): ShortArray?
+        @JvmStatic external fun _nGetUTF32Glyph(ptr: Long, uni: Int): Short
+        @JvmStatic external fun _nGetUTF32Glyphs(ptr: Long, uni: IntArray?): ShortArray
+        @JvmStatic external fun _nGetStringGlyphsCount(ptr: Long, str: String?): Int
+        @JvmStatic external fun _nMeasureText(ptr: Long, str: String?, paintPtr: Long): Rect
+        @JvmStatic external fun _nMeasureTextWidth(ptr: Long, str: String?, paintPtr: Long): Float
+        @JvmStatic external fun _nGetWidths(ptr: Long, glyphs: ShortArray?): FloatArray
+        @JvmStatic external fun _nGetBounds(ptr: Long, glyphs: ShortArray?, paintPtr: Long): Array<Rect>
+        @JvmStatic external fun _nGetPositions(ptr: Long, glyphs: ShortArray?, x: Float, y: Float): Array<Point>
+        @JvmStatic external fun _nGetXPositions(ptr: Long, glyphs: ShortArray?, x: Float): FloatArray
+        @JvmStatic external fun _nGetPath(ptr: Long, glyph: Short): Long
+        @JvmStatic external fun _nGetPaths(ptr: Long, glyphs: ShortArray?): Array<Path>
+        @JvmStatic external fun _nGetMetrics(ptr: Long): FontMetrics
+        @JvmStatic external fun _nGetSpacing(ptr: Long): Float
 
         init {
             staticLoad()

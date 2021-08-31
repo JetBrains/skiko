@@ -161,7 +161,7 @@ class State {
 }
 
 private val fontCollection = FontCollection()
-    .setDefaultFontManager(FontMgr.getDefault())
+    .setDefaultFontManager(FontMgr._DefaultHolder.default)
 
 fun displayScene(renderer: Renderer, width: Int, height: Int, nanoTime: Long, xpos: Int, ypos: Int, state: State) {
     val canvas = renderer.canvas!!

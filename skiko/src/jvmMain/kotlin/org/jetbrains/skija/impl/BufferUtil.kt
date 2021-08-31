@@ -14,6 +14,6 @@ object BufferUtil {
         return result
     }
 
-    external fun _nGetByteBufferFromPointer(ptr: Long, size: Int): ByteBuffer?
-    external fun _nGetPointerFromByteBuffer(buffer: ByteBuffer?): Long
+    @JvmStatic external fun _nGetByteBufferFromPointer(ptr: Long, size: Int): ByteBuffer?
+    @JvmStatic external fun _nGetPointerFromByteBuffer(buffer: ByteBuffer?): Long
 }

@@ -2,144 +2,8 @@ package org.jetbrains.skija
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
 import org.jetbrains.annotations.ApiStatus
-import org.jetbrains.skija.impl.RefCnt
-import org.jetbrains.skija.impl.Managed.CleanerThunk
-import org.jetbrains.skija.paragraph.Shadow
-import org.jetbrains.skija.paragraph.TextBox
-import org.jetbrains.skija.paragraph.Affinity
-import org.jetbrains.skija.ManagedString
-import org.jetbrains.skija.paragraph.Paragraph
-import org.jetbrains.skija.IRange
-import org.jetbrains.skija.FontFeature
-import org.jetbrains.skija.Typeface
-import org.jetbrains.skija.paragraph.HeightMode
-import org.jetbrains.skija.paragraph.StrutStyle
-import org.jetbrains.skija.paragraph.BaselineMode
-import org.jetbrains.skija.paragraph.RectWidthMode
-import org.jetbrains.skija.paragraph.FontCollection
-import org.jetbrains.skija.FontMgr
-import org.jetbrains.skija.paragraph.ParagraphCache
-import org.jetbrains.skija.paragraph.ParagraphStyle
-import org.jetbrains.skija.paragraph.RectHeightMode
-import org.jetbrains.skija.paragraph.DecorationStyle
-import org.jetbrains.skija.paragraph.ParagraphBuilder
-import org.jetbrains.skija.paragraph.PlaceholderStyle
-import org.jetbrains.skija.paragraph.TextStyleAttribute
-import org.jetbrains.skija.paragraph.DecorationLineStyle
-import org.jetbrains.skija.paragraph.PlaceholderAlignment
-import org.jetbrains.skija.paragraph.PositionWithAffinity
-import org.jetbrains.skija.paragraph.TypefaceFontProvider
-import org.jetbrains.skija.shaper.Shaper
-import org.jetbrains.skija.TextBlob
-import org.jetbrains.skija.shaper.FontRun
-import org.jetbrains.skija.FourByteTag
-import org.jetbrains.skija.shaper.LanguageRun
-import org.jetbrains.skija.shaper.ShapingOptions
-import org.jetbrains.skija.shaper.FontMgrRunIterator
-import org.jetbrains.skija.shaper.IcuBidiRunIterator
-import org.jetbrains.skija.shaper.ManagedRunIterator
-import org.jetbrains.skija.shaper.HbIcuScriptRunIterator
-import org.jetbrains.skija.shaper.TextBlobBuilderRunHandler
-import org.jetbrains.annotations.ApiStatus.OverrideOnly
-import org.jetbrains.skija.skottie.Animation
-import org.jetbrains.skija.sksg.InvalidationController
-import org.jetbrains.skija.skottie.RenderFlag
-import org.jetbrains.skija.skottie.AnimationBuilder
-import org.jetbrains.skija.skottie.AnimationBuilderFlag
-import org.jetbrains.skija.Matrix33
-import org.jetbrains.skija.svg.SVGDOM
-import org.jetbrains.skija.svg.SVGSVG
-import org.jetbrains.skija.svg.SVGTag
-import org.jetbrains.skija.svg.SVGNode
-import org.jetbrains.skija.WStream
-import org.jetbrains.skija.svg.SVGCanvas
-import org.jetbrains.skija.svg.SVGLength
-import org.jetbrains.skija.svg.SVGLengthType
-import org.jetbrains.skija.svg.SVGLengthUnit
-import org.jetbrains.skija.svg.SVGLengthContext
-import org.jetbrains.skija.svg.SVGPreserveAspectRatio
-import org.jetbrains.skija.svg.SVGPreserveAspectRatioAlign
-import org.jetbrains.skija.svg.SVGPreserveAspectRatioScale
-import org.jetbrains.skija.ColorAlphaType
-import org.jetbrains.skija.AnimationDisposalMode
-import org.jetbrains.skija.BlendMode
-import org.jetbrains.skija.IRect
-import org.jetbrains.skija.AnimationFrameInfo
-import org.jetbrains.skija.BackendRenderTarget
-import org.jetbrains.skija.IHasImageInfo
-import org.jetbrains.skija.ImageInfo
-import org.jetbrains.skija.IPoint
-import org.jetbrains.skija.PixelRef
-import org.jetbrains.skija.Shader
-import org.jetbrains.skija.FilterTileMode
-import org.jetbrains.skija.SamplingMode
-import org.jetbrains.skija.U16String
-import org.jetbrains.skija.SurfaceProps
-import org.jetbrains.skija.RRect
-import org.jetbrains.skija.ClipMode
-import org.jetbrains.skija.FilterMode
-import org.jetbrains.skija.Picture
-import org.jetbrains.skija.Matrix44
-import org.jetbrains.skija.EncodedOrigin
-import org.jetbrains.skija.EncodedImageFormat
-import org.jetbrains.skija.Color4f
-import org.jetbrains.skija.ColorChannel
-import org.jetbrains.skija.ColorFilter
-import org.jetbrains.skija.ColorMatrix
-import org.jetbrains.skija.ColorFilter._LinearToSRGBGammaHolder
-import org.jetbrains.skija.ColorFilter._SRGBToLinearGammaHolder
-import org.jetbrains.skija.InversionMode
-import org.jetbrains.skija.ColorFilter._LumaHolder
-import org.jetbrains.skija.ColorInfo
-import org.jetbrains.skija.ColorSpace._SRGBHolder
-import org.jetbrains.skija.ColorSpace._SRGBLinearHolder
-import org.jetbrains.skija.ColorSpace._DisplayP3Holder
-import org.jetbrains.skija.ContentChangeMode
-import org.jetbrains.skija.CubicResampler
-import org.jetbrains.skija.DirectContext
-import org.jetbrains.skija.GLBackendState
-import org.jetbrains.annotations.ApiStatus.NonExtendable
 import org.jetbrains.annotations.Contract
-import org.jetbrains.skija.FilterBlurMode
-import org.jetbrains.skija.MipmapMode
-import org.jetbrains.skija.FilterMipmap
-import org.jetbrains.skija.FilterQuality
-import org.jetbrains.skija.FontEdging
-import org.jetbrains.skija.FontHinting
-import org.jetbrains.skija.FontExtents
-import org.jetbrains.skija.FontFamilyName
-import org.jetbrains.skija.FontMgr._DefaultHolder
-import org.jetbrains.skija.FontStyleSet
-import org.jetbrains.skija.FontSlant
-import org.jetbrains.skija.FontWidth
-import org.jetbrains.skija.FontVariation
-import org.jetbrains.skija.FontVariationAxis
-import org.jetbrains.skija.GradientStyle
 import org.jetbrains.skija.ImageFilter.Companion.makeDropShadowOnly
-import org.jetbrains.skija.MaskFilter
-import org.jetbrains.skija.OutputWStream
-import org.jetbrains.skija.PaintMode
-import org.jetbrains.skija.PaintStrokeCap
-import org.jetbrains.skija.PaintStrokeJoin
-import org.jetbrains.skija.PathEffect
-import org.jetbrains.skija.PaintFilterCanvas
-import org.jetbrains.skija.PathSegment
-import org.jetbrains.skija.PathOp
-import org.jetbrains.skija.PathFillMode
-import org.jetbrains.skija.PathVerb
-import org.jetbrains.skija.PathEllipseArc
-import org.jetbrains.skija.PathDirection
-import org.jetbrains.skija.PathSegmentIterator
-import org.jetbrains.skija.RSXform
-import org.jetbrains.skija.PathMeasure
-import org.jetbrains.skija.PictureRecorder
-import org.jetbrains.skija.PixelGeometry
-import org.jetbrains.skija.Point3
-import org.jetbrains.skija.RuntimeEffect
-import org.jetbrains.skija.ShadowUtils
-import org.jetbrains.skija.SurfaceOrigin
-import org.jetbrains.skija.SurfaceColorFormat
-import org.jetbrains.skija.TextBlobBuilder
 import org.jetbrains.skija.impl.Managed
 import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.impl.Stats
@@ -148,12 +12,12 @@ import java.lang.ref.Reference
 open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, internal val _owner: Any) :
     Managed(ptr, _FinalizerHolder.PTR, managed) {
     companion object {
-        external fun _nGetFinalizer(): Long
-        external fun _nMakeFromBitmap(bitmapPtr: Long, flags: Int, pixelGeometry: Int): Long
-        external fun _nDrawPoint(ptr: Long, x: Float, y: Float, paintPtr: Long)
-        external fun _nDrawPoints(ptr: Long, mode: Int, coords: FloatArray?, paintPtr: Long)
-        external fun _nDrawLine(ptr: Long, x0: Float, y0: Float, x1: Float, y1: Float, paintPtr: Long)
-        external fun _nDrawArc(
+        @JvmStatic external fun _nGetFinalizer(): Long
+        @JvmStatic external fun _nMakeFromBitmap(bitmapPtr: Long, flags: Int, pixelGeometry: Int): Long
+        @JvmStatic external fun _nDrawPoint(ptr: Long, x: Float, y: Float, paintPtr: Long)
+        @JvmStatic external fun _nDrawPoints(ptr: Long, mode: Int, coords: FloatArray?, paintPtr: Long)
+        @JvmStatic external fun _nDrawLine(ptr: Long, x0: Float, y0: Float, x1: Float, y1: Float, paintPtr: Long)
+        @JvmStatic external fun _nDrawArc(
             ptr: Long,
             left: Float,
             top: Float,
@@ -165,9 +29,9 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
             paintPtr: Long
         )
 
-        external fun _nDrawRect(ptr: Long, left: Float, top: Float, right: Float, bottom: Float, paintPtr: Long)
-        external fun _nDrawOval(ptr: Long, left: Float, top: Float, right: Float, bottom: Float, paint: Long)
-        external fun _nDrawRRect(
+        @JvmStatic external fun _nDrawRect(ptr: Long, left: Float, top: Float, right: Float, bottom: Float, paintPtr: Long)
+        @JvmStatic external fun _nDrawOval(ptr: Long, left: Float, top: Float, right: Float, bottom: Float, paint: Long)
+        @JvmStatic external fun _nDrawRRect(
             ptr: Long,
             left: Float,
             top: Float,
@@ -177,7 +41,7 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
             paintPtr: Long
         )
 
-        external fun _nDrawDRRect(
+        @JvmStatic external fun _nDrawDRRect(
             ptr: Long,
             ol: Float,
             ot: Float,
@@ -192,8 +56,8 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
             paintPtr: Long
         )
 
-        external fun _nDrawPath(ptr: Long, nativePath: Long, paintPtr: Long)
-        external fun _nDrawImageRect(
+        @JvmStatic external fun _nDrawPath(ptr: Long, nativePath: Long, paintPtr: Long)
+        @JvmStatic external fun _nDrawImageRect(
             ptr: Long,
             nativeImage: Long,
             sl: Float,
@@ -209,7 +73,7 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
             strict: Boolean
         )
 
-        external fun _nDrawImageNine(
+        @JvmStatic external fun _nDrawImageNine(
             ptr: Long,
             nativeImage: Long,
             cl: Int,
@@ -224,11 +88,11 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
             paintPtr: Long
         )
 
-        external fun _nDrawRegion(ptr: Long, nativeRegion: Long, paintPtr: Long)
-        external fun _nDrawString(ptr: Long, string: String?, x: Float, y: Float, font: Long, paint: Long)
-        external fun _nDrawTextBlob(ptr: Long, blob: Long, x: Float, y: Float, paint: Long)
-        external fun _nDrawPicture(ptr: Long, picturePtr: Long, matrix: FloatArray?, paintPtr: Long)
-        external fun _nDrawVertices(
+        @JvmStatic external fun _nDrawRegion(ptr: Long, nativeRegion: Long, paintPtr: Long)
+        @JvmStatic external fun _nDrawString(ptr: Long, string: String?, x: Float, y: Float, font: Long, paint: Long)
+        @JvmStatic external fun _nDrawTextBlob(ptr: Long, blob: Long, x: Float, y: Float, paint: Long)
+        @JvmStatic external fun _nDrawPicture(ptr: Long, picturePtr: Long, matrix: FloatArray?, paintPtr: Long)
+        @JvmStatic external fun _nDrawVertices(
             ptr: Long,
             verticesMode: Int,
             cubics: FloatArray?,
@@ -239,7 +103,7 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
             paintPtr: Long
         )
 
-        external fun _nDrawPatch(
+        @JvmStatic external fun _nDrawPatch(
             ptr: Long,
             cubics: FloatArray?,
             colors: IntArray?,
@@ -248,13 +112,13 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
             paintPtr: Long
         )
 
-        external fun _nDrawDrawable(ptr: Long, drawablePrt: Long, matrix: FloatArray?)
-        external fun _nClear(ptr: Long, color: Int)
-        external fun _nDrawPaint(ptr: Long, paintPtr: Long)
-        external fun _nSetMatrix(ptr: Long, matrix: FloatArray?)
-        external fun _nGetLocalToDevice(ptr: Long): FloatArray
-        external fun _nResetMatrix(ptr: Long)
-        external fun _nClipRect(
+        @JvmStatic external fun _nDrawDrawable(ptr: Long, drawablePrt: Long, matrix: FloatArray?)
+        @JvmStatic external fun _nClear(ptr: Long, color: Int)
+        @JvmStatic external fun _nDrawPaint(ptr: Long, paintPtr: Long)
+        @JvmStatic external fun _nSetMatrix(ptr: Long, matrix: FloatArray?)
+        @JvmStatic external fun _nGetLocalToDevice(ptr: Long): FloatArray
+        @JvmStatic external fun _nResetMatrix(ptr: Long)
+        @JvmStatic external fun _nClipRect(
             ptr: Long,
             left: Float,
             top: Float,
@@ -264,7 +128,7 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
             antiAlias: Boolean
         )
 
-        external fun _nClipRRect(
+        @JvmStatic external fun _nClipRRect(
             ptr: Long,
             left: Float,
             top: Float,
@@ -275,15 +139,15 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
             antiAlias: Boolean
         )
 
-        external fun _nClipPath(ptr: Long, nativePath: Long, mode: Int, antiAlias: Boolean)
-        external fun _nClipRegion(ptr: Long, nativeRegion: Long, mode: Int)
-        external fun _nConcat(ptr: Long, matrix: FloatArray?)
-        external fun _nConcat44(ptr: Long, matrix: FloatArray?)
-        external fun _nReadPixels(ptr: Long, bitmapPtr: Long, srcX: Int, srcY: Int): Boolean
-        external fun _nWritePixels(ptr: Long, bitmapPtr: Long, x: Int, y: Int): Boolean
-        external fun _nSave(ptr: Long): Int
-        external fun _nSaveLayer(ptr: Long, paintPtr: Long): Int
-        external fun _nSaveLayerRect(
+        @JvmStatic external fun _nClipPath(ptr: Long, nativePath: Long, mode: Int, antiAlias: Boolean)
+        @JvmStatic external fun _nClipRegion(ptr: Long, nativeRegion: Long, mode: Int)
+        @JvmStatic external fun _nConcat(ptr: Long, matrix: FloatArray?)
+        @JvmStatic external fun _nConcat44(ptr: Long, matrix: FloatArray?)
+        @JvmStatic external fun _nReadPixels(ptr: Long, bitmapPtr: Long, srcX: Int, srcY: Int): Boolean
+        @JvmStatic external fun _nWritePixels(ptr: Long, bitmapPtr: Long, x: Int, y: Int): Boolean
+        @JvmStatic external fun _nSave(ptr: Long): Int
+        @JvmStatic external fun _nSaveLayer(ptr: Long, paintPtr: Long): Int
+        @JvmStatic external fun _nSaveLayerRect(
             ptr: Long,
             left: Float,
             top: Float,
@@ -292,9 +156,9 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
             paintPtr: Long
         ): Int
 
-        external fun _nGetSaveCount(ptr: Long): Int
-        external fun _nRestore(ptr: Long)
-        external fun _nRestoreToCount(ptr: Long, saveCount: Int)
+        @JvmStatic external fun _nGetSaveCount(ptr: Long): Int
+        @JvmStatic external fun _nRestore(ptr: Long)
+        @JvmStatic external fun _nRestoreToCount(ptr: Long, saveCount: Int)
 
         init {
             staticLoad()
@@ -571,7 +435,7 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
         assert(r != null) { "Can’t drawRect with r == null" }
         assert(paint != null) { "Can’t drawRect with paint == null" }
         Stats.onNativeCall()
-        _nDrawRect(_ptr, r._left, r._top, r._right, r._bottom, Native.Companion.getPtr(paint))
+        _nDrawRect(_ptr, r.left, r.top, r.right, r.bottom, Native.Companion.getPtr(paint))
         Reference.reachabilityFence(paint)
         return this
     }
@@ -581,7 +445,7 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
         assert(r != null) { "Can’t drawOval with r == null" }
         assert(paint != null) { "Can’t drawOval with paint == null" }
         Stats.onNativeCall()
-        _nDrawOval(_ptr, r._left, r._top, r._right, r._bottom, Native.Companion.getPtr(paint))
+        _nDrawOval(_ptr, r.left, r.top, r.right, r.bottom, Native.Companion.getPtr(paint))
         Reference.reachabilityFence(paint)
         return this
     }
@@ -600,7 +464,7 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
         assert(r != null) { "Can’t drawRRect with r == null" }
         assert(paint != null) { "Can’t drawRRect with paint == null" }
         Stats.onNativeCall()
-        _nDrawRRect(_ptr, r.left, r.top, r.right, r.bottom, r._radii, Native.getPtr(paint))
+        _nDrawRRect(_ptr, r.left, r.top, r.right, r.bottom, r.radii, Native.getPtr(paint))
         Reference.reachabilityFence(paint)
         return this
     }
@@ -617,12 +481,12 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
             outer.top,
             outer.right,
             outer.bottom,
-            outer._radii,
+            outer.radii,
             inner.left,
             inner.top,
             inner.right,
             inner.bottom,
-            inner._radii,
+            inner.radii,
             Native.getPtr(paint)
         )
         Reference.reachabilityFence(paint)
@@ -1467,7 +1331,7 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
         assert(r != null) { "Can’t clipRRect with r == null" }
         assert(mode != null) { "Can’t clipRRect with mode == null" }
         Stats.onNativeCall()
-        _nClipRRect(_ptr, r.left, r.top, r.right, r.bottom, r._radii, mode.ordinal, antiAlias)
+        _nClipRRect(_ptr, r.left, r.top, r.right, r.bottom, r.radii, mode.ordinal, antiAlias)
         return this
     }
 

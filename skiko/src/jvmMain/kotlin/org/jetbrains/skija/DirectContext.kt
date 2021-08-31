@@ -3,19 +3,16 @@ package org.jetbrains.skija
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
 import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.skija.impl.RefCnt
-import org.jetbrains.annotations.Contract
 import org.jetbrains.skija.impl.Stats
 import java.lang.ref.Reference
 
 class DirectContext @ApiStatus.Internal constructor(ptr: Long) : RefCnt(ptr) {
     companion object {
-        @Contract("-> new")
         fun makeGL(): DirectContext {
             Stats.onNativeCall()
             return DirectContext(_nMakeGL())
         }
 
-        @Contract("-> this")
         fun makeMetal(devicePtr: Long, queuePtr: Long): DirectContext {
             Stats.onNativeCall()
             return DirectContext(_nMakeMetal(devicePtr, queuePtr))
@@ -34,54 +31,42 @@ class DirectContext @ApiStatus.Internal constructor(ptr: Long) : RefCnt(ptr) {
          * is created with provided device in devicePtr with
          * type D3D12_COMMAND_LIST_TYPE_DIRECT; must be not zero
          */
-        @Contract("-> this")
         fun makeDirect3D(adapterPtr: Long, devicePtr: Long, queuePtr: Long): DirectContext {
             Stats.onNativeCall()
             return DirectContext(_nMakeDirect3D(adapterPtr, devicePtr, queuePtr))
         }
 
-        @ApiStatus.Internal
-        external fun _nMakeGL(): Long
-        @ApiStatus.Internal
-        external fun _nMakeMetal(devicePtr: Long, queuePtr: Long): Long
-        @ApiStatus.Internal
-        external fun _nMakeDirect3D(adapterPtr: Long, devicePtr: Long, queuePtr: Long): Long
-        @ApiStatus.Internal
-        external fun _nFlush(ptr: Long): Long
-        @ApiStatus.Internal
-        external fun _nSubmit(ptr: Long, syncCpu: Boolean): Long
-        @ApiStatus.Internal
-        external fun _nReset(ptr: Long, flags: Int)
-        @ApiStatus.Internal
-        external fun _nAbandon(ptr: Long)
+        @JvmStatic external fun _nMakeGL(): Long
+        @JvmStatic external fun _nMakeMetal(devicePtr: Long, queuePtr: Long): Long
+        @JvmStatic external fun _nMakeDirect3D(adapterPtr: Long, devicePtr: Long, queuePtr: Long): Long
+        @JvmStatic external fun _nFlush(ptr: Long): Long
+        @JvmStatic external fun _nSubmit(ptr: Long, syncCpu: Boolean): Long
+        @JvmStatic external fun _nReset(ptr: Long, flags: Int)
+        @JvmStatic external fun _nAbandon(ptr: Long)
 
         init {
             staticLoad()
         }
     }
 
-    @Contract("-> this")
     fun flush(): DirectContext {
         Stats.onNativeCall()
         _nFlush(_ptr)
         return this
     }
 
-    @Contract("-> this")
     fun resetAll(): DirectContext {
         Stats.onNativeCall()
         _nReset(_ptr, -1)
         return this
     }
 
-    @Contract("-> this")
     fun resetGLAll(): DirectContext {
         Stats.onNativeCall()
         _nReset(_ptr, 0xffff)
         return this
     }
 
-    @Contract("_ -> this")
     fun resetGL(vararg states: GLBackendState): DirectContext {
         Stats.onNativeCall()
         var flags = 0

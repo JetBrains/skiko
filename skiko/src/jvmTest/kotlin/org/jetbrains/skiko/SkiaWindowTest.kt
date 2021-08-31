@@ -26,7 +26,7 @@ import kotlin.test.assertTrue
 
 @Suppress("BlockingMethodInNonBlockingContext", "SameParameterValue")
 class SkiaWindowTest {
-    private val fontManager = FontMgr.getDefault()
+    private val fontManager = FontMgr._DefaultHolder.default
     private val fontCollection = FontCollection()
         .setDefaultFontManager(fontManager)
 
@@ -317,10 +317,10 @@ class SkiaWindowTest {
         override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
             val dpi = layer.contentScale
             canvas.drawRect(Rect(0f, 0f, width.toFloat(), height.toFloat()), Paint().apply {
-                color = Color.WHITE.rgb
+                setColor(Color.WHITE.rgb)
             })
             canvas.drawRect(Rect(0f, 0f, rectWidth * dpi, rectHeight * dpi), Paint().apply {
-                color = rectColor.rgb
+                setColor(rectColor.rgb)
             })
         }
     }
@@ -345,7 +345,7 @@ class SkiaWindowTest {
             }
 
             canvas.drawRect(Rect(x.toFloat(), 0f, x.toFloat() + size.toFloat(), size.toFloat()), Paint().apply {
-                color = Color.RED.rgb
+                setColor(Color.RED.rgb)
             })
 
             layer.needRedraw()

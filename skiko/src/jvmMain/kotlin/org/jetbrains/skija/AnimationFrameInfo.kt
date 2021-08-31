@@ -1,7 +1,5 @@
 package org.jetbrains.skija
 
-import org.jetbrains.annotations.ApiStatus
-
 /**
  * Information about individual frames in a multi-framed image.
  */
@@ -68,8 +66,7 @@ class AnimationFrameInfo(
      */
     internal var frameRect: IRect
 ) {
-    @ApiStatus.Internal
-    constructor(
+    internal constructor(
         requiredFrame: Int,
         duration: Int,
         fullyReceived: Boolean,
@@ -87,8 +84,7 @@ class AnimationFrameInfo(
         AnimationDisposalMode._values[disposalMethodOrdinal],
         BlendMode.Companion._values.get(blendModeOrdinal),
         frameRect
-    ) {
-    }
+    )
     /**
      *
      * The frame that this frame needs to be blended with, or

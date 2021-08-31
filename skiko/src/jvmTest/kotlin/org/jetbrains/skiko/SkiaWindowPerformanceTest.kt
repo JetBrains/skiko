@@ -243,7 +243,7 @@ j  org.jetbrains.skiko.redrawer.MacOsRedrawer$drawLayer$1.draw()V+7
         clipRect(Rect(2f, 2f, 18f, 18f))
 
         drawRect(Rect(0f, 0f, 20f, 20f), Paint().apply {
-            color = 0x88FF0000.toInt()
+            setColor(0x88FF0000.toInt())
         })
 
         drawRRect(RRect.makeLTRB(0f, 0f, 20f, 20f, 4f), Paint().apply {

@@ -260,7 +260,7 @@ class ImageInfo(val colorInfo: ColorInfo, val width: Int, val height: Int) {
         @Contract("_, _, _ -> new")
         fun makeS32(width: Int, height: Int, alphaType: ColorAlphaType): ImageInfo {
             return ImageInfo(
-                ColorInfo(ColorType.Companion.N32, alphaType, ColorSpace.Companion.getSRGB()),
+                ColorInfo(ColorType.N32, alphaType, ColorSpace._SRGBHolder.sRGB),
                 width,
                 height
             )

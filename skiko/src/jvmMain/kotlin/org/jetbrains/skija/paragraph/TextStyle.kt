@@ -2,64 +2,7 @@ package org.jetbrains.skija.paragraph
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
 import org.jetbrains.annotations.ApiStatus
-import org.jetbrains.skija.impl.RefCnt
-import org.jetbrains.skija.impl.Managed.CleanerThunk
-import org.jetbrains.skija.paragraph.Shadow
-import org.jetbrains.skija.paragraph.TextBox
-import org.jetbrains.skija.paragraph.Affinity
-import org.jetbrains.skija.paragraph.Paragraph
-import org.jetbrains.skija.paragraph.HeightMode
-import org.jetbrains.skija.paragraph.StrutStyle
-import org.jetbrains.skija.paragraph.BaselineMode
-import org.jetbrains.skija.paragraph.RectWidthMode
-import org.jetbrains.skija.paragraph.FontCollection
-import org.jetbrains.skija.paragraph.ParagraphCache
-import org.jetbrains.skija.paragraph.ParagraphStyle
-import org.jetbrains.skija.paragraph.RectHeightMode
-import org.jetbrains.skija.paragraph.DecorationStyle
-import org.jetbrains.skija.paragraph.ParagraphBuilder
-import org.jetbrains.skija.paragraph.PlaceholderStyle
-import org.jetbrains.skija.paragraph.TextStyleAttribute
-import org.jetbrains.skija.paragraph.DecorationLineStyle
-import org.jetbrains.skija.paragraph.PlaceholderAlignment
-import org.jetbrains.skija.paragraph.PositionWithAffinity
-import org.jetbrains.skija.paragraph.TypefaceFontProvider
-import org.jetbrains.skija.shaper.Shaper
-import org.jetbrains.skija.shaper.FontRun
-import org.jetbrains.skija.shaper.LanguageRun
-import org.jetbrains.skija.shaper.ShapingOptions
-import org.jetbrains.skija.shaper.FontMgrRunIterator
-import org.jetbrains.skija.shaper.IcuBidiRunIterator
-import org.jetbrains.skija.shaper.ManagedRunIterator
-import org.jetbrains.skija.shaper.HbIcuScriptRunIterator
-import org.jetbrains.skija.shaper.TextBlobBuilderRunHandler
-import org.jetbrains.annotations.ApiStatus.OverrideOnly
-import org.jetbrains.skija.skottie.Animation
-import org.jetbrains.skija.sksg.InvalidationController
-import org.jetbrains.skija.skottie.RenderFlag
-import org.jetbrains.skija.skottie.AnimationBuilder
-import org.jetbrains.skija.skottie.AnimationBuilderFlag
-import org.jetbrains.skija.svg.SVGDOM
-import org.jetbrains.skija.svg.SVGSVG
-import org.jetbrains.skija.svg.SVGTag
-import org.jetbrains.skija.svg.SVGNode
-import org.jetbrains.skija.svg.SVGCanvas
-import org.jetbrains.skija.svg.SVGLength
-import org.jetbrains.skija.svg.SVGLengthType
-import org.jetbrains.skija.svg.SVGLengthUnit
-import org.jetbrains.skija.svg.SVGLengthContext
-import org.jetbrains.skija.svg.SVGPreserveAspectRatio
-import org.jetbrains.skija.svg.SVGPreserveAspectRatioAlign
-import org.jetbrains.skija.svg.SVGPreserveAspectRatioScale
-import org.jetbrains.skija.ColorFilter._LinearToSRGBGammaHolder
-import org.jetbrains.skija.ColorFilter._SRGBToLinearGammaHolder
-import org.jetbrains.skija.ColorFilter._LumaHolder
-import org.jetbrains.skija.ColorSpace._SRGBHolder
-import org.jetbrains.skija.ColorSpace._SRGBLinearHolder
-import org.jetbrains.skija.ColorSpace._DisplayP3Holder
-import org.jetbrains.annotations.ApiStatus.NonExtendable
 import org.jetbrains.skija.*
-import org.jetbrains.skija.FontMgr._DefaultHolder
 import org.jetbrains.skija.impl.Managed
 import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.impl.Stats
@@ -67,18 +10,18 @@ import java.lang.ref.Reference
 
 class TextStyle @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
-        external fun _nGetFinalizer(): Long
-        external fun _nMake(): Long
-        external fun _nEquals(ptr: Long, otherPtr: Long): Boolean
-        external fun _nAttributeEquals(ptr: Long, attribute: Int, otherPtr: Long): Boolean
-        external fun _nGetColor(ptr: Long): Int
-        external fun _nSetColor(ptr: Long, color: Int)
-        external fun _nGetForeground(ptr: Long): Long
-        external fun _nSetForeground(ptr: Long, paintPtr: Long)
-        external fun _nGetBackground(ptr: Long): Long
-        external fun _nSetBackground(ptr: Long, paintPtr: Long)
-        external fun _nGetDecorationStyle(ptr: Long): DecorationStyle
-        external fun _nSetDecorationStyle(
+        @JvmStatic external fun _nGetFinalizer(): Long
+        @JvmStatic external fun _nMake(): Long
+        @JvmStatic external fun _nEquals(ptr: Long, otherPtr: Long): Boolean
+        @JvmStatic external fun _nAttributeEquals(ptr: Long, attribute: Int, otherPtr: Long): Boolean
+        @JvmStatic external fun _nGetColor(ptr: Long): Int
+        @JvmStatic external fun _nSetColor(ptr: Long, color: Int)
+        @JvmStatic external fun _nGetForeground(ptr: Long): Long
+        @JvmStatic external fun _nSetForeground(ptr: Long, paintPtr: Long)
+        @JvmStatic external fun _nGetBackground(ptr: Long): Long
+        @JvmStatic external fun _nSetBackground(ptr: Long, paintPtr: Long)
+        @JvmStatic external fun _nGetDecorationStyle(ptr: Long): DecorationStyle
+        @JvmStatic external fun _nSetDecorationStyle(
             ptr: Long,
             underline: Boolean,
             overline: Boolean,
@@ -89,33 +32,33 @@ class TextStyle @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _Final
             thicknessMultiplier: Float
         )
 
-        external fun _nGetFontStyle(ptr: Long): Int
-        external fun _nSetFontStyle(ptr: Long, fontStyle: Int)
-        external fun _nGetShadows(ptr: Long): Array<Shadow>
-        external fun _nAddShadow(ptr: Long, color: Int, offsetX: Float, offsetY: Float, blurSigma: Double)
-        external fun _nClearShadows(ptr: Long)
-        external fun _nGetFontFeatures(ptr: Long): Array<FontFeature>
-        external fun _nAddFontFeature(ptr: Long, name: String?, value: Int)
-        external fun _nClearFontFeatures(ptr: Long)
-        external fun _nGetFontSize(ptr: Long): Float
-        external fun _nSetFontSize(ptr: Long, size: Float)
-        external fun _nGetFontFamilies(ptr: Long): Array<String>
-        external fun _nSetFontFamilies(ptr: Long, families: Array<String>?)
-        external fun _nGetHeight(ptr: Long): Float?
-        external fun _nSetHeight(ptr: Long, override: Boolean, height: Float)
-        external fun _nGetLetterSpacing(ptr: Long): Float
-        external fun _nSetLetterSpacing(ptr: Long, letterSpacing: Float)
-        external fun _nGetWordSpacing(ptr: Long): Float
-        external fun _nSetWordSpacing(ptr: Long, wordSpacing: Float)
-        external fun _nGetTypeface(ptr: Long): Long
-        external fun _nSetTypeface(ptr: Long, typefacePtr: Long)
-        external fun _nGetLocale(ptr: Long): String
-        external fun _nSetLocale(ptr: Long, locale: String?)
-        external fun _nGetBaselineMode(ptr: Long): Int
-        external fun _nSetBaselineMode(ptr: Long, mode: Int)
-        external fun _nGetFontMetrics(ptr: Long): FontMetrics
-        external fun _nIsPlaceholder(ptr: Long): Boolean
-        external fun _nSetPlaceholder(ptr: Long)
+        @JvmStatic external fun _nGetFontStyle(ptr: Long): Int
+        @JvmStatic external fun _nSetFontStyle(ptr: Long, fontStyle: Int)
+        @JvmStatic external fun _nGetShadows(ptr: Long): Array<Shadow>
+        @JvmStatic external fun _nAddShadow(ptr: Long, color: Int, offsetX: Float, offsetY: Float, blurSigma: Double)
+        @JvmStatic external fun _nClearShadows(ptr: Long)
+        @JvmStatic external fun _nGetFontFeatures(ptr: Long): Array<FontFeature>
+        @JvmStatic external fun _nAddFontFeature(ptr: Long, name: String?, value: Int)
+        @JvmStatic external fun _nClearFontFeatures(ptr: Long)
+        @JvmStatic external fun _nGetFontSize(ptr: Long): Float
+        @JvmStatic external fun _nSetFontSize(ptr: Long, size: Float)
+        @JvmStatic external fun _nGetFontFamilies(ptr: Long): Array<String>
+        @JvmStatic external fun _nSetFontFamilies(ptr: Long, families: Array<String>?)
+        @JvmStatic external fun _nGetHeight(ptr: Long): Float?
+        @JvmStatic external fun _nSetHeight(ptr: Long, override: Boolean, height: Float)
+        @JvmStatic external fun _nGetLetterSpacing(ptr: Long): Float
+        @JvmStatic external fun _nSetLetterSpacing(ptr: Long, letterSpacing: Float)
+        @JvmStatic external fun _nGetWordSpacing(ptr: Long): Float
+        @JvmStatic external fun _nSetWordSpacing(ptr: Long, wordSpacing: Float)
+        @JvmStatic external fun _nGetTypeface(ptr: Long): Long
+        @JvmStatic external fun _nSetTypeface(ptr: Long, typefacePtr: Long)
+        @JvmStatic external fun _nGetLocale(ptr: Long): String
+        @JvmStatic external fun _nSetLocale(ptr: Long, locale: String?)
+        @JvmStatic external fun _nGetBaselineMode(ptr: Long): Int
+        @JvmStatic external fun _nSetBaselineMode(ptr: Long, mode: Int)
+        @JvmStatic external fun _nGetFontMetrics(ptr: Long): FontMetrics
+        @JvmStatic external fun _nIsPlaceholder(ptr: Long): Boolean
+        @JvmStatic external fun _nSetPlaceholder(ptr: Long)
 
         init {
             staticLoad()
@@ -145,8 +88,8 @@ class TextStyle @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _Final
             Stats.onNativeCall()
             _nAttributeEquals(
                 _ptr,
-                attribute.ordinal(),
-                Native.Companion.getPtr(other)
+                attribute.ordinal,
+                Native.getPtr(other)
             )
         } finally {
             Reference.reachabilityFence(this)
@@ -228,9 +171,9 @@ class TextStyle @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _Final
             d._overline,
             d._lineThrough,
             d._gaps,
-            d._color,
-            d._lineStyle.ordinal(),
-            d._thicknessMultiplier
+            d.color,
+            d._lineStyle.ordinal,
+            d.thicknessMultiplier
         )
         return this
     }
@@ -259,7 +202,7 @@ class TextStyle @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _Final
 
     fun addShadow(s: Shadow): TextStyle {
         Stats.onNativeCall()
-        _nAddShadow(_ptr, s._color, s._offsetX, s._offsetY, s._blurSigma)
+        _nAddShadow(_ptr, s.color, s.offsetX, s.offsetY, s.blurSigma)
         return this
     }
 
@@ -284,7 +227,7 @@ class TextStyle @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _Final
 
     fun addFontFeature(f: FontFeature): TextStyle {
         Stats.onNativeCall()
-        _nAddFontFeature(_ptr, f.tag, f._value)
+        _nAddFontFeature(_ptr, f.tag, f.value)
         return this
     }
 
@@ -419,7 +362,7 @@ class TextStyle @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _Final
 
     fun setBaselineMode(baseline: BaselineMode): TextStyle {
         Stats.onNativeCall()
-        _nSetBaselineMode(_ptr, baseline.ordinal())
+        _nSetBaselineMode(_ptr, baseline.ordinal)
         return this
     }
 

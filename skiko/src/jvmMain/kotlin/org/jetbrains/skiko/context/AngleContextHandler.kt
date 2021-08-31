@@ -1,16 +1,11 @@
 package org.jetbrains.skiko.context
 
-import java.lang.ref.Reference
 import org.jetbrains.skija.ColorSpace
-import org.jetbrains.skija.FramebufferFormat
-import org.jetbrains.skija.Picture
 import org.jetbrains.skija.Surface
 import org.jetbrains.skija.SurfaceColorFormat
 import org.jetbrains.skija.SurfaceOrigin
-import org.jetbrains.skija.impl.Native
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.redrawer.AngleRedrawer
-import org.jetbrains.skiko.redrawer.Redrawer
 
 internal class AngleContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
     val angleRedrawer: AngleRedrawer
@@ -47,7 +42,7 @@ internal class AngleContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
             renderTarget!!,
             SurfaceOrigin.BOTTOM_LEFT,
             SurfaceColorFormat.RGBA_8888,
-            ColorSpace.getSRGB()
+            ColorSpace._SRGBHolder.sRGB
         )
 
         canvas = surface!!.canvas

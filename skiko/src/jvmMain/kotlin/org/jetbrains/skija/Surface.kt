@@ -3,149 +3,14 @@ package org.jetbrains.skija
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
 import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.skija.impl.RefCnt
-import org.jetbrains.skija.impl.Managed.CleanerThunk
-import org.jetbrains.skija.paragraph.Shadow
-import org.jetbrains.skija.paragraph.TextBox
-import org.jetbrains.skija.paragraph.Affinity
-import org.jetbrains.skija.ManagedString
-import org.jetbrains.skija.paragraph.Paragraph
-import org.jetbrains.skija.IRange
-import org.jetbrains.skija.FontFeature
-import org.jetbrains.skija.Typeface
-import org.jetbrains.skija.paragraph.HeightMode
-import org.jetbrains.skija.paragraph.StrutStyle
-import org.jetbrains.skija.paragraph.BaselineMode
-import org.jetbrains.skija.paragraph.RectWidthMode
-import org.jetbrains.skija.paragraph.FontCollection
-import org.jetbrains.skija.FontMgr
-import org.jetbrains.skija.paragraph.ParagraphCache
-import org.jetbrains.skija.paragraph.ParagraphStyle
-import org.jetbrains.skija.paragraph.RectHeightMode
-import org.jetbrains.skija.paragraph.DecorationStyle
-import org.jetbrains.skija.paragraph.ParagraphBuilder
-import org.jetbrains.skija.paragraph.PlaceholderStyle
-import org.jetbrains.skija.paragraph.TextStyleAttribute
-import org.jetbrains.skija.paragraph.DecorationLineStyle
-import org.jetbrains.skija.paragraph.PlaceholderAlignment
-import org.jetbrains.skija.paragraph.PositionWithAffinity
-import org.jetbrains.skija.paragraph.TypefaceFontProvider
-import org.jetbrains.skija.shaper.Shaper
-import org.jetbrains.skija.TextBlob
-import org.jetbrains.skija.shaper.FontRun
-import org.jetbrains.skija.FourByteTag
-import org.jetbrains.skija.shaper.LanguageRun
-import org.jetbrains.skija.shaper.ShapingOptions
-import org.jetbrains.skija.shaper.FontMgrRunIterator
-import org.jetbrains.skija.shaper.IcuBidiRunIterator
-import org.jetbrains.skija.shaper.ManagedRunIterator
-import org.jetbrains.skija.shaper.HbIcuScriptRunIterator
-import org.jetbrains.skija.shaper.TextBlobBuilderRunHandler
-import org.jetbrains.annotations.ApiStatus.OverrideOnly
-import org.jetbrains.skija.skottie.Animation
-import org.jetbrains.skija.sksg.InvalidationController
-import org.jetbrains.skija.skottie.RenderFlag
-import org.jetbrains.skija.skottie.AnimationBuilder
-import org.jetbrains.skija.skottie.AnimationBuilderFlag
-import org.jetbrains.skija.Matrix33
-import org.jetbrains.skija.svg.SVGDOM
-import org.jetbrains.skija.svg.SVGSVG
-import org.jetbrains.skija.svg.SVGTag
-import org.jetbrains.skija.svg.SVGNode
-import org.jetbrains.skija.WStream
-import org.jetbrains.skija.svg.SVGCanvas
-import org.jetbrains.skija.svg.SVGLength
-import org.jetbrains.skija.svg.SVGLengthType
-import org.jetbrains.skija.svg.SVGLengthUnit
-import org.jetbrains.skija.svg.SVGLengthContext
-import org.jetbrains.skija.svg.SVGPreserveAspectRatio
-import org.jetbrains.skija.svg.SVGPreserveAspectRatioAlign
-import org.jetbrains.skija.svg.SVGPreserveAspectRatioScale
-import org.jetbrains.skija.ColorAlphaType
-import org.jetbrains.skija.AnimationDisposalMode
-import org.jetbrains.skija.BlendMode
-import org.jetbrains.skija.IRect
-import org.jetbrains.skija.AnimationFrameInfo
-import org.jetbrains.skija.BackendRenderTarget
-import org.jetbrains.skija.IHasImageInfo
-import org.jetbrains.skija.ImageInfo
-import org.jetbrains.skija.IPoint
-import org.jetbrains.skija.PixelRef
-import org.jetbrains.skija.Shader
-import org.jetbrains.skija.FilterTileMode
-import org.jetbrains.skija.SamplingMode
-import org.jetbrains.skija.U16String
-import org.jetbrains.skija.SurfaceProps
-import org.jetbrains.skija.RRect
-import org.jetbrains.skija.ClipMode
-import org.jetbrains.skija.FilterMode
-import org.jetbrains.skija.Picture
-import org.jetbrains.skija.Matrix44
-import org.jetbrains.skija.EncodedOrigin
-import org.jetbrains.skija.EncodedImageFormat
-import org.jetbrains.skija.Color4f
-import org.jetbrains.skija.ColorChannel
-import org.jetbrains.skija.ColorFilter
-import org.jetbrains.skija.ColorMatrix
-import org.jetbrains.skija.ColorFilter._LinearToSRGBGammaHolder
-import org.jetbrains.skija.ColorFilter._SRGBToLinearGammaHolder
-import org.jetbrains.skija.InversionMode
-import org.jetbrains.skija.ColorFilter._LumaHolder
-import org.jetbrains.skija.ColorInfo
-import org.jetbrains.skija.ColorSpace._SRGBHolder
-import org.jetbrains.skija.ColorSpace._SRGBLinearHolder
-import org.jetbrains.skija.ColorSpace._DisplayP3Holder
-import org.jetbrains.skija.ContentChangeMode
-import org.jetbrains.skija.CubicResampler
-import org.jetbrains.skija.DirectContext
-import org.jetbrains.skija.GLBackendState
-import org.jetbrains.annotations.ApiStatus.NonExtendable
 import org.jetbrains.annotations.Contract
-import org.jetbrains.skija.FilterBlurMode
-import org.jetbrains.skija.MipmapMode
-import org.jetbrains.skija.FilterMipmap
-import org.jetbrains.skija.FilterQuality
-import org.jetbrains.skija.FontEdging
-import org.jetbrains.skija.FontHinting
-import org.jetbrains.skija.FontExtents
-import org.jetbrains.skija.FontFamilyName
-import org.jetbrains.skija.FontMgr._DefaultHolder
-import org.jetbrains.skija.FontStyleSet
-import org.jetbrains.skija.FontSlant
-import org.jetbrains.skija.FontWidth
-import org.jetbrains.skija.FontVariation
-import org.jetbrains.skija.FontVariationAxis
-import org.jetbrains.skija.GradientStyle
-import org.jetbrains.skija.MaskFilter
-import org.jetbrains.skija.OutputWStream
-import org.jetbrains.skija.PaintMode
-import org.jetbrains.skija.PaintStrokeCap
-import org.jetbrains.skija.PaintStrokeJoin
-import org.jetbrains.skija.PathEffect
-import org.jetbrains.skija.PaintFilterCanvas
-import org.jetbrains.skija.PathSegment
-import org.jetbrains.skija.PathOp
-import org.jetbrains.skija.PathFillMode
-import org.jetbrains.skija.PathVerb
-import org.jetbrains.skija.PathEllipseArc
-import org.jetbrains.skija.PathDirection
-import org.jetbrains.skija.PathSegmentIterator
-import org.jetbrains.skija.RSXform
-import org.jetbrains.skija.PathMeasure
-import org.jetbrains.skija.PictureRecorder
-import org.jetbrains.skija.PixelGeometry
-import org.jetbrains.skija.Point3
-import org.jetbrains.skija.RuntimeEffect
-import org.jetbrains.skija.ShadowUtils
-import org.jetbrains.skija.SurfaceOrigin
-import org.jetbrains.skija.SurfaceColorFormat
-import org.jetbrains.skija.TextBlobBuilder
 import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.impl.Stats
+import java.lang.IllegalArgumentException
 import java.lang.ref.Reference
 
 class Surface : RefCnt {
     companion object {
-        @Contract("_ -> new")
         fun makeRasterDirect(pixmap: Pixmap): Surface {
             return makeRasterDirect(pixmap, null)
         }
@@ -177,7 +42,6 @@ class Surface : RefCnt {
          * @param rowBytes      memory address of destination native pixels buffer
          * @return              created Surface
          */
-        @Contract("_, _, _ -> new")
         fun makeRasterDirect(
             imageInfo: ImageInfo,
             pixelsPtr: Long,
@@ -186,7 +50,6 @@ class Surface : RefCnt {
             return makeRasterDirect(imageInfo, pixelsPtr, rowBytes, null)
         }
 
-        @Contract("_, _ -> new")
         fun makeRasterDirect(
             pixmap: Pixmap,
             surfaceProps: SurfaceProps?
@@ -239,7 +102,6 @@ class Surface : RefCnt {
          * may be null
          * @return              created Surface
          */
-        @Contract("_, _, _, _ -> new")
         fun makeRasterDirect(
             imageInfo: ImageInfo,
             pixelsPtr: Long,
@@ -250,11 +112,11 @@ class Surface : RefCnt {
                 assert(imageInfo != null) { "Can’t makeRasterDirect with imageInfo == null" }
                 Stats.onNativeCall()
                 val ptr = _nMakeRasterDirect(
-                    imageInfo._width,
-                    imageInfo._height,
-                    imageInfo._colorInfo._colorType.ordinal,
-                    imageInfo._colorInfo._alphaType.ordinal,
-                    Native.Companion.getPtr(imageInfo._colorInfo._colorSpace),
+                    imageInfo.width,
+                    imageInfo.height,
+                    imageInfo.colorInfo.colorType.ordinal,
+                    imageInfo.colorInfo.alphaType.ordinal,
+                    Native.getPtr(imageInfo.colorInfo.colorSpace),
                     pixelsPtr,
                     rowBytes,
                     surfaceProps
@@ -270,7 +132,7 @@ class Surface : RefCnt {
                 }
                 Surface(ptr)
             } finally {
-                Reference.reachabilityFence(imageInfo._colorInfo._colorSpace)
+                Reference.reachabilityFence(imageInfo.colorInfo.colorSpace)
             }
         }
 
@@ -290,7 +152,6 @@ class Surface : RefCnt {
          * of raster surface; width and height must be greater than zero
          * @return              new Surface
          */
-        @Contract("_, _, _ -> new")
         fun makeRaster(imageInfo: ImageInfo): Surface {
             return makeRaster(imageInfo, 0, null)
         }
@@ -317,7 +178,6 @@ class Surface : RefCnt {
          * @param rowBytes      interval from one Surface row to the next; may be zero
          * @return              new Surface
          */
-        @Contract("_, _, _ -> new")
         fun makeRaster(
             imageInfo: ImageInfo,
             rowBytes: Long
@@ -349,7 +209,6 @@ class Surface : RefCnt {
          * may be null
          * @return              new Surface
          */
-        @Contract("_, _, _ -> new")
         fun makeRaster(
             imageInfo: ImageInfo,
             rowBytes: Long,
@@ -359,11 +218,11 @@ class Surface : RefCnt {
                 assert(imageInfo != null) { "Can’t makeRaster with imageInfo == null" }
                 Stats.onNativeCall()
                 val ptr = _nMakeRaster(
-                    imageInfo._width,
-                    imageInfo._height,
-                    imageInfo._colorInfo._colorType.ordinal,
-                    imageInfo._colorInfo._alphaType.ordinal,
-                    Native.Companion.getPtr(imageInfo._colorInfo._colorSpace),
+                    imageInfo.width,
+                    imageInfo.height,
+                    imageInfo.colorInfo.colorType.ordinal,
+                    imageInfo.colorInfo.alphaType.ordinal,
+                    Native.getPtr(imageInfo.colorInfo.colorSpace),
                     rowBytes,
                     surfaceProps
                 )
@@ -377,7 +236,7 @@ class Surface : RefCnt {
                 }
                 Surface(ptr)
             } finally {
-                Reference.reachabilityFence(imageInfo._colorInfo._colorSpace)
+                Reference.reachabilityFence(imageInfo.colorInfo.colorSpace)
             }
         }
         /**
@@ -550,7 +409,6 @@ class Surface : RefCnt {
          * width, or height, or both, may be zero
          * @return                      new SkSurface
          */
-        @Contract("_, _, _ -> new")
         fun makeRenderTarget(
             context: DirectContext,
             budgeted: Boolean,
@@ -581,7 +439,6 @@ class Surface : RefCnt {
          * fonts; may be null
          * @return                      new SkSurface
          */
-        @Contract("_, _, _, _, _ -> new")
         fun makeRenderTarget(
             context: DirectContext,
             budgeted: Boolean,
@@ -623,7 +480,6 @@ class Surface : RefCnt {
          * fonts; may be null
          * @return                      new SkSurface
          */
-        @Contract("_, _, _, _, _, _ -> new")
         fun makeRenderTarget(
             context: DirectContext,
             budgeted: Boolean,
@@ -662,7 +518,6 @@ class Surface : RefCnt {
          * @param shouldCreateWithMips  hint that SkSurface will host mip map images
          * @return                      new SkSurface
          */
-        @Contract("_, _, _, _, _, _, _ -> new")
         fun makeRenderTarget(
             context: DirectContext,
             budgeted: Boolean,
@@ -678,13 +533,13 @@ class Surface : RefCnt {
                 assert(origin != null) { "Can’t makeFromBackendRenderTarget with origin == null" }
                 Stats.onNativeCall()
                 val ptr = _nMakeRenderTarget(
-                    Native.Companion.getPtr(context),
+                    Native.getPtr(context),
                     budgeted,
-                    imageInfo._width,
-                    imageInfo._height,
-                    imageInfo._colorInfo._colorType.ordinal,
-                    imageInfo._colorInfo._alphaType.ordinal,
-                    Native.Companion.getPtr(imageInfo._colorInfo._colorSpace),
+                    imageInfo.width,
+                    imageInfo.height,
+                    imageInfo.colorInfo.colorType.ordinal,
+                    imageInfo.colorInfo.alphaType.ordinal,
+                    Native.Companion.getPtr(imageInfo.colorInfo.colorSpace),
                     sampleCount,
                     origin.ordinal,
                     surfaceProps,
@@ -705,7 +560,7 @@ class Surface : RefCnt {
                 Surface(ptr, context)
             } finally {
                 Reference.reachabilityFence(context)
-                Reference.reachabilityFence(imageInfo._colorInfo._colorSpace)
+                Reference.reachabilityFence(imageInfo.colorInfo.colorSpace)
             }
         }
 
@@ -719,7 +574,6 @@ class Surface : RefCnt {
          *
          * @see [https://fiddle.skia.org/c/@Surface_MakeNull](https://fiddle.skia.org/c/@Surface_MakeNull)
          */
-        @Contract("_, _ -> new")
         fun makeNull(width: Int, height: Int): Surface {
             Stats.onNativeCall()
             val ptr = _nMakeNull(width, height)
@@ -727,7 +581,7 @@ class Surface : RefCnt {
             return Surface(ptr)
         }
 
-        external fun _nMakeRasterDirect(
+        @JvmStatic external fun _nMakeRasterDirect(
             width: Int,
             height: Int,
             colorType: Int,
@@ -738,8 +592,8 @@ class Surface : RefCnt {
             surfaceProps: SurfaceProps?
         ): Long
 
-        external fun _nMakeRasterDirectWithPixmap(pixmapPtr: Long, surfaceProps: SurfaceProps?): Long
-        external fun _nMakeRaster(
+        @JvmStatic external fun _nMakeRasterDirectWithPixmap(pixmapPtr: Long, surfaceProps: SurfaceProps?): Long
+        @JvmStatic external fun _nMakeRaster(
             width: Int,
             height: Int,
             colorType: Int,
@@ -749,8 +603,8 @@ class Surface : RefCnt {
             surfaceProps: SurfaceProps?
         ): Long
 
-        external fun _nMakeRasterN32Premul(width: Int, height: Int): Long
-        external fun _nMakeFromBackendRenderTarget(
+        @JvmStatic external fun _nMakeRasterN32Premul(width: Int, height: Int): Long
+        @JvmStatic external fun _nMakeFromBackendRenderTarget(
             pContext: Long,
             pBackendRenderTarget: Long,
             surfaceOrigin: Int,
@@ -759,7 +613,7 @@ class Surface : RefCnt {
             surfaceProps: SurfaceProps?
         ): Long
 
-        external fun _nMakeFromMTKView(
+        @JvmStatic external fun _nMakeFromMTKView(
             contextPtr: Long,
             mtkViewPtr: Long,
             surfaceOrigin: Int,
@@ -769,7 +623,7 @@ class Surface : RefCnt {
             surfaceProps: SurfaceProps?
         ): Long
 
-        external fun _nMakeRenderTarget(
+        @JvmStatic external fun _nMakeRenderTarget(
             contextPtr: Long,
             budgeted: Boolean,
             width: Int,
@@ -783,15 +637,15 @@ class Surface : RefCnt {
             shouldCreateWithMips: Boolean
         ): Long
 
-        external fun _nMakeNull(width: Int, height: Int): Long
-        external fun _nGetWidth(ptr: Long): Int
-        external fun _nGetHeight(ptr: Long): Int
-        external fun _nGetImageInfo(ptr: Long): ImageInfo
-        external fun _nGenerationId(ptr: Long): Int
-        external fun _nNotifyContentWillChange(ptr: Long, mode: Int)
-        external fun _nGetRecordingContext(ptr: Long): Long
-        external fun _nGetCanvas(ptr: Long): Long
-        external fun _nMakeSurfaceI(
+        @JvmStatic external fun _nMakeNull(width: Int, height: Int): Long
+        @JvmStatic external fun _nGetWidth(ptr: Long): Int
+        @JvmStatic external fun _nGetHeight(ptr: Long): Int
+        @JvmStatic external fun _nGetImageInfo(ptr: Long): ImageInfo
+        @JvmStatic external fun _nGenerationId(ptr: Long): Int
+        @JvmStatic external fun _nNotifyContentWillChange(ptr: Long, mode: Int)
+        @JvmStatic external fun _nGetRecordingContext(ptr: Long): Long
+        @JvmStatic external fun _nGetCanvas(ptr: Long): Long
+        @JvmStatic external fun _nMakeSurfaceI(
             ptr: Long,
             width: Int,
             height: Int,
@@ -800,18 +654,18 @@ class Surface : RefCnt {
             colorSpacePtr: Long
         ): Long
 
-        external fun _nMakeSurface(ptr: Long, width: Int, height: Int): Long
-        external fun _nMakeImageSnapshot(ptr: Long): Long
-        external fun _nMakeImageSnapshotR(ptr: Long, left: Int, top: Int, right: Int, bottom: Int): Long
-        external fun _nDraw(ptr: Long, canvasPtr: Long, x: Float, y: Float, paintPtr: Long)
-        external fun _nPeekPixels(ptr: Long, pixmapPtr: Long): Boolean
-        external fun _nReadPixelsToPixmap(ptr: Long, pixmapPtr: Long, srcX: Int, srcY: Int): Boolean
-        external fun _nReadPixels(ptr: Long, bitmapPtr: Long, srcX: Int, srcY: Int): Boolean
-        external fun _nWritePixelsFromPixmap(ptr: Long, pixmapPtr: Long, x: Int, y: Int)
-        external fun _nWritePixels(ptr: Long, bitmapPtr: Long, x: Int, y: Int)
-        external fun _nFlushAndSubmit(ptr: Long, syncCpu: Boolean)
-        external fun _nFlush(ptr: Long)
-        external fun _nUnique(ptr: Long): Boolean
+        @JvmStatic external fun _nMakeSurface(ptr: Long, width: Int, height: Int): Long
+        @JvmStatic external fun _nMakeImageSnapshot(ptr: Long): Long
+        @JvmStatic external fun _nMakeImageSnapshotR(ptr: Long, left: Int, top: Int, right: Int, bottom: Int): Long
+        @JvmStatic external fun _nDraw(ptr: Long, canvasPtr: Long, x: Float, y: Float, paintPtr: Long)
+        @JvmStatic external fun _nPeekPixels(ptr: Long, pixmapPtr: Long): Boolean
+        @JvmStatic external fun _nReadPixelsToPixmap(ptr: Long, pixmapPtr: Long, srcX: Int, srcY: Int): Boolean
+        @JvmStatic external fun _nReadPixels(ptr: Long, bitmapPtr: Long, srcX: Int, srcY: Int): Boolean
+        @JvmStatic external fun _nWritePixelsFromPixmap(ptr: Long, pixmapPtr: Long, x: Int, y: Int)
+        @JvmStatic external fun _nWritePixels(ptr: Long, bitmapPtr: Long, x: Int, y: Int)
+        @JvmStatic external fun _nFlushAndSubmit(ptr: Long, syncCpu: Boolean)
+        @JvmStatic external fun _nFlush(ptr: Long)
+        @JvmStatic external fun _nUnique(ptr: Long): Boolean
 
         init {
             staticLoad()
@@ -933,7 +787,7 @@ class Surface : RefCnt {
         get() = try {
             Stats.onNativeCall()
             val ptr = _nGetCanvas(_ptr)
-            if (ptr == 0L) null else org.jetbrains.skija.Canvas(ptr, false, this)
+            if (ptr == 0L) throw IllegalArgumentException() else Canvas(ptr, false, this)
         } finally {
             Reference.reachabilityFence(this)
         }
@@ -958,11 +812,11 @@ class Surface : RefCnt {
             Stats.onNativeCall()
             val ptr = _nMakeSurfaceI(
                 _ptr,
-                imageInfo._width,
-                imageInfo._height,
-                imageInfo._colorInfo._colorType.ordinal,
-                imageInfo._colorInfo._alphaType.ordinal,
-                Native.Companion.getPtr(imageInfo._colorInfo._colorSpace)
+                imageInfo.width,
+                imageInfo.height,
+                imageInfo.colorInfo.colorType.ordinal,
+                imageInfo.colorInfo.alphaType.ordinal,
+                Native.Companion.getPtr(imageInfo.colorInfo.colorSpace)
             )
             Surface(ptr)
         } finally {
@@ -1039,10 +893,10 @@ class Surface : RefCnt {
             org.jetbrains.skija.Image(
                 _nMakeImageSnapshotR(
                     _ptr,
-                    area._left,
-                    area._top,
-                    area._right,
-                    area._bottom
+                    area.left,
+                    area.top,
+                    area.right,
+                    area.bottom
                 )
             )
         } finally {

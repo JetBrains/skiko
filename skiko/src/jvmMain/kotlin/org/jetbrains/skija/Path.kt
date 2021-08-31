@@ -2,142 +2,6 @@ package org.jetbrains.skija
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
 import org.jetbrains.annotations.ApiStatus
-import org.jetbrains.skija.impl.RefCnt
-import org.jetbrains.skija.impl.Managed.CleanerThunk
-import org.jetbrains.skija.paragraph.Shadow
-import org.jetbrains.skija.paragraph.TextBox
-import org.jetbrains.skija.paragraph.Affinity
-import org.jetbrains.skija.ManagedString
-import org.jetbrains.skija.paragraph.Paragraph
-import org.jetbrains.skija.IRange
-import org.jetbrains.skija.FontFeature
-import org.jetbrains.skija.Typeface
-import org.jetbrains.skija.paragraph.HeightMode
-import org.jetbrains.skija.paragraph.StrutStyle
-import org.jetbrains.skija.paragraph.BaselineMode
-import org.jetbrains.skija.paragraph.RectWidthMode
-import org.jetbrains.skija.paragraph.FontCollection
-import org.jetbrains.skija.FontMgr
-import org.jetbrains.skija.paragraph.ParagraphCache
-import org.jetbrains.skija.paragraph.ParagraphStyle
-import org.jetbrains.skija.paragraph.RectHeightMode
-import org.jetbrains.skija.paragraph.DecorationStyle
-import org.jetbrains.skija.paragraph.ParagraphBuilder
-import org.jetbrains.skija.paragraph.PlaceholderStyle
-import org.jetbrains.skija.paragraph.TextStyleAttribute
-import org.jetbrains.skija.paragraph.DecorationLineStyle
-import org.jetbrains.skija.paragraph.PlaceholderAlignment
-import org.jetbrains.skija.paragraph.PositionWithAffinity
-import org.jetbrains.skija.paragraph.TypefaceFontProvider
-import org.jetbrains.skija.shaper.Shaper
-import org.jetbrains.skija.TextBlob
-import org.jetbrains.skija.shaper.FontRun
-import org.jetbrains.skija.FourByteTag
-import org.jetbrains.skija.shaper.LanguageRun
-import org.jetbrains.skija.shaper.ShapingOptions
-import org.jetbrains.skija.shaper.FontMgrRunIterator
-import org.jetbrains.skija.shaper.IcuBidiRunIterator
-import org.jetbrains.skija.shaper.ManagedRunIterator
-import org.jetbrains.skija.shaper.HbIcuScriptRunIterator
-import org.jetbrains.skija.shaper.TextBlobBuilderRunHandler
-import org.jetbrains.annotations.ApiStatus.OverrideOnly
-import org.jetbrains.skija.skottie.Animation
-import org.jetbrains.skija.sksg.InvalidationController
-import org.jetbrains.skija.skottie.RenderFlag
-import org.jetbrains.skija.skottie.AnimationBuilder
-import org.jetbrains.skija.skottie.AnimationBuilderFlag
-import org.jetbrains.skija.Matrix33
-import org.jetbrains.skija.svg.SVGDOM
-import org.jetbrains.skija.svg.SVGSVG
-import org.jetbrains.skija.svg.SVGTag
-import org.jetbrains.skija.svg.SVGNode
-import org.jetbrains.skija.WStream
-import org.jetbrains.skija.svg.SVGCanvas
-import org.jetbrains.skija.svg.SVGLength
-import org.jetbrains.skija.svg.SVGLengthType
-import org.jetbrains.skija.svg.SVGLengthUnit
-import org.jetbrains.skija.svg.SVGLengthContext
-import org.jetbrains.skija.svg.SVGPreserveAspectRatio
-import org.jetbrains.skija.svg.SVGPreserveAspectRatioAlign
-import org.jetbrains.skija.svg.SVGPreserveAspectRatioScale
-import org.jetbrains.skija.ColorAlphaType
-import org.jetbrains.skija.AnimationDisposalMode
-import org.jetbrains.skija.BlendMode
-import org.jetbrains.skija.IRect
-import org.jetbrains.skija.AnimationFrameInfo
-import org.jetbrains.skija.BackendRenderTarget
-import org.jetbrains.skija.IHasImageInfo
-import org.jetbrains.skija.ImageInfo
-import org.jetbrains.skija.IPoint
-import org.jetbrains.skija.PixelRef
-import org.jetbrains.skija.Shader
-import org.jetbrains.skija.FilterTileMode
-import org.jetbrains.skija.SamplingMode
-import org.jetbrains.skija.U16String
-import org.jetbrains.skija.SurfaceProps
-import org.jetbrains.skija.RRect
-import org.jetbrains.skija.ClipMode
-import org.jetbrains.skija.FilterMode
-import org.jetbrains.skija.Picture
-import org.jetbrains.skija.Matrix44
-import org.jetbrains.skija.EncodedOrigin
-import org.jetbrains.skija.EncodedImageFormat
-import org.jetbrains.skija.Color4f
-import org.jetbrains.skija.ColorChannel
-import org.jetbrains.skija.ColorFilter
-import org.jetbrains.skija.ColorMatrix
-import org.jetbrains.skija.ColorFilter._LinearToSRGBGammaHolder
-import org.jetbrains.skija.ColorFilter._SRGBToLinearGammaHolder
-import org.jetbrains.skija.InversionMode
-import org.jetbrains.skija.ColorFilter._LumaHolder
-import org.jetbrains.skija.ColorInfo
-import org.jetbrains.skija.ColorSpace._SRGBHolder
-import org.jetbrains.skija.ColorSpace._SRGBLinearHolder
-import org.jetbrains.skija.ColorSpace._DisplayP3Holder
-import org.jetbrains.skija.ContentChangeMode
-import org.jetbrains.skija.CubicResampler
-import org.jetbrains.skija.DirectContext
-import org.jetbrains.skija.GLBackendState
-import org.jetbrains.annotations.ApiStatus.NonExtendable
-import org.jetbrains.skija.FilterBlurMode
-import org.jetbrains.skija.MipmapMode
-import org.jetbrains.skija.FilterMipmap
-import org.jetbrains.skija.FilterQuality
-import org.jetbrains.skija.FontEdging
-import org.jetbrains.skija.FontHinting
-import org.jetbrains.skija.FontExtents
-import org.jetbrains.skija.FontFamilyName
-import org.jetbrains.skija.FontMgr._DefaultHolder
-import org.jetbrains.skija.FontStyleSet
-import org.jetbrains.skija.FontSlant
-import org.jetbrains.skija.FontWidth
-import org.jetbrains.skija.FontVariation
-import org.jetbrains.skija.FontVariationAxis
-import org.jetbrains.skija.GradientStyle
-import org.jetbrains.skija.MaskFilter
-import org.jetbrains.skija.OutputWStream
-import org.jetbrains.skija.PaintMode
-import org.jetbrains.skija.PaintStrokeCap
-import org.jetbrains.skija.PaintStrokeJoin
-import org.jetbrains.skija.PathEffect
-import org.jetbrains.skija.PaintFilterCanvas
-import org.jetbrains.skija.PathSegment
-import org.jetbrains.skija.PathOp
-import org.jetbrains.skija.PathFillMode
-import org.jetbrains.skija.PathVerb
-import org.jetbrains.skija.PathEllipseArc
-import org.jetbrains.skija.PathDirection
-import org.jetbrains.skija.PathSegmentIterator
-import org.jetbrains.skija.RSXform
-import org.jetbrains.skija.PathMeasure
-import org.jetbrains.skija.PictureRecorder
-import org.jetbrains.skija.PixelGeometry
-import org.jetbrains.skija.Point3
-import org.jetbrains.skija.RuntimeEffect
-import org.jetbrains.skija.ShadowUtils
-import org.jetbrains.skija.SurfaceOrigin
-import org.jetbrains.skija.SurfaceColorFormat
-import org.jetbrains.skija.TextBlobBuilder
 import org.jetbrains.skija.impl.Managed
 import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.impl.Stats
@@ -198,7 +62,7 @@ class Path @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
          */
         fun isLineDegenerate(p1: Point, p2: Point, exact: Boolean): Boolean {
             Stats.onNativeCall()
-            return _nIsLineDegenerate(p1._x, p1._y, p2._x, p2._y, exact)
+            return _nIsLineDegenerate(p1.x, p1.y, p2.x, p2.y, exact)
         }
 
         /**
@@ -218,7 +82,7 @@ class Path @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
          */
         fun isQuadDegenerate(p1: Point, p2: Point, p3: Point, exact: Boolean): Boolean {
             Stats.onNativeCall()
-            return _nIsQuadDegenerate(p1._x, p1._y, p2._x, p2._y, p3._x, p3._y, exact)
+            return _nIsQuadDegenerate(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, exact)
         }
 
         /**
@@ -239,7 +103,7 @@ class Path @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
          */
         fun isCubicDegenerate(p1: Point, p2: Point, p3: Point, p4: Point, exact: Boolean): Boolean {
             Stats.onNativeCall()
-            return _nIsCubicDegenerate(p1._x, p1._y, p2._x, p2._y, p3._x, p3._y, p4._x, p4._y, exact)
+            return _nIsCubicDegenerate(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, p4.x, p4.y, exact)
         }
 
         /**
@@ -281,7 +145,7 @@ class Path @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
          */
         fun convertConicToQuads(p0: Point, p1: Point, p2: Point, w: Float, pow2: Int): Array<Point> {
             Stats.onNativeCall()
-            return _nConvertConicToQuads(p0._x, p0._y, p1._x, p1._y, p2._x, p2._y, w, pow2)
+            return _nConvertConicToQuads(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, w, pow2)
         }
 
         /**
@@ -1043,10 +907,10 @@ class Path @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
             Stats.onNativeCall()
             _nConservativelyContainsRect(
                 _ptr,
-                rect._left,
-                rect._top,
-                rect._right,
-                rect._bottom
+                rect.left,
+                rect.top,
+                rect.right,
+                rect.bottom
             )
         } finally {
             Reference.reachabilityFence(this)
@@ -1092,7 +956,7 @@ class Path @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
      * @return   this
      */
     fun moveTo(p: Point): Path {
-        return moveTo(p._x, p._y)
+        return moveTo(p.x, p.y)
     }
 
     /**
@@ -1150,7 +1014,7 @@ class Path @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
      * @return   reference to Path
      */
     fun lineTo(p: Point): Path {
-        return lineTo(p._x, p._y)
+        return lineTo(p.x, p.y)
     }
 
     /**
@@ -1225,7 +1089,7 @@ class Path @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
      * @return    reference to Path
      */
     fun quadTo(p1: Point, p2: Point): Path {
-        return quadTo(p1._x, p1._y, p2._x, p2._y)
+        return quadTo(p1.x, p1.y, p2.x, p2.y)
     }
 
     /**
@@ -1333,7 +1197,7 @@ class Path @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
      * @return    reference to Path
      */
     fun conicTo(p1: Point, p2: Point, w: Float): Path {
-        return conicTo(p1._x, p1._y, p2._x, p2._y, w)
+        return conicTo(p1.x, p1.y, p2.x, p2.y, w)
     }
 
     /**
@@ -1415,7 +1279,7 @@ class Path @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
      * @return    reference to Path
      */
     fun cubicTo(p1: Point, p2: Point, p3: Point): Path {
-        return cubicTo(p1._x, p1._y, p2._x, p2._y, p3._x, p3._y)
+        return cubicTo(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y)
     }
 
     /**
@@ -1475,7 +1339,7 @@ class Path @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
      */
     fun arcTo(oval: Rect, startAngle: Float, sweepAngle: Float, forceMoveTo: Boolean): Path {
         Stats.onNativeCall()
-        _nArcTo(_ptr, oval._left, oval._top, oval._right, oval._bottom, startAngle, sweepAngle, forceMoveTo)
+        _nArcTo(_ptr, oval.left, oval.top, oval.right, oval.bottom, startAngle, sweepAngle, forceMoveTo)
         return this
     }
 
@@ -1546,7 +1410,7 @@ class Path @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
      * @return        reference to Path
      */
     fun tangentArcTo(p1: Point, p2: Point, radius: Float): Path {
-        return tangentArcTo(p1._x, p1._y, p2._x, p2._y, radius)
+        return tangentArcTo(p1.x, p1.y, p2.x, p2.y, radius)
     }
 
     /**
@@ -1622,7 +1486,7 @@ class Path @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
      * @return             reference to Path
      */
     fun ellipticalArcTo(r: Point, xAxisRotate: Float, arc: PathEllipseArc, direction: PathDirection, xy: Point): Path {
-        return ellipticalArcTo(r._x, r._y, xAxisRotate, arc, direction, xy._x, xy._y)
+        return ellipticalArcTo(r.x, r.y, xAxisRotate, arc, direction, xy.x, xy.y)
     }
 
     /**
@@ -1748,7 +1612,7 @@ class Path @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
     @JvmOverloads
     fun addRect(rect: Rect, dir: PathDirection = PathDirection.CLOCKWISE, start: Int = 0): Path {
         Stats.onNativeCall()
-        _nAddRect(_ptr, rect._left, rect._top, rect._right, rect._bottom, dir.ordinal, start)
+        _nAddRect(_ptr, rect.left, rect.top, rect.right, rect.bottom, dir.ordinal, start)
         return this
     }
     /**
@@ -1796,7 +1660,7 @@ class Path @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
     @JvmOverloads
     fun addOval(oval: Rect, dir: PathDirection = PathDirection.CLOCKWISE, start: Int = 1): Path {
         Stats.onNativeCall()
-        _nAddOval(_ptr, oval._left, oval._top, oval._right, oval._bottom, dir.ordinal, start)
+        _nAddOval(_ptr, oval.left, oval.top, oval.right, oval.bottom, dir.ordinal, start)
         return this
     }
     /**
@@ -1855,29 +1719,10 @@ class Path @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
      */
     fun addArc(oval: Rect, startAngle: Float, sweepAngle: Float): Path {
         Stats.onNativeCall()
-        _nAddArc(_ptr, oval._left, oval._top, oval._right, oval._bottom, startAngle, sweepAngle)
+        _nAddArc(_ptr, oval.left, oval.top, oval.right, oval.bottom, startAngle, sweepAngle)
         return this
     }
 
-    /**
-     *
-     * Adds rrect to Path, creating a new closed contour. If
-     * dir is [PathDirection.CLOCKWISE], rrect starts at top-left of the lower-left corner and
-     * winds clockwise. If dir is [PathDirection.COUNTER_CLOCKWISE], rrect starts at the bottom-left
-     * of the upper-left corner and winds counterclockwise.
-     *
-     *
-     * After appending, Path may be empty, or may contain: Rect, Oval, or RRect.
-     *
-     * @param rrect  bounds and radii of rounded rectangle
-     * @param dir    Direction to wind RRect
-     * @return       reference to Path
-     *
-     * @see [https://fiddle.skia.org/c/@Path_addRRect](https://fiddle.skia.org/c/@Path_addRRect)
-     */
-    fun addRRect(rrect: RRect, dir: PathDirection): Path {
-        return addRRect(rrect, dir, if (dir == PathDirection.CLOCKWISE) 6 else 7)
-    }
     /**
      *
      * Adds rrect to Path, creating a new closed contour. If dir is [PathDirection.CLOCKWISE], rrect
@@ -1908,7 +1753,7 @@ class Path @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
     @JvmOverloads
     fun addRRect(rrect: RRect, dir: PathDirection = PathDirection.CLOCKWISE, start: Int = 6): Path {
         Stats.onNativeCall()
-        _nAddRRect(_ptr, rrect._left, rrect._top, rrect._right, rrect._bottom, rrect._radii, dir.ordinal, start)
+        _nAddRRect(_ptr, rrect.left, rrect.top, rrect.right, rrect.bottom, rrect.radii, dir.ordinal, start)
         return this
     }
 
@@ -1931,8 +1776,8 @@ class Path @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
     fun addPoly(pts: Array<Point>, close: Boolean): Path {
         val flat = FloatArray(pts.size * 2)
         for (i in pts.indices) {
-            flat[i * 2] = pts[i]._x
-            flat[i * 2 + 1] = pts[i]._y
+            flat[i * 2] = pts[i].x
+            flat[i * 2 + 1] = pts[i].y
         }
         return addPoly(flat, close)
     }
@@ -2232,7 +2077,7 @@ class Path @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
      * @return   this
      */
     fun setLastPt(p: Point): Path {
-        return setLastPt(p._x, p._y)
+        return setLastPt(p.x, p.y)
     }
 
     /**
@@ -2301,7 +2146,7 @@ class Path @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
      * @see [https://fiddle.skia.org/c/@Path_contains](https://fiddle.skia.org/c/@Path_contains)
      */
     operator fun contains(p: Point): Boolean {
-        return contains(p._x, p._y)
+        return contains(p.x, p.y)
     }
 
     /**

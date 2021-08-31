@@ -8,7 +8,7 @@ class Shadow(val color: Int, val offsetX: Float, val offsetY: Float, val blurSig
     constructor(color: Int, offset: Point, blurSigma: Double) : this(color, offset.x, offset.y, blurSigma) {}
 
     val offset: Point
-        get() = org.jetbrains.skija.Point(offsetX, offsetY)
+        get() = Point(offsetX, offsetY)
 
     override fun equals(o: Any?): Boolean {
         if (o === this) return true
