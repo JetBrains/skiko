@@ -1,7 +1,5 @@
 package org.jetbrains.skija
 
-import org.jetbrains.annotations.ApiStatus
-
 enum class FilterTileMode {
     /** Replicate the edge color if the shader draws outside of its original bounds.  */
     CLAMP,
@@ -16,7 +14,6 @@ enum class FilterTileMode {
     DECAL;
 
     companion object {
-        @ApiStatus.Internal
-        val _values = values()
+        internal val _values = values()
     }
 }

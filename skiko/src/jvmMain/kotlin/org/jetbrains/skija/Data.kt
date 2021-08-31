@@ -1,7 +1,6 @@
 package org.jetbrains.skija
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
-import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.skija.impl.Managed
 import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.impl.Stats
@@ -11,7 +10,7 @@ import java.nio.ByteBuffer
 /**
  * Data holds an immutable data buffer.
  */
-class Data @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
+class Data internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
         @JvmOverloads
         fun makeFromBytes(bytes: ByteArray, offset: Long = 0, length: Long = bytes.size.toLong()): Data {
@@ -75,7 +74,6 @@ class Data @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
      * Returns true if these two objects have the same length and contents,
      * effectively returning 0 == memcmp(...)
      */
-    @ApiStatus.Internal
     override fun _nativeEquals(other: Native?): Boolean {
         return try {
             Stats.onNativeCall()
@@ -117,8 +115,7 @@ class Data @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
         }
     }
 
-    @ApiStatus.Internal
-    object _FinalizerHolder {
+    internal object _FinalizerHolder {
         val PTR = _nGetFinalizer()
     }
 }

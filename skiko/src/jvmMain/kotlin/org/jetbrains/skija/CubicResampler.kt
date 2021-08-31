@@ -1,7 +1,5 @@
 package org.jetbrains.skija
 
-import org.jetbrains.annotations.ApiStatus
-
 /**
  *
  * Specify B and C (each between 0...1) to create a shader that applies the corresponding
@@ -25,7 +23,6 @@ import org.jetbrains.annotations.ApiStatus
  */
 class CubicResampler(internal val b: Float, internal val c: Float) : SamplingMode {
 
-    @ApiStatus.Internal
     override fun _pack(): Long {
         return ((java.lang.Float.floatToIntBits(b).toULong() shl 32) or
                 java.lang.Float.floatToIntBits(c).toULong()).toLong()

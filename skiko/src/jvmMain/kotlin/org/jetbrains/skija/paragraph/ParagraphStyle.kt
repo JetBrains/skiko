@@ -1,7 +1,6 @@
 package org.jetbrains.skija.paragraph
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
-import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.skija.impl.Managed
 import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.impl.Stats
@@ -37,7 +36,6 @@ class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
         }
     }
 
-    @ApiStatus.Internal
     override fun _nativeEquals(other: Native?): Boolean {
         return try {
             Stats.onNativeCall()
@@ -189,8 +187,7 @@ class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
         return this
     }
 
-    @ApiStatus.Internal
-    object _FinalizerHolder {
+    internal object _FinalizerHolder {
         val PTR = _nGetFinalizer()
     }
 

@@ -1,12 +1,11 @@
 package org.jetbrains.skija
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
-import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.skija.impl.RefCnt
 import org.jetbrains.skija.impl.Stats
 import java.lang.ref.Reference
 
-class DirectContext @ApiStatus.Internal constructor(ptr: Long) : RefCnt(ptr) {
+class DirectContext internal constructor(ptr: Long) : RefCnt(ptr) {
     companion object {
         fun makeGL(): DirectContext {
             Stats.onNativeCall()

@@ -1,7 +1,5 @@
 package org.jetbrains.skija.paragraph
 
-import org.jetbrains.annotations.ApiStatus
-
 class DecorationStyle(
     val _underline: Boolean,
     val _overline: Boolean,
@@ -14,8 +12,7 @@ class DecorationStyle(
     val _lineStyle: DecorationLineStyle
     val thicknessMultiplier: Float
 
-    @ApiStatus.Internal
-    constructor(
+    internal constructor(
         underline: Boolean,
         overline: Boolean,
         lineThrough: Boolean,

@@ -1,8 +1,6 @@
 package org.jetbrains.skija.svg
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
-import org.jetbrains.annotations.ApiStatus
-import org.jetbrains.annotations.Contract
 import org.jetbrains.skija.*
 import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.impl.Stats
@@ -38,7 +36,6 @@ object SVGCanvas {
      * @param prettyXML           add newlines and tabs in output
      * @return                    new Canvas
      */
-    @Contract("_, _, _, _ -> new")
     fun make(bounds: Rect, out: WStream, convertTextToPaths: Boolean, prettyXML: Boolean): Canvas {
         Stats.onNativeCall()
         val ptr = _nMake(
@@ -49,11 +46,10 @@ object SVGCanvas {
             Native.getPtr(out),
             0 or (if (convertTextToPaths) 1 else 0) or if (prettyXML) 0 else 2
         )
-        return org.jetbrains.skija.Canvas(ptr, true, out)
+        return Canvas(ptr, true, out)
     }
 
-    @ApiStatus.Internal
-    external fun _nMake(left: Float, top: Float, right: Float, bottom: Float, wstreamPtr: Long, flags: Int): Long
+    @JvmStatic external fun _nMake(left: Float, top: Float, right: Float, bottom: Float, wstreamPtr: Long, flags: Int): Long
 
     init {
         staticLoad()

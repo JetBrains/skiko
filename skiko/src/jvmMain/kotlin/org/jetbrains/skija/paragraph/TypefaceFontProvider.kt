@@ -9,8 +9,8 @@ import java.lang.ref.Reference
 
 class TypefaceFontProvider : FontMgr(_nMake()) {
     companion object {
-        external fun _nMake(): Long
-        external fun _nRegisterTypeface(ptr: Long, typefacePtr: Long, alias: String?): Long
+        @JvmStatic external fun _nMake(): Long
+        @JvmStatic external fun _nRegisterTypeface(ptr: Long, typefacePtr: Long, alias: String?): Long
 
         init {
             staticLoad()

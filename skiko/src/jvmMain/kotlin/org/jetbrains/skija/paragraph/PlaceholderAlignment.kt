@@ -1,7 +1,5 @@
 package org.jetbrains.skija.paragraph
 
-import org.jetbrains.annotations.ApiStatus
-
 /**
  * Where to vertically align the placeholder relative to the surrounding text.
  */
@@ -45,7 +43,6 @@ enum class PlaceholderAlignment {
     MIDDLE;
 
     companion object {
-        @ApiStatus.Internal
-        val _values = values()
+        internal val _values = values()
     }
 }

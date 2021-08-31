@@ -1,7 +1,5 @@
 package org.jetbrains.skija
 
-import org.jetbrains.annotations.ApiStatus
-
 enum class BlendMode {
     /** Replaces destination with zero: fully transparent.  */
     CLEAR,
@@ -91,7 +89,6 @@ enum class BlendMode {
     LUMINOSITY;
 
     companion object {
-        @ApiStatus.Internal
-        val _values = values()
+        internal val _values = values()
     }
 }

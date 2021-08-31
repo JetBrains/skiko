@@ -1,8 +1,6 @@
 package org.jetbrains.skija
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
-import org.jetbrains.annotations.ApiStatus
-import org.jetbrains.annotations.Contract
 import org.jetbrains.skija.impl.Managed
 import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.impl.Stats
@@ -11,7 +9,7 @@ import java.lang.RuntimeException
 import java.lang.UnsupportedOperationException
 import java.lang.ref.Reference
 
-class Codec @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR), IHasImageInfo {
+class Codec internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR), IHasImageInfo {
     companion object {
         /**
          * If this data represents an encoded image that we know how to decode,
@@ -29,8 +27,7 @@ class Codec @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _Finalizer
             }
         }
 
-        @ApiStatus.Internal
-        fun _validateResult(result: Int) {
+        internal fun _validateResult(result: Int) {
             when (result) {
                 1 -> throw IllegalArgumentException("Incomplete input: A partial image was generated.")
                 2 -> throw IllegalArgumentException("Error in input")
@@ -44,36 +41,24 @@ class Codec @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _Finalizer
             }
         }
 
-        @ApiStatus.Internal
-        external fun _nGetFinalizer(): Long
-        @ApiStatus.Internal
-        external fun _nMakeFromData(dataPtr: Long): Long
-        @ApiStatus.Internal
-        external fun _nGetImageInfo(ptr: Long): ImageInfo?
-        @ApiStatus.Internal
-        external fun _nGetSize(ptr: Long): Long
-        @ApiStatus.Internal
-        external fun _nGetEncodedOrigin(ptr: Long): Int
-        @ApiStatus.Internal
-        external fun _nGetEncodedImageFormat(ptr: Long): Int
-        @ApiStatus.Internal
-        external fun _nReadPixels(ptr: Long, bitmapPtr: Long, frame: Int, priorFrame: Int): Int
-        @ApiStatus.Internal
-        external fun _nGetFrameCount(ptr: Long): Int
-        @ApiStatus.Internal
-        external fun _nGetFrameInfo(ptr: Long, frame: Int): AnimationFrameInfo
-        @ApiStatus.Internal
-        external fun _nGetFramesInfo(ptr: Long): Array<AnimationFrameInfo>
-        @ApiStatus.Internal
-        external fun _nGetRepetitionCount(ptr: Long): Int
+        @JvmStatic external fun _nGetFinalizer(): Long
+        @JvmStatic external fun _nMakeFromData(dataPtr: Long): Long
+        @JvmStatic external fun _nGetImageInfo(ptr: Long): ImageInfo?
+        @JvmStatic external fun _nGetSize(ptr: Long): Long
+        @JvmStatic external fun _nGetEncodedOrigin(ptr: Long): Int
+        @JvmStatic external fun _nGetEncodedImageFormat(ptr: Long): Int
+        @JvmStatic external fun _nReadPixels(ptr: Long, bitmapPtr: Long, frame: Int, priorFrame: Int): Int
+        @JvmStatic external fun _nGetFrameCount(ptr: Long): Int
+        @JvmStatic external fun _nGetFrameInfo(ptr: Long, frame: Int): AnimationFrameInfo
+        @JvmStatic external fun _nGetFramesInfo(ptr: Long): Array<AnimationFrameInfo>
+        @JvmStatic external fun _nGetRepetitionCount(ptr: Long): Int
 
         init {
             staticLoad()
         }
     }
 
-    @ApiStatus.Internal
-    var _imageInfo: ImageInfo? = null
+    internal var _imageInfo: ImageInfo? = null
     override val imageInfo: ImageInfo
         get() = try {
             if (_imageInfo == null) {
@@ -85,7 +70,6 @@ class Codec @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _Finalizer
             Reference.reachabilityFence(this)
         }
 
-    @get:Contract("-> new")
     val size: IPoint
         get() = try {
             Stats.onNativeCall()
@@ -114,7 +98,6 @@ class Codec @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _Finalizer
      *
      * @return  decoded bitmap
      */
-    @Contract("_ -> new")
     fun readPixels(): Bitmap {
         val bitmap = org.jetbrains.skija.Bitmap()
         bitmap.allocPixels(imageInfo)
@@ -161,7 +144,6 @@ class Codec @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _Finalizer
      * @param bitmap      the description of the format (config, size) expected by the caller
      * @return            this
      */
-    @Contract("_ -> this")
     fun readPixels(bitmap: Bitmap?): Codec {
         return try {
             Stats.onNativeCall()
@@ -219,7 +201,6 @@ class Codec @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _Finalizer
      * @param frame       index of the frame in multi-frame image to decode
      * @return            this
      */
-    @Contract("_ -> this")
     fun readPixels(bitmap: Bitmap?, frame: Int): Codec {
         return try {
             Stats.onNativeCall()
@@ -278,7 +259,6 @@ class Codec @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _Finalizer
      * @param priorFrame  index of the frame already in bitmap, might be used to optimize retrieving current frame
      * @return            this
      */
-    @Contract("_ -> this")
     fun readPixels(bitmap: Bitmap?, frame: Int, priorFrame: Int): Codec {
         return try {
             Stats.onNativeCall()
@@ -378,8 +358,7 @@ class Codec @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _Finalizer
             Reference.reachabilityFence(this)
         }
 
-    @ApiStatus.Internal
-    object _FinalizerHolder {
+    internal object _FinalizerHolder {
         val PTR = _nGetFinalizer()
     }
 }

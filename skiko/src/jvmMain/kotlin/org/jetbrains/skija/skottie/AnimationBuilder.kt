@@ -1,45 +1,34 @@
 package org.jetbrains.skija.skottie
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
-import org.jetbrains.annotations.ApiStatus
-import org.jetbrains.annotations.Contract
 import org.jetbrains.skija.*
 import org.jetbrains.skija.impl.Managed
 import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.impl.Stats
 import java.lang.ref.Reference
 
-class AnimationBuilder @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
+class AnimationBuilder internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
-        @ApiStatus.Internal
-        fun _flagsToInt(vararg builderFlags: AnimationBuilderFlag): Int {
+        internal fun _flagsToInt(vararg builderFlags: AnimationBuilderFlag): Int {
             var flags = 0
             for (flag in builderFlags) flags = flags or flag._flag
             return flags
         }
 
-        @ApiStatus.Internal
-        external fun _nGetFinalizer(): Long
-        @ApiStatus.Internal
-        external fun _nMake(flags: Int): Long
-        @ApiStatus.Internal
-        external fun _nSetFontManager(ptr: Long, fontMgrPtr: Long)
-        @ApiStatus.Internal
-        external fun _nSetLogger(ptr: Long, loggerPtr: Long)
-        @ApiStatus.Internal
-        external fun _nBuildFromString(ptr: Long, data: String?): Long
-        @ApiStatus.Internal
-        external fun _nBuildFromFile(ptr: Long, path: String?): Long
-        @ApiStatus.Internal
-        external fun _nBuildFromData(ptr: Long, dataPtr: Long): Long
+        @JvmStatic external fun _nGetFinalizer(): Long
+        @JvmStatic external fun _nMake(flags: Int): Long
+        @JvmStatic external fun _nSetFontManager(ptr: Long, fontMgrPtr: Long)
+        @JvmStatic external fun _nSetLogger(ptr: Long, loggerPtr: Long)
+        @JvmStatic external fun _nBuildFromString(ptr: Long, data: String?): Long
+        @JvmStatic external fun _nBuildFromFile(ptr: Long, path: String?): Long
+        @JvmStatic external fun _nBuildFromData(ptr: Long, dataPtr: Long): Long
 
         init {
             staticLoad()
         }
     }
 
-    @ApiStatus.Internal
-    object _FinalizerHolder {
+    internal object _FinalizerHolder {
         val PTR = _nGetFinalizer()
     }
 
@@ -52,7 +41,6 @@ class AnimationBuilder @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr,
      *
      * Specify a font manager for loading animation fonts.
      */
-    @Contract("_ -> this")
     fun setFontManager(fontMgr: FontMgr?): AnimationBuilder {
         return try {
             Stats.onNativeCall()
@@ -67,7 +55,6 @@ class AnimationBuilder @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr,
      *
      * Register a [Logger] with this builder.
      */
-    @Contract("_ -> this")
     fun setLogger(logger: Logger?): AnimationBuilder {
         return try {
             Stats.onNativeCall()
@@ -78,7 +65,6 @@ class AnimationBuilder @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr,
         }
     }
 
-    @Contract("!null -> new; null -> fail")
     fun buildFromString(data: String): Animation {
         return try {
             assert(data != null) { "Can’t buildFromString with data == null" }
@@ -91,7 +77,6 @@ class AnimationBuilder @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr,
         }
     }
 
-    @Contract("!null -> new; null -> fail")
     fun buildFromFile(path: String): Animation {
         return try {
             assert(path != null) { "Can’t buildFromFile with path == null" }
@@ -104,7 +89,6 @@ class AnimationBuilder @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr,
         }
     }
 
-    @Contract("!null -> new; null -> fail")
     fun buildFromData(data: Data): Animation {
         return try {
             assert(data != null) { "Can’t buildFromData with data == null" }

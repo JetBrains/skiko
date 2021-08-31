@@ -1,7 +1,5 @@
 package org.jetbrains.skija
 
-import org.jetbrains.annotations.ApiStatus
-
 /**
  *
  * This specifies how the next frame is based on this frame.
@@ -40,7 +38,6 @@ enum class AnimationDisposalMode {
     RESTORE_PREVIOUS;
 
     companion object {
-        @ApiStatus.Internal
-        val _values = values()
+        internal val _values = values()
     }
 }

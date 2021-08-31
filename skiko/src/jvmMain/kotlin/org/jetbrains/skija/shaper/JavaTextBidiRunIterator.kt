@@ -7,14 +7,11 @@ class JavaTextBidiRunIterator @JvmOverloads constructor(
     text: String?,
     flags: Int = Bidi.DIRECTION_DEFAULT_LEFT_TO_RIGHT
 ) : MutableIterator<BidiRun?> {
-    @ApiStatus.Internal
-    val _bidi: Bidi
+    internal val _bidi: Bidi
 
-    @ApiStatus.Internal
-    val _runsCount: Int
+    internal val _runsCount: Int
 
-    @ApiStatus.Internal
-    var _run: Int
+    internal var _run: Int
     override fun next(): BidiRun {
         _run++
         return BidiRun(_bidi.getRunLimit(_run), _bidi.getRunLevel(_run))

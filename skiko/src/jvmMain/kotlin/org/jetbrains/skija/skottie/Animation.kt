@@ -10,9 +10,8 @@ import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.impl.Stats
 import java.lang.ref.Reference
 
-class Animation @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
+class Animation internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
-        @Contract("!null -> new; null -> fail")
         fun makeFromString(data: String): Animation {
             assert(data != null) { "Can’t Animation::makeFromString with data == null" }
             Stats.onNativeCall()
@@ -21,7 +20,6 @@ class Animation @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _Final
             return Animation(ptr)
         }
 
-        @Contract("!null -> new; null -> fail")
         fun makeFromFile(path: String): Animation {
             assert(path != null) { "Can’t Animation::makeFromFile with path == null" }
             Stats.onNativeCall()
@@ -30,7 +28,6 @@ class Animation @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _Final
             return Animation(ptr)
         }
 
-        @Contract("!null -> new; null -> fail")
         fun makeFromData(data: Data): Animation {
             assert(data != null) { "Can’t Animation::makeFromData with data == null" }
             Stats.onNativeCall()
@@ -39,16 +36,11 @@ class Animation @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _Final
             return Animation(ptr)
         }
 
-        @ApiStatus.Internal
-        external fun _nGetFinalizer(): Long
-        @ApiStatus.Internal
-        external fun _nMakeFromString(data: String?): Long
-        @ApiStatus.Internal
-        external fun _nMakeFromFile(path: String?): Long
-        @ApiStatus.Internal
-        external fun _nMakeFromData(dataPtr: Long): Long
-        @ApiStatus.Internal
-        external fun _nRender(
+        @JvmStatic external fun _nGetFinalizer(): Long
+        @JvmStatic external fun _nMakeFromString(data: String?): Long
+        @JvmStatic external fun _nMakeFromFile(path: String?): Long
+        @JvmStatic external fun _nMakeFromData(dataPtr: Long): Long
+        @JvmStatic external fun _nRender(
             ptr: Long,
             canvasPtr: Long,
             left: Float,
@@ -58,32 +50,22 @@ class Animation @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _Final
             flags: Int
         )
 
-        @ApiStatus.Internal
-        external fun _nSeek(ptr: Long, t: Float, icPtr: Long)
-        @ApiStatus.Internal
-        external fun _nSeekFrame(ptr: Long, t: Float, icPtr: Long)
-        @ApiStatus.Internal
-        external fun _nSeekFrameTime(ptr: Long, t: Float, icPtr: Long)
-        @ApiStatus.Internal
-        external fun _nGetDuration(ptr: Long): Float
-        @ApiStatus.Internal
-        external fun _nGetFPS(ptr: Long): Float
-        @ApiStatus.Internal
-        external fun _nGetInPoint(ptr: Long): Float
-        @ApiStatus.Internal
-        external fun _nGetOutPoint(ptr: Long): Float
-        @ApiStatus.Internal
-        external fun _nGetVersion(ptr: Long): String
-        @ApiStatus.Internal
-        external fun _nGetSize(ptr: Long): Point?
+        @JvmStatic external fun _nSeek(ptr: Long, t: Float, icPtr: Long)
+        @JvmStatic external fun _nSeekFrame(ptr: Long, t: Float, icPtr: Long)
+        @JvmStatic external fun _nSeekFrameTime(ptr: Long, t: Float, icPtr: Long)
+        @JvmStatic external fun _nGetDuration(ptr: Long): Float
+        @JvmStatic external fun _nGetFPS(ptr: Long): Float
+        @JvmStatic external fun _nGetInPoint(ptr: Long): Float
+        @JvmStatic external fun _nGetOutPoint(ptr: Long): Float
+        @JvmStatic external fun _nGetVersion(ptr: Long): String
+        @JvmStatic external fun _nGetSize(ptr: Long): Point?
 
         init {
             staticLoad()
         }
     }
 
-    @ApiStatus.Internal
-    object _FinalizerHolder {
+    internal object _FinalizerHolder {
         val PTR = _nGetFinalizer()
     }
 
@@ -98,7 +80,6 @@ class Animation @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _Final
      * @param canvas  destination canvas
      * @return        this
      */
-    @Contract("!null -> this; null -> fail")
     fun render(canvas: Canvas): Animation {
         return render(canvas, Rect.Companion.makeXYWH(0f, 0f, width, height))
     }
@@ -115,7 +96,6 @@ class Animation @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _Final
      * @param offset  destination offset
      * @return        this
      */
-    @Contract("_, _, _ -> this")
     fun render(canvas: Canvas, offset: Point): Animation {
         assert(offset != null) { "Can’t Animation::render with offset == null" }
         return render(canvas, offset.x, offset.y)
@@ -134,7 +114,6 @@ class Animation @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _Final
      * @param top     destination offset top
      * @return        this
      */
-    @Contract("_, _, _ -> this")
     fun render(canvas: Canvas, left: Float, top: Float): Animation {
         return render(canvas, Rect.Companion.makeXYWH(left, top, width, height))
     }
@@ -152,7 +131,6 @@ class Animation @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _Final
      * @param renderFlags  render flags
      * @return             this
      */
-    @Contract("_, _, _ -> this")
     fun render(canvas: Canvas, dst: Rect, vararg renderFlags: RenderFlag): Animation {
         return try {
             assert(canvas != null) { "Can’t Animation::render with canvas == null" }
@@ -187,7 +165,6 @@ class Animation @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _Final
      * @param ic  invalidation controller (dirty region tracking)
      * @return    this
      */
-    @Contract("_, _ -> this")
     fun seek(t: Float, ic: InvalidationController?): Animation {
         return try {
             Stats.onNativeCall()
@@ -210,7 +187,6 @@ class Animation @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _Final
      * @param t   frame index
      * @return    this
      */
-    @Contract("_ -> this")
     fun seekFrame(t: Float): Animation {
         return seekFrame(t, null)
     }
@@ -247,7 +223,6 @@ class Animation @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _Final
      * @param t   frame time
      * @return    this
      */
-    @Contract("_ -> this")
     fun seekFrameTime(t: Float): Animation {
         return seekFrameTime(t, null)
     }
@@ -261,7 +236,6 @@ class Animation @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _Final
      * @param ic  invalidation controller (dirty region tracking)
      * @return    this
      */
-    @Contract("_, _ -> this")
     fun seekFrameTime(t: Float, ic: InvalidationController?): Animation {
         return try {
             Stats.onNativeCall()
@@ -323,8 +297,7 @@ class Animation @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _Final
             Reference.reachabilityFence(this)
         }
 
-    @ApiStatus.Internal
-    var _size: Point? = null
+    private var _size: Point? = null
     val size: Point
         get() {
             if (_size == null) {

@@ -1,7 +1,6 @@
 package org.jetbrains.skija
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
-import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.skija.impl.Managed
 import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.impl.Stats
@@ -67,11 +66,9 @@ class ColorSpace : Managed {
         }
     }
 
-    @ApiStatus.Internal
-    constructor(ptr: Long) : super(ptr, _FinalizerHolder.PTR, true)
+    internal constructor(ptr: Long) : super(ptr, _FinalizerHolder.PTR, true)
 
-    @ApiStatus.Internal
-    constructor(ptr: Long, managed: Boolean) : super(ptr, _FinalizerHolder.PTR, managed)
+    internal constructor(ptr: Long, managed: Boolean) : super(ptr, _FinalizerHolder.PTR, managed)
 
     /**
      * @return  true if the color space gamma is near enough to be approximated as sRGB
@@ -117,8 +114,7 @@ class ColorSpace : Managed {
             Reference.reachabilityFence(this)
         }
 
-    @ApiStatus.Internal
-    object _FinalizerHolder {
+    internal object _FinalizerHolder {
         val PTR = _nGetFinalizer()
     }
 }

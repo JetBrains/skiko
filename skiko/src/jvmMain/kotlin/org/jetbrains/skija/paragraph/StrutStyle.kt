@@ -8,7 +8,7 @@ import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.impl.Stats
 import java.lang.ref.Reference
 
-class StrutStyle @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
+class StrutStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
         @JvmStatic external fun _nGetFinalizer(): Long
         @JvmStatic external fun _nMake(): Long
@@ -39,7 +39,6 @@ class StrutStyle @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _Fina
         Stats.onNativeCall()
     }
 
-    @ApiStatus.Internal
     override fun _nativeEquals(other: Native?): Boolean {
         return try {
             Stats.onNativeCall()
@@ -162,8 +161,7 @@ class StrutStyle @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _Fina
         return this
     }
 
-    @ApiStatus.Internal
-    object _FinalizerHolder {
+    internal object _FinalizerHolder {
         val PTR = _nGetFinalizer()
     }
 }

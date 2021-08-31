@@ -84,11 +84,6 @@ val skiaDir = run {
     }
 }
 
-val jetbrainsAnnotations by configurations.creating
-dependencies {
-    jetbrainsAnnotations("org.jetbrains:annotations:19.0.0")
-}
-
 val skiaBinSubdir = "out/${buildType.id}-${targetOs.id}-${targetArch.id}"
 
 val Project.supportNative: Boolean
@@ -139,7 +134,6 @@ kotlin {
             dependencies {
                 implementation(kotlin("stdlib-jdk8"))
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:$coroutinesVersion")
-                compileOnly(jetbrainsAnnotations)
             }
 
         }

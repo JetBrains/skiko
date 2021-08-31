@@ -1,6 +1,5 @@
 package org.jetbrains.skija
 
-import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.skija.impl.Stats
 import java.lang.IllegalArgumentException
 import java.lang.RuntimeException
@@ -327,14 +326,12 @@ enum class ColorType {
     }
 
     companion object {
-        @ApiStatus.Internal
-        val _values = values()
+        internal val _values = values()
 
         /**
          * Native ARGB 32-bit encoding
          */
         var N32 = BGRA_8888
-        @ApiStatus.Internal
-        external fun _nIsAlwaysOpaque(value: Int): Boolean
+        @JvmStatic external fun _nIsAlwaysOpaque(value: Int): Boolean
     }
 }

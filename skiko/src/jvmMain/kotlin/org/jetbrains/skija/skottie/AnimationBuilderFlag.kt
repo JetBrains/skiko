@@ -1,6 +1,5 @@
 package org.jetbrains.skija.skottie
 
-import org.jetbrains.annotations.ApiStatus
 
 enum class AnimationBuilderFlag(internal val _flag: Int) {
     /**
@@ -17,7 +16,6 @@ enum class AnimationBuilderFlag(internal val _flag: Int) {
     PREFER_EMBEDDED_FONTS(0x02);
 
     companion object {
-        @ApiStatus.Internal
-        val _values = values()
+        internal val _values = values()
     }
 }

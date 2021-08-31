@@ -11,10 +11,8 @@ class IcuBidiRunIterator(text: ManagedString?, manageText: Boolean, bidiLevel: I
     _nMake(Native.Companion.getPtr(text), bidiLevel), text, manageText
 ) {
     companion object {
-        @ApiStatus.Internal
-        external fun _nMake(textPtr: Long, bidiLevel: Int): Long
-        @ApiStatus.Internal
-        external fun _nGetCurrentLevel(ptr: Long): Int
+        @JvmStatic external fun _nMake(textPtr: Long, bidiLevel: Int): Long
+        @JvmStatic external fun _nGetCurrentLevel(ptr: Long): Int
 
         init {
             staticLoad()

@@ -1,7 +1,5 @@
 package org.jetbrains.skija.skottie
 
-import org.jetbrains.annotations.ApiStatus
-
 enum class RenderFlag(internal val _flag: Int) {
     /**
      * When rendering into a known transparent buffer, clients can pass
@@ -18,7 +16,6 @@ enum class RenderFlag(internal val _flag: Int) {
     DISABLE_TOP_LEVEL_CLIPPING(0x02);
 
     companion object {
-        @ApiStatus.Internal
-        val _values = values()
+        internal val _values = values()
     }
 }

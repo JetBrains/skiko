@@ -8,7 +8,7 @@ import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.impl.Stats
 import java.lang.ref.Reference
 
-class TextStyle @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
+class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
         @JvmStatic external fun _nGetFinalizer(): Long
         @JvmStatic external fun _nMake(): Long
@@ -387,8 +387,7 @@ class TextStyle @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _Final
         return this
     }
 
-    @ApiStatus.Internal
-    object _FinalizerHolder {
+    internal object _FinalizerHolder {
         val PTR = _nGetFinalizer()
     }
 }

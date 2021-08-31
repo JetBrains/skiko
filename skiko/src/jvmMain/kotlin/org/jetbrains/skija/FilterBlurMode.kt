@@ -1,7 +1,5 @@
 package org.jetbrains.skija
 
-import org.jetbrains.annotations.ApiStatus
-
 enum class FilterBlurMode {
     /** fuzzy inside and outside  */
     NORMAL,
@@ -16,7 +14,6 @@ enum class FilterBlurMode {
     INNER;
 
     companion object {
-        @ApiStatus.Internal
-        val _values = values()
+        internal val _values = values()
     }
 }

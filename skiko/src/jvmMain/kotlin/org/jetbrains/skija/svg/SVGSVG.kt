@@ -1,75 +1,60 @@
 package org.jetbrains.skija.svg
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
-import org.jetbrains.annotations.ApiStatus
-import org.jetbrains.annotations.Contract
 import org.jetbrains.skija.*
 import org.jetbrains.skija.impl.Stats
 import java.lang.ref.Reference
 
-class SVGSVG @ApiStatus.Internal constructor(ptr: Long) : SVGContainer(ptr) {
+class SVGSVG internal constructor(ptr: Long) : SVGContainer(ptr) {
     companion object {
-        @ApiStatus.Internal
-        external fun _nGetX(ptr: Long): SVGLength
-        @ApiStatus.Internal
-        external fun _nGetY(ptr: Long): SVGLength
-        @ApiStatus.Internal
-        external fun _nGetWidth(ptr: Long): SVGLength
-        @ApiStatus.Internal
-        external fun _nGetHeight(ptr: Long): SVGLength
-        @ApiStatus.Internal
-        external fun _nGetPreserveAspectRatio(ptr: Long): SVGPreserveAspectRatio
-        @ApiStatus.Internal
-        external fun _nGetViewBox(ptr: Long): Rect?
-        @ApiStatus.Internal
-        external fun _nGetIntrinsicSize(ptr: Long, width: Float, height: Float, dpi: Float): Point
-        @ApiStatus.Internal
-        external fun _nSetX(ptr: Long, value: Float, unit: Int)
-        @ApiStatus.Internal
-        external fun _nSetY(ptr: Long, value: Float, unit: Int)
-        @ApiStatus.Internal
-        external fun _nSetWidth(ptr: Long, value: Float, unit: Int)
-        @ApiStatus.Internal
-        external fun _nSetHeight(ptr: Long, value: Float, unit: Int)
-        @ApiStatus.Internal
-        external fun _nSetPreserveAspectRatio(ptr: Long, align: Int, scale: Int)
-        @ApiStatus.Internal
-        external fun _nSetViewBox(ptr: Long, l: Float, t: Float, r: Float, b: Float)
+        @JvmStatic external fun _nGetX(ptr: Long): SVGLength
+        @JvmStatic external fun _nGetY(ptr: Long): SVGLength
+        @JvmStatic external fun _nGetWidth(ptr: Long): SVGLength
+        @JvmStatic external fun _nGetHeight(ptr: Long): SVGLength
+        @JvmStatic external fun _nGetPreserveAspectRatio(ptr: Long): SVGPreserveAspectRatio
+        @JvmStatic external fun _nGetViewBox(ptr: Long): Rect?
+        @JvmStatic external fun _nGetIntrinsicSize(ptr: Long, width: Float, height: Float, dpi: Float): Point
+        @JvmStatic external fun _nSetX(ptr: Long, value: Float, unit: Int)
+        @JvmStatic external fun _nSetY(ptr: Long, value: Float, unit: Int)
+        @JvmStatic external fun _nSetWidth(ptr: Long, value: Float, unit: Int)
+        @JvmStatic external fun _nSetHeight(ptr: Long, value: Float, unit: Int)
+        @JvmStatic external fun _nSetPreserveAspectRatio(ptr: Long, align: Int, scale: Int)
+        @JvmStatic external fun _nSetViewBox(ptr: Long, l: Float, t: Float, r: Float, b: Float)
 
         init {
             staticLoad()
         }
     }
 
-    val x: org.jetbrains.skija.svg.SVGLength
+    val x: SVGLength
         get() = try {
             Stats.onNativeCall()
             _nGetX(_ptr)
         } finally {
             Reference.reachabilityFence(this)
         }
-    val y: org.jetbrains.skija.svg.SVGLength
+    val y: SVGLength
         get() = try {
             Stats.onNativeCall()
             _nGetY(_ptr)
         } finally {
             Reference.reachabilityFence(this)
         }
-    val width: org.jetbrains.skija.svg.SVGLength
+    val width: SVGLength
         get() = try {
             Stats.onNativeCall()
             _nGetWidth(_ptr)
         } finally {
             Reference.reachabilityFence(this)
         }
-    val height: org.jetbrains.skija.svg.SVGLength
+    val height: SVGLength
         get() = try {
             Stats.onNativeCall()
             _nGetHeight(_ptr)
         } finally {
             Reference.reachabilityFence(this)
         }
-    val preserveAspectRatio: org.jetbrains.skija.svg.SVGPreserveAspectRatio
+    val preserveAspectRatio: SVGPreserveAspectRatio
         get() = try {
             Stats.onNativeCall()
             _nGetPreserveAspectRatio(_ptr)
@@ -93,7 +78,6 @@ class SVGSVG @ApiStatus.Internal constructor(ptr: Long) : SVGContainer(ptr) {
         }
     }
 
-    @Contract("_ -> this")
     fun setX(length: SVGLength): SVGSVG {
         return try {
             Stats.onNativeCall()
@@ -104,7 +88,6 @@ class SVGSVG @ApiStatus.Internal constructor(ptr: Long) : SVGContainer(ptr) {
         }
     }
 
-    @Contract("_ -> this")
     fun setY(length: SVGLength): SVGSVG {
         return try {
             Stats.onNativeCall()
@@ -115,7 +98,6 @@ class SVGSVG @ApiStatus.Internal constructor(ptr: Long) : SVGContainer(ptr) {
         }
     }
 
-    @Contract("_ -> this")
     fun setWidth(length: SVGLength): SVGSVG {
         return try {
             Stats.onNativeCall()
@@ -126,7 +108,6 @@ class SVGSVG @ApiStatus.Internal constructor(ptr: Long) : SVGContainer(ptr) {
         }
     }
 
-    @Contract("_ -> this")
     fun setHeight(length: SVGLength): SVGSVG {
         return try {
             Stats.onNativeCall()
@@ -137,7 +118,6 @@ class SVGSVG @ApiStatus.Internal constructor(ptr: Long) : SVGContainer(ptr) {
         }
     }
 
-    @Contract("_ -> this")
     fun setPreserveAspectRatio(ratio: SVGPreserveAspectRatio): SVGSVG {
         return try {
             Stats.onNativeCall()
@@ -148,7 +128,6 @@ class SVGSVG @ApiStatus.Internal constructor(ptr: Long) : SVGContainer(ptr) {
         }
     }
 
-    @Contract("_ -> this")
     fun setViewBox(viewBox: Rect): SVGSVG {
         return try {
             Stats.onNativeCall()

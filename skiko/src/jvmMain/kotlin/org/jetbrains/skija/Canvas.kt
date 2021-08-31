@@ -1,7 +1,6 @@
 package org.jetbrains.skija
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
-import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.annotations.Contract
 import org.jetbrains.skija.ImageFilter.Companion.makeDropShadowOnly
 import org.jetbrains.skija.impl.Managed
@@ -9,7 +8,7 @@ import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.impl.Stats
 import java.lang.ref.Reference
 
-open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, internal val _owner: Any) :
+open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val _owner: Any) :
     Managed(ptr, _FinalizerHolder.PTR, managed) {
     companion object {
         @JvmStatic external fun _nGetFinalizer(): Long
@@ -209,7 +208,6 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
         Reference.reachabilityFence(bitmap)
     }
 
-    @Contract("_, _, _ -> this")
     fun drawPoint(x: Float, y: Float, paint: Paint): Canvas {
         assert(paint != null) { "Can’t drawPoint with paint == null" }
         Stats.onNativeCall()
@@ -243,7 +241,6 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
      *
      * @see [https://fiddle.skia.org/c/@Canvas_drawPoints](https://fiddle.skia.org/c/@Canvas_drawPoints)
      */
-    @Contract("_, _ -> this")
     fun drawPoints(coords: Array<Point>, paint: Paint): Canvas {
         return drawPoints(Point.Companion.flattenArray(coords)!!, paint)
     }
@@ -273,8 +270,7 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
      *
      * @see [https://fiddle.skia.org/c/@Canvas_drawPoints](https://fiddle.skia.org/c/@Canvas_drawPoints)
      */
-    @Contract("_, _ -> this")
-    fun drawPoints(coords: FloatArray, paint: Paint): Canvas {
+        fun drawPoints(coords: FloatArray, paint: Paint): Canvas {
         assert(coords != null) { "Can’t drawPoints with coords == null" }
         assert(paint != null) { "Can’t drawPoints with paint == null" }
         Stats.onNativeCall()
@@ -306,8 +302,7 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
      *
      * @see [https://fiddle.skia.org/c/@Canvas_drawPoints](https://fiddle.skia.org/c/@Canvas_drawPoints)
      */
-    @Contract("_, _ -> this")
-    fun drawLines(coords: Array<Point>, paint: Paint): Canvas {
+        fun drawLines(coords: Array<Point>, paint: Paint): Canvas {
         return drawLines(Point.Companion.flattenArray(coords)!!, paint)
     }
 
@@ -334,8 +329,7 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
      *
      * @see [https://fiddle.skia.org/c/@Canvas_drawPoints](https://fiddle.skia.org/c/@Canvas_drawPoints)
      */
-    @Contract("_, _ -> this")
-    fun drawLines(coords: FloatArray, paint: Paint): Canvas {
+        fun drawLines(coords: FloatArray, paint: Paint): Canvas {
         assert(coords != null) { "Can’t drawLines with coords == null" }
         assert(paint != null) { "Can’t drawLines with paint == null" }
         Stats.onNativeCall()
@@ -366,8 +360,7 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
      *
      * @see [https://fiddle.skia.org/c/@Canvas_drawPoints](https://fiddle.skia.org/c/@Canvas_drawPoints)
      */
-    @Contract("_, _ -> this")
-    fun drawPolygon(coords: Array<Point>, paint: Paint): Canvas {
+        fun drawPolygon(coords: Array<Point>, paint: Paint): Canvas {
         return drawPolygon(Point.Companion.flattenArray(coords)!!, paint)
     }
 
@@ -393,8 +386,7 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
      *
      * @see [https://fiddle.skia.org/c/@Canvas_drawPoints](https://fiddle.skia.org/c/@Canvas_drawPoints)
      */
-    @Contract("_, _ -> this")
-    fun drawPolygon(coords: FloatArray, paint: Paint): Canvas {
+        fun drawPolygon(coords: FloatArray, paint: Paint): Canvas {
         assert(coords != null) { "Can’t drawPolygon with coords == null" }
         assert(paint != null) { "Can’t drawPolygon with paint == null" }
         Stats.onNativeCall()
@@ -403,8 +395,7 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
         return this
     }
 
-    @Contract("_, _, _, _, _ -> this")
-    fun drawLine(x0: Float, y0: Float, x1: Float, y1: Float, paint: Paint): Canvas {
+        fun drawLine(x0: Float, y0: Float, x1: Float, y1: Float, paint: Paint): Canvas {
         assert(paint != null) { "Can’t drawLine with paint == null" }
         Stats.onNativeCall()
         _nDrawLine(_ptr, x0, y0, x1, y1, Native.Companion.getPtr(paint))
@@ -412,8 +403,7 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
         return this
     }
 
-    @Contract("_, _, _, _, _, _, _, _ -> this")
-    fun drawArc(
+        fun drawArc(
         left: Float,
         top: Float,
         right: Float,
@@ -430,8 +420,7 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
         return this
     }
 
-    @Contract("_, _ -> this")
-    fun drawRect(r: Rect, paint: Paint): Canvas {
+        fun drawRect(r: Rect, paint: Paint): Canvas {
         assert(r != null) { "Can’t drawRect with r == null" }
         assert(paint != null) { "Can’t drawRect with paint == null" }
         Stats.onNativeCall()
@@ -440,8 +429,7 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
         return this
     }
 
-    @Contract("_, _ -> this")
-    fun drawOval(r: Rect, paint: Paint): Canvas {
+        fun drawOval(r: Rect, paint: Paint): Canvas {
         assert(r != null) { "Can’t drawOval with r == null" }
         assert(paint != null) { "Can’t drawOval with paint == null" }
         Stats.onNativeCall()
@@ -450,8 +438,7 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
         return this
     }
 
-    @Contract("_, _, _, _ -> this")
-    fun drawCircle(x: Float, y: Float, radius: Float, paint: Paint): Canvas {
+        fun drawCircle(x: Float, y: Float, radius: Float, paint: Paint): Canvas {
         assert(paint != null) { "Can’t drawCircle with paint == null" }
         Stats.onNativeCall()
         _nDrawOval(_ptr, x - radius, y - radius, x + radius, y + radius, Native.Companion.getPtr(paint))
@@ -459,8 +446,7 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
         return this
     }
 
-    @Contract("_, _ -> this")
-    fun drawRRect(r: RRect, paint: Paint): Canvas {
+        fun drawRRect(r: RRect, paint: Paint): Canvas {
         assert(r != null) { "Can’t drawRRect with r == null" }
         assert(paint != null) { "Can’t drawRRect with paint == null" }
         Stats.onNativeCall()
@@ -469,8 +455,7 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
         return this
     }
 
-    @Contract("_, _, _ -> this")
-    fun drawDRRect(outer: RRect, inner: RRect, paint: Paint): Canvas {
+        fun drawDRRect(outer: RRect, inner: RRect, paint: Paint): Canvas {
         assert(outer != null) { "Can’t drawDRRect with outer == null" }
         assert(inner != null) { "Can’t drawDRRect with inner == null" }
         assert(paint != null) { "Can’t drawDRRect with paint == null" }
@@ -493,13 +478,11 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
         return this
     }
 
-    @Contract("_, _ -> this")
-    fun drawRectShadow(r: Rect, dx: Float, dy: Float, blur: Float, color: Int): Canvas {
+        fun drawRectShadow(r: Rect, dx: Float, dy: Float, blur: Float, color: Int): Canvas {
         return drawRectShadow(r, dx, dy, blur, 0f, color)
     }
 
-    @Contract("_, _ -> this")
-    fun drawRectShadow(r: Rect, dx: Float, dy: Float, blur: Float, spread: Float, color: Int): Canvas {
+        fun drawRectShadow(r: Rect, dx: Float, dy: Float, blur: Float, spread: Float, color: Int): Canvas {
         assert(r != null) { "Can’t drawRectShadow with r == null" }
         val insides = r.inflate(-1f)
         if (!insides.isEmpty) {
@@ -511,8 +494,7 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
         return this
     }
 
-    @Contract("_, _ -> this")
-    fun drawRectShadowNoclip(r: Rect, dx: Float, dy: Float, blur: Float, spread: Float, color: Int): Canvas {
+        fun drawRectShadowNoclip(r: Rect, dx: Float, dy: Float, blur: Float, spread: Float, color: Int): Canvas {
         assert(r != null) { "Can’t drawRectShadow with r == null" }
         val outline = r.inflate(spread)
         makeDropShadowOnly(dx, dy, blur / 2f, blur / 2f, color).use { f ->
@@ -524,8 +506,7 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
         return this
     }
 
-    @Contract("_, _ -> this")
-    fun drawPath(path: Path, paint: Paint): Canvas {
+        fun drawPath(path: Path, paint: Paint): Canvas {
         assert(path != null) { "Can’t drawPath with path == null" }
         assert(paint != null) { "Can’t drawPath with paint == null" }
         Stats.onNativeCall()
@@ -535,8 +516,7 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
         return this
     }
 
-    @Contract("_, _, _ -> this")
-    fun drawImage(image: Image, left: Float, top: Float): Canvas {
+        fun drawImage(image: Image, left: Float, top: Float): Canvas {
         return drawImageRect(
             image,
             Rect.Companion.makeWH(image.width.toFloat(), image.height.toFloat()),
@@ -547,8 +527,7 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
         )
     }
 
-    @Contract("_, _, _, _ -> this")
-    fun drawImage(image: Image, left: Float, top: Float, paint: Paint?): Canvas {
+        fun drawImage(image: Image, left: Float, top: Float, paint: Paint?): Canvas {
         return drawImageRect(
             image,
             Rect.makeWH(image.width.toFloat(), image.height.toFloat()),
@@ -559,8 +538,7 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
         )
     }
 
-    @Contract("_, _ -> this")
-    fun drawImageRect(image: Image, dst: Rect): Canvas {
+        fun drawImageRect(image: Image, dst: Rect): Canvas {
         return drawImageRect(
             image,
             Rect.makeWH(image.width.toFloat(), image.height.toFloat()),
@@ -571,8 +549,7 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
         )
     }
 
-    @Contract("_, _, _ -> this")
-    fun drawImageRect(image: Image, dst: Rect, paint: Paint?): Canvas {
+        fun drawImageRect(image: Image, dst: Rect, paint: Paint?): Canvas {
         return drawImageRect(
             image,
             Rect.makeWH(image.width.toFloat(), image.height.toFloat()),
@@ -583,23 +560,19 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
         )
     }
 
-    @Contract("_, _, _, _ -> this")
-    fun drawImageRect(image: Image, src: Rect, dst: Rect): Canvas {
+        fun drawImageRect(image: Image, src: Rect, dst: Rect): Canvas {
         return drawImageRect(image, src, dst, SamplingMode.DEFAULT, null, true)
     }
 
-    @Contract("_, _, _, _ -> this")
-    fun drawImageRect(image: Image, src: Rect, dst: Rect, paint: Paint?): Canvas {
+        fun drawImageRect(image: Image, src: Rect, dst: Rect, paint: Paint?): Canvas {
         return drawImageRect(image, src, dst, SamplingMode.DEFAULT, paint, true)
     }
 
-    @Contract("_, _, _, _, _ -> this")
-    fun drawImageRect(image: Image, src: Rect, dst: Rect, paint: Paint?, strict: Boolean): Canvas {
+        fun drawImageRect(image: Image, src: Rect, dst: Rect, paint: Paint?, strict: Boolean): Canvas {
         return drawImageRect(image, src, dst, SamplingMode.DEFAULT, paint, strict)
     }
 
-    @Contract("_, _, _, _, _ -> this")
-    fun drawImageRect(
+        fun drawImageRect(
         image: Image,
         src: Rect,
         dst: Rect,
@@ -632,8 +605,7 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
         return this
     }
 
-    @Contract("_, _, _, _, _ -> this")
-    fun drawImageNine(image: Image, center: IRect, dst: Rect, filterMode: FilterMode, paint: Paint?): Canvas {
+        fun drawImageNine(image: Image, center: IRect, dst: Rect, filterMode: FilterMode, paint: Paint?): Canvas {
         assert(image != null) { "Can’t drawImageNine with image == null" }
         assert(center != null) { "Can’t drawImageNine with center == null" }
         assert(dst != null) { "Can’t drawImageNine with dst == null" }
@@ -658,7 +630,6 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
         return this
     }
 
-    @Contract("_, _ -> this")
     fun drawRegion(r: Region, paint: Paint): Canvas {
         assert(r != null) { "Can’t drawRegion with r == null" }
         assert(paint != null) { "Can’t drawRegion with paint == null" }
@@ -669,7 +640,6 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
         return this
     }
 
-    @Contract("_, _, _, _, _ -> this")
     fun drawString(s: String, x: Float, y: Float, font: Font?, paint: Paint): Canvas {
         assert(s != null) { "Can’t drawString with s == null" }
         assert(paint != null) { "Can’t drawString with paint == null" }
@@ -680,7 +650,6 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
         return this
     }
 
-    @Contract("_, _, _, _ -> this")
     fun drawTextBlob(blob: TextBlob, x: Float, y: Float, paint: Paint): Canvas {
         assert(blob != null) { "Can’t drawTextBlob with blob == null" }
         assert(paint != null) { "Can’t drawTextBlob with paint == null" }
@@ -691,7 +660,6 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
         return this
     }
 
-    @Contract("_, _, _, _ -> this")
     fun drawTextLine(line: TextLine, x: Float, y: Float, paint: Paint): Canvas {
         assert(line != null) { "Can’t drawTextLine with line == null" }
         assert(paint != null) { "Can’t drawTextLine with paint == null" }
@@ -699,12 +667,10 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
         return this
     }
 
-    @Contract("_ -> this")
     fun drawPicture(picture: Picture): Canvas {
         return drawPicture(picture, null, null)
     }
 
-    @Contract("_, _, _ -> this")
     fun drawPicture(picture: Picture, matrix: Matrix33?, paint: Paint?): Canvas {
         assert(picture != null) { "Can’t drawPicture with picture == null" }
         Stats.onNativeCall()
@@ -733,7 +699,6 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
      *
      * @see [https://fiddle.skia.org/c/@Canvas_drawVertices_2](https://fiddle.skia.org/c/@Canvas_drawVertices_2)
      */
-    @Contract("_, _, _ -> this")
     fun drawTriangles(positions: Array<Point>, colors: IntArray?, paint: Paint): Canvas {
         return drawTriangles(positions, colors, null, null, BlendMode.MODULATE, paint)
     }
@@ -760,7 +725,6 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
      *
      * @see [https://fiddle.skia.org/c/@Canvas_drawVertices_2](https://fiddle.skia.org/c/@Canvas_drawVertices_2)
      */
-    @Contract("_, _, _, _, _ -> this")
     fun drawTriangles(
         positions: Array<Point>,
         colors: IntArray?,
@@ -794,7 +758,6 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
      *
      * @see [https://fiddle.skia.org/c/@Canvas_drawVertices_2](https://fiddle.skia.org/c/@Canvas_drawVertices_2)
      */
-    @Contract("_, _, _, _, _, _ -> this")
     fun drawTriangles(
         positions: Array<Point>,
         colors: IntArray?,
@@ -842,7 +805,6 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
      *
      * @see [https://fiddle.skia.org/c/@Canvas_drawVertices_2](https://fiddle.skia.org/c/@Canvas_drawVertices_2)
      */
-    @Contract("_, _, _ -> this")
     fun drawTriangleStrip(positions: Array<Point>, colors: IntArray?, paint: Paint): Canvas {
         return drawTriangleStrip(positions, colors, null, null, BlendMode.MODULATE, paint)
     }
@@ -869,7 +831,6 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
      *
      * @see [https://fiddle.skia.org/c/@Canvas_drawVertices_2](https://fiddle.skia.org/c/@Canvas_drawVertices_2)
      */
-    @Contract("_, _, _, _, _ -> this")
     fun drawTriangleStrip(
         positions: Array<Point>,
         colors: IntArray?,
@@ -903,7 +864,6 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
      *
      * @see [https://fiddle.skia.org/c/@Canvas_drawVertices_2](https://fiddle.skia.org/c/@Canvas_drawVertices_2)
      */
-    @Contract("_, _, _, _, _, _ -> this")
     fun drawTriangleStrip(
         positions: Array<Point>,
         colors: IntArray?,
@@ -951,7 +911,6 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
      *
      * @see [https://fiddle.skia.org/c/@Canvas_drawVertices_2](https://fiddle.skia.org/c/@Canvas_drawVertices_2)
      */
-    @Contract("_, _, _ -> this")
     fun drawTriangleFan(positions: Array<Point>, colors: IntArray?, paint: Paint): Canvas {
         return drawTriangleFan(positions, colors, null, null, BlendMode.MODULATE, paint)
     }
@@ -978,7 +937,6 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
      *
      * @see [https://fiddle.skia.org/c/@Canvas_drawVertices_2](https://fiddle.skia.org/c/@Canvas_drawVertices_2)
      */
-    @Contract("_, _, _, _, _ -> this")
     fun drawTriangleFan(
         positions: Array<Point>,
         colors: IntArray?,
@@ -1012,7 +970,6 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
      *
      * @see [https://fiddle.skia.org/c/@Canvas_drawVertices_2](https://fiddle.skia.org/c/@Canvas_drawVertices_2)
      */
-    @Contract("_, _, _, _, _, _ -> this")
     fun drawTriangleFan(
         positions: Array<Point>,
         colors: IntArray?,
@@ -1068,8 +1025,7 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
      *
      * @see [https://fiddle.skia.org/c/4cf70f8d194867d053d7e177e5088445](https://fiddle.skia.org/c/4cf70f8d194867d053d7e177e5088445)
      */
-    @Contract("_, _, _ -> this")
-    fun drawPatch(cubics: Array<Point>, colors: IntArray, paint: Paint): Canvas {
+        fun drawPatch(cubics: Array<Point>, colors: IntArray, paint: Paint): Canvas {
         return drawPatch(cubics, colors, null, paint)
     }
 
@@ -1106,8 +1062,7 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
      *
      * @see [https://fiddle.skia.org/c/4cf70f8d194867d053d7e177e5088445](https://fiddle.skia.org/c/4cf70f8d194867d053d7e177e5088445)
      */
-    @Contract("_, _, _, _ -> this")
-    fun drawPatch(cubics: Array<Point>, colors: IntArray, texCoords: Array<Point>?, paint: Paint): Canvas {
+        fun drawPatch(cubics: Array<Point>, colors: IntArray, texCoords: Array<Point>?, paint: Paint): Canvas {
         return drawPatch(cubics, colors, texCoords, BlendMode.MODULATE, paint)
     }
 
@@ -1129,7 +1084,7 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
      *
      *
      * Color array color associates colors with corners in top-left, top-right,
-     * bottom-right, bottom-left order.
+     * bottom-right, bottom-left order.C
      *
      *
      * If paint contains Shader, Point array texCoords maps Shader as texture to
@@ -1146,8 +1101,7 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
      *
      * @see [https://fiddle.skia.org/c/4cf70f8d194867d053d7e177e5088445](https://fiddle.skia.org/c/4cf70f8d194867d053d7e177e5088445)
      */
-    @Contract("_, _, _, _, _ -> this")
-    fun drawPatch(
+        fun drawPatch(
         cubics: Array<Point>,
         colors: IntArray,
         texCoords: Array<Point>?,
@@ -1187,8 +1141,7 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
      * @param drawable  custom struct encapsulating drawing commands
      * @return          this
      */
-    @Contract("_ -> this")
-    fun drawDrawable(drawable: Drawable): Canvas {
+        fun drawDrawable(drawable: Drawable): Canvas {
         return drawDrawable(drawable, null)
     }
 
@@ -1209,8 +1162,7 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
      *
      * @see [https://fiddle.skia.org/c/@Canvas_drawDrawable_2](https://fiddle.skia.org/c/@Canvas_drawDrawable_2)
      */
-    @Contract("_, _, _ -> this")
-    fun drawDrawable(drawable: Drawable, x: Float, y: Float): Canvas {
+        fun drawDrawable(drawable: Drawable, x: Float, y: Float): Canvas {
         return drawDrawable(drawable, Matrix33.Companion.makeTranslate(x, y))
     }
 
@@ -1231,8 +1183,7 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
      *
      * @see [https://fiddle.skia.org/c/@Canvas_drawDrawable](https://fiddle.skia.org/c/@Canvas_drawDrawable)
      */
-    @Contract("_, _ -> this")
-    fun drawDrawable(drawable: Drawable, matrix: Matrix33?): Canvas {
+        fun drawDrawable(drawable: Drawable, matrix: Matrix33?): Canvas {
         assert(drawable != null) { "Can’t drawDrawable with drawable == null" }
         Stats.onNativeCall()
         _nDrawDrawable(_ptr, Native.Companion.getPtr(drawable), matrix?.mat)
@@ -1240,15 +1191,13 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
         return this
     }
 
-    @Contract("_ -> this")
-    fun clear(color: Int): Canvas {
+        fun clear(color: Int): Canvas {
         Stats.onNativeCall()
         _nClear(_ptr, color)
         return this
     }
 
-    @Contract("_ -> this")
-    fun drawPaint(paint: Paint): Canvas {
+        fun drawPaint(paint: Paint): Canvas {
         assert(paint != null) { "Can’t drawPaint with paint == null" }
         Stats.onNativeCall()
         _nDrawPaint(_ptr, Native.Companion.getPtr(paint))
@@ -1264,8 +1213,7 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
      *
      * @see [https://fiddle.skia.org/c/@Canvas_setMatrix](https://fiddle.skia.org/c/@Canvas_setMatrix)
      */
-    @Contract("_ -> this")
-    fun setMatrix(matrix: Matrix33): Canvas {
+        fun setMatrix(matrix: Matrix33): Canvas {
         assert(matrix != null) { "Can’t setMatrix with matrix == null" }
         Stats.onNativeCall()
         _nSetMatrix(_ptr, matrix.mat)
@@ -1278,8 +1226,7 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
      *
      * @see [https://fiddle.skia.org/c/@Canvas_resetMatrix](https://fiddle.skia.org/c/@Canvas_resetMatrix)
      */
-    @Contract("-> this")
-    fun resetMatrix(): Canvas {
+        fun resetMatrix(): Canvas {
         Stats.onNativeCall()
         _nResetMatrix(_ptr)
         return this
@@ -1302,8 +1249,7 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
     val localToDeviceAsMatrix33: Matrix33
         get() = localToDevice.asMatrix33()
 
-    @Contract("_, _, _ -> this")
-    fun clipRect(r: Rect, mode: ClipMode, antiAlias: Boolean): Canvas {
+        fun clipRect(r: Rect, mode: ClipMode, antiAlias: Boolean): Canvas {
         assert(r != null) { "Can’t clipRect with r == null" }
         assert(mode != null) { "Can’t clipRect with mode == null" }
         Stats.onNativeCall()
@@ -1311,23 +1257,19 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
         return this
     }
 
-    @Contract("_, _ -> this")
-    fun clipRect(r: Rect, mode: ClipMode): Canvas {
+        fun clipRect(r: Rect, mode: ClipMode): Canvas {
         return clipRect(r, mode, false)
     }
 
-    @Contract("_, _ -> this")
-    fun clipRect(r: Rect, antiAlias: Boolean): Canvas {
+        fun clipRect(r: Rect, antiAlias: Boolean): Canvas {
         return clipRect(r, ClipMode.INTERSECT, antiAlias)
     }
 
-    @Contract("_ -> this")
-    fun clipRect(r: Rect): Canvas {
+        fun clipRect(r: Rect): Canvas {
         return clipRect(r, ClipMode.INTERSECT, false)
     }
 
-    @Contract("_, _, _ -> this")
-    fun clipRRect(r: RRect, mode: ClipMode, antiAlias: Boolean): Canvas {
+        fun clipRRect(r: RRect, mode: ClipMode, antiAlias: Boolean): Canvas {
         assert(r != null) { "Can’t clipRRect with r == null" }
         assert(mode != null) { "Can’t clipRRect with mode == null" }
         Stats.onNativeCall()
@@ -1335,23 +1277,19 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
         return this
     }
 
-    @Contract("_, _ -> this")
-    fun clipRRect(r: RRect, mode: ClipMode): Canvas {
+        fun clipRRect(r: RRect, mode: ClipMode): Canvas {
         return clipRRect(r, mode, false)
     }
 
-    @Contract("_, _ -> this")
-    fun clipRRect(r: RRect, antiAlias: Boolean): Canvas {
+        fun clipRRect(r: RRect, antiAlias: Boolean): Canvas {
         return clipRRect(r, ClipMode.INTERSECT, antiAlias)
     }
 
-    @Contract("_ -> this")
-    fun clipRRect(r: RRect): Canvas {
+        fun clipRRect(r: RRect): Canvas {
         return clipRRect(r, ClipMode.INTERSECT, false)
     }
 
-    @Contract("_, _, _ -> this")
-    fun clipPath(p: Path, mode: ClipMode, antiAlias: Boolean): Canvas {
+        fun clipPath(p: Path, mode: ClipMode, antiAlias: Boolean): Canvas {
         assert(p != null) { "Can’t clipPath with p == null" }
         assert(mode != null) { "Can’t clipPath with mode == null" }
         Stats.onNativeCall()
@@ -1360,23 +1298,19 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
         return this
     }
 
-    @Contract("_, _ -> this")
-    fun clipPath(p: Path, mode: ClipMode): Canvas {
+        fun clipPath(p: Path, mode: ClipMode): Canvas {
         return clipPath(p, mode, false)
     }
 
-    @Contract("_, _ -> this")
-    fun clipPath(p: Path, antiAlias: Boolean): Canvas {
+        fun clipPath(p: Path, antiAlias: Boolean): Canvas {
         return clipPath(p, ClipMode.INTERSECT, antiAlias)
     }
 
-    @Contract("_ -> this")
-    fun clipPath(p: Path): Canvas {
+        fun clipPath(p: Path): Canvas {
         return clipPath(p, ClipMode.INTERSECT, false)
     }
 
-    @Contract("_, _ -> this")
-    fun clipRegion(r: Region, mode: ClipMode): Canvas {
+        fun clipRegion(r: Region, mode: ClipMode): Canvas {
         assert(r != null) { "Can’t clipRegion with r == null" }
         assert(mode != null) { "Can’t clipRegion with mode == null" }
         Stats.onNativeCall()
@@ -1385,18 +1319,15 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
         return this
     }
 
-    @Contract("_ -> this")
-    fun clipRegion(r: Region): Canvas {
+        fun clipRegion(r: Region): Canvas {
         return clipRegion(r, ClipMode.INTERSECT)
     }
 
-    @Contract("_, _ -> this")
-    fun translate(dx: Float, dy: Float): Canvas {
+        fun translate(dx: Float, dy: Float): Canvas {
         return concat(Matrix33.Companion.makeTranslate(dx, dy))
     }
 
-    @Contract("_, _ -> this")
-    fun scale(sx: Float, sy: Float): Canvas {
+        fun scale(sx: Float, sy: Float): Canvas {
         return concat(Matrix33.Companion.makeScale(sx, sy))
     }
 
@@ -1404,26 +1335,22 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
      * @param deg  angle in degrees
      * @return     this
      */
-    @Contract("_ -> this")
-    fun rotate(deg: Float): Canvas {
+        fun rotate(deg: Float): Canvas {
         return concat(Matrix33.Companion.makeRotate(deg))
     }
 
-    @Contract("_, _ -> this")
-    fun skew(sx: Float, sy: Float): Canvas {
+        fun skew(sx: Float, sy: Float): Canvas {
         return concat(Matrix33.Companion.makeSkew(sx, sy))
     }
 
-    @Contract("_ -> this")
-    fun concat(matrix: Matrix33): Canvas {
+        fun concat(matrix: Matrix33): Canvas {
         assert(matrix != null) { "Can’t concat with matrix == null" }
         Stats.onNativeCall()
         _nConcat(_ptr, matrix.mat)
         return this
     }
 
-    @Contract("_ -> this")
-    fun concat(matrix: Matrix44): Canvas {
+        fun concat(matrix: Matrix44): Canvas {
         assert(matrix != null) { "Can’t concat with matrix == null" }
         Stats.onNativeCall()
         _nConcat44(_ptr, matrix.mat)
@@ -1640,22 +1567,19 @@ open class Canvas @ApiStatus.Internal constructor(ptr: Long, managed: Boolean, i
             Reference.reachabilityFence(this)
         }
 
-    @Contract("-> this")
     fun restore(): Canvas {
         Stats.onNativeCall()
         _nRestore(_ptr)
         return this
     }
 
-    @Contract("_ -> this")
     fun restoreToCount(saveCount: Int): Canvas {
         Stats.onNativeCall()
         _nRestoreToCount(_ptr, saveCount)
         return this
     }
 
-    @ApiStatus.Internal
-    object _FinalizerHolder {
+    internal object _FinalizerHolder {
         val PTR = _nGetFinalizer()
     }
 }

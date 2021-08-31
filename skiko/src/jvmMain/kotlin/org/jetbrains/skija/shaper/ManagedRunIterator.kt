@@ -7,20 +7,16 @@ import org.jetbrains.skija.impl.Managed
 import org.jetbrains.skija.impl.Native
 import java.lang.ref.Reference
 
-abstract class ManagedRunIterator<T> @ApiStatus.Internal constructor(
+abstract class ManagedRunIterator<T> internal constructor(
     ptr: Long,
     text: ManagedString?,
     manageText: Boolean
 ) : Managed(ptr, _FinalizerHolder.PTR), MutableIterator<T> {
     companion object {
-        @ApiStatus.Internal
-        external fun _nGetFinalizer(): Long
-        @ApiStatus.Internal
-        external fun _nConsume(ptr: Long)
-        @ApiStatus.Internal
-        external fun _nGetEndOfCurrentRun(ptr: Long, textPtr: Long): Int
-        @ApiStatus.Internal
-        external fun _nIsAtEnd(ptr: Long): Boolean
+        @JvmStatic external fun _nGetFinalizer(): Long
+        @JvmStatic external fun _nConsume(ptr: Long)
+        @JvmStatic external fun _nGetEndOfCurrentRun(ptr: Long, textPtr: Long): Int
+        @JvmStatic external fun _nIsAtEnd(ptr: Long): Boolean
 
         init {
             staticLoad()
@@ -52,8 +48,7 @@ abstract class ManagedRunIterator<T> @ApiStatus.Internal constructor(
         }
     }
 
-    @ApiStatus.Internal
-    object _FinalizerHolder {
+    internal object _FinalizerHolder {
         val PTR = _nGetFinalizer()
     }
 

@@ -1,7 +1,5 @@
 package org.jetbrains.skija.paragraph
 
-import org.jetbrains.annotations.ApiStatus
-
 enum class RectHeightMode {
     /** Provide tight bounding boxes that fit heights per run.  */
     TIGHT,
@@ -30,7 +28,6 @@ enum class RectHeightMode {
     INCLUDE_LINE_SPACING_BOTTOM, STRUT;
 
     companion object {
-        @ApiStatus.Internal
-        val _values = values()
+        internal val _values = values()
     }
 }

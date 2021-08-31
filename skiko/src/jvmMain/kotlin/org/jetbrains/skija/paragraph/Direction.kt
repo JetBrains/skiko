@@ -6,7 +6,6 @@ enum class Direction {
     RTL, LTR;
 
     companion object {
-        @ApiStatus.Internal
-        val _values = values()
+        internal val _values = values()
     }
 }

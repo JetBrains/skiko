@@ -3,14 +3,11 @@ package org.jetbrains.skija.shaper
 import org.jetbrains.annotations.ApiStatus
 
 class TrivialLanguageRunIterator(text: String, language: String) : MutableIterator<LanguageRun?> {
-    @ApiStatus.Internal
-    val _length: Int
+    internal val _length: Int
 
-    @ApiStatus.Internal
-    val _language: String
+    internal val _language: String
 
-    @ApiStatus.Internal
-    var _atEnd: Boolean
+    internal var _atEnd: Boolean
     override fun next(): LanguageRun {
         _atEnd = true
         return LanguageRun(_length, _language)

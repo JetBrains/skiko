@@ -1,7 +1,5 @@
 package org.jetbrains.skija
 
-import org.jetbrains.annotations.ApiStatus
-
 enum class FilterQuality {
     /** fastest but lowest quality, typically nearest-neighbor  */
     NONE,
@@ -16,7 +14,6 @@ enum class FilterQuality {
     HIGH;
 
     companion object {
-        @ApiStatus.Internal
-        val _values = values()
+        internal val _values = values()
     }
 }

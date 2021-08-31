@@ -1,16 +1,11 @@
 package org.jetbrains.skija.svg
 
-import org.jetbrains.annotations.ApiStatus
-
 class SVGPreserveAspectRatio(align: SVGPreserveAspectRatioAlign, scale: SVGPreserveAspectRatioScale) {
-    @ApiStatus.Internal
-    val _align: SVGPreserveAspectRatioAlign
+    internal val _align: SVGPreserveAspectRatioAlign
 
-    @ApiStatus.Internal
-    val _scale: SVGPreserveAspectRatioScale
+    internal val _scale: SVGPreserveAspectRatioScale
 
-    @ApiStatus.Internal
-    constructor(align: Int, scale: Int) : this(
+    internal constructor(align: Int, scale: Int) : this(
         SVGPreserveAspectRatioAlign.valueOf(align),
         SVGPreserveAspectRatioScale._values.get(scale)
     )

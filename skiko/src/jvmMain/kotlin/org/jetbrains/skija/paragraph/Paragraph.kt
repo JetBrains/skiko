@@ -8,7 +8,7 @@ import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.impl.Stats
 import java.lang.ref.Reference
 
-class Paragraph @ApiStatus.Internal constructor(ptr: Long, text: ManagedString?) : Managed(ptr, _FinalizerHolder.PTR) {
+class Paragraph internal constructor(ptr: Long, text: ManagedString?) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
         @JvmStatic external fun _nGetFinalizer(): Long
         @JvmStatic external fun _nGetMaxWidth(ptr: Long): Float
@@ -47,8 +47,7 @@ class Paragraph @ApiStatus.Internal constructor(ptr: Long, text: ManagedString?)
         }
     }
 
-    @ApiStatus.Internal
-    var _text: ManagedString?
+    private var _text: ManagedString?
     override fun close() {
         if (_text != null) {
             _text!!.close()

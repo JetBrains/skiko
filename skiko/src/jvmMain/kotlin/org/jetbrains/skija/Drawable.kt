@@ -1,10 +1,7 @@
 package org.jetbrains.skija
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
-import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.skija.impl.RefCnt
-import org.jetbrains.annotations.ApiStatus.OverrideOnly
-import org.jetbrains.annotations.ApiStatus.NonExtendable
 import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.impl.Stats
 import java.lang.ref.Reference
@@ -20,31 +17,24 @@ import java.lang.ref.Reference
  */
 abstract class Drawable : RefCnt(_nMake()) {
     companion object {
-        @ApiStatus.Internal
-        external fun _nMake(): Long
-        @ApiStatus.Internal
-        external fun _nDraw(ptr: Long, canvasPtr: Long, matrix: FloatArray?)
-        @ApiStatus.Internal
-        external fun _nMakePictureSnapshot(ptr: Long): Long
-        @ApiStatus.Internal
-        external fun _nGetGenerationId(ptr: Long): Int
-        @ApiStatus.Internal
-        external fun _nNotifyDrawingChanged(ptr: Long)
+        @JvmStatic external fun _nMake(): Long
+        @JvmStatic external fun _nDraw(ptr: Long, canvasPtr: Long, matrix: FloatArray?)
+        @JvmStatic external fun _nMakePictureSnapshot(ptr: Long): Long
+        @JvmStatic external fun _nGetGenerationId(ptr: Long): Int
+        @JvmStatic external fun _nNotifyDrawingChanged(ptr: Long)
 
         init {
             staticLoad()
         }
     }
 
-    @ApiStatus.Internal
-    var _bounds: Rect? = null
+    internal var _bounds: Rect? = null
 
     /**
      * Draws into the specified content. The drawing sequence will be balanced upon return
      * (i.e. the saveLevel() on the canvas will match what it was when draw() was called,
      * and the current matrix and clip settings will not be changed.
      */
-    @NonExtendable
     fun draw(canvas: Canvas?): Drawable {
         return draw(canvas, null)
     }
@@ -54,7 +44,6 @@ abstract class Drawable : RefCnt(_nMake()) {
      * (i.e. the saveLevel() on the canvas will match what it was when draw() was called,
      * and the current matrix and clip settings will not be changed.
      */
-    @NonExtendable
     fun draw(canvas: Canvas?, x: Float, y: Float): Drawable {
         return draw(canvas, Matrix33.Companion.makeTranslate(x, y))
     }
@@ -64,7 +53,6 @@ abstract class Drawable : RefCnt(_nMake()) {
      * (i.e. the saveLevel() on the canvas will match what it was when draw() was called,
      * and the current matrix and clip settings will not be changed.
      */
-    @NonExtendable
     fun draw(canvas: Canvas?, matrix: Matrix33?): Drawable {
         return try {
             Stats.onNativeCall()
@@ -79,7 +67,6 @@ abstract class Drawable : RefCnt(_nMake()) {
         }
     }
 
-    @NonExtendable
     fun makePictureSnapshot(): Picture {
         return try {
             Stats.onNativeCall()
@@ -111,7 +98,6 @@ abstract class Drawable : RefCnt(_nMake()) {
      * change what it draws (e.g. animation or in response to some external change), then this
      * must return a bounds that is always valid for all possible states.
      */
-    @get:NonExtendable
     val bounds: Rect
         get() {
             if (_bounds == null) _bounds = onGetBounds()
@@ -123,7 +109,6 @@ abstract class Drawable : RefCnt(_nMake()) {
      * the next time getGenerationId() is called. Typically this is called by the object itself,
      * in response to its internal state changing.
      */
-    @NonExtendable
     fun notifyDrawingChanged(): Drawable {
         Stats.onNativeCall()
         _nNotifyDrawingChanged(_ptr)
@@ -131,16 +116,12 @@ abstract class Drawable : RefCnt(_nMake()) {
         return this
     }
 
-    @OverrideOnly
     abstract fun onDraw(canvas: Canvas?)
-    @OverrideOnly
     abstract fun onGetBounds(): Rect
-    @ApiStatus.Internal
-    fun _onDraw(canvasPtr: Long) {
-        onDraw(org.jetbrains.skija.Canvas(canvasPtr, false, this))
+    internal fun _onDraw(canvasPtr: Long) {
+        onDraw(Canvas(canvasPtr, false, this))
     }
 
-    @ApiStatus.Internal
     external fun _nInit(ptr: Long)
 
     init {

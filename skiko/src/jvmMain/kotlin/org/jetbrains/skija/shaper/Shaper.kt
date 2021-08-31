@@ -16,7 +16,7 @@ import java.util.*
  * Shapes text using HarfBuzz and places the shaped text into a
  * client-managed buffer.
  */
-class Shaper @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
+class Shaper internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
         @Contract("-> new")
         fun makePrimitive(): Shaper {
@@ -101,14 +101,14 @@ class Shaper @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _Finalize
             }
         }
 
-        external fun _nGetFinalizer(): Long
-        external fun _nMakePrimitive(): Long
-        external fun _nMakeShaperDrivenWrapper(fontMgrPtr: Long): Long
-        external fun _nMakeShapeThenWrap(fontMgrPtr: Long): Long
-        external fun _nMakeShapeDontWrapOrReorder(fontMgrPtr: Long): Long
-        external fun _nMakeCoreText(): Long
-        external fun _nMake(fontMgrPtr: Long): Long
-        external fun _nShapeBlob(
+        @JvmStatic external fun _nGetFinalizer(): Long
+        @JvmStatic external fun _nMakePrimitive(): Long
+        @JvmStatic external fun _nMakeShaperDrivenWrapper(fontMgrPtr: Long): Long
+        @JvmStatic external fun _nMakeShapeThenWrap(fontMgrPtr: Long): Long
+        @JvmStatic external fun _nMakeShapeDontWrapOrReorder(fontMgrPtr: Long): Long
+        @JvmStatic external fun _nMakeCoreText(): Long
+        @JvmStatic external fun _nMake(fontMgrPtr: Long): Long
+        @JvmStatic external fun _nShapeBlob(
             ptr: Long,
             text: String?,
             fontPtr: Long,
@@ -118,8 +118,8 @@ class Shaper @ApiStatus.Internal constructor(ptr: Long) : Managed(ptr, _Finalize
             offsetY: Float
         ): Long
 
-        external fun _nShapeLine(ptr: Long, text: String?, fontPtr: Long, opts: ShapingOptions?): Long
-        external fun _nShape(
+        @JvmStatic external fun _nShapeLine(ptr: Long, text: String?, fontPtr: Long, opts: ShapingOptions?): Long
+        @JvmStatic external fun _nShape(
             ptr: Long,
             textPtr: Long,
             fontIter: Iterator<FontRun?>?,

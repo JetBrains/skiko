@@ -1,8 +1,6 @@
 package org.jetbrains.skija
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
-import org.jetbrains.annotations.ApiStatus
-import org.jetbrains.annotations.Contract
 import org.jetbrains.skija.impl.Managed
 import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.impl.Stats
@@ -113,8 +111,7 @@ class Bitmap internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR
         }
     }
 
-    @ApiStatus.Internal
-    var _imageInfo: ImageInfo? = null
+    internal var _imageInfo: ImageInfo? = null
 
     /**
      * Creates an empty Bitmap without pixels, with [ColorType.UNKNOWN],
@@ -137,7 +134,6 @@ class Bitmap internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR
      *
      * @see [https://fiddle.skia.org/c/@Bitmap_copy_const_SkBitmap](https://fiddle.skia.org/c/@Bitmap_copy_const_SkBitmap)
      */
-    @Contract("-> new")
     fun makeClone(): Bitmap {
         return try {
             Stats.onNativeCall()
@@ -324,7 +320,6 @@ class Bitmap internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR
      *
      * @see [https://fiddle.skia.org/c/@Bitmap_setImmutable](https://fiddle.skia.org/c/@Bitmap_setImmutable)
      */
-    @Contract("-> this")
     fun setImmutable(): Bitmap {
         Stats.onNativeCall()
         _nSetImmutable(_ptr)
@@ -346,7 +341,6 @@ class Bitmap internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR
      *
      * @see [https://fiddle.skia.org/c/@Bitmap_reset](https://fiddle.skia.org/c/@Bitmap_reset)
      */
-    @Contract("-> this")
     fun reset(): Bitmap {
         Stats.onNativeCall()
         _imageInfo = null
@@ -756,7 +750,6 @@ class Bitmap internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR
      *
      * @see [https://fiddle.skia.org/c/@Bitmap_setPixelRef](https://fiddle.skia.org/c/@Bitmap_setPixelRef)
      */
-    @Contract("_, _, _ -> this")
     fun setPixelRef(pixelRef: PixelRef?, dx: Int, dy: Int): Bitmap {
         return try {
             _imageInfo = null
@@ -814,7 +807,6 @@ class Bitmap internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR
      *
      * @see [https://fiddle.skia.org/c/@Bitmap_notifyPixelsChanged](https://fiddle.skia.org/c/@Bitmap_notifyPixelsChanged)
      */
-    @Contract("-> this")
     fun notifyPixelsChanged(): Bitmap {
         return try {
             Stats.onNativeCall()
@@ -835,7 +827,6 @@ class Bitmap internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR
      *
      * @see [https://fiddle.skia.org/c/@Bitmap_eraseColor](https://fiddle.skia.org/c/@Bitmap_eraseColor)
      */
-    @Contract("_ -> this")
     fun erase(color: Int): Bitmap {
         return try {
             Stats.onNativeCall()
@@ -859,7 +850,6 @@ class Bitmap internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR
      *
      * @see [https://fiddle.skia.org/c/@Bitmap_erase](https://fiddle.skia.org/c/@Bitmap_erase)
      */
-    @Contract("_, _ -> this")
     fun erase(color: Int, area: IRect): Bitmap {
         return try {
             Stats.onNativeCall()
@@ -1117,8 +1107,7 @@ class Bitmap internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR
         }
     }
 
-    @ApiStatus.Internal
-    object _FinalizerHolder {
+    internal object _FinalizerHolder {
         val PTR = _nGetFinalizer()
     }
 }

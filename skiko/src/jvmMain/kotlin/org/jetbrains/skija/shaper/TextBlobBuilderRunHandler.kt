@@ -1,7 +1,6 @@
 package org.jetbrains.skija.shaper
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
-import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.skija.*
 import org.jetbrains.skija.impl.Managed
 import org.jetbrains.skija.impl.Native
@@ -9,7 +8,7 @@ import org.jetbrains.skija.impl.Stats
 import java.lang.UnsupportedOperationException
 import java.lang.ref.Reference
 
-class TextBlobBuilderRunHandler<T> @ApiStatus.Internal constructor(
+class TextBlobBuilderRunHandler<T> internal constructor(
     text: ManagedString?,
     manageText: Boolean,
     offsetX: Float,
@@ -18,20 +17,16 @@ class TextBlobBuilderRunHandler<T> @ApiStatus.Internal constructor(
     _nMake(Native.Companion.getPtr(text), offsetX, offsetY), _FinalizerHolder.PTR
 ), RunHandler {
     companion object {
-        @ApiStatus.Internal
-        external fun _nGetFinalizer(): Long
-        @ApiStatus.Internal
-        external fun _nMake(textPtr: Long, offsetX: Float, offsetY: Float): Long
-        @ApiStatus.Internal
-        external fun _nMakeBlob(ptr: Long): Long
+        @JvmStatic external fun _nGetFinalizer(): Long
+        @JvmStatic external fun _nMake(textPtr: Long, offsetX: Float, offsetY: Float): Long
+        @JvmStatic external fun _nMakeBlob(ptr: Long): Long
 
         init {
             staticLoad()
         }
     }
 
-    @ApiStatus.Internal
-    val _text: ManagedString?
+    internal val _text: ManagedString?
 
     constructor(text: String?) : this(ManagedString(text), true, 0f, 0f) {}
     constructor(text: String?, offset: Point) : this(ManagedString(text), true, offset.x, offset.y) {}
@@ -75,8 +70,7 @@ class TextBlobBuilderRunHandler<T> @ApiStatus.Internal constructor(
         }
     }
 
-    @ApiStatus.Internal
-    object _FinalizerHolder {
+    internal object _FinalizerHolder {
         val PTR = _nGetFinalizer()
     }
 

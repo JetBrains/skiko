@@ -1,13 +1,10 @@
 package org.jetbrains.skija
 
-import org.jetbrains.annotations.ApiStatus
-
 class FilterMipmap @JvmOverloads constructor(
     internal val filterMode: FilterMode,
     internal val mipmapMode: MipmapMode = MipmapMode.NONE
 ) : SamplingMode {
 
-    @ApiStatus.Internal
     override fun _pack(): Long {
         return 9223372036854775807L and (filterMode.ordinal.toLong() shl 32 or mipmapMode.ordinal.toLong())
     }

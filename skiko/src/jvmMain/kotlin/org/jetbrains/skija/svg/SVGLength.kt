@@ -1,15 +1,10 @@
 package org.jetbrains.skija.svg
 
-import org.jetbrains.annotations.ApiStatus
-
 class SVGLength(internal val value: Float, unit: SVGLengthUnit) {
 
-    @ApiStatus.Internal
-    val _unit: SVGLengthUnit
+    internal val _unit: SVGLengthUnit
 
-    @ApiStatus.Internal
-    constructor(value: Float, unit: Int) : this(value, SVGLengthUnit._values.get(unit)) {
-    }
+    internal constructor(value: Float, unit: Int) : this(value, SVGLengthUnit._values.get(unit))
 
     constructor(value: Float) : this(value, SVGLengthUnit.NUMBER) {}
 

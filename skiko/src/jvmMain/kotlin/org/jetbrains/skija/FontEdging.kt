@@ -1,7 +1,5 @@
 package org.jetbrains.skija
 
-import org.jetbrains.annotations.ApiStatus
-
 /**
  * Whether edge pixels draw opaque or with partial transparency.
  */
@@ -22,7 +20,6 @@ enum class FontEdging {
     SUBPIXEL_ANTI_ALIAS;
 
     companion object {
-        @ApiStatus.Internal
-        val _values = values()
+        internal val _values = values()
     }
 }

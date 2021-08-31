@@ -6,7 +6,6 @@ enum class BaselineMode {
     ALPHABETIC, IDEOGRAPHIC;
 
     companion object {
-        @ApiStatus.Internal
-        val _values = values()
+        internal val _values = values()
     }
 }

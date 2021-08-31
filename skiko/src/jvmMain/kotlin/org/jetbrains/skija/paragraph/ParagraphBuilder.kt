@@ -91,8 +91,7 @@ class ParagraphBuilder(style: ParagraphStyle?, fc: FontCollection?) :
         }
     }
 
-    @ApiStatus.Internal
-    object _FinalizerHolder {
+    internal object _FinalizerHolder {
         val PTR = _nGetFinalizer()
     }
 

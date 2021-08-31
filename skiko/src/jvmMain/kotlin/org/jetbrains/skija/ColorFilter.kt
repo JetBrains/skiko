@@ -1,7 +1,6 @@
 package org.jetbrains.skija
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
-import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.skija.impl.RefCnt
 import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.impl.Stats
@@ -80,19 +79,19 @@ class ColorFilter : RefCnt {
             return ColorFilter(_nMakeOverdraw(colors[0], colors[1], colors[2], colors[3], colors[4], colors[5]))
         }
 
-        external fun _nMakeComposed(outer: Long, inner: Long): Long
-        external fun _nMakeBlend(color: Int, blendMode: Int): Long
-        external fun _nMakeMatrix(rowMajor: FloatArray?): Long
-        external fun _nMakeHSLAMatrix(rowMajor: FloatArray?): Long
-        external fun _nGetLinearToSRGBGamma(): Long
-        external fun _nGetSRGBToLinearGamma(): Long
-        external fun _nMakeLerp(t: Float, dstPtr: Long, srcPtr: Long): Long
-        external fun _nMakeLighting(colorMul: Int, colorAdd: Int): Long
-        external fun _nMakeHighContrast(grayscale: Boolean, inversionMode: Int, contrast: Float): Long
-        external fun _nMakeTable(table: ByteArray?): Long
-        external fun _nMakeTableARGB(a: ByteArray?, r: ByteArray?, g: ByteArray?, b: ByteArray?): Long
-        external fun _nMakeOverdraw(c0: Int, c1: Int, c2: Int, c3: Int, c4: Int, c5: Int): Long
-        external fun _nGetLuma(): Long
+        @JvmStatic external fun _nMakeComposed(outer: Long, inner: Long): Long
+        @JvmStatic external fun _nMakeBlend(color: Int, blendMode: Int): Long
+        @JvmStatic external fun _nMakeMatrix(rowMajor: FloatArray?): Long
+        @JvmStatic external fun _nMakeHSLAMatrix(rowMajor: FloatArray?): Long
+        @JvmStatic external fun _nGetLinearToSRGBGamma(): Long
+        @JvmStatic external fun _nGetSRGBToLinearGamma(): Long
+        @JvmStatic external fun _nMakeLerp(t: Float, dstPtr: Long, srcPtr: Long): Long
+        @JvmStatic external fun _nMakeLighting(colorMul: Int, colorAdd: Int): Long
+        @JvmStatic external fun _nMakeHighContrast(grayscale: Boolean, inversionMode: Int, contrast: Float): Long
+        @JvmStatic external fun _nMakeTable(table: ByteArray?): Long
+        @JvmStatic external fun _nMakeTableARGB(a: ByteArray?, r: ByteArray?, g: ByteArray?, b: ByteArray?): Long
+        @JvmStatic external fun _nMakeOverdraw(c0: Int, c1: Int, c2: Int, c3: Int, c4: Int, c5: Int): Long
+        @JvmStatic external fun _nGetLuma(): Long
 
         init {
             staticLoad()
@@ -123,11 +122,7 @@ class ColorFilter : RefCnt {
         }
     }
 
-    @ApiStatus.Internal
-    constructor(ptr: Long) : super(ptr) {
-    }
+    internal constructor(ptr: Long) : super(ptr)
 
-    @ApiStatus.Internal
-    constructor(ptr: Long, allowClose: Boolean) : super(ptr, allowClose) {
-    }
+    internal constructor(ptr: Long, allowClose: Boolean) : super(ptr, allowClose)
 }

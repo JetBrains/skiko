@@ -3,14 +3,11 @@ package org.jetbrains.skija.shaper
 import org.jetbrains.annotations.ApiStatus
 
 class TrivialScriptRunIterator(text: String, script: String) : MutableIterator<ScriptRun?> {
-    @ApiStatus.Internal
-    val _length: Int
+    internal val _length: Int
 
-    @ApiStatus.Internal
-    val _script: String
+    internal val _script: String
 
-    @ApiStatus.Internal
-    var _atEnd: Boolean
+    internal var _atEnd: Boolean
     override fun next(): ScriptRun {
         _atEnd = true
         return ScriptRun(_length, _script)

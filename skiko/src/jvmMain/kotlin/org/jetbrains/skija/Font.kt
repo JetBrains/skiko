@@ -1,7 +1,6 @@
 package org.jetbrains.skija
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
-import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.skija.impl.Managed
 import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.impl.Stats
@@ -9,8 +8,7 @@ import java.lang.ref.Reference
 
 class Font : Managed {
     companion object {
-        @ApiStatus.Internal
-        fun makeClone(ptr: Long): Font {
+        internal fun makeClone(ptr: Long): Font {
             Stats.onNativeCall()
             return Font(_nMakeClone(ptr))
         }
@@ -67,13 +65,9 @@ class Font : Managed {
         }
     }
 
-    @ApiStatus.Internal
-    constructor(ptr: Long) : super(ptr, _FinalizerHolder.PTR) {
-    }
+    internal constructor(ptr: Long) : super(ptr, _FinalizerHolder.PTR)
 
-    @ApiStatus.Internal
-    constructor(ptr: Long, managed: Boolean) : super(ptr, _FinalizerHolder.PTR, managed) {
-    }
+    internal constructor(ptr: Long, managed: Boolean) : super(ptr, _FinalizerHolder.PTR, managed)
 
     /**
      * Returns Font initialized with default values
@@ -87,7 +81,7 @@ class Font : Managed {
      *
      * @param typeface  typeface and style used to draw and measure text. Pass null for default
      */
-    constructor(typeface: Typeface?) : this(_nMakeTypeface(Native.Companion.getPtr(typeface))) {
+    constructor(typeface: Typeface?) : this(_nMakeTypeface(Native.getPtr(typeface))) {
         Stats.onNativeCall()
         Reference.reachabilityFence(typeface)
     }
@@ -124,7 +118,6 @@ class Font : Managed {
      * Compares fonts, and returns true if they are equivalent.
      * May return false if Typeface has identical contents but different pointers.
      */
-    @ApiStatus.Internal
     override fun _nativeEquals(other: Native?): Boolean {
         return try {
             _nEquals(_ptr, Native.Companion.getPtr(other))
@@ -651,8 +644,7 @@ class Font : Managed {
             Reference.reachabilityFence(this)
         }
 
-    @ApiStatus.Internal
-    object _FinalizerHolder {
+    internal object _FinalizerHolder {
         val PTR = _nGetFinalizer()
     }
 }

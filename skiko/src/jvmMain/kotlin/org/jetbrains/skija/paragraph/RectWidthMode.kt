@@ -1,7 +1,5 @@
 package org.jetbrains.skija.paragraph
 
-import org.jetbrains.annotations.ApiStatus
-
 enum class RectWidthMode {
     /** Provide tight bounding boxes that fit widths to the runs of each line independently.  */
     TIGHT,
@@ -10,7 +8,6 @@ enum class RectWidthMode {
     MAX;
 
     companion object {
-        @ApiStatus.Internal
-        val _values = values()
+        internal val _values = values()
     }
 }
