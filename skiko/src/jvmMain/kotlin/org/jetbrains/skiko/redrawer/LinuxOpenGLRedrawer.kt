@@ -12,14 +12,6 @@ internal class LinuxOpenGLRedrawer(
     private var isDisposed = false
     private var context = 0L
     private val swapInterval = if (properties.isVsyncEnabled) 1 else 0
-    private val frameLimiter by lazy { FrameLimiter(layer) }
-
-    private suspend fun limitFramesIfNeeded() {
-        // Some Linuxes don't turn vsync on, so we apply additional frame limit (which should be no longer than enabled vsync)
-        if (properties.isVsyncEnabled) {
-            frameLimiter.awaitNextFrame()
-        }
-    }
 
     init {
     	layer.backedLayer.lockDrawingSurface {
@@ -31,7 +23,15 @@ internal class LinuxOpenGLRedrawer(
             it.setSwapInterval(swapInterval)
         }
     }
-    
+
+    private val frameLimiter by lazy { FrameLimiter(layer) }
+
+    private suspend fun limitFramesIfNeeded() {
+        // Some Linuxes don't turn vsync on, so we apply additional frame limit (which should be no longer than enabled vsync)
+        if (properties.isVsyncEnabled) {
+            frameLimiter.awaitNextFrame()
+        }
+    }
 
     override fun dispose() {
         check(!isDisposed) { "LinuxOpenGLRedrawer is disposed" }
@@ -78,8 +78,8 @@ internal class LinuxOpenGLRedrawer(
         private val toRedrawAlive = toRedrawCopy.asSequence().filterNot(LinuxOpenGLRedrawer::isDisposed)
 
         private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
-            toRedrawAlive.forEach {
-                it.limitFramesIfNeeded()
+            toRedrawAlive.forEach { redrawer ->
+                redrawer.limitFramesIfNeeded()
             }
 
             toRedrawCopy.clear()
@@ -96,23 +96,23 @@ internal class LinuxOpenGLRedrawer(
                 }
             }
 
-            val drawingSurfaces = toRedrawAlive.map { lockDrawingSurface(it.layer.backedLayer) }.toList()
+            val drawingSurfaces = toRedrawAlive.associateWith { lockDrawingSurface(it.layer.backedLayer) }
             try {
-                toRedrawAlive.forEachIndexed { index, redrawer ->
-                    drawingSurfaces[index].makeCurrent(redrawer.context)
+                toRedrawAlive.forEach { redrawer ->
+                    drawingSurfaces[redrawer]!!.makeCurrent(redrawer.context)
                     redrawer.draw()
                 }
 
-                toRedrawAlive.forEachIndexed { index, _ ->
-                    drawingSurfaces[index].swapBuffers()
+                toRedrawAlive.forEach { redrawer ->
+                    drawingSurfaces[redrawer]!!.swapBuffers()
                 }
 
-                toRedrawAlive.forEachIndexed { index, redrawer ->
-                    drawingSurfaces[index].makeCurrent(redrawer.context)
+                toRedrawAlive.forEach { redrawer ->
+                    drawingSurfaces[redrawer]!!.makeCurrent(redrawer.context)
                     OpenGLApi.instance.glFinish()
                 }
             } finally {
-                drawingSurfaces.forEach(::unlockDrawingSurface)
+                drawingSurfaces.values.forEach(::unlockDrawingSurface)
             }
         }
     }

@@ -1,15 +1,12 @@
 package org.jetbrains.skiko
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.awt.Component
 import java.awt.GraphicsEnvironment
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTime
 
 private const val NanosecondsPerMillisecond = 1_000_000L
-
-private const val MinMainstreamMonitorRefreshRate = 60
 
 @Volatile
 private var maxGlobalRefreshRate = MinMainstreamMonitorRefreshRate
@@ -18,21 +15,17 @@ private val SwingGlobalFrameLimiter by lazy {
     val scope = CoroutineScope(Dispatchers.IO)
 
     scope.launch {
-        maxGlobalRefreshRate = GraphicsEnvironment
-            .getLocalGraphicsEnvironment()
-            .screenDevices
-            .maxOf { it.displayMode.refreshRate }
-            .coerceAtLeast(MinMainstreamMonitorRefreshRate)
+        // TODO instead of getting max refresh rate of all displays and cache it, we should use individual frame limiters for each window, and update refresh rate when the display mode or the display is changed.
+        //  we can't call it every frame, as it can be expensive (~3ms on Linux on my machine)
+        maxGlobalRefreshRate = getMaxDisplayRefreshRate()
     }
 
     FrameLimiter(
         scope,
-        { 1000L / maxGlobalRefreshRate }
+        { (1000L / maxGlobalRefreshRate).toLong() }
     )
 }
 
-// TODO because it can be slow on some Linux'es (~100ms), we use global frame limiter instead of the local ones.
-//  but it doesn't refresh when user change frame rate or plug external monitors.
 @Suppress("UNUSED_PARAMETER")
 internal fun FrameLimiter(component: Component) = SwingGlobalFrameLimiter
 
@@ -42,6 +35,7 @@ internal fun FrameLimiter(component: Component) = SwingGlobalFrameLimiter
  * (Windows has ~15ms precision by default, Linux/macOs ~2ms).
  * FrameLimiter will try to delay frames as close as possible to [frameMillis], but not greater
  */
+@OptIn(ExperimentalTime::class)
 class FrameLimiter(
     coroutineScope: CoroutineScope,
     private val frameMillis: () -> Long,
@@ -50,7 +44,7 @@ class FrameLimiter(
     private val channel = RendezvousBroadcastChannel<Unit>()
 
     init {
-        coroutineScope.launch {
+        coroutineScope.launch(Dispatchers.IO) {
             while (true) {
                 channel.sendAll(Unit)
                 preciseDelay(frameMillis())
