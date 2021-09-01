@@ -36,12 +36,27 @@ repositories {
 }
 
 val skiaZip = run {
-    val zipName = skiko.skiaReleaseForTargetOS + ".zip"
+    val zipName = skiko.skiaReleaseFor(targetOs, targetArch) + ".zip"
     val zipFile = skiko.dependenciesDir.resolve("skia/${zipName.substringAfterLast('/')}")
 
     tasks.register("downloadSkia", Download::class) {
         onlyIf { skiko.skiaDir == null && !zipFile.exists() }
-        inputs.property("skia.release.for.target.os", skiko.skiaReleaseForTargetOS)
+        inputs.property("skia.release.for.target.os", skiko.skiaReleaseFor(targetOs, targetArch))
+        src("https://github.com/JetBrains/skia-pack/releases/download/$zipName")
+        dest(zipFile)
+        onlyIfModified(true)
+    }.map { zipFile }
+}
+
+// Somewhat ugly.
+val skiaWasmZip = run {
+    val release = skiko.skiaReleaseFor(OS.Wasm, Arch.Wasm)
+    val zipName = "$release.zip"
+    val zipFile = skiko.dependenciesDir.resolve("skia/${zipName.substringAfterLast('/')}")
+
+    tasks.register("downloadSkiaWasm", Download::class) {
+        onlyIf { skiko.skiaDir == null && !zipFile.exists() }
+        inputs.property("skia.release.for.wasm", release)
         src("https://github.com/JetBrains/skia-pack/releases/download/$zipName")
         dest(zipFile)
         onlyIfModified(true)
@@ -65,6 +80,24 @@ val skiaDir = run {
         val targetDir = skiko.dependenciesDir.resolve("skia/skia")
         tasks.register("unzipSkia", Copy::class) {
             from(skiaZip.map { zipTree(it) })
+            configureSkiaCopy(targetDir)
+        }.map { targetDir }
+    }
+}
+
+val skiaWasmDir = run {
+    if (skiko.skiaDir != null) {
+        tasks.register("skiaWasmDir", DefaultTask::class) {
+            // dummy task to simplify usage of the resulting provider (see `else` branch)
+            // if a file provider is not created from a task provider,
+            // then it cannot be used instead of a task in `dependsOn` clauses of other tasks.
+            // e.g. the resulting `skiaDir` could not be used in `dependsOn` of CppCompile configuration
+            enabled = false
+        }.map { skiko.skiaDir!! }
+    } else {
+        val targetDir = skiko.dependenciesDir.resolve("skia/skia-wasm")
+        tasks.register("unzipSkiaWasm", Copy::class) {
+            from(skiaWasmZip.map { zipTree(it) })
             configureSkiaCopy(targetDir)
         }.map { targetDir }
     }
@@ -247,9 +280,7 @@ tasks.withType(CppCompile::class.java).configureEach {
                     )
             )
         }
-        OS.Wasm -> {
-
-        }
+        OS.Wasm -> throw GradleException("Should not reach here")
     }
 }
 
@@ -283,14 +314,15 @@ project.tasks.register<Exec>("objcCompile") {
 }
 
 project.tasks.register<Exec>("wasmCompile") {
+    dependsOn(skiaWasmDir)
     val inputDir = "$projectDir/src/jsMain/cpp"
     val outDir = "$buildDir/wasm"
     val names = File(inputDir).listFiles()!!.map { it.name.removeSuffix(".cc") }
     val srcs = names.map { "$inputDir/$it.cc" }.toTypedArray()
     val out = "$outDir/skiko.wasm"
-    // TODO: fix me, use WASM Skia, by making sure it's a function that accepts target.
-    val skiaDir = skiaDir.get().absolutePath
+    val skiaDir = skiaWasmDir.get().absolutePath
     workingDir = File(outDir)
+    val libs = fileTree("$skiaDir/out/Release-wasm-wasm").filter { it.name.endsWith(".a") }
     commandLine = listOf(
         "emcc",
         *Arch.Wasm.clangFlags,
@@ -300,7 +332,7 @@ project.tasks.register<Exec>("wasmCompile") {
         "-std=c++17",
         "-o",
         out,
-        // TODO: pass Skia lib
+        *libs.files.map { it.absolutePath }.toTypedArray(),
         *srcs
     )
     file(outDir).mkdirs()

@@ -90,16 +90,12 @@ class SkikoProperties(private val myProject: Project) {
     val buildType: SkiaBuildType
         get() = if (myProject.findProperty("skiko.debug") == "true") SkiaBuildType.DEBUG else SkiaBuildType.RELEASE
 
-    val skiaReleaseForTargetOS: String
-        get() {
-            val tag = myProject.property("dependencies.skia.$target") as String
-            val suffix = if (targetOs == OS.Linux && targetArch == Arch.X64) {
-                "-ubuntu14"
-            } else {
-                ""
-            }
-            return "${tag}/Skia-${tag}-${targetOs.id}-${buildType.id}-${targetArch.id}$suffix"
-        }
+    fun skiaReleaseFor(os: OS, arch: Arch): String {
+        val target = "${os.id}-${arch.id}"
+        val tag = myProject.property("dependencies.skia.$target") as String
+        val suffix = if (os == OS.Linux && arch == Arch.X64) "-ubuntu14" else ""
+        return "${tag}/Skia-${tag}-${os.id}-${buildType.id}-${arch.id}$suffix"
+    }
 
     val releaseGithubVersion: String
         get() = (myProject.property("release.github.version") as String)
