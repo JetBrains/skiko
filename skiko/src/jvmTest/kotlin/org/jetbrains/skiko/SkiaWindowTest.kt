@@ -316,7 +316,7 @@ class SkiaWindowTest {
         override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
             val dpi = layer.contentScale
             canvas.drawRect(Rect(0f, 0f, width.toFloat(), height.toFloat()), Paint().apply {
-                color = Color.WHITE.rgb)
+                color = Color.WHITE.rgb
             })
             canvas.drawRect(Rect(0f, 0f, rectWidth * dpi, rectHeight * dpi), Paint().apply {
                 color = rectColor.rgb
