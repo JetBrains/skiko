@@ -82,7 +82,7 @@ class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
         }
     }
 
-    val direction: org.jetbrains.skija.paragraph.Direction
+    val direction: Direction
         get() = try {
             Stats.onNativeCall()
             Direction.values().get(_nGetDirection(_ptr))
@@ -96,7 +96,7 @@ class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
         return this
     }
 
-    val alignment: org.jetbrains.skija.paragraph.Alignment
+    val alignment: Alignment
         get() = try {
             Stats.onNativeCall()
             Alignment._values.get(_nGetAlignment(_ptr))
@@ -152,7 +152,7 @@ class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
         return this
     }
 
-    val heightMode: org.jetbrains.skija.paragraph.HeightMode
+    val heightMode: HeightMode
         get() = try {
             Stats.onNativeCall()
             HeightMode.values().get(_nGetHeightMode(_ptr))
@@ -166,7 +166,7 @@ class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
         return this
     }
 
-    val effectiveAlignment: org.jetbrains.skija.paragraph.Alignment
+    val effectiveAlignment: Alignment
         get() = try {
             Stats.onNativeCall()
             Alignment._values.get(_nGetEffectiveAlignment(_ptr))

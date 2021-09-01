@@ -8,7 +8,7 @@ class SVGLength(internal val value: Float, unit: SVGLengthUnit) {
 
     constructor(value: Float) : this(value, SVGLengthUnit.NUMBER) {}
 
-    val unit: org.jetbrains.skija.svg.SVGLengthUnit
+    val unit: SVGLengthUnit
         get() = _unit
 
     override fun equals(o: Any?): Boolean {
