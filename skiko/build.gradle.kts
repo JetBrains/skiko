@@ -48,20 +48,6 @@ val skiaZip = run {
     }.map { zipFile }
 }
 
-fun String.insertAfterFirst(substring: String, stringToInsert: String): String =
-    let { orig ->
-        buildString {
-            var i = orig.indexOf(substring)
-            if (i < 0) return orig
-
-            i += substring.length
-
-            append(orig.substring(0, i))
-            append(stringToInsert)
-            append(orig.substring(i))
-        }
-    }
-
 fun AbstractCopyTask.configureSkiaCopy(targetDir: File) {
     into(targetDir)
 }
@@ -94,6 +80,11 @@ kotlin {
         compilations.all {
             kotlinOptions.jvmTarget = "11"
         }
+    }
+
+    js(IR) {
+        browser()
+        binaries.executable()
     }
 
     if (supportNative) {
@@ -144,9 +135,7 @@ kotlin {
             }
         }
         if (supportNative) {
-            val macosX64Main by getting {
-
-            }
+            val macosX64Main by getting {}
         }
     }
 }
@@ -258,6 +247,9 @@ tasks.withType(CppCompile::class.java).configureEach {
                     )
             )
         }
+        OS.Wasm -> {
+
+        }
     }
 }
 
@@ -281,6 +273,29 @@ project.tasks.register<Exec>("objcCompile") {
         "-I$skiaDir/include",
         "-I$skiaDir/include/gpu",
         "-DSK_METAL",
+        "-std=c++17",
+        "-c",
+        *srcs
+    )
+    file(outDir).mkdirs()
+    inputs.files(srcs)
+    outputs.files(outs)
+}
+
+project.tasks.register<Exec>("wasmCompile") {
+    val inputDir = "$projectDir/src/jsMain/cpp"
+    val outDir = "$buildDir/wasm"
+    val names = File(inputDir).listFiles()!!.map { it.name.removeSuffix(".cc") }
+    val srcs = names.map { "$inputDir/$it.cc" }.toTypedArray()
+    val outs = names.map { "$outDir/$it.o" }.toTypedArray()
+    workingDir = File(outDir)
+    val skiaDir = skiaDir.get().absolutePath
+    commandLine = listOf(
+        "emcc",
+        *Arch.Wasm.clangFlags,
+        "-I$skiaDir",
+        "-I$skiaDir/include",
+        "-I$skiaDir/include/gpu",
         "-std=c++17",
         "-c",
         *srcs
@@ -408,6 +423,9 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
                 )
             )
         }
+        OS.Wasm -> {
+            throw GradleException("This task shalln't be used with WASM")
+        }
     }
 }
 
@@ -502,6 +520,16 @@ val skikoJvmRuntimeJar by project.tasks.registering(Jar::class) {
         from(files(skiaDir.map { it.resolve("${skiaBinSubdir}/icudtl.dat") }))
     }
     from(createChecksums.get().outputs.files)
+}
+
+project.tasks.register<Jar>("skikoJsJar") {
+    // We produce jar that contains .js of wrapper/bindings and .wasm with Skia + bindings.
+    from(kotlin.js().compilations["main"].output.allOutputs)
+    from(project.tasks.named("wasmCompile").get().outputs)
+    archiveBaseName.set("skiko-wasm")
+    doLast {
+        println("output at ${outputs.files.files.single()}")
+    }
 }
 
 project.tasks.register<JavaExec>("run") {
