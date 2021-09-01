@@ -26,9 +26,8 @@ import kotlin.test.assertTrue
 
 @Suppress("BlockingMethodInNonBlockingContext", "SameParameterValue")
 class SkiaWindowTest {
-    private val fontManager = FontMgr.getDefault()
     private val fontCollection = FontCollection()
-        .setDefaultFontManager(fontManager)
+        .setDefaultFontManager(FontMgr.default)
 
     private fun paragraph(size: Float, text: String) =
         ParagraphBuilder(ParagraphStyle(), fontCollection)
@@ -345,7 +344,7 @@ class SkiaWindowTest {
             }
 
             canvas.drawRect(Rect(x.toFloat(), 0f, x.toFloat() + size.toFloat(), size.toFloat()), Paint().apply {
-                color = Color.RED.rgb
+                setColor(Color.RED.rgb)
             })
 
             layer.needRedraw()
