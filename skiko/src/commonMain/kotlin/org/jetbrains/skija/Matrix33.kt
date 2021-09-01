@@ -1,6 +1,11 @@
 package org.jetbrains.skija
 
-import java.util.*
+import kotlin.math.PI
+import kotlin.math.abs
+import kotlin.math.cos
+import kotlin.math.sin
+
+internal fun Float.toRadians(): Double = this.toDouble() / 180 * PI
 
 /**
  *
@@ -114,7 +119,7 @@ class Matrix33(vararg mat: Float) {
         if (o !is Matrix33) return false
         val other = o
         if (!other.canEqual(this as Any)) return false
-        return if (!Arrays.equals(mat, other.mat)) false else true
+        return mat.contentEquals(other.mat)
     }
 
     protected fun canEqual(other: Any?): Boolean {
@@ -124,12 +129,12 @@ class Matrix33(vararg mat: Float) {
     override fun hashCode(): Int {
         val PRIME = 59
         var result = 1
-        result = result * PRIME + Arrays.hashCode(mat)
+        result = result * PRIME + mat.contentHashCode()
         return result
     }
 
     override fun toString(): String {
-        return "Matrix33(_mat=" + Arrays.toString(mat) + ")"
+        return "Matrix33(_mat=$mat)"
     }
 
     companion object {
@@ -204,12 +209,12 @@ class Matrix33(vararg mat: Float) {
          * @return     Matrix33 with rotation
          */
         fun makeRotate(deg: Float): Matrix33 {
-            val rad = Math.toRadians(deg.toDouble())
-            var sin = Math.sin(rad)
-            var cos = Math.cos(rad)
+            val rad = deg.toRadians()
+            var sin = sin(rad)
+            var cos = cos(rad)
             val tolerance = (1.0f / (1 shl 12)).toDouble()
-            if (Math.abs(sin) <= tolerance) sin = 0.0
-            if (Math.abs(cos) <= tolerance) cos = 0.0
+            if (abs(sin) <= tolerance) sin = 0.0
+            if (abs(cos) <= tolerance) cos = 0.0
             return Matrix33(
                 *floatArrayOf(
                     cos.toFloat(),
@@ -245,12 +250,12 @@ class Matrix33(vararg mat: Float) {
          * @return        Matrix33 with rotation
          */
         fun makeRotate(deg: Float, pivotx: Float, pivoty: Float): Matrix33 {
-            val rad = Math.toRadians(deg.toDouble())
-            var sin = Math.sin(rad)
-            var cos = Math.cos(rad)
+            val rad = deg.toRadians()
+            var sin = sin(rad)
+            var cos = cos(rad)
             val tolerance = (1.0f / (1 shl 12)).toDouble()
-            if (Math.abs(sin) <= tolerance) sin = 0.0
-            if (Math.abs(cos) <= tolerance) cos = 0.0
+            if (abs(sin) <= tolerance) sin = 0.0
+            if (abs(cos) <= tolerance) cos = 0.0
             return Matrix33(
                 *floatArrayOf(
                     cos.toFloat(),
@@ -286,7 +291,7 @@ class Matrix33(vararg mat: Float) {
     }
 
     init {
-        assert(mat.size == 9) { (if ("Expected 9 elements, got $mat" == null) null else mat.size)!! }
+        require(mat.size == 9) { (if ("Expected 9 elements, got $mat" == null) null else mat.size)!! }
         this.mat = mat
     }
 }

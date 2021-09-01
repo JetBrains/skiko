@@ -10,7 +10,7 @@ class TextBox(val rect: Rect, direction: Direction) {
         Direction.values().get(direction)
     )
 
-    val direction: org.jetbrains.skija.paragraph.Direction
+    val direction: Direction
         get() = _direction
 
     override fun equals(o: Any?): Boolean {

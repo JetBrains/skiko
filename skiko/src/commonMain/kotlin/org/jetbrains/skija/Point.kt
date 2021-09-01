@@ -7,7 +7,6 @@ class Point(val x: Float, val y: Float) {
     }
 
     fun offset(vec: Point): Point {
-        assert(vec != null) { "Point::offset expected other != null" }
         return offset(vec.x, vec.y)
     }
 
@@ -27,8 +26,8 @@ class Point(val x: Float, val y: Float) {
         if (o !is Point) return false
         val other = o
         if (!other.canEqual(this as Any)) return false
-        if (java.lang.Float.compare(x, other.x) != 0) return false
-        return if (java.lang.Float.compare(y, other.y) != 0) false else true
+        if (x.compareTo(other.x) != 0) return false
+        return if (y.compareTo(other.y) != 0) false else true
     }
 
     protected fun canEqual(other: Any?): Boolean {
@@ -38,13 +37,13 @@ class Point(val x: Float, val y: Float) {
     override fun hashCode(): Int {
         val PRIME = 59
         var result = 1
-        result = result * PRIME + java.lang.Float.floatToIntBits(x)
-        result = result * PRIME + java.lang.Float.floatToIntBits(y)
+        result = result * PRIME + x.toBits()
+        result = result * PRIME + y.toBits()
         return result
     }
 
     override fun toString(): String {
-        return "Point(_x=" + x + ", _y=" + y + ")"
+        return "Point(_x=$x, _y=$y)"
     }
 
     companion object {
@@ -61,7 +60,7 @@ class Point(val x: Float, val y: Float) {
 
         fun fromArray(pts: FloatArray?): Array<Point?>? {
             if (pts == null) return null
-            assert(pts.size % 2 == 0) { "Expected " + pts.size + " % 2 == 0" }
+            require(pts.size % 2 == 0) { "Expected " + pts.size + " % 2 == 0" }
             val arr = arrayOfNulls<Point>(pts.size / 2)
             for (i in 0 until pts.size / 2) arr[i] = Point(pts[i * 2], pts[i * 2 + 1])
             return arr
