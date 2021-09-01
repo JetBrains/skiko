@@ -20,35 +20,15 @@ class ColorSpace : Managed {
         init {
             staticLoad()
         }
-    }
 
-    object _SRGBHolder {
         val sRGB = ColorSpace(_nMakeSRGB(), false)
-
-        init {
-            Stats.onNativeCall()
-        }
-    }
-
-    object _SRGBLinearHolder {
-        val sRGBLinear = ColorSpace(_nMakeSRGBLinear(), false)
-
-        init {
-            Stats.onNativeCall()
-        }
-    }
-
-    object _DisplayP3Holder {
         val displayP3 = ColorSpace(_nMakeDisplayP3(), false)
-
-        init {
-            Stats.onNativeCall()
-        }
     }
+
 
     fun convert(to: ColorSpace?, color: Color4f): Color4f {
         var to = to
-        to = to ?: _SRGBHolder.sRGB
+        to = to ?: sRGB
         return try {
             Color4f(
                 _nConvert(

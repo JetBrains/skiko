@@ -4,7 +4,6 @@ import org.jetbrains.skija.ColorSpace
 import org.jetbrains.skija.Surface
 import org.jetbrains.skija.SurfaceColorFormat
 import org.jetbrains.skija.SurfaceOrigin
-import org.jetbrains.skija.impl.Native
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.redrawer.MetalRedrawer
 
@@ -42,7 +41,7 @@ internal class MetalContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
             renderTarget!!,
             SurfaceOrigin.TOP_LEFT,
             SurfaceColorFormat.BGRA_8888,
-            ColorSpace._SRGBHolder.sRGB
+            ColorSpace.sRGB
         )
 
         canvas = surface!!.canvas

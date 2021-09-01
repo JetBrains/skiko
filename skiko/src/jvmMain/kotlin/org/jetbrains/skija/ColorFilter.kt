@@ -96,30 +96,9 @@ class ColorFilter : RefCnt {
         init {
             staticLoad()
         }
-    }
 
-    object _LinearToSRGBGammaHolder {
-        val linearToSRGBGamma = ColorFilter(_nGetLinearToSRGBGamma(), false)
-
-        init {
-            Stats.onNativeCall()
-        }
-    }
-
-    object _SRGBToLinearGammaHolder {
         val sRGBToLinearGamma = ColorFilter(_nGetSRGBToLinearGamma(), false)
-
-        init {
-            Stats.onNativeCall()
-        }
-    }
-
-    object _LumaHolder {
         val luma = ColorFilter(_nGetLuma(), false)
-
-        init {
-            Stats.onNativeCall()
-        }
     }
 
     internal constructor(ptr: Long) : super(ptr)

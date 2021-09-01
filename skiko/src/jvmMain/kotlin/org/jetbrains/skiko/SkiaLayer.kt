@@ -367,7 +367,7 @@ open class SkiaLayer(
                 if (picture != null) {
                     val store = Bitmap()
                     val ci = ColorInfo(
-                        ColorType.BGRA_8888, ColorAlphaType.OPAQUE, ColorSpace._SRGBHolder.sRGB)
+                        ColorType.BGRA_8888, ColorAlphaType.OPAQUE, ColorSpace.sRGB)
                     store.setImageInfo(ImageInfo(ci, picture.width, picture.height))
                     store.allocN32Pixels(picture.width, picture.height)
                     val canvas = Canvas(store)

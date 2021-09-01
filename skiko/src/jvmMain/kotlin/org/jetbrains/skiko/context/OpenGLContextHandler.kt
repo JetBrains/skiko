@@ -59,7 +59,7 @@ internal class OpenGLContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
                 renderTarget!!,
                 SurfaceOrigin.BOTTOM_LEFT,
                 SurfaceColorFormat.RGBA_8888,
-                ColorSpace._SRGBHolder.sRGB
+                ColorSpace.sRGB
             )
         }
 

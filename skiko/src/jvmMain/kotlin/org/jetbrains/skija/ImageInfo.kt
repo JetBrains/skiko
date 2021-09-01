@@ -35,9 +35,9 @@ class ImageInfo(val colorInfo: ColorInfo, val width: Int, val height: Int) {
     internal constructor(width: Int, height: Int, colorType: Int, alphaType: Int, colorSpace: Long) : this(
         width,
         height,
-        ColorType.values().get(colorType),
-        ColorAlphaType.values().get(alphaType),
-        if (colorSpace == 0L) null else org.jetbrains.skija.ColorSpace(colorSpace)
+        ColorType.values()[colorType],
+        ColorAlphaType.values()[alphaType],
+        if (colorSpace == 0L) null else ColorSpace(colorSpace)
     ) {
     }
 
@@ -81,7 +81,7 @@ class ImageInfo(val colorInfo: ColorInfo, val width: Int, val height: Int) {
      * @return  true if alphaType is [ColorAlphaType.OPAQUE]
      */
     val isOpaque: Boolean
-        get() = colorInfo!!.isOpaque
+        get() = colorInfo.isOpaque
 
     /**
      * @return  integral rectangle from (0, 0) to (getWidth(), getHeight())
@@ -94,7 +94,7 @@ class ImageInfo(val colorInfo: ColorInfo, val width: Int, val height: Int) {
      * is approximately the same as sRGB.
      */
     val isGammaCloseToSRGB: Boolean
-        get() = colorInfo!!.isGammaCloseToSRGB
+        get() = colorInfo.isGammaCloseToSRGB
 
     fun withWidthHeight(width: Int, height: Int): ImageInfo {
         return ImageInfo(colorInfo, width, height)
@@ -243,7 +243,7 @@ class ImageInfo(val colorInfo: ColorInfo, val width: Int, val height: Int) {
          * @return  ImageInfo with [ColorType.N32]
          */
         fun makeN32(width: Int, height: Int, alphaType: ColorAlphaType, colorSpace: ColorSpace?): ImageInfo {
-            return ImageInfo(ColorInfo(ColorType.Companion.N32, alphaType, colorSpace), width, height)
+            return ImageInfo(ColorInfo(ColorType.N32, alphaType, colorSpace), width, height)
         }
 
         /**
@@ -253,7 +253,7 @@ class ImageInfo(val colorInfo: ColorInfo, val width: Int, val height: Int) {
          */
         fun makeS32(width: Int, height: Int, alphaType: ColorAlphaType): ImageInfo {
             return ImageInfo(
-                ColorInfo(ColorType.N32, alphaType, ColorSpace._SRGBHolder.sRGB),
+                ColorInfo(ColorType.N32, alphaType, ColorSpace.sRGB),
                 width,
                 height
             )
