@@ -287,9 +287,10 @@ project.tasks.register<Exec>("wasmCompile") {
     val outDir = "$buildDir/wasm"
     val names = File(inputDir).listFiles()!!.map { it.name.removeSuffix(".cc") }
     val srcs = names.map { "$inputDir/$it.cc" }.toTypedArray()
-    val outs = names.map { "$outDir/$it.o" }.toTypedArray()
-    workingDir = File(outDir)
+    val out = "$outDir/skiko.wasm"
+    // TODO: fix me, use WASM Skia, by making sure it's a function that accepts target.
     val skiaDir = skiaDir.get().absolutePath
+    workingDir = File(outDir)
     commandLine = listOf(
         "emcc",
         *Arch.Wasm.clangFlags,
@@ -297,12 +298,14 @@ project.tasks.register<Exec>("wasmCompile") {
         "-I$skiaDir/include",
         "-I$skiaDir/include/gpu",
         "-std=c++17",
-        "-c",
+        "-o",
+        out,
+        // TODO: pass Skia lib
         *srcs
     )
     file(outDir).mkdirs()
     inputs.files(srcs)
-    outputs.files(outs)
+    outputs.files(out)
 }
 
 fun localSign(signer: String, lib: File): File {
