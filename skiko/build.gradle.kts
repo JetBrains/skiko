@@ -561,6 +561,7 @@ project.tasks.register<Jar>("skikoJsJar") {
     // We produce jar that contains .js of wrapper/bindings and .wasm with Skia + bindings.
     from(kotlin.js().compilations["main"].output.allOutputs)
     from(project.tasks.named("wasmCompile").get().outputs)
+    from(project.tasks.named("jsJar").get().outputs)
     archiveBaseName.set("skiko-wasm")
     doLast {
         println("output at ${outputs.files.files.single()}")
