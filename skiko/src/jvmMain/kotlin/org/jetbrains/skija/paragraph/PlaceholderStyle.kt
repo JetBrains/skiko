@@ -34,9 +34,9 @@ class PlaceholderStyle(
      * the alphabetic baseline.
      */
     val baseline: Float
-    val alignment: org.jetbrains.skija.paragraph.PlaceholderAlignment
+    val alignment: PlaceholderAlignment
         get() = _alignment
-    val baselineMode: org.jetbrains.skija.paragraph.BaselineMode
+    val baselineMode: BaselineMode
         get() = _baselineMode
 
     override fun equals(o: Any?): Boolean {

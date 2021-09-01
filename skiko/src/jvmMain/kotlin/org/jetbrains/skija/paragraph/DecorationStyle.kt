@@ -47,7 +47,7 @@ class DecorationStyle(
         return _gaps
     }
 
-    val lineStyle: org.jetbrains.skija.paragraph.DecorationLineStyle
+    val lineStyle: DecorationLineStyle
         get() = _lineStyle
 
     override fun equals(o: Any?): Boolean {

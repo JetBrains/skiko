@@ -1,7 +1,5 @@
 package org.jetbrains.skija
 
-import java.util.*
-
 /**
  *
  * 4x4 matrix used by SkCanvas and other parts of Skia.
@@ -41,7 +39,7 @@ class Matrix44(vararg mat: Float) {
         if (o !is Matrix44) return false
         val other = o
         if (!other.canEqual(this as Any)) return false
-        return if (!Arrays.equals(mat, other.mat)) false else true
+        return mat.contentEquals(other.mat)
     }
 
     protected fun canEqual(other: Any?): Boolean {
@@ -51,12 +49,12 @@ class Matrix44(vararg mat: Float) {
     override fun hashCode(): Int {
         val PRIME = 59
         var result = 1
-        result = result * PRIME + Arrays.hashCode(mat)
+        result = result * PRIME + mat.contentHashCode()
         return result
     }
 
     override fun toString(): String {
-        return "Matrix44(_mat=" + Arrays.toString(mat) + ")"
+        return "Matrix44(_mat=$mat)"
     }
 
     companion object {
@@ -67,7 +65,7 @@ class Matrix44(vararg mat: Float) {
      * The constructor parameters are in row-major order.
      */
     init {
-        assert(mat.size == 16) { (if ("Expected 16 elements, got $mat" == null) null else mat.size)!! }
+        require(mat.size == 16) { (if ("Expected 16 elements, got $mat" == null) null else mat.size)!! }
         this.mat = mat
     }
 }

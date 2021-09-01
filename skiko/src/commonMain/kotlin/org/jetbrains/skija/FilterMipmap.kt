@@ -1,6 +1,6 @@
 package org.jetbrains.skija
 
-class FilterMipmap @JvmOverloads constructor(
+class FilterMipmap constructor(
     internal val filterMode: FilterMode,
     internal val mipmapMode: MipmapMode = MipmapMode.NONE
 ) : SamplingMode {
@@ -16,10 +16,10 @@ class FilterMipmap @JvmOverloads constructor(
         if (!other.canEqual(this as Any)) return false
         val `this$_filterMode`: Any = filterMode
         val `other$_filterMode`: Any = other.filterMode
-        if (if (`this$_filterMode` == null) `other$_filterMode` != null else `this$_filterMode` != `other$_filterMode`) return false
+        if (`this$_filterMode` != `other$_filterMode`) return false
         val `this$_mipmapMode`: Any = mipmapMode
         val `other$_mipmapMode`: Any = other.mipmapMode
-        return if (if (`this$_mipmapMode` == null) `other$_mipmapMode` != null else `this$_mipmapMode` != `other$_mipmapMode`) false else true
+        return `this$_mipmapMode` == `other$_mipmapMode`
     }
 
     protected fun canEqual(other: Any?): Boolean {
@@ -30,13 +30,13 @@ class FilterMipmap @JvmOverloads constructor(
         val PRIME = 59
         var result = 1
         val `$_filterMode`: Any = filterMode
-        result = result * PRIME + (`$_filterMode`?.hashCode() ?: 43)
+        result = result * PRIME + (`$_filterMode`.hashCode())
         val `$_mipmapMode`: Any = mipmapMode
-        result = result * PRIME + (`$_mipmapMode`?.hashCode() ?: 43)
+        result = result * PRIME + (`$_mipmapMode`.hashCode())
         return result
     }
 
     override fun toString(): String {
-        return "FilterMipmap(_filterMode=" + filterMode + ", _mipmapMode=" + mipmapMode + ")"
+        return "FilterMipmap(_filterMode=$filterMode, _mipmapMode=$mipmapMode)"
     }
 }

@@ -24,8 +24,7 @@ package org.jetbrains.skija
 class CubicResampler(internal val b: Float, internal val c: Float) : SamplingMode {
 
     override fun _pack(): Long {
-        return ((java.lang.Float.floatToIntBits(b).toULong() shl 32) or
-                java.lang.Float.floatToIntBits(c).toULong()).toLong()
+        return ((b.toBits().toULong() shl 32) or c.toBits().toULong()).toLong()
     }
 
     override fun equals(o: Any?): Boolean {
@@ -33,8 +32,8 @@ class CubicResampler(internal val b: Float, internal val c: Float) : SamplingMod
         if (o !is CubicResampler) return false
         val other = o
         if (!other.canEqual(this as Any)) return false
-        if (java.lang.Float.compare(b, other.b) != 0) return false
-        return if (java.lang.Float.compare(c, other.c) != 0) false else true
+        if (b.compareTo(other.b) != 0) return false
+        return c.compareTo(other.c) == 0
     }
 
     protected fun canEqual(other: Any?): Boolean {
@@ -44,12 +43,12 @@ class CubicResampler(internal val b: Float, internal val c: Float) : SamplingMod
     override fun hashCode(): Int {
         val PRIME = 59
         var result = 1
-        result = result * PRIME + java.lang.Float.floatToIntBits(b)
-        result = result * PRIME + java.lang.Float.floatToIntBits(c)
+        result = result * PRIME + b.toBits()
+        result = result * PRIME + c.toBits()
         return result
     }
 
     override fun toString(): String {
-        return "CubicResampler(_B=" + b + ", _C=" + c + ")"
+        return "CubicResampler(_B=$b, _C=$c)"
     }
 }

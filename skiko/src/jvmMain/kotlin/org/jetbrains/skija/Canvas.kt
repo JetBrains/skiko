@@ -1,7 +1,6 @@
 package org.jetbrains.skija
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
-import org.jetbrains.annotations.Contract
 import org.jetbrains.skija.ImageFilter.Companion.makeDropShadowOnly
 import org.jetbrains.skija.impl.Managed
 import org.jetbrains.skija.impl.Native
@@ -573,12 +572,12 @@ open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val
     }
 
         fun drawImageRect(
-        image: Image,
-        src: Rect,
-        dst: Rect,
-        samplingMode: SamplingMode,
-        paint: Paint?,
-        strict: Boolean
+            image: Image,
+            src: Rect,
+            dst: Rect,
+            samplingMode: SamplingMode,
+            paint: Paint?,
+            strict: Boolean
     ): Canvas {
         assert(image != null) { "Can’t drawImageRect with image == null" }
         assert(src != null) { "Can’t drawImageRect with src == null" }
@@ -1235,7 +1234,6 @@ open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val
     /**
      * Returns the total transformation matrix for the canvas.
      */
-    @get:Contract("-> new")
     val localToDevice: Matrix44
         get() = try {
             Stats.onNativeCall()
@@ -1245,7 +1243,6 @@ open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val
             Reference.reachabilityFence(this)
         }
 
-    @get:Contract("-> new")
     val localToDeviceAsMatrix33: Matrix33
         get() = localToDevice.asMatrix33()
 

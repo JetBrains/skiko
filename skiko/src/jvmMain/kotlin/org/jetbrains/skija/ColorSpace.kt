@@ -2,7 +2,6 @@ package org.jetbrains.skija
 
 import org.jetbrains.skija.impl.Library.Companion.staticLoad
 import org.jetbrains.skija.impl.Managed
-import org.jetbrains.skija.impl.Native
 import org.jetbrains.skija.impl.Stats
 import java.lang.ref.Reference
 
@@ -33,7 +32,7 @@ class ColorSpace : Managed {
             Color4f(
                 _nConvert(
                     _ptr,
-                    Native.Companion.getPtr(to),
+                    getPtr(to),
                     color.r,
                     color.g,
                     color.b,

@@ -1,9 +1,5 @@
 package org.jetbrains.skija
 
-import org.jetbrains.skija.impl.Stats
-import java.lang.IllegalArgumentException
-import java.lang.RuntimeException
-
 /**
  * Describes how pixel bits encode color. A pixel may be an alpha mask, a
  * grayscale, RGB, or ARGB.
@@ -172,20 +168,8 @@ enum class ColorType {
                 R16G16_FLOAT -> 2
                 R16G16B16A16_UNORM -> 3
             }
-            throw RuntimeException("Unreachable")
         }
 
-    /**
-     * Returns true if ColorType always decodes alpha to 1.0, making the pixel
-     * fully opaque. If true, ColorType does not reserve bits to encode alpha.
-     *
-     * @return  true if alpha is always set to 1.0
-     */
-    val isAlwaysOpaque: Boolean
-        get() {
-            Stats.onNativeCall()
-            return _nIsAlwaysOpaque(ordinal)
-        }
 
     /**
      *
@@ -219,7 +203,7 @@ enum class ColorType {
 
     fun getR(color: Byte): Float {
         return when (this) {
-            GRAY_8 -> java.lang.Byte.toUnsignedInt(color) / 255f
+            GRAY_8 -> (color.toInt() and 0xff) / 255f
             else -> throw IllegalArgumentException("getR(byte) is not supported on ColorType.$this")
         }
     }
@@ -247,7 +231,7 @@ enum class ColorType {
 
     fun getG(color: Byte): Float {
         return when (this) {
-            GRAY_8 -> java.lang.Byte.toUnsignedInt(color) / 255f
+            GRAY_8 -> (color.toInt() and 0xff) / 255f
             else -> throw IllegalArgumentException("getG(byte) is not supported on ColorType.$this")
         }
     }
@@ -275,7 +259,7 @@ enum class ColorType {
 
     fun getB(color: Byte): Float {
         return when (this) {
-            GRAY_8 -> java.lang.Byte.toUnsignedInt(color) / 255f
+            GRAY_8 -> (color.toInt() and 0xff).toFloat() / 255f
             else -> throw IllegalArgumentException("getB(byte) is not supported on ColorType.$this")
         }
     }
@@ -303,7 +287,7 @@ enum class ColorType {
 
     fun getA(color: Byte): Float {
         return when (this) {
-            ALPHA_8 -> java.lang.Byte.toUnsignedInt(color) / 255f
+            ALPHA_8 -> (color.toInt() and 0xff) / 255f
             else -> throw IllegalArgumentException("getA(byte) is not supported on ColorType.$this")
         }
     }
@@ -330,6 +314,5 @@ enum class ColorType {
          * Native ARGB 32-bit encoding
          */
         var N32 = BGRA_8888
-        @JvmStatic external fun _nIsAlwaysOpaque(value: Int): Boolean
     }
 }

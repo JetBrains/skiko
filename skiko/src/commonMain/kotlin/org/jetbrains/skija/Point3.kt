@@ -6,9 +6,9 @@ class Point3(val x: Float, val y: Float, val z: Float) {
         if (o !is Point3) return false
         val other = o
         if (!other.canEqual(this as Any)) return false
-        if (java.lang.Float.compare(x, other.x) != 0) return false
-        if (java.lang.Float.compare(y, other.y) != 0) return false
-        return if (java.lang.Float.compare(z, other.z) != 0) false else true
+        if (x.compareTo(other.x) != 0) return false
+        if (y.compareTo(other.y) != 0) return false
+        return z.compareTo(other.z) == 0
     }
 
     protected fun canEqual(other: Any?): Boolean {
@@ -18,13 +18,13 @@ class Point3(val x: Float, val y: Float, val z: Float) {
     override fun hashCode(): Int {
         val PRIME = 59
         var result = 1
-        result = result * PRIME + java.lang.Float.floatToIntBits(x)
-        result = result * PRIME + java.lang.Float.floatToIntBits(y)
-        result = result * PRIME + java.lang.Float.floatToIntBits(z)
+        result = result * PRIME + x.toBits()
+        result = result * PRIME + y.toBits()
+        result = result * PRIME + z.toBits()
         return result
     }
 
     override fun toString(): String {
-        return "Point3(_x=" + x + ", _y=" + y + ", _z=" + z + ")"
+        return "Point3(_x=$x, _y=$y, _z=$z)"
     }
 }

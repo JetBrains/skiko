@@ -10,10 +10,10 @@ object Color {
     }
 
     fun makeARGB(a: Int, r: Int, g: Int, b: Int): Int {
-        assert(0 <= a && a <= 255) { "Alpha is out of 0..255 range: $a" }
-        assert(0 <= r && r <= 255) { "Red is out of 0..255 range: $r" }
-        assert(0 <= g && g <= 255) { "Green is out of 0..255 range: $g" }
-        assert(0 <= b && b <= 255) { "Blue is out of 0..255 range: $b" }
+        require(0 <= a && a <= 255) { "Alpha is out of 0..255 range: $a" }
+        require(0 <= r && r <= 255) { "Red is out of 0..255 range: $r" }
+        require(0 <= g && g <= 255) { "Green is out of 0..255 range: $g" }
+        require(0 <= b && b <= 255) { "Blue is out of 0..255 range: $b" }
         return (a and 0xFF shl 24
                 or (r and 0xFF shl 16)
                 or (g and 0xFF shl 8)
@@ -41,22 +41,22 @@ object Color {
     }
 
     fun withA(color: Int, a: Int): Int {
-        assert(0 <= a && a <= 255) { "Alpha is out of 0..255 range: $a" }
+        require(0 <= a && a <= 255) { "Alpha is out of 0..255 range: $a" }
         return a and 0xFF shl 24 or (color and 0x00FFFFFF)
     }
 
     fun withR(color: Int, r: Int): Int {
-        assert(0 <= r && r <= 255) { "Red is out of 0..255 range: $r" }
+        require(0 <= r && r <= 255) { "Red is out of 0..255 range: $r" }
         return r and 0xFF shl 16 or (color and -0xff0001)
     }
 
     fun withG(color: Int, g: Int): Int {
-        assert(0 <= g && g <= 255) { "Green is out of 0..255 range: $g" }
+        require(0 <= g && g <= 255) { "Green is out of 0..255 range: $g" }
         return g and 0xFF shl 8 or (color and -0xff01)
     }
 
     fun withB(color: Int, b: Int): Int {
-        assert(0 <= b && b <= 255) { "Blue is out of 0..255 range: $b" }
+        require(0 <= b && b <= 255) { "Blue is out of 0..255 range: $b" }
         return b and 0xFF or (color and -0x100)
     }
 }

@@ -350,7 +350,7 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
         return this
     }
 
-    val baselineMode: org.jetbrains.skija.paragraph.BaselineMode
+    val baselineMode: BaselineMode
         get() = try {
             Stats.onNativeCall()
             BaselineMode.values().get(_nGetBaselineMode(_ptr))
