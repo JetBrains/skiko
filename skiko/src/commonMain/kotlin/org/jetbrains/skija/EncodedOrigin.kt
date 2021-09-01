@@ -1,7 +1,5 @@
 package org.jetbrains.skija
 
-import java.lang.IllegalArgumentException
-
 enum class EncodedOrigin {
     _UNUSED,
 

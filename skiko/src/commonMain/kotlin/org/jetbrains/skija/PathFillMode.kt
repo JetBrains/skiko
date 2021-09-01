@@ -1,7 +1,5 @@
 package org.jetbrains.skija
 
-import java.lang.RuntimeException
-
 enum class PathFillMode {
     /** Specifies that "inside" is computed by a non-zero sum of signed edge crossings.  */
     WINDING,

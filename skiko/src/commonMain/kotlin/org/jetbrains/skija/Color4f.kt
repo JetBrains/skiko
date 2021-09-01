@@ -1,6 +1,8 @@
 package org.jetbrains.skija
 
-class Color4f @JvmOverloads constructor(val r: Float, val g: Float, val b: Float, val a: Float = 1.0f) {
+import kotlin.math.round
+
+class Color4f constructor(val r: Float, val g: Float, val b: Float, val a: Float = 1.0f) {
 
     constructor(rgba: FloatArray) : this(rgba[0], rgba[1], rgba[2], rgba[3]) {}
     constructor(c: Int) : this(
@@ -12,9 +14,9 @@ class Color4f @JvmOverloads constructor(val r: Float, val g: Float, val b: Float
     }
 
     fun toColor(): Int {
-        return Math.round(a * 255.0f) shl 24 or (Math.round(r * 255.0f) shl 16) or (Math.round(
+        return round(a * 255.0f).toInt() shl 24 or (round(r * 255.0f).toInt() shl 16) or (round(
             g * 255.0f
-        ) shl 8) or Math.round(b * 255.0f)
+        ).toInt() shl 8) or round(b * 255.0f).toInt()
     }
 
     fun flatten(): FloatArray {
@@ -36,10 +38,10 @@ class Color4f @JvmOverloads constructor(val r: Float, val g: Float, val b: Float
         if (o !is Color4f) return false
         val other = o
         if (!other.canEqual(this as Any)) return false
-        if (java.lang.Float.compare(r, other.r) != 0) return false
-        if (java.lang.Float.compare(g, other.g) != 0) return false
-        if (java.lang.Float.compare(b, other.b) != 0) return false
-        return if (java.lang.Float.compare(a, other.a) != 0) false else true
+        if (r.compareTo(other.r) != 0) return false
+        if (g.compareTo(other.g) != 0) return false
+        if (b.compareTo(other.b) != 0) return false
+        return a.compareTo(other.a) == 0
     }
 
     protected fun canEqual(other: Any?): Boolean {
@@ -49,15 +51,15 @@ class Color4f @JvmOverloads constructor(val r: Float, val g: Float, val b: Float
     override fun hashCode(): Int {
         val PRIME = 59
         var result = 1
-        result = result * PRIME + java.lang.Float.floatToIntBits(r)
-        result = result * PRIME + java.lang.Float.floatToIntBits(g)
-        result = result * PRIME + java.lang.Float.floatToIntBits(b)
-        result = result * PRIME + java.lang.Float.floatToIntBits(a)
+        result = result * PRIME + r.toBits()
+        result = result * PRIME + g.toBits()
+        result = result * PRIME + b.toBits()
+        result = result * PRIME + a.toBits()
         return result
     }
 
     override fun toString(): String {
-        return "Color4f(_r=" + r + ", _g=" + g + ", _b=" + b + ", _a=" + a + ")"
+        return "Color4f(_r=$r, _g=$g, _b=$b, _a=$a)"
     }
 
     fun withR(_r: Float): Color4f {

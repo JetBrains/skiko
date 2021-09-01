@@ -22,9 +22,4 @@ enum class SurfaceColorFormat {
     A16_UNORM,  //<! pixel with a little endian uint16_t for alpha
     R16G16_UNORM,  //<! pixel with a little endian uint16_t for red and green
     R16G16B16A16_UNORM;
-
-    companion object {
-        //<! pixel with a little endian uint16_t for red, green, blue, and alpha
-        internal val _values = values()
-    }
 }

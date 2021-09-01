@@ -48,20 +48,6 @@ val skiaZip = run {
     }.map { zipFile }
 }
 
-fun String.insertAfterFirst(substring: String, stringToInsert: String): String =
-    let { orig ->
-        buildString {
-            var i = orig.indexOf(substring)
-            if (i < 0) return orig
-
-            i += substring.length
-
-            append(orig.substring(0, i))
-            append(stringToInsert)
-            append(orig.substring(i))
-        }
-    }
-
 fun AbstractCopyTask.configureSkiaCopy(targetDir: File) {
     into(targetDir)
 }
@@ -145,7 +131,6 @@ kotlin {
         }
         if (supportNative) {
             val macosX64Main by getting {
-
             }
         }
     }

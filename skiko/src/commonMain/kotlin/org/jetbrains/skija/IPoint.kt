@@ -1,6 +1,5 @@
 package org.jetbrains.skija
 
-
 class IPoint(val x: Int, val y: Int) {
 
     fun offset(dx: Int, dy: Int): IPoint {
@@ -8,7 +7,6 @@ class IPoint(val x: Int, val y: Int) {
     }
 
     fun offset(vec: IPoint): IPoint {
-        assert(vec != null) { "IPoint::offset expected other != null" }
         return offset(vec.x, vec.y)
     }
 
@@ -37,7 +35,7 @@ class IPoint(val x: Int, val y: Int) {
     }
 
     override fun toString(): String {
-        return "IPoint(_x=" + x + ", _y=" + y + ")"
+        return "IPoint(_x=$x, _y=$y)"
     }
 
     companion object {
