@@ -319,7 +319,7 @@ project.tasks.register<Exec>("wasmCompile") {
     val outDir = "$buildDir/wasm"
     val names = File(inputDir).listFiles()!!.map { it.name.removeSuffix(".cc") }
     val srcs = names.map { "$inputDir/$it.cc" }.toTypedArray()
-    val out = "$outDir/skiko.js"
+    val out = "$outDir/skiko.wasm"
     val skiaDir = skiaWasmDir.get().absolutePath
     workingDir = File(outDir)
     val libs = fileTree("$skiaDir/out/Release-wasm-wasm").filter { it.name.endsWith(".a") }
@@ -336,7 +336,7 @@ project.tasks.register<Exec>("wasmCompile") {
     )
     file(outDir).mkdirs()
     inputs.files(srcs)
-    outputs.dir(outDir)
+    outputs.files(out)
 }
 
 fun localSign(signer: String, lib: File): File {
