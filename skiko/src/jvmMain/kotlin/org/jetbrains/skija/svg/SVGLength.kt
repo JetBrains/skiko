@@ -4,7 +4,7 @@ class SVGLength(internal val value: Float, unit: SVGLengthUnit) {
 
     internal val _unit: SVGLengthUnit
 
-    internal constructor(value: Float, unit: Int) : this(value, SVGLengthUnit._values.get(unit))
+    internal constructor(value: Float, unit: Int) : this(value, SVGLengthUnit.values()[unit])
 
     constructor(value: Float) : this(value, SVGLengthUnit.NUMBER) {}
 
@@ -16,10 +16,10 @@ class SVGLength(internal val value: Float, unit: SVGLengthUnit) {
         if (o !is SVGLength) return false
         val other = o
         if (!other.canEqual(this as Any)) return false
-        if (java.lang.Float.compare(value, other.value) != 0) return false
+        if (value.compareTo(other.value) != 0) return false
         val `this$_unit`: Any = unit
         val `other$_unit`: Any = other.unit
-        return if (if (`this$_unit` == null) `other$_unit` != null else `this$_unit` != `other$_unit`) false else true
+        return `this$_unit` == `other$_unit`
     }
 
     protected fun canEqual(other: Any?): Boolean {
@@ -36,7 +36,7 @@ class SVGLength(internal val value: Float, unit: SVGLengthUnit) {
     }
 
     override fun toString(): String {
-        return "SVGLength(_value=" + value + ", _unit=" + unit + ")"
+        return "SVGLength(_value=$value, _unit=$unit)"
     }
 
     fun withValue(_value: Float): SVGLength {
