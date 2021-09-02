@@ -99,7 +99,7 @@ class Codec internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR)
      * @return  decoded bitmap
      */
     fun readPixels(): Bitmap {
-        val bitmap = org.jetbrains.skia.Bitmap()
+        val bitmap = Bitmap()
         bitmap.allocPixels(imageInfo)
         readPixels(bitmap)
         return bitmap
