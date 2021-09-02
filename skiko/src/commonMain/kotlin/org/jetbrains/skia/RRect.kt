@@ -1,6 +1,7 @@
 package org.jetbrains.skia
 
-import java.util.*
+import kotlin.jvm.JvmStatic
+import kotlin.math.abs
 
 class RRect internal constructor(l: Float, t: Float, r: Float, b: Float, val radii: FloatArray) :
     Rect(l, t, r, b) {
@@ -12,28 +13,26 @@ class RRect internal constructor(l: Float, t: Float, r: Float, b: Float, val rad
                 break
             }
         }
-        return if (becomesRect) Rect.Companion.makeLTRB(
+        return if (becomesRect) makeLTRB(
             left - spread,
             top - spread,
-            Math.max(left - spread, right + spread),
-            Math.max(top - spread, bottom + spread)
+            maxOf(left - spread, right + spread),
+            maxOf(top - spread, bottom + spread)
         ) else {
-            val radii = Arrays.copyOf(radii, radii.size)
-            for (i in radii.indices) radii[i] = Math.max(0.0f, radii[i] + spread)
+            val radii = radii.copyOf()
+            for (i in radii.indices) radii[i] = maxOf(0.0f, radii[i] + spread)
             RRect(
                 left - spread,
                 top - spread,
-                Math.max(left - spread, right + spread),
-                Math.max(top - spread, bottom + spread),
+                maxOf(left - spread, right + spread),
+                maxOf(top - spread, bottom + spread),
                 radii
             )
         }
     }
 
     override fun toString(): String {
-        return "RRect(_left=" + left + ", _top=" + top + ", _right=" + right + ", _bottom=" + bottom + ", _radii=" + Arrays.toString(
-            radii
-        ) + ")"
+        return "RRect(_left=$left, _top=$top, _right=$right, _bottom=$bottom, _radii=$radii)"
     }
 
     override fun equals(o: Any?): Boolean {
@@ -42,7 +41,7 @@ class RRect internal constructor(l: Float, t: Float, r: Float, b: Float, val rad
         val other = o
         if (!other.canEqual(this as Any)) return false
         if (!super.equals(o)) return false
-        return if (!Arrays.equals(radii, other.radii)) false else true
+        return radii.contentEquals(other.radii)
     }
 
     override fun canEqual(other: Any?): Boolean {
@@ -52,7 +51,7 @@ class RRect internal constructor(l: Float, t: Float, r: Float, b: Float, val rad
     override fun hashCode(): Int {
         val PRIME = 59
         var result = super.hashCode()
-        result = result * PRIME + Arrays.hashCode(radii)
+        result = result * PRIME + radii.contentHashCode()
         return result
     }
 
@@ -101,11 +100,11 @@ class RRect internal constructor(l: Float, t: Float, r: Float, b: Float, val rad
         }
 
         fun makeOvalLTRB(l: Float, t: Float, r: Float, b: Float): RRect {
-            return RRect(l, t, r, b, floatArrayOf(Math.abs(r - l) / 2.0f, Math.abs(b - t) / 2.0f))
+            return RRect(l, t, r, b, floatArrayOf(abs(r - l) / 2.0f, abs(b - t) / 2.0f))
         }
 
         fun makePillLTRB(l: Float, t: Float, r: Float, b: Float): RRect {
-            return RRect(l, t, r, b, floatArrayOf(Math.min(Math.abs(r - l), Math.abs(t - b)) / 2.0f))
+            return RRect(l, t, r, b, floatArrayOf(minOf(abs(r - l), abs(t - b)) / 2.0f))
         }
 
         fun makeXYWH(l: Float, t: Float, w: Float, h: Float, radius: Float): RRect {
@@ -151,7 +150,7 @@ class RRect internal constructor(l: Float, t: Float, r: Float, b: Float, val rad
         }
 
         fun makePillXYWH(l: Float, t: Float, w: Float, h: Float): RRect {
-            return RRect(l, t, l + w, t + h, floatArrayOf(Math.min(w, h) / 2.0f))
+            return RRect(l, t, l + w, t + h, floatArrayOf(minOf(w, h) / 2.0f))
         }
     }
 }

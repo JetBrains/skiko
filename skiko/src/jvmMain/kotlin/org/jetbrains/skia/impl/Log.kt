@@ -70,6 +70,6 @@ object Log {
                                 4 else if ("ERROR" == property)
                                     5 else if ("NONE" == property)
                                         6 else
-                                            throw IllegalArgumentException("Unknown log level: " + property)
+                                            throw IllegalArgumentException("Unknown log level: $property")
     }
 }

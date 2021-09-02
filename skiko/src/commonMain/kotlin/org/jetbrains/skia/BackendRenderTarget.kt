@@ -3,6 +3,7 @@ package org.jetbrains.skia
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Stats
+import kotlin.jvm.JvmStatic
 
 class BackendRenderTarget internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {

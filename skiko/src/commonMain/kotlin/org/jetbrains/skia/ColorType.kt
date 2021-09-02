@@ -1,5 +1,7 @@
 package org.jetbrains.skia
 
+import kotlin.jvm.JvmStatic
+
 /**
  * Describes how pixel bits encode color. A pixel may be an alpha mask, a
  * grayscale, RGB, or ARGB.
@@ -314,5 +316,19 @@ enum class ColorType {
          * Native ARGB 32-bit encoding
          */
         var N32 = BGRA_8888
+        @JvmStatic external fun _nIsAlwaysOpaque(value: Int): Boolean
     }
+
+    /**
+     * Returns true if ColorType always decodes alpha to 1.0, making the pixel
+     * fully opaque. If true, ColorType does not reserve bits to encode alpha.
+     *
+     * @return  true if alpha is always set to 1.0
+     */
+    val isAlwaysOpaque: Boolean
+        get() {
+            return _nIsAlwaysOpaque(ordinal)
+        }
+
 }
+

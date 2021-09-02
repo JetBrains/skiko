@@ -16,7 +16,7 @@ class BidiRun(
         val other = o
         if (!other.canEqual(this as Any)) return false
         if (end != other.end) return false
-        return if (level != other.level) false else true
+        return level == other.level
     }
 
     protected fun canEqual(other: Any?): Boolean {
@@ -32,6 +32,6 @@ class BidiRun(
     }
 
     override fun toString(): String {
-        return "BidiRun(_end=" + end + ", _level=" + level + ")"
+        return "BidiRun(_end=$end, _level=$level)"
     }
 }

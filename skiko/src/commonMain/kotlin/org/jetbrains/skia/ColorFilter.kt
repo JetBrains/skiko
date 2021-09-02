@@ -2,9 +2,9 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.RefCnt
-import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
-import java.lang.ref.Reference
+import org.jetbrains.skia.impl.reachabilityBarrier
+import kotlin.jvm.JvmStatic
 
 class ColorFilter : RefCnt {
     companion object {
@@ -13,13 +13,13 @@ class ColorFilter : RefCnt {
                 Stats.onNativeCall()
                 ColorFilter(
                     _nMakeComposed(
-                        Native.Companion.getPtr(outer),
-                        Native.Companion.getPtr(inner)
+                        getPtr(outer),
+                        getPtr(inner)
                     )
                 )
             } finally {
-                Reference.reachabilityFence(outer)
-                Reference.reachabilityFence(inner)
+                reachabilityBarrier(outer)
+                reachabilityBarrier(inner)
             }
         }
 
@@ -43,13 +43,13 @@ class ColorFilter : RefCnt {
                 ColorFilter(
                     _nMakeLerp(
                         t,
-                        Native.Companion.getPtr(dst),
-                        Native.Companion.getPtr(src)
+                        getPtr(dst),
+                        getPtr(src)
                     )
                 )
             } finally {
-                Reference.reachabilityFence(dst)
-                Reference.reachabilityFence(src)
+                reachabilityBarrier(dst)
+                reachabilityBarrier(src)
             }
         }
 
@@ -62,20 +62,20 @@ class ColorFilter : RefCnt {
         }
 
         fun makeTable(table: ByteArray): ColorFilter {
-            assert(table.size == 256) { "Expected 256 elements, got " + table.size }
+            require(table.size == 256) { "Expected 256 elements, got " + table.size }
             return ColorFilter(_nMakeTable(table))
         }
 
         fun makeTableARGB(a: ByteArray?, r: ByteArray?, g: ByteArray?, b: ByteArray?): ColorFilter {
-            assert(a == null || a.size == 256) { "Expected 256 elements in a[], got " + a!!.size }
-            assert(r == null || r.size == 256) { "Expected 256 elements in r[], got " + r!!.size }
-            assert(g == null || g.size == 256) { "Expected 256 elements in g[], got " + g!!.size }
-            assert(b == null || b.size == 256) { "Expected 256 elements in b[], got " + b!!.size }
+            require(a == null || a.size == 256) { "Expected 256 elements in a[], got " + a!!.size }
+            require(r == null || r.size == 256) { "Expected 256 elements in r[], got " + r!!.size }
+            require(g == null || g.size == 256) { "Expected 256 elements in g[], got " + g!!.size }
+            require(b == null || b.size == 256) { "Expected 256 elements in b[], got " + b!!.size }
             return ColorFilter(_nMakeTableARGB(a, r, g, b))
         }
 
         fun makeOverdraw(colors: IntArray): ColorFilter {
-            assert(colors.size == 6) { "Expected 6 elements, got " + colors.size }
+            require(colors.size == 6) { "Expected 6 elements, got " + colors.size }
             return ColorFilter(_nMakeOverdraw(colors[0], colors[1], colors[2], colors[3], colors[4], colors[5]))
         }
 
