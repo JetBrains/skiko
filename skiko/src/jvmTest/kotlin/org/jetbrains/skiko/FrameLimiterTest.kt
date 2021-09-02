@@ -1,20 +1,12 @@
 package org.jetbrains.skiko
 
-import kotlinx.coroutines.CancellableContinuation
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Delay
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.Runnable
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlinx.coroutines.test.DelayController
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.TestCoroutineScope
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.ceil
@@ -157,6 +149,45 @@ class FrameLimiterTest {
         assertEquals(frames.map { it * 10 }, ticks1)
         assertEquals(frames.map { it * 10 }, ticks2)
         assertEquals(frames.map { it * 10 }, ticks3)
+    }
+
+    @Test
+    fun `cancel scope before awaitNextFrame`() = runBlockingTest {
+        pauseDispatcher()
+        val scope = CoroutineScope(coroutineContext + Job())
+        val frameLimiter = FrameLimiter(scope, { 10 }, nanoTime = { currentTime * 1_000_000 })
+
+        scope.cancel()
+
+        assertThrow<kotlin.coroutines.cancellation.CancellationException> {
+            frameLimiter.awaitNextFrame()
+        }
+    }
+
+    @Test
+    fun `cancel scope after awaitNextFrame`() = runBlockingTest {
+        pauseDispatcher()
+        val scope = CoroutineScope(coroutineContext + Job())
+
+        val frameLimiter = FrameLimiter(scope, { 10 }, nanoTime = { currentTime * 1_000_000 })
+
+        launch {
+            scope.cancel()
+        }
+
+        assertThrow<kotlin.coroutines.cancellation.CancellationException> {
+            frameLimiter.awaitNextFrame()
+        }
+    }
+
+    private inline fun <reified T : Throwable> assertThrow(body: () -> Unit) {
+        var actualE: Throwable? = null
+        try {
+            body()
+        } catch (e: Throwable) {
+            actualE = e
+        }
+        assertTrue("Actual ${actualE?.javaClass}, expected ${T::class.java}", actualE is T)
     }
 
     private fun frameLimiterTest(

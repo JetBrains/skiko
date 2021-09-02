@@ -37,7 +37,7 @@ internal fun FrameLimiter(component: Component) = SwingGlobalFrameLimiter
  */
 @OptIn(ExperimentalTime::class)
 class FrameLimiter(
-    coroutineScope: CoroutineScope,
+    private val coroutineScope: CoroutineScope,
     private val frameMillis: () -> Long,
     private val nanoTime: () -> Long = System::nanoTime
 ) {
@@ -70,6 +70,8 @@ class FrameLimiter(
      * was called less than [frameMillis] ago)
      */
     suspend fun awaitNextFrame() {
-        channel.receive()
+        withContext(coroutineScope.coroutineContext) {
+            channel.receive()
+        }
     }
 }
