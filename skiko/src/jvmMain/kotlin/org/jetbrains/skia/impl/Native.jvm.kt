@@ -21,7 +21,7 @@ actual abstract class Native actual constructor(ptr: Long) {
         }
     }
 
-    open fun _nativeEquals(other: Native?): Boolean {
+    actual open fun _nativeEquals(other: Native?): Boolean {
         return false
     }
 

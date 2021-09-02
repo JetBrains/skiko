@@ -113,7 +113,7 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
         get() = try {
             Stats.onNativeCall()
             val ptr = _nGetForeground(_ptr)
-            if (ptr == 0L) null else org.jetbrains.skia.Paint(ptr, true)
+            if (ptr == 0L) null else Paint(ptr, true)
         } finally {
             Reference.reachabilityFence(this)
         }
@@ -135,7 +135,7 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
         get() = try {
             Stats.onNativeCall()
             val ptr = _nGetBackground(_ptr)
-            if (ptr == 0L) null else org.jetbrains.skia.Paint(ptr, true)
+            if (ptr == 0L) null else Paint(ptr, true)
         } finally {
             Reference.reachabilityFence(this)
         }
@@ -179,7 +179,7 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
     val fontStyle: FontStyle
         get() = try {
             Stats.onNativeCall()
-            org.jetbrains.skia.FontStyle(_nGetFontStyle(_ptr))
+            FontStyle(_nGetFontStyle(_ptr))
         } finally {
             Reference.reachabilityFence(this)
         }

@@ -1,5 +1,6 @@
 package org.jetbrains.skiko
 
+import org.jetbrains.skia.Bitmap
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
@@ -102,7 +103,7 @@ object Library {
 // We have to keep this tiny class in Skiko for testing purposes.
 internal class LibraryTestImpl() {
     fun run(): Long {
-        val bitmap = org.jetbrains.skia.Bitmap()
+        val bitmap = Bitmap()
         return bitmap._ptr
     }
 }

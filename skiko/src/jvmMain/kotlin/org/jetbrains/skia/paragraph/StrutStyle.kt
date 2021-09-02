@@ -65,7 +65,7 @@ class StrutStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder
     val fontStyle: FontStyle
         get() = try {
             Stats.onNativeCall()
-            org.jetbrains.skia.FontStyle(_nGetFontStyle(_ptr))
+            FontStyle(_nGetFontStyle(_ptr))
         } finally {
             Reference.reachabilityFence(this)
         }

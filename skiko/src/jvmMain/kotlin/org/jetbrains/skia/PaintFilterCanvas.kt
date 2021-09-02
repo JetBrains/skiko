@@ -29,7 +29,7 @@ abstract class PaintFilterCanvas(canvas: Canvas, unrollDrawable: Boolean) :
      */
     abstract fun onFilter(paint: Paint): Boolean
     fun onFilter(paintPtr: Long): Boolean {
-        val paint = org.jetbrains.skia.Paint(paintPtr, false)
+        val paint = Paint(paintPtr, false)
         return onFilter(paint)
     }
 
