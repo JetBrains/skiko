@@ -62,7 +62,7 @@ class PictureRecorder internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
     fun beginRecording(bounds: Rect): Canvas {
         return try {
             Stats.onNativeCall()
-            org.jetbrains.skia.Canvas(
+            Canvas(
                 _nBeginRecording(
                     _ptr,
                     bounds.left,
@@ -83,7 +83,7 @@ class PictureRecorder internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
         get() = try {
             Stats.onNativeCall()
             val ptr = _nGetRecordingCanvas(_ptr)
-            if (ptr == 0L) null else org.jetbrains.skia.Canvas(ptr, false, this)
+            if (ptr == 0L) null else Canvas(ptr, false, this)
         } finally {
             Reference.reachabilityFence(this)
         }

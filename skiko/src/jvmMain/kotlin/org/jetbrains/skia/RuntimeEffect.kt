@@ -39,6 +39,6 @@ class RuntimeEffect internal constructor(ptr: Long) : RefCnt(ptr) {
         val childrenPtrs = LongArray(childCount)
         for (i in 0 until childCount) childrenPtrs[i] = Native.Companion.getPtr(children!![i])
         val matrix = localMatrix?.mat
-        return Shader(_nMakeShader(_ptr, Native.Companion.getPtr(uniforms), childrenPtrs, matrix, isOpaque))
+        return Shader(_nMakeShader(_ptr, getPtr(uniforms), childrenPtrs, matrix, isOpaque))
     }
 }

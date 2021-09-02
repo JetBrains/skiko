@@ -860,7 +860,7 @@ class Surface : RefCnt {
     fun makeImageSnapshot(): Image {
         return try {
             Stats.onNativeCall()
-            org.jetbrains.skia.Image(_nMakeImageSnapshot(_ptr))
+            Image(_nMakeImageSnapshot(_ptr))
         } finally {
             Reference.reachabilityFence(this)
         }
@@ -886,7 +886,7 @@ class Surface : RefCnt {
     fun makeImageSnapshot(area: IRect): Image? {
         return try {
             Stats.onNativeCall()
-            org.jetbrains.skia.Image(
+            Image(
                 _nMakeImageSnapshotR(
                     _ptr,
                     area.left,
