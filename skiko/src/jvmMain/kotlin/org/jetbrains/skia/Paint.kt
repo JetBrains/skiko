@@ -438,12 +438,15 @@ class Paint : Managed {
      *
      * @return  zero and greater miter limit
      */
-    val strokeMiter: Float
+    var strokeMiter: Float
         get() = try {
             Stats.onNativeCall()
             _nGetStrokeMiter(_ptr)
         } finally {
             Reference.reachabilityFence(this)
+        }
+        set(value) {
+            setStrokeMiter(value)
         }
 
     /**
@@ -465,12 +468,15 @@ class Paint : Managed {
     /**
      * @return  the geometry drawn at the beginning and end of strokes.
      */
-    val strokeCap: PaintStrokeCap
+    var strokeCap: PaintStrokeCap
         get() = try {
             Stats.onNativeCall()
             PaintStrokeCap.values().get(_nGetStrokeCap(_ptr))
         } finally {
             Reference.reachabilityFence(this)
+        }
+        set(value) {
+            setStrokeCap(value)
         }
 
     /**
@@ -492,12 +498,15 @@ class Paint : Managed {
     /**
      * @return  the geometry drawn at the corners of strokes.
      */
-    val strokeJoin: PaintStrokeJoin
+    var strokeJoin: PaintStrokeJoin
         get() = try {
             Stats.onNativeCall()
             PaintStrokeJoin.values().get(_nGetStrokeJoin(_ptr))
         } finally {
             Reference.reachabilityFence(this)
+        }
+        set(value) {
+            setStrokeJoin(value)
         }
 
     /**
@@ -564,13 +573,16 @@ class Paint : Managed {
      * @return  [Shader] or null
      * @see [https://fiddle.skia.org/c/@Paint_refShader](https://fiddle.skia.org/c/@Paint_refShader)
      */
-    val shader: Shader?
+    var shader: Shader?
         get() = try {
             Stats.onNativeCall()
             val shaderPtr = _nGetShader(_ptr)
             if (shaderPtr == 0L) null else Shader(shaderPtr)
         } finally {
             Reference.reachabilityFence(this)
+        }
+        set(value) {
+            setShader(value)
         }
 
     /**
@@ -594,13 +606,16 @@ class Paint : Managed {
      * @return  [ColorFilter] or null
      * @see [https://fiddle.skia.org/c/@Paint_refColorFilter](https://fiddle.skia.org/c/@Paint_refColorFilter)
      */
-    val colorFilter: ColorFilter?
+    var colorFilter: ColorFilter?
         get() = try {
             Stats.onNativeCall()
             val colorFilterPtr = _nGetColorFilter(_ptr)
             if (colorFilterPtr == 0L) null else ColorFilter(colorFilterPtr)
         } finally {
             Reference.reachabilityFence(this)
+        }
+        set(value) {
+            setColorFilter(value)
         }
 
     /**
@@ -628,12 +643,15 @@ class Paint : Managed {
      *
      * @return  mode used to combine source color with destination color
      */
-    val blendMode: BlendMode?
+    var blendMode: BlendMode?
         get() = try {
             Stats.onNativeCall()
             BlendMode.values().get(_nGetBlendMode(_ptr))
         } finally {
             Reference.reachabilityFence(this)
+        }
+        set(value) {
+            setBlendMode(value)
         }
 
     /**
@@ -648,10 +666,10 @@ class Paint : Managed {
      * @param mode  BlendMode used to combine source color and destination
      * @return      this
      */
-    fun setBlendMode(mode: BlendMode): Paint {
+    fun setBlendMode(mode: BlendMode?): Paint {
         assert(mode != null) { "Paint::setBlendMode expected mode != null" }
         Stats.onNativeCall()
-        _nSetBlendMode(_ptr, mode.ordinal)
+        _nSetBlendMode(_ptr, mode!!.ordinal)
         return this
     }
 
@@ -659,13 +677,16 @@ class Paint : Managed {
      * @return  [PathEffect] or null
      * @see [https://fiddle.skia.org/c/@Paint_refPathEffect](https://fiddle.skia.org/c/@Paint_refPathEffect)
      */
-    val pathEffect: PathEffect?
+    var pathEffect: PathEffect?
         get() = try {
             Stats.onNativeCall()
             val pathEffectPtr = _nGetPathEffect(_ptr)
             if (pathEffectPtr == 0L) null else PathEffect(pathEffectPtr)
         } finally {
             Reference.reachabilityFence(this)
+        }
+        set(value) {
+            setPathEffect(value)
         }
 
     /**

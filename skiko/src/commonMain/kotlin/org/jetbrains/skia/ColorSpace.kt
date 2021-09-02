@@ -22,6 +22,7 @@ class ColorSpace : Managed {
         }
 
         val sRGB = ColorSpace(_nMakeSRGB(), false)
+        val sRGBLinear = ColorSpace(_nMakeSRGBLinear(), false)
         val displayP3 = ColorSpace(_nMakeDisplayP3(), false)
     }
 

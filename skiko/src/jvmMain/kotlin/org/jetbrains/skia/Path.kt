@@ -447,12 +447,15 @@ class Path internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR),
         }
     }
 
-    val fillMode: PathFillMode
+    var fillMode: PathFillMode
         get() = try {
             Stats.onNativeCall()
             PathFillMode.values().get(_nGetFillMode(_ptr))
         } finally {
             Reference.reachabilityFence(this)
+        }
+        set(value) {
+            setFillMode(value)
         }
 
     fun setFillMode(fillMode: PathFillMode): Path {
