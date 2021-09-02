@@ -12,11 +12,11 @@
 
 extern "C"
 {
-    JNIEXPORT jdouble JNICALL Java_org_jetbrains_skiko_DisplayKt_getLinuxDefaultDisplayRefreshRate(JNIEnv *env, jobject obj)
+    JNIEXPORT jdouble JNICALL Java_org_jetbrains_skiko_DisplayKt_getLinuxDisplayRefreshRate(JNIEnv *env, jobject obj, jlong displayPtr, jlong windowPtr)
     {
-        Display *display = XOpenDisplay(NULL);
-        Window window = DefaultRootWindow(display);
-        XRRScreenResources *screenResources = XRRGetScreenResources(display, window);
+        Display *display = fromJavaPointer<Display *>(displayPtr);
+        Window window = fromJavaPointer<Window>(windowPtr);
+        XRRScreenResources *screenResources = XRRGetScreenResourcesCurrent(display, window);
 
         RRMode activeModeId = 0;
         for (int i = 0; i < screenResources->ncrtc; ++i) {
@@ -36,7 +36,6 @@ extern "C"
         }
 
         XRRFreeScreenResources(screenResources);
-        XCloseDisplay(display);
 
         return rate;
     }

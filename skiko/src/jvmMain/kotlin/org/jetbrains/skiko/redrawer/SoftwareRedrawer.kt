@@ -1,6 +1,6 @@
 package org.jetbrains.skiko.redrawer
 
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.swing.Swing
 import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.FrameLimiter
@@ -11,7 +11,8 @@ internal class SoftwareRedrawer(
     private val layer: SkiaLayer,
     private val properties: SkiaLayerProperties
 ) : Redrawer {
-    private val frameLimiter by lazy { FrameLimiter(layer) }
+    private val frameJob = Job()
+    private val frameLimiter = FrameLimiter(CoroutineScope(Dispatchers.IO + frameJob), layer.backedLayer)
 
     private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
         if (properties.isVsyncEnabled && properties.isVsyncFramelimitFallbackEnabled) {
@@ -26,6 +27,9 @@ internal class SoftwareRedrawer(
 
     override fun dispose() {
         frameDispatcher.cancel()
+        runBlocking {
+            frameJob.cancelAndJoin()
+        }
     }
 
     override fun needRedraw() {

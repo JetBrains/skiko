@@ -1,12 +1,8 @@
 package org.jetbrains.skiko.redrawer
 
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.swing.Swing
 import org.jetbrains.skiko.*
-import org.jetbrains.skiko.LinuxDrawingSurface
-import org.jetbrains.skiko.lockLinuxDrawingSurface
-import org.jetbrains.skiko.unlockLinuxDrawingSurface
 
 internal class LinuxOpenGLRedrawer(
     private val layer: SkiaLayer,
@@ -26,13 +22,23 @@ internal class LinuxOpenGLRedrawer(
             it.setSwapInterval(swapInterval)
         }
     }
-
-    private val frameLimiter by lazy { FrameLimiter(layer) }
+    private val frameJob = Job()
+    @Volatile
+    private var frameLimit = 0.0
+    private val frameLimiter = FrameLimiter(
+        CoroutineScope(Dispatchers.IO + frameJob),
+        layer.backedLayer,
+        onNewFrameLimit = { frameLimit = it }
+    )
 
     private suspend fun limitFramesIfNeeded() {
         // Some Linuxes don't turn vsync on, so we apply additional frame limit (which should be no longer than enabled vsync)
         if (properties.isVsyncEnabled) {
-            frameLimiter.awaitNextFrame()
+            try {
+                frameLimiter.awaitNextFrame()
+            } catch (e: CancellationException) {
+                // ignore
+            }
         }
     }
 
@@ -40,6 +46,9 @@ internal class LinuxOpenGLRedrawer(
         check(!isDisposed) { "LinuxOpenGLRedrawer is disposed" }
         layer.backedLayer.lockLinuxDrawingSurface {
             it.destroyContext(context)
+        }
+        runBlocking {
+            frameJob.cancelAndJoin()
         }
         isDisposed = true
     }
@@ -81,9 +90,8 @@ internal class LinuxOpenGLRedrawer(
         private val toRedrawAlive = toRedrawCopy.asSequence().filterNot(LinuxOpenGLRedrawer::isDisposed)
 
         private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
-            toRedrawAlive.forEach { redrawer ->
-                redrawer.limitFramesIfNeeded()
-            }
+            // we should wait for the window with the maximum frame limit to avoid bottleneck when there is a window on a slower monitor
+            toRedrawAlive.maxByOrNull { it.frameLimit }?.limitFramesIfNeeded()
 
             toRedrawCopy.clear()
             toRedrawCopy.addAll(toRedraw)
@@ -106,6 +114,9 @@ internal class LinuxOpenGLRedrawer(
                     redrawer.draw()
                 }
 
+                // TODO(demin) it seems now vsync doesn't work as expected with two windows (we have fps = refreshRate / windowCount)
+                //  perhaps we should create frameDispatcher for each display.
+                //  Don't know what happened, but on 620547a commit everything was okay. maybe something changed in the code, maybe my system changed
                 toRedrawAlive.forEach { redrawer ->
                     drawingSurfaces[redrawer]!!.swapBuffers()
                 }

@@ -1,33 +1,58 @@
 package org.jetbrains.skiko
 
-import kotlinx.coroutines.*
-import java.awt.Component
-import java.awt.GraphicsEnvironment
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.time.ExperimentalTime
-import kotlin.time.measureTime
 
 private const val NanosecondsPerMillisecond = 1_000_000L
 
-@Volatile
-private var maxGlobalRefreshRate = MinMainstreamMonitorRefreshRate
-
-private val SwingGlobalFrameLimiter by lazy {
-    val scope = CoroutineScope(Dispatchers.IO)
-
-    scope.launch {
-        // TODO instead of getting max refresh rate of all displays and cache it, we should use individual frame limiters for each window, and update refresh rate when the display mode or the display is changed.
-        //  we can't call it every frame, as it can be expensive (~3ms on Linux on my machine)
-        maxGlobalRefreshRate = getMaxDisplayRefreshRate()
+/**
+ * HardwareLayer should not dispose native resources while [scope] is active.
+ *
+ * So wait for scope cancellation in dispose method:
+ * ```
+ *  runBlocking {
+ *      frameJob.cancelAndJoin()
+ *  }
+ * ```
+ */
+@OptIn(ExperimentalTime::class)
+@Suppress("UNUSED_PARAMETER")
+internal fun FrameLimiter(
+    scope: CoroutineScope,
+    component: HardwareLayer,
+    onNewFrameLimit: (frameLimit: Double) -> Unit = {}
+): FrameLimiter {
+    val state = object {
+        @Volatile
+        var frameLimit = MinMainstreamMonitorRefreshRate
     }
 
-    FrameLimiter(
+    val frames = Channel<Unit>(Channel.CONFLATED)
+    frames.trySend(Unit)
+
+    scope.launch {
+        while (true) {
+            frames.receive()
+            // TODO will lockLinuxDrawingSurface inside getDisplayRefreshRate can cause draw lock too?
+            // it takes 2ms on my machine on Linux (0.01ms on macOs, 0.1ms on Windows)
+            state.frameLimit = component.getDisplayRefreshRate()
+            onNewFrameLimit(state.frameLimit)
+            delay(1000)
+        }
+    }
+
+    return FrameLimiter(
         scope,
-        { (1000L / maxGlobalRefreshRate).toLong() }
+        frameMillis = {
+            frames.trySend(Unit)
+            (1000 / state.frameLimit).toLong()
+        }
     )
 }
-
-@Suppress("UNUSED_PARAMETER")
-internal fun FrameLimiter(component: Component) = SwingGlobalFrameLimiter
 
 /**
  * Limit the duration of the frames (to avoid high CPU usage) to [frameMillis].

@@ -1,23 +1,24 @@
 package org.jetbrains.skiko
 
-import java.awt.GraphicsEnvironment
+import kotlin.time.ExperimentalTime
 
 internal const val MinMainstreamMonitorRefreshRate = 60.0
 
-internal fun getMaxDisplayRefreshRate(): Double {
+@OptIn(ExperimentalTime::class)
+internal fun HardwareLayer.getDisplayRefreshRate(): Double {
+    // We use different method for Linux, because it.displayMode.refreshRate returns always a wrong value: 50 (probably because of the using the old xrandr API)
     return if (hostOs == OS.Linux) {
-        // TODO it is difficult to retrieve all displays (https://stackoverflow.com/questions/11367354/obtaining-list-of-all-xorg-displays).
-        //  So we need to switch to "one window - one FrameLimiter" approach, when we find time to do it (see FrameLimiter.kt).
-//      we use different method for Linux, because it.displayMode.refreshRate returns always a wrong value: 50 (probably because of the using the old xrandr API)
-        getLinuxDefaultDisplayRefreshRate()
+        lockLinuxDrawingSurface {
+            getLinuxDisplayRefreshRate(it.display, it.window)
+        }
     } else {
-        GraphicsEnvironment
-            .getLocalGraphicsEnvironment()
-            .screenDevices
-            .maxOf { it.displayMode.refreshRate }
+        graphicsConfiguration
+            .device
+            .displayMode
+            .refreshRate
             .toDouble()
             .coerceAtLeast(MinMainstreamMonitorRefreshRate)
     }
 }
 
-private external fun getLinuxDefaultDisplayRefreshRate(): Double
+private external fun getLinuxDisplayRefreshRate(display: Long, window: Long): Double
