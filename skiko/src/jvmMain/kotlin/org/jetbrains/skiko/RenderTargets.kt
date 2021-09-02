@@ -1,7 +1,7 @@
 package org.jetbrains.skiko
 
-import org.jetbrains.skija.BackendRenderTarget
-import org.jetbrains.skija.DirectContext
+import org.jetbrains.skia.BackendRenderTarget
+import org.jetbrains.skia.DirectContext
 
 internal fun makeGLContext() = DirectContext(
     makeGLContextNative()

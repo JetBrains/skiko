@@ -1,6 +1,6 @@
 package org.jetbrains.skiko
 
-import org.jetbrains.skija.Bitmap
+import org.jetbrains.skia.Bitmap
 import org.junit.Test
 
 internal class LibraryTest {

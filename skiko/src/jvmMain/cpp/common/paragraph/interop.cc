@@ -8,7 +8,7 @@ namespace skija {
             jmethodID ctor;
 
             void onLoad(JNIEnv* env) {
-                jclass local = env->FindClass("org/jetbrains/skija/paragraph/LineMetrics");
+                jclass local = env->FindClass("org/jetbrains/skia/paragraph/LineMetrics");
                 cls  = static_cast<jclass>(env->NewGlobalRef(local));
                 ctor = env->GetMethodID(cls, "<init>", "(JJJJZDDDDDDDJ)V");
             }
@@ -23,7 +23,7 @@ namespace skija {
             jmethodID ctor;
 
             void onLoad(JNIEnv* env) {
-                jclass local = env->FindClass("org/jetbrains/skija/paragraph/TextBox");
+                jclass local = env->FindClass("org/jetbrains/skia/paragraph/TextBox");
                 cls  = static_cast<jclass>(env->NewGlobalRef(local));
                 ctor = env->GetMethodID(cls, "<init>", "(FFFFI)V");
             }
@@ -38,7 +38,7 @@ namespace skija {
             jmethodID ctor;
 
             void onLoad(JNIEnv* env) {
-                jclass local = env->FindClass("org/jetbrains/skija/paragraph/DecorationStyle");
+                jclass local = env->FindClass("org/jetbrains/skia/paragraph/DecorationStyle");
                 cls  = static_cast<jclass>(env->NewGlobalRef(local));
                 ctor = env->GetMethodID(cls, "<init>", "(ZZZZIIF)V");
             }
@@ -53,7 +53,7 @@ namespace skija {
             jmethodID ctor;
 
             void onLoad(JNIEnv* env) {
-                jclass local = env->FindClass("org/jetbrains/skija/paragraph/Shadow");
+                jclass local = env->FindClass("org/jetbrains/skia/paragraph/Shadow");
                 cls  = static_cast<jclass>(env->NewGlobalRef(local));
                 ctor = env->GetMethodID(cls, "<init>", "(IFFD)V");
             }

@@ -1,10 +1,10 @@
 package org.jetbrains.skiko.context
 
-import org.jetbrains.skija.Bitmap
-import org.jetbrains.skija.Canvas
-import org.jetbrains.skija.ColorAlphaType
-import org.jetbrains.skija.ImageInfo
-import org.jetbrains.skija.Picture
+import org.jetbrains.skia.Bitmap
+import org.jetbrains.skia.Canvas
+import org.jetbrains.skia.ColorAlphaType
+import org.jetbrains.skia.ImageInfo
+import org.jetbrains.skia.Picture
 import org.jetbrains.skiko.SkiaLayer
 import java.awt.Transparency
 import java.awt.color.ColorSpace

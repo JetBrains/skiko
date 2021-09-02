@@ -56,7 +56,7 @@ private fun testSkikoLoad(loader: ClassLoader) {
     val ptr = clazz.getMethod("run").invoke(tester) as Long
     assert(ptr != 0L)
 
-    val paragraphPackage = "org.jetbrains.skija.paragraph"
+    val paragraphPackage = "org.jetbrains.skia.paragraph"
     val paragraphStyle = newInstance(loader, "$paragraphPackage.ParagraphStyle")
     val fontCollection = newInstance(loader, "$paragraphPackage.FontCollection")
     newInstance(loader, "$paragraphPackage.ParagraphBuilder", paragraphStyle, fontCollection)

@@ -2,8 +2,8 @@ package org.jetbrains.skiko.redrawer
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
-import org.jetbrains.skija.BackendRenderTarget
-import org.jetbrains.skija.DirectContext
+import org.jetbrains.skia.BackendRenderTarget
+import org.jetbrains.skia.DirectContext
 import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaLayerProperties

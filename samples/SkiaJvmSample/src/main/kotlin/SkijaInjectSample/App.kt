@@ -2,11 +2,11 @@ package SkijaInjectSample
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.swing.Swing
-import org.jetbrains.skija.*
-import org.jetbrains.skija.paragraph.FontCollection
-import org.jetbrains.skija.paragraph.ParagraphBuilder
-import org.jetbrains.skija.paragraph.ParagraphStyle
-import org.jetbrains.skija.paragraph.TextStyle
+import org.jetbrains.skia.*
+import org.jetbrains.skia.paragraph.FontCollection
+import org.jetbrains.skia.paragraph.ParagraphBuilder
+import org.jetbrains.skia.paragraph.ParagraphStyle
+import org.jetbrains.skia.paragraph.TextStyle
 import org.jetbrains.skiko.*
 import java.awt.Dimension
 import java.awt.Toolkit

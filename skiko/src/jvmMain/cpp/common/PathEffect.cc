@@ -8,7 +8,7 @@
 #include "SkDiscretePathEffect.h"
 #include "interop.hh"
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_PathEffect__1nMakeSum
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathEffect__1nMakeSum
   (JNIEnv* env, jclass jclass, jlong firstPtr, jlong secondPtr) {
     SkPathEffect* first = reinterpret_cast<SkPathEffect*>(static_cast<uintptr_t>(firstPtr));
     SkPathEffect* second = reinterpret_cast<SkPathEffect*>(static_cast<uintptr_t>(secondPtr));
@@ -16,7 +16,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_PathEffect__1nMakeSu
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_PathEffect__1nMakeCompose
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathEffect__1nMakeCompose
   (JNIEnv* env, jclass jclass, jlong outerPtr, jlong innerPtr) {
     SkPathEffect* outer = reinterpret_cast<SkPathEffect*>(static_cast<uintptr_t>(outerPtr));
     SkPathEffect* inner = reinterpret_cast<SkPathEffect*>(static_cast<uintptr_t>(innerPtr));
@@ -24,7 +24,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_PathEffect__1nMakeCo
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_PathEffect__1nMakePath1D
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathEffect__1nMakePath1D
   (JNIEnv* env, jclass jclass, jlong pathPtr, jfloat advance, jfloat phase, jint styleInt) {
     SkPath* path = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(pathPtr));
     SkPath1DPathEffect::Style style = static_cast<SkPath1DPathEffect::Style>(styleInt);
@@ -32,7 +32,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_PathEffect__1nMakePa
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_PathEffect__1nMakePath2D
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathEffect__1nMakePath2D
   (JNIEnv* env, jclass jclass, jfloatArray matrixArr, jlong pathPtr) {
     std::unique_ptr<SkMatrix> m = skMatrix(env, matrixArr);
     SkPath* path = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(pathPtr));
@@ -40,20 +40,20 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_PathEffect__1nMakePa
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_PathEffect__1nMakeLine2D
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathEffect__1nMakeLine2D
   (JNIEnv* env, jclass jclass, jfloat width, jfloatArray matrixArr) {
     std::unique_ptr<SkMatrix> m = skMatrix(env, matrixArr);
     SkPathEffect* ptr = SkLine2DPathEffect::Make(width, *m).release();
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_PathEffect__1nMakeCorner
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathEffect__1nMakeCorner
   (JNIEnv* env, jclass jclass, jfloat radius) {
     SkPathEffect* ptr = SkCornerPathEffect::Make(radius).release();
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_PathEffect__1nMakeDash
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathEffect__1nMakeDash
   (JNIEnv* env, jclass jclass, jfloatArray intervalsArray, jfloat phase) {
     jsize len = env->GetArrayLength(intervalsArray);
     jfloat* intervals = env->GetFloatArrayElements(intervalsArray, 0);
@@ -62,7 +62,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_PathEffect__1nMakeDa
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_PathEffect__1nMakeDiscrete
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathEffect__1nMakeDiscrete
   (JNIEnv* env, jclass jclass, jfloat segLength, jfloat dev, jint seed) {
     SkPathEffect* ptr = SkDiscretePathEffect::Make(segLength, dev, static_cast<uint32_t>(seed)).release();
     return reinterpret_cast<jlong>(ptr);

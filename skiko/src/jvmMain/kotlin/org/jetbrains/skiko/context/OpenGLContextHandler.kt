@@ -1,10 +1,10 @@
 package org.jetbrains.skiko.context
 
-import org.jetbrains.skija.ColorSpace
-import org.jetbrains.skija.FramebufferFormat
-import org.jetbrains.skija.Surface
-import org.jetbrains.skija.SurfaceColorFormat
-import org.jetbrains.skija.SurfaceOrigin
+import org.jetbrains.skia.ColorSpace
+import org.jetbrains.skia.FramebufferFormat
+import org.jetbrains.skia.Surface
+import org.jetbrains.skia.SurfaceColorFormat
+import org.jetbrains.skia.SurfaceOrigin
 import org.jetbrains.skiko.OpenGLApi
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.makeGLContext

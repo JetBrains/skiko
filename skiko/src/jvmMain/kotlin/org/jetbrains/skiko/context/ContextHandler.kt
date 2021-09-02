@@ -1,10 +1,10 @@
 package org.jetbrains.skiko.context
 
-import org.jetbrains.skija.BackendRenderTarget
-import org.jetbrains.skija.Canvas
-import org.jetbrains.skija.DirectContext
-import org.jetbrains.skija.Picture
-import org.jetbrains.skija.Surface
+import org.jetbrains.skia.BackendRenderTarget
+import org.jetbrains.skia.Canvas
+import org.jetbrains.skia.DirectContext
+import org.jetbrains.skia.Picture
+import org.jetbrains.skia.Surface
 import org.jetbrains.skiko.GraphicsApi
 import org.jetbrains.skiko.OS
 import org.jetbrains.skiko.SkiaLayer

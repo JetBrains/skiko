@@ -1,8 +1,8 @@
 package org.jetbrains.skiko
 
-import org.jetbrains.skija.Bitmap
-import org.jetbrains.skija.ColorType
-import org.jetbrains.skija.Image
+import org.jetbrains.skia.Bitmap
+import org.jetbrains.skia.ColorType
+import org.jetbrains.skia.Image
 import java.awt.Transparency
 import java.awt.color.ColorSpace
 import java.awt.image.BufferedImage

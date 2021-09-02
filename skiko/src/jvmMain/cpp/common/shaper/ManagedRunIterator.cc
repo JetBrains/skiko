@@ -7,17 +7,17 @@ static void deleteRunIterator(SkShaper::RunIterator* instance) {
     delete instance;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_shaper_ManagedRunIterator__1nGetFinalizer(JNIEnv* env, jclass jclass) {
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ManagedRunIterator__1nGetFinalizer(JNIEnv* env, jclass jclass) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteRunIterator));
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skija_shaper_ManagedRunIterator__1nConsume
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_shaper_ManagedRunIterator__1nConsume
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkShaper::RunIterator* instance = reinterpret_cast<SkShaper::RunIterator*>(static_cast<uintptr_t>(ptr));
     instance->consume();
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skija_shaper_ManagedRunIterator__1nGetEndOfCurrentRun
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_shaper_ManagedRunIterator__1nGetEndOfCurrentRun
   (JNIEnv* env, jclass jclass, jlong ptr, jlong textPtr) {
     SkShaper::RunIterator* instance = reinterpret_cast<SkShaper::RunIterator*>(static_cast<uintptr_t>(ptr));
     SkString* text = reinterpret_cast<SkString*>(static_cast<uintptr_t>(textPtr));
@@ -25,7 +25,7 @@ extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skija_shaper_ManagedRunIter
     return skija::UtfIndicesConverter(*text).from8To16(end8);
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skija_shaper_ManagedRunIterator__1nIsAtEnd
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_shaper_ManagedRunIterator__1nIsAtEnd
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkShaper::RunIterator* instance = reinterpret_cast<SkShaper::RunIterator*>(static_cast<uintptr_t>(ptr));
     return instance->atEnd();
