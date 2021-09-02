@@ -4,6 +4,9 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import org.jetbrains.skiko.*
+import org.jetbrains.skiko.LinuxDrawingSurface
+import org.jetbrains.skiko.lockLinuxDrawingSurface
+import org.jetbrains.skiko.unlockLinuxDrawingSurface
 
 internal class LinuxOpenGLRedrawer(
     private val layer: SkiaLayer,
@@ -14,7 +17,7 @@ internal class LinuxOpenGLRedrawer(
     private val swapInterval = if (properties.isVsyncEnabled) 1 else 0
 
     init {
-    	layer.backedLayer.lockDrawingSurface {
+    	layer.backedLayer.lockLinuxDrawingSurface {
             context = it.createContext()
             it.makeCurrent(context)
             if (context == 0L || !isVideoCardSupported(layer.renderApi)) {
@@ -35,7 +38,7 @@ internal class LinuxOpenGLRedrawer(
 
     override fun dispose() {
         check(!isDisposed) { "LinuxOpenGLRedrawer is disposed" }
-        layer.backedLayer.lockDrawingSurface {
+        layer.backedLayer.lockLinuxDrawingSurface {
             it.destroyContext(context)
         }
         isDisposed = true
@@ -51,7 +54,7 @@ internal class LinuxOpenGLRedrawer(
         return frameDispatcher.awaitFrame()
     }
 
-    override fun redrawImmediately() = layer.backedLayer.lockDrawingSurface {
+    override fun redrawImmediately() = layer.backedLayer.lockLinuxDrawingSurface {
         check(!isDisposed) { "LinuxOpenGLRedrawer is disposed" }
         update(System.nanoTime())
         it.makeCurrent(context)
@@ -96,7 +99,7 @@ internal class LinuxOpenGLRedrawer(
                 }
             }
 
-            val drawingSurfaces = toRedrawAlive.associateWith { lockDrawingSurface(it.layer.backedLayer) }
+            val drawingSurfaces = toRedrawAlive.associateWith { lockLinuxDrawingSurface(it.layer.backedLayer) }
             try {
                 toRedrawAlive.forEach { redrawer ->
                     drawingSurfaces[redrawer]!!.makeCurrent(redrawer.context)
@@ -112,48 +115,17 @@ internal class LinuxOpenGLRedrawer(
                     OpenGLApi.instance.glFinish()
                 }
             } finally {
-                drawingSurfaces.values.forEach(::unlockDrawingSurface)
+                drawingSurfaces.values.forEach(::unlockLinuxDrawingSurface)
             }
         }
     }
 }
 
-private inline fun <T> HardwareLayer.lockDrawingSurface(action: (LinuxDrawingSurface) -> T): T {
-    val drawingSurface = lockDrawingSurface(this)
-    try {
-        return action(drawingSurface)
-    } finally {
-        unlockDrawingSurface(drawingSurface)
-    }
-}
-
-private fun lockDrawingSurface(layer: HardwareLayer): LinuxDrawingSurface {
-    val drawingSurface = layer.getDrawingSurface()
-    drawingSurface.lock()
-    return drawingSurface.getInfo().use {
-        LinuxDrawingSurface(drawingSurface, getDisplay(it.platformInfo), getWindow(it.platformInfo))
-    }
-}
-
-private fun unlockDrawingSurface(drawingSurface: LinuxDrawingSurface) {
-    drawingSurface.common.unlock()
-    drawingSurface.common.close()
-}
-
-private class LinuxDrawingSurface(
-    val common: DrawingSurface,
-    val display: Long,
-    val window: Long
-) {
-    fun createContext() = createContext(display)
-    fun destroyContext(context: Long) = destroyContext(display, context)
-    fun makeCurrent(context: Long) = makeCurrent(display, window, context)
-    fun swapBuffers() = swapBuffers(display, window)
-    fun setSwapInterval(interval: Int) = setSwapInterval(display, window, interval)
-}
-
-private external fun getDisplay(platformInfo: Long): Long
-private external fun getWindow(platformInfo: Long): Long
+private fun LinuxDrawingSurface.createContext() = createContext(display)
+private fun LinuxDrawingSurface.destroyContext(context: Long) = destroyContext(display, context)
+private fun LinuxDrawingSurface.makeCurrent(context: Long) = makeCurrent(display, window, context)
+private fun LinuxDrawingSurface.swapBuffers() = swapBuffers(display, window)
+private fun LinuxDrawingSurface.setSwapInterval(interval: Int) = setSwapInterval(display, window, interval)
 
 private external fun makeCurrent(display: Long, window: Long, context: Long)
 private external fun createContext(display: Long): Long

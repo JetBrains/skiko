@@ -13,20 +13,6 @@ typedef GLXContext (*glXCreateContextAttribsARBProc)(Display *, GLXFBConfig, GLX
 
 extern "C"
 {
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_getDisplay(JNIEnv *env, jobject redrawer, jlong platformInfoPtr)
-    {
-        JAWT_X11DrawingSurfaceInfo *dsi_x11 = fromJavaPointer<JAWT_X11DrawingSurfaceInfo *>(platformInfoPtr);
-        Display *display = dsi_x11->display;
-        return toJavaPointer(display);
-    }
-
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_getWindow(JNIEnv *env, jobject redrawer, jlong platformInfoPtr)
-    {
-        JAWT_X11DrawingSurfaceInfo *dsi_x11 = fromJavaPointer<JAWT_X11DrawingSurfaceInfo *>(platformInfoPtr);
-        Window window = dsi_x11->drawable;
-        return toJavaPointer(window);
-    }
-
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_setSwapInterval(JNIEnv *env, jobject redrawer, jlong displayPtr, jlong windowPtr, jint interval)
     {
         Display *display = fromJavaPointer<Display *>(displayPtr);
