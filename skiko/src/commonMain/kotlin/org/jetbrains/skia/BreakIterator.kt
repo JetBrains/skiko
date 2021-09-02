@@ -2,9 +2,9 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Managed
-import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
-import java.lang.ref.Reference
+import org.jetbrains.skia.impl.reachabilityBarrier
+import kotlin.jvm.JvmStatic
 
 /**
  *
@@ -190,7 +190,7 @@ import java.lang.ref.Reference
  * with punctuation or other non-word characters.
 </blockquote> *
  */
-class BreakIterator internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR), Cloneable {
+class BreakIterator internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
         /**
          * DONE is returned by previous() and next() after all valid
@@ -255,7 +255,6 @@ class BreakIterator internal constructor(ptr: Long) : Managed(ptr, _FinalizerHol
         /**
          * Returns a new BreakIterator instance for character breaks for the default locale.
          */
-        @JvmOverloads
         fun makeCharacterInstance(locale: String? = null): BreakIterator {
             Stats.onNativeCall()
             return BreakIterator(_nMake(0, locale)) // UBRK_CHARACTER
@@ -266,7 +265,6 @@ class BreakIterator internal constructor(ptr: Long) : Managed(ptr, _FinalizerHol
         /**
          * Returns a new BreakIterator instance for word breaks for the default locale.
          */
-        @JvmOverloads
         fun makeWordInstance(locale: String? = null): BreakIterator {
             Stats.onNativeCall()
             return BreakIterator(_nMake(1, locale)) // UBRK_WORD
@@ -277,7 +275,6 @@ class BreakIterator internal constructor(ptr: Long) : Managed(ptr, _FinalizerHol
         /**
          * Returns a new BreakIterator instance for line breaks for the default locale.
          */
-        @JvmOverloads
         fun makeLineInstance(locale: String? = null): BreakIterator {
             Stats.onNativeCall()
             return BreakIterator(_nMake(2, locale)) // UBRK_LINE
@@ -288,7 +285,6 @@ class BreakIterator internal constructor(ptr: Long) : Managed(ptr, _FinalizerHol
         /**
          * Returns a new BreakIterator instance for sentence breaks for the default locale.
          */
-        @JvmOverloads
         fun makeSentenceInstance(locale: String? = null): BreakIterator {
             Stats.onNativeCall()
             return BreakIterator(_nMake(3, locale)) // UBRK_SENTENCE
@@ -323,7 +319,7 @@ class BreakIterator internal constructor(ptr: Long) : Managed(ptr, _FinalizerHol
     /**
      * Create a copy of this iterator
      */
-    public override fun clone(): BreakIterator {
+    fun clone(): BreakIterator {
         Stats.onNativeCall()
         return BreakIterator(_nClone(_ptr))
     }
@@ -342,7 +338,7 @@ class BreakIterator internal constructor(ptr: Long) : Managed(ptr, _FinalizerHol
             Stats.onNativeCall()
             _nCurrent(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 
@@ -358,7 +354,7 @@ class BreakIterator internal constructor(ptr: Long) : Managed(ptr, _FinalizerHol
             Stats.onNativeCall()
             _nNext(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 
@@ -402,7 +398,7 @@ class BreakIterator internal constructor(ptr: Long) : Managed(ptr, _FinalizerHol
             Stats.onNativeCall()
             _nPrevious(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 
@@ -414,7 +410,7 @@ class BreakIterator internal constructor(ptr: Long) : Managed(ptr, _FinalizerHol
             Stats.onNativeCall()
             _nFirst(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 
@@ -426,7 +422,7 @@ class BreakIterator internal constructor(ptr: Long) : Managed(ptr, _FinalizerHol
             Stats.onNativeCall()
             _nLast(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 
@@ -443,7 +439,7 @@ class BreakIterator internal constructor(ptr: Long) : Managed(ptr, _FinalizerHol
             Stats.onNativeCall()
             _nPreceding(_ptr, offset)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 
@@ -460,7 +456,7 @@ class BreakIterator internal constructor(ptr: Long) : Managed(ptr, _FinalizerHol
             Stats.onNativeCall()
             _nFollowing(_ptr, offset)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 
@@ -472,7 +468,7 @@ class BreakIterator internal constructor(ptr: Long) : Managed(ptr, _FinalizerHol
             Stats.onNativeCall()
             _nIsBoundary(_ptr, offset)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 
@@ -493,7 +489,7 @@ class BreakIterator internal constructor(ptr: Long) : Managed(ptr, _FinalizerHol
             Stats.onNativeCall()
             _nGetRuleStatus(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     /**
@@ -511,7 +507,7 @@ class BreakIterator internal constructor(ptr: Long) : Managed(ptr, _FinalizerHol
             Stats.onNativeCall()
             _nGetRuleStatuses(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     /**
@@ -521,10 +517,10 @@ class BreakIterator internal constructor(ptr: Long) : Managed(ptr, _FinalizerHol
         try {
             Stats.onNativeCall()
             _text = U16String(text)
-            _nSetText(_ptr, Native.Companion.getPtr(_text))
+            _nSetText(_ptr, getPtr(_text))
         } finally {
-            Reference.reachabilityFence(this)
-            Reference.reachabilityFence(_text)
+            reachabilityBarrier(this)
+            reachabilityBarrier(_text)
         }
     }
 

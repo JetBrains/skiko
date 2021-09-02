@@ -236,7 +236,7 @@ class ImageInfo(val colorInfo: ColorInfo, val width: Int, val height: Int) {
          * @return  ImageInfo with [ColorType.N32]
          */
         fun makeN32(width: Int, height: Int, alphaType: ColorAlphaType): ImageInfo {
-            return ImageInfo(ColorInfo(ColorType.Companion.N32, alphaType, null), width, height)
+            return ImageInfo(ColorInfo(ColorType.N32, alphaType, null), width, height)
         }
 
         /**
@@ -263,14 +263,14 @@ class ImageInfo(val colorInfo: ColorInfo, val width: Int, val height: Int) {
          * @return  ImageInfo with [ColorType.N32] and [ColorAlphaType.PREMUL]
          */
         fun makeN32Premul(width: Int, height: Int): ImageInfo {
-            return ImageInfo(ColorInfo(ColorType.Companion.N32, ColorAlphaType.PREMUL, null), width, height)
+            return ImageInfo(ColorInfo(ColorType.N32, ColorAlphaType.PREMUL, null), width, height)
         }
 
         /**
          * @return  ImageInfo with [ColorType.N32] and [ColorAlphaType.PREMUL]
          */
         fun makeN32Premul(width: Int, height: Int, colorSpace: ColorSpace?): ImageInfo {
-            return ImageInfo(ColorInfo(ColorType.Companion.N32, ColorAlphaType.PREMUL, colorSpace), width, height)
+            return ImageInfo(ColorInfo(ColorType.N32, ColorAlphaType.PREMUL, colorSpace), width, height)
         }
 
         /**
