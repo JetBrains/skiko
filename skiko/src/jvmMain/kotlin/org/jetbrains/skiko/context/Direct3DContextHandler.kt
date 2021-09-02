@@ -1,7 +1,7 @@
 package org.jetbrains.skiko.context
 
-import org.jetbrains.skija.Surface
-import org.jetbrains.skija.impl.Native
+import org.jetbrains.skia.Surface
+import org.jetbrains.skia.impl.Native
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.redrawer.Direct3DRedrawer
 import java.lang.ref.Reference

@@ -13,7 +13,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     return JNI_VERSION_1_8;
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skija_impl_Library__1nAfterLoad
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_impl_Library__1nAfterLoad
   (JNIEnv* env, jclass jclass) {
     env->EnsureLocalCapacity(64);
     java::onLoad(env);

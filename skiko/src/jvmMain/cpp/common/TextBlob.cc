@@ -10,25 +10,25 @@ static void unrefTextBlob(SkTextBlob* ptr) {
     ptr->unref();
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_TextBlob__1nGetFinalizer
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TextBlob__1nGetFinalizer
   (JNIEnv* env, jclass jclass) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&unrefTextBlob));
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skija_TextBlob__1nBounds
+extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_TextBlob__1nBounds
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(static_cast<uintptr_t>(ptr));
     SkRect bounds = instance->bounds();
     return skija::Rect::fromSkRect(env, instance->bounds());
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skija_TextBlob__1nGetUniqueId
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TextBlob__1nGetUniqueId
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(static_cast<uintptr_t>(ptr));
     return instance->uniqueID();
 }
 
-extern "C" JNIEXPORT jfloatArray JNICALL Java_org_jetbrains_skija_TextBlob__1nGetIntercepts
+extern "C" JNIEXPORT jfloatArray JNICALL Java_org_jetbrains_skia_TextBlob__1nGetIntercepts
   (JNIEnv* env, jclass jclass, jlong ptr, jfloat lower, jfloat upper, jlong paintPtr) {
     SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(static_cast<uintptr_t>(ptr));
     std::vector<float> bounds {lower, upper};
@@ -39,7 +39,7 @@ extern "C" JNIEXPORT jfloatArray JNICALL Java_org_jetbrains_skija_TextBlob__1nGe
     return javaFloatArray(env, intervals);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_TextBlob__1nMakeFromPosH
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TextBlob__1nMakeFromPosH
   (JNIEnv* env, jclass jclass, jshortArray glyphsArr, jfloatArray xposArr, jfloat ypos, jlong fontPtr) {
     jsize len = env->GetArrayLength(glyphsArr);
     jshort* glyphs = env->GetShortArrayElements(glyphsArr, nullptr);
@@ -54,7 +54,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_TextBlob__1nMakeFrom
     return reinterpret_cast<jlong>(instance);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_TextBlob__1nMakeFromPos
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TextBlob__1nMakeFromPos
   (JNIEnv* env, jclass jclass, jshortArray glyphsArr, jfloatArray posArr, jlong fontPtr ) {
     jsize len = env->GetArrayLength(glyphsArr);
     jshort* glyphs = env->GetShortArrayElements(glyphsArr, nullptr);
@@ -69,7 +69,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_TextBlob__1nMakeFrom
     return reinterpret_cast<jlong>(instance);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_TextBlob__1nMakeFromRSXform
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TextBlob__1nMakeFromRSXform
   (JNIEnv* env, jclass jclass, jshortArray glyphsArr, jfloatArray xformArr, jlong fontPtr ) {
     jsize len = env->GetArrayLength(glyphsArr);
     jshort* glyphs = env->GetShortArrayElements(glyphsArr, nullptr);
@@ -84,14 +84,14 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_TextBlob__1nMakeFrom
     return reinterpret_cast<jlong>(instance);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_TextBlob__1nSerializeToData
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TextBlob__1nSerializeToData
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(static_cast<uintptr_t>(ptr));
     SkData* data = instance->serialize({}).release();
     return reinterpret_cast<jlong>(data);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_TextBlob__1nMakeFromData
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TextBlob__1nMakeFromData
   (JNIEnv* env, jclass jclass, jlong dataPtr) {
     SkData* data = reinterpret_cast<SkData*>(static_cast<uintptr_t>(dataPtr));
     SkTextBlob* instance = SkTextBlob::Deserialize(data->data(), data->size(), {}).release();
@@ -162,7 +162,7 @@ public:
     }
 };
 
-extern "C" JNIEXPORT jshortArray JNICALL Java_org_jetbrains_skija_TextBlob__1nGetGlyphs
+extern "C" JNIEXPORT jshortArray JNICALL Java_org_jetbrains_skia_TextBlob__1nGetGlyphs
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(static_cast<uintptr_t>(ptr));
     SkTextBlob::Iter iter(*instance);
@@ -177,7 +177,7 @@ extern "C" JNIEXPORT jshortArray JNICALL Java_org_jetbrains_skija_TextBlob__1nGe
     return javaShortArray(env, glyphs);
 }
 
-extern "C" JNIEXPORT jfloatArray JNICALL Java_org_jetbrains_skija_TextBlob__1nGetPositions
+extern "C" JNIEXPORT jfloatArray JNICALL Java_org_jetbrains_skia_TextBlob__1nGetPositions
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(static_cast<uintptr_t>(ptr));
     SkTextBlob::Iter iter(*instance);
@@ -195,7 +195,7 @@ extern "C" JNIEXPORT jfloatArray JNICALL Java_org_jetbrains_skija_TextBlob__1nGe
     return javaFloatArray(env, positions);
 }
 
-extern "C" JNIEXPORT jintArray JNICALL Java_org_jetbrains_skija_TextBlob__1nGetClusters
+extern "C" JNIEXPORT jintArray JNICALL Java_org_jetbrains_skia_TextBlob__1nGetClusters
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(static_cast<uintptr_t>(ptr));
     SkTextBlob::Iter iter(*instance);
@@ -223,7 +223,7 @@ extern "C" JNIEXPORT jintArray JNICALL Java_org_jetbrains_skija_TextBlob__1nGetC
     return javaIntArray(env, clusters);
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skija_TextBlob__1nGetTightBounds
+extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_TextBlob__1nGetTightBounds
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(static_cast<uintptr_t>(ptr));
     SkTextBlob::Iter iter(*instance);
@@ -244,7 +244,7 @@ extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skija_TextBlob__1nGetTig
     return skija::Rect::fromSkRect(env, bounds);
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skija_TextBlob__1nGetBlockBounds
+extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_TextBlob__1nGetBlockBounds
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(static_cast<uintptr_t>(ptr));
     SkTextBlob::Iter iter(*instance);
@@ -275,7 +275,7 @@ extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skija_TextBlob__1nGetBlo
     return skija::Rect::fromSkRect(env, bounds);
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skija_TextBlob__1nGetFirstBaseline
+extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_TextBlob__1nGetFirstBaseline
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(static_cast<uintptr_t>(ptr));
     SkTextBlob::Iter iter(*instance);
@@ -291,7 +291,7 @@ extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skija_TextBlob__1nGetFir
     return nullptr;
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skija_TextBlob__1nGetLastBaseline
+extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_TextBlob__1nGetLastBaseline
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(static_cast<uintptr_t>(ptr));
     SkTextBlob::Iter iter(*instance);

@@ -2,14 +2,14 @@ package org.jetbrains.skiko
 
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.delay
-import org.jetbrains.skija.Canvas
-import org.jetbrains.skija.FontMgr
-import org.jetbrains.skija.Paint
-import org.jetbrains.skija.Rect
-import org.jetbrains.skija.paragraph.FontCollection
-import org.jetbrains.skija.paragraph.ParagraphBuilder
-import org.jetbrains.skija.paragraph.ParagraphStyle
-import org.jetbrains.skija.paragraph.TextStyle
+import org.jetbrains.skia.Canvas
+import org.jetbrains.skia.FontMgr
+import org.jetbrains.skia.Paint
+import org.jetbrains.skia.Rect
+import org.jetbrains.skia.paragraph.FontCollection
+import org.jetbrains.skia.paragraph.ParagraphBuilder
+import org.jetbrains.skia.paragraph.ParagraphStyle
+import org.jetbrains.skia.paragraph.TextStyle
 import org.jetbrains.skiko.util.ScreenshotTestRule
 import org.jetbrains.skiko.util.swingTest
 import org.junit.Assume.assumeTrue

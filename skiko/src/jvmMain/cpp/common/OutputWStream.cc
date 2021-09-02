@@ -44,12 +44,12 @@ static void deleteOutputWStream(OutputWStream* out) {
     delete out;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_OutputWStream__1nGetFinalizer
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_OutputWStream__1nGetFinalizer
   (JNIEnv* env, jclass jclass) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteOutputWStream));
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_OutputWStream__1nMake
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_OutputWStream__1nMake
   (JNIEnv* env, jclass jclass, jobject outputStream) {
     OutputWStream* instance = new OutputWStream(env, outputStream);
     return reinterpret_cast<jlong>(instance);

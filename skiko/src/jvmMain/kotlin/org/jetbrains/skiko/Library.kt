@@ -92,7 +92,7 @@ object Library {
 
         try {
             // Init code executed after library was loaded.
-            org.jetbrains.skija.impl.Library._nAfterLoad()
+            org.jetbrains.skia.impl.Library._nAfterLoad()
         } catch (t: Throwable) {
             t.printStackTrace()
         }
@@ -102,7 +102,7 @@ object Library {
 // We have to keep this tiny class in Skiko for testing purposes.
 internal class LibraryTestImpl() {
     fun run(): Long {
-        val bitmap = org.jetbrains.skija.Bitmap()
+        val bitmap = org.jetbrains.skia.Bitmap()
         return bitmap._ptr
     }
 }
