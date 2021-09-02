@@ -15,8 +15,4 @@ enum class GLBackendState(internal val _bit: Int) {
         1 shl 8
     ),
     FIXED_FUNCTION(1 shl 9), MISC(1 shl 10), PATH_RENDERING(1 shl 11);
-
-    companion object {
-        internal val _values = values()
-    }
 }

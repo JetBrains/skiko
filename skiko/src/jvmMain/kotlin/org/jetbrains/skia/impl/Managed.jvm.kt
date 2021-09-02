@@ -2,7 +2,7 @@ package org.jetbrains.skia.impl
 
 import java.lang.ref.Cleaner
 
-abstract class Managed @JvmOverloads constructor(ptr: Long, finalizer: Long, managed: Boolean = true) : Native(ptr),
+actual abstract class Managed actual constructor(ptr: Long, finalizer: Long, managed: Boolean) : Native(ptr),
     AutoCloseable {
     private var _cleanable: Cleaner.Cleanable? = null
     override fun close() {

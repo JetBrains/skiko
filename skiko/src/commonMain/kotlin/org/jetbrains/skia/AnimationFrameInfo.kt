@@ -79,10 +79,10 @@ class AnimationFrameInfo(
         requiredFrame,
         duration,
         fullyReceived,
-        ColorAlphaType.values().get(alphaTypeOrdinal),
+        ColorAlphaType.values()[alphaTypeOrdinal],
         hasAlphaWithinBounds,
         AnimationDisposalMode.values()[disposalMethodOrdinal],
-        BlendMode.values().get(blendModeOrdinal),
+        BlendMode.values()[blendModeOrdinal],
         frameRect
     )
     /**
@@ -251,16 +251,16 @@ class AnimationFrameInfo(
         if (isHasAlphaWithinBounds != other.isHasAlphaWithinBounds) return false
         val `this$_alphaType`: Any = alphaType
         val `other$_alphaType`: Any = other.alphaType
-        if (if (`this$_alphaType` == null) `other$_alphaType` != null else `this$_alphaType` != `other$_alphaType`) return false
+        if (`this$_alphaType` != `other$_alphaType`) return false
         val `this$_disposalMethod`: Any = disposalMethod
         val `other$_disposalMethod`: Any = other.disposalMethod
-        if (if (`this$_disposalMethod` == null) `other$_disposalMethod` != null else `this$_disposalMethod` != `other$_disposalMethod`) return false
+        if (`this$_disposalMethod` != `other$_disposalMethod`) return false
         val `this$_blendMode`: Any = blendMode
         val `other$_blendMode`: Any = other.blendMode
-        if (if (`this$_blendMode` == null) `other$_blendMode` != null else `this$_blendMode` != `other$_blendMode`) return false
+        if (`this$_blendMode` != `other$_blendMode`) return false
         val `this$_frameRect`: Any = frameRect
         val `other$_frameRect`: Any = other.frameRect
-        return if (if (`this$_frameRect` == null) `other$_frameRect` != null else `this$_frameRect` != `other$_frameRect`) false else true
+        return `this$_frameRect` == `other$_frameRect`
     }
 
     protected fun canEqual(other: Any?): Boolean {
@@ -275,18 +275,18 @@ class AnimationFrameInfo(
         result = result * PRIME + if (isFullyReceived) 79 else 97
         result = result * PRIME + if (isHasAlphaWithinBounds) 79 else 97
         val `$_alphaType`: Any = alphaType
-        result = result * PRIME + (`$_alphaType`?.hashCode() ?: 43)
+        result = result * PRIME + (`$_alphaType`.hashCode())
         val `$_disposalMethod`: Any = disposalMethod
-        result = result * PRIME + (`$_disposalMethod`?.hashCode() ?: 43)
+        result = result * PRIME + `$_disposalMethod`.hashCode()
         val `$_blendMode`: Any = blendMode
-        result = result * PRIME + (`$_blendMode`?.hashCode() ?: 43)
+        result = result * PRIME + `$_blendMode`.hashCode()
         val `$_frameRect`: Any = frameRect
-        result = result * PRIME + (`$_frameRect`?.hashCode() ?: 43)
+        result = result * PRIME + `$_frameRect`.hashCode()
         return result
     }
 
     override fun toString(): String {
-        return "AnimationFrameInfo(_requiredFrame=" + requiredFrame + ", _duration=" + duration + ", _fullyReceived=" + isFullyReceived + ", _alphaType=" + alphaType + ", _hasAlphaWithinBounds=" + isHasAlphaWithinBounds + ", _disposalMethod=" + disposalMethod + ", _blendMode=" + blendMode + ", _frameRect=" + frameRect + ")"
+        return "AnimationFrameInfo(_requiredFrame=$requiredFrame, _duration=$duration, _fullyReceived=$isFullyReceived, _alphaType=$alphaType, _hasAlphaWithinBounds=$isHasAlphaWithinBounds, _disposalMethod=$disposalMethod, _blendMode=$blendMode, _frameRect=$frameRect)"
     }
 
     /**

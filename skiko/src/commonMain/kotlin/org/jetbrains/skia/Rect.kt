@@ -1,5 +1,7 @@
 package org.jetbrains.skia
 
+import kotlin.jvm.JvmStatic
+
 open class Rect internal constructor(val left: Float, val top: Float, val right: Float, val bottom: Float) {
     val width: Float
         get() = right - left
@@ -8,11 +10,11 @@ open class Rect internal constructor(val left: Float, val top: Float, val right:
 
     fun intersect(other: Rect): Rect? {
         return if (right <= other.left || other.right <= left || bottom <= other.top || other.bottom <= top) null else Rect(
-            Math.max(
+            maxOf(
                 left, other.left
-            ), Math.max(top, other.top), Math.min(
+            ), maxOf(top, other.top), minOf(
                 right, other.right
-            ), Math.min(bottom, other.bottom)
+            ), minOf(bottom, other.bottom)
         )
     }
 
@@ -38,11 +40,11 @@ open class Rect internal constructor(val left: Float, val top: Float, val right:
 
     open fun inflate(spread: Float): Rect {
         return if (spread <= 0) makeLTRB(
-            left - spread, top - spread, Math.max(
+            left - spread, top - spread, maxOf(
                 left - spread, right + spread
-            ), Math.max(top - spread, bottom + spread)
-        ) else RRect.Companion.makeLTRB(
-            left - spread, top - spread, Math.max(left - spread, right + spread), Math.max(
+            ), maxOf(top - spread, bottom + spread)
+        ) else RRect.makeLTRB(
+            left - spread, top - spread, maxOf(left - spread, right + spread), maxOf(
                 top - spread, bottom + spread
             ), spread
         )
@@ -56,10 +58,10 @@ open class Rect internal constructor(val left: Float, val top: Float, val right:
         if (o !is Rect) return false
         val other = o
         if (!other.canEqual(this as Any)) return false
-        if (java.lang.Float.compare(left, other.left) != 0) return false
-        if (java.lang.Float.compare(top, other.top) != 0) return false
-        if (java.lang.Float.compare(right, other.right) != 0) return false
-        return if (java.lang.Float.compare(bottom, other.bottom) != 0) false else true
+        if (left.compareTo(other.left) != 0) return false
+        if (top.compareTo(other.top) != 0) return false
+        if (right.compareTo(other.right) != 0) return false
+        return bottom.compareTo(other.bottom) == 0
     }
 
     protected open fun canEqual(other: Any?): Boolean {
@@ -69,15 +71,15 @@ open class Rect internal constructor(val left: Float, val top: Float, val right:
     override fun hashCode(): Int {
         val PRIME = 59
         var result = 1
-        result = result * PRIME + java.lang.Float.floatToIntBits(left)
-        result = result * PRIME + java.lang.Float.floatToIntBits(top)
-        result = result * PRIME + java.lang.Float.floatToIntBits(right)
-        result = result * PRIME + java.lang.Float.floatToIntBits(bottom)
+        result = result * PRIME + left.toBits()
+        result = result * PRIME + top.toBits()
+        result = result * PRIME + right.toBits()
+        result = result * PRIME + bottom.toBits()
         return result
     }
 
     override fun toString(): String {
-        return "Rect(_left=" + left + ", _top=" + top + ", _right=" + right + ", _bottom=" + bottom + ")"
+        return "Rect(_left=$left, _top=$top, _right=$right, _bottom=$bottom)"
     }
 
     companion object {
