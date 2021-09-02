@@ -8,7 +8,7 @@
 #include "SkRect.h"
 #include "interop.hh"
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeAlphaThreshold
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilter__1nMakeAlphaThreshold
   (JNIEnv* env, jclass jclass, jlong regionPtr, jfloat innerMin, jfloat outerMax, jlong inputPtr, jobject cropObj) {
     SkRegion* region = reinterpret_cast<SkRegion*>(static_cast<uintptr_t>(regionPtr));
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>(static_cast<uintptr_t>(inputPtr));
@@ -17,7 +17,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeA
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeArithmetic
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilter__1nMakeArithmetic
   (JNIEnv* env, jclass jclass, jfloat k1, jfloat k2, jfloat k3, jfloat k4, jboolean enforcePMColor, jlong bgPtr, jlong fgPtr, jobject cropObj) {
     SkImageFilter* bg = reinterpret_cast<SkImageFilter*>(static_cast<uintptr_t>(bgPtr));
     SkImageFilter* fg = reinterpret_cast<SkImageFilter*>(static_cast<uintptr_t>(fgPtr));
@@ -26,7 +26,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeA
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeBlend
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilter__1nMakeBlend
   (JNIEnv* env, jclass jclass, jint blendModeInt, jlong bgPtr, jlong fgPtr, jobject cropObj) {
     SkBlendMode blendMode = static_cast<SkBlendMode>(blendModeInt);
     SkImageFilter* bg = reinterpret_cast<SkImageFilter*>(static_cast<uintptr_t>(bgPtr));
@@ -36,7 +36,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeB
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeBlur
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilter__1nMakeBlur
   (JNIEnv* env, jclass jclass, jfloat sigmaX, jfloat sigmaY, jint tileModeInt, jlong inputPtr, jobject cropObj) {
     SkTileMode tileMode = static_cast<SkTileMode>(tileModeInt);
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>(static_cast<uintptr_t>(inputPtr));
@@ -45,7 +45,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeB
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeColorFilter
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilter__1nMakeColorFilter
   (JNIEnv* env, jclass jclass, jlong colorFilterPtr, jlong inputPtr, jobject cropObj) {
     SkColorFilter* colorFilter = reinterpret_cast<SkColorFilter*>(static_cast<uintptr_t>(colorFilterPtr));
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>(static_cast<uintptr_t>(inputPtr));
@@ -54,7 +54,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeC
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeCompose
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilter__1nMakeCompose
   (JNIEnv* env, jclass jclass, jlong outerPtr, jlong innerPtr) {
     SkImageFilter* outer = reinterpret_cast<SkImageFilter*>(static_cast<uintptr_t>(outerPtr));
     SkImageFilter* inner = reinterpret_cast<SkImageFilter*>(static_cast<uintptr_t>(innerPtr));
@@ -62,7 +62,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeC
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeDisplacementMap
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilter__1nMakeDisplacementMap
   (JNIEnv* env, jclass jclass, jint xChanInt, jint yChanInt, jfloat scale, jlong displacementPtr, jlong colorPtr, jobject cropObj) {
     SkColorChannel xChan = static_cast<SkColorChannel>(xChanInt);
     SkColorChannel yChan = static_cast<SkColorChannel>(yChanInt);
@@ -73,7 +73,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeD
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeDropShadow
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilter__1nMakeDropShadow
   (JNIEnv* env, jclass jclass, jfloat dx, jfloat dy, jfloat sigmaX, jfloat sigmaY, jint color, jlong inputPtr, jobject cropObj) {
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>(static_cast<uintptr_t>(inputPtr));
     std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
@@ -81,7 +81,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeD
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeDropShadowOnly
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilter__1nMakeDropShadowOnly
   (JNIEnv* env, jclass jclass, jfloat dx, jfloat dy, jfloat sigmaX, jfloat sigmaY, jint color, jlong inputPtr, jobject cropObj) {
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>(static_cast<uintptr_t>(inputPtr));
     std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
@@ -89,14 +89,14 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeD
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeImage
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilter__1nMakeImage
   (JNIEnv* env, jclass jclass, jlong imagePtr, jfloat l0, jfloat t0, jfloat r0, jfloat b0, jfloat l1, jfloat t1, jfloat r1, jfloat b1, jlong samplingMode) {
     SkImage* image = reinterpret_cast<SkImage*>(static_cast<uintptr_t>(imagePtr));
     SkImageFilter* ptr = SkImageFilters::Image(sk_ref_sp(image), SkRect{l0, t0, r0, b0}, SkRect{l1, t1, r1, b1}, skija::SamplingMode::unpack(samplingMode)).release();
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeMagnifier
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilter__1nMakeMagnifier
   (JNIEnv* env, jclass jclass, jfloat l, jfloat t, jfloat r, jfloat b, jfloat inset, jlong inputPtr, jobject cropObj) {
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>(static_cast<uintptr_t>(inputPtr));
     std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
@@ -104,7 +104,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeM
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeMatrixConvolution
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilter__1nMakeMatrixConvolution
   (JNIEnv* env, jclass jclass, jint kernelW, jint kernelH, jfloatArray kernelArray, jfloat gain, jfloat bias, jint offsetX, jint offsetY, jint tileModeInt, jboolean convolveAlpha, jlong inputPtr, jobject cropObj) {
     jfloat* kernel = env->GetFloatArrayElements(kernelArray, 0);
     SkTileMode tileMode = static_cast<SkTileMode>(tileModeInt);
@@ -115,7 +115,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeM
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeMatrixTransform
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilter__1nMakeMatrixTransform
   (JNIEnv* env, jclass jclass, jfloatArray matrixArray, jlong samplingMode, jlong inputPtr) {
     std::unique_ptr<SkMatrix> matrix = skMatrix(env, matrixArray);
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>(static_cast<uintptr_t>(inputPtr));
@@ -123,7 +123,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeM
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeMerge
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilter__1nMakeMerge
   (JNIEnv* env, jclass jclass, jlongArray filtersArray, jobject cropObj) {
     jlong* f = env->GetLongArrayElements(filtersArray, 0);
     jsize len = env->GetArrayLength(filtersArray);
@@ -138,7 +138,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeM
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeOffset
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilter__1nMakeOffset
   (JNIEnv* env, jclass jclass, jfloat dx, jfloat dy, jlong inputPtr, jobject cropObj) {
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>(static_cast<uintptr_t>(inputPtr));
     std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
@@ -146,7 +146,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeO
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakePaint
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilter__1nMakePaint
   (JNIEnv* env, jclass jclass, jlong paintPtr, jobject cropObj) {
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
     std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
@@ -154,21 +154,21 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeP
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakePicture
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilter__1nMakePicture
   (JNIEnv* env, jclass jclass, jlong picturePtr, jfloat l, jfloat t, jfloat r, jfloat b) {
     SkPicture* picture = reinterpret_cast<SkPicture*>(static_cast<uintptr_t>(picturePtr));
     SkImageFilter* ptr = SkImageFilters::Picture(sk_ref_sp(picture), SkRect{l, t, r, b}).release();
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeTile
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilter__1nMakeTile
   (JNIEnv* env, jclass jclass, jfloat l0, jfloat t0, jfloat r0, jfloat b0, jfloat l1, jfloat t1, jfloat r1, jfloat b1, jlong inputPtr) {
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>(static_cast<uintptr_t>(inputPtr));
     SkImageFilter* ptr = SkImageFilters::Tile(SkRect{l0, t0, r0, b0}, SkRect{l1, t1, r1, b1}, sk_ref_sp(input)).release();
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeDilate
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilter__1nMakeDilate
   (JNIEnv* env, jclass jclass, float rx, jfloat ry, jlong inputPtr, jobject cropObj) {
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>(static_cast<uintptr_t>(inputPtr));
     std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
@@ -176,7 +176,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeD
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeErode
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilter__1nMakeErode
   (JNIEnv* env, jclass jclass, float rx, jfloat ry, jlong inputPtr, jobject cropObj) {
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>(static_cast<uintptr_t>(inputPtr));
     std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
@@ -184,7 +184,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeE
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeDistantLitDiffuse
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilter__1nMakeDistantLitDiffuse
   (JNIEnv* env, jclass jclass, jfloat x, jfloat y, jfloat z, jint lightColor, jfloat surfaceScale, jfloat kd, jlong inputPtr, jobject cropObj) {
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>(static_cast<uintptr_t>(inputPtr));
     std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
@@ -192,7 +192,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeD
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakePointLitDiffuse
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilter__1nMakePointLitDiffuse
   (JNIEnv* env, jclass jclass, jfloat x, jfloat y, jfloat z, jint lightColor, jfloat surfaceScale, jfloat kd, jlong inputPtr, jobject cropObj) {
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>(static_cast<uintptr_t>(inputPtr));
     std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
@@ -200,7 +200,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeP
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeSpotLitDiffuse
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilter__1nMakeSpotLitDiffuse
   (JNIEnv* env, jclass jclass, jfloat x0, jfloat y0, jfloat z0, jfloat x1, jfloat y1, jfloat z1, jfloat falloffExponent, jfloat cutoffAngle, jint lightColor, jfloat surfaceScale, jfloat kd, jlong inputPtr, jobject cropObj) {
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>(static_cast<uintptr_t>(inputPtr));
     std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
@@ -208,7 +208,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeS
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeDistantLitSpecular
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilter__1nMakeDistantLitSpecular
   (JNIEnv* env, jclass jclass, jfloat x, jfloat y, jfloat z, jint lightColor, jfloat surfaceScale, jfloat ks, jfloat shininess, jlong inputPtr, jobject cropObj) {
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>(static_cast<uintptr_t>(inputPtr));
     std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
@@ -216,7 +216,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeD
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakePointLitSpecular
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilter__1nMakePointLitSpecular
   (JNIEnv* env, jclass jclass, jfloat x, jfloat y, jfloat z, jint lightColor, jfloat surfaceScale, jfloat ks, jfloat shininess, jlong inputPtr, jobject cropObj) {
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>(static_cast<uintptr_t>(inputPtr));
     std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
@@ -224,7 +224,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeP
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_ImageFilter__1nMakeSpotLitSpecular
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilter__1nMakeSpotLitSpecular
   (JNIEnv* env, jclass jclass, jfloat x0, jfloat y0, jfloat z0, jfloat x1, jfloat y1, jfloat z1, jfloat falloffExponent, jfloat cutoffAngle, jint lightColor, jfloat surfaceScale, jfloat ks, jfloat shininess, jlong inputPtr, jobject cropObj) {
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>(static_cast<uintptr_t>(inputPtr));
     std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);

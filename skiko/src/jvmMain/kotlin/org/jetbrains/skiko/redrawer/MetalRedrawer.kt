@@ -4,8 +4,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
-import org.jetbrains.skija.BackendRenderTarget
-import org.jetbrains.skija.DirectContext
+import org.jetbrains.skia.BackendRenderTarget
+import org.jetbrains.skia.DirectContext
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.useDrawingSurfacePlatformInfo
 import javax.swing.SwingUtilities.convertPoint

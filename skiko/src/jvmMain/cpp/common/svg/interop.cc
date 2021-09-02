@@ -8,7 +8,7 @@ namespace skija {
             jmethodID ctor;
 
             void onLoad(JNIEnv* env) {
-                jclass local = env->FindClass("org/jetbrains/skija/svg/SVGLength");
+                jclass local = env->FindClass("org/jetbrains/skia/svg/SVGLength");
                 cls  = static_cast<jclass>(env->NewGlobalRef(local));
                 ctor = env->GetMethodID(cls, "<init>", "(FI)V");
             }
@@ -27,7 +27,7 @@ namespace skija {
             jmethodID ctor;
 
             void onLoad(JNIEnv* env) {
-                jclass local = env->FindClass("org/jetbrains/skija/svg/SVGPreserveAspectRatio");
+                jclass local = env->FindClass("org/jetbrains/skia/svg/SVGPreserveAspectRatio");
                 cls  = static_cast<jclass>(env->NewGlobalRef(local));
                 ctor = env->GetMethodID(cls, "<init>", "(II)V");
             }

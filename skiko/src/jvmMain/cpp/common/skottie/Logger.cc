@@ -37,13 +37,13 @@ private:
     jobject fObject;
 };
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skija_skottie_Logger__1nMake
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_skottie_Logger__1nMake
   (JNIEnv* env, jclass jclass) {
     SkijaLoggerImpl* instance = new SkijaLoggerImpl();
     return reinterpret_cast<jlong>(instance);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skija_skottie_Logger__1nInit
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_skottie_Logger__1nInit
   (JNIEnv* env, jobject jthis, jlong ptr) {
     SkijaLoggerImpl* instance = reinterpret_cast<SkijaLoggerImpl*>(static_cast<uintptr_t>(ptr));
     instance->init(env, jthis);

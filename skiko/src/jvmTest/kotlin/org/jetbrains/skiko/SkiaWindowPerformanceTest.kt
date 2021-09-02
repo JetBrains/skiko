@@ -2,7 +2,7 @@ package org.jetbrains.skiko
 
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.delay
-import org.jetbrains.skija.*
+import org.jetbrains.skia.*
 import org.jetbrains.skiko.util.swingTest
 import org.junit.Test
 import java.awt.Point

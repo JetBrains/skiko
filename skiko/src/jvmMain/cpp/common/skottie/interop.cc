@@ -8,9 +8,9 @@ namespace skija {
             jmethodID log;
 
             void onLoad(JNIEnv* env) {
-                jclass local = env->FindClass("org/jetbrains/skija/skottie/Logger");
+                jclass local = env->FindClass("org/jetbrains/skia/skottie/Logger");
                 cls = static_cast<jclass>(env->NewGlobalRef(local));
-                log = env->GetMethodID(cls, "log", "(Lorg/jetbrains/skija/skottie/LogLevel;Ljava/lang/String;Ljava/lang/String;)V");
+                log = env->GetMethodID(cls, "log", "(Lorg/jetbrains/skia/skottie/LogLevel;Ljava/lang/String;Ljava/lang/String;)V");
             }
 
             void onUnload(JNIEnv* env) {
@@ -23,11 +23,11 @@ namespace skija {
             jobject ERROR;
 
             void onLoad(JNIEnv* env) {
-                jclass cls = env->FindClass("org/jetbrains/skija/skottie/LogLevel");
-                jfieldID warningField = env->GetStaticFieldID(cls, "WARNING", "Lorg/jetbrains/skija/skottie/LogLevel;");
+                jclass cls = env->FindClass("org/jetbrains/skia/skottie/LogLevel");
+                jfieldID warningField = env->GetStaticFieldID(cls, "WARNING", "Lorg/jetbrains/skia/skottie/LogLevel;");
                 WARNING = env->NewGlobalRef(env->GetStaticObjectField(cls, warningField));
 
-                jfieldID errorField = env->GetStaticFieldID(cls, "ERROR", "Lorg/jetbrains/skija/skottie/LogLevel;");
+                jfieldID errorField = env->GetStaticFieldID(cls, "ERROR", "Lorg/jetbrains/skia/skottie/LogLevel;");
                 ERROR = env->NewGlobalRef(env->GetStaticObjectField(cls, errorField));
             }
 
