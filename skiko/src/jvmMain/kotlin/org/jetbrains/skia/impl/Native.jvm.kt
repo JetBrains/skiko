@@ -2,10 +2,10 @@ package org.jetbrains.skia.impl
 
 import java.lang.ref.Reference
 
-abstract class Native(ptr: Long) {
-    var _ptr: Long
+actual abstract class Native actual constructor(ptr: Long) {
+    actual var _ptr: Long
     override fun toString(): String {
-        return javaClass.simpleName + "(_ptr=0x" + java.lang.Long.toString(_ptr, 16) + ")"
+        return javaClass.simpleName + "(_ptr=0x" + _ptr.toString(16) + ")"
     }
 
     override fun equals(other: Any?): Boolean {
@@ -30,8 +30,8 @@ abstract class Native(ptr: Long) {
         return java.lang.Long.hashCode(_ptr)
     }
 
-    companion object {
-        fun getPtr(n: Native?): Long {
+    actual companion object {
+        actual fun getPtr(n: Native?): Long {
             return n?._ptr ?: 0
         }
     }
@@ -40,4 +40,8 @@ abstract class Native(ptr: Long) {
         if (ptr == 0L) throw RuntimeException("Can't wrap nullptr")
         _ptr = ptr
     }
+}
+
+actual fun reachabilityBarrier(obj: Any?) {
+    Reference.reachabilityFence(obj)
 }

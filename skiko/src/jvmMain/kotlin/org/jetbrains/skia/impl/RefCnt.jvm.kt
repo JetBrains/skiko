@@ -2,9 +2,9 @@ package org.jetbrains.skia.impl
 
 import java.lang.ref.Reference
 
-abstract class RefCnt : Managed {
-    protected constructor(ptr: Long) : super(ptr, _FinalizerHolder.PTR) {}
-    protected constructor(ptr: Long, allowClose: Boolean) : super(ptr, _FinalizerHolder.PTR, allowClose) {}
+actual abstract class RefCnt : Managed {
+    protected actual constructor(ptr: Long) : super(ptr, _FinalizerHolder.PTR) {}
+    protected actual constructor(ptr: Long, allowClose: Boolean) : super(ptr, _FinalizerHolder.PTR, allowClose)
 
     val refCount: Int
         get() = try {

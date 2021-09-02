@@ -2,10 +2,10 @@ package org.jetbrains.skia.impl
 
 import java.lang.ref.Cleaner
 
-abstract class Managed @JvmOverloads constructor(ptr: Long, finalizer: Long, managed: Boolean = true) : Native(ptr),
+actual abstract class Managed actual constructor(ptr: Long, finalizer: Long, managed: Boolean) : Native(ptr),
     AutoCloseable {
     private var _cleanable: Cleaner.Cleanable? = null
-    override fun close() {
+    actual override fun close() {
         if (0L == _ptr) throw RuntimeException("Object already closed: $javaClass, _ptr=$_ptr") else if (null == _cleanable) throw RuntimeException(
             "Object is not managed in JVM, can't close(): $javaClass, _ptr=$_ptr"
         ) else {

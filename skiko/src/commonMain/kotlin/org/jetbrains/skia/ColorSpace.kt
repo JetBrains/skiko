@@ -3,7 +3,8 @@ package org.jetbrains.skia
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Stats
-import java.lang.ref.Reference
+import org.jetbrains.skia.impl.reachabilityBarrier
+import kotlin.jvm.JvmStatic
 
 class ColorSpace : Managed {
     companion object {
@@ -40,8 +41,8 @@ class ColorSpace : Managed {
                 )
             )
         } finally {
-            Reference.reachabilityFence(this)
-            Reference.reachabilityFence(to)
+            reachabilityBarrier(this)
+            reachabilityBarrier(to)
         }
     }
 
@@ -57,7 +58,7 @@ class ColorSpace : Managed {
             Stats.onNativeCall()
             _nIsGammaCloseToSRGB(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     /**
@@ -68,7 +69,7 @@ class ColorSpace : Managed {
             Stats.onNativeCall()
             _nIsGammaLinear(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     /**
@@ -90,7 +91,7 @@ class ColorSpace : Managed {
             Stats.onNativeCall()
             _nIsSRGB(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     private object _FinalizerHolder {

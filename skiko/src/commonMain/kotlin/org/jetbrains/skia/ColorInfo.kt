@@ -47,13 +47,13 @@ class ColorInfo(colorType: ColorType, alphaType: ColorAlphaType, colorSpace: Col
         if (!other.canEqual(this as Any)) return false
         val `this$_colorType`: Any = colorType
         val `other$_colorType`: Any = other.colorType
-        if (if (`this$_colorType` == null) `other$_colorType` != null else `this$_colorType` != `other$_colorType`) return false
+        if (`this$_colorType` != `other$_colorType`) return false
         val `this$_alphaType`: Any = alphaType
         val `other$_alphaType`: Any = other.alphaType
-        if (if (`this$_alphaType` == null) `other$_alphaType` != null else `this$_alphaType` != `other$_alphaType`) return false
+        if (`this$_alphaType` != `other$_alphaType`) return false
         val `this$_colorSpace`: Any? = colorSpace
         val `other$_colorSpace`: Any? = other.colorSpace
-        return if (if (`this$_colorSpace` == null) `other$_colorSpace` != null else `this$_colorSpace` != `other$_colorSpace`) false else true
+        return !if (`this$_colorSpace` == null) `other$_colorSpace` != null else `this$_colorSpace` != `other$_colorSpace`
     }
 
     protected fun canEqual(other: Any?): Boolean {
@@ -64,16 +64,16 @@ class ColorInfo(colorType: ColorType, alphaType: ColorAlphaType, colorSpace: Col
         val PRIME = 59
         var result = 1
         val `$_colorType`: Any = colorType
-        result = result * PRIME + (`$_colorType`?.hashCode() ?: 43)
+        result = result * PRIME + `$_colorType`.hashCode()
         val `$_alphaType`: Any = alphaType
-        result = result * PRIME + (`$_alphaType`?.hashCode() ?: 43)
+        result = result * PRIME + `$_alphaType`.hashCode()
         val `$_colorSpace`: Any? = colorSpace
-        result = result * PRIME + (`$_colorSpace`?.hashCode() ?: 43)
+        result = result * PRIME + `$_colorSpace`.hashCode()
         return result
     }
 
     override fun toString(): String {
-        return "ColorInfo(_colorType=" + colorType + ", _alphaType=" + alphaType + ", _colorSpace=" + colorSpace + ")"
+        return "ColorInfo(_colorType=$colorType, _alphaType=$alphaType, _colorSpace=$colorSpace)"
     }
 
     fun withColorType(_colorType: ColorType): ColorInfo {

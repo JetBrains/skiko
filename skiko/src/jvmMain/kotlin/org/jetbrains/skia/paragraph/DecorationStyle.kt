@@ -63,7 +63,7 @@ class DecorationStyle(
         if (java.lang.Float.compare(thicknessMultiplier, other.thicknessMultiplier) != 0) return false
         val `this$_lineStyle`: Any = lineStyle
         val `other$_lineStyle`: Any = other.lineStyle
-        return if (if (`this$_lineStyle` == null) `other$_lineStyle` != null else `this$_lineStyle` != `other$_lineStyle`) false else true
+        return `this$_lineStyle` == `other$_lineStyle`
     }
 
     protected fun canEqual(other: Any?): Boolean {
@@ -85,7 +85,7 @@ class DecorationStyle(
     }
 
     override fun toString(): String {
-        return "DecorationStyle(_underline=" + _underline + ", _overline=" + _overline + ", _lineThrough=" + _lineThrough + ", _gaps=" + _gaps + ", _color=" + color + ", _lineStyle=" + lineStyle + ", _thicknessMultiplier=" + thicknessMultiplier + ")"
+        return "DecorationStyle(_underline=$_underline, _overline=$_overline, _lineThrough=$_lineThrough, _gaps=$_gaps, _color=$color, _lineStyle=$lineStyle, _thicknessMultiplier=$thicknessMultiplier)"
     }
 
     fun withUnderline(_underline: Boolean): DecorationStyle {

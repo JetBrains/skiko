@@ -1,5 +1,7 @@
 package org.jetbrains.skia
 
+import kotlin.jvm.JvmStatic
+
 class IRect internal constructor(val left: Int, val top: Int, val right: Int, val bottom: Int) {
     val width: Int
         get() = right - left
@@ -8,9 +10,9 @@ class IRect internal constructor(val left: Int, val top: Int, val right: Int, va
 
     fun intersect(other: IRect): IRect? {
         return if (right <= other.left || other.right <= left || bottom <= other.top || other.bottom <= top) null else IRect(
-            Math.max(left, other.left), Math.max(top, other.top), Math.min(
+            maxOf(left, other.left), maxOf(top, other.top), minOf(
                 right, other.right
-            ), Math.min(bottom, other.bottom)
+            ), minOf(bottom, other.bottom)
         )
     }
 
