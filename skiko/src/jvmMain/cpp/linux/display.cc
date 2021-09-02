@@ -12,7 +12,7 @@
 
 extern "C"
 {
-    JNIEXPORT jdouble JNICALL Java_org_jetbrains_skiko_DisplayKt_getLinuxMaxDisplayRefreshRate(JNIEnv *env, jobject obj)
+    JNIEXPORT jdouble JNICALL Java_org_jetbrains_skiko_DisplayKt_getLinuxDefaultDisplayRefreshRate(JNIEnv *env, jobject obj)
     {
         Display *display = XOpenDisplay(NULL);
         Window window = DefaultRootWindow(display);

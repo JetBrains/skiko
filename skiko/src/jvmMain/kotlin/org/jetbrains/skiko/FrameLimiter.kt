@@ -44,7 +44,7 @@ class FrameLimiter(
     private val channel = RendezvousBroadcastChannel<Unit>()
 
     init {
-        coroutineScope.launch(Dispatchers.IO) {
+        coroutineScope.launch {
             while (true) {
                 channel.sendAll(Unit)
                 preciseDelay(frameMillis())
