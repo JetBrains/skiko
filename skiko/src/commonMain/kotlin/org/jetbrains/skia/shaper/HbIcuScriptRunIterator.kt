@@ -1,3 +1,4 @@
+@file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia.shaper
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
