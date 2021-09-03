@@ -1,6 +1,5 @@
 import de.undercouch.gradle.tasks.download.Download
 import org.gradle.crypto.checksum.Checksum
-import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 
@@ -123,19 +122,6 @@ kotlin {
             "macos-x64", "macos-arm64" -> macosX64()
             else -> null
         }
-        nativeTarget?.apply {
-            compilations.getByName("main") {
-                val skia by cinterops.creating {
-                    defFile("src/nativeInterop/cinterop/skia.def")
-                    val skiaDir = skiaDir.get().absolutePath
-                    compilerOpts("-I$skiaDir")
-                    extraOpts("-staticLibrary", "libskia.a")
-                    extraOpts("-staticLibrary", "libskshaper.a")
-                    extraOpts("-staticLibrary", "libskparagraph.a")
-                    extraOpts("-libraryPath", "$skiaDir/$skiaBinSubdir")
-                }
-            }
-        }
     }
 
     sourceSets {
@@ -168,10 +154,6 @@ kotlin {
             }
         }
     }
-}
-
-tasks.withType(CInteropProcess::class.java).forEach {
-    it.dependsOn(skiaDir)
 }
 
 tasks.withType(JavaCompile::class.java).configureEach {
@@ -705,12 +687,6 @@ publishing {
             }
         }
         if (supportNative) {
-            create<MavenPublication>("skikoNativeSkiaInterop") {
-                artifactId = SkikoArtifacts.nativeSkiaInteropArtifactIdFor(targetOs, targetArch)
-                    afterEvaluate {
-                        artifact(project.tasks.withType(CInteropProcess::class.java).single().outputs.getFiles().single())
-                    }
-            }
             create<MavenPublication>("skikoNativeRuntime") {
                 artifactId = SkikoArtifacts.nativeRuntimeArtifactIdFor(targetOs, targetArch)
                     afterEvaluate {
