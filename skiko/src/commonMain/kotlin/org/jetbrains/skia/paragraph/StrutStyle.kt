@@ -72,9 +72,14 @@ class StrutStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder
             reachabilityBarrier(this)
         }
         set(value) {
-            Stats.onNativeCall()
-            _nSetFontStyle(_ptr, value._value)
+            setFontStyle(value)
         }
+    
+    fun setFontStyle(style: FontStyle): StrutStyle {
+        Stats.onNativeCall()
+        _nSetFontStyle(_ptr, style._value)
+        return this
+    }
 
     var fontSize: Float
         get() = try {
@@ -84,9 +89,14 @@ class StrutStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder
             reachabilityBarrier(this)
         }
         set(value) {
-            Stats.onNativeCall()
-            _nSetFontSize(_ptr, value)
+            setFontSize(value)
         }
+
+    fun setFontSize(value: Float): StrutStyle {
+        Stats.onNativeCall()
+        _nSetFontSize(_ptr, value)
+        return this
+    }
 
     var height: Float
         get() = try {
@@ -96,9 +106,14 @@ class StrutStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder
             reachabilityBarrier(this)
         }
         set(value) {
-            Stats.onNativeCall()
-            _nSetHeight(_ptr, value)
+            setHeight(value)
         }
+    
+    fun setHeight(value: Float): StrutStyle {
+        Stats.onNativeCall()
+        _nSetHeight(_ptr, value)
+        return this
+    }
 
     var leading: Float
         get() = try {
@@ -108,9 +123,14 @@ class StrutStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder
             reachabilityBarrier(this)
         }
         set(value) {
-            Stats.onNativeCall()
-            _nSetLeading(_ptr, value)
+            setLeading(value)
         }
+    
+    fun setLeading(value: Float): StrutStyle {
+        Stats.onNativeCall()
+        _nSetLeading(_ptr, value)
+        return this
+    }
 
     var isEnabled: Boolean
         get() = try {
@@ -120,9 +140,14 @@ class StrutStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder
             reachabilityBarrier(this)
         }
         set(value) {
-            Stats.onNativeCall()
-            _nSetEnabled(_ptr, value)
+            setEnabled(value)
         }
+    
+    fun setEnabled(value: Boolean): StrutStyle {
+        Stats.onNativeCall()
+        _nSetEnabled(_ptr, value)
+        return this
+    }
 
     var isHeightForced: Boolean
         get() = try {
@@ -132,9 +157,14 @@ class StrutStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder
             reachabilityBarrier(this)
         }
         set(value) {
-            Stats.onNativeCall()
-            _nSetHeightForced(_ptr, value)
+            setHeightForced(value)
         }
+    
+    fun setHeightForced(value: Boolean): StrutStyle {
+        Stats.onNativeCall()
+        _nSetHeightForced(_ptr, value)
+        return this
+    }
 
     var isHeightOverridden: Boolean
         get() = try {
@@ -144,9 +174,14 @@ class StrutStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder
             reachabilityBarrier(this)
         }
         set(value) {
-            Stats.onNativeCall()
-            _nSetHeightOverridden(_ptr, value)
+            setHeightOverridden(value)
         }
+    
+    fun setHeightOverridden(value: Boolean): StrutStyle {
+        Stats.onNativeCall()
+        _nSetHeightOverridden(_ptr, value)
+        return this
+    }
 
     private object _FinalizerHolder {
         val PTR = _nGetFinalizer()

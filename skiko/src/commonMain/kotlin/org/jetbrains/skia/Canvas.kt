@@ -589,12 +589,12 @@ open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val
     }
 
     fun drawImageRect(
-            image: Image,
-            src: Rect,
-            dst: Rect,
-            samplingMode: SamplingMode,
-            paint: Paint?,
-            strict: Boolean
+        image: Image,
+        src: Rect,
+        dst: Rect,
+        samplingMode: SamplingMode,
+        paint: Paint?,
+        strict: Boolean
     ): Canvas {
         Stats.onNativeCall()
         _nDrawImageRect(
@@ -663,7 +663,7 @@ open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val
     }
 
     fun drawTextLine(line: TextLine, x: Float, y: Float, paint: Paint): Canvas {
-        line.textBlob?.use { blob -> blob?.let { drawTextBlob(it, x, y, paint) } }
+        line.textBlob?.use { blob -> blob.let { drawTextBlob(it, x, y, paint) } }
         return this
     }
 

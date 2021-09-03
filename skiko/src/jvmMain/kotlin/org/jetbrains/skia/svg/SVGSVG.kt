@@ -34,13 +34,18 @@ class SVGSVG internal constructor(ptr: Long) : SVGContainer(ptr) {
             Reference.reachabilityFence(this)
         }
         set(value) {
-            try {
-                Stats.onNativeCall()
-                _nSetX(_ptr, value.value, value._unit.ordinal)
-            } finally {
-                Reference.reachabilityFence(this)
-            }
+            setX(value)
         }
+    
+    fun setX(length: SVGLength): SVGSVG {
+        return try {
+            Stats.onNativeCall()
+            _nSetX(_ptr, length.value, length._unit.ordinal)
+            this
+        } finally {
+            Reference.reachabilityFence(this)
+        }
+    }
 
     var y: SVGLength
         get() = try {
@@ -50,13 +55,18 @@ class SVGSVG internal constructor(ptr: Long) : SVGContainer(ptr) {
             Reference.reachabilityFence(this)
         }
         set(value) {
-            try {
-                Stats.onNativeCall()
-                _nSetY(_ptr, value.value, value._unit.ordinal)
-            } finally {
-                Reference.reachabilityFence(this)
-            }
+            setY(value)
         }
+    
+    fun setY(length: SVGLength): SVGSVG {
+        return try {
+            Stats.onNativeCall()
+            _nSetY(_ptr, length.value, length._unit.ordinal)
+            this
+        } finally {
+            Reference.reachabilityFence(this)
+        }
+    }
 
     var width: SVGLength
         get() = try {
@@ -66,13 +76,18 @@ class SVGSVG internal constructor(ptr: Long) : SVGContainer(ptr) {
             Reference.reachabilityFence(this)
         }
         set(value) {
-            try {
-                Stats.onNativeCall()
-                _nSetWidth(_ptr, value.value, value._unit.ordinal)
-            } finally {
-                Reference.reachabilityFence(this)
-            }
+            setWidth(value)
         }
+    
+    fun setWidth(length: SVGLength): SVGSVG {
+        return try {
+            Stats.onNativeCall()
+            _nSetWidth(_ptr, length.value, length._unit.ordinal)
+            this
+        } finally {
+            Reference.reachabilityFence(this)
+        }
+    }
 
     var height: SVGLength
         get() = try {
@@ -82,13 +97,18 @@ class SVGSVG internal constructor(ptr: Long) : SVGContainer(ptr) {
             Reference.reachabilityFence(this)
         }
         set(value) {
-            try {
-                Stats.onNativeCall()
-                _nSetHeight(_ptr, value.value, value._unit.ordinal)
-            } finally {
-                Reference.reachabilityFence(this)
-            }
+            setHeight(value)
         }
+
+    fun setHeight(length: SVGLength): SVGSVG {
+        return try {
+            Stats.onNativeCall()
+            _nSetHeight(_ptr, length.value, length._unit.ordinal)
+            this
+        } finally {
+            Reference.reachabilityFence(this)
+        }
+    }
 
     var preserveAspectRatio: SVGPreserveAspectRatio
         get() = try {
@@ -98,13 +118,18 @@ class SVGSVG internal constructor(ptr: Long) : SVGContainer(ptr) {
             Reference.reachabilityFence(this)
         }
         set(value) {
-            try {
-                Stats.onNativeCall()
-                _nSetPreserveAspectRatio(_ptr, value._align._value, value._scale.ordinal)
-            } finally {
-                Reference.reachabilityFence(this)
-            }
+            setPreserveAspectRatio(value)
         }
+
+    fun setPreserveAspectRatio(ratio: SVGPreserveAspectRatio): SVGSVG {
+        return try {
+            Stats.onNativeCall()
+            _nSetPreserveAspectRatio(_ptr, ratio._align._value, ratio._scale.ordinal)
+            this
+        } finally {
+            Reference.reachabilityFence(this)
+        }
+    }
 
     var viewBox: Rect?
         get() = try {
@@ -114,14 +139,19 @@ class SVGSVG internal constructor(ptr: Long) : SVGContainer(ptr) {
             Reference.reachabilityFence(this)
         }
         set(value) {
-            try {
-                assert(value != null) { "Can’t set viewBox with value == null" }
-                Stats.onNativeCall()
-                _nSetViewBox(_ptr, value!!.left, value.top, value.right, value.bottom)
-            } finally {
-                Reference.reachabilityFence(this)
-            }
+            require(value != null) { "Can't set viewBox with value == null" }
+            setViewBox(value)
         }
+    
+    fun setViewBox(viewBox: Rect): SVGSVG {
+        return try {
+            Stats.onNativeCall()
+            _nSetViewBox(_ptr, viewBox.left, viewBox.top, viewBox.right, viewBox.bottom)
+            this
+        } finally {
+            Reference.reachabilityFence(this)
+        }
+    }
 
     fun getIntrinsicSize(lc: SVGLengthContext): Point {
         return try {

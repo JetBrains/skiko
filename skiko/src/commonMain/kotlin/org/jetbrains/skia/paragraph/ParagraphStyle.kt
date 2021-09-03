@@ -56,13 +56,18 @@ class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
             reachabilityBarrier(this)
         }
         set(value) {
-            try {
-                Stats.onNativeCall()
-                _nSetStrutStyle(_ptr, getPtr(value))
-            } finally {
-                reachabilityBarrier(value)
-            }
+            setStrutStyle(value)
         }
+    
+    fun setStrutStyle(s: StrutStyle?): ParagraphStyle {
+        return try {
+            Stats.onNativeCall()
+            _nSetStrutStyle(_ptr, getPtr(s))
+            this
+        } finally {
+            reachabilityBarrier(s)
+        }
+    }
 
     var textStyle: TextStyle
         get() = try {
@@ -72,13 +77,18 @@ class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
             reachabilityBarrier(this)
         }
         set(value) {
-            try {
-                Stats.onNativeCall()
-                _nSetTextStyle(_ptr, getPtr(value))
-            } finally {
-                reachabilityBarrier(value)
-            }
+            setTextStyle(value)
         }
+    
+    fun setTextStyle(style: TextStyle?): ParagraphStyle {
+        return try {
+            Stats.onNativeCall()
+            _nSetTextStyle(_ptr, getPtr(style))
+            this
+        } finally {
+            reachabilityBarrier(style)
+        }
+    }
 
     var direction: Direction
         get() = try {
@@ -88,9 +98,14 @@ class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
             reachabilityBarrier(this)
         }
         set(value) {
-            Stats.onNativeCall()
-            _nSetDirection(_ptr, value.ordinal)
+            setDirection(value)
         }
+
+    fun setDirection(style: Direction): ParagraphStyle {
+        Stats.onNativeCall()
+        _nSetDirection(_ptr, style.ordinal)
+        return this
+    }
 
     var alignment: Alignment
         get() = try {
@@ -100,9 +115,14 @@ class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
             reachabilityBarrier(this)
         }
         set(value) {
-            Stats.onNativeCall()
-            _nSetAlignment(_ptr, value.ordinal)
+            setAlignment(value)
         }
+
+    fun setAlignment(alignment: Alignment): ParagraphStyle {
+        Stats.onNativeCall()
+        _nSetAlignment(_ptr, alignment.ordinal)
+        return this
+    }
 
     var maxLinesCount: Long
         get() = try {
@@ -112,9 +132,14 @@ class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
             reachabilityBarrier(this)
         }
         set(value) {
-            Stats.onNativeCall()
-            _nSetMaxLinesCount(_ptr, value)
+            setMaxLinesCount(value)
         }
+
+    fun setMaxLinesCount(count: Long): ParagraphStyle {
+        Stats.onNativeCall()
+        _nSetMaxLinesCount(_ptr, count)
+        return this
+    }
 
     var ellipsis: String
         get() = try {
@@ -124,9 +149,14 @@ class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
             reachabilityBarrier(this)
         }
         set(value) {
-            Stats.onNativeCall()
-            _nSetEllipsis(_ptr, value)
+            setEllipsis(value)
         }
+
+    fun setEllipsis(ellipsis: String?): ParagraphStyle {
+        Stats.onNativeCall()
+        _nSetEllipsis(_ptr, ellipsis)
+        return this
+    }
 
     var height: Float
         get() = try {
@@ -136,9 +166,14 @@ class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
             reachabilityBarrier(this)
         }
         set(value) {
-            Stats.onNativeCall()
-            _nSetHeight(_ptr, value)
+            setHeight(value)
         }
+
+    fun setHeight(height: Float): ParagraphStyle {
+        Stats.onNativeCall()
+        _nSetHeight(_ptr, height)
+        return this
+    }
 
     var heightMode: HeightMode
         get() = try {
@@ -148,9 +183,14 @@ class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
             reachabilityBarrier(this)
         }
         set(value) {
-            Stats.onNativeCall()
-            _nSetHeightMode(_ptr, value.ordinal)
+            setHeightMode(value)
         }
+
+    fun setHeightMode(behavior: HeightMode): ParagraphStyle {
+        Stats.onNativeCall()
+        _nSetHeightMode(_ptr, behavior.ordinal)
+        return this
+    }
 
     val effectiveAlignment: Alignment
         get() = try {

@@ -176,9 +176,19 @@ class Paint : Managed {
             reachabilityBarrier(this)
         }
         set(value) {
-            Stats.onNativeCall()
-            _nSetAntiAlias(_ptr, value)
+            setAntiAlias(value)
         }
+    
+    /**
+     * Requests, but does not require, that edge pixels draw opaque or with partial transparency.
+     *
+     * @param value  setting for antialiasing
+     */
+    fun setAntiAlias(value: Boolean): Paint {
+        Stats.onNativeCall()
+        _nSetAntiAlias(_ptr, value)
+        return this
+    }
 
     /**
      * Requests, but does not require, to distribute color error.
@@ -193,9 +203,20 @@ class Paint : Managed {
             reachabilityBarrier(this)
         }
         set(value) {
-            Stats.onNativeCall()
-            _nSetDither(_ptr, value)
+            setDither(value)
         }
+
+    /**
+     * Requests, but does not require, to distribute color error.
+     *
+     * @param value  setting for ditering
+     * @return       this
+     */
+    fun setDither(value: Boolean): Paint {
+        Stats.onNativeCall()
+        _nSetDither(_ptr, value)
+        return this
+    }
 
     /**
      * Sets whether the geometry is filled, stroked, or filled and stroked.
@@ -214,9 +235,21 @@ class Paint : Managed {
             reachabilityBarrier(this)
         }
         set(value) {
-            Stats.onNativeCall()
-            _nSetMode(_ptr, value.ordinal)
+            setMode(value)
         }
+
+    /**
+     * Sets whether the geometry is filled, stroked, or filled and stroked.
+     *
+     * @see [https://fiddle.skia.org/c/@Paint_setStyle](https://fiddle.skia.org/c/@Paint_setStyle)
+     *
+     * @see [https://fiddle.skia.org/c/@Stroke_Width](https://fiddle.skia.org/c/@Stroke_Width)
+     */
+    fun setMode(style: PaintMode): Paint {
+        Stats.onNativeCall()
+        _nSetMode(_ptr, style.ordinal)
+        return this
+    }
 
     /**
      * Set paint's mode to STROKE if true, or FILL if false.
@@ -249,9 +282,22 @@ class Paint : Managed {
             reachabilityBarrier(this)
         }
         set(value) {
-            Stats.onNativeCall()
-            _nSetColor(_ptr, value)
+            setColor(value)
         }
+
+    /**
+     * Sets alpha and RGB used when stroking and filling. The color is a 32-bit value,
+     * unpremultiplied, packing 8-bit components for alpha, red, blue, and green.
+     *
+     * @param color  unpremultiplied ARGB
+     *
+     * @see [https://fiddle.skia.org/c/@Paint_setColor](https://fiddle.skia.org/c/@Paint_setColor)
+     */
+    fun setColor(color: Int): Paint {
+        Stats.onNativeCall()
+        _nSetColor(_ptr, color)
+        return this
+    }
 
     /**
      * Sets alpha and RGB used when stroking and filling. The color is four floating
@@ -270,8 +316,19 @@ class Paint : Managed {
             reachabilityBarrier(this)
         }
         set(value) {
-            setColor4f(value, null)
+            setColor4f(value)
         }
+    
+    /**
+     * Sets alpha and RGB used when stroking and filling. The color is four floating
+     * point values, unpremultiplied. The color values are interpreted as being in sRGB.
+     *
+     * @param color       unpremultiplied RGBA
+     * @return            this
+     */
+    fun setColor4f(color: Color4f): Paint {
+        return setColor4f(color, null)
+    }
 
     /**
      * Sets alpha and RGB used when stroking and filling. The color is four floating
@@ -388,9 +445,26 @@ class Paint : Managed {
             reachabilityBarrier(this)
         }
         set(value) {
-            Stats.onNativeCall()
-            _nSetStrokeWidth(_ptr, value)
+            setStrokeWidth(value)
         }
+
+    /**
+     * Sets the thickness of the pen used by the paint to outline the shape.
+     * A stroke-width of zero is treated as "hairline" width. Hairlines are always exactly one
+     * pixel wide in device space (their thickness does not change as the canvas is scaled).
+     * Negative stroke-widths are invalid; setting a negative width will have no effect.
+     *
+     * @param width  zero thickness for hairline; greater than zero for pen thickness
+     *
+     * @see [https://fiddle.skia.org/c/@Miter_Limit](https://fiddle.skia.org/c/@Miter_Limit)
+     *
+     * @see [https://fiddle.skia.org/c/@Paint_setStrokeWidth](https://fiddle.skia.org/c/@Paint_setStrokeWidth)
+     */
+    fun setStrokeWidth(width: Float): Paint {
+        Stats.onNativeCall()
+        _nSetStrokeWidth(_ptr, width)
+        return this
+    }
 
     /**
      * Sets the limit at which a sharp corner is drawn beveled.
@@ -411,9 +485,24 @@ class Paint : Managed {
             reachabilityBarrier(this)
         }
         set(value) {
-            Stats.onNativeCall()
-            _nSetStrokeMiter(_ptr, value)
+            setStrokeMiter(value)
         }
+
+    /**
+     * Sets the limit at which a sharp corner is drawn beveled.
+     * Valid values are zero and greater.
+     * Has no effect if miter is less than zero.
+     *
+     * @param miter  zero and greater miter limit
+     * @return       this
+     *
+     * @see [https://fiddle.skia.org/c/@Paint_setStrokeMiter](https://fiddle.skia.org/c/@Paint_setStrokeMiter)
+     */
+    fun setStrokeMiter(miter: Float): Paint {
+        Stats.onNativeCall()
+        _nSetStrokeMiter(_ptr, miter)
+        return this
+    }
 
     /**
      * Sets the geometry drawn at the beginning and end of strokes.
@@ -432,9 +521,23 @@ class Paint : Managed {
             reachabilityBarrier(this)
         }
         set(value) {
-            Stats.onNativeCall()
-            _nSetStrokeCap(_ptr, value.ordinal)
+            setStrokeCap(value)
         }
+
+    /**
+     * Sets the geometry drawn at the beginning and end of strokes.
+     *
+     * @return  this
+     *
+     * @see [https://fiddle.skia.org/c/@Paint_setStrokeCap_a](https://fiddle.skia.org/c/@Paint_setStrokeCap_a)
+     *
+     * @see [https://fiddle.skia.org/c/@Paint_setStrokeCap_b](https://fiddle.skia.org/c/@Paint_setStrokeCap_b)
+     */
+    fun setStrokeCap(cap: PaintStrokeCap): Paint {
+        Stats.onNativeCall()
+        _nSetStrokeCap(_ptr, cap.ordinal)
+        return this
+    }
 
 
     /**
@@ -452,9 +555,21 @@ class Paint : Managed {
             reachabilityBarrier(this)
         }
         set(value) {
-            Stats.onNativeCall()
-            _nSetStrokeJoin(_ptr, value.ordinal)
+            setStrokeJoin(value)
         }
+
+    /**
+     * Sets the geometry drawn at the corners of strokes.
+     *
+     * @return  this
+     *
+     * @see [https://fiddle.skia.org/c/@Paint_setStrokeJoin](https://fiddle.skia.org/c/@Paint_setStrokeJoin)
+     */
+    fun setStrokeJoin(join: PaintStrokeJoin): Paint {
+        Stats.onNativeCall()
+        _nSetStrokeJoin(_ptr, join.ordinal)
+        return this
+    }
 
     /**
      * Returns the filled equivalent of the stroked path.
@@ -520,13 +635,25 @@ class Paint : Managed {
             reachabilityBarrier(this)
         }
         set(value) {
-            try {
-                Stats.onNativeCall()
-                _nSetShader(_ptr, getPtr(value))
-            } finally {
-                reachabilityBarrier(value)
-            }
+            setShader(value)
         }
+
+    /**
+     * @param shader  how geometry is filled with color; if null, color is used instead
+     *
+     * @see [https://fiddle.skia.org/c/@Color_Filter_Methods](https://fiddle.skia.org/c/@Color_Filter_Methods)
+     *
+     * @see [https://fiddle.skia.org/c/@Paint_setShader](https://fiddle.skia.org/c/@Paint_setShader)
+     */
+    fun setShader(shader: Shader?): Paint {
+        return try {
+            Stats.onNativeCall()
+            _nSetShader(_ptr, getPtr(shader))
+            this
+        } finally {
+            reachabilityBarrier(shader)
+        }
+    }
 
     /**
      * @param colorFilter [ColorFilter] to apply to subsequent draw
@@ -547,16 +674,28 @@ class Paint : Managed {
             reachabilityBarrier(this)
         }
         set(value) {
-            try {
-                Stats.onNativeCall()
-                _nSetColorFilter(
-                    _ptr,
-                    getPtr(value)
-                )
-            } finally {
-                reachabilityBarrier(value)
-            }
+            setColorFilter(value)
         }
+
+    /**
+     * @param colorFilter [ColorFilter] to apply to subsequent draw
+     *
+     * @see [https://fiddle.skia.org/c/@Blend_Mode_Methods](https://fiddle.skia.org/c/@Blend_Mode_Methods)
+     *
+     * @see [https://fiddle.skia.org/c/@Paint_setColorFilter](https://fiddle.skia.org/c/@Paint_setColorFilter)
+     */
+    fun setColorFilter(colorFilter: ColorFilter?): Paint {
+        return try {
+            Stats.onNativeCall()
+            _nSetColorFilter(
+                _ptr,
+                getPtr(colorFilter)
+            )
+            this
+        } finally {
+            reachabilityBarrier(colorFilter)
+        }
+    }
 
     /**
      * Sets SkBlendMode to mode. Does not check for valid input.
@@ -574,9 +713,20 @@ class Paint : Managed {
             reachabilityBarrier(this)
         }
         set(value) {
-            Stats.onNativeCall()
-            _nSetBlendMode(_ptr, value.ordinal)
+            setBlendMode(value)
         }
+
+    /**
+     * Sets SkBlendMode to mode. Does not check for valid input.
+     *
+     * @param mode  BlendMode used to combine source color and destination
+     * @return      this
+     */
+    fun setBlendMode(mode: BlendMode): Paint {
+        Stats.onNativeCall()
+        _nSetBlendMode(_ptr, mode.ordinal)
+        return this
+    }
 
     /**
      * @return  true if BlendMode is BlendMode.SRC_OVER, the default.
@@ -603,13 +753,25 @@ class Paint : Managed {
             reachabilityBarrier(this)
         }
         set(value) {
-            try {
-                Stats.onNativeCall()
-                _nSetPathEffect(_ptr, getPtr(value))
-            } finally {
-                reachabilityBarrier(value)
-            }
+            setPathEffect(value)
         }
+
+    /**
+     * @param p  replace [Path] with a modification when drawn
+     *
+     * @see [https://fiddle.skia.org/c/@Mask_Filter_Methods](https://fiddle.skia.org/c/@Mask_Filter_Methods)
+     *
+     * @see [https://fiddle.skia.org/c/@Paint_setPathEffect](https://fiddle.skia.org/c/@Paint_setPathEffect)
+     */
+    fun setPathEffect(p: PathEffect?): Paint {
+        return try {
+            Stats.onNativeCall()
+            _nSetPathEffect(_ptr, getPtr(p))
+            this
+        } finally {
+            reachabilityBarrier(p)
+        }
+    }
 
 
     /**
@@ -631,16 +793,29 @@ class Paint : Managed {
             reachabilityBarrier(this)
         }
         set(value) {
-            try {
-                Stats.onNativeCall()
-                _nSetMaskFilter(
-                    _ptr,
-                    getPtr(value)
-                )
-            } finally {
-                reachabilityBarrier(value)
-            }
+            setMaskFilter(value)
         }
+    
+    /**
+     * @param maskFilter  modifies clipping mask generated from drawn geometry
+     * @return            this
+     *
+     * @see [https://fiddle.skia.org/c/@Paint_setMaskFilter](https://fiddle.skia.org/c/@Paint_setMaskFilter)
+     *
+     * @see [https://fiddle.skia.org/c/@Typeface_Methods](https://fiddle.skia.org/c/@Typeface_Methods)
+     */
+    fun setMaskFilter(maskFilter: MaskFilter?): Paint {
+        return try {
+            Stats.onNativeCall()
+            _nSetMaskFilter(
+                _ptr,
+                getPtr(maskFilter)
+            )
+            this
+        } finally {
+            reachabilityBarrier(maskFilter)
+        }
+    }
 
     /**
      * imageFilter  how SkImage is sampled when transformed
@@ -661,16 +836,28 @@ class Paint : Managed {
             reachabilityBarrier(this)
         }
         set(value) {
-            try {
-                Stats.onNativeCall()
-                _nSetImageFilter(
-                    _ptr,
-                    getPtr(value)
-                )
-            } finally {
-                reachabilityBarrier(value)
-            }
+            setImageFilter(value)
         }
+    
+    /**
+     * @param imageFilter  how SkImage is sampled when transformed
+     *
+     * @see [https://fiddle.skia.org/c/@Draw_Looper_Methods](https://fiddle.skia.org/c/@Draw_Looper_Methods)
+     *
+     * @see [https://fiddle.skia.org/c/@Paint_setImageFilter](https://fiddle.skia.org/c/@Paint_setImageFilter)
+     */
+    fun setImageFilter(imageFilter: ImageFilter?): Paint {
+        return try {
+            Stats.onNativeCall()
+            _nSetImageFilter(
+                _ptr,
+                getPtr(imageFilter)
+            )
+            this
+        } finally {
+            reachabilityBarrier(imageFilter)
+        }
+    }
 
     /**
      *

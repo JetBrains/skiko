@@ -105,9 +105,14 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
             reachabilityBarrier(this)
         }
         set(value) {
-            Stats.onNativeCall()
-            _nSetColor(_ptr, value)
+            setColor(value)
         }
+    
+    fun setColor(color: Int): TextStyle {
+        Stats.onNativeCall()
+        _nSetColor(_ptr, color)
+        return this
+    }
 
     var foreground: Paint?
         get() = try {
@@ -118,17 +123,21 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
             reachabilityBarrier(this)
         }
         set(value) {
-            try {
-                Stats.onNativeCall()
-                _nSetForeground(
-                    _ptr,
-                    getPtr(value)
-                )
-                this
-            } finally {
-                reachabilityBarrier(value)
-            }
+            setForeground(value)
         }
+    
+    fun setForeground(paint: Paint?): TextStyle {
+        return try {
+            Stats.onNativeCall()
+            _nSetForeground(
+                _ptr,
+                getPtr(paint)
+            )
+            this
+        } finally {
+            reachabilityBarrier(paint)
+        }
+    }
 
     var background: Paint?
         get() = try {
@@ -139,17 +148,21 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
             reachabilityBarrier(this)
         }
         set(value) {
-            try {
-                Stats.onNativeCall()
-                _nSetBackground(
-                    _ptr,
-                    getPtr(value)
-                )
-                this
-            } finally {
-                reachabilityBarrier(value)
-            }
+            setBackground(value)
         }
+
+    fun setBackground(paint: Paint?): TextStyle {
+        return try {
+            Stats.onNativeCall()
+            _nSetBackground(
+                _ptr,
+                getPtr(paint)
+            )
+            this
+        } finally {
+            reachabilityBarrier(paint)
+        }
+    }
 
     var decorationStyle: org.jetbrains.skia.paragraph.DecorationStyle
         get() = try {
@@ -159,18 +172,23 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
             reachabilityBarrier(this)
         }
         set(value) {
-            Stats.onNativeCall()
-            _nSetDecorationStyle(
-                _ptr,
-                value._underline,
-                value._overline,
-                value._lineThrough,
-                value._gaps,
-                value.color,
-                value._lineStyle.ordinal,
-                value.thicknessMultiplier
-            )
+            setDecorationStyle(value)
         }
+    
+    fun setDecorationStyle(d: DecorationStyle): TextStyle {
+        Stats.onNativeCall()
+        _nSetDecorationStyle(
+            _ptr,
+            d._underline,
+            d._overline,
+            d._lineThrough,
+            d._gaps,
+            d.color,
+            d._lineStyle.ordinal,
+            d.thicknessMultiplier
+        )
+        return this
+    }
 
     var fontStyle: FontStyle
         get() = try {
@@ -180,9 +198,14 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
             reachabilityBarrier(this)
         }
         set(value) {
-            Stats.onNativeCall()
-            _nSetFontStyle(_ptr, value._value)
+            setFontStyle(value)
         }
+    
+    fun setFontStyle(s: FontStyle): TextStyle {
+        Stats.onNativeCall()
+        _nSetFontStyle(_ptr, s._value)
+        return this
+    }
 
     val shadows: Array<org.jetbrains.skia.paragraph.Shadow>
         get() = try {
@@ -242,9 +265,14 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
             reachabilityBarrier(this)
         }
         set(value) {
-            Stats.onNativeCall()
-            _nSetFontSize(_ptr, value)
+            setFontSize(value)
         }
+    
+    fun setFontSize(size: Float): TextStyle {
+        Stats.onNativeCall()
+        _nSetFontSize(_ptr, size)
+        return this
+    }
 
     var fontFamilies: Array<String>
         get() = try {
@@ -254,12 +282,16 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
             reachabilityBarrier(this)
         }
         set(value) {
-            Stats.onNativeCall()
-            _nSetFontFamilies(_ptr, value)
+            setFontFamilies(value)
         }
 
     fun setFontFamily(family: String): TextStyle {
-        fontFamilies = arrayOf(family)
+        return setFontFamilies(arrayOf(family))
+    }
+
+    fun setFontFamilies(families: Array<String>?): TextStyle {
+        Stats.onNativeCall()
+        _nSetFontFamilies(_ptr, families)
         return this
     }
 
@@ -271,9 +303,14 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
             reachabilityBarrier(this)
         }
         set(value) {
-            Stats.onNativeCall()
-            if (value == null) _nSetHeight(_ptr, false, 0f) else _nSetHeight(_ptr, true, value)
+            setHeight(value)
         }
+    
+    fun setHeight(height: Float?): TextStyle {
+        Stats.onNativeCall()
+        if (height == null) _nSetHeight(_ptr, false, 0f) else _nSetHeight(_ptr, true, height)
+        return this
+    }
 
     var letterSpacing: Float
         get() = try {
@@ -283,9 +320,14 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
             reachabilityBarrier(this)
         }
         set(value) {
-            Stats.onNativeCall()
-            _nSetLetterSpacing(_ptr, value)
+            setLetterSpacing(value)
         }
+
+    fun setLetterSpacing(letterSpacing: Float): TextStyle {
+        Stats.onNativeCall()
+        _nSetLetterSpacing(_ptr, letterSpacing)
+        return this
+    }
 
     var wordSpacing: Float
         get() = try {
@@ -295,9 +337,14 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
             reachabilityBarrier(this)
         }
         set(value) {
-            Stats.onNativeCall()
-            _nSetWordSpacing(_ptr, value)
+            setWordSpacing(value)
         }
+    
+    fun setWordSpacing(wordSpacing: Float): TextStyle {
+        Stats.onNativeCall()
+        _nSetWordSpacing(_ptr, wordSpacing)
+        return this
+    }
 
     var typeface: Typeface?
         get() = try {
@@ -308,16 +355,21 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
             reachabilityBarrier(this)
         }
         set(value) {
-            try {
-                Stats.onNativeCall()
-                _nSetTypeface(
-                    _ptr,
-                    getPtr(value)
-                )
-            } finally {
-                reachabilityBarrier(value)
-            }
+            setTypeface(value)
         }
+    
+    fun setTypeface(typeface: Typeface?): TextStyle {
+        return try {
+            Stats.onNativeCall()
+            _nSetTypeface(
+                _ptr,
+                getPtr(typeface)
+            )
+            this
+        } finally {
+            reachabilityBarrier(typeface)
+        }
+    }
 
     var locale: String
         get() = try {
@@ -327,9 +379,14 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
             reachabilityBarrier(this)
         }
         set(value) {
-            Stats.onNativeCall()
-            _nSetLocale(_ptr, value)
+            setLocale(value)
         }
+
+    fun setLocale(locale: String?): TextStyle {
+        Stats.onNativeCall()
+        _nSetLocale(_ptr, locale)
+        return this
+    }
 
     var baselineMode: BaselineMode
         get() = try {
@@ -339,9 +396,14 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
             reachabilityBarrier(this)
         }
         set(value) {
-            Stats.onNativeCall()
-            _nSetBaselineMode(_ptr, value.ordinal)
+            setBaselineMode(value)
         }
+    
+    fun setBaselineMode(baseline: BaselineMode): TextStyle {
+        Stats.onNativeCall()
+        _nSetBaselineMode(_ptr, baseline.ordinal)
+        return this
+    }
 
     val fontMetrics: FontMetrics
         get() = try {
