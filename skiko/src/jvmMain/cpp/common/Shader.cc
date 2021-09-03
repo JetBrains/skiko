@@ -154,7 +154,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_Shader__1nMakeFractal
     for (int i = 0; i < len; i += 2)
         tiles[i / 2] = {arr[i], arr[i+1]};
     env->ReleaseIntArrayElements(tilesArray, arr, 0);
-    SkShader* ptr = SkPerlinNoiseShader::MakeFractalNoise(baseFrequencyX, baseFrequencyY, numOctaves, seed, nullptr).release();
+    SkShader* ptr = SkPerlinNoiseShader::MakeFractalNoise(baseFrequencyX, baseFrequencyY, numOctaves, seed, tiles.data()).release();
     return reinterpret_cast<jlong>(ptr);
 }
 
@@ -166,6 +166,6 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_Shader__1nMakeTurbule
     for (int i = 0; i < len; i += 2)
         tiles[i / 2] = {arr[i], arr[i+1]};
     env->ReleaseIntArrayElements(tilesArray, arr, 0);
-    SkShader* ptr = SkPerlinNoiseShader::MakeTurbulence(baseFrequencyX, baseFrequencyY, numOctaves, seed, nullptr).release();
+    SkShader* ptr = SkPerlinNoiseShader::MakeTurbulence(baseFrequencyX, baseFrequencyY, numOctaves, seed, tiles.data()).release();
     return reinterpret_cast<jlong>(ptr);
 }
