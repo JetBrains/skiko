@@ -85,9 +85,7 @@ kotlin {
     if (supportNative) {
         val nativeTarget = when (target) {
             "macos-x64", "macos-arm64" -> macosX64()
-                // "linux-x64" -> linuxX64()
-                // "windows-x64" -> mingwX64()
-                else -> null
+            else -> null
         }
         nativeTarget?.apply {
             compilations.getByName("main") {
