@@ -15,7 +15,15 @@
 static void* loadXrandr() {
     static void* result = nullptr;
     if (result != nullptr) return result;
-    result = dlopen("libXrandr.so", RTLD_LOCAL);
+
+    static const char* searchPaths[] = { "/lib", "/lib/x86_64-linux-gnu", "/lib/aarch64-linux-gnu", nullptr };
+    for (int i = 0; searchPaths[i] != nullptr; i++) {
+        char buf[MAX_PATH];
+        snprintf(buf, MAX_PATH, "%s/libXrandr.so", searchPaths[i]);
+        result = dlopen(buf, RTLD_LOCAL);
+        if (result) break;
+    }
+    printf("library is %p\n", result);
     return result;
 }
 
