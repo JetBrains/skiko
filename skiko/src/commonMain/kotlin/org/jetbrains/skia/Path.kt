@@ -408,7 +408,6 @@ class Path internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR),
     }
 
     /**
-     *
      * Interpolates between Path with [Point] array of equal size.
      * Copy verb array and weights to out, and set out Point array to a weighted
      * average of this Point array and ending Point array, using the formula:
@@ -459,7 +458,7 @@ class Path internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR),
         set(value) {
             setFillMode(value)
         }
-
+    
     fun setFillMode(fillMode: PathFillMode): Path {
         Stats.onNativeCall()
         _nSetFillMode(_ptr, fillMode.ordinal)
@@ -601,6 +600,20 @@ class Path internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR),
         }
 
     /**
+     *
+     * Specifies whether Path is volatile; whether it will be altered or discarded
+     * by the caller after it is drawn. Path by default have volatile set false, allowing
+     * SkBaseDevice to attach a cache of data which speeds repeated drawing.
+     *
+     * Mark temporary paths, discarded or modified after use, as volatile
+     * to inform SkBaseDevice that the path need not be cached.
+     *
+     * Mark animating Path volatile to improve performance.
+     * Mark unchanging Path non-volatile to improve repeated rendering.
+     *
+     * raster surface Path draws are affected by volatile for some shadows.
+     * GPU surface Path draws are affected by volatile for some shadows and concave geometries.
+     *
      * Returns true if the path is volatile; it will not be altered or discarded
      * by the caller after it is drawn. Path by default have volatile set false, allowing
      * [Surface] to attach a cache of data which speeds repeated drawing. If true, [Surface]
@@ -608,14 +621,18 @@ class Path internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR),
      *
      * @return  true if caller will alter Path after drawing
      */
-    val isVolatile: Boolean
+    var isVolatile: Boolean
         get() = try {
             Stats.onNativeCall()
             _nIsVolatile(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
-
+        set(value) {
+            Stats.onNativeCall()
+            _nSetVolatile(_ptr, value)
+        }
+    
     /**
      *
      * Specifies whether Path is volatile; whether it will be altered or discarded

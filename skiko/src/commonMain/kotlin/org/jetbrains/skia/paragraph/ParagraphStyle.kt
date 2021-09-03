@@ -48,14 +48,17 @@ class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
         }
     }
 
-    val strutStyle: StrutStyle
+    var strutStyle: StrutStyle
         get() = try {
             Stats.onNativeCall()
             StrutStyle(_nGetStrutStyle(_ptr))
         } finally {
             reachabilityBarrier(this)
         }
-
+        set(value) {
+            setStrutStyle(value)
+        }
+    
     fun setStrutStyle(s: StrutStyle?): ParagraphStyle {
         return try {
             Stats.onNativeCall()
@@ -66,14 +69,17 @@ class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
         }
     }
 
-    val textStyle: TextStyle
+    var textStyle: TextStyle
         get() = try {
             Stats.onNativeCall()
             TextStyle(_nGetTextStyle(_ptr))
         } finally {
             reachabilityBarrier(this)
         }
-
+        set(value) {
+            setTextStyle(value)
+        }
+    
     fun setTextStyle(style: TextStyle?): ParagraphStyle {
         return try {
             Stats.onNativeCall()
@@ -84,12 +90,15 @@ class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
         }
     }
 
-    val direction: Direction
+    var direction: Direction
         get() = try {
             Stats.onNativeCall()
             Direction.values()[_nGetDirection(_ptr)]
         } finally {
             reachabilityBarrier(this)
+        }
+        set(value) {
+            setDirection(value)
         }
 
     fun setDirection(style: Direction): ParagraphStyle {
@@ -98,12 +107,15 @@ class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
         return this
     }
 
-    val alignment: Alignment
+    var alignment: Alignment
         get() = try {
             Stats.onNativeCall()
             Alignment.values()[_nGetAlignment(_ptr)]
         } finally {
             reachabilityBarrier(this)
+        }
+        set(value) {
+            setAlignment(value)
         }
 
     fun setAlignment(alignment: Alignment): ParagraphStyle {
@@ -112,12 +124,15 @@ class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
         return this
     }
 
-    val maxLinesCount: Long
+    var maxLinesCount: Long
         get() = try {
             Stats.onNativeCall()
             _nGetMaxLinesCount(_ptr)
         } finally {
             reachabilityBarrier(this)
+        }
+        set(value) {
+            setMaxLinesCount(value)
         }
 
     fun setMaxLinesCount(count: Long): ParagraphStyle {
@@ -126,12 +141,15 @@ class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
         return this
     }
 
-    val ellipsis: String
+    var ellipsis: String
         get() = try {
             Stats.onNativeCall()
             _nGetEllipsis(_ptr)
         } finally {
             reachabilityBarrier(this)
+        }
+        set(value) {
+            setEllipsis(value)
         }
 
     fun setEllipsis(ellipsis: String?): ParagraphStyle {
@@ -140,12 +158,15 @@ class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
         return this
     }
 
-    val height: Float
+    var height: Float
         get() = try {
             Stats.onNativeCall()
             _nGetHeight(_ptr)
         } finally {
             reachabilityBarrier(this)
+        }
+        set(value) {
+            setHeight(value)
         }
 
     fun setHeight(height: Float): ParagraphStyle {
@@ -154,12 +175,15 @@ class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
         return this
     }
 
-    val heightMode: HeightMode
+    var heightMode: HeightMode
         get() = try {
             Stats.onNativeCall()
             HeightMode.values()[_nGetHeightMode(_ptr)]
         } finally {
             reachabilityBarrier(this)
+        }
+        set(value) {
+            setHeightMode(value)
         }
 
     fun setHeightMode(behavior: HeightMode): ParagraphStyle {
@@ -175,6 +199,7 @@ class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
         } finally {
             reachabilityBarrier(this)
         }
+
     val isHintingEnabled: Boolean
         get() = try {
             Stats.onNativeCall()

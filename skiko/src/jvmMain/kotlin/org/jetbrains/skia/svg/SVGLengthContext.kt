@@ -25,7 +25,6 @@ class SVGLengthContext @JvmOverloads constructor(
                             height.toDouble()
                         ) / Math.sqrt(2.0) / 100.0).toFloat()
                 }
-                length.value * dpi / 2.54f
             }
             SVGLengthUnit.CM -> length.value * dpi / 2.54f
             SVGLengthUnit.MM -> length.value * dpi / 25.4f

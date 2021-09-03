@@ -64,26 +64,32 @@ class StrutStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder
         return this
     }
 
-    val fontStyle: FontStyle
+    var fontStyle: FontStyle
         get() = try {
             Stats.onNativeCall()
             FontStyle(_nGetFontStyle(_ptr))
         } finally {
             reachabilityBarrier(this)
         }
-
+        set(value) {
+            setFontStyle(value)
+        }
+    
     fun setFontStyle(style: FontStyle): StrutStyle {
         Stats.onNativeCall()
         _nSetFontStyle(_ptr, style._value)
         return this
     }
 
-    val fontSize: Float
+    var fontSize: Float
         get() = try {
             Stats.onNativeCall()
             _nGetFontSize(_ptr)
         } finally {
             reachabilityBarrier(this)
+        }
+        set(value) {
+            setFontSize(value)
         }
 
     fun setFontSize(value: Float): StrutStyle {
@@ -92,70 +98,85 @@ class StrutStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder
         return this
     }
 
-    val height: Float
+    var height: Float
         get() = try {
             Stats.onNativeCall()
             _nGetHeight(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
-
+        set(value) {
+            setHeight(value)
+        }
+    
     fun setHeight(value: Float): StrutStyle {
         Stats.onNativeCall()
         _nSetHeight(_ptr, value)
         return this
     }
 
-    val leading: Float
+    var leading: Float
         get() = try {
             Stats.onNativeCall()
             _nGetLeading(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
-
+        set(value) {
+            setLeading(value)
+        }
+    
     fun setLeading(value: Float): StrutStyle {
         Stats.onNativeCall()
         _nSetLeading(_ptr, value)
         return this
     }
 
-    val isEnabled: Boolean
+    var isEnabled: Boolean
         get() = try {
             Stats.onNativeCall()
             _nIsEnabled(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
-
+        set(value) {
+            setEnabled(value)
+        }
+    
     fun setEnabled(value: Boolean): StrutStyle {
         Stats.onNativeCall()
         _nSetEnabled(_ptr, value)
         return this
     }
 
-    val isHeightForced: Boolean
+    var isHeightForced: Boolean
         get() = try {
             Stats.onNativeCall()
             _nIsHeightForced(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
-
+        set(value) {
+            setHeightForced(value)
+        }
+    
     fun setHeightForced(value: Boolean): StrutStyle {
         Stats.onNativeCall()
         _nSetHeightForced(_ptr, value)
         return this
     }
 
-    val isHeightOverridden: Boolean
+    var isHeightOverridden: Boolean
         get() = try {
             Stats.onNativeCall()
             _nIsHeightOverridden(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
-
+        set(value) {
+            setHeightOverridden(value)
+        }
+    
     fun setHeightOverridden(value: Boolean): StrutStyle {
         Stats.onNativeCall()
         _nSetHeightOverridden(_ptr, value)

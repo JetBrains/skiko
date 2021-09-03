@@ -1,6 +1,6 @@
 package org.jetbrains.skia.svg
 
-class SVGLength(internal val value: Float, unit: SVGLengthUnit) {
+class SVGLength(val value: Float, unit: SVGLengthUnit) {
 
     internal val _unit: SVGLengthUnit
 

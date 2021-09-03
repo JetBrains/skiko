@@ -421,8 +421,6 @@ open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val
      * @see [https://fiddle.skia.org/c/@Canvas_drawPoints](https://fiddle.skia.org/c/@Canvas_drawPoints)
      */
     fun drawPolygon(coords: FloatArray, paint: Paint): Canvas {
-        require(coords != null) { "Can’t drawPolygon with coords == null" }
-        require(paint != null) { "Can’t drawPolygon with paint == null" }
         Stats.onNativeCall()
         _nDrawPoints(_ptr, 2 /* SkCanvas::PointMode::kPolygon_PointMode */, coords, getPtr(paint))
         reachabilityBarrier(paint)
@@ -430,7 +428,6 @@ open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val
     }
 
     fun drawLine(x0: Float, y0: Float, x1: Float, y1: Float, paint: Paint): Canvas {
-        require(paint != null) { "Can’t drawLine with paint == null" }
         Stats.onNativeCall()
         _nDrawLine(_ptr, x0, y0, x1, y1, getPtr(paint))
         reachabilityBarrier(paint)
@@ -447,7 +444,6 @@ open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val
         includeCenter: Boolean,
         paint: Paint
     ): Canvas {
-        require(paint != null) { "Can’t drawArc with paint == null" }
         Stats.onNativeCall()
         _nDrawArc(_ptr, left, top, right, bottom, startAngle, sweepAngle, includeCenter, getPtr(paint))
         reachabilityBarrier(paint)
@@ -455,8 +451,6 @@ open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val
     }
 
     fun drawRect(r: Rect, paint: Paint): Canvas {
-        require(r != null) { "Can’t drawRect with r == null" }
-        require(paint != null) { "Can’t drawRect with paint == null" }
         Stats.onNativeCall()
         _nDrawRect(_ptr, r.left, r.top, r.right, r.bottom, getPtr(paint))
         reachabilityBarrier(paint)
@@ -464,8 +458,6 @@ open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val
     }
 
     fun drawOval(r: Rect, paint: Paint): Canvas {
-        require(r != null) { "Can’t drawOval with r == null" }
-        require(paint != null) { "Can’t drawOval with paint == null" }
         Stats.onNativeCall()
         _nDrawOval(_ptr, r.left, r.top, r.right, r.bottom, getPtr(paint))
         reachabilityBarrier(paint)
@@ -473,7 +465,6 @@ open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val
     }
 
     fun drawCircle(x: Float, y: Float, radius: Float, paint: Paint): Canvas {
-        require(paint != null) { "Can’t drawCircle with paint == null" }
         Stats.onNativeCall()
         _nDrawOval(_ptr, x - radius, y - radius, x + radius, y + radius, getPtr(paint))
         reachabilityBarrier(paint)
@@ -481,8 +472,6 @@ open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val
     }
 
     fun drawRRect(r: RRect, paint: Paint): Canvas {
-        require(r != null) { "Can’t drawRRect with r == null" }
-        require(paint != null) { "Can’t drawRRect with paint == null" }
         Stats.onNativeCall()
         _nDrawRRect(_ptr, r.left, r.top, r.right, r.bottom, r.radii, getPtr(paint))
         reachabilityBarrier(paint)
@@ -490,9 +479,6 @@ open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val
     }
 
     fun drawDRRect(outer: RRect, inner: RRect, paint: Paint): Canvas {
-        require(outer != null) { "Can’t drawDRRect with outer == null" }
-        require(inner != null) { "Can’t drawDRRect with inner == null" }
-        require(paint != null) { "Can’t drawDRRect with paint == null" }
         Stats.onNativeCall()
         _nDrawDRRect(
             _ptr,
@@ -517,7 +503,6 @@ open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val
     }
 
     fun drawRectShadow(r: Rect, dx: Float, dy: Float, blur: Float, spread: Float, color: Int): Canvas {
-        require(r != null) { "Can’t drawRectShadow with r == null" }
         val insides = r.inflate(-1f)
         if (!insides.isEmpty) {
             save()
@@ -529,11 +514,10 @@ open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val
     }
 
     fun drawRectShadowNoclip(r: Rect, dx: Float, dy: Float, blur: Float, spread: Float, color: Int): Canvas {
-        require(r != null) { "Can’t drawRectShadow with r == null" }
         val outline = r.inflate(spread)
         makeDropShadowOnly(dx, dy, blur / 2f, blur / 2f, color).use { f ->
-            Paint().use { p ->
-                p.setImageFilter(f)
+            org.jetbrains.skia.Paint().use { p ->
+                p.imageFilter = f
                 if (outline is RRect) drawRRect(outline, p) else drawRect(outline, p)
             }
         }
@@ -612,10 +596,6 @@ open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val
         paint: Paint?,
         strict: Boolean
     ): Canvas {
-        require(image != null) { "Can’t drawImageRect with image == null" }
-        require(src != null) { "Can’t drawImageRect with src == null" }
-        require(dst != null) { "Can’t drawImageRect with dst == null" }
-        require(samplingMode != null) { "Can’t drawImageRect with samplingMode == null" }
         Stats.onNativeCall()
         _nDrawImageRect(
             _ptr,
@@ -638,10 +618,6 @@ open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val
     }
 
     fun drawImageNine(image: Image, center: IRect, dst: Rect, filterMode: FilterMode, paint: Paint?): Canvas {
-        require(image != null) { "Can’t drawImageNine with image == null" }
-        require(center != null) { "Can’t drawImageNine with center == null" }
-        require(dst != null) { "Can’t drawImageNine with dst == null" }
-        require(filterMode != null) { "Can’t drawImageNine with filterMode == null" }
         Stats.onNativeCall()
         _nDrawImageNine(
             _ptr,
@@ -663,8 +639,6 @@ open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val
     }
 
     fun drawRegion(r: Region, paint: Paint): Canvas {
-        require(r != null) { "Can’t drawRegion with r == null" }
-        require(paint != null) { "Can’t drawRegion with paint == null" }
         Stats.onNativeCall()
         _nDrawRegion(_ptr, getPtr(r), getPtr(paint))
         reachabilityBarrier(r)
@@ -673,8 +647,6 @@ open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val
     }
 
     fun drawString(s: String, x: Float, y: Float, font: Font?, paint: Paint): Canvas {
-        require(s != null) { "Can’t drawString with s == null" }
-        require(paint != null) { "Can’t drawString with paint == null" }
         Stats.onNativeCall()
         _nDrawString(_ptr, s, x, y, getPtr(font), getPtr(paint))
         reachabilityBarrier(font)
@@ -683,8 +655,6 @@ open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val
     }
 
     fun drawTextBlob(blob: TextBlob, x: Float, y: Float, paint: Paint): Canvas {
-        require(blob != null) { "Can’t drawTextBlob with blob == null" }
-        require(paint != null) { "Can’t drawTextBlob with paint == null" }
         Stats.onNativeCall()
         _nDrawTextBlob(_ptr, getPtr(blob), x, y, getPtr(paint))
         reachabilityBarrier(blob)
@@ -693,9 +663,7 @@ open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val
     }
 
     fun drawTextLine(line: TextLine, x: Float, y: Float, paint: Paint): Canvas {
-        require(line != null) { "Can’t drawTextLine with line == null" }
-        require(paint != null) { "Can’t drawTextLine with paint == null" }
-        line.textBlob?.use { blob -> drawTextBlob(blob, x, y, paint) }
+        line.textBlob?.use { blob -> blob.let { drawTextBlob(it, x, y, paint) } }
         return this
     }
 
@@ -797,11 +765,9 @@ open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val
         mode: BlendMode,
         paint: Paint
     ): Canvas {
-        require(positions != null) { "Can’t drawTriangles with positions == null" }
         require(positions.size % 3 == 0) { "Expected positions.length % 3 == 0, got: " + positions.size }
         require(colors == null || colors.size == positions.size) { "Expected colors.length == positions.length, got: " + colors!!.size + " != " + positions.size }
         require(texCoords == null || texCoords.size == positions.size) { "Expected texCoords.length == positions.length, got: " + texCoords!!.size + " != " + positions.size }
-        require(paint != null) { "Can’t drawTriangles with paint == null" }
         Stats.onNativeCall()
         _nDrawVertices(
             _ptr,
@@ -903,11 +869,8 @@ open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val
         mode: BlendMode,
         paint: Paint
     ): Canvas {
-        require(positions != null) { "Can’t drawTriangleStrip with positions == null" }
         require(colors == null || colors.size == positions.size) { "Expected colors.length == positions.length, got: " + colors!!.size + " != " + positions.size }
         require(texCoords == null || texCoords.size == positions.size) { "Expected texCoords.length == positions.length, got: " + texCoords!!.size + " != " + positions.size }
-        require(mode != null) { "Can’t drawTriangles with mode == null" }
-        require(paint != null) { "Can’t drawTriangles with paint == null" }
         Stats.onNativeCall()
         _nDrawVertices(
             _ptr,
@@ -1136,13 +1099,9 @@ open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val
         mode: BlendMode,
         paint: Paint
     ): Canvas {
-        require(cubics != null) { "Can’t drawPatch with cubics == null" }
         require(cubics.size == 12) { "Expected cubics.length == 12, got: " + cubics.size }
-        require(colors != null) { "Can’t drawPatch with colors == null" }
         require(colors.size == 4) { "Expected colors.length == 4, got: " + colors.size }
         require(texCoords == null || texCoords.size == 4) { "Expected texCoords.length == 4, got: " + texCoords!!.size }
-        require(mode != null) { "Can’t drawPatch with mode == null" }
-        require(paint != null) { "Can’t drawPatch with paint == null" }
         Stats.onNativeCall()
         _nDrawPatch(
             _ptr,
@@ -1212,7 +1171,6 @@ open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val
      * @see [https://fiddle.skia.org/c/@Canvas_drawDrawable](https://fiddle.skia.org/c/@Canvas_drawDrawable)
      */
     fun drawDrawable(drawable: Drawable, matrix: Matrix33?): Canvas {
-        require(drawable != null) { "Can’t drawDrawable with drawable == null" }
         Stats.onNativeCall()
         _nDrawDrawable(_ptr, getPtr(drawable), matrix?.mat)
         reachabilityBarrier(drawable)
@@ -1226,7 +1184,6 @@ open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val
     }
 
     fun drawPaint(paint: Paint): Canvas {
-        require(paint != null) { "Can’t drawPaint with paint == null" }
         Stats.onNativeCall()
         _nDrawPaint(_ptr, getPtr(paint))
         reachabilityBarrier(paint)
@@ -1242,7 +1199,6 @@ open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val
      * @see [https://fiddle.skia.org/c/@Canvas_setMatrix](https://fiddle.skia.org/c/@Canvas_setMatrix)
      */
     fun setMatrix(matrix: Matrix33): Canvas {
-        require(matrix != null) { "Can’t setMatrix with matrix == null" }
         Stats.onNativeCall()
         _nSetMatrix(_ptr, matrix.mat)
         return this
@@ -1276,8 +1232,6 @@ open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val
         get() = localToDevice.asMatrix33()
 
     fun clipRect(r: Rect, mode: ClipMode, antiAlias: Boolean): Canvas {
-        require(r != null) { "Can’t clipRect with r == null" }
-        require(mode != null) { "Can’t clipRect with mode == null" }
         Stats.onNativeCall()
         _nClipRect(_ptr, r.left, r.top, r.right, r.bottom, mode.ordinal, antiAlias)
         return this
@@ -1296,8 +1250,6 @@ open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val
     }
 
     fun clipRRect(r: RRect, mode: ClipMode, antiAlias: Boolean): Canvas {
-        require(r != null) { "Can’t clipRRect with r == null" }
-        require(mode != null) { "Can’t clipRRect with mode == null" }
         Stats.onNativeCall()
         _nClipRRect(_ptr, r.left, r.top, r.right, r.bottom, r.radii, mode.ordinal, antiAlias)
         return this
@@ -1316,8 +1268,6 @@ open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val
     }
 
     fun clipPath(p: Path, mode: ClipMode, antiAlias: Boolean): Canvas {
-        require(p != null) { "Can’t clipPath with p == null" }
-        require(mode != null) { "Can’t clipPath with mode == null" }
         Stats.onNativeCall()
         _nClipPath(_ptr, getPtr(p), mode.ordinal, antiAlias)
         reachabilityBarrier(p)
@@ -1337,8 +1287,6 @@ open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val
     }
 
     fun clipRegion(r: Region, mode: ClipMode): Canvas {
-        require(r != null) { "Can’t clipRegion with r == null" }
-        require(mode != null) { "Can’t clipRegion with mode == null" }
         Stats.onNativeCall()
         _nClipRegion(_ptr, getPtr(r), mode.ordinal)
         reachabilityBarrier(r)
@@ -1370,14 +1318,12 @@ open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val
     }
 
     fun concat(matrix: Matrix33): Canvas {
-        require(matrix != null) { "Can’t concat with matrix == null" }
         Stats.onNativeCall()
         _nConcat(_ptr, matrix.mat)
         return this
     }
 
     fun concat(matrix: Matrix44): Canvas {
-        require(matrix != null) { "Can’t concat with matrix == null" }
         Stats.onNativeCall()
         _nConcat44(_ptr, matrix.mat)
         return this
@@ -1430,7 +1376,6 @@ open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val
      */
     fun readPixels(bitmap: Bitmap, srcX: Int, srcY: Int): Boolean {
         return try {
-            require(bitmap != null) { "Can’t readPixels with bitmap == null" }
             Stats.onNativeCall()
             _nReadPixels(
                 _ptr,
@@ -1496,7 +1441,6 @@ open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val
      */
     fun writePixels(bitmap: Bitmap, x: Int, y: Int): Boolean {
         return try {
-            require(bitmap != null) { "Can’t writePixels with bitmap == null" }
             Stats.onNativeCall()
             _nWritePixels(
                 _ptr,
