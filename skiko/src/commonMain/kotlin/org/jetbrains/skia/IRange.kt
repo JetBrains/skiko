@@ -1,7 +1,7 @@
 package org.jetbrains.skia
 
 
-class IRange(internal val start: Int, internal val end: Int) {
+class IRange(val start: Int, val end: Int) {
 
     override fun equals(o: Any?): Boolean {
         if (o === this) return true
