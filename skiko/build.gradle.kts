@@ -119,7 +119,13 @@ kotlin {
 
     if (supportNative) {
         val nativeTarget = when (target) {
-            "macos-x64", "macos-arm64" -> macosX64()
+            "macos-x64", "macos-arm64" -> macosX64() {
+                compilations.all {
+                    kotlinOptions {
+                        freeCompilerArgs += listOf("-include-binary", "$buildDir/nativeBridges/static/$target/skiko-native-bridges-$target.a")
+                    }
+                }
+            }
             else -> null
         }
     }
@@ -151,6 +157,7 @@ kotlin {
         }
         if (supportNative) {
             val macosX64Main by getting {
+                dependsOn(commonMain)
             }
         }
     }
@@ -160,19 +167,9 @@ tasks.withType(JavaCompile::class.java).configureEach {
     this.getOptions().compilerArgs.addAll(listOf("-source", "11", "-target", "11"))
 }
 
-// See https://docs.gradle.org/current/userguide/cpp_library_plugin.html.
-tasks.withType(CppCompile::class.java).configureEach {
-    // Prefer 'java.home' system property to simplify overriding from Intellij.
-    // When used from command-line, it is effectively equal to JAVA_HOME.
-    if (JavaVersion.current() < JavaVersion.VERSION_11) {
-        error("JDK 11+ is required, but Gradle JVM is ${JavaVersion.current()}. " +
-                "Check JAVA_HOME (CLI) or Gradle settings (Intellij).")
-    }
-    val jdkHome = System.getProperty("java.home") ?: error("'java.home' is null")
-    dependsOn(skiaDir)
+val skiaPreprocessorFlags: Array<String> get() {
     val skiaDir = skiaDir.get().absolutePath
-    compilerArgs.addAll(listOf(
-        "-I$jdkHome/include",
+    return listOf(
         "-I$skiaDir",
         "-I$skiaDir/include",
         "-I$skiaDir/include/core",
@@ -204,8 +201,26 @@ tasks.withType(CppCompile::class.java).configureEach {
         "-DU_DISABLE_RENAMING",
         "-DSK_USING_THIRD_PARTY_ICU",
         *buildType.flags
-    ))
+    ).toTypedArray()
+}
+
+// See https://docs.gradle.org/current/userguide/cpp_library_plugin.html.
+tasks.withType(CppCompile::class.java).configureEach {
+    // Prefer 'java.home' system property to simplify overriding from Intellij.
+    // When used from command-line, it is effectively equal to JAVA_HOME.
+    if (JavaVersion.current() < JavaVersion.VERSION_11) {
+        error("JDK 11+ is required, but Gradle JVM is ${JavaVersion.current()}. " +
+                "Check JAVA_HOME (CLI) or Gradle settings (Intellij).")
+    }
+    val jdkHome = System.getProperty("java.home") ?: error("'java.home' is null")
+    dependsOn(skiaDir)
+    val skiaDir = skiaDir.get().absolutePath
+    compilerArgs.addAll(
+        listOf("-I$jdkHome/include") + skiaPreprocessorFlags
+    )
     val includeDir = "$projectDir/src/jvmMain/cpp/include"
+    val commonIncludeDir = "$projectDir/src/commonMain/cpp/headers"
+
     when (targetOs) {
         OS.MacOS -> {
             compilerArgs.addAll(
@@ -214,6 +229,7 @@ tasks.withType(CppCompile::class.java).configureEach {
                     "-fvisibility-inlines-hidden",
                     "-I$jdkHome/include/darwin",
                     "-I$includeDir",
+                    "-I$commonIncludeDir",
                     "-DSK_SHAPER_CORETEXT_AVAILABLE",
                     "-DSK_BUILD_FOR_MAC",
                     "-DSK_METAL",
@@ -318,6 +334,60 @@ project.tasks.register<Exec>("wasmCompile") {
     inputs.files(srcs)
     outputs.files(outJs, outWasm)
 }
+
+// Very hacky way to compilenative bridges and add the
+// resulting object files into the final native klib.
+project.tasks.register<Exec>("nativeBridgesCompile") {
+    val inputDirs = listOf(
+        "$projectDir/src/macosX64Main/cpp/common",
+        "$projectDir/src/commonMain/cpp/common"
+    )
+    val outDir = "$buildDir/nativeBridges/obj/$target"
+    val srcs = inputDirs
+        .map{ File(it) }
+        .flatMap { (it.listFiles()?:emptyArray()).toList() }
+        .map { it.absolutePath }
+        .toTypedArray()
+    val outs = srcs.map { it.substringAfterLast("/") }.map { File(it).nameWithoutExtension }
+    workingDir = File(outDir)
+    commandLine = listOf(
+        "clang++",
+        *targetArch.clangFlags,
+        "-mmacosx-version-min=10.13",
+        "-std=c++17",
+        "-c",
+        "-I$projectDir/src/macosX64Main/cpp/headers",
+        "-I$projectDir/src/commonMain/cpp/headers",
+        *skiaPreprocessorFlags,
+        *srcs
+    )
+    file(outDir).mkdirs()
+    inputs.files(srcs)
+    outputs.files(outs)
+}
+
+// Very hacky way to compilenative bridges and add the
+// resulting object files into the final native klib.
+/*
+project.tasks.register<Exec>("nativeBridgesLink") {
+
+    val inputDirs = listOf("$buildDir/nativeBridges/obj/$target")
+    val outDir = "$buildDir/nativeBridges/static/$target"
+    val srcs = inputDirs
+        .map{ File(it) }
+        .flatMap { (it.listFiles()?:emptyArray()).toList() }
+        .map { it.absolutePath }
+        .toTypedArray()
+    val outs = arrayOf("$outDir/skiko-native-bridges-$target.a")
+    workingDir = File(outDir)
+    commandLine = listOf(
+
+    )
+    file(outDir).mkdirs()
+    inputs.files(srcs)
+    outputs.files(outs)
+}
+ */
 
 fun localSign(signer: String, lib: File): File {
     println("Local signing $lib as $signer")
@@ -445,6 +515,7 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
 
 extensions.configure<CppLibrary> {
     source.from(
+        fileTree("$projectDir/src/commonMain/cpp/common"),
         fileTree("$projectDir/src/jvmMain/cpp/common"),
         fileTree("$projectDir/src/jvmMain/cpp/${targetOs.id}")
     )

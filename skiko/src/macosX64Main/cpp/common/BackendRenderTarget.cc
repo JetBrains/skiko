@@ -1,9 +1,7 @@
 #include <iostream>
 #include <stdint.h>
 #include "GrBackendSurface.h"
-
-typedef jint int32_t;
-typedef jlong int64_t;
+#include "common.h"
 
 static void deleteBackendRenderTarget(GrBackendRenderTarget* rt) {
     delete rt;
