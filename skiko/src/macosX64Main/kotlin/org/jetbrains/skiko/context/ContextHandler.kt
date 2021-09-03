@@ -1,7 +1,7 @@
 package org.jetbrains.skiko.native.context
 
 import kotlinx.cinterop.ptr
-import org.jetbrains.skiko.skia.native.*
+import org.jetbrains.skia.*
 import org.jetbrains.skiko.native.*
 
 internal fun createContextHandler(layer: HardwareLayer): ContextHandler {

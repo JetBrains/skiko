@@ -4,7 +4,7 @@ import kotlinx.cinterop.pointed
 import kotlinx.cinterop.useContents
 import org.jetbrains.skiko.native.context.*
 import org.jetbrains.skiko.native.redrawer.*
-import org.jetbrains.skiko.skia.native.*
+import org.jetbrains.skia.*
 
 interface SkiaRenderer {
     fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long)

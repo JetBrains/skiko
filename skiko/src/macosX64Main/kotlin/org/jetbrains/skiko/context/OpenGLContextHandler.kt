@@ -1,7 +1,7 @@
 package org.jetbrains.skiko.native.context
 
 import kotlinx.cinterop.*
-import org.jetbrains.skiko.skia.native.*
+import org.jetbrains.skia.*
 import org.jetbrains.skiko.native.*
 import platform.OpenGL.GL_DRAW_FRAMEBUFFER_BINDING
 import platform.OpenGL.GL_RGBA8
