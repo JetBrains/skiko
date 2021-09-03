@@ -2,6 +2,7 @@
 #include <emscripten.h>
 
 typedef int32_t jint;
+// TODO: likely we shall use jint, not jlong for passing pointers.
 typedef int64_t jlong;
 
 static void deleteBackendRenderTarget(GrBackendRenderTarget* rt) {
@@ -9,12 +10,12 @@ static void deleteBackendRenderTarget(GrBackendRenderTarget* rt) {
 }
 
 EMSCRIPTEN_KEEPALIVE
-extern "C" long BackendRenderTarget_nGetFinalizer() {
+extern "C" jlong BackendRenderTarget_nGetFinalizer() {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteBackendRenderTarget));
 }
 
 EMSCRIPTEN_KEEPALIVE
-extern "C" long BackendRenderTarget_nMakeGL
+extern "C" jlong BackendRenderTarget_nMakeGL
   (jint width, jint height, jint sampleCnt, jint stencilBits, jint fbId, jint fbFormat) {
     GrGLFramebufferInfo glInfo = { static_cast<unsigned int>(fbId), static_cast<unsigned int>(fbFormat) };
     GrBackendRenderTarget* instance = new GrBackendRenderTarget(width, height, sampleCnt, stencilBits, glInfo);
@@ -22,7 +23,7 @@ extern "C" long BackendRenderTarget_nMakeGL
 }
 
 EMSCRIPTEN_KEEPALIVE
-extern "C" long BackendRenderTarget_nMakeMetal
+extern "C" jlong BackendRenderTarget_nMakeMetal
   (jint width, jint height, jlong texturePtr) {
 #ifdef SK_METAL
     GrMTLHandle texture = reinterpret_cast<GrMTLHandle>(static_cast<uintptr_t>(texturePtr));
