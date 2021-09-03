@@ -18,3 +18,4 @@ actual fun defaultLanguageTag(): String = Locale.getDefault().toLanguageTag()
 
 actual fun compilePattern(regex: String): Pattern = Pattern.compile(regex)
 
+actual typealias OutputStream = java.io.OutputStream

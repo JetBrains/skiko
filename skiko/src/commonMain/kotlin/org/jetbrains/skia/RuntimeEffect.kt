@@ -1,9 +1,11 @@
+@file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
+import kotlin.jvm.JvmStatic
 
 class RuntimeEffect internal constructor(ptr: Long) : RefCnt(ptr) {
     companion object {

@@ -1,9 +1,11 @@
+@file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Stats
-import java.lang.ref.Reference
+import org.jetbrains.skia.impl.reachabilityBarrier
+import kotlin.jvm.JvmStatic
 
 class PictureRecorder internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
@@ -72,7 +74,7 @@ class PictureRecorder internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
                 ), false, this
             )
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 
@@ -85,7 +87,7 @@ class PictureRecorder internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
             val ptr = _nGetRecordingCanvas(_ptr)
             if (ptr == 0L) null else Canvas(ptr, false, this)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     /**
@@ -104,7 +106,7 @@ class PictureRecorder internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
             Stats.onNativeCall()
             Picture(_nFinishRecordingAsPicture(_ptr))
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 
@@ -131,7 +133,7 @@ class PictureRecorder internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
                 )
             )
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 }

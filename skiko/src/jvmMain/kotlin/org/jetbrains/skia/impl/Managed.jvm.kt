@@ -15,7 +15,7 @@ actual abstract class Managed actual constructor(ptr: Long, finalizer: Long, man
         }
     }
 
-    open val isClosed: Boolean
+    actual open val isClosed: Boolean
         get() = _ptr == 0L
 
     class CleanerThunk(var _className: String, var _ptr: Long, var _finalizerPtr: Long) : Runnable {

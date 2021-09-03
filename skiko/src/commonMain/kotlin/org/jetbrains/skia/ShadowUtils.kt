@@ -1,8 +1,10 @@
+@file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
+import kotlin.jvm.JvmStatic
 
 object ShadowUtils {
     /**
@@ -39,8 +41,8 @@ object ShadowUtils {
         if (transparentOccluder) flags = flags or 1
         if (geometricOnly) flags = flags or 2
         _nDrawShadow(
-            Native.Companion.getPtr(canvas),
-            Native.Companion.getPtr(path),
+            Native.getPtr(canvas),
+            Native.getPtr(path),
             zPlaneParams.x,
             zPlaneParams.y,
             zPlaneParams.z,

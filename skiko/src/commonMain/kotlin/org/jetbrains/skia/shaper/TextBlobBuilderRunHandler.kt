@@ -1,12 +1,12 @@
+@file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia.shaper
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.Managed
-import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
-import java.lang.UnsupportedOperationException
-import java.lang.ref.Reference
+import org.jetbrains.skia.impl.reachabilityBarrier
+import kotlin.jvm.JvmStatic
 
 class TextBlobBuilderRunHandler<T> internal constructor(
     text: ManagedString?,
@@ -14,7 +14,7 @@ class TextBlobBuilderRunHandler<T> internal constructor(
     offsetX: Float,
     offsetY: Float
 ) : Managed(
-    _nMake(Native.Companion.getPtr(text), offsetX, offsetY), _FinalizerHolder.PTR
+    _nMake(getPtr(text), offsetX, offsetY), _FinalizerHolder.PTR
 ), RunHandler {
     companion object {
         @JvmStatic external fun _nGetFinalizer(): Long
@@ -66,7 +66,7 @@ class TextBlobBuilderRunHandler<T> internal constructor(
             val ptr = _nMakeBlob(_ptr)
             if (0L == ptr) null else TextBlob(ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 
@@ -76,6 +76,6 @@ class TextBlobBuilderRunHandler<T> internal constructor(
 
     init {
         _text = if (manageText) text else null
-        Reference.reachabilityFence(text)
+        reachabilityBarrier(text)
     }
 }

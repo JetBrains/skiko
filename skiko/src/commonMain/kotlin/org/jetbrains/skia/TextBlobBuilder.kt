@@ -1,10 +1,11 @@
+@file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Managed
-import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
-import java.lang.ref.Reference
+import org.jetbrains.skia.impl.reachabilityBarrier
+import kotlin.jvm.JvmStatic
 
 class TextBlobBuilder internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
@@ -58,7 +59,7 @@ class TextBlobBuilder internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
             val ptr = _nBuild(_ptr)
             if (ptr == 0L) null else TextBlob(ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 
@@ -119,7 +120,7 @@ class TextBlobBuilder internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
             Stats.onNativeCall()
             _nAppendRun(
                 _ptr,
-                Native.getPtr(font),
+                getPtr(font),
                 glyphs,
                 x,
                 y,
@@ -127,7 +128,7 @@ class TextBlobBuilder internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
             )
             this
         } finally {
-            Reference.reachabilityFence(font)
+            reachabilityBarrier(font)
         }
     }
     /**
@@ -156,7 +157,6 @@ class TextBlobBuilder internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
      * @param y       vertical offset within the blob
      * @return        this
      */
-    @JvmOverloads
     fun appendRunPosH(
         font: Font?,
         glyphs: ShortArray,
@@ -165,11 +165,11 @@ class TextBlobBuilder internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
         bounds: Rect? = null
     ): TextBlobBuilder {
         return try {
-            assert(glyphs.size == xs.size) { "glyphs.length " + glyphs.size + " != xs.length " + xs.size }
+            require(glyphs.size == xs.size) { "glyphs.length " + glyphs.size + " != xs.length " + xs.size }
             Stats.onNativeCall()
             _nAppendRunPosH(
                 _ptr,
-                Native.Companion.getPtr(font),
+                getPtr(font),
                 glyphs,
                 xs,
                 y,
@@ -177,7 +177,7 @@ class TextBlobBuilder internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
             )
             this
         } finally {
-            Reference.reachabilityFence(font)
+            reachabilityBarrier(font)
         }
     }
     /**
@@ -204,10 +204,9 @@ class TextBlobBuilder internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
      * @param pos     positions of glyphs within the blob
      * @return        this
      */
-    @JvmOverloads
     fun appendRunPos(font: Font?, glyphs: ShortArray, pos: Array<Point>, bounds: Rect? = null): TextBlobBuilder {
         return try {
-            assert(glyphs.size == pos.size) { "glyphs.length " + glyphs.size + " != pos.length " + pos.size }
+            require(glyphs.size == pos.size) { "glyphs.length " + glyphs.size + " != pos.length " + pos.size }
             val floatPos = FloatArray(pos.size * 2)
             for (i in pos.indices) {
                 floatPos[i * 2] = pos[i].x
@@ -216,20 +215,20 @@ class TextBlobBuilder internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
             Stats.onNativeCall()
             _nAppendRunPos(
                 _ptr,
-                Native.Companion.getPtr(font),
+                getPtr(font),
                 glyphs,
                 floatPos,
                 bounds
             )
             this
         } finally {
-            Reference.reachabilityFence(font)
+            reachabilityBarrier(font)
         }
     }
 
     fun appendRunRSXform(font: Font?, glyphs: ShortArray, xform: Array<RSXform>): TextBlobBuilder {
         return try {
-            assert(glyphs.size == xform.size) { "glyphs.length " + glyphs.size + " != xform.length " + xform.size }
+            require(glyphs.size == xform.size) { "glyphs.length " + glyphs.size + " != xform.length " + xform.size }
             val floatXform = FloatArray(xform.size * 4)
             for (i in xform.indices) {
                 floatXform[i * 4] = xform[i].scos
@@ -240,13 +239,13 @@ class TextBlobBuilder internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
             Stats.onNativeCall()
             _nAppendRunRSXform(
                 _ptr,
-                Native.Companion.getPtr(font),
+                getPtr(font),
                 glyphs,
                 floatXform
             )
             this
         } finally {
-            Reference.reachabilityFence(font)
+            reachabilityBarrier(font)
         }
     }
 

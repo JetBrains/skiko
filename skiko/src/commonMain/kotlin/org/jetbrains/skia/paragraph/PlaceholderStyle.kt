@@ -44,15 +44,15 @@ class PlaceholderStyle(
         if (o !is PlaceholderStyle) return false
         val other = o
         if (!other.canEqual(this as Any)) return false
-        if (java.lang.Float.compare(width, other.width) != 0) return false
-        if (java.lang.Float.compare(height, other.height) != 0) return false
-        if (java.lang.Float.compare(baseline, other.baseline) != 0) return false
+        if (width.compareTo(other.width) != 0) return false
+        if (height.compareTo(other.height) != 0) return false
+        if (baseline.compareTo(other.baseline) != 0) return false
         val `this$_alignment`: Any = alignment
         val `other$_alignment`: Any = other.alignment
-        if (if (`this$_alignment` == null) `other$_alignment` != null else `this$_alignment` != `other$_alignment`) return false
+        if (`this$_alignment` != `other$_alignment`) return false
         val `this$_baselineMode`: Any = baselineMode
         val `other$_baselineMode`: Any = other.baselineMode
-        return if (if (`this$_baselineMode` == null) `other$_baselineMode` != null else `this$_baselineMode` != `other$_baselineMode`) false else true
+        return `this$_baselineMode` == `other$_baselineMode`
     }
 
     protected fun canEqual(other: Any?): Boolean {
@@ -62,18 +62,18 @@ class PlaceholderStyle(
     override fun hashCode(): Int {
         val PRIME = 59
         var result = 1
-        result = result * PRIME + java.lang.Float.floatToIntBits(width)
-        result = result * PRIME + java.lang.Float.floatToIntBits(height)
-        result = result * PRIME + java.lang.Float.floatToIntBits(baseline)
+        result = result * PRIME + width.toBits()
+        result = result * PRIME + height.toBits()
+        result = result * PRIME + baseline.toBits()
         val `$_alignment`: Any = alignment
-        result = result * PRIME + (`$_alignment`?.hashCode() ?: 43)
+        result = result * PRIME + (`$_alignment`.hashCode())
         val `$_baselineMode`: Any = baselineMode
-        result = result * PRIME + (`$_baselineMode`?.hashCode() ?: 43)
+        result = result * PRIME + (`$_baselineMode`.hashCode())
         return result
     }
 
     override fun toString(): String {
-        return "PlaceholderStyle(_width=" + width + ", _height=" + height + ", _alignment=" + alignment + ", _baselineMode=" + baselineMode + ", _baseline=" + baseline + ")"
+        return "PlaceholderStyle(_width=$width, _height=$height, _alignment=$alignment, _baselineMode=$baselineMode, _baseline=$baseline)"
     }
 
     init {

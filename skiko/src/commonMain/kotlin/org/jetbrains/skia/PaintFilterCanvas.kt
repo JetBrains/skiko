@@ -1,15 +1,15 @@
+@file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
-import java.lang.ref.Reference
+import org.jetbrains.skia.impl.reachabilityBarrier
 
 /**
  * A utility proxy base class for implementing draw/paint filters.
  */
 abstract class PaintFilterCanvas(canvas: Canvas, unrollDrawable: Boolean) :
-    Canvas(_nMake(Native.Companion.getPtr(canvas), unrollDrawable), true, canvas) {
+    Canvas(_nMake(getPtr(canvas), unrollDrawable), true, canvas) {
     companion object {
         external fun _nMake(canvasPtr: Long, unrollDrawable: Boolean): Long
 
@@ -42,6 +42,6 @@ abstract class PaintFilterCanvas(canvas: Canvas, unrollDrawable: Boolean) :
         Stats.onNativeCall()
         _nAttachToJava(_ptr)
         Stats.onNativeCall()
-        Reference.reachabilityFence(canvas)
+        reachabilityBarrier(canvas)
     }
 }

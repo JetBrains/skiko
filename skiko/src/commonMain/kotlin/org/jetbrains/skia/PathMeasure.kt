@@ -1,10 +1,11 @@
+@file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Managed
-import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
-import java.lang.ref.Reference
+import org.jetbrains.skia.impl.reachabilityBarrier
+import kotlin.jvm.JvmStatic
 
 class PathMeasure internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
@@ -53,14 +54,13 @@ class PathMeasure internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolde
      * Initialize the pathmeasure with the specified path. The parts of the path that are needed
      * are copied, so the client is free to modify/delete the path after this call.
      */
-    @JvmOverloads
     constructor(
         path: Path?,
         forceClosed: Boolean = false,
         resScale: Float = 1f
-    ) : this(_nMakePath(Native.Companion.getPtr(path), forceClosed, resScale)) {
+    ) : this(_nMakePath(getPtr(path), forceClosed, resScale)) {
         Stats.onNativeCall()
-        Reference.reachabilityFence(path)
+        reachabilityBarrier(path)
     }
 
     /**
@@ -70,10 +70,10 @@ class PathMeasure internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolde
     fun setPath(path: Path?, forceClosed: Boolean): PathMeasure {
         return try {
             Stats.onNativeCall()
-            _nSetPath(_ptr, Native.Companion.getPtr(path), forceClosed)
+            _nSetPath(_ptr, getPtr(path), forceClosed)
             this
         } finally {
-            Reference.reachabilityFence(path)
+            reachabilityBarrier(path)
         }
     }
 
@@ -86,7 +86,7 @@ class PathMeasure internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolde
             Stats.onNativeCall()
             _nGetLength(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     /**
@@ -100,7 +100,7 @@ class PathMeasure internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolde
             Stats.onNativeCall()
             _nGetPosition(_ptr, distance)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 
@@ -115,7 +115,7 @@ class PathMeasure internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolde
             Stats.onNativeCall()
             _nGetTangent(_ptr, distance)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 
@@ -130,7 +130,7 @@ class PathMeasure internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolde
             Stats.onNativeCall()
             _nGetRSXform(_ptr, distance)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 
@@ -144,9 +144,9 @@ class PathMeasure internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolde
         return try {
             Stats.onNativeCall()
             val mat = _nGetMatrix(_ptr, distance, getPosition, getTangent)
-            mat?.let { Matrix33(*it.clone()) }
+            mat?.let { Matrix33(*it.copyOf()) }
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 
@@ -164,12 +164,12 @@ class PathMeasure internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolde
                 _ptr,
                 startD,
                 endD,
-                Native.Companion.getPtr(dst),
+                getPtr(dst),
                 startWithMoveTo
             )
         } finally {
-            Reference.reachabilityFence(this)
-            Reference.reachabilityFence(dst)
+            reachabilityBarrier(this)
+            reachabilityBarrier(dst)
         }
     }
 
@@ -181,7 +181,7 @@ class PathMeasure internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolde
             Stats.onNativeCall()
             _nIsClosed(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     /**
@@ -193,7 +193,7 @@ class PathMeasure internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolde
             Stats.onNativeCall()
             _nNextContour(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 

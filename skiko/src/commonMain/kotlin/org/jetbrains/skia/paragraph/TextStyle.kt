@@ -1,3 +1,4 @@
+@file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia.paragraph
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
@@ -5,7 +6,8 @@ import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
-import java.lang.ref.Reference
+import org.jetbrains.skia.impl.reachabilityBarrier
+import kotlin.jvm.JvmStatic
 
 class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
@@ -73,11 +75,11 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
             Stats.onNativeCall()
             _nEquals(
                 _ptr,
-                Native.Companion.getPtr(other)
+                getPtr(other)
             )
         } finally {
-            Reference.reachabilityFence(this)
-            Reference.reachabilityFence(other)
+            reachabilityBarrier(this)
+            reachabilityBarrier(other)
         }
     }
 
@@ -87,11 +89,11 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
             _nAttributeEquals(
                 _ptr,
                 attribute.ordinal,
-                Native.getPtr(other)
+                getPtr(other)
             )
         } finally {
-            Reference.reachabilityFence(this)
-            Reference.reachabilityFence(other)
+            reachabilityBarrier(this)
+            reachabilityBarrier(other)
         }
     }
 
@@ -100,7 +102,7 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
             Stats.onNativeCall()
             _nGetColor(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
         set(value) {
             Stats.onNativeCall()
@@ -113,17 +115,18 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
             val ptr = _nGetForeground(_ptr)
             if (ptr == 0L) null else Paint(ptr, true)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
         set(value) {
             try {
                 Stats.onNativeCall()
                 _nSetForeground(
                     _ptr,
-                    Native.Companion.getPtr(value)
+                    getPtr(value)
                 )
+                this
             } finally {
-                Reference.reachabilityFence(value)
+                reachabilityBarrier(value)
             }
         }
 
@@ -133,17 +136,18 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
             val ptr = _nGetBackground(_ptr)
             if (ptr == 0L) null else Paint(ptr, true)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
         set(value) {
             try {
                 Stats.onNativeCall()
                 _nSetBackground(
                     _ptr,
-                    Native.Companion.getPtr(value)
+                    getPtr(value)
                 )
+                this
             } finally {
-                Reference.reachabilityFence(value)
+                reachabilityBarrier(value)
             }
         }
 
@@ -152,7 +156,7 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
             Stats.onNativeCall()
             _nGetDecorationStyle(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
         set(value) {
             Stats.onNativeCall()
@@ -173,7 +177,7 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
             Stats.onNativeCall()
             FontStyle(_nGetFontStyle(_ptr))
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
         set(value) {
             Stats.onNativeCall()
@@ -185,7 +189,7 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
             Stats.onNativeCall()
             _nGetShadows(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     fun addShadow(s: Shadow): TextStyle {
@@ -210,7 +214,7 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
             Stats.onNativeCall()
             _nGetFontFeatures(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     fun addFontFeature(f: FontFeature): TextStyle {
@@ -235,7 +239,7 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
             Stats.onNativeCall()
             _nGetFontSize(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
         set(value) {
             Stats.onNativeCall()
@@ -247,7 +251,7 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
             Stats.onNativeCall()
             _nGetFontFamilies(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
         set(value) {
             Stats.onNativeCall()
@@ -264,7 +268,7 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
             Stats.onNativeCall()
             _nGetHeight(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
         set(value) {
             Stats.onNativeCall()
@@ -276,7 +280,7 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
             Stats.onNativeCall()
             _nGetLetterSpacing(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
         set(value) {
             Stats.onNativeCall()
@@ -288,7 +292,7 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
             Stats.onNativeCall()
             _nGetWordSpacing(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
         set(value) {
             Stats.onNativeCall()
@@ -301,18 +305,17 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
             val ptr = _nGetTypeface(_ptr)
             if (ptr == 0L) null else Typeface(ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
         set(value) {
             try {
                 Stats.onNativeCall()
                 _nSetTypeface(
                     _ptr,
-                    Native.Companion.getPtr(value)
+                    getPtr(value)
                 )
-                this
             } finally {
-                Reference.reachabilityFence(value)
+                reachabilityBarrier(value)
             }
         }
 
@@ -321,7 +324,7 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
             Stats.onNativeCall()
             _nGetLocale(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
         set(value) {
             Stats.onNativeCall()
@@ -333,7 +336,7 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
             Stats.onNativeCall()
             BaselineMode.values().get(_nGetBaselineMode(_ptr))
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
         set(value) {
             Stats.onNativeCall()
@@ -345,7 +348,7 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
             Stats.onNativeCall()
             _nGetFontMetrics(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     val isPlaceholder: Boolean
@@ -353,7 +356,7 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
             Stats.onNativeCall()
             _nIsPlaceholder(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     fun setPlaceholder(): TextStyle {
