@@ -28,3 +28,7 @@ interface BooleanSupplier {
      */
     val asBoolean: Boolean
 }
+
+@OptIn(ExperimentalMultiplatform::class)
+@OptionalExpectation
+expect annotation class ExternalSymbolName(val name: String)

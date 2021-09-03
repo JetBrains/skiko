@@ -21,3 +21,5 @@ actual class Matcher {
 actual fun defaultLanguageTag(): String = TODO()
 
 actual fun compilePattern(regex: String): Pattern = TODO()
+
+actual typealias ExternalSymbolName = kotlin.js.JsName
