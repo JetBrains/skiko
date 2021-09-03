@@ -2,7 +2,7 @@ package org.jetbrains.skia
 
 import kotlin.jvm.JvmStatic
 
-open class Rect internal constructor(val left: Float, val top: Float, val right: Float, val bottom: Float) {
+open class Rect constructor(val left: Float, val top: Float, val right: Float, val bottom: Float) {
     val width: Float
         get() = right - left
     val height: Float

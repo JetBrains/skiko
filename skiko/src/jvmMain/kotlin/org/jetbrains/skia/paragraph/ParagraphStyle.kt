@@ -46,125 +46,109 @@ class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
         }
     }
 
-    val strutStyle: StrutStyle
+    var strutStyle: StrutStyle
         get() = try {
             Stats.onNativeCall()
             StrutStyle(_nGetStrutStyle(_ptr))
         } finally {
             Reference.reachabilityFence(this)
         }
-
-    fun setStrutStyle(s: StrutStyle?): ParagraphStyle {
-        return try {
-            Stats.onNativeCall()
-            _nSetStrutStyle(_ptr, Native.getPtr(s))
-            this
-        } finally {
-            Reference.reachabilityFence(s)
+        set(value) {
+            try {
+                Stats.onNativeCall()
+                _nSetStrutStyle(_ptr, Native.getPtr(value))
+            } finally {
+                Reference.reachabilityFence(value)
+            }
         }
-    }
 
-    val textStyle: TextStyle
+    var textStyle: TextStyle
         get() = try {
             Stats.onNativeCall()
             TextStyle(_nGetTextStyle(_ptr))
         } finally {
             Reference.reachabilityFence(this)
         }
-
-    fun setTextStyle(style: TextStyle?): ParagraphStyle {
-        return try {
-            Stats.onNativeCall()
-            _nSetTextStyle(_ptr, Native.Companion.getPtr(style))
-            this
-        } finally {
-            Reference.reachabilityFence(style)
+        set(value) {
+            try {
+                Stats.onNativeCall()
+                _nSetTextStyle(_ptr, Native.Companion.getPtr(value))
+            } finally {
+                Reference.reachabilityFence(value)
+            }
         }
-    }
 
-    val direction: Direction
+    var direction: Direction
         get() = try {
             Stats.onNativeCall()
             Direction.values()[_nGetDirection(_ptr)]
         } finally {
             Reference.reachabilityFence(this)
         }
+        set(value) {
+            Stats.onNativeCall()
+            _nSetDirection(_ptr, value.ordinal)
+        }
 
-    fun setDirection(style: Direction): ParagraphStyle {
-        Stats.onNativeCall()
-        _nSetDirection(_ptr, style.ordinal)
-        return this
-    }
-
-    val alignment: Alignment
+    var alignment: Alignment
         get() = try {
             Stats.onNativeCall()
             Alignment.values()[_nGetAlignment(_ptr)]
         } finally {
             Reference.reachabilityFence(this)
         }
+        set(value) {
+            Stats.onNativeCall()
+            _nSetAlignment(_ptr, value.ordinal)
+        }
 
-    fun setAlignment(alignment: Alignment): ParagraphStyle {
-        Stats.onNativeCall()
-        _nSetAlignment(_ptr, alignment.ordinal)
-        return this
-    }
-
-    val maxLinesCount: Long
+    var maxLinesCount: Long
         get() = try {
             Stats.onNativeCall()
             _nGetMaxLinesCount(_ptr)
         } finally {
             Reference.reachabilityFence(this)
         }
+        set(value) {
+            Stats.onNativeCall()
+            _nSetMaxLinesCount(_ptr, value)
+        }
 
-    fun setMaxLinesCount(count: Long): ParagraphStyle {
-        Stats.onNativeCall()
-        _nSetMaxLinesCount(_ptr, count)
-        return this
-    }
-
-    val ellipsis: String
+    var ellipsis: String
         get() = try {
             Stats.onNativeCall()
             _nGetEllipsis(_ptr)
         } finally {
             Reference.reachabilityFence(this)
         }
+        set(value) {
+            Stats.onNativeCall()
+            _nSetEllipsis(_ptr, value)
+        }
 
-    fun setEllipsis(ellipsis: String?): ParagraphStyle {
-        Stats.onNativeCall()
-        _nSetEllipsis(_ptr, ellipsis)
-        return this
-    }
-
-    val height: Float
+    var height: Float
         get() = try {
             Stats.onNativeCall()
             _nGetHeight(_ptr)
         } finally {
             Reference.reachabilityFence(this)
         }
+        set(value) {
+            Stats.onNativeCall()
+            _nSetHeight(_ptr, value)
+        }
 
-    fun setHeight(height: Float): ParagraphStyle {
-        Stats.onNativeCall()
-        _nSetHeight(_ptr, height)
-        return this
-    }
-
-    val heightMode: HeightMode
+    var heightMode: HeightMode
         get() = try {
             Stats.onNativeCall()
             HeightMode.values()[_nGetHeightMode(_ptr)]
         } finally {
             Reference.reachabilityFence(this)
         }
-
-    fun setHeightMode(behavior: HeightMode): ParagraphStyle {
-        Stats.onNativeCall()
-        _nSetHeightMode(_ptr, behavior.ordinal)
-        return this
-    }
+        set(value) {
+            Stats.onNativeCall()
+            _nSetHeightMode(_ptr, value.ordinal)
+        }
 
     val effectiveAlignment: Alignment
         get() = try {
@@ -173,6 +157,7 @@ class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
         } finally {
             Reference.reachabilityFence(this)
         }
+
     val isHintingEnabled: Boolean
         get() = try {
             Stats.onNativeCall()

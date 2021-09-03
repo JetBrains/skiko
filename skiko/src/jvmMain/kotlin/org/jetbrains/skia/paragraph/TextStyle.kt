@@ -95,21 +95,19 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
         }
     }
 
-    val color: Int
+    var color: Int
         get() = try {
             Stats.onNativeCall()
             _nGetColor(_ptr)
         } finally {
             Reference.reachabilityFence(this)
         }
+        set(value) {
+            Stats.onNativeCall()
+            _nSetColor(_ptr, value)
+        }
 
-    fun setColor(color: Int): TextStyle {
-        Stats.onNativeCall()
-        _nSetColor(_ptr, color)
-        return this
-    }
-
-    val foreground: Paint?
+    var foreground: Paint?
         get() = try {
             Stats.onNativeCall()
             val ptr = _nGetForeground(_ptr)
@@ -117,21 +115,19 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
         } finally {
             Reference.reachabilityFence(this)
         }
-
-    fun setForeground(paint: Paint?): TextStyle {
-        return try {
-            Stats.onNativeCall()
-            _nSetForeground(
-                _ptr,
-                Native.Companion.getPtr(paint)
-            )
-            this
-        } finally {
-            Reference.reachabilityFence(paint)
+        set(value) {
+            try {
+                Stats.onNativeCall()
+                _nSetForeground(
+                    _ptr,
+                    Native.Companion.getPtr(value)
+                )
+            } finally {
+                Reference.reachabilityFence(value)
+            }
         }
-    }
 
-    val background: Paint?
+    var background: Paint?
         get() = try {
             Stats.onNativeCall()
             val ptr = _nGetBackground(_ptr)
@@ -139,56 +135,50 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
         } finally {
             Reference.reachabilityFence(this)
         }
-
-    fun setBackground(paint: Paint?): TextStyle {
-        return try {
-            Stats.onNativeCall()
-            _nSetBackground(
-                _ptr,
-                Native.Companion.getPtr(paint)
-            )
-            this
-        } finally {
-            Reference.reachabilityFence(paint)
+        set(value) {
+            try {
+                Stats.onNativeCall()
+                _nSetBackground(
+                    _ptr,
+                    Native.Companion.getPtr(value)
+                )
+            } finally {
+                Reference.reachabilityFence(value)
+            }
         }
-    }
 
-    val decorationStyle: org.jetbrains.skia.paragraph.DecorationStyle
+    var decorationStyle: org.jetbrains.skia.paragraph.DecorationStyle
         get() = try {
             Stats.onNativeCall()
             _nGetDecorationStyle(_ptr)
         } finally {
             Reference.reachabilityFence(this)
         }
+        set(value) {
+            Stats.onNativeCall()
+            _nSetDecorationStyle(
+                _ptr,
+                value._underline,
+                value._overline,
+                value._lineThrough,
+                value._gaps,
+                value.color,
+                value._lineStyle.ordinal,
+                value.thicknessMultiplier
+            )
+        }
 
-    fun setDecorationStyle(d: DecorationStyle): TextStyle {
-        Stats.onNativeCall()
-        _nSetDecorationStyle(
-            _ptr,
-            d._underline,
-            d._overline,
-            d._lineThrough,
-            d._gaps,
-            d.color,
-            d._lineStyle.ordinal,
-            d.thicknessMultiplier
-        )
-        return this
-    }
-
-    val fontStyle: FontStyle
+    var fontStyle: FontStyle
         get() = try {
             Stats.onNativeCall()
             org.jetbrains.skia.FontStyle(_nGetFontStyle(_ptr))
         } finally {
             Reference.reachabilityFence(this)
         }
-
-    fun setFontStyle(s: FontStyle): TextStyle {
-        Stats.onNativeCall()
-        _nSetFontStyle(_ptr, s._value)
-        return this
-    }
+        set(value) {
+            Stats.onNativeCall()
+            _nSetFontStyle(_ptr, value._value)
+        }
 
     val shadows: Array<org.jetbrains.skia.paragraph.Shadow>
         get() = try {
@@ -240,81 +230,72 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
         return this
     }
 
-    val fontSize: Float
+    var fontSize: Float
         get() = try {
             Stats.onNativeCall()
             _nGetFontSize(_ptr)
         } finally {
             Reference.reachabilityFence(this)
         }
+        set(value) {
+            Stats.onNativeCall()
+            _nSetFontSize(_ptr, value)
+        }
 
-    fun setFontSize(size: Float): TextStyle {
-        Stats.onNativeCall()
-        _nSetFontSize(_ptr, size)
-        return this
-    }
-
-    val fontFamilies: Array<String>
+    var fontFamilies: Array<String>
         get() = try {
             Stats.onNativeCall()
             _nGetFontFamilies(_ptr)
         } finally {
             Reference.reachabilityFence(this)
         }
+        set(value) {
+            Stats.onNativeCall()
+            _nSetFontFamilies(_ptr, value)
+        }
 
     fun setFontFamily(family: String): TextStyle {
-        return setFontFamilies(arrayOf(family))
-    }
-
-    fun setFontFamilies(families: Array<String>?): TextStyle {
-        Stats.onNativeCall()
-        _nSetFontFamilies(_ptr, families)
+        fontFamilies = arrayOf(family)
         return this
     }
 
-    val height: Float?
+    var height: Float?
         get() = try {
             Stats.onNativeCall()
             _nGetHeight(_ptr)
         } finally {
             Reference.reachabilityFence(this)
         }
+        set(value) {
+            Stats.onNativeCall()
+            if (value == null) _nSetHeight(_ptr, false, 0f) else _nSetHeight(_ptr, true, value)
+        }
 
-    fun setHeight(height: Float?): TextStyle {
-        Stats.onNativeCall()
-        if (height == null) _nSetHeight(_ptr, false, 0f) else _nSetHeight(_ptr, true, height)
-        return this
-    }
-
-    val letterSpacing: Float
+    var letterSpacing: Float
         get() = try {
             Stats.onNativeCall()
             _nGetLetterSpacing(_ptr)
         } finally {
             Reference.reachabilityFence(this)
         }
+        set(value) {
+            Stats.onNativeCall()
+            _nSetLetterSpacing(_ptr, value)
+        }
 
-    fun setLetterSpacing(letterSpacing: Float): TextStyle {
-        Stats.onNativeCall()
-        _nSetLetterSpacing(_ptr, letterSpacing)
-        return this
-    }
-
-    val wordSpacing: Float
+    var wordSpacing: Float
         get() = try {
             Stats.onNativeCall()
             _nGetWordSpacing(_ptr)
         } finally {
             Reference.reachabilityFence(this)
         }
+        set(value) {
+            Stats.onNativeCall()
+            _nSetWordSpacing(_ptr, value)
+        }
 
-    fun setWordSpacing(wordSpacing: Float): TextStyle {
-        Stats.onNativeCall()
-        _nSetWordSpacing(_ptr, wordSpacing)
-        return this
-    }
-
-    val typeface: Typeface?
+    var typeface: Typeface?
         get() = try {
             Stats.onNativeCall()
             val ptr = _nGetTypeface(_ptr)
@@ -322,47 +303,42 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
         } finally {
             Reference.reachabilityFence(this)
         }
-
-    fun setTypeface(typeface: Typeface?): TextStyle {
-        return try {
-            Stats.onNativeCall()
-            _nSetTypeface(
-                _ptr,
-                Native.Companion.getPtr(typeface)
-            )
-            this
-        } finally {
-            Reference.reachabilityFence(typeface)
+        set(value) {
+            try {
+                Stats.onNativeCall()
+                _nSetTypeface(
+                    _ptr,
+                    Native.Companion.getPtr(value)
+                )
+                this
+            } finally {
+                Reference.reachabilityFence(value)
+            }
         }
-    }
 
-    val locale: String
+    var locale: String
         get() = try {
             Stats.onNativeCall()
             _nGetLocale(_ptr)
         } finally {
             Reference.reachabilityFence(this)
         }
+        set(value) {
+            Stats.onNativeCall()
+            _nSetLocale(_ptr, value)
+        }
 
-    fun setLocale(locale: String?): TextStyle {
-        Stats.onNativeCall()
-        _nSetLocale(_ptr, locale)
-        return this
-    }
-
-    val baselineMode: BaselineMode
+    var baselineMode: BaselineMode
         get() = try {
             Stats.onNativeCall()
             BaselineMode.values().get(_nGetBaselineMode(_ptr))
         } finally {
             Reference.reachabilityFence(this)
         }
-
-    fun setBaselineMode(baseline: BaselineMode): TextStyle {
-        Stats.onNativeCall()
-        _nSetBaselineMode(_ptr, baseline.ordinal)
-        return this
-    }
+        set(value) {
+            Stats.onNativeCall()
+            _nSetBaselineMode(_ptr, value.ordinal)
+        }
 
     val fontMetrics: FontMetrics
         get() = try {
@@ -371,6 +347,7 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
         } finally {
             Reference.reachabilityFence(this)
         }
+
     val isPlaceholder: Boolean
         get() = try {
             Stats.onNativeCall()

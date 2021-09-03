@@ -36,15 +36,15 @@ class Data internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) 
             return Data(_nMakeEmpty())
         }
 
-        external fun _nGetFinalizer(): Long
-        external fun _nSize(ptr: Long): Long
-        external fun _nBytes(ptr: Long, offset: Long, length: Long): ByteArray
-        external fun _nEquals(ptr: Long, otherPtr: Long): Boolean
-        external fun _nToByteBuffer(ptr: Long): ByteBuffer
-        external fun _nMakeFromBytes(bytes: ByteArray?, offset: Long, length: Long): Long
-        external fun _nMakeFromFileName(path: String?): Long
-        external fun _nMakeSubset(ptr: Long, offset: Long, length: Long): Long
-        external fun _nMakeEmpty(): Long
+        @JvmStatic external fun _nGetFinalizer(): Long
+        @JvmStatic external fun _nSize(ptr: Long): Long
+        @JvmStatic external fun _nBytes(ptr: Long, offset: Long, length: Long): ByteArray
+        @JvmStatic external fun _nEquals(ptr: Long, otherPtr: Long): Boolean
+        @JvmStatic external fun _nToByteBuffer(ptr: Long): ByteBuffer
+        @JvmStatic external fun _nMakeFromBytes(bytes: ByteArray?, offset: Long, length: Long): Long
+        @JvmStatic external fun _nMakeFromFileName(path: String?): Long
+        @JvmStatic external fun _nMakeSubset(ptr: Long, offset: Long, length: Long): Long
+        @JvmStatic external fun _nMakeEmpty(): Long
 
         init {
             staticLoad()

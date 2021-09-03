@@ -22,9 +22,9 @@ class PathSegmentIterator internal constructor(val _path: Path?, ptr: Long) : Ma
             }
         }
 
-        external fun _nMake(pathPtr: Long, forceClose: Boolean): Long
-        external fun _nGetFinalizer(): Long
-        external fun _nNext(ptr: Long): PathSegment?
+        @JvmStatic external fun _nMake(pathPtr: Long, forceClose: Boolean): Long
+        @JvmStatic external fun _nGetFinalizer(): Long
+        @JvmStatic external fun _nNext(ptr: Long): PathSegment?
 
         init {
             staticLoad()

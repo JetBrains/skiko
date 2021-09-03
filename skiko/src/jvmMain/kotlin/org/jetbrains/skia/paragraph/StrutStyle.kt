@@ -62,103 +62,89 @@ class StrutStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder
         return this
     }
 
-    val fontStyle: FontStyle
+    var fontStyle: FontStyle
         get() = try {
             Stats.onNativeCall()
             org.jetbrains.skia.FontStyle(_nGetFontStyle(_ptr))
         } finally {
             Reference.reachabilityFence(this)
         }
+        set(value) {
+            Stats.onNativeCall()
+            _nSetFontStyle(_ptr, value._value)
+        }
 
-    fun setFontStyle(style: FontStyle): StrutStyle {
-        Stats.onNativeCall()
-        _nSetFontStyle(_ptr, style._value)
-        return this
-    }
-
-    val fontSize: Float
+    var fontSize: Float
         get() = try {
             Stats.onNativeCall()
             _nGetFontSize(_ptr)
         } finally {
             Reference.reachabilityFence(this)
         }
+        set(value) {
+            Stats.onNativeCall()
+            _nSetFontSize(_ptr, value)
+        }
 
-    fun setFontSize(value: Float): StrutStyle {
-        Stats.onNativeCall()
-        _nSetFontSize(_ptr, value)
-        return this
-    }
-
-    val height: Float
+    var height: Float
         get() = try {
             Stats.onNativeCall()
             _nGetHeight(_ptr)
         } finally {
             Reference.reachabilityFence(this)
         }
+        set(value) {
+            Stats.onNativeCall()
+            _nSetHeight(_ptr, value)
+        }
 
-    fun setHeight(value: Float): StrutStyle {
-        Stats.onNativeCall()
-        _nSetHeight(_ptr, value)
-        return this
-    }
-
-    val leading: Float
+    var leading: Float
         get() = try {
             Stats.onNativeCall()
             _nGetLeading(_ptr)
         } finally {
             Reference.reachabilityFence(this)
         }
+        set(value) {
+            Stats.onNativeCall()
+            _nSetLeading(_ptr, value)
+        }
 
-    fun setLeading(value: Float): StrutStyle {
-        Stats.onNativeCall()
-        _nSetLeading(_ptr, value)
-        return this
-    }
-
-    val isEnabled: Boolean
+    var isEnabled: Boolean
         get() = try {
             Stats.onNativeCall()
             _nIsEnabled(_ptr)
         } finally {
             Reference.reachabilityFence(this)
         }
+        set(value) {
+            Stats.onNativeCall()
+            _nSetEnabled(_ptr, value)
+        }
 
-    fun setEnabled(value: Boolean): StrutStyle {
-        Stats.onNativeCall()
-        _nSetEnabled(_ptr, value)
-        return this
-    }
-
-    val isHeightForced: Boolean
+    var isHeightForced: Boolean
         get() = try {
             Stats.onNativeCall()
             _nIsHeightForced(_ptr)
         } finally {
             Reference.reachabilityFence(this)
         }
+        set(value) {
+            Stats.onNativeCall()
+            _nSetHeightForced(_ptr, value)
+        }
 
-    fun setHeightForced(value: Boolean): StrutStyle {
-        Stats.onNativeCall()
-        _nSetHeightForced(_ptr, value)
-        return this
-    }
-
-    val isHeightOverridden: Boolean
+    var isHeightOverridden: Boolean
         get() = try {
             Stats.onNativeCall()
             _nIsHeightOverridden(_ptr)
         } finally {
             Reference.reachabilityFence(this)
         }
-
-    fun setHeightOverridden(value: Boolean): StrutStyle {
-        Stats.onNativeCall()
-        _nSetHeightOverridden(_ptr, value)
-        return this
-    }
+        set(value) {
+            Stats.onNativeCall()
+            _nSetHeightOverridden(_ptr, value)
+        }
 
     private object _FinalizerHolder {
         val PTR = _nGetFinalizer()
