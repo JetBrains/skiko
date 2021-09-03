@@ -36,12 +36,25 @@ repositories {
 }
 
 val skiaZip = run {
-    val zipName = skiko.skiaReleaseForTargetOS + ".zip"
+    val zipName = skiko.skiaReleaseFor(targetOs, targetArch) + ".zip"
     val zipFile = skiko.dependenciesDir.resolve("skia/${zipName.substringAfterLast('/')}")
 
     tasks.register("downloadSkia", Download::class) {
         onlyIf { skiko.skiaDir == null && !zipFile.exists() }
-        inputs.property("skia.release.for.target.os", skiko.skiaReleaseForTargetOS)
+        inputs.property("skia.release.for.target.os", skiko.skiaReleaseFor(targetOs, targetArch))
+        src("https://github.com/JetBrains/skia-pack/releases/download/$zipName")
+        dest(zipFile)
+        onlyIfModified(true)
+    }.map { zipFile }
+}
+
+val skiaWasmZip = run {
+    val release = skiko.skiaReleaseFor(OS.Wasm, Arch.Wasm)
+    val zipName = "$release.zip"
+    val zipFile = skiko.dependenciesDir.resolve("skia/${zipName.substringAfterLast('/')}")
+    tasks.register("downloadSkiaWasm", Download::class) {
+        onlyIf { skiko.skiaDir == null && !zipFile.exists() }
+        inputs.property("skia.release.for.wasm", release)
         src("https://github.com/JetBrains/skia-pack/releases/download/$zipName")
         dest(zipFile)
         onlyIfModified(true)
@@ -70,6 +83,24 @@ val skiaDir = run {
     }
 }
 
+val skiaWasmDir = run {
+    if (skiko.skiaDir != null) {
+        tasks.register("skiaWasmDir", DefaultTask::class) {
+            // dummy task to simplify usage of the resulting provider (see `else` branch)
+            // if a file provider is not created from a task provider,
+            // then it cannot be used instead of a task in `dependsOn` clauses of other tasks.
+            // e.g. the resulting `skiaDir` could not be used in `dependsOn` of CppCompile configuration
+            enabled = false
+        }.map { skiko.skiaDir!! }
+    } else {
+        val targetDir = skiko.dependenciesDir.resolve("skia/skia-wasm")
+        tasks.register("unzipSkiaWasm", Copy::class) {
+            from(skiaWasmZip.map { zipTree(it) })
+            configureSkiaCopy(targetDir)
+        }.map { targetDir }
+    }
+}
+
 val skiaBinSubdir = "out/${buildType.id}-${targetOs.id}-${targetArch.id}"
 
 val Project.supportNative: Boolean
@@ -80,6 +111,11 @@ kotlin {
         compilations.all {
             kotlinOptions.jvmTarget = "11"
         }
+    }
+
+    js(IR) {
+        browser()
+        binaries.executable()
     }
 
     if (supportNative) {
@@ -241,6 +277,7 @@ tasks.withType(CppCompile::class.java).configureEach {
                     )
             )
         }
+        OS.Wasm -> throw GradleException("Should not reach here")
     }
 }
 
@@ -271,6 +308,33 @@ project.tasks.register<Exec>("objcCompile") {
     file(outDir).mkdirs()
     inputs.files(srcs)
     outputs.files(outs)
+}
+
+project.tasks.register<Exec>("wasmCompile") {
+    dependsOn(skiaWasmDir)
+    val inputDir = "$projectDir/src/jsMain/cpp"
+    val outDir = "$buildDir/wasm"
+    val names = File(inputDir).listFiles()!!.map { it.name.removeSuffix(".cc") }
+    val srcs = names.map { "$inputDir/$it.cc" }.toTypedArray()
+    val outJs = "$outDir/skiko.js"
+    val outWasm = "$outDir/skiko.wasm"
+    val skiaDir = skiaWasmDir.get().absolutePath
+    workingDir = File(outDir)
+    val libs = fileTree("$skiaDir/out/Release-wasm-wasm").filter { it.name.endsWith(".a") }
+    commandLine = listOf(
+        "emcc",
+        *Arch.Wasm.clangFlags,
+        "-I$skiaDir",
+        "-I$skiaDir/include",
+        "-I$skiaDir/include/gpu",
+        "-std=c++17",
+        "-o", outJs,
+        *libs.files.map { it.absolutePath }.toTypedArray(),
+        *srcs
+    )
+    file(outDir).mkdirs()
+    inputs.files(srcs)
+    outputs.files(outJs, outWasm)
 }
 
 fun localSign(signer: String, lib: File): File {
@@ -391,6 +455,9 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
                 )
             )
         }
+        OS.Wasm -> {
+            throw GradleException("This task shalln't be used with WASM")
+        }
     }
 }
 
@@ -485,6 +552,17 @@ val skikoJvmRuntimeJar by project.tasks.registering(Jar::class) {
         from(files(skiaDir.map { it.resolve("${skiaBinSubdir}/icudtl.dat") }))
     }
     from(createChecksums.get().outputs.files)
+}
+
+project.tasks.register<Jar>("skikoJsJar") {
+    // We produce jar that contains .js of wrapper/bindings and .wasm with Skia + bindings.
+    from(kotlin.js().compilations["main"].output.allOutputs)
+    from(project.tasks.named("wasmCompile").get().outputs)
+    from(project.tasks.named("jsJar").get().outputs)
+    archiveBaseName.set("skiko-wasm")
+    doLast {
+        println("output at ${outputs.files.files.single()}")
+    }
 }
 
 project.tasks.register<JavaExec>("run") {

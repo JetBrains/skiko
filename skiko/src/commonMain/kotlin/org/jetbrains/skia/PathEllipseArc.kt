@@ -1,6 +1,5 @@
 package org.jetbrains.skia
 
-
 enum class PathEllipseArc {
     /** Smaller of arc pair.  */
     SMALLER,

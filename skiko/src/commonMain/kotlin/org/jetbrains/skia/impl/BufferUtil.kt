@@ -1,3 +1,4 @@
+@file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia.impl
 
 import org.jetbrains.skia.ByteBuffer
