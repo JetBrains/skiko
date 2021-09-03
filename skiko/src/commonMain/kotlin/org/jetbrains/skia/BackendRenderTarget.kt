@@ -50,10 +50,18 @@ class BackendRenderTarget internal constructor(ptr: Long) : Managed(ptr, _Finali
             return BackendRenderTarget(_nMakeDirect3D(width, height, texturePtr, format, sampleCnt, levelCnt))
         }
 
-        @JvmStatic external fun _nGetFinalizer(): Long
-        @JvmStatic external fun _nMakeGL(width: Int, height: Int, sampleCnt: Int, stencilBits: Int, fbId: Int, fbFormat: Int): Long
-        @JvmStatic external fun _nMakeMetal(width: Int, height: Int, texturePtr: Long): Long
-        @JvmStatic external fun _nMakeDirect3D(
+        @JvmStatic
+        @ExternalSymbolName("BackendRenderTarget_nGetFinalizer")
+        external fun _nGetFinalizer(): Long
+        @JvmStatic
+        @ExternalSymbolName("BackendRenderTarget_nMakeGL")
+        external fun _nMakeGL(width: Int, height: Int, sampleCnt: Int, stencilBits: Int, fbId: Int, fbFormat: Int): Long
+        @JvmStatic
+        @ExternalSymbolName("BackendRenderTarget_nMakeMetal")
+        external fun _nMakeMetal(width: Int, height: Int, texturePtr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("BackendRenderTarget_nMakeDirect3D")
+        external fun _nMakeDirect3D(
             width: Int,
             height: Int,
             texturePtr: Long,
