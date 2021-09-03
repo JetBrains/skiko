@@ -1,7 +1,9 @@
 #include "GrBackendSurface.h"
 #include "GrDirectContext.h"
+#include <emscripten.h>
 
-void* init_surface() {
+EMSCRIPTEN_KEEPALIVE
+extern "C" void* init_surface() {
    return nullptr;
 }
 

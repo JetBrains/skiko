@@ -556,7 +556,6 @@ val skikoJvmRuntimeJar by project.tasks.registering(Jar::class) {
 
 project.tasks.register<Jar>("skikoJsJar") {
     // We produce jar that contains .js of wrapper/bindings and .wasm with Skia + bindings.
-    from(kotlin.js().compilations["main"].output.allOutputs)
     from(project.tasks.named("wasmCompile").get().outputs)
     from(project.tasks.named("jsJar").get().outputs)
     archiveBaseName.set("skiko-wasm")
