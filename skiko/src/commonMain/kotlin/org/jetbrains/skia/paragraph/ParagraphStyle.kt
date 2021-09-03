@@ -1,10 +1,12 @@
+@file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia.paragraph
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
-import java.lang.ref.Reference
+import org.jetbrains.skia.impl.reachabilityBarrier
+import kotlin.jvm.JvmStatic
 
 class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
     companion object {
@@ -39,10 +41,10 @@ class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
     override fun _nativeEquals(other: Native?): Boolean {
         return try {
             Stats.onNativeCall()
-            _nEquals(_ptr, Native.getPtr(other))
+            _nEquals(_ptr, getPtr(other))
         } finally {
-            Reference.reachabilityFence(this)
-            Reference.reachabilityFence(other)
+            reachabilityBarrier(this)
+            reachabilityBarrier(other)
         }
     }
 
@@ -51,16 +53,16 @@ class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
             Stats.onNativeCall()
             StrutStyle(_nGetStrutStyle(_ptr))
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     fun setStrutStyle(s: StrutStyle?): ParagraphStyle {
         return try {
             Stats.onNativeCall()
-            _nSetStrutStyle(_ptr, Native.getPtr(s))
+            _nSetStrutStyle(_ptr, getPtr(s))
             this
         } finally {
-            Reference.reachabilityFence(s)
+            reachabilityBarrier(s)
         }
     }
 
@@ -69,16 +71,16 @@ class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
             Stats.onNativeCall()
             TextStyle(_nGetTextStyle(_ptr))
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     fun setTextStyle(style: TextStyle?): ParagraphStyle {
         return try {
             Stats.onNativeCall()
-            _nSetTextStyle(_ptr, Native.Companion.getPtr(style))
+            _nSetTextStyle(_ptr, getPtr(style))
             this
         } finally {
-            Reference.reachabilityFence(style)
+            reachabilityBarrier(style)
         }
     }
 
@@ -87,7 +89,7 @@ class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
             Stats.onNativeCall()
             Direction.values()[_nGetDirection(_ptr)]
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     fun setDirection(style: Direction): ParagraphStyle {
@@ -101,7 +103,7 @@ class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
             Stats.onNativeCall()
             Alignment.values()[_nGetAlignment(_ptr)]
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     fun setAlignment(alignment: Alignment): ParagraphStyle {
@@ -115,7 +117,7 @@ class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
             Stats.onNativeCall()
             _nGetMaxLinesCount(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     fun setMaxLinesCount(count: Long): ParagraphStyle {
@@ -129,7 +131,7 @@ class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
             Stats.onNativeCall()
             _nGetEllipsis(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     fun setEllipsis(ellipsis: String?): ParagraphStyle {
@@ -143,7 +145,7 @@ class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
             Stats.onNativeCall()
             _nGetHeight(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     fun setHeight(height: Float): ParagraphStyle {
@@ -157,7 +159,7 @@ class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
             Stats.onNativeCall()
             HeightMode.values()[_nGetHeightMode(_ptr)]
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     fun setHeightMode(behavior: HeightMode): ParagraphStyle {
@@ -171,14 +173,14 @@ class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
             Stats.onNativeCall()
             Alignment.values()[_nGetEffectiveAlignment(_ptr)]
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     val isHintingEnabled: Boolean
         get() = try {
             Stats.onNativeCall()
             _nIsHintingEnabled(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     fun disableHinting(): ParagraphStyle {

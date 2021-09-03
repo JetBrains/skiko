@@ -1,11 +1,11 @@
+@file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.RefCnt
-import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
-import java.lang.IllegalArgumentException
-import java.lang.ref.Reference
+import org.jetbrains.skia.impl.reachabilityBarrier
+import kotlin.jvm.JvmStatic
 
 class Surface : RefCnt {
     companion object {
@@ -53,21 +53,16 @@ class Surface : RefCnt {
             surfaceProps: SurfaceProps?
         ): Surface {
             return try {
-                assert(pixmap != null) { "Can’t makeRasterDirect with pixmap == null" }
                 Stats.onNativeCall()
                 val ptr = _nMakeRasterDirectWithPixmap(
-                    Native.Companion.getPtr(pixmap), surfaceProps
+                    getPtr(pixmap), surfaceProps
                 )
                 require(ptr != 0L) {
-                    String.format(
-                        "Failed Surface.makeRasterDirect(%s, %s)",
-                        pixmap,
-                        surfaceProps
-                    )
+                    "Failed Surface.makeRasterDirect($pixmap, $surfaceProps)"
                 }
                 Surface(ptr)
             } finally {
-                Reference.reachabilityFence(pixmap)
+                reachabilityBarrier(pixmap)
             }
         }
 
@@ -107,30 +102,23 @@ class Surface : RefCnt {
             surfaceProps: SurfaceProps?
         ): Surface {
             return try {
-                assert(imageInfo != null) { "Can’t makeRasterDirect with imageInfo == null" }
                 Stats.onNativeCall()
                 val ptr = _nMakeRasterDirect(
                     imageInfo.width,
                     imageInfo.height,
                     imageInfo.colorInfo.colorType.ordinal,
                     imageInfo.colorInfo.alphaType.ordinal,
-                    Native.getPtr(imageInfo.colorInfo.colorSpace),
+                    getPtr(imageInfo.colorInfo.colorSpace),
                     pixelsPtr,
                     rowBytes,
                     surfaceProps
                 )
                 require(ptr != 0L) {
-                    String.format(
-                        "Failed Surface.makeRasterDirect(%s, %d, %d, %s)",
-                        imageInfo,
-                        pixelsPtr,
-                        rowBytes,
-                        surfaceProps
-                    )
+                    "Failed Surface.makeRasterDirect($imageInfo, $pixelsPtr, $rowBytes, $surfaceProps)"
                 }
                 Surface(ptr)
             } finally {
-                Reference.reachabilityFence(imageInfo.colorInfo.colorSpace)
+                reachabilityBarrier(imageInfo.colorInfo.colorSpace)
             }
         }
 
@@ -213,28 +201,22 @@ class Surface : RefCnt {
             surfaceProps: SurfaceProps?
         ): Surface {
             return try {
-                assert(imageInfo != null) { "Can’t makeRaster with imageInfo == null" }
                 Stats.onNativeCall()
                 val ptr = _nMakeRaster(
                     imageInfo.width,
                     imageInfo.height,
                     imageInfo.colorInfo.colorType.ordinal,
                     imageInfo.colorInfo.alphaType.ordinal,
-                    Native.getPtr(imageInfo.colorInfo.colorSpace),
+                    getPtr(imageInfo.colorInfo.colorSpace),
                     rowBytes,
                     surfaceProps
                 )
                 require(ptr != 0L) {
-                    String.format(
-                        "Failed Surface.makeRaster(%s, %d, %s)",
-                        imageInfo,
-                        rowBytes,
-                        surfaceProps
-                    )
+                    "Failed Surface.makeRaster($imageInfo, $rowBytes, $surfaceProps)"
                 }
                 Surface(ptr)
             } finally {
-                Reference.reachabilityFence(imageInfo.colorInfo.colorSpace)
+                reachabilityBarrier(imageInfo.colorInfo.colorSpace)
             }
         }
         /**
@@ -282,7 +264,6 @@ class Surface : RefCnt {
          * @return              Surface if all parameters are valid; otherwise, null
          * @see [https://fiddle.skia.org/c/@Surface_MakeFromBackendTexture](https://fiddle.skia.org/c/@Surface_MakeFromBackendTexture)
          */
-        @JvmOverloads
         fun makeFromBackendRenderTarget(
             context: DirectContext,
             rt: BackendRenderTarget,
@@ -292,34 +273,23 @@ class Surface : RefCnt {
             surfaceProps: SurfaceProps? = null
         ): Surface {
             return try {
-                assert(context != null) { "Can’t makeFromBackendRenderTarget with context == null" }
-                assert(rt != null) { "Can’t makeFromBackendRenderTarget with rt == null" }
-                assert(origin != null) { "Can’t makeFromBackendRenderTarget with origin == null" }
-                assert(colorFormat != null) { "Can’t makeFromBackendRenderTarget with colorFormat == null" }
                 Stats.onNativeCall()
                 val ptr = _nMakeFromBackendRenderTarget(
-                    Native.Companion.getPtr(context),
-                    Native.Companion.getPtr(rt),
+                    getPtr(context),
+                    getPtr(rt),
                     origin.ordinal,
                     colorFormat.ordinal,
-                    Native.Companion.getPtr(colorSpace),
+                    getPtr(colorSpace),
                     surfaceProps
                 )
                 require(ptr != 0L) {
-                    String.format(
-                        "Failed Surface.makeFromBackendRenderTarget(%s, %s, %s, %s, %s)",
-                        context,
-                        rt,
-                        origin,
-                        colorFormat,
-                        colorSpace
-                    )
+                    "Failed Surface.makeFromBackendRenderTarget($context, $rt, $origin, $colorFormat, $colorSpace)"
                 }
                 Surface(ptr, context, rt)
             } finally {
-                Reference.reachabilityFence(context)
-                Reference.reachabilityFence(rt)
-                Reference.reachabilityFence(colorSpace)
+                reachabilityBarrier(context)
+                reachabilityBarrier(rt)
+                reachabilityBarrier(colorSpace)
             }
         }
 
@@ -333,34 +303,23 @@ class Surface : RefCnt {
             surfaceProps: SurfaceProps?
         ): Surface {
             return try {
-                assert(context != null) { "Can’t makeFromBackendRenderTarget with context == null" }
-                assert(origin != null) { "Can’t makeFromBackendRenderTarget with origin == null" }
-                assert(colorFormat != null) { "Can’t makeFromBackendRenderTarget with colorFormat == null" }
                 Stats.onNativeCall()
                 val ptr = _nMakeFromMTKView(
-                    Native.Companion.getPtr(context),
+                    getPtr(context),
                     mtkViewPtr,
                     origin.ordinal,
                     sampleCount,
                     colorFormat.ordinal,
-                    Native.Companion.getPtr(colorSpace),
+                    getPtr(colorSpace),
                     surfaceProps
                 )
                 require(ptr != 0L) {
-                    String.format(
-                        "Failed Surface.makeFromMTKView(%s, %s, %s, %s, %s, %s)",
-                        context,
-                        mtkViewPtr,
-                        origin,
-                        colorFormat,
-                        colorSpace,
-                        surfaceProps
-                    )
+                    "Failed Surface.makeFromMTKView($context, $mtkViewPtr $origin, $colorFormat, $surfaceProps)"
                 }
                 Surface(ptr, context)
             } finally {
-                Reference.reachabilityFence(context)
-                Reference.reachabilityFence(colorSpace)
+                reachabilityBarrier(context)
+                reachabilityBarrier(colorSpace)
             }
         }
 
@@ -390,7 +349,7 @@ class Surface : RefCnt {
         fun makeRasterN32Premul(width: Int, height: Int): Surface {
             Stats.onNativeCall()
             val ptr = _nMakeRasterN32Premul(width, height)
-            require(ptr != 0L) { String.format("Failed Surface.makeRasterN32Premul(%d, %d)", width, height) }
+            require(ptr != 0L) { "Failed Surface.makeRasterN32Premul($width, $height)" }
             return Surface(ptr)
         }
 
@@ -526,39 +485,27 @@ class Surface : RefCnt {
             shouldCreateWithMips: Boolean
         ): Surface {
             return try {
-                assert(context != null) { "Can’t makeFromBackendRenderTarget with context == null" }
-                assert(imageInfo != null) { "Can’t makeFromBackendRenderTarget with imageInfo == null" }
-                assert(origin != null) { "Can’t makeFromBackendRenderTarget with origin == null" }
                 Stats.onNativeCall()
                 val ptr = _nMakeRenderTarget(
-                    Native.getPtr(context),
+                    getPtr(context),
                     budgeted,
                     imageInfo.width,
                     imageInfo.height,
                     imageInfo.colorInfo.colorType.ordinal,
                     imageInfo.colorInfo.alphaType.ordinal,
-                    Native.Companion.getPtr(imageInfo.colorInfo.colorSpace),
+                    getPtr(imageInfo.colorInfo.colorSpace),
                     sampleCount,
                     origin.ordinal,
                     surfaceProps,
                     shouldCreateWithMips
                 )
                 require(ptr != 0L) {
-                    String.format(
-                        "Failed Surface.makeRenderTarget(%s, %b, %s, %d, %s, %s, %b)",
-                        context,
-                        budgeted,
-                        imageInfo,
-                        sampleCount,
-                        origin,
-                        surfaceProps,
-                        shouldCreateWithMips
-                    )
+                    "Failed Surface.makeRenderTarget($context, $budgeted, $imageInfo, $sampleCount, $origin, $surfaceProps, $shouldCreateWithMips)"
                 }
                 Surface(ptr, context)
             } finally {
-                Reference.reachabilityFence(context)
-                Reference.reachabilityFence(imageInfo.colorInfo.colorSpace)
+                reachabilityBarrier(context)
+                reachabilityBarrier(imageInfo.colorInfo.colorSpace)
             }
         }
 
@@ -575,7 +522,7 @@ class Surface : RefCnt {
         fun makeNull(width: Int, height: Int): Surface {
             Stats.onNativeCall()
             val ptr = _nMakeNull(width, height)
-            require(ptr != 0L) { String.format("Failed Surface.makeNull(%d, %d)", width, height) }
+            require(ptr != 0L) { "Failed Surface.makeNull($width, $height)" }
             return Surface(ptr)
         }
 
@@ -686,7 +633,7 @@ class Surface : RefCnt {
             Stats.onNativeCall()
             _nGetWidth(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     /**
@@ -701,7 +648,7 @@ class Surface : RefCnt {
             Stats.onNativeCall()
             _nGetHeight(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     /**
@@ -715,7 +662,7 @@ class Surface : RefCnt {
             Stats.onNativeCall()
             _nGetImageInfo(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     /**
@@ -733,7 +680,7 @@ class Surface : RefCnt {
             Stats.onNativeCall()
             _nGenerationId(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     /**
@@ -750,7 +697,7 @@ class Surface : RefCnt {
             Stats.onNativeCall()
             _nNotifyContentWillChange(_ptr, mode.ordinal)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 
@@ -766,7 +713,7 @@ class Surface : RefCnt {
             val ptr = _nGetRecordingContext(_ptr)
             if (ptr == 0L) null else DirectContext(ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     /**
@@ -785,7 +732,7 @@ class Surface : RefCnt {
             val ptr = _nGetCanvas(_ptr)
             if (ptr == 0L) throw IllegalArgumentException() else Canvas(ptr, false, this)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     /**
@@ -812,11 +759,11 @@ class Surface : RefCnt {
                 imageInfo.height,
                 imageInfo.colorInfo.colorType.ordinal,
                 imageInfo.colorInfo.alphaType.ordinal,
-                Native.Companion.getPtr(imageInfo.colorInfo.colorSpace)
+                getPtr(imageInfo.colorInfo.colorSpace)
             )
             Surface(ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 
@@ -842,7 +789,7 @@ class Surface : RefCnt {
             val ptr = _nMakeSurface(_ptr, width, height)
             Surface(ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 
@@ -862,7 +809,7 @@ class Surface : RefCnt {
             Stats.onNativeCall()
             Image(_nMakeImageSnapshot(_ptr))
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 
@@ -896,7 +843,7 @@ class Surface : RefCnt {
                 )
             )
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 
@@ -916,11 +863,11 @@ class Surface : RefCnt {
     fun draw(canvas: Canvas?, x: Int, y: Int, paint: Paint?) {
         try {
             Stats.onNativeCall()
-            _nDraw(_ptr, Native.Companion.getPtr(canvas), x.toFloat(), y.toFloat(), Native.Companion.getPtr(paint))
+            _nDraw(_ptr, getPtr(canvas), x.toFloat(), y.toFloat(), getPtr(paint))
         } finally {
-            Reference.reachabilityFence(this)
-            Reference.reachabilityFence(canvas)
-            Reference.reachabilityFence(paint)
+            reachabilityBarrier(this)
+            reachabilityBarrier(canvas)
+            reachabilityBarrier(paint)
         }
     }
 
@@ -929,11 +876,11 @@ class Surface : RefCnt {
             Stats.onNativeCall()
             _nPeekPixels(
                 _ptr,
-                Native.Companion.getPtr(pixmap)
+                getPtr(pixmap)
             )
         } finally {
-            Reference.reachabilityFence(this)
-            Reference.reachabilityFence(pixmap)
+            reachabilityBarrier(this)
+            reachabilityBarrier(pixmap)
         }
     }
 
@@ -942,13 +889,13 @@ class Surface : RefCnt {
             Stats.onNativeCall()
             _nReadPixelsToPixmap(
                 _ptr,
-                Native.Companion.getPtr(pixmap),
+                getPtr(pixmap),
                 srcX,
                 srcY
             )
         } finally {
-            Reference.reachabilityFence(this)
-            Reference.reachabilityFence(pixmap)
+            reachabilityBarrier(this)
+            reachabilityBarrier(pixmap)
         }
     }
 
@@ -997,23 +944,23 @@ class Surface : RefCnt {
             Stats.onNativeCall()
             _nReadPixels(
                 _ptr,
-                Native.Companion.getPtr(bitmap),
+                getPtr(bitmap),
                 srcX,
                 srcY
             )
         } finally {
-            Reference.reachabilityFence(this)
-            Reference.reachabilityFence(bitmap)
+            reachabilityBarrier(this)
+            reachabilityBarrier(bitmap)
         }
     }
 
     fun writePixels(pixmap: Pixmap?, x: Int, y: Int) {
         try {
             Stats.onNativeCall()
-            _nWritePixelsFromPixmap(_ptr, Native.Companion.getPtr(pixmap), x, y)
+            _nWritePixelsFromPixmap(_ptr, getPtr(pixmap), x, y)
         } finally {
-            Reference.reachabilityFence(this)
-            Reference.reachabilityFence(pixmap)
+            reachabilityBarrier(this)
+            reachabilityBarrier(pixmap)
         }
     }
 
@@ -1037,10 +984,10 @@ class Surface : RefCnt {
     fun writePixels(bitmap: Bitmap?, x: Int, y: Int) {
         try {
             Stats.onNativeCall()
-            _nWritePixels(_ptr, Native.Companion.getPtr(bitmap), x, y)
+            _nWritePixels(_ptr, getPtr(bitmap), x, y)
         } finally {
-            Reference.reachabilityFence(this)
-            Reference.reachabilityFence(bitmap)
+            reachabilityBarrier(this)
+            reachabilityBarrier(bitmap)
         }
     }
 
@@ -1060,7 +1007,7 @@ class Surface : RefCnt {
             Stats.onNativeCall()
             _nFlushAndSubmit(_ptr, false)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 
@@ -1082,7 +1029,7 @@ class Surface : RefCnt {
             Stats.onNativeCall()
             _nFlushAndSubmit(_ptr, syncCpu)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 
@@ -1091,7 +1038,7 @@ class Surface : RefCnt {
             Stats.onNativeCall()
             _nFlush(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 
@@ -1107,7 +1054,7 @@ class Surface : RefCnt {
             Stats.onNativeCall()
             _nUnique(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     internal constructor(ptr: Long) : super(ptr) {

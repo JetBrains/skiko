@@ -1,11 +1,12 @@
+@file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia.paragraph
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.*
-import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
-import java.lang.ref.Reference
+import org.jetbrains.skia.impl.reachabilityBarrier
+import kotlin.jvm.JvmStatic
 
 class FontCollection internal constructor(ptr: Long) : RefCnt(ptr) {
     companion object {
@@ -36,16 +37,16 @@ class FontCollection internal constructor(ptr: Long) : RefCnt(ptr) {
             Stats.onNativeCall()
             _nGetFontManagersCount(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     fun setAssetFontManager(fontMgr: FontMgr?): FontCollection {
         return try {
             Stats.onNativeCall()
-            _nSetAssetFontManager(_ptr, Native.Companion.getPtr(fontMgr))
+            _nSetAssetFontManager(_ptr, getPtr(fontMgr))
             this
         } finally {
-            Reference.reachabilityFence(fontMgr)
+            reachabilityBarrier(fontMgr)
         }
     }
 
@@ -54,21 +55,21 @@ class FontCollection internal constructor(ptr: Long) : RefCnt(ptr) {
             Stats.onNativeCall()
             _nSetDynamicFontManager(
                 _ptr,
-                Native.Companion.getPtr(fontMgr)
+                getPtr(fontMgr)
             )
             this
         } finally {
-            Reference.reachabilityFence(fontMgr)
+            reachabilityBarrier(fontMgr)
         }
     }
 
     fun setTestFontManager(fontMgr: FontMgr?): FontCollection {
         return try {
             Stats.onNativeCall()
-            _nSetTestFontManager(_ptr, Native.Companion.getPtr(fontMgr))
+            _nSetTestFontManager(_ptr, getPtr(fontMgr))
             this
         } finally {
-            Reference.reachabilityFence(fontMgr)
+            reachabilityBarrier(fontMgr)
         }
     }
 
@@ -81,12 +82,12 @@ class FontCollection internal constructor(ptr: Long) : RefCnt(ptr) {
             Stats.onNativeCall()
             _nSetDefaultFontManager(
                 _ptr,
-                Native.Companion.getPtr(fontMgr),
+                getPtr(fontMgr),
                 defaultFamilyName
             )
             this
         } finally {
-            Reference.reachabilityFence(fontMgr)
+            reachabilityBarrier(fontMgr)
         }
     }
 
@@ -96,7 +97,7 @@ class FontCollection internal constructor(ptr: Long) : RefCnt(ptr) {
             val ptr = _nGetFallbackManager(_ptr)
             if (ptr == 0L) null else FontMgr(ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     fun findTypefaces(familyNames: Array<String?>?, style: FontStyle): Array<Typeface?> {
@@ -107,7 +108,7 @@ class FontCollection internal constructor(ptr: Long) : RefCnt(ptr) {
             for (i in ptrs.indices) res[i] = Typeface(ptrs[i])
             res
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 
@@ -117,7 +118,7 @@ class FontCollection internal constructor(ptr: Long) : RefCnt(ptr) {
             val ptr = _nDefaultFallbackChar(_ptr, unicode, style._value, locale)
             if (ptr == 0L) null else Typeface(ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 
@@ -127,7 +128,7 @@ class FontCollection internal constructor(ptr: Long) : RefCnt(ptr) {
             val ptr = _nDefaultFallback(_ptr)
             if (ptr == 0L) null else Typeface(ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 
@@ -142,6 +143,6 @@ class FontCollection internal constructor(ptr: Long) : RefCnt(ptr) {
             Stats.onNativeCall()
             ParagraphCache(this, _nGetParagraphCache(_ptr))
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 }

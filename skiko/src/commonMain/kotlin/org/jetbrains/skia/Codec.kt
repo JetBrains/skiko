@@ -1,13 +1,11 @@
+@file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Managed
-import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
-import java.lang.IllegalArgumentException
-import java.lang.RuntimeException
-import java.lang.UnsupportedOperationException
-import java.lang.ref.Reference
+import org.jetbrains.skia.impl.reachabilityBarrier
+import kotlin.jvm.JvmStatic
 
 class Codec internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR), IHasImageInfo {
     companion object {
@@ -19,11 +17,11 @@ class Codec internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR)
             return try {
                 Stats.onNativeCall()
                 val ptr =
-                    _nMakeFromData(Native.getPtr(data))
+                    _nMakeFromData(getPtr(data))
                 require(ptr != 0L) { "Unsupported format" }
                 Codec(ptr)
             } finally {
-                Reference.reachabilityFence(data)
+                reachabilityBarrier(data)
             }
         }
 
@@ -67,29 +65,29 @@ class Codec internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR)
             }
             _imageInfo!!
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     val size: IPoint
         get() = try {
             Stats.onNativeCall()
-            IPoint.Companion._makeFromLong(_nGetSize(_ptr))
+            IPoint._makeFromLong(_nGetSize(_ptr))
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     val encodedOrigin: EncodedOrigin
         get() = try {
             Stats.onNativeCall()
             EncodedOrigin.values().get(_nGetEncodedOrigin(_ptr))
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     val encodedImageFormat: EncodedImageFormat
         get() = try {
             Stats.onNativeCall()
             EncodedImageFormat.values().get(_nGetEncodedImageFormat(_ptr))
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     /**
@@ -150,14 +148,14 @@ class Codec internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR)
             _validateResult(
                 _nReadPixels(
                     _ptr,
-                    Native.Companion.getPtr(bitmap),
+                    getPtr(bitmap),
                     0,
                     -1
                 )
             )
             this
         } finally {
-            Reference.reachabilityFence(bitmap)
+            reachabilityBarrier(bitmap)
         }
     }
 
@@ -207,14 +205,14 @@ class Codec internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR)
             _validateResult(
                 _nReadPixels(
                     _ptr,
-                    Native.Companion.getPtr(bitmap),
+                    getPtr(bitmap),
                     frame,
                     -1
                 )
             )
             this
         } finally {
-            Reference.reachabilityFence(bitmap)
+            reachabilityBarrier(bitmap)
         }
     }
 
@@ -265,14 +263,14 @@ class Codec internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR)
             _validateResult(
                 _nReadPixels(
                     _ptr,
-                    Native.Companion.getPtr(bitmap),
+                    getPtr(bitmap),
                     frame,
                     priorFrame
                 )
             )
             this
         } finally {
-            Reference.reachabilityFence(bitmap)
+            reachabilityBarrier(bitmap)
         }
     }
 
@@ -288,7 +286,7 @@ class Codec internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR)
             Stats.onNativeCall()
             _nGetFrameCount(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     /**
@@ -305,7 +303,7 @@ class Codec internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR)
             Stats.onNativeCall()
             _nGetFrameInfo(_ptr, frame)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 
@@ -328,7 +326,7 @@ class Codec internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR)
             Stats.onNativeCall()
             _nGetFramesInfo(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     /**
@@ -355,7 +353,7 @@ class Codec internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR)
             Stats.onNativeCall()
             _nGetRepetitionCount(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     internal object _FinalizerHolder {

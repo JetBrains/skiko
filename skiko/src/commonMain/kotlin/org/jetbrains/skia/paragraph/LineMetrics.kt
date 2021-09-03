@@ -103,14 +103,14 @@ class LineMetrics(
         if (endExcludingWhitespaces != other.endExcludingWhitespaces) return false
         if (endIncludingNewline != other.endIncludingNewline) return false
         if (isHardBreak != other.isHardBreak) return false
-        if (java.lang.Double.compare(ascent, other.ascent) != 0) return false
-        if (java.lang.Double.compare(descent, other.descent) != 0) return false
-        if (java.lang.Double.compare(unscaledAscent, other.unscaledAscent) != 0) return false
-        if (java.lang.Double.compare(height, other.height) != 0) return false
-        if (java.lang.Double.compare(width, other.width) != 0) return false
-        if (java.lang.Double.compare(left, other.left) != 0) return false
-        if (java.lang.Double.compare(baseline, other.baseline) != 0) return false
-        return if (lineNumber != other.lineNumber) false else true
+        if (ascent.compareTo(other.ascent) != 0) return false
+        if (descent.compareTo(other.descent) != 0) return false
+        if (unscaledAscent.compareTo(other.unscaledAscent) != 0) return false
+        if (height.compareTo(other.height) != 0) return false
+        if (width.compareTo(other.width) != 0) return false
+        if (left.compareTo(other.left) != 0) return false
+        if (baseline.compareTo(other.baseline) != 0) return false
+        return lineNumber == other.lineNumber
     }
 
     protected fun canEqual(other: Any?): Boolean {
@@ -129,19 +129,19 @@ class LineMetrics(
         val `$_endIncludingNewline` = endIncludingNewline
         result = result * PRIME + (`$_endIncludingNewline` ushr 32 xor `$_endIncludingNewline`).toInt()
         result = result * PRIME + if (isHardBreak) 79 else 97
-        val `$_ascent` = java.lang.Double.doubleToLongBits(ascent)
+        val `$_ascent` = ascent.toBits()
         result = result * PRIME + (`$_ascent` ushr 32 xor `$_ascent`).toInt()
-        val `$_descent` = java.lang.Double.doubleToLongBits(descent)
+        val `$_descent` = descent.toBits()
         result = result * PRIME + (`$_descent` ushr 32 xor `$_descent`).toInt()
-        val `$_unscaledAscent` = java.lang.Double.doubleToLongBits(unscaledAscent)
+        val `$_unscaledAscent` = unscaledAscent.toBits()
         result = result * PRIME + (`$_unscaledAscent` ushr 32 xor `$_unscaledAscent`).toInt()
-        val `$_height` = java.lang.Double.doubleToLongBits(height)
+        val `$_height` = height.toBits()
         result = result * PRIME + (`$_height` ushr 32 xor `$_height`).toInt()
-        val `$_width` = java.lang.Double.doubleToLongBits(width)
+        val `$_width` = width.toBits()
         result = result * PRIME + (`$_width` ushr 32 xor `$_width`).toInt()
-        val `$_left` = java.lang.Double.doubleToLongBits(left)
+        val `$_left` = left.toBits()
         result = result * PRIME + (`$_left` ushr 32 xor `$_left`).toInt()
-        val `$_baseline` = java.lang.Double.doubleToLongBits(baseline)
+        val `$_baseline` = baseline.toBits()
         result = result * PRIME + (`$_baseline` ushr 32 xor `$_baseline`).toInt()
         val `$_lineNumber` = lineNumber
         result = result * PRIME + (`$_lineNumber` ushr 32 xor `$_lineNumber`).toInt()
@@ -149,6 +149,6 @@ class LineMetrics(
     }
 
     override fun toString(): String {
-        return "LineMetrics(_startIndex=" + startIndex + ", _endIndex=" + endIndex + ", _endExcludingWhitespaces=" + endExcludingWhitespaces + ", _endIncludingNewline=" + endIncludingNewline + ", _hardBreak=" + isHardBreak + ", _ascent=" + ascent + ", _descent=" + descent + ", _unscaledAscent=" + unscaledAscent + ", _height=" + height + ", _width=" + width + ", _left=" + left + ", _baseline=" + baseline + ", _lineNumber=" + lineNumber + ")"
+        return "LineMetrics(_startIndex=$startIndex, _endIndex=$endIndex, _endExcludingWhitespaces=$endExcludingWhitespaces, _endIncludingNewline=$endIncludingNewline, _hardBreak=$isHardBreak, _ascent=$ascent, _descent=$descent, _unscaledAscent=$unscaledAscent, _height=$height, _width=$width, _left=$left, _baseline=$baseline, _lineNumber=$lineNumber)"
     }
 }

@@ -1,8 +1,10 @@
 package org.jetbrains.skia
 
+import kotlin.math.abs
+
 class FontExtents(val ascender: Float, val descender: Float, val lineGap: Float) {
     val ascenderAbs: Float
-        get() = Math.abs(ascender)
+        get() = abs(ascender)
     val lineHeight: Float
         get() = -ascender + descender + lineGap
 
@@ -11,9 +13,9 @@ class FontExtents(val ascender: Float, val descender: Float, val lineGap: Float)
         if (o !is FontExtents) return false
         val other = o
         if (!other.canEqual(this as Any)) return false
-        if (java.lang.Float.compare(ascender, other.ascender) != 0) return false
-        if (java.lang.Float.compare(descender, other.descender) != 0) return false
-        return if (java.lang.Float.compare(lineGap, other.lineGap) != 0) false else true
+        if (ascender.compareTo(other.ascender) != 0) return false
+        if (descender.compareTo(other.descender) != 0) return false
+        return lineGap.compareTo(other.lineGap) == 0
     }
 
     protected fun canEqual(other: Any?): Boolean {
@@ -23,13 +25,13 @@ class FontExtents(val ascender: Float, val descender: Float, val lineGap: Float)
     override fun hashCode(): Int {
         val PRIME = 59
         var result = 1
-        result = result * PRIME + java.lang.Float.floatToIntBits(ascender)
-        result = result * PRIME + java.lang.Float.floatToIntBits(descender)
-        result = result * PRIME + java.lang.Float.floatToIntBits(lineGap)
+        result = result * PRIME + ascender.toBits()
+        result = result * PRIME + descender.toBits()
+        result = result * PRIME + lineGap.toBits()
         return result
     }
 
     override fun toString(): String {
-        return "FontExtents(_ascender=" + ascender + ", _descender=" + descender + ", _lineGap=" + lineGap + ")"
+        return "FontExtents(_ascender=$ascender, _descender=$descender, _lineGap=$lineGap)"
     }
 }

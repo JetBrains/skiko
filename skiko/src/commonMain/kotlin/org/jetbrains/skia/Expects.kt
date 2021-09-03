@@ -8,6 +8,8 @@ expect fun String.intCodePoints(): IntArray
 
 expect fun defaultLanguageTag(): String
 
+expect abstract class OutputStream
+
 expect class Pattern {
     fun split(input: CharSequence): Array<String?>?
     fun matcher(input: CharSequence): Matcher

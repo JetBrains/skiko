@@ -1,3 +1,4 @@
+@file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia.paragraph
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
@@ -5,7 +6,8 @@ import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
-import java.lang.ref.Reference
+import org.jetbrains.skia.impl.reachabilityBarrier
+import kotlin.jvm.JvmStatic
 
 class StrutStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
@@ -41,10 +43,10 @@ class StrutStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder
     override fun _nativeEquals(other: Native?): Boolean {
         return try {
             Stats.onNativeCall()
-            _nEquals(_ptr, Native.getPtr(other))
+            _nEquals(_ptr, getPtr(other))
         } finally {
-            Reference.reachabilityFence(this)
-            Reference.reachabilityFence(other)
+            reachabilityBarrier(this)
+            reachabilityBarrier(other)
         }
     }
 
@@ -53,7 +55,7 @@ class StrutStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder
             Stats.onNativeCall()
             _nGetFontFamilies(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     fun setFontFamilies(families: Array<String?>?): StrutStyle {
@@ -67,7 +69,7 @@ class StrutStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder
             Stats.onNativeCall()
             FontStyle(_nGetFontStyle(_ptr))
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     fun setFontStyle(style: FontStyle): StrutStyle {
@@ -81,7 +83,7 @@ class StrutStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder
             Stats.onNativeCall()
             _nGetFontSize(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     fun setFontSize(value: Float): StrutStyle {
@@ -95,7 +97,7 @@ class StrutStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder
             Stats.onNativeCall()
             _nGetHeight(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     fun setHeight(value: Float): StrutStyle {
@@ -109,7 +111,7 @@ class StrutStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder
             Stats.onNativeCall()
             _nGetLeading(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     fun setLeading(value: Float): StrutStyle {
@@ -123,7 +125,7 @@ class StrutStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder
             Stats.onNativeCall()
             _nIsEnabled(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     fun setEnabled(value: Boolean): StrutStyle {
@@ -137,7 +139,7 @@ class StrutStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder
             Stats.onNativeCall()
             _nIsHeightForced(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     fun setHeightForced(value: Boolean): StrutStyle {
@@ -151,7 +153,7 @@ class StrutStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder
             Stats.onNativeCall()
             _nIsHeightOverridden(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     fun setHeightOverridden(value: Boolean): StrutStyle {
