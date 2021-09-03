@@ -51,6 +51,7 @@ val skiaWasmZip = run {
     val release = skiko.skiaReleaseFor(OS.Wasm, Arch.Wasm)
     val zipName = "$release.zip"
     val zipFile = skiko.dependenciesDir.resolve("skia/${zipName.substringAfterLast('/')}")
+
     tasks.register("downloadSkiaWasm", Download::class) {
         onlyIf { skiko.skiaDir == null && !zipFile.exists() }
         inputs.property("skia.release.for.wasm", release)
@@ -113,7 +114,15 @@ kotlin {
     }
 
     js(IR) {
-        browser()
+        browser() {
+            testTask {
+                testLogging.showStandardStreams = true
+                dependsOn(project.tasks.named("wasmCompile"))
+                useKarma() {
+                    useChromeHeadless()
+                }
+            }
+        }
         binaries.executable()
     }
 
@@ -149,12 +158,21 @@ kotlin {
             }
 
         }
+
         val jvmTest by getting {
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
                 implementation(kotlin("test-junit"))
             }
         }
+
+        val jsTest by getting {
+            dependencies {
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1")
+                implementation(kotlin("test-js"))
+            }
+        }
+
         if (supportNative) {
             val macosX64Main by getting {
                 dependsOn(commonMain)
@@ -314,6 +332,7 @@ project.tasks.register<Exec>("wasmCompile") {
     val outDir = "$buildDir/wasm"
     val names = File(inputDir).listFiles()!!.map { it.name.removeSuffix(".cc") }
     val srcs = names.map { "$inputDir/$it.cc" }.toTypedArray()
+    val commonSrcs = fileTree("$projectDir/src/commonMain/cpp/common").map { it.absolutePath }
     val outJs = "$outDir/skiko.js"
     val outWasm = "$outDir/skiko.wasm"
     val skiaDir = skiaWasmDir.get().absolutePath
@@ -322,16 +341,21 @@ project.tasks.register<Exec>("wasmCompile") {
     commandLine = listOf(
         "emcc",
         *Arch.Wasm.clangFlags,
+        "-I$projectDir/src/commonMain/cpp/headers",
         "-I$skiaDir",
         "-I$skiaDir/include",
+        "-I$skiaDir/include/core",
         "-I$skiaDir/include/gpu",
         "-std=c++17",
+        "--bind",
+        "--no-entry",
         "-o", outJs,
         *libs.files.map { it.absolutePath }.toTypedArray(),
-        *srcs
+        *(srcs + commonSrcs)
     )
     file(outDir).mkdirs()
     inputs.files(srcs)
+    inputs.files(commonSrcs)
     outputs.files(outJs, outWasm)
 }
 

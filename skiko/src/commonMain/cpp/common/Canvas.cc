@@ -3,7 +3,6 @@
 #include "SkRRect.h"
 #include "SkTextBlob.h"
 #include "SkVertices.h"
-
 #include "common.h"
 
 static void deleteCanvas(SkCanvas* canvas) {

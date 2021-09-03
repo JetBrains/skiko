@@ -1,15 +1,16 @@
+#include <common.h>
+
 #include "GrBackendSurface.h"
 #include "GrDirectContext.h"
-#include <emscripten.h>
+#include <emscripten/bind.h>
 
-EMSCRIPTEN_KEEPALIVE
+using namespace emscripten;
+
 extern "C" void* init_surface() {
    return nullptr;
 }
 
-int main() {
-    printf("Hello from WASM\n");
-    //void* ctx = GrDirectContext::MakeGL().release();
-    //printf("Context is %p\n");
-    return 0;
-}
+EMSCRIPTEN_BINDINGS(Skiko) {
+    function("org_jetbrains_skia_Canvas__1nDrawPoint", &org_jetbrains_skia_Canvas__1nDrawPoint);
+};
+
