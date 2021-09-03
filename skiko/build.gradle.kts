@@ -114,7 +114,15 @@ kotlin {
     }
 
     js(IR) {
-        browser()
+        browser() {
+            testTask {
+                testLogging.showStandardStreams = true
+                dependsOn(project.tasks.named("wasmCompile"))
+                useKarma() {
+                    useChromeHeadless()
+                }
+            }
+        }
         binaries.executable()
     }
 
@@ -163,6 +171,14 @@ kotlin {
                 implementation(kotlin("test-junit"))
             }
         }
+
+        val jsTest by getting {
+            dependencies {
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
+                implementation(kotlin("test-js"))
+            }
+        }
+
         if (supportNative) {
             val macosX64Main by getting {
             }
@@ -328,6 +344,7 @@ project.tasks.register<Exec>("wasmCompile") {
         "-I$skiaDir/include",
         "-I$skiaDir/include/gpu",
         "-std=c++17",
+        "--bind",
         "-o", outJs,
         *libs.files.map { it.absolutePath }.toTypedArray(),
         *srcs
