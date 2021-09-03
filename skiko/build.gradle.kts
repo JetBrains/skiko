@@ -330,9 +330,9 @@ project.tasks.register<Exec>("wasmCompile") {
     dependsOn(skiaWasmDir)
     val inputDir = "$projectDir/src/jsMain/cpp"
     val outDir = "$buildDir/wasm"
-    val names = File(inputDir).listFiles()!!.map { it.name.removeSuffix(".cc") }
-    val srcs = names.map { "$inputDir/$it.cc" }.toTypedArray()
-    val commonSrcs = fileTree("$projectDir/src/commonMain/cpp/common").map { it.absolutePath }
+    val commonCppDir = "$projectDir/src/commonMain/cpp"
+    val commonSrcs = fileTree("$commonCppDir/common").map { it.absolutePath }
+    val srcs = fileTree(inputDir).map { it.absolutePath }
     val outJs = "$outDir/skiko.js"
     val outWasm = "$outDir/skiko.wasm"
     val skiaDir = skiaWasmDir.get().absolutePath
@@ -341,7 +341,7 @@ project.tasks.register<Exec>("wasmCompile") {
     commandLine = listOf(
         "emcc",
         *Arch.Wasm.clangFlags,
-        "-I$projectDir/src/commonMain/cpp/headers",
+        "-I$commonCppDir/headers",
         "-I$skiaDir",
         "-I$skiaDir/include",
         "-I$skiaDir/include/core",
@@ -351,7 +351,7 @@ project.tasks.register<Exec>("wasmCompile") {
         "--no-entry",
         "-o", outJs,
         *libs.files.map { it.absolutePath }.toTypedArray(),
-        *(srcs + commonSrcs)
+        *((srcs + commonSrcs).toTypedArray())
     )
     file(outDir).mkdirs()
     inputs.files(srcs)
