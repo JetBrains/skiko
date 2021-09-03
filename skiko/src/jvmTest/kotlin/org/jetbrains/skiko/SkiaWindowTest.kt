@@ -32,9 +32,10 @@ class SkiaWindowTest {
     private fun paragraph(size: Float, text: String) =
         ParagraphBuilder(ParagraphStyle(), fontCollection)
             .pushStyle(
-                TextStyle()
-                    .setColor(Color.RED.rgb)
-                    .setFontSize(size)
+                TextStyle().apply {
+                    color = Color.RED.rgb
+                    fontSize = size
+                }
             )
             .addText(text)
             .popStyle()
@@ -344,7 +345,7 @@ class SkiaWindowTest {
             }
 
             canvas.drawRect(Rect(x.toFloat(), 0f, x.toFloat() + size.toFloat(), size.toFloat()), Paint().apply {
-                setColor(Color.RED.rgb)
+                color = Color.RED.rgb
             })
 
             layer.needRedraw()
