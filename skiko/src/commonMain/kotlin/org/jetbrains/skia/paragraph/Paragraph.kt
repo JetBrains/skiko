@@ -1,11 +1,12 @@
+@file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia.paragraph
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.Managed
-import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
-import java.lang.ref.Reference
+import org.jetbrains.skia.impl.reachabilityBarrier
+import kotlin.jvm.JvmStatic
 
 class Paragraph internal constructor(ptr: Long, text: ManagedString?) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
@@ -60,49 +61,49 @@ class Paragraph internal constructor(ptr: Long, text: ManagedString?) : Managed(
             Stats.onNativeCall()
             _nGetMaxWidth(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     val height: Float
         get() = try {
             Stats.onNativeCall()
             _nGetHeight(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     val minIntrinsicWidth: Float
         get() = try {
             Stats.onNativeCall()
             _nGetMinIntrinsicWidth(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     val maxIntrinsicWidth: Float
         get() = try {
             Stats.onNativeCall()
             _nGetMaxIntrinsicWidth(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     val alphabeticBaseline: Float
         get() = try {
             Stats.onNativeCall()
             _nGetAlphabeticBaseline(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     val ideographicBaseline: Float
         get() = try {
             Stats.onNativeCall()
             _nGetIdeographicBaseline(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     val longestLine: Float
         get() = try {
             Stats.onNativeCall()
             _nGetLongestLine(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     fun didExceedMaxLines(): Boolean {
@@ -110,7 +111,7 @@ class Paragraph internal constructor(ptr: Long, text: ManagedString?) : Managed(
             Stats.onNativeCall()
             _nDidExceedMaxLines(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 
@@ -123,10 +124,10 @@ class Paragraph internal constructor(ptr: Long, text: ManagedString?) : Managed(
     fun paint(canvas: Canvas?, x: Float, y: Float): Paragraph {
         return try {
             Stats.onNativeCall()
-            _nPaint(_ptr, Native.Companion.getPtr(canvas), x, y)
+            _nPaint(_ptr, getPtr(canvas), x, y)
             this
         } finally {
-            Reference.reachabilityFence(canvas)
+            reachabilityBarrier(canvas)
         }
     }
 
@@ -144,7 +145,7 @@ class Paragraph internal constructor(ptr: Long, text: ManagedString?) : Managed(
             Stats.onNativeCall()
             _nGetRectsForRange(_ptr, start, end, rectHeightMode.ordinal, rectWidthMode.ordinal)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 
@@ -153,7 +154,7 @@ class Paragraph internal constructor(ptr: Long, text: ManagedString?) : Managed(
             Stats.onNativeCall()
             _nGetRectsForPlaceholders(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     fun getGlyphPositionAtCoordinate(dx: Float, dy: Float): PositionWithAffinity {
@@ -165,7 +166,7 @@ class Paragraph internal constructor(ptr: Long, text: ManagedString?) : Managed(
                 Affinity.UPSTREAM
             )
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 
@@ -174,7 +175,7 @@ class Paragraph internal constructor(ptr: Long, text: ManagedString?) : Managed(
             Stats.onNativeCall()
             IRange.Companion._makeFromLong(_nGetWordBoundary(_ptr, offset))
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 
@@ -184,18 +185,18 @@ class Paragraph internal constructor(ptr: Long, text: ManagedString?) : Managed(
                 arrayOfNulls(0)
             } else {
                 Stats.onNativeCall()
-                _nGetLineMetrics(_ptr, Native.Companion.getPtr(_text))
+                _nGetLineMetrics(_ptr, getPtr(_text))
             }
         } finally {
-            Reference.reachabilityFence(this)
-            Reference.reachabilityFence(_text)
+            reachabilityBarrier(this)
+            reachabilityBarrier(_text)
         }
     val lineNumber: Long
         get() = try {
             Stats.onNativeCall()
             _nGetLineNumber(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     fun markDirty(): Paragraph {
@@ -209,7 +210,7 @@ class Paragraph internal constructor(ptr: Long, text: ManagedString?) : Managed(
             Stats.onNativeCall()
             _nGetUnresolvedGlyphsCount(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     fun updateAlignment(alignment: Alignment): Paragraph {
@@ -233,12 +234,12 @@ class Paragraph internal constructor(ptr: Long, text: ManagedString?) : Managed(
                     from,
                     to,
                     size,
-                    Native.Companion.getPtr(_text)
+                    getPtr(_text)
                 )
             }
             this
         } finally {
-            Reference.reachabilityFence(_text)
+            reachabilityBarrier(_text)
         }
     }
 
@@ -250,14 +251,14 @@ class Paragraph internal constructor(ptr: Long, text: ManagedString?) : Managed(
                     _ptr,
                     from,
                     to,
-                    Native.Companion.getPtr(paint),
-                    Native.Companion.getPtr(_text)
+                    getPtr(paint),
+                    getPtr(_text)
                 )
             }
             this
         } finally {
-            Reference.reachabilityFence(paint)
-            Reference.reachabilityFence(_text)
+            reachabilityBarrier(paint)
+            reachabilityBarrier(_text)
         }
     }
 
@@ -269,14 +270,14 @@ class Paragraph internal constructor(ptr: Long, text: ManagedString?) : Managed(
                     _ptr,
                     from,
                     to,
-                    Native.Companion.getPtr(paint),
-                    Native.Companion.getPtr(_text)
+                    getPtr(paint),
+                    getPtr(_text)
                 )
             }
             this
         } finally {
-            Reference.reachabilityFence(paint)
-            Reference.reachabilityFence(_text)
+            reachabilityBarrier(paint)
+            reachabilityBarrier(_text)
         }
     }
 

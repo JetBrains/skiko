@@ -15,9 +15,9 @@ class Shadow(val color: Int, val offsetX: Float, val offsetY: Float, val blurSig
         val other = o
         if (!other.canEqual(this as Any)) return false
         if (color != other.color) return false
-        if (java.lang.Float.compare(offsetX, other.offsetX) != 0) return false
-        if (java.lang.Float.compare(offsetY, other.offsetY) != 0) return false
-        return if (java.lang.Double.compare(blurSigma, other.blurSigma) != 0) false else true
+        if (offsetX.compareTo(other.offsetX) != 0) return false
+        if (offsetY.compareTo(other.offsetY) != 0) return false
+        return blurSigma.compareTo(other.blurSigma) == 0
     }
 
     protected fun canEqual(other: Any?): Boolean {
@@ -28,15 +28,15 @@ class Shadow(val color: Int, val offsetX: Float, val offsetY: Float, val blurSig
         val PRIME = 59
         var result = 1
         result = result * PRIME + color
-        result = result * PRIME + java.lang.Float.floatToIntBits(offsetX)
-        result = result * PRIME + java.lang.Float.floatToIntBits(offsetY)
-        val `$_blurSigma` = java.lang.Double.doubleToLongBits(blurSigma)
+        result = result * PRIME + offsetX.toBits()
+        result = result * PRIME + offsetY.toBits()
+        val `$_blurSigma` = blurSigma.toBits()
         result = result * PRIME + (`$_blurSigma` ushr 32 xor `$_blurSigma`).toInt()
         return result
     }
 
     override fun toString(): String {
-        return "Shadow(_color=" + color + ", _offsetX=" + offsetX + ", _offsetY=" + offsetY + ", _blurSigma=" + blurSigma + ")"
+        return "Shadow(_color=$color, _offsetX=$offsetX, _offsetY=$offsetY, _blurSigma=$blurSigma)"
     }
 
     fun withColor(_color: Int): Shadow {

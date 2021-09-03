@@ -1,14 +1,15 @@
+@file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia.paragraph
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.ManagedString
 import org.jetbrains.skia.impl.Managed
-import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
-import java.lang.ref.Reference
+import org.jetbrains.skia.impl.reachabilityBarrier
+import kotlin.jvm.JvmStatic
 
 class ParagraphBuilder(style: ParagraphStyle?, fc: FontCollection?) :
-    Managed(_nMake(Native.getPtr(style), Native.getPtr(fc)), _FinalizerHolder.PTR) {
+    Managed(_nMake(getPtr(style), getPtr(fc)), _FinalizerHolder.PTR) {
     companion object {
         @JvmStatic external fun _nMake(paragraphStylePtr: Long, fontCollectionPtr: Long): Long
         @JvmStatic external fun _nGetFinalizer(): Long
@@ -36,10 +37,10 @@ class ParagraphBuilder(style: ParagraphStyle?, fc: FontCollection?) :
     fun pushStyle(style: TextStyle?): ParagraphBuilder {
         return try {
             Stats.onNativeCall()
-            _nPushStyle(_ptr, Native.Companion.getPtr(style))
+            _nPushStyle(_ptr, getPtr(style))
             this
         } finally {
-            Reference.reachabilityFence(style)
+            reachabilityBarrier(style)
         }
     }
 
@@ -72,10 +73,10 @@ class ParagraphBuilder(style: ParagraphStyle?, fc: FontCollection?) :
     fun setParagraphStyle(style: ParagraphStyle?): ParagraphBuilder {
         return try {
             Stats.onNativeCall()
-            _nSetParagraphStyle(_ptr, Native.getPtr(style))
+            _nSetParagraphStyle(_ptr, getPtr(style))
             this
         } finally {
-            Reference.reachabilityFence(style)
+            reachabilityBarrier(style)
         }
     }
 
@@ -86,7 +87,7 @@ class ParagraphBuilder(style: ParagraphStyle?, fc: FontCollection?) :
             _text = null
             paragraph
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 
@@ -96,7 +97,7 @@ class ParagraphBuilder(style: ParagraphStyle?, fc: FontCollection?) :
 
     init {
         Stats.onNativeCall()
-        Reference.reachabilityFence(style)
-        Reference.reachabilityFence(fc)
+        reachabilityBarrier(style)
+        reachabilityBarrier(fc)
     }
 }

@@ -60,7 +60,7 @@ class DecorationStyle(
         if (_lineThrough != other._lineThrough) return false
         if (_gaps != other._gaps) return false
         if (color != other.color) return false
-        if (java.lang.Float.compare(thicknessMultiplier, other.thicknessMultiplier) != 0) return false
+        if (thicknessMultiplier.compareTo(other.thicknessMultiplier) != 0) return false
         val `this$_lineStyle`: Any = lineStyle
         val `other$_lineStyle`: Any = other.lineStyle
         return `this$_lineStyle` == `other$_lineStyle`
@@ -78,7 +78,7 @@ class DecorationStyle(
         result = result * PRIME + if (_lineThrough) 79 else 97
         result = result * PRIME + if (_gaps) 79 else 97
         result = result * PRIME + color
-        result = result * PRIME + java.lang.Float.floatToIntBits(thicknessMultiplier)
+        result = result * PRIME + thicknessMultiplier.toBits()
         val `$_lineStyle`: Any = lineStyle
         result = result * PRIME + (`$_lineStyle`?.hashCode() ?: 43)
         return result
