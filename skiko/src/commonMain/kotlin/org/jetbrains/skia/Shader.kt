@@ -444,6 +444,46 @@ class Shader internal constructor(ptr: Long) : RefCnt(ptr) {
             }
         }
 
+        fun makeFractalNoise(
+            baseFrequencyX: Float,
+            baseFrequencyY: Float,
+            numOctaves: Int,
+            seed: Float,
+            tiles: Array<ISize>
+        ): Shader {
+            return try {
+                val arr = IntArray(tiles.size * 2)
+                for (i in tiles.indices) {
+                    arr[i * 2] = tiles[i].width
+                    arr[i * 2 + 1] = tiles[i].height
+                }
+                Stats.onNativeCall()
+                Shader(_nMakeFractalNoise(baseFrequencyX, baseFrequencyY, numOctaves, seed, arr))
+            } finally {
+                reachabilityBarrier(this)
+            }
+        }
+
+        fun makeTurbulence(
+            baseFrequencyX: Float,
+            baseFrequencyY: Float,
+            numOctaves: Int,
+            seed: Float,
+            tiles: Array<ISize>
+        ): Shader {
+            return try {
+                val arr = IntArray(tiles.size * 2)
+                for (i in tiles.indices) {
+                    arr[i * 2] = tiles[i].width
+                    arr[i * 2 + 1] = tiles[i].height
+                }
+                Stats.onNativeCall()
+                Shader(_nMakeTurbulence(baseFrequencyX, baseFrequencyY, numOctaves, seed, arr))
+            } finally {
+                reachabilityBarrier(this)
+            }
+        }
+
         @JvmStatic external fun _nMakeWithColorFilter(ptr: Long, colorFilterPtr: Long): Long
         @JvmStatic external fun _nMakeLinearGradient(
             x0: Float,
@@ -545,6 +585,22 @@ class Shader internal constructor(ptr: Long) : RefCnt(ptr) {
             tileType: Int,
             flags: Int,
             matrix: FloatArray?
+        ): Long
+
+        @JvmStatic external fun _nMakeFractalNoise(
+            baseFrequencyX: Float,
+            baseFrequencyY: Float,
+            numOctaves: Int,
+            seed: Float,
+            tiles: IntArray?
+        ): Long
+
+        @JvmStatic external fun _nMakeTurbulence(
+            baseFrequencyX: Float,
+            baseFrequencyY: Float,
+            numOctaves: Int,
+            seed: Float,
+            tiles: IntArray?
         ): Long
 
         @JvmStatic external fun _nMakeEmpty(): Long

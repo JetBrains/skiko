@@ -1,8 +1,11 @@
 #include <iostream>
 #include <jni.h>
+#include "interop.hh"
 #include "SkColorFilter.h"
 #include "SkShader.h"
 #include "SkGradientShader.h"
+#include "SkPerlinNoiseShader.h"
+#include "SkSize.h"
 #include "interop.hh"
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_Shader__1nMakeWithColorFilter
@@ -140,5 +143,29 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_Shader__1nMakeBlend(J
     SkShader* src = reinterpret_cast<SkShader*>(static_cast<uintptr_t>(srcPtr));
     SkBlendMode blendMode = static_cast<SkBlendMode>(blendModeInt);
     SkShader* ptr = SkShaders::Blend(blendMode, sk_ref_sp<SkShader>(dst), sk_ref_sp<SkShader>(src)).release();
+    return reinterpret_cast<jlong>(ptr);
+}
+
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_Shader__1nMakeFractalNoise
+  (JNIEnv* env, jclass jclass, jfloat baseFrequencyX, jfloat baseFrequencyY, jint numOctaves, jfloat seed, jintArray tilesArray) {
+    int len = env->GetArrayLength(tilesArray);
+    std::vector<SkISize> tiles(len / 2);
+    jint* arr = env->GetIntArrayElements(tilesArray, 0);
+    for (int i = 0; i < len; i += 2)
+        tiles[i / 2] = {arr[i], arr[i+1]};
+    env->ReleaseIntArrayElements(tilesArray, arr, 0);
+    SkShader* ptr = SkPerlinNoiseShader::MakeFractalNoise(baseFrequencyX, baseFrequencyY, numOctaves, seed, tiles.data()).release();
+    return reinterpret_cast<jlong>(ptr);
+}
+
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_Shader__1nMakeTurbulence
+  (JNIEnv* env, jclass jclass, jfloat baseFrequencyX, jfloat baseFrequencyY, jint numOctaves, jfloat seed, jintArray tilesArray) {
+    int len = env->GetArrayLength(tilesArray);
+    std::vector<SkISize> tiles(len / 2);
+    jint* arr = env->GetIntArrayElements(tilesArray, 0);
+    for (int i = 0; i < len; i += 2)
+        tiles[i / 2] = {arr[i], arr[i+1]};
+    env->ReleaseIntArrayElements(tilesArray, arr, 0);
+    SkShader* ptr = SkPerlinNoiseShader::MakeTurbulence(baseFrequencyX, baseFrequencyY, numOctaves, seed, tiles.data()).release();
     return reinterpret_cast<jlong>(ptr);
 }
