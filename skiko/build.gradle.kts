@@ -819,8 +819,13 @@ publishing {
     }
 }
 
-tasks.withType<KotlinCompile>().configureEach {
-    if (name == "compileTestKotlinJvm") {
-        kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+afterEvaluate {
+    tasks.withType<KotlinCompile>().configureEach {
+        if (name == "compileTestKotlinJvm") {
+            kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+        }
+        if (supportNative) {
+            dependsOn(tasks.getByName("nativeBridgesLink"))
+        }
     }
 }
