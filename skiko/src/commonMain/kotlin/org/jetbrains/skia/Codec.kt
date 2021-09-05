@@ -5,6 +5,7 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 
 class Codec internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR), IHasImageInfo {
@@ -39,17 +40,39 @@ class Codec internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR)
             }
         }
 
-        @JvmStatic external fun _nGetFinalizer(): Long
-        @JvmStatic external fun _nMakeFromData(dataPtr: Long): Long
-        @JvmStatic external fun _nGetImageInfo(ptr: Long): ImageInfo?
-        @JvmStatic external fun _nGetSize(ptr: Long): Long
-        @JvmStatic external fun _nGetEncodedOrigin(ptr: Long): Int
-        @JvmStatic external fun _nGetEncodedImageFormat(ptr: Long): Int
-        @JvmStatic external fun _nReadPixels(ptr: Long, bitmapPtr: Long, frame: Int, priorFrame: Int): Int
-        @JvmStatic external fun _nGetFrameCount(ptr: Long): Int
-        @JvmStatic external fun _nGetFrameInfo(ptr: Long, frame: Int): AnimationFrameInfo
-        @JvmStatic external fun _nGetFramesInfo(ptr: Long): Array<AnimationFrameInfo>
-        @JvmStatic external fun _nGetRepetitionCount(ptr: Long): Int
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetFinalizer")
+        external fun _nGetFinalizer(): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Codec__1nMakeFromData")
+        external fun _nMakeFromData(dataPtr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetImageInfo")
+        external fun _nGetImageInfo(ptr: Long): ImageInfo?
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetSize")
+        external fun _nGetSize(ptr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetEncodedOrigin")
+        external fun _nGetEncodedOrigin(ptr: Long): Int
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetEncodedImageFormat")
+        external fun _nGetEncodedImageFormat(ptr: Long): Int
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Codec__1nReadPixels")
+        external fun _nReadPixels(ptr: Long, bitmapPtr: Long, frame: Int, priorFrame: Int): Int
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetFrameCount")
+        external fun _nGetFrameCount(ptr: Long): Int
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetFrameInfo")
+        external fun _nGetFrameInfo(ptr: Long, frame: Int): AnimationFrameInfo
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetFramesInfo")
+        external fun _nGetFramesInfo(ptr: Long): Array<AnimationFrameInfo>
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetRepetitionCount")
+        external fun _nGetRepetitionCount(ptr: Long): Int
 
         init {
             staticLoad()

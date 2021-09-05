@@ -5,18 +5,35 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 
 class ColorSpace : Managed {
     companion object {
-        @JvmStatic external fun _nGetFinalizer(): Long
-        @JvmStatic external fun _nMakeSRGB(): Long
-        @JvmStatic external fun _nMakeDisplayP3(): Long
-        @JvmStatic external fun _nMakeSRGBLinear(): Long
-        @JvmStatic external fun _nConvert(fromPtr: Long, toPtr: Long, r: Float, g: Float, b: Float, a: Float): FloatArray
-        @JvmStatic external fun _nIsGammaCloseToSRGB(ptr: Long): Boolean
-        @JvmStatic external fun _nIsGammaLinear(ptr: Long): Boolean
-        @JvmStatic external fun _nIsSRGB(ptr: Long): Boolean
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nGetFinalizer")
+        external fun _nGetFinalizer(): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nMakeSRGB")
+        external fun _nMakeSRGB(): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nMakeDisplayP3")
+        external fun _nMakeDisplayP3(): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nMakeSRGBLinear")
+        external fun _nMakeSRGBLinear(): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nConvert")
+        external fun _nConvert(fromPtr: Long, toPtr: Long, r: Float, g: Float, b: Float, a: Float): FloatArray
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nIsGammaCloseToSRGB")
+        external fun _nIsGammaCloseToSRGB(ptr: Long): Boolean
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nIsGammaLinear")
+        external fun _nIsGammaLinear(ptr: Long): Boolean
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nIsSRGB")
+        external fun _nIsSRGB(ptr: Long): Boolean
 
         init {
             staticLoad()

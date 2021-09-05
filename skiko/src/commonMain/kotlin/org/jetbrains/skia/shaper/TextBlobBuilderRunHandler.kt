@@ -6,6 +6,7 @@ import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 
 class TextBlobBuilderRunHandler<T> internal constructor(
@@ -17,9 +18,15 @@ class TextBlobBuilderRunHandler<T> internal constructor(
     _nMake(getPtr(text), offsetX, offsetY), _FinalizerHolder.PTR
 ), RunHandler {
     companion object {
-        @JvmStatic external fun _nGetFinalizer(): Long
-        @JvmStatic external fun _nMake(textPtr: Long, offsetX: Float, offsetY: Float): Long
-        @JvmStatic external fun _nMakeBlob(ptr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilderRunHandler__1nGetFinalizer")
+        external fun _nGetFinalizer(): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilderRunHandler__1nMake")
+        external fun _nMake(textPtr: Long, offsetX: Float, offsetY: Float): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilderRunHandler__1nMakeBlob")
+        external fun _nMakeBlob(ptr: Long): Long
 
         init {
             staticLoad()

@@ -5,6 +5,7 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 
 class Shader internal constructor(ptr: Long) : RefCnt(ptr) {
@@ -484,8 +485,12 @@ class Shader internal constructor(ptr: Long) : RefCnt(ptr) {
             }
         }
 
-        @JvmStatic external fun _nMakeWithColorFilter(ptr: Long, colorFilterPtr: Long): Long
-        @JvmStatic external fun _nMakeLinearGradient(
+        @JvmStatic 
+        @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeWithColorFilter")
+        external fun _nMakeWithColorFilter(ptr: Long, colorFilterPtr: Long): Long
+        @JvmStatic 
+        @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeLinearGradient")
+        external fun _nMakeLinearGradient(
             x0: Float,
             y0: Float,
             x1: Float,
@@ -497,7 +502,9 @@ class Shader internal constructor(ptr: Long) : RefCnt(ptr) {
             matrix: FloatArray?
         ): Long
 
-        @JvmStatic external fun _nMakeLinearGradientCS(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeLinearGradientCS")
+        external fun _nMakeLinearGradientCS(
             x0: Float,
             y0: Float,
             x1: Float,
@@ -510,7 +517,9 @@ class Shader internal constructor(ptr: Long) : RefCnt(ptr) {
             matrix: FloatArray?
         ): Long
 
-        @JvmStatic external fun _nMakeRadialGradient(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeRadialGradient")
+        external fun _nMakeRadialGradient(
             x: Float,
             y: Float,
             r: Float,
@@ -521,7 +530,9 @@ class Shader internal constructor(ptr: Long) : RefCnt(ptr) {
             matrix: FloatArray?
         ): Long
 
-        @JvmStatic external fun _nMakeRadialGradientCS(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeRadialGradientCS")
+        external fun _nMakeRadialGradientCS(
             x: Float,
             y: Float,
             r: Float,
@@ -533,7 +544,9 @@ class Shader internal constructor(ptr: Long) : RefCnt(ptr) {
             matrix: FloatArray?
         ): Long
 
-        @JvmStatic external fun _nMakeTwoPointConicalGradient(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeTwoPointConicalGradient")
+        external fun _nMakeTwoPointConicalGradient(
             x0: Float,
             y0: Float,
             r0: Float,
@@ -547,7 +560,9 @@ class Shader internal constructor(ptr: Long) : RefCnt(ptr) {
             matrix: FloatArray?
         ): Long
 
-        @JvmStatic external fun _nMakeTwoPointConicalGradientCS(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeTwoPointConicalGradientCS")
+        external fun _nMakeTwoPointConicalGradientCS(
             x0: Float,
             y0: Float,
             r0: Float,
@@ -562,7 +577,9 @@ class Shader internal constructor(ptr: Long) : RefCnt(ptr) {
             matrix: FloatArray?
         ): Long
 
-        @JvmStatic external fun _nMakeSweepGradient(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeSweepGradient")
+        external fun _nMakeSweepGradient(
             x: Float,
             y: Float,
             startAngle: Float,
@@ -574,7 +591,9 @@ class Shader internal constructor(ptr: Long) : RefCnt(ptr) {
             matrix: FloatArray?
         ): Long
 
-        @JvmStatic external fun _nMakeSweepGradientCS(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeSweepGradientCS")
+        external fun _nMakeSweepGradientCS(
             x: Float,
             y: Float,
             startAngle: Float,
@@ -587,7 +606,9 @@ class Shader internal constructor(ptr: Long) : RefCnt(ptr) {
             matrix: FloatArray?
         ): Long
 
-        @JvmStatic external fun _nMakeFractalNoise(
+        @JvmStatic 
+        @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeFractalNoise")
+        external fun _nMakeFractalNoise(
             baseFrequencyX: Float,
             baseFrequencyY: Float,
             numOctaves: Int,
@@ -595,7 +616,9 @@ class Shader internal constructor(ptr: Long) : RefCnt(ptr) {
             tiles: IntArray?
         ): Long
 
-        @JvmStatic external fun _nMakeTurbulence(
+        @JvmStatic 
+        @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeTurbulence")
+        external fun _nMakeTurbulence(
             baseFrequencyX: Float,
             baseFrequencyY: Float,
             numOctaves: Int,
@@ -603,10 +626,18 @@ class Shader internal constructor(ptr: Long) : RefCnt(ptr) {
             tiles: IntArray?
         ): Long
 
-        @JvmStatic external fun _nMakeEmpty(): Long
-        @JvmStatic external fun _nMakeColor(color: Int): Long
-        @JvmStatic external fun _nMakeColorCS(r: Float, g: Float, b: Float, a: Float, colorSpacePtr: Long): Long
-        @JvmStatic external fun _nMakeBlend(blendMode: Int, dst: Long, src: Long): Long
+        @JvmStatic 
+        @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeEmpty")
+        external fun _nMakeEmpty(): Long
+        @JvmStatic 
+        @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeColor")
+        external fun _nMakeColor(color: Int): Long
+        @JvmStatic 
+        @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeColorCS")
+        external fun _nMakeColorCS(r: Float, g: Float, b: Float, a: Float, colorSpacePtr: Long): Long
+        @JvmStatic 
+        @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeBlend")
+        external fun _nMakeBlend(blendMode: Int, dst: Long, src: Long): Long
 
         init {
             staticLoad()

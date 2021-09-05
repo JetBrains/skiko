@@ -3,12 +3,17 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 
 class OutputWStream(out: OutputStream?) : WStream(_nMake(out), _FinalizerHolder.PTR) {
     companion object {
-        @JvmStatic external fun _nGetFinalizer(): Long
-        @JvmStatic external fun _nMake(out: OutputStream?): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_OutputWStream__1nGetFinalizer")
+        external fun _nGetFinalizer(): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_OutputWStream__1nMake")
+        external fun _nMake(out: OutputStream?): Long
 
         init {
             staticLoad()

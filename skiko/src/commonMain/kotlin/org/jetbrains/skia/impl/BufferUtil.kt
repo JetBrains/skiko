@@ -2,6 +2,7 @@
 package org.jetbrains.skia.impl
 
 import org.jetbrains.skia.ByteBuffer
+import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 
 object BufferUtil {
@@ -16,6 +17,10 @@ object BufferUtil {
         return result
     }
 
-    @JvmStatic external fun _nGetByteBufferFromPointer(ptr: Long, size: Int): ByteBuffer?
-    @JvmStatic external fun _nGetPointerFromByteBuffer(buffer: ByteBuffer?): Long
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_BufferUtil__1nGetByteBufferFromPointer")
+    external fun _nGetByteBufferFromPointer(ptr: Long, size: Int): ByteBuffer?
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_BufferUtil__1nGetPointerFromByteBuffer")
+    external fun _nGetPointerFromByteBuffer(buffer: ByteBuffer?): Long
 }

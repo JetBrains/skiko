@@ -5,17 +5,32 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 
 class ParagraphCache internal constructor(owner: FontCollection, ptr: Long) : Native(ptr) {
     companion object {
-        @JvmStatic external fun _nAbandon(ptr: Long)
-        @JvmStatic external fun _nReset(ptr: Long)
-        @JvmStatic external fun _nUpdateParagraph(ptr: Long, paragraphPtr: Long): Boolean
-        @JvmStatic external fun _nFindParagraph(ptr: Long, paragraphPtr: Long): Boolean
-        @JvmStatic external fun _nPrintStatistics(ptr: Long)
-        @JvmStatic external fun _nSetEnabled(ptr: Long, value: Boolean)
-        @JvmStatic external fun _nGetCount(ptr: Long): Int
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ParagraphCache__1nAbandon")
+        external fun _nAbandon(ptr: Long)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ParagraphCache__1nReset")
+        external fun _nReset(ptr: Long)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ParagraphCache__1nUpdateParagraph")
+        external fun _nUpdateParagraph(ptr: Long, paragraphPtr: Long): Boolean
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ParagraphCache__1nFindParagraph")
+        external fun _nFindParagraph(ptr: Long, paragraphPtr: Long): Boolean
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ParagraphCache__1nPrintStatistics")
+        external fun _nPrintStatistics(ptr: Long)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ParagraphCache__1nSetEnabled")
+        external fun _nSetEnabled(ptr: Long, value: Boolean)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ParagraphCache__1nGetCount")
+        external fun _nGetCount(ptr: Long): Int
 
         init {
             staticLoad()

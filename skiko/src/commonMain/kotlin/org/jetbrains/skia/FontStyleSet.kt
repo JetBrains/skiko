@@ -5,6 +5,7 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 
 class FontStyleSet internal constructor(ptr: Long) : RefCnt(ptr) {
@@ -14,12 +15,24 @@ class FontStyleSet internal constructor(ptr: Long) : RefCnt(ptr) {
             return FontStyleSet(_nMakeEmpty())
         }
 
-        @JvmStatic external fun _nMakeEmpty(): Long
-        @JvmStatic external fun _nCount(ptr: Long): Int
-        @JvmStatic external fun _nGetStyle(ptr: Long, index: Int): Int
-        @JvmStatic external fun _nGetStyleName(ptr: Long, index: Int): String
-        @JvmStatic external fun _nGetTypeface(ptr: Long, index: Int): Long
-        @JvmStatic external fun _nMatchStyle(ptr: Long, style: Int): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nMakeEmpty")
+        external fun _nMakeEmpty(): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nCount")
+        external fun _nCount(ptr: Long): Int
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nGetStyle")
+        external fun _nGetStyle(ptr: Long, index: Int): Int
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nGetStyleName")
+        external fun _nGetStyleName(ptr: Long, index: Int): String
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nGetTypeface")
+        external fun _nGetTypeface(ptr: Long, index: Int): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nMatchStyle")
+        external fun _nMatchStyle(ptr: Long, style: Int): Long
 
         init {
             staticLoad()

@@ -5,6 +5,7 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 
 /**
@@ -12,9 +13,15 @@ import kotlin.jvm.JvmStatic
  */
 class U16String internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
-        @JvmStatic external fun _nMake(s: String?): Long
-        @JvmStatic external fun _nGetFinalizer(): Long
-        @JvmStatic external fun _nToString(ptr: Long): String
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_U16String__1nMake")
+        external fun _nMake(s: String?): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_U16String__1nGetFinalizer")
+        external fun _nGetFinalizer(): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_U16String__1nToString")
+        external fun _nToString(ptr: Long): String
 
         init {
             staticLoad()

@@ -6,22 +6,47 @@ import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 
 class FontCollection internal constructor(ptr: Long) : RefCnt(ptr) {
     companion object {
-        @JvmStatic external fun _nMake(): Long
-        @JvmStatic external fun _nGetFontManagersCount(ptr: Long): Long
-        @JvmStatic external fun _nSetAssetFontManager(ptr: Long, fontManagerPtr: Long): Long
-        @JvmStatic external fun _nSetDynamicFontManager(ptr: Long, fontManagerPtr: Long): Long
-        @JvmStatic external fun _nSetTestFontManager(ptr: Long, fontManagerPtr: Long): Long
-        @JvmStatic external fun _nSetDefaultFontManager(ptr: Long, fontManagerPtr: Long, defaultFamilyName: String?): Long
-        @JvmStatic external fun _nGetFallbackManager(ptr: Long): Long
-        @JvmStatic external fun _nFindTypefaces(ptr: Long, familyNames: Array<String?>?, fontStyle: Int): LongArray
-        @JvmStatic external fun _nDefaultFallbackChar(ptr: Long, unicode: Int, fontStyle: Int, locale: String?): Long
-        @JvmStatic external fun _nDefaultFallback(ptr: Long): Long
-        @JvmStatic external fun _nSetEnableFallback(ptr: Long, value: Boolean): Long
-        @JvmStatic external fun _nGetParagraphCache(ptr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_FontCollection__1nMake")
+        external fun _nMake(): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_FontCollection__1nGetFontManagersCount")
+        external fun _nGetFontManagersCount(ptr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_FontCollection__1nSetAssetFontManager")
+        external fun _nSetAssetFontManager(ptr: Long, fontManagerPtr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_FontCollection__1nSetDynamicFontManager")
+        external fun _nSetDynamicFontManager(ptr: Long, fontManagerPtr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_FontCollection__1nSetTestFontManager")
+        external fun _nSetTestFontManager(ptr: Long, fontManagerPtr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_FontCollection__1nSetDefaultFontManager")
+        external fun _nSetDefaultFontManager(ptr: Long, fontManagerPtr: Long, defaultFamilyName: String?): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_FontCollection__1nGetFallbackManager")
+        external fun _nGetFallbackManager(ptr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_FontCollection__1nFindTypefaces")
+        external fun _nFindTypefaces(ptr: Long, familyNames: Array<String?>?, fontStyle: Int): LongArray
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_FontCollection__1nDefaultFallbackChar")
+        external fun _nDefaultFallbackChar(ptr: Long, unicode: Int, fontStyle: Int, locale: String?): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_FontCollection__1nDefaultFallback")
+        external fun _nDefaultFallback(ptr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_FontCollection__1nSetEnableFallback")
+        external fun _nSetEnableFallback(ptr: Long, value: Boolean): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_FontCollection__1nGetParagraphCache")
+        external fun _nGetParagraphCache(ptr: Long): Long
 
         init {
             staticLoad()

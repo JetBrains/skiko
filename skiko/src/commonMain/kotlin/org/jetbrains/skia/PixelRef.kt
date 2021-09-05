@@ -5,17 +5,32 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 
 class PixelRef internal constructor(ptr: Long) : RefCnt(ptr) {
     companion object {
-        @JvmStatic external fun _nGetWidth(ptr: Long): Int
-        @JvmStatic external fun _nGetHeight(ptr: Long): Int
-        @JvmStatic external fun _nGetRowBytes(ptr: Long): Long
-        @JvmStatic external fun _nGetGenerationId(ptr: Long): Int
-        @JvmStatic external fun _nNotifyPixelsChanged(ptr: Long)
-        @JvmStatic external fun _nIsImmutable(ptr: Long): Boolean
-        @JvmStatic external fun _nSetImmutable(ptr: Long)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_PixelRef__1nGetWidth")
+        external fun _nGetWidth(ptr: Long): Int
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_PixelRef__1nGetHeight")
+        external fun _nGetHeight(ptr: Long): Int
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_PixelRef__1nGetRowBytes")
+        external fun _nGetRowBytes(ptr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_PixelRef__1nGetGenerationId")
+        external fun _nGetGenerationId(ptr: Long): Int
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_PixelRef__1nNotifyPixelsChanged")
+        external fun _nNotifyPixelsChanged(ptr: Long)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_PixelRef__1nIsImmutable")
+        external fun _nIsImmutable(ptr: Long): Boolean
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_PixelRef__1nSetImmutable")
+        external fun _nSetImmutable(ptr: Long)
 
         init {
             staticLoad()

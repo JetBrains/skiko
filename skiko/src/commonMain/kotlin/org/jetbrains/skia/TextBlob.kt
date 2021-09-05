@@ -5,6 +5,7 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 
 class TextBlob internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
@@ -93,22 +94,54 @@ class TextBlob internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.P
             }
         }
 
-        @JvmStatic external fun _nGetFinalizer(): Long
-        @JvmStatic external fun _nBounds(ptr: Long): Rect
-        @JvmStatic external fun _nGetUniqueId(ptr: Long): Int
-        @JvmStatic external fun _nGetIntercepts(ptr: Long, lower: Float, upper: Float, paintPtr: Long): FloatArray?
-        @JvmStatic external fun _nMakeFromPosH(glyphs: ShortArray?, xpos: FloatArray?, ypos: Float, fontPtr: Long): Long
-        @JvmStatic external fun _nMakeFromPos(glyphs: ShortArray?, pos: FloatArray?, fontPtr: Long): Long
-        @JvmStatic external fun _nMakeFromRSXform(glyphs: ShortArray?, xform: FloatArray?, fontPtr: Long): Long
-        @JvmStatic external fun _nSerializeToData(ptr: Long /*, SkSerialProcs */): Long
-        @JvmStatic external fun _nMakeFromData(dataPtr: Long /*, SkDeserialProcs */): Long
-        @JvmStatic external fun _nGetGlyphs(ptr: Long): ShortArray
-        @JvmStatic external fun _nGetPositions(ptr: Long): FloatArray
-        @JvmStatic external fun _nGetClusters(ptr: Long): IntArray
-        @JvmStatic external fun _nGetTightBounds(ptr: Long): Rect
-        @JvmStatic external fun _nGetBlockBounds(ptr: Long): Rect
-        @JvmStatic external fun _nGetFirstBaseline(ptr: Long): Float
-        @JvmStatic external fun _nGetLastBaseline(ptr: Long): Float
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetFinalizer")
+        external fun _nGetFinalizer(): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nBounds")
+        external fun _nBounds(ptr: Long): Rect
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetUniqueId")
+        external fun _nGetUniqueId(ptr: Long): Int
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetIntercepts")
+        external fun _nGetIntercepts(ptr: Long, lower: Float, upper: Float, paintPtr: Long): FloatArray?
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromPosH")
+        external fun _nMakeFromPosH(glyphs: ShortArray?, xpos: FloatArray?, ypos: Float, fontPtr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromPos")
+        external fun _nMakeFromPos(glyphs: ShortArray?, pos: FloatArray?, fontPtr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromRSXform")
+        external fun _nMakeFromRSXform(glyphs: ShortArray?, xform: FloatArray?, fontPtr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nSerializeToData")
+        external fun _nSerializeToData(ptr: Long /*, SkSerialProcs */): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromData")
+        external fun _nMakeFromData(dataPtr: Long /*, SkDeserialProcs */): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetGlyphs")
+        external fun _nGetGlyphs(ptr: Long): ShortArray
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetPositions")
+        external fun _nGetPositions(ptr: Long): FloatArray
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetClusters")
+        external fun _nGetClusters(ptr: Long): IntArray
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetTightBounds")
+        external fun _nGetTightBounds(ptr: Long): Rect
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetBlockBounds")
+        external fun _nGetBlockBounds(ptr: Long): Rect
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetFirstBaseline")
+        external fun _nGetFirstBaseline(ptr: Long): Float
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetLastBaseline")
+        external fun _nGetLastBaseline(ptr: Long): Float
 
         init {
             staticLoad()

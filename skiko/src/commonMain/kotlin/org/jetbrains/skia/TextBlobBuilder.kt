@@ -5,15 +5,26 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 
 class TextBlobBuilder internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
-        @JvmStatic external fun _nGetFinalizer(): Long
-        @JvmStatic external fun _nMake(): Long
-        @JvmStatic external fun _nBuild(ptr: Long): Long
-        @JvmStatic external fun _nAppendRun(ptr: Long, fontPtr: Long, glyphs: ShortArray?, x: Float, y: Float, bounds: Rect?)
-        @JvmStatic external fun _nAppendRunPosH(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nGetFinalizer")
+        external fun _nGetFinalizer(): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nMake")
+        external fun _nMake(): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nBuild")
+        external fun _nBuild(ptr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nAppendRun")
+        external fun _nAppendRun(ptr: Long, fontPtr: Long, glyphs: ShortArray?, x: Float, y: Float, bounds: Rect?)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nAppendRunPosH")
+        external fun _nAppendRunPosH(
             ptr: Long,
             fontPtr: Long,
             glyphs: ShortArray?,
@@ -22,8 +33,12 @@ class TextBlobBuilder internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
             bounds: Rect?
         )
 
-        @JvmStatic external fun _nAppendRunPos(ptr: Long, fontPtr: Long, glyphs: ShortArray?, pos: FloatArray?, bounds: Rect?)
-        @JvmStatic external fun _nAppendRunRSXform(ptr: Long, fontPtr: Long, glyphs: ShortArray?, xform: FloatArray?)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nAppendRunPos")
+        external fun _nAppendRunPos(ptr: Long, fontPtr: Long, glyphs: ShortArray?, pos: FloatArray?, bounds: Rect?)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nAppendRunRSXform")
+        external fun _nAppendRunRSXform(ptr: Long, fontPtr: Long, glyphs: ShortArray?, xform: FloatArray?)
 
         init {
             staticLoad()
