@@ -9,10 +9,7 @@ package org.jetbrains.skia
  * It encodes how pixel bits describe alpha, transparency; color components red, blue,
  * and green; and ColorSpace, the range and linearity of colors.
  */
-class ColorInfo(colorType: ColorType, alphaType: ColorAlphaType, colorSpace: ColorSpace?) {
-    val colorType: ColorType
-    val alphaType: ColorAlphaType
-    val colorSpace: ColorSpace?
+class ColorInfo(val colorType: ColorType, val alphaType: ColorAlphaType, val colorSpace: ColorSpace?) {
     val isOpaque: Boolean
         get() = alphaType == ColorAlphaType.OPAQUE || colorType.isAlwaysOpaque
 
@@ -40,10 +37,9 @@ class ColorInfo(colorType: ColorType, alphaType: ColorAlphaType, colorSpace: Col
     val isGammaCloseToSRGB: Boolean
         get() = colorSpace != null && colorSpace.isGammaCloseToSRGB
 
-    override fun equals(o: Any?): Boolean {
-        if (o === this) return true
-        if (o !is ColorInfo) return false
-        val other = o
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is ColorInfo) return false
         if (!other.canEqual(this as Any)) return false
         val `this$_colorType`: Any = colorType
         val `other$_colorType`: Any = other.colorType
@@ -77,16 +73,10 @@ class ColorInfo(colorType: ColorType, alphaType: ColorAlphaType, colorSpace: Col
     }
 
     fun withColorType(_colorType: ColorType): ColorInfo {
-        if (_colorType == null) {
-            throw NullPointerException("_colorType is marked non-null but is null")
-        }
         return if (colorType == _colorType) this else ColorInfo(_colorType, alphaType, colorSpace)
     }
 
     fun withAlphaType(_alphaType: ColorAlphaType): ColorInfo {
-        if (_alphaType == null) {
-            throw NullPointerException("_alphaType is marked non-null but is null")
-        }
         return if (alphaType == _alphaType) this else ColorInfo(colorType, _alphaType, colorSpace)
     }
 
@@ -100,11 +90,5 @@ class ColorInfo(colorType: ColorType, alphaType: ColorAlphaType, colorSpace: Col
          * and no ColorSpace.
          */
         val DEFAULT = ColorInfo(ColorType.UNKNOWN, ColorAlphaType.UNKNOWN, null)
-    }
-
-    init {
-        this.colorType = colorType
-        this.alphaType = alphaType
-        this.colorSpace = colorSpace
     }
 }
