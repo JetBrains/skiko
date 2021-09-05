@@ -277,6 +277,7 @@ tasks.withType(CppCompile::class.java).configureEach {
                     "-fvisibility-inlines-hidden",
                     "-I$jdkHome/include/linux",
                     "-I$includeDir",
+                    "-I$commonIncludeDir",
                     "-DSK_BUILD_FOR_LINUX",
                     "-D_GLIBCXX_USE_CXX11_ABI=0",
                     *buildType.clangFlags
@@ -288,6 +289,7 @@ tasks.withType(CppCompile::class.java).configureEach {
                 listOf(
                     "-I$jdkHome/include/win32",
                     "-I$includeDir",
+                    "-I$commonIncludeDir",
                     "-DSK_BUILD_FOR_WIN",
                     "-D_CRT_SECURE_NO_WARNINGS",
                     "-D_HAS_EXCEPTIONS=0",
