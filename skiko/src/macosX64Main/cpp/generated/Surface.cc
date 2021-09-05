@@ -109,18 +109,13 @@ extern "C" jlong org_jetbrains_skia_Surface__1nMakeRasterN32Premul
 
 extern "C" jlong org_jetbrains_skia_Surface__1nMakeFromBackendRenderTarget
   (kref __Kinstance, jlong pContext, jlong pBackendRenderTarget, jint surfaceOrigin, jint colorType, jlong colorSpacePtr, jobject surfacePropsObj) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Surface__1nMakeFromBackendRenderTarget");
-}
-     
-#if 0 
-extern "C" jlong org_jetbrains_skia_Surface__1nMakeFromBackendRenderTarget
-  (kref __Kinstance, jlong pContext, jlong pBackendRenderTarget, jint surfaceOrigin, jint colorType, jlong colorSpacePtr, jobject surfacePropsObj) {
     GrDirectContext* context = reinterpret_cast<GrDirectContext*>(static_cast<uintptr_t>(pContext));
     GrBackendRenderTarget* backendRenderTarget = reinterpret_cast<GrBackendRenderTarget*>(static_cast<uintptr_t>(pBackendRenderTarget));
     GrSurfaceOrigin grSurfaceOrigin = static_cast<GrSurfaceOrigin>(surfaceOrigin);
     SkColorType skColorType = static_cast<SkColorType>(colorType);
     sk_sp<SkColorSpace> colorSpace = sk_ref_sp<SkColorSpace>(reinterpret_cast<SkColorSpace*>(static_cast<uintptr_t>(colorSpacePtr)));
-    std::unique_ptr<SkSurfaceProps> surfaceProps = skija::SurfaceProps::toSkSurfaceProps(env, surfacePropsObj);
+
+    // std::unique_ptr<SkSurfaceProps> surfaceProps = skija::SurfaceProps::toSkSurfaceProps(env, surfacePropsObj);
 
     sk_sp<SkSurface> surface = SkSurface::MakeFromBackendRenderTarget(
         static_cast<GrRecordingContext*>(context),
@@ -128,13 +123,14 @@ extern "C" jlong org_jetbrains_skia_Surface__1nMakeFromBackendRenderTarget
         grSurfaceOrigin,
         skColorType,
         colorSpace,
-        surfaceProps.get(),
+        // "TODO: we silently ignore the surfacePropsObj arg for now.
+        // surfaceProps,
+        nullptr,
         /* RenderTargetReleaseProc */ nullptr,
         /* ReleaseContext */ nullptr
     );
     return reinterpret_cast<jlong>(surface.release());
 }
-#endif
 
 
 
