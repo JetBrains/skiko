@@ -216,3 +216,39 @@ extern "C" jlong org_jetbrains_skia_Shader__1nMakeBlend(kref __Kinstance, jint b
     SkShader* ptr = SkShaders::Blend(blendMode, sk_ref_sp<SkShader>(dst), sk_ref_sp<SkShader>(src)).release();
     return reinterpret_cast<jlong>(ptr);
 }
+
+extern "C" jlong org_jetbrains_skia_Shader__1nMakeFractalNoise
+  (jfloat baseFrequencyX, jfloat baseFrequencyY, jint numOctaves, jfloat seed, jintArray tilesArray) {
+    throw std::runtime_error("TODO: implement org_jetbrains_skia_Shader__1nMakeFractalNoise");
+}
+#if 0
+extern "C" jlong org_jetbrains_skia_Shader__1nMakeFractalNoise
+  (jfloat baseFrequencyX, jfloat baseFrequencyY, jint numOctaves, jfloat seed, jintArray tilesArray) {
+    int len = env->GetArrayLength(tilesArray);
+    std::vector<SkISize> tiles(len / 2);
+    jint* arr = env->GetIntArrayElements(tilesArray, 0);
+    for (int i = 0; i < len; i += 2)
+        tiles[i / 2] = {arr[i], arr[i+1]};
+    env->ReleaseIntArrayElements(tilesArray, arr, 0);
+    SkShader* ptr = SkPerlinNoiseShader::MakeFractalNoise(baseFrequencyX, baseFrequencyY, numOctaves, seed, tiles.data()).release();
+    return reinterpret_cast<jlong>(ptr);
+}
+#endif
+
+extern "C" jlong org_jetbrains_skia_Shader__1nMakeTurbulence
+  (jfloat baseFrequencyX, jfloat baseFrequencyY, jint numOctaves, jfloat seed, jintArray tilesArray) {
+    throw std::runtime_error("TODO: implement org_jetbrains_skia_Shader__1nMakeTurbulence");
+}
+#if 0
+extern "C" jlong org_jetbrains_skia_Shader__1nMakeTurbulence
+  (JNIEnv* env, jclass jclass, jfloat baseFrequencyX, jfloat baseFrequencyY, jint numOctaves, jfloat seed, jintArray tilesArray) {
+    int len = env->GetArrayLength(tilesArray);
+    std::vector<SkISize> tiles(len / 2);
+    jint* arr = env->GetIntArrayElements(tilesArray, 0);
+    for (int i = 0; i < len; i += 2)
+        tiles[i / 2] = {arr[i], arr[i+1]};
+    env->ReleaseIntArrayElements(tilesArray, arr, 0);
+    SkShader* ptr = SkPerlinNoiseShader::MakeTurbulence(baseFrequencyX, baseFrequencyY, numOctaves, seed, tiles.data()).release();
+    return reinterpret_cast<jlong>(ptr);
+}
+#endif
