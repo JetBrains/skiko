@@ -1,6 +1,7 @@
 @file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Stats
@@ -73,7 +74,19 @@ class ColorFilter : RefCnt {
             require(r == null || r.size == 256) { "Expected 256 elements in r[], got " + r!!.size }
             require(g == null || g.size == 256) { "Expected 256 elements in g[], got " + g!!.size }
             require(b == null || b.size == 256) { "Expected 256 elements in b[], got " + b!!.size }
-            return ColorFilter(_nMakeTableARGB(a, r, g, b))
+            val aHandle = makeInteropHandle(a)
+            val rHandle = makeInteropHandle(r)
+            val gHandle = makeInteropHandle(g)
+            val bHandle = makeInteropHandle(b)
+
+            return try {
+                ColorFilter(_nMakeTableARGB(aHandle?.asInterop(), rHandle?.asInterop(), gHandle?.asInterop(), bHandle?.asInterop()))
+            } finally {
+                releaseInteropHandle(aHandle)
+                releaseInteropHandle(rHandle)
+                releaseInteropHandle(gHandle)
+                releaseInteropHandle(bHandle)
+            }
         }
 
         fun makeOverdraw(colors: IntArray): ColorFilter {
@@ -113,7 +126,7 @@ class ColorFilter : RefCnt {
         external fun _nMakeTable(table: ByteArray?): Long
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeTableARGB")
-        external fun _nMakeTableARGB(a: ByteArray?, r: ByteArray?, g: ByteArray?, b: ByteArray?): Long
+        external fun _nMakeTableARGB(a: InteropPointer?, r: InteropPointer?, g: InteropPointer?, b: InteropPointer?): NativePointer?
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeOverdraw")
         external fun _nMakeOverdraw(c0: Int, c1: Int, c2: Int, c3: Int, c4: Int, c5: Int): Long
@@ -130,6 +143,8 @@ class ColorFilter : RefCnt {
     }
 
     internal constructor(ptr: Long) : super(ptr)
+
+    internal constructor(ptr: NativePointer?) : super(0) { TODO() }
 
     internal constructor(ptr: Long, allowClose: Boolean) : super(ptr, allowClose)
 }

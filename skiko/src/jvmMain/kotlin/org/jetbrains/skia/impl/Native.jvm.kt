@@ -45,3 +45,35 @@ actual abstract class Native actual constructor(ptr: Long) {
 actual fun reachabilityBarrier(obj: Any?) {
     Reference.reachabilityFence(obj)
 }
+
+actual typealias InteropHandle = Any
+
+actual typealias NativePointer = Long
+actual typealias InteropPointer = Any
+
+actual abstract class Native2 actual constructor(ptr: NativePointer) {
+    actual var _ptr: NativePointer
+
+    actual open fun _nativeEquals(other: Native2?): Boolean = this._ptr == other?._ptr
+
+    actual companion object {
+        actual fun getPtr(n: Native2?): NativePointer {
+            return n?._ptr ?: 0L
+        }
+    }
+
+    init {
+        if (ptr == 0L) throw RuntimeException("Can't wrap nullptr")
+        _ptr = ptr
+    }
+}
+
+actual fun InteropHandle.asInterop(): InteropPointer = this
+
+internal actual inline fun makeInteropHandle(obj: Any?): InteropHandle? {
+    return obj
+}
+
+internal actual inline fun releaseInteropHandle(handle: InteropHandle?) {
+    Reference.reachabilityFence(handle)
+}
