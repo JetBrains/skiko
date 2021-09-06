@@ -1,11 +1,11 @@
 import org.gradle.api.Project
 import java.io.File
 
-enum class OS(val id: String) {
-    Linux("linux"),
-    Windows("windows"),
-    MacOS("macos"),
-    Wasm("wasm")
+enum class OS(val id: String, val clangFlags: Array<String>) {
+    Linux("linux", arrayOf()),
+    Windows("windows", arrayOf()),
+    MacOS("macos", arrayOf("-mmacosx-version-min=10.13")),
+    Wasm("wasm", arrayOf())
     ;
 
     val isWindows

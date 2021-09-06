@@ -138,10 +138,7 @@ kotlin {
                             "-include-binary",
                             "$skiaDir/$skiaBinSubdir/libskshaper.a",
                             "-include-binary",
-                            "$skiaDir/$skiaBinSubdir/libskparagraph.a"
-                        )
-
-                        freeCompilerArgs += listOf(
+                            "$skiaDir/$skiaBinSubdir/libskparagraph.a",
                             "-include-binary",
                             "$buildDir/nativeBridges/static/$targetString/skiko-native-bridges-$targetString.a"
                         )
@@ -187,7 +184,6 @@ kotlin {
 
         if (supportNative) {
             val macosX64Main by getting {
-                dependsOn(commonMain)
             }
         }
     }
@@ -324,7 +320,7 @@ project.tasks.register<Exec>("objcCompile") {
     commandLine = listOf(
         "clang",
         *targetArch.clangFlags,
-        "-mmacosx-version-min=10.13",
+        *targetOs.clangFlags,
         "-I$jdkHome/include",
         "-I$jdkHome/include/darwin",
         "-I$skiaDir",
@@ -398,7 +394,7 @@ project.tasks.register<Exec>("nativeBridgesCompile") {
     commandLine = listOf(
         "clang++",
         *targetArch.clangFlags,
-        "-mmacosx-version-min=10.13",
+        *targetOs.clangFlags,
         "-std=c++17",
         "-c",
         "-DPROVIDE_JNI_TYPES",

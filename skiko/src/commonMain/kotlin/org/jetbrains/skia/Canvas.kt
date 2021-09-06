@@ -1338,13 +1338,11 @@ open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val
     }
 
     fun translate(dx: Float, dy: Float): Canvas {
-        val matrix = Matrix33.makeTranslate(dx, dy)
-        return concat(matrix)
+        return concat(Matrix33.makeTranslate(dx, dy))
     }
 
     fun scale(sx: Float, sy: Float): Canvas {
-        val matrix = Matrix33.makeScale(sx, sy)
-        return concat(matrix)
+        return concat(Matrix33.makeScale(sx, sy))
     }
 
     /**
