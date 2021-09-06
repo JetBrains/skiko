@@ -1,9 +1,10 @@
 package org.jetbrains.skia.svg
 
 import org.jetbrains.skia.*
-import java.lang.IllegalArgumentException
+import kotlin.math.hypot
+import kotlin.math.sqrt
 
-class SVGLengthContext @JvmOverloads constructor(
+class SVGLengthContext constructor(
     internal val width: Float,
     internal val height: Float,
     internal val dpi: Float = 90f
@@ -20,10 +21,10 @@ class SVGLengthContext @JvmOverloads constructor(
                     SVGLengthType.HORIZONTAL -> return length.value * width / 100.0f
                     SVGLengthType.VERTICAL -> return length.value * height / 100.0f
                     SVGLengthType.OTHER ->                 // https://www.w3.org/TR/SVG11/coords.html#Units_viewport_percentage
-                        return (length.value * Math.hypot(
+                        return (length.value * hypot(
                             width.toDouble(),
                             height.toDouble()
-                        ) / Math.sqrt(2.0) / 100.0).toFloat()
+                        ) / sqrt(2.0) / 100.0).toFloat()
                 }
             }
             SVGLengthUnit.CM -> length.value * dpi / 2.54f
@@ -49,9 +50,9 @@ class SVGLengthContext @JvmOverloads constructor(
         if (o !is SVGLengthContext) return false
         val other = o
         if (!other.canEqual(this as Any)) return false
-        if (java.lang.Float.compare(width, other.width) != 0) return false
-        if (java.lang.Float.compare(height, other.height) != 0) return false
-        return if (java.lang.Float.compare(dpi, other.dpi) != 0) false else true
+        if (width.compareTo(other.width) != 0) return false
+        if (height.compareTo(other.height) != 0) return false
+        return dpi.compareTo(other.dpi) == 0
     }
 
     protected fun canEqual(other: Any?): Boolean {
@@ -61,14 +62,14 @@ class SVGLengthContext @JvmOverloads constructor(
     override fun hashCode(): Int {
         val PRIME = 59
         var result = 1
-        result = result * PRIME + java.lang.Float.floatToIntBits(width)
-        result = result * PRIME + java.lang.Float.floatToIntBits(height)
-        result = result * PRIME + java.lang.Float.floatToIntBits(dpi)
+        result = result * PRIME + width.toBits()
+        result = result * PRIME + height.toBits()
+        result = result * PRIME + dpi.toBits()
         return result
     }
 
     override fun toString(): String {
-        return "SVGLengthContext(_width=" + width + ", _height=" + height + ", _dpi=" + dpi + ")"
+        return "SVGLengthContext(_width=$width, _height=$height, _dpi=$dpi)"
     }
 
     fun withWidth(_width: Float): SVGLengthContext {

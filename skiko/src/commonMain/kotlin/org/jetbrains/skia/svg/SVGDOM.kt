@@ -1,15 +1,17 @@
+@file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia.svg
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.*
-import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
-import java.lang.ref.Reference
+import org.jetbrains.skia.impl.reachabilityBarrier
+import kotlin.jvm.JvmStatic
 
 class SVGDOM internal constructor(ptr: Long) : RefCnt(ptr) {
     companion object {
-        @JvmStatic external fun _nMakeFromData(dataPtr: Long): Long
+        @JvmStatic
+        external fun _nMakeFromData(dataPtr: Long): Long
         @JvmStatic external fun _nGetRoot(ptr: Long): Long
         @JvmStatic external fun _nGetContainerSize(ptr: Long): Point
         @JvmStatic external fun _nSetContainerSize(ptr: Long, width: Float, height: Float)
@@ -20,18 +22,18 @@ class SVGDOM internal constructor(ptr: Long) : RefCnt(ptr) {
         }
     }
 
-    constructor(data: Data) : this(_nMakeFromData(Native.getPtr(data))) {
+    constructor(data: Data) : this(_nMakeFromData(getPtr(data))) {
         Stats.onNativeCall()
-        Reference.reachabilityFence(data)
+        reachabilityBarrier(data)
     }
 
-    val root: org.jetbrains.skia.svg.SVGSVG?
+    val root: SVGSVG?
         get() = try {
             Stats.onNativeCall()
             val ptr = _nGetRoot(_ptr)
             if (ptr == 0L) null else SVGSVG(ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     /**
@@ -42,7 +44,7 @@ class SVGDOM internal constructor(ptr: Long) : RefCnt(ptr) {
         get() = try {
             _nGetContainerSize(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     fun setContainerSize(width: Float, height: Float): SVGDOM {
@@ -61,10 +63,10 @@ class SVGDOM internal constructor(ptr: Long) : RefCnt(ptr) {
     fun render(canvas: Canvas): SVGDOM {
         return try {
             Stats.onNativeCall()
-            _nRender(_ptr, Native.Companion.getPtr(canvas))
+            _nRender(_ptr, getPtr(canvas))
             this
         } finally {
-            Reference.reachabilityFence(canvas)
+            reachabilityBarrier(canvas)
         }
     }
 }

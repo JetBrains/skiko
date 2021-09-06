@@ -1,13 +1,16 @@
+@file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia.svg
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.Stats
-import java.lang.ref.Reference
+import org.jetbrains.skia.impl.reachabilityBarrier
+import kotlin.jvm.JvmStatic
 
 class SVGSVG internal constructor(ptr: Long) : SVGContainer(ptr) {
     companion object {
-        @JvmStatic external fun _nGetX(ptr: Long): SVGLength
+        @JvmStatic
+        external fun _nGetX(ptr: Long): SVGLength
         @JvmStatic external fun _nGetY(ptr: Long): SVGLength
         @JvmStatic external fun _nGetWidth(ptr: Long): SVGLength
         @JvmStatic external fun _nGetHeight(ptr: Long): SVGLength
@@ -31,7 +34,7 @@ class SVGSVG internal constructor(ptr: Long) : SVGContainer(ptr) {
             Stats.onNativeCall()
             _nGetX(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
         set(value) {
             setX(value)
@@ -43,7 +46,7 @@ class SVGSVG internal constructor(ptr: Long) : SVGContainer(ptr) {
             _nSetX(_ptr, length.value, length._unit.ordinal)
             this
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 
@@ -52,7 +55,7 @@ class SVGSVG internal constructor(ptr: Long) : SVGContainer(ptr) {
             Stats.onNativeCall()
             _nGetY(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
         set(value) {
             setY(value)
@@ -64,7 +67,7 @@ class SVGSVG internal constructor(ptr: Long) : SVGContainer(ptr) {
             _nSetY(_ptr, length.value, length._unit.ordinal)
             this
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 
@@ -73,7 +76,7 @@ class SVGSVG internal constructor(ptr: Long) : SVGContainer(ptr) {
             Stats.onNativeCall()
             _nGetWidth(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
         set(value) {
             setWidth(value)
@@ -85,7 +88,7 @@ class SVGSVG internal constructor(ptr: Long) : SVGContainer(ptr) {
             _nSetWidth(_ptr, length.value, length._unit.ordinal)
             this
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 
@@ -94,7 +97,7 @@ class SVGSVG internal constructor(ptr: Long) : SVGContainer(ptr) {
             Stats.onNativeCall()
             _nGetHeight(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
         set(value) {
             setHeight(value)
@@ -106,7 +109,7 @@ class SVGSVG internal constructor(ptr: Long) : SVGContainer(ptr) {
             _nSetHeight(_ptr, length.value, length._unit.ordinal)
             this
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 
@@ -115,7 +118,7 @@ class SVGSVG internal constructor(ptr: Long) : SVGContainer(ptr) {
             Stats.onNativeCall()
             _nGetPreserveAspectRatio(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
         set(value) {
             setPreserveAspectRatio(value)
@@ -127,7 +130,7 @@ class SVGSVG internal constructor(ptr: Long) : SVGContainer(ptr) {
             _nSetPreserveAspectRatio(_ptr, ratio._align._value, ratio._scale.ordinal)
             this
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 
@@ -136,7 +139,7 @@ class SVGSVG internal constructor(ptr: Long) : SVGContainer(ptr) {
             Stats.onNativeCall()
             _nGetViewBox(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
         set(value) {
             require(value != null) { "Can't set viewBox with value == null" }
@@ -149,7 +152,7 @@ class SVGSVG internal constructor(ptr: Long) : SVGContainer(ptr) {
             _nSetViewBox(_ptr, viewBox.left, viewBox.top, viewBox.right, viewBox.bottom)
             this
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 
@@ -158,7 +161,7 @@ class SVGSVG internal constructor(ptr: Long) : SVGContainer(ptr) {
             Stats.onNativeCall()
             _nGetIntrinsicSize(_ptr, lc.width, lc.height, lc.dpi)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 }

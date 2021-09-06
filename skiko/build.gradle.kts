@@ -419,7 +419,6 @@ project.tasks.register<Exec>("nativeBridgesLink") {
     val srcs = inputs.files.files
         .map { it.absolutePath }
         .toTypedArray()
-    println("SRCS: $srcs")
     val staticLib = "$outDir/skiko-native-bridges-$target.a"
     workingDir = File(outDir)
     commandLine = listOf(

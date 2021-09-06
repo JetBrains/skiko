@@ -29,7 +29,7 @@ class SVGPreserveAspectRatio(align: SVGPreserveAspectRatioAlign, scale: SVGPrese
         if (if (`this$_align` == null) `other$_align` != null else `this$_align` != `other$_align`) return false
         val `this$_scale`: Any = scale
         val `other$_scale`: Any = other.scale
-        return if (if (`this$_scale` == null) `other$_scale` != null else `this$_scale` != `other$_scale`) false else true
+        return !if (`this$_scale` == null) true else `this$_scale` != `other$_scale`
     }
 
     protected fun canEqual(other: Any?): Boolean {
@@ -40,14 +40,14 @@ class SVGPreserveAspectRatio(align: SVGPreserveAspectRatioAlign, scale: SVGPrese
         val PRIME = 59
         var result = 1
         val `$_align`: Any = align
-        result = result * PRIME + (`$_align`?.hashCode() ?: 43)
+        result = result * PRIME + (`$_align`.hashCode())
         val `$_scale`: Any = scale
-        result = result * PRIME + (`$_scale`?.hashCode() ?: 43)
+        result = result * PRIME + (`$_scale`.hashCode())
         return result
     }
 
     override fun toString(): String {
-        return "SVGPreserveAspectRatio(_align=" + align + ", _scale=" + scale + ")"
+        return "SVGPreserveAspectRatio(_align=$align, _scale=$scale)"
     }
 
     fun withAlign(_align: SVGPreserveAspectRatioAlign): SVGPreserveAspectRatio {

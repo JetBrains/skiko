@@ -1,11 +1,12 @@
+@file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia.skottie
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.Managed
-import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
-import java.lang.ref.Reference
+import org.jetbrains.skia.impl.reachabilityBarrier
+import kotlin.jvm.JvmStatic
 
 class AnimationBuilder internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
@@ -15,7 +16,8 @@ class AnimationBuilder internal constructor(ptr: Long) : Managed(ptr, _Finalizer
             return flags
         }
 
-        @JvmStatic external fun _nGetFinalizer(): Long
+        @JvmStatic
+        external fun _nGetFinalizer(): Long
         @JvmStatic external fun _nMake(flags: Int): Long
         @JvmStatic external fun _nSetFontManager(ptr: Long, fontMgrPtr: Long)
         @JvmStatic external fun _nSetLogger(ptr: Long, loggerPtr: Long)
@@ -44,10 +46,10 @@ class AnimationBuilder internal constructor(ptr: Long) : Managed(ptr, _Finalizer
     fun setFontManager(fontMgr: FontMgr?): AnimationBuilder {
         return try {
             Stats.onNativeCall()
-            _nSetFontManager(_ptr, Native.Companion.getPtr(fontMgr))
+            _nSetFontManager(_ptr, getPtr(fontMgr))
             this
         } finally {
-            Reference.reachabilityFence(fontMgr)
+            reachabilityBarrier(fontMgr)
         }
     }
 
@@ -58,47 +60,44 @@ class AnimationBuilder internal constructor(ptr: Long) : Managed(ptr, _Finalizer
     fun setLogger(logger: Logger?): AnimationBuilder {
         return try {
             Stats.onNativeCall()
-            _nSetLogger(_ptr, Native.Companion.getPtr(logger))
+            _nSetLogger(_ptr, getPtr(logger))
             this
         } finally {
-            Reference.reachabilityFence(logger)
+            reachabilityBarrier(logger)
         }
     }
 
     fun buildFromString(data: String): Animation {
         return try {
-            assert(data != null) { "Can’t buildFromString with data == null" }
             Stats.onNativeCall()
             val ptr = _nBuildFromString(_ptr, data)
             require(ptr != 0L) { "Failed to create Animation from string: \"$data\"" }
             Animation(ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 
     fun buildFromFile(path: String): Animation {
         return try {
-            assert(path != null) { "Can’t buildFromFile with path == null" }
             Stats.onNativeCall()
             val ptr = _nBuildFromFile(_ptr, path)
             require(ptr != 0L) { "Failed to create Animation from path: $path" }
             Animation(ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 
     fun buildFromData(data: Data): Animation {
         return try {
-            assert(data != null) { "Can’t buildFromData with data == null" }
             Stats.onNativeCall()
             val ptr =
-                _nBuildFromData(_ptr, Native.Companion.getPtr(data))
+                _nBuildFromData(_ptr, getPtr(data))
             require(ptr != 0L) { "Failed to create Animation from data" }
             Animation(ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     }
 }
