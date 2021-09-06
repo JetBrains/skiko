@@ -74,7 +74,7 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextHandler(layer) 
 
     override fun flush() {
         try {
-            directXRedrawer.finishFrame(
+            flush(
                 Native.getPtr(context!!),
                 Native.getPtr(surface!!)
             )
@@ -99,4 +99,6 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextHandler(layer) 
             "Video card: ${directXRedrawer.getAdapterName()}\n" +
             "Total VRAM: ${directXRedrawer.getAdapterMemorySize() / 1024 / 1024} MB\n"
     }
+
+    private external fun flush(context: Long, surface: Long)
 }

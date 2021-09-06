@@ -62,6 +62,7 @@ internal class Direct3DRedrawer(
                 synchronized(disposeLock) {
                     if (!isDisposed) {
                         layer.draw()
+                        swap(device, properties.isVsyncEnabled)
                     }
                 }
             }
@@ -75,10 +76,6 @@ internal class Direct3DRedrawer(
     fun makeSurface(context: Long, width: Int, height: Int, index: Int) = Surface(
         makeDirectXSurface(device, context, width, height, index)
     )
-
-    fun finishFrame(context: Long, surface: Long) {
-        finishFrame(device, context, surface, properties.isVsyncEnabled)
-    }
 
     private fun getAdapterPriority(): Int {
         val adapterPriority = GpuPriority.parse(System.getProperty("skiko.directx.gpu.priority"))
@@ -102,7 +99,7 @@ internal class Direct3DRedrawer(
     private external fun makeDirectXContext(device: Long): Long
     private external fun makeDirectXSurface(device: Long, context: Long, width: Int, height: Int, index: Int): Long
     private external fun resizeBuffers(device: Long, width: Int, height: Int)
-    private external fun finishFrame(device: Long, context: Long, surface: Long, isVsyncEnabled: Boolean)
+    private external fun swap(device: Long, isVsyncEnabled: Boolean)
     private external fun disposeDevice(device: Long)
     private external fun getBufferIndex(device: Long): Int
     private external fun initSwapChain(device: Long)

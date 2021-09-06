@@ -418,17 +418,10 @@ extern "C"
         GR_D3D_CALL_ERRCHECK(d3dDevice->swapChain->ResizeBuffers(BuffersCount, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 0));
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_finishFrame(
-        JNIEnv *env, jobject redrawer, jlong devicePtr, jlong contextPtr, jlong surfacePtr, jboolean isVsyncEnabled)
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_swap(
+        JNIEnv *env, jobject redrawer, jlong devicePtr, jboolean isVsyncEnabled)
     {
         DirectXDevice *d3dDevice = fromJavaPointer<DirectXDevice *>(devicePtr);
-        SkSurface *surface = fromJavaPointer<SkSurface *>(surfacePtr);
-        GrDirectContext *context = fromJavaPointer<GrDirectContext *>(contextPtr);
-
-        surface->flushAndSubmit(true);
-        surface->flush(SkSurface::BackendSurfaceAccess::kPresent, GrFlushInfo());
-        context->flush({});
-        context->submit(true);
 
         // 1 value in [Present(1, 0)] enables vblank wait so this is how vertical sync works in DirectX.
         const UINT64 fenceValue = d3dDevice->fenceValues[d3dDevice->bufferIndex];
