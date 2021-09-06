@@ -4,6 +4,7 @@ package org.jetbrains.skia.skottie
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 
 /**
@@ -14,6 +15,7 @@ import kotlin.jvm.JvmStatic
 abstract class Logger : RefCnt(_nMake()) {
     companion object {
         @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_skottie_Logger__1nMake")
         external fun _nMake(): Long
 
         init {
@@ -22,6 +24,7 @@ abstract class Logger : RefCnt(_nMake()) {
     }
 
     abstract fun log(level: LogLevel?, message: String?, json: String?)
+    @ExternalSymbolName("org_jetbrains_skia_skottie_Logger__1nInit")
     external fun _nInit(ptr: Long)
 
     init {

@@ -5,6 +5,7 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 
 object SVGCanvas {
@@ -52,6 +53,7 @@ object SVGCanvas {
     }
 
     @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_svg_SVGCanvas__1nMake")
     external fun _nMake(left: Float, top: Float, right: Float, bottom: Float, wstreamPtr: Long, flags: Int): Long
 
     init {

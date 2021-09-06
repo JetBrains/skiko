@@ -6,6 +6,7 @@ import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 
 class AnimationBuilder internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
@@ -17,13 +18,26 @@ class AnimationBuilder internal constructor(ptr: Long) : Managed(ptr, _Finalizer
         }
 
         @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nGetFinalizer")
         external fun _nGetFinalizer(): Long
-        @JvmStatic external fun _nMake(flags: Int): Long
-        @JvmStatic external fun _nSetFontManager(ptr: Long, fontMgrPtr: Long)
-        @JvmStatic external fun _nSetLogger(ptr: Long, loggerPtr: Long)
-        @JvmStatic external fun _nBuildFromString(ptr: Long, data: String?): Long
-        @JvmStatic external fun _nBuildFromFile(ptr: Long, path: String?): Long
-        @JvmStatic external fun _nBuildFromData(ptr: Long, dataPtr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nMake")
+        external fun _nMake(flags: Int): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nSetFontManager")
+        external fun _nSetFontManager(ptr: Long, fontMgrPtr: Long)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nSetLogger")
+        external fun _nSetLogger(ptr: Long, loggerPtr: Long)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromString")
+        external fun _nBuildFromString(ptr: Long, data: String?): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromFile")
+        external fun _nBuildFromFile(ptr: Long, path: String?): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromData")
+        external fun _nBuildFromData(ptr: Long, dataPtr: Long): Long
 
         init {
             staticLoad()
