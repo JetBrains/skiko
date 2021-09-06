@@ -29,9 +29,9 @@ class SVGLength(val value: Float, unit: SVGLengthUnit) {
     override fun hashCode(): Int {
         val PRIME = 59
         var result = 1
-        result = result * PRIME + java.lang.Float.floatToIntBits(value)
+        result = result * PRIME + value.toBits()
         val `$_unit`: Any = unit
-        result = result * PRIME + (`$_unit`?.hashCode() ?: 43)
+        result = result * PRIME + (`$_unit`.hashCode())
         return result
     }
 

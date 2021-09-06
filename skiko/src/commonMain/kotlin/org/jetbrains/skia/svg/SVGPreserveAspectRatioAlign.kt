@@ -1,14 +1,18 @@
 package org.jetbrains.skia.svg
 
-import java.lang.IllegalArgumentException
-
 enum class SVGPreserveAspectRatioAlign constructor(internal val _value: Int) {
     // These values are chosen such that bits [0,1] encode X alignment, and
     // bits [2,3] encode Y alignment.
-    XMIN_YMIN(0x00), XMID_YMIN(0x01), XMAX_YMIN(0x02), XMIN_YMID(0x04), XMID_YMID(0x05), XMAX_YMID(0x06), XMIN_YMAX(0x08), XMID_YMAX(
-        0x09
-    ),
-    XMAX_YMAX(0x0a), NONE(0x10);
+    XMIN_YMIN(0x00),
+    XMID_YMIN(0x01),
+    XMAX_YMIN(0x02),
+    XMIN_YMID(0x04),
+    XMID_YMID(0x05),
+    XMAX_YMID(0x06),
+    XMIN_YMAX(0x08),
+    XMID_YMAX(0x09),
+    XMAX_YMAX(0x0a),
+    NONE(0x10);
 
     companion object {
         internal fun valueOf(value: Int): SVGPreserveAspectRatioAlign {

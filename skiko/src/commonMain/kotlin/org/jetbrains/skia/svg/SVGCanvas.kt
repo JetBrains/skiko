@@ -1,9 +1,11 @@
+@file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia.svg
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
+import kotlin.jvm.JvmStatic
 
 object SVGCanvas {
     /**
@@ -49,7 +51,8 @@ object SVGCanvas {
         return Canvas(ptr, true, out)
     }
 
-    @JvmStatic external fun _nMake(left: Float, top: Float, right: Float, bottom: Float, wstreamPtr: Long, flags: Int): Long
+    @JvmStatic
+    external fun _nMake(left: Float, top: Float, right: Float, bottom: Float, wstreamPtr: Long, flags: Int): Long
 
     init {
         staticLoad()

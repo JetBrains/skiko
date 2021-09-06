@@ -1,8 +1,10 @@
+@file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia.skottie
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Stats
+import kotlin.jvm.JvmStatic
 
 /**
  *
@@ -11,7 +13,8 @@ import org.jetbrains.skia.impl.Stats
  */
 abstract class Logger : RefCnt(_nMake()) {
     companion object {
-        @JvmStatic external fun _nMake(): Long
+        @JvmStatic
+        external fun _nMake(): Long
 
         init {
             staticLoad()

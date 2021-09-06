@@ -1,12 +1,13 @@
+@file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia.skottie
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.sksg.InvalidationController
 import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.Managed
-import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
-import java.lang.ref.Reference
+import org.jetbrains.skia.impl.reachabilityBarrier
+import kotlin.jvm.JvmStatic
 
 class Animation internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
@@ -26,12 +27,13 @@ class Animation internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
 
         fun makeFromData(data: Data): Animation {
             Stats.onNativeCall()
-            val ptr = _nMakeFromData(Native.Companion.getPtr(data))
+            val ptr = _nMakeFromData(getPtr(data))
             require(ptr != 0L) { "Failed to create Animation from data." }
             return Animation(ptr)
         }
 
-        @JvmStatic external fun _nGetFinalizer(): Long
+        @JvmStatic
+        external fun _nGetFinalizer(): Long
         @JvmStatic external fun _nMakeFromString(data: String?): Long
         @JvmStatic external fun _nMakeFromFile(path: String?): Long
         @JvmStatic external fun _nMakeFromData(dataPtr: Long): Long
@@ -127,15 +129,13 @@ class Animation internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
      */
     fun render(canvas: Canvas, dst: Rect, vararg renderFlags: RenderFlag): Animation {
         return try {
-            assert(canvas != null) { "Can’t Animation::render with canvas == null" }
-            assert(dst != null) { "Can’t Animation::render with dst == null" }
             Stats.onNativeCall()
             var flags = 0
             for (flag in renderFlags) flags = flags or flag._flag
-            _nRender(_ptr, Native.Companion.getPtr(canvas), dst.left, dst.top, dst.right, dst.bottom, flags)
+            _nRender(_ptr, getPtr(canvas), dst.left, dst.top, dst.right, dst.bottom, flags)
             this
         } finally {
-            Reference.reachabilityFence(canvas)
+            reachabilityBarrier(canvas)
         }
     }
 
@@ -161,10 +161,10 @@ class Animation internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
     fun seek(t: Float, ic: InvalidationController?): Animation {
         return try {
             Stats.onNativeCall()
-            _nSeek(_ptr, t, Native.Companion.getPtr(ic))
+            _nSeek(_ptr, t, getPtr(ic))
             this
         } finally {
-            Reference.reachabilityFence(ic)
+            reachabilityBarrier(ic)
         }
     }
 
@@ -200,10 +200,10 @@ class Animation internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
     fun seekFrame(t: Float, ic: InvalidationController?): Animation {
         return try {
             Stats.onNativeCall()
-            _nSeekFrame(_ptr, t, Native.Companion.getPtr(ic))
+            _nSeekFrame(_ptr, t, getPtr(ic))
             this
         } finally {
-            Reference.reachabilityFence(ic)
+            reachabilityBarrier(ic)
         }
     }
 
@@ -231,10 +231,10 @@ class Animation internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
     fun seekFrameTime(t: Float, ic: InvalidationController?): Animation {
         return try {
             Stats.onNativeCall()
-            _nSeekFrameTime(_ptr, t, Native.Companion.getPtr(ic))
+            _nSeekFrameTime(_ptr, t, getPtr(ic))
             this
         } finally {
-            Reference.reachabilityFence(ic)
+            reachabilityBarrier(ic)
         }
     }
 
@@ -246,7 +246,7 @@ class Animation internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
             Stats.onNativeCall()
             _nGetDuration(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     /**
@@ -257,7 +257,7 @@ class Animation internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
             Stats.onNativeCall()
             _nGetFPS(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     /**
@@ -268,7 +268,7 @@ class Animation internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
             Stats.onNativeCall()
             _nGetInPoint(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     /**
@@ -279,14 +279,14 @@ class Animation internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
             Stats.onNativeCall()
             _nGetOutPoint(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
     val version: String
         get() = try {
             Stats.onNativeCall()
             _nGetVersion(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     private var _size: Point? = null
