@@ -16,7 +16,7 @@ internal class Direct3DRedrawer(
 ) : Redrawer {
 
     private var isDisposed = false
-    private var disposeLock = Any()
+    private var drawLock = Any()
 
     private val device = createDirectXDevice(getAdapterPriority(), layer.contentHandle).also {
         if (it == 0L) {
@@ -29,7 +29,7 @@ internal class Direct3DRedrawer(
         draw()
     }
 
-    override fun dispose() = synchronized(disposeLock) {
+    override fun dispose() = synchronized(drawLock) {
         disposeDevice(device)
         frameDispatcher.cancel()
         isDisposed = true
@@ -46,10 +46,10 @@ internal class Direct3DRedrawer(
 
     override fun redrawImmediately() {
         check(!isDisposed) { "Direct3DRedrawer is disposed" }
-        // TODO now we wait until previous layer.draw is finished. it ends only on the next vsync.
-        //  because of that we lose one frame on resize and can theoretically see very small white bars on the sides of the window
-        //  to avoid this we should be able to draw in two modes: with vsync and without.
-        frameDispatcher.scheduleFrame()
+        layer.update(System.nanoTime())
+        if (prepareDrawContext()) {
+            drawAndSwap(withVsync = false)
+        }
     }
 
     private fun update(nanoTime: Long) {
@@ -57,15 +57,21 @@ internal class Direct3DRedrawer(
     }
 
     private suspend fun draw() {
-        if (layer.prepareDrawContext()) {
+        if (prepareDrawContext()) {
             withContext(Dispatchers.IO) {
-                synchronized(disposeLock) {
-                    if (!isDisposed) {
-                        layer.draw()
-                        swap(device, properties.isVsyncEnabled)
-                    }
-                }
+                drawAndSwap(withVsync = properties.isVsyncEnabled)
             }
+        }
+    }
+
+    private fun prepareDrawContext() = synchronized(drawLock) {
+        layer.prepareDrawContext()
+    }
+
+    private fun drawAndSwap(withVsync: Boolean) = synchronized(drawLock) {
+        if (!isDisposed) {
+            layer.draw()
+            swap(device, withVsync)
         }
     }
 
