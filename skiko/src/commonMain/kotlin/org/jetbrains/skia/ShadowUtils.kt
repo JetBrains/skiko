@@ -4,6 +4,7 @@ package org.jetbrains.skia
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 
 object ShadowUtils {
@@ -80,7 +81,9 @@ object ShadowUtils {
         return _nComputeTonalSpotColor(ambientColor, spotColor)
     }
 
-    @JvmStatic external fun _nDrawShadow(
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_ShadowUtils__1nDrawShadow")
+    external fun _nDrawShadow(
         canvasPtr: Long,
         pathPtr: Long,
         zPlaneX: Float,
@@ -95,8 +98,12 @@ object ShadowUtils {
         flags: Int
     )
 
-    @JvmStatic external fun _nComputeTonalAmbientColor(ambientColor: Int, spotColor: Int): Int
-    @JvmStatic external fun _nComputeTonalSpotColor(ambientColor: Int, spotColor: Int): Int
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_ShadowUtils__1nComputeTonalAmbientColor")
+    external fun _nComputeTonalAmbientColor(ambientColor: Int, spotColor: Int): Int
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_ShadowUtils__1nComputeTonalSpotColor")
+    external fun _nComputeTonalSpotColor(ambientColor: Int, spotColor: Int): Int
 
     init {
         staticLoad()

@@ -4,7 +4,7 @@ import kotlinx.cinterop.pointed
 import kotlinx.cinterop.useContents
 import org.jetbrains.skiko.native.context.*
 import org.jetbrains.skiko.native.redrawer.*
-import org.jetbrains.skiko.skia.native.*
+import org.jetbrains.skia.*
 
 interface SkiaRenderer {
     fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long)
@@ -53,9 +53,8 @@ open class SkiaLayer(
         val pictureWidth = (width * contentScale).coerceAtLeast(0.0)
         val pictureHeight = (height * contentScale).coerceAtLeast(0.0)
 
-        val bounds = SkRect.MakeWH(pictureWidth.toFloat(), pictureHeight.toFloat())
-        val canvas = pictureRecorder.beginRecording(bounds, null)!!
-
+        val bounds = Rect.makeWH(pictureWidth.toFloat(), pictureHeight.toFloat())
+        val canvas = pictureRecorder.beginRecording(bounds)!!
         renderer?.onRender(canvas, pictureWidth.toInt(), pictureHeight.toInt(), nanoTime)
 
         val picture = pictureRecorder.finishRecordingAsPicture()!!

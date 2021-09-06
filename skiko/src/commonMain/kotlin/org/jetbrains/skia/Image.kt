@@ -5,6 +5,7 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 
 class Image internal constructor(ptr: Long) : RefCnt(ptr), IHasImageInfo {
@@ -142,7 +143,9 @@ class Image internal constructor(ptr: Long) : RefCnt(ptr), IHasImageInfo {
             return Image(ptr)
         }
 
-        @JvmStatic external fun _nMakeRaster(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeRaster")
+        external fun _nMakeRaster(
             width: Int,
             height: Int,
             colorType: Int,
@@ -152,7 +155,9 @@ class Image internal constructor(ptr: Long) : RefCnt(ptr), IHasImageInfo {
             rowBytes: Long
         ): Long
 
-        @JvmStatic external fun _nMakeRasterData(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeRasterData")
+        external fun _nMakeRasterData(
             width: Int,
             height: Int,
             colorType: Int,
@@ -162,16 +167,36 @@ class Image internal constructor(ptr: Long) : RefCnt(ptr), IHasImageInfo {
             rowBytes: Long
         ): Long
 
-        @JvmStatic external fun _nMakeFromBitmap(bitmapPtr: Long): Long
-        @JvmStatic external fun _nMakeFromPixmap(pixmapPtr: Long): Long
-        @JvmStatic external fun _nMakeFromEncoded(bytes: ByteArray?): Long
-        @JvmStatic external fun _nGetImageInfo(ptr: Long): ImageInfo?
-        @JvmStatic external fun _nEncodeToData(ptr: Long, format: Int, quality: Int): Long
-        @JvmStatic external fun _nMakeShader(ptr: Long, tmx: Int, tmy: Int, samplingMode: Long, localMatrix: FloatArray?): Long
-        @JvmStatic external fun _nPeekPixels(ptr: Long): ByteBuffer?
-        @JvmStatic external fun _nPeekPixelsToPixmap(ptr: Long, pixmapPtr: Long): Boolean
-        @JvmStatic external fun _nScalePixels(ptr: Long, pixmapPtr: Long, samplingOptions: Long, cache: Boolean): Boolean
-        @JvmStatic external fun _nReadPixelsBitmap(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeFromBitmap")
+        external fun _nMakeFromBitmap(bitmapPtr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeFromPixmap")
+        external fun _nMakeFromPixmap(pixmapPtr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeFromEncoded")
+        external fun _nMakeFromEncoded(bytes: ByteArray?): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Image__1nGetImageInfo")
+        external fun _nGetImageInfo(ptr: Long): ImageInfo?
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Image__1nEncodeToData")
+        external fun _nEncodeToData(ptr: Long, format: Int, quality: Int): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeShader")
+        external fun _nMakeShader(ptr: Long, tmx: Int, tmy: Int, samplingMode: Long, localMatrix: FloatArray?): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Image__1nPeekPixels")
+        external fun _nPeekPixels(ptr: Long): ByteBuffer?
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Image__1nPeekPixelsToPixmap")
+        external fun _nPeekPixelsToPixmap(ptr: Long, pixmapPtr: Long): Boolean
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Image__1nScalePixels")
+        external fun _nScalePixels(ptr: Long, pixmapPtr: Long, samplingOptions: Long, cache: Boolean): Boolean
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Image__1nReadPixelsBitmap")
+        external fun _nReadPixelsBitmap(
             ptr: Long,
             contextPtr: Long,
             bitmapPtr: Long,
@@ -180,7 +205,9 @@ class Image internal constructor(ptr: Long) : RefCnt(ptr), IHasImageInfo {
             cache: Boolean
         ): Boolean
 
-        @JvmStatic external fun _nReadPixelsPixmap(ptr: Long, pixmapPtr: Long, srcX: Int, srcY: Int, cache: Boolean): Boolean
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Image__1nReadPixelsPixmap")
+        external fun _nReadPixelsPixmap(ptr: Long, pixmapPtr: Long, srcX: Int, srcY: Int, cache: Boolean): Boolean
 
         init {
             staticLoad()

@@ -1,5 +1,6 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 
 open class Rect constructor(val left: Float, val top: Float, val right: Float, val bottom: Float) {

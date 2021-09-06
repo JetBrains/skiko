@@ -6,32 +6,77 @@ import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 
 class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
     companion object {
-        @JvmStatic external fun _nGetFinalizer(): Long
-        @JvmStatic external fun _nMake(): Long
-        @JvmStatic external fun _nEquals(ptr: Long, otherPtr: Long): Boolean
-        @JvmStatic external fun _nGetStrutStyle(ptr: Long): Long
-        @JvmStatic external fun _nSetStrutStyle(ptr: Long, stylePtr: Long)
-        @JvmStatic external fun _nGetTextStyle(ptr: Long): Long
-        @JvmStatic external fun _nSetTextStyle(ptr: Long, textStylePtr: Long)
-        @JvmStatic external fun _nGetDirection(ptr: Long): Int
-        @JvmStatic external fun _nSetDirection(ptr: Long, direction: Int)
-        @JvmStatic external fun _nGetAlignment(ptr: Long): Int
-        @JvmStatic external fun _nSetAlignment(ptr: Long, align: Int)
-        @JvmStatic external fun _nGetMaxLinesCount(ptr: Long): Long
-        @JvmStatic external fun _nSetMaxLinesCount(ptr: Long, maxLines: Long)
-        @JvmStatic external fun _nGetEllipsis(ptr: Long): String
-        @JvmStatic external fun _nSetEllipsis(ptr: Long, ellipsis: String?)
-        @JvmStatic external fun _nGetHeight(ptr: Long): Float
-        @JvmStatic external fun _nSetHeight(ptr: Long, height: Float)
-        @JvmStatic external fun _nGetHeightMode(ptr: Long): Int
-        @JvmStatic external fun _nSetHeightMode(ptr: Long, v: Int)
-        @JvmStatic external fun _nGetEffectiveAlignment(ptr: Long): Int
-        @JvmStatic external fun _nIsHintingEnabled(ptr: Long): Boolean
-        @JvmStatic external fun _nDisableHinting(ptr: Long)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nGetFinalizer")
+        external fun _nGetFinalizer(): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nMake")
+        external fun _nMake(): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nEquals")
+        external fun _nEquals(ptr: Long, otherPtr: Long): Boolean
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nGetStrutStyle")
+        external fun _nGetStrutStyle(ptr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nSetStrutStyle")
+        external fun _nSetStrutStyle(ptr: Long, stylePtr: Long)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nGetTextStyle")
+        external fun _nGetTextStyle(ptr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nSetTextStyle")
+        external fun _nSetTextStyle(ptr: Long, textStylePtr: Long)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nGetDirection")
+        external fun _nGetDirection(ptr: Long): Int
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nSetDirection")
+        external fun _nSetDirection(ptr: Long, direction: Int)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nGetAlignment")
+        external fun _nGetAlignment(ptr: Long): Int
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nSetAlignment")
+        external fun _nSetAlignment(ptr: Long, align: Int)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nGetMaxLinesCount")
+        external fun _nGetMaxLinesCount(ptr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nSetMaxLinesCount")
+        external fun _nSetMaxLinesCount(ptr: Long, maxLines: Long)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nGetEllipsis")
+        external fun _nGetEllipsis(ptr: Long): String
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nSetEllipsis")
+        external fun _nSetEllipsis(ptr: Long, ellipsis: String?)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nGetHeight")
+        external fun _nGetHeight(ptr: Long): Float
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nSetHeight")
+        external fun _nSetHeight(ptr: Long, height: Float)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nGetHeightMode")
+        external fun _nGetHeightMode(ptr: Long): Int
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nSetHeightMode")
+        external fun _nSetHeightMode(ptr: Long, v: Int)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nGetEffectiveAlignment")
+        external fun _nGetEffectiveAlignment(ptr: Long): Int
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nIsHintingEnabled")
+        external fun _nIsHintingEnabled(ptr: Long): Boolean
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nDisableHinting")
+        external fun _nDisableHinting(ptr: Long)
 
         init {
             staticLoad()

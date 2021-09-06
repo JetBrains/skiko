@@ -1,6 +1,7 @@
 @file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia
 
+import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 
 /**
@@ -317,7 +318,9 @@ enum class ColorType {
          * Native ARGB 32-bit encoding
          */
         var N32 = BGRA_8888
-        @JvmStatic external fun _nIsAlwaysOpaque(value: Int): Boolean
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ColorType__1nIsAlwaysOpaque")
+        external fun _nIsAlwaysOpaque(value: Int): Boolean
     }
 
     /**

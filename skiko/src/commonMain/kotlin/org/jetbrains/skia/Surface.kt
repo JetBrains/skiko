@@ -5,6 +5,7 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 
 class Surface : RefCnt {
@@ -526,7 +527,9 @@ class Surface : RefCnt {
             return Surface(ptr)
         }
 
-        @JvmStatic external fun _nMakeRasterDirect(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeRasterDirect")
+        external fun _nMakeRasterDirect(
             width: Int,
             height: Int,
             colorType: Int,
@@ -537,8 +540,12 @@ class Surface : RefCnt {
             surfaceProps: SurfaceProps?
         ): Long
 
-        @JvmStatic external fun _nMakeRasterDirectWithPixmap(pixmapPtr: Long, surfaceProps: SurfaceProps?): Long
-        @JvmStatic external fun _nMakeRaster(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeRasterDirectWithPixmap")
+        external fun _nMakeRasterDirectWithPixmap(pixmapPtr: Long, surfaceProps: SurfaceProps?): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeRaster")
+        external fun _nMakeRaster(
             width: Int,
             height: Int,
             colorType: Int,
@@ -548,8 +555,12 @@ class Surface : RefCnt {
             surfaceProps: SurfaceProps?
         ): Long
 
-        @JvmStatic external fun _nMakeRasterN32Premul(width: Int, height: Int): Long
-        @JvmStatic external fun _nMakeFromBackendRenderTarget(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeRasterN32Premul")
+        external fun _nMakeRasterN32Premul(width: Int, height: Int): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeFromBackendRenderTarget")
+        external fun _nMakeFromBackendRenderTarget(
             pContext: Long,
             pBackendRenderTarget: Long,
             surfaceOrigin: Int,
@@ -558,7 +569,9 @@ class Surface : RefCnt {
             surfaceProps: SurfaceProps?
         ): Long
 
-        @JvmStatic external fun _nMakeFromMTKView(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeFromMTKView")
+        external fun _nMakeFromMTKView(
             contextPtr: Long,
             mtkViewPtr: Long,
             surfaceOrigin: Int,
@@ -568,7 +581,9 @@ class Surface : RefCnt {
             surfaceProps: SurfaceProps?
         ): Long
 
-        @JvmStatic external fun _nMakeRenderTarget(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeRenderTarget")
+        external fun _nMakeRenderTarget(
             contextPtr: Long,
             budgeted: Boolean,
             width: Int,
@@ -582,15 +597,33 @@ class Surface : RefCnt {
             shouldCreateWithMips: Boolean
         ): Long
 
-        @JvmStatic external fun _nMakeNull(width: Int, height: Int): Long
-        @JvmStatic external fun _nGetWidth(ptr: Long): Int
-        @JvmStatic external fun _nGetHeight(ptr: Long): Int
-        @JvmStatic external fun _nGetImageInfo(ptr: Long): ImageInfo
-        @JvmStatic external fun _nGenerationId(ptr: Long): Int
-        @JvmStatic external fun _nNotifyContentWillChange(ptr: Long, mode: Int)
-        @JvmStatic external fun _nGetRecordingContext(ptr: Long): Long
-        @JvmStatic external fun _nGetCanvas(ptr: Long): Long
-        @JvmStatic external fun _nMakeSurfaceI(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeNull")
+        external fun _nMakeNull(width: Int, height: Int): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Surface__1nGetWidth")
+        external fun _nGetWidth(ptr: Long): Int
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Surface__1nGetHeight")
+        external fun _nGetHeight(ptr: Long): Int
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Surface__1nGetImageInfo")
+        external fun _nGetImageInfo(ptr: Long): ImageInfo
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Surface__1nGenerationId")
+        external fun _nGenerationId(ptr: Long): Int
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Surface__1nNotifyContentWillChange")
+        external fun _nNotifyContentWillChange(ptr: Long, mode: Int)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Surface__1nGetRecordingContext")
+        external fun _nGetRecordingContext(ptr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Surface__1nGetCanvas")
+        external fun _nGetCanvas(ptr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeSurfaceI")
+        external fun _nMakeSurfaceI(
             ptr: Long,
             width: Int,
             height: Int,
@@ -599,18 +632,42 @@ class Surface : RefCnt {
             colorSpacePtr: Long
         ): Long
 
-        @JvmStatic external fun _nMakeSurface(ptr: Long, width: Int, height: Int): Long
-        @JvmStatic external fun _nMakeImageSnapshot(ptr: Long): Long
-        @JvmStatic external fun _nMakeImageSnapshotR(ptr: Long, left: Int, top: Int, right: Int, bottom: Int): Long
-        @JvmStatic external fun _nDraw(ptr: Long, canvasPtr: Long, x: Float, y: Float, paintPtr: Long)
-        @JvmStatic external fun _nPeekPixels(ptr: Long, pixmapPtr: Long): Boolean
-        @JvmStatic external fun _nReadPixelsToPixmap(ptr: Long, pixmapPtr: Long, srcX: Int, srcY: Int): Boolean
-        @JvmStatic external fun _nReadPixels(ptr: Long, bitmapPtr: Long, srcX: Int, srcY: Int): Boolean
-        @JvmStatic external fun _nWritePixelsFromPixmap(ptr: Long, pixmapPtr: Long, x: Int, y: Int)
-        @JvmStatic external fun _nWritePixels(ptr: Long, bitmapPtr: Long, x: Int, y: Int)
-        @JvmStatic external fun _nFlushAndSubmit(ptr: Long, syncCpu: Boolean)
-        @JvmStatic external fun _nFlush(ptr: Long)
-        @JvmStatic external fun _nUnique(ptr: Long): Boolean
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeSurface")
+        external fun _nMakeSurface(ptr: Long, width: Int, height: Int): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeImageSnapshot")
+        external fun _nMakeImageSnapshot(ptr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeImageSnapshotR")
+        external fun _nMakeImageSnapshotR(ptr: Long, left: Int, top: Int, right: Int, bottom: Int): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Surface__1nDraw")
+        external fun _nDraw(ptr: Long, canvasPtr: Long, x: Float, y: Float, paintPtr: Long)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Surface__1nPeekPixels")
+        external fun _nPeekPixels(ptr: Long, pixmapPtr: Long): Boolean
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Surface__1nReadPixelsToPixmap")
+        external fun _nReadPixelsToPixmap(ptr: Long, pixmapPtr: Long, srcX: Int, srcY: Int): Boolean
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Surface__1nReadPixels")
+        external fun _nReadPixels(ptr: Long, bitmapPtr: Long, srcX: Int, srcY: Int): Boolean
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Surface__1nWritePixelsFromPixmap")
+        external fun _nWritePixelsFromPixmap(ptr: Long, pixmapPtr: Long, x: Int, y: Int)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Surface__1nWritePixels")
+        external fun _nWritePixels(ptr: Long, bitmapPtr: Long, x: Int, y: Int)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Surface__1nFlushAndSubmit")
+        external fun _nFlushAndSubmit(ptr: Long, syncCpu: Boolean)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Surface__1nFlush")
+        external fun _nFlush(ptr: Long)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Surface__1nUnique")
+        external fun _nUnique(ptr: Long): Boolean
 
         init {
             staticLoad()

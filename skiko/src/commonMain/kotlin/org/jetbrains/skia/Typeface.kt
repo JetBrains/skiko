@@ -6,6 +6,7 @@ import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 
 class Typeface internal constructor(ptr: Long) : RefCnt(ptr) {
@@ -63,29 +64,75 @@ class Typeface internal constructor(ptr: Long) : RefCnt(ptr) {
             }
         }
 
-        @JvmStatic external fun _nGetFontStyle(ptr: Long): Int
-        @JvmStatic external fun _nIsFixedPitch(ptr: Long): Boolean
-        @JvmStatic external fun _nGetVariations(ptr: Long): Array<FontVariation>?
-        @JvmStatic external fun _nGetVariationAxes(ptr: Long): Array<FontVariationAxis>?
-        @JvmStatic external fun _nGetUniqueId(ptr: Long): Int
-        @JvmStatic external fun _nEquals(ptr: Long, otherPtr: Long): Boolean
-        @JvmStatic external fun _nMakeDefault(): Long
-        @JvmStatic external fun _nMakeFromName(name: String?, fontStyle: Int): Long
-        @JvmStatic external fun _nMakeFromFile(path: String?, index: Int): Long
-        @JvmStatic external fun _nMakeFromData(dataPtr: Long, index: Int): Long
-        @JvmStatic external fun _nMakeClone(ptr: Long, variations: Array<FontVariation>?, collectionIndex: Int): Long
-        @JvmStatic external fun _nGetUTF32Glyphs(ptr: Long, uni: IntArray?): ShortArray
-        @JvmStatic external fun _nGetUTF32Glyph(ptr: Long, unichar: Int): Short
-        @JvmStatic external fun _nGetGlyphsCount(ptr: Long): Int
-        @JvmStatic external fun _nGetTablesCount(ptr: Long): Int
-        @JvmStatic external fun _nGetTableTags(ptr: Long): IntArray?
-        @JvmStatic external fun _nGetTableSize(ptr: Long, tag: Int): Long
-        @JvmStatic external fun _nGetTableData(ptr: Long, tag: Int): Long
-        @JvmStatic external fun _nGetUnitsPerEm(ptr: Long): Int
-        @JvmStatic external fun _nGetKerningPairAdjustments(ptr: Long, glyphs: ShortArray?): IntArray?
-        @JvmStatic external fun _nGetFamilyNames(ptr: Long): Array<FontFamilyName>
-        @JvmStatic external fun _nGetFamilyName(ptr: Long): String
-        @JvmStatic external fun _nGetBounds(ptr: Long): Rect
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetFontStyle")
+        external fun _nGetFontStyle(ptr: Long): Int
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Typeface__1nIsFixedPitch")
+        external fun _nIsFixedPitch(ptr: Long): Boolean
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetVariations")
+        external fun _nGetVariations(ptr: Long): Array<FontVariation>?
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetVariationAxes")
+        external fun _nGetVariationAxes(ptr: Long): Array<FontVariationAxis>?
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUniqueId")
+        external fun _nGetUniqueId(ptr: Long): Int
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Typeface__1nEquals")
+        external fun _nEquals(ptr: Long, otherPtr: Long): Boolean
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeDefault")
+        external fun _nMakeDefault(): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeFromName")
+        external fun _nMakeFromName(name: String?, fontStyle: Int): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeFromFile")
+        external fun _nMakeFromFile(path: String?, index: Int): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeFromData")
+        external fun _nMakeFromData(dataPtr: Long, index: Int): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeClone")
+        external fun _nMakeClone(ptr: Long, variations: Array<FontVariation>?, collectionIndex: Int): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUTF32Glyphs")
+        external fun _nGetUTF32Glyphs(ptr: Long, uni: IntArray?): ShortArray
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUTF32Glyph")
+        external fun _nGetUTF32Glyph(ptr: Long, unichar: Int): Short
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetGlyphsCount")
+        external fun _nGetGlyphsCount(ptr: Long): Int
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetTablesCount")
+        external fun _nGetTablesCount(ptr: Long): Int
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetTableTags")
+        external fun _nGetTableTags(ptr: Long): IntArray?
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetTableSize")
+        external fun _nGetTableSize(ptr: Long, tag: Int): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetTableData")
+        external fun _nGetTableData(ptr: Long, tag: Int): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUnitsPerEm")
+        external fun _nGetUnitsPerEm(ptr: Long): Int
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetKerningPairAdjustments")
+        external fun _nGetKerningPairAdjustments(ptr: Long, glyphs: ShortArray?): IntArray?
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetFamilyNames")
+        external fun _nGetFamilyNames(ptr: Long): Array<FontFamilyName>
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetFamilyName")
+        external fun _nGetFamilyName(ptr: Long): String
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetBounds")
+        external fun _nGetBounds(ptr: Long): Rect
 
         init {
             staticLoad()

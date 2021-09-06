@@ -5,24 +5,41 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 
 open class FontMgr : RefCnt {
     companion object {
-        @JvmStatic external fun _nGetFamiliesCount(ptr: Long): Int
-        @JvmStatic external fun _nGetFamilyName(ptr: Long, index: Int): String
-        @JvmStatic external fun _nMakeStyleSet(ptr: Long, index: Int): Long
-        @JvmStatic external fun _nMatchFamily(ptr: Long, familyName: String?): Long
-        @JvmStatic external fun _nMatchFamilyStyle(ptr: Long, familyName: String?, fontStyle: Int): Long
-        @JvmStatic external fun _nMatchFamilyStyleCharacter(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nGetFamiliesCount")
+        external fun _nGetFamiliesCount(ptr: Long): Int
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nGetFamilyName")
+        external fun _nGetFamilyName(ptr: Long, index: Int): String
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMakeStyleSet")
+        external fun _nMakeStyleSet(ptr: Long, index: Int): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMatchFamily")
+        external fun _nMatchFamily(ptr: Long, familyName: String?): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMatchFamilyStyle")
+        external fun _nMatchFamilyStyle(ptr: Long, familyName: String?, fontStyle: Int): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMatchFamilyStyleCharacter")
+        external fun _nMatchFamilyStyleCharacter(
             ptr: Long,
             familyName: String?,
             fontStyle: Int,
             bcp47: Array<String?>?,
             character: Int
         ): Long
-        @JvmStatic external fun _nMakeFromData(ptr: Long, dataPtr: Long, ttcIndex: Int): Long
-        @JvmStatic external fun _nDefault(): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMakeFromData")
+        external fun _nMakeFromData(ptr: Long, dataPtr: Long, ttcIndex: Int): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nDefault")
+        external fun _nDefault(): Long
 
         init {
             staticLoad()

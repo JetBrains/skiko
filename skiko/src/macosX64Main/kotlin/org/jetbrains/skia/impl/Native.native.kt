@@ -2,6 +2,9 @@ package org.jetbrains.skia.impl
 
 actual abstract class Native actual constructor(ptr: Long) {
     actual var _ptr: Long
+    override fun toString(): String {
+        return this::class.simpleName + "(_ptr=0x" + _ptr.toString(16) + ")"
+    }
 
     actual open fun _nativeEquals(other: Native?): Boolean = TODO()
 
@@ -18,5 +21,5 @@ actual abstract class Native actual constructor(ptr: Long) {
 }
 
 actual fun reachabilityBarrier(obj: Any?) {
-    TODO()
+    // TODO: implement native barrier
 }

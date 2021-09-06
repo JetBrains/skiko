@@ -7,22 +7,47 @@ import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 
 class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
-        @JvmStatic external fun _nGetFinalizer(): Long
-        @JvmStatic external fun _nMake(): Long
-        @JvmStatic external fun _nEquals(ptr: Long, otherPtr: Long): Boolean
-        @JvmStatic external fun _nAttributeEquals(ptr: Long, attribute: Int, otherPtr: Long): Boolean
-        @JvmStatic external fun _nGetColor(ptr: Long): Int
-        @JvmStatic external fun _nSetColor(ptr: Long, color: Int)
-        @JvmStatic external fun _nGetForeground(ptr: Long): Long
-        @JvmStatic external fun _nSetForeground(ptr: Long, paintPtr: Long)
-        @JvmStatic external fun _nGetBackground(ptr: Long): Long
-        @JvmStatic external fun _nSetBackground(ptr: Long, paintPtr: Long)
-        @JvmStatic external fun _nGetDecorationStyle(ptr: Long): DecorationStyle
-        @JvmStatic external fun _nSetDecorationStyle(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetFinalizer")
+        external fun _nGetFinalizer(): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nMake")
+        external fun _nMake(): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nEquals")
+        external fun _nEquals(ptr: Long, otherPtr: Long): Boolean
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nAttributeEquals")
+        external fun _nAttributeEquals(ptr: Long, attribute: Int, otherPtr: Long): Boolean
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetColor")
+        external fun _nGetColor(ptr: Long): Int
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nSetColor")
+        external fun _nSetColor(ptr: Long, color: Int)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetForeground")
+        external fun _nGetForeground(ptr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nSetForeground")
+        external fun _nSetForeground(ptr: Long, paintPtr: Long)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetBackground")
+        external fun _nGetBackground(ptr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nSetBackground")
+        external fun _nSetBackground(ptr: Long, paintPtr: Long)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetDecorationStyle")
+        external fun _nGetDecorationStyle(ptr: Long): DecorationStyle
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nSetDecorationStyle")
+        external fun _nSetDecorationStyle(
             ptr: Long,
             underline: Boolean,
             overline: Boolean,
@@ -33,33 +58,87 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
             thicknessMultiplier: Float
         )
 
-        @JvmStatic external fun _nGetFontStyle(ptr: Long): Int
-        @JvmStatic external fun _nSetFontStyle(ptr: Long, fontStyle: Int)
-        @JvmStatic external fun _nGetShadows(ptr: Long): Array<Shadow>
-        @JvmStatic external fun _nAddShadow(ptr: Long, color: Int, offsetX: Float, offsetY: Float, blurSigma: Double)
-        @JvmStatic external fun _nClearShadows(ptr: Long)
-        @JvmStatic external fun _nGetFontFeatures(ptr: Long): Array<FontFeature>
-        @JvmStatic external fun _nAddFontFeature(ptr: Long, name: String?, value: Int)
-        @JvmStatic external fun _nClearFontFeatures(ptr: Long)
-        @JvmStatic external fun _nGetFontSize(ptr: Long): Float
-        @JvmStatic external fun _nSetFontSize(ptr: Long, size: Float)
-        @JvmStatic external fun _nGetFontFamilies(ptr: Long): Array<String>
-        @JvmStatic external fun _nSetFontFamilies(ptr: Long, families: Array<String>?)
-        @JvmStatic external fun _nGetHeight(ptr: Long): Float?
-        @JvmStatic external fun _nSetHeight(ptr: Long, override: Boolean, height: Float)
-        @JvmStatic external fun _nGetLetterSpacing(ptr: Long): Float
-        @JvmStatic external fun _nSetLetterSpacing(ptr: Long, letterSpacing: Float)
-        @JvmStatic external fun _nGetWordSpacing(ptr: Long): Float
-        @JvmStatic external fun _nSetWordSpacing(ptr: Long, wordSpacing: Float)
-        @JvmStatic external fun _nGetTypeface(ptr: Long): Long
-        @JvmStatic external fun _nSetTypeface(ptr: Long, typefacePtr: Long)
-        @JvmStatic external fun _nGetLocale(ptr: Long): String
-        @JvmStatic external fun _nSetLocale(ptr: Long, locale: String?)
-        @JvmStatic external fun _nGetBaselineMode(ptr: Long): Int
-        @JvmStatic external fun _nSetBaselineMode(ptr: Long, mode: Int)
-        @JvmStatic external fun _nGetFontMetrics(ptr: Long): FontMetrics
-        @JvmStatic external fun _nIsPlaceholder(ptr: Long): Boolean
-        @JvmStatic external fun _nSetPlaceholder(ptr: Long)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetFontStyle")
+        external fun _nGetFontStyle(ptr: Long): Int
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nSetFontStyle")
+        external fun _nSetFontStyle(ptr: Long, fontStyle: Int)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetShadows")
+        external fun _nGetShadows(ptr: Long): Array<Shadow>
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nAddShadow")
+        external fun _nAddShadow(ptr: Long, color: Int, offsetX: Float, offsetY: Float, blurSigma: Double)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nClearShadows")
+        external fun _nClearShadows(ptr: Long)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetFontFeatures")
+        external fun _nGetFontFeatures(ptr: Long): Array<FontFeature>
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nAddFontFeature")
+        external fun _nAddFontFeature(ptr: Long, name: String?, value: Int)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nClearFontFeatures")
+        external fun _nClearFontFeatures(ptr: Long)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetFontSize")
+        external fun _nGetFontSize(ptr: Long): Float
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nSetFontSize")
+        external fun _nSetFontSize(ptr: Long, size: Float)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetFontFamilies")
+        external fun _nGetFontFamilies(ptr: Long): Array<String>
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nSetFontFamilies")
+        external fun _nSetFontFamilies(ptr: Long, families: Array<String>?)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetHeight")
+        external fun _nGetHeight(ptr: Long): Float?
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nSetHeight")
+        external fun _nSetHeight(ptr: Long, override: Boolean, height: Float)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetLetterSpacing")
+        external fun _nGetLetterSpacing(ptr: Long): Float
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nSetLetterSpacing")
+        external fun _nSetLetterSpacing(ptr: Long, letterSpacing: Float)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetWordSpacing")
+        external fun _nGetWordSpacing(ptr: Long): Float
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nSetWordSpacing")
+        external fun _nSetWordSpacing(ptr: Long, wordSpacing: Float)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetTypeface")
+        external fun _nGetTypeface(ptr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nSetTypeface")
+        external fun _nSetTypeface(ptr: Long, typefacePtr: Long)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetLocale")
+        external fun _nGetLocale(ptr: Long): String
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nSetLocale")
+        external fun _nSetLocale(ptr: Long, locale: String?)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetBaselineMode")
+        external fun _nGetBaselineMode(ptr: Long): Int
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nSetBaselineMode")
+        external fun _nSetBaselineMode(ptr: Long, mode: Int)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetFontMetrics")
+        external fun _nGetFontMetrics(ptr: Long): FontMetrics
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nIsPlaceholder")
+        external fun _nIsPlaceholder(ptr: Long): Boolean
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nSetPlaceholder")
+        external fun _nSetPlaceholder(ptr: Long)
 
         init {
             staticLoad()

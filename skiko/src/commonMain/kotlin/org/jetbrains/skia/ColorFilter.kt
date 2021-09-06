@@ -5,6 +5,7 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 
 class ColorFilter : RefCnt {
@@ -80,19 +81,45 @@ class ColorFilter : RefCnt {
             return ColorFilter(_nMakeOverdraw(colors[0], colors[1], colors[2], colors[3], colors[4], colors[5]))
         }
 
-        @JvmStatic external fun _nMakeComposed(outer: Long, inner: Long): Long
-        @JvmStatic external fun _nMakeBlend(color: Int, blendMode: Int): Long
-        @JvmStatic external fun _nMakeMatrix(rowMajor: FloatArray?): Long
-        @JvmStatic external fun _nMakeHSLAMatrix(rowMajor: FloatArray?): Long
-        @JvmStatic external fun _nGetLinearToSRGBGamma(): Long
-        @JvmStatic external fun _nGetSRGBToLinearGamma(): Long
-        @JvmStatic external fun _nMakeLerp(t: Float, dstPtr: Long, srcPtr: Long): Long
-        @JvmStatic external fun _nMakeLighting(colorMul: Int, colorAdd: Int): Long
-        @JvmStatic external fun _nMakeHighContrast(grayscale: Boolean, inversionMode: Int, contrast: Float): Long
-        @JvmStatic external fun _nMakeTable(table: ByteArray?): Long
-        @JvmStatic external fun _nMakeTableARGB(a: ByteArray?, r: ByteArray?, g: ByteArray?, b: ByteArray?): Long
-        @JvmStatic external fun _nMakeOverdraw(c0: Int, c1: Int, c2: Int, c3: Int, c4: Int, c5: Int): Long
-        @JvmStatic external fun _nGetLuma(): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeComposed")
+        external fun _nMakeComposed(outer: Long, inner: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeBlend")
+        external fun _nMakeBlend(color: Int, blendMode: Int): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeMatrix")
+        external fun _nMakeMatrix(rowMajor: FloatArray?): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeHSLAMatrix")
+        external fun _nMakeHSLAMatrix(rowMajor: FloatArray?): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nGetLinearToSRGBGamma")
+        external fun _nGetLinearToSRGBGamma(): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nGetSRGBToLinearGamma")
+        external fun _nGetSRGBToLinearGamma(): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeLerp")
+        external fun _nMakeLerp(t: Float, dstPtr: Long, srcPtr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeLighting")
+        external fun _nMakeLighting(colorMul: Int, colorAdd: Int): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeHighContrast")
+        external fun _nMakeHighContrast(grayscale: Boolean, inversionMode: Int, contrast: Float): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeTable")
+        external fun _nMakeTable(table: ByteArray?): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeTableARGB")
+        external fun _nMakeTableARGB(a: ByteArray?, r: ByteArray?, g: ByteArray?, b: ByteArray?): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeOverdraw")
+        external fun _nMakeOverdraw(c0: Int, c1: Int, c2: Int, c3: Int, c4: Int, c5: Int): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nGetLuma")
+        external fun _nGetLuma(): Long
 
         init {
             staticLoad()

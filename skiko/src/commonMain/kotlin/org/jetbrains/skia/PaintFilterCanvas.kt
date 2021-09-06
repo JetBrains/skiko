@@ -11,6 +11,7 @@ import org.jetbrains.skia.impl.reachabilityBarrier
 abstract class PaintFilterCanvas(canvas: Canvas, unrollDrawable: Boolean) :
     Canvas(_nMake(getPtr(canvas), unrollDrawable), true, canvas) {
     companion object {
+        @ExternalSymbolName("org_jetbrains_skia_PaintFilterCanvas__1nMake")
         external fun _nMake(canvasPtr: Long, unrollDrawable: Boolean): Long
 
         init {
@@ -33,6 +34,7 @@ abstract class PaintFilterCanvas(canvas: Canvas, unrollDrawable: Boolean) :
         return onFilter(paint)
     }
 
+    @ExternalSymbolName("org_jetbrains_skia_PaintFilterCanvas__1nAttachToJava")
     external fun _nAttachToJava(canvasPtr: Long)
 
     /**

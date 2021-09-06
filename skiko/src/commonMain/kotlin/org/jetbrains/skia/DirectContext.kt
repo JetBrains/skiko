@@ -5,6 +5,7 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 
 class DirectContext internal constructor(ptr: Long) : RefCnt(ptr) {
@@ -37,13 +38,27 @@ class DirectContext internal constructor(ptr: Long) : RefCnt(ptr) {
             return DirectContext(_nMakeDirect3D(adapterPtr, devicePtr, queuePtr))
         }
 
-        @JvmStatic external fun _nMakeGL(): Long
-        @JvmStatic external fun _nMakeMetal(devicePtr: Long, queuePtr: Long): Long
-        @JvmStatic external fun _nMakeDirect3D(adapterPtr: Long, devicePtr: Long, queuePtr: Long): Long
-        @JvmStatic external fun _nFlush(ptr: Long): Long
-        @JvmStatic external fun _nSubmit(ptr: Long, syncCpu: Boolean): Long
-        @JvmStatic external fun _nReset(ptr: Long, flags: Int)
-        @JvmStatic external fun _nAbandon(ptr: Long)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeGL")
+        external fun _nMakeGL(): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeMetal")
+        external fun _nMakeMetal(devicePtr: Long, queuePtr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeDirect3D")
+        external fun _nMakeDirect3D(adapterPtr: Long, devicePtr: Long, queuePtr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nFlush")
+        external fun _nFlush(ptr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nSubmit")
+        external fun _nSubmit(ptr: Long, syncCpu: Boolean): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nReset")
+        external fun _nReset(ptr: Long, flags: Int)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nAbandon")
+        external fun _nAbandon(ptr: Long)
 
         init {
             staticLoad()

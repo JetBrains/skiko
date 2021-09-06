@@ -5,6 +5,7 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 
 class Picture internal constructor(ptr: Long) : RefCnt(ptr) {
@@ -44,15 +45,33 @@ class Picture internal constructor(ptr: Long) : RefCnt(ptr) {
             return Picture(_nMakePlaceholder(cull.left, cull.top, cull.right, cull.bottom))
         }
 
-        @JvmStatic external fun _nMakeFromData(dataPtr: Long /*, SkDeserialProcs */): Long
-        @JvmStatic external fun _nPlayback(ptr: Long, canvasPtr: Long, abort: BooleanSupplier?)
-        @JvmStatic external fun _nGetCullRect(ptr: Long): Rect
-        @JvmStatic external fun _nGetUniqueId(ptr: Long): Int
-        @JvmStatic external fun _nSerializeToData(ptr: Long /*, SkSerialProcs */): Long
-        @JvmStatic external fun _nMakePlaceholder(left: Float, top: Float, right: Float, bottom: Float): Long
-        @JvmStatic external fun _nGetApproximateOpCount(ptr: Long): Int
-        @JvmStatic external fun _nGetApproximateBytesUsed(ptr: Long): Long
-        @JvmStatic external fun _nMakeShader(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Picture__1nMakeFromData")
+        external fun _nMakeFromData(dataPtr: Long /*, SkDeserialProcs */): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Picture__1nPlayback")
+        external fun _nPlayback(ptr: Long, canvasPtr: Long, abort: BooleanSupplier?)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Picture__1nGetCullRect")
+        external fun _nGetCullRect(ptr: Long): Rect
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Picture__1nGetUniqueId")
+        external fun _nGetUniqueId(ptr: Long): Int
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Picture__1nSerializeToData")
+        external fun _nSerializeToData(ptr: Long /*, SkSerialProcs */): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Picture__1nMakePlaceholder")
+        external fun _nMakePlaceholder(left: Float, top: Float, right: Float, bottom: Float): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Picture__1nGetApproximateOpCount")
+        external fun _nGetApproximateOpCount(ptr: Long): Int
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Picture__1nGetApproximateBytesUsed")
+        external fun _nGetApproximateBytesUsed(ptr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Picture__1nMakeShader")
+        external fun _nMakeShader(
             ptr: Long,
             tmx: Int,
             tmy: Int,

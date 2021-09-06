@@ -1,7 +1,7 @@
 package org.jetbrains.skiko.native.context
 
 import kotlinx.cinterop.ptr
-import org.jetbrains.skiko.skia.native.*
+import org.jetbrains.skia.*
 import org.jetbrains.skiko.native.*
 
 internal fun createContextHandler(layer: HardwareLayer): ContextHandler {
@@ -17,7 +17,7 @@ internal abstract class ContextHandler(val layer: HardwareLayer) {
 
     // TODO: hostOs is all written in jdk kotlin.
     // open val bleachConstant = if (hostOs == OS.MacOS) 0 else -1
-    open val bleachConstant = 0U
+    open val bleachConstant = 0
     var context: DirectContext? = null
     var renderTarget: BackendRenderTarget? = null
     var surface: Surface? = null

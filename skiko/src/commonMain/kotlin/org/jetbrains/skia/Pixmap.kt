@@ -2,6 +2,7 @@
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
+import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 
 class Pixmap internal constructor(ptr: Long, managed: Boolean) :
@@ -269,9 +270,15 @@ class Pixmap internal constructor(ptr: Long, managed: Boolean) :
             }
         }
 
-        @JvmStatic external fun _nGetFinalizer(): Long
-        @JvmStatic external fun _nMakeNull(): Long
-        @JvmStatic external fun _nMake(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nGetFinalizer")
+        external fun _nGetFinalizer(): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nMakeNull")
+        external fun _nMakeNull(): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nMake")
+        external fun _nMake(
             width: Int,
             height: Int,
             colorType: Int,
@@ -281,8 +288,12 @@ class Pixmap internal constructor(ptr: Long, managed: Boolean) :
             rowBytes: Int
         ): Long
 
-        @JvmStatic external fun _nReset(ptr: Long)
-        @JvmStatic external fun _nResetWithInfo(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nReset")
+        external fun _nReset(ptr: Long)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nResetWithInfo")
+        external fun _nResetWithInfo(
             ptr: Long,
             width: Int,
             height: Int,
@@ -293,24 +304,48 @@ class Pixmap internal constructor(ptr: Long, managed: Boolean) :
             rowBytes: Int
         )
 
-        @JvmStatic external fun _nSetColorSpace(ptr: Long, colorSpacePtr: Long)
-        @JvmStatic external fun _nExtractSubset(ptr: Long, subsetPtr: Long, l: Int, t: Int, r: Int, b: Int): Boolean
-        @JvmStatic external fun _nGetInfo(ptr: Long): ImageInfo
-        @JvmStatic external fun _nGetRowBytes(ptr: Long): Int
-        @JvmStatic external fun _nGetAddr(ptr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nSetColorSpace")
+        external fun _nSetColorSpace(ptr: Long, colorSpacePtr: Long)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nExtractSubset")
+        external fun _nExtractSubset(ptr: Long, subsetPtr: Long, l: Int, t: Int, r: Int, b: Int): Boolean
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nGetInfo")
+        external fun _nGetInfo(ptr: Long): ImageInfo
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nGetRowBytes")
+        external fun _nGetRowBytes(ptr: Long): Int
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nGetAddr")
+        external fun _nGetAddr(ptr: Long): Long
 
         // TODO methods flattening ImageInfo not included yet - use GetInfo() instead.
-        @JvmStatic external fun _nGetRowBytesAsPixels(ptr: Long): Int
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nGetRowBytesAsPixels")
+        external fun _nGetRowBytesAsPixels(ptr: Long): Int
 
         // TODO shiftPerPixel
-        @JvmStatic external fun _nComputeByteSize(ptr: Long): Int
-        @JvmStatic external fun _nComputeIsOpaque(ptr: Long): Boolean
-        @JvmStatic external fun _nGetColor(ptr: Long, x: Int, y: Int): Int
-        @JvmStatic external fun _nGetAlphaF(ptr: Long, x: Int, y: Int): Float
-        @JvmStatic external fun _nGetAddrAt(ptr: Long, x: Int, y: Int): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nComputeByteSize")
+        external fun _nComputeByteSize(ptr: Long): Int
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nComputeIsOpaque")
+        external fun _nComputeIsOpaque(ptr: Long): Boolean
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nGetColor")
+        external fun _nGetColor(ptr: Long, x: Int, y: Int): Int
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nGetAlphaF")
+        external fun _nGetAlphaF(ptr: Long, x: Int, y: Int): Float
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nGetAddrAt")
+        external fun _nGetAddrAt(ptr: Long, x: Int, y: Int): Long
 
         // methods related to C++ types(addr8/16/32/64, writable_addr8/16/32/64) not included - not needed
-        @JvmStatic external fun _nReadPixels(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nReadPixels")
+        external fun _nReadPixels(
             ptr: Long,
             width: Int,
             height: Int,
@@ -321,7 +356,9 @@ class Pixmap internal constructor(ptr: Long, managed: Boolean) :
             dstRowBytes: Int
         ): Boolean
 
-        @JvmStatic external fun _nReadPixelsFromPoint(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nReadPixelsFromPoint")
+        external fun _nReadPixelsFromPoint(
             ptr: Long,
             width: Int,
             height: Int,
@@ -334,11 +371,21 @@ class Pixmap internal constructor(ptr: Long, managed: Boolean) :
             srcY: Int
         ): Boolean
 
-        @JvmStatic external fun _nReadPixelsToPixmap(ptr: Long, dstPixmapPtr: Long): Boolean
-        @JvmStatic external fun _nReadPixelsToPixmapFromPoint(ptr: Long, dstPixmapPtr: Long, srcX: Int, srcY: Int): Boolean
-        @JvmStatic external fun _nScalePixels(ptr: Long, dstPixmapPtr: Long, samplingOptions: Long): Boolean
-        @JvmStatic external fun _nErase(ptr: Long, color: Int): Boolean
-        @JvmStatic external fun _nEraseSubset(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nReadPixelsToPixmap")
+        external fun _nReadPixelsToPixmap(ptr: Long, dstPixmapPtr: Long): Boolean
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nReadPixelsToPixmapFromPoint")
+        external fun _nReadPixelsToPixmapFromPoint(ptr: Long, dstPixmapPtr: Long, srcX: Int, srcY: Int): Boolean
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nScalePixels")
+        external fun _nScalePixels(ptr: Long, dstPixmapPtr: Long, samplingOptions: Long): Boolean
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nErase")
+        external fun _nErase(ptr: Long, color: Int): Boolean
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nEraseSubset")
+        external fun _nEraseSubset(
             ptr: Long,
             color: Int,
             l: Int,

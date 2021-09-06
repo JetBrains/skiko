@@ -44,6 +44,7 @@ kotlin {
         binaries {
             executable {
                 entryPoint = "org.jetbrains.skiko.sample.native.main"
+                freeCompilerArgs += listOf("-linker-options", "-framework", "-linker-option", "Metal")
             }
         }
     }
@@ -65,8 +66,6 @@ kotlin {
             dependsOn(nativeMain)
             dependencies {
                 implementation("org.jetbrains.skiko:skiko-native-runtime-$target:$version")
-                implementation("org.jetbrains.skiko:skiko-native-skia-interop-$target:$version")
-
             }
         }
     }

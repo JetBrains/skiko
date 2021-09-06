@@ -5,6 +5,7 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.ManagedString
 import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 
 abstract class ManagedRunIterator<T> internal constructor(
@@ -13,10 +14,18 @@ abstract class ManagedRunIterator<T> internal constructor(
     manageText: Boolean
 ) : Managed(ptr, _FinalizerHolder.PTR), MutableIterator<T> {
     companion object {
-        @JvmStatic external fun _nGetFinalizer(): Long
-        @JvmStatic external fun _nConsume(ptr: Long)
-        @JvmStatic external fun _nGetEndOfCurrentRun(ptr: Long, textPtr: Long): Int
-        @JvmStatic external fun _nIsAtEnd(ptr: Long): Boolean
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ManagedRunIterator__1nGetFinalizer")
+        external fun _nGetFinalizer(): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ManagedRunIterator__1nConsume")
+        external fun _nConsume(ptr: Long)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ManagedRunIterator__1nGetEndOfCurrentRun")
+        external fun _nGetEndOfCurrentRun(ptr: Long, textPtr: Long): Int
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ManagedRunIterator__1nIsAtEnd")
+        external fun _nIsAtEnd(ptr: Long): Boolean
 
         init {
             staticLoad()

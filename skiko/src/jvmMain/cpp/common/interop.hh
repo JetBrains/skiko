@@ -17,6 +17,7 @@
 #include "SkShaper.h"
 #include "SkString.h"
 #include "SkSurfaceProps.h"
+#include "common.h"
 
 namespace java {
     namespace io {
@@ -288,10 +289,6 @@ namespace skija {
         void onUnload(JNIEnv* env);
     }
 
-    namespace SamplingMode {
-        SkSamplingOptions unpack(jlong val);
-    }
-
     namespace SurfaceProps {
         extern jmethodID _getFlags;
         extern jmethodID _getPixelGeometryOrdinal;
@@ -310,20 +307,6 @@ namespace skija {
 
     void onLoad(JNIEnv* env);
     void onUnload(JNIEnv* env);
-
-    class UtfIndicesConverter {
-    public:
-        UtfIndicesConverter(const char* chars8, size_t len8);
-        UtfIndicesConverter(const SkString& s);
-
-        const char* fStart8;
-        const char* fPtr8;
-        const char* fEnd8;
-        uint32_t fPos16;
-
-        size_t from16To8(uint32_t i16);
-        uint32_t from8To16(size_t i8);
-    };
 }
 
 std::unique_ptr<SkMatrix> skMatrix(JNIEnv* env, jfloatArray arr);
@@ -350,12 +333,3 @@ jobjectArray javaStringArray(JNIEnv* env, const std::vector<SkString>& strings);
 
 void deleteJBytes(void* addr, void*);
 
-template <typename T>
-inline T jlongToPtr(jlong ptr) {
-    return reinterpret_cast<T>(static_cast<uintptr_t>(ptr));
-}
-
-template <typename T>
-jlong ptrToJlong(T* ptr) {
-    return static_cast<jlong>(reinterpret_cast<uintptr_t>(ptr));
-}

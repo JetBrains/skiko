@@ -5,6 +5,7 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 
 class RuntimeEffect internal constructor(ptr: Long) : RefCnt(ptr) {
@@ -19,13 +20,19 @@ class RuntimeEffect internal constructor(ptr: Long) : RefCnt(ptr) {
             return RuntimeEffect(_nMakeForColorFilter(sksl))
         }
 
-        @JvmStatic external fun _nMakeShader(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_RuntimeEffect__1nMakeShader")
+        external fun _nMakeShader(
             runtimeEffectPtr: Long, uniformPtr: Long, childrenPtrs: LongArray?,
             localMatrix: FloatArray?, isOpaque: Boolean
         ): Long
 
-        @JvmStatic external fun _nMakeForShader(sksl: String?): Long
-        @JvmStatic external fun _nMakeForColorFilter(sksl: String?): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_RuntimeEffect__1nMakeForShader")
+        external fun _nMakeForShader(sksl: String?): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_RuntimeEffect__1nMakeForColorFilter")
+        external fun _nMakeForColorFilter(sksl: String?): Long
 
         init {
             staticLoad()

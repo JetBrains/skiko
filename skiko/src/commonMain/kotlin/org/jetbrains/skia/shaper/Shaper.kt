@@ -7,6 +7,7 @@ import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.impl.use
+import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 
 /**
@@ -89,20 +90,28 @@ class Shaper internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR
         }
 
         @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Shaper__1nGetFinalizer")
         external fun _nGetFinalizer(): Long
         @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Shaper__1nMakePrimitive")
         external fun _nMakePrimitive(): Long
         @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Shaper__1nMakeShaperDrivenWrapper")
         external fun _nMakeShaperDrivenWrapper(fontMgrPtr: Long): Long
         @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Shaper__1nMakeShapeThenWrap")
         external fun _nMakeShapeThenWrap(fontMgrPtr: Long): Long
         @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Shaper__1nMakeShapeDontWrapOrReorder")
         external fun _nMakeShapeDontWrapOrReorder(fontMgrPtr: Long): Long
         @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Shaper__1nMakeCoreText")
         external fun _nMakeCoreText(): Long
         @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Shaper__1nMake")
         external fun _nMake(fontMgrPtr: Long): Long
         @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Shaper__1nShapeBlob")
         external fun _nShapeBlob(
             ptr: Long,
             text: String?,
@@ -114,8 +123,10 @@ class Shaper internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR
         ): Long
 
         @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Shaper__1nShapeLine")
         external fun _nShapeLine(ptr: Long, text: String?, fontPtr: Long, opts: ShapingOptions?): Long
         @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Shaper__1nShape")
         external fun _nShape(
             ptr: Long,
             textPtr: Long,

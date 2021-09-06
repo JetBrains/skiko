@@ -1,6 +1,5 @@
 import de.undercouch.gradle.tasks.download.Download
 import org.gradle.crypto.checksum.Checksum
-import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 
@@ -127,22 +126,26 @@ kotlin {
     }
 
     if (supportNative) {
-        val nativeTarget = when (target) {
-            "macos-x64", "macos-arm64" -> macosX64()
-            else -> null
-        }
-        nativeTarget?.apply {
-            compilations.getByName("main") {
-                val skia by cinterops.creating {
-                    defFile("src/nativeInterop/cinterop/skia.def")
-                    val skiaDir = skiaDir.get().absolutePath
-                    compilerOpts("-I$skiaDir")
-                    extraOpts("-staticLibrary", "libskia.a")
-                    extraOpts("-staticLibrary", "libskshaper.a")
-                    extraOpts("-staticLibrary", "libskparagraph.a")
-                    extraOpts("-libraryPath", "$skiaDir/$skiaBinSubdir")
+        val targetString = target
+        val skiaDir = skiaDir.get().absolutePath
+        val nativeTarget = when (targetString) {
+            "macos-x64", "macos-arm64" -> macosX64() {
+                compilations.all {
+                    kotlinOptions {
+                        freeCompilerArgs += listOf(
+                            "-include-binary",
+                            "$skiaDir/$skiaBinSubdir/libskia.a",
+                            "-include-binary",
+                            "$skiaDir/$skiaBinSubdir/libskshaper.a",
+                            "-include-binary",
+                            "$skiaDir/$skiaBinSubdir/libskparagraph.a",
+                            "-include-binary",
+                            "$buildDir/nativeBridges/static/$targetString/skiko-native-bridges-$targetString.a"
+                        )
+                    }
                 }
             }
+            else -> null
         }
     }
 
@@ -186,27 +189,13 @@ kotlin {
     }
 }
 
-tasks.withType(CInteropProcess::class.java).forEach {
-    it.dependsOn(skiaDir)
-}
-
 tasks.withType(JavaCompile::class.java).configureEach {
     this.getOptions().compilerArgs.addAll(listOf("-source", "11", "-target", "11"))
 }
 
-// See https://docs.gradle.org/current/userguide/cpp_library_plugin.html.
-tasks.withType(CppCompile::class.java).configureEach {
-    // Prefer 'java.home' system property to simplify overriding from Intellij.
-    // When used from command-line, it is effectively equal to JAVA_HOME.
-    if (JavaVersion.current() < JavaVersion.VERSION_11) {
-        error("JDK 11+ is required, but Gradle JVM is ${JavaVersion.current()}. " +
-                "Check JAVA_HOME (CLI) or Gradle settings (Intellij).")
-    }
-    val jdkHome = System.getProperty("java.home") ?: error("'java.home' is null")
-    dependsOn(skiaDir)
+val skiaPreprocessorFlags: Array<String> get() {
     val skiaDir = skiaDir.get().absolutePath
-    compilerArgs.addAll(listOf(
-        "-I$jdkHome/include",
+    return listOf(
         "-I$skiaDir",
         "-I$skiaDir/include",
         "-I$skiaDir/include/core",
@@ -238,8 +227,26 @@ tasks.withType(CppCompile::class.java).configureEach {
         "-DU_DISABLE_RENAMING",
         "-DSK_USING_THIRD_PARTY_ICU",
         *buildType.flags
-    ))
+    ).toTypedArray()
+}
+
+// See https://docs.gradle.org/current/userguide/cpp_library_plugin.html.
+tasks.withType(CppCompile::class.java).configureEach {
+    // Prefer 'java.home' system property to simplify overriding from Intellij.
+    // When used from command-line, it is effectively equal to JAVA_HOME.
+    if (JavaVersion.current() < JavaVersion.VERSION_11) {
+        error("JDK 11+ is required, but Gradle JVM is ${JavaVersion.current()}. " +
+                "Check JAVA_HOME (CLI) or Gradle settings (Intellij).")
+    }
+    val jdkHome = System.getProperty("java.home") ?: error("'java.home' is null")
+    dependsOn(skiaDir)
+    val skiaDir = skiaDir.get().absolutePath
+    compilerArgs.addAll(
+        listOf("-I$jdkHome/include") + skiaPreprocessorFlags
+    )
     val includeDir = "$projectDir/src/jvmMain/cpp/include"
+    val commonIncludeDir = "$projectDir/src/commonMain/cpp/headers"
+
     when (targetOs) {
         OS.MacOS -> {
             compilerArgs.addAll(
@@ -248,6 +255,7 @@ tasks.withType(CppCompile::class.java).configureEach {
                     "-fvisibility-inlines-hidden",
                     "-I$jdkHome/include/darwin",
                     "-I$includeDir",
+                    "-I$commonIncludeDir",
                     "-DSK_SHAPER_CORETEXT_AVAILABLE",
                     "-DSK_BUILD_FOR_MAC",
                     "-DSK_METAL",
@@ -265,6 +273,7 @@ tasks.withType(CppCompile::class.java).configureEach {
                     "-fvisibility-inlines-hidden",
                     "-I$jdkHome/include/linux",
                     "-I$includeDir",
+                    "-I$commonIncludeDir",
                     "-DSK_BUILD_FOR_LINUX",
                     "-D_GLIBCXX_USE_CXX11_ABI=0",
                     *buildType.clangFlags
@@ -276,6 +285,7 @@ tasks.withType(CppCompile::class.java).configureEach {
                 listOf(
                     "-I$jdkHome/include/win32",
                     "-I$includeDir",
+                    "-I$commonIncludeDir",
                     "-DSK_BUILD_FOR_WIN",
                     "-D_CRT_SECURE_NO_WARNINGS",
                     "-D_HAS_EXCEPTIONS=0",
@@ -310,7 +320,7 @@ project.tasks.register<Exec>("objcCompile") {
     commandLine = listOf(
         "clang",
         *targetArch.clangFlags,
-        "-mmacosx-version-min=10.13",
+        *targetOs.clangFlags,
         "-I$jdkHome/include",
         "-I$jdkHome/include/darwin",
         "-I$skiaDir",
@@ -352,6 +362,75 @@ project.tasks.register<Exec>("wasmCompile") {
     file(outDir).mkdirs()
     inputs.files(srcs)
     outputs.files(outJs, outWasm)
+}
+
+fun List<String>.findAllFiles(suffix: String): List<String> = this
+    .map { File(it) }
+    .flatMap { it.walk().toList() }
+    .map { it.absolutePath }
+    .filter { it.endsWith(suffix) }
+
+
+// Very hacky way to compile native bridges and add the
+// resulting object files into the final native klib.
+project.tasks.register<Exec>("nativeBridgesCompile") {
+    dependsOn(skiaDir)
+    val inputDirs = listOf(
+        "$projectDir/src/macosX64Main/cpp/generated",
+        "$projectDir/src/macosX64Main/cpp/common",
+        "$projectDir/src/commonMain/cpp/common"
+    )
+    val outDir = "$buildDir/nativeBridges/obj/$target"
+    val srcs = inputDirs
+        .findAllFiles(".cc")
+        .toTypedArray()
+    val outs = srcs
+        .map { it.substringAfterLast("/") }
+        .map { File(it).nameWithoutExtension }
+        .map { "$outDir/$it.o" }
+        .toTypedArray()
+
+    workingDir = File(outDir)
+    commandLine = listOf(
+        "clang++",
+        *targetArch.clangFlags,
+        *targetOs.clangFlags,
+        "-std=c++17",
+        "-c",
+        "-DPROVIDE_JNI_TYPES",
+        "-DSK_SHAPER_CORETEXT_AVAILABLE",
+        "-DSK_BUILD_FOR_MAC",
+        "-DSK_METAL",
+        "-I$projectDir/src/macosX64Main/cpp/headers",
+        "-I$projectDir/src/commonMain/cpp/headers",
+        *skiaPreprocessorFlags,
+        *srcs
+    )
+    file(outDir).mkdirs()
+    inputs.files(srcs)
+    outputs.files(outs)
+}
+
+project.tasks.register<Exec>("nativeBridgesLink") {
+    dependsOn(project.tasks.getByName("nativeBridgesCompile"))
+    inputs.files(project.tasks.getByName("nativeBridgesCompile").outputs)
+
+    val outDir = "$buildDir/nativeBridges/static/$target"
+    val srcs = inputs.files.files
+        .map { it.absolutePath }
+        .toTypedArray()
+    println("SRCS: $srcs")
+    val staticLib = "$outDir/skiko-native-bridges-$target.a"
+    workingDir = File(outDir)
+    commandLine = listOf(
+        "libtool",
+        "-static",
+        "-o",
+        staticLib,
+        *srcs
+    )
+    file(outDir).mkdirs()
+    outputs.files(staticLib)
 }
 
 fun localSign(signer: String, lib: File): File {
@@ -480,6 +559,7 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
 
 extensions.configure<CppLibrary> {
     source.from(
+        fileTree("$projectDir/src/commonMain/cpp/common"),
         fileTree("$projectDir/src/jvmMain/cpp/common"),
         fileTree("$projectDir/src/jvmMain/cpp/${targetOs.id}")
     )
@@ -722,12 +802,6 @@ publishing {
             }
         }
         if (supportNative) {
-            create<MavenPublication>("skikoNativeSkiaInterop") {
-                artifactId = SkikoArtifacts.nativeSkiaInteropArtifactIdFor(targetOs, targetArch)
-                    afterEvaluate {
-                        artifact(project.tasks.withType(CInteropProcess::class.java).single().outputs.getFiles().single())
-                    }
-            }
             create<MavenPublication>("skikoNativeRuntime") {
                 artifactId = SkikoArtifacts.nativeRuntimeArtifactIdFor(targetOs, targetArch)
                     afterEvaluate {
@@ -741,8 +815,13 @@ publishing {
     }
 }
 
-tasks.withType<KotlinCompile>().configureEach {
-    if (name == "compileTestKotlinJvm") {
-        kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+afterEvaluate {
+    tasks.withType<KotlinCompile>().configureEach {
+        if (name == "compileTestKotlinJvm") {
+            kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+        }
+        if (supportNative) {
+            dependsOn(tasks.getByName("nativeBridgesLink"))
+        }
     }
 }

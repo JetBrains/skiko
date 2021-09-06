@@ -5,6 +5,7 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 
 class Bitmap internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR), IHasImageInfo {
@@ -18,24 +19,60 @@ class Bitmap internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR
             }
         }
 
-        @JvmStatic external fun _nGetFinalizer(): Long
-        @JvmStatic external fun _nMake(): Long
-        @JvmStatic external fun _nMakeClone(ptr: Long): Long
-        @JvmStatic external fun _nSwap(ptr: Long, otherPtr: Long)
-        @JvmStatic external fun _nGetPixmap(ptr: Long): Long
-        @JvmStatic external fun _nGetImageInfo(ptr: Long): ImageInfo?
-        @JvmStatic external fun _nGetRowBytesAsPixels(ptr: Long): Int
-        @JvmStatic external fun _nIsNull(ptr: Long): Boolean
-        @JvmStatic external fun _nGetRowBytes(ptr: Long): Long
-        @JvmStatic external fun _nSetAlphaType(ptr: Long, alphaType: Int): Boolean
-        @JvmStatic external fun _nComputeByteSize(ptr: Long): Long
-        @JvmStatic external fun _nIsImmutable(ptr: Long): Boolean
-        @JvmStatic external fun _nSetImmutable(ptr: Long)
-        @JvmStatic external fun _nIsVolatile(ptr: Long): Boolean
-        @JvmStatic external fun _nSetVolatile(ptr: Long, value: Boolean)
-        @JvmStatic external fun _nReset(ptr: Long)
-        @JvmStatic external fun _nComputeIsOpaque(ptr: Long): Boolean
-        @JvmStatic external fun _nSetImageInfo(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetFinalizer")
+        external fun _nGetFinalizer(): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nMake")
+        external fun _nMake(): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nMakeClone")
+        external fun _nMakeClone(ptr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nSwap")
+        external fun _nSwap(ptr: Long, otherPtr: Long)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetPixmap")
+        external fun _nGetPixmap(ptr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetImageInfo")
+        external fun _nGetImageInfo(ptr: Long): ImageInfo?
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetRowBytesAsPixels")
+        external fun _nGetRowBytesAsPixels(ptr: Long): Int
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nIsNull")
+        external fun _nIsNull(ptr: Long): Boolean
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetRowBytes")
+        external fun _nGetRowBytes(ptr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nSetAlphaType")
+        external fun _nSetAlphaType(ptr: Long, alphaType: Int): Boolean
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nComputeByteSize")
+        external fun _nComputeByteSize(ptr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nIsImmutable")
+        external fun _nIsImmutable(ptr: Long): Boolean
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nSetImmutable")
+        external fun _nSetImmutable(ptr: Long)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nIsVolatile")
+        external fun _nIsVolatile(ptr: Long): Boolean
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nSetVolatile")
+        external fun _nSetVolatile(ptr: Long, value: Boolean)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nReset")
+        external fun _nReset(ptr: Long)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nComputeIsOpaque")
+        external fun _nComputeIsOpaque(ptr: Long): Boolean
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nSetImageInfo")
+        external fun _nSetImageInfo(
             ptr: Long,
             width: Int,
             height: Int,
@@ -45,7 +82,9 @@ class Bitmap internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR
             rowBytes: Long
         ): Boolean
 
-        @JvmStatic external fun _nAllocPixelsFlags(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nAllocPixelsFlags")
+        external fun _nAllocPixelsFlags(
             ptr: Long,
             width: Int,
             height: Int,
@@ -55,7 +94,9 @@ class Bitmap internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR
             flags: Int
         ): Boolean
 
-        @JvmStatic external fun _nAllocPixelsRowBytes(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nAllocPixelsRowBytes")
+        external fun _nAllocPixelsRowBytes(
             ptr: Long,
             width: Int,
             height: Int,
@@ -65,7 +106,9 @@ class Bitmap internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR
             rowBytes: Long
         ): Boolean
 
-        @JvmStatic external fun _nInstallPixels(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nInstallPixels")
+        external fun _nInstallPixels(
             ptr: Long,
             width: Int,
             height: Int,
@@ -76,19 +119,45 @@ class Bitmap internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR
             rowBytes: Long
         ): Boolean
 
-        @JvmStatic external fun _nAllocPixels(ptr: Long): Boolean
-        @JvmStatic external fun _nGetPixelRef(ptr: Long): Long
-        @JvmStatic external fun _nGetPixelRefOrigin(ptr: Long): Long
-        @JvmStatic external fun _nSetPixelRef(ptr: Long, pixelRefPtr: Long, dx: Int, dy: Int)
-        @JvmStatic external fun _nIsReadyToDraw(ptr: Long): Boolean
-        @JvmStatic external fun _nGetGenerationId(ptr: Long): Int
-        @JvmStatic external fun _nNotifyPixelsChanged(ptr: Long)
-        @JvmStatic external fun _nEraseColor(ptr: Long, color: Int)
-        @JvmStatic external fun _nErase(ptr: Long, color: Int, left: Int, top: Int, right: Int, bottom: Int)
-        @JvmStatic external fun _nGetColor(ptr: Long, x: Int, y: Int): Int
-        @JvmStatic external fun _nGetAlphaf(ptr: Long, x: Int, y: Int): Float
-        @JvmStatic external fun _nExtractSubset(ptr: Long, dstPtr: Long, left: Int, top: Int, right: Int, bottom: Int): Boolean
-        @JvmStatic external fun _nReadPixels(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nAllocPixels")
+        external fun _nAllocPixels(ptr: Long): Boolean
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetPixelRef")
+        external fun _nGetPixelRef(ptr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetPixelRefOrigin")
+        external fun _nGetPixelRefOrigin(ptr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nSetPixelRef")
+        external fun _nSetPixelRef(ptr: Long, pixelRefPtr: Long, dx: Int, dy: Int)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nIsReadyToDraw")
+        external fun _nIsReadyToDraw(ptr: Long): Boolean
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetGenerationId")
+        external fun _nGetGenerationId(ptr: Long): Int
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nNotifyPixelsChanged")
+        external fun _nNotifyPixelsChanged(ptr: Long)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nEraseColor")
+        external fun _nEraseColor(ptr: Long, color: Int)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nErase")
+        external fun _nErase(ptr: Long, color: Int, left: Int, top: Int, right: Int, bottom: Int)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetColor")
+        external fun _nGetColor(ptr: Long, x: Int, y: Int): Int
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetAlphaf")
+        external fun _nGetAlphaf(ptr: Long, x: Int, y: Int): Float
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nExtractSubset")
+        external fun _nExtractSubset(ptr: Long, dstPtr: Long, left: Int, top: Int, right: Int, bottom: Int): Boolean
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nReadPixels")
+        external fun _nReadPixels(
             ptr: Long,
             width: Int,
             height: Int,
@@ -100,9 +169,15 @@ class Bitmap internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR
             srcY: Int
         ): ByteArray?
 
-        @JvmStatic external fun _nExtractAlpha(ptr: Long, dstPtr: Long, paintPtr: Long): IPoint?
-        @JvmStatic external fun _nPeekPixels(ptr: Long): ByteBuffer?
-        @JvmStatic external fun _nMakeShader(ptr: Long, tmx: Int, tmy: Int, samplingMode: Long, localMatrix: FloatArray?): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nExtractAlpha")
+        external fun _nExtractAlpha(ptr: Long, dstPtr: Long, paintPtr: Long): IPoint?
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nPeekPixels")
+        external fun _nPeekPixels(ptr: Long): ByteBuffer?
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nMakeShader")
+        external fun _nMakeShader(ptr: Long, tmx: Int, tmy: Int, samplingMode: Long, localMatrix: FloatArray?): Long
 
         init {
             staticLoad()

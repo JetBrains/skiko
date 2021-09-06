@@ -5,6 +5,7 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 
 class PictureRecorder internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
@@ -26,12 +27,24 @@ class PictureRecorder internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
         //     Stats.onNativeCall();
         //     return new Drawable(_nFinishRecordingAsDrawable(_ptr, 0));
         // }
-        @JvmStatic external fun _nMake(): Long
-        @JvmStatic external fun _nGetFinalizer(): Long
-        @JvmStatic external fun _nBeginRecording(ptr: Long, left: Float, top: Float, right: Float, bottom: Float): Long
-        @JvmStatic external fun _nGetRecordingCanvas(ptr: Long): Long
-        @JvmStatic external fun _nFinishRecordingAsPicture(ptr: Long): Long
-        @JvmStatic external fun _nFinishRecordingAsPictureWithCull(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nMake")
+        external fun _nMake(): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nGetFinalizer")
+        external fun _nGetFinalizer(): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nBeginRecording")
+        external fun _nBeginRecording(ptr: Long, left: Float, top: Float, right: Float, bottom: Float): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nGetRecordingCanvas")
+        external fun _nGetRecordingCanvas(ptr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nFinishRecordingAsPicture")
+        external fun _nFinishRecordingAsPicture(ptr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nFinishRecordingAsPictureWithCull")
+        external fun _nFinishRecordingAsPictureWithCull(
             ptr: Long,
             left: Float,
             top: Float,
@@ -39,7 +52,9 @@ class PictureRecorder internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
             bottom: Float
         ): Long
 
-        @JvmStatic external fun _nFinishRecordingAsDrawable(ptr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nFinishRecordingAsDrawable")
+        external fun _nFinishRecordingAsDrawable(ptr: Long): Long
 
         init {
             staticLoad()

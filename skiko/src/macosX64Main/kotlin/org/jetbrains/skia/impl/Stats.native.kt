@@ -2,14 +2,14 @@ package org.jetbrains.skia.impl
 
 actual object Stats {
     actual fun onNativeCall() {
-        TODO()
+        // TODO
     }
 
     actual fun onAllocated(className: String) {
-        TODO()
+        // TODO
     }
 
     actual fun onDeallocated(className: String) {
-        TODO()
+        // TODO
     }
 }

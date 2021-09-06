@@ -6,6 +6,7 @@ import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 
 class ImageFilter internal constructor(ptr: Long) : RefCnt(ptr) {
@@ -608,6 +609,7 @@ class ImageFilter internal constructor(ptr: Long) : RefCnt(ptr) {
         }
 
         @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeAlphaThreshold")
         external fun _nMakeAlphaThreshold(
             regionPtr: Long,
             innerMin: Float,
@@ -616,7 +618,9 @@ class ImageFilter internal constructor(ptr: Long) : RefCnt(ptr) {
             crop: IRect?
         ): Long
 
-        @JvmStatic external fun _nMakeArithmetic(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeArithmetic")
+        external fun _nMakeArithmetic(
             k1: Float,
             k2: Float,
             k3: Float,
@@ -627,11 +631,21 @@ class ImageFilter internal constructor(ptr: Long) : RefCnt(ptr) {
             crop: IRect?
         ): Long
 
-        @JvmStatic external fun _nMakeBlend(blendMode: Int, bg: Long, fg: Long, crop: IRect?): Long
-        @JvmStatic external fun _nMakeBlur(sigmaX: Float, sigmaY: Float, tileMode: Int, input: Long, crop: IRect?): Long
-        @JvmStatic external fun _nMakeColorFilter(colorFilterPtr: Long, input: Long, crop: IRect?): Long
-        @JvmStatic external fun _nMakeCompose(outer: Long, inner: Long): Long
-        @JvmStatic external fun _nMakeDisplacementMap(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeBlend")
+        external fun _nMakeBlend(blendMode: Int, bg: Long, fg: Long, crop: IRect?): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeBlur")
+        external fun _nMakeBlur(sigmaX: Float, sigmaY: Float, tileMode: Int, input: Long, crop: IRect?): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeColorFilter")
+        external fun _nMakeColorFilter(colorFilterPtr: Long, input: Long, crop: IRect?): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeCompose")
+        external fun _nMakeCompose(outer: Long, inner: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDisplacementMap")
+        external fun _nMakeDisplacementMap(
             xChan: Int,
             yChan: Int,
             scale: Float,
@@ -640,7 +654,9 @@ class ImageFilter internal constructor(ptr: Long) : RefCnt(ptr) {
             crop: IRect?
         ): Long
 
-        @JvmStatic external fun _nMakeDropShadow(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDropShadow")
+        external fun _nMakeDropShadow(
             dx: Float,
             dy: Float,
             sigmaX: Float,
@@ -650,7 +666,9 @@ class ImageFilter internal constructor(ptr: Long) : RefCnt(ptr) {
             crop: IRect?
         ): Long
 
-        @JvmStatic external fun _nMakeDropShadowOnly(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDropShadowOnly")
+        external fun _nMakeDropShadowOnly(
             dx: Float,
             dy: Float,
             sigmaX: Float,
@@ -660,7 +678,9 @@ class ImageFilter internal constructor(ptr: Long) : RefCnt(ptr) {
             crop: IRect?
         ): Long
 
-        @JvmStatic external fun _nMakeImage(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeImage")
+        external fun _nMakeImage(
             image: Long,
             l0: Float,
             t0: Float,
@@ -673,7 +693,9 @@ class ImageFilter internal constructor(ptr: Long) : RefCnt(ptr) {
             samplingMode: Long
         ): Long
 
-        @JvmStatic external fun _nMakeMagnifier(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMagnifier")
+        external fun _nMakeMagnifier(
             l: Float,
             t: Float,
             r: Float,
@@ -683,7 +705,9 @@ class ImageFilter internal constructor(ptr: Long) : RefCnt(ptr) {
             crop: IRect?
         ): Long
 
-        @JvmStatic external fun _nMakeMatrixConvolution(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMatrixConvolution")
+        external fun _nMakeMatrixConvolution(
             kernelW: Int,
             kernelH: Int,
             kernel: FloatArray?,
@@ -697,12 +721,24 @@ class ImageFilter internal constructor(ptr: Long) : RefCnt(ptr) {
             crop: IRect?
         ): Long
 
-        @JvmStatic external fun _nMakeMatrixTransform(matrix: FloatArray?, samplingMode: Long, input: Long): Long
-        @JvmStatic external fun _nMakeMerge(filters: LongArray?, crop: IRect?): Long
-        @JvmStatic external fun _nMakeOffset(dx: Float, dy: Float, input: Long, crop: IRect?): Long
-        @JvmStatic external fun _nMakePaint(paint: Long, crop: IRect?): Long
-        @JvmStatic external fun _nMakePicture(picture: Long, l: Float, t: Float, r: Float, b: Float): Long
-        @JvmStatic external fun _nMakeTile(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMatrixTransform")
+        external fun _nMakeMatrixTransform(matrix: FloatArray?, samplingMode: Long, input: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMerge")
+        external fun _nMakeMerge(filters: LongArray?, crop: IRect?): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeOffset")
+        external fun _nMakeOffset(dx: Float, dy: Float, input: Long, crop: IRect?): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakePaint")
+        external fun _nMakePaint(paint: Long, crop: IRect?): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakePicture")
+        external fun _nMakePicture(picture: Long, l: Float, t: Float, r: Float, b: Float): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeTile")
+        external fun _nMakeTile(
             l0: Float,
             t0: Float,
             r0: Float,
@@ -714,9 +750,15 @@ class ImageFilter internal constructor(ptr: Long) : RefCnt(ptr) {
             input: Long
         ): Long
 
-        @JvmStatic external fun _nMakeDilate(rx: Float, ry: Float, input: Long, crop: IRect?): Long
-        @JvmStatic external fun _nMakeErode(rx: Float, ry: Float, input: Long, crop: IRect?): Long
-        @JvmStatic external fun _nMakeDistantLitDiffuse(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDilate")
+        external fun _nMakeDilate(rx: Float, ry: Float, input: Long, crop: IRect?): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeErode")
+        external fun _nMakeErode(rx: Float, ry: Float, input: Long, crop: IRect?): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDistantLitDiffuse")
+        external fun _nMakeDistantLitDiffuse(
             x: Float,
             y: Float,
             z: Float,
@@ -727,7 +769,9 @@ class ImageFilter internal constructor(ptr: Long) : RefCnt(ptr) {
             crop: IRect?
         ): Long
 
-        @JvmStatic external fun _nMakePointLitDiffuse(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakePointLitDiffuse")
+        external fun _nMakePointLitDiffuse(
             x: Float,
             y: Float,
             z: Float,
@@ -738,7 +782,9 @@ class ImageFilter internal constructor(ptr: Long) : RefCnt(ptr) {
             crop: IRect?
         ): Long
 
-        @JvmStatic external fun _nMakeSpotLitDiffuse(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeSpotLitDiffuse")
+        external fun _nMakeSpotLitDiffuse(
             x0: Float,
             y0: Float,
             z0: Float,
@@ -754,7 +800,9 @@ class ImageFilter internal constructor(ptr: Long) : RefCnt(ptr) {
             crop: IRect?
         ): Long
 
-        @JvmStatic external fun _nMakeDistantLitSpecular(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDistantLitSpecular")
+        external fun _nMakeDistantLitSpecular(
             x: Float,
             y: Float,
             z: Float,
@@ -766,7 +814,9 @@ class ImageFilter internal constructor(ptr: Long) : RefCnt(ptr) {
             crop: IRect?
         ): Long
 
-        @JvmStatic external fun _nMakePointLitSpecular(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakePointLitSpecular")
+        external fun _nMakePointLitSpecular(
             x: Float,
             y: Float,
             z: Float,
@@ -778,7 +828,9 @@ class ImageFilter internal constructor(ptr: Long) : RefCnt(ptr) {
             crop: IRect?
         ): Long
 
-        @JvmStatic external fun _nMakeSpotLitSpecular(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeSpotLitSpecular")
+        external fun _nMakeSpotLitSpecular(
             x0: Float,
             y0: Float,
             z0: Float,

@@ -1,7 +1,7 @@
 package org.jetbrains.skiko.native.context
 
 import kotlinx.cinterop.*
-import org.jetbrains.skiko.skia.native.*
+import org.jetbrains.skia.*
 import org.jetbrains.skiko.native.*
 import platform.OpenGL.GL_DRAW_FRAMEBUFFER_BINDING
 import platform.OpenGL.GL_RGBA8
@@ -14,7 +14,7 @@ internal class OpenGLContextHandler(layer: HardwareLayer) : ContextHandler(layer
         println("OpenGLContextHandler::initContext")
         try {
             if (context == null) {
-                context = DirectContext.MakeGL()
+                context = DirectContext.makeGL()
             }
         } catch (e: Exception) {
             println("Failed to create Skia OpenGL context!")
@@ -43,31 +43,24 @@ internal class OpenGLContextHandler(layer: HardwareLayer) : ContextHandler(layer
         val w = (layer.nsView.frame.useContents { size.width } * scale).toInt().coerceAtLeast(0)
         val h = (layer.nsView.frame.useContents { size.height } * scale).toInt().coerceAtLeast(0)
 
-        val fbId = openglGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING.toUInt())
+            val fbId = openglGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING.toUInt())
+            renderTarget = BackendRenderTarget.makeGL(
+                w,
+                h,
+                0,
+                8,
+                fbId.toInt(),
+                FramebufferFormat.GR_GL_RGBA8
+            )
+            surface = Surface.makeFromBackendRenderTarget(
+                context!!,
+                renderTarget!!,
+                SurfaceOrigin.BOTTOM_LEFT,
+                SurfaceColorFormat.RGBA_8888,
+                ColorSpace.sRGB
+            )
 
-        // TODO: Skia C++ interop: glInfo is a `struct`, not `class`,
-        // so we fallback to C interop here.
-        memScoped {
-            val glInfo: GrGLFramebufferInfo = alloc<GrGLFramebufferInfo>()
-            glInfo.fFBOID = fbId
-            glInfo.fFormat = GL_RGBA8.toUInt()
-            renderTarget = BackendRenderTarget(w, h, 0, 8, glInfo.readValue())
-        }
-
-        surface = Surface.MakeFromBackendRenderTarget(
-            // TODO: C++ interop knows nothing about inheritance.
-            // As a bare minimum have an extension function for such conversions.
-            RecordingContext(context!!.cpp.ptr.reinterpret<GrRecordingContext>().pointed, managed = false),
-            renderTarget!!,
-            GrSurfaceOrigin.kBottomLeft_GrSurfaceOrigin,
-            colorType = kRGBA_8888_SkColorType,
-            colorSpace = ColorSpace.MakeSRGB(),
-            surfaceProps = null,
-            releaseProc = null,
-            releaseContext = null
-        ) ?: error("Could not obtain Surface")
-
-        canvas = surface!!.getCanvas()
+        canvas = surface!!.canvas
             ?: error("Could not obtain Canvas from Surface")
     }
 }
