@@ -1,23 +1,11 @@
 package org.jetbrains.skiko
 
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import kotlinx.coroutines.test.TestCoroutineScope
 import kotlinx.coroutines.test.runBlockingTest
-import kotlinx.coroutines.yield
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.util.concurrent.Executors
-import kotlin.coroutines.AbstractCoroutineContextElement
-import kotlin.coroutines.CoroutineContext
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class FrameDispatcherTest {
@@ -195,75 +183,6 @@ class FrameDispatcherTest {
         }
 
         assertEquals(listOf("frame0", "task", "frame1"), history)
-    }
-
-    @Test
-    fun `await frame`() = test {
-        val scope = CoroutineScope(coroutineContext)
-        val frameDispatcher = FrameDispatcher(scope = scope) {
-            frameCount++
-        }
-
-        frameDispatcher.awaitFrame()
-        assertEquals(1, frameCount)
-
-        frameDispatcher.awaitFrame()
-        assertEquals(2, frameCount)
-
-        frameDispatcher.awaitFrame()
-        assertEquals(3, frameCount)
-
-        repeat(100) {
-            yield()
-        }
-        assertEquals(3, frameCount)
-    }
-
-    @Test
-    fun `await active frame`() = test {
-        val scope = CoroutineScope(coroutineContext)
-        val frameDispatcher = FrameDispatcher(scope = scope) {}
-
-        val isActive = frameDispatcher.awaitFrame()
-        assertTrue(isActive)
-    }
-
-    @Test
-    fun `await failed frame`() = test {
-        val ignoreExceptionHandler = object :
-            AbstractCoroutineContextElement(CoroutineExceptionHandler),
-            CoroutineExceptionHandler {
-            override fun handleException(context: CoroutineContext, exception: Throwable) = Unit
-        }
-
-        val scope = CoroutineScope(coroutineContext + ignoreExceptionHandler)
-
-        val frameDispatcher = FrameDispatcher(scope = scope) {
-            throw RuntimeException()
-        }
-
-        val isActive = frameDispatcher.awaitFrame()
-        assertFalse(isActive)
-    }
-
-    @Test
-    fun `cancel dispatcher before awaitFrame`() = test {
-        val scope = CoroutineScope(coroutineContext)
-        val frameDispatcher = FrameDispatcher(scope = scope) {}
-        frameDispatcher.cancel()
-
-        val isActive = frameDispatcher.awaitFrame()
-        assertFalse(isActive)
-    }
-
-    @Test
-    fun `cancel scope before awaitFrame`() = test {
-        val scope = CoroutineScope(coroutineContext)
-        val frameDispatcher = FrameDispatcher(scope = scope) {}
-        scope.cancel()
-
-        val isActive = frameDispatcher.awaitFrame()
-        assertFalse(isActive)
     }
 
     private fun test(

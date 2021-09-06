@@ -79,7 +79,7 @@ class SkiaWindowTest {
             window.layer.renderer = renderer
             window.isUndecorated = true
             window.pack()
-            window.layer.awaitRedraw()
+            window.paint(window.graphics)
             window.isVisible = true
 
             delay(1000)

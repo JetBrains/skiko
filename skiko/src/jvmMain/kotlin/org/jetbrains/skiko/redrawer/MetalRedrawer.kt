@@ -7,7 +7,6 @@ import kotlinx.coroutines.withContext
 import org.jetbrains.skia.BackendRenderTarget
 import org.jetbrains.skia.DirectContext
 import org.jetbrains.skiko.*
-import org.jetbrains.skiko.useDrawingSurfacePlatformInfo
 import javax.swing.SwingUtilities.convertPoint
 import javax.swing.SwingUtilities.getRootPane
 import kotlin.time.ExperimentalTime
@@ -32,7 +31,6 @@ internal class MetalRedrawer(
         setVSyncEnabled(device, properties.isVsyncEnabled)
     }
 
-    @OptIn(ExperimentalTime::class)
     private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
         update(System.nanoTime())
         draw()
@@ -47,10 +45,6 @@ internal class MetalRedrawer(
     override fun needRedraw() {
         check(!isDisposed) { "MetalRedrawer is disposed" }
         frameDispatcher.scheduleFrame()
-    }
-
-    override suspend fun awaitRedraw(): Boolean {
-        return frameDispatcher.awaitFrame()
     }
 
     override fun redrawImmediately() {

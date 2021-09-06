@@ -25,7 +25,7 @@ fun main() {
     }
 }
 
-fun createWindow(title: String, exitOnClose: Boolean) = runBlocking(Dispatchers.Swing) {
+fun createWindow(title: String, exitOnClose: Boolean) {
     var mouseX = 0
     var mouseY = 0
 
@@ -113,7 +113,7 @@ fun createWindow(title: String, exitOnClose: Boolean) = runBlocking(Dispatchers.
     // MANDATORY: set window preferred size before calling pack()
     window.preferredSize = Dimension(800, 600)
     window.pack()
-    window.layer.awaitRedraw()
+    window.layer.paint(window.graphics)
     window.isVisible = true
 }
 

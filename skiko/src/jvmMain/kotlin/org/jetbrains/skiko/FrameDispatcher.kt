@@ -3,11 +3,8 @@ package org.jetbrains.skiko
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.yield
-import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.resume
 
 /**
  * Dispatch frame after call of [scheduleFrame].
@@ -34,7 +31,6 @@ class FrameDispatcher(
             frameChannel.receive()
             frameScheduled = false
             onFrame()
-            resumeFrameAwaiters(isActive = true)
             // As per `yield()` documentation:
             //
             // For other dispatchers (not == Unconfined) , this function calls [CoroutineDispatcher.dispatch] and
@@ -42,12 +38,6 @@ class FrameDispatcher(
             //
             // What means for Swing dispatcher we'll process all pending events and resume renderer.
             yield()
-        }
-    }
-
-    init {
-        job.invokeOnCompletion {
-            resumeFrameAwaiters(isActive = false)
         }
     }
 
@@ -67,37 +57,6 @@ class FrameDispatcher(
         if (!frameScheduled) {
             frameScheduled = true
             frameChannel.offer(Unit)
-        }
-    }
-
-    private val frameAwaiters = mutableListOf<Continuation<Boolean>>()
-
-    /**
-     * Schedule next frame to render in the frame loop, and wait it to finish.
-     *
-     * If frame loop was completed (cancelled or there was an exception inside it) then don't wait and immediately continue execution.
-     *
-     * @return true if frame loop is active, false if it was completed.
-     */
-    suspend fun awaitFrame(): Boolean {
-        return if (job.isActive) {
-            suspendCancellableCoroutine { continuation ->
-                synchronized(frameAwaiters) {
-                    frameAwaiters.add(continuation)
-                }
-                scheduleFrame()
-            }
-        } else {
-            false
-        }
-    }
-
-    private fun resumeFrameAwaiters(isActive: Boolean) {
-        synchronized(frameAwaiters) {
-            for (frameAwaiter in frameAwaiters) {
-                frameAwaiter.resume(isActive)
-            }
-            frameAwaiters.clear()
         }
     }
 }

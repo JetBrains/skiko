@@ -2,12 +2,7 @@ package org.jetbrains.skiko.redrawer
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
-import org.jetbrains.skiko.FrameDispatcher
-import org.jetbrains.skiko.OpenGLApi
-import org.jetbrains.skiko.SkiaLayer
-import org.jetbrains.skiko.SkiaLayerProperties
-import org.jetbrains.skiko.Task
-import org.jetbrains.skiko.useDrawingSurfacePlatformInfo
+import org.jetbrains.skiko.*
 import javax.swing.SwingUtilities.convertPoint
 import javax.swing.SwingUtilities.getRootPane
 
@@ -119,10 +114,6 @@ internal class MacOsOpenGLRedrawer(
 
     override fun needRedraw() {
         frameDispatcher.scheduleFrame()
-    }
-
-    override suspend fun awaitRedraw(): Boolean {
-        return frameDispatcher.awaitFrame()
     }
 
     override fun redrawImmediately() {

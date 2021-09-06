@@ -40,10 +40,6 @@ internal class Direct3DRedrawer(
         frameDispatcher.scheduleFrame()
     }
 
-    override suspend fun awaitRedraw(): Boolean {
-        return frameDispatcher.awaitFrame()
-    }
-
     override fun redrawImmediately() {
         check(!isDisposed) { "Direct3DRedrawer is disposed" }
         layer.update(System.nanoTime())
