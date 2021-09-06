@@ -36,8 +36,8 @@ if (project.hasProperty("skiko.version")) {
 dependencies {
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.4.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.4.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.5.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.0")
     implementation("org.jetbrains.skiko:skiko-jvm-runtime-$target:$version")
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")

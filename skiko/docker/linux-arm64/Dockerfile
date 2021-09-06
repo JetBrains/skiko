@@ -3,7 +3,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -y
 RUN apt-get install binutils build-essential -y
 RUN apt-get install software-properties-common -y
-RUN apt-get install python git fontconfig libfontconfig1-dev libglu1-mesa-dev curl wget -y
+RUN apt-get install python git fontconfig libfontconfig1-dev libglu1-mesa-dev libxrandr-dev curl wget -y
 RUN apt-get install openjdk-11-jdk -y
 RUN apt-get install clang-11 -y && \
     apt-get remove g++ -y && \

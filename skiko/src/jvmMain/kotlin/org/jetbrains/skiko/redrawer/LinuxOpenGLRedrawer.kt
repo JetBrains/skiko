@@ -1,35 +1,54 @@
 package org.jetbrains.skiko.redrawer
 
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.swing.Swing
-import org.jetbrains.skiko.DrawingSurface
-import org.jetbrains.skiko.FrameDispatcher
-import org.jetbrains.skiko.HardwareLayer
-import org.jetbrains.skiko.OpenGLApi
-import org.jetbrains.skiko.SkiaLayer
-import org.jetbrains.skiko.SkiaLayerProperties
-import org.jetbrains.skiko.getDrawingSurface
-import org.jetbrains.skiko.isVideoCardSupported
+import org.jetbrains.skiko.*
 
 internal class LinuxOpenGLRedrawer(
     private val layer: SkiaLayer,
     private val properties: SkiaLayerProperties
 ) : Redrawer {
-    private val context = layer.backedLayer.lockDrawingSurface {
-        val result = it.createContext()
-        it.makeCurrent(result)
-        if (result == 0L || !isVideoCardSupported(layer.renderApi)) {
-            throw IllegalArgumentException("Cannot create Linux GL context")
-        }
-        result
-    }
     private var isDisposed = false
+    private var context = 0L
+    private val swapInterval = if (properties.isVsyncEnabled) 1 else 0
+
+    init {
+    	layer.backedLayer.lockLinuxDrawingSurface {
+            context = it.createContext()
+            it.makeCurrent(context)
+            if (context == 0L || !isVideoCardSupported(layer.renderApi)) {
+                throw IllegalArgumentException("Cannot create Linux GL context")
+            }
+            it.setSwapInterval(swapInterval)
+        }
+    }
+    private val frameJob = Job()
+    @Volatile
+    private var frameLimit = 0.0
+    private val frameLimiter = FrameLimiter(
+        CoroutineScope(Dispatchers.IO + frameJob),
+        layer.backedLayer,
+        onNewFrameLimit = { frameLimit = it }
+    )
+
+    private suspend fun limitFramesIfNeeded() {
+        // Some Linuxes don't turn vsync on, so we apply additional frame limit (which should be no longer than enabled vsync)
+        if (properties.isVsyncEnabled) {
+            try {
+                frameLimiter.awaitNextFrame()
+            } catch (e: CancellationException) {
+                // ignore
+            }
+        }
+    }
 
     override fun dispose() {
         check(!isDisposed) { "LinuxOpenGLRedrawer is disposed" }
-        layer.backedLayer.lockDrawingSurface {
+        layer.backedLayer.lockLinuxDrawingSurface {
             it.destroyContext(context)
+        }
+        runBlocking {
+            frameJob.cancelAndJoin()
         }
         isDisposed = true
     }
@@ -44,7 +63,7 @@ internal class LinuxOpenGLRedrawer(
         return frameDispatcher.awaitFrame()
     }
 
-    override fun redrawImmediately() = layer.backedLayer.lockDrawingSurface {
+    override fun redrawImmediately() = layer.backedLayer.lockLinuxDrawingSurface {
         check(!isDisposed) { "LinuxOpenGLRedrawer is disposed" }
         update(System.nanoTime())
         it.makeCurrent(context)
@@ -52,6 +71,7 @@ internal class LinuxOpenGLRedrawer(
         it.setSwapInterval(0)
         it.swapBuffers()
         OpenGLApi.instance.glFinish()
+        it.setSwapInterval(swapInterval)
     }
 
     private fun update(nanoTime: Long) {
@@ -70,6 +90,9 @@ internal class LinuxOpenGLRedrawer(
         private val toRedrawAlive = toRedrawCopy.asSequence().filterNot(LinuxOpenGLRedrawer::isDisposed)
 
         private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
+            // we should wait for the window with the maximum frame limit to avoid bottleneck when there is a window on a slower monitor
+            toRedrawAlive.maxByOrNull { it.frameLimit }?.limitFramesIfNeeded()
+
             toRedrawCopy.clear()
             toRedrawCopy.addAll(toRedraw)
             toRedraw.clear()
@@ -84,68 +107,36 @@ internal class LinuxOpenGLRedrawer(
                 }
             }
 
-            val isVsyncEnabled = toRedrawAlive.all { it.properties.isVsyncEnabled }
-
-            val drawingSurfaces = toRedrawAlive.map { lockDrawingSurface(it.layer.backedLayer) }.toList()
+            val drawingSurfaces = toRedrawAlive.associateWith { lockLinuxDrawingSurface(it.layer.backedLayer) }
             try {
-                toRedrawAlive.forEachIndexed { index, redrawer ->
-                    drawingSurfaces[index].makeCurrent(redrawer.context)
+                toRedrawAlive.forEach { redrawer ->
+                    drawingSurfaces[redrawer]!!.makeCurrent(redrawer.context)
                     redrawer.draw()
                 }
 
-                toRedrawAlive.forEachIndexed { index, _ ->
-                    // it is ok to set swap interval every frame, there is no performance overhead
-                    drawingSurfaces[index].setSwapInterval(if (isVsyncEnabled) 1 else 0)
-                    drawingSurfaces[index].swapBuffers()
+                // TODO(demin) it seems now vsync doesn't work as expected with two windows (we have fps = refreshRate / windowCount)
+                //  perhaps we should create frameDispatcher for each display.
+                //  Don't know what happened, but on 620547a commit everything was okay. maybe something changed in the code, maybe my system changed
+                toRedrawAlive.forEach { redrawer ->
+                    drawingSurfaces[redrawer]!!.swapBuffers()
                 }
 
-                toRedrawAlive.forEachIndexed { index, redrawer ->
-                    drawingSurfaces[index].makeCurrent(redrawer.context)
+                toRedrawAlive.forEach { redrawer ->
+                    drawingSurfaces[redrawer]!!.makeCurrent(redrawer.context)
                     OpenGLApi.instance.glFinish()
                 }
             } finally {
-                drawingSurfaces.forEach(::unlockDrawingSurface)
+                drawingSurfaces.values.forEach(::unlockLinuxDrawingSurface)
             }
         }
     }
 }
 
-private inline fun <T> HardwareLayer.lockDrawingSurface(action: (LinuxDrawingSurface) -> T): T {
-    val drawingSurface = lockDrawingSurface(this)
-    try {
-        return action(drawingSurface)
-    } finally {
-        unlockDrawingSurface(drawingSurface)
-    }
-}
-
-private fun lockDrawingSurface(layer: HardwareLayer): LinuxDrawingSurface {
-    val drawingSurface = layer.getDrawingSurface()
-    drawingSurface.lock()
-    return drawingSurface.getInfo().use {
-        LinuxDrawingSurface(drawingSurface, getDisplay(it.platformInfo), getWindow(it.platformInfo))
-    }
-}
-
-private fun unlockDrawingSurface(drawingSurface: LinuxDrawingSurface) {
-    drawingSurface.common.unlock()
-    drawingSurface.common.close()
-}
-
-private class LinuxDrawingSurface(
-    val common: DrawingSurface,
-    val display: Long,
-    val window: Long
-) {
-    fun createContext() = createContext(display)
-    fun destroyContext(context: Long) = destroyContext(display, context)
-    fun makeCurrent(context: Long) = makeCurrent(display, window, context)
-    fun swapBuffers() = swapBuffers(display, window)
-    fun setSwapInterval(interval: Int) = setSwapInterval(display, window, interval)
-}
-
-private external fun getDisplay(platformInfo: Long): Long
-private external fun getWindow(platformInfo: Long): Long
+private fun LinuxDrawingSurface.createContext() = createContext(display)
+private fun LinuxDrawingSurface.destroyContext(context: Long) = destroyContext(display, context)
+private fun LinuxDrawingSurface.makeCurrent(context: Long) = makeCurrent(display, window, context)
+private fun LinuxDrawingSurface.swapBuffers() = swapBuffers(display, window)
+private fun LinuxDrawingSurface.setSwapInterval(interval: Int) = setSwapInterval(display, window, interval)
 
 private external fun makeCurrent(display: Long, window: Long, context: Long)
 private external fun createContext(display: Long): Long
