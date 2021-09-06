@@ -6,16 +6,26 @@ import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 
 class SVGDOM internal constructor(ptr: Long) : RefCnt(ptr) {
     companion object {
         @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nMakeFromData")
         external fun _nMakeFromData(dataPtr: Long): Long
-        @JvmStatic external fun _nGetRoot(ptr: Long): Long
-        @JvmStatic external fun _nGetContainerSize(ptr: Long): Point
-        @JvmStatic external fun _nSetContainerSize(ptr: Long, width: Float, height: Float)
-        @JvmStatic external fun _nRender(ptr: Long, canvasPtr: Long)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nGetRoot")
+        external fun _nGetRoot(ptr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nGetContainerSize")
+        external fun _nGetContainerSize(ptr: Long): Point
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nSetContainerSize")
+        external fun _nSetContainerSize(ptr: Long, width: Float, height: Float)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nRender")
+        external fun _nRender(ptr: Long, canvasPtr: Long)
 
         init {
             staticLoad()

@@ -5,24 +5,50 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 
 class SVGSVG internal constructor(ptr: Long) : SVGContainer(ptr) {
     companion object {
         @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nGetX")
         external fun _nGetX(ptr: Long): SVGLength
-        @JvmStatic external fun _nGetY(ptr: Long): SVGLength
-        @JvmStatic external fun _nGetWidth(ptr: Long): SVGLength
-        @JvmStatic external fun _nGetHeight(ptr: Long): SVGLength
-        @JvmStatic external fun _nGetPreserveAspectRatio(ptr: Long): SVGPreserveAspectRatio
-        @JvmStatic external fun _nGetViewBox(ptr: Long): Rect?
-        @JvmStatic external fun _nGetIntrinsicSize(ptr: Long, width: Float, height: Float, dpi: Float): Point
-        @JvmStatic external fun _nSetX(ptr: Long, value: Float, unit: Int)
-        @JvmStatic external fun _nSetY(ptr: Long, value: Float, unit: Int)
-        @JvmStatic external fun _nSetWidth(ptr: Long, value: Float, unit: Int)
-        @JvmStatic external fun _nSetHeight(ptr: Long, value: Float, unit: Int)
-        @JvmStatic external fun _nSetPreserveAspectRatio(ptr: Long, align: Int, scale: Int)
-        @JvmStatic external fun _nSetViewBox(ptr: Long, l: Float, t: Float, r: Float, b: Float)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nGetY")
+        external fun _nGetY(ptr: Long): SVGLength
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nGetWidth")
+        external fun _nGetWidth(ptr: Long): SVGLength
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nGetHeight")
+        external fun _nGetHeight(ptr: Long): SVGLength
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nGetPreserveAspectRatio")
+        external fun _nGetPreserveAspectRatio(ptr: Long): SVGPreserveAspectRatio
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nGetViewBox")
+        external fun _nGetViewBox(ptr: Long): Rect?
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nGetIntrinsicSize")
+        external fun _nGetIntrinsicSize(ptr: Long, width: Float, height: Float, dpi: Float): Point
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nSetX")
+        external fun _nSetX(ptr: Long, value: Float, unit: Int)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nSetY")
+        external fun _nSetY(ptr: Long, value: Float, unit: Int)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nSetWidth")
+        external fun _nSetWidth(ptr: Long, value: Float, unit: Int)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nSetHeight")
+        external fun _nSetHeight(ptr: Long, value: Float, unit: Int)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nSetPreserveAspectRatio")
+        external fun _nSetPreserveAspectRatio(ptr: Long, align: Int, scale: Int)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nSetViewBox")
+        external fun _nSetViewBox(ptr: Long, l: Float, t: Float, r: Float, b: Float)
 
         init {
             staticLoad()

@@ -7,6 +7,7 @@ import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 
 class Animation internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
@@ -33,11 +34,20 @@ class Animation internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
         }
 
         @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetFinalizer")
         external fun _nGetFinalizer(): Long
-        @JvmStatic external fun _nMakeFromString(data: String?): Long
-        @JvmStatic external fun _nMakeFromFile(path: String?): Long
-        @JvmStatic external fun _nMakeFromData(dataPtr: Long): Long
-        @JvmStatic external fun _nRender(
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nMakeFromString")
+        external fun _nMakeFromString(data: String?): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nMakeFromFile")
+        external fun _nMakeFromFile(path: String?): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nMakeFromData")
+        external fun _nMakeFromData(dataPtr: Long): Long
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nRender")
+        external fun _nRender(
             ptr: Long,
             canvasPtr: Long,
             left: Float,
@@ -47,15 +57,33 @@ class Animation internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
             flags: Int
         )
 
-        @JvmStatic external fun _nSeek(ptr: Long, t: Float, icPtr: Long)
-        @JvmStatic external fun _nSeekFrame(ptr: Long, t: Float, icPtr: Long)
-        @JvmStatic external fun _nSeekFrameTime(ptr: Long, t: Float, icPtr: Long)
-        @JvmStatic external fun _nGetDuration(ptr: Long): Float
-        @JvmStatic external fun _nGetFPS(ptr: Long): Float
-        @JvmStatic external fun _nGetInPoint(ptr: Long): Float
-        @JvmStatic external fun _nGetOutPoint(ptr: Long): Float
-        @JvmStatic external fun _nGetVersion(ptr: Long): String
-        @JvmStatic external fun _nGetSize(ptr: Long): Point?
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nSeek")
+        external fun _nSeek(ptr: Long, t: Float, icPtr: Long)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nSeekFrame")
+        external fun _nSeekFrame(ptr: Long, t: Float, icPtr: Long)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nSeekFrameTime")
+        external fun _nSeekFrameTime(ptr: Long, t: Float, icPtr: Long)
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetDuration")
+        external fun _nGetDuration(ptr: Long): Float
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetFPS")
+        external fun _nGetFPS(ptr: Long): Float
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetInPoint")
+        external fun _nGetInPoint(ptr: Long): Float
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetOutPoint")
+        external fun _nGetOutPoint(ptr: Long): Float
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetVersion")
+        external fun _nGetVersion(ptr: Long): String
+        @JvmStatic
+        @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetSize")
+        external fun _nGetSize(ptr: Long): Point?
 
         init {
             staticLoad()
