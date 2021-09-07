@@ -1,4 +1,5 @@
 @file:Suppress("NESTED_EXTERNAL_DECLARATION")
+
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
@@ -6,136 +7,264 @@ import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
-import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 import kotlin.math.round
 
+interface PaintNativeApiInterface {
+    fun _nGetFinalizer(): Long
+
+    fun _nMake(): Long
+
+    fun _nMakeClone(ptr: Long): Long
+
+    fun _nEquals(ptr: Long, otherPtr: Long): Boolean
+
+    fun _nReset(ptr: Long)
+
+    fun _nIsAntiAlias(ptr: Long): Boolean
+
+    fun _nSetAntiAlias(ptr: Long, value: Boolean)
+
+    fun _nIsDither(ptr: Long): Boolean
+
+    fun _nSetDither(ptr: Long, value: Boolean)
+
+    fun _nGetMode(ptr: Long): Int
+
+    fun _nSetMode(ptr: Long, value: Int)
+
+    fun _nGetColor(ptr: Long): Int
+
+    fun _nGetColor4f(ptr: Long): Color4f
+
+    fun _nSetColor(ptr: Long, argb: Int)
+
+    fun _nSetColor4f(ptr: Long, r: Float, g: Float, b: Float, a: Float, colorSpacePtr: Long)
+
+    fun _nGetStrokeWidth(ptr: Long): Float
+
+    fun _nSetStrokeWidth(ptr: Long, value: Float)
+
+    fun _nGetStrokeMiter(ptr: Long): Float
+
+    fun _nSetStrokeMiter(ptr: Long, value: Float)
+
+    fun _nGetStrokeCap(ptr: Long): Int
+
+    fun _nSetStrokeCap(ptr: Long, value: Int)
+
+    fun _nGetStrokeJoin(ptr: Long): Int
+
+    fun _nSetStrokeJoin(ptr: Long, value: Int)
+
+    fun _nGetFillPath(ptr: Long, path: Long, resScale: Float): Long
+
+    fun _nGetFillPathCull(
+        ptr: Long,
+        path: Long,
+        left: Float,
+        top: Float,
+        right: Float,
+        bottom: Float,
+        resScale: Float
+    ): Long
+
+
+    fun _nGetShader(ptr: Long): Long
+
+    fun _nSetShader(ptr: Long, shaderPtr: Long)
+
+    fun _nGetColorFilter(ptr: Long): Long
+
+    fun _nSetColorFilter(ptr: Long, colorFilterPtr: Long)
+
+    fun _nGetBlendMode(ptr: Long): Int
+
+    fun _nSetBlendMode(ptr: Long, mode: Int)
+
+    fun _nGetPathEffect(ptr: Long): Long
+
+    fun _nSetPathEffect(ptr: Long, pathEffectPtr: Long)
+
+    fun _nGetMaskFilter(ptr: Long): Long
+
+    fun _nSetMaskFilter(ptr: Long, filterPtr: Long)
+
+    fun _nGetImageFilter(ptr: Long): Long
+
+    fun _nSetImageFilter(ptr: Long, filterPtr: Long)
+
+    fun _nHasNothingToDraw(ptr: Long): Boolean
+
+}
+expect open class PaintNativeApi constructor() : PaintNativeApiInterface
+
+object PaintApiC  {
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetFinalizer")
+    external fun _nGetFinalizer(): Long
+
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_Paint__1nMake")
+    external fun _nMake(): Long
+
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_Paint__1nMakeClone")
+    external fun _nMakeClone(ptr: Long): Long
+
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_Paint__1nEquals")
+    external fun _nEquals(ptr: Long, otherPtr: Long): Boolean
+
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_Paint__1nReset")
+    external fun _nReset(ptr: Long)
+
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_Paint__1nIsAntiAlias")
+    external fun _nIsAntiAlias(ptr: Long): Boolean
+
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetAntiAlias")
+    external fun _nSetAntiAlias(ptr: Long, value: Boolean)
+
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_Paint__1nIsDither")
+    external fun _nIsDither(ptr: Long): Boolean
+
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetDither")
+    external fun _nSetDither(ptr: Long, value: Boolean)
+
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetMode")
+    external fun _nGetMode(ptr: Long): Int
+
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetMode")
+    external fun _nSetMode(ptr: Long, value: Int)
+
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetColor")
+    external fun _nGetColor(ptr: Long): Int
+
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetColor4f")
+    external fun _nGetColor4f(ptr: Long): Color4f
+
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetColor")
+    external fun _nSetColor(ptr: Long, argb: Int)
+
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetColor4f")
+    external fun _nSetColor4f(ptr: Long, r: Float, g: Float, b: Float, a: Float, colorSpacePtr: Long)
+
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetStrokeWidth")
+    external fun _nGetStrokeWidth(ptr: Long): Float
+
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetStrokeWidth")
+    external fun _nSetStrokeWidth(ptr: Long, value: Float)
+
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetStrokeMiter")
+    external fun _nGetStrokeMiter(ptr: Long): Float
+
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetStrokeMiter")
+    external fun _nSetStrokeMiter(ptr: Long, value: Float)
+
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetStrokeCap")
+    external fun _nGetStrokeCap(ptr: Long): Int
+
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetStrokeCap")
+    external fun _nSetStrokeCap(ptr: Long, value: Int)
+
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetStrokeJoin")
+    external fun _nGetStrokeJoin(ptr: Long): Int
+
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetStrokeJoin")
+    external fun _nSetStrokeJoin(ptr: Long, value: Int)
+
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetFillPath")
+    external fun _nGetFillPath(ptr: Long, path: Long, resScale: Float): Long
+
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetFillPathCull")
+    external fun _nGetFillPathCull(
+        ptr: Long,
+        path: Long,
+        left: Float,
+        top: Float,
+        right: Float,
+        bottom: Float,
+        resScale: Float
+    ): Long
+
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetShader")
+    external fun _nGetShader(ptr: Long): Long
+
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetShader")
+    external fun _nSetShader(ptr: Long, shaderPtr: Long)
+
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetColorFilter")
+    external fun _nGetColorFilter(ptr: Long): Long
+
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetColorFilter")
+    external fun _nSetColorFilter(ptr: Long, colorFilterPtr: Long)
+
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetBlendMode")
+    external fun _nGetBlendMode(ptr: Long): Int
+
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetBlendMode")
+    external fun _nSetBlendMode(ptr: Long, mode: Int)
+
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetPathEffect")
+    external fun _nGetPathEffect(ptr: Long): Long
+
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetPathEffect")
+    external fun _nSetPathEffect(ptr: Long, pathEffectPtr: Long)
+
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetMaskFilter")
+    external fun _nGetMaskFilter(ptr: Long): Long
+
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetMaskFilter")
+    external fun _nSetMaskFilter(ptr: Long, filterPtr: Long)
+
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetImageFilter")
+    external fun _nGetImageFilter(ptr: Long): Long
+
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetImageFilter")
+    external fun _nSetImageFilter(ptr: Long, filterPtr: Long)
+
+    @JvmStatic
+    @ExternalSymbolName("org_jetbrains_skia_Paint__1nHasNothingToDraw")
+    external fun _nHasNothingToDraw(ptr: Long): Boolean
+
+}
+
+
 class Paint : Managed {
-    companion object {
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetFinalizer")
-        external fun _nGetFinalizer(): Long
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paint__1nMake")
-        external fun _nMake(): Long
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paint__1nMakeClone")
-        external fun _nMakeClone(ptr: Long): Long
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paint__1nEquals")
-        external fun _nEquals(ptr: Long, otherPtr: Long): Boolean
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paint__1nReset")
-        external fun _nReset(ptr: Long)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paint__1nIsAntiAlias")
-        external fun _nIsAntiAlias(ptr: Long): Boolean
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetAntiAlias")
-        external fun _nSetAntiAlias(ptr: Long, value: Boolean)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paint__1nIsDither")
-        external fun _nIsDither(ptr: Long): Boolean
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetDither")
-        external fun _nSetDither(ptr: Long, value: Boolean)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetMode")
-        external fun _nGetMode(ptr: Long): Int
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetMode")
-        external fun _nSetMode(ptr: Long, value: Int)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetColor")
-        external fun _nGetColor(ptr: Long): Int
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetColor4f")
-        external fun _nGetColor4f(ptr: Long): Color4f
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetColor")
-        external fun _nSetColor(ptr: Long, argb: Int)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetColor4f")
-        external fun _nSetColor4f(ptr: Long, r: Float, g: Float, b: Float, a: Float, colorSpacePtr: Long)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetStrokeWidth")
-        external fun _nGetStrokeWidth(ptr: Long): Float
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetStrokeWidth")
-        external fun _nSetStrokeWidth(ptr: Long, value: Float)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetStrokeMiter")
-        external fun _nGetStrokeMiter(ptr: Long): Float
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetStrokeMiter")
-        external fun _nSetStrokeMiter(ptr: Long, value: Float)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetStrokeCap")
-        external fun _nGetStrokeCap(ptr: Long): Int
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetStrokeCap")
-        external fun _nSetStrokeCap(ptr: Long, value: Int)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetStrokeJoin")
-        external fun _nGetStrokeJoin(ptr: Long): Int
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetStrokeJoin")
-        external fun _nSetStrokeJoin(ptr: Long, value: Int)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetFillPath")
-        external fun _nGetFillPath(ptr: Long, path: Long, resScale: Float): Long
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetFillPathCull")
-        external fun _nGetFillPathCull(
-            ptr: Long,
-            path: Long,
-            left: Float,
-            top: Float,
-            right: Float,
-            bottom: Float,
-            resScale: Float
-        ): Long
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetShader")
-        external fun _nGetShader(ptr: Long): Long
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetShader")
-        external fun _nSetShader(ptr: Long, shaderPtr: Long)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetColorFilter")
-        external fun _nGetColorFilter(ptr: Long): Long
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetColorFilter")
-        external fun _nSetColorFilter(ptr: Long, colorFilterPtr: Long)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetBlendMode")
-        external fun _nGetBlendMode(ptr: Long): Int
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetBlendMode")
-        external fun _nSetBlendMode(ptr: Long, mode: Int)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetPathEffect")
-        external fun _nGetPathEffect(ptr: Long): Long
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetPathEffect")
-        external fun _nSetPathEffect(ptr: Long, pathEffectPtr: Long)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetMaskFilter")
-        external fun _nGetMaskFilter(ptr: Long): Long
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetMaskFilter")
-        external fun _nSetMaskFilter(ptr: Long, filterPtr: Long)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetImageFilter")
-        external fun _nGetImageFilter(ptr: Long): Long
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetImageFilter")
-        external fun _nSetImageFilter(ptr: Long, filterPtr: Long)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paint__1nHasNothingToDraw")
-        external fun _nHasNothingToDraw(ptr: Long): Boolean
-
+    private companion object : PaintNativeApi() {
         init {
             staticLoad()
         }
@@ -217,7 +346,7 @@ class Paint : Managed {
         set(value) {
             setAntiAlias(value)
         }
-    
+
     /**
      * Requests, but does not require, that edge pixels draw opaque or with partial transparency.
      *
@@ -357,7 +486,7 @@ class Paint : Managed {
         set(value) {
             setColor4f(value)
         }
-    
+
     /**
      * Sets alpha and RGB used when stroking and filling. The color is four floating
      * point values, unpremultiplied. The color values are interpreted as being in sRGB.
@@ -834,7 +963,7 @@ class Paint : Managed {
         set(value) {
             setMaskFilter(value)
         }
-    
+
     /**
      * @param maskFilter  modifies clipping mask generated from drawn geometry
      * @return            this
@@ -877,7 +1006,7 @@ class Paint : Managed {
         set(value) {
             setImageFilter(value)
         }
-    
+
     /**
      * @param imageFilter  how SkImage is sampled when transformed
      *
