@@ -12,14 +12,14 @@ extern "C" jlong BackendRenderTarget_nGetFinalizer() {
 }
 
 extern "C" jlong BackendRenderTarget_nMakeGL
-  (jint width, jint height, jint sampleCnt, jint stencilBits, jint fbId, jint fbFormat) {
+  (kref __Kinstance, jint width, jint height, jint sampleCnt, jint stencilBits, jint fbId, jint fbFormat) {
     GrGLFramebufferInfo glInfo = { static_cast<unsigned int>(fbId), static_cast<unsigned int>(fbFormat) };
     GrBackendRenderTarget* instance = new GrBackendRenderTarget(width, height, sampleCnt, stencilBits, glInfo);
     return reinterpret_cast<jlong>(instance);
 }
 
 extern "C" jlong BackendRenderTarget_nMakeMetal
-  (jint width, jint height, jlong texturePtr) {
+  (kref __Kinstance, jint width, jint height, jlong texturePtr) {
 #ifdef SK_METAL
     GrMTLHandle texture = reinterpret_cast<GrMTLHandle>(static_cast<uintptr_t>(texturePtr));
     GrMtlTextureInfo fbInfo;
@@ -36,7 +36,7 @@ extern "C" jlong BackendRenderTarget_nMakeMetal
 #endif
 
 extern "C" jlong BackendRenderTarget_MakeDirect3D
-  (jint width, jint height, jlong texturePtr, jint format, jint sampleCnt, jint levelCnt) {
+  (kref __Kinstance, jint width, jint height, jlong texturePtr, jint format, jint sampleCnt, jint levelCnt) {
 #ifdef SK_DIRECT3D
     GrD3DTextureResourceInfo texResInfo = {};
     ID3D12Resource* resource = reinterpret_cast<ID3D12Resource*>(static_cast<uintptr_t>(texturePtr));

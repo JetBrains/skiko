@@ -18,7 +18,16 @@ class BackendRenderTarget internal constructor(ptr: NativePointer) : Managed(ptr
             fbFormat: Int
         ): BackendRenderTarget {
             Stats.onNativeCall()
-            return BackendRenderTarget(_nMakeGL(width, height, sampleCnt, stencilBits, fbId, fbFormat))
+            return BackendRenderTarget(
+                _nMakeGL(
+                    width,
+                    height,
+                    sampleCnt,
+                    stencilBits,
+                    fbId,
+                    fbFormat
+                )
+            )
         }
 
         fun makeMetal(width: Int, height: Int, texturePtr: NativePointer): BackendRenderTarget {

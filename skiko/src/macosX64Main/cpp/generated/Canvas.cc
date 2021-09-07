@@ -8,6 +8,7 @@
 #include "SkVertices.h"
 #include "hb.h"
 #include "common.h"
+#include "native_interop.h"
 
 static void deleteCanvas(SkCanvas* canvas) {
     // std::cout << "Deleting [SkCanvas " << canvas << "]" << std::endl;
@@ -187,20 +188,12 @@ extern "C" void org_jetbrains_skia_Canvas__1nDrawTextBlob
 
 extern "C" void org_jetbrains_skia_Canvas__1nDrawPicture
   (kref __Kinstance, jlong ptr, jlong picturePtr, jfloatArray matrixArr, jlong paintPtr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Canvas__1nDrawPicture");
-}
-     
-#if 0 
-extern "C" void org_jetbrains_skia_Canvas__1nDrawPicture
-  (kref __Kinstance, jlong ptr, jlong picturePtr, jfloatArray matrixArr, jlong paintPtr) {
     SkCanvas* canvas   = reinterpret_cast<SkCanvas*>   (static_cast<uintptr_t>(ptr));
     SkPicture* picture = reinterpret_cast<SkPicture*>(static_cast<uintptr_t>(picturePtr));
-    std::unique_ptr<SkMatrix> matrix = skMatrix(env, matrixArr);
+    std::unique_ptr<SkMatrix> matrix = skMatrix(matrixArr);
     SkPaint* paint     = reinterpret_cast<SkPaint*>    (static_cast<uintptr_t>(paintPtr));
     canvas->drawPicture(picture, matrix.get(), paint);
 }
-#endif
-
 
 
 extern "C" void org_jetbrains_skia_Canvas__1nDrawVertices
@@ -370,33 +363,18 @@ extern "C" void org_jetbrains_skia_Canvas__1nClipRegion
 
 extern "C" void org_jetbrains_skia_Canvas__1nConcat
   (kref __Kinstance, jlong ptr, jfloatArray matrixArr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Canvas__1nConcat");
-}
-     
-#if 0 
-extern "C" void org_jetbrains_skia_Canvas__1nConcat
-  (kref __Kinstance, jlong ptr, jfloatArray matrixArr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(ptr));
-    std::unique_ptr<SkMatrix> m = skMatrix(env, matrixArr);
+    std::unique_ptr<SkMatrix> m = skMatrix(matrixArr);
     canvas->concat(*m);
 }
-#endif
-
 
 
 extern "C" void org_jetbrains_skia_Canvas__1nConcat44
   (kref __Kinstance, jlong ptr, jfloatArray matrixArr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Canvas__1nConcat44");
-}
-     
-#if 0 
-extern "C" void org_jetbrains_skia_Canvas__1nConcat44
-  (kref __Kinstance, jlong ptr, jfloatArray matrixArr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(ptr));
-    std::unique_ptr<SkM44> m = skM44(env, matrixArr);
+    std::unique_ptr<SkM44> m = skM44(matrixArr);
     canvas->concat(*m);
 }
-#endif
 
 
 extern "C" jint org_jetbrains_skia_Canvas__1nReadPixels

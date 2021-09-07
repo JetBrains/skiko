@@ -399,11 +399,12 @@ project.tasks.register<Exec>("nativeBridgesCompile") {
         *targetOs.clangFlags,
         "-std=c++17",
         "-c",
+        "-g",
         "-DPROVIDE_JNI_TYPES",
         "-DSK_SHAPER_CORETEXT_AVAILABLE",
         "-DSK_BUILD_FOR_MAC",
         "-DSK_METAL",
-        "-I$projectDir/src/macosX64Main/cpp/headers",
+        "-I$projectDir/src/macosX64Main/cpp/include",
         "-I$projectDir/src/commonMain/cpp/headers",
         *skiaPreprocessorFlags,
         *srcs
