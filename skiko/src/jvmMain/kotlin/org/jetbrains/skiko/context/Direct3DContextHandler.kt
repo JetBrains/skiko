@@ -89,15 +89,15 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextHandler(layer) 
     }
 
     override fun disposeCanvas() {
-        for (bufferIndex in 0..bufferCount - 1) {
+        for (bufferIndex in 0 until bufferCount) {
             surfaces[bufferIndex]?.close()
         }
     }
 
     override fun rendererInfo(): String {
         return super.rendererInfo() +
-            "Video card: ${directXRedrawer.getAdapterName()}\n" +
-            "Total VRAM: ${directXRedrawer.getAdapterMemorySize() / 1024 / 1024} MB\n"
+            "Video card: ${directXRedrawer.adapterName}\n" +
+            "Total VRAM: ${directXRedrawer.adapterMemorySize / 1024 / 1024} MB\n"
     }
 
     private external fun flush(context: Long, surface: Long)

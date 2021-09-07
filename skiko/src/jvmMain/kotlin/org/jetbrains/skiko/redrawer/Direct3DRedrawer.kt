@@ -94,8 +94,8 @@ internal class Direct3DRedrawer(
     fun getBufferIndex() = getBufferIndex(device)
     fun initSwapChain() = initSwapChain(device)
     fun initFence() = initFence(device)
-    fun getAdapterName() = getAdapterName(device)
-    fun getAdapterMemorySize() = getAdapterMemorySize(device)
+    val adapterName get() = getAdapterName(device)
+    val adapterMemorySize get() = getAdapterMemorySize(device)
 
     private external fun createDirectXDevice(adapterPriority: Int, contentHandle: Long): Long
     private external fun makeDirectXContext(device: Long): Long

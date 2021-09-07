@@ -25,7 +25,7 @@ fun main() {
     }
 }
 
-fun createWindow(title: String, exitOnClose: Boolean) {
+fun createWindow(title: String, exitOnClose: Boolean) = SwingUtilities.invokeLater {
     var mouseX = 0
     var mouseY = 0
 
