@@ -825,7 +825,9 @@ afterEvaluate {
     }
 }
 
-// Kotlin/JS have a bug preventing compilation on non-x86 Linux machines: https://youtrack.jetbrains.com/issue/KT-48631
+// Kotlin/JS has a bug preventing compilation on non-x86 Linux machines,
+// see https://youtrack.jetbrains.com/issue/KT-48631
+// It always downloads and uses x86 version, so on those achitectures
 if (hostOs == OS.Linux && hostArch != Arch.X64) {
     rootProject.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin::class.java) {
         rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>().download = false
