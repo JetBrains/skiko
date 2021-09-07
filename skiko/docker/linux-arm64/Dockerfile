@@ -9,6 +9,7 @@ RUN apt-get install clang-11 -y && \
     apt-get remove g++ -y && \
     update-alternatives --install /usr/bin/clang clang /usr/bin/clang-11 100 && \
     update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-11 100
+RUN apt-get install nodejs -y
 
 # Install libs & tools
 ENV DEPOT_TOOLS=/usr/depot_tools
