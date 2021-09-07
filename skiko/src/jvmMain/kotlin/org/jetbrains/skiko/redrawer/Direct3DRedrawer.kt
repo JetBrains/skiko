@@ -25,8 +25,10 @@ internal class Direct3DRedrawer(
     }
 
     private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
-        update(System.nanoTime())
-        draw()
+        if (layer.isShowing) {
+            update(System.nanoTime())
+            draw()
+        }
     }
 
     override fun dispose() = synchronized(drawLock) {

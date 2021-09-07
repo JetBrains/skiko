@@ -83,11 +83,14 @@ internal class LinuxOpenGLRedrawer(
     companion object {
         private val toRedraw = mutableSetOf<LinuxOpenGLRedrawer>()
         private val toRedrawCopy = mutableSetOf<LinuxOpenGLRedrawer>()
-        private val toRedrawAlive = toRedrawCopy.asSequence().filterNot(LinuxOpenGLRedrawer::isDisposed)
+        private val toRedrawVisible = toRedrawCopy
+            .asSequence()
+            .filterNot(LinuxOpenGLRedrawer::isDisposed)
+            .filter { it.layer.isShowing }
 
         private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
             // we should wait for the window with the maximum frame limit to avoid bottleneck when there is a window on a slower monitor
-            toRedrawAlive.maxByOrNull { it.frameLimit }?.limitFramesIfNeeded()
+            toRedrawVisible.maxByOrNull { it.frameLimit }?.limitFramesIfNeeded()
 
             toRedrawCopy.clear()
             toRedrawCopy.addAll(toRedraw)
@@ -95,7 +98,7 @@ internal class LinuxOpenGLRedrawer(
 
             val nanoTime = System.nanoTime()
 
-            for (redrawer in toRedrawAlive) {
+            for (redrawer in toRedrawVisible) {
                 try {
                     redrawer.update(nanoTime)
                 } catch (e: CancellationException) {
@@ -103,9 +106,9 @@ internal class LinuxOpenGLRedrawer(
                 }
             }
 
-            val drawingSurfaces = toRedrawAlive.associateWith { lockLinuxDrawingSurface(it.layer.backedLayer) }
+            val drawingSurfaces = toRedrawVisible.associateWith { lockLinuxDrawingSurface(it.layer.backedLayer) }
             try {
-                toRedrawAlive.forEach { redrawer ->
+                toRedrawVisible.forEach { redrawer ->
                     drawingSurfaces[redrawer]!!.makeCurrent(redrawer.context)
                     redrawer.draw()
                 }
@@ -113,11 +116,11 @@ internal class LinuxOpenGLRedrawer(
                 // TODO(demin) it seems now vsync doesn't work as expected with two windows (we have fps = refreshRate / windowCount)
                 //  perhaps we should create frameDispatcher for each display.
                 //  Don't know what happened, but on 620547a commit everything was okay. maybe something changed in the code, maybe my system changed
-                toRedrawAlive.forEach { redrawer ->
+                toRedrawVisible.forEach { redrawer ->
                     drawingSurfaces[redrawer]!!.swapBuffers()
                 }
 
-                toRedrawAlive.forEach { redrawer ->
+                toRedrawVisible.forEach { redrawer ->
                     drawingSurfaces[redrawer]!!.makeCurrent(redrawer.context)
                     OpenGLApi.instance.glFinish()
                 }
