@@ -1,9 +1,5 @@
 package org.jetbrains.skiko
 
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.swing.Swing
-import kotlinx.coroutines.withContext
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.context.ContextHandler
 import org.jetbrains.skiko.context.createContextHandler
@@ -67,8 +63,7 @@ open class SkiaLayer(
         }
     }
 
-    private val onInit = CompletableDeferred<Unit>()
-    private val isInited get() = onInit.isCompleted
+    private var isInited = false
     private var isRendering = false
 
     private fun checkInit() {
@@ -138,7 +133,7 @@ open class SkiaLayer(
     open fun init() {
         backedLayer.init()
         findNextWorkingRenderApi(false)
-        onInit.complete(Unit)
+        isInited = true
     }
 
     private val stateHandlers =
@@ -279,20 +274,6 @@ open class SkiaLayer(
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         check(!isDisposed) { "SkiaLayer is disposed" }
         redrawer?.needRedraw()
-    }
-
-    /**
-     * Redraw on the next animation Frame (on vsync signal if vsync is enabled),
-     * and wait the frame to finish.
-     *
-     * @return true if frame was rendered, false if rendering loop was completed (cancelled or there was an exception inside it)
-     */
-    suspend fun awaitRedraw(): Boolean {
-        return withContext(Dispatchers.Swing) {
-            check(!isDisposed) { "SkiaLayer is disposed" }
-            onInit.await()
-            redrawer?.awaitRedraw() != false
-        }
     }
 
     @Suppress("LeakingThis")

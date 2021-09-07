@@ -32,10 +32,6 @@ internal class AngleRedrawer(
         frameDispatcher.scheduleFrame()
     }
 
-    override suspend fun awaitRedraw(): Boolean {
-        return frameDispatcher.awaitFrame()
-    }
-
     override fun redrawImmediately() {
         check(!isDisposed) { "AngleRedrawer is disposed" }
         update(System.nanoTime())

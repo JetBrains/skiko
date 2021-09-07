@@ -59,10 +59,6 @@ internal class LinuxOpenGLRedrawer(
         frameDispatcher.scheduleFrame()
     }
 
-    override suspend fun awaitRedraw(): Boolean {
-        return frameDispatcher.awaitFrame()
-    }
-
     override fun redrawImmediately() = layer.backedLayer.lockLinuxDrawingSurface {
         check(!isDisposed) { "LinuxOpenGLRedrawer is disposed" }
         update(System.nanoTime())

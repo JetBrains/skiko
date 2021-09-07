@@ -49,7 +49,8 @@ class ScreenshotTestRule : TestRule {
         }
         if (expectedFile.exists()) {
             val expected = ImageIO.read(expectedFile)
-            if (!isContentSame(expected, actual)) {
+            // macOs screenshots can have different color on different configurations
+            if (!isContentSame(expected, actual, sensitivity = 0.25)) {
                 ImageIO.write(actual, "png", actualFile)
                 throw AssertionError(
                     "Image mismatch! Expected image ${expectedFile.absolutePath}, actual: ${actualFile.absolutePath}"

@@ -7,13 +7,13 @@ import kotlinx.coroutines.withContext
 import org.jetbrains.skia.BackendRenderTarget
 import org.jetbrains.skia.DirectContext
 import org.jetbrains.skiko.*
-import org.jetbrains.skiko.useDrawingSurfacePlatformInfo
 import javax.swing.SwingUtilities.convertPoint
 import javax.swing.SwingUtilities.getRootPane
+import kotlin.time.ExperimentalTime
 
 internal class MetalRedrawer(
     private val layer: SkiaLayer,
-    properties: SkiaLayerProperties
+    private val properties: SkiaLayerProperties
 ) : Redrawer {
     companion object {
         init {
@@ -21,18 +21,22 @@ internal class MetalRedrawer(
         }
     }
     private var isDisposed = false
-    private var disposeLock = Any()
+    private var drawLock = Any()
     private val device = layer.backedLayer.useDrawingSurfacePlatformInfo {
         createMetalDevice(getAdapterPriority(), it)
     }
     private val windowHandle = layer.windowHandle
+
+    init {
+        setVSyncEnabled(device, properties.isVsyncEnabled)
+    }
 
     private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
         update(System.nanoTime())
         draw()
     }
 
-    override fun dispose() = synchronized(disposeLock) {
+    override fun dispose() = synchronized(drawLock) {
         frameDispatcher.cancel()
         disposeDevice(device)
         isDisposed = true
@@ -43,16 +47,12 @@ internal class MetalRedrawer(
         frameDispatcher.scheduleFrame()
     }
 
-    override suspend fun awaitRedraw(): Boolean {
-        return frameDispatcher.awaitFrame()
-    }
-
     override fun redrawImmediately() {
         check(!isDisposed) { "MetalRedrawer is disposed" }
-        // TODO: now we wait until previous `layer.draw` is finished. it ends only on the next vsync.
-        //  Because of that we lose one frame on resize and can theoretically see very small white bars on the sides
-        //  of the window to avoid this we should be able to draw in two modes: with vsync and without.
-        frameDispatcher.scheduleFrame()
+        setVSyncEnabled(device, enabled = false)
+        update(System.nanoTime())
+        performDraw()
+        setVSyncEnabled(device, properties.isVsyncEnabled)
     }
 
     private fun update(nanoTime: Long) {
@@ -60,25 +60,20 @@ internal class MetalRedrawer(
     }
 
     private suspend fun draw() {
+        // 2,3 GHz 8-Core Intel Core i9
+        //
+        // Test1. 8 windows, multiple clocks, 800x600
+        //
+        // Executors.newSingleThreadExecutor().asCoroutineDispatcher(): 20 FPS, 130% CPU
+        // Dispatchers.IO: 58 FPS, 460% CPU
+        //
+        // Test2. 60 windows, single clock, 800x600
+        //
+        // Executors.newSingleThreadExecutor().asCoroutineDispatcher(): 50 FPS, 150% CPU
+        // Dispatchers.IO: 50 FPS, 200% CPU
         withContext(Dispatchers.IO) {
             val handle = startRendering()
-            synchronized(disposeLock) {
-                if (!isDisposed)
-                    if (layer.prepareDrawContext()) {
-                        // 2,3 GHz 8-Core Intel Core i9
-                        //
-                        // Test1. 8 windows, multiple clocks, 800x600
-                        //
-                        // Executors.newSingleThreadExecutor().asCoroutineDispatcher(): 20 FPS, 130% CPU
-                        // Dispatchers.IO: 58 FPS, 460% CPU
-                        //
-                        // Test2. 60 windows, single clock, 800x600
-                        //
-                        // Executors.newSingleThreadExecutor().asCoroutineDispatcher(): 50 FPS, 150% CPU
-                        // Dispatchers.IO: 50 FPS, 200% CPU
-                        layer.draw()
-                    }
-            }
+            performDraw()
             endRendering(handle)
         }
         // When window is not visible - it doesn't make sense to redraw fast to avoid battery drain.
@@ -86,6 +81,14 @@ internal class MetalRedrawer(
         // `NSWindowDidChangeOcclusionStateNotification`, but current approach seems to work as well in practise.
         if (isOccluded(windowHandle))
             delay(300)
+    }
+
+    private fun performDraw() = synchronized(drawLock) {
+        if (!isDisposed) {
+            if (layer.prepareDrawContext()) {
+                layer.draw()
+            }
+        }
     }
 
     override fun syncSize() {
@@ -131,6 +134,7 @@ internal class MetalRedrawer(
     private external fun finishFrame(device: Long)
     private external fun resizeLayers(device: Long, x: Int, y: Int, width: Int, height: Int)
     private external fun setContentScale(device: Long, contentScale: Float)
+    private external fun setVSyncEnabled(device: Long, enabled: Boolean)
     private external fun isOccluded(window: Long): Boolean
     private external fun getAdapterName(device: Long): String
     private external fun getAdapterMemorySize(device: Long): Long

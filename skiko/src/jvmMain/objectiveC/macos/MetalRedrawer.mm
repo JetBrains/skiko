@@ -247,6 +247,12 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_setConten
     [CATransaction flush];
 }
 
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_setVSyncEnabled(JNIEnv *env, jobject obj, jlong devicePtr, jboolean enabled)
+{
+    MetalDevice *device = (MetalDevice *) devicePtr;
+    device.layer.displaySyncEnabled = enabled;
+}
+
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_finishFrame(
     JNIEnv *env, jobject redrawer, jlong devicePtr)
 {

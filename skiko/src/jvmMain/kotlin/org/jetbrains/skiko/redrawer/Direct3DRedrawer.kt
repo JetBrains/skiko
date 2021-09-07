@@ -16,14 +16,21 @@ internal class Direct3DRedrawer(
 ) : Redrawer {
 
     private var isDisposed = false
-    private var disposeLock = Any()
+    private var drawLock = Any()
+
+    private val device = createDirectXDevice(getAdapterPriority(), layer.contentHandle).also {
+        if (it == 0L) {
+            throw Exception("Failed to create DirectX12 device.")
+        }
+    }
 
     private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
         update(System.nanoTime())
         draw()
     }
 
-    override fun dispose() = synchronized(disposeLock) {
+    override fun dispose() = synchronized(drawLock) {
+        disposeDevice(device)
         frameDispatcher.cancel()
         isDisposed = true
     }
@@ -33,16 +40,12 @@ internal class Direct3DRedrawer(
         frameDispatcher.scheduleFrame()
     }
 
-    override suspend fun awaitRedraw(): Boolean {
-        return frameDispatcher.awaitFrame()
-    }
-
     override fun redrawImmediately() {
         check(!isDisposed) { "Direct3DRedrawer is disposed" }
-        // TODO now we wait until previous layer.draw is finished. it ends only on the next vsync.
-        //  because of that we lose one frame on resize and can theoretically see very small white bars on the sides of the window
-        //  to avoid this we should be able to draw in two modes: with vsync and without.
-        frameDispatcher.scheduleFrame()
+        layer.update(System.nanoTime())
+        if (prepareDrawContext()) {
+            drawAndSwap(withVsync = false)
+        }
     }
 
     private fun update(nanoTime: Long) {
@@ -50,32 +53,33 @@ internal class Direct3DRedrawer(
     }
 
     private suspend fun draw() {
-        if (layer.prepareDrawContext()) {
+        if (prepareDrawContext()) {
             withContext(Dispatchers.IO) {
-                synchronized(disposeLock) {
-                    if (!isDisposed) {
-                        layer.draw()
-                    }
-                }
+                drawAndSwap(withVsync = properties.isVsyncEnabled)
             }
         }
     }
 
-    fun makeContext(device: Long) = DirectContext(
+    private fun prepareDrawContext() = synchronized(drawLock) {
+        layer.prepareDrawContext()
+    }
+
+    private fun drawAndSwap(withVsync: Boolean) = synchronized(drawLock) {
+        if (!isDisposed) {
+            layer.draw()
+            swap(device, withVsync)
+        }
+    }
+
+    fun makeContext() = DirectContext(
         makeDirectXContext(device)
     )
 
-    fun makeSurface(device: Long, context: Long, width: Int, height: Int, index: Int) = Surface(
+    fun makeSurface(context: Long, width: Int, height: Int, index: Int) = Surface(
         makeDirectXSurface(device, context, width, height, index)
     )
 
-    fun createDevice(): Long = createDirectXDevice(getAdapterPriority(), layer.contentHandle)
-
-    fun finishFrame(device: Long, context: Long, surface: Long) {
-        finishFrame(device, context, surface, properties.isVsyncEnabled)
-    }
-
-    fun getAdapterPriority(): Int {
+    private fun getAdapterPriority(): Int {
         val adapterPriority = GpuPriority.parse(System.getProperty("skiko.directx.gpu.priority"))
         return when (adapterPriority) {
             GpuPriority.Auto -> 0
@@ -85,15 +89,23 @@ internal class Direct3DRedrawer(
         }
     }
 
-    external fun createDirectXDevice(adapterPriority: Int, contentHandle: Long): Long
-    external fun makeDirectXContext(device: Long): Long
-    external fun makeDirectXSurface(device: Long, context: Long, width: Int, height: Int, index: Int): Long
-    external fun resizeBuffers(device: Long, width: Int, height: Int)
-    private external fun finishFrame(device: Long, context: Long, surface: Long, isVsyncEnabled: Boolean)
-    external fun disposeDevice(device: Long)
-    external fun getBufferIndex(device: Long): Int
-    external fun initSwapChain(device: Long)
-    external fun initFence(device: Long)
-    external fun getAdapterName(device: Long): String
-    external fun getAdapterMemorySize(device: Long): Long
+    fun resizeBuffers(width: Int, height: Int) = resizeBuffers(device, width, height)
+
+    fun getBufferIndex() = getBufferIndex(device)
+    fun initSwapChain() = initSwapChain(device)
+    fun initFence() = initFence(device)
+    val adapterName get() = getAdapterName(device)
+    val adapterMemorySize get() = getAdapterMemorySize(device)
+
+    private external fun createDirectXDevice(adapterPriority: Int, contentHandle: Long): Long
+    private external fun makeDirectXContext(device: Long): Long
+    private external fun makeDirectXSurface(device: Long, context: Long, width: Int, height: Int, index: Int): Long
+    private external fun resizeBuffers(device: Long, width: Int, height: Int)
+    private external fun swap(device: Long, isVsyncEnabled: Boolean)
+    private external fun disposeDevice(device: Long)
+    private external fun getBufferIndex(device: Long): Int
+    private external fun initSwapChain(device: Long)
+    private external fun initFence(device: Long)
+    private external fun getAdapterName(device: Long): String
+    private external fun getAdapterMemorySize(device: Long): Long
 }
