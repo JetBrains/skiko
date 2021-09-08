@@ -5,10 +5,7 @@ import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
 import org.jetbrains.skia.DirectContext
 import org.jetbrains.skia.Surface
-import org.jetbrains.skiko.FrameDispatcher
-import org.jetbrains.skiko.GpuPriority
-import org.jetbrains.skiko.SkiaLayer
-import org.jetbrains.skiko.SkiaLayerProperties
+import org.jetbrains.skiko.*
 
 internal class Direct3DRedrawer(
     private val layer: SkiaLayer,
@@ -19,8 +16,8 @@ internal class Direct3DRedrawer(
     private var drawLock = Any()
 
     private val device = createDirectXDevice(getAdapterPriority(), layer.contentHandle).also {
-        if (it == 0L) {
-            throw Exception("Failed to create DirectX12 device.")
+        if (it == 0L || !isVideoCardSupported(layer.renderApi)) {
+            throw IllegalArgumentException("Failed to create DirectX12 device.")
         }
     }
 
