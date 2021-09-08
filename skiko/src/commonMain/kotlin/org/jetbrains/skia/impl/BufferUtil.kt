@@ -13,7 +13,7 @@ object BufferUtil {
 
     fun getPointerFromByteBuffer(buffer: ByteBuffer): NativePointer {
         val result = _nGetPointerFromByteBuffer(buffer)
-        require(result != NULLPNTR) { "The given buffer " + buffer + "is not a direct buffer or current JVM doesn't support JNI direct buffer access!" }
+        require(result != Native.NULLPNTR) { "The given buffer " + buffer + "is not a direct buffer or current JVM doesn't support JNI direct buffer access!" }
         return result
     }
 

@@ -11,6 +11,11 @@ actual abstract class Native actual constructor(ptr: NativePointer) {
 
     actual open fun _nativeEquals(other: Native?): Boolean = TODO()
 
+    actual companion object {
+        actual val NULLPNTR: NativePointer
+            get() = 0
+    }
+
     init {
         if (ptr == NULLPNTR) throw RuntimeException("Can't wrap nullptr")
         _ptr = ptr
@@ -22,9 +27,6 @@ actual fun reachabilityBarrier(obj: Any?) {
 }
 
 actual typealias NativePointer = Int
-
-actual val NULLPNTR: NativePointer
-    get() = 0
 
 actual fun toIRange(p: NativePointer): IRange = IRange((p ushr 32), (p and -1))
 actual fun toIPoint(p: NativePointer): IPoint = IPoint((p ushr 32), (p and -1))

@@ -9,6 +9,12 @@ import java.lang.ref.Reference
 
 actual abstract class Native actual constructor(ptr: Long) {
     actual var _ptr: Long
+
+    actual companion object {
+        actual val NULLPNTR: NativePointer
+            get() = 0L
+    }
+
     override fun toString(): String {
         return javaClass.simpleName + "(_ptr=0x" + _ptr.toString(16) + ")"
     }
@@ -36,7 +42,7 @@ actual abstract class Native actual constructor(ptr: Long) {
     }
 
     init {
-        if (ptr == 0L) throw RuntimeException("Can't wrap nullptr")
+        if (ptr == NULLPNTR) throw RuntimeException("Can't wrap nullptr")
         _ptr = ptr
     }
 }
@@ -46,9 +52,6 @@ actual fun reachabilityBarrier(obj: Any?) {
 }
 
 actual typealias NativePointer = Long
-
-actual val NULLPNTR: NativePointer
-    get() = 0L
 
 actual fun toIRange(p: NativePointer): IRange = IRange((p ushr 32).toInt(), (p and -1).toInt())
 

@@ -1,6 +1,6 @@
 package org.jetbrains.skia
 
-import org.jetbrains.skia.impl.NULLPNTR
+import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.computeByteSize
 import org.jetbrains.skia.impl.minRowBytes
@@ -42,7 +42,7 @@ class ImageInfo(val colorInfo: ColorInfo, val width: Int, val height: Int) {
         height,
         ColorType.values()[colorType],
         ColorAlphaType.values()[alphaType],
-        if (colorSpace == NULLPNTR) null else ColorSpace(colorSpace)
+        if (colorSpace == Native.NULLPNTR) null else ColorSpace(colorSpace)
     ) {
     }
 

@@ -1,7 +1,7 @@
 package org.jetbrains.skia.shaper
 
 import org.jetbrains.skia.*
-import org.jetbrains.skia.impl.NULLPNTR
+import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.NativePointer
 
 class RunInfo(
@@ -31,7 +31,7 @@ class RunInfo(
         get() = rangeBegin + rangeSize
     val font: Font
         get() {
-            check(_fontPtr != NULLPNTR) { "getFont() is only valid inside RunHandler callbacks" }
+            check(_fontPtr != Native.NULLPNTR) { "getFont() is only valid inside RunHandler callbacks" }
             return Font.makeClone(_fontPtr)
         }
 

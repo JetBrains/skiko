@@ -5,8 +5,6 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
-import org.jetbrains.skia.ExternalSymbolName
-import org.jetbrains.skia.impl.NULLPNTR
 import org.jetbrains.skia.impl.NativePointer
 import kotlin.jvm.JvmStatic
 
