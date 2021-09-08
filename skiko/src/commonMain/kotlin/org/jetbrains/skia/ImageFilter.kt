@@ -691,7 +691,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             t1: Float,
             r1: Float,
             b1: Float,
-            samplingMode: NativePointer
+            samplingMode: Long
         ): NativePointer
 
         @JvmStatic
@@ -724,7 +724,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMatrixTransform")
-        external fun _nMakeMatrixTransform(matrix: FloatArray?, samplingMode: NativePointer, input: NativePointer): NativePointer
+        external fun _nMakeMatrixTransform(matrix: FloatArray?, samplingMode: Long, input: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMerge")
         external fun _nMakeMerge(filters: Array<NativePointer>?, crop: IRect?): NativePointer

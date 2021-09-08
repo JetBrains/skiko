@@ -459,7 +459,7 @@ class Paint : Managed {
      */
     fun setARGB(a: Int, r: Int, g: Int, b: Int): Paint {
         Stats.onNativeCall()
-        _nSetColor4f(_ptr, r / 255f, g / 255f, b / 255f, a / 255f, NULLPNTR)
+        _nSetColor4f(_ptr, r / 255f, g / 255f, b / 255f, a / 255f, NullPointer)
         return this
     }
 
@@ -670,7 +670,7 @@ class Paint : Managed {
         get() = try {
             Stats.onNativeCall()
             val shaderPtr = _nGetShader(_ptr)
-            if (shaderPtr == NULLPNTR) null else Shader(shaderPtr)
+            if (shaderPtr == NullPointer) null else Shader(shaderPtr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -709,7 +709,7 @@ class Paint : Managed {
         get() = try {
             Stats.onNativeCall()
             val colorFilterPtr = _nGetColorFilter(_ptr)
-            if (colorFilterPtr == NULLPNTR) null else ColorFilter(colorFilterPtr)
+            if (colorFilterPtr == NullPointer) null else ColorFilter(colorFilterPtr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -788,7 +788,7 @@ class Paint : Managed {
         get() = try {
             Stats.onNativeCall()
             val pathEffectPtr = _nGetPathEffect(_ptr)
-            if (pathEffectPtr == NULLPNTR) null else PathEffect(pathEffectPtr)
+            if (pathEffectPtr == NullPointer) null else PathEffect(pathEffectPtr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -828,7 +828,7 @@ class Paint : Managed {
         get() = try {
             Stats.onNativeCall()
             val maskFilterPtr = _nGetMaskFilter(_ptr)
-            if (maskFilterPtr == NULLPNTR) null else MaskFilter(maskFilterPtr)
+            if (maskFilterPtr == NullPointer) null else MaskFilter(maskFilterPtr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -871,7 +871,7 @@ class Paint : Managed {
         get() = try {
             Stats.onNativeCall()
             val imageFilterPtr = _nGetImageFilter(_ptr)
-            if (imageFilterPtr == NULLPNTR) null else org.jetbrains.skia.ImageFilter(imageFilterPtr)
+            if (imageFilterPtr == NullPointer) null else org.jetbrains.skia.ImageFilter(imageFilterPtr)
         } finally {
             reachabilityBarrier(this)
         }

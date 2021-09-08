@@ -113,7 +113,7 @@ class ParagraphCache internal constructor(owner: FontCollection, ptr: NativePoin
     internal val _owner: FontCollection
     internal fun _validate() {
         try {
-            check(getPtr(_owner) != NULLPNTR) { "ParagraphCache needs owning FontCollection to be alive" }
+            check(getPtr(_owner) != NullPointer) { "ParagraphCache needs owning FontCollection to be alive" }
         } finally {
             reachabilityBarrier(_owner)
         }

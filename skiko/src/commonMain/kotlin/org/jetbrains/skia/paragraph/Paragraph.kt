@@ -64,7 +64,7 @@ class Paragraph internal constructor(ptr: NativePointer, text: ManagedString?) :
         external fun _nGetGlyphPositionAtCoordinate(ptr: NativePointer, dx: Float, dy: Float): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetWordBoundary")
-        external fun _nGetWordBoundary(ptr: NativePointer, offset: Int): NativePointer
+        external fun _nGetWordBoundary(ptr: NativePointer, offset: Int): Long
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetLineMetrics")
         external fun _nGetLineMetrics(ptr: NativePointer, textPtr: NativePointer): Array<LineMetrics?>
@@ -219,6 +219,8 @@ class Paragraph internal constructor(ptr: NativePointer, text: ManagedString?) :
         }
     }
 
+
+
     fun getWordBoundary(offset: Int): IRange {
         return try {
             Stats.onNativeCall()
@@ -227,6 +229,8 @@ class Paragraph internal constructor(ptr: NativePointer, text: ManagedString?) :
             reachabilityBarrier(this)
         }
     }
+
+    private fun toIRange(p: Long) = IRange((p ushr 32).toInt(), (p and -1).toInt())
 
     val lineMetrics: Array<LineMetrics?>
         get() = try {

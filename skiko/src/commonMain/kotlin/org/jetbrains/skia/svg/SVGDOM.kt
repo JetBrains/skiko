@@ -43,7 +43,7 @@ class SVGDOM internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         get() = try {
             Stats.onNativeCall()
             val ptr = _nGetRoot(_ptr)
-            if (ptr == NULLPNTR) null else SVGSVG(ptr)
+            if (ptr == NullPointer) null else SVGSVG(ptr)
         } finally {
             reachabilityBarrier(this)
         }

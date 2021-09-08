@@ -73,7 +73,7 @@ class TextBlobBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _F
         return try {
             Stats.onNativeCall()
             val ptr = _nBuild(_ptr)
-            if (ptr == NULLPNTR) null else TextBlob(ptr)
+            if (ptr == NullPointer) null else TextBlob(ptr)
         } finally {
             reachabilityBarrier(this)
         }

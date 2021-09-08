@@ -7,7 +7,7 @@ class FilterMipmap constructor(
     internal val mipmapMode: MipmapMode = MipmapMode.NONE
 ) : SamplingMode {
 
-    override fun _pack() = _actualPack()
+    override fun _pack() = filterMode.ordinal.toLong() shl 32 or mipmapMode.ordinal.toLong()
 
     override fun equals(o: Any?): Boolean {
         if (o === this) return true
@@ -40,5 +40,3 @@ class FilterMipmap constructor(
         return "FilterMipmap(_filterMode=$filterMode, _mipmapMode=$mipmapMode)"
     }
 }
-
-expect fun FilterMipmap._actualPack(): NativePointer

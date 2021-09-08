@@ -20,7 +20,7 @@ class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHo
                 Stats.onNativeCall()
                 val ptr =
                     _nMakeFromData(getPtr(data))
-                require(ptr != NULLPNTR) { "Unsupported format" }
+                require(ptr != NullPointer) { "Unsupported format" }
                 Codec(ptr)
             } finally {
                 reachabilityBarrier(data)
@@ -52,7 +52,7 @@ class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHo
         external fun _nGetImageInfo(ptr: NativePointer): ImageInfo?
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetSize")
-        external fun _nGetSize(ptr: NativePointer): NativePointer
+        external fun _nGetSize(ptr: NativePointer): Long
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetEncodedOrigin")
         external fun _nGetEncodedOrigin(ptr: NativePointer): Int

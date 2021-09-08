@@ -70,7 +70,7 @@ class FontStyleSet internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         return try {
             Stats.onNativeCall()
             val ptr = _nGetTypeface(_ptr, index)
-            if (ptr == NULLPNTR) null else Typeface(ptr)
+            if (ptr == NullPointer) null else Typeface(ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -80,7 +80,7 @@ class FontStyleSet internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         return try {
             Stats.onNativeCall()
             val ptr = _nMatchStyle(_ptr, style._value)
-            if (ptr == NULLPNTR) null else Typeface(ptr)
+            if (ptr == NullPointer) null else Typeface(ptr)
         } finally {
             reachabilityBarrier(this)
         }

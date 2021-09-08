@@ -31,7 +31,7 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
                     ypos,
                     getPtr(font)
                 )
-                if (ptr == NULLPNTR) null else TextBlob(ptr)
+                if (ptr == NullPointer) null else TextBlob(ptr)
             } finally {
                 reachabilityBarrier(font)
             }
@@ -57,7 +57,7 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
                 Stats.onNativeCall()
                 val ptr =
                     _nMakeFromPos(glyphs, floatPos, getPtr(font))
-                if (ptr == NULLPNTR) null else TextBlob(ptr)
+                if (ptr == NullPointer) null else TextBlob(ptr)
             } finally {
                 reachabilityBarrier(font)
             }
@@ -79,7 +79,7 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
                     floatXform,
                     getPtr(font)
                 )
-                if (ptr == NULLPNTR) null else TextBlob(ptr)
+                if (ptr == NullPointer) null else TextBlob(ptr)
             } finally {
                 reachabilityBarrier(font)
             }
@@ -89,7 +89,7 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
             return try {
                 Stats.onNativeCall()
                 val ptr = _nMakeFromData(getPtr(data))
-                if (ptr == NULLPNTR) null else TextBlob(ptr)
+                if (ptr == NullPointer) null else TextBlob(ptr)
             } finally {
                 reachabilityBarrier(data)
             }

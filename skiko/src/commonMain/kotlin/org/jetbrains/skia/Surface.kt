@@ -59,7 +59,7 @@ class Surface : RefCnt {
                 val ptr = _nMakeRasterDirectWithPixmap(
                     getPtr(pixmap), surfaceProps
                 )
-                require(ptr != NULLPNTR) {
+                require(ptr != NullPointer) {
                     "Failed Surface.makeRasterDirect($pixmap, $surfaceProps)"
                 }
                 Surface(ptr)
@@ -115,7 +115,7 @@ class Surface : RefCnt {
                     rowBytes,
                     surfaceProps
                 )
-                require(ptr != NULLPNTR) {
+                require(ptr != NullPointer) {
                     "Failed Surface.makeRasterDirect($imageInfo, $pixelsPtr, $rowBytes, $surfaceProps)"
                 }
                 Surface(ptr)
@@ -141,7 +141,7 @@ class Surface : RefCnt {
          * @return              new Surface
          */
         fun makeRaster(imageInfo: ImageInfo): Surface {
-            return makeRaster(imageInfo, NULLPNTR, null)
+            return makeRaster(imageInfo, NullPointer, null)
         }
 
         /**
@@ -213,7 +213,7 @@ class Surface : RefCnt {
                     rowBytes,
                     surfaceProps
                 )
-                require(ptr != NULLPNTR) {
+                require(ptr != NullPointer) {
                     "Failed Surface.makeRaster($imageInfo, $rowBytes, $surfaceProps)"
                 }
                 Surface(ptr)
@@ -284,7 +284,7 @@ class Surface : RefCnt {
                     getPtr(colorSpace),
                     surfaceProps
                 )
-                require(ptr != NULLPNTR) {
+                require(ptr != NullPointer) {
                     "Failed Surface.makeFromBackendRenderTarget($context, $rt, $origin, $colorFormat, $colorSpace)"
                 }
                 Surface(ptr, context, rt)
@@ -315,7 +315,7 @@ class Surface : RefCnt {
                     getPtr(colorSpace),
                     surfaceProps
                 )
-                require(ptr != NULLPNTR) {
+                require(ptr != NullPointer) {
                     "Failed Surface.makeFromMTKView($context, $mtkViewPtr $origin, $colorFormat, $surfaceProps)"
                 }
                 Surface(ptr, context)
@@ -351,7 +351,7 @@ class Surface : RefCnt {
         fun makeRasterN32Premul(width: Int, height: Int): Surface {
             Stats.onNativeCall()
             val ptr = _nMakeRasterN32Premul(width, height)
-            require(ptr != NULLPNTR) { "Failed Surface.makeRasterN32Premul($width, $height)" }
+            require(ptr != NullPointer) { "Failed Surface.makeRasterN32Premul($width, $height)" }
             return Surface(ptr)
         }
 
@@ -501,7 +501,7 @@ class Surface : RefCnt {
                     surfaceProps,
                     shouldCreateWithMips
                 )
-                require(ptr != NULLPNTR) {
+                require(ptr != NullPointer) {
                     "Failed Surface.makeRenderTarget($context, $budgeted, $imageInfo, $sampleCount, $origin, $surfaceProps, $shouldCreateWithMips)"
                 }
                 Surface(ptr, context)
@@ -524,7 +524,7 @@ class Surface : RefCnt {
         fun makeNull(width: Int, height: Int): Surface {
             Stats.onNativeCall()
             val ptr = _nMakeNull(width, height)
-            require(ptr != NULLPNTR) { "Failed Surface.makeNull($width, $height)" }
+            require(ptr != NullPointer) { "Failed Surface.makeNull($width, $height)" }
             return Surface(ptr)
         }
 
@@ -769,7 +769,7 @@ class Surface : RefCnt {
         get() = try {
             Stats.onNativeCall()
             val ptr = _nGetRecordingContext(_ptr)
-            if (ptr == NULLPNTR) null else DirectContext(ptr)
+            if (ptr == NullPointer) null else DirectContext(ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -788,7 +788,7 @@ class Surface : RefCnt {
         get() = try {
             Stats.onNativeCall()
             val ptr = _nGetCanvas(_ptr)
-            if (ptr == NULLPNTR) throw IllegalArgumentException() else Canvas(ptr, false, this)
+            if (ptr == NullPointer) throw IllegalArgumentException() else Canvas(ptr, false, this)
         } finally {
             reachabilityBarrier(this)
         }

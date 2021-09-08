@@ -73,7 +73,7 @@ class TextBlobBuilderRunHandler<T> internal constructor(
         return try {
             Stats.onNativeCall()
             val ptr = _nMakeBlob(_ptr)
-            if (NULLPNTR == ptr) null else TextBlob(ptr)
+            if (NullPointer == ptr) null else TextBlob(ptr)
         } finally {
             reachabilityBarrier(this)
         }

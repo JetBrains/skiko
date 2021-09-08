@@ -2,7 +2,6 @@
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
-import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 
 class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
@@ -263,7 +262,7 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
                     info.colorInfo.alphaType.ordinal,
                     getPtr(info.colorInfo.colorSpace), addr, rowBytes
                 )
-                require(ptr != NULLPNTR) { "Failed to create Pixmap." }
+                require(ptr != NullPointer) { "Failed to create Pixmap." }
                 Pixmap(ptr, true)
             } finally {
                 reachabilityBarrier(info.colorInfo.colorSpace)
@@ -379,7 +378,7 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
         external fun _nReadPixelsToPixmapFromPoint(ptr: NativePointer, dstPixmapPtr: NativePointer, srcX: Int, srcY: Int): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nScalePixels")
-        external fun _nScalePixels(ptr: NativePointer, dstPixmapPtr: NativePointer, samplingOptions: NativePointer): Boolean
+        external fun _nScalePixels(ptr: NativePointer, dstPixmapPtr: NativePointer, samplingOptions: Long): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nErase")
         external fun _nErase(ptr: NativePointer, color: Int): Boolean

@@ -6,7 +6,7 @@ actual abstract class Native actual constructor(ptr: Long) {
     actual var _ptr: Long
 
     actual companion object {
-        actual val NULLPNTR: NativePointer
+        actual val NullPointer: NativePointer
             get() = 0L
     }
 
@@ -37,7 +37,7 @@ actual abstract class Native actual constructor(ptr: Long) {
     }
 
     init {
-        if (ptr == NULLPNTR) throw RuntimeException("Can't wrap nullptr")
+        if (ptr == NullPointer) throw RuntimeException("Can't wrap nullptr")
         _ptr = ptr
     }
 }

@@ -128,7 +128,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
         external fun _nGetPixelRef(ptr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetPixelRefOrigin")
-        external fun _nGetPixelRefOrigin(ptr: NativePointer): NativePointer
+        external fun _nGetPixelRefOrigin(ptr: NativePointer): Long
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nSetPixelRef")
         external fun _nSetPixelRef(ptr: NativePointer, pixelRefPtr: NativePointer, dx: Int, dy: Int)
@@ -178,7 +178,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
         external fun _nPeekPixels(ptr: NativePointer): ByteBuffer?
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nMakeShader")
-        external fun _nMakeShader(ptr: NativePointer, tmx: Int, tmy: Int, samplingMode: NativePointer, localMatrix: FloatArray?): NativePointer
+        external fun _nMakeShader(ptr: NativePointer, tmx: Int, tmy: Int, samplingMode: Long, localMatrix: FloatArray?): NativePointer
 
         init {
             staticLoad()
@@ -773,7 +773,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
         get() = try {
             Stats.onNativeCall()
             val res = _nGetPixelRef(_ptr)
-            if (res == NULLPNTR) null else PixelRef(res)
+            if (res == NullPointer) null else PixelRef(res)
         } finally {
             reachabilityBarrier(this)
         }

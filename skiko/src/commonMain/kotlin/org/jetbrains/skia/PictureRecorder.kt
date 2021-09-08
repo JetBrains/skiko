@@ -100,7 +100,7 @@ class PictureRecorder internal constructor(ptr: NativePointer) : Managed(ptr, _F
         get() = try {
             Stats.onNativeCall()
             val ptr = _nGetRecordingCanvas(_ptr)
-            if (ptr == NULLPNTR) null else Canvas(ptr, false, this)
+            if (ptr == NullPointer) null else Canvas(ptr, false, this)
         } finally {
             reachabilityBarrier(this)
         }

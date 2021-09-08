@@ -4,5 +4,5 @@ actual abstract class Managed actual constructor(ptr: NativePointer, finalizer: 
     actual open fun close(): Unit = TODO()
 
     actual open val isClosed: Boolean
-        get() = _ptr == NULLPNTR
+        get() = _ptr == NullPointer
 }

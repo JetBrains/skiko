@@ -8,7 +8,7 @@ import org.jetbrains.skia.impl.NativePointer
  * @see org.jetbrains.skia.CubicResampler
  */
 interface SamplingMode {
-    fun _pack(): NativePointer
+    fun _pack(): Long
 
     companion object {
         val DEFAULT: SamplingMode = FilterMipmap(FilterMode.NEAREST, MipmapMode.NONE)

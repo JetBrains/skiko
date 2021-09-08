@@ -6,12 +6,12 @@ actual abstract class Native actual constructor(ptr: NativePointer) {
     actual open fun _nativeEquals(other: Native?): Boolean = TODO()
 
     actual companion object {
-        actual val NULLPNTR: NativePointer
+        actual val NullPointer: NativePointer
             get() = 0
     }
 
     init {
-        if (ptr == NULLPNTR) throw RuntimeException("Can't wrap nullptr")
+        if (ptr == NullPointer) throw RuntimeException("Can't wrap nullptr")
         _ptr = ptr
     }
 }

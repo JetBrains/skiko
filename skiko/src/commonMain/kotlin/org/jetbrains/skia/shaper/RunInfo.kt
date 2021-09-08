@@ -31,7 +31,7 @@ class RunInfo(
         get() = rangeBegin + rangeSize
     val font: Font
         get() {
-            check(_fontPtr != Native.NULLPNTR) { "getFont() is only valid inside RunHandler callbacks" }
+            check(_fontPtr != Native.NullPointer) { "getFont() is only valid inside RunHandler callbacks" }
             return Font.makeClone(_fontPtr)
         }
 

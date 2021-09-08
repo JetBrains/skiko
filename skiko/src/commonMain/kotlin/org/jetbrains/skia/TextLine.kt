@@ -3,7 +3,6 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.shaper.*
-import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 
 class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
@@ -145,7 +144,7 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
             Stats.onNativeCall()
             return try {
                 val res = _nGetTextBlob(_ptr)
-                if (res == NULLPNTR) null else TextBlob(res)
+                if (res == NullPointer) null else TextBlob(res)
             } finally {
                 reachabilityBarrier(this)
             }

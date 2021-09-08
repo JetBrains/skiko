@@ -122,7 +122,7 @@ class FontCollection internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         get() = try {
             Stats.onNativeCall()
             val ptr = _nGetFallbackManager(_ptr)
-            if (ptr == NULLPNTR) null else FontMgr(ptr)
+            if (ptr == NullPointer) null else FontMgr(ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -143,7 +143,7 @@ class FontCollection internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         return try {
             Stats.onNativeCall()
             val ptr = _nDefaultFallbackChar(_ptr, unicode, style._value, locale)
-            if (ptr == NULLPNTR) null else Typeface(ptr)
+            if (ptr == NullPointer) null else Typeface(ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -153,7 +153,7 @@ class FontCollection internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         return try {
             Stats.onNativeCall()
             val ptr = _nDefaultFallback(_ptr)
-            if (ptr == NULLPNTR) null else Typeface(ptr)
+            if (ptr == NullPointer) null else Typeface(ptr)
         } finally {
             reachabilityBarrier(this)
         }

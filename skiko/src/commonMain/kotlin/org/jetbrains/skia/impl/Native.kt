@@ -1,5 +1,7 @@
 package org.jetbrains.skia.impl
 
+import org.jetbrains.skia.IPoint
+
 expect class NativePointer
 
 expect abstract class Native(ptr: NativePointer) {
@@ -7,11 +9,10 @@ expect abstract class Native(ptr: NativePointer) {
     open fun _nativeEquals(other: Native?): Boolean
 
     companion object {
-        val NULLPNTR: NativePointer
+        val NullPointer: NativePointer
     }
 }
 
 expect fun reachabilityBarrier(obj: Any?)
 
-fun getPtr(n: Native?): NativePointer = n?._ptr ?: Native.NULLPNTR
-
+fun getPtr(n: Native?): NativePointer = n?._ptr ?: Native.NullPointer

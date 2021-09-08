@@ -70,7 +70,7 @@ open class FontMgr : RefCnt {
         return try {
             Stats.onNativeCall()
             val ptr = _nMakeStyleSet(_ptr, index)
-            if (ptr == NULLPNTR) null else FontStyleSet(ptr)
+            if (ptr == NullPointer) null else FontStyleSet(ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -112,7 +112,7 @@ open class FontMgr : RefCnt {
         return try {
             Stats.onNativeCall()
             val ptr = _nMatchFamilyStyle(_ptr, familyName, style._value)
-            if (ptr == NULLPNTR) null else Typeface(ptr)
+            if (ptr == NullPointer) null else Typeface(ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -150,7 +150,7 @@ open class FontMgr : RefCnt {
         return try {
             Stats.onNativeCall()
             val ptr = _nMatchFamilyStyleCharacter(_ptr, familyName, style._value, bcp47, character)
-            if (ptr == NULLPNTR) null else Typeface(ptr)
+            if (ptr == NullPointer) null else Typeface(ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -179,7 +179,7 @@ open class FontMgr : RefCnt {
             Stats.onNativeCall()
             val ptr =
                 _nMakeFromData(_ptr, getPtr(data), ttcIndex)
-            if (ptr == NULLPNTR) null else Typeface(ptr)
+            if (ptr == NullPointer) null else Typeface(ptr)
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(data)

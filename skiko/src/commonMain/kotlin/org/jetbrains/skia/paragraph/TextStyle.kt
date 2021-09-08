@@ -199,7 +199,7 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         get() = try {
             Stats.onNativeCall()
             val ptr = _nGetForeground(_ptr)
-            if (ptr == NULLPNTR) null else Paint(ptr, true)
+            if (ptr == NullPointer) null else Paint(ptr, true)
         } finally {
             reachabilityBarrier(this)
         }
@@ -224,7 +224,7 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         get() = try {
             Stats.onNativeCall()
             val ptr = _nGetBackground(_ptr)
-            if (ptr == NULLPNTR) null else Paint(ptr, true)
+            if (ptr == NullPointer) null else Paint(ptr, true)
         } finally {
             reachabilityBarrier(this)
         }
@@ -431,7 +431,7 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         get() = try {
             Stats.onNativeCall()
             val ptr = _nGetTypeface(_ptr)
-            if (ptr == NULLPNTR) null else Typeface(ptr)
+            if (ptr == NullPointer) null else Typeface(ptr)
         } finally {
             reachabilityBarrier(this)
         }

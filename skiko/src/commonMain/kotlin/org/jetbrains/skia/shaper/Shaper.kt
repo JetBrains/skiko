@@ -74,7 +74,7 @@ class Shaper internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
         fun makeCoreText(): Shaper {
             Stats.onNativeCall()
             val ptr = _nMakeCoreText()
-            if (ptr == NULLPNTR) throw UnsupportedOperationException("CoreText not available")
+            if (ptr == NullPointer) throw UnsupportedOperationException("CoreText not available")
             return Shaper(ptr)
         }
 
@@ -170,7 +170,7 @@ class Shaper internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
                 offset.x,
                 offset.y
             )
-            if (NULLPNTR == ptr) null else TextBlob(ptr)
+            if (NullPointer == ptr) null else TextBlob(ptr)
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(font)

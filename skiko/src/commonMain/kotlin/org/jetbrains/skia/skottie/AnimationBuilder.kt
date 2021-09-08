@@ -87,7 +87,7 @@ class AnimationBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _
         return try {
             Stats.onNativeCall()
             val ptr = _nBuildFromString(_ptr, data)
-            require(ptr != NULLPNTR) { "Failed to create Animation from string: \"$data\"" }
+            require(ptr != NullPointer) { "Failed to create Animation from string: \"$data\"" }
             Animation(ptr)
         } finally {
             reachabilityBarrier(this)
@@ -98,7 +98,7 @@ class AnimationBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _
         return try {
             Stats.onNativeCall()
             val ptr = _nBuildFromFile(_ptr, path)
-            require(ptr != NULLPNTR) { "Failed to create Animation from path: $path" }
+            require(ptr != NullPointer) { "Failed to create Animation from path: $path" }
             Animation(ptr)
         } finally {
             reachabilityBarrier(this)
@@ -110,7 +110,7 @@ class AnimationBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _
             Stats.onNativeCall()
             val ptr =
                 _nBuildFromData(_ptr, getPtr(data))
-            require(ptr != NULLPNTR) { "Failed to create Animation from data" }
+            require(ptr != NullPointer) { "Failed to create Animation from data" }
             Animation(ptr)
         } finally {
             reachabilityBarrier(this)

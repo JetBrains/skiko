@@ -20,7 +20,7 @@ class Picture internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             return try {
                 Stats.onNativeCall()
                 val ptr = _nMakeFromData(getPtr(data))
-                if (ptr == NULLPNTR) null else Picture(ptr)
+                if (ptr == NullPointer) null else Picture(ptr)
             } finally {
                 reachabilityBarrier(data)
             }

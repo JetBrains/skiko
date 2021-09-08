@@ -44,7 +44,7 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
                     bytes,
                     rowBytes
                 )
-                if (ptr == NULLPNTR) throw RuntimeException("Failed to makeRaster $imageInfo $bytes $rowBytes")
+                if (ptr == NullPointer) throw RuntimeException("Failed to makeRaster $imageInfo $bytes $rowBytes")
                 Image(ptr)
             } finally {
                 reachabilityBarrier(imageInfo.colorInfo.colorSpace)
@@ -82,7 +82,7 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
                     getPtr(data),
                     rowBytes
                 )
-                if (ptr == NULLPNTR) throw RuntimeException("Failed to makeRaster $imageInfo $data $rowBytes")
+                if (ptr == NullPointer) throw RuntimeException("Failed to makeRaster $imageInfo $data $rowBytes")
                 Image(ptr)
             } finally {
                 reachabilityBarrier(imageInfo.colorInfo.colorSpace)
@@ -113,11 +113,10 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
          */
         fun makeFromBitmap(bitmap: Bitmap): Image {
             return try {
-                require(bitmap != null) { "Can’t makeFromBitmap with bitmap == null" }
                 Stats.onNativeCall()
                 val ptr =
                     _nMakeFromBitmap(getPtr(bitmap))
-                if (ptr == NULLPNTR) throw RuntimeException("Failed to Image::makeFromBitmap $bitmap")
+                if (ptr == NullPointer) throw RuntimeException("Failed to Image::makeFromBitmap $bitmap")
                 Image(ptr)
             } finally {
                 reachabilityBarrier(bitmap)
@@ -126,11 +125,10 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
 
         fun makeFromPixmap(pixmap: Pixmap): Image {
             return try {
-                require(pixmap != null) { "Can’t makeFromPixmap with pixmap == null" }
                 Stats.onNativeCall()
                 val ptr =
                     _nMakeFromPixmap(getPtr(pixmap))
-                if (ptr == NULLPNTR) throw RuntimeException("Failed to Image::makeFromRaster $pixmap")
+                if (ptr == NullPointer) throw RuntimeException("Failed to Image::makeFromRaster $pixmap")
                 Image(ptr)
             } finally {
                 reachabilityBarrier(pixmap)
@@ -140,7 +138,7 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
         fun makeFromEncoded(bytes: ByteArray?): Image {
             Stats.onNativeCall()
             val ptr = _nMakeFromEncoded(bytes)
-            require(ptr != NULLPNTR) { "Failed to Image::makeFromEncoded" }
+            require(ptr != NullPointer) { "Failed to Image::makeFromEncoded" }
             return Image(ptr)
         }
 
@@ -185,7 +183,7 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
         external fun _nEncodeToData(ptr: NativePointer, format: Int, quality: Int): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeShader")
-        external fun _nMakeShader(ptr: NativePointer, tmx: Int, tmy: Int, samplingMode: NativePointer, localMatrix: FloatArray?): NativePointer
+        external fun _nMakeShader(ptr: NativePointer, tmx: Int, tmy: Int, samplingMode: Long, localMatrix: FloatArray?): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Image__1nPeekPixels")
         external fun _nPeekPixels(ptr: NativePointer): ByteBuffer?
@@ -194,7 +192,7 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
         external fun _nPeekPixelsToPixmap(ptr: NativePointer, pixmapPtr: NativePointer): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Image__1nScalePixels")
-        external fun _nScalePixels(ptr: NativePointer, pixmapPtr: NativePointer, samplingOptions: NativePointer, cache: Boolean): Boolean
+        external fun _nScalePixels(ptr: NativePointer, pixmapPtr: NativePointer, samplingOptions: Long, cache: Boolean): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Image__1nReadPixelsBitmap")
         external fun _nReadPixelsBitmap(
@@ -271,7 +269,7 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
         return try {
             Stats.onNativeCall()
             val ptr = _nEncodeToData(_ptr, format.ordinal, quality)
-            if (ptr == NULLPNTR) null else org.jetbrains.skia.Data(ptr)
+            if (ptr == NullPointer) null else org.jetbrains.skia.Data(ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -296,9 +294,6 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
         localMatrix: Matrix33? = null
     ): Shader {
         return try {
-            require(tmx != null) { "Can’t Bitmap.makeShader with tmx == null" }
-            require(tmy != null) { "Can’t Bitmap.makeShader with tmy == null" }
-            require(sampling != null) { "Can’t Bitmap.makeShader with sampling == null" }
             Stats.onNativeCall()
             Shader(
                 _nMakeShader(
@@ -393,7 +388,6 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
      */
     fun readPixels(context: DirectContext?, dst: Bitmap, srcX: Int, srcY: Int, cache: Boolean): Boolean {
         return try {
-            require(dst != null) { "Can’t readPixels with dst == null" }
             _nReadPixelsBitmap(
                 _ptr,
                 getPtr(context),
@@ -411,7 +405,6 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
 
     fun readPixels(dst: Pixmap, srcX: Int, srcY: Int, cache: Boolean): Boolean {
         return try {
-            require(dst != null) { "Can’t readPixels with dst == null" }
             _nReadPixelsPixmap(
                 _ptr,
                 getPtr(dst),
@@ -427,7 +420,6 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
 
     fun scalePixels(dst: Pixmap, samplingMode: SamplingMode, cache: Boolean): Boolean {
         return try {
-            require(dst != null) { "Can’t scalePixels with dst == null" }
             _nScalePixels(
                 _ptr,
                 getPtr(dst),

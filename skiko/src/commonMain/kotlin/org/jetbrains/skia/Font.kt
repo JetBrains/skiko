@@ -431,7 +431,7 @@ class Font : Managed {
         get() = try {
             Stats.onNativeCall()
             val ptr = _nGetTypeface(_ptr)
-            if (ptr == NULLPNTR) null else Typeface(ptr)
+            if (ptr == NullPointer) null else Typeface(ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -697,7 +697,7 @@ class Font : Managed {
         return try {
             Stats.onNativeCall()
             val ptr = _nGetPath(_ptr, glyph)
-            if (ptr == NULLPNTR) null else Path(ptr)
+            if (ptr == NullPointer) null else Path(ptr)
         } finally {
             reachabilityBarrier(this)
         }

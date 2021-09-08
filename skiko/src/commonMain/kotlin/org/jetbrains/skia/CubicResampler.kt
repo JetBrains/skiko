@@ -25,7 +25,7 @@ import org.jetbrains.skia.impl.NativePointer
  */
 class CubicResampler(internal val b: Float, internal val c: Float) : SamplingMode {
 
-    override fun _pack(): NativePointer = _actualPack()
+    override fun _pack(): Long =  ((b.toBits().toULong() shl 32) or c.toBits().toULong()).toLong()
 
     override fun equals(o: Any?): Boolean {
         if (o === this) return true
@@ -52,5 +52,3 @@ class CubicResampler(internal val b: Float, internal val c: Float) : SamplingMod
         return "CubicResampler(_B=$b, _C=$c)"
     }
 }
-
-expect fun CubicResampler._actualPack(): NativePointer

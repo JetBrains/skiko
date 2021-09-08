@@ -21,7 +21,7 @@ class IPoint(val x: Int, val y: Int) {
         val other = o
         if (!other.canEqual(this as Any)) return false
         if (x != other.x) return false
-        return if (y != other.y) false else true
+        return y == other.y
     }
 
     protected fun canEqual(other: Any?): Boolean {
@@ -45,4 +45,4 @@ class IPoint(val x: Int, val y: Int) {
     }
 }
 
-expect fun toIPoint(p: NativePointer): IPoint
+fun toIPoint(p: Long): IPoint = IPoint((p ushr 32).toInt(), (p and -1).toInt())

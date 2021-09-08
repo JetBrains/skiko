@@ -17,21 +17,21 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         fun makeFromString(data: String): Animation {
             Stats.onNativeCall()
             val ptr = _nMakeFromString(data)
-            require(ptr != NULLPNTR) { "Failed to create Animation from string=\"$data\"" }
+            require(ptr != NullPointer) { "Failed to create Animation from string=\"$data\"" }
             return Animation(ptr)
         }
 
         fun makeFromFile(path: String): Animation {
             Stats.onNativeCall()
             val ptr = _nMakeFromFile(path)
-            require(ptr != NULLPNTR) { "Failed to create Animation from path=\"$path\"" }
+            require(ptr != NullPointer) { "Failed to create Animation from path=\"$path\"" }
             return Animation(ptr)
         }
 
         fun makeFromData(data: Data): Animation {
             Stats.onNativeCall()
             val ptr = _nMakeFromData(getPtr(data))
-            require(ptr != NULLPNTR) { "Failed to create Animation from data." }
+            require(ptr != NullPointer) { "Failed to create Animation from data." }
             return Animation(ptr)
         }
 

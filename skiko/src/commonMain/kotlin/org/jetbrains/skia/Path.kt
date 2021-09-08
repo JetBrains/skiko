@@ -38,7 +38,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     companion object {
         fun makeFromSVGString(svg: String): Path {
             val res = _nMakeFromSVGString(svg)
-            return if (res == NULLPNTR) throw IllegalArgumentException("Failed to parse SVG Path string: $svg") else Path(
+            return if (res == NullPointer) throw IllegalArgumentException("Failed to parse SVG Path string: $svg") else Path(
                 res
             )
         }
@@ -172,7 +172,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
                     getPtr(two),
                     op.ordinal
                 )
-                if (ptr == NULLPNTR) null else Path(ptr)
+                if (ptr == NullPointer) null else Path(ptr)
             } finally {
                 reachabilityBarrier(one)
                 reachabilityBarrier(two)
@@ -589,7 +589,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
                 getPtr(ending),
                 weight
             )
-            require(ptr != NULLPNTR) { "Point array is not the same size as ending Point array" }
+            require(ptr != NullPointer) { "Point array is not the same size as ending Point array" }
             Path(ptr)
         } finally {
             reachabilityBarrier(this)

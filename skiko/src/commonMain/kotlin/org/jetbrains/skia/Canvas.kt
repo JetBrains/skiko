@@ -95,7 +95,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
             dt: Float,
             dr: Float,
             db: Float,
-            samplingMode: NativePointer,
+            samplingMode: Long,
             paintPtr: NativePointer,
             strict: Boolean
         )

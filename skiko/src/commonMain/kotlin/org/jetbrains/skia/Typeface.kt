@@ -43,7 +43,7 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         fun makeFromFile(path: String, index: Int = 0): Typeface {
             Stats.onNativeCall()
             val ptr = _nMakeFromFile(path, index)
-            require(ptr != NULLPNTR) { "Failed to create Typeface from path=\"$path\" index=$index" }
+            require(ptr != NullPointer) { "Failed to create Typeface from path=\"$path\" index=$index" }
             return Typeface(ptr)
         }
         /**
@@ -58,7 +58,7 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             return try {
                 Stats.onNativeCall()
                 val ptr = _nMakeFromData(getPtr(data), index)
-                require(ptr != NULLPNTR) { "Failed to create Typeface from data $data" }
+                require(ptr != NullPointer) { "Failed to create Typeface from data $data" }
                 Typeface(ptr)
             } finally {
                 reachabilityBarrier(data)
@@ -251,7 +251,7 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             if (variations.size == 0) return this
             Stats.onNativeCall()
             val ptr = _nMakeClone(_ptr, variations, collectionIndex)
-            require(ptr != NULLPNTR) {
+            require(ptr != NullPointer) {
                 "Failed to clone Typeface $this with $variations"
             }
             Typeface(ptr)
@@ -352,7 +352,7 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         return try {
             Stats.onNativeCall()
             val ptr = _nGetTableData(_ptr, FourByteTag.fromString(tag))
-            if (ptr == NULLPNTR) null else Data(ptr)
+            if (ptr == NullPointer) null else Data(ptr)
         } finally {
             reachabilityBarrier(this)
         }
