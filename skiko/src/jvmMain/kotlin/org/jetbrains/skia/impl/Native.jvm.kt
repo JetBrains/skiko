@@ -1,9 +1,5 @@
 package org.jetbrains.skia.impl
 
-import org.jetbrains.skia.CubicResampler
-import org.jetbrains.skia.FilterMipmap
-import org.jetbrains.skia.IPoint
-import org.jetbrains.skia.IRange
 import java.lang.ref.Reference
 
 actual abstract class Native actual constructor(ptr: Long) {
@@ -53,10 +49,3 @@ actual fun reachabilityBarrier(obj: Any?) {
 actual typealias NativePointer = Long
 
 actual fun Int.toNativePointer(): NativePointer = toLong()
-actual fun CubicResampler._actualPack(): NativePointer {
-    return ((b.toBits().toULong() shl 32) or c.toBits().toULong()).toLong()
-}
-
-actual fun FilterMipmap._actualPack(): NativePointer {
-    return filterMode.ordinal.toLong() shl 32 or mipmapMode.ordinal.toLong()
-}

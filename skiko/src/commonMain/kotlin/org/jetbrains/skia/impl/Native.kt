@@ -1,14 +1,8 @@
 package org.jetbrains.skia.impl
 
-import org.jetbrains.skia.CubicResampler
-import org.jetbrains.skia.FilterMipmap
-
 expect class NativePointer
 
 expect fun Int.toNativePointer(): NativePointer
-
-expect fun CubicResampler._actualPack(): NativePointer
-expect fun FilterMipmap._actualPack(): NativePointer
 
 expect abstract class Native(ptr: NativePointer) {
     var _ptr: NativePointer

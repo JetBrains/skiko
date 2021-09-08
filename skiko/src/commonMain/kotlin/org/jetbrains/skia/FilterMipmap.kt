@@ -1,7 +1,6 @@
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl._actualPack
 
 class FilterMipmap constructor(
     internal val filterMode: FilterMode,
@@ -41,3 +40,5 @@ class FilterMipmap constructor(
         return "FilterMipmap(_filterMode=$filterMode, _mipmapMode=$mipmapMode)"
     }
 }
+
+expect fun FilterMipmap._actualPack(): NativePointer

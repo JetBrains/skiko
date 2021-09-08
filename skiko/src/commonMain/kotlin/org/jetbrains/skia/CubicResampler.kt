@@ -1,7 +1,6 @@
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl._actualPack
 
 /**
  *
@@ -53,3 +52,5 @@ class CubicResampler(internal val b: Float, internal val c: Float) : SamplingMod
         return "CubicResampler(_B=$b, _C=$c)"
     }
 }
+
+expect fun CubicResampler._actualPack(): NativePointer
