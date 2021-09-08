@@ -5,28 +5,29 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
-import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.getPtr
 import kotlin.jvm.JvmStatic
 
-class TextBlobBuilder internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
+class TextBlobBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nGetFinalizer")
-        external fun _nGetFinalizer(): Long
+        external fun _nGetFinalizer(): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nMake")
-        external fun _nMake(): Long
+        external fun _nMake(): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nBuild")
-        external fun _nBuild(ptr: Long): Long
+        external fun _nBuild(ptr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nAppendRun")
-        external fun _nAppendRun(ptr: Long, fontPtr: Long, glyphs: ShortArray?, x: Float, y: Float, bounds: Rect?)
+        external fun _nAppendRun(ptr: NativePointer, fontPtr: NativePointer, glyphs: ShortArray?, x: Float, y: Float, bounds: Rect?)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nAppendRunPosH")
         external fun _nAppendRunPosH(
-            ptr: Long,
-            fontPtr: Long,
+            ptr: NativePointer,
+            fontPtr: NativePointer,
             glyphs: ShortArray?,
             xs: FloatArray?,
             y: Float,
@@ -35,10 +36,10 @@ class TextBlobBuilder internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nAppendRunPos")
-        external fun _nAppendRunPos(ptr: Long, fontPtr: Long, glyphs: ShortArray?, pos: FloatArray?, bounds: Rect?)
+        external fun _nAppendRunPos(ptr: NativePointer, fontPtr: NativePointer, glyphs: ShortArray?, pos: FloatArray?, bounds: Rect?)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nAppendRunRSXform")
-        external fun _nAppendRunRSXform(ptr: Long, fontPtr: Long, glyphs: ShortArray?, xform: FloatArray?)
+        external fun _nAppendRunRSXform(ptr: NativePointer, fontPtr: NativePointer, glyphs: ShortArray?, xform: FloatArray?)
 
         init {
             staticLoad()
@@ -72,7 +73,7 @@ class TextBlobBuilder internal constructor(ptr: Long) : Managed(ptr, _FinalizerH
         return try {
             Stats.onNativeCall()
             val ptr = _nBuild(_ptr)
-            if (ptr == 0L) null else TextBlob(ptr)
+            if (ptr == NullPointer) null else TextBlob(ptr)
         } finally {
             reachabilityBarrier(this)
         }

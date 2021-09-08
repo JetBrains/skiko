@@ -1,6 +1,6 @@
 package org.jetbrains.skia.impl
 
-expect abstract class Managed(ptr: Long, finalizer: Long, managed: Boolean = true) : Native {
+expect abstract class Managed(ptr: NativePointer, finalizer: NativePointer, managed: Boolean = true) : Native {
     open fun close()
     open val isClosed: Boolean
 }

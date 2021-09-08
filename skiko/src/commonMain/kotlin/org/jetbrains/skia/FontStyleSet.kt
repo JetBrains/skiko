@@ -5,10 +5,10 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
-import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.NativePointer
 import kotlin.jvm.JvmStatic
 
-class FontStyleSet internal constructor(ptr: Long) : RefCnt(ptr) {
+class FontStyleSet internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
         fun makeEmpty(): FontStyleSet {
             Stats.onNativeCall()
@@ -17,22 +17,22 @@ class FontStyleSet internal constructor(ptr: Long) : RefCnt(ptr) {
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nMakeEmpty")
-        external fun _nMakeEmpty(): Long
+        external fun _nMakeEmpty(): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nCount")
-        external fun _nCount(ptr: Long): Int
+        external fun _nCount(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nGetStyle")
-        external fun _nGetStyle(ptr: Long, index: Int): Int
+        external fun _nGetStyle(ptr: NativePointer, index: Int): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nGetStyleName")
-        external fun _nGetStyleName(ptr: Long, index: Int): String
+        external fun _nGetStyleName(ptr: NativePointer, index: Int): String
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nGetTypeface")
-        external fun _nGetTypeface(ptr: Long, index: Int): Long
+        external fun _nGetTypeface(ptr: NativePointer, index: Int): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nMatchStyle")
-        external fun _nMatchStyle(ptr: Long, style: Int): Long
+        external fun _nMatchStyle(ptr: NativePointer, style: Int): NativePointer
 
         init {
             staticLoad()
@@ -70,7 +70,7 @@ class FontStyleSet internal constructor(ptr: Long) : RefCnt(ptr) {
         return try {
             Stats.onNativeCall()
             val ptr = _nGetTypeface(_ptr, index)
-            if (ptr == 0L) null else Typeface(ptr)
+            if (ptr == NullPointer) null else Typeface(ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -80,7 +80,7 @@ class FontStyleSet internal constructor(ptr: Long) : RefCnt(ptr) {
         return try {
             Stats.onNativeCall()
             val ptr = _nMatchStyle(_ptr, style._value)
-            if (ptr == 0L) null else Typeface(ptr)
+            if (ptr == NullPointer) null else Typeface(ptr)
         } finally {
             reachabilityBarrier(this)
         }

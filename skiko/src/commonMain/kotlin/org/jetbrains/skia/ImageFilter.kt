@@ -7,9 +7,11 @@ import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.getPtr
 import kotlin.jvm.JvmStatic
 
-class ImageFilter internal constructor(ptr: Long) : RefCnt(ptr) {
+class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
         fun makeAlphaThreshold(
             r: Region?,
@@ -316,8 +318,7 @@ class ImageFilter internal constructor(ptr: Long) : RefCnt(ptr) {
         fun makeMerge(filters: Array<ImageFilter?>, crop: IRect?): ImageFilter {
             return try {
                 Stats.onNativeCall()
-                val filterPtrs = LongArray(filters.size)
-                filterPtrs.forEachIndexed { i: Int, _: Long -> getPtr(filters[i]) }
+                val filterPtrs = filters.map { getPtr(it) }.toTypedArray()
                 ImageFilter(_nMakeMerge(filterPtrs, crop))
             } finally {
                 reachabilityBarrier(filters)
@@ -611,12 +612,12 @@ class ImageFilter internal constructor(ptr: Long) : RefCnt(ptr) {
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeAlphaThreshold")
         external fun _nMakeAlphaThreshold(
-            regionPtr: Long,
+            regionPtr: NativePointer,
             innerMin: Float,
             outerMax: Float,
-            input: Long,
+            input: NativePointer,
             crop: IRect?
-        ): Long
+        ): NativePointer
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeArithmetic")
@@ -626,33 +627,33 @@ class ImageFilter internal constructor(ptr: Long) : RefCnt(ptr) {
             k3: Float,
             k4: Float,
             enforcePMColor: Boolean,
-            bg: Long,
-            fg: Long,
+            bg: NativePointer,
+            fg: NativePointer,
             crop: IRect?
-        ): Long
+        ): NativePointer
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeBlend")
-        external fun _nMakeBlend(blendMode: Int, bg: Long, fg: Long, crop: IRect?): Long
+        external fun _nMakeBlend(blendMode: Int, bg: NativePointer, fg: NativePointer, crop: IRect?): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeBlur")
-        external fun _nMakeBlur(sigmaX: Float, sigmaY: Float, tileMode: Int, input: Long, crop: IRect?): Long
+        external fun _nMakeBlur(sigmaX: Float, sigmaY: Float, tileMode: Int, input: NativePointer, crop: IRect?): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeColorFilter")
-        external fun _nMakeColorFilter(colorFilterPtr: Long, input: Long, crop: IRect?): Long
+        external fun _nMakeColorFilter(colorFilterPtr: NativePointer, input: NativePointer, crop: IRect?): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeCompose")
-        external fun _nMakeCompose(outer: Long, inner: Long): Long
+        external fun _nMakeCompose(outer: NativePointer, inner: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDisplacementMap")
         external fun _nMakeDisplacementMap(
             xChan: Int,
             yChan: Int,
             scale: Float,
-            displacement: Long,
-            color: Long,
+            displacement: NativePointer,
+            color: NativePointer,
             crop: IRect?
-        ): Long
+        ): NativePointer
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDropShadow")
@@ -662,9 +663,9 @@ class ImageFilter internal constructor(ptr: Long) : RefCnt(ptr) {
             sigmaX: Float,
             sigmaY: Float,
             color: Int,
-            input: Long,
+            input: NativePointer,
             crop: IRect?
-        ): Long
+        ): NativePointer
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDropShadowOnly")
@@ -674,14 +675,14 @@ class ImageFilter internal constructor(ptr: Long) : RefCnt(ptr) {
             sigmaX: Float,
             sigmaY: Float,
             color: Int,
-            input: Long,
+            input: NativePointer,
             crop: IRect?
-        ): Long
+        ): NativePointer
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeImage")
         external fun _nMakeImage(
-            image: Long,
+            image: NativePointer,
             l0: Float,
             t0: Float,
             r0: Float,
@@ -691,7 +692,7 @@ class ImageFilter internal constructor(ptr: Long) : RefCnt(ptr) {
             r1: Float,
             b1: Float,
             samplingMode: Long
-        ): Long
+        ): NativePointer
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMagnifier")
@@ -701,9 +702,9 @@ class ImageFilter internal constructor(ptr: Long) : RefCnt(ptr) {
             r: Float,
             b: Float,
             inset: Float,
-            input: Long,
+            input: NativePointer,
             crop: IRect?
-        ): Long
+        ): NativePointer
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMatrixConvolution")
@@ -717,25 +718,25 @@ class ImageFilter internal constructor(ptr: Long) : RefCnt(ptr) {
             offsetY: Int,
             tileMode: Int,
             convolveAlpha: Boolean,
-            input: Long,
+            input: NativePointer,
             crop: IRect?
-        ): Long
+        ): NativePointer
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMatrixTransform")
-        external fun _nMakeMatrixTransform(matrix: FloatArray?, samplingMode: Long, input: Long): Long
+        external fun _nMakeMatrixTransform(matrix: FloatArray?, samplingMode: Long, input: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMerge")
-        external fun _nMakeMerge(filters: LongArray?, crop: IRect?): Long
+        external fun _nMakeMerge(filters: Array<NativePointer>?, crop: IRect?): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeOffset")
-        external fun _nMakeOffset(dx: Float, dy: Float, input: Long, crop: IRect?): Long
+        external fun _nMakeOffset(dx: Float, dy: Float, input: NativePointer, crop: IRect?): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakePaint")
-        external fun _nMakePaint(paint: Long, crop: IRect?): Long
+        external fun _nMakePaint(paint: NativePointer, crop: IRect?): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakePicture")
-        external fun _nMakePicture(picture: Long, l: Float, t: Float, r: Float, b: Float): Long
+        external fun _nMakePicture(picture: NativePointer, l: Float, t: Float, r: Float, b: Float): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeTile")
         external fun _nMakeTile(
@@ -747,15 +748,15 @@ class ImageFilter internal constructor(ptr: Long) : RefCnt(ptr) {
             t1: Float,
             r1: Float,
             b1: Float,
-            input: Long
-        ): Long
+            input: NativePointer
+        ): NativePointer
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDilate")
-        external fun _nMakeDilate(rx: Float, ry: Float, input: Long, crop: IRect?): Long
+        external fun _nMakeDilate(rx: Float, ry: Float, input: NativePointer, crop: IRect?): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeErode")
-        external fun _nMakeErode(rx: Float, ry: Float, input: Long, crop: IRect?): Long
+        external fun _nMakeErode(rx: Float, ry: Float, input: NativePointer, crop: IRect?): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDistantLitDiffuse")
         external fun _nMakeDistantLitDiffuse(
@@ -765,9 +766,9 @@ class ImageFilter internal constructor(ptr: Long) : RefCnt(ptr) {
             lightColor: Int,
             surfaceScale: Float,
             kd: Float,
-            input: Long,
+            input: NativePointer,
             crop: IRect?
-        ): Long
+        ): NativePointer
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakePointLitDiffuse")
@@ -778,9 +779,9 @@ class ImageFilter internal constructor(ptr: Long) : RefCnt(ptr) {
             lightColor: Int,
             surfaceScale: Float,
             kd: Float,
-            input: Long,
+            input: NativePointer,
             crop: IRect?
-        ): Long
+        ): NativePointer
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeSpotLitDiffuse")
@@ -796,9 +797,9 @@ class ImageFilter internal constructor(ptr: Long) : RefCnt(ptr) {
             lightColor: Int,
             surfaceScale: Float,
             kd: Float,
-            input: Long,
+            input: NativePointer,
             crop: IRect?
-        ): Long
+        ): NativePointer
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDistantLitSpecular")
@@ -810,9 +811,9 @@ class ImageFilter internal constructor(ptr: Long) : RefCnt(ptr) {
             surfaceScale: Float,
             ks: Float,
             shininess: Float,
-            input: Long,
+            input: NativePointer,
             crop: IRect?
-        ): Long
+        ): NativePointer
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakePointLitSpecular")
@@ -824,9 +825,9 @@ class ImageFilter internal constructor(ptr: Long) : RefCnt(ptr) {
             surfaceScale: Float,
             ks: Float,
             shininess: Float,
-            input: Long,
+            input: NativePointer,
             crop: IRect?
-        ): Long
+        ): NativePointer
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeSpotLitSpecular")
@@ -843,9 +844,9 @@ class ImageFilter internal constructor(ptr: Long) : RefCnt(ptr) {
             surfaceScale: Float,
             ks: Float,
             shininess: Float,
-            input: Long,
+            input: NativePointer,
             crop: IRect?
-        ): Long
+        ): NativePointer
 
         init {
             staticLoad()

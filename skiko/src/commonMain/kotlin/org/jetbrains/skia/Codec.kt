@@ -5,10 +5,11 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
-import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.getPtr
 import kotlin.jvm.JvmStatic
 
-class Codec internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR), IHasImageInfo {
+class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR), IHasImageInfo {
     companion object {
         /**
          * If this data represents an encoded image that we know how to decode,
@@ -19,7 +20,7 @@ class Codec internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR)
                 Stats.onNativeCall()
                 val ptr =
                     _nMakeFromData(getPtr(data))
-                require(ptr != 0L) { "Unsupported format" }
+                require(ptr != NullPointer) { "Unsupported format" }
                 Codec(ptr)
             } finally {
                 reachabilityBarrier(data)
@@ -42,37 +43,37 @@ class Codec internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR)
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetFinalizer")
-        external fun _nGetFinalizer(): Long
+        external fun _nGetFinalizer(): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Codec__1nMakeFromData")
-        external fun _nMakeFromData(dataPtr: Long): Long
+        external fun _nMakeFromData(dataPtr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetImageInfo")
-        external fun _nGetImageInfo(ptr: Long): ImageInfo?
+        external fun _nGetImageInfo(ptr: NativePointer): ImageInfo?
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetSize")
-        external fun _nGetSize(ptr: Long): Long
+        external fun _nGetSize(ptr: NativePointer): Long
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetEncodedOrigin")
-        external fun _nGetEncodedOrigin(ptr: Long): Int
+        external fun _nGetEncodedOrigin(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetEncodedImageFormat")
-        external fun _nGetEncodedImageFormat(ptr: Long): Int
+        external fun _nGetEncodedImageFormat(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Codec__1nReadPixels")
-        external fun _nReadPixels(ptr: Long, bitmapPtr: Long, frame: Int, priorFrame: Int): Int
+        external fun _nReadPixels(ptr: NativePointer, bitmapPtr: NativePointer, frame: Int, priorFrame: Int): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetFrameCount")
-        external fun _nGetFrameCount(ptr: Long): Int
+        external fun _nGetFrameCount(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetFrameInfo")
-        external fun _nGetFrameInfo(ptr: Long, frame: Int): AnimationFrameInfo
+        external fun _nGetFrameInfo(ptr: NativePointer, frame: Int): AnimationFrameInfo
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetFramesInfo")
-        external fun _nGetFramesInfo(ptr: Long): Array<AnimationFrameInfo>
+        external fun _nGetFramesInfo(ptr: NativePointer): Array<AnimationFrameInfo>
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetRepetitionCount")
-        external fun _nGetRepetitionCount(ptr: Long): Int
+        external fun _nGetRepetitionCount(ptr: NativePointer): Int
 
         init {
             staticLoad()
@@ -94,7 +95,7 @@ class Codec internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR)
     val size: IPoint
         get() = try {
             Stats.onNativeCall()
-            IPoint._makeFromLong(_nGetSize(_ptr))
+            toIPoint(_nGetSize(_ptr))
         } finally {
             reachabilityBarrier(this)
         }

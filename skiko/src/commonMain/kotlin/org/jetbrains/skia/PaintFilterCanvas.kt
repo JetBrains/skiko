@@ -2,7 +2,9 @@
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.impl.getPtr
 import org.jetbrains.skia.impl.reachabilityBarrier
 
 /**
@@ -12,7 +14,7 @@ abstract class PaintFilterCanvas(canvas: Canvas, unrollDrawable: Boolean) :
     Canvas(_nMake(getPtr(canvas), unrollDrawable), true, canvas) {
     companion object {
         @ExternalSymbolName("org_jetbrains_skia_PaintFilterCanvas__1nMake")
-        external fun _nMake(canvasPtr: Long, unrollDrawable: Boolean): Long
+        external fun _nMake(canvasPtr: NativePointer, unrollDrawable: Boolean): NativePointer
 
         init {
             staticLoad()
@@ -29,13 +31,13 @@ abstract class PaintFilterCanvas(canvas: Canvas, unrollDrawable: Boolean) :
      * Note: The base implementation calls onFilter() for top-level/explicit paints only.
      */
     abstract fun onFilter(paint: Paint): Boolean
-    fun onFilter(paintPtr: Long): Boolean {
+    fun onFilter(paintPtr: NativePointer): Boolean {
         val paint = Paint(paintPtr, false)
         return onFilter(paint)
     }
 
     @ExternalSymbolName("org_jetbrains_skia_PaintFilterCanvas__1nAttachToJava")
-    external fun _nAttachToJava(canvasPtr: Long)
+    external fun _nAttachToJava(canvasPtr: NativePointer)
 
     /**
      * @param unrollDrawable if needed to filter nested drawable content using this canvas (for drawables there is no paint to filter)

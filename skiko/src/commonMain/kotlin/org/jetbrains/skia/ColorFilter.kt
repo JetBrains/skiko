@@ -6,6 +6,8 @@ import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.getPtr
 import kotlin.jvm.JvmStatic
 
 class ColorFilter : RefCnt {
@@ -83,43 +85,43 @@ class ColorFilter : RefCnt {
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeComposed")
-        external fun _nMakeComposed(outer: Long, inner: Long): Long
+        external fun _nMakeComposed(outer: NativePointer, inner: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeBlend")
-        external fun _nMakeBlend(color: Int, blendMode: Int): Long
+        external fun _nMakeBlend(color: Int, blendMode: Int): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeMatrix")
-        external fun _nMakeMatrix(rowMajor: FloatArray?): Long
+        external fun _nMakeMatrix(rowMajor: FloatArray?): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeHSLAMatrix")
-        external fun _nMakeHSLAMatrix(rowMajor: FloatArray?): Long
+        external fun _nMakeHSLAMatrix(rowMajor: FloatArray?): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nGetLinearToSRGBGamma")
-        external fun _nGetLinearToSRGBGamma(): Long
+        external fun _nGetLinearToSRGBGamma(): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nGetSRGBToLinearGamma")
-        external fun _nGetSRGBToLinearGamma(): Long
+        external fun _nGetSRGBToLinearGamma(): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeLerp")
-        external fun _nMakeLerp(t: Float, dstPtr: Long, srcPtr: Long): Long
+        external fun _nMakeLerp(t: Float, dstPtr: NativePointer, srcPtr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeLighting")
-        external fun _nMakeLighting(colorMul: Int, colorAdd: Int): Long
+        external fun _nMakeLighting(colorMul: Int, colorAdd: Int): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeHighContrast")
-        external fun _nMakeHighContrast(grayscale: Boolean, inversionMode: Int, contrast: Float): Long
+        external fun _nMakeHighContrast(grayscale: Boolean, inversionMode: Int, contrast: Float): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeTable")
-        external fun _nMakeTable(table: ByteArray?): Long
+        external fun _nMakeTable(table: ByteArray?): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeTableARGB")
-        external fun _nMakeTableARGB(a: ByteArray?, r: ByteArray?, g: ByteArray?, b: ByteArray?): Long
+        external fun _nMakeTableARGB(a: ByteArray?, r: ByteArray?, g: ByteArray?, b: ByteArray?): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeOverdraw")
-        external fun _nMakeOverdraw(c0: Int, c1: Int, c2: Int, c3: Int, c4: Int, c5: Int): Long
+        external fun _nMakeOverdraw(c0: Int, c1: Int, c2: Int, c3: Int, c4: Int, c5: Int): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nGetLuma")
-        external fun _nGetLuma(): Long
+        external fun _nGetLuma(): NativePointer
 
         init {
             staticLoad()
@@ -129,7 +131,7 @@ class ColorFilter : RefCnt {
         val luma = ColorFilter(_nGetLuma(), false)
     }
 
-    internal constructor(ptr: Long) : super(ptr)
+    internal constructor(ptr: NativePointer) : super(ptr)
 
-    internal constructor(ptr: Long, allowClose: Boolean) : super(ptr, allowClose)
+    internal constructor(ptr: NativePointer, allowClose: Boolean) : super(ptr, allowClose)
 }

@@ -6,7 +6,8 @@ import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
-import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.getPtr
 import kotlin.jvm.JvmStatic
 
 /**
@@ -33,11 +34,11 @@ import kotlin.jvm.JvmStatic
  * Internally, Path lazily computes metrics likes bounds and convexity. Call
  * [.updateBoundsCache] to make Path thread safe.
  */
-class Path internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR), Iterable<PathSegment?> {
+class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR), Iterable<PathSegment?> {
     companion object {
         fun makeFromSVGString(svg: String): Path {
             val res = _nMakeFromSVGString(svg)
-            return if (res == 0L) throw IllegalArgumentException("Failed to parse SVG Path string: $svg") else Path(
+            return if (res == NullPointer) throw IllegalArgumentException("Failed to parse SVG Path string: $svg") else Path(
                 res
             )
         }
@@ -171,7 +172,7 @@ class Path internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR),
                     getPtr(two),
                     op.ordinal
                 )
-                if (ptr == 0L) null else Path(ptr)
+                if (ptr == NullPointer) null else Path(ptr)
             } finally {
                 reachabilityBarrier(one)
                 reachabilityBarrier(two)
@@ -203,58 +204,58 @@ class Path internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR),
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nGetFinalizer")
-        external fun _nGetFinalizer(): Long
+        external fun _nGetFinalizer(): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nMake")
-        external fun _nMake(): Long
+        external fun _nMake(): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nMakeFromSVGString")
-        external fun _nMakeFromSVGString(s: String?): Long
+        external fun _nMakeFromSVGString(s: String?): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nEquals")
-        external fun _nEquals(aPtr: Long, bPtr: Long): Boolean
+        external fun _nEquals(aPtr: NativePointer, bPtr: NativePointer): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nIsInterpolatable")
-        external fun _nIsInterpolatable(ptr: Long, comparePtr: Long): Boolean
+        external fun _nIsInterpolatable(ptr: NativePointer, comparePtr: NativePointer): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nMakeLerp")
-        external fun _nMakeLerp(ptr: Long, endingPtr: Long, weight: Float): Long
+        external fun _nMakeLerp(ptr: NativePointer, endingPtr: NativePointer, weight: Float): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nGetFillMode")
-        external fun _nGetFillMode(ptr: Long): Int
+        external fun _nGetFillMode(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nSetFillMode")
-        external fun _nSetFillMode(ptr: Long, fillMode: Int)
+        external fun _nSetFillMode(ptr: NativePointer, fillMode: Int)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nIsConvex")
-        external fun _nIsConvex(ptr: Long): Boolean
+        external fun _nIsConvex(ptr: NativePointer): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nIsOval")
-        external fun _nIsOval(ptr: Long): Rect
+        external fun _nIsOval(ptr: NativePointer): Rect
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nIsRRect")
-        external fun _nIsRRect(ptr: Long): RRect
+        external fun _nIsRRect(ptr: NativePointer): RRect
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nReset")
-        external fun _nReset(ptr: Long)
+        external fun _nReset(ptr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nRewind")
-        external fun _nRewind(ptr: Long)
+        external fun _nRewind(ptr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nIsEmpty")
-        external fun _nIsEmpty(ptr: Long): Boolean
+        external fun _nIsEmpty(ptr: NativePointer): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nIsLastContourClosed")
-        external fun _nIsLastContourClosed(ptr: Long): Boolean
+        external fun _nIsLastContourClosed(ptr: NativePointer): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nIsFinite")
-        external fun _nIsFinite(ptr: Long): Boolean
+        external fun _nIsFinite(ptr: NativePointer): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nIsVolatile")
-        external fun _nIsVolatile(ptr: Long): Boolean
+        external fun _nIsVolatile(ptr: NativePointer): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nSetVolatile")
-        external fun _nSetVolatile(ptr: Long, isVolatile: Boolean)
+        external fun _nSetVolatile(ptr: NativePointer, isVolatile: Boolean)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nIsLineDegenerate")
         external fun _nIsLineDegenerate(x0: Float, y0: Float, x1: Float, y1: Float, exact: Boolean): Boolean
@@ -286,77 +287,77 @@ class Path internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR),
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nMaybeGetAsLine")
-        external fun _nMaybeGetAsLine(ptr: Long): Array<Point>
+        external fun _nMaybeGetAsLine(ptr: NativePointer): Array<Point>
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nGetPointsCount")
-        external fun _nGetPointsCount(ptr: Long): Int
+        external fun _nGetPointsCount(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nGetPoint")
-        external fun _nGetPoint(ptr: Long, index: Int): Point
+        external fun _nGetPoint(ptr: NativePointer, index: Int): Point
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nGetPoints")
-        external fun _nGetPoints(ptr: Long, points: Array<Point?>?, max: Int): Int
+        external fun _nGetPoints(ptr: NativePointer, points: Array<Point?>?, max: Int): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nCountVerbs")
-        external fun _nCountVerbs(ptr: Long): Int
+        external fun _nCountVerbs(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nGetVerbs")
-        external fun _nGetVerbs(ptr: Long, verbs: ByteArray?, max: Int): Int
+        external fun _nGetVerbs(ptr: NativePointer, verbs: ByteArray?, max: Int): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nApproximateBytesUsed")
-        external fun _nApproximateBytesUsed(ptr: Long): Long
+        external fun _nApproximateBytesUsed(ptr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nSwap")
-        external fun _nSwap(ptr: Long, otherPtr: Long)
+        external fun _nSwap(ptr: NativePointer, otherPtr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nGetBounds")
-        external fun _nGetBounds(ptr: Long): Rect
+        external fun _nGetBounds(ptr: NativePointer): Rect
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nUpdateBoundsCache")
-        external fun _nUpdateBoundsCache(ptr: Long)
+        external fun _nUpdateBoundsCache(ptr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nComputeTightBounds")
-        external fun _nComputeTightBounds(ptr: Long): Rect
+        external fun _nComputeTightBounds(ptr: NativePointer): Rect
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nConservativelyContainsRect")
-        external fun _nConservativelyContainsRect(ptr: Long, l: Float, t: Float, r: Float, b: Float): Boolean
+        external fun _nConservativelyContainsRect(ptr: NativePointer, l: Float, t: Float, r: Float, b: Float): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nIncReserve")
-        external fun _nIncReserve(ptr: Long, extraPtCount: Int)
+        external fun _nIncReserve(ptr: NativePointer, extraPtCount: Int)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nMoveTo")
-        external fun _nMoveTo(ptr: Long, x: Float, y: Float)
+        external fun _nMoveTo(ptr: NativePointer, x: Float, y: Float)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nRMoveTo")
-        external fun _nRMoveTo(ptr: Long, dx: Float, dy: Float)
+        external fun _nRMoveTo(ptr: NativePointer, dx: Float, dy: Float)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nLineTo")
-        external fun _nLineTo(ptr: Long, x: Float, y: Float)
+        external fun _nLineTo(ptr: NativePointer, x: Float, y: Float)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nRLineTo")
-        external fun _nRLineTo(ptr: Long, dx: Float, dy: Float)
+        external fun _nRLineTo(ptr: NativePointer, dx: Float, dy: Float)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nQuadTo")
-        external fun _nQuadTo(ptr: Long, x1: Float, y1: Float, x2: Float, y2: Float)
+        external fun _nQuadTo(ptr: NativePointer, x1: Float, y1: Float, x2: Float, y2: Float)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nRQuadTo")
-        external fun _nRQuadTo(ptr: Long, dx1: Float, dy1: Float, dx2: Float, dy2: Float)
+        external fun _nRQuadTo(ptr: NativePointer, dx1: Float, dy1: Float, dx2: Float, dy2: Float)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nConicTo")
-        external fun _nConicTo(ptr: Long, x1: Float, y1: Float, x2: Float, y2: Float, w: Float)
+        external fun _nConicTo(ptr: NativePointer, x1: Float, y1: Float, x2: Float, y2: Float, w: Float)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nRConicTo")
-        external fun _nRConicTo(ptr: Long, dx1: Float, dy1: Float, dx2: Float, dy2: Float, w: Float)
+        external fun _nRConicTo(ptr: NativePointer, dx1: Float, dy1: Float, dx2: Float, dy2: Float, w: Float)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nCubicTo")
-        external fun _nCubicTo(ptr: Long, x1: Float, y1: Float, x2: Float, y2: Float, x3: Float, y3: Float)
+        external fun _nCubicTo(ptr: NativePointer, x1: Float, y1: Float, x2: Float, y2: Float, x3: Float, y3: Float)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nRCubicTo")
-        external fun _nRCubicTo(ptr: Long, dx1: Float, dy1: Float, dx2: Float, dy2: Float, dx3: Float, dy3: Float)
+        external fun _nRCubicTo(ptr: NativePointer, dx1: Float, dy1: Float, dx2: Float, dy2: Float, dx3: Float, dy3: Float)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nArcTo")
         external fun _nArcTo(
-            ptr: Long,
+            ptr: NativePointer,
             left: Float,
             top: Float,
             right: Float,
@@ -368,11 +369,11 @@ class Path internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR),
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nTangentArcTo")
-        external fun _nTangentArcTo(ptr: Long, x1: Float, y1: Float, x2: Float, y2: Float, radius: Float)
+        external fun _nTangentArcTo(ptr: NativePointer, x1: Float, y1: Float, x2: Float, y2: Float, radius: Float)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nEllipticalArcTo")
         external fun _nEllipticalArcTo(
-            ptr: Long,
+            ptr: NativePointer,
             rx: Float,
             ry: Float,
             xAxisRotate: Float,
@@ -385,7 +386,7 @@ class Path internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR),
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nREllipticalArcTo")
         external fun _nREllipticalArcTo(
-            ptr: Long,
+            ptr: NativePointer,
             rx: Float,
             ry: Float,
             xAxisRotate: Float,
@@ -397,7 +398,7 @@ class Path internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR),
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nClosePath")
-        external fun _nClosePath(ptr: Long)
+        external fun _nClosePath(ptr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nConvertConicToQuads")
         external fun _nConvertConicToQuads(
@@ -413,23 +414,23 @@ class Path internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR),
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nIsRect")
-        external fun _nIsRect(ptr: Long): Rect
+        external fun _nIsRect(ptr: NativePointer): Rect
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nAddRect")
-        external fun _nAddRect(ptr: Long, l: Float, t: Float, r: Float, b: Float, dir: Int, start: Int)
+        external fun _nAddRect(ptr: NativePointer, l: Float, t: Float, r: Float, b: Float, dir: Int, start: Int)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nAddOval")
-        external fun _nAddOval(ptr: Long, l: Float, t: Float, r: Float, b: Float, dir: Int, start: Int)
+        external fun _nAddOval(ptr: NativePointer, l: Float, t: Float, r: Float, b: Float, dir: Int, start: Int)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nAddCircle")
-        external fun _nAddCircle(ptr: Long, x: Float, y: Float, r: Float, dir: Int)
+        external fun _nAddCircle(ptr: NativePointer, x: Float, y: Float, r: Float, dir: Int)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nAddArc")
-        external fun _nAddArc(ptr: Long, l: Float, t: Float, r: Float, b: Float, startAngle: Float, sweepAngle: Float)
+        external fun _nAddArc(ptr: NativePointer, l: Float, t: Float, r: Float, b: Float, startAngle: Float, sweepAngle: Float)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nAddRRect")
         external fun _nAddRRect(
-            ptr: Long,
+            ptr: NativePointer,
             l: Float,
             t: Float,
             r: Float,
@@ -441,58 +442,58 @@ class Path internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR),
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nAddPoly")
-        external fun _nAddPoly(ptr: Long, coords: FloatArray?, close: Boolean)
+        external fun _nAddPoly(ptr: NativePointer, coords: FloatArray?, close: Boolean)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nAddPath")
-        external fun _nAddPath(ptr: Long, srcPtr: Long, extend: Boolean)
+        external fun _nAddPath(ptr: NativePointer, srcPtr: NativePointer, extend: Boolean)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nAddPathOffset")
-        external fun _nAddPathOffset(ptr: Long, srcPtr: Long, dx: Float, dy: Float, extend: Boolean)
+        external fun _nAddPathOffset(ptr: NativePointer, srcPtr: NativePointer, dx: Float, dy: Float, extend: Boolean)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nAddPathTransform")
-        external fun _nAddPathTransform(ptr: Long, srcPtr: Long, matrix: FloatArray?, extend: Boolean)
+        external fun _nAddPathTransform(ptr: NativePointer, srcPtr: NativePointer, matrix: FloatArray?, extend: Boolean)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nReverseAddPath")
-        external fun _nReverseAddPath(ptr: Long, srcPtr: Long)
+        external fun _nReverseAddPath(ptr: NativePointer, srcPtr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nOffset")
-        external fun _nOffset(ptr: Long, dx: Float, dy: Float, dst: Long)
+        external fun _nOffset(ptr: NativePointer, dx: Float, dy: Float, dst: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nTransform")
-        external fun _nTransform(ptr: Long, matrix: FloatArray?, dst: Long, applyPerspectiveClip: Boolean)
+        external fun _nTransform(ptr: NativePointer, matrix: FloatArray?, dst: NativePointer, applyPerspectiveClip: Boolean)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nGetLastPt")
-        external fun _nGetLastPt(ptr: Long): Point
+        external fun _nGetLastPt(ptr: NativePointer): Point
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nSetLastPt")
-        external fun _nSetLastPt(ptr: Long, x: Float, y: Float)
+        external fun _nSetLastPt(ptr: NativePointer, x: Float, y: Float)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nGetSegmentMasks")
-        external fun _nGetSegmentMasks(ptr: Long): Int
+        external fun _nGetSegmentMasks(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nContains")
-        external fun _nContains(ptr: Long, x: Float, y: Float): Boolean
+        external fun _nContains(ptr: NativePointer, x: Float, y: Float): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nDump")
-        external fun _nDump(ptr: Long)
+        external fun _nDump(ptr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nDumpHex")
-        external fun _nDumpHex(ptr: Long)
+        external fun _nDumpHex(ptr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nSerializeToBytes")
-        external fun _nSerializeToBytes(ptr: Long): ByteArray
+        external fun _nSerializeToBytes(ptr: NativePointer): ByteArray
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nMakeCombining")
-        external fun _nMakeCombining(onePtr: Long, twoPtr: Long, op: Int): Long
+        external fun _nMakeCombining(onePtr: NativePointer, twoPtr: NativePointer, op: Int): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nMakeFromBytes")
-        external fun _nMakeFromBytes(data: ByteArray?): Long
+        external fun _nMakeFromBytes(data: ByteArray?): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nGetGenerationId")
-        external fun _nGetGenerationId(ptr: Long): Int
+        external fun _nGetGenerationId(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Path__1nIsValid")
-        external fun _nIsValid(ptr: Long): Boolean
+        external fun _nIsValid(ptr: NativePointer): Boolean
 
         init {
             staticLoad()
@@ -588,7 +589,7 @@ class Path internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR),
                 getPtr(ending),
                 weight
             )
-            require(ptr != 0L) { "Point array is not the same size as ending Point array" }
+            require(ptr != NullPointer) { "Point array is not the same size as ending Point array" }
             Path(ptr)
         } finally {
             reachabilityBarrier(this)
@@ -953,7 +954,7 @@ class Path internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR),
      *
      * @return  approximate size
      */
-    val approximateBytesUsed: Long
+    val approximateBytesUsed: NativePointer
         get() = try {
             Stats.onNativeCall()
             _nApproximateBytesUsed(_ptr)

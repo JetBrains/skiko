@@ -7,76 +7,78 @@ import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.getPtr
 import kotlin.jvm.JvmStatic
 
 class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
     companion object {
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nGetFinalizer")
-        external fun _nGetFinalizer(): Long
+        external fun _nGetFinalizer(): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nMake")
-        external fun _nMake(): Long
+        external fun _nMake(): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nEquals")
-        external fun _nEquals(ptr: Long, otherPtr: Long): Boolean
+        external fun _nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nGetStrutStyle")
-        external fun _nGetStrutStyle(ptr: Long): Long
+        external fun _nGetStrutStyle(ptr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nSetStrutStyle")
-        external fun _nSetStrutStyle(ptr: Long, stylePtr: Long)
+        external fun _nSetStrutStyle(ptr: NativePointer, stylePtr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nGetTextStyle")
-        external fun _nGetTextStyle(ptr: Long): Long
+        external fun _nGetTextStyle(ptr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nSetTextStyle")
-        external fun _nSetTextStyle(ptr: Long, textStylePtr: Long)
+        external fun _nSetTextStyle(ptr: NativePointer, textStylePtr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nGetDirection")
-        external fun _nGetDirection(ptr: Long): Int
+        external fun _nGetDirection(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nSetDirection")
-        external fun _nSetDirection(ptr: Long, direction: Int)
+        external fun _nSetDirection(ptr: NativePointer, direction: Int)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nGetAlignment")
-        external fun _nGetAlignment(ptr: Long): Int
+        external fun _nGetAlignment(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nSetAlignment")
-        external fun _nSetAlignment(ptr: Long, align: Int)
+        external fun _nSetAlignment(ptr: NativePointer, align: Int)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nGetMaxLinesCount")
-        external fun _nGetMaxLinesCount(ptr: Long): Long
+        external fun _nGetMaxLinesCount(ptr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nSetMaxLinesCount")
-        external fun _nSetMaxLinesCount(ptr: Long, maxLines: Long)
+        external fun _nSetMaxLinesCount(ptr: NativePointer, maxLines: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nGetEllipsis")
-        external fun _nGetEllipsis(ptr: Long): String
+        external fun _nGetEllipsis(ptr: NativePointer): String
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nSetEllipsis")
-        external fun _nSetEllipsis(ptr: Long, ellipsis: String?)
+        external fun _nSetEllipsis(ptr: NativePointer, ellipsis: String?)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nGetHeight")
-        external fun _nGetHeight(ptr: Long): Float
+        external fun _nGetHeight(ptr: NativePointer): Float
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nSetHeight")
-        external fun _nSetHeight(ptr: Long, height: Float)
+        external fun _nSetHeight(ptr: NativePointer, height: Float)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nGetHeightMode")
-        external fun _nGetHeightMode(ptr: Long): Int
+        external fun _nGetHeightMode(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nSetHeightMode")
-        external fun _nSetHeightMode(ptr: Long, v: Int)
+        external fun _nSetHeightMode(ptr: NativePointer, v: Int)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nGetEffectiveAlignment")
-        external fun _nGetEffectiveAlignment(ptr: Long): Int
+        external fun _nGetEffectiveAlignment(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nIsHintingEnabled")
-        external fun _nIsHintingEnabled(ptr: Long): Boolean
+        external fun _nIsHintingEnabled(ptr: NativePointer): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nDisableHinting")
-        external fun _nDisableHinting(ptr: Long)
+        external fun _nDisableHinting(ptr: NativePointer)
 
         init {
             staticLoad()
@@ -169,7 +171,7 @@ class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
         return this
     }
 
-    var maxLinesCount: Long
+    var maxLinesCount: NativePointer
         get() = try {
             Stats.onNativeCall()
             _nGetMaxLinesCount(_ptr)
@@ -180,7 +182,7 @@ class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
             setMaxLinesCount(value)
         }
 
-    fun setMaxLinesCount(count: Long): ParagraphStyle {
+    fun setMaxLinesCount(count: NativePointer): ParagraphStyle {
         Stats.onNativeCall()
         _nSetMaxLinesCount(_ptr, count)
         return this

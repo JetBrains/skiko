@@ -6,6 +6,8 @@ import org.jetbrains.skia.ManagedString
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.getPtr
 import kotlin.jvm.JvmStatic
 
 class HbIcuScriptRunIterator(text: ManagedString?, manageText: Boolean) : ManagedRunIterator<ScriptRun?>(
@@ -16,10 +18,10 @@ class HbIcuScriptRunIterator(text: ManagedString?, manageText: Boolean) : Manage
     companion object {
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_HbIcuScriptRunIterator__1nMake")
-        external fun _nMake(textPtr: Long): Long
+        external fun _nMake(textPtr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_HbIcuScriptRunIterator__1nGetCurrentScriptTag")
-        external fun _nGetCurrentScriptTag(ptr: Long): Int
+        external fun _nGetCurrentScriptTag(ptr: NativePointer): Int
 
         init {
             staticLoad()

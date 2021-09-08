@@ -6,9 +6,11 @@ import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.getPtr
 import kotlin.jvm.JvmStatic
 
-class Shader internal constructor(ptr: Long) : RefCnt(ptr) {
+class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
         // Linear
         fun makeLinearGradient(p0: Point, p1: Point, colors: IntArray): Shader {
@@ -487,7 +489,7 @@ class Shader internal constructor(ptr: Long) : RefCnt(ptr) {
 
         @JvmStatic 
         @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeWithColorFilter")
-        external fun _nMakeWithColorFilter(ptr: Long, colorFilterPtr: Long): Long
+        external fun _nMakeWithColorFilter(ptr: NativePointer, colorFilterPtr: NativePointer): NativePointer
         @JvmStatic 
         @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeLinearGradient")
         external fun _nMakeLinearGradient(
@@ -500,7 +502,7 @@ class Shader internal constructor(ptr: Long) : RefCnt(ptr) {
             tileType: Int,
             flags: Int,
             matrix: FloatArray?
-        ): Long
+        ): NativePointer
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeLinearGradientCS")
@@ -510,12 +512,12 @@ class Shader internal constructor(ptr: Long) : RefCnt(ptr) {
             x1: Float,
             y1: Float,
             colors: FloatArray?,
-            colorSpacePtr: Long,
+            colorSpacePtr: NativePointer,
             positions: FloatArray?,
             tileType: Int,
             flags: Int,
             matrix: FloatArray?
-        ): Long
+        ): NativePointer
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeRadialGradient")
@@ -528,7 +530,7 @@ class Shader internal constructor(ptr: Long) : RefCnt(ptr) {
             tileType: Int,
             flags: Int,
             matrix: FloatArray?
-        ): Long
+        ): NativePointer
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeRadialGradientCS")
@@ -537,12 +539,12 @@ class Shader internal constructor(ptr: Long) : RefCnt(ptr) {
             y: Float,
             r: Float,
             colors: FloatArray?,
-            colorSpacePtr: Long,
+            colorSpacePtr: NativePointer,
             positions: FloatArray?,
             tileType: Int,
             flags: Int,
             matrix: FloatArray?
-        ): Long
+        ): NativePointer
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeTwoPointConicalGradient")
@@ -558,7 +560,7 @@ class Shader internal constructor(ptr: Long) : RefCnt(ptr) {
             tileType: Int,
             flags: Int,
             matrix: FloatArray?
-        ): Long
+        ): NativePointer
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeTwoPointConicalGradientCS")
@@ -570,12 +572,12 @@ class Shader internal constructor(ptr: Long) : RefCnt(ptr) {
             y1: Float,
             r1: Float,
             colors: FloatArray?,
-            colorSpacePtr: Long,
+            colorSpacePtr: NativePointer,
             positions: FloatArray?,
             tileType: Int,
             flags: Int,
             matrix: FloatArray?
-        ): Long
+        ): NativePointer
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeSweepGradient")
@@ -589,7 +591,7 @@ class Shader internal constructor(ptr: Long) : RefCnt(ptr) {
             tileType: Int,
             flags: Int,
             matrix: FloatArray?
-        ): Long
+        ): NativePointer
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeSweepGradientCS")
@@ -599,12 +601,12 @@ class Shader internal constructor(ptr: Long) : RefCnt(ptr) {
             startAngle: Float,
             endAngle: Float,
             colors: FloatArray?,
-            colorSpacePtr: Long,
+            colorSpacePtr: NativePointer,
             positions: FloatArray?,
             tileType: Int,
             flags: Int,
             matrix: FloatArray?
-        ): Long
+        ): NativePointer
 
         @JvmStatic 
         @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeFractalNoise")
@@ -614,7 +616,7 @@ class Shader internal constructor(ptr: Long) : RefCnt(ptr) {
             numOctaves: Int,
             seed: Float,
             tiles: IntArray?
-        ): Long
+        ): NativePointer
 
         @JvmStatic 
         @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeTurbulence")
@@ -624,20 +626,20 @@ class Shader internal constructor(ptr: Long) : RefCnt(ptr) {
             numOctaves: Int,
             seed: Float,
             tiles: IntArray?
-        ): Long
+        ): NativePointer
 
         @JvmStatic 
         @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeEmpty")
-        external fun _nMakeEmpty(): Long
+        external fun _nMakeEmpty(): NativePointer
         @JvmStatic 
         @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeColor")
-        external fun _nMakeColor(color: Int): Long
+        external fun _nMakeColor(color: Int): NativePointer
         @JvmStatic 
         @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeColorCS")
-        external fun _nMakeColorCS(r: Float, g: Float, b: Float, a: Float, colorSpacePtr: Long): Long
+        external fun _nMakeColorCS(r: Float, g: Float, b: Float, a: Float, colorSpacePtr: NativePointer): NativePointer
         @JvmStatic 
         @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeBlend")
-        external fun _nMakeBlend(blendMode: Int, dst: Long, src: Long): Long
+        external fun _nMakeBlend(blendMode: Int, dst: NativePointer, src: NativePointer): NativePointer
 
         init {
             staticLoad()

@@ -4,6 +4,7 @@ package org.jetbrains.skia.sksg
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.Managed
+import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import kotlin.jvm.JvmStatic
@@ -14,14 +15,14 @@ import kotlin.jvm.JvmStatic
  *
  * Tracks dirty regions for repaint.
  */
-class InvalidationController internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
+class InvalidationController internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
         @JvmStatic
-        external fun _nGetFinalizer(): Long
-        @JvmStatic external fun _nMake(): Long
-        @JvmStatic external fun _nInvalidate(ptr: Long, left: Float, top: Float, right: Float, bottom: Float, matrix: FloatArray?)
-        @JvmStatic external fun _nGetBounds(ptr: Long): Rect
-        @JvmStatic external fun _nReset(ptr: Long)
+        external fun _nGetFinalizer(): NativePointer
+        @JvmStatic external fun _nMake(): NativePointer
+        @JvmStatic external fun _nInvalidate(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float, matrix: FloatArray?)
+        @JvmStatic external fun _nGetBounds(ptr: NativePointer): Rect
+        @JvmStatic external fun _nReset(ptr: NativePointer)
 
         init {
             staticLoad()

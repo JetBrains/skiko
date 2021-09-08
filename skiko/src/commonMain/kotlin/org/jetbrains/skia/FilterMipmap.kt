@@ -1,13 +1,13 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.NativePointer
+
 class FilterMipmap constructor(
     internal val filterMode: FilterMode,
     internal val mipmapMode: MipmapMode = MipmapMode.NONE
 ) : SamplingMode {
 
-    override fun _pack(): Long {
-        return filterMode.ordinal.toLong() shl 32 or mipmapMode.ordinal.toLong()
-    }
+    override fun _pack() = filterMode.ordinal.toLong() shl 32 or mipmapMode.ordinal.toLong()
 
     override fun equals(o: Any?): Boolean {
         if (o === this) return true

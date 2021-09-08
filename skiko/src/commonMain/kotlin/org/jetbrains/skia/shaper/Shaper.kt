@@ -8,13 +8,15 @@ import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.impl.use
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.getPtr
 import kotlin.jvm.JvmStatic
 
 /**
  * Shapes text using HarfBuzz and places the shaped text into a
  * client-managed buffer.
  */
-class Shaper internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
+class Shaper internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
         fun makePrimitive(): Shaper {
             Stats.onNativeCall()
@@ -72,7 +74,7 @@ class Shaper internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR
         fun makeCoreText(): Shaper {
             Stats.onNativeCall()
             val ptr = _nMakeCoreText()
-            if (ptr == 0L) throw UnsupportedOperationException("CoreText not available")
+            if (ptr == NullPointer) throw UnsupportedOperationException("CoreText not available")
             return Shaper(ptr)
         }
 
@@ -91,45 +93,45 @@ class Shaper internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Shaper__1nGetFinalizer")
-        external fun _nGetFinalizer(): Long
+        external fun _nGetFinalizer(): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Shaper__1nMakePrimitive")
-        external fun _nMakePrimitive(): Long
+        external fun _nMakePrimitive(): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Shaper__1nMakeShaperDrivenWrapper")
-        external fun _nMakeShaperDrivenWrapper(fontMgrPtr: Long): Long
+        external fun _nMakeShaperDrivenWrapper(fontMgrPtr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Shaper__1nMakeShapeThenWrap")
-        external fun _nMakeShapeThenWrap(fontMgrPtr: Long): Long
+        external fun _nMakeShapeThenWrap(fontMgrPtr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Shaper__1nMakeShapeDontWrapOrReorder")
-        external fun _nMakeShapeDontWrapOrReorder(fontMgrPtr: Long): Long
+        external fun _nMakeShapeDontWrapOrReorder(fontMgrPtr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Shaper__1nMakeCoreText")
-        external fun _nMakeCoreText(): Long
+        external fun _nMakeCoreText(): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Shaper__1nMake")
-        external fun _nMake(fontMgrPtr: Long): Long
+        external fun _nMake(fontMgrPtr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Shaper__1nShapeBlob")
         external fun _nShapeBlob(
-            ptr: Long,
+            ptr: NativePointer,
             text: String?,
-            fontPtr: Long,
+            fontPtr: NativePointer,
             opts: ShapingOptions?,
             width: Float,
             offsetX: Float,
             offsetY: Float
-        ): Long
+        ): NativePointer
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Shaper__1nShapeLine")
-        external fun _nShapeLine(ptr: Long, text: String?, fontPtr: Long, opts: ShapingOptions?): Long
+        external fun _nShapeLine(ptr: NativePointer, text: String?, fontPtr: NativePointer, opts: ShapingOptions?): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Shaper__1nShape")
         external fun _nShape(
-            ptr: Long,
-            textPtr: Long,
+            ptr: NativePointer,
+            textPtr: NativePointer,
             fontIter: Iterator<FontRun?>?,
             bidiIter: Iterator<BidiRun?>?,
             scriptIter: Iterator<ScriptRun?>?,
@@ -168,7 +170,7 @@ class Shaper internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR
                 offset.x,
                 offset.y
             )
-            if (0L == ptr) null else TextBlob(ptr)
+            if (NullPointer == ptr) null else TextBlob(ptr)
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(font)

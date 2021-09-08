@@ -6,31 +6,32 @@ import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.NativePointer
 import kotlin.jvm.JvmStatic
 
-class PixelRef internal constructor(ptr: Long) : RefCnt(ptr) {
+class PixelRef internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_PixelRef__1nGetWidth")
-        external fun _nGetWidth(ptr: Long): Int
+        external fun _nGetWidth(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_PixelRef__1nGetHeight")
-        external fun _nGetHeight(ptr: Long): Int
+        external fun _nGetHeight(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_PixelRef__1nGetRowBytes")
-        external fun _nGetRowBytes(ptr: Long): Long
+        external fun _nGetRowBytes(ptr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_PixelRef__1nGetGenerationId")
-        external fun _nGetGenerationId(ptr: Long): Int
+        external fun _nGetGenerationId(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_PixelRef__1nNotifyPixelsChanged")
-        external fun _nNotifyPixelsChanged(ptr: Long)
+        external fun _nNotifyPixelsChanged(ptr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_PixelRef__1nIsImmutable")
-        external fun _nIsImmutable(ptr: Long): Boolean
+        external fun _nIsImmutable(ptr: NativePointer): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_PixelRef__1nSetImmutable")
-        external fun _nSetImmutable(ptr: Long)
+        external fun _nSetImmutable(ptr: NativePointer)
 
         init {
             staticLoad()
@@ -51,7 +52,7 @@ class PixelRef internal constructor(ptr: Long) : RefCnt(ptr) {
         } finally {
             reachabilityBarrier(this)
         }
-    val rowBytes: Long
+    val rowBytes: NativePointer
         get() = try {
             Stats.onNativeCall()
             _nGetRowBytes(_ptr)

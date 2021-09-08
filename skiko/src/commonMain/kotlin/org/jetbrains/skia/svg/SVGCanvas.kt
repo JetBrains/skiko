@@ -3,9 +3,10 @@ package org.jetbrains.skia.svg
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.*
-import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.getPtr
 import kotlin.jvm.JvmStatic
 
 object SVGCanvas {
@@ -46,7 +47,7 @@ object SVGCanvas {
             bounds.top,
             bounds.right,
             bounds.bottom,
-            Native.getPtr(out),
+            getPtr(out),
             0 or (if (convertTextToPaths) 1 else 0) or if (prettyXML) 0 else 2
         )
         return Canvas(ptr, true, out)
@@ -54,7 +55,7 @@ object SVGCanvas {
 
     @JvmStatic
     @ExternalSymbolName("org_jetbrains_skia_svg_SVGCanvas__1nMake")
-    external fun _nMake(left: Float, top: Float, right: Float, bottom: Float, wstreamPtr: Long, flags: Int): Long
+    external fun _nMake(left: Float, top: Float, right: Float, bottom: Float, wstreamPtr: NativePointer, flags: Int): NativePointer
 
     init {
         staticLoad()

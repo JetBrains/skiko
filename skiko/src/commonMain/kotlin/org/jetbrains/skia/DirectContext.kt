@@ -6,16 +6,17 @@ import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.NativePointer
 import kotlin.jvm.JvmStatic
 
-class DirectContext internal constructor(ptr: Long) : RefCnt(ptr) {
+class DirectContext internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
         fun makeGL(): DirectContext {
             Stats.onNativeCall()
             return DirectContext(_nMakeGL())
         }
 
-        fun makeMetal(devicePtr: Long, queuePtr: Long): DirectContext {
+        fun makeMetal(devicePtr: NativePointer, queuePtr: NativePointer): DirectContext {
             Stats.onNativeCall()
             return DirectContext(_nMakeMetal(devicePtr, queuePtr))
         }
@@ -33,32 +34,32 @@ class DirectContext internal constructor(ptr: Long) : RefCnt(ptr) {
          * is created with provided device in devicePtr with
          * type D3D12_COMMAND_LIST_TYPE_DIRECT; must be not zero
          */
-        fun makeDirect3D(adapterPtr: Long, devicePtr: Long, queuePtr: Long): DirectContext {
+        fun makeDirect3D(adapterPtr: NativePointer, devicePtr: NativePointer, queuePtr: NativePointer): DirectContext {
             Stats.onNativeCall()
             return DirectContext(_nMakeDirect3D(adapterPtr, devicePtr, queuePtr))
         }
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeGL")
-        external fun _nMakeGL(): Long
+        external fun _nMakeGL(): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeMetal")
-        external fun _nMakeMetal(devicePtr: Long, queuePtr: Long): Long
+        external fun _nMakeMetal(devicePtr: NativePointer, queuePtr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeDirect3D")
-        external fun _nMakeDirect3D(adapterPtr: Long, devicePtr: Long, queuePtr: Long): Long
+        external fun _nMakeDirect3D(adapterPtr: NativePointer, devicePtr: NativePointer, queuePtr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nFlush")
-        external fun _nFlush(ptr: Long): Long
+        external fun _nFlush(ptr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nSubmit")
-        external fun _nSubmit(ptr: Long, syncCpu: Boolean): Long
+        external fun _nSubmit(ptr: NativePointer, syncCpu: Boolean): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nReset")
-        external fun _nReset(ptr: Long, flags: Int)
+        external fun _nReset(ptr: NativePointer, flags: Int)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nAbandon")
-        external fun _nAbandon(ptr: Long)
+        external fun _nAbandon(ptr: NativePointer)
 
         init {
             staticLoad()

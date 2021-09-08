@@ -5,10 +5,11 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
-import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.getPtr
 import kotlin.jvm.JvmStatic
 
-class TextBlob internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
+class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
         /**
          * Returns a TextBlob built from a single run of text with x-positions and a single y value.
@@ -30,7 +31,7 @@ class TextBlob internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.P
                     ypos,
                     getPtr(font)
                 )
-                if (ptr == 0L) null else TextBlob(ptr)
+                if (ptr == NullPointer) null else TextBlob(ptr)
             } finally {
                 reachabilityBarrier(font)
             }
@@ -56,7 +57,7 @@ class TextBlob internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.P
                 Stats.onNativeCall()
                 val ptr =
                     _nMakeFromPos(glyphs, floatPos, getPtr(font))
-                if (ptr == 0L) null else TextBlob(ptr)
+                if (ptr == NullPointer) null else TextBlob(ptr)
             } finally {
                 reachabilityBarrier(font)
             }
@@ -78,7 +79,7 @@ class TextBlob internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.P
                     floatXform,
                     getPtr(font)
                 )
-                if (ptr == 0L) null else TextBlob(ptr)
+                if (ptr == NullPointer) null else TextBlob(ptr)
             } finally {
                 reachabilityBarrier(font)
             }
@@ -88,7 +89,7 @@ class TextBlob internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.P
             return try {
                 Stats.onNativeCall()
                 val ptr = _nMakeFromData(getPtr(data))
-                if (ptr == 0L) null else TextBlob(ptr)
+                if (ptr == NullPointer) null else TextBlob(ptr)
             } finally {
                 reachabilityBarrier(data)
             }
@@ -96,52 +97,52 @@ class TextBlob internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.P
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetFinalizer")
-        external fun _nGetFinalizer(): Long
+        external fun _nGetFinalizer(): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nBounds")
-        external fun _nBounds(ptr: Long): Rect
+        external fun _nBounds(ptr: NativePointer): Rect
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetUniqueId")
-        external fun _nGetUniqueId(ptr: Long): Int
+        external fun _nGetUniqueId(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetIntercepts")
-        external fun _nGetIntercepts(ptr: Long, lower: Float, upper: Float, paintPtr: Long): FloatArray?
+        external fun _nGetIntercepts(ptr: NativePointer, lower: Float, upper: Float, paintPtr: NativePointer): FloatArray?
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromPosH")
-        external fun _nMakeFromPosH(glyphs: ShortArray?, xpos: FloatArray?, ypos: Float, fontPtr: Long): Long
+        external fun _nMakeFromPosH(glyphs: ShortArray?, xpos: FloatArray?, ypos: Float, fontPtr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromPos")
-        external fun _nMakeFromPos(glyphs: ShortArray?, pos: FloatArray?, fontPtr: Long): Long
+        external fun _nMakeFromPos(glyphs: ShortArray?, pos: FloatArray?, fontPtr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromRSXform")
-        external fun _nMakeFromRSXform(glyphs: ShortArray?, xform: FloatArray?, fontPtr: Long): Long
+        external fun _nMakeFromRSXform(glyphs: ShortArray?, xform: FloatArray?, fontPtr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nSerializeToData")
-        external fun _nSerializeToData(ptr: Long /*, SkSerialProcs */): Long
+        external fun _nSerializeToData(ptr: NativePointer /*, SkSerialProcs */): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromData")
-        external fun _nMakeFromData(dataPtr: Long /*, SkDeserialProcs */): Long
+        external fun _nMakeFromData(dataPtr: NativePointer /*, SkDeserialProcs */): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetGlyphs")
-        external fun _nGetGlyphs(ptr: Long): ShortArray
+        external fun _nGetGlyphs(ptr: NativePointer): ShortArray
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetPositions")
-        external fun _nGetPositions(ptr: Long): FloatArray
+        external fun _nGetPositions(ptr: NativePointer): FloatArray
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetClusters")
-        external fun _nGetClusters(ptr: Long): IntArray
+        external fun _nGetClusters(ptr: NativePointer): IntArray
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetTightBounds")
-        external fun _nGetTightBounds(ptr: Long): Rect
+        external fun _nGetTightBounds(ptr: NativePointer): Rect
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetBlockBounds")
-        external fun _nGetBlockBounds(ptr: Long): Rect
+        external fun _nGetBlockBounds(ptr: NativePointer): Rect
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetFirstBaseline")
-        external fun _nGetFirstBaseline(ptr: Long): Float
+        external fun _nGetFirstBaseline(ptr: NativePointer): Float
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetLastBaseline")
-        external fun _nGetLastBaseline(ptr: Long): Float
+        external fun _nGetLastBaseline(ptr: NativePointer): Float
 
         init {
             staticLoad()

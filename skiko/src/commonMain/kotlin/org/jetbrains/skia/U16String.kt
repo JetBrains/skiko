@@ -6,22 +6,23 @@ import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.NativePointer
 import kotlin.jvm.JvmStatic
 
 /**
  * Kotlin mirror of std::vector&lt;jchar&gt; (UTF-16)
  */
-class U16String internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
+class U16String internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_U16String__1nMake")
-        external fun _nMake(s: String?): Long
+        external fun _nMake(s: String?): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_U16String__1nGetFinalizer")
-        external fun _nGetFinalizer(): Long
+        external fun _nGetFinalizer(): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_U16String__1nToString")
-        external fun _nToString(ptr: Long): String
+        external fun _nToString(ptr: NativePointer): String
 
         init {
             staticLoad()

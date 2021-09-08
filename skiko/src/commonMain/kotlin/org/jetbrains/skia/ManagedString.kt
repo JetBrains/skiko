@@ -6,31 +6,32 @@ import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.NativePointer
 import kotlin.jvm.JvmStatic
 
-class ManagedString internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
+class ManagedString internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ManagedString__1nMake")
-        external fun _nMake(s: String?): Long
+        external fun _nMake(s: String?): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ManagedString__1nGetFinalizer")
-        external fun _nGetFinalizer(): Long
+        external fun _nGetFinalizer(): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ManagedString__1nToString")
-        external fun _nToString(ptr: Long): String
+        external fun _nToString(ptr: NativePointer): String
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ManagedString__1nInsert")
-        external fun _nInsert(ptr: Long, offset: Int, s: String?)
+        external fun _nInsert(ptr: NativePointer, offset: Int, s: String?)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ManagedString__1nAppend")
-        external fun _nAppend(ptr: Long, s: String?)
+        external fun _nAppend(ptr: NativePointer, s: String?)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ManagedString__1nRemoveSuffix")
-        external fun _nRemoveSuffix(ptr: Long, from: Int)
+        external fun _nRemoveSuffix(ptr: NativePointer, from: Int)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ManagedString__1nRemove")
-        external fun _nRemove(ptr: Long, from: Int, length: Int)
+        external fun _nRemove(ptr: NativePointer, from: Int, length: Int)
 
         init {
             staticLoad()

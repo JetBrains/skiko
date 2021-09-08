@@ -1,5 +1,7 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.NativePointer
+
 /**
  * @see org.jetbrains.skia.FilterMipmap
  *

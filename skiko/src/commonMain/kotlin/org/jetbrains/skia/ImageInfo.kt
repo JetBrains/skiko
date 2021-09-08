@@ -1,5 +1,8 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.Native
+import org.jetbrains.skia.impl.NativePointer
+
 /**
  *
  * Describes pixel dimensions and encoding. Bitmap, Image, Pixmap, and Surface
@@ -32,14 +35,21 @@ class ImageInfo(val colorInfo: ColorInfo, val width: Int, val height: Int) {
     ) : this(ColorInfo(colorType, alphaType, colorSpace), width, height) {
     }
 
-    internal constructor(width: Int, height: Int, colorType: Int, alphaType: Int, colorSpace: Long) : this(
+    internal constructor(width: Int, height: Int, colorType: Int, alphaType: Int, colorSpace: NativePointer) : this(
         width,
         height,
         ColorType.values()[colorType],
         ColorAlphaType.values()[alphaType],
-        if (colorSpace == 0L) null else ColorSpace(colorSpace)
-    ) {
-    }
+        if (colorSpace == Native.NullPointer) null else ColorSpace(colorSpace)
+    )
+
+    /**
+     * Returns minimum bytes per row, computed from pixel getWidth() and ColorType, which
+     * specifies getBytesPerPixel(). Bitmap maximum value for row bytes must fit
+     * in 31 bits.
+     */
+    val minRowBytes: Long
+        get() = (width * bytesPerPixel).toLong()
 
     val colorType: ColorType
         get() = colorInfo.colorType
@@ -119,12 +129,16 @@ class ImageInfo(val colorInfo: ColorInfo, val width: Int, val height: Int) {
         get() = colorInfo.shiftPerPixel
 
     /**
-     * Returns minimum bytes per row, computed from pixel getWidth() and ColorType, which
-     * specifies getBytesPerPixel(). Bitmap maximum value for row bytes must fit
-     * in 31 bits.
+     * Returns true if rowBytes is valid for this ImageInfo.
+     *
+     * @param rowBytes  size of pixel row including padding
+     * @return          true if rowBytes is large enough to contain pixel row and is properly aligned
      */
-    val minRowBytes: Long
-        get() = (width * bytesPerPixel).toLong()
+    fun isRowBytesValid(rowBytes: Long): Boolean {
+        if (rowBytes < minRowBytes) return false
+        val shift = shiftPerPixel
+        return rowBytes shr shift shl shift == rowBytes
+    }
 
     /**
      *
@@ -173,18 +187,6 @@ class ImageInfo(val colorInfo: ColorInfo, val width: Int, val height: Int) {
      */
     fun computeMinByteSize(): Long {
         return computeByteSize(minRowBytes)
-    }
-
-    /**
-     * Returns true if rowBytes is valid for this ImageInfo.
-     *
-     * @param rowBytes  size of pixel row including padding
-     * @return          true if rowBytes is large enough to contain pixel row and is properly aligned
-     */
-    fun isRowBytesValid(rowBytes: Long): Boolean {
-        if (rowBytes < minRowBytes) return false
-        val shift = shiftPerPixel
-        return rowBytes shr shift shl shift == rowBytes
     }
 
     override fun equals(o: Any?): Boolean {

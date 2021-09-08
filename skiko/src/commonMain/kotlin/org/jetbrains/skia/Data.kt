@@ -4,16 +4,18 @@ package org.jetbrains.skia
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Native
+import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.impl.getPtr
 import org.jetbrains.skia.impl.reachabilityBarrier
 import kotlin.jvm.JvmStatic
 
 /**
  * Data holds an immutable data buffer.
  */
-class Data internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
+class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
-        fun makeFromBytes(bytes: ByteArray, offset: Long = 0, length: Long = bytes.size.toLong()): Data {
+        fun makeFromBytes(bytes: ByteArray, offset: Long = 0L, length: Long = bytes.size.toLong()): Data {
             Stats.onNativeCall()
             return Data(_nMakeFromBytes(bytes, offset, length))
         }
@@ -38,31 +40,31 @@ class Data internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) 
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Data__1nGetFinalizer")
-        external fun _nGetFinalizer(): Long
+        external fun _nGetFinalizer(): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Data__1nSize")
-        external fun _nSize(ptr: Long): Long
+        external fun _nSize(ptr: NativePointer): Long
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Data__1nBytes")
-        external fun _nBytes(ptr: Long, offset: Long, length: Long): ByteArray
+        external fun _nBytes(ptr: NativePointer, offset: Long, length: Long): ByteArray
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Data__1nEquals")
-        external fun _nEquals(ptr: Long, otherPtr: Long): Boolean
+        external fun _nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Data__1nToByteBuffer")
-        external fun _nToByteBuffer(ptr: Long): ByteBuffer
+        external fun _nToByteBuffer(ptr: NativePointer): ByteBuffer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Data__1nMakeFromBytes")
-        external fun _nMakeFromBytes(bytes: ByteArray?, offset: Long, length: Long): Long
+        external fun _nMakeFromBytes(bytes: ByteArray?, offset: Long, length: Long): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Data__1nMakeFromFileName")
-        external fun _nMakeFromFileName(path: String?): Long
+        external fun _nMakeFromFileName(path: String?): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Data__1nMakeSubset")
-        external fun _nMakeSubset(ptr: Long, offset: Long, length: Long): Long
+        external fun _nMakeSubset(ptr: NativePointer, offset: Long, length: Long): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Data__1nMakeEmpty")
-        external fun _nMakeEmpty(): Long
+        external fun _nMakeEmpty(): NativePointer
 
         init {
             staticLoad()

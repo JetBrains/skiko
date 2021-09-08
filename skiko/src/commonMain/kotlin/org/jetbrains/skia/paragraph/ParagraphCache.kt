@@ -6,31 +6,33 @@ import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.getPtr
 import kotlin.jvm.JvmStatic
 
-class ParagraphCache internal constructor(owner: FontCollection, ptr: Long) : Native(ptr) {
+class ParagraphCache internal constructor(owner: FontCollection, ptr: NativePointer) : Native(ptr) {
     companion object {
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ParagraphCache__1nAbandon")
-        external fun _nAbandon(ptr: Long)
+        external fun _nAbandon(ptr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ParagraphCache__1nReset")
-        external fun _nReset(ptr: Long)
+        external fun _nReset(ptr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ParagraphCache__1nUpdateParagraph")
-        external fun _nUpdateParagraph(ptr: Long, paragraphPtr: Long): Boolean
+        external fun _nUpdateParagraph(ptr: NativePointer, paragraphPtr: NativePointer): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ParagraphCache__1nFindParagraph")
-        external fun _nFindParagraph(ptr: Long, paragraphPtr: Long): Boolean
+        external fun _nFindParagraph(ptr: NativePointer, paragraphPtr: NativePointer): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ParagraphCache__1nPrintStatistics")
-        external fun _nPrintStatistics(ptr: Long)
+        external fun _nPrintStatistics(ptr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ParagraphCache__1nSetEnabled")
-        external fun _nSetEnabled(ptr: Long, value: Boolean)
+        external fun _nSetEnabled(ptr: NativePointer, value: Boolean)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ParagraphCache__1nGetCount")
-        external fun _nGetCount(ptr: Long): Int
+        external fun _nGetCount(ptr: NativePointer): Int
 
         init {
             staticLoad()
@@ -111,7 +113,7 @@ class ParagraphCache internal constructor(owner: FontCollection, ptr: Long) : Na
     internal val _owner: FontCollection
     internal fun _validate() {
         try {
-            check(Native.getPtr(_owner) != 0L) { "ParagraphCache needs owning FontCollection to be alive" }
+            check(getPtr(_owner) != NullPointer) { "ParagraphCache needs owning FontCollection to be alive" }
         } finally {
             reachabilityBarrier(_owner)
         }

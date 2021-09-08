@@ -1,9 +1,11 @@
 package org.jetbrains.skia.shaper
 
 import org.jetbrains.skia.*
+import org.jetbrains.skia.impl.Native
+import org.jetbrains.skia.impl.NativePointer
 
 class RunInfo(
-    var _fontPtr: Long, val bidiLevel: Int, val advanceX: Float, val advanceY: Float, val glyphCount: Long,
+    var _fontPtr: NativePointer, val bidiLevel: Int, val advanceX: Float, val advanceY: Float, val glyphCount: NativePointer,
     /**
      * WARN does not work in Shaper.makeCoreText https://bugs.chromium.org/p/skia/issues/detail?id=10899
      */
@@ -29,11 +31,11 @@ class RunInfo(
         get() = rangeBegin + rangeSize
     val font: Font
         get() {
-            check(_fontPtr != 0L) { "getFont() is only valid inside RunHandler callbacks" }
-            return Font.Companion.makeClone(_fontPtr)
+            check(_fontPtr != Native.NullPointer) { "getFont() is only valid inside RunHandler callbacks" }
+            return Font.makeClone(_fontPtr)
         }
 
-    fun setFontPtr(_fontPtr: Long): RunInfo {
+    fun setFontPtr(_fontPtr: NativePointer): RunInfo {
         this._fontPtr = _fontPtr
         return this
     }
@@ -60,12 +62,13 @@ class RunInfo(
         val PRIME = 59
         var result = 1
         val `$_fontPtr` = _fontPtr
-        result = result * PRIME + (`$_fontPtr` ushr 32 xor `$_fontPtr`).toInt()
+        // TODO("Shagen: COMMENT OUT BEFORE ANY ACTUAL USAGE")
+        //result = result * PRIME + (`$_fontPtr` ushr 32 xor `$_fontPtr`).toInt()
         result = result * PRIME + bidiLevel
         result = result * PRIME + advanceX.toBits()
         result = result * PRIME + advanceY.toBits()
         val `$_glyphCount` = glyphCount
-        result = result * PRIME + (`$_glyphCount` ushr 32 xor `$_glyphCount`).toInt()
+        //result = result * PRIME + (`$_glyphCount` ushr 32 xor `$_glyphCount`).toInt()
         result = result * PRIME + rangeBegin
         result = result * PRIME + rangeSize
         return result

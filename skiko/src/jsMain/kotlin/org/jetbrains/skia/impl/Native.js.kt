@@ -1,18 +1,17 @@
 package org.jetbrains.skia.impl
 
-actual abstract class Native actual constructor(ptr: Long) {
-    actual var _ptr: Long
+actual abstract class Native actual constructor(ptr: NativePointer) {
+    actual var _ptr: NativePointer
 
     actual open fun _nativeEquals(other: Native?): Boolean = TODO()
 
     actual companion object {
-        actual fun getPtr(n: Native?): Long {
-            return n?._ptr ?: 0
-        }
+        actual val NullPointer: NativePointer
+            get() = 0
     }
 
     init {
-        if (ptr == 0L) throw RuntimeException("Can't wrap nullptr")
+        if (ptr == NullPointer) throw RuntimeException("Can't wrap nullptr")
         _ptr = ptr
     }
 }
@@ -20,3 +19,5 @@ actual abstract class Native actual constructor(ptr: Long) {
 actual fun reachabilityBarrier(obj: Any?) {
     TODO()
 }
+
+actual typealias NativePointer = Int

@@ -2,6 +2,7 @@ package org.jetbrains.skiko.context
 
 import org.jetbrains.skia.Surface
 import org.jetbrains.skia.impl.Native
+import org.jetbrains.skia.impl.getPtr
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.redrawer.Direct3DRedrawer
 import java.lang.ref.Reference
@@ -57,7 +58,7 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextHandler(layer) 
             
             try {
                 for (bufferIndex in 0..bufferCount - 1) {
-                    surfaces[bufferIndex] = directXRedrawer.makeSurface(Native.getPtr(context!!), w, h, bufferIndex)
+                    surfaces[bufferIndex] = directXRedrawer.makeSurface(getPtr(context!!), w, h, bufferIndex)
                 }
             } finally {
                 Reference.reachabilityFence(context!!)
@@ -75,8 +76,8 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextHandler(layer) 
     override fun flush() {
         try {
             flush(
-                Native.getPtr(context!!),
-                Native.getPtr(surface!!)
+                getPtr(context!!),
+                getPtr(surface!!)
             )
         } finally {
             Reference.reachabilityFence(context!!)

@@ -5,41 +5,42 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
-import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.getPtr
 import kotlin.jvm.JvmStatic
 
 open class FontMgr : RefCnt {
     companion object {
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nGetFamiliesCount")
-        external fun _nGetFamiliesCount(ptr: Long): Int
+        external fun _nGetFamiliesCount(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nGetFamilyName")
-        external fun _nGetFamilyName(ptr: Long, index: Int): String
+        external fun _nGetFamilyName(ptr: NativePointer, index: Int): String
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMakeStyleSet")
-        external fun _nMakeStyleSet(ptr: Long, index: Int): Long
+        external fun _nMakeStyleSet(ptr: NativePointer, index: Int): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMatchFamily")
-        external fun _nMatchFamily(ptr: Long, familyName: String?): Long
+        external fun _nMatchFamily(ptr: NativePointer, familyName: String?): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMatchFamilyStyle")
-        external fun _nMatchFamilyStyle(ptr: Long, familyName: String?, fontStyle: Int): Long
+        external fun _nMatchFamilyStyle(ptr: NativePointer, familyName: String?, fontStyle: Int): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMatchFamilyStyleCharacter")
         external fun _nMatchFamilyStyleCharacter(
-            ptr: Long,
+            ptr: NativePointer,
             familyName: String?,
             fontStyle: Int,
             bcp47: Array<String?>?,
             character: Int
-        ): Long
+        ): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMakeFromData")
-        external fun _nMakeFromData(ptr: Long, dataPtr: Long, ttcIndex: Int): Long
+        external fun _nMakeFromData(ptr: NativePointer, dataPtr: NativePointer, ttcIndex: Int): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nDefault")
-        external fun _nDefault(): Long
+        external fun _nDefault(): NativePointer
 
         init {
             staticLoad()
@@ -69,7 +70,7 @@ open class FontMgr : RefCnt {
         return try {
             Stats.onNativeCall()
             val ptr = _nMakeStyleSet(_ptr, index)
-            if (ptr == 0L) null else FontStyleSet(ptr)
+            if (ptr == NullPointer) null else FontStyleSet(ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -111,7 +112,7 @@ open class FontMgr : RefCnt {
         return try {
             Stats.onNativeCall()
             val ptr = _nMatchFamilyStyle(_ptr, familyName, style._value)
-            if (ptr == 0L) null else Typeface(ptr)
+            if (ptr == NullPointer) null else Typeface(ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -149,7 +150,7 @@ open class FontMgr : RefCnt {
         return try {
             Stats.onNativeCall()
             val ptr = _nMatchFamilyStyleCharacter(_ptr, familyName, style._value, bcp47, character)
-            if (ptr == 0L) null else Typeface(ptr)
+            if (ptr == NullPointer) null else Typeface(ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -178,14 +179,14 @@ open class FontMgr : RefCnt {
             Stats.onNativeCall()
             val ptr =
                 _nMakeFromData(_ptr, getPtr(data), ttcIndex)
-            if (ptr == 0L) null else Typeface(ptr)
+            if (ptr == NullPointer) null else Typeface(ptr)
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(data)
         }
     }
 
-    internal constructor(ptr: Long) : super(ptr)
+    internal constructor(ptr: NativePointer) : super(ptr)
 
-    internal constructor(ptr: Long, allowClose: Boolean) : super(ptr, allowClose)
+    internal constructor(ptr: NativePointer, allowClose: Boolean) : super(ptr, allowClose)
 }

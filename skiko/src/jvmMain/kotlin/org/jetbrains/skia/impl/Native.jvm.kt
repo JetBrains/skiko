@@ -4,6 +4,12 @@ import java.lang.ref.Reference
 
 actual abstract class Native actual constructor(ptr: Long) {
     actual var _ptr: Long
+
+    actual companion object {
+        actual val NullPointer: NativePointer
+            get() = 0L
+    }
+
     override fun toString(): String {
         return javaClass.simpleName + "(_ptr=0x" + _ptr.toString(16) + ")"
     }
@@ -21,23 +27,17 @@ actual abstract class Native actual constructor(ptr: Long) {
         }
     }
 
-    actual open fun _nativeEquals(other: Native?): Boolean {
-        return false
-    }
-
     // FIXME two different pointers might point to equal objects
     override fun hashCode(): Int {
         return java.lang.Long.hashCode(_ptr)
     }
 
-    actual companion object {
-        actual fun getPtr(n: Native?): Long {
-            return n?._ptr ?: 0
-        }
+    actual open fun _nativeEquals(other: Native?): Boolean {
+        return false
     }
 
     init {
-        if (ptr == 0L) throw RuntimeException("Can't wrap nullptr")
+        if (ptr == NullPointer) throw RuntimeException("Can't wrap nullptr")
         _ptr = ptr
     }
 }
@@ -45,3 +45,5 @@ actual abstract class Native actual constructor(ptr: Long) {
 actual fun reachabilityBarrier(obj: Any?) {
     Reference.reachabilityFence(obj)
 }
+
+actual typealias NativePointer = Long

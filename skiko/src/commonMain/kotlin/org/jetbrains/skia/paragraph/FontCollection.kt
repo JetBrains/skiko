@@ -7,46 +7,48 @@ import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.getPtr
 import kotlin.jvm.JvmStatic
 
-class FontCollection internal constructor(ptr: Long) : RefCnt(ptr) {
+class FontCollection internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_FontCollection__1nMake")
-        external fun _nMake(): Long
+        external fun _nMake(): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_FontCollection__1nGetFontManagersCount")
-        external fun _nGetFontManagersCount(ptr: Long): Long
+        external fun _nGetFontManagersCount(ptr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_FontCollection__1nSetAssetFontManager")
-        external fun _nSetAssetFontManager(ptr: Long, fontManagerPtr: Long): Long
+        external fun _nSetAssetFontManager(ptr: NativePointer, fontManagerPtr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_FontCollection__1nSetDynamicFontManager")
-        external fun _nSetDynamicFontManager(ptr: Long, fontManagerPtr: Long): Long
+        external fun _nSetDynamicFontManager(ptr: NativePointer, fontManagerPtr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_FontCollection__1nSetTestFontManager")
-        external fun _nSetTestFontManager(ptr: Long, fontManagerPtr: Long): Long
+        external fun _nSetTestFontManager(ptr: NativePointer, fontManagerPtr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_FontCollection__1nSetDefaultFontManager")
-        external fun _nSetDefaultFontManager(ptr: Long, fontManagerPtr: Long, defaultFamilyName: String?): Long
+        external fun _nSetDefaultFontManager(ptr: NativePointer, fontManagerPtr: NativePointer, defaultFamilyName: String?): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_FontCollection__1nGetFallbackManager")
-        external fun _nGetFallbackManager(ptr: Long): Long
+        external fun _nGetFallbackManager(ptr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_FontCollection__1nFindTypefaces")
-        external fun _nFindTypefaces(ptr: Long, familyNames: Array<String?>?, fontStyle: Int): LongArray
+        external fun _nFindTypefaces(ptr: NativePointer, familyNames: Array<String?>?, fontStyle: Int): Array<NativePointer>
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_FontCollection__1nDefaultFallbackChar")
-        external fun _nDefaultFallbackChar(ptr: Long, unicode: Int, fontStyle: Int, locale: String?): Long
+        external fun _nDefaultFallbackChar(ptr: NativePointer, unicode: Int, fontStyle: Int, locale: String?): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_FontCollection__1nDefaultFallback")
-        external fun _nDefaultFallback(ptr: Long): Long
+        external fun _nDefaultFallback(ptr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_FontCollection__1nSetEnableFallback")
-        external fun _nSetEnableFallback(ptr: Long, value: Boolean): Long
+        external fun _nSetEnableFallback(ptr: NativePointer, value: Boolean): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_FontCollection__1nGetParagraphCache")
-        external fun _nGetParagraphCache(ptr: Long): Long
+        external fun _nGetParagraphCache(ptr: NativePointer): NativePointer
 
         init {
             staticLoad()
@@ -57,7 +59,7 @@ class FontCollection internal constructor(ptr: Long) : RefCnt(ptr) {
         Stats.onNativeCall()
     }
 
-    val fontManagersCount: Long
+    val fontManagersCount: NativePointer
         get() = try {
             Stats.onNativeCall()
             _nGetFontManagersCount(_ptr)
@@ -120,7 +122,7 @@ class FontCollection internal constructor(ptr: Long) : RefCnt(ptr) {
         get() = try {
             Stats.onNativeCall()
             val ptr = _nGetFallbackManager(_ptr)
-            if (ptr == 0L) null else FontMgr(ptr)
+            if (ptr == NullPointer) null else FontMgr(ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -141,7 +143,7 @@ class FontCollection internal constructor(ptr: Long) : RefCnt(ptr) {
         return try {
             Stats.onNativeCall()
             val ptr = _nDefaultFallbackChar(_ptr, unicode, style._value, locale)
-            if (ptr == 0L) null else Typeface(ptr)
+            if (ptr == NullPointer) null else Typeface(ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -151,7 +153,7 @@ class FontCollection internal constructor(ptr: Long) : RefCnt(ptr) {
         return try {
             Stats.onNativeCall()
             val ptr = _nDefaultFallback(_ptr)
-            if (ptr == 0L) null else Typeface(ptr)
+            if (ptr == NullPointer) null else Typeface(ptr)
         } finally {
             reachabilityBarrier(this)
         }
