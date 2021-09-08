@@ -3,8 +3,8 @@ package org.jetbrains.skia.impl
 import java.lang.ref.Reference
 
 actual abstract class RefCnt : Managed {
-    protected actual constructor(ptr: Long) : super(ptr, _FinalizerHolder.PTR) {}
-    protected actual constructor(ptr: Long, allowClose: Boolean) : super(ptr, _FinalizerHolder.PTR, allowClose)
+    protected actual constructor(ptr: NativePointer) : super(ptr, _FinalizerHolder.PTR) {}
+    protected actual constructor(ptr: NativePointer, allowClose: Boolean) : super(ptr, _FinalizerHolder.PTR, allowClose)
 
     val refCount: Int
         get() = try {
@@ -25,8 +25,8 @@ actual abstract class RefCnt : Managed {
 
     companion object {
         @JvmStatic
-        external fun _nGetFinalizer(): Long
+        external fun _nGetFinalizer(): NativePointer
         @JvmStatic
-        external fun _nGetRefCount(ptr: Long): Int
+        external fun _nGetRefCount(ptr: NativePointer): Int
     }
 }

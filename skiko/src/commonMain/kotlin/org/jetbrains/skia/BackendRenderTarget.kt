@@ -3,10 +3,11 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Managed
+import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.Stats
 import kotlin.jvm.JvmStatic
 
-class BackendRenderTarget internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
+class BackendRenderTarget internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
         fun makeGL(
             width: Int,
@@ -20,7 +21,7 @@ class BackendRenderTarget internal constructor(ptr: Long) : Managed(ptr, _Finali
             return BackendRenderTarget(_nMakeGL(width, height, sampleCnt, stencilBits, fbId, fbFormat))
         }
 
-        fun makeMetal(width: Int, height: Int, texturePtr: Long): BackendRenderTarget {
+        fun makeMetal(width: Int, height: Int, texturePtr: NativePointer): BackendRenderTarget {
             Stats.onNativeCall()
             return BackendRenderTarget(_nMakeMetal(width, height, texturePtr))
         }
@@ -41,7 +42,7 @@ class BackendRenderTarget internal constructor(ptr: Long) : Managed(ptr, _Finali
         fun makeDirect3D(
             width: Int,
             height: Int,
-            texturePtr: Long,
+            texturePtr: NativePointer,
             format: Int,
             sampleCnt: Int,
             levelCnt: Int
@@ -52,23 +53,23 @@ class BackendRenderTarget internal constructor(ptr: Long) : Managed(ptr, _Finali
 
         @JvmStatic
         @ExternalSymbolName("BackendRenderTarget_nGetFinalizer")
-        external fun _nGetFinalizer(): Long
+        external fun _nGetFinalizer(): NativePointer
         @JvmStatic
         @ExternalSymbolName("BackendRenderTarget_nMakeGL")
-        external fun _nMakeGL(width: Int, height: Int, sampleCnt: Int, stencilBits: Int, fbId: Int, fbFormat: Int): Long
+        external fun _nMakeGL(width: Int, height: Int, sampleCnt: Int, stencilBits: Int, fbId: Int, fbFormat: Int): NativePointer
         @JvmStatic
         @ExternalSymbolName("BackendRenderTarget_nMakeMetal")
-        external fun _nMakeMetal(width: Int, height: Int, texturePtr: Long): Long
+        external fun _nMakeMetal(width: Int, height: Int, texturePtr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("BackendRenderTarget_nMakeDirect3D")
         external fun _nMakeDirect3D(
             width: Int,
             height: Int,
-            texturePtr: Long,
+            texturePtr: NativePointer,
             format: Int,
             sampleCnt: Int,
             levelCnt: Int
-        ): Long
+        ): NativePointer
 
         init {
             staticLoad()

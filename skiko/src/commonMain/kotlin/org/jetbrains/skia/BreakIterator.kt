@@ -6,6 +6,8 @@ import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.getPtr
 import kotlin.jvm.JvmStatic
 
 /**
@@ -192,7 +194,7 @@ import kotlin.jvm.JvmStatic
  * with punctuation or other non-word characters.
 </blockquote> *
  */
-class BreakIterator internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
+class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
         /**
          * DONE is returned by previous() and next() after all valid
@@ -294,46 +296,46 @@ class BreakIterator internal constructor(ptr: Long) : Managed(ptr, _FinalizerHol
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nGetFinalizer")
-        external fun _nGetFinalizer(): Long
+        external fun _nGetFinalizer(): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nMake")
-        external fun _nMake(type: Int, locale: String?): Long
+        external fun _nMake(type: Int, locale: String?): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nClone")
-        external fun _nClone(ptr: Long): Long
+        external fun _nClone(ptr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nCurrent")
-        external fun _nCurrent(ptr: Long): Int
+        external fun _nCurrent(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nNext")
-        external fun _nNext(ptr: Long): Int
+        external fun _nNext(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nPrevious")
-        external fun _nPrevious(ptr: Long): Int
+        external fun _nPrevious(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nFirst")
-        external fun _nFirst(ptr: Long): Int
+        external fun _nFirst(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nLast")
-        external fun _nLast(ptr: Long): Int
+        external fun _nLast(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nPreceding")
-        external fun _nPreceding(ptr: Long, offset: Int): Int
+        external fun _nPreceding(ptr: NativePointer, offset: Int): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nFollowing")
-        external fun _nFollowing(ptr: Long, offset: Int): Int
+        external fun _nFollowing(ptr: NativePointer, offset: Int): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nIsBoundary")
-        external fun _nIsBoundary(ptr: Long, offset: Int): Boolean
+        external fun _nIsBoundary(ptr: NativePointer, offset: Int): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nGetRuleStatus")
-        external fun _nGetRuleStatus(ptr: Long): Int
+        external fun _nGetRuleStatus(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nGetRuleStatuses")
-        external fun _nGetRuleStatuses(ptr: Long): IntArray
+        external fun _nGetRuleStatuses(ptr: NativePointer): IntArray
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nSetText")
-        external fun _nSetText(ptr: Long, textPtr: Long)
+        external fun _nSetText(ptr: NativePointer, textPtr: NativePointer)
 
         init {
             staticLoad()

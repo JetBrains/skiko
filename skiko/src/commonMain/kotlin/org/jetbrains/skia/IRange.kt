@@ -27,10 +27,4 @@ class IRange(val start: Int, val end: Int) {
     override fun toString(): String {
         return "IRange(_start=" + start + ", _end=" + end + ")"
     }
-
-    companion object {
-        internal fun _makeFromLong(l: Long): IRange {
-            return IRange((l ushr 32).toInt(), (l and -1).toInt())
-        }
-    }
 }

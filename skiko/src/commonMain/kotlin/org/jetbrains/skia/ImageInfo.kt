@@ -1,5 +1,10 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.NULLPNTR
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.computeByteSize
+import org.jetbrains.skia.impl.minRowBytes
+
 /**
  *
  * Describes pixel dimensions and encoding. Bitmap, Image, Pixmap, and Surface
@@ -32,12 +37,12 @@ class ImageInfo(val colorInfo: ColorInfo, val width: Int, val height: Int) {
     ) : this(ColorInfo(colorType, alphaType, colorSpace), width, height) {
     }
 
-    internal constructor(width: Int, height: Int, colorType: Int, alphaType: Int, colorSpace: Long) : this(
+    internal constructor(width: Int, height: Int, colorType: Int, alphaType: Int, colorSpace: NativePointer) : this(
         width,
         height,
         ColorType.values()[colorType],
         ColorAlphaType.values()[alphaType],
-        if (colorSpace == 0L) null else ColorSpace(colorSpace)
+        if (colorSpace == NULLPNTR) null else ColorSpace(colorSpace)
     ) {
     }
 
@@ -119,14 +124,6 @@ class ImageInfo(val colorInfo: ColorInfo, val width: Int, val height: Int) {
         get() = colorInfo.shiftPerPixel
 
     /**
-     * Returns minimum bytes per row, computed from pixel getWidth() and ColorType, which
-     * specifies getBytesPerPixel(). Bitmap maximum value for row bytes must fit
-     * in 31 bits.
-     */
-    val minRowBytes: Long
-        get() = (width * bytesPerPixel).toLong()
-
-    /**
      *
      * Returns byte offset of pixel from pixel base address.
      *
@@ -145,22 +142,6 @@ class ImageInfo(val colorInfo: ColorInfo, val width: Int, val height: Int) {
         return colorInfo.colorType.computeOffset(x, y, rowBytes)
     }
 
-    /**
-     *
-     * Returns storage required by pixel array, given ImageInfo dimensions, ColorType,
-     * and rowBytes. rowBytes is assumed to be at least as large as [.getMinRowBytes].
-     *
-     *
-     * Returns zero if height is zero.
-     *
-     * @param rowBytes  size of pixel row or larger
-     * @return          memory required by pixel buffer
-     *
-     * @see [https://fiddle.skia.org/c/@ImageInfo_computeByteSize](https://fiddle.skia.org/c/@ImageInfo_computeByteSize)
-     */
-    fun computeByteSize(rowBytes: Long): Long {
-        return if (0 == height) 0 else (height - 1) * rowBytes + width * bytesPerPixel
-    }
 
     /**
      *
@@ -171,20 +152,8 @@ class ImageInfo(val colorInfo: ColorInfo, val width: Int, val height: Int) {
      *
      * @return  least memory required by pixel buffer
      */
-    fun computeMinByteSize(): Long {
+    fun computeMinByteSize(): NativePointer {
         return computeByteSize(minRowBytes)
-    }
-
-    /**
-     * Returns true if rowBytes is valid for this ImageInfo.
-     *
-     * @param rowBytes  size of pixel row including padding
-     * @return          true if rowBytes is large enough to contain pixel row and is properly aligned
-     */
-    fun isRowBytesValid(rowBytes: Long): Boolean {
-        if (rowBytes < minRowBytes) return false
-        val shift = shiftPerPixel
-        return rowBytes shr shift shl shift == rowBytes
     }
 
     override fun equals(o: Any?): Boolean {

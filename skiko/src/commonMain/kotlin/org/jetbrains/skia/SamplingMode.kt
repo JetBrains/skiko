@@ -1,12 +1,14 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.NativePointer
+
 /**
  * @see org.jetbrains.skia.FilterMipmap
  *
  * @see org.jetbrains.skia.CubicResampler
  */
 interface SamplingMode {
-    fun _pack(): Long
+    fun _pack(): NativePointer
 
     companion object {
         val DEFAULT: SamplingMode = FilterMipmap(FilterMode.NEAREST, MipmapMode.NONE)

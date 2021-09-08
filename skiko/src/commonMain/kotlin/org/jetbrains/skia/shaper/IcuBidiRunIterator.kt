@@ -6,6 +6,8 @@ import org.jetbrains.skia.ManagedString
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.getPtr
 import kotlin.jvm.JvmStatic
 
 class IcuBidiRunIterator(text: ManagedString?, manageText: Boolean, bidiLevel: Int) : ManagedRunIterator<BidiRun?>(
@@ -14,10 +16,10 @@ class IcuBidiRunIterator(text: ManagedString?, manageText: Boolean, bidiLevel: I
     companion object {
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_IcuBidiRunIterator__1nMake")
-        external fun _nMake(textPtr: Long, bidiLevel: Int): Long
+        external fun _nMake(textPtr: NativePointer, bidiLevel: Int): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_IcuBidiRunIterator__1nGetCurrentLevel")
-        external fun _nGetCurrentLevel(ptr: Long): Int
+        external fun _nGetCurrentLevel(ptr: NativePointer): Int
 
         init {
             staticLoad()

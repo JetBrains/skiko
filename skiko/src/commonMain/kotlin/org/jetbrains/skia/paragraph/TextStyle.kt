@@ -8,47 +8,50 @@ import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.NULLPNTR
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.getPtr
 import kotlin.jvm.JvmStatic
 
-class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
+class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetFinalizer")
-        external fun _nGetFinalizer(): Long
+        external fun _nGetFinalizer(): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nMake")
-        external fun _nMake(): Long
+        external fun _nMake(): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nEquals")
-        external fun _nEquals(ptr: Long, otherPtr: Long): Boolean
+        external fun _nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nAttributeEquals")
-        external fun _nAttributeEquals(ptr: Long, attribute: Int, otherPtr: Long): Boolean
+        external fun _nAttributeEquals(ptr: NativePointer, attribute: Int, otherPtr: NativePointer): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetColor")
-        external fun _nGetColor(ptr: Long): Int
+        external fun _nGetColor(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nSetColor")
-        external fun _nSetColor(ptr: Long, color: Int)
+        external fun _nSetColor(ptr: NativePointer, color: Int)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetForeground")
-        external fun _nGetForeground(ptr: Long): Long
+        external fun _nGetForeground(ptr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nSetForeground")
-        external fun _nSetForeground(ptr: Long, paintPtr: Long)
+        external fun _nSetForeground(ptr: NativePointer, paintPtr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetBackground")
-        external fun _nGetBackground(ptr: Long): Long
+        external fun _nGetBackground(ptr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nSetBackground")
-        external fun _nSetBackground(ptr: Long, paintPtr: Long)
+        external fun _nSetBackground(ptr: NativePointer, paintPtr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetDecorationStyle")
-        external fun _nGetDecorationStyle(ptr: Long): DecorationStyle
+        external fun _nGetDecorationStyle(ptr: NativePointer): DecorationStyle
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nSetDecorationStyle")
         external fun _nSetDecorationStyle(
-            ptr: Long,
+            ptr: NativePointer,
             underline: Boolean,
             overline: Boolean,
             lineThrough: Boolean,
@@ -60,85 +63,85 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetFontStyle")
-        external fun _nGetFontStyle(ptr: Long): Int
+        external fun _nGetFontStyle(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nSetFontStyle")
-        external fun _nSetFontStyle(ptr: Long, fontStyle: Int)
+        external fun _nSetFontStyle(ptr: NativePointer, fontStyle: Int)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetShadows")
-        external fun _nGetShadows(ptr: Long): Array<Shadow>
+        external fun _nGetShadows(ptr: NativePointer): Array<Shadow>
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nAddShadow")
-        external fun _nAddShadow(ptr: Long, color: Int, offsetX: Float, offsetY: Float, blurSigma: Double)
+        external fun _nAddShadow(ptr: NativePointer, color: Int, offsetX: Float, offsetY: Float, blurSigma: Double)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nClearShadows")
-        external fun _nClearShadows(ptr: Long)
+        external fun _nClearShadows(ptr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetFontFeatures")
-        external fun _nGetFontFeatures(ptr: Long): Array<FontFeature>
+        external fun _nGetFontFeatures(ptr: NativePointer): Array<FontFeature>
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nAddFontFeature")
-        external fun _nAddFontFeature(ptr: Long, name: String?, value: Int)
+        external fun _nAddFontFeature(ptr: NativePointer, name: String?, value: Int)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nClearFontFeatures")
-        external fun _nClearFontFeatures(ptr: Long)
+        external fun _nClearFontFeatures(ptr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetFontSize")
-        external fun _nGetFontSize(ptr: Long): Float
+        external fun _nGetFontSize(ptr: NativePointer): Float
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nSetFontSize")
-        external fun _nSetFontSize(ptr: Long, size: Float)
+        external fun _nSetFontSize(ptr: NativePointer, size: Float)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetFontFamilies")
-        external fun _nGetFontFamilies(ptr: Long): Array<String>
+        external fun _nGetFontFamilies(ptr: NativePointer): Array<String>
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nSetFontFamilies")
-        external fun _nSetFontFamilies(ptr: Long, families: Array<String>?)
+        external fun _nSetFontFamilies(ptr: NativePointer, families: Array<String>?)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetHeight")
-        external fun _nGetHeight(ptr: Long): Float?
+        external fun _nGetHeight(ptr: NativePointer): Float?
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nSetHeight")
-        external fun _nSetHeight(ptr: Long, override: Boolean, height: Float)
+        external fun _nSetHeight(ptr: NativePointer, override: Boolean, height: Float)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetLetterSpacing")
-        external fun _nGetLetterSpacing(ptr: Long): Float
+        external fun _nGetLetterSpacing(ptr: NativePointer): Float
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nSetLetterSpacing")
-        external fun _nSetLetterSpacing(ptr: Long, letterSpacing: Float)
+        external fun _nSetLetterSpacing(ptr: NativePointer, letterSpacing: Float)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetWordSpacing")
-        external fun _nGetWordSpacing(ptr: Long): Float
+        external fun _nGetWordSpacing(ptr: NativePointer): Float
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nSetWordSpacing")
-        external fun _nSetWordSpacing(ptr: Long, wordSpacing: Float)
+        external fun _nSetWordSpacing(ptr: NativePointer, wordSpacing: Float)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetTypeface")
-        external fun _nGetTypeface(ptr: Long): Long
+        external fun _nGetTypeface(ptr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nSetTypeface")
-        external fun _nSetTypeface(ptr: Long, typefacePtr: Long)
+        external fun _nSetTypeface(ptr: NativePointer, typefacePtr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetLocale")
-        external fun _nGetLocale(ptr: Long): String
+        external fun _nGetLocale(ptr: NativePointer): String
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nSetLocale")
-        external fun _nSetLocale(ptr: Long, locale: String?)
+        external fun _nSetLocale(ptr: NativePointer, locale: String?)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetBaselineMode")
-        external fun _nGetBaselineMode(ptr: Long): Int
+        external fun _nGetBaselineMode(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nSetBaselineMode")
-        external fun _nSetBaselineMode(ptr: Long, mode: Int)
+        external fun _nSetBaselineMode(ptr: NativePointer, mode: Int)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetFontMetrics")
-        external fun _nGetFontMetrics(ptr: Long): FontMetrics
+        external fun _nGetFontMetrics(ptr: NativePointer): FontMetrics
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nIsPlaceholder")
-        external fun _nIsPlaceholder(ptr: Long): Boolean
+        external fun _nIsPlaceholder(ptr: NativePointer): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nSetPlaceholder")
-        external fun _nSetPlaceholder(ptr: Long)
+        external fun _nSetPlaceholder(ptr: NativePointer)
 
         init {
             staticLoad()
@@ -197,7 +200,7 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
         get() = try {
             Stats.onNativeCall()
             val ptr = _nGetForeground(_ptr)
-            if (ptr == 0L) null else Paint(ptr, true)
+            if (ptr == NULLPNTR) null else Paint(ptr, true)
         } finally {
             reachabilityBarrier(this)
         }
@@ -222,7 +225,7 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
         get() = try {
             Stats.onNativeCall()
             val ptr = _nGetBackground(_ptr)
-            if (ptr == 0L) null else Paint(ptr, true)
+            if (ptr == NULLPNTR) null else Paint(ptr, true)
         } finally {
             reachabilityBarrier(this)
         }
@@ -429,7 +432,7 @@ class TextStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
         get() = try {
             Stats.onNativeCall()
             val ptr = _nGetTypeface(_ptr)
-            if (ptr == 0L) null else Typeface(ptr)
+            if (ptr == NULLPNTR) null else Typeface(ptr)
         } finally {
             reachabilityBarrier(this)
         }

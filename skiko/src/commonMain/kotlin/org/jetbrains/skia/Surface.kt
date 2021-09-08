@@ -6,6 +6,9 @@ import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.NULLPNTR
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.getPtr
 import kotlin.jvm.JvmStatic
 
 class Surface : RefCnt {
@@ -43,8 +46,8 @@ class Surface : RefCnt {
          */
         fun makeRasterDirect(
             imageInfo: ImageInfo,
-            pixelsPtr: Long,
-            rowBytes: Long
+            pixelsPtr: NativePointer,
+            rowBytes: NativePointer
         ): Surface {
             return makeRasterDirect(imageInfo, pixelsPtr, rowBytes, null)
         }
@@ -58,7 +61,7 @@ class Surface : RefCnt {
                 val ptr = _nMakeRasterDirectWithPixmap(
                     getPtr(pixmap), surfaceProps
                 )
-                require(ptr != 0L) {
+                require(ptr != NULLPNTR) {
                     "Failed Surface.makeRasterDirect($pixmap, $surfaceProps)"
                 }
                 Surface(ptr)
@@ -98,8 +101,8 @@ class Surface : RefCnt {
          */
         fun makeRasterDirect(
             imageInfo: ImageInfo,
-            pixelsPtr: Long,
-            rowBytes: Long,
+            pixelsPtr: NativePointer,
+            rowBytes: NativePointer,
             surfaceProps: SurfaceProps?
         ): Surface {
             return try {
@@ -114,7 +117,7 @@ class Surface : RefCnt {
                     rowBytes,
                     surfaceProps
                 )
-                require(ptr != 0L) {
+                require(ptr != NULLPNTR) {
                     "Failed Surface.makeRasterDirect($imageInfo, $pixelsPtr, $rowBytes, $surfaceProps)"
                 }
                 Surface(ptr)
@@ -140,7 +143,7 @@ class Surface : RefCnt {
          * @return              new Surface
          */
         fun makeRaster(imageInfo: ImageInfo): Surface {
-            return makeRaster(imageInfo, 0, null)
+            return makeRaster(imageInfo, NULLPNTR, null)
         }
 
         /**
@@ -167,7 +170,7 @@ class Surface : RefCnt {
          */
         fun makeRaster(
             imageInfo: ImageInfo,
-            rowBytes: Long
+            rowBytes: NativePointer
         ): Surface {
             return makeRaster(imageInfo, rowBytes, null)
         }
@@ -198,7 +201,7 @@ class Surface : RefCnt {
          */
         fun makeRaster(
             imageInfo: ImageInfo,
-            rowBytes: Long,
+            rowBytes: NativePointer,
             surfaceProps: SurfaceProps?
         ): Surface {
             return try {
@@ -212,7 +215,7 @@ class Surface : RefCnt {
                     rowBytes,
                     surfaceProps
                 )
-                require(ptr != 0L) {
+                require(ptr != NULLPNTR) {
                     "Failed Surface.makeRaster($imageInfo, $rowBytes, $surfaceProps)"
                 }
                 Surface(ptr)
@@ -283,7 +286,7 @@ class Surface : RefCnt {
                     getPtr(colorSpace),
                     surfaceProps
                 )
-                require(ptr != 0L) {
+                require(ptr != NULLPNTR) {
                     "Failed Surface.makeFromBackendRenderTarget($context, $rt, $origin, $colorFormat, $colorSpace)"
                 }
                 Surface(ptr, context, rt)
@@ -296,7 +299,7 @@ class Surface : RefCnt {
 
         fun makeFromMTKView(
             context: DirectContext,
-            mtkViewPtr: Long,
+            mtkViewPtr: NativePointer,
             origin: SurfaceOrigin,
             sampleCount: Int,
             colorFormat: SurfaceColorFormat,
@@ -314,7 +317,7 @@ class Surface : RefCnt {
                     getPtr(colorSpace),
                     surfaceProps
                 )
-                require(ptr != 0L) {
+                require(ptr != NULLPNTR) {
                     "Failed Surface.makeFromMTKView($context, $mtkViewPtr $origin, $colorFormat, $surfaceProps)"
                 }
                 Surface(ptr, context)
@@ -350,7 +353,7 @@ class Surface : RefCnt {
         fun makeRasterN32Premul(width: Int, height: Int): Surface {
             Stats.onNativeCall()
             val ptr = _nMakeRasterN32Premul(width, height)
-            require(ptr != 0L) { "Failed Surface.makeRasterN32Premul($width, $height)" }
+            require(ptr != NULLPNTR) { "Failed Surface.makeRasterN32Premul($width, $height)" }
             return Surface(ptr)
         }
 
@@ -500,7 +503,7 @@ class Surface : RefCnt {
                     surfaceProps,
                     shouldCreateWithMips
                 )
-                require(ptr != 0L) {
+                require(ptr != NULLPNTR) {
                     "Failed Surface.makeRenderTarget($context, $budgeted, $imageInfo, $sampleCount, $origin, $surfaceProps, $shouldCreateWithMips)"
                 }
                 Surface(ptr, context)
@@ -523,7 +526,7 @@ class Surface : RefCnt {
         fun makeNull(width: Int, height: Int): Surface {
             Stats.onNativeCall()
             val ptr = _nMakeNull(width, height)
-            require(ptr != 0L) { "Failed Surface.makeNull($width, $height)" }
+            require(ptr != NULLPNTR) { "Failed Surface.makeNull($width, $height)" }
             return Surface(ptr)
         }
 
@@ -534,15 +537,15 @@ class Surface : RefCnt {
             height: Int,
             colorType: Int,
             alphaType: Int,
-            colorSpacePtr: Long,
-            pixelsPtr: Long,
-            rowBytes: Long,
+            colorSpacePtr: NativePointer,
+            pixelsPtr: NativePointer,
+            rowBytes: NativePointer,
             surfaceProps: SurfaceProps?
-        ): Long
+        ): NativePointer
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeRasterDirectWithPixmap")
-        external fun _nMakeRasterDirectWithPixmap(pixmapPtr: Long, surfaceProps: SurfaceProps?): Long
+        external fun _nMakeRasterDirectWithPixmap(pixmapPtr: NativePointer, surfaceProps: SurfaceProps?): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeRaster")
         external fun _nMakeRaster(
@@ -550,124 +553,124 @@ class Surface : RefCnt {
             height: Int,
             colorType: Int,
             alphaType: Int,
-            colorSpacePtr: Long,
-            rowBytes: Long,
+            colorSpacePtr: NativePointer,
+            rowBytes: NativePointer,
             surfaceProps: SurfaceProps?
-        ): Long
+        ): NativePointer
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeRasterN32Premul")
-        external fun _nMakeRasterN32Premul(width: Int, height: Int): Long
+        external fun _nMakeRasterN32Premul(width: Int, height: Int): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeFromBackendRenderTarget")
         external fun _nMakeFromBackendRenderTarget(
-            pContext: Long,
-            pBackendRenderTarget: Long,
+            pContext: NativePointer,
+            pBackendRenderTarget: NativePointer,
             surfaceOrigin: Int,
             colorType: Int,
-            colorSpacePtr: Long,
+            colorSpacePtr: NativePointer,
             surfaceProps: SurfaceProps?
-        ): Long
+        ): NativePointer
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeFromMTKView")
         external fun _nMakeFromMTKView(
-            contextPtr: Long,
-            mtkViewPtr: Long,
+            contextPtr: NativePointer,
+            mtkViewPtr: NativePointer,
             surfaceOrigin: Int,
             sampleCount: Int,
             colorType: Int,
-            colorSpacePtr: Long,
+            colorSpacePtr: NativePointer,
             surfaceProps: SurfaceProps?
-        ): Long
+        ): NativePointer
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeRenderTarget")
         external fun _nMakeRenderTarget(
-            contextPtr: Long,
+            contextPtr: NativePointer,
             budgeted: Boolean,
             width: Int,
             height: Int,
             colorType: Int,
             alphaType: Int,
-            colorSpacePtr: Long,
+            colorSpacePtr: NativePointer,
             sampleCount: Int,
             surfaceOrigin: Int,
             surfaceProps: SurfaceProps?,
             shouldCreateWithMips: Boolean
-        ): Long
+        ): NativePointer
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeNull")
-        external fun _nMakeNull(width: Int, height: Int): Long
+        external fun _nMakeNull(width: Int, height: Int): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Surface__1nGetWidth")
-        external fun _nGetWidth(ptr: Long): Int
+        external fun _nGetWidth(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Surface__1nGetHeight")
-        external fun _nGetHeight(ptr: Long): Int
+        external fun _nGetHeight(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Surface__1nGetImageInfo")
-        external fun _nGetImageInfo(ptr: Long): ImageInfo
+        external fun _nGetImageInfo(ptr: NativePointer): ImageInfo
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Surface__1nGenerationId")
-        external fun _nGenerationId(ptr: Long): Int
+        external fun _nGenerationId(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Surface__1nNotifyContentWillChange")
-        external fun _nNotifyContentWillChange(ptr: Long, mode: Int)
+        external fun _nNotifyContentWillChange(ptr: NativePointer, mode: Int)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Surface__1nGetRecordingContext")
-        external fun _nGetRecordingContext(ptr: Long): Long
+        external fun _nGetRecordingContext(ptr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Surface__1nGetCanvas")
-        external fun _nGetCanvas(ptr: Long): Long
+        external fun _nGetCanvas(ptr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeSurfaceI")
         external fun _nMakeSurfaceI(
-            ptr: Long,
+            ptr: NativePointer,
             width: Int,
             height: Int,
             colorType: Int,
             alphaType: Int,
-            colorSpacePtr: Long
-        ): Long
+            colorSpacePtr: NativePointer
+        ): NativePointer
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeSurface")
-        external fun _nMakeSurface(ptr: Long, width: Int, height: Int): Long
+        external fun _nMakeSurface(ptr: NativePointer, width: Int, height: Int): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeImageSnapshot")
-        external fun _nMakeImageSnapshot(ptr: Long): Long
+        external fun _nMakeImageSnapshot(ptr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeImageSnapshotR")
-        external fun _nMakeImageSnapshotR(ptr: Long, left: Int, top: Int, right: Int, bottom: Int): Long
+        external fun _nMakeImageSnapshotR(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Surface__1nDraw")
-        external fun _nDraw(ptr: Long, canvasPtr: Long, x: Float, y: Float, paintPtr: Long)
+        external fun _nDraw(ptr: NativePointer, canvasPtr: NativePointer, x: Float, y: Float, paintPtr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Surface__1nPeekPixels")
-        external fun _nPeekPixels(ptr: Long, pixmapPtr: Long): Boolean
+        external fun _nPeekPixels(ptr: NativePointer, pixmapPtr: NativePointer): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Surface__1nReadPixelsToPixmap")
-        external fun _nReadPixelsToPixmap(ptr: Long, pixmapPtr: Long, srcX: Int, srcY: Int): Boolean
+        external fun _nReadPixelsToPixmap(ptr: NativePointer, pixmapPtr: NativePointer, srcX: Int, srcY: Int): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Surface__1nReadPixels")
-        external fun _nReadPixels(ptr: Long, bitmapPtr: Long, srcX: Int, srcY: Int): Boolean
+        external fun _nReadPixels(ptr: NativePointer, bitmapPtr: NativePointer, srcX: Int, srcY: Int): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Surface__1nWritePixelsFromPixmap")
-        external fun _nWritePixelsFromPixmap(ptr: Long, pixmapPtr: Long, x: Int, y: Int)
+        external fun _nWritePixelsFromPixmap(ptr: NativePointer, pixmapPtr: NativePointer, x: Int, y: Int)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Surface__1nWritePixels")
-        external fun _nWritePixels(ptr: Long, bitmapPtr: Long, x: Int, y: Int)
+        external fun _nWritePixels(ptr: NativePointer, bitmapPtr: NativePointer, x: Int, y: Int)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Surface__1nFlushAndSubmit")
-        external fun _nFlushAndSubmit(ptr: Long, syncCpu: Boolean)
+        external fun _nFlushAndSubmit(ptr: NativePointer, syncCpu: Boolean)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Surface__1nFlush")
-        external fun _nFlush(ptr: Long)
+        external fun _nFlush(ptr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Surface__1nUnique")
-        external fun _nUnique(ptr: Long): Boolean
+        external fun _nUnique(ptr: NativePointer): Boolean
 
         init {
             staticLoad()
@@ -768,7 +771,7 @@ class Surface : RefCnt {
         get() = try {
             Stats.onNativeCall()
             val ptr = _nGetRecordingContext(_ptr)
-            if (ptr == 0L) null else DirectContext(ptr)
+            if (ptr == NULLPNTR) null else DirectContext(ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -787,7 +790,7 @@ class Surface : RefCnt {
         get() = try {
             Stats.onNativeCall()
             val ptr = _nGetCanvas(_ptr)
-            if (ptr == 0L) throw IllegalArgumentException() else Canvas(ptr, false, this)
+            if (ptr == NULLPNTR) throw IllegalArgumentException() else Canvas(ptr, false, this)
         } finally {
             reachabilityBarrier(this)
         }
@@ -1114,17 +1117,17 @@ class Surface : RefCnt {
             reachabilityBarrier(this)
         }
 
-    internal constructor(ptr: Long) : super(ptr) {
+    internal constructor(ptr: NativePointer) : super(ptr) {
         _context = null
         _renderTarget = null
     }
 
-    internal constructor(ptr: Long, context: DirectContext?) : super(ptr) {
+    internal constructor(ptr: NativePointer, context: DirectContext?) : super(ptr) {
         _context = context
         _renderTarget = null
     }
 
-    internal constructor(ptr: Long, context: DirectContext?, renderTarget: BackendRenderTarget?) : super(ptr) {
+    internal constructor(ptr: NativePointer, context: DirectContext?, renderTarget: BackendRenderTarget?) : super(ptr) {
         _context = context
         _renderTarget = renderTarget
     }

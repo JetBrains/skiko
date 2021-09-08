@@ -6,9 +6,12 @@ import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.NULLPNTR
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.getPtr
 import kotlin.jvm.JvmStatic
 
-class Picture internal constructor(ptr: Long) : RefCnt(ptr) {
+class Picture internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
         /**
          * Recreates Picture that was serialized into data. Returns constructed Picture
@@ -19,7 +22,7 @@ class Picture internal constructor(ptr: Long) : RefCnt(ptr) {
             return try {
                 Stats.onNativeCall()
                 val ptr = _nMakeFromData(getPtr(data))
-                if (ptr == 0L) null else Picture(ptr)
+                if (ptr == NULLPNTR) null else Picture(ptr)
             } finally {
                 reachabilityBarrier(data)
             }
@@ -47,38 +50,38 @@ class Picture internal constructor(ptr: Long) : RefCnt(ptr) {
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Picture__1nMakeFromData")
-        external fun _nMakeFromData(dataPtr: Long /*, SkDeserialProcs */): Long
+        external fun _nMakeFromData(dataPtr: NativePointer /*, SkDeserialProcs */): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Picture__1nPlayback")
-        external fun _nPlayback(ptr: Long, canvasPtr: Long, abort: BooleanSupplier?)
+        external fun _nPlayback(ptr: NativePointer, canvasPtr: NativePointer, abort: BooleanSupplier?)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Picture__1nGetCullRect")
-        external fun _nGetCullRect(ptr: Long): Rect
+        external fun _nGetCullRect(ptr: NativePointer): Rect
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Picture__1nGetUniqueId")
-        external fun _nGetUniqueId(ptr: Long): Int
+        external fun _nGetUniqueId(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Picture__1nSerializeToData")
-        external fun _nSerializeToData(ptr: Long /*, SkSerialProcs */): Long
+        external fun _nSerializeToData(ptr: NativePointer /*, SkSerialProcs */): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Picture__1nMakePlaceholder")
-        external fun _nMakePlaceholder(left: Float, top: Float, right: Float, bottom: Float): Long
+        external fun _nMakePlaceholder(left: Float, top: Float, right: Float, bottom: Float): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Picture__1nGetApproximateOpCount")
-        external fun _nGetApproximateOpCount(ptr: Long): Int
+        external fun _nGetApproximateOpCount(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Picture__1nGetApproximateBytesUsed")
-        external fun _nGetApproximateBytesUsed(ptr: Long): Long
+        external fun _nGetApproximateBytesUsed(ptr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Picture__1nMakeShader")
         external fun _nMakeShader(
-            ptr: Long,
+            ptr: NativePointer,
             tmx: Int,
             tmy: Int,
             filterMode: Int,
             localMatrix: FloatArray?,
             tileRect: Rect?
-        ): Long
+        ): NativePointer
 
         init {
             staticLoad()
@@ -197,7 +200,7 @@ class Picture internal constructor(ptr: Long) : RefCnt(ptr) {
      *
      * @see [https://fiddle.skia.org/c/@Picture_approximateBytesUsed](https://fiddle.skia.org/c/@Picture_approximateBytesUsed)
      */
-    val approximateBytesUsed: Long
+    val approximateBytesUsed: NativePointer
         get() = try {
             Stats.onNativeCall()
             _nGetApproximateBytesUsed(_ptr)

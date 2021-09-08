@@ -7,9 +7,12 @@ import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.NULLPNTR
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.getPtr
 import kotlin.jvm.JvmStatic
 
-class AnimationBuilder internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
+class AnimationBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
         internal fun _flagsToInt(vararg builderFlags: AnimationBuilderFlag): Int {
             var flags = 0
@@ -19,25 +22,25 @@ class AnimationBuilder internal constructor(ptr: Long) : Managed(ptr, _Finalizer
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nGetFinalizer")
-        external fun _nGetFinalizer(): Long
+        external fun _nGetFinalizer(): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nMake")
-        external fun _nMake(flags: Int): Long
+        external fun _nMake(flags: Int): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nSetFontManager")
-        external fun _nSetFontManager(ptr: Long, fontMgrPtr: Long)
+        external fun _nSetFontManager(ptr: NativePointer, fontMgrPtr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nSetLogger")
-        external fun _nSetLogger(ptr: Long, loggerPtr: Long)
+        external fun _nSetLogger(ptr: NativePointer, loggerPtr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromString")
-        external fun _nBuildFromString(ptr: Long, data: String?): Long
+        external fun _nBuildFromString(ptr: NativePointer, data: String?): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromFile")
-        external fun _nBuildFromFile(ptr: Long, path: String?): Long
+        external fun _nBuildFromFile(ptr: NativePointer, path: String?): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromData")
-        external fun _nBuildFromData(ptr: Long, dataPtr: Long): Long
+        external fun _nBuildFromData(ptr: NativePointer, dataPtr: NativePointer): NativePointer
 
         init {
             staticLoad()
@@ -85,7 +88,7 @@ class AnimationBuilder internal constructor(ptr: Long) : Managed(ptr, _Finalizer
         return try {
             Stats.onNativeCall()
             val ptr = _nBuildFromString(_ptr, data)
-            require(ptr != 0L) { "Failed to create Animation from string: \"$data\"" }
+            require(ptr != NULLPNTR) { "Failed to create Animation from string: \"$data\"" }
             Animation(ptr)
         } finally {
             reachabilityBarrier(this)
@@ -96,7 +99,7 @@ class AnimationBuilder internal constructor(ptr: Long) : Managed(ptr, _Finalizer
         return try {
             Stats.onNativeCall()
             val ptr = _nBuildFromFile(_ptr, path)
-            require(ptr != 0L) { "Failed to create Animation from path: $path" }
+            require(ptr != NULLPNTR) { "Failed to create Animation from path: $path" }
             Animation(ptr)
         } finally {
             reachabilityBarrier(this)
@@ -108,7 +111,7 @@ class AnimationBuilder internal constructor(ptr: Long) : Managed(ptr, _Finalizer
             Stats.onNativeCall()
             val ptr =
                 _nBuildFromData(_ptr, getPtr(data))
-            require(ptr != 0L) { "Failed to create Animation from data" }
+            require(ptr != NULLPNTR) { "Failed to create Animation from data" }
             Animation(ptr)
         } finally {
             reachabilityBarrier(this)

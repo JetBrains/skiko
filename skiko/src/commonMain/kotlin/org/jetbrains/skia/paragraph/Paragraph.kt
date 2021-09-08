@@ -7,47 +7,50 @@ import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.toIRange
 import kotlin.jvm.JvmStatic
 
-class Paragraph internal constructor(ptr: Long, text: ManagedString?) : Managed(ptr, _FinalizerHolder.PTR) {
+class Paragraph internal constructor(ptr: NativePointer, text: ManagedString?) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetFinalizer")
-        external fun _nGetFinalizer(): Long
+        external fun _nGetFinalizer(): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetMaxWidth")
-        external fun _nGetMaxWidth(ptr: Long): Float
+        external fun _nGetMaxWidth(ptr: NativePointer): Float
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetHeight")
-        external fun _nGetHeight(ptr: Long): Float
+        external fun _nGetHeight(ptr: NativePointer): Float
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetMinIntrinsicWidth")
-        external fun _nGetMinIntrinsicWidth(ptr: Long): Float
+        external fun _nGetMinIntrinsicWidth(ptr: NativePointer): Float
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetMaxIntrinsicWidth")
-        external fun _nGetMaxIntrinsicWidth(ptr: Long): Float
+        external fun _nGetMaxIntrinsicWidth(ptr: NativePointer): Float
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetAlphabeticBaseline")
-        external fun _nGetAlphabeticBaseline(ptr: Long): Float
+        external fun _nGetAlphabeticBaseline(ptr: NativePointer): Float
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetIdeographicBaseline")
-        external fun _nGetIdeographicBaseline(ptr: Long): Float
+        external fun _nGetIdeographicBaseline(ptr: NativePointer): Float
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetLongestLine")
-        external fun _nGetLongestLine(ptr: Long): Float
+        external fun _nGetLongestLine(ptr: NativePointer): Float
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nDidExceedMaxLines")
-        external fun _nDidExceedMaxLines(ptr: Long): Boolean
+        external fun _nDidExceedMaxLines(ptr: NativePointer): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nLayout")
-        external fun _nLayout(ptr: Long, width: Float)
+        external fun _nLayout(ptr: NativePointer, width: Float)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nPaint")
-        external fun _nPaint(ptr: Long, canvasPtr: Long, x: Float, y: Float): Long
+        external fun _nPaint(ptr: NativePointer, canvasPtr: NativePointer, x: Float, y: Float): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetRectsForRange")
         external fun _nGetRectsForRange(
-            ptr: Long,
+            ptr: NativePointer,
             start: Int,
             end: Int,
             rectHeightMode: Int,
@@ -56,38 +59,38 @@ class Paragraph internal constructor(ptr: Long, text: ManagedString?) : Managed(
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetRectsForPlaceholders")
-        external fun _nGetRectsForPlaceholders(ptr: Long): Array<TextBox>
+        external fun _nGetRectsForPlaceholders(ptr: NativePointer): Array<TextBox>
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetGlyphPositionAtCoordinate")
-        external fun _nGetGlyphPositionAtCoordinate(ptr: Long, dx: Float, dy: Float): Int
+        external fun _nGetGlyphPositionAtCoordinate(ptr: NativePointer, dx: Float, dy: Float): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetWordBoundary")
-        external fun _nGetWordBoundary(ptr: Long, offset: Int): Long
+        external fun _nGetWordBoundary(ptr: NativePointer, offset: Int): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetLineMetrics")
-        external fun _nGetLineMetrics(ptr: Long, textPtr: Long): Array<LineMetrics?>
+        external fun _nGetLineMetrics(ptr: NativePointer, textPtr: NativePointer): Array<LineMetrics?>
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetLineNumber")
-        external fun _nGetLineNumber(ptr: Long): Long
+        external fun _nGetLineNumber(ptr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nMarkDirty")
-        external fun _nMarkDirty(ptr: Long)
+        external fun _nMarkDirty(ptr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetUnresolvedGlyphsCount")
-        external fun _nGetUnresolvedGlyphsCount(ptr: Long): Int
+        external fun _nGetUnresolvedGlyphsCount(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nUpdateAlignment")
-        external fun _nUpdateAlignment(ptr: Long, Align: Int)
+        external fun _nUpdateAlignment(ptr: NativePointer, Align: Int)
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nUpdateFontSize")
-        external fun _nUpdateFontSize(ptr: Long, from: Int, to: Int, size: Float, textPtr: Long)
+        external fun _nUpdateFontSize(ptr: NativePointer, from: Int, to: Int, size: Float, textPtr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nUpdateForegroundPaint")
-        external fun _nUpdateForegroundPaint(ptr: Long, from: Int, to: Int, paintPtr: Long, textPtr: Long)
+        external fun _nUpdateForegroundPaint(ptr: NativePointer, from: Int, to: Int, paintPtr: NativePointer, textPtr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nUpdateBackgroundPaint")
-        external fun _nUpdateBackgroundPaint(ptr: Long, from: Int, to: Int, paintPtr: Long, textPtr: Long)
+        external fun _nUpdateBackgroundPaint(ptr: NativePointer, from: Int, to: Int, paintPtr: NativePointer, textPtr: NativePointer)
 
         init {
             staticLoad()
@@ -220,7 +223,7 @@ class Paragraph internal constructor(ptr: Long, text: ManagedString?) : Managed(
     fun getWordBoundary(offset: Int): IRange {
         return try {
             Stats.onNativeCall()
-            IRange.Companion._makeFromLong(_nGetWordBoundary(_ptr, offset))
+            toIRange(_nGetWordBoundary(_ptr, offset))
         } finally {
             reachabilityBarrier(this)
         }
@@ -238,7 +241,7 @@ class Paragraph internal constructor(ptr: Long, text: ManagedString?) : Managed(
             reachabilityBarrier(this)
             reachabilityBarrier(_text)
         }
-    val lineNumber: Long
+    val lineNumber: NativePointer
         get() = try {
             Stats.onNativeCall()
             _nGetLineNumber(_ptr)

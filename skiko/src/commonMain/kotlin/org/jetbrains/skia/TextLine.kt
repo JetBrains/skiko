@@ -6,7 +6,7 @@ import org.jetbrains.skia.shaper.*
 import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 
-class TextLine internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
+class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
         fun make(text: String?, font: Font?): TextLine {
             return make(text, font, ShapingOptions.DEFAULT)
@@ -18,55 +18,55 @@ class TextLine internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.P
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetFinalizer")
-        external fun _nGetFinalizer(): Long
+        external fun _nGetFinalizer(): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetAscent")
-        external fun _nGetAscent(ptr: Long): Float
+        external fun _nGetAscent(ptr: NativePointer): Float
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetCapHeight")
-        external fun _nGetCapHeight(ptr: Long): Float
+        external fun _nGetCapHeight(ptr: NativePointer): Float
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetXHeight")
-        external fun _nGetXHeight(ptr: Long): Float
+        external fun _nGetXHeight(ptr: NativePointer): Float
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetDescent")
-        external fun _nGetDescent(ptr: Long): Float
+        external fun _nGetDescent(ptr: NativePointer): Float
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetLeading")
-        external fun _nGetLeading(ptr: Long): Float
+        external fun _nGetLeading(ptr: NativePointer): Float
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetWidth")
-        external fun _nGetWidth(ptr: Long): Float
+        external fun _nGetWidth(ptr: NativePointer): Float
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetHeight")
-        external fun _nGetHeight(ptr: Long): Float
+        external fun _nGetHeight(ptr: NativePointer): Float
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetTextBlob")
-        external fun _nGetTextBlob(ptr: Long): Long
+        external fun _nGetTextBlob(ptr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetGlyphs")
-        external fun _nGetGlyphs(ptr: Long): ShortArray
+        external fun _nGetGlyphs(ptr: NativePointer): ShortArray
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetPositions")
-        external fun _nGetPositions(ptr: Long): FloatArray
+        external fun _nGetPositions(ptr: NativePointer): FloatArray
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetRunPositions")
-        external fun _nGetRunPositions(ptr: Long): FloatArray?
+        external fun _nGetRunPositions(ptr: NativePointer): FloatArray?
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetBreakPositions")
-        external fun _nGetBreakPositions(ptr: Long): FloatArray?
+        external fun _nGetBreakPositions(ptr: NativePointer): FloatArray?
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetBreakOffsets")
-        external fun _nGetBreakOffsets(ptr: Long): IntArray?
+        external fun _nGetBreakOffsets(ptr: NativePointer): IntArray?
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetOffsetAtCoord")
-        external fun _nGetOffsetAtCoord(ptr: Long, x: Float): Int
+        external fun _nGetOffsetAtCoord(ptr: NativePointer, x: Float): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetLeftOffsetAtCoord")
-        external fun _nGetLeftOffsetAtCoord(ptr: Long, x: Float): Int
+        external fun _nGetLeftOffsetAtCoord(ptr: NativePointer, x: Float): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetCoordAtOffset")
-        external fun _nGetCoordAtOffset(ptr: Long, offset: Int): Float
+        external fun _nGetCoordAtOffset(ptr: NativePointer, offset: Int): Float
 
         init {
             Library.staticLoad()
@@ -145,7 +145,7 @@ class TextLine internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.P
             Stats.onNativeCall()
             return try {
                 val res = _nGetTextBlob(_ptr)
-                if (res == 0L) null else TextBlob(res)
+                if (res == NULLPNTR) null else TextBlob(res)
             } finally {
                 reachabilityBarrier(this)
             }

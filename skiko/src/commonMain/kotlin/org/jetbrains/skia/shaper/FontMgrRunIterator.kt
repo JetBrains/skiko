@@ -7,19 +7,21 @@ import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.getPtr
 import kotlin.jvm.JvmStatic
 
 class FontMgrRunIterator(text: ManagedString?, manageText: Boolean, font: Font?, opts: ShapingOptions) :
     ManagedRunIterator<FontRun?>(
-        _nMake(Native.getPtr(text), Native.getPtr(font), opts), text, manageText
+        _nMake(getPtr(text), getPtr(font), opts), text, manageText
     ) {
     companion object {
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_FontMgrRunIterator__1nMake")
-        external fun _nMake(textPtr: Long, fontPtr: Long, opts: ShapingOptions?): Long
+        external fun _nMake(textPtr: NativePointer, fontPtr: NativePointer, opts: ShapingOptions?): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_FontMgrRunIterator__1nGetCurrentFont")
-        external fun _nGetCurrentFont(ptr: Long): Long
+        external fun _nGetCurrentFont(ptr: NativePointer): NativePointer
 
         init {
             staticLoad()

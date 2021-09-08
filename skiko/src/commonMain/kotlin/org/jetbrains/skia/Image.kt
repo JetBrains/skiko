@@ -6,9 +6,12 @@ import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.NULLPNTR
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.getPtr
 import kotlin.jvm.JvmStatic
 
-class Image internal constructor(ptr: Long) : RefCnt(ptr), IHasImageInfo {
+class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInfo {
     companion object {
         /**
          *
@@ -31,7 +34,7 @@ class Image internal constructor(ptr: Long) : RefCnt(ptr), IHasImageInfo {
          *
          * @see [https://fiddle.skia.org/c/@Image_MakeRasterCopy](https://fiddle.skia.org/c/@Image_MakeRasterCopy)
          */
-        fun makeRaster(imageInfo: ImageInfo, bytes: ByteArray, rowBytes: Long): Image {
+        fun makeRaster(imageInfo: ImageInfo, bytes: ByteArray, rowBytes: NativePointer): Image {
             return try {
                 Stats.onNativeCall()
                 val ptr = _nMakeRaster(
@@ -43,7 +46,7 @@ class Image internal constructor(ptr: Long) : RefCnt(ptr), IHasImageInfo {
                     bytes,
                     rowBytes
                 )
-                if (ptr == 0L) throw RuntimeException("Failed to makeRaster $imageInfo $bytes $rowBytes")
+                if (ptr == NULLPNTR) throw RuntimeException("Failed to makeRaster $imageInfo $bytes $rowBytes")
                 Image(ptr)
             } finally {
                 reachabilityBarrier(imageInfo.colorInfo.colorSpace)
@@ -69,7 +72,7 @@ class Image internal constructor(ptr: Long) : RefCnt(ptr), IHasImageInfo {
          * @param rowBytes   how many bytes in a row
          * @return           Image
          */
-        fun makeRaster(imageInfo: ImageInfo, data: Data, rowBytes: Long): Image {
+        fun makeRaster(imageInfo: ImageInfo, data: Data, rowBytes: NativePointer): Image {
             return try {
                 Stats.onNativeCall()
                 val ptr = _nMakeRasterData(
@@ -81,7 +84,7 @@ class Image internal constructor(ptr: Long) : RefCnt(ptr), IHasImageInfo {
                     getPtr(data),
                     rowBytes
                 )
-                if (ptr == 0L) throw RuntimeException("Failed to makeRaster $imageInfo $data $rowBytes")
+                if (ptr == NULLPNTR) throw RuntimeException("Failed to makeRaster $imageInfo $data $rowBytes")
                 Image(ptr)
             } finally {
                 reachabilityBarrier(imageInfo.colorInfo.colorSpace)
@@ -116,7 +119,7 @@ class Image internal constructor(ptr: Long) : RefCnt(ptr), IHasImageInfo {
                 Stats.onNativeCall()
                 val ptr =
                     _nMakeFromBitmap(getPtr(bitmap))
-                if (ptr == 0L) throw RuntimeException("Failed to Image::makeFromBitmap $bitmap")
+                if (ptr == NULLPNTR) throw RuntimeException("Failed to Image::makeFromBitmap $bitmap")
                 Image(ptr)
             } finally {
                 reachabilityBarrier(bitmap)
@@ -129,7 +132,7 @@ class Image internal constructor(ptr: Long) : RefCnt(ptr), IHasImageInfo {
                 Stats.onNativeCall()
                 val ptr =
                     _nMakeFromPixmap(getPtr(pixmap))
-                if (ptr == 0L) throw RuntimeException("Failed to Image::makeFromRaster $pixmap")
+                if (ptr == NULLPNTR) throw RuntimeException("Failed to Image::makeFromRaster $pixmap")
                 Image(ptr)
             } finally {
                 reachabilityBarrier(pixmap)
@@ -139,7 +142,7 @@ class Image internal constructor(ptr: Long) : RefCnt(ptr), IHasImageInfo {
         fun makeFromEncoded(bytes: ByteArray?): Image {
             Stats.onNativeCall()
             val ptr = _nMakeFromEncoded(bytes)
-            require(ptr != 0L) { "Failed to Image::makeFromEncoded" }
+            require(ptr != NULLPNTR) { "Failed to Image::makeFromEncoded" }
             return Image(ptr)
         }
 
@@ -150,10 +153,10 @@ class Image internal constructor(ptr: Long) : RefCnt(ptr), IHasImageInfo {
             height: Int,
             colorType: Int,
             alphaType: Int,
-            colorSpacePtr: Long,
+            colorSpacePtr: NativePointer,
             pixels: ByteArray?,
-            rowBytes: Long
-        ): Long
+            rowBytes: NativePointer
+        ): NativePointer
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeRasterData")
@@ -162,44 +165,44 @@ class Image internal constructor(ptr: Long) : RefCnt(ptr), IHasImageInfo {
             height: Int,
             colorType: Int,
             alphaType: Int,
-            colorSpacePtr: Long,
-            dataPtr: Long,
-            rowBytes: Long
-        ): Long
+            colorSpacePtr: NativePointer,
+            dataPtr: NativePointer,
+            rowBytes: NativePointer
+        ): NativePointer
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeFromBitmap")
-        external fun _nMakeFromBitmap(bitmapPtr: Long): Long
+        external fun _nMakeFromBitmap(bitmapPtr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeFromPixmap")
-        external fun _nMakeFromPixmap(pixmapPtr: Long): Long
+        external fun _nMakeFromPixmap(pixmapPtr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeFromEncoded")
-        external fun _nMakeFromEncoded(bytes: ByteArray?): Long
+        external fun _nMakeFromEncoded(bytes: ByteArray?): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Image__1nGetImageInfo")
-        external fun _nGetImageInfo(ptr: Long): ImageInfo?
+        external fun _nGetImageInfo(ptr: NativePointer): ImageInfo?
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Image__1nEncodeToData")
-        external fun _nEncodeToData(ptr: Long, format: Int, quality: Int): Long
+        external fun _nEncodeToData(ptr: NativePointer, format: Int, quality: Int): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeShader")
-        external fun _nMakeShader(ptr: Long, tmx: Int, tmy: Int, samplingMode: Long, localMatrix: FloatArray?): Long
+        external fun _nMakeShader(ptr: NativePointer, tmx: Int, tmy: Int, samplingMode: NativePointer, localMatrix: FloatArray?): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Image__1nPeekPixels")
-        external fun _nPeekPixels(ptr: Long): ByteBuffer?
+        external fun _nPeekPixels(ptr: NativePointer): ByteBuffer?
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Image__1nPeekPixelsToPixmap")
-        external fun _nPeekPixelsToPixmap(ptr: Long, pixmapPtr: Long): Boolean
+        external fun _nPeekPixelsToPixmap(ptr: NativePointer, pixmapPtr: NativePointer): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Image__1nScalePixels")
-        external fun _nScalePixels(ptr: Long, pixmapPtr: Long, samplingOptions: Long, cache: Boolean): Boolean
+        external fun _nScalePixels(ptr: NativePointer, pixmapPtr: NativePointer, samplingOptions: NativePointer, cache: Boolean): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Image__1nReadPixelsBitmap")
         external fun _nReadPixelsBitmap(
-            ptr: Long,
-            contextPtr: Long,
-            bitmapPtr: Long,
+            ptr: NativePointer,
+            contextPtr: NativePointer,
+            bitmapPtr: NativePointer,
             srcX: Int,
             srcY: Int,
             cache: Boolean
@@ -207,7 +210,7 @@ class Image internal constructor(ptr: Long) : RefCnt(ptr), IHasImageInfo {
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Image__1nReadPixelsPixmap")
-        external fun _nReadPixelsPixmap(ptr: Long, pixmapPtr: Long, srcX: Int, srcY: Int, cache: Boolean): Boolean
+        external fun _nReadPixelsPixmap(ptr: NativePointer, pixmapPtr: NativePointer, srcX: Int, srcY: Int, cache: Boolean): Boolean
 
         init {
             staticLoad()
@@ -270,7 +273,7 @@ class Image internal constructor(ptr: Long) : RefCnt(ptr), IHasImageInfo {
         return try {
             Stats.onNativeCall()
             val ptr = _nEncodeToData(_ptr, format.ordinal, quality)
-            if (ptr == 0L) null else org.jetbrains.skia.Data(ptr)
+            if (ptr == NULLPNTR) null else org.jetbrains.skia.Data(ptr)
         } finally {
             reachabilityBarrier(this)
         }

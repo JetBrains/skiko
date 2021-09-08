@@ -8,30 +8,32 @@ import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.impl.use
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.getPtr
 import kotlin.jvm.JvmStatic
 
-open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val _owner: Any) :
+open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, internal val _owner: Any) :
     Managed(ptr, _FinalizerHolder.PTR, managed) {
     companion object {
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nGetFinalizer")
-        external fun _nGetFinalizer(): Long
+        external fun _nGetFinalizer(): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nMakeFromBitmap")
-        external fun _nMakeFromBitmap(bitmapPtr: Long, flags: Int, pixelGeometry: Int): Long
+        external fun _nMakeFromBitmap(bitmapPtr: NativePointer, flags: Int, pixelGeometry: Int): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawPoint")
-        external fun _nDrawPoint(ptr: Long, x: Float, y: Float, paintPtr: Long)
+        external fun _nDrawPoint(ptr: NativePointer, x: Float, y: Float, paintPtr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawPoints")
-        external fun _nDrawPoints(ptr: Long, mode: Int, coords: FloatArray?, paintPtr: Long)
+        external fun _nDrawPoints(ptr: NativePointer, mode: Int, coords: FloatArray?, paintPtr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawLine")
-        external fun _nDrawLine(ptr: Long, x0: Float, y0: Float, x1: Float, y1: Float, paintPtr: Long)
+        external fun _nDrawLine(ptr: NativePointer, x0: Float, y0: Float, x1: Float, y1: Float, paintPtr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawArc")
         external fun _nDrawArc(
-            ptr: Long,
+            ptr: NativePointer,
             left: Float,
             top: Float,
             right: Float,
@@ -39,31 +41,31 @@ open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val
             startAngle: Float,
             sweepAngle: Float,
             includeCenter: Boolean,
-            paintPtr: Long
+            paintPtr: NativePointer
         )
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawRect")
-        external fun _nDrawRect(ptr: Long, left: Float, top: Float, right: Float, bottom: Float, paintPtr: Long)
+        external fun _nDrawRect(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float, paintPtr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawOval")
-        external fun _nDrawOval(ptr: Long, left: Float, top: Float, right: Float, bottom: Float, paint: Long)
+        external fun _nDrawOval(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float, paint: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawRRect")
         external fun _nDrawRRect(
-            ptr: Long,
+            ptr: NativePointer,
             left: Float,
             top: Float,
             right: Float,
             bottom: Float,
             radii: FloatArray?,
-            paintPtr: Long
+            paintPtr: NativePointer
         )
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawDRRect")
         external fun _nDrawDRRect(
-            ptr: Long,
+            ptr: NativePointer,
             ol: Float,
             ot: Float,
             or: Float,
@@ -74,17 +76,17 @@ open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val
             ir: Float,
             ib: Float,
             iradii: FloatArray?,
-            paintPtr: Long
+            paintPtr: NativePointer
         )
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawPath")
-        external fun _nDrawPath(ptr: Long, nativePath: Long, paintPtr: Long)
+        external fun _nDrawPath(ptr: NativePointer, nativePath: NativePointer, paintPtr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawImageRect")
         external fun _nDrawImageRect(
-            ptr: Long,
-            nativeImage: Long,
+            ptr: NativePointer,
+            nativeImage: NativePointer,
             sl: Float,
             st: Float,
             sr: Float,
@@ -93,16 +95,16 @@ open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val
             dt: Float,
             dr: Float,
             db: Float,
-            samplingMode: Long,
-            paintPtr: Long,
+            samplingMode: NativePointer,
+            paintPtr: NativePointer,
             strict: Boolean
         )
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawImageNine")
         external fun _nDrawImageNine(
-            ptr: Long,
-            nativeImage: Long,
+            ptr: NativePointer,
+            nativeImage: NativePointer,
             cl: Int,
             ct: Int,
             cr: Int,
@@ -112,67 +114,67 @@ open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val
             dr: Float,
             db: Float,
             filterMode: Int,
-            paintPtr: Long
+            paintPtr: NativePointer
         )
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawRegion")
-        external fun _nDrawRegion(ptr: Long, nativeRegion: Long, paintPtr: Long)
+        external fun _nDrawRegion(ptr: NativePointer, nativeRegion: NativePointer, paintPtr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawString")
-        external fun _nDrawString(ptr: Long, string: String?, x: Float, y: Float, font: Long, paint: Long)
+        external fun _nDrawString(ptr: NativePointer, string: String?, x: Float, y: Float, font: NativePointer, paint: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawTextBlob")
-        external fun _nDrawTextBlob(ptr: Long, blob: Long, x: Float, y: Float, paint: Long)
+        external fun _nDrawTextBlob(ptr: NativePointer, blob: NativePointer, x: Float, y: Float, paint: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawPicture")
-        external fun _nDrawPicture(ptr: Long, picturePtr: Long, matrix: FloatArray?, paintPtr: Long)
+        external fun _nDrawPicture(ptr: NativePointer, picturePtr: NativePointer, matrix: FloatArray?, paintPtr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawVertices")
         external fun _nDrawVertices(
-            ptr: Long,
+            ptr: NativePointer,
             verticesMode: Int,
             cubics: FloatArray?,
             colors: IntArray?,
             texCoords: FloatArray?,
             indices: ShortArray?,
             blendMode: Int,
-            paintPtr: Long
+            paintPtr: NativePointer
         )
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawPatch")
         external fun _nDrawPatch(
-            ptr: Long,
+            ptr: NativePointer,
             cubics: FloatArray?,
             colors: IntArray?,
             texCoords: FloatArray?,
             blendMode: Int,
-            paintPtr: Long
+            paintPtr: NativePointer
         )
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawDrawable")
-        external fun _nDrawDrawable(ptr: Long, drawablePrt: Long, matrix: FloatArray?)
+        external fun _nDrawDrawable(ptr: NativePointer, drawablePrt: NativePointer, matrix: FloatArray?)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nClear")
-        external fun _nClear(ptr: Long, color: Int)
+        external fun _nClear(ptr: NativePointer, color: Int)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawPaint")
-        external fun _nDrawPaint(ptr: Long, paintPtr: Long)
+        external fun _nDrawPaint(ptr: NativePointer, paintPtr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nSetMatrix")
-        external fun _nSetMatrix(ptr: Long, matrix: FloatArray?)
+        external fun _nSetMatrix(ptr: NativePointer, matrix: FloatArray?)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nGetLocalToDevice")
-        external fun _nGetLocalToDevice(ptr: Long): FloatArray
+        external fun _nGetLocalToDevice(ptr: NativePointer): FloatArray
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nResetMatrix")
-        external fun _nResetMatrix(ptr: Long)
+        external fun _nResetMatrix(ptr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nClipRect")
         external fun _nClipRect(
-            ptr: Long,
+            ptr: NativePointer,
             left: Float,
             top: Float,
             right: Float,
@@ -184,7 +186,7 @@ open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nClipRRect")
         external fun _nClipRRect(
-            ptr: Long,
+            ptr: NativePointer,
             left: Float,
             top: Float,
             right: Float,
@@ -196,48 +198,48 @@ open class Canvas internal constructor(ptr: Long, managed: Boolean, internal val
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nClipPath")
-        external fun _nClipPath(ptr: Long, nativePath: Long, mode: Int, antiAlias: Boolean)
+        external fun _nClipPath(ptr: NativePointer, nativePath: NativePointer, mode: Int, antiAlias: Boolean)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nClipRegion")
-        external fun _nClipRegion(ptr: Long, nativeRegion: Long, mode: Int)
+        external fun _nClipRegion(ptr: NativePointer, nativeRegion: NativePointer, mode: Int)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nConcat")
-        external fun _nConcat(ptr: Long, matrix: FloatArray?)
+        external fun _nConcat(ptr: NativePointer, matrix: FloatArray?)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nConcat44")
-        external fun _nConcat44(ptr: Long, matrix: FloatArray?)
+        external fun _nConcat44(ptr: NativePointer, matrix: FloatArray?)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nReadPixels")
-        external fun _nReadPixels(ptr: Long, bitmapPtr: Long, srcX: Int, srcY: Int): Boolean
+        external fun _nReadPixels(ptr: NativePointer, bitmapPtr: NativePointer, srcX: Int, srcY: Int): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nWritePixels")
-        external fun _nWritePixels(ptr: Long, bitmapPtr: Long, x: Int, y: Int): Boolean
+        external fun _nWritePixels(ptr: NativePointer, bitmapPtr: NativePointer, x: Int, y: Int): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nSave")
-        external fun _nSave(ptr: Long): Int
+        external fun _nSave(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nSaveLayer")
-        external fun _nSaveLayer(ptr: Long, paintPtr: Long): Int
+        external fun _nSaveLayer(ptr: NativePointer, paintPtr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nSaveLayerRect")
         external fun _nSaveLayerRect(
-            ptr: Long,
+            ptr: NativePointer,
             left: Float,
             top: Float,
             right: Float,
             bottom: Float,
-            paintPtr: Long
+            paintPtr: NativePointer
         ): Int
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nGetSaveCount")
-        external fun _nGetSaveCount(ptr: Long): Int
+        external fun _nGetSaveCount(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nRestore")
-        external fun _nRestore(ptr: Long)
+        external fun _nRestore(ptr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nRestoreToCount")
-        external fun _nRestoreToCount(ptr: Long, saveCount: Int)
+        external fun _nRestoreToCount(ptr: NativePointer, saveCount: Int)
 
         init {
             staticLoad()

@@ -1,5 +1,8 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl._actualPack
+
 /**
  *
  * Specify B and C (each between 0...1) to create a shader that applies the corresponding
@@ -23,9 +26,7 @@ package org.jetbrains.skia
  */
 class CubicResampler(internal val b: Float, internal val c: Float) : SamplingMode {
 
-    override fun _pack(): Long {
-        return ((b.toBits().toULong() shl 32) or c.toBits().toULong()).toLong()
-    }
+    override fun _pack(): NativePointer = _actualPack()
 
     override fun equals(o: Any?): Boolean {
         if (o === this) return true

@@ -8,67 +8,69 @@ import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.getPtr
 import kotlin.jvm.JvmStatic
 
-class StrutStyle internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
+class StrutStyle internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_StrutStyle__1nGetFinalizer")
-        external fun _nGetFinalizer(): Long
+        external fun _nGetFinalizer(): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_StrutStyle__1nMake")
-        external fun _nMake(): Long
+        external fun _nMake(): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_StrutStyle__1nEquals")
-        external fun _nEquals(ptr: Long, otherPtr: Long): Boolean
+        external fun _nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_StrutStyle__1nGetFontFamilies")
-        external fun _nGetFontFamilies(ptr: Long): Array<String>
+        external fun _nGetFontFamilies(ptr: NativePointer): Array<String>
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_StrutStyle__1nSetFontFamilies")
-        external fun _nSetFontFamilies(ptr: Long, families: Array<String?>?)
+        external fun _nSetFontFamilies(ptr: NativePointer, families: Array<String?>?)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_StrutStyle__1nGetFontStyle")
-        external fun _nGetFontStyle(ptr: Long): Int
+        external fun _nGetFontStyle(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_StrutStyle__1nSetFontStyle")
-        external fun _nSetFontStyle(ptr: Long, value: Int)
+        external fun _nSetFontStyle(ptr: NativePointer, value: Int)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_StrutStyle__1nGetFontSize")
-        external fun _nGetFontSize(ptr: Long): Float
+        external fun _nGetFontSize(ptr: NativePointer): Float
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_StrutStyle__1nSetFontSize")
-        external fun _nSetFontSize(ptr: Long, value: Float)
+        external fun _nSetFontSize(ptr: NativePointer, value: Float)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_StrutStyle__1nGetHeight")
-        external fun _nGetHeight(ptr: Long): Float
+        external fun _nGetHeight(ptr: NativePointer): Float
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_StrutStyle__1nSetHeight")
-        external fun _nSetHeight(ptr: Long, value: Float)
+        external fun _nSetHeight(ptr: NativePointer, value: Float)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_StrutStyle__1nGetLeading")
-        external fun _nGetLeading(ptr: Long): Float
+        external fun _nGetLeading(ptr: NativePointer): Float
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_StrutStyle__1nSetLeading")
-        external fun _nSetLeading(ptr: Long, value: Float)
+        external fun _nSetLeading(ptr: NativePointer, value: Float)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_StrutStyle__1nIsEnabled")
-        external fun _nIsEnabled(ptr: Long): Boolean
+        external fun _nIsEnabled(ptr: NativePointer): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_StrutStyle__1nSetEnabled")
-        external fun _nSetEnabled(ptr: Long, value: Boolean)
+        external fun _nSetEnabled(ptr: NativePointer, value: Boolean)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_StrutStyle__1nIsHeightForced")
-        external fun _nIsHeightForced(ptr: Long): Boolean
+        external fun _nIsHeightForced(ptr: NativePointer): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_StrutStyle__1nSetHeightForced")
-        external fun _nSetHeightForced(ptr: Long, value: Boolean)
+        external fun _nSetHeightForced(ptr: NativePointer, value: Boolean)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_StrutStyle__1nIsHeightOverridden")
-        external fun _nIsHeightOverridden(ptr: Long): Boolean
+        external fun _nIsHeightOverridden(ptr: NativePointer): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_StrutStyle__1nSetHeightOverridden")
-        external fun _nSetHeightOverridden(ptr: Long, value: Boolean)
+        external fun _nSetHeightOverridden(ptr: NativePointer, value: Boolean)
 
         init {
             staticLoad()

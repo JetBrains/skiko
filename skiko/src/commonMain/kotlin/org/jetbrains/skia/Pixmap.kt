@@ -5,7 +5,7 @@ import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.ExternalSymbolName
 import kotlin.jvm.JvmStatic
 
-class Pixmap internal constructor(ptr: Long, managed: Boolean) :
+class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
     Managed(ptr, _FinalizerHolder.PTR, managed) {
     constructor() : this(_nMakeNull(), true) {
         Stats.onNativeCall()
@@ -17,7 +17,7 @@ class Pixmap internal constructor(ptr: Long, managed: Boolean) :
         reachabilityBarrier(this)
     }
 
-    fun reset(info: ImageInfo, addr: Long, rowBytes: Int) {
+    fun reset(info: ImageInfo, addr: NativePointer, rowBytes: Int) {
         Stats.onNativeCall()
         _nResetWithInfo(
             _ptr,
@@ -41,7 +41,7 @@ class Pixmap internal constructor(ptr: Long, managed: Boolean) :
         reachabilityBarrier(colorSpace)
     }
 
-    fun extractSubset(subsetPtr: Long, area: IRect): Boolean {
+    fun extractSubset(subsetPtr: NativePointer, area: IRect): Boolean {
         return try {
             Stats.onNativeCall()
             _nExtractSubset(
@@ -79,7 +79,7 @@ class Pixmap internal constructor(ptr: Long, managed: Boolean) :
                 reachabilityBarrier(this)
             }
         }
-    val addr: Long
+    val addr: NativePointer
         get() {
             Stats.onNativeCall()
             return try {
@@ -134,7 +134,7 @@ class Pixmap internal constructor(ptr: Long, managed: Boolean) :
         }
     }
 
-    fun getAddr(x: Int, y: Int): Long {
+    fun getAddr(x: Int, y: Int): NativePointer {
         Stats.onNativeCall()
         return try {
             _nGetAddrAt(_ptr, x, y)
@@ -143,7 +143,7 @@ class Pixmap internal constructor(ptr: Long, managed: Boolean) :
         }
     }
 
-    fun readPixels(info: ImageInfo, addr: Long, rowBytes: Int): Boolean {
+    fun readPixels(info: ImageInfo, addr: NativePointer, rowBytes: Int): Boolean {
         Stats.onNativeCall()
         return try {
             _nReadPixels(
@@ -159,7 +159,7 @@ class Pixmap internal constructor(ptr: Long, managed: Boolean) :
         }
     }
 
-    fun readPixels(info: ImageInfo, addr: Long, rowBytes: Int, srcX: Int, srcY: Int): Boolean {
+    fun readPixels(info: ImageInfo, addr: NativePointer, rowBytes: Int, srcX: Int, srcY: Int): Boolean {
         Stats.onNativeCall()
         return try {
             _nReadPixelsFromPoint(
@@ -255,7 +255,7 @@ class Pixmap internal constructor(ptr: Long, managed: Boolean) :
             return make(info, BufferUtil.getPointerFromByteBuffer(buffer), rowBytes)
         }
 
-        fun make(info: ImageInfo, addr: Long, rowBytes: Int): Pixmap {
+        fun make(info: ImageInfo, addr: NativePointer, rowBytes: Int): Pixmap {
             return try {
                 val ptr = _nMake(
                     info.width, info.height,
@@ -263,7 +263,7 @@ class Pixmap internal constructor(ptr: Long, managed: Boolean) :
                     info.colorInfo.alphaType.ordinal,
                     getPtr(info.colorInfo.colorSpace), addr, rowBytes
                 )
-                require(ptr != 0L) { "Failed to create Pixmap." }
+                require(ptr != NULLPNTR) { "Failed to create Pixmap." }
                 Pixmap(ptr, true)
             } finally {
                 reachabilityBarrier(info.colorInfo.colorSpace)
@@ -272,10 +272,10 @@ class Pixmap internal constructor(ptr: Long, managed: Boolean) :
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nGetFinalizer")
-        external fun _nGetFinalizer(): Long
+        external fun _nGetFinalizer(): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nMakeNull")
-        external fun _nMakeNull(): Long
+        external fun _nMakeNull(): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nMake")
         external fun _nMake(
@@ -283,89 +283,89 @@ class Pixmap internal constructor(ptr: Long, managed: Boolean) :
             height: Int,
             colorType: Int,
             alphaType: Int,
-            colorSpacePtr: Long,
-            pixelsPtr: Long,
+            colorSpacePtr: NativePointer,
+            pixelsPtr: NativePointer,
             rowBytes: Int
-        ): Long
+        ): NativePointer
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nReset")
-        external fun _nReset(ptr: Long)
+        external fun _nReset(ptr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nResetWithInfo")
         external fun _nResetWithInfo(
-            ptr: Long,
+            ptr: NativePointer,
             width: Int,
             height: Int,
             colorType: Int,
             alphaType: Int,
-            colorSpacePtr: Long,
-            pixelsPtr: Long,
+            colorSpacePtr: NativePointer,
+            pixelsPtr: NativePointer,
             rowBytes: Int
         )
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nSetColorSpace")
-        external fun _nSetColorSpace(ptr: Long, colorSpacePtr: Long)
+        external fun _nSetColorSpace(ptr: NativePointer, colorSpacePtr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nExtractSubset")
-        external fun _nExtractSubset(ptr: Long, subsetPtr: Long, l: Int, t: Int, r: Int, b: Int): Boolean
+        external fun _nExtractSubset(ptr: NativePointer, subsetPtr: NativePointer, l: Int, t: Int, r: Int, b: Int): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nGetInfo")
-        external fun _nGetInfo(ptr: Long): ImageInfo
+        external fun _nGetInfo(ptr: NativePointer): ImageInfo
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nGetRowBytes")
-        external fun _nGetRowBytes(ptr: Long): Int
+        external fun _nGetRowBytes(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nGetAddr")
-        external fun _nGetAddr(ptr: Long): Long
+        external fun _nGetAddr(ptr: NativePointer): NativePointer
 
         // TODO methods flattening ImageInfo not included yet - use GetInfo() instead.
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nGetRowBytesAsPixels")
-        external fun _nGetRowBytesAsPixels(ptr: Long): Int
+        external fun _nGetRowBytesAsPixels(ptr: NativePointer): Int
 
         // TODO shiftPerPixel
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nComputeByteSize")
-        external fun _nComputeByteSize(ptr: Long): Int
+        external fun _nComputeByteSize(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nComputeIsOpaque")
-        external fun _nComputeIsOpaque(ptr: Long): Boolean
+        external fun _nComputeIsOpaque(ptr: NativePointer): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nGetColor")
-        external fun _nGetColor(ptr: Long, x: Int, y: Int): Int
+        external fun _nGetColor(ptr: NativePointer, x: Int, y: Int): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nGetAlphaF")
-        external fun _nGetAlphaF(ptr: Long, x: Int, y: Int): Float
+        external fun _nGetAlphaF(ptr: NativePointer, x: Int, y: Int): Float
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nGetAddrAt")
-        external fun _nGetAddrAt(ptr: Long, x: Int, y: Int): Long
+        external fun _nGetAddrAt(ptr: NativePointer, x: Int, y: Int): NativePointer
 
         // methods related to C++ types(addr8/16/32/64, writable_addr8/16/32/64) not included - not needed
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nReadPixels")
         external fun _nReadPixels(
-            ptr: Long,
+            ptr: NativePointer,
             width: Int,
             height: Int,
             colorType: Int,
             alphaType: Int,
-            colorSpacePtr: Long,
-            dstPixelsPtr: Long,
+            colorSpacePtr: NativePointer,
+            dstPixelsPtr: NativePointer,
             dstRowBytes: Int
         ): Boolean
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nReadPixelsFromPoint")
         external fun _nReadPixelsFromPoint(
-            ptr: Long,
+            ptr: NativePointer,
             width: Int,
             height: Int,
             colorType: Int,
             alphaType: Int,
-            colorSpacePtr: Long,
-            dstPixelsPtr: Long,
+            colorSpacePtr: NativePointer,
+            dstPixelsPtr: NativePointer,
             dstRowBytes: Int,
             srcX: Int,
             srcY: Int
@@ -373,20 +373,20 @@ class Pixmap internal constructor(ptr: Long, managed: Boolean) :
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nReadPixelsToPixmap")
-        external fun _nReadPixelsToPixmap(ptr: Long, dstPixmapPtr: Long): Boolean
+        external fun _nReadPixelsToPixmap(ptr: NativePointer, dstPixmapPtr: NativePointer): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nReadPixelsToPixmapFromPoint")
-        external fun _nReadPixelsToPixmapFromPoint(ptr: Long, dstPixmapPtr: Long, srcX: Int, srcY: Int): Boolean
+        external fun _nReadPixelsToPixmapFromPoint(ptr: NativePointer, dstPixmapPtr: NativePointer, srcX: Int, srcY: Int): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nScalePixels")
-        external fun _nScalePixels(ptr: Long, dstPixmapPtr: Long, samplingOptions: Long): Boolean
+        external fun _nScalePixels(ptr: NativePointer, dstPixmapPtr: NativePointer, samplingOptions: NativePointer): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nErase")
-        external fun _nErase(ptr: Long, color: Int): Boolean
+        external fun _nErase(ptr: NativePointer, color: Int): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nEraseSubset")
         external fun _nEraseSubset(
-            ptr: Long,
+            ptr: NativePointer,
             color: Int,
             l: Int,
             t: Int,

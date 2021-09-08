@@ -1,6 +1,6 @@
 package org.jetbrains.skia.impl
 
 expect abstract class RefCnt : Managed {
-    protected constructor(ptr: Long)
-    protected constructor(ptr: Long, allowClose: Boolean)
+    protected constructor(ptr: NativePointer)
+    protected constructor(ptr: NativePointer, allowClose: Boolean)
 }

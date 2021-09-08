@@ -7,162 +7,165 @@ import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.NULLPNTR
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.getPtr
 import kotlin.jvm.JvmStatic
 
 class Font : Managed {
     companion object {
-        internal fun makeClone(ptr: Long): Font {
+        internal fun makeClone(ptr: NativePointer): Font {
             Stats.onNativeCall()
             return Font(_nMakeClone(ptr))
         }
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nGetFinalizer")
-        external fun _nGetFinalizer(): Long
+        external fun _nGetFinalizer(): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nMakeDefault")
-        external fun _nMakeDefault(): Long
+        external fun _nMakeDefault(): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nMakeTypeface")
-        external fun _nMakeTypeface(typefacePtr: Long): Long
+        external fun _nMakeTypeface(typefacePtr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nMakeTypefaceSize")
-        external fun _nMakeTypefaceSize(typefacePtr: Long, size: Float): Long
+        external fun _nMakeTypefaceSize(typefacePtr: NativePointer, size: Float): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nMakeTypefaceSizeScaleSkew")
-        external fun _nMakeTypefaceSizeScaleSkew(typefacePtr: Long, size: Float, scaleX: Float, skewX: Float): Long
+        external fun _nMakeTypefaceSizeScaleSkew(typefacePtr: NativePointer, size: Float, scaleX: Float, skewX: Float): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nMakeClone")
-        external fun _nMakeClone(ptr: Long): Long
+        external fun _nMakeClone(ptr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nEquals")
-        external fun _nEquals(ptr: Long, otherPtr: Long): Boolean
+        external fun _nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nIsAutoHintingForced")
-        external fun _nIsAutoHintingForced(ptr: Long): Boolean
+        external fun _nIsAutoHintingForced(ptr: NativePointer): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nAreBitmapsEmbedded")
-        external fun _nAreBitmapsEmbedded(ptr: Long): Boolean
+        external fun _nAreBitmapsEmbedded(ptr: NativePointer): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nIsSubpixel")
-        external fun _nIsSubpixel(ptr: Long): Boolean
+        external fun _nIsSubpixel(ptr: NativePointer): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nAreMetricsLinear")
-        external fun _nAreMetricsLinear(ptr: Long): Boolean
+        external fun _nAreMetricsLinear(ptr: NativePointer): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nIsEmboldened")
-        external fun _nIsEmboldened(ptr: Long): Boolean
+        external fun _nIsEmboldened(ptr: NativePointer): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nIsBaselineSnapped")
-        external fun _nIsBaselineSnapped(ptr: Long): Boolean
+        external fun _nIsBaselineSnapped(ptr: NativePointer): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nSetAutoHintingForced")
-        external fun _nSetAutoHintingForced(ptr: Long, value: Boolean)
+        external fun _nSetAutoHintingForced(ptr: NativePointer, value: Boolean)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nSetBitmapsEmbedded")
-        external fun _nSetBitmapsEmbedded(ptr: Long, value: Boolean)
+        external fun _nSetBitmapsEmbedded(ptr: NativePointer, value: Boolean)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nSetSubpixel")
-        external fun _nSetSubpixel(ptr: Long, value: Boolean)
+        external fun _nSetSubpixel(ptr: NativePointer, value: Boolean)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nSetMetricsLinear")
-        external fun _nSetMetricsLinear(ptr: Long, value: Boolean)
+        external fun _nSetMetricsLinear(ptr: NativePointer, value: Boolean)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nSetEmboldened")
-        external fun _nSetEmboldened(ptr: Long, value: Boolean)
+        external fun _nSetEmboldened(ptr: NativePointer, value: Boolean)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nSetBaselineSnapped")
-        external fun _nSetBaselineSnapped(ptr: Long, value: Boolean)
+        external fun _nSetBaselineSnapped(ptr: NativePointer, value: Boolean)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nGetEdging")
-        external fun _nGetEdging(ptr: Long): Int
+        external fun _nGetEdging(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nSetEdging")
-        external fun _nSetEdging(ptr: Long, value: Int)
+        external fun _nSetEdging(ptr: NativePointer, value: Int)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nGetHinting")
-        external fun _nGetHinting(ptr: Long): Int
+        external fun _nGetHinting(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nSetHinting")
-        external fun _nSetHinting(ptr: Long, value: Int)
+        external fun _nSetHinting(ptr: NativePointer, value: Int)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nGetTypeface")
-        external fun _nGetTypeface(ptr: Long): Long
+        external fun _nGetTypeface(ptr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nGetTypefaceOrDefault")
-        external fun _nGetTypefaceOrDefault(ptr: Long): Long
+        external fun _nGetTypefaceOrDefault(ptr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nGetSize")
-        external fun _nGetSize(ptr: Long): Float
+        external fun _nGetSize(ptr: NativePointer): Float
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nGetScaleX")
-        external fun _nGetScaleX(ptr: Long): Float
+        external fun _nGetScaleX(ptr: NativePointer): Float
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nGetSkewX")
-        external fun _nGetSkewX(ptr: Long): Float
+        external fun _nGetSkewX(ptr: NativePointer): Float
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nSetTypeface")
-        external fun _nSetTypeface(ptr: Long, typefacePtr: Long)
+        external fun _nSetTypeface(ptr: NativePointer, typefacePtr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nSetSize")
-        external fun _nSetSize(ptr: Long, value: Float)
+        external fun _nSetSize(ptr: NativePointer, value: Float)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nSetScaleX")
-        external fun _nSetScaleX(ptr: Long, value: Float)
+        external fun _nSetScaleX(ptr: NativePointer, value: Float)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nSetSkewX")
-        external fun _nSetSkewX(ptr: Long, value: Float)
+        external fun _nSetSkewX(ptr: NativePointer, value: Float)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nGetStringGlyphs")
-        external fun _nGetStringGlyphs(ptr: Long, str: String?): ShortArray?
+        external fun _nGetStringGlyphs(ptr: NativePointer, str: String?): ShortArray?
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nGetUTF32Glyph")
-        external fun _nGetUTF32Glyph(ptr: Long, uni: Int): Short
+        external fun _nGetUTF32Glyph(ptr: NativePointer, uni: Int): Short
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nGetUTF32Glyphs")
-        external fun _nGetUTF32Glyphs(ptr: Long, uni: IntArray?): ShortArray
+        external fun _nGetUTF32Glyphs(ptr: NativePointer, uni: IntArray?): ShortArray
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nGetStringGlyphsCount")
-        external fun _nGetStringGlyphsCount(ptr: Long, str: String?): Int
+        external fun _nGetStringGlyphsCount(ptr: NativePointer, str: String?): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nMeasureText")
-        external fun _nMeasureText(ptr: Long, str: String?, paintPtr: Long): Rect
+        external fun _nMeasureText(ptr: NativePointer, str: String?, paintPtr: NativePointer): Rect
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nMeasureTextWidth")
-        external fun _nMeasureTextWidth(ptr: Long, str: String?, paintPtr: Long): Float
+        external fun _nMeasureTextWidth(ptr: NativePointer, str: String?, paintPtr: NativePointer): Float
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nGetWidths")
-        external fun _nGetWidths(ptr: Long, glyphs: ShortArray?): FloatArray
+        external fun _nGetWidths(ptr: NativePointer, glyphs: ShortArray?): FloatArray
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nGetBounds")
-        external fun _nGetBounds(ptr: Long, glyphs: ShortArray?, paintPtr: Long): Array<Rect>
+        external fun _nGetBounds(ptr: NativePointer, glyphs: ShortArray?, paintPtr: NativePointer): Array<Rect>
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nGetPositions")
-        external fun _nGetPositions(ptr: Long, glyphs: ShortArray?, x: Float, y: Float): Array<Point>
+        external fun _nGetPositions(ptr: NativePointer, glyphs: ShortArray?, x: Float, y: Float): Array<Point>
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nGetXPositions")
-        external fun _nGetXPositions(ptr: Long, glyphs: ShortArray?, x: Float): FloatArray
+        external fun _nGetXPositions(ptr: NativePointer, glyphs: ShortArray?, x: Float): FloatArray
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nGetPath")
-        external fun _nGetPath(ptr: Long, glyph: Short): Long
+        external fun _nGetPath(ptr: NativePointer, glyph: Short): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nGetPaths")
-        external fun _nGetPaths(ptr: Long, glyphs: ShortArray?): Array<Path>
+        external fun _nGetPaths(ptr: NativePointer, glyphs: ShortArray?): Array<Path>
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nGetMetrics")
-        external fun _nGetMetrics(ptr: Long): FontMetrics
+        external fun _nGetMetrics(ptr: NativePointer): FontMetrics
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Font__1nGetSpacing")
-        external fun _nGetSpacing(ptr: Long): Float
+        external fun _nGetSpacing(ptr: NativePointer): Float
 
         init {
             staticLoad()
         }
     }
 
-    internal constructor(ptr: Long) : super(ptr, _FinalizerHolder.PTR)
+    internal constructor(ptr: NativePointer) : super(ptr, _FinalizerHolder.PTR)
 
-    internal constructor(ptr: Long, managed: Boolean) : super(ptr, _FinalizerHolder.PTR, managed)
+    internal constructor(ptr: NativePointer, managed: Boolean) : super(ptr, _FinalizerHolder.PTR, managed)
 
     /**
      * Returns Font initialized with default values
@@ -430,7 +433,7 @@ class Font : Managed {
         get() = try {
             Stats.onNativeCall()
             val ptr = _nGetTypeface(_ptr)
-            if (ptr == 0L) null else Typeface(ptr)
+            if (ptr == NULLPNTR) null else Typeface(ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -696,7 +699,7 @@ class Font : Managed {
         return try {
             Stats.onNativeCall()
             val ptr = _nGetPath(_ptr, glyph)
-            if (ptr == 0L) null else Path(ptr)
+            if (ptr == NULLPNTR) null else Path(ptr)
         } finally {
             reachabilityBarrier(this)
         }

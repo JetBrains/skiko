@@ -5,6 +5,8 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.getPtr
 import kotlin.jvm.JvmStatic
 
 object ShadowUtils {
@@ -42,8 +44,8 @@ object ShadowUtils {
         if (transparentOccluder) flags = flags or 1
         if (geometricOnly) flags = flags or 2
         _nDrawShadow(
-            Native.getPtr(canvas),
-            Native.getPtr(path),
+            getPtr(canvas),
+            getPtr(path),
             zPlaneParams.x,
             zPlaneParams.y,
             zPlaneParams.z,
@@ -84,8 +86,8 @@ object ShadowUtils {
     @JvmStatic
     @ExternalSymbolName("org_jetbrains_skia_ShadowUtils__1nDrawShadow")
     external fun _nDrawShadow(
-        canvasPtr: Long,
-        pathPtr: Long,
+        canvasPtr: NativePointer,
+        pathPtr: NativePointer,
         zPlaneX: Float,
         zPlaneY: Float,
         zPlaneZ: Float,

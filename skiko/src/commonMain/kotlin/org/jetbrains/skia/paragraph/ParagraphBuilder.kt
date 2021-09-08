@@ -7,6 +7,8 @@ import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.getPtr
 import kotlin.jvm.JvmStatic
 
 class ParagraphBuilder(style: ParagraphStyle?, fc: FontCollection?) :
@@ -14,23 +16,23 @@ class ParagraphBuilder(style: ParagraphStyle?, fc: FontCollection?) :
     companion object {
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ParagraphBuilder__1nMake")
-        external fun _nMake(paragraphStylePtr: Long, fontCollectionPtr: Long): Long
+        external fun _nMake(paragraphStylePtr: NativePointer, fontCollectionPtr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ParagraphBuilder__1nGetFinalizer")
-        external fun _nGetFinalizer(): Long
+        external fun _nGetFinalizer(): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ParagraphBuilder__1nPushStyle")
-        external fun _nPushStyle(ptr: Long, textStylePtr: Long)
+        external fun _nPushStyle(ptr: NativePointer, textStylePtr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ParagraphBuilder__1nPopStyle")
-        external fun _nPopStyle(ptr: Long)
+        external fun _nPopStyle(ptr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ParagraphBuilder__1nAddText")
-        external fun _nAddText(ptr: Long, text: String?)
+        external fun _nAddText(ptr: NativePointer, text: String?)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ParagraphBuilder__1nAddPlaceholder")
         external fun _nAddPlaceholder(
-            ptr: Long,
+            ptr: NativePointer,
             width: Float,
             height: Float,
             alignment: Int,
@@ -40,10 +42,10 @@ class ParagraphBuilder(style: ParagraphStyle?, fc: FontCollection?) :
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ParagraphBuilder__1nSetParagraphStyle")
-        external fun _nSetParagraphStyle(ptr: Long, stylePtr: Long)
+        external fun _nSetParagraphStyle(ptr: NativePointer, stylePtr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ParagraphBuilder__1nBuild")
-        external fun _nBuild(ptr: Long): Long
+        external fun _nBuild(ptr: NativePointer): NativePointer
 
         init {
             staticLoad()

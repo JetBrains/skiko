@@ -40,8 +40,5 @@ class IPoint(val x: Int, val y: Int) {
 
     companion object {
         val ZERO = IPoint(0, 0)
-        internal fun _makeFromLong(l: Long): IPoint {
-            return IPoint((l ushr 32).toInt(), (l and -1).toInt())
-        }
     }
 }

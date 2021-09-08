@@ -6,34 +6,36 @@ import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.getPtr
 import kotlin.jvm.JvmStatic
 
 class ColorSpace : Managed {
     companion object {
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nGetFinalizer")
-        external fun _nGetFinalizer(): Long
+        external fun _nGetFinalizer(): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nMakeSRGB")
-        external fun _nMakeSRGB(): Long
+        external fun _nMakeSRGB(): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nMakeDisplayP3")
-        external fun _nMakeDisplayP3(): Long
+        external fun _nMakeDisplayP3(): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nMakeSRGBLinear")
-        external fun _nMakeSRGBLinear(): Long
+        external fun _nMakeSRGBLinear(): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nConvert")
-        external fun _nConvert(fromPtr: Long, toPtr: Long, r: Float, g: Float, b: Float, a: Float): FloatArray
+        external fun _nConvert(fromPtr: NativePointer, toPtr: NativePointer, r: Float, g: Float, b: Float, a: Float): FloatArray
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nIsGammaCloseToSRGB")
-        external fun _nIsGammaCloseToSRGB(ptr: Long): Boolean
+        external fun _nIsGammaCloseToSRGB(ptr: NativePointer): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nIsGammaLinear")
-        external fun _nIsGammaLinear(ptr: Long): Boolean
+        external fun _nIsGammaLinear(ptr: NativePointer): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nIsSRGB")
-        external fun _nIsSRGB(ptr: Long): Boolean
+        external fun _nIsSRGB(ptr: NativePointer): Boolean
 
         init {
             staticLoad()
@@ -65,9 +67,9 @@ class ColorSpace : Managed {
         }
     }
 
-    internal constructor(ptr: Long) : super(ptr, _FinalizerHolder.PTR, true)
+    internal constructor(ptr: NativePointer) : super(ptr, _FinalizerHolder.PTR, true)
 
-    internal constructor(ptr: Long, managed: Boolean) : super(ptr, _FinalizerHolder.PTR, managed)
+    internal constructor(ptr: NativePointer, managed: Boolean) : super(ptr, _FinalizerHolder.PTR, managed)
 
     /**
      * @return  true if the color space gamma is near enough to be approximated as sRGB

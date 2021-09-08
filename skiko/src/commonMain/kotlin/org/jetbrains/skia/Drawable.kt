@@ -6,6 +6,8 @@ import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.getPtr
 import kotlin.jvm.JvmStatic
 
 /**
@@ -21,19 +23,19 @@ abstract class Drawable : RefCnt(_nMake()) {
     companion object {
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Drawable__1nMake")
-        external fun _nMake(): Long
+        external fun _nMake(): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Drawable__1nDraw")
-        external fun _nDraw(ptr: Long, canvasPtr: Long, matrix: FloatArray?)
+        external fun _nDraw(ptr: NativePointer, canvasPtr: NativePointer, matrix: FloatArray?)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Drawable__1nMakePictureSnapshot")
-        external fun _nMakePictureSnapshot(ptr: Long): Long
+        external fun _nMakePictureSnapshot(ptr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Drawable__1nGetGenerationId")
-        external fun _nGetGenerationId(ptr: Long): Int
+        external fun _nGetGenerationId(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Drawable__1nNotifyDrawingChanged")
-        external fun _nNotifyDrawingChanged(ptr: Long)
+        external fun _nNotifyDrawingChanged(ptr: NativePointer)
 
         init {
             staticLoad()
@@ -130,12 +132,12 @@ abstract class Drawable : RefCnt(_nMake()) {
 
     abstract fun onDraw(canvas: Canvas?)
     abstract fun onGetBounds(): Rect
-    fun _onDraw(canvasPtr: Long) {
+    fun _onDraw(canvasPtr: NativePointer) {
         onDraw(Canvas(canvasPtr, false, this))
     }
 
     @ExternalSymbolName("org_jetbrains_skia_Drawable__1nInit")
-    external fun _nInit(ptr: Long)
+    external fun _nInit(ptr: NativePointer)
 
     init {
         Stats.onNativeCall()

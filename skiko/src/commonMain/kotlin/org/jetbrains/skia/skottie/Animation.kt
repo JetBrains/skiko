@@ -8,48 +8,51 @@ import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.NULLPNTR
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.getPtr
 import kotlin.jvm.JvmStatic
 
-class Animation internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.PTR) {
+class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
         fun makeFromString(data: String): Animation {
             Stats.onNativeCall()
             val ptr = _nMakeFromString(data)
-            require(ptr != 0L) { "Failed to create Animation from string=\"$data\"" }
+            require(ptr != NULLPNTR) { "Failed to create Animation from string=\"$data\"" }
             return Animation(ptr)
         }
 
         fun makeFromFile(path: String): Animation {
             Stats.onNativeCall()
             val ptr = _nMakeFromFile(path)
-            require(ptr != 0L) { "Failed to create Animation from path=\"$path\"" }
+            require(ptr != NULLPNTR) { "Failed to create Animation from path=\"$path\"" }
             return Animation(ptr)
         }
 
         fun makeFromData(data: Data): Animation {
             Stats.onNativeCall()
             val ptr = _nMakeFromData(getPtr(data))
-            require(ptr != 0L) { "Failed to create Animation from data." }
+            require(ptr != NULLPNTR) { "Failed to create Animation from data." }
             return Animation(ptr)
         }
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetFinalizer")
-        external fun _nGetFinalizer(): Long
+        external fun _nGetFinalizer(): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nMakeFromString")
-        external fun _nMakeFromString(data: String?): Long
+        external fun _nMakeFromString(data: String?): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nMakeFromFile")
-        external fun _nMakeFromFile(path: String?): Long
+        external fun _nMakeFromFile(path: String?): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nMakeFromData")
-        external fun _nMakeFromData(dataPtr: Long): Long
+        external fun _nMakeFromData(dataPtr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nRender")
         external fun _nRender(
-            ptr: Long,
-            canvasPtr: Long,
+            ptr: NativePointer,
+            canvasPtr: NativePointer,
             left: Float,
             top: Float,
             right: Float,
@@ -59,31 +62,31 @@ class Animation internal constructor(ptr: Long) : Managed(ptr, _FinalizerHolder.
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nSeek")
-        external fun _nSeek(ptr: Long, t: Float, icPtr: Long)
+        external fun _nSeek(ptr: NativePointer, t: Float, icPtr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nSeekFrame")
-        external fun _nSeekFrame(ptr: Long, t: Float, icPtr: Long)
+        external fun _nSeekFrame(ptr: NativePointer, t: Float, icPtr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nSeekFrameTime")
-        external fun _nSeekFrameTime(ptr: Long, t: Float, icPtr: Long)
+        external fun _nSeekFrameTime(ptr: NativePointer, t: Float, icPtr: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetDuration")
-        external fun _nGetDuration(ptr: Long): Float
+        external fun _nGetDuration(ptr: NativePointer): Float
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetFPS")
-        external fun _nGetFPS(ptr: Long): Float
+        external fun _nGetFPS(ptr: NativePointer): Float
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetInPoint")
-        external fun _nGetInPoint(ptr: Long): Float
+        external fun _nGetInPoint(ptr: NativePointer): Float
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetOutPoint")
-        external fun _nGetOutPoint(ptr: Long): Float
+        external fun _nGetOutPoint(ptr: NativePointer): Float
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetVersion")
-        external fun _nGetVersion(ptr: Long): String
+        external fun _nGetVersion(ptr: NativePointer): String
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetSize")
-        external fun _nGetSize(ptr: Long): Point?
+        external fun _nGetSize(ptr: NativePointer): Point?
 
         init {
             staticLoad()

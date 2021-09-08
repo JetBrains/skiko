@@ -6,13 +6,14 @@ import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.NativePointer
 import kotlin.jvm.JvmStatic
 
-abstract class SVGNode internal constructor(ptr: Long) : RefCnt(ptr) {
+abstract class SVGNode internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_svg_SVGNode__1nGetTag")
-        external fun _nGetTag(ptr: Long): Int
+        external fun _nGetTag(ptr: NativePointer): Int
 
         init {
             staticLoad()

@@ -7,9 +7,12 @@ import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.NULLPNTR
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.getPtr
 import kotlin.jvm.JvmStatic
 
-class Typeface internal constructor(ptr: Long) : RefCnt(ptr) {
+class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
         /**
          * @return  the default normal typeface, which is never null
@@ -42,7 +45,7 @@ class Typeface internal constructor(ptr: Long) : RefCnt(ptr) {
         fun makeFromFile(path: String, index: Int = 0): Typeface {
             Stats.onNativeCall()
             val ptr = _nMakeFromFile(path, index)
-            require(ptr != 0L) { "Failed to create Typeface from path=\"$path\" index=$index" }
+            require(ptr != NULLPNTR) { "Failed to create Typeface from path=\"$path\" index=$index" }
             return Typeface(ptr)
         }
         /**
@@ -57,7 +60,7 @@ class Typeface internal constructor(ptr: Long) : RefCnt(ptr) {
             return try {
                 Stats.onNativeCall()
                 val ptr = _nMakeFromData(getPtr(data), index)
-                require(ptr != 0L) { "Failed to create Typeface from data $data" }
+                require(ptr != NULLPNTR) { "Failed to create Typeface from data $data" }
                 Typeface(ptr)
             } finally {
                 reachabilityBarrier(data)
@@ -66,73 +69,73 @@ class Typeface internal constructor(ptr: Long) : RefCnt(ptr) {
 
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetFontStyle")
-        external fun _nGetFontStyle(ptr: Long): Int
+        external fun _nGetFontStyle(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Typeface__1nIsFixedPitch")
-        external fun _nIsFixedPitch(ptr: Long): Boolean
+        external fun _nIsFixedPitch(ptr: NativePointer): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetVariations")
-        external fun _nGetVariations(ptr: Long): Array<FontVariation>?
+        external fun _nGetVariations(ptr: NativePointer): Array<FontVariation>?
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetVariationAxes")
-        external fun _nGetVariationAxes(ptr: Long): Array<FontVariationAxis>?
+        external fun _nGetVariationAxes(ptr: NativePointer): Array<FontVariationAxis>?
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUniqueId")
-        external fun _nGetUniqueId(ptr: Long): Int
+        external fun _nGetUniqueId(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Typeface__1nEquals")
-        external fun _nEquals(ptr: Long, otherPtr: Long): Boolean
+        external fun _nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeDefault")
-        external fun _nMakeDefault(): Long
+        external fun _nMakeDefault(): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeFromName")
-        external fun _nMakeFromName(name: String?, fontStyle: Int): Long
+        external fun _nMakeFromName(name: String?, fontStyle: Int): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeFromFile")
-        external fun _nMakeFromFile(path: String?, index: Int): Long
+        external fun _nMakeFromFile(path: String?, index: Int): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeFromData")
-        external fun _nMakeFromData(dataPtr: Long, index: Int): Long
+        external fun _nMakeFromData(dataPtr: NativePointer, index: Int): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeClone")
-        external fun _nMakeClone(ptr: Long, variations: Array<FontVariation>?, collectionIndex: Int): Long
+        external fun _nMakeClone(ptr: NativePointer, variations: Array<FontVariation>?, collectionIndex: Int): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUTF32Glyphs")
-        external fun _nGetUTF32Glyphs(ptr: Long, uni: IntArray?): ShortArray
+        external fun _nGetUTF32Glyphs(ptr: NativePointer, uni: IntArray?): ShortArray
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUTF32Glyph")
-        external fun _nGetUTF32Glyph(ptr: Long, unichar: Int): Short
+        external fun _nGetUTF32Glyph(ptr: NativePointer, unichar: Int): Short
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetGlyphsCount")
-        external fun _nGetGlyphsCount(ptr: Long): Int
+        external fun _nGetGlyphsCount(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetTablesCount")
-        external fun _nGetTablesCount(ptr: Long): Int
+        external fun _nGetTablesCount(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetTableTags")
-        external fun _nGetTableTags(ptr: Long): IntArray?
+        external fun _nGetTableTags(ptr: NativePointer): IntArray?
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetTableSize")
-        external fun _nGetTableSize(ptr: Long, tag: Int): Long
+        external fun _nGetTableSize(ptr: NativePointer, tag: Int): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetTableData")
-        external fun _nGetTableData(ptr: Long, tag: Int): Long
+        external fun _nGetTableData(ptr: NativePointer, tag: Int): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUnitsPerEm")
-        external fun _nGetUnitsPerEm(ptr: Long): Int
+        external fun _nGetUnitsPerEm(ptr: NativePointer): Int
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetKerningPairAdjustments")
-        external fun _nGetKerningPairAdjustments(ptr: Long, glyphs: ShortArray?): IntArray?
+        external fun _nGetKerningPairAdjustments(ptr: NativePointer, glyphs: ShortArray?): IntArray?
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetFamilyNames")
-        external fun _nGetFamilyNames(ptr: Long): Array<FontFamilyName>
+        external fun _nGetFamilyNames(ptr: NativePointer): Array<FontFamilyName>
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetFamilyName")
-        external fun _nGetFamilyName(ptr: Long): String
+        external fun _nGetFamilyName(ptr: NativePointer): String
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetBounds")
-        external fun _nGetBounds(ptr: Long): Rect
+        external fun _nGetBounds(ptr: NativePointer): Rect
 
         init {
             staticLoad()
@@ -250,7 +253,7 @@ class Typeface internal constructor(ptr: Long) : RefCnt(ptr) {
             if (variations.size == 0) return this
             Stats.onNativeCall()
             val ptr = _nMakeClone(_ptr, variations, collectionIndex)
-            require(ptr != 0L) {
+            require(ptr != NULLPNTR) {
                 "Failed to clone Typeface $this with $variations"
             }
             Typeface(ptr)
@@ -331,7 +334,7 @@ class Typeface internal constructor(ptr: Long) : RefCnt(ptr) {
     /**
      * Given a table tag, return the size of its contents, or 0 if not present
      */
-    fun getTableSize(tag: String): Long {
+    fun getTableSize(tag: String): NativePointer {
         return try {
             Stats.onNativeCall()
             _nGetTableSize(_ptr, FourByteTag.fromString(tag))
@@ -351,7 +354,7 @@ class Typeface internal constructor(ptr: Long) : RefCnt(ptr) {
         return try {
             Stats.onNativeCall()
             val ptr = _nGetTableData(_ptr, FourByteTag.fromString(tag))
-            if (ptr == 0L) null else Data(ptr)
+            if (ptr == NULLPNTR) null else Data(ptr)
         } finally {
             reachabilityBarrier(this)
         }
