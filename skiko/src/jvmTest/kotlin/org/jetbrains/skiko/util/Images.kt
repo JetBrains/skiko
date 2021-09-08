@@ -1,17 +1,23 @@
 package org.jetbrains.skiko.util
 
+import org.jetbrains.skia.Image
+import org.jetbrains.skia.Pixmap
 import java.awt.Color
-import java.awt.image.BufferedImage
+import java.io.InputStream
 import kotlin.math.abs
 
-fun isContentSame(img1: BufferedImage, img2: BufferedImage, sensitivity: Double): Boolean {
+fun isContentSame(img1: Image, img2: Image, sensitivity: Double): Boolean {
     require(sensitivity in 0.0..1.0)
     val sensitivity255 = (sensitivity * 255).toInt()
     if (img1.width == img2.width && img1.height == img2.height) {
-        for (x in 0 until img1.width) {
-            for (y in 0 until img1.height) {
-                val color1 = Color(img1.getRGB(x, y))
-                val color2 = Color(img2.getRGB(x, y))
+        val pixMap1 = Pixmap()
+        val pixMap2 = Pixmap()
+        img1.readPixels(pixMap1, 0, 0, false)
+        img2.readPixels(pixMap2, 0, 0, false)
+        for (y in 0 until img1.height) {
+            for (x in 0 until img1.width) {
+                val color1 = Color(pixMap1.getColor(x, y))
+                val color2 = Color(pixMap2.getColor(x, y))
                 if (abs(color1.red - color2.red) > sensitivity255) {
                     return false
                 }
@@ -31,3 +37,20 @@ fun isContentSame(img1: BufferedImage, img2: BufferedImage, sensitivity: Double)
     }
     return true
 }
+
+fun loadResourceImage(path: String) = useResource(path, ::loadImage)
+
+inline fun <T> useResource(
+    resourcePath: String,
+    block: (InputStream) -> T
+): T = openResource(resourcePath).use(block)
+
+fun openResource(resourcePath: String): InputStream {
+    val classLoader = Thread.currentThread().contextClassLoader!!
+    return requireNotNull(classLoader.getResourceAsStream(resourcePath)) {
+        "Resource $resourcePath not found"
+    }
+}
+
+fun loadImage(inputStream: InputStream): Image =
+    Image.makeFromEncoded(inputStream.readAllBytes())

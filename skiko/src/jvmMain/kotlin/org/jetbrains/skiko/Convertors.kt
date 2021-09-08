@@ -1,17 +1,14 @@
 package org.jetbrains.skiko
 
 import org.jetbrains.skia.Bitmap
+import org.jetbrains.skia.ColorAlphaType
 import org.jetbrains.skia.ColorType
+import org.jetbrains.skia.ImageInfo
 import org.jetbrains.skia.Image
 import java.awt.Transparency
 import java.awt.color.ColorSpace
-import java.awt.image.BufferedImage
-import java.awt.image.ComponentColorModel
-import java.awt.image.DataBuffer
-import java.awt.image.Raster
-import java.io.ByteArrayOutputStream
+import java.awt.image.*
 import java.nio.ByteBuffer
-import javax.imageio.ImageIO
 
 private class DirectDataBuffer(val backing: ByteBuffer): DataBuffer(TYPE_BYTE, backing.limit()) {
     override fun getElem(bank: Int, index: Int): Int {
@@ -49,12 +46,30 @@ fun Bitmap.toBufferedImage(): BufferedImage {
 }
 
 fun BufferedImage.toBitmap(): Bitmap {
-    return Bitmap.makeFromImage(this.toImage())
+    val bytesPerPixel = 4
+    val pixels = ByteArray(width * height * bytesPerPixel)
+
+    var k = 0
+    for (y in 0 until height) {
+        for (x in 0 until width) {
+            val argb = getRGB(x, y)
+            val a = (argb shr 24) and 0xff
+            val r = (argb shr 16) and 0xff
+            val g = (argb shr 8) and 0xff
+            val b = (argb shr 0) and 0xff
+            pixels[k++] = b.toByte()
+            pixels[k++] = g.toByte()
+            pixels[k++] = r.toByte()
+            pixels[k++] = a.toByte()
+        }
+    }
+
+    val bitmap = Bitmap()
+    bitmap.allocPixels(ImageInfo.makeS32(width, height, ColorAlphaType.UNPREMUL))
+    bitmap.installPixels(pixels)
+    return bitmap
 }
 
 fun BufferedImage.toImage(): Image {
-    val bos = ByteArrayOutputStream()
-    ImageIO.write(this, "png", bos)
-    val data = bos.toByteArray()
-    return Image.makeFromEncoded(data)
+    return Image.makeFromBitmap(toBitmap())
 }

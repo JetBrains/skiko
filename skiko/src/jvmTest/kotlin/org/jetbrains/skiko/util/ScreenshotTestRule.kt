@@ -1,7 +1,9 @@
 package org.jetbrains.skiko.util
 
+import org.jetbrains.skia.Image
 import org.jetbrains.skiko.OS
 import org.jetbrains.skiko.hostOs
+import org.jetbrains.skiko.toImage
 import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
@@ -41,6 +43,10 @@ class ScreenshotTestRule : TestRule {
 
     fun assert(rectangle: Rectangle, id: String = "") {
         val actual = robot.createScreenCapture(rectangle)
+        assert(actual.toImage(), id)
+    }
+
+    fun assert(actual: Image, id: String = "") {
         val name = if (id.isNotEmpty()) "${testIdentifier}_$id" else testIdentifier
         val actualFile = File(screenshotsDir, "${name}_actual.png")
         val expectedFile = File(screenshotsDir, "$name.png")
@@ -48,16 +54,16 @@ class ScreenshotTestRule : TestRule {
             actualFile.delete()
         }
         if (expectedFile.exists()) {
-            val expected = ImageIO.read(expectedFile)
+            val expected = Image.makeFromEncoded(expectedFile.readBytes())
             // macOs screenshots can have different color on different configurations
             if (!isContentSame(expected, actual, sensitivity = 0.25)) {
-                ImageIO.write(actual, "png", actualFile)
+                actualFile.writeBytes(actual.encodeToData()!!.bytes)
                 throw AssertionError(
                     "Image mismatch! Expected image ${expectedFile.absolutePath}, actual: ${actualFile.absolutePath}"
                 )
             }
         } else {
-            ImageIO.write(actual, "png", actualFile)
+            actualFile.writeBytes(actual.encodeToData()!!.bytes)
             throw AssertionError(
                 "Missing screenshot image " +
                         "${actualFile.absolutePath}. " +

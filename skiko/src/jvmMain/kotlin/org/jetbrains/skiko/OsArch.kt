@@ -6,8 +6,14 @@ enum class OS(val id: String) {
     MacOS("macos")
     ;
 
+    val isLinux
+        get() = this == Linux
+
     val isWindows
         get() = this == Windows
+
+    val isMacOS
+        get() = this == MacOS
 }
 
 enum class Arch(val id: String) {
