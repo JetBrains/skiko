@@ -4,7 +4,6 @@ import org.jetbrains.skia.CubicResampler
 import org.jetbrains.skia.FilterMipmap
 import org.jetbrains.skia.IPoint
 import org.jetbrains.skia.IRange
-import org.jetbrains.skia.ImageInfo
 import java.lang.ref.Reference
 
 actual abstract class Native actual constructor(ptr: Long) {
@@ -56,24 +55,6 @@ actual typealias NativePointer = Long
 actual fun toIRange(p: NativePointer): IRange = IRange((p ushr 32).toInt(), (p and -1).toInt())
 
 actual fun toIPoint(p: NativePointer): IPoint = IPoint((p ushr 32).toInt(), (p and -1).toInt())
-actual val ImageInfo.minRowBytes
-    get() = (width * bytesPerPixel).toLong()
-
-actual fun ImageInfo.computeByteSize(rowBytes: NativePointer): NativePointer {
-    return if (0 == height) 0 else (height - 1) * rowBytes + width * bytesPerPixel
-}
-
-/**
- * Returns true if rowBytes is valid for this ImageInfo.
- *
- * @param rowBytes  size of pixel row including padding
- * @return          true if rowBytes is large enough to contain pixel row and is properly aligned
- */
-actual fun ImageInfo.isRowBytesValid(rowBytes: NativePointer): Boolean {
-    if (rowBytes < minRowBytes) return false
-    val shift = shiftPerPixel
-    return rowBytes shr shift shl shift == rowBytes
-}
 
 actual fun Int.toNativePointer(): NativePointer = toLong()
 actual fun CubicResampler._actualPack(): NativePointer {
