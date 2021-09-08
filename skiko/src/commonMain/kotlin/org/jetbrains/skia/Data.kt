@@ -8,7 +8,6 @@ import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.getPtr
 import org.jetbrains.skia.impl.reachabilityBarrier
-import org.jetbrains.skia.impl.toNativePointer
 import kotlin.jvm.JvmStatic
 
 /**
@@ -16,7 +15,7 @@ import kotlin.jvm.JvmStatic
  */
 class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
-        fun makeFromBytes(bytes: ByteArray, offset: NativePointer = NULLPNTR, length: NativePointer = bytes.size.toNativePointer()): Data {
+        fun makeFromBytes(bytes: ByteArray, offset: Long = 0L, length: Long = bytes.size.toLong()): Data {
             Stats.onNativeCall()
             return Data(_nMakeFromBytes(bytes, offset, length))
         }
@@ -44,10 +43,10 @@ class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
         external fun _nGetFinalizer(): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Data__1nSize")
-        external fun _nSize(ptr: NativePointer): NativePointer
+        external fun _nSize(ptr: NativePointer): Long
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Data__1nBytes")
-        external fun _nBytes(ptr: NativePointer, offset: NativePointer, length: NativePointer): ByteArray
+        external fun _nBytes(ptr: NativePointer, offset: Long, length: Long): ByteArray
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Data__1nEquals")
         external fun _nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
@@ -56,13 +55,13 @@ class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
         external fun _nToByteBuffer(ptr: NativePointer): ByteBuffer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Data__1nMakeFromBytes")
-        external fun _nMakeFromBytes(bytes: ByteArray?, offset: NativePointer, length: NativePointer): NativePointer
+        external fun _nMakeFromBytes(bytes: ByteArray?, offset: Long, length: Long): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Data__1nMakeFromFileName")
         external fun _nMakeFromFileName(path: String?): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Data__1nMakeSubset")
-        external fun _nMakeSubset(ptr: NativePointer, offset: NativePointer, length: NativePointer): NativePointer
+        external fun _nMakeSubset(ptr: NativePointer, offset: Long, length: Long): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Data__1nMakeEmpty")
         external fun _nMakeEmpty(): NativePointer
@@ -72,7 +71,7 @@ class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
         }
     }
 
-    val size: NativePointer
+    val size: Long
         get() = try {
             Stats.onNativeCall()
             _nSize(_ptr)
@@ -80,9 +79,9 @@ class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
             reachabilityBarrier(this)
         }
     val bytes: ByteArray
-        get() = getBytes(NULLPNTR, size)
+        get() = getBytes(0, size)
 
-    fun getBytes(offset: NativePointer, length: NativePointer): ByteArray {
+    fun getBytes(offset: Long, length: Long): ByteArray {
         return try {
             Stats.onNativeCall()
             _nBytes(_ptr, offset, length)
@@ -109,7 +108,7 @@ class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      * Create a new dataref using a subset of the data in the specified
      * src dataref.
      */
-    fun makeSubset(offset: NativePointer, length: NativePointer): Data {
+    fun makeSubset(offset: Long, length: Long): Data {
         return try {
             Stats.onNativeCall()
             Data(_nMakeSubset(_ptr, offset, length))
@@ -121,7 +120,7 @@ class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     fun makeCopy(): Data {
         return try {
             Stats.onNativeCall()
-            Data(_nMakeSubset(_ptr, NULLPNTR, size))
+            Data(_nMakeSubset(_ptr, 0, size))
         } finally {
             reachabilityBarrier(this)
         }

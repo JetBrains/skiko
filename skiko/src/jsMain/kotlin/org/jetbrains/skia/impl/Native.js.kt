@@ -21,5 +21,3 @@ actual fun reachabilityBarrier(obj: Any?) {
 }
 
 actual typealias NativePointer = Int
-
-actual fun Int.toNativePointer(): NativePointer = this

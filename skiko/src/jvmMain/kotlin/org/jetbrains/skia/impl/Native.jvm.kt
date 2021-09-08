@@ -47,5 +47,3 @@ actual fun reachabilityBarrier(obj: Any?) {
 }
 
 actual typealias NativePointer = Long
-
-actual fun Int.toNativePointer(): NativePointer = toLong()
