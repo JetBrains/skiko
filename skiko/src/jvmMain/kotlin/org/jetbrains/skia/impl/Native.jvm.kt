@@ -52,10 +52,6 @@ actual fun reachabilityBarrier(obj: Any?) {
 
 actual typealias NativePointer = Long
 
-actual fun toIRange(p: NativePointer): IRange = IRange((p ushr 32).toInt(), (p and -1).toInt())
-
-actual fun toIPoint(p: NativePointer): IPoint = IPoint((p ushr 32).toInt(), (p and -1).toInt())
-
 actual fun Int.toNativePointer(): NativePointer = toLong()
 actual fun CubicResampler._actualPack(): NativePointer {
     return ((b.toBits().toULong() shl 32) or c.toBits().toULong()).toLong()

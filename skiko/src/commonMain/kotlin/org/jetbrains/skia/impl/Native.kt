@@ -2,13 +2,8 @@ package org.jetbrains.skia.impl
 
 import org.jetbrains.skia.CubicResampler
 import org.jetbrains.skia.FilterMipmap
-import org.jetbrains.skia.IPoint
-import org.jetbrains.skia.IRange
 
 expect class NativePointer
-
-expect fun toIPoint(p: NativePointer): IPoint
-expect fun toIRange(p: NativePointer): IRange
 
 expect fun Int.toNativePointer(): NativePointer
 

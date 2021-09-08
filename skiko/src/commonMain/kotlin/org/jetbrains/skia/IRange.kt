@@ -1,5 +1,7 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.NativePointer
+
 
 class IRange(val start: Int, val end: Int) {
 
@@ -28,3 +30,5 @@ class IRange(val start: Int, val end: Int) {
         return "IRange(_start=" + start + ", _end=" + end + ")"
     }
 }
+
+expect fun toIRange(p: NativePointer): IRange
