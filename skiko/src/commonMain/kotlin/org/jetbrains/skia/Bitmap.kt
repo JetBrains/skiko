@@ -46,7 +46,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
         external fun _nIsNull(ptr: NativePointer): Boolean
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetRowBytes")
-        external fun _nGetRowBytes(ptr: NativePointer): NativePointer
+        external fun _nGetRowBytes(ptr: NativePointer): Long
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nSetAlphaType")
         external fun _nSetAlphaType(ptr: NativePointer, alphaType: Int): Boolean
@@ -80,7 +80,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
             colorType: Int,
             alphaType: Int,
             colorSpacePtr: NativePointer,
-            rowBytes: NativePointer
+            rowBytes: Long
         ): Boolean
 
         @JvmStatic
@@ -104,7 +104,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
             colorType: Int,
             alphaType: Int,
             colorSpacePtr: NativePointer,
-            rowBytes: NativePointer
+            rowBytes: Long
         ): Boolean
 
         @JvmStatic
@@ -117,7 +117,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
             alphaType: Int,
             colorSpacePtr: NativePointer,
             pixels: ByteArray?,
-            rowBytes: NativePointer
+            rowBytes: Long
         ): Boolean
 
         @JvmStatic
@@ -165,7 +165,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
             colorType: Int,
             alphaType: Int,
             colorSpacePtr: NativePointer,
-            dstRowBytes: NativePointer,
+            dstRowBytes: Long,
             srcX: Int,
             srcY: Int
         ): ByteArray?
@@ -292,7 +292,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
      *
      * @return  byte length of pixel row
      */
-    val rowBytes: NativePointer
+    val rowBytes: Long
         get() = try {
             Stats.onNativeCall()
             _nGetRowBytes(_ptr)
@@ -499,7 +499,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
      */
     fun setImageInfo(imageInfo: ImageInfo): Boolean {
         _imageInfo = null
-        return setImageInfo(imageInfo, NULLPNTR)
+        return setImageInfo(imageInfo, 0)
     }
 
     /**
@@ -537,7 +537,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
      *
      * @see [https://fiddle.skia.org/c/@Bitmap_setInfo](https://fiddle.skia.org/c/@Bitmap_setInfo)
      */
-    fun setImageInfo(imageInfo: ImageInfo, rowBytes: NativePointer): Boolean {
+    fun setImageInfo(imageInfo: ImageInfo, rowBytes: Long): Boolean {
         return try {
             _imageInfo = null
             Stats.onNativeCall()
@@ -614,7 +614,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
      * @param rowBytes  size of pixel row or larger; may be zero
      * @return          true if pixel storage is allocated
      */
-    fun allocPixels(info: ImageInfo, rowBytes: NativePointer): Boolean {
+    fun allocPixels(info: ImageInfo, rowBytes: Long): Boolean {
         return try {
             _imageInfo = null
             Stats.onNativeCall()
@@ -720,7 +720,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
     fun installPixels(
         info: ImageInfo,
         pixels: ByteArray?,
-        rowBytes: NativePointer
+        rowBytes: Long
     ): Boolean {
         return try {
             _imageInfo = null
@@ -1060,7 +1060,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
      */
     fun readPixels(
         dstInfo: ImageInfo = imageInfo,
-        dstRowBytes: NativePointer = rowBytes,
+        dstRowBytes: Long = rowBytes,
         srcX: Int = 0,
         srcY: Int = 0
     ): ByteArray? {
