@@ -70,6 +70,17 @@ actual class InteropScope actual constructor() {
         fromWasm(this@fromInterop, result)
     }
 
+    actual fun toInterop(array: NativePointerArray?): InteropPointer {
+        return if (array != null) {
+            val data = _malloc(array.size * 4)
+            elements.add(data)
+            toWasm(data, array)
+            data
+        } else {
+            0
+        }
+    }
+
     actual fun release()  {
         elements.forEach {
             _free(it)
@@ -97,6 +108,10 @@ private fun toWasm(dest: NativePointer, src: CharArray) {
 }
 
 private fun toWasm(dest: NativePointer, src: FloatArray) {
+    js("HEAPU32.set(src, dest)")
+}
+
+private fun toWasm(dest: NativePointer, src: IntArray) {
     js("HEAPU32.set(src, dest)")
 }
 

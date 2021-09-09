@@ -69,6 +69,18 @@ actual class InteropScope actual constructor() {
         }
     }
 
+    actual fun toInterop(array: NativePointerArray?): InteropPointer {
+        return if (array != null) {
+            // We pass it as LongArray via boundary.
+            val pinned = array.backing.pin()
+            elements.add(pinned)
+            val result = pinned.addressOf(0).rawValue
+            result
+        } else {
+            NativePtr.NULL
+        }
+    }
+
     actual fun InteropPointer.fromInterop(result: FloatArray) {}
 
     actual fun release()  {
@@ -80,4 +92,17 @@ actual class InteropScope actual constructor() {
     private val elements = mutableListOf<Pinned<*>>()
 }
 
-actual typealias NativePointerArray = LongArray
+// Ugly! NativePtrArray in stdlib is unfortunately internal, don't have ctor and cannot be used.
+actual class NativePointerArray actual constructor(size: Int) {
+    internal val backing = LongArray(size)
+    actual operator fun get(index: Int): NativePointer {
+        return NativePtr.NULL + backing[index]
+    }
+
+    actual operator fun set(index: Int, value: NativePointer) {
+        backing[index] = value.toLong()
+    }
+
+    actual val size: Int
+        get() = backing.size
+}

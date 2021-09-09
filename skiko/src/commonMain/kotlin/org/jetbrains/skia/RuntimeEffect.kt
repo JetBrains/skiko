@@ -1,14 +1,8 @@
 @file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.RefCnt
-import org.jetbrains.skia.impl.Native
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.ExternalSymbolName
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.NativePointerArray
-import org.jetbrains.skia.impl.getPtr
 import kotlin.jvm.JvmStatic
 
 class RuntimeEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
@@ -26,8 +20,8 @@ class RuntimeEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_RuntimeEffect__1nMakeShader")
         external fun _nMakeShader(
-            runtimeEffectPtr: NativePointer, uniformPtr: NativePointer, childrenPtrs: NativePointerArray?,
-            localMatrix: FloatArray?, isOpaque: Boolean
+            runtimeEffectPtr: NativePointer, uniformPtr: NativePointer, childrenPtrs: InteropPointer,
+            localMatrix: InteropPointer, isOpaque: Boolean
         ): NativePointer
 
         @JvmStatic
@@ -51,6 +45,8 @@ class RuntimeEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         val childrenPtrs = NativePointerArray(childCount)
         for (i in 0 until childCount) childrenPtrs[i] = getPtr(children!![i])
         val matrix = localMatrix?.mat
-        return Shader(_nMakeShader(_ptr, getPtr(uniforms), childrenPtrs, matrix, isOpaque))
+        return interopScope {
+            Shader(_nMakeShader(_ptr, getPtr(uniforms), toInterop(childrenPtrs), toInterop(matrix), isOpaque))
+        }
     }
 }
