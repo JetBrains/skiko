@@ -19,7 +19,9 @@ fun getPtr(n: Native?): NativePointer = n?._ptr ?: Native.NullPointer
 
 expect class InteropScope() {
     fun toInterop(array: ByteArray?): InteropPointer
-    fun byteArrayFromInterop(ptr: InteropPointer): ByteArray?
+    fun InteropPointer.fromInterop(result: ByteArray)
+    fun toInterop(array: FloatArray?): InteropPointer
+    fun InteropPointer.fromInterop(result: FloatArray)
     fun release()
 }
 
@@ -31,3 +33,18 @@ inline fun <T> interopScope(block: InteropScope.() -> T): T {
         scope.release()
     }
 }
+
+inline fun withResult(result: ByteArray, block: (InteropPointer) -> Unit): ByteArray = interopScope {
+    val handle = toInterop(result)
+    block(handle)
+    handle.fromInterop(result)
+    result
+}
+
+inline fun withResult(result: FloatArray, block: (InteropPointer) -> Unit): FloatArray = interopScope {
+    val handle = toInterop(result)
+    block(handle)
+    handle.fromInterop(result)
+    result
+}
+

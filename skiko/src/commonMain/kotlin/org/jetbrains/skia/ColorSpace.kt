@@ -2,12 +2,8 @@
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.Managed
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.*
 import kotlin.jvm.JvmStatic
 
 class ColorSpace : Managed {
@@ -24,9 +20,6 @@ class ColorSpace : Managed {
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nMakeSRGBLinear")
         external fun _nMakeSRGBLinear(): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nConvert")
-        external fun _nConvert(fromPtr: NativePointer, toPtr: NativePointer, r: Float, g: Float, b: Float, a: Float): FloatArray
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nIsGammaCloseToSRGB")
         external fun _nIsGammaCloseToSRGB(ptr: NativePointer): Boolean
@@ -51,16 +44,17 @@ class ColorSpace : Managed {
         var to = to
         to = to ?: sRGB
         return try {
-            Color4f(
-                _nConvert(
-                    _ptr,
-                    getPtr(to),
-                    color.r,
-                    color.g,
-                    color.b,
-                    color.a
-                )
-            )
+            Color4f(withResult(FloatArray(4)) {
+                    _nConvert(
+                        _ptr,
+                        getPtr(to),
+                        color.r,
+                        color.g,
+                        color.b,
+                        color.a,
+                        it
+                    )
+            })
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(to)
@@ -119,3 +113,7 @@ class ColorSpace : Managed {
         val PTR = _nGetFinalizer()
     }
 }
+
+@ExternalSymbolName("org_jetbrains_skia_ColorSpace__nConvert")
+private external fun _nConvert(
+    fromPtr: NativePointer, toPtr: NativePointer, r: Float, g: Float, b: Float, a: Float, result: InteropPointer)

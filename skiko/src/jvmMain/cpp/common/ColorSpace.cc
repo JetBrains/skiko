@@ -27,8 +27,8 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorSpace__1nMakeDis
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jfloatArray JNICALL Java_org_jetbrains_skia_ColorSpace__1nConvert
-  (JNIEnv* env, jclass jclass, jlong fromPtr, jlong toPtr, float r, float g, float b, float a) {
+extern "C" JNIEXPORT jfloatArray JNICALL Java_org_jetbrains_skia_ColorSpaceKt__nConvert
+  (JNIEnv* env, jobject jclass, jlong fromPtr, jlong toPtr, float r, float g, float b, float a, jfloatArray jresult) {
     SkColorSpace* from = reinterpret_cast<SkColorSpace*>(static_cast<uintptr_t>(fromPtr));
     SkColorSpace* to = reinterpret_cast<SkColorSpace*>(static_cast<uintptr_t>(toPtr));
 
@@ -38,11 +38,13 @@ extern "C" JNIEXPORT jfloatArray JNICALL Java_org_jetbrains_skia_ColorSpace__1nC
     skcms_TransferFunction toFn;
     to->invTransferFn(&toFn);
 
-    float r1 = skcms_TransferFunction_eval(&toFn, skcms_TransferFunction_eval(&fromFn, r));
-    float g1 = skcms_TransferFunction_eval(&toFn, skcms_TransferFunction_eval(&fromFn, g));
-    float b1 = skcms_TransferFunction_eval(&toFn, skcms_TransferFunction_eval(&fromFn, b));
-    float a1 = skcms_TransferFunction_eval(&toFn, skcms_TransferFunction_eval(&fromFn, a));
-    return javaFloatArray(env, {r1, g1, b1, a1});
+    float result[4];
+    result[0] = skcms_TransferFunction_eval(&toFn, skcms_TransferFunction_eval(&fromFn, r));
+    result[1] = skcms_TransferFunction_eval(&toFn, skcms_TransferFunction_eval(&fromFn, g));
+    result[2] = skcms_TransferFunction_eval(&toFn, skcms_TransferFunction_eval(&fromFn, b));
+    result[3] = skcms_TransferFunction_eval(&toFn, skcms_TransferFunction_eval(&fromFn, a));
+
+    env->SetFloatArrayRegion(jresult, 0, 4, &result[0]);
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorSpace__1nIsGammaCloseToSRGB
@@ -57,7 +59,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorSpace__1nIsGamma
     return instance->gammaIsLinear();
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorSpace__1nIsSRGB
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorSpaceKt__1nIsSRGB
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkColorSpace* instance = reinterpret_cast<SkColorSpace*>(static_cast<uintptr_t>(ptr));
     return instance->isSRGB();

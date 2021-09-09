@@ -26,26 +26,33 @@ actual typealias InteropPointer = Int
 
 actual class InteropScope actual constructor() {
     private val elements = mutableListOf<NativePointer>()
-    private val pointerToObjectSize = mutableMapOf<InteropPointer, Int>()
 
     actual fun toInterop(array: ByteArray?): InteropPointer {
         return if (array != null) {
             val data = _malloc(array.size)
             elements.add(data)
-            pointerToObjectSize[data] = array.size
             toWasm(data, array)
             data
         } else {
             0
         }
     }
+    actual fun InteropPointer.fromInterop(result: FloatArray) {
+        fromWasm(this@fromInterop, result)
+    }
 
-    actual fun byteArrayFromInterop(ptr: InteropPointer): ByteArray? {
-        return if (ptr == 0) {
-            null
+    actual fun toInterop(array: FloatArray?): InteropPointer {
+        return if (array != null) {
+            val data = _malloc(array.size * 4)
+            elements.add(data)
+            toWasm(data, array)
+            data
         } else {
-            fromWasm(ptr, pointerToObjectSize[ptr]!!)
+            0
         }
+    }
+    actual fun InteropPointer.fromInterop(result: ByteArray) {
+        fromWasm(this@fromInterop, result)
     }
 
     actual fun release()  {
@@ -65,8 +72,17 @@ private fun toWasm(dest: NativePointer, src: ByteArray) {
     js("HEAPU8.set(src, dest)")
 }
 
-private fun fromWasm(src: NativePointer, size: Int): ByteArray {
-    val result = ByteArray(size)
-    js("result.set(HEAPU8.subarray(src, size))")
-    return result
+private fun toWasm(dest: NativePointer, src: FloatArray) {
+    js("HEAPU32.set(src, dest)")
 }
+
+
+private fun fromWasm(src: NativePointer, result: ByteArray) {
+    js("result.set(HEAPU8.subarray(src, result.size))")
+}
+
+private fun fromWasm(src: NativePointer, result: FloatArray) {
+    js("result.set(HEAPU32.subarray(src, result.size))")
+}
+
+

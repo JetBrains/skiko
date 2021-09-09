@@ -37,20 +37,26 @@ actual class InteropScope actual constructor() {
             val pinned = array.pin()
             elements.add(pinned)
             val result = pinned.addressOf(0).rawValue
-            pointerToObject[result] = array
             result
         } else {
             NativePtr.NULL
         }
     }
 
-    actual fun byteArrayFromInterop(ptr: InteropPointer): ByteArray? {
-        return if (ptr == NativePtr.NULL) {
-            null
+    actual fun InteropPointer.fromInterop(result: ByteArray) {}
+
+    actual fun toInterop(array: FloatArray?): InteropPointer {
+        return if (array != null) {
+            val pinned = array.pin()
+            elements.add(pinned)
+            val result = pinned.addressOf(0).rawValue
+            result
         } else {
-            pointerToObject[ptr] as ByteArray
+            NativePtr.NULL
         }
     }
+
+    actual fun InteropPointer.fromInterop(result: FloatArray) {}
 
     actual fun release()  {
         elements.forEach {
@@ -58,8 +64,6 @@ actual class InteropScope actual constructor() {
         }
     }
 
-    // TODO: optimize to one structure.
-    private val pointerToObject = mutableMapOf<InteropPointer, Any?>()
     private val elements = mutableListOf<Pinned<*>>()
 }
 
