@@ -1,7 +1,5 @@
 package org.jetbrains.skia
 
-import org.jetbrains.skia.impl.NativePointer
-
 class FilterMipmap constructor(
     internal val filterMode: FilterMode,
     internal val mipmapMode: MipmapMode = MipmapMode.NONE
