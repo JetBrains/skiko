@@ -52,5 +52,6 @@ actual typealias InteropPointer = Any?
 
 actual class InteropScope actual constructor() {
     actual fun toInterop(array: ByteArray?): InteropPointer = array
+    actual fun byteArrayFromInterop(ptr: InteropPointer): ByteArray? = ptr as ByteArray?
     actual fun release() {}
 }

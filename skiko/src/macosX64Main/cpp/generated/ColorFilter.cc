@@ -112,13 +112,13 @@ extern "C" jlong org_jetbrains_skia_ColorFilter__1nMakeTable
 typedef void* KPointer;
 
 extern "C" KPointer org_jetbrains_skia_ColorFilter__nMakeTableARGB
-  (jbyteArray arrayA,
+  (uint8_t* arrayA,
    jint arrayASize,
-   jbyteArray arrayR,
+   uint8_t* arrayR,
    jint arrayRSize,
-   jbyteArray arrayG,
+   uint8_t* arrayG,
    jint arrayGSize,
-   jbyteArray arrayB,
+   uint8_t* arrayB,
    jint arrayBSize
 ) {
     SkColorFilter* ptr = SkTableColorFilter::MakeARGB(arrayA, arrayR, arrayG, arrayB).release();
