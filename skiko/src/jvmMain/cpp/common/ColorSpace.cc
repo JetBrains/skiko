@@ -59,7 +59,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorSpace__1nIsGamma
     return instance->gammaIsLinear();
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorSpaceKt__1nIsSRGB
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorSpace__1nIsSRGB
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkColorSpace* instance = reinterpret_cast<SkColorSpace*>(static_cast<uintptr_t>(ptr));
     return instance->isSRGB();
