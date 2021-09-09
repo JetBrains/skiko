@@ -1,4 +1,4 @@
-package SkijaInjectSample
+package SkiaJvmSample
 
 import org.jetbrains.skiko.ClipComponent
 import org.jetbrains.skiko.SkiaLayer

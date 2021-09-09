@@ -1,7 +1,6 @@
-package SkijaInjectSample
+package SkiaJvmSample
 
 import kotlinx.coroutines.*
-import kotlinx.coroutines.swing.Swing
 import org.jetbrains.skia.*
 import org.jetbrains.skia.paragraph.FontCollection
 import org.jetbrains.skia.paragraph.ParagraphBuilder
@@ -30,6 +29,7 @@ fun createWindow(title: String, exitOnClose: Boolean) = SwingUtilities.invokeLat
     var mouseY = 0
 
     val window = SkiaWindow()
+
     window.defaultCloseOperation =
         if (exitOnClose) WindowConstants.EXIT_ON_CLOSE else WindowConstants.DISPOSE_ON_CLOSE
     window.title = title
