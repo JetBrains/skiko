@@ -86,7 +86,7 @@ extern "C" void org_jetbrains_skia_Paint__1nSetColor
 
 extern "C" jobject org_jetbrains_skia_Paint__1nGetColor4f
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Paint__1nGetColor4f");
+    TODO("implement org_jetbrains_skia_Paint__1nGetColor4f");
 }
      
 #if 0 

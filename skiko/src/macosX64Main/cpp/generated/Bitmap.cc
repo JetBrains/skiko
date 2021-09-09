@@ -37,7 +37,7 @@ extern "C" void org_jetbrains_skia_Bitmap__1nSwap
 
 extern "C" jobject org_jetbrains_skia_Bitmap__1nGetImageInfo
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Bitmap__1nGetImageInfo");
+    TODO("implement org_jetbrains_skia_Bitmap__1nGetImageInfo");
 }
      
 #if 0 
@@ -142,7 +142,7 @@ extern "C" jboolean org_jetbrains_skia_Bitmap__1nAllocPixelsRowBytes
 
 extern "C" jboolean org_jetbrains_skia_Bitmap__1nInstallPixels
   (kref __Kinstance, jlong ptr, jint width, jint height, jint colorType, jint alphaType, jlong colorSpacePtr, jbyteArray pixelsArr, jlong rowBytes) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Bitmap__1nInstallPixels");
+    TODO("implement org_jetbrains_skia_Bitmap__1nInstallPixels");
 }
      
 #if 0 
@@ -244,7 +244,7 @@ extern "C" jboolean org_jetbrains_skia_Bitmap__1nExtractSubset
 
 extern "C" jbyteArray org_jetbrains_skia_Bitmap__1nReadPixels
   (kref __Kinstance, jlong ptr, jint width, jint height, jint colorType, jint alphaType, jlong colorSpacePtr, jlong rowBytes, jint srcX, jint srcY) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Bitmap__1nReadPixels");
+    TODO("implement org_jetbrains_skia_Bitmap__1nReadPixels");
 }
      
 #if 0 
@@ -269,7 +269,7 @@ extern "C" jbyteArray org_jetbrains_skia_Bitmap__1nReadPixels
 
 extern "C" jobject org_jetbrains_skia_Bitmap__1nExtractAlpha
   (kref __Kinstance, jlong ptr, jlong dstPtr, jlong paintPtr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Bitmap__1nExtractAlpha");
+    TODO("implement org_jetbrains_skia_Bitmap__1nExtractAlpha");
 }
      
 #if 0 
@@ -290,7 +290,7 @@ extern "C" jobject org_jetbrains_skia_Bitmap__1nExtractAlpha
 
 extern "C" jobject org_jetbrains_skia_Bitmap__1nPeekPixels
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Bitmap__1nPeekPixels");
+    TODO("implement org_jetbrains_skia_Bitmap__1nPeekPixels");
 }
      
 #if 0 
@@ -309,7 +309,7 @@ extern "C" jobject org_jetbrains_skia_Bitmap__1nPeekPixels
 
 extern "C" jlong org_jetbrains_skia_Bitmap__1nMakeShader
   (kref __Kinstance, jlong ptr, jint tmx, jint tmy, jlong samplingMode, jfloatArray localMatrixArr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Bitmap__1nMakeShader");
+    TODO("implement org_jetbrains_skia_Bitmap__1nMakeShader");
 }
      
 #if 0 

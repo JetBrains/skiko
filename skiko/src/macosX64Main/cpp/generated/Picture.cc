@@ -17,7 +17,7 @@ extern "C" jlong org_jetbrains_skia_Picture__1nMakeFromData
 
 extern "C" void org_jetbrains_skia_Picture__1nPlayback
   (kref __Kinstance, jlong ptr, jlong canvasPtr, jobject abort) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Picture__1nPlayback");
+    TODO("implement org_jetbrains_skia_Picture__1nPlayback");
 }
      
 #if 0 
@@ -38,7 +38,7 @@ extern "C" void org_jetbrains_skia_Picture__1nPlayback
 
 extern "C" jobject org_jetbrains_skia_Picture__1nGetCullRect
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Picture__1nGetCullRect");
+    TODO("implement org_jetbrains_skia_Picture__1nGetCullRect");
 }
      
 #if 0 
@@ -85,7 +85,7 @@ extern "C" jlong org_jetbrains_skia_Picture__1nGetApproximateBytesUsed
 
 extern "C" jlong org_jetbrains_skia_Picture__1nMakeShader
   (kref __Kinstance, jlong ptr, jint tmxValue, jint tmyValue, jint filterModeValue, jfloatArray localMatrixArr, jobject tileRectObj) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Picture__1nMakeShader");
+    TODO("implement org_jetbrains_skia_Picture__1nMakeShader");
 }
      
 #if 0 

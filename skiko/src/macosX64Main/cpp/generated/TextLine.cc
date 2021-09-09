@@ -9,7 +9,7 @@
 
 extern "C" jlong org_jetbrains_skia_TextLine__1nGetFinalizer
   (kref __Kinstance) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_TextLine__1nGetFinalizer");
+    TODO("implement org_jetbrains_skia_TextLine__1nGetFinalizer");
 }
      
 #if 0 
@@ -23,7 +23,7 @@ extern "C" jlong org_jetbrains_skia_TextLine__1nGetFinalizer
 
 extern "C" jfloat org_jetbrains_skia_TextLine__1nGetAscent
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_TextLine__1nGetAscent");
+    TODO("implement org_jetbrains_skia_TextLine__1nGetAscent");
 }
      
 #if 0 
@@ -38,7 +38,7 @@ extern "C" jfloat org_jetbrains_skia_TextLine__1nGetAscent
 
 extern "C" jfloat org_jetbrains_skia_TextLine__1nGetCapHeight
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_TextLine__1nGetCapHeight");
+    TODO("implement org_jetbrains_skia_TextLine__1nGetCapHeight");
 }
      
 #if 0 
@@ -53,7 +53,7 @@ extern "C" jfloat org_jetbrains_skia_TextLine__1nGetCapHeight
 
 extern "C" jfloat org_jetbrains_skia_TextLine__1nGetXHeight
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_TextLine__1nGetXHeight");
+    TODO("implement org_jetbrains_skia_TextLine__1nGetXHeight");
 }
      
 #if 0 
@@ -68,7 +68,7 @@ extern "C" jfloat org_jetbrains_skia_TextLine__1nGetXHeight
 
 extern "C" jfloat org_jetbrains_skia_TextLine__1nGetDescent
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_TextLine__1nGetDescent");
+    TODO("implement org_jetbrains_skia_TextLine__1nGetDescent");
 }
      
 #if 0 
@@ -83,7 +83,7 @@ extern "C" jfloat org_jetbrains_skia_TextLine__1nGetDescent
 
 extern "C" jfloat org_jetbrains_skia_TextLine__1nGetLeading
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_TextLine__1nGetLeading");
+    TODO("implement org_jetbrains_skia_TextLine__1nGetLeading");
 }
      
 #if 0 
@@ -98,7 +98,7 @@ extern "C" jfloat org_jetbrains_skia_TextLine__1nGetLeading
 
 extern "C" jfloat org_jetbrains_skia_TextLine__1nGetWidth
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_TextLine__1nGetWidth");
+    TODO("implement org_jetbrains_skia_TextLine__1nGetWidth");
 }
      
 #if 0 
@@ -113,7 +113,7 @@ extern "C" jfloat org_jetbrains_skia_TextLine__1nGetWidth
 
 extern "C" jfloat org_jetbrains_skia_TextLine__1nGetHeight
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_TextLine__1nGetHeight");
+    TODO("implement org_jetbrains_skia_TextLine__1nGetHeight");
 }
      
 #if 0 
@@ -128,7 +128,7 @@ extern "C" jfloat org_jetbrains_skia_TextLine__1nGetHeight
 
 extern "C" jlong org_jetbrains_skia_TextLine__1nGetTextBlob
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_TextLine__1nGetTextBlob");
+    TODO("implement org_jetbrains_skia_TextLine__1nGetTextBlob");
 }
      
 #if 0 
@@ -146,7 +146,7 @@ extern "C" jlong org_jetbrains_skia_TextLine__1nGetTextBlob
 
 extern "C" jshortArray org_jetbrains_skia_TextLine__1nGetGlyphs
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_TextLine__1nGetGlyphs");
+    TODO("implement org_jetbrains_skia_TextLine__1nGetGlyphs");
 }
      
 #if 0 
@@ -168,7 +168,7 @@ extern "C" jshortArray org_jetbrains_skia_TextLine__1nGetGlyphs
 
 extern "C" jfloatArray org_jetbrains_skia_TextLine__1nGetPositions
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_TextLine__1nGetPositions");
+    TODO("implement org_jetbrains_skia_TextLine__1nGetPositions");
 }
      
 #if 0 
@@ -190,7 +190,7 @@ extern "C" jfloatArray org_jetbrains_skia_TextLine__1nGetPositions
 
 extern "C" jfloatArray org_jetbrains_skia_TextLine__1nGetRunPositions
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_TextLine__1nGetRunPositions");
+    TODO("implement org_jetbrains_skia_TextLine__1nGetRunPositions");
 }
      
 #if 0 
@@ -208,7 +208,7 @@ extern "C" jfloatArray org_jetbrains_skia_TextLine__1nGetRunPositions
 
 extern "C" jfloatArray org_jetbrains_skia_TextLine__1nGetBreakPositions
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_TextLine__1nGetBreakPositions");
+    TODO("implement org_jetbrains_skia_TextLine__1nGetBreakPositions");
 }
      
 #if 0 
@@ -226,7 +226,7 @@ extern "C" jfloatArray org_jetbrains_skia_TextLine__1nGetBreakPositions
 
 extern "C" jintArray org_jetbrains_skia_TextLine__1nGetBreakOffsets
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_TextLine__1nGetBreakOffsets");
+    TODO("implement org_jetbrains_skia_TextLine__1nGetBreakOffsets");
 }
      
 #if 0 
@@ -244,7 +244,7 @@ extern "C" jintArray org_jetbrains_skia_TextLine__1nGetBreakOffsets
 
 extern "C" jint org_jetbrains_skia_TextLine__1nGetOffsetAtCoord
   (kref __Kinstance, jlong ptr, jfloat x) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_TextLine__1nGetOffsetAtCoord");
+    TODO("implement org_jetbrains_skia_TextLine__1nGetOffsetAtCoord");
 }
      
 #if 0 
@@ -273,7 +273,7 @@ extern "C" jint org_jetbrains_skia_TextLine__1nGetOffsetAtCoord
 
 extern "C" jint org_jetbrains_skia_TextLine__1nGetLeftOffsetAtCoord
   (kref __Kinstance, jlong ptr, jfloat x) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_TextLine__1nGetLeftOffsetAtCoord");
+    TODO("implement org_jetbrains_skia_TextLine__1nGetLeftOffsetAtCoord");
 }
      
 #if 0 
@@ -300,7 +300,7 @@ extern "C" jint org_jetbrains_skia_TextLine__1nGetLeftOffsetAtCoord
 
 extern "C" jfloat org_jetbrains_skia_TextLine__1nGetCoordAtOffset
   (kref __Kinstance, jlong ptr, jint offset16) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_TextLine__1nGetCoordAtOffset");
+    TODO("implement org_jetbrains_skia_TextLine__1nGetCoordAtOffset");
 }
      
 #if 0 

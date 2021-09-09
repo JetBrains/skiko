@@ -35,7 +35,7 @@ extern "C" void org_jetbrains_skia_Canvas__1nDrawPoint
 
 extern "C" void org_jetbrains_skia_Canvas__1nDrawPoints
   (kref __Kinstance, jlong canvasPtr, int mode, jfloatArray coords, jlong paintPtr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Canvas__1nDrawPoints");
+    TODO("implement org_jetbrains_skia_Canvas__1nDrawPoints");
 }
      
 #if 0 
@@ -83,7 +83,7 @@ extern "C" void org_jetbrains_skia_Canvas__1nDrawOval
 
 extern "C" void org_jetbrains_skia_Canvas__1nDrawRRect
   (kref __Kinstance, jlong canvasPtr, jfloat left, jfloat top, jfloat right, jfloat bottom, jfloatArray jradii, jlong paintPtr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Canvas__1nDrawRRect");
+    TODO("implement org_jetbrains_skia_Canvas__1nDrawRRect");
 }
      
 #if 0 
@@ -102,7 +102,7 @@ extern "C" void org_jetbrains_skia_Canvas__1nDrawDRRect
    jfloat ol, jfloat ot, jfloat oright, jfloat ob, jfloatArray ojradii,
    jfloat il, jfloat it, jfloat ir, jfloat ib, jfloatArray ijradii,
    jlong paintPtr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Canvas__1nDrawDRRect");
+    TODO("implement org_jetbrains_skia_Canvas__1nDrawDRRect");
 }
      
 #if 0 
@@ -159,7 +159,7 @@ extern "C" void org_jetbrains_skia_Canvas__1nDrawRegion
 
 extern "C" void org_jetbrains_skia_Canvas__1nDrawString
   (kref __Kinstance, jlong canvasPtr, jstring stringObj, jfloat x, jfloat y, jlong skFontPtr, jlong paintPtr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Canvas__1nDrawString");
+    TODO("implement org_jetbrains_skia_Canvas__1nDrawString");
 }
      
 #if 0 
@@ -205,7 +205,7 @@ extern "C" void org_jetbrains_skia_Canvas__1nDrawPicture
 
 extern "C" void org_jetbrains_skia_Canvas__1nDrawVertices
   (kref __Kinstance, jlong ptr, jint verticesMode, jfloatArray positionsArr, jintArray colorsArr, jfloatArray texCoordsArr, jshortArray indexArr, jint blendMode, jlong paintPtr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Canvas__1nDrawVertices");
+    TODO("implement org_jetbrains_skia_Canvas__1nDrawVertices");
 }
      
 #if 0 
@@ -241,7 +241,7 @@ extern "C" void org_jetbrains_skia_Canvas__1nDrawVertices
 
 extern "C" void org_jetbrains_skia_Canvas__1nDrawPatch
   (kref __Kinstance, jlong ptr, jfloatArray cubicsArr, jintArray colorsArr, jfloatArray texCoordsArr, jint blendMode, jlong paintPtr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Canvas__1nDrawPatch");
+    TODO("implement org_jetbrains_skia_Canvas__1nDrawPatch");
 }
      
 #if 0 
@@ -266,7 +266,7 @@ extern "C" void org_jetbrains_skia_Canvas__1nDrawPatch
 
 extern "C" void org_jetbrains_skia_Canvas__1nDrawDrawable
   (kref __Kinstance, jlong ptr, jlong drawablePtr, jfloatArray matrixArr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Canvas__1nDrawDrawable");
+    TODO("implement org_jetbrains_skia_Canvas__1nDrawDrawable");
 }
      
 #if 0 
@@ -295,7 +295,7 @@ extern "C" void org_jetbrains_skia_Canvas__1nDrawPaint
 
 extern "C" void org_jetbrains_skia_Canvas__1nSetMatrix
   (kref __Kinstance, jlong canvasPtr, jfloatArray matrixArr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Canvas__1nSetMatrix");
+    TODO("implement org_jetbrains_skia_Canvas__1nSetMatrix");
 }
      
 #if 0 
@@ -317,7 +317,7 @@ extern "C" void org_jetbrains_skia_Canvas__1nResetMatrix
 
 extern "C" jobject org_jetbrains_skia_Canvas__1nGetLocalToDevice
 (kref __Kinstance, jlong canvasPtr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Canvas__1nGetLocalToDevice");
+    TODO("implement org_jetbrains_skia_Canvas__1nGetLocalToDevice");
 }
      
 #if 0 
@@ -341,7 +341,7 @@ extern "C" void org_jetbrains_skia_Canvas__1nClipRect
 
 extern "C" void org_jetbrains_skia_Canvas__1nClipRRect
   (kref __Kinstance, jlong canvasPtr, jfloat left, jfloat top, jfloat right, jfloat bottom, jfloatArray jradii, jint mode, jboolean antiAlias) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Canvas__1nClipRRect");
+    TODO("implement org_jetbrains_skia_Canvas__1nClipRRect");
 }
      
 #if 0 

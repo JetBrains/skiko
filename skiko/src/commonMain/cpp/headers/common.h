@@ -55,5 +55,7 @@ jlong ptrToJlong(T* ptr) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(ptr));
 }
 
+void TODO(const char*);
+
 #endif /* SKIKO_COMMON_H */
 

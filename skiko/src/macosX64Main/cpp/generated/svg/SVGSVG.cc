@@ -14,7 +14,7 @@ extern "C" jint org_jetbrains_skia_svg_SVGSVG__1nGetTag
 
 extern "C" jobject org_jetbrains_skia_svg_SVGSVG__1nGetX
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_svg_SVGSVG__1nGetX");
+    TODO("implement org_jetbrains_skia_svg_SVGSVG__1nGetX");
 }
      
 #if 0 
@@ -29,7 +29,7 @@ extern "C" jobject org_jetbrains_skia_svg_SVGSVG__1nGetX
 
 extern "C" jobject org_jetbrains_skia_svg_SVGSVG__1nGetY
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_svg_SVGSVG__1nGetY");
+    TODO("implement org_jetbrains_skia_svg_SVGSVG__1nGetY");
 }
      
 #if 0 
@@ -44,7 +44,7 @@ extern "C" jobject org_jetbrains_skia_svg_SVGSVG__1nGetY
 
 extern "C" jobject org_jetbrains_skia_svg_SVGSVG__1nGetWidth
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_svg_SVGSVG__1nGetWidth");
+    TODO("implement org_jetbrains_skia_svg_SVGSVG__1nGetWidth");
 }
      
 #if 0 
@@ -59,7 +59,7 @@ extern "C" jobject org_jetbrains_skia_svg_SVGSVG__1nGetWidth
 
 extern "C" jobject org_jetbrains_skia_svg_SVGSVG__1nGetHeight
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_svg_SVGSVG__1nGetHeight");
+    TODO("implement org_jetbrains_skia_svg_SVGSVG__1nGetHeight");
 }
      
 #if 0 
@@ -74,7 +74,7 @@ extern "C" jobject org_jetbrains_skia_svg_SVGSVG__1nGetHeight
 
 extern "C" jobject org_jetbrains_skia_svg_SVGSVG__1nGetPreserveAspectRatio
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_svg_SVGSVG__1nGetPreserveAspectRatio");
+    TODO("implement org_jetbrains_skia_svg_SVGSVG__1nGetPreserveAspectRatio");
 }
      
 #if 0 
@@ -89,7 +89,7 @@ extern "C" jobject org_jetbrains_skia_svg_SVGSVG__1nGetPreserveAspectRatio
 
 extern "C" jobject org_jetbrains_skia_svg_SVGSVG__1nGetViewBox
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_svg_SVGSVG__1nGetViewBox");
+    TODO("implement org_jetbrains_skia_svg_SVGSVG__1nGetViewBox");
 }
      
 #if 0 
@@ -105,7 +105,7 @@ extern "C" jobject org_jetbrains_skia_svg_SVGSVG__1nGetViewBox
 
 extern "C" jobject org_jetbrains_skia_svg_SVGSVG__1nGetIntrinsicSize
   (kref __Kinstance, jlong ptr, float width, float height, float dpi) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_svg_SVGSVG__1nGetIntrinsicSize");
+    TODO("implement org_jetbrains_skia_svg_SVGSVG__1nGetIntrinsicSize");
 }
      
 #if 0 

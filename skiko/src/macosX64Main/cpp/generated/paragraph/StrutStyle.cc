@@ -33,7 +33,7 @@ extern "C" jboolean org_jetbrains_skia_paragraph_StrutStyle__1nEquals
 
 extern "C" jobjectArray org_jetbrains_skia_paragraph_StrutStyle__1nGetFontFamilies
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_paragraph_StrutStyle__1nGetFontFamilies");
+    TODO("implement org_jetbrains_skia_paragraph_StrutStyle__1nGetFontFamilies");
 }
      
 #if 0 
@@ -48,7 +48,7 @@ extern "C" jobjectArray org_jetbrains_skia_paragraph_StrutStyle__1nGetFontFamili
 
 extern "C" void org_jetbrains_skia_paragraph_StrutStyle__1nSetFontFamilies
   (kref __Kinstance, jlong ptr, jobjectArray familiesArr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_paragraph_StrutStyle__1nSetFontFamilies");
+    TODO("implement org_jetbrains_skia_paragraph_StrutStyle__1nSetFontFamilies");
 }
      
 #if 0 
@@ -63,7 +63,7 @@ extern "C" void org_jetbrains_skia_paragraph_StrutStyle__1nSetFontFamilies
 
 extern "C" jint org_jetbrains_skia_paragraph_StrutStyle__1nGetFontStyle
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_paragraph_StrutStyle__1nGetFontStyle");
+    TODO("implement org_jetbrains_skia_paragraph_StrutStyle__1nGetFontStyle");
 }
      
 #if 0 
@@ -78,7 +78,7 @@ extern "C" jint org_jetbrains_skia_paragraph_StrutStyle__1nGetFontStyle
 
 extern "C" void org_jetbrains_skia_paragraph_StrutStyle__1nSetFontStyle
   (kref __Kinstance, jlong ptr, jint style) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_paragraph_StrutStyle__1nSetFontStyle");
+    TODO("implement org_jetbrains_skia_paragraph_StrutStyle__1nSetFontStyle");
 }
      
 #if 0 

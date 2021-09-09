@@ -42,7 +42,7 @@ extern "C" jboolean org_jetbrains_skia_Region__1nIsComplex(kref __Kinstance, jlo
 
 
 extern "C" jobject org_jetbrains_skia_Region__1nGetBounds(kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Region__1nGetBounds(kref");
+    TODO("implement org_jetbrains_skia_Region__1nGetBounds(kref");
 }
      
 #if 0 
@@ -76,7 +76,7 @@ extern "C" jboolean org_jetbrains_skia_Region__1nSetRect(kref __Kinstance, jlong
 
 
 extern "C" jboolean org_jetbrains_skia_Region__1nSetRects(kref __Kinstance, jlong ptr, jintArray coords) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Region__1nSetRects(kref");
+    TODO("implement org_jetbrains_skia_Region__1nSetRects(kref");
 }
      
 #if 0 

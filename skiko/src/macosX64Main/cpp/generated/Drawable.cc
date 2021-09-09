@@ -8,7 +8,7 @@
 
 extern "C" jlong org_jetbrains_skia_Drawable__1nMake
   (kref __Kinstance) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Drawable__1nMake");
+    TODO("implement org_jetbrains_skia_Drawable__1nMake");
 }
      
 #if 0 
@@ -23,7 +23,7 @@ extern "C" jlong org_jetbrains_skia_Drawable__1nMake
 
 extern "C" void org_jetbrains_skia_Drawable__1nInit
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Drawable__1nInit");
+    TODO("implement org_jetbrains_skia_Drawable__1nInit");
 }
      
 #if 0 
@@ -38,7 +38,7 @@ extern "C" void org_jetbrains_skia_Drawable__1nInit
 
 extern "C" void org_jetbrains_skia_Drawable__1nDraw
   (kref __Kinstance, jlong ptr, jlong canvasPtr, jfloatArray matrixArr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Drawable__1nDraw");
+    TODO("implement org_jetbrains_skia_Drawable__1nDraw");
 }
      
 #if 0 
@@ -55,7 +55,7 @@ extern "C" void org_jetbrains_skia_Drawable__1nDraw
 
 extern "C" jlong org_jetbrains_skia_Drawable__1nMakePictureSnapshot
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Drawable__1nMakePictureSnapshot");
+    TODO("implement org_jetbrains_skia_Drawable__1nMakePictureSnapshot");
 }
      
 #if 0 
@@ -70,7 +70,7 @@ extern "C" jlong org_jetbrains_skia_Drawable__1nMakePictureSnapshot
 
 extern "C" jint org_jetbrains_skia_Drawable__1nGetGenerationId
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Drawable__1nGetGenerationId");
+    TODO("implement org_jetbrains_skia_Drawable__1nGetGenerationId");
 }
      
 #if 0 
@@ -85,7 +85,7 @@ extern "C" jint org_jetbrains_skia_Drawable__1nGetGenerationId
 
 extern "C" void org_jetbrains_skia_Drawable__1nNotifyDrawingChanged
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Drawable__1nNotifyDrawingChanged");
+    TODO("implement org_jetbrains_skia_Drawable__1nNotifyDrawingChanged");
 }
      
 #if 0 

@@ -16,7 +16,7 @@ extern "C" jint org_jetbrains_skia_FontMgr__1nGetFamiliesCount
 
 extern "C" jstring org_jetbrains_skia_FontMgr__1nGetFamilyName
   (kref __Kinstance, jlong ptr, jint index) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_FontMgr__1nGetFamilyName");
+    TODO("implement org_jetbrains_skia_FontMgr__1nGetFamilyName");
 }
      
 #if 0 
@@ -40,7 +40,7 @@ extern "C" jlong org_jetbrains_skia_FontMgr__1nMakeStyleSet
 
 extern "C" jlong org_jetbrains_skia_FontMgr__1nMatchFamily
   (kref __Kinstance, jlong ptr, jstring familyNameStr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_FontMgr__1nMatchFamily");
+    TODO("implement org_jetbrains_skia_FontMgr__1nMatchFamily");
 }
      
 #if 0 
@@ -57,7 +57,7 @@ extern "C" jlong org_jetbrains_skia_FontMgr__1nMatchFamily
 
 extern "C" jlong org_jetbrains_skia_FontMgr__1nMatchFamilyStyle
   (kref __Kinstance, jlong ptr, jstring familyNameStr, jint fontStyle) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_FontMgr__1nMatchFamilyStyle");
+    TODO("implement org_jetbrains_skia_FontMgr__1nMatchFamilyStyle");
 }
      
 #if 0 
@@ -74,7 +74,7 @@ extern "C" jlong org_jetbrains_skia_FontMgr__1nMatchFamilyStyle
 
 extern "C" jlong org_jetbrains_skia_FontMgr__1nMatchFamilyStyleCharacter
   (kref __Kinstance, jlong ptr, jstring familyNameStr, jint fontStyle, jobjectArray bcp47Array, jint character) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_FontMgr__1nMatchFamilyStyleCharacter");
+    TODO("implement org_jetbrains_skia_FontMgr__1nMatchFamilyStyleCharacter");
 }
      
 #if 0 

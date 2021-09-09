@@ -68,7 +68,7 @@ extern "C" jboolean org_jetbrains_skia_Pixmap__1nExtractSubset
 
 extern "C" jobject org_jetbrains_skia_Pixmap__1nGetInfo
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Pixmap__1nGetInfo");
+    TODO("implement org_jetbrains_skia_Pixmap__1nGetInfo");
 }
      
 #if 0 

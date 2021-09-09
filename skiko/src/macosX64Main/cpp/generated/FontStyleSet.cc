@@ -29,7 +29,7 @@ extern "C" jint org_jetbrains_skia_FontStyleSet__1nGetStyle
 
 extern "C" jstring org_jetbrains_skia_FontStyleSet__1nGetStyleName
   (kref __Kinstance, jlong ptr, jint index) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_FontStyleSet__1nGetStyleName");
+    TODO("implement org_jetbrains_skia_FontStyleSet__1nGetStyleName");
 }
      
 #if 0 
@@ -53,7 +53,7 @@ extern "C" jlong org_jetbrains_skia_FontStyleSet__1nGetTypeface
 
 extern "C" jlong org_jetbrains_skia_FontStyleSet__1nMatchStyle
   (kref __Kinstance, jlong ptr, jint fontStyle) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_FontStyleSet__1nMatchStyle");
+    TODO("implement org_jetbrains_skia_FontStyleSet__1nMatchStyle");
 }
      
 #if 0 

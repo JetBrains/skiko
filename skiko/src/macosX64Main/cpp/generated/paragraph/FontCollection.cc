@@ -23,7 +23,7 @@ extern "C" jlong org_jetbrains_skia_paragraph_FontCollection__1nGetFontManagersC
 
 extern "C" void org_jetbrains_skia_paragraph_FontCollection__1nSetAssetFontManager
   (kref __Kinstance, jlong ptr, jlong fontManagerPtr, jstring defaultFamilyNameStr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_paragraph_FontCollection__1nSetAssetFontManager");
+    TODO("implement org_jetbrains_skia_paragraph_FontCollection__1nSetAssetFontManager");
 }
      
 #if 0 
@@ -39,7 +39,7 @@ extern "C" void org_jetbrains_skia_paragraph_FontCollection__1nSetAssetFontManag
 
 extern "C" void org_jetbrains_skia_paragraph_FontCollection__1nSetDynamicFontManager
   (kref __Kinstance, jlong ptr, jlong fontManagerPtr, jstring defaultFamilyNameStr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_paragraph_FontCollection__1nSetDynamicFontManager");
+    TODO("implement org_jetbrains_skia_paragraph_FontCollection__1nSetDynamicFontManager");
 }
      
 #if 0 
@@ -55,7 +55,7 @@ extern "C" void org_jetbrains_skia_paragraph_FontCollection__1nSetDynamicFontMan
 
 extern "C" void org_jetbrains_skia_paragraph_FontCollection__1nSetTestFontManager
   (kref __Kinstance, jlong ptr, jlong fontManagerPtr, jstring defaultFamilyNameStr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_paragraph_FontCollection__1nSetTestFontManager");
+    TODO("implement org_jetbrains_skia_paragraph_FontCollection__1nSetTestFontManager");
 }
      
 #if 0 
@@ -71,7 +71,7 @@ extern "C" void org_jetbrains_skia_paragraph_FontCollection__1nSetTestFontManage
 
 extern "C" void org_jetbrains_skia_paragraph_FontCollection__1nSetDefaultFontManager
   (kref __Kinstance, jlong ptr, jlong fontManagerPtr, jstring defaultFamilyNameStr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_paragraph_FontCollection__1nSetDefaultFontManager");
+    TODO("implement org_jetbrains_skia_paragraph_FontCollection__1nSetDefaultFontManager");
 }
      
 #if 0 
@@ -99,7 +99,7 @@ extern "C" jlong org_jetbrains_skia_paragraph_FontCollection__1nGetFallbackManag
 
 extern "C" jlongArray org_jetbrains_skia_paragraph_FontCollection__1nFindTypefaces
   (kref __Kinstance, jlong ptr, jobjectArray familyNamesArray, jint fontStyle) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_paragraph_FontCollection__1nFindTypefaces");
+    TODO("implement org_jetbrains_skia_paragraph_FontCollection__1nFindTypefaces");
 }
      
 #if 0 
@@ -130,7 +130,7 @@ extern "C" jlongArray org_jetbrains_skia_paragraph_FontCollection__1nFindTypefac
 
 extern "C" jlong org_jetbrains_skia_paragraph_FontCollection__1nDefaultFallbackChar
   (kref __Kinstance, jlong ptr, jint unicode, jint fontStyle, jstring locale) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_paragraph_FontCollection__1nDefaultFallbackChar");
+    TODO("implement org_jetbrains_skia_paragraph_FontCollection__1nDefaultFallbackChar");
 }
      
 #if 0 

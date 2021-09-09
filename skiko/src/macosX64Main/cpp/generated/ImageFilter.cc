@@ -12,7 +12,7 @@
 
 extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakeAlphaThreshold
   (kref __Kinstance, jlong regionPtr, jfloat innerMin, jfloat outerMax, jlong inputPtr, jobject cropObj) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_ImageFilter__1nMakeAlphaThreshold");
+    TODO("implement org_jetbrains_skia_ImageFilter__1nMakeAlphaThreshold");
 }
      
 #if 0 
@@ -30,7 +30,7 @@ extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakeAlphaThreshold
 
 extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakeArithmetic
   (kref __Kinstance, jfloat k1, jfloat k2, jfloat k3, jfloat k4, jboolean enforcePMColor, jlong bgPtr, jlong fgPtr, jobject cropObj) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_ImageFilter__1nMakeArithmetic");
+    TODO("implement org_jetbrains_skia_ImageFilter__1nMakeArithmetic");
 }
      
 #if 0 
@@ -48,7 +48,7 @@ extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakeArithmetic
 
 extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakeBlend
   (kref __Kinstance, jint blendModeInt, jlong bgPtr, jlong fgPtr, jobject cropObj) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_ImageFilter__1nMakeBlend");
+    TODO("implement org_jetbrains_skia_ImageFilter__1nMakeBlend");
 }
      
 #if 0 
@@ -67,7 +67,7 @@ extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakeBlend
 
 extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakeBlur
   (kref __Kinstance, jfloat sigmaX, jfloat sigmaY, jint tileModeInt, jlong inputPtr, jobject cropObj) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_ImageFilter__1nMakeBlur");
+    TODO("implement org_jetbrains_skia_ImageFilter__1nMakeBlur");
 }
      
 #if 0 
@@ -85,7 +85,7 @@ extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakeBlur
 
 extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakeColorFilter
   (kref __Kinstance, jlong colorFilterPtr, jlong inputPtr, jobject cropObj) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_ImageFilter__1nMakeColorFilter");
+    TODO("implement org_jetbrains_skia_ImageFilter__1nMakeColorFilter");
 }
      
 #if 0 
@@ -111,7 +111,7 @@ extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakeCompose
 
 extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakeDisplacementMap
   (kref __Kinstance, jint xChanInt, jint yChanInt, jfloat scale, jlong displacementPtr, jlong colorPtr, jobject cropObj) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_ImageFilter__1nMakeDisplacementMap");
+    TODO("implement org_jetbrains_skia_ImageFilter__1nMakeDisplacementMap");
 }
      
 #if 0 
@@ -131,7 +131,7 @@ extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakeDisplacementMap
 
 extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakeDropShadow
   (kref __Kinstance, jfloat dx, jfloat dy, jfloat sigmaX, jfloat sigmaY, jint color, jlong inputPtr, jobject cropObj) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_ImageFilter__1nMakeDropShadow");
+    TODO("implement org_jetbrains_skia_ImageFilter__1nMakeDropShadow");
 }
      
 #if 0 
@@ -148,7 +148,7 @@ extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakeDropShadow
 
 extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakeDropShadowOnly
   (kref __Kinstance, jfloat dx, jfloat dy, jfloat sigmaX, jfloat sigmaY, jint color, jlong inputPtr, jobject cropObj) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_ImageFilter__1nMakeDropShadowOnly");
+    TODO("implement org_jetbrains_skia_ImageFilter__1nMakeDropShadowOnly");
 }
      
 #if 0 
@@ -172,7 +172,7 @@ extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakeImage
 
 extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakeMagnifier
   (kref __Kinstance, jfloat l, jfloat t, jfloat r, jfloat b, jfloat inset, jlong inputPtr, jobject cropObj) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_ImageFilter__1nMakeMagnifier");
+    TODO("implement org_jetbrains_skia_ImageFilter__1nMakeMagnifier");
 }
      
 #if 0 
@@ -189,7 +189,7 @@ extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakeMagnifier
 
 extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakeMatrixConvolution
   (kref __Kinstance, jint kernelW, jint kernelH, jfloatArray kernelArray, jfloat gain, jfloat bias, jint offsetX, jint offsetY, jint tileModeInt, jboolean convolveAlpha, jlong inputPtr, jobject cropObj) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_ImageFilter__1nMakeMatrixConvolution");
+    TODO("implement org_jetbrains_skia_ImageFilter__1nMakeMatrixConvolution");
 }
      
 #if 0 
@@ -209,7 +209,7 @@ extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakeMatrixConvolution
 
 extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakeMatrixTransform
   (kref __Kinstance, jfloatArray matrixArray, jlong samplingMode, jlong inputPtr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_ImageFilter__1nMakeMatrixTransform");
+    TODO("implement org_jetbrains_skia_ImageFilter__1nMakeMatrixTransform");
 }
      
 #if 0 
@@ -226,7 +226,7 @@ extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakeMatrixTransform
 
 extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakeMerge
   (kref __Kinstance, jlongArray filtersArray, jobject cropObj) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_ImageFilter__1nMakeMerge");
+    TODO("implement org_jetbrains_skia_ImageFilter__1nMakeMerge");
 }
      
 #if 0 
@@ -250,7 +250,7 @@ extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakeMerge
 
 extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakeOffset
   (kref __Kinstance, jfloat dx, jfloat dy, jlong inputPtr, jobject cropObj) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_ImageFilter__1nMakeOffset");
+    TODO("implement org_jetbrains_skia_ImageFilter__1nMakeOffset");
 }
      
 #if 0 
@@ -267,7 +267,7 @@ extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakeOffset
 
 extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakePaint
   (kref __Kinstance, jlong paintPtr, jobject cropObj) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_ImageFilter__1nMakePaint");
+    TODO("implement org_jetbrains_skia_ImageFilter__1nMakePaint");
 }
      
 #if 0 
@@ -298,7 +298,7 @@ extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakeTile
 
 extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakeDilate
   (kref __Kinstance, float rx, jfloat ry, jlong inputPtr, jobject cropObj) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_ImageFilter__1nMakeDilate");
+    TODO("implement org_jetbrains_skia_ImageFilter__1nMakeDilate");
 }
      
 #if 0 
@@ -315,7 +315,7 @@ extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakeDilate
 
 extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakeErode
   (kref __Kinstance, float rx, jfloat ry, jlong inputPtr, jobject cropObj) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_ImageFilter__1nMakeErode");
+    TODO("implement org_jetbrains_skia_ImageFilter__1nMakeErode");
 }
      
 #if 0 
@@ -332,7 +332,7 @@ extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakeErode
 
 extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakeDistantLitDiffuse
   (kref __Kinstance, jfloat x, jfloat y, jfloat z, jint lightColor, jfloat surfaceScale, jfloat kd, jlong inputPtr, jobject cropObj) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_ImageFilter__1nMakeDistantLitDiffuse");
+    TODO("implement org_jetbrains_skia_ImageFilter__1nMakeDistantLitDiffuse");
 }
      
 #if 0 
@@ -349,7 +349,7 @@ extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakeDistantLitDiffuse
 
 extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakePointLitDiffuse
   (kref __Kinstance, jfloat x, jfloat y, jfloat z, jint lightColor, jfloat surfaceScale, jfloat kd, jlong inputPtr, jobject cropObj) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_ImageFilter__1nMakePointLitDiffuse");
+    TODO("implement org_jetbrains_skia_ImageFilter__1nMakePointLitDiffuse");
 }
      
 #if 0 
@@ -366,7 +366,7 @@ extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakePointLitDiffuse
 
 extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakeSpotLitDiffuse
   (kref __Kinstance, jfloat x0, jfloat y0, jfloat z0, jfloat x1, jfloat y1, jfloat z1, jfloat falloffExponent, jfloat cutoffAngle, jint lightColor, jfloat surfaceScale, jfloat kd, jlong inputPtr, jobject cropObj) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_ImageFilter__1nMakeSpotLitDiffuse");
+    TODO("implement org_jetbrains_skia_ImageFilter__1nMakeSpotLitDiffuse");
 }
      
 #if 0 
@@ -383,7 +383,7 @@ extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakeSpotLitDiffuse
 
 extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakeDistantLitSpecular
   (kref __Kinstance, jfloat x, jfloat y, jfloat z, jint lightColor, jfloat surfaceScale, jfloat ks, jfloat shininess, jlong inputPtr, jobject cropObj) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_ImageFilter__1nMakeDistantLitSpecular");
+    TODO("implement org_jetbrains_skia_ImageFilter__1nMakeDistantLitSpecular");
 }
      
 #if 0 
@@ -400,7 +400,7 @@ extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakeDistantLitSpecular
 
 extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakePointLitSpecular
   (kref __Kinstance, jfloat x, jfloat y, jfloat z, jint lightColor, jfloat surfaceScale, jfloat ks, jfloat shininess, jlong inputPtr, jobject cropObj) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_ImageFilter__1nMakePointLitSpecular");
+    TODO("implement org_jetbrains_skia_ImageFilter__1nMakePointLitSpecular");
 }
      
 #if 0 
@@ -417,7 +417,7 @@ extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakePointLitSpecular
 
 extern "C" jlong org_jetbrains_skia_ImageFilter__1nMakeSpotLitSpecular
   (kref __Kinstance, jfloat x0, jfloat y0, jfloat z0, jfloat x1, jfloat y1, jfloat z1, jfloat falloffExponent, jfloat cutoffAngle, jint lightColor, jfloat surfaceScale, jfloat ks, jfloat shininess, jlong inputPtr, jobject cropObj) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_ImageFilter__1nMakeSpotLitSpecular");
+    TODO("implement org_jetbrains_skia_ImageFilter__1nMakeSpotLitSpecular");
 }
      
 #if 0 

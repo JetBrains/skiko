@@ -16,7 +16,7 @@ extern "C" jlong org_jetbrains_skia_paragraph_TypefaceFontProvider__1nMake
 
 extern "C" void org_jetbrains_skia_paragraph_TypefaceFontProvider__1nRegisterTypeface
   (kref __Kinstance, jlong ptr, jlong typefacePtr, jstring aliasStr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_paragraph_TypefaceFontProvider__1nRegisterTypeface");
+    TODO("implement org_jetbrains_skia_paragraph_TypefaceFontProvider__1nRegisterTypeface");
 }
      
 #if 0 

@@ -27,7 +27,7 @@ extern "C" jlong org_jetbrains_skia_svg_SVGDOM__1nGetRoot
 
 extern "C" jobject org_jetbrains_skia_svg_SVGDOM__1nGetContainerSize
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_svg_SVGDOM__1nGetContainerSize");
+    TODO("implement org_jetbrains_skia_svg_SVGDOM__1nGetContainerSize");
 }
      
 #if 0 

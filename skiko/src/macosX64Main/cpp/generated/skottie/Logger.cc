@@ -8,7 +8,7 @@ using namespace skottie;
 
 extern "C" jlong org_jetbrains_skia_skottie_Logger__1nMake
   (kref __Kinstance) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_skottie_Logger__1nMake");
+    TODO("implement org_jetbrains_skia_skottie_Logger__1nMake");
 }
      
 #if 0 
@@ -23,7 +23,7 @@ extern "C" jlong org_jetbrains_skia_skottie_Logger__1nMake
 
 extern "C" void org_jetbrains_skia_skottie_Logger__1nInit
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_skottie_Logger__1nInit");
+    TODO("implement org_jetbrains_skia_skottie_Logger__1nInit");
 }
      
 #if 0 

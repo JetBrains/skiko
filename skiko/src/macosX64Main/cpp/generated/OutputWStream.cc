@@ -8,7 +8,7 @@
 
 extern "C" jlong org_jetbrains_skia_OutputWStream__1nGetFinalizer
   (kref __Kinstance) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_OutputWStream__1nGetFinalizer");
+    TODO("implement org_jetbrains_skia_OutputWStream__1nGetFinalizer");
 }
      
 #if 0 
@@ -22,7 +22,7 @@ extern "C" jlong org_jetbrains_skia_OutputWStream__1nGetFinalizer
 
 extern "C" jlong org_jetbrains_skia_OutputWStream__1nMake
   (kref __Kinstance, jobject outputStream) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_OutputWStream__1nMake");
+    TODO("implement org_jetbrains_skia_OutputWStream__1nMake");
 }
      
 #if 0 

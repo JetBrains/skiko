@@ -31,7 +31,7 @@ extern "C" jlong org_jetbrains_skiko_RenderTargetsKt_makeMetalRenderTargetNative
 
 extern "C" jlong org_jetbrains_skiko_RenderTargetsKt_makeMetalContextNative
     (kref __Kinstance) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skiko_RenderTargetsKt_makeMetalContextNative");
+    TODO("implement org_jetbrains_skiko_RenderTargetsKt_makeMetalContextNative");
 }
      
 #if 0 

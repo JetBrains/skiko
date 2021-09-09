@@ -15,7 +15,7 @@ extern "C" jlong org_jetbrains_skia_BreakIterator__1nGetFinalizer(kref __Kinstan
 
 extern "C" jlong org_jetbrains_skia_BreakIterator__1nMake
   (kref __Kinstance, jint type, jstring localeStr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_BreakIterator__1nMake");
+    TODO("implement org_jetbrains_skia_BreakIterator__1nMake");
 }
      
 #if 0 
@@ -42,7 +42,7 @@ extern "C" jlong org_jetbrains_skia_BreakIterator__1nMake
 
 extern "C" jint org_jetbrains_skia_BreakIterator__1nClone
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_BreakIterator__1nClone");
+    TODO("implement org_jetbrains_skia_BreakIterator__1nClone");
 }
      
 #if 0 
@@ -117,7 +117,7 @@ extern "C" jint org_jetbrains_skia_BreakIterator__1nGetRuleStatus
 
 extern "C" jintArray org_jetbrains_skia_BreakIterator__1nGetRuleStatuses
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_BreakIterator__1nGetRuleStatuses");
+    TODO("implement org_jetbrains_skia_BreakIterator__1nGetRuleStatuses");
 }
      
 #if 0 
@@ -140,7 +140,7 @@ extern "C" jintArray org_jetbrains_skia_BreakIterator__1nGetRuleStatuses
 
 extern "C" void org_jetbrains_skia_BreakIterator__1nSetText
   (kref __Kinstance, jlong ptr, jlong textPtr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_BreakIterator__1nSetText");
+    TODO("implement org_jetbrains_skia_BreakIterator__1nSetText");
 }
      
 #if 0 

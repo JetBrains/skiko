@@ -29,7 +29,7 @@ extern "C" jlong org_jetbrains_skia_ColorFilter__1nMakeBlend
 
 extern "C" jlong org_jetbrains_skia_ColorFilter__1nMakeMatrix
   (kref __Kinstance, jfloatArray rowMajorArray) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_ColorFilter__1nMakeMatrix");
+    TODO("implement org_jetbrains_skia_ColorFilter__1nMakeMatrix");
 }
      
 #if 0 
@@ -46,7 +46,7 @@ extern "C" jlong org_jetbrains_skia_ColorFilter__1nMakeMatrix
 
 extern "C" jlong org_jetbrains_skia_ColorFilter__1nMakeHSLAMatrix
   (kref __Kinstance, jfloatArray rowMajorArray) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_ColorFilter__1nMakeHSLAMatrix");
+    TODO("implement org_jetbrains_skia_ColorFilter__1nMakeHSLAMatrix");
 }
      
 #if 0 
@@ -96,7 +96,7 @@ extern "C" jlong org_jetbrains_skia_ColorFilter__1nMakeHighContrast
 
 extern "C" jlong org_jetbrains_skia_ColorFilter__1nMakeTable
   (kref __Kinstance, jbyteArray tableArray) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_ColorFilter__1nMakeTable");
+    TODO("implement org_jetbrains_skia_ColorFilter__1nMakeTable");
 }
      
 #if 0 

@@ -38,7 +38,7 @@ extern "C" void org_jetbrains_skia_skottie_AnimationBuilder__1nSetLogger
 
 extern "C" jlong org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromString
   (kref __Kinstance, jlong ptr, jstring dataStr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromString");
+    TODO("implement org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromString");
 }
      
 #if 0 
@@ -55,7 +55,7 @@ extern "C" jlong org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromString
 
 extern "C" jlong org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromFile
   (kref __Kinstance, jlong ptr, jstring pathStr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromFile");
+    TODO("implement org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromFile");
 }
      
 #if 0 

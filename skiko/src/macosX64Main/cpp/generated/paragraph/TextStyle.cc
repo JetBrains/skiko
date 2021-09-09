@@ -89,7 +89,7 @@ extern "C" void org_jetbrains_skia_paragraph_TextStyle__1nSetBackground
 
 extern "C" jobject org_jetbrains_skia_paragraph_TextStyle__1nGetDecorationStyle
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_paragraph_TextStyle__1nGetDecorationStyle");
+    TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nGetDecorationStyle");
 }
      
 #if 0 
@@ -126,7 +126,7 @@ extern "C" void org_jetbrains_skia_paragraph_TextStyle__1nSetDecorationStyle
 
 extern "C" jint org_jetbrains_skia_paragraph_TextStyle__1nGetFontStyle
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_paragraph_TextStyle__1nGetFontStyle");
+    TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nGetFontStyle");
 }
      
 #if 0 
@@ -141,7 +141,7 @@ extern "C" jint org_jetbrains_skia_paragraph_TextStyle__1nGetFontStyle
 
 extern "C" void org_jetbrains_skia_paragraph_TextStyle__1nSetFontStyle
   (kref __Kinstance, jlong ptr, jint fontStyleValue) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_paragraph_TextStyle__1nSetFontStyle");
+    TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nSetFontStyle");
 }
      
 #if 0 
@@ -156,7 +156,7 @@ extern "C" void org_jetbrains_skia_paragraph_TextStyle__1nSetFontStyle
 
 extern "C" jobjectArray org_jetbrains_skia_paragraph_TextStyle__1nGetShadows
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_paragraph_TextStyle__1nGetShadows");
+    TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nGetShadows");
 }
      
 #if 0 
@@ -190,7 +190,7 @@ extern "C" void org_jetbrains_skia_paragraph_TextStyle__1nClearShadows
 
 extern "C" jobjectArray org_jetbrains_skia_paragraph_TextStyle__1nGetFontFeatures
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_paragraph_TextStyle__1nGetFontFeatures");
+    TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nGetFontFeatures");
 }
      
 #if 0 
@@ -213,7 +213,7 @@ extern "C" jobjectArray org_jetbrains_skia_paragraph_TextStyle__1nGetFontFeature
 
 extern "C" void org_jetbrains_skia_paragraph_TextStyle__1nAddFontFeature
   (kref __Kinstance, jlong ptr, jstring nameStr, jint value) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_paragraph_TextStyle__1nAddFontFeature");
+    TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nAddFontFeature");
 }
      
 #if 0 
@@ -246,7 +246,7 @@ extern "C" void org_jetbrains_skia_paragraph_TextStyle__1nSetFontSize
 
 extern "C" jobjectArray org_jetbrains_skia_paragraph_TextStyle__1nGetFontFamilies
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_paragraph_TextStyle__1nGetFontFamilies");
+    TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nGetFontFamilies");
 }
      
 #if 0 
@@ -261,7 +261,7 @@ extern "C" jobjectArray org_jetbrains_skia_paragraph_TextStyle__1nGetFontFamilie
 
 extern "C" void org_jetbrains_skia_paragraph_TextStyle__1nSetFontFamilies
   (kref __Kinstance, jlong ptr, jobjectArray familiesArray) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_paragraph_TextStyle__1nSetFontFamilies");
+    TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nSetFontFamilies");
 }
      
 #if 0 
@@ -276,7 +276,7 @@ extern "C" void org_jetbrains_skia_paragraph_TextStyle__1nSetFontFamilies
 
 extern "C" jobject org_jetbrains_skia_paragraph_TextStyle__1nGetHeight
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_paragraph_TextStyle__1nGetHeight");
+    TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nGetHeight");
 }
      
 #if 0 
@@ -335,7 +335,7 @@ extern "C" void org_jetbrains_skia_paragraph_TextStyle__1nSetTypeface
 
 extern "C" jstring org_jetbrains_skia_paragraph_TextStyle__1nGetLocale
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_paragraph_TextStyle__1nGetLocale");
+    TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nGetLocale");
 }
      
 #if 0 
@@ -350,7 +350,7 @@ extern "C" jstring org_jetbrains_skia_paragraph_TextStyle__1nGetLocale
 
 extern "C" void org_jetbrains_skia_paragraph_TextStyle__1nSetLocale
   (kref __Kinstance, jlong ptr, jstring locale) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_paragraph_TextStyle__1nSetLocale");
+    TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nSetLocale");
 }
      
 #if 0 
@@ -377,7 +377,7 @@ extern "C" void org_jetbrains_skia_paragraph_TextStyle__1nSetBaselineMode
 
 extern "C" jobject org_jetbrains_skia_paragraph_TextStyle__1nGetFontMetrics
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_paragraph_TextStyle__1nGetFontMetrics");
+    TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nGetFontMetrics");
 }
      
 #if 0 

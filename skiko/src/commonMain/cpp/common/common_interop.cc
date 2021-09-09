@@ -1,5 +1,6 @@
 #include "common.h"
 #include "src/utils/SkUTF.h"
+#include <stdio.h>
 
 jlong packTwoInts(int32_t a, int32_t b) {
     return (uint64_t (a) << 32) | b;
@@ -72,3 +73,10 @@ uint32_t skija::UtfIndicesConverter::from8To16(size_t i8) {
 
     return fPos16;
 }
+
+void TODO(const char* message) {
+    printf("TODO: %s\n", message);
+    fflush(stdout);
+    abort();
+}
+

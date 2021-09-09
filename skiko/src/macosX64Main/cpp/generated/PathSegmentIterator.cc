@@ -24,7 +24,7 @@ extern "C" jlong org_jetbrains_skia_PathSegmentIterator__1nGetFinalizer
 
 extern "C" jobject org_jetbrains_skia_PathSegmentIterator__1nNext
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_PathSegmentIterator__1nNext");
+    TODO("implement org_jetbrains_skia_PathSegmentIterator__1nNext");
 }
      
 #if 0 
