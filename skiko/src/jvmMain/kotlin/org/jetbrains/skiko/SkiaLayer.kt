@@ -339,7 +339,13 @@ open class SkiaLayer(
                 findNextWorkingRenderApi(true)
                 return false
             }
-            initCanvas()
+            try {
+                initCanvas()
+            } catch (e: Exception) {
+                println(e.message)
+                findNextWorkingRenderApi(false)
+                return false
+            }
         }
         return true
     }
