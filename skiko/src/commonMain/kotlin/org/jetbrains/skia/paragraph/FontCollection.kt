@@ -8,6 +8,7 @@ import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.NativePointerArray
 import org.jetbrains.skia.impl.getPtr
 import kotlin.jvm.JvmStatic
 
@@ -36,7 +37,7 @@ class FontCollection internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         external fun _nGetFallbackManager(ptr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_FontCollection__1nFindTypefaces")
-        external fun _nFindTypefaces(ptr: NativePointer, familyNames: Array<String?>?, fontStyle: Int): Array<NativePointer>
+        external fun _nFindTypefaces(ptr: NativePointer, familyNames: Array<String?>?, fontStyle: Int): NativePointerArray
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_FontCollection__1nDefaultFallbackChar")
         external fun _nDefaultFallbackChar(ptr: NativePointer, unicode: Int, fontStyle: Int, locale: String?): NativePointer
@@ -132,7 +133,7 @@ class FontCollection internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             Stats.onNativeCall()
             val ptrs = _nFindTypefaces(_ptr, familyNames, style._value)
             val res = arrayOfNulls<Typeface>(ptrs.size)
-            for (i in ptrs.indices) res[i] = Typeface(ptrs[i])
+            for (i in 0 until ptrs.size) res[i] = Typeface(ptrs[i])
             res
         } finally {
             reachabilityBarrier(this)

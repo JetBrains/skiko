@@ -7,6 +7,7 @@ import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.NativePointerArray
 import org.jetbrains.skia.impl.getPtr
 import kotlin.jvm.JvmStatic
 
@@ -25,7 +26,7 @@ class RuntimeEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_RuntimeEffect__1nMakeShader")
         external fun _nMakeShader(
-            runtimeEffectPtr: NativePointer, uniformPtr: NativePointer, childrenPtrs: Array<NativePointer>?,
+            runtimeEffectPtr: NativePointer, uniformPtr: NativePointer, childrenPtrs: NativePointerArray?,
             localMatrix: FloatArray?, isOpaque: Boolean
         ): NativePointer
 
@@ -47,7 +48,7 @@ class RuntimeEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     ): Shader {
         Stats.onNativeCall()
         val childCount = children?.size ?: 0
-        val childrenPtrs = arrayOf<NativePointer>()
+        val childrenPtrs = NativePointerArray(childCount)
         for (i in 0 until childCount) childrenPtrs[i] = getPtr(children!![i])
         val matrix = localMatrix?.mat
         return Shader(_nMakeShader(_ptr, getPtr(uniforms), childrenPtrs, matrix, isOpaque))
