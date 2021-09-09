@@ -8,6 +8,7 @@ import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.NativePointerArray
 import org.jetbrains.skia.impl.getPtr
 import kotlin.jvm.JvmStatic
 
@@ -318,7 +319,8 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         fun makeMerge(filters: Array<ImageFilter?>, crop: IRect?): ImageFilter {
             return try {
                 Stats.onNativeCall()
-                val filterPtrs = filters.map { getPtr(it) }.toTypedArray()
+                val filterPtrs = NativePointerArray(filters.size)
+                for (i in filters.indices) filterPtrs[i] = getPtr(filters[i])
                 ImageFilter(_nMakeMerge(filterPtrs, crop))
             } finally {
                 reachabilityBarrier(filters)
@@ -727,7 +729,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         external fun _nMakeMatrixTransform(matrix: FloatArray?, samplingMode: Long, input: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMerge")
-        external fun _nMakeMerge(filters: Array<NativePointer>?, crop: IRect?): NativePointer
+        external fun _nMakeMerge(filters: NativePointerArray?, crop: IRect?): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeOffset")
         external fun _nMakeOffset(dx: Float, dy: Float, input: NativePointer, crop: IRect?): NativePointer
