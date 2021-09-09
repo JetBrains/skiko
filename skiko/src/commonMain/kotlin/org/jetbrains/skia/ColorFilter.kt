@@ -2,12 +2,8 @@
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.RefCnt
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.*
 import kotlin.jvm.JvmStatic
 
 class ColorFilter : RefCnt {
@@ -75,7 +71,13 @@ class ColorFilter : RefCnt {
             require(r == null || r.size == 256) { "Expected 256 elements in r[], got " + r!!.size }
             require(g == null || g.size == 256) { "Expected 256 elements in g[], got " + g!!.size }
             require(b == null || b.size == 256) { "Expected 256 elements in b[], got " + b!!.size }
-            return ColorFilter(_nMakeTableARGB(a, r, g, b))
+            interopScope {
+                return ColorFilter(_nMakeTableARGB(
+                    toInterop(a), a?.size ?: 0,
+                    toInterop(r), r?.size ?: 0,
+                    toInterop(g), g?.size ?: 0,
+                    toInterop(b), a?.size ?: 0))
+            }
         }
 
         fun makeOverdraw(colors: IntArray): ColorFilter {
@@ -114,9 +116,6 @@ class ColorFilter : RefCnt {
         @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeTable")
         external fun _nMakeTable(table: ByteArray?): NativePointer
         @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeTableARGB")
-        external fun _nMakeTableARGB(a: ByteArray?, r: ByteArray?, g: ByteArray?, b: ByteArray?): NativePointer
-        @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeOverdraw")
         external fun _nMakeOverdraw(c0: Int, c1: Int, c2: Int, c3: Int, c4: Int, c5: Int): NativePointer
         @JvmStatic
@@ -135,3 +134,11 @@ class ColorFilter : RefCnt {
 
     internal constructor(ptr: NativePointer, allowClose: Boolean) : super(ptr, allowClose)
 }
+
+@ExternalSymbolName("org_jetbrains_skia_ColorFilter__nMakeTableARGB")
+private external fun _nMakeTableARGB(
+    a: InteropPointer, aSize: Int,
+    r: InteropPointer, rSize: Int,
+    g: InteropPointer, gSize: Int,
+    b: InteropPointer, bSize: Int
+): NativePointer

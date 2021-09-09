@@ -109,13 +109,22 @@ extern "C" jlong org_jetbrains_skia_ColorFilter__1nMakeTable
 }
 #endif
 
+typedef void* KPointer;
 
-
-extern "C" jlong org_jetbrains_skia_ColorFilter__1nMakeTableARGB
-  (kref __Kinstance, jbyteArray arrayA, jbyteArray arrayR, jbyteArray arrayG, jbyteArray arrayB) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_ColorFilter__1nMakeTableARGB");
+extern "C" KPointer org_jetbrains_skia_ColorFilter__nMakeTableARGB
+  (uint8_t* arrayA,
+   jint arrayASize,
+   uint8_t* arrayR,
+   jint arrayRSize,
+   uint8_t* arrayG,
+   jint arrayGSize,
+   uint8_t* arrayB,
+   jint arrayBSize
+) {
+    SkColorFilter* ptr = SkTableColorFilter::MakeARGB(arrayA, arrayR, arrayG, arrayB).release();
+    return ptr;
 }
-     
+
 #if 0 
 extern "C" jlong org_jetbrains_skia_ColorFilter__1nMakeTableARGB
   (kref __Kinstance, jbyteArray arrayA, jbyteArray arrayR, jbyteArray arrayG, jbyteArray arrayB) {

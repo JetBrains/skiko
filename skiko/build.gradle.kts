@@ -340,7 +340,7 @@ project.tasks.register<Exec>("wasmCompile") {
     dependsOn(skiaWasmDir)
     val inputDir = "$projectDir/src/jsMain/cpp"
     val outDir = "$buildDir/wasm"
-    val names = File(inputDir).listFiles()!!.map { it.name.removeSuffix(".cc") }
+    val names = File(inputDir).listFiles()!!.filter { it.name.endsWith(".cc") }.map { it.name.removeSuffix(".cc") }
     val srcs = names.map { "$inputDir/$it.cc" }.toTypedArray()
     val outJs = "$outDir/skiko.js"
     val outWasm = "$outDir/skiko.wasm"
@@ -352,6 +352,8 @@ project.tasks.register<Exec>("wasmCompile") {
         *Arch.Wasm.clangFlags,
         "-I$skiaDir",
         "-I$skiaDir/include",
+        "-I$skiaDir/include/core",
+        "-I$skiaDir/include/effects",
         "-I$skiaDir/include/gpu",
         "-std=c++17",
         "--bind",

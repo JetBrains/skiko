@@ -7,7 +7,7 @@ class SVGPreserveAspectRatio(align: SVGPreserveAspectRatioAlign, scale: SVGPrese
 
     internal constructor(align: Int, scale: Int) : this(
         SVGPreserveAspectRatioAlign.valueOf(align),
-        SVGPreserveAspectRatioScale.values().get(scale)
+        SVGPreserveAspectRatioScale.values()[scale]
     )
 
     constructor() : this(SVGPreserveAspectRatioAlign.XMID_YMID, SVGPreserveAspectRatioScale.MEET) {}
@@ -26,10 +26,10 @@ class SVGPreserveAspectRatio(align: SVGPreserveAspectRatioAlign, scale: SVGPrese
         if (!other.canEqual(this as Any)) return false
         val `this$_align`: Any = align
         val `other$_align`: Any = other.align
-        if (if (`this$_align` == null) `other$_align` != null else `this$_align` != `other$_align`) return false
+        if (`this$_align` != `other$_align`) return false
         val `this$_scale`: Any = scale
         val `other$_scale`: Any = other.scale
-        return !if (`this$_scale` == null) true else `this$_scale` != `other$_scale`
+        return `this$_scale` == `other$_scale`
     }
 
     protected fun canEqual(other: Any?): Boolean {

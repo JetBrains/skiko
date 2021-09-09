@@ -30,14 +30,8 @@ extern "C" jlong org_jetbrains_skia_ColorSpace__1nMakeDisplayP3(kref __Kinstance
 }
 
 
-extern "C" jfloatArray org_jetbrains_skia_ColorSpace__1nConvert
-  (kref __Kinstance, jlong fromPtr, jlong toPtr, float r, float g, float b, float a) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_ColorSpace__1nConvert");
-}
-     
-#if 0 
-extern "C" jfloatArray org_jetbrains_skia_ColorSpace__1nConvert
-  (kref __Kinstance, jlong fromPtr, jlong toPtr, float r, float g, float b, float a) {
+extern "C" void org_jetbrains_skia_ColorSpace__nConvert(
+    jlong fromPtr, jlong toPtr, float r, float g, float b, float a, float* result) {
     SkColorSpace* from = reinterpret_cast<SkColorSpace*>(static_cast<uintptr_t>(fromPtr));
     SkColorSpace* to = reinterpret_cast<SkColorSpace*>(static_cast<uintptr_t>(toPtr));
 
@@ -47,13 +41,11 @@ extern "C" jfloatArray org_jetbrains_skia_ColorSpace__1nConvert
     skcms_TransferFunction toFn;
     to->invTransferFn(&toFn);
 
-    float r1 = skcms_TransferFunction_eval(&toFn, skcms_TransferFunction_eval(&fromFn, r));
-    float g1 = skcms_TransferFunction_eval(&toFn, skcms_TransferFunction_eval(&fromFn, g));
-    float b1 = skcms_TransferFunction_eval(&toFn, skcms_TransferFunction_eval(&fromFn, b));
-    float a1 = skcms_TransferFunction_eval(&toFn, skcms_TransferFunction_eval(&fromFn, a));
-    return javaFloatArray(env, {r1, g1, b1, a1});
+    result[0] = skcms_TransferFunction_eval(&toFn, skcms_TransferFunction_eval(&fromFn, r));
+    result[1] = skcms_TransferFunction_eval(&toFn, skcms_TransferFunction_eval(&fromFn, g));
+    result[2] = skcms_TransferFunction_eval(&toFn, skcms_TransferFunction_eval(&fromFn, b));
+    result[3] = skcms_TransferFunction_eval(&toFn, skcms_TransferFunction_eval(&fromFn, a));
 }
-#endif
 
 
 extern "C" jlong org_jetbrains_skia_ColorSpace__1nIsGammaCloseToSRGB

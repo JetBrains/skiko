@@ -2,8 +2,8 @@ package org.jetbrains.skia.impl
 
 import java.lang.ref.Reference
 
-actual abstract class Native actual constructor(ptr: Long) {
-    actual var _ptr: Long
+actual abstract class Native actual constructor(ptr: NativePointer) {
+    actual var _ptr: NativePointer
 
     actual companion object {
         actual val NullPointer: NativePointer
@@ -47,3 +47,15 @@ actual fun reachabilityBarrier(obj: Any?) {
 }
 
 actual typealias NativePointer = Long
+
+actual typealias InteropPointer = Any?
+
+actual class InteropScope actual constructor() {
+    actual fun toInterop(string: String?): InteropPointer = string
+    actual fun InteropPointer.fromInterop(result: CharArray) {}
+    actual fun toInterop(array: ByteArray?): InteropPointer = array
+    actual fun InteropPointer.fromInterop(result: ByteArray) {}
+    actual fun toInterop(array: FloatArray?): InteropPointer = array
+    actual fun InteropPointer.fromInterop(result: FloatArray) {}
+    actual fun release() {}
+}
