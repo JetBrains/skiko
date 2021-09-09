@@ -15,5 +15,6 @@ extern "C" KPointer org_jetbrains_skia_ColorFilter__nMakeTableARGB(
     KByteArray arrayG, KInt arrayGSize,
     KByteArray arrayB, KInt arrayBSize
 ) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_ColorFilter__nMakeTableARGB");
+    SkColorFilter* ptr = SkTableColorFilter::MakeARGB(arrayA, arrayR, arrayG, arrayB).release();
+    return reinterpret_cast<KPointer>(ptr);
 }

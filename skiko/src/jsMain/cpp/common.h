@@ -4,4 +4,4 @@ typedef int32_t KInt;
 typedef int64_t KLong;
 typedef int32_t KPointer;
 
-typedef char* KByteArray;
+typedef uint8_t* KByteArray;
