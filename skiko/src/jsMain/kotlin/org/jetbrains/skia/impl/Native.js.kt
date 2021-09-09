@@ -21,7 +21,7 @@ actual fun reachabilityBarrier(obj: Any?) {
 }
 
 actual typealias NativePointer = Int
-
+actual typealias NativePointerArray = IntArray
 actual typealias InteropPointer = Int
 
 actual class InteropScope actual constructor() {

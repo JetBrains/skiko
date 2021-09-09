@@ -47,6 +47,7 @@ actual fun reachabilityBarrier(obj: Any?) {
 }
 
 actual typealias NativePointer = Long
+actual typealias NativePointerArray = LongArray
 
 actual typealias InteropPointer = Any?
 

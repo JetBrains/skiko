@@ -80,3 +80,4 @@ actual class InteropScope actual constructor() {
     private val elements = mutableListOf<Pinned<*>>()
 }
 
+actual typealias NativePointerArray = LongArray
