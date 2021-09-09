@@ -81,7 +81,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilter__1nMakeTa
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilter__1nMakeTableARGB
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilter__nMakeTableARGB
   (JNIEnv* env, jclass jclass, jbyteArray arrayA, jbyteArray arrayR, jbyteArray arrayG, jbyteArray arrayB) {
     jbyte* a = arrayA ? env->GetByteArrayElements(arrayA, 0) : nullptr;
     jbyte* r = arrayR ? env->GetByteArrayElements(arrayR, 0) : nullptr;

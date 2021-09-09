@@ -1,5 +1,8 @@
 package org.jetbrains.skia.impl
 
+import kotlinx.cinterop.Pinned
+import kotlinx.cinterop.addressOf
+import kotlinx.cinterop.pin
 import kotlin.native.internal.NativePtr
 
 actual abstract class Native actual constructor(ptr: NativePointer) {
@@ -22,7 +25,29 @@ actual abstract class Native actual constructor(ptr: NativePointer) {
 }
 
 actual typealias NativePointer = NativePtr
+actual typealias InteropPointer = NativePtr
 
 actual fun reachabilityBarrier(obj: Any?) {
     // TODO: implement native barrier
 }
+
+actual class InteropScope actual constructor() {
+    actual fun toInterop(array: ByteArray?): InteropPointer {
+        return if (array != null) {
+            val pinned = array.pin()
+            elements.add(pinned)
+            pinned.addressOf(0).rawValue
+        } else {
+            NativePtr.NULL
+        }
+    }
+
+    actual fun release()  {
+        elements.forEach {
+            it.unpin()
+        }
+    }
+
+    private val elements = mutableListOf<Pinned<*>>()
+}
+

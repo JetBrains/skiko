@@ -111,9 +111,18 @@ extern "C" jlong org_jetbrains_skia_ColorFilter__1nMakeTable
 
 
 
-extern "C" jlong org_jetbrains_skia_ColorFilter__1nMakeTableARGB
-  (kref __Kinstance, jbyteArray arrayA, jbyteArray arrayR, jbyteArray arrayG, jbyteArray arrayB) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_ColorFilter__1nMakeTableARGB");
+extern "C" jlong org_jetbrains_skia_ColorFilter__nMakeTableARGB
+  (kref __Kinstance,
+   jbyteArray arrayA,
+   jint arrayASize,
+   jbyteArray arrayR,
+   jint arrayRSize,
+   jbyteArray arrayG,
+   jint arrayGSize,
+   jbyteArray arrayB,
+   jint arrayBSize
+) {
+    throw std::runtime_error("TODO: implement org_jetbrains_skia_ColorFilter__nMakeTableARGB");
 }
      
 #if 0 

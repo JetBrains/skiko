@@ -1,8 +1,8 @@
 package org.jetbrains.skia.impl
 
-import org.jetbrains.skia.IPoint
-
 expect class NativePointer
+
+expect class InteropPointer
 
 expect abstract class Native(ptr: NativePointer) {
     var _ptr: NativePointer
@@ -16,3 +16,17 @@ expect abstract class Native(ptr: NativePointer) {
 expect fun reachabilityBarrier(obj: Any?)
 
 fun getPtr(n: Native?): NativePointer = n?._ptr ?: Native.NullPointer
+
+expect class InteropScope() {
+    fun toInterop(array: ByteArray?): InteropPointer
+    fun release()
+}
+
+inline fun <T> interopScope(block: InteropScope.() -> T): T {
+    val scope = InteropScope()
+    try {
+        return scope.block()
+    } finally {
+        scope.release()
+    }
+}

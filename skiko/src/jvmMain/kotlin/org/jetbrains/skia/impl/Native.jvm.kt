@@ -47,3 +47,10 @@ actual fun reachabilityBarrier(obj: Any?) {
 }
 
 actual typealias NativePointer = Long
+
+actual typealias InteropPointer = Any?
+
+actual class InteropScope actual constructor() {
+    actual fun toInterop(array: ByteArray?): InteropPointer = array
+    actual fun release() {}
+}
