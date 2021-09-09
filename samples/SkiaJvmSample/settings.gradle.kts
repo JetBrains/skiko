@@ -8,5 +8,5 @@ pluginManagement {
     }
 
 }
-rootProject.name = "SkijaInjectSample"
+rootProject.name = "SkiaJvmSample"
 

@@ -37,6 +37,7 @@ class FontCollection internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         external fun _nGetFallbackManager(ptr: NativePointer): NativePointer
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_FontCollection__1nFindTypefaces")
+        // TODO: fix me, must pass value to store result!
         external fun _nFindTypefaces(ptr: NativePointer, familyNames: Array<String?>?, fontStyle: Int): NativePointerArray
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_FontCollection__1nDefaultFallbackChar")

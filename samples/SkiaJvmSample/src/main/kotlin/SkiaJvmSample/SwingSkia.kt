@@ -1,4 +1,4 @@
-package SkijaInjectSample
+package SkiaJvmSample
 
 import java.awt.BorderLayout
 import java.awt.Color
@@ -32,7 +32,6 @@ fun Button(
 }
 
 fun SwingSkia() = SwingUtilities.invokeLater {
-
     val window = JFrame()
     window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
     window.title = "SwingSkiaWindow"

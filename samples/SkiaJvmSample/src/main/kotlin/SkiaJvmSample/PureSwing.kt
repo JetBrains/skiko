@@ -1,4 +1,4 @@
-package SkijaInjectSample
+package SkiaJvmSample
 
 import java.awt.BorderLayout
 import javax.swing.JFrame
