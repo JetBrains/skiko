@@ -27,7 +27,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorSpace__1nMakeDis
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jfloatArray JNICALL Java_org_jetbrains_skia_ColorSpaceKt__nConvert
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_ColorSpaceKt__nConvert
   (JNIEnv* env, jobject jclass, jlong fromPtr, jlong toPtr, float r, float g, float b, float a, jfloatArray jresult) {
     SkColorSpace* from = reinterpret_cast<SkColorSpace*>(static_cast<uintptr_t>(fromPtr));
     SkColorSpace* to = reinterpret_cast<SkColorSpace*>(static_cast<uintptr_t>(toPtr));
