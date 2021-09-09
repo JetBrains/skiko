@@ -25,6 +25,37 @@ actual typealias NativePointer = Int
 actual typealias InteropPointer = Int
 
 actual class InteropScope actual constructor() {
-    actual fun toInterop(array: ByteArray?): InteropPointer = TODO()
-    actual fun release()  { TODO() }
+    val elements = mutableListOf<NativePointer>()
+
+    actual fun toInterop(array: ByteArray?): InteropPointer {
+        return if (array != null) {
+            val data = _malloc(array.size)
+            elements.add(data)
+            toWasm(data, array)
+            data
+        } else {
+            0
+        }
+    }
+    actual fun release()  {
+        elements.forEach {
+            _free(it)
+        }
+    }
+}
+
+private external fun _malloc(size: Int): NativePointer
+
+private external fun _free(ptr: NativePointer)
+
+private external val HEAPU8: ByteArray
+
+private fun toWasm(dest: NativePointer, src: ByteArray) {
+    js("HEAPU8.set(src, dest)")
+}
+
+private fun fromWasm(src: NativePointer, size: Int): ByteArray {
+    val result = ByteArray(size)
+    js("result.set(HEAPU8.subarray(src, size))")
+    return result
 }
