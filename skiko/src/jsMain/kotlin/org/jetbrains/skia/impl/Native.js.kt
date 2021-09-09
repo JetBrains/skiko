@@ -27,6 +27,21 @@ actual typealias InteropPointer = Int
 actual class InteropScope actual constructor() {
     private val elements = mutableListOf<NativePointer>()
 
+    actual fun toInterop(string: String?): InteropPointer {
+        return if (string != null) {
+            val data = _malloc(string.length * 4)
+            stringToUTF8(string, data, string.length * 4)
+            elements.add(data)
+            data
+        } else {
+            0
+        }
+    }
+
+    actual fun InteropPointer.fromInterop(result: CharArray) {
+        fromWasm(this@fromInterop, result)
+    }
+
     actual fun toInterop(array: ByteArray?): InteropPointer {
         return if (array != null) {
             val data = _malloc(array.size)
@@ -62,23 +77,35 @@ actual class InteropScope actual constructor() {
     }
 }
 
+// Those functions are defined by Emscripten.
 private external fun _malloc(size: Int): NativePointer
 
 private external fun _free(ptr: NativePointer)
 
+private external fun stringToUTF8(str: String, outPtr: NativePointer, maxBytesToWrite: Int)
+
 private external val HEAPU8: ByteArray
 
+
+// Data copying routines.
 private fun toWasm(dest: NativePointer, src: ByteArray) {
     js("HEAPU8.set(src, dest)")
+}
+
+private fun toWasm(dest: NativePointer, src: CharArray) {
+    js("HEAPU16.set(src, dest)")
 }
 
 private fun toWasm(dest: NativePointer, src: FloatArray) {
     js("HEAPU32.set(src, dest)")
 }
 
-
 private fun fromWasm(src: NativePointer, result: ByteArray) {
     js("result.set(HEAPU8.subarray(src, result.size))")
+}
+
+private fun fromWasm(src: NativePointer, result: CharArray) {
+    js("result.set(HEAPU16.subarray(src, result.size))")
 }
 
 private fun fromWasm(src: NativePointer, result: FloatArray) {

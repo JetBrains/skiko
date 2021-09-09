@@ -32,6 +32,19 @@ actual fun reachabilityBarrier(obj: Any?) {
 }
 
 actual class InteropScope actual constructor() {
+    actual fun toInterop(string: String?): InteropPointer {
+        return if (string != null) {
+            val pinned = string.pin()
+            elements.add(pinned)
+            val result = pinned.addressOf(0).rawValue
+            result
+        } else {
+            NativePtr.NULL
+        }
+    }
+
+    actual fun InteropPointer.fromInterop(result: CharArray) {}
+
     actual fun toInterop(array: ByteArray?): InteropPointer {
         return if (array != null) {
             val pinned = array.pin()
