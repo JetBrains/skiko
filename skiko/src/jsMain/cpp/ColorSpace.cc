@@ -3,6 +3,7 @@
 #include "common.h"
 #include <emscripten.h>
 
+EMSCRIPTEN_KEEPALIVE
 extern "C" void org_jetbrains_skia_ColorSpace__nConvert(
         KPointer fromPtr, KPointer toPtr, float r, float g, float b, float a, float* result) {
     SkColorSpace* from = reinterpret_cast<SkColorSpace*>(fromPtr);

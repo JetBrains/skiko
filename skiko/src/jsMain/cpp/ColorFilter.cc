@@ -4,6 +4,7 @@
 #include "SkLumaColorFilter.h"
 #include "SkOverdrawColorFilter.h"
 #include "SkTableColorFilter.h"
+
 #include "common.h"
 
 #include <emscripten.h>
