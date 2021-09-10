@@ -73,11 +73,10 @@ jobs:
        - shell: bash
          run: |
            cd ./skiko
-           # TODO: simplify installation of compilers.
-           apt-get update -y
-           apt-get install binutils build-essential -y
-           apt-get install software-properties-common -y
-           apt-get install python git curl wget -y
+           sudo apt-get update -y
+           sudo apt-get install binutils build-essential -y
+           sudo apt-get install software-properties-common -y
+           sudo apt-get install python git curl wget -y
            if [ -d ./emsdk ]; then
              cd ./emsdk
              git pull
