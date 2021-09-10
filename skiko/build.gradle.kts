@@ -339,7 +339,6 @@ project.tasks.register<Exec>("objcCompile") {
 project.tasks.register<Exec>("wasmCompile") {
     dependsOn(skiaWasmDir)
     val skiaDir = skiaWasmDir.get().absolutePath
-    val skiaBinDir = "$skiaDir/out/Release-wasm-wasm"
     val inputDir = "$projectDir/src/jsMain/cpp"
     val outDir = "$buildDir/wasm"
     val names = File(inputDir).listFiles()!!.filter { it.name.endsWith(".cc") }.map { it.name.removeSuffix(".cc") }
@@ -359,6 +358,7 @@ project.tasks.register<Exec>("wasmCompile") {
         *srcs
     )
     argumentProviders.add(CommandLineArgumentProvider {
+        val skiaBinDir = "$skiaDir/out/${buildType.id}-wasm-wasm"
         // We must compute this list after Skia unpacking task has finished.
         listOf(skiaBinDir).findAllFiles(".a")
     })
