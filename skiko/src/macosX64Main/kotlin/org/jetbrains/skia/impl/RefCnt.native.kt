@@ -1,10 +1,30 @@
 package org.jetbrains.skia.impl
 
+import org.jetbrains.skia.ExternalSymbolName
+
 actual abstract class RefCnt : Managed {
-    actual protected constructor(ptr: NativePointer): super(ptr, NullPointer, false) {
-        println("TODO: implement native RefCnt")
+    protected actual constructor(ptr: NativePointer) : super(ptr, _FinalizerHolder.PTR) {}
+    protected actual constructor(ptr: NativePointer, allowClose: Boolean) : super(ptr, _FinalizerHolder.PTR, allowClose)
+
+    val refCount: Int
+        get() = try {
+            Stats.onNativeCall()
+            _nGetRefCount(_ptr)
+        } finally {
+            reachabilityBarrier(this)
+        }
+
+    override fun toString(): String {
+        val s = super.toString()
+        return s.substring(0, s.length - 1) + ", refCount=" + refCount + ")"
     }
-    actual protected constructor(ptr: NativePointer, allowClose: Boolean): super(ptr, NullPointer, allowClose) {
-        println("TODO: implement native RefCnt")
+
+    private object _FinalizerHolder {
+        val PTR = _nGetFinalizer()
     }
 }
+
+@ExternalSymbolName("org_jetbrains_skia_impl_RefCnt__1nGetFinalizer")
+private external fun _nGetFinalizer(): NativePointer
+@ExternalSymbolName("org_jetbrains_skia_impl_RefCnt__1nGetRefCount")
+private external fun _nGetRefCount(ptr: NativePointer): Int
