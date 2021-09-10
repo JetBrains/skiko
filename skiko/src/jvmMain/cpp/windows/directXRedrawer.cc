@@ -342,7 +342,7 @@ extern "C"
             gr_cp<IDXGISwapChain1> swapChain;
             GR_D3D_CALL_ERRCHECK(swapChainFactory->CreateSwapChainForHwnd(d3dDevice->queue.get(), d3dDevice->window, &swapChainDesc, nullptr, nullptr, &swapChain));
             GR_D3D_CALL_ERRCHECK(swapChainFactory->MakeWindowAssociation(d3dDevice->window, DXGI_MWA_NO_ALT_ENTER));
-            // GR_D3D_CALL_ERRCHECK(swapChain->QueryInterface(IID_PPV_ARGS(&d3dDevice->swapChain)));
+            GR_D3D_CALL_ERRCHECK(swapChain->QueryInterface(IID_PPV_ARGS(&d3dDevice->swapChain)));
 
             RECT windowRect;
             GetWindowRect(d3dDevice->window, &windowRect);

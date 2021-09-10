@@ -1,7 +1,7 @@
 #include "jni_helpers.h"
 
 std::string handleException(std::string function) {
-    std::exception_ptr &eptr = std::current_exception();
+    std::exception_ptr eptr = std::current_exception();
     if (!eptr) {
         throw std::bad_exception();
     }
@@ -25,9 +25,7 @@ std::string handleException(std::string function) {
 }
 
 void throwJavaException(JNIEnv *env, std::string message) {
-    jclass exClass;
-    char *className = "java/lang/RuntimeException" ;
-    exClass = env->FindClass(className);
+    jclass exClass = env->FindClass("java/lang/RuntimeException");
     if ( exClass == NULL ) {
         env->ThrowNew(exClass, message.c_str());
     }
