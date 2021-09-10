@@ -439,9 +439,9 @@ extern "C" void org_jetbrains_skia_Path__1nAddArc
 }
 
 extern "C" void org_jetbrains_skia_Path__1nAddRRect
-  (kref __Kinstance, jlong ptr, jfloat l, jfloat t, jfloat r, jfloat b, jfloatArray radii, jint size, jint dirInt, jint start) {
+  (kref __Kinstance, jlong ptr, jfloat l, jfloat t, jfloat r, jfloat b, jfloatArray radii, jint radiiSize, jint dirInt, jint start) {
     SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
-    SkRRect rrect = skija::RRect::toSkRRect(l, t, r, b, radii, size);
+    SkRRect rrect = skija::RRect::toSkRRect(l, t, r, b, radii, radiiSize);
     SkPathDirection dir = static_cast<SkPathDirection>(dirInt);
     instance->addRRect(rrect, dir, start);
 }

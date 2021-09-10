@@ -82,33 +82,22 @@ extern "C" void org_jetbrains_skia_Canvas__1nDrawOval
 }
 
 extern "C" void org_jetbrains_skia_Canvas__1nDrawRRect
-  (kref __Kinstance, jlong canvasPtr, jfloat left, jfloat top, jfloat right, jfloat bottom, jfloatArray jradii, jint size, jlong paintPtr) {
+  (kref __Kinstance, jlong canvasPtr, jfloat left, jfloat top, jfloat right, jfloat bottom, jfloatArray jradii, jint jradiiSize, jlong paintPtr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
-    canvas->drawRRect(skija::RRect::toSkRRect(left, top, right, bottom, jradii, size), *paint);
+    canvas->drawRRect(skija::RRect::toSkRRect(left, top, right, bottom, jradii, jradiiSize), *paint);
 }
 
 extern "C" void org_jetbrains_skia_Canvas__1nDrawDRRect
   (kref __Kinstance, jlong canvasPtr,
-   jfloat ol, jfloat ot, jfloat oright, jfloat ob, jfloatArray ojradii,
-   jfloat il, jfloat it, jfloat ir, jfloat ib, jfloatArray ijradii,
-   jlong paintPtr) {
-    TODO("implement org_jetbrains_skia_Canvas__1nDrawDRRect");
-}
-     
-#if 0 
-extern "C" void org_jetbrains_skia_Canvas__1nDrawDRRect
-  (kref __Kinstance, jlong canvasPtr,
-   jfloat ol, jfloat ot, jfloat oright, jfloat ob, jfloatArray ojradii,
-   jfloat il, jfloat it, jfloat ir, jfloat ib, jfloatArray ijradii,
+   jfloat ol, jfloat ot, jfloat oright, jfloat ob, jfloatArray ojradii, jint ojradiiSize,
+   jfloat il, jfloat it, jfloat ir, jfloat ib, jfloatArray ijradii, jint ijradiiSize,
    jlong paintPtr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
-    canvas->drawDRRect(skija::RRect::toSkRRect(env, ol, ot, oright, ob, ojradii),
-        skija::RRect::toSkRRect(env, il, it, ir, ib, ijradii), *paint);
+    canvas->drawDRRect(skija::RRect::toSkRRect(ol, ot, oright, ob, ojradii, ojradiiSize),
+        skija::RRect::toSkRRect(il, it, ir, ib, ijradii, ijradiiSize), *paint);
 }
-#endif
-
 
 extern "C" void org_jetbrains_skia_Canvas__1nDrawPath
   (kref __Kinstance, jlong canvasPtr, jlong pathPtr, jlong paintPtr) {
@@ -322,9 +311,9 @@ extern "C" void org_jetbrains_skia_Canvas__1nClipRect
 }
 
 extern "C" void org_jetbrains_skia_Canvas__1nClipRRect
-  (kref __Kinstance, jlong canvasPtr, jfloat left, jfloat top, jfloat right, jfloat bottom, jfloatArray jradii, jint size, jint mode, jboolean antiAlias) {
+  (kref __Kinstance, jlong canvasPtr, jfloat left, jfloat top, jfloat right, jfloat bottom, jfloatArray jradii, jint jradiiSize, jint mode, jboolean antiAlias) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
-    canvas->clipRRect(skija::RRect::toSkRRect(left, top, right, bottom, jradii, size), static_cast<SkClipOp>(mode), antiAlias);
+    canvas->clipRRect(skija::RRect::toSkRRect(left, top, right, bottom, jradii, jradiiSize), static_cast<SkClipOp>(mode), antiAlias);
 }
 
 extern "C" void org_jetbrains_skia_Canvas__1nClipPath

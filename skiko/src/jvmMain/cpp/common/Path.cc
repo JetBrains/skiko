@@ -345,7 +345,7 @@ extern "C" JNIEXPORT void Java_org_jetbrains_skia_Path__1nAddArc
 }
 
 extern "C" JNIEXPORT void Java_org_jetbrains_skia_Path__1nAddRRect
-  (JNIEnv* env, jclass jclass, jlong ptr, jfloat l, jfloat t, jfloat r, jfloat b, jfloatArray radii, jint size, jint dirInt, jint start) {
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloat l, jfloat t, jfloat r, jfloat b, jfloatArray radii, jint radiiSize, jint dirInt, jint start) {
     SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
     SkRRect rrect = skija::RRect::toSkRRect(env, l, t, r, b, radii);
     SkPathDirection dir = static_cast<SkPathDirection>(dirInt);

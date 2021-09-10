@@ -24,11 +24,11 @@ std::unique_ptr<SkM44> skM44(jfloatArray matrixArray) {
 
 namespace skija {
     namespace RRect {
-        SkRRect toSkRRect(jfloat left, jfloat top, jfloat right, jfloat bottom, jfloatArray jradii, jint size) {
+        SkRRect toSkRRect(jfloat left, jfloat top, jfloat right, jfloat bottom, jfloatArray jradii, jint radiiSize) {
             SkRect rect {left, top, right, bottom};
             SkRRect rrect = SkRRect::MakeEmpty();
             jfloat* radii = static_cast<jfloat *>(jradii);
-            switch (size) {
+            switch (radiiSize) {
                 case 1:
                     rrect.setRectXY(rect, radii[0], radii[0]);
                     break;

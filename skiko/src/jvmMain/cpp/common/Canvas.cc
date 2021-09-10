@@ -70,7 +70,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_Canvas__1nDrawOval
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_Canvas__1nDrawRRect
-  (JNIEnv* env, jclass jclass, jlong canvasPtr, jfloat left, jfloat top, jfloat right, jfloat bottom, jfloatArray jradii, jint size, jlong paintPtr) {
+  (JNIEnv* env, jclass jclass, jlong canvasPtr, jfloat left, jfloat top, jfloat right, jfloat bottom, jfloatArray jradii, jint jradiiSize, jlong paintPtr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
     canvas->drawRRect(skija::RRect::toSkRRect(env, left, top, right, bottom, jradii), *paint);
@@ -78,8 +78,8 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_Canvas__1nDrawRRect
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_Canvas__1nDrawDRRect
   (JNIEnv* env, jclass jclass, jlong canvasPtr,
-   jfloat ol, jfloat ot, jfloat oright, jfloat ob, jfloatArray ojradii,
-   jfloat il, jfloat it, jfloat ir, jfloat ib, jfloatArray ijradii,
+   jfloat ol, jfloat ot, jfloat oright, jfloat ob, jfloatArray ojradii, jint ojradiiSize,
+   jfloat il, jfloat it, jfloat ir, jfloat ib, jfloatArray ijradii, jint ijradiiSize,
    jlong paintPtr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
@@ -245,7 +245,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_Canvas__1nClipRect
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_Canvas__1nClipRRect
-  (JNIEnv* env, jclass jclass, jlong canvasPtr, jfloat left, jfloat top, jfloat right, jfloat bottom, jfloatArray jradii, jint size, jint mode, jboolean antiAlias) {
+  (JNIEnv* env, jclass jclass, jlong canvasPtr, jfloat left, jfloat top, jfloat right, jfloat bottom, jfloatArray jradii, jint jradiiSize, jint mode, jboolean antiAlias) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
     canvas->clipRRect(skija::RRect::toSkRRect(env, left, top, right, bottom, jradii), static_cast<SkClipOp>(mode), antiAlias);
 }
