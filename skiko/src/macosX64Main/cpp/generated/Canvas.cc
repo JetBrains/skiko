@@ -81,22 +81,12 @@ extern "C" void org_jetbrains_skia_Canvas__1nDrawOval
     canvas->drawOval({left, top, right, bottom}, *paint);
 }
 
-
 extern "C" void org_jetbrains_skia_Canvas__1nDrawRRect
-  (kref __Kinstance, jlong canvasPtr, jfloat left, jfloat top, jfloat right, jfloat bottom, jfloatArray jradii, jlong paintPtr) {
-    TODO("implement org_jetbrains_skia_Canvas__1nDrawRRect");
-}
-     
-#if 0 
-extern "C" void org_jetbrains_skia_Canvas__1nDrawRRect
-  (kref __Kinstance, jlong canvasPtr, jfloat left, jfloat top, jfloat right, jfloat bottom, jfloatArray jradii, jlong paintPtr) {
+  (kref __Kinstance, jlong canvasPtr, jfloat left, jfloat top, jfloat right, jfloat bottom, jfloatArray jradii, jint size, jlong paintPtr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
-    canvas->drawRRect(skija::RRect::toSkRRect(env, left, top, right, bottom, jradii), *paint);
+    canvas->drawRRect(skija::RRect::toSkRRect(left, top, right, bottom, jradii, size), *paint);
 }
-#endif
-
-
 
 extern "C" void org_jetbrains_skia_Canvas__1nDrawDRRect
   (kref __Kinstance, jlong canvasPtr,
@@ -331,20 +321,11 @@ extern "C" void org_jetbrains_skia_Canvas__1nClipRect
     canvas->clipRect({left, top, right, bottom}, static_cast<SkClipOp>(mode), antiAlias);
 }
 
-
 extern "C" void org_jetbrains_skia_Canvas__1nClipRRect
-  (kref __Kinstance, jlong canvasPtr, jfloat left, jfloat top, jfloat right, jfloat bottom, jfloatArray jradii, jint mode, jboolean antiAlias) {
-    TODO("implement org_jetbrains_skia_Canvas__1nClipRRect");
-}
-     
-#if 0 
-extern "C" void org_jetbrains_skia_Canvas__1nClipRRect
-  (kref __Kinstance, jlong canvasPtr, jfloat left, jfloat top, jfloat right, jfloat bottom, jfloatArray jradii, jint mode, jboolean antiAlias) {
+  (kref __Kinstance, jlong canvasPtr, jfloat left, jfloat top, jfloat right, jfloat bottom, jfloatArray jradii, jint size, jint mode, jboolean antiAlias) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
-    canvas->clipRRect(skija::RRect::toSkRRect(env, left, top, right, bottom, jradii), static_cast<SkClipOp>(mode), antiAlias);
+    canvas->clipRRect(skija::RRect::toSkRRect(left, top, right, bottom, jradii, size), static_cast<SkClipOp>(mode), antiAlias);
 }
-#endif
-
 
 extern "C" void org_jetbrains_skia_Canvas__1nClipPath
   (kref __Kinstance, jlong canvasPtr, jlong pathPtr, jint mode, jboolean antiAlias) {

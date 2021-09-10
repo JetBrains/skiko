@@ -53,7 +53,8 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
             top: Float,
             right: Float,
             bottom: Float,
-            radii: FloatArray?,
+            radii: InteropPointer,
+            size: Int,
             paintPtr: NativePointer
         )
 
@@ -187,7 +188,8 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
             top: Float,
             right: Float,
             bottom: Float,
-            radii: FloatArray?,
+            radii: InteropPointer,
+            size: Int,
             mode: Int,
             antiAlias: Boolean
         )
@@ -513,7 +515,9 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
 
     fun drawRRect(r: RRect, paint: Paint): Canvas {
         Stats.onNativeCall()
-        _nDrawRRect(_ptr, r.left, r.top, r.right, r.bottom, r.radii, getPtr(paint))
+        interopScope {
+            _nDrawRRect(_ptr, r.left, r.top, r.right, r.bottom, toInterop(r.radii), r.radii.size, getPtr(paint))
+        }
         reachabilityBarrier(paint)
         return this
     }
@@ -1293,7 +1297,9 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
 
     fun clipRRect(r: RRect, mode: ClipMode, antiAlias: Boolean): Canvas {
         Stats.onNativeCall()
-        _nClipRRect(_ptr, r.left, r.top, r.right, r.bottom, r.radii, mode.ordinal, antiAlias)
+        interopScope {
+            _nClipRRect(_ptr, r.left, r.top, r.right, r.bottom, toInterop(r.radii), r.radii.size, mode.ordinal, antiAlias)
+        }
         return this
     }
 

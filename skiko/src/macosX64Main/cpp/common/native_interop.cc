@@ -12,7 +12,6 @@ std::unique_ptr<SkMatrix> skMatrix(jfloatArray matrixArray) {
     }
 }
 
-
 std::unique_ptr<SkM44> skM44(jfloatArray matrixArray) {
     if (matrixArray == nullptr)
         return std::unique_ptr<SkM44>(nullptr);
@@ -23,4 +22,31 @@ std::unique_ptr<SkM44> skM44(jfloatArray matrixArray) {
     }
 }
 
-
+namespace skija {
+    namespace RRect {
+        SkRRect toSkRRect(jfloat left, jfloat top, jfloat right, jfloat bottom, jfloatArray jradii, jint size) {
+            SkRect rect {left, top, right, bottom};
+            SkRRect rrect = SkRRect::MakeEmpty();
+            jfloat* radii = static_cast<jfloat *>(jradii);
+            switch (size) {
+                case 1:
+                    rrect.setRectXY(rect, radii[0], radii[0]);
+                    break;
+                case 2:
+                    rrect.setRectXY(rect, radii[0], radii[1]);
+                    break;
+                case 4: {
+                    SkVector vradii[4] = {{radii[0], radii[0]}, {radii[1], radii[1]}, {radii[2], radii[2]}, {radii[3], radii[3]}};
+                    rrect.setRectRadii(rect, vradii);
+                    break;
+                }
+                case 8: {
+                    SkVector vradii[4] = {{radii[0], radii[1]}, {radii[2], radii[3]}, {radii[4], radii[5]}, {radii[6], radii[7]}};
+                    rrect.setRectRadii(rect, vradii);
+                    break;
+                }
+            }
+            return rrect;
+        }
+    }
+}

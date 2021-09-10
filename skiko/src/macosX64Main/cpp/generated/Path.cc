@@ -9,6 +9,7 @@
 #include "SkPathOps.h"
 #include "include/utils/SkParsePath.h"
 #include "common.h"
+#include "native_interop.h"
 
 static void deletePath(SkPath* path) {
     // std::cout << "Deleting [SkPath " << path << "]" << std::endl;
@@ -437,23 +438,13 @@ extern "C" void org_jetbrains_skia_Path__1nAddArc
     instance->addArc({l, t, r, b}, startAngle, sweepAngle);
 }
 
-
 extern "C" void org_jetbrains_skia_Path__1nAddRRect
-  (kref __Kinstance, jlong ptr, jfloat l, jfloat t, jfloat r, jfloat b, jfloatArray radii, jint dirInt, jint start) {
-    TODO("implement org_jetbrains_skia_Path__1nAddRRect");
-}
-     
-#if 0 
-extern "C" void org_jetbrains_skia_Path__1nAddRRect
-  (kref __Kinstance, jlong ptr, jfloat l, jfloat t, jfloat r, jfloat b, jfloatArray radii, jint dirInt, jint start) {
+  (kref __Kinstance, jlong ptr, jfloat l, jfloat t, jfloat r, jfloat b, jfloatArray radii, jint size, jint dirInt, jint start) {
     SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
-    SkRRect rrect = skija::RRect::toSkRRect(env, l, t, r, b, radii);
+    SkRRect rrect = skija::RRect::toSkRRect(l, t, r, b, radii, size);
     SkPathDirection dir = static_cast<SkPathDirection>(dirInt);
     instance->addRRect(rrect, dir, start);
 }
-#endif
-
-
 
 extern "C" void org_jetbrains_skia_Path__1nAddPoly
   (kref __Kinstance, jlong ptr, jfloatArray coords, jboolean close) {
