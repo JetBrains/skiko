@@ -59,7 +59,7 @@ jobs:
           sudo apt-get install ninja-build fontconfig libfontconfig1-dev libglu1-mesa-dev libxrandr-dev zip -y
           ./gradlew jvmTest
           ./gradlew publishToMavenLocal
-    js:
+   js:
      runs-on: ubuntu-20.04
      # Steps represent a sequence of tasks that will be executed as part of the job
      steps:
