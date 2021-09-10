@@ -346,7 +346,7 @@ project.tasks.register<Exec>("wasmCompile") {
     val outWasm = "$outDir/skiko.wasm"
     val skiaDir = skiaWasmDir.get().absolutePath
     workingDir = File(outDir)
-    val libs = fileTree("$skiaDir/out/Release-wasm-wasm").filter { it.name.endsWith(".a") }
+    val libs = listOf("$skiaDir/out/Release-wasm-wasm").findAllFiles(".a")
     commandLine = listOf(
         "emcc",
         *Arch.Wasm.clangFlags,
@@ -358,7 +358,7 @@ project.tasks.register<Exec>("wasmCompile") {
         "-std=c++17",
         "--bind",
         "-o", outJs,
-        *libs.files.map { it.absolutePath }.toTypedArray(),
+        *libs.toTypedArray(),
         *srcs
     )
     file(outDir).mkdirs()
