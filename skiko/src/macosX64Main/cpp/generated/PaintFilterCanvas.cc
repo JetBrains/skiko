@@ -10,7 +10,7 @@
 
 extern "C" void org_jetbrains_skia_PaintFilterCanvas__1nAttachToJava
   (kref __Kinstance, jlong canvasPtr, jboolean unrollDrawable) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_PaintFilterCanvas__1nAttachToJava");
+    TODO("implement org_jetbrains_skia_PaintFilterCanvas__1nAttachToJava");
 }
      
 #if 0 
@@ -25,7 +25,7 @@ extern "C" void org_jetbrains_skia_PaintFilterCanvas__1nAttachToJava
 
 extern "C" jlong org_jetbrains_skia_PaintFilterCanvas__1nMake
   (kref __Kinstance, jlong canvasPtr, jboolean unrollDrawable) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_PaintFilterCanvas__1nMake");
+    TODO("implement org_jetbrains_skia_PaintFilterCanvas__1nMake");
 }
      
 #if 0 

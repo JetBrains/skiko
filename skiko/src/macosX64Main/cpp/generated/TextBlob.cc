@@ -20,7 +20,7 @@ extern "C" jlong org_jetbrains_skia_TextBlob__1nGetFinalizer
 
 extern "C" jobject org_jetbrains_skia_TextBlob__1nBounds
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_TextBlob__1nBounds");
+    TODO("implement org_jetbrains_skia_TextBlob__1nBounds");
 }
      
 #if 0 
@@ -42,7 +42,7 @@ extern "C" jint org_jetbrains_skia_TextBlob__1nGetUniqueId
 
 extern "C" jfloatArray org_jetbrains_skia_TextBlob__1nGetIntercepts
   (kref __Kinstance, jlong ptr, jfloat lower, jfloat upper, jlong paintPtr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_TextBlob__1nGetIntercepts");
+    TODO("implement org_jetbrains_skia_TextBlob__1nGetIntercepts");
 }
      
 #if 0 
@@ -62,7 +62,7 @@ extern "C" jfloatArray org_jetbrains_skia_TextBlob__1nGetIntercepts
 
 extern "C" jlong org_jetbrains_skia_TextBlob__1nMakeFromPosH
   (kref __Kinstance, jshortArray glyphsArr, jfloatArray xposArr, jfloat ypos, jlong fontPtr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_TextBlob__1nMakeFromPosH");
+    TODO("implement org_jetbrains_skia_TextBlob__1nMakeFromPosH");
 }
      
 #if 0 
@@ -86,7 +86,7 @@ extern "C" jlong org_jetbrains_skia_TextBlob__1nMakeFromPosH
 
 extern "C" jlong org_jetbrains_skia_TextBlob__1nMakeFromPos
   (kref __Kinstance, jshortArray glyphsArr, jfloatArray posArr, jlong fontPtr ) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_TextBlob__1nMakeFromPos");
+    TODO("implement org_jetbrains_skia_TextBlob__1nMakeFromPos");
 }
      
 #if 0 
@@ -110,7 +110,7 @@ extern "C" jlong org_jetbrains_skia_TextBlob__1nMakeFromPos
 
 extern "C" jlong org_jetbrains_skia_TextBlob__1nMakeFromRSXform
   (kref __Kinstance, jshortArray glyphsArr, jfloatArray xformArr, jlong fontPtr ) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_TextBlob__1nMakeFromRSXform");
+    TODO("implement org_jetbrains_skia_TextBlob__1nMakeFromRSXform");
 }
      
 #if 0 
@@ -148,7 +148,7 @@ extern "C" jlong org_jetbrains_skia_TextBlob__1nMakeFromData
 
 extern "C" jshortArray org_jetbrains_skia_TextBlob__1nGetGlyphs
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_TextBlob__1nGetGlyphs");
+    TODO("implement org_jetbrains_skia_TextBlob__1nGetGlyphs");
 }
      
 #if 0 
@@ -172,7 +172,7 @@ extern "C" jshortArray org_jetbrains_skia_TextBlob__1nGetGlyphs
 
 extern "C" jfloatArray org_jetbrains_skia_TextBlob__1nGetPositions
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_TextBlob__1nGetPositions");
+    TODO("implement org_jetbrains_skia_TextBlob__1nGetPositions");
 }
      
 #if 0 
@@ -199,7 +199,7 @@ extern "C" jfloatArray org_jetbrains_skia_TextBlob__1nGetPositions
 
 extern "C" jintArray org_jetbrains_skia_TextBlob__1nGetClusters
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_TextBlob__1nGetClusters");
+    TODO("implement org_jetbrains_skia_TextBlob__1nGetClusters");
 }
      
 #if 0 
@@ -236,7 +236,7 @@ extern "C" jintArray org_jetbrains_skia_TextBlob__1nGetClusters
 
 extern "C" jobject org_jetbrains_skia_TextBlob__1nGetTightBounds
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_TextBlob__1nGetTightBounds");
+    TODO("implement org_jetbrains_skia_TextBlob__1nGetTightBounds");
 }
      
 #if 0 
@@ -266,7 +266,7 @@ extern "C" jobject org_jetbrains_skia_TextBlob__1nGetTightBounds
 
 extern "C" jobject org_jetbrains_skia_TextBlob__1nGetBlockBounds
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_TextBlob__1nGetBlockBounds");
+    TODO("implement org_jetbrains_skia_TextBlob__1nGetBlockBounds");
 }
      
 #if 0 
@@ -306,7 +306,7 @@ extern "C" jobject org_jetbrains_skia_TextBlob__1nGetBlockBounds
 
 extern "C" jobject org_jetbrains_skia_TextBlob__1nGetFirstBaseline
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_TextBlob__1nGetFirstBaseline");
+    TODO("implement org_jetbrains_skia_TextBlob__1nGetFirstBaseline");
 }
      
 #if 0 
@@ -331,7 +331,7 @@ extern "C" jobject org_jetbrains_skia_TextBlob__1nGetFirstBaseline
 
 extern "C" jobject org_jetbrains_skia_TextBlob__1nGetLastBaseline
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_TextBlob__1nGetLastBaseline");
+    TODO("implement org_jetbrains_skia_TextBlob__1nGetLastBaseline");
 }
      
 #if 0 

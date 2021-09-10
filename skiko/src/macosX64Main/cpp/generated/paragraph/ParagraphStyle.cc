@@ -98,7 +98,7 @@ extern "C" void org_jetbrains_skia_paragraph_ParagraphStyle__1nSetMaxLinesCount
 
 extern "C" jstring org_jetbrains_skia_paragraph_ParagraphStyle__1nGetEllipsis
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_paragraph_ParagraphStyle__1nGetEllipsis");
+    TODO("implement org_jetbrains_skia_paragraph_ParagraphStyle__1nGetEllipsis");
 }
      
 #if 0 
@@ -113,7 +113,7 @@ extern "C" jstring org_jetbrains_skia_paragraph_ParagraphStyle__1nGetEllipsis
 
 extern "C" void org_jetbrains_skia_paragraph_ParagraphStyle__1nSetEllipsis
   (kref __Kinstance, jlong ptr, jstring ellipsis) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_paragraph_ParagraphStyle__1nSetEllipsis");
+    TODO("implement org_jetbrains_skia_paragraph_ParagraphStyle__1nSetEllipsis");
 }
      
 #if 0 

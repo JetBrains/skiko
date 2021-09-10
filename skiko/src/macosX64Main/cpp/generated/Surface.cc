@@ -13,7 +13,7 @@ extern "C" jlong org_jetbrains_skia_Surface__1nMakeRasterDirect
     jlong pixelsPtr, jlong rowBytes,
     jobject surfacePropsObj)
 {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Surface__1nMakeRasterDirect");
+    TODO("implement org_jetbrains_skia_Surface__1nMakeRasterDirect");
 }
      
 #if 0 
@@ -46,7 +46,7 @@ extern "C" jlong org_jetbrains_skia_Surface__1nMakeRasterDirectWithPixmap
   (kref __Kinstance,
     jlong pixmapPtr, jobject surfacePropsObj)
 {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Surface__1nMakeRasterDirectWithPixmap");
+    TODO("implement org_jetbrains_skia_Surface__1nMakeRasterDirectWithPixmap");
 }
      
 #if 0 
@@ -70,7 +70,7 @@ extern "C" jlong org_jetbrains_skia_Surface__1nMakeRaster
     jlong rowBytes,
     jobject surfacePropsObj)
 {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Surface__1nMakeRaster");
+    TODO("implement org_jetbrains_skia_Surface__1nMakeRaster");
 }
      
 #if 0 
@@ -136,7 +136,7 @@ extern "C" jlong org_jetbrains_skia_Surface__1nMakeFromBackendRenderTarget
 
 extern "C" jlong org_jetbrains_skia_Surface__1nMakeFromMTKView
   (kref __Kinstance, jlong contextPtr, jlong mtkViewPtr, jint surfaceOrigin, jint sampleCount, jint colorType, jlong colorSpacePtr, jobject surfacePropsObj) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Surface__1nMakeFromMTKView");
+    TODO("implement org_jetbrains_skia_Surface__1nMakeFromMTKView");
 }
      
 #if 0 
@@ -170,7 +170,7 @@ extern "C" jlong org_jetbrains_skia_Surface__1nMakeRenderTarget
     jobject surfacePropsObj,
     jboolean shouldCreateWithMips)
 {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Surface__1nMakeRenderTarget");
+    TODO("implement org_jetbrains_skia_Surface__1nMakeRenderTarget");
 }
      
 #if 0 
@@ -292,7 +292,7 @@ extern "C" jboolean org_jetbrains_skia_Surface__1nUnique
 
 extern "C" jobject org_jetbrains_skia_Surface__1nGetImageInfo
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Surface__1nGetImageInfo");
+    TODO("implement org_jetbrains_skia_Surface__1nGetImageInfo");
 }
      
 #if 0 

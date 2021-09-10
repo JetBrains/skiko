@@ -81,7 +81,7 @@ extern "C" void org_jetbrains_skia_paragraph_Paragraph__1nPaint
 
 extern "C" jobjectArray org_jetbrains_skia_paragraph_Paragraph__1nGetRectsForRange
   (kref __Kinstance, jlong ptr, jint start, jint end, jint rectHeightStyle, jint rectWidthStyle) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_paragraph_Paragraph__1nGetRectsForRange");
+    TODO("implement org_jetbrains_skia_paragraph_Paragraph__1nGetRectsForRange");
 }
      
 #if 0 
@@ -104,7 +104,7 @@ extern "C" jobjectArray org_jetbrains_skia_paragraph_Paragraph__1nGetRectsForRan
 
 extern "C" jobjectArray org_jetbrains_skia_paragraph_Paragraph__1nGetRectsForPlaceholders
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_paragraph_Paragraph__1nGetRectsForPlaceholders");
+    TODO("implement org_jetbrains_skia_paragraph_Paragraph__1nGetRectsForPlaceholders");
 }
      
 #if 0 
@@ -144,7 +144,7 @@ extern "C" jlong org_jetbrains_skia_paragraph_Paragraph__1nGetWordBoundary
 
 extern "C" jobjectArray org_jetbrains_skia_paragraph_Paragraph__1nGetLineMetrics
   (kref __Kinstance, jlong ptr, jlong textPtr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_paragraph_Paragraph__1nGetLineMetrics");
+    TODO("implement org_jetbrains_skia_paragraph_Paragraph__1nGetLineMetrics");
 }
      
 #if 0 

@@ -25,7 +25,7 @@ extern "C" jlong org_jetbrains_skia_MaskFilter__1nMakeShader
 
 extern "C" jlong org_jetbrains_skia_MaskFilter__1nMakeTable
   (kref __Kinstance, jbyteArray tableArray) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_MaskFilter__1nMakeTable");
+    TODO("implement org_jetbrains_skia_MaskFilter__1nMakeTable");
 }
      
 #if 0 

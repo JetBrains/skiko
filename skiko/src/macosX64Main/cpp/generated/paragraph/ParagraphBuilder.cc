@@ -41,7 +41,7 @@ extern "C" void org_jetbrains_skia_paragraph_ParagraphBuilder__1nPopStyle
 
 extern "C" void org_jetbrains_skia_paragraph_ParagraphBuilder__1nAddText
   (kref __Kinstance, jlong ptr, jstring textString) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_paragraph_ParagraphBuilder__1nAddText");
+    TODO("implement org_jetbrains_skia_paragraph_ParagraphBuilder__1nAddText");
 }
      
 #if 0 

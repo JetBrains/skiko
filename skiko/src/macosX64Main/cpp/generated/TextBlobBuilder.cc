@@ -28,7 +28,7 @@ extern "C" jlong org_jetbrains_skia_TextBlobBuilder__1nBuild
 
 extern "C" void org_jetbrains_skia_TextBlobBuilder__1nAppendRun
   (kref __Kinstance, jlong ptr, jlong fontPtr, jshortArray glyphsArr, jfloat x, jfloat y, jobject boundsObj) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_TextBlobBuilder__1nAppendRun");
+    TODO("implement org_jetbrains_skia_TextBlobBuilder__1nAppendRun");
 }
      
 #if 0 
@@ -47,7 +47,7 @@ extern "C" void org_jetbrains_skia_TextBlobBuilder__1nAppendRun
 
 extern "C" void org_jetbrains_skia_TextBlobBuilder__1nAppendRunPosH
   (kref __Kinstance, jlong ptr, jlong fontPtr, jshortArray glyphsArr, jfloatArray xsArr, jfloat y, jobject boundsObj) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_TextBlobBuilder__1nAppendRunPosH");
+    TODO("implement org_jetbrains_skia_TextBlobBuilder__1nAppendRunPosH");
 }
      
 #if 0 
@@ -67,7 +67,7 @@ extern "C" void org_jetbrains_skia_TextBlobBuilder__1nAppendRunPosH
 
 extern "C" void org_jetbrains_skia_TextBlobBuilder__1nAppendRunPos
   (kref __Kinstance, jlong ptr, jlong fontPtr, jshortArray glyphsArr, jfloatArray posArr, jobject boundsObj) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_TextBlobBuilder__1nAppendRunPos");
+    TODO("implement org_jetbrains_skia_TextBlobBuilder__1nAppendRunPos");
 }
      
 #if 0 
@@ -87,7 +87,7 @@ extern "C" void org_jetbrains_skia_TextBlobBuilder__1nAppendRunPos
 
 extern "C" void org_jetbrains_skia_TextBlobBuilder__1nAppendRunRSXform
   (kref __Kinstance, jlong ptr, jlong fontPtr, jshortArray glyphsArr, jfloatArray xformArr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_TextBlobBuilder__1nAppendRunRSXform");
+    TODO("implement org_jetbrains_skia_TextBlobBuilder__1nAppendRunRSXform");
 }
      
 #if 0 

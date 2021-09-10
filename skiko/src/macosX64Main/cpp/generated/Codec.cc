@@ -25,7 +25,7 @@ extern "C" jlong org_jetbrains_skia_Codec__1nMakeFromData
 
 extern "C" jobject org_jetbrains_skia_Codec__1nGetImageInfo
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Codec__1nGetImageInfo");
+    TODO("implement org_jetbrains_skia_Codec__1nGetImageInfo");
 }
      
 #if 0 
@@ -75,7 +75,7 @@ extern "C" jint org_jetbrains_skia_Codec__1nGetFrameCount
 
 extern "C" jobject org_jetbrains_skia_Codec__1nGetFrameInfo
   (kref __Kinstance, jlong ptr, jint frame) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Codec__1nGetFrameInfo");
+    TODO("implement org_jetbrains_skia_Codec__1nGetFrameInfo");
 }
      
 #if 0 
@@ -92,7 +92,7 @@ extern "C" jobject org_jetbrains_skia_Codec__1nGetFrameInfo
 
 extern "C" jobject org_jetbrains_skia_Codec__1nGetFramesInfo
   (kref __Kinstance, jlong ptr, jint frame) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Codec__1nGetFramesInfo");
+    TODO("implement org_jetbrains_skia_Codec__1nGetFramesInfo");
 }
      
 #if 0 

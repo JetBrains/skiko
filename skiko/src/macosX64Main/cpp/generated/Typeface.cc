@@ -9,7 +9,7 @@
 
 extern "C" jint org_jetbrains_skia_Typeface__1nGetFontStyle
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Typeface__1nGetFontStyle");
+    TODO("implement org_jetbrains_skia_Typeface__1nGetFontStyle");
 }
      
 #if 0 
@@ -30,7 +30,7 @@ extern "C" jboolean org_jetbrains_skia_Typeface__1nIsFixedPitch
 
 extern "C" jobjectArray org_jetbrains_skia_Typeface__1nGetVariations
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Typeface__1nGetVariations");
+    TODO("implement org_jetbrains_skia_Typeface__1nGetVariations");
 }
      
 #if 0 
@@ -56,7 +56,7 @@ extern "C" jobjectArray org_jetbrains_skia_Typeface__1nGetVariations
 
 extern "C" jobjectArray org_jetbrains_skia_Typeface__1nGetVariationAxes
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Typeface__1nGetVariationAxes");
+    TODO("implement org_jetbrains_skia_Typeface__1nGetVariationAxes");
 }
      
 #if 0 
@@ -121,7 +121,7 @@ sk_sp<SkTypeface> setDefaultVariationCoords(sk_sp<SkTypeface> face) {
 
 extern "C" jlong org_jetbrains_skia_Typeface__1nMakeFromName
   (kref __Kinstance, jstring nameStr, jint styleValue) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Typeface__1nMakeFromName");
+    TODO("implement org_jetbrains_skia_Typeface__1nMakeFromName");
 }
      
 #if 0 
@@ -139,7 +139,7 @@ extern "C" jlong org_jetbrains_skia_Typeface__1nMakeFromName
 
 extern "C" jlong org_jetbrains_skia_Typeface__1nMakeFromFile
   (kref __Kinstance, jstring pathStr, jint index) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Typeface__1nMakeFromFile");
+    TODO("implement org_jetbrains_skia_Typeface__1nMakeFromFile");
 }
      
 #if 0 
@@ -164,7 +164,7 @@ extern "C" jlong org_jetbrains_skia_Typeface__1nMakeFromData
 
 extern "C" jlong org_jetbrains_skia_Typeface__1nMakeClone
   (kref __Kinstance, jlong typefacePtr, jobjectArray variations, jint collectionIndex) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Typeface__1nMakeClone");
+    TODO("implement org_jetbrains_skia_Typeface__1nMakeClone");
 }
      
 #if 0 
@@ -193,7 +193,7 @@ extern "C" jlong org_jetbrains_skia_Typeface__1nMakeClone
 
 extern "C" jshortArray org_jetbrains_skia_Typeface__1nGetUTF32Glyphs
   (kref __Kinstance, jlong ptr, jintArray uniArr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Typeface__1nGetUTF32Glyphs");
+    TODO("implement org_jetbrains_skia_Typeface__1nGetUTF32Glyphs");
 }
      
 #if 0 
@@ -231,7 +231,7 @@ extern "C" jint org_jetbrains_skia_Typeface__1nGetTablesCount
 
 extern "C" jintArray org_jetbrains_skia_Typeface__1nGetTableTags
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Typeface__1nGetTableTags");
+    TODO("implement org_jetbrains_skia_Typeface__1nGetTableTags");
 }
      
 #if 0 
@@ -268,7 +268,7 @@ extern "C" jint org_jetbrains_skia_Typeface__1nGetUnitsPerEm
 
 extern "C" jintArray org_jetbrains_skia_Typeface__1nGetKerningPairAdjustments
   (kref __Kinstance, jlong ptr, jshortArray glyphsArr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Typeface__1nGetKerningPairAdjustments");
+    TODO("implement org_jetbrains_skia_Typeface__1nGetKerningPairAdjustments");
 }
      
 #if 0 
@@ -295,7 +295,7 @@ extern "C" jintArray org_jetbrains_skia_Typeface__1nGetKerningPairAdjustments
 
 extern "C" jobjectArray org_jetbrains_skia_Typeface__1nGetFamilyNames
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Typeface__1nGetFamilyNames");
+    TODO("implement org_jetbrains_skia_Typeface__1nGetFamilyNames");
 }
      
 #if 0 
@@ -324,7 +324,7 @@ extern "C" jobjectArray org_jetbrains_skia_Typeface__1nGetFamilyNames
 
 extern "C" jstring org_jetbrains_skia_Typeface__1nGetFamilyName
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Typeface__1nGetFamilyName");
+    TODO("implement org_jetbrains_skia_Typeface__1nGetFamilyName");
 }
      
 #if 0 
@@ -341,7 +341,7 @@ extern "C" jstring org_jetbrains_skia_Typeface__1nGetFamilyName
 
 extern "C" jobject org_jetbrains_skia_Typeface__1nGetBounds
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Typeface__1nGetBounds");
+    TODO("implement org_jetbrains_skia_Typeface__1nGetBounds");
 }
      
 #if 0 

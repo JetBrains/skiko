@@ -17,7 +17,7 @@ extern "C" jlong org_jetbrains_skia_U16String__1nGetFinalizer
 
 extern "C" jlong org_jetbrains_skia_U16String__1nMake
   (kref __Kinstance, jstring str) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_U16String__1nMake");
+    TODO("implement org_jetbrains_skia_U16String__1nMake");
 }
      
 #if 0 
@@ -34,7 +34,7 @@ extern "C" jlong org_jetbrains_skia_U16String__1nMake
 
 extern "C" jobject org_jetbrains_skia_U16String__1nToString
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_U16String__1nToString");
+    TODO("implement org_jetbrains_skia_U16String__1nToString");
 }
      
 #if 0 

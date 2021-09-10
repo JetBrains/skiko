@@ -8,7 +8,7 @@
 
 extern "C" jlong org_jetbrains_skia_shaper_FontMgrRunIterator__1nMake
   (kref __Kinstance, jlong textPtr, jlong fontPtr, jobject opts) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_shaper_FontMgrRunIterator__1nMake");
+    TODO("implement org_jetbrains_skia_shaper_FontMgrRunIterator__1nMake");
 }
      
 #if 0 
@@ -40,7 +40,7 @@ extern "C" jlong org_jetbrains_skia_shaper_FontMgrRunIterator__1nMake
 
 extern "C" jlong org_jetbrains_skia_shaper_FontMgrRunIterator__1nGetCurrentFont
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_shaper_FontMgrRunIterator__1nGetCurrentFont");
+    TODO("implement org_jetbrains_skia_shaper_FontMgrRunIterator__1nGetCurrentFont");
 }
      
 #if 0 

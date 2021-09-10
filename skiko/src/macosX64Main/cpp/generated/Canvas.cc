@@ -8,6 +8,7 @@
 #include "SkVertices.h"
 #include "hb.h"
 #include "common.h"
+#include "native_interop.h"
 
 static void deleteCanvas(SkCanvas* canvas) {
     // std::cout << "Deleting [SkCanvas " << canvas << "]" << std::endl;
@@ -35,7 +36,7 @@ extern "C" void org_jetbrains_skia_Canvas__1nDrawPoint
 
 extern "C" void org_jetbrains_skia_Canvas__1nDrawPoints
   (kref __Kinstance, jlong canvasPtr, int mode, jfloatArray coords, jlong paintPtr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Canvas__1nDrawPoints");
+    TODO("implement org_jetbrains_skia_Canvas__1nDrawPoints");
 }
      
 #if 0 
@@ -80,44 +81,23 @@ extern "C" void org_jetbrains_skia_Canvas__1nDrawOval
     canvas->drawOval({left, top, right, bottom}, *paint);
 }
 
-
 extern "C" void org_jetbrains_skia_Canvas__1nDrawRRect
-  (kref __Kinstance, jlong canvasPtr, jfloat left, jfloat top, jfloat right, jfloat bottom, jfloatArray jradii, jlong paintPtr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Canvas__1nDrawRRect");
-}
-     
-#if 0 
-extern "C" void org_jetbrains_skia_Canvas__1nDrawRRect
-  (kref __Kinstance, jlong canvasPtr, jfloat left, jfloat top, jfloat right, jfloat bottom, jfloatArray jradii, jlong paintPtr) {
+  (kref __Kinstance, jlong canvasPtr, jfloat left, jfloat top, jfloat right, jfloat bottom, jfloatArray jradii, jint jradiiSize, jlong paintPtr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
-    canvas->drawRRect(skija::RRect::toSkRRect(env, left, top, right, bottom, jradii), *paint);
+    canvas->drawRRect(skija::RRect::toSkRRect(left, top, right, bottom, jradii, jradiiSize), *paint);
 }
-#endif
-
-
 
 extern "C" void org_jetbrains_skia_Canvas__1nDrawDRRect
   (kref __Kinstance, jlong canvasPtr,
-   jfloat ol, jfloat ot, jfloat oright, jfloat ob, jfloatArray ojradii,
-   jfloat il, jfloat it, jfloat ir, jfloat ib, jfloatArray ijradii,
-   jlong paintPtr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Canvas__1nDrawDRRect");
-}
-     
-#if 0 
-extern "C" void org_jetbrains_skia_Canvas__1nDrawDRRect
-  (kref __Kinstance, jlong canvasPtr,
-   jfloat ol, jfloat ot, jfloat oright, jfloat ob, jfloatArray ojradii,
-   jfloat il, jfloat it, jfloat ir, jfloat ib, jfloatArray ijradii,
+   jfloat ol, jfloat ot, jfloat oright, jfloat ob, jfloatArray ojradii, jint ojradiiSize,
+   jfloat il, jfloat it, jfloat ir, jfloat ib, jfloatArray ijradii, jint ijradiiSize,
    jlong paintPtr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
-    canvas->drawDRRect(skija::RRect::toSkRRect(env, ol, ot, oright, ob, ojradii),
-        skija::RRect::toSkRRect(env, il, it, ir, ib, ijradii), *paint);
+    canvas->drawDRRect(skija::RRect::toSkRRect(ol, ot, oright, ob, ojradii, ojradiiSize),
+        skija::RRect::toSkRRect(il, it, ir, ib, ijradii, ijradiiSize), *paint);
 }
-#endif
-
 
 extern "C" void org_jetbrains_skia_Canvas__1nDrawPath
   (kref __Kinstance, jlong canvasPtr, jlong pathPtr, jlong paintPtr) {
@@ -159,7 +139,7 @@ extern "C" void org_jetbrains_skia_Canvas__1nDrawRegion
 
 extern "C" void org_jetbrains_skia_Canvas__1nDrawString
   (kref __Kinstance, jlong canvasPtr, jstring stringObj, jfloat x, jfloat y, jlong skFontPtr, jlong paintPtr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Canvas__1nDrawString");
+    TODO("implement org_jetbrains_skia_Canvas__1nDrawString");
 }
      
 #if 0 
@@ -187,25 +167,17 @@ extern "C" void org_jetbrains_skia_Canvas__1nDrawTextBlob
 
 extern "C" void org_jetbrains_skia_Canvas__1nDrawPicture
   (kref __Kinstance, jlong ptr, jlong picturePtr, jfloatArray matrixArr, jlong paintPtr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Canvas__1nDrawPicture");
-}
-     
-#if 0 
-extern "C" void org_jetbrains_skia_Canvas__1nDrawPicture
-  (kref __Kinstance, jlong ptr, jlong picturePtr, jfloatArray matrixArr, jlong paintPtr) {
     SkCanvas* canvas   = reinterpret_cast<SkCanvas*>   (static_cast<uintptr_t>(ptr));
     SkPicture* picture = reinterpret_cast<SkPicture*>(static_cast<uintptr_t>(picturePtr));
-    std::unique_ptr<SkMatrix> matrix = skMatrix(env, matrixArr);
+    std::unique_ptr<SkMatrix> matrix = skMatrix(matrixArr);
     SkPaint* paint     = reinterpret_cast<SkPaint*>    (static_cast<uintptr_t>(paintPtr));
     canvas->drawPicture(picture, matrix.get(), paint);
 }
-#endif
-
 
 
 extern "C" void org_jetbrains_skia_Canvas__1nDrawVertices
   (kref __Kinstance, jlong ptr, jint verticesMode, jfloatArray positionsArr, jintArray colorsArr, jfloatArray texCoordsArr, jshortArray indexArr, jint blendMode, jlong paintPtr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Canvas__1nDrawVertices");
+    TODO("implement org_jetbrains_skia_Canvas__1nDrawVertices");
 }
      
 #if 0 
@@ -241,7 +213,7 @@ extern "C" void org_jetbrains_skia_Canvas__1nDrawVertices
 
 extern "C" void org_jetbrains_skia_Canvas__1nDrawPatch
   (kref __Kinstance, jlong ptr, jfloatArray cubicsArr, jintArray colorsArr, jfloatArray texCoordsArr, jint blendMode, jlong paintPtr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Canvas__1nDrawPatch");
+    TODO("implement org_jetbrains_skia_Canvas__1nDrawPatch");
 }
      
 #if 0 
@@ -266,7 +238,7 @@ extern "C" void org_jetbrains_skia_Canvas__1nDrawPatch
 
 extern "C" void org_jetbrains_skia_Canvas__1nDrawDrawable
   (kref __Kinstance, jlong ptr, jlong drawablePtr, jfloatArray matrixArr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Canvas__1nDrawDrawable");
+    TODO("implement org_jetbrains_skia_Canvas__1nDrawDrawable");
 }
      
 #if 0 
@@ -295,7 +267,7 @@ extern "C" void org_jetbrains_skia_Canvas__1nDrawPaint
 
 extern "C" void org_jetbrains_skia_Canvas__1nSetMatrix
   (kref __Kinstance, jlong canvasPtr, jfloatArray matrixArr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Canvas__1nSetMatrix");
+    TODO("implement org_jetbrains_skia_Canvas__1nSetMatrix");
 }
      
 #if 0 
@@ -317,7 +289,7 @@ extern "C" void org_jetbrains_skia_Canvas__1nResetMatrix
 
 extern "C" jobject org_jetbrains_skia_Canvas__1nGetLocalToDevice
 (kref __Kinstance, jlong canvasPtr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Canvas__1nGetLocalToDevice");
+    TODO("implement org_jetbrains_skia_Canvas__1nGetLocalToDevice");
 }
      
 #if 0 
@@ -338,20 +310,11 @@ extern "C" void org_jetbrains_skia_Canvas__1nClipRect
     canvas->clipRect({left, top, right, bottom}, static_cast<SkClipOp>(mode), antiAlias);
 }
 
-
 extern "C" void org_jetbrains_skia_Canvas__1nClipRRect
-  (kref __Kinstance, jlong canvasPtr, jfloat left, jfloat top, jfloat right, jfloat bottom, jfloatArray jradii, jint mode, jboolean antiAlias) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Canvas__1nClipRRect");
-}
-     
-#if 0 
-extern "C" void org_jetbrains_skia_Canvas__1nClipRRect
-  (kref __Kinstance, jlong canvasPtr, jfloat left, jfloat top, jfloat right, jfloat bottom, jfloatArray jradii, jint mode, jboolean antiAlias) {
+  (kref __Kinstance, jlong canvasPtr, jfloat left, jfloat top, jfloat right, jfloat bottom, jfloatArray jradii, jint jradiiSize, jint mode, jboolean antiAlias) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
-    canvas->clipRRect(skija::RRect::toSkRRect(env, left, top, right, bottom, jradii), static_cast<SkClipOp>(mode), antiAlias);
+    canvas->clipRRect(skija::RRect::toSkRRect(left, top, right, bottom, jradii, jradiiSize), static_cast<SkClipOp>(mode), antiAlias);
 }
-#endif
-
 
 extern "C" void org_jetbrains_skia_Canvas__1nClipPath
   (kref __Kinstance, jlong canvasPtr, jlong pathPtr, jint mode, jboolean antiAlias) {
@@ -370,33 +333,18 @@ extern "C" void org_jetbrains_skia_Canvas__1nClipRegion
 
 extern "C" void org_jetbrains_skia_Canvas__1nConcat
   (kref __Kinstance, jlong ptr, jfloatArray matrixArr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Canvas__1nConcat");
-}
-     
-#if 0 
-extern "C" void org_jetbrains_skia_Canvas__1nConcat
-  (kref __Kinstance, jlong ptr, jfloatArray matrixArr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(ptr));
-    std::unique_ptr<SkMatrix> m = skMatrix(env, matrixArr);
+    std::unique_ptr<SkMatrix> m = skMatrix(matrixArr);
     canvas->concat(*m);
 }
-#endif
-
 
 
 extern "C" void org_jetbrains_skia_Canvas__1nConcat44
   (kref __Kinstance, jlong ptr, jfloatArray matrixArr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Canvas__1nConcat44");
-}
-     
-#if 0 
-extern "C" void org_jetbrains_skia_Canvas__1nConcat44
-  (kref __Kinstance, jlong ptr, jfloatArray matrixArr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(ptr));
-    std::unique_ptr<SkM44> m = skM44(env, matrixArr);
+    std::unique_ptr<SkM44> m = skM44(matrixArr);
     canvas->concat(*m);
 }
-#endif
 
 
 extern "C" jint org_jetbrains_skia_Canvas__1nReadPixels

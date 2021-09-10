@@ -9,7 +9,7 @@
 
 extern "C" jlong org_jetbrains_skia_Image__1nMakeRaster
   (kref __Kinstance, jint width, jint height, jint colorType, jint alphaType, jlong colorSpacePtr, jbyteArray bytesArr, jlong rowBytes) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Image__1nMakeRaster");
+    TODO("implement org_jetbrains_skia_Image__1nMakeRaster");
 }
      
 #if 0 
@@ -59,7 +59,7 @@ extern "C" jlong org_jetbrains_skia_Image__1nMakeFromPixmap
 
 extern "C" jlong org_jetbrains_skia_Image__1nMakeFromEncoded
   (kref __Kinstance, jbyteArray encodedArray) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Image__1nMakeFromEncoded");
+    TODO("implement org_jetbrains_skia_Image__1nMakeFromEncoded");
 }
      
 #if 0 
@@ -80,7 +80,7 @@ extern "C" jlong org_jetbrains_skia_Image__1nMakeFromEncoded
 
 extern "C" jobject org_jetbrains_skia_Image__1nGetImageInfo
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Image__1nGetImageInfo");
+    TODO("implement org_jetbrains_skia_Image__1nGetImageInfo");
 }
      
 #if 0 
@@ -102,7 +102,7 @@ extern "C" jlong org_jetbrains_skia_Image__1nEncodeToData
 
 extern "C" jlong org_jetbrains_skia_Image__1nMakeShader
   (kref __Kinstance, jlong ptr, jint tmx, jint tmy, jlong sampling, jfloatArray localMatrixArr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Image__1nMakeShader");
+    TODO("implement org_jetbrains_skia_Image__1nMakeShader");
 }
      
 #if 0 
@@ -119,7 +119,7 @@ extern "C" jlong org_jetbrains_skia_Image__1nMakeShader
 
 extern "C" jobject org_jetbrains_skia_Image__1nPeekPixels
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Image__1nPeekPixels");
+    TODO("implement org_jetbrains_skia_Image__1nPeekPixels");
 }
      
 #if 0 

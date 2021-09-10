@@ -16,7 +16,7 @@ extern "C" jlong org_jetbrains_skia_ManagedString__1nGetFinalizer
 
 extern "C" jlong org_jetbrains_skia_ManagedString__1nMake
   (kref __Kinstance, jstring textStr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_ManagedString__1nMake");
+    TODO("implement org_jetbrains_skia_ManagedString__1nMake");
 }
      
 #if 0 
@@ -31,7 +31,7 @@ extern "C" jlong org_jetbrains_skia_ManagedString__1nMake
 
 extern "C" jobject org_jetbrains_skia_ManagedString__1nToString
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_ManagedString__1nToString");
+    TODO("implement org_jetbrains_skia_ManagedString__1nToString");
 }
      
 #if 0 
@@ -46,7 +46,7 @@ extern "C" jobject org_jetbrains_skia_ManagedString__1nToString
 
 extern "C" void org_jetbrains_skia_ManagedString__1nInsert
   (kref __Kinstance, jlong ptr, jint offset, jstring s) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_ManagedString__1nInsert");
+    TODO("implement org_jetbrains_skia_ManagedString__1nInsert");
 }
      
 #if 0 
@@ -62,7 +62,7 @@ extern "C" void org_jetbrains_skia_ManagedString__1nInsert
 
 extern "C" void org_jetbrains_skia_ManagedString__1nAppend
   (kref __Kinstance, jlong ptr, jstring s) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_ManagedString__1nAppend");
+    TODO("implement org_jetbrains_skia_ManagedString__1nAppend");
 }
      
 #if 0 

@@ -22,7 +22,7 @@ extern "C" jlong org_jetbrains_skia_Data__1nSize
 
 extern "C" jobject org_jetbrains_skia_Data__1nToByteBuffer
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Data__1nToByteBuffer");
+    TODO("implement org_jetbrains_skia_Data__1nToByteBuffer");
 }
      
 #if 0 
@@ -37,7 +37,7 @@ extern "C" jobject org_jetbrains_skia_Data__1nToByteBuffer
 
 extern "C" jbyteArray org_jetbrains_skia_Data__1nBytes
   (kref __Kinstance, jlong ptr, jlong offset, jlong length) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Data__1nBytes");
+    TODO("implement org_jetbrains_skia_Data__1nBytes");
 }
      
 #if 0 
@@ -62,7 +62,7 @@ extern "C" jboolean org_jetbrains_skia_Data__1nEquals
 
 extern "C" jlong org_jetbrains_skia_Data__1nMakeFromBytes
   (kref __Kinstance, jbyteArray bytesArray, jlong offset, jlong length) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Data__1nMakeFromBytes");
+    TODO("implement org_jetbrains_skia_Data__1nMakeFromBytes");
 }
      
 #if 0 
@@ -80,7 +80,7 @@ extern "C" jlong org_jetbrains_skia_Data__1nMakeFromBytes
 
 extern "C" jlong org_jetbrains_skia_Data__1nMakeFromFileName
   (kref __Kinstance, jstring pathStr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Data__1nMakeFromFileName");
+    TODO("implement org_jetbrains_skia_Data__1nMakeFromFileName");
 }
      
 #if 0 

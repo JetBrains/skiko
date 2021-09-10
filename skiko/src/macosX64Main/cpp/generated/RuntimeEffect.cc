@@ -7,7 +7,7 @@
 
 extern "C" jlong org_jetbrains_skia_RuntimeEffect__1nMakeShader
     (kref __Kinstance, jlong ptr, jlong uniformPtr, jlongArray childrenPtrsArr, jfloatArray localMatrixArr, jboolean isOpaque) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_RuntimeEffect__1nMakeShader");
+    TODO("implement org_jetbrains_skia_RuntimeEffect__1nMakeShader");
 }
      
 #if 0 
@@ -39,7 +39,7 @@ extern "C" jlong org_jetbrains_skia_RuntimeEffect__1nMakeShader
 
 extern "C" jlong org_jetbrains_skia_RuntimeEffect__1nMakeForShader
     (kref __Kinstance, jstring sksl) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_RuntimeEffect__1nMakeForShader");
+    TODO("implement org_jetbrains_skia_RuntimeEffect__1nMakeForShader");
 }
      
 #if 0 
@@ -61,7 +61,7 @@ extern "C" jlong org_jetbrains_skia_RuntimeEffect__1nMakeForShader
 
 extern "C" jlong org_jetbrains_skia_RuntimeEffect__1nMakeForColorFilter
     (kref __Kinstance, jstring sksl) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_RuntimeEffect__1nMakeForColorFilter");
+    TODO("implement org_jetbrains_skia_RuntimeEffect__1nMakeForColorFilter");
 }
      
 #if 0 

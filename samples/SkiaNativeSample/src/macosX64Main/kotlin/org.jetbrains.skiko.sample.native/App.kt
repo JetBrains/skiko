@@ -40,8 +40,7 @@ class Renderer(
     override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
         this.canvas = canvas
         val contentScale = layer.contentScale
-        // TODO: Disabled for now, as it requires us to pass float array to native world.
-        //canvas.scale(contentScale, contentScale)
+        canvas.scale(contentScale, contentScale)
         displayScene(this, (width / contentScale).toInt(), (height / contentScale).toInt(), nanoTime)
         layer.needRedraw()
     }
@@ -51,16 +50,17 @@ fun displayScene(renderer: Renderer, nanoTime: Long) {
     val canvas = renderer.canvas!!
 
     val paint = Paint()
+    // TODO: make color constants.
     //paint.setColor(Color.GREEN)
     paint.setColor(0xFF00FF00.toInt())
 
-    // canvas.clear(Color.RED);
-    canvas.clear(0x00FF00FF.toInt());
+    // TODO: make color constants.
+    // canvas.clear(Color.RED)
+    canvas.clear(0xFFFF0000.toInt())
 
     canvas.save();
-    // TODO: disabled to ramp up the new native skiko.
-    //canvas.translate(128.0f, 128.0f)
-    //canvas.rotate(nanoTime.toFloat() / 1e7f)
+    canvas.translate(128.0f, 128.0f)
+    canvas.rotate(nanoTime.toFloat() / 1e7f)
     val rect = Rect.makeXYWH(-90.5f, -90.5f, 181.0f, 181.0f)
     canvas.drawRect(rect, paint)
     canvas.restore();

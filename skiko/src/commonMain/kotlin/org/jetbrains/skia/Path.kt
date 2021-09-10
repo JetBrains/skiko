@@ -1,13 +1,8 @@
 @file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.Managed
-import org.jetbrains.skia.impl.Native
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.reachabilityBarrier
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.getPtr
 import kotlin.jvm.JvmStatic
 
 /**
@@ -435,7 +430,8 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
             t: Float,
             r: Float,
             b: Float,
-            radii: FloatArray?,
+            radii: InteropPointer,
+            size: Int,
             dir: Int,
             start: Int
         )
@@ -1917,7 +1913,9 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      */
     fun addRRect(rrect: RRect, dir: PathDirection = PathDirection.CLOCKWISE, start: Int = 6): Path {
         Stats.onNativeCall()
-        _nAddRRect(_ptr, rrect.left, rrect.top, rrect.right, rrect.bottom, rrect.radii, dir.ordinal, start)
+        interopScope {
+            _nAddRRect(_ptr, rrect.left, rrect.top, rrect.right, rrect.bottom, toInterop(rrect.radii), rrect.radii.size, dir.ordinal, start)
+        }
         return this
     }
 

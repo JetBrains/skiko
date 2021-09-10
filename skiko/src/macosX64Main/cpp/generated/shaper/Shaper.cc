@@ -57,7 +57,7 @@ extern "C" jlong org_jetbrains_skia_shaper_Shaper__1nMake
 
 extern "C" jlong org_jetbrains_skia_shaper_Shaper__1nShapeBlob
   (kref __Kinstance, jlong ptr, jstring textObj, jlong fontPtr, jobject opts, jfloat width, jfloat offsetX, jfloat offsetY) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_shaper_Shaper__1nShapeBlob");
+    TODO("implement org_jetbrains_skia_shaper_Shaper__1nShapeBlob");
 }
      
 #if 0 
@@ -103,7 +103,7 @@ extern "C" jlong org_jetbrains_skia_shaper_Shaper__1nShapeBlob
 
 extern "C" jlong org_jetbrains_skia_shaper_Shaper__1nShapeLine
   (kref __Kinstance, jlong ptr, jstring textObj, jlong fontPtr, jobject opts) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_shaper_Shaper__1nShapeLine");
+    TODO("implement org_jetbrains_skia_shaper_Shaper__1nShapeLine");
 }
      
 #if 0 
@@ -155,7 +155,7 @@ extern "C" jlong org_jetbrains_skia_shaper_Shaper__1nShapeLine
 extern "C" void org_jetbrains_skia_shaper_Shaper__1nShape
   (kref __Kinstance, jlong ptr, jlong textPtr, jobject fontRunIterObj, jobject bidiRunIterObj, jobject scriptRunIterObj, jobject languageRunIterObj, jobject opts, jfloat width, jobject runHandlerObj)
 {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_shaper_Shaper__1nShape");
+    TODO("implement org_jetbrains_skia_shaper_Shaper__1nShape");
 }
      
 #if 0 

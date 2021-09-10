@@ -9,6 +9,7 @@
 #include "SkPathOps.h"
 #include "include/utils/SkParsePath.h"
 #include "common.h"
+#include "native_interop.h"
 
 static void deletePath(SkPath* path) {
     // std::cout << "Deleting [SkPath " << path << "]" << std::endl;
@@ -27,7 +28,7 @@ extern "C" jlong org_jetbrains_skia_Path__1nMake(kref __Kinstance) {
 
 extern "C" jlong org_jetbrains_skia_Path__1nMakeFromSVGString
   (kref __Kinstance, jstring d) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Path__1nMakeFromSVGString");
+    TODO("implement org_jetbrains_skia_Path__1nMakeFromSVGString");
 }
      
 #if 0 
@@ -86,7 +87,7 @@ extern "C" jboolean org_jetbrains_skia_Path__1nIsConvex(kref __Kinstance, jlong 
 
 
 extern "C" jobject org_jetbrains_skia_Path__1nIsOval(kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Path__1nIsOval(kref");
+    TODO("implement org_jetbrains_skia_Path__1nIsOval(kref");
 }
      
 #if 0 
@@ -103,7 +104,7 @@ extern "C" jobject org_jetbrains_skia_Path__1nIsOval(kref __Kinstance, jlong ptr
 
 
 extern "C" jobject org_jetbrains_skia_Path__1nIsRRect(kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Path__1nIsRRect(kref");
+    TODO("implement org_jetbrains_skia_Path__1nIsRRect(kref");
 }
      
 #if 0 
@@ -167,7 +168,7 @@ extern "C" jboolean org_jetbrains_skia_Path__1nIsCubicDegenerate(kref __Kinstanc
 
 
 extern "C" jobjectArray org_jetbrains_skia_Path__1nMaybeGetAsLine(kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Path__1nMaybeGetAsLine(kref");
+    TODO("implement org_jetbrains_skia_Path__1nMaybeGetAsLine(kref");
 }
      
 #if 0 
@@ -192,7 +193,7 @@ extern "C" jint org_jetbrains_skia_Path__1nGetPointsCount(kref __Kinstance, jlon
 
 
 extern "C" jobject org_jetbrains_skia_Path__1nGetPoint(kref __Kinstance, jlong ptr, jint index) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Path__1nGetPoint(kref");
+    TODO("implement org_jetbrains_skia_Path__1nGetPoint(kref");
 }
      
 #if 0 
@@ -206,7 +207,7 @@ extern "C" jobject org_jetbrains_skia_Path__1nGetPoint(kref __Kinstance, jlong p
 
 
 extern "C" jint org_jetbrains_skia_Path__1nGetPoints(kref __Kinstance, jlong ptr, jobjectArray pointsArray, jint max) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Path__1nGetPoints(kref");
+    TODO("implement org_jetbrains_skia_Path__1nGetPoints(kref");
 }
      
 #if 0 
@@ -228,7 +229,7 @@ extern "C" jint org_jetbrains_skia_Path__1nCountVerbs(kref __Kinstance, jlong pt
 
 
 extern "C" jint org_jetbrains_skia_Path__1nGetVerbs(kref __Kinstance, jlong ptr, jbyteArray verbsArray, jint max) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Path__1nGetVerbs(kref");
+    TODO("implement org_jetbrains_skia_Path__1nGetVerbs(kref");
 }
      
 #if 0 
@@ -256,7 +257,7 @@ extern "C" void org_jetbrains_skia_Path__1nSwap(kref __Kinstance, jlong ptr, jlo
 
 
 extern "C" jobject org_jetbrains_skia_Path__1nGetBounds(kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Path__1nGetBounds(kref");
+    TODO("implement org_jetbrains_skia_Path__1nGetBounds(kref");
 }
      
 #if 0 
@@ -274,7 +275,7 @@ extern "C" void org_jetbrains_skia_Path__1nUpdateBoundsCache(kref __Kinstance, j
 
 
 extern "C" jobject org_jetbrains_skia_Path__1nComputeTightBounds(kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Path__1nComputeTightBounds(kref");
+    TODO("implement org_jetbrains_skia_Path__1nComputeTightBounds(kref");
 }
      
 #if 0 
@@ -374,7 +375,7 @@ extern "C" void org_jetbrains_skia_Path__1nClosePath(kref __Kinstance, jlong ptr
 
 extern "C" jobjectArray org_jetbrains_skia_Path__1nConvertConicToQuads
   (kref __Kinstance, jfloat x0, jfloat y0, jfloat x1, jfloat y1, jfloat x2, jfloat y2, jfloat w, jint pow2) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Path__1nConvertConicToQuads");
+    TODO("implement org_jetbrains_skia_Path__1nConvertConicToQuads");
 }
      
 #if 0 
@@ -394,7 +395,7 @@ extern "C" jobjectArray org_jetbrains_skia_Path__1nConvertConicToQuads
 
 extern "C" jobject org_jetbrains_skia_Path__1nIsRect
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Path__1nIsRect");
+    TODO("implement org_jetbrains_skia_Path__1nIsRect");
 }
      
 #if 0 
@@ -437,27 +438,17 @@ extern "C" void org_jetbrains_skia_Path__1nAddArc
     instance->addArc({l, t, r, b}, startAngle, sweepAngle);
 }
 
-
 extern "C" void org_jetbrains_skia_Path__1nAddRRect
-  (kref __Kinstance, jlong ptr, jfloat l, jfloat t, jfloat r, jfloat b, jfloatArray radii, jint dirInt, jint start) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Path__1nAddRRect");
-}
-     
-#if 0 
-extern "C" void org_jetbrains_skia_Path__1nAddRRect
-  (kref __Kinstance, jlong ptr, jfloat l, jfloat t, jfloat r, jfloat b, jfloatArray radii, jint dirInt, jint start) {
+  (kref __Kinstance, jlong ptr, jfloat l, jfloat t, jfloat r, jfloat b, jfloatArray radii, jint radiiSize, jint dirInt, jint start) {
     SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
-    SkRRect rrect = skija::RRect::toSkRRect(env, l, t, r, b, radii);
+    SkRRect rrect = skija::RRect::toSkRRect(l, t, r, b, radii, radiiSize);
     SkPathDirection dir = static_cast<SkPathDirection>(dirInt);
     instance->addRRect(rrect, dir, start);
 }
-#endif
-
-
 
 extern "C" void org_jetbrains_skia_Path__1nAddPoly
   (kref __Kinstance, jlong ptr, jfloatArray coords, jboolean close) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Path__1nAddPoly");
+    TODO("implement org_jetbrains_skia_Path__1nAddPoly");
 }
      
 #if 0 
@@ -491,7 +482,7 @@ extern "C" void org_jetbrains_skia_Path__1nAddPathOffset
 
 extern "C" void org_jetbrains_skia_Path__1nAddPathTransform
   (kref __Kinstance, jlong ptr, jlong srcPtr, jfloatArray matrixArr, jboolean extend) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Path__1nAddPathTransform");
+    TODO("implement org_jetbrains_skia_Path__1nAddPathTransform");
 }
      
 #if 0 
@@ -523,7 +514,7 @@ extern "C" void org_jetbrains_skia_Path__1nOffset
 
 extern "C" void org_jetbrains_skia_Path__1nTransform
   (kref __Kinstance, jlong ptr, jfloatArray matrixArr, jlong dstPtr, jboolean pcBool) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Path__1nTransform");
+    TODO("implement org_jetbrains_skia_Path__1nTransform");
 }
      
 #if 0 
@@ -541,7 +532,7 @@ extern "C" void org_jetbrains_skia_Path__1nTransform
 
 extern "C" jobject org_jetbrains_skia_Path__1nGetLastPt
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Path__1nGetLastPt");
+    TODO("implement org_jetbrains_skia_Path__1nGetLastPt");
 }
      
 #if 0 
@@ -590,7 +581,7 @@ extern "C" void org_jetbrains_skia_Path__1nDumpHex
 
 extern "C" jbyteArray org_jetbrains_skia_Path__1nSerializeToBytes
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Path__1nSerializeToBytes");
+    TODO("implement org_jetbrains_skia_Path__1nSerializeToBytes");
 }
      
 #if 0 
@@ -622,7 +613,7 @@ extern "C" jlong org_jetbrains_skia_Path__1nMakeCombining
 
 extern "C" jlong org_jetbrains_skia_Path__1nMakeFromBytes
   (kref __Kinstance, jbyteArray bytesArray) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Path__1nMakeFromBytes");
+    TODO("implement org_jetbrains_skia_Path__1nMakeFromBytes");
 }
      
 #if 0 

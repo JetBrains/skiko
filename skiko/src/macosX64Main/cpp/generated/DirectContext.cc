@@ -25,7 +25,7 @@ extern "C" jlong org_jetbrains_skia_DirectContext__1nMakeMetal
 
 extern "C" jlong org_jetbrains_skia_DirectContext__1nMakeDirect3D
   (kref __Kinstance, jlong adapterPtr, jlong devicePtr, jlong queuePtr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_DirectContext__1nMakeDirect3D");
+    TODO("implement org_jetbrains_skia_DirectContext__1nMakeDirect3D");
 }
      
 #if 0 

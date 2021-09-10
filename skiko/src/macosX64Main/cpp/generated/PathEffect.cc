@@ -37,7 +37,7 @@ extern "C" jlong org_jetbrains_skia_PathEffect__1nMakePath1D
 
 extern "C" jlong org_jetbrains_skia_PathEffect__1nMakePath2D
   (kref __Kinstance, jfloatArray matrixArr, jlong pathPtr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_PathEffect__1nMakePath2D");
+    TODO("implement org_jetbrains_skia_PathEffect__1nMakePath2D");
 }
      
 #if 0 
@@ -54,7 +54,7 @@ extern "C" jlong org_jetbrains_skia_PathEffect__1nMakePath2D
 
 extern "C" jlong org_jetbrains_skia_PathEffect__1nMakeLine2D
   (kref __Kinstance, jfloat width, jfloatArray matrixArr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_PathEffect__1nMakeLine2D");
+    TODO("implement org_jetbrains_skia_PathEffect__1nMakeLine2D");
 }
      
 #if 0 
@@ -76,7 +76,7 @@ extern "C" jlong org_jetbrains_skia_PathEffect__1nMakeCorner
 
 extern "C" jlong org_jetbrains_skia_PathEffect__1nMakeDash
   (kref __Kinstance, jfloatArray intervalsArray, jfloat phase) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_PathEffect__1nMakeDash");
+    TODO("implement org_jetbrains_skia_PathEffect__1nMakeDash");
 }
      
 #if 0 

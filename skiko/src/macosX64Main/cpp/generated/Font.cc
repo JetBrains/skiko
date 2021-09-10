@@ -213,7 +213,7 @@ extern "C" void org_jetbrains_skia_Font__1nSetSkewX
 
 extern "C" jshortArray org_jetbrains_skia_Font__1nGetStringGlyphs
   (kref __Kinstance, jlong ptr, jstring str) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Font__1nGetStringGlyphs");
+    TODO("implement org_jetbrains_skia_Font__1nGetStringGlyphs");
 }
      
 #if 0 
@@ -234,7 +234,7 @@ extern "C" jshortArray org_jetbrains_skia_Font__1nGetStringGlyphs
 
 extern "C" jshortArray org_jetbrains_skia_Font__1nGetUTF32Glyphs
   (kref __Kinstance, jlong ptr, jintArray uniArr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Font__1nGetUTF32Glyphs");
+    TODO("implement org_jetbrains_skia_Font__1nGetUTF32Glyphs");
 }
      
 #if 0 
@@ -260,7 +260,7 @@ extern "C" jshort org_jetbrains_skia_Font__1nGetUTF32Glyph
 
 extern "C" jint org_jetbrains_skia_Font__1nGetStringGlyphsCount
   (kref __Kinstance, jlong ptr, jstring str) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Font__1nGetStringGlyphsCount");
+    TODO("implement org_jetbrains_skia_Font__1nGetStringGlyphsCount");
 }
      
 #if 0 
@@ -279,7 +279,7 @@ extern "C" jint org_jetbrains_skia_Font__1nGetStringGlyphsCount
 
 extern "C" jobject org_jetbrains_skia_Font__1nMeasureText
   (kref __Kinstance, jlong ptr, jstring str, jlong paintPtr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Font__1nMeasureText");
+    TODO("implement org_jetbrains_skia_Font__1nMeasureText");
 }
      
 #if 0 
@@ -300,7 +300,7 @@ extern "C" jobject org_jetbrains_skia_Font__1nMeasureText
 
 extern "C" jfloat org_jetbrains_skia_Font__1nMeasureTextWidth
   (kref __Kinstance, jlong ptr, jstring str, jlong paintPtr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Font__1nMeasureTextWidth");
+    TODO("implement org_jetbrains_skia_Font__1nMeasureTextWidth");
 }
      
 #if 0 
@@ -320,7 +320,7 @@ extern "C" jfloat org_jetbrains_skia_Font__1nMeasureTextWidth
 
 extern "C" jfloatArray org_jetbrains_skia_Font__1nGetWidths
   (kref __Kinstance, jlong ptr, jshortArray glyphsArr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Font__1nGetWidths");
+    TODO("implement org_jetbrains_skia_Font__1nGetWidths");
 }
      
 #if 0 
@@ -340,7 +340,7 @@ extern "C" jfloatArray org_jetbrains_skia_Font__1nGetWidths
 
 extern "C" jobjectArray org_jetbrains_skia_Font__1nGetBounds
   (kref __Kinstance, jlong ptr, jshortArray glyphsArr, jlong paintPtr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Font__1nGetBounds");
+    TODO("implement org_jetbrains_skia_Font__1nGetBounds");
 }
      
 #if 0 
@@ -368,7 +368,7 @@ extern "C" jobjectArray org_jetbrains_skia_Font__1nGetBounds
 
 extern "C" jobjectArray org_jetbrains_skia_Font__1nGetPositions
   (kref __Kinstance, jlong ptr, jshortArray glyphsArr, jfloat dx, jfloat dy) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Font__1nGetPositions");
+    TODO("implement org_jetbrains_skia_Font__1nGetPositions");
 }
      
 #if 0 
@@ -390,7 +390,7 @@ extern "C" jobjectArray org_jetbrains_skia_Font__1nGetPositions
 
 extern "C" jfloatArray org_jetbrains_skia_Font__1nGetXPositions
   (kref __Kinstance, jlong ptr, jshortArray glyphsArr, jfloat dx) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Font__1nGetXPositions");
+    TODO("implement org_jetbrains_skia_Font__1nGetXPositions");
 }
      
 #if 0 
@@ -418,7 +418,7 @@ extern "C" jlong org_jetbrains_skia_Font__1nGetPath
 
 extern "C" jobjectArray org_jetbrains_skia_Font__1nGetPaths
   (kref __Kinstance, jlong ptr, jshortArray glyphsArr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Font__1nGetPaths");
+    TODO("implement org_jetbrains_skia_Font__1nGetPaths");
 }
      
 #if 0 
@@ -456,7 +456,7 @@ extern "C" jobjectArray org_jetbrains_skia_Font__1nGetPaths
 
 extern "C" jobject org_jetbrains_skia_Font__1nGetMetrics
   (kref __Kinstance, jlong ptr, jshortArray glyphsArr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Font__1nGetMetrics");
+    TODO("implement org_jetbrains_skia_Font__1nGetMetrics");
 }
      
 #if 0 
@@ -473,7 +473,7 @@ extern "C" jobject org_jetbrains_skia_Font__1nGetMetrics
 
 extern "C" jfloat org_jetbrains_skia_Font__1nGetSpacing
   (kref __Kinstance, jlong ptr, jshortArray glyphsArr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_Font__1nGetSpacing");
+    TODO("implement org_jetbrains_skia_Font__1nGetSpacing");
 }
      
 #if 0 

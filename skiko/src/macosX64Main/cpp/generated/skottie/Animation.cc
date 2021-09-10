@@ -19,7 +19,7 @@ extern "C" jlong org_jetbrains_skia_skottie_Animation__1nGetFinalizer
 
 extern "C" jlong org_jetbrains_skia_skottie_Animation__1nMakeFromString
   (kref __Kinstance, jstring dataStr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_skottie_Animation__1nMakeFromString");
+    TODO("implement org_jetbrains_skia_skottie_Animation__1nMakeFromString");
 }
      
 #if 0 
@@ -35,7 +35,7 @@ extern "C" jlong org_jetbrains_skia_skottie_Animation__1nMakeFromString
 
 extern "C" jlong org_jetbrains_skia_skottie_Animation__1nMakeFromFile
   (kref __Kinstance, jstring pathStr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_skottie_Animation__1nMakeFromFile");
+    TODO("implement org_jetbrains_skia_skottie_Animation__1nMakeFromFile");
 }
      
 #if 0 
@@ -112,7 +112,7 @@ extern "C" jfloat org_jetbrains_skia_skottie_Animation__1nGetOutPoint
 
 extern "C" jstring org_jetbrains_skia_skottie_Animation__1nGetVersion
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_skottie_Animation__1nGetVersion");
+    TODO("implement org_jetbrains_skia_skottie_Animation__1nGetVersion");
 }
      
 #if 0 
@@ -127,7 +127,7 @@ extern "C" jstring org_jetbrains_skia_skottie_Animation__1nGetVersion
 
 extern "C" jobject org_jetbrains_skia_skottie_Animation__1nGetSize
   (kref __Kinstance, jlong ptr) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_skottie_Animation__1nGetSize");
+    TODO("implement org_jetbrains_skia_skottie_Animation__1nGetSize");
 }
      
 #if 0 

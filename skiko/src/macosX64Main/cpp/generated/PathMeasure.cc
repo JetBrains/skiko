@@ -39,7 +39,7 @@ extern "C" jfloat org_jetbrains_skia_PathMeasure__1nGetLength
 
 extern "C" jobject org_jetbrains_skia_PathMeasure__1nGetPosition
   (kref __Kinstance, jlong ptr, jfloat distance) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_PathMeasure__1nGetPosition");
+    TODO("implement org_jetbrains_skia_PathMeasure__1nGetPosition");
 }
      
 #if 0 
@@ -58,7 +58,7 @@ extern "C" jobject org_jetbrains_skia_PathMeasure__1nGetPosition
 
 extern "C" jobject org_jetbrains_skia_PathMeasure__1nGetTangent
   (kref __Kinstance, jlong ptr, jfloat distance) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_PathMeasure__1nGetTangent");
+    TODO("implement org_jetbrains_skia_PathMeasure__1nGetTangent");
 }
      
 #if 0 
@@ -77,7 +77,7 @@ extern "C" jobject org_jetbrains_skia_PathMeasure__1nGetTangent
 
 extern "C" jobject org_jetbrains_skia_PathMeasure__1nGetRSXform
   (kref __Kinstance, jlong ptr, jfloat distance) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_PathMeasure__1nGetRSXform");
+    TODO("implement org_jetbrains_skia_PathMeasure__1nGetRSXform");
 }
      
 #if 0 
@@ -97,7 +97,7 @@ extern "C" jobject org_jetbrains_skia_PathMeasure__1nGetRSXform
 
 extern "C" jobject org_jetbrains_skia_PathMeasure__1nGetMatrix
   (kref __Kinstance, jlong ptr, jfloat distance, jboolean getPosition, jboolean getTangent) {
-    throw std::runtime_error("TODO: implement org_jetbrains_skia_PathMeasure__1nGetMatrix");
+    TODO("implement org_jetbrains_skia_PathMeasure__1nGetMatrix");
 }
      
 #if 0 

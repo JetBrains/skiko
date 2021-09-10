@@ -3,13 +3,8 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.ImageFilter.Companion.makeDropShadowOnly
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.Managed
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.reachabilityBarrier
-import org.jetbrains.skia.impl.use
 import org.jetbrains.skia.ExternalSymbolName
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.*
 import kotlin.jvm.JvmStatic
 
 open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, internal val _owner: Any) :
@@ -58,7 +53,8 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
             top: Float,
             right: Float,
             bottom: Float,
-            radii: FloatArray?,
+            radii: InteropPointer,
+            radiiSize: Int,
             paintPtr: NativePointer
         )
 
@@ -70,12 +66,14 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
             ot: Float,
             or: Float,
             ob: Float,
-            oradii: FloatArray?,
+            oradii: InteropPointer,
+            oradiiSize: Int,
             il: Float,
             it: Float,
             ir: Float,
             ib: Float,
-            iradii: FloatArray?,
+            iradii: InteropPointer,
+            iradiiSize: Int,
             paintPtr: NativePointer
         )
 
@@ -128,7 +126,8 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         external fun _nDrawTextBlob(ptr: NativePointer, blob: NativePointer, x: Float, y: Float, paint: NativePointer)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawPicture")
-        external fun _nDrawPicture(ptr: NativePointer, picturePtr: NativePointer, matrix: FloatArray?, paintPtr: NativePointer)
+        external fun _nDrawPicture(ptr: NativePointer, picturePtr: NativePointer, matrix: InteropPointer, paintPtr: NativePointer)
+
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawVertices")
         external fun _nDrawVertices(
@@ -191,7 +190,8 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
             top: Float,
             right: Float,
             bottom: Float,
-            radii: FloatArray?,
+            radii: InteropPointer,
+            size: Int,
             mode: Int,
             antiAlias: Boolean
         )
@@ -204,10 +204,12 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         external fun _nClipRegion(ptr: NativePointer, nativeRegion: NativePointer, mode: Int)
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nConcat")
-        external fun _nConcat(ptr: NativePointer, matrix: FloatArray?)
+        external fun _nConcat(ptr: NativePointer, matrix: InteropPointer)
+
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nConcat44")
-        external fun _nConcat44(ptr: NativePointer, matrix: FloatArray?)
+        external fun _nConcat44(ptr: NativePointer, matrix: InteropPointer)
+
         @JvmStatic
         @ExternalSymbolName("org_jetbrains_skia_Canvas__1nReadPixels")
         external fun _nReadPixels(ptr: NativePointer, bitmapPtr: NativePointer, srcX: Int, srcY: Int): Boolean
@@ -515,27 +517,33 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
 
     fun drawRRect(r: RRect, paint: Paint): Canvas {
         Stats.onNativeCall()
-        _nDrawRRect(_ptr, r.left, r.top, r.right, r.bottom, r.radii, getPtr(paint))
+        interopScope {
+            _nDrawRRect(_ptr, r.left, r.top, r.right, r.bottom, toInterop(r.radii), r.radii.size, getPtr(paint))
+        }
         reachabilityBarrier(paint)
         return this
     }
 
     fun drawDRRect(outer: RRect, inner: RRect, paint: Paint): Canvas {
         Stats.onNativeCall()
-        _nDrawDRRect(
-            _ptr,
-            outer.left,
-            outer.top,
-            outer.right,
-            outer.bottom,
-            outer.radii,
-            inner.left,
-            inner.top,
-            inner.right,
-            inner.bottom,
-            inner.radii,
-            getPtr(paint)
-        )
+        interopScope {
+            _nDrawDRRect(
+                _ptr,
+                outer.left,
+                outer.top,
+                outer.right,
+                outer.bottom,
+                toInterop(outer.radii),
+                outer.radii.size,
+                inner.left,
+                inner.top,
+                inner.right,
+                inner.bottom,
+                toInterop(inner.radii),
+                inner.radii.size,
+                getPtr(paint)
+            )
+        }
         reachabilityBarrier(paint)
         return this
     }
@@ -715,9 +723,11 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
 
     fun drawPicture(picture: Picture, matrix: Matrix33?, paint: Paint?): Canvas {
         Stats.onNativeCall()
-        _nDrawPicture(_ptr, getPtr(picture), matrix?.mat, getPtr(paint))
-        reachabilityBarrier(picture)
-        reachabilityBarrier(paint)
+        interopScope {
+            _nDrawPicture(_ptr, getPtr(picture), toInterop(matrix?.mat), getPtr(paint))
+            reachabilityBarrier(picture)
+            reachabilityBarrier(paint)
+        }
         return this
     }
 
@@ -1293,7 +1303,9 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
 
     fun clipRRect(r: RRect, mode: ClipMode, antiAlias: Boolean): Canvas {
         Stats.onNativeCall()
-        _nClipRRect(_ptr, r.left, r.top, r.right, r.bottom, r.radii, mode.ordinal, antiAlias)
+        interopScope {
+            _nClipRRect(_ptr, r.left, r.top, r.right, r.bottom, toInterop(r.radii), r.radii.size, mode.ordinal, antiAlias)
+        }
         return this
     }
 
@@ -1360,14 +1372,22 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     }
 
     fun concat(matrix: Matrix33): Canvas {
-        Stats.onNativeCall()
-        _nConcat(_ptr, matrix.mat)
+        interopScope {
+            Stats.onNativeCall()
+            _nConcat(
+                _ptr, toInterop(matrix.mat)
+            )
+        }
         return this
     }
 
     fun concat(matrix: Matrix44): Canvas {
-        Stats.onNativeCall()
-        _nConcat44(_ptr, matrix.mat)
+        interopScope {
+            Stats.onNativeCall()
+            _nConcat44(
+                _ptr, toInterop(matrix.mat)
+            )
+        }
         return this
     }
 
