@@ -9,7 +9,7 @@ static void deleteBackendRenderTarget(GrBackendRenderTarget* rt) {
 
 EMSCRIPTEN_KEEPALIVE
 extern "C" KPointer BackendRenderTarget_nGetFinalizer() {
-    return static_cast<KPointer>(reinterpret_cast<uintptr_t>(&deleteBackendRenderTarget));
+    return reinterpret_cast<KPointer>(reinterpret_cast<uintptr_t>(&deleteBackendRenderTarget));
 }
 
 EMSCRIPTEN_KEEPALIVE
