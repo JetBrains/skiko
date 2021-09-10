@@ -117,7 +117,7 @@ kotlin {
             testTask {
                 testLogging.showStandardStreams = true
                 dependsOn(project.tasks.named("wasmCompile"))
-                useKarma() {
+                useKarma {
                     useChromeHeadless()
                 }
             }
@@ -338,15 +338,15 @@ project.tasks.register<Exec>("objcCompile") {
 
 project.tasks.register<Exec>("wasmCompile") {
     dependsOn(skiaWasmDir)
+    val skiaDir = skiaWasmDir.get().absolutePath
+    val skiaBinDir = "$skiaDir/out/Release-wasm-wasm"
     val inputDir = "$projectDir/src/jsMain/cpp"
     val outDir = "$buildDir/wasm"
     val names = File(inputDir).listFiles()!!.filter { it.name.endsWith(".cc") }.map { it.name.removeSuffix(".cc") }
     val srcs = names.map { "$inputDir/$it.cc" }.toTypedArray()
     val outJs = "$outDir/skiko.js"
     val outWasm = "$outDir/skiko.wasm"
-    val skiaDir = skiaWasmDir.get().absolutePath
     workingDir = File(outDir)
-    val libs = listOf("$skiaDir/out/Release-wasm-wasm").findAllFiles(".a")
     commandLine = listOf(
         "emcc",
         *Arch.Wasm.clangFlags,
@@ -355,12 +355,13 @@ project.tasks.register<Exec>("wasmCompile") {
         "-I$skiaDir/include/core",
         "-I$skiaDir/include/effects",
         "-I$skiaDir/include/gpu",
-        "-std=c++17",
-        "--bind",
         "-o", outJs,
-        *libs.toTypedArray(),
         *srcs
     )
+    argumentProviders.add(CommandLineArgumentProvider {
+        // We must compute this list after Skia unpacking task has finished.
+        listOf(skiaBinDir).findAllFiles(".a")
+    })
     file(outDir).mkdirs()
     inputs.files(srcs)
     outputs.files(outJs, outWasm)
@@ -662,11 +663,6 @@ project.tasks.register<Jar>("skikoJsJar") {
     }
 }
 
-project.tasks.register<JavaExec>("run") {
-    main = "org.jetbrains.skiko.MainKt"
-    classpath = files(skikoJvmRuntimeJar.map { it.archiveFile })
-}
-
 // disable unexpected native publications (default C++ publications are failing)
 tasks.withType<AbstractPublishToMaven>().configureEach {
     doFirst {
@@ -808,8 +804,7 @@ publishing {
                     afterEvaluate {
                         artifact(project.tasks.withType(KotlinNativeCompile::class.java)
                                 .single { it.name.startsWith("compileKotlin") } // Exclude compileTestKotlin.
-                                .outputs.getFiles().single { it.name.endsWith(".klib") }
-                                )
+                                .outputs.files.single { it.name.endsWith(".klib") })
                     }
             }
         }
