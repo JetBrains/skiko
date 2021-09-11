@@ -43,9 +43,7 @@ internal abstract class ContextHandler(val layer: HardwareLayer) {
     }
 
     fun dispose() {
-        println("Need to free surface")
-        println("Need to free renderTarget")
-        // surface?.close()
-        // renderTarget?.close()
+        surface?.close()
+        renderTarget?.close()
     }
 }
