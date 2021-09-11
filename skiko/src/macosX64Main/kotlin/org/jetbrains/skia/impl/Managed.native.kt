@@ -2,25 +2,24 @@ package org.jetbrains.skia.impl
 
 import kotlinx.cinterop.nativeNullPtr
 import org.jetbrains.skia.ExternalSymbolName
-import kotlin.native.concurrent.AtomicLong
+import kotlin.native.concurrent.AtomicNativePtr
 import kotlin.native.concurrent.freeze
 import kotlin.native.internal.createCleaner
 
 private class FinalizationThunk(private val finalizer: NativePointer, val className: String, obj: NativePointer) {
 
-    private var obj = AtomicLong(obj.toLong())
+    private var obj = AtomicNativePtr(obj)
 
     fun clean() {
         val ptr = obj.value
-        if (ptr != 0L && obj.compareAndSet(ptr, 0L)) {
+        if (ptr != nativeNullPtr && obj.compareAndSet(ptr, nativeNullPtr)) {
             Stats.onDeallocated(className)
             Stats.onNativeCall()
-            _nInvokeFinalizer(finalizer, ptr.toNativePtr())
+            _nInvokeFinalizer(finalizer, ptr)
         }
     }
-    val isActive get() = (obj.value != 0L)
-
-    private fun Long.toNativePtr() = nativeNullPtr + this
+    val isActive get() =
+        obj.value != nativeNullPtr
 }
 
 actual abstract class Managed actual constructor(
