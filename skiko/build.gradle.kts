@@ -665,13 +665,12 @@ val skikoJvmRuntimeJar by project.tasks.registering(Jar::class) {
     from(createChecksums.get().outputs.files)
 }
 
-project.tasks.register<Jar>("skikoJsJar") {
+project.tasks.register<Jar>("skikoWasmJar") {
     // We produce jar that contains .js of wrapper/bindings and .wasm with Skia + bindings.
     from(project.tasks.named("wasmCompile").get().outputs)
-    from(project.tasks.named("jsJar").get().outputs)
     archiveBaseName.set("skiko-wasm")
     doLast {
-        println("output at ${outputs.files.files.single()}")
+        println("Wasm and JS at ${outputs.files.files.single()}")
     }
 }
 
@@ -810,6 +809,14 @@ publishing {
                 artifact(skikoJvmRuntimeJar.map { it.archiveFile.get() })
             }
         }
+        create<MavenPublication>("skikoJsRuntime") {
+            artifactId = SkikoArtifacts.jsArtifactId
+            afterEvaluate {
+                // TODO: rethink how we publish.
+                artifact(project.tasks.named("jsJar").get()
+                    .outputs.files.single { it.name.endsWith(".klib") })
+            }
+        }
         if (supportNative) {
             create<MavenPublication>("skikoNativeRuntime") {
                 artifactId = SkikoArtifacts.nativeRuntimeArtifactIdFor(targetOs, targetArch)
@@ -821,20 +828,11 @@ publishing {
             }
         }
         if (supportWasm) {
-            create<MavenPublication>("skikoJsRuntime") {
-                artifactId = SkikoArtifacts.jsArtifactId
+            create<MavenPublication>("skikoWasmRuntime") {
+                artifactId = SkikoArtifacts.jsWasmArtifactId
                 afterEvaluate {
-                    // TODO: rethink how we publish.
-                    artifact(project.tasks.named("jsJar").get()
-                        .outputs.files.single { it.name.endsWith(".klib") })
-                }
-            }
-            // TODO: temp artifact, rethink!
-            create<MavenPublication>("skikoWithWasmRuntime") {
-                artifactId = "skiko-js-wasm-runtime"
-                afterEvaluate {
-                    // TODO: rethink how we publish.
-                    artifact(project.tasks.named("skikoJsJar").get()
+                    // TODO: maybe rethink how we publish.
+                    artifact(project.tasks.named("skikoWasmJar").get()
                         .outputs.files.single { it.name.endsWith(".jar") })
                 }
             }
@@ -855,7 +853,7 @@ afterEvaluate {
 
 // Kotlin/JS has a bug preventing compilation on non-x86 Linux machines,
 // see https://youtrack.jetbrains.com/issue/KT-48631
-// It always downloads and uses x86 version, so on those achitectures
+// It always downloads and uses x86 version, so on those architectures
 if (hostOs == OS.Linux && hostArch != Arch.X64) {
     rootProject.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin::class.java) {
         rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>().download = false
