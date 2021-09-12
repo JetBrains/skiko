@@ -105,6 +105,9 @@ val skiaBinSubdir = "out/${buildType.id}-${targetOs.id}-${targetArch.id}"
 val Project.supportNative: Boolean
    get() = properties.get("skiko.native.enabled") == "true"
 
+val Project.supportWasm: Boolean
+    get() = properties.get("skiko.wasm.enabled") == "true"
+
 kotlin {
     jvm {
         compilations.all {
@@ -129,7 +132,7 @@ kotlin {
         val targetString = target
         val skiaDir = skiaDir.get().absolutePath
         val nativeTarget = when (targetString) {
-            "macos-x64", "macos-arm64" -> macosX64() {
+            "macos-x64", "macos-arm64" -> macosX64 {
                 compilations.all {
                     kotlinOptions {
                         freeCompilerArgs += listOf(
@@ -337,34 +340,43 @@ project.tasks.register<Exec>("objcCompile") {
 }
 
 project.tasks.register<Exec>("wasmCompile") {
-    dependsOn(skiaWasmDir)
-    val skiaDir = skiaWasmDir.get().absolutePath
-    val inputDir = "$projectDir/src/jsMain/cpp"
-    val outDir = "$buildDir/wasm"
-    val names = File(inputDir).listFiles()!!.filter { it.name.endsWith(".cc") }.map { it.name.removeSuffix(".cc") }
-    val srcs = names.map { "$inputDir/$it.cc" }.toTypedArray()
-    val outJs = "$outDir/skiko.js"
-    val outWasm = "$outDir/skiko.wasm"
-    workingDir = File(outDir)
-    commandLine = listOf(
-        "emcc",
-        *Arch.Wasm.clangFlags,
-        "-I$skiaDir",
-        "-I$skiaDir/include",
-        "-I$skiaDir/include/core",
-        "-I$skiaDir/include/effects",
-        "-I$skiaDir/include/gpu",
-        "-o", outJs,
-        *srcs
-    )
-    argumentProviders.add(CommandLineArgumentProvider {
-        val skiaBinDir = "$skiaDir/out/${buildType.id}-wasm-wasm"
-        // We must compute this list after Skia unpacking task has finished.
-        listOf(skiaBinDir).findAllFiles(".a")
-    })
-    file(outDir).mkdirs()
-    inputs.files(srcs)
-    outputs.files(outJs, outWasm)
+        dependsOn(skiaWasmDir)
+        val skiaDir = skiaWasmDir.get().absolutePath
+        val inputDir = "$projectDir/src/jsMain/cpp"
+        val outDir = "$buildDir/wasm"
+        val names = File(inputDir).listFiles()!!.filter { it.name.endsWith(".cc") }.map { it.name.removeSuffix(".cc") }
+        val srcs = names.map { "$inputDir/$it.cc" }.toTypedArray()
+        val outJs = "$outDir/skiko.js"
+        val outWasm = "$outDir/skiko.wasm"
+        workingDir = File(outDir)
+        if (supportWasm) {
+            commandLine = listOf(
+                "emcc",
+                *Arch.Wasm.clangFlags,
+                "-I$skiaDir",
+                "-I$skiaDir/include",
+                "-I$skiaDir/include/core",
+                "-I$skiaDir/include/effects",
+                "-I$skiaDir/include/gpu",
+                "-o", outJs,
+                *srcs
+            )
+            argumentProviders.add(CommandLineArgumentProvider {
+                val skiaBinDir = "$skiaDir/out/${buildType.id}-wasm-wasm"
+                // We must compute this list after Skia unpacking task has finished.
+                listOf(skiaBinDir).findAllFiles(".a")
+            })
+        } else {
+            // Create dummy files anyway.
+            commandLine = listOf(
+                "touch",
+                outJs,
+                outWasm
+            )
+        }
+        file(outDir).mkdirs()
+        inputs.files(srcs)
+        outputs.files(outJs, outWasm)
 }
 
 fun List<String>.findAllFiles(suffix: String): List<String> = this
@@ -806,6 +818,25 @@ publishing {
                                 .single { it.name.startsWith("compileKotlin") } // Exclude compileTestKotlin.
                                 .outputs.files.single { it.name.endsWith(".klib") })
                     }
+            }
+        }
+        if (supportWasm) {
+            create<MavenPublication>("skikoJsRuntime") {
+                artifactId = SkikoArtifacts.jsArtifactId
+                afterEvaluate {
+                    // TODO: rethink how we publish.
+                    artifact(project.tasks.named("jsJar").get()
+                        .outputs.files.single { it.name.endsWith(".klib") })
+                }
+            }
+            // TODO: temp artifact, rethink!
+            create<MavenPublication>("skikoWithWasmRuntime") {
+                artifactId = "skiko-js-wasm-runtime"
+                afterEvaluate {
+                    // TODO: rethink how we publish.
+                    artifact(project.tasks.named("skikoJsJar").get()
+                        .outputs.files.single { it.name.endsWith(".jar") })
+                }
             }
         }
     }

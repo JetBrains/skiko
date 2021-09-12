@@ -138,10 +138,9 @@ class SkikoProperties(private val myProject: Project) {
 object SkikoArtifacts {
     // names are also used in samples, e.g. samples/SkijaInjectSample/build.gradle
     val commonArtifactId = "skiko-jvm"
+    val jsArtifactId = "skiko-js-runtime"
     fun runtimeArtifactIdFor(os: OS, arch: Arch) =
         "skiko-jvm-runtime-${targetId(os, arch)}"
     fun nativeRuntimeArtifactIdFor(os: OS, arch: Arch) =
         "skiko-native-runtime-${targetId(os, arch)}"
-    fun nativeSkiaInteropArtifactIdFor(os: OS, arch: Arch) =
-        "skiko-native-skia-interop-${targetId(os, arch)}"
 }
