@@ -7,7 +7,6 @@ import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
-import kotlin.jvm.JvmStatic
 
 class Surface : RefCnt {
     companion object {
@@ -528,148 +527,6 @@ class Surface : RefCnt {
             return Surface(ptr)
         }
 
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeRasterDirect")
-        external fun _nMakeRasterDirect(
-            width: Int,
-            height: Int,
-            colorType: Int,
-            alphaType: Int,
-            colorSpacePtr: NativePointer,
-            pixelsPtr: NativePointer,
-            rowBytes: NativePointer,
-            surfaceProps: SurfaceProps?
-        ): NativePointer
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeRasterDirectWithPixmap")
-        external fun _nMakeRasterDirectWithPixmap(pixmapPtr: NativePointer, surfaceProps: SurfaceProps?): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeRaster")
-        external fun _nMakeRaster(
-            width: Int,
-            height: Int,
-            colorType: Int,
-            alphaType: Int,
-            colorSpacePtr: NativePointer,
-            rowBytes: NativePointer,
-            surfaceProps: SurfaceProps?
-        ): NativePointer
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeRasterN32Premul")
-        external fun _nMakeRasterN32Premul(width: Int, height: Int): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeFromBackendRenderTarget")
-        external fun _nMakeFromBackendRenderTarget(
-            pContext: NativePointer,
-            pBackendRenderTarget: NativePointer,
-            surfaceOrigin: Int,
-            colorType: Int,
-            colorSpacePtr: NativePointer,
-            surfaceProps: SurfaceProps?
-        ): NativePointer
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeFromMTKView")
-        external fun _nMakeFromMTKView(
-            contextPtr: NativePointer,
-            mtkViewPtr: NativePointer,
-            surfaceOrigin: Int,
-            sampleCount: Int,
-            colorType: Int,
-            colorSpacePtr: NativePointer,
-            surfaceProps: SurfaceProps?
-        ): NativePointer
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeRenderTarget")
-        external fun _nMakeRenderTarget(
-            contextPtr: NativePointer,
-            budgeted: Boolean,
-            width: Int,
-            height: Int,
-            colorType: Int,
-            alphaType: Int,
-            colorSpacePtr: NativePointer,
-            sampleCount: Int,
-            surfaceOrigin: Int,
-            surfaceProps: SurfaceProps?,
-            shouldCreateWithMips: Boolean
-        ): NativePointer
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeNull")
-        external fun _nMakeNull(width: Int, height: Int): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Surface__1nGetWidth")
-        external fun _nGetWidth(ptr: NativePointer): Int
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Surface__1nGetHeight")
-        external fun _nGetHeight(ptr: NativePointer): Int
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Surface__1nGetImageInfo")
-        external fun _nGetImageInfo(ptr: NativePointer): ImageInfo
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Surface__1nGenerationId")
-        external fun _nGenerationId(ptr: NativePointer): Int
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Surface__1nNotifyContentWillChange")
-        external fun _nNotifyContentWillChange(ptr: NativePointer, mode: Int)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Surface__1nGetRecordingContext")
-        external fun _nGetRecordingContext(ptr: NativePointer): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Surface__1nGetCanvas")
-        external fun _nGetCanvas(ptr: NativePointer): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeSurfaceI")
-        external fun _nMakeSurfaceI(
-            ptr: NativePointer,
-            width: Int,
-            height: Int,
-            colorType: Int,
-            alphaType: Int,
-            colorSpacePtr: NativePointer
-        ): NativePointer
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeSurface")
-        external fun _nMakeSurface(ptr: NativePointer, width: Int, height: Int): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeImageSnapshot")
-        external fun _nMakeImageSnapshot(ptr: NativePointer): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeImageSnapshotR")
-        external fun _nMakeImageSnapshotR(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Surface__1nDraw")
-        external fun _nDraw(ptr: NativePointer, canvasPtr: NativePointer, x: Float, y: Float, paintPtr: NativePointer)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Surface__1nPeekPixels")
-        external fun _nPeekPixels(ptr: NativePointer, pixmapPtr: NativePointer): Boolean
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Surface__1nReadPixelsToPixmap")
-        external fun _nReadPixelsToPixmap(ptr: NativePointer, pixmapPtr: NativePointer, srcX: Int, srcY: Int): Boolean
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Surface__1nReadPixels")
-        external fun _nReadPixels(ptr: NativePointer, bitmapPtr: NativePointer, srcX: Int, srcY: Int): Boolean
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Surface__1nWritePixelsFromPixmap")
-        external fun _nWritePixelsFromPixmap(ptr: NativePointer, pixmapPtr: NativePointer, x: Int, y: Int)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Surface__1nWritePixels")
-        external fun _nWritePixels(ptr: NativePointer, bitmapPtr: NativePointer, x: Int, y: Int)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Surface__1nFlushAndSubmit")
-        external fun _nFlushAndSubmit(ptr: NativePointer, syncCpu: Boolean)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Surface__1nFlush")
-        external fun _nFlush(ptr: NativePointer)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Surface__1nUnique")
-        external fun _nUnique(ptr: NativePointer): Boolean
-
         init {
             staticLoad()
         }
@@ -1130,3 +987,145 @@ class Surface : RefCnt {
         _renderTarget = renderTarget
     }
 }
+
+
+@ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeRasterDirect")
+private external fun _nMakeRasterDirect(
+    width: Int,
+    height: Int,
+    colorType: Int,
+    alphaType: Int,
+    colorSpacePtr: NativePointer,
+    pixelsPtr: NativePointer,
+    rowBytes: NativePointer,
+    surfaceProps: SurfaceProps?
+): NativePointer
+
+
+@ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeRasterDirectWithPixmap")
+private external fun _nMakeRasterDirectWithPixmap(pixmapPtr: NativePointer, surfaceProps: SurfaceProps?): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeRaster")
+private external fun _nMakeRaster(
+    width: Int,
+    height: Int,
+    colorType: Int,
+    alphaType: Int,
+    colorSpacePtr: NativePointer,
+    rowBytes: NativePointer,
+    surfaceProps: SurfaceProps?
+): NativePointer
+
+
+@ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeRasterN32Premul")
+private external fun _nMakeRasterN32Premul(width: Int, height: Int): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeFromBackendRenderTarget")
+private external fun _nMakeFromBackendRenderTarget(
+    pContext: NativePointer,
+    pBackendRenderTarget: NativePointer,
+    surfaceOrigin: Int,
+    colorType: Int,
+    colorSpacePtr: NativePointer,
+    surfaceProps: SurfaceProps?
+): NativePointer
+
+
+@ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeFromMTKView")
+private external fun _nMakeFromMTKView(
+    contextPtr: NativePointer,
+    mtkViewPtr: NativePointer,
+    surfaceOrigin: Int,
+    sampleCount: Int,
+    colorType: Int,
+    colorSpacePtr: NativePointer,
+    surfaceProps: SurfaceProps?
+): NativePointer
+
+
+@ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeRenderTarget")
+private external fun _nMakeRenderTarget(
+    contextPtr: NativePointer,
+    budgeted: Boolean,
+    width: Int,
+    height: Int,
+    colorType: Int,
+    alphaType: Int,
+    colorSpacePtr: NativePointer,
+    sampleCount: Int,
+    surfaceOrigin: Int,
+    surfaceProps: SurfaceProps?,
+    shouldCreateWithMips: Boolean
+): NativePointer
+
+
+@ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeNull")
+private external fun _nMakeNull(width: Int, height: Int): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Surface__1nGetWidth")
+private external fun _nGetWidth(ptr: NativePointer): Int
+
+@ExternalSymbolName("org_jetbrains_skia_Surface__1nGetHeight")
+private external fun _nGetHeight(ptr: NativePointer): Int
+
+@ExternalSymbolName("org_jetbrains_skia_Surface__1nGetImageInfo")
+private external fun _nGetImageInfo(ptr: NativePointer): ImageInfo
+
+@ExternalSymbolName("org_jetbrains_skia_Surface__1nGenerationId")
+private external fun _nGenerationId(ptr: NativePointer): Int
+
+@ExternalSymbolName("org_jetbrains_skia_Surface__1nNotifyContentWillChange")
+private external fun _nNotifyContentWillChange(ptr: NativePointer, mode: Int)
+
+@ExternalSymbolName("org_jetbrains_skia_Surface__1nGetRecordingContext")
+private external fun _nGetRecordingContext(ptr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Surface__1nGetCanvas")
+private external fun _nGetCanvas(ptr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeSurfaceI")
+private external fun _nMakeSurfaceI(
+    ptr: NativePointer,
+    width: Int,
+    height: Int,
+    colorType: Int,
+    alphaType: Int,
+    colorSpacePtr: NativePointer
+): NativePointer
+
+
+@ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeSurface")
+private external fun _nMakeSurface(ptr: NativePointer, width: Int, height: Int): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeImageSnapshot")
+private external fun _nMakeImageSnapshot(ptr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeImageSnapshotR")
+private external fun _nMakeImageSnapshotR(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Surface__1nDraw")
+private external fun _nDraw(ptr: NativePointer, canvasPtr: NativePointer, x: Float, y: Float, paintPtr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_Surface__1nPeekPixels")
+private external fun _nPeekPixels(ptr: NativePointer, pixmapPtr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Surface__1nReadPixelsToPixmap")
+private external fun _nReadPixelsToPixmap(ptr: NativePointer, pixmapPtr: NativePointer, srcX: Int, srcY: Int): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Surface__1nReadPixels")
+private external fun _nReadPixels(ptr: NativePointer, bitmapPtr: NativePointer, srcX: Int, srcY: Int): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Surface__1nWritePixelsFromPixmap")
+private external fun _nWritePixelsFromPixmap(ptr: NativePointer, pixmapPtr: NativePointer, x: Int, y: Int)
+
+@ExternalSymbolName("org_jetbrains_skia_Surface__1nWritePixels")
+private external fun _nWritePixels(ptr: NativePointer, bitmapPtr: NativePointer, x: Int, y: Int)
+
+@ExternalSymbolName("org_jetbrains_skia_Surface__1nFlushAndSubmit")
+private external fun _nFlushAndSubmit(ptr: NativePointer, syncCpu: Boolean)
+
+@ExternalSymbolName("org_jetbrains_skia_Surface__1nFlush")
+private external fun _nFlush(ptr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_Surface__1nUnique")
+private external fun _nUnique(ptr: NativePointer): Boolean
