@@ -2,12 +2,9 @@
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
-import kotlin.jvm.JvmStatic
 
 object ShadowUtils {
     /**
@@ -83,31 +80,31 @@ object ShadowUtils {
         return _nComputeTonalSpotColor(ambientColor, spotColor)
     }
 
-    @JvmStatic
-    @ExternalSymbolName("org_jetbrains_skia_ShadowUtils__1nDrawShadow")
-    external fun _nDrawShadow(
-        canvasPtr: NativePointer,
-        pathPtr: NativePointer,
-        zPlaneX: Float,
-        zPlaneY: Float,
-        zPlaneZ: Float,
-        lightPosX: Float,
-        lightPosY: Float,
-        lightPosZ: Float,
-        lightRadius: Float,
-        ambientColor: Int,
-        spotColor: Int,
-        flags: Int
-    )
-
-    @JvmStatic
-    @ExternalSymbolName("org_jetbrains_skia_ShadowUtils__1nComputeTonalAmbientColor")
-    external fun _nComputeTonalAmbientColor(ambientColor: Int, spotColor: Int): Int
-    @JvmStatic
-    @ExternalSymbolName("org_jetbrains_skia_ShadowUtils__1nComputeTonalSpotColor")
-    external fun _nComputeTonalSpotColor(ambientColor: Int, spotColor: Int): Int
-
     init {
         staticLoad()
     }
 }
+
+
+@ExternalSymbolName("org_jetbrains_skia_ShadowUtils__1nDrawShadow")
+private external fun _nDrawShadow(
+    canvasPtr: NativePointer,
+    pathPtr: NativePointer,
+    zPlaneX: Float,
+    zPlaneY: Float,
+    zPlaneZ: Float,
+    lightPosX: Float,
+    lightPosY: Float,
+    lightPosZ: Float,
+    lightRadius: Float,
+    ambientColor: Int,
+    spotColor: Int,
+    flags: Int
+)
+
+
+@ExternalSymbolName("org_jetbrains_skia_ShadowUtils__1nComputeTonalAmbientColor")
+private external fun _nComputeTonalAmbientColor(ambientColor: Int, spotColor: Int): Int
+
+@ExternalSymbolName("org_jetbrains_skia_ShadowUtils__1nComputeTonalSpotColor")
+private external fun _nComputeTonalSpotColor(ambientColor: Int, spotColor: Int): Int
