@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     kotlin("multiplatform") version "1.5.21"
 }
@@ -14,6 +16,8 @@ if (project.hasProperty("skiko.version")) {
     version = project.properties["skiko.version"] as String
 }
 
+val resourcesDir = "$buildDir/resources/"
+
 kotlin {
 
     js(IR) {
@@ -29,9 +33,25 @@ kotlin {
             dependencies {
                 // This one is tricky - it has js and wasm binaries required for final linking.
                 // We cannot use it directly but need to extract data from there.
-                // implementation("org.jetbrains.skiko:skiko-js-wasm-runtime:$version")
                 implementation("org.jetbrains.skiko:skiko-js-runtime:$version")
             }
+            resources.setSrcDirs(listOf(resourcesDir))
         }
     }
 }
+
+val skikoWasm by configurations.creating
+
+dependencies {
+    skikoWasm("org.jetbrains.skiko:skiko-js-wasm-runtime:$version")
+}
+
+val unzipTask = tasks.register("unzipWasm", Copy::class) {
+    destinationDir = file(resourcesDir)
+    from(skikoWasm.map { zipTree(it) })
+}
+
+tasks.withType<KotlinCompile>().configureEach {
+    dependsOn(unzipTask)
+}
+

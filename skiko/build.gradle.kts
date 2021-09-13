@@ -609,7 +609,7 @@ library {
 
 val skikoJvmJar: Provider<Jar> by tasks.registering(Jar::class) {
     archiveBaseName.set("skiko-jvm")
-    from(kotlin.jvm().compilations["main"].output.allOutputs)
+        from(kotlin.jvm().compilations["main"].output.allOutputs)
 }
 
 val skikoNativeLib: File
@@ -665,7 +665,7 @@ val skikoJvmRuntimeJar by project.tasks.registering(Jar::class) {
     from(createChecksums.get().outputs.files)
 }
 
-project.tasks.register<Jar>("skikoWasmJar") {
+val skikoWasmJar by project.tasks.registering(Jar::class) {
     // We produce jar that contains .js of wrapper/bindings and .wasm with Skia + bindings.
     from(project.tasks.named("wasmCompile").get().outputs)
     archiveBaseName.set("skiko-wasm")
@@ -809,32 +809,24 @@ publishing {
                 artifact(skikoJvmRuntimeJar.map { it.archiveFile.get() })
             }
         }
-        create<MavenPublication>("skikoJsRuntime") {
-            artifactId = SkikoArtifacts.jsArtifactId
-            afterEvaluate {
-                // TODO: rethink how we publish.
-                artifact(project.tasks.named("jsJar").get()
-                    .outputs.files.single { it.name.endsWith(".klib") })
-            }
-        }
         if (supportNative) {
             create<MavenPublication>("skikoNativeRuntime") {
                 artifactId = SkikoArtifacts.nativeRuntimeArtifactIdFor(targetOs, targetArch)
-                    afterEvaluate {
-                        artifact(project.tasks.withType(KotlinNativeCompile::class.java)
+                afterEvaluate {
+                    artifact(project.tasks.withType(KotlinNativeCompile::class.java)
                                 .single { it.name.startsWith("compileKotlin") } // Exclude compileTestKotlin.
                                 .outputs.files.single { it.name.endsWith(".klib") })
-                    }
+                }
             }
+        }
+        create<MavenPublication>("skikoJsRuntime") {
+            artifactId = SkikoArtifacts.jsArtifactId
+            artifact(project.tasks.named("jsJar").get())
         }
         if (supportWasm) {
             create<MavenPublication>("skikoWasmRuntime") {
                 artifactId = SkikoArtifacts.jsWasmArtifactId
-                afterEvaluate {
-                    // TODO: maybe rethink how we publish.
-                    artifact(project.tasks.named("skikoWasmJar").get()
-                        .outputs.files.single { it.name.endsWith(".jar") })
-                }
+                artifact(skikoWasmJar.get())
             }
         }
     }
