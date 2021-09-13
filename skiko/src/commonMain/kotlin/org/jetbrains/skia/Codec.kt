@@ -9,6 +9,39 @@ import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
 import kotlin.jvm.JvmStatic
 
+@ExternalSymbolName("org_jetbrains_skia_Codec__1nGetFinalizer")
+private external fun _nGetFinalizer(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Codec__1nMakeFromData")
+private external fun _nMakeFromData(dataPtr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Codec__1nGetImageInfo")
+private external fun _nGetImageInfo(ptr: NativePointer): ImageInfo?
+
+@ExternalSymbolName("org_jetbrains_skia_Codec__1nGetSize")
+private external fun _nGetSize(ptr: NativePointer): Long
+
+@ExternalSymbolName("org_jetbrains_skia_Codec__1nGetEncodedOrigin")
+private external fun _nGetEncodedOrigin(ptr: NativePointer): Int
+
+@ExternalSymbolName("org_jetbrains_skia_Codec__1nGetEncodedImageFormat")
+private external fun _nGetEncodedImageFormat(ptr: NativePointer): Int
+
+@ExternalSymbolName("org_jetbrains_skia_Codec__1nReadPixels")
+private external fun _nReadPixels(ptr: NativePointer, bitmapPtr: NativePointer, frame: Int, priorFrame: Int): Int
+
+@ExternalSymbolName("org_jetbrains_skia_Codec__1nGetFrameCount")
+private external fun _nGetFrameCount(ptr: NativePointer): Int
+
+@ExternalSymbolName("org_jetbrains_skia_Codec__1nGetFrameInfo")
+private external fun _nGetFrameInfo(ptr: NativePointer, frame: Int): AnimationFrameInfo
+
+@ExternalSymbolName("org_jetbrains_skia_Codec__1nGetFramesInfo")
+private external fun _nGetFramesInfo(ptr: NativePointer): Array<AnimationFrameInfo>
+
+@ExternalSymbolName("org_jetbrains_skia_Codec__1nGetRepetitionCount")
+private external fun _nGetRepetitionCount(ptr: NativePointer): Int
+
 class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR), IHasImageInfo {
     companion object {
         /**
@@ -40,40 +73,6 @@ class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHo
                 9 -> throw UnsupportedOperationException("Unimplemented: This method is not implemented by this codec")
             }
         }
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetFinalizer")
-        external fun _nGetFinalizer(): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Codec__1nMakeFromData")
-        external fun _nMakeFromData(dataPtr: NativePointer): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetImageInfo")
-        external fun _nGetImageInfo(ptr: NativePointer): ImageInfo?
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetSize")
-        external fun _nGetSize(ptr: NativePointer): Long
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetEncodedOrigin")
-        external fun _nGetEncodedOrigin(ptr: NativePointer): Int
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetEncodedImageFormat")
-        external fun _nGetEncodedImageFormat(ptr: NativePointer): Int
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Codec__1nReadPixels")
-        external fun _nReadPixels(ptr: NativePointer, bitmapPtr: NativePointer, frame: Int, priorFrame: Int): Int
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetFrameCount")
-        external fun _nGetFrameCount(ptr: NativePointer): Int
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetFrameInfo")
-        external fun _nGetFrameInfo(ptr: NativePointer, frame: Int): AnimationFrameInfo
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetFramesInfo")
-        external fun _nGetFramesInfo(ptr: NativePointer): Array<AnimationFrameInfo>
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetRepetitionCount")
-        external fun _nGetRepetitionCount(ptr: NativePointer): Int
 
         init {
             staticLoad()
