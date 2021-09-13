@@ -6,7 +6,7 @@ pluginManagement {
             url = uri("https://dl.bintray.com/kotlin/kotlin-eap")
         }
     }
-    
 }
+
 rootProject.name = "SkiaJsSample"
 

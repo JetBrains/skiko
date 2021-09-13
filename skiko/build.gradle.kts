@@ -106,7 +106,12 @@ val Project.supportNative: Boolean
    get() = properties.get("skiko.native.enabled") == "true"
 
 val Project.supportWasm: Boolean
-    get() = properties.get("skiko.wasm.enabled") == "true"
+   get() = properties.get("skiko.wasm.enabled") == "true"
+
+
+val wasmConfiguration by configurations.creating {
+    extendsFrom(configurations.implementation.get())
+}
 
 kotlin {
     jvm {
@@ -115,17 +120,24 @@ kotlin {
         }
     }
 
-    js(IR) {
-        browser() {
-            testTask {
-                testLogging.showStandardStreams = true
-                dependsOn(project.tasks.named("wasmCompile"))
-                useKarma {
-                    useChromeHeadless()
+    if (supportWasm) {
+        js(IR) {
+            browser() {
+                testTask {
+                    testLogging.showStandardStreams = true
+                    useKarma() {
+                        useChromeHeadless()
+                    }
                 }
             }
+            binaries.executable()
+
+            dependencies {
+                wasmConfiguration(files(project.buildDir.resolve("wasm")) {
+                    builtBy("wasmCompile")
+                })
+            }
         }
-        binaries.executable()
     }
 
     if (supportNative) {
@@ -178,10 +190,12 @@ kotlin {
             }
         }
 
-        val jsTest by getting {
-            dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
-                implementation(kotlin("test-js"))
+        if (supportWasm) {
+            val jsTest by getting {
+                dependencies {
+                    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
+                    implementation(kotlin("test-js"))
+                }
             }
         }
 
@@ -339,7 +353,7 @@ project.tasks.register<Exec>("objcCompile") {
     outputs.files(outs)
 }
 
-project.tasks.register<Exec>("wasmCompile") {
+val wasmCompile by tasks.registering(Exec::class) {
         dependsOn(skiaWasmDir)
         val skiaDir = skiaWasmDir.get().absolutePath
         val inputDir = "$projectDir/src/jsMain/cpp"
@@ -665,10 +679,9 @@ val skikoJvmRuntimeJar by project.tasks.registering(Jar::class) {
     from(createChecksums.get().outputs.files)
 }
 
-project.tasks.register<Jar>("skikoWasmJar") {
+val skikoWasmJar: Provider<Jar> by project.tasks.registering(Jar::class) {
     // We produce jar that contains .js of wrapper/bindings and .wasm with Skia + bindings.
-    from(project.tasks.named("wasmCompile").get().outputs)
-    archiveBaseName.set("skiko-wasm")
+    from(wasmCompile.get().outputs)
     doLast {
         println("Wasm and JS at ${outputs.files.files.single()}")
     }
@@ -810,9 +823,14 @@ publishing {
             }
         }
         create<MavenPublication>("skikoJsRuntime") {
+            val wasmDir = project.buildDir.resolve("wasm")
             artifactId = SkikoArtifacts.jsArtifactId
             afterEvaluate {
-                // TODO: rethink how we publish.
+                wasmCompile.get().outputs.files.forEach {
+                    artifact(artifacts.add("wasmConfiguration", project.buildDir.resolve(it)) {
+                        classifier="skiko"
+                    })
+                }
                 artifact(project.tasks.named("jsJar").get()
                     .outputs.files.single { it.name.endsWith(".klib") })
             }
@@ -832,8 +850,7 @@ publishing {
                 artifactId = SkikoArtifacts.jsWasmArtifactId
                 afterEvaluate {
                     // TODO: maybe rethink how we publish.
-                    artifact(project.tasks.named("skikoWasmJar").get()
-                        .outputs.files.single { it.name.endsWith(".jar") })
+                    artifact(skikoWasmJar.get().outputs.files.single { it.name.endsWith(".jar") })
                 }
             }
         }
