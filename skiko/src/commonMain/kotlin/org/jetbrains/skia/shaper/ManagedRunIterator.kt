@@ -8,7 +8,6 @@ import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
-import kotlin.jvm.JvmStatic
 
 abstract class ManagedRunIterator<T> internal constructor(
     ptr: NativePointer,
@@ -16,19 +15,6 @@ abstract class ManagedRunIterator<T> internal constructor(
     manageText: Boolean
 ) : Managed(ptr, _FinalizerHolder.PTR), MutableIterator<T> {
     companion object {
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ManagedRunIterator__1nGetFinalizer")
-        external fun _nGetFinalizer(): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ManagedRunIterator__1nConsume")
-        external fun _nConsume(ptr: NativePointer)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ManagedRunIterator__1nGetEndOfCurrentRun")
-        external fun _nGetEndOfCurrentRun(ptr: NativePointer, textPtr: NativePointer): Int
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ManagedRunIterator__1nIsAtEnd")
-        external fun _nIsAtEnd(ptr: NativePointer): Boolean
-
         init {
             staticLoad()
         }
@@ -65,3 +51,16 @@ abstract class ManagedRunIterator<T> internal constructor(
         _text = if (manageText) text else null
     }
 }
+
+
+@ExternalSymbolName("org_jetbrains_skia_ManagedRunIterator__1nGetFinalizer")
+private external fun _nGetFinalizer(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_ManagedRunIterator__1nConsume")
+internal external fun _nConsume(ptr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_ManagedRunIterator__1nGetEndOfCurrentRun")
+private external fun _nGetEndOfCurrentRun(ptr: NativePointer, textPtr: NativePointer): Int
+
+@ExternalSymbolName("org_jetbrains_skia_ManagedRunIterator__1nIsAtEnd")
+private external fun _nIsAtEnd(ptr: NativePointer): Boolean
