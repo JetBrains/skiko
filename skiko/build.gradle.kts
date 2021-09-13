@@ -186,7 +186,13 @@ kotlin {
         }
 
         if (supportNative) {
+            // See https://kotlinlang.org/docs/mpp-share-on-platforms.html#configure-the-hierarchical-structure-manually
+            val nativeMain by creating {}
+            val macosMain by creating {
+                dependsOn(nativeMain)
+            }
             val macosX64Main by getting {
+                dependsOn(macosMain)
             }
         }
     }
@@ -391,8 +397,8 @@ fun List<String>.findAllFiles(suffix: String): List<String> = this
 project.tasks.register<Exec>("nativeBridgesCompile") {
     dependsOn(skiaDir)
     val inputDirs = listOf(
-        "$projectDir/src/macosX64Main/cpp/generated",
-        "$projectDir/src/macosX64Main/cpp/common",
+        "$projectDir/src/nativeMain/cpp/generated",
+        "$projectDir/src/nativeMain/cpp/common",
         "$projectDir/src/commonMain/cpp/common"
     )
     val outDir = "$buildDir/nativeBridges/obj/$target"
@@ -416,7 +422,7 @@ project.tasks.register<Exec>("nativeBridgesCompile") {
         "-DSK_SHAPER_CORETEXT_AVAILABLE",
         "-DSK_BUILD_FOR_MAC",
         "-DSK_METAL",
-        "-I$projectDir/src/macosX64Main/cpp/include",
+        "-I$projectDir/src/nativeMain/cpp/include",
         "-I$projectDir/src/commonMain/cpp/headers",
         *skiaPreprocessorFlags,
         *srcs
