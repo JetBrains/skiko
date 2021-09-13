@@ -2,7 +2,7 @@
 #include "SkPath.h"
 #include "interop.hh"
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathSegmentIterator__1nMake
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathSegmentIteratorKt__1nMake
   (JNIEnv* env, jclass jclass, jlong pathPtr, jboolean forceClose) {
     SkPath* path = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(pathPtr));
     SkPath::Iter* iter = new SkPath::Iter(*path, forceClose);
@@ -14,12 +14,12 @@ static void deletePathSegmentIterator(SkPath::Iter* iter) {
     delete iter;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathSegmentIterator__1nGetFinalizer
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathSegmentIteratorKt__1nGetFinalizer
   (JNIEnv* env, jclass jclass) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deletePathSegmentIterator));
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_PathSegmentIterator__1nNext
+extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_PathSegmentIteratorKt__1nNext
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkPath::Iter* instance = reinterpret_cast<SkPath::Iter*>(static_cast<uintptr_t>(ptr));
     SkPoint pts[4];

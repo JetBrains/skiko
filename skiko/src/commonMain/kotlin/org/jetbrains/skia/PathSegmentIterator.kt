@@ -24,16 +24,6 @@ class PathSegmentIterator internal constructor(val _path: Path?, ptr: NativePoin
             }
         }
 
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_PathSegmentIterator__1nMake")
-        external fun _nMake(pathPtr: NativePointer, forceClose: Boolean): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_PathSegmentIterator__1nGetFinalizer")
-        external fun _nGetFinalizer(): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_PathSegmentIterator__1nNext")
-        external fun _nNext(ptr: NativePointer): PathSegment?
-
         init {
             staticLoad()
         }
@@ -67,3 +57,13 @@ class PathSegmentIterator internal constructor(val _path: Path?, ptr: NativePoin
         TODO("Not yet implemented")
     }
 }
+
+
+@ExternalSymbolName("org_jetbrains_skia_PathSegmentIterator__1nMake")
+private external fun _nMake(pathPtr: NativePointer, forceClose: Boolean): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_PathSegmentIterator__1nGetFinalizer")
+private external fun _nGetFinalizer(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_PathSegmentIterator__1nNext")
+private external fun _nNext(ptr: NativePointer): PathSegment?
