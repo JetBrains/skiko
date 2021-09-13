@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     kotlin("multiplatform") version "1.5.21"
 }
@@ -51,7 +49,7 @@ val unzipTask = tasks.register("unzipWasm", Copy::class) {
     from(skikoWasm.map { zipTree(it) })
 }
 
-tasks.withType<KotlinCompile>().configureEach {
+tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().configureEach {
     dependsOn(unzipTask)
 }
 
