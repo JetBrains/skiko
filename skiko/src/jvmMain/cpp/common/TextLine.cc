@@ -9,54 +9,54 @@ static void unrefTextLine(TextLine* ptr) {
     ptr->unref();
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TextLine__1nGetFinalizer
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TextLineKt__1nGetFinalizer
   (JNIEnv* env, jclass jclass) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&unrefTextLine));
 }
 
-extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_TextLine__1nGetAscent
+extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_TextLineKt__1nGetAscent
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
     return instance->fAscent;
 }
 
-extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_TextLine__1nGetCapHeight
+extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_TextLineKt__1nGetCapHeight
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
     return instance->fCapHeight;
 }
 
-extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_TextLine__1nGetXHeight
+extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_TextLineKt__1nGetXHeight
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
     return instance->fXHeight;
 }
 
-extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_TextLine__1nGetDescent
+extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_TextLineKt__1nGetDescent
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
     return instance->fDescent;
 }
 
-extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_TextLine__1nGetLeading
+extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_TextLineKt__1nGetLeading
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
     return instance->fLeading;
 }
 
-extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_TextLine__1nGetWidth
+extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_TextLineKt__1nGetWidth
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
     return instance->fWidth;
 }
 
-extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_TextLine__1nGetHeight
+extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_TextLineKt__1nGetHeight
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
     return -instance->fAscent + instance->fDescent + instance->fLeading;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TextLine__1nGetTextBlob
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TextLineKt__1nGetTextBlob
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
     if (instance->fBlob == nullptr)
@@ -65,7 +65,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TextLine__1nGetTextBl
     return reinterpret_cast<jlong>(instance->fBlob.get());
 }
 
-extern "C" JNIEXPORT jshortArray JNICALL Java_org_jetbrains_skia_TextLine__1nGetGlyphs
+extern "C" JNIEXPORT jshortArray JNICALL Java_org_jetbrains_skia_TextLineKt__1nGetGlyphs
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
     std::vector<jshort> glyphs(instance->fGlyphCount);
@@ -78,7 +78,7 @@ extern "C" JNIEXPORT jshortArray JNICALL Java_org_jetbrains_skia_TextLine__1nGet
     return javaShortArray(env, glyphs);
 }
 
-extern "C" JNIEXPORT jfloatArray JNICALL Java_org_jetbrains_skia_TextLine__1nGetPositions
+extern "C" JNIEXPORT jfloatArray JNICALL Java_org_jetbrains_skia_TextLineKt__1nGetPositions
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
     std::vector<jfloat> positions(2 * instance->fGlyphCount);
@@ -91,7 +91,7 @@ extern "C" JNIEXPORT jfloatArray JNICALL Java_org_jetbrains_skia_TextLine__1nGet
     return javaFloatArray(env, positions);
 }
 
-extern "C" JNIEXPORT jfloatArray JNICALL Java_org_jetbrains_skia_TextLine__1nGetRunPositions
+extern "C" JNIEXPORT jfloatArray JNICALL Java_org_jetbrains_skia_TextLineKt__1nGetRunPositions
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
     std::vector<jfloat> positions(instance->fRuns.size());
@@ -100,7 +100,7 @@ extern "C" JNIEXPORT jfloatArray JNICALL Java_org_jetbrains_skia_TextLine__1nGet
     return javaFloatArray(env, positions);
 }
 
-extern "C" JNIEXPORT jfloatArray JNICALL Java_org_jetbrains_skia_TextLine__1nGetBreakPositions
+extern "C" JNIEXPORT jfloatArray JNICALL Java_org_jetbrains_skia_TextLineKt__1nGetBreakPositions
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
     std::vector<jfloat> positions;
@@ -109,7 +109,7 @@ extern "C" JNIEXPORT jfloatArray JNICALL Java_org_jetbrains_skia_TextLine__1nGet
     return javaFloatArray(env, positions);
 }
 
-extern "C" JNIEXPORT jintArray JNICALL Java_org_jetbrains_skia_TextLine__1nGetBreakOffsets
+extern "C" JNIEXPORT jintArray JNICALL Java_org_jetbrains_skia_TextLineKt__1nGetBreakOffsets
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
     std::vector<jint> offsets;
@@ -118,7 +118,7 @@ extern "C" JNIEXPORT jintArray JNICALL Java_org_jetbrains_skia_TextLine__1nGetBr
     return javaIntArray(env, offsets);
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TextLine__1nGetOffsetAtCoord
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TextLineKt__1nGetOffsetAtCoord
   (JNIEnv* env, jclass jclass, jlong ptr, jfloat x) {
     TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
 
@@ -138,7 +138,7 @@ extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TextLine__1nGetOffsetA
     return (jint) instance->fRuns.back().fBreakOffsets.back();
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TextLine__1nGetLeftOffsetAtCoord
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TextLineKt__1nGetLeftOffsetAtCoord
   (JNIEnv* env, jclass jclass, jlong ptr, jfloat x) {
     TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
 
@@ -156,7 +156,7 @@ extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TextLine__1nGetLeftOff
     return (jint) instance->fRuns.back().fBreakOffsets.back();
 }
 
-extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_TextLine__1nGetCoordAtOffset
+extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_TextLineKt__1nGetCoordAtOffset
   (JNIEnv* env, jclass jclass, jlong ptr, jint offset16) {
     TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
 
