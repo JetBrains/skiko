@@ -7,7 +7,6 @@ import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
-import kotlin.jvm.JvmStatic
 
 object SVGCanvas {
     /**
@@ -53,11 +52,10 @@ object SVGCanvas {
         return Canvas(ptr, true, out)
     }
 
-    @JvmStatic
-    @ExternalSymbolName("org_jetbrains_skia_svg_SVGCanvas__1nMake")
-    external fun _nMake(left: Float, top: Float, right: Float, bottom: Float, wstreamPtr: NativePointer, flags: Int): NativePointer
-
     init {
         staticLoad()
     }
 }
+
+@ExternalSymbolName("org_jetbrains_skia_svg_SVGCanvas__1nMake")
+private external fun _nMake(left: Float, top: Float, right: Float, bottom: Float, wstreamPtr: NativePointer, flags: Int): NativePointer
