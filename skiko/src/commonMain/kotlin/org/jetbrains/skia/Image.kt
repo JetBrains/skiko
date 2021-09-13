@@ -7,7 +7,6 @@ import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
-import kotlin.jvm.JvmStatic
 
 class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInfo {
     companion object {
@@ -141,72 +140,6 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
             require(ptr != NullPointer) { "Failed to Image::makeFromEncoded" }
             return Image(ptr)
         }
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeRaster")
-        external fun _nMakeRaster(
-            width: Int,
-            height: Int,
-            colorType: Int,
-            alphaType: Int,
-            colorSpacePtr: NativePointer,
-            pixels: ByteArray?,
-            rowBytes: NativePointer
-        ): NativePointer
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeRasterData")
-        external fun _nMakeRasterData(
-            width: Int,
-            height: Int,
-            colorType: Int,
-            alphaType: Int,
-            colorSpacePtr: NativePointer,
-            dataPtr: NativePointer,
-            rowBytes: NativePointer
-        ): NativePointer
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeFromBitmap")
-        external fun _nMakeFromBitmap(bitmapPtr: NativePointer): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeFromPixmap")
-        external fun _nMakeFromPixmap(pixmapPtr: NativePointer): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeFromEncoded")
-        external fun _nMakeFromEncoded(bytes: ByteArray?): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Image__1nGetImageInfo")
-        external fun _nGetImageInfo(ptr: NativePointer): ImageInfo?
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Image__1nEncodeToData")
-        external fun _nEncodeToData(ptr: NativePointer, format: Int, quality: Int): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeShader")
-        external fun _nMakeShader(ptr: NativePointer, tmx: Int, tmy: Int, samplingMode: Long, localMatrix: FloatArray?): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Image__1nPeekPixels")
-        external fun _nPeekPixels(ptr: NativePointer): ByteBuffer?
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Image__1nPeekPixelsToPixmap")
-        external fun _nPeekPixelsToPixmap(ptr: NativePointer, pixmapPtr: NativePointer): Boolean
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Image__1nScalePixels")
-        external fun _nScalePixels(ptr: NativePointer, pixmapPtr: NativePointer, samplingOptions: Long, cache: Boolean): Boolean
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Image__1nReadPixelsBitmap")
-        external fun _nReadPixelsBitmap(
-            ptr: NativePointer,
-            contextPtr: NativePointer,
-            bitmapPtr: NativePointer,
-            srcX: Int,
-            srcY: Int,
-            cache: Boolean
-        ): Boolean
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Image__1nReadPixelsPixmap")
-        external fun _nReadPixelsPixmap(ptr: NativePointer, pixmapPtr: NativePointer, srcX: Int, srcY: Int, cache: Boolean): Boolean
 
         init {
             staticLoad()
@@ -432,3 +365,69 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
         }
     }
 }
+
+
+@ExternalSymbolName("org_jetbrains_skia_Image__1nMakeRaster")
+private external fun _nMakeRaster(
+    width: Int,
+    height: Int,
+    colorType: Int,
+    alphaType: Int,
+    colorSpacePtr: NativePointer,
+    pixels: ByteArray?,
+    rowBytes: NativePointer
+): NativePointer
+
+
+@ExternalSymbolName("org_jetbrains_skia_Image__1nMakeRasterData")
+private external fun _nMakeRasterData(
+    width: Int,
+    height: Int,
+    colorType: Int,
+    alphaType: Int,
+    colorSpacePtr: NativePointer,
+    dataPtr: NativePointer,
+    rowBytes: NativePointer
+): NativePointer
+
+
+@ExternalSymbolName("org_jetbrains_skia_Image__1nMakeFromBitmap")
+private external fun _nMakeFromBitmap(bitmapPtr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Image__1nMakeFromPixmap")
+private external fun _nMakeFromPixmap(pixmapPtr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Image__1nMakeFromEncoded")
+private external fun _nMakeFromEncoded(bytes: ByteArray?): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Image__1nGetImageInfo")
+private external fun _nGetImageInfo(ptr: NativePointer): ImageInfo?
+
+@ExternalSymbolName("org_jetbrains_skia_Image__1nEncodeToData")
+private external fun _nEncodeToData(ptr: NativePointer, format: Int, quality: Int): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Image__1nMakeShader")
+private external fun _nMakeShader(ptr: NativePointer, tmx: Int, tmy: Int, samplingMode: Long, localMatrix: FloatArray?): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Image__1nPeekPixels")
+private external fun _nPeekPixels(ptr: NativePointer): ByteBuffer?
+
+@ExternalSymbolName("org_jetbrains_skia_Image__1nPeekPixelsToPixmap")
+private external fun _nPeekPixelsToPixmap(ptr: NativePointer, pixmapPtr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Image__1nScalePixels")
+private external fun _nScalePixels(ptr: NativePointer, pixmapPtr: NativePointer, samplingOptions: Long, cache: Boolean): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Image__1nReadPixelsBitmap")
+private external fun _nReadPixelsBitmap(
+    ptr: NativePointer,
+    contextPtr: NativePointer,
+    bitmapPtr: NativePointer,
+    srcX: Int,
+    srcY: Int,
+    cache: Boolean
+): Boolean
+
+
+@ExternalSymbolName("org_jetbrains_skia_Image__1nReadPixelsPixmap")
+private external fun _nReadPixelsPixmap(ptr: NativePointer, pixmapPtr: NativePointer, srcX: Int, srcY: Int, cache: Boolean): Boolean
