@@ -1,120 +1,16 @@
 @file:Suppress("NESTED_EXTERNAL_DECLARATION")
+
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Managed
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.reachabilityBarrier
-import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.getPtr
-import kotlin.jvm.JvmStatic
+import org.jetbrains.skia.impl.reachabilityBarrier
 
 class Region : Managed(_nMake(), _FinalizerHolder.PTR) {
     companion object {
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Region__1nMake")
-        external fun _nMake(): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Region__1nGetFinalizer")
-        external fun _nGetFinalizer(): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Region__1nSet")
-        external fun _nSet(ptr: NativePointer, regoinPtr: NativePointer): Boolean
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Region__1nIsEmpty")
-        external fun _nIsEmpty(ptr: NativePointer): Boolean
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Region__1nIsRect")
-        external fun _nIsRect(ptr: NativePointer): Boolean
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Region__1nIsComplex")
-        external fun _nIsComplex(ptr: NativePointer): Boolean
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Region__1nGetBounds")
-        external fun _nGetBounds(ptr: NativePointer): IRect
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Region__1nComputeRegionComplexity")
-        external fun _nComputeRegionComplexity(ptr: NativePointer): Int
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Region__1nGetBoundaryPath")
-        external fun _nGetBoundaryPath(ptr: NativePointer, pathPtr: NativePointer): Boolean
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Region__1nSetEmpty")
-        external fun _nSetEmpty(ptr: NativePointer): Boolean
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Region__1nSetRect")
-        external fun _nSetRect(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int): Boolean
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Region__1nSetRects")
-        external fun _nSetRects(ptr: NativePointer, rects: IntArray?): Boolean
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Region__1nSetRegion")
-        external fun _nSetRegion(ptr: NativePointer, regionPtr: NativePointer): Boolean
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Region__1nSetPath")
-        external fun _nSetPath(ptr: NativePointer, pathPtr: NativePointer, regionPtr: NativePointer): Boolean
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Region__1nIntersectsIRect")
-        external fun _nIntersectsIRect(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int): Boolean
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Region__1nIntersectsRegion")
-        external fun _nIntersectsRegion(ptr: NativePointer, regionPtr: NativePointer): Boolean
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Region__1nContainsIPoint")
-        external fun _nContainsIPoint(ptr: NativePointer, x: Int, y: Int): Boolean
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Region__1nContainsIRect")
-        external fun _nContainsIRect(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int): Boolean
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Region__1nContainsRegion")
-        external fun _nContainsRegion(ptr: NativePointer, regionPtr: NativePointer): Boolean
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Region__1nQuickContains")
-        external fun _nQuickContains(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int): Boolean
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Region__1nQuickRejectIRect")
-        external fun _nQuickRejectIRect(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int): Boolean
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Region__1nQuickRejectRegion")
-        external fun _nQuickRejectRegion(ptr: NativePointer, regionPtr: NativePointer): Boolean
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Region__1nTranslate")
-        external fun _nTranslate(ptr: NativePointer, dx: Int, dy: Int)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Region__1nOpIRect")
-        external fun _nOpIRect(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int, op: Int): Boolean
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Region__1nOpRegion")
-        external fun _nOpRegion(ptr: NativePointer, regionPtr: NativePointer, op: Int): Boolean
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Region__1nOpIRectRegion")
-        external fun _nOpIRectRegion(
-            ptr: NativePointer,
-            left: Int,
-            top: Int,
-            right: Int,
-            bottom: Int,
-            regionPtr: NativePointer,
-            op: Int
-        ): Boolean
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Region__1nOpRegionIRect")
-        external fun _nOpRegionIRect(
-            ptr: NativePointer,
-            regionPtr: NativePointer,
-            left: Int,
-            top: Int,
-            right: Int,
-            bottom: Int,
-            op: Int
-        ): Boolean
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Region__1nOpRegionRegion")
-        external fun _nOpRegionRegion(ptr: NativePointer, regionPtrA: NativePointer, regionPtrB: NativePointer, op: Int): Boolean
-
         init {
             staticLoad()
         }
@@ -428,3 +324,111 @@ class Region : Managed(_nMake(), _FinalizerHolder.PTR) {
         Stats.onNativeCall()
     }
 }
+
+
+@ExternalSymbolName("org_jetbrains_skia_Region__1nMake")
+private external fun _nMake(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Region__1nGetFinalizer")
+private external fun _nGetFinalizer(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Region__1nSet")
+private external fun _nSet(ptr: NativePointer, regoinPtr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Region__1nIsEmpty")
+private external fun _nIsEmpty(ptr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Region__1nIsRect")
+private external fun _nIsRect(ptr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Region__1nIsComplex")
+private external fun _nIsComplex(ptr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Region__1nGetBounds")
+private external fun _nGetBounds(ptr: NativePointer): IRect
+
+@ExternalSymbolName("org_jetbrains_skia_Region__1nComputeRegionComplexity")
+private external fun _nComputeRegionComplexity(ptr: NativePointer): Int
+
+@ExternalSymbolName("org_jetbrains_skia_Region__1nGetBoundaryPath")
+private external fun _nGetBoundaryPath(ptr: NativePointer, pathPtr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Region__1nSetEmpty")
+private external fun _nSetEmpty(ptr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Region__1nSetRect")
+private external fun _nSetRect(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Region__1nSetRects")
+private external fun _nSetRects(ptr: NativePointer, rects: IntArray?): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Region__1nSetRegion")
+private external fun _nSetRegion(ptr: NativePointer, regionPtr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Region__1nSetPath")
+private external fun _nSetPath(ptr: NativePointer, pathPtr: NativePointer, regionPtr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Region__1nIntersectsIRect")
+private external fun _nIntersectsIRect(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Region__1nIntersectsRegion")
+private external fun _nIntersectsRegion(ptr: NativePointer, regionPtr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Region__1nContainsIPoint")
+private external fun _nContainsIPoint(ptr: NativePointer, x: Int, y: Int): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Region__1nContainsIRect")
+private external fun _nContainsIRect(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Region__1nContainsRegion")
+private external fun _nContainsRegion(ptr: NativePointer, regionPtr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Region__1nQuickContains")
+private external fun _nQuickContains(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Region__1nQuickRejectIRect")
+private external fun _nQuickRejectIRect(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Region__1nQuickRejectRegion")
+private external fun _nQuickRejectRegion(ptr: NativePointer, regionPtr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Region__1nTranslate")
+private external fun _nTranslate(ptr: NativePointer, dx: Int, dy: Int)
+
+@ExternalSymbolName("org_jetbrains_skia_Region__1nOpIRect")
+private external fun _nOpIRect(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int, op: Int): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Region__1nOpRegion")
+private external fun _nOpRegion(ptr: NativePointer, regionPtr: NativePointer, op: Int): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Region__1nOpIRectRegion")
+private external fun _nOpIRectRegion(
+    ptr: NativePointer,
+    left: Int,
+    top: Int,
+    right: Int,
+    bottom: Int,
+    regionPtr: NativePointer,
+    op: Int
+): Boolean
+
+
+@ExternalSymbolName("org_jetbrains_skia_Region__1nOpRegionIRect")
+private external fun _nOpRegionIRect(
+    ptr: NativePointer,
+    regionPtr: NativePointer,
+    left: Int,
+    top: Int,
+    right: Int,
+    bottom: Int,
+    op: Int
+): Boolean
+
+
+@ExternalSymbolName("org_jetbrains_skia_Region__1nOpRegionRegion")
+private external fun _nOpRegionRegion(
+    ptr: NativePointer,
+    regionPtrA: NativePointer,
+    regionPtrB: NativePointer,
+    op: Int
+): Boolean
