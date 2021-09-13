@@ -9,44 +9,10 @@ import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
-import kotlin.jvm.JvmStatic
 
 class ParagraphBuilder(style: ParagraphStyle?, fc: FontCollection?) :
     Managed(_nMake(getPtr(style), getPtr(fc)), _FinalizerHolder.PTR) {
     companion object {
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ParagraphBuilder__1nMake")
-        external fun _nMake(paragraphStylePtr: NativePointer, fontCollectionPtr: NativePointer): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ParagraphBuilder__1nGetFinalizer")
-        external fun _nGetFinalizer(): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ParagraphBuilder__1nPushStyle")
-        external fun _nPushStyle(ptr: NativePointer, textStylePtr: NativePointer)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ParagraphBuilder__1nPopStyle")
-        external fun _nPopStyle(ptr: NativePointer)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ParagraphBuilder__1nAddText")
-        external fun _nAddText(ptr: NativePointer, text: String?)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ParagraphBuilder__1nAddPlaceholder")
-        external fun _nAddPlaceholder(
-            ptr: NativePointer,
-            width: Float,
-            height: Float,
-            alignment: Int,
-            baselineMode: Int,
-            baseline: Float
-        )
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ParagraphBuilder__1nSetParagraphStyle")
-        external fun _nSetParagraphStyle(ptr: NativePointer, stylePtr: NativePointer)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ParagraphBuilder__1nBuild")
-        external fun _nBuild(ptr: NativePointer): NativePointer
-
         init {
             staticLoad()
         }
@@ -120,3 +86,36 @@ class ParagraphBuilder(style: ParagraphStyle?, fc: FontCollection?) :
         reachabilityBarrier(fc)
     }
 }
+
+
+@ExternalSymbolName("org_jetbrains_skia_ParagraphBuilder__1nMake")
+private external fun _nMake(paragraphStylePtr: NativePointer, fontCollectionPtr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_ParagraphBuilder__1nGetFinalizer")
+private external fun _nGetFinalizer(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_ParagraphBuilder__1nPushStyle")
+private external fun _nPushStyle(ptr: NativePointer, textStylePtr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_ParagraphBuilder__1nPopStyle")
+private external fun _nPopStyle(ptr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_ParagraphBuilder__1nAddText")
+private external fun _nAddText(ptr: NativePointer, text: String?)
+
+@ExternalSymbolName("org_jetbrains_skia_ParagraphBuilder__1nAddPlaceholder")
+private external fun _nAddPlaceholder(
+    ptr: NativePointer,
+    width: Float,
+    height: Float,
+    alignment: Int,
+    baselineMode: Int,
+    baseline: Float
+)
+
+
+@ExternalSymbolName("org_jetbrains_skia_ParagraphBuilder__1nSetParagraphStyle")
+private external fun _nSetParagraphStyle(ptr: NativePointer, stylePtr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_ParagraphBuilder__1nBuild")
+private external fun _nBuild(ptr: NativePointer): NativePointer
