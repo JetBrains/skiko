@@ -10,7 +10,6 @@ import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
-import kotlin.jvm.JvmStatic
 
 class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
@@ -34,58 +33,6 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
             require(ptr != NullPointer) { "Failed to create Animation from data." }
             return Animation(ptr)
         }
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetFinalizer")
-        external fun _nGetFinalizer(): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nMakeFromString")
-        external fun _nMakeFromString(data: String?): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nMakeFromFile")
-        external fun _nMakeFromFile(path: String?): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nMakeFromData")
-        external fun _nMakeFromData(dataPtr: NativePointer): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nRender")
-        external fun _nRender(
-            ptr: NativePointer,
-            canvasPtr: NativePointer,
-            left: Float,
-            top: Float,
-            right: Float,
-            bottom: Float,
-            flags: Int
-        )
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nSeek")
-        external fun _nSeek(ptr: NativePointer, t: Float, icPtr: NativePointer)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nSeekFrame")
-        external fun _nSeekFrame(ptr: NativePointer, t: Float, icPtr: NativePointer)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nSeekFrameTime")
-        external fun _nSeekFrameTime(ptr: NativePointer, t: Float, icPtr: NativePointer)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetDuration")
-        external fun _nGetDuration(ptr: NativePointer): Float
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetFPS")
-        external fun _nGetFPS(ptr: NativePointer): Float
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetInPoint")
-        external fun _nGetInPoint(ptr: NativePointer): Float
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetOutPoint")
-        external fun _nGetOutPoint(ptr: NativePointer): Float
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetVersion")
-        external fun _nGetVersion(ptr: NativePointer): String
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetSize")
-        external fun _nGetSize(ptr: NativePointer): Point?
 
         init {
             staticLoad()
@@ -332,3 +279,55 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     val height: Float
         get() = size.y
 }
+
+
+@ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetFinalizer")
+private external fun _nGetFinalizer(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nMakeFromString")
+private external fun _nMakeFromString(data: String?): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nMakeFromFile")
+private external fun _nMakeFromFile(path: String?): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nMakeFromData")
+private external fun _nMakeFromData(dataPtr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nRender")
+private external fun _nRender(
+    ptr: NativePointer,
+    canvasPtr: NativePointer,
+    left: Float,
+    top: Float,
+    right: Float,
+    bottom: Float,
+    flags: Int
+)
+
+
+@ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nSeek")
+private external fun _nSeek(ptr: NativePointer, t: Float, icPtr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nSeekFrame")
+private external fun _nSeekFrame(ptr: NativePointer, t: Float, icPtr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nSeekFrameTime")
+private external fun _nSeekFrameTime(ptr: NativePointer, t: Float, icPtr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetDuration")
+private external fun _nGetDuration(ptr: NativePointer): Float
+
+@ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetFPS")
+private external fun _nGetFPS(ptr: NativePointer): Float
+
+@ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetInPoint")
+private external fun _nGetInPoint(ptr: NativePointer): Float
+
+@ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetOutPoint")
+private external fun _nGetOutPoint(ptr: NativePointer): Float
+
+@ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetVersion")
+private external fun _nGetVersion(ptr: NativePointer): String
+
+@ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetSize")
+private external fun _nGetSize(ptr: NativePointer): Point?
