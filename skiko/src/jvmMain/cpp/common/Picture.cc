@@ -5,7 +5,7 @@
 #include "SkPicture.h"
 #include "SkShader.h"
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_Picture__1nMakeFromData
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PictureKt__1nMakeFromData
   (JNIEnv* env, jclass jclass, jlong dataPtr) {
     SkData* data = reinterpret_cast<SkData*>(static_cast<uintptr_t>(dataPtr));
     SkPicture* instance = SkPicture::MakeFromData(data).release();
@@ -29,7 +29,7 @@ private:
     jobject supplier;
 };
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_Picture__1nPlayback
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PictureKt__1nPlayback
   (JNIEnv* env, jclass jclass, jlong ptr, jlong canvasPtr, jobject abort) {
     SkPicture* instance = reinterpret_cast<SkPicture*>(static_cast<uintptr_t>(ptr));
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
@@ -41,45 +41,45 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_Picture__1nPlayback
     }
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_Picture__1nGetCullRect
+extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_PictureKt__1nGetCullRect
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkPicture* instance = reinterpret_cast<SkPicture*>(static_cast<uintptr_t>(ptr));
     return skija::Rect::fromSkRect(env, instance->cullRect());
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_Picture__1nGetUniqueId
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_PictureKt__1nGetUniqueId
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkPicture* instance = reinterpret_cast<SkPicture*>(static_cast<uintptr_t>(ptr));
     return instance->uniqueID();
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_Picture__1nSerializeToData
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PictureKt__1nSerializeToData
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkPicture* instance = reinterpret_cast<SkPicture*>(static_cast<uintptr_t>(ptr));
     SkData* data = instance->serialize().release();
     return reinterpret_cast<jlong>(data);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_Picture__1nMakePlaceholder
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PictureKt__1nMakePlaceholder
   (JNIEnv* env, jclass jclass, jfloat left, jfloat top, jfloat right, jfloat bottom) {
     SkRect cull = SkRect::MakeLTRB(left, top, right, bottom);
     SkPicture* instance = SkPicture::MakePlaceholder(cull).release();
     return reinterpret_cast<jlong>(instance);
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_Picture__1nGetApproximateOpCount
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_PictureKt__1nGetApproximateOpCount
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkPicture* instance = reinterpret_cast<SkPicture*>(static_cast<uintptr_t>(ptr));
     return instance->approximateOpCount();
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_Picture__1nGetApproximateBytesUsed
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PictureKt__1nGetApproximateBytesUsed
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkPicture* instance = reinterpret_cast<SkPicture*>(static_cast<uintptr_t>(ptr));
     return instance->approximateBytesUsed();
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_Picture__1nMakeShader
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PictureKt__1nMakeShader
   (JNIEnv* env, jclass jclass, jlong ptr, jint tmxValue, jint tmyValue, jint filterModeValue, jfloatArray localMatrixArr, jobject tileRectObj) {
     SkPicture* instance = reinterpret_cast<SkPicture*>(static_cast<uintptr_t>(ptr));
     SkTileMode tmx = static_cast<SkTileMode>(tmxValue);

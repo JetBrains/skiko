@@ -7,7 +7,6 @@ import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
-import kotlin.jvm.JvmStatic
 
 class Picture internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
@@ -45,41 +44,6 @@ class Picture internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             Stats.onNativeCall()
             return Picture(_nMakePlaceholder(cull.left, cull.top, cull.right, cull.bottom))
         }
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Picture__1nMakeFromData")
-        external fun _nMakeFromData(dataPtr: NativePointer /*, SkDeserialProcs */): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Picture__1nPlayback")
-        external fun _nPlayback(ptr: NativePointer, canvasPtr: NativePointer, abort: BooleanSupplier?)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Picture__1nGetCullRect")
-        external fun _nGetCullRect(ptr: NativePointer): Rect
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Picture__1nGetUniqueId")
-        external fun _nGetUniqueId(ptr: NativePointer): Int
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Picture__1nSerializeToData")
-        external fun _nSerializeToData(ptr: NativePointer /*, SkSerialProcs */): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Picture__1nMakePlaceholder")
-        external fun _nMakePlaceholder(left: Float, top: Float, right: Float, bottom: Float): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Picture__1nGetApproximateOpCount")
-        external fun _nGetApproximateOpCount(ptr: NativePointer): Int
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Picture__1nGetApproximateBytesUsed")
-        external fun _nGetApproximateBytesUsed(ptr: NativePointer): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Picture__1nMakeShader")
-        external fun _nMakeShader(
-            ptr: NativePointer,
-            tmx: Int,
-            tmy: Int,
-            filterMode: Int,
-            localMatrix: FloatArray?,
-            tileRect: Rect?
-        ): NativePointer
 
         init {
             staticLoad()
@@ -254,3 +218,38 @@ class Picture internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         }
     }
 }
+
+
+@ExternalSymbolName("org_jetbrains_skia_Picture__1nMakeFromData")
+private external fun _nMakeFromData(dataPtr: NativePointer /*, SkDeserialProcs */): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Picture__1nPlayback")
+private external fun _nPlayback(ptr: NativePointer, canvasPtr: NativePointer, abort: BooleanSupplier?)
+
+@ExternalSymbolName("org_jetbrains_skia_Picture__1nGetCullRect")
+private external fun _nGetCullRect(ptr: NativePointer): Rect
+
+@ExternalSymbolName("org_jetbrains_skia_Picture__1nGetUniqueId")
+private external fun _nGetUniqueId(ptr: NativePointer): Int
+
+@ExternalSymbolName("org_jetbrains_skia_Picture__1nSerializeToData")
+private external fun _nSerializeToData(ptr: NativePointer /*, SkSerialProcs */): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Picture__1nMakePlaceholder")
+private external fun _nMakePlaceholder(left: Float, top: Float, right: Float, bottom: Float): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Picture__1nGetApproximateOpCount")
+private external fun _nGetApproximateOpCount(ptr: NativePointer): Int
+
+@ExternalSymbolName("org_jetbrains_skia_Picture__1nGetApproximateBytesUsed")
+private external fun _nGetApproximateBytesUsed(ptr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Picture__1nMakeShader")
+private external fun _nMakeShader(
+    ptr: NativePointer,
+    tmx: Int,
+    tmy: Int,
+    filterMode: Int,
+    localMatrix: FloatArray?,
+    tileRect: Rect?
+): NativePointer
