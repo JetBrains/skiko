@@ -8,31 +8,31 @@ import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.impl.NativePointer
 import kotlin.jvm.JvmStatic
 
+
+@ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nMakeEmpty")
+private external fun _nMakeEmpty(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nCount")
+private external fun _nCount(ptr: NativePointer): Int
+
+@ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nGetStyle")
+private external fun _nGetStyle(ptr: NativePointer, index: Int): Int
+
+@ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nGetStyleName")
+private external fun _nGetStyleName(ptr: NativePointer, index: Int): String
+
+@ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nGetTypeface")
+private external fun _nGetTypeface(ptr: NativePointer, index: Int): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nMatchStyle")
+private external fun _nMatchStyle(ptr: NativePointer, style: Int): NativePointer
+
 class FontStyleSet internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
         fun makeEmpty(): FontStyleSet {
             Stats.onNativeCall()
             return FontStyleSet(_nMakeEmpty())
         }
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nMakeEmpty")
-        external fun _nMakeEmpty(): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nCount")
-        external fun _nCount(ptr: NativePointer): Int
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nGetStyle")
-        external fun _nGetStyle(ptr: NativePointer, index: Int): Int
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nGetStyleName")
-        external fun _nGetStyleName(ptr: NativePointer, index: Int): String
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nGetTypeface")
-        external fun _nGetTypeface(ptr: NativePointer, index: Int): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nMatchStyle")
-        external fun _nMatchStyle(ptr: NativePointer, style: Int): NativePointer
 
         init {
             staticLoad()
