@@ -9,42 +9,42 @@ static void deleteCodec(SkCodec* instance) {
     delete instance;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_Codec__1nGetFinalizer(JNIEnv* env, jclass jclass) {
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_CodecKt__1nGetFinalizer(JNIEnv* env, jclass jclass) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteCodec));
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_Codec__1nMakeFromData
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_CodecKt__1nMakeFromData
   (JNIEnv* env, jclass jclass, jlong dataPtr) {
     SkData* data = reinterpret_cast<SkData*>(static_cast<uintptr_t>(dataPtr));
     std::unique_ptr<SkCodec> instance = SkCodec::MakeFromData(sk_ref_sp(data));
     return reinterpret_cast<jlong>(instance.release());
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_Codec__1nGetImageInfo
+extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_CodecKt__1nGetImageInfo
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkCodec* instance = reinterpret_cast<SkCodec*>(static_cast<uintptr_t>(ptr));
     return skija::ImageInfo::toJava(env, instance->getInfo());
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_Codec__1nGetSize
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_CodecKt__1nGetSize
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkCodec* instance = reinterpret_cast<SkCodec*>(static_cast<uintptr_t>(ptr));
     return packISize(instance->dimensions());
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_Codec__1nGetEncodedOrigin
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_CodecKt__1nGetEncodedOrigin
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkCodec* instance = reinterpret_cast<SkCodec*>(static_cast<uintptr_t>(ptr));
     return static_cast<jint>(instance->getOrigin());
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_Codec__1nGetEncodedImageFormat
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_CodecKt__1nGetEncodedImageFormat
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkCodec* instance = reinterpret_cast<SkCodec*>(static_cast<uintptr_t>(ptr));
     return static_cast<jint>(instance->getEncodedFormat());
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_Codec__1nReadPixels
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CodecKt__1nReadPixels
   (JNIEnv* env, jclass jclass, jlong ptr, jlong bitmapPtr, jint frame, jint priorFrame) {
     SkCodec* instance = reinterpret_cast<SkCodec*>(static_cast<uintptr_t>(ptr));
     SkBitmap* bitmap = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(bitmapPtr));
@@ -55,13 +55,13 @@ extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_Codec__1nReadPixels
     return static_cast<jint>(result);
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_Codec__1nGetFrameCount
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CodecKt__1nGetFrameCount
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkCodec* instance = reinterpret_cast<SkCodec*>(static_cast<uintptr_t>(ptr));
     return instance->getFrameCount();
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_Codec__1nGetFrameInfo
+extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_CodecKt__1nGetFrameInfo
   (JNIEnv* env, jclass jclass, jlong ptr, jint frame) {
     SkCodec* instance = reinterpret_cast<SkCodec*>(static_cast<uintptr_t>(ptr));
     SkCodec::FrameInfo info;
@@ -69,7 +69,7 @@ extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_Codec__1nGetFrameIn
     return skija::AnimationFrameInfo::toJava(env, info);
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_Codec__1nGetFramesInfo
+extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_CodecKt__1nGetFramesInfo
   (JNIEnv* env, jclass jclass, jlong ptr, jint frame) {
     SkCodec* instance = reinterpret_cast<SkCodec*>(static_cast<uintptr_t>(ptr));
     SkCodec::FrameInfo info;
@@ -84,7 +84,7 @@ extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_Codec__1nGetFramesI
     return res;
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_Codec__1nGetRepetitionCount
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CodecKt__1nGetRepetitionCount
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkCodec* instance = reinterpret_cast<SkCodec*>(static_cast<uintptr_t>(ptr));
     return instance->getRepetitionCount();
