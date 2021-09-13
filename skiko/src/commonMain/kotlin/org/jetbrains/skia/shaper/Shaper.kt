@@ -10,7 +10,6 @@ import org.jetbrains.skia.impl.use
 import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
-import kotlin.jvm.JvmStatic
 
 /**
  * Shapes text using HarfBuzz and places the shaped text into a
@@ -90,56 +89,6 @@ class Shaper internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
                 reachabilityBarrier(fontMgr)
             }
         }
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Shaper__1nGetFinalizer")
-        external fun _nGetFinalizer(): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Shaper__1nMakePrimitive")
-        external fun _nMakePrimitive(): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Shaper__1nMakeShaperDrivenWrapper")
-        external fun _nMakeShaperDrivenWrapper(fontMgrPtr: NativePointer): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Shaper__1nMakeShapeThenWrap")
-        external fun _nMakeShapeThenWrap(fontMgrPtr: NativePointer): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Shaper__1nMakeShapeDontWrapOrReorder")
-        external fun _nMakeShapeDontWrapOrReorder(fontMgrPtr: NativePointer): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Shaper__1nMakeCoreText")
-        external fun _nMakeCoreText(): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Shaper__1nMake")
-        external fun _nMake(fontMgrPtr: NativePointer): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Shaper__1nShapeBlob")
-        external fun _nShapeBlob(
-            ptr: NativePointer,
-            text: String?,
-            fontPtr: NativePointer,
-            opts: ShapingOptions?,
-            width: Float,
-            offsetX: Float,
-            offsetY: Float
-        ): NativePointer
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Shaper__1nShapeLine")
-        external fun _nShapeLine(ptr: NativePointer, text: String?, fontPtr: NativePointer, opts: ShapingOptions?): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Shaper__1nShape")
-        external fun _nShape(
-            ptr: NativePointer,
-            textPtr: NativePointer,
-            fontIter: Iterator<FontRun?>?,
-            bidiIter: Iterator<BidiRun?>?,
-            scriptIter: Iterator<ScriptRun?>?,
-            langIter: Iterator<LanguageRun?>?,
-            opts: ShapingOptions?,
-            width: Float,
-            runHandler: RunHandler?
-        )
 
         init {
             staticLoad()
@@ -275,3 +224,53 @@ class Shaper internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
         val PTR = _nGetFinalizer()
     }
 }
+
+
+@ExternalSymbolName("org_jetbrains_skia_Shaper__1nGetFinalizer")
+private external fun _nGetFinalizer(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Shaper__1nMakePrimitive")
+private external fun _nMakePrimitive(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Shaper__1nMakeShaperDrivenWrapper")
+private external fun _nMakeShaperDrivenWrapper(fontMgrPtr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Shaper__1nMakeShapeThenWrap")
+private external fun _nMakeShapeThenWrap(fontMgrPtr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Shaper__1nMakeShapeDontWrapOrReorder")
+private external fun _nMakeShapeDontWrapOrReorder(fontMgrPtr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Shaper__1nMakeCoreText")
+private external fun _nMakeCoreText(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Shaper__1nMake")
+private external fun _nMake(fontMgrPtr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Shaper__1nShapeBlob")
+private external fun _nShapeBlob(
+    ptr: NativePointer,
+    text: String?,
+    fontPtr: NativePointer,
+    opts: ShapingOptions?,
+    width: Float,
+    offsetX: Float,
+    offsetY: Float
+): NativePointer
+
+
+@ExternalSymbolName("org_jetbrains_skia_Shaper__1nShapeLine")
+private external fun _nShapeLine(ptr: NativePointer, text: String?, fontPtr: NativePointer, opts: ShapingOptions?): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Shaper__1nShape")
+private external fun _nShape(
+    ptr: NativePointer,
+    textPtr: NativePointer,
+    fontIter: Iterator<FontRun?>?,
+    bidiIter: Iterator<BidiRun?>?,
+    scriptIter: Iterator<ScriptRun?>?,
+    langIter: Iterator<LanguageRun?>?,
+    opts: ShapingOptions?,
+    width: Float,
+    runHandler: RunHandler?
+)

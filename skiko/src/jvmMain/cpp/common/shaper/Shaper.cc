@@ -13,34 +13,34 @@ static void deleteShaper(SkShaper* instance) {
     delete instance;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_Shaper__1nGetFinalizer(JNIEnv* env, jclass jclass) {
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nGetFinalizer(JNIEnv* env, jclass jclass) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteShaper));
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_Shaper__1nMakePrimitive
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nMakePrimitive
   (JNIEnv* env, jclass jclass) {
     return reinterpret_cast<jlong>(SkShaper::MakePrimitive().release());
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_Shaper__1nMakeShaperDrivenWrapper
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nMakeShaperDrivenWrapper
   (JNIEnv* env, jclass jclass, jlong fontMgrPtr) {
     SkFontMgr* fontMgr = reinterpret_cast<SkFontMgr*>(static_cast<uintptr_t>(fontMgrPtr));
     return reinterpret_cast<jlong>(SkShaper::MakeShaperDrivenWrapper(sk_ref_sp(fontMgr)).release());
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_Shaper__1nMakeShapeThenWrap
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nMakeShapeThenWrap
   (JNIEnv* env, jclass jclass, jlong fontMgrPtr) {
     SkFontMgr* fontMgr = reinterpret_cast<SkFontMgr*>(static_cast<uintptr_t>(fontMgrPtr));
     return reinterpret_cast<jlong>(SkShaper::MakeShapeThenWrap(sk_ref_sp(fontMgr)).release());
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_Shaper__1nMakeShapeDontWrapOrReorder
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nMakeShapeDontWrapOrReorder
   (JNIEnv* env, jclass jclass, jlong fontMgrPtr) {
     SkFontMgr* fontMgr = reinterpret_cast<SkFontMgr*>(static_cast<uintptr_t>(fontMgrPtr));
     return reinterpret_cast<jlong>(SkShaper::MakeShapeDontWrapOrReorder(sk_ref_sp(fontMgr)).release());
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_Shaper__1nMakeCoreText
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nMakeCoreText
   (JNIEnv* env, jclass jclass) {
     #ifdef SK_SHAPER_CORETEXT_AVAILABLE
         return reinterpret_cast<jlong>(SkShaper::MakeCoreText().release());
@@ -49,13 +49,13 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_Shaper__1nMake
     #endif
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_Shaper__1nMake
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nMake
   (JNIEnv* env, jclass jclass, jlong fontMgrPtr) {
     SkFontMgr* fontMgr = reinterpret_cast<SkFontMgr*>(static_cast<uintptr_t>(fontMgrPtr));
     return reinterpret_cast<jlong>(SkShaper::Make(sk_ref_sp(fontMgr)).release());
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_Shaper__1nShapeBlob
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nShapeBlob
   (JNIEnv* env, jclass jclass, jlong ptr, jstring textObj, jlong fontPtr, jobject opts, jfloat width, jfloat offsetX, jfloat offsetY) {
     SkShaper* instance = reinterpret_cast<SkShaper*>(static_cast<uintptr_t>(ptr));
     SkString text = skString(env, textObj);
@@ -92,7 +92,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_Shaper__1nShap
     return reinterpret_cast<jlong>(blob);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_Shaper__1nShapeLine
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nShapeLine
   (JNIEnv* env, jclass jclass, jlong ptr, jstring textObj, jlong fontPtr, jobject opts) {
     SkShaper* instance = reinterpret_cast<SkShaper*>(static_cast<uintptr_t>(ptr));
 
@@ -328,7 +328,7 @@ private:
     std::vector<jint> fClusters;
 };
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_shaper_Shaper__1nShape
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nShape
   (JNIEnv* env, jclass jclass, jlong ptr, jlong textPtr, jobject fontRunIterObj, jobject bidiRunIterObj, jobject scriptRunIterObj, jobject languageRunIterObj, jobject opts, jfloat width, jobject runHandlerObj)
 {
     SkShaper* instance = reinterpret_cast<SkShaper*>(static_cast<uintptr_t>(ptr));
