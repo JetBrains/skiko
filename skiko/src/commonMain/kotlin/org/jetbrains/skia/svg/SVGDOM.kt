@@ -9,26 +9,9 @@ import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
-import kotlin.jvm.JvmStatic
 
 class SVGDOM internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nMakeFromData")
-        external fun _nMakeFromData(dataPtr: NativePointer): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nGetRoot")
-        external fun _nGetRoot(ptr: NativePointer): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nGetContainerSize")
-        external fun _nGetContainerSize(ptr: NativePointer): Point
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nSetContainerSize")
-        external fun _nSetContainerSize(ptr: NativePointer, width: Float, height: Float)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nRender")
-        external fun _nRender(ptr: NativePointer, canvasPtr: NativePointer)
-
         init {
             staticLoad()
         }
@@ -82,3 +65,19 @@ class SVGDOM internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         }
     }
 }
+
+
+@ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nMakeFromData")
+private external fun _nMakeFromData(dataPtr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nGetRoot")
+private external fun _nGetRoot(ptr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nGetContainerSize")
+private external fun _nGetContainerSize(ptr: NativePointer): Point
+
+@ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nSetContainerSize")
+private external fun _nSetContainerSize(ptr: NativePointer, width: Float, height: Float)
+
+@ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nRender")
+private external fun _nRender(ptr: NativePointer, canvasPtr: NativePointer)
