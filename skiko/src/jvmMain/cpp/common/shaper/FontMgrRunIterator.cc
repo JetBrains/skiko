@@ -5,7 +5,7 @@
 #include "SkFontMgr.h"
 #include "SkShaper.h"
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_FontMgrRunIterator__1nMake
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_FontMgrRunIteratorKt__1nMake
   (JNIEnv* env, jclass jclass, jlong textPtr, jlong fontPtr, jobject opts) {
     SkString* text = reinterpret_cast<SkString*>(static_cast<uintptr_t>(textPtr));
     SkFont* font = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(fontPtr));
@@ -28,7 +28,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_FontMgrRunIter
     return reinterpret_cast<jlong>(instance);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_FontMgrRunIterator__1nGetCurrentFont
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_FontMgrRunIteratorKt__1nGetCurrentFont
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkShaper::FontRunIterator* instance = reinterpret_cast<SkShaper::FontRunIterator*>(static_cast<uintptr_t>(ptr));
     SkFont* font = new SkFont(instance->currentFont());
