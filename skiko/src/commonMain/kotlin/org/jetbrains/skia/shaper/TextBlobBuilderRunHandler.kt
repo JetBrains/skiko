@@ -9,7 +9,6 @@ import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
-import kotlin.jvm.JvmStatic
 
 class TextBlobBuilderRunHandler<T> internal constructor(
     text: ManagedString?,
@@ -20,16 +19,6 @@ class TextBlobBuilderRunHandler<T> internal constructor(
     _nMake(getPtr(text), offsetX, offsetY), _FinalizerHolder.PTR
 ), RunHandler {
     companion object {
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilderRunHandler__1nGetFinalizer")
-        external fun _nGetFinalizer(): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilderRunHandler__1nMake")
-        external fun _nMake(textPtr: NativePointer, offsetX: Float, offsetY: Float): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilderRunHandler__1nMakeBlob")
-        external fun _nMakeBlob(ptr: NativePointer): NativePointer
-
         init {
             staticLoad()
         }
@@ -88,3 +77,13 @@ class TextBlobBuilderRunHandler<T> internal constructor(
         reachabilityBarrier(text)
     }
 }
+
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlobBuilderRunHandler__1nGetFinalizer")
+private external fun _nGetFinalizer(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlobBuilderRunHandler__1nMake")
+private external fun _nMake(textPtr: NativePointer, offsetX: Float, offsetY: Float): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlobBuilderRunHandler__1nMakeBlob")
+private external fun _nMakeBlob(ptr: NativePointer): NativePointer
