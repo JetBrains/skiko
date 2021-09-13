@@ -9,7 +9,6 @@ import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
-import kotlin.jvm.JvmStatic
 
 class AnimationBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
@@ -18,28 +17,6 @@ class AnimationBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _
             for (flag in builderFlags) flags = flags or flag._flag
             return flags
         }
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nGetFinalizer")
-        external fun _nGetFinalizer(): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nMake")
-        external fun _nMake(flags: Int): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nSetFontManager")
-        external fun _nSetFontManager(ptr: NativePointer, fontMgrPtr: NativePointer)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nSetLogger")
-        external fun _nSetLogger(ptr: NativePointer, loggerPtr: NativePointer)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromString")
-        external fun _nBuildFromString(ptr: NativePointer, data: String?): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromFile")
-        external fun _nBuildFromFile(ptr: NativePointer, path: String?): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromData")
-        external fun _nBuildFromData(ptr: NativePointer, dataPtr: NativePointer): NativePointer
 
         init {
             staticLoad()
@@ -117,3 +94,25 @@ class AnimationBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _
         }
     }
 }
+
+
+@ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nGetFinalizer")
+private external fun _nGetFinalizer(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nMake")
+private external fun _nMake(flags: Int): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nSetFontManager")
+private external fun _nSetFontManager(ptr: NativePointer, fontMgrPtr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nSetLogger")
+private external fun _nSetLogger(ptr: NativePointer, loggerPtr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromString")
+private external fun _nBuildFromString(ptr: NativePointer, data: String?): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromFile")
+private external fun _nBuildFromFile(ptr: NativePointer, path: String?): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromData")
+private external fun _nBuildFromData(ptr: NativePointer, dataPtr: NativePointer): NativePointer
