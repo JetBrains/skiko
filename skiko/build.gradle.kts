@@ -105,6 +105,9 @@ val skiaBinSubdir = "out/${buildType.id}-${targetOs.id}-${targetArch.id}"
 val Project.supportNative: Boolean
    get() = properties.get("skiko.native.enabled") == "true"
 
+val Project.supportWasm: Boolean
+    get() = properties.get("skiko.wasm.enabled") == "true"
+
 kotlin {
     jvm {
         compilations.all {
@@ -129,7 +132,7 @@ kotlin {
         val targetString = target
         val skiaDir = skiaDir.get().absolutePath
         val nativeTarget = when (targetString) {
-            "macos-x64", "macos-arm64" -> macosX64() {
+            "macos-x64", "macos-arm64" -> macosX64 {
                 compilations.all {
                     kotlinOptions {
                         freeCompilerArgs += listOf(
@@ -337,34 +340,43 @@ project.tasks.register<Exec>("objcCompile") {
 }
 
 project.tasks.register<Exec>("wasmCompile") {
-    dependsOn(skiaWasmDir)
-    val skiaDir = skiaWasmDir.get().absolutePath
-    val inputDir = "$projectDir/src/jsMain/cpp"
-    val outDir = "$buildDir/wasm"
-    val names = File(inputDir).listFiles()!!.filter { it.name.endsWith(".cc") }.map { it.name.removeSuffix(".cc") }
-    val srcs = names.map { "$inputDir/$it.cc" }.toTypedArray()
-    val outJs = "$outDir/skiko.js"
-    val outWasm = "$outDir/skiko.wasm"
-    workingDir = File(outDir)
-    commandLine = listOf(
-        "emcc",
-        *Arch.Wasm.clangFlags,
-        "-I$skiaDir",
-        "-I$skiaDir/include",
-        "-I$skiaDir/include/core",
-        "-I$skiaDir/include/effects",
-        "-I$skiaDir/include/gpu",
-        "-o", outJs,
-        *srcs
-    )
-    argumentProviders.add(CommandLineArgumentProvider {
-        val skiaBinDir = "$skiaDir/out/${buildType.id}-wasm-wasm"
-        // We must compute this list after Skia unpacking task has finished.
-        listOf(skiaBinDir).findAllFiles(".a")
-    })
-    file(outDir).mkdirs()
-    inputs.files(srcs)
-    outputs.files(outJs, outWasm)
+        dependsOn(skiaWasmDir)
+        val skiaDir = skiaWasmDir.get().absolutePath
+        val inputDir = "$projectDir/src/jsMain/cpp"
+        val outDir = "$buildDir/wasm"
+        val names = File(inputDir).listFiles()!!.filter { it.name.endsWith(".cc") }.map { it.name.removeSuffix(".cc") }
+        val srcs = names.map { "$inputDir/$it.cc" }.toTypedArray()
+        val outJs = "$outDir/skiko.js"
+        val outWasm = "$outDir/skiko.wasm"
+        workingDir = File(outDir)
+        if (supportWasm) {
+            commandLine = listOf(
+                "emcc",
+                *Arch.Wasm.clangFlags,
+                "-I$skiaDir",
+                "-I$skiaDir/include",
+                "-I$skiaDir/include/core",
+                "-I$skiaDir/include/effects",
+                "-I$skiaDir/include/gpu",
+                "-o", outJs,
+                *srcs
+            )
+            argumentProviders.add(CommandLineArgumentProvider {
+                val skiaBinDir = "$skiaDir/out/${buildType.id}-wasm-wasm"
+                // We must compute this list after Skia unpacking task has finished.
+                listOf(skiaBinDir).findAllFiles(".a")
+            })
+        } else {
+            // Create dummy files anyway.
+            commandLine = listOf(
+                "touch",
+                outJs,
+                outWasm
+            )
+        }
+        file(outDir).mkdirs()
+        inputs.files(srcs)
+        outputs.files(outJs, outWasm)
 }
 
 fun List<String>.findAllFiles(suffix: String): List<String> = this
@@ -597,7 +609,7 @@ library {
 
 val skikoJvmJar: Provider<Jar> by tasks.registering(Jar::class) {
     archiveBaseName.set("skiko-jvm")
-    from(kotlin.jvm().compilations["main"].output.allOutputs)
+        from(kotlin.jvm().compilations["main"].output.allOutputs)
 }
 
 val skikoNativeLib: File
@@ -653,13 +665,12 @@ val skikoJvmRuntimeJar by project.tasks.registering(Jar::class) {
     from(createChecksums.get().outputs.files)
 }
 
-project.tasks.register<Jar>("skikoJsJar") {
+val skikoWasmJar by project.tasks.registering(Jar::class) {
     // We produce jar that contains .js of wrapper/bindings and .wasm with Skia + bindings.
     from(project.tasks.named("wasmCompile").get().outputs)
-    from(project.tasks.named("jsJar").get().outputs)
     archiveBaseName.set("skiko-wasm")
     doLast {
-        println("output at ${outputs.files.files.single()}")
+        println("Wasm and JS at ${outputs.files.files.single()}")
     }
 }
 
@@ -801,11 +812,21 @@ publishing {
         if (supportNative) {
             create<MavenPublication>("skikoNativeRuntime") {
                 artifactId = SkikoArtifacts.nativeRuntimeArtifactIdFor(targetOs, targetArch)
-                    afterEvaluate {
-                        artifact(project.tasks.withType(KotlinNativeCompile::class.java)
+                afterEvaluate {
+                    artifact(project.tasks.withType(KotlinNativeCompile::class.java)
                                 .single { it.name.startsWith("compileKotlin") } // Exclude compileTestKotlin.
                                 .outputs.files.single { it.name.endsWith(".klib") })
-                    }
+                }
+            }
+        }
+        create<MavenPublication>("skikoJsRuntime") {
+            artifactId = SkikoArtifacts.jsArtifactId
+            artifact(project.tasks.named("jsJar").get())
+        }
+        if (supportWasm) {
+            create<MavenPublication>("skikoWasmRuntime") {
+                artifactId = SkikoArtifacts.jsWasmArtifactId
+                artifact(skikoWasmJar.get())
             }
         }
     }
@@ -824,7 +845,7 @@ afterEvaluate {
 
 // Kotlin/JS has a bug preventing compilation on non-x86 Linux machines,
 // see https://youtrack.jetbrains.com/issue/KT-48631
-// It always downloads and uses x86 version, so on those achitectures
+// It always downloads and uses x86 version, so on those architectures
 if (hostOs == OS.Linux && hostArch != Arch.X64) {
     rootProject.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin::class.java) {
         rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>().download = false
