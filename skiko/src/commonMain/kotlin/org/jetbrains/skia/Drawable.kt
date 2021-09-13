@@ -21,22 +21,6 @@ import kotlin.jvm.JvmStatic
  */
 abstract class Drawable : RefCnt(_nMake()) {
     companion object {
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Drawable__1nMake")
-        external fun _nMake(): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Drawable__1nDraw")
-        external fun _nDraw(ptr: NativePointer, canvasPtr: NativePointer, matrix: FloatArray?)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Drawable__1nMakePictureSnapshot")
-        external fun _nMakePictureSnapshot(ptr: NativePointer): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Drawable__1nGetGenerationId")
-        external fun _nGetGenerationId(ptr: NativePointer): Int
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Drawable__1nNotifyDrawingChanged")
-        external fun _nNotifyDrawingChanged(ptr: NativePointer)
-
         init {
             staticLoad()
         }
@@ -145,3 +129,19 @@ abstract class Drawable : RefCnt(_nMake()) {
         _nInit(_ptr)
     }
 }
+
+
+@ExternalSymbolName("org_jetbrains_skia_Drawable__1nMake")
+private external fun _nMake(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Drawable__1nDraw")
+private external fun _nDraw(ptr: NativePointer, canvasPtr: NativePointer, matrix: FloatArray?)
+
+@ExternalSymbolName("org_jetbrains_skia_Drawable__1nMakePictureSnapshot")
+private external fun _nMakePictureSnapshot(ptr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Drawable__1nGetGenerationId")
+private external fun _nGetGenerationId(ptr: NativePointer): Int
+
+@ExternalSymbolName("org_jetbrains_skia_Drawable__1nNotifyDrawingChanged")
+private external fun _nNotifyDrawingChanged(ptr: NativePointer)
