@@ -1,7 +1,5 @@
 package org.jetbrains.skia
 
-import org.jetbrains.skia.impl.NativePointer
-
 class IPoint(val x: Int, val y: Int) {
 
     fun offset(dx: Int, dy: Int): IPoint {

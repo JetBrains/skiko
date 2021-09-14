@@ -23,7 +23,7 @@ class OutputWStream(out: OutputStream?) : WStream(_nMake(out), _FinalizerHolder.
 
     private val _out: OutputStream?
 
-    internal object _FinalizerHolder {
+    private object _FinalizerHolder {
         val PTR = _nGetFinalizer()
     }
 

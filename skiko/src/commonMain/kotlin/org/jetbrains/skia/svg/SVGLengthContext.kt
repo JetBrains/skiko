@@ -5,15 +5,15 @@ import kotlin.math.hypot
 import kotlin.math.sqrt
 
 class SVGLengthContext constructor(
-    internal val width: Float,
-    internal val height: Float,
-    internal val dpi: Float = 90f
+    val width: Float,
+    val height: Float,
+    val dpi: Float = 90f
 ) {
 
     constructor(size: Point) : this(size.x, size.y, 90f)
 
     fun resolve(length: SVGLength, type: SVGLengthType): Float {
-        return when (length._unit) {
+        return when (length.unit) {
             SVGLengthUnit.NUMBER -> length.value
             SVGLengthUnit.PX -> length.value
             SVGLengthUnit.PERCENTAGE -> {
@@ -32,7 +32,7 @@ class SVGLengthContext constructor(
             SVGLengthUnit.IN -> length.value * dpi
             SVGLengthUnit.PT -> length.value * dpi / 72.272f
             SVGLengthUnit.PC -> length.value * dpi * 12.0f / 72.272f
-            else -> throw IllegalArgumentException("Unknown SVGLengthUnit: " + length._unit)
+            else -> throw IllegalArgumentException("Unknown SVGLengthUnit: " + length.unit)
         }
     }
 

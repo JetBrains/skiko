@@ -1,9 +1,9 @@
 package org.jetbrains.skia.shaper
 
 class TrivialScriptRunIterator(text: String, script: String) : MutableIterator<ScriptRun?> {
-    internal val _length: Int
+    val _length: Int
 
-    internal val _script: String
+    val _script: String
 
     internal var _atEnd: Boolean
     override fun next(): ScriptRun {

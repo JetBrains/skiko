@@ -170,6 +170,6 @@ class FontMetrics(
     }
 
     override fun toString(): String {
-        return "FontMetrics(_top=" + top + ", _ascent=" + ascent + ", _descent=" + descent + ", _bottom=" + bottom + ", _leading=" + leading + ", _avgCharWidth=" + avgCharWidth + ", _maxCharWidth=" + maxCharWidth + ", _xMin=" + xMin + ", _xMax=" + xMax + ", _xHeight=" + xHeight + ", _capHeight=" + capHeight + ", _underlineThickness=" + underlineThickness + ", _underlinePosition=" + underlinePosition + ", _strikeoutThickness=" + strikeoutThickness + ", _strikeoutPosition=" + strikeoutPosition + ")"
+        return "FontMetrics(_top=$top, _ascent=$ascent, _descent=$descent, _bottom=$bottom, _leading=$leading, _avgCharWidth=$avgCharWidth, _maxCharWidth=$maxCharWidth, _xMin=$xMin, _xMax=$xMax, _xHeight=$xHeight, _capHeight=$capHeight, _underlineThickness=$underlineThickness, _underlinePosition=$underlinePosition, _strikeoutThickness=$strikeoutThickness, _strikeoutPosition=$strikeoutPosition)"
     }
 }

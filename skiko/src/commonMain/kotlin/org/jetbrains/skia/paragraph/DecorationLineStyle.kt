@@ -1,5 +1,9 @@
 package org.jetbrains.skia.paragraph
 
 enum class DecorationLineStyle {
-    SOLID, DOUBLE, DOTTED, DASHED, WAVY;
+    SOLID,
+    DOUBLE,
+    DOTTED,
+    DASHED,
+    WAVY;
 }

@@ -22,7 +22,7 @@ package org.jetbrains.skia
  *  * Nice overview [https://entropymine.com/imageworsener/bicubic/](https://entropymine.com/imageworsener/bicubic/)
  *
  */
-class CubicResampler(internal val b: Float, internal val c: Float) : SamplingMode {
+class CubicResampler(val b: Float, val c: Float) : SamplingMode {
 
     override fun _pack(): Long = (0x8L shl 60) or ((b.toBits().toULong() shl 32) or c.toBits().toULong()).toLong()
 

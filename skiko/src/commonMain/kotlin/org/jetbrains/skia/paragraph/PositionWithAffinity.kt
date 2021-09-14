@@ -25,7 +25,7 @@ class PositionWithAffinity(val position: Int, affinity: Affinity) {
         var result = 1
         result = result * PRIME + position
         val `$_affinity`: Any = affinity
-        result = result * PRIME + (`$_affinity`?.hashCode())
+        result = result * PRIME + `$_affinity`.hashCode()
         return result
     }
 

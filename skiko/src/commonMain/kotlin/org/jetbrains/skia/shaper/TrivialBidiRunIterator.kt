@@ -1,9 +1,9 @@
 package org.jetbrains.skia.shaper
 
 class TrivialBidiRunIterator(text: String, level: Int) : MutableIterator<BidiRun?> {
-    internal val _length: Int
+    val _length: Int
 
-    internal val _level: Int
+    val _level: Int
 
     internal var _atEnd: Boolean
     override fun next(): BidiRun {

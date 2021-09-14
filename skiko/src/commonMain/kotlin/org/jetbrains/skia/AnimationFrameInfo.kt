@@ -15,11 +15,11 @@ class AnimationFrameInfo(
      * for blending. Any frame from [_requiredFrame, i) can be
      * used, unless its getDisposalMethod() is [AnimationDisposalMode.RESTORE_PREVIOUS].
      */
-    internal var requiredFrame: Int,
+    var requiredFrame: Int,
     /**
      * Number of milliseconds to show this frame.
      */
-    internal var duration: Int,
+    var duration: Int,
     /**
      *
      * Whether the end marker for this frame is contained in the stream.
@@ -28,13 +28,13 @@ class AnimationFrameInfo(
      * Note: this does not guarantee that an attempt to decode will be complete.
      * There could be an error in the stream.
      */
-    internal var isFullyReceived: Boolean,
+    var isFullyReceived: Boolean,
     /**
      *
      * This is conservative; it will still return non-opaque if e.g. a
      * color index-based frame has a color with alpha but does not use it.
      */
-    internal var alphaType: ColorAlphaType,
+    var alphaType: ColorAlphaType,
     /**
      *
      * Whether the updated rectangle contains alpha.
@@ -45,17 +45,17 @@ class AnimationFrameInfo(
      * addition, it may be set to true, even if the final frame, after
      * blending, is opaque.
      */
-    internal var isHasAlphaWithinBounds: Boolean,
+    var isHasAlphaWithinBounds: Boolean,
     /**
      *
      * How this frame should be modified before decoding the next one.
      */
-    internal var disposalMethod: AnimationDisposalMode,
+    var disposalMethod: AnimationDisposalMode,
     /**
      *
      * How this frame should blend with the prior frame.
      */
-    internal var blendMode: BlendMode,
+    var blendMode: BlendMode,
     /**
      *
      * The rectangle updated by this frame.
@@ -85,161 +85,6 @@ class AnimationFrameInfo(
         BlendMode.values()[blendModeOrdinal],
         frameRect
     )
-    /**
-     *
-     * The frame that this frame needs to be blended with, or
-     * -1 if this frame is independent (so it can be
-     * drawn over an uninitialized buffer).
-     *
-     *
-     * Note that this is the *earliest* frame that can be used
-     * for blending. Any frame from [_requiredFrame, i) can be
-     * used, unless its getDisposalMethod() is [AnimationDisposalMode.RESTORE_PREVIOUS].
-     */
-    /**
-     * Number of milliseconds to show this frame.
-     */
-    /**
-     *
-     * Whether the end marker for this frame is contained in the stream.
-     *
-     *
-     * Note: this does not guarantee that an attempt to decode will be complete.
-     * There could be an error in the stream.
-     */
-    /**
-     *
-     * This is conservative; it will still return non-opaque if e.g. a
-     * color index-based frame has a color with alpha but does not use it.
-     */
-    /**
-     *
-     * Whether the updated rectangle contains alpha.
-     *
-     *
-     * This is conservative; it will still be set to true if e.g. a color
-     * index-based frame has a color with alpha but does not use it. In
-     * addition, it may be set to true, even if the final frame, after
-     * blending, is opaque.
-     */
-    /**
-     *
-     * How this frame should be modified before decoding the next one.
-     */
-    /**
-     *
-     * How this frame should blend with the prior frame.
-     */
-    /**
-     *
-     * The rectangle updated by this frame.
-     *
-     *
-     * It may be empty, if the frame does not change the image. It will
-     * always be contained by [Codec.getSize].
-     */
-
-    /**
-     *
-     * The frame that this frame needs to be blended with, or
-     * -1 if this frame is independent (so it can be
-     * drawn over an uninitialized buffer).
-     *
-     *
-     * Note that this is the *earliest* frame that can be used
-     * for blending. Any frame from [_requiredFrame, i) can be
-     * used, unless its getDisposalMethod() is [AnimationDisposalMode.RESTORE_PREVIOUS].
-     * @return `this`.
-     */
-    fun setRequiredFrame(_requiredFrame: Int): AnimationFrameInfo {
-        requiredFrame = _requiredFrame
-        return this
-    }
-
-    /**
-     * Number of milliseconds to show this frame.
-     * @return `this`.
-     */
-    fun setDuration(_duration: Int): AnimationFrameInfo {
-        duration = _duration
-        return this
-    }
-
-    /**
-     *
-     * Whether the end marker for this frame is contained in the stream.
-     *
-     *
-     * Note: this does not guarantee that an attempt to decode will be complete.
-     * There could be an error in the stream.
-     * @return `this`.
-     */
-    fun setFullyReceived(_fullyReceived: Boolean): AnimationFrameInfo {
-        isFullyReceived = _fullyReceived
-        return this
-    }
-
-    /**
-     *
-     * This is conservative; it will still return non-opaque if e.g. a
-     * color index-based frame has a color with alpha but does not use it.
-     * @return `this`.
-     */
-    fun setAlphaType(_alphaType: ColorAlphaType): AnimationFrameInfo {
-        alphaType = _alphaType
-        return this
-    }
-
-    /**
-     *
-     * Whether the updated rectangle contains alpha.
-     *
-     *
-     * This is conservative; it will still be set to true if e.g. a color
-     * index-based frame has a color with alpha but does not use it. In
-     * addition, it may be set to true, even if the final frame, after
-     * blending, is opaque.
-     * @return `this`.
-     */
-    fun setHasAlphaWithinBounds(_hasAlphaWithinBounds: Boolean): AnimationFrameInfo {
-        isHasAlphaWithinBounds = _hasAlphaWithinBounds
-        return this
-    }
-
-    /**
-     *
-     * How this frame should be modified before decoding the next one.
-     * @return `this`.
-     */
-    fun setDisposalMethod(_disposalMethod: AnimationDisposalMode): AnimationFrameInfo {
-        disposalMethod = _disposalMethod
-        return this
-    }
-
-    /**
-     *
-     * How this frame should blend with the prior frame.
-     * @return `this`.
-     */
-    fun setBlendMode(_blendMode: BlendMode): AnimationFrameInfo {
-        blendMode = _blendMode
-        return this
-    }
-
-    /**
-     *
-     * The rectangle updated by this frame.
-     *
-     *
-     * It may be empty, if the frame does not change the image. It will
-     * always be contained by [Codec.getSize].
-     * @return `this`.
-     */
-    fun setFrameRect(_frameRect: IRect): AnimationFrameInfo {
-        frameRect = _frameRect
-        return this
-    }
-
     override fun equals(o: Any?): Boolean {
         if (o === this) return true
         if (o !is AnimationFrameInfo) return false

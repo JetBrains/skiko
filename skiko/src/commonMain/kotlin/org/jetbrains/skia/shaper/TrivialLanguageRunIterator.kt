@@ -1,9 +1,9 @@
 package org.jetbrains.skia.shaper
 
 class TrivialLanguageRunIterator(text: String, language: String) : MutableIterator<LanguageRun?> {
-    internal val _length: Int
+    val _length: Int
 
-    internal val _language: String
+    val _language: String
 
     internal var _atEnd: Boolean
     override fun next(): LanguageRun {

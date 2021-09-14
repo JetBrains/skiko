@@ -1,6 +1,6 @@
 package org.jetbrains.skia.skottie
 
-enum class AnimationBuilderFlag(internal val _flag: Int) {
+enum class AnimationBuilderFlag(val _flag: Int) {
     /**
      * Normally, all static image frames are resolved at
      * load time via ImageAsset::getFrame(0).  With this flag,

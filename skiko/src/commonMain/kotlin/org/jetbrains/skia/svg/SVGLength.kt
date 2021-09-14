@@ -1,15 +1,10 @@
 package org.jetbrains.skia.svg
 
-class SVGLength(val value: Float, unit: SVGLengthUnit) {
-
-    internal val _unit: SVGLengthUnit
+class SVGLength(val value: Float, val unit: SVGLengthUnit) {
 
     internal constructor(value: Float, unit: Int) : this(value, SVGLengthUnit.values()[unit])
 
     constructor(value: Float) : this(value, SVGLengthUnit.NUMBER) {}
-
-    val unit: SVGLengthUnit
-        get() = _unit
 
     override fun equals(o: Any?): Boolean {
         if (o === this) return true
@@ -40,14 +35,10 @@ class SVGLength(val value: Float, unit: SVGLengthUnit) {
     }
 
     fun withValue(_value: Float): SVGLength {
-        return if (value == _value) this else SVGLength(_value, _unit)
+        return if (value == _value) this else SVGLength(_value, unit)
     }
 
     fun withUnit(_unit: SVGLengthUnit): SVGLength {
-        return if (this._unit === _unit) this else SVGLength(value, _unit)
-    }
-
-    init {
-        _unit = unit
+        return if (this.unit === unit) this else SVGLength(value, unit)
     }
 }
