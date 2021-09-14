@@ -44,7 +44,7 @@ class DirectContext internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 
     fun flush(): DirectContext {
         Stats.onNativeCall()
-        Direct_nFlush(_ptr)
+        DirectContext_nFlush(_ptr)
         return this
     }
 
@@ -114,7 +114,7 @@ class DirectContext internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nFlush")
-private external fun Direct_nFlush(ptr: NativePointer): NativePointer
+private external fun DirectContext_nFlush(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeGL")
 private external fun _nMakeGL(): NativePointer
