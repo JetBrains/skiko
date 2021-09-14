@@ -1,8 +1,5 @@
 package org.jetbrains.skia
 
-import org.jetbrains.skia.impl.NativePointer
-
-
 class IRange(val start: Int, val end: Int) {
 
     override fun equals(o: Any?): Boolean {
@@ -11,7 +8,7 @@ class IRange(val start: Int, val end: Int) {
         val other = o
         if (!other.canEqual(this as Any)) return false
         if (start != other.start) return false
-        return if (end != other.end) false else true
+        return end == other.end
     }
 
     protected fun canEqual(other: Any?): Boolean {

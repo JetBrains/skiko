@@ -3,9 +3,9 @@ package org.jetbrains.skia.shaper
 import org.jetbrains.skia.*
 
 class TrivialFontRunIterator(text: String, font: Font) : MutableIterator<FontRun?> {
-    internal val _length: Int
+    val _length: Int
 
-    internal val _font: Font
+    val _font: Font
 
     internal var _atEnd: Boolean
     override fun next(): FontRun {

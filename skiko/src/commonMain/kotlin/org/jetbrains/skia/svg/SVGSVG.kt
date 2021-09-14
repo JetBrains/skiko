@@ -70,7 +70,7 @@ class SVGSVG internal constructor(ptr: NativePointer) : SVGContainer(ptr) {
     fun setX(length: SVGLength): SVGSVG {
         return try {
             Stats.onNativeCall()
-            _nSetX(_ptr, length.value, length._unit.ordinal)
+            _nSetX(_ptr, length.value, length.unit.ordinal)
             this
         } finally {
             reachabilityBarrier(this)
@@ -91,7 +91,7 @@ class SVGSVG internal constructor(ptr: NativePointer) : SVGContainer(ptr) {
     fun setY(length: SVGLength): SVGSVG {
         return try {
             Stats.onNativeCall()
-            _nSetY(_ptr, length.value, length._unit.ordinal)
+            _nSetY(_ptr, length.value, length.unit.ordinal)
             this
         } finally {
             reachabilityBarrier(this)
@@ -112,7 +112,7 @@ class SVGSVG internal constructor(ptr: NativePointer) : SVGContainer(ptr) {
     fun setWidth(length: SVGLength): SVGSVG {
         return try {
             Stats.onNativeCall()
-            _nSetWidth(_ptr, length.value, length._unit.ordinal)
+            _nSetWidth(_ptr, length.value, length.unit.ordinal)
             this
         } finally {
             reachabilityBarrier(this)
@@ -133,7 +133,7 @@ class SVGSVG internal constructor(ptr: NativePointer) : SVGContainer(ptr) {
     fun setHeight(length: SVGLength): SVGSVG {
         return try {
             Stats.onNativeCall()
-            _nSetHeight(_ptr, length.value, length._unit.ordinal)
+            _nSetHeight(_ptr, length.value, length.unit.ordinal)
             this
         } finally {
             reachabilityBarrier(this)

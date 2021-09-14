@@ -23,7 +23,7 @@ class TextBox(val rect: Rect, direction: Direction) {
         if (if (`this$_rect` == null) `other$_rect` != null else `this$_rect` != `other$_rect`) return false
         val `this$_direction`: Any = direction
         val `other$_direction`: Any = other.direction
-        return if (if (`this$_direction` == null) `other$_direction` != null else `this$_direction` != `other$_direction`) false else true
+        return !if (`this$_direction` == null) true else `this$_direction` != `other$_direction`
     }
 
     protected fun canEqual(other: Any?): Boolean {

@@ -1,6 +1,6 @@
 package org.jetbrains.skia.skottie
 
-enum class RenderFlag(internal val _flag: Int) {
+enum class RenderFlag(val _flag: Int) {
     /**
      * When rendering into a known transparent buffer, clients can pass
      * this flag to avoid some unnecessary compositing overhead for

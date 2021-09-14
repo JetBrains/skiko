@@ -21,7 +21,7 @@ class ISize internal constructor(val width: Int, val height: Int) {
         val other = o
         if (!other.canEqual(this as Any)) return false
         if (width != other.width) return false
-        return if (height != other.height) false else true
+        return height == other.height
     }
 
     protected fun canEqual(other: Any?): Boolean {
@@ -37,7 +37,7 @@ class ISize internal constructor(val width: Int, val height: Int) {
     }
 
     override fun toString(): String {
-        return "ISize(_width=" + width + ", _height=" + height + ")"
+        return "ISize(_width=$width, _height=$height)"
     }
 
     companion object {

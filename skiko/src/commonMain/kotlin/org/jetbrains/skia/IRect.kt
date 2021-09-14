@@ -36,7 +36,7 @@ class IRect internal constructor(val left: Int, val top: Int, val right: Int, va
         if (left != other.left) return false
         if (top != other.top) return false
         if (right != other.right) return false
-        return if (bottom != other.bottom) false else true
+        return bottom == other.bottom
     }
 
     protected fun canEqual(other: Any?): Boolean {
@@ -54,7 +54,7 @@ class IRect internal constructor(val left: Int, val top: Int, val right: Int, va
     }
 
     override fun toString(): String {
-        return "IRect(_left=" + left + ", _top=" + top + ", _right=" + right + ", _bottom=" + bottom + ")"
+        return "IRect(_left=$left, _top=$top, _right=$right, _bottom=$bottom)"
     }
 
     companion object {

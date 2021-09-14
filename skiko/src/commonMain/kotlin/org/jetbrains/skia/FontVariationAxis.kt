@@ -1,11 +1,11 @@
 package org.jetbrains.skia
 
 class FontVariationAxis(
-    internal val _tag: Int,
-    internal val minValue: Float,
-    internal val defaultValue: Float,
-    internal val maxValue: Float,
-    internal val isHidden: Boolean
+    val _tag: Int,
+    val minValue: Float,
+    val defaultValue: Float,
+    val maxValue: Float,
+    val isHidden: Boolean
 ) {
 
     val tag: String

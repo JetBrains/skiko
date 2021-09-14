@@ -46,7 +46,7 @@ class AnimationBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _
         }
     }
 
-    internal object _FinalizerHolder {
+    private object _FinalizerHolder {
         val PTR = _nGetFinalizer()
     }
 

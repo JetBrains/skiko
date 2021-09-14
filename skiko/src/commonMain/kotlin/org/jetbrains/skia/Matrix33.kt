@@ -291,7 +291,7 @@ class Matrix33(vararg mat: Float) {
     }
 
     init {
-        require(mat.size == 9) { (if ("Expected 9 elements, got $mat" == null) null else mat.size)!! }
+        require(mat.size == 9) { "Expected 9 elements, got ${mat.size}" }
         this.mat = mat
     }
 }

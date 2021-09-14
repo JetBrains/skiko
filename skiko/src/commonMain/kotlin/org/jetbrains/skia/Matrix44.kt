@@ -65,7 +65,7 @@ class Matrix44(vararg mat: Float) {
      * The constructor parameters are in row-major order.
      */
     init {
-        require(mat.size == 16) { (if ("Expected 16 elements, got $mat" == null) null else mat.size)!! }
+        require(mat.size == 16) { "Expected 16 elements, got ${mat.size}" }
         this.mat = mat
     }
 }

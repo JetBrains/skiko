@@ -556,7 +556,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
         }
     }
 
-    internal object _FinalizerHolder {
+    private object _FinalizerHolder {
         val PTR = _nGetFinalizer()
     }
 }

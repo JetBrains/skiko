@@ -1,9 +1,9 @@
 package org.jetbrains.skia
 
 class GradientStyle(
-    internal val tileMode: FilterTileMode,
-    internal val isPremul: Boolean,
-    internal val localMatrix: Matrix33?
+    val tileMode: FilterTileMode,
+    val isPremul: Boolean,
+    val localMatrix: Matrix33?
 ) {
 
     internal fun _getFlags(): Int {
@@ -11,7 +11,7 @@ class GradientStyle(
     }
 
     internal fun _getMatrixArray(): FloatArray? {
-        return if (localMatrix == null) null else localMatrix.mat
+        return localMatrix?.mat
     }
 
     override fun equals(o: Any?): Boolean {
@@ -22,10 +22,10 @@ class GradientStyle(
         if (isPremul != other.isPremul) return false
         val `this$_tileMode`: Any = tileMode
         val `other$_tileMode`: Any = other.tileMode
-        if (if (`this$_tileMode` == null) `other$_tileMode` != null else `this$_tileMode` != `other$_tileMode`) return false
+        if (`this$_tileMode` != `other$_tileMode`) return false
         val `this$_localMatrix`: Any? = localMatrix
         val `other$_localMatrix`: Any? = other.localMatrix
-        return if (if (`this$_localMatrix` == null) `other$_localMatrix` != null else `this$_localMatrix` != `other$_localMatrix`) false else true
+        return !if (`this$_localMatrix` == null) `other$_localMatrix` != null else `this$_localMatrix` != `other$_localMatrix`
     }
 
     protected fun canEqual(other: Any?): Boolean {
@@ -44,7 +44,7 @@ class GradientStyle(
     }
 
     override fun toString(): String {
-        return "GradientStyle(_tileMode=" + tileMode + ", _premul=" + isPremul + ", _localMatrix=" + localMatrix + ")"
+        return "GradientStyle(_tileMode=$tileMode, _premul=$isPremul, _localMatrix=$localMatrix)"
     }
 
     fun withTileMode(_tileMode: FilterTileMode): GradientStyle {
