@@ -2,9 +2,7 @@
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.*
-import kotlin.jvm.JvmStatic
 
 class ColorFilter : RefCnt {
     companion object {

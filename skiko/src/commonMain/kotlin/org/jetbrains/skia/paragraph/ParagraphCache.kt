@@ -8,7 +8,6 @@ import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
-import kotlin.jvm.JvmStatic
 
 class ParagraphCache internal constructor(owner: FontCollection, ptr: NativePointer) : Native(ptr) {
     companion object {
