@@ -21,7 +21,7 @@ extern "C"
             context->flush({});
             context->submit(true);
         } catch(...) {
-            throwJavaException(env, handleException(__FUNCTION__));
+            logJavaException(env, handleException(__FUNCTION__));
         }
     }
 }

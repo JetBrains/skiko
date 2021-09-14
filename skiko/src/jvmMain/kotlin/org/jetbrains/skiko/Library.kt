@@ -98,6 +98,10 @@ object Library {
             t.printStackTrace()
         }
     }
+
+    val skikoVersion: String by lazy {
+        Library::class.java.getResource("/version").readText()
+    }
 }
 
 // We have to keep this tiny class in Skiko for testing purposes.

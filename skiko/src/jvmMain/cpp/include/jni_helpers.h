@@ -12,4 +12,4 @@ jlong inline toJavaPointer(T ptr) { return static_cast<jlong>(reinterpret_cast<u
 
 std::string handleException(std::string function);
 
-void throwJavaException(JNIEnv *env, std::string message);
+void logJavaException(JNIEnv *env, std::string message);

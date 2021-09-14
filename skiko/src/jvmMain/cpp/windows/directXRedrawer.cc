@@ -353,7 +353,7 @@ extern "C"
             swapChainFactory.reset(nullptr);
             swapChainFactory.reset(nullptr);
         } catch(...) {
-            throwJavaException(env, handleException(__FUNCTION__));
+            logJavaException(env, handleException(__FUNCTION__));
         }
     }
 
@@ -407,21 +407,17 @@ extern "C"
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_resizeBuffers(
         JNIEnv *env, jobject redrawer, jlong devicePtr, jint width, jint height)
     {
-        try {
-            DirectXDevice *d3dDevice = fromJavaPointer<DirectXDevice *>(devicePtr);
-            for (int i = 0; i < BuffersCount; i++)
+        DirectXDevice *d3dDevice = fromJavaPointer<DirectXDevice *>(devicePtr);
+        for (int i = 0; i < BuffersCount; i++)
+        {
+            if (d3dDevice->fence->GetCompletedValue() < d3dDevice->fenceValues[i])
             {
-                if (d3dDevice->fence->GetCompletedValue() < d3dDevice->fenceValues[i])
-                {
-                    GR_D3D_CALL_ERRCHECK(d3dDevice->fence->SetEventOnCompletion(d3dDevice->fenceValues[i], d3dDevice->fenceEvent));
-                    WaitForSingleObjectEx(d3dDevice->fenceEvent, INFINITE, FALSE);
-                }
-                d3dDevice->buffers[i].reset(nullptr);
+                GR_D3D_CALL_ERRCHECK(d3dDevice->fence->SetEventOnCompletion(d3dDevice->fenceValues[i], d3dDevice->fenceEvent));
+                WaitForSingleObjectEx(d3dDevice->fenceEvent, INFINITE, FALSE);
             }
-            GR_D3D_CALL_ERRCHECK(d3dDevice->swapChain->ResizeBuffers(BuffersCount, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 0));
-        } catch(...) {
-            throwJavaException(env, handleException(__FUNCTION__));
+            d3dDevice->buffers[i].reset(nullptr);
         }
+        GR_D3D_CALL_ERRCHECK(d3dDevice->swapChain->ResizeBuffers(BuffersCount, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 0));
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_swap(
@@ -434,7 +430,7 @@ extern "C"
             GR_D3D_CALL_ERRCHECK(d3dDevice->swapChain->Present((int)isVsyncEnabled, 0));
             GR_D3D_CALL_ERRCHECK(d3dDevice->queue->Signal(d3dDevice->fence.get(), fenceValue));
         } catch(...) {
-            throwJavaException(env, handleException(__FUNCTION__));
+            logJavaException(env, handleException(__FUNCTION__));
         }
     }
 

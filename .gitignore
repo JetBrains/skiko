@@ -8,3 +8,5 @@ local.properties
 deploy.sh
 deploy.bat
 skiko/src/jvmMain/java
+skiko-render-exception.log
+skiko/src/jvmMain/resources/version

@@ -12,24 +12,28 @@ extern "C"
 {
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt_getDevice(JNIEnv *env, jobject redrawer, jlong platformInfoPtr)
     {
-        JAWT_Win32DrawingSurfaceInfo* dsi_win = fromJavaPointer<JAWT_Win32DrawingSurfaceInfo *>(platformInfoPtr);
+        try {
+            JAWT_Win32DrawingSurfaceInfo* dsi_win = fromJavaPointer<JAWT_Win32DrawingSurfaceInfo *>(platformInfoPtr);
 
-        HWND hwnd = dsi_win->hwnd;
-        HDC device = GetDC(hwnd);
+            HWND hwnd = dsi_win->hwnd;
+            HDC device = GetDC(hwnd);
 
-        PIXELFORMATDESCRIPTOR pixFormatDscr;
-        memset(&pixFormatDscr, 0, sizeof(PIXELFORMATDESCRIPTOR));
-        pixFormatDscr.nSize = sizeof(PIXELFORMATDESCRIPTOR);
-        pixFormatDscr.nVersion = 1;
-        pixFormatDscr.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
+            PIXELFORMATDESCRIPTOR pixFormatDscr;
+            memset(&pixFormatDscr, 0, sizeof(PIXELFORMATDESCRIPTOR));
+            pixFormatDscr.nSize = sizeof(PIXELFORMATDESCRIPTOR);
+            pixFormatDscr.nVersion = 1;
+            pixFormatDscr.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
 
-        pixFormatDscr.iPixelType = PFD_TYPE_RGBA;
-        pixFormatDscr.cColorBits = 32;
-        int iPixelFormat = ChoosePixelFormat(device, &pixFormatDscr);
-        SetPixelFormat(device, iPixelFormat, &pixFormatDscr);
-        DescribePixelFormat(device, iPixelFormat, sizeof(PIXELFORMATDESCRIPTOR), &pixFormatDscr);
-
-        return toJavaPointer(device);
+            pixFormatDscr.iPixelType = PFD_TYPE_RGBA;
+            pixFormatDscr.cColorBits = 32;
+            int iPixelFormat = ChoosePixelFormat(device, &pixFormatDscr);
+            SetPixelFormat(device, iPixelFormat, &pixFormatDscr);
+            DescribePixelFormat(device, iPixelFormat, sizeof(PIXELFORMATDESCRIPTOR), &pixFormatDscr);
+      
+            return toJavaPointer(device);
+        } catch(...) {
+            logJavaException(env, handleException(__FUNCTION__));
+        }
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt_setSwapInterval(JNIEnv *env, jobject redrawer, jint interval)
@@ -59,8 +63,12 @@ extern "C"
 
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt_createContext(JNIEnv *env, jobject redrawer, jlong devicePtr)
     {
-        HDC device = fromJavaPointer<HDC>(devicePtr);
-        return toJavaPointer(wglCreateContext(device));
+        try {
+            HDC device = fromJavaPointer<HDC>(devicePtr);
+            return toJavaPointer(wglCreateContext(device));
+        } catch(...) {
+            logJavaException(env, handleException(__FUNCTION__));
+        }
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt_deleteContext(JNIEnv *env, jobject redrawer, jlong contextPtr)

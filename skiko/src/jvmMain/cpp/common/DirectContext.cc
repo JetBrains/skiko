@@ -1,5 +1,7 @@
+#include <string>
 #include <iostream>
 #include <jni.h>
+#include "jni_helpers.h"
 #include "GrDirectContext.h"
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DirectContextKt__1nMakeGL
@@ -41,8 +43,12 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DirectContextKt__1nMa
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_DirectContextKt_DirectContext_1nFlush
   (JNIEnv* env, jclass jclass, jlong ptr) {
-    GrDirectContext* context = reinterpret_cast<GrDirectContext*>(static_cast<uintptr_t>(ptr));
-    context->flush(GrFlushInfo());
+    try {
+      GrDirectContext* context = reinterpret_cast<GrDirectContext*>(static_cast<uintptr_t>(ptr));
+      context->flush(GrFlushInfo());
+    } catch(...) {
+      logJavaException(env, handleException(__FUNCTION__));
+    }
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_DirectContextKt__1nSubmit

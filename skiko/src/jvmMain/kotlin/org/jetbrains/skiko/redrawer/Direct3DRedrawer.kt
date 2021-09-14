@@ -17,7 +17,7 @@ internal class Direct3DRedrawer(
 
     private val device = createDirectXDevice(getAdapterPriority(), layer.contentHandle).also {
         if (it == 0L || !isVideoCardSupported(layer.renderApi)) {
-            throw IllegalArgumentException("Failed to create DirectX12 device.")
+            throw Exception("Failed to create DirectX12 device.")
         }
     }
 
