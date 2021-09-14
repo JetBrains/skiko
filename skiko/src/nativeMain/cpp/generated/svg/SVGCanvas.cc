@@ -6,7 +6,7 @@
 #include "common.h"
 
 extern "C" jlong org_jetbrains_skia_svg_SVGCanvas__1nMake
-  (kref __Kinstance, jfloat left, jfloat top, jfloat right, jfloat bottom, jlong wstreamPtr, jint flags) {
+  (jfloat left, jfloat top, jfloat right, jfloat bottom, jlong wstreamPtr, jint flags) {
     SkWStream* wstream = reinterpret_cast<SkWStream*>(static_cast<uintptr_t>(wstreamPtr));
     SkRect bounds {left, top, right, bottom};
     SkCanvas* instance = SkSVGCanvas::Make(bounds, wstream, flags).release();

@@ -8,13 +8,13 @@
 
 
 extern "C" jint org_jetbrains_skia_Typeface__1nGetFontStyle
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TODO("implement org_jetbrains_skia_Typeface__1nGetFontStyle");
 }
      
 #if 0 
 extern "C" jint org_jetbrains_skia_Typeface__1nGetFontStyle
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     return skija::FontStyle::toJava(instance->fontStyle());
 }
@@ -22,20 +22,20 @@ extern "C" jint org_jetbrains_skia_Typeface__1nGetFontStyle
 
 
 extern "C" jboolean org_jetbrains_skia_Typeface__1nIsFixedPitch
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     return instance->isFixedPitch();
 }
 
 
 extern "C" jobjectArray org_jetbrains_skia_Typeface__1nGetVariations
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TODO("implement org_jetbrains_skia_Typeface__1nGetVariations");
 }
      
 #if 0 
 extern "C" jobjectArray org_jetbrains_skia_Typeface__1nGetVariations
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     int count = instance->getVariationDesignPosition(nullptr, 0);
     if (count > 0) {
@@ -55,13 +55,13 @@ extern "C" jobjectArray org_jetbrains_skia_Typeface__1nGetVariations
 
 
 extern "C" jobjectArray org_jetbrains_skia_Typeface__1nGetVariationAxes
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TODO("implement org_jetbrains_skia_Typeface__1nGetVariationAxes");
 }
      
 #if 0 
 extern "C" jobjectArray org_jetbrains_skia_Typeface__1nGetVariationAxes
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     int count = instance->getVariationDesignParameters(nullptr, 0);
     if (count > 0) {
@@ -80,20 +80,20 @@ extern "C" jobjectArray org_jetbrains_skia_Typeface__1nGetVariationAxes
 
 
 extern "C" jint org_jetbrains_skia_Typeface__1nGetUniqueId
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     return instance->uniqueID();
 }
 
 extern "C" jint org_jetbrains_skia_Typeface__1nEquals
-  (kref __Kinstance, jlong ptr, jlong otherPtr) {
+  (jlong ptr, jlong otherPtr) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     SkTypeface* other = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(otherPtr));
     return SkTypeface::Equal(instance, other);
 }
 
 extern "C" jlong org_jetbrains_skia_Typeface__1nMakeDefault
-  (kref __Kinstance) {
+  () {
     return reinterpret_cast<jlong>(SkTypeface::MakeDefault().release());
 }
 
@@ -120,13 +120,13 @@ sk_sp<SkTypeface> setDefaultVariationCoords(sk_sp<SkTypeface> face) {
 
 
 extern "C" jlong org_jetbrains_skia_Typeface__1nMakeFromName
-  (kref __Kinstance, jstring nameStr, jint styleValue) {
+  (jstring nameStr, jint styleValue) {
     TODO("implement org_jetbrains_skia_Typeface__1nMakeFromName");
 }
      
 #if 0 
 extern "C" jlong org_jetbrains_skia_Typeface__1nMakeFromName
-  (kref __Kinstance, jstring nameStr, jint styleValue) {
+  (jstring nameStr, jint styleValue) {
     SkString name = skString(env, nameStr);
     SkFontStyle style = skija::FontStyle::fromJava(styleValue);
     sk_sp<SkTypeface> instance = SkTypeface::MakeFromName(name.c_str(), style);
@@ -138,13 +138,13 @@ extern "C" jlong org_jetbrains_skia_Typeface__1nMakeFromName
 
 
 extern "C" jlong org_jetbrains_skia_Typeface__1nMakeFromFile
-  (kref __Kinstance, jstring pathStr, jint index) {
+  (jstring pathStr, jint index) {
     TODO("implement org_jetbrains_skia_Typeface__1nMakeFromFile");
 }
      
 #if 0 
 extern "C" jlong org_jetbrains_skia_Typeface__1nMakeFromFile
-  (kref __Kinstance, jstring pathStr, jint index) {
+  (jstring pathStr, jint index) {
     SkString path = skString(env, pathStr);
     sk_sp<SkTypeface> instance = SkTypeface::MakeFromFile(path.c_str(), index);
     SkTypeface* ptr = setDefaultVariationCoords(instance).release();
@@ -154,7 +154,7 @@ extern "C" jlong org_jetbrains_skia_Typeface__1nMakeFromFile
 
 
 extern "C" jlong org_jetbrains_skia_Typeface__1nMakeFromData
-  (kref __Kinstance, jlong dataPtr, jint index) {
+  (jlong dataPtr, jint index) {
     SkData* data = reinterpret_cast<SkData*>(static_cast<uintptr_t>(dataPtr));
     sk_sp<SkTypeface> instance = SkTypeface::MakeFromData(sk_ref_sp(data), index);
     SkTypeface* ptr = setDefaultVariationCoords(instance).release();
@@ -163,13 +163,13 @@ extern "C" jlong org_jetbrains_skia_Typeface__1nMakeFromData
 
 
 extern "C" jlong org_jetbrains_skia_Typeface__1nMakeClone
-  (kref __Kinstance, jlong typefacePtr, jobjectArray variations, jint collectionIndex) {
+  (jlong typefacePtr, jobjectArray variations, jint collectionIndex) {
     TODO("implement org_jetbrains_skia_Typeface__1nMakeClone");
 }
      
 #if 0 
 extern "C" jlong org_jetbrains_skia_Typeface__1nMakeClone
-  (kref __Kinstance, jlong typefacePtr, jobjectArray variations, jint collectionIndex) {
+  (jlong typefacePtr, jobjectArray variations, jint collectionIndex) {
     SkTypeface* typeface = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(typefacePtr));
     int variationCount = env->GetArrayLength(variations);
     std::vector<SkFontArguments::VariationPosition::Coordinate> coordinates(variationCount);
@@ -192,13 +192,13 @@ extern "C" jlong org_jetbrains_skia_Typeface__1nMakeClone
 
 
 extern "C" jshortArray org_jetbrains_skia_Typeface__1nGetUTF32Glyphs
-  (kref __Kinstance, jlong ptr, jintArray uniArr) {
+  (jlong ptr, jintArray uniArr) {
     TODO("implement org_jetbrains_skia_Typeface__1nGetUTF32Glyphs");
 }
      
 #if 0 
 extern "C" jshortArray org_jetbrains_skia_Typeface__1nGetUTF32Glyphs
-  (kref __Kinstance, jlong ptr, jintArray uniArr) {
+  (jlong ptr, jintArray uniArr) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     jint count = env->GetArrayLength(uniArr);
     std::vector<short> glyphs(count);
@@ -211,32 +211,32 @@ extern "C" jshortArray org_jetbrains_skia_Typeface__1nGetUTF32Glyphs
 
 
 extern "C" jshort org_jetbrains_skia_Typeface__1nGetUTF32Glyph
-  (kref __Kinstance, jlong ptr, jint uni) {
+  (jlong ptr, jint uni) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     return instance->unicharToGlyph(uni);
 }
 
 extern "C" jint org_jetbrains_skia_Typeface__1nGetGlyphsCount
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     return instance->countGlyphs();
 }
 
 extern "C" jint org_jetbrains_skia_Typeface__1nGetTablesCount
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     return instance->countTables();
 }
 
 
 extern "C" jintArray org_jetbrains_skia_Typeface__1nGetTableTags
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TODO("implement org_jetbrains_skia_Typeface__1nGetTableTags");
 }
      
 #if 0 
 extern "C" jintArray org_jetbrains_skia_Typeface__1nGetTableTags
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     int count = instance->countTables();
     std::vector<jint> tags(count);
@@ -247,33 +247,33 @@ extern "C" jintArray org_jetbrains_skia_Typeface__1nGetTableTags
 
 
 extern "C" jlong org_jetbrains_skia_Typeface__1nGetTableSize
-  (kref __Kinstance, jlong ptr, jint tag) {
+  (jlong ptr, jint tag) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     return instance->getTableSize(tag);
 }
 
 extern "C" jlong org_jetbrains_skia_Typeface__1nGetTableData
-  (kref __Kinstance, jlong ptr, jint tag) {
+  (jlong ptr, jint tag) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     SkData* data = instance->copyTableData(tag).release();
     return reinterpret_cast<jlong>(data);
 }
 
 extern "C" jint org_jetbrains_skia_Typeface__1nGetUnitsPerEm
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     return instance->getUnitsPerEm();
 }
 
 
 extern "C" jintArray org_jetbrains_skia_Typeface__1nGetKerningPairAdjustments
-  (kref __Kinstance, jlong ptr, jshortArray glyphsArr) {
+  (jlong ptr, jshortArray glyphsArr) {
     TODO("implement org_jetbrains_skia_Typeface__1nGetKerningPairAdjustments");
 }
      
 #if 0 
 extern "C" jintArray org_jetbrains_skia_Typeface__1nGetKerningPairAdjustments
-  (kref __Kinstance, jlong ptr, jshortArray glyphsArr) {
+  (jlong ptr, jshortArray glyphsArr) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     int count = glyphsArr == nullptr ? 0 : env->GetArrayLength(glyphsArr);
     if (count > 0) {
@@ -294,13 +294,13 @@ extern "C" jintArray org_jetbrains_skia_Typeface__1nGetKerningPairAdjustments
 
 
 extern "C" jobjectArray org_jetbrains_skia_Typeface__1nGetFamilyNames
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TODO("implement org_jetbrains_skia_Typeface__1nGetFamilyNames");
 }
      
 #if 0 
 extern "C" jobjectArray org_jetbrains_skia_Typeface__1nGetFamilyNames
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     SkTypeface::LocalizedStrings* iter = instance->createFamilyNameIterator();
     std::vector<SkTypeface::LocalizedString> names;
@@ -323,13 +323,13 @@ extern "C" jobjectArray org_jetbrains_skia_Typeface__1nGetFamilyNames
 
 
 extern "C" jstring org_jetbrains_skia_Typeface__1nGetFamilyName
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TODO("implement org_jetbrains_skia_Typeface__1nGetFamilyName");
 }
      
 #if 0 
 extern "C" jstring org_jetbrains_skia_Typeface__1nGetFamilyName
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     SkString name;
     instance->getFamilyName(&name);
@@ -340,13 +340,13 @@ extern "C" jstring org_jetbrains_skia_Typeface__1nGetFamilyName
 
 
 extern "C" jobject org_jetbrains_skia_Typeface__1nGetBounds
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TODO("implement org_jetbrains_skia_Typeface__1nGetBounds");
 }
      
 #if 0 
 extern "C" jobject org_jetbrains_skia_Typeface__1nGetBounds
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     return skija::Rect::fromSkRect(env, instance->getBounds());
 }

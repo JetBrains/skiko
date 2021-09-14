@@ -13,19 +13,19 @@ static void unrefTextBlob(SkTextBlob* ptr) {
 }
 
 extern "C" jlong org_jetbrains_skia_TextBlob__1nGetFinalizer
-  (kref __Kinstance) {
+  () {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&unrefTextBlob));
 }
 
 
 extern "C" jobject org_jetbrains_skia_TextBlob__1nBounds
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TODO("implement org_jetbrains_skia_TextBlob__1nBounds");
 }
      
 #if 0 
 extern "C" jobject org_jetbrains_skia_TextBlob__1nBounds
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(static_cast<uintptr_t>(ptr));
     SkRect bounds = instance->bounds();
     return skija::Rect::fromSkRect(env, instance->bounds());
@@ -34,20 +34,20 @@ extern "C" jobject org_jetbrains_skia_TextBlob__1nBounds
 
 
 extern "C" jint org_jetbrains_skia_TextBlob__1nGetUniqueId
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(static_cast<uintptr_t>(ptr));
     return instance->uniqueID();
 }
 
 
 extern "C" jfloatArray org_jetbrains_skia_TextBlob__1nGetIntercepts
-  (kref __Kinstance, jlong ptr, jfloat lower, jfloat upper, jlong paintPtr) {
+  (jlong ptr, jfloat lower, jfloat upper, jlong paintPtr) {
     TODO("implement org_jetbrains_skia_TextBlob__1nGetIntercepts");
 }
      
 #if 0 
 extern "C" jfloatArray org_jetbrains_skia_TextBlob__1nGetIntercepts
-  (kref __Kinstance, jlong ptr, jfloat lower, jfloat upper, jlong paintPtr) {
+  (jlong ptr, jfloat lower, jfloat upper, jlong paintPtr) {
     SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(static_cast<uintptr_t>(ptr));
     std::vector<float> bounds {lower, upper};
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
@@ -61,13 +61,13 @@ extern "C" jfloatArray org_jetbrains_skia_TextBlob__1nGetIntercepts
 
 
 extern "C" jlong org_jetbrains_skia_TextBlob__1nMakeFromPosH
-  (kref __Kinstance, jshortArray glyphsArr, jfloatArray xposArr, jfloat ypos, jlong fontPtr) {
+  (jshortArray glyphsArr, jfloatArray xposArr, jfloat ypos, jlong fontPtr) {
     TODO("implement org_jetbrains_skia_TextBlob__1nMakeFromPosH");
 }
      
 #if 0 
 extern "C" jlong org_jetbrains_skia_TextBlob__1nMakeFromPosH
-  (kref __Kinstance, jshortArray glyphsArr, jfloatArray xposArr, jfloat ypos, jlong fontPtr) {
+  (jshortArray glyphsArr, jfloatArray xposArr, jfloat ypos, jlong fontPtr) {
     jsize len = env->GetArrayLength(glyphsArr);
     jshort* glyphs = env->GetShortArrayElements(glyphsArr, nullptr);
     jfloat* xpos = env->GetFloatArrayElements(xposArr, nullptr);
@@ -85,13 +85,13 @@ extern "C" jlong org_jetbrains_skia_TextBlob__1nMakeFromPosH
 
 
 extern "C" jlong org_jetbrains_skia_TextBlob__1nMakeFromPos
-  (kref __Kinstance, jshortArray glyphsArr, jfloatArray posArr, jlong fontPtr ) {
+  (jshortArray glyphsArr, jfloatArray posArr, jlong fontPtr ) {
     TODO("implement org_jetbrains_skia_TextBlob__1nMakeFromPos");
 }
      
 #if 0 
 extern "C" jlong org_jetbrains_skia_TextBlob__1nMakeFromPos
-  (kref __Kinstance, jshortArray glyphsArr, jfloatArray posArr, jlong fontPtr ) {
+  (jshortArray glyphsArr, jfloatArray posArr, jlong fontPtr ) {
     jsize len = env->GetArrayLength(glyphsArr);
     jshort* glyphs = env->GetShortArrayElements(glyphsArr, nullptr);
     jfloat* pos = env->GetFloatArrayElements(posArr, nullptr);
@@ -109,13 +109,13 @@ extern "C" jlong org_jetbrains_skia_TextBlob__1nMakeFromPos
 
 
 extern "C" jlong org_jetbrains_skia_TextBlob__1nMakeFromRSXform
-  (kref __Kinstance, jshortArray glyphsArr, jfloatArray xformArr, jlong fontPtr ) {
+  (jshortArray glyphsArr, jfloatArray xformArr, jlong fontPtr ) {
     TODO("implement org_jetbrains_skia_TextBlob__1nMakeFromRSXform");
 }
      
 #if 0 
 extern "C" jlong org_jetbrains_skia_TextBlob__1nMakeFromRSXform
-  (kref __Kinstance, jshortArray glyphsArr, jfloatArray xformArr, jlong fontPtr ) {
+  (jshortArray glyphsArr, jfloatArray xformArr, jlong fontPtr ) {
     jsize len = env->GetArrayLength(glyphsArr);
     jshort* glyphs = env->GetShortArrayElements(glyphsArr, nullptr);
     jfloat* xform = env->GetFloatArrayElements(xformArr, nullptr);
@@ -132,14 +132,14 @@ extern "C" jlong org_jetbrains_skia_TextBlob__1nMakeFromRSXform
 
 
 extern "C" jlong org_jetbrains_skia_TextBlob__1nSerializeToData
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(static_cast<uintptr_t>(ptr));
     SkData* data = instance->serialize({}).release();
     return reinterpret_cast<jlong>(data);
 }
 
 extern "C" jlong org_jetbrains_skia_TextBlob__1nMakeFromData
-  (kref __Kinstance, jlong dataPtr) {
+  (jlong dataPtr) {
     SkData* data = reinterpret_cast<SkData*>(static_cast<uintptr_t>(dataPtr));
     SkTextBlob* instance = SkTextBlob::Deserialize(data->data(), data->size(), {}).release();
     return reinterpret_cast<jlong>(instance);
@@ -147,13 +147,13 @@ extern "C" jlong org_jetbrains_skia_TextBlob__1nMakeFromData
 
 
 extern "C" jshortArray org_jetbrains_skia_TextBlob__1nGetGlyphs
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TODO("implement org_jetbrains_skia_TextBlob__1nGetGlyphs");
 }
      
 #if 0 
 extern "C" jshortArray org_jetbrains_skia_TextBlob__1nGetGlyphs
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(static_cast<uintptr_t>(ptr));
     SkTextBlob::Iter iter(*instance);
     SkTextBlob::Iter::Run run;
@@ -171,13 +171,13 @@ extern "C" jshortArray org_jetbrains_skia_TextBlob__1nGetGlyphs
 
 
 extern "C" jfloatArray org_jetbrains_skia_TextBlob__1nGetPositions
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TODO("implement org_jetbrains_skia_TextBlob__1nGetPositions");
 }
      
 #if 0 
 extern "C" jfloatArray org_jetbrains_skia_TextBlob__1nGetPositions
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(static_cast<uintptr_t>(ptr));
     SkTextBlob::Iter iter(*instance);
     SkTextBlob::Iter::Run run;
@@ -198,13 +198,13 @@ extern "C" jfloatArray org_jetbrains_skia_TextBlob__1nGetPositions
 
 
 extern "C" jintArray org_jetbrains_skia_TextBlob__1nGetClusters
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TODO("implement org_jetbrains_skia_TextBlob__1nGetClusters");
 }
      
 #if 0 
 extern "C" jintArray org_jetbrains_skia_TextBlob__1nGetClusters
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(static_cast<uintptr_t>(ptr));
     SkTextBlob::Iter iter(*instance);
     SkTextBlob::Iter::Run run;
@@ -235,13 +235,13 @@ extern "C" jintArray org_jetbrains_skia_TextBlob__1nGetClusters
 
 
 extern "C" jobject org_jetbrains_skia_TextBlob__1nGetTightBounds
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TODO("implement org_jetbrains_skia_TextBlob__1nGetTightBounds");
 }
      
 #if 0 
 extern "C" jobject org_jetbrains_skia_TextBlob__1nGetTightBounds
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(static_cast<uintptr_t>(ptr));
     SkTextBlob::Iter iter(*instance);
     SkTextBlob::Iter::Run run;
@@ -265,13 +265,13 @@ extern "C" jobject org_jetbrains_skia_TextBlob__1nGetTightBounds
 
 
 extern "C" jobject org_jetbrains_skia_TextBlob__1nGetBlockBounds
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TODO("implement org_jetbrains_skia_TextBlob__1nGetBlockBounds");
 }
      
 #if 0 
 extern "C" jobject org_jetbrains_skia_TextBlob__1nGetBlockBounds
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(static_cast<uintptr_t>(ptr));
     SkTextBlob::Iter iter(*instance);
     SkTextBlob::Iter::Run run;
@@ -305,13 +305,13 @@ extern "C" jobject org_jetbrains_skia_TextBlob__1nGetBlockBounds
 
 
 extern "C" jobject org_jetbrains_skia_TextBlob__1nGetFirstBaseline
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TODO("implement org_jetbrains_skia_TextBlob__1nGetFirstBaseline");
 }
      
 #if 0 
 extern "C" jobject org_jetbrains_skia_TextBlob__1nGetFirstBaseline
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(static_cast<uintptr_t>(ptr));
     SkTextBlob::Iter iter(*instance);
     SkTextBlob::Iter::Run run;
@@ -330,13 +330,13 @@ extern "C" jobject org_jetbrains_skia_TextBlob__1nGetFirstBaseline
 
 
 extern "C" jobject org_jetbrains_skia_TextBlob__1nGetLastBaseline
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TODO("implement org_jetbrains_skia_TextBlob__1nGetLastBaseline");
 }
      
 #if 0 
 extern "C" jobject org_jetbrains_skia_TextBlob__1nGetLastBaseline
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(static_cast<uintptr_t>(ptr));
     SkTextBlob::Iter iter(*instance);
     SkTextBlob::Iter::Run run;

@@ -7,13 +7,13 @@
 
 
 extern "C" jlong org_jetbrains_skia_shaper_FontMgrRunIterator__1nMake
-  (kref __Kinstance, jlong textPtr, jlong fontPtr, jobject opts) {
+  (jlong textPtr, jlong fontPtr, jobject opts) {
     TODO("implement org_jetbrains_skia_shaper_FontMgrRunIterator__1nMake");
 }
      
 #if 0 
 extern "C" jlong org_jetbrains_skia_shaper_FontMgrRunIterator__1nMake
-  (kref __Kinstance, jlong textPtr, jlong fontPtr, jobject opts) {
+  (jlong textPtr, jlong fontPtr, jobject opts) {
     SkString* text = reinterpret_cast<SkString*>(static_cast<uintptr_t>(textPtr));
     SkFont* font = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(fontPtr));
     jobject fontMgrObj = env->GetObjectField(opts, skija::shaper::ShapingOptions::_fontMgr);
@@ -39,13 +39,13 @@ extern "C" jlong org_jetbrains_skia_shaper_FontMgrRunIterator__1nMake
 
 
 extern "C" jlong org_jetbrains_skia_shaper_FontMgrRunIterator__1nGetCurrentFont
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TODO("implement org_jetbrains_skia_shaper_FontMgrRunIterator__1nGetCurrentFont");
 }
      
 #if 0 
 extern "C" jlong org_jetbrains_skia_shaper_FontMgrRunIterator__1nGetCurrentFont
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkShaper::FontRunIterator* instance = reinterpret_cast<SkShaper::FontRunIterator*>(static_cast<uintptr_t>(ptr));
     SkFont* font = new SkFont(instance->currentFont());
     return reinterpret_cast<jlong>(font);

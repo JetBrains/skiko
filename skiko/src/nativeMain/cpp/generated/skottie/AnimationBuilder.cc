@@ -12,24 +12,24 @@ static void deleteAnimationBuilder(Animation::Builder* builder) {
 }
 
 extern "C" jlong org_jetbrains_skia_skottie_AnimationBuilder__1nGetFinalizer
-  (kref __Kinstance) {
+  () {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteAnimationBuilder));
 }
 
 extern "C" jlong org_jetbrains_skia_skottie_AnimationBuilder__1nMake
-  (kref __Kinstance, jint flags) {
+  (jint flags) {
     return reinterpret_cast<jlong>(new Animation::Builder(flags));
 }
 
 extern "C" void org_jetbrains_skia_skottie_AnimationBuilder__1nSetFontManager
-  (kref __Kinstance, jlong ptr, jlong fontMgrPtr) {
+  (jlong ptr, jlong fontMgrPtr) {
     Animation::Builder* instance = reinterpret_cast<Animation::Builder*>(static_cast<uintptr_t>(ptr));
     sk_sp<SkFontMgr> fontMgr = sk_ref_sp(reinterpret_cast<SkFontMgr*>(static_cast<uintptr_t>(fontMgrPtr)));
     instance->setFontManager(fontMgr);
 }
 
 extern "C" void org_jetbrains_skia_skottie_AnimationBuilder__1nSetLogger
-  (kref __Kinstance, jlong ptr, jlong loggerPtr) {
+  (jlong ptr, jlong loggerPtr) {
     Animation::Builder* instance = reinterpret_cast<Animation::Builder*>(static_cast<uintptr_t>(ptr));
     sk_sp<skottie::Logger> logger = sk_ref_sp(reinterpret_cast<skottie::Logger*>(static_cast<uintptr_t>(loggerPtr)));
     instance->setLogger(logger);
@@ -37,13 +37,13 @@ extern "C" void org_jetbrains_skia_skottie_AnimationBuilder__1nSetLogger
 
 
 extern "C" jlong org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromString
-  (kref __Kinstance, jlong ptr, jstring dataStr) {
+  (jlong ptr, jstring dataStr) {
     TODO("implement org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromString");
 }
      
 #if 0 
 extern "C" jlong org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromString
-  (kref __Kinstance, jlong ptr, jstring dataStr) {
+  (jlong ptr, jstring dataStr) {
     Animation::Builder* instance = reinterpret_cast<Animation::Builder*>(static_cast<uintptr_t>(ptr));
     SkString data = skString(env, dataStr);
     sk_sp<Animation> animation = instance->make(data.c_str(), data.size());
@@ -54,13 +54,13 @@ extern "C" jlong org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromString
 
 
 extern "C" jlong org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromFile
-  (kref __Kinstance, jlong ptr, jstring pathStr) {
+  (jlong ptr, jstring pathStr) {
     TODO("implement org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromFile");
 }
      
 #if 0 
 extern "C" jlong org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromFile
-  (kref __Kinstance, jlong ptr, jstring pathStr) {
+  (jlong ptr, jstring pathStr) {
     Animation::Builder* instance = reinterpret_cast<Animation::Builder*>(static_cast<uintptr_t>(ptr));
     SkString path = skString(env, pathStr);
     sk_sp<Animation> animation = instance->makeFromFile(path.c_str());
@@ -70,7 +70,7 @@ extern "C" jlong org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromFile
 
 
 extern "C" jlong org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromData
-  (kref __Kinstance, jlong ptr, jlong dataPtr) {
+  (jlong ptr, jlong dataPtr) {
     Animation::Builder* instance = reinterpret_cast<Animation::Builder*>(static_cast<uintptr_t>(ptr));
     SkData* data = reinterpret_cast<SkData*>(static_cast<uintptr_t>(dataPtr));
     SkMemoryStream stream(sk_ref_sp(data));

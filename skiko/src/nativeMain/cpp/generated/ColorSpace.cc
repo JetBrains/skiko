@@ -10,21 +10,21 @@ static void unrefColorSpace(SkColorSpace* ptr) {
     ptr->unref();
 }
 
-extern "C" jlong org_jetbrains_skia_ColorSpace__1nGetFinalizer(kref __Kinstance) {
+extern "C" jlong org_jetbrains_skia_ColorSpace__1nGetFinalizer() {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&unrefColorSpace));
 }
 
-extern "C" jlong org_jetbrains_skia_ColorSpace__1nMakeSRGB(kref __Kinstance) {
+extern "C" jlong org_jetbrains_skia_ColorSpace__1nMakeSRGB() {
     SkColorSpace* ptr = SkColorSpace::MakeSRGB().release();
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" jlong org_jetbrains_skia_ColorSpace__1nMakeSRGBLinear(kref __Kinstance) {
+extern "C" jlong org_jetbrains_skia_ColorSpace__1nMakeSRGBLinear() {
     SkColorSpace* ptr = SkColorSpace::MakeSRGBLinear().release();
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" jlong org_jetbrains_skia_ColorSpace__1nMakeDisplayP3(kref __Kinstance) {
+extern "C" jlong org_jetbrains_skia_ColorSpace__1nMakeDisplayP3() {
     SkColorSpace* ptr = SkColorSpace::MakeRGB(SkNamedTransferFn::kSRGB, SkNamedGamut::kDisplayP3).release();
     return reinterpret_cast<jlong>(ptr);
 }
@@ -49,19 +49,19 @@ extern "C" void org_jetbrains_skia_ColorSpace__nConvert(
 
 
 extern "C" jlong org_jetbrains_skia_ColorSpace__1nIsGammaCloseToSRGB
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkColorSpace* instance = reinterpret_cast<SkColorSpace*>(static_cast<uintptr_t>(ptr));
     return instance->gammaCloseToSRGB();
 }
 
 extern "C" jlong org_jetbrains_skia_ColorSpace__1nIsGammaLinear
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkColorSpace* instance = reinterpret_cast<SkColorSpace*>(static_cast<uintptr_t>(ptr));
     return instance->gammaIsLinear();
 }
 
 extern "C" jlong org_jetbrains_skia_ColorSpace__1nIsSRGB
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkColorSpace* instance = reinterpret_cast<SkColorSpace*>(static_cast<uintptr_t>(ptr));
     return instance->isSRGB();
 }

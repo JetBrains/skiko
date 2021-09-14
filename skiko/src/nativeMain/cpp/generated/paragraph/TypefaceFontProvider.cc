@@ -8,20 +8,20 @@ using namespace skia::textlayout;
 #include "common.h"
 
 extern "C" jlong org_jetbrains_skia_paragraph_TypefaceFontProvider__1nMake
-  (kref __Kinstance) {
+  () {
     TypefaceFontProvider* instance = new TypefaceFontProvider();
     return reinterpret_cast<jlong>(instance);
 }
 
 
 extern "C" void org_jetbrains_skia_paragraph_TypefaceFontProvider__1nRegisterTypeface
-  (kref __Kinstance, jlong ptr, jlong typefacePtr, jstring aliasStr) {
+  (jlong ptr, jlong typefacePtr, jstring aliasStr) {
     TODO("implement org_jetbrains_skia_paragraph_TypefaceFontProvider__1nRegisterTypeface");
 }
      
 #if 0 
 extern "C" void org_jetbrains_skia_paragraph_TypefaceFontProvider__1nRegisterTypeface
-  (kref __Kinstance, jlong ptr, jlong typefacePtr, jstring aliasStr) {
+  (jlong ptr, jlong typefacePtr, jstring aliasStr) {
     TypefaceFontProvider* instance = reinterpret_cast<TypefaceFontProvider*>(static_cast<uintptr_t>(ptr));
     SkTypeface* typeface = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(typefacePtr));
     if (aliasStr == nullptr)

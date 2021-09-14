@@ -11,12 +11,12 @@ static void deleteCodec(SkCodec* instance) {
     delete instance;
 }
 
-extern "C" jlong org_jetbrains_skia_Codec__1nGetFinalizer(kref __Kinstance) {
+extern "C" jlong org_jetbrains_skia_Codec__1nGetFinalizer() {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteCodec));
 }
 
 extern "C" jlong org_jetbrains_skia_Codec__1nMakeFromData
-  (kref __Kinstance, jlong dataPtr) {
+  (jlong dataPtr) {
     SkData* data = reinterpret_cast<SkData*>(static_cast<uintptr_t>(dataPtr));
     std::unique_ptr<SkCodec> instance = SkCodec::MakeFromData(sk_ref_sp(data));
     return reinterpret_cast<jlong>(instance.release());
@@ -24,13 +24,13 @@ extern "C" jlong org_jetbrains_skia_Codec__1nMakeFromData
 
 
 extern "C" jobject org_jetbrains_skia_Codec__1nGetImageInfo
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TODO("implement org_jetbrains_skia_Codec__1nGetImageInfo");
 }
      
 #if 0 
 extern "C" jobject org_jetbrains_skia_Codec__1nGetImageInfo
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkCodec* instance = reinterpret_cast<SkCodec*>(static_cast<uintptr_t>(ptr));
     return skija::ImageInfo::toJava(env, instance->getInfo());
 }
@@ -38,25 +38,25 @@ extern "C" jobject org_jetbrains_skia_Codec__1nGetImageInfo
 
 
 extern "C" jlong org_jetbrains_skia_Codec__1nGetSize
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkCodec* instance = reinterpret_cast<SkCodec*>(static_cast<uintptr_t>(ptr));
     return packISize(instance->dimensions());
 }
 
 extern "C" jlong org_jetbrains_skia_Codec__1nGetEncodedOrigin
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkCodec* instance = reinterpret_cast<SkCodec*>(static_cast<uintptr_t>(ptr));
     return static_cast<jint>(instance->getOrigin());
 }
 
 extern "C" jlong org_jetbrains_skia_Codec__1nGetEncodedImageFormat
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkCodec* instance = reinterpret_cast<SkCodec*>(static_cast<uintptr_t>(ptr));
     return static_cast<jint>(instance->getEncodedFormat());
 }
 
 extern "C" jint org_jetbrains_skia_Codec__1nReadPixels
-  (kref __Kinstance, jlong ptr, jlong bitmapPtr, jint frame, jint priorFrame) {
+  (jlong ptr, jlong bitmapPtr, jint frame, jint priorFrame) {
     SkCodec* instance = reinterpret_cast<SkCodec*>(static_cast<uintptr_t>(ptr));
     SkBitmap* bitmap = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(bitmapPtr));
     SkCodec::Options opts;
@@ -67,20 +67,20 @@ extern "C" jint org_jetbrains_skia_Codec__1nReadPixels
 }
 
 extern "C" jint org_jetbrains_skia_Codec__1nGetFrameCount
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkCodec* instance = reinterpret_cast<SkCodec*>(static_cast<uintptr_t>(ptr));
     return instance->getFrameCount();
 }
 
 
 extern "C" jobject org_jetbrains_skia_Codec__1nGetFrameInfo
-  (kref __Kinstance, jlong ptr, jint frame) {
+  (jlong ptr, jint frame) {
     TODO("implement org_jetbrains_skia_Codec__1nGetFrameInfo");
 }
      
 #if 0 
 extern "C" jobject org_jetbrains_skia_Codec__1nGetFrameInfo
-  (kref __Kinstance, jlong ptr, jint frame) {
+  (jlong ptr, jint frame) {
     SkCodec* instance = reinterpret_cast<SkCodec*>(static_cast<uintptr_t>(ptr));
     SkCodec::FrameInfo info;
     instance->getFrameInfo(frame, &info);
@@ -91,13 +91,13 @@ extern "C" jobject org_jetbrains_skia_Codec__1nGetFrameInfo
 
 
 extern "C" jobject org_jetbrains_skia_Codec__1nGetFramesInfo
-  (kref __Kinstance, jlong ptr, jint frame) {
+  (jlong ptr, jint frame) {
     TODO("implement org_jetbrains_skia_Codec__1nGetFramesInfo");
 }
      
 #if 0 
 extern "C" jobject org_jetbrains_skia_Codec__1nGetFramesInfo
-  (kref __Kinstance, jlong ptr, jint frame) {
+  (jlong ptr, jint frame) {
     SkCodec* instance = reinterpret_cast<SkCodec*>(static_cast<uintptr_t>(ptr));
     SkCodec::FrameInfo info;
     std::vector<SkCodec::FrameInfo> frames = instance->getFrameInfo();
@@ -114,7 +114,7 @@ extern "C" jobject org_jetbrains_skia_Codec__1nGetFramesInfo
 
 
 extern "C" jint org_jetbrains_skia_Codec__1nGetRepetitionCount
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkCodec* instance = reinterpret_cast<SkCodec*>(static_cast<uintptr_t>(ptr));
     return instance->getRepetitionCount();
 }
