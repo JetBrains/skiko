@@ -6,7 +6,7 @@ static void deleteString(SkString* instance) {
     delete instance;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ManagedStringKt__1nGetFinalizer
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ManagedStringKt_ManagedString_1nGetFinalizer
   (JNIEnv* env, jclass jclass) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteString));
 }

@@ -16,7 +16,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathEffectKt__1nMakeS
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathEffectKt__1nMakeCompose
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathEffectKt_PathEffect_1nMakeCompose
   (JNIEnv* env, jclass jclass, jlong outerPtr, jlong innerPtr) {
     SkPathEffect* outer = reinterpret_cast<SkPathEffect*>(static_cast<uintptr_t>(outerPtr));
     SkPathEffect* inner = reinterpret_cast<SkPathEffect*>(static_cast<uintptr_t>(innerPtr));

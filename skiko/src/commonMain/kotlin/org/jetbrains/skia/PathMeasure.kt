@@ -179,12 +179,12 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
     }
 
     internal object _FinalizerHolder {
-        val PTR = `PathMeasure_nGetFinalizer`()
+        val PTR = PathMeasure_nGetFinalizer()
     }
 }
 
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetFinalizer")
-private external fun `PathMeasure_nGetFinalizer`(): NativePointer
+private external fun PathMeasure_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nMake")
 private external fun PathMeasure_nMake(): NativePointer

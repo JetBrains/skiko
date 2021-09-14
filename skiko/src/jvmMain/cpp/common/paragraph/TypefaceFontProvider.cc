@@ -6,7 +6,7 @@
 
 using namespace skia::textlayout;
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_TypefaceFontProviderKt__1nMake
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_TypefaceFontProviderKt_TypefaceFontProvider_1nMake
   (JNIEnv* env, jclass jclass) {
     TypefaceFontProvider* instance = new TypefaceFontProvider();
     return reinterpret_cast<jlong>(instance);

@@ -9,7 +9,7 @@ static void deleteFont(SkFont* font) {
     delete font;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontKt__1nGetFinalizer
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontKt_Font_1nGetFinalizer
   (JNIEnv* env, jclass jclass) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteFont));
 }
@@ -41,14 +41,14 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontKt__1nMakeTypefac
     return reinterpret_cast<jlong>(obj);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontKt__1nMakeClone
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontKt_Font_1nMakeClone
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     SkFont* clone = new SkFont(*instance);
     return reinterpret_cast<jlong>(clone);
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_FontKt__1nEquals
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_FontKt_Font_1nEquals
   (JNIEnv* env, jclass jclass, jlong ptr, jlong otherPtr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     SkFont* other = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(otherPtr));
@@ -165,7 +165,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontKt__1nGetTypeface
     return reinterpret_cast<jlong>(typeface);
 }
 
-extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_FontKt__1nGetSize
+extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_FontKt_Font_1nGetSize
  (JNIEnv* env, jclass jclass, jlong ptr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     return instance->getSize();

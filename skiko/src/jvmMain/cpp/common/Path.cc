@@ -13,11 +13,11 @@ static void deletePath(SkPath* path) {
     delete path;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathKt__1nGetFinalizer(JNIEnv* env, jclass jclass) {
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathKt_Path_1nGetFinalizer(JNIEnv* env, jclass jclass) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deletePath));
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathKt__1nMake(JNIEnv* env, jclass jclass) {
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathKt_Path_1nMake(JNIEnv* env, jclass jclass) {
     SkPath* obj = new SkPath();
     return reinterpret_cast<jlong>(obj);
 }
@@ -34,7 +34,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathKt__1nMakeFromSVG
     }
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathKt__1nEquals(JNIEnv* env, jclass jclass, jlong aPtr, jlong bPtr) {
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathKt_Path_1nEquals(JNIEnv* env, jclass jclass, jlong aPtr, jlong bPtr) {
     SkPath* a = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(aPtr));
     SkPath* b = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(bPtr));
     return *a == *b;
@@ -91,7 +91,7 @@ extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_PathKt__1nIsRRect(J
         return nullptr;
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathKt__1nReset(JNIEnv* env, jclass jclass, jlong ptr) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathKt_Path_1nReset(JNIEnv* env, jclass jclass, jlong ptr) {
     SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
     instance->reset();
 }
@@ -116,12 +116,12 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathKt__1nIsFinite
     return instance->isFinite();
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathKt__1nIsVolatile(JNIEnv* env, jclass jclass, jlong ptr) {
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathKt_Path_1nIsVolatile(JNIEnv* env, jclass jclass, jlong ptr) {
     SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
     return instance->isVolatile();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathKt__1nSetVolatile(JNIEnv* env, jclass jclass, jlong ptr, jboolean isVolatile) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathKt_Path_1nSetVolatile(JNIEnv* env, jclass jclass, jlong ptr, jboolean isVolatile) {
     SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
     instance->setIsVolatile(isVolatile);
 }
@@ -189,7 +189,7 @@ extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_PathKt__1nApproximateB
     return (jint) instance->approximateBytesUsed();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathKt__1nSwap(JNIEnv* env, jclass jclass, jlong ptr, jlong otherPtr) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathKt_Path_1nSwap(JNIEnv* env, jclass jclass, jlong ptr, jlong otherPtr) {
     SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
     SkPath* other = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(otherPtr));
     instance->swap(*other);
@@ -487,7 +487,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathKt__1nMakeFromByt
     }
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_PathKt__1nGetGenerationId
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_PathKt_Path_1nGetGenerationId
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
     return instance->getGenerationID();

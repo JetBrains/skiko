@@ -10,7 +10,7 @@ static void deleteBitmap(SkBitmap* instance) {
     delete instance;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BitmapKt__1nGetFinalizer(JNIEnv* env, jclass jclass) {
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BitmapKt_Bitmap_1nGetFinalizer(JNIEnv* env, jclass jclass) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteBitmap));
 }
 

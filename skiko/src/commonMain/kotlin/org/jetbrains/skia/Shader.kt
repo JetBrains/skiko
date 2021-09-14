@@ -500,6 +500,8 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     }
 }
 
+@ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeEmpty")
+private external fun Shader_nMakeEmpty(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeWithColorFilter")
 private external fun _nMakeWithColorFilter(ptr: NativePointer, colorFilterPtr: NativePointer): NativePointer
@@ -640,10 +642,6 @@ private external fun _nMakeTurbulence(
     seed: Float,
     tiles: IntArray?
 ): NativePointer
-
-
-@ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeEmpty")
-private external fun Shader_nMakeEmpty(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeColor")
 private external fun _nMakeColor(color: Int): NativePointer

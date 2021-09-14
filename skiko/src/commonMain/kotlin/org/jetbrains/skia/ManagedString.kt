@@ -56,12 +56,11 @@ class ManagedString internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
     }
 }
 
+@ExternalSymbolName("org_jetbrains_skia_ManagedString__1nGetFinalizer")
+private external fun ManagedString_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ManagedString__1nMake")
 private external fun _nMake(s: String?): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_ManagedString__1nGetFinalizer")
-private external fun ManagedString_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ManagedString__1nToString")
 private external fun _nToString(ptr: NativePointer): String

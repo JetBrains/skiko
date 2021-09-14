@@ -9,7 +9,7 @@ static void unrefTextLine(TextLine* ptr) {
     ptr->unref();
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TextLineKt__1nGetFinalizer
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TextLineKt_TextLine_1nGetFinalizer
   (JNIEnv* env, jclass jclass) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&unrefTextLine));
 }
@@ -44,13 +44,13 @@ extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_TextLineKt__1nGetLea
     return instance->fLeading;
 }
 
-extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_TextLineKt__1nGetWidth
+extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_TextLineKt_TextLine_1nGetWidth
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
     return instance->fWidth;
 }
 
-extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_TextLineKt__1nGetHeight
+extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_TextLineKt_TextLine_1nGetHeight
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
     return -instance->fAscent + instance->fDescent + instance->fLeading;
@@ -65,7 +65,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TextLineKt__1nGetText
     return reinterpret_cast<jlong>(instance->fBlob.get());
 }
 
-extern "C" JNIEXPORT jshortArray JNICALL Java_org_jetbrains_skia_TextLineKt__1nGetGlyphs
+extern "C" JNIEXPORT jshortArray JNICALL Java_org_jetbrains_skia_TextLineKt_TextLine_1nGetGlyphs
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
     std::vector<jshort> glyphs(instance->fGlyphCount);
@@ -78,7 +78,7 @@ extern "C" JNIEXPORT jshortArray JNICALL Java_org_jetbrains_skia_TextLineKt__1nG
     return javaShortArray(env, glyphs);
 }
 
-extern "C" JNIEXPORT jfloatArray JNICALL Java_org_jetbrains_skia_TextLineKt__1nGetPositions
+extern "C" JNIEXPORT jfloatArray JNICALL Java_org_jetbrains_skia_TextLineKt_TextLine_1nGetPositions
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
     std::vector<jfloat> positions(2 * instance->fGlyphCount);

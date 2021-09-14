@@ -245,7 +245,7 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
         get() = BufferUtil.getByteBufferFromPointer(addr, computeByteSize())
 
     private object _FinalizerHolder {
-        val PTR = PixMap_nGetFinalizer()
+        val PTR = Pixmap_nGetFinalizer()
     }
 
     companion object {
@@ -272,7 +272,7 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
 
 
 @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nGetFinalizer")
-private external fun PixMap_nGetFinalizer(): NativePointer
+private external fun Pixmap_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nReset")
 private external fun Pixmap_nReset(ptr: NativePointer)

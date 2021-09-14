@@ -7,7 +7,7 @@ static void deleteData(SkData* data) {
     data->unref();
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DataKt__1nGetFinalizer(JNIEnv* env, jclass jclass) {
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DataKt_Data_1nGetFinalizer(JNIEnv* env, jclass jclass) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteData));
 }
 

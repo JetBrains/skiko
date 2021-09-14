@@ -6,11 +6,11 @@ static void deletePathMeasure(SkPathMeasure* instance) {
     delete instance;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathMeasureKt__1nGetFinalizer(JNIEnv* env, jclass jclass) {
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathMeasureKt_PathMeasure_1nGetFinalizer(JNIEnv* env, jclass jclass) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deletePathMeasure));
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathMeasureKt__1nMake
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathMeasureKt_PathMeasure_1nMake
   (JNIEnv* env, jclass jclass) {
     return reinterpret_cast<jlong>(new SkPathMeasure());
 }

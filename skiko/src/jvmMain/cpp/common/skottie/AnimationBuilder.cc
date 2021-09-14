@@ -10,12 +10,12 @@ static void deleteAnimationBuilder(Animation::Builder* builder) {
     delete builder;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_skottie_AnimationBuilderKt__1nGetFinalizer
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_skottie_AnimationBuilderKt_AnimationBuilder_1nGetFinalizer
   (JNIEnv* env, jclass jclass) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteAnimationBuilder));
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_skottie_AnimationBuilderKt__1nMake
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_skottie_AnimationBuilderKt_AnimationBuilder_1nMake
   (JNIEnv* env, jclass jclass, jint flags) {
     return reinterpret_cast<jlong>(new Animation::Builder(flags));
 }

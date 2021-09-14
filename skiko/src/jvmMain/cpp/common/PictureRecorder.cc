@@ -9,13 +9,13 @@ static void deletePictureRecorder(SkPictureRecorder* pr) {
     delete pr;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PictureRecorderKt__1nMake
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PictureRecorderKt_PictureRecorder_1nMake
   (JNIEnv* env, jclass jclass) {
     SkPictureRecorder* instance = new SkPictureRecorder();
     return reinterpret_cast<jlong>(instance);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PictureRecorderKt__1nGetFinalizer
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PictureRecorderKt_PictureRecorder_1nGetFinalizer
   (JNIEnv* env, jclass jclass) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deletePictureRecorder));
 }

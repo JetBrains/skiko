@@ -8,12 +8,12 @@ static void deleteRegion(SkRegion* region) {
     delete region;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_RegionKt__1nMake(JNIEnv* env, jclass jclass) {
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_RegionKt_Region_1nMake(JNIEnv* env, jclass jclass) {
     SkRegion* obj = new SkRegion();
     return reinterpret_cast<jlong>(obj);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_RegionKt__1nGetFinalizer(JNIEnv* env, jclass jclass) {
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_RegionKt_Region_1nGetFinalizer(JNIEnv* env, jclass jclass) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteRegion));
 }
 
@@ -23,12 +23,12 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_RegionKt__1nSet(JN
     return instance->set(*other);
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_RegionKt__1nIsEmpty(JNIEnv* env, jclass jclass, jlong ptr) {
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_RegionKt_Region_1nIsEmpty(JNIEnv* env, jclass jclass, jlong ptr) {
     SkRegion* instance = reinterpret_cast<SkRegion*>(static_cast<uintptr_t>(ptr));
     return instance->isEmpty();
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_RegionKt__1nIsRect(JNIEnv* env, jclass jclass, jlong ptr) {
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_RegionKt_Region_1nIsRect(JNIEnv* env, jclass jclass, jlong ptr) {
     SkRegion* instance = reinterpret_cast<SkRegion*>(static_cast<uintptr_t>(ptr));
     return instance->isRect();
 }
@@ -38,7 +38,7 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_RegionKt__1nIsComp
     return instance->isComplex();
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_RegionKt__1nGetBounds(JNIEnv* env, jclass jclass, jlong ptr) {
+extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_RegionKt_Region_1nGetBounds(JNIEnv* env, jclass jclass, jlong ptr) {
     SkRegion* instance = reinterpret_cast<SkRegion*>(static_cast<uintptr_t>(ptr));
     return skija::IRect::fromSkIRect(env, instance->getBounds());
 }

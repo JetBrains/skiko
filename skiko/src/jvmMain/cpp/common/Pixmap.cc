@@ -7,7 +7,7 @@ static void deletePixmap(SkPixmap *pixmap) {
 }
 
 extern "C" {
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PixmapKt__1nGetFinalizer
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PixmapKt_Pixmap_1nGetFinalizer
       (JNIEnv *env, jclass klass) {
         return ptrToJlong(&deletePixmap);
     }
@@ -30,7 +30,7 @@ extern "C" {
             imageInfo, jlongToPtr<void*>(pixelsPtr), rowBytes));
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skia_PixmapKt__1nReset
+    JNIEXPORT void JNICALL Java_org_jetbrains_skia_PixmapKt_Pixmap_1nReset
       (JNIEnv *env, jclass klass, jlong ptr) {
         SkPixmap* pixmap = jlongToPtr<SkPixmap*>(ptr);
         pixmap->reset();
@@ -56,7 +56,7 @@ extern "C" {
         pixmap->setColorSpace(sk_ref_sp<SkColorSpace>(colorSpace));
     }
 
-    JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PixmapKt__1nExtractSubset
+    JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PixmapKt_Pixmap_1nExtractSubset
       (JNIEnv *env, jclass klass, jlong ptr,
       jlong subsetPtr, jint l, jint t, jint w, jint h) {
         SkPixmap* pixmap = jlongToPtr<SkPixmap*>(ptr);
@@ -71,7 +71,7 @@ extern "C" {
         return skija::ImageInfo::toJava(env, imageInfo);
     }
 
-    JNIEXPORT jint JNICALL Java_org_jetbrains_skia_PixmapKt__1nGetRowBytes
+    JNIEXPORT jint JNICALL Java_org_jetbrains_skia_PixmapKt_Pixmap_1nGetRowBytes
       (JNIEnv *env, jclass klass, jlong ptr) {
         SkPixmap* pixmap = jlongToPtr<SkPixmap*>(ptr);
         return static_cast<jint>(pixmap->rowBytes());
@@ -83,25 +83,25 @@ extern "C" {
         return ptrToJlong(pixmap->addr());
     }
 
-    JNIEXPORT jint JNICALL Java_org_jetbrains_skia_PixmapKt__1nGetRowBytesAsPixels
+    JNIEXPORT jint JNICALL Java_org_jetbrains_skia_PixmapKt_Pixmap_1nGetRowBytesAsPixels
       (JNIEnv *env, jclass klass, jlong ptr) {
         SkPixmap* pixmap = jlongToPtr<SkPixmap*>(ptr);
         return static_cast<jint>(pixmap->rowBytesAsPixels());
     }
 
-    JNIEXPORT jint JNICALL Java_org_jetbrains_skia_PixmapKt__1nComputeByteSize
+    JNIEXPORT jint JNICALL Java_org_jetbrains_skia_PixmapKt_Pixmap_1nComputeByteSize
       (JNIEnv *env, jclass klass, jlong ptr) {
         SkPixmap* pixmap = jlongToPtr<SkPixmap*>(ptr);
         return static_cast<jint>(pixmap->computeByteSize());
     }
 
-    JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PixmapKt__1nComputeIsOpaque
+    JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PixmapKt_Pixmap_1nComputeIsOpaque
       (JNIEnv *env, jclass klass, jlong ptr) {
         SkPixmap* pixmap = jlongToPtr<SkPixmap*>(ptr);
         return static_cast<jboolean>(pixmap->computeIsOpaque());
     }
 
-    JNIEXPORT jint JNICALL Java_org_jetbrains_skia_PixmapKt__1nGetColor
+    JNIEXPORT jint JNICALL Java_org_jetbrains_skia_PixmapKt_Pixmap_1nGetColor
       (JNIEnv *env, jclass klass, jlong ptr, jint x, jint y) {
         SkPixmap* pixmap = jlongToPtr<SkPixmap*>(ptr);
         return static_cast<jint>(pixmap->getColor(x, y));

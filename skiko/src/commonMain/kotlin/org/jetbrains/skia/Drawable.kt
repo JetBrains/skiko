@@ -132,14 +132,14 @@ abstract class Drawable : RefCnt(Drawable_nMake()) {
 @ExternalSymbolName("org_jetbrains_skia_Drawable__1nMake")
 private external fun Drawable_nMake(): NativePointer
 
+@ExternalSymbolName("org_jetbrains_skia_Drawable__1nGetGenerationId")
+private external fun Drawable_nGetGenerationId(ptr: NativePointer): Int
+
 @ExternalSymbolName("org_jetbrains_skia_Drawable__1nDraw")
 private external fun _nDraw(ptr: NativePointer, canvasPtr: NativePointer, matrix: FloatArray?)
 
 @ExternalSymbolName("org_jetbrains_skia_Drawable__1nMakePictureSnapshot")
 private external fun _nMakePictureSnapshot(ptr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Drawable__1nGetGenerationId")
-private external fun Drawable_nGetGenerationId(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Drawable__1nNotifyDrawingChanged")
 private external fun _nNotifyDrawingChanged(ptr: NativePointer)

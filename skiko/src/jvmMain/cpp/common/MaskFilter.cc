@@ -27,7 +27,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_MaskFilterKt__1nMakeS
 //     return reinterpret_cast<jlong>(ptr);
 // }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_MaskFilterKt__1nMakeTable
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_MaskFilterKt_MaskFilter_1nMakeTable
   (JNIEnv* env, jclass jclass, jbyteArray tableArray) {
     jbyte* table = env->GetByteArrayElements(tableArray, 0);
     SkMaskFilter* ptr = SkTableMaskFilter::Create(reinterpret_cast<uint8_t*>(table));

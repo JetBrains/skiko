@@ -608,6 +608,15 @@ class Font : Managed {
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetFinalizer")
 private external fun Font_nGetFinalizer(): NativePointer
 
+@ExternalSymbolName("org_jetbrains_skia_Font__1nMakeClone")
+private external fun Font_nMakeClone(ptr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nEquals")
+private external fun Font_nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nGetSize")
+private external fun Font_nGetSize(ptr: NativePointer): Float
+
 @ExternalSymbolName("org_jetbrains_skia_Font__1nMakeDefault")
 private external fun _nMakeDefault(): NativePointer
 
@@ -619,12 +628,6 @@ private external fun _nMakeTypefaceSize(typefacePtr: NativePointer, size: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nMakeTypefaceSizeScaleSkew")
 private external fun _nMakeTypefaceSizeScaleSkew(typefacePtr: NativePointer, size: Float, scaleX: Float, skewX: Float): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Font__1nMakeClone")
-private external fun Font_nMakeClone(ptr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Font__1nEquals")
-private external fun Font_nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nIsAutoHintingForced")
 private external fun _nIsAutoHintingForced(ptr: NativePointer): Boolean
@@ -679,9 +682,6 @@ private external fun _nGetTypeface(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetTypefaceOrDefault")
 private external fun _nGetTypefaceOrDefault(ptr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Font__1nGetSize")
-private external fun Font_nGetSize(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetScaleX")
 private external fun _nGetScaleX(ptr: NativePointer): Float

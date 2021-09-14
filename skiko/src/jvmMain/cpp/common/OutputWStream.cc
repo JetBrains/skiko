@@ -44,7 +44,7 @@ static void deleteOutputWStream(OutputWStream* out) {
     delete out;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_OutputWStreamKt__1nGetFinalizer
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_OutputWStreamKt_OutputWStream_1nGetFinalizer
   (JNIEnv* env, jclass jclass) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteOutputWStream));
 }

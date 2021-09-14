@@ -13,7 +13,7 @@ static void deleteShaper(SkShaper* instance) {
     delete instance;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nGetFinalizer(JNIEnv* env, jclass jclass) {
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt_Shaper_1nGetFinalizer(JNIEnv* env, jclass jclass) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteShaper));
 }
 
@@ -49,7 +49,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nMa
     #endif
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nMake
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt_Shaper_1nMake
   (JNIEnv* env, jclass jclass, jlong fontMgrPtr) {
     SkFontMgr* fontMgr = reinterpret_cast<SkFontMgr*>(static_cast<uintptr_t>(fontMgrPtr));
     return reinterpret_cast<jlong>(SkShaper::Make(sk_ref_sp(fontMgr)).release());

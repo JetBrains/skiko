@@ -12,18 +12,18 @@ static void deleteStrutStyle(StrutStyle* instance) {
     delete instance;
 }
 
-extern "C" jlong org_jetbrains_skia_paragraph_StrutStyleKt__1nGetFinalizer
+extern "C" jlong org_jetbrains_skia_paragraph_StrutStyleKt_StrutStyle_1nGetFinalizer
   (kref __Kinstance) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteStrutStyle));
 }
 
-extern "C" jlong org_jetbrains_skia_paragraph_StrutStyleKt__1nMake
+extern "C" jlong org_jetbrains_skia_paragraph_StrutStyleKt_StrutStyle_1nMake
   (kref __Kinstance) {
     StrutStyle* instance = new StrutStyle();
     return reinterpret_cast<jlong>(instance);
 }
 
-extern "C" jboolean org_jetbrains_skia_paragraph_StrutStyleKt__1nEquals
+extern "C" jboolean org_jetbrains_skia_paragraph_StrutStyleKt_StrutStyle_1nEquals
   (kref __Kinstance, jlong ptr, jlong otherPtr) {
     StrutStyle* instance = reinterpret_cast<StrutStyle*>(static_cast<uintptr_t>(ptr));
     StrutStyle* other = reinterpret_cast<StrutStyle*>(static_cast<uintptr_t>(otherPtr));
@@ -102,13 +102,13 @@ extern "C" void org_jetbrains_skia_paragraph_StrutStyleKt__1nSetFontSize
     instance->setFontSize(size);
 }
 
-extern "C" jfloat org_jetbrains_skia_paragraph_StrutStyleKt__1nGetHeight
+extern "C" jfloat org_jetbrains_skia_paragraph_StrutStyleKt_StrutStyle_1nGetHeight
   (kref __Kinstance, jlong ptr) {
     StrutStyle* instance = reinterpret_cast<StrutStyle*>(static_cast<uintptr_t>(ptr));
     return instance->getHeight();
 }
 
-extern "C" void org_jetbrains_skia_paragraph_StrutStyleKt__1nSetHeight
+extern "C" void org_jetbrains_skia_paragraph_StrutStyleKt_StrutStyle_1nSetHeight
   (kref __Kinstance, jlong ptr, jfloat height) {
     StrutStyle* instance = reinterpret_cast<StrutStyle*>(static_cast<uintptr_t>(ptr));
     instance->setHeight(height);
@@ -132,7 +132,7 @@ extern "C" jboolean org_jetbrains_skia_paragraph_StrutStyleKt__1nIsEnabled
     return instance->getStrutEnabled();
 }
 
-extern "C" void org_jetbrains_skia_paragraph_StrutStyleKt__1nSetEnabled
+extern "C" void org_jetbrains_skia_paragraph_StrutStyleKt_StrutStyle_1nSetEnabled
   (kref __Kinstance, jlong ptr, jboolean value) {
     StrutStyle* instance = reinterpret_cast<StrutStyle*>(static_cast<uintptr_t>(ptr));
     instance->setStrutEnabled(value);

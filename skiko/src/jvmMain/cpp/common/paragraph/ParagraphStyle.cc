@@ -11,12 +11,12 @@ static void deleteParagraphStyle(ParagraphStyle* instance) {
     delete instance;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_ParagraphStyleKt__1nGetFinalizer
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_ParagraphStyleKt_ParagraphStyle_1nGetFinalizer
   (JNIEnv* env, jclass jclass) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteParagraphStyle));
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_ParagraphStyleKt__1nMake
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_ParagraphStyleKt_ParagraphStyle_1nMake
   (JNIEnv* env, jclass jclass) {
     ParagraphStyle* instance = new ParagraphStyle();
     return reinterpret_cast<jlong>(instance);
@@ -107,7 +107,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_ParagraphSty
     instance->setEllipsis(skString(env, ellipsis));
 }
 
-extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_paragraph_ParagraphStyleKt__1nGetHeight
+extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_paragraph_ParagraphStyleKt_ParagraphStyle_1nGetHeight
   (JNIEnv* env, jclass jclass, jlong ptr) {
     ParagraphStyle* instance = reinterpret_cast<ParagraphStyle*>(static_cast<uintptr_t>(ptr));
     return instance->getHeight();

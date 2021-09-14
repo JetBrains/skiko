@@ -5,7 +5,7 @@
 #include "SkPicture.h"
 #include "SkShader.h"
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PictureKt__1nMakeFromData
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PictureKt_Picture_1nMakeFromData
   (JNIEnv* env, jclass jclass, jlong dataPtr) {
     SkData* data = reinterpret_cast<SkData*>(static_cast<uintptr_t>(dataPtr));
     SkPicture* instance = SkPicture::MakeFromData(data).release();

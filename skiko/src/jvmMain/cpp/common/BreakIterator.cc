@@ -6,7 +6,7 @@ static void deleteBreakIterator(UBreakIterator* instance) {
   ubrk_close(instance);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nGetFinalizer(JNIEnv* env, jclass jclass) {
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BreakIteratorKt_BreakIterator_1nGetFinalizer(JNIEnv* env, jclass jclass) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteBreakIterator));
 }
 

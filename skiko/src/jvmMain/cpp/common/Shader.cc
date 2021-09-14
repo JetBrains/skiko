@@ -122,7 +122,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ShaderKt__1nMakeSweep
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ShaderKt__1nMakeEmpty(JNIEnv* env, jclass jclass) {
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ShaderKt_Shader_1nMakeEmpty(JNIEnv* env, jclass jclass) {
     SkShader* ptr = SkShaders::Empty().release();
     return reinterpret_cast<jlong>(ptr);
 }

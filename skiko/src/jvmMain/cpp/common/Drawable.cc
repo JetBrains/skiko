@@ -38,7 +38,7 @@ private:
     jobject fObject;
 };
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DrawableKt__1nMake
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DrawableKt_Drawable_1nMake
   (JNIEnv* env, jclass jclass) {
     SkijaDrawableImpl* instance = new SkijaDrawableImpl();
     return reinterpret_cast<jlong>(instance);
@@ -64,7 +64,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DrawableKt__1nMakePic
     return reinterpret_cast<jlong>(instance->newPictureSnapshot());
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_DrawableKt__1nGetGenerationId
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_DrawableKt_Drawable_1nGetGenerationId
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkijaDrawableImpl* instance = reinterpret_cast<SkijaDrawableImpl*>(static_cast<uintptr_t>(ptr));
     return instance->getGenerationID();

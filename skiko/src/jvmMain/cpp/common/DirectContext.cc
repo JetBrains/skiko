@@ -39,7 +39,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DirectContextKt__1nMa
 }
 #endif //SK_DIRECT3D 
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_DirectContextKt__1nFlush
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_DirectContextKt_DirectContext_1nFlush
   (JNIEnv* env, jclass jclass, jlong ptr) {
     GrDirectContext* context = reinterpret_cast<GrDirectContext*>(static_cast<uintptr_t>(ptr));
     context->flush(GrFlushInfo());

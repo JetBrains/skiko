@@ -366,6 +366,14 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
     }
 }
 
+@ExternalSymbolName("org_jetbrains_skia_Image__1nGetImageInfo")
+private external fun Image_nGetImageInfo(ptr: NativePointer): ImageInfo?
+
+@ExternalSymbolName("org_jetbrains_skia_Image__1nMakeShader")
+private external fun Image_nMakeShader(ptr: NativePointer, tmx: Int, tmy: Int, samplingMode: Long, localMatrix: FloatArray?): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Image__1nPeekPixels")
+private external fun Image_nPeekPixels(ptr: NativePointer): ByteBuffer?
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeRaster")
 private external fun _nMakeRaster(
@@ -400,17 +408,8 @@ private external fun _nMakeFromPixmap(pixmapPtr: NativePointer): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeFromEncoded")
 private external fun _nMakeFromEncoded(bytes: ByteArray?): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_Image__1nGetImageInfo")
-private external fun Image_nGetImageInfo(ptr: NativePointer): ImageInfo?
-
 @ExternalSymbolName("org_jetbrains_skia_Image__1nEncodeToData")
 private external fun _nEncodeToData(ptr: NativePointer, format: Int, quality: Int): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Image__1nMakeShader")
-private external fun Image_nMakeShader(ptr: NativePointer, tmx: Int, tmy: Int, samplingMode: Long, localMatrix: FloatArray?): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Image__1nPeekPixels")
-private external fun Image_nPeekPixels(ptr: NativePointer): ByteBuffer?
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nPeekPixelsToPixmap")
 private external fun _nPeekPixelsToPixmap(ptr: NativePointer, pixmapPtr: NativePointer): Boolean

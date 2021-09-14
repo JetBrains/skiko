@@ -4,7 +4,7 @@
 #include "SkTypeface.h"
 #include "SkFontMgr.h"
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontStyleSetKt__1nMakeEmpty
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontStyleSetKt_FontStyleSet_1nMakeEmpty
   (JNIEnv* env, jclass jclass) {
     SkFontStyleSet* instance = SkFontStyleSet::CreateEmpty();
     return reinterpret_cast<jlong>(instance);

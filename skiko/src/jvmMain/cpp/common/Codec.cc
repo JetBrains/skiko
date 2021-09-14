@@ -9,7 +9,7 @@ static void deleteCodec(SkCodec* instance) {
     delete instance;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_CodecKt__1nGetFinalizer(JNIEnv* env, jclass jclass) {
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_CodecKt_Codec_1nGetFinalizer(JNIEnv* env, jclass jclass) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteCodec));
 }
 
@@ -20,7 +20,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_CodecKt__1nMakeFromDa
     return reinterpret_cast<jlong>(instance.release());
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_CodecKt__1nGetImageInfo
+extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_CodecKt_Codec_1nGetImageInfo
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkCodec* instance = reinterpret_cast<SkCodec*>(static_cast<uintptr_t>(ptr));
     return skija::ImageInfo::toJava(env, instance->getInfo());
@@ -44,7 +44,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_CodecKt__1nGetEncoded
     return static_cast<jint>(instance->getEncodedFormat());
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CodecKt__1nReadPixels
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CodecKt_Codec_1nReadPixels
   (JNIEnv* env, jclass jclass, jlong ptr, jlong bitmapPtr, jint frame, jint priorFrame) {
     SkCodec* instance = reinterpret_cast<SkCodec*>(static_cast<uintptr_t>(ptr));
     SkBitmap* bitmap = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(bitmapPtr));

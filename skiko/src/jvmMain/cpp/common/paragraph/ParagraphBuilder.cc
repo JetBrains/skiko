@@ -19,7 +19,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_ParagraphBu
     return reinterpret_cast<jlong>(instance);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_ParagraphBuilderKt__1nGetFinalizer
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_ParagraphBuilderKt_ParagraphBuilder_1nGetFinalizer
   (JNIEnv* env, jclass jclass) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteParagraphBuilder));
 }

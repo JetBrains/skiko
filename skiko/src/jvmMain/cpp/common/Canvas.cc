@@ -12,7 +12,7 @@ static void deleteCanvas(SkCanvas* canvas) {
     delete canvas;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_CanvasKt__1nGetFinalizer(JNIEnv* env, jclass jclass) {
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_CanvasKt_Canvas_1nGetFinalizer(JNIEnv* env, jclass jclass) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteCanvas));
 }
 

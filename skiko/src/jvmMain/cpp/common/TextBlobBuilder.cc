@@ -7,12 +7,12 @@ static void deleteTextBlobBuilder(SkTextBlobBuilder* ptr) {
     delete ptr;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TextBlobBuilderKt__1nGetFinalizer
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TextBlobBuilderKt_TextBlobBuilder_1nGetFinalizer
   (JNIEnv* env, jclass jclass) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteTextBlobBuilder));
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TextBlobBuilderKt__1nMake
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TextBlobBuilderKt_TextBlobBuilder_1nMake
   (JNIEnv* env, jclass jclass) {
     return reinterpret_cast<jlong>(new SkTextBlobBuilder());
 }

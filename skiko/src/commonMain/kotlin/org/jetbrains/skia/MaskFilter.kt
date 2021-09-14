@@ -45,14 +45,14 @@ class MaskFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     }
 }
 
+@ExternalSymbolName("org_jetbrains_skia_MaskFilter__1nMakeTable")
+private external fun MaskFilter_nMakeTable(table: ByteArray?): NativePointer
+
 @ExternalSymbolName("org_jetbrains_skia_MaskFilter__1nMakeBlur")
 private external fun _nMakeBlur(mode: Int, sigma: Float, respectCTM: Boolean): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_MaskFilter__1nMakeShader")
 private external fun _nMakeShader(shaderPtr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_MaskFilter__1nMakeTable")
-private external fun MaskFilter_nMakeTable(table: ByteArray?): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_MaskFilter__1nMakeGamma")
 private external fun _nMakeGamma(gamma: Float): NativePointer

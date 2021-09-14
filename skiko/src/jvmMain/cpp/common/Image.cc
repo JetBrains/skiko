@@ -57,7 +57,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nMakeFromEn
     return reinterpret_cast<jlong>(image.release());
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_ImageKt__1nGetImageInfo
+extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_ImageKt_Image_1nGetImageInfo
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkImage* instance = reinterpret_cast<SkImage*>(static_cast<uintptr_t>(ptr));
     return skija::ImageInfo::toJava(env, instance->imageInfo());
@@ -70,7 +70,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nEncodeToDa
     return reinterpret_cast<jlong>(data);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nMakeShader
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt_Image_1nMakeShader
   (JNIEnv* env, jclass jclass, jlong ptr, jint tmx, jint tmy, jlong sampling, jfloatArray localMatrixArr) {
     SkImage* instance = reinterpret_cast<SkImage*>(static_cast<uintptr_t>(ptr));
     std::unique_ptr<SkMatrix> localMatrix = skMatrix(env, localMatrixArr);
@@ -78,7 +78,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nMakeShader
     return reinterpret_cast<jlong>(shader.release());
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_ImageKt__1nPeekPixels
+extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_ImageKt_Image_1nPeekPixels
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkImage* instance = reinterpret_cast<SkImage*>(static_cast<uintptr_t>(ptr));
     SkPixmap pixmap;

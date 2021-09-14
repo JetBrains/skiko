@@ -14,12 +14,12 @@ static void deletePathSegmentIterator(SkPath::Iter* iter) {
     delete iter;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathSegmentIteratorKt__1nGetFinalizer
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathSegmentIteratorKt_PathSegmentIterator_1nGetFinalizer
   (JNIEnv* env, jclass jclass) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deletePathSegmentIterator));
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_PathSegmentIteratorKt__1nNext
+extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_PathSegmentIteratorKt_PathSegmentIterator_1nNext
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkPath::Iter* instance = reinterpret_cast<SkPath::Iter*>(static_cast<uintptr_t>(ptr));
     SkPoint pts[4];

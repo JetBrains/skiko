@@ -13,33 +13,33 @@ static void deletePaint(SkPaint* paint) {
     delete paint;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PaintKt__1nGetFinalizer
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PaintKt_Paint_1nGetFinalizer
   (JNIEnv* env, jclass jclass) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deletePaint));
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PaintKt__1nMake
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PaintKt_Paint_1nMake
   (JNIEnv* env, jclass jclass) {
     SkPaint* obj = new SkPaint();
     obj->setAntiAlias(true);
     return reinterpret_cast<jlong>(obj);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PaintKt__1nMakeClone
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PaintKt_Paint_1nMakeClone
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkPaint* instance = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(ptr));
     SkPaint* obj = new SkPaint(*instance);
     return reinterpret_cast<jlong>(obj);
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PaintKt__1nEquals
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PaintKt_Paint_1nEquals
   (JNIEnv* env, jclass jclass, jlong aPtr, jlong bPtr) {
     SkPaint* a = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(aPtr));
     SkPaint* b = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(bPtr));
     return *a == *b;
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PaintKt__1nReset
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PaintKt_Paint_1nReset
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkPaint* instance = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(ptr));
     instance->reset();
