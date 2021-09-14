@@ -8,7 +8,7 @@ using namespace std;
 using namespace skia::textlayout;
 #include "common.h"
 
-extern "C" jlong org_jetbrains_skia_paragraph_TextStyleKt_TextStyle_1nMake
+extern "C" jlong org_jetbrains_skia_paragraph_TextStyle__1nMake
   (kref __Kinstance) {
     TextStyle* instance = new TextStyle();
     return reinterpret_cast<jlong>(instance);
@@ -18,19 +18,19 @@ static void deleteTextStyle(TextStyle* instance) {
     delete instance;
 }
 
-extern "C" jlong org_jetbrains_skia_paragraph_TextStyleKt_TextStyle_1nGetFinalizer
+extern "C" jlong org_jetbrains_skia_paragraph_TextStyle__1nGetFinalizer
   (kref __Kinstance) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteTextStyle));
 }
 
-extern "C" jboolean org_jetbrains_skia_paragraph_TextStyleKt_TextStyle_1nEquals
+extern "C" jboolean org_jetbrains_skia_paragraph_TextStyle__1nEquals
   (kref __Kinstance, jlong ptr, jlong otherPtr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     TextStyle* other = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(otherPtr));
     return instance->equals(*other);
 }
 
-extern "C" jboolean org_jetbrains_skia_paragraph_TextStyleKt__1nAttributeEquals
+extern "C" jboolean org_jetbrains_skia_paragraph_TextStyle__1nAttributeEquals
   (kref __Kinstance, jlong ptr, jint attribute, jlong otherPtr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     TextStyle* other = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(otherPtr));
@@ -40,25 +40,25 @@ extern "C" jboolean org_jetbrains_skia_paragraph_TextStyleKt__1nAttributeEquals
         return instance->matchOneAttribute(static_cast<StyleType>(attribute), *other);
 }
 
-extern "C" jint org_jetbrains_skia_paragraph_TextStyleKt__1nGetColor
+extern "C" jint org_jetbrains_skia_paragraph_TextStyle__1nGetColor
   (kref __Kinstance, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     return instance->getColor();
 }
 
-extern "C" void org_jetbrains_skia_paragraph_TextStyleKt__1nSetColor
+extern "C" void org_jetbrains_skia_paragraph_TextStyle__1nSetColor
   (kref __Kinstance, jlong ptr, jint color) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     instance->setColor(color);
 }
 
-extern "C" jlong org_jetbrains_skia_paragraph_TextStyleKt__1nGetForeground
+extern "C" jlong org_jetbrains_skia_paragraph_TextStyle__1nGetForeground
   (kref __Kinstance, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     return instance->hasForeground() ? reinterpret_cast<jlong>(new SkPaint(instance->getForeground())) : 0;
 }
 
-extern "C" void org_jetbrains_skia_paragraph_TextStyleKt__1nSetForeground
+extern "C" void org_jetbrains_skia_paragraph_TextStyle__1nSetForeground
   (kref __Kinstance, jlong ptr, jlong paintPtr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     if (paintPtr == 0)
@@ -69,13 +69,13 @@ extern "C" void org_jetbrains_skia_paragraph_TextStyleKt__1nSetForeground
     }
 }
 
-extern "C" jlong org_jetbrains_skia_paragraph_TextStyleKt__1nGetBackground
+extern "C" jlong org_jetbrains_skia_paragraph_TextStyle__1nGetBackground
   (kref __Kinstance, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     return instance->hasBackground() ? reinterpret_cast<jlong>(new SkPaint(instance->getBackground())) : 0;
 }
 
-extern "C" void org_jetbrains_skia_paragraph_TextStyleKt__1nSetBackground
+extern "C" void org_jetbrains_skia_paragraph_TextStyle__1nSetBackground
   (kref __Kinstance, jlong ptr, jlong paintPtr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     if (paintPtr == 0)
@@ -87,13 +87,13 @@ extern "C" void org_jetbrains_skia_paragraph_TextStyleKt__1nSetBackground
 }
 
 
-extern "C" jobject org_jetbrains_skia_paragraph_TextStyleKt__1nGetDecorationStyle
+extern "C" jobject org_jetbrains_skia_paragraph_TextStyle__1nGetDecorationStyle
   (kref __Kinstance, jlong ptr) {
-    TODO("implement org_jetbrains_skia_paragraph_TextStyleKt__1nGetDecorationStyle");
+    TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nGetDecorationStyle");
 }
      
 #if 0 
-extern "C" jobject org_jetbrains_skia_paragraph_TextStyleKt__1nGetDecorationStyle
+extern "C" jobject org_jetbrains_skia_paragraph_TextStyle__1nGetDecorationStyle
   (kref __Kinstance, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     Decoration d = instance->getDecoration();
@@ -109,7 +109,7 @@ extern "C" jobject org_jetbrains_skia_paragraph_TextStyleKt__1nGetDecorationStyl
 #endif
 
 
-extern "C" void org_jetbrains_skia_paragraph_TextStyleKt__1nSetDecorationStyle
+extern "C" void org_jetbrains_skia_paragraph_TextStyle__1nSetDecorationStyle
   (kref __Kinstance, jlong ptr, jboolean underline, jboolean overline, jboolean lineThrough, jboolean gaps, jint color, jint style, jfloat thicknessMultiplier) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     int typeMask = 0;
@@ -124,13 +124,13 @@ extern "C" void org_jetbrains_skia_paragraph_TextStyleKt__1nSetDecorationStyle
 }
 
 
-extern "C" jint org_jetbrains_skia_paragraph_TextStyleKt_TextStyle_1nGetFontStyle
+extern "C" jint org_jetbrains_skia_paragraph_TextStyle__1nGetFontStyle
   (kref __Kinstance, jlong ptr) {
-    TODO("implement org_jetbrains_skia_paragraph_TextStyleKt__1nGetFontStyle");
+    TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nGetFontStyle");
 }
      
 #if 0 
-extern "C" jint org_jetbrains_skia_paragraph_TextStyleKt__1nGetFontStyle
+extern "C" jint org_jetbrains_skia_paragraph_TextStyle__1nGetFontStyle
   (kref __Kinstance, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     return skija::FontStyle::toJava(instance->getFontStyle());
@@ -139,13 +139,13 @@ extern "C" jint org_jetbrains_skia_paragraph_TextStyleKt__1nGetFontStyle
 
 
 
-extern "C" void org_jetbrains_skia_paragraph_TextStyleKt_TextStyle_1nSetFontStyle
+extern "C" void org_jetbrains_skia_paragraph_TextStyle__1nSetFontStyle
   (kref __Kinstance, jlong ptr, jint fontStyleValue) {
-    TODO("implement org_jetbrains_skia_paragraph_TextStyleKt__1nSetFontStyle");
+    TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nSetFontStyle");
 }
      
 #if 0 
-extern "C" void org_jetbrains_skia_paragraph_TextStyleKt__1nSetFontStyle
+extern "C" void org_jetbrains_skia_paragraph_TextStyle__1nSetFontStyle
   (kref __Kinstance, jlong ptr, jint fontStyleValue) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     instance->setFontStyle(skija::FontStyle::fromJava(fontStyleValue));
@@ -154,13 +154,13 @@ extern "C" void org_jetbrains_skia_paragraph_TextStyleKt__1nSetFontStyle
 
 
 
-extern "C" jobjectArray org_jetbrains_skia_paragraph_TextStyleKt__1nGetShadows
+extern "C" jobjectArray org_jetbrains_skia_paragraph_TextStyle__1nGetShadows
   (kref __Kinstance, jlong ptr) {
-    TODO("implement org_jetbrains_skia_paragraph_TextStyleKt__1nGetShadows");
+    TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nGetShadows");
 }
      
 #if 0 
-extern "C" jobjectArray org_jetbrains_skia_paragraph_TextStyleKt__1nGetShadows
+extern "C" jobjectArray org_jetbrains_skia_paragraph_TextStyle__1nGetShadows
   (kref __Kinstance, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     std::vector<TextShadow> shadows = instance->getShadows();
@@ -175,26 +175,26 @@ extern "C" jobjectArray org_jetbrains_skia_paragraph_TextStyleKt__1nGetShadows
 #endif
 
 
-extern "C" void org_jetbrains_skia_paragraph_TextStyleKt__1nAddShadow
+extern "C" void org_jetbrains_skia_paragraph_TextStyle__1nAddShadow
   (kref __Kinstance, jlong ptr, jint color, jfloat offsetX, jfloat offsetY, jdouble blurSigma) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     instance->addShadow({static_cast<SkColor>(color), {offsetX, offsetY}, blurSigma});
 }
 
-extern "C" void org_jetbrains_skia_paragraph_TextStyleKt__1nClearShadows
+extern "C" void org_jetbrains_skia_paragraph_TextStyle__1nClearShadows
   (kref __Kinstance, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     instance->resetShadows();
 }
 
 
-extern "C" jobjectArray org_jetbrains_skia_paragraph_TextStyleKt__1nGetFontFeatures
+extern "C" jobjectArray org_jetbrains_skia_paragraph_TextStyle__1nGetFontFeatures
   (kref __Kinstance, jlong ptr) {
-    TODO("implement org_jetbrains_skia_paragraph_TextStyleKt__1nGetFontFeatures");
+    TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nGetFontFeatures");
 }
      
 #if 0 
-extern "C" jobjectArray org_jetbrains_skia_paragraph_TextStyleKt__1nGetFontFeatures
+extern "C" jobjectArray org_jetbrains_skia_paragraph_TextStyle__1nGetFontFeatures
   (kref __Kinstance, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     std::vector<FontFeature> fontFeatures = instance->getFontFeatures();
@@ -211,13 +211,13 @@ extern "C" jobjectArray org_jetbrains_skia_paragraph_TextStyleKt__1nGetFontFeatu
 
 
 
-extern "C" void org_jetbrains_skia_paragraph_TextStyleKt__1nAddFontFeature
+extern "C" void org_jetbrains_skia_paragraph_TextStyle__1nAddFontFeature
   (kref __Kinstance, jlong ptr, jstring nameStr, jint value) {
-    TODO("implement org_jetbrains_skia_paragraph_TextStyleKt__1nAddFontFeature");
+    TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nAddFontFeature");
 }
      
 #if 0 
-extern "C" void org_jetbrains_skia_paragraph_TextStyleKt__1nAddFontFeature
+extern "C" void org_jetbrains_skia_paragraph_TextStyle__1nAddFontFeature
   (kref __Kinstance, jlong ptr, jstring nameStr, jint value) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     instance->addFontFeature(skString(env, nameStr), value);
@@ -225,32 +225,32 @@ extern "C" void org_jetbrains_skia_paragraph_TextStyleKt__1nAddFontFeature
 #endif
 
 
-extern "C" void org_jetbrains_skia_paragraph_TextStyleKt__1nClearFontFeatures
+extern "C" void org_jetbrains_skia_paragraph_TextStyle__1nClearFontFeatures
   (kref __Kinstance, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     instance->resetFontFeatures();
 }
 
-extern "C" jfloat org_jetbrains_skia_paragraph_TextStyleKt_TextStyle_1nGetFontSize
+extern "C" jfloat org_jetbrains_skia_paragraph_TextStyle__1nGetFontSize
   (kref __Kinstance, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     return instance->getFontSize();
 }
 
-extern "C" void org_jetbrains_skia_paragraph_TextStyleKt_TextStyle_1nSetFontSize
+extern "C" void org_jetbrains_skia_paragraph_TextStyle__1nSetFontSize
   (kref __Kinstance, jlong ptr, jfloat size) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     instance->setFontSize(size);
 }
 
 
-extern "C" jobjectArray org_jetbrains_skia_paragraph_TextStyleKt_TextStyle_1nGetFontFamilies
+extern "C" jobjectArray org_jetbrains_skia_paragraph_TextStyle__1nGetFontFamilies
   (kref __Kinstance, jlong ptr) {
-    TODO("implement org_jetbrains_skia_paragraph_TextStyleKt__1nGetFontFamilies");
+    TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nGetFontFamilies");
 }
      
 #if 0 
-extern "C" jobjectArray org_jetbrains_skia_paragraph_TextStyleKt__1nGetFontFamilies
+extern "C" jobjectArray org_jetbrains_skia_paragraph_TextStyle__1nGetFontFamilies
   (kref __Kinstance, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     return javaStringArray(env, instance->getFontFamilies());
@@ -259,13 +259,13 @@ extern "C" jobjectArray org_jetbrains_skia_paragraph_TextStyleKt__1nGetFontFamil
 
 
 
-extern "C" void org_jetbrains_skia_paragraph_TextStyleKt__1nSetFontFamilies
+extern "C" void org_jetbrains_skia_paragraph_TextStyle__1nSetFontFamilies
   (kref __Kinstance, jlong ptr, jobjectArray familiesArray) {
-    TODO("implement org_jetbrains_skia_paragraph_TextStyleKt__1nSetFontFamilies");
+    TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nSetFontFamilies");
 }
      
 #if 0 
-extern "C" void org_jetbrains_skia_paragraph_TextStyleKt__1nSetFontFamilies
+extern "C" void org_jetbrains_skia_paragraph_TextStyle__1nSetFontFamilies
   (kref __Kinstance, jlong ptr, jobjectArray familiesArray) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     instance->setFontFamilies(skStringVector(env, familiesArray));
@@ -274,13 +274,13 @@ extern "C" void org_jetbrains_skia_paragraph_TextStyleKt__1nSetFontFamilies
 
 
 
-extern "C" jobject org_jetbrains_skia_paragraph_TextStyleKt_TextStyle_1nGetHeight
+extern "C" jobject org_jetbrains_skia_paragraph_TextStyle__1nGetHeight
   (kref __Kinstance, jlong ptr) {
-    TODO("implement org_jetbrains_skia_paragraph_TextStyleKt__1nGetHeight");
+    TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nGetHeight");
 }
      
 #if 0 
-extern "C" jobject org_jetbrains_skia_paragraph_TextStyleKt__1nGetHeight
+extern "C" jobject org_jetbrains_skia_paragraph_TextStyle__1nGetHeight
   (kref __Kinstance, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     return instance->getHeightOverride() ? javaFloat(env, instance->getHeight()) : nullptr;
@@ -288,44 +288,44 @@ extern "C" jobject org_jetbrains_skia_paragraph_TextStyleKt__1nGetHeight
 #endif
 
 
-extern "C" void org_jetbrains_skia_paragraph_TextStyleKt_TextStyle_1nSetHeight
+extern "C" void org_jetbrains_skia_paragraph_TextStyle__1nSetHeight
   (kref __Kinstance, jlong ptr, jboolean override, jfloat height) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     instance->setHeightOverride(override);
     instance->setHeight(height);
 }
 
-extern "C" jfloat org_jetbrains_skia_paragraph_TextStyleKt__1nGetLetterSpacing
+extern "C" jfloat org_jetbrains_skia_paragraph_TextStyle__1nGetLetterSpacing
   (kref __Kinstance, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     return instance->getLetterSpacing();
 }
 
-extern "C" void org_jetbrains_skia_paragraph_TextStyleKt__1nSetLetterSpacing
+extern "C" void org_jetbrains_skia_paragraph_TextStyle__1nSetLetterSpacing
   (kref __Kinstance, jlong ptr, jfloat letterSpacing) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     instance->setLetterSpacing(letterSpacing);
 }
 
-extern "C" jfloat org_jetbrains_skia_paragraph_TextStyleKt__1nGetWordSpacing
+extern "C" jfloat org_jetbrains_skia_paragraph_TextStyle__1nGetWordSpacing
   (kref __Kinstance, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     return instance->getWordSpacing();
 }
 
-extern "C" void org_jetbrains_skia_paragraph_TextStyleKt__1nSetWordSpacing
+extern "C" void org_jetbrains_skia_paragraph_TextStyle__1nSetWordSpacing
   (kref __Kinstance, jlong ptr, jfloat wordSpacing) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     instance->setWordSpacing(wordSpacing);
 }
 
-extern "C" jlong org_jetbrains_skia_paragraph_TextStyleKt__1nGetTypeface
+extern "C" jlong org_jetbrains_skia_paragraph_TextStyle__1nGetTypeface
   (kref __Kinstance, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     return reinterpret_cast<jlong>(instance->refTypeface().release());
 }
 
-extern "C" void org_jetbrains_skia_paragraph_TextStyleKt__1nSetTypeface
+extern "C" void org_jetbrains_skia_paragraph_TextStyle__1nSetTypeface
   (kref __Kinstance, jlong ptr, jlong typefacePtr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     SkTypeface* typeface = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(typefacePtr));
@@ -333,13 +333,13 @@ extern "C" void org_jetbrains_skia_paragraph_TextStyleKt__1nSetTypeface
 }
 
 
-extern "C" jstring org_jetbrains_skia_paragraph_TextStyleKt__1nGetLocale
+extern "C" jstring org_jetbrains_skia_paragraph_TextStyle__1nGetLocale
   (kref __Kinstance, jlong ptr) {
-    TODO("implement org_jetbrains_skia_paragraph_TextStyleKt__1nGetLocale");
+    TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nGetLocale");
 }
      
 #if 0 
-extern "C" jstring org_jetbrains_skia_paragraph_TextStyleKt__1nGetLocale
+extern "C" jstring org_jetbrains_skia_paragraph_TextStyle__1nGetLocale
   (kref __Kinstance, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     return javaString(env, instance->getLocale());
@@ -348,13 +348,13 @@ extern "C" jstring org_jetbrains_skia_paragraph_TextStyleKt__1nGetLocale
 
 
 
-extern "C" void org_jetbrains_skia_paragraph_TextStyleKt__1nSetLocale
+extern "C" void org_jetbrains_skia_paragraph_TextStyle__1nSetLocale
   (kref __Kinstance, jlong ptr, jstring locale) {
-    TODO("implement org_jetbrains_skia_paragraph_TextStyleKt__1nSetLocale");
+    TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nSetLocale");
 }
      
 #if 0 
-extern "C" void org_jetbrains_skia_paragraph_TextStyleKt__1nSetLocale
+extern "C" void org_jetbrains_skia_paragraph_TextStyle__1nSetLocale
   (kref __Kinstance, jlong ptr, jstring locale) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     instance->setLocale(skString(env, locale));
@@ -362,26 +362,26 @@ extern "C" void org_jetbrains_skia_paragraph_TextStyleKt__1nSetLocale
 #endif
 
 
-extern "C" jint org_jetbrains_skia_paragraph_TextStyleKt__1nGetBaselineMode
+extern "C" jint org_jetbrains_skia_paragraph_TextStyle__1nGetBaselineMode
   (kref __Kinstance, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     return static_cast<jint>(instance->getTextBaseline());
 }
 
-extern "C" void org_jetbrains_skia_paragraph_TextStyleKt__1nSetBaselineMode
+extern "C" void org_jetbrains_skia_paragraph_TextStyle__1nSetBaselineMode
   (kref __Kinstance, jlong ptr, jint baselineModeValue) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     instance->setTextBaseline(static_cast<TextBaseline>(baselineModeValue));
 }
 
 
-extern "C" jobject org_jetbrains_skia_paragraph_TextStyleKt__1nGetFontMetrics
+extern "C" jobject org_jetbrains_skia_paragraph_TextStyle__1nGetFontMetrics
   (kref __Kinstance, jlong ptr) {
-    TODO("implement org_jetbrains_skia_paragraph_TextStyleKt__1nGetFontMetrics");
+    TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nGetFontMetrics");
 }
      
 #if 0 
-extern "C" jobject org_jetbrains_skia_paragraph_TextStyleKt__1nGetFontMetrics
+extern "C" jobject org_jetbrains_skia_paragraph_TextStyle__1nGetFontMetrics
   (kref __Kinstance, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     SkFontMetrics m;
@@ -391,13 +391,13 @@ extern "C" jobject org_jetbrains_skia_paragraph_TextStyleKt__1nGetFontMetrics
 #endif
 
 
-extern "C" jboolean org_jetbrains_skia_paragraph_TextStyleKt__1nIsPlaceholder
+extern "C" jboolean org_jetbrains_skia_paragraph_TextStyle__1nIsPlaceholder
   (kref __Kinstance, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     return instance->isPlaceholder();
 }
 
-extern "C" void org_jetbrains_skia_paragraph_TextStyleKt__1nSetPlaceholder
+extern "C" void org_jetbrains_skia_paragraph_TextStyle__1nSetPlaceholder
   (kref __Kinstance, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     instance->setPlaceholder();
