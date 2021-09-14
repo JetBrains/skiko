@@ -77,7 +77,7 @@ class ParagraphBuilder(style: ParagraphStyle?, fc: FontCollection?) :
     }
 
     internal object _FinalizerHolder {
-        val PTR = _nGetFinalizer()
+        val PTR = ParagraphBuilder_nGetFinalizer()
     }
 
     init {
@@ -87,12 +87,11 @@ class ParagraphBuilder(style: ParagraphStyle?, fc: FontCollection?) :
     }
 }
 
+@ExternalSymbolName("org_jetbrains_skia_ParagraphBuilder__1nGetFinalizer")
+private external fun ParagraphBuilder_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ParagraphBuilder__1nMake")
 private external fun _nMake(paragraphStylePtr: NativePointer, fontCollectionPtr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_ParagraphBuilder__1nGetFinalizer")
-private external fun _nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ParagraphBuilder__1nPushStyle")
 private external fun _nPushStyle(ptr: NativePointer, textStylePtr: NativePointer)

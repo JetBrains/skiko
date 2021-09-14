@@ -10,7 +10,7 @@ import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
 
-class TypefaceFontProvider : FontMgr(_nMake()) {
+class TypefaceFontProvider : FontMgr(TypefaceFontProvider_nMake()) {
     companion object {
         init {
             staticLoad()
@@ -38,7 +38,7 @@ class TypefaceFontProvider : FontMgr(_nMake()) {
 
 
 @ExternalSymbolName("org_jetbrains_skia_TypefaceFontProvider__1nMake")
-private external fun _nMake(): NativePointer
+private external fun TypefaceFontProvider_nMake(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_TypefaceFontProvider__1nRegisterTypeface")
 private external fun _nRegisterTypeface(ptr: NativePointer, typefacePtr: NativePointer, alias: String?): NativePointer

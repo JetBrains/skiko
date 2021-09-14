@@ -26,7 +26,7 @@ class MaskFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 
         fun makeTable(table: ByteArray?): MaskFilter {
             Stats.onNativeCall()
-            return MaskFilter(_nMakeTable(table))
+            return MaskFilter(MaskFilter_nMakeTable(table))
         }
 
         fun makeGamma(gamma: Float): MaskFilter {
@@ -52,7 +52,7 @@ private external fun _nMakeBlur(mode: Int, sigma: Float, respectCTM: Boolean): N
 private external fun _nMakeShader(shaderPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_MaskFilter__1nMakeTable")
-private external fun _nMakeTable(table: ByteArray?): NativePointer
+private external fun MaskFilter_nMakeTable(table: ByteArray?): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_MaskFilter__1nMakeGamma")
 private external fun _nMakeGamma(gamma: Float): NativePointer

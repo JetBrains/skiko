@@ -13,9 +13,8 @@ class OutputWStream(out: OutputStream?) : WStream(_nMake(out), _FinalizerHolder.
     }
 
     private val _out: OutputStream?
-
     private object _FinalizerHolder {
-        val PTR = _nGetFinalizer()
+        val PTR = OutputWStream_nGetFinalizer()
     }
 
     init {
@@ -26,7 +25,7 @@ class OutputWStream(out: OutputStream?) : WStream(_nMake(out), _FinalizerHolder.
 
 
 @ExternalSymbolName("org_jetbrains_skia_OutputWStream__1nGetFinalizer")
-private external fun _nGetFinalizer(): NativePointer
+private external fun OutputWStream_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_OutputWStream__1nMake")
 private external fun _nMake(out: OutputStream?): NativePointer

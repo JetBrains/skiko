@@ -18,14 +18,14 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         }
     }
 
-    constructor() : this(_nMake()) {
+    constructor() : this(TextStyle_nMake()) {
         Stats.onNativeCall()
     }
 
     override fun _nativeEquals(other: Native?): Boolean {
         return try {
             Stats.onNativeCall()
-            _nEquals(
+            TextStyle_nEquals(
                 _ptr,
                 getPtr(other)
             )
@@ -145,7 +145,7 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     var fontStyle: FontStyle
         get() = try {
             Stats.onNativeCall()
-            FontStyle(_nGetFontStyle(_ptr))
+            FontStyle(TextStyle_nGetFontStyle(_ptr))
         } finally {
             reachabilityBarrier(this)
         }
@@ -155,7 +155,7 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     
     fun setFontStyle(s: FontStyle): TextStyle {
         Stats.onNativeCall()
-        _nSetFontStyle(_ptr, s._value)
+        TextStyle_nSetFontStyle(_ptr, s._value)
         return this
     }
 
@@ -212,7 +212,7 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     var fontSize: Float
         get() = try {
             Stats.onNativeCall()
-            _nGetFontSize(_ptr)
+            TextStyle_nGetFontSize(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -222,14 +222,14 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     
     fun setFontSize(size: Float): TextStyle {
         Stats.onNativeCall()
-        _nSetFontSize(_ptr, size)
+        TextStyle_nSetFontSize(_ptr, size)
         return this
     }
 
     var fontFamilies: Array<String>
         get() = try {
             Stats.onNativeCall()
-            _nGetFontFamilies(_ptr)
+            TextStyle_nGetFontFamilies(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -250,7 +250,7 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     var height: Float?
         get() = try {
             Stats.onNativeCall()
-            _nGetHeight(_ptr)
+            TextStyle_nGetHeight(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -260,7 +260,7 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     
     fun setHeight(height: Float?): TextStyle {
         Stats.onNativeCall()
-        if (height == null) _nSetHeight(_ptr, false, 0f) else _nSetHeight(_ptr, true, height)
+        if (height == null) TextStyle_nSetHeight(_ptr, false, 0f) else TextStyle_nSetHeight(_ptr, true, height)
         return this
     }
 
@@ -380,19 +380,40 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     }
 
     internal object _FinalizerHolder {
-        val PTR = _nGetFinalizer()
+        val PTR = TextStyle_nGetFinalizer()
     }
 }
 
 
 @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetFinalizer")
-private external fun _nGetFinalizer(): NativePointer
+private external fun TextStyle_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nMake")
-private external fun _nMake(): NativePointer
+private external fun TextStyle_nMake(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nEquals")
-private external fun _nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
+private external fun TextStyle_nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetFontStyle")
+private external fun TextStyle_nGetFontStyle(ptr: NativePointer): Int
+
+@ExternalSymbolName("org_jetbrains_skia_TextStyle__1nSetFontStyle")
+private external fun TextStyle_nSetFontStyle(ptr: NativePointer, fontStyle: Int)
+
+@ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetFontSize")
+private external fun TextStyle_nGetFontSize(ptr: NativePointer): Float
+
+@ExternalSymbolName("org_jetbrains_skia_TextStyle__1nSetFontSize")
+private external fun TextStyle_nSetFontSize(ptr: NativePointer, size: Float)
+
+@ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetFontFamilies")
+private external fun TextStyle_nGetFontFamilies(ptr: NativePointer): Array<String>
+
+@ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetHeight")
+private external fun TextStyle_nGetHeight(ptr: NativePointer): Float?
+
+@ExternalSymbolName("org_jetbrains_skia_TextStyle__1nSetHeight")
+private external fun TextStyle_nSetHeight(ptr: NativePointer, override: Boolean, height: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nAttributeEquals")
 private external fun _nAttributeEquals(ptr: NativePointer, attribute: Int, otherPtr: NativePointer): Boolean
@@ -430,13 +451,6 @@ private external fun _nSetDecorationStyle(
     thicknessMultiplier: Float
 )
 
-
-@ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetFontStyle")
-private external fun _nGetFontStyle(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_TextStyle__1nSetFontStyle")
-private external fun _nSetFontStyle(ptr: NativePointer, fontStyle: Int)
-
 @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetShadows")
 private external fun _nGetShadows(ptr: NativePointer): Array<Shadow>
 
@@ -455,23 +469,8 @@ private external fun _nAddFontFeature(ptr: NativePointer, name: String?, value: 
 @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nClearFontFeatures")
 private external fun _nClearFontFeatures(ptr: NativePointer)
 
-@ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetFontSize")
-private external fun _nGetFontSize(ptr: NativePointer): Float
-
-@ExternalSymbolName("org_jetbrains_skia_TextStyle__1nSetFontSize")
-private external fun _nSetFontSize(ptr: NativePointer, size: Float)
-
-@ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetFontFamilies")
-private external fun _nGetFontFamilies(ptr: NativePointer): Array<String>
-
 @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nSetFontFamilies")
 private external fun _nSetFontFamilies(ptr: NativePointer, families: Array<String>?)
-
-@ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetHeight")
-private external fun _nGetHeight(ptr: NativePointer): Float?
-
-@ExternalSymbolName("org_jetbrains_skia_TextStyle__1nSetHeight")
-private external fun _nSetHeight(ptr: NativePointer, override: Boolean, height: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_TextStyle__1nGetLetterSpacing")
 private external fun _nGetLetterSpacing(ptr: NativePointer): Float

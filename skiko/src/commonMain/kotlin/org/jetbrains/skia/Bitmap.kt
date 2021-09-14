@@ -7,7 +7,6 @@ import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
-import kotlin.jvm.JvmStatic
 
 class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR), IHasImageInfo {
     companion object {
@@ -1019,13 +1018,13 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
     }
 
     private object _FinalizerHolder {
-        val PTR = _nGetFinalizer()
+        val PTR = Bitmap_nGetFinalizer()
     }
 }
 
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetFinalizer")
-private external fun _nGetFinalizer(): NativePointer
+private external fun Bitmap_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nMake")
 private external fun _nMake(): NativePointer

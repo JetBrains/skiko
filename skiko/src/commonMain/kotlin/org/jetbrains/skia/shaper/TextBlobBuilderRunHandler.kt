@@ -16,7 +16,7 @@ class TextBlobBuilderRunHandler<T> internal constructor(
     offsetX: Float,
     offsetY: Float
 ) : Managed(
-    _nMake(getPtr(text), offsetX, offsetY), _FinalizerHolder.PTR
+    TextBlobBuilderRunHandler_nMake(getPtr(text), offsetX, offsetY), _FinalizerHolder.PTR
 ), RunHandler {
     companion object {
         init {
@@ -69,7 +69,7 @@ class TextBlobBuilderRunHandler<T> internal constructor(
     }
 
     internal object _FinalizerHolder {
-        val PTR = _nGetFinalizer()
+        val PTR = TextBlobBuilderRunHandler_nGetFinalizer()
     }
 
     init {
@@ -80,10 +80,10 @@ class TextBlobBuilderRunHandler<T> internal constructor(
 
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilderRunHandler__1nGetFinalizer")
-private external fun _nGetFinalizer(): NativePointer
+private external fun TextBlobBuilderRunHandler_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilderRunHandler__1nMake")
-private external fun _nMake(textPtr: NativePointer, offsetX: Float, offsetY: Float): NativePointer
+private external fun TextBlobBuilderRunHandler_nMake(textPtr: NativePointer, offsetX: Float, offsetY: Float): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilderRunHandler__1nMakeBlob")
 private external fun _nMakeBlob(ptr: NativePointer): NativePointer

@@ -10,7 +10,7 @@ import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
 
-class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
+class ParagraphStyle : Managed(ParagraphStyle_nMake(), _FinalizerHolder.PTR) {
     companion object {
         init {
             staticLoad()
@@ -140,7 +140,7 @@ class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
     var height: Float
         get() = try {
             Stats.onNativeCall()
-            _nGetHeight(_ptr)
+            ParagraphStyle_nGetHeight(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -194,7 +194,7 @@ class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
     }
 
     internal object _FinalizerHolder {
-        val PTR = _nGetFinalizer()
+        val PTR = ParagraphStyle_nGetFinalizer()
     }
 
     init {
@@ -204,10 +204,13 @@ class ParagraphStyle : Managed(_nMake(), _FinalizerHolder.PTR) {
 
 
 @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nGetFinalizer")
-private external fun _nGetFinalizer(): NativePointer
+private external fun ParagraphStyle_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nMake")
-private external fun _nMake(): NativePointer
+private external fun ParagraphStyle_nMake(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nGetHeight")
+private external fun ParagraphStyle_nGetHeight(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nEquals")
 private external fun _nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
@@ -247,9 +250,6 @@ private external fun _nGetEllipsis(ptr: NativePointer): String
 
 @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nSetEllipsis")
 private external fun _nSetEllipsis(ptr: NativePointer, ellipsis: String?)
-
-@ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nGetHeight")
-private external fun _nGetHeight(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nSetHeight")
 private external fun _nSetHeight(ptr: NativePointer, height: Float)

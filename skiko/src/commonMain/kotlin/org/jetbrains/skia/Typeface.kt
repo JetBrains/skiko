@@ -16,7 +16,7 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
          */
         fun makeDefault(): Typeface {
             Stats.onNativeCall()
-            return Typeface(_nMakeDefault())
+            return Typeface(Typeface_nMakeDefault())
         }
 
         /**
@@ -134,7 +134,7 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     val uniqueId: Int
         get() = try {
             Stats.onNativeCall()
-            _nGetUniqueId(_ptr)
+            Typeface_nGetUniqueId(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -144,7 +144,7 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
      */
     override fun _nativeEquals(other: Native?): Boolean {
         return try {
-            _nEquals(_ptr, getPtr(other))
+            Typeface_nEquals(_ptr, getPtr(other))
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(other)
@@ -206,7 +206,7 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     fun getUTF32Glyphs(uni: IntArray?): ShortArray {
         return try {
             Stats.onNativeCall()
-            _nGetUTF32Glyphs(_ptr, uni)
+            Typeface_nGetUTF32Glyphs(_ptr, uni)
         } finally {
             reachabilityBarrier(this)
         }
@@ -219,7 +219,7 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     fun getUTF32Glyph(unichar: Int): Short {
         return try {
             Stats.onNativeCall()
-            _nGetUTF32Glyph(_ptr, unichar)
+            Typeface_nGetUTF32Glyph(_ptr, unichar)
         } finally {
             reachabilityBarrier(this)
         }
@@ -349,12 +349,29 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     val bounds: Rect
         get() = try {
             Stats.onNativeCall()
-            _nGetBounds(_ptr)
+            Typeface_nGetBounds(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
 }
 
+@ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUniqueId")
+private external fun Typeface_nGetUniqueId(ptr: NativePointer): Int
+
+@ExternalSymbolName("org_jetbrains_skia_Typeface__1nEquals")
+private external fun Typeface_nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeDefault")
+private external fun Typeface_nMakeDefault(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUTF32Glyphs")
+private external fun Typeface_nGetUTF32Glyphs(ptr: NativePointer, uni: IntArray?): ShortArray
+
+@ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUTF32Glyph")
+private external fun Typeface_nGetUTF32Glyph(ptr: NativePointer, unichar: Int): Short
+
+@ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetBounds")
+private external fun Typeface_nGetBounds(ptr: NativePointer): Rect
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetFontStyle")
 private external fun _nGetFontStyle(ptr: NativePointer): Int
@@ -368,15 +385,6 @@ private external fun _nGetVariations(ptr: NativePointer): Array<FontVariation>?
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetVariationAxes")
 private external fun _nGetVariationAxes(ptr: NativePointer): Array<FontVariationAxis>?
 
-@ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUniqueId")
-private external fun _nGetUniqueId(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_Typeface__1nEquals")
-private external fun _nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeDefault")
-private external fun _nMakeDefault(): NativePointer
-
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeFromName")
 private external fun _nMakeFromName(name: String?, fontStyle: Int): NativePointer
 
@@ -388,12 +396,6 @@ private external fun _nMakeFromData(dataPtr: NativePointer, index: Int): NativeP
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeClone")
 private external fun _nMakeClone(ptr: NativePointer, variations: Array<FontVariation>?, collectionIndex: Int): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUTF32Glyphs")
-private external fun _nGetUTF32Glyphs(ptr: NativePointer, uni: IntArray?): ShortArray
-
-@ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUTF32Glyph")
-private external fun _nGetUTF32Glyph(ptr: NativePointer, unichar: Int): Short
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetGlyphsCount")
 private external fun _nGetGlyphsCount(ptr: NativePointer): Int
@@ -421,6 +423,3 @@ private external fun _nGetFamilyNames(ptr: NativePointer): Array<FontFamilyName>
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetFamilyName")
 private external fun _nGetFamilyName(ptr: NativePointer): String
-
-@ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetBounds")
-private external fun _nGetBounds(ptr: NativePointer): Rect

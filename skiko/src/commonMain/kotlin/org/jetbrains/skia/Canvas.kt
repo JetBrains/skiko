@@ -1377,13 +1377,13 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     }
 
     private object _FinalizerHolder {
-        val PTR = _nGetFinalizer()
+        val PTR = Canvas_nGetFinalizer()
     }
 }
 
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nGetFinalizer")
-private external fun _nGetFinalizer(): NativePointer
+private external fun Canvas_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nMakeFromBitmap")
 private external fun _nMakeFromBitmap(bitmapPtr: NativePointer, flags: Int, pixelGeometry: Int): NativePointer

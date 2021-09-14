@@ -84,7 +84,7 @@ class Shaper internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
         fun make(fontMgr: FontMgr?): Shaper {
             return try {
                 Stats.onNativeCall()
-                Shaper(_nMake(getPtr(fontMgr)))
+                Shaper(Shaper_nMake(getPtr(fontMgr)))
             } finally {
                 reachabilityBarrier(fontMgr)
             }
@@ -221,13 +221,16 @@ class Shaper internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
     }
 
     private object _FinalizerHolder {
-        val PTR = _nGetFinalizer()
+        val PTR = Shaper_nGetFinalizer()
     }
 }
 
 
 @ExternalSymbolName("org_jetbrains_skia_Shaper__1nGetFinalizer")
-private external fun _nGetFinalizer(): NativePointer
+private external fun Shaper_nGetFinalizer(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Shaper__1nMake")
+private external fun Shaper_nMake(fontMgrPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Shaper__1nMakePrimitive")
 private external fun _nMakePrimitive(): NativePointer
@@ -243,9 +246,6 @@ private external fun _nMakeShapeDontWrapOrReorder(fontMgrPtr: NativePointer): Na
 
 @ExternalSymbolName("org_jetbrains_skia_Shaper__1nMakeCoreText")
 private external fun _nMakeCoreText(): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Shaper__1nMake")
-private external fun _nMake(fontMgrPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Shaper__1nShapeBlob")
 private external fun _nShapeBlob(

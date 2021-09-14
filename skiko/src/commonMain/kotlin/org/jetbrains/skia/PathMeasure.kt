@@ -5,10 +5,8 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
-import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
-import kotlin.jvm.JvmStatic
 
 class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
@@ -17,7 +15,7 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
         }
     }
 
-    constructor() : this(_nMake()) {
+    constructor() : this(PathMeasure_nMake()) {
         Stats.onNativeCall()
     }
     /**
@@ -181,15 +179,15 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
     }
 
     internal object _FinalizerHolder {
-        val PTR = _nGetFinalizer()
+        val PTR = `PathMeasure_nGetFinalizer`()
     }
 }
 
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetFinalizer")
-private external fun _nGetFinalizer(): NativePointer
+private external fun `PathMeasure_nGetFinalizer`(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nMake")
-private external fun _nMake(): NativePointer
+private external fun PathMeasure_nMake(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nMakePath")
 private external fun _nMakePath(pathPtr: NativePointer, forceClosed: Boolean, resScale: Float): NativePointer

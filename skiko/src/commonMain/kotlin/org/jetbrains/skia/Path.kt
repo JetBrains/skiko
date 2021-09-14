@@ -3,7 +3,6 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import kotlin.jvm.JvmStatic
 
 /**
  *
@@ -203,14 +202,14 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     }
 
     internal object _FinalizerHolder {
-        val PTR = _nGetFinalizer()
+        val PTR = Path_nGetFinalizer()
     }
 
     /**
      * Constructs an empty Path. By default, Path has no verbs, no [Point], and no weights.
      * FillMode is set to [PathFillMode.WINDING].
      */
-    constructor() : this(_nMake()) {
+    constructor() : this(Path_nMake()) {
         Stats.onNativeCall()
     }
 
@@ -223,7 +222,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      */
         override fun _nativeEquals(other: Native?): Boolean {
         return try {
-            _nEquals(_ptr, getPtr(other))
+            Path_nEquals(_ptr, getPtr(other))
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(other)
@@ -373,7 +372,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      */
     fun reset(): Path {
         Stats.onNativeCall()
-        _nReset(_ptr)
+        Path_nReset(_ptr)
         return this
     }
 
@@ -475,13 +474,13 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     var isVolatile: Boolean
         get() = try {
             Stats.onNativeCall()
-            _nIsVolatile(_ptr)
+            Path_nIsVolatile(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
         set(value) {
             Stats.onNativeCall()
-            _nSetVolatile(_ptr, value)
+            Path_nSetVolatile(_ptr, value)
         }
     
     /**
@@ -507,7 +506,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      */
     fun setVolatile(isVolatile: Boolean): Path {
         Stats.onNativeCall()
-        _nSetVolatile(_ptr, isVolatile)
+        Path_nSetVolatile(_ptr, isVolatile)
         return this
     }
 
@@ -678,7 +677,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     fun swap(other: Path?): Path {
         return try {
             Stats.onNativeCall()
-            _nSwap(_ptr, getPtr(other))
+            Path_nSwap(_ptr, getPtr(other))
             this
         } finally {
             reachabilityBarrier(other)
@@ -2094,7 +2093,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     val generationId: Int
         get() = try {
             Stats.onNativeCall()
-            _nGetGenerationId(_ptr)
+            Path_nGetGenerationId(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -2117,16 +2116,31 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
 
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nGetFinalizer")
-private external fun _nGetFinalizer(): NativePointer
+private external fun Path_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nMake")
-private external fun _nMake(): NativePointer
+private external fun Path_nMake(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nEquals")
+private external fun Path_nEquals(aPtr: NativePointer, bPtr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nReset")
+private external fun Path_nReset(ptr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nIsVolatile")
+private external fun Path_nIsVolatile(ptr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nSetVolatile")
+private external fun Path_nSetVolatile(ptr: NativePointer, isVolatile: Boolean)
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nSwap")
+private external fun Path_nSwap(ptr: NativePointer, otherPtr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_Path__1nGetGenerationId")
+private external fun Path_nGetGenerationId(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nMakeFromSVGString")
 private external fun _nMakeFromSVGString(s: String?): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nEquals")
-private external fun _nEquals(aPtr: NativePointer, bPtr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nIsInterpolatable")
 private external fun _nIsInterpolatable(ptr: NativePointer, comparePtr: NativePointer): Boolean
@@ -2149,9 +2163,6 @@ private external fun _nIsOval(ptr: NativePointer): Rect
 @ExternalSymbolName("org_jetbrains_skia_Path__1nIsRRect")
 private external fun _nIsRRect(ptr: NativePointer): RRect
 
-@ExternalSymbolName("org_jetbrains_skia_Path__1nReset")
-private external fun _nReset(ptr: NativePointer)
-
 @ExternalSymbolName("org_jetbrains_skia_Path__1nRewind")
 private external fun _nRewind(ptr: NativePointer)
 
@@ -2163,12 +2174,6 @@ private external fun _nIsLastContourClosed(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nIsFinite")
 private external fun _nIsFinite(ptr: NativePointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nIsVolatile")
-private external fun _nIsVolatile(ptr: NativePointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nSetVolatile")
-private external fun _nSetVolatile(ptr: NativePointer, isVolatile: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nIsLineDegenerate")
 private external fun _nIsLineDegenerate(x0: Float, y0: Float, x1: Float, y1: Float, exact: Boolean): Boolean
@@ -2219,9 +2224,6 @@ private external fun _nGetVerbs(ptr: NativePointer, verbs: ByteArray?, max: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nApproximateBytesUsed")
 private external fun _nApproximateBytesUsed(ptr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nSwap")
-private external fun _nSwap(ptr: NativePointer, otherPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nGetBounds")
 private external fun _nGetBounds(ptr: NativePointer): Rect
@@ -2402,9 +2404,6 @@ private external fun _nMakeCombining(onePtr: NativePointer, twoPtr: NativePointe
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nMakeFromBytes")
 private external fun _nMakeFromBytes(data: ByteArray?): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Path__1nGetGenerationId")
-private external fun _nGetGenerationId(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nIsValid")
 private external fun _nIsValid(ptr: NativePointer): Boolean

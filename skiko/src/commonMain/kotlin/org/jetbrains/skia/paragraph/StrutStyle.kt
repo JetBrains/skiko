@@ -18,14 +18,14 @@ class StrutStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finali
         }
     }
 
-    constructor() : this(_nMake()) {
+    constructor() : this(StrutStyle_nMake()) {
         Stats.onNativeCall()
     }
 
     override fun _nativeEquals(other: Native?): Boolean {
         return try {
             Stats.onNativeCall()
-            _nEquals(_ptr, getPtr(other))
+            StrutStyle_nEquals(_ptr, getPtr(other))
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(other)
@@ -83,7 +83,7 @@ class StrutStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finali
     var height: Float
         get() = try {
             Stats.onNativeCall()
-            _nGetHeight(_ptr)
+            StrutStyle_nGetHeight(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -93,7 +93,7 @@ class StrutStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finali
     
     fun setHeight(value: Float): StrutStyle {
         Stats.onNativeCall()
-        _nSetHeight(_ptr, value)
+        StrutStyle_nSetHeight(_ptr, value)
         return this
     }
 
@@ -127,7 +127,7 @@ class StrutStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finali
     
     fun setEnabled(value: Boolean): StrutStyle {
         Stats.onNativeCall()
-        _nSetEnabled(_ptr, value)
+        StrutStyle_nSetEnabled(_ptr, value)
         return this
     }
 
@@ -166,19 +166,28 @@ class StrutStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finali
     }
 
     private object _FinalizerHolder {
-        val PTR = _nGetFinalizer()
+        val PTR = StrutStyle_nGetFinalizer()
     }
 }
 
 
 @ExternalSymbolName("org_jetbrains_skia_StrutStyle__1nGetFinalizer")
-private external fun _nGetFinalizer(): NativePointer
+private external fun StrutStyle_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_StrutStyle__1nMake")
-private external fun _nMake(): NativePointer
+private external fun StrutStyle_nMake(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_StrutStyle__1nEquals")
-private external fun _nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
+private external fun StrutStyle_nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_StrutStyle__1nGetHeight")
+private external fun StrutStyle_nGetHeight(ptr: NativePointer): Float
+
+@ExternalSymbolName("org_jetbrains_skia_StrutStyle__1nSetHeight")
+private external fun StrutStyle_nSetHeight(ptr: NativePointer, value: Float)
+
+@ExternalSymbolName("org_jetbrains_skia_StrutStyle__1nSetEnabled")
+private external fun StrutStyle_nSetEnabled(ptr: NativePointer, value: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_StrutStyle__1nGetFontFamilies")
 private external fun _nGetFontFamilies(ptr: NativePointer): Array<String>
@@ -198,12 +207,6 @@ private external fun _nGetFontSize(ptr: NativePointer): Float
 @ExternalSymbolName("org_jetbrains_skia_StrutStyle__1nSetFontSize")
 private external fun _nSetFontSize(ptr: NativePointer, value: Float)
 
-@ExternalSymbolName("org_jetbrains_skia_StrutStyle__1nGetHeight")
-private external fun _nGetHeight(ptr: NativePointer): Float
-
-@ExternalSymbolName("org_jetbrains_skia_StrutStyle__1nSetHeight")
-private external fun _nSetHeight(ptr: NativePointer, value: Float)
-
 @ExternalSymbolName("org_jetbrains_skia_StrutStyle__1nGetLeading")
 private external fun _nGetLeading(ptr: NativePointer): Float
 
@@ -212,9 +215,6 @@ private external fun _nSetLeading(ptr: NativePointer, value: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_StrutStyle__1nIsEnabled")
 private external fun _nIsEnabled(ptr: NativePointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_StrutStyle__1nSetEnabled")
-private external fun _nSetEnabled(ptr: NativePointer, value: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_StrutStyle__1nIsHeightForced")
 private external fun _nIsHeightForced(ptr: NativePointer): Boolean

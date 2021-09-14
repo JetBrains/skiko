@@ -13,7 +13,7 @@ class Font : Managed {
     companion object {
         internal fun makeClone(ptr: NativePointer): Font {
             Stats.onNativeCall()
-            return Font(_nMakeClone(ptr))
+            return Font(Font_nMakeClone(ptr))
         }
 
         init {
@@ -76,7 +76,7 @@ class Font : Managed {
      */
     override fun _nativeEquals(other: Native?): Boolean {
         return try {
-            _nEquals(_ptr, getPtr(other))
+            Font_nEquals(_ptr, getPtr(other))
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(other)
@@ -313,7 +313,7 @@ class Font : Managed {
     val size: Float
         get() = try {
             Stats.onNativeCall()
-            _nGetSize(_ptr)
+            Font_nGetSize(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -600,13 +600,13 @@ class Font : Managed {
         }
 
     private object _FinalizerHolder {
-        val PTR = _nGetFinalizer()
+        val PTR = Font_nGetFinalizer()
     }
 }
 
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetFinalizer")
-private external fun _nGetFinalizer(): NativePointer
+private external fun Font_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nMakeDefault")
 private external fun _nMakeDefault(): NativePointer
@@ -621,10 +621,10 @@ private external fun _nMakeTypefaceSize(typefacePtr: NativePointer, size: Float)
 private external fun _nMakeTypefaceSizeScaleSkew(typefacePtr: NativePointer, size: Float, scaleX: Float, skewX: Float): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nMakeClone")
-private external fun _nMakeClone(ptr: NativePointer): NativePointer
+private external fun Font_nMakeClone(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nEquals")
-private external fun _nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
+private external fun Font_nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nIsAutoHintingForced")
 private external fun _nIsAutoHintingForced(ptr: NativePointer): Boolean
@@ -681,7 +681,7 @@ private external fun _nGetTypeface(ptr: NativePointer): NativePointer
 private external fun _nGetTypefaceOrDefault(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetSize")
-private external fun _nGetSize(ptr: NativePointer): Float
+private external fun Font_nGetSize(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetScaleX")
 private external fun _nGetScaleX(ptr: NativePointer): Float

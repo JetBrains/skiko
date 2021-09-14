@@ -31,7 +31,7 @@ class PixelRef internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     val rowBytes: NativePointer
         get() = try {
             Stats.onNativeCall()
-            _nGetRowBytes(_ptr)
+            PixelRef_nGetRowBytes(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -44,7 +44,7 @@ class PixelRef internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     val generationId: Int
         get() = try {
             Stats.onNativeCall()
-            _nGetGenerationId(_ptr)
+            PixelRef_nGetGenerationId(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -56,7 +56,7 @@ class PixelRef internal constructor(ptr: NativePointer) : RefCnt(ptr) {
      */
     fun notifyPixelsChanged(): PixelRef {
         Stats.onNativeCall()
-        _nNotifyPixelsChanged(_ptr)
+        PixelRef_nNotifyPixelsChanged(_ptr)
         return this
     }
 
@@ -67,7 +67,7 @@ class PixelRef internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     val isImmutable: Boolean
         get() = try {
             Stats.onNativeCall()
-            _nIsImmutable(_ptr)
+            PixelRef_nIsImmutable(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -79,29 +79,28 @@ class PixelRef internal constructor(ptr: NativePointer) : RefCnt(ptr) {
      */
     fun setImmutable(): PixelRef {
         Stats.onNativeCall()
-        _nSetImmutable(_ptr)
+        PixelRef_nSetImmutable(_ptr)
         return this
     }
 }
 
+@ExternalSymbolName("org_jetbrains_skia_PixelRef__1nGetRowBytes")
+private external fun PixelRef_nGetRowBytes(ptr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_PixelRef__1nGetGenerationId")
+private external fun PixelRef_nGetGenerationId(ptr: NativePointer): Int
+
+@ExternalSymbolName("org_jetbrains_skia_PixelRef__1nNotifyPixelsChanged")
+private external fun PixelRef_nNotifyPixelsChanged(ptr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_PixelRef__1nIsImmutable")
+private external fun PixelRef_nIsImmutable(ptr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_PixelRef__1nSetImmutable")
+private external fun PixelRef_nSetImmutable(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_PixelRef__1nGetWidth")
 private external fun _nGetWidth(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_PixelRef__1nGetHeight")
 private external fun _nGetHeight(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_PixelRef__1nGetRowBytes")
-private external fun _nGetRowBytes(ptr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_PixelRef__1nGetGenerationId")
-private external fun _nGetGenerationId(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_PixelRef__1nNotifyPixelsChanged")
-private external fun _nNotifyPixelsChanged(ptr: NativePointer)
-
-@ExternalSymbolName("org_jetbrains_skia_PixelRef__1nIsImmutable")
-private external fun _nIsImmutable(ptr: NativePointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_PixelRef__1nSetImmutable")
-private external fun _nSetImmutable(ptr: NativePointer)

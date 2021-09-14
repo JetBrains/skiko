@@ -32,12 +32,12 @@ class PictureRecorder internal constructor(ptr: NativePointer) : Managed(ptr, _F
         }
     }
 
-    constructor() : this(_nMake()) {
+    constructor() : this(PictureRecorder_nMake()) {
         Stats.onNativeCall()
     }
 
     private object _FinalizerHolder {
-        val PTR = _nGetFinalizer()
+        val PTR = PictureRecorder_nGetFinalizer()
     }
 
     /**
@@ -126,10 +126,10 @@ class PictureRecorder internal constructor(ptr: NativePointer) : Managed(ptr, _F
 
 
 @ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nMake")
-private external fun _nMake(): NativePointer
+private external fun PictureRecorder_nMake(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nGetFinalizer")
-private external fun _nGetFinalizer(): NativePointer
+private external fun PictureRecorder_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nBeginRecording")
 private external fun _nBeginRecording(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float): NativePointer

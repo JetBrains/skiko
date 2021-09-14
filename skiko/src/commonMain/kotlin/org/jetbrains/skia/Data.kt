@@ -8,7 +8,6 @@ import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.getPtr
 import org.jetbrains.skia.impl.reachabilityBarrier
-import kotlin.jvm.JvmStatic
 
 /**
  * Data holds an immutable data buffer.
@@ -108,13 +107,13 @@ class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     }
 
     private object _FinalizerHolder {
-        val PTR = _nGetFinalizer()
+        val PTR = Data_nGetFinalizer()
     }
 }
 
 
 @ExternalSymbolName("org_jetbrains_skia_Data__1nGetFinalizer")
-private external fun _nGetFinalizer(): NativePointer
+private external fun Data_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Data__1nSize")
 private external fun _nSize(ptr: NativePointer): Long

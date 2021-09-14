@@ -7,7 +7,6 @@ import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
-import kotlin.jvm.JvmStatic
 
 class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR), IHasImageInfo {
     companion object {
@@ -51,7 +50,7 @@ class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHo
         get() = try {
             if (_imageInfo == null) {
                 Stats.onNativeCall()
-                _imageInfo = _nGetImageInfo(_ptr)
+                _imageInfo = Codec_nGetImageInfo(_ptr)
             }
             _imageInfo!!
         } finally {
@@ -136,7 +135,7 @@ class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHo
         return try {
             Stats.onNativeCall()
             _validateResult(
-                _nReadPixels(
+                Codec_nReadPixels(
                     _ptr,
                     getPtr(bitmap),
                     0,
@@ -193,7 +192,7 @@ class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHo
         return try {
             Stats.onNativeCall()
             _validateResult(
-                _nReadPixels(
+                Codec_nReadPixels(
                     _ptr,
                     getPtr(bitmap),
                     frame,
@@ -251,7 +250,7 @@ class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHo
         return try {
             Stats.onNativeCall()
             _validateResult(
-                _nReadPixels(
+                Codec_nReadPixels(
                     _ptr,
                     getPtr(bitmap),
                     frame,
@@ -347,18 +346,18 @@ class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHo
         }
 
     internal object _FinalizerHolder {
-        val PTR = _nGetFinalizer()
+        val PTR = Codec_nGetFinalizer()
     }
 }
 
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetFinalizer")
-private external fun _nGetFinalizer(): NativePointer
+private external fun Codec_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nMakeFromData")
 private external fun _nMakeFromData(dataPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetImageInfo")
-private external fun _nGetImageInfo(ptr: NativePointer): ImageInfo?
+private external fun Codec_nGetImageInfo(ptr: NativePointer): ImageInfo?
 
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetSize")
 private external fun _nGetSize(ptr: NativePointer): Long
@@ -370,7 +369,7 @@ private external fun _nGetEncodedOrigin(ptr: NativePointer): Int
 private external fun _nGetEncodedImageFormat(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nReadPixels")
-private external fun _nReadPixels(ptr: NativePointer, bitmapPtr: NativePointer, frame: Int, priorFrame: Int): Int
+private external fun Codec_nReadPixels(ptr: NativePointer, bitmapPtr: NativePointer, frame: Int, priorFrame: Int): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetFrameCount")
 private external fun _nGetFrameCount(ptr: NativePointer): Int

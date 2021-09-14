@@ -9,7 +9,7 @@ import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.getPtr
 import org.jetbrains.skia.impl.reachabilityBarrier
 
-class Region : Managed(_nMake(), _FinalizerHolder.PTR) {
+class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     companion object {
         init {
             staticLoad()
@@ -37,14 +37,14 @@ class Region : Managed(_nMake(), _FinalizerHolder.PTR) {
     val isEmpty: Boolean
         get() = try {
             Stats.onNativeCall()
-            _nIsEmpty(_ptr)
+            Region_nIsEmpty(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
     val isRect: Boolean
         get() = try {
             Stats.onNativeCall()
-            _nIsRect(_ptr)
+            Region_nIsRect(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -58,7 +58,7 @@ class Region : Managed(_nMake(), _FinalizerHolder.PTR) {
     val bounds: IRect
         get() = try {
             Stats.onNativeCall()
-            _nGetBounds(_ptr)
+            Region_nGetBounds(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -317,7 +317,7 @@ class Region : Managed(_nMake(), _FinalizerHolder.PTR) {
     }
 
     private object _FinalizerHolder {
-        val PTR = _nGetFinalizer()
+        val PTR = Region_nGetFinalizer()
     }
 
     init {
@@ -327,25 +327,25 @@ class Region : Managed(_nMake(), _FinalizerHolder.PTR) {
 
 
 @ExternalSymbolName("org_jetbrains_skia_Region__1nMake")
-private external fun _nMake(): NativePointer
+private external fun Region_nMake(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Region__1nGetFinalizer")
-private external fun _nGetFinalizer(): NativePointer
+private external fun Region_nGetFinalizer(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Region__1nIsEmpty")
+private external fun Region_nIsEmpty(ptr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Region__1nIsRect")
+private external fun Region_nIsRect(ptr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Region__1nGetBounds")
+private external fun Region_nGetBounds(ptr: NativePointer): IRect
 
 @ExternalSymbolName("org_jetbrains_skia_Region__1nSet")
 private external fun _nSet(ptr: NativePointer, regoinPtr: NativePointer): Boolean
 
-@ExternalSymbolName("org_jetbrains_skia_Region__1nIsEmpty")
-private external fun _nIsEmpty(ptr: NativePointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Region__1nIsRect")
-private external fun _nIsRect(ptr: NativePointer): Boolean
-
 @ExternalSymbolName("org_jetbrains_skia_Region__1nIsComplex")
 private external fun _nIsComplex(ptr: NativePointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Region__1nGetBounds")
-private external fun _nGetBounds(ptr: NativePointer): IRect
 
 @ExternalSymbolName("org_jetbrains_skia_Region__1nComputeRegionComplexity")
 private external fun _nComputeRegionComplexity(ptr: NativePointer): Int

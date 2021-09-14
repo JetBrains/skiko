@@ -7,17 +7,22 @@ import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
-import kotlin.jvm.JvmStatic
 
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetFinalizer")
-private external fun _nGetFinalizer(): NativePointer
+private external fun TextBlob_nGetFinalizer(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetUniqueId")
+private external fun TextBlob_nGetUniqueId(ptr: NativePointer): Int
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nSerializeToData")
+private external fun TextBlob_nSerializeToData(ptr: NativePointer /*, SkSerialProcs */): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromData")
+private external fun TextBlob_nMakeFromData(dataPtr: NativePointer /*, SkDeserialProcs */): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nBounds")
 private external fun _nBounds(ptr: NativePointer): Rect
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetUniqueId")
-private external fun _nGetUniqueId(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetIntercepts")
 private external fun _nGetIntercepts(ptr: NativePointer, lower: Float, upper: Float, paintPtr: NativePointer): FloatArray?
@@ -30,12 +35,6 @@ private external fun _nMakeFromPos(glyphs: ShortArray?, pos: FloatArray?, fontPt
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromRSXform")
 private external fun _nMakeFromRSXform(glyphs: ShortArray?, xform: FloatArray?, fontPtr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nSerializeToData")
-private external fun _nSerializeToData(ptr: NativePointer /*, SkSerialProcs */): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromData")
-private external fun _nMakeFromData(dataPtr: NativePointer /*, SkDeserialProcs */): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetGlyphs")
 private external fun _nGetGlyphs(ptr: NativePointer): ShortArray
@@ -137,7 +136,7 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
         fun makeFromData(data: Data?): TextBlob? {
             return try {
                 Stats.onNativeCall()
-                val ptr = _nMakeFromData(getPtr(data))
+                val ptr = TextBlob_nMakeFromData(getPtr(data))
                 if (ptr == NullPointer) null else TextBlob(ptr)
             } finally {
                 reachabilityBarrier(data)
@@ -172,7 +171,7 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
     val uniqueId: Int
         get() = try {
             Stats.onNativeCall()
-            _nGetUniqueId(_ptr)
+            TextBlob_nGetUniqueId(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -228,7 +227,7 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
     fun serializeToData(): Data {
         return try {
             Stats.onNativeCall()
-            Data(_nSerializeToData(_ptr))
+            Data(TextBlob_nSerializeToData(_ptr))
         } finally {
             reachabilityBarrier(this)
         }
@@ -343,6 +342,6 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
         }
 
     private object _FinalizerHolder {
-        val PTR = _nGetFinalizer()
+        val PTR = TextBlob_nGetFinalizer()
     }
 }

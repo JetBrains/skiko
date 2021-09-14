@@ -52,7 +52,7 @@ class ManagedString internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
     }
 
     internal object _FinalizerHolder {
-        val PTR = _nGetFinalizer()
+        val PTR = ManagedString_nGetFinalizer()
     }
 }
 
@@ -61,7 +61,7 @@ class ManagedString internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
 private external fun _nMake(s: String?): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ManagedString__1nGetFinalizer")
-private external fun _nGetFinalizer(): NativePointer
+private external fun ManagedString_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ManagedString__1nToString")
 private external fun _nToString(ptr: NativePointer): String

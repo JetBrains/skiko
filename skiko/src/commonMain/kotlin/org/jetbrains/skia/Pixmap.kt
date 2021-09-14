@@ -11,7 +11,7 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
 
     fun reset() {
         Stats.onNativeCall()
-        _nReset(_ptr)
+        Pixmap_nReset(_ptr)
         reachabilityBarrier(this)
     }
 
@@ -42,7 +42,7 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
     fun extractSubset(subsetPtr: NativePointer, area: IRect): Boolean {
         return try {
             Stats.onNativeCall()
-            _nExtractSubset(
+            Pixmap_nExtractSubset(
                 _ptr,
                 subsetPtr,
                 area.left,
@@ -72,7 +72,7 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
         get() {
             Stats.onNativeCall()
             return try {
-                _nGetRowBytes(_ptr)
+                Pixmap_nGetRowBytes(_ptr)
             } finally {
                 reachabilityBarrier(this)
             }
@@ -90,7 +90,7 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
         get() {
             Stats.onNativeCall()
             return try {
-                _nGetRowBytesAsPixels(_ptr)
+                Pixmap_nGetRowBytesAsPixels(_ptr)
             } finally {
                 reachabilityBarrier(this)
             }
@@ -99,7 +99,7 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
     fun computeByteSize(): Int {
         Stats.onNativeCall()
         return try {
-            _nComputeByteSize(_ptr)
+            Pixmap_nComputeByteSize(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -108,7 +108,7 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
     fun computeIsOpaque(): Boolean {
         Stats.onNativeCall()
         return try {
-            _nComputeIsOpaque(_ptr)
+            Pixmap_nComputeIsOpaque(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -117,7 +117,7 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
     fun getColor(x: Int, y: Int): Int {
         Stats.onNativeCall()
         return try {
-            _nGetColor(_ptr, x, y)
+            Pixmap_nGetColor(_ptr, x, y)
         } finally {
             reachabilityBarrier(this)
         }
@@ -245,7 +245,7 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
         get() = BufferUtil.getByteBufferFromPointer(addr, computeByteSize())
 
     private object _FinalizerHolder {
-        val PTR = _nGetFinalizer()
+        val PTR = PixMap_nGetFinalizer()
     }
 
     companion object {
@@ -272,7 +272,28 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
 
 
 @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nGetFinalizer")
-private external fun _nGetFinalizer(): NativePointer
+private external fun PixMap_nGetFinalizer(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Pixmap__1nReset")
+private external fun Pixmap_nReset(ptr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_Pixmap__1nExtractSubset")
+private external fun Pixmap_nExtractSubset(ptr: NativePointer, subsetPtr: NativePointer, l: Int, t: Int, r: Int, b: Int): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Pixmap__1nGetRowBytes")
+private external fun Pixmap_nGetRowBytes(ptr: NativePointer): Int
+
+@ExternalSymbolName("org_jetbrains_skia_Pixmap__1nGetRowBytesAsPixels")
+private external fun Pixmap_nGetRowBytesAsPixels(ptr: NativePointer): Int
+
+@ExternalSymbolName("org_jetbrains_skia_Pixmap__1nComputeByteSize")
+private external fun Pixmap_nComputeByteSize(ptr: NativePointer): Int
+
+@ExternalSymbolName("org_jetbrains_skia_Pixmap__1nComputeIsOpaque")
+private external fun Pixmap_nComputeIsOpaque(ptr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Pixmap__1nGetColor")
+private external fun Pixmap_nGetColor(ptr: NativePointer, x: Int, y: Int): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nMakeNull")
 private external fun _nMakeNull(): NativePointer
@@ -288,9 +309,6 @@ private external fun _nMake(
     rowBytes: Int
 ): NativePointer
 
-
-@ExternalSymbolName("org_jetbrains_skia_Pixmap__1nReset")
-private external fun _nReset(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nResetWithInfo")
 private external fun _nResetWithInfo(
@@ -308,33 +326,15 @@ private external fun _nResetWithInfo(
 @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nSetColorSpace")
 private external fun _nSetColorSpace(ptr: NativePointer, colorSpacePtr: NativePointer)
 
-@ExternalSymbolName("org_jetbrains_skia_Pixmap__1nExtractSubset")
-private external fun _nExtractSubset(ptr: NativePointer, subsetPtr: NativePointer, l: Int, t: Int, r: Int, b: Int): Boolean
-
 @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nGetInfo")
 private external fun _nGetInfo(ptr: NativePointer): ImageInfo
-
-@ExternalSymbolName("org_jetbrains_skia_Pixmap__1nGetRowBytes")
-private external fun _nGetRowBytes(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nGetAddr")
 private external fun _nGetAddr(ptr: NativePointer): NativePointer
 
 // TODO methods flattening ImageInfo not included yet - use GetInfo() instead.
 
-@ExternalSymbolName("org_jetbrains_skia_Pixmap__1nGetRowBytesAsPixels")
-private external fun _nGetRowBytesAsPixels(ptr: NativePointer): Int
-
 // TODO shiftPerPixel
-
-@ExternalSymbolName("org_jetbrains_skia_Pixmap__1nComputeByteSize")
-private external fun _nComputeByteSize(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_Pixmap__1nComputeIsOpaque")
-private external fun _nComputeIsOpaque(ptr: NativePointer): Boolean
-
-@ExternalSymbolName("org_jetbrains_skia_Pixmap__1nGetColor")
-private external fun _nGetColor(ptr: NativePointer, x: Int, y: Int): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nGetAlphaF")
 private external fun _nGetAlphaF(ptr: NativePointer, x: Int, y: Int): Float

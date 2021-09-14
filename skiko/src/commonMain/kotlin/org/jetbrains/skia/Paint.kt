@@ -18,7 +18,7 @@ class Paint : Managed {
     }
 
     internal object _FinalizerHolder {
-        val PTR = _nGetFinalizer()
+        val PTR = Paint_nGetFinalizer()
     }
 
     internal constructor(ptr: NativePointer, managed: Boolean) : super(ptr, _FinalizerHolder.PTR, managed)
@@ -28,7 +28,7 @@ class Paint : Managed {
      *
      * @see [https://fiddle.skia.org/c/@Paint_empty_constructor](https://fiddle.skia.org/c/@Paint_empty_constructor)
      */
-    constructor() : super(_nMake(), _FinalizerHolder.PTR) {
+    constructor() : super(Paint_nMake(), _FinalizerHolder.PTR) {
         Stats.onNativeCall()
     }
 
@@ -49,7 +49,7 @@ class Paint : Managed {
     fun makeClone(): Paint {
         return try {
             Stats.onNativeCall()
-            Paint(_nMakeClone(_ptr), true)
+            Paint(Paint_nMakeClone(_ptr), true)
         } finally {
             reachabilityBarrier(this)
         }
@@ -57,7 +57,7 @@ class Paint : Managed {
 
     override fun _nativeEquals(other: Native?): Boolean {
         return try {
-            _nEquals(_ptr, getPtr(other))
+            Paint_nEquals(_ptr, getPtr(other))
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(other)
@@ -72,7 +72,7 @@ class Paint : Managed {
      */
     fun reset(): Paint {
         Stats.onNativeCall()
-        _nReset(_ptr)
+        Paint_nReset(_ptr)
         return this
     }
 
@@ -799,19 +799,19 @@ class Paint : Managed {
 
 
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetFinalizer")
-private external fun _nGetFinalizer(): NativePointer
+private external fun Paint_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nMake")
-private external fun _nMake(): NativePointer
+private external fun Paint_nMake(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nMakeClone")
-private external fun _nMakeClone(ptr: NativePointer): NativePointer
+private external fun Paint_nMakeClone(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nEquals")
-private external fun _nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
+private external fun Paint_nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nReset")
-private external fun _nReset(ptr: NativePointer)
+private external fun Paint_nReset(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nIsAntiAlias")
 private external fun _nIsAntiAlias(ptr: NativePointer): Boolean

@@ -18,7 +18,7 @@ class Picture internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         fun makeFromData(data: Data?): Picture? {
             return try {
                 Stats.onNativeCall()
-                val ptr = _nMakeFromData(getPtr(data))
+                val ptr = Picture_nMakeFromData(getPtr(data))
                 if (ptr == NullPointer) null else Picture(ptr)
             } finally {
                 reachabilityBarrier(data)
@@ -221,7 +221,7 @@ class Picture internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nMakeFromData")
-private external fun _nMakeFromData(dataPtr: NativePointer /*, SkDeserialProcs */): NativePointer
+private external fun Picture_nMakeFromData(dataPtr: NativePointer /*, SkDeserialProcs */): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nPlayback")
 private external fun _nPlayback(ptr: NativePointer, canvasPtr: NativePointer, abort: BooleanSupplier?)

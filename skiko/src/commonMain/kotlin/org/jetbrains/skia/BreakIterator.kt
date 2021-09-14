@@ -512,13 +512,13 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
     }
 
     private object _FinalizerHolder {
-        val PTR = _nGetFinalizer()
+        val PTR = BreakIterator_nGetFinalizer()
     }
 }
 
 
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nGetFinalizer")
-private external fun _nGetFinalizer(): NativePointer
+private external fun BreakIterator_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nMake")
 private external fun _nMake(type: Int, locale: String?): NativePointer

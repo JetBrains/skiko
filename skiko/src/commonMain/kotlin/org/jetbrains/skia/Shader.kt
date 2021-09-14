@@ -404,7 +404,7 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         //
         fun makeEmpty(): Shader {
             Stats.onNativeCall()
-            return Shader(_nMakeEmpty())
+            return Shader(Shader_nMakeEmpty())
         }
 
         fun makeColor(color: Int): Shader {
@@ -643,7 +643,7 @@ private external fun _nMakeTurbulence(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeEmpty")
-private external fun _nMakeEmpty(): NativePointer
+private external fun Shader_nMakeEmpty(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeColor")
 private external fun _nMakeColor(color: Int): NativePointer

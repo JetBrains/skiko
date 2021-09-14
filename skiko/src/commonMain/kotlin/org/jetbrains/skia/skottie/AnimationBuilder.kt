@@ -24,11 +24,11 @@ class AnimationBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _
     }
 
     private object _FinalizerHolder {
-        val PTR = _nGetFinalizer()
+        val PTR = AnimationBuilder_nGetFinalizer()
     }
 
     constructor() : this(*emptyArray<AnimationBuilderFlag>()) {}
-    constructor(vararg builderFlags: AnimationBuilderFlag) : this(_nMake(_flagsToInt(*builderFlags))) {
+    constructor(vararg builderFlags: AnimationBuilderFlag) : this(AnimationBuilder_nMake(_flagsToInt(*builderFlags))) {
         Stats.onNativeCall()
     }
 
@@ -97,10 +97,10 @@ class AnimationBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _
 
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nGetFinalizer")
-private external fun _nGetFinalizer(): NativePointer
+private external fun AnimationBuilder_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nMake")
-private external fun _nMake(flags: Int): NativePointer
+private external fun AnimationBuilder_nMake(flags: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nSetFontManager")
 private external fun _nSetFontManager(ptr: NativePointer, fontMgrPtr: NativePointer)

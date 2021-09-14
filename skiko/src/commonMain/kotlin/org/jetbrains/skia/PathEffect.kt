@@ -5,10 +5,8 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
-import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
-import kotlin.jvm.JvmStatic
 
 class PathEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
@@ -91,7 +89,7 @@ class PathEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     fun makeCompose(inner: PathEffect?): PathEffect {
         return try {
             Stats.onNativeCall()
-            PathEffect(_nMakeCompose(_ptr, getPtr(inner)))
+            PathEffect(PathEffect_nMakeCompose(_ptr, getPtr(inner)))
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(inner)
@@ -99,11 +97,11 @@ class PathEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     }
 }
 
+@ExternalSymbolName("org_jetbrains_skia_PathEffect__1nMakeCompose")
+private external fun PathEffect_nMakeCompose(outerPtr: NativePointer, innerPtr: NativePointer): NativePointer
+
 @ExternalSymbolName("org_jetbrains_skia_PathEffect__1nMakeSum")
 private external fun _nMakeSum(firstPtr: NativePointer, secondPtr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_PathEffect__1nMakeCompose")
-private external fun _nMakeCompose(outerPtr: NativePointer, innerPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_PathEffect__1nMakePath1D")
 private external fun _nMakePath1D(pathPtr: NativePointer, advance: Float, phase: Float, style: Int): NativePointer

@@ -2,9 +2,7 @@
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.*
-import kotlin.jvm.JvmStatic
 
 class ColorSpace : Managed {
     companion object {
@@ -89,7 +87,7 @@ class ColorSpace : Managed {
         }
 
     private object _FinalizerHolder {
-        val PTR = _nGetFinalizer()
+        val PTR = ColorSpace_nGetFinalizer()
     }
 }
 
@@ -99,7 +97,7 @@ private external fun _nConvert(
 
 
 @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nGetFinalizer")
-private external fun _nGetFinalizer(): NativePointer
+private external fun ColorSpace_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nMakeSRGB")
 private external fun _nMakeSRGB(): NativePointer

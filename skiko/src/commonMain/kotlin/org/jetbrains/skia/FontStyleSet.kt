@@ -6,13 +6,12 @@ import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.impl.NativePointer
-import kotlin.jvm.JvmStatic
 
 class FontStyleSet internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
         fun makeEmpty(): FontStyleSet {
             Stats.onNativeCall()
-            return FontStyleSet(_nMakeEmpty())
+            return FontStyleSet(FontStyleSet_nMakeEmpty())
         }
 
         init {
@@ -70,7 +69,7 @@ class FontStyleSet internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 
 
 @ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nMakeEmpty")
-private external fun _nMakeEmpty(): NativePointer
+private external fun FontStyleSet_nMakeEmpty(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nCount")
 private external fun _nCount(ptr: NativePointer): Int
