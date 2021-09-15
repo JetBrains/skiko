@@ -353,23 +353,13 @@ val wasmCompile = project.tasks.register<Exec>("wasmCompile") {
         ).findAllFiles(".cc").toTypedArray()
         val outJs = "$outDir/skiko.js"
         val outWasm = "$outDir/skiko.wasm"
-        val setupSrc = "$projectDir/src/jsMain/resources/setup.js"
         workingDir = File(outDir)
         if (supportWasm) {
             commandLine = listOf(
                 "emcc",
                 *Arch.Wasm.clangFlags,
-<<<<<<< HEAD
                 "-I$projectDir/src/commonMain/cpp",
                 *skiaPreprocessorFlags(skiaDir),
-=======
-                "-I$skiaDir",
-                "-I$skiaDir/include",
-                "-I$skiaDir/include/core",
-                "-I$skiaDir/include/effects",
-                "-I$skiaDir/include/gpu",
-                "--pre-js", setupSrc,
->>>>>>> d69ffdc (Introduce minimal initialisation setup / api that can be called from kotlin side)
                 "-o", outJs,
                 *srcs
             )
@@ -387,7 +377,7 @@ val wasmCompile = project.tasks.register<Exec>("wasmCompile") {
             )
         }
         file(outDir).mkdirs()
-        inputs.files(srcs + listOf(setupSrc))
+        inputs.files(srcs)
         outputs.files(outJs, outWasm)
 }
 
