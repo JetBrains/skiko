@@ -51,6 +51,20 @@ actual class InteropScope actual constructor() {
             0
         }
     }
+    actual fun InteropPointer.fromInterop(result: ShortArray) {
+        fromWasm(this@fromInterop, result)
+    }
+
+    actual fun toInterop(array: ShortArray?): InteropPointer {
+        return if (array != null) {
+            val data = _malloc(array.size * 2)
+            elements.add(data)
+            toWasm(data, array)
+            data
+        } else {
+            0
+        }
+    }
 
     actual fun InteropPointer.fromInterop(result: IntArray) {
         fromWasm(this@fromInterop, result)
@@ -139,6 +153,10 @@ private fun toWasm(dest: NativePointer, src: CharArray) {
     js("HEAPU16.set(src, dest)")
 }
 
+private fun toWasm(dest: NativePointer, src: ShortArray) {
+    js("HEAPU16.set(src, dest)")
+}
+
 private fun toWasm(dest: NativePointer, src: FloatArray) {
     js("HEAPU32.set(src, dest)")
 }
@@ -152,6 +170,10 @@ private fun fromWasm(src: NativePointer, result: ByteArray) {
 }
 
 private fun fromWasm(src: NativePointer, result: CharArray) {
+    js("result.set(HEAPU16.subarray(src, result.size))")
+}
+
+private fun fromWasm(src: NativePointer, result: ShortArray) {
     js("result.set(HEAPU16.subarray(src, result.size))")
 }
 

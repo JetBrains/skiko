@@ -55,6 +55,8 @@ actual class InteropScope actual constructor() {
     actual fun InteropPointer.fromInterop(result: CharArray) {}
     actual fun toInterop(array: ByteArray?): InteropPointer = array
     actual fun InteropPointer.fromInterop(result: ByteArray) {}
+    actual fun toInterop(array: ShortArray?): InteropPointer = array
+    actual fun InteropPointer.fromInterop(result: ShortArray) {}
     actual fun toInterop(array: IntArray?): InteropPointer = array
     actual fun InteropPointer.fromInterop(result: IntArray) {}
     actual fun toInterop(array: LongArray?): InteropPointer = array

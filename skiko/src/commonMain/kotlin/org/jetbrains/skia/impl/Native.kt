@@ -22,6 +22,8 @@ expect class InteropScope() {
     fun InteropPointer.fromInterop(result: CharArray)
     fun toInterop(array: ByteArray?): InteropPointer
     fun InteropPointer.fromInterop(result: ByteArray)
+    fun toInterop(array: ShortArray?): InteropPointer
+    fun InteropPointer.fromInterop(result: ShortArray)
     fun toInterop(array: IntArray?): InteropPointer
     fun InteropPointer.fromInterop(result: IntArray)
     fun toInterop(array: LongArray?): InteropPointer
