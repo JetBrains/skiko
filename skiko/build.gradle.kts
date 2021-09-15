@@ -674,6 +674,7 @@ val skikoWasmJar by project.tasks.registering(Jar::class) {
     // We produce jar that contains .js of wrapper/bindings and .wasm with Skia + bindings.
     from(wasmCompileTask.get().outputs.files.single { it.name.endsWith(".wasm")})
     from(wasmJsPatcher.get().outputs)
+    rename { if (it == "skiko_processed.js") "skiko.js" else it }
     archiveBaseName.set("skiko-wasm")
     doLast {
         println("Wasm and JS at ${outputs.files.files.single()}")
