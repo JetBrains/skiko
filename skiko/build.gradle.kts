@@ -252,9 +252,7 @@ tasks.withType(CppCompile::class.java).configureEach {
     compilerArgs.addAll(
         listOf("-I$jdkHome/include") + skiaPreprocessorFlags(skiaDir)
     )
-    val includeDir = "$projectDir/src/jvmMain/cpp/include"
-    val commonIncludeDir = "$projectDir/src/commonMain/cpp"
-
+    compilerArgs.add("-I$projectDir/src/jvmMain/cpp/include")
     when (targetOs) {
         OS.MacOS -> {
             compilerArgs.addAll(
@@ -262,8 +260,6 @@ tasks.withType(CppCompile::class.java).configureEach {
                     "-fvisibility=hidden",
                     "-fvisibility-inlines-hidden",
                     "-I$jdkHome/include/darwin",
-                    "-I$includeDir",
-                    //"-I$commonIncludeDir",
                     "-DSK_SHAPER_CORETEXT_AVAILABLE",
                     "-DSK_BUILD_FOR_MAC",
                     "-DSK_METAL",
@@ -280,8 +276,6 @@ tasks.withType(CppCompile::class.java).configureEach {
                     "-fvisibility=hidden",
                     "-fvisibility-inlines-hidden",
                     "-I$jdkHome/include/linux",
-                    "-I$includeDir",
-                    "-I$commonIncludeDir",
                     "-DSK_BUILD_FOR_LINUX",
                     "-D_GLIBCXX_USE_CXX11_ABI=0",
                     *buildType.clangFlags
@@ -292,8 +286,6 @@ tasks.withType(CppCompile::class.java).configureEach {
             compilerArgs.addAll(
                 listOf(
                     "-I$jdkHome/include/win32",
-                    "-I$includeDir",
-                    "-I$commonIncludeDir",
                     "-DSK_BUILD_FOR_WIN",
                     "-D_CRT_SECURE_NO_WARNINGS",
                     "-D_HAS_EXCEPTIONS=0",
@@ -351,7 +343,7 @@ fun List<String>.findAllFiles(suffix: String): List<String> = this
     .filter { it.endsWith(suffix) }
 
 
-project.tasks.register<Exec>("wasmCompile") {
+val wasmCompileTask = project.tasks.register<Exec>("wasmCompile") {
         dependsOn(skiaWasmDir)
         val skiaDir = skiaWasmDir.get().absolutePath
         val outDir = "$buildDir/wasm"
@@ -389,13 +381,26 @@ project.tasks.register<Exec>("wasmCompile") {
         outputs.files(outJs, outWasm)
 }
 
+val wasmJsPatcher = project.tasks.register<Exec>("wasmJsPatcher") {
+    dependsOn(wasmCompileTask)
+    val inJs = wasmCompileTask.get().outputs.files.single { it.name.endsWith(".js") }
+    val outDir = "$buildDir/wasm"
+    val outJs = "$outDir/skiko_processed.js"
+    commandLine = listOf(
+        "bash", "-c",
+        "sed 's/_org_jetbrains_/org_jetbrains_/g' ${inJs.absolutePath} > ${outJs}"
+    )
+    inputs.files(inJs)
+    outputs.files(outJs)
+}
+
 // Very hacky way to compile native bridges and add the
 // resulting object files into the final native klib.
 project.tasks.register<Exec>("nativeBridgesCompile") {
     dependsOn(skiaDir)
     val inputDirs = listOf(
         "$projectDir/src/nativeMain/cpp/common",
-        "$projectDir/src/commonMain/cpp/common"
+        "$projectDir/src/commonMain/cpp"
     )
     val outDir = "$buildDir/nativeBridges/obj/$target"
     val srcs = inputDirs
@@ -667,7 +672,8 @@ val skikoJvmRuntimeJar by project.tasks.registering(Jar::class) {
 
 val skikoWasmJar by project.tasks.registering(Jar::class) {
     // We produce jar that contains .js of wrapper/bindings and .wasm with Skia + bindings.
-    from(project.tasks.named("wasmCompile").get().outputs)
+    from(wasmCompileTask.get().outputs.files.single { it.name.endsWith(".wasm")})
+    from(wasmJsPatcher.get().outputs)
     archiveBaseName.set("skiko-wasm")
     doLast {
         println("Wasm and JS at ${outputs.files.files.single()}")
