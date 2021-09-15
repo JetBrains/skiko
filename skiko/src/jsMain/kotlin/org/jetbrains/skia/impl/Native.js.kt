@@ -127,6 +127,17 @@ actual class InteropScope actual constructor() {
         }
     }
 
+    actual fun InteropPointer.fromInterop(result: NativePointerArray) {
+        TODO("implement wasm fromInterop(NativePointerArray)")
+    }
+
+    actual fun toInterop(stringArray: Array<String>?): InteropPointer =
+        TODO("implement wasm toInterop(Array<String>)")
+
+    actual fun InteropPointer.fromInteropNativePointerArray(): NativePointerArray {
+        TODO("implement wasm fromInteropNativePointerArray")
+    }
+
     actual fun release()  {
         elements.forEach {
             _free(it)

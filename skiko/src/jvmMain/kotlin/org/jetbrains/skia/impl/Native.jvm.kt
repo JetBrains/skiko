@@ -66,12 +66,18 @@ actual class InteropScope actual constructor() {
     actual fun toInterop(array: DoubleArray?): InteropPointer = array
     actual fun InteropPointer.fromInterop(result: DoubleArray) {}
     actual fun toInterop(array: NativePointerArray?): InteropPointer = array?.backing
+    actual fun InteropPointer.fromInterop(result: NativePointerArray) {}
+    actual fun toInterop(stringArray: Array<String>?): InteropPointer = stringArray
+    actual fun InteropPointer.fromInteropNativePointerArray(): NativePointerArray =
+        NativePointerArray((this as LongArray).size, this)
     actual fun release() {}
 }
 
 // Ugly! NativePtrArray in stdlib is unfortunately internal, don't have ctor and cannot be used.
-actual class NativePointerArray actual constructor(size: Int) {
-    internal val backing = LongArray(size)
+actual class NativePointerArray constructor(size: Int, internal val backing: LongArray) {
+
+    actual constructor(size: Int) : this(size, LongArray(size))
+
     actual operator fun get(index: Int): NativePointer {
         return backing[index]
     }

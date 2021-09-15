@@ -135,6 +135,26 @@ actual class InteropScope actual constructor() {
         }
     }
 
+    actual fun InteropPointer.fromInterop(result: NativePointerArray) {}
+
+    actual fun toInterop(stringArray: Array<String>?): InteropPointer {
+        if (stringArray == null) return NativePtr.NULL
+
+        val pins = stringArray.toList()
+            .map { it.encodeToByteArray().pin() }
+
+        val nativePointerArray = NativePointerArray(stringArray.size)
+        pins.forEachIndexed { index, pin ->
+            elements.add(pin)
+            nativePointerArray[index] = pin.addressOf(0).rawValue
+        }
+        return toInterop(nativePointerArray)
+    }
+
+    actual fun InteropPointer.fromInteropNativePointerArray(): NativePointerArray {
+        TODO("implement native fromInteropNativePointerArray")
+    }
+
     actual fun release()  {
         elements.forEach {
             it.unpin()

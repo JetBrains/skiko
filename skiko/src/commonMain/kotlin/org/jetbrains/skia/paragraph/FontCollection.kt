@@ -2,14 +2,9 @@
 package org.jetbrains.skia.paragraph
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.*
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.NativePointerArray
-import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.*
 
 class FontCollection internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
@@ -90,10 +85,12 @@ class FontCollection internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             reachabilityBarrier(this)
         }
 
-    fun findTypefaces(familyNames: Array<String?>?, style: FontStyle): Array<Typeface?> {
+    fun findTypefaces(familyNames: Array<String>?, style: FontStyle): Array<Typeface?> {
         return try {
             Stats.onNativeCall()
-            val ptrs = _nFindTypefaces(_ptr, familyNames, style._value)
+            val ptrs = interopScope {
+                _nFindTypefaces(_ptr, toInterop(familyNames), style._value).fromInteropNativePointerArray()
+            }
             val res = arrayOfNulls<Typeface>(ptrs.size)
             for (i in 0 until ptrs.size) res[i] = Typeface(ptrs[i])
             res
@@ -160,8 +157,7 @@ private external fun _nSetDefaultFontManager(ptr: NativePointer, fontManagerPtr:
 private external fun _nGetFallbackManager(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nFindTypefaces")
-// TODO: fix me, must pass value to store result!
-private external fun _nFindTypefaces(ptr: NativePointer, familyNames: Array<String?>?, fontStyle: Int): NativePointerArray
+private external fun _nFindTypefaces(ptr: NativePointer, familyNames: InteropPointer, fontStyle: Int): InteropPointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nDefaultFallbackChar")
 private external fun _nDefaultFallbackChar(ptr: NativePointer, unicode: Int, fontStyle: Int, locale: String?): NativePointer

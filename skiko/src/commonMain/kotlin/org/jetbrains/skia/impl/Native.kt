@@ -17,6 +17,10 @@ expect fun reachabilityBarrier(obj: Any?)
 
 fun getPtr(n: Native?): NativePointer = n?._ptr ?: Native.NullPointer
 
+interface ArrayInteropDecoder<T> {
+    fun popArrayElement(array: InteropPointer): T?
+}
+
 expect class InteropScope() {
     fun toInterop(string: String?): InteropPointer
     fun InteropPointer.fromInterop(result: CharArray)
@@ -33,7 +37,9 @@ expect class InteropScope() {
     fun toInterop(array: DoubleArray?): InteropPointer
     fun InteropPointer.fromInterop(result: DoubleArray)
     fun toInterop(array: NativePointerArray?): InteropPointer
-
+    fun InteropPointer.fromInterop(result: NativePointerArray)
+    fun toInterop(stringArray: Array<String>?): InteropPointer
+    fun InteropPointer.fromInteropNativePointerArray(): NativePointerArray
     fun release()
 }
 
@@ -60,3 +66,9 @@ inline fun withResult(result: FloatArray, block: (InteropPointer) -> Unit): Floa
     result
 }
 
+inline fun withResult(result: NativePointerArray, block: (InteropPointer) -> Unit): NativePointerArray = interopScope {
+    val handle = toInterop(result)
+    block(handle)
+    handle.fromInterop(result)
+    result
+}
