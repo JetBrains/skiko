@@ -58,6 +58,6 @@ actual class InteropScope actual constructor() {
     actual fun InteropPointer.fromInterop(result: ByteArray) {}
     actual fun toInterop(array: FloatArray?): InteropPointer = array
     actual fun InteropPointer.fromInterop(result: FloatArray) {}
-    actual fun toInterop(array: NativePointerArray?): InteropPointer = array
+    actual fun toInteropArray(array: NativePointerArray?): InteropPointer = array
     actual fun release() {}
 }

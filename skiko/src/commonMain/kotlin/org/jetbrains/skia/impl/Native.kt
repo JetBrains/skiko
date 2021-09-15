@@ -24,7 +24,7 @@ expect class InteropScope() {
     fun InteropPointer.fromInterop(result: ByteArray)
     fun toInterop(array: FloatArray?): InteropPointer
     fun InteropPointer.fromInterop(result: FloatArray)
-    fun toInterop(array: NativePointerArray?): InteropPointer
+    fun toInteropArray(array: NativePointerArray?): InteropPointer
 
     fun release()
 }

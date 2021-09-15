@@ -31,7 +31,7 @@ class RuntimeEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         for (i in 0 until childCount) childrenPtrs[i] = getPtr(children!![i])
         val matrix = localMatrix?.mat
         return interopScope {
-            Shader(_nMakeShader(_ptr, getPtr(uniforms), toInterop(childrenPtrs), toInterop(matrix), isOpaque))
+            Shader(_nMakeShader(_ptr, getPtr(uniforms), toInteropArray(childrenPtrs), toInterop(matrix), isOpaque))
         }
     }
 }

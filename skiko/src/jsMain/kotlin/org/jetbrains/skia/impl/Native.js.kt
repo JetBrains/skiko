@@ -70,7 +70,7 @@ actual class InteropScope actual constructor() {
         fromWasm(this@fromInterop, result)
     }
 
-    actual fun toInterop(array: NativePointerArray?): InteropPointer {
+    actual fun toInteropArray(array: NativePointerArray?): InteropPointer {
         return if (array != null) {
             val data = _malloc(array.size * 4)
             elements.add(data)
