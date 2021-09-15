@@ -1,5 +1,7 @@
+import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
+
 plugins {
-    kotlin("multiplatform") version "1.5.21"
+    kotlin("multiplatform") version "1.5.10"
 }
 
 repositories {
@@ -15,6 +17,22 @@ if (project.hasProperty("skiko.version")) {
 }
 
 val resourcesDir = "$buildDir/resources/"
+
+val skikoWasm by configurations.creating
+
+dependencies {
+    skikoWasm("org.jetbrains.skiko:skiko-js-wasm-runtime:$version")
+}
+
+val unzipTask = tasks.register("unzipWasm", Copy::class) {
+    destinationDir = file(resourcesDir)
+    from(skikoWasm.map { zipTree(it) })
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().configureEach {
+    dependsOn(unzipTask)
+}
+
 
 kotlin {
 
@@ -33,23 +51,15 @@ kotlin {
                 // We cannot use it directly but need to extract data from there.
                 implementation("org.jetbrains.skiko:skiko-js-runtime:$version")
             }
-            resources.setSrcDirs(listOf(resourcesDir))
+            resources.setSrcDirs(resources.srcDirs + unzipTask.get().destinationDir)
         }
     }
 }
 
-val skikoWasm by configurations.creating
-
-dependencies {
-    skikoWasm("org.jetbrains.skiko:skiko-js-wasm-runtime:$version")
-}
-
-val unzipTask = tasks.register("unzipWasm", Copy::class) {
-    destinationDir = file(resourcesDir)
-    from(skikoWasm.map { zipTree(it) })
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().configureEach {
-    dependsOn(unzipTask)
+// a temporary workaround for a bug in jsRun invocation - see https://youtrack.jetbrains.com/issue/KT-48273
+afterEvaluate {
+    extensions.configure<NodeJsRootExtension> {
+        versions.webpackDevServer.version = "4.0.0"
+    }
 }
 
