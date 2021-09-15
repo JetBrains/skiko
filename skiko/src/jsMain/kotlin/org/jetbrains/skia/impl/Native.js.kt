@@ -21,7 +21,6 @@ actual fun reachabilityBarrier(obj: Any?) {
 }
 
 actual typealias NativePointer = Int
-actual typealias NativePointerArray = IntArray
 actual typealias InteropPointer = Int
 
 actual class InteropScope actual constructor() {
@@ -103,11 +102,11 @@ actual class InteropScope actual constructor() {
         fromWasm(this@fromInterop, result)
     }
 
-    actual fun toInteropArray(array: NativePointerArray?): InteropPointer {
+    actual fun toInterop(array: NativePointerArray?): InteropPointer {
         return if (array != null) {
             val data = _malloc(array.size * 4)
             elements.add(data)
-            toWasm(data, array)
+            toWasm(data, array.backing)
             data
         } else {
             0
@@ -164,4 +163,16 @@ private fun fromWasm(src: NativePointer, result: FloatArray) {
     js("result.set(HEAPU32.subarray(src, result.size))")
 }
 
+actual class NativePointerArray actual constructor(size: Int) {
+    internal val backing = IntArray(size)
+    actual operator fun get(index: Int): NativePointer {
+        return backing[index]
+    }
 
+    actual operator fun set(index: Int, value: NativePointer) {
+        backing[index] = value
+    }
+
+    actual val size: Int
+        get() = backing.size
+}

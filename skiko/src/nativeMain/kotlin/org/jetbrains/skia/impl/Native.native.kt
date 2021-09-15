@@ -110,7 +110,7 @@ actual class InteropScope actual constructor() {
 
     actual fun InteropPointer.fromInterop(result: DoubleArray) {}
 
-    actual fun toInteropArray(array: NativePointerArray?): InteropPointer {
+    actual fun toInterop(array: NativePointerArray?): InteropPointer {
         return if (array != null) {
             // We pass it as LongArray via boundary.
             val pinned = array.backing.pin()

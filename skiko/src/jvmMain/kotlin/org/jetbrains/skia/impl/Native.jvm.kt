@@ -47,7 +47,6 @@ actual fun reachabilityBarrier(obj: Any?) {
 }
 
 actual typealias NativePointer = Long
-actual typealias NativePointerArray = LongArray
 
 actual typealias InteropPointer = Any?
 
@@ -64,6 +63,21 @@ actual class InteropScope actual constructor() {
     actual fun InteropPointer.fromInterop(result: FloatArray) {}
     actual fun toInterop(array: DoubleArray?): InteropPointer = array
     actual fun InteropPointer.fromInterop(result: DoubleArray) {}
-    actual fun toInteropArray(array: NativePointerArray?): InteropPointer = array
+    actual fun toInterop(array: NativePointerArray?): InteropPointer = array?.backing
     actual fun release() {}
+}
+
+// Ugly! NativePtrArray in stdlib is unfortunately internal, don't have ctor and cannot be used.
+actual class NativePointerArray actual constructor(size: Int) {
+    internal val backing = LongArray(size)
+    actual operator fun get(index: Int): NativePointer {
+        return backing[index]
+    }
+
+    actual operator fun set(index: Int, value: NativePointer) {
+        backing[index] = value
+    }
+
+    actual val size: Int
+        get() = backing.size
 }

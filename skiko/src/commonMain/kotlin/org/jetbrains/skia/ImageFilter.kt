@@ -314,7 +314,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                     Stats.onNativeCall()
                     val filterPtrs = NativePointerArray(filters.size)
                     for (i in filters.indices) filterPtrs[i] = getPtr(filters[i])
-                    ImageFilter(_nMakeMerge(toInteropArray(filterPtrs), crop))
+                    ImageFilter(_nMakeMerge(toInterop(filterPtrs), crop))
                 } finally {
                     reachabilityBarrier(filters)
                 }

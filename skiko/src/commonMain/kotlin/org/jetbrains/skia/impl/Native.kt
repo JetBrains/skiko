@@ -30,7 +30,7 @@ expect class InteropScope() {
     fun InteropPointer.fromInterop(result: FloatArray)
     fun toInterop(array: DoubleArray?): InteropPointer
     fun InteropPointer.fromInterop(result: DoubleArray)
-    fun toInteropArray(array: NativePointerArray?): InteropPointer
+    fun toInterop(array: NativePointerArray?): InteropPointer
 
     fun release()
 }
