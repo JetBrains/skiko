@@ -58,6 +58,32 @@ actual class InteropScope actual constructor() {
 
     actual fun InteropPointer.fromInterop(result: ByteArray) {}
 
+    actual fun toInterop(array: IntArray?): InteropPointer {
+        return if (array != null) {
+            val pinned = array.pin()
+            elements.add(pinned)
+            val result = pinned.addressOf(0).rawValue
+            result
+        } else {
+            NativePtr.NULL
+        }
+    }
+
+    actual fun InteropPointer.fromInterop(result: IntArray) {}
+
+    actual fun toInterop(array: LongArray?): InteropPointer {
+        return if (array != null) {
+            val pinned = array.pin()
+            elements.add(pinned)
+            val result = pinned.addressOf(0).rawValue
+            result
+        } else {
+            NativePtr.NULL
+        }
+    }
+
+    actual fun InteropPointer.fromInterop(result: LongArray) {}
+
     actual fun toInterop(array: FloatArray?): InteropPointer {
         return if (array != null) {
             val pinned = array.pin()
@@ -68,6 +94,21 @@ actual class InteropScope actual constructor() {
             NativePtr.NULL
         }
     }
+
+    actual fun InteropPointer.fromInterop(result: FloatArray) {}
+
+    actual fun toInterop(array: DoubleArray?): InteropPointer {
+        return if (array != null) {
+            val pinned = array.pin()
+            elements.add(pinned)
+            val result = pinned.addressOf(0).rawValue
+            result
+        } else {
+            NativePtr.NULL
+        }
+    }
+
+    actual fun InteropPointer.fromInterop(result: DoubleArray) {}
 
     actual fun toInteropArray(array: NativePointerArray?): InteropPointer {
         return if (array != null) {
@@ -80,8 +121,6 @@ actual class InteropScope actual constructor() {
             NativePtr.NULL
         }
     }
-
-    actual fun InteropPointer.fromInterop(result: FloatArray) {}
 
     actual fun release()  {
         elements.forEach {
