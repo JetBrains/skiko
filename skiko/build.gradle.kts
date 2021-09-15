@@ -659,9 +659,10 @@ val skikoJvmRuntimeJar by project.tasks.registering(Jar::class) {
 
 val skikoWasmJar by project.tasks.registering(Jar::class) {
     // We produce jar that contains .js of wrapper/bindings and .wasm with Skia + bindings.
-    from(wasmCompile.get().outputs.files.single { it.name.endsWith(".wasm")})
+    val wasmOutputs = wasmCompile.get().outputs
+    from(wasmOutputs.files.single { it.name.endsWith(".wasm")})
 
-    from(wasmCompile.get().outputs) {
+    from(wasmOutputs) {
         include("skiko.js")
         filter { line -> line.replace("_org_jetbrains_", "org_jetbrains_") }
     }
