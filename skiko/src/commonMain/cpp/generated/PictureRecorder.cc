@@ -24,7 +24,6 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_PictureRecorder__1nGetFinalizer
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_PictureRecorder__1nBeginRecording
   (KNativePointer ptr, KFloat left, KFloat top, KFloat right, KFloat bottom) {
-    printf("begin %p\n", ptr);
     SkPictureRecorder* instance = reinterpret_cast<SkPictureRecorder*>((ptr));
     SkCanvas* canvas = instance->beginRecording(SkRect::MakeLTRB(left, top, right, bottom), nullptr);
     return reinterpret_cast<KNativePointer>(canvas);

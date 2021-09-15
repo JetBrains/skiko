@@ -1,6 +1,8 @@
 
 // This file has been auto generated.
 
+#ifndef SKIKO_WASM
+
 #include <iostream>
 #include "GrDirectContext.h"
 #include "mtl/GrMtlBackendContext.h"
@@ -27,22 +29,6 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeDirect3D
   (KNativePointer adapterPtr, KNativePointer devicePtr, KNativePointer queuePtr) {
     TODO("implement org_jetbrains_skia_DirectContext__1nMakeDirect3D");
 }
-     
-#if 0 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeDirect3D
-  (KNativePointer adapterPtr, KNativePointer devicePtr, KNativePointer queuePtr) {
-    GrD3DBackendContext backendContext = {};
-    IDXGIAdapter1* adapter = reinterpret_cast<IDXGIAdapter1*>((adapterPtr));
-    ID3D12Device* device = reinterpret_cast<ID3D12Device*>((devicePtr));
-    ID3D12CommandQueue* queue = reinterpret_cast<ID3D12CommandQueue*>((queuePtr));
-    backendContext.fAdapter.retain(adapter);
-    backendContext.fDevice.retain(device);
-    backendContext.fQueue.retain(queue);
-    sk_sp<GrDirectContext> instance = GrDirectContext::MakeDirect3D(backendContext);
-    return reinterpret_cast<KNativePointer>(instance.release());
-}
-#endif
-
 
 SKIKO_EXPORT void org_jetbrains_skia_DirectContext__1nFlush
   (KNativePointer ptr) {
@@ -67,3 +53,5 @@ SKIKO_EXPORT void org_jetbrains_skia_DirectContext__1nAbandon
     GrDirectContext* context = reinterpret_cast<GrDirectContext*>((ptr));
     context->abandonContext();
 }
+
+#endif
