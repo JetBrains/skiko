@@ -18,15 +18,15 @@
 #include <stdexcept>
 #include "types.h"
 
-jlong packTwoInts(int32_t a, int32_t b);
+KLong packTwoInts(KInt a, KInt b);
 
-jlong packIPoint(SkIPoint p);
+KLong packIPoint(SkIPoint p);
 
-jlong packISize(SkISize p);
+KLong packISize(SkISize p);
 
 namespace skija {
     namespace SamplingMode {
-        SkSamplingOptions unpack(jlong val);
+        SkSamplingOptions unpack(KLong val);
     }
 
     class UtfIndicesConverter {
@@ -46,13 +46,13 @@ namespace skija {
 
 
 template <typename T>
-inline T jlongToPtr(jlong ptr) {
-    return reinterpret_cast<T>(static_cast<uintptr_t>(ptr));
+inline T interopToPtr(KNativePointer ptr) {
+    return reinterpret_cast<T>(ptr);
 }
 
 template <typename T>
-jlong ptrToJlong(T* ptr) {
-    return static_cast<jlong>(reinterpret_cast<uintptr_t>(ptr));
+KNativePointer ptrToInterop(T* ptr) {
+    return ptr;
 }
 
 #ifdef __clang__

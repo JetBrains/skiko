@@ -7,25 +7,25 @@ static void deleteBackendRenderTarget(GrBackendRenderTarget* rt) {
     delete rt;
 }
 
-extern "C" jlong BackendRenderTarget_nGetFinalizer() {
-    return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteBackendRenderTarget));
+SKIKO_EXPORT KNativePointer BackendRenderTarget_nGetFinalizer() {
+    return reinterpret_cast<KNativePointer>(&deleteBackendRenderTarget);
 }
 
-extern "C" jlong BackendRenderTarget_nMakeGL
-  (jint width, jint height, jint sampleCnt, jint stencilBits, jint fbId, jint fbFormat) {
+SKIKO_EXPORT KNativePointer BackendRenderTarget_nMakeGL
+  (KInteropPointer __Kinstance, KInt width, KInt height, KInt sampleCnt, KInt stencilBits, KInt fbId, KInt fbFormat) {
     GrGLFramebufferInfo glInfo = { static_cast<unsigned int>(fbId), static_cast<unsigned int>(fbFormat) };
     GrBackendRenderTarget* instance = new GrBackendRenderTarget(width, height, sampleCnt, stencilBits, glInfo);
-    return reinterpret_cast<jlong>(instance);
+    return instance;
 }
 
-extern "C" jlong BackendRenderTarget_nMakeMetal
-  (jint width, jint height, jlong texturePtr) {
+SKIKO_EXPORT KNativePointer BackendRenderTarget_nMakeMetal
+  (KInteropPointer __Kinstance, KInt width, KInt height, KNativePointer texturePtr) {
 #ifdef SK_METAL
-    GrMTLHandle texture = reinterpret_cast<GrMTLHandle>(static_cast<uintptr_t>(texturePtr));
+    GrMTLHandle texture = reinterpret_cast<GrMTLHandle>((texturePtr));
     GrMtlTextureInfo fbInfo;
     fbInfo.fTexture.retain(texture);
     GrBackendRenderTarget* instance = new GrBackendRenderTarget(width, height, fbInfo);
-    return reinterpret_cast<jlong>(instance);
+    return instance;
 #else
     return 0;
 #endif
@@ -35,18 +35,18 @@ extern "C" jlong BackendRenderTarget_nMakeMetal
 #include "d3d/GrD3DTypes.h"
 #endif
 
-extern "C" jlong BackendRenderTarget_MakeDirect3D
-  (jint width, jint height, jlong texturePtr, jint format, jint sampleCnt, jint levelCnt) {
+SKIKO_EXPORT KNativePointer BackendRenderTarget_MakeDirect3D
+  (KInteropPointer __Kinstance, KInt width, KInt height, KNativePointer texturePtr, KInt format, KInt sampleCnt, KInt levelCnt) {
 #ifdef SK_DIRECT3D
     GrD3DTextureResourceInfo texResInfo = {};
-    ID3D12Resource* resource = reinterpret_cast<ID3D12Resource*>(static_cast<uintptr_t>(texturePtr));
+    ID3D12Resource* resource = reinterpret_cast<ID3D12Resource*>((texturePtr));
     texResInfo.fResource.retain(resource);
     texResInfo.fResourceState = D3D12_RESOURCE_STATE_COMMON;
     texResInfo.fFormat = static_cast<DXGI_FORMAT>(format);
     texResInfo.fSampleCount = static_cast<uint32_t>(sampleCnt);
     texResInfo.fLevelCount = static_cast<uint32_t>(levelCnt);
     GrBackendRenderTarget* instance = new GrBackendRenderTarget(width, height, texResInfo);
-    return reinterpret_cast<jlong>(instance);
+    return instance;
 #else
     return 0;
 #endif

@@ -397,7 +397,6 @@ fun List<String>.findAllFiles(suffix: String): List<String> = this
 project.tasks.register<Exec>("nativeBridgesCompile") {
     dependsOn(skiaDir)
     val inputDirs = listOf(
-        "$projectDir/src/nativeMain/cpp/generated",
         "$projectDir/src/nativeMain/cpp/common",
         "$projectDir/src/commonMain/cpp/common"
     )

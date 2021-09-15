@@ -2,22 +2,22 @@
 #include "src/utils/SkUTF.h"
 #include <stdio.h>
 
-jlong packTwoInts(int32_t a, int32_t b) {
+KLong packTwoInts(int32_t a, int32_t b) {
     return (uint64_t (a) << 32) | b;
 }
 
-jlong packIPoint(SkIPoint p) {
+KLong packIPoint(SkIPoint p) {
     return packTwoInts(p.fX, p.fY);
 }
 
-jlong packISize(SkISize p) {
+KLong packISize(SkISize p) {
     return packTwoInts(p.fWidth, p.fHeight);
 }
 
 namespace skija {
 
     namespace SamplingMode {
-        SkSamplingOptions unpack(jlong val) {
+        SkSamplingOptions unpack(KLong val) {
             if (0x8000000000000000 & val) {
                 val = val & 0x7FFFFFFFFFFFFFFF;
                 float* ptr = reinterpret_cast<float*>(&val);

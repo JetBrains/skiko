@@ -4,7 +4,7 @@
 #include "SkImageInfo.h"
 #include "common.h"
 
-extern "C" jlong org_jetbrains_skia_ColorType__1nIsAlwaysOpaque
-  (jint value) {
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorType__1nIsAlwaysOpaque
+  (KInteropPointer __Kinstance, KInt value) {
     return SkColorTypeIsAlwaysOpaque(static_cast<SkColorType>(value));
 }

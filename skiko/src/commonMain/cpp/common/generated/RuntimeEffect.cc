@@ -4,24 +4,23 @@
 #include "SkRuntimeEffect.h"
 #include "common.h"
 
-
-extern "C" jlong org_jetbrains_skia_RuntimeEffect__1nMakeShader
-    (jlong ptr, jlong uniformPtr, jlongArray childrenPtrsArr, jfloatArray localMatrixArr, jboolean isOpaque) {
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_RuntimeEffect__1nMakeShader
+    (KNativePointer ptr, KNativePointer uniformPtr, KNativePointerArray childrenPtrsArr, KFloat* localMatrixArr, KBoolean isOpaque) {
     TODO("implement org_jetbrains_skia_RuntimeEffect__1nMakeShader");
 }
      
 #if 0 
-extern "C" jlong org_jetbrains_skia_RuntimeEffect__1nMakeShader
-    (jlong ptr, jlong uniformPtr, jlongArray childrenPtrsArr, jfloatArray localMatrixArr, jboolean isOpaque) {
-    SkRuntimeEffect* runtimeEffect = jlongToPtr<SkRuntimeEffect*>(ptr);
-    SkData* uniform = jlongToPtr<SkData*>(uniformPtr);
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_RuntimeEffect__1nMakeShader
+    (KNativePointer ptr, KNativePointer uniformPtr, KNativePointerArray childrenPtrsArr, KFloat* localMatrixArr, KBoolean isOpaque) {
+    SkRuntimeEffect* runtimeEffect = KNativePointerToPtr<SkRuntimeEffect*>(ptr);
+    SkData* uniform = KNativePointerToPtr<SkData*>(uniformPtr);
     std::unique_ptr<SkMatrix> localMatrix = skMatrix(env, localMatrixArr);
 
     jsize childCount = env->GetArrayLength(childrenPtrsArr);
-    jlong* childrenPtrs = env->GetLongArrayElements(childrenPtrsArr, 0);
+    KNativePointer* childrenPtrs = env->GetLongArrayElements(childrenPtrsArr, 0);
     std::vector<sk_sp<SkShader>> children(childCount);
     for (size_t i = 0; i < childCount; i++) {
-        SkShader* si = jlongToPtr<SkShader*>(childrenPtrs[i]);
+        SkShader* si = KNativePointerToPtr<SkShader*>(childrenPtrs[i]);
         children[i] = sk_ref_sp(si);
     }
     env->ReleaseLongArrayElements(childrenPtrsArr, childrenPtrs, 0);
@@ -31,25 +30,25 @@ extern "C" jlong org_jetbrains_skia_RuntimeEffect__1nMakeShader
                                                        childCount,
                                                        localMatrix.get(),
                                                        isOpaque);
-    return ptrToJlong(shader.release());
+    return ptrToKNativePointer(shader.release());
 }
 #endif
 
 
 
-extern "C" jlong org_jetbrains_skia_RuntimeEffect__1nMakeForShader
-    (jstring sksl) {
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_RuntimeEffect__1nMakeForShader
+    (KInteropPointer sksl) {
     TODO("implement org_jetbrains_skia_RuntimeEffect__1nMakeForShader");
 }
      
 #if 0 
-extern "C" jlong org_jetbrains_skia_RuntimeEffect__1nMakeForShader
-    (jstring sksl) {
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_RuntimeEffect__1nMakeForShader
+    (KInteropPointer sksl) {
     SkString skslProper = skString(env, sksl);
     SkRuntimeEffect::Result result = SkRuntimeEffect::MakeForShader(skslProper);
     if (result.errorText.isEmpty()) {
         sk_sp<SkRuntimeEffect> effect = result.effect;
-        return ptrToJlong(effect.release());
+        return ptrToKNativePointer(effect.release());
     } else {
         env->ThrowNew(java::lang::RuntimeException::cls, result.errorText.c_str());
         return 0;
@@ -59,18 +58,18 @@ extern "C" jlong org_jetbrains_skia_RuntimeEffect__1nMakeForShader
 
 
 
-extern "C" jlong org_jetbrains_skia_RuntimeEffect__1nMakeForColorFilter
-    (jstring sksl) {
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_RuntimeEffect__1nMakeForColorFilter
+    (KInteropPointer sksl) {
     TODO("implement org_jetbrains_skia_RuntimeEffect__1nMakeForColorFilter");
 }
      
 #if 0 
-extern "C" jlong org_jetbrains_skia_RuntimeEffect__1nMakeForColorFilter
-    (jstring sksl) {
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_RuntimeEffect__1nMakeForColorFilter
+    (KInteropPointer sksl) {
     SkString skslProper = skString(env, sksl);
     SkRuntimeEffect::Result result = SkRuntimeEffect::MakeForColorFilter(skslProper);
     if (result.errorText.isEmpty()) {
-        return ptrToJlong(result.effect.release());
+        return ptrToKNativePointer(result.effect.release());
     } else {
         env->ThrowNew(java::lang::RuntimeException::cls, result.errorText.c_str());
         return 0;

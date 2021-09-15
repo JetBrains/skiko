@@ -1,0 +1,92 @@
+
+// This file has been auto generated.
+
+#include "SkString.h"
+#include "common.h"
+
+static void deleteString(SkString* instance) {
+    delete instance;
+}
+
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_ManagedString__1nGetFinalizer
+  (KInteropPointer __Kinstance) {
+    return reinterpret_cast<KNativePointer>((&deleteString));
+}
+
+
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_ManagedString__1nMake
+  (KInteropPointer __Kinstance, KInteropPointer textStr) {
+    TODO("implement org_jetbrains_skia_ManagedString__1nMake");
+}
+     
+#if 0 
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_ManagedString__1nMake
+  (KInteropPointer __Kinstance, KInteropPointer textStr) {
+    SkString* text = new SkString(skString(env, textStr));
+    return reinterpret_cast<KNativePointer>(text);
+}
+#endif
+
+
+
+SKIKO_EXPORT KInteropPointer org_jetbrains_skia_ManagedString__1nToString
+  (KInteropPointer __Kinstance, KNativePointer ptr) {
+    TODO("implement org_jetbrains_skia_ManagedString__1nToString");
+}
+     
+#if 0 
+SKIKO_EXPORT KInteropPointer org_jetbrains_skia_ManagedString__1nToString
+  (KInteropPointer __Kinstance, KNativePointer ptr) {
+    SkString* instance = reinterpret_cast<SkString*>((ptr));
+    return javaString(env, *instance);
+}
+#endif
+
+
+
+SKIKO_EXPORT void org_jetbrains_skia_ManagedString__1nInsert
+  (KInteropPointer __Kinstance, KNativePointer ptr, KInt offset, KInteropPointer s) {
+    TODO("implement org_jetbrains_skia_ManagedString__1nInsert");
+}
+     
+#if 0 
+SKIKO_EXPORT void org_jetbrains_skia_ManagedString__1nInsert
+  (KInteropPointer __Kinstance, KNativePointer ptr, KInt offset, KInteropPointer s) {
+    SkString* instance = reinterpret_cast<SkString*>((ptr));
+    skija::UtfIndicesConverter conv(*instance);
+    instance->insert(conv.from16To8(offset), skString(env, s));
+}
+#endif
+
+
+
+SKIKO_EXPORT void org_jetbrains_skia_ManagedString__1nAppend
+  (KInteropPointer __Kinstance, KNativePointer ptr, KInteropPointer s) {
+    TODO("implement org_jetbrains_skia_ManagedString__1nAppend");
+}
+     
+#if 0 
+SKIKO_EXPORT void org_jetbrains_skia_ManagedString__1nAppend
+  (KInteropPointer __Kinstance, KNativePointer ptr, KInteropPointer s) {
+    SkString* instance = reinterpret_cast<SkString*>((ptr));
+    instance->append(skString(env, s));
+}
+#endif
+
+
+SKIKO_EXPORT void org_jetbrains_skia_ManagedString__1nRemoveSuffix
+  (KInteropPointer __Kinstance, KNativePointer ptr, KInt from) {
+    SkString* instance = reinterpret_cast<SkString*>((ptr));
+    skija::UtfIndicesConverter conv(*instance);
+    size_t from8 = conv.from16To8(from);
+    instance->remove(from8, instance->size() - from8);
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_ManagedString__1nRemove
+  (KInteropPointer __Kinstance, KNativePointer ptr, KInt from, KInt len) {
+    SkString* instance = reinterpret_cast<SkString*>((ptr));
+    skija::UtfIndicesConverter conv(*instance);
+    size_t from8 = conv.from16To8(from);
+    size_t to8 = conv.from16To8(from + len);
+    instance->remove(from8, to8 - from8);
+}
