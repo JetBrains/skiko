@@ -101,23 +101,23 @@ class ParagraphCache internal constructor(owner: FontCollection, ptr: NativePoin
     }
 }
 
-@ExternalSymbolName("org_jetbrains_skia_ParagraphCache__1nAbandon")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphCache__1nAbandon")
 private external fun _nAbandon(ptr: NativePointer)
 
-@ExternalSymbolName("org_jetbrains_skia_ParagraphCache__1nReset")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphCache__1nReset")
 private external fun _nReset(ptr: NativePointer)
 
-@ExternalSymbolName("org_jetbrains_skia_ParagraphCache__1nUpdateParagraph")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphCache__1nUpdateParagraph")
 private external fun _nUpdateParagraph(ptr: NativePointer, paragraphPtr: NativePointer): Boolean
 
-@ExternalSymbolName("org_jetbrains_skia_ParagraphCache__1nFindParagraph")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphCache__1nFindParagraph")
 private external fun _nFindParagraph(ptr: NativePointer, paragraphPtr: NativePointer): Boolean
 
-@ExternalSymbolName("org_jetbrains_skia_ParagraphCache__1nPrintStatistics")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphCache__1nPrintStatistics")
 private external fun _nPrintStatistics(ptr: NativePointer)
 
-@ExternalSymbolName("org_jetbrains_skia_ParagraphCache__1nSetEnabled")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphCache__1nSetEnabled")
 private external fun _nSetEnabled(ptr: NativePointer, value: Boolean)
 
-@ExternalSymbolName("org_jetbrains_skia_ParagraphCache__1nGetCount")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphCache__1nGetCount")
 private external fun _nGetCount(ptr: NativePointer): Int

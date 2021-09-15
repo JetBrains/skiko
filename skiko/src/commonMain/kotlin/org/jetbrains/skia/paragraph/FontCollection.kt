@@ -138,39 +138,39 @@ class FontCollection internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 }
 
 
-@ExternalSymbolName("org_jetbrains_skia_FontCollection__1nMake")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nMake")
 private external fun _nMake(): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_FontCollection__1nGetFontManagersCount")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nGetFontManagersCount")
 private external fun _nGetFontManagersCount(ptr: NativePointer): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_FontCollection__1nSetAssetFontManager")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nSetAssetFontManager")
 private external fun _nSetAssetFontManager(ptr: NativePointer, fontManagerPtr: NativePointer): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_FontCollection__1nSetDynamicFontManager")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nSetDynamicFontManager")
 private external fun _nSetDynamicFontManager(ptr: NativePointer, fontManagerPtr: NativePointer): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_FontCollection__1nSetTestFontManager")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nSetTestFontManager")
 private external fun _nSetTestFontManager(ptr: NativePointer, fontManagerPtr: NativePointer): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_FontCollection__1nSetDefaultFontManager")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nSetDefaultFontManager")
 private external fun _nSetDefaultFontManager(ptr: NativePointer, fontManagerPtr: NativePointer, defaultFamilyName: String?): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_FontCollection__1nGetFallbackManager")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nGetFallbackManager")
 private external fun _nGetFallbackManager(ptr: NativePointer): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_FontCollection__1nFindTypefaces")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nFindTypefaces")
 // TODO: fix me, must pass value to store result!
 private external fun _nFindTypefaces(ptr: NativePointer, familyNames: Array<String?>?, fontStyle: Int): NativePointerArray
 
-@ExternalSymbolName("org_jetbrains_skia_FontCollection__1nDefaultFallbackChar")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nDefaultFallbackChar")
 private external fun _nDefaultFallbackChar(ptr: NativePointer, unicode: Int, fontStyle: Int, locale: String?): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_FontCollection__1nDefaultFallback")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nDefaultFallback")
 private external fun _nDefaultFallback(ptr: NativePointer): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_FontCollection__1nSetEnableFallback")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nSetEnableFallback")
 private external fun _nSetEnableFallback(ptr: NativePointer, value: Boolean): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_FontCollection__1nGetParagraphCache")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nGetParagraphCache")
 private external fun _nGetParagraphCache(ptr: NativePointer): NativePointer
