@@ -1,12 +1,8 @@
 @file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.RefCnt
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.reachabilityBarrier
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.getPtr
 
 class Picture internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
@@ -212,7 +208,11 @@ class Picture internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         return try {
             Stats.onNativeCall()
             val arr = localMatrix?.mat
-            Shader(_nMakeShader(_ptr, tmx.ordinal, tmy.ordinal, mode.ordinal, arr, tileRect))
+            Shader(
+                interopScope {
+                    _nMakeShader(_ptr, tmx.ordinal, tmy.ordinal, mode.ordinal, toInterop(arr), tileRect)
+                }
+            )
         } finally {
             reachabilityBarrier(this)
         }
@@ -250,6 +250,6 @@ private external fun _nMakeShader(
     tmx: Int,
     tmy: Int,
     filterMode: Int,
-    localMatrix: FloatArray?,
+    localMatrix: InteropPointer,
     tileRect: Rect?
 ): NativePointer

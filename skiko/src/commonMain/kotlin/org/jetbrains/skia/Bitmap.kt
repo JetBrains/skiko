@@ -1,12 +1,8 @@
 @file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.Managed
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.reachabilityBarrier
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.getPtr
 
 class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR), IHasImageInfo {
     companion object {
@@ -564,16 +560,18 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
         return try {
             _imageInfo = null
             Stats.onNativeCall()
-            _nInstallPixels(
-                _ptr,
-                info.width,
-                info.height,
-                info.colorInfo.colorType.ordinal,
-                info.colorInfo.alphaType.ordinal,
-                getPtr(info.colorInfo.colorSpace),
-                pixels,
-                rowBytes
-            )
+            interopScope {
+                _nInstallPixels(
+                    _ptr,
+                    info.width,
+                    info.height,
+                    info.colorInfo.colorType.ordinal,
+                    info.colorInfo.alphaType.ordinal,
+                    getPtr(info.colorInfo.colorSpace),
+                    toInterop(pixels),
+                    rowBytes
+                )
+            }
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(info.colorInfo.colorSpace)
@@ -1004,13 +1002,15 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
             require(sampling != null) { "Can’t Bitmap.makeShader with sampling == null" }
             Stats.onNativeCall()
             Shader(
-                _nMakeShader(
-                    _ptr,
-                    tmx.ordinal,
-                    tmy.ordinal,
-                    sampling._pack(),
-                    localMatrix?.mat
-                )
+                interopScope {
+                    _nMakeShader(
+                        _ptr,
+                        tmx.ordinal,
+                        tmy.ordinal,
+                        sampling._pack(),
+                        toInterop(localMatrix?.mat)
+                    )
+                }
             )
         } finally {
             reachabilityBarrier(this)
@@ -1118,7 +1118,7 @@ private external fun _nInstallPixels(
     colorType: Int,
     alphaType: Int,
     colorSpacePtr: NativePointer,
-    pixels: ByteArray?,
+    pixels: InteropPointer,
     rowBytes: Long
 ): Boolean
 
@@ -1180,4 +1180,4 @@ private external fun _nExtractAlpha(ptr: NativePointer, dstPtr: NativePointer, p
 private external fun _nPeekPixels(ptr: NativePointer): ByteBuffer?
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nMakeShader")
-private external fun _nMakeShader(ptr: NativePointer, tmx: Int, tmy: Int, samplingMode: Long, localMatrix: FloatArray?): NativePointer
+private external fun _nMakeShader(ptr: NativePointer, tmx: Int, tmy: Int, samplingMode: Long, localMatrix: InteropPointer): NativePointer

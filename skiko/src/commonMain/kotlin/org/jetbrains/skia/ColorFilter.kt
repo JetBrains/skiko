@@ -28,12 +28,20 @@ class ColorFilter : RefCnt {
 
         fun makeMatrix(matrix: ColorMatrix): ColorFilter {
             Stats.onNativeCall()
-            return ColorFilter(_nMakeMatrix(matrix.mat))
+            return ColorFilter(
+                interopScope {
+                    _nMakeMatrix(toInterop(matrix.mat))
+                }
+            )
         }
 
         fun makeHSLAMatrix(matrix: ColorMatrix): ColorFilter {
             Stats.onNativeCall()
-            return ColorFilter(_nMakeHSLAMatrix(matrix.mat))
+            return ColorFilter(
+                interopScope {
+                    _nMakeHSLAMatrix(toInterop(matrix.mat))
+                }
+            )
         }
 
         fun makeLerp(dst: ColorFilter?, src: ColorFilter?, t: Float): ColorFilter {
@@ -61,7 +69,11 @@ class ColorFilter : RefCnt {
 
         fun makeTable(table: ByteArray): ColorFilter {
             require(table.size == 256) { "Expected 256 elements, got " + table.size }
-            return ColorFilter(_nMakeTable(table))
+            return ColorFilter(
+                interopScope {
+                    _nMakeTable(toInterop(table))
+                }
+            )
         }
 
         fun makeTableARGB(a: ByteArray?, r: ByteArray?, g: ByteArray?, b: ByteArray?): ColorFilter {
@@ -104,10 +116,10 @@ private external fun _nMakeComposed(outer: NativePointer, inner: NativePointer):
 private external fun _nMakeBlend(color: Int, blendMode: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeMatrix")
-private external fun _nMakeMatrix(rowMajor: FloatArray?): NativePointer
+private external fun _nMakeMatrix(rowMajor: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeHSLAMatrix")
-private external fun _nMakeHSLAMatrix(rowMajor: FloatArray?): NativePointer
+private external fun _nMakeHSLAMatrix(rowMajor: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nGetLinearToSRGBGamma")
 private external fun _nGetLinearToSRGBGamma(): NativePointer
@@ -125,7 +137,7 @@ private external fun _nMakeLighting(colorMul: Int, colorAdd: Int): NativePointer
 private external fun _nMakeHighContrast(grayscale: Boolean, inversionMode: Int, contrast: Float): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeTable")
-private external fun _nMakeTable(table: ByteArray?): NativePointer
+private external fun _nMakeTable(table: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeOverdraw")
 private external fun _nMakeOverdraw(c0: Int, c1: Int, c2: Int, c3: Int, c4: Int, c5: Int): NativePointer

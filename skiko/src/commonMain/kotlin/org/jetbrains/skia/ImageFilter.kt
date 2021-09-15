@@ -274,19 +274,21 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             return try {
                 Stats.onNativeCall()
                 ImageFilter(
-                    _nMakeMatrixConvolution(
-                        kernelW,
-                        kernelH,
-                        kernel,
-                        gain,
-                        bias,
-                        offsetX,
-                        offsetY,
-                        tileMode.ordinal,
-                        convolveAlpha,
-                        getPtr(input),
-                        crop
-                    )
+                    interopScope {
+                        _nMakeMatrixConvolution(
+                            kernelW,
+                            kernelH,
+                            toInterop(kernel),
+                            gain,
+                            bias,
+                            offsetX,
+                            offsetY,
+                            tileMode.ordinal,
+                            convolveAlpha,
+                            getPtr(input),
+                            crop
+                        )
+                    }
                 )
             } finally {
                 reachabilityBarrier(input)
@@ -297,11 +299,13 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             return try {
                 Stats.onNativeCall()
                 ImageFilter(
-                    _nMakeMatrixTransform(
-                        matrix.mat,
-                        mode._pack(),
-                        getPtr(input)
-                    )
+                    interopScope {
+                        _nMakeMatrixTransform(
+                            toInterop(matrix.mat),
+                            mode._pack(),
+                            getPtr(input)
+                        )
+                    }
                 )
             } finally {
                 reachabilityBarrier(input)
@@ -701,7 +705,7 @@ private external fun _nMakeMagnifier(
 private external fun _nMakeMatrixConvolution(
     kernelW: Int,
     kernelH: Int,
-    kernel: FloatArray?,
+    kernel: InteropPointer,
     gain: Float,
     bias: Float,
     offsetX: Int,
@@ -713,7 +717,7 @@ private external fun _nMakeMatrixConvolution(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMatrixTransform")
-private external fun _nMakeMatrixTransform(matrix: FloatArray?, samplingMode: Long, input: NativePointer): NativePointer
+private external fun _nMakeMatrixTransform(matrix: InteropPointer, samplingMode: Long, input: NativePointer): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMerge")
 private external fun _nMakeMerge(filters: InteropPointer, crop: IRect?): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeOffset")

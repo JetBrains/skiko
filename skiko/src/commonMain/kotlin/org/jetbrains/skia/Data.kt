@@ -1,13 +1,8 @@
 @file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.Managed
-import org.jetbrains.skia.impl.Native
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.getPtr
-import org.jetbrains.skia.impl.reachabilityBarrier
 
 /**
  * Data holds an immutable data buffer.
@@ -16,7 +11,11 @@ class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     companion object {
         fun makeFromBytes(bytes: ByteArray, offset: Long = 0L, length: Long = bytes.size.toLong()): Data {
             Stats.onNativeCall()
-            return Data(_nMakeFromBytes(bytes, offset, length))
+            return Data(
+                interopScope {
+                    _nMakeFromBytes(toInterop(bytes), offset, length)
+                }
+            )
         }
 
         /**
@@ -128,7 +127,7 @@ private external fun _nEquals(ptr: NativePointer, otherPtr: NativePointer): Bool
 private external fun _nToByteBuffer(ptr: NativePointer): ByteBuffer
 
 @ExternalSymbolName("org_jetbrains_skia_Data__1nMakeFromBytes")
-private external fun _nMakeFromBytes(bytes: ByteArray?, offset: Long, length: Long): NativePointer
+private external fun _nMakeFromBytes(bytes: InteropPointer, offset: Long, length: Long): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Data__1nMakeFromFileName")
 private external fun _nMakeFromFileName(path: String?): NativePointer

@@ -1,12 +1,8 @@
 @file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.RefCnt
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.reachabilityBarrier
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.getPtr
 
 class MaskFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
@@ -26,7 +22,11 @@ class MaskFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 
         fun makeTable(table: ByteArray?): MaskFilter {
             Stats.onNativeCall()
-            return MaskFilter(MaskFilter_nMakeTable(table))
+            return MaskFilter(
+                interopScope {
+                    MaskFilter_nMakeTable(toInterop(table))
+                }
+            )
         }
 
         fun makeGamma(gamma: Float): MaskFilter {
@@ -46,7 +46,7 @@ class MaskFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_MaskFilter__1nMakeTable")
-private external fun MaskFilter_nMakeTable(table: ByteArray?): NativePointer
+private external fun MaskFilter_nMakeTable(table: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_MaskFilter__1nMakeBlur")
 private external fun _nMakeBlur(mode: Int, sigma: Float, respectCTM: Boolean): NativePointer
