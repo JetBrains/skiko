@@ -183,13 +183,13 @@ extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_paragraph_TextStyleK
     return instance->getFontSize();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nSetFontSize
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_TextStyle_1nSetFontSize
   (JNIEnv* env, jclass jclass, jlong ptr, jfloat size) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     instance->setFontSize(size);
 }
 
-extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nGetFontFamilies
+extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_TextStyle_1nGetFontFamilies
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     return javaStringArray(env, instance->getFontFamilies());
@@ -201,7 +201,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_
     instance->setFontFamilies(skStringVector(env, familiesArray));
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nGetHeight
+extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_TextStyle_1nGetHeight
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     return instance->getHeightOverride() ? javaFloat(env, instance->getHeight()) : nullptr;
