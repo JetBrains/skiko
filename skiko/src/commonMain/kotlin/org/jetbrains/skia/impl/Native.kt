@@ -19,6 +19,10 @@ expect fun reachabilityBarrier(obj: Any?)
 
 fun getPtr(n: Native?): NativePointer = n?._ptr ?: Native.NullPointer
 
+interface ArrayInteropDecoder<T> {
+    fun popArrayElement(array: InteropPointer): T?
+}
+
 expect class InteropScope() {
     fun toInterop(string: String?): InteropPointer
     fun InteropPointer.fromInterop(result: CharArray)
