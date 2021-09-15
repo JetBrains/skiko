@@ -15,7 +15,7 @@ enum class OS(val id: String, val clangFlags: Array<String>) {
 enum class Arch(val id: String, val clangFlags: Array<String>) {
     X64("x64", arrayOf("-arch", "x86_64")),
     Arm64("arm64", arrayOf("-arch", "arm64")),
-    Wasm("wasm", arrayOf("-std=c++17", "--bind"))
+    Wasm("wasm", arrayOf("-std=c++17", "--bind", "-DSKIKO_WASM"))
 }
 
 enum class SkiaBuildType(

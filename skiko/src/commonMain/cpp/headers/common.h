@@ -62,5 +62,12 @@ void TODO(const char*);
 void TODO(const char*);
 #endif
 
+#ifdef SKIKO_WASM
+#include <emscripten.h>
+#define SKIKO_EXPORT EMSCRIPTEN_KEEPALIVE extern "C"
+#else
+#define SKIKO_EXPORT extern "C"
+#endif
+
 #endif /* SKIKO_COMMON_H */
 
