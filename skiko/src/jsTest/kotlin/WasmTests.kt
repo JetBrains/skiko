@@ -12,24 +12,20 @@ external interface ModuleInterface {
     fun ping(): Boolean
 }
 
-external val ModulePromised: Promise<ModuleInterface>
+external val Module: ModuleInterface
 
 suspend fun <T> Promise<T>.await(): T = suspendCoroutine { cont ->
     then({ cont.resume(it) }, { cont.resumeWithException(it) })
 }
 
-private fun async(block: suspend () -> Unit): dynamic = GlobalScope.promise {
-    block()
-}
-
-private fun withModule(block: ModuleInterface.() -> Unit) = async {
-    val module = ModulePromised.await()
-    block.invoke(module)
+private fun wasmTest(block: () -> Unit) = GlobalScope.promise {
+    wasmSetup.await()
+    block.invoke()
 }
 
 class WasmTests {
-    @Test   
-    fun pingTest() = withModule {
-        assertTrue(this.ping())
+    @Test
+    fun pingTest() = wasmTest {
+        assertTrue(Module.ping())
     }
 }

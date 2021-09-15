@@ -8,8 +8,7 @@ var wasmSetup = new Promise(function(resolve, reject) {
 function onWasmReady(onReady) { wasmSetup.then(onReady); }
 
 function onInit(context) {
-    Object.keys(Module["asm"]).forEach((key) => {
-        console.log(`KEY ${key}`);
+    Object.keys(Module).forEach((key) => {
         if (key.startsWith("org_jetbrains_skia")) {
             console.log(`BINGO ${key}`);
         }
