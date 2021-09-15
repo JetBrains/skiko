@@ -11,13 +11,13 @@
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeAlphaThreshold
-  (KInteropPointer __Kinstance, KNativePointer regionPtr, KFloat innerMin, KFloat outerMax, KNativePointer inputPtr, KInteropPointer cropObj) {
+  (KNativePointer regionPtr, KFloat innerMin, KFloat outerMax, KNativePointer inputPtr, KInteropPointer cropObj) {
     TODO("implement org_jetbrains_skia_ImageFilter__1nMakeAlphaThreshold");
 }
      
 #if 0 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeAlphaThreshold
-  (KInteropPointer __Kinstance, KNativePointer regionPtr, KFloat innerMin, KFloat outerMax, KNativePointer inputPtr, KInteropPointer cropObj) {
+  (KNativePointer regionPtr, KFloat innerMin, KFloat outerMax, KNativePointer inputPtr, KInteropPointer cropObj) {
     SkRegion* region = reinterpret_cast<SkRegion*>((regionPtr));
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>((inputPtr));
     std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
@@ -29,13 +29,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeAlphaThreshold
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeArithmetic
-  (KInteropPointer __Kinstance, KFloat k1, KFloat k2, KFloat k3, KFloat k4, KBoolean enforcePMColor, KNativePointer bgPtr, KNativePointer fgPtr, KInteropPointer cropObj) {
+  (KFloat k1, KFloat k2, KFloat k3, KFloat k4, KBoolean enforcePMColor, KNativePointer bgPtr, KNativePointer fgPtr, KInteropPointer cropObj) {
     TODO("implement org_jetbrains_skia_ImageFilter__1nMakeArithmetic");
 }
      
 #if 0 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeArithmetic
-  (KInteropPointer __Kinstance, KFloat k1, KFloat k2, KFloat k3, KFloat k4, KBoolean enforcePMColor, KNativePointer bgPtr, KNativePointer fgPtr, KInteropPointer cropObj) {
+  (KFloat k1, KFloat k2, KFloat k3, KFloat k4, KBoolean enforcePMColor, KNativePointer bgPtr, KNativePointer fgPtr, KInteropPointer cropObj) {
     SkImageFilter* bg = reinterpret_cast<SkImageFilter*>((bgPtr));
     SkImageFilter* fg = reinterpret_cast<SkImageFilter*>((fgPtr));
     std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
@@ -47,13 +47,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeArithmetic
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeBlend
-  (KInteropPointer __Kinstance, KInt blendModeInt, KNativePointer bgPtr, KNativePointer fgPtr, KInteropPointer cropObj) {
+  (KInt blendModeInt, KNativePointer bgPtr, KNativePointer fgPtr, KInteropPointer cropObj) {
     TODO("implement org_jetbrains_skia_ImageFilter__1nMakeBlend");
 }
      
 #if 0 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeBlend
-  (KInteropPointer __Kinstance, KInt blendModeInt, KNativePointer bgPtr, KNativePointer fgPtr, KInteropPointer cropObj) {
+  (KInt blendModeInt, KNativePointer bgPtr, KNativePointer fgPtr, KInteropPointer cropObj) {
     SkBlendMode blendMode = static_cast<SkBlendMode>(blendModeInt);
     SkImageFilter* bg = reinterpret_cast<SkImageFilter*>((bgPtr));
     SkImageFilter* fg = reinterpret_cast<SkImageFilter*>((fgPtr));
@@ -66,13 +66,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeBlend
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeBlur
-  (KInteropPointer __Kinstance, KFloat sigmaX, KFloat sigmaY, KInt tileModeInt, KNativePointer inputPtr, KInteropPointer cropObj) {
+  (KFloat sigmaX, KFloat sigmaY, KInt tileModeInt, KNativePointer inputPtr, KInteropPointer cropObj) {
     TODO("implement org_jetbrains_skia_ImageFilter__1nMakeBlur");
 }
      
 #if 0 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeBlur
-  (KInteropPointer __Kinstance, KFloat sigmaX, KFloat sigmaY, KInt tileModeInt, KNativePointer inputPtr, KInteropPointer cropObj) {
+  (KFloat sigmaX, KFloat sigmaY, KInt tileModeInt, KNativePointer inputPtr, KInteropPointer cropObj) {
     SkTileMode tileMode = static_cast<SkTileMode>(tileModeInt);
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>((inputPtr));
     std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
@@ -84,13 +84,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeBlur
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeColorFilter
-  (KInteropPointer __Kinstance, KNativePointer colorFilterPtr, KNativePointer inputPtr, KInteropPointer cropObj) {
+  (KNativePointer colorFilterPtr, KNativePointer inputPtr, KInteropPointer cropObj) {
     TODO("implement org_jetbrains_skia_ImageFilter__1nMakeColorFilter");
 }
      
 #if 0 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeColorFilter
-  (KInteropPointer __Kinstance, KNativePointer colorFilterPtr, KNativePointer inputPtr, KInteropPointer cropObj) {
+  (KNativePointer colorFilterPtr, KNativePointer inputPtr, KInteropPointer cropObj) {
     SkColorFilter* colorFilter = reinterpret_cast<SkColorFilter*>((colorFilterPtr));
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>((inputPtr));
     std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
@@ -101,7 +101,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeColorFilter
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeCompose
-  (KInteropPointer __Kinstance, KNativePointer outerPtr, KNativePointer innerPtr) {
+  (KNativePointer outerPtr, KNativePointer innerPtr) {
     SkImageFilter* outer = reinterpret_cast<SkImageFilter*>((outerPtr));
     SkImageFilter* inner = reinterpret_cast<SkImageFilter*>((innerPtr));
     SkImageFilter* ptr = SkImageFilters::Compose(sk_ref_sp(outer), sk_ref_sp(inner)).release();
@@ -110,13 +110,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeCompose
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeDisplacementMap
-  (KInteropPointer __Kinstance, KInt xChanInt, KInt yChanInt, KFloat scale, KNativePointer displacementPtr, KNativePointer colorPtr, KInteropPointer cropObj) {
+  (KInt xChanInt, KInt yChanInt, KFloat scale, KNativePointer displacementPtr, KNativePointer colorPtr, KInteropPointer cropObj) {
     TODO("implement org_jetbrains_skia_ImageFilter__1nMakeDisplacementMap");
 }
      
 #if 0 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeDisplacementMap
-  (KInteropPointer __Kinstance, KInt xChanInt, KInt yChanInt, KFloat scale, KNativePointer displacementPtr, KNativePointer colorPtr, KInteropPointer cropObj) {
+  (KInt xChanInt, KInt yChanInt, KFloat scale, KNativePointer displacementPtr, KNativePointer colorPtr, KInteropPointer cropObj) {
     SkColorChannel xChan = static_cast<SkColorChannel>(xChanInt);
     SkColorChannel yChan = static_cast<SkColorChannel>(yChanInt);
     SkImageFilter* displacement = reinterpret_cast<SkImageFilter*>((displacementPtr));
@@ -130,13 +130,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeDisplacementMa
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeDropShadow
-  (KInteropPointer __Kinstance, KFloat dx, KFloat dy, KFloat sigmaX, KFloat sigmaY, KInt color, KNativePointer inputPtr, KInteropPointer cropObj) {
+  (KFloat dx, KFloat dy, KFloat sigmaX, KFloat sigmaY, KInt color, KNativePointer inputPtr, KInteropPointer cropObj) {
     TODO("implement org_jetbrains_skia_ImageFilter__1nMakeDropShadow");
 }
      
 #if 0 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeDropShadow
-  (KInteropPointer __Kinstance, KFloat dx, KFloat dy, KFloat sigmaX, KFloat sigmaY, KInt color, KNativePointer inputPtr, KInteropPointer cropObj) {
+  (KFloat dx, KFloat dy, KFloat sigmaX, KFloat sigmaY, KInt color, KNativePointer inputPtr, KInteropPointer cropObj) {
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>((inputPtr));
     std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
     SkImageFilter* ptr = SkImageFilters::DropShadow(dx, dy, sigmaX, sigmaY, color, sk_ref_sp(input), crop.get()).release();
@@ -147,13 +147,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeDropShadow
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeDropShadowOnly
-  (KInteropPointer __Kinstance, KFloat dx, KFloat dy, KFloat sigmaX, KFloat sigmaY, KInt color, KNativePointer inputPtr, KInteropPointer cropObj) {
+  (KFloat dx, KFloat dy, KFloat sigmaX, KFloat sigmaY, KInt color, KNativePointer inputPtr, KInteropPointer cropObj) {
     TODO("implement org_jetbrains_skia_ImageFilter__1nMakeDropShadowOnly");
 }
      
 #if 0 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeDropShadowOnly
-  (KInteropPointer __Kinstance, KFloat dx, KFloat dy, KFloat sigmaX, KFloat sigmaY, KInt color, KNativePointer inputPtr, KInteropPointer cropObj) {
+  (KFloat dx, KFloat dy, KFloat sigmaX, KFloat sigmaY, KInt color, KNativePointer inputPtr, KInteropPointer cropObj) {
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>((inputPtr));
     std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
     SkImageFilter* ptr = SkImageFilters::DropShadowOnly(dx, dy, sigmaX, sigmaY, color, sk_ref_sp(input), crop.get()).release();
@@ -163,7 +163,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeDropShadowOnly
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeImage
-  (KInteropPointer __Kinstance, KNativePointer imagePtr, KFloat l0, KFloat t0, KFloat r0, KFloat b0, KFloat l1, KFloat t1, KFloat r1, KFloat b1, KNativePointer samplingMode) {
+  (KNativePointer imagePtr, KFloat l0, KFloat t0, KFloat r0, KFloat b0, KFloat l1, KFloat t1, KFloat r1, KFloat b1, KLong samplingMode) {
     SkImage* image = reinterpret_cast<SkImage*>((imagePtr));
     SkImageFilter* ptr = SkImageFilters::Image(sk_ref_sp(image), SkRect{l0, t0, r0, b0}, SkRect{l1, t1, r1, b1}, skija::SamplingMode::unpack(samplingMode)).release();
     return reinterpret_cast<KNativePointer>(ptr);
@@ -171,13 +171,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeImage
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeMagnifier
-  (KInteropPointer __Kinstance, KFloat l, KFloat t, KFloat r, KFloat b, KFloat inset, KNativePointer inputPtr, KInteropPointer cropObj) {
+  (KFloat l, KFloat t, KFloat r, KFloat b, KFloat inset, KNativePointer inputPtr, KInteropPointer cropObj) {
     TODO("implement org_jetbrains_skia_ImageFilter__1nMakeMagnifier");
 }
      
 #if 0 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeMagnifier
-  (KInteropPointer __Kinstance, KFloat l, KFloat t, KFloat r, KFloat b, KFloat inset, KNativePointer inputPtr, KInteropPointer cropObj) {
+  (KFloat l, KFloat t, KFloat r, KFloat b, KFloat inset, KNativePointer inputPtr, KInteropPointer cropObj) {
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>((inputPtr));
     std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
     SkImageFilter* ptr = SkImageFilters::Magnifier(SkRect{l, t, r, b}, inset, sk_ref_sp(input), crop.get()).release();
@@ -188,13 +188,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeMagnifier
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeMatrixConvolution
-  (KInteropPointer __Kinstance, KInt kernelW, KInt kernelH, KFloat* kernelArray, KFloat gain, KFloat bias, KInt offsetX, KInt offsetY, KInt tileModeInt, KBoolean convolveAlpha, KNativePointer inputPtr, KInteropPointer cropObj) {
+  (KInt kernelW, KInt kernelH, KFloat* kernelArray, KFloat gain, KFloat bias, KInt offsetX, KInt offsetY, KInt tileModeInt, KBoolean convolveAlpha, KNativePointer inputPtr, KInteropPointer cropObj) {
     TODO("implement org_jetbrains_skia_ImageFilter__1nMakeMatrixConvolution");
 }
      
 #if 0 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeMatrixConvolution
-  (KInteropPointer __Kinstance, KInt kernelW, KInt kernelH, KFloat* kernelArray, KFloat gain, KFloat bias, KInt offsetX, KInt offsetY, KInt tileModeInt, KBoolean convolveAlpha, KNativePointer inputPtr, KInteropPointer cropObj) {
+  (KInt kernelW, KInt kernelH, KFloat* kernelArray, KFloat gain, KFloat bias, KInt offsetX, KInt offsetY, KInt tileModeInt, KBoolean convolveAlpha, KNativePointer inputPtr, KInteropPointer cropObj) {
     KFloat* kernel = env->GetFloatArrayElements(kernelArray, 0);
     SkTileMode tileMode = static_cast<SkTileMode>(tileModeInt);
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>((inputPtr));
@@ -208,13 +208,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeMatrixConvolut
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeMatrixTransform
-  (KInteropPointer __Kinstance, KFloat* matrixArray, KNativePointer samplingMode, KNativePointer inputPtr) {
+  (KFloat* matrixArray, KNativePointer samplingMode, KNativePointer inputPtr) {
     TODO("implement org_jetbrains_skia_ImageFilter__1nMakeMatrixTransform");
 }
      
 #if 0 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeMatrixTransform
-  (KInteropPointer __Kinstance, KFloat* matrixArray, KNativePointer samplingMode, KNativePointer inputPtr) {
+  (KFloat* matrixArray, KNativePointer samplingMode, KNativePointer inputPtr) {
     std::unique_ptr<SkMatrix> matrix = skMatrix(env, matrixArray);
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>((inputPtr));
     SkImageFilter* ptr = SkImageFilters::MatrixTransform(*matrix, skija::SamplingMode::unpack(samplingMode), sk_ref_sp(input)).release();
@@ -225,13 +225,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeMatrixTransfor
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeMerge
-  (KInteropPointer __Kinstance, KNativePointerArray filtersArray, KInteropPointer cropObj) {
+  (KNativePointerArray filtersArray, KInteropPointer cropObj) {
     TODO("implement org_jetbrains_skia_ImageFilter__1nMakeMerge");
 }
      
 #if 0 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeMerge
-  (KInteropPointer __Kinstance, KNativePointerArray filtersArray, KInteropPointer cropObj) {
+  (KNativePointerArray filtersArray, KInteropPointer cropObj) {
     KNativePointer* f = env->GetLongArrayElements(filtersArray, 0);
     jsize len = env->GetArrayLength(filtersArray);
     std::vector<sk_sp<SkImageFilter>> filters(len);
@@ -249,13 +249,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeMerge
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeOffset
-  (KInteropPointer __Kinstance, KFloat dx, KFloat dy, KNativePointer inputPtr, KInteropPointer cropObj) {
+  (KFloat dx, KFloat dy, KNativePointer inputPtr, KInteropPointer cropObj) {
     TODO("implement org_jetbrains_skia_ImageFilter__1nMakeOffset");
 }
      
 #if 0 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeOffset
-  (KInteropPointer __Kinstance, KFloat dx, KFloat dy, KNativePointer inputPtr, KInteropPointer cropObj) {
+  (KFloat dx, KFloat dy, KNativePointer inputPtr, KInteropPointer cropObj) {
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>((inputPtr));
     std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
     SkImageFilter* ptr = SkImageFilters::Offset(dx, dy, sk_ref_sp(input), crop.get()).release();
@@ -266,13 +266,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeOffset
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakePaint
-  (KInteropPointer __Kinstance, KNativePointer paintPtr, KInteropPointer cropObj) {
+  (KNativePointer paintPtr, KInteropPointer cropObj) {
     TODO("implement org_jetbrains_skia_ImageFilter__1nMakePaint");
 }
      
 #if 0 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakePaint
-  (KInteropPointer __Kinstance, KNativePointer paintPtr, KInteropPointer cropObj) {
+  (KNativePointer paintPtr, KInteropPointer cropObj) {
     SkPaint* paint = reinterpret_cast<SkPaint*>((paintPtr));
     std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
     SkImageFilter* ptr = SkImageFilters::Paint(*paint, crop.get()).release();
@@ -282,14 +282,14 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakePaint
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakePicture
-  (KInteropPointer __Kinstance, KNativePointer picturePtr, KFloat l, KFloat t, KFloat r, KFloat b) {
+  (KNativePointer picturePtr, KFloat l, KFloat t, KFloat r, KFloat b) {
     SkPicture* picture = reinterpret_cast<SkPicture*>((picturePtr));
     SkImageFilter* ptr = SkImageFilters::Picture(sk_ref_sp(picture), SkRect{l, t, r, b}).release();
     return reinterpret_cast<KNativePointer>(ptr);
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeTile
-  (KInteropPointer __Kinstance, KFloat l0, KFloat t0, KFloat r0, KFloat b0, KFloat l1, KFloat t1, KFloat r1, KFloat b1, KNativePointer inputPtr) {
+  (KFloat l0, KFloat t0, KFloat r0, KFloat b0, KFloat l1, KFloat t1, KFloat r1, KFloat b1, KNativePointer inputPtr) {
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>((inputPtr));
     SkImageFilter* ptr = SkImageFilters::Tile(SkRect{l0, t0, r0, b0}, SkRect{l1, t1, r1, b1}, sk_ref_sp(input)).release();
     return reinterpret_cast<KNativePointer>(ptr);
@@ -297,13 +297,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeTile
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeDilate
-  (KInteropPointer __Kinstance, float rx, KFloat ry, KNativePointer inputPtr, KInteropPointer cropObj) {
+  (float rx, KFloat ry, KNativePointer inputPtr, KInteropPointer cropObj) {
     TODO("implement org_jetbrains_skia_ImageFilter__1nMakeDilate");
 }
      
 #if 0 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeDilate
-  (KInteropPointer __Kinstance, float rx, KFloat ry, KNativePointer inputPtr, KInteropPointer cropObj) {
+  (float rx, KFloat ry, KNativePointer inputPtr, KInteropPointer cropObj) {
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>((inputPtr));
     std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
     SkImageFilter* ptr = SkImageFilters::Dilate(rx, ry, sk_ref_sp(input), crop.get()).release();
@@ -314,13 +314,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeDilate
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeErode
-  (KInteropPointer __Kinstance, float rx, KFloat ry, KNativePointer inputPtr, KInteropPointer cropObj) {
+  (float rx, KFloat ry, KNativePointer inputPtr, KInteropPointer cropObj) {
     TODO("implement org_jetbrains_skia_ImageFilter__1nMakeErode");
 }
      
 #if 0 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeErode
-  (KInteropPointer __Kinstance, float rx, KFloat ry, KNativePointer inputPtr, KInteropPointer cropObj) {
+  (float rx, KFloat ry, KNativePointer inputPtr, KInteropPointer cropObj) {
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>((inputPtr));
     std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
     SkImageFilter* ptr = SkImageFilters::Erode(rx, ry, sk_ref_sp(input), crop.get()).release();
@@ -331,13 +331,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeErode
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeDistantLitDiffuse
-  (KInteropPointer __Kinstance, KFloat x, KFloat y, KFloat z, KInt lightColor, KFloat surfaceScale, KFloat kd, KNativePointer inputPtr, KInteropPointer cropObj) {
+  (KFloat x, KFloat y, KFloat z, KInt lightColor, KFloat surfaceScale, KFloat kd, KNativePointer inputPtr, KInteropPointer cropObj) {
     TODO("implement org_jetbrains_skia_ImageFilter__1nMakeDistantLitDiffuse");
 }
      
 #if 0 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeDistantLitDiffuse
-  (KInteropPointer __Kinstance, KFloat x, KFloat y, KFloat z, KInt lightColor, KFloat surfaceScale, KFloat kd, KNativePointer inputPtr, KInteropPointer cropObj) {
+  (KFloat x, KFloat y, KFloat z, KInt lightColor, KFloat surfaceScale, KFloat kd, KNativePointer inputPtr, KInteropPointer cropObj) {
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>((inputPtr));
     std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
     SkImageFilter* ptr = SkImageFilters::DistantLitDiffuse(SkPoint3{x, y, z}, lightColor, surfaceScale, kd, sk_ref_sp(input), crop.get()).release();
@@ -348,13 +348,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeDistantLitDiff
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakePointLitDiffuse
-  (KInteropPointer __Kinstance, KFloat x, KFloat y, KFloat z, KInt lightColor, KFloat surfaceScale, KFloat kd, KNativePointer inputPtr, KInteropPointer cropObj) {
+  (KFloat x, KFloat y, KFloat z, KInt lightColor, KFloat surfaceScale, KFloat kd, KNativePointer inputPtr, KInteropPointer cropObj) {
     TODO("implement org_jetbrains_skia_ImageFilter__1nMakePointLitDiffuse");
 }
      
 #if 0 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakePointLitDiffuse
-  (KInteropPointer __Kinstance, KFloat x, KFloat y, KFloat z, KInt lightColor, KFloat surfaceScale, KFloat kd, KNativePointer inputPtr, KInteropPointer cropObj) {
+  (KFloat x, KFloat y, KFloat z, KInt lightColor, KFloat surfaceScale, KFloat kd, KNativePointer inputPtr, KInteropPointer cropObj) {
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>((inputPtr));
     std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
     SkImageFilter* ptr = SkImageFilters::PointLitDiffuse(SkPoint3{x, y, z}, lightColor, surfaceScale, kd, sk_ref_sp(input), crop.get()).release();
@@ -365,13 +365,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakePointLitDiffus
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeSpotLitDiffuse
-  (KInteropPointer __Kinstance, KFloat x0, KFloat y0, KFloat z0, KFloat x1, KFloat y1, KFloat z1, KFloat falloffExponent, KFloat cutoffAngle, KInt lightColor, KFloat surfaceScale, KFloat kd, KNativePointer inputPtr, KInteropPointer cropObj) {
+  (KFloat x0, KFloat y0, KFloat z0, KFloat x1, KFloat y1, KFloat z1, KFloat falloffExponent, KFloat cutoffAngle, KInt lightColor, KFloat surfaceScale, KFloat kd, KNativePointer inputPtr, KInteropPointer cropObj) {
     TODO("implement org_jetbrains_skia_ImageFilter__1nMakeSpotLitDiffuse");
 }
      
 #if 0 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeSpotLitDiffuse
-  (KInteropPointer __Kinstance, KFloat x0, KFloat y0, KFloat z0, KFloat x1, KFloat y1, KFloat z1, KFloat falloffExponent, KFloat cutoffAngle, KInt lightColor, KFloat surfaceScale, KFloat kd, KNativePointer inputPtr, KInteropPointer cropObj) {
+  (KFloat x0, KFloat y0, KFloat z0, KFloat x1, KFloat y1, KFloat z1, KFloat falloffExponent, KFloat cutoffAngle, KInt lightColor, KFloat surfaceScale, KFloat kd, KNativePointer inputPtr, KInteropPointer cropObj) {
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>((inputPtr));
     std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
     SkImageFilter* ptr = SkImageFilters::SpotLitDiffuse(SkPoint3{x0, y0, z0}, SkPoint3{x1, y1, z1}, falloffExponent, cutoffAngle, lightColor, surfaceScale, kd, sk_ref_sp(input), crop.get()).release();
@@ -382,13 +382,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeSpotLitDiffuse
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeDistantLitSpecular
-  (KInteropPointer __Kinstance, KFloat x, KFloat y, KFloat z, KInt lightColor, KFloat surfaceScale, KFloat ks, KFloat shininess, KNativePointer inputPtr, KInteropPointer cropObj) {
+  (KFloat x, KFloat y, KFloat z, KInt lightColor, KFloat surfaceScale, KFloat ks, KFloat shininess, KNativePointer inputPtr, KInteropPointer cropObj) {
     TODO("implement org_jetbrains_skia_ImageFilter__1nMakeDistantLitSpecular");
 }
      
 #if 0 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeDistantLitSpecular
-  (KInteropPointer __Kinstance, KFloat x, KFloat y, KFloat z, KInt lightColor, KFloat surfaceScale, KFloat ks, KFloat shininess, KNativePointer inputPtr, KInteropPointer cropObj) {
+  (KFloat x, KFloat y, KFloat z, KInt lightColor, KFloat surfaceScale, KFloat ks, KFloat shininess, KNativePointer inputPtr, KInteropPointer cropObj) {
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>((inputPtr));
     std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
     SkImageFilter* ptr = SkImageFilters::DistantLitSpecular(SkPoint3{x, y, z}, lightColor, surfaceScale, ks, shininess, sk_ref_sp(input), crop.get()).release();
@@ -399,13 +399,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeDistantLitSpec
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakePointLitSpecular
-  (KInteropPointer __Kinstance, KFloat x, KFloat y, KFloat z, KInt lightColor, KFloat surfaceScale, KFloat ks, KFloat shininess, KNativePointer inputPtr, KInteropPointer cropObj) {
+  (KFloat x, KFloat y, KFloat z, KInt lightColor, KFloat surfaceScale, KFloat ks, KFloat shininess, KNativePointer inputPtr, KInteropPointer cropObj) {
     TODO("implement org_jetbrains_skia_ImageFilter__1nMakePointLitSpecular");
 }
      
 #if 0 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakePointLitSpecular
-  (KInteropPointer __Kinstance, KFloat x, KFloat y, KFloat z, KInt lightColor, KFloat surfaceScale, KFloat ks, KFloat shininess, KNativePointer inputPtr, KInteropPointer cropObj) {
+  (KFloat x, KFloat y, KFloat z, KInt lightColor, KFloat surfaceScale, KFloat ks, KFloat shininess, KNativePointer inputPtr, KInteropPointer cropObj) {
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>((inputPtr));
     std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
     SkImageFilter* ptr = SkImageFilters::PointLitSpecular(SkPoint3{x, y, z}, lightColor, surfaceScale, ks, shininess, sk_ref_sp(input), crop.get()).release();
@@ -416,13 +416,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakePointLitSpecul
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeSpotLitSpecular
-  (KInteropPointer __Kinstance, KFloat x0, KFloat y0, KFloat z0, KFloat x1, KFloat y1, KFloat z1, KFloat falloffExponent, KFloat cutoffAngle, KInt lightColor, KFloat surfaceScale, KFloat ks, KFloat shininess, KNativePointer inputPtr, KInteropPointer cropObj) {
+  (KFloat x0, KFloat y0, KFloat z0, KFloat x1, KFloat y1, KFloat z1, KFloat falloffExponent, KFloat cutoffAngle, KInt lightColor, KFloat surfaceScale, KFloat ks, KFloat shininess, KNativePointer inputPtr, KInteropPointer cropObj) {
     TODO("implement org_jetbrains_skia_ImageFilter__1nMakeSpotLitSpecular");
 }
      
 #if 0 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeSpotLitSpecular
-  (KInteropPointer __Kinstance, KFloat x0, KFloat y0, KFloat z0, KFloat x1, KFloat y1, KFloat z1, KFloat falloffExponent, KFloat cutoffAngle, KInt lightColor, KFloat surfaceScale, KFloat ks, KFloat shininess, KNativePointer inputPtr, KInteropPointer cropObj) {
+  (KFloat x0, KFloat y0, KFloat z0, KFloat x1, KFloat y1, KFloat z1, KFloat falloffExponent, KFloat cutoffAngle, KInt lightColor, KFloat surfaceScale, KFloat ks, KFloat shininess, KNativePointer inputPtr, KInteropPointer cropObj) {
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>((inputPtr));
     std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
     SkImageFilter* ptr = SkImageFilters::SpotLitSpecular(SkPoint3{x0, y0, z0}, SkPoint3{x1, y1, z1}, falloffExponent, cutoffAngle, lightColor, surfaceScale, ks, shininess, sk_ref_sp(input), crop.get()).release();

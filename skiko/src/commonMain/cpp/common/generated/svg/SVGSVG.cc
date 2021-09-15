@@ -6,20 +6,20 @@
 #include "common.h"
 
 SKIKO_EXPORT KInt org_jetbrains_skia_svg_SVGSVG__1nGetTag
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     SkSVGNode* instance = reinterpret_cast<SkSVGNode*>((ptr));
     return static_cast<KInt>(instance->tag());
 }
 
 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_svg_SVGSVG__1nGetX
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     TODO("implement org_jetbrains_skia_svg_SVGSVG__1nGetX");
 }
      
 #if 0 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_svg_SVGSVG__1nGetX
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>((ptr));
     return skija::svg::SVGLength::toJava(env, instance->getX());
 }
@@ -28,13 +28,13 @@ SKIKO_EXPORT KInteropPointer org_jetbrains_skia_svg_SVGSVG__1nGetX
 
 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_svg_SVGSVG__1nGetY
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     TODO("implement org_jetbrains_skia_svg_SVGSVG__1nGetY");
 }
      
 #if 0 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_svg_SVGSVG__1nGetY
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>((ptr));
     return skija::svg::SVGLength::toJava(env, instance->getY());
 }
@@ -43,13 +43,13 @@ SKIKO_EXPORT KInteropPointer org_jetbrains_skia_svg_SVGSVG__1nGetY
 
 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_svg_SVGSVG__1nGetWidth
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     TODO("implement org_jetbrains_skia_svg_SVGSVG__1nGetWidth");
 }
      
 #if 0 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_svg_SVGSVG__1nGetWidth
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>((ptr));
     return skija::svg::SVGLength::toJava(env, instance->getWidth());
 }
@@ -58,13 +58,13 @@ SKIKO_EXPORT KInteropPointer org_jetbrains_skia_svg_SVGSVG__1nGetWidth
 
 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_svg_SVGSVG__1nGetHeight
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     TODO("implement org_jetbrains_skia_svg_SVGSVG__1nGetHeight");
 }
      
 #if 0 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_svg_SVGSVG__1nGetHeight
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>((ptr));
     return skija::svg::SVGLength::toJava(env, instance->getHeight());
 }
@@ -73,13 +73,13 @@ SKIKO_EXPORT KInteropPointer org_jetbrains_skia_svg_SVGSVG__1nGetHeight
 
 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_svg_SVGSVG__1nGetPreserveAspectRatio
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     TODO("implement org_jetbrains_skia_svg_SVGSVG__1nGetPreserveAspectRatio");
 }
      
 #if 0 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_svg_SVGSVG__1nGetPreserveAspectRatio
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>((ptr));
     return skija::svg::SVGPreserveAspectRatio::toJava(env, instance->getPreserveAspectRatio());
 }
@@ -88,13 +88,13 @@ SKIKO_EXPORT KInteropPointer org_jetbrains_skia_svg_SVGSVG__1nGetPreserveAspectR
 
 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_svg_SVGSVG__1nGetViewBox
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     TODO("implement org_jetbrains_skia_svg_SVGSVG__1nGetViewBox");
 }
      
 #if 0 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_svg_SVGSVG__1nGetViewBox
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>((ptr));
     SkTLazy<SkSVGViewBoxType> viewBox = instance->getViewBox();
     return viewBox.isValid() ? skija::Rect::fromSkRect(env, *viewBox.get()) : nullptr;
@@ -104,13 +104,13 @@ SKIKO_EXPORT KInteropPointer org_jetbrains_skia_svg_SVGSVG__1nGetViewBox
 
 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_svg_SVGSVG__1nGetIntrinsicSize
-  (KInteropPointer __Kinstance, KNativePointer ptr, float width, float height, float dpi) {
+  (KNativePointer ptr, float width, float height, float dpi) {
     TODO("implement org_jetbrains_skia_svg_SVGSVG__1nGetIntrinsicSize");
 }
      
 #if 0 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_svg_SVGSVG__1nGetIntrinsicSize
-  (KInteropPointer __Kinstance, KNativePointer ptr, float width, float height, float dpi) {
+  (KNativePointer ptr, float width, float height, float dpi) {
     SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>((ptr));
     SkSVGLengthContext lc({width, height}, dpi);
     SkSize size = instance->intrinsicSize(lc);
@@ -120,42 +120,42 @@ SKIKO_EXPORT KInteropPointer org_jetbrains_skia_svg_SVGSVG__1nGetIntrinsicSize
 
 
 SKIKO_EXPORT void org_jetbrains_skia_svg_SVGSVG__1nSetX
-  (KInteropPointer __Kinstance, KNativePointer ptr, float value, int unit) {
+  (KNativePointer ptr, float value, int unit) {
     SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>((ptr));
     SkSVGLength lenght(value, static_cast<SkSVGLength::Unit>(unit));
     instance->setX(lenght);
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_svg_SVGSVG__1nSetY
-  (KInteropPointer __Kinstance, KNativePointer ptr, float value, int unit) {
+  (KNativePointer ptr, float value, int unit) {
     SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>((ptr));
     SkSVGLength lenght(value, static_cast<SkSVGLength::Unit>(unit));
     instance->setY(lenght);
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_svg_SVGSVG__1nSetWidth
-  (KInteropPointer __Kinstance, KNativePointer ptr, float value, int unit) {
+  (KNativePointer ptr, float value, int unit) {
     SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>((ptr));
     SkSVGLength lenght(value, static_cast<SkSVGLength::Unit>(unit));
     instance->setWidth(lenght);
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_svg_SVGSVG__1nSetHeight
-  (KInteropPointer __Kinstance, KNativePointer ptr, float value, int unit) {
+  (KNativePointer ptr, float value, int unit) {
     SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>((ptr));
     SkSVGLength lenght(value, static_cast<SkSVGLength::Unit>(unit));
     instance->setHeight(lenght);
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_svg_SVGSVG__1nSetPreserveAspectRatio
-  (KInteropPointer __Kinstance, KNativePointer ptr, KInt align, KInt scale) {
+  (KNativePointer ptr, KInt align, KInt scale) {
     SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>((ptr));
     instance->setPreserveAspectRatio(SkSVGPreserveAspectRatio { static_cast<SkSVGPreserveAspectRatio::Align>(align),
                                                                 static_cast<SkSVGPreserveAspectRatio::Scale>(scale) });
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_svg_SVGSVG__1nSetViewBox
-  (KInteropPointer __Kinstance, KNativePointer ptr, float l, float t, float r, float b) {
+  (KNativePointer ptr, float l, float t, float r, float b) {
     SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>((ptr));
     instance->setViewBox(SkRect::MakeLTRB(l, t, r, b));
 }

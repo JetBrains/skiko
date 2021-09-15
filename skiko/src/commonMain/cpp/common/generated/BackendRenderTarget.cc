@@ -6,20 +6,19 @@
 static void deleteBackendRenderTarget(GrBackendRenderTarget* rt) {
     delete rt;
 }
-
 SKIKO_EXPORT KNativePointer BackendRenderTarget_nGetFinalizer() {
     return reinterpret_cast<KNativePointer>(&deleteBackendRenderTarget);
 }
 
 SKIKO_EXPORT KNativePointer BackendRenderTarget_nMakeGL
-  (KInteropPointer __Kinstance, KInt width, KInt height, KInt sampleCnt, KInt stencilBits, KInt fbId, KInt fbFormat) {
+  (KInt width, KInt height, KInt sampleCnt, KInt stencilBits, KInt fbId, KInt fbFormat) {
     GrGLFramebufferInfo glInfo = { static_cast<unsigned int>(fbId), static_cast<unsigned int>(fbFormat) };
     GrBackendRenderTarget* instance = new GrBackendRenderTarget(width, height, sampleCnt, stencilBits, glInfo);
     return instance;
 }
 
 SKIKO_EXPORT KNativePointer BackendRenderTarget_nMakeMetal
-  (KInteropPointer __Kinstance, KInt width, KInt height, KNativePointer texturePtr) {
+  ( KInt width, KInt height, KNativePointer texturePtr) {
 #ifdef SK_METAL
     GrMTLHandle texture = reinterpret_cast<GrMTLHandle>((texturePtr));
     GrMtlTextureInfo fbInfo;
@@ -36,7 +35,7 @@ SKIKO_EXPORT KNativePointer BackendRenderTarget_nMakeMetal
 #endif
 
 SKIKO_EXPORT KNativePointer BackendRenderTarget_MakeDirect3D
-  (KInteropPointer __Kinstance, KInt width, KInt height, KNativePointer texturePtr, KInt format, KInt sampleCnt, KInt levelCnt) {
+  (KInt width, KInt height, KNativePointer texturePtr, KInt format, KInt sampleCnt, KInt levelCnt) {
 #ifdef SK_DIRECT3D
     GrD3DTextureResourceInfo texResInfo = {};
     ID3D12Resource* resource = reinterpret_cast<ID3D12Resource*>((texturePtr));

@@ -8,7 +8,7 @@
 #include "common.h"
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Picture__1nMakeFromData
-  (KInteropPointer __Kinstance, KNativePointer dataPtr) {
+  (KNativePointer dataPtr) {
     SkData* data = reinterpret_cast<SkData*>((dataPtr));
     SkPicture* instance = SkPicture::MakeFromData(data).release();
     return reinterpret_cast<KNativePointer>(instance);
@@ -16,13 +16,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Picture__1nMakeFromData
 
 
 SKIKO_EXPORT void org_jetbrains_skia_Picture__1nPlayback
-  (KInteropPointer __Kinstance, KNativePointer ptr, KNativePointer canvasPtr, KInteropPointer abort) {
+  (KNativePointer ptr, KNativePointer canvasPtr, KInteropPointer abort) {
     TODO("implement org_jetbrains_skia_Picture__1nPlayback");
 }
      
 #if 0 
 SKIKO_EXPORT void org_jetbrains_skia_Picture__1nPlayback
-  (KInteropPointer __Kinstance, KNativePointer ptr, KNativePointer canvasPtr, KInteropPointer abort) {
+  (KNativePointer ptr, KNativePointer canvasPtr, KInteropPointer abort) {
     SkPicture* instance = reinterpret_cast<SkPicture*>((ptr));
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>((canvasPtr));
     if (abort == nullptr) {
@@ -37,13 +37,13 @@ SKIKO_EXPORT void org_jetbrains_skia_Picture__1nPlayback
 
 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Picture__1nGetCullRect
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     TODO("implement org_jetbrains_skia_Picture__1nGetCullRect");
 }
      
 #if 0 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Picture__1nGetCullRect
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     SkPicture* instance = reinterpret_cast<SkPicture*>((ptr));
     return skija::Rect::fromSkRect(env, instance->cullRect());
 }
@@ -51,46 +51,46 @@ SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Picture__1nGetCullRect
 
 
 SKIKO_EXPORT KInt org_jetbrains_skia_Picture__1nGetUniqueId
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     SkPicture* instance = reinterpret_cast<SkPicture*>((ptr));
     return instance->uniqueID();
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Picture__1nSerializeToData
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     SkPicture* instance = reinterpret_cast<SkPicture*>((ptr));
     SkData* data = instance->serialize().release();
     return reinterpret_cast<KNativePointer>(data);
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Picture__1nMakePlaceholder
-  (KInteropPointer __Kinstance, KFloat left, KFloat top, KFloat right, KFloat bottom) {
+  (KFloat left, KFloat top, KFloat right, KFloat bottom) {
     SkRect cull = SkRect::MakeLTRB(left, top, right, bottom);
     SkPicture* instance = SkPicture::MakePlaceholder(cull).release();
     return reinterpret_cast<KNativePointer>(instance);
 }
 
 SKIKO_EXPORT KInt org_jetbrains_skia_Picture__1nGetApproximateOpCount
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     SkPicture* instance = reinterpret_cast<SkPicture*>((ptr));
     return instance->approximateOpCount();
 }
 
 SKIKO_EXPORT KLong org_jetbrains_skia_Picture__1nGetApproximateBytesUsed
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     SkPicture* instance = reinterpret_cast<SkPicture*>((ptr));
     return instance->approximateBytesUsed();
 }
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Picture__1nMakeShader
-  (KInteropPointer __Kinstance, KNativePointer ptr, KInt tmxValue, KInt tmyValue, KInt filterModeValue, KFloat* localMatrixArr, KInteropPointer tileRectObj) {
+  (KNativePointer ptr, KInt tmxValue, KInt tmyValue, KInt filterModeValue, KFloat* localMatrixArr, KInteropPointer tileRectObj) {
     TODO("implement org_jetbrains_skia_Picture__1nMakeShader");
 }
      
 #if 0 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Picture__1nMakeShader
-  (KInteropPointer __Kinstance, KNativePointer ptr, KInt tmxValue, KInt tmyValue, KInt filterModeValue, KFloat* localMatrixArr, KInteropPointer tileRectObj) {
+  (KNativePointer ptr, KInt tmxValue, KInt tmyValue, KInt filterModeValue, KFloat* localMatrixArr, KInteropPointer tileRectObj) {
     SkPicture* instance = reinterpret_cast<SkPicture*>((ptr));
     SkTileMode tmx = static_cast<SkTileMode>(tmxValue);
     SkTileMode tmy = static_cast<SkTileMode>(tmyValue);

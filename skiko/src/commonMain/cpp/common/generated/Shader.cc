@@ -176,23 +176,9 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Shader__1nMakeSweepGradientCS
   (KFloat x, KFloat y, KFloat start, KFloat end, KFloat* colorsArray, KNativePointer colorSpacePtr, KFloat* posArray, KInt tileModeInt, KInt flags, KFloat* matrixArray) {
     TODO("implement org_jetbrains_skia_Shader__1nMakeSweepGradientCS");
 }
-     
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_Shader__1nMakeSweepGradientCS
-  (KFloat x, KFloat y, KFloat start, KFloat end, KFloat* colorsArray, KNativePointer colorSpacePtr, KFloat* posArray, KInt tileModeInt, KInt flags, KFloat* matrixArray) {
-    float* colors = env->GetFloatArrayElements(colorsArray, nullptr);
-    sk_sp<SkColorSpace> colorSpace = sk_ref_sp<SkColorSpace>(reinterpret_cast<SkColorSpace*>((colorSpacePtr)));
-    float* pos = env->GetFloatArrayElements(posArray, nullptr);
-    SkTileMode tileMode = static_cast<SkTileMode>(tileModeInt);
-    std::unique_ptr<SkMatrix> localMatrix = skMatrix(env, matrixArray);
-    SkShader* ptr = SkGradientShader::MakeSweep(x, y, reinterpret_cast<SkColor4f*>(colors), colorSpace, pos, env->GetArrayLength(colorsArray), tileMode, start, end, static_cast<uint32_t>(flags), localMatrix.get()).release();
-    env->ReleaseFloatArrayElements(colorsArray, colors, 0);
-    env->ReleaseFloatArrayElements(posArray, pos, 0);
-    return reinterpret_cast<KNativePointer>(ptr);
-}
-#endif
 
 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_Shader__1nMakeEmpty(KInteropPointer __Kinstance) {
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_Shader__1nMakeEmpty() {
     SkShader* ptr = SkShaders::Empty().release();
     return reinterpret_cast<KNativePointer>(ptr);
 }
@@ -238,16 +224,3 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Shader__1nMakeTurbulence
   (KFloat baseFrequencyX, KFloat baseFrequencyY, KInt numOctaves, KFloat seed, KInt* tilesArray) {
     TODO("implement org_jetbrains_skia_Shader__1nMakeTurbulence");
 }
-#if 0
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_Shader__1nMakeTurbulence
-  (JNIEnv* env, jclass jclass, KFloat baseFrequencyX, KFloat baseFrequencyY, KInt numOctaves, KFloat seed, KInt* tilesArray) {
-    int len = env->GetArrayLength(tilesArray);
-    std::vector<SkISize> tiles(len / 2);
-    KInt* arr = env->GetIntArrayElements(tilesArray, 0);
-    for (int i = 0; i < len; i += 2)
-        tiles[i / 2] = {arr[i], arr[i+1]};
-    env->ReleaseIntArrayElements(tilesArray, arr, 0);
-    SkShader* ptr = SkPerlinNoiseShader::MakeTurbulence(baseFrequencyX, baseFrequencyY, numOctaves, seed, tiles.data()).release();
-    return reinterpret_cast<KNativePointer>(ptr);
-}
-#endif

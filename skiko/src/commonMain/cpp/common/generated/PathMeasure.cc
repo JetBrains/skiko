@@ -8,43 +8,43 @@ static void deletePathMeasure(SkPathMeasure* instance) {
     delete instance;
 }
 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_PathMeasure__1nGetFinalizer(KInteropPointer __Kinstance) {
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_PathMeasure__1nGetFinalizer() {
     return reinterpret_cast<KNativePointer>((&deletePathMeasure));
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_PathMeasure__1nMake
-  (KInteropPointer __Kinstance) {
+  () {
     return reinterpret_cast<KNativePointer>(new SkPathMeasure());
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_PathMeasure__1nMakePath
-  (KInteropPointer __Kinstance, KNativePointer pathPtr, KBoolean forceClosed, KFloat resScale) {
+  (KNativePointer pathPtr, KBoolean forceClosed, KFloat resScale) {
     SkPath* path = reinterpret_cast<SkPath*>((pathPtr));
     return reinterpret_cast<KNativePointer>(new SkPathMeasure(*path, forceClosed, resScale));
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_PathMeasure__1nSetPath
-  (KInteropPointer __Kinstance, KNativePointer ptr, KNativePointer pathPtr, KBoolean forceClosed) {
+  (KNativePointer ptr, KNativePointer pathPtr, KBoolean forceClosed) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>((ptr));
     SkPath* path = reinterpret_cast<SkPath*>((pathPtr));
     instance->setPath(path, forceClosed);
 }
 
 SKIKO_EXPORT KFloat org_jetbrains_skia_PathMeasure__1nGetLength
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>((ptr));
     return instance->getLength();
 }
 
 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_PathMeasure__1nGetPosition
-  (KInteropPointer __Kinstance, KNativePointer ptr, KFloat distance) {
+  (KNativePointer ptr, KFloat distance) {
     TODO("implement org_jetbrains_skia_PathMeasure__1nGetPosition");
 }
      
 #if 0 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_PathMeasure__1nGetPosition
-  (KInteropPointer __Kinstance, KNativePointer ptr, KFloat distance) {
+  (KNativePointer ptr, KFloat distance) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>((ptr));
     SkPoint position;
     if (instance->getPosTan(distance, &position, nullptr))
@@ -57,13 +57,13 @@ SKIKO_EXPORT KInteropPointer org_jetbrains_skia_PathMeasure__1nGetPosition
 
 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_PathMeasure__1nGetTangent
-  (KInteropPointer __Kinstance, KNativePointer ptr, KFloat distance) {
+  (KNativePointer ptr, KFloat distance) {
     TODO("implement org_jetbrains_skia_PathMeasure__1nGetTangent");
 }
      
 #if 0 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_PathMeasure__1nGetTangent
-  (KInteropPointer __Kinstance, KNativePointer ptr, KFloat distance) {
+  (KNativePointer ptr, KFloat distance) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>((ptr));
     SkVector tangent;
     if (instance->getPosTan(distance, nullptr, &tangent))
@@ -76,13 +76,13 @@ SKIKO_EXPORT KInteropPointer org_jetbrains_skia_PathMeasure__1nGetTangent
 
 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_PathMeasure__1nGetRSXform
-  (KInteropPointer __Kinstance, KNativePointer ptr, KFloat distance) {
+  (KNativePointer ptr, KFloat distance) {
     TODO("implement org_jetbrains_skia_PathMeasure__1nGetRSXform");
 }
      
 #if 0 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_PathMeasure__1nGetRSXform
-  (KInteropPointer __Kinstance, KNativePointer ptr, KFloat distance) {
+  (KNativePointer ptr, KFloat distance) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>((ptr));
     SkPoint position;
     SkVector tangent;
@@ -96,13 +96,13 @@ SKIKO_EXPORT KInteropPointer org_jetbrains_skia_PathMeasure__1nGetRSXform
 
 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_PathMeasure__1nGetMatrix
-  (KInteropPointer __Kinstance, KNativePointer ptr, KFloat distance, KBoolean getPosition, KBoolean getTangent) {
+  (KNativePointer ptr, KFloat distance, KBoolean getPosition, KBoolean getTangent) {
     TODO("implement org_jetbrains_skia_PathMeasure__1nGetMatrix");
 }
      
 #if 0 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_PathMeasure__1nGetMatrix
-  (KInteropPointer __Kinstance, KNativePointer ptr, KFloat distance, KBoolean getPosition, KBoolean getTangent) {
+  (KNativePointer ptr, KFloat distance, KBoolean getPosition, KBoolean getTangent) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>((ptr));
     SkMatrix matrix;
     int flags = 0;
@@ -123,20 +123,20 @@ SKIKO_EXPORT KInteropPointer org_jetbrains_skia_PathMeasure__1nGetMatrix
 
 
 SKIKO_EXPORT KBoolean org_jetbrains_skia_PathMeasure__1nGetSegment
-  (KInteropPointer __Kinstance, KNativePointer ptr, KFloat startD, KFloat endD, KNativePointer dstPtr, KBoolean startWithMoveTo) {
+  (KNativePointer ptr, KFloat startD, KFloat endD, KNativePointer dstPtr, KBoolean startWithMoveTo) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>((ptr));
     SkPath* dst = reinterpret_cast<SkPath*>((dstPtr));
     return instance->getSegment(startD, endD, dst, startWithMoveTo);
 }
 
 SKIKO_EXPORT KBoolean org_jetbrains_skia_PathMeasure__1nIsClosed
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>((ptr));
     return instance->isClosed();
 }
 
 SKIKO_EXPORT KBoolean org_jetbrains_skia_PathMeasure__1nNextContour
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>((ptr));
     return instance->nextContour();
 }

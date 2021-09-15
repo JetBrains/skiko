@@ -10,21 +10,21 @@ static void unrefColorSpace(SkColorSpace* ptr) {
     ptr->unref();
 }
 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorSpace__1nGetFinalizer(KInteropPointer __Kinstance) {
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorSpace__1nGetFinalizer() {
     return reinterpret_cast<KNativePointer>((&unrefColorSpace));
 }
 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorSpace__1nMakeSRGB(KInteropPointer __Kinstance) {
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorSpace__1nMakeSRGB() {
     SkColorSpace* ptr = SkColorSpace::MakeSRGB().release();
     return reinterpret_cast<KNativePointer>(ptr);
 }
 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorSpace__1nMakeSRGBLinear(KInteropPointer __Kinstance) {
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorSpace__1nMakeSRGBLinear() {
     SkColorSpace* ptr = SkColorSpace::MakeSRGBLinear().release();
     return reinterpret_cast<KNativePointer>(ptr);
 }
 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorSpace__1nMakeDisplayP3(KInteropPointer __Kinstance) {
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorSpace__1nMakeDisplayP3() {
     SkColorSpace* ptr = SkColorSpace::MakeRGB(SkNamedTransferFn::kSRGB, SkNamedGamut::kDisplayP3).release();
     return reinterpret_cast<KNativePointer>(ptr);
 }
@@ -49,19 +49,19 @@ SKIKO_EXPORT void org_jetbrains_skia_ColorSpace__nConvert(
 
 
 SKIKO_EXPORT KBoolean org_jetbrains_skia_ColorSpace__1nIsGammaCloseToSRGB
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     SkColorSpace* instance = reinterpret_cast<SkColorSpace*>((ptr));
     return instance->gammaCloseToSRGB();
 }
 
 SKIKO_EXPORT KBoolean org_jetbrains_skia_ColorSpace__1nIsGammaLinear
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     SkColorSpace* instance = reinterpret_cast<SkColorSpace*>((ptr));
     return instance->gammaIsLinear();
 }
 
 SKIKO_EXPORT KBoolean org_jetbrains_skia_ColorSpace__1nIsSRGB
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     SkColorSpace* instance = reinterpret_cast<SkColorSpace*>((ptr));
     return instance->isSRGB();
 }

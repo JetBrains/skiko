@@ -4,7 +4,6 @@
 #include "SkShaper.h"
 #include "unicode/ubrk.h"
 #include "unicode/utext.h"
-#include "common.h"
 
 namespace skija {
     namespace shaper {

@@ -8,20 +8,20 @@
 #include "common.h"
 
 SKIKO_EXPORT KInt org_jetbrains_skia_FontMgr__1nGetFamiliesCount
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     SkFontMgr* instance = reinterpret_cast<SkFontMgr*>((ptr));
     return instance->countFamilies();
 }
 
 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_FontMgr__1nGetFamilyName
-  (KInteropPointer __Kinstance, KNativePointer ptr, KInt index) {
+  (KNativePointer ptr, KInt index) {
     TODO("implement org_jetbrains_skia_FontMgr__1nGetFamilyName");
 }
      
 #if 0 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_FontMgr__1nGetFamilyName
-  (KInteropPointer __Kinstance, KNativePointer ptr, KInt index) {
+  (KNativePointer ptr, KInt index) {
     SkFontMgr* instance = reinterpret_cast<SkFontMgr*>((ptr));
     SkString familyName;
     instance->getFamilyName(index, &familyName);
@@ -31,7 +31,7 @@ SKIKO_EXPORT KInteropPointer org_jetbrains_skia_FontMgr__1nGetFamilyName
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_FontMgr__1nMakeStyleSet
-  (KInteropPointer __Kinstance, KNativePointer ptr, KInt index) {
+  (KNativePointer ptr, KInt index) {
     SkFontMgr* instance = reinterpret_cast<SkFontMgr*>((ptr));
     SkFontStyleSet* styleSet = instance->createStyleSet(index);
     return reinterpret_cast<KNativePointer>(styleSet);
@@ -39,13 +39,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_FontMgr__1nMakeStyleSet
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_FontMgr__1nMatchFamily
-  (KInteropPointer __Kinstance, KNativePointer ptr, KInteropPointer familyNameStr) {
+  (KNativePointer ptr, KInteropPointer familyNameStr) {
     TODO("implement org_jetbrains_skia_FontMgr__1nMatchFamily");
 }
      
 #if 0 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_FontMgr__1nMatchFamily
-  (KInteropPointer __Kinstance, KNativePointer ptr, KInteropPointer familyNameStr) {
+  (KNativePointer ptr, KInteropPointer familyNameStr) {
     SkFontMgr* instance = reinterpret_cast<SkFontMgr*>((ptr));
     SkString familyName = skString(env, familyNameStr);
     SkFontStyleSet* styleSet = instance->matchFamily(familyName.c_str());
@@ -56,13 +56,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_FontMgr__1nMatchFamily
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_FontMgr__1nMatchFamilyStyle
-  (KInteropPointer __Kinstance, KNativePointer ptr, KInteropPointer familyNameStr, KInt fontStyle) {
+  (KNativePointer ptr, KInteropPointer familyNameStr, KInt fontStyle) {
     TODO("implement org_jetbrains_skia_FontMgr__1nMatchFamilyStyle");
 }
      
 #if 0 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_FontMgr__1nMatchFamilyStyle
-  (KInteropPointer __Kinstance, KNativePointer ptr, KInteropPointer familyNameStr, KInt fontStyle) {
+  (KNativePointer ptr, KInteropPointer familyNameStr, KInt fontStyle) {
     SkFontMgr* instance = reinterpret_cast<SkFontMgr*>((ptr));
     SkString familyName = skString(env, familyNameStr);
     SkTypeface* typeface = instance->matchFamilyStyle(familyName.c_str(), skija::FontStyle::fromJava(fontStyle));
@@ -73,13 +73,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_FontMgr__1nMatchFamilyStyle
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_FontMgr__1nMatchFamilyStyleCharacter
-  (KInteropPointer __Kinstance, KNativePointer ptr, KInteropPointer familyNameStr, KInt fontStyle, KInteropPointerArray bcp47Array, KInt character) {
+  (KNativePointer ptr, KInteropPointer familyNameStr, KInt fontStyle, KInteropPointerArray bcp47Array, KInt character) {
     TODO("implement org_jetbrains_skia_FontMgr__1nMatchFamilyStyleCharacter");
 }
      
 #if 0 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_FontMgr__1nMatchFamilyStyleCharacter
-  (KInteropPointer __Kinstance, KNativePointer ptr, KInteropPointer familyNameStr, KInt fontStyle, KInteropPointerArray bcp47Array, KInt character) {
+  (KNativePointer ptr, KInteropPointer familyNameStr, KInt fontStyle, KInteropPointerArray bcp47Array, KInt character) {
     SkFontMgr* instance = reinterpret_cast<SkFontMgr*>((ptr));
 
     SkString familyName = skString(env, familyNameStr);
@@ -97,7 +97,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_FontMgr__1nMatchFamilyStyleCharac
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_FontMgr__1nMakeFromData
-  (KInteropPointer __Kinstance, KNativePointer ptr, KNativePointer dataPtr, KInt ttcIndex) {
+  (KNativePointer ptr, KNativePointer dataPtr, KInt ttcIndex) {
     SkFontMgr* instance = reinterpret_cast<SkFontMgr*>((ptr));
     SkData* data = reinterpret_cast<SkData*>((dataPtr));
     SkTypeface* typeface = instance->makeFromData(sk_ref_sp(data), ttcIndex).release();
@@ -105,7 +105,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_FontMgr__1nMakeFromData
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_FontMgr__1nDefault
-  (KInteropPointer __Kinstance) {
+  () {
     SkFontMgr* instance = SkFontMgr::RefDefault().release();
     return reinterpret_cast<KNativePointer>(instance);
 }

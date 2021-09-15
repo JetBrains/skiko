@@ -11,7 +11,7 @@
 #include "common.h"
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorFilter__1nMakeComposed
-  (KInteropPointer __Kinstance, KNativePointer outerPtr, KNativePointer innerPtr) {
+  (KNativePointer outerPtr, KNativePointer innerPtr) {
     SkColorFilter* outer = reinterpret_cast<SkColorFilter*>((outerPtr));
     SkColorFilter* inner = reinterpret_cast<SkColorFilter*>((innerPtr));
     SkColorFilter* ptr = SkColorFilters::Compose(sk_ref_sp(outer), sk_ref_sp(inner)).release();
@@ -19,7 +19,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorFilter__1nMakeComposed
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorFilter__1nMakeBlend
-  (KInteropPointer __Kinstance, KInt colorInt, KInt modeInt) {
+  (KInt colorInt, KInt modeInt) {
     SkColor color = static_cast<SkColor>(colorInt);
     SkBlendMode mode = static_cast<SkBlendMode>(modeInt);
     SkColorFilter* ptr = SkColorFilters::Blend(color, mode).release();
@@ -28,13 +28,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorFilter__1nMakeBlend
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorFilter__1nMakeMatrix
-  (KInteropPointer __Kinstance, KFloat* rowMajorArray) {
+  (KFloat* rowMajorArray) {
     TODO("implement org_jetbrains_skia_ColorFilter__1nMakeMatrix");
 }
      
 #if 0 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorFilter__1nMakeMatrix
-  (KInteropPointer __Kinstance, KFloat* rowMajorArray) {
+  (KFloat* rowMajorArray) {
     KFloat* rowMajor = env->GetFloatArrayElements(rowMajorArray, 0);
     SkColorFilter* ptr = SkColorFilters::Matrix(rowMajor).release();
     env->ReleaseFloatArrayElements(rowMajorArray, rowMajor, 0);
@@ -45,13 +45,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorFilter__1nMakeMatrix
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorFilter__1nMakeHSLAMatrix
-  (KInteropPointer __Kinstance, KFloat* rowMajorArray) {
+  (KFloat* rowMajorArray) {
     TODO("implement org_jetbrains_skia_ColorFilter__1nMakeHSLAMatrix");
 }
      
 #if 0 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorFilter__1nMakeHSLAMatrix
-  (KInteropPointer __Kinstance, KFloat* rowMajorArray) {
+  (KFloat* rowMajorArray) {
     KFloat* rowMajor = env->GetFloatArrayElements(rowMajorArray, 0);
     SkColorFilter* ptr = SkColorFilters::HSLAMatrix(rowMajor).release();
     env->ReleaseFloatArrayElements(rowMajorArray, rowMajor, 0);
@@ -61,19 +61,19 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorFilter__1nMakeHSLAMatrix
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorFilter__1nGetLinearToSRGBGamma
-  (KInteropPointer __Kinstance) {
+  () {
     SkColorFilter* ptr = SkColorFilters::LinearToSRGBGamma().release();
     return reinterpret_cast<KNativePointer>(ptr);
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorFilter__1nGetSRGBToLinearGamma
-  (KInteropPointer __Kinstance) {
+  () {
     SkColorFilter* ptr = SkColorFilters::SRGBToLinearGamma().release();
     return reinterpret_cast<KNativePointer>(ptr);
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorFilter__1nMakeLerp
-  (KInteropPointer __Kinstance, KFloat t, KNativePointer dstPtr, KNativePointer srcPtr) {
+  (KFloat t, KNativePointer dstPtr, KNativePointer srcPtr) {
     SkColorFilter* dst = reinterpret_cast<SkColorFilter*>((dstPtr));
     SkColorFilter* src = reinterpret_cast<SkColorFilter*>((srcPtr));
     SkColorFilter* ptr = SkColorFilters::Lerp(t, sk_ref_sp(dst), sk_ref_sp(src)).release();
@@ -81,13 +81,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorFilter__1nMakeLerp
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorFilter__1nMakeLighting
-  (KInteropPointer __Kinstance, KInt mul, KInt add) {
+  (KInt mul, KInt add) {
     SkColorFilter* ptr = SkColorMatrixFilter::MakeLightingFilter(mul, add).release();
     return reinterpret_cast<KNativePointer>(ptr);
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorFilter__1nMakeHighContrast
-  (KInteropPointer __Kinstance, KBoolean grayscale, KInt inverionModeInt, KFloat contrast) {
+  (KBoolean grayscale, KInt inverionModeInt, KFloat contrast) {
     SkHighContrastConfig config(grayscale, static_cast<SkHighContrastConfig::InvertStyle>(inverionModeInt), contrast);
     SkColorFilter* ptr = SkHighContrastFilter::Make(config).release();
     return reinterpret_cast<KNativePointer>(ptr);
@@ -95,14 +95,14 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorFilter__1nMakeHighContrast
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorFilter__1nMakeTable
-  (KInteropPointer __Kinstance, jbyteArray tableArray) {
+  (KByte* tableArray) {
     TODO("implement org_jetbrains_skia_ColorFilter__1nMakeTable");
 }
      
 #if 0 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorFilter__1nMakeTable
-  (KInteropPointer __Kinstance, jbyteArray tableArray) {
-    jbyte* table = env->GetByteArrayElements(tableArray, 0);
+  (KByte* tableArray) {
+    KByte* table = env->GetByteArrayElements(tableArray, 0);
     SkColorFilter* ptr = SkTableColorFilter::Make(reinterpret_cast<uint8_t*>(table)).release();
     env->ReleaseByteArrayElements(tableArray, table, 0);
     return reinterpret_cast<KNativePointer>(ptr);
@@ -127,11 +127,11 @@ SKIKO_EXPORT KInteropPointer org_jetbrains_skia_ColorFilter__nMakeTableARGB
 
 #if 0 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorFilter__1nMakeTableARGB
-  (KInteropPointer __Kinstance, jbyteArray arrayA, jbyteArray arrayR, jbyteArray arrayG, jbyteArray arrayB) {
-    jbyte* a = arrayA ? env->GetByteArrayElements(arrayA, 0) : nullptr;
-    jbyte* r = arrayR ? env->GetByteArrayElements(arrayR, 0) : nullptr;
-    jbyte* g = arrayG ? env->GetByteArrayElements(arrayG, 0) : nullptr;
-    jbyte* b = arrayB ? env->GetByteArrayElements(arrayB, 0) : nullptr;
+  (KByte* arrayA, KByte* arrayR, KByte* arrayG, KByte* arrayB) {
+    KByte* a = arrayA ? env->GetByteArrayElements(arrayA, 0) : nullptr;
+    KByte* r = arrayR ? env->GetByteArrayElements(arrayR, 0) : nullptr;
+    KByte* g = arrayG ? env->GetByteArrayElements(arrayG, 0) : nullptr;
+    KByte* b = arrayB ? env->GetByteArrayElements(arrayB, 0) : nullptr;
 
     SkColorFilter* ptr = SkTableColorFilter::MakeARGB(reinterpret_cast<uint8_t*>(a), reinterpret_cast<uint8_t*>(r), reinterpret_cast<uint8_t*>(g), reinterpret_cast<uint8_t*>(b)).release();
     
@@ -146,7 +146,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorFilter__1nMakeTableARGB
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorFilter__1nMakeOverdraw
-  (KInteropPointer __Kinstance, KInt c0, KInt c1, KInt c2, KInt c3, KInt c4, KInt c5) {
+  (KInt c0, KInt c1, KInt c2, KInt c3, KInt c4, KInt c5) {
     SkColor colors[6];
     colors[0] = c0;
     colors[1] = c1;
@@ -159,7 +159,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorFilter__1nMakeOverdraw
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorFilter__1nGetLuma
-  (KInteropPointer __Kinstance) {
+  () {
     SkColorFilter* ptr = SkLumaColorFilter::Make().release();
     return reinterpret_cast<KNativePointer>(ptr);
 }

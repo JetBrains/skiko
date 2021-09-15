@@ -17,7 +17,6 @@
 #include "SkShaper.h"
 #include "SkString.h"
 #include "SkSurfaceProps.h"
-#include "common.h"
 
 namespace java {
     namespace io {
@@ -296,6 +295,24 @@ namespace skija {
         std::unique_ptr<SkSurfaceProps> toSkSurfaceProps(JNIEnv* env, jobject surfacePropsObj);
     }
 
+    namespace SamplingMode {
+            SkSamplingOptions unpack(jlong val);
+        }
+
+    class UtfIndicesConverter {
+        public:
+            UtfIndicesConverter(const char* chars8, size_t len8);
+            UtfIndicesConverter(const SkString& s);
+
+            const char* fStart8;
+            const char* fPtr8;
+            const char* fEnd8;
+            uint32_t fPos16;
+
+            size_t from16To8(uint32_t i16);
+            uint32_t from8To16(size_t i8);
+    };
+
     namespace impl {
         namespace Native {
             extern jfieldID _ptr;
@@ -330,6 +347,16 @@ jfloatArray  javaFloatArray (JNIEnv* env, const std::vector<float>& floats);
 
 std::vector<SkString> skStringVector(JNIEnv* env, jobjectArray arr);
 jobjectArray javaStringArray(JNIEnv* env, const std::vector<SkString>& strings);
+
+template <typename T>
+jlong ptrToJlong(T* ptr) {
+    return static_cast<jlong>(reinterpret_cast<uintptr_t>(ptr));
+}
+
+template <typename T>
+inline T jlongToPtr(jlong ptr) {
+    return reinterpret_cast<T>(static_cast<uintptr_t>(ptr));
+}
 
 void deleteJBytes(void* addr, void*);
 

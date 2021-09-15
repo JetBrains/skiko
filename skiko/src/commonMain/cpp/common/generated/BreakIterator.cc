@@ -8,7 +8,7 @@ static void deleteBreakIterator(UBreakIterator* instance) {
   ubrk_close(instance);
 }
 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_BreakIterator__1nGetFinalizer(KInteropPointer __Kinstance) {
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_BreakIterator__1nGetFinalizer() {
     return reinterpret_cast<KNativePointer>((&deleteBreakIterator));
 }
 
@@ -108,7 +108,7 @@ SKIKO_EXPORT void org_jetbrains_skia_BreakIterator__1nSetText
 SKIKO_EXPORT void org_jetbrains_skia_BreakIterator__1nSetText
   (KNativePointer ptr, KNativePointer textPtr) {
     UBreakIterator* instance = reinterpret_cast<UBreakIterator*>((ptr));
-    std::vector<jchar>* text = reinterpret_cast<std::vector<jchar>*>((textPtr));
+    std::vector<KChar>* text = reinterpret_cast<std::vector<KChar>*>((textPtr));
     UErrorCode status = U_ZERO_ERROR;
     ubrk_setText(instance, reinterpret_cast<UChar *>(text->data()), text->size(), &status);
     if (U_FAILURE(status))

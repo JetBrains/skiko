@@ -7,11 +7,11 @@
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_FontMgrRunIterator__1nMake
-  (KInteropPointer __Kinstance, KNativePointer textPtr, KNativePointer fontPtr, KInteropPointer opts) {
+  (KNativePointer textPtr, KNativePointer fontPtr, KInteropPointer opts) {
     TODO("implement org_jetbrains_skia_shaper_FontMgrRunIterator__1nMake");
 }
      
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_FontMgrRunIterator__1nGetCurrentFont
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     TODO("implement org_jetbrains_skia_shaper_FontMgrRunIterator__1nGetCurrentFont");
 }

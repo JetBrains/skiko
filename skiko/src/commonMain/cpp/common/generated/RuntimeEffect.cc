@@ -5,10 +5,10 @@
 #include "common.h"
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_RuntimeEffect__1nMakeShader
-    (KNativePointer ptr, KNativePointer uniformPtr, KNativePointerArray childrenPtrsArr, KFloat* localMatrixArr, KBoolean isOpaque) {
+    (KNativePointer ptr, KNativePointer uniformPtr, KNativePointer childrenPtrsArr, KFloat* localMatrixArr, KBoolean isOpaque) {
     TODO("implement org_jetbrains_skia_RuntimeEffect__1nMakeShader");
 }
-     
+
 #if 0 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_RuntimeEffect__1nMakeShader
     (KNativePointer ptr, KNativePointer uniformPtr, KNativePointerArray childrenPtrsArr, KFloat* localMatrixArr, KBoolean isOpaque) {

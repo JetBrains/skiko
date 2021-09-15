@@ -1,6 +1,10 @@
 #ifndef SKIKO_COMMON_H
 #define SKIKO_COMMON_H
 
+// Note that this file is only common between Wasm and Native targets, JVM uses different headers.
+
+#include <stdexcept>
+
 #include "SkCodec.h"
 #include "SkFontMetrics.h"
 #include "SkFontStyle.h"
@@ -15,7 +19,7 @@
 #include "SkShaper.h"
 #include "SkString.h"
 #include "SkSurfaceProps.h"
-#include <stdexcept>
+
 #include "types.h"
 
 KLong packTwoInts(KInt a, KInt b);
@@ -42,8 +46,14 @@ namespace skija {
         size_t from16To8(uint32_t i16);
         uint32_t from8To16(size_t i8);
     };
+
+    namespace RRect {
+        SkRRect toSkRRect(KFloat left, KFloat top, KFloat right, KFloat bottom, KFloat* jradii, KInt size);
+    }
 }
 
+std::unique_ptr<SkMatrix> skMatrix(KFloat* matrixArray);
+std::unique_ptr<SkM44> skM44(KFloat* matrixArray);
 
 template <typename T>
 inline T interopToPtr(KNativePointer ptr) {
@@ -60,6 +70,13 @@ __attribute__((noreturn))
 void TODO(const char*);
 #else
 void TODO(const char*);
+#endif
+
+#ifdef SKIKO_WASM
+#include <emscripten.h>
+#define SKIKO_EXPORT EMSCRIPTEN_KEEPALIVE extern "C"
+#else
+#define SKIKO_EXPORT extern "C"
 #endif
 
 #endif /* SKIKO_COMMON_H */

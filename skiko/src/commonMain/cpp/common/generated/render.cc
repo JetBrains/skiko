@@ -6,18 +6,18 @@
 #include "common.h"
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skiko_RenderTargetsKt_makeGLRenderTargetNative
-    (KInteropPointer __Kinstance, KInt width, KInt height, KInt sampleCnt, KInt stencilBits, KInt fbId, KInt fbFormat) {
+    (KInt width, KInt height, KInt sampleCnt, KInt stencilBits, KInt fbId, KInt fbFormat) {
     GrGLFramebufferInfo glInfo = { static_cast<unsigned int>(fbId), static_cast<unsigned int>(fbFormat) };
     GrBackendRenderTarget* obj = new GrBackendRenderTarget(width, height, sampleCnt, stencilBits, glInfo);
     return reinterpret_cast<KNativePointer>(obj);
 }
 
-SKIKO_EXPORT KNativePointer org_jetbrains_skiko_RenderTargetsKt_makeGLContextNative(KInteropPointer __Kinstance) {
+SKIKO_EXPORT KNativePointer org_jetbrains_skiko_RenderTargetsKt_makeGLContextNative() {
     return reinterpret_cast<KNativePointer>(GrDirectContext::MakeGL().release());
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skiko_RenderTargetsKt_makeMetalRenderTargetNative
-    (KInteropPointer __Kinstance, KInt width, KInt height, KInt sampleCnt) {
+    (KInt width, KInt height, KInt sampleCnt) {
 #ifdef SK_METAL
     // TODO: create properly.
     GrMtlTextureInfo mtlInfo;
@@ -30,13 +30,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skiko_RenderTargetsKt_makeMetalRenderT
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skiko_RenderTargetsKt_makeMetalContextNative
-    (KInteropPointer __Kinstance) {
+    () {
     TODO("implement org_jetbrains_skiko_RenderTargetsKt_makeMetalContextNative");
 }
      
 #if 0 
 SKIKO_EXPORT KNativePointer org_jetbrains_skiko_RenderTargetsKt_makeMetalContextNative
-    (KInteropPointer __Kinstance) {
+    () {
 #ifdef SK_METAL
     void* device = nullptr;
     void* queue = nullptr;

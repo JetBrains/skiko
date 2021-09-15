@@ -11,12 +11,12 @@ static void deleteCodec(SkCodec* instance) {
     delete instance;
 }
 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_Codec__1nGetFinalizer(KInteropPointer __Kinstance) {
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_Codec__1nGetFinalizer() {
     return reinterpret_cast<KNativePointer>(&deleteCodec);
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Codec__1nMakeFromData
-  (KInteropPointer __Kinstance, KNativePointer dataPtr) {
+  (KNativePointer dataPtr) {
     SkData* data = reinterpret_cast<SkData*>((dataPtr));
     std::unique_ptr<SkCodec> instance = SkCodec::MakeFromData(sk_ref_sp(data));
     return reinterpret_cast<KNativePointer>(instance.release());
@@ -24,39 +24,39 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Codec__1nMakeFromData
 
 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Codec__1nGetImageInfo
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     TODO("implement org_jetbrains_skia_Codec__1nGetImageInfo");
 }
      
 #if 0 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Codec__1nGetImageInfo
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     SkCodec* instance = reinterpret_cast<SkCodec*>((ptr));
     return skija::ImageInfo::toJava(env, instance->getInfo());
 }
 #endif
 
 
-SKIKO_EXPORT KLong org_jetbrains_skia_Codec__1nGetSize
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+SKIKO_EXPORT KInt org_jetbrains_skia_Codec__1nGetSize
+  (KNativePointer ptr) {
     SkCodec* instance = reinterpret_cast<SkCodec*>((ptr));
     return packISize(instance->dimensions());
 }
 
-SKIKO_EXPORT KLong org_jetbrains_skia_Codec__1nGetEncodedOrigin
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+SKIKO_EXPORT KInt org_jetbrains_skia_Codec__1nGetEncodedOrigin
+  (KNativePointer ptr) {
     SkCodec* instance = reinterpret_cast<SkCodec*>((ptr));
     return static_cast<KInt>(instance->getOrigin());
 }
 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_Codec__1nGetEncodedImageFormat
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+SKIKO_EXPORT KInt org_jetbrains_skia_Codec__1nGetEncodedImageFormat
+  (KNativePointer ptr) {
     SkCodec* instance = reinterpret_cast<SkCodec*>((ptr));
     return static_cast<KInt>(instance->getEncodedFormat());
 }
 
 SKIKO_EXPORT KInt org_jetbrains_skia_Codec__1nReadPixels
-  (KInteropPointer __Kinstance, KNativePointer ptr, KNativePointer bitmapPtr, KInt frame, KInt priorFrame) {
+  (KNativePointer ptr, KNativePointer bitmapPtr, KInt frame, KInt priorFrame) {
     SkCodec* instance = reinterpret_cast<SkCodec*>((ptr));
     SkBitmap* bitmap = reinterpret_cast<SkBitmap*>((bitmapPtr));
     SkCodec::Options opts;
@@ -67,20 +67,20 @@ SKIKO_EXPORT KInt org_jetbrains_skia_Codec__1nReadPixels
 }
 
 SKIKO_EXPORT KInt org_jetbrains_skia_Codec__1nGetFrameCount
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     SkCodec* instance = reinterpret_cast<SkCodec*>((ptr));
     return instance->getFrameCount();
 }
 
 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Codec__1nGetFrameInfo
-  (KInteropPointer __Kinstance, KNativePointer ptr, KInt frame) {
+  (KNativePointer ptr, KInt frame) {
     TODO("implement org_jetbrains_skia_Codec__1nGetFrameInfo");
 }
      
 #if 0 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Codec__1nGetFrameInfo
-  (KInteropPointer __Kinstance, KNativePointer ptr, KInt frame) {
+  (KNativePointer ptr, KInt frame) {
     SkCodec* instance = reinterpret_cast<SkCodec*>((ptr));
     SkCodec::FrameInfo info;
     instance->getFrameInfo(frame, &info);
@@ -91,13 +91,13 @@ SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Codec__1nGetFrameInfo
 
 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Codec__1nGetFramesInfo
-  (KInteropPointer __Kinstance, KNativePointer ptr, KInt frame) {
+  (KNativePointer ptr, KInt frame) {
     TODO("implement org_jetbrains_skia_Codec__1nGetFramesInfo");
 }
      
 #if 0 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Codec__1nGetFramesInfo
-  (KInteropPointer __Kinstance, KNativePointer ptr, KInt frame) {
+  (KNativePointer ptr, KInt frame) {
     SkCodec* instance = reinterpret_cast<SkCodec*>((ptr));
     SkCodec::FrameInfo info;
     std::vector<SkCodec::FrameInfo> frames = instance->getFrameInfo();
@@ -114,7 +114,7 @@ SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Codec__1nGetFramesInfo
 
 
 SKIKO_EXPORT KInt org_jetbrains_skia_Codec__1nGetRepetitionCount
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     SkCodec* instance = reinterpret_cast<SkCodec*>((ptr));
     return instance->getRepetitionCount();
 }

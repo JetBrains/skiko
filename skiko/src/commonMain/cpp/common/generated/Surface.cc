@@ -98,7 +98,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeRaster
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeRasterN32Premul
-  (KInteropPointer __Kinstance, KInt width, KInt height) {
+  (KInt width, KInt height) {
     sk_sp<SkSurface> surface = SkSurface::MakeRasterN32Premul(
         width, height,
         /* const SkSurfaceProps* */ nullptr
@@ -108,7 +108,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeRasterN32Premul
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeFromBackendRenderTarget
-  (KInteropPointer __Kinstance, KNativePointer pContext, KNativePointer pBackendRenderTarget, KInt surfaceOrigin, KInt colorType, KNativePointer colorSpacePtr, KInteropPointer surfacePropsObj) {
+  (KNativePointer pContext, KNativePointer pBackendRenderTarget, KInt surfaceOrigin, KInt colorType, KNativePointer colorSpacePtr, KInteropPointer surfacePropsObj) {
     GrDirectContext* context = reinterpret_cast<GrDirectContext*>((pContext));
     GrBackendRenderTarget* backendRenderTarget = reinterpret_cast<GrBackendRenderTarget*>((pBackendRenderTarget));
     GrSurfaceOrigin grSurfaceOrigin = static_cast<GrSurfaceOrigin>(surfaceOrigin);
@@ -135,13 +135,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeFromBackendRenderT
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeFromMTKView
-  (KInteropPointer __Kinstance, KNativePointer contextPtr, KNativePointer mtkViewPtr, KInt surfaceOrigin, KInt sampleCount, KInt colorType, KNativePointer colorSpacePtr, KInteropPointer surfacePropsObj) {
+  (KNativePointer contextPtr, KNativePointer mtkViewPtr, KInt surfaceOrigin, KInt sampleCount, KInt colorType, KNativePointer colorSpacePtr, KInteropPointer surfacePropsObj) {
     TODO("implement org_jetbrains_skia_Surface__1nMakeFromMTKView");
 }
      
 #if 0 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeFromMTKView
-  (KInteropPointer __Kinstance, KNativePointer contextPtr, KNativePointer mtkViewPtr, KInt surfaceOrigin, KInt sampleCount, KInt colorType, KNativePointer colorSpacePtr, KInteropPointer surfacePropsObj) {
+  (KNativePointer contextPtr, KNativePointer mtkViewPtr, KInt surfaceOrigin, KInt sampleCount, KInt colorType, KNativePointer colorSpacePtr, KInteropPointer surfacePropsObj) {
     GrDirectContext* context = reinterpret_cast<GrDirectContext*>((contextPtr));
     GrMTLHandle* mtkView = reinterpret_cast<GrMTLHandle*>((mtkViewPtr));
     GrSurfaceOrigin grSurfaceOrigin = static_cast<GrSurfaceOrigin>(surfaceOrigin);
@@ -164,7 +164,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeFromMTKView
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeRenderTarget
-  (KInteropPointer __Kinstance, KNativePointer contextPtr, KBoolean budgeted,
+  (KNativePointer contextPtr, KBoolean budgeted,
     KInt width, KInt height, KInt colorType, KInt alphaType, KNativePointer colorSpacePtr,
     KInt sampleCount, KInt surfaceOrigin,
     KInteropPointer surfacePropsObj,
@@ -175,7 +175,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeRenderTarget
      
 #if 0 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeRenderTarget
-  (KInteropPointer __Kinstance, KNativePointer contextPtr, KBoolean budgeted,
+  (KNativePointer contextPtr, KBoolean budgeted,
     KInt width, KInt height, KInt colorType, KInt alphaType, KNativePointer colorSpacePtr,
     KInt sampleCount, KInt surfaceOrigin,
     KInteropPointer surfacePropsObj,
@@ -202,102 +202,102 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeRenderTarget
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeNull
-  (KInteropPointer __Kinstance, KInt width, KInt height) {
+  (KInt width, KInt height) {
   sk_sp<SkSurface> instance = SkSurface::MakeNull(width, height);
   return reinterpret_cast<KNativePointer>(instance.release());
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nGetCanvas
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     SkSurface* surface = reinterpret_cast<SkSurface*>((ptr));
     return reinterpret_cast<KNativePointer>(surface->getCanvas());
 }
 
 SKIKO_EXPORT KInt org_jetbrains_skia_Surface__1nGetWidth
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     SkSurface* surface = reinterpret_cast<SkSurface*>((ptr));
     return surface->width();
 }
 
 SKIKO_EXPORT KInt org_jetbrains_skia_Surface__1nGetHeight
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     SkSurface* surface = reinterpret_cast<SkSurface*>((ptr));
     return surface->height();
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeImageSnapshot
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     SkSurface* surface = reinterpret_cast<SkSurface*>((ptr));
     return reinterpret_cast<KNativePointer>(surface->makeImageSnapshot().release());
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeImageSnapshotR
-  (KInteropPointer __Kinstance, KNativePointer ptr, KInt left, KInt top, KInt right, KInt bottom) {
+  (KNativePointer ptr, KInt left, KInt top, KInt right, KInt bottom) {
     SkSurface* surface = reinterpret_cast<SkSurface*>((ptr));
     return reinterpret_cast<KNativePointer>(surface->makeImageSnapshot({left, top, right, bottom}).release());
 }
 
 SKIKO_EXPORT KInt org_jetbrains_skia_Surface__1nGenerationId
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     SkSurface* surface = reinterpret_cast<SkSurface*>((ptr));
     return surface->generationID();
 }
 
 SKIKO_EXPORT KBoolean org_jetbrains_skia_Surface__1nReadPixelsToPixmap
-  (KInteropPointer __Kinstance, KNativePointer ptr, KNativePointer pixmapPtr, KInt srcX, KInt srcY) {
+  (KNativePointer ptr, KNativePointer pixmapPtr, KInt srcX, KInt srcY) {
     SkSurface* surface = reinterpret_cast<SkSurface*>((ptr));
     SkPixmap* pixmap = reinterpret_cast<SkPixmap*>((pixmapPtr));
     return surface->readPixels(*pixmap, srcX, srcY);
 }
 
 SKIKO_EXPORT KBoolean org_jetbrains_skia_Surface__1nReadPixels
-  (KInteropPointer __Kinstance, KNativePointer ptr, KNativePointer bitmapPtr, KInt srcX, KInt srcY) {
+  (KNativePointer ptr, KNativePointer bitmapPtr, KInt srcX, KInt srcY) {
     SkSurface* surface = reinterpret_cast<SkSurface*>((ptr));
     SkBitmap* bitmap = reinterpret_cast<SkBitmap*>((bitmapPtr));
     return surface->readPixels(*bitmap, srcX, srcY);
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_Surface__1nWritePixelsFromPixmap
-  (KInteropPointer __Kinstance, KNativePointer ptr, KNativePointer pixmapPtr, KInt x, KInt y) {
+  (KNativePointer ptr, KNativePointer pixmapPtr, KInt x, KInt y) {
     SkSurface* surface = reinterpret_cast<SkSurface*>((ptr));
     SkPixmap* pixmap = reinterpret_cast<SkPixmap*>((pixmapPtr));
     surface->writePixels(*pixmap, x, y);
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_Surface__1nWritePixels
-  (KInteropPointer __Kinstance, KNativePointer ptr, KNativePointer bitmapPtr, KInt x, KInt y) {
+  (KNativePointer ptr, KNativePointer bitmapPtr, KInt x, KInt y) {
     SkSurface* surface = reinterpret_cast<SkSurface*>((ptr));
     SkBitmap* bitmap = reinterpret_cast<SkBitmap*>((bitmapPtr));
     surface->writePixels(*bitmap, x, y);
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_Surface__1nFlushAndSubmit
-  (KInteropPointer __Kinstance, KNativePointer ptr, KBoolean syncCpu) {
+  (KNativePointer ptr, KBoolean syncCpu) {
     SkSurface* surface = reinterpret_cast<SkSurface*>((ptr));
     surface->flushAndSubmit(syncCpu);
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_Surface__1nFlush
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     SkSurface* surface = reinterpret_cast<SkSurface*>((ptr));
     surface->flush();
 }
 
 SKIKO_EXPORT KBoolean org_jetbrains_skia_Surface__1nUnique
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     SkSurface* surface = reinterpret_cast<SkSurface*>((ptr));
     return surface->unique();
 }
 
 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Surface__1nGetImageInfo
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     TODO("implement org_jetbrains_skia_Surface__1nGetImageInfo");
 }
      
 #if 0 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Surface__1nGetImageInfo
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     SkSurface* surface = reinterpret_cast<SkSurface*>((ptr));
     const SkImageInfo& info = surface->imageInfo();
     return env->NewObject(skija::ImageInfo::cls, skija::ImageInfo::ctor,
@@ -311,14 +311,14 @@ SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Surface__1nGetImageInfo
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeSurface
-  (KInteropPointer __Kinstance, KNativePointer ptr, KInt width, KInt height) {
+  (KNativePointer ptr, KInt width, KInt height) {
     SkSurface* surface = reinterpret_cast<SkSurface*>((ptr));
     sk_sp<SkSurface> newSurface = surface->makeSurface(width, height);
     return reinterpret_cast<KNativePointer>(newSurface.release());
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeSurfaceI
-  (KInteropPointer __Kinstance, KNativePointer ptr, KInt width, KInt height, KInt colorType, KInt alphaType, KNativePointer colorSpacePtr) {
+  (KNativePointer ptr, KInt width, KInt height, KInt colorType, KInt alphaType, KNativePointer colorSpacePtr) {
     SkSurface* surface = reinterpret_cast<SkSurface*>((ptr));
     SkColorSpace* colorSpace = reinterpret_cast<SkColorSpace*>((colorSpacePtr));
     SkImageInfo imageInfo = SkImageInfo::Make(width,
@@ -331,7 +331,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeSurfaceI
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_Surface__1nDraw
-  (KInteropPointer __Kinstance, KNativePointer ptr, KNativePointer canvasPtr, KFloat x, KFloat y, KNativePointer paintPtr) {
+  (KNativePointer ptr, KNativePointer canvasPtr, KFloat x, KFloat y, KNativePointer paintPtr) {
     SkSurface* surface = reinterpret_cast<SkSurface*>((ptr));
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>((canvasPtr));
     SkPaint* paint = reinterpret_cast<SkPaint*>((paintPtr));
@@ -339,20 +339,20 @@ SKIKO_EXPORT void org_jetbrains_skia_Surface__1nDraw
 }
 
 SKIKO_EXPORT KBoolean org_jetbrains_skia_Surface__1nPeekPixels
-  (KInteropPointer __Kinstance, KNativePointer ptr, KNativePointer dstPixmapPtr) {
+  (KNativePointer ptr, KNativePointer dstPixmapPtr) {
     SkSurface* surface = reinterpret_cast<SkSurface*>((ptr));
     SkPixmap* pixmap = reinterpret_cast<SkPixmap*>((dstPixmapPtr));
     return static_cast<KBoolean>(surface->peekPixels(pixmap));
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_Surface__1nNotifyContentWillChange
-  (KInteropPointer __Kinstance, KNativePointer ptr, KInt mode) {
+  (KNativePointer ptr, KInt mode) {
     SkSurface* surface = reinterpret_cast<SkSurface*>((ptr));
     surface->notifyContentWillChange(static_cast<SkSurface::ContentChangeMode>(mode));
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nGetRecordingContext
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     SkSurface* surface = reinterpret_cast<SkSurface*>((ptr));
     return reinterpret_cast<KNativePointer>(surface->recordingContext());
 }

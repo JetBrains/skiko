@@ -578,7 +578,6 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
 
 extensions.configure<CppLibrary> {
     source.from(
-        fileTree("$projectDir/src/commonMain/cpp/common"),
         fileTree("$projectDir/src/jvmMain/cpp/common"),
         fileTree("$projectDir/src/jvmMain/cpp/${targetOs.id}")
     )

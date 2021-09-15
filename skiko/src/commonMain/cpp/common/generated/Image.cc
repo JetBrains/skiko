@@ -8,13 +8,13 @@
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nMakeRaster
-  (KInteropPointer __Kinstance, KInt width, KInt height, KInt colorType, KInt alphaType, KNativePointer colorSpacePtr, jbyteArray bytesArr, KNativePointer rowBytes) {
+  (KInt width, KInt height, KInt colorType, KInt alphaType, KNativePointer colorSpacePtr, KByte* bytesArr, KNativePointer rowBytes) {
     TODO("implement org_jetbrains_skia_Image__1nMakeRaster");
 }
      
 #if 0 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nMakeRaster
-  (KInteropPointer __Kinstance, KInt width, KInt height, KInt colorType, KInt alphaType, KNativePointer colorSpacePtr, jbyteArray bytesArr, KNativePointer rowBytes) {
+  (KInt width, KInt height, KInt colorType, KInt alphaType, KNativePointer colorSpacePtr, KByte* bytesArr, KNativePointer rowBytes) {
     SkColorSpace* colorSpace = reinterpret_cast<SkColorSpace*>((colorSpacePtr));
     SkImageInfo imageInfo = SkImageInfo::Make(width,
                                               height,
@@ -30,7 +30,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nMakeRaster
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nMakeRasterData
-  (KInteropPointer __Kinstance, KInt width, KInt height, KInt colorType, KInt alphaType, KNativePointer colorSpacePtr, KNativePointer dataPtr, KNativePointer rowBytes) {
+  (KInt width, KInt height, KInt colorType, KInt alphaType, KNativePointer colorSpacePtr, KNativePointer dataPtr, KInt rowBytes) {
     SkColorSpace* colorSpace = reinterpret_cast<SkColorSpace*>((colorSpacePtr));
     SkImageInfo imageInfo = SkImageInfo::Make(width,
                                               height,
@@ -43,14 +43,14 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nMakeRasterData
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nMakeFromBitmap
-  (KInteropPointer __Kinstance, KNativePointer bitmapPtr) {
+  (KNativePointer bitmapPtr) {
     SkBitmap* bitmap = reinterpret_cast<SkBitmap*>((bitmapPtr));
     sk_sp<SkImage> image = SkImage::MakeFromBitmap(*bitmap);
     return reinterpret_cast<KNativePointer>(image.release());
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nMakeFromPixmap
-  (KInteropPointer __Kinstance, KNativePointer pixmapPtr) {
+  (KNativePointer pixmapPtr) {
     SkPixmap* pixmap = reinterpret_cast<SkPixmap*>((pixmapPtr));
     sk_sp<SkImage> image = SkImage::MakeFromRaster(*pixmap, nullptr, nullptr);
     return reinterpret_cast<KNativePointer>(image.release());
@@ -58,15 +58,15 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nMakeFromPixmap
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nMakeFromEncoded
-  (KInteropPointer __Kinstance, jbyteArray encodedArray) {
+  (KByte* encodedArray) {
     TODO("implement org_jetbrains_skia_Image__1nMakeFromEncoded");
 }
      
 #if 0 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nMakeFromEncoded
-  (KInteropPointer __Kinstance, jbyteArray encodedArray) {
+  (KByte* encodedArray) {
     jsize encodedLen = env->GetArrayLength(encodedArray);
-    jbyte* encoded = env->GetByteArrayElements(encodedArray, 0);
+    KByte* encoded = env->GetByteArrayElements(encodedArray, 0);
     sk_sp<SkData> encodedData = SkData::MakeWithCopy(encoded, encodedLen);
     env->ReleaseByteArrayElements(encodedArray, encoded, 0);
 
@@ -79,13 +79,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nMakeFromEncoded
 
 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Image__1nGetImageInfo
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     TODO("implement org_jetbrains_skia_Image__1nGetImageInfo");
 }
      
 #if 0 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Image__1nGetImageInfo
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     SkImage* instance = reinterpret_cast<SkImage*>((ptr));
     return skija::ImageInfo::toJava(env, instance->imageInfo());
 }
@@ -93,7 +93,7 @@ SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Image__1nGetImageInfo
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nEncodeToData
-  (KInteropPointer __Kinstance, KNativePointer ptr, KInt format, KInt quality) {
+  (KNativePointer ptr, KInt format, KInt quality) {
     SkImage* instance = reinterpret_cast<SkImage*>((ptr));
     SkData* data = instance->encodeToData(static_cast<SkEncodedImageFormat>(format), quality).release();
     return reinterpret_cast<KNativePointer>(data);
@@ -101,13 +101,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nEncodeToData
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nMakeShader
-  (KInteropPointer __Kinstance, KNativePointer ptr, KInt tmx, KInt tmy, KNativePointer sampling, KFloat* localMatrixArr) {
+  (KNativePointer ptr, KInt tmx, KInt tmy, KNativePointer sampling, KFloat* localMatrixArr) {
     TODO("implement org_jetbrains_skia_Image__1nMakeShader");
 }
      
 #if 0 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nMakeShader
-  (KInteropPointer __Kinstance, KNativePointer ptr, KInt tmx, KInt tmy, KNativePointer sampling, KFloat* localMatrixArr) {
+  (KNativePointer ptr, KInt tmx, KInt tmy, KNativePointer sampling, KFloat* localMatrixArr) {
     SkImage* instance = reinterpret_cast<SkImage*>((ptr));
     std::unique_ptr<SkMatrix> localMatrix = skMatrix(env, localMatrixArr);
     sk_sp<SkShader> shader = instance->makeShader(static_cast<SkTileMode>(tmx), static_cast<SkTileMode>(tmy), skija::SamplingMode::unpack(sampling), localMatrix.get());
@@ -118,13 +118,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nMakeShader
 
 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Image__1nPeekPixels
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     TODO("implement org_jetbrains_skia_Image__1nPeekPixels");
 }
      
 #if 0 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Image__1nPeekPixels
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     SkImage* instance = reinterpret_cast<SkImage*>((ptr));
     SkPixmap pixmap;
     if (instance->peekPixels(&pixmap))
@@ -136,14 +136,14 @@ SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Image__1nPeekPixels
 
 
 SKIKO_EXPORT KBoolean org_jetbrains_skia_Image__1nPeekPixelsToPixmap
-  (KInteropPointer __Kinstance, KNativePointer ptr, KNativePointer pixmapPtr) {
+  (KNativePointer ptr, KNativePointer pixmapPtr) {
     SkImage* instance = reinterpret_cast<SkImage*>((ptr));
     SkPixmap* pixmap = reinterpret_cast<SkPixmap*>((pixmapPtr));
     return instance->peekPixels(pixmap);
 }
 
 SKIKO_EXPORT KBoolean org_jetbrains_skia_Image__1nReadPixelsBitmap
-  (KInteropPointer __Kinstance, KNativePointer ptr, KNativePointer contextPtr, KNativePointer bitmapPtr, KInt srcX, KInt srcY, KBoolean cache) {
+  (KNativePointer ptr, KNativePointer contextPtr, KNativePointer bitmapPtr, KInt srcX, KInt srcY, KBoolean cache) {
     SkImage* instance = reinterpret_cast<SkImage*>((ptr));
     GrDirectContext* context = reinterpret_cast<GrDirectContext*>((contextPtr));
     SkBitmap* bitmap = reinterpret_cast<SkBitmap*>((bitmapPtr));
@@ -152,7 +152,7 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_Image__1nReadPixelsBitmap
 }
 
 SKIKO_EXPORT KBoolean org_jetbrains_skia_Image__1nReadPixelsPixmap
-  (KInteropPointer __Kinstance, KNativePointer ptr, KNativePointer pixmapPtr, KInt srcX, KInt srcY, KBoolean cache) {
+  (KNativePointer ptr, KNativePointer pixmapPtr, KInt srcX, KInt srcY, KBoolean cache) {
     SkImage* instance = reinterpret_cast<SkImage*>((ptr));
     SkPixmap* pixmap = reinterpret_cast<SkPixmap*>((pixmapPtr));
     auto cachingHint = cache ? SkImage::CachingHint::kAllow_CachingHint : SkImage::CachingHint::kDisallow_CachingHint;
@@ -160,7 +160,7 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_Image__1nReadPixelsPixmap
 }
 
 SKIKO_EXPORT KBoolean org_jetbrains_skia_Image__1nScalePixels
-  (KInteropPointer __Kinstance, KNativePointer ptr, KNativePointer pixmapPtr, KNativePointer samplingOptions, KBoolean cache) {
+  (KNativePointer ptr, KNativePointer pixmapPtr, KLong samplingOptions, KBoolean cache) {
     SkImage* instance = reinterpret_cast<SkImage*>((ptr));
     SkPixmap* pixmap = reinterpret_cast<SkPixmap*>((pixmapPtr));
     auto cachingHint = cache ? SkImage::CachingHint::kAllow_CachingHint : SkImage::CachingHint::kDisallow_CachingHint;

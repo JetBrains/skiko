@@ -17,7 +17,7 @@ static void deletePathSegmentIterator(SkPath::Iter* iter) {
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_PathSegmentIterator__1nGetFinalizer
-  (KInteropPointer __Kinstance) {
+  () {
     return reinterpret_cast<KNativePointer>((&deletePathSegmentIterator));
 }
 

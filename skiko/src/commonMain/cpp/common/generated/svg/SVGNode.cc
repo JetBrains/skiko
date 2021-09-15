@@ -5,7 +5,7 @@
 #include "common.h"
 
 SKIKO_EXPORT KInt org_jetbrains_skia_svg_SVGNode__1nGetTag
-  (KInteropPointer __Kinstance, KNativePointer ptr) {
+  (KNativePointer ptr) {
     SkSVGNode* instance = reinterpret_cast<SkSVGNode*>((ptr));
     return static_cast<KInt>(instance->tag());
 }
