@@ -273,7 +273,7 @@ tasks.withType(CppCompile::class.java).configureEach {
             compilerArgs.addAll(
                 listOf(
                     "-fno-rtti",
-                    "-fno-exceptions",
+                    "-fexceptions",
                     "-fvisibility=hidden",
                     "-fvisibility-inlines-hidden",
                     "-I$jdkHome/include/linux",

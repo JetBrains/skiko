@@ -17,7 +17,7 @@ internal class LinuxOpenGLRedrawer(
             context = it.createContext()
             it.makeCurrent(context)
             if (context == 0L || !isVideoCardSupported(layer.renderApi)) {
-                throw Exception("Cannot create Linux GL context")
+                throw IllegalArgumentException("Cannot create Linux GL context")
             }
             it.setSwapInterval(swapInterval)
         }

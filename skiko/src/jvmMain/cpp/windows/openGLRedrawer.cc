@@ -34,6 +34,7 @@ extern "C"
         } catch(...) {
             logJavaException(env, handleException(__FUNCTION__));
         }
+        return (jlong) 0;
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt_setSwapInterval(JNIEnv *env, jobject redrawer, jint interval)
@@ -69,6 +70,7 @@ extern "C"
         } catch(...) {
             logJavaException(env, handleException(__FUNCTION__));
         }
+        return (jlong) 0;
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt_deleteContext(JNIEnv *env, jobject redrawer, jlong contextPtr)
