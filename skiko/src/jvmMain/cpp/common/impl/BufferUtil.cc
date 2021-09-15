@@ -7,12 +7,12 @@ namespace {
 }
 
 extern "C" {
-    JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_impl_BufferUtil__1nGetByteBufferFromPointer
+    JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_impl_BufferUtilKt__1nGetByteBufferFromPointer
       (JNIEnv *env, jclass, jlong ptr, jint size) {
         return env->NewDirectByteBuffer(jlongToPtr<void*>(ptr), size);
     }
 
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_impl_BufferUtil__1nGetPointerFromByteBuffer
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_impl_BufferUtilKt__1nGetPointerFromByteBuffer
       (JNIEnv *env, jclass, jobject buffer) {
         return ptrToJlong(env->GetDirectBufferAddress(buffer));
     }

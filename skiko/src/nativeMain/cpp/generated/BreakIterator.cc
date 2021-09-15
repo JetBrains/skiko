@@ -8,19 +8,19 @@ static void deleteBreakIterator(UBreakIterator* instance) {
   ubrk_close(instance);
 }
 
-extern "C" jlong org_jetbrains_skia_BreakIterator__1nGetFinalizer(kref __Kinstance) {
+extern "C" jlong org_jetbrains_skia_BreakIterator__1nGetFinalizer() {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteBreakIterator));
 }
 
 
 extern "C" jlong org_jetbrains_skia_BreakIterator__1nMake
-  (kref __Kinstance, jint type, jstring localeStr) {
+  (jint type, jstring localeStr) {
     TODO("implement org_jetbrains_skia_BreakIterator__1nMake");
 }
      
 #if 0 
 extern "C" jlong org_jetbrains_skia_BreakIterator__1nMake
-  (kref __Kinstance, jint type, jstring localeStr) {
+  (jint type, jstring localeStr) {
     UErrorCode status = U_ZERO_ERROR;
     UBreakIterator* instance;
     if (localeStr == nullptr)
@@ -41,13 +41,13 @@ extern "C" jlong org_jetbrains_skia_BreakIterator__1nMake
 
 
 extern "C" jint org_jetbrains_skia_BreakIterator__1nClone
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TODO("implement org_jetbrains_skia_BreakIterator__1nClone");
 }
      
 #if 0 
 extern "C" jint org_jetbrains_skia_BreakIterator__1nClone
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
     UErrorCode status = U_ZERO_ERROR;
     UBreakIterator* clone = ubrk_safeClone(instance, nullptr, 0, &status);
@@ -61,68 +61,68 @@ extern "C" jint org_jetbrains_skia_BreakIterator__1nClone
 
 
 extern "C" jint org_jetbrains_skia_BreakIterator__1nCurrent
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
     return ubrk_current(instance);
 }
 
 extern "C" jint org_jetbrains_skia_BreakIterator__1nNext
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
     return ubrk_next(instance);
 }
 
 extern "C" jint org_jetbrains_skia_BreakIterator__1nPrevious
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
     return ubrk_previous(instance);
 }
 
 extern "C" jint org_jetbrains_skia_BreakIterator__1nFirst
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
     return ubrk_first(instance);
 }
 
 extern "C" jint org_jetbrains_skia_BreakIterator__1nLast
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
     return ubrk_last(instance);
 }
 
 extern "C" jint org_jetbrains_skia_BreakIterator__1nPreceding
-  (kref __Kinstance, jlong ptr, jint offset) {
+  (jlong ptr, jint offset) {
     UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
     return ubrk_preceding(instance, offset);
 }
 
 extern "C" jint org_jetbrains_skia_BreakIterator__1nFollowing
-  (kref __Kinstance, jlong ptr, jint offset) {
+  (jlong ptr, jint offset) {
     UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
     return ubrk_following(instance, offset);
 }
 
 extern "C" jboolean org_jetbrains_skia_BreakIterator__1nIsBoundary
-  (kref __Kinstance, jlong ptr, jint offset) {
+  (jlong ptr, jint offset) {
     UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
     return ubrk_isBoundary(instance, offset);
 }
 
 extern "C" jint org_jetbrains_skia_BreakIterator__1nGetRuleStatus
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
     return ubrk_getRuleStatus(instance);
 }
 
 
 extern "C" jintArray org_jetbrains_skia_BreakIterator__1nGetRuleStatuses
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TODO("implement org_jetbrains_skia_BreakIterator__1nGetRuleStatuses");
 }
      
 #if 0 
 extern "C" jintArray org_jetbrains_skia_BreakIterator__1nGetRuleStatuses
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
     UErrorCode status = U_ZERO_ERROR;
     int32_t len = ubrk_getRuleStatusVec(instance, nullptr, 0, &status);
@@ -139,13 +139,13 @@ extern "C" jintArray org_jetbrains_skia_BreakIterator__1nGetRuleStatuses
 
 
 extern "C" void org_jetbrains_skia_BreakIterator__1nSetText
-  (kref __Kinstance, jlong ptr, jlong textPtr) {
+  (jlong ptr, jlong textPtr) {
     TODO("implement org_jetbrains_skia_BreakIterator__1nSetText");
 }
      
 #if 0 
 extern "C" void org_jetbrains_skia_BreakIterator__1nSetText
-  (kref __Kinstance, jlong ptr, jlong textPtr) {
+  (jlong ptr, jlong textPtr) {
     UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
     std::vector<jchar>* text = reinterpret_cast<std::vector<jchar>*>(static_cast<uintptr_t>(textPtr));
     UErrorCode status = U_ZERO_ERROR;

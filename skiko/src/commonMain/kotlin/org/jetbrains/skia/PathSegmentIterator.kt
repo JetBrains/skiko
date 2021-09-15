@@ -7,9 +7,8 @@ import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.getPtr
 import org.jetbrains.skia.impl.reachabilityBarrier
-import kotlin.jvm.JvmStatic
 
-class PathSegmentIterator internal constructor(val _path: Path?, ptr: NativePointer) : Managed(ptr, _nGetFinalizer()),
+class PathSegmentIterator internal constructor(val _path: Path?, ptr: NativePointer) : Managed(ptr, PathSegmentIterator_nGetFinalizer()),
     MutableIterator<PathSegment?> {
     companion object {
         fun make(path: Path?, forceClose: Boolean): PathSegmentIterator {
@@ -17,22 +16,12 @@ class PathSegmentIterator internal constructor(val _path: Path?, ptr: NativePoin
                 val ptr =
                     _nMake(getPtr(path), forceClose)
                 val i = PathSegmentIterator(path, ptr)
-                i._nextSegment = _nNext(ptr)
+                i._nextSegment = PathSegmentIterator_nNext(ptr)
                 i
             } finally {
                 reachabilityBarrier(path)
             }
         }
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_PathSegmentIterator__1nMake")
-        external fun _nMake(pathPtr: NativePointer, forceClose: Boolean): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_PathSegmentIterator__1nGetFinalizer")
-        external fun _nGetFinalizer(): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_PathSegmentIterator__1nNext")
-        external fun _nNext(ptr: NativePointer): PathSegment?
 
         init {
             staticLoad()
@@ -44,7 +33,7 @@ class PathSegmentIterator internal constructor(val _path: Path?, ptr: NativePoin
         return try {
             if (_nextSegment?.verb == PathVerb.DONE) throw NoSuchElementException()
             val res = _nextSegment
-            _nextSegment = _nNext(_ptr)
+            _nextSegment = PathSegmentIterator_nNext(_ptr)
             res
         } finally {
             reachabilityBarrier(this)
@@ -56,7 +45,7 @@ class PathSegmentIterator internal constructor(val _path: Path?, ptr: NativePoin
     }
 
     private object _FinalizerHolder {
-        val PTR = _nGetFinalizer()
+        val PTR = PathSegmentIterator_nGetFinalizer()
     }
 
     init {
@@ -67,3 +56,12 @@ class PathSegmentIterator internal constructor(val _path: Path?, ptr: NativePoin
         TODO("Not yet implemented")
     }
 }
+
+@ExternalSymbolName("org_jetbrains_skia_PathSegmentIterator__1nGetFinalizer")
+private external fun PathSegmentIterator_nGetFinalizer(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_PathSegmentIterator__1nNext")
+private external fun PathSegmentIterator_nNext(ptr: NativePointer): PathSegment?
+
+@ExternalSymbolName("org_jetbrains_skia_PathSegmentIterator__1nMake")
+private external fun _nMake(pathPtr: NativePointer, forceClose: Boolean): NativePointer

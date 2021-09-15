@@ -7,40 +7,9 @@ import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
-import kotlin.jvm.JvmStatic
 
 class TextBlobBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nGetFinalizer")
-        external fun _nGetFinalizer(): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nMake")
-        external fun _nMake(): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nBuild")
-        external fun _nBuild(ptr: NativePointer): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nAppendRun")
-        external fun _nAppendRun(ptr: NativePointer, fontPtr: NativePointer, glyphs: ShortArray?, x: Float, y: Float, bounds: Rect?)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nAppendRunPosH")
-        external fun _nAppendRunPosH(
-            ptr: NativePointer,
-            fontPtr: NativePointer,
-            glyphs: ShortArray?,
-            xs: FloatArray?,
-            y: Float,
-            bounds: Rect?
-        )
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nAppendRunPos")
-        external fun _nAppendRunPos(ptr: NativePointer, fontPtr: NativePointer, glyphs: ShortArray?, pos: FloatArray?, bounds: Rect?)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nAppendRunRSXform")
-        external fun _nAppendRunRSXform(ptr: NativePointer, fontPtr: NativePointer, glyphs: ShortArray?, xform: FloatArray?)
-
         init {
             staticLoad()
         }
@@ -51,7 +20,7 @@ class TextBlobBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _F
      *
      * @see [https://fiddle.skia.org/c/@TextBlobBuilder_empty_constructor](https://fiddle.skia.org/c/@TextBlobBuilder_empty_constructor)
      */
-    constructor() : this(_nMake()) {
+    constructor() : this(TextBlobBuilder_nMake()) {
         Stats.onNativeCall()
     }
 
@@ -266,6 +235,36 @@ class TextBlobBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _F
     }
 
     private object _FinalizerHolder {
-        val PTR = _nGetFinalizer()
+        val PTR = TextBlobBuilder_nGetFinalizer()
     }
 }
+
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nGetFinalizer")
+private external fun TextBlobBuilder_nGetFinalizer(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nMake")
+private external fun TextBlobBuilder_nMake(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nBuild")
+private external fun _nBuild(ptr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nAppendRun")
+private external fun _nAppendRun(ptr: NativePointer, fontPtr: NativePointer, glyphs: ShortArray?, x: Float, y: Float, bounds: Rect?)
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nAppendRunPosH")
+private external fun _nAppendRunPosH(
+    ptr: NativePointer,
+    fontPtr: NativePointer,
+    glyphs: ShortArray?,
+    xs: FloatArray?,
+    y: Float,
+    bounds: Rect?
+)
+
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nAppendRunPos")
+private external fun _nAppendRunPos(ptr: NativePointer, fontPtr: NativePointer, glyphs: ShortArray?, pos: FloatArray?, bounds: Rect?)
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nAppendRunRSXform")
+private external fun _nAppendRunRSXform(ptr: NativePointer, fontPtr: NativePointer, glyphs: ShortArray?, xform: FloatArray?)

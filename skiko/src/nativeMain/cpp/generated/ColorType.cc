@@ -5,6 +5,6 @@
 #include "common.h"
 
 extern "C" jlong org_jetbrains_skia_ColorType__1nIsAlwaysOpaque
-  (kref __Kinstance, jint value) {
+  (jint value) {
     return SkColorTypeIsAlwaysOpaque(static_cast<SkColorType>(value));
 }

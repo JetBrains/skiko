@@ -8,153 +8,13 @@ import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
-import kotlin.jvm.JvmStatic
 
 class Font : Managed {
     companion object {
         internal fun makeClone(ptr: NativePointer): Font {
             Stats.onNativeCall()
-            return Font(_nMakeClone(ptr))
+            return Font(Font_nMakeClone(ptr))
         }
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nGetFinalizer")
-        external fun _nGetFinalizer(): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nMakeDefault")
-        external fun _nMakeDefault(): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nMakeTypeface")
-        external fun _nMakeTypeface(typefacePtr: NativePointer): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nMakeTypefaceSize")
-        external fun _nMakeTypefaceSize(typefacePtr: NativePointer, size: Float): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nMakeTypefaceSizeScaleSkew")
-        external fun _nMakeTypefaceSizeScaleSkew(typefacePtr: NativePointer, size: Float, scaleX: Float, skewX: Float): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nMakeClone")
-        external fun _nMakeClone(ptr: NativePointer): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nEquals")
-        external fun _nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nIsAutoHintingForced")
-        external fun _nIsAutoHintingForced(ptr: NativePointer): Boolean
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nAreBitmapsEmbedded")
-        external fun _nAreBitmapsEmbedded(ptr: NativePointer): Boolean
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nIsSubpixel")
-        external fun _nIsSubpixel(ptr: NativePointer): Boolean
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nAreMetricsLinear")
-        external fun _nAreMetricsLinear(ptr: NativePointer): Boolean
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nIsEmboldened")
-        external fun _nIsEmboldened(ptr: NativePointer): Boolean
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nIsBaselineSnapped")
-        external fun _nIsBaselineSnapped(ptr: NativePointer): Boolean
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nSetAutoHintingForced")
-        external fun _nSetAutoHintingForced(ptr: NativePointer, value: Boolean)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nSetBitmapsEmbedded")
-        external fun _nSetBitmapsEmbedded(ptr: NativePointer, value: Boolean)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nSetSubpixel")
-        external fun _nSetSubpixel(ptr: NativePointer, value: Boolean)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nSetMetricsLinear")
-        external fun _nSetMetricsLinear(ptr: NativePointer, value: Boolean)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nSetEmboldened")
-        external fun _nSetEmboldened(ptr: NativePointer, value: Boolean)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nSetBaselineSnapped")
-        external fun _nSetBaselineSnapped(ptr: NativePointer, value: Boolean)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nGetEdging")
-        external fun _nGetEdging(ptr: NativePointer): Int
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nSetEdging")
-        external fun _nSetEdging(ptr: NativePointer, value: Int)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nGetHinting")
-        external fun _nGetHinting(ptr: NativePointer): Int
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nSetHinting")
-        external fun _nSetHinting(ptr: NativePointer, value: Int)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nGetTypeface")
-        external fun _nGetTypeface(ptr: NativePointer): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nGetTypefaceOrDefault")
-        external fun _nGetTypefaceOrDefault(ptr: NativePointer): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nGetSize")
-        external fun _nGetSize(ptr: NativePointer): Float
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nGetScaleX")
-        external fun _nGetScaleX(ptr: NativePointer): Float
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nGetSkewX")
-        external fun _nGetSkewX(ptr: NativePointer): Float
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nSetTypeface")
-        external fun _nSetTypeface(ptr: NativePointer, typefacePtr: NativePointer)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nSetSize")
-        external fun _nSetSize(ptr: NativePointer, value: Float)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nSetScaleX")
-        external fun _nSetScaleX(ptr: NativePointer, value: Float)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nSetSkewX")
-        external fun _nSetSkewX(ptr: NativePointer, value: Float)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nGetStringGlyphs")
-        external fun _nGetStringGlyphs(ptr: NativePointer, str: String?): ShortArray?
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nGetUTF32Glyph")
-        external fun _nGetUTF32Glyph(ptr: NativePointer, uni: Int): Short
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nGetUTF32Glyphs")
-        external fun _nGetUTF32Glyphs(ptr: NativePointer, uni: IntArray?): ShortArray
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nGetStringGlyphsCount")
-        external fun _nGetStringGlyphsCount(ptr: NativePointer, str: String?): Int
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nMeasureText")
-        external fun _nMeasureText(ptr: NativePointer, str: String?, paintPtr: NativePointer): Rect
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nMeasureTextWidth")
-        external fun _nMeasureTextWidth(ptr: NativePointer, str: String?, paintPtr: NativePointer): Float
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nGetWidths")
-        external fun _nGetWidths(ptr: NativePointer, glyphs: ShortArray?): FloatArray
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nGetBounds")
-        external fun _nGetBounds(ptr: NativePointer, glyphs: ShortArray?, paintPtr: NativePointer): Array<Rect>
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nGetPositions")
-        external fun _nGetPositions(ptr: NativePointer, glyphs: ShortArray?, x: Float, y: Float): Array<Point>
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nGetXPositions")
-        external fun _nGetXPositions(ptr: NativePointer, glyphs: ShortArray?, x: Float): FloatArray
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nGetPath")
-        external fun _nGetPath(ptr: NativePointer, glyph: Short): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nGetPaths")
-        external fun _nGetPaths(ptr: NativePointer, glyphs: ShortArray?): Array<Path>
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nGetMetrics")
-        external fun _nGetMetrics(ptr: NativePointer): FontMetrics
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Font__1nGetSpacing")
-        external fun _nGetSpacing(ptr: NativePointer): Float
 
         init {
             staticLoad()
@@ -216,7 +76,7 @@ class Font : Managed {
      */
     override fun _nativeEquals(other: Native?): Boolean {
         return try {
-            _nEquals(_ptr, getPtr(other))
+            Font_nEquals(_ptr, getPtr(other))
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(other)
@@ -453,7 +313,7 @@ class Font : Managed {
     val size: Float
         get() = try {
             Stats.onNativeCall()
-            _nGetSize(_ptr)
+            Font_nGetSize(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -740,6 +600,145 @@ class Font : Managed {
         }
 
     private object _FinalizerHolder {
-        val PTR = _nGetFinalizer()
+        val PTR = Font_nGetFinalizer()
     }
 }
+
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nGetFinalizer")
+private external fun Font_nGetFinalizer(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nMakeClone")
+private external fun Font_nMakeClone(ptr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nEquals")
+private external fun Font_nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nGetSize")
+private external fun Font_nGetSize(ptr: NativePointer): Float
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nMakeDefault")
+private external fun _nMakeDefault(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nMakeTypeface")
+private external fun _nMakeTypeface(typefacePtr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nMakeTypefaceSize")
+private external fun _nMakeTypefaceSize(typefacePtr: NativePointer, size: Float): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nMakeTypefaceSizeScaleSkew")
+private external fun _nMakeTypefaceSizeScaleSkew(typefacePtr: NativePointer, size: Float, scaleX: Float, skewX: Float): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nIsAutoHintingForced")
+private external fun _nIsAutoHintingForced(ptr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nAreBitmapsEmbedded")
+private external fun _nAreBitmapsEmbedded(ptr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nIsSubpixel")
+private external fun _nIsSubpixel(ptr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nAreMetricsLinear")
+private external fun _nAreMetricsLinear(ptr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nIsEmboldened")
+private external fun _nIsEmboldened(ptr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nIsBaselineSnapped")
+private external fun _nIsBaselineSnapped(ptr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nSetAutoHintingForced")
+private external fun _nSetAutoHintingForced(ptr: NativePointer, value: Boolean)
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nSetBitmapsEmbedded")
+private external fun _nSetBitmapsEmbedded(ptr: NativePointer, value: Boolean)
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nSetSubpixel")
+private external fun _nSetSubpixel(ptr: NativePointer, value: Boolean)
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nSetMetricsLinear")
+private external fun _nSetMetricsLinear(ptr: NativePointer, value: Boolean)
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nSetEmboldened")
+private external fun _nSetEmboldened(ptr: NativePointer, value: Boolean)
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nSetBaselineSnapped")
+private external fun _nSetBaselineSnapped(ptr: NativePointer, value: Boolean)
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nGetEdging")
+private external fun _nGetEdging(ptr: NativePointer): Int
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nSetEdging")
+private external fun _nSetEdging(ptr: NativePointer, value: Int)
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nGetHinting")
+private external fun _nGetHinting(ptr: NativePointer): Int
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nSetHinting")
+private external fun _nSetHinting(ptr: NativePointer, value: Int)
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nGetTypeface")
+private external fun _nGetTypeface(ptr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nGetTypefaceOrDefault")
+private external fun _nGetTypefaceOrDefault(ptr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nGetScaleX")
+private external fun _nGetScaleX(ptr: NativePointer): Float
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nGetSkewX")
+private external fun _nGetSkewX(ptr: NativePointer): Float
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nSetTypeface")
+private external fun _nSetTypeface(ptr: NativePointer, typefacePtr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nSetSize")
+private external fun _nSetSize(ptr: NativePointer, value: Float)
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nSetScaleX")
+private external fun _nSetScaleX(ptr: NativePointer, value: Float)
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nSetSkewX")
+private external fun _nSetSkewX(ptr: NativePointer, value: Float)
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nGetStringGlyphs")
+private external fun _nGetStringGlyphs(ptr: NativePointer, str: String?): ShortArray?
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nGetUTF32Glyph")
+private external fun _nGetUTF32Glyph(ptr: NativePointer, uni: Int): Short
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nGetUTF32Glyphs")
+private external fun _nGetUTF32Glyphs(ptr: NativePointer, uni: IntArray?): ShortArray
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nGetStringGlyphsCount")
+private external fun _nGetStringGlyphsCount(ptr: NativePointer, str: String?): Int
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nMeasureText")
+private external fun _nMeasureText(ptr: NativePointer, str: String?, paintPtr: NativePointer): Rect
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nMeasureTextWidth")
+private external fun _nMeasureTextWidth(ptr: NativePointer, str: String?, paintPtr: NativePointer): Float
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nGetWidths")
+private external fun _nGetWidths(ptr: NativePointer, glyphs: ShortArray?): FloatArray
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nGetBounds")
+private external fun _nGetBounds(ptr: NativePointer, glyphs: ShortArray?, paintPtr: NativePointer): Array<Rect>
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nGetPositions")
+private external fun _nGetPositions(ptr: NativePointer, glyphs: ShortArray?, x: Float, y: Float): Array<Point>
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nGetXPositions")
+private external fun _nGetXPositions(ptr: NativePointer, glyphs: ShortArray?, x: Float): FloatArray
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nGetPath")
+private external fun _nGetPath(ptr: NativePointer, glyph: Short): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nGetPaths")
+private external fun _nGetPaths(ptr: NativePointer, glyphs: ShortArray?): Array<Path>
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nGetMetrics")
+private external fun _nGetMetrics(ptr: NativePointer): FontMetrics
+
+@ExternalSymbolName("org_jetbrains_skia_Font__1nGetSpacing")
+private external fun _nGetSpacing(ptr: NativePointer): Float

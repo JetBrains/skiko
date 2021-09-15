@@ -8,7 +8,6 @@ import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.getPtr
 import org.jetbrains.skia.impl.reachabilityBarrier
-import kotlin.jvm.JvmStatic
 
 /**
  * Data holds an immutable data buffer.
@@ -37,34 +36,6 @@ class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
             Stats.onNativeCall()
             return Data(_nMakeEmpty())
         }
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Data__1nGetFinalizer")
-        external fun _nGetFinalizer(): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Data__1nSize")
-        external fun _nSize(ptr: NativePointer): Long
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Data__1nBytes")
-        external fun _nBytes(ptr: NativePointer, offset: Long, length: Long): ByteArray
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Data__1nEquals")
-        external fun _nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Data__1nToByteBuffer")
-        external fun _nToByteBuffer(ptr: NativePointer): ByteBuffer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Data__1nMakeFromBytes")
-        external fun _nMakeFromBytes(bytes: ByteArray?, offset: Long, length: Long): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Data__1nMakeFromFileName")
-        external fun _nMakeFromFileName(path: String?): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Data__1nMakeSubset")
-        external fun _nMakeSubset(ptr: NativePointer, offset: Long, length: Long): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Data__1nMakeEmpty")
-        external fun _nMakeEmpty(): NativePointer
 
         init {
             staticLoad()
@@ -136,6 +107,34 @@ class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     }
 
     private object _FinalizerHolder {
-        val PTR = _nGetFinalizer()
+        val PTR = Data_nGetFinalizer()
     }
 }
+
+
+@ExternalSymbolName("org_jetbrains_skia_Data__1nGetFinalizer")
+private external fun Data_nGetFinalizer(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Data__1nSize")
+private external fun _nSize(ptr: NativePointer): Long
+
+@ExternalSymbolName("org_jetbrains_skia_Data__1nBytes")
+private external fun _nBytes(ptr: NativePointer, offset: Long, length: Long): ByteArray
+
+@ExternalSymbolName("org_jetbrains_skia_Data__1nEquals")
+private external fun _nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Data__1nToByteBuffer")
+private external fun _nToByteBuffer(ptr: NativePointer): ByteBuffer
+
+@ExternalSymbolName("org_jetbrains_skia_Data__1nMakeFromBytes")
+private external fun _nMakeFromBytes(bytes: ByteArray?, offset: Long, length: Long): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Data__1nMakeFromFileName")
+private external fun _nMakeFromFileName(path: String?): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Data__1nMakeSubset")
+private external fun _nMakeSubset(ptr: NativePointer, offset: Long, length: Long): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Data__1nMakeEmpty")
+private external fun _nMakeEmpty(): NativePointer

@@ -2,9 +2,7 @@
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.*
-import kotlin.jvm.JvmStatic
 
 class ColorFilter : RefCnt {
     companion object {
@@ -85,43 +83,6 @@ class ColorFilter : RefCnt {
             return ColorFilter(_nMakeOverdraw(colors[0], colors[1], colors[2], colors[3], colors[4], colors[5]))
         }
 
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeComposed")
-        external fun _nMakeComposed(outer: NativePointer, inner: NativePointer): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeBlend")
-        external fun _nMakeBlend(color: Int, blendMode: Int): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeMatrix")
-        external fun _nMakeMatrix(rowMajor: FloatArray?): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeHSLAMatrix")
-        external fun _nMakeHSLAMatrix(rowMajor: FloatArray?): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nGetLinearToSRGBGamma")
-        external fun _nGetLinearToSRGBGamma(): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nGetSRGBToLinearGamma")
-        external fun _nGetSRGBToLinearGamma(): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeLerp")
-        external fun _nMakeLerp(t: Float, dstPtr: NativePointer, srcPtr: NativePointer): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeLighting")
-        external fun _nMakeLighting(colorMul: Int, colorAdd: Int): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeHighContrast")
-        external fun _nMakeHighContrast(grayscale: Boolean, inversionMode: Int, contrast: Float): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeTable")
-        external fun _nMakeTable(table: ByteArray?): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeOverdraw")
-        external fun _nMakeOverdraw(c0: Int, c1: Int, c2: Int, c3: Int, c4: Int, c5: Int): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nGetLuma")
-        external fun _nGetLuma(): NativePointer
-
         init {
             staticLoad()
         }
@@ -134,6 +95,43 @@ class ColorFilter : RefCnt {
 
     internal constructor(ptr: NativePointer, allowClose: Boolean) : super(ptr, allowClose)
 }
+
+
+@ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeComposed")
+private external fun _nMakeComposed(outer: NativePointer, inner: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeBlend")
+private external fun _nMakeBlend(color: Int, blendMode: Int): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeMatrix")
+private external fun _nMakeMatrix(rowMajor: FloatArray?): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeHSLAMatrix")
+private external fun _nMakeHSLAMatrix(rowMajor: FloatArray?): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nGetLinearToSRGBGamma")
+private external fun _nGetLinearToSRGBGamma(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nGetSRGBToLinearGamma")
+private external fun _nGetSRGBToLinearGamma(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeLerp")
+private external fun _nMakeLerp(t: Float, dstPtr: NativePointer, srcPtr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeLighting")
+private external fun _nMakeLighting(colorMul: Int, colorAdd: Int): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeHighContrast")
+private external fun _nMakeHighContrast(grayscale: Boolean, inversionMode: Int, contrast: Float): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeTable")
+private external fun _nMakeTable(table: ByteArray?): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeOverdraw")
+private external fun _nMakeOverdraw(c0: Int, c1: Int, c2: Int, c3: Int, c4: Int, c5: Int): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nGetLuma")
+private external fun _nGetLuma(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ColorFilter__nMakeTableARGB")
 private external fun _nMakeTableARGB(

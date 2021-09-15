@@ -8,13 +8,13 @@
 
 
 extern "C" jlong org_jetbrains_skia_TextLine__1nGetFinalizer
-  (kref __Kinstance) {
+  () {
     TODO("implement org_jetbrains_skia_TextLine__1nGetFinalizer");
 }
      
 #if 0 
 extern "C" jlong org_jetbrains_skia_TextLine__1nGetFinalizer
-  (kref __Kinstance) {
+  () {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&unrefTextLine));
 }
 #endif
@@ -22,13 +22,13 @@ extern "C" jlong org_jetbrains_skia_TextLine__1nGetFinalizer
 
 
 extern "C" jfloat org_jetbrains_skia_TextLine__1nGetAscent
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TODO("implement org_jetbrains_skia_TextLine__1nGetAscent");
 }
      
 #if 0 
 extern "C" jfloat org_jetbrains_skia_TextLine__1nGetAscent
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
     return instance->fAscent;
 }
@@ -37,13 +37,13 @@ extern "C" jfloat org_jetbrains_skia_TextLine__1nGetAscent
 
 
 extern "C" jfloat org_jetbrains_skia_TextLine__1nGetCapHeight
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TODO("implement org_jetbrains_skia_TextLine__1nGetCapHeight");
 }
      
 #if 0 
 extern "C" jfloat org_jetbrains_skia_TextLine__1nGetCapHeight
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
     return instance->fCapHeight;
 }
@@ -52,13 +52,13 @@ extern "C" jfloat org_jetbrains_skia_TextLine__1nGetCapHeight
 
 
 extern "C" jfloat org_jetbrains_skia_TextLine__1nGetXHeight
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TODO("implement org_jetbrains_skia_TextLine__1nGetXHeight");
 }
      
 #if 0 
 extern "C" jfloat org_jetbrains_skia_TextLine__1nGetXHeight
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
     return instance->fXHeight;
 }
@@ -67,13 +67,13 @@ extern "C" jfloat org_jetbrains_skia_TextLine__1nGetXHeight
 
 
 extern "C" jfloat org_jetbrains_skia_TextLine__1nGetDescent
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TODO("implement org_jetbrains_skia_TextLine__1nGetDescent");
 }
      
 #if 0 
 extern "C" jfloat org_jetbrains_skia_TextLine__1nGetDescent
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
     return instance->fDescent;
 }
@@ -82,13 +82,13 @@ extern "C" jfloat org_jetbrains_skia_TextLine__1nGetDescent
 
 
 extern "C" jfloat org_jetbrains_skia_TextLine__1nGetLeading
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TODO("implement org_jetbrains_skia_TextLine__1nGetLeading");
 }
      
 #if 0 
 extern "C" jfloat org_jetbrains_skia_TextLine__1nGetLeading
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
     return instance->fLeading;
 }
@@ -97,13 +97,13 @@ extern "C" jfloat org_jetbrains_skia_TextLine__1nGetLeading
 
 
 extern "C" jfloat org_jetbrains_skia_TextLine__1nGetWidth
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TODO("implement org_jetbrains_skia_TextLine__1nGetWidth");
 }
      
 #if 0 
 extern "C" jfloat org_jetbrains_skia_TextLine__1nGetWidth
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
     return instance->fWidth;
 }
@@ -112,13 +112,13 @@ extern "C" jfloat org_jetbrains_skia_TextLine__1nGetWidth
 
 
 extern "C" jfloat org_jetbrains_skia_TextLine__1nGetHeight
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TODO("implement org_jetbrains_skia_TextLine__1nGetHeight");
 }
      
 #if 0 
 extern "C" jfloat org_jetbrains_skia_TextLine__1nGetHeight
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
     return -instance->fAscent + instance->fDescent + instance->fLeading;
 }
@@ -127,13 +127,13 @@ extern "C" jfloat org_jetbrains_skia_TextLine__1nGetHeight
 
 
 extern "C" jlong org_jetbrains_skia_TextLine__1nGetTextBlob
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TODO("implement org_jetbrains_skia_TextLine__1nGetTextBlob");
 }
      
 #if 0 
 extern "C" jlong org_jetbrains_skia_TextLine__1nGetTextBlob
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
     if (instance->fBlob == nullptr)
         return 0;
@@ -145,13 +145,13 @@ extern "C" jlong org_jetbrains_skia_TextLine__1nGetTextBlob
 
 
 extern "C" jshortArray org_jetbrains_skia_TextLine__1nGetGlyphs
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TODO("implement org_jetbrains_skia_TextLine__1nGetGlyphs");
 }
      
 #if 0 
 extern "C" jshortArray org_jetbrains_skia_TextLine__1nGetGlyphs
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
     std::vector<jshort> glyphs(instance->fGlyphCount);
     size_t idx = 0;
@@ -167,13 +167,13 @@ extern "C" jshortArray org_jetbrains_skia_TextLine__1nGetGlyphs
 
 
 extern "C" jfloatArray org_jetbrains_skia_TextLine__1nGetPositions
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TODO("implement org_jetbrains_skia_TextLine__1nGetPositions");
 }
      
 #if 0 
 extern "C" jfloatArray org_jetbrains_skia_TextLine__1nGetPositions
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
     std::vector<jfloat> positions(2 * instance->fGlyphCount);
     size_t idx = 0;
@@ -189,13 +189,13 @@ extern "C" jfloatArray org_jetbrains_skia_TextLine__1nGetPositions
 
 
 extern "C" jfloatArray org_jetbrains_skia_TextLine__1nGetRunPositions
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TODO("implement org_jetbrains_skia_TextLine__1nGetRunPositions");
 }
      
 #if 0 
 extern "C" jfloatArray org_jetbrains_skia_TextLine__1nGetRunPositions
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
     std::vector<jfloat> positions(instance->fRuns.size());
     for (size_t idx = 0; idx < positions.size(); ++idx)
@@ -207,13 +207,13 @@ extern "C" jfloatArray org_jetbrains_skia_TextLine__1nGetRunPositions
 
 
 extern "C" jfloatArray org_jetbrains_skia_TextLine__1nGetBreakPositions
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TODO("implement org_jetbrains_skia_TextLine__1nGetBreakPositions");
 }
      
 #if 0 
 extern "C" jfloatArray org_jetbrains_skia_TextLine__1nGetBreakPositions
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
     std::vector<jfloat> positions;
     for (auto& run: instance->fRuns)
@@ -225,13 +225,13 @@ extern "C" jfloatArray org_jetbrains_skia_TextLine__1nGetBreakPositions
 
 
 extern "C" jintArray org_jetbrains_skia_TextLine__1nGetBreakOffsets
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TODO("implement org_jetbrains_skia_TextLine__1nGetBreakOffsets");
 }
      
 #if 0 
 extern "C" jintArray org_jetbrains_skia_TextLine__1nGetBreakOffsets
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
     std::vector<jint> offsets;
     for (auto& run: instance->fRuns)
@@ -243,13 +243,13 @@ extern "C" jintArray org_jetbrains_skia_TextLine__1nGetBreakOffsets
 
 
 extern "C" jint org_jetbrains_skia_TextLine__1nGetOffsetAtCoord
-  (kref __Kinstance, jlong ptr, jfloat x) {
+  (jlong ptr, jfloat x) {
     TODO("implement org_jetbrains_skia_TextLine__1nGetOffsetAtCoord");
 }
      
 #if 0 
 extern "C" jint org_jetbrains_skia_TextLine__1nGetOffsetAtCoord
-  (kref __Kinstance, jlong ptr, jfloat x) {
+  (jlong ptr, jfloat x) {
     TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
 
     if (instance->fRuns.empty())
@@ -272,13 +272,13 @@ extern "C" jint org_jetbrains_skia_TextLine__1nGetOffsetAtCoord
 
 
 extern "C" jint org_jetbrains_skia_TextLine__1nGetLeftOffsetAtCoord
-  (kref __Kinstance, jlong ptr, jfloat x) {
+  (jlong ptr, jfloat x) {
     TODO("implement org_jetbrains_skia_TextLine__1nGetLeftOffsetAtCoord");
 }
      
 #if 0 
 extern "C" jint org_jetbrains_skia_TextLine__1nGetLeftOffsetAtCoord
-  (kref __Kinstance, jlong ptr, jfloat x) {
+  (jlong ptr, jfloat x) {
     TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
 
     if (instance->fRuns.empty())
@@ -299,13 +299,13 @@ extern "C" jint org_jetbrains_skia_TextLine__1nGetLeftOffsetAtCoord
 
 
 extern "C" jfloat org_jetbrains_skia_TextLine__1nGetCoordAtOffset
-  (kref __Kinstance, jlong ptr, jint offset16) {
+  (jlong ptr, jint offset16) {
     TODO("implement org_jetbrains_skia_TextLine__1nGetCoordAtOffset");
 }
      
 #if 0 
 extern "C" jfloat org_jetbrains_skia_TextLine__1nGetCoordAtOffset
-  (kref __Kinstance, jlong ptr, jint offset16) {
+  (jlong ptr, jint offset16) {
     TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
 
     for (auto& run: instance->fRuns) {

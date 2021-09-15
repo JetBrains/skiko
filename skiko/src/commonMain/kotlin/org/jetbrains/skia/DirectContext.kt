@@ -5,9 +5,7 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
-import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.NativePointer
-import kotlin.jvm.JvmStatic
 
 class DirectContext internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
@@ -39,28 +37,6 @@ class DirectContext internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             return DirectContext(_nMakeDirect3D(adapterPtr, devicePtr, queuePtr))
         }
 
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeGL")
-        external fun _nMakeGL(): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeMetal")
-        external fun _nMakeMetal(devicePtr: NativePointer, queuePtr: NativePointer): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeDirect3D")
-        external fun _nMakeDirect3D(adapterPtr: NativePointer, devicePtr: NativePointer, queuePtr: NativePointer): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nFlush")
-        external fun _nFlush(ptr: NativePointer): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nSubmit")
-        external fun _nSubmit(ptr: NativePointer, syncCpu: Boolean): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nReset")
-        external fun _nReset(ptr: NativePointer, flags: Int)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nAbandon")
-        external fun _nAbandon(ptr: NativePointer)
-
         init {
             staticLoad()
         }
@@ -68,7 +44,7 @@ class DirectContext internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 
     fun flush(): DirectContext {
         Stats.onNativeCall()
-        _nFlush(_ptr)
+        DirectContext_nFlush(_ptr)
         return this
     }
 
@@ -136,3 +112,24 @@ class DirectContext internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         }
     }
 }
+
+@ExternalSymbolName("org_jetbrains_skia_DirectContext__1nFlush")
+private external fun DirectContext_nFlush(ptr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeGL")
+private external fun _nMakeGL(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeMetal")
+private external fun _nMakeMetal(devicePtr: NativePointer, queuePtr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeDirect3D")
+private external fun _nMakeDirect3D(adapterPtr: NativePointer, devicePtr: NativePointer, queuePtr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_DirectContext__1nSubmit")
+private external fun _nSubmit(ptr: NativePointer, syncCpu: Boolean): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_DirectContext__1nReset")
+private external fun _nReset(ptr: NativePointer, flags: Int)
+
+@ExternalSymbolName("org_jetbrains_skia_DirectContext__1nAbandon")
+private external fun _nAbandon(ptr: NativePointer)

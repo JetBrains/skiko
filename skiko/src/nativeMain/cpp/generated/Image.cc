@@ -8,13 +8,13 @@
 
 
 extern "C" jlong org_jetbrains_skia_Image__1nMakeRaster
-  (kref __Kinstance, jint width, jint height, jint colorType, jint alphaType, jlong colorSpacePtr, jbyteArray bytesArr, jlong rowBytes) {
+  (jint width, jint height, jint colorType, jint alphaType, jlong colorSpacePtr, jbyteArray bytesArr, jlong rowBytes) {
     TODO("implement org_jetbrains_skia_Image__1nMakeRaster");
 }
      
 #if 0 
 extern "C" jlong org_jetbrains_skia_Image__1nMakeRaster
-  (kref __Kinstance, jint width, jint height, jint colorType, jint alphaType, jlong colorSpacePtr, jbyteArray bytesArr, jlong rowBytes) {
+  (jint width, jint height, jint colorType, jint alphaType, jlong colorSpacePtr, jbyteArray bytesArr, jlong rowBytes) {
     SkColorSpace* colorSpace = reinterpret_cast<SkColorSpace*>(static_cast<uintptr_t>(colorSpacePtr));
     SkImageInfo imageInfo = SkImageInfo::Make(width,
                                               height,
@@ -30,7 +30,7 @@ extern "C" jlong org_jetbrains_skia_Image__1nMakeRaster
 
 
 extern "C" jlong org_jetbrains_skia_Image__1nMakeRasterData
-  (kref __Kinstance, jint width, jint height, jint colorType, jint alphaType, jlong colorSpacePtr, jlong dataPtr, jlong rowBytes) {
+  (jint width, jint height, jint colorType, jint alphaType, jlong colorSpacePtr, jlong dataPtr, jlong rowBytes) {
     SkColorSpace* colorSpace = reinterpret_cast<SkColorSpace*>(static_cast<uintptr_t>(colorSpacePtr));
     SkImageInfo imageInfo = SkImageInfo::Make(width,
                                               height,
@@ -43,14 +43,14 @@ extern "C" jlong org_jetbrains_skia_Image__1nMakeRasterData
 }
 
 extern "C" jlong org_jetbrains_skia_Image__1nMakeFromBitmap
-  (kref __Kinstance, jlong bitmapPtr) {
+  (jlong bitmapPtr) {
     SkBitmap* bitmap = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(bitmapPtr));
     sk_sp<SkImage> image = SkImage::MakeFromBitmap(*bitmap);
     return reinterpret_cast<jlong>(image.release());
 }
 
 extern "C" jlong org_jetbrains_skia_Image__1nMakeFromPixmap
-  (kref __Kinstance, jlong pixmapPtr) {
+  (jlong pixmapPtr) {
     SkPixmap* pixmap = reinterpret_cast<SkPixmap*>(static_cast<uintptr_t>(pixmapPtr));
     sk_sp<SkImage> image = SkImage::MakeFromRaster(*pixmap, nullptr, nullptr);
     return reinterpret_cast<jlong>(image.release());
@@ -58,13 +58,13 @@ extern "C" jlong org_jetbrains_skia_Image__1nMakeFromPixmap
 
 
 extern "C" jlong org_jetbrains_skia_Image__1nMakeFromEncoded
-  (kref __Kinstance, jbyteArray encodedArray) {
+  (jbyteArray encodedArray) {
     TODO("implement org_jetbrains_skia_Image__1nMakeFromEncoded");
 }
      
 #if 0 
 extern "C" jlong org_jetbrains_skia_Image__1nMakeFromEncoded
-  (kref __Kinstance, jbyteArray encodedArray) {
+  (jbyteArray encodedArray) {
     jsize encodedLen = env->GetArrayLength(encodedArray);
     jbyte* encoded = env->GetByteArrayElements(encodedArray, 0);
     sk_sp<SkData> encodedData = SkData::MakeWithCopy(encoded, encodedLen);
@@ -79,13 +79,13 @@ extern "C" jlong org_jetbrains_skia_Image__1nMakeFromEncoded
 
 
 extern "C" jobject org_jetbrains_skia_Image__1nGetImageInfo
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TODO("implement org_jetbrains_skia_Image__1nGetImageInfo");
 }
      
 #if 0 
 extern "C" jobject org_jetbrains_skia_Image__1nGetImageInfo
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkImage* instance = reinterpret_cast<SkImage*>(static_cast<uintptr_t>(ptr));
     return skija::ImageInfo::toJava(env, instance->imageInfo());
 }
@@ -93,7 +93,7 @@ extern "C" jobject org_jetbrains_skia_Image__1nGetImageInfo
 
 
 extern "C" jlong org_jetbrains_skia_Image__1nEncodeToData
-  (kref __Kinstance, jlong ptr, jint format, jint quality) {
+  (jlong ptr, jint format, jint quality) {
     SkImage* instance = reinterpret_cast<SkImage*>(static_cast<uintptr_t>(ptr));
     SkData* data = instance->encodeToData(static_cast<SkEncodedImageFormat>(format), quality).release();
     return reinterpret_cast<jlong>(data);
@@ -101,13 +101,13 @@ extern "C" jlong org_jetbrains_skia_Image__1nEncodeToData
 
 
 extern "C" jlong org_jetbrains_skia_Image__1nMakeShader
-  (kref __Kinstance, jlong ptr, jint tmx, jint tmy, jlong sampling, jfloatArray localMatrixArr) {
+  (jlong ptr, jint tmx, jint tmy, jlong sampling, jfloatArray localMatrixArr) {
     TODO("implement org_jetbrains_skia_Image__1nMakeShader");
 }
      
 #if 0 
 extern "C" jlong org_jetbrains_skia_Image__1nMakeShader
-  (kref __Kinstance, jlong ptr, jint tmx, jint tmy, jlong sampling, jfloatArray localMatrixArr) {
+  (jlong ptr, jint tmx, jint tmy, jlong sampling, jfloatArray localMatrixArr) {
     SkImage* instance = reinterpret_cast<SkImage*>(static_cast<uintptr_t>(ptr));
     std::unique_ptr<SkMatrix> localMatrix = skMatrix(env, localMatrixArr);
     sk_sp<SkShader> shader = instance->makeShader(static_cast<SkTileMode>(tmx), static_cast<SkTileMode>(tmy), skija::SamplingMode::unpack(sampling), localMatrix.get());
@@ -118,13 +118,13 @@ extern "C" jlong org_jetbrains_skia_Image__1nMakeShader
 
 
 extern "C" jobject org_jetbrains_skia_Image__1nPeekPixels
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TODO("implement org_jetbrains_skia_Image__1nPeekPixels");
 }
      
 #if 0 
 extern "C" jobject org_jetbrains_skia_Image__1nPeekPixels
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkImage* instance = reinterpret_cast<SkImage*>(static_cast<uintptr_t>(ptr));
     SkPixmap pixmap;
     if (instance->peekPixels(&pixmap))
@@ -136,14 +136,14 @@ extern "C" jobject org_jetbrains_skia_Image__1nPeekPixels
 
 
 extern "C" jboolean org_jetbrains_skia_Image__1nPeekPixelsToPixmap
-  (kref __Kinstance, jlong ptr, jlong pixmapPtr) {
+  (jlong ptr, jlong pixmapPtr) {
     SkImage* instance = reinterpret_cast<SkImage*>(static_cast<uintptr_t>(ptr));
     SkPixmap* pixmap = reinterpret_cast<SkPixmap*>(static_cast<uintptr_t>(pixmapPtr));
     return instance->peekPixels(pixmap);
 }
 
 extern "C" jboolean org_jetbrains_skia_Image__1nReadPixelsBitmap
-  (kref __Kinstance, jlong ptr, jlong contextPtr, jlong bitmapPtr, jint srcX, jint srcY, jboolean cache) {
+  (jlong ptr, jlong contextPtr, jlong bitmapPtr, jint srcX, jint srcY, jboolean cache) {
     SkImage* instance = reinterpret_cast<SkImage*>(static_cast<uintptr_t>(ptr));
     GrDirectContext* context = reinterpret_cast<GrDirectContext*>(static_cast<uintptr_t>(contextPtr));
     SkBitmap* bitmap = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(bitmapPtr));
@@ -152,7 +152,7 @@ extern "C" jboolean org_jetbrains_skia_Image__1nReadPixelsBitmap
 }
 
 extern "C" jboolean org_jetbrains_skia_Image__1nReadPixelsPixmap
-  (kref __Kinstance, jlong ptr, jlong pixmapPtr, jint srcX, jint srcY, jboolean cache) {
+  (jlong ptr, jlong pixmapPtr, jint srcX, jint srcY, jboolean cache) {
     SkImage* instance = reinterpret_cast<SkImage*>(static_cast<uintptr_t>(ptr));
     SkPixmap* pixmap = reinterpret_cast<SkPixmap*>(static_cast<uintptr_t>(pixmapPtr));
     auto cachingHint = cache ? SkImage::CachingHint::kAllow_CachingHint : SkImage::CachingHint::kDisallow_CachingHint;
@@ -160,7 +160,7 @@ extern "C" jboolean org_jetbrains_skia_Image__1nReadPixelsPixmap
 }
 
 extern "C" jboolean org_jetbrains_skia_Image__1nScalePixels
-  (kref __Kinstance, jlong ptr, jlong pixmapPtr, jlong samplingOptions, jboolean cache) {
+  (jlong ptr, jlong pixmapPtr, jlong samplingOptions, jboolean cache) {
     SkImage* instance = reinterpret_cast<SkImage*>(static_cast<uintptr_t>(ptr));
     SkPixmap* pixmap = reinterpret_cast<SkPixmap*>(static_cast<uintptr_t>(pixmapPtr));
     auto cachingHint = cache ? SkImage::CachingHint::kAllow_CachingHint : SkImage::CachingHint::kDisallow_CachingHint;

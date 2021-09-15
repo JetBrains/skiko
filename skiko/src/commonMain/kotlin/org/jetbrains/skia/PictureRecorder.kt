@@ -6,7 +6,6 @@ import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.impl.NativePointer
-import kotlin.jvm.JvmStatic
 
 class PictureRecorder internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
@@ -27,46 +26,18 @@ class PictureRecorder internal constructor(ptr: NativePointer) : Managed(ptr, _F
         //     Stats.onNativeCall();
         //     return new Drawable(_nFinishRecordingAsDrawable(_ptr, 0));
         // }
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nMake")
-        external fun _nMake(): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nGetFinalizer")
-        external fun _nGetFinalizer(): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nBeginRecording")
-        external fun _nBeginRecording(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nGetRecordingCanvas")
-        external fun _nGetRecordingCanvas(ptr: NativePointer): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nFinishRecordingAsPicture")
-        external fun _nFinishRecordingAsPicture(ptr: NativePointer): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nFinishRecordingAsPictureWithCull")
-        external fun _nFinishRecordingAsPictureWithCull(
-            ptr: NativePointer,
-            left: Float,
-            top: Float,
-            right: Float,
-            bottom: Float
-        ): NativePointer
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nFinishRecordingAsDrawable")
-        external fun _nFinishRecordingAsDrawable(ptr: NativePointer): NativePointer
 
         init {
             staticLoad()
         }
     }
 
-    constructor() : this(_nMake()) {
+    constructor() : this(PictureRecorder_nMake()) {
         Stats.onNativeCall()
     }
 
     private object _FinalizerHolder {
-        val PTR = _nGetFinalizer()
+        val PTR = PictureRecorder_nGetFinalizer()
     }
 
     /**
@@ -152,3 +123,33 @@ class PictureRecorder internal constructor(ptr: NativePointer) : Managed(ptr, _F
         }
     }
 }
+
+
+@ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nMake")
+private external fun PictureRecorder_nMake(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nGetFinalizer")
+private external fun PictureRecorder_nGetFinalizer(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nBeginRecording")
+private external fun _nBeginRecording(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nGetRecordingCanvas")
+private external fun _nGetRecordingCanvas(ptr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nFinishRecordingAsPicture")
+private external fun _nFinishRecordingAsPicture(ptr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nFinishRecordingAsPictureWithCull")
+private external fun _nFinishRecordingAsPictureWithCull(
+    ptr: NativePointer,
+    left: Float,
+    top: Float,
+    right: Float,
+    bottom: Float
+): NativePointer
+
+
+@ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nFinishRecordingAsDrawable")
+private external fun _nFinishRecordingAsDrawable(ptr: NativePointer): NativePointer
+

@@ -5,14 +5,14 @@
 #include "common.h"
 
 extern "C" jlong org_jetbrains_skia_shaper_IcuBidiRunIterator__1nMake
-  (kref __Kinstance, jlong textPtr, jint bidiLevel) {
+  (jlong textPtr, jint bidiLevel) {
     SkString* text = reinterpret_cast<SkString*>(static_cast<uintptr_t>(textPtr));
     std::unique_ptr<SkShaper::BiDiRunIterator> instance(SkShaper::MakeIcuBiDiRunIterator(text->c_str(), text->size(), bidiLevel & 0xFF));
     return reinterpret_cast<jlong>(instance.release());
 }
 
 extern "C" jint org_jetbrains_skia_shaper_IcuBidiRunIterator__1nGetCurrentLevel
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkShaper::BiDiRunIterator* instance = reinterpret_cast<SkShaper::BiDiRunIterator*>(static_cast<uintptr_t>(ptr));
     return instance->currentLevel();
 }

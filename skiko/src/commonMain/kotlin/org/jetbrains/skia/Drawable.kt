@@ -5,10 +5,8 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
-import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
-import kotlin.jvm.JvmStatic
 
 /**
  *
@@ -19,24 +17,8 @@ import kotlin.jvm.JvmStatic
  * allow for clients of the drawable that may want to cache the results, the drawable must
  * change its generation id whenever its internal state changes such that it will draw differently.
  */
-abstract class Drawable : RefCnt(_nMake()) {
+abstract class Drawable : RefCnt(Drawable_nMake()) {
     companion object {
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Drawable__1nMake")
-        external fun _nMake(): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Drawable__1nDraw")
-        external fun _nDraw(ptr: NativePointer, canvasPtr: NativePointer, matrix: FloatArray?)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Drawable__1nMakePictureSnapshot")
-        external fun _nMakePictureSnapshot(ptr: NativePointer): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Drawable__1nGetGenerationId")
-        external fun _nGetGenerationId(ptr: NativePointer): Int
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Drawable__1nNotifyDrawingChanged")
-        external fun _nNotifyDrawingChanged(ptr: NativePointer)
-
         init {
             staticLoad()
         }
@@ -102,7 +84,7 @@ abstract class Drawable : RefCnt(_nMake()) {
     val generationId: Int
         get() = try {
             Stats.onNativeCall()
-            _nGetGenerationId(_ptr)
+            Drawable_nGetGenerationId(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -145,3 +127,19 @@ abstract class Drawable : RefCnt(_nMake()) {
         _nInit(_ptr)
     }
 }
+
+
+@ExternalSymbolName("org_jetbrains_skia_Drawable__1nMake")
+private external fun Drawable_nMake(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Drawable__1nGetGenerationId")
+private external fun Drawable_nGetGenerationId(ptr: NativePointer): Int
+
+@ExternalSymbolName("org_jetbrains_skia_Drawable__1nDraw")
+private external fun _nDraw(ptr: NativePointer, canvasPtr: NativePointer, matrix: FloatArray?)
+
+@ExternalSymbolName("org_jetbrains_skia_Drawable__1nMakePictureSnapshot")
+private external fun _nMakePictureSnapshot(ptr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Drawable__1nNotifyDrawingChanged")
+private external fun _nNotifyDrawingChanged(ptr: NativePointer)

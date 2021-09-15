@@ -5,10 +5,8 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
-import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
-import kotlin.jvm.JvmStatic
 
 class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
@@ -406,7 +404,7 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         //
         fun makeEmpty(): Shader {
             Stats.onNativeCall()
-            return Shader(_nMakeEmpty())
+            return Shader(Shader_nMakeEmpty())
         }
 
         fun makeColor(color: Int): Shader {
@@ -487,160 +485,6 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
-        @JvmStatic 
-        @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeWithColorFilter")
-        external fun _nMakeWithColorFilter(ptr: NativePointer, colorFilterPtr: NativePointer): NativePointer
-        @JvmStatic 
-        @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeLinearGradient")
-        external fun _nMakeLinearGradient(
-            x0: Float,
-            y0: Float,
-            x1: Float,
-            y1: Float,
-            colors: IntArray?,
-            positions: FloatArray?,
-            tileType: Int,
-            flags: Int,
-            matrix: FloatArray?
-        ): NativePointer
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeLinearGradientCS")
-        external fun _nMakeLinearGradientCS(
-            x0: Float,
-            y0: Float,
-            x1: Float,
-            y1: Float,
-            colors: FloatArray?,
-            colorSpacePtr: NativePointer,
-            positions: FloatArray?,
-            tileType: Int,
-            flags: Int,
-            matrix: FloatArray?
-        ): NativePointer
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeRadialGradient")
-        external fun _nMakeRadialGradient(
-            x: Float,
-            y: Float,
-            r: Float,
-            colors: IntArray?,
-            positions: FloatArray?,
-            tileType: Int,
-            flags: Int,
-            matrix: FloatArray?
-        ): NativePointer
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeRadialGradientCS")
-        external fun _nMakeRadialGradientCS(
-            x: Float,
-            y: Float,
-            r: Float,
-            colors: FloatArray?,
-            colorSpacePtr: NativePointer,
-            positions: FloatArray?,
-            tileType: Int,
-            flags: Int,
-            matrix: FloatArray?
-        ): NativePointer
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeTwoPointConicalGradient")
-        external fun _nMakeTwoPointConicalGradient(
-            x0: Float,
-            y0: Float,
-            r0: Float,
-            x1: Float,
-            y1: Float,
-            r1: Float,
-            colors: IntArray?,
-            positions: FloatArray?,
-            tileType: Int,
-            flags: Int,
-            matrix: FloatArray?
-        ): NativePointer
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeTwoPointConicalGradientCS")
-        external fun _nMakeTwoPointConicalGradientCS(
-            x0: Float,
-            y0: Float,
-            r0: Float,
-            x1: Float,
-            y1: Float,
-            r1: Float,
-            colors: FloatArray?,
-            colorSpacePtr: NativePointer,
-            positions: FloatArray?,
-            tileType: Int,
-            flags: Int,
-            matrix: FloatArray?
-        ): NativePointer
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeSweepGradient")
-        external fun _nMakeSweepGradient(
-            x: Float,
-            y: Float,
-            startAngle: Float,
-            endAngle: Float,
-            colors: IntArray?,
-            positions: FloatArray?,
-            tileType: Int,
-            flags: Int,
-            matrix: FloatArray?
-        ): NativePointer
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeSweepGradientCS")
-        external fun _nMakeSweepGradientCS(
-            x: Float,
-            y: Float,
-            startAngle: Float,
-            endAngle: Float,
-            colors: FloatArray?,
-            colorSpacePtr: NativePointer,
-            positions: FloatArray?,
-            tileType: Int,
-            flags: Int,
-            matrix: FloatArray?
-        ): NativePointer
-
-        @JvmStatic 
-        @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeFractalNoise")
-        external fun _nMakeFractalNoise(
-            baseFrequencyX: Float,
-            baseFrequencyY: Float,
-            numOctaves: Int,
-            seed: Float,
-            tiles: IntArray?
-        ): NativePointer
-
-        @JvmStatic 
-        @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeTurbulence")
-        external fun _nMakeTurbulence(
-            baseFrequencyX: Float,
-            baseFrequencyY: Float,
-            numOctaves: Int,
-            seed: Float,
-            tiles: IntArray?
-        ): NativePointer
-
-        @JvmStatic 
-        @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeEmpty")
-        external fun _nMakeEmpty(): NativePointer
-        @JvmStatic 
-        @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeColor")
-        external fun _nMakeColor(color: Int): NativePointer
-        @JvmStatic 
-        @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeColorCS")
-        external fun _nMakeColorCS(r: Float, g: Float, b: Float, a: Float, colorSpacePtr: NativePointer): NativePointer
-        @JvmStatic 
-        @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeBlend")
-        external fun _nMakeBlend(blendMode: Int, dst: NativePointer, src: NativePointer): NativePointer
-
         init {
             staticLoad()
         }
@@ -655,3 +499,155 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         }
     }
 }
+
+@ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeEmpty")
+private external fun Shader_nMakeEmpty(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeWithColorFilter")
+private external fun _nMakeWithColorFilter(ptr: NativePointer, colorFilterPtr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeLinearGradient")
+private external fun _nMakeLinearGradient(
+    x0: Float,
+    y0: Float,
+    x1: Float,
+    y1: Float,
+    colors: IntArray?,
+    positions: FloatArray?,
+    tileType: Int,
+    flags: Int,
+    matrix: FloatArray?
+): NativePointer
+
+
+@ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeLinearGradientCS")
+private external fun _nMakeLinearGradientCS(
+    x0: Float,
+    y0: Float,
+    x1: Float,
+    y1: Float,
+    colors: FloatArray?,
+    colorSpacePtr: NativePointer,
+    positions: FloatArray?,
+    tileType: Int,
+    flags: Int,
+    matrix: FloatArray?
+): NativePointer
+
+
+@ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeRadialGradient")
+private external fun _nMakeRadialGradient(
+    x: Float,
+    y: Float,
+    r: Float,
+    colors: IntArray?,
+    positions: FloatArray?,
+    tileType: Int,
+    flags: Int,
+    matrix: FloatArray?
+): NativePointer
+
+
+@ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeRadialGradientCS")
+private external fun _nMakeRadialGradientCS(
+    x: Float,
+    y: Float,
+    r: Float,
+    colors: FloatArray?,
+    colorSpacePtr: NativePointer,
+    positions: FloatArray?,
+    tileType: Int,
+    flags: Int,
+    matrix: FloatArray?
+): NativePointer
+
+
+@ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeTwoPointConicalGradient")
+private external fun _nMakeTwoPointConicalGradient(
+    x0: Float,
+    y0: Float,
+    r0: Float,
+    x1: Float,
+    y1: Float,
+    r1: Float,
+    colors: IntArray?,
+    positions: FloatArray?,
+    tileType: Int,
+    flags: Int,
+    matrix: FloatArray?
+): NativePointer
+
+
+@ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeTwoPointConicalGradientCS")
+private external fun _nMakeTwoPointConicalGradientCS(
+    x0: Float,
+    y0: Float,
+    r0: Float,
+    x1: Float,
+    y1: Float,
+    r1: Float,
+    colors: FloatArray?,
+    colorSpacePtr: NativePointer,
+    positions: FloatArray?,
+    tileType: Int,
+    flags: Int,
+    matrix: FloatArray?
+): NativePointer
+
+
+@ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeSweepGradient")
+private external fun _nMakeSweepGradient(
+    x: Float,
+    y: Float,
+    startAngle: Float,
+    endAngle: Float,
+    colors: IntArray?,
+    positions: FloatArray?,
+    tileType: Int,
+    flags: Int,
+    matrix: FloatArray?
+): NativePointer
+
+
+@ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeSweepGradientCS")
+private external fun _nMakeSweepGradientCS(
+    x: Float,
+    y: Float,
+    startAngle: Float,
+    endAngle: Float,
+    colors: FloatArray?,
+    colorSpacePtr: NativePointer,
+    positions: FloatArray?,
+    tileType: Int,
+    flags: Int,
+    matrix: FloatArray?
+): NativePointer
+
+
+@ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeFractalNoise")
+private external fun _nMakeFractalNoise(
+    baseFrequencyX: Float,
+    baseFrequencyY: Float,
+    numOctaves: Int,
+    seed: Float,
+    tiles: IntArray?
+): NativePointer
+
+
+@ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeTurbulence")
+private external fun _nMakeTurbulence(
+    baseFrequencyX: Float,
+    baseFrequencyY: Float,
+    numOctaves: Int,
+    seed: Float,
+    tiles: IntArray?
+): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeColor")
+private external fun _nMakeColor(color: Int): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeColorCS")
+private external fun _nMakeColorCS(r: Float, g: Float, b: Float, a: Float, colorSpacePtr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeBlend")
+private external fun _nMakeBlend(blendMode: Int, dst: NativePointer, src: NativePointer): NativePointer

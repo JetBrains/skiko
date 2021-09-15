@@ -35,13 +35,13 @@ private:
     float unrollDrawable;
 };
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PaintFilterCanvas__1nAttachToJava
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PaintFilterCanvasKt__1nAttachToJava
   (JNIEnv* env, jobject jobj, jlong canvasPtr, jboolean unrollDrawable) {
     SkijaPaintFilterCanvas* canvas = reinterpret_cast<SkijaPaintFilterCanvas*>(static_cast<uintptr_t>(canvasPtr));
     canvas->jobj = skija::PaintFilterCanvas::attach(env, jobj);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PaintFilterCanvas__1nMake
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PaintFilterCanvasKt_PaintFilterCanvas_1nMake
   (JNIEnv* env, jclass jclass, jlong canvasPtr, jboolean unrollDrawable) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
     SkijaPaintFilterCanvas* filterCanvas = new SkijaPaintFilterCanvas(canvas, unrollDrawable);

@@ -9,88 +9,9 @@ import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
-import kotlin.jvm.JvmStatic
 
 class Paragraph internal constructor(ptr: NativePointer, text: ManagedString?) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetFinalizer")
-        external fun _nGetFinalizer(): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetMaxWidth")
-        external fun _nGetMaxWidth(ptr: NativePointer): Float
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetHeight")
-        external fun _nGetHeight(ptr: NativePointer): Float
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetMinIntrinsicWidth")
-        external fun _nGetMinIntrinsicWidth(ptr: NativePointer): Float
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetMaxIntrinsicWidth")
-        external fun _nGetMaxIntrinsicWidth(ptr: NativePointer): Float
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetAlphabeticBaseline")
-        external fun _nGetAlphabeticBaseline(ptr: NativePointer): Float
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetIdeographicBaseline")
-        external fun _nGetIdeographicBaseline(ptr: NativePointer): Float
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetLongestLine")
-        external fun _nGetLongestLine(ptr: NativePointer): Float
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nDidExceedMaxLines")
-        external fun _nDidExceedMaxLines(ptr: NativePointer): Boolean
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nLayout")
-        external fun _nLayout(ptr: NativePointer, width: Float)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nPaint")
-        external fun _nPaint(ptr: NativePointer, canvasPtr: NativePointer, x: Float, y: Float): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetRectsForRange")
-        external fun _nGetRectsForRange(
-            ptr: NativePointer,
-            start: Int,
-            end: Int,
-            rectHeightMode: Int,
-            rectWidthMode: Int
-        ): Array<TextBox>
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetRectsForPlaceholders")
-        external fun _nGetRectsForPlaceholders(ptr: NativePointer): Array<TextBox>
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetGlyphPositionAtCoordinate")
-        external fun _nGetGlyphPositionAtCoordinate(ptr: NativePointer, dx: Float, dy: Float): Int
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetWordBoundary")
-        external fun _nGetWordBoundary(ptr: NativePointer, offset: Int): Long
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetLineMetrics")
-        external fun _nGetLineMetrics(ptr: NativePointer, textPtr: NativePointer): Array<LineMetrics?>
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetLineNumber")
-        external fun _nGetLineNumber(ptr: NativePointer): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nMarkDirty")
-        external fun _nMarkDirty(ptr: NativePointer)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetUnresolvedGlyphsCount")
-        external fun _nGetUnresolvedGlyphsCount(ptr: NativePointer): Int
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nUpdateAlignment")
-        external fun _nUpdateAlignment(ptr: NativePointer, Align: Int)
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nUpdateFontSize")
-        external fun _nUpdateFontSize(ptr: NativePointer, from: Int, to: Int, size: Float, textPtr: NativePointer)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nUpdateForegroundPaint")
-        external fun _nUpdateForegroundPaint(ptr: NativePointer, from: Int, to: Int, paintPtr: NativePointer, textPtr: NativePointer)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_Paragraph__1nUpdateBackgroundPaint")
-        external fun _nUpdateBackgroundPaint(ptr: NativePointer, from: Int, to: Int, paintPtr: NativePointer, textPtr: NativePointer)
-
         init {
             staticLoad()
         }
@@ -343,3 +264,81 @@ class Paragraph internal constructor(ptr: NativePointer, text: ManagedString?) :
         _text = text
     }
 }
+
+
+@ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetFinalizer")
+private external fun _nGetFinalizer(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetMaxWidth")
+private external fun _nGetMaxWidth(ptr: NativePointer): Float
+
+@ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetHeight")
+private external fun _nGetHeight(ptr: NativePointer): Float
+
+@ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetMinIntrinsicWidth")
+private external fun _nGetMinIntrinsicWidth(ptr: NativePointer): Float
+
+@ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetMaxIntrinsicWidth")
+private external fun _nGetMaxIntrinsicWidth(ptr: NativePointer): Float
+
+@ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetAlphabeticBaseline")
+private external fun _nGetAlphabeticBaseline(ptr: NativePointer): Float
+
+@ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetIdeographicBaseline")
+private external fun _nGetIdeographicBaseline(ptr: NativePointer): Float
+
+@ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetLongestLine")
+private external fun _nGetLongestLine(ptr: NativePointer): Float
+
+@ExternalSymbolName("org_jetbrains_skia_Paragraph__1nDidExceedMaxLines")
+private external fun _nDidExceedMaxLines(ptr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Paragraph__1nLayout")
+private external fun _nLayout(ptr: NativePointer, width: Float)
+
+@ExternalSymbolName("org_jetbrains_skia_Paragraph__1nPaint")
+private external fun _nPaint(ptr: NativePointer, canvasPtr: NativePointer, x: Float, y: Float): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetRectsForRange")
+private external fun _nGetRectsForRange(
+    ptr: NativePointer,
+    start: Int,
+    end: Int,
+    rectHeightMode: Int,
+    rectWidthMode: Int
+): Array<TextBox>
+
+
+@ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetRectsForPlaceholders")
+private external fun _nGetRectsForPlaceholders(ptr: NativePointer): Array<TextBox>
+
+@ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetGlyphPositionAtCoordinate")
+private external fun _nGetGlyphPositionAtCoordinate(ptr: NativePointer, dx: Float, dy: Float): Int
+
+@ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetWordBoundary")
+private external fun _nGetWordBoundary(ptr: NativePointer, offset: Int): Long
+
+@ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetLineMetrics")
+private external fun _nGetLineMetrics(ptr: NativePointer, textPtr: NativePointer): Array<LineMetrics?>
+
+@ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetLineNumber")
+private external fun _nGetLineNumber(ptr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Paragraph__1nMarkDirty")
+private external fun _nMarkDirty(ptr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_Paragraph__1nGetUnresolvedGlyphsCount")
+private external fun _nGetUnresolvedGlyphsCount(ptr: NativePointer): Int
+
+@ExternalSymbolName("org_jetbrains_skia_Paragraph__1nUpdateAlignment")
+private external fun _nUpdateAlignment(ptr: NativePointer, Align: Int)
+
+
+@ExternalSymbolName("org_jetbrains_skia_Paragraph__1nUpdateFontSize")
+private external fun _nUpdateFontSize(ptr: NativePointer, from: Int, to: Int, size: Float, textPtr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_Paragraph__1nUpdateForegroundPaint")
+private external fun _nUpdateForegroundPaint(ptr: NativePointer, from: Int, to: Int, paintPtr: NativePointer, textPtr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_Paragraph__1nUpdateBackgroundPaint")
+private external fun _nUpdateBackgroundPaint(ptr: NativePointer, from: Int, to: Int, paintPtr: NativePointer, textPtr: NativePointer)

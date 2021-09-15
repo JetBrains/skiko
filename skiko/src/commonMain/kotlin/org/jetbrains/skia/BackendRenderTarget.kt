@@ -5,7 +5,6 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.Stats
-import kotlin.jvm.JvmStatic
 
 class BackendRenderTarget internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
@@ -60,26 +59,6 @@ class BackendRenderTarget internal constructor(ptr: NativePointer) : Managed(ptr
             return BackendRenderTarget(_nMakeDirect3D(width, height, texturePtr, format, sampleCnt, levelCnt))
         }
 
-        @JvmStatic
-        @ExternalSymbolName("BackendRenderTarget_nGetFinalizer")
-        external fun _nGetFinalizer(): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("BackendRenderTarget_nMakeGL")
-        external fun _nMakeGL(width: Int, height: Int, sampleCnt: Int, stencilBits: Int, fbId: Int, fbFormat: Int): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("BackendRenderTarget_nMakeMetal")
-        external fun _nMakeMetal(width: Int, height: Int, texturePtr: NativePointer): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("BackendRenderTarget_nMakeDirect3D")
-        external fun _nMakeDirect3D(
-            width: Int,
-            height: Int,
-            texturePtr: NativePointer,
-            format: Int,
-            sampleCnt: Int,
-            levelCnt: Int
-        ): NativePointer
-
         init {
             staticLoad()
         }
@@ -89,3 +68,23 @@ class BackendRenderTarget internal constructor(ptr: NativePointer) : Managed(ptr
         val PTR = _nGetFinalizer()
     }
 }
+
+
+@ExternalSymbolName("BackendRenderTarget_nGetFinalizer")
+private external fun _nGetFinalizer(): NativePointer
+
+@ExternalSymbolName("BackendRenderTarget_nMakeGL")
+private external fun _nMakeGL(width: Int, height: Int, sampleCnt: Int, stencilBits: Int, fbId: Int, fbFormat: Int): NativePointer
+
+@ExternalSymbolName("BackendRenderTarget_nMakeMetal")
+private external fun _nMakeMetal(width: Int, height: Int, texturePtr: NativePointer): NativePointer
+
+@ExternalSymbolName("BackendRenderTarget_nMakeDirect3D")
+private external fun _nMakeDirect3D(
+    width: Int,
+    height: Int,
+    texturePtr: NativePointer,
+    format: Int,
+    sampleCnt: Int,
+    levelCnt: Int
+): NativePointer

@@ -11,11 +11,8 @@ import org.jetbrains.skia.impl.reachabilityBarrier
  * A utility proxy base class for implementing draw/paint filters.
  */
 abstract class PaintFilterCanvas(canvas: Canvas, unrollDrawable: Boolean) :
-    Canvas(_nMake(getPtr(canvas), unrollDrawable), true, canvas) {
+    Canvas(PaintFilterCanvas_nMake(getPtr(canvas), unrollDrawable), true, canvas) {
     companion object {
-        @ExternalSymbolName("org_jetbrains_skia_PaintFilterCanvas__1nMake")
-        external fun _nMake(canvasPtr: NativePointer, unrollDrawable: Boolean): NativePointer
-
         init {
             staticLoad()
         }
@@ -36,9 +33,6 @@ abstract class PaintFilterCanvas(canvas: Canvas, unrollDrawable: Boolean) :
         return onFilter(paint)
     }
 
-    @ExternalSymbolName("org_jetbrains_skia_PaintFilterCanvas__1nAttachToJava")
-    external fun _nAttachToJava(canvasPtr: NativePointer)
-
     /**
      * @param unrollDrawable if needed to filter nested drawable content using this canvas (for drawables there is no paint to filter)
      */
@@ -49,3 +43,10 @@ abstract class PaintFilterCanvas(canvas: Canvas, unrollDrawable: Boolean) :
         reachabilityBarrier(canvas)
     }
 }
+
+@ExternalSymbolName("org_jetbrains_skia_PaintFilterCanvas__1nMake")
+private external fun PaintFilterCanvas_nMake(canvasPtr: NativePointer, unrollDrawable: Boolean): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_PaintFilterCanvas__1nAttachToJava")
+external fun _nAttachToJava(canvasPtr: NativePointer)
+

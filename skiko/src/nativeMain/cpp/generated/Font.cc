@@ -12,213 +12,213 @@ static void deleteFont(SkFont* font) {
 }
 
 extern "C" jlong org_jetbrains_skia_Font__1nGetFinalizer
-  (kref __Kinstance) {
+  () {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteFont));
 }
 
 extern "C" jlong org_jetbrains_skia_Font__1nMakeDefault
-  (kref __Kinstance) {
+  () {
     SkFont* obj = new SkFont();
     return reinterpret_cast<jlong>(obj);
 }
 
 extern "C" jlong org_jetbrains_skia_Font__1nMakeTypeface
-  (kref __Kinstance, jlong typefacePtr) {
+  (jlong typefacePtr) {
     SkTypeface* typeface = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(typefacePtr));
     SkFont* obj = new SkFont(sk_ref_sp<SkTypeface>(typeface));
     return reinterpret_cast<jlong>(obj);
 }
 
 extern "C" jlong org_jetbrains_skia_Font__1nMakeTypefaceSize
-  (kref __Kinstance, jlong typefacePtr, jfloat size) {
+  (jlong typefacePtr, jfloat size) {
     SkTypeface* typeface = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(typefacePtr));
     SkFont* obj = new SkFont(sk_ref_sp<SkTypeface>(typeface), size);
     return reinterpret_cast<jlong>(obj);
 }
 
 extern "C" jlong org_jetbrains_skia_Font__1nMakeTypefaceSizeScaleSkew
-  (kref __Kinstance, jlong typefacePtr, jfloat size, jfloat scaleX, jfloat skewX) {
+  (jlong typefacePtr, jfloat size, jfloat scaleX, jfloat skewX) {
     SkTypeface* typeface = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(typefacePtr));
     SkFont* obj = new SkFont(sk_ref_sp<SkTypeface>(typeface), size, scaleX, skewX);
     return reinterpret_cast<jlong>(obj);
 }
 
 extern "C" jlong org_jetbrains_skia_Font__1nMakeClone
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     SkFont* clone = new SkFont(*instance);
     return reinterpret_cast<jlong>(clone);
 }
 
 extern "C" jboolean org_jetbrains_skia_Font__1nEquals
-  (kref __Kinstance, jlong ptr, jlong otherPtr) {
+  (jlong ptr, jlong otherPtr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     SkFont* other = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(otherPtr));
     return *instance == *other;
 }
 
 extern "C" jboolean org_jetbrains_skia_Font__1nIsAutoHintingForced
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     return instance->isForceAutoHinting();
 }
 
 extern "C" jboolean org_jetbrains_skia_Font__1nAreBitmapsEmbedded
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     return instance->isEmbeddedBitmaps();
 }
 
 extern "C" jboolean org_jetbrains_skia_Font__1nIsSubpixel
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     return instance->isSubpixel();
 }
 
 extern "C" jboolean org_jetbrains_skia_Font__1nAreMetricsLinear
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     return instance->isLinearMetrics();
 }
 
 extern "C" jboolean org_jetbrains_skia_Font__1nIsEmboldened
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     return instance->isEmbolden();
 }
 
 extern "C" jboolean org_jetbrains_skia_Font__1nIsBaselineSnapped
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     return instance->isBaselineSnap();
 }
 
 extern "C" void org_jetbrains_skia_Font__1nSetAutoHintingForced
-  (kref __Kinstance, jlong ptr, jboolean value) {
+  (jlong ptr, jboolean value) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     instance->setForceAutoHinting(value);
 }
 
 extern "C" void org_jetbrains_skia_Font__1nSetBitmapsEmbedded
-  (kref __Kinstance, jlong ptr, jboolean value) {
+  (jlong ptr, jboolean value) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     instance->setEmbeddedBitmaps(value);
 }
 
 extern "C" void org_jetbrains_skia_Font__1nSetSubpixel
-  (kref __Kinstance, jlong ptr, jboolean value) {
+  (jlong ptr, jboolean value) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     instance->setSubpixel(value);
 }
 
 extern "C" void org_jetbrains_skia_Font__1nSetMetricsLinear
-  (kref __Kinstance, jlong ptr, jboolean value) {
+  (jlong ptr, jboolean value) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     instance->setLinearMetrics(value);
 }
 
 extern "C" void org_jetbrains_skia_Font__1nSetEmboldened
-  (kref __Kinstance, jlong ptr, jboolean value) {
+  (jlong ptr, jboolean value) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     instance->setEmbolden(value);
 }
 
 extern "C" void org_jetbrains_skia_Font__1nSetBaselineSnapped
-  (kref __Kinstance, jlong ptr, jboolean value) {
+  (jlong ptr, jboolean value) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     instance->setBaselineSnap(value);
 }
 
 extern "C" jint org_jetbrains_skia_Font__1nGetEdging
- (kref __Kinstance, jlong ptr) {
+ (jlong ptr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     return static_cast<jint>(instance->getEdging());
 }
 
 extern "C" void org_jetbrains_skia_Font__1nSetEdging
- (kref __Kinstance, jlong ptr, jint value) {
+ (jlong ptr, jint value) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     instance->setEdging(static_cast<SkFont::Edging>(value));
 }
 
 extern "C" jint org_jetbrains_skia_Font__1nGetHinting
- (kref __Kinstance, jlong ptr) {
+ (jlong ptr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     return static_cast<jint>(instance->getHinting());
 }
 
 extern "C" void org_jetbrains_skia_Font__1nSetHinting
- (kref __Kinstance, jlong ptr, jint value) {
+ (jlong ptr, jint value) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     instance->setHinting(static_cast<SkFontHinting>(value));
 }
 
 extern "C" jlong org_jetbrains_skia_Font__1nGetTypeface
- (kref __Kinstance, jlong ptr) {
+ (jlong ptr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     SkTypeface* typeface = instance->refTypeface().release();
     return reinterpret_cast<jlong>(typeface);
 }
 
 extern "C" jlong org_jetbrains_skia_Font__1nGetTypefaceOrDefault
- (kref __Kinstance, jlong ptr) {
+ (jlong ptr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     SkTypeface* typeface = instance->refTypefaceOrDefault().release();
     return reinterpret_cast<jlong>(typeface);
 }
 
 extern "C" jfloat org_jetbrains_skia_Font__1nGetSize
- (kref __Kinstance, jlong ptr) {
+ (jlong ptr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     return instance->getSize();
 }
 
 extern "C" jfloat org_jetbrains_skia_Font__1nGetScaleX
- (kref __Kinstance, jlong ptr) {
+ (jlong ptr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     return instance->getScaleX();
 }
 
 extern "C" jfloat org_jetbrains_skia_Font__1nGetSkewX
- (kref __Kinstance, jlong ptr) {
+ (jlong ptr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     return instance->getSkewX();
 }
 
 extern "C" void org_jetbrains_skia_Font__1nSetTypeface
- (kref __Kinstance, jlong ptr, jlong typefacePtr) {
+ (jlong ptr, jlong typefacePtr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     SkTypeface* typeface = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(typefacePtr));
     instance->setTypeface(sk_ref_sp(typeface));
 }
 
 extern "C" void org_jetbrains_skia_Font__1nSetSize
- (kref __Kinstance, jlong ptr, jfloat value) {
+ (jlong ptr, jfloat value) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     instance->setSize(value);
 }
 
 extern "C" void org_jetbrains_skia_Font__1nSetScaleX
- (kref __Kinstance, jlong ptr, jfloat value) {
+ (jlong ptr, jfloat value) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     instance->setScaleX(value);
 }
 
 extern "C" void org_jetbrains_skia_Font__1nSetSkewX
- (kref __Kinstance, jlong ptr, jfloat value) {
+ (jlong ptr, jfloat value) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     instance->setSkewX(value);
 }
 
 
 extern "C" jshortArray org_jetbrains_skia_Font__1nGetStringGlyphs
-  (kref __Kinstance, jlong ptr, jstring str) {
+  (jlong ptr, jstring str) {
     TODO("implement org_jetbrains_skia_Font__1nGetStringGlyphs");
 }
      
 #if 0 
 extern "C" jshortArray org_jetbrains_skia_Font__1nGetStringGlyphs
-  (kref __Kinstance, jlong ptr, jstring str) {
+  (jlong ptr, jstring str) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     jsize len = env->GetStringLength(str);
     const jchar* chars = env->GetStringCritical(str, nullptr);
@@ -233,13 +233,13 @@ extern "C" jshortArray org_jetbrains_skia_Font__1nGetStringGlyphs
 
 
 extern "C" jshortArray org_jetbrains_skia_Font__1nGetUTF32Glyphs
-  (kref __Kinstance, jlong ptr, jintArray uniArr) {
+  (jlong ptr, jintArray uniArr) {
     TODO("implement org_jetbrains_skia_Font__1nGetUTF32Glyphs");
 }
      
 #if 0 
 extern "C" jshortArray org_jetbrains_skia_Font__1nGetUTF32Glyphs
-  (kref __Kinstance, jlong ptr, jintArray uniArr) {
+  (jlong ptr, jintArray uniArr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     int count = env->GetArrayLength(uniArr);
     std::vector<jshort> glyphs(count);
@@ -252,20 +252,20 @@ extern "C" jshortArray org_jetbrains_skia_Font__1nGetUTF32Glyphs
 
 
 extern "C" jshort org_jetbrains_skia_Font__1nGetUTF32Glyph
-  (kref __Kinstance, jlong ptr, jint uni) {
+  (jlong ptr, jint uni) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     return instance->unicharToGlyph(uni);
 }
 
 
 extern "C" jint org_jetbrains_skia_Font__1nGetStringGlyphsCount
-  (kref __Kinstance, jlong ptr, jstring str) {
+  (jlong ptr, jstring str) {
     TODO("implement org_jetbrains_skia_Font__1nGetStringGlyphsCount");
 }
      
 #if 0 
 extern "C" jint org_jetbrains_skia_Font__1nGetStringGlyphsCount
-  (kref __Kinstance, jlong ptr, jstring str) {
+  (jlong ptr, jstring str) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     jsize len = env->GetStringLength(str);
     const jchar* chars = env->GetStringCritical(str, nullptr);
@@ -278,13 +278,13 @@ extern "C" jint org_jetbrains_skia_Font__1nGetStringGlyphsCount
 
 
 extern "C" jobject org_jetbrains_skia_Font__1nMeasureText
-  (kref __Kinstance, jlong ptr, jstring str, jlong paintPtr) {
+  (jlong ptr, jstring str, jlong paintPtr) {
     TODO("implement org_jetbrains_skia_Font__1nMeasureText");
 }
      
 #if 0 
 extern "C" jobject org_jetbrains_skia_Font__1nMeasureText
-  (kref __Kinstance, jlong ptr, jstring str, jlong paintPtr) {
+  (jlong ptr, jstring str, jlong paintPtr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
     jsize len = env->GetStringLength(str);
@@ -299,13 +299,13 @@ extern "C" jobject org_jetbrains_skia_Font__1nMeasureText
 
 
 extern "C" jfloat org_jetbrains_skia_Font__1nMeasureTextWidth
-  (kref __Kinstance, jlong ptr, jstring str, jlong paintPtr) {
+  (jlong ptr, jstring str, jlong paintPtr) {
     TODO("implement org_jetbrains_skia_Font__1nMeasureTextWidth");
 }
      
 #if 0 
 extern "C" jfloat org_jetbrains_skia_Font__1nMeasureTextWidth
-  (kref __Kinstance, jlong ptr, jstring str, jlong paintPtr) {
+  (jlong ptr, jstring str, jlong paintPtr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
     jsize len = env->GetStringLength(str);
@@ -319,13 +319,13 @@ extern "C" jfloat org_jetbrains_skia_Font__1nMeasureTextWidth
 
 
 extern "C" jfloatArray org_jetbrains_skia_Font__1nGetWidths
-  (kref __Kinstance, jlong ptr, jshortArray glyphsArr) {
+  (jlong ptr, jshortArray glyphsArr) {
     TODO("implement org_jetbrains_skia_Font__1nGetWidths");
 }
      
 #if 0 
 extern "C" jfloatArray org_jetbrains_skia_Font__1nGetWidths
-  (kref __Kinstance, jlong ptr, jshortArray glyphsArr) {
+  (jlong ptr, jshortArray glyphsArr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     int count = env->GetArrayLength(glyphsArr);
     std::vector<jfloat> widths(count);
@@ -339,13 +339,13 @@ extern "C" jfloatArray org_jetbrains_skia_Font__1nGetWidths
 
 
 extern "C" jobjectArray org_jetbrains_skia_Font__1nGetBounds
-  (kref __Kinstance, jlong ptr, jshortArray glyphsArr, jlong paintPtr) {
+  (jlong ptr, jshortArray glyphsArr, jlong paintPtr) {
     TODO("implement org_jetbrains_skia_Font__1nGetBounds");
 }
      
 #if 0 
 extern "C" jobjectArray org_jetbrains_skia_Font__1nGetBounds
-  (kref __Kinstance, jlong ptr, jshortArray glyphsArr, jlong paintPtr) {
+  (jlong ptr, jshortArray glyphsArr, jlong paintPtr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
     int count = env->GetArrayLength(glyphsArr);
@@ -367,13 +367,13 @@ extern "C" jobjectArray org_jetbrains_skia_Font__1nGetBounds
 
 
 extern "C" jobjectArray org_jetbrains_skia_Font__1nGetPositions
-  (kref __Kinstance, jlong ptr, jshortArray glyphsArr, jfloat dx, jfloat dy) {
+  (jlong ptr, jshortArray glyphsArr, jfloat dx, jfloat dy) {
     TODO("implement org_jetbrains_skia_Font__1nGetPositions");
 }
      
 #if 0 
 extern "C" jobjectArray org_jetbrains_skia_Font__1nGetPositions
-  (kref __Kinstance, jlong ptr, jshortArray glyphsArr, jfloat dx, jfloat dy) {
+  (jlong ptr, jshortArray glyphsArr, jfloat dx, jfloat dy) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     
     int count = env->GetArrayLength(glyphsArr);
@@ -389,13 +389,13 @@ extern "C" jobjectArray org_jetbrains_skia_Font__1nGetPositions
 
 
 extern "C" jfloatArray org_jetbrains_skia_Font__1nGetXPositions
-  (kref __Kinstance, jlong ptr, jshortArray glyphsArr, jfloat dx) {
+  (jlong ptr, jshortArray glyphsArr, jfloat dx) {
     TODO("implement org_jetbrains_skia_Font__1nGetXPositions");
 }
      
 #if 0 
 extern "C" jfloatArray org_jetbrains_skia_Font__1nGetXPositions
-  (kref __Kinstance, jlong ptr, jshortArray glyphsArr, jfloat dx) {
+  (jlong ptr, jshortArray glyphsArr, jfloat dx) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     int count = env->GetArrayLength(glyphsArr);
     std::vector<jfloat> positions(count);
@@ -408,7 +408,7 @@ extern "C" jfloatArray org_jetbrains_skia_Font__1nGetXPositions
 
 
 extern "C" jlong org_jetbrains_skia_Font__1nGetPath
-  (kref __Kinstance, jlong ptr, jshort glyph) {
+  (jlong ptr, jshort glyph) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     SkPath* path = new SkPath();
     instance->getPath(glyph, path);
@@ -417,13 +417,13 @@ extern "C" jlong org_jetbrains_skia_Font__1nGetPath
 
 
 extern "C" jobjectArray org_jetbrains_skia_Font__1nGetPaths
-  (kref __Kinstance, jlong ptr, jshortArray glyphsArr) {
+  (jlong ptr, jshortArray glyphsArr) {
     TODO("implement org_jetbrains_skia_Font__1nGetPaths");
 }
      
 #if 0 
 extern "C" jobjectArray org_jetbrains_skia_Font__1nGetPaths
-  (kref __Kinstance, jlong ptr, jshortArray glyphsArr) {
+  (jlong ptr, jshortArray glyphsArr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     
     int count = env->GetArrayLength(glyphsArr);
@@ -455,13 +455,13 @@ extern "C" jobjectArray org_jetbrains_skia_Font__1nGetPaths
 
 
 extern "C" jobject org_jetbrains_skia_Font__1nGetMetrics
-  (kref __Kinstance, jlong ptr, jshortArray glyphsArr) {
+  (jlong ptr, jshortArray glyphsArr) {
     TODO("implement org_jetbrains_skia_Font__1nGetMetrics");
 }
      
 #if 0 
 extern "C" jobject org_jetbrains_skia_Font__1nGetMetrics
-  (kref __Kinstance, jlong ptr, jshortArray glyphsArr) {
+  (jlong ptr, jshortArray glyphsArr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     SkFontMetrics m;
     instance->getMetrics(&m);
@@ -472,13 +472,13 @@ extern "C" jobject org_jetbrains_skia_Font__1nGetMetrics
 
 
 extern "C" jfloat org_jetbrains_skia_Font__1nGetSpacing
-  (kref __Kinstance, jlong ptr, jshortArray glyphsArr) {
+  (jlong ptr, jshortArray glyphsArr) {
     TODO("implement org_jetbrains_skia_Font__1nGetSpacing");
 }
      
 #if 0 
 extern "C" jfloat org_jetbrains_skia_Font__1nGetSpacing
-  (kref __Kinstance, jlong ptr, jshortArray glyphsArr) {
+  (jlong ptr, jshortArray glyphsArr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     return instance->getSpacing();
 }

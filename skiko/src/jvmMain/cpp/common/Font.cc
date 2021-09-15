@@ -9,206 +9,206 @@ static void deleteFont(SkFont* font) {
     delete font;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_Font__1nGetFinalizer
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontKt_Font_1nGetFinalizer
   (JNIEnv* env, jclass jclass) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteFont));
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_Font__1nMakeDefault
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontKt__1nMakeDefault
   (JNIEnv* env, jclass jclass) {
     SkFont* obj = new SkFont();
     return reinterpret_cast<jlong>(obj);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_Font__1nMakeTypeface
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontKt__1nMakeTypeface
   (JNIEnv* env, jclass jclass, jlong typefacePtr) {
     SkTypeface* typeface = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(typefacePtr));
     SkFont* obj = new SkFont(sk_ref_sp<SkTypeface>(typeface));
     return reinterpret_cast<jlong>(obj);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_Font__1nMakeTypefaceSize
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontKt__1nMakeTypefaceSize
   (JNIEnv* env, jclass jclass, jlong typefacePtr, jfloat size) {
     SkTypeface* typeface = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(typefacePtr));
     SkFont* obj = new SkFont(sk_ref_sp<SkTypeface>(typeface), size);
     return reinterpret_cast<jlong>(obj);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_Font__1nMakeTypefaceSizeScaleSkew
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontKt__1nMakeTypefaceSizeScaleSkew
   (JNIEnv* env, jclass jclass, jlong typefacePtr, jfloat size, jfloat scaleX, jfloat skewX) {
     SkTypeface* typeface = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(typefacePtr));
     SkFont* obj = new SkFont(sk_ref_sp<SkTypeface>(typeface), size, scaleX, skewX);
     return reinterpret_cast<jlong>(obj);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_Font__1nMakeClone
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontKt_Font_1nMakeClone
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     SkFont* clone = new SkFont(*instance);
     return reinterpret_cast<jlong>(clone);
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_Font__1nEquals
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_FontKt_Font_1nEquals
   (JNIEnv* env, jclass jclass, jlong ptr, jlong otherPtr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     SkFont* other = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(otherPtr));
     return *instance == *other;
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_Font__1nIsAutoHintingForced
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_FontKt__1nIsAutoHintingForced
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     return instance->isForceAutoHinting();
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_Font__1nAreBitmapsEmbedded
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_FontKt__1nAreBitmapsEmbedded
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     return instance->isEmbeddedBitmaps();
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_Font__1nIsSubpixel
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_FontKt__1nIsSubpixel
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     return instance->isSubpixel();
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_Font__1nAreMetricsLinear
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_FontKt__1nAreMetricsLinear
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     return instance->isLinearMetrics();
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_Font__1nIsEmboldened
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_FontKt__1nIsEmboldened
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     return instance->isEmbolden();
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_Font__1nIsBaselineSnapped
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_FontKt__1nIsBaselineSnapped
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     return instance->isBaselineSnap();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_Font__1nSetAutoHintingForced
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nSetAutoHintingForced
   (JNIEnv* env, jclass jclass, jlong ptr, jboolean value) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     instance->setForceAutoHinting(value);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_Font__1nSetBitmapsEmbedded
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nSetBitmapsEmbedded
   (JNIEnv* env, jclass jclass, jlong ptr, jboolean value) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     instance->setEmbeddedBitmaps(value);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_Font__1nSetSubpixel
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nSetSubpixel
   (JNIEnv* env, jclass jclass, jlong ptr, jboolean value) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     instance->setSubpixel(value);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_Font__1nSetMetricsLinear
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nSetMetricsLinear
   (JNIEnv* env, jclass jclass, jlong ptr, jboolean value) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     instance->setLinearMetrics(value);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_Font__1nSetEmboldened
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nSetEmboldened
   (JNIEnv* env, jclass jclass, jlong ptr, jboolean value) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     instance->setEmbolden(value);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_Font__1nSetBaselineSnapped
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nSetBaselineSnapped
   (JNIEnv* env, jclass jclass, jlong ptr, jboolean value) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     instance->setBaselineSnap(value);
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_Font__1nGetEdging
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_FontKt__1nGetEdging
  (JNIEnv* env, jclass jclass, jlong ptr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     return static_cast<jint>(instance->getEdging());
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_Font__1nSetEdging
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nSetEdging
  (JNIEnv* env, jclass jclass, jlong ptr, jint value) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     instance->setEdging(static_cast<SkFont::Edging>(value));
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_Font__1nGetHinting
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_FontKt__1nGetHinting
  (JNIEnv* env, jclass jclass, jlong ptr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     return static_cast<jint>(instance->getHinting());
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_Font__1nSetHinting
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nSetHinting
  (JNIEnv* env, jclass jclass, jlong ptr, jint value) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     instance->setHinting(static_cast<SkFontHinting>(value));
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_Font__1nGetTypeface
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontKt__1nGetTypeface
  (JNIEnv* env, jclass jclass, jlong ptr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     SkTypeface* typeface = instance->refTypeface().release();
     return reinterpret_cast<jlong>(typeface);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_Font__1nGetTypefaceOrDefault
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontKt__1nGetTypefaceOrDefault
  (JNIEnv* env, jclass jclass, jlong ptr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     SkTypeface* typeface = instance->refTypefaceOrDefault().release();
     return reinterpret_cast<jlong>(typeface);
 }
 
-extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_Font__1nGetSize
+extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_FontKt_Font_1nGetSize
  (JNIEnv* env, jclass jclass, jlong ptr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     return instance->getSize();
 }
 
-extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_Font__1nGetScaleX
+extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_FontKt__1nGetScaleX
  (JNIEnv* env, jclass jclass, jlong ptr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     return instance->getScaleX();
 }
 
-extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_Font__1nGetSkewX
+extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_FontKt__1nGetSkewX
  (JNIEnv* env, jclass jclass, jlong ptr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     return instance->getSkewX();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_Font__1nSetTypeface
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nSetTypeface
  (JNIEnv* env, jclass jclass, jlong ptr, jlong typefacePtr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     SkTypeface* typeface = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(typefacePtr));
     instance->setTypeface(sk_ref_sp(typeface));
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_Font__1nSetSize
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nSetSize
  (JNIEnv* env, jclass jclass, jlong ptr, jfloat value) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     instance->setSize(value);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_Font__1nSetScaleX
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nSetScaleX
  (JNIEnv* env, jclass jclass, jlong ptr, jfloat value) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     instance->setScaleX(value);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_Font__1nSetSkewX
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nSetSkewX
  (JNIEnv* env, jclass jclass, jlong ptr, jfloat value) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     instance->setSkewX(value);
 }
 
-extern "C" JNIEXPORT jshortArray JNICALL Java_org_jetbrains_skia_Font__1nGetStringGlyphs
+extern "C" JNIEXPORT jshortArray JNICALL Java_org_jetbrains_skia_FontKt__1nGetStringGlyphs
   (JNIEnv* env, jclass jclass, jlong ptr, jstring str) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     jsize len = env->GetStringLength(str);
@@ -220,7 +220,7 @@ extern "C" JNIEXPORT jshortArray JNICALL Java_org_jetbrains_skia_Font__1nGetStri
     return javaShortArray(env, glyphs);
 }
 
-extern "C" JNIEXPORT jshortArray JNICALL Java_org_jetbrains_skia_Font__1nGetUTF32Glyphs
+extern "C" JNIEXPORT jshortArray JNICALL Java_org_jetbrains_skia_FontKt__1nGetUTF32Glyphs
   (JNIEnv* env, jclass jclass, jlong ptr, jintArray uniArr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     int count = env->GetArrayLength(uniArr);
@@ -231,13 +231,13 @@ extern "C" JNIEXPORT jshortArray JNICALL Java_org_jetbrains_skia_Font__1nGetUTF3
     return javaShortArray(env, glyphs);
 }
 
-extern "C" JNIEXPORT jshort JNICALL Java_org_jetbrains_skia_Font__1nGetUTF32Glyph
+extern "C" JNIEXPORT jshort JNICALL Java_org_jetbrains_skia_FontKt__1nGetUTF32Glyph
   (JNIEnv* env, jclass jclass, jlong ptr, jint uni) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     return instance->unicharToGlyph(uni);
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_Font__1nGetStringGlyphsCount
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_FontKt__1nGetStringGlyphsCount
   (JNIEnv* env, jclass jclass, jlong ptr, jstring str) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     jsize len = env->GetStringLength(str);
@@ -247,7 +247,7 @@ extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_Font__1nGetStringGlyph
     return count;
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_Font__1nMeasureText
+extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_FontKt__1nMeasureText
   (JNIEnv* env, jclass jclass, jlong ptr, jstring str, jlong paintPtr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
@@ -259,7 +259,7 @@ extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_Font__1nMeasureText
     return skija::Rect::fromSkRect(env, bounds);
 }
 
-extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_Font__1nMeasureTextWidth
+extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_FontKt__1nMeasureTextWidth
   (JNIEnv* env, jclass jclass, jlong ptr, jstring str, jlong paintPtr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
@@ -270,7 +270,7 @@ extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_Font__1nMeasureTextW
     return width;
 }
 
-extern "C" JNIEXPORT jfloatArray JNICALL Java_org_jetbrains_skia_Font__1nGetWidths
+extern "C" JNIEXPORT jfloatArray JNICALL Java_org_jetbrains_skia_FontKt__1nGetWidths
   (JNIEnv* env, jclass jclass, jlong ptr, jshortArray glyphsArr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     int count = env->GetArrayLength(glyphsArr);
@@ -281,7 +281,7 @@ extern "C" JNIEXPORT jfloatArray JNICALL Java_org_jetbrains_skia_Font__1nGetWidt
     return javaFloatArray(env, widths);
 }
 
-extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_Font__1nGetBounds
+extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_FontKt__1nGetBounds
   (JNIEnv* env, jclass jclass, jlong ptr, jshortArray glyphsArr, jlong paintPtr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
@@ -300,7 +300,7 @@ extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_Font__1nGetBou
     return res;
 }
 
-extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_Font__1nGetPositions
+extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_FontKt__1nGetPositions
   (JNIEnv* env, jclass jclass, jlong ptr, jshortArray glyphsArr, jfloat dx, jfloat dy) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     
@@ -313,7 +313,7 @@ extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_Font__1nGetPos
     return skija::Point::fromSkPoints(env, positions);
 }
 
-extern "C" JNIEXPORT jfloatArray JNICALL Java_org_jetbrains_skia_Font__1nGetXPositions
+extern "C" JNIEXPORT jfloatArray JNICALL Java_org_jetbrains_skia_FontKt__1nGetXPositions
   (JNIEnv* env, jclass jclass, jlong ptr, jshortArray glyphsArr, jfloat dx) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     int count = env->GetArrayLength(glyphsArr);
@@ -324,7 +324,7 @@ extern "C" JNIEXPORT jfloatArray JNICALL Java_org_jetbrains_skia_Font__1nGetXPos
     return javaFloatArray(env, positions);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_Font__1nGetPath
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontKt__1nGetPath
   (JNIEnv* env, jclass jclass, jlong ptr, jshort glyph) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     SkPath* path = new SkPath();
@@ -332,7 +332,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_Font__1nGetPath
     return reinterpret_cast<jlong>(path);
 }
 
-extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_Font__1nGetPaths
+extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_FontKt__1nGetPaths
   (JNIEnv* env, jclass jclass, jlong ptr, jshortArray glyphsArr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     
@@ -361,7 +361,7 @@ extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_Font__1nGetPat
     return ctx.paths;
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_Font__1nGetMetrics
+extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_FontKt__1nGetMetrics
   (JNIEnv* env, jclass jclass, jlong ptr, jshortArray glyphsArr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     SkFontMetrics m;
@@ -369,7 +369,7 @@ extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_Font__1nGetMetrics
     return skija::FontMetrics::toJava(env, m);
 }
 
-extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_Font__1nGetSpacing
+extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_FontKt__1nGetSpacing
   (JNIEnv* env, jclass jclass, jlong ptr, jshortArray glyphsArr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     return instance->getSpacing();

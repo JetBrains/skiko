@@ -8,8 +8,7 @@
 
 
 extern "C" jlong org_jetbrains_skia_Surface__1nMakeRasterDirect
-  (kref __Kinstance,
-    jint width, jint height, jint colorType, jint alphaType, jlong colorSpacePtr,
+  (jint width, jint height, jint colorType, jint alphaType, jlong colorSpacePtr,
     jlong pixelsPtr, jlong rowBytes,
     jobject surfacePropsObj)
 {
@@ -18,7 +17,7 @@ extern "C" jlong org_jetbrains_skia_Surface__1nMakeRasterDirect
      
 #if 0 
 extern "C" jlong org_jetbrains_skia_Surface__1nMakeRasterDirect
-  (kref __Kinstance,
+  (
     jint width, jint height, jint colorType, jint alphaType, jlong colorSpacePtr,
     jlong pixelsPtr, jlong rowBytes,
     jobject surfacePropsObj)
@@ -43,7 +42,7 @@ extern "C" jlong org_jetbrains_skia_Surface__1nMakeRasterDirect
 
 
 extern "C" jlong org_jetbrains_skia_Surface__1nMakeRasterDirectWithPixmap
-  (kref __Kinstance,
+  (
     jlong pixmapPtr, jobject surfacePropsObj)
 {
     TODO("implement org_jetbrains_skia_Surface__1nMakeRasterDirectWithPixmap");
@@ -51,7 +50,7 @@ extern "C" jlong org_jetbrains_skia_Surface__1nMakeRasterDirectWithPixmap
      
 #if 0 
 extern "C" jlong org_jetbrains_skia_Surface__1nMakeRasterDirectWithPixmap
-  (kref __Kinstance,
+  (
     jlong pixmapPtr, jobject surfacePropsObj)
 {
     SkPixmap* pixmap = reinterpret_cast<SkPixmap*>(static_cast<uintptr_t>(pixmapPtr));
@@ -65,7 +64,7 @@ extern "C" jlong org_jetbrains_skia_Surface__1nMakeRasterDirectWithPixmap
 
 
 extern "C" jlong org_jetbrains_skia_Surface__1nMakeRaster
-  (kref __Kinstance,
+  (
     jint width, jint height, jint colorType, jint alphaType, jlong colorSpacePtr,
     jlong rowBytes,
     jobject surfacePropsObj)
@@ -75,7 +74,7 @@ extern "C" jlong org_jetbrains_skia_Surface__1nMakeRaster
      
 #if 0 
 extern "C" jlong org_jetbrains_skia_Surface__1nMakeRaster
-  (kref __Kinstance,
+  (
     jint width, jint height, jint colorType, jint alphaType, jlong colorSpacePtr,
     jlong rowBytes,
     jobject surfacePropsObj)
@@ -98,7 +97,7 @@ extern "C" jlong org_jetbrains_skia_Surface__1nMakeRaster
 
 
 extern "C" jlong org_jetbrains_skia_Surface__1nMakeRasterN32Premul
-  (kref __Kinstance, jint width, jint height) {
+  (jint width, jint height) {
     sk_sp<SkSurface> surface = SkSurface::MakeRasterN32Premul(
         width, height,
         /* const SkSurfaceProps* */ nullptr
@@ -108,7 +107,7 @@ extern "C" jlong org_jetbrains_skia_Surface__1nMakeRasterN32Premul
 
 
 extern "C" jlong org_jetbrains_skia_Surface__1nMakeFromBackendRenderTarget
-  (kref __Kinstance, jlong pContext, jlong pBackendRenderTarget, jint surfaceOrigin, jint colorType, jlong colorSpacePtr, jobject surfacePropsObj) {
+  (jlong pContext, jlong pBackendRenderTarget, jint surfaceOrigin, jint colorType, jlong colorSpacePtr, jobject surfacePropsObj) {
     GrDirectContext* context = reinterpret_cast<GrDirectContext*>(static_cast<uintptr_t>(pContext));
     GrBackendRenderTarget* backendRenderTarget = reinterpret_cast<GrBackendRenderTarget*>(static_cast<uintptr_t>(pBackendRenderTarget));
     GrSurfaceOrigin grSurfaceOrigin = static_cast<GrSurfaceOrigin>(surfaceOrigin);
@@ -135,13 +134,13 @@ extern "C" jlong org_jetbrains_skia_Surface__1nMakeFromBackendRenderTarget
 
 
 extern "C" jlong org_jetbrains_skia_Surface__1nMakeFromMTKView
-  (kref __Kinstance, jlong contextPtr, jlong mtkViewPtr, jint surfaceOrigin, jint sampleCount, jint colorType, jlong colorSpacePtr, jobject surfacePropsObj) {
+  (jlong contextPtr, jlong mtkViewPtr, jint surfaceOrigin, jint sampleCount, jint colorType, jlong colorSpacePtr, jobject surfacePropsObj) {
     TODO("implement org_jetbrains_skia_Surface__1nMakeFromMTKView");
 }
      
 #if 0 
 extern "C" jlong org_jetbrains_skia_Surface__1nMakeFromMTKView
-  (kref __Kinstance, jlong contextPtr, jlong mtkViewPtr, jint surfaceOrigin, jint sampleCount, jint colorType, jlong colorSpacePtr, jobject surfacePropsObj) {
+  (jlong contextPtr, jlong mtkViewPtr, jint surfaceOrigin, jint sampleCount, jint colorType, jlong colorSpacePtr, jobject surfacePropsObj) {
     GrDirectContext* context = reinterpret_cast<GrDirectContext*>(static_cast<uintptr_t>(contextPtr));
     GrMTLHandle* mtkView = reinterpret_cast<GrMTLHandle*>(static_cast<uintptr_t>(mtkViewPtr));
     GrSurfaceOrigin grSurfaceOrigin = static_cast<GrSurfaceOrigin>(surfaceOrigin);
@@ -164,7 +163,7 @@ extern "C" jlong org_jetbrains_skia_Surface__1nMakeFromMTKView
 
 
 extern "C" jlong org_jetbrains_skia_Surface__1nMakeRenderTarget
-  (kref __Kinstance, jlong contextPtr, jboolean budgeted,
+  (jlong contextPtr, jboolean budgeted,
     jint width, jint height, jint colorType, jint alphaType, jlong colorSpacePtr,
     jint sampleCount, jint surfaceOrigin,
     jobject surfacePropsObj,
@@ -175,7 +174,7 @@ extern "C" jlong org_jetbrains_skia_Surface__1nMakeRenderTarget
      
 #if 0 
 extern "C" jlong org_jetbrains_skia_Surface__1nMakeRenderTarget
-  (kref __Kinstance, jlong contextPtr, jboolean budgeted,
+  (jlong contextPtr, jboolean budgeted,
     jint width, jint height, jint colorType, jint alphaType, jlong colorSpacePtr,
     jint sampleCount, jint surfaceOrigin,
     jobject surfacePropsObj,
@@ -202,102 +201,102 @@ extern "C" jlong org_jetbrains_skia_Surface__1nMakeRenderTarget
 
 
 extern "C" jlong org_jetbrains_skia_Surface__1nMakeNull
-  (kref __Kinstance, jint width, jint height) {
+  (jint width, jint height) {
   sk_sp<SkSurface> instance = SkSurface::MakeNull(width, height);
   return reinterpret_cast<jlong>(instance.release());
 }
 
 extern "C" jlong org_jetbrains_skia_Surface__1nGetCanvas
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkSurface* surface = reinterpret_cast<SkSurface*>(static_cast<uintptr_t>(ptr));
     return reinterpret_cast<jlong>(surface->getCanvas());
 }
 
 extern "C" jint org_jetbrains_skia_Surface__1nGetWidth
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkSurface* surface = reinterpret_cast<SkSurface*>(static_cast<uintptr_t>(ptr));
     return surface->width();
 }
 
 extern "C" jint org_jetbrains_skia_Surface__1nGetHeight
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkSurface* surface = reinterpret_cast<SkSurface*>(static_cast<uintptr_t>(ptr));
     return surface->height();
 }
 
 extern "C" jlong org_jetbrains_skia_Surface__1nMakeImageSnapshot
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkSurface* surface = reinterpret_cast<SkSurface*>(static_cast<uintptr_t>(ptr));
     return reinterpret_cast<jlong>(surface->makeImageSnapshot().release());
 }
 
 extern "C" jlong org_jetbrains_skia_Surface__1nMakeImageSnapshotR
-  (kref __Kinstance, jlong ptr, jint left, jint top, jint right, jint bottom) {
+  (jlong ptr, jint left, jint top, jint right, jint bottom) {
     SkSurface* surface = reinterpret_cast<SkSurface*>(static_cast<uintptr_t>(ptr));
     return reinterpret_cast<jlong>(surface->makeImageSnapshot({left, top, right, bottom}).release());
 }
 
 extern "C" jint org_jetbrains_skia_Surface__1nGenerationId
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkSurface* surface = reinterpret_cast<SkSurface*>(static_cast<uintptr_t>(ptr));
     return surface->generationID();
 }
 
 extern "C" jboolean org_jetbrains_skia_Surface__1nReadPixelsToPixmap
-  (kref __Kinstance, jlong ptr, jlong pixmapPtr, jint srcX, jint srcY) {
+  (jlong ptr, jlong pixmapPtr, jint srcX, jint srcY) {
     SkSurface* surface = reinterpret_cast<SkSurface*>(static_cast<uintptr_t>(ptr));
     SkPixmap* pixmap = reinterpret_cast<SkPixmap*>(static_cast<uintptr_t>(pixmapPtr));
     return surface->readPixels(*pixmap, srcX, srcY);
 }
 
 extern "C" jboolean org_jetbrains_skia_Surface__1nReadPixels
-  (kref __Kinstance, jlong ptr, jlong bitmapPtr, jint srcX, jint srcY) {
+  (jlong ptr, jlong bitmapPtr, jint srcX, jint srcY) {
     SkSurface* surface = reinterpret_cast<SkSurface*>(static_cast<uintptr_t>(ptr));
     SkBitmap* bitmap = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(bitmapPtr));
     return surface->readPixels(*bitmap, srcX, srcY);
 }
 
 extern "C" void org_jetbrains_skia_Surface__1nWritePixelsFromPixmap
-  (kref __Kinstance, jlong ptr, jlong pixmapPtr, jint x, jint y) {
+  (jlong ptr, jlong pixmapPtr, jint x, jint y) {
     SkSurface* surface = reinterpret_cast<SkSurface*>(static_cast<uintptr_t>(ptr));
     SkPixmap* pixmap = reinterpret_cast<SkPixmap*>(static_cast<uintptr_t>(pixmapPtr));
     surface->writePixels(*pixmap, x, y);
 }
 
 extern "C" void org_jetbrains_skia_Surface__1nWritePixels
-  (kref __Kinstance, jlong ptr, jlong bitmapPtr, jint x, jint y) {
+  (jlong ptr, jlong bitmapPtr, jint x, jint y) {
     SkSurface* surface = reinterpret_cast<SkSurface*>(static_cast<uintptr_t>(ptr));
     SkBitmap* bitmap = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(bitmapPtr));
     surface->writePixels(*bitmap, x, y);
 }
 
 extern "C" void org_jetbrains_skia_Surface__1nFlushAndSubmit
-  (kref __Kinstance, jlong ptr, jboolean syncCpu) {
+  (jlong ptr, jboolean syncCpu) {
     SkSurface* surface = reinterpret_cast<SkSurface*>(static_cast<uintptr_t>(ptr));
     surface->flushAndSubmit(syncCpu);
 }
 
 extern "C" void org_jetbrains_skia_Surface__1nFlush
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkSurface* surface = reinterpret_cast<SkSurface*>(static_cast<uintptr_t>(ptr));
     surface->flush();
 }
 
 extern "C" jboolean org_jetbrains_skia_Surface__1nUnique
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkSurface* surface = reinterpret_cast<SkSurface*>(static_cast<uintptr_t>(ptr));
     return surface->unique();
 }
 
 
 extern "C" jobject org_jetbrains_skia_Surface__1nGetImageInfo
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TODO("implement org_jetbrains_skia_Surface__1nGetImageInfo");
 }
      
 #if 0 
 extern "C" jobject org_jetbrains_skia_Surface__1nGetImageInfo
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkSurface* surface = reinterpret_cast<SkSurface*>(static_cast<uintptr_t>(ptr));
     const SkImageInfo& info = surface->imageInfo();
     return env->NewObject(skija::ImageInfo::cls, skija::ImageInfo::ctor,
@@ -311,14 +310,14 @@ extern "C" jobject org_jetbrains_skia_Surface__1nGetImageInfo
 
 
 extern "C" jlong org_jetbrains_skia_Surface__1nMakeSurface
-  (kref __Kinstance, jlong ptr, jint width, jint height) {
+  (jlong ptr, jint width, jint height) {
     SkSurface* surface = reinterpret_cast<SkSurface*>(static_cast<uintptr_t>(ptr));
     sk_sp<SkSurface> newSurface = surface->makeSurface(width, height);
     return reinterpret_cast<jlong>(newSurface.release());
 }
 
 extern "C" jlong org_jetbrains_skia_Surface__1nMakeSurfaceI
-  (kref __Kinstance, jlong ptr, jint width, jint height, jint colorType, jint alphaType, jlong colorSpacePtr) {
+  (jlong ptr, jint width, jint height, jint colorType, jint alphaType, jlong colorSpacePtr) {
     SkSurface* surface = reinterpret_cast<SkSurface*>(static_cast<uintptr_t>(ptr));
     SkColorSpace* colorSpace = reinterpret_cast<SkColorSpace*>(static_cast<uintptr_t>(colorSpacePtr));
     SkImageInfo imageInfo = SkImageInfo::Make(width,
@@ -331,7 +330,7 @@ extern "C" jlong org_jetbrains_skia_Surface__1nMakeSurfaceI
 }
 
 extern "C" void org_jetbrains_skia_Surface__1nDraw
-  (kref __Kinstance, jlong ptr, jlong canvasPtr, jfloat x, jfloat y, jlong paintPtr) {
+  (jlong ptr, jlong canvasPtr, jfloat x, jfloat y, jlong paintPtr) {
     SkSurface* surface = reinterpret_cast<SkSurface*>(static_cast<uintptr_t>(ptr));
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
@@ -339,20 +338,20 @@ extern "C" void org_jetbrains_skia_Surface__1nDraw
 }
 
 extern "C" jboolean org_jetbrains_skia_Surface__1nPeekPixels
-  (kref __Kinstance, jlong ptr, jlong dstPixmapPtr) {
+  (jlong ptr, jlong dstPixmapPtr) {
     SkSurface* surface = reinterpret_cast<SkSurface*>(static_cast<uintptr_t>(ptr));
     SkPixmap* pixmap = reinterpret_cast<SkPixmap*>(static_cast<uintptr_t>(dstPixmapPtr));
     return static_cast<jboolean>(surface->peekPixels(pixmap));
 }
 
 extern "C" void org_jetbrains_skia_Surface__1nNotifyContentWillChange
-  (kref __Kinstance, jlong ptr, jint mode) {
+  (jlong ptr, jint mode) {
     SkSurface* surface = reinterpret_cast<SkSurface*>(static_cast<uintptr_t>(ptr));
     surface->notifyContentWillChange(static_cast<SkSurface::ContentChangeMode>(mode));
 }
 
 extern "C" jlong org_jetbrains_skia_Surface__1nGetRecordingContext
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkSurface* surface = reinterpret_cast<SkSurface*>(static_cast<uintptr_t>(ptr));
     return reinterpret_cast<jlong>(surface->recordingContext());
 }

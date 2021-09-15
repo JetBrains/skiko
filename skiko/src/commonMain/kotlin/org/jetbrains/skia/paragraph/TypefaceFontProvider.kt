@@ -9,17 +9,9 @@ import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
-import kotlin.jvm.JvmStatic
 
-class TypefaceFontProvider : FontMgr(_nMake()) {
+class TypefaceFontProvider : FontMgr(TypefaceFontProvider_nMake()) {
     companion object {
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TypefaceFontProvider__1nMake")
-        external fun _nMake(): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TypefaceFontProvider__1nRegisterTypeface")
-        external fun _nRegisterTypeface(ptr: NativePointer, typefacePtr: NativePointer, alias: String?): NativePointer
-
         init {
             staticLoad()
         }
@@ -43,3 +35,10 @@ class TypefaceFontProvider : FontMgr(_nMake()) {
         Stats.onNativeCall()
     }
 }
+
+
+@ExternalSymbolName("org_jetbrains_skia_TypefaceFontProvider__1nMake")
+private external fun TypefaceFontProvider_nMake(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_TypefaceFontProvider__1nRegisterTypeface")
+private external fun _nRegisterTypeface(ptr: NativePointer, typefacePtr: NativePointer, alias: String?): NativePointer

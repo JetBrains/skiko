@@ -2,33 +2,10 @@
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.*
-import kotlin.jvm.JvmStatic
 
 class ColorSpace : Managed {
     companion object {
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nGetFinalizer")
-        external fun _nGetFinalizer(): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nMakeSRGB")
-        external fun _nMakeSRGB(): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nMakeDisplayP3")
-        external fun _nMakeDisplayP3(): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nMakeSRGBLinear")
-        external fun _nMakeSRGBLinear(): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nIsGammaCloseToSRGB")
-        external fun _nIsGammaCloseToSRGB(ptr: NativePointer): Boolean
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nIsGammaLinear")
-        external fun _nIsGammaLinear(ptr: NativePointer): Boolean
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nIsSRGB")
-        external fun _nIsSRGB(ptr: NativePointer): Boolean
 
         init {
             staticLoad()
@@ -110,10 +87,31 @@ class ColorSpace : Managed {
         }
 
     private object _FinalizerHolder {
-        val PTR = _nGetFinalizer()
+        val PTR = ColorSpace_nGetFinalizer()
     }
 }
+
+@ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nGetFinalizer")
+private external fun ColorSpace_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ColorSpace__nConvert")
 private external fun _nConvert(
     fromPtr: NativePointer, toPtr: NativePointer, r: Float, g: Float, b: Float, a: Float, result: InteropPointer)
+
+@ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nMakeSRGB")
+private external fun _nMakeSRGB(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nMakeDisplayP3")
+private external fun _nMakeDisplayP3(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nMakeSRGBLinear")
+private external fun _nMakeSRGBLinear(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nIsGammaCloseToSRGB")
+private external fun _nIsGammaCloseToSRGB(ptr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nIsGammaLinear")
+private external fun _nIsGammaLinear(ptr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nIsSRGB")
+private external fun _nIsSRGB(ptr: NativePointer): Boolean

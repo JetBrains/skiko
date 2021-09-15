@@ -6,7 +6,6 @@ import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.NativePointer
-import kotlin.jvm.JvmStatic
 
 /**
  *
@@ -15,18 +14,12 @@ import kotlin.jvm.JvmStatic
  */
 abstract class Logger : RefCnt(_nMake()) {
     companion object {
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_skottie_Logger__1nMake")
-        external fun _nMake(): NativePointer
-
         init {
             staticLoad()
         }
     }
 
     abstract fun log(level: LogLevel?, message: String?, json: String?)
-    @ExternalSymbolName("org_jetbrains_skia_skottie_Logger__1nInit")
-    external fun _nInit(ptr: NativePointer)
 
     init {
         Stats.onNativeCall()
@@ -34,3 +27,9 @@ abstract class Logger : RefCnt(_nMake()) {
         _nInit(_ptr)
     }
 }
+
+@ExternalSymbolName("org_jetbrains_skia_skottie_Logger__1nMake")
+private external fun _nMake(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_skottie_Logger__1nInit")
+external fun _nInit(ptr: NativePointer)

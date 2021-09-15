@@ -7,7 +7,55 @@ import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
-import kotlin.jvm.JvmStatic
+
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetFinalizer")
+private external fun TextBlob_nGetFinalizer(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetUniqueId")
+private external fun TextBlob_nGetUniqueId(ptr: NativePointer): Int
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nSerializeToData")
+private external fun TextBlob_nSerializeToData(ptr: NativePointer /*, SkSerialProcs */): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromData")
+private external fun TextBlob_nMakeFromData(dataPtr: NativePointer /*, SkDeserialProcs */): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nBounds")
+private external fun _nBounds(ptr: NativePointer): Rect
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetIntercepts")
+private external fun _nGetIntercepts(ptr: NativePointer, lower: Float, upper: Float, paintPtr: NativePointer): FloatArray?
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromPosH")
+private external fun _nMakeFromPosH(glyphs: ShortArray?, xpos: FloatArray?, ypos: Float, fontPtr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromPos")
+private external fun _nMakeFromPos(glyphs: ShortArray?, pos: FloatArray?, fontPtr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromRSXform")
+private external fun _nMakeFromRSXform(glyphs: ShortArray?, xform: FloatArray?, fontPtr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetGlyphs")
+private external fun _nGetGlyphs(ptr: NativePointer): ShortArray
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetPositions")
+private external fun _nGetPositions(ptr: NativePointer): FloatArray
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetClusters")
+private external fun _nGetClusters(ptr: NativePointer): IntArray
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetTightBounds")
+private external fun _nGetTightBounds(ptr: NativePointer): Rect
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetBlockBounds")
+private external fun _nGetBlockBounds(ptr: NativePointer): Rect
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetFirstBaseline")
+private external fun _nGetFirstBaseline(ptr: NativePointer): Float
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetLastBaseline")
+private external fun _nGetLastBaseline(ptr: NativePointer): Float
 
 class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
@@ -88,61 +136,12 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
         fun makeFromData(data: Data?): TextBlob? {
             return try {
                 Stats.onNativeCall()
-                val ptr = _nMakeFromData(getPtr(data))
+                val ptr = TextBlob_nMakeFromData(getPtr(data))
                 if (ptr == NullPointer) null else TextBlob(ptr)
             } finally {
                 reachabilityBarrier(data)
             }
         }
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetFinalizer")
-        external fun _nGetFinalizer(): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nBounds")
-        external fun _nBounds(ptr: NativePointer): Rect
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetUniqueId")
-        external fun _nGetUniqueId(ptr: NativePointer): Int
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetIntercepts")
-        external fun _nGetIntercepts(ptr: NativePointer, lower: Float, upper: Float, paintPtr: NativePointer): FloatArray?
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromPosH")
-        external fun _nMakeFromPosH(glyphs: ShortArray?, xpos: FloatArray?, ypos: Float, fontPtr: NativePointer): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromPos")
-        external fun _nMakeFromPos(glyphs: ShortArray?, pos: FloatArray?, fontPtr: NativePointer): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromRSXform")
-        external fun _nMakeFromRSXform(glyphs: ShortArray?, xform: FloatArray?, fontPtr: NativePointer): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nSerializeToData")
-        external fun _nSerializeToData(ptr: NativePointer /*, SkSerialProcs */): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromData")
-        external fun _nMakeFromData(dataPtr: NativePointer /*, SkDeserialProcs */): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetGlyphs")
-        external fun _nGetGlyphs(ptr: NativePointer): ShortArray
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetPositions")
-        external fun _nGetPositions(ptr: NativePointer): FloatArray
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetClusters")
-        external fun _nGetClusters(ptr: NativePointer): IntArray
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetTightBounds")
-        external fun _nGetTightBounds(ptr: NativePointer): Rect
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetBlockBounds")
-        external fun _nGetBlockBounds(ptr: NativePointer): Rect
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetFirstBaseline")
-        external fun _nGetFirstBaseline(ptr: NativePointer): Float
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetLastBaseline")
-        external fun _nGetLastBaseline(ptr: NativePointer): Float
 
         init {
             staticLoad()
@@ -172,7 +171,7 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
     val uniqueId: Int
         get() = try {
             Stats.onNativeCall()
-            _nGetUniqueId(_ptr)
+            TextBlob_nGetUniqueId(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -228,7 +227,7 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
     fun serializeToData(): Data {
         return try {
             Stats.onNativeCall()
-            Data(_nSerializeToData(_ptr))
+            Data(TextBlob_nSerializeToData(_ptr))
         } finally {
             reachabilityBarrier(this)
         }
@@ -343,6 +342,6 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
         }
 
     private object _FinalizerHolder {
-        val PTR = _nGetFinalizer()
+        val PTR = TextBlob_nGetFinalizer()
     }
 }

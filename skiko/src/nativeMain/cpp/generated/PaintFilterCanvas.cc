@@ -9,13 +9,13 @@
 
 
 extern "C" void org_jetbrains_skia_PaintFilterCanvas__1nAttachToJava
-  (kref __Kinstance, jlong canvasPtr, jboolean unrollDrawable) {
+  (jlong canvasPtr, jboolean unrollDrawable) {
     TODO("implement org_jetbrains_skia_PaintFilterCanvas__1nAttachToJava");
 }
      
 #if 0 
 extern "C" void org_jetbrains_skia_PaintFilterCanvas__1nAttachToJava
-  (kref __Kinstance, jlong canvasPtr, jboolean unrollDrawable) {
+  (jlong canvasPtr, jboolean unrollDrawable) {
     SkijaPaintFilterCanvas* canvas = reinterpret_cast<SkijaPaintFilterCanvas*>(static_cast<uintptr_t>(canvasPtr));
     canvas->jobj = skija::PaintFilterCanvas::attach(env, jobj);
 }
@@ -24,13 +24,13 @@ extern "C" void org_jetbrains_skia_PaintFilterCanvas__1nAttachToJava
 
 
 extern "C" jlong org_jetbrains_skia_PaintFilterCanvas__1nMake
-  (kref __Kinstance, jlong canvasPtr, jboolean unrollDrawable) {
+  (jlong canvasPtr, jboolean unrollDrawable) {
     TODO("implement org_jetbrains_skia_PaintFilterCanvas__1nMake");
 }
      
 #if 0 
 extern "C" jlong org_jetbrains_skia_PaintFilterCanvas__1nMake
-  (kref __Kinstance, jlong canvasPtr, jboolean unrollDrawable) {
+  (jlong canvasPtr, jboolean unrollDrawable) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
     SkijaPaintFilterCanvas* filterCanvas = new SkijaPaintFilterCanvas(canvas, unrollDrawable);
     return reinterpret_cast<jlong>(filterCanvas);

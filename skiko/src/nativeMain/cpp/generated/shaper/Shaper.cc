@@ -12,35 +12,35 @@ static void deleteShaper(SkShaper* instance) {
     delete instance;
 }
 
-extern "C" jlong org_jetbrains_skia_shaper_Shaper__1nGetFinalizer(kref __Kinstance) {
+extern "C" jlong org_jetbrains_skia_shaper_Shaper__1nGetFinalizer() {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteShaper));
 }
 
 extern "C" jlong org_jetbrains_skia_shaper_Shaper__1nMakePrimitive
-  (kref __Kinstance) {
+  () {
     return reinterpret_cast<jlong>(SkShaper::MakePrimitive().release());
 }
 
 extern "C" jlong org_jetbrains_skia_shaper_Shaper__1nMakeShaperDrivenWrapper
-  (kref __Kinstance, jlong fontMgrPtr) {
+  (jlong fontMgrPtr) {
     SkFontMgr* fontMgr = reinterpret_cast<SkFontMgr*>(static_cast<uintptr_t>(fontMgrPtr));
     return reinterpret_cast<jlong>(SkShaper::MakeShaperDrivenWrapper(sk_ref_sp(fontMgr)).release());
 }
 
 extern "C" jlong org_jetbrains_skia_shaper_Shaper__1nMakeShapeThenWrap
-  (kref __Kinstance, jlong fontMgrPtr) {
+  (jlong fontMgrPtr) {
     SkFontMgr* fontMgr = reinterpret_cast<SkFontMgr*>(static_cast<uintptr_t>(fontMgrPtr));
     return reinterpret_cast<jlong>(SkShaper::MakeShapeThenWrap(sk_ref_sp(fontMgr)).release());
 }
 
 extern "C" jlong org_jetbrains_skia_shaper_Shaper__1nMakeShapeDontWrapOrReorder
-  (kref __Kinstance, jlong fontMgrPtr) {
+  (jlong fontMgrPtr) {
     SkFontMgr* fontMgr = reinterpret_cast<SkFontMgr*>(static_cast<uintptr_t>(fontMgrPtr));
     return reinterpret_cast<jlong>(SkShaper::MakeShapeDontWrapOrReorder(sk_ref_sp(fontMgr)).release());
 }
 
 extern "C" jlong org_jetbrains_skia_shaper_Shaper__1nMakeCoreText
-  (kref __Kinstance) {
+  () {
     #ifdef SK_SHAPER_CORETEXT_AVAILABLE
         return reinterpret_cast<jlong>(SkShaper::MakeCoreText().release());
     #else
@@ -49,20 +49,20 @@ extern "C" jlong org_jetbrains_skia_shaper_Shaper__1nMakeCoreText
 }
 
 extern "C" jlong org_jetbrains_skia_shaper_Shaper__1nMake
-  (kref __Kinstance, jlong fontMgrPtr) {
+  (jlong fontMgrPtr) {
     SkFontMgr* fontMgr = reinterpret_cast<SkFontMgr*>(static_cast<uintptr_t>(fontMgrPtr));
     return reinterpret_cast<jlong>(SkShaper::Make(sk_ref_sp(fontMgr)).release());
 }
 
 
 extern "C" jlong org_jetbrains_skia_shaper_Shaper__1nShapeBlob
-  (kref __Kinstance, jlong ptr, jstring textObj, jlong fontPtr, jobject opts, jfloat width, jfloat offsetX, jfloat offsetY) {
+  (jlong ptr, jstring textObj, jlong fontPtr, jobject opts, jfloat width, jfloat offsetX, jfloat offsetY) {
     TODO("implement org_jetbrains_skia_shaper_Shaper__1nShapeBlob");
 }
      
 #if 0 
 extern "C" jlong org_jetbrains_skia_shaper_Shaper__1nShapeBlob
-  (kref __Kinstance, jlong ptr, jstring textObj, jlong fontPtr, jobject opts, jfloat width, jfloat offsetX, jfloat offsetY) {
+  (jlong ptr, jstring textObj, jlong fontPtr, jobject opts, jfloat width, jfloat offsetX, jfloat offsetY) {
     SkShaper* instance = reinterpret_cast<SkShaper*>(static_cast<uintptr_t>(ptr));
     SkString text = skString(env, textObj);
     std::shared_ptr<UBreakIterator> graphemeIter = skija::shaper::graphemeBreakIterator(text);
@@ -102,13 +102,13 @@ extern "C" jlong org_jetbrains_skia_shaper_Shaper__1nShapeBlob
 
 
 extern "C" jlong org_jetbrains_skia_shaper_Shaper__1nShapeLine
-  (kref __Kinstance, jlong ptr, jstring textObj, jlong fontPtr, jobject opts) {
+  (jlong ptr, jstring textObj, jlong fontPtr, jobject opts) {
     TODO("implement org_jetbrains_skia_shaper_Shaper__1nShapeLine");
 }
      
 #if 0 
 extern "C" jlong org_jetbrains_skia_shaper_Shaper__1nShapeLine
-  (kref __Kinstance, jlong ptr, jstring textObj, jlong fontPtr, jobject opts) {
+  (jlong ptr, jstring textObj, jlong fontPtr, jobject opts) {
     SkShaper* instance = reinterpret_cast<SkShaper*>(static_cast<uintptr_t>(ptr));
 
     SkString text = skString(env, textObj);
@@ -153,14 +153,14 @@ extern "C" jlong org_jetbrains_skia_shaper_Shaper__1nShapeLine
 
 
 extern "C" void org_jetbrains_skia_shaper_Shaper__1nShape
-  (kref __Kinstance, jlong ptr, jlong textPtr, jobject fontRunIterObj, jobject bidiRunIterObj, jobject scriptRunIterObj, jobject languageRunIterObj, jobject opts, jfloat width, jobject runHandlerObj)
+  (jlong ptr, jlong textPtr, jobject fontRunIterObj, jobject bidiRunIterObj, jobject scriptRunIterObj, jobject languageRunIterObj, jobject opts, jfloat width, jobject runHandlerObj)
 {
     TODO("implement org_jetbrains_skia_shaper_Shaper__1nShape");
 }
      
 #if 0 
 extern "C" void org_jetbrains_skia_shaper_Shaper__1nShape
-  (kref __Kinstance, jlong ptr, jlong textPtr, jobject fontRunIterObj, jobject bidiRunIterObj, jobject scriptRunIterObj, jobject languageRunIterObj, jobject opts, jfloat width, jobject runHandlerObj)
+  (jlong ptr, jlong textPtr, jobject fontRunIterObj, jobject bidiRunIterObj, jobject scriptRunIterObj, jobject languageRunIterObj, jobject opts, jfloat width, jobject runHandlerObj)
 {
     SkShaper* instance = reinterpret_cast<SkShaper*>(static_cast<uintptr_t>(ptr));
     SkString* text = reinterpret_cast<SkString*>(static_cast<uintptr_t>(textPtr));

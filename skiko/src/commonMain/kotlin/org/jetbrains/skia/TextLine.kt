@@ -3,7 +3,6 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.shaper.*
-import kotlin.jvm.JvmStatic
 
 class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
@@ -15,65 +14,13 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
             return Shaper.makeShapeDontWrapOrReorder().use { shaper -> shaper.shapeLine(text, font, opts!!) }
         }
 
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetFinalizer")
-        external fun _nGetFinalizer(): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetAscent")
-        external fun _nGetAscent(ptr: NativePointer): Float
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetCapHeight")
-        external fun _nGetCapHeight(ptr: NativePointer): Float
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetXHeight")
-        external fun _nGetXHeight(ptr: NativePointer): Float
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetDescent")
-        external fun _nGetDescent(ptr: NativePointer): Float
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetLeading")
-        external fun _nGetLeading(ptr: NativePointer): Float
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetWidth")
-        external fun _nGetWidth(ptr: NativePointer): Float
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetHeight")
-        external fun _nGetHeight(ptr: NativePointer): Float
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetTextBlob")
-        external fun _nGetTextBlob(ptr: NativePointer): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetGlyphs")
-        external fun _nGetGlyphs(ptr: NativePointer): ShortArray
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetPositions")
-        external fun _nGetPositions(ptr: NativePointer): FloatArray
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetRunPositions")
-        external fun _nGetRunPositions(ptr: NativePointer): FloatArray?
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetBreakPositions")
-        external fun _nGetBreakPositions(ptr: NativePointer): FloatArray?
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetBreakOffsets")
-        external fun _nGetBreakOffsets(ptr: NativePointer): IntArray?
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetOffsetAtCoord")
-        external fun _nGetOffsetAtCoord(ptr: NativePointer, x: Float): Int
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetLeftOffsetAtCoord")
-        external fun _nGetLeftOffsetAtCoord(ptr: NativePointer, x: Float): Int
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetCoordAtOffset")
-        external fun _nGetCoordAtOffset(ptr: NativePointer, offset: Int): Float
-
         init {
             Library.staticLoad()
         }
     }
 
     private object _FinalizerHolder {
-        val PTR = _nGetFinalizer()
+        val PTR = TextLine_nGetFinalizer()
     }
 
     val ascent: Float
@@ -125,7 +72,7 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
         get() {
             Stats.onNativeCall()
             return try {
-                _nGetWidth(_ptr)
+                TextLine_nGetWidth(_ptr)
             } finally {
                 reachabilityBarrier(this)
             }
@@ -134,7 +81,7 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
         get() {
             Stats.onNativeCall()
             return try {
-                _nGetHeight(_ptr)
+                TextLine_nGetHeight(_ptr)
             } finally {
                 reachabilityBarrier(this)
             }
@@ -153,7 +100,7 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
         get() {
             Stats.onNativeCall()
             return try {
-                _nGetGlyphs(_ptr)
+                TextLine_nGetGlyphs(_ptr)
             } finally {
                 reachabilityBarrier(this)
             }
@@ -166,7 +113,7 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
         get() {
             Stats.onNativeCall()
             return try {
-                _nGetPositions(_ptr)
+                TextLine_nGetPositions(_ptr)
             } finally {
                 reachabilityBarrier(this)
             }
@@ -247,3 +194,55 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
         }
     }
 }
+
+
+@ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetFinalizer")
+private external fun TextLine_nGetFinalizer(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetWidth")
+private external fun TextLine_nGetWidth(ptr: NativePointer): Float
+
+@ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetHeight")
+private external fun TextLine_nGetHeight(ptr: NativePointer): Float
+
+@ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetGlyphs")
+private external fun TextLine_nGetGlyphs(ptr: NativePointer): ShortArray
+
+@ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetPositions")
+private external fun TextLine_nGetPositions(ptr: NativePointer): FloatArray
+
+@ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetAscent")
+private external fun _nGetAscent(ptr: NativePointer): Float
+
+@ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetCapHeight")
+private external fun _nGetCapHeight(ptr: NativePointer): Float
+
+@ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetXHeight")
+private external fun _nGetXHeight(ptr: NativePointer): Float
+
+@ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetDescent")
+private external fun _nGetDescent(ptr: NativePointer): Float
+
+@ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetLeading")
+private external fun _nGetLeading(ptr: NativePointer): Float
+
+@ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetTextBlob")
+private external fun _nGetTextBlob(ptr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetRunPositions")
+private external fun _nGetRunPositions(ptr: NativePointer): FloatArray?
+
+@ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetBreakPositions")
+private external fun _nGetBreakPositions(ptr: NativePointer): FloatArray?
+
+@ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetBreakOffsets")
+private external fun _nGetBreakOffsets(ptr: NativePointer): IntArray?
+
+@ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetOffsetAtCoord")
+private external fun _nGetOffsetAtCoord(ptr: NativePointer, x: Float): Int
+
+@ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetLeftOffsetAtCoord")
+private external fun _nGetLeftOffsetAtCoord(ptr: NativePointer, x: Float): Int
+
+@ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetCoordAtOffset")
+private external fun _nGetCoordAtOffset(ptr: NativePointer, offset: Int): Float

@@ -2,9 +2,7 @@
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.*
-import kotlin.jvm.JvmStatic
 
 class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
@@ -607,247 +605,221 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeAlphaThreshold")
-        external fun _nMakeAlphaThreshold(
-            regionPtr: NativePointer,
-            innerMin: Float,
-            outerMax: Float,
-            input: NativePointer,
-            crop: IRect?
-        ): NativePointer
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeArithmetic")
-        external fun _nMakeArithmetic(
-            k1: Float,
-            k2: Float,
-            k3: Float,
-            k4: Float,
-            enforcePMColor: Boolean,
-            bg: NativePointer,
-            fg: NativePointer,
-            crop: IRect?
-        ): NativePointer
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeBlend")
-        external fun _nMakeBlend(blendMode: Int, bg: NativePointer, fg: NativePointer, crop: IRect?): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeBlur")
-        external fun _nMakeBlur(sigmaX: Float, sigmaY: Float, tileMode: Int, input: NativePointer, crop: IRect?): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeColorFilter")
-        external fun _nMakeColorFilter(colorFilterPtr: NativePointer, input: NativePointer, crop: IRect?): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeCompose")
-        external fun _nMakeCompose(outer: NativePointer, inner: NativePointer): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDisplacementMap")
-        external fun _nMakeDisplacementMap(
-            xChan: Int,
-            yChan: Int,
-            scale: Float,
-            displacement: NativePointer,
-            color: NativePointer,
-            crop: IRect?
-        ): NativePointer
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDropShadow")
-        external fun _nMakeDropShadow(
-            dx: Float,
-            dy: Float,
-            sigmaX: Float,
-            sigmaY: Float,
-            color: Int,
-            input: NativePointer,
-            crop: IRect?
-        ): NativePointer
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDropShadowOnly")
-        external fun _nMakeDropShadowOnly(
-            dx: Float,
-            dy: Float,
-            sigmaX: Float,
-            sigmaY: Float,
-            color: Int,
-            input: NativePointer,
-            crop: IRect?
-        ): NativePointer
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeImage")
-        external fun _nMakeImage(
-            image: NativePointer,
-            l0: Float,
-            t0: Float,
-            r0: Float,
-            b0: Float,
-            l1: Float,
-            t1: Float,
-            r1: Float,
-            b1: Float,
-            samplingMode: Long
-        ): NativePointer
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMagnifier")
-        external fun _nMakeMagnifier(
-            l: Float,
-            t: Float,
-            r: Float,
-            b: Float,
-            inset: Float,
-            input: NativePointer,
-            crop: IRect?
-        ): NativePointer
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMatrixConvolution")
-        external fun _nMakeMatrixConvolution(
-            kernelW: Int,
-            kernelH: Int,
-            kernel: FloatArray?,
-            gain: Float,
-            bias: Float,
-            offsetX: Int,
-            offsetY: Int,
-            tileMode: Int,
-            convolveAlpha: Boolean,
-            input: NativePointer,
-            crop: IRect?
-        ): NativePointer
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMatrixTransform")
-        external fun _nMakeMatrixTransform(matrix: FloatArray?, samplingMode: Long, input: NativePointer): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMerge")
-        external fun _nMakeMerge(filters: InteropPointer, crop: IRect?): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeOffset")
-        external fun _nMakeOffset(dx: Float, dy: Float, input: NativePointer, crop: IRect?): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakePaint")
-        external fun _nMakePaint(paint: NativePointer, crop: IRect?): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakePicture")
-        external fun _nMakePicture(picture: NativePointer, l: Float, t: Float, r: Float, b: Float): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeTile")
-        external fun _nMakeTile(
-            l0: Float,
-            t0: Float,
-            r0: Float,
-            b0: Float,
-            l1: Float,
-            t1: Float,
-            r1: Float,
-            b1: Float,
-            input: NativePointer
-        ): NativePointer
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDilate")
-        external fun _nMakeDilate(rx: Float, ry: Float, input: NativePointer, crop: IRect?): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeErode")
-        external fun _nMakeErode(rx: Float, ry: Float, input: NativePointer, crop: IRect?): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDistantLitDiffuse")
-        external fun _nMakeDistantLitDiffuse(
-            x: Float,
-            y: Float,
-            z: Float,
-            lightColor: Int,
-            surfaceScale: Float,
-            kd: Float,
-            input: NativePointer,
-            crop: IRect?
-        ): NativePointer
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakePointLitDiffuse")
-        external fun _nMakePointLitDiffuse(
-            x: Float,
-            y: Float,
-            z: Float,
-            lightColor: Int,
-            surfaceScale: Float,
-            kd: Float,
-            input: NativePointer,
-            crop: IRect?
-        ): NativePointer
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeSpotLitDiffuse")
-        external fun _nMakeSpotLitDiffuse(
-            x0: Float,
-            y0: Float,
-            z0: Float,
-            x1: Float,
-            y1: Float,
-            z1: Float,
-            falloffExponent: Float,
-            cutoffAngle: Float,
-            lightColor: Int,
-            surfaceScale: Float,
-            kd: Float,
-            input: NativePointer,
-            crop: IRect?
-        ): NativePointer
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDistantLitSpecular")
-        external fun _nMakeDistantLitSpecular(
-            x: Float,
-            y: Float,
-            z: Float,
-            lightColor: Int,
-            surfaceScale: Float,
-            ks: Float,
-            shininess: Float,
-            input: NativePointer,
-            crop: IRect?
-        ): NativePointer
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakePointLitSpecular")
-        external fun _nMakePointLitSpecular(
-            x: Float,
-            y: Float,
-            z: Float,
-            lightColor: Int,
-            surfaceScale: Float,
-            ks: Float,
-            shininess: Float,
-            input: NativePointer,
-            crop: IRect?
-        ): NativePointer
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeSpotLitSpecular")
-        external fun _nMakeSpotLitSpecular(
-            x0: Float,
-            y0: Float,
-            z0: Float,
-            x1: Float,
-            y1: Float,
-            z1: Float,
-            falloffExponent: Float,
-            cutoffAngle: Float,
-            lightColor: Int,
-            surfaceScale: Float,
-            ks: Float,
-            shininess: Float,
-            input: NativePointer,
-            crop: IRect?
-        ): NativePointer
-
         init {
             staticLoad()
         }
     }
 }
+
+@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeAlphaThreshold")
+private external fun _nMakeAlphaThreshold(
+    regionPtr: NativePointer,
+    innerMin: Float,
+    outerMax: Float,
+    input: NativePointer,
+    crop: IRect?
+): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeArithmetic")
+private external fun _nMakeArithmetic(
+    k1: Float,
+    k2: Float,
+    k3: Float,
+    k4: Float,
+    enforcePMColor: Boolean,
+    bg: NativePointer,
+    fg: NativePointer,
+    crop: IRect?
+): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeBlend")
+private external fun _nMakeBlend(blendMode: Int, bg: NativePointer, fg: NativePointer, crop: IRect?): NativePointer
+@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeBlur")
+private external fun _nMakeBlur(sigmaX: Float, sigmaY: Float, tileMode: Int, input: NativePointer, crop: IRect?): NativePointer
+@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeColorFilter")
+private external fun _nMakeColorFilter(colorFilterPtr: NativePointer, input: NativePointer, crop: IRect?): NativePointer
+@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeCompose")
+private external fun _nMakeCompose(outer: NativePointer, inner: NativePointer): NativePointer
+@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDisplacementMap")
+private external fun _nMakeDisplacementMap(
+    xChan: Int,
+    yChan: Int,
+    scale: Float,
+    displacement: NativePointer,
+    color: NativePointer,
+    crop: IRect?
+): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDropShadow")
+private external fun _nMakeDropShadow(
+    dx: Float,
+    dy: Float,
+    sigmaX: Float,
+    sigmaY: Float,
+    color: Int,
+    input: NativePointer,
+    crop: IRect?
+): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDropShadowOnly")
+private external fun _nMakeDropShadowOnly(
+    dx: Float,
+    dy: Float,
+    sigmaX: Float,
+    sigmaY: Float,
+    color: Int,
+    input: NativePointer,
+    crop: IRect?
+): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeImage")
+private external fun _nMakeImage(
+    image: NativePointer,
+    l0: Float,
+    t0: Float,
+    r0: Float,
+    b0: Float,
+    l1: Float,
+    t1: Float,
+    r1: Float,
+    b1: Float,
+    samplingMode: Long
+): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMagnifier")
+private external fun _nMakeMagnifier(
+    l: Float,
+    t: Float,
+    r: Float,
+    b: Float,
+    inset: Float,
+    input: NativePointer,
+    crop: IRect?
+): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMatrixConvolution")
+private external fun _nMakeMatrixConvolution(
+    kernelW: Int,
+    kernelH: Int,
+    kernel: FloatArray?,
+    gain: Float,
+    bias: Float,
+    offsetX: Int,
+    offsetY: Int,
+    tileMode: Int,
+    convolveAlpha: Boolean,
+    input: NativePointer,
+    crop: IRect?
+): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMatrixTransform")
+private external fun _nMakeMatrixTransform(matrix: FloatArray?, samplingMode: Long, input: NativePointer): NativePointer
+@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMerge")
+private external fun _nMakeMerge(filters: InteropPointer, crop: IRect?): NativePointer
+@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeOffset")
+private external fun _nMakeOffset(dx: Float, dy: Float, input: NativePointer, crop: IRect?): NativePointer
+@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakePaint")
+private external fun _nMakePaint(paint: NativePointer, crop: IRect?): NativePointer
+@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakePicture")
+private external fun _nMakePicture(picture: NativePointer, l: Float, t: Float, r: Float, b: Float): NativePointer
+@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeTile")
+private external fun _nMakeTile(
+    l0: Float,
+    t0: Float,
+    r0: Float,
+    b0: Float,
+    l1: Float,
+    t1: Float,
+    r1: Float,
+    b1: Float,
+    input: NativePointer
+): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDilate")
+private external fun _nMakeDilate(rx: Float, ry: Float, input: NativePointer, crop: IRect?): NativePointer
+@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeErode")
+private external fun _nMakeErode(rx: Float, ry: Float, input: NativePointer, crop: IRect?): NativePointer
+@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDistantLitDiffuse")
+private external fun _nMakeDistantLitDiffuse(
+    x: Float,
+    y: Float,
+    z: Float,
+    lightColor: Int,
+    surfaceScale: Float,
+    kd: Float,
+    input: NativePointer,
+    crop: IRect?
+): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakePointLitDiffuse")
+private external fun _nMakePointLitDiffuse(
+    x: Float,
+    y: Float,
+    z: Float,
+    lightColor: Int,
+    surfaceScale: Float,
+    kd: Float,
+    input: NativePointer,
+    crop: IRect?
+): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeSpotLitDiffuse")
+private external fun _nMakeSpotLitDiffuse(
+    x0: Float,
+    y0: Float,
+    z0: Float,
+    x1: Float,
+    y1: Float,
+    z1: Float,
+    falloffExponent: Float,
+    cutoffAngle: Float,
+    lightColor: Int,
+    surfaceScale: Float,
+    kd: Float,
+    input: NativePointer,
+    crop: IRect?
+): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDistantLitSpecular")
+private external fun _nMakeDistantLitSpecular(
+    x: Float,
+    y: Float,
+    z: Float,
+    lightColor: Int,
+    surfaceScale: Float,
+    ks: Float,
+    shininess: Float,
+    input: NativePointer,
+    crop: IRect?
+): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakePointLitSpecular")
+private external fun _nMakePointLitSpecular(
+    x: Float,
+    y: Float,
+    z: Float,
+    lightColor: Int,
+    surfaceScale: Float,
+    ks: Float,
+    shininess: Float,
+    input: NativePointer,
+    crop: IRect?
+): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeSpotLitSpecular")
+private external fun _nMakeSpotLitSpecular(
+    x0: Float,
+    y0: Float,
+    z0: Float,
+    x1: Float,
+    y1: Float,
+    z1: Float,
+    falloffExponent: Float,
+    cutoffAngle: Float,
+    lightColor: Int,
+    surfaceScale: Float,
+    ks: Float,
+    shininess: Float,
+    input: NativePointer,
+    crop: IRect?
+): NativePointer

@@ -6,13 +6,13 @@
 
 
 extern "C" jlong org_jetbrains_skia_RuntimeEffect__1nMakeShader
-    (kref __Kinstance, jlong ptr, jlong uniformPtr, jlongArray childrenPtrsArr, jfloatArray localMatrixArr, jboolean isOpaque) {
+    (jlong ptr, jlong uniformPtr, jlongArray childrenPtrsArr, jfloatArray localMatrixArr, jboolean isOpaque) {
     TODO("implement org_jetbrains_skia_RuntimeEffect__1nMakeShader");
 }
      
 #if 0 
 extern "C" jlong org_jetbrains_skia_RuntimeEffect__1nMakeShader
-    (kref __Kinstance, jlong ptr, jlong uniformPtr, jlongArray childrenPtrsArr, jfloatArray localMatrixArr, jboolean isOpaque) {
+    (jlong ptr, jlong uniformPtr, jlongArray childrenPtrsArr, jfloatArray localMatrixArr, jboolean isOpaque) {
     SkRuntimeEffect* runtimeEffect = jlongToPtr<SkRuntimeEffect*>(ptr);
     SkData* uniform = jlongToPtr<SkData*>(uniformPtr);
     std::unique_ptr<SkMatrix> localMatrix = skMatrix(env, localMatrixArr);
@@ -38,13 +38,13 @@ extern "C" jlong org_jetbrains_skia_RuntimeEffect__1nMakeShader
 
 
 extern "C" jlong org_jetbrains_skia_RuntimeEffect__1nMakeForShader
-    (kref __Kinstance, jstring sksl) {
+    (jstring sksl) {
     TODO("implement org_jetbrains_skia_RuntimeEffect__1nMakeForShader");
 }
      
 #if 0 
 extern "C" jlong org_jetbrains_skia_RuntimeEffect__1nMakeForShader
-    (kref __Kinstance, jstring sksl) {
+    (jstring sksl) {
     SkString skslProper = skString(env, sksl);
     SkRuntimeEffect::Result result = SkRuntimeEffect::MakeForShader(skslProper);
     if (result.errorText.isEmpty()) {
@@ -60,13 +60,13 @@ extern "C" jlong org_jetbrains_skia_RuntimeEffect__1nMakeForShader
 
 
 extern "C" jlong org_jetbrains_skia_RuntimeEffect__1nMakeForColorFilter
-    (kref __Kinstance, jstring sksl) {
+    (jstring sksl) {
     TODO("implement org_jetbrains_skia_RuntimeEffect__1nMakeForColorFilter");
 }
      
 #if 0 
 extern "C" jlong org_jetbrains_skia_RuntimeEffect__1nMakeForColorFilter
-    (kref __Kinstance, jstring sksl) {
+    (jstring sksl) {
     SkString skslProper = skString(env, sksl);
     SkRuntimeEffect::Result result = SkRuntimeEffect::MakeForColorFilter(skslProper);
     if (result.errorText.isEmpty()) {

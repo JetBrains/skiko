@@ -5,63 +5,17 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
-import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
-import kotlin.jvm.JvmStatic
 
 class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetFinalizer")
-        external fun _nGetFinalizer(): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nMake")
-        external fun _nMake(): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nMakePath")
-        external fun _nMakePath(pathPtr: NativePointer, forceClosed: Boolean, resScale: Float): NativePointer
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nSetPath")
-        external fun _nSetPath(ptr: NativePointer, pathPtr: NativePointer, forceClosed: Boolean)
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetLength")
-        external fun _nGetLength(ptr: NativePointer): Float
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetPosition")
-        external fun _nGetPosition(ptr: NativePointer, distance: Float): Point?
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetTangent")
-        external fun _nGetTangent(ptr: NativePointer, distance: Float): Point?
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetRSXform")
-        external fun _nGetRSXform(ptr: NativePointer, distance: Float): RSXform?
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetMatrix")
-        external fun _nGetMatrix(ptr: NativePointer, distance: Float, getPosition: Boolean, getTangent: Boolean): FloatArray?
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetSegment")
-        external fun _nGetSegment(
-            ptr: NativePointer,
-            startD: Float,
-            endD: Float,
-            dstPtr: NativePointer,
-            startWithMoveTo: Boolean
-        ): Boolean
-
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nIsClosed")
-        external fun _nIsClosed(ptr: NativePointer): Boolean
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nNextContour")
-        external fun _nNextContour(ptr: NativePointer): Boolean
-
         init {
             staticLoad()
         }
     }
 
-    constructor() : this(_nMake()) {
+    constructor() : this(PathMeasure_nMake()) {
         Stats.onNativeCall()
     }
     /**
@@ -225,6 +179,49 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
     }
 
     internal object _FinalizerHolder {
-        val PTR = _nGetFinalizer()
+        val PTR = PathMeasure_nGetFinalizer()
     }
 }
+
+@ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetFinalizer")
+private external fun PathMeasure_nGetFinalizer(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nMake")
+private external fun PathMeasure_nMake(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nMakePath")
+private external fun _nMakePath(pathPtr: NativePointer, forceClosed: Boolean, resScale: Float): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nSetPath")
+private external fun _nSetPath(ptr: NativePointer, pathPtr: NativePointer, forceClosed: Boolean)
+
+@ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetLength")
+private external fun _nGetLength(ptr: NativePointer): Float
+
+@ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetPosition")
+private external fun _nGetPosition(ptr: NativePointer, distance: Float): Point?
+
+@ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetTangent")
+private external fun _nGetTangent(ptr: NativePointer, distance: Float): Point?
+
+@ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetRSXform")
+private external fun _nGetRSXform(ptr: NativePointer, distance: Float): RSXform?
+
+@ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetMatrix")
+private external fun _nGetMatrix(ptr: NativePointer, distance: Float, getPosition: Boolean, getTangent: Boolean): FloatArray?
+
+@ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetSegment")
+private external fun _nGetSegment(
+    ptr: NativePointer,
+    startD: Float,
+    endD: Float,
+    dstPtr: NativePointer,
+    startWithMoveTo: Boolean
+): Boolean
+
+
+@ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nIsClosed")
+private external fun _nIsClosed(ptr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nNextContour")
+private external fun _nNextContour(ptr: NativePointer): Boolean

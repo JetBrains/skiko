@@ -10,30 +10,30 @@ static void deleteTextBlobBuilder(SkTextBlobBuilder* ptr) {
 }
 
 extern "C" jlong org_jetbrains_skia_TextBlobBuilder__1nGetFinalizer
-  (kref __Kinstance) {
+  () {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteTextBlobBuilder));
 }
 
 extern "C" jlong org_jetbrains_skia_TextBlobBuilder__1nMake
-  (kref __Kinstance) {
+  () {
     return reinterpret_cast<jlong>(new SkTextBlobBuilder());
 }
 
 extern "C" jlong org_jetbrains_skia_TextBlobBuilder__1nBuild
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkTextBlobBuilder* instance = reinterpret_cast<SkTextBlobBuilder*>(static_cast<uintptr_t>(ptr));
     return reinterpret_cast<jlong>(instance->make().release());
 }
 
 
 extern "C" void org_jetbrains_skia_TextBlobBuilder__1nAppendRun
-  (kref __Kinstance, jlong ptr, jlong fontPtr, jshortArray glyphsArr, jfloat x, jfloat y, jobject boundsObj) {
+  (jlong ptr, jlong fontPtr, jshortArray glyphsArr, jfloat x, jfloat y, jobject boundsObj) {
     TODO("implement org_jetbrains_skia_TextBlobBuilder__1nAppendRun");
 }
      
 #if 0 
 extern "C" void org_jetbrains_skia_TextBlobBuilder__1nAppendRun
-  (kref __Kinstance, jlong ptr, jlong fontPtr, jshortArray glyphsArr, jfloat x, jfloat y, jobject boundsObj) {
+  (jlong ptr, jlong fontPtr, jshortArray glyphsArr, jfloat x, jfloat y, jobject boundsObj) {
     SkTextBlobBuilder* instance = reinterpret_cast<SkTextBlobBuilder*>(static_cast<uintptr_t>(ptr));
     SkFont* font = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(fontPtr));
     jsize len = env->GetArrayLength(glyphsArr);
@@ -46,13 +46,13 @@ extern "C" void org_jetbrains_skia_TextBlobBuilder__1nAppendRun
 
 
 extern "C" void org_jetbrains_skia_TextBlobBuilder__1nAppendRunPosH
-  (kref __Kinstance, jlong ptr, jlong fontPtr, jshortArray glyphsArr, jfloatArray xsArr, jfloat y, jobject boundsObj) {
+  (jlong ptr, jlong fontPtr, jshortArray glyphsArr, jfloatArray xsArr, jfloat y, jobject boundsObj) {
     TODO("implement org_jetbrains_skia_TextBlobBuilder__1nAppendRunPosH");
 }
      
 #if 0 
 extern "C" void org_jetbrains_skia_TextBlobBuilder__1nAppendRunPosH
-  (kref __Kinstance, jlong ptr, jlong fontPtr, jshortArray glyphsArr, jfloatArray xsArr, jfloat y, jobject boundsObj) {
+  (jlong ptr, jlong fontPtr, jshortArray glyphsArr, jfloatArray xsArr, jfloat y, jobject boundsObj) {
     SkTextBlobBuilder* instance = reinterpret_cast<SkTextBlobBuilder*>(static_cast<uintptr_t>(ptr));
     SkFont* font = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(fontPtr));
     jsize len = env->GetArrayLength(glyphsArr);
@@ -66,13 +66,13 @@ extern "C" void org_jetbrains_skia_TextBlobBuilder__1nAppendRunPosH
 
 
 extern "C" void org_jetbrains_skia_TextBlobBuilder__1nAppendRunPos
-  (kref __Kinstance, jlong ptr, jlong fontPtr, jshortArray glyphsArr, jfloatArray posArr, jobject boundsObj) {
+  (jlong ptr, jlong fontPtr, jshortArray glyphsArr, jfloatArray posArr, jobject boundsObj) {
     TODO("implement org_jetbrains_skia_TextBlobBuilder__1nAppendRunPos");
 }
      
 #if 0 
 extern "C" void org_jetbrains_skia_TextBlobBuilder__1nAppendRunPos
-  (kref __Kinstance, jlong ptr, jlong fontPtr, jshortArray glyphsArr, jfloatArray posArr, jobject boundsObj) {
+  (jlong ptr, jlong fontPtr, jshortArray glyphsArr, jfloatArray posArr, jobject boundsObj) {
     SkTextBlobBuilder* instance = reinterpret_cast<SkTextBlobBuilder*>(static_cast<uintptr_t>(ptr));
     SkFont* font = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(fontPtr));
     jsize len = env->GetArrayLength(glyphsArr);
@@ -86,13 +86,13 @@ extern "C" void org_jetbrains_skia_TextBlobBuilder__1nAppendRunPos
 
 
 extern "C" void org_jetbrains_skia_TextBlobBuilder__1nAppendRunRSXform
-  (kref __Kinstance, jlong ptr, jlong fontPtr, jshortArray glyphsArr, jfloatArray xformArr) {
+  (jlong ptr, jlong fontPtr, jshortArray glyphsArr, jfloatArray xformArr) {
     TODO("implement org_jetbrains_skia_TextBlobBuilder__1nAppendRunRSXform");
 }
      
 #if 0 
 extern "C" void org_jetbrains_skia_TextBlobBuilder__1nAppendRunRSXform
-  (kref __Kinstance, jlong ptr, jlong fontPtr, jshortArray glyphsArr, jfloatArray xformArr) {
+  (jlong ptr, jlong fontPtr, jshortArray glyphsArr, jfloatArray xformArr) {
     SkTextBlobBuilder* instance = reinterpret_cast<SkTextBlobBuilder*>(static_cast<uintptr_t>(ptr));
     SkFont* font = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(fontPtr));
     jsize len = env->GetArrayLength(glyphsArr);

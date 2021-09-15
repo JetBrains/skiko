@@ -8,43 +8,43 @@ static void deletePathMeasure(SkPathMeasure* instance) {
     delete instance;
 }
 
-extern "C" jlong org_jetbrains_skia_PathMeasure__1nGetFinalizer(kref __Kinstance) {
+extern "C" jlong org_jetbrains_skia_PathMeasure__1nGetFinalizer() {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deletePathMeasure));
 }
 
 extern "C" jlong org_jetbrains_skia_PathMeasure__1nMake
-  (kref __Kinstance) {
+  () {
     return reinterpret_cast<jlong>(new SkPathMeasure());
 }
 
 extern "C" jlong org_jetbrains_skia_PathMeasure__1nMakePath
-  (kref __Kinstance, jlong pathPtr, jboolean forceClosed, jfloat resScale) {
+  (jlong pathPtr, jboolean forceClosed, jfloat resScale) {
     SkPath* path = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(pathPtr));
     return reinterpret_cast<jlong>(new SkPathMeasure(*path, forceClosed, resScale));
 }
 
 extern "C" void org_jetbrains_skia_PathMeasure__1nSetPath
-  (kref __Kinstance, jlong ptr, jlong pathPtr, jboolean forceClosed) {
+  (jlong ptr, jlong pathPtr, jboolean forceClosed) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>(static_cast<uintptr_t>(ptr));
     SkPath* path = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(pathPtr));
     instance->setPath(path, forceClosed);
 }
 
 extern "C" jfloat org_jetbrains_skia_PathMeasure__1nGetLength
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>(static_cast<uintptr_t>(ptr));
     return instance->getLength();
 }
 
 
 extern "C" jobject org_jetbrains_skia_PathMeasure__1nGetPosition
-  (kref __Kinstance, jlong ptr, jfloat distance) {
+  (jlong ptr, jfloat distance) {
     TODO("implement org_jetbrains_skia_PathMeasure__1nGetPosition");
 }
      
 #if 0 
 extern "C" jobject org_jetbrains_skia_PathMeasure__1nGetPosition
-  (kref __Kinstance, jlong ptr, jfloat distance) {
+  (jlong ptr, jfloat distance) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>(static_cast<uintptr_t>(ptr));
     SkPoint position;
     if (instance->getPosTan(distance, &position, nullptr))
@@ -57,13 +57,13 @@ extern "C" jobject org_jetbrains_skia_PathMeasure__1nGetPosition
 
 
 extern "C" jobject org_jetbrains_skia_PathMeasure__1nGetTangent
-  (kref __Kinstance, jlong ptr, jfloat distance) {
+  (jlong ptr, jfloat distance) {
     TODO("implement org_jetbrains_skia_PathMeasure__1nGetTangent");
 }
      
 #if 0 
 extern "C" jobject org_jetbrains_skia_PathMeasure__1nGetTangent
-  (kref __Kinstance, jlong ptr, jfloat distance) {
+  (jlong ptr, jfloat distance) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>(static_cast<uintptr_t>(ptr));
     SkVector tangent;
     if (instance->getPosTan(distance, nullptr, &tangent))
@@ -76,13 +76,13 @@ extern "C" jobject org_jetbrains_skia_PathMeasure__1nGetTangent
 
 
 extern "C" jobject org_jetbrains_skia_PathMeasure__1nGetRSXform
-  (kref __Kinstance, jlong ptr, jfloat distance) {
+  (jlong ptr, jfloat distance) {
     TODO("implement org_jetbrains_skia_PathMeasure__1nGetRSXform");
 }
      
 #if 0 
 extern "C" jobject org_jetbrains_skia_PathMeasure__1nGetRSXform
-  (kref __Kinstance, jlong ptr, jfloat distance) {
+  (jlong ptr, jfloat distance) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>(static_cast<uintptr_t>(ptr));
     SkPoint position;
     SkVector tangent;
@@ -96,13 +96,13 @@ extern "C" jobject org_jetbrains_skia_PathMeasure__1nGetRSXform
 
 
 extern "C" jobject org_jetbrains_skia_PathMeasure__1nGetMatrix
-  (kref __Kinstance, jlong ptr, jfloat distance, jboolean getPosition, jboolean getTangent) {
+  (jlong ptr, jfloat distance, jboolean getPosition, jboolean getTangent) {
     TODO("implement org_jetbrains_skia_PathMeasure__1nGetMatrix");
 }
      
 #if 0 
 extern "C" jobject org_jetbrains_skia_PathMeasure__1nGetMatrix
-  (kref __Kinstance, jlong ptr, jfloat distance, jboolean getPosition, jboolean getTangent) {
+  (jlong ptr, jfloat distance, jboolean getPosition, jboolean getTangent) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>(static_cast<uintptr_t>(ptr));
     SkMatrix matrix;
     int flags = 0;
@@ -123,20 +123,20 @@ extern "C" jobject org_jetbrains_skia_PathMeasure__1nGetMatrix
 
 
 extern "C" jboolean org_jetbrains_skia_PathMeasure__1nGetSegment
-  (kref __Kinstance, jlong ptr, jfloat startD, jfloat endD, jlong dstPtr, jboolean startWithMoveTo) {
+  (jlong ptr, jfloat startD, jfloat endD, jlong dstPtr, jboolean startWithMoveTo) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>(static_cast<uintptr_t>(ptr));
     SkPath* dst = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(dstPtr));
     return instance->getSegment(startD, endD, dst, startWithMoveTo);
 }
 
 extern "C" jboolean org_jetbrains_skia_PathMeasure__1nIsClosed
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>(static_cast<uintptr_t>(ptr));
     return instance->isClosed();
 }
 
 extern "C" jboolean org_jetbrains_skia_PathMeasure__1nNextContour
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>(static_cast<uintptr_t>(ptr));
     return instance->nextContour();
 }

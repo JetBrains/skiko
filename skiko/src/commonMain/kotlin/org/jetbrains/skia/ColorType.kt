@@ -1,9 +1,6 @@
 @file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia
 
-import org.jetbrains.skia.ExternalSymbolName
-import kotlin.jvm.JvmStatic
-
 /**
  * Describes how pixel bits encode color. A pixel may be an alpha mask, a
  * grayscale, RGB, or ARGB.
@@ -318,9 +315,6 @@ enum class ColorType {
          * Native ARGB 32-bit encoding
          */
         var N32 = BGRA_8888
-        @JvmStatic
-        @ExternalSymbolName("org_jetbrains_skia_ColorType__1nIsAlwaysOpaque")
-        external fun _nIsAlwaysOpaque(value: Int): Boolean
     }
 
     /**
@@ -336,3 +330,5 @@ enum class ColorType {
 
 }
 
+@ExternalSymbolName("org_jetbrains_skia_ColorType__1nIsAlwaysOpaque")
+private external fun _nIsAlwaysOpaque(value: Int): Boolean

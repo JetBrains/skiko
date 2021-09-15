@@ -5,7 +5,7 @@
 #include "common.h"
 
 extern "C" jlong org_jetbrains_skia_PathSegmentIterator__1nMake
-  (kref __Kinstance, jlong pathPtr, jboolean forceClose) {
+  (jlong pathPtr, jboolean forceClose) {
     SkPath* path = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(pathPtr));
     SkPath::Iter* iter = new SkPath::Iter(*path, forceClose);
     return reinterpret_cast<jlong>(iter);
@@ -17,19 +17,19 @@ static void deletePathSegmentIterator(SkPath::Iter* iter) {
 }
 
 extern "C" jlong org_jetbrains_skia_PathSegmentIterator__1nGetFinalizer
-  (kref __Kinstance) {
+  () {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deletePathSegmentIterator));
 }
 
 
 extern "C" jobject org_jetbrains_skia_PathSegmentIterator__1nNext
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     TODO("implement org_jetbrains_skia_PathSegmentIterator__1nNext");
 }
      
 #if 0 
 extern "C" jobject org_jetbrains_skia_PathSegmentIterator__1nNext
-  (kref __Kinstance, jlong ptr) {
+  (jlong ptr) {
     SkPath::Iter* instance = reinterpret_cast<SkPath::Iter*>(static_cast<uintptr_t>(ptr));
     SkPoint pts[4];
     SkPath::Verb verb = instance->next(pts);
