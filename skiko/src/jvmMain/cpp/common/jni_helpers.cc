@@ -1,6 +1,6 @@
 #include "jni_helpers.h"
 
-JavaVM *jvm = NULL;
+JavaVM *jvmPointer = NULL;
 
 std::string handleException(std::string function)
 {
@@ -39,9 +39,9 @@ std::string handleException(std::string function)
 
 void logJavaException(JNIEnv *env, std::string message)
 {
-    if (jvm == NULL)
+    if (jvmPointer == NULL)
     {
-        env->GetJavaVM(&jvm);
+        env->GetJavaVM(&jvmPointer);
     }
 
     static jclass logClass = NULL;
