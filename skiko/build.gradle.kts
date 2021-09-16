@@ -547,7 +547,7 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
                     // Hack to fix problem with linker not always finding certain declarations.
                     "$skia/libsksg.a",
                     "$skia/libskia.a",
-                    "$skia/libskshaper.a"
+                    "$skia/libskunicode.a"
                     )
             )
         }
