@@ -586,16 +586,18 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         require(colors == null || colors.size == positions.size) { "Expected colors.length == positions.length, got: " + colors!!.size + " != " + positions.size }
         require(texCoords == null || texCoords.size == positions.size) { "Expected texCoords.length == positions.length, got: " + texCoords!!.size + " != " + positions.size }
         Stats.onNativeCall()
-        _nDrawVertices(
-            _ptr,
-            0 /* kTriangles_VertexMode */,
-            Point.flattenArray(positions),
-            colors,
-            Point.flattenArray(texCoords),
-            indices,
-            mode.ordinal,
-            getPtr(paint)
-        )
+        interopScope {
+            _nDrawVertices(
+                _ptr,
+                0 /* kTriangles_VertexMode */,
+                toInterop(Point.flattenArray(positions)),
+                toInterop(colors),
+                toInterop(Point.flattenArray(texCoords)),
+                toInterop(indices),
+                mode.ordinal,
+                getPtr(paint)
+            )
+        }
         reachabilityBarrier(paint)
         return this
     }
@@ -689,16 +691,18 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         require(colors == null || colors.size == positions.size) { "Expected colors.length == positions.length, got: " + colors!!.size + " != " + positions.size }
         require(texCoords == null || texCoords.size == positions.size) { "Expected texCoords.length == positions.length, got: " + texCoords!!.size + " != " + positions.size }
         Stats.onNativeCall()
-        _nDrawVertices(
-            _ptr,
-            1 /* kTriangleStrip_VertexMode */,
-            Point.flattenArray(positions),
-            colors,
-            Point.flattenArray(texCoords),
-            indices,
-            mode.ordinal,
-            getPtr(paint)
-        )
+        interopScope {
+            _nDrawVertices(
+                _ptr,
+                1 /* kTriangleStrip_VertexMode */,
+                toInterop(Point.flattenArray(positions)),
+                toInterop(colors),
+                toInterop(Point.flattenArray(texCoords)),
+                toInterop(indices),
+                mode.ordinal,
+                getPtr(paint)
+            )
+        }
         reachabilityBarrier(paint)
         return this
     }
@@ -792,16 +796,71 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         require(colors == null || colors.size == positions.size) { "Expected colors.length == positions.length, got: " + colors!!.size + " != " + positions.size }
         require(texCoords == null || texCoords.size == positions.size) { "Expected texCoords.length == positions.length, got: " + texCoords!!.size + " != " + positions.size }
         Stats.onNativeCall()
-        _nDrawVertices(
-            _ptr,
-            2 /* kTriangleFan_VertexMode */,
-            Point.flattenArray(positions),
-            colors,
-            Point.flattenArray(texCoords),
-            indices,
-            mode.ordinal,
-            getPtr(paint)
-        )
+        interopScope {
+            _nDrawVertices(
+                _ptr,
+                2 /* kTriangleFan_VertexMode */,
+                toInterop(Point.flattenArray(positions)),
+                toInterop(colors),
+                toInterop(Point.flattenArray(texCoords)),
+                toInterop(indices),
+                mode.ordinal,
+                getPtr(paint)
+            )
+        }
+        reachabilityBarrier(paint)
+        return this
+    }
+
+    /**
+     *
+     * Draws a triangle, triangle strip or triangle fan mesh, using clip and Matrix.
+     *
+     *
+     * If paint contains an Shader and vertices does not contain texCoords, the shader
+     * is mapped using the vertices' positions.
+     *
+     *
+     * If vertices colors are defined in vertices, and Paint paint contains Shader,
+     * BlendMode mode combines vertices colors with Shader.
+     *
+     * @param vertexMode 0 - triangles, 1 - triangle strip, 2 - triangle fan
+     * @param positions  flattened array of the mesh to draw
+     * @param colors     color array, one for each corner; may be null
+     * @param texCoords  flattened Point array of texture coordinates, mapping Shader to corners; may be null
+     * @param indices    with which indices points should be drawn; may be null
+     * @param mode       combines vertices colors with Shader, if both are present
+     * @param paint      specifies the Shader, used as Vertices texture
+     *
+     * @see [https://fiddle.skia.org/c/@Canvas_drawVertices](https://fiddle.skia.org/c/@Canvas_drawVertices)
+     *
+     * @see [https://fiddle.skia.org/c/@Canvas_drawVertices_2](https://fiddle.skia.org/c/@Canvas_drawVertices_2)
+     */
+
+    fun drawVertices(
+        vertexMode: VertexMode,
+        positions: FloatArray,
+        colors: IntArray?,
+        texCoords: FloatArray?,
+        indices: ShortArray?,
+        mode: BlendMode,
+        paint: Paint
+    ): Canvas {
+        require(colors == null || colors.size == positions.size) { "Expected colors.length == positions.length, got: " + colors!!.size + " != " + positions.size }
+        require(texCoords == null || texCoords.size == positions.size) { "Expected texCoords.length == positions.length, got: " + texCoords!!.size + " != " + positions.size }
+        Stats.onNativeCall()
+        interopScope {
+            _nDrawVertices(
+                _ptr,
+                vertexMode.ordinal,
+                toInterop(positions),
+                toInterop(colors),
+                toInterop(texCoords),
+                toInterop(indices),
+                mode.ordinal,
+                getPtr(paint)
+            )
+        }
         reachabilityBarrier(paint)
         return this
     }
@@ -1504,10 +1563,10 @@ private external fun _nDrawPicture(ptr: NativePointer, picturePtr: NativePointer
 private external fun _nDrawVertices(
     ptr: NativePointer,
     verticesMode: Int,
-    cubics: FloatArray?,
-    colors: IntArray?,
-    texCoords: FloatArray?,
-    indices: ShortArray?,
+    cubics: InteropPointer,
+    colors: InteropPointer,
+    texCoords: InteropPointer,
+    indices: InteropPointer,
     blendMode: Int,
     paintPtr: NativePointer
 )
