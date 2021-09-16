@@ -73,7 +73,6 @@ actual class InteropScope actual constructor() {
     actual fun release() {}
 }
 
-// Ugly! NativePtrArray in stdlib is unfortunately internal, don't have ctor and cannot be used.
 actual class NativePointerArray constructor(size: Int, internal val backing: LongArray) {
 
     actual constructor(size: Int) : this(size, LongArray(size))
