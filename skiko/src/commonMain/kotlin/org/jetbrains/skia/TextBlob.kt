@@ -1,12 +1,8 @@
 @file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.Managed
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.reachabilityBarrier
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.getPtr
 
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetFinalizer")
@@ -28,13 +24,13 @@ private external fun _nBounds(ptr: NativePointer): Rect
 private external fun _nGetIntercepts(ptr: NativePointer, lower: Float, upper: Float, paintPtr: NativePointer): FloatArray?
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromPosH")
-private external fun _nMakeFromPosH(glyphs: ShortArray?, xpos: FloatArray?, ypos: Float, fontPtr: NativePointer): NativePointer
+private external fun _nMakeFromPosH(glyphs: InteropPointer, xpos: InteropPointer, ypos: Float, fontPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromPos")
-private external fun _nMakeFromPos(glyphs: ShortArray?, pos: FloatArray?, fontPtr: NativePointer): NativePointer
+private external fun _nMakeFromPos(glyphs: InteropPointer, pos: InteropPointer, fontPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromRSXform")
-private external fun _nMakeFromRSXform(glyphs: ShortArray?, xform: FloatArray?, fontPtr: NativePointer): NativePointer
+private external fun _nMakeFromRSXform(glyphs: InteropPointer, xform: InteropPointer, fontPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetGlyphs")
 private external fun _nGetGlyphs(ptr: NativePointer): ShortArray
@@ -73,12 +69,14 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
             return try {
                 require(glyphs.size == xpos.size) { "glyphs.length " + glyphs.size + " != xpos.length " + xpos.size }
                 Stats.onNativeCall()
-                val ptr = _nMakeFromPosH(
-                    glyphs,
-                    xpos,
-                    ypos,
-                    getPtr(font)
-                )
+                val ptr = interopScope {
+                    _nMakeFromPosH(
+                        toInterop(glyphs),
+                        toInterop(xpos),
+                        ypos,
+                        getPtr(font)
+                    )
+                }
                 if (ptr == NullPointer) null else TextBlob(ptr)
             } finally {
                 reachabilityBarrier(font)
@@ -104,7 +102,9 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
                 }
                 Stats.onNativeCall()
                 val ptr =
-                    _nMakeFromPos(glyphs, floatPos, getPtr(font))
+                    interopScope {
+                        _nMakeFromPos(toInterop(glyphs), toInterop(floatPos), getPtr(font))
+                    }
                 if (ptr == NullPointer) null else TextBlob(ptr)
             } finally {
                 reachabilityBarrier(font)
@@ -122,11 +122,13 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
                     floatXform[i * 4 + 3] = xform[i].ty
                 }
                 Stats.onNativeCall()
-                val ptr = _nMakeFromRSXform(
-                    glyphs,
-                    floatXform,
-                    getPtr(font)
-                )
+                val ptr = interopScope {
+                    _nMakeFromRSXform(
+                        toInterop(glyphs),
+                        toInterop(floatXform),
+                        getPtr(font)
+                    )
+                }
                 if (ptr == NullPointer) null else TextBlob(ptr)
             } finally {
                 reachabilityBarrier(font)

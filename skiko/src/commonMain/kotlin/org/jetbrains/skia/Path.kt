@@ -193,7 +193,11 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
          */
         fun makeFromBytes(data: ByteArray?): Path {
             Stats.onNativeCall()
-            return Path(_nMakeFromBytes(data))
+            return Path(
+                interopScope {
+                    _nMakeFromBytes(toInterop(data))
+                }
+            )
         }
 
         init {
@@ -640,7 +644,9 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
             require(if (verbs == null) max == 0 else true)
             Stats.onNativeCall()
             val out = if (verbs == null) null else ByteArray(max)
-            val count = _nGetVerbs(_ptr, out, max)
+            val count = interopScope {
+                _nGetVerbs(_ptr, toInterop(out), max)
+            }
             if (verbs != null) for (i in 0 until minOf(count, max)) verbs[i] = PathVerb.values().get(
                 out!![i].toInt()
             )
@@ -1668,7 +1674,9 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     fun addPoly(pts: FloatArray, close: Boolean): Path {
         require(pts.size % 2 == 0) { "Expected even amount of pts, got " + pts.size }
         Stats.onNativeCall()
-        _nAddPoly(_ptr, pts, close)
+        interopScope {
+            _nAddPoly(_ptr, toInterop(pts), close)
+        }
         return this
     }
     /**
@@ -1782,12 +1790,14 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     fun addPath(src: Path?, matrix: Matrix33, extend: Boolean = false): Path {
         return try {
             Stats.onNativeCall()
-            _nAddPathTransform(
-                _ptr,
-                getPtr(src),
-                matrix.mat,
-                extend
-            )
+            interopScope {
+                _nAddPathTransform(
+                    _ptr,
+                    getPtr(src),
+                    toInterop(matrix.mat),
+                    extend
+                )
+            }
             this
         } finally {
             reachabilityBarrier(src)
@@ -1888,12 +1898,14 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     fun transform(matrix: Matrix33, dst: Path? = null, applyPerspectiveClip: Boolean = true): Path {
         return try {
             Stats.onNativeCall()
-            _nTransform(
-                _ptr,
-                matrix.mat,
-                getPtr(dst),
-                applyPerspectiveClip
-            )
+            interopScope {
+                _nTransform(
+                    _ptr,
+                    toInterop(matrix.mat),
+                    getPtr(dst),
+                    applyPerspectiveClip
+                )
+            }
             this
         } finally {
             reachabilityBarrier(dst)
@@ -2220,7 +2232,7 @@ private external fun _nGetPoints(ptr: NativePointer, points: Array<Point?>?, max
 private external fun _nCountVerbs(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nGetVerbs")
-private external fun _nGetVerbs(ptr: NativePointer, verbs: ByteArray?, max: Int): Int
+private external fun _nGetVerbs(ptr: NativePointer, verbs: InteropPointer, max: Int): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nApproximateBytesUsed")
 private external fun _nApproximateBytesUsed(ptr: NativePointer): NativePointer
@@ -2358,7 +2370,7 @@ private external fun _nAddRRect(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nAddPoly")
-private external fun _nAddPoly(ptr: NativePointer, coords: FloatArray?, close: Boolean)
+private external fun _nAddPoly(ptr: NativePointer, coords: InteropPointer, close: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nAddPath")
 private external fun _nAddPath(ptr: NativePointer, srcPtr: NativePointer, extend: Boolean)
@@ -2367,7 +2379,7 @@ private external fun _nAddPath(ptr: NativePointer, srcPtr: NativePointer, extend
 private external fun _nAddPathOffset(ptr: NativePointer, srcPtr: NativePointer, dx: Float, dy: Float, extend: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nAddPathTransform")
-private external fun _nAddPathTransform(ptr: NativePointer, srcPtr: NativePointer, matrix: FloatArray?, extend: Boolean)
+private external fun _nAddPathTransform(ptr: NativePointer, srcPtr: NativePointer, matrix: InteropPointer, extend: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nReverseAddPath")
 private external fun _nReverseAddPath(ptr: NativePointer, srcPtr: NativePointer)
@@ -2376,7 +2388,7 @@ private external fun _nReverseAddPath(ptr: NativePointer, srcPtr: NativePointer)
 private external fun _nOffset(ptr: NativePointer, dx: Float, dy: Float, dst: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nTransform")
-private external fun _nTransform(ptr: NativePointer, matrix: FloatArray?, dst: NativePointer, applyPerspectiveClip: Boolean)
+private external fun _nTransform(ptr: NativePointer, matrix: InteropPointer, dst: NativePointer, applyPerspectiveClip: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nGetLastPt")
 private external fun _nGetLastPt(ptr: NativePointer): Point
@@ -2403,7 +2415,7 @@ private external fun _nSerializeToBytes(ptr: NativePointer): ByteArray
 private external fun _nMakeCombining(onePtr: NativePointer, twoPtr: NativePointer, op: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nMakeFromBytes")
-private external fun _nMakeFromBytes(data: ByteArray?): NativePointer
+private external fun _nMakeFromBytes(data: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nIsValid")
 private external fun _nIsValid(ptr: NativePointer): Boolean

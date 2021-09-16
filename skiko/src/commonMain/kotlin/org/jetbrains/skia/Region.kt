@@ -2,12 +2,8 @@
 
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.Managed
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.getPtr
-import org.jetbrains.skia.impl.reachabilityBarrier
 
 class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     companion object {
@@ -113,7 +109,9 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
                 arr[i * 4 + 3] = rects[i].bottom
             }
             Stats.onNativeCall()
-            _nSetRects(_ptr, arr)
+            interopScope {
+                _nSetRects(_ptr, toInterop(arr))
+            }
         } finally {
             reachabilityBarrier(this)
         }
@@ -360,7 +358,7 @@ private external fun _nSetEmpty(ptr: NativePointer): Boolean
 private external fun _nSetRect(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Region__1nSetRects")
-private external fun _nSetRects(ptr: NativePointer, rects: IntArray?): Boolean
+private external fun _nSetRects(ptr: NativePointer, rects: InteropPointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Region__1nSetRegion")
 private external fun _nSetRegion(ptr: NativePointer, regionPtr: NativePointer): Boolean

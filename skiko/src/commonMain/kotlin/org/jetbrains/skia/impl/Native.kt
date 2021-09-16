@@ -42,14 +42,7 @@ expect class InteropScope() {
     fun release()
 }
 
-inline fun <T> interopScope(block: InteropScope.() -> T): T {
-    val scope = InteropScope()
-    try {
-        return scope.block()
-    } finally {
-        scope.release()
-    }
-}
+expect inline fun <T> interopScope(block: InteropScope.() -> T): T
 
 inline fun withResult(result: ByteArray, block: (InteropPointer) -> Unit): ByteArray = interopScope {
     val handle = toInterop(result)

@@ -1,12 +1,8 @@
 @file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.RefCnt
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.reachabilityBarrier
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.getPtr
 
 class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInfo {
     companion object {
@@ -34,15 +30,17 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
         fun makeRaster(imageInfo: ImageInfo, bytes: ByteArray, rowBytes: NativePointer): Image {
             return try {
                 Stats.onNativeCall()
-                val ptr = _nMakeRaster(
-                    imageInfo.width,
-                    imageInfo.height,
-                    imageInfo.colorInfo.colorType.ordinal,
-                    imageInfo.colorInfo.alphaType.ordinal,
-                    getPtr(imageInfo.colorInfo.colorSpace),
-                    bytes,
-                    rowBytes
-                )
+                val ptr = interopScope {
+                    _nMakeRaster(
+                        imageInfo.width,
+                        imageInfo.height,
+                        imageInfo.colorInfo.colorType.ordinal,
+                        imageInfo.colorInfo.alphaType.ordinal,
+                        getPtr(imageInfo.colorInfo.colorSpace),
+                        toInterop(bytes),
+                        rowBytes
+                    )
+                }
                 if (ptr == NullPointer) throw RuntimeException("Failed to makeRaster $imageInfo $bytes $rowBytes")
                 Image(ptr)
             } finally {
@@ -136,7 +134,9 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
 
         fun makeFromEncoded(bytes: ByteArray?): Image {
             Stats.onNativeCall()
-            val ptr = _nMakeFromEncoded(bytes)
+            val ptr = interopScope {
+                _nMakeFromEncoded(toInterop(bytes))
+            }
             require(ptr != NullPointer) { "Failed to Image::makeFromEncoded" }
             return Image(ptr)
         }
@@ -229,13 +229,15 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
         return try {
             Stats.onNativeCall()
             Shader(
-                Image_nMakeShader(
-                    _ptr,
-                    tmx.ordinal,
-                    tmy.ordinal,
-                    sampling._pack(),
-                    localMatrix?.mat
-                )
+                interopScope {
+                    Image_nMakeShader(
+                        _ptr,
+                        tmx.ordinal,
+                        tmy.ordinal,
+                        sampling._pack(),
+                        toInterop(localMatrix?.mat)
+                    )
+                }
             )
         } finally {
             reachabilityBarrier(this)
@@ -370,7 +372,7 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
 private external fun Image_nGetImageInfo(ptr: NativePointer): ImageInfo?
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeShader")
-private external fun Image_nMakeShader(ptr: NativePointer, tmx: Int, tmy: Int, samplingMode: Long, localMatrix: FloatArray?): NativePointer
+private external fun Image_nMakeShader(ptr: NativePointer, tmx: Int, tmy: Int, samplingMode: Long, localMatrix: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nPeekPixels")
 private external fun Image_nPeekPixels(ptr: NativePointer): ByteBuffer?
@@ -382,7 +384,7 @@ private external fun _nMakeRaster(
     colorType: Int,
     alphaType: Int,
     colorSpacePtr: NativePointer,
-    pixels: ByteArray?,
+    pixels: InteropPointer,
     rowBytes: NativePointer
 ): NativePointer
 
@@ -406,7 +408,7 @@ private external fun _nMakeFromBitmap(bitmapPtr: NativePointer): NativePointer
 private external fun _nMakeFromPixmap(pixmapPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeFromEncoded")
-private external fun _nMakeFromEncoded(bytes: ByteArray?): NativePointer
+private external fun _nMakeFromEncoded(bytes: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nEncodeToData")
 private external fun _nEncodeToData(ptr: NativePointer, format: Int, quality: Int): NativePointer

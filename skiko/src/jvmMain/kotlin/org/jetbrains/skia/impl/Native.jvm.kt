@@ -50,7 +50,12 @@ actual typealias NativePointer = Long
 
 actual typealias InteropPointer = Any?
 
-actual class InteropScope actual constructor() {
+object theScope: InteropScope()
+actual inline fun <T> interopScope(block: InteropScope.() -> T): T {
+    return theScope.block()
+}
+
+actual open class InteropScope actual constructor() {
     actual fun toInterop(string: String?): InteropPointer = string
     actual fun InteropPointer.fromInterop(result: CharArray) {}
     actual fun toInterop(array: ByteArray?): InteropPointer = array

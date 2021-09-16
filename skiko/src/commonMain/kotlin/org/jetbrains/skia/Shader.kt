@@ -1,12 +1,8 @@
 @file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.RefCnt
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.reachabilityBarrier
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.getPtr
 
 class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
@@ -41,17 +37,19 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             require(positions == null || colors.size == positions.size) { "colors.length " + colors.size + "!= positions.length " + positions!!.size }
             Stats.onNativeCall()
             return Shader(
-                _nMakeLinearGradient(
-                    x0,
-                    y0,
-                    x1,
-                    y1,
-                    colors,
-                    positions,
-                    style.tileMode.ordinal,
-                    style._getFlags(),
-                    style._getMatrixArray()
-                )
+                interopScope {
+                    _nMakeLinearGradient(
+                        x0,
+                        y0,
+                        x1,
+                        y1,
+                        toInterop(colors),
+                        toInterop(positions),
+                        style.tileMode.ordinal,
+                        style._getFlags(),
+                        toInterop(style._getMatrixArray())
+                    )
+                }
             )
         }
 
@@ -80,18 +78,20 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                 require(positions == null || colors.size == positions.size) { "colors.length " + colors.size + "!= positions.length " + positions!!.size }
                 Stats.onNativeCall()
                 Shader(
-                    _nMakeLinearGradientCS(
-                        x0,
-                        y0,
-                        x1,
-                        y1,
-                        Color4f.flattenArray(colors),
-                        getPtr(cs),
-                        positions,
-                        style.tileMode.ordinal,
-                        style._getFlags(),
-                        style._getMatrixArray()
-                    )
+                    interopScope {
+                        _nMakeLinearGradientCS(
+                            x0,
+                            y0,
+                            x1,
+                            y1,
+                            toInterop(Color4f.flattenArray(colors)),
+                            getPtr(cs),
+                            toInterop(positions),
+                            style.tileMode.ordinal,
+                            style._getFlags(),
+                            toInterop(style._getMatrixArray())
+                        )
+                    }
                 )
             } finally {
                 reachabilityBarrier(cs)
@@ -128,16 +128,18 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             require(positions == null || colors.size == positions.size) { "colors.length " + colors.size + "!= positions.length " + positions!!.size }
             Stats.onNativeCall()
             return Shader(
-                _nMakeRadialGradient(
-                    x,
-                    y,
-                    r,
-                    colors,
-                    positions,
-                    style.tileMode.ordinal,
-                    style._getFlags(),
-                    style._getMatrixArray()
-                )
+                interopScope {
+                    _nMakeRadialGradient(
+                        x,
+                        y,
+                        r,
+                        toInterop(colors),
+                        toInterop(positions),
+                        style.tileMode.ordinal,
+                        style._getFlags(),
+                        toInterop(style._getMatrixArray())
+                    )
+                }
             )
         }
 
@@ -165,17 +167,19 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                 require(positions == null || colors.size == positions.size) { "colors.length " + colors.size + "!= positions.length " + positions!!.size }
                 Stats.onNativeCall()
                 Shader(
-                    _nMakeRadialGradientCS(
-                        x,
-                        y,
-                        r,
-                        Color4f.flattenArray(colors),
-                        getPtr(cs),
-                        positions,
-                        style.tileMode.ordinal,
-                        style._getFlags(),
-                        style._getMatrixArray()
-                    )
+                    interopScope {
+                        _nMakeRadialGradientCS(
+                            x,
+                            y,
+                            r,
+                            toInterop(Color4f.flattenArray(colors)),
+                            getPtr(cs),
+                            toInterop(positions),
+                            style.tileMode.ordinal,
+                            style._getFlags(),
+                            toInterop(style._getMatrixArray())
+                        )
+                    }
                 )
             } finally {
                 reachabilityBarrier(cs)
@@ -224,19 +228,21 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             require(positions == null || colors.size == positions.size) { "colors.length " + colors.size + "!= positions.length " + positions!!.size }
             Stats.onNativeCall()
             return Shader(
-                _nMakeTwoPointConicalGradient(
-                    x0,
-                    y0,
-                    r0,
-                    x1,
-                    y1,
-                    r1,
-                    colors,
-                    positions,
-                    style.tileMode.ordinal,
-                    style._getFlags(),
-                    style._getMatrixArray()
-                )
+                interopScope {
+                    _nMakeTwoPointConicalGradient(
+                        x0,
+                        y0,
+                        r0,
+                        x1,
+                        y1,
+                        r1,
+                        toInterop(colors),
+                        toInterop(positions),
+                        style.tileMode.ordinal,
+                        style._getFlags(),
+                        toInterop(style._getMatrixArray())
+                    )
+                }
             )
         }
 
@@ -269,20 +275,22 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                 require(positions == null || colors.size == positions.size) { "colors.length " + colors.size + "!= positions.length " + positions!!.size }
                 Stats.onNativeCall()
                 Shader(
-                    _nMakeTwoPointConicalGradientCS(
-                        x0,
-                        y0,
-                        r0,
-                        x1,
-                        y1,
-                        r1,
-                        Color4f.flattenArray(colors),
-                        getPtr(cs),
-                        positions,
-                        style.tileMode.ordinal,
-                        style._getFlags(),
-                        style._getMatrixArray()
-                    )
+                    interopScope {
+                        _nMakeTwoPointConicalGradientCS(
+                            x0,
+                            y0,
+                            r0,
+                            x1,
+                            y1,
+                            r1,
+                            toInterop(Color4f.flattenArray(colors)),
+                            getPtr(cs),
+                            toInterop(positions),
+                            style.tileMode.ordinal,
+                            style._getFlags(),
+                            toInterop(style._getMatrixArray())
+                        )
+                    }
                 )
             } finally {
                 reachabilityBarrier(cs)
@@ -343,17 +351,19 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             require(positions == null || colors.size == positions.size) { "colors.length " + colors.size + "!= positions.length " + positions!!.size }
             Stats.onNativeCall()
             return Shader(
-                _nMakeSweepGradient(
-                    x,
-                    y,
-                    startAngle,
-                    endAngle,
-                    colors,
-                    positions,
-                    style.tileMode.ordinal,
-                    style._getFlags(),
-                    style._getMatrixArray()
-                )
+                interopScope {
+                    _nMakeSweepGradient(
+                        x,
+                        y,
+                        startAngle,
+                        endAngle,
+                        toInterop(colors),
+                        toInterop(positions),
+                        style.tileMode.ordinal,
+                        style._getFlags(),
+                        toInterop(style._getMatrixArray())
+                    )
+                }
             )
         }
 
@@ -383,18 +393,20 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                 require(positions == null || colors.size == positions.size) { "colors.length " + colors.size + "!= positions.length " + positions!!.size }
                 Stats.onNativeCall()
                 Shader(
-                    _nMakeSweepGradientCS(
-                        x,
-                        y,
-                        startAngle,
-                        endAngle,
-                        Color4f.flattenArray(colors),
-                        getPtr(cs),
-                        positions,
-                        style.tileMode.ordinal,
-                        style._getFlags(),
-                        style._getMatrixArray()
-                    )
+                    interopScope {
+                        _nMakeSweepGradientCS(
+                            x,
+                            y,
+                            startAngle,
+                            endAngle,
+                            toInterop(Color4f.flattenArray(colors)),
+                            getPtr(cs),
+                            toInterop(positions),
+                            style.tileMode.ordinal,
+                            style._getFlags(),
+                            toInterop(style._getMatrixArray())
+                        )
+                    }
                 )
             } finally {
                 reachabilityBarrier(cs)
@@ -459,7 +471,11 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                     arr[i * 2 + 1] = tiles[i].height
                 }
                 Stats.onNativeCall()
-                Shader(_nMakeFractalNoise(baseFrequencyX, baseFrequencyY, numOctaves, seed, arr))
+                Shader(
+                    interopScope {
+                        _nMakeFractalNoise(baseFrequencyX, baseFrequencyY, numOctaves, seed, toInterop(arr))
+                    }
+                )
             } finally {
                 reachabilityBarrier(this)
             }
@@ -479,7 +495,11 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                     arr[i * 2 + 1] = tiles[i].height
                 }
                 Stats.onNativeCall()
-                Shader(_nMakeTurbulence(baseFrequencyX, baseFrequencyY, numOctaves, seed, arr))
+                Shader(
+                    interopScope {
+                        _nMakeTurbulence(baseFrequencyX, baseFrequencyY, numOctaves, seed, toInterop(arr))
+                    }
+                )
             } finally {
                 reachabilityBarrier(this)
             }
@@ -512,11 +532,11 @@ private external fun _nMakeLinearGradient(
     y0: Float,
     x1: Float,
     y1: Float,
-    colors: IntArray?,
-    positions: FloatArray?,
+    colors: InteropPointer,
+    positions: InteropPointer,
     tileType: Int,
     flags: Int,
-    matrix: FloatArray?
+    matrix: InteropPointer
 ): NativePointer
 
 
@@ -526,12 +546,12 @@ private external fun _nMakeLinearGradientCS(
     y0: Float,
     x1: Float,
     y1: Float,
-    colors: FloatArray?,
+    colors: InteropPointer,
     colorSpacePtr: NativePointer,
-    positions: FloatArray?,
+    positions: InteropPointer,
     tileType: Int,
     flags: Int,
-    matrix: FloatArray?
+    matrix: InteropPointer
 ): NativePointer
 
 
@@ -540,11 +560,11 @@ private external fun _nMakeRadialGradient(
     x: Float,
     y: Float,
     r: Float,
-    colors: IntArray?,
-    positions: FloatArray?,
+    colors: InteropPointer,
+    positions: InteropPointer,
     tileType: Int,
     flags: Int,
-    matrix: FloatArray?
+    matrix: InteropPointer
 ): NativePointer
 
 
@@ -553,12 +573,12 @@ private external fun _nMakeRadialGradientCS(
     x: Float,
     y: Float,
     r: Float,
-    colors: FloatArray?,
+    colors: InteropPointer,
     colorSpacePtr: NativePointer,
-    positions: FloatArray?,
+    positions: InteropPointer,
     tileType: Int,
     flags: Int,
-    matrix: FloatArray?
+    matrix: InteropPointer
 ): NativePointer
 
 
@@ -570,11 +590,11 @@ private external fun _nMakeTwoPointConicalGradient(
     x1: Float,
     y1: Float,
     r1: Float,
-    colors: IntArray?,
-    positions: FloatArray?,
+    colors: InteropPointer,
+    positions: InteropPointer,
     tileType: Int,
     flags: Int,
-    matrix: FloatArray?
+    matrix: InteropPointer
 ): NativePointer
 
 
@@ -586,12 +606,12 @@ private external fun _nMakeTwoPointConicalGradientCS(
     x1: Float,
     y1: Float,
     r1: Float,
-    colors: FloatArray?,
+    colors: InteropPointer,
     colorSpacePtr: NativePointer,
-    positions: FloatArray?,
+    positions: InteropPointer,
     tileType: Int,
     flags: Int,
-    matrix: FloatArray?
+    matrix: InteropPointer
 ): NativePointer
 
 
@@ -601,11 +621,11 @@ private external fun _nMakeSweepGradient(
     y: Float,
     startAngle: Float,
     endAngle: Float,
-    colors: IntArray?,
-    positions: FloatArray?,
+    colors: InteropPointer,
+    positions: InteropPointer,
     tileType: Int,
     flags: Int,
-    matrix: FloatArray?
+    matrix: InteropPointer
 ): NativePointer
 
 
@@ -615,12 +635,12 @@ private external fun _nMakeSweepGradientCS(
     y: Float,
     startAngle: Float,
     endAngle: Float,
-    colors: FloatArray?,
+    colors: InteropPointer,
     colorSpacePtr: NativePointer,
-    positions: FloatArray?,
+    positions: InteropPointer,
     tileType: Int,
     flags: Int,
-    matrix: FloatArray?
+    matrix: InteropPointer
 ): NativePointer
 
 
@@ -630,7 +650,7 @@ private external fun _nMakeFractalNoise(
     baseFrequencyY: Float,
     numOctaves: Int,
     seed: Float,
-    tiles: IntArray?
+    tiles: InteropPointer
 ): NativePointer
 
 
@@ -640,7 +660,7 @@ private external fun _nMakeTurbulence(
     baseFrequencyY: Float,
     numOctaves: Int,
     seed: Float,
-    tiles: IntArray?
+    tiles: InteropPointer
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeColor")

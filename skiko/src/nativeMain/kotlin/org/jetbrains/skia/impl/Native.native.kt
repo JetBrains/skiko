@@ -32,6 +32,15 @@ actual fun reachabilityBarrier(obj: Any?) {
     // TODO: implement native barrier
 }
 
+actual inline fun <T> interopScope(block: InteropScope.() -> T): T {
+    val scope = InteropScope()
+    try {
+        return scope.block()
+    } finally {
+        scope.release()
+    }
+}
+
 actual class InteropScope actual constructor() {
     actual fun toInterop(string: String?): InteropPointer {
         return if (string != null) {

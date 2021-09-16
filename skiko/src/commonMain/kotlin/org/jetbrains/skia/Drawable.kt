@@ -1,12 +1,8 @@
 @file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.RefCnt
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.reachabilityBarrier
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.getPtr
 
 /**
  *
@@ -52,11 +48,13 @@ abstract class Drawable : RefCnt(Drawable_nMake()) {
     fun draw(canvas: Canvas?, matrix: Matrix33?): Drawable {
         return try {
             Stats.onNativeCall()
-            _nDraw(
-                _ptr,
-                getPtr(canvas),
-                matrix?.mat
-            )
+            interopScope {
+                _nDraw(
+                    _ptr,
+                    getPtr(canvas),
+                    toInterop(matrix?.mat)
+                )
+            }
             this
         } finally {
             reachabilityBarrier(canvas)
@@ -136,7 +134,7 @@ private external fun Drawable_nMake(): NativePointer
 private external fun Drawable_nGetGenerationId(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Drawable__1nDraw")
-private external fun _nDraw(ptr: NativePointer, canvasPtr: NativePointer, matrix: FloatArray?)
+private external fun _nDraw(ptr: NativePointer, canvasPtr: NativePointer, matrix: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Drawable__1nMakePictureSnapshot")
 private external fun _nMakePictureSnapshot(ptr: NativePointer): NativePointer

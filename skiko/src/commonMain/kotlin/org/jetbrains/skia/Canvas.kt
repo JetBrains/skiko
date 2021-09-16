@@ -2,8 +2,8 @@
 package org.jetbrains.skia
 
 import org.jetbrains.skia.ImageFilter.Companion.makeDropShadowOnly
-import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.*
+import org.jetbrains.skia.impl.Library.Companion.staticLoad
 
 open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, internal val _owner: Any) :
     Managed(ptr, _FinalizerHolder.PTR, managed) {
@@ -119,7 +119,9 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
      */
     fun drawPoints(coords: FloatArray, paint: Paint): Canvas {
         Stats.onNativeCall()
-        _nDrawPoints(_ptr, 0 /* SkCanvas::PointMode::kPoints_PointMode */, coords, getPtr(paint))
+        interopScope {
+            _nDrawPoints(_ptr, 0 /* SkCanvas::PointMode::kPoints_PointMode */, toInterop(coords), getPtr(paint))
+        }
         reachabilityBarrier(paint)
         return this
     }
@@ -176,7 +178,9 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
      */
     fun drawLines(coords: FloatArray, paint: Paint): Canvas {
         Stats.onNativeCall()
-        _nDrawPoints(_ptr, 1 /* SkCanvas::PointMode::kLines_PointMode */, coords, getPtr(paint))
+        interopScope {
+            _nDrawPoints(_ptr, 1 /* SkCanvas::PointMode::kLines_PointMode */, toInterop(coords), getPtr(paint))
+        }
         reachabilityBarrier(paint)
         return this
     }
@@ -231,7 +235,9 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
      */
     fun drawPolygon(coords: FloatArray, paint: Paint): Canvas {
         Stats.onNativeCall()
-        _nDrawPoints(_ptr, 2 /* SkCanvas::PointMode::kPolygon_PointMode */, coords, getPtr(paint))
+        interopScope {
+            _nDrawPoints(_ptr, 2 /* SkCanvas::PointMode::kPolygon_PointMode */, toInterop(coords), getPtr(paint))
+        }
         reachabilityBarrier(paint)
         return this
     }
@@ -979,14 +985,16 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         require(colors.size == 4) { "Expected colors.length == 4, got: " + colors.size }
         require(texCoords == null || texCoords.size == 4) { "Expected texCoords.length == 4, got: " + texCoords!!.size }
         Stats.onNativeCall()
-        _nDrawPatch(
-            _ptr,
-            Point.flattenArray(cubics),
-            colors,
-            Point.flattenArray(texCoords),
-            mode.ordinal,
-            getPtr(paint)
-        )
+        interopScope {
+            _nDrawPatch(
+                _ptr,
+                toInterop(Point.flattenArray(cubics)),
+                toInterop(colors),
+                toInterop(Point.flattenArray(texCoords)),
+                mode.ordinal,
+                getPtr(paint)
+            )
+        }
         reachabilityBarrier(paint)
         return this
     }
@@ -1048,7 +1056,9 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
      */
     fun drawDrawable(drawable: Drawable, matrix: Matrix33?): Canvas {
         Stats.onNativeCall()
-        _nDrawDrawable(_ptr, getPtr(drawable), matrix?.mat)
+        interopScope {
+            _nDrawDrawable(_ptr, getPtr(drawable), toInterop(matrix?.mat))
+        }
         reachabilityBarrier(drawable)
         return this
     }
@@ -1076,7 +1086,9 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
      */
     fun setMatrix(matrix: Matrix33): Canvas {
         Stats.onNativeCall()
-        _nSetMatrix(_ptr, matrix.mat)
+        interopScope {
+            _nSetMatrix(_ptr, toInterop(matrix.mat))
+        }
         return this
     }
 
@@ -1451,7 +1463,7 @@ private external fun _nMakeFromBitmap(bitmapPtr: NativePointer, flags: Int, pixe
 private external fun _nDrawPoint(ptr: NativePointer, x: Float, y: Float, paintPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawPoints")
-private external fun _nDrawPoints(ptr: NativePointer, mode: Int, coords: FloatArray?, paintPtr: NativePointer)
+private external fun _nDrawPoints(ptr: NativePointer, mode: Int, coords: InteropPointer, paintPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawLine")
 private external fun _nDrawLine(ptr: NativePointer, x0: Float, y0: Float, x1: Float, y1: Float, paintPtr: NativePointer)
@@ -1575,16 +1587,16 @@ private external fun _nDrawVertices(
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawPatch")
 private external fun _nDrawPatch(
     ptr: NativePointer,
-    cubics: FloatArray?,
-    colors: IntArray?,
-    texCoords: FloatArray?,
+    cubics: InteropPointer,
+    colors: InteropPointer,
+    texCoords: InteropPointer,
     blendMode: Int,
     paintPtr: NativePointer
 )
 
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawDrawable")
-private external fun _nDrawDrawable(ptr: NativePointer, drawablePrt: NativePointer, matrix: FloatArray?)
+private external fun _nDrawDrawable(ptr: NativePointer, drawablePrt: NativePointer, matrix: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nClear")
 private external fun _nClear(ptr: NativePointer, color: Int)
@@ -1593,7 +1605,7 @@ private external fun _nClear(ptr: NativePointer, color: Int)
 private external fun _nDrawPaint(ptr: NativePointer, paintPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nSetMatrix")
-private external fun _nSetMatrix(ptr: NativePointer, matrix: FloatArray?)
+private external fun _nSetMatrix(ptr: NativePointer, matrix: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nGetLocalToDevice")
 private external fun _nGetLocalToDevice(ptr: NativePointer): FloatArray
