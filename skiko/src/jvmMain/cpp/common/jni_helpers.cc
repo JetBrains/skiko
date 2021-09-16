@@ -87,7 +87,7 @@ void logJavaException(JNIEnv *env, const char *function, DWORD sehCode)
 
     if (jvm == NULL)
     {
-        env->GetJavaVM(&jvm);
+        env->GetJavaVM(&jvmPointer);
     }
 
     if (isHandleException(env)) {
