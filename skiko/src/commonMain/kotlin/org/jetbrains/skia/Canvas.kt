@@ -838,7 +838,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
      */
 
     fun drawVertices(
-        vertexMode: Int,
+        vertexMode: VertexMode,
         positions: FloatArray,
         colors: IntArray?,
         texCoords: FloatArray?,
@@ -852,7 +852,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         interopScope {
             _nDrawVertices(
                 _ptr,
-                vertexMode,
+                vertexMode.ordinal,
                 toInterop(positions),
                 toInterop(colors),
                 toInterop(texCoords),
