@@ -24,6 +24,7 @@ class RenderExceptionsHandler {
                 append("OS: $hostFullName\n")
                 append("CPU: ${getNativeCpuInfo()}\n")
                 append("Graphics adapters:\n${getNativeGraphicsAdapterInfo()}\n")
+                append("Exception message: ${exception.message}\n")
                 append("Exception stack trace:\n")
                 val stackTrace = exception.stackTrace.filterIndexed { line, _ -> line > 1 }
                 for(line in stackTrace) {
@@ -31,8 +32,7 @@ class RenderExceptionsHandler {
                 }
                 append("\n\n")
             }
-         
-            val output = File("skiko-render-exception.log")
+            val output = File("${Library.cacheRoot}/skiko-render-exception.log")
             output.appendText(outputBuilder.toString())
         }
 

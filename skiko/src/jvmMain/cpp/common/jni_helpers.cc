@@ -10,29 +10,29 @@ std::string handleException(std::string function)
         throw std::bad_exception();
     }
     std::ostringstream oss;
-    oss << "Native exception in [" << function << "]" << std::endl;
+    oss << "Native exception in [" << function << "]:" << std::endl;
     try
     {
         std::rethrow_exception(eptr);
     }
     catch (const std::exception &e)
     {
-        oss << e.what() << std::endl;
+        oss << " - " << e.what() << std::endl;
         return oss.str();
     }
     catch (const std::string &e)
     {
-        oss << e << std::endl;
+        oss << " - " << e << std::endl;
         return oss.str();
     }
     catch (const char *e)
     {
-        oss << e << std::endl;
+        oss << " - " << e << std::endl;
         return oss.str();
     }
     catch (...)
     {
-        oss << "Unknown exception - no stack trace" << std::endl;
+        oss << " - Unknown exception - no stack trace" << std::endl;
         return oss.str();
     }
 }

@@ -10,8 +10,8 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 object Library {
     internal const val SKIKO_LIBRARY_PATH_PROPERTY = "skiko.library.path"
+    internal val cacheRoot = "${System.getProperty("user.home")}/.skiko/"
     private val skikoLibraryPath = System.getProperty(SKIKO_LIBRARY_PATH_PROPERTY)
-    private val cacheRoot = "${System.getProperty("user.home")}/.skiko/"
     private var copyDir: File? = null
 
     // Same native library cannot be loaded in several classloaders, so we have to clone
