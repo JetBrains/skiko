@@ -59,5 +59,5 @@ actual abstract class Managed actual constructor(
         get() = _ptr == NullPointer
 }
 
-@ExternalSymbolName("org_jetbrains_skia_impl_Managed__1nInvokeFinalizer")
+@ExternalSymbolName("org_jetbrains_skia_impl_Managed__invokeFinalizer")
 external fun _nInvokeFinalizer(finalizer: NativePointer, ptr: NativePointer)

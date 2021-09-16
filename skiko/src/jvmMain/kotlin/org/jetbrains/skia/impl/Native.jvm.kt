@@ -10,7 +10,7 @@ actual abstract class Native actual constructor(ptr: NativePointer) {
             get() = 0L
     }
 
-    override fun toString(): String {
+    actual override fun toString(): String {
         return javaClass.simpleName + "(_ptr=0x" + _ptr.toString(16) + ")"
     }
 

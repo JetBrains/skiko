@@ -1,10 +1,8 @@
 #include "common.h"
-#include <emscripten.h>
 
 typedef void (*finalizer_t)(void*);
 
-EMSCRIPTEN_KEEPALIVE
-extern "C" void org_jetbrains_skia_ColorSpace__nInvokeFinalizer(KPointer finalizer, KPointer obj) {
+SKIKO_EXPORT void org_jetbrains_skia_impl_Managed__invokeFinalizer(KNativePointer finalizer, KNativePointer obj) {
     finalizer_t finalizer_f = reinterpret_cast<finalizer_t>(finalizer);
     finalizer_f(obj);
 }

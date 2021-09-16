@@ -354,13 +354,16 @@ val wasmCompile = project.tasks.register<Exec>("wasmCompile") {
         val outJs = "$outDir/skiko.js"
         val outWasm = "$outDir/skiko.wasm"
         workingDir = File(outDir)
+        val skikoJsPrefix = "$projectDir/src/jsMain/resources/setup.js"
         if (supportWasm) {
             commandLine = listOf(
                 "emcc",
+                *buildType.clangFlags,
                 *Arch.Wasm.clangFlags,
                 "-I$projectDir/src/commonMain/cpp",
                 *skiaPreprocessorFlags(skiaDir),
                 "-o", outJs,
+                "--extern-post-js", skikoJsPrefix,
                 *srcs
             )
             argumentProviders.add(CommandLineArgumentProvider {
@@ -377,7 +380,7 @@ val wasmCompile = project.tasks.register<Exec>("wasmCompile") {
             )
         }
         file(outDir).mkdirs()
-        inputs.files(srcs)
+        inputs.files(srcs + listOf(skikoJsPrefix))
         outputs.files(outJs, outWasm)
 }
 

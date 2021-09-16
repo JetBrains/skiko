@@ -7,15 +7,16 @@ import kotlin.native.internal.NativePtr
 
 actual abstract class Native actual constructor(ptr: NativePointer) {
     actual var _ptr: NativePointer
-    override fun toString(): String {
-        return this::class.simpleName + "(_ptr=0x$_ptr)"
-    }
 
     actual open fun _nativeEquals(other: Native?): Boolean = this._ptr == other?._ptr ?: Native.NullPointer
 
     actual companion object {
         actual val NullPointer: NativePointer
             get() = NativePtr.NULL
+    }
+
+    actual override fun toString(): String {
+        return this::class.simpleName + "(_ptr=0x" + _ptr.toString() + ")"
     }
 
     init {

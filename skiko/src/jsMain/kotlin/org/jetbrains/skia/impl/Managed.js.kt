@@ -49,12 +49,12 @@ actual abstract class Managed actual constructor(ptr: NativePointer, finalizer: 
         if (managed) {
             require(ptr != 0) { "Managed ptr is 0" }
             require(finalizer != 0) { "Managed finalizer is 0" }
-            val thunk = FinalizationThunk(ptr, finalizer)
+            val thunk = FinalizationThunk(finalizer, ptr)
             register(this, thunk)
             cleaner = thunk
         }
     }
 }
 
-@JsName("org_jetbrains_skia_Managed__invokeFinalizer")
+@JsName("org_jetbrains_skia_impl_Managed__invokeFinalizer")
 private external fun _nInvokeFinalizer(finalizer: NativePointer, obj: NativePointer)

@@ -11,6 +11,8 @@ expect abstract class Native(ptr: NativePointer) {
     companion object {
         val NullPointer: NativePointer
     }
+
+    override fun toString(): String
 }
 
 expect fun reachabilityBarrier(obj: Any?)
