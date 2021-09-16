@@ -18,6 +18,10 @@ actual abstract class Native actual constructor(ptr: NativePointer) {
             get() = NativePtr.NULL
     }
 
+    actual override fun toString(): String {
+        return this::class.simpleName + "(_ptr=0x" + _ptr.toString(16) + ")"
+    }
+
     init {
         if (ptr == NativePtr.NULL) throw RuntimeException("Can't wrap nullptr")
         _ptr = ptr

@@ -11,17 +11,15 @@
 #include "SkFilterQuality.h"
 #include "common.h"
 
-static void deletePaint(SkPaint* paint) {
+void deletePaint(SkPaint* paint) {
     delete paint;
 }
 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_Paint__1nGetFinalizer
-  (){
-    return reinterpret_cast<KNativePointer>((&deletePaint));
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_Paint__1nGetFinalizer(){
+    return reinterpret_cast<KNativePointer>(&deletePaint);
 }
 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_Paint__1nMake
-  (){
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_Paint__1nMake(){
     SkPaint* obj = new SkPaint();
     obj->setAntiAlias(true);
     return reinterpret_cast<KNativePointer>(obj);
