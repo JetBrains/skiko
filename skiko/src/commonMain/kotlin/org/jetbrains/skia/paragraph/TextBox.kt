@@ -1,6 +1,7 @@
 package org.jetbrains.skia.paragraph
 
 import org.jetbrains.skia.*
+import org.jetbrains.skia.impl.*
 
 class TextBox(val rect: Rect, direction: Direction) {
     val _direction: Direction
@@ -47,4 +48,22 @@ class TextBox(val rect: Rect, direction: Direction) {
     init {
         _direction = direction
     }
+
+    companion object : ArrayInteropDecoder<TextBox> {
+        override fun popArrayElement(array: InteropPointer): TextBox? {
+            val index = IntArray(1)
+            val rect = FloatArray(4)
+            val direction = IntArray(1)
+            val result = interopScope {
+                TextBox_nPopArrayElement(array, toInterop(index), toInterop(rect), toInterop(direction))
+            }
+            return if (result == Native.NullPointer)
+                null
+            else
+                TextBox(rect[0], rect[1], rect[2], rect[3], direction[0])
+        }
+    }
 }
+
+@ExternalSymbolName("org_jetbrains_skia_paragraph_TextBox__1nPopArrayElement")
+private external fun TextBox_nPopArrayElement(array: InteropPointer, indexArray: InteropPointer, rectArray: InteropPointer, directionArray: InteropPointer): NativePointer

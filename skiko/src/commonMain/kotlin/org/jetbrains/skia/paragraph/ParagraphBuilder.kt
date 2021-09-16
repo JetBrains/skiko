@@ -3,12 +3,8 @@ package org.jetbrains.skia.paragraph
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.ManagedString
-import org.jetbrains.skia.impl.Managed
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.*
 
 class ParagraphBuilder(style: ParagraphStyle?, fc: FontCollection?) :
     Managed(_nMake(getPtr(style), getPtr(fc)), _FinalizerHolder.PTR) {
@@ -37,7 +33,9 @@ class ParagraphBuilder(style: ParagraphStyle?, fc: FontCollection?) :
 
     fun addText(text: String): ParagraphBuilder {
         Stats.onNativeCall()
-        _nAddText(_ptr, text)
+        interopScope {
+            _nAddText(_ptr, toInterop(text))
+        }
         if (_text == null) _text = ManagedString(text) else _text!!.append(text)
         return this
     }
@@ -100,7 +98,7 @@ private external fun _nPushStyle(ptr: NativePointer, textStylePtr: NativePointer
 private external fun _nPopStyle(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nAddText")
-private external fun _nAddText(ptr: NativePointer, text: String?)
+private external fun _nAddText(ptr: NativePointer, text: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nAddPlaceholder")
 private external fun _nAddPlaceholder(

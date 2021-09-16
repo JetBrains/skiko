@@ -3,13 +3,8 @@ package org.jetbrains.skia.paragraph
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.*
-import org.jetbrains.skia.impl.Managed
-import org.jetbrains.skia.impl.Native
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.*
 
 class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
@@ -243,7 +238,9 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
 
     fun setFontFamilies(families: Array<String>?): TextStyle {
         Stats.onNativeCall()
-        _nSetFontFamilies(_ptr, families)
+        interopScope {
+            _nSetFontFamilies(_ptr, toInterop(families))
+        }
         return this
     }
 
@@ -470,7 +467,7 @@ private external fun _nAddFontFeature(ptr: NativePointer, name: String?, value: 
 private external fun _nClearFontFeatures(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetFontFamilies")
-private external fun _nSetFontFamilies(ptr: NativePointer, families: Array<String>?)
+private external fun _nSetFontFamilies(ptr: NativePointer, families: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetLetterSpacing")
 private external fun _nGetLetterSpacing(ptr: NativePointer): Float

@@ -50,10 +50,16 @@ namespace skija {
     namespace RRect {
         SkRRect toSkRRect(KFloat left, KFloat top, KFloat right, KFloat bottom, KFloat* jradii, KInt size);
     }
+
+    namespace FontStyle {
+        SkFontStyle fromKotlin(KInt style);
+        KInt toKotlin(const SkFontStyle& fs);
+    }
 }
 
 std::unique_ptr<SkMatrix> skMatrix(KFloat* matrixArray);
 std::unique_ptr<SkM44> skM44(KFloat* matrixArray);
+SkString skString(KNativePointer str);
 
 template <typename T>
 inline T interopToPtr(KNativePointer ptr) {

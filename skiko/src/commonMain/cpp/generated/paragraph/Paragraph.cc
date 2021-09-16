@@ -100,29 +100,12 @@ SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_paragraph_Paragraph__1nGetR
 }
 #endif
 
-
-
-SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_paragraph_Paragraph__1nGetRectsForPlaceholders
-  (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_paragraph_Paragraph__1nGetRectsForPlaceholders");
-}
-     
-#if 0 
 SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_paragraph_Paragraph__1nGetRectsForPlaceholders
   (KNativePointer ptr) {
     Paragraph* instance = reinterpret_cast<Paragraph*>((ptr));
-    std::vector<TextBox> rects = instance->getRectsForPlaceholders();
-    KInteropPointerArray rectsArray = env->NewObjectArray((jsize) rects.size(), skija::paragraph::TextBox::cls, nullptr);
-    for (int i = 0; i < rects.size(); ++i) {
-        TextBox box = rects[i];
-        KInteropPointer boxObj = env->NewObject(skija::paragraph::TextBox::cls, skija::paragraph::TextBox::ctor, box.rect.fLeft, box.rect.fTop, box.rect.fRight, box.rect.fBottom, static_cast<KInt>(box.direction));
-        env->SetObjectArrayElement(rectsArray, i, boxObj);
-        env->DeleteLocalRef(boxObj);
-    }
-    return rectsArray;
+    std::vector<TextBox> *vect = new std::vector<TextBox>(instance->getRectsForPlaceholders());
+    return vect;
 }
-#endif
-
 
 SKIKO_EXPORT KInt org_jetbrains_skia_paragraph_Paragraph__1nGetGlyphPositionAtCoordinate
   (KNativePointer ptr, KFloat dx, KFloat dy) {
@@ -144,7 +127,12 @@ SKIKO_EXPORT KLong org_jetbrains_skia_paragraph_Paragraph__1nGetWordBoundary
 
 SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_paragraph_Paragraph__1nGetLineMetrics
   (KNativePointer ptr, KNativePointer textPtr) {
-    TODO("implement org_jetbrains_skia_paragraph_Paragraph__1nGetLineMetrics");
+    Paragraph* instance = reinterpret_cast<Paragraph*>((ptr));
+    SkString* text = reinterpret_cast<SkString*>((textPtr));
+
+    std::vector<LineMetrics>* res = new std::vector<LineMetrics>;
+    instance->getLineMetrics(*res);
+    return res;
 }
      
 SKIKO_EXPORT KInt org_jetbrains_skia_paragraph_Paragraph__1nGetLineNumber

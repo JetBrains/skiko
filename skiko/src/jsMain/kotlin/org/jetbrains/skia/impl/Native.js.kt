@@ -142,6 +142,9 @@ actual class InteropScope actual constructor() {
         TODO("implement wasm fromInteropNativePointerArray")
     }
 
+    actual inline fun <reified T> InteropPointer.fromInterop(decoder: ArrayInteropDecoder<T>): Array<T> =
+        TODO("implement wasm fromInteropArray()")
+
     actual fun release()  {
         elements.forEach {
             _free(it)

@@ -103,7 +103,7 @@ class ParagraphStyle : Managed(ParagraphStyle_nMake(), _FinalizerHolder.PTR) {
         return this
     }
 
-    var maxLinesCount: NativePointer
+    var maxLinesCount: Int
         get() = try {
             Stats.onNativeCall()
             _nGetMaxLinesCount(_ptr)
@@ -114,7 +114,7 @@ class ParagraphStyle : Managed(ParagraphStyle_nMake(), _FinalizerHolder.PTR) {
             setMaxLinesCount(value)
         }
 
-    fun setMaxLinesCount(count: NativePointer): ParagraphStyle {
+    fun setMaxLinesCount(count: Int): ParagraphStyle {
         Stats.onNativeCall()
         _nSetMaxLinesCount(_ptr, count)
         return this
@@ -240,10 +240,10 @@ private external fun _nGetAlignment(ptr: NativePointer): Int
 private external fun _nSetAlignment(ptr: NativePointer, align: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetMaxLinesCount")
-private external fun _nGetMaxLinesCount(ptr: NativePointer): NativePointer
+private external fun _nGetMaxLinesCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetMaxLinesCount")
-private external fun _nSetMaxLinesCount(ptr: NativePointer, maxLines: NativePointer)
+private external fun _nSetMaxLinesCount(ptr: NativePointer, maxLines: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetEllipsis")
 private external fun _nGetEllipsis(ptr: NativePointer): String
