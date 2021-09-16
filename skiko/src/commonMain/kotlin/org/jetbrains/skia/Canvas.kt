@@ -586,16 +586,18 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         require(colors == null || colors.size == positions.size) { "Expected colors.length == positions.length, got: " + colors!!.size + " != " + positions.size }
         require(texCoords == null || texCoords.size == positions.size) { "Expected texCoords.length == positions.length, got: " + texCoords!!.size + " != " + positions.size }
         Stats.onNativeCall()
-        _nDrawVertices(
-            _ptr,
-            0 /* kTriangles_VertexMode */,
-            Point.flattenArray(positions),
-            colors,
-            Point.flattenArray(texCoords),
-            indices,
-            mode.ordinal,
-            getPtr(paint)
-        )
+        interopScope {
+            _nDrawVertices(
+                _ptr,
+                0 /* kTriangles_VertexMode */,
+                toInterop(Point.flattenArray(positions)),
+                toInterop(colors),
+                toInterop(Point.flattenArray(texCoords)),
+                toInterop(indices),
+                mode.ordinal,
+                getPtr(paint)
+            )
+        }
         reachabilityBarrier(paint)
         return this
     }
@@ -689,16 +691,18 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         require(colors == null || colors.size == positions.size) { "Expected colors.length == positions.length, got: " + colors!!.size + " != " + positions.size }
         require(texCoords == null || texCoords.size == positions.size) { "Expected texCoords.length == positions.length, got: " + texCoords!!.size + " != " + positions.size }
         Stats.onNativeCall()
-        _nDrawVertices(
-            _ptr,
-            1 /* kTriangleStrip_VertexMode */,
-            Point.flattenArray(positions),
-            colors,
-            Point.flattenArray(texCoords),
-            indices,
-            mode.ordinal,
-            getPtr(paint)
-        )
+        interopScope {
+            _nDrawVertices(
+                _ptr,
+                1 /* kTriangleStrip_VertexMode */,
+                toInterop(Point.flattenArray(positions)),
+                toInterop(colors),
+                toInterop(Point.flattenArray(texCoords)),
+                toInterop(indices),
+                mode.ordinal,
+                getPtr(paint)
+            )
+        }
         reachabilityBarrier(paint)
         return this
     }
@@ -792,16 +796,18 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         require(colors == null || colors.size == positions.size) { "Expected colors.length == positions.length, got: " + colors!!.size + " != " + positions.size }
         require(texCoords == null || texCoords.size == positions.size) { "Expected texCoords.length == positions.length, got: " + texCoords!!.size + " != " + positions.size }
         Stats.onNativeCall()
-        _nDrawVertices(
-            _ptr,
-            2 /* kTriangleFan_VertexMode */,
-            Point.flattenArray(positions),
-            colors,
-            Point.flattenArray(texCoords),
-            indices,
-            mode.ordinal,
-            getPtr(paint)
-        )
+        interopScope {
+            _nDrawVertices(
+                _ptr,
+                2 /* kTriangleFan_VertexMode */,
+                toInterop(Point.flattenArray(positions)),
+                toInterop(colors),
+                toInterop(Point.flattenArray(texCoords)),
+                toInterop(indices),
+                mode.ordinal,
+                getPtr(paint)
+            )
+        }
         reachabilityBarrier(paint)
         return this
     }
@@ -833,9 +839,9 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
 
     fun drawVertices(
         vertexMode: Int,
-        positions: Array<Point>,
+        positions: FloatArray,
         colors: IntArray?,
-        texCoords: Array<Point>?,
+        texCoords: FloatArray?,
         indices: ShortArray?,
         mode: BlendMode,
         paint: Paint
@@ -843,16 +849,18 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         require(colors == null || colors.size == positions.size) { "Expected colors.length == positions.length, got: " + colors!!.size + " != " + positions.size }
         require(texCoords == null || texCoords.size == positions.size) { "Expected texCoords.length == positions.length, got: " + texCoords!!.size + " != " + positions.size }
         Stats.onNativeCall()
-        _nDrawVertices(
-            _ptr,
-            vertexMode,
-            Point.flattenArray(positions),
-            colors,
-            Point.flattenArray(texCoords),
-            indices,
-            mode.ordinal,
-            getPtr(paint)
-        )
+        interopScope {
+            _nDrawVertices(
+                _ptr,
+                vertexMode,
+                toInterop(positions),
+                toInterop(colors),
+                toInterop(texCoords),
+                toInterop(indices),
+                mode.ordinal,
+                getPtr(paint)
+            )
+        }
         reachabilityBarrier(paint)
         return this
     }
@@ -1555,10 +1563,10 @@ private external fun _nDrawPicture(ptr: NativePointer, picturePtr: NativePointer
 private external fun _nDrawVertices(
     ptr: NativePointer,
     verticesMode: Int,
-    cubics: FloatArray?,
-    colors: IntArray?,
-    texCoords: FloatArray?,
-    indices: ShortArray?,
+    cubics: InteropPointer,
+    colors: InteropPointer,
+    texCoords: InteropPointer,
+    indices: InteropPointer,
     blendMode: Int,
     paintPtr: NativePointer
 )
