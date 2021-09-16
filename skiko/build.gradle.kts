@@ -530,6 +530,7 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
             )
         }
         OS.Linux -> {
+            val skia = skiaDir.get().absolutePath + "/" + skiaBinSubdir
             linkerArgs.addAll(
                 listOf(
                     "-static-libstdc++",
@@ -544,8 +545,9 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
                     // To fix it we enforce resolve of all GOT entries at library load time, and make it read-only afterwards.
                     "-Wl,-z,relro,-z,now",
                     // Hack to fix problem with linker not always finding certain declarations.
-                    skiaDir.get().absolutePath + "/$skiaBinSubdir/libsksg.a",
-                    skiaDir.get().absolutePath + "/$skiaBinSubdir/libskia.a"
+                    "$skia/libsksg.a",
+                    "$skia/libskia.a",
+                    "$skia/libskshaper.a"
                     )
             )
         }
