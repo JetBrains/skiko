@@ -73,5 +73,7 @@ inline fun withResult(result: NativePointerArray, block: (InteropPointer) -> Uni
 }
 
 interface ArrayInteropDecoder<T> {
-    fun popArrayElement(array: InteropPointer): T?
+    fun getArrayElement(array: InteropPointer, index: Int): T
+    fun getArraySize(array: InteropPointer): Int
+    fun disposeArray(array: InteropPointer)
 }

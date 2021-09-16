@@ -50,20 +50,22 @@ class TextBox(val rect: Rect, direction: Direction) {
     }
 
     companion object : ArrayInteropDecoder<TextBox> {
-        override fun popArrayElement(array: InteropPointer): TextBox? {
-            val index = IntArray(1)
+        override fun getArrayElement(array: InteropPointer, index: Int): TextBox {
             val rect = FloatArray(4)
             val direction = IntArray(1)
-            val result = interopScope {
-                TextBox_nPopArrayElement(array, toInterop(index), toInterop(rect), toInterop(direction))
+            interopScope {
+                TextBox_nGetArrayElement(array, index, toInterop(rect), toInterop(direction))
             }
-            return if (result == Native.NullPointer)
-                null
-            else
-                TextBox(rect[0], rect[1], rect[2], rect[3], direction[0])
+            return TextBox(rect[0], rect[1], rect[2], rect[3], direction[0])
         }
+        override fun getArraySize(array: InteropPointer) = TextBox_nGetArraySize(array)
+        override fun disposeArray(array: InteropPointer) = TextBox_nDisposeArray(array)
     }
 }
 
-@ExternalSymbolName("org_jetbrains_skia_paragraph_TextBox__1nPopArrayElement")
-private external fun TextBox_nPopArrayElement(array: InteropPointer, indexArray: InteropPointer, rectArray: InteropPointer, directionArray: InteropPointer): NativePointer
+@ExternalSymbolName("org_jetbrains_skia_paragraph_TextBox__1nGetArraySize")
+private external fun TextBox_nGetArraySize(array: InteropPointer): Int
+@ExternalSymbolName("org_jetbrains_skia_paragraph_TextBox__1nDisposeArray")
+private external fun TextBox_nDisposeArray(array: InteropPointer)
+@ExternalSymbolName("org_jetbrains_skia_paragraph_TextBox__1nGetArrayElement")
+private external fun TextBox_nGetArrayElement(array: InteropPointer, index: Int, rectArray: InteropPointer, directionArray: InteropPointer)

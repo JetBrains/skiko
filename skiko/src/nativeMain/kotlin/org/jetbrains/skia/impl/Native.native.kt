@@ -154,9 +154,12 @@ actual class InteropScope actual constructor() {
     }
 
     actual inline fun <reified T> InteropPointer.fromInterop(decoder: ArrayInteropDecoder<T>): Array<T> {
-        return generateSequence {
-            decoder.popArrayElement(this)
-        }.toList().reversed().toTypedArray()
+        val size = decoder.getArraySize(this)
+        val result = Array<T>(size) {
+            decoder.getArrayElement(this, it)
+        }
+        decoder.disposeArray(this)
+        return result
     }
 
     actual fun InteropPointer.fromInteropNativePointerArray(): NativePointerArray {

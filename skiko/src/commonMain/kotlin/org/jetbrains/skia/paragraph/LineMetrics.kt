@@ -153,31 +153,29 @@ class LineMetrics(
     }
 
     companion object : ArrayInteropDecoder<LineMetrics> {
-        override fun popArrayElement(array: InteropPointer): LineMetrics? {
-            val index = IntArray(1)
+        override fun getArraySize(array: InteropPointer) = LineMetrics_nGetArraySize(array)
+        override fun disposeArray(array: InteropPointer) = LineMetrics_nDisposeArray(array)
+        override fun getArrayElement(array: InteropPointer, index: Int): LineMetrics {
             val longArray = LongArray(6)
             val doubleArray = DoubleArray(7)
             val result = interopScope {
-                LineMetrics_nPopArrayElement(array, toInterop(index), toInterop(longArray), toInterop(doubleArray))
+                LineMetrics_nGetArrayElement(array, index, toInterop(longArray), toInterop(doubleArray))
             }
-            return if (result == Native.NullPointer)
-                null
-            else
-                LineMetrics(
-                    longArray[0],
-                    longArray[1],
-                    longArray[2],
-                    longArray[3],
-                    longArray[4] != 0L,
-                    doubleArray[0],
-                    doubleArray[1],
-                    doubleArray[2],
-                    doubleArray[3],
-                    doubleArray[4],
-                    doubleArray[5],
-                    doubleArray[6],
-                    longArray[5]
-                )
+            return LineMetrics(
+                longArray[0],
+                longArray[1],
+                longArray[2],
+                longArray[3],
+                longArray[4] != 0L,
+                doubleArray[0],
+                doubleArray[1],
+                doubleArray[2],
+                doubleArray[3],
+                doubleArray[4],
+                doubleArray[5],
+                doubleArray[6],
+                longArray[5]
+            )
         }
     }
 
@@ -186,5 +184,9 @@ class LineMetrics(
     }
 }
 
-@ExternalSymbolName("org_jetbrains_skia_paragraph_LineMetrics__1nPopArrayElement")
-private external fun LineMetrics_nPopArrayElement(array: InteropPointer, index: InteropPointer, longArgs: InteropPointer, doubleArgs: InteropPointer): NativePointer
+@ExternalSymbolName("org_jetbrains_skia_paragraph_LineMetrics__1nGetArraySize")
+private external fun LineMetrics_nGetArraySize(array: InteropPointer): Int
+@ExternalSymbolName("org_jetbrains_skia_paragraph_LineMetrics__1nDisposeArray")
+private external fun LineMetrics_nDisposeArray(array: InteropPointer)
+@ExternalSymbolName("org_jetbrains_skia_paragraph_LineMetrics__1nGetArrayElement")
+private external fun LineMetrics_nGetArrayElement(array: InteropPointer, index: Int, longArgs: InteropPointer, doubleArgs: InteropPointer)
