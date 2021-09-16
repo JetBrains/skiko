@@ -343,7 +343,7 @@ fun List<String>.findAllFiles(suffix: String): List<String> = this
     .filter { it.endsWith(suffix) }
 
 
-val wasmCompileTask = project.tasks.register<Exec>("wasmCompile") {
+val wasmCompile = project.tasks.register<Exec>("wasmCompile") {
         dependsOn(skiaWasmDir)
         val skiaDir = skiaWasmDir.get().absolutePath
         val outDir = "$buildDir/wasm"
@@ -379,19 +379,6 @@ val wasmCompileTask = project.tasks.register<Exec>("wasmCompile") {
         file(outDir).mkdirs()
         inputs.files(srcs)
         outputs.files(outJs, outWasm)
-}
-
-val wasmJsPatcher = project.tasks.register<Exec>("wasmJsPatcher") {
-    dependsOn(wasmCompileTask)
-    val inJs = wasmCompileTask.get().outputs.files.single { it.name.endsWith(".js") }
-    val outDir = "$buildDir/wasm"
-    val outJs = "$outDir/skiko_processed.js"
-    commandLine = listOf(
-        "bash", "-c",
-        "sed 's/_org_jetbrains_/org_jetbrains_/g' ${inJs.absolutePath} > ${outJs}"
-    )
-    inputs.files(inJs)
-    outputs.files(outJs)
 }
 
 // Very hacky way to compile native bridges and add the
@@ -672,9 +659,14 @@ val skikoJvmRuntimeJar by project.tasks.registering(Jar::class) {
 
 val skikoWasmJar by project.tasks.registering(Jar::class) {
     // We produce jar that contains .js of wrapper/bindings and .wasm with Skia + bindings.
-    from(wasmCompileTask.get().outputs.files.single { it.name.endsWith(".wasm")})
-    from(wasmJsPatcher.get().outputs)
-    rename { if (it == "skiko_processed.js") "skiko.js" else it }
+    val wasmOutputs = wasmCompile.get().outputs
+    from(wasmOutputs.files.single { it.name.endsWith(".wasm")})
+
+    from(wasmOutputs) {
+        include("skiko.js")
+        filter { line -> line.replace("_org_jetbrains_", "org_jetbrains_") }
+    }
+
     archiveBaseName.set("skiko-wasm")
     doLast {
         println("Wasm and JS at ${outputs.files.files.single()}")
