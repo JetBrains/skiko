@@ -358,6 +358,7 @@ val wasmCompile = project.tasks.register<Exec>("wasmCompile") {
         if (supportWasm) {
             commandLine = listOf(
                 "emcc",
+                *buildType.clangFlags,
                 *Arch.Wasm.clangFlags,
                 "-I$projectDir/src/commonMain/cpp",
                 *skiaPreprocessorFlags(skiaDir),
