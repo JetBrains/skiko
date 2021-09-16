@@ -20,7 +20,7 @@ private object _FinalizerHolder {
     val PTR = _nGetFinalizer()
 }
 
-@JsName("org_jetbrains_skia_RefCnt__nGetFinalizer")
+@JsName("org_jetbrains_skia_RefCnt__getFinalizer")
 private external fun _nGetFinalizer(): NativePointer
-@JsName("org_jetbrains_skia_RefCnt__nGetCount")
+@JsName("org_jetbrains_skia_RefCnt__getCount")
 private external fun _nGetRefCount(ptr: NativePointer): Int

@@ -24,7 +24,7 @@ actual abstract class RefCnt : Managed {
     }
 }
 
-@ExternalSymbolName("org_jetbrains_skia_impl_RefCnt__1nGetFinalizer")
+@ExternalSymbolName("org_jetbrains_skia_impl_RefCnt__getFinalizer")
 private external fun _nGetFinalizer(): NativePointer
-@ExternalSymbolName("org_jetbrains_skia_impl_RefCnt__1nGetRefCount")
+@ExternalSymbolName("org_jetbrains_skia_impl_RefCnt__getRefCount")
 private external fun _nGetRefCount(ptr: NativePointer): Int
