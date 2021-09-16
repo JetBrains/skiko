@@ -825,9 +825,9 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
      * BlendMode mode combines vertices colors with Shader.
      *
      * @param vertexMode 0 - triangles, 1 - triangle strip, 2 - triangle fan
-     * @param positions  the mesh to draw
+     * @param positions  flattened array of the mesh to draw
      * @param colors     color array, one for each corner; may be null
-     * @param texCoords  Point array of texture coordinates, mapping Shader to corners; may be null
+     * @param texCoords  flattened Point array of texture coordinates, mapping Shader to corners; may be null
      * @param indices    with which indices points should be drawn; may be null
      * @param mode       combines vertices colors with Shader, if both are present
      * @param paint      specifies the Shader, used as Vertices texture
