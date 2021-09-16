@@ -20,37 +20,38 @@ SKIKO_EXPORT KInt org_jetbrains_skia_paragraph_FontCollection__1nGetFontManagers
     return instance->getFontManagersCount();
 }
 
-
-SKIKO_EXPORT void org_jetbrains_skia_paragraph_FontCollection__1nSetAssetFontManager
-  (KNativePointer ptr, KNativePointer fontManagerPtr, KInteropPointer defaultFamilyNameStr) {
-    TODO("implement org_jetbrains_skia_paragraph_FontCollection__1nSetAssetFontManager");
-}
-     
-#if 0 
 SKIKO_EXPORT void org_jetbrains_skia_paragraph_FontCollection__1nSetAssetFontManager
   (KNativePointer ptr, KNativePointer fontManagerPtr, KInteropPointer defaultFamilyNameStr) {
     FontCollection* instance = reinterpret_cast<FontCollection*>((ptr));
     SkFontMgr* fontManager = reinterpret_cast<SkFontMgr*>((fontManagerPtr));
     instance->setAssetFontManager(sk_ref_sp(fontManager));
 }
-#endif
-
-
 
 SKIKO_EXPORT void org_jetbrains_skia_paragraph_FontCollection__1nSetDynamicFontManager
-  (KNativePointer ptr, KNativePointer fontManagerPtr, KInteropPointer defaultFamilyNameStr) {
-    TODO("implement org_jetbrains_skia_paragraph_FontCollection__1nSetDynamicFontManager");
+  (KNativePointer ptr, KNativePointer fontManagerPtr, KNativePointer defaultFamilyNameStr) {
+    FontCollection* instance = reinterpret_cast<FontCollection*>((ptr));
+    SkFontMgr* fontManager = reinterpret_cast<SkFontMgr*>((fontManagerPtr));
+    instance->setDynamicFontManager(sk_ref_sp(fontManager));
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_paragraph_FontCollection__1nSetTestFontManager
-  (KNativePointer ptr, KNativePointer fontManagerPtr, KInteropPointer defaultFamilyNameStr) {
-    TODO("implement org_jetbrains_skia_paragraph_FontCollection__1nSetTestFontManager");
+  (KNativePointer ptr, KNativePointer fontManagerPtr, KNativePointer defaultFamilyNameStr) {
+    FontCollection* instance = reinterpret_cast<FontCollection*>((ptr));
+    SkFontMgr* fontManager = reinterpret_cast<SkFontMgr*>((fontManagerPtr));
+    instance->setTestFontManager(sk_ref_sp(fontManager));
 }
 
-
 SKIKO_EXPORT void org_jetbrains_skia_paragraph_FontCollection__1nSetDefaultFontManager
-  (KNativePointer ptr, KNativePointer fontManagerPtr, KInteropPointer defaultFamilyNameStr) {
-    TODO("implement org_jetbrains_skia_paragraph_FontCollection__1nSetDefaultFontManager");
+  (KNativePointer ptr, KNativePointer fontManagerPtr, KNativePointer defaultFamilyNameStr) {
+    FontCollection* instance = reinterpret_cast<FontCollection*>((ptr));
+    SkFontMgr* fontManager = reinterpret_cast<SkFontMgr*>((fontManagerPtr));
+
+    if (defaultFamilyNameStr == nullptr)
+        instance->setDefaultFontManager(sk_ref_sp(fontManager));
+    else {
+        SkString defaultFamilyName = skString(defaultFamilyNameStr);
+        instance->setDefaultFontManager(sk_ref_sp(fontManager), defaultFamilyName.c_str());
+    }
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_paragraph_FontCollection__1nGetFallbackManager

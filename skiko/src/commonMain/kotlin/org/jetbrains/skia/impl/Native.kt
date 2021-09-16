@@ -38,6 +38,7 @@ expect class InteropScope() {
     fun InteropPointer.fromInterop(result: NativePointerArray)
     fun toInterop(stringArray: Array<String>?): InteropPointer
     fun InteropPointer.fromInteropNativePointerArray(): NativePointerArray
+    inline fun <reified T> InteropPointer.fromInterop(decoder: ArrayInteropDecoder<T>): Array<T>
     fun release()
 }
 
@@ -69,4 +70,10 @@ inline fun withResult(result: NativePointerArray, block: (InteropPointer) -> Uni
     block(handle)
     handle.fromInterop(result)
     result
+}
+
+interface ArrayInteropDecoder<T> {
+    fun getArrayElement(array: InteropPointer, index: Int): T
+    fun getArraySize(array: InteropPointer): Int
+    fun disposeArray(array: InteropPointer)
 }

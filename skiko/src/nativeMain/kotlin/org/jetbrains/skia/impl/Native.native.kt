@@ -35,7 +35,8 @@ actual fun reachabilityBarrier(obj: Any?) {
 actual class InteropScope actual constructor() {
     actual fun toInterop(string: String?): InteropPointer {
         return if (string != null) {
-            val pinned = string.pin()
+            // encodeToByteArray encodes to utf8
+            val pinned = string.encodeToByteArray().pin()
             elements.add(pinned)
             val result = pinned.addressOf(0).rawValue
             result
@@ -150,6 +151,15 @@ actual class InteropScope actual constructor() {
             nativePointerArray[index] = pin.addressOf(0).rawValue
         }
         return toInterop(nativePointerArray)
+    }
+
+    actual inline fun <reified T> InteropPointer.fromInterop(decoder: ArrayInteropDecoder<T>): Array<T> {
+        val size = decoder.getArraySize(this)
+        val result = Array<T>(size) {
+            decoder.getArrayElement(this, it)
+        }
+        decoder.disposeArray(this)
+        return result
     }
 
     actual fun InteropPointer.fromInteropNativePointerArray(): NativePointerArray {

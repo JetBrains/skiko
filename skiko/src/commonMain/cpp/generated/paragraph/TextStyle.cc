@@ -123,36 +123,17 @@ SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nSetDecorationStyle
     instance->setDecorationThicknessMultiplier(thicknessMultiplier);
 }
 
-
-SKIKO_EXPORT KInt org_jetbrains_skia_paragraph_TextStyle__1nGetFontStyle
-  (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nGetFontStyle");
-}
-     
-#if 0 
 SKIKO_EXPORT KInt org_jetbrains_skia_paragraph_TextStyle__1nGetFontStyle
   (KNativePointer ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>((ptr));
-    return skija::FontStyle::toJava(instance->getFontStyle());
+    return skija::FontStyle::toKotlin(instance->getFontStyle());
 }
-#endif
 
-
-
-SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nSetFontStyle
-  (KNativePointer ptr, KInt fontStyleValue) {
-    TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nSetFontStyle");
-}
-     
-#if 0 
 SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nSetFontStyle
   (KNativePointer ptr, KInt fontStyleValue) {
     TextStyle* instance = reinterpret_cast<TextStyle*>((ptr));
-    instance->setFontStyle(skija::FontStyle::fromJava(fontStyleValue));
+    instance->setFontStyle(skija::FontStyle::fromKotlin(fontStyleValue));
 }
-#endif
-
-
 
 SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_paragraph_TextStyle__1nGetShadows
   (KNativePointer ptr) {

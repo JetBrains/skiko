@@ -65,11 +65,13 @@ class FontCollection internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     fun setDefaultFontManager(fontMgr: FontMgr?, defaultFamilyName: String?): FontCollection {
         return try {
             Stats.onNativeCall()
-            _nSetDefaultFontManager(
-                _ptr,
-                getPtr(fontMgr),
-                defaultFamilyName
-            )
+            interopScope {
+                _nSetDefaultFontManager(
+                    _ptr,
+                    getPtr(fontMgr),
+                    toInterop(defaultFamilyName)
+                )
+            }
             this
         } finally {
             reachabilityBarrier(fontMgr)
@@ -151,7 +153,7 @@ private external fun _nSetDynamicFontManager(ptr: NativePointer, fontManagerPtr:
 private external fun _nSetTestFontManager(ptr: NativePointer, fontManagerPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nSetDefaultFontManager")
-private external fun _nSetDefaultFontManager(ptr: NativePointer, fontManagerPtr: NativePointer, defaultFamilyName: String?): NativePointer
+private external fun _nSetDefaultFontManager(ptr: NativePointer, fontManagerPtr: NativePointer, defaultFamilyName: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nGetFallbackManager")
 private external fun _nGetFallbackManager(ptr: NativePointer): NativePointer

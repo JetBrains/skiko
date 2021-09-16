@@ -13,21 +13,11 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ManagedString__1nGetFinalizer
     return reinterpret_cast<KNativePointer>((&deleteString));
 }
 
-
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ManagedString__1nMake
   (KInteropPointer textStr) {
-    TODO("implement org_jetbrains_skia_ManagedString__1nMake");
-}
-     
-#if 0 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_ManagedString__1nMake
-  (KInteropPointer textStr) {
-    SkString* text = new SkString(skString(env, textStr));
+    SkString* text = new SkString(skString(textStr));
     return reinterpret_cast<KNativePointer>(text);
 }
-#endif
-
-
 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_ManagedString__1nToString
   (KNativePointer ptr) {
@@ -58,21 +48,11 @@ SKIKO_EXPORT void org_jetbrains_skia_ManagedString__1nInsert
 }
 #endif
 
-
-
-SKIKO_EXPORT void org_jetbrains_skia_ManagedString__1nAppend
-  (KNativePointer ptr, KInteropPointer s) {
-    TODO("implement org_jetbrains_skia_ManagedString__1nAppend");
-}
-     
-#if 0 
 SKIKO_EXPORT void org_jetbrains_skia_ManagedString__1nAppend
   (KNativePointer ptr, KInteropPointer s) {
     SkString* instance = reinterpret_cast<SkString*>((ptr));
-    instance->append(skString(env, s));
+    instance->append(skString(s));
 }
-#endif
-
 
 SKIKO_EXPORT void org_jetbrains_skia_ManagedString__1nRemoveSuffix
   (KNativePointer ptr, KInt from) {

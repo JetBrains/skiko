@@ -3,12 +3,8 @@ package org.jetbrains.skia.paragraph
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.*
-import org.jetbrains.skia.impl.Managed
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.*
 
 class Paragraph internal constructor(ptr: NativePointer, text: ManagedString?) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
@@ -122,7 +118,9 @@ class Paragraph internal constructor(ptr: NativePointer, text: ManagedString?) :
     val rectsForPlaceholders: Array<org.jetbrains.skia.paragraph.TextBox>
         get() = try {
             Stats.onNativeCall()
-            _nGetRectsForPlaceholders(_ptr)
+            interopScope {
+                _nGetRectsForPlaceholders(_ptr).fromInterop(TextBox)
+            }
         } finally {
             reachabilityBarrier(this)
         }
@@ -153,19 +151,21 @@ class Paragraph internal constructor(ptr: NativePointer, text: ManagedString?) :
 
     private fun toIRange(p: Long) = IRange((p ushr 32).toInt(), (p and -1).toInt())
 
-    val lineMetrics: Array<LineMetrics?>
+    val lineMetrics: Array<LineMetrics>
         get() = try {
             if (_text == null) {
-                arrayOfNulls(0)
+                arrayOf<LineMetrics>()
             } else {
                 Stats.onNativeCall()
-                _nGetLineMetrics(_ptr, getPtr(_text))
+                interopScope {
+                    _nGetLineMetrics(_ptr, getPtr(_text)).fromInterop(LineMetrics)
+                }
             }
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(_text)
         }
-    val lineNumber: NativePointer
+    val lineNumber: Int
         get() = try {
             Stats.onNativeCall()
             _nGetLineNumber(_ptr)
@@ -310,7 +310,7 @@ private external fun _nGetRectsForRange(
 
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nGetRectsForPlaceholders")
-private external fun _nGetRectsForPlaceholders(ptr: NativePointer): Array<TextBox>
+private external fun _nGetRectsForPlaceholders(ptr: NativePointer): InteropPointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nGetGlyphPositionAtCoordinate")
 private external fun _nGetGlyphPositionAtCoordinate(ptr: NativePointer, dx: Float, dy: Float): Int
@@ -319,10 +319,10 @@ private external fun _nGetGlyphPositionAtCoordinate(ptr: NativePointer, dx: Floa
 private external fun _nGetWordBoundary(ptr: NativePointer, offset: Int): Long
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nGetLineMetrics")
-private external fun _nGetLineMetrics(ptr: NativePointer, textPtr: NativePointer): Array<LineMetrics?>
+private external fun _nGetLineMetrics(ptr: NativePointer, textPtr: NativePointer): InteropPointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nGetLineNumber")
-private external fun _nGetLineNumber(ptr: NativePointer): NativePointer
+private external fun _nGetLineNumber(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nMarkDirty")
 private external fun _nMarkDirty(ptr: NativePointer)

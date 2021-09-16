@@ -1,5 +1,8 @@
 package org.jetbrains.skia.paragraph
 
+import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.*
+
 class LineMetrics(
     /**
      * The index in the text buffer the line begins.
@@ -16,7 +19,8 @@ class LineMetrics(
     /**
      * The index in the text buffer the line begins.
      */
-    val endIncludingNewline: Long, val isHardBreak: Boolean,
+    val endIncludingNewline: Long,
+    val isHardBreak: Boolean,
     /**
      * The final computed ascent for the line. This can be impacted by the strut, height,
      * scaling, as well as outlying runs that are very tall. The top edge is
@@ -148,7 +152,41 @@ class LineMetrics(
         return result
     }
 
+    companion object : ArrayInteropDecoder<LineMetrics> {
+        override fun getArraySize(array: InteropPointer) = LineMetrics_nGetArraySize(array)
+        override fun disposeArray(array: InteropPointer) = LineMetrics_nDisposeArray(array)
+        override fun getArrayElement(array: InteropPointer, index: Int): LineMetrics {
+            val longArray = LongArray(6)
+            val doubleArray = DoubleArray(7)
+            val result = interopScope {
+                LineMetrics_nGetArrayElement(array, index, toInterop(longArray), toInterop(doubleArray))
+            }
+            return LineMetrics(
+                longArray[0],
+                longArray[1],
+                longArray[2],
+                longArray[3],
+                longArray[4] != 0L,
+                doubleArray[0],
+                doubleArray[1],
+                doubleArray[2],
+                doubleArray[3],
+                doubleArray[4],
+                doubleArray[5],
+                doubleArray[6],
+                longArray[5]
+            )
+        }
+    }
+
     override fun toString(): String {
         return "LineMetrics(_startIndex=$startIndex, _endIndex=$endIndex, _endExcludingWhitespaces=$endExcludingWhitespaces, _endIncludingNewline=$endIncludingNewline, _hardBreak=$isHardBreak, _ascent=$ascent, _descent=$descent, _unscaledAscent=$unscaledAscent, _height=$height, _width=$width, _left=$left, _baseline=$baseline, _lineNumber=$lineNumber)"
     }
 }
+
+@ExternalSymbolName("org_jetbrains_skia_paragraph_LineMetrics__1nGetArraySize")
+private external fun LineMetrics_nGetArraySize(array: InteropPointer): Int
+@ExternalSymbolName("org_jetbrains_skia_paragraph_LineMetrics__1nDisposeArray")
+private external fun LineMetrics_nDisposeArray(array: InteropPointer)
+@ExternalSymbolName("org_jetbrains_skia_paragraph_LineMetrics__1nGetArrayElement")
+private external fun LineMetrics_nGetArrayElement(array: InteropPointer, index: Int, longArgs: InteropPointer, doubleArgs: InteropPointer)

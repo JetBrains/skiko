@@ -38,21 +38,12 @@ SKIKO_EXPORT void org_jetbrains_skia_paragraph_ParagraphBuilder__1nPopStyle
     instance->pop();
 }
 
-
-SKIKO_EXPORT void org_jetbrains_skia_paragraph_ParagraphBuilder__1nAddText
-  (KNativePointer ptr, KInteropPointer textString) {
-    TODO("implement org_jetbrains_skia_paragraph_ParagraphBuilder__1nAddText");
-}
-     
-#if 0 
 SKIKO_EXPORT void org_jetbrains_skia_paragraph_ParagraphBuilder__1nAddText
   (KNativePointer ptr, KInteropPointer textString) {
     ParagraphBuilder* instance = reinterpret_cast<ParagraphBuilder*>((ptr));
-    SkString text = skString(env, textString);
+    SkString text = skString(textString);
     instance->addText(text.c_str(), text.size());
 }
-#endif
-
 
 SKIKO_EXPORT void org_jetbrains_skia_paragraph_ParagraphBuilder__1nAddPlaceholder
   (KNativePointer ptr, KFloat width, KFloat height, KInt alignment, KInt baselinePosition, KFloat baseline) {

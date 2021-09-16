@@ -101,6 +101,15 @@ std::unique_ptr<SkM44> skM44(KFloat* matrixArray) {
     }
 }
 
+SkString skString(KInteropPointer s) {
+    char* str = reinterpret_cast<char *>(s);
+    if (str == nullptr) {
+        return SkString();
+    } else {
+        return SkString(str);
+    }
+}
+
 namespace skija {
     namespace RRect {
         SkRRect toSkRRect(KFloat left, KFloat top, KFloat right, KFloat bottom, KFloat* radii, KInt radiiSize) {
@@ -125,6 +134,15 @@ namespace skija {
                 }
             }
             return rrect;
+        }
+    }
+    namespace FontStyle {
+        SkFontStyle fromKotlin(KInt style) {
+            return SkFontStyle(style & 0xFFFF, (style >> 16) & 0xFF, static_cast<SkFontStyle::Slant>((style >> 24) & 0xFF));
+        }
+
+        KInt toKotlin(const SkFontStyle& fs) {
+            return (static_cast<int>(fs.slant()) << 24)| (fs.width() << 16) | fs.weight();
         }
     }
 }
