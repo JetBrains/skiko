@@ -8,8 +8,14 @@ import org.jetbrains.skiko.hostFullName
 
 class RenderExceptionsHandler {
     companion object {
+        private var output: File? = null
         @JvmStatic
         fun logAndThrow(message: String) {
+            if (output == null) {
+                output = File(
+                    "${Library.cacheRoot}/skiko-render-exception-${ProcessHandle.current().pid()}.log"
+                )
+            }
             val exception = Exception(message)
             if (System.getProperty("skiko.renderexceptionlogger.enabled") == "true") {
                 writeLog(exception)
@@ -32,8 +38,7 @@ class RenderExceptionsHandler {
                 }
                 append("\n\n")
             }
-            val output = File("${Library.cacheRoot}/skiko-render-exception.log")
-            output.appendText(outputBuilder.toString())
+            output?.appendText(outputBuilder.toString())
         }
 
     }
