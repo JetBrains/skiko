@@ -203,68 +203,68 @@ class ParagraphStyle : Managed(ParagraphStyle_nMake(), _FinalizerHolder.PTR) {
 }
 
 
-@ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nGetFinalizer")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetFinalizer")
 private external fun ParagraphStyle_nGetFinalizer(): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nMake")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nMake")
 private external fun ParagraphStyle_nMake(): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nGetHeight")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetHeight")
 private external fun ParagraphStyle_nGetHeight(ptr: NativePointer): Float
 
-@ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nEquals")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nEquals")
 private external fun _nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
 
-@ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nGetStrutStyle")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetStrutStyle")
 private external fun _nGetStrutStyle(ptr: NativePointer): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nSetStrutStyle")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetStrutStyle")
 private external fun _nSetStrutStyle(ptr: NativePointer, stylePtr: NativePointer)
 
-@ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nGetTextStyle")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetTextStyle")
 private external fun _nGetTextStyle(ptr: NativePointer): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nSetTextStyle")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetTextStyle")
 private external fun _nSetTextStyle(ptr: NativePointer, textStylePtr: NativePointer)
 
-@ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nGetDirection")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetDirection")
 private external fun _nGetDirection(ptr: NativePointer): Int
 
-@ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nSetDirection")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetDirection")
 private external fun _nSetDirection(ptr: NativePointer, direction: Int)
 
-@ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nGetAlignment")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetAlignment")
 private external fun _nGetAlignment(ptr: NativePointer): Int
 
-@ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nSetAlignment")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetAlignment")
 private external fun _nSetAlignment(ptr: NativePointer, align: Int)
 
-@ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nGetMaxLinesCount")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetMaxLinesCount")
 private external fun _nGetMaxLinesCount(ptr: NativePointer): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nSetMaxLinesCount")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetMaxLinesCount")
 private external fun _nSetMaxLinesCount(ptr: NativePointer, maxLines: NativePointer)
 
-@ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nGetEllipsis")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetEllipsis")
 private external fun _nGetEllipsis(ptr: NativePointer): String
 
-@ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nSetEllipsis")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetEllipsis")
 private external fun _nSetEllipsis(ptr: NativePointer, ellipsis: String?)
 
-@ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nSetHeight")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetHeight")
 private external fun _nSetHeight(ptr: NativePointer, height: Float)
 
-@ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nGetHeightMode")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetHeightMode")
 private external fun _nGetHeightMode(ptr: NativePointer): Int
 
-@ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nSetHeightMode")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetHeightMode")
 private external fun _nSetHeightMode(ptr: NativePointer, v: Int)
 
-@ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nGetEffectiveAlignment")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetEffectiveAlignment")
 private external fun _nGetEffectiveAlignment(ptr: NativePointer): Int
 
-@ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nIsHintingEnabled")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nIsHintingEnabled")
 private external fun _nIsHintingEnabled(ptr: NativePointer): Boolean
 
-@ExternalSymbolName("org_jetbrains_skia_ParagraphStyle__1nDisableHinting")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nDisableHinting")
 private external fun _nDisableHinting(ptr: NativePointer)

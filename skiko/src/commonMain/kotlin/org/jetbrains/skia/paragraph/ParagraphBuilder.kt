@@ -87,22 +87,22 @@ class ParagraphBuilder(style: ParagraphStyle?, fc: FontCollection?) :
     }
 }
 
-@ExternalSymbolName("org_jetbrains_skia_ParagraphBuilder__1nGetFinalizer")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nGetFinalizer")
 private external fun ParagraphBuilder_nGetFinalizer(): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_ParagraphBuilder__1nMake")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nMake")
 private external fun _nMake(paragraphStylePtr: NativePointer, fontCollectionPtr: NativePointer): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_ParagraphBuilder__1nPushStyle")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nPushStyle")
 private external fun _nPushStyle(ptr: NativePointer, textStylePtr: NativePointer)
 
-@ExternalSymbolName("org_jetbrains_skia_ParagraphBuilder__1nPopStyle")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nPopStyle")
 private external fun _nPopStyle(ptr: NativePointer)
 
-@ExternalSymbolName("org_jetbrains_skia_ParagraphBuilder__1nAddText")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nAddText")
 private external fun _nAddText(ptr: NativePointer, text: String?)
 
-@ExternalSymbolName("org_jetbrains_skia_ParagraphBuilder__1nAddPlaceholder")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nAddPlaceholder")
 private external fun _nAddPlaceholder(
     ptr: NativePointer,
     width: Float,
@@ -113,8 +113,8 @@ private external fun _nAddPlaceholder(
 )
 
 
-@ExternalSymbolName("org_jetbrains_skia_ParagraphBuilder__1nSetParagraphStyle")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nSetParagraphStyle")
 private external fun _nSetParagraphStyle(ptr: NativePointer, stylePtr: NativePointer)
 
-@ExternalSymbolName("org_jetbrains_skia_ParagraphBuilder__1nBuild")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nBuild")
 private external fun _nBuild(ptr: NativePointer): NativePointer

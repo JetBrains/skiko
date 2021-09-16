@@ -37,8 +37,8 @@ class TypefaceFontProvider : FontMgr(TypefaceFontProvider_nMake()) {
 }
 
 
-@ExternalSymbolName("org_jetbrains_skia_TypefaceFontProvider__1nMake")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_TypefaceFontProvider__1nMake")
 private external fun TypefaceFontProvider_nMake(): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_TypefaceFontProvider__1nRegisterTypeface")
+@ExternalSymbolName("org_jetbrains_skia_paragraph_TypefaceFontProvider__1nRegisterTypeface")
 private external fun _nRegisterTypeface(ptr: NativePointer, typefacePtr: NativePointer, alias: String?): NativePointer
