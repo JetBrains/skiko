@@ -24,10 +24,20 @@ expect class InteropScope() {
     fun InteropPointer.fromInterop(result: CharArray)
     fun toInterop(array: ByteArray?): InteropPointer
     fun InteropPointer.fromInterop(result: ByteArray)
+    fun toInterop(array: ShortArray?): InteropPointer
+    fun InteropPointer.fromInterop(result: ShortArray)
+    fun toInterop(array: IntArray?): InteropPointer
+    fun InteropPointer.fromInterop(result: IntArray)
+    fun toInterop(array: LongArray?): InteropPointer
+    fun InteropPointer.fromInterop(result: LongArray)
     fun toInterop(array: FloatArray?): InteropPointer
     fun InteropPointer.fromInterop(result: FloatArray)
+    fun toInterop(array: DoubleArray?): InteropPointer
+    fun InteropPointer.fromInterop(result: DoubleArray)
     fun toInterop(array: NativePointerArray?): InteropPointer
-
+    fun InteropPointer.fromInterop(result: NativePointerArray)
+    fun toInterop(stringArray: Array<String>?): InteropPointer
+    fun InteropPointer.fromInteropNativePointerArray(): NativePointerArray
     fun release()
 }
 
@@ -54,3 +64,9 @@ inline fun withResult(result: FloatArray, block: (InteropPointer) -> Unit): Floa
     result
 }
 
+inline fun withResult(result: NativePointerArray, block: (InteropPointer) -> Unit): NativePointerArray = interopScope {
+    val handle = toInterop(result)
+    block(handle)
+    handle.fromInterop(result)
+    result
+}

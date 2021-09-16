@@ -47,7 +47,6 @@ actual fun reachabilityBarrier(obj: Any?) {
 }
 
 actual typealias NativePointer = Long
-actual typealias NativePointerArray = LongArray
 
 actual typealias InteropPointer = Any?
 
@@ -56,8 +55,36 @@ actual class InteropScope actual constructor() {
     actual fun InteropPointer.fromInterop(result: CharArray) {}
     actual fun toInterop(array: ByteArray?): InteropPointer = array
     actual fun InteropPointer.fromInterop(result: ByteArray) {}
+    actual fun toInterop(array: ShortArray?): InteropPointer = array
+    actual fun InteropPointer.fromInterop(result: ShortArray) {}
+    actual fun toInterop(array: IntArray?): InteropPointer = array
+    actual fun InteropPointer.fromInterop(result: IntArray) {}
+    actual fun toInterop(array: LongArray?): InteropPointer = array
+    actual fun InteropPointer.fromInterop(result: LongArray) {}
     actual fun toInterop(array: FloatArray?): InteropPointer = array
     actual fun InteropPointer.fromInterop(result: FloatArray) {}
-    actual fun toInterop(array: NativePointerArray?): InteropPointer = array
+    actual fun toInterop(array: DoubleArray?): InteropPointer = array
+    actual fun InteropPointer.fromInterop(result: DoubleArray) {}
+    actual fun toInterop(array: NativePointerArray?): InteropPointer = array?.backing
+    actual fun InteropPointer.fromInterop(result: NativePointerArray) {}
+    actual fun toInterop(stringArray: Array<String>?): InteropPointer = stringArray
+    actual fun InteropPointer.fromInteropNativePointerArray(): NativePointerArray =
+        NativePointerArray((this as LongArray).size, this)
     actual fun release() {}
+}
+
+actual class NativePointerArray constructor(size: Int, internal val backing: LongArray) {
+
+    actual constructor(size: Int) : this(size, LongArray(size))
+
+    actual operator fun get(index: Int): NativePointer {
+        return backing[index]
+    }
+
+    actual operator fun set(index: Int, value: NativePointer) {
+        backing[index] = value
+    }
+
+    actual val size: Int
+        get() = backing.size
 }

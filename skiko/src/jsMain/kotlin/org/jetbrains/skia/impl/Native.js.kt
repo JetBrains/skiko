@@ -25,7 +25,6 @@ actual fun reachabilityBarrier(obj: Any?) {
 }
 
 actual typealias NativePointer = Int
-actual typealias NativePointerArray = IntArray
 actual typealias InteropPointer = Int
 
 actual class InteropScope actual constructor() {
@@ -56,6 +55,44 @@ actual class InteropScope actual constructor() {
             0
         }
     }
+    actual fun InteropPointer.fromInterop(result: ShortArray) {
+        fromWasm(this@fromInterop, result)
+    }
+
+    actual fun toInterop(array: ShortArray?): InteropPointer {
+        return if (array != null) {
+            val data = _malloc(array.size * 2)
+            elements.add(data)
+            toWasm(data, array)
+            data
+        } else {
+            0
+        }
+    }
+
+    actual fun InteropPointer.fromInterop(result: IntArray) {
+        fromWasm(this@fromInterop, result)
+    }
+
+    actual fun toInterop(array: IntArray?): InteropPointer {
+        return if (array != null) {
+            val data = _malloc(array.size * 4)
+            elements.add(data)
+            toWasm(data, array)
+            data
+        } else {
+            0
+        }
+    }
+
+    actual fun InteropPointer.fromInterop(result: LongArray) {
+        TODO("implement wasm fromInterop(LongArray)")
+    }
+
+    actual fun toInterop(array: LongArray?): InteropPointer {
+        TODO("implement wasm toInterop(LongArray)")
+    }
+
     actual fun InteropPointer.fromInterop(result: FloatArray) {
         fromWasm(this@fromInterop, result)
     }
@@ -70,6 +107,15 @@ actual class InteropScope actual constructor() {
             0
         }
     }
+
+    actual fun InteropPointer.fromInterop(result: DoubleArray) {
+        TODO("implement wasm fromInterop(DoubleArray)")
+    }
+
+    actual fun toInterop(array: DoubleArray?): InteropPointer {
+        TODO("implement wasm toInterop(DoubleArray)")
+    }
+
     actual fun InteropPointer.fromInterop(result: ByteArray) {
         fromWasm(this@fromInterop, result)
     }
@@ -78,11 +124,22 @@ actual class InteropScope actual constructor() {
         return if (array != null) {
             val data = _malloc(array.size * 4)
             elements.add(data)
-            toWasm(data, array)
+            toWasm(data, array.backing)
             data
         } else {
             0
         }
+    }
+
+    actual fun InteropPointer.fromInterop(result: NativePointerArray) {
+        TODO("implement wasm fromInterop(NativePointerArray)")
+    }
+
+    actual fun toInterop(stringArray: Array<String>?): InteropPointer =
+        TODO("implement wasm toInterop(Array<String>)")
+
+    actual fun InteropPointer.fromInteropNativePointerArray(): NativePointerArray {
+        TODO("implement wasm fromInteropNativePointerArray")
     }
 
     actual fun release()  {
@@ -111,6 +168,10 @@ private fun toWasm(dest: NativePointer, src: CharArray) {
     js("HEAPU16.set(src, dest)")
 }
 
+private fun toWasm(dest: NativePointer, src: ShortArray) {
+    js("HEAPU16.set(src, dest)")
+}
+
 private fun toWasm(dest: NativePointer, src: FloatArray) {
     js("HEAPU32.set(src, dest)")
 }
@@ -127,8 +188,28 @@ private fun fromWasm(src: NativePointer, result: CharArray) {
     js("result.set(HEAPU16.subarray(src, result.size))")
 }
 
+private fun fromWasm(src: NativePointer, result: ShortArray) {
+    js("result.set(HEAPU16.subarray(src, result.size))")
+}
+
+private fun fromWasm(src: NativePointer, result: IntArray) {
+    js("result.set(HEAPU32.subarray(src, result.size))")
+}
+
 private fun fromWasm(src: NativePointer, result: FloatArray) {
     js("result.set(HEAPU32.subarray(src, result.size))")
 }
 
+actual class NativePointerArray actual constructor(size: Int) {
+    internal val backing = IntArray(size)
+    actual operator fun get(index: Int): NativePointer {
+        return backing[index]
+    }
 
+    actual operator fun set(index: Int, value: NativePointer) {
+        backing[index] = value
+    }
+
+    actual val size: Int
+        get() = backing.size
+}
