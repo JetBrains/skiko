@@ -27,6 +27,15 @@ actual fun reachabilityBarrier(obj: Any?) {
 actual typealias NativePointer = Int
 actual typealias InteropPointer = Int
 
+actual inline fun <T> interopScope(block: InteropScope.() -> T): T {
+    val scope = InteropScope()
+    try {
+        return scope.block()
+    } finally {
+        scope.release()
+    }
+}
+
 actual class InteropScope actual constructor() {
     private val elements = mutableListOf<NativePointer>()
 
