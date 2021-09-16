@@ -6,7 +6,6 @@
 #include "SkPaint.h"
 #include "SkPathEffect.h"
 #include "SkShader.h"
-#include "SkFilterQuality.h"
 #include "interop.hh"
 
 static void deletePaint(SkPaint* paint) {

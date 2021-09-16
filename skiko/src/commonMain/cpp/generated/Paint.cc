@@ -8,7 +8,6 @@
 #include "SkPaint.h"
 #include "SkPathEffect.h"
 #include "SkShader.h"
-#include "SkFilterQuality.h"
 #include "common.h"
 
 void deletePaint(SkPaint* paint) {
