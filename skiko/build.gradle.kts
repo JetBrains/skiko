@@ -363,7 +363,7 @@ val wasmCompile = project.tasks.register<Exec>("wasmCompile") {
                 "-I$projectDir/src/commonMain/cpp",
                 *skiaPreprocessorFlags(skiaDir),
                 "-o", outJs,
-                "--pre-js", skikoJsPrefix,
+                "--extern-post-js", skikoJsPrefix,
                 *srcs
             )
             argumentProviders.add(CommandLineArgumentProvider {
