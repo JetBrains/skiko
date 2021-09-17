@@ -1,6 +1,3 @@
-#define WIN32_LEAN_AND_MEAN
-#include <vector>
-#include <string>
 #include <windows.h>
 #include <wingdi.h>
 #include <gl/GL.h>
@@ -12,9 +9,9 @@ extern "C"
 {
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt_getDevice(JNIEnv *env, jobject redrawer, jlong platformInfoPtr)
     {
-        try {
+        __try
+        {
             JAWT_Win32DrawingSurfaceInfo* dsi_win = fromJavaPointer<JAWT_Win32DrawingSurfaceInfo *>(platformInfoPtr);
-
             HWND hwnd = dsi_win->hwnd;
             HDC device = GetDC(hwnd);
 
@@ -31,28 +28,44 @@ extern "C"
             DescribePixelFormat(device, iPixelFormat, sizeof(PIXELFORMATDESCRIPTOR), &pixFormatDscr);
       
             return toJavaPointer(device);
-        } catch(...) {
-            logJavaException(env, handleException(__FUNCTION__));
+        }
+        __except(EXCEPTION_EXECUTE_HANDLER) {
+            auto code = GetExceptionCode();
+            logJavaException(env, __FUNCTION__, code);
         }
         return (jlong) 0;
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt_setSwapInterval(JNIEnv *env, jobject redrawer, jint interval)
     {
-        typedef BOOL (WINAPI *PFNWGLSWAPINTERVALEXTPROC)(int interval);
-        // according to [https://opengl.gpuinfo.org/listreports.php?extension=WGL_EXT_swap_control&option=not] (filter by OS=windows)
-        // there a very few devices that doesn't support swap control
-        static PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT = (PFNWGLSWAPINTERVALEXTPROC) wglGetProcAddress("wglSwapIntervalEXT");
-        if (wglSwapIntervalEXT != NULL)
+        __try
         {
-            wglSwapIntervalEXT(interval);
+            typedef BOOL (WINAPI *PFNWGLSWAPINTERVALEXTPROC)(int interval);
+            // according to [https://opengl.gpuinfo.org/listreports.php?extension=WGL_EXT_swap_control&option=not] (filter by OS=windows)
+            // there a very few devices that doesn't support swap control
+            static PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT = (PFNWGLSWAPINTERVALEXTPROC) wglGetProcAddress("wglSwapIntervalEXT");
+            if (wglSwapIntervalEXT != NULL)
+            {
+                wglSwapIntervalEXT(interval);
+            }
+        }
+        __except(EXCEPTION_EXECUTE_HANDLER) {
+            auto code = GetExceptionCode();
+            logJavaException(env, __FUNCTION__, code);
         }
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt_swapBuffers(JNIEnv *env, jobject redrawer, jlong devicePtr)
     {
-        HDC device = fromJavaPointer<HDC>(devicePtr);
-        SwapBuffers(device);
+        __try
+        {
+            HDC device = fromJavaPointer<HDC>(devicePtr);
+            SwapBuffers(device);
+        }
+        __except(EXCEPTION_EXECUTE_HANDLER) {
+            auto code = GetExceptionCode();
+            logJavaException(env, __FUNCTION__, code);
+        }
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt_makeCurrent(JNIEnv *env, jobject redrawer, jlong devicePtr, jlong contextPtr)
@@ -64,11 +77,14 @@ extern "C"
 
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt_createContext(JNIEnv *env, jobject redrawer, jlong devicePtr)
     {
-        try {
+        __try
+        {
             HDC device = fromJavaPointer<HDC>(devicePtr);
             return toJavaPointer(wglCreateContext(device));
-        } catch(...) {
-            logJavaException(env, handleException(__FUNCTION__));
+        }
+        __except(EXCEPTION_EXECUTE_HANDLER) {
+            auto code = GetExceptionCode();
+            logJavaException(env, __FUNCTION__, code);
         }
         return (jlong) 0;
     }

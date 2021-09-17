@@ -43,12 +43,8 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DirectContextKt__1nMa
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_DirectContextKt_DirectContext_1nFlush
   (JNIEnv* env, jclass jclass, jlong ptr) {
-    try {
-      GrDirectContext* context = reinterpret_cast<GrDirectContext*>(static_cast<uintptr_t>(ptr));
-      context->flush(GrFlushInfo());
-    } catch(...) {
-      logJavaException(env, handleException(__FUNCTION__));
-    }
+    GrDirectContext* context = reinterpret_cast<GrDirectContext*>(static_cast<uintptr_t>(ptr));
+    context->flush(GrFlushInfo());
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_DirectContextKt__1nSubmit

@@ -13,15 +13,18 @@ extern "C"
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_context_Direct3DContextHandler_flush(
         JNIEnv *env, jobject redrawer, jlong contextPtr, jlong surfacePtr)
     {
-        try {
+        __try
+        {
             SkSurface *surface = fromJavaPointer<SkSurface *>(surfacePtr);
             GrDirectContext *context = fromJavaPointer<GrDirectContext *>(contextPtr);
             surface->flushAndSubmit(true);
             surface->flush(SkSurface::BackendSurfaceAccess::kPresent, GrFlushInfo());
             context->flush({});
             context->submit(true);
-        } catch(...) {
-            logJavaException(env, handleException(__FUNCTION__));
+        }
+        __except(EXCEPTION_EXECUTE_HANDLER) {
+            auto code = GetExceptionCode();
+            logJavaException(env, __FUNCTION__, code);
         }
     }
 }

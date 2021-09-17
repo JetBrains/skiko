@@ -15,50 +15,41 @@ extern "C"
 {
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_setSwapInterval(JNIEnv *env, jobject redrawer, jlong displayPtr, jlong windowPtr, jint interval)
     {
-        try {
-            Display *display = fromJavaPointer<Display *>(displayPtr);
-            Window window = fromJavaPointer<Window>(windowPtr);
-
-            // according to:
-            // https://opengl.gpuinfo.org/listreports.php?extension=GLX_EXT_swap_control
-            // https://opengl.gpuinfo.org/listreports.php?extension=GLX_MESA_swap_control
-            // https://opengl.gpuinfo.org/listreports.php?extension=GLX_SGI_swap_control
-            // there is no Linux that doesn't support at least one of these extensions
-            static PFNGLXSWAPINTERVALEXTPROC glXSwapIntervalEXT = (PFNGLXSWAPINTERVALEXTPROC) glXGetProcAddress((const GLubyte*)"glXSwapIntervalEXT");
-            if (glXSwapIntervalEXT != NULL)
+        Display *display = fromJavaPointer<Display *>(displayPtr);
+        Window window = fromJavaPointer<Window>(windowPtr);
+        // according to:
+        // https://opengl.gpuinfo.org/listreports.php?extension=GLX_EXT_swap_control
+        // https://opengl.gpuinfo.org/listreports.php?extension=GLX_MESA_swap_control
+        // https://opengl.gpuinfo.org/listreports.php?extension=GLX_SGI_swap_control
+        // there is no Linux that doesn't support at least one of these extensions
+        static PFNGLXSWAPINTERVALEXTPROC glXSwapIntervalEXT = (PFNGLXSWAPINTERVALEXTPROC) glXGetProcAddress((const GLubyte*)"glXSwapIntervalEXT");
+        if (glXSwapIntervalEXT != NULL)
+        {
+            glXSwapIntervalEXT(display, window, interval);
+        }
+        else
+        {
+            static PFNGLXSWAPINTERVALMESAPROC glXSwapIntervalMESA = (PFNGLXSWAPINTERVALMESAPROC) glXGetProcAddress((const GLubyte*)"glXSwapIntervalMESA");
+            if (glXSwapIntervalMESA != NULL)
             {
-                glXSwapIntervalEXT(display, window, interval);
+                glXSwapIntervalMESA(interval);
             }
             else
             {
-                static PFNGLXSWAPINTERVALMESAPROC glXSwapIntervalMESA = (PFNGLXSWAPINTERVALMESAPROC) glXGetProcAddress((const GLubyte*)"glXSwapIntervalMESA");
-                if (glXSwapIntervalMESA != NULL)
+                static PFNGLXSWAPINTERVALSGIPROC glXSwapIntervalSGI = (PFNGLXSWAPINTERVALSGIPROC) glXGetProcAddress((const GLubyte*)"glXSwapIntervalSGI");
+                if (glXSwapIntervalSGI != NULL)
                 {
-                    glXSwapIntervalMESA(interval);
-                }
-                else
-                {
-                    static PFNGLXSWAPINTERVALSGIPROC glXSwapIntervalSGI = (PFNGLXSWAPINTERVALSGIPROC) glXGetProcAddress((const GLubyte*)"glXSwapIntervalSGI");
-                    if (glXSwapIntervalSGI != NULL)
-                    {
-                        glXSwapIntervalSGI(interval);
-                    }
+                    glXSwapIntervalSGI(interval);
                 }
             }
-        } catch(...) {
-            logJavaException(env, handleException(__FUNCTION__));
         }
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_swapBuffers(JNIEnv *env, jobject redrawer, jlong displayPtr, jlong windowPtr)
     {
-        try {
-            Display *display = fromJavaPointer<Display *>(displayPtr);
-            Window window = fromJavaPointer<Window>(windowPtr);
-            glXSwapBuffers(display, window);
-        } catch(...) {
-            logJavaException(env, handleException(__FUNCTION__));
-        }
+        Display *display = fromJavaPointer<Display *>(displayPtr);
+        Window window = fromJavaPointer<Window>(windowPtr);
+        glXSwapBuffers(display, window);
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_makeCurrent(JNIEnv *env, jobject redrawer, jlong displayPtr, jlong windowPtr, jlong contextPtr)
@@ -72,21 +63,16 @@ extern "C"
 
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_createContext(JNIEnv *env, jobject redrawer, jlong displayPtr)
     {
-        try {
-            Display *display = fromJavaPointer<Display *>(displayPtr);
-            if (!display) return 0;
+        Display *display = fromJavaPointer<Display *>(displayPtr);
+        if (!display) return 0;
 
-            GLint att[] = {GLX_RGBA, GLX_DOUBLEBUFFER, True, None};
-            XVisualInfo *vi = glXChooseVisual(display, 0, att);
+        GLint att[] = {GLX_RGBA, GLX_DOUBLEBUFFER, True, None};
+        XVisualInfo *vi = glXChooseVisual(display, 0, att);
 
-            if (!vi) return 0;
+        if (!vi) return 0;
 
-            GLXContext *context = new GLXContext(glXCreateContext(display, vi, NULL, GL_TRUE));
-            return toJavaPointer(context);
-        } catch(...) {
-            logJavaException(env, handleException(__FUNCTION__));
-        }
-        return (jlong) 0;
+        GLXContext *context = new GLXContext(glXCreateContext(display, vi, NULL, GL_TRUE));
+        return toJavaPointer(context);
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_destroyContext(JNIEnv *env, jobject redrawer, jlong displayPtr, jlong contextPtr)

@@ -1,60 +1,110 @@
+#if SK_BUILD_FOR_WIN
+
 #include "jni_helpers.h"
 
-JavaVM *jvmPointer = NULL;
+JavaVM *jvm = NULL;
 
-std::string handleException(std::string function)
+bool isHandleException(JNIEnv *env)
 {
-    std::exception_ptr eptr = std::current_exception();
-    if (!eptr)
+    static jclass systemClass = NULL;
+    if (!systemClass)
     {
-        throw std::bad_exception();
+        systemClass = env->FindClass("java/lang/System");
     }
+
+    static jmethodID getPropertyMethod = NULL;
+    if (!getPropertyMethod)
+    {
+        getPropertyMethod = env->GetStaticMethodID(systemClass, "getProperty", "(Ljava/lang/String;)Ljava/lang/String;");
+    }
+
+    jstring propertyName= env->NewStringUTF("skiko.win.renderexceptionhandling.enabled");
+    jstring propertyString = (jstring)env->CallStaticObjectMethod(systemClass, getPropertyMethod, propertyName);
+    if (propertyString == 0)
+    {
+        return false;
+    }
+    const char *property = env->GetStringUTFChars(propertyString, 0);
+    bool result = !strcmp(property, "true");
+    env->ReleaseStringUTFChars(propertyString, property);
+    return result;
+}
+
+std::string getDescription(DWORD code)
+{
+    switch (code)
+    {
+    case EXCEPTION_ACCESS_VIOLATION:
+        return "EXCEPTION_ACCESS_VIOLATION";
+    case EXCEPTION_ARRAY_BOUNDS_EXCEEDED:
+        return "EXCEPTION_ARRAY_BOUNDS_EXCEEDED";
+    case EXCEPTION_BREAKPOINT:
+        return "EXCEPTION_BREAKPOINT";
+    case EXCEPTION_DATATYPE_MISALIGNMENT:
+        return "EXCEPTION_DATATYPE_MISALIGNMENT";
+    case EXCEPTION_FLT_DENORMAL_OPERAND:
+        return "EXCEPTION_FLT_DENORMAL_OPERAND";
+    case EXCEPTION_FLT_DIVIDE_BY_ZERO:
+        return "EXCEPTION_FLT_DIVIDE_BY_ZERO";
+    case EXCEPTION_FLT_INEXACT_RESULT:
+        return "EXCEPTION_FLT_INEXACT_RESULT";
+    case EXCEPTION_FLT_INVALID_OPERATION:
+        return "EXCEPTION_FLT_INVALID_OPERATION";
+    case EXCEPTION_FLT_OVERFLOW:
+        return "EXCEPTION_FLT_OVERFLOW";
+    case EXCEPTION_FLT_STACK_CHECK:
+        return "EXCEPTION_FLT_STACK_CHECK";
+    case EXCEPTION_FLT_UNDERFLOW:
+        return "EXCEPTION_FLT_UNDERFLOW";
+    case EXCEPTION_ILLEGAL_INSTRUCTION:
+        return "EXCEPTION_ILLEGAL_INSTRUCTION";
+    case EXCEPTION_IN_PAGE_ERROR:
+        return "EXCEPTION_IN_PAGE_ERROR";
+    case EXCEPTION_INT_DIVIDE_BY_ZERO:
+        return "EXCEPTION_INT_DIVIDE_BY_ZERO";
+    case EXCEPTION_INT_OVERFLOW:
+        return "EXCEPTION_INT_OVERFLOW";
+    case EXCEPTION_INVALID_DISPOSITION:
+        return "EXCEPTION_INVALID_DISPOSITION";
+    case EXCEPTION_NONCONTINUABLE_EXCEPTION:
+        return "EXCEPTION_NONCONTINUABLE_EXCEPTION";
+    case EXCEPTION_PRIV_INSTRUCTION:
+        return "EXCEPTION_PRIV_INSTRUCTION";
+    case EXCEPTION_SINGLE_STEP:
+        return "EXCEPTION_SINGLE_STEP";
+    case EXCEPTION_STACK_OVERFLOW:
+        return "EXCEPTION_STACK_OVERFLOW";
+    default:
+        return "UNKNOWN EXCEPTION";
+    }
+}
+
+void logJavaException(JNIEnv *env, const char *function, DWORD sehCode)
+{
     std::ostringstream oss;
     oss << "Native exception in [" << function << "]:" << std::endl;
-    try
+    oss << "SEH description: " << getDescription(sehCode) << std::endl;
+
+    if (jvm == NULL)
     {
-        std::rethrow_exception(eptr);
+        env->GetJavaVM(&jvm);
     }
-    catch (const std::exception &e)
-    {
-        oss << " - " << e.what() << std::endl;
-        return oss.str();
-    }
-    catch (const std::string &e)
-    {
-        oss << " - " << e << std::endl;
-        return oss.str();
-    }
-    catch (const char *e)
-    {
-        oss << " - " << e << std::endl;
-        return oss.str();
-    }
-    catch (...)
-    {
-        oss << " - Unknown exception - no stack trace" << std::endl;
-        return oss.str();
+
+    if (isHandleException(env)) {
+        static jclass logClass = NULL;
+        if (!logClass)
+        {
+            logClass = env->FindClass("org/jetbrains/skiko/RenderExceptionsHandler");
+        }
+
+        static jmethodID logMethod = NULL;
+        if (!logMethod)
+        {
+            logMethod = env->GetStaticMethodID(logClass, "logAndThrow", "(Ljava/lang/String;)V");
+        }
+
+        env->CallStaticVoidMethod(logClass, logMethod, env->NewStringUTF(oss.str().c_str()));
     }
 }
 
-void logJavaException(JNIEnv *env, std::string message)
-{
-    if (jvmPointer == NULL)
-    {
-        env->GetJavaVM(&jvmPointer);
-    }
-
-    static jclass logClass = NULL;
-    if (!logClass)
-    {
-        logClass = env->FindClass("org/jetbrains/skiko/RenderExceptionsHandler");
-    }
-
-    static jmethodID logMethod = NULL;
-    if (!logMethod)
-    {
-        logMethod = env->GetStaticMethodID(logClass, "logAndThrow", "(Ljava/lang/String;)V");
-    }
-
-    env->CallStaticVoidMethod(logClass, logMethod, env->NewStringUTF(message.c_str()));
-}
+#endif

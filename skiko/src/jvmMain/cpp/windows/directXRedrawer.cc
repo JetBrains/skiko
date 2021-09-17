@@ -15,18 +15,6 @@
 #include <dxgi1_4.h>
 #include <dxgi1_6.h>
 
-#define GR_D3D_CALL_ERRCHECK(X)                                        \
-    do                                                                 \
-    {                                                                  \
-        HRESULT result = X;                                            \
-        SkASSERT(SUCCEEDED(result));                                   \
-        if (!SUCCEEDED(result))                                        \
-        {                                                              \
-            SkDebugf("Failed Direct3D call. Error: 0x%08x\n", result); \
-            throw std::exception("ERROR");                             \
-        }                                                              \
-    } while (false)
-
 const int BuffersCount = 2;
 
 // This is a list of not supported graphics cards that have rendering issues (black screen, flickering)
@@ -69,6 +57,28 @@ public:
         swapChain.reset(nullptr);
         queue.reset(nullptr);
         device.reset(nullptr);
+    }
+
+    void initSwapChain() {
+        gr_cp<IDXGIFactory4> swapChainFactory4;
+        gr_cp<IDXGISwapChain1> swapChain1;
+        CreateDXGIFactory2(0, IID_PPV_ARGS(&swapChainFactory4));
+        DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
+        swapChainDesc.BufferCount = BuffersCount;
+        swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+        swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+        swapChainDesc.SampleDesc.Count = 1;
+        swapChainDesc.Scaling = DXGI_SCALING_NONE;
+        swapChainFactory4->CreateSwapChainForHwnd(queue.get(), window, &swapChainDesc, nullptr, nullptr, &swapChain1);
+        swapChainFactory4->MakeWindowAssociation(window, DXGI_MWA_NO_ALT_ENTER);
+        swapChain1->QueryInterface(IID_PPV_ARGS(&swapChain));
+        RECT windowRect;
+        GetWindowRect(window, &windowRect);
+        unsigned int w = windowRect.right - windowRect.left;
+        unsigned int h = windowRect.bottom - windowRect.top;
+        swapChain->ResizeBuffers(BuffersCount, w, h, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
+        swapChainFactory4.reset(nullptr);
     }
 };
 
@@ -324,52 +334,35 @@ extern "C"
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_initSwapChain(
         JNIEnv *env, jobject redrawer, jlong devicePtr)
     {
-        try {
+        __try
+        {
             DirectXDevice *d3dDevice = fromJavaPointer<DirectXDevice *>(devicePtr);
-
-            // Make the swapchain
-            gr_cp<IDXGIFactory4> swapChainFactory;
-            GR_D3D_CALL_ERRCHECK(CreateDXGIFactory2(0, IID_PPV_ARGS(&swapChainFactory)));
-
-            DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
-            swapChainDesc.BufferCount = BuffersCount;
-            swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-            swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-            swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-            swapChainDesc.SampleDesc.Count = 1;
-            swapChainDesc.Scaling = DXGI_SCALING_NONE;
-
-            gr_cp<IDXGISwapChain1> swapChain;
-            GR_D3D_CALL_ERRCHECK(swapChainFactory->CreateSwapChainForHwnd(d3dDevice->queue.get(), d3dDevice->window, &swapChainDesc, nullptr, nullptr, &swapChain));
-            GR_D3D_CALL_ERRCHECK(swapChainFactory->MakeWindowAssociation(d3dDevice->window, DXGI_MWA_NO_ALT_ENTER));
-            GR_D3D_CALL_ERRCHECK(swapChain->QueryInterface(IID_PPV_ARGS(&d3dDevice->swapChain)));
-
-            RECT windowRect;
-            GetWindowRect(d3dDevice->window, &windowRect);
-            unsigned int w = windowRect.right - windowRect.left;
-            unsigned int h = windowRect.bottom - windowRect.top;
-            GR_D3D_CALL_ERRCHECK(d3dDevice->swapChain->ResizeBuffers(BuffersCount, w, h, DXGI_FORMAT_R8G8B8A8_UNORM, 0));
-
-            swapChainFactory.reset(nullptr);
-            swapChainFactory.reset(nullptr);
-        } catch(...) {
-            logJavaException(env, handleException(__FUNCTION__));
+            d3dDevice->initSwapChain();
+        }
+        __except(EXCEPTION_EXECUTE_HANDLER) {
+            auto code = GetExceptionCode();
+            logJavaException(env, __FUNCTION__, code);
         }
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_initFence(
         JNIEnv *env, jobject redrawer, jlong devicePtr)
     {
-        DirectXDevice *d3dDevice = fromJavaPointer<DirectXDevice *>(devicePtr);
-        for (int i = 0; i < BuffersCount; i++)
+        __try
         {
-            d3dDevice->fenceValues[i] = 10000;
+            DirectXDevice *d3dDevice = fromJavaPointer<DirectXDevice *>(devicePtr);
+            for (int i = 0; i < BuffersCount; i++)
+            {
+                d3dDevice->fenceValues[i] = 10000;
+            }
+            d3dDevice->device->CreateFence(d3dDevice->fenceValues[0], D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&d3dDevice->fence));
+            d3dDevice->fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+            SkASSERT(d3dDevice->fenceEvent);
         }
-        GR_D3D_CALL_ERRCHECK(d3dDevice->device->CreateFence(d3dDevice->fenceValues[0],
-                                                            D3D12_FENCE_FLAG_NONE,
-                                                            IID_PPV_ARGS(&d3dDevice->fence)));
-        d3dDevice->fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-        SkASSERT(d3dDevice->fenceEvent);
+        __except(EXCEPTION_EXECUTE_HANDLER) {
+            auto code = GetExceptionCode();
+            logJavaException(env, __FUNCTION__, code);
+        }
     }
 
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_makeDirectXContext(
@@ -392,45 +385,55 @@ extern "C"
                                       1,
                                       1,
                                       0);
-        GR_D3D_CALL_ERRCHECK(d3dDevice->swapChain->GetBuffer(index, IID_PPV_ARGS(&d3dDevice->buffers[index])));
+        d3dDevice->swapChain->GetBuffer(index, IID_PPV_ARGS(&d3dDevice->buffers[index]));
 
         info.fResource = d3dDevice->buffers[index];
 
         SkSurfaceProps surfaceProps(0, kRGB_H_SkPixelGeometry);
         GrBackendTexture backendTexture((int)d3dDevice->buffers[index]->GetDesc().Width, (int)d3dDevice->buffers[index]->GetDesc().Height, info);
-        return toJavaPointer(SkSurface::MakeFromBackendTexture(
+        auto result = SkSurface::MakeFromBackendTexture(
                                  context, backendTexture, kTopLeft_GrSurfaceOrigin, 0,
                                  kRGBA_8888_SkColorType, SkColorSpace::MakeSRGB(), &surfaceProps)
-                                 .release());
+                                 .release();
+        return toJavaPointer(result);
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_resizeBuffers(
         JNIEnv *env, jobject redrawer, jlong devicePtr, jint width, jint height)
     {
-        DirectXDevice *d3dDevice = fromJavaPointer<DirectXDevice *>(devicePtr);
-        for (int i = 0; i < BuffersCount; i++)
-        {
-            if (d3dDevice->fence->GetCompletedValue() < d3dDevice->fenceValues[i])
+        __try {
+            DirectXDevice *d3dDevice = fromJavaPointer<DirectXDevice *>(devicePtr);
+            for (int i = 0; i < BuffersCount; i++)
             {
-                GR_D3D_CALL_ERRCHECK(d3dDevice->fence->SetEventOnCompletion(d3dDevice->fenceValues[i], d3dDevice->fenceEvent));
-                WaitForSingleObjectEx(d3dDevice->fenceEvent, INFINITE, FALSE);
+                if (d3dDevice->fence->GetCompletedValue() < d3dDevice->fenceValues[i])
+                {
+                    d3dDevice->fence->SetEventOnCompletion(d3dDevice->fenceValues[i], d3dDevice->fenceEvent);
+                    WaitForSingleObjectEx(d3dDevice->fenceEvent, INFINITE, FALSE);
+                }
+                d3dDevice->buffers[i].reset(nullptr);
             }
-            d3dDevice->buffers[i].reset(nullptr);
+            d3dDevice->swapChain->ResizeBuffers(BuffersCount, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
         }
-        GR_D3D_CALL_ERRCHECK(d3dDevice->swapChain->ResizeBuffers(BuffersCount, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 0));
+        __except(EXCEPTION_EXECUTE_HANDLER) {
+            auto code = GetExceptionCode();
+            logJavaException(env, __FUNCTION__, code);
+        }
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_swap(
         JNIEnv *env, jobject redrawer, jlong devicePtr, jboolean isVsyncEnabled)
     {
-        try {
+        __try
+        {
             DirectXDevice *d3dDevice = fromJavaPointer<DirectXDevice *>(devicePtr);
             // 1 value in [Present(1, 0)] enables vblank wait so this is how vertical sync works in DirectX.
             const UINT64 fenceValue = d3dDevice->fenceValues[d3dDevice->bufferIndex];
-            GR_D3D_CALL_ERRCHECK(d3dDevice->swapChain->Present((int)isVsyncEnabled, 0));
-            GR_D3D_CALL_ERRCHECK(d3dDevice->queue->Signal(d3dDevice->fence.get(), fenceValue));
-        } catch(...) {
-            logJavaException(env, handleException(__FUNCTION__));
+            d3dDevice->swapChain->Present((int)isVsyncEnabled, 0);
+            d3dDevice->queue->Signal(d3dDevice->fence.get(), fenceValue);
+        }
+        __except(EXCEPTION_EXECUTE_HANDLER) {
+            auto code = GetExceptionCode();
+            logJavaException(env, __FUNCTION__, code);
         }
     }
 
@@ -444,16 +447,22 @@ extern "C"
     JNIEXPORT jint JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_getBufferIndex(
         JNIEnv *env, jobject redrawer, jlong devicePtr)
     {
-        DirectXDevice *d3dDevice = fromJavaPointer<DirectXDevice *>(devicePtr);
-        const UINT64 fenceValue = d3dDevice->fenceValues[d3dDevice->bufferIndex];
-        d3dDevice->bufferIndex = d3dDevice->swapChain->GetCurrentBackBufferIndex();
-        if (d3dDevice->fence->GetCompletedValue() < fenceValue)
-        {
-            GR_D3D_CALL_ERRCHECK(d3dDevice->fence->SetEventOnCompletion(fenceValue, d3dDevice->fenceEvent));
-            WaitForSingleObjectEx(d3dDevice->fenceEvent, INFINITE, FALSE);
+        __try {
+            DirectXDevice *d3dDevice = fromJavaPointer<DirectXDevice *>(devicePtr);
+            const UINT64 fenceValue = d3dDevice->fenceValues[d3dDevice->bufferIndex];
+            d3dDevice->bufferIndex = d3dDevice->swapChain->GetCurrentBackBufferIndex();
+            if (d3dDevice->fence->GetCompletedValue() < fenceValue)
+            {
+                d3dDevice->fence->SetEventOnCompletion(fenceValue, d3dDevice->fenceEvent);
+                WaitForSingleObjectEx(d3dDevice->fenceEvent, INFINITE, FALSE);
+            }
+            d3dDevice->fenceValues[d3dDevice->bufferIndex] = fenceValue + 1;
+            return d3dDevice->bufferIndex;
         }
-        d3dDevice->fenceValues[d3dDevice->bufferIndex] = fenceValue + 1;
-        return d3dDevice->bufferIndex;
+        __except(EXCEPTION_EXECUTE_HANDLER) {
+            auto code = GetExceptionCode();
+            logJavaException(env, __FUNCTION__, code);
+        }
     }
 
     JNIEXPORT jstring JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_getAdapterName(JNIEnv *env, jobject redrawer, jlong devicePtr)

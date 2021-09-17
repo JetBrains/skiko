@@ -6,7 +6,7 @@ import java.util.Date
 import kotlin.jvm.JvmStatic
 import org.jetbrains.skiko.hostFullName
 
-class RenderExceptionsHandler {
+internal class RenderExceptionsHandler {
     companion object {
         private var output: File? = null
         @JvmStatic
@@ -17,7 +17,7 @@ class RenderExceptionsHandler {
                 )
             }
             val exception = Exception(message)
-            if (System.getProperty("skiko.renderexceptionlogger.enabled") == "true") {
+            if (System.getProperty("skiko.win.renderexceptionlogger.enabled") == "true") {
                 writeLog(exception)
             }
             throw exception
