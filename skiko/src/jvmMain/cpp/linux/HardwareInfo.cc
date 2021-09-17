@@ -14,7 +14,7 @@ extern "C"
         std::string result;
         std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(command, "r"), pclose);
         if (!pipe) {
-            throw std::runtime_error("popen() failed!");
+            return "";
         }
         while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
             result += buffer.data();
@@ -29,6 +29,9 @@ extern "C"
         std::string searchSentence = "VGA compatible controller: ";
         stream << "lspci | grep " << "\"" << searchSentence << "\"";
         std::string gpu = process(stream.str().c_str());
+        if (gpu == "") {
+            return env->NewStringUTF("Can't get GPU info.");
+        }
         size_t pos = gpu.find(searchSentence);
         gpu.erase(0, pos + searchSentence.length());
         stream.str(std::string());
@@ -43,6 +46,9 @@ extern "C"
         std::string searchSentence = "Model name: ";
         stream << "lscpu | grep " << "\"" << searchSentence << "\"";
         std::string cpu = process(stream.str().c_str());
+        if (cpu == "") {
+            return env->NewStringUTF("Can't get CPU info.");
+        }
         size_t pos = cpu.find(searchSentence);
         cpu.erase(0, pos + searchSentence.length());
         std::string result = std::regex_replace(cpu, std::regex("^ +"), "");
