@@ -6,11 +6,11 @@
 static void deleteBackendRenderTarget(GrBackendRenderTarget* rt) {
     delete rt;
 }
-SKIKO_EXPORT KNativePointer BackendRenderTarget_nGetFinalizer() {
+SKIKO_EXPORT KNativePointer org_jetbrains_skiko_BackendRenderTarget__nGetFinalizer() {
     return reinterpret_cast<KNativePointer>(&deleteBackendRenderTarget);
 }
 
-SKIKO_EXPORT KNativePointer BackendRenderTarget_nMakeGL
+SKIKO_EXPORT KNativePointer org_jetbrains_skiko_BackendRenderTarget__nMakeGL
   (KInt width, KInt height, KInt sampleCnt, KInt stencilBits, KInt fbId, KInt fbFormat) {
     GrGLFramebufferInfo glInfo = { static_cast<unsigned int>(fbId), static_cast<unsigned int>(fbFormat) };
     GrBackendRenderTarget* instance = new GrBackendRenderTarget(width, height, sampleCnt, stencilBits, glInfo);

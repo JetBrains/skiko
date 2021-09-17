@@ -70,10 +70,10 @@ class BackendRenderTarget internal constructor(ptr: NativePointer) : Managed(ptr
 }
 
 
-@ExternalSymbolName("BackendRenderTarget_nGetFinalizer")
+@ExternalSymbolName("org_jetbrains_skiko_BackendRenderTarget__nGetFinalizer")
 private external fun _nGetFinalizer(): NativePointer
 
-@ExternalSymbolName("BackendRenderTarget_nMakeGL")
+@ExternalSymbolName("org_jetbrains_skiko_BackendRenderTarget__nMakeGL")
 private external fun _nMakeGL(width: Int, height: Int, sampleCnt: Int, stencilBits: Int, fbId: Int, fbFormat: Int): NativePointer
 
 @ExternalSymbolName("BackendRenderTarget_nMakeMetal")

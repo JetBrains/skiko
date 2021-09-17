@@ -10,6 +10,8 @@
 #include "src/gpu/gl/GrGLDefines.h"
 #include <GLES3/gl3.h>
 #include "webgl/webgl1.h"
+#include "common.h"
+#include <iostream>
 
 using namespace emscripten;
 
@@ -108,7 +110,7 @@ EMSCRIPTEN_WEBGL_CONTEXT_HANDLE createContext(std::string id) {
  * Sets the given WebGL context to be "current" and then creates a GrDirectContext from that
  * context.
  */
-static sk_sp<GrDirectContext> MakeGrContext(EMSCRIPTEN_WEBGL_CONTEXT_HANDLE context)
+SKIKO_EXPORT KNativePointer org_jetbrains_skia__MakeGrContext(EMSCRIPTEN_WEBGL_CONTEXT_HANDLE context)
 {
     EMSCRIPTEN_RESULT r = emscripten_webgl_make_context_current(context);
     if (r < 0) {
@@ -117,14 +119,15 @@ static sk_sp<GrDirectContext> MakeGrContext(EMSCRIPTEN_WEBGL_CONTEXT_HANDLE cont
     }
     // setup GrDirectContext
     auto interface = GrGLMakeNativeInterface();
+    std::cout << "org_jetbrains_skia__MakeGrContext " << interface << std::endl;
     // setup contexts
     sk_sp<GrDirectContext> dContext(GrDirectContext::MakeGL(interface));
-    return dContext;
+    return reinterpret_cast<KNativePointer>(dContext.release());
 }
 
 EMSCRIPTEN_BINDINGS(Skiko) {
     function("ping", &ping);
-    function("MakeGrContext", &MakeGrContext);
+//    function("MakeGrContext", &MakeGrContext);
     function("createContext", &createContext);
     function("MakeOnScreenGLSurface", &MakeOnScreenGLSurface);
 };

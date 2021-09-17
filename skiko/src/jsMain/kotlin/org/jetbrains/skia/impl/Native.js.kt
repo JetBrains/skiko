@@ -21,7 +21,7 @@ actual abstract class Native actual constructor(ptr: NativePointer) {
 }
 
 actual fun reachabilityBarrier(obj: Any?) {
-    TODO()
+    // todo later
 }
 
 actual typealias NativePointer = Int

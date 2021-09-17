@@ -95,8 +95,8 @@ val skiaWasmDir = run {
     } else {
         val targetDir = skiko.dependenciesDir.resolve("skia/skia-wasm")
         tasks.register("unzipSkiaWasm", Copy::class) {
-            from(skiaWasmZip.map { zipTree(it) })
-            configureSkiaCopy(targetDir)
+            //from(skiaWasmZip.map { zipTree(it) })
+            //configureSkiaCopy(targetDir)
         }.map { targetDir }
     }
 }
@@ -368,6 +368,8 @@ val wasmCompile = project.tasks.register<Exec>("wasmCompile") {
                 "-s", "USE_WEBGL2",
                 "-o", outJs,
                 "--extern-post-js", skikoJsPrefix,
+                "-s", "USE_WEBGL2=1",
+                "-s", "OFFSCREEN_FRAMEBUFFER=1",
                 *srcs
             )
             argumentProviders.add(CommandLineArgumentProvider {
