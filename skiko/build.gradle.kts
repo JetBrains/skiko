@@ -801,6 +801,13 @@ publishing {
                 }
             }
         }
+        create<MavenPublication>("skikoMetadata") {
+            artifactId = SkikoArtifacts.metadataArtifactId
+            afterEvaluate {
+                artifact(project.tasks.named("metadataJar").get())
+
+            }
+        }
         create<MavenPublication>("skikoJvm") {
             artifactId = SkikoArtifacts.commonArtifactId
             afterEvaluate {
