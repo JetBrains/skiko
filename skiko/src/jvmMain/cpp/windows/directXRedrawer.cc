@@ -418,7 +418,6 @@ extern "C"
             auto code = GetExceptionCode();
             logJavaException(env, __FUNCTION__, code);
         }
-        GR_D3D_CALL_ERRCHECK(d3dDevice->swapChain->ResizeBuffers(BuffersCount, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 0));
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_swap(
