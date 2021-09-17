@@ -38,6 +38,31 @@ struct ColorSettings {
     GrGLenum pixFormat;
 };
 
+bool createSurface(int width, int height) {
+    // The on-screen canvas is FBO 0. Wrap it in a Skia render target so Skia can render to it.
+    GrGLFramebufferInfo info;
+    info.fFBOID = 0;
+
+    GrGLint stencil;
+        emscripten_glGetIntegerv(GL_STENCIL_BITS, &stencil);
+
+    GrGLint sampleCnt;
+        emscripten_glGetIntegerv(GL_SAMPLES, &sampleCnt);
+
+    GrBackendRenderTarget target(width, height, sampleCnt, stencil, info);
+
+    SkSurface::MakeFromBackendRenderTarget(
+        0L,
+        target,
+        kBottomLeft_GrSurfaceOrigin,
+        kRGBA_8888_SkColorType,
+        nullptr,
+        nullptr
+    );
+
+    return true;
+}
+
 sk_sp<SkSurface> MakeOnScreenGLSurface(sk_sp<GrDirectContext> dContext, int width, int height,
                                        sk_sp<SkColorSpace> colorSpace) {
     // WebGL should already be clearing the color and stencil buffers, but do it again here to
@@ -61,8 +86,11 @@ sk_sp<SkSurface> MakeOnScreenGLSurface(sk_sp<GrDirectContext> dContext, int widt
     const auto colorSettings = ColorSettings(colorSpace);
     info.fFormat = colorSettings.pixFormat;
     GrBackendRenderTarget target(width, height, sampleCnt, stencil, info);
+
+
     sk_sp<SkSurface> surface(SkSurface::MakeFromBackendRenderTarget(dContext.get(), target,
         kBottomLeft_GrSurfaceOrigin, colorSettings.colorType, colorSpace, nullptr));
+
     return surface;
 }
 
@@ -93,7 +121,6 @@ static sk_sp<GrDirectContext> MakeGrContext(EMSCRIPTEN_WEBGL_CONTEXT_HANDLE cont
     sk_sp<GrDirectContext> dContext(GrDirectContext::MakeGL(interface));
     return dContext;
 }
-
 
 EMSCRIPTEN_BINDINGS(Skiko) {
     function("ping", &ping);
