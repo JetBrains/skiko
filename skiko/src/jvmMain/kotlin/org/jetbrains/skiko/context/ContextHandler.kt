@@ -62,5 +62,7 @@ internal abstract class ContextHandler(val layer: SkiaLayer) {
             "Java location: $javaLocation\n"
     }
 
-    protected open fun destroyContext() = Unit
+    protected open fun destroyContext() {
+        context?.close()
+    }
 }
