@@ -25,7 +25,7 @@ bool isHandleException(JNIEnv *env)
         return false;
     }
     const char *property = env->GetStringUTFChars(propertyString, 0);
-    bool result = !strcmp(property, "true");
+    bool result = !strncmp(property, "true", 4);
     env->ReleaseStringUTFChars(propertyString, property);
     return result;
 }
