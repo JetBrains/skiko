@@ -1,7 +1,6 @@
 #include <string>
 #include <iostream>
 #include <jni.h>
-#include "jni_helpers.h"
 #include "GrDirectContext.h"
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DirectContextKt__1nMakeGL

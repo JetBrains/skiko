@@ -17,6 +17,7 @@ extern "C"
     {
         Display *display = fromJavaPointer<Display *>(displayPtr);
         Window window = fromJavaPointer<Window>(windowPtr);
+
         // according to:
         // https://opengl.gpuinfo.org/listreports.php?extension=GLX_EXT_swap_control
         // https://opengl.gpuinfo.org/listreports.php?extension=GLX_MESA_swap_control
@@ -49,6 +50,7 @@ extern "C"
     {
         Display *display = fromJavaPointer<Display *>(displayPtr);
         Window window = fromJavaPointer<Window>(windowPtr);
+
         glXSwapBuffers(display, window);
     }
 
