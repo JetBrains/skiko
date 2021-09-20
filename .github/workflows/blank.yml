@@ -33,7 +33,7 @@ jobs:
           ./gradlew publishToMavenLocal
           ./gradlew -Pskiko.native.enabled=true publishToMavenLocal
    linux:
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-20.04
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
