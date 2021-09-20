@@ -53,10 +53,6 @@ internal class MetalContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
         metalRedrawer.finishFrame()
     }
 
-    override fun destroyContext() {
-        context?.close()
-    }
-
     override fun rendererInfo(): String {
         return super.rendererInfo() +
             "Video card: ${metalRedrawer.getAdapterName()}\n" +
