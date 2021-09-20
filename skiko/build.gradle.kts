@@ -362,6 +362,7 @@ val wasmCompile = project.tasks.register<Exec>("wasmCompile") {
                 *Arch.Wasm.clangFlags,
                 "-I$projectDir/src/commonMain/cpp",
                 *skiaPreprocessorFlags(skiaDir),
+                "-s", "USE_WEBGL2",
                 "-o", outJs,
                 "--extern-post-js", skikoJsPrefix,
                 *srcs
