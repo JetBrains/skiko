@@ -2,7 +2,7 @@
 
 #include "jni_helpers.h"
 
-JavaVM *jvm = NULL;
+static JavaVM *jvm = NULL;
 
 bool isHandleException(JNIEnv *env)
 {
