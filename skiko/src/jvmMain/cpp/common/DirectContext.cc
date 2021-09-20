@@ -1,4 +1,3 @@
-#include <string>
 #include <iostream>
 #include <jni.h>
 #include "GrDirectContext.h"
