@@ -85,8 +85,8 @@ SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Paint__1nGetColor4f
   (KNativePointer ptr) {
     TODO("implement org_jetbrains_skia_Paint__1nGetColor4f");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Paint__1nGetColor4f
   (KNativePointer ptr) {
     SkPaint* instance = reinterpret_cast<SkPaint*>((ptr));

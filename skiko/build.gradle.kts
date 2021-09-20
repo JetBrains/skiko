@@ -95,8 +95,8 @@ val skiaWasmDir = run {
     } else {
         val targetDir = skiko.dependenciesDir.resolve("skia/skia-wasm")
         tasks.register("unzipSkiaWasm", Copy::class) {
-            //from(skiaWasmZip.map { zipTree(it) })
-            //configureSkiaCopy(targetDir)
+            from(skiaWasmZip.map { zipTree(it) })
+            configureSkiaCopy(targetDir)
         }.map { targetDir }
     }
 }

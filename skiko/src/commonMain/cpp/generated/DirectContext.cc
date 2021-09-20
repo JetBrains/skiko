@@ -3,28 +3,14 @@
 
 //#ifndef SKIKO_WASM
 
-#include <iostream>
 #include "GrDirectContext.h"
 #include "include/gpu/gl/GrGLInterface.h"
 //#include "mtl/GrMtlBackendContext.h"
 #include "common.h"
 
-using namespace std;
-
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeGL
   () {
     return reinterpret_cast<KNativePointer>(GrDirectContext::MakeGL().release());
-}
-
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeGL2()
-{
-    // We assume that any calls we make to GL for the remainder of this function will go to the
-    // desired WebGL Context.
-    // setup interface.
-    auto interface = GrGLMakeNativeInterface();
-    std::cout << "org_jetbrains_skia_DirectContext__1nMakeGL2 " << interface << endl;
-    // setup context
-    return reinterpret_cast<KNativePointer>(GrDirectContext::MakeGL(interface).release());
 }
 
 //SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeMetal
