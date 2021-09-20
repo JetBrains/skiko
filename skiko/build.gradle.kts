@@ -370,6 +370,7 @@ val wasmCompile = project.tasks.register<Exec>("wasmCompile") {
                 "--extern-post-js", skikoJsPrefix,
                 "-s", "USE_WEBGL2=1",
                 "-s", "OFFSCREEN_FRAMEBUFFER=1",
+                "-DSK_SUPPORT_GPU=1",
                 *srcs
             )
             argumentProviders.add(CommandLineArgumentProvider {
