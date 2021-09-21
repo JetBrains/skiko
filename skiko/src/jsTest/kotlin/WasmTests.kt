@@ -20,8 +20,4 @@ private fun wasmTest(block: () -> Unit) = GlobalScope.promise {
     block.invoke()
 }
 
-class WasmTests {
-    @Test
-    fun pingTest() = wasmTest {
-    }
-}
+class WasmTests
