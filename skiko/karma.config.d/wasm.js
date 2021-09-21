@@ -21,7 +21,3 @@ config.files = [
     path.resolve(wasmPath, "skiko.js"),
     {pattern: path.resolve(wasmPath, "skiko.wasm"), included: false, served: true, watched: false},
 ].concat(config.files);
-
-
-const fs = require("fs");
-fs.writeFileSync("KARMA.txt", JSON.stringify(config, null, 4));
