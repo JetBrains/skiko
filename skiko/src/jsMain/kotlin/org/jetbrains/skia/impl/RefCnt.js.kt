@@ -1,5 +1,7 @@
 package org.jetbrains.skia.impl
 
+import org.jetbrains.skia.ExternalSymbolName
+
 actual abstract class RefCnt : Managed {
     actual protected constructor(ptr: NativePointer): super(ptr, _FinalizerHolder.PTR, false)
     actual protected constructor(ptr: NativePointer, allowClose: Boolean): super(ptr, _FinalizerHolder.PTR, allowClose)
@@ -20,7 +22,7 @@ private object _FinalizerHolder {
     val PTR = _nGetFinalizer()
 }
 
-@JsName("org_jetbrains_skia_impl_RefCnt__getFinalizer")
+@ExternalSymbolName("org_jetbrains_skia_impl_RefCnt__getFinalizer")
 private external fun _nGetFinalizer(): NativePointer
-@JsName("org_jetbrains_skia_impl_RefCnt__getCount")
+@ExternalSymbolName("org_jetbrains_skia_impl_RefCnt__getRefCount")
 private external fun _nGetRefCount(ptr: NativePointer): Int
