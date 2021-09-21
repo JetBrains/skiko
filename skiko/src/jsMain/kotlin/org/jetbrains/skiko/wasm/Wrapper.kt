@@ -73,9 +73,3 @@ fun GetWebGLContext(canvas: HTMLCanvasElement, attr: ContextAttributes? = null):
     val contextPointer = GL.createContext(canvas, contextAttributes.asJsObject())
     return GL.makeContextCurrent(contextPointer)
 }
-
-
-@JsExport
-fun createSkikoCanvas(): HTMLCanvasElement {
-    return document.createElement("canvas") {} as HTMLCanvasElement
-}
