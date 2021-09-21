@@ -1,5 +1,7 @@
 #pragma once
 
+#include <jni.h>
+
 template<typename T>
 T inline fromJavaPointer(jlong ptr) { return reinterpret_cast<T>(static_cast<uintptr_t>(ptr)); }
 
