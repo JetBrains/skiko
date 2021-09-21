@@ -26,6 +26,7 @@ internal class RenderExceptionsHandler {
         private fun writeLog(exception: Exception) {
             val outputBuilder = StringBuilder().apply {
                 append("When: ${SimpleDateFormat("dd/M/yyyy hh:mm:ss").format(Date())}\n")
+                append("Skiko version: ${Version.skiko}\n")
                 append("OS: $hostFullName\n")
                 append("CPU: ${getNativeCpuInfo()}\n")
                 append("Graphics adapters:\n${getNativeGraphicsAdapterInfo()}\n")
