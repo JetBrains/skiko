@@ -1,18 +1,20 @@
 
 // This file has been auto generated.
 
-#ifndef SKIKO_WASM
-
-#include <iostream>
 #include "GrDirectContext.h"
-#include "mtl/GrMtlBackendContext.h"
+#include "include/gpu/gl/GrGLInterface.h"
 #include "common.h"
+
+#ifdef SK_METAL
+#include "mtl/GrMtlBackendContext.h"
+#endif
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeGL
   () {
     return reinterpret_cast<KNativePointer>(GrDirectContext::MakeGL().release());
 }
 
+#ifdef SK_METAL
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeMetal
   (long devicePtr, long queuePtr) {
     GrMtlBackendContext backendContext = {};
@@ -23,7 +25,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeMetal
     sk_sp<GrDirectContext> instance = GrDirectContext::MakeMetal(backendContext);
     return reinterpret_cast<KNativePointer>(instance.release());
 }
-
+#endif
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeDirect3D
   (KNativePointer adapterPtr, KNativePointer devicePtr, KNativePointer queuePtr) {
@@ -54,4 +56,3 @@ SKIKO_EXPORT void org_jetbrains_skia_DirectContext__1nAbandon
     context->abandonContext();
 }
 
-#endif
