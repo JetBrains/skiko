@@ -8,10 +8,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-external interface ModuleInterface {
-    fun ping(): Boolean
-}
-
+external interface ModuleInterface
 external val Module: ModuleInterface
 
 suspend fun <T> Promise<T>.await(): T = suspendCoroutine { cont ->
@@ -26,6 +23,5 @@ private fun wasmTest(block: () -> Unit) = GlobalScope.promise {
 class WasmTests {
     @Test
     fun pingTest() = wasmTest {
-        assertTrue(Module.ping())
     }
 }
