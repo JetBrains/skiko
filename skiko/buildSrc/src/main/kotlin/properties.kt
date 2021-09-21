@@ -81,7 +81,6 @@ class SkikoProperties(private val myProject: Project) {
     val deployVersion: String
         get() {
             val version = myProject.property("deploy.version") as String
-            File("src/jvmMain/resources/version").writeText(version)
             return if (isRelease) version else "$version-SNAPSHOT"
         }
 

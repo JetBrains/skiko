@@ -7,6 +7,7 @@
 #include "GrBackendSurface.h"
 #include "GrDirectContext.h"
 #include "SkSurface.h"
+#include "exceptions_handler.h"
 
 extern "C"
 {

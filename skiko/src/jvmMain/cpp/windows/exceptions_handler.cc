@@ -1,6 +1,6 @@
 #if SK_BUILD_FOR_WIN
 
-#include "jni_helpers.h"
+#include "exceptions_handler.h"
 
 static JavaVM *jvm = NULL;
 
@@ -18,7 +18,7 @@ bool isHandleException(JNIEnv *env)
         getPropertyMethod = env->GetStaticMethodID(systemClass, "getProperty", "(Ljava/lang/String;)Ljava/lang/String;");
     }
 
-    jstring propertyName= env->NewStringUTF("skiko.win.renderexceptionhandling.enabled");
+    jstring propertyName = env->NewStringUTF("skiko.win.exception.handler.enabled");
     jstring propertyString = (jstring)env->CallStaticObjectMethod(systemClass, getPropertyMethod, propertyName);
     if (propertyString == 0)
     {
@@ -30,7 +30,7 @@ bool isHandleException(JNIEnv *env)
     return result;
 }
 
-std::string getDescription(DWORD code)
+const char *getDescription(DWORD code)
 {
     switch (code)
     {
@@ -81,16 +81,17 @@ std::string getDescription(DWORD code)
 
 void logJavaException(JNIEnv *env, const char *function, DWORD sehCode)
 {
-    std::ostringstream oss;
-    oss << "Native exception in [" << function << "]:" << std::endl;
-    oss << "SEH description: " << getDescription(sehCode) << std::endl;
+    char buffer[200];
+    int result = snprintf(
+        buffer, 200, "Native exception in [%s]:\nSEH description: %s\n", function, getDescription(sehCode));
 
     if (jvm == NULL)
     {
         env->GetJavaVM(&jvm);
     }
 
-    if (isHandleException(env)) {
+    if (isHandleException(env))
+    {
         static jclass logClass = NULL;
         if (!logClass)
         {
@@ -103,7 +104,7 @@ void logJavaException(JNIEnv *env, const char *function, DWORD sehCode)
             logMethod = env->GetStaticMethodID(logClass, "logAndThrow", "(Ljava/lang/String;)V");
         }
 
-        env->CallStaticVoidMethod(logClass, logMethod, env->NewStringUTF(oss.str().c_str()));
+        env->CallStaticVoidMethod(logClass, logMethod, env->NewStringUTF(buffer));
     }
 }
 

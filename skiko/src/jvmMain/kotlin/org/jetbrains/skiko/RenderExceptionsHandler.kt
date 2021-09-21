@@ -17,7 +17,7 @@ internal class RenderExceptionsHandler {
                 )
             }
             val exception = Exception(message)
-            if (System.getProperty("skiko.win.renderexceptionlogger.enabled") == "true") {
+            if (System.getProperty("skiko.win.exception.logger.enabled") == "true") {
                 writeLog(exception)
             }
             throw exception
@@ -26,7 +26,7 @@ internal class RenderExceptionsHandler {
         private fun writeLog(exception: Exception) {
             val outputBuilder = StringBuilder().apply {
                 append("When: ${SimpleDateFormat("dd/M/yyyy hh:mm:ss").format(Date())}\n")
-                append("Skiko version: ${Library.skikoVersion}\n")
+                append("Skiko version: ${skikoVersion}\n")
                 append("OS: $hostFullName\n")
                 append("CPU: ${getNativeCpuInfo()}\n")
                 append("Graphics adapters:\n${getNativeGraphicsAdapterInfo()}\n")

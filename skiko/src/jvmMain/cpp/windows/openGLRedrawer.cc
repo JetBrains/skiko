@@ -4,6 +4,7 @@
 #include <jawt_md.h>
 #include <dwmapi.h>
 #include "jni_helpers.h"
+#include "exceptions_handler.h"
 
 extern "C"
 {

@@ -35,6 +35,15 @@ repositories {
     mavenCentral()
 }
 
+fun putLibraryVersion() {
+    val versionFile = File("src/jvmMain/kotlin/org/jetbrains/skiko/Version.kt")
+    val outputBuilder = StringBuilder().apply {
+        append("package org.jetbrains.skiko\n")
+        append("val skikoVersion = \"${skiko.deployVersion}\"\n")
+    }
+    versionFile.writeText(outputBuilder.toString())
+}
+
 val skiaZip = run {
     val zipName = skiko.skiaReleaseFor(targetOs, targetArch) + ".zip"
     val zipFile = skiko.dependenciesDir.resolve("skia/${zipName.substringAfterLast('/')}")
@@ -600,6 +609,8 @@ library {
     linkage.addAll(listOf(Linkage.SHARED))
     targetMachines.addAll(listOf(machines.macOS.x86_64, machines.linux.x86_64, machines.windows.x86_64))
     baseName.set("skiko-$target")
+
+    putLibraryVersion()
 
     dependencies {
         implementation(

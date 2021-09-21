@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include <jawt_md.h>
 #include "jni_helpers.h"
+#include "exceptions_handler.h"
 
 #include "GrBackendSurface.h"
 #include "GrDirectContext.h"

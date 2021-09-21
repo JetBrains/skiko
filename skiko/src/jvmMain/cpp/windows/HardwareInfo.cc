@@ -1,6 +1,5 @@
 #ifdef SK_DIRECT3D
 
-#include <locale>
 #include <Windows.h>
 #include <sstream>
 #include <iostream>
