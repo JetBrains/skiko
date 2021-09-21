@@ -3,12 +3,12 @@ package org.jetbrains.skiko.sample.js
 import kotlinx.browser.document
 import kotlinx.browser.window
 import org.jetbrains.skia.*
-import org.jetbrains.skiko.wasm.GetWebGLContextK
+import org.jetbrains.skiko.wasm.GetWebGLContext
 import org.jetbrains.skiko.wasm.onWasmReady
 import org.w3c.dom.HTMLCanvasElement
 
 
-fun main(args: Array<String>) {
+fun main() {
     onWasmReady {
         val paint = Paint()
         paint.setColor4f(Color4f(0f, 1f, 0f, 1.0f))
@@ -18,7 +18,7 @@ fun main(args: Array<String>) {
         val canvas = document.getElementById("c") as HTMLCanvasElement
         canvas.getContext("webgl")
 
-        GetWebGLContextK(canvas)
+        GetWebGLContext(canvas)
 
         val grContext = DirectContext.makeGL()
 
@@ -44,6 +44,3 @@ fun main(args: Array<String>) {
         draw()
     }
 }
-
-
-external fun GetWebGLContext(canvas: HTMLCanvasElement, attrs: dynamic): dynamic

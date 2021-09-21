@@ -54,7 +54,7 @@ fun ContextAttributes.asJsObject(): dynamic {
 }
 
 
-fun GetWebGLContextK(canvas: HTMLCanvasElement, attr: ContextAttributes? = null): Boolean {
+fun GetWebGLContext(canvas: HTMLCanvasElement, attr: ContextAttributes? = null): Boolean {
     val contextAttributes = object : ContextAttributes {
         override val alpha = attr?.alpha ?: 1
         override val depth = attr?.depth ?: 1
