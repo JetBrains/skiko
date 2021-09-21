@@ -3,6 +3,7 @@ package org.jetbrains.skiko.sample.js
 import kotlinx.browser.document
 import kotlinx.browser.window
 import org.jetbrains.skia.*
+import org.jetbrains.skiko.wasm.GetWebGLContextK
 import org.jetbrains.skiko.wasm.onWasmReady
 import org.w3c.dom.HTMLCanvasElement
 
@@ -17,16 +18,9 @@ fun main(args: Array<String>) {
         val canvas = document.getElementById("c") as HTMLCanvasElement
         canvas.getContext("webgl")
 
-        val webGlContext = GetWebGLContext(
-            canvas, js("{}")
-        )
-
-        console.log(webGlContext)
-        console.log(canvas)
+        GetWebGLContextK(canvas)
 
         val grContext = DirectContext.makeGL()
-
-        console.log(grContext)
 
         val surface = Surface.makeFromBackendRenderTarget(
             grContext,
@@ -38,12 +32,11 @@ fun main(args: Array<String>) {
             ColorSpace.sRGB
         )
 
-        console.log(surface)
-        console.log(surface.canvas)
-
-
         fun draw() {
             surface.canvas.drawCircle(50f, 50f, 25f, paint)
+            paint.setColor4f(Color4f(1f, 1f, 0f, 1.0f))
+            surface.canvas.drawCircle(100f, 100f, 10f, paint)
+            surface.canvas.drawCircle(200f, 200f, 30f, paint)
             window.requestAnimationFrame { draw() }
             surface.flushAndSubmit()
         }
