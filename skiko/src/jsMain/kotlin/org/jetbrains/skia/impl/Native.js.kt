@@ -51,7 +51,8 @@ actual class InteropScope actual constructor() {
     }
 
     actual fun InteropPointer.fromInterop(result: CharArray) {
-        fromWasm(this@fromInterop, result)
+        val tmp = UTF8ToString(this@fromInterop)
+        tmp.toCharArray().copyInto(result)
     }
 
     actual fun toInterop(array: ByteArray?): InteropPointer {
@@ -118,11 +119,18 @@ actual class InteropScope actual constructor() {
     }
 
     actual fun InteropPointer.fromInterop(result: DoubleArray) {
-        TODO("implement wasm fromInterop(DoubleArray)")
+        fromWasm(this@fromInterop, result)
     }
 
     actual fun toInterop(array: DoubleArray?): InteropPointer {
-        TODO("implement wasm toInterop(DoubleArray)")
+        return if (array != null) {
+            val data = _malloc(array.size * 8)
+            elements.add(data)
+            toWasm(data, array)
+            data
+        } else {
+            0
+        }
     }
 
     actual fun InteropPointer.fromInterop(result: ByteArray) {
@@ -168,48 +176,76 @@ private external fun _free(ptr: NativePointer)
 
 private external fun stringToUTF8(str: String, outPtr: NativePointer, maxBytesToWrite: Int)
 
+private external fun UTF8ToString(ptr: NativePointer): String
+
 private external val HEAPU8: ByteArray
 
 
 // Data copying routines.
 private fun toWasm(dest: NativePointer, src: ByteArray) {
-    js("HEAPU8.set(src, dest)")
+    val index = dest
+    js("HEAPU8.set(src, index)")
 }
 
 private fun toWasm(dest: NativePointer, src: CharArray) {
-    js("HEAPU16.set(src, dest)")
+    val index = dest / 2
+    js("HEAPU16.set(src, index)")
 }
 
 private fun toWasm(dest: NativePointer, src: ShortArray) {
-    js("HEAPU16.set(src, dest)")
+    val index = dest / 2
+    js("HEAPU16.set(src, index)")
 }
 
 private fun toWasm(dest: NativePointer, src: FloatArray) {
-    js("HEAPU32.set(src, dest)")
+    val index = dest / 4
+    js("HEAPF32.set(src, index)")
+}
+
+private fun toWasm(dest: NativePointer, src: DoubleArray) {
+    val index = dest / 8
+    js("HEAPF64.set(src, index)")
 }
 
 private fun toWasm(dest: NativePointer, src: IntArray) {
-    js("HEAPU32.set(src, dest)")
+    val index = dest / 4
+    js("HEAPU32.set(src, index)")
 }
 
 private fun fromWasm(src: NativePointer, result: ByteArray) {
-    js("result.set(HEAPU8.subarray(src, result.size))")
+    val startIndex = src
+    val endIndex = startIndex + result.size
+    js("result.set(HEAPU8.subarray(startIndex, endIndex))")
 }
 
-private fun fromWasm(src: NativePointer, result: CharArray) {
-    js("result.set(HEAPU16.subarray(src, result.size))")
-}
+//private fun fromWasm(src: NativePointer, result: CharArray) {
+//    val startIndex = src / 2
+//    val endIndex = startIndex + result.size
+//    js("result.set(HEAPU16.subarray(startIndex, endIndex))")
+//}
 
 private fun fromWasm(src: NativePointer, result: ShortArray) {
-    js("result.set(HEAPU16.subarray(src, result.size))")
+    val startIndex = src / 2
+    val endIndex = startIndex + result.size
+    js("result.set(HEAPU16.subarray(startIndex, endIndex))")
 }
 
 private fun fromWasm(src: NativePointer, result: IntArray) {
-    js("result.set(HEAPU32.subarray(src, result.size))")
+    val startIndex = src / 4
+    val endIndex = startIndex + result.size
+    js("result.set(HEAPU32.subarray(startIndex, endIndex))")
 }
 
 private fun fromWasm(src: NativePointer, result: FloatArray) {
-    js("result.set(HEAPU32.subarray(src, result.size))")
+    val startIndex = src / 4
+    val endIndex = startIndex + result.size
+    js("result.set(HEAPF32.subarray(startIndex, endIndex))")
+}
+
+private fun fromWasm(src: NativePointer, result: DoubleArray) {
+    val startIndex = src / 8
+    val endIndex = startIndex + result.size
+    js("result.set(HEAPF64.subarray(startIndex, endIndex))")
 }
 
 actual class NativePointerArray actual constructor(size: Int) {
@@ -224,4 +260,12 @@ actual class NativePointerArray actual constructor(size: Int) {
 
     actual val size: Int
         get() = backing.size
+
+    companion object {
+        internal fun fromIntArray(intArray: IntArray): NativePointerArray {
+            return NativePointerArray(intArray.size).apply {
+                intArray.copyInto(backing)
+            }
+        }
+    }
 }
