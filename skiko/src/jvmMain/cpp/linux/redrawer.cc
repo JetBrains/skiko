@@ -85,6 +85,6 @@ extern "C"
         if (display && context) {
             glXDestroyContext(display, *context);
             delete context;
-	}
+	    }
     }
 }

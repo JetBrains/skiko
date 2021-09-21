@@ -53,6 +53,8 @@ val casualRun = tasks.named<JavaExec>("run") {
     systemProperty("skiko.fps.enabled", "true")
     systemProperty("skiko.linux.autodpi", "true")
     systemProperty("skiko.hardwareInfo.enabled", "true")
+    systemProperty("skiko.win.exception.logger.enabled", "true")
+    systemProperty("skiko.win.exception.handler.enabled", "true")
     jvmArgs?.add("-ea")
     // Use systemProperty("skiko.library.path", "/tmp") to test loader.
     System.getProperties().entries

@@ -4,6 +4,7 @@ build
 local.properties
 .DS_Store
 .idea
+.vscode
 deploy.sh
 deploy.bat
 skiko/src/jvmMain/java

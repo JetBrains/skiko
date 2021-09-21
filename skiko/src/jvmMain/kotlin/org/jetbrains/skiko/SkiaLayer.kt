@@ -4,6 +4,7 @@ import org.jetbrains.skia.*
 import org.jetbrains.skiko.context.ContextHandler
 import org.jetbrains.skiko.context.createContextHandler
 import org.jetbrains.skiko.redrawer.Redrawer
+import org.jetbrains.skiko.withExceptionHandler
 import java.awt.Graphics
 import java.awt.event.*
 import java.awt.im.InputMethodRequests
@@ -130,6 +131,10 @@ open class SkiaLayer(
     private var picture: PictureHolder? = null
     private val pictureRecorder = PictureRecorder()
     private val pictureLock = Any()
+    private val onExceptionAction: () -> Boolean = {
+        findNextWorkingRenderApi(false)
+        false
+    }
 
     private fun findNextWorkingRenderApi(redraw: Boolean) {
         var thrown: Boolean
@@ -142,7 +147,7 @@ open class SkiaLayer(
                 contextHandler = createContextHandler(this, renderApi)
                 redrawer = platformOperations.createRedrawer(this, renderApi, properties)
                 if (redraw) redrawer!!.redrawImmediately()
-            } catch (e: IllegalArgumentException) {
+            } catch (e: Exception) {
                 println(e.message)
                 thrown = true
             }
@@ -206,10 +211,12 @@ open class SkiaLayer(
         // such as `jframe.isEnabled = false` on Linux
         //
         // To avoid recursive call of `draw` (we don't support recursive calls) we just schedule redrawing.
-        if (isRendering) {
-            redrawer?.needRedraw()
-        } else {
-            redrawer?.redrawImmediately()
+        withExceptionHandler(onExceptionAction) {
+            if (isRendering) {
+                redrawer?.needRedraw()
+            } else {
+                redrawer?.redrawImmediately()
+            }
         }
     }
 
@@ -308,7 +315,7 @@ open class SkiaLayer(
         val pictureHeight = (height * contentScale).toInt().coerceAtLeast(0)
 
         val bounds = Rect.makeWH(pictureWidth.toFloat(), pictureHeight.toFloat())
-        val canvas = pictureRecorder.beginRecording(bounds)!!
+        val canvas = pictureRecorder.beginRecording(bounds)
 
         // clipping
         for (component in clipComponents) {
@@ -339,7 +346,10 @@ open class SkiaLayer(
                 findNextWorkingRenderApi(true)
                 return false
             }
-            initCanvas()
+            withExceptionHandler(onExceptionAction) {
+                initCanvas()
+                true
+            }
         }
         return true
     }
