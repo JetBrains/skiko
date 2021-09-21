@@ -24,6 +24,7 @@ buildscript {
 
 val skiko = SkikoProperties(rootProject)
 val buildType = skiko.buildType
+val generatedKotlin = "$buildDir/kotlin/commonMain"
 
 allprojects {
     group = "org.jetbrains.skiko"
@@ -383,6 +384,24 @@ val wasmCompile = project.tasks.register<Exec>("wasmCompile") {
         file(outDir).mkdirs()
         inputs.files(srcs + listOf(skikoJsPrefix))
         outputs.files(outJs, outWasm)
+}
+
+val generateVersion = project.tasks.register("generateVersion") {
+    val outDir = generatedKotlin
+    file(outDir).mkdirs()
+    val out = "$outDir/Version.kt"
+    outputs.dir(outDir)
+    doFirst {
+        val target = "${targetOs.id}-${targetArch.id}"
+        val skiaTag = project.property("dependencies.skia.$target") as String
+        File(out).writeText("""
+        package org.jetbrains.skiko
+        object Version {
+          val skiko = "${skiko.deployVersion}"
+          val skia = "${skiaTag}"
+        }
+        """.trimIndent())
+    }
 }
 
 // Very hacky way to compile native bridges and add the
@@ -846,6 +865,9 @@ publishing {
 
 afterEvaluate {
     tasks.withType<KotlinCompile>().configureEach {
+        dependsOn(generateVersion)
+        source(generatedKotlin)
+
         if (name == "compileTestKotlinJvm") {
             kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
         }
