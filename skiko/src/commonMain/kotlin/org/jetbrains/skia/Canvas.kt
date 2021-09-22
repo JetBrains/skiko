@@ -852,8 +852,16 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         mode: BlendMode,
         paint: Paint
     ): Canvas {
-        require(colors == null || colors.size == positions.size) { "Expected colors.length == positions.length, got: " + colors!!.size + " != " + positions.size }
-        require(texCoords == null || texCoords.size == positions.size) { "Expected texCoords.length == positions.length, got: " + texCoords!!.size + " != " + positions.size }
+        require(positions.size % 2 == 0) {
+            "Expected even number of positions: ${positions.size}"
+        }
+        val points = positions.size / 2
+        require(colors == null || colors.size == points) {
+            "Expected colors.length == positions.length / 2, got: " + colors!!.size + " != " + points
+        }
+        require(texCoords == null || texCoords.size == positions.size) {
+            "Expected texCoords.length == positions.length, got: " + texCoords!!.size + " != " + positions.size
+        }
         Stats.onNativeCall()
         interopScope {
             _nDrawVertices(
