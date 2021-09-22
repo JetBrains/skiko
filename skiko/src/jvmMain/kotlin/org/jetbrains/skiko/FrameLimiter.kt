@@ -18,6 +18,8 @@ private const val NanosecondsPerMillisecond = 1_000_000L
  *      frameJob.cancelAndJoin()
  *  }
  * ```
+ *
+ * Can be accessed from multiple threads.
  */
 @OptIn(ExperimentalTime::class)
 @Suppress("UNUSED_PARAMETER")
