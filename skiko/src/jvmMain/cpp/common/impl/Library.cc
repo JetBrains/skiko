@@ -7,10 +7,10 @@
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     JNIEnv* env;
-    if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_8) != JNI_OK)
+    if (vm->GetEnv(reinterpret_cast<void**>(&env), SKIKO_JNI_VERSION) != JNI_OK)
         return JNI_ERR;
 
-    return JNI_VERSION_1_8;
+    return SKIKO_JNI_VERSION;
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_impl_Library__1nAfterLoad
@@ -26,7 +26,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_impl_Library__1nAfterL
 
 JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
     JNIEnv* env;
-    if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_8) != JNI_OK)
+    if (vm->GetEnv(reinterpret_cast<void**>(&env), SKIKO_JNI_VERSION) != JNI_OK)
         return;
 
     skija::svg::onUnload(env);
