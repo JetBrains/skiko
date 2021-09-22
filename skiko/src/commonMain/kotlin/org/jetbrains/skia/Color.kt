@@ -59,4 +59,14 @@ object Color {
         require(0 <= b && b <= 255) { "Blue is out of 0..255 range: $b" }
         return b and 0xFF or (color and -0x100)
     }
+
+    const val TRANSPARENT: Int   = 0x00_00_00_00
+    const val BLACK: Int         = 0xFF_00_00_00.toInt()
+    const val WHITE: Int         = 0xFF_FF_FF_FF.toInt()
+    const val RED: Int           = 0xFF_FF_00_00.toInt()
+    const val GREEN: Int         = 0xFF_00_FF_00.toInt()
+    const val BLUE: Int          = 0xFF_00_00_FF.toInt()
+    const val YELLOW: Int        = 0xFF_FF_FF_00.toInt()
+    const val CYAN: Int          = 0xFF_00_FF_FF.toInt()
+    const val MAGENTA: Int       = 0xFF_FF_00_FF.toInt()
 }
