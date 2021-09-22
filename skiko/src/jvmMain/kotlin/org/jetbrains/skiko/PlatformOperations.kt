@@ -83,8 +83,8 @@ internal val platformOperations: PlatformOperations by lazy {
                     renderApi: GraphicsApi,
                     properties: SkiaLayerProperties
                 ) = when(renderApi) {
-                    GraphicsApi.SOFTWARE -> SoftwareRedrawer(layer, properties)
-                    // GraphicsApi.SOFTWARE -> WindowsSoftwareRedrawer(layer, properties)
+                    // GraphicsApi.SOFTWARE -> SoftwareRedrawer(layer, properties)
+                    GraphicsApi.SOFTWARE -> WindowsSoftwareRedrawer(layer, properties)
                     GraphicsApi.DIRECT3D -> Direct3DRedrawer(layer, properties)
                     else -> WindowsOpenGLRedrawer(layer, properties)
                 }
