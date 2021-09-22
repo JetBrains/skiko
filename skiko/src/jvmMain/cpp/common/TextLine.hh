@@ -1,5 +1,6 @@
 #include "SkCanvas.h"
 #include "SkFont.h"
+#include "SkFontMetrics.h"
 #include "SkPoint.h"
 #include "SkRefCnt.h"
 #include "SkTextBlob.h"

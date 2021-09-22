@@ -4,6 +4,7 @@
 #include "../TextLine.hh"
 #include "SkShaper.h"
 #include "SkTextBlob.h"
+#include "unicode/ubrk.h"
 
 class TextLineRunHandler: public SkShaper::RunHandler {
 public:

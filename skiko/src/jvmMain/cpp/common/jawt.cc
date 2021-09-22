@@ -1,5 +1,7 @@
+#ifndef SK_BUILD_FOR_ANDROID
 #include <jawt.h>
 #include <jawt_md.h>
+
 #include <stdlib.h>
 
 #if SK_BUILD_FOR_WIN
@@ -97,3 +99,5 @@ extern "C" jboolean Skiko_GetAWT(JNIEnv *env, JAWT *awt) {
 #endif
     return func(env, awt);
 }
+
+#endif
