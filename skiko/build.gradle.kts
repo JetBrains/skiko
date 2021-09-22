@@ -13,6 +13,10 @@ plugins {
 
 val coroutinesVersion = "1.5.0"
 
+fun targetSuffix(os: OS, arch: Arch): String {
+    return "${os.id}_${arch.id}"
+}
+
 buildscript {
     dependencies {
         classpath("org.kohsuke:github-api:1.116")
@@ -36,33 +40,83 @@ repositories {
 }
 
 val skiaZip = run {
-    val zipName = skiko.skiaReleaseFor(targetOs, targetArch) + ".zip"
+    val zipName = skiko.skiaReleaseFor(targetOs, targetArch, buildType) + ".zip"
     val zipFile = skiko.dependenciesDir.resolve("skia/${zipName.substringAfterLast('/')}")
 
     tasks.register("downloadSkia", Download::class) {
         onlyIf { skiko.skiaDir == null && !zipFile.exists() }
-        inputs.property("skia.release.for.target.os", skiko.skiaReleaseFor(targetOs, targetArch))
+        inputs.property("skia.release.for.target.os", skiko.skiaReleaseFor(targetOs, targetArch, buildType))
         src("https://github.com/JetBrains/skia-pack/releases/download/$zipName")
         dest(zipFile)
         onlyIfModified(true)
     }.map { zipFile }
 }
 
-val skiaWasmZip = run {
-    val release = skiko.skiaReleaseFor(OS.Wasm, Arch.Wasm)
-    val zipName = "$release.zip"
-    val zipFile = skiko.dependenciesDir.resolve("skia/${zipName.substringAfterLast('/')}")
-    tasks.register("downloadSkiaWasm", Download::class) {
-        onlyIf { skiko.skiaDir == null && !zipFile.exists() }
-        inputs.property("skia.release.for.wasm", release)
-        src("https://github.com/JetBrains/skia-pack/releases/download/$zipName")
-        dest(zipFile)
-        onlyIfModified(true)
-    }.map { zipFile }
-}
+val crossTargets = listOf(
+    OS.Wasm to Arch.Wasm
+)
 
-fun AbstractCopyTask.configureSkiaCopy(targetDir: File) {
-    into(targetDir)
+val skiaCrossDownloadTasks = crossTargets.map { osArch ->
+    val suffix = targetSuffix(osArch.first, osArch.second)
+    val result = tasks.register<Download>("skiaCrossDownload$suffix") {
+        val release = skiko.skiaReleaseFor(osArch.first, osArch.second, buildType)
+        val out = skiko.dependenciesDir.resolve("skia/skia-$suffix.zip")
+        src("https://github.com/JetBrains/skia-pack/releases/download/$release.zip")
+        dest(out.absolutePath)
+        onlyIfModified(true)
+    }
+    osArch to result
+}.toMap()
+
+val skiaCrossUnzipTasks = crossTargets.map { osArch ->
+    val suffix = targetSuffix(osArch.first, osArch.second)
+    val result = tasks.register("skiaCrossUnzip$suffix", Copy::class) {
+        val downloader = skiaCrossDownloadTasks[osArch]!!
+        dependsOn(downloader)
+        from(zipTree(downloader.get().outputFiles.single()))
+        destinationDir = skiko.dependenciesDir.resolve("skia/skia-$suffix")
+    }
+    osArch to result
+}.toMap()
+
+tasks.register<CrossCompileTask>("wasmCrossCompile") {
+    val osArch = OS.Wasm to Arch.Wasm
+
+    val unzipper = skiaCrossUnzipTasks[osArch]!!
+    dependsOn(unzipper)
+    val unpackedSkia = unzipper.get().destinationDir
+
+    buildVariant.set(buildType)
+    targetOs.set(osArch.first)
+    targetArch.set(osArch.second)
+    inputDir.set(projectDir.resolve("src/commonMain/cpp"))
+    outputDir.set(buildDir)
+
+    val outDir = targetOutputDir
+    val outWasm = "$outDir/skiko.wasm"
+
+    val jsSrcs = listOf(
+        "$projectDir/src/jsMain/cpp"
+    ).findAllFiles(".cc").toTypedArray()
+
+    compiler.set("emcc")
+    skiaDir.set(unpackedSkia.resolve("out/${buildType.id}-${osArch.first.id}-${osArch.second.id}"))
+    val skikoJsPrefix = "$projectDir/src/jsMain/resources/setup.js"
+    flags.set(listOf(
+        "-I$projectDir/src/commonMain/cpp",
+        *skiaPreprocessorFlags(unpackedSkia.absolutePath),
+        "-l", "GL",
+        "-s", "USE_WEBGL2=1",
+        "-s", "OFFSCREEN_FRAMEBUFFER=1",
+        "-DSK_SUPPORT_GPU=1",
+        "--extern-post-js", skikoJsPrefix,
+        *jsSrcs
+    ))
+
+    outputFile.set("skiko.js")
+
+    inputs.files(jsSrcs + listOf(skikoJsPrefix))
+    outputs.files(outWasm)
 }
 
 val skiaDir = run {
@@ -78,25 +132,6 @@ val skiaDir = run {
         val targetDir = skiko.dependenciesDir.resolve("skia/skia")
         tasks.register("unzipSkia", Copy::class) {
             from(skiaZip.map { zipTree(it) })
-            configureSkiaCopy(targetDir)
-        }.map { targetDir }
-    }
-}
-
-val skiaWasmDir = run {
-    if (skiko.skiaDir != null) {
-        tasks.register("skiaWasmDir", DefaultTask::class) {
-            // dummy task to simplify usage of the resulting provider (see `else` branch)
-            // if a file provider is not created from a task provider,
-            // then it cannot be used instead of a task in `dependsOn` clauses of other tasks.
-            // e.g. the resulting `skiaDir` could not be used in `dependsOn` of CppCompile configuration
-            enabled = false
-        }.map { skiko.skiaDir!! }
-    } else {
-        val targetDir = skiko.dependenciesDir.resolve("skia/skia-wasm")
-        tasks.register("unzipSkiaWasm", Copy::class) {
-            from(skiaWasmZip.map { zipTree(it) })
-            configureSkiaCopy(targetDir)
         }.map { targetDir }
     }
 }
@@ -345,8 +380,9 @@ fun List<String>.findAllFiles(suffix: String): List<String> = this
 
 
 val wasmCompile = project.tasks.register<Exec>("wasmCompile") {
-        dependsOn(skiaWasmDir)
-        val skiaDir = skiaWasmDir.get().absolutePath
+        val unzipper = skiaCrossUnzipTasks[OS.Wasm to Arch.Wasm]!!
+        dependsOn(unzipper)
+        val skiaDir = unzipper.get().destinationDir.absolutePath
         val outDir = "$buildDir/wasm"
         val srcs = listOf(
             "$projectDir/src/jsMain/cpp",
@@ -356,8 +392,7 @@ val wasmCompile = project.tasks.register<Exec>("wasmCompile") {
         val outWasm = "$outDir/skiko.wasm"
         workingDir = File(outDir)
         val skikoJsPrefix = "$projectDir/src/jsMain/resources/setup.js"
-        if (supportWasm) {
-            commandLine = listOf(
+        commandLine = listOf(
                 "emcc",
                 *buildType.clangFlags,
                 *Arch.Wasm.clangFlags,
@@ -376,14 +411,6 @@ val wasmCompile = project.tasks.register<Exec>("wasmCompile") {
                 // We must compute this list after Skia unpacking task has finished.
                 listOf(skiaBinDir).findAllFiles(".a")
             })
-        } else {
-            // Create dummy files anyway.
-            commandLine = listOf(
-                "touch",
-                outJs,
-                outWasm
-            )
-        }
         file(outDir).mkdirs()
         inputs.files(srcs + listOf(skikoJsPrefix))
         outputs.files(outJs, outWasm)
@@ -432,7 +459,6 @@ project.tasks.register<Exec>("nativeBridgesCompile") {
         *targetOs.clangFlags,
         *buildType.clangFlags,
         "-c",
-        "-DPROVIDE_JNI_TYPES",
         "-DSK_SHAPER_CORETEXT_AVAILABLE",
         "-DSK_BUILD_FOR_MAC",
         "-DSK_METAL",
