@@ -712,6 +712,7 @@ val skikoJvmRuntimeJar by project.tasks.registering(Jar::class) {
 }
 
 val skikoWasmJar by project.tasks.registering(Jar::class) {
+    dependsOn(wasmCompile)
     // We produce jar that contains .js of wrapper/bindings and .wasm with Skia + bindings.
     val wasmOutputs = wasmCompile.get().outputs
     from(wasmOutputs.files.single { it.name.endsWith(".wasm")})
