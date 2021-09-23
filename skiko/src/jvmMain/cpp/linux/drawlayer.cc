@@ -24,7 +24,23 @@ extern "C"
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getWindowHandle(JNIEnv *env, jobject canvas, jlong platformInfoPtr)
     {
         JAWT_X11DrawingSurfaceInfo *dsi_x11 = fromJavaPointer<JAWT_X11DrawingSurfaceInfo *>(platformInfoPtr);
-        return (jlong) dsi_x11->display;
+        Window win = dsi_x11->drawable;
+        Window parent = win;
+        Window root = None;
+        Window *children;
+        unsigned int nchildren;
+        Status s;
+
+        while (parent != root) {
+            win = parent;
+            s = XQueryTree(dsi_x11->display, win, &root, &parent, &children, &nchildren);
+
+            if (s)
+                XFree(children);
+            else
+                return 0;
+        }
+        return (jlong)win;
     }
 
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getContentHandle(JNIEnv *env, jobject canvas, jlong platformInfoPtr)
