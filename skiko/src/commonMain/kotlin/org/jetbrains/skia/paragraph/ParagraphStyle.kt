@@ -123,7 +123,7 @@ class ParagraphStyle : Managed(ParagraphStyle_nMake(), _FinalizerHolder.PTR) {
         }
         set(value) = try {
             Stats.onNativeCall()
-            _nSetHeight(_ptr, height)
+            _nSetHeight(_ptr, value)
         } finally {
             reachabilityBarrier(this)
         }

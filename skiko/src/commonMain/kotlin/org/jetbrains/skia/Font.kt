@@ -260,7 +260,7 @@ class Font : Managed {
         }
         set(value) = try {
             Stats.onNativeCall()
-            _nSetSize(_ptr, size)
+            _nSetSize(_ptr, value)
         } finally {
             reachabilityBarrier(this)
         }

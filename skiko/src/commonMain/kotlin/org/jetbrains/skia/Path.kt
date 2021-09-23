@@ -311,7 +311,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
         }
         set(value) = try {
             Stats.onNativeCall()
-            _nSetFillMode(_ptr, fillMode.ordinal)
+            _nSetFillMode(_ptr, value.ordinal)
         } finally {
             reachabilityBarrier(this)
         }
