@@ -8,6 +8,7 @@ import org.jetbrains.skiko.redrawer.Redrawer
 import org.jetbrains.skiko.redrawer.SoftwareRedrawer
 import org.jetbrains.skiko.redrawer.WindowsOpenGLRedrawer
 import org.jetbrains.skiko.redrawer.WindowsSoftwareRedrawer
+import org.jetbrains.skiko.redrawer.LinuxSoftwareRedrawer
 import java.awt.Component
 import java.awt.Window
 import javax.swing.SwingUtilities
@@ -83,7 +84,6 @@ internal val platformOperations: PlatformOperations by lazy {
                     renderApi: GraphicsApi,
                     properties: SkiaLayerProperties
                 ) = when(renderApi) {
-                    // GraphicsApi.SOFTWARE -> SoftwareRedrawer(layer, properties)
                     GraphicsApi.SOFTWARE -> WindowsSoftwareRedrawer(layer, properties)
                     GraphicsApi.DIRECT3D -> Direct3DRedrawer(layer, properties)
                     else -> WindowsOpenGLRedrawer(layer, properties)
@@ -119,7 +119,7 @@ internal val platformOperations: PlatformOperations by lazy {
                     renderApi: GraphicsApi,
                     properties: SkiaLayerProperties
                 ) = when(renderApi) {
-                    GraphicsApi.SOFTWARE -> SoftwareRedrawer(layer, properties)
+                    GraphicsApi.SOFTWARE -> LinuxSoftwareRedrawer(layer, properties)
                     else -> LinuxOpenGLRedrawer(layer, properties)
                 }
             }

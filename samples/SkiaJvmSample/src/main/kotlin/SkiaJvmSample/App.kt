@@ -20,8 +20,7 @@ import javax.imageio.ImageIO
 fun main() {
     val windows = 1
     repeat(windows) {
-        // createWindow("window $it", windows == 1)
-        SwingSkia()
+        createWindow("window $it", windows == 1)
     }
 }
 

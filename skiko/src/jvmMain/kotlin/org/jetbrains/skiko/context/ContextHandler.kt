@@ -15,8 +15,12 @@ import org.jetbrains.skiko.javaVendor
 
 internal fun createContextHandler(layer: SkiaLayer, renderApi: GraphicsApi): ContextHandler {
     return when (renderApi) {
-        // GraphicsApi.SOFTWARE -> SoftwareContextHandler(layer)
-        GraphicsApi.SOFTWARE -> WindowsSoftwareContextHandler(layer)
+        GraphicsApi.SOFTWARE -> return when (hostOs) {
+            OS.Windows -> WindowsSoftwareContextHandler(layer)
+            OS.Linux -> LinuxSoftwareContextHandler(layer)
+            OS.MacOS -> SoftwareContextHandler(layer)
+            else -> SoftwareContextHandler(layer)
+        }
         GraphicsApi.OPENGL -> OpenGLContextHandler(layer)
         GraphicsApi.DIRECT3D -> Direct3DContextHandler(layer)
         GraphicsApi.METAL -> MetalContextHandler(layer)
