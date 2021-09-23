@@ -49,8 +49,7 @@ class Renderer(
 fun displayScene(renderer: Renderer, nanoTime: Long) {
     val canvas = renderer.canvas!!
 
-    val paint = Paint()
-    paint.setColor(Color.GREEN)
+    val paint = Paint().apply { color = Color.GREEN}
 
     canvas.clear(Color.RED)
 
