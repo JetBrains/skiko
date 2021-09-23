@@ -12,7 +12,6 @@ import kotlin.coroutines.resume
 internal class RendezvousBroadcastChannel<T> {
     private val onRequest = Channel<Unit>(Channel.CONFLATED)
     private val receivers = mutableListOf<Continuation<T>>()
-    private val receiversCopy = mutableListOf<Continuation<T>>()
 
     /**
      * Send value to all current consumers which await value on `receive` method, or await for the first one.
@@ -21,14 +20,15 @@ internal class RendezvousBroadcastChannel<T> {
      */
     suspend fun sendAll(value: T) {
         onRequest.receive()
-        synchronized(receivers) {
-            receiversCopy.addAll(receivers)
-            receivers.clear()
+        val receiversCopy = synchronized(receivers) {
+            mutableListOf<Continuation<T>>().apply {
+                addAll(receivers)
+                receivers.clear()
+            }
         }
         for (receiver in receiversCopy) {
             receiver.resume(value)
         }
-        receiversCopy.clear()
     }
 
     /**
