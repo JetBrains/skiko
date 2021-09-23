@@ -180,6 +180,41 @@ class FrameLimiterTest {
         }
     }
 
+    @Test(timeout = 30000)
+    fun `multithreaded awaiter`() {
+        val scope = CoroutineScope(Dispatchers.IO)
+        val frameLimiter = FrameLimiter(scope, { 0 }, nanoTime = System::nanoTime)
+
+        runBlocking(Dispatchers.IO) {
+            repeat(50000) {
+                frameLimiter.awaitNextFrame()
+            }
+        }
+
+        scope.cancel()
+    }
+
+    @Test(timeout = 30000)
+    fun `multiple multithreaded awaiters`() {
+        val scope = CoroutineScope(Dispatchers.IO)
+        val frameLimiter = FrameLimiter(scope, { 0 }, nanoTime = System::nanoTime)
+
+        runBlocking(Dispatchers.IO) {
+            repeat(3) {
+                launch {
+                    repeat(50000) {
+                        frameLimiter.awaitNextFrame()
+                        yield()
+                        yield()
+                        yield()
+                    }
+                }
+            }
+        }
+
+        scope.cancel()
+    }
+
     private inline fun <reified T : Throwable> assertThrow(body: () -> Unit) {
         var actualE: Throwable? = null
         try {
