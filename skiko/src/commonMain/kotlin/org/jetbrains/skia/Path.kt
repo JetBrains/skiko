@@ -224,7 +224,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      * @param other  Path to compare
      * @return   true if this and Path are equivalent
      */
-        override fun _nativeEquals(other: Native?): Boolean {
+    override fun _nativeEquals(other: Native?): Boolean {
         return try {
             Path_nEquals(_ptr, getPtr(other))
         } finally {
@@ -309,15 +309,12 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
         } finally {
             reachabilityBarrier(this)
         }
-        set(value) {
-            setFillMode(value)
+        set(value) = try {
+            Stats.onNativeCall()
+            _nSetFillMode(_ptr, fillMode.ordinal)
+        } finally {
+            reachabilityBarrier(this)
         }
-    
-    fun setFillMode(fillMode: PathFillMode): Path {
-        Stats.onNativeCall()
-        _nSetFillMode(_ptr, fillMode.ordinal)
-        return this
-    }
 
     /**
      * Returns true if the path is convex. If necessary, it will first compute the convexity.
@@ -482,9 +479,11 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
         } finally {
             reachabilityBarrier(this)
         }
-        set(value) {
+        set(value) = try {
             Stats.onNativeCall()
             Path_nSetVolatile(_ptr, value)
+        } finally {
+            reachabilityBarrier(this)
         }
     
     /**
@@ -1919,12 +1918,15 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      *
      * @see [https://fiddle.skia.org/c/@Path_getLastPt](https://fiddle.skia.org/c/@Path_getLastPt)
      */
-    val lastPt: Point
+    var lastPt: Point
         get() = try {
             Stats.onNativeCall()
             _nGetLastPt(_ptr)
         } finally {
             reachabilityBarrier(this)
+        }
+        set(value) {
+            setLastPt(value.x, value.y)
         }
 
     /**
@@ -1941,17 +1943,6 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
         Stats.onNativeCall()
         _nSetLastPt(_ptr, x, y)
         return this
-    }
-
-    /**
-     * Sets the last point on the path. If Point array is empty, append [PathVerb.MOVE] to
-     * verb array and append p to Point array.
-     *
-     * @param p  set value of last point
-     * @return   this
-     */
-    fun setLastPt(p: Point): Path {
-        return setLastPt(p.x, p.y)
     }
 
     /**

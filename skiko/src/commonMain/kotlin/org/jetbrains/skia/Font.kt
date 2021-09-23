@@ -89,10 +89,16 @@ class Font : Managed {
      *
      * @return  true if all glyphs are hinted
      */
-    val isAutoHintingForced: Boolean
+    var isAutoHintingForced: Boolean
         get() = try {
             Stats.onNativeCall()
             _nIsAutoHintingForced(_ptr)
+        } finally {
+            reachabilityBarrier(this)
+        }
+        set(value) = try {
+            Stats.onNativeCall()
+            _nSetAutoHintingForced(_ptr, value)
         } finally {
             reachabilityBarrier(this)
         }
@@ -112,10 +118,16 @@ class Font : Managed {
     /**
      * @return  true if glyphs may be drawn at sub-pixel offsets
      */
-    val isSubpixel: Boolean
+    var isSubpixel: Boolean
         get() = try {
             Stats.onNativeCall()
             _nIsSubpixel(_ptr)
+        } finally {
+            reachabilityBarrier(this)
+        }
+        set(value) = try {
+            Stats.onNativeCall()
+            _nSetSubpixel(_ptr, value)
         } finally {
             reachabilityBarrier(this)
         }
@@ -138,10 +150,16 @@ class Font : Managed {
      *
      * @return  true if bold is approximated through stroke width
      */
-    val isEmboldened: Boolean
+    var isEmboldened: Boolean
         get() = try {
             Stats.onNativeCall()
             _nIsEmboldened(_ptr)
+        } finally {
+            reachabilityBarrier(this)
+        }
+        set(value) = try {
+            Stats.onNativeCall()
+            _nSetEmboldened(_ptr, value)
         } finally {
             reachabilityBarrier(this)
         }
@@ -152,130 +170,53 @@ class Font : Managed {
      *
      * @return  true if baselines may be snapped to pixels
      */
-    val isBaselineSnapped: Boolean
+    var isBaselineSnapped: Boolean
         get() = try {
             Stats.onNativeCall()
             _nIsBaselineSnapped(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
-
-    /**
-     * Sets whether to always hint glyphs. If forceAutoHinting is set, instructs the font manager to always hint glyphs. Only affects platforms that use FreeType as the font manager.
-     *
-     * @param value  setting to always hint glyphs
-     * @return       this
-     */
-    fun setAutoHintingForced(value: Boolean): Font {
-        Stats.onNativeCall()
-        _nSetAutoHintingForced(_ptr, value)
-        return this
-    }
-
-    /**
-     * Requests, but does not require, to use bitmaps in fonts instead of outlines.
-     *
-     * @param value  setting to use bitmaps in fonts
-     * @return       this
-     */
-    fun setBitmapsEmbedded(value: Boolean): Font {
-        Stats.onNativeCall()
-        _nSetBitmapsEmbedded(_ptr, value)
-        return this
-    }
-
-    /**
-     * Requests, but does not require, that glyphs respect sub-pixel positioning.
-     *
-     * @param value  setting for sub-pixel positioning
-     * @return       this
-     */
-    fun setSubpixel(value: Boolean): Font {
-        Stats.onNativeCall()
-        _nSetSubpixel(_ptr, value)
-        return this
-    }
-
-    /**
-     * Requests, but does not require, linearly scalable font and glyph metrics.
-     *
-     * For outline fonts 'true' means font and glyph metrics should ignore hinting and rounding.
-     * Note that some bitmap formats may not be able to scale linearly and will ignore this flag.
-     *
-     * @param value  setting for linearly scalable font and glyph metrics.
-     * @return       this
-     */
-    fun setMetricsLinear(value: Boolean): Font {
-        Stats.onNativeCall()
-        _nSetMetricsLinear(_ptr, value)
-        return this
-    }
-
-    /**
-     * Increases stroke width when creating glyph bitmaps to approximate a bold typeface.
-     *
-     * @param value  setting for bold approximation
-     * @return       this
-     */
-    fun setEmboldened(value: Boolean): Font {
-        Stats.onNativeCall()
-        _nSetEmboldened(_ptr, value)
-        return this
-    }
-
-    /**
-     * Requests that baselines be snapped to pixels when the current transformation matrix is axis
-     * aligned.
-     *
-     * @param value  setting for baseline snapping to pixels
-     * @return       this
-     */
-    fun setBaselineSnapped(value: Boolean): Font {
-        Stats.onNativeCall()
-        _nSetBaselineSnapped(_ptr, value)
-        return this
-    }
+        set(value) = try {
+            Stats.onNativeCall()
+            _nSetBaselineSnapped(_ptr, value)
+        } finally {
+            reachabilityBarrier(this)
+        }
 
     /**
      * Whether edge pixels draw opaque or with partial transparency.
      */
-    val edging: FontEdging
+    var edging: FontEdging
         get() = try {
             Stats.onNativeCall()
             FontEdging.values().get(_nGetEdging(_ptr))
         } finally {
             reachabilityBarrier(this)
         }
-
-    /**
-     * Requests, but does not require, that edge pixels draw opaque or with
-     * partial transparency.
-     */
-    fun setEdging(value: FontEdging): Font {
-        Stats.onNativeCall()
-        _nSetEdging(_ptr, value.ordinal)
-        return this
-    }
+        set(value) = try {
+            Stats.onNativeCall()
+            _nSetEdging(_ptr, value.ordinal)
+        } finally {
+            reachabilityBarrier(this)
+        }
 
     /**
      * @return  level of glyph outline adjustment
      */
-    val hinting: FontHinting
+    var hinting: FontHinting
         get() = try {
             Stats.onNativeCall()
             FontHinting.values().get(_nGetHinting(_ptr))
         } finally {
             reachabilityBarrier(this)
         }
-
-    /**
-     * Sets level of glyph outline adjustment. Does not check for valid values of hintingLevel.
-     */
-    fun setHinting(value: FontHinting): Font {
-        Stats.onNativeCall()
-        _nSetHinting(_ptr, value.ordinal)
-        return this
-    }
+        set(value) = try {
+            Stats.onNativeCall()
+            _nSetHinting(_ptr, value.ordinal)
+        } finally {
+            reachabilityBarrier(this)
+        }
 
     /**
      * Returns a font with the same attributes of this font, but with the specified size.
@@ -310,21 +251,34 @@ class Font : Managed {
     /**
      * @return  text size in points
      */
-    val size: Float
+    var size: Float
         get() = try {
             Stats.onNativeCall()
             Font_nGetSize(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
+        set(value) = try {
+            Stats.onNativeCall()
+            _nSetSize(_ptr, size)
+        } finally {
+            reachabilityBarrier(this)
+        }
+
 
     /**
      * @return  text scale on x-axis. Default value is 1
      */
-    val scaleX: Float
+    var scaleX: Float
         get() = try {
             Stats.onNativeCall()
             _nGetScaleX(_ptr)
+        } finally {
+            reachabilityBarrier(this)
+        }
+        set(value) = try {
+            Stats.onNativeCall()
+            _nSetScaleX(_ptr, value)
         } finally {
             reachabilityBarrier(this)
         }
@@ -332,10 +286,16 @@ class Font : Managed {
     /**
      * @return  text skew on x-axis. Default value is 0
      */
-    val skewX: Float
+    var skewX: Float
         get() = try {
             Stats.onNativeCall()
             _nGetSkewX(_ptr)
+        } finally {
+            reachabilityBarrier(this)
+        }
+        set(value) = try {
+            Stats.onNativeCall()
+            _nSetSkewX(_ptr, value)
         } finally {
             reachabilityBarrier(this)
         }
@@ -354,33 +314,6 @@ class Font : Managed {
         } finally {
             reachabilityBarrier(typeface)
         }
-    }
-
-    /**
-     * Sets text size in points. Has no effect if value is not greater than or equal to zero.
-     */
-    fun setSize(value: Float): Font {
-        Stats.onNativeCall()
-        _nSetSize(_ptr, value)
-        return this
-    }
-
-    /**
-     * Sets text scale on x-axis. Default value is 1.
-     */
-    fun setScaleX(value: Float): Font {
-        Stats.onNativeCall()
-        _nSetScaleX(_ptr, value)
-        return this
-    }
-
-    /**
-     * Sets text skew on x-axis. Default value is 0.
-     */
-    fun setSkewX(value: Float): Font {
-        Stats.onNativeCall()
-        _nSetSkewX(_ptr, value)
-        return this
     }
 
     /**
