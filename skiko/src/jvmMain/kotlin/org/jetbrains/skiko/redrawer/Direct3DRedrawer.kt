@@ -17,7 +17,7 @@ internal class Direct3DRedrawer(
 
     private val device = createDirectXDevice(getAdapterPriority(), layer.contentHandle).also {
         if (it == 0L || !isVideoCardSupported(layer.renderApi)) {
-            throw IllegalArgumentException("Failed to create DirectX12 device.")
+            throw RenderException("Failed to create DirectX12 device.")
         }
     }
 
@@ -42,7 +42,7 @@ internal class Direct3DRedrawer(
     override fun redrawImmediately() {
         check(!isDisposed) { "Direct3DRedrawer is disposed" }
         layer.update(System.nanoTime())
-        if (prepareDrawContext()) {
+        layer.inDrawScope {
             drawAndSwap(withVsync = false)
         }
     }
@@ -52,15 +52,11 @@ internal class Direct3DRedrawer(
     }
 
     private suspend fun draw() {
-        if (prepareDrawContext()) {
+        layer.inDrawScope {
             withContext(Dispatchers.IO) {
                 drawAndSwap(withVsync = properties.isVsyncEnabled)
             }
         }
-    }
-
-    private fun prepareDrawContext() = synchronized(drawLock) {
-        layer.prepareDrawContext()
     }
 
     private fun drawAndSwap(withVsync: Boolean) = synchronized(drawLock) {

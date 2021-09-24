@@ -4,10 +4,10 @@ import org.jetbrains.skia.*
 import org.jetbrains.skiko.context.ContextHandler
 import org.jetbrains.skiko.context.createContextHandler
 import org.jetbrains.skiko.redrawer.Redrawer
-import org.jetbrains.skiko.withExceptionHandler
 import java.awt.Graphics
 import java.awt.event.*
 import java.awt.im.InputMethodRequests
+import java.util.concurrent.CancellationException
 import javax.swing.JPanel
 import javax.swing.SwingUtilities.isEventDispatchThread
 
@@ -131,12 +131,8 @@ open class SkiaLayer(
     private var picture: PictureHolder? = null
     private val pictureRecorder = PictureRecorder()
     private val pictureLock = Any()
-    private val onExceptionAction: () -> Boolean = {
-        findNextWorkingRenderApi(false)
-        false
-    }
 
-    private fun findNextWorkingRenderApi(redraw: Boolean) {
+    private fun findNextWorkingRenderApi() {
         var thrown: Boolean
         do {
             thrown = false
@@ -146,17 +142,21 @@ open class SkiaLayer(
                 redrawer?.dispose()
                 contextHandler = createContextHandler(this, renderApi)
                 redrawer = platformOperations.createRedrawer(this, renderApi, properties)
-                if (redraw) redrawer!!.redrawImmediately()
-            } catch (e: Exception) {
+                redrawer?.syncSize()
+            } catch (e: RenderException) {
                 println(e.message)
                 thrown = true
             }
-        } while (thrown)
+        } while (thrown && fallbackRenderApiQueue.isNotEmpty())
+
+        if (thrown && fallbackRenderApiQueue.isEmpty()) {
+            throw RenderException("Cannot fallback to any render API")
+        }
     }
 
-    open fun init() {
+    protected open fun init() {
         backedLayer.init()
-        findNextWorkingRenderApi(false)
+        findNextWorkingRenderApi()
         isInited = true
     }
 
@@ -196,6 +196,7 @@ open class SkiaLayer(
         }
         super.setBounds(x, y, roundedWidth, roundedHeight)
         backedLayer.setSize(roundedWidth, roundedHeight)
+        redrawer?.syncSize()
     }
 
     override fun paint(g: Graphics) {
@@ -203,7 +204,7 @@ open class SkiaLayer(
         if (backedLayer.checkContentScale()) {
             notifyChange(PropertyKind.ContentScale)
         }
-        redrawer?.syncSize()
+        redrawer?.syncSize() // setBounds not always called (for example when we change density on Linux
 
         // `paint` can be called when we already inside `draw` method.
         //
@@ -211,12 +212,10 @@ open class SkiaLayer(
         // such as `jframe.isEnabled = false` on Linux
         //
         // To avoid recursive call of `draw` (we don't support recursive calls) we just schedule redrawing.
-        withExceptionHandler(onExceptionAction) {
-            if (isRendering) {
-                redrawer?.needRedraw()
-            } else {
-                redrawer?.redrawImmediately()
-            }
+        if (isRendering) {
+            redrawer?.needRedraw()
+        } else {
+            redrawer?.redrawImmediately()
         }
     }
 
@@ -339,22 +338,32 @@ open class SkiaLayer(
         }
     }
 
-    internal fun prepareDrawContext(): Boolean {
+    internal inline fun inDrawScope(body: () -> Unit) {
+        check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         check(!isDisposed) { "SkiaLayer is disposed" }
-        contextHandler?.apply {
-            if (!initContext()) {
-                findNextWorkingRenderApi(true)
-                return false
-            }
-            withExceptionHandler(onExceptionAction) {
-                initCanvas()
-                true
+        try {
+            body()
+        } catch (e: CancellationException) {
+            // ignore
+        } catch (e: RenderException) {
+            if (!isDisposed) {
+                println(e.message)
+                findNextWorkingRenderApi()
+                redrawer?.redrawImmediately()
             }
         }
-        return true
     }
 
+    // can be called from non-swing thread
+    // throws exception if initialization of graphic context was not successful
     internal fun draw() {
+        contextHandler?.apply {
+            if (!initContext()) {
+                throw RenderException("Cannot init graphic context")
+            }
+            initCanvas()
+        }
+
         check(!isDisposed) { "SkiaLayer is disposed" }
         contextHandler?.apply {
             clearCanvas()

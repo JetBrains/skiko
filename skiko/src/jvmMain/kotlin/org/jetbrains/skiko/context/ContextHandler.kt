@@ -13,7 +13,12 @@ import org.jetbrains.skiko.hostFullName
 import org.jetbrains.skiko.javaLocation
 import org.jetbrains.skiko.javaVendor
 
+internal var testNonSoftwareContextHandler: ((SkiaLayer) -> ContextHandler)? = null
+
 internal fun createContextHandler(layer: SkiaLayer, renderApi: GraphicsApi): ContextHandler {
+    if (testNonSoftwareContextHandler != null && renderApi != GraphicsApi.SOFTWARE) {
+        return testNonSoftwareContextHandler!!(layer)
+    }
     return when (renderApi) {
         GraphicsApi.SOFTWARE -> SoftwareContextHandler(layer)
         GraphicsApi.OPENGL -> OpenGLContextHandler(layer)

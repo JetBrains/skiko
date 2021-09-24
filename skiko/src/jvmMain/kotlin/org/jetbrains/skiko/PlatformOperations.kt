@@ -2,7 +2,6 @@ package org.jetbrains.skiko
 
 import org.jetbrains.skiko.redrawer.Direct3DRedrawer
 import org.jetbrains.skiko.redrawer.LinuxOpenGLRedrawer
-import org.jetbrains.skiko.redrawer.MacOsOpenGLRedrawer
 import org.jetbrains.skiko.redrawer.MetalRedrawer
 import org.jetbrains.skiko.redrawer.Redrawer
 import org.jetbrains.skiko.redrawer.SoftwareRedrawer
@@ -10,6 +9,8 @@ import org.jetbrains.skiko.redrawer.WindowsOpenGLRedrawer
 import java.awt.Component
 import java.awt.Window
 import javax.swing.SwingUtilities
+
+internal var testNonSoftwareRedrawer: ((SkiaLayer) -> Redrawer)? = null
 
 internal interface PlatformOperations {
     fun isFullscreen(component: Component): Boolean
@@ -49,8 +50,7 @@ internal val platformOperations: PlatformOperations by lazy {
                     properties: SkiaLayerProperties
                 ) = when(renderApi) {
                     GraphicsApi.SOFTWARE -> SoftwareRedrawer(layer, properties)
-                    GraphicsApi.METAL -> MetalRedrawer(layer, properties)
-                    else -> MacOsOpenGLRedrawer(layer, properties)
+                    else -> testNonSoftwareRedrawer?.invoke(layer) ?: MetalRedrawer(layer, properties)
                 }
         }
         OS.Windows -> {
@@ -83,8 +83,9 @@ internal val platformOperations: PlatformOperations by lazy {
                     properties: SkiaLayerProperties
                 ) = when(renderApi) {
                     GraphicsApi.SOFTWARE -> SoftwareRedrawer(layer, properties)
-                    GraphicsApi.DIRECT3D -> Direct3DRedrawer(layer, properties)
-                    else -> WindowsOpenGLRedrawer(layer, properties)
+                    GraphicsApi.OPENGL ->
+                        testNonSoftwareRedrawer?.invoke(layer) ?: WindowsOpenGLRedrawer(layer, properties)
+                    else -> testNonSoftwareRedrawer?.invoke(layer) ?: Direct3DRedrawer(layer, properties)
                 }
             }
         }
@@ -118,7 +119,7 @@ internal val platformOperations: PlatformOperations by lazy {
                     properties: SkiaLayerProperties
                 ) = when(renderApi) {
                     GraphicsApi.SOFTWARE -> SoftwareRedrawer(layer, properties)
-                    else -> LinuxOpenGLRedrawer(layer, properties)
+                    else -> testNonSoftwareRedrawer?.invoke(layer) ?: LinuxOpenGLRedrawer(layer, properties)
                 }
             }
         }
