@@ -18,9 +18,10 @@ internal fun createContextHandler(layer: SkiaLayer, renderApi: GraphicsApi): Con
         GraphicsApi.SOFTWARE -> return when (hostOs) {
             OS.Windows -> WindowsSoftwareContextHandler(layer)
             OS.Linux -> LinuxSoftwareContextHandler(layer)
-            OS.MacOS -> SoftwareContextHandler(layer)
-            else -> SoftwareContextHandler(layer)
+            OS.MacOS -> AWTSoftwareContextHandler(layer)
+            else -> AWTSoftwareContextHandler(layer)
         }
+        GraphicsApi.AWTSOFTWARE -> AWTSoftwareContextHandler(layer)
         GraphicsApi.OPENGL -> OpenGLContextHandler(layer)
         GraphicsApi.DIRECT3D -> Direct3DContextHandler(layer)
         GraphicsApi.METAL -> MetalContextHandler(layer)

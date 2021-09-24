@@ -36,6 +36,7 @@ internal object SkikoProperties {
 
     private fun parseRenderApi(text: String?): GraphicsApi {
         when(text) {
+            "AWTSOFTWARE" -> return GraphicsApi.AWTSOFTWARE
             "SOFTWARE" -> return GraphicsApi.SOFTWARE
             "OPENGL" -> return GraphicsApi.OPENGL
             "DIRECT3D" -> {
@@ -63,9 +64,9 @@ internal object SkikoProperties {
         var renderApiList = mutableListOf<GraphicsApi>()
 
         when (hostOs) {
-            OS.Linux -> renderApiList = mutableListOf(GraphicsApi.OPENGL, GraphicsApi.SOFTWARE)
-            OS.MacOS -> renderApiList = mutableListOf(GraphicsApi.METAL, GraphicsApi.SOFTWARE)
-            OS.Windows -> renderApiList = mutableListOf(GraphicsApi.DIRECT3D, GraphicsApi.OPENGL, GraphicsApi.SOFTWARE)
+            OS.Linux -> renderApiList = mutableListOf(GraphicsApi.OPENGL, GraphicsApi.SOFTWARE, GraphicsApi.AWTSOFTWARE)
+            OS.MacOS -> renderApiList = mutableListOf(GraphicsApi.METAL, GraphicsApi.AWTSOFTWARE)
+            OS.Windows -> renderApiList = mutableListOf(GraphicsApi.DIRECT3D, GraphicsApi.OPENGL, GraphicsApi.SOFTWARE, GraphicsApi.AWTSOFTWARE)
         }
         renderApiList.remove(head)
 

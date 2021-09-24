@@ -7,7 +7,7 @@ import org.jetbrains.skiko.FrameLimiter
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaLayerProperties
 
-internal class SoftwareRedrawer(
+internal class AWTSoftwareRedrawer(
     private val layer: SkiaLayer,
     private val properties: SkiaLayerProperties
 ) : Redrawer {
