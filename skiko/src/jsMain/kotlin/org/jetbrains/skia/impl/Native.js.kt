@@ -149,18 +149,33 @@ actual class InteropScope actual constructor() {
     }
 
     actual fun InteropPointer.fromInterop(result: NativePointerArray) {
-        TODO("implement wasm fromInterop(NativePointerArray)")
+        return fromWasm(this@fromInterop, result.backing)
     }
 
-    actual fun toInterop(stringArray: Array<String>?): InteropPointer =
-        TODO("implement wasm toInterop(Array<String>)")
+    actual fun toInterop(stringArray: Array<String>?): InteropPointer {
+        return if (stringArray != null) {
+            val ptrs = stringArray.map {
+                toInterop(it)
+            }.toIntArray()
+
+            toInterop(ptrs)
+        } else {
+            0
+        }
+    }
 
     actual fun InteropPointer.fromInteropNativePointerArray(): NativePointerArray {
         TODO("implement wasm fromInteropNativePointerArray")
     }
 
-    actual inline fun <reified T> InteropPointer.fromInterop(decoder: ArrayInteropDecoder<T>): Array<T> =
-        TODO("implement wasm fromInteropArray()")
+    actual inline fun <reified T> InteropPointer.fromInterop(decoder: ArrayInteropDecoder<T>): Array<T> {
+        val size = decoder.getArraySize(this)
+        val result = Array<T>(size) {
+            decoder.getArrayElement(this, it)
+        }
+        decoder.disposeArray(this)
+        return result
+    }
 
     actual fun release()  {
         elements.forEach {
@@ -217,12 +232,6 @@ private fun fromWasm(src: NativePointer, result: ByteArray) {
     val endIndex = startIndex + result.size
     js("result.set(HEAPU8.subarray(startIndex, endIndex))")
 }
-
-//private fun fromWasm(src: NativePointer, result: CharArray) {
-//    val startIndex = src / 2
-//    val endIndex = startIndex + result.size
-//    js("result.set(HEAPU16.subarray(startIndex, endIndex))")
-//}
 
 private fun fromWasm(src: NativePointer, result: ShortArray) {
     val startIndex = src / 2

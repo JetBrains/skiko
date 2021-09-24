@@ -1,10 +1,12 @@
 package org.jetbrains.skia.impl
 
+import IgnoreTestOnJvm
 import runTest
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 
+@IgnoreTestOnJvm
 class InteropScopeTests {
 
     @Test
@@ -27,10 +29,10 @@ class InteropScopeTests {
     @Test
     fun toInteropFloatArray() = runTest {
         interopScope {
-            val array = floatArrayOf(-1f, 2f, 3f, 0f, 5f)
+            val array = floatArrayOf(Float.MIN_VALUE, 2f, -1f, 0f, 1f, Float.MAX_VALUE)
             val interopPointer = toInterop(array)
 
-            val readArray = FloatArray(5)
+            val readArray = FloatArray(6)
             interopPointer.fromInterop(readArray)
             assertContentEquals(array, readArray)
         }
@@ -39,7 +41,7 @@ class InteropScopeTests {
     @Test
     fun toInteropByteArray() = runTest {
         interopScope {
-            val array = byteArrayOf(-1, 2, 3, 0, 5)
+            val array = byteArrayOf(Byte.MIN_VALUE, -2, 3, 0, Byte.MAX_VALUE)
             val interopPointer = toInterop(array)
 
             val readArray = ByteArray(5)
@@ -51,7 +53,7 @@ class InteropScopeTests {
     @Test
     fun toInteropShortArray() = runTest {
         interopScope {
-            val array = shortArrayOf(-1, 2, 3, 0, 5)
+            val array = shortArrayOf(Short.MIN_VALUE, 2, -3, 0, Short.MAX_VALUE)
             val interopPointer = toInterop(array)
 
             val readArray = ShortArray(5)
@@ -63,7 +65,7 @@ class InteropScopeTests {
     @Test
     fun toInteropIntArray() = runTest {
         interopScope {
-            val array = intArrayOf(-1, 2, 3, 0, 5)
+            val array = intArrayOf(Int.MIN_VALUE, 2, -3, 0, Int.MAX_VALUE)
             val interopPointer = toInterop(array)
 
             val readArray = IntArray(5)
@@ -76,7 +78,7 @@ class InteropScopeTests {
     @Ignore
     fun toInteropLongArray() = runTest {
         interopScope {
-            val array = longArrayOf(-1, 2, 3, 0, 5)
+            val array = longArrayOf(Long.MIN_VALUE, -2, 3, 0, Long.MAX_VALUE)
             val interopPointer = toInterop(array)
 
             val readArray = LongArray(5)
@@ -88,7 +90,7 @@ class InteropScopeTests {
     @Test
     fun toInteropDoubleArray() = runTest {
         interopScope {
-            val array = doubleArrayOf(-1.0, 2.0, 3.0, 0.0, 5.0)
+            val array = doubleArrayOf(Double.MIN_VALUE, 2.0, -3.0, 0.0, Double.MAX_VALUE)
             val interopPointer = toInterop(array)
 
             val readArray = DoubleArray(5)
@@ -103,19 +105,18 @@ class InteropScopeTests {
             val array = arrayOf("s1", "s2", "s3")
             val interopPointer = toInterop(array)
 
-//            interopPointer.fromInterop(readArray)
-//            assertContentEquals(array, readArray)
+            val npa = NativePointerArray(3)
+            interopPointer.fromInterop(npa)
+
+            val res = generateSequence(0) {
+                it + 1
+            }.map {
+                val charArray = CharArray(2)
+                (npa[it] as InteropPointer).fromInterop(charArray)
+                charArray.concatToString()
+            }.take(3).toList().toTypedArray()
+
+            assertContentEquals(array, res)
         }
     }
-
-//    @Test
-//    fun toInteropNativePointerArray() = runTest {
-//        interopScope {
-//            val array = createTestNativePointerArray()
-//            val interopPointer = toInterop(array)
-//
-//            val readArray = NativePointerArray(array.size)
-//            //interopPointer.fromInterop(readArray)
-//        }
-//    }
 }
