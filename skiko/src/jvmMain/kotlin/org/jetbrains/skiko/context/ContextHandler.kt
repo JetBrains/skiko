@@ -13,21 +13,6 @@ import org.jetbrains.skiko.hostFullName
 import org.jetbrains.skiko.javaLocation
 import org.jetbrains.skiko.javaVendor
 
-internal var testNonSoftwareContextHandler: ((SkiaLayer) -> ContextHandler)? = null
-
-internal fun createContextHandler(layer: SkiaLayer, renderApi: GraphicsApi): ContextHandler {
-    if (testNonSoftwareContextHandler != null && renderApi != GraphicsApi.SOFTWARE) {
-        return testNonSoftwareContextHandler!!(layer)
-    }
-    return when (renderApi) {
-        GraphicsApi.SOFTWARE -> SoftwareContextHandler(layer)
-        GraphicsApi.OPENGL -> OpenGLContextHandler(layer)
-        GraphicsApi.DIRECT3D -> Direct3DContextHandler(layer)
-        GraphicsApi.METAL -> MetalContextHandler(layer)
-        else -> TODO("Unsupported yet.")
-    }
-}
-
 internal abstract class ContextHandler(val layer: SkiaLayer) {
     open val bleachConstant = if (hostOs == OS.MacOS) 0 else -1
     var context: DirectContext? = null

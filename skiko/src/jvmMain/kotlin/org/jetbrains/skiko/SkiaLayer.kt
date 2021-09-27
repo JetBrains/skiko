@@ -2,7 +2,6 @@ package org.jetbrains.skiko
 
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.context.ContextHandler
-import org.jetbrains.skiko.context.createContextHandler
 import org.jetbrains.skiko.redrawer.Redrawer
 import java.awt.Graphics
 import java.awt.event.*
@@ -17,8 +16,9 @@ interface SkiaRenderer {
 
 private class PictureHolder(val instance: Picture, val width: Int, val height: Int)
 
-open class SkiaLayer(
-    private val properties: SkiaLayerProperties = SkiaLayerProperties()
+open class SkiaLayer  internal constructor(
+    private val properties: SkiaLayerProperties = SkiaLayerProperties(),
+    private val renderFactory: RenderFactory
 ) : JPanel() {
     companion object {
         init {
@@ -32,6 +32,10 @@ open class SkiaLayer(
     }
 
     internal val backedLayer: HardwareLayer
+
+    internal constructor(
+        properties: SkiaLayerProperties = SkiaLayerProperties()
+    ) : this(properties, RenderFactory.Default)
 
     val canvas: java.awt.Canvas
         get() = backedLayer
@@ -140,8 +144,8 @@ open class SkiaLayer(
                 renderApi = fallbackRenderApiQueue.removeAt(0)
                 contextHandler?.dispose()
                 redrawer?.dispose()
-                contextHandler = createContextHandler(this, renderApi)
-                redrawer = platformOperations.createRedrawer(this, renderApi, properties)
+                contextHandler = renderFactory.createContextHandler(this, renderApi)
+                redrawer = renderFactory.createRedrawer(this, renderApi, properties)
                 redrawer?.syncSize()
             } catch (e: RenderException) {
                 println(e.message)
