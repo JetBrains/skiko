@@ -147,9 +147,7 @@ class SkikoProperties(private val myProject: Project) {
 
 object SkikoArtifacts {
     // names are also used in samples, e.g. samples/SkijaInjectSample/build.gradle
-    val commonArtifactId = "skiko-jvm"
-    val metadataArtifactId = "skiko-metadata"
-    val jsArtifactId = "skiko-js-runtime"
+    val jvmArtifactId = "skiko-jvm"
     val jsWasmArtifactId = "skiko-js-wasm-runtime"
     fun runtimeArtifactIdFor(os: OS, arch: Arch) =
         "skiko-jvm-runtime-${targetId(os, arch)}"

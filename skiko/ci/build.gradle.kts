@@ -20,7 +20,7 @@ dependencies {
         }
     }
 
-    skikoDep(SkikoArtifacts.commonArtifactId)
+    skikoDep(SkikoArtifacts.jvmArtifactId)
     skikoDep(SkikoArtifacts.runtimeArtifactIdFor(OS.Windows, Arch.X64))
     skikoDep(SkikoArtifacts.runtimeArtifactIdFor(OS.Linux, Arch.X64))
     skikoDep(SkikoArtifacts.runtimeArtifactIdFor(OS.Linux, Arch.Arm64))

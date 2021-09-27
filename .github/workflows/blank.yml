@@ -90,7 +90,7 @@ jobs:
            source ./emsdk_env.sh
            cd ..
            ./gradlew -Pskiko.wasm.enabled=true jsTest
-           ./gradlew -Pskiko.wasm.enabled=true publishSkikoWasmRuntimePublicationToMavenLocal publishSkikoJsRuntimePublicationToMavenLocal
+           ./gradlew -Pskiko.wasm.enabled=true publishSkikoWasmRuntimePublicationToMavenLocal
    windows:
     runs-on: windows-2019
     steps:
