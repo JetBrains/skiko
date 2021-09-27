@@ -7,7 +7,6 @@ import kotlinx.coroutines.withContext
 import org.jetbrains.skia.BackendRenderTarget
 import org.jetbrains.skia.DirectContext
 import org.jetbrains.skiko.*
-import javax.swing.SwingUtilities
 import javax.swing.SwingUtilities.*
 
 internal class MetalRedrawer(
@@ -19,7 +18,6 @@ internal class MetalRedrawer(
             Library.load()
         }
     }
-    @Volatile
     private var isDisposed = false
     private var drawLock = Any()
     private val device = layer.backedLayer.useDrawingSurfacePlatformInfo {
