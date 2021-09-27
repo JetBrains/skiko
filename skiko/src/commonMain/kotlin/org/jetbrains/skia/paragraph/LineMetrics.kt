@@ -7,19 +7,19 @@ class LineMetrics(
     /**
      * The index in the text buffer the line begins.
      */
-    val startIndex: Long,
+    val startIndex: Int,
     /**
      * The index in the text buffer the line ends.
      */
-    val endIndex: Long,
+    val endIndex: Int,
     /**
      * The index in the text buffer the line ends.
      */
-    val endExcludingWhitespaces: Long,
+    val endExcludingWhitespaces: Int,
     /**
      * The index in the text buffer the line begins.
      */
-    val endIncludingNewline: Long,
+    val endIncludingNewline: Int,
     val isHardBreak: Boolean,
     /**
      * The final computed ascent for the line. This can be impacted by the strut, height,
@@ -61,7 +61,7 @@ class LineMetrics(
     /**
      * Zero indexed line number
      */
-    val lineNumber: Long
+    val lineNumber: Int
 ) {
     /**
      * The final computed ascent for the line. This can be impacted by the strut, height,
@@ -156,17 +156,17 @@ class LineMetrics(
         override fun getArraySize(array: InteropPointer) = LineMetrics_nGetArraySize(array)
         override fun disposeArray(array: InteropPointer) = LineMetrics_nDisposeArray(array)
         override fun getArrayElement(array: InteropPointer, index: Int): LineMetrics {
-            val longArray = LongArray(6)
+            val intArray = IntArray(6)
             val doubleArray = DoubleArray(7)
             val result = interopScope {
-                LineMetrics_nGetArrayElement(array, index, toInterop(longArray), toInterop(doubleArray))
+                LineMetrics_nGetArrayElement(array, index, toInterop(intArray), toInterop(doubleArray))
             }
             return LineMetrics(
-                longArray[0],
-                longArray[1],
-                longArray[2],
-                longArray[3],
-                longArray[4] != 0L,
+                intArray[0],
+                intArray[1],
+                intArray[2],
+                intArray[3],
+                intArray[4] != 0,
                 doubleArray[0],
                 doubleArray[1],
                 doubleArray[2],
@@ -174,7 +174,7 @@ class LineMetrics(
                 doubleArray[4],
                 doubleArray[5],
                 doubleArray[6],
-                longArray[5]
+                intArray[5]
             )
         }
     }

@@ -302,6 +302,16 @@ class SkiaWindowTest {
             window.isVisible = true
             delay(1000)
 
+            // check the line metrics
+            val lineMetrics = paragraph.lineMetrics
+            assertTrue(lineMetrics.isNotEmpty())
+            assertEquals(0, lineMetrics.first().startIndex)
+            assertEquals(5, lineMetrics.first().endIndex)
+            assertEquals(5, lineMetrics.first().endExcludingWhitespaces)
+            assertEquals(5, lineMetrics.first().endIncludingNewline)
+            assertEquals(true, lineMetrics.first().isHardBreak)
+            assertEquals(0, lineMetrics.first().lineNumber)
+
             screenshots.assert(window.bounds)
         } finally {
             window.close()
