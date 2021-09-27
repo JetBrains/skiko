@@ -1,27 +1,44 @@
 import org.gradle.api.Project
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
 import java.io.File
 
-enum class OS(val id: String, val clangFlags: Array<String>) {
+enum class OS(
+    @get:Input
+    val id: String,
+    @get:Input
+    val clangFlags: Array<String>
+) {
     Linux("linux", arrayOf()),
     Windows("windows", arrayOf()),
     MacOS("macos", arrayOf("-mmacosx-version-min=10.13")),
     Wasm("wasm", arrayOf())
     ;
 
+    @get:Internal
     val isWindows
         get() = this == Windows
 }
 
-enum class Arch(val id: String, val clangFlags: Array<String>) {
+enum class Arch(
+    @get:Input
+    val id: String,
+    @get:Input
+    val clangFlags: Array<String>
+) {
     X64("x64", arrayOf("-arch", "x86_64")),
     Arm64("arm64", arrayOf("-arch", "arm64")),
     Wasm("wasm", arrayOf("-std=c++17", "--bind", "-DSKIKO_WASM"))
 }
 
 enum class SkiaBuildType(
+    @get:Input
     val id: String,
+    @get:Input
     val flags: Array<String>,
+    @get:Input
     val clangFlags: Array<String>,
+    @get:Input
     val msvcFlags: Array<String>
 ) {
     DEBUG("Debug", arrayOf("-DSK_DEBUG"), arrayOf("-std=c++14", "-g"), emptyArray()),
@@ -106,6 +123,7 @@ class SkikoProperties(private val myProject: Project) {
     val visualStudioBuildToolsDir: File?
         get() = System.getenv()["SKIKO_VSBT_PATH"]?.let { File(it) }?.takeIf { it.isDirectory }
 
+    // todo: make compatible with the configuration cache
     val skiaDir: File?
         get() = (System.getenv()["SKIA_DIR"] ?: System.getProperty("skia.dir"))?.let { File(it) }
             ?.takeIf { it.isDirectory }

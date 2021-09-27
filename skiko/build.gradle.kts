@@ -2,6 +2,7 @@ import de.undercouch.gradle.tasks.download.Download
 import org.gradle.crypto.checksum.Checksum
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
+import org.jetbrains.kotlin.utils.keysToMap
 
 plugins {
     kotlin("multiplatform") version "1.5.10"
@@ -56,70 +57,79 @@ val crossTargets = listOf(
     OS.Wasm to Arch.Wasm
 )
 
-val skiaCrossDownloadTasks = crossTargets.map { osArch ->
+val skiaCrossDownloadTasks: Map<Pair<OS, Arch>, Provider<File>> = crossTargets.keysToMap { osArch ->
     val suffix = targetSuffix(osArch.first, osArch.second)
-    val result = tasks.register<Download>("skiaCrossDownload$suffix") {
+    val out = skiko.dependenciesDir.resolve("skia/skia-$suffix.zip")
+
+    tasks.register<Download>("skiaCrossDownload$suffix") {
         val release = skiko.skiaReleaseFor(osArch.first, osArch.second, buildType)
-        val out = skiko.dependenciesDir.resolve("skia/skia-$suffix.zip")
         src("https://github.com/JetBrains/skia-pack/releases/download/$release.zip")
         dest(out.absolutePath)
         onlyIfModified(true)
-    }
-    osArch to result
-}.toMap()
-
-val skiaCrossUnzipTasks = crossTargets.map { osArch ->
-    val suffix = targetSuffix(osArch.first, osArch.second)
-    val result = tasks.register("skiaCrossUnzip$suffix", Copy::class) {
-        val downloader = skiaCrossDownloadTasks[osArch]!!
-        dependsOn(downloader)
-        from(zipTree(downloader.get().outputFiles.single()))
-        destinationDir = skiko.dependenciesDir.resolve("skia/skia-$suffix")
-    }
-    osArch to result
-}.toMap()
-
-tasks.register<CrossCompileTask>("wasmCrossCompile") {
-    val osArch = OS.Wasm to Arch.Wasm
-
-    val unzipper = skiaCrossUnzipTasks[osArch]!!
-    dependsOn(unzipper)
-    val unpackedSkia = unzipper.get().destinationDir
-
-    buildVariant.set(buildType)
-    targetOs.set(osArch.first)
-    targetArch.set(osArch.second)
-    inputDir.set(projectDir.resolve("src/commonMain/cpp"))
-    outputDir.set(buildDir)
-
-    val outDir = targetOutputDir
-    val outWasm = "$outDir/skiko.wasm"
-
-    val jsSrcs = listOf(
-        "$projectDir/src/jsMain/cpp"
-    ).findAllFiles(".cc").toTypedArray()
-
-    compiler.set("emcc")
-    skiaDir.set(unpackedSkia.resolve("out/${buildType.id}-${osArch.first.id}-${osArch.second.id}"))
-    val skikoJsPrefix = "$projectDir/src/jsMain/resources/setup.js"
-    flags.set(listOf(
-        "-I$projectDir/src/commonMain/cpp",
-        *skiaPreprocessorFlags(unpackedSkia.absolutePath),
-        "-l", "GL",
-        "-s", "USE_WEBGL2=1",
-        "-s", "OFFSCREEN_FRAMEBUFFER=1",
-        "-DSK_SUPPORT_GPU=1",
-        "--extern-post-js", skikoJsPrefix,
-        *jsSrcs
-    ))
-
-    outputFile.set("skiko.js")
-
-    inputs.files(jsSrcs + listOf(skikoJsPrefix))
-    outputs.files(outWasm)
+    }.map { out.absoluteFile }
 }
 
-val skiaDir = run {
+val skiaDirProviderForCrossTargets: Map<Pair<OS, Arch>, Provider<File>> = crossTargets.keysToMap { osArch ->
+    val suffix = targetSuffix(osArch.first, osArch.second)
+
+    if (skiko.skiaDir != null) {
+        tasks.register("skiaCrossDir$suffix", DefaultTask::class) {
+            // dummy task to simplify usage of the resulting provider (see `else` branch)
+            // if a file provider is not created from a task provider,
+            // then it cannot be used instead of a task in `dependsOn` clauses of other tasks.
+            // e.g. the resulting `skiaDir` could not be used in `dependsOn` of CppCompile configuration
+            enabled = false
+        }.map { skiko.skiaDir!!.absoluteFile }
+    } else {
+        val targetDir = skiko.dependenciesDir.resolve("skia/skia-$suffix")
+        tasks.register("skiaCrossUnzip$suffix", Copy::class) {
+            val downloader = skiaCrossDownloadTasks[osArch]!!
+            dependsOn(downloader)
+            from(downloader.map { zipTree(it) })
+            into(targetDir)
+            destinationDir = targetDir.absoluteFile
+        }.map { it.destinationDir.absoluteFile }
+    }
+}
+
+val wasmCrossCompile = tasks.register<WasmCrossCompileTask>("wasmCrossCompile") {
+    val osArch = OS.Wasm to Arch.Wasm
+
+    val unzipper = skiaDirProviderForCrossTargets[osArch]!!
+    dependsOn(unzipper)
+    val unpackedSkia = unzipper.get()
+
+    targetOs.set(osArch.first)
+    targetArch.set(osArch.second)
+    buildVariant.set(buildType)
+
+    cFiles =
+        project.fileTree("src/jsMain/cpp") { include("**/*.cc") } +
+        project.fileTree("src/commonMain/cpp") { include("**/*.cc") }
+    val skiaAFilesDir = unpackedSkia.resolve("out/${buildType.id}-${osArch.first.id}-${osArch.second.id}")
+    aFiles = project.fileTree(skiaAFilesDir)  { include("**/*.a") }
+
+    outDir.set(project.layout.buildDirectory.dir("out/${buildType.id}-${osArch.first.id}-${osArch.second.id}"))
+    wasmFileName.set("skiko.wasm")
+    jsFileName.set("skiko.js")
+
+    skikoJsPrefix.set(project.layout.projectDirectory.file("src/jsMain/resources/setup.js"))
+
+    includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp"))
+    includeHeadersNonRecursive(skiaHeadersDirs(unpackedSkia))
+
+    flags.set(listOf(
+        *skiaPreprocessorFlags(),
+        "-s", "USE_WEBGL2=1",
+        "-l", "GL",
+        "-s", "OFFSCREEN_FRAMEBUFFER=1",
+        "-DSK_SUPPORT_GPU=1",
+        "--extern-post-js",
+        skikoJsPrefix.get().asFile.absolutePath,
+    ))
+}
+
+val skiaDir: Provider<File> = run {
     if (skiko.skiaDir != null) {
         tasks.register("skiaDir", DefaultTask::class) {
             // dummy task to simplify usage of the resulting provider (see `else` branch)
@@ -132,6 +142,7 @@ val skiaDir = run {
         val targetDir = skiko.dependenciesDir.resolve("skia/skia")
         tasks.register("unzipSkia", Copy::class) {
             from(skiaZip.map { zipTree(it) })
+            into(targetDir)
         }.map { targetDir }
     }
 }
@@ -155,7 +166,7 @@ kotlin {
         browser() {
             testTask {
                 testLogging.showStandardStreams = true
-                dependsOn(project.tasks.named("wasmCompile"))
+                dependsOn(wasmCrossCompile)
                 useKarma {
                     useChromeHeadless()
                 }
@@ -238,25 +249,32 @@ tasks.withType(JavaCompile::class.java).configureEach {
     this.getOptions().compilerArgs.addAll(listOf("-source", "11", "-target", "11"))
 }
 
-fun skiaPreprocessorFlags(skiaDir: String): Array<String> {
+fun skiaHeadersDirs(skiaDir: File): List<File> =
+    listOf(
+        skiaDir,
+        skiaDir.resolve("include"),
+        skiaDir.resolve("include/core"),
+        skiaDir.resolve("include/gpu"),
+        skiaDir.resolve("include/effects"),
+        skiaDir.resolve("include/pathops"),
+        skiaDir.resolve("include/utils"),
+        skiaDir.resolve("include/codec"),
+        skiaDir.resolve("include/svg"),
+        skiaDir.resolve("modules/skottie/include"),
+        skiaDir.resolve("modules/skparagraph/include"),
+        skiaDir.resolve("modules/skshaper/include"),
+        skiaDir.resolve("modules/sksg/include"),
+        skiaDir.resolve("modules/svg/include"),
+        skiaDir.resolve("third_party/externals/harfbuzz/src"),
+        skiaDir.resolve("third_party/icu"),
+        skiaDir.resolve("third_party/externals/icu/source/common"),
+    )
+
+fun includeHeadersFlags(headersDirs: List<File>) =
+    headersDirs.map { "-I${it.absolutePath}" }.toTypedArray()
+
+fun skiaPreprocessorFlags(): Array<String> {
     return listOf(
-        "-I$skiaDir",
-        "-I$skiaDir/include",
-        "-I$skiaDir/include/core",
-        "-I$skiaDir/include/gpu",
-        "-I$skiaDir/include/effects",
-        "-I$skiaDir/include/pathops",
-        "-I$skiaDir/include/utils",
-        "-I$skiaDir/include/codec",
-        "-I$skiaDir/include/svg",
-        "-I$skiaDir/modules/skottie/include",
-        "-I$skiaDir/modules/skparagraph/include",
-        "-I$skiaDir/modules/skshaper/include",
-        "-I$skiaDir/modules/sksg/include",
-        "-I$skiaDir/modules/svg/include",
-        "-I$skiaDir/third_party/externals/harfbuzz/src",
-        "-I$skiaDir/third_party/icu",
-        "-I$skiaDir/third_party/externals/icu/source/common",
         "-DSK_ALLOW_STATIC_GLOBAL_INITIALIZERS=1",
         "-DSK_FORCE_DISTANCE_FIELD_TEXT=0",
         "-DSK_GAMMA_APPLY_TO_A8",
@@ -284,10 +302,11 @@ tasks.withType(CppCompile::class.java).configureEach {
     }
     val jdkHome = System.getProperty("java.home") ?: error("'java.home' is null")
     dependsOn(skiaDir)
-    val skiaDir = skiaDir.get().absolutePath
     compilerArgs.addAll(
-        listOf("-I$jdkHome/include") + skiaPreprocessorFlags(skiaDir)
-    )
+        listOf("-I$jdkHome/include")
+                    + includeHeadersFlags(skiaHeadersDirs(skiaDir.get()))
+                    + skiaPreprocessorFlags()
+        )
     compilerArgs.add("-I$projectDir/src/jvmMain/cpp/include")
     when (targetOs) {
         OS.MacOS -> {
@@ -378,44 +397,6 @@ fun List<String>.findAllFiles(suffix: String): List<String> = this
     .map { it.absolutePath }
     .filter { it.endsWith(suffix) }
 
-
-val wasmCompile = project.tasks.register<Exec>("wasmCompile") {
-        val unzipper = skiaCrossUnzipTasks[OS.Wasm to Arch.Wasm]!!
-        dependsOn(unzipper)
-        val skiaDir = unzipper.get().destinationDir.absolutePath
-        val outDir = "$buildDir/wasm"
-        val srcs = listOf(
-            "$projectDir/src/jsMain/cpp",
-            "$projectDir/src/commonMain/cpp"
-        ).findAllFiles(".cc").toTypedArray()
-        val outJs = "$outDir/skiko.js"
-        val outWasm = "$outDir/skiko.wasm"
-        workingDir = File(outDir)
-        val skikoJsPrefix = "$projectDir/src/jsMain/resources/setup.js"
-        commandLine = listOf(
-                "emcc",
-                *buildType.clangFlags,
-                *Arch.Wasm.clangFlags,
-                "-I$projectDir/src/commonMain/cpp",
-                *skiaPreprocessorFlags(skiaDir),
-                "-l", "GL",
-                "-s", "USE_WEBGL2=1",
-                "-s", "OFFSCREEN_FRAMEBUFFER=1",
-                "-DSK_SUPPORT_GPU=1",
-                "-o", outJs,
-                "--extern-post-js", skikoJsPrefix,
-                *srcs
-            )
-            argumentProviders.add(CommandLineArgumentProvider {
-                val skiaBinDir = "$skiaDir/out/${buildType.id}-wasm-wasm"
-                // We must compute this list after Skia unpacking task has finished.
-                listOf(skiaBinDir).findAllFiles(".a")
-            })
-        file(outDir).mkdirs()
-        inputs.files(srcs + listOf(skikoJsPrefix))
-        outputs.files(outJs, outWasm)
-}
-
 val generateVersion = project.tasks.register("generateVersion") {
     val outDir = generatedKotlin
     file(outDir).mkdirs()
@@ -463,7 +444,8 @@ project.tasks.register<Exec>("nativeBridgesCompile") {
         "-DSK_BUILD_FOR_MAC",
         "-DSK_METAL",
         "-I$projectDir/src/commonMain/cpp",
-        *skiaPreprocessorFlags(skiaDir.get().absolutePath),
+        *includeHeadersFlags(skiaHeadersDirs(skiaDir.get())),
+        *skiaPreprocessorFlags(),
         *srcs
     )
     file(outDir).mkdirs()
@@ -712,19 +694,22 @@ val skikoJvmRuntimeJar by project.tasks.registering(Jar::class) {
 }
 
 val skikoWasmJar by project.tasks.registering(Jar::class) {
-    dependsOn(wasmCompile)
+    dependsOn(wasmCrossCompile)
     // We produce jar that contains .js of wrapper/bindings and .wasm with Skia + bindings.
-    val wasmOutputs = wasmCompile.get().outputs
-    from(wasmOutputs.files.single { it.name.endsWith(".wasm")})
+    val wasmOutDir = wasmCrossCompile.map { it.outDir }
 
-    from(wasmOutputs) {
-        include("skiko.js")
+    from(wasmOutDir) {
+        include("*.wasm")
+    }
+
+    from(wasmOutDir) {
+        include("*.js")
         filter { line -> line.replace("_org_jetbrains_", "org_jetbrains_") }
     }
 
     archiveBaseName.set("skiko-wasm")
     doLast {
-        println("Wasm and JS at ${outputs.files.files.single()}")
+        println("Wasm and JS at: ${archiveFile.get().asFile.absolutePath}")
     }
 }
 
