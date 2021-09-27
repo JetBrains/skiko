@@ -1,5 +1,3 @@
-#if SK_BUILD_FOR_WIN
-
 #include <Windows.h>
 #include <sstream>
 #include <iostream>
@@ -59,5 +57,3 @@ extern "C"
         return env->NewStringUTF("Can't get CPU info.");
     }
 }
-
-#endif

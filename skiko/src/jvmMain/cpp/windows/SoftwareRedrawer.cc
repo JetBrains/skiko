@@ -1,5 +1,3 @@
-#if SK_BUILD_FOR_WIN
-
 #include <Windows.h>
 #include <jawt_md.h>
 #include "jni_helpers.h"
@@ -96,5 +94,3 @@ extern "C"
         delete device;
     }
 }
-
-#endif
