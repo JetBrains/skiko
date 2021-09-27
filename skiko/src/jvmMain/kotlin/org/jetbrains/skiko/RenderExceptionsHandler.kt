@@ -1,10 +1,15 @@
 package org.jetbrains.skiko
 
 import java.io.File
+import java.lang.RuntimeException
 import java.text.SimpleDateFormat
 import java.util.Date
 import kotlin.jvm.JvmStatic
-import org.jetbrains.skiko.hostFullName
+
+internal class RenderException(
+    message: String? = null,
+    cause: Exception? = null
+) : RuntimeException(message, cause)
 
 internal class RenderExceptionsHandler {
     companion object {
@@ -16,7 +21,7 @@ internal class RenderExceptionsHandler {
                     "${Library.cacheRoot}/skiko-render-exception-${ProcessHandle.current().pid()}.log"
                 )
             }
-            val exception = Exception(message)
+            val exception = RenderException(message)
             if (System.getProperty("skiko.win.exception.logger.enabled") == "true") {
                 writeLog(exception)
             }
@@ -40,16 +45,6 @@ internal class RenderExceptionsHandler {
             }
             output?.appendText(outputBuilder.toString())
         }
-
-    }
-}
-
-fun <T> withExceptionHandler(onException: () -> T, action: () -> T): T {
-    try {
-        return action()
-    } catch (e: Exception) {
-        println(e.message)
-        return onException()
     }
 }
 

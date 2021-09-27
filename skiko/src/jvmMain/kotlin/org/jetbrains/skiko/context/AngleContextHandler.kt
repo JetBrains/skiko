@@ -4,6 +4,7 @@ import org.jetbrains.skia.ColorSpace
 import org.jetbrains.skia.Surface
 import org.jetbrains.skia.SurfaceColorFormat
 import org.jetbrains.skia.SurfaceOrigin
+import org.jetbrains.skiko.RenderException
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.redrawer.AngleRedrawer
 
@@ -17,7 +18,7 @@ internal class AngleContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
             if (context == null) {
                 device = angleRedrawer.createDevice()
                 if (device == 0L) {
-                    throw Exception("Failed to create Angle device.")
+                    throw RenderException("Failed to create Angle device.")
                 }
                 context = angleRedrawer.makeContext()
             }

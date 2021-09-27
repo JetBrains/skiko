@@ -227,7 +227,11 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_resizeLay
     [CATransaction begin];
     [CATransaction setValue:(id)kCFBooleanTrue forKey:kCATransactionDisableActions];
     device.layer.frame = frame;
-    device.layer.drawableSize = drawableSize;
+    // to avoid warning in console:
+    // CAMetalLayer ignoring invalid setDrawableSize width=0.000000 height=0.000000
+    if (width > 0 && height > 0) {
+        device.layer.drawableSize = drawableSize;
+    }
     [CATransaction commit];
     [CATransaction flush];
 }

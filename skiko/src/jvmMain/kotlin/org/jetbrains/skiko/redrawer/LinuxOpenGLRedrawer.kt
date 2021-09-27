@@ -17,7 +17,7 @@ internal class LinuxOpenGLRedrawer(
             context = it.createContext()
             it.makeCurrent(context)
             if (context == 0L || !isVideoCardSupported(layer.renderApi)) {
-                throw IllegalArgumentException("Cannot create Linux GL context")
+                throw RenderException("Cannot create Linux GL context")
             }
             it.setSwapInterval(swapInterval)
         }
@@ -75,9 +75,7 @@ internal class LinuxOpenGLRedrawer(
     }
 
     private fun draw() {
-        if (layer.prepareDrawContext()) {
-            layer.draw()
-        }
+        layer.inDrawScope(layer::draw)
     }
 
     companion object {
