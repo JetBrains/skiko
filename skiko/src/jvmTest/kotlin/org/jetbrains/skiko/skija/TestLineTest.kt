@@ -9,19 +9,12 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
 class TextLineTest {
-    var inter36: Font = Font(Typeface.makeFromFile("src/jvmTest/resources/fonts/InterHinted-Regular.ttf"), 36f)
-    var firaCode36: Font = Font(Typeface.makeFromFile("src/jvmTest/resources/fonts/FiraCode-Regular.ttf"), 36f)
-    var jbMono36: Font = Font(Typeface.makeFromFile("src/jvmTest/resources/fonts/JetBrainsMono-Regular.ttf"), 36f)
-    @Throws(Exception::class)
-    fun execute() {
-        testAbc()
-        testLigatures()
-        testCombining()
-        testEmoji()
-    }
+    private var inter36: Font = Font(Typeface.makeFromFile("src/jvmTest/resources/fonts/InterHinted-Regular.ttf"), 36f)
+    private var firaCode36: Font = Font(Typeface.makeFromFile("src/jvmTest/resources/fonts/FiraCode-Regular.ttf"), 36f)
+    private var jbMono36: Font = Font(Typeface.makeFromFile("src/jvmTest/resources/fonts/JetBrainsMono-Regular.ttf"), 36f)
 
     @Test
-    fun testAbc() {
+    fun getOffsetAtCoordTest() {
         TextLine.make("abc", inter36).use { line ->
             assertContentEquals(shortArrayOf(503, 574, 581), line.glyphs)
             assertEquals(0, line.getOffsetAtCoord(-10f)) // before “a”
@@ -39,6 +32,12 @@ class TextLineTest {
             assertEquals(3, line.getOffsetAtCoord(57f)) // right half of “c”
             assertEquals(3, line.getOffsetAtCoord(62f)) // end of “c”
             assertEquals(3, line.getOffsetAtCoord(100f)) // after “c”
+        }
+    }
+
+    @Test
+    fun getLeftOffsetAtCoordTest() {
+        TextLine.make("abc", inter36).use { line ->
             assertEquals(0, line.getLeftOffsetAtCoord(-10f)) // before “a”
             assertEquals(0, line.getLeftOffsetAtCoord(0f)) // beginning of “a”
             assertEquals(0, line.getLeftOffsetAtCoord(5f)) // left half of “a”
@@ -54,6 +53,12 @@ class TextLineTest {
             assertEquals(2, line.getLeftOffsetAtCoord(57f)) // right half of “c”
             assertEquals(3, line.getLeftOffsetAtCoord(62f)) // end of “c”
             assertEquals(3, line.getLeftOffsetAtCoord(100f)) // after “c”
+        }
+    }
+
+    @Test
+    fun getCoordAtOffsetTest() {
+        TextLine.make("abc", inter36).use { line ->
             assertCloseEnough(0f, line.getCoordAtOffset(0))
             assertCloseEnough(20f, line.getCoordAtOffset(1))
             assertCloseEnough(42f, line.getCoordAtOffset(2))
@@ -62,7 +67,7 @@ class TextLineTest {
     }
 
     @Test
-    fun testLigatures() {
+    fun ligaturesTest() {
         TextLine.make("<=>->", inter36).use { line ->
             assertContentEquals(shortArrayOf(1712, 1701), line.glyphs)
 
@@ -83,7 +88,7 @@ class TextLineTest {
     }
 
     @Test
-    fun testCombining() {
+    fun combiningTest() {
         // u   U+0075  LATIN SMALL LETTER U
         // ̈    U+0308  COMBINING DIAERESIS
         // a   U+0061  LATIN SMALL LETTER A
@@ -115,7 +120,7 @@ class TextLineTest {
     }
 
     @Test
-    fun testEmoji() {
+    fun emojiTest() {
         TextLine.make("☺", firaCode36).use { misc ->
             TextLine.make("☺️", firaCode36).use { emoji ->
                 assertContentEquals(shortArrayOf(1706), misc.glyphs)
