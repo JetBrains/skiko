@@ -1,11 +1,8 @@
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 annotation class DoNothing
 actual typealias IgnoreTestOnJvm = DoNothing
 
 actual fun runTest(block: suspend () -> Unit) {
-    GlobalScope.launch {
-        block()
-    }
+    runBlocking { block() }
 }

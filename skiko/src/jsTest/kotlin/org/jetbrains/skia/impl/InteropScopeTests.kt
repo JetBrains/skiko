@@ -1,12 +1,10 @@
 package org.jetbrains.skia.impl
 
-import IgnoreTestOnJvm
 import runTest
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 
-@IgnoreTestOnJvm
 class InteropScopeTests {
 
     @Test

@@ -126,6 +126,16 @@ val wasmCrossCompile = tasks.register<WasmCrossCompileTask>("wasmCrossCompile") 
         "--extern-post-js",
         skikoJsPrefix.get().asFile.absolutePath,
     ))
+
+    finalizedBy(replaceSymbolsInSkikoJsOutput)
+}
+
+val replaceSymbolsInSkikoJsOutput by project.tasks.registering {
+    doLast {
+        val skikoJsFile = buildDir.resolve("wasm/skiko.js")
+        val replacedContent = skikoJsFile.readText().replace("_org_jetbrains", "org_jetbrains")
+        skikoJsFile.writeText(replacedContent)
+    }
 }
 
 val skiaDir: Provider<File> = run {
