@@ -67,7 +67,7 @@ val casualRun = tasks.named<JavaExec>("run") {
 }
 
 tasks.register("runSoftware") {
-    additionalArguments += mapOf("skiko.renderApi" to "SOFTWARE")
+    additionalArguments += mapOf("skiko.renderApi" to "DIRECT_SOFTWARE")
     dependsOn(casualRun)
 }
 

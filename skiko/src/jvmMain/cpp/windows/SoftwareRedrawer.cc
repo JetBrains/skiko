@@ -30,7 +30,7 @@ extern "C"
         return toJavaPointer(device);
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_WindowsSoftwareRedrawer_resize(
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_AbstractDirectSoftwareRedrawer_resize(
         JNIEnv *env, jobject redrawer, jlong devicePtr, jint width, jint height)
     {
         __try
@@ -60,14 +60,14 @@ extern "C"
         }
     }
 
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_WindowsSoftwareRedrawer_getSurface(
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_AbstractDirectSoftwareRedrawer_getSurface(
         JNIEnv *env, jobject redrawer, jlong devicePtr)
     {
         SoftwareDevice *device = fromJavaPointer<SoftwareDevice *>(devicePtr);
         return toJavaPointer(device->surface.release());
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_WindowsSoftwareRedrawer_finishFrame(
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_AbstractDirectSoftwareRedrawer_finishFrame(
         JNIEnv *env, jobject redrawer, jlong devicePtr)
     {
         __try
@@ -87,7 +87,7 @@ extern "C"
         }
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_WindowsSoftwareRedrawer_disposeDevice(
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_AbstractDirectSoftwareRedrawer_disposeDevice(
         JNIEnv *env, jobject redrawer, jlong devicePtr)
     {
         SoftwareDevice *device = fromJavaPointer<SoftwareDevice *>(devicePtr);

@@ -4,15 +4,15 @@ import org.jetbrains.skia.Surface
 import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.getPtr
 import org.jetbrains.skiko.SkiaLayer
-import org.jetbrains.skiko.redrawer.WindowsSoftwareRedrawer
+import org.jetbrains.skiko.redrawer.AbstractDirectSoftwareRedrawer
 import java.lang.ref.Reference
 
-internal class WindowsSoftwareContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
+internal class DirectSoftwareContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
     override val bleachConstant = -1
     var isInited = false
 
-    val softwareRedrawer: WindowsSoftwareRedrawer
-        get() = layer.redrawer!! as WindowsSoftwareRedrawer
+    val softwareRedrawer: AbstractDirectSoftwareRedrawer
+        get() = layer.redrawer!! as AbstractDirectSoftwareRedrawer
 
     private var currentWidth = 0
     private var currentHeight = 0

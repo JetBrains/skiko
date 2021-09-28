@@ -15,9 +15,7 @@ public:
     SkAutoMalloc surfaceMemory;
     sk_sp<SkSurface> surface;
 
-    ~SoftwareDevice() {
-        surface.reset(nullptr);
-    }
+    ~SoftwareDevice() {}
 };
 
 extern "C"
@@ -34,7 +32,7 @@ extern "C"
         return toJavaPointer(device);
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_LinuxSoftwareRedrawer_resize(
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_AbstractDirectSoftwareRedrawer_resize(
         JNIEnv *env, jobject redrawer, jlong devicePtr, jint width, jint height)
     {
         SoftwareDevice *device = fromJavaPointer<SoftwareDevice *>(devicePtr);
@@ -45,14 +43,14 @@ extern "C"
         device->surface = SkSurface::MakeRaster(info);
     }
 
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_LinuxSoftwareRedrawer_getSurface(
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_AbstractDirectSoftwareRedrawer_getSurface(
         JNIEnv *env, jobject redrawer, jlong devicePtr)
     {
         SoftwareDevice *device = fromJavaPointer<SoftwareDevice *>(devicePtr);
         return toJavaPointer(device->surface.get());
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_LinuxSoftwareRedrawer_finishFrame(
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_AbstractDirectSoftwareRedrawer_finishFrame(
         JNIEnv *env, jobject redrawer, jlong devicePtr)
     {
         SoftwareDevice *device = fromJavaPointer<SoftwareDevice *>(devicePtr);
@@ -80,7 +78,7 @@ extern "C"
         XPutImage(device->display, device->window, device->gc, &image, 0, 0, 0, 0, pm.width(), pm.height());
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_LinuxSoftwareRedrawer_disposeDevice(
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_AbstractDirectSoftwareRedrawer_disposeDevice(
         JNIEnv *env, jobject redrawer, jlong devicePtr)
     {
         SoftwareDevice *device = fromJavaPointer<SoftwareDevice *>(devicePtr);

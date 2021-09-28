@@ -11,13 +11,11 @@ internal interface RenderFactory {
         val Default = object : RenderFactory {
             override fun createContextHandler(layer: SkiaLayer, renderApi: GraphicsApi): ContextHandler {
                 return when (renderApi) {
-                    GraphicsApi.SOFTWARE -> return when (hostOs) {
-                        OS.Windows -> WindowsSoftwareContextHandler(layer)
-                        OS.Linux -> LinuxSoftwareContextHandler(layer)
-                        OS.MacOS -> AWTSoftwareContextHandler(layer)
-                        else -> AWTSoftwareContextHandler(layer)
+                    GraphicsApi.DIRECT_SOFTWARE -> return when (hostOs) {
+                        OS.Windows, OS.Linux -> DirectSoftwareContextHandler(layer)
+                        else -> SoftwareContextHandler(layer)
                     }
-                    GraphicsApi.AWTSOFTWARE -> AWTSoftwareContextHandler(layer)
+                    GraphicsApi.SOFTWARE -> SoftwareContextHandler(layer)
                     GraphicsApi.OPENGL -> OpenGLContextHandler(layer)
                     GraphicsApi.DIRECT3D -> Direct3DContextHandler(layer)
                     GraphicsApi.METAL -> MetalContextHandler(layer)
@@ -31,18 +29,18 @@ internal interface RenderFactory {
                 properties: SkiaLayerProperties
             ): Redrawer = when (hostOs) {
                 OS.MacOS -> when (renderApi) {
-                    GraphicsApi.SOFTWARE -> AWTSoftwareRedrawer(layer, properties)
+                    GraphicsApi.SOFTWARE, GraphicsApi.DIRECT_SOFTWARE -> SoftwareRedrawer(layer, properties)
                     else -> MetalRedrawer(layer, properties)
                 }
                 OS.Windows -> when (renderApi) {
-                    GraphicsApi.AWTSOFTWARE -> AWTSoftwareRedrawer(layer, properties)
-                    GraphicsApi.SOFTWARE -> WindowsSoftwareRedrawer(layer, properties)
+                    GraphicsApi.SOFTWARE -> SoftwareRedrawer(layer, properties)
+                    GraphicsApi.DIRECT_SOFTWARE -> WindowsSoftwareRedrawer(layer, properties)
                     GraphicsApi.OPENGL -> WindowsOpenGLRedrawer(layer, properties)
                     else -> Direct3DRedrawer(layer, properties)
                 }
                 OS.Linux -> when (renderApi) {
-                    GraphicsApi.AWTSOFTWARE -> AWTSoftwareRedrawer(layer, properties)
-                    GraphicsApi.SOFTWARE -> LinuxSoftwareRedrawer(layer, properties)
+                    GraphicsApi.SOFTWARE -> SoftwareRedrawer(layer, properties)
+                    GraphicsApi.DIRECT_SOFTWARE -> LinuxSoftwareRedrawer(layer, properties)
                     else -> LinuxOpenGLRedrawer(layer, properties)
                 }
             }
