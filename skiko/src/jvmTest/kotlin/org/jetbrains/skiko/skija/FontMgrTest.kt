@@ -4,7 +4,6 @@ import org.jetbrains.skia.Data
 import org.jetbrains.skia.FontStyle
 import org.jetbrains.skia.Typeface
 import org.jetbrains.skia.paragraph.TypefaceFontProvider
-import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -26,47 +25,53 @@ class FontMgrTest {
         assertEquals("JetBrains Mono", fontManager.getFamilyName(0))
         assertEquals("Interface", fontManager.getFamilyName(1))
 
-        fontManager.makeStyleSet(0).use { ss ->
-            assertEquals(0, ss?.count())
+        fontManager.makeStyleSet(0).use { styleSet ->
+            assertEquals(0, styleSet?.count())
         }
 
-        fontManager.makeStyleSet(1).use { ss ->
-            assertEquals(0, ss?.count())
+        fontManager.makeStyleSet(1).use { styleSet ->
+            assertEquals(0, styleSet?.count())
         }
 
-        fontManager.matchFamily("JetBrains Mono").use { ss ->
-            assertEquals(2, ss.count())
-            assertEquals(FontStyle.NORMAL, ss.getStyle(0))
-            assertEquals("JetBrains Mono", ss.getStyleName(0))
-            assertEquals(FontStyle.BOLD, ss.getStyle(1))
-            assertEquals("JetBrains Mono", ss.getStyleName(1))
+        fontManager.matchFamily("JetBrains Mono").use { styleSet ->
+            assertEquals(2, styleSet.count())
+            assertEquals(FontStyle.NORMAL, styleSet.getStyle(0))
+            assertEquals("JetBrains Mono", styleSet.getStyleName(0))
+            assertEquals(FontStyle.BOLD, styleSet.getStyle(1))
+            assertEquals("JetBrains Mono", styleSet.getStyleName(1))
             assertEquals(2, jbMono.refCount)
-            ss.getTypeface(0).use { face ->
+
+            styleSet.getTypeface(0).use { face ->
                 assertEquals(3, jbMono.refCount)
                 assertEquals(jbMono, face)
             }
-            assertEquals(2, jbMono.refCount)
-            assertEquals(2, jbMonoBold.refCount)
-            ss.getTypeface(1).use { face ->
-                assertEquals(3, jbMonoBold.refCount)
-                assertEquals(jbMonoBold, face)
-            }
-            assertEquals(2, jbMonoBold.refCount)
-            assertEquals(2, jbMono.refCount)
-            ss.matchStyle(FontStyle.NORMAL).use { face ->
-                assertEquals(3, jbMono.refCount)
-                assertEquals(jbMono, face)
-            }
+
             assertEquals(2, jbMono.refCount)
             assertEquals(2, jbMonoBold.refCount)
 
-            ss.matchStyle(FontStyle.BOLD).use { face ->
+            styleSet.getTypeface(1).use { face ->
                 assertEquals(3, jbMonoBold.refCount)
                 assertEquals(jbMonoBold, face)
             }
 
             assertEquals(2, jbMonoBold.refCount)
-            assertEquals(jbMono, ss.matchStyle(FontStyle.ITALIC))
+            assertEquals(2, jbMono.refCount)
+
+            styleSet.matchStyle(FontStyle.NORMAL).use { face ->
+                assertEquals(3, jbMono.refCount)
+                assertEquals(jbMono, face)
+            }
+
+            assertEquals(2, jbMono.refCount)
+            assertEquals(2, jbMonoBold.refCount)
+
+            styleSet.matchStyle(FontStyle.BOLD).use { face ->
+                assertEquals(3, jbMonoBold.refCount)
+                assertEquals(jbMonoBold, face)
+            }
+
+            assertEquals(2, jbMonoBold.refCount)
+            assertEquals(jbMono, styleSet.matchStyle(FontStyle.ITALIC))
         }
 
         assertEquals(null, fontManager.matchFamilyStyle("JetBrains Mono", FontStyle.BOLD))
@@ -79,9 +84,9 @@ class FontMgrTest {
 
         Data.makeFromFileName("src/jvmTest/resources/fonts/JetBrainsMono-Italic.ttf").use { data ->
             fontManager.makeFromData(data).use {
-                fontManager.matchFamily("JetBrains Mono").use { ss ->
+                fontManager.matchFamily("JetBrains Mono").use { styleSet ->
                     assertEquals(2, fontManager.familiesCount)
-                    assertEquals(2, ss.count())
+                    assertEquals(2, styleSet.count())
                 }
             }
         }
