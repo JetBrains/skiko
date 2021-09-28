@@ -99,15 +99,14 @@ val wasmCrossCompile = tasks.register<WasmCrossCompileTask>("wasmCrossCompile") 
     dependsOn(unzipper)
     val unpackedSkia = unzipper.get()
 
-    targetOs.set(osArch.first)
     targetArch.set(osArch.second)
     buildVariant.set(buildType)
 
-    cFiles =
+    sourceFiles =
         project.fileTree("src/jsMain/cpp") { include("**/*.cc") } +
         project.fileTree("src/commonMain/cpp") { include("**/*.cc") }
     val skiaAFilesDir = unpackedSkia.resolve("out/${buildType.id}-${osArch.first.id}-${osArch.second.id}")
-    aFiles = project.fileTree(skiaAFilesDir)  { include("**/*.a") }
+    libFiles = project.fileTree(skiaAFilesDir)  { include("**/*.a") }
 
     outDir.set(project.layout.buildDirectory.dir("out/${buildType.id}-${osArch.first.id}-${osArch.second.id}"))
     wasmFileName.set("skiko.wasm")

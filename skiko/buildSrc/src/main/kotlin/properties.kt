@@ -1,12 +1,8 @@
 import org.gradle.api.Project
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Internal
 import java.io.File
 
 enum class OS(
-    @get:Input
     val id: String,
-    @get:Input
     val clangFlags: Array<String>
 ) {
     Linux("linux", arrayOf()),
@@ -15,15 +11,12 @@ enum class OS(
     Wasm("wasm", arrayOf())
     ;
 
-    @get:Internal
     val isWindows
         get() = this == Windows
 }
 
 enum class Arch(
-    @get:Input
     val id: String,
-    @get:Input
     val clangFlags: Array<String>
 ) {
     X64("x64", arrayOf("-arch", "x86_64")),
@@ -32,13 +25,9 @@ enum class Arch(
 }
 
 enum class SkiaBuildType(
-    @get:Input
     val id: String,
-    @get:Input
     val flags: Array<String>,
-    @get:Input
     val clangFlags: Array<String>,
-    @get:Input
     val msvcFlags: Array<String>
 ) {
     DEBUG("Debug", arrayOf("-DSK_DEBUG"), arrayOf("-std=c++14", "-g"), emptyArray()),

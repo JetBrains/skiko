@@ -14,23 +14,20 @@ abstract class WasmCrossCompileTask : DefaultTask() {
     @get:Inject
     abstract val execOperations: ExecOperations
 
-    @get:Nested
-    abstract val targetOs: Property<OS>
-
-    @get:Nested
+    @get:Input
     abstract val targetArch: Property<Arch>
 
-    @get:Nested
+    @get:Input
     abstract val buildVariant: Property<SkiaBuildType>
 
     @get:Input
     abstract val flags: ListProperty<String>
 
     @get:InputFiles
-    lateinit var cFiles: FileCollection
+    lateinit var sourceFiles: FileCollection
 
     @get:InputFiles
-    lateinit var aFiles: FileCollection
+    lateinit var libFiles: FileCollection
 
     @get:Optional
     @get:Input
@@ -47,6 +44,9 @@ abstract class WasmCrossCompileTask : DefaultTask() {
     @get:Optional
     abstract val skikoJsPrefix: RegularFileProperty
 
+    @get:Input
+    var compiler: String = "emcc"
+
     /**
      * Used only for up-to-date checks of headers' content
      *
@@ -54,7 +54,7 @@ abstract class WasmCrossCompileTask : DefaultTask() {
      */
     @Suppress("UNUSED")
     @get:InputFiles
-    val hFiles: FileCollection
+    val headerFiles: FileCollection
         get() {
             fun File.isHeaderFile(): Boolean =
                 isFile && name.endsWith(".h", ignoreCase = true)
@@ -83,7 +83,7 @@ abstract class WasmCrossCompileTask : DefaultTask() {
     @TaskAction
     fun exec() {
         execOperations.exec {
-            executable = "emcc"
+            executable = compiler
             val args = argumentProviders
 
             args.add { headersDirs.map { "-I${it.absolutePath}" } }
@@ -94,8 +94,8 @@ abstract class WasmCrossCompileTask : DefaultTask() {
                 (flags.get() + targetArch.get().clangFlags + bt.flags + bt.clangFlags).asIterable()
             }
 
-            args.add { cFiles.files.map { it.absolutePath } }
-            args.add { aFiles.files.map { it.absolutePath } }
+            args.add { sourceFiles.files.map { it.absolutePath } }
+            args.add { libFiles.files.map { it.absolutePath } }
 
             args.add { listOf("-o", outDir.resolveToAbsolutePath(wasmFileName)) }
             args.add { listOf("-o", outDir.resolveToAbsolutePath(jsFileName)) }
