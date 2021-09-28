@@ -19,10 +19,10 @@ class TypefaceTest {
 
     @Test
     fun typefaceTest() {
-        val inter = Typeface.makeFromFile("src/jvmTest/resources/fonts/InterHinted-Regular.ttf")
-        val interV = Typeface.makeFromFile("src/jvmTest/resources/fonts/Inter-V.ttf")
-        val jbMono = Typeface.makeFromFile("src/jvmTest/resources/fonts/JetBrainsMono-Regular.ttf")
-        val jbMonoBold = Typeface.makeFromData(Data.makeFromFileName("src/jvmTest/resources/fonts/JetBrainsMono-Bold.ttf"))
+        val inter = Typeface.makeFromResource("InterHinted-Regular.ttf")
+        val interV = Typeface.makeFromResource("Inter-V.ttf")
+        val jbMono = Typeface.makeFromResource("JetBrainsMono-Regular.ttf")
+        val jbMonoBold = Typeface.makeFromData(Data.makeFromResource("JetBrainsMono-Bold.ttf"))
 
         assertEquals(FontStyle.NORMAL, inter.fontStyle)
         assertFalse(inter.isBold)

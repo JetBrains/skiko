@@ -13,13 +13,13 @@ class FontMgrTest {
     fun fontMgrTest() {
         val fontManager = TypefaceFontProvider()
 
-        val jbMono = Typeface.makeFromFile("src/jvmTest/resources/fonts/JetBrainsMono-Regular.ttf", 0)
+        val jbMono = Typeface.makeFromResource("JetBrainsMono-Regular.ttf")
         fontManager.registerTypeface(jbMono)
 
-        val jbMonoBold = Typeface.makeFromFile("src/jvmTest/resources/fonts/JetBrainsMono-Bold.ttf", 0)
+        val jbMonoBold = Typeface.makeFromResource("JetBrainsMono-Bold.ttf")
         fontManager.registerTypeface(jbMonoBold)
 
-        val inter: Typeface = Typeface.makeFromFile("src/jvmTest/resources/fonts/InterHinted-Regular.ttf", 0)
+        val inter: Typeface = Typeface.makeFromResource("InterHinted-Regular.ttf")
         fontManager.registerTypeface(inter, "Interface")
 
         assertEquals(2, fontManager.familiesCount)

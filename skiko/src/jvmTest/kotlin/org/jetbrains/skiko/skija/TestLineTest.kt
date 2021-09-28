@@ -9,9 +9,9 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
 class TextLineTest {
-    private var inter36: Font = Font(Typeface.makeFromFile("src/jvmTest/resources/fonts/InterHinted-Regular.ttf"), 36f)
-    private var firaCode36: Font = Font(Typeface.makeFromFile("src/jvmTest/resources/fonts/FiraCode-Regular.ttf"), 36f)
-    private var jbMono36: Font = Font(Typeface.makeFromFile("src/jvmTest/resources/fonts/JetBrainsMono-Regular.ttf"), 36f)
+    private var inter36: Font = Font(Typeface.makeFromResource("InterHinted-Regular.ttf"), 36f)
+    private var firaCode36: Font = Font(Typeface.makeFromResource("FiraCode-Regular.ttf"), 36f)
+    private var jbMono36: Font = Font(Typeface.makeFromResource("JetBrainsMono-Regular.ttf"), 36f)
 
     @Test
     fun getOffsetAtCoordTest() {
