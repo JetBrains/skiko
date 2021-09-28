@@ -20,9 +20,9 @@ private fun Canvas.draw(circle: Circle, paint: Paint) {
     drawCircle(circle.x, circle.y, circle.r, paint)
 }
 
-private fun Circle.move(s: Float, angle: Float) {
-    x += s * sin(angle)
-    y += s * cos(angle)
+private fun Circle.move(s: Float, angle: Float, width: Int, height: Int, r: Float) {
+    x = (x + s * sin(angle)).coerceAtLeast(r).coerceAtMost(width.toFloat() - r)
+    y = (y + s * cos(angle)).coerceAtLeast(r).coerceAtMost(height.toFloat() - r)
 }
 
 private enum class Position {
@@ -65,7 +65,7 @@ private class BouncingBall(
             Position.TOUCHES_NORTH -> angle = PI - angle
         }
 
-        circle.move(velocity * (dt / 1000), angle.toFloat())
+        circle.move(velocity * (dt.coerceAtMost(500f) / 1000), angle.toFloat(), width, height, circle.r)
     }
 }
 
