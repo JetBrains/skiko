@@ -63,6 +63,7 @@ private class BouncingBall(
             Position.TOUCHES_EAST -> angle = -angle
             Position.TOUCHES_WEST -> angle = -angle
             Position.TOUCHES_NORTH -> angle = PI - angle
+            Position.INSIDE -> angle
         }
 
         circle.move(velocity * (dt.coerceAtMost(500f) / 1000), angle.toFloat(), width, height, circle.r)
