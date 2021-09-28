@@ -14,6 +14,7 @@ public:
     GC gc;
     SkAutoMalloc surfaceMemory;
     sk_sp<SkSurface> surface;
+    unsigned int depth = 0;
 
     ~SoftwareDevice() {
         XFreeGC(display, gc);
@@ -22,6 +23,32 @@ public:
 
 extern "C"
 {
+    void getDisplayDepthBits(SoftwareDevice *device) {
+        Window window;
+        int x, y;
+        unsigned int w, h, border, displayDepth;
+        XGetGeometry(
+            device->display, device->window, &window, &x, &y, &w, &h, &border, &device->depth);
+    }
+
+    SkColorType getDeviceColorSpace(SoftwareDevice *device) {
+        if (device->depth >16) {
+            return kBGRA_8888_SkColorType;
+        }
+        return kRGB_565_SkColorType;
+    }
+
+    bool isSupportedDepth(unsigned int depth) {
+        switch(depth) {
+            case 16:
+            case 24:
+            case 32:
+                return true;
+            default:
+                return false;
+        }
+    }
+
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_LinuxSoftwareRedrawer_createDevice(
         JNIEnv *env, jobject redrawer, jlong displayPtr, jlong windowPtr)
     {
@@ -31,7 +58,12 @@ extern "C"
         device->display = display;
         device->window = window;
         device->gc = XCreateGC(device->display, device->window, 0, nullptr);
-        return toJavaPointer(device);
+        getDisplayDepthBits(device);
+        if (isSupportedDepth(device->depth))
+        {
+            return toJavaPointer(device);
+        }
+        return 0L;
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_AbstractDirectSoftwareRedrawer_resize(
@@ -40,7 +72,7 @@ extern "C"
         SoftwareDevice *device = fromJavaPointer<SoftwareDevice *>(devicePtr);
         device->surface.reset();
         SkImageInfo info = SkImageInfo::Make(
-            width, height, kBGRA_8888_SkColorType, kPremul_SkAlphaType,
+            width, height, getDeviceColorSpace(device), kPremul_SkAlphaType,
             SkColorSpace::MakeSRGB());
         device->surface = SkSurface::MakeRaster(info);
     }
@@ -71,7 +103,7 @@ extern "C"
         image.bitmap_unit = bitsPerPixel;
         image.bitmap_bit_order = LSBFirst;
         image.bitmap_pad = bitsPerPixel;
-        image.depth = 24;
+        image.depth = device->depth;
         image.bytes_per_line = pm.rowBytes() - pm.width() * pm.info().bytesPerPixel();
         image.bits_per_pixel = bitsPerPixel;
         if (!XInitImage(&image)) {

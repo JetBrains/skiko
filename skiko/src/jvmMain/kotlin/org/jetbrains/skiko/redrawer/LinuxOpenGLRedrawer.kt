@@ -15,10 +15,10 @@ internal class LinuxOpenGLRedrawer(
     init {
     	layer.backedLayer.lockLinuxDrawingSurface {
             context = it.createContext()
-            it.makeCurrent(context)
             if (context == 0L || !isVideoCardSupported(layer.renderApi)) {
                 throw RenderException("Cannot create Linux GL context")
             }
+            it.makeCurrent(context)
             it.setSwapInterval(swapInterval)
         }
     }
