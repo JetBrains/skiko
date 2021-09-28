@@ -22,4 +22,28 @@ class InteropScopeCommonTests {
 
         assertContentEquals(floatArrayOf(0.0f, 1.1f, 2.2f, 3.3f, -4.4f), floatArray)
     }
+
+    @Test
+    fun withResultShortArray() = runTest {
+        val shortArray = ShortArray(5)
+        TestHelpers()._nFillShortArrayOf5(shortArray)
+
+        assertContentEquals(shortArrayOf(0, 1, 2, -3, 4), shortArray)
+    }
+
+    @Test
+    fun withResultIntArray() = runTest {
+        val intArray = IntArray(5)
+        TestHelpers()._nFillIntArrayOf5(intArray)
+
+        assertContentEquals(intArrayOf(0, 1, -22, 3, 4), intArray)
+    }
+
+    @Test
+    fun withResultDoubleArray() = runTest {
+        val doubleArray = DoubleArray(5)
+        TestHelpers()._nFillDoubleArrayOf5(doubleArray)
+
+        assertContentEquals(doubleArrayOf(-0.001, 0.00222, 2.71828, 3.1415, 10000000.9991), doubleArray)
+    }
 }

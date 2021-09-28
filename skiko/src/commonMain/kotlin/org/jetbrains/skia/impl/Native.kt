@@ -58,6 +58,27 @@ inline fun withResult(result: FloatArray, block: (InteropPointer) -> Unit): Floa
     result
 }
 
+inline fun withResult(result: IntArray, block: (InteropPointer) -> Unit): IntArray = interopScope {
+    val handle = toInterop(result)
+    block(handle)
+    handle.fromInterop(result)
+    result
+}
+
+inline fun withResult(result: ShortArray, block: (InteropPointer) -> Unit): ShortArray = interopScope {
+    val handle = toInterop(result)
+    block(handle)
+    handle.fromInterop(result)
+    result
+}
+
+inline fun withResult(result: DoubleArray, block: (InteropPointer) -> Unit): DoubleArray = interopScope {
+    val handle = toInterop(result)
+    block(handle)
+    handle.fromInterop(result)
+    result
+}
+
 inline fun withResult(result: NativePointerArray, block: (InteropPointer) -> Unit): NativePointerArray = interopScope {
     val handle = toInterop(result)
     block(handle)
