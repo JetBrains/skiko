@@ -1,7 +1,10 @@
 import org.gradle.api.Project
 import java.io.File
 
-enum class OS(val id: String, val clangFlags: Array<String>) {
+enum class OS(
+    val id: String,
+    val clangFlags: Array<String>
+) {
     Linux("linux", arrayOf()),
     Windows("windows", arrayOf()),
     MacOS("macos", arrayOf("-mmacosx-version-min=10.13")),
@@ -12,7 +15,10 @@ enum class OS(val id: String, val clangFlags: Array<String>) {
         get() = this == Windows
 }
 
-enum class Arch(val id: String, val clangFlags: Array<String>) {
+enum class Arch(
+    val id: String,
+    val clangFlags: Array<String>
+) {
     X64("x64", arrayOf("-arch", "x86_64")),
     Arm64("arm64", arrayOf("-arch", "arm64")),
     Wasm("wasm", arrayOf("-std=c++17", "--bind", "-DSKIKO_WASM"))
@@ -90,7 +96,7 @@ class SkikoProperties(private val myProject: Project) {
     val buildType: SkiaBuildType
         get() = if (myProject.findProperty("skiko.debug") == "true") SkiaBuildType.DEBUG else SkiaBuildType.RELEASE
 
-    fun skiaReleaseFor(os: OS, arch: Arch): String {
+    fun skiaReleaseFor(os: OS, arch: Arch, buildType: SkiaBuildType): String {
         val target = "${os.id}-${arch.id}"
         val tag = myProject.property("dependencies.skia.$target") as String
         val suffix = if (os == OS.Linux && arch == Arch.X64) "-ubuntu14" else ""
@@ -106,6 +112,7 @@ class SkikoProperties(private val myProject: Project) {
     val visualStudioBuildToolsDir: File?
         get() = System.getenv()["SKIKO_VSBT_PATH"]?.let { File(it) }?.takeIf { it.isDirectory }
 
+    // todo: make compatible with the configuration cache
     val skiaDir: File?
         get() = (System.getenv()["SKIA_DIR"] ?: System.getProperty("skia.dir"))?.let { File(it) }
             ?.takeIf { it.isDirectory }
