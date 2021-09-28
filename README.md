@@ -31,7 +31,7 @@ i.e. something like this
         else -> error("Unsupported arch: $osArch")
     }
 
-    val version = "0.3.0"
+    val version = "0.4.12"
     val target = "${targetOs}-${targetArch}"
     dependencies {
         implementation("org.jetbrains.skiko:skiko-jvm-runtime-$target:$version")

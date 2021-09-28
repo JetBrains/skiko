@@ -1,12 +1,7 @@
 package org.jetbrains.skiko
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.TimeoutCancellationException
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import kotlinx.coroutines.test.runBlockingTest
-import kotlinx.coroutines.withTimeout
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import kotlin.random.Random
@@ -69,6 +64,30 @@ class RendezvousBroadcastChannelTest {
         }
 
         assertEquals(listOf(1, 1, 1, 1, 1), actualValues)
+    }
+
+    @Test(timeout = 30000)
+    fun `multithreading sending and receiving should not cause deadlock`() {
+        val channel = RendezvousBroadcastChannel<Int>()
+
+        runBlocking {
+            val receiverJobs = (1..10).map {
+                launch(Dispatchers.IO) {
+                    repeat(1000) {
+                        channel.receive()
+                    }
+                }
+            }
+
+            val sendingJob = launch(Dispatchers.IO) {
+                while (true) {
+                    channel.sendAll(1)
+                }
+            }
+
+            receiverJobs.joinAll()
+            sendingJob.cancel()
+        }
     }
 
     @Test

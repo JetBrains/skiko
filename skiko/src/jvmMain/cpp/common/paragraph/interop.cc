@@ -10,7 +10,7 @@ namespace skija {
             void onLoad(JNIEnv* env) {
                 jclass local = env->FindClass("org/jetbrains/skia/paragraph/LineMetrics");
                 cls  = static_cast<jclass>(env->NewGlobalRef(local));
-                ctor = env->GetMethodID(cls, "<init>", "(JJJJZDDDDDDDJ)V");
+                ctor = env->GetMethodID(cls, "<init>", "(IIIIZDDDDDDDI)V");
             }
 
             void onUnload(JNIEnv* env) {
@@ -75,6 +75,6 @@ namespace skija {
             DecorationStyle::onUnload(env);
             TextBox::onUnload(env);
             LineMetrics::onUnload(env);
-        } 
+        }
     }
 }

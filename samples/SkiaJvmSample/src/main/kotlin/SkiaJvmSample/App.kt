@@ -124,9 +124,9 @@ class Renderer(
     val typeface = Typeface.makeFromFile("fonts/JetBrainsMono-Regular.ttf")
     val font = Font(typeface, 40f)
     val paint = Paint().apply {
-            setColor(0xff9BC730L.toInt())
-            setMode(PaintMode.FILL)
-            setStrokeWidth(1f)
+            color = 0xff9BC730L.toInt()
+            mode = PaintMode.FILL
+            strokeWidth = 1f
     }
 
     var canvas: Canvas? = null
@@ -165,10 +165,18 @@ private val fontCollection = FontCollection()
 
 fun displayScene(renderer: Renderer, width: Int, height: Int, nanoTime: Long, xpos: Int, ypos: Int, state: State) {
     val canvas = renderer.canvas!!
-    val watchFill = Paint().setColor(0xFFFFFFFF.toInt())
-    val watchStroke = Paint().setColor(0xFF000000.toInt()).setMode(PaintMode.STROKE).setStrokeWidth(1f)
-    val watchStrokeAA = Paint().setColor(0xFF000000.toInt()).setMode(PaintMode.STROKE).setStrokeWidth(1f)
-    val watchFillHover = Paint().setColor(0xFFE4FF01.toInt())
+    val watchFill = Paint().apply { color = 0xFFFFFFFF.toInt() }
+    val watchStroke = Paint().apply {
+           color = 0xFF000000.toInt()
+           mode = PaintMode.STROKE
+           strokeWidth = 1f
+    }
+    val watchStrokeAA = Paint().apply {
+      color = 0xFF000000.toInt()
+      mode = PaintMode.STROKE
+      strokeWidth = 1f
+    }
+    val watchFillHover = Paint().apply { color = 0xFFE4FF01.toInt() }
     for (x in 0 .. (width - 50) step 50) {
         for (y in 20 .. (height - 50) step 50) {
             val hover = xpos > x + 0 && xpos < x + 50 && ypos > y + 0 && ypos < y + 50

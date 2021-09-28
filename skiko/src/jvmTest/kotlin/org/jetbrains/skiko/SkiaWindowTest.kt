@@ -2,6 +2,7 @@ package org.jetbrains.skiko
 
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.yield
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.FontMgr
 import org.jetbrains.skia.Paint
@@ -10,8 +11,11 @@ import org.jetbrains.skia.paragraph.FontCollection
 import org.jetbrains.skia.paragraph.ParagraphBuilder
 import org.jetbrains.skia.paragraph.ParagraphStyle
 import org.jetbrains.skia.paragraph.TextStyle
+import org.jetbrains.skiko.context.ContextHandler
+import org.jetbrains.skiko.redrawer.Redrawer
 import org.jetbrains.skiko.util.ScreenshotTestRule
 import org.jetbrains.skiko.util.swingTest
+import org.junit.Assert.assertEquals
 import org.junit.Assume.assumeTrue
 import org.junit.Rule
 import org.junit.Test
@@ -21,7 +25,6 @@ import java.awt.event.WindowEvent
 import javax.swing.JFrame
 import javax.swing.WindowConstants
 import kotlin.random.Random
-import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 @Suppress("BlockingMethodInNonBlockingContext", "SameParameterValue")
@@ -185,14 +188,14 @@ class SkiaWindowTest {
         }
     }
 
-    @Test
-    fun `open windows stress test`() = swingTest {
+    @Test(timeout = 60000)
+    fun `stress test - open multiple windows`() = swingTest {
         fun window(isAnimated: Boolean) = SkiaWindow().apply {
             setLocation(200,200)
             setSize(40, 20)
             defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
             layer.renderer = if (isAnimated) {
-                AnimatedBoxRenderer(layer, pixelsPerSecond = 20.0, size = 2.0)
+                AnimatedBoxRenderer(layer, pixelsPerSecond = 20.0, size = 20.0)
             } else {
                 RectRenderer(layer, 20, 10, Color.RED)
             }
@@ -227,10 +230,185 @@ class SkiaWindowTest {
         delay(5000)
     }
 
+    @Test(timeout = 60000)
+    fun `stress test - resize and paint immediately`() = swingTest {
+        fun openWindow() = SkiaWindow(
+            properties = SkiaLayerProperties(isVsyncEnabled = false)
+        ).apply {
+            setLocation(200,200)
+            setSize(400, 200)
+            defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+            layer.renderer = AnimatedBoxRenderer(layer, pixelsPerSecond = 20.0, size = 20.0)
+            isVisible = true
+        }
+
+        val window = openWindow()
+
+        repeat(100) {
+            window.size = Dimension(200 + Random.nextInt(200), 200 + Random.nextInt(200))
+            window.paint(window.graphics)
+            yield()
+        }
+
+        window.close()
+    }
+
+    @Test(timeout = 60000)
+    fun `stress test - open and paint immediately`() = swingTest {
+        fun openWindow() = SkiaWindow(
+            properties = SkiaLayerProperties(isVsyncEnabled = false)
+        ).apply {
+            setLocation(200,200)
+            setSize(400, 200)
+            preferredSize = Dimension(400, 200)
+            defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+            layer.renderer = object : SkiaRenderer {
+                override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+                }
+            }
+        }
+
+        repeat(30) {
+            delay(100)
+            val window = openWindow()
+            window.isVisible = true
+            window.layer.needRedraw()
+            yield()
+            window.paint(window.graphics)
+            window.close()
+        }
+    }
+
+    @Test(timeout = 60000)
+    fun `fallback to software renderer, fail on init context`() = swingTest {
+        testFallbackToSoftware(
+            object : RenderFactory {
+                override fun createContextHandler(
+                    layer: SkiaLayer,
+                    renderApi: GraphicsApi
+                ) = object : ContextHandler(layer) {
+                    override fun initContext() = false
+                    override fun initCanvas() = Unit
+                }
+
+                override fun createRedrawer(
+                    layer: SkiaLayer,
+                    renderApi: GraphicsApi,
+                    properties: SkiaLayerProperties
+                ): Redrawer = object : Redrawer {
+                    override fun dispose() = Unit
+                    override fun needRedraw() = Unit
+                    override fun redrawImmediately() = layer.inDrawScope { layer.draw() }
+                }
+            }
+        )
+    }
+
+    @Test(timeout = 60000)
+    fun `fallback to software renderer, fail on create redrawer`() = swingTest {
+        testFallbackToSoftware(
+            object : RenderFactory {
+                override fun createContextHandler(
+                    layer: SkiaLayer,
+                    renderApi: GraphicsApi
+                ) = object : ContextHandler(layer) {
+                    override fun initContext() = true
+                    override fun initCanvas() = Unit
+                }
+
+                override fun createRedrawer(
+                    layer: SkiaLayer,
+                    renderApi: GraphicsApi,
+                    properties: SkiaLayerProperties
+                ) =  throw RenderException()
+            }
+        )
+    }
+
+    @Test(timeout = 60000)
+    fun `fallback to software renderer, fail on draw`() = swingTest {
+        testFallbackToSoftware(
+            object : RenderFactory {
+                override fun createContextHandler(
+                    layer: SkiaLayer,
+                    renderApi: GraphicsApi
+                ) = object : ContextHandler(layer) {
+                    override fun initContext() = true
+                    override fun initCanvas() = Unit
+                }
+
+                override fun createRedrawer(
+                    layer: SkiaLayer,
+                    renderApi: GraphicsApi,
+                    properties: SkiaLayerProperties
+                ) = object : Redrawer {
+                    override fun dispose() = Unit
+                    override fun needRedraw() = Unit
+                    override fun redrawImmediately() = layer.inDrawScope {
+                        throw RenderException()
+                    }
+                }
+            }
+        )
+    }
+
+    private suspend fun testFallbackToSoftware(nonSoftwareRenderFactory: RenderFactory) {
+        val window = SkiaWindow(
+            layerFactory = {
+                SkiaLayer(
+                    renderFactory = OverrideNonSoftwareRenderFactory(nonSoftwareRenderFactory)
+                )
+            }
+        )
+        try {
+            window.setLocation(200, 200)
+            window.setSize(400, 200)
+            window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+            val renderer = RectRenderer(window.layer, 200, 100, Color.RED)
+            window.layer.renderer = renderer
+            window.isUndecorated = true
+            window.isVisible = true
+
+            delay(1000)
+            screenshots.assert(window.bounds, "frame1", "testFallbackToSoftware")
+
+            renderer.rectWidth = 100
+            window.layer.needRedraw()
+            delay(1000)
+            screenshots.assert(window.bounds, "frame2", "testFallbackToSoftware")
+
+            assertEquals(GraphicsApi.SOFTWARE, window.layer.renderApi)
+        } finally {
+            window.close()
+        }
+    }
+
+    private class OverrideNonSoftwareRenderFactory(
+        private val nonSoftwareRenderFactory: RenderFactory
+    ) : RenderFactory {
+        override fun createContextHandler(layer: SkiaLayer, renderApi: GraphicsApi): ContextHandler {
+            return if (renderApi == GraphicsApi.SOFTWARE) {
+                RenderFactory.Default.createContextHandler(layer, renderApi)
+            } else {
+                nonSoftwareRenderFactory.createContextHandler(layer, renderApi)
+            }
+        }
+
+        override fun createRedrawer(
+            layer: SkiaLayer,
+            renderApi: GraphicsApi,
+            properties: SkiaLayerProperties
+        ): Redrawer {
+            return if (renderApi == GraphicsApi.SOFTWARE) {
+                RenderFactory.Default.createRedrawer(layer, renderApi, properties)
+            } else {
+                nonSoftwareRenderFactory.createRedrawer(layer, renderApi, properties)
+            }
+        }
+    }
+
     @Test(timeout = 20000)
     fun `render continuously empty content without vsync`() = swingTest {
-        assumeTrue(hostOs != OS.MacOS) // TODO remove when we will support drawing without vsync on macOs
-
         val targetDrawCount = 500
         var drawCount = 0
         val onDrawCompleted = CompletableDeferred<Unit>()
@@ -301,6 +479,16 @@ class SkiaWindowTest {
             window.isUndecorated = true
             window.isVisible = true
             delay(1000)
+
+            // check the line metrics
+            val lineMetrics = paragraph.lineMetrics
+            assertTrue(lineMetrics.isNotEmpty())
+            assertEquals(0, lineMetrics.first().startIndex)
+            assertEquals(5, lineMetrics.first().endIndex)
+            assertEquals(5, lineMetrics.first().endExcludingWhitespaces)
+            assertEquals(5, lineMetrics.first().endIncludingNewline)
+            assertEquals(true, lineMetrics.first().isHardBreak)
+            assertEquals(0, lineMetrics.first().lineNumber)
 
             screenshots.assert(window.bounds)
         } finally {

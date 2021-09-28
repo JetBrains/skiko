@@ -21,9 +21,7 @@ internal class AWTSoftwareRedrawer(
 
         if (layer.isShowing) {
             layer.update(System.nanoTime())
-            if (layer.prepareDrawContext()) {
-                layer.draw()
-            }
+            layer.inDrawScope(layer::draw)
         }
     }
 
@@ -40,8 +38,6 @@ internal class AWTSoftwareRedrawer(
 
     override fun redrawImmediately() {
         layer.update(System.nanoTime())
-        if (layer.prepareDrawContext()) {
-            layer.draw()
-        }
+        layer.inDrawScope(layer::draw)
     }
 }

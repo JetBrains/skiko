@@ -20,8 +20,7 @@ class ScreenshotTestRule : TestRule {
     private val robot by lazy { Robot() }
 
     private lateinit var testIdentifier: String
-    private val subDir = if (hostOs == OS.MacOS) "macos" else "windows_linux"
-    private val screenshotsDir = File(System.getProperty("skiko.test.screenshots.dir")!!).resolve(subDir)
+    private val screenshotsDir = File(System.getProperty("skiko.test.screenshots.dir")!!)
 
     override fun apply(base: Statement, description: Description): Statement {
         return object : Statement() {
@@ -41,12 +40,20 @@ class ScreenshotTestRule : TestRule {
         }
     }
 
-    fun assert(rectangle: Rectangle, id: String = "") {
+    fun assert(
+        rectangle: Rectangle,
+        id: String = "",
+        testIdentifier: String = this.testIdentifier
+    ) {
         val actual = robot.createScreenCapture(rectangle)
-        assert(actual.toImage(), id)
+        assert(actual.toImage(), id, testIdentifier)
     }
 
-    fun assert(actual: Image, id: String = "") {
+    fun assert(
+        actual: Image,
+        id: String = "",
+        testIdentifier: String = this.testIdentifier
+    ) {
         val name = if (id.isNotEmpty()) "${testIdentifier}_$id" else testIdentifier
         val actualFile = File(screenshotsDir, "${name}_actual.png")
         val expectedFile = File(screenshotsDir, "$name.png")

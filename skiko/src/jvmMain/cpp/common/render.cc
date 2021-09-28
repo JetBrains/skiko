@@ -1,7 +1,7 @@
 #include <jni.h>
 
 #if SK_BUILD_FOR_LINUX
-    #include <stdint.h>
+#include <stdint.h>
 #endif
 
 #include "jni_helpers.h"

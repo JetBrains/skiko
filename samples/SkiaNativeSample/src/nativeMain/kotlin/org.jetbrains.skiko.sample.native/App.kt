@@ -49,14 +49,9 @@ class Renderer(
 fun displayScene(renderer: Renderer, nanoTime: Long) {
     val canvas = renderer.canvas!!
 
-    val paint = Paint()
-    // TODO: make color constants.
-    //paint.setColor(Color.GREEN)
-    paint.setColor(0xFF00FF00.toInt())
+    val paint = Paint().apply { color = Color.GREEN}
 
-    // TODO: make color constants.
-    // canvas.clear(Color.RED)
-    canvas.clear(0xFFFF0000.toInt())
+    canvas.clear(Color.RED)
 
     canvas.save();
     canvas.translate(128.0f, 128.0f)

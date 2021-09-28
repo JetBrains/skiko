@@ -14,7 +14,7 @@ internal class WindowsOpenGLRedrawer(
     private val context = createContext(device).also {
         makeCurrent(device, it)
         if (it == 0L || !isVideoCardSupported(layer.renderApi)) {
-            throw IllegalArgumentException("Cannot create Windows GL context")
+            throw RenderException("Cannot create Windows GL context")
         }
     }
     private var isDisposed = false
@@ -54,9 +54,7 @@ internal class WindowsOpenGLRedrawer(
     }
 
     private fun draw() {
-        if (layer.prepareDrawContext()) {
-            layer.draw()
-        }
+        layer.inDrawScope(layer::draw)
     }
 
     private fun makeCurrent() = makeCurrent(device, context)

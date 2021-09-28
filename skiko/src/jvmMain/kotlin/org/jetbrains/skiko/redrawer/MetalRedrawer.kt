@@ -7,8 +7,7 @@ import kotlinx.coroutines.withContext
 import org.jetbrains.skia.BackendRenderTarget
 import org.jetbrains.skia.DirectContext
 import org.jetbrains.skiko.*
-import javax.swing.SwingUtilities.convertPoint
-import javax.swing.SwingUtilities.getRootPane
+import javax.swing.SwingUtilities.*
 
 internal class MetalRedrawer(
     private val layer: SkiaLayer,
@@ -52,7 +51,7 @@ internal class MetalRedrawer(
         check(!isDisposed) { "MetalRedrawer is disposed" }
         setVSyncEnabled(device, enabled = false)
         update(System.nanoTime())
-        performDraw()
+        layer.inDrawScope(::performDraw)
         setVSyncEnabled(device, properties.isVsyncEnabled)
     }
 
@@ -72,10 +71,15 @@ internal class MetalRedrawer(
         //
         // Executors.newSingleThreadExecutor().asCoroutineDispatcher(): 50 FPS, 150% CPU
         // Dispatchers.IO: 50 FPS, 200% CPU
-        withContext(Dispatchers.IO) {
-            val handle = startRendering()
-            performDraw()
-            endRendering(handle)
+        layer.inDrawScope {
+            withContext(Dispatchers.IO) {
+                val handle = startRendering()
+                try {
+                    performDraw()
+                } finally {
+                    endRendering(handle)
+                }
+            }
         }
         // When window is not visible - it doesn't make sense to redraw fast to avoid battery drain.
         // In theory, we could be more precise, and just suspend rendering in
@@ -86,13 +90,12 @@ internal class MetalRedrawer(
 
     private fun performDraw() = synchronized(drawLock) {
         if (!isDisposed) {
-            if (layer.prepareDrawContext()) {
-                layer.draw()
-            }
+            layer.draw()
         }
     }
 
-    override fun syncSize() {
+    override fun syncSize() = synchronized(drawLock) {
+        check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         val rootPane = getRootPane(layer)
         val globalPosition = convertPoint(layer, layer.x, layer.y, rootPane)
         setContentScale(device, layer.contentScale)

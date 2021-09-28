@@ -4,6 +4,8 @@
 #endif
 #if SK_BUILD_FOR_MAC
 #import <OpenGL/gl3.h>
+#elif SK_BUILD_FOR_ANDROID
+#include <GLES/gl.h>
 #else
 #include <GL/gl.h>
 #endif

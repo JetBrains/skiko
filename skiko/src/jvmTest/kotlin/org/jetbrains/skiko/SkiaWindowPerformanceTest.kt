@@ -134,7 +134,7 @@ native crash in SkiaWindowTest "render single window"
     @Test
     fun `FPS is near display refresh rate (multiple windows)`() = swingTest {
         val windows = (1..3).map { index ->
-            TestWindow(width = 40, height = 20, frameCount = 300, deviatedTerminalCount = 10).apply {
+            TestWindow(width = 40, height = 20, frameCount = 300, deviatedTerminalCount = 20).apply {
                 toFront()
                 location = Point((index + 1) * 200, 200)
             }
