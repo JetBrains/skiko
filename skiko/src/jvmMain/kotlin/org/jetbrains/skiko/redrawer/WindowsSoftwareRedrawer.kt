@@ -7,6 +7,7 @@ import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.FrameLimiter
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaLayerProperties
+import org.jetbrains.skiko.RenderException
 
 internal class WindowsSoftwareRedrawer(
     private val layer: SkiaLayer,
