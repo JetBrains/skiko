@@ -1,11 +1,7 @@
 package org.jetbrains.skiko.wasm
 
-import kotlinx.dom.createElement
-import kotlinx.browser.document
 import org.jetbrains.skia.impl.NativePointer
-import org.khronos.webgl.WebGLRenderingContext
 import org.w3c.dom.HTMLCanvasElement
-import org.w3c.dom.RenderingContext
 import kotlin.js.Promise
 
 external val wasmSetup: Promise<Boolean>
@@ -16,7 +12,7 @@ external interface GLInterface {
     fun makeContextCurrent(contextPointer: NativePointer): Boolean;
 }
 
-external object GL: GLInterface {
+external object GL : GLInterface {
     override fun createContext(context: HTMLCanvasElement, contextAttributes: dynamic): Int = definedExternally
     override fun makeContextCurrent(contextPointer: NativePointer): Boolean = definedExternally
 }
@@ -54,7 +50,7 @@ fun ContextAttributes.asJsObject(): dynamic {
 }
 
 
-fun GetWebGLContext(canvas: HTMLCanvasElement, attr: ContextAttributes? = null): Boolean {
+fun CreateWebGLContext(canvas: HTMLCanvasElement, attr: ContextAttributes? = null): NativePointer {
     val contextAttributes = object : ContextAttributes {
         override val alpha = attr?.alpha ?: 1
         override val depth = attr?.depth ?: 1
@@ -70,6 +66,5 @@ fun GetWebGLContext(canvas: HTMLCanvasElement, attr: ContextAttributes? = null):
         override val majorVersion = attr?.majorVersion ?: 1
     }
 
-    val contextPointer = GL.createContext(canvas, contextAttributes.asJsObject())
-    return GL.makeContextCurrent(contextPointer)
+    return GL.createContext(canvas, contextAttributes.asJsObject())
 }
