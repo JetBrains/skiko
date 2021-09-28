@@ -18,9 +18,7 @@ internal class LinuxSoftwareRedrawer(
 
         if (layer.isShowing) {
             layer.update(System.nanoTime())
-            if (layer.prepareDrawContext()) {
-                layer.draw()
-            }
+            layer.inDrawScope(layer::draw)
         }
     }
 
@@ -42,9 +40,7 @@ internal class LinuxSoftwareRedrawer(
 
     override fun redrawImmediately() = layer.backedLayer.lockLinuxDrawingSurface {
         layer.update(System.nanoTime())
-        if (layer.prepareDrawContext()) {
-            layer.draw()
-        }
+        layer.inDrawScope(layer::draw)
     }
 
     fun resize(width: Int, height: Int) = layer.backedLayer.lockLinuxDrawingSurface {

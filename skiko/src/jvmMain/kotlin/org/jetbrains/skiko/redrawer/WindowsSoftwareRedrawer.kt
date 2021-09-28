@@ -21,9 +21,7 @@ internal class WindowsSoftwareRedrawer(
 
         if (layer.isShowing) {
             layer.update(System.nanoTime())
-            if (layer.prepareDrawContext()) {
-                layer.draw()
-            }
+            layer.inDrawScope(layer::draw)
         }
     }
 
@@ -39,9 +37,7 @@ internal class WindowsSoftwareRedrawer(
 
     override fun redrawImmediately() {
         layer.update(System.nanoTime())
-        if (layer.prepareDrawContext()) {
-            layer.draw()
-        }
+        layer.inDrawScope(layer::draw)
     }
 
     fun resize(width: Int, height: Int) = resize(device, width, height)
