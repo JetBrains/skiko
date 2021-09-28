@@ -181,7 +181,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_osxDisableT
 {
     NSWindow* window = findWindow(platformInfoPtr);
     if (window == nil) return;
-    dispatch_async(dispatch_get_main_queue(), ^{
+    dispatch_sync(dispatch_get_main_queue(), ^{
         [window setTitlebarAppearsTransparent:YES];
         [window setTitleVisibility:NSWindowTitleHidden];
         [window setStyleMask:[window styleMask]|NSWindowStyleMaskFullSizeContentView];
