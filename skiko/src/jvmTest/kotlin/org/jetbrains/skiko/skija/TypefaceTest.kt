@@ -9,9 +9,11 @@ import org.jetbrains.skia.Typeface
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class TypefaceTest {
 
@@ -23,14 +25,14 @@ class TypefaceTest {
         val jbMonoBold = Typeface.makeFromData(Data.makeFromFileName("src/jvmTest/resources/fonts/JetBrainsMono-Bold.ttf"))
 
         assertEquals(FontStyle.NORMAL, inter.fontStyle)
-        assertEquals(false, inter.isBold)
-        assertEquals(false, inter.isItalic)
+        assertFalse(inter.isBold)
+        assertFalse(inter.isItalic)
         assertEquals(FontStyle.BOLD, jbMonoBold.fontStyle)
 
-        assertEquals(true, jbMonoBold.isBold)
-        assertEquals(false, jbMonoBold.isItalic)
-        assertEquals(false, inter.isFixedPitch)
-        assertEquals(true, jbMono.isFixedPitch)
+        assertTrue(jbMonoBold.isBold)
+        assertFalse(jbMonoBold.isItalic)
+        assertFalse(inter.isFixedPitch)
+        assertTrue(jbMono.isFixedPitch)
         assertNull(inter.variationAxes)
         assertNull(inter.variations)
         val axes = arrayOf(
@@ -78,7 +80,7 @@ class TypefaceTest {
             ), inter.tableTags
         )
 
-        assertEquals(true, inter.getTableData("loca")!!.size > 0)
+        assertTrue(inter.getTableData("loca")!!.size > 0)
         assertEquals(2816, inter.unitsPerEm)
 
         assertNull(jbMono.getKerningPairAdjustments(null))

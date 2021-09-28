@@ -6,6 +6,7 @@ import org.jetbrains.skia.Typeface
 import org.jetbrains.skia.paragraph.TypefaceFontProvider
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 class FontMgrTest {
     @Test
@@ -74,8 +75,8 @@ class FontMgrTest {
             assertEquals(jbMono, styleSet.matchStyle(FontStyle.ITALIC))
         }
 
-        assertEquals(null, fontManager.matchFamilyStyle("JetBrains Mono", FontStyle.BOLD))
-        assertEquals(null, fontManager.matchFamilyStyle("Interface", FontStyle.NORMAL))
+        assertNull(fontManager.matchFamilyStyle("JetBrains Mono", FontStyle.BOLD))
+        assertNull(fontManager.matchFamilyStyle("Interface", FontStyle.NORMAL))
 
         assertEquals(
             null,

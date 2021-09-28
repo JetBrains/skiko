@@ -15,40 +15,46 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class PathTest {
     @Test
     fun iterTest() {
         Path().moveTo(10f, 10f).lineTo(20f, 0f).lineTo(20f, 20f).closePath().use { p ->
             p.iterator().use { i ->
-                assertEquals(true, i.hasNext())
+                assertTrue(i.hasNext())
+
                 var s = i.next()!!
                 assertEquals(PathVerb.MOVE, s.verb)
                 assertEquals(Point(10f, 10f), s.p0)
-                assertEquals(true, s.isClosedContour)
-                assertEquals(true, i.hasNext())
+                assertTrue(s.isClosedContour)
+                assertTrue(i.hasNext())
+
                 s = i.next()!!
                 assertEquals(PathVerb.LINE, s.verb)
                 assertEquals(Point(10f, 10f), s.p0)
                 assertEquals(Point(20f, 0f), s.p1)
-                assertEquals(false, s.isCloseLine)
-                assertEquals(true, i.hasNext())
+                assertFalse(s.isCloseLine)
+                assertTrue(i.hasNext())
+
                 s = i.next()!!
                 assertEquals(PathVerb.LINE, s.verb)
                 assertEquals(Point(20f, 0f), s.p0)
                 assertEquals(Point(20f, 20f), s.p1)
-                assertEquals(false, s.isCloseLine)
-                assertEquals(true, i.hasNext())
+                assertFalse(s.isCloseLine)
+                assertTrue(i.hasNext())
+
                 s = i.next()!!
                 assertEquals(PathVerb.LINE, s.verb)
                 assertEquals(Point(20f, 20f), s.p0)
                 assertEquals(Point(10f, 10f), s.p1)
-                assertEquals(true, s.isCloseLine)
-                assertEquals(true, i.hasNext())
+                assertTrue(s.isCloseLine)
+                assertTrue(i.hasNext())
+
                 s = i.next()!!
                 assertEquals(PathVerb.CLOSE, s.verb)
                 assertEquals(Point(10f, 10f), s.p0)
-                assertEquals(false, i.hasNext())
+                assertFalse(i.hasNext())
                 assertFailsWith<NoSuchElementException> {
                     i.next()
                 }
@@ -58,7 +64,7 @@ class PathTest {
 
     @Test
     fun convexityTest() {
-        Path().lineTo(40f, 20f).lineTo(0f, 40f).lineTo(0f, 0f).closePath().use { p -> assertEquals(true, p.isConvex) }
+        Path().lineTo(40f, 20f).lineTo(0f, 40f).lineTo(0f, 0f).closePath().use { p -> assertTrue(p.isConvex) }
         Path().lineTo(40f, 40f).lineTo(40f, 0f).lineTo(0f, 40f).lineTo(0f, 0f).closePath().use { p ->
             assertFalse(p.isConvex)
         }
@@ -120,25 +126,25 @@ class PathTest {
     @Test
     fun checksTest() {
         Path().lineTo(40f, 40f).lineTo(40f, 0f).lineTo(0f, 40f).lineTo(0f, 0f).closePath().use { p ->
-            assertEquals(false, p.isEmpty)
+            assertFalse(p.isEmpty)
             p.reset()
-            assertEquals(true, p.isEmpty)
+            assertTrue(p.isEmpty)
         }
         Path().lineTo(40f, 40f).lineTo(40f, 0f).lineTo(0f, 40f).lineTo(0f, 0f).closePath().use { p ->
-            assertEquals(false, p.isEmpty)
+            assertFalse(p.isEmpty)
             p.rewind()
-            assertEquals(true, p.isEmpty)
+            assertTrue(p.isEmpty)
         }
         Path().lineTo(40f, 40f).lineTo(40f, 0f).lineTo(0f, 40f).lineTo(0f, 0f).use { p ->
-            assertEquals(false, p.isLastContourClosed)
+            assertFalse(p.isLastContourClosed)
             p.closePath()
-            assertEquals(true, p.isLastContourClosed)
+            assertTrue(p.isLastContourClosed)
             p.moveTo(100f, 100f).lineTo(140f, 140f).lineTo(140f, 100f).lineTo(100f, 140f)
-            assertEquals(false, p.isLastContourClosed)
+            assertFalse(p.isLastContourClosed)
             p.closePath()
-            assertEquals(true, p.isLastContourClosed)
+            assertTrue(p.isLastContourClosed)
         }
-        Path().lineTo(40f, 40f).lineTo(40f, 0f).lineTo(0f, 40f).lineTo(0f, 0f).use { p -> assertEquals(true, p.isFinite) }
+        Path().lineTo(40f, 40f).lineTo(40f, 0f).lineTo(0f, 40f).lineTo(0f, 0f).use { p -> assertTrue(p.isFinite) }
         Path().lineTo(40f, 40f).lineTo(Float.POSITIVE_INFINITY, 0f).lineTo(0f, 40f).lineTo(0f, 0f).closePath().use { p ->
             assertEquals(
                 false,
@@ -146,11 +152,11 @@ class PathTest {
             )
         }
         Path().lineTo(40f, 40f).lineTo(40f, 0f).lineTo(0f, 40f).lineTo(0f, 0f).use { p ->
-            assertEquals(false, p.isVolatile)
+            assertFalse(p.isVolatile)
             p.setVolatile(true)
-            assertEquals(true, p.isVolatile)
+            assertTrue(p.isVolatile)
             p.setVolatile(false)
-            assertEquals(false, p.isVolatile)
+            assertFalse(p.isVolatile)
         }
         Path().lineTo(40f, 40f).lineTo(40f, 0f).lineTo(0f, 40f).lineTo(0f, 0f).closePath().use { p ->
             assertNull(p.asLine)
@@ -256,26 +262,26 @@ class PathTest {
     @Test
     fun containsTest() {
         Path().addRRect(RRect.makeLTRB(10f, 20f, 54f, 120f, 10f, 20f)).use { p ->
-            assertEquals(true, p.conservativelyContainsRect(Rect.makeLTRB(10f, 40f, 54f, 80f)))
-            assertEquals(true, p.conservativelyContainsRect(Rect.makeLTRB(25f, 20f, 39f, 120f)))
-            assertEquals(true, p.conservativelyContainsRect(Rect.makeLTRB(15f, 25f, 49f, 115f)))
-            assertEquals(true, p.conservativelyContainsRect(Rect.makeLTRB(13f, 27f, 51f, 113f)))
-            assertEquals(false, p.conservativelyContainsRect(Rect.makeLTRB(0f, 40f, 60f, 80f)))
-            assertEquals(true, p.contains(30f, 70f))
-            assertEquals(false, p.contains(0f, 0f))
+            assertTrue(p.conservativelyContainsRect(Rect.makeLTRB(10f, 40f, 54f, 80f)))
+            assertTrue(p.conservativelyContainsRect(Rect.makeLTRB(25f, 20f, 39f, 120f)))
+            assertTrue(p.conservativelyContainsRect(Rect.makeLTRB(15f, 25f, 49f, 115f)))
+            assertTrue(p.conservativelyContainsRect(Rect.makeLTRB(13f, 27f, 51f, 113f)))
+            assertFalse(p.conservativelyContainsRect(Rect.makeLTRB(0f, 40f, 60f, 80f)))
+            assertTrue(p.contains(30f, 70f))
+            assertFalse(p.contains(0f, 0f))
         }
     }
 
     @Test
     fun utilsTest() {
-        assertEquals(false, Path.isLineDegenerate(Point(0f, 0f), Point(10f, 0f), false))
-        assertEquals(true, Path.isLineDegenerate(Point(0f, 0f), Point(0f, 0f), true))
-        assertEquals(true, Path.isLineDegenerate(Point(0f, 0f), Point(0f, 0f), false))
-        assertEquals(false, Path.isLineDegenerate(Point(0f, 0f), Point(0f, 1e-13f), true))
-        assertEquals(false, Path.isQuadDegenerate(Point(0f, 0f), Point(10f, 0f), Point(0f, 0f), false))
-        assertEquals(true, Path.isQuadDegenerate(Point(0f, 0f), Point(0f, 0f), Point(0f, 0f), false))
-        assertEquals(false, Path.isCubicDegenerate(Point(0f, 0f), Point(10f, 0f), Point(0f, 0f), Point(0f, 0f), false))
-        assertEquals(true, Path.isCubicDegenerate(Point(0f, 0f), Point(0f, 0f), Point(0f, 0f), Point(0f, 0f), false))
+        assertFalse(Path.isLineDegenerate(Point(0f, 0f), Point(10f, 0f), false))
+        assertTrue(Path.isLineDegenerate(Point(0f, 0f), Point(0f, 0f), true))
+        assertTrue(Path.isLineDegenerate(Point(0f, 0f), Point(0f, 0f), false))
+        assertFalse(Path.isLineDegenerate(Point(0f, 0f), Point(0f, 1e-13f), true))
+        assertFalse(Path.isQuadDegenerate(Point(0f, 0f), Point(10f, 0f), Point(0f, 0f), false))
+        assertTrue(Path.isQuadDegenerate(Point(0f, 0f), Point(0f, 0f), Point(0f, 0f), false))
+        assertFalse(Path.isCubicDegenerate(Point(0f, 0f), Point(10f, 0f), Point(0f, 0f), Point(0f, 0f), false))
+        assertTrue(Path.isCubicDegenerate(Point(0f, 0f), Point(0f, 0f), Point(0f, 0f), Point(0f, 0f), false))
         assertContentEquals(
             arrayOf(Point(0f, 20f), Point(6.666667f, 13.333334f)),
             Path.convertConicToQuads(Point(0f, 20f), Point(20f, 0f), Point(40f, 20f), 0.5f, 1)

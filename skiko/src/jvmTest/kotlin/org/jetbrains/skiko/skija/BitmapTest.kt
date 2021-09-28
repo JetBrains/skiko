@@ -6,7 +6,9 @@ import org.jetbrains.skia.ImageInfo
 import kotlin.test.Test
 
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
+import kotlin.test.assertTrue
 
 class BitmapTest {
     @Test
@@ -14,13 +16,13 @@ class BitmapTest {
         val bitmap = Bitmap()
         val id1: Int = bitmap.generationId
 
-        assertEquals(true, bitmap.isNull)
-        assertEquals(true, bitmap.isEmpty)
+        assertTrue(bitmap.isNull)
+        assertTrue(bitmap.isEmpty)
 
         bitmap.allocPixels(ImageInfo.makeS32(7, 3, ColorAlphaType.OPAQUE))
         assertNotEquals(id1, bitmap.generationId)
-        assertEquals(false, bitmap.isNull)
-        assertEquals(false, bitmap.isEmpty)
+        assertFalse(bitmap.isNull)
+        assertFalse(bitmap.isEmpty)
         assertEquals(7L * 4, bitmap.rowBytes)
         assertEquals(4, bitmap.bytesPerPixel)
         assertEquals(7, bitmap.rowBytesAsPixels)
@@ -31,13 +33,13 @@ class BitmapTest {
         assertEquals(8, bitmap.rowBytesAsPixels)
 
         bitmap.setImageInfo(ImageInfo.makeS32(7, 3, ColorAlphaType.OPAQUE))
-        assertEquals(true, bitmap.isNull)
-        assertEquals(false, bitmap.isEmpty)
-        assertEquals(false, bitmap.isReadyToDraw)
+        assertTrue(bitmap.isNull)
+        assertFalse(bitmap.isEmpty)
+        assertFalse(bitmap.isReadyToDraw)
 
         bitmap.allocPixels()
-        assertEquals(false, bitmap.isNull)
-        assertEquals(true, bitmap.isReadyToDraw)
+        assertFalse(bitmap.isNull)
+        assertTrue(bitmap.isReadyToDraw)
 
         bitmap.generationId
     }
