@@ -1,8 +1,7 @@
 #include <jni.h>
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_impl_TestHelpersKt__1nFillByteArrayOf5
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_tests_TestHelpersKt__1nFillByteArrayOf5
 (JNIEnv* env, jclass jclass, jbyteArray jbarray) {
-
     jbyte *result_bytes = env->GetByteArrayElements(jbarray, NULL);
     result_bytes[0] = 1;
     result_bytes[1] = 2;
@@ -13,7 +12,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_impl_TestHelpersKt__1n
 }
 
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_impl_TestHelpersKt__1nFillFloatArrayOf5
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_tests_TestHelpersKt__1nFillFloatArrayOf5
 (JNIEnv* env, jclass jclass, jfloatArray jfarray) {
     jfloat *result_float = env->GetFloatArrayElements(jfarray, NULL);
     result_float[0] = 0.0;

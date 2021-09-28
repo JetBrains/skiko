@@ -1,6 +1,9 @@
-package org.jetbrains.skia.impl
+package org.jetbrains.skiko.tests
 
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.InteropPointer
+import org.jetbrains.skia.impl.Library
+import org.jetbrains.skia.impl.withResult
 
 class TestHelpers {
 
@@ -21,8 +24,8 @@ class TestHelpers {
     }
 }
 
-@ExternalSymbolName("org_jetbrains_skia_impl_TestHelpers__1nFillByteArrayOf5")
+@ExternalSymbolName("org_jetbrains_skiko_tests_TestHelpers__1nFillByteArrayOf5")
 private external fun _nFillByteArrayOf5(interopPointer: InteropPointer)
 
-@ExternalSymbolName("org_jetbrains_skia_impl_TestHelpers__1nFillFloatArrayOf5")
+@ExternalSymbolName("org_jetbrains_skiko_tests_TestHelpers__1nFillFloatArrayOf5")
 private external fun _nFillFloatArrayOf5(interopPointer: InteropPointer)

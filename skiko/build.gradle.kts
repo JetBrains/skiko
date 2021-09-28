@@ -431,10 +431,12 @@ val generateVersion = project.tasks.register("generateVersion") {
 // resulting object files into the final native klib.
 project.tasks.register<Exec>("nativeBridgesCompile") {
     dependsOn(skiaDir)
-    val inputDirs = listOf(
+    val inputDirs = mutableListOf(
         "$projectDir/src/nativeMain/cpp/common",
         "$projectDir/src/commonMain/cpp"
-    )
+    ).apply {
+        if (skiko.includeTestHelpers) add("$projectDir/src/commonTest/cpp/TestHelpers.cc")
+    }
     val outDir = "$buildDir/nativeBridges/obj/$target"
     val srcs = inputDirs
         .findAllFiles(".cc")
@@ -613,10 +615,15 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
 }
 
 extensions.configure<CppLibrary> {
-    source.from(
+    val paths = mutableListOf(
         fileTree("$projectDir/src/jvmMain/cpp/common"),
         fileTree("$projectDir/src/jvmMain/cpp/${targetOs.id}")
-    )
+    ).apply {
+        if (skiko.includeTestHelpers) {
+            add(fileTree("$projectDir/src/jvmTest/cpp/TestHelpers.cc"))
+        }
+    }
+    source.setFrom(paths)
 }
 
 library {

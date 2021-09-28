@@ -1,6 +1,6 @@
 package org.jetbrains.skia.impl
 
-import runTest
+import org.jetbrains.skiko.tests.runTest
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertContentEquals

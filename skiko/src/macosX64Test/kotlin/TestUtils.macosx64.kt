@@ -1,3 +1,5 @@
+package org.jetbrains.skiko.tests
+
 import kotlinx.coroutines.runBlocking
 
 annotation class DoNothing

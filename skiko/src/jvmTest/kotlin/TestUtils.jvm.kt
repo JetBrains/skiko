@@ -1,3 +1,5 @@
+package org.jetbrains.skiko.tests
+
 import kotlinx.coroutines.runBlocking
 
 actual typealias IgnoreTestOnJvm = org.junit.Ignore

@@ -1,3 +1,5 @@
+package org.jetbrains.skiko.tests
+
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.promise
 import org.jetbrains.skiko.wasm.await
