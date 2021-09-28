@@ -16,7 +16,7 @@ internal class WindowsSoftwareRedrawer(
     init {
         device = createDevice(layer.contentHandle).also {
             if (it == 0L) {
-                throw IllegalArgumentException("Failed to create Software device.")
+                throw RenderException("Failed to create Software device")
             }
         }
     }

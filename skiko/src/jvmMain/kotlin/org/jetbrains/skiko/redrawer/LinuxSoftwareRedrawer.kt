@@ -14,7 +14,7 @@ internal class LinuxSoftwareRedrawer(
         layer.backedLayer.lockLinuxDrawingSurface {
             device = createDevice(it.display, it.window).also {
                 if (it == 0L) {
-                    throw IllegalArgumentException("Failed to create Software device.")
+                    throw RenderException("Failed to create Software device")
                 }
             }
         }

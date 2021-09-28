@@ -15,7 +15,9 @@ public:
     SkAutoMalloc surfaceMemory;
     sk_sp<SkSurface> surface;
 
-    ~SoftwareDevice() {}
+    ~SoftwareDevice() {
+        XFreeGC(display, gc);
+    }
 };
 
 extern "C"
