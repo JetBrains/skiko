@@ -16,7 +16,7 @@ interface SkiaRenderer {
 
 private class PictureHolder(val instance: Picture, val width: Int, val height: Int)
 
-open class SkiaLayer  internal constructor(
+open class SkiaLayer internal constructor(
     private val properties: SkiaLayerProperties = SkiaLayerProperties(),
     private val renderFactory: RenderFactory
 ) : JPanel() {
@@ -33,7 +33,7 @@ open class SkiaLayer  internal constructor(
 
     internal val backedLayer: HardwareLayer
 
-    internal constructor(
+    constructor(
         properties: SkiaLayerProperties = SkiaLayerProperties()
     ) : this(properties, RenderFactory.Default)
 
