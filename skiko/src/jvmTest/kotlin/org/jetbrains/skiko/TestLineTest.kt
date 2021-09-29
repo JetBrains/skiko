@@ -1,8 +1,10 @@
-package org.jetbrains.skiko.skija
+package org.jetbrains.skiko
 
 import org.jetbrains.skia.Font
 import org.jetbrains.skia.TextLine
 import org.jetbrains.skia.Typeface
+import org.jetbrains.skiko.skija.assertCloseEnough
+import org.jetbrains.skiko.skija.makeFromResource
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals

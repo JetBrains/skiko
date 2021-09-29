@@ -1,4 +1,4 @@
-package org.jetbrains.skiko.skija
+package org.jetbrains.skiko
 
 import org.jetbrains.skia.Path
 import org.jetbrains.skia.PathDirection

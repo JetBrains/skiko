@@ -1,9 +1,10 @@
-package org.jetbrains.skiko.skija
+package org.jetbrains.skiko
 
 import org.jetbrains.skia.Data
 import org.jetbrains.skia.FontStyle
 import org.jetbrains.skia.Typeface
 import org.jetbrains.skia.paragraph.TypefaceFontProvider
+import org.jetbrains.skiko.skija.makeFromResource
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
