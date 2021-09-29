@@ -1,7 +1,5 @@
 plugins {
-    // Cannot move to 1.5.31 due to
-    // "Cannot change attributes of dependency configuration ':commonTestApiDependenciesMetadata' after it has been resolved"
-    kotlin("multiplatform") version "1.5.20"
+    kotlin("multiplatform") version "1.5.31"
 }
 
 repositories {
@@ -49,7 +47,8 @@ kotlin {
 
         val jsMain by getting {
             dependsOn(commonMain)
-            resources.setSrcDirs(resources.srcDirs + unzipTask.get().destinationDir)
+            resources.setSrcDirs(resources.srcDirs)
+            resources.srcDirs(unzipTask.map { it.destinationDir })
         }
     }
 }
