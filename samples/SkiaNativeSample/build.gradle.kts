@@ -52,7 +52,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(kotlin("stdlib-common"))
+                implementation("org.jetbrains.skiko:skiko:$version")
             }
         }
 
@@ -66,7 +66,6 @@ kotlin {
             dependsOn(nativeMain)
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-macosx64:1.5.2")
-                implementation("org.jetbrains.skiko:skiko-native-runtime-$target:$version")
             }
         }
     }

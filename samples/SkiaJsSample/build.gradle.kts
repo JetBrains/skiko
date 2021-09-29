@@ -39,15 +39,14 @@ kotlin {
     }
 
     sourceSets {
-        val commonMain by getting {}
+        val commonMain by getting {
+            dependencies {
+                implementation("org.jetbrains.skiko:skiko:$version")
+            }
+        }
 
         val jsMain by getting {
             dependsOn(commonMain)
-            dependencies {
-                // This one is tricky - it has js and wasm binaries required for final linking.
-                // We cannot use it directly but need to extract data from there.
-                implementation("org.jetbrains.skiko:skiko-js-runtime:$version")
-            }
             resources.setSrcDirs(resources.srcDirs)
             resources.srcDirs(unzipTask.map { it.destinationDir })
         }

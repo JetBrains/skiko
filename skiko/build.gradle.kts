@@ -740,7 +740,7 @@ val skikoWasmJar by project.tasks.registering(Jar::class) {
 // disable unexpected native publications (default C++ publications are failing)
 tasks.withType<AbstractPublishToMaven>().configureEach {
     doFirst {
-        if (!publication.name.startsWith("skiko")) {
+        if (!publication.isSkikoPublication()) {
             throw StopExecutionException("Publication '${publication.name}' is disabled")
         }
     }
@@ -777,8 +777,16 @@ tasks.withType<Test>().configureEach {
     }
 }
 
-fun Publication.isSkikoPublication() =
-    (this as? MavenPublication)?.name?.startsWith("skiko") == true
+fun Publication.isSkikoPublication(): Boolean {
+    val component = (this as? org.gradle.api.publish.maven.internal.publication.DefaultMavenPublication)?.component
+
+    // Don't publish libraries included into jvm-runtime-*.
+    // Or whatever `cpp-library` considers their public api.
+    if (component is CppBinary ||
+        component?.javaClass?.simpleName == "MainLibraryVariant") return false
+
+    return true
+}
 
 fun Task.disable() {
     enabled = false
@@ -800,14 +808,14 @@ afterEvaluate {
         }
     }
 
-    // Disable publishing Gradle Metadata, because it seems unnecessary at the moment.
-    // Also generating metadata for default C++ publications fails
+    // Gradle metadata for default C++ publications fails.
     tasks.withType(GenerateModuleMetadata::class).configureEach {
-        disable()
+        if (!this.publication.get().isSkikoPublication()) {
+            disable()
+        }
     }
 
-    // Disable publishing for default publications, because
-    // publishing for default C++ publications fails
+    // Publishing for default C++ publications fails.
     tasks.withType<AbstractPublishToMaven>().configureEach {
         if (!publication.isSkikoPublication()) {
             disable()
@@ -860,39 +868,14 @@ publishing {
                 }
             }
         }
-        create<MavenPublication>("skikoMetadata") {
-            artifactId = SkikoArtifacts.metadataArtifactId
-            afterEvaluate {
-                artifact(project.tasks.named("metadataJar").get())
 
-            }
-        }
-        create<MavenPublication>("skikoJvm") {
-            artifactId = SkikoArtifacts.commonArtifactId
-            afterEvaluate {
-                artifact(skikoJvmJar.map { it.archiveFile.get() })
-            }
-        }
         create<MavenPublication>("skikoJvmRuntime") {
             artifactId = SkikoArtifacts.runtimeArtifactIdFor(targetOs, targetArch)
             afterEvaluate {
                 artifact(skikoJvmRuntimeJar.map { it.archiveFile.get() })
             }
         }
-        if (supportNative) {
-            create<MavenPublication>("skikoNativeRuntime") {
-                artifactId = SkikoArtifacts.nativeRuntimeArtifactIdFor(targetOs, targetArch)
-                afterEvaluate {
-                    artifact(project.tasks.withType(KotlinNativeCompile::class.java)
-                                .single { it.name.startsWith("compileKotlin") } // Exclude compileTestKotlin.
-                                .outputs.files.single { it.name.endsWith(".klib") })
-                }
-            }
-        }
-        create<MavenPublication>("skikoJsRuntime") {
-            artifactId = SkikoArtifacts.jsArtifactId
-            artifact(project.tasks.named("jsJar").get())
-        }
+
         if (supportWasm) {
             create<MavenPublication>("skikoWasmRuntime") {
                 artifactId = SkikoArtifacts.jsWasmArtifactId
