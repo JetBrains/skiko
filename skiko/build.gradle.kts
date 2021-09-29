@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 import org.jetbrains.kotlin.utils.keysToMap
 
 plugins {
-    kotlin("multiplatform") version "1.5.10"
+    kotlin("multiplatform") version "1.5.31"
     `cpp-library`
     `maven-publish`
     id("org.gradle.crypto.checksum") version "1.1.0"
