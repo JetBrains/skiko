@@ -15,40 +15,36 @@ public:
     SkAutoMalloc surfaceMemory;
     sk_sp<SkSurface> surface;
     unsigned int depth = 0;
+    SkColorType colorSpace = kUnknown_SkColorType;
+
+    void initDevice() {
+        Window wnd;
+        int x, y;
+        unsigned int w, h, border;
+        XGetGeometry(display, window, &wnd, &x, &y, &w, &h, &border, &depth);
+
+        switch(depth) {
+            case 16:
+                colorSpace = kRGB_565_SkColorType;
+                break;
+            case 24: case 32:
+                colorSpace = kBGRA_8888_SkColorType;
+                break;
+            default:
+                colorSpace = kUnknown_SkColorType;
+        }
+    }
 
     ~SoftwareDevice() {
-        XFreeGC(display, gc);
+        if (display != NULL && gc != NULL)
+        {
+            XFreeGC(display, gc);
+        }
     }
 };
 
 extern "C"
 {
-    void getDisplayDepthBits(SoftwareDevice *device) {
-        Window window;
-        int x, y;
-        unsigned int w, h, border, displayDepth;
-        XGetGeometry(
-            device->display, device->window, &window, &x, &y, &w, &h, &border, &device->depth);
-    }
-
-    SkColorType getDeviceColorSpace(SoftwareDevice *device) {
-        if (device->depth >16) {
-            return kBGRA_8888_SkColorType;
-        }
-        return kRGB_565_SkColorType;
-    }
-
-    bool isSupportedDepth(unsigned int depth) {
-        switch(depth) {
-            case 16:
-            case 24:
-            case 32:
-                return true;
-            default:
-                return false;
-        }
-    }
-
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_LinuxSoftwareRedrawer_createDevice(
         JNIEnv *env, jobject redrawer, jlong displayPtr, jlong windowPtr)
     {
@@ -58,12 +54,12 @@ extern "C"
         device->display = display;
         device->window = window;
         device->gc = XCreateGC(device->display, device->window, 0, nullptr);
-        getDisplayDepthBits(device);
-        if (isSupportedDepth(device->depth))
+        device->initDevice();
+        if (device->colorSpace == kUnknown_SkColorType)
         {
-            return toJavaPointer(device);
+            return 0L;
         }
-        return 0L;
+        return toJavaPointer(device);
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_AbstractDirectSoftwareRedrawer_resize(
@@ -72,7 +68,7 @@ extern "C"
         SoftwareDevice *device = fromJavaPointer<SoftwareDevice *>(devicePtr);
         device->surface.reset();
         SkImageInfo info = SkImageInfo::Make(
-            width, height, getDeviceColorSpace(device), kPremul_SkAlphaType,
+            width, height, device->colorSpace, kPremul_SkAlphaType,
             SkColorSpace::MakeSRGB());
         device->surface = SkSurface::MakeRaster(info);
     }

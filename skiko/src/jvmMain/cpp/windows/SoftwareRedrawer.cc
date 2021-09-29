@@ -14,9 +14,7 @@ public:
     SkAutoMalloc surfaceMemory;
     sk_sp<SkSurface> surface;
 
-    ~SoftwareDevice() {
-        surface.reset(nullptr);
-    }
+    ~SoftwareDevice() {}
 };
 
 extern "C"
