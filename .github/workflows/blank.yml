@@ -2,7 +2,7 @@
 
 name: CI
 
-# Controls when the action will run. 
+# Controls when the action will run.
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
@@ -31,6 +31,7 @@ jobs:
           cd $GITHUB_WORKSPACE/skiko
           ./gradlew jvmTest
           ./gradlew publishToMavenLocal
+          ./gradlew -Pskiko.native.enabled=true macosX64Test
           ./gradlew -Pskiko.native.enabled=true publishToMavenLocal
    linux:
     runs-on: ubuntu-20.04
@@ -55,7 +56,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install gcc-9 g++-9 -y
           sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 60 --slave /usr/bin/g++ g++ /usr/bin/g++-9
-          sudo update-alternatives --config gcc 
+          sudo update-alternatives --config gcc
           sudo apt-get install ninja-build fontconfig libfontconfig1-dev libglu1-mesa-dev libxrandr-dev zip -y
           ./gradlew -i jvmTest
           ./gradlew publishToMavenLocal
@@ -88,6 +89,7 @@ jobs:
            ./emsdk activate 2.0.29
            source ./emsdk_env.sh
            cd ..
+           ./gradlew -Pskiko.wasm.enabled=true jsTest
            ./gradlew -Pskiko.wasm.enabled=true publishSkikoWasmRuntimePublicationToMavenLocal publishSkikoJsRuntimePublicationToMavenLocal
    windows:
     runs-on: windows-2019
