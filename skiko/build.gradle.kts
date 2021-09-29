@@ -105,6 +105,10 @@ val wasmCrossCompile = tasks.register<WasmCrossCompileTask>("wasmCrossCompile") 
     sourceFiles =
         project.fileTree("src/jsMain/cpp") { include("**/*.cc") } +
         project.fileTree("src/commonMain/cpp") { include("**/*.cc") }
+    if (skiko.includeTestHelpers) {
+        sourceFiles += project.fileTree("src/commonTest/cpp") { include("**/*.cc") }
+    }
+
     val skiaAFilesDir = unpackedSkia.resolve("out/${buildType.id}-${osArch.first.id}-${osArch.second.id}")
     libFiles = project.fileTree(skiaAFilesDir)  { include("**/*.a") }
 
@@ -132,7 +136,8 @@ val wasmCrossCompile = tasks.register<WasmCrossCompileTask>("wasmCrossCompile") 
 
 val replaceSymbolsInSkikoJsOutput by project.tasks.registering {
     doLast {
-        val skikoJsFile = buildDir.resolve("wasm/skiko.js")
+        val wasmTask = project.tasks.getByName("wasmCrossCompile") as WasmCrossCompileTask
+        val skikoJsFile: File = wasmTask.outDir.asFile.get().resolve("skiko.js")
         val replacedContent = skikoJsFile.readText().replace("_org_jetbrains", "org_jetbrains")
         skikoJsFile.writeText(replacedContent)
     }
@@ -898,13 +903,18 @@ publishing {
 }
 
 afterEvaluate {
-    tasks.withType<KotlinCompile>().configureEach {
+    tasks.withType<KotlinCompile>().configureEach { // this one is actually KotlinJvmCompile
         dependsOn(generateVersion)
         source(generatedKotlin)
 
         if (name == "compileTestKotlinJvm") {
             kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
         }
+    }
+    tasks.withType<KotlinNativeCompile>().configureEach {
+        dependsOn(generateVersion)
+        source(generatedKotlin)
+
         if (supportNative) {
             dependsOn(tasks.getByName("nativeBridgesLink"))
         }

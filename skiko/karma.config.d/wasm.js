@@ -6,9 +6,9 @@ config.browserConsoleLogOptions.level = "debug";
 
 const basePath = config.basePath;
 const projectPath = path.resolve(basePath, "..", "..", "..", "..", "..");
-const wasmPath = path.resolve(projectPath, "build", "wasm")
+const wasmPath = path.resolve(projectPath, "build", "out", "Release-wasm-wasm")
 
-const debug = message => console.log(`[karma-config] ${message}`); 
+const debug = message => console.log(`[karma-config] ${message}`);
 
 debug(`karma basePath: ${basePath}`);
 debug(`karma wasmPath: ${wasmPath}`);
