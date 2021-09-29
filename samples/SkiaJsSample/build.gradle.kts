@@ -1,7 +1,7 @@
-import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
-
 plugins {
-    kotlin("multiplatform") version "1.5.31"
+    // Cannot move to 1.5.31 due to
+    // "Cannot change attributes of dependency configuration ':commonTestApiDependenciesMetadata' after it has been resolved"
+    kotlin("multiplatform") version "1.5.20"
 }
 
 repositories {
@@ -33,7 +33,6 @@ tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().configureEach 
     dependsOn(unzipTask)
 }
 
-
 kotlin {
 
     js(IR) {
@@ -58,7 +57,7 @@ kotlin {
 
 // a temporary workaround for a bug in jsRun invocation - see https://youtrack.jetbrains.com/issue/KT-48273
 afterEvaluate {
-    extensions.configure<NodeJsRootExtension> {
+    extensions.configure<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension> {
         versions.webpackDevServer.version = "4.0.0"
     }
 }

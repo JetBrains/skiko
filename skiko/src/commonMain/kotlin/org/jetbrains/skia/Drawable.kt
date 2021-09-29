@@ -1,4 +1,3 @@
-@file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
@@ -116,16 +115,15 @@ abstract class Drawable : RefCnt(Drawable_nMake()) {
         onDraw(Canvas(canvasPtr, false, this))
     }
 
-    @ExternalSymbolName("org_jetbrains_skia_Drawable__1nInit")
-    external fun _nInit(ptr: NativePointer)
-
     init {
         Stats.onNativeCall()
         Stats.onNativeCall()
-        _nInit(_ptr)
+        Drawable_nInit(this, _ptr)
     }
 }
 
+@ExternalSymbolName("org_jetbrains_skia_Drawable__1nInit")
+private external fun Drawable_nInit(drawable: Drawable, ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Drawable__1nMake")
 private external fun Drawable_nMake(): NativePointer

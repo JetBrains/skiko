@@ -12,7 +12,7 @@ plugins {
     id("de.undercouch.download") version "4.1.1"
 }
 
-val coroutinesVersion = "1.5.0"
+val coroutinesVersion = "1.5.2"
 
 fun targetSuffix(os: OS, arch: Arch): String {
     return "${os.id}_${arch.id}"

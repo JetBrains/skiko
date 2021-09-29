@@ -1,6 +1,5 @@
 package org.jetbrains.skia
 
-
 enum class MipmapMode {
     /**
      * ignore mipmap levels, sample from the "base"

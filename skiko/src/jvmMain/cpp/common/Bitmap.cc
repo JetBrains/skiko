@@ -202,7 +202,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_BitmapKt__1nErase
     instance->erase(color, {left, top, right, bottom});
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BitmapKt__1nGetColor
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BitmapKt_Bitmap_1nGetColor
   (JNIEnv* env, jclass jclass, jlong ptr, jint x, jint y) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(ptr));
     return instance->getColor(x, y);
