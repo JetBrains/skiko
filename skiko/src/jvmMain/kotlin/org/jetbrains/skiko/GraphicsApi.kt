@@ -5,7 +5,7 @@ import org.jetbrains.skiko.redrawer.WindowsOpenGLRedrawer
 import org.jetbrains.skiko.redrawer.LinuxOpenGLRedrawer
 
 enum class GraphicsApi {
-    UNKNOWN, SOFTWARE, OPENGL, DIRECT3D, VULKAN, METAL
+    UNKNOWN, SOFTWARE, DIRECT_SOFTWARE, OPENGL, DIRECT3D, VULKAN, METAL
 }
 
 enum class GpuPriority(val value: String) {

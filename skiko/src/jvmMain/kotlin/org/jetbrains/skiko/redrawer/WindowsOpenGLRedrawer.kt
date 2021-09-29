@@ -12,8 +12,11 @@ internal class WindowsOpenGLRedrawer(
 ) : Redrawer {
     private val device = layer.backedLayer.useDrawingSurfacePlatformInfo(::getDevice)
     private val context = createContext(device).also {
+        if (it == 0L) {
+            throw RenderException("Cannot create Windows GL context")
+        }
         makeCurrent(device, it)
-        if (it == 0L || !isVideoCardSupported(layer.renderApi)) {
+        if (!isVideoCardSupported(layer.renderApi)) {
             throw RenderException("Cannot create Windows GL context")
         }
     }
