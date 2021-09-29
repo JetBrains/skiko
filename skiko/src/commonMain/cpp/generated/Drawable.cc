@@ -22,7 +22,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Drawable__1nMake
 
 
 SKIKO_EXPORT void org_jetbrains_skia_Drawable__1nInit
-  (KNativePointer ptr) {
+  (KInteropPointer kthis, KNativePointer ptr) {
     TODO("implement org_jetbrains_skia_Drawable__1nInit");
 }
      

@@ -1,5 +1,3 @@
-@file:Suppress("NESTED_EXTERNAL_DECLARATION")
-
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
@@ -23,7 +21,7 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     fun set(r: Region?): Boolean {
         return try {
             Stats.onNativeCall()
-            _nSet(_ptr, getPtr(r))
+            Region_nSet(_ptr, getPtr(r))
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(r)
@@ -47,7 +45,7 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     val isComplex: Boolean
         get() = try {
             Stats.onNativeCall()
-            _nIsComplex(_ptr)
+            Region_nIsComplex(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -62,7 +60,7 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     fun computeRegionComplexity(): Int {
         return try {
             Stats.onNativeCall()
-            _nComputeRegionComplexity(_ptr)
+            Region_nComputeRegionComplexity(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -71,7 +69,7 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     fun getBoundaryPath(p: Path?): Boolean {
         return try {
             Stats.onNativeCall()
-            _nGetBoundaryPath(
+            Region_nGetBoundaryPath(
                 _ptr,
                 getPtr(p)
             )
@@ -84,7 +82,7 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     fun setEmpty(): Boolean {
         return try {
             Stats.onNativeCall()
-            _nSetEmpty(_ptr)
+            Region_nSetEmpty(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -93,7 +91,7 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     fun setRect(rect: IRect): Boolean {
         return try {
             Stats.onNativeCall()
-            _nSetRect(_ptr, rect.left, rect.top, rect.right, rect.bottom)
+            Region_nSetRect(_ptr, rect.left, rect.top, rect.right, rect.bottom)
         } finally {
             reachabilityBarrier(this)
         }
@@ -110,7 +108,7 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
             }
             Stats.onNativeCall()
             interopScope {
-                _nSetRects(_ptr, toInterop(arr))
+                Region_nSetRects(_ptr, toInterop(arr))
             }
         } finally {
             reachabilityBarrier(this)
@@ -120,7 +118,7 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     fun setRegion(r: Region?): Boolean {
         return try {
             Stats.onNativeCall()
-            _nSetRegion(_ptr, getPtr(r))
+            Region_nSetRegion(_ptr, getPtr(r))
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(r)
@@ -130,7 +128,7 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     fun setPath(path: Path?, clip: Region?): Boolean {
         return try {
             Stats.onNativeCall()
-            _nSetPath(
+            Region_nSetPath(
                 _ptr,
                 getPtr(path),
                 getPtr(clip)
@@ -145,7 +143,7 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     fun intersects(rect: IRect): Boolean {
         return try {
             Stats.onNativeCall()
-            _nIntersectsIRect(_ptr, rect.left, rect.top, rect.right, rect.bottom)
+            Region_nIntersectsIRect(_ptr, rect.left, rect.top, rect.right, rect.bottom)
         } finally {
             reachabilityBarrier(this)
         }
@@ -154,7 +152,7 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     fun intersects(r: Region?): Boolean {
         return try {
             Stats.onNativeCall()
-            _nIntersectsRegion(
+            Region_nIntersectsRegion(
                 _ptr,
                 getPtr(r)
             )
@@ -167,7 +165,7 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     fun contains(x: Int, y: Int): Boolean {
         return try {
             Stats.onNativeCall()
-            _nContainsIPoint(_ptr, x, y)
+            Region_nContainsIPoint(_ptr, x, y)
         } finally {
             reachabilityBarrier(this)
         }
@@ -176,7 +174,7 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     operator fun contains(rect: IRect): Boolean {
         return try {
             Stats.onNativeCall()
-            _nContainsIRect(_ptr, rect.left, rect.top, rect.right, rect.bottom)
+            Region_nContainsIRect(_ptr, rect.left, rect.top, rect.right, rect.bottom)
         } finally {
             reachabilityBarrier(this)
         }
@@ -185,7 +183,7 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     operator fun contains(r: Region?): Boolean {
         return try {
             Stats.onNativeCall()
-            _nContainsRegion(_ptr, getPtr(r))
+            Region_nContainsRegion(_ptr, getPtr(r))
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(r)
@@ -195,7 +193,7 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     fun quickContains(rect: IRect): Boolean {
         return try {
             Stats.onNativeCall()
-            _nQuickContains(_ptr, rect.left, rect.top, rect.right, rect.bottom)
+            Region_nQuickContains(_ptr, rect.left, rect.top, rect.right, rect.bottom)
         } finally {
             reachabilityBarrier(this)
         }
@@ -204,7 +202,7 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     fun quickReject(rect: IRect): Boolean {
         return try {
             Stats.onNativeCall()
-            _nQuickRejectIRect(_ptr, rect.left, rect.top, rect.right, rect.bottom)
+            Region_nQuickRejectIRect(_ptr, rect.left, rect.top, rect.right, rect.bottom)
         } finally {
             reachabilityBarrier(this)
         }
@@ -213,7 +211,7 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     fun quickReject(r: Region?): Boolean {
         return try {
             Stats.onNativeCall()
-            _nQuickRejectRegion(
+            Region_nQuickRejectRegion(
                 _ptr,
                 getPtr(r)
             )
@@ -226,7 +224,7 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     fun translate(dx: Int, dy: Int) {
         try {
             Stats.onNativeCall()
-            _nTranslate(_ptr, dx, dy)
+            Region_nTranslate(_ptr, dx, dy)
         } finally {
             reachabilityBarrier(this)
         }
@@ -235,7 +233,7 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     fun op(rect: IRect, op: Op): Boolean {
         return try {
             Stats.onNativeCall()
-            _nOpIRect(
+            Region_nOpIRect(
                 _ptr,
                 rect.left,
                 rect.top,
@@ -251,7 +249,7 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     fun op(r: Region?, op: Op): Boolean {
         return try {
             Stats.onNativeCall()
-            _nOpRegion(
+            Region_nOpRegion(
                 _ptr,
                 getPtr(r),
                 op.ordinal
@@ -265,7 +263,7 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     fun op(rect: IRect, r: Region?, op: Op): Boolean {
         return try {
             Stats.onNativeCall()
-            _nOpIRectRegion(
+            Region_nOpIRectRegion(
                 _ptr,
                 rect.left,
                 rect.top,
@@ -283,7 +281,7 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     fun op(r: Region?, rect: IRect, op: Op): Boolean {
         return try {
             Stats.onNativeCall()
-            _nOpRegionIRect(
+            Region_nOpRegionIRect(
                 _ptr,
                 getPtr(r),
                 rect.left,
@@ -301,7 +299,7 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     fun op(a: Region?, b: Region?, op: Op): Boolean {
         return try {
             Stats.onNativeCall()
-            _nOpRegionRegion(
+            Region_nOpRegionRegion(
                 _ptr,
                 getPtr(a),
                 getPtr(b),
@@ -340,67 +338,67 @@ private external fun Region_nIsRect(ptr: NativePointer): Boolean
 private external fun Region_nGetBounds(ptr: NativePointer): IRect
 
 @ExternalSymbolName("org_jetbrains_skia_Region__1nSet")
-private external fun _nSet(ptr: NativePointer, regoinPtr: NativePointer): Boolean
+private external fun Region_nSet(ptr: NativePointer, regoinPtr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Region__1nIsComplex")
-private external fun _nIsComplex(ptr: NativePointer): Boolean
+private external fun Region_nIsComplex(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Region__1nComputeRegionComplexity")
-private external fun _nComputeRegionComplexity(ptr: NativePointer): Int
+private external fun Region_nComputeRegionComplexity(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Region__1nGetBoundaryPath")
-private external fun _nGetBoundaryPath(ptr: NativePointer, pathPtr: NativePointer): Boolean
+private external fun Region_nGetBoundaryPath(ptr: NativePointer, pathPtr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Region__1nSetEmpty")
-private external fun _nSetEmpty(ptr: NativePointer): Boolean
+private external fun Region_nSetEmpty(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Region__1nSetRect")
-private external fun _nSetRect(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int): Boolean
+private external fun Region_nSetRect(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Region__1nSetRects")
-private external fun _nSetRects(ptr: NativePointer, rects: InteropPointer): Boolean
+private external fun Region_nSetRects(ptr: NativePointer, rects: InteropPointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Region__1nSetRegion")
-private external fun _nSetRegion(ptr: NativePointer, regionPtr: NativePointer): Boolean
+private external fun Region_nSetRegion(ptr: NativePointer, regionPtr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Region__1nSetPath")
-private external fun _nSetPath(ptr: NativePointer, pathPtr: NativePointer, regionPtr: NativePointer): Boolean
+private external fun Region_nSetPath(ptr: NativePointer, pathPtr: NativePointer, regionPtr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Region__1nIntersectsIRect")
-private external fun _nIntersectsIRect(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int): Boolean
+private external fun Region_nIntersectsIRect(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Region__1nIntersectsRegion")
-private external fun _nIntersectsRegion(ptr: NativePointer, regionPtr: NativePointer): Boolean
+private external fun Region_nIntersectsRegion(ptr: NativePointer, regionPtr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Region__1nContainsIPoint")
-private external fun _nContainsIPoint(ptr: NativePointer, x: Int, y: Int): Boolean
+private external fun Region_nContainsIPoint(ptr: NativePointer, x: Int, y: Int): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Region__1nContainsIRect")
-private external fun _nContainsIRect(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int): Boolean
+private external fun Region_nContainsIRect(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Region__1nContainsRegion")
-private external fun _nContainsRegion(ptr: NativePointer, regionPtr: NativePointer): Boolean
+private external fun Region_nContainsRegion(ptr: NativePointer, regionPtr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Region__1nQuickContains")
-private external fun _nQuickContains(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int): Boolean
+private external fun Region_nQuickContains(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Region__1nQuickRejectIRect")
-private external fun _nQuickRejectIRect(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int): Boolean
+private external fun Region_nQuickRejectIRect(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Region__1nQuickRejectRegion")
-private external fun _nQuickRejectRegion(ptr: NativePointer, regionPtr: NativePointer): Boolean
+private external fun Region_nQuickRejectRegion(ptr: NativePointer, regionPtr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Region__1nTranslate")
-private external fun _nTranslate(ptr: NativePointer, dx: Int, dy: Int)
+private external fun Region_nTranslate(ptr: NativePointer, dx: Int, dy: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Region__1nOpIRect")
-private external fun _nOpIRect(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int, op: Int): Boolean
+private external fun Region_nOpIRect(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int, op: Int): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Region__1nOpRegion")
-private external fun _nOpRegion(ptr: NativePointer, regionPtr: NativePointer, op: Int): Boolean
+private external fun Region_nOpRegion(ptr: NativePointer, regionPtr: NativePointer, op: Int): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Region__1nOpIRectRegion")
-private external fun _nOpIRectRegion(
+private external fun Region_nOpIRectRegion(
     ptr: NativePointer,
     left: Int,
     top: Int,
@@ -412,7 +410,7 @@ private external fun _nOpIRectRegion(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Region__1nOpRegionIRect")
-private external fun _nOpRegionIRect(
+private external fun Region_nOpRegionIRect(
     ptr: NativePointer,
     regionPtr: NativePointer,
     left: Int,
@@ -424,7 +422,7 @@ private external fun _nOpRegionIRect(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Region__1nOpRegionRegion")
-private external fun _nOpRegionRegion(
+private external fun Region_nOpRegionRegion(
     ptr: NativePointer,
     regionPtrA: NativePointer,
     regionPtrB: NativePointer,

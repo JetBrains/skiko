@@ -1,4 +1,3 @@
-@file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
@@ -255,7 +254,7 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
 
         fun make(info: ImageInfo, addr: NativePointer, rowBytes: Int): Pixmap {
             return try {
-                val ptr = _nMake(
+                val ptr = Pixmap_nMake(
                     info.width, info.height,
                     info.colorInfo.colorType.ordinal,
                     info.colorInfo.alphaType.ordinal,
@@ -299,7 +298,7 @@ private external fun Pixmap_nGetColor(ptr: NativePointer, x: Int, y: Int): Int
 private external fun _nMakeNull(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nMake")
-private external fun _nMake(
+private external fun Pixmap_nMake(
     width: Int,
     height: Int,
     colorType: Int,
@@ -308,7 +307,6 @@ private external fun _nMake(
     pixelsPtr: NativePointer,
     rowBytes: Int
 ): NativePointer
-
 
 @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nResetWithInfo")
 private external fun _nResetWithInfo(

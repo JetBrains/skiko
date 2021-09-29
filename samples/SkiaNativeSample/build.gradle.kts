@@ -1,5 +1,5 @@
 plugins {
-    kotlin("multiplatform") version "1.5.21"
+    kotlin("multiplatform") version "1.5.31"
 }
 
 repositories {
@@ -65,6 +65,7 @@ kotlin {
         val macosX64Main by getting {
             dependsOn(nativeMain)
             dependencies {
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-macosx64:1.5.2")
                 implementation("org.jetbrains.skiko:skiko-native-runtime-$target:$version")
             }
         }

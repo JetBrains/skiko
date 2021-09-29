@@ -17,7 +17,7 @@ extern "C" {
         return ptrToJlong(new SkPixmap());
     }
 
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PixmapKt__1nMake
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PixmapKt_Pixmap_1nMake
       (JNIEnv *env, jclass klass,
       jint width, jint height, jint colorType, jint alphaType, jlong colorSpacePtr, jlong pixelsPtr, jint rowBytes) {
         SkColorSpace* colorSpace = jlongToPtr<SkColorSpace*>(colorSpacePtr);
