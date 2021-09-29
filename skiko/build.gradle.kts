@@ -105,6 +105,10 @@ val wasmCrossCompile = tasks.register<WasmCrossCompileTask>("wasmCrossCompile") 
     sourceFiles =
         project.fileTree("src/jsMain/cpp") { include("**/*.cc") } +
         project.fileTree("src/commonMain/cpp") { include("**/*.cc") }
+    if (skiko.includeTestHelpers) {
+        sourceFiles += project.fileTree("src/commonTest/cpp") { include("**/*.cc") }
+    }
+
     val skiaAFilesDir = unpackedSkia.resolve("out/${buildType.id}-${osArch.first.id}-${osArch.second.id}")
     libFiles = project.fileTree(skiaAFilesDir)  { include("**/*.a") }
 
@@ -126,6 +130,17 @@ val wasmCrossCompile = tasks.register<WasmCrossCompileTask>("wasmCrossCompile") 
         "--extern-post-js",
         skikoJsPrefix.get().asFile.absolutePath,
     ))
+
+    finalizedBy(replaceSymbolsInSkikoJsOutput)
+}
+
+val replaceSymbolsInSkikoJsOutput by project.tasks.registering {
+    doLast {
+        val wasmTask = project.tasks.getByName("wasmCrossCompile") as WasmCrossCompileTask
+        val skikoJsFile: File = wasmTask.outDir.asFile.get().resolve("skiko.js")
+        val replacedContent = skikoJsFile.readText().replace("_org_jetbrains", "org_jetbrains")
+        skikoJsFile.writeText(replacedContent)
+    }
 }
 
 val skiaDir: Provider<File> = run {
@@ -239,6 +254,9 @@ kotlin {
             }
             val macosX64Main by getting {
                 dependsOn(macosMain)
+                dependencies {
+                    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
+                }
             }
         }
     }
@@ -418,10 +436,12 @@ val generateVersion = project.tasks.register("generateVersion") {
 // resulting object files into the final native klib.
 project.tasks.register<Exec>("nativeBridgesCompile") {
     dependsOn(skiaDir)
-    val inputDirs = listOf(
+    val inputDirs = mutableListOf(
         "$projectDir/src/nativeMain/cpp/common",
         "$projectDir/src/commonMain/cpp"
-    )
+    ).apply {
+        if (skiko.includeTestHelpers) add("$projectDir/src/commonTest/cpp/TestHelpers.cc")
+    }
     val outDir = "$buildDir/nativeBridges/obj/$target"
     val srcs = inputDirs
         .findAllFiles(".cc")
@@ -600,10 +620,15 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
 }
 
 extensions.configure<CppLibrary> {
-    source.from(
+    val paths = mutableListOf(
         fileTree("$projectDir/src/jvmMain/cpp/common"),
         fileTree("$projectDir/src/jvmMain/cpp/${targetOs.id}")
-    )
+    ).apply {
+        if (skiko.includeTestHelpers) {
+            add(fileTree("$projectDir/src/jvmTest/cpp/TestHelpers.cc"))
+        }
+    }
+    source.setFrom(paths)
 }
 
 library {
@@ -878,13 +903,18 @@ publishing {
 }
 
 afterEvaluate {
-    tasks.withType<KotlinCompile>().configureEach {
+    tasks.withType<KotlinCompile>().configureEach { // this one is actually KotlinJvmCompile
         dependsOn(generateVersion)
         source(generatedKotlin)
 
         if (name == "compileTestKotlinJvm") {
             kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
         }
+    }
+    tasks.withType<KotlinNativeCompile>().configureEach {
+        dependsOn(generateVersion)
+        source(generatedKotlin)
+
         if (supportNative) {
             dependsOn(tasks.getByName("nativeBridgesLink"))
         }
