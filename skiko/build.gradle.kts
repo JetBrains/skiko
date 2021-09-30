@@ -127,20 +127,11 @@ val wasmCrossCompile = tasks.register<WasmCrossCompileTask>("wasmCrossCompile") 
         "-l", "GL",
         "-s", "OFFSCREEN_FRAMEBUFFER=1",
         "-DSK_SUPPORT_GPU=1",
-        "--extern-post-js",
-        skikoJsPrefix.get().asFile.absolutePath,
-    ))
+        "--extern-post-js", skikoJsPrefix.get().asFile.absolutePath,
+        "--js-transform", "node postprocess.js",
+        ))
 
-    finalizedBy(replaceSymbolsInSkikoJsOutput)
-}
-
-val replaceSymbolsInSkikoJsOutput by project.tasks.registering {
-    doLast {
-        val wasmTask = project.tasks.getByName("wasmCrossCompile") as WasmCrossCompileTask
-        val skikoJsFile: File = wasmTask.outDir.asFile.get().resolve("skiko.js")
-        val replacedContent = skikoJsFile.readText().replace("_org_jetbrains", "org_jetbrains")
-        skikoJsFile.writeText(replacedContent)
-    }
+    inputs.file("postprocess.js")
 }
 
 val skiaDir: Provider<File> = run {
@@ -730,7 +721,6 @@ val skikoWasmJar by project.tasks.registering(Jar::class) {
 
     from(wasmOutDir) {
         include("*.js")
-        filter { line -> line.replace("_org_jetbrains_", "org_jetbrains_") }
     }
 
     archiveBaseName.set("skiko-wasm")
