@@ -5,9 +5,13 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import org.gradle.process.ExecOperations
+import org.gradle.work.ChangeType
+import org.gradle.work.FileChange
 import org.gradle.work.Incremental
+import org.gradle.work.InputChanges
 import java.io.File
 import java.util.LinkedHashSet
+import java.util.concurrent.Callable
 import javax.inject.Inject
 
 abstract class CrossCompileTask : DefaultTask() {
@@ -44,8 +48,9 @@ abstract class CrossCompileTask : DefaultTask() {
      */
     @Suppress("UNUSED")
     @get:InputFiles
-    val headerFiles: FileCollection
-        get() {
+    @get:Incremental
+    val headerFiles: FileCollection =
+        project.files(Callable {
             fun File.isHeaderFile(): Boolean =
                 isFile && name.endsWith(".h", ignoreCase = true)
 
@@ -58,8 +63,8 @@ abstract class CrossCompileTask : DefaultTask() {
                     }
                 }
             }
-            return project.files(headers)
-        }
+            headers
+        })
 
     @get:Internal
     internal val headersDirs = LinkedHashSet<File>()
@@ -71,16 +76,64 @@ abstract class CrossCompileTask : DefaultTask() {
     }
 
     @TaskAction
-    open fun run() {
+    open fun run(inputChanges: InputChanges) {
         execOperations.exec {
+            val sourcesToCompile = determineSourcesToCompile(inputChanges)
             executable = compiler.get()
             args = arrayListOf<String>().also { args ->
                 configureCompilerArgs(args)
+                args.addAll(sourcesToCompile.map { it.absolutePath })
             }
 
             workingDir = outDir.get().asFile
             // todo: log args to file system
         }
+    }
+
+    private sealed class Mode {
+        class Incremental(val changes: Iterable<FileChange>) : Mode()
+        class NonIncremental(val reason: String) : Mode()
+    }
+
+    private fun determineSourcesToCompile(inputChanges: InputChanges): Collection<File> {
+        val compilationMode = analyzeIncrementalChanges(inputChanges)
+        val outDir = outDir.get().asFile
+        return when (compilationMode) {
+            is Mode.Incremental -> {
+                val sourcesToCompile = arrayListOf<File>()
+                for (change in compilationMode.changes) {
+                    val outdatedOutputFile = outDir.resolve(change.file.nameWithoutExtension + ".o")
+                    if (outdatedOutputFile.exists()) {
+                        // `outdatedOutputFile` might not exist,
+                        // when `change.file` is a new file, which was not compiled
+                        // todo: log in verbose mode
+                        outdatedOutputFile.delete()
+                    }
+                    if (change.changeType != ChangeType.REMOVED) {
+                        sourcesToCompile.add(change.file)
+                    }
+                }
+                logger.warn("Compiling ${sourcesToCompile.size} files incrementally")
+                sourcesToCompile
+            }
+            is Mode.NonIncremental -> {
+                outDir.deleteRecursively()
+                outDir.mkdirs()
+                logger.warn("Recompiling all files: ${compilationMode.reason}")
+                sourceFiles.files
+            }
+        }
+    }
+    private fun analyzeIncrementalChanges(inputChanges: InputChanges): Mode {
+        if (!inputChanges.isIncremental) {
+            return Mode.NonIncremental("input changes are not incremental")
+        }
+
+        if (inputChanges.getFileChanges(headerFiles).any()) {
+            return Mode.NonIncremental("header files are modified or removed")
+        }
+
+        return Mode.Incremental(inputChanges.getFileChanges(sourceFiles))
     }
 
     open fun configureCompilerArgs(args: MutableList<String>) {
@@ -94,7 +147,5 @@ abstract class CrossCompileTask : DefaultTask() {
         val bt = buildVariant.get()
         args.addAll(bt.flags)
         args.addAll(bt.clangFlags)
-
-        args.addAll(sourceFiles.map { it.absolutePath })
     }
 }
