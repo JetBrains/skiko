@@ -146,15 +146,17 @@ val linkWasm = tasks.register<LinkWasmTask>("linkWasm") {
         "-s", "OFFSCREEN_FRAMEBUFFER=1",
     ))
 
-    finalizedBy(replaceSymbolsInSkikoJsOutput)
-}
-
-val replaceSymbolsInSkikoJsOutput by project.tasks.registering {
     doLast {
-        val wasmTask = project.tasks.getByName("wasmCrossCompile") as WasmCrossCompileTask
-        val skikoJsFile: File = wasmTask.outDir.asFile.get().resolve("skiko.js")
-        val replacedContent = skikoJsFile.readText().replace("_org_jetbrains", "org_jetbrains")
-        skikoJsFile.writeText(replacedContent)
+        // skiko.js file is directly referenced in karma.config.d/wasm.js
+        // so symbols must be replaced right after linking
+        val jsFiles = outDir.asFile.get().walk()
+            .filter { it.isFile && it.name.endsWith(".js") }
+
+        for (jsFile in jsFiles) {
+            val originalContent = jsFile.readText()
+            val newContent = originalContent.replace("_org_jetbrains", "org_jetbrains")
+            jsFile.writeText(newContent)
+        }
     }
 }
 
@@ -733,11 +735,7 @@ val skikoWasmJar by project.tasks.registering(Jar::class) {
 
     from(wasmOutDir) {
         include("*.wasm")
-    }
-
-    from(wasmOutDir) {
         include("*.js")
-        filter { line -> line.replace("_org_jetbrains_", "org_jetbrains_") }
     }
 
     archiveBaseName.set("skiko-wasm")
