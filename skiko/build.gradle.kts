@@ -186,7 +186,6 @@ kotlin {
                 }
             }
         }
-        binaries.executable()
     }
 
     if (supportNative) {
