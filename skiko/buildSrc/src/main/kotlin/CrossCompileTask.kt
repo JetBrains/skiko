@@ -1,18 +1,22 @@
 import org.gradle.api.DefaultTask
-import org.gradle.api.file.*
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import org.gradle.process.ExecOperations
-
-import javax.inject.Inject
-
+import org.gradle.work.Incremental
 import java.io.File
 import java.util.LinkedHashSet
+import javax.inject.Inject
 
-abstract class WasmCrossCompileTask : DefaultTask() {
+abstract class CrossCompileTask : DefaultTask() {
     @get:Inject
     abstract val execOperations: ExecOperations
+
+    @get:Input
+    @get:Optional
+    abstract val targetOs: Property<OS>
 
     @get:Input
     abstract val targetArch: Property<Arch>
@@ -24,28 +28,14 @@ abstract class WasmCrossCompileTask : DefaultTask() {
     abstract val flags: ListProperty<String>
 
     @get:InputFiles
+    @get:Incremental
     lateinit var sourceFiles: FileCollection
-
-    @get:InputFiles
-    lateinit var libFiles: FileCollection
-
-    @get:Optional
-    @get:Input
-    abstract val wasmFileName: Property<String>
-
-    @get:Optional
-    @get:Input
-    abstract val jsFileName: Property<String>
 
     @get:OutputDirectory
     abstract val outDir: DirectoryProperty
 
-    @get:InputFile
-    @get:Optional
-    abstract val skikoJsPrefix: RegularFileProperty
-
     @get:Input
-    var compiler: String = "emcc"
+    abstract val compiler: Property<String>
 
     /**
      * Used only for up-to-date checks of headers' content
@@ -81,24 +71,30 @@ abstract class WasmCrossCompileTask : DefaultTask() {
     }
 
     @TaskAction
-    fun exec() {
+    open fun run() {
         execOperations.exec {
-            executable = compiler
-            val args = argumentProviders
-
-            args.add { headersDirs.map { "-I${it.absolutePath}" } }
-
-            args.add {
-                // todo: ensure that flags do not start with '-I' (all headers should be added via [headersDirs])
-                val bt = buildVariant.get()
-                (flags.get() + targetArch.get().clangFlags + bt.flags + bt.clangFlags).asIterable()
+            executable = compiler.get()
+            args = arrayListOf<String>().also { args ->
+                configureCompilerArgs(args)
             }
 
-            args.add { sourceFiles.files.map { it.absolutePath } }
-            args.add { libFiles.files.map { it.absolutePath } }
-
-            args.add { listOf("-o", outDir.resolveToAbsolutePath(wasmFileName)) }
-            args.add { listOf("-o", outDir.resolveToAbsolutePath(jsFileName)) }
+            workingDir = outDir.get().asFile
+            // todo: log args to file system
         }
+    }
+
+    open fun configureCompilerArgs(args: MutableList<String>) {
+        args.add("-c")
+        args.addAll(headersDirs.map { "-I${it.absolutePath}" })
+
+        // todo: ensure that flags do not start with '-I' (all headers should be added via [headersDirs])
+        args.addAll(flags.get())
+        args.addAll(targetOs.orNull?.clangFlags ?: arrayOf())
+        args.addAll(targetArch.get().clangFlags)
+        val bt = buildVariant.get()
+        args.addAll(bt.flags)
+        args.addAll(bt.clangFlags)
+
+        args.addAll(sourceFiles.map { it.absolutePath })
     }
 }

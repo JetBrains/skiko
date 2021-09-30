@@ -94,13 +94,14 @@ val skiaDirProviderForCrossTargets: Map<Pair<OS, Arch>, Provider<File>> = crossT
     }
 }
 
-val wasmCrossCompile = tasks.register<WasmCrossCompileTask>("wasmCrossCompile") {
+val wasmCrossCompile = tasks.register<CrossCompileTask>("wasmCrossCompile") {
     val osArch = OS.Wasm to Arch.Wasm
 
     val unzipper = skiaDirProviderForCrossTargets[osArch]!!
     dependsOn(unzipper)
     val unpackedSkia = unzipper.get()
 
+    compiler.set("emcc")
     targetArch.set(osArch.second)
     buildVariant.set(buildType)
 
@@ -110,27 +111,39 @@ val wasmCrossCompile = tasks.register<WasmCrossCompileTask>("wasmCrossCompile") 
     if (skiko.includeTestHelpers) {
         sourceFiles += project.fileTree("src/commonTest/cpp") { include("**/*.cc") }
     }
-
-    val skiaAFilesDir = unpackedSkia.resolve("out/${buildType.id}-${osArch.first.id}-${osArch.second.id}")
-    libFiles = project.fileTree(skiaAFilesDir)  { include("**/*.a") }
-
-    outDir.set(project.layout.buildDirectory.dir("out/${buildType.id}-${osArch.first.id}-${osArch.second.id}"))
-    wasmFileName.set("skiko.wasm")
-    jsFileName.set("skiko.js")
-
-    skikoJsPrefix.set(project.layout.projectDirectory.file("src/jsMain/resources/setup.js"))
+    outDir.set(project.layout.buildDirectory.dir("out/compile/${buildType.id}-${osArch.first.id}-${osArch.second.id}"))
 
     includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp"))
     includeHeadersNonRecursive(skiaHeadersDirs(unpackedSkia))
 
     flags.set(listOf(
         *skiaPreprocessorFlags(),
-        "-s", "USE_WEBGL2=1",
+        "-DSK_SUPPORT_GPU=1"
+    ))
+}
+
+val linkWasm = tasks.register<LinkWasmTask>("linkWasm") {
+    val osArch = OS.Wasm to Arch.Wasm
+
+    dependsOn(wasmCrossCompile)
+
+    val unzipper = skiaDirProviderForCrossTargets[osArch]!!
+    dependsOn(unzipper)
+    val unpackedSkia = unzipper.get()
+
+    libFiles = project.fileTree(unpackedSkia)  { include("**/*.a") }
+    objectFiles = project.fileTree(wasmCrossCompile.map { it.outDir.get() }) { include("**/*.o") }
+
+    wasmFileName.set("skiko.wasm")
+    jsFileName.set("skiko.js")
+
+    skikoJsPrefix.set(project.layout.projectDirectory.file("src/jsMain/resources/setup.js"))
+    outDir.set(project.layout.buildDirectory.dir("out/link/${buildType.id}-${osArch.first.id}-${osArch.second.id}"))
+
+    flags.set(listOf(
         "-l", "GL",
+        "-s", "USE_WEBGL2=1",
         "-s", "OFFSCREEN_FRAMEBUFFER=1",
-        "-DSK_SUPPORT_GPU=1",
-        "--extern-post-js",
-        skikoJsPrefix.get().asFile.absolutePath,
     ))
 
     finalizedBy(replaceSymbolsInSkikoJsOutput)
@@ -182,7 +195,7 @@ kotlin {
         browser() {
             testTask {
                 testLogging.showStandardStreams = true
-                dependsOn(wasmCrossCompile)
+                dependsOn(linkWasm)
                 useKarma {
                     useChromeHeadless()
                 }
@@ -722,9 +735,9 @@ val skikoJvmRuntimeJar by project.tasks.registering(Jar::class) {
 }
 
 val skikoWasmJar by project.tasks.registering(Jar::class) {
-    dependsOn(wasmCrossCompile)
+    dependsOn(linkWasm)
     // We produce jar that contains .js of wrapper/bindings and .wasm with Skia + bindings.
-    val wasmOutDir = wasmCrossCompile.map { it.outDir }
+    val wasmOutDir = linkWasm.map { it.outDir }
 
     from(wasmOutDir) {
         include("*.wasm")
