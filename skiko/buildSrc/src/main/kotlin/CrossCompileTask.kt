@@ -20,10 +20,10 @@ abstract class CrossCompileTask : DefaultTask() {
 
     @get:Input
     @get:Optional
-    abstract val targetOs: Property<OS>
+    abstract val crossCompileTargetOS: Property<OS>
 
     @get:Input
-    abstract val targetArch: Property<Arch>
+    abstract val crossCompileTargetArch: Property<Arch>
 
     @get:Input
     abstract val buildVariant: Property<SkiaBuildType>
@@ -142,8 +142,8 @@ abstract class CrossCompileTask : DefaultTask() {
 
         // todo: ensure that flags do not start with '-I' (all headers should be added via [headersDirs])
         args.addAll(flags.get())
-        args.addAll(targetOs.orNull?.clangFlags ?: arrayOf())
-        args.addAll(targetArch.get().clangFlags)
+        args.addAll(crossCompileTargetOS.orNull?.clangFlags ?: arrayOf())
+        args.addAll(crossCompileTargetArch.get().clangFlags)
         val bt = buildVariant.get()
         args.addAll(bt.flags)
         args.addAll(bt.clangFlags)

@@ -102,7 +102,7 @@ val wasmCrossCompile = tasks.register<CrossCompileTask>("wasmCrossCompile") {
     val unpackedSkia = unzipper.get()
 
     compiler.set("emcc")
-    targetArch.set(osArch.second)
+    crossCompileTargetArch.set(osArch.second)
     buildVariant.set(buildType)
 
     sourceFiles =
@@ -451,42 +451,34 @@ val generateVersion = project.tasks.register("generateVersion") {
 
 // Very hacky way to compile native bridges and add the
 // resulting object files into the final native klib.
-project.tasks.register<Exec>("nativeBridgesCompile") {
+project.tasks.register<CrossCompileTask>("nativeBridgesCompile") {
     dependsOn(skiaDir)
-    val inputDirs = mutableListOf(
-        "$projectDir/src/nativeMain/cpp/common",
-        "$projectDir/src/commonMain/cpp"
-    ).apply {
-        if (skiko.includeTestHelpers) add("$projectDir/src/commonTest/cpp/TestHelpers.cc")
-    }
-    val outDir = "$buildDir/nativeBridges/obj/$target"
-    val srcs = inputDirs
-        .findAllFiles(".cc")
-        .toTypedArray()
-    val outs = srcs
-        .map { it.substringAfterLast("/") }
-        .map { File(it).nameWithoutExtension }
-        .map { "$outDir/$it.o" }
-        .toTypedArray()
 
-    workingDir = File(outDir)
-    commandLine = listOf(
-        "clang++",
-        *targetArch.clangFlags,
-        *targetOs.clangFlags,
-        *buildType.clangFlags,
+    compiler.set("clang++")
+    crossCompileTargetOS.set(targetOs)
+    crossCompileTargetArch.set(targetArch)
+    buildVariant.set(buildType)
+
+    sourceFiles =
+        project.fileTree("src/nativeMain/cpp") { include("**/*.cc") } +
+                project.fileTree("src/commonMain/cpp") { include("**/*.cc") }
+    if (skiko.includeTestHelpers) {
+        sourceFiles += project.fileTree("src/commonTest/cpp") { include("**/*.cc") }
+    }
+
+    outDir.set(project.layout.buildDirectory.dir("nativeBridges/obj/$target"))
+
+    includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp"))
+    includeHeadersNonRecursive(skiaHeadersDirs(skiaDir.get()))
+
+    flags.set(listOf(
+        // todo: commonize
         "-c",
         "-DSK_SHAPER_CORETEXT_AVAILABLE",
         "-DSK_BUILD_FOR_MAC",
         "-DSK_METAL",
-        "-I$projectDir/src/commonMain/cpp",
-        *includeHeadersFlags(skiaHeadersDirs(skiaDir.get())),
         *skiaPreprocessorFlags(),
-        *srcs
-    )
-    file(outDir).mkdirs()
-    inputs.files(srcs)
-    outputs.files(outs)
+    ))
 }
 
 project.tasks.register<Exec>("nativeBridgesLink") {
