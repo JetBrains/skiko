@@ -89,8 +89,7 @@ jobs:
            ./emsdk activate 2.0.29
            source ./emsdk_env.sh
            cd ..
-           ./gradlew -Pskiko.wasm.enabled=true jsTest
-           ./gradlew -Pskiko.wasm.enabled=true publishSkikoWasmRuntimePublicationToMavenLocal
+           ./gradlew -Pskiko.wasm.enabled=true compileKotlinJs jsTest publishSkikoWasmRuntimePublicationToMavenLocal
    windows:
     runs-on: windows-2019
     steps:
