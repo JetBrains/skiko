@@ -62,6 +62,8 @@ val skiaCrossDownloadTasks: Map<Pair<OS, Arch>, Provider<File>> = crossTargets.k
     val out = skiko.dependenciesDir.resolve("skia/skia-$suffix.zip")
 
     tasks.register<Download>("skiaCrossDownload$suffix") {
+        onlyIf { skiko.skiaDir == null && !out.exists() }
+
         val release = skiko.skiaReleaseFor(osArch.first, osArch.second, buildType)
         src("https://github.com/JetBrains/skia-pack/releases/download/$release.zip")
         dest(out.absolutePath)
