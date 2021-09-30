@@ -236,6 +236,8 @@ kotlin {
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
                 implementation(kotlin("test-junit"))
+
+                implementation(kotlin("test"))
             }
         }
 
