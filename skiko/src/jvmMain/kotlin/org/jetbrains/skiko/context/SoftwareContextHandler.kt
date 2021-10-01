@@ -16,7 +16,7 @@ import java.awt.image.Raster
 import java.awt.image.WritableRaster
 
 internal class SoftwareContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
-    override val bleachConstant = -1 // it looks like java.awt.Canvas doesn't support transparency
+    override val clearColor = 0 // it looks like java.awt.Canvas doesn't support transparency
 
     val colorModel = ComponentColorModel(
         ColorSpace.getInstance(ColorSpace.CS_sRGB),

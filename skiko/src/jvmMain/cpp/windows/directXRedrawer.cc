@@ -4,6 +4,7 @@
 #include <jawt_md.h>
 #include "jni_helpers.h"
 #include "exceptions_handler.h"
+#include "window_util.h"
 
 #include "GrBackendSurface.h"
 #include "GrDirectContext.h"
@@ -289,7 +290,7 @@ extern "C"
     }
 
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_createDirectXDevice(
-        JNIEnv *env, jobject redrawer, jint adapterPriority, jlong contentHandle)
+        JNIEnv *env, jobject redrawer, jint adapterPriority, jlong contentHandle, jboolean transparency)
     {
         gr_cp<IDXGIFactory4> deviceFactory;
         if (!SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&deviceFactory))))
@@ -328,6 +329,14 @@ extern "C"
         d3dDevice->device = device;
         d3dDevice->queue = queue;
         d3dDevice->window = (HWND)contentHandle;
+
+        if (transparency)
+        {
+            //TODO: curent swapChain does not support transparency
+            return 0;
+            // HWND wnd = GetAncestor(d3dDevice->window, GA_PARENT);
+            // enableTransparentWindow(wnd);
+        }
 
         return toJavaPointer(d3dDevice);
     }

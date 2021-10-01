@@ -11,7 +11,7 @@ internal class WindowsOpenGLRedrawer(
     private val properties: SkiaLayerProperties
 ) : Redrawer {
     private val device = layer.backedLayer.useDrawingSurfacePlatformInfo(::getDevice)
-    private val context = createContext(device).also {
+    private val context = createContext(device, layer.contentHandle, layer.transparency).also {
         if (it == 0L) {
             throw RenderException("Cannot create Windows GL context")
         }
@@ -112,7 +112,7 @@ internal class WindowsOpenGLRedrawer(
 
 private external fun makeCurrent(device: Long, context: Long)
 private external fun getDevice(platformInfo: Long): Long
-private external fun createContext(device: Long): Long
+private external fun createContext(device: Long, contentHandle:Long, transparency: Boolean): Long
 private external fun deleteContext(context: Long)
 private external fun setSwapInterval(interval: Int)
 private external fun swapBuffers(device: Long)

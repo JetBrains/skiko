@@ -6,15 +6,13 @@ import org.jetbrains.skia.DirectContext
 import org.jetbrains.skia.Picture
 import org.jetbrains.skia.Surface
 import org.jetbrains.skiko.GraphicsApi
-import org.jetbrains.skiko.OS
 import org.jetbrains.skiko.SkiaLayer
-import org.jetbrains.skiko.hostOs
 import org.jetbrains.skiko.hostFullName
 import org.jetbrains.skiko.javaLocation
 import org.jetbrains.skiko.javaVendor
 
 internal abstract class ContextHandler(val layer: SkiaLayer) {
-    open val bleachConstant = if (hostOs == OS.MacOS) 0 else -1
+    open val clearColor = 0 //transparent
     var context: DirectContext? = null
     var renderTarget: BackendRenderTarget? = null
     var surface: Surface? = null
@@ -24,7 +22,7 @@ internal abstract class ContextHandler(val layer: SkiaLayer) {
     abstract fun initCanvas()
 
     fun clearCanvas() {
-        canvas?.clear(bleachConstant)
+        canvas?.clear(clearColor)
     }
 
     open fun drawOnCanvas(picture: Picture) {

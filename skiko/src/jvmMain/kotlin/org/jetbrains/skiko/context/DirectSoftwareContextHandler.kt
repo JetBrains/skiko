@@ -8,7 +8,6 @@ import org.jetbrains.skiko.redrawer.AbstractDirectSoftwareRedrawer
 import java.lang.ref.Reference
 
 internal class DirectSoftwareContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
-    override val bleachConstant = -1
     var isInited = false
 
     val softwareRedrawer: AbstractDirectSoftwareRedrawer
