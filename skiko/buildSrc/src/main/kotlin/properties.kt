@@ -16,13 +16,21 @@ enum class OS(
         get() = this == Windows
 }
 
-enum class Arch(
-    val id: String,
-    val clangFlags: Array<String>
-) {
-    X64("x64", arrayOf()),
-    Arm64("arm64", arrayOf()),
-    Wasm("wasm", arrayOf("--bind", "-DSKIKO_WASM"))
+fun compilerForTarget(os: OS, arch: Arch): String =
+    when (os) {
+        OS.Linux -> "g++"
+        OS.Windows -> "cl.exe"
+        OS.MacOS, OS.IOS -> "clang++"
+        OS.Wasm -> "emcc"
+    }
+
+fun linkerForTarget(os: OS, arch: Arch): String =
+    if (os.isWindows) "link.exe" else compilerForTarget(os, arch)
+
+enum class Arch(val id: String) {
+    X64("x64"),
+    Arm64("arm64"),
+    Wasm("wasm")
 }
 
 enum class SkiaBuildType(
@@ -31,7 +39,7 @@ enum class SkiaBuildType(
     val clangFlags: Array<String>,
     val msvcFlags: Array<String>
 ) {
-    DEBUG("Debug", arrayOf("-DSK_DEBUG"), arrayOf("-std=c++17", "-g"), emptyArray()),
+    DEBUG("Debug", arrayOf("-DSK_DEBUG"), arrayOf("-std=c++17", "-g"), arrayOf("/Zi")),
     RELEASE("Release", arrayOf("-DNDEBUG"), arrayOf("-std=c++17", "-O3"), arrayOf("/O2"))
     ;
     override fun toString() = id
