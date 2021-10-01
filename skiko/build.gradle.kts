@@ -121,6 +121,8 @@ val wasmCrossCompile = tasks.register<WasmCrossCompileTask>("wasmCrossCompile") 
     includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp"))
     includeHeadersNonRecursive(skiaHeadersDirs(unpackedSkia))
 
+    val postprocessScript = "tools/postprocess_wasm.js"
+
     flags.set(listOf(
         *skiaPreprocessorFlags(),
         "-s", "USE_WEBGL2=1",
@@ -128,10 +130,10 @@ val wasmCrossCompile = tasks.register<WasmCrossCompileTask>("wasmCrossCompile") 
         "-s", "OFFSCREEN_FRAMEBUFFER=1",
         "-DSK_SUPPORT_GPU=1",
         "--extern-post-js", skikoJsPrefix.get().asFile.absolutePath,
-        "--js-transform", "node postprocess.js",
+        "--js-transform", "node $postprocessScript",
         ))
 
-    inputs.file("postprocess.js")
+    inputs.file(postprocessScript)
 }
 
 val skiaDir: Provider<File> = run {
