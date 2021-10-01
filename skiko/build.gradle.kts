@@ -62,6 +62,8 @@ val skiaCrossDownloadTasks: Map<Pair<OS, Arch>, Provider<File>> = crossTargets.k
     val out = skiko.dependenciesDir.resolve("skia/skia-$suffix.zip")
 
     tasks.register<Download>("skiaCrossDownload$suffix") {
+        onlyIf { skiko.skiaDir == null && !out.exists() }
+
         val release = skiko.skiaReleaseFor(osArch.first, osArch.second, buildType)
         src("https://github.com/JetBrains/skia-pack/releases/download/$release.zip")
         dest(out.absolutePath)
@@ -92,14 +94,15 @@ val skiaDirProviderForCrossTargets: Map<Pair<OS, Arch>, Provider<File>> = crossT
     }
 }
 
-val wasmCrossCompile = tasks.register<WasmCrossCompileTask>("wasmCrossCompile") {
+val wasmCrossCompile = tasks.register<CrossCompileTask>("wasmCrossCompile") {
     val osArch = OS.Wasm to Arch.Wasm
 
     val unzipper = skiaDirProviderForCrossTargets[osArch]!!
     dependsOn(unzipper)
     val unpackedSkia = unzipper.get()
 
-    targetArch.set(osArch.second)
+    compiler.set("emcc")
+    crossCompileTargetArch.set(osArch.second)
     buildVariant.set(buildType)
 
     sourceFiles =
@@ -108,38 +111,52 @@ val wasmCrossCompile = tasks.register<WasmCrossCompileTask>("wasmCrossCompile") 
     if (skiko.includeTestHelpers) {
         sourceFiles += project.fileTree("src/commonTest/cpp") { include("**/*.cc") }
     }
-
-    val skiaAFilesDir = unpackedSkia.resolve("out/${buildType.id}-${osArch.first.id}-${osArch.second.id}")
-    libFiles = project.fileTree(skiaAFilesDir)  { include("**/*.a") }
-
-    outDir.set(project.layout.buildDirectory.dir("out/${buildType.id}-${osArch.first.id}-${osArch.second.id}"))
-    wasmFileName.set("skiko.wasm")
-    jsFileName.set("skiko.js")
-
-    skikoJsPrefix.set(project.layout.projectDirectory.file("src/jsMain/resources/setup.js"))
+    outDir.set(project.layout.buildDirectory.dir("out/compile/${buildType.id}-${osArch.first.id}-${osArch.second.id}"))
 
     includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp"))
     includeHeadersNonRecursive(skiaHeadersDirs(unpackedSkia))
 
     flags.set(listOf(
         *skiaPreprocessorFlags(),
-        "-s", "USE_WEBGL2=1",
-        "-l", "GL",
-        "-s", "OFFSCREEN_FRAMEBUFFER=1",
-        "-DSK_SUPPORT_GPU=1",
-        "--extern-post-js",
-        skikoJsPrefix.get().asFile.absolutePath,
+        "-DSK_SUPPORT_GPU=1"
     ))
-
-    finalizedBy(replaceSymbolsInSkikoJsOutput)
 }
 
-val replaceSymbolsInSkikoJsOutput by project.tasks.registering {
+val linkWasm = tasks.register<LinkWasmTask>("linkWasm") {
+    val osArch = OS.Wasm to Arch.Wasm
+
+    dependsOn(wasmCrossCompile)
+
+    val unzipper = skiaDirProviderForCrossTargets[osArch]!!
+    dependsOn(unzipper)
+    val unpackedSkia = unzipper.get()
+
+    libFiles = project.fileTree(unpackedSkia)  { include("**/*.a") }
+    objectFiles = project.fileTree(wasmCrossCompile.map { it.outDir.get() }) { include("**/*.o") }
+
+    wasmFileName.set("skiko.wasm")
+    jsFileName.set("skiko.js")
+
+    skikoJsPrefix.set(project.layout.projectDirectory.file("src/jsMain/resources/setup.js"))
+    outDir.set(project.layout.buildDirectory.dir("out/link/${buildType.id}-${osArch.first.id}-${osArch.second.id}"))
+
+    flags.set(listOf(
+        "-l", "GL",
+        "-s", "USE_WEBGL2=1",
+        "-s", "OFFSCREEN_FRAMEBUFFER=1",
+    ))
+
     doLast {
-        val wasmTask = project.tasks.getByName("wasmCrossCompile") as WasmCrossCompileTask
-        val skikoJsFile: File = wasmTask.outDir.asFile.get().resolve("skiko.js")
-        val replacedContent = skikoJsFile.readText().replace("_org_jetbrains", "org_jetbrains")
-        skikoJsFile.writeText(replacedContent)
+        // skiko.js file is directly referenced in karma.config.d/wasm.js
+        // so symbols must be replaced right after linking
+        val jsFiles = outDir.asFile.get().walk()
+            .filter { it.isFile && it.name.endsWith(".js") }
+
+        for (jsFile in jsFiles) {
+            val originalContent = jsFile.readText()
+            val newContent = originalContent.replace("_org_jetbrains", "org_jetbrains")
+            jsFile.writeText(newContent)
+        }
     }
 }
 
@@ -180,7 +197,7 @@ kotlin {
         browser() {
             testTask {
                 testLogging.showStandardStreams = true
-                dependsOn(wasmCrossCompile)
+                dependsOn(linkWasm)
                 useKarma {
                     useChromeHeadless()
                 }
@@ -436,63 +453,56 @@ val generateVersion = project.tasks.register("generateVersion") {
 
 // Very hacky way to compile native bridges and add the
 // resulting object files into the final native klib.
-project.tasks.register<Exec>("nativeBridgesCompile") {
+val compileNativeBridges = project.tasks.register<CrossCompileTask>("compileNativeBridges") {
     dependsOn(skiaDir)
-    val inputDirs = mutableListOf(
-        "$projectDir/src/nativeMain/cpp/common",
-        "$projectDir/src/commonMain/cpp"
-    ).apply {
-        if (skiko.includeTestHelpers) add("$projectDir/src/commonTest/cpp/TestHelpers.cc")
-    }
-    val outDir = "$buildDir/nativeBridges/obj/$target"
-    val srcs = inputDirs
-        .findAllFiles(".cc")
-        .toTypedArray()
-    val outs = srcs
-        .map { it.substringAfterLast("/") }
-        .map { File(it).nameWithoutExtension }
-        .map { "$outDir/$it.o" }
-        .toTypedArray()
 
-    workingDir = File(outDir)
-    commandLine = listOf(
-        "clang++",
-        *targetArch.clangFlags,
-        *targetOs.clangFlags,
-        *buildType.clangFlags,
-        "-c",
+    compiler.set("clang++")
+    crossCompileTargetOS.set(targetOs)
+    crossCompileTargetArch.set(targetArch)
+    buildVariant.set(buildType)
+
+    sourceFiles =
+        project.fileTree("src/nativeMain/cpp") { include("**/*.cc") } +
+                project.fileTree("src/commonMain/cpp") { include("**/*.cc") }
+    if (skiko.includeTestHelpers) {
+        sourceFiles += project.fileTree("src/commonTest/cpp") { include("**/*.cc") }
+    }
+
+    outDir.set(project.layout.buildDirectory.dir("nativeBridges/obj/$target"))
+
+    includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp"))
+    includeHeadersNonRecursive(skiaHeadersDirs(skiaDir.get()))
+
+    flags.set(listOf(
         "-DSK_SHAPER_CORETEXT_AVAILABLE",
         "-DSK_BUILD_FOR_MAC",
         "-DSK_METAL",
-        "-I$projectDir/src/commonMain/cpp",
-        *includeHeadersFlags(skiaHeadersDirs(skiaDir.get())),
         *skiaPreprocessorFlags(),
-        *srcs
-    )
-    file(outDir).mkdirs()
-    inputs.files(srcs)
-    outputs.files(outs)
+    ))
 }
 
-project.tasks.register<Exec>("nativeBridgesLink") {
-    dependsOn(project.tasks.getByName("nativeBridgesCompile"))
-    inputs.files(project.tasks.getByName("nativeBridgesCompile").outputs)
+val linkNativeBridges = project.tasks.register<Exec>("linkNativeBridges") {
+    dependsOn(compileNativeBridges)
+    val objectFilesDir = compileNativeBridges.map { it.outDir.get() }
+    val objectFiles = project.fileTree(objectFilesDir) {
+        include("**/*.o")
+    }
+    inputs.files(objectFiles)
 
     val outDir = "$buildDir/nativeBridges/static/$target"
-    val srcs = inputs.files.files
-        .map { it.absolutePath }
-        .toTypedArray()
     val staticLib = "$outDir/skiko-native-bridges-$target.a"
     workingDir = File(outDir)
-    commandLine = listOf(
-        "libtool",
-        "-static",
-        "-o",
-        staticLib,
-        *srcs
-    )
+    executable = "libtool"
+    argumentProviders.add {
+        listOf(
+            "-static",
+            "-o",
+            staticLib
+        )
+    }
+    argumentProviders.add { objectFiles.files.map { it.absolutePath } }
     file(outDir).mkdirs()
-    outputs.files(staticLib)
+    outputs.dir(outDir)
 }
 
 fun localSign(signer: String, lib: File): File {
@@ -749,17 +759,13 @@ val skikoJvmRuntimeJar by project.tasks.registering(Jar::class) {
 }
 
 val skikoWasmJar by project.tasks.registering(Jar::class) {
-    dependsOn(wasmCrossCompile)
+    dependsOn(linkWasm)
     // We produce jar that contains .js of wrapper/bindings and .wasm with Skia + bindings.
-    val wasmOutDir = wasmCrossCompile.map { it.outDir }
+    val wasmOutDir = linkWasm.map { it.outDir }
 
     from(wasmOutDir) {
         include("*.wasm")
-    }
-
-    from(wasmOutDir) {
         include("*.js")
-        filter { line -> line.replace("_org_jetbrains_", "org_jetbrains_") }
     }
 
     archiveBaseName.set("skiko-wasm")
@@ -930,7 +936,7 @@ afterEvaluate {
         source(generatedKotlin)
 
         if (supportNative) {
-            dependsOn(tasks.getByName("nativeBridgesLink"))
+            dependsOn(linkNativeBridges)
         }
     }
 }
