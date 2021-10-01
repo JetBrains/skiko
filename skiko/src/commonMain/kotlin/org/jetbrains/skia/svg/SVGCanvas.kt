@@ -1,4 +1,3 @@
-@file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia.svg
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
@@ -41,7 +40,7 @@ object SVGCanvas {
      */
     fun make(bounds: Rect, out: WStream, convertTextToPaths: Boolean, prettyXML: Boolean): Canvas {
         Stats.onNativeCall()
-        val ptr = _nMake(
+        val ptr = SVGCanvas_nMake(
             bounds.left,
             bounds.top,
             bounds.right,
@@ -58,4 +57,4 @@ object SVGCanvas {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGCanvas__1nMake")
-private external fun _nMake(left: Float, top: Float, right: Float, bottom: Float, wstreamPtr: NativePointer, flags: Int): NativePointer
+private external fun SVGCanvas_nMake(left: Float, top: Float, right: Float, bottom: Float, wstreamPtr: NativePointer, flags: Int): NativePointer
