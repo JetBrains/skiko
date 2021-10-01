@@ -474,8 +474,6 @@ val compileNativeBridges = project.tasks.register<CrossCompileTask>("compileNati
     includeHeadersNonRecursive(skiaHeadersDirs(skiaDir.get()))
 
     flags.set(listOf(
-        // todo: commonize
-        "-c",
         "-DSK_SHAPER_CORETEXT_AVAILABLE",
         "-DSK_BUILD_FOR_MAC",
         "-DSK_METAL",
