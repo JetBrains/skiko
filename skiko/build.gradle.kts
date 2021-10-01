@@ -453,7 +453,7 @@ val generateVersion = project.tasks.register("generateVersion") {
 
 // Very hacky way to compile native bridges and add the
 // resulting object files into the final native klib.
-project.tasks.register<CrossCompileTask>("nativeBridgesCompile") {
+val compileNativeBridges = project.tasks.register<CrossCompileTask>("compileNativeBridges") {
     dependsOn(skiaDir)
 
     compiler.set("clang++")
@@ -483,25 +483,28 @@ project.tasks.register<CrossCompileTask>("nativeBridgesCompile") {
     ))
 }
 
-project.tasks.register<Exec>("nativeBridgesLink") {
-    dependsOn(project.tasks.getByName("nativeBridgesCompile"))
-    inputs.files(project.tasks.getByName("nativeBridgesCompile").outputs)
+val linkNativeBridges = project.tasks.register<Exec>("linkNativeBridges") {
+    dependsOn(compileNativeBridges)
+    val objectFilesDir = compileNativeBridges.map { it.outDir.get() }
+    val objectFiles = project.fileTree(objectFilesDir) {
+        include("**/*.o")
+    }
+    inputs.files(objectFiles)
 
     val outDir = "$buildDir/nativeBridges/static/$target"
-    val srcs = inputs.files.files
-        .map { it.absolutePath }
-        .toTypedArray()
     val staticLib = "$outDir/skiko-native-bridges-$target.a"
     workingDir = File(outDir)
-    commandLine = listOf(
-        "libtool",
-        "-static",
-        "-o",
-        staticLib,
-        *srcs
-    )
+    executable = "libtool"
+    argumentProviders.add {
+        listOf(
+            "-static",
+            "-o",
+            staticLib
+        )
+    }
+    argumentProviders.add { objectFiles.files.map { it.absolutePath } }
     file(outDir).mkdirs()
-    outputs.files(staticLib)
+    outputs.dir(outDir)
 }
 
 fun localSign(signer: String, lib: File): File {
@@ -906,7 +909,7 @@ afterEvaluate {
         source(generatedKotlin)
 
         if (supportNative) {
-            dependsOn(tasks.getByName("nativeBridgesLink"))
+            dependsOn(linkNativeBridges)
         }
     }
 }
