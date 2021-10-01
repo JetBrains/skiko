@@ -7,6 +7,7 @@ import org.jetbrains.skia.ImageInfo
 import org.jetbrains.skia.Picture
 import org.jetbrains.skiko.SkiaLayer
 import java.awt.Transparency
+import java.awt.Color
 import java.awt.color.ColorSpace
 import java.awt.image.BufferedImage
 import java.awt.image.ComponentColorModel
@@ -16,7 +17,7 @@ import java.awt.image.Raster
 import java.awt.image.WritableRaster
 
 internal class SoftwareContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
-    override val clearColor = 0 // it looks like java.awt.Canvas doesn't support transparency
+    override val clearColor = if (layer.transparency) 0 else -1 // it looks like java.awt.Canvas doesn't support transparency
 
     val colorModel = ComponentColorModel(
         ColorSpace.getInstance(ColorSpace.CS_sRGB),
@@ -76,6 +77,11 @@ internal class SoftwareContextHandler(layer: SkiaLayer) : ContextHandler(layer) 
                 null
             )
             image = BufferedImage(colorModel, raster!!, false, null)
+            val graphics = layer.backedLayer.getGraphics()
+            if (graphics != null) {
+                graphics.setColor(Color(0, 0, 0, 0))
+                graphics.clearRect(0,0,w,h)
+            }
             layer.backedLayer.getGraphics()?.drawImage(image!!, 0, 0, layer.width, layer.height, null)
         }
     }
