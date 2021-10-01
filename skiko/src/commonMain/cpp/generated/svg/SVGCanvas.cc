@@ -5,7 +5,7 @@
 #include "SkStream.h"
 #include "common.h"
 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_svg_SVGCanvas_SVGCanvas_nMake
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_svg_SVGCanvas__1nMake
   (KFloat left, KFloat top, KFloat right, KFloat bottom, KNativePointer wstreamPtr, KInt flags) {
     SkWStream* wstream = reinterpret_cast<SkWStream*>((wstreamPtr));
     SkRect bounds {left, top, right, bottom};
