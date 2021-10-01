@@ -527,7 +527,7 @@ fun sealBinary(sealer: String, lib: File) {
 }
 
 
-fun remoteSign(signHost: String, lib: File, out: File) {
+fun remoteSignCurl(signHost: String, lib: File, out: File) {
     println("Remote signing $lib on $signHost")
     val user = skiko.signUser ?: error("signUser is null")
     val token = skiko.signToken ?: error("signToken is null")
@@ -538,6 +538,35 @@ fun remoteSign(signHost: String, lib: File, out: File) {
         -H "Content-Type:application/x-mac-app-bin" \
         "$signHost/sign?name=${lib.name}" -o "${out.absolutePath}"
     """.trimIndent()
+    val proc = ProcessBuilder("bash", "-c", cmd)
+        .redirectOutput(ProcessBuilder.Redirect.PIPE)
+        .redirectError(ProcessBuilder.Redirect.PIPE)
+        .start()
+    proc.waitFor(5, TimeUnit.MINUTES)
+    if (proc.exitValue() != 0) {
+        val out = proc.inputStream.bufferedReader().readText()
+        val err = proc.errorStream.bufferedReader().readText()
+        println(out)
+        println(err)
+        throw GradleException("Cannot sign $lib: $err")
+    } else {
+        val outSize = out.length()
+        if (outSize < 200 * 1024) {
+            val content = out.readText()
+            println(content)
+            throw GradleException("Output is too short $outSize: ${content.take(200)}...")
+        }
+    }
+}
+
+fun remoteSignCodesign(signHost: String, lib: File, out: File) {
+    val user = skiko.signUser ?: error("signUser is null")
+    val token = skiko.signToken ?: error("signToken is null")
+    val cmd = """
+        SERVICE_ACCOUNT_TOKEN=$token SERVICE_ACCOUNT_NAME=$user \
+        $projectDir/tools/codesign-client-darwin-x64 ${lib.absolutePath} && \
+        cp ${lib.absolutePath} ${out.absolutePath}
+    """
     val proc = ProcessBuilder("bash", "-c", cmd)
         .redirectOutput(ProcessBuilder.Redirect.PIPE)
         .redirectError(ProcessBuilder.Redirect.PIPE)
@@ -689,7 +718,7 @@ val maybeSign by project.tasks.registering {
             sealBinary(sealer, lib)
         }
         if (skiko.signHost != null) {
-            remoteSign(skiko.signHost!!, lib, output)
+            remoteSignCodesign(skiko.signHost!!, lib, output)
         } else {
             lib.copyTo(output, overwrite = true)
         }
