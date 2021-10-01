@@ -1,6 +1,5 @@
-package org.jetbrains.skiko.util
+package org.jetbrains.skiko
 
-import org.jetbrains.skiko.Library
 import org.junit.Test
 import java.net.URL
 import java.net.URLClassLoader

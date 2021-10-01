@@ -1,4 +1,3 @@
-@file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia.svg
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
@@ -18,11 +17,11 @@ abstract class SVGNode internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     val tag: SVGTag
         get() = try {
             Stats.onNativeCall()
-            SVGTag.values().get(_nGetTag(_ptr))
+            SVGTag.values()[SVGNode_nGetTag(_ptr)]
         } finally {
             reachabilityBarrier(this)
         }
 }
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGNode__1nGetTag")
-private external fun _nGetTag(ptr: NativePointer): Int
+private external fun SVGNode_nGetTag(ptr: NativePointer): Int

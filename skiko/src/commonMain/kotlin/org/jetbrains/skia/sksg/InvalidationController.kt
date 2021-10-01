@@ -1,4 +1,3 @@
-@file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia.sksg
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
@@ -17,27 +16,20 @@ import kotlin.jvm.JvmStatic
  */
 class InvalidationController internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
-        @JvmStatic
-        external fun _nGetFinalizer(): NativePointer
-        @JvmStatic external fun _nMake(): NativePointer
-        @JvmStatic external fun _nInvalidate(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float, matrix: FloatArray?)
-        @JvmStatic external fun _nGetBounds(ptr: NativePointer): Rect
-        @JvmStatic external fun _nReset(ptr: NativePointer)
-
         init {
             staticLoad()
         }
     }
 
     internal object _FinalizerHolder {
-        val PTR = _nGetFinalizer()
+        val PTR = InvalidationController_nGetFinalizer()
     }
 
-    constructor() : this(_nMake()) {}
+    constructor() : this(InvalidationController_nMake()) {}
 
     fun invalidate(left: Float, top: Float, right: Float, bottom: Float, matrix: Matrix33?): InvalidationController {
         Stats.onNativeCall()
-        _nInvalidate(
+        InvalidationController_nInvalidate(
             _ptr,
             left,
             top,
@@ -51,14 +43,26 @@ class InvalidationController internal constructor(ptr: NativePointer) : Managed(
     val bounds: Rect
         get() = try {
             Stats.onNativeCall()
-            _nGetBounds(_ptr)
+            InvalidationController_nGetBounds(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
 
     fun reset(): InvalidationController {
         Stats.onNativeCall()
-        _nReset(_ptr)
+
+        InvalidationController_nReset(_ptr)
         return this
     }
 }
+
+@ExternalSymbolName("org_jetbrains_skia_sksg_InvalidationController_nGetFinalizer")
+private external fun InvalidationController_nGetFinalizer(): NativePointer
+@ExternalSymbolName("org_jetbrains_skia_sksg_InvalidationController_nMake")
+private external fun InvalidationController_nMake(): NativePointer
+@ExternalSymbolName("org_jetbrains_skia_sksg_InvalidationController_nInvalidate")
+private external fun InvalidationController_nInvalidate(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float, matrix: FloatArray?)
+@ExternalSymbolName("org_jetbrains_skia_sksg_InvalidationController_nGetBounds")
+private external fun InvalidationController_nGetBounds(ptr: NativePointer): Rect
+@ExternalSymbolName("org_jetbrains_skia_sksg_InvalidationController_nReset")
+private external fun InvalidationController_nReset(ptr: NativePointer)

@@ -1,4 +1,3 @@
-@file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia.svg
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
@@ -17,7 +16,7 @@ class SVGDOM internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         }
     }
 
-    constructor(data: Data) : this(_nMakeFromData(getPtr(data))) {
+    constructor(data: Data) : this(SVGDOM_nMakeFromData(getPtr(data))) {
         Stats.onNativeCall()
         reachabilityBarrier(data)
     }
@@ -25,7 +24,7 @@ class SVGDOM internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     val root: SVGSVG?
         get() = try {
             Stats.onNativeCall()
-            val ptr = _nGetRoot(_ptr)
+            val ptr = SVGDOM_nGetRoot(_ptr)
             if (ptr == NullPointer) null else SVGSVG(ptr)
         } finally {
             reachabilityBarrier(this)
@@ -37,20 +36,20 @@ class SVGDOM internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     @get:Deprecated("")
     val containerSize: Point
         get() = try {
-            _nGetContainerSize(_ptr)
+            SVGDOM_nGetContainerSize(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
 
     fun setContainerSize(width: Float, height: Float): SVGDOM {
         Stats.onNativeCall()
-        _nSetContainerSize(_ptr, width, height)
+        SVGDOM_nSetContainerSize(_ptr, width, height)
         return this
     }
 
     fun setContainerSize(size: Point): SVGDOM {
         Stats.onNativeCall()
-        _nSetContainerSize(_ptr, size.x, size.y)
+        SVGDOM_nSetContainerSize(_ptr, size.x, size.y)
         return this
     }
 
@@ -58,7 +57,7 @@ class SVGDOM internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     fun render(canvas: Canvas): SVGDOM {
         return try {
             Stats.onNativeCall()
-            _nRender(_ptr, getPtr(canvas))
+            SVGDOM_nRender(_ptr, getPtr(canvas))
             this
         } finally {
             reachabilityBarrier(canvas)
@@ -68,16 +67,16 @@ class SVGDOM internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nMakeFromData")
-private external fun _nMakeFromData(dataPtr: NativePointer): NativePointer
+private external fun SVGDOM_nMakeFromData(dataPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nGetRoot")
-private external fun _nGetRoot(ptr: NativePointer): NativePointer
+private external fun SVGDOM_nGetRoot(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nGetContainerSize")
-private external fun _nGetContainerSize(ptr: NativePointer): Point
+private external fun SVGDOM_nGetContainerSize(ptr: NativePointer): Point
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nSetContainerSize")
-private external fun _nSetContainerSize(ptr: NativePointer, width: Float, height: Float)
+private external fun SVGDOM_nSetContainerSize(ptr: NativePointer, width: Float, height: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nRender")
-private external fun _nRender(ptr: NativePointer, canvasPtr: NativePointer)
+private external fun SVGDOM_nRender(ptr: NativePointer, canvasPtr: NativePointer)
