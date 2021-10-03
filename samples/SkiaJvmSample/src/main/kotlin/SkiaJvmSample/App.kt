@@ -110,6 +110,16 @@ fun createWindow(title: String, exitOnClose: Boolean) = SwingUtilities.invokeLat
         }
     })
 
+    // Window transparency
+    if (System.getProperty("skiko.transparency") == "true") {
+        window.setUndecorated(true)
+        // On Windows we don't set transparent background to avoid event input issues (JDK specific)
+        if (hostOs != OS.Windows) {
+            window.background = java.awt.Color(0, 0, 0, 0)
+        }
+        window.layer.transparency = true
+    }
+
     // MANDATORY: set window preferred size before calling pack()
     window.preferredSize = Dimension(800, 600)
     window.pack()

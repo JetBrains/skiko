@@ -71,6 +71,11 @@ tasks.register("runSoftware") {
     dependsOn(casualRun)
 }
 
+tasks.register("runWithTransparency") {
+    additionalArguments += mapOf("skiko.transparency" to "true")
+    dependsOn(casualRun)
+}
+
 tasks.withType<KotlinCompile>().configureEach {
     kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
 }
