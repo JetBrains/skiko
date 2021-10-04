@@ -210,8 +210,9 @@ kotlin {
         val targetString = target
         val skiaDir = skiaDir.get().absolutePath
         val nativeTarget = when (targetString) {
-            "macos-x64", "macos-arm64" -> macosX64 {}
-            "linux-x64" -> linuxX64 {}
+            "macos-x64" -> macosX64 {}
+            "macos-arm64" -> macosArm64 {}
+            // "linux-x64" -> linuxX64 {}
             else -> null
         }
         nativeTarget?.let {
