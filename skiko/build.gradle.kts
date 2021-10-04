@@ -54,8 +54,19 @@ val skiaZip = run {
 }
 
 val crossTargets = listOf(
-    OS.Wasm to Arch.Wasm
+    OS.Wasm to Arch.Wasm,
+    OS.IOS to Arch.X64,
+    OS.IOS to Arch.Arm64,
+    OS.MacOS to Arch.X64,
+    OS.MacOS to Arch.Arm64,
 )
+
+class NativeCompilationInfo(val target: org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget) {
+    var linkTask: Provider<Exec>? = null
+    var task: KotlinNativeCompile? = null
+}
+
+val allNativeTargets = mutableMapOf<Pair<OS, Arch>, NativeCompilationInfo>()
 
 val skiaCrossDownloadTasks: Map<Pair<OS, Arch>, Provider<File>> = crossTargets.keysToMap { osArch ->
     val suffix = targetSuffix(osArch.first, osArch.second)
@@ -122,6 +133,43 @@ val wasmCrossCompile = tasks.register<CrossCompileTask>("wasmCrossCompile") {
     ))
 }
 
+fun registerIosTask(arch: Arch): TaskProvider<CrossCompileTask> {
+    return tasks.register<CrossCompileTask>("${arch.id}IosCrossCompile") {
+        val osArch = OS.IOS to arch
+
+        val unzipper = skiaDirProviderForCrossTargets[osArch]!!
+        dependsOn(unzipper)
+        val unpackedSkia = unzipper.get()
+
+        compiler.set("clang")
+        val sdkRoot = "/Applications/Xcode.app/Contents/Developer/Platforms"
+        if (arch == Arch.Arm64)
+            flags.set(listOf(
+                "-target", "arm64-apple-ios",
+                "-isysroot", "$sdkRoot/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk"
+            ))
+        else
+            flags.set(listOf(
+                "-target", "x86_64-apple-ios-simulator",
+                "-isysroot", "$sdkRoot/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk"
+            ))
+        crossCompileTargetArch.set(osArch.second)
+        buildVariant.set(buildType)
+
+        sourceFiles =
+            project.fileTree("src/commonMain/cpp") { include("**/*.cc") }
+        outDir.set(project.layout.buildDirectory.dir("out/compile/${buildType.id}-${osArch.first.id}-${osArch.second.id}"))
+
+        includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp"))
+        includeHeadersNonRecursive(skiaHeadersDirs(unpackedSkia))
+
+        flags.set(listOf(
+            *skiaPreprocessorFlags(),
+            "-DSK_SUPPORT_GPU=1"
+        ))
+    }
+}
+
 val linkWasm = tasks.register<LinkWasmTask>("linkWasm") {
     val osArch = OS.Wasm to Arch.Wasm
 
@@ -186,6 +234,7 @@ val Project.supportNative: Boolean
 val Project.supportWasm: Boolean
     get() = properties.get("skiko.wasm.enabled") == "true"
 
+
 kotlin {
     jvm {
         compilations.all {
@@ -207,26 +256,67 @@ kotlin {
     }
 
     if (supportNative) {
-        val skiaDir = skiaDir.get().absolutePath
-        val nativeTarget = when (target) {
-            "macos-x64" -> macosX64 {}
-            "macos-arm64" -> macosArm64 {}
-            else -> null
+        when ("${hostOs.id}-${hostArch.id}") {
+            "macos-x64" -> allNativeTargets[OS.IOS to Arch.X64] = NativeCompilationInfo(macosX64())
+            "macos-arm64" -> allNativeTargets[OS.IOS to Arch.Arm64] = NativeCompilationInfo(macosArm64())
         }
-        val targetString = target
-        nativeTarget?.let {
-            it.compilations.all {
+
+        if (hostOs == OS.MacOS) {
+            allNativeTargets[OS.IOS to Arch.Arm64] = NativeCompilationInfo(iosArm64())
+            allNativeTargets[OS.IOS to Arch.X64] = NativeCompilationInfo(iosX64())
+        }
+
+        for ((osArch, compilation) in allNativeTargets) {
+            val targetString = "${osArch.first.id}-${osArch.second.id}"
+
+            val unzipper = skiaDirProviderForCrossTargets[osArch]!!
+            val unpackedSkia = unzipper.get()
+
+            val skiaDir = unpackedSkia.absolutePath
+            val skiaBinSubdir = "out/${buildType.id}-$targetString"
+
+            compilation.target.compilations.all {
+                println("for $osArch compile is ${this.compileKotlinTask}")
+                allNativeTargets[osArch]!!.task = this.compileKotlinTask
+
                 kotlinOptions {
                     freeCompilerArgs += listOf(
-                        "-include-binary",
-                        "$skiaDir/$skiaBinSubdir/libskia.a",
-                        "-include-binary",
-                        "$skiaDir/$skiaBinSubdir/libskshaper.a",
-                        "-include-binary",
-                        "$skiaDir/$skiaBinSubdir/libskparagraph.a",
-                        "-include-binary",
-                        "$buildDir/nativeBridges/static/$targetString/skiko-native-bridges-$targetString.a"
+                            "-include-binary",
+                            "$skiaDir/$skiaBinSubdir/libskia.a",
+                            "-include-binary",
+                            "$skiaDir/$skiaBinSubdir/libskshaper.a",
+                            "-include-binary",
+                            "$skiaDir/$skiaBinSubdir/libskparagraph.a",
+                            "-include-binary",
+                            "$buildDir/nativeBridges/static/$targetString/skiko-native-bridges-$targetString.a"
                     )
+                }
+            }
+
+            if (osArch.first == OS.IOS) {
+                val iosCrossCompile = registerIosTask(osArch.second)
+                allNativeTargets[osArch]!!.linkTask = project.tasks.register<Exec>("linkNativeBridges$targetString") {
+                    dependsOn(iosCrossCompile)
+                    val objectFilesDir = iosCrossCompile.map { it.outDir.get() }
+                    val objectFiles = project.fileTree(objectFilesDir) {
+                        include("**/*.o")
+                    }
+                    inputs.files(objectFiles)
+
+                    val outDir = "$buildDir/nativeBridges/static/$targetString"
+                    val staticLib = "$outDir/skiko-native-bridges-$targetString.a"
+                    workingDir = File(outDir)
+                    executable = "libtool"
+                    argumentProviders.add {
+                        listOf(
+                            "-static",
+                            "-o",
+                            staticLib
+                        )
+                    }
+                    argumentProviders.add { objectFiles.files.map { it.absolutePath } }
+                    file(outDir).mkdirs()
+                    outputs.dir(outDir)
                 }
             }
         }
@@ -275,8 +365,11 @@ kotlin {
                     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
                 }
             }
-            if (targetOs == OS.MacOS) {
+            if (hostOs == OS.MacOS) {
                 val macosMain by creating {
+                    dependsOn(nativeMain)
+                }
+                val iosMain by creating {
                     dependsOn(nativeMain)
                 }
                 val macosArchMain = when (targetArch) {
@@ -293,6 +386,12 @@ kotlin {
                         macosArm64Main
                     }
                     else -> throw GradleException("Unsupported arch $targetArch for macOS")
+                }
+                val iosX64Main by getting {
+                    dependsOn(iosMain)
+                }
+                val iosArm64Main by getting {
+                    dependsOn(iosMain)
                 }
             }
         }
@@ -412,7 +511,7 @@ tasks.withType(CppCompile::class.java).configureEach {
                     )
             )
         }
-        OS.Wasm -> throw GradleException("Should not reach here")
+        OS.Wasm, OS.IOS -> throw GradleException("Should not reach here")
     }
 }
 
@@ -672,8 +771,8 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
                 )
             )
         }
-        OS.Wasm -> {
-            throw GradleException("This task shalln't be used with WASM")
+        OS.Wasm, OS.IOS -> {
+            throw GradleException("This task shalln't be used with $targetOs")
         }
     }
 }
@@ -954,7 +1053,10 @@ afterEvaluate {
         source(generatedKotlin)
 
         if (supportNative) {
-            dependsOn(linkNativeBridges)
+            println("configure deps for $this")
+            allNativeTargets.values.singleOrNull { it.task == this }?.let {
+                dependsOn(it.linkTask)
+            }
         }
     }
 }
