@@ -53,6 +53,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation("org.jetbrains.skiko:skiko:$version")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
             }
         }
 
@@ -64,19 +65,12 @@ kotlin {
             "macos-x64" -> {
                 val macosX64Main by getting {
                     dependsOn(nativeMain)
-                    dependencies {
-                        // TODO: can we do better?
-                        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-macosx64:$coroutinesVersion")
-                    }
                 }
                 macosX64Main
             }
             "macos-arm64" -> {
                 val macosArm64Main by getting {
                     dependsOn(nativeMain)
-                    dependencies {
-                        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-macosarm64:$coroutinesVersion")
-                    }
                 }
                 macosArm64Main
             }
