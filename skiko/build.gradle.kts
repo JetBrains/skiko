@@ -210,23 +210,25 @@ kotlin {
         val targetString = target
         val skiaDir = skiaDir.get().absolutePath
         val nativeTarget = when (targetString) {
-            "macos-x64", "macos-arm64" -> macosX64 {
-                compilations.all {
-                    kotlinOptions {
-                        freeCompilerArgs += listOf(
-                            "-include-binary",
-                            "$skiaDir/$skiaBinSubdir/libskia.a",
-                            "-include-binary",
-                            "$skiaDir/$skiaBinSubdir/libskshaper.a",
-                            "-include-binary",
-                            "$skiaDir/$skiaBinSubdir/libskparagraph.a",
-                            "-include-binary",
-                            "$buildDir/nativeBridges/static/$targetString/skiko-native-bridges-$targetString.a"
-                        )
-                    }
+            "macos-x64", "macos-arm64" -> macosX64 {}
+            "linux-x64" -> linuxX64 {}
+            else -> null
+        }
+        nativeTarget?.let {
+            it.compilations.all {
+                kotlinOptions {
+                    freeCompilerArgs += listOf(
+                        "-include-binary",
+                        "$skiaDir/$skiaBinSubdir/libskia.a",
+                        "-include-binary",
+                        "$skiaDir/$skiaBinSubdir/libskshaper.a",
+                        "-include-binary",
+                        "$skiaDir/$skiaBinSubdir/libskparagraph.a",
+                        "-include-binary",
+                        "$buildDir/nativeBridges/static/$targetString/skiko-native-bridges-$targetString.a"
+                    )
                 }
             }
-            else -> null
         }
     }
 
@@ -267,7 +269,9 @@ kotlin {
 
         if (supportNative) {
             // See https://kotlinlang.org/docs/mpp-share-on-platforms.html#configure-the-hierarchical-structure-manually
-            val nativeMain by creating {}
+            val nativeMain by creating {
+                dependsOn(commonMain)
+            }
             val macosMain by creating {
                 dependsOn(nativeMain)
             }

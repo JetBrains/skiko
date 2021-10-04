@@ -1,5 +1,7 @@
 package org.jetbrains.skiko.native
 
+import  org.jetbrains.skiko.GraphicsApi
+
 // TODO: jvm version uses java properties here.
 // there is no properties support available for native.
 internal object SkikoProperties {
