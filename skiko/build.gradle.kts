@@ -207,26 +207,28 @@ kotlin {
     }
 
     if (supportNative) {
-        val targetString = target
         val skiaDir = skiaDir.get().absolutePath
-        val nativeTarget = when (targetString) {
-            "macos-x64", "macos-arm64" -> macosX64 {
-                compilations.all {
-                    kotlinOptions {
-                        freeCompilerArgs += listOf(
-                            "-include-binary",
-                            "$skiaDir/$skiaBinSubdir/libskia.a",
-                            "-include-binary",
-                            "$skiaDir/$skiaBinSubdir/libskshaper.a",
-                            "-include-binary",
-                            "$skiaDir/$skiaBinSubdir/libskparagraph.a",
-                            "-include-binary",
-                            "$buildDir/nativeBridges/static/$targetString/skiko-native-bridges-$targetString.a"
-                        )
-                    }
+        val nativeTarget = when (target) {
+            "macos-x64" -> macosX64 {}
+            "macos-arm64" -> macosArm64 {}
+            else -> null
+        }
+        val targetString = target
+        nativeTarget?.let {
+            it.compilations.all {
+                kotlinOptions {
+                    freeCompilerArgs += listOf(
+                        "-include-binary",
+                        "$skiaDir/$skiaBinSubdir/libskia.a",
+                        "-include-binary",
+                        "$skiaDir/$skiaBinSubdir/libskshaper.a",
+                        "-include-binary",
+                        "$skiaDir/$skiaBinSubdir/libskparagraph.a",
+                        "-include-binary",
+                        "$buildDir/nativeBridges/static/$targetString/skiko-native-bridges-$targetString.a"
+                    )
                 }
             }
-            else -> null
         }
     }
 
@@ -267,14 +269,30 @@ kotlin {
 
         if (supportNative) {
             // See https://kotlinlang.org/docs/mpp-share-on-platforms.html#configure-the-hierarchical-structure-manually
-            val nativeMain by creating {}
-            val macosMain by creating {
-                dependsOn(nativeMain)
-            }
-            val macosX64Main by getting {
-                dependsOn(macosMain)
+            val nativeMain by creating {
+                dependsOn(commonMain)
                 dependencies {
-                    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
+                    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
+                }
+            }
+            if (targetOs == OS.MacOS) {
+                val macosMain by creating {
+                    dependsOn(nativeMain)
+                }
+                val macosArchMain = when (targetArch) {
+                    Arch.X64 -> {
+                        val macosX64Main by getting {
+                            dependsOn(macosMain)
+                        }
+                        macosX64Main
+                    }
+                    Arch.Arm64 -> {
+                        val macosArm64Main by getting {
+                            dependsOn(macosMain)
+                        }
+                        macosArm64Main
+                    }
+                    else -> throw GradleException("Unsupported arch $targetArch for macOS")
                 }
             }
         }

@@ -1,27 +1,6 @@
 package org.jetbrains.skiko
 
-enum class OS(val id: String) {
-    Linux("linux"),
-    Windows("windows"),
-    MacOS("macos")
-    ;
-
-    val isLinux
-        get() = this == Linux
-
-    val isWindows
-        get() = this == Windows
-
-    val isMacOS
-        get() = this == MacOS
-}
-
-enum class Arch(val id: String) {
-    X64("x64"),
-    Arm64("arm64")
-}
-
-val hostOs by lazy {
+actual val hostOs: OS by lazy {
     val osName = System.getProperty("os.name")
     when {
         osName == "Mac OS X" -> OS.MacOS
@@ -31,7 +10,7 @@ val hostOs by lazy {
     }
 }
 
-val hostArch by lazy {
+actual val hostArch: Arch by lazy {
     val osArch = System.getProperty("os.arch")
     when (osArch) {
         "x86_64", "amd64" -> Arch.X64
@@ -40,7 +19,7 @@ val hostArch by lazy {
     }
 }
 
-val hostId by lazy {
+actual val hostId by lazy {
     "${hostOs.id}-${hostArch.id}"
 }
 
@@ -55,3 +34,6 @@ internal val javaVendor by lazy {
 internal val javaLocation by lazy {
     "${System.getProperty("java.home")}"
 }
+
+actual val kotlinBackend: KotlinBackend
+    get() = KotlinBackend.JVM

@@ -85,6 +85,9 @@ internal val platformOperations: PlatformOperations by lazy {
                 }
             }
         }
+        OS.JS -> {
+            TODO("Commonize me")
+        }
     }
 }
 

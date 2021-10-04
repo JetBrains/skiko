@@ -43,6 +43,9 @@ internal interface RenderFactory {
                     GraphicsApi.DIRECT_SOFTWARE -> LinuxSoftwareRedrawer(layer, properties)
                     else -> LinuxOpenGLRedrawer(layer, properties)
                 }
+                OS.JS -> {
+                    TODO("Commonize me")
+                }
             }
         }
     }

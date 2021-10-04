@@ -1,21 +1,5 @@
 package org.jetbrains.skiko
 
-import org.jetbrains.skiko.redrawer.Redrawer
-import org.jetbrains.skiko.redrawer.WindowsOpenGLRedrawer
-import org.jetbrains.skiko.redrawer.LinuxOpenGLRedrawer
-
-enum class GraphicsApi {
-    UNKNOWN, SOFTWARE, DIRECT_SOFTWARE, OPENGL, DIRECT3D, VULKAN, METAL
-}
-
-enum class GpuPriority(val value: String) {
-    Auto("auto"), Integrated("integrated"), Discrete("discrete");
-
-    companion object {
-        fun parse(value: String?): GpuPriority? = GpuPriority.values().find { it.value == value }
-    }
-}
-
 private val notSupportedAdapters by lazy {
     val resource = SkiaLayer::class.java.getResource("/not-supported-adapter.list").readText()
     resource.split(";").map { it.trim() }

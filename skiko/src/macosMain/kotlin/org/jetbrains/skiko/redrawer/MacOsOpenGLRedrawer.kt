@@ -3,6 +3,7 @@ package org.jetbrains.skiko.native.redrawer
 import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.useContents
 import org.jetbrains.skiko.native.*
+import org.jetbrains.skiko.redrawer.Redrawer
 import platform.CoreFoundation.CFTimeInterval
 import platform.CoreGraphics.CGRectMake
 import platform.CoreVideo.CVTimeStamp

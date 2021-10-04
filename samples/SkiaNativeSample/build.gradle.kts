@@ -2,6 +2,8 @@ plugins {
     kotlin("multiplatform") version "1.5.31"
 }
 
+val coroutinesVersion = "1.5.2"
+
 repositories {
     mavenLocal()
     jcenter()
@@ -32,11 +34,9 @@ if (project.hasProperty("skiko.version")) {
 }
 
 kotlin {
-
-    val nativeTarget = when {
-        osName == "Mac OS X" -> macosX64()
-        osName.startsWith("Win") -> mingwX64()
-        osName.startsWith("Linux") -> linuxX64()
+    val nativeTarget = when (target) {
+        "macos-x64" -> macosX64()
+        "macos-arm64" -> macosArm64()
         else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
     }
 
@@ -53,20 +53,28 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation("org.jetbrains.skiko:skiko:$version")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
             }
         }
 
         val nativeMain by creating {
             dependsOn(commonMain)
-            dependencies {
-            }
         }
 
-        val macosX64Main by getting {
-            dependsOn(nativeMain)
-            dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-macosx64:1.5.2")
+        val archTargetMain = when (target) {
+            "macos-x64" -> {
+                val macosX64Main by getting {
+                    dependsOn(nativeMain)
+                }
+                macosX64Main
             }
+            "macos-arm64" -> {
+                val macosArm64Main by getting {
+                    dependsOn(nativeMain)
+                }
+                macosArm64Main
+            }
+            else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
         }
     }
 }
