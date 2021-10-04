@@ -2,6 +2,8 @@ plugins {
     kotlin("multiplatform") version "1.5.31"
 }
 
+val coroutinesVersion = "1.5.2"
+
 repositories {
     mavenLocal()
     jcenter()
@@ -64,7 +66,7 @@ kotlin {
                     dependsOn(nativeMain)
                     dependencies {
                         // TODO: can we do better?
-                        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-macosx64:1.5.2")
+                        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-macosx64:$coroutinesVersion")
                     }
                 }
                 macosX64Main
@@ -73,7 +75,7 @@ kotlin {
                 val macosArm64Main by getting {
                     dependsOn(nativeMain)
                     dependencies {
-                        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-macosarm64:1.5.2")
+                        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-macosarm64:$coroutinesVersion")
                     }
                 }
                 macosArm64Main
