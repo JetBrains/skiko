@@ -1,4 +1,4 @@
-package org.jetbrains.skiko.sample.native
+package org.jetbrains.skiko.sample
 
 import platform.AppKit.*
 
@@ -25,7 +25,7 @@ fun createWindow(title: String)  {
     var angle = 0.0f
 
     window.layer.renderer = Renderer(window.layer) {
-        renderer, w, h, nanoTime -> displayScene(renderer, nanoTime)
+        renderer, w, h, nanoTime -> displayScene(renderer.canvas!!, nanoTime)
     }
 
     window.nsWindow.orderFrontRegardless()
@@ -44,20 +44,5 @@ class Renderer(
         displayScene(this, (width / contentScale).toInt(), (height / contentScale).toInt(), nanoTime)
         layer.needRedraw()
     }
-}
-
-fun displayScene(renderer: Renderer, nanoTime: Long) {
-    val canvas = renderer.canvas!!
-
-    val paint = Paint().apply { color = Color.GREEN}
-
-    canvas.clear(Color.RED)
-
-    canvas.save();
-    canvas.translate(128.0f, 128.0f)
-    canvas.rotate(nanoTime.toFloat() / 1e7f)
-    val rect = Rect.makeXYWH(-90.5f, -90.5f, 181.0f, 181.0f)
-    canvas.drawRect(rect, paint)
-    canvas.restore();
 }
 
