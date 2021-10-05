@@ -54,8 +54,18 @@ val skiaZip = run {
 }
 
 val crossTargets = listOf(
-    OS.Wasm to Arch.Wasm
+    OS.Wasm to Arch.Wasm,
+    OS.IOS to Arch.X64,
+    OS.IOS to Arch.Arm64,
+    OS.MacOS to Arch.X64,
+    OS.MacOS to Arch.Arm64,
 )
+
+class NativeCompilationInfo(val target: org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget) {
+    var linkTask: Provider<Exec>? = null
+}
+
+val allNativeTargets = mutableMapOf<Pair<OS, Arch>, NativeCompilationInfo>()
 
 val skiaCrossDownloadTasks: Map<Pair<OS, Arch>, Provider<File>> = crossTargets.keysToMap { osArch ->
     val suffix = targetSuffix(osArch.first, osArch.second)
@@ -122,6 +132,76 @@ val wasmCrossCompile = tasks.register<CrossCompileTask>("wasmCrossCompile") {
     ))
 }
 
+fun registerNativeBridgesTask(os: OS, arch: Arch): TaskProvider<CrossCompileTask> {
+    return tasks.register<CrossCompileTask>("${os.id}_${arch.id}_CrossCompile") {
+        val osArch = os to arch
+
+        val unzipper = skiaDirProviderForCrossTargets[osArch]!!
+        dependsOn(unzipper)
+        val unpackedSkia = unzipper.get()
+
+        compiler.set("clang++")
+        when (os)  {
+            OS.IOS -> {
+                val sdkRoot = "/Applications/Xcode.app/Contents/Developer/Platforms"
+                val iosFlags = listOf(
+                    "-std=c++17",
+                    "-stdlib=libc++",
+                    "-DSK_SHAPER_CORETEXT_AVAILABLE",
+                    "-DSK_BUILD_FOR_IOS",
+                    "-DSK_METAL",
+                    "-DSK_SUPPORT_GPU=1"
+                )
+                when (arch) {
+                    Arch.Arm64 ->
+                        flags.set(
+                            listOf(
+                                "-target", "arm64-apple-ios",
+                                "-isysroot", "$sdkRoot/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk"
+                            ) +
+                            iosFlags +
+                            skiaPreprocessorFlags()
+                        )
+                    Arch.X64 -> flags.set(
+                            listOf(
+                                "-target", "x86_64-apple-ios-simulator",
+                                "-isysroot", "$sdkRoot/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk")
+                            + iosFlags
+                            + skiaPreprocessorFlags()
+                        )
+                    else -> throw GradleException("Unsupported arch: $arch")
+                }
+            }
+            OS.MacOS -> {
+                flags.set(listOf(
+                    "-std=c++17",
+                    "-DSK_SHAPER_CORETEXT_AVAILABLE",
+                    "-DSK_BUILD_FOR_MAC",
+                    "-DSK_METAL",
+                    "-DSK_SUPPORT_GPU=1",
+                    *skiaPreprocessorFlags()
+                ))
+            }
+        }
+
+        crossCompileTargetOS.set(osArch.first)
+        crossCompileTargetArch.set(osArch.second)
+        buildVariant.set(buildType)
+
+        sourceFiles =
+                project.fileTree("src/nativeMain/cpp") { include("**/*.cc") } +
+                project.fileTree("src/commonMain/cpp") { include("**/*.cc") }
+        if (skiko.includeTestHelpers) {
+            sourceFiles += project.fileTree("src/commonTest/cpp") { include("**/*.cc") }
+        }
+
+        outDir.set(project.layout.buildDirectory.dir("out/compile/${buildType.id}-${osArch.first.id}-${osArch.second.id}"))
+
+        includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp"))
+        includeHeadersNonRecursive(skiaHeadersDirs(unpackedSkia))
+    }
+}
+
 val linkWasm = tasks.register<LinkWasmTask>("linkWasm") {
     val osArch = OS.Wasm to Arch.Wasm
 
@@ -186,6 +266,7 @@ val Project.supportNative: Boolean
 val Project.supportWasm: Boolean
     get() = properties.get("skiko.wasm.enabled") == "true"
 
+
 kotlin {
     jvm {
         compilations.all {
@@ -207,27 +288,63 @@ kotlin {
     }
 
     if (supportNative) {
-        val skiaDir = skiaDir.get().absolutePath
-        val nativeTarget = when (target) {
-            "macos-x64" -> macosX64 {}
-            "macos-arm64" -> macosArm64 {}
-            else -> null
+        when ("${hostOs.id}-${hostArch.id}") {
+            "macos-x64" -> allNativeTargets[OS.MacOS to Arch.X64] = NativeCompilationInfo(macosX64())
+            "macos-arm64" -> allNativeTargets[OS.MacOS to Arch.Arm64] = NativeCompilationInfo(macosArm64())
         }
-        val targetString = target
-        nativeTarget?.let {
-            it.compilations.all {
+
+        if (hostOs == OS.MacOS) {
+            allNativeTargets[OS.IOS to Arch.Arm64] = NativeCompilationInfo(iosArm64())
+            allNativeTargets[OS.IOS to Arch.X64] = NativeCompilationInfo(iosX64())
+        }
+
+        for ((osArch, compilation) in allNativeTargets) {
+            val targetString = "${osArch.first.id}-${osArch.second.id}"
+
+            val unzipper = skiaDirProviderForCrossTargets[osArch]!!
+            val unpackedSkia = unzipper.get()
+
+            val skiaDir = unpackedSkia.absolutePath
+            val skiaBinSubdir = "out/${buildType.id}-$targetString"
+
+            compilation.target.compilations.all {
                 kotlinOptions {
                     freeCompilerArgs += listOf(
-                        "-include-binary",
-                        "$skiaDir/$skiaBinSubdir/libskia.a",
-                        "-include-binary",
-                        "$skiaDir/$skiaBinSubdir/libskshaper.a",
-                        "-include-binary",
-                        "$skiaDir/$skiaBinSubdir/libskparagraph.a",
-                        "-include-binary",
-                        "$buildDir/nativeBridges/static/$targetString/skiko-native-bridges-$targetString.a"
+                            "-include-binary",
+                            "$skiaDir/$skiaBinSubdir/libskia.a",
+                            "-include-binary",
+                            "$skiaDir/$skiaBinSubdir/libskshaper.a",
+                            "-include-binary",
+                            "$skiaDir/$skiaBinSubdir/libskparagraph.a",
+                            "-include-binary",
+                            "$buildDir/nativeBridges/static/$targetString/skiko-native-bridges-$targetString.a"
                     )
                 }
+            }
+
+            val crossCompileTask = registerNativeBridgesTask(osArch.first, osArch.second)
+            allNativeTargets[osArch]!!.linkTask = project.tasks.register<Exec>("linkNativeBridges$targetString") {
+                dependsOn(crossCompileTask)
+                val objectFilesDir = crossCompileTask.map { it.outDir.get() }
+                val objectFiles = project.fileTree(objectFilesDir) {
+                    include("**/*.o")
+                }
+                inputs.files(objectFiles)
+
+                val outDir = "$buildDir/nativeBridges/static/$targetString"
+                val staticLib = "$outDir/skiko-native-bridges-$targetString.a"
+                workingDir = File(outDir)
+                executable = "libtool"
+                argumentProviders.add {
+                    listOf(
+                        "-static",
+                        "-o",
+                        staticLib
+                    )
+                }
+                argumentProviders.add { objectFiles.files.map { it.absolutePath } }
+                file(outDir).mkdirs()
+                outputs.dir(outDir)
             }
         }
     }
@@ -275,8 +392,11 @@ kotlin {
                     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
                 }
             }
-            if (targetOs == OS.MacOS) {
+            if (hostOs == OS.MacOS) {
                 val macosMain by creating {
+                    dependsOn(nativeMain)
+                }
+                val iosMain by creating {
                     dependsOn(nativeMain)
                 }
                 val macosArchMain = when (targetArch) {
@@ -293,6 +413,12 @@ kotlin {
                         macosArm64Main
                     }
                     else -> throw GradleException("Unsupported arch $targetArch for macOS")
+                }
+                val iosX64Main by getting {
+                    dependsOn(iosMain)
+                }
+                val iosArm64Main by getting {
+                    dependsOn(iosMain)
                 }
             }
         }
@@ -412,7 +538,7 @@ tasks.withType(CppCompile::class.java).configureEach {
                     )
             )
         }
-        OS.Wasm -> throw GradleException("Should not reach here")
+        OS.Wasm, OS.IOS -> throw GradleException("Should not reach here")
     }
 }
 
@@ -467,60 +593,6 @@ val generateVersion = project.tasks.register("generateVersion") {
         }
         """.trimIndent())
     }
-}
-
-// Very hacky way to compile native bridges and add the
-// resulting object files into the final native klib.
-val compileNativeBridges = project.tasks.register<CrossCompileTask>("compileNativeBridges") {
-    dependsOn(skiaDir)
-
-    compiler.set("clang++")
-    crossCompileTargetOS.set(targetOs)
-    crossCompileTargetArch.set(targetArch)
-    buildVariant.set(buildType)
-
-    sourceFiles =
-        project.fileTree("src/nativeMain/cpp") { include("**/*.cc") } +
-                project.fileTree("src/commonMain/cpp") { include("**/*.cc") }
-    if (skiko.includeTestHelpers) {
-        sourceFiles += project.fileTree("src/commonTest/cpp") { include("**/*.cc") }
-    }
-
-    outDir.set(project.layout.buildDirectory.dir("nativeBridges/obj/$target"))
-
-    includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp"))
-    includeHeadersNonRecursive(skiaHeadersDirs(skiaDir.get()))
-
-    flags.set(listOf(
-        "-DSK_SHAPER_CORETEXT_AVAILABLE",
-        "-DSK_BUILD_FOR_MAC",
-        "-DSK_METAL",
-        *skiaPreprocessorFlags(),
-    ))
-}
-
-val linkNativeBridges = project.tasks.register<Exec>("linkNativeBridges") {
-    dependsOn(compileNativeBridges)
-    val objectFilesDir = compileNativeBridges.map { it.outDir.get() }
-    val objectFiles = project.fileTree(objectFilesDir) {
-        include("**/*.o")
-    }
-    inputs.files(objectFiles)
-
-    val outDir = "$buildDir/nativeBridges/static/$target"
-    val staticLib = "$outDir/skiko-native-bridges-$target.a"
-    workingDir = File(outDir)
-    executable = "libtool"
-    argumentProviders.add {
-        listOf(
-            "-static",
-            "-o",
-            staticLib
-        )
-    }
-    argumentProviders.add { objectFiles.files.map { it.absolutePath } }
-    file(outDir).mkdirs()
-    outputs.dir(outDir)
 }
 
 fun localSign(signer: String, lib: File): File {
@@ -672,8 +744,8 @@ tasks.withType(LinkSharedLibrary::class.java).configureEach {
                 )
             )
         }
-        OS.Wasm -> {
-            throw GradleException("This task shalln't be used with WASM")
+        OS.Wasm, OS.IOS -> {
+            throw GradleException("This task shalln't be used with $targetOs")
         }
     }
 }
@@ -952,9 +1024,11 @@ afterEvaluate {
     tasks.withType<KotlinNativeCompile>().configureEach {
         dependsOn(generateVersion)
         source(generatedKotlin)
-
+        // TDOD: do we need this 'if'?
         if (supportNative) {
-            dependsOn(linkNativeBridges)
+            val compilationInfoKey = allNativeTargets.keys.singleOrNull { "${it.first.id}_${it.second.id}" == this.target }
+                ?: throw GradleException("No cross-target for ${this.target}")
+            dependsOn(allNativeTargets[compilationInfoKey]!!.linkTask)
         }
     }
 }

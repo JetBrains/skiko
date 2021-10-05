@@ -7,7 +7,6 @@ import kotlin.native.concurrent.freeze
 import kotlin.native.internal.createCleaner
 
 private class FinalizationThunk(private val finalizer: NativePointer, val className: String, obj: NativePointer) {
-
     private var obj = AtomicNativePtr(obj)
 
     fun clean() {

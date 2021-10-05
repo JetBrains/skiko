@@ -8,7 +8,8 @@ enum class OS(
     Linux("linux", arrayOf()),
     Windows("windows", arrayOf()),
     MacOS("macos", arrayOf("-mmacosx-version-min=10.13")),
-    Wasm("wasm", arrayOf())
+    Wasm("wasm", arrayOf()),
+    IOS("ios", arrayOf())
     ;
 
     val isWindows

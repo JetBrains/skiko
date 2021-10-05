@@ -1,17 +1,9 @@
 package org.jetbrains.skiko.native.context
 
-import kotlinx.cinterop.ptr
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.native.*
 
-internal fun createContextHandler(layer: HardwareLayer): ContextHandler {
-    return OpenGLContextHandler(layer)
-    //return when (SkikoProperties.renderApi) {
-    //    GraphicsApi.SOFTWARE -> SoftwareContextHandler(layer)
-    //    GraphicsApi.OPENGL -> OpenGLContextHandler(layer)
-    //    else -> TODO("Unsupported yet")
-    //}
-}
+internal expect fun createContextHandler(layer: HardwareLayer): ContextHandler
 
 internal abstract class ContextHandler(val layer: HardwareLayer) {
 

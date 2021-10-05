@@ -4,10 +4,19 @@ import kotlinx.cinterop.*
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.native.*
 import platform.OpenGL.GL_DRAW_FRAMEBUFFER_BINDING
-import platform.OpenGL.GL_RGBA8
 import platform.OpenGL.glGetIntegerv
 import platform.OpenGL.*
 import platform.OpenGLCommon.GLenum
+
+
+internal actual fun createContextHandler(layer: HardwareLayer): ContextHandler {
+    return OpenGLContextHandler(layer)
+    //return when (SkikoProperties.renderApi) {
+    //    GraphicsApi.SOFTWARE -> SoftwareContextHandler(layer)
+    //    GraphicsApi.OPENGL -> OpenGLContextHandler(layer)
+    //    else -> TODO("Unsupported yet")
+    //}
+}
 
 internal class OpenGLContextHandler(layer: HardwareLayer) : ContextHandler(layer) {
     override fun initContext(): Boolean {
