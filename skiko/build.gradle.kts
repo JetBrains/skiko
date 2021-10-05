@@ -140,59 +140,65 @@ fun registerNativeBridgesTask(os: OS, arch: Arch): TaskProvider<CrossCompileTask
         dependsOn(unzipper)
         val unpackedSkia = unzipper.get()
 
-        compiler.set("clang")
+        compiler.set("clang++")
         when (os)  {
             OS.IOS -> {
                 val sdkRoot = "/Applications/Xcode.app/Contents/Developer/Platforms"
+                val iosFlags = listOf(
+                    "-std=c++17",
+                    "-stdlib=libc++",
+                    "-DSK_SHAPER_CORETEXT_AVAILABLE",
+                    "-DSK_BUILD_FOR_IOS",
+                    "-DSK_METAL",
+                    "-DSK_SUPPORT_GPU=1"
+                )
                 when (arch) {
                     Arch.Arm64 ->
                         flags.set(
                             listOf(
                                 "-target", "arm64-apple-ios",
-                                "-isysroot", "$sdkRoot/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk",
-                                "-DSK_SHAPER_CORETEXT_AVAILABLE",
-                                "-DSK_BUILD_FOR_IOS",
-                                "-DSK_METAL",
-                                *skiaPreprocessorFlags()
-                            )
+                                "-isysroot", "$sdkRoot/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk"
+                            ) +
+                            iosFlags +
+                            skiaPreprocessorFlags()
                         )
                     Arch.X64 -> flags.set(
-                        listOf(
-                            "-target", "x86_64-apple-ios-simulator",
-                            "-isysroot", "$sdkRoot/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk",
-                            "-DSK_SHAPER_CORETEXT_AVAILABLE",
-                            "-DSK_BUILD_FOR_IOS",
-                            "-DSK_METAL",
-                            *skiaPreprocessorFlags()
-                            )
-                    )
+                            listOf(
+                                "-target", "x86_64-apple-ios-simulator",
+                                "-isysroot", "$sdkRoot/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk")
+                            + iosFlags
+                            + skiaPreprocessorFlags()
+                        )
                     else -> throw GradleException("Unsupported arch: $arch")
                 }
             }
             OS.MacOS -> {
                 flags.set(listOf(
+                    "-std=c++17",
                     "-DSK_SHAPER_CORETEXT_AVAILABLE",
                     "-DSK_BUILD_FOR_MAC",
                     "-DSK_METAL",
+                    "-DSK_SUPPORT_GPU=1",
                     *skiaPreprocessorFlags()
                 ))
             }
         }
 
+        crossCompileTargetOS.set(osArch.first)
         crossCompileTargetArch.set(osArch.second)
         buildVariant.set(buildType)
 
         sourceFiles =
-            project.fileTree("src/commonMain/cpp") { include("**/*.cc") }
+                project.fileTree("src/nativeMain/cpp") { include("**/*.cc") } +
+                project.fileTree("src/commonMain/cpp") { include("**/*.cc") }
+        if (skiko.includeTestHelpers) {
+            sourceFiles += project.fileTree("src/commonTest/cpp") { include("**/*.cc") }
+        }
+
         outDir.set(project.layout.buildDirectory.dir("out/compile/${buildType.id}-${osArch.first.id}-${osArch.second.id}"))
 
         includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp"))
         includeHeadersNonRecursive(skiaHeadersDirs(unpackedSkia))
-
-        flags.set(listOf(
-            *skiaPreprocessorFlags(),
-            "-DSK_SUPPORT_GPU=1"
-        ))
     }
 }
 
