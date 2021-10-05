@@ -63,7 +63,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_1n
     instance->setY(lenght);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_nSetWidth
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_1nSetWidth
   (JNIEnv* env, jclass jclass, jlong ptr, float value, int unit) {
     SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>(static_cast<uintptr_t>(ptr));
     SkSVGLength lenght(value, static_cast<SkSVGLength::Unit>(unit));

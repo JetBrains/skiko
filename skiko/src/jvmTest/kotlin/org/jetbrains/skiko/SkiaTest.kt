@@ -46,6 +46,7 @@ class SkiaTest {
         val e = dom.root!!
         assert(e.x.unit == SVGLengthUnit.NUMBER)
         assert(e.y.unit == SVGLengthUnit.NUMBER)
+        assert(e.width.unit == SVGLengthUnit.NUMBER)
         assert(e.height.unit == SVGLengthUnit.NUMBER)
         assert(e.viewBox == null)
         assert(e.tag == SVGTag.SVG)
