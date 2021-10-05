@@ -2,6 +2,9 @@ package org.jetbrains.skiko
 
 import org.jetbrains.skia.*
 import org.jetbrains.skia.svg.SVGDOM
+import org.jetbrains.skia.svg.SVGLengthContext
+import org.jetbrains.skia.svg.SVGLengthUnit
+import org.jetbrains.skia.svg.SVGTag
 import org.junit.Test
 
 class SkiaTest {
@@ -20,7 +23,7 @@ class SkiaTest {
     }
 
     @Test
-    fun `svg dom`() {
+    fun `svg smoke`() {
         val svgText = """
             <svg version="1.1"
                  width="300" height="200"
@@ -40,5 +43,14 @@ class SkiaTest {
         dom.setContainerSize(Point(100f, 100f))
         dom.setContainerSize(101f, 101f)
         assert(dom.root != null)
+        val e = dom.root!!
+        assert(e.x.unit == SVGLengthUnit.NUMBER)
+        assert(e.y.unit == SVGLengthUnit.NUMBER)
+        assert(e.height.unit == SVGLengthUnit.NUMBER)
+        assert(e.viewBox == null)
+        assert(e.tag == SVGTag.SVG)
+        // e.viewBox = Rect(0f, 1f, 100f, 200f)
+        // assert(e.viewBox!!.top == 1f)
+        assert(e.getIntrinsicSize(SVGLengthContext(100f, 100f)).x == 300f)
     }
 }

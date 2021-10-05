@@ -63,7 +63,6 @@ class SVGDOM internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     }
 }
 
-
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nMakeFromData")
 private external fun SVGDOM_nMakeFromData(dataPtr: NativePointer): NativePointer
 
