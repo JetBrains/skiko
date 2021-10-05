@@ -4,44 +4,44 @@
 #include "SkSVGSVG.h"
 #include "SkSVGRenderContext.h"
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_nGetX
+extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_1nGetX
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>(static_cast<uintptr_t>(ptr));
     return skija::svg::SVGLength::toJava(env, instance->getX());
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_nGetY
+extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_1nGetY
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>(static_cast<uintptr_t>(ptr));
     return skija::svg::SVGLength::toJava(env, instance->getY());
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_nGetWidth
+extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_1nGetWidth
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>(static_cast<uintptr_t>(ptr));
     return skija::svg::SVGLength::toJava(env, instance->getWidth());
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_nGetHeight
+extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_1nGetHeight
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>(static_cast<uintptr_t>(ptr));
     return skija::svg::SVGLength::toJava(env, instance->getHeight());
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_nGetPreserveAspectRatio
+extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_1nGetPreserveAspectRatio
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>(static_cast<uintptr_t>(ptr));
     return skija::svg::SVGPreserveAspectRatio::toJava(env, instance->getPreserveAspectRatio());
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_nGetViewBox
+extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_1nGetViewBox
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>(static_cast<uintptr_t>(ptr));
     SkTLazy<SkSVGViewBoxType> viewBox = instance->getViewBox();
     return viewBox.isValid() ? skija::Rect::fromSkRect(env, *viewBox.get()) : nullptr;
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_nGetIntrinsicSize
+extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_1nGetIntrinsicSize
   (JNIEnv* env, jclass jclass, jlong ptr, float width, float height, float dpi) {
     SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>(static_cast<uintptr_t>(ptr));
     SkSVGLengthContext lc({width, height}, dpi);
@@ -49,42 +49,42 @@ extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG
     return skija::Point::fromSkPoint(env, {size.width(), size.height()});
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_nSetX
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_1nSetX
   (JNIEnv* env, jclass jclass, jlong ptr, float value, int unit) {
     SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>(static_cast<uintptr_t>(ptr));
     SkSVGLength lenght(value, static_cast<SkSVGLength::Unit>(unit));
     instance->setX(lenght);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_nSetY
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_1nSetY
   (JNIEnv* env, jclass jclass, jlong ptr, float value, int unit) {
     SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>(static_cast<uintptr_t>(ptr));
     SkSVGLength lenght(value, static_cast<SkSVGLength::Unit>(unit));
     instance->setY(lenght);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_nSetWidth
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_1nSetWidth
   (JNIEnv* env, jclass jclass, jlong ptr, float value, int unit) {
     SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>(static_cast<uintptr_t>(ptr));
     SkSVGLength lenght(value, static_cast<SkSVGLength::Unit>(unit));
     instance->setWidth(lenght);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_nSetHeight
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_1nSetHeight
   (JNIEnv* env, jclass jclass, jlong ptr, float value, int unit) {
     SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>(static_cast<uintptr_t>(ptr));
     SkSVGLength lenght(value, static_cast<SkSVGLength::Unit>(unit));
     instance->setHeight(lenght);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_nSetPreserveAspectRatio
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_1nSetPreserveAspectRatio
   (JNIEnv* env, jclass jclass, jlong ptr, jint align, jint scale) {
     SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>(static_cast<uintptr_t>(ptr));
     instance->setPreserveAspectRatio(SkSVGPreserveAspectRatio { static_cast<SkSVGPreserveAspectRatio::Align>(align),
                                                                 static_cast<SkSVGPreserveAspectRatio::Scale>(scale) });
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_nSetViewBox
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_1nSetViewBox
   (JNIEnv* env, jclass jclass, jlong ptr, float l, float t, float r, float b) {
     SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>(static_cast<uintptr_t>(ptr));
     instance->setViewBox(SkRect::MakeLTRB(l, t, r, b));

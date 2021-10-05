@@ -6,27 +6,18 @@ class SVGLength(val value: Float, val unit: SVGLengthUnit) {
 
     constructor(value: Float) : this(value, SVGLengthUnit.NUMBER) {}
 
-    override fun equals(o: Any?): Boolean {
-        if (o === this) return true
-        if (o !is SVGLength) return false
-        val other = o
-        if (!other.canEqual(this as Any)) return false
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is SVGLength) return false
         if (value.compareTo(other.value) != 0) return false
-        val `this$_unit`: Any = unit
-        val `other$_unit`: Any = other.unit
-        return `this$_unit` == `other$_unit`
-    }
-
-    protected fun canEqual(other: Any?): Boolean {
-        return other is SVGLength
+        return unit == other.unit
     }
 
     override fun hashCode(): Int {
         val PRIME = 59
         var result = 1
         result = result * PRIME + value.toBits()
-        val `$_unit`: Any = unit
-        result = result * PRIME + (`$_unit`.hashCode())
+        result = result * PRIME + unit.hashCode()
         return result
     }
 

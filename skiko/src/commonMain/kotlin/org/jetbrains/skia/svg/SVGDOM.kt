@@ -41,16 +41,14 @@ class SVGDOM internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             reachabilityBarrier(this)
         }
 
-    fun setContainerSize(width: Float, height: Float): SVGDOM {
+    fun setContainerSize(width: Float, height: Float) {
         Stats.onNativeCall()
         SVGDOM_nSetContainerSize(_ptr, width, height)
-        return this
     }
 
-    fun setContainerSize(size: Point): SVGDOM {
+    fun setContainerSize(size: Point) {
         Stats.onNativeCall()
         SVGDOM_nSetContainerSize(_ptr, size.x, size.y)
-        return this
     }
 
     // sk_sp<SkSVGNode>* findNodeById(const char* id);
@@ -64,7 +62,6 @@ class SVGDOM internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         }
     }
 }
-
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nMakeFromData")
 private external fun SVGDOM_nMakeFromData(dataPtr: NativePointer): NativePointer
