@@ -303,22 +303,14 @@ kotlin {
 
             val unzipper = skiaDirProviderForCrossTargets[osArch]!!
             val unpackedSkia = unzipper.get()
-
             val skiaDir = unpackedSkia.absolutePath
-            val skiaBinSubdir = "out/${buildType.id}-$targetString"
+
+            val bridgesLibrary = "$buildDir/nativeBridges/static/$targetString/skiko-native-bridges-$targetString.a"
+            val allLibraries = skiaStaticLibraries(skiaDir, targetString) + bridgesLibrary
 
             compilation.target.compilations.all {
                 kotlinOptions {
-                    freeCompilerArgs += listOf(
-                            "-include-binary",
-                            "$skiaDir/$skiaBinSubdir/libskia.a",
-                            "-include-binary",
-                            "$skiaDir/$skiaBinSubdir/libskshaper.a",
-                            "-include-binary",
-                            "$skiaDir/$skiaBinSubdir/libskparagraph.a",
-                            "-include-binary",
-                            "$buildDir/nativeBridges/static/$targetString/skiko-native-bridges-$targetString.a"
-                    )
+                    freeCompilerArgs = allLibraries.map{ listOf("-include-binary", it) }.flatten()
                 }
             }
 
@@ -470,6 +462,34 @@ fun skiaPreprocessorFlags(): Array<String> {
         "-DSK_USING_THIRD_PARTY_ICU",
         *buildType.flags
     ).toTypedArray()
+}
+
+fun skiaStaticLibraries(skiaDir: String, targetString: String): List<String> {
+    val skiaBinSubdir = "$skiaDir/out/${buildType.id}-$targetString"
+    return listOf(
+        "libskresources.a",
+        "libparticles.a",
+        "libskparagraph.a",
+        "libskia.a",
+        "libicu.a",
+        "libskottie.a",
+        "libsvg.a",
+        "libpng.a",
+        "libfreetype2.a",
+        "libwebp_sse41.a",
+        "libsksg.a",
+        "libskunicode.a",
+        "libwebp.a",
+        "libdng_sdk.a",
+        "libpiex.a",
+        "libharfbuzz.a",
+        "libexpat.a",
+        "libzlib.a",
+        "libjpeg.a",
+        "libskshaper.a"
+    ).map{
+        "$skiaBinSubdir/$it"
+    }
 }
 
 // See https://docs.gradle.org/current/userguide/cpp_library_plugin.html.
