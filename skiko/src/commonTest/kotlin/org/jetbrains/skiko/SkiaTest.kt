@@ -23,8 +23,7 @@ class SkiaTest {
         require(table._ptr != Native.NullPointer)
     }
 
-    // @Test
-    // TODO: disabled until all methods implemented in JS/Native.
+    @Test
     fun `svg_smoke`() {
         val svgText = """
             <svg version="1.1"
@@ -48,12 +47,15 @@ class SkiaTest {
         val e = dom.root!!
         require(e.x.unit == SVGLengthUnit.NUMBER)
         require(e.y.unit == SVGLengthUnit.NUMBER)
-        require(e.width.unit == SVGLengthUnit.NUMBER)
-        require(e.height.unit == SVGLengthUnit.NUMBER)
-        require(e.viewBox == null)
-        require(e.tag == SVGTag.SVG)
-        // e.viewBox = Rect(0f, 1f, 100f, 200f)
-        // assert(e.viewBox!!.top == 1f)
-        require(e.getIntrinsicSize(SVGLengthContext(100f, 100f)).x == 300f)
+        if (false) {
+            // TODO: disabled until all methods implemented in JS/Native.
+            require(e.width.unit == SVGLengthUnit.NUMBER)
+            require(e.height.unit == SVGLengthUnit.NUMBER)
+            require(e.viewBox == null)
+            require(e.tag == SVGTag.SVG)
+            // e.viewBox = Rect(0f, 1f, 100f, 200f)
+            // assert(e.viewBox!!.top == 1f)
+            require(e.getIntrinsicSize(SVGLengthContext(100f, 100f)).x == 300f)
+        }
     }
 }
