@@ -71,20 +71,20 @@ private fun pathSegmentFromFloatArray(points: FloatArray): PathSegment {
     val isClosedLineBit = ((context shr 6) and 1)
     val isClosed = isClosedBit != 0
 
-    return when (verb) {
-        PathVerb.MOVE.ordinal, PathVerb.CLOSE.ordinal -> {
+    return when (PathVerb.values()[verb]) {
+        PathVerb.MOVE, PathVerb.CLOSE -> {
             PathSegment(verb, points[0], points[1], isClosed)
         }
-        PathVerb.LINE.ordinal -> {
+        PathVerb.LINE -> {
             PathSegment(points[0], points[1], points[2], points[3], isClosedLineBit != 0, isClosed)
         }
-        PathVerb.QUAD.ordinal -> {
+        PathVerb.QUAD -> {
             PathSegment(points[0], points[1], points[2], points[3], points[4], points[5], isClosed)
         }
-        PathVerb.CONIC.ordinal -> {
+        PathVerb.CONIC -> {
             PathSegment(points[0], points[1], points[2], points[3], points[4], points[5], points[8], isClosed)
         }
-        PathVerb.CUBIC.ordinal -> {
+        PathVerb.CUBIC -> {
             PathSegment(
                 points[0],
                 points[1],
@@ -97,10 +97,9 @@ private fun pathSegmentFromFloatArray(points: FloatArray): PathSegment {
                 isClosed
             )
         }
-        PathVerb.DONE.ordinal -> {
+        PathVerb.DONE -> {
             PathSegment()
         }
-        else -> throw IllegalStateException()
     }
 }
 
