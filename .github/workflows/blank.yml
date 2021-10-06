@@ -31,7 +31,7 @@ jobs:
           cd $GITHUB_WORKSPACE/skiko
           ./gradlew jvmTest
           ./gradlew publishToMavenLocal
-          ./gradlew -Pskiko.native.enabled=true macosX64Test
+          ./gradlew -Pskiko.native.enabled=true macosX64Test iosX64Test
           ./gradlew -Pskiko.native.enabled=true publishToMavenLocal
    linux:
     runs-on: ubuntu-20.04
