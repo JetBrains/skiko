@@ -392,12 +392,14 @@ kotlin {
                     dependsOn(nativeMain)
                 }
                 val macosTest by creating {
+                    dependsOn(nativeMain)
                     dependsOn(nativeTest)
                 }
                 val iosMain by creating {
                     dependsOn(nativeMain)
                 }
                 val iosTest by creating {
+                    dependsOn(nativeMain)
                     dependsOn(nativeTest)
                 }
                 val macosArch = when (targetArch) {
@@ -406,6 +408,7 @@ kotlin {
                             dependsOn(macosMain)
                         }
                         val macosX64Test by getting {
+                            dependsOn(macosMain)
                             dependsOn(macosTest)
                         }
                         macosX64Main to macosX64Test
@@ -415,6 +418,7 @@ kotlin {
                             dependsOn(macosMain)
                         }
                         val macosArm64Test by getting {
+                            dependsOn(macosMain)
                             dependsOn(macosTest)
                         }
                         macosArm64Main to macosArm64Test
@@ -425,12 +429,14 @@ kotlin {
                     dependsOn(iosMain)
                 }
                 val iosX64Test by getting {
-                    dependsOn(iosTest)
+                    dependsOn(iosMain)
+                    dependsOn(iosMain)
                 }
                 val iosArm64Main by getting {
                     dependsOn(iosMain)
                 }
                 val iosArm64Test by getting {
+                    dependsOn(iosMain)
                     dependsOn(iosTest)
                 }
             }
