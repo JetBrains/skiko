@@ -33,6 +33,7 @@ internal class WindowsOpenGLRedrawer(
 
     override fun dispose() {
         check(!isDisposed) { "WindowsOpenGLRedrawer is disposed" }
+        makeCurrent()
         deleteContext(context)
         isDisposed = true
     }
