@@ -307,18 +307,16 @@ kotlin {
             val skiaDir = unpackedSkia.absolutePath
             val skiaBinSubdir = "out/${buildType.id}-$targetString"
 
+            val skiaLibraries = project.fileTree("$skiaDir/$skiaBinSubdir") {
+                include("**/*.a")
+            }.files.map { it.absolutePath }
+            val bridgesLibrary = "$buildDir/nativeBridges/static/$targetString/skiko-native-bridges-$targetString.a"
+            val libraries = skiaLibraries + bridgesLibrary
+            val libraryFlags = libraries.map { listOf("-include-binary", it) }.flatten()
+
             compilation.target.compilations.all {
                 kotlinOptions {
-                    freeCompilerArgs += listOf(
-                            "-include-binary",
-                            "$skiaDir/$skiaBinSubdir/libskia.a",
-                            "-include-binary",
-                            "$skiaDir/$skiaBinSubdir/libskshaper.a",
-                            "-include-binary",
-                            "$skiaDir/$skiaBinSubdir/libskparagraph.a",
-                            "-include-binary",
-                            "$buildDir/nativeBridges/static/$targetString/skiko-native-bridges-$targetString.a"
-                    )
+                    freeCompilerArgs = libraryFlags
                 }
             }
 
