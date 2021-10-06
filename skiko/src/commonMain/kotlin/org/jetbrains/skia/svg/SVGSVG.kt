@@ -2,10 +2,8 @@ package org.jetbrains.skia.svg
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.*
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
-import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.*
 
 class SVGSVG internal constructor(ptr: NativePointer) : SVGContainer(ptr) {
     companion object {
@@ -17,7 +15,10 @@ class SVGSVG internal constructor(ptr: NativePointer) : SVGContainer(ptr) {
     var x: SVGLength
         get() = try {
             Stats.onNativeCall()
-            SVGSVG_nGetX(_ptr)
+            val result = withResult(IntArray(2)) {
+                SVGSVG_nGetX(_ptr, it)
+            }
+            SVGLength(Float.fromBits(result[0]), result[1])
         } finally {
             reachabilityBarrier(this)
         }
@@ -31,7 +32,10 @@ class SVGSVG internal constructor(ptr: NativePointer) : SVGContainer(ptr) {
     var y: SVGLength
         get() = try {
             Stats.onNativeCall()
-            SVGSVG_nGetY(_ptr)
+            val result = withResult(IntArray(2)) {
+                SVGSVG_nGetY(_ptr, it)
+            }
+            SVGLength(Float.fromBits(result[0]), result[1])
         } finally {
             reachabilityBarrier(this)
         }
@@ -116,12 +120,11 @@ class SVGSVG internal constructor(ptr: NativePointer) : SVGContainer(ptr) {
     }
 }
 
-
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nGetX")
-private external fun SVGSVG_nGetX(ptr: NativePointer): SVGLength
+private external fun SVGSVG_nGetX(ptr: NativePointer, result: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nGetY")
-private external fun SVGSVG_nGetY(ptr: NativePointer): SVGLength
+private external fun SVGSVG_nGetY(ptr: NativePointer, result: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nGetWidth")
 private external fun SVGSVG_nGetWidth(ptr: NativePointer): SVGLength
