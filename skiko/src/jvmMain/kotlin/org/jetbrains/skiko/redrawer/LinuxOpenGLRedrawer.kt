@@ -116,15 +116,26 @@ internal class LinuxOpenGLRedrawer(
                     redrawer.draw()
                 }
 
-                // TODO(demin) it seems now vsync doesn't work as expected with two windows (we have fps = refreshRate / windowCount)
-                //  perhaps we should create frameDispatcher for each display.
-                //  Don't know what happened, but on 620547a commit everything was okay. maybe something changed in the code, maybe my system changed
-                for (redrawer in toRedrawVisible) {
+                // TODO(demin): How can we properly synchronize multiple windows with multiple displays?
+                //  I checked, and without vsync there is no tearing. Is it only my case (Ubuntu, Nvidia, X11),
+                //  or Ubuntu write all the screen content into an intermediate buffer? If so, then we probably only
+                //  need a frame limiter.
+
+                // Synchronize with vsync only for the fastest monitor, for the single window.
+                // Otherwise, 5 windows will wait for vsync 5 times.
+                val fastestRedrawer = toRedrawVisible.maxByOrNull { it.frameLimit }
+
+                for (redrawer in toRedrawVisible.filter { it != fastestRedrawer }) {
+                    drawingSurfaces[redrawer]!!.makeCurrent(redrawer.context)
+                    drawingSurfaces[redrawer]!!.setSwapInterval(0)
                     drawingSurfaces[redrawer]!!.swapBuffers()
+                    OpenGLApi.instance.glFinish()
                 }
 
-                for (redrawer in toRedrawVisible) {
-                    drawingSurfaces[redrawer]!!.makeCurrent(redrawer.context)
+                if (fastestRedrawer != null) {
+                    drawingSurfaces[fastestRedrawer]!!.makeCurrent(fastestRedrawer.context)
+                    drawingSurfaces[fastestRedrawer]!!.setSwapInterval(1)
+                    drawingSurfaces[fastestRedrawer]!!.swapBuffers()
                     OpenGLApi.instance.glFinish()
                 }
             } finally {

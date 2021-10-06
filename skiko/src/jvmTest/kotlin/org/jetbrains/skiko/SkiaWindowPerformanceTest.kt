@@ -56,7 +56,7 @@ native crash in SkiaWindowTest "render single window"
         private val expectedDeviatePercent3 = 0.30
         private val expectedDeviatePercentTerminal = 0.50
 
-        private val expectedFrameNanos = 1E9 / graphicsConfiguration.device.displayMode.refreshRate
+        private val expectedFrameNanos get() = 1E9 / layer.backedLayer.getDisplayRefreshRate()
         private val frameTimes = mutableListOf<Long>()
         private var canCollect = false
 
