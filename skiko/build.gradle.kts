@@ -310,12 +310,16 @@ kotlin {
 
             compilation.target.compilations.all {
                 kotlinOptions {
-                    freeCompilerArgs = allLibraries.map{ listOf("-include-binary", it) }.flatten()
+                    val linkerFlags = if (osArch.first == OS.MacOS || osArch.first == OS.IOS)
+                        listOf("-linker-options", "-framework", "-linker-option", "Metal") else emptyList()
+                    freeCompilerArgs = allLibraries.map { listOf("-include-binary", it) }.flatten() + linkerFlags
                 }
             }
 
             val crossCompileTask = registerNativeBridgesTask(osArch.first, osArch.second)
-            allNativeTargets[osArch]!!.linkTask = project.tasks.register<Exec>("linkNativeBridges$targetString") {
+
+            val info = allNativeTargets[osArch]!!
+            info.linkTask = project.tasks.register<Exec>("linkNativeBridges$targetString") {
                 dependsOn(crossCompileTask)
                 val objectFilesDir = crossCompileTask.map { it.outDir.get() }
                 val objectFiles = project.fileTree(objectFilesDir) {
@@ -338,7 +342,19 @@ kotlin {
                 file(outDir).mkdirs()
                 outputs.dir(outDir)
             }
+
+            if (osArch.first == OS.MacOS || osArch.first == OS.IOS) {
+                info.target.apply {
+                    binaries {
+                        executable {
+                            freeCompilerArgs += listOf("-linker-options", "-framework", "-linker-option", "Metal")
+                        }
+                    }
+                }
+            }
         }
+
+
     }
 
     sourceSets {
@@ -392,14 +408,12 @@ kotlin {
                     dependsOn(nativeMain)
                 }
                 val macosTest by creating {
-                    dependsOn(nativeMain)
                     dependsOn(nativeTest)
                 }
                 val iosMain by creating {
                     dependsOn(nativeMain)
                 }
                 val iosTest by creating {
-                    dependsOn(nativeMain)
                     dependsOn(nativeTest)
                 }
                 val macosArch = when (targetArch) {
@@ -408,7 +422,6 @@ kotlin {
                             dependsOn(macosMain)
                         }
                         val macosX64Test by getting {
-                            dependsOn(macosMain)
                             dependsOn(macosTest)
                         }
                         macosX64Main to macosX64Test
@@ -418,7 +431,6 @@ kotlin {
                             dependsOn(macosMain)
                         }
                         val macosArm64Test by getting {
-                            dependsOn(macosMain)
                             dependsOn(macosTest)
                         }
                         macosArm64Main to macosArm64Test
@@ -429,14 +441,12 @@ kotlin {
                     dependsOn(iosMain)
                 }
                 val iosX64Test by getting {
-                    dependsOn(iosMain)
-                    dependsOn(iosMain)
+                    dependsOn(iosTest)
                 }
                 val iosArm64Main by getting {
                     dependsOn(iosMain)
                 }
                 val iosArm64Test by getting {
-                    dependsOn(iosMain)
                     dependsOn(iosTest)
                 }
             }
