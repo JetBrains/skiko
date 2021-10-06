@@ -310,8 +310,13 @@ kotlin {
 
             compilation.target.compilations.all {
                 kotlinOptions {
-                    val linkerFlags = if (osArch.first == OS.MacOS || osArch.first == OS.IOS)
-                        listOf("-linker-options", "-framework", "-linker-option", "Metal") else emptyList()
+                    val linkerFlags = when (osArch.first) {
+                        OS.MacOS -> listOf("-linker-options", "-framework", "-linker-option", "Metal")
+                        OS.IOS -> listOf("-linker-options", "-framework", "-linker-option", "Metal",
+                            "-linker-option", "-framework", "-linker-option", "CoreGraphics",
+                            "-linker-option", "-framework", "-linker-option", "CoreText")
+                        else -> emptyList()
+                    }
                     freeCompilerArgs = allLibraries.map { listOf("-include-binary", it) }.flatten() + linkerFlags
                 }
             }
