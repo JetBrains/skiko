@@ -53,7 +53,7 @@ kotlin {
             binaries {
                 executable {
                     entryPoint = "org.jetbrains.skiko.sample.main"
-                    freeCompilerArgs += listOf("-linker-options", "-framework", "-linker-option", "Metal")
+                    freeCompilerArgs += listOf("-linker-option", "-framework", "-linker-option", "Metal")
                 }
             }
         }

@@ -367,3 +367,12 @@ void deleteJBytes(void* addr, void*);
 #define SKIKO_JNI_VERSION JNI_VERSION_1_8
 #define AS_JNI_ENV_PTR(env) ((void**)(env))
 #endif
+
+static inline jint rawBits(jfloat f) {
+    union {
+        jfloat f;
+        jint i;
+    } u;
+    u.f = f;
+    return u.i;
+}

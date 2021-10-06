@@ -48,8 +48,12 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_Data__1nEquals
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Data__1nMakeFromBytes
-  (KByte* bytesArray, KNativePointer offset, KNativePointer length) {
-    TODO("implement org_jetbrains_skia_Data__1nMakeFromBytes");
+  (KByte* bytesArray, KInt offset, KInt length) {
+    KByte* bytes = reinterpret_cast<KByte*>(malloc(length));
+    if (!bytes) return 0;
+    memcpy(bytes, bytesArray + offset, length);
+    SkData* instance = SkData::MakeFromMalloc(bytes, length).release();
+    return instance;
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Data__1nMakeFromFileName

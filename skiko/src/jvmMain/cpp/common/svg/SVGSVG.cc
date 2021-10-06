@@ -4,16 +4,20 @@
 #include "SkSVGSVG.h"
 #include "SkSVGRenderContext.h"
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_1nGetX
-  (JNIEnv* env, jclass jclass, jlong ptr) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_1nGetX
+  (JNIEnv* env, jclass jclass, jlong ptr, jintArray jresult) {
     SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>(static_cast<uintptr_t>(ptr));
-    return skija::svg::SVGLength::toJava(env, instance->getX());
+    auto x = instance->getX();
+    jint result[2] = { rawBits(x.value()), (jint)x.unit() };
+    env->SetIntArrayRegion(jresult, 0, 2, result);
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_1nGetY
-  (JNIEnv* env, jclass jclass, jlong ptr) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_1nGetY
+  (JNIEnv* env, jclass jclass, jlong ptr, jintArray jresult) {
     SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>(static_cast<uintptr_t>(ptr));
-    return skija::svg::SVGLength::toJava(env, instance->getY());
+    auto y = instance->getY();
+    jint result[2] = { rawBits(y.value()), (jint)y.unit() };
+    env->SetIntArrayRegion(jresult, 0, 2, result);
 }
 
 extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_1nGetWidth

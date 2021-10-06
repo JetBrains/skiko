@@ -310,12 +310,21 @@ kotlin {
 
             compilation.target.compilations.all {
                 kotlinOptions {
-                    freeCompilerArgs = allLibraries.map{ listOf("-include-binary", it) }.flatten()
+                    val linkerFlags = when (osArch.first) {
+                        OS.MacOS -> listOf("-linker-option", "-framework", "-linker-option", "Metal")
+                        OS.IOS -> listOf("-linker-option", "-framework", "-linker-option", "Metal",
+                            "-linker-option", "-framework", "-linker-option", "CoreGraphics",
+                            "-linker-option", "-framework", "-linker-option", "CoreText")
+                        else -> emptyList()
+                    }
+                    freeCompilerArgs = allLibraries.map { listOf("-include-binary", it) }.flatten() + linkerFlags
                 }
             }
 
             val crossCompileTask = registerNativeBridgesTask(osArch.first, osArch.second)
-            allNativeTargets[osArch]!!.linkTask = project.tasks.register<Exec>("linkNativeBridges$targetString") {
+
+            val info = allNativeTargets[osArch]!!
+            info.linkTask = project.tasks.register<Exec>("linkNativeBridges$targetString") {
                 dependsOn(crossCompileTask)
                 val objectFilesDir = crossCompileTask.map { it.outDir.get() }
                 val objectFiles = project.fileTree(objectFilesDir) {
@@ -384,33 +393,54 @@ kotlin {
                     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
                 }
             }
+            val nativeTest by creating {
+                dependsOn(commonTest)
+            }
             if (hostOs == OS.MacOS) {
                 val macosMain by creating {
                     dependsOn(nativeMain)
                 }
+                val macosTest by creating {
+                    dependsOn(nativeTest)
+                }
                 val iosMain by creating {
                     dependsOn(nativeMain)
                 }
-                val macosArchMain = when (targetArch) {
+                val iosTest by creating {
+                    dependsOn(nativeTest)
+                }
+                val macosArch = when (targetArch) {
                     Arch.X64 -> {
                         val macosX64Main by getting {
                             dependsOn(macosMain)
                         }
-                        macosX64Main
+                        val macosX64Test by getting {
+                            dependsOn(macosTest)
+                        }
+                        macosX64Main to macosX64Test
                     }
                     Arch.Arm64 -> {
                         val macosArm64Main by getting {
                             dependsOn(macosMain)
                         }
-                        macosArm64Main
+                        val macosArm64Test by getting {
+                            dependsOn(macosTest)
+                        }
+                        macosArm64Main to macosArm64Test
                     }
                     else -> throw GradleException("Unsupported arch $targetArch for macOS")
                 }
                 val iosX64Main by getting {
                     dependsOn(iosMain)
                 }
+                val iosX64Test by getting {
+                    dependsOn(iosTest)
+                }
                 val iosArm64Main by getting {
                     dependsOn(iosMain)
+                }
+                val iosArm64Test by getting {
+                    dependsOn(iosTest)
                 }
             }
         }
