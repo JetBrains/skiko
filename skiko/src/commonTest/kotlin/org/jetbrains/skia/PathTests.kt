@@ -56,7 +56,7 @@ class PathTests {
     }
 
     @Test
-    fun convexityTest() {
+    fun convexityTest() = runTest {
         Path().lineTo(40f, 20f).lineTo(0f, 40f).lineTo(0f, 0f).closePath().use { p -> assertTrue(p.isConvex) }
         Path().lineTo(40f, 40f).lineTo(40f, 0f).lineTo(0f, 40f).lineTo(0f, 0f).closePath().use { p ->
             assertFalse(p.isConvex)
