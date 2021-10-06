@@ -342,19 +342,7 @@ kotlin {
                 file(outDir).mkdirs()
                 outputs.dir(outDir)
             }
-
-            if (osArch.first == OS.MacOS || osArch.first == OS.IOS) {
-                info.target.apply {
-                    binaries {
-                        executable {
-                            freeCompilerArgs += listOf("-linker-options", "-framework", "-linker-option", "Metal")
-                        }
-                    }
-                }
-            }
         }
-
-
     }
 
     sourceSets {
