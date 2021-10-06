@@ -72,7 +72,6 @@ internal class WindowsOpenGLRedrawer(
             .filter { it.layer.isShowing }
 
         private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
-            toRedrawCopy.clear()
             toRedrawCopy.addAll(toRedraw)
             toRedraw.clear()
 
@@ -106,6 +105,9 @@ internal class WindowsOpenGLRedrawer(
                     dwmFlush() // wait for vsync
                 }
             }
+
+            // Without clearing we will have a memory leak
+            toRedrawCopy.clear()
         }
     }
 }

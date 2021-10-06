@@ -90,12 +90,11 @@ internal class LinuxOpenGLRedrawer(
             .filter { it.layer.isShowing }
 
         private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
-            // we should wait for the window with the maximum frame limit to avoid bottleneck when there is a window on a slower monitor
-            toRedrawVisible.maxByOrNull { it.frameLimit }?.limitFramesIfNeeded()
-
-            toRedrawCopy.clear()
             toRedrawCopy.addAll(toRedraw)
             toRedraw.clear()
+
+            // we should wait for the window with the maximum frame limit to avoid bottleneck when there is a window on a slower monitor
+            toRedrawVisible.maxByOrNull { it.frameLimit }?.limitFramesIfNeeded()
 
             val nanoTime = System.nanoTime()
 
@@ -109,7 +108,7 @@ internal class LinuxOpenGLRedrawer(
 
             val drawingSurfaces = toRedrawVisible.associateWith { lockLinuxDrawingSurface(it.layer.backedLayer) }
             try {
-                toRedrawVisible.forEach { redrawer ->
+                for (redrawer in toRedrawVisible) {
                     drawingSurfaces[redrawer]!!.makeCurrent(redrawer.context)
                     redrawer.draw()
                 }
@@ -117,17 +116,20 @@ internal class LinuxOpenGLRedrawer(
                 // TODO(demin) it seems now vsync doesn't work as expected with two windows (we have fps = refreshRate / windowCount)
                 //  perhaps we should create frameDispatcher for each display.
                 //  Don't know what happened, but on 620547a commit everything was okay. maybe something changed in the code, maybe my system changed
-                toRedrawVisible.forEach { redrawer ->
+                for (redrawer in toRedrawVisible) {
                     drawingSurfaces[redrawer]!!.swapBuffers()
                 }
 
-                toRedrawVisible.forEach { redrawer ->
+                for (redrawer in toRedrawVisible) {
                     drawingSurfaces[redrawer]!!.makeCurrent(redrawer.context)
                     OpenGLApi.instance.glFinish()
                 }
             } finally {
                 drawingSurfaces.values.forEach(::unlockLinuxDrawingSurface)
             }
+
+            // Without clearing we will have a memory leak
+            toRedrawCopy.clear()
         }
     }
 }
