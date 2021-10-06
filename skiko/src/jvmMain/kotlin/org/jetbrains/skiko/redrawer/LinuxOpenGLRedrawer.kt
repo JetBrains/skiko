@@ -123,19 +123,21 @@ internal class LinuxOpenGLRedrawer(
 
                 // Synchronize with vsync only for the fastest monitor, for the single window.
                 // Otherwise, 5 windows will wait for vsync 5 times.
-                val fastestRedrawer = toRedrawVisible.maxByOrNull { it.frameLimit }
+                val vsyncRedrawer = toRedrawVisible
+                    .filter { it.properties.isVsyncEnabled }
+                    .maxByOrNull { it.frameLimit }
 
-                for (redrawer in toRedrawVisible.filter { it != fastestRedrawer }) {
+                for (redrawer in toRedrawVisible.filter { it != vsyncRedrawer }) {
                     drawingSurfaces[redrawer]!!.makeCurrent(redrawer.context)
                     drawingSurfaces[redrawer]!!.setSwapInterval(0)
                     drawingSurfaces[redrawer]!!.swapBuffers()
                     OpenGLApi.instance.glFinish()
                 }
 
-                if (fastestRedrawer != null) {
-                    drawingSurfaces[fastestRedrawer]!!.makeCurrent(fastestRedrawer.context)
-                    drawingSurfaces[fastestRedrawer]!!.setSwapInterval(1)
-                    drawingSurfaces[fastestRedrawer]!!.swapBuffers()
+                if (vsyncRedrawer != null) {
+                    drawingSurfaces[vsyncRedrawer]!!.makeCurrent(vsyncRedrawer.context)
+                    drawingSurfaces[vsyncRedrawer]!!.setSwapInterval(1)
+                    drawingSurfaces[vsyncRedrawer]!!.swapBuffers()
                     OpenGLApi.instance.glFinish()
                 }
             } finally {
