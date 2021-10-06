@@ -40,7 +40,7 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_DataKt__1nEquals
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DataKt__1nMakeFromBytes
-  (JNIEnv* env, jclass jclass, jbyteArray bytesArray, jlong offset, jlong length) {
+  (JNIEnv* env, jclass jclass, jbyteArray bytesArray, jint offset, jint length) {
     jbyte* bytes = reinterpret_cast<jbyte*>(malloc(length));
     if (!bytes) return 0;
     env->GetByteArrayRegion(bytesArray, (jsize) offset, (jsize) length, bytes);
