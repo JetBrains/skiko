@@ -1,4 +1,4 @@
-package org.jetbrains.skiko.skija
+package org.jetbrains.skia.tests
 
 import org.jetbrains.skia.Matrix33
 import org.jetbrains.skia.Point

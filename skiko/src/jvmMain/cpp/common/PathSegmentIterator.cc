@@ -19,32 +19,50 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathSegmentIteratorKt
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deletePathSegmentIterator));
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_PathSegmentIteratorKt_PathSegmentIterator_1nNext
-  (JNIEnv* env, jclass jclass, jlong ptr) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathSegmentIteratorKt_PathSegmentIterator_1nNext
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray result) {
     SkPath::Iter* instance = reinterpret_cast<SkPath::Iter*>(static_cast<uintptr_t>(ptr));
     SkPoint pts[4];
     SkPath::Verb verb = instance->next(pts);
-    jobject segment;
+
+    std::bitset<8> context(verb);
+    context.set(7, instance->isClosedContour());
+    context.set(6, instance->isCloseLine());
+
+    float fcontext = (float) (int) context.to_ulong();
+
     switch (verb) {
-        case SkPath::Verb::kDone_Verb:
-            segment = env->NewObject(skija::PathSegment::cls, skija::PathSegment::ctorDone);
+        case SkPath::Verb::kDone_Verb: {
+            float f[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, fcontext};
+            env->SetFloatArrayRegion(result, 0, 10, f);
             break;
+        }
         case SkPath::Verb::kMove_Verb:
-        case SkPath::Verb::kClose_Verb:
-            segment = env->NewObject(skija::PathSegment::cls, skija::PathSegment::ctorMoveClose, static_cast<jint>(verb), pts[0].fX, pts[0].fY, instance->isClosedContour());
+        case SkPath::Verb::kClose_Verb: {
+            float f[10] = { pts[0].fX, pts[0].fY, 0, 0, 0, 0, 0, 0, 0, fcontext};
+            env->SetFloatArrayRegion(result, 0, 10, f);
             break;
-        case SkPath::Verb::kLine_Verb:
-            segment = env->NewObject(skija::PathSegment::cls, skija::PathSegment::ctorLine, pts[0].fX, pts[0].fY, pts[1].fX, pts[1].fY, instance->isCloseLine(), instance->isClosedContour());
+        }
+        case SkPath::Verb::kLine_Verb: {
+            float f[10] = { pts[0].fX, pts[0].fY, pts[1].fX, pts[1].fY, 0, 0, 0, 0, 0, fcontext};
+            env->SetFloatArrayRegion(result, 0, 10, f);
             break;
-        case SkPath::Verb::kQuad_Verb:
-            segment = env->NewObject(skija::PathSegment::cls, skija::PathSegment::ctorQuad, pts[0].fX, pts[0].fY, pts[1].fX, pts[1].fY, pts[2].fX, pts[2].fY, instance->isClosedContour());
+        }
+        case SkPath::Verb::kQuad_Verb: {
+            float f[10] = { pts[0].fX, pts[0].fY, pts[1].fX, pts[1].fY, pts[2].fX, pts[2].fY, 0, 0, 0, fcontext};
+            env->SetFloatArrayRegion(result, 0, 10, f);
             break;
-        case SkPath::Verb::kConic_Verb:
-            segment = env->NewObject(skija::PathSegment::cls, skija::PathSegment::ctorConic, pts[0].fX, pts[0].fY, pts[1].fX, pts[1].fY, pts[2].fX, pts[2].fY, instance->conicWeight(), instance->isClosedContour());
+        }
+        case SkPath::Verb::kConic_Verb: {
+            float f[10] = { pts[0].fX, pts[0].fY, pts[1].fX, pts[1].fY, pts[2].fX, pts[2].fY, 0, 0, instance->conicWeight(), fcontext};
+            env->SetFloatArrayRegion(result, 0, 10, f);
             break;
-        case SkPath::Verb::kCubic_Verb:
-            segment = env->NewObject(skija::PathSegment::cls, skija::PathSegment::ctorConic, pts[0].fX, pts[0].fY, pts[1].fX, pts[1].fY, pts[2].fX, pts[2].fY, pts[3].fX, pts[3].fY, instance->isClosedContour());
+        }
+        case SkPath::Verb::kCubic_Verb: {
+            float f[10] = { pts[0].fX, pts[0].fY, pts[1].fX, pts[1].fY, pts[2].fX, pts[2].fY, pts[3].fX, pts[3].fY, 0, fcontext};
+            env->SetFloatArrayRegion(result, 0, 10, f);
             break;
+        }
     }
-    return segment;
+
 }

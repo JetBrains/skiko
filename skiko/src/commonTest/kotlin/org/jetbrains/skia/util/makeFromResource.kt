@@ -1,4 +1,4 @@
-package org.jetbrains.skiko.skija
+package org.jetbrains.skia.tests
 
 import org.jetbrains.skia.Data
 import org.jetbrains.skia.Typeface

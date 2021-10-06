@@ -18,57 +18,6 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class PathTest {
-    @Test
-    fun iterTest() {
-        Path().moveTo(10f, 10f).lineTo(20f, 0f).lineTo(20f, 20f).closePath().use { p ->
-            p.iterator().use { i ->
-                assertTrue(i.hasNext())
-
-                var s = i.next()!!
-                assertEquals(PathVerb.MOVE, s.verb)
-                assertEquals(Point(10f, 10f), s.p0)
-                assertTrue(s.isClosedContour)
-                assertTrue(i.hasNext())
-
-                s = i.next()!!
-                assertEquals(PathVerb.LINE, s.verb)
-                assertEquals(Point(10f, 10f), s.p0)
-                assertEquals(Point(20f, 0f), s.p1)
-                assertFalse(s.isCloseLine)
-                assertTrue(i.hasNext())
-
-                s = i.next()!!
-                assertEquals(PathVerb.LINE, s.verb)
-                assertEquals(Point(20f, 0f), s.p0)
-                assertEquals(Point(20f, 20f), s.p1)
-                assertFalse(s.isCloseLine)
-                assertTrue(i.hasNext())
-
-                s = i.next()!!
-                assertEquals(PathVerb.LINE, s.verb)
-                assertEquals(Point(20f, 20f), s.p0)
-                assertEquals(Point(10f, 10f), s.p1)
-                assertTrue(s.isCloseLine)
-                assertTrue(i.hasNext())
-
-                s = i.next()!!
-                assertEquals(PathVerb.CLOSE, s.verb)
-                assertEquals(Point(10f, 10f), s.p0)
-                assertFalse(i.hasNext())
-                assertFailsWith<NoSuchElementException> {
-                    i.next()
-                }
-            }
-        }
-    }
-
-    @Test
-    fun convexityTest() {
-        Path().lineTo(40f, 20f).lineTo(0f, 40f).lineTo(0f, 0f).closePath().use { p -> assertTrue(p.isConvex) }
-        Path().lineTo(40f, 40f).lineTo(40f, 0f).lineTo(0f, 40f).lineTo(0f, 0f).closePath().use { p ->
-            assertFalse(p.isConvex)
-        }
-    }
 
     @Test
     fun isShapeTest() {

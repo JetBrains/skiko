@@ -5,7 +5,7 @@ import org.jetbrains.skia.FontStyle
 import org.jetbrains.skia.Typeface
 import org.jetbrains.skia.paragraph.FontCollection
 import org.jetbrains.skia.paragraph.TypefaceFontProvider
-import org.jetbrains.skiko.skija.makeFromResource
+import org.jetbrains.skia.tests.makeFromResource
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
