@@ -58,7 +58,7 @@ jobs:
           sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 60 --slave /usr/bin/g++ g++ /usr/bin/g++-9
           sudo update-alternatives --config gcc
           sudo apt-get install ninja-build fontconfig libfontconfig1-dev libglu1-mesa-dev libxrandr-dev zip -y
-          ./gradlew -i jvmTest
+          ./gradlew -Pskiko.native.enabled=true -i linuxX64Test jvmTest
           ./gradlew publishToMavenLocal
    js:
      runs-on: ubuntu-20.04
