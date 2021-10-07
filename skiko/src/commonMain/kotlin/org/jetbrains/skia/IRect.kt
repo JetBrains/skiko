@@ -9,11 +9,12 @@ class IRect internal constructor(val left: Int, val top: Int, val right: Int, va
         get() = bottom - top
 
     fun intersect(other: IRect): IRect? {
-        return if (right <= other.left || other.right <= left || bottom <= other.top || other.bottom <= top) null else IRect(
-            maxOf(left, other.left), maxOf(top, other.top), minOf(
-                right, other.right
-            ), minOf(bottom, other.bottom)
-        )
+        return if (right <= other.left || other.right <= left ||
+                bottom <= other.top || other.bottom <= top) null
+            else IRect(
+                maxOf(left, other.left), maxOf(top, other.top),
+                minOf(right, other.right), minOf(bottom, other.bottom)
+            )
     }
 
     fun offset(dx: Int, dy: Int): IRect {
@@ -28,19 +29,13 @@ class IRect internal constructor(val left: Int, val top: Int, val right: Int, va
         return Rect(left.toFloat(), top.toFloat(), right.toFloat(), bottom.toFloat())
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (o === this) return true
-        if (o !is IRect) return false
-        val other = o
-        if (!other.canEqual(this as Any)) return false
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is IRect) return false
         if (left != other.left) return false
         if (top != other.top) return false
         if (right != other.right) return false
         return bottom == other.bottom
-    }
-
-    protected fun canEqual(other: Any?): Boolean {
-        return other is IRect
     }
 
     override fun hashCode(): Int {

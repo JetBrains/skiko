@@ -10,17 +10,11 @@ class BidiRun(
     /**
      * The unicode bidi embedding level (even ltr, odd rtl)
      */
-    override fun equals(o: Any?): Boolean {
-        if (o === this) return true
-        if (o !is BidiRun) return false
-        val other = o
-        if (!other.canEqual(this as Any)) return false
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is BidiRun) return false
         if (end != other.end) return false
         return level == other.level
-    }
-
-    protected fun canEqual(other: Any?): Boolean {
-        return other is BidiRun
     }
 
     override fun hashCode(): Int {

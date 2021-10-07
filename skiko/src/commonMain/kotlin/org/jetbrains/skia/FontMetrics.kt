@@ -110,11 +110,9 @@ class FontMetrics(
     val height: Float
         get() = descent - ascent
 
-    override fun equals(o: Any?): Boolean {
-        if (o === this) return true
-        if (o !is FontMetrics) return false
-        val other = o
-        if (!other.canEqual(this as Any)) return false
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is FontMetrics) return false
         if (top.compareTo(other.top) != 0) return false
         if (ascent.compareTo(other.ascent) != 0) return false
         if (descent.compareTo(other.descent) != 0) return false
@@ -126,22 +124,10 @@ class FontMetrics(
         if (xMax.compareTo(other.xMax) != 0) return false
         if (xHeight.compareTo(other.xHeight) != 0) return false
         if (capHeight.compareTo(other.capHeight) != 0) return false
-        val `this$_underlineThickness`: Any? = underlineThickness
-        val `other$_underlineThickness`: Any? = other.underlineThickness
-        if (if (`this$_underlineThickness` == null) `other$_underlineThickness` != null else `this$_underlineThickness` != `other$_underlineThickness`) return false
-        val `this$_underlinePosition`: Any? = underlinePosition
-        val `other$_underlinePosition`: Any? = other.underlinePosition
-        if (if (`this$_underlinePosition` == null) `other$_underlinePosition` != null else `this$_underlinePosition` != `other$_underlinePosition`) return false
-        val `this$_strikeoutThickness`: Any? = strikeoutThickness
-        val `other$_strikeoutThickness`: Any? = other.strikeoutThickness
-        if (if (`this$_strikeoutThickness` == null) `other$_strikeoutThickness` != null else `this$_strikeoutThickness` != `other$_strikeoutThickness`) return false
-        val `this$_strikeoutPosition`: Any? = strikeoutPosition
-        val `other$_strikeoutPosition`: Any? = other.strikeoutPosition
-        return if (if (`this$_strikeoutPosition` == null) `other$_strikeoutPosition` != null else `this$_strikeoutPosition` != `other$_strikeoutPosition`) false else true
-    }
-
-    protected fun canEqual(other: Any?): Boolean {
-        return other is FontMetrics
+        if (if (this.underlineThickness == null) other.underlineThickness != null else this.underlineThickness != other.underlineThickness) return false
+        if (if (this.underlinePosition == null) other.underlinePosition != null else this.underlinePosition != other.underlinePosition) return false
+        if (if (this.strikeoutThickness == null) other.strikeoutThickness != null else this.strikeoutThickness != other.strikeoutThickness) return false
+        return !if (this.strikeoutPosition == null) other.strikeoutPosition != null else this.strikeoutPosition != other.strikeoutPosition
     }
 
     override fun hashCode(): Int {
@@ -158,14 +144,10 @@ class FontMetrics(
         result = result * PRIME + xMax.toBits()
         result = result * PRIME + xHeight.toBits()
         result = result * PRIME + capHeight.toBits()
-        val `$_underlineThickness`: Any? = underlineThickness
-        result = result * PRIME + (`$_underlineThickness`?.hashCode() ?: 43)
-        val `$_underlinePosition`: Any? = underlinePosition
-        result = result * PRIME + (`$_underlinePosition`?.hashCode() ?: 43)
-        val `$_strikeoutThickness`: Any? = strikeoutThickness
-        result = result * PRIME + (`$_strikeoutThickness`?.hashCode() ?: 43)
-        val `$_strikeoutPosition`: Any? = strikeoutPosition
-        result = result * PRIME + (`$_strikeoutPosition`?.hashCode() ?: 43)
+        result = result * PRIME + underlineThickness.hashCode()
+        result = result * PRIME + underlinePosition.hashCode()
+        result = result * PRIME + strikeoutThickness.hashCode()
+        result = result * PRIME + strikeoutPosition.hashCode()
         return result
     }
 

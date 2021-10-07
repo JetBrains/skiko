@@ -35,17 +35,11 @@ class RRect internal constructor(l: Float, t: Float, r: Float, b: Float, val rad
         return "RRect(_left=$left, _top=$top, _right=$right, _bottom=$bottom, _radii=$radii)"
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (o === this) return true
-        if (o !is RRect) return false
-        val other = o
-        if (!other.canEqual(this as Any)) return false
-        if (!super.equals(o)) return false
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is RRect) return false
+        if (!super.equals(other)) return false
         return radii.contentEquals(other.radii)
-    }
-
-    override fun canEqual(other: Any?): Boolean {
-        return other is RRect
     }
 
     override fun hashCode(): Int {

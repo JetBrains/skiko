@@ -15,17 +15,11 @@ class ISize internal constructor(val width: Int, val height: Int) {
         return width * height
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (o === this) return true
-        if (o !is ISize) return false
-        val other = o
-        if (!other.canEqual(this as Any)) return false
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is ISize) return false
         if (width != other.width) return false
         return height == other.height
-    }
-
-    protected fun canEqual(other: Any?): Boolean {
-        return other is ISize
     }
 
     override fun hashCode(): Int {

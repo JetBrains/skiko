@@ -14,32 +14,20 @@ class GradientStyle(
         return localMatrix?.mat
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (o === this) return true
-        if (o !is GradientStyle) return false
-        val other = o
-        if (!other.canEqual(this as Any)) return false
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is GradientStyle) return false
         if (isPremul != other.isPremul) return false
-        val `this$_tileMode`: Any = tileMode
-        val `other$_tileMode`: Any = other.tileMode
-        if (`this$_tileMode` != `other$_tileMode`) return false
-        val `this$_localMatrix`: Any? = localMatrix
-        val `other$_localMatrix`: Any? = other.localMatrix
-        return !if (`this$_localMatrix` == null) `other$_localMatrix` != null else `this$_localMatrix` != `other$_localMatrix`
-    }
-
-    protected fun canEqual(other: Any?): Boolean {
-        return other is GradientStyle
+        if (this.tileMode != other.tileMode) return false
+        return !if (this.localMatrix == null) other.localMatrix != null else this.localMatrix != other.localMatrix
     }
 
     override fun hashCode(): Int {
         val PRIME = 59
         var result = 1
         result = result * PRIME + if (isPremul) 79 else 97
-        val `$_tileMode`: Any = tileMode
-        result = result * PRIME + (`$_tileMode`?.hashCode() ?: 43)
-        val `$_localMatrix`: Any? = localMatrix
-        result = result * PRIME + (`$_localMatrix`?.hashCode() ?: 43)
+        result = result * PRIME + tileMode.hashCode()
+        result = result * PRIME + (localMatrix?.hashCode() ?: 43)
         return result
     }
 

@@ -141,7 +141,6 @@ enum class ColorType {
                 R16G16_FLOAT -> 4
                 R16G16B16A16_UNORM -> 8
             }
-            throw RuntimeException("Unreachable")
         }
     val shiftPerPixel: Int
         get() {
@@ -183,18 +182,19 @@ enum class ColorType {
      * @return  ColorAlphaType if can be associated with colorType
      */
     fun validateAlphaType(alphaType: ColorAlphaType): ColorAlphaType? {
-        var alphaType = alphaType
-        when (this) {
-            UNKNOWN -> alphaType = ColorAlphaType.UNKNOWN
+        return when (this) {
+            UNKNOWN -> ColorAlphaType.UNKNOWN
             ALPHA_8, A16_UNORM, A16_FLOAT -> {
-                if (ColorAlphaType.UNPREMUL == alphaType) alphaType = ColorAlphaType.PREMUL
-                if (ColorAlphaType.UNKNOWN == alphaType) return null
+                if (ColorAlphaType.UNPREMUL == alphaType) ColorAlphaType.PREMUL
+                else if (ColorAlphaType.UNKNOWN == alphaType) null
+                else alphaType
             }
-            ARGB_4444, RGBA_8888, BGRA_8888, RGBA_1010102, BGRA_1010102, RGBA_F16NORM, RGBA_F16, RGBA_F32, R16G16B16A16_UNORM -> if (ColorAlphaType.UNKNOWN == alphaType) return null
-            GRAY_8, R8G8_UNORM, R16G16_UNORM, R16G16_FLOAT, RGB_565, RGB_888X, RGB_101010X, BGR_101010X -> alphaType =
+            ARGB_4444, RGBA_8888, BGRA_8888, RGBA_1010102, BGRA_1010102, RGBA_F16NORM, RGBA_F16, RGBA_F32, R16G16B16A16_UNORM ->
+                if (ColorAlphaType.UNKNOWN == alphaType) null
+                else alphaType
+            GRAY_8, R8G8_UNORM, R16G16_UNORM, R16G16_FLOAT, RGB_565, RGB_888X, RGB_101010X, BGR_101010X ->
                 ColorAlphaType.OPAQUE
         }
-        return alphaType
     }
 
     fun computeOffset(x: Int, y: Int, rowBytes: Long): Long {

@@ -39,24 +39,14 @@ class PlaceholderStyle(
     val baselineMode: BaselineMode
         get() = _baselineMode
 
-    override fun equals(o: Any?): Boolean {
-        if (o === this) return true
-        if (o !is PlaceholderStyle) return false
-        val other = o
-        if (!other.canEqual(this as Any)) return false
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is PlaceholderStyle) return false
         if (width.compareTo(other.width) != 0) return false
         if (height.compareTo(other.height) != 0) return false
         if (baseline.compareTo(other.baseline) != 0) return false
-        val `this$_alignment`: Any = alignment
-        val `other$_alignment`: Any = other.alignment
-        if (`this$_alignment` != `other$_alignment`) return false
-        val `this$_baselineMode`: Any = baselineMode
-        val `other$_baselineMode`: Any = other.baselineMode
-        return `this$_baselineMode` == `other$_baselineMode`
-    }
-
-    protected fun canEqual(other: Any?): Boolean {
-        return other is PlaceholderStyle
+        if (this.alignment != other.alignment) return false
+        return this.baselineMode == other.baselineMode
     }
 
     override fun hashCode(): Int {
@@ -65,10 +55,8 @@ class PlaceholderStyle(
         result = result * PRIME + width.toBits()
         result = result * PRIME + height.toBits()
         result = result * PRIME + baseline.toBits()
-        val `$_alignment`: Any = alignment
-        result = result * PRIME + (`$_alignment`.hashCode())
-        val `$_baselineMode`: Any = baselineMode
-        result = result * PRIME + (`$_baselineMode`.hashCode())
+        result = result * PRIME + alignment.hashCode()
+        result = result * PRIME + baselineMode.hashCode()
         return result
     }
 

@@ -135,7 +135,6 @@ class FontCollection internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         }
 }
 
-
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nMake")
 private external fun _nMake(): NativePointer
 

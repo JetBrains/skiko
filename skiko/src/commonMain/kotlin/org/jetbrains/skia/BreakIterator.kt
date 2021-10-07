@@ -353,8 +353,8 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
      * @return The character offset of the boundary position n boundaries away from
      * the current one.
      */
-    fun next(n: Int): Int {
-        var n = n
+    fun next(index: Int): Int {
+        var n = index
         var result = 0
         if (n > 0) {
             while (n > 0 && result != DONE) {

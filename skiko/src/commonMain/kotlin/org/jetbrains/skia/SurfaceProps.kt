@@ -4,38 +4,24 @@ class SurfaceProps constructor(
     internal val isDeviceIndependentFonts: Boolean = false,
     internal val pixelGeometry: PixelGeometry = PixelGeometry.UNKNOWN
 ) {
-
-    constructor(geo: PixelGeometry) : this(false, geo) {}
+    constructor(geo: PixelGeometry) : this(false, geo)
 
     fun _getFlags(): Int {
         return 0 or if (isDeviceIndependentFonts) 1 else 0
     }
 
-    private fun _getPixelGeometryOrdinal(): Int {
-        return pixelGeometry.ordinal
-    }
-
-    override fun equals(o: Any?): Boolean {
-        if (o === this) return true
-        if (o !is SurfaceProps) return false
-        val other = o
-        if (!other.canEqual(this as Any)) return false
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is SurfaceProps) return false
         if (isDeviceIndependentFonts != other.isDeviceIndependentFonts) return false
-        val `this$_pixelGeometry`: Any = pixelGeometry
-        val `other$_pixelGeometry`: Any = other.pixelGeometry
-        return `this$_pixelGeometry` == `other$_pixelGeometry`
-    }
-
-    protected fun canEqual(other: Any?): Boolean {
-        return other is SurfaceProps
+        return this.pixelGeometry == other.pixelGeometry
     }
 
     override fun hashCode(): Int {
         val PRIME = 59
         var result = 1
         result = result * PRIME + if (isDeviceIndependentFonts) 79 else 97
-        val `$_pixelGeometry`: Any = pixelGeometry
-        result = result * PRIME + (`$_pixelGeometry`.hashCode())
+        result = result * PRIME + pixelGeometry.hashCode()
         return result
     }
 

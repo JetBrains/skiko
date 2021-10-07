@@ -26,10 +26,6 @@ class SVGPreserveAspectRatio(align: SVGPreserveAspectRatioAlign, scale: SVGPrese
         return scale == other.scale
     }
 
-    protected fun canEqual(other: Any?): Boolean {
-        return other is SVGPreserveAspectRatio
-    }
-
     override fun hashCode(): Int {
         val PRIME = 59
         var result = 1

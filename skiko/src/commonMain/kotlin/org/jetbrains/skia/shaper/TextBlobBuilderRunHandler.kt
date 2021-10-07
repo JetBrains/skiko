@@ -26,8 +26,8 @@ class TextBlobBuilderRunHandler<T> internal constructor(
 
     internal val _text: ManagedString?
 
-    constructor(text: String?) : this(ManagedString(text), true, 0f, 0f) {}
-    constructor(text: String?, offset: Point) : this(ManagedString(text), true, offset.x, offset.y) {}
+    constructor(text: String?) : this(ManagedString(text), true, 0f, 0f)
+    constructor(text: String?, offset: Point) : this(ManagedString(text), true, offset.x, offset.y)
 
     override fun close() {
         super.close()
@@ -77,7 +77,6 @@ class TextBlobBuilderRunHandler<T> internal constructor(
         reachabilityBarrier(text)
     }
 }
-
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilderRunHandler__1nGetFinalizer")
 private external fun TextBlobBuilderRunHandler_nGetFinalizer(): NativePointer

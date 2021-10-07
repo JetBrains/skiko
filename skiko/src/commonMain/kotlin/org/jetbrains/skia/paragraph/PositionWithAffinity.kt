@@ -5,27 +5,18 @@ class PositionWithAffinity(val position: Int, affinity: Affinity) {
     val affinity: Affinity
         get() = _affinity
 
-    override fun equals(o: Any?): Boolean {
-        if (o === this) return true
-        if (o !is PositionWithAffinity) return false
-        val other = o
-        if (!other.canEqual(this as Any)) return false
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is PositionWithAffinity) return false
         if (position != other.position) return false
-        val `this$_affinity`: Any = affinity
-        val `other$_affinity`: Any = other.affinity
-        return `this$_affinity` == `other$_affinity`
-    }
-
-    protected fun canEqual(other: Any?): Boolean {
-        return other is PositionWithAffinity
+        return this.affinity == other.affinity
     }
 
     override fun hashCode(): Int {
         val PRIME = 59
         var result = 1
         result = result * PRIME + position
-        val `$_affinity`: Any = affinity
-        result = result * PRIME + `$_affinity`.hashCode()
+        result = result * PRIME + affinity.hashCode()
         return result
     }
 

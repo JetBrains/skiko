@@ -68,7 +68,6 @@ class BackendRenderTarget internal constructor(ptr: NativePointer) : Managed(ptr
     }
 }
 
-
 @ExternalSymbolName("org_jetbrains_skia_BackendRenderTarget__1nGetFinalizer")
 private external fun BackendRenderTarget_nGetFinalizer(): NativePointer
 

@@ -34,7 +34,6 @@ enum class PathFillMode {
             EVEN_ODD -> INVERSE_EVEN_ODD
             INVERSE_WINDING -> WINDING
             INVERSE_EVEN_ODD -> EVEN_ODD
-            else -> throw RuntimeException("Unreachable")
         }
     }
 }

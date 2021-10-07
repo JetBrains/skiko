@@ -30,8 +30,7 @@ class PathSegment constructor(
         0.0f,
         isCloseLine,
         isClosedContour
-    ) {
-    }
+    )
 
     constructor(x0: Float, y0: Float, x1: Float, y1: Float, x2: Float, y2: Float, isClosedContour: Boolean) : this(
         PathVerb.QUAD,
@@ -42,8 +41,7 @@ class PathSegment constructor(
         0.0f,
         false,
         isClosedContour
-    ) {
-    }
+    )
 
     constructor(
         x0: Float,
@@ -63,8 +61,7 @@ class PathSegment constructor(
         conicWeight,
         false,
         isClosedContour
-    ) {
-    }
+    )
 
     constructor(
         x0: Float,
@@ -85,25 +82,23 @@ class PathSegment constructor(
         0.0f,
         false,
         isClosedContour
-    ) {
-    }
+    )
 
     override fun toString(): String {
         return "Segment(" + "verb=" + verb + (if (verb != PathVerb.DONE) ", p0=$p0" else "") + (if (verb == PathVerb.LINE || verb == PathVerb.QUAD || verb == PathVerb.CONIC || verb == PathVerb.CUBIC) ", p1=" + p1 else "") + (if (verb == PathVerb.QUAD || verb == PathVerb.CONIC || verb == PathVerb.CUBIC) ", p2=" + p2 else "") + (if (verb == PathVerb.CUBIC) ", p3=" + p3 else "") + (if (verb == PathVerb.CONIC) ", conicWeight=" + conicWeight else "") + (if (verb == PathVerb.LINE) ", closeLine=" + isCloseLine else "") + (if (verb != PathVerb.DONE) ", closedContour=" + isClosedContour else "") + ")"
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (this === o) return true
-        if (o == null || o !is PathSegment) return false
-        val segment = o
-        return verb == segment.verb &&
-                (if (verb != PathVerb.DONE) p0 == segment.p0 else true) &&
-                (if (verb == PathVerb.LINE || verb == PathVerb.QUAD || verb == PathVerb.CONIC || verb == PathVerb.CUBIC) p1 == segment.p1 else true) &&
-                (if (verb == PathVerb.QUAD || verb == PathVerb.CONIC || verb == PathVerb.CUBIC) p2 == segment.p2 else true) &&
-                (if (verb == PathVerb.CUBIC) p3 == segment.p3 else true) &&
-                (if (verb == PathVerb.CONIC) segment.conicWeight.compareTo(conicWeight) == 0 else true) &&
-                (if (verb == PathVerb.LINE) isCloseLine == segment.isCloseLine else true) &&
-                if (verb != PathVerb.DONE) isClosedContour == segment.isClosedContour else true
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is PathSegment) return false
+        return verb == other.verb &&
+                (if (verb != PathVerb.DONE) p0 == other.p0 else true) &&
+                (if (verb == PathVerb.LINE || verb == PathVerb.QUAD || verb == PathVerb.CONIC || verb == PathVerb.CUBIC) p1 == other.p1 else true) &&
+                (if (verb == PathVerb.QUAD || verb == PathVerb.CONIC || verb == PathVerb.CUBIC) p2 == other.p2 else true) &&
+                (if (verb == PathVerb.CUBIC) p3 == other.p3 else true) &&
+                (if (verb == PathVerb.CONIC) other.conicWeight.compareTo(conicWeight) == 0 else true) &&
+                (if (verb == PathVerb.LINE) isCloseLine == other.isCloseLine else true) &&
+                if (verb != PathVerb.DONE) isClosedContour == other.isClosedContour else true
     }
 
     override fun hashCode(): Int {

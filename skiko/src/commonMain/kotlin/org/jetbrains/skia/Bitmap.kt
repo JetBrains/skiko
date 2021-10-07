@@ -996,9 +996,6 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
         localMatrix: Matrix33? = null
     ): Shader {
         return try {
-            require(tmx != null) { "Can’t Bitmap.makeShader with tmx == null" }
-            require(tmy != null) { "Can’t Bitmap.makeShader with tmy == null" }
-            require(sampling != null) { "Can’t Bitmap.makeShader with sampling == null" }
             Stats.onNativeCall()
             Shader(
                 interopScope {

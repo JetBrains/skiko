@@ -18,20 +18,15 @@ class RSXform(
     internal val ty: Float
 ) {
 
-    override fun equals(o: Any?): Boolean {
-        if (o === this) return true
-        if (o !is RSXform) return false
-        val other = o
-        if (!other.canEqual(this as Any)) return false
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is RSXform) return false
         if (scos.compareTo(other.scos) != 0) return false
         if (ssin.compareTo(other.ssin) != 0) return false
         if (tx.compareTo(other.tx) != 0) return false
         return ty.compareTo(other.ty) == 0
     }
 
-    protected fun canEqual(other: Any?): Boolean {
-        return other is RSXform
-    }
 
     override fun hashCode(): Int {
         val PRIME = 59

@@ -109,7 +109,6 @@ private external fun _nAddPlaceholder(
     baseline: Float
 )
 
-
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nSetParagraphStyle")
 private external fun _nSetParagraphStyle(ptr: NativePointer, stylePtr: NativePointer)
 
