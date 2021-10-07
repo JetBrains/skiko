@@ -128,8 +128,7 @@ val wasmCrossCompile = tasks.register<CrossCompileTask>("wasmCrossCompile") {
     includeHeadersNonRecursive(skiaHeadersDirs(unpackedSkia))
 
     flags.set(listOf(
-        *skiaPreprocessorFlags(),
-        "-DSK_SUPPORT_GPU=1"
+        *skiaPreprocessorFlags()
     ))
 }
 
@@ -150,8 +149,7 @@ fun registerNativeBridgesTask(os: OS, arch: Arch): TaskProvider<CrossCompileTask
                     "-stdlib=libc++",
                     "-DSK_SHAPER_CORETEXT_AVAILABLE",
                     "-DSK_BUILD_FOR_IOS",
-                    "-DSK_METAL",
-                    "-DSK_SUPPORT_GPU=1"
+                    "-DSK_METAL"
                 )
                 when (arch) {
                     Arch.Arm64 ->
@@ -179,7 +177,6 @@ fun registerNativeBridgesTask(os: OS, arch: Arch): TaskProvider<CrossCompileTask
                     "-DSK_SHAPER_CORETEXT_AVAILABLE",
                     "-DSK_BUILD_FOR_MAC",
                     "-DSK_METAL",
-                    "-DSK_SUPPORT_GPU=1",
                     *skiaPreprocessorFlags()
                 ))
             }
@@ -325,6 +322,7 @@ kotlin {
             val allLibraries = skiaStaticLibraries(skiaDir, targetString) + bridgesLibrary
 
             compilation.target.compilations.all {
+                val skiaBinDir = "$skiaDir/out/${buildType.id}-${osArch.first.id}-${osArch.second.id}"
                 kotlinOptions {
                     val linkerFlags = when (osArch.first) {
                         OS.MacOS -> listOf("-linker-option", "-framework", "-linker-option", "Metal")
@@ -334,8 +332,12 @@ kotlin {
                         OS.Linux -> listOf(
                             "-linker-option", "-L/usr/lib/x86_64-linux-gnu",
                             "-linker-option", "-lfontconfig",
-                            "-linker-option", "-lGL"
-                        )
+                            "-linker-option", "-lGL",
+                            // TODO: an ugly hack, Linux linker searches only unresolved symbols.
+                            "-linker-option", "$skiaBinDir/libskshaper.a",
+                            "-linker-option", "$skiaBinDir/libskunicode.a",
+                            "-linker-option", "$skiaBinDir/libskia.a"
+                            )
                         else -> emptyList()
                     }
                     freeCompilerArgs = allLibraries.map { listOf("-include-binary", it) }.flatten() + linkerFlags
