@@ -44,7 +44,7 @@ class ShapingOptions(
         if (if (this.fontMgr == null) other.fontMgr != null else this.fontMgr != other.fontMgr) return false
         return features.contentDeepEquals(other.features)
     }
-    
+
     override fun hashCode(): Int {
         val PRIME = 59
         var result = 1
