@@ -20,9 +20,9 @@ enum class Arch(
     val id: String,
     val clangFlags: Array<String>
 ) {
-    X64("x64", arrayOf("-arch", "x86_64")),
-    Arm64("arm64", arrayOf("-arch", "arm64")),
-    Wasm("wasm", arrayOf("-std=c++17", "--bind", "-DSKIKO_WASM"))
+    X64("x64", arrayOf()),
+    Arm64("arm64", arrayOf()),
+    Wasm("wasm", arrayOf("--bind", "-DSKIKO_WASM"))
 }
 
 enum class SkiaBuildType(
@@ -31,8 +31,8 @@ enum class SkiaBuildType(
     val clangFlags: Array<String>,
     val msvcFlags: Array<String>
 ) {
-    DEBUG("Debug", arrayOf("-DSK_DEBUG"), arrayOf("-std=c++14", "-g"), emptyArray()),
-    RELEASE("Release", arrayOf("-DNDEBUG"), arrayOf("-std=c++14", "-O3"), arrayOf("/O2"))
+    DEBUG("Debug", arrayOf("-DSK_DEBUG"), arrayOf("-std=c++17", "-g"), emptyArray()),
+    RELEASE("Release", arrayOf("-DNDEBUG"), arrayOf("-std=c++17", "-O3"), arrayOf("/O2"))
     ;
     override fun toString() = id
 }

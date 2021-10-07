@@ -316,7 +316,8 @@ kotlin {
         for ((osArch, compilation) in allNativeTargets) {
             val targetString = "${osArch.first.id}-${osArch.second.id}"
 
-            val unzipper = skiaDirProviderForCrossTargets[osArch]!!
+            val unzipper = skiaDirProviderForCrossTargets[osArch] ?:
+                throw GradleException("add $osArch to the list of cross-targets")
             val unpackedSkia = unzipper.get()
             val skiaDir = unpackedSkia.absolutePath
 
@@ -330,6 +331,11 @@ kotlin {
                         OS.IOS -> listOf("-linker-option", "-framework", "-linker-option", "Metal",
                             "-linker-option", "-framework", "-linker-option", "CoreGraphics",
                             "-linker-option", "-framework", "-linker-option", "CoreText")
+                        OS.Linux -> listOf(
+                            "-linker-option", "-L/usr/lib/x86_64-linux-gnu",
+                            "-linker-option", "-lfontconfig",
+                            "-linker-option", "-lGL"
+                        )
                         else -> emptyList()
                     }
                     freeCompilerArgs = allLibraries.map { listOf("-include-binary", it) }.flatten() + linkerFlags
@@ -350,13 +356,23 @@ kotlin {
                 val outDir = "$buildDir/nativeBridges/static/$targetString"
                 val staticLib = "$outDir/skiko-native-bridges-$targetString.a"
                 workingDir = File(outDir)
-                executable = "libtool"
-                argumentProviders.add {
-                    listOf(
-                        "-static",
-                        "-o",
-                        staticLib
-                    )
+                if (osArch.first == OS.Linux) {
+                    executable = "ar"
+                    argumentProviders.add {
+                        listOf(
+                            "-crs",
+                            staticLib
+                        )
+                    }
+                } else {
+                    executable = "libtool"
+                    argumentProviders.add {
+                        listOf(
+                            "-static",
+                            "-o",
+                            staticLib
+                        )
+                    }
                 }
                 argumentProviders.add { objectFiles.files.map { it.absolutePath } }
                 file(outDir).mkdirs()
@@ -410,6 +426,20 @@ kotlin {
             }
             val nativeTest by creating {
                 dependsOn(commonTest)
+            }
+            if (hostOs == OS.Linux) {
+                val linuxMain by creating {
+                    dependsOn(nativeMain)
+                }
+                val linuxTest by creating {
+                    dependsOn(nativeTest)
+                }
+                val linuxX64Main by getting {
+                    dependsOn(linuxMain)
+                }
+                val linuxX64Test by getting {
+                    dependsOn(linuxTest)
+                }
             }
             if (hostOs == OS.MacOS) {
                 val macosMain by creating {
