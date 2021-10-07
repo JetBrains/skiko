@@ -12,10 +12,6 @@ class PositionWithAffinity(val position: Int, affinity: Affinity) {
         return this.affinity == other.affinity
     }
 
-    protected fun canEqual(other: Any?): Boolean {
-        return other is PositionWithAffinity
-    }
-
     override fun hashCode(): Int {
         val PRIME = 59
         var result = 1

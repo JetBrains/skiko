@@ -18,10 +18,6 @@ class Shadow(val color: Int, val offsetX: Float, val offsetY: Float, val blurSig
         return blurSigma.compareTo(other.blurSigma) == 0
     }
 
-    protected fun canEqual(other: Any?): Boolean {
-        return other is Shadow
-    }
-
     override fun hashCode(): Int {
         val PRIME = 59
         var result = 1

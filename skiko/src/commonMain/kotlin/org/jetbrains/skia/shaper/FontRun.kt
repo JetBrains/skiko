@@ -22,10 +22,6 @@ class FontRun(internal val end: Int, internal val font: Font) {
         return this.font == other.font
     }
 
-    protected fun canEqual(other: Any?): Boolean {
-        return other is FontRun
-    }
-
     override fun hashCode(): Int {
         val PRIME = 59
         var result = 1
