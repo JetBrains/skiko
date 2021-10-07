@@ -59,6 +59,7 @@ val crossTargets = listOf(
     OS.IOS to Arch.Arm64,
     OS.MacOS to Arch.X64,
     OS.MacOS to Arch.Arm64,
+    OS.Linux to Arch.X64
 )
 
 class NativeCompilationInfo(val target: org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget) {
@@ -182,6 +183,19 @@ fun registerNativeBridgesTask(os: OS, arch: Arch): TaskProvider<CrossCompileTask
                     *skiaPreprocessorFlags()
                 ))
             }
+            OS.Linux -> {
+                flags.set(listOf(
+                    "-std=c++17",
+                    "-fno-rtti",
+                    "-fno-exceptions",
+                    "-fvisibility=hidden",
+                    "-fvisibility-inlines-hidden",
+                    "-DSK_BUILD_FOR_LINUX",
+                    "-D_GLIBCXX_USE_CXX11_ABI=0",
+                    *skiaPreprocessorFlags()
+                ))
+            }
+            else -> throw GradleException("$os not yet supported")
         }
 
         crossCompileTargetOS.set(osArch.first)
@@ -291,6 +305,7 @@ kotlin {
         when ("${hostOs.id}-${hostArch.id}") {
             "macos-x64" -> allNativeTargets[OS.MacOS to Arch.X64] = NativeCompilationInfo(macosX64())
             "macos-arm64" -> allNativeTargets[OS.MacOS to Arch.Arm64] = NativeCompilationInfo(macosArm64())
+            "linux-x64" -> allNativeTargets[OS.Linux to Arch.X64] = NativeCompilationInfo(linuxX64())
         }
 
         if (hostOs == OS.MacOS) {
