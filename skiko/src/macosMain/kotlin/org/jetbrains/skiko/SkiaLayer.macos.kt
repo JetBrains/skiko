@@ -1,23 +1,23 @@
-package org.jetbrains.skiko.native
+package org.jetbrains.skiko
 
 import kotlinx.cinterop.useContents
 import org.jetbrains.skiko.native.context.*
 import org.jetbrains.skia.*
+import org.jetbrains.skiko.native.MacOSHardwareLayer
 import org.jetbrains.skiko.redrawer.Redrawer
 
-interface SkiaRenderer {
-    fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long)
-}
+actual open class SkiaLayer(
+    private val properties: SkiaLayerProperties = makeDefaultSkiaLayerProperties()
+) {
+    internal actual val backedLayer: HardwareLayer
+        get() = platformHardwareLayer
+    actual var renderApi: GraphicsApi = GraphicsApi.OPENGL
 
-// TODO: this is exact copy of jvm counterpart. Commonize!
-private class PictureHolder(val instance: Picture, val width: Int, val height: Int)
+    internal val platformHardwareLayer = MacOSHardwareLayer()
 
-open class SkiaLayer(
-    private val properties: SkiaLayerProperties = SkiaLayerProperties()
-) : HardwareLayer() {
     var renderer: SkiaRenderer? = null
 
-    internal var skiaState = createContextHandler(this)
+    internal var skiaState = OpenGLContextHandler(this)
 
     private var isDisposed = false
 
@@ -27,30 +27,28 @@ open class SkiaLayer(
     private val pictureRecorder = PictureRecorder()
     private val pictureLock = Any()
 
-    override fun init() {
+    fun init() {
         println("SkiaLayer::init")
-        super.init()
-        redrawer = platformOperations.createRedrawer(this, properties)
+        redrawer = createNativeRedrawer(this, GraphicsApi.OPENGL, properties)
         redrawer?.redrawImmediately()
     }
 
-    override fun dispose() {
+    fun dispose() {
         redrawer?.dispose()
-        super.dispose()
     }
 
     fun needRedraw() {
         redrawer?.needRedraw()
     }
 
-    override fun update(nanoTime: Long) {
+    fun update(nanoTime: Long) {
         println("SkiaLayer::update")
 
-        val width = nsView.frame.useContents { size.width }
-        val height = nsView.frame.useContents { size.height }
+        val width = platformHardwareLayer.nsView.frame.useContents { size.width }
+        val height = platformHardwareLayer.nsView.frame.useContents { size.height }
 
-        val pictureWidth = (width * contentScale).coerceAtLeast(0.0)
-        val pictureHeight = (height * contentScale).coerceAtLeast(0.0)
+        val pictureWidth = (width * platformHardwareLayer.contentScale).coerceAtLeast(0.0)
+        val pictureHeight = (height * platformHardwareLayer.contentScale).coerceAtLeast(0.0)
 
         val bounds = Rect.makeWH(pictureWidth.toFloat(), pictureHeight.toFloat())
         val canvas = pictureRecorder.beginRecording(bounds)
@@ -60,7 +58,7 @@ open class SkiaLayer(
         this.picture = PictureHolder(picture, pictureWidth.toInt(), pictureHeight.toInt())
     }
 
-    override fun draw() {
+    fun draw() {
         println("SkiaLayer::draw")
         skiaState.apply {
             if (!initContext()) {

@@ -1,9 +1,10 @@
 package org.jetbrains.skiko.native
 
+import org.jetbrains.skiko.HardwareLayer
 import platform.AppKit.*
 import platform.Foundation.*
 
-actual abstract class HardwareLayer {
+internal class MacOSHardwareLayer: HardwareLayer() {
     val nsView = NSView(NSMakeRect(0.0, 0.0, 640.0, 480.0))
 
     // getDpiScale is expensive operation on some platforms, so we cache it
@@ -18,25 +19,6 @@ actual abstract class HardwareLayer {
             isInit = true
         }
     }
-
-    open fun init() {
-    }
-
-    protected open fun nativeInit(platformInfo: Long) {
-    }
-
-    open fun dispose() {
-
-    }
-
-    protected open fun contentScaleChanged() = Unit
-
-    private fun checkContentScale() {
-    }
-
-    internal abstract fun update(nanoTime: Long)
-
-    internal abstract fun draw()
 
     val contentScale: Float
         get() = _contentScale!!

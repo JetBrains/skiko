@@ -5,13 +5,10 @@ import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.DirectContext
 import org.jetbrains.skia.Picture
 import org.jetbrains.skia.Surface
-import org.jetbrains.skiko.GraphicsApi
 import org.jetbrains.skiko.OS
 import org.jetbrains.skiko.SkiaLayer
+import org.jetbrains.skiko.hostArch
 import org.jetbrains.skiko.hostOs
-import org.jetbrains.skiko.hostFullName
-import org.jetbrains.skiko.javaLocation
-import org.jetbrains.skiko.javaVendor
 
 internal abstract class ContextHandler(val layer: SkiaLayer) {
     open val bleachConstant = if (hostOs == OS.MacOS) 0 else -1
@@ -47,9 +44,7 @@ internal abstract class ContextHandler(val layer: SkiaLayer) {
 
     open fun rendererInfo(): String {
         return "GraphicsApi: ${layer.renderApi}\n" +
-            "OS: $hostFullName\n" +
-            "Java: $javaVendor\n" +
-            "Java location: $javaLocation\n"
+                "OS: ${hostOs.id} ${hostArch.id}\n"
     }
 
     protected open fun destroyContext() {

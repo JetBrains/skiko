@@ -1,24 +1,13 @@
-package org.jetbrains.skiko.native.context
+package org.jetbrains.skiko.context
 
 import kotlinx.cinterop.*
 import org.jetbrains.skia.*
-import org.jetbrains.skiko.native.*
+import org.jetbrains.skiko.SkiaLayer
 import platform.OpenGL.GL_DRAW_FRAMEBUFFER_BINDING
 import platform.OpenGL.glGetIntegerv
-import platform.OpenGL.*
 import platform.OpenGLCommon.GLenum
 
-
-internal actual fun createContextHandler(layer: HardwareLayer): ContextHandler {
-    return OpenGLContextHandler(layer)
-    //return when (SkikoProperties.renderApi) {
-    //    GraphicsApi.SOFTWARE -> SoftwareContextHandler(layer)
-    //    GraphicsApi.OPENGL -> OpenGLContextHandler(layer)
-    //    else -> TODO("Unsupported yet")
-    //}
-}
-
-internal class OpenGLContextHandler(layer: HardwareLayer) : ContextHandler(layer) {
+internal class MacOSOpenGLContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
     override fun initContext(): Boolean {
         println("OpenGLContextHandler::initContext")
         try {
@@ -43,14 +32,13 @@ internal class OpenGLContextHandler(layer: HardwareLayer) : ContextHandler(layer
         return result
     }
 
-    @ExperimentalUnsignedTypes
     override fun initCanvas() {
         println("OpenGLContextHandler::initCanvas")
         dispose()
 
-        val scale = layer.contentScale
-        val w = (layer.nsView.frame.useContents { size.width } * scale).toInt().coerceAtLeast(0)
-        val h = (layer.nsView.frame.useContents { size.height } * scale).toInt().coerceAtLeast(0)
+        val scale = layer.platformHardwareLayer.contentScale
+        val w = (layer.platformHardwareLayer.nsView.frame.useContents { size.width } * scale).toInt().coerceAtLeast(0)
+        val h = (layer.platformHardwareLayer.nsView.frame.useContents { size.height } * scale).toInt().coerceAtLeast(0)
 
             val fbId = openglGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING.toUInt())
             renderTarget = BackendRenderTarget.makeGL(

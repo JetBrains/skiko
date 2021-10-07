@@ -1,5 +1,6 @@
 package org.jetbrains.skiko.native
 
+import org.jetbrains.skiko.SkiaLayer
 import platform.AppKit.*
 import platform.Cocoa.*
 import platform.Foundation.*

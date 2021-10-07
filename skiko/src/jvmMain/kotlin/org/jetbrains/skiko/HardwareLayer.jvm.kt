@@ -4,7 +4,7 @@ import java.awt.Canvas
 import java.awt.Graphics
 import java.awt.event.InputMethodEvent
 
-internal open class HardwareLayer : Canvas() {
+internal actual open class HardwareLayer : Canvas() {
     companion object {
         init {
             Library.load()
@@ -20,11 +20,11 @@ internal open class HardwareLayer : Canvas() {
 
     override fun paint(g: Graphics) {}
 
-    open fun init() {
+    actual open fun init() {
         useDrawingSurfacePlatformInfo(::nativeInit)
     }
 
-    fun dispose() {
+    actual open fun dispose() {
         nativeDispose()
     }
 

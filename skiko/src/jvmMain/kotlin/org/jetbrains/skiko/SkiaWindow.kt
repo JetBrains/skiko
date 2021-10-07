@@ -3,7 +3,7 @@ package org.jetbrains.skiko
 import javax.swing.JFrame
 
 open class SkiaWindow(
-    properties: SkiaLayerProperties = SkiaLayerProperties(),
+    properties: SkiaLayerProperties = makeDefaultSkiaLayerProperties(),
     layerFactory: () -> SkiaLayer = { SkiaLayer(properties) }
 ) : JFrame() {
     val layer = layerFactory()
