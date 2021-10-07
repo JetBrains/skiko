@@ -40,31 +40,17 @@ class ColorInfo(val colorType: ColorType, val alphaType: ColorAlphaType, val col
     override fun equals(other: Any?): Boolean {
         if (other === this) return true
         if (other !is ColorInfo) return false
-        if (!other.canEqual(this as Any)) return false
-        val `this$_colorType`: Any = colorType
-        val `other$_colorType`: Any = other.colorType
-        if (`this$_colorType` != `other$_colorType`) return false
-        val `this$_alphaType`: Any = alphaType
-        val `other$_alphaType`: Any = other.alphaType
-        if (`this$_alphaType` != `other$_alphaType`) return false
-        val `this$_colorSpace`: Any? = colorSpace
-        val `other$_colorSpace`: Any? = other.colorSpace
-        return !if (`this$_colorSpace` == null) `other$_colorSpace` != null else `this$_colorSpace` != `other$_colorSpace`
-    }
-
-    protected fun canEqual(other: Any?): Boolean {
-        return other is ColorInfo
+        if (this.colorType != other.colorType) return false
+        if (this.alphaType != other.alphaType) return false
+        return this.colorSpace == other.colorSpace
     }
 
     override fun hashCode(): Int {
         val PRIME = 59
         var result = 1
-        val `$_colorType`: Any = colorType
-        result = result * PRIME + `$_colorType`.hashCode()
-        val `$_alphaType`: Any = alphaType
-        result = result * PRIME + `$_alphaType`.hashCode()
-        val `$_colorSpace`: Any? = colorSpace
-        result = result * PRIME + `$_colorSpace`.hashCode()
+        result = result * PRIME + colorType.hashCode()
+        result = result * PRIME + alphaType.hashCode()
+        result = result * PRIME + colorSpace.hashCode()
         return result
     }
 

@@ -189,20 +189,12 @@ class ImageInfo(val colorInfo: ColorInfo, val width: Int, val height: Int) {
         return computeByteSize(minRowBytes)
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (o === this) return true
-        if (o !is ImageInfo) return false
-        val other = o
-        if (!other.canEqual(this as Any)) return false
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is ImageInfo) return false
         if (width != other.width) return false
         if (height != other.height) return false
-        val `this$_colorInfo`: Any? = colorInfo
-        val `other$_colorInfo`: Any? = other.colorInfo
-        return if (if (`this$_colorInfo` == null) `other$_colorInfo` != null else `this$_colorInfo` != `other$_colorInfo`) false else true
-    }
-
-    protected fun canEqual(other: Any?): Boolean {
-        return other is ImageInfo
+        return this.colorInfo == other.colorInfo
     }
 
     override fun hashCode(): Int {
@@ -210,13 +202,12 @@ class ImageInfo(val colorInfo: ColorInfo, val width: Int, val height: Int) {
         var result = 1
         result = result * PRIME + width
         result = result * PRIME + height
-        val `$_colorInfo`: Any? = colorInfo
-        result = result * PRIME + (`$_colorInfo`?.hashCode() ?: 43)
+        result = result * PRIME + colorInfo.hashCode()
         return result
     }
 
     override fun toString(): String {
-        return "ImageInfo(_colorInfo=" + colorInfo + ", _width=" + width + ", _height=" + height + ")"
+        return "ImageInfo(_colorInfo=$colorInfo, _width=$width, _height=$height)"
     }
 
     fun withColorInfo(_colorInfo: ColorInfo): ImageInfo {

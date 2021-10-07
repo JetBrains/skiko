@@ -2,16 +2,10 @@ package org.jetbrains.skia
 
 class ColorMatrix(vararg mat: Float) {
     val mat: FloatArray
-    override fun equals(o: Any?): Boolean {
-        if (o === this) return true
-        if (o !is ColorMatrix) return false
-        val other = o
-        if (!other.canEqual(this as Any)) return false
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is ColorMatrix) return false
         return mat.contentEquals(other.mat)
-    }
-
-    protected fun canEqual(other: Any?): Boolean {
-        return other is ColorMatrix
     }
 
     override fun hashCode(): Int {

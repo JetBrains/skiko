@@ -40,11 +40,9 @@ class RunInfo(
         return this
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (o === this) return true
-        if (o !is RunInfo) return false
-        val other = o
-        if (!other.canEqual(this as Any)) return false
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is RunInfo) return false
         if (_fontPtr != other._fontPtr) return false
         if (bidiLevel != other.bidiLevel) return false
         if (advanceX.compareTo(other.advanceX) != 0) return false
@@ -54,21 +52,15 @@ class RunInfo(
         return rangeSize == other.rangeSize
     }
 
-    protected fun canEqual(other: Any?): Boolean {
-        return other is RunInfo
-    }
-
     override fun hashCode(): Int {
         val PRIME = 59
         var result = 1
-        val `$_fontPtr` = _fontPtr
         // TODO("Shagen: COMMENT OUT BEFORE ANY ACTUAL USAGE")
-        //result = result * PRIME + (`$_fontPtr` ushr 32 xor `$_fontPtr`).toInt()
+        //result = result * PRIME + (fontPtr ushr 32 xor fontPtr).toInt()
         result = result * PRIME + bidiLevel
         result = result * PRIME + advanceX.toBits()
         result = result * PRIME + advanceY.toBits()
-        val `$_glyphCount` = glyphCount
-        //result = result * PRIME + (`$_glyphCount` ushr 32 xor `$_glyphCount`).toInt()
+        //result = result * PRIME + (glyphCount ushr 32 xor glyphCount).toInt()
         result = result * PRIME + rangeBegin
         result = result * PRIME + rangeSize
         return result

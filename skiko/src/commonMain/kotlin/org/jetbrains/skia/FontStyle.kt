@@ -26,26 +26,20 @@ class FontStyle {
     }
 
     val slant: FontSlant
-        get() = FontSlant.values().get(_value shr 24 and 255)
+        get() = FontSlant.values()[_value shr 24 and 255]
 
     fun withSlant(slant: FontSlant): FontStyle {
         return FontStyle(weight, width, slant)
     }
 
     override fun toString(): String {
-        return "FontStyle(weight=$weight, width=$width, slant=\'$slant)"
+        return "FontStyle(weight=$weight, width=$width, slant=$slant)"
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (o === this) return true
-        if (o !is FontStyle) return false
-        val other = o
-        if (!other.canEqual(this as Any)) return false
-        return if (_value != other._value) false else true
-    }
-
-    protected fun canEqual(other: Any?): Boolean {
-        return other is FontStyle
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is FontStyle) return false
+        return _value == other._value
     }
 
     override fun hashCode(): Int {

@@ -19,8 +19,8 @@ class FontMgrRunIterator(text: ManagedString?, manageText: Boolean, font: Font?,
         }
     }
 
-    constructor(text: String?, font: Font?, opts: ShapingOptions) : this(ManagedString(text), true, font, opts) {}
-    constructor(text: String?, font: Font?) : this(ManagedString(text), true, font, ShapingOptions.DEFAULT) {}
+    constructor(text: String?, font: Font?, opts: ShapingOptions) : this(ManagedString(text), true, font, opts)
+    constructor(text: String?, font: Font?) : this(ManagedString(text), true, font, ShapingOptions.DEFAULT)
 
     override operator fun next(): FontRun {
         return try {
@@ -42,7 +42,6 @@ class FontMgrRunIterator(text: ManagedString?, manageText: Boolean, font: Font?,
         TODO("Not yet implemented")
     }
 }
-
 
 @ExternalSymbolName("org_jetbrains_skia_FontMgrRunIterator__1nMake")
 private external fun _nMake(textPtr: NativePointer, fontPtr: NativePointer, opts: ShapingOptions?): NativePointer

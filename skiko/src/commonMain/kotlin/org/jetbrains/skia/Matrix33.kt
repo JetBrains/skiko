@@ -114,16 +114,10 @@ class Matrix33(vararg mat: Float) {
         return Matrix44(mat[0], mat[1], 0f, mat[2], mat[3], mat[4], 0f, mat[5], 0f, 0f, 1f, 0f, mat[6], mat[7], 0f, mat[8])
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (o === this) return true
-        if (o !is Matrix33) return false
-        val other = o
-        if (!other.canEqual(this as Any)) return false
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is Matrix33) return false
         return mat.contentEquals(other.mat)
-    }
-
-    protected fun canEqual(other: Any?): Boolean {
-        return other is Matrix33
     }
 
     override fun hashCode(): Int {

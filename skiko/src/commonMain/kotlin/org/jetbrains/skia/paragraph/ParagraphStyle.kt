@@ -173,7 +173,6 @@ class ParagraphStyle : Managed(ParagraphStyle_nMake(), _FinalizerHolder.PTR) {
     }
 }
 
-
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetFinalizer")
 private external fun ParagraphStyle_nGetFinalizer(): NativePointer
 

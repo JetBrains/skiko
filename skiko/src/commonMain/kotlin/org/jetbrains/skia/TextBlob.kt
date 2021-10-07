@@ -3,55 +3,6 @@ package org.jetbrains.skia
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetFinalizer")
-private external fun TextBlob_nGetFinalizer(): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetUniqueId")
-private external fun TextBlob_nGetUniqueId(ptr: NativePointer): Int
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nSerializeToData")
-private external fun TextBlob_nSerializeToData(ptr: NativePointer /*, SkSerialProcs */): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromData")
-private external fun TextBlob_nMakeFromData(dataPtr: NativePointer /*, SkDeserialProcs */): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nBounds")
-private external fun _nBounds(ptr: NativePointer): Rect
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetIntercepts")
-private external fun _nGetIntercepts(ptr: NativePointer, lower: Float, upper: Float, paintPtr: NativePointer): FloatArray?
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromPosH")
-private external fun _nMakeFromPosH(glyphs: InteropPointer, xpos: InteropPointer, ypos: Float, fontPtr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromPos")
-private external fun _nMakeFromPos(glyphs: InteropPointer, pos: InteropPointer, fontPtr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromRSXform")
-private external fun _nMakeFromRSXform(glyphs: InteropPointer, xform: InteropPointer, fontPtr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetGlyphs")
-private external fun _nGetGlyphs(ptr: NativePointer): ShortArray
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetPositions")
-private external fun _nGetPositions(ptr: NativePointer): FloatArray
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetClusters")
-private external fun _nGetClusters(ptr: NativePointer): IntArray
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetTightBounds")
-private external fun _nGetTightBounds(ptr: NativePointer): Rect
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetBlockBounds")
-private external fun _nGetBlockBounds(ptr: NativePointer): Rect
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetFirstBaseline")
-private external fun _nGetFirstBaseline(ptr: NativePointer): Float
-
-@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetLastBaseline")
-private external fun _nGetLastBaseline(ptr: NativePointer): Float
-
 class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
         /**
@@ -346,3 +297,51 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
         val PTR = TextBlob_nGetFinalizer()
     }
 }
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetFinalizer")
+private external fun TextBlob_nGetFinalizer(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetUniqueId")
+private external fun TextBlob_nGetUniqueId(ptr: NativePointer): Int
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nSerializeToData")
+private external fun TextBlob_nSerializeToData(ptr: NativePointer /*, SkSerialProcs */): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromData")
+private external fun TextBlob_nMakeFromData(dataPtr: NativePointer /*, SkDeserialProcs */): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nBounds")
+private external fun _nBounds(ptr: NativePointer): Rect
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetIntercepts")
+private external fun _nGetIntercepts(ptr: NativePointer, lower: Float, upper: Float, paintPtr: NativePointer): FloatArray?
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromPosH")
+private external fun _nMakeFromPosH(glyphs: InteropPointer, xpos: InteropPointer, ypos: Float, fontPtr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromPos")
+private external fun _nMakeFromPos(glyphs: InteropPointer, pos: InteropPointer, fontPtr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromRSXform")
+private external fun _nMakeFromRSXform(glyphs: InteropPointer, xform: InteropPointer, fontPtr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetGlyphs")
+private external fun _nGetGlyphs(ptr: NativePointer): ShortArray
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetPositions")
+private external fun _nGetPositions(ptr: NativePointer): FloatArray
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetClusters")
+private external fun _nGetClusters(ptr: NativePointer): IntArray?
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetTightBounds")
+private external fun _nGetTightBounds(ptr: NativePointer): Rect?
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetBlockBounds")
+private external fun _nGetBlockBounds(ptr: NativePointer): Rect?
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetFirstBaseline")
+private external fun _nGetFirstBaseline(ptr: NativePointer): Float?
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetLastBaseline")
+private external fun _nGetLastBaseline(ptr: NativePointer): Float?

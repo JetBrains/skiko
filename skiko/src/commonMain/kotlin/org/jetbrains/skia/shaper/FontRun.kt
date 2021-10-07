@@ -15,15 +15,11 @@ class FontRun(internal val end: Int, internal val font: Font) {
         }
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (o === this) return true
-        if (o !is FontRun) return false
-        val other = o
-        if (!other.canEqual(this as Any)) return false
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is FontRun) return false
         if (end != other.end) return false
-        val `this$_font`: Any = font
-        val `other$_font`: Any = other.font
-        return `this$_font` == `other$_font`
+        return this.font == other.font
     }
 
     protected fun canEqual(other: Any?): Boolean {
@@ -34,8 +30,7 @@ class FontRun(internal val end: Int, internal val font: Font) {
         val PRIME = 59
         var result = 1
         result = result * PRIME + end
-        val `$_font`: Any = font
-        result = result * PRIME + `$_font`.hashCode()
+        result = result * PRIME + font.hashCode()
         return result
     }
 

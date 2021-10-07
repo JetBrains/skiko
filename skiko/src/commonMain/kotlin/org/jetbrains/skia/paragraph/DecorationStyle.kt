@@ -50,24 +50,16 @@ class DecorationStyle(
     val lineStyle: DecorationLineStyle
         get() = _lineStyle
 
-    override fun equals(o: Any?): Boolean {
-        if (o === this) return true
-        if (o !is DecorationStyle) return false
-        val other = o
-        if (!other.canEqual(this as Any)) return false
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is DecorationStyle) return false
         if (_underline != other._underline) return false
         if (_overline != other._overline) return false
         if (_lineThrough != other._lineThrough) return false
         if (_gaps != other._gaps) return false
         if (color != other.color) return false
         if (thicknessMultiplier.compareTo(other.thicknessMultiplier) != 0) return false
-        val `this$_lineStyle`: Any = lineStyle
-        val `other$_lineStyle`: Any = other.lineStyle
-        return `this$_lineStyle` == `other$_lineStyle`
-    }
-
-    protected fun canEqual(other: Any?): Boolean {
-        return other is DecorationStyle
+        return this.lineStyle == other.lineStyle
     }
 
     override fun hashCode(): Int {
@@ -79,8 +71,7 @@ class DecorationStyle(
         result = result * PRIME + if (_gaps) 79 else 97
         result = result * PRIME + color
         result = result * PRIME + thicknessMultiplier.toBits()
-        val `$_lineStyle`: Any = lineStyle
-        result = result * PRIME + (`$_lineStyle`?.hashCode() ?: 43)
+        result = result * PRIME + lineStyle.hashCode()
         return result
     }
 

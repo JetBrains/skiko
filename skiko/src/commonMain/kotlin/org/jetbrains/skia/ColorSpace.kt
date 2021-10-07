@@ -16,8 +16,8 @@ class ColorSpace : Managed {
     }
 
 
-    fun convert(to: ColorSpace?, color: Color4f): Color4f {
-        var to = to
+    fun convert(toColor: ColorSpace?, color: Color4f): Color4f {
+        var to = toColor
         to = to ?: sRGB
         return try {
             Color4f(withResult(FloatArray(4)) {

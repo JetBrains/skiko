@@ -97,11 +97,9 @@ class LineMetrics(
     val right: Double
         get() = left + width
 
-    override fun equals(o: Any?): Boolean {
-        if (o === this) return true
-        if (o !is LineMetrics) return false
-        val other = o
-        if (!other.canEqual(this as Any)) return false
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is LineMetrics) return false
         if (startIndex != other.startIndex) return false
         if (endIndex != other.endIndex) return false
         if (endExcludingWhitespaces != other.endExcludingWhitespaces) return false
@@ -117,38 +115,22 @@ class LineMetrics(
         return lineNumber == other.lineNumber
     }
 
-    protected fun canEqual(other: Any?): Boolean {
-        return other is LineMetrics
-    }
-
     override fun hashCode(): Int {
         val PRIME = 59
         var result = 1
-        val `$_startIndex` = startIndex
-        result = result * PRIME + (`$_startIndex` ushr 32 xor `$_startIndex`).toInt()
-        val `$_endIndex` = endIndex
-        result = result * PRIME + (`$_endIndex` ushr 32 xor `$_endIndex`).toInt()
-        val `$_endExcludingWhitespaces` = endExcludingWhitespaces
-        result = result * PRIME + (`$_endExcludingWhitespaces` ushr 32 xor `$_endExcludingWhitespaces`).toInt()
-        val `$_endIncludingNewline` = endIncludingNewline
-        result = result * PRIME + (`$_endIncludingNewline` ushr 32 xor `$_endIncludingNewline`).toInt()
+        result = result * PRIME + startIndex
+        result = result * PRIME + endIndex
+        result = result * PRIME + endExcludingWhitespaces
+        result = result * PRIME + endIncludingNewline
         result = result * PRIME + if (isHardBreak) 79 else 97
-        val `$_ascent` = ascent.toBits()
-        result = result * PRIME + (`$_ascent` ushr 32 xor `$_ascent`).toInt()
-        val `$_descent` = descent.toBits()
-        result = result * PRIME + (`$_descent` ushr 32 xor `$_descent`).toInt()
-        val `$_unscaledAscent` = unscaledAscent.toBits()
-        result = result * PRIME + (`$_unscaledAscent` ushr 32 xor `$_unscaledAscent`).toInt()
-        val `$_height` = height.toBits()
-        result = result * PRIME + (`$_height` ushr 32 xor `$_height`).toInt()
-        val `$_width` = width.toBits()
-        result = result * PRIME + (`$_width` ushr 32 xor `$_width`).toInt()
-        val `$_left` = left.toBits()
-        result = result * PRIME + (`$_left` ushr 32 xor `$_left`).toInt()
-        val `$_baseline` = baseline.toBits()
-        result = result * PRIME + (`$_baseline` ushr 32 xor `$_baseline`).toInt()
-        val `$_lineNumber` = lineNumber
-        result = result * PRIME + (`$_lineNumber` ushr 32 xor `$_lineNumber`).toInt()
+        result = result * PRIME + ascent.toBits().toInt()
+        result = result * PRIME + descent.toBits().toInt()
+        result = result * PRIME + unscaledAscent.toBits().toInt()
+        result = result * PRIME + height.toBits().toInt()
+        result = result * PRIME + width.toBits().toInt()
+        result = result * PRIME + left.toBits().toInt()
+        result = result * PRIME + baseline.toBits().toInt()
+        result = result * PRIME + lineNumber
         return result
     }
 
@@ -158,7 +140,7 @@ class LineMetrics(
         override fun getArrayElement(array: InteropPointer, index: Int): LineMetrics {
             val intArray = IntArray(6)
             val doubleArray = DoubleArray(7)
-            val result = interopScope {
+            interopScope {
                 LineMetrics_nGetArrayElement(array, index, toInterop(intArray), toInterop(doubleArray))
             }
             return LineMetrics(

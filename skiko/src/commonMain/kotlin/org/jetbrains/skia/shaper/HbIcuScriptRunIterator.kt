@@ -20,7 +20,7 @@ class HbIcuScriptRunIterator(text: ManagedString?, manageText: Boolean) : Manage
         }
     }
 
-    constructor(text: String?) : this(ManagedString(text), true) {}
+    constructor(text: String?) : this(ManagedString(text), true)
 
     override operator fun next(): ScriptRun {
         return try {

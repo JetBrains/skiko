@@ -1,6 +1,5 @@
 package org.jetbrains.skia
 
-
 /**
  *
  * Specify B and C (each between 0...1) to create a shader that applies the corresponding
@@ -26,17 +25,11 @@ class CubicResampler(val b: Float, val c: Float) : SamplingMode {
 
     override fun _pack(): Long = (0x8L shl 60) or ((b.toBits().toULong() shl 32) or c.toBits().toULong()).toLong()
 
-    override fun equals(o: Any?): Boolean {
-        if (o === this) return true
-        if (o !is CubicResampler) return false
-        val other = o
-        if (!other.canEqual(this as Any)) return false
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is CubicResampler) return false
         if (b.compareTo(other.b) != 0) return false
         return c.compareTo(other.c) == 0
-    }
-
-    protected fun canEqual(other: Any?): Boolean {
-        return other is CubicResampler
     }
 
     override fun hashCode(): Int {

@@ -17,8 +17,7 @@ class FontVariationAxis(
         def: Float,
         max: Float,
         hidden: Boolean
-    ) : this(FourByteTag.fromString(tag), min, def, max, hidden) {
-    }
+    ) : this(FourByteTag.fromString(tag), min, def, max, hidden)
 
     constructor(tag: String, min: Float, def: Float, max: Float) : this(
         FourByteTag.fromString(tag),
@@ -26,32 +25,22 @@ class FontVariationAxis(
         def,
         max,
         false
-    ) {
-    }
+    )
 
-    override fun equals(o: Any?): Boolean {
-        if (o === this) return true
-        if (o !is FontVariationAxis) return false
-        val other = o
-        if (!other.canEqual(this as Any)) return false
-        val `this$_tag`: Any = _tag
-        val `other$_tag`: Any = other._tag
-        if (`this$_tag` != `other$_tag`) return false
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is FontVariationAxis) return false
+        if (this._tag != other._tag) return false
         if (minValue.compareTo(other.minValue) != 0) return false
         if (defaultValue.compareTo(other.defaultValue) != 0) return false
         if (maxValue.compareTo(other.maxValue) != 0) return false
         return isHidden == other.isHidden
     }
 
-    protected fun canEqual(other: Any?): Boolean {
-        return other is FontVariationAxis
-    }
-
     override fun hashCode(): Int {
         val PRIME = 59
         var result = 1
-        val `$_tag`: Any = _tag
-        result = result * PRIME + (`$_tag`.hashCode())
+        result = result * PRIME + _tag.hashCode()
         result = result * PRIME + minValue.toBits()
         result = result * PRIME + defaultValue.toBits()
         result = result * PRIME + maxValue.toBits()

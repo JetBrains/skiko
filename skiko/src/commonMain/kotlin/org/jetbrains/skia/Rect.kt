@@ -54,19 +54,13 @@ open class Rect constructor(val left: Float, val top: Float, val right: Float, v
     val isEmpty: Boolean
         get() = right == left || top == bottom
 
-    override fun equals(o: Any?): Boolean {
-        if (o === this) return true
-        if (o !is Rect) return false
-        val other = o
-        if (!other.canEqual(this as Any)) return false
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is Rect) return false
         if (left.compareTo(other.left) != 0) return false
         if (top.compareTo(other.top) != 0) return false
         if (right.compareTo(other.right) != 0) return false
         return bottom.compareTo(other.bottom) == 0
-    }
-
-    protected open fun canEqual(other: Any?): Boolean {
-        return other is Rect
     }
 
     override fun hashCode(): Int {

@@ -39,7 +39,6 @@ class IcuBidiRunIterator(text: ManagedString?, manageText: Boolean, bidiLevel: I
     }
 }
 
-
 @ExternalSymbolName("org_jetbrains_skia_IcuBidiRunIterator__1nMake")
 private external fun _nMake(textPtr: NativePointer, bidiLevel: Int): NativePointer
 

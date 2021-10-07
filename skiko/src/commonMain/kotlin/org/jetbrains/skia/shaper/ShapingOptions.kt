@@ -35,17 +35,13 @@ class ShapingOptions(
         )
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (o === this) return true
-        if (o !is ShapingOptions) return false
-        val other = o
-        if (!other.canEqual(this as Any)) return false
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is ShapingOptions) return false
         if (isLeftToRight != other.isLeftToRight) return false
         if (isApproximateSpaces != other.isApproximateSpaces) return false
         if (isApproximatePunctuation != other.isApproximatePunctuation) return false
-        val `this$_fontMgr`: Any? = fontMgr
-        val `other$_fontMgr`: Any? = other.fontMgr
-        if (if (`this$_fontMgr` == null) `other$_fontMgr` != null else `this$_fontMgr` != `other$_fontMgr`) return false
+        if (if (this.fontMgr == null) other.fontMgr != null else this.fontMgr != other.fontMgr) return false
         return features.contentDeepEquals(other.features)
     }
 
@@ -59,8 +55,7 @@ class ShapingOptions(
         result = result * PRIME + if (isLeftToRight) 79 else 97
         result = result * PRIME + if (isApproximateSpaces) 79 else 97
         result = result * PRIME + if (isApproximatePunctuation) 79 else 97
-        val `$_fontMgr`: Any? = fontMgr
-        result = result * PRIME + (`$_fontMgr`?.hashCode() ?: 43)
+        result = result * PRIME + fontMgr.hashCode()
         result = result * PRIME + features.contentDeepHashCode()
         return result
     }

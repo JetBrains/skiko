@@ -8,18 +8,12 @@ class FontExtents(val ascender: Float, val descender: Float, val lineGap: Float)
     val lineHeight: Float
         get() = -ascender + descender + lineGap
 
-    override fun equals(o: Any?): Boolean {
-        if (o === this) return true
-        if (o !is FontExtents) return false
-        val other = o
-        if (!other.canEqual(this as Any)) return false
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is FontExtents) return false
         if (ascender.compareTo(other.ascender) != 0) return false
         if (descender.compareTo(other.descender) != 0) return false
         return lineGap.compareTo(other.lineGap) == 0
-    }
-
-    protected fun canEqual(other: Any?): Boolean {
-        return other is FontExtents
     }
 
     override fun hashCode(): Int {
