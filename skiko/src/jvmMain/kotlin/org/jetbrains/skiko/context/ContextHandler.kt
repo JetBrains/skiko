@@ -12,7 +12,7 @@ import org.jetbrains.skiko.javaLocation
 import org.jetbrains.skiko.javaVendor
 
 internal abstract class ContextHandler(val layer: SkiaLayer) {
-    open val clearColor = 0 //transparent
+    open val clearColor = if (layer.transparency) 0 else -1
     var context: DirectContext? = null
     var renderTarget: BackendRenderTarget? = null
     var surface: Surface? = null

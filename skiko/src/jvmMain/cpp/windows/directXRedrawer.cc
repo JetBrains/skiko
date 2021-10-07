@@ -332,7 +332,7 @@ extern "C"
 
         if (transparency)
         {
-            //TODO: curent swapChain does not support transparency
+            //TODO: current swapChain does not support transparency
             return 0;
             // HWND wnd = GetAncestor(d3dDevice->window, GA_PARENT);
             // enableTransparentWindow(wnd);
