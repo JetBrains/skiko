@@ -23,24 +23,24 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_PathSegmentIterator__1nGetFinaliz
 
 
 SKIKO_EXPORT void org_jetbrains_skia_PathSegmentIterator__1nNext
-  (KNativePointer ptr, float* points) {
+  (KNativePointer ptr, KInt* data) {
     SkPath::Iter* instance = reinterpret_cast<SkPath::Iter*>((ptr));
     SkPoint pts[4];
     SkPath::Verb verb = instance->next(pts);
 
-    points[0] = pts[0].fX;
-    points[1] = pts[0].fY;
+    data[0] = rawBits(pts[0].fX);
+    data[1] = rawBits(pts[0].fY);
 
-    points[2] = pts[1].fX;
-    points[3] = pts[1].fY;
+    data[2] = rawBits(pts[1].fX);
+    data[3] = rawBits(pts[1].fY);
 
-    points[4] = pts[2].fX;
-    points[5] = pts[2].fY;
+    data[4] = rawBits(pts[2].fX);
+    data[5] = rawBits(pts[2].fY);
 
-    points[6] = pts[3].fX;
-    points[7] = pts[3].fY;
+    data[6] = rawBits(pts[3].fX);
+    data[7] = rawBits(pts[3].fY);
 
-    points[8] = instance->conicWeight();
+    data[8] = rawBits(instance->conicWeight());
 
     int context = verb;
     if (instance -> isClosedContour()) {
@@ -50,6 +50,6 @@ SKIKO_EXPORT void org_jetbrains_skia_PathSegmentIterator__1nNext
         context = context | (1 << 6);
     }
 
-    points[9] = (float) context;
+    data[9] = context;
 }
 

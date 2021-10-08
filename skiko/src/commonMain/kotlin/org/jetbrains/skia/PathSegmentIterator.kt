@@ -58,13 +58,13 @@ class PathSegmentIterator internal constructor(val _path: Path?, ptr: NativePoin
     }
 }
 
-private fun NativePointer.nextSegment() = pathSegmentFromFloatArray(withResult(FloatArray(10)) {
+private fun NativePointer.nextSegment() = pathSegmentFromIntArray(withResult(IntArray(10)) {
     PathSegmentIterator_nNext(this, it)
 })
 
 
-private fun pathSegmentFromFloatArray(points: FloatArray): PathSegment {
-    val context = points.last().toInt()
+private fun pathSegmentFromIntArray(points: IntArray): PathSegment {
+    val context = points.last()
 
     val verb = (context) and ((1 shl 3) - 1)
     val isClosedBit = ((context shr 7) and 1)
@@ -73,27 +73,51 @@ private fun pathSegmentFromFloatArray(points: FloatArray): PathSegment {
 
     return when (PathVerb.values()[verb]) {
         PathVerb.MOVE, PathVerb.CLOSE -> {
-            PathSegment(verb, points[0], points[1], isClosed)
+            PathSegment(verb, Float.fromBits(points[0]), Float.fromBits(points[1]), isClosed)
         }
         PathVerb.LINE -> {
-            PathSegment(points[0], points[1], points[2], points[3], isClosedLineBit != 0, isClosed)
+            PathSegment(
+                Float.fromBits(points[0]),
+                Float.fromBits(points[1]),
+                Float.fromBits(points[2]),
+                Float.fromBits(points[3]),
+                isClosedLineBit != 0,
+                isClosed
+            )
         }
         PathVerb.QUAD -> {
-            PathSegment(points[0], points[1], points[2], points[3], points[4], points[5], isClosed)
+            PathSegment(
+                Float.fromBits(points[0]),
+                Float.fromBits(points[1]),
+                Float.fromBits(points[2]),
+                Float.fromBits(points[3]),
+                Float.fromBits(points[4]),
+                Float.fromBits(points[5]),
+                isClosed
+            )
         }
         PathVerb.CONIC -> {
-            PathSegment(points[0], points[1], points[2], points[3], points[4], points[5], points[8], isClosed)
+            PathSegment(
+                Float.fromBits(points[0]),
+                Float.fromBits(points[1]),
+                Float.fromBits(points[2]),
+                Float.fromBits(points[3]),
+                Float.fromBits(points[4]),
+                Float.fromBits(points[5]),
+                Float.fromBits(points[8]),
+                isClosed
+            )
         }
         PathVerb.CUBIC -> {
             PathSegment(
-                points[0],
-                points[1],
-                points[2],
-                points[3],
-                points[4],
-                points[5],
-                points[6],
-                points[7],
+                Float.fromBits(points[0]),
+                Float.fromBits(points[1]),
+                Float.fromBits(points[2]),
+                Float.fromBits(points[3]),
+                Float.fromBits(points[4]),
+                Float.fromBits(points[5]),
+                Float.fromBits(points[6]),
+                Float.fromBits(points[7]),
                 isClosed
             )
         }
