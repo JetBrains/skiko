@@ -44,8 +44,8 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DrawableKt_Drawable_1
     return reinterpret_cast<jlong>(instance);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_DrawableKt__1nInit
-  (JNIEnv* env, jobject jthis, jlong ptr) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_DrawableKt_Drawable__1nInit
+  (JNIEnv* env,  jclass jclass, jobject jthis, jlong ptr) {
     SkijaDrawableImpl* instance = reinterpret_cast<SkijaDrawableImpl*>(static_cast<uintptr_t>(ptr));
     instance->init(env, jthis);
 }

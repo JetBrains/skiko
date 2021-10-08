@@ -1,4 +1,3 @@
-@file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
@@ -65,13 +64,12 @@ class BackendRenderTarget internal constructor(ptr: NativePointer) : Managed(ptr
     }
 
     private object _FinalizerHolder {
-        val PTR = _nGetFinalizer()
+        val PTR = BackendRenderTarget_nGetFinalizer()
     }
 }
 
-
 @ExternalSymbolName("org_jetbrains_skia_BackendRenderTarget__1nGetFinalizer")
-private external fun _nGetFinalizer(): NativePointer
+private external fun BackendRenderTarget_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_BackendRenderTarget__1nMakeGL")
 private external fun _nMakeGL(width: Int, height: Int, sampleCnt: Int, stencilBits: Int, fbId: Int, fbFormat: Int): NativePointer

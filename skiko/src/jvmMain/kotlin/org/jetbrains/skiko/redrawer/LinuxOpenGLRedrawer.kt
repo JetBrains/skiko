@@ -48,6 +48,9 @@ internal class LinuxOpenGLRedrawer(
     override fun dispose() {
         check(!isDisposed) { "LinuxOpenGLRedrawer is disposed" }
         layer.backedLayer.lockLinuxDrawingSurface {
+            // makeCurrent is mandatory to destroy context, otherwise, OpenGL will destroy wrong context (from another window).
+            // see the official example: https://www.khronos.org/opengl/wiki/Tutorial:_OpenGL_3.0_Context_Creation_(GLX)
+            it.makeCurrent(context)
             it.destroyContext(context)
         }
         runBlocking {
@@ -90,12 +93,11 @@ internal class LinuxOpenGLRedrawer(
             .filter { it.layer.isShowing }
 
         private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
-            // we should wait for the window with the maximum frame limit to avoid bottleneck when there is a window on a slower monitor
-            toRedrawVisible.maxByOrNull { it.frameLimit }?.limitFramesIfNeeded()
-
-            toRedrawCopy.clear()
             toRedrawCopy.addAll(toRedraw)
             toRedraw.clear()
+
+            // we should wait for the window with the maximum frame limit to avoid bottleneck when there is a window on a slower monitor
+            toRedrawVisible.maxByOrNull { it.frameLimit }?.limitFramesIfNeeded()
 
             val nanoTime = System.nanoTime()
 
@@ -109,25 +111,41 @@ internal class LinuxOpenGLRedrawer(
 
             val drawingSurfaces = toRedrawVisible.associateWith { lockLinuxDrawingSurface(it.layer.backedLayer) }
             try {
-                toRedrawVisible.forEach { redrawer ->
+                for (redrawer in toRedrawVisible) {
                     drawingSurfaces[redrawer]!!.makeCurrent(redrawer.context)
                     redrawer.draw()
                 }
 
-                // TODO(demin) it seems now vsync doesn't work as expected with two windows (we have fps = refreshRate / windowCount)
-                //  perhaps we should create frameDispatcher for each display.
-                //  Don't know what happened, but on 620547a commit everything was okay. maybe something changed in the code, maybe my system changed
-                toRedrawVisible.forEach { redrawer ->
+                // TODO(demin): How can we properly synchronize multiple windows with multiple displays?
+                //  I checked, and without vsync there is no tearing. Is it only my case (Ubuntu, Nvidia, X11),
+                //  or Ubuntu write all the screen content into an intermediate buffer? If so, then we probably only
+                //  need a frame limiter.
+
+                // Synchronize with vsync only for the fastest monitor, for the single window.
+                // Otherwise, 5 windows will wait for vsync 5 times.
+                val vsyncRedrawer = toRedrawVisible
+                    .filter { it.properties.isVsyncEnabled }
+                    .maxByOrNull { it.frameLimit }
+
+                for (redrawer in toRedrawVisible.filter { it != vsyncRedrawer }) {
+                    drawingSurfaces[redrawer]!!.makeCurrent(redrawer.context)
+                    drawingSurfaces[redrawer]!!.setSwapInterval(0)
                     drawingSurfaces[redrawer]!!.swapBuffers()
+                    OpenGLApi.instance.glFinish()
                 }
 
-                toRedrawVisible.forEach { redrawer ->
-                    drawingSurfaces[redrawer]!!.makeCurrent(redrawer.context)
+                if (vsyncRedrawer != null) {
+                    drawingSurfaces[vsyncRedrawer]!!.makeCurrent(vsyncRedrawer.context)
+                    drawingSurfaces[vsyncRedrawer]!!.setSwapInterval(1)
+                    drawingSurfaces[vsyncRedrawer]!!.swapBuffers()
                     OpenGLApi.instance.glFinish()
                 }
             } finally {
                 drawingSurfaces.values.forEach(::unlockLinuxDrawingSurface)
             }
+
+            // Without clearing we will have a memory leak
+            toRedrawCopy.clear()
         }
     }
 }

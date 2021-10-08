@@ -11,26 +11,17 @@ class FontVariation(val _tag: Int, val value: Float) {
         return "$tag=$value"
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (o === this) return true
-        if (o !is FontVariation) return false
-        val other = o
-        if (!other.canEqual(this as Any)) return false
-        val `this$_tag`: Any = _tag
-        val `other$_tag`: Any = other._tag
-        if (`this$_tag` != `other$_tag`) return false
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is FontVariation) return false
+        if (this.tag != other.tag) return false
         return value.compareTo(other.value) == 0
-    }
-
-    protected fun canEqual(other: Any?): Boolean {
-        return other is FontVariation
     }
 
     override fun hashCode(): Int {
         val PRIME = 59
         var result = 1
-        val `$_tag`: Any = _tag
-        result = result * PRIME + (`$_tag`?.hashCode() ?: 43)
+        result = result * PRIME + _tag
         result = result * PRIME + value.toBits()
         return result
     }
@@ -49,8 +40,8 @@ class FontVariation(val _tag: Int, val value: Float) {
             return FontVariation(m.group("tag")!!, value)
         }
 
-        fun parse(s: String?): Array<FontVariation> {
-            return _splitPattern.split(s!!)!!.map { s -> parseOne(s!!) }
+        fun parse(str: String): Array<FontVariation> {
+            return _splitPattern.split(str)!!.map { s -> parseOne(s!!) }
                 .toTypedArray()
         }
     }

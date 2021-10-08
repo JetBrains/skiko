@@ -10,27 +10,18 @@ class LanguageRun(
     /**
      * Should be BCP-47, c locale names may also work.
      */
-    override fun equals(o: Any?): Boolean {
-        if (o === this) return true
-        if (o !is LanguageRun) return false
-        val other = o
-        if (!other.canEqual(this as Any)) return false
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is LanguageRun) return false
         if (end != other.end) return false
-        val `this$_language`: Any = language
-        val `other$_language`: Any = other.language
-        return `this$_language` == `other$_language`
-    }
-
-    protected fun canEqual(other: Any?): Boolean {
-        return other is LanguageRun
+        return this.language == other.language
     }
 
     override fun hashCode(): Int {
         val PRIME = 59
         var result = 1
         result = result * PRIME + end
-        val `$_language`: Any = language
-        result = result * PRIME + `$_language`.hashCode()
+        result = result * PRIME + language.hashCode()
         return result
     }
 

@@ -7,7 +7,7 @@ static void deleteBackendRenderTarget(GrBackendRenderTarget* rt) {
     delete rt;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BackendRenderTargetKt__1nGetFinalizer
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BackendRenderTargetKt_BackendRenderTarget_1nGetFinalizer
   (JNIEnv* env, jclass jclass) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteBackendRenderTarget));
 }

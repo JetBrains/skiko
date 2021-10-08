@@ -12,17 +12,11 @@ class ScriptRun(internal val end: Int, internal val scriptTag: Int) {
     val script: String
         get() = FourByteTag.toString(scriptTag)
 
-    override fun equals(o: Any?): Boolean {
-        if (o === this) return true
-        if (o !is ScriptRun) return false
-        val other = o
-        if (!other.canEqual(this as Any)) return false
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is ScriptRun) return false
         if (end != other.end) return false
         return scriptTag == other.scriptTag
-    }
-
-    protected fun canEqual(other: Any?): Boolean {
-        return other is ScriptRun
     }
 
     override fun hashCode(): Int {

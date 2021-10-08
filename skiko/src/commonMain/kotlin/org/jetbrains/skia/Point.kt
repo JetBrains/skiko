@@ -21,17 +21,11 @@ class Point(val x: Float, val y: Float) {
     val isEmpty: Boolean
         get() = x <= 0 || y <= 0
 
-    override fun equals(o: Any?): Boolean {
-        if (o === this) return true
-        if (o !is Point) return false
-        val other = o
-        if (!other.canEqual(this as Any)) return false
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is Point) return false
         if (x.compareTo(other.x) != 0) return false
-        return if (y.compareTo(other.y) != 0) false else true
-    }
-
-    protected fun canEqual(other: Any?): Boolean {
-        return other is Point
+        return y.compareTo(other.y) == 0
     }
 
     override fun hashCode(): Int {

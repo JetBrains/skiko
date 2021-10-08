@@ -1,4 +1,3 @@
-@file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia.paragraph
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
@@ -109,7 +108,6 @@ private external fun _nAddPlaceholder(
     baselineMode: Int,
     baseline: Float
 )
-
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nSetParagraphStyle")
 private external fun _nSetParagraphStyle(ptr: NativePointer, stylePtr: NativePointer)

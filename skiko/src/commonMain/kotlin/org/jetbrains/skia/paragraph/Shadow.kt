@@ -4,24 +4,18 @@ import org.jetbrains.skia.Point
 
 class Shadow(val color: Int, val offsetX: Float, val offsetY: Float, val blurSigma: Double) {
 
-    constructor(color: Int, offset: Point, blurSigma: Double) : this(color, offset.x, offset.y, blurSigma) {}
+    constructor(color: Int, offset: Point, blurSigma: Double) : this(color, offset.x, offset.y, blurSigma)
 
     val offset: Point
         get() = Point(offsetX, offsetY)
 
-    override fun equals(o: Any?): Boolean {
-        if (o === this) return true
-        if (o !is Shadow) return false
-        val other = o
-        if (!other.canEqual(this as Any)) return false
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is Shadow) return false
         if (color != other.color) return false
         if (offsetX.compareTo(other.offsetX) != 0) return false
         if (offsetY.compareTo(other.offsetY) != 0) return false
         return blurSigma.compareTo(other.blurSigma) == 0
-    }
-
-    protected fun canEqual(other: Any?): Boolean {
-        return other is Shadow
     }
 
     override fun hashCode(): Int {
@@ -30,8 +24,8 @@ class Shadow(val color: Int, val offsetX: Float, val offsetY: Float, val blurSig
         result = result * PRIME + color
         result = result * PRIME + offsetX.toBits()
         result = result * PRIME + offsetY.toBits()
-        val `$_blurSigma` = blurSigma.toBits()
-        result = result * PRIME + (`$_blurSigma` ushr 32 xor `$_blurSigma`).toInt()
+        val blurSigma = blurSigma.toBits()
+        result = result * PRIME + (blurSigma ushr 32 xor blurSigma).toInt()
         return result
     }
 

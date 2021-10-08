@@ -95,7 +95,6 @@ class AnimationBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _
     }
 }
 
-
 @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nGetFinalizer")
 private external fun AnimationBuilder_nGetFinalizer(): NativePointer
 

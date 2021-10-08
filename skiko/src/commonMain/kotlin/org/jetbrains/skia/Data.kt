@@ -1,4 +1,3 @@
-@file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
@@ -9,7 +8,7 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
  */
 class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
-        fun makeFromBytes(bytes: ByteArray, offset: Long = 0L, length: Long = bytes.size.toLong()): Data {
+        fun makeFromBytes(bytes: ByteArray, offset: Int = 0, length: Int = bytes.size): Data {
             Stats.onNativeCall()
             return Data(
                 interopScope {
@@ -127,7 +126,7 @@ private external fun _nEquals(ptr: NativePointer, otherPtr: NativePointer): Bool
 private external fun _nToByteBuffer(ptr: NativePointer): ByteBuffer
 
 @ExternalSymbolName("org_jetbrains_skia_Data__1nMakeFromBytes")
-private external fun _nMakeFromBytes(bytes: InteropPointer, offset: Long, length: Long): NativePointer
+private external fun _nMakeFromBytes(bytes: InteropPointer, offset: Int, length: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Data__1nMakeFromFileName")
 private external fun _nMakeFromFileName(path: String?): NativePointer

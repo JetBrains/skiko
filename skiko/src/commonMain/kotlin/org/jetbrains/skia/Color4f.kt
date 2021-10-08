@@ -33,19 +33,13 @@ class Color4f constructor(val r: Float, val g: Float, val b: Float, val a: Float
         )
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (o === this) return true
-        if (o !is Color4f) return false
-        val other = o
-        if (!other.canEqual(this as Any)) return false
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is Color4f) return false
         if (r.compareTo(other.r) != 0) return false
         if (g.compareTo(other.g) != 0) return false
         if (b.compareTo(other.b) != 0) return false
         return a.compareTo(other.a) == 0
-    }
-
-    protected fun canEqual(other: Any?): Boolean {
-        return other is Color4f
     }
 
     override fun hashCode(): Int {

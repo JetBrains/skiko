@@ -1,4 +1,3 @@
-@file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
@@ -165,7 +164,7 @@ class Paint : Managed {
     var color: Int
         get() = try {
             Stats.onNativeCall()
-            _nGetColor(_ptr)
+            Paint_nGetColor(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -642,7 +641,7 @@ private external fun _nGetMode(ptr: NativePointer): Int
 private external fun _nSetMode(ptr: NativePointer, value: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetColor")
-private external fun _nGetColor(ptr: NativePointer): Int
+private external fun Paint_nGetColor(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetColor4f")
 private external fun _nGetColor4f(ptr: NativePointer): Color4f

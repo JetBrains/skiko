@@ -12,24 +12,18 @@ SKIKO_EXPORT KInt org_jetbrains_skia_svg_SVGSVG__1nGetTag
 }
 
 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_svg_SVGSVG__1nGetX
-  (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_svg_SVGSVG__1nGetX");
+SKIKO_EXPORT void org_jetbrains_skia_svg_SVGSVG__1nGetX(KNativePointer ptr, KInt* result) {
+    SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>(ptr);
+    auto x = instance->getX();
+    result[0] = rawBits(x.value());
+    result[1] = static_cast<KInt>(x.unit());
 }
-     
-#if 0 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_svg_SVGSVG__1nGetX
-  (KNativePointer ptr) {
-    SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>((ptr));
-    return skija::svg::SVGLength::toJava(env, instance->getX());
-}
-#endif
 
-
-
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_svg_SVGSVG__1nGetY
-  (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_svg_SVGSVG__1nGetY");
+SKIKO_EXPORT void org_jetbrains_skia_svg_SVGSVG__1nGetY(KNativePointer ptr, KInt* result) {
+      SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>(ptr);
+      auto y = instance->getY();
+      result[0] = rawBits(y.value());
+      result[1] = static_cast<KInt>(y.unit());
 }
      
 #if 0 

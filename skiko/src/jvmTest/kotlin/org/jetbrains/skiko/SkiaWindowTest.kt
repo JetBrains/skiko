@@ -233,7 +233,7 @@ class SkiaWindowTest {
     @Test(timeout = 60000)
     fun `stress test - resize and paint immediately`() = swingTest {
         fun openWindow() = SkiaWindow(
-            properties = SkiaLayerProperties(isVsyncEnabled = false)
+            properties = SkiaLayerProperties(isVsyncEnabled = false, isVsyncFramelimitFallbackEnabled = true)
         ).apply {
             setLocation(200,200)
             setSize(400, 200)
@@ -256,7 +256,7 @@ class SkiaWindowTest {
     @Test(timeout = 60000)
     fun `stress test - open and paint immediately`() = swingTest {
         fun openWindow() = SkiaWindow(
-            properties = SkiaLayerProperties(isVsyncEnabled = false)
+            properties = SkiaLayerProperties(isVsyncEnabled = false, isVsyncFramelimitFallbackEnabled = true)
         ).apply {
             setLocation(200,200)
             setSize(400, 200)
@@ -415,7 +415,8 @@ class SkiaWindowTest {
 
         val window = SkiaWindow(
             properties = SkiaLayerProperties(
-                isVsyncEnabled = false
+                isVsyncEnabled = false,
+                isVsyncFramelimitFallbackEnabled = true
             )
         )
 

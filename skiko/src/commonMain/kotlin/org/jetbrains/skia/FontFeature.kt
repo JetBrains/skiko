@@ -39,33 +39,22 @@ class FontFeature(val _tag: Int, val value: Int, val start: Long, val end: Long)
         return "FontFeature($valuePrefix$_tag$range$valueSuffix)"
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (o === this) return true
-        if (o !is FontFeature) return false
-        val other = o
-        if (!other.canEqual(this as Any)) return false
-        val `this$_tag`: Any = _tag
-        val `other$_tag`: Any = other._tag
-        if (`this$_tag` != `other$_tag`) return false
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is FontFeature) return false
+        if (this.tag != other) return false
         if (value != other.value) return false
         if (start != other.start) return false
-        return if (end != other.end) false else true
-    }
-
-    protected fun canEqual(other: Any?): Boolean {
-        return other is FontFeature
+        return end == other.end
     }
 
     override fun hashCode(): Int {
         val PRIME = 59
         var result = 1
-        val `$_tag`: Any = _tag
-        result = result * PRIME + (`$_tag`.hashCode())
+        result = result * PRIME + (_tag.hashCode())
         result = result * PRIME + value
-        val `$_start` = start
-        result = result * PRIME + (`$_start` ushr 32 xor `$_start`).toInt()
-        val `$_end` = end
-        result = result * PRIME + (`$_end` ushr 32 xor `$_end`).toInt()
+        result = result * PRIME + (start ushr 32 xor start).toInt()
+        result = result * PRIME + (end ushr 32 xor end).toInt()
         return result
     }
 
@@ -87,8 +76,8 @@ class FontFeature(val _tag: Int, val value: Int, val start: Long, val end: Long)
             return FontFeature(m.group("tag")!!, value, start, end)
         }
 
-        fun parse(s: String): Array<FontFeature?> {
-            return _splitPattern.split(s)?.map { s -> parseOne(s!!) }?.toTypedArray() ?: emptyArray()
+        fun parse(str: String): Array<FontFeature?> {
+            return _splitPattern.split(str)?.map { s -> parseOne(s!!) }?.toTypedArray() ?: emptyArray()
         }
     }
 }

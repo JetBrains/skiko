@@ -8,7 +8,8 @@ enum class OS(
     Linux("linux", arrayOf()),
     Windows("windows", arrayOf()),
     MacOS("macos", arrayOf("-mmacosx-version-min=10.13")),
-    Wasm("wasm", arrayOf())
+    Wasm("wasm", arrayOf()),
+    IOS("ios", arrayOf())
     ;
 
     val isWindows
@@ -19,9 +20,9 @@ enum class Arch(
     val id: String,
     val clangFlags: Array<String>
 ) {
-    X64("x64", arrayOf("-arch", "x86_64")),
-    Arm64("arm64", arrayOf("-arch", "arm64")),
-    Wasm("wasm", arrayOf("-std=c++17", "--bind", "-DSKIKO_WASM"))
+    X64("x64", arrayOf()),
+    Arm64("arm64", arrayOf()),
+    Wasm("wasm", arrayOf("--bind", "-DSKIKO_WASM"))
 }
 
 enum class SkiaBuildType(
@@ -30,8 +31,8 @@ enum class SkiaBuildType(
     val clangFlags: Array<String>,
     val msvcFlags: Array<String>
 ) {
-    DEBUG("Debug", arrayOf("-DSK_DEBUG"), arrayOf("-std=c++14", "-g"), emptyArray()),
-    RELEASE("Release", arrayOf("-DNDEBUG"), arrayOf("-std=c++14", "-O3"), arrayOf("/O2"))
+    DEBUG("Debug", arrayOf("-DSK_DEBUG"), arrayOf("-std=c++17", "-g"), emptyArray()),
+    RELEASE("Release", arrayOf("-DNDEBUG"), arrayOf("-std=c++17", "-O3"), arrayOf("/O2"))
     ;
     override fun toString() = id
 }
@@ -147,9 +148,7 @@ class SkikoProperties(private val myProject: Project) {
 
 object SkikoArtifacts {
     // names are also used in samples, e.g. samples/SkijaInjectSample/build.gradle
-    val commonArtifactId = "skiko-jvm"
-    val metadataArtifactId = "skiko-metadata"
-    val jsArtifactId = "skiko-js-runtime"
+    val jvmArtifactId = "skiko-jvm"
     val jsWasmArtifactId = "skiko-js-wasm-runtime"
     fun runtimeArtifactIdFor(os: OS, arch: Arch) =
         "skiko-jvm-runtime-${targetId(os, arch)}"

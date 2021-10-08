@@ -45,18 +45,12 @@ class SVGLengthContext constructor(
         )
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (o === this) return true
-        if (o !is SVGLengthContext) return false
-        val other = o
-        if (!other.canEqual(this as Any)) return false
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is SVGLengthContext) return false
         if (width.compareTo(other.width) != 0) return false
         if (height.compareTo(other.height) != 0) return false
         return dpi.compareTo(other.dpi) == 0
-    }
-
-    protected fun canEqual(other: Any?): Boolean {
-        return other is SVGLengthContext
     }
 
     override fun hashCode(): Int {

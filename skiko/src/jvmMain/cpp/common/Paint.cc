@@ -68,7 +68,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PaintKt__1nSetDither
     instance->setDither(value);
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_PaintKt__1nGetColor
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_PaintKt_Paint_1nGetColor
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkPaint* instance = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(ptr));
     return instance->getColor();

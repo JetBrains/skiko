@@ -1,4 +1,3 @@
-@file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia.paragraph
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
@@ -256,7 +255,7 @@ class Paragraph internal constructor(ptr: NativePointer, text: ManagedString?) :
     }
 
     private object _FinalizerHolder {
-        val PTR = _nGetFinalizer()
+        val PTR = Paragraph_nGetFinalizer()
     }
 
     init {
@@ -267,7 +266,7 @@ class Paragraph internal constructor(ptr: NativePointer, text: ManagedString?) :
 
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nGetFinalizer")
-private external fun _nGetFinalizer(): NativePointer
+private external fun Paragraph_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nGetMaxWidth")
 private external fun _nGetMaxWidth(ptr: NativePointer): Float

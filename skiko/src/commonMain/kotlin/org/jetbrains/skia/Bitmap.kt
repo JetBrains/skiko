@@ -1,4 +1,3 @@
-@file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
@@ -792,7 +791,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
     fun getColor(x: Int, y: Int): Int {
         return try {
             Stats.onNativeCall()
-            _nGetColor(_ptr, x, y)
+            Bitmap_nGetColor(_ptr, x, y)
         } finally {
             reachabilityBarrier(this)
         }
@@ -997,9 +996,6 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
         localMatrix: Matrix33? = null
     ): Shader {
         return try {
-            require(tmx != null) { "Can’t Bitmap.makeShader with tmx == null" }
-            require(tmy != null) { "Can’t Bitmap.makeShader with tmy == null" }
-            require(sampling != null) { "Can’t Bitmap.makeShader with sampling == null" }
             Stats.onNativeCall()
             Shader(
                 interopScope {
@@ -1151,7 +1147,7 @@ private external fun _nEraseColor(ptr: NativePointer, color: Int)
 private external fun _nErase(ptr: NativePointer, color: Int, left: Int, top: Int, right: Int, bottom: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetColor")
-private external fun _nGetColor(ptr: NativePointer, x: Int, y: Int): Int
+private external fun Bitmap_nGetColor(ptr: NativePointer, x: Int, y: Int): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetAlphaf")
 private external fun _nGetAlphaf(ptr: NativePointer, x: Int, y: Int): Float

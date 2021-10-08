@@ -1,4 +1,3 @@
-@file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia.paragraph
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
@@ -135,7 +134,6 @@ class FontCollection internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             reachabilityBarrier(this)
         }
 }
-
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nMake")
 private external fun _nMake(): NativePointer

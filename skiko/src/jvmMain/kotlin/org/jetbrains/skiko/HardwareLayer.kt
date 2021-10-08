@@ -24,7 +24,7 @@ internal open class HardwareLayer : Canvas() {
         useDrawingSurfacePlatformInfo(::nativeInit)
     }
 
-    fun dispose() {
+    open fun dispose() {
         nativeDispose()
     }
 

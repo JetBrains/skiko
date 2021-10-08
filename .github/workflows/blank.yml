@@ -31,7 +31,7 @@ jobs:
           cd $GITHUB_WORKSPACE/skiko
           ./gradlew jvmTest
           ./gradlew publishToMavenLocal
-          ./gradlew -Pskiko.native.enabled=true macosX64Test
+          ./gradlew -Pskiko.native.enabled=true macosX64Test iosX64Test
           ./gradlew -Pskiko.native.enabled=true publishToMavenLocal
    linux:
     runs-on: ubuntu-20.04
@@ -58,7 +58,7 @@ jobs:
           sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 60 --slave /usr/bin/g++ g++ /usr/bin/g++-9
           sudo update-alternatives --config gcc
           sudo apt-get install ninja-build fontconfig libfontconfig1-dev libglu1-mesa-dev libxrandr-dev zip -y
-          ./gradlew -i jvmTest
+          ./gradlew -Pskiko.native.enabled=true -i linuxX64Test jvmTest
           ./gradlew publishToMavenLocal
    js:
      runs-on: ubuntu-20.04
@@ -90,7 +90,7 @@ jobs:
            source ./emsdk_env.sh
            cd ..
            ./gradlew -Pskiko.wasm.enabled=true jsTest
-           ./gradlew -Pskiko.wasm.enabled=true publishSkikoWasmRuntimePublicationToMavenLocal publishSkikoJsRuntimePublicationToMavenLocal
+           ./gradlew -Pskiko.wasm.enabled=true publishSkikoWasmRuntimePublicationToMavenLocal
    windows:
     runs-on: windows-2019
     steps:

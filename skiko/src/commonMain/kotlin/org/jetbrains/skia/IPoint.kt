@@ -13,17 +13,11 @@ class IPoint(val x: Int, val y: Int) {
     val isEmpty: Boolean
         get() = x <= 0 || y <= 0
 
-    override fun equals(o: Any?): Boolean {
-        if (o === this) return true
-        if (o !is IPoint) return false
-        val other = o
-        if (!other.canEqual(this as Any)) return false
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is IPoint) return false
         if (x != other.x) return false
         return y == other.y
-    }
-
-    protected fun canEqual(other: Any?): Boolean {
-        return other is IPoint
     }
 
     override fun hashCode(): Int {

@@ -56,6 +56,7 @@ internal object SkikoProperties {
             OS.MacOS -> return GraphicsApi.METAL
             OS.Linux -> return GraphicsApi.OPENGL
             OS.Windows -> return GraphicsApi.DIRECT3D
+            OS.JS -> TODO("commonize me")
         }
     }
 
@@ -67,6 +68,7 @@ internal object SkikoProperties {
             OS.Linux -> renderApiList = mutableListOf(GraphicsApi.OPENGL, GraphicsApi.DIRECT_SOFTWARE, GraphicsApi.SOFTWARE)
             OS.MacOS -> renderApiList = mutableListOf(GraphicsApi.METAL, GraphicsApi.SOFTWARE)
             OS.Windows -> renderApiList = mutableListOf(GraphicsApi.DIRECT3D, GraphicsApi.OPENGL, GraphicsApi.DIRECT_SOFTWARE, GraphicsApi.SOFTWARE)
+            OS.JS -> TODO("commonize me")
         }
         renderApiList.remove(head)
 

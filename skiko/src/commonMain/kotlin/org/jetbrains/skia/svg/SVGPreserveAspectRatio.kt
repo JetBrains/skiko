@@ -10,39 +10,27 @@ class SVGPreserveAspectRatio(align: SVGPreserveAspectRatioAlign, scale: SVGPrese
         SVGPreserveAspectRatioScale.values()[scale]
     )
 
-    constructor() : this(SVGPreserveAspectRatioAlign.XMID_YMID, SVGPreserveAspectRatioScale.MEET) {}
-    constructor(align: SVGPreserveAspectRatioAlign) : this(align, SVGPreserveAspectRatioScale.MEET) {}
-    constructor(scale: SVGPreserveAspectRatioScale) : this(SVGPreserveAspectRatioAlign.XMID_YMID, scale) {}
+    constructor() : this(SVGPreserveAspectRatioAlign.XMID_YMID, SVGPreserveAspectRatioScale.MEET)
+    constructor(align: SVGPreserveAspectRatioAlign) : this(align, SVGPreserveAspectRatioScale.MEET)
+    constructor(scale: SVGPreserveAspectRatioScale) : this(SVGPreserveAspectRatioAlign.XMID_YMID, scale)
 
     val align: SVGPreserveAspectRatioAlign
         get() = _align
     val scale: SVGPreserveAspectRatioScale
         get() = _scale
 
-    override fun equals(o: Any?): Boolean {
-        if (o === this) return true
-        if (o !is SVGPreserveAspectRatio) return false
-        val other = o
-        if (!other.canEqual(this as Any)) return false
-        val `this$_align`: Any = align
-        val `other$_align`: Any = other.align
-        if (`this$_align` != `other$_align`) return false
-        val `this$_scale`: Any = scale
-        val `other$_scale`: Any = other.scale
-        return `this$_scale` == `other$_scale`
-    }
-
-    protected fun canEqual(other: Any?): Boolean {
-        return other is SVGPreserveAspectRatio
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is SVGPreserveAspectRatio) return false
+        if (align != other.align) return false
+        return scale == other.scale
     }
 
     override fun hashCode(): Int {
         val PRIME = 59
         var result = 1
-        val `$_align`: Any = align
-        result = result * PRIME + (`$_align`.hashCode())
-        val `$_scale`: Any = scale
-        result = result * PRIME + (`$_scale`.hashCode())
+        result = result * PRIME + align.hashCode()
+        result = result * PRIME + scale.hashCode()
         return result
     }
 

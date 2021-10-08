@@ -85,5 +85,13 @@ void TODO(const char*);
 #define SKIKO_EXPORT extern "C"
 #endif
 
+static inline KInt rawBits(KFloat f) {
+    union {
+        KFloat f;
+        KInt i;
+    } u;
+    u.f = f;
+    return u.i;
+}
 #endif /* SKIKO_COMMON_H */
 

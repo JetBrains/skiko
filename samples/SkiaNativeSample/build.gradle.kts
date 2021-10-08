@@ -1,6 +1,8 @@
 plugins {
-    kotlin("multiplatform") version "1.5.21"
+    kotlin("multiplatform") version "1.5.31"
 }
+
+val coroutinesVersion = "1.5.2"
 
 repositories {
     mavenLocal()
@@ -10,7 +12,7 @@ repositories {
 }
 
 val osName = System.getProperty("os.name")
-val targetOs = when {
+val hostOs = when {
     osName == "Mac OS X" -> "macos"
     osName.startsWith("Win") -> "windows"
     osName.startsWith("Linux") -> "linux"
@@ -18,13 +20,13 @@ val targetOs = when {
 }
 
 val osArch = System.getProperty("os.arch")
-var targetArch = when (osArch) {
+var hostArch = when (osArch) {
     "x86_64", "amd64" -> "x64"
     "aarch64" -> "arm64"
     else -> error("Unsupported arch: $osArch")
 }
 
-val target = "${targetOs}-${targetArch}"
+val host = "${hostOs}-${hostArch}"
 
 var version = "0.0.0-SNAPSHOT"
 if (project.hasProperty("skiko.version")) {
@@ -32,19 +34,27 @@ if (project.hasProperty("skiko.version")) {
 }
 
 kotlin {
-
-    val nativeTarget = when {
-        osName == "Mac OS X" -> macosX64()
-        osName.startsWith("Win") -> mingwX64()
-        osName.startsWith("Linux") -> linuxX64()
-        else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
+    val targets = mutableListOf<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>()
+    val nativeHostTarget = when (host) {
+        "macos-x64" -> macosX64()
+        "macos-arm64" -> macosArm64()
+        else -> throw GradleException("Host OS is not supported yet")
     }
 
-    nativeTarget.apply {
-        binaries {
-            executable {
-                entryPoint = "org.jetbrains.skiko.sample.native.main"
-                freeCompilerArgs += listOf("-linker-options", "-framework", "-linker-option", "Metal")
+    targets.add(nativeHostTarget)
+
+    if (hostOs == "macos") {
+        targets.add(iosX64())
+        targets.add(iosArm64())
+    }
+
+    targets.forEach {
+        it.apply {
+            binaries {
+                executable {
+                    entryPoint = "org.jetbrains.skiko.sample.main"
+                    freeCompilerArgs += listOf("-linker-option", "-framework", "-linker-option", "Metal")
+                }
             }
         }
     }
@@ -52,21 +62,63 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(kotlin("stdlib-common"))
+                implementation("org.jetbrains.skiko:skiko:$version")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
             }
         }
 
         val nativeMain by creating {
             dependsOn(commonMain)
-            dependencies {
-            }
         }
 
-        val macosX64Main by getting {
+        val macosMain by creating {
             dependsOn(nativeMain)
-            dependencies {
-                implementation("org.jetbrains.skiko:skiko-native-runtime-$target:$version")
+        }
+
+        val archTargetMain = when (host) {
+            "macos-x64" -> {
+                val macosX64Main by getting {
+                    dependsOn(macosMain)
+                }
+                macosX64Main
+            }
+            "macos-arm64" -> {
+                val macosArm64Main by getting {
+                    dependsOn(macosMain)
+                }
+                macosArm64Main
+            }
+            else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
+        }
+
+        if (hostOs == "macos") {
+            val iosMain by creating {
+                dependsOn(nativeMain)
+            }
+            val iosX64Main by getting {
+                dependsOn(iosMain)
+            }
+            val iosArm64Main by getting {
+                dependsOn(iosMain)
             }
         }
+    }
+}
+
+project.tasks.register<Exec>("runIosSim") {
+    val device = "iPhone 11"
+    workingDir = project.buildDir
+    val binTask = project.tasks.named("linkReleaseExecutableIosX64")
+    dependsOn(binTask)
+    commandLine = listOf(
+        "xcrun",
+        "simctl",
+        "spawn",
+        "--standalone",
+        device
+    )
+    argumentProviders.add {
+        val out = fileTree(binTask.get().outputs.files.files.single()) { include("*.kexe") }
+        listOf(out.single { it.name.endsWith(".kexe") }.absolutePath)
     }
 }

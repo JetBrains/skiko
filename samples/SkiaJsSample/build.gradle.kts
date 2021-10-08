@@ -1,7 +1,5 @@
-import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
-
 plugins {
-    kotlin("multiplatform") version "1.5.10"
+    kotlin("multiplatform") version "1.5.31"
 }
 
 repositories {
@@ -33,7 +31,6 @@ tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().configureEach 
     dependsOn(unzipTask)
 }
 
-
 kotlin {
 
     js(IR) {
@@ -42,23 +39,23 @@ kotlin {
     }
 
     sourceSets {
-        val commonMain by getting {}
+        val commonMain by getting {
+            dependencies {
+                implementation("org.jetbrains.skiko:skiko:$version")
+            }
+        }
 
         val jsMain by getting {
             dependsOn(commonMain)
-            dependencies {
-                // This one is tricky - it has js and wasm binaries required for final linking.
-                // We cannot use it directly but need to extract data from there.
-                implementation("org.jetbrains.skiko:skiko-js-runtime:$version")
-            }
-            resources.setSrcDirs(resources.srcDirs + unzipTask.get().destinationDir)
+            resources.setSrcDirs(resources.srcDirs)
+            resources.srcDirs(unzipTask.map { it.destinationDir })
         }
     }
 }
 
 // a temporary workaround for a bug in jsRun invocation - see https://youtrack.jetbrains.com/issue/KT-48273
 afterEvaluate {
-    extensions.configure<NodeJsRootExtension> {
+    extensions.configure<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension> {
         versions.webpackDevServer.version = "4.0.0"
     }
 }

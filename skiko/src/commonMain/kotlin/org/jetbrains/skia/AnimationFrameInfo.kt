@@ -85,31 +85,17 @@ class AnimationFrameInfo(
         BlendMode.values()[blendModeOrdinal],
         frameRect
     )
-    override fun equals(o: Any?): Boolean {
-        if (o === this) return true
-        if (o !is AnimationFrameInfo) return false
-        val other = o
-        if (!other.canEqual(this as Any)) return false
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is AnimationFrameInfo) return false
         if (requiredFrame != other.requiredFrame) return false
         if (duration != other.duration) return false
         if (isFullyReceived != other.isFullyReceived) return false
         if (isHasAlphaWithinBounds != other.isHasAlphaWithinBounds) return false
-        val `this$_alphaType`: Any = alphaType
-        val `other$_alphaType`: Any = other.alphaType
-        if (`this$_alphaType` != `other$_alphaType`) return false
-        val `this$_disposalMethod`: Any = disposalMethod
-        val `other$_disposalMethod`: Any = other.disposalMethod
-        if (`this$_disposalMethod` != `other$_disposalMethod`) return false
-        val `this$_blendMode`: Any = blendMode
-        val `other$_blendMode`: Any = other.blendMode
-        if (`this$_blendMode` != `other$_blendMode`) return false
-        val `this$_frameRect`: Any = frameRect
-        val `other$_frameRect`: Any = other.frameRect
-        return `this$_frameRect` == `other$_frameRect`
-    }
-
-    protected fun canEqual(other: Any?): Boolean {
-        return other is AnimationFrameInfo
+        if (this.alphaType != other.alphaType) return false
+        if (this.disposalMethod != other.disposalMethod) return false
+        if (this.blendMode != other.blendMode) return false
+        return this.frameRect == other.frameRect
     }
 
     override fun hashCode(): Int {
@@ -119,14 +105,10 @@ class AnimationFrameInfo(
         result = result * PRIME + duration
         result = result * PRIME + if (isFullyReceived) 79 else 97
         result = result * PRIME + if (isHasAlphaWithinBounds) 79 else 97
-        val `$_alphaType`: Any = alphaType
-        result = result * PRIME + (`$_alphaType`.hashCode())
-        val `$_disposalMethod`: Any = disposalMethod
-        result = result * PRIME + `$_disposalMethod`.hashCode()
-        val `$_blendMode`: Any = blendMode
-        result = result * PRIME + `$_blendMode`.hashCode()
-        val `$_frameRect`: Any = frameRect
-        result = result * PRIME + `$_frameRect`.hashCode()
+        result = result * PRIME + alphaType.hashCode()
+        result = result * PRIME + disposalMethod.hashCode()
+        result = result * PRIME + blendMode.hashCode()
+        result = result * PRIME + frameRect.hashCode()
         return result
     }
 
