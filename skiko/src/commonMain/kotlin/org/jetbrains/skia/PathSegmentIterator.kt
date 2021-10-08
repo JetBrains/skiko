@@ -15,8 +15,7 @@ class PathSegmentIterator internal constructor(val _path: Path?, ptr: NativePoin
     companion object {
         fun make(path: Path?, forceClose: Boolean): PathSegmentIterator {
             return try {
-                val ptr = _nMake(getPtr(path), forceClose)
-                val i = PathSegmentIterator(path, ptr)
+                val i = PathSegmentIterator(path, _nMake(getPtr(path), forceClose))
                 i._nextSegment = i.nextSegment()
                 i
             } finally {
