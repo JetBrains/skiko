@@ -17,9 +17,6 @@ import java.awt.image.DataBuffer
 import java.awt.image.DataBufferByte
 import java.awt.image.Raster
 import java.awt.image.WritableRaster
-import javax.swing.JFrame
-import javax.swing.SwingUtilities
-import java.awt.Dimension
 
 internal class SoftwareContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
     override val clearColor = if (layer.transparency && hostOs == OS.MacOS) 0 else -1

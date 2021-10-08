@@ -6,9 +6,6 @@ import org.jetbrains.skia.SurfaceColorFormat
 import org.jetbrains.skia.SurfaceOrigin
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.redrawer.MetalRedrawer
-import javax.swing.JFrame
-import javax.swing.SwingUtilities
-import java.awt.Dimension
 
 internal class MetalContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
     val metalRedrawer: MetalRedrawer
