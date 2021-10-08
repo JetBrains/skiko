@@ -25,7 +25,7 @@ actual open class SkiaLayer internal constructor(
         ContentScale,
     }
 
-    internal actual val backedLayer: HardwareLayer
+    internal val backedLayer: HardwareLayer
 
     constructor(
         properties: SkiaLayerProperties = makeDefaultSkiaLayerProperties()

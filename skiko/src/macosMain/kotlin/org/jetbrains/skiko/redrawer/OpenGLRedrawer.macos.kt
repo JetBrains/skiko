@@ -18,7 +18,9 @@ internal class MacOsOpenGLRedrawer(
     private val layer: SkiaLayer,
     private val properties: SkiaLayerProperties
 ) : Redrawer {
-    private var isDisposed = false
+    init {
+        println("create MacOsOpenGLRedrawer")
+    }
 
     private val drawLayer = MacosGLLayer(layer, setNeedsDisplayOnBoundsChange = true)
 
@@ -28,7 +30,7 @@ internal class MacOsOpenGLRedrawer(
 
     override fun syncSize() {
         // TODO: What do we really do here?
-        layer.backedLayer.nsView.frame.useContents {
+        layer.nsView.frame.useContents {
             drawLayer.setFrame(
                 origin.x.toInt(),
                 origin.y.toInt(),
@@ -47,27 +49,22 @@ internal class MacOsOpenGLRedrawer(
 }
 
 class MacosGLLayer(val layer: SkiaLayer, setNeedsDisplayOnBoundsChange: Boolean) : CAOpenGLLayer() {
-
-    val container = layer.backedLayer.nsView
-
     init {
         this.setNeedsDisplayOnBoundsChange(setNeedsDisplayOnBoundsChange)
         this.removeAllAnimations()
         this.setAutoresizingMask(kCALayerWidthSizable or kCALayerHeightSizable )
         this.setAsynchronous(true)
-        container.layer = this
-        container.wantsLayer = true
+        layer.nsView.layer = this
+        layer.nsView.wantsLayer = true
     }
 
     fun draw()  { 
-        println("MacosGLLayer::draw")
-
         layer.update(getTimeNanos())
         layer.draw()
     }
 
     fun setFrame(x: Int, y: Int, width: Int, height: Int) {
-        val newY = container.frame.useContents { size.height } - y - height
+        val newY = layer.nsView.frame.useContents { size.height } - y - height
 
         CATransaction.begin()
         CATransaction.setDisableActions(true)
@@ -79,8 +76,6 @@ class MacosGLLayer(val layer: SkiaLayer, setNeedsDisplayOnBoundsChange: Boolean)
         this.removeFromSuperlayer()
         // TODO: anything else to dispose the layer?
     }
-
-    protected open fun canDraw() = true
 
     @Suppress("unused") 
     private fun performDraw() {
@@ -98,7 +93,7 @@ class MacosGLLayer(val layer: SkiaLayer, setNeedsDisplayOnBoundsChange: Boolean)
         forLayerTime: CFTimeInterval,
         displayTime: CPointer<CVTimeStamp>?
     ): Boolean {
-        return canDraw()
+        return true
     }
 
     override fun drawInCGLContext(

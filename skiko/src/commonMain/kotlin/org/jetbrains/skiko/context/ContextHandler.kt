@@ -32,7 +32,7 @@ internal abstract class ContextHandler(val layer: SkiaLayer) {
         context?.flush()
     }
 
-    fun dispose() {
+    open fun dispose() {
         disposeCanvas()
         destroyContext()
     }

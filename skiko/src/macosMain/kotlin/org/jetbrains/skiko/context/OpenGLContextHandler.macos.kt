@@ -9,7 +9,7 @@ import platform.OpenGLCommon.GLenum
 
 internal class MacOSOpenGLContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
     override fun initContext(): Boolean {
-        println("OpenGLContextHandler::initContext")
+        println("MacOSOpenGLContextHandler.initContext")
         try {
             if (context == null) {
                 context = DirectContext.makeGL()
@@ -33,15 +33,13 @@ internal class MacOSOpenGLContextHandler(layer: SkiaLayer) : ContextHandler(laye
     }
 
     override fun initCanvas() {
-        println("OpenGLContextHandler::initCanvas")
-        dispose()
+        println("MacOSOpenGLContextHandler.initCanvas")
+        val scale = layer.contentScale
+        val w = (layer.nsView.frame.useContents { size.width } * scale).toInt().coerceAtLeast(0)
+        val h = (layer.nsView.frame.useContents { size.height } * scale).toInt().coerceAtLeast(0)
 
-        val scale = layer.backedLayer.contentScale
-        val w = (layer.backedLayer.nsView.frame.useContents { size.width } * scale).toInt().coerceAtLeast(0)
-        val h = (layer.backedLayer.nsView.frame.useContents { size.height } * scale).toInt().coerceAtLeast(0)
-
-            val fbId = openglGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING.toUInt())
-            renderTarget = BackendRenderTarget.makeGL(
+        val fbId = openglGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING.toUInt())
+        renderTarget = BackendRenderTarget.makeGL(
                 w,
                 h,
                 0,
@@ -49,7 +47,7 @@ internal class MacOSOpenGLContextHandler(layer: SkiaLayer) : ContextHandler(laye
                 fbId.toInt(),
                 FramebufferFormat.GR_GL_RGBA8
             )
-            surface = Surface.makeFromBackendRenderTarget(
+        surface = Surface.makeFromBackendRenderTarget(
                 context!!,
                 renderTarget!!,
                 SurfaceOrigin.BOTTOM_LEFT,
@@ -57,7 +55,7 @@ internal class MacOSOpenGLContextHandler(layer: SkiaLayer) : ContextHandler(laye
                 ColorSpace.sRGB
             )
 
-        canvas = surface!!.canvas
+        canvas = surface?.canvas
             ?: error("Could not obtain Canvas from Surface")
     }
 }

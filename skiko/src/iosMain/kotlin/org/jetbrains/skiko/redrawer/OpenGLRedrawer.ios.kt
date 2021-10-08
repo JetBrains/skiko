@@ -3,7 +3,7 @@ package org.jetbrains.skiko.redrawer
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaLayerProperties
 
-internal class IosOpenGLRedrawer(
+internal class OpenGLRedrawer(
     private val layer: SkiaLayer,
     private val properties: SkiaLayerProperties
 ) : Redrawer {

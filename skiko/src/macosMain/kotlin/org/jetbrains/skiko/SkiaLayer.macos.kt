@@ -4,36 +4,38 @@ import kotlinx.cinterop.useContents
 import org.jetbrains.skiko.context.*
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.redrawer.Redrawer
+import platform.AppKit.NSView
+import platform.Foundation.NSMakeRect
 
 actual open class SkiaLayer(
     private val properties: SkiaLayerProperties = makeDefaultSkiaLayerProperties()
 ) {
-    internal actual val backedLayer: HardwareLayer = HardwareLayer()
     actual var renderApi: GraphicsApi = GraphicsApi.OPENGL
-
     actual val contentScale: Float
-        get() = backedLayer.contentScale
+        get() = _contentScale
+
+    val nsView = NSView(NSMakeRect(0.0, 0.0, 640.0, 480.0))
+    var _contentScale: Float = 1.0f
 
     var renderer: SkiaRenderer? = null
 
-    internal var skiaState = MacOSOpenGLContextHandler(this)
-
-    private var isDisposed = false
+    private var contextHandler = MacOSOpenGLContextHandler(this)
 
     private var redrawer: Redrawer? = null
 
     private var picture: PictureHolder? = null
     private val pictureRecorder = PictureRecorder()
-    private val pictureLock = Any()
 
-    fun init() {
-        println("SkiaLayer::init")
+    fun initLayer() {
+        println("SkiaLayer.initLayer")
         redrawer = createNativeRedrawer(this, GraphicsApi.OPENGL, properties)
         redrawer?.redrawImmediately()
     }
 
-    fun dispose() {
+    fun disposeLayer() {
         redrawer?.dispose()
+        redrawer = null
+        initedCanvas = false
     }
 
     fun needRedraw() {
@@ -41,13 +43,13 @@ actual open class SkiaLayer(
     }
 
     fun update(nanoTime: Long) {
-        println("SkiaLayer::update")
+        println("SkiaLayer.update")
 
-        val width = backedLayer.nsView.frame.useContents { size.width }
-        val height = backedLayer.nsView.frame.useContents { size.height }
+        val width = nsView.frame.useContents { size.width }
+        val height = nsView.frame.useContents { size.height }
 
-        val pictureWidth = (width * backedLayer.contentScale).coerceAtLeast(0.0)
-        val pictureHeight = (height * backedLayer.contentScale).coerceAtLeast(0.0)
+        val pictureWidth = (width * contentScale).coerceAtLeast(0.0)
+        val pictureHeight = (height * contentScale).coerceAtLeast(0.0)
 
         val bounds = Rect.makeWH(pictureWidth.toFloat(), pictureHeight.toFloat())
         val canvas = pictureRecorder.beginRecording(bounds)
@@ -57,17 +59,22 @@ actual open class SkiaLayer(
         this.picture = PictureHolder(picture, pictureWidth.toInt(), pictureHeight.toInt())
     }
 
+    private var initedCanvas = false
+
     fun draw() {
-        println("SkiaLayer::draw")
-        skiaState.apply {
-            if (!initContext()) {
-                error("initContext() failure. No fallback to raster for Skia/native yet.")
-                return
+        println("SkiaLayer.draw")
+        contextHandler.apply {
+            if (!initedCanvas) {
+                if (!initContext()) {
+                    error("initContext() failure")
+                    return
+                }
+                initCanvas()
+                initedCanvas = true
             }
-            initCanvas()
             clearCanvas()
             val picture = picture
-            println("SkiaLayer::draw: picture=$picture")
+            println("SkiaLayer.draw: picture=$picture")
             if (picture != null) {
                 drawOnCanvas(picture.instance)
             }

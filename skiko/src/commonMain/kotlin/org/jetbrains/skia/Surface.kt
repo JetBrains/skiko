@@ -283,7 +283,7 @@ class Surface : RefCnt {
                     surfaceProps
                 )
                 require(ptr != NullPointer) {
-                    "Failed Surface.makeFromBackendRenderTarget($context, $rt, $origin, $colorFormat, $colorSpace)"
+                    "Failed Surface.makeFromBackendRenderTarget"
                 }
                 Surface(ptr, context, rt)
             } finally {
