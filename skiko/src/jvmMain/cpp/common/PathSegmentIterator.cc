@@ -25,11 +25,15 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathSegmentIteratorKt_
     SkPoint pts[4];
     SkPath::Verb verb = instance->next(pts);
 
-    std::bitset<8> context(verb);
-    context.set(7, instance->isClosedContour());
-    context.set(6, instance->isCloseLine());
+    int context = verb;
+    if (instance -> isClosedContour()) {
+        context = context | (1 << 7);
+    }
+    if (instance -> isCloseLine()) {
+        context = context | (1 << 6);
+    }
 
-    float fcontext = (float) (int) context.to_ulong();
+    float fcontext = (float) context;
 
     switch (verb) {
         case SkPath::Verb::kDone_Verb: {

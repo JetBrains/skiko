@@ -27,7 +27,6 @@ SKIKO_EXPORT void org_jetbrains_skia_PathSegmentIterator__1nNext
     SkPath::Iter* instance = reinterpret_cast<SkPath::Iter*>((ptr));
     SkPoint pts[4];
     SkPath::Verb verb = instance->next(pts);
-    KInteropPointer segment;
 
     points[0] = pts[0].fX;
     points[1] = pts[0].fY;
@@ -43,11 +42,14 @@ SKIKO_EXPORT void org_jetbrains_skia_PathSegmentIterator__1nNext
 
     points[8] = instance->conicWeight();
 
-    std::bitset<8> context(verb);
-    context.set(7, instance->isClosedContour());
-    context.set(6, instance->isCloseLine());
+    int context = verb;
+    if (instance -> isClosedContour()) {
+        context = context | (1 << 7);
+    }
+    if (instance -> isCloseLine()) {
+        context = context | (1 << 6);
+    }
 
-
-    points[9] = (float) (int) context.to_ulong();
+    points[9] = (float) context;
 }
 
