@@ -81,8 +81,10 @@ void TODO(const char*);
 #ifdef SKIKO_WASM
 #include <emscripten.h>
 #define SKIKO_EXPORT EMSCRIPTEN_KEEPALIVE extern "C"
+#define pointerTypeAlias int
 #else
 #define SKIKO_EXPORT extern "C"
+#define pointerTypeAlias long
 #endif
 
 static inline KInt rawBits(KFloat f) {

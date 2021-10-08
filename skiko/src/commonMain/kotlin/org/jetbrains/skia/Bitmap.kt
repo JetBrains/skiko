@@ -70,7 +70,23 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
         get() = try {
             if (_imageInfo == null) {
                 Stats.onNativeCall()
-                _imageInfo = _nGetImageInfo(_ptr)
+                var colorSpacePtr: NativePointer? = null
+
+                _imageInfo = withResult(IntArray(4)) { intArrayPointer ->
+
+                    colorSpacePtr = withResult(NativePointerArray(1)) { nativePointerArrayPtr ->
+                        _nGetImageInfo(_ptr, intArrayPointer, nativePointerArrayPtr)
+                    }[0]
+
+                }.let {
+                    ImageInfo(
+                        width = it[0],
+                        height = it[1],
+                        colorType = it[2],
+                        alphaType = it[3],
+                        colorSpace = colorSpacePtr!!
+                    )
+                }
             }
             _imageInfo!!
         } finally {
@@ -126,7 +142,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
      *
      * @return  byte length of pixel row
      */
-    val rowBytes: Long
+    val rowBytes: Int
         get() = try {
             Stats.onNativeCall()
             _nGetRowBytes(_ptr)
@@ -554,7 +570,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
     fun installPixels(
         info: ImageInfo,
         pixels: ByteArray?,
-        rowBytes: Long
+        rowBytes: Int
     ): Boolean {
         return try {
             _imageInfo = null
@@ -896,7 +912,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
      */
     fun readPixels(
         dstInfo: ImageInfo = imageInfo,
-        dstRowBytes: Long = rowBytes,
+        dstRowBytes: Int = rowBytes,
         srcX: Int = 0,
         srcY: Int = 0
     ): ByteArray? {
@@ -1035,7 +1051,7 @@ private external fun _nSwap(ptr: NativePointer, otherPtr: NativePointer)
 private external fun _nGetPixmap(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetImageInfo")
-private external fun _nGetImageInfo(ptr: NativePointer): ImageInfo?
+private external fun _nGetImageInfo(ptr: NativePointer, imageInfo: InteropPointer, colorSpacePtrs: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetRowBytesAsPixels")
 private external fun _nGetRowBytesAsPixels(ptr: NativePointer): Int
@@ -1044,7 +1060,7 @@ private external fun _nGetRowBytesAsPixels(ptr: NativePointer): Int
 private external fun _nIsNull(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetRowBytes")
-private external fun _nGetRowBytes(ptr: NativePointer): Long
+private external fun _nGetRowBytes(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nSetAlphaType")
 private external fun _nSetAlphaType(ptr: NativePointer, alphaType: Int): Boolean
@@ -1115,7 +1131,7 @@ private external fun _nInstallPixels(
     alphaType: Int,
     colorSpacePtr: NativePointer,
     pixels: InteropPointer,
-    rowBytes: Long
+    rowBytes: Int
 ): Boolean
 
 
@@ -1163,7 +1179,7 @@ private external fun _nReadPixels(
     colorType: Int,
     alphaType: Int,
     colorSpacePtr: NativePointer,
-    dstRowBytes: Long,
+    dstRowBytes: Int,
     srcX: Int,
     srcY: Int
 ): ByteArray?

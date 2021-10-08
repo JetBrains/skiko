@@ -32,10 +32,21 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_BitmapKt__1nSwap
     instance->swap(*other);
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_BitmapKt__1nGetImageInfo
-  (JNIEnv* env, jclass jclass, jlong ptr) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_BitmapKt__1nGetImageInfo
+  (JNIEnv* env, jclass jclass, jlong ptr, jintArray imageInfoResult, jlongArray colorSpaceResultPtr) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(ptr));
-    return skija::ImageInfo::toJava(env, instance->info());
+    SkImageInfo imageInfo = instance->info();
+
+    jint *result_int = env->GetIntArrayElements(imageInfoResult, NULL);
+    result_int[0] = instance->width();
+    result_int[1] = instance->height();
+    result_int[2] = static_cast<int>(imageInfo.colorType());
+    result_int[3] = static_cast<int>(imageInfo.alphaType());
+    env->ReleaseIntArrayElements(imageInfoResult, result_int, 0);
+
+    jlong *result_long = env->GetLongArrayElements(colorSpaceResultPtr, NULL);
+    result_long[0] = reinterpret_cast<jlong>(imageInfo.colorSpace());
+    env->ReleaseLongArrayElements(colorSpaceResultPtr, result_long, 0);
 }
 
 extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BitmapKt__1nGetRowBytesAsPixels

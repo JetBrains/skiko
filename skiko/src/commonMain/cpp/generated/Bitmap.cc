@@ -35,12 +35,51 @@ SKIKO_EXPORT void org_jetbrains_skia_Bitmap__1nSwap
 }
 
 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Bitmap__1nGetImageInfo
-  (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_Bitmap__1nGetImageInfo");
+SKIKO_EXPORT void org_jetbrains_skia_Bitmap__1nGetImageInfo
+  (KNativePointer ptr, KInt* imageInfoResult, KNativePointerArray colorSpacePtrs) {
+
+  SkBitmap* instance = reinterpret_cast<SkBitmap*>(ptr);
+  SkImageInfo imageInfo = instance->info();
+
+  int width = instance->width();
+  int height = instance->height();
+  int colorType = static_cast<int>(imageInfo.colorType());
+  int alphaType = static_cast<int>(imageInfo.alphaType());
+
+  imageInfoResult[0] = instance->width();
+  imageInfoResult[1] = instance->height();
+  imageInfoResult[2] = static_cast<int>(imageInfo.colorType());
+  imageInfoResult[3] = static_cast<int>(imageInfo.alphaType());
+
+  // Для того, чтобы на стороне котлина создать ImageInfo нам нужен NativePointer на ColorSpace
+  // и возник вопрос как вернуть KNativePointer отсюда в котлин?
+
+  // вариант 1) return писать не хочется, так как функция называется GetImageInfo
+  // и возвращать из неё KNativePointer на ColorSpace будет плохо
+
+  // вариант 2) использовать NativePointerArray размером = 1.
+  // тогда необходимо закастить его к актуальному типу int* для wasm и long* для native?
+  // сделал это с использованием #ifdef SKIKO_WASM ниже. Норм ли так?
+
+  // какие есть альтерантивы? Можно разбить этот метод на два:
+  // метод 1 будет заполнять IntArray imageInfoResult
+  // метод 2 будет возвращать KNativePointer на ColorSpace
+  // кмк такой вариант тоже так себе, так как придётся делать два вызова вместо одного везде
+  // где нужен GetImageInfo (правда с точки зрения Bitmap.kt такое место всего одно)
+
+  pointerTypeAlias* arr = static_cast<pointerTypeAlias*>(colorSpacePtrs);
+  arr[0] = reinterpret_cast<pointerTypeAlias>(imageInfo.colorSpace());
+
+//  #ifdef SKIKO_WASM
+//    int* arr = static_cast<int*>(colorSpacePtrs);
+//    arr[0] = reinterpret_cast<int>(imageInfo.colorSpace());
+//  #else
+//    long* arr = static_cast<long*>(colorSpacePtrs);
+//    arr[0] = reinterpret_cast<long>(imageInfo.colorSpace());
+//  #endif
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Bitmap__1nGetImageInfo
   (KNativePointer ptr) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>((ptr));
@@ -141,11 +180,11 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_Bitmap__1nAllocPixelsRowBytes
 
 
 SKIKO_EXPORT KBoolean org_jetbrains_skia_Bitmap__1nInstallPixels
-  (KNativePointer ptr, KInt width, KInt height, KInt colorType, KInt alphaType, KNativePointer colorSpacePtr, KByte* pixelsArr, KNativePointer rowBytes) {
+  (KNativePointer ptr, KInt width, KInt height, KInt colorType, KInt alphaType, KNativePointer colorSpacePtr, KByte* pixelsArr, KInt rowBytes) {
     TODO("implement org_jetbrains_skia_Bitmap__1nInstallPixels");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KBoolean org_jetbrains_skia_Bitmap__1nInstallPixels
   (KNativePointer ptr, KInt width, KInt height, KInt colorType, KInt alphaType, KNativePointer colorSpacePtr, KByte* pixelsArr, KNativePointer rowBytes) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>((ptr));
@@ -243,11 +282,11 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_Bitmap__1nExtractSubset
 
 
 SKIKO_EXPORT KByte* org_jetbrains_skia_Bitmap__1nReadPixels
-  (KNativePointer ptr, KInt width, KInt height, KInt colorType, KInt alphaType, KNativePointer colorSpacePtr, KNativePointer rowBytes, KInt srcX, KInt srcY) {
+  (KNativePointer ptr, KInt width, KInt height, KInt colorType, KInt alphaType, KNativePointer colorSpacePtr, KInt rowBytes, KInt srcX, KInt srcY) {
     TODO("implement org_jetbrains_skia_Bitmap__1nReadPixels");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KByte* org_jetbrains_skia_Bitmap__1nReadPixels
   (KNativePointer ptr, KInt width, KInt height, KInt colorType, KInt alphaType, KNativePointer colorSpacePtr, KNativePointer rowBytes, KInt srcX, KInt srcY) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>((ptr));
