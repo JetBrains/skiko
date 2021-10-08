@@ -15,9 +15,8 @@ class PathSegmentIterator internal constructor(val _path: Path?, ptr: NativePoin
     companion object {
         fun make(path: Path?, forceClose: Boolean): PathSegmentIterator {
             return try {
-                val ptr = _nMake(getPtr(path), forceClose)
-                val i = PathSegmentIterator(path, ptr)
-                i._nextSegment = ptr.nextSegment()
+                val i = PathSegmentIterator(path, _nMake(getPtr(path), forceClose))
+                i._nextSegment = i.nextSegment()
                 i
             } finally {
                 reachabilityBarrier(path)
@@ -33,9 +32,11 @@ class PathSegmentIterator internal constructor(val _path: Path?, ptr: NativePoin
     override fun next(): PathSegment? {
         return try {
             if (_nextSegment?.verb == PathVerb.DONE) throw NoSuchElementException()
-            val res = _nextSegment
-            _nextSegment = _ptr.nextSegment()
-            res
+            pathSegmentFromIntArray(withResult(IntArray(10)) {
+                PathSegmentIterator_nNext(this._ptr , it)
+            }).also {
+                _nextSegment = it
+            }
         } finally {
             reachabilityBarrier(this)
         }
@@ -56,12 +57,11 @@ class PathSegmentIterator internal constructor(val _path: Path?, ptr: NativePoin
     override fun remove() {
         TODO("Not yet implemented")
     }
+
+    private fun nextSegment() = pathSegmentFromIntArray(withResult(IntArray(10)) {
+        PathSegmentIterator_nNext(this._ptr, it)
+    })
 }
-
-private fun NativePointer.nextSegment() = pathSegmentFromIntArray(withResult(IntArray(10)) {
-    PathSegmentIterator_nNext(this, it)
-})
-
 
 private fun pathSegmentFromIntArray(points: IntArray): PathSegment {
     val context = points.last()
