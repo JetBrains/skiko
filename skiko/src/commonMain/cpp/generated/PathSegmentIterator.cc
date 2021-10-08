@@ -6,7 +6,7 @@
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_PathSegmentIterator__1nMake
   (KNativePointer pathPtr, KBoolean forceClose) {
-    SkPath* path = reinterpret_cast<SkPath*>(pathPtr);
+    SkPath* path = reinterpret_cast<SkPath*>((pathPtr));
     SkPath::Iter* iter = new SkPath::Iter(*path, forceClose);
     return reinterpret_cast<KNativePointer>(iter);
 }
@@ -16,12 +16,15 @@ static void deletePathSegmentIterator(SkPath::Iter* iter) {
     delete iter;
 }
 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_PathSegmentIterator__1nGetFinalizer() {
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_PathSegmentIterator__1nGetFinalizer
+  () {
     return reinterpret_cast<KNativePointer>((&deletePathSegmentIterator));
 }
 
-SKIKO_EXPORT void org_jetbrains_skia_PathSegmentIterator__1nNext(KNativePointer ptr, KInt* data) {
-    SkPath::Iter* instance = reinterpret_cast<SkPath::Iter*>(ptr);
+
+SKIKO_EXPORT void org_jetbrains_skia_PathSegmentIterator__1nNext
+  (KNativePointer ptr, KInt* data) {
+    SkPath::Iter* instance = reinterpret_cast<SkPath::Iter*>((ptr));
     SkPoint pts[4];
     SkPath::Verb verb = instance->next(pts);
 
@@ -37,9 +40,7 @@ SKIKO_EXPORT void org_jetbrains_skia_PathSegmentIterator__1nNext(KNativePointer 
     data[6] = rawBits(pts[3].fX);
     data[7] = rawBits(pts[3].fY);
 
-    // Otherwise it's null.
-    if (verb == SkPath::Verb::kConic_Verb)
-        data[8] = rawBits(instance->conicWeight());
+    data[8] = rawBits(instance->conicWeight());
 
     int context = verb;
     if (instance -> isClosedContour()) {
