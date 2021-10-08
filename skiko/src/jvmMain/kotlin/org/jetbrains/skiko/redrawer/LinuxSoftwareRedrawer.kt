@@ -1,8 +1,5 @@
 package org.jetbrains.skiko.redrawer
 
-import org.jetbrains.skia.Surface
-import kotlinx.coroutines.*
-import kotlinx.coroutines.swing.Swing
 import org.jetbrains.skiko.*
 
 internal class LinuxSoftwareRedrawer(

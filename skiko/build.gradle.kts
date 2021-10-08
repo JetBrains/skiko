@@ -325,7 +325,11 @@ kotlin {
                 val skiaBinDir = "$skiaDir/out/${buildType.id}-${osArch.first.id}-${osArch.second.id}"
                 kotlinOptions {
                     val linkerFlags = when (osArch.first) {
-                        OS.MacOS -> listOf("-linker-option", "-framework", "-linker-option", "Metal")
+                        OS.MacOS -> listOf("-linker-option", "-framework", "-linker-option", "Metal",
+                            "-linker-option", "-framework", "-linker-option", "CoreGraphics",
+                            "-linker-option", "-framework", "-linker-option", "CoreText",
+                            "-linker-option", "-framework", "-linker-option", "CoreServices"
+                            )
                         OS.IOS -> listOf("-linker-option", "-framework", "-linker-option", "Metal",
                             "-linker-option", "-framework", "-linker-option", "CoreGraphics",
                             "-linker-option", "-framework", "-linker-option", "CoreText")

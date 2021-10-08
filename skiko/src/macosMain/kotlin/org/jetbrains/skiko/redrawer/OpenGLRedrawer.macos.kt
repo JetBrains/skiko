@@ -1,9 +1,9 @@
-package org.jetbrains.skiko.native.redrawer
+package org.jetbrains.skiko.redrawer
 
 import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.useContents
-import org.jetbrains.skiko.native.*
-import org.jetbrains.skiko.redrawer.Redrawer
+import org.jetbrains.skiko.SkiaLayer
+import org.jetbrains.skiko.SkiaLayerProperties
 import platform.CoreFoundation.CFTimeInterval
 import platform.CoreGraphics.CGRectMake
 import platform.CoreVideo.CVTimeStamp
@@ -15,10 +15,12 @@ import platform.QuartzCore.*
 import kotlin.system.getTimeNanos
 
 internal class MacOsOpenGLRedrawer(
-    private val layer: HardwareLayer,
+    private val layer: SkiaLayer,
     private val properties: SkiaLayerProperties
 ) : Redrawer {
-    private var isDisposed = false
+    init {
+        println("create MacOsOpenGLRedrawer")
+    }
 
     private val drawLayer = MacosGLLayer(layer, setNeedsDisplayOnBoundsChange = true)
 
@@ -46,28 +48,23 @@ internal class MacOsOpenGLRedrawer(
     }
 }
 
-class MacosGLLayer(val layer: HardwareLayer, setNeedsDisplayOnBoundsChange: Boolean) : CAOpenGLLayer() {
-
-    val container = layer.nsView
-
+class MacosGLLayer(val layer: SkiaLayer, setNeedsDisplayOnBoundsChange: Boolean) : CAOpenGLLayer() {
     init {
         this.setNeedsDisplayOnBoundsChange(setNeedsDisplayOnBoundsChange)
         this.removeAllAnimations()
         this.setAutoresizingMask(kCALayerWidthSizable or kCALayerHeightSizable )
         this.setAsynchronous(true)
-        container.layer = this
-        container.wantsLayer = true
+        layer.nsView.layer = this
+        layer.nsView.wantsLayer = true
     }
 
     fun draw()  { 
-        println("MacosGLLayer::draw")
-
         layer.update(getTimeNanos())
         layer.draw()
     }
 
     fun setFrame(x: Int, y: Int, width: Int, height: Int) {
-        val newY = container.frame.useContents { size.height } - y - height
+        val newY = layer.nsView.frame.useContents { size.height } - y - height
 
         CATransaction.begin()
         CATransaction.setDisableActions(true)
@@ -79,8 +76,6 @@ class MacosGLLayer(val layer: HardwareLayer, setNeedsDisplayOnBoundsChange: Bool
         this.removeFromSuperlayer()
         // TODO: anything else to dispose the layer?
     }
-
-    protected open fun canDraw() = true
 
     @Suppress("unused") 
     private fun performDraw() {
@@ -98,7 +93,7 @@ class MacosGLLayer(val layer: HardwareLayer, setNeedsDisplayOnBoundsChange: Bool
         forLayerTime: CFTimeInterval,
         displayTime: CPointer<CVTimeStamp>?
     ): Boolean {
-        return canDraw()
+        return true
     }
 
     override fun drawInCGLContext(

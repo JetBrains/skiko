@@ -6,6 +6,11 @@ class SurfaceProps constructor(
 ) {
     constructor(geo: PixelGeometry) : this(false, geo)
 
+    // Used from JNI code.
+    private fun _getPixelGeometryOrdinal(): Int {
+        return pixelGeometry.ordinal
+    }
+
     fun _getFlags(): Int {
         return 0 or if (isDeviceIndependentFonts) 1 else 0
     }

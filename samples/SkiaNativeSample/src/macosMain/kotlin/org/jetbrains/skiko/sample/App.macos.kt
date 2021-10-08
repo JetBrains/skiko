@@ -3,14 +3,12 @@ package org.jetbrains.skiko.sample
 import platform.AppKit.*
 
 import org.jetbrains.skia.*
-import org.jetbrains.skiko.native.SkiaLayer
-import org.jetbrains.skiko.native.SkiaRenderer
-import org.jetbrains.skiko.native.SkiaWindow
+import org.jetbrains.skiko.*
 import kotlinx.cinterop.*
 import kotlin.math.cos
 import kotlin.math.sin
 
-fun main(args: Array<String>) {
+fun main() {
     // TODO: Remove me! This is to run all cleaners before main() exits.
     kotlin.native.internal.Debugging.forceCheckedShutdown = true
 

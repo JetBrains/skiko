@@ -1,13 +1,12 @@
-package org.jetbrains.skiko.native
+package org.jetbrains.skiko
 
 import platform.AppKit.*
-import platform.Cocoa.*
 import platform.Foundation.*
 
 open class SkiaWindow(
-    properties: SkiaLayerProperties = SkiaLayerProperties()
+    properties: SkiaLayerProperties = makeDefaultSkiaLayerProperties()
 ) {
-    val windowStyle =
+    private val windowStyle =
         NSWindowStyleMaskTitled or
         NSWindowStyleMaskMiniaturizable or
         NSWindowStyleMaskClosable or
@@ -21,12 +20,12 @@ open class SkiaWindow(
         contentRect =  NSMakeRect(0.0, 0.0, 640.0, 480.0),
         styleMask = windowStyle,
         backing =  NSBackingStoreBuffered,
-        defer =  true)
+        defer = true)
 
     val layer = SkiaLayer(properties)
 
     init {
-        nsWindow.contentView?.addSubview(layer.nsView)
-        layer.checkIsShowing() // TODO: The awt versions has hierarchy listener. What should we use here?
+        nsWindow.contentView!!.addSubview(layer.nsView)
+        layer.initLayer()
     }
 }

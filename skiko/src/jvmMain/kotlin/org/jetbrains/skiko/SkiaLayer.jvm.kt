@@ -10,14 +10,8 @@ import java.util.concurrent.CancellationException
 import javax.swing.JPanel
 import javax.swing.SwingUtilities.isEventDispatchThread
 
-interface SkiaRenderer {
-    fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long)
-}
-
-private class PictureHolder(val instance: Picture, val width: Int, val height: Int)
-
-open class SkiaLayer internal constructor(
-    private val properties: SkiaLayerProperties = SkiaLayerProperties(),
+actual open class SkiaLayer internal constructor(
+    private val properties: SkiaLayerProperties = makeDefaultSkiaLayerProperties(),
     private val renderFactory: RenderFactory
 ) : JPanel() {
     companion object {
@@ -34,7 +28,7 @@ open class SkiaLayer internal constructor(
     internal val backedLayer: HardwareLayer
 
     constructor(
-        properties: SkiaLayerProperties = SkiaLayerProperties()
+        properties: SkiaLayerProperties = makeDefaultSkiaLayerProperties()
     ) : this(properties, RenderFactory.Default)
 
     val canvas: java.awt.Canvas
@@ -95,7 +89,7 @@ open class SkiaLayer internal constructor(
         return isShowingCached
     }
 
-    val contentScale: Float
+    actual val contentScale: Float
         get() = backedLayer.contentScale
 
     val contentHandle: Long
@@ -119,7 +113,7 @@ open class SkiaLayer internal constructor(
     private var contextHandler: ContextHandler? = null
     private val fallbackRenderApiQueue = SkikoProperties.fallbackRenderApiQueue.toMutableList()
     private var renderApi_ = fallbackRenderApiQueue[0]
-    var renderApi: GraphicsApi
+    actual var renderApi: GraphicsApi
         get() = renderApi_
         private set(value) {
             this.renderApi_ = value

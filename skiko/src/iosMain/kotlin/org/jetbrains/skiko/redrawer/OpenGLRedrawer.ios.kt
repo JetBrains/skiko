@@ -1,10 +1,10 @@
-package org.jetbrains.skiko.native.redrawer
+package org.jetbrains.skiko.redrawer
 
-import org.jetbrains.skiko.native.*
-import org.jetbrains.skiko.redrawer.Redrawer
+import org.jetbrains.skiko.SkiaLayer
+import org.jetbrains.skiko.SkiaLayerProperties
 
-internal class IosOpenGLRedrawer(
-    private val layer: HardwareLayer,
+internal class OpenGLRedrawer(
+    private val layer: SkiaLayer,
     private val properties: SkiaLayerProperties
 ) : Redrawer {
     override fun dispose() {

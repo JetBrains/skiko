@@ -1,50 +1,49 @@
-package org.jetbrains.skiko.native
+package org.jetbrains.skiko
 
 import kotlinx.cinterop.useContents
-import org.jetbrains.skiko.native.context.*
+import org.jetbrains.skiko.context.*
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.redrawer.Redrawer
+import platform.AppKit.NSView
+import platform.Foundation.NSMakeRect
 
-interface SkiaRenderer {
-    fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long)
-}
+actual open class SkiaLayer(
+    private val properties: SkiaLayerProperties = makeDefaultSkiaLayerProperties()
+) {
+    actual var renderApi: GraphicsApi = GraphicsApi.OPENGL
+    actual val contentScale: Float
+        get() = _contentScale
 
-// TODO: this is exact copy of jvm counterpart. Commonize!
-private class PictureHolder(val instance: Picture, val width: Int, val height: Int)
+    val nsView = NSView(NSMakeRect(0.0, 0.0, 640.0, 480.0))
+    var _contentScale: Float = 1.0f
 
-open class SkiaLayer(
-    private val properties: SkiaLayerProperties = SkiaLayerProperties()
-) : HardwareLayer() {
     var renderer: SkiaRenderer? = null
 
-    internal var skiaState = createContextHandler(this)
-
-    private var isDisposed = false
+    private var contextHandler = MacOSOpenGLContextHandler(this)
 
     private var redrawer: Redrawer? = null
 
     private var picture: PictureHolder? = null
     private val pictureRecorder = PictureRecorder()
-    private val pictureLock = Any()
 
-    override fun init() {
-        println("SkiaLayer::init")
-        super.init()
-        redrawer = platformOperations.createRedrawer(this, properties)
+    fun initLayer() {
+        println("SkiaLayer.initLayer")
+        redrawer = createNativeRedrawer(this, GraphicsApi.OPENGL, properties)
         redrawer?.redrawImmediately()
     }
 
-    override fun dispose() {
+    fun disposeLayer() {
         redrawer?.dispose()
-        super.dispose()
+        redrawer = null
+        initedCanvas = false
     }
 
     fun needRedraw() {
         redrawer?.needRedraw()
     }
 
-    override fun update(nanoTime: Long) {
-        println("SkiaLayer::update")
+    fun update(nanoTime: Long) {
+        println("SkiaLayer.update")
 
         val width = nsView.frame.useContents { size.width }
         val height = nsView.frame.useContents { size.height }
@@ -60,17 +59,22 @@ open class SkiaLayer(
         this.picture = PictureHolder(picture, pictureWidth.toInt(), pictureHeight.toInt())
     }
 
-    override fun draw() {
-        println("SkiaLayer::draw")
-        skiaState.apply {
-            if (!initContext()) {
-                error("initContext() failure. No fallback to raster for Skia/native yet.")
-                return
+    private var initedCanvas = false
+
+    fun draw() {
+        println("SkiaLayer.draw")
+        contextHandler.apply {
+            if (!initedCanvas) {
+                if (!initContext()) {
+                    error("initContext() failure")
+                    return
+                }
+                initCanvas()
+                initedCanvas = true
             }
-            initCanvas()
             clearCanvas()
             val picture = picture
-            println("SkiaLayer::draw: picture=$picture")
+            println("SkiaLayer.draw: picture=$picture")
             if (picture != null) {
                 drawOnCanvas(picture.instance)
             }

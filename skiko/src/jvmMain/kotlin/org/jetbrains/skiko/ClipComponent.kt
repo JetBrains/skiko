@@ -2,13 +2,6 @@ package org.jetbrains.skiko
 
 import java.awt.Component
 
-interface ClipRectangle {
-    val x: Float
-    val y: Float
-    val width: Float
-    val height: Float
-}
-
 class ClipComponent(val component: Component) : ClipRectangle {
     override val x: Float
         get() = component.x.toFloat()
