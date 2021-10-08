@@ -49,28 +49,10 @@ internal class MetalContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
         canvas = surface!!.canvas
     }
 
-    private var fullscreenEvent = false
-    private val originalBounds = Dimension(0, 0)
-
     override fun flush() {
         super.flush()
         surface!!.flushAndSubmit()
         metalRedrawer.finishFrame()
-
-        val window = SwingUtilities.getRoot(layer) as JFrame
-        if (fullscreenEvent && !layer.fullscreen && layer.transparency) {
-            window.setSize(originalBounds.width, originalBounds.height)
-            fullscreenEvent = false
-        }
-        if (!fullscreenEvent && !layer.fullscreen && layer.transparency) {
-            originalBounds.width = window.width
-            originalBounds.height = window.height
-        }
-        if (!fullscreenEvent && layer.fullscreen && layer.transparency) {
-            fullscreenEvent = true
-            val display = window.graphicsConfiguration.device.displayMode
-            window.setSize(display.getWidth(), display.getHeight())
-        }
     }
 
     override fun rendererInfo(): String {
