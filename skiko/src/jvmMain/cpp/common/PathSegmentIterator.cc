@@ -35,33 +35,33 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathSegmentIteratorKt_
 
     switch (verb) {
         case SkPath::Verb::kDone_Verb: {
-            int d[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, context};
+            jint d[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, context};
             env->SetIntArrayRegion(result, 0, 10, d);
             break;
         }
         case SkPath::Verb::kMove_Verb:
         case SkPath::Verb::kClose_Verb: {
-            int d[10] = { rawBits(pts[0].fX), rawBits(pts[0].fY), 0, 0, 0, 0, 0, 0, 0, context};
+            jint d[10] = { rawBits(pts[0].fX), rawBits(pts[0].fY), 0, 0, 0, 0, 0, 0, 0, context};
             env->SetIntArrayRegion(result, 0, 10, d);
             break;
         }
         case SkPath::Verb::kLine_Verb: {
-            int d[10] = { rawBits(pts[0].fX), rawBits(pts[0].fY), rawBits(pts[1].fX), rawBits(pts[1].fY), 0, 0, 0, 0, 0, context};
+            jint d[10] = { rawBits(pts[0].fX), rawBits(pts[0].fY), rawBits(pts[1].fX), rawBits(pts[1].fY), 0, 0, 0, 0, 0, context};
             env->SetIntArrayRegion(result, 0, 10, d);
             break;
         }
         case SkPath::Verb::kQuad_Verb: {
-            int d[10] = { rawBits(pts[0].fX), rawBits(pts[0].fY), rawBits(pts[1].fX), rawBits(pts[1].fY), rawBits(pts[2].fX), rawBits(pts[2].fY), 0, 0, 0, context};
+            jint d[10] = { rawBits(pts[0].fX), rawBits(pts[0].fY), rawBits(pts[1].fX), rawBits(pts[1].fY), rawBits(pts[2].fX), rawBits(pts[2].fY), 0, 0, 0, context};
             env->SetIntArrayRegion(result, 0, 10, d);
             break;
         }
         case SkPath::Verb::kConic_Verb: {
-            int d[10] = { rawBits(pts[0].fX), rawBits(pts[0].fY), rawBits(pts[1].fX), rawBits(pts[1].fY), rawBits(pts[2].fX), rawBits(pts[2].fY), 0, 0, rawBits(instance->conicWeight()), context};
+            jint d[10] = { rawBits(pts[0].fX), rawBits(pts[0].fY), rawBits(pts[1].fX), rawBits(pts[1].fY), rawBits(pts[2].fX), rawBits(pts[2].fY), 0, 0, rawBits(instance->conicWeight()), context};
             env->SetIntArrayRegion(result, 0, 10, d);
             break;
         }
         case SkPath::Verb::kCubic_Verb: {
-            int d[10] = { rawBits(pts[0].fX), rawBits(pts[0].fY), rawBits(pts[1].fX), rawBits(pts[1].fY), rawBits(pts[2].fX), rawBits(pts[2].fY), rawBits(pts[3].fX), rawBits(pts[3].fY), 0, context};
+            jint d[10] = { rawBits(pts[0].fX), rawBits(pts[0].fY), rawBits(pts[1].fX), rawBits(pts[1].fY), rawBits(pts[2].fX), rawBits(pts[2].fY), rawBits(pts[3].fX), rawBits(pts[3].fY), 0, context};
             env->SetIntArrayRegion(result, 0, 10, d);
             break;
         }
