@@ -36,9 +36,9 @@ internal class MacOSOpenGLContextHandler(layer: SkiaLayer) : ContextHandler(laye
         println("OpenGLContextHandler::initCanvas")
         dispose()
 
-        val scale = layer.platformHardwareLayer.contentScale
-        val w = (layer.platformHardwareLayer.nsView.frame.useContents { size.width } * scale).toInt().coerceAtLeast(0)
-        val h = (layer.platformHardwareLayer.nsView.frame.useContents { size.height } * scale).toInt().coerceAtLeast(0)
+        val scale = layer.backedLayer.contentScale
+        val w = (layer.backedLayer.nsView.frame.useContents { size.width } * scale).toInt().coerceAtLeast(0)
+        val h = (layer.backedLayer.nsView.frame.useContents { size.height } * scale).toInt().coerceAtLeast(0)
 
             val fbId = openglGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING.toUInt())
             renderTarget = BackendRenderTarget.makeGL(

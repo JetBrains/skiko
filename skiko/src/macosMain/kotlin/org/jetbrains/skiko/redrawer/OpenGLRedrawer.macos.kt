@@ -2,11 +2,8 @@ package org.jetbrains.skiko.redrawer
 
 import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.useContents
-import org.jetbrains.skiko.HardwareLayer
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaLayerProperties
-import org.jetbrains.skiko.native.*
-import org.jetbrains.skiko.redrawer.Redrawer
 import platform.CoreFoundation.CFTimeInterval
 import platform.CoreGraphics.CGRectMake
 import platform.CoreVideo.CVTimeStamp
@@ -31,7 +28,7 @@ internal class MacOsOpenGLRedrawer(
 
     override fun syncSize() {
         // TODO: What do we really do here?
-        layer.platformHardwareLayer.nsView.frame.useContents {
+        layer.backedLayer.nsView.frame.useContents {
             drawLayer.setFrame(
                 origin.x.toInt(),
                 origin.y.toInt(),
@@ -51,7 +48,7 @@ internal class MacOsOpenGLRedrawer(
 
 class MacosGLLayer(val layer: SkiaLayer, setNeedsDisplayOnBoundsChange: Boolean) : CAOpenGLLayer() {
 
-    val container = layer.platformHardwareLayer.nsView
+    val container = layer.backedLayer.nsView
 
     init {
         this.setNeedsDisplayOnBoundsChange(setNeedsDisplayOnBoundsChange)

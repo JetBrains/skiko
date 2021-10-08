@@ -10,6 +10,7 @@ interface SkiaRenderer {
 expect open class SkiaLayer {
     internal val backedLayer: HardwareLayer
     var renderApi: GraphicsApi
+    val contentScale: Float
 }
 
 internal class PictureHolder(val instance: Picture, val width: Int, val height: Int)

@@ -10,8 +10,6 @@ import java.util.concurrent.CancellationException
 import javax.swing.JPanel
 import javax.swing.SwingUtilities.isEventDispatchThread
 
-private class PictureHolder(val instance: Picture, val width: Int, val height: Int)
-
 actual open class SkiaLayer internal constructor(
     private val properties: SkiaLayerProperties = makeDefaultSkiaLayerProperties(),
     private val renderFactory: RenderFactory
@@ -91,7 +89,7 @@ actual open class SkiaLayer internal constructor(
         return isShowingCached
     }
 
-    val contentScale: Float
+    actual val contentScale: Float
         get() = backedLayer.contentScale
 
     val contentHandle: Long

@@ -1,23 +1,22 @@
 package org.jetbrains.skiko
 
 import kotlinx.cinterop.useContents
-import org.jetbrains.skiko.native.context.*
+import org.jetbrains.skiko.context.*
 import org.jetbrains.skia.*
-import org.jetbrains.skiko.native.MacOSHardwareLayer
 import org.jetbrains.skiko.redrawer.Redrawer
 
 actual open class SkiaLayer(
     private val properties: SkiaLayerProperties = makeDefaultSkiaLayerProperties()
 ) {
-    internal actual val backedLayer: HardwareLayer
-        get() = platformHardwareLayer
+    internal actual val backedLayer: HardwareLayer = HardwareLayer()
     actual var renderApi: GraphicsApi = GraphicsApi.OPENGL
 
-    internal val platformHardwareLayer = MacOSHardwareLayer()
+    actual val contentScale: Float
+        get() = backedLayer.contentScale
 
     var renderer: SkiaRenderer? = null
 
-    internal var skiaState = OpenGLContextHandler(this)
+    internal var skiaState = MacOSOpenGLContextHandler(this)
 
     private var isDisposed = false
 
@@ -44,11 +43,11 @@ actual open class SkiaLayer(
     fun update(nanoTime: Long) {
         println("SkiaLayer::update")
 
-        val width = platformHardwareLayer.nsView.frame.useContents { size.width }
-        val height = platformHardwareLayer.nsView.frame.useContents { size.height }
+        val width = backedLayer.nsView.frame.useContents { size.width }
+        val height = backedLayer.nsView.frame.useContents { size.height }
 
-        val pictureWidth = (width * platformHardwareLayer.contentScale).coerceAtLeast(0.0)
-        val pictureHeight = (height * platformHardwareLayer.contentScale).coerceAtLeast(0.0)
+        val pictureWidth = (width * backedLayer.contentScale).coerceAtLeast(0.0)
+        val pictureHeight = (height * backedLayer.contentScale).coerceAtLeast(0.0)
 
         val bounds = Rect.makeWH(pictureWidth.toFloat(), pictureHeight.toFloat())
         val canvas = pictureRecorder.beginRecording(bounds)
