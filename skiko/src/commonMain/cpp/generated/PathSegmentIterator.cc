@@ -1,12 +1,9 @@
-
-// This file has been auto generated.
-
 #include "SkPath.h"
 #include "common.h"
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_PathSegmentIterator__1nMake
   (KNativePointer pathPtr, KBoolean forceClose) {
-    SkPath* path = reinterpret_cast<SkPath*>((pathPtr));
+    SkPath* path = reinterpret_cast<SkPath*>(pathPtr);
     SkPath::Iter* iter = new SkPath::Iter(*path, forceClose);
     return reinterpret_cast<KNativePointer>(iter);
 }
@@ -16,15 +13,12 @@ static void deletePathSegmentIterator(SkPath::Iter* iter) {
     delete iter;
 }
 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_PathSegmentIterator__1nGetFinalizer
-  () {
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_PathSegmentIterator__1nGetFinalizer() {
     return reinterpret_cast<KNativePointer>((&deletePathSegmentIterator));
 }
 
-
-SKIKO_EXPORT void org_jetbrains_skia_PathSegmentIterator__1nNext
-  (KNativePointer ptr, KInt* data) {
-    SkPath::Iter* instance = reinterpret_cast<SkPath::Iter*>((ptr));
+SKIKO_EXPORT void org_jetbrains_skia_PathSegmentIterator__1nNext(KNativePointer ptr, KInt* data) {
+    SkPath::Iter* instance = reinterpret_cast<SkPath::Iter*>(ptr);
     SkPoint pts[4];
     SkPath::Verb verb = instance->next(pts);
 
@@ -54,4 +48,3 @@ SKIKO_EXPORT void org_jetbrains_skia_PathSegmentIterator__1nNext
 
     data[9] = context;
 }
-
