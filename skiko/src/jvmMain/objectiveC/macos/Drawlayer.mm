@@ -11,6 +11,8 @@
 @interface LayerHandler : NSObject
 
 @property jobject canvasGlobalRef;
+@property BOOL isTaskCompleted;
+@property BOOL isJvmFullscreen;
 @property (retain, strong) CALayer *container;
 @property (retain, strong) NSWindow *window;
 
@@ -27,6 +29,8 @@
         self.canvasGlobalRef = NULL;
         self.container = nil;
         self.window = nil;
+        self.isTaskCompleted = YES;
+        self.isJvmFullscreen = NO;
     }
 
     return self;
@@ -40,20 +44,29 @@
 }
 
 - (BOOL) isFullScreen {
+    if (!self.isTaskCompleted) {
+        return self.isJvmFullscreen;
+    }
     NSUInteger masks = [self.window styleMask];
     return (masks & NSWindowStyleMaskFullScreen) != 0;
 }
 
 - (void) makeFullscreen: (BOOL) value
 {
-    if (value && !self.isFullScreen)
-    {
-        [self.window performSelectorOnMainThread:@selector(toggleFullScreen:) withObject:nil waitUntilDone:NO];
-    }
-    else if (!value && self.isFullScreen)
-    {
-        [self.window performSelectorOnMainThread:@selector(toggleFullScreen:) withObject:nil waitUntilDone:NO];
-    }
+    self.isTaskCompleted = NO;
+    self.isJvmFullscreen = value;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        BOOL isFullScreen = ([self.window styleMask] & NSWindowStyleMaskFullScreen) != 0;
+        if (value && !isFullScreen)
+        {
+            [self.window toggleFullScreen:self];
+        }
+        else if (!value && isFullScreen)
+        {
+            [self.window toggleFullScreen:self];
+        }
+        self.isTaskCompleted = YES;
+    });
 }
 
 @end

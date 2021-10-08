@@ -17,6 +17,9 @@ import java.awt.image.DataBuffer
 import java.awt.image.DataBufferByte
 import java.awt.image.Raster
 import java.awt.image.WritableRaster
+import javax.swing.JFrame
+import javax.swing.SwingUtilities
+import java.awt.Dimension
 
 internal class SoftwareContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
     override val clearColor = if (layer.transparency && hostOs == OS.MacOS) 0 else -1
@@ -80,7 +83,7 @@ internal class SoftwareContextHandler(layer: SkiaLayer) : ContextHandler(layer) 
             )
             image = BufferedImage(colorModel, raster!!, false, null)
             val graphics = layer.backedLayer.getGraphics()
-            if (layer.transparency && hostOs == OS.MacOS) {
+            if (!layer.fullscreen && layer.transparency && hostOs == OS.MacOS) {
                 graphics?.setColor(Color(0, 0, 0, 0))
                 graphics?.clearRect(0, 0, w, h)
             }
@@ -88,7 +91,27 @@ internal class SoftwareContextHandler(layer: SkiaLayer) : ContextHandler(layer) 
         }
     }
 
+    private var fullscreenEvent = false
+    private val originalBounds = Dimension(0, 0)
+
     override fun flush() {
         // Raster does not need to flush canvas
+
+        if (layer.transparency && hostOs == OS.MacOS) {
+            val window = SwingUtilities.getRoot(layer) as JFrame
+            if (fullscreenEvent && !layer.fullscreen && layer.transparency) {
+                window.setSize(originalBounds.width, originalBounds.height)
+                fullscreenEvent = false
+            }
+            if (!fullscreenEvent && !layer.fullscreen && layer.transparency) {
+                originalBounds.width = window.width
+                originalBounds.height = window.height
+            }
+            if (!fullscreenEvent && layer.fullscreen && layer.transparency) {
+                fullscreenEvent = true
+                val display = window.graphicsConfiguration.device.displayMode
+                window.setSize(display.getWidth(), display.getHeight())
+            }
+        }
     }
 }

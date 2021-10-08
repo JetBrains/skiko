@@ -63,21 +63,30 @@ extern "C"
         glXMakeCurrent(display, window, *context);
     }
 
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_createContext(JNIEnv *env, jobject redrawer, jlong displayPtr)
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_LinuxOpenGLRedrawerKt_createContext(JNIEnv *env, jobject redrawer, jlong displayPtr, jboolean transparency)
     {
         Display *display = fromJavaPointer<Display *>(displayPtr);
         if (!display) return 0;
 
-        GLint att[] = {
-            GLX_RGBA,
-            GLX_RED_SIZE, 8,
-            GLX_GREEN_SIZE, 8,
-            GLX_BLUE_SIZE, 8,
-            GLX_ALPHA_SIZE, 8,
-            GLX_DEPTH_SIZE, 32,
-            GLX_DOUBLEBUFFER, True, None
-        };
-        XVisualInfo *vi = glXChooseVisual(display, 0, att);
+        XVisualInfo *vi;
+
+        if (transparency)
+        {
+            GLint att[] = {
+                GLX_RGBA,
+                GLX_RED_SIZE, 8,
+                GLX_GREEN_SIZE, 8,
+                GLX_BLUE_SIZE, 8,
+                GLX_ALPHA_SIZE, 8,
+                GLX_DEPTH_SIZE, 32,
+                GLX_DOUBLEBUFFER, True, None
+            };
+            vi = glXChooseVisual(display, 0, att);
+        }
+        else {
+            GLint att[] = {GLX_RGBA, GLX_DOUBLEBUFFER, True, None};
+            vi = glXChooseVisual(display, 0, att);
+        }
 
         if (!vi) return 0;
 

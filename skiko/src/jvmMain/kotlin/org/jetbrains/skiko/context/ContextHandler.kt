@@ -22,7 +22,8 @@ internal abstract class ContextHandler(val layer: SkiaLayer) {
     abstract fun initCanvas()
 
     fun clearCanvas() {
-        canvas?.clear(clearColor)
+        val color = if (layer.fullscreen) -1 else clearColor
+        canvas?.clear(color)
     }
 
     open fun drawOnCanvas(picture: Picture) {
