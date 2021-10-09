@@ -6,7 +6,6 @@ import org.jetbrains.skia.FontStyle
 import org.jetbrains.skia.FontVariation
 import org.jetbrains.skia.FontVariationAxis
 import org.jetbrains.skia.Typeface
-import org.jetbrains.skiko.skija.makeFromResource
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
@@ -15,6 +14,7 @@ import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import org.jetbrains.skia.tests.makeFromResource
 
 class TypefaceTest {
 

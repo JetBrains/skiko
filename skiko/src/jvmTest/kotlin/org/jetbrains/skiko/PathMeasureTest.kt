@@ -4,9 +4,9 @@ import org.jetbrains.skia.Matrix33
 import org.jetbrains.skia.Path
 import org.jetbrains.skia.PathMeasure
 import org.jetbrains.skia.Point
-import org.jetbrains.skiko.skija.assertCloseEnough
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import org.jetbrains.skia.tests.assertCloseEnough
 
 class PathMeasureTest {
     @Test

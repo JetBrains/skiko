@@ -1978,7 +1978,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     }
 
     fun iterator(forceClose: Boolean): PathSegmentIterator {
-        return PathSegmentIterator.Companion.make(this, forceClose)
+        return PathSegmentIterator.make(this, forceClose)
     }
 
     /**
