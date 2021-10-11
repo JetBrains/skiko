@@ -20,6 +20,16 @@ class PathMeasureTest {
 
     @Test
     @Ignore
+    fun getTangent() = runTest {
+        Path().moveTo(0f, 0f).lineTo(20f, 0f).moveTo(0f, 40f).lineTo(30f, 50f).use { path ->
+            PathMeasure(path, false).use { measure ->
+                assertEquals(Point(1f, 0f), measure.getTangent(2f))
+            }
+        }
+    }
+
+    @Test
+    @Ignore
     fun pathMeasureTest() = runTest {
         Path().moveTo(0f, 0f).lineTo(40f, 0f).moveTo(0f, 40f).lineTo(10f, 50f).use { path ->
             PathMeasure(path, false).use { measure ->

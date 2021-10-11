@@ -113,7 +113,6 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
             val data = withResult(IntArray(4)) {
                 _nGetRSXform(_ptr, distance, it)
             }
-            println("DATA ${Float.fromBits(data[0])}")
             RSXform(Float.fromBits(data[0]), Float.fromBits(data[1]), Float.fromBits(data[2]), Float.fromBits(data[3]))
         } finally {
             reachabilityBarrier(this)
