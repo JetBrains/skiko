@@ -46,7 +46,7 @@ public:
 extern "C"
 {
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_LinuxSoftwareRedrawer_createDevice(
-        JNIEnv *env, jobject redrawer, jlong displayPtr, jlong windowPtr)
+        JNIEnv *env, jobject redrawer, jlong displayPtr, jlong windowPtr, jint width, jint height)
     {
         Display *display = fromJavaPointer<Display *>(displayPtr);
         Window window = fromJavaPointer<Window>(windowPtr);
@@ -59,6 +59,13 @@ extern "C"
         {
             return 0L;
         }
+
+        device->surface.reset();
+        SkImageInfo info = SkImageInfo::Make(
+            width, height, device->colorSpace, kPremul_SkAlphaType,
+            SkColorSpace::MakeSRGB());
+        device->surface = SkSurface::MakeRaster(info);
+
         return toJavaPointer(device);
     }
 
