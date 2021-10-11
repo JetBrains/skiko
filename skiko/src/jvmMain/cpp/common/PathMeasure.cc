@@ -76,8 +76,8 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathMeasureKt__1nG
     return false;
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_PathMeasureKt__1nGetMatrix
-  (JNIEnv* env, jclass jclass, jlong ptr, jfloat distance, jboolean getPosition, jboolean getTangent) {
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathMeasureKt__1nGetMatrix
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloat distance, jboolean getPosition, jboolean getTangent, jintArray data) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>(static_cast<uintptr_t>(ptr));
     SkMatrix matrix;
     int flags = 0;
@@ -88,11 +88,27 @@ extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_PathMeasureKt__1nGe
         flags |= SkPathMeasure::MatrixFlags::kGetTangent_MatrixFlag;
 
     if (instance->getMatrix(distance, &matrix, static_cast<SkPathMeasure::MatrixFlags>(flags))) {
-        std::vector<float> floats(9);
-        matrix.get9(floats.data());
-        return javaFloatArray(env, floats);
-    } else
-        return nullptr;
+        float* floats;
+        matrix.get9(floats);
+
+        jint d[9] = {
+          rawBits(floats[0]),
+          rawBits(floats[1]),
+          rawBits(floats[2]),
+          rawBits(floats[3]),
+          rawBits(floats[4]),
+          rawBits(floats[5]),
+          rawBits(floats[6]),
+          rawBits(floats[7]),
+          rawBits(floats[8])
+        };
+
+        env->SetIntArrayRegion(data, 0, 9, d);
+
+        return true;
+    }
+
+    return false;
 }
 
 extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathMeasureKt__1nGetSegment
