@@ -1,4 +1,4 @@
-// Use `xcodegen` first, then `open ./SkikoSample.xcodeproj` and then Rub
+// Use `xcodegen` first, then `open ./SkikoSample.xcodeproj` and then Run
 
 package org.jetbrains.skiko.sample
 
