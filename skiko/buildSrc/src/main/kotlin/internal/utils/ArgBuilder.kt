@@ -20,6 +20,7 @@ interface ArgBuilder {
     fun rawArgs(args: Collection<String>) {
         args.forEach { rawArg(it) }
     }
+    fun toArray(): Array<String>
 }
 
 internal abstract class AbstractArgBuilder : ArgBuilder {
@@ -70,6 +71,8 @@ internal abstract class AbstractArgBuilder : ArgBuilder {
     protected open fun escapePathIfNeeded(file: File): String =
         file.absolutePath
 
+    override fun toArray(): Array<String> =
+        args.toTypedArray()
 }
 
 internal abstract class BaseVisualStudioBuildToolsArgBuilder : AbstractArgBuilder() {

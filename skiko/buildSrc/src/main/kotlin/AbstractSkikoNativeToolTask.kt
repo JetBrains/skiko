@@ -98,5 +98,11 @@ abstract class AbstractSkikoNativeToolTask : DefaultTask() {
 
     protected open fun beforeRun() {}
     protected open fun afterRun() {}
+    protected fun logArgs(prefix: String, args: ArgBuilder, argFile: File) {
+        if (logger.isInfoEnabled) {
+            val argsString = args.toArray().joinToString(", ", prefix = "[", postfix = "]")
+            logger.info("$prefix: $argsString")
+        } else logger.warn("$prefix: '$argFile'")
+    }
 }
 

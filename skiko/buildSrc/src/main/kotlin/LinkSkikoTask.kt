@@ -41,7 +41,7 @@ abstract class LinkSkikoTask : AbstractSkikoNativeToolTask() {
 
         val argFile = argsFile.get().asFile
         val argFileArg = args.createArgFile(argFile)
-        logger.warn("Linker args: '$argFile'")
+        logArgs("Linker args", args, argFile)
 
         execOperations.exec {
             executable = linker.get()

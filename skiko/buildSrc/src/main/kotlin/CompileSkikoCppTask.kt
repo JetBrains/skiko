@@ -110,7 +110,6 @@ abstract class CompileSkikoCppTask : AbstractSkikoNativeToolTask() {
         val workQueue = workerExecutor.noIsolation()
         val submittedWorks = HashSet<String>()
 
-
         val sourceOutputPairs = sourcesToCompile.map { sourceFile ->
             // check all output files and their parent dirs before compiling anything
             val outputFile = sourceToOutputMapping[sourceFile]
@@ -126,7 +125,7 @@ abstract class CompileSkikoCppTask : AbstractSkikoNativeToolTask() {
         cleanDirs(argFilesDir)
         val commonArgsFile = argFilesDir.parentFile.resolve("common-args.txt")
         args.createArgFile(commonArgsFile)
-        logger.warn("Common compiler args: '$commonArgsFile'")
+        logArgs("Compiler args", args, commonArgsFile)
 
         for ((sourceFile, outputFile) in sourceOutputPairs) {
             val workId = "Compiling '${sourceFile.absolutePath}'"
