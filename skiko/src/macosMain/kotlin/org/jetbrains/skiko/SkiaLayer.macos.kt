@@ -7,8 +7,8 @@ import org.jetbrains.skiko.redrawer.Redrawer
 import platform.AppKit.NSView
 import platform.Foundation.NSMakeRect
 
-actual open class SkiaLayer(
-    private val properties: SkiaLayerProperties = makeDefaultSkiaLayerProperties()
+actual open class SkiaLayer actual constructor(
+    private val properties: SkiaLayerProperties
 ) {
     actual var renderApi: GraphicsApi = GraphicsApi.OPENGL
     actual val contentScale: Float
@@ -50,7 +50,7 @@ actual open class SkiaLayer(
         initedCanvas = false
     }
 
-    fun needRedraw() {
+    actual fun needRedraw() {
         redrawer?.needRedraw()
     }
 

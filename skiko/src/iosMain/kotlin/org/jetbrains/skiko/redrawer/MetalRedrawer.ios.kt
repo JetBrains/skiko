@@ -2,25 +2,24 @@ package org.jetbrains.skiko.redrawer
 
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaLayerProperties
-import kotlin.system.getTimeNanos
 
-internal class OpenGLRedrawer(
+internal class MetalRedrawer(
     private val layer: SkiaLayer,
     private val properties: SkiaLayerProperties
 ) : Redrawer {
     override fun dispose() {
-        println("dispose")
+        TODO()
     }
 
     override fun syncSize() {
-        println("syncSize")
+        TODO()
     }
 
     override fun needRedraw() {
-        println("needRedraw")
+        TODO()
     }
 
     override fun redrawImmediately() {
-        layer.update(getTimeNanos())
+        TODO()
     }
 }

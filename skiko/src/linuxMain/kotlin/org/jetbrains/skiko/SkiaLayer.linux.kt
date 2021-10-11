@@ -12,4 +12,7 @@ actual open class SkiaLayer {
     actual var transparency: Boolean
         get() = TODO("Not yet implemented")
         set(value) {}
+    actual fun needRedraw() {
+        TODO("unimplemented")
+    }
 }
