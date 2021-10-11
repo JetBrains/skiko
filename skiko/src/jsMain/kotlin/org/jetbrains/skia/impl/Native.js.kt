@@ -56,7 +56,7 @@ actual class InteropScope actual constructor() {
     }
 
     actual fun toInterop(array: ByteArray?): InteropPointer {
-        return if (array != null) {
+        return if (array != null && array.isNotEmpty()) {
             val data = _malloc(array.size)
             elements.add(data)
             toWasm(data, array)
@@ -70,7 +70,7 @@ actual class InteropScope actual constructor() {
     }
 
     actual fun toInterop(array: ShortArray?): InteropPointer {
-        return if (array != null) {
+        return if (array != null && array.isNotEmpty()) {
             val data = _malloc(array.size * 2)
             elements.add(data)
             toWasm(data, array)
@@ -85,7 +85,7 @@ actual class InteropScope actual constructor() {
     }
 
     actual fun toInterop(array: IntArray?): InteropPointer {
-        return if (array != null) {
+        return if (array != null && array.isNotEmpty()) {
             val data = _malloc(array.size * 4)
             elements.add(data)
             toWasm(data, array)
@@ -108,7 +108,7 @@ actual class InteropScope actual constructor() {
     }
 
     actual fun toInterop(array: FloatArray?): InteropPointer {
-        return if (array != null) {
+        return if (array != null && array.isNotEmpty()) {
             val data = _malloc(array.size * 4)
             elements.add(data)
             toWasm(data, array)
@@ -123,7 +123,7 @@ actual class InteropScope actual constructor() {
     }
 
     actual fun toInterop(array: DoubleArray?): InteropPointer {
-        return if (array != null) {
+        return if (array != null && array.isNotEmpty()) {
             val data = _malloc(array.size * 8)
             elements.add(data)
             toWasm(data, array)
@@ -138,7 +138,7 @@ actual class InteropScope actual constructor() {
     }
 
     actual fun toInterop(array: NativePointerArray?): InteropPointer {
-        return if (array != null) {
+        return if (array != null && array.size > 0) {
             val data = _malloc(array.size * 4)
             elements.add(data)
             toWasm(data, array.backing)
@@ -153,7 +153,7 @@ actual class InteropScope actual constructor() {
     }
 
     actual fun toInterop(stringArray: Array<String>?): InteropPointer {
-        return if (stringArray != null) {
+        return if (stringArray != null && stringArray.isNotEmpty()) {
             val ptrs = stringArray.map {
                 toInterop(it)
             }.toIntArray()

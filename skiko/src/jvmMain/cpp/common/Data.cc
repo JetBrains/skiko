@@ -11,7 +11,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DataKt_Data_1nGetFina
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteData));
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DataKt__1nSize
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_DataKt__1nSize
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkData* instance = reinterpret_cast<SkData*>(static_cast<uintptr_t>(ptr));
     return instance->size();
@@ -23,13 +23,11 @@ extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_DataKt__1nToByteBuf
     return env->NewDirectByteBuffer(instance->writable_data(), instance->size());
 }
 
-extern "C" JNIEXPORT jbyteArray JNICALL Java_org_jetbrains_skia_DataKt__1nBytes
-  (JNIEnv* env, jclass jclass, jlong ptr, jlong offset, jlong length) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_DataKt__1nBytes
+  (JNIEnv* env, jclass jclass, jlong ptr, jlong offset, jlong length, jbyteArray destBytes) {
     SkData* instance = reinterpret_cast<SkData*>(static_cast<uintptr_t>(ptr));
-    jbyteArray bytesArray = env->NewByteArray((jsize) length);
     const jbyte* bytes = reinterpret_cast<const jbyte*>(instance->bytes() + offset);
-    env->SetByteArrayRegion(bytesArray, 0, (jsize) length, bytes);
-    return bytesArray;
+    env->SetByteArrayRegion(destBytes, 0, (jsize) length, bytes);
 }
 
 extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_DataKt__1nEquals
@@ -56,7 +54,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DataKt__1nMakeFromFil
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DataKt__1nMakeSubset
-  (JNIEnv* env, jclass jclass, jlong ptr, jlong offset, jlong length) {
+  (JNIEnv* env, jclass jclass, jlong ptr, jint offset, jint length) {
     SkData* instance = reinterpret_cast<SkData*>(static_cast<uintptr_t>(ptr));
     SkData* subset = SkData::MakeSubset(instance, offset, length).release();
     return reinterpret_cast<jlong>(subset);
