@@ -1,9 +1,12 @@
 package org.jetbrains.skiko
 
+import kotlinx.cinterop.*
+import platform.Foundation.*
+import platform.UIKit.*
+
 actual open class SkiaLayer {
-    actual var renderApi: GraphicsApi
-        get() = TODO("Not yet implemented")
-        set(value) {}
+    actual var renderApi: GraphicsApi = GraphicsApi.OPENGL
+
     actual val contentScale: Float
-        get() = TODO("Not yet implemented")
+        get() = 1.0f
 }
