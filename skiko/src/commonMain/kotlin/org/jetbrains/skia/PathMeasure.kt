@@ -6,8 +6,8 @@ import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.interopScope
 import org.jetbrains.skia.impl.reachabilityBarrier
-import org.jetbrains.skia.impl.withResult
 
 class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
@@ -80,8 +80,10 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
     fun getPosition(distance: Float): Point? {
         return try {
             Stats.onNativeCall()
-            val points = withResult(IntArray(2)) { _nGetPosition(_ptr, distance, it) }
-            Point(Float.fromBits(points[0]), Float.fromBits(points[1]))
+            withResultExpected(IntArray(2)) { _nGetPosition(_ptr, distance, it) }?.let { points ->
+                Point(Float.fromBits(points[0]), Float.fromBits(points[1]))
+
+            }
         } finally {
             reachabilityBarrier(this)
         }
@@ -96,8 +98,9 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
     fun getTangent(distance: Float): Point? {
         return try {
             Stats.onNativeCall()
-            val data = withResult(IntArray(2)) { _nGetTangent(_ptr, distance, it) }
-            Point(Float.fromBits(data[0]), Float.fromBits(data[1]))
+            withResultExpected(IntArray(2)) { _nGetTangent(_ptr, distance, it) }?.let { points ->
+                Point(Float.fromBits(points[0]), Float.fromBits(points[1]))
+            }
         } finally {
             reachabilityBarrier(this)
         }
@@ -112,10 +115,16 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
     fun getRSXform(distance: Float): RSXform? {
         return try {
             Stats.onNativeCall()
-            val data = withResult(IntArray(4)) {
+            withResultExpected(IntArray(4)) {
                 _nGetRSXform(_ptr, distance, it)
+            }?.let { data ->
+                RSXform(
+                    Float.fromBits(data[0]),
+                    Float.fromBits(data[1]),
+                    Float.fromBits(data[2]),
+                    Float.fromBits(data[3])
+                )
             }
-            RSXform(Float.fromBits(data[0]), Float.fromBits(data[1]), Float.fromBits(data[2]), Float.fromBits(data[3]))
         } finally {
             reachabilityBarrier(this)
         }
@@ -130,20 +139,21 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
     fun getMatrix(distance: Float, getPosition: Boolean, getTangent: Boolean): Matrix33? {
         return try {
             Stats.onNativeCall()
-            val data = withResult(IntArray(9)) {
+            withResultExpected(IntArray(9)) {
                 _nGetMatrix(_ptr, distance, getPosition, getTangent, it)
+            }?.let { data ->
+                Matrix33(
+                    Float.fromBits(data[0]),
+                    Float.fromBits(data[1]),
+                    Float.fromBits(data[2]),
+                    Float.fromBits(data[3]),
+                    Float.fromBits(data[4]),
+                    Float.fromBits(data[5]),
+                    Float.fromBits(data[6]),
+                    Float.fromBits(data[7]),
+                    Float.fromBits(data[8])
+                )
             }
-            Matrix33(
-                Float.fromBits(data[0]),
-                Float.fromBits(data[1]),
-                Float.fromBits(data[2]),
-                Float.fromBits(data[3]),
-                Float.fromBits(data[4]),
-                Float.fromBits(data[5]),
-                Float.fromBits(data[6]),
-                Float.fromBits(data[7]),
-                Float.fromBits(data[8])
-            )
         } finally {
             reachabilityBarrier(this)
         }
@@ -198,6 +208,17 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
 
     internal object _FinalizerHolder {
         val PTR = PathMeasure_nGetFinalizer()
+    }
+}
+
+private inline fun withResultExpected(result: IntArray, block: (InteropPointer) -> Boolean): IntArray? = interopScope {
+    val handle = toInterop(result)
+    val blockResult = block(handle)
+    if (blockResult) {
+        handle.fromInterop(result)
+        result
+    } else {
+        null
     }
 }
 
