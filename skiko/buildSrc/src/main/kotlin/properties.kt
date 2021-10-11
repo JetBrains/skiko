@@ -16,24 +16,48 @@ enum class OS(
         get() = this == Windows
 }
 
-enum class Arch(
-    val id: String,
-    val clangFlags: Array<String>
-) {
-    X64("x64", arrayOf()),
-    Arm64("arm64", arrayOf()),
-    Wasm("wasm", arrayOf("--bind", "-DSKIKO_WASM"))
+fun compilerForTarget(os: OS, arch: Arch): String =
+    when (os) {
+        OS.Linux -> when (arch) {
+            Arch.X64 -> "g++"
+            Arch.Arm64 -> "clang++"
+            Arch.Wasm -> "Unexpected combination: $os & $arch"
+        }
+        OS.Windows -> "cl.exe"
+        OS.MacOS, OS.IOS -> "clang++"
+        OS.Wasm -> "emcc"
+    }
+
+fun linkerForTarget(os: OS, arch: Arch): String =
+    if (os.isWindows) "link.exe" else compilerForTarget(os, arch)
+
+enum class Arch(val id: String) {
+    X64("x64"),
+    Arm64("arm64"),
+    Wasm("wasm")
 }
 
 enum class SkiaBuildType(
     val id: String,
     val flags: Array<String>,
     val clangFlags: Array<String>,
-    val msvcFlags: Array<String>
+    val msvcCompilerFlags: Array<String>,
+    val msvcLinkerFlags: Array<String>
 ) {
-    DEBUG("Debug", arrayOf("-DSK_DEBUG"), arrayOf("-std=c++17", "-g"), emptyArray()),
-    RELEASE("Release", arrayOf("-DNDEBUG"), arrayOf("-std=c++17", "-O3"), arrayOf("/O2"))
-    ;
+    DEBUG(
+        "Debug",
+        flags = arrayOf("-DSK_DEBUG"),
+        clangFlags = arrayOf("-std=c++17", "-g"),
+        msvcCompilerFlags = arrayOf("/Zi"),
+        msvcLinkerFlags = arrayOf("/DEBUG"),
+    ),
+    RELEASE(
+        id = "Release",
+        flags = arrayOf("-DNDEBUG"),
+        clangFlags = arrayOf("-std=c++17", "-O3"),
+        msvcCompilerFlags = arrayOf("/O2"),
+        msvcLinkerFlags = arrayOf("/DEBUG"),
+    );
     override fun toString() = id
 }
 
