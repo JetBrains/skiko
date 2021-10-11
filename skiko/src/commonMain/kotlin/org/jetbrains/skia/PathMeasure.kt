@@ -130,8 +130,20 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
     fun getMatrix(distance: Float, getPosition: Boolean, getTangent: Boolean): Matrix33? {
         return try {
             Stats.onNativeCall()
-            val mat = _nGetMatrix(_ptr, distance, getPosition, getTangent)
-            mat?.let { Matrix33(*it.copyOf()) }
+            val data = withResult(IntArray(9)) {
+                _nGetMatrix(_ptr, distance, getPosition, getTangent, it)
+            }
+            Matrix33(
+                Float.fromBits(data[0]),
+                Float.fromBits(data[1]),
+                Float.fromBits(data[2]),
+                Float.fromBits(data[3]),
+                Float.fromBits(data[4]),
+                Float.fromBits(data[5]),
+                Float.fromBits(data[6]),
+                Float.fromBits(data[7]),
+                Float.fromBits(data[8])
+            )
         } finally {
             reachabilityBarrier(this)
         }
@@ -218,8 +230,9 @@ private external fun _nGetMatrix(
     ptr: NativePointer,
     distance: Float,
     getPosition: Boolean,
-    getTangent: Boolean
-): FloatArray?
+    getTangent: Boolean,
+    data: InteropPointer
+): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetSegment")
 private external fun _nGetSegment(

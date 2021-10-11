@@ -80,33 +80,37 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_PathMeasure__1nGetRSXform
     return false;
 }
      
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_PathMeasure__1nGetMatrix
-  (KNativePointer ptr, KFloat distance, KBoolean getPosition, KBoolean getTangent) {
-    TODO("implement org_jetbrains_skia_PathMeasure__1nGetMatrix");
+SKIKO_EXPORT KBoolean org_jetbrains_skia_PathMeasure__1nGetMatrix
+  (KNativePointer ptr, KFloat distance, KBoolean getPosition, KBoolean getTangent, KInt* data) {
+  SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>((ptr));
+  SkMatrix matrix;
+  int flags = 0;
+
+  if (getPosition)
+      flags |= SkPathMeasure::MatrixFlags::kGetPosition_MatrixFlag;
+  if (getTangent)
+      flags |= SkPathMeasure::MatrixFlags::kGetTangent_MatrixFlag;
+
+  if (instance->getMatrix(distance, &matrix, static_cast<SkPathMeasure::MatrixFlags>(flags))) {
+      float* f;
+      matrix.get9(f);
+
+      data[0] = rawBits(data[0]);
+      data[1] = rawBits(data[1]);
+      data[2] = rawBits(data[2]);
+      data[3] = rawBits(data[3]);
+      data[4] = rawBits(data[4]);
+      data[5] = rawBits(data[5]);
+      data[6] = rawBits(data[6]);
+      data[7] = rawBits(data[7]);
+      data[8] = rawBits(data[8]);
+
+      return true;
+  }
+
+  return false;
 }
      
-#if 0 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_PathMeasure__1nGetMatrix
-  (KNativePointer ptr, KFloat distance, KBoolean getPosition, KBoolean getTangent) {
-    SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>((ptr));
-    SkMatrix matrix;
-    int flags = 0;
-    
-    if (getPosition)
-        flags |= SkPathMeasure::MatrixFlags::kGetPosition_MatrixFlag;
-    if (getTangent)
-        flags |= SkPathMeasure::MatrixFlags::kGetTangent_MatrixFlag;
-
-    if (instance->getMatrix(distance, &matrix, static_cast<SkPathMeasure::MatrixFlags>(flags))) {
-        std::vector<float> floats(9);
-        matrix.get9(floats.data());
-        return javaFloatArray(env, floats);
-    } else
-        return nullptr;
-}
-#endif
-
-
 SKIKO_EXPORT KBoolean org_jetbrains_skia_PathMeasure__1nGetSegment
   (KNativePointer ptr, KFloat startD, KFloat endD, KNativePointer dstPtr, KBoolean startWithMoveTo) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>((ptr));
