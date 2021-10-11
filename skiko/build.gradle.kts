@@ -636,7 +636,7 @@ val compileJvmBindings = tasks.register<CompileSkikoCppTask>("compileJvmBindings
             includeHeadersNonRecursive(jdkHome.resolve("include/win32"))
             osFlags = arrayOf(
                 "/nologo",
-                *buildType.msvcFlags,
+                *buildType.msvcCompilerFlags,
                 "-DSK_BUILD_FOR_WIN",
                 "-D_CRT_SECURE_NO_WARNINGS",
                 "-D_HAS_EXCEPTIONS=0",
@@ -731,7 +731,7 @@ val linkJvmBindings = tasks.register<LinkSkikoTask>("linkJvmBindings") {
             linker.set(windowsSdkPaths.linker.absolutePath)
             libDirs.set(windowsSdkPaths.libDirs)
             osFlags = arrayOf(
-                "/DEBUG",
+                *buildType.msvcLinkerFlags,
                 "/NOLOGO",
                 "/DLL",
                 "Advapi32.lib",
