@@ -28,6 +28,16 @@ class PathMeasureTest {
     }
 
     @Test
+    fun getPosition() = runTest {
+        Path().moveTo(0f, 10f).lineTo(20f, 0f).moveTo(0f, 40f).lineTo(30f, 50f).use { path ->
+            PathMeasure(path, false).use { measure ->
+                assertCloseEnough(Point(0.89442724f, 9.552787f), measure.getPosition(1f))
+            }
+        }
+    }
+
+
+    @Test
     @Ignore
     fun pathMeasureTest() = runTest {
         Path().moveTo(0f, 0f).lineTo(40f, 0f).moveTo(0f, 40f).lineTo(10f, 50f).use { path ->

@@ -37,24 +37,19 @@ SKIKO_EXPORT KFloat org_jetbrains_skia_PathMeasure__1nGetLength
 }
 
 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_PathMeasure__1nGetPosition
-  (KNativePointer ptr, KFloat distance) {
-    TODO("implement org_jetbrains_skia_PathMeasure__1nGetPosition");
-}
-     
-#if 0 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_PathMeasure__1nGetPosition
-  (KNativePointer ptr, KFloat distance) {
+SKIKO_EXPORT KBoolean org_jetbrains_skia_PathMeasure__1nGetPosition
+  (KNativePointer ptr, KFloat distance, KInt* data) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>((ptr));
     SkPoint position;
-    if (instance->getPosTan(distance, &position, nullptr))
-        return skija::Point::fromSkPoint(env, position);
-    else
-        return nullptr;
+    if (instance->getPosTan(distance, &position, nullptr)) {
+        data[0] = rawBits(position.fX);
+        data[1] = rawBits(position.fY);
+        return true;
+    }
+
+    return false;
 }
-#endif
-
-
+     
 SKIKO_EXPORT KBoolean org_jetbrains_skia_PathMeasure__1nGetTangent
   (KNativePointer ptr, KFloat distance, KInt* data) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>((ptr));
