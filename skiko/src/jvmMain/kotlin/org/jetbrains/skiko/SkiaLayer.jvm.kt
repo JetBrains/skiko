@@ -24,7 +24,7 @@ import javax.swing.JPanel
 import javax.swing.SwingUtilities.isEventDispatchThread
 
 actual open class SkiaLayer internal constructor(
-    externalAccessible: ((Component) -> Accessible)? = null,
+    externalAccessibleFactory: ((Component) -> Accessible)? = null,
     private val properties: SkiaLayerProperties = makeDefaultSkiaLayerProperties(),
     private val renderFactory: RenderFactory
 ) : JPanel() {
@@ -45,8 +45,8 @@ actual open class SkiaLayer internal constructor(
 
     constructor(
         properties: SkiaLayerProperties = makeDefaultSkiaLayerProperties(),
-        externalAccessible: ((Component) -> Accessible)? = null
-    ) : this(externalAccessible, properties, RenderFactory.Default)
+        externalAccessibleFactory: ((Component) -> Accessible)? = null
+    ) : this(externalAccessibleFactory, properties, RenderFactory.Default)
 
     val canvas: java.awt.Canvas
         get() = backedLayer
@@ -55,7 +55,7 @@ actual open class SkiaLayer internal constructor(
         isOpaque = false
         background = Color(0, 0, 0, 0)
         layout = null
-        backedLayer = object : HardwareLayer(externalAccessible) {
+        backedLayer = object : HardwareLayer(externalAccessibleFactory) {
             override fun paint(g: Graphics) {
                 // 1. JPanel.paint is not always called (in rare cases).
                 //    For example if we call 'jframe.isResizable = false` on Ubuntu

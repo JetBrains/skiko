@@ -8,7 +8,7 @@ import javax.accessibility.Accessible
 import javax.accessibility.AccessibleContext
 
 internal open class HardwareLayer(
-    externalAccessible: ((Component) -> Accessible)? = null
+    externalAccessibleFactory: ((Component) -> Accessible)? = null
 ) : Canvas() {
     companion object {
         init {
@@ -72,7 +72,7 @@ internal open class HardwareLayer(
     private external fun getContentHandle(platformInfo: Long): Long
     private external fun getWindowHandle(platformInfo: Long): Long
 
-    private val _externalAccessible = externalAccessible?.invoke(this)
+    private val _externalAccessible = externalAccessibleFactory?.invoke(this)
     override fun getAccessibleContext(): AccessibleContext {
         val res = _externalAccessible?.accessibleContext
         return res ?: super.getAccessibleContext()
