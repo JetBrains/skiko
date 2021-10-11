@@ -5,6 +5,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.swing.Swing
 import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.FrameLimiter
+import org.jetbrains.skiko.RenderException
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaLayerProperties
 
@@ -37,7 +38,13 @@ internal abstract class AbstractDirectSoftwareRedrawer(
     }
 
     open fun resize(width: Int, height: Int) = resize(device, width, height)
-    fun getSurface() = Surface(getSurface(device))
+    fun getSurface(): Surface {
+        val surface = getSurface(device)
+        if (surface == 0L) {
+            throw RenderException("Failed to create Surface")
+        }
+        return Surface(surface)
+    }
     open fun finishFrame() = finishFrame(device)
     override fun dispose() {
         disposeDevice(device)
