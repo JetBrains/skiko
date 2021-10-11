@@ -5,9 +5,21 @@ import kotlin.test.assertEquals
 import org.jetbrains.skia.tests.assertCloseEnough
 import org.jetbrains.skia.impl.use
 import org.jetbrains.skiko.tests.runTest
+import kotlin.test.Ignore
 
 class PathMeasureTest {
+
     @Test
+    fun getRSXformTest() = runTest {
+        Path().moveTo(0f, 0f).lineTo(40f, 0f).moveTo(0f, 40f).lineTo(10f, 50f).use { path ->
+            PathMeasure(path, false).use { measure ->
+                assertEquals(RSXform(1.0f, 0f, 0.5f, 0f), measure.getRSXform(0.5f))
+            }
+        }
+    }
+
+    @Test
+    @Ignore
     fun pathMeasureTest() = runTest {
         Path().moveTo(0f, 0f).lineTo(40f, 0f).moveTo(0f, 40f).lineTo(10f, 50f).use { path ->
             PathMeasure(path, false).use { measure ->

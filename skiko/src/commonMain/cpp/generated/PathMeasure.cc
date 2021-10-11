@@ -75,9 +75,20 @@ SKIKO_EXPORT KInteropPointer org_jetbrains_skia_PathMeasure__1nGetTangent
 
 
 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_PathMeasure__1nGetRSXform
-  (KNativePointer ptr, KFloat distance) {
-    TODO("implement org_jetbrains_skia_PathMeasure__1nGetRSXform");
+SKIKO_EXPORT KBoolean org_jetbrains_skia_PathMeasure__1nGetRSXform
+  (KNativePointer ptr, KFloat distance, KInt* data) {
+    SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>((ptr));
+    SkPoint position;
+    SkVector tangent;
+    if (instance->getPosTan(distance, &position, &tangent)) {
+        data[0] = rawBits(tangent.fX);
+        data[1] = rawBits(tangent.fY);
+        data[2] = rawBits(position.fX);
+        data[3] = rawBits(position.fY);
+        return true;
+    }
+
+    return false;
 }
      
 #if 0 

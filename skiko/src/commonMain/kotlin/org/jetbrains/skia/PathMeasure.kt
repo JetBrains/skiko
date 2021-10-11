@@ -1,11 +1,13 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Managed
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.impl.withResult
 
 class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
@@ -108,7 +110,11 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
     fun getRSXform(distance: Float): RSXform? {
         return try {
             Stats.onNativeCall()
-            _nGetRSXform(_ptr, distance)
+            val data = withResult(IntArray(4)) {
+                _nGetRSXform(_ptr, distance, it)
+            }
+            println("DATA ${Float.fromBits(data[0])}")
+            RSXform(Float.fromBits(data[0]), Float.fromBits(data[1]), Float.fromBits(data[2]), Float.fromBits(data[3]))
         } finally {
             reachabilityBarrier(this)
         }
@@ -204,10 +210,15 @@ private external fun _nGetPosition(ptr: NativePointer, distance: Float): Point?
 private external fun _nGetTangent(ptr: NativePointer, distance: Float): Point?
 
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetRSXform")
-private external fun _nGetRSXform(ptr: NativePointer, distance: Float): RSXform?
+private external fun _nGetRSXform(ptr: NativePointer, distance: Float, data: InteropPointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetMatrix")
-private external fun _nGetMatrix(ptr: NativePointer, distance: Float, getPosition: Boolean, getTangent: Boolean): FloatArray?
+private external fun _nGetMatrix(
+    ptr: NativePointer,
+    distance: Float,
+    getPosition: Boolean,
+    getTangent: Boolean
+): FloatArray?
 
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetSegment")
 private external fun _nGetSegment(
