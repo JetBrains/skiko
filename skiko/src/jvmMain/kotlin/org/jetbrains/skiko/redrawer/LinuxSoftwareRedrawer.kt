@@ -8,8 +8,11 @@ internal class LinuxSoftwareRedrawer(
 ) : AbstractDirectSoftwareRedrawer(layer, properties) {
 
     init {
+        val scale = layer.contentScale
+        val w = (layer.width * scale).toInt().coerceAtLeast(0)
+        val h = (layer.height * scale).toInt().coerceAtLeast(0)
         layer.backedLayer.lockLinuxDrawingSurface {
-            device = createDevice(it.display, it.window).also {
+            device = createDevice(it.display, it.window, w, h).also {
                 if (it == 0L) {
                     throw RenderException("Failed to create Software device")
                 }
@@ -29,5 +32,5 @@ internal class LinuxSoftwareRedrawer(
         super.finishFrame()
     }
 
-    private external fun createDevice(display: Long, window: Long): Long
+    private external fun createDevice(display: Long, window: Long, width: Int, height: Int): Long
 }
