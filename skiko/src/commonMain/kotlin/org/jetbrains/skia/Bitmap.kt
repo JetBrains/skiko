@@ -2,6 +2,7 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import kotlin.math.min
 
 class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR), IHasImageInfo {
     companion object {
@@ -918,17 +919,24 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
     ): ByteArray? {
         return try {
             Stats.onNativeCall()
-            _nReadPixels(
-                _ptr,
-                dstInfo.width,
-                dstInfo.height,
-                dstInfo.colorInfo.colorType.ordinal,
-                dstInfo.colorInfo.alphaType.ordinal,
-                getPtr(dstInfo.colorInfo.colorSpace),
-                dstRowBytes,
-                srcX,
-                srcY
-            )
+            val size = min(dstInfo.height, height - srcY) * rowBytes
+            var readResult = 0.toByte()
+
+            val result = withResult(ByteArray(size)) {
+                readResult = _nReadPixels(
+                    _ptr,
+                    dstInfo.width,
+                    dstInfo.height,
+                    dstInfo.colorInfo.colorType.ordinal,
+                    dstInfo.colorInfo.alphaType.ordinal,
+                    getPtr(dstInfo.colorInfo.colorSpace),
+                    dstRowBytes,
+                    srcX,
+                    srcY,
+                    it
+                )
+            }
+            if (readResult > 0) result else null
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(dstInfo.colorInfo.colorSpace)
@@ -964,11 +972,20 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
     fun extractAlpha(dst: Bitmap, paint: Paint?): IPoint? {
         return try {
             Stats.onNativeCall()
-            _nExtractAlpha(
-                _ptr,
-                getPtr(dst),
-                getPtr(paint)
-            )
+            // result[0] contains 1 if result is not null
+            val result = withResult(IntArray(3)) {
+                _nExtractAlpha(
+                    ptr = _ptr,
+                    dstPtr = getPtr(dst),
+                    paintPtr = getPtr(paint),
+                    iPointResultIntArray = it
+                )
+            }
+            if (result[0] == 1) {
+                IPoint(x = result[1], y = result[2])
+            } else {
+                null
+            }
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(dst)
@@ -1181,12 +1198,13 @@ private external fun _nReadPixels(
     colorSpacePtr: NativePointer,
     dstRowBytes: Int,
     srcX: Int,
-    srcY: Int
-): ByteArray?
+    srcY: Int,
+    resultBytes: InteropPointer
+): Byte
 
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nExtractAlpha")
-private external fun _nExtractAlpha(ptr: NativePointer, dstPtr: NativePointer, paintPtr: NativePointer): IPoint?
+private external fun _nExtractAlpha(ptr: NativePointer, dstPtr: NativePointer, paintPtr: NativePointer, iPointResultIntArray: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nPeekPixels")
 private external fun _nPeekPixels(ptr: NativePointer): ByteBuffer?

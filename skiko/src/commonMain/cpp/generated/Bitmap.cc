@@ -252,32 +252,41 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_Bitmap__1nExtractSubset
 }
 
 
-SKIKO_EXPORT KByte* org_jetbrains_skia_Bitmap__1nReadPixels
-  (KNativePointer ptr, KInt width, KInt height, KInt colorType, KInt alphaType, KNativePointer colorSpacePtr, KInt rowBytes, KInt srcX, KInt srcY) {
-    TODO("implement org_jetbrains_skia_Bitmap__1nReadPixels");
-}
-
-#if 0
-SKIKO_EXPORT KByte* org_jetbrains_skia_Bitmap__1nReadPixels
-  (KNativePointer ptr, KInt width, KInt height, KInt colorType, KInt alphaType, KNativePointer colorSpacePtr, KNativePointer rowBytes, KInt srcX, KInt srcY) {
-    SkBitmap* instance = reinterpret_cast<SkBitmap*>((ptr));
-    SkColorSpace* colorSpace = reinterpret_cast<SkColorSpace*>((colorSpacePtr));
+// returns 1 if readBytes contain array contains successfully read bytes. returns 0 otherwise
+SKIKO_EXPORT KByte org_jetbrains_skia_Bitmap__1nReadPixels
+  (KNativePointer ptr, KInt width, KInt height, KInt colorType,
+  KInt alphaType, KNativePointer colorSpacePtr, KInt rowBytes, KInt srcX, KInt srcY, KByte* resultBytes
+  ) {
+    SkBitmap* instance = reinterpret_cast<SkBitmap*>(ptr);
+    SkColorSpace* colorSpace = reinterpret_cast<SkColorSpace*>(colorSpacePtr);
     SkImageInfo imageInfo = SkImageInfo::Make(width,
                                               height,
                                               static_cast<SkColorType>(colorType),
                                               static_cast<SkAlphaType>(alphaType),
                                               sk_ref_sp<SkColorSpace>(colorSpace));
-    std::vector<KByte> pixels(std::min(height, instance->height() - srcY) * rowBytes);
-    if (instance->readPixels(imageInfo, pixels.data(), rowBytes, srcX, srcY))
-        return javaByteArray(env, pixels);
-    else
-        return nullptr;
-}
-#endif
 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Bitmap__1nExtractAlpha
-  (KNativePointer ptr, KNativePointer dstPtr, KNativePointer paintPtr) {
-    TODO("implement org_jetbrains_skia_Bitmap__1nExtractAlpha");
+    if (instance->readPixels(imageInfo, resultBytes, rowBytes, srcX, srcY)) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_Bitmap__1nExtractAlpha
+  (KNativePointer ptr, KNativePointer dstPtr, KNativePointer paintPtr, KInt* result) {
+
+  SkBitmap* instance = reinterpret_cast<SkBitmap*>(ptr);
+  SkBitmap* dst = reinterpret_cast<SkBitmap*>(dstPtr);
+  SkPaint* paint = reinterpret_cast<SkPaint*>(paintPtr);
+  SkIPoint offset;
+
+  if (instance->extractAlpha(dst, paint, &offset)) {
+      result[0] = 1;
+      result[1] = offset.fX;
+      result[2] = offset.fY;
+  } else {
+     result[0] = 0;
+  }
 }
 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Bitmap__1nPeekPixels
@@ -286,7 +295,15 @@ SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Bitmap__1nPeekPixels
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Bitmap__1nMakeShader
-  (KNativePointer ptr, KInt tmx, KInt tmy, KNativePointer samplingMode, KFloat* localMatrixArr) {
-    TODO("implement org_jetbrains_skia_Bitmap__1nMakeShader");
+  (KNativePointer ptr, KInt tmx, KInt tmy, KLong samplingMode, KFloat* localMatrixArr) {
+    SkBitmap* instance = reinterpret_cast<SkBitmap*>(ptr);
+    std::unique_ptr<SkMatrix> localMatrix = skMatrix(localMatrixArr);
+    sk_sp<SkShader> shader = instance->makeShader(
+        static_cast<SkTileMode>(tmx),
+        static_cast<SkTileMode>(tmy),
+        skija::SamplingMode::unpack(samplingMode),
+        localMatrix.get()
+    );
+    return reinterpret_cast<KNativePointer>(shader.release());
 }
 

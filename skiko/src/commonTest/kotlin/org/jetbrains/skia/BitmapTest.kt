@@ -9,6 +9,7 @@ import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
 class BitmapTest {
+
     @Test
     fun bitmapTest() = runTest {
         val bitmap = Bitmap()
@@ -43,5 +44,33 @@ class BitmapTest {
         assertTrue(bitmap.isReadyToDraw)
 
         bitmap.generationId
+    }
+
+    @Test
+    fun canMakeShader() = runTest {
+        val bitmap = Bitmap()
+        bitmap.allocPixels(ImageInfo.makeS32(25, 25, ColorAlphaType.OPAQUE))
+        val shader = bitmap.makeShader(Matrix33.makeRotate(45f))
+    }
+
+    @Test
+    fun canExtractAlpha() = runTest {
+        val bitmap = Bitmap()
+        bitmap.allocPixels(ImageInfo.makeS32(25, 25, ColorAlphaType.OPAQUE))
+
+        val bitmap2 = Bitmap()
+        bitmap2.allocPixels(ImageInfo.makeS32(15, 15, ColorAlphaType.OPAQUE))
+
+        assertTrue(bitmap.extractAlpha(bitmap2))
+    }
+
+    @Test
+    fun canReadPixels() = runTest {
+        val bitmap = Bitmap()
+        bitmap.allocPixels(ImageInfo.makeS32(10, 10, ColorAlphaType.OPAQUE))
+        val result = bitmap.readPixels(srcY = 5)!!
+
+        assertTrue(bitmap.rowBytes > 0)
+        assertEquals(5 * bitmap.rowBytes, result.size)
     }
 }
