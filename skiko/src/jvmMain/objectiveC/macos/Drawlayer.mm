@@ -211,6 +211,4 @@ void getMetalDeviceAndQueue(void** device, void** queue)
     *queue = (__bridge void*)fQueue;
 }
 
-
-
 } // extern C

@@ -2,6 +2,7 @@
 #include <jawt_md.h>
 #include "jni_helpers.h"
 #include "exceptions_handler.h"
+#include "window_util.h"
 
 #include "SkSurface.h"
 #include "src/core/SkAutoMalloc.h"
@@ -20,10 +21,15 @@ public:
 extern "C"
 {
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_WindowsSoftwareRedrawer_createDevice(
-        JNIEnv *env, jobject redrawer, jlong contentHandle)
+        JNIEnv *env, jobject redrawer, jlong contentHandle, jboolean transparency)
     {
         SoftwareDevice *device = new SoftwareDevice();
         device->window = (HWND)contentHandle;
+        if (transparency)
+        {
+            HWND parent = GetAncestor(device->window, GA_PARENT);
+            enableTransparentWindow(parent);
+        }
         GetClientRect(device->window, &device->clientRect);
         return toJavaPointer(device);
     }

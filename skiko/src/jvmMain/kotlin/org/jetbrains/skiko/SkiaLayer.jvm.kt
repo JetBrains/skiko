@@ -1,8 +1,19 @@
 package org.jetbrains.skiko
 
-import org.jetbrains.skia.*
+import org.jetbrains.skia.Canvas
+import org.jetbrains.skia.Bitmap
+import org.jetbrains.skia.ColorAlphaType
+import org.jetbrains.skia.ColorInfo
+import org.jetbrains.skia.ColorType
+import org.jetbrains.skia.ColorSpace
+import org.jetbrains.skia.ClipMode
+import org.jetbrains.skia.ImageInfo
+import org.jetbrains.skia.Picture
+import org.jetbrains.skia.PictureRecorder
+import org.jetbrains.skia.Rect
 import org.jetbrains.skiko.context.ContextHandler
 import org.jetbrains.skiko.redrawer.Redrawer
+import java.awt.Color
 import java.awt.Graphics
 import java.awt.event.*
 import java.awt.im.InputMethodRequests
@@ -25,6 +36,8 @@ actual open class SkiaLayer internal constructor(
         ContentScale,
     }
 
+    actual var transparency: Boolean = false
+
     internal val backedLayer: HardwareLayer
 
     constructor(
@@ -36,6 +49,7 @@ actual open class SkiaLayer internal constructor(
 
     init {
         isOpaque = false
+        background = Color(0, 0, 0, 0)
         layout = null
         backedLayer = object : HardwareLayer() {
             override fun paint(g: Graphics) {
@@ -98,7 +112,7 @@ actual open class SkiaLayer internal constructor(
     val windowHandle: Long
         get() = backedLayer.windowHandle
 
-    var fullscreen: Boolean
+    actual var fullscreen: Boolean
         get() = backedLayer.fullscreen
         set(value) {
             backedLayer.fullscreen = value
