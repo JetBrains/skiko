@@ -80,7 +80,7 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
     fun getPosition(distance: Float): Point? {
         return try {
             Stats.onNativeCall()
-            withResultExpected(IntArray(2)) { _nGetPosition(_ptr, distance, it) }?.let { points ->
+            withNullableResult(IntArray(2)) { _nGetPosition(_ptr, distance, it) }?.let { points ->
                 Point(Float.fromBits(points[0]), Float.fromBits(points[1]))
 
             }
@@ -98,7 +98,7 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
     fun getTangent(distance: Float): Point? {
         return try {
             Stats.onNativeCall()
-            withResultExpected(IntArray(2)) { _nGetTangent(_ptr, distance, it) }?.let { points ->
+            withNullableResult(IntArray(2)) { _nGetTangent(_ptr, distance, it) }?.let { points ->
                 Point(Float.fromBits(points[0]), Float.fromBits(points[1]))
             }
         } finally {
@@ -115,7 +115,7 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
     fun getRSXform(distance: Float): RSXform? {
         return try {
             Stats.onNativeCall()
-            withResultExpected(IntArray(4)) {
+            withNullableResult(IntArray(4)) {
                 _nGetRSXform(_ptr, distance, it)
             }?.let { data ->
                 RSXform(
@@ -139,7 +139,7 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
     fun getMatrix(distance: Float, getPosition: Boolean, getTangent: Boolean): Matrix33? {
         return try {
             Stats.onNativeCall()
-            withResultExpected(IntArray(9)) {
+            withNullableResult(IntArray(9)) {
                 _nGetMatrix(_ptr, distance, getPosition, getTangent, it)
             }?.let { data ->
                 Matrix33(
@@ -211,7 +211,7 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
     }
 }
 
-private inline fun withResultExpected(result: IntArray, block: (InteropPointer) -> Boolean): IntArray? = interopScope {
+private inline fun withNullableResult(result: IntArray, block: (InteropPointer) -> Boolean): IntArray? = interopScope {
     val handle = toInterop(result)
     val blockResult = block(handle)
     if (blockResult) {
