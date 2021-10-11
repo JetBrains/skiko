@@ -95,7 +95,8 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
     fun getTangent(distance: Float): Point? {
         return try {
             Stats.onNativeCall()
-            _nGetTangent(_ptr, distance)
+            val data = withResult(IntArray(2)) { _nGetTangent(_ptr, distance, it) }
+            Point(Float.fromBits(data[0]), Float.fromBits(data[1]))
         } finally {
             reachabilityBarrier(this)
         }
@@ -206,7 +207,7 @@ private external fun _nGetLength(ptr: NativePointer): Float
 private external fun _nGetPosition(ptr: NativePointer, distance: Float): Point?
 
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetTangent")
-private external fun _nGetTangent(ptr: NativePointer, distance: Float): Point?
+private external fun _nGetTangent(ptr: NativePointer, distance: Float, data: InteropPointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetRSXform")
 private external fun _nGetRSXform(ptr: NativePointer, distance: Float, data: InteropPointer): Boolean
