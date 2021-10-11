@@ -272,7 +272,7 @@ SKIKO_EXPORT KByte org_jetbrains_skia_Bitmap__1nReadPixels
     }
 }
 
-SKIKO_EXPORT void org_jetbrains_skia_Bitmap__1nExtractAlpha
+SKIKO_EXPORT KByte org_jetbrains_skia_Bitmap__1nExtractAlpha
   (KNativePointer ptr, KNativePointer dstPtr, KNativePointer paintPtr, KInt* result) {
 
   SkBitmap* instance = reinterpret_cast<SkBitmap*>(ptr);
@@ -281,11 +281,11 @@ SKIKO_EXPORT void org_jetbrains_skia_Bitmap__1nExtractAlpha
   SkIPoint offset;
 
   if (instance->extractAlpha(dst, paint, &offset)) {
-      result[0] = 1;
-      result[1] = offset.fX;
-      result[2] = offset.fY;
+      result[0] = offset.fX;
+      result[1] = offset.fY;
+      return 1;
   } else {
-     result[0] = 0;
+     return 0;
   }
 }
 

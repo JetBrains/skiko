@@ -252,7 +252,7 @@ extern "C" JNIEXPORT jbyte JNICALL Java_org_jetbrains_skia_BitmapKt__1nReadPixel
     }
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_BitmapKt__1nExtractAlpha
+extern "C" JNIEXPORT jbyte JNICALL Java_org_jetbrains_skia_BitmapKt__1nExtractAlpha
   (JNIEnv* env, jclass jclass, jlong ptr, jlong dstPtr, jlong paintPtr, jintArray resultPoint) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(ptr));
     SkBitmap* dst = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(dstPtr));
@@ -261,13 +261,13 @@ extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_BitmapKt__1nExtract
 
     jint *result_int = env->GetIntArrayElements(resultPoint, NULL);
     if (instance->extractAlpha(dst, paint, &offset)) {
-        result_int[0] = 1;
-        result_int[1] = offset.fX;
-        result_int[2] = offset.fY;
+        result_int[0] = offset.fX;
+        result_int[1] = offset.fY;
+        env->ReleaseIntArrayElements(resultPoint, result_int, 0);
+        return 1;
     } else {
-        result_int[0] = 0;
+        return 0;
     }
-    env->ReleaseIntArrayElements(resultPoint, result_int, 0);
 }
 
 extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_BitmapKt__1nPeekPixels

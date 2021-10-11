@@ -74,11 +74,9 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
                 var colorSpacePtr: NativePointer? = null
 
                 _imageInfo = withResult(IntArray(4)) { intArrayPointer ->
-
                     colorSpacePtr = withResult(NativePointerArray(1)) { nativePointerArrayPtr ->
                         _nGetImageInfo(_ptr, intArrayPointer, nativePointerArrayPtr)
                     }[0]
-
                 }.let {
                     ImageInfo(
                         width = it[0],
@@ -972,17 +970,17 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
     fun extractAlpha(dst: Bitmap, paint: Paint?): IPoint? {
         return try {
             Stats.onNativeCall()
-            // result[0] contains 1 if result is not null
-            val result = withResult(IntArray(3)) {
-                _nExtractAlpha(
+            var isResultNotNull = false
+            val resultArray = withResult(IntArray(3)) {
+                isResultNotNull = _nExtractAlpha(
                     ptr = _ptr,
                     dstPtr = getPtr(dst),
                     paintPtr = getPtr(paint),
                     iPointResultIntArray = it
-                )
+                ) == 1.toByte()
             }
-            if (result[0] == 1) {
-                IPoint(x = result[1], y = result[2])
+            if (isResultNotNull) {
+                IPoint(x = resultArray[1], y = resultArray[2])
             } else {
                 null
             }
@@ -1204,7 +1202,7 @@ private external fun _nReadPixels(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nExtractAlpha")
-private external fun _nExtractAlpha(ptr: NativePointer, dstPtr: NativePointer, paintPtr: NativePointer, iPointResultIntArray: InteropPointer)
+private external fun _nExtractAlpha(ptr: NativePointer, dstPtr: NativePointer, paintPtr: NativePointer, iPointResultIntArray: InteropPointer): Byte
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nPeekPixels")
 private external fun _nPeekPixels(ptr: NativePointer): ByteBuffer?
