@@ -14,14 +14,17 @@ import org.jetbrains.skia.Rect
 import org.jetbrains.skiko.context.ContextHandler
 import org.jetbrains.skiko.redrawer.Redrawer
 import java.awt.Color
+import java.awt.Component
 import java.awt.Graphics
 import java.awt.event.*
 import java.awt.im.InputMethodRequests
 import java.util.concurrent.CancellationException
+import javax.accessibility.Accessible
 import javax.swing.JPanel
 import javax.swing.SwingUtilities.isEventDispatchThread
 
 actual open class SkiaLayer internal constructor(
+    externalAccessible: ((Component) -> Accessible)? = null,
     private val properties: SkiaLayerProperties = makeDefaultSkiaLayerProperties(),
     private val renderFactory: RenderFactory
 ) : JPanel() {
@@ -41,8 +44,9 @@ actual open class SkiaLayer internal constructor(
     internal val backedLayer: HardwareLayer
 
     constructor(
-        properties: SkiaLayerProperties = makeDefaultSkiaLayerProperties()
-    ) : this(properties, RenderFactory.Default)
+        properties: SkiaLayerProperties = makeDefaultSkiaLayerProperties(),
+        externalAccessible: ((Component) -> Accessible)? = null
+    ) : this(externalAccessible, properties, RenderFactory.Default)
 
     val canvas: java.awt.Canvas
         get() = backedLayer
@@ -51,7 +55,7 @@ actual open class SkiaLayer internal constructor(
         isOpaque = false
         background = Color(0, 0, 0, 0)
         layout = null
-        backedLayer = object : HardwareLayer() {
+        backedLayer = object : HardwareLayer(externalAccessible) {
             override fun paint(g: Graphics) {
                 // 1. JPanel.paint is not always called (in rare cases).
                 //    For example if we call 'jframe.isResizable = false` on Ubuntu

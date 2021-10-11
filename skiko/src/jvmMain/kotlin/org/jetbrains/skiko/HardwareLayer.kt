@@ -1,10 +1,15 @@
 package org.jetbrains.skiko
 
 import java.awt.Canvas
+import java.awt.Component
 import java.awt.Graphics
 import java.awt.event.InputMethodEvent
+import javax.accessibility.Accessible
+import javax.accessibility.AccessibleContext
 
-internal open class HardwareLayer : Canvas() {
+internal open class HardwareLayer(
+    externalAccessible: ((Component) -> Accessible)? = null
+) : Canvas() {
     companion object {
         init {
             Library.load()
@@ -66,4 +71,10 @@ internal open class HardwareLayer : Canvas() {
 
     private external fun getContentHandle(platformInfo: Long): Long
     private external fun getWindowHandle(platformInfo: Long): Long
+
+    private val _externalAccessible = externalAccessible?.invoke(this)
+    override fun getAccessibleContext(): AccessibleContext {
+        val res = _externalAccessible?.accessibleContext
+        return res ?: super.getAccessibleContext()
+    }
 }
