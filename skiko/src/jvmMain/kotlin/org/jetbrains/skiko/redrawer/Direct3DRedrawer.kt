@@ -15,7 +15,7 @@ internal class Direct3DRedrawer(
     private var isDisposed = false
     private var drawLock = Any()
 
-    private val device = createDirectXDevice(getAdapterPriority(), layer.contentHandle).also {
+    private val device = createDirectXDevice(getAdapterPriority(), layer.contentHandle, layer.transparency).also {
         if (it == 0L || !isVideoCardSupported(layer.renderApi)) {
             throw RenderException("Failed to create DirectX12 device.")
         }
@@ -92,7 +92,7 @@ internal class Direct3DRedrawer(
     val adapterName get() = getAdapterName(device)
     val adapterMemorySize get() = getAdapterMemorySize(device)
 
-    private external fun createDirectXDevice(adapterPriority: Int, contentHandle: Long): Long
+    private external fun createDirectXDevice(adapterPriority: Int, contentHandle: Long, transparency: Boolean): Long
     private external fun makeDirectXContext(device: Long): Long
     private external fun makeDirectXSurface(device: Long, context: Long, width: Int, height: Int, index: Int): Long
     private external fun resizeBuffers(device: Long, width: Int, height: Int)

@@ -183,7 +183,7 @@ id<MTLDevice> MTLCreateIntegratedDevice(int adapterPriority) {
 }
 
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMetalDevice(
-    JNIEnv *env, jobject redrawer, jint adapterPriority, jlong platformInfoPtr)
+    JNIEnv *env, jobject redrawer, jlong windowPtr, jboolean transparency, jint adapterPriority, jlong platformInfoPtr)
 {
     MetalDevice *device = [MetalDevice new];
 
@@ -213,6 +213,12 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
     CGFloat transparent[] = { 0.0f, 0.0f, 0.0f, 0.0f };
     device.layer.backgroundColor = CGColorCreate(CGColorSpaceCreateDeviceRGB(), transparent);
     device.layer.opaque = NO;
+    
+    if (transparency)
+    {
+        NSWindow* window = (NSWindow*)windowPtr;
+        window.hasShadow = NO;
+    }
 
     return (jlong) device;
 }

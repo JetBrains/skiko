@@ -21,7 +21,7 @@ internal class MetalRedrawer(
     private var isDisposed = false
     private var drawLock = Any()
     private val device = layer.backedLayer.useDrawingSurfacePlatformInfo {
-        createMetalDevice(getAdapterPriority(), it)
+        createMetalDevice(layer.windowHandle, layer.transparency, getAdapterPriority(), it)
     }
     private val windowHandle = layer.windowHandle
 
@@ -131,7 +131,7 @@ internal class MetalRedrawer(
     fun getAdapterName(): String = getAdapterName(device)
     fun getAdapterMemorySize(): Long = getAdapterMemorySize(device)
 
-    private external fun createMetalDevice(adapterPriority: Int, platformInfo: Long): Long
+    private external fun createMetalDevice(window:Long, transparency: Boolean, adapterPriority: Int, platformInfo: Long): Long
     private external fun makeMetalContext(device: Long): Long
     private external fun makeMetalRenderTarget(device: Long, width: Int, height: Int): Long
     private external fun disposeDevice(device: Long)

@@ -5,6 +5,7 @@
 #include <dwmapi.h>
 #include "jni_helpers.h"
 #include "exceptions_handler.h"
+#include "window_util.h"
 
 extern "C"
 {
@@ -20,10 +21,11 @@ extern "C"
             memset(&pixFormatDscr, 0, sizeof(PIXELFORMATDESCRIPTOR));
             pixFormatDscr.nSize = sizeof(PIXELFORMATDESCRIPTOR);
             pixFormatDscr.nVersion = 1;
-            pixFormatDscr.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
+            pixFormatDscr.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER | PFD_SUPPORT_COMPOSITION;
 
             pixFormatDscr.iPixelType = PFD_TYPE_RGBA;
             pixFormatDscr.cColorBits = 32;
+            pixFormatDscr.cAlphaBits = 8;
             int iPixelFormat = ChoosePixelFormat(device, &pixFormatDscr);
             SetPixelFormat(device, iPixelFormat, &pixFormatDscr);
             DescribePixelFormat(device, iPixelFormat, sizeof(PIXELFORMATDESCRIPTOR), &pixFormatDscr);
@@ -76,10 +78,16 @@ extern "C"
         wglMakeCurrent(device, context);
     }
 
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt_createContext(JNIEnv *env, jobject redrawer, jlong devicePtr)
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_WindowsOpenGLRedrawerKt_createContext(JNIEnv *env, jobject redrawer, jlong devicePtr, jlong contentHandle, jboolean transparency)
     {
         __try
         {
+            if (transparency)
+            {
+                HWND parent = GetAncestor(fromJavaPointer<HWND>(contentHandle), GA_PARENT);
+                enableTransparentWindow(parent);
+            }
+
             HDC device = fromJavaPointer<HDC>(devicePtr);
             return toJavaPointer(wglCreateContext(device));
         }

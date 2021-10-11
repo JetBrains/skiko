@@ -10,6 +10,8 @@ interface SkiaRenderer {
 expect open class SkiaLayer {
     var renderApi: GraphicsApi
     val contentScale: Float
+    var fullscreen: Boolean
+    var transparency: Boolean
 }
 
 internal class PictureHolder(val instance: Picture, val width: Int, val height: Int)

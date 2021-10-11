@@ -9,4 +9,10 @@ actual open class SkiaLayer {
 
     actual val contentScale: Float
         get() = 1.0f
+    actual var fullscreen: Boolean
+        get() = TODO("Not yet implemented")
+        set(value) {}
+    actual var transparency: Boolean
+        get() = TODO("Not yet implemented")
+        set(value) {}
 }

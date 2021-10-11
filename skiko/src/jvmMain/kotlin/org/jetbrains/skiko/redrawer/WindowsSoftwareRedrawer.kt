@@ -10,12 +10,12 @@ internal class WindowsSoftwareRedrawer(
 ) : AbstractDirectSoftwareRedrawer(layer, properties) {
 
     init {
-        device = createDevice(layer.contentHandle).also {
+        device = createDevice(layer.contentHandle, layer.transparency).also {
             if (it == 0L) {
                 throw RenderException("Failed to create Software device")
             }
         }
     }
 
-    private external fun createDevice(contentHandle: Long): Long
+    private external fun createDevice(contentHandle: Long, transparency: Boolean): Long
 }
