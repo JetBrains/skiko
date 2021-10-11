@@ -34,14 +34,17 @@ extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_PathMeasureKt__1nGet
     return instance->getLength();
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_PathMeasureKt__1nGetPosition
-  (JNIEnv* env, jclass jclass, jlong ptr, jfloat distance) {
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathMeasureKt__1nGetPosition
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloat distance, jintArray data) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>(static_cast<uintptr_t>(ptr));
     SkPoint position;
-    if (instance->getPosTan(distance, &position, nullptr))
-        return skija::Point::fromSkPoint(env, position);
-    else
-        return nullptr;
+    if (instance->getPosTan(distance, &position, nullptr)) {
+        jint d[2] = { rawBits(position.fX), rawBits(position.fY) };
+        env->SetIntArrayRegion(data, 0, 2, d);
+        return true;
+    }
+
+    return false;
 }
 
 extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathMeasureKt__1nGetTangent

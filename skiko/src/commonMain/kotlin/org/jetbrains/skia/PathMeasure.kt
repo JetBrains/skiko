@@ -205,7 +205,7 @@ private external fun _nSetPath(ptr: NativePointer, pathPtr: NativePointer, force
 private external fun _nGetLength(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetPosition")
-private external fun _nGetPosition(ptr: NativePointer, distance: Float, data: InteropPointer): Point?
+private external fun _nGetPosition(ptr: NativePointer, distance: Float, data: InteropPointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetTangent")
 private external fun _nGetTangent(ptr: NativePointer, distance: Float, data: InteropPointer): Boolean
