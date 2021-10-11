@@ -8,6 +8,8 @@ actual open class SkiaLayer {
         get() = TODO("Not yet implemented")
     actual var fullscreen: Boolean
         get() = TODO("Not yet implemented")
+        set(value) {}
     actual var transparency: Boolean
         get() = TODO("Not yet implemented")
+        set(value) {}
 }
