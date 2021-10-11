@@ -84,7 +84,7 @@ class FontMgrTest {
             fontManager.matchFamilyStyleCharacter("JetBrains Mono", FontStyle.BOLD, arrayOf("en-US"), 65 /* A */)
         )
 
-        Data.makeFromFileName("src/jvmTest/resources/fonts/JetBrainsMono-Italic.ttf").use { data ->
+        Data.makeFromFileName("src/commonTest/resources/fonts/JetBrainsMono-Italic.ttf").use { data ->
             fontManager.makeFromData(data).use {
                 fontManager.matchFamily("JetBrains Mono").use { styleSet ->
                     assertEquals(2, fontManager.familiesCount)
