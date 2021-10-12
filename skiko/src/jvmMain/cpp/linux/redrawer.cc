@@ -78,7 +78,6 @@ extern "C"
                 GLX_GREEN_SIZE, 8,
                 GLX_BLUE_SIZE, 8,
                 GLX_ALPHA_SIZE, 8,
-                GLX_DEPTH_SIZE, 32,
                 GLX_DOUBLEBUFFER, True, None
             };
             vi = glXChooseVisual(display, 0, att);

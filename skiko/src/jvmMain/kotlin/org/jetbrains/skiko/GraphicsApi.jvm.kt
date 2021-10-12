@@ -15,7 +15,9 @@ internal fun isVideoCardSupported(renderApi: GraphicsApi): Boolean {
             val adaptersList = notSupportedAdapters.filter { it.startsWith("opengl:") }.map {
                 it.replace("opengl:", "")
             }
-            var adapter = gl.glGetString(gl.GL_RENDERER)
+            var adapter = gl.glGetString(gl.GL_RENDERER).also {
+                if (it == null) { return false }
+            }
             adaptersList.forEach {
                 if (adapter.startsWith(it)) {
                     return false
