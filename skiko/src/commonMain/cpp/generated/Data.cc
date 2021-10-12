@@ -24,8 +24,8 @@ SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Data__1nToByteBuffer
   (KNativePointer ptr) {
     TODO("implement org_jetbrains_skia_Data__1nToByteBuffer");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Data__1nToByteBuffer
   (KNativePointer ptr) {
     SkData* instance = reinterpret_cast<SkData*>((ptr));
@@ -35,9 +35,11 @@ SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Data__1nToByteBuffer
 
 
 
-SKIKO_EXPORT KByte* org_jetbrains_skia_Data__1nBytes
-  (KNativePointer ptr, KNativePointer offset, KNativePointer length) {
-    TODO("implement org_jetbrains_skia_Data__1nBytes");
+SKIKO_EXPORT void org_jetbrains_skia_Data__1nBytes
+  (KNativePointer ptr, int offset, int length, KByte* destBytes) {
+    SkData* instance = reinterpret_cast<SkData*>(ptr);
+    const KByte* source = reinterpret_cast<const KByte*>(instance->bytes() + offset);
+    memcpy(destBytes, source, length);
 }
 
 SKIKO_EXPORT KBoolean org_jetbrains_skia_Data__1nEquals

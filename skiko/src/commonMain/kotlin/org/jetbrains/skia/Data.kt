@@ -40,7 +40,7 @@ class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
         }
     }
 
-    val size: Long
+    val size: Int
         get() = try {
             Stats.onNativeCall()
             _nSize(_ptr)
@@ -50,13 +50,23 @@ class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     val bytes: ByteArray
         get() = getBytes(0, size)
 
-    fun getBytes(offset: Long, length: Long): ByteArray {
+    fun getBytes(offset: Int, length: Int): ByteArray {
         return try {
             Stats.onNativeCall()
-            _nBytes(_ptr, offset, length)
+            check(_nSize(_ptr) >= offset + length) {
+                "Data=${_ptr}: Can't getBytes with offset=$offset and length=$length"
+            }
+            withResult(ByteArray(length)) {
+                _nBytes(_ptr, offset, length, it)
+            }
         } finally {
             reachabilityBarrier(this)
         }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        val otherData = other as? Data ?: return false
+        return _nativeEquals(otherData)
     }
 
     /**
@@ -77,7 +87,7 @@ class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      * Create a new dataref using a subset of the data in the specified
      * src dataref.
      */
-    fun makeSubset(offset: Long, length: Long): Data {
+    fun makeSubset(offset: Int, length: Int): Data {
         return try {
             Stats.onNativeCall()
             Data(_nMakeSubset(_ptr, offset, length))
@@ -114,10 +124,10 @@ class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
 private external fun Data_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Data__1nSize")
-private external fun _nSize(ptr: NativePointer): Long
+private external fun _nSize(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Data__1nBytes")
-private external fun _nBytes(ptr: NativePointer, offset: Long, length: Long): ByteArray
+private external fun _nBytes(ptr: NativePointer, offset: Int, length: Int, destBytes: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Data__1nEquals")
 private external fun _nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
@@ -132,7 +142,7 @@ private external fun _nMakeFromBytes(bytes: InteropPointer, offset: Int, length:
 private external fun _nMakeFromFileName(path: String?): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Data__1nMakeSubset")
-private external fun _nMakeSubset(ptr: NativePointer, offset: Long, length: Long): NativePointer
+private external fun _nMakeSubset(ptr: NativePointer, offset: Int, length: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Data__1nMakeEmpty")
 private external fun _nMakeEmpty(): NativePointer

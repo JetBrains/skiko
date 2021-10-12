@@ -1,21 +1,20 @@
-package org.jetbrains.skiko
+package org.jetbrains.skia
 
-import org.jetbrains.skia.Color
-import org.jetbrains.skia.Color4f
+import org.jetbrains.skiko.tests.runTest
 import kotlin.test.Test
 
 import kotlin.test.assertEquals
 
 class ColorTest {
     @Test
-    fun testColor() {
+    fun testColor() = runTest {
         val cases = mapOf(
-        0x00000000 to Color4f(0f, 0f, 0f, 0f),
-        -0x1000000 to Color4f(0f, 0f, 0f, 1f),
-        0x00FF0000 to Color4f(1f, 0f, 0f, 0f),
-        0x0000FF00 to Color4f(0f, 1f, 0f, 0f),
-        0x000000FF to Color4f(0f, 0f, 1f, 0f),
-        -0x7f7f7f80 to Color4f(128 / 255f, 128 / 255f, 128 / 255f, 128 / 255f)
+            0x00000000 to Color4f(0f, 0f, 0f, 0f),
+            -0x1000000 to Color4f(0f, 0f, 0f, 1f),
+            0x00FF0000 to Color4f(1f, 0f, 0f, 0f),
+            0x0000FF00 to Color4f(0f, 1f, 0f, 0f),
+            0x000000FF to Color4f(0f, 0f, 1f, 0f),
+            -0x7f7f7f80 to Color4f(128 / 255f, 128 / 255f, 128 / 255f, 128 / 255f)
         )
 
         cases.forEach { (value, color) ->
