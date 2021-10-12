@@ -47,11 +47,11 @@ internal class SoftwareContextHandler(layer: SkiaLayer) : ContextHandler(layer) 
 
     override fun initCanvas() {
         disposeCanvas()
-        
+
         val scale = layer.contentScale
         val w = (layer.width * scale).toInt().coerceAtLeast(0)
         val h = (layer.height * scale).toInt().coerceAtLeast(0)
-        
+
         if (storage.width != w || storage.height != h) {
             storage.allocPixelsFlags(ImageInfo.makeS32(w, h, ColorAlphaType.PREMUL), false)
         }
@@ -67,7 +67,7 @@ internal class SoftwareContextHandler(layer: SkiaLayer) : ContextHandler(layer) 
         val h = (layer.height * scale).toInt().coerceAtLeast(0)
 
 
-        val bytes = storage.readPixels(storage.imageInfo, (w * 4).toLong(), 0, 0)
+        val bytes = storage.readPixels(storage.imageInfo, (w * 4), 0, 0)
         if (bytes != null) {
             val buffer = DataBufferByte(bytes, bytes.size)
             raster = Raster.createInterleavedRaster(

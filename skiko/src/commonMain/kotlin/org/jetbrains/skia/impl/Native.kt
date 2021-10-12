@@ -51,6 +51,16 @@ inline fun withResult(result: ByteArray, block: (InteropPointer) -> Unit): ByteA
     result
 }
 
+inline fun withNullableResult(result: ByteArray, block: (InteropPointer) -> Boolean): ByteArray? = interopScope {
+    val handle = toInterop(result)
+    return if (block(handle)) {
+        handle.fromInterop(result)
+        result
+    } else {
+        null
+    }
+}
+
 inline fun withResult(result: FloatArray, block: (InteropPointer) -> Unit): FloatArray = interopScope {
     val handle = toInterop(result)
     block(handle)
@@ -63,6 +73,16 @@ inline fun withResult(result: IntArray, block: (InteropPointer) -> Unit): IntArr
     block(handle)
     handle.fromInterop(result)
     result
+}
+
+inline fun withNullableResult(result: IntArray, block: (InteropPointer) -> Boolean): IntArray? = interopScope {
+    val handle = toInterop(result)
+    return if (block(handle)) {
+        handle.fromInterop(result)
+        result
+    } else {
+        null
+    }
 }
 
 inline fun withResult(result: ShortArray, block: (InteropPointer) -> Unit): ShortArray = interopScope {
