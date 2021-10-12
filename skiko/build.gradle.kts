@@ -2,7 +2,6 @@ import de.undercouch.gradle.tasks.download.Download
 import org.gradle.crypto.checksum.Checksum
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
-import org.jetbrains.kotlin.utils.keysToMap
 
 plugins {
     kotlin("multiplatform") version "1.5.31" // "1.6.0-M1"
@@ -39,19 +38,6 @@ repositories {
     mavenCentral()
 }
 
-val skiaZip = run {
-    val zipName = skiko.skiaReleaseFor(targetOs, targetArch, buildType) + ".zip"
-    val zipFile = skiko.dependenciesDir.resolve("skia/${zipName.substringAfterLast('/')}")
-
-    tasks.register("downloadSkia", Download::class) {
-        onlyIf { skiko.skiaDir == null && !zipFile.exists() }
-        inputs.property("skia.release.for.target.os", skiko.skiaReleaseFor(targetOs, targetArch, buildType))
-        src("https://github.com/JetBrains/skia-pack/releases/download/$zipName")
-        dest(zipFile)
-        onlyIfModified(true)
-    }.map { zipFile }
-}
-
 val windowsSdkPaths: WindowsSdkPaths by lazy {
     findWindowsSdkPathsForCurrentOS(gradle)
 }
@@ -71,49 +57,12 @@ class NativeCompilationInfo(val target: org.jetbrains.kotlin.gradle.plugin.mpp.K
 
 val allNativeTargets = mutableMapOf<Pair<OS, Arch>, NativeCompilationInfo>()
 
-val skiaCrossDownloadTasks: Map<Pair<OS, Arch>, Provider<File>> = crossTargets.keysToMap { osArch ->
-    val suffix = targetSuffix(osArch.first, osArch.second)
-    val out = skiko.dependenciesDir.resolve("skia/skia-$suffix.zip")
-
-    tasks.register<Download>("skiaCrossDownload$suffix") {
-        onlyIf { skiko.skiaDir == null && !out.exists() }
-
-        val release = skiko.skiaReleaseFor(osArch.first, osArch.second, buildType)
-        src("https://github.com/JetBrains/skia-pack/releases/download/$release.zip")
-        dest(out.absolutePath)
-        onlyIfModified(true)
-    }.map { out.absoluteFile }
-}
-
-val skiaDirProviderForCrossTargets: Map<Pair<OS, Arch>, Provider<File>> = crossTargets.keysToMap { osArch ->
-    val suffix = targetSuffix(osArch.first, osArch.second)
-
-    if (skiko.skiaDir != null) {
-        tasks.register("skiaCrossDir$suffix", DefaultTask::class) {
-            // dummy task to simplify usage of the resulting provider (see `else` branch)
-            // if a file provider is not created from a task provider,
-            // then it cannot be used instead of a task in `dependsOn` clauses of other tasks.
-            // e.g. the resulting `skiaDir` could not be used in `dependsOn` of CppCompile configuration
-            enabled = false
-        }.map { skiko.skiaDir!!.absoluteFile }
-    } else {
-        val targetDir = skiko.dependenciesDir.resolve("skia/skia-$suffix")
-        tasks.register("skiaCrossUnzip$suffix", Copy::class) {
-            val downloader = skiaCrossDownloadTasks[osArch]!!
-            dependsOn(downloader)
-            from(downloader.map { zipTree(it) })
-            into(targetDir)
-            destinationDir = targetDir.absoluteFile
-        }.map { it.destinationDir.absoluteFile }
-    }
-}
+val skiaWasmDir = registerOrGetSkiaDirProvider(OS.Wasm, Arch.Wasm)
 
 val compileWasm = tasks.register<CompileSkikoCppTask>("compileWasm") {
     val osArch = OS.Wasm to Arch.Wasm
 
-    val unzipper = skiaDirProviderForCrossTargets[osArch]!!
-    dependsOn(unzipper)
-    val unpackedSkia = unzipper.get()
+    dependsOn(skiaWasmDir)
 
     compiler.set(compilerForTarget(OS.Wasm, Arch.Wasm))
     buildTargetOS.set(osArch.first)
@@ -125,7 +74,7 @@ val compileWasm = tasks.register<CompileSkikoCppTask>("compileWasm") {
     sourceRoots.set(srcDirs)
 
     includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp"))
-    includeHeadersNonRecursive(skiaHeadersDirs(unpackedSkia))
+    includeHeadersNonRecursive(skiaHeadersDirs(skiaWasmDir.get()))
 
     flags.set(listOf(
         *skiaPreprocessorFlags(),
@@ -134,16 +83,15 @@ val compileWasm = tasks.register<CompileSkikoCppTask>("compileWasm") {
 }
 
 fun registerNativeBridgesTask(os: OS, arch: Arch): TaskProvider<CompileSkikoCppTask> {
-    return tasks.register<CompileSkikoCppTask>("${os.id}_${arch.id}_CrossCompile") {
-        val osArch = os to arch
+    val skiaNativeDir = registerOrGetSkiaDirProvider(os, arch)
 
-        val unzipper = skiaDirProviderForCrossTargets[osArch]!!
-        dependsOn(unzipper)
-        val unpackedSkia = unzipper.get()
+    return tasks.register<CompileSkikoCppTask>("${os.id}_${arch.id}_CrossCompile") {
+        dependsOn(skiaNativeDir)
+        val unpackedSkia = skiaNativeDir.get()
 
         compiler.set(compilerForTarget(os, arch))
-        buildTargetOS.set(osArch.first)
-        buildTargetArch.set(osArch.second)
+        buildTargetOS.set(os)
+        buildTargetArch.set(arch)
         buildVariant.set(buildType)
 
         when (os)  {
@@ -213,10 +161,8 @@ val linkWasm = tasks.register<LinkSkikoWasmTask>("linkWasm") {
     val osArch = OS.Wasm to Arch.Wasm
 
     dependsOn(compileWasm)
-
-    val unzipper = skiaDirProviderForCrossTargets[osArch]!!
-    dependsOn(unzipper)
-    val unpackedSkia = unzipper.get()
+    dependsOn(skiaWasmDir)
+    val unpackedSkia = skiaWasmDir.get()
 
     linker.set(linkerForTarget(OS.Wasm, Arch.Wasm))
     buildTargetOS.set(osArch.first)
@@ -251,24 +197,6 @@ val linkWasm = tasks.register<LinkSkikoWasmTask>("linkWasm") {
             val newContent = originalContent.replace("_org_jetbrains", "org_jetbrains")
             jsFile.writeText(newContent)
         }
-    }
-}
-
-val skiaDir: Provider<File> = run {
-    if (skiko.skiaDir != null) {
-        tasks.register("skiaDir", DefaultTask::class) {
-            // dummy task to simplify usage of the resulting provider (see `else` branch)
-            // if a file provider is not created from a task provider,
-            // then it cannot be used instead of a task in `dependsOn` clauses of other tasks.
-            // e.g. the resulting `skiaDir` could not be used in `dependsOn` of CppCompile configuration
-            enabled = false
-        }.map { skiko.skiaDir!! }
-    } else {
-        val targetDir = skiko.dependenciesDir.resolve("skia/skia")
-        tasks.register("unzipSkia", Copy::class) {
-            from(skiaZip.map { zipTree(it) })
-            into(targetDir)
-        }.map { targetDir }
     }
 }
 
@@ -315,8 +243,7 @@ kotlin {
         for ((osArch, compilation) in allNativeTargets) {
             val targetString = "${osArch.first.id}-${osArch.second.id}"
 
-            val unzipper = skiaDirProviderForCrossTargets[osArch] ?:
-                throw GradleException("add $osArch to the list of cross-targets")
+            val unzipper = registerOrGetSkiaDirProvider(osArch.first, osArch.second)
             val unpackedSkia = unzipper.get()
             val skiaDir = unpackedSkia.absolutePath
 
@@ -575,6 +502,8 @@ fun skiaStaticLibraries(skiaDir: String, targetString: String): List<String> {
     }
 }
 
+val skiaJvmBindingsDir: Provider<File> = registerOrGetSkiaDirProvider(targetOs, targetArch)
+
 val compileJvmBindings = tasks.register<CompileSkikoCppTask>("compileJvmBindings") {
     // Prefer 'java.home' system property to simplify overriding from Intellij.
     // When used from command-line, it is effectively equal to JAVA_HOME.
@@ -583,7 +512,7 @@ val compileJvmBindings = tasks.register<CompileSkikoCppTask>("compileJvmBindings
                 "Check JAVA_HOME (CLI) or Gradle settings (Intellij).")
     }
     val jdkHome = File(System.getProperty("java.home") ?: error("'java.home' is null"))
-    dependsOn(skiaDir)
+    dependsOn(skiaJvmBindingsDir)
     buildTargetOS.set(targetOs)
     buildTargetArch.set(targetArch)
     buildVariant.set(buildType)
@@ -596,7 +525,7 @@ val compileJvmBindings = tasks.register<CompileSkikoCppTask>("compileJvmBindings
     sourceRoots.set(srcDirs)
 
     includeHeadersNonRecursive(jdkHome.resolve("include"))
-    includeHeadersNonRecursive(skiaHeadersDirs(skiaDir.get()))
+    includeHeadersNonRecursive(skiaHeadersDirs(skiaJvmBindingsDir.get()))
     includeHeadersNonRecursive(projectDir.resolve("src/jvmMain/cpp/include"))
 
     compiler.set(compilerForTarget(targetOs, targetArch))
@@ -664,10 +593,10 @@ val compileJvmBindings = tasks.register<CompileSkikoCppTask>("compileJvmBindings
 }
 
 val linkJvmBindings = tasks.register<LinkSkikoTask>("linkJvmBindings") {
-    val skiaBinDir = skiaDir.get().absolutePath + "/" + skiaBinSubdir
+    val skiaBinDir = skiaJvmBindingsDir.get().absolutePath + "/" + skiaBinSubdir
     val osFlags: Array<String>
 
-    libFiles = fileTree(skiaDir.map { it.resolve(skiaBinSubdir)}) {
+    libFiles = fileTree(skiaJvmBindingsDir.map { it.resolve(skiaBinSubdir)}) {
         include(if (targetOs.isWindows) "*.lib" else "*.a")
     }
 
@@ -759,7 +688,7 @@ project.tasks.register<Exec>("objcCompile") {
     val srcs = names.map { "$inputDir/$it.mm" }.toTypedArray()
     val outs = names.map { "$outDir/$it.o" }.toTypedArray()
     workingDir = File(outDir)
-    val skiaDir = skiaDir.get().absolutePath
+    val skiaDir = skiaJvmBindingsDir.get().absolutePath
     commandLine = listOf(
         "clang",
         *targetOs.clangFlags,
@@ -930,7 +859,7 @@ val maybeSign by project.tasks.registering {
 val createChecksums by project.tasks.registering(org.gradle.crypto.checksum.Checksum::class) {
     dependsOn(maybeSign)
     files = project.files(maybeSign.map { it.outputs.files }) +
-            if (targetOs.isWindows) files(skiaDir.map { it.resolve("${skiaBinSubdir}/icudtl.dat") }) else files()
+            if (targetOs.isWindows) files(skiaJvmBindingsDir.map { it.resolve("${skiaBinSubdir}/icudtl.dat") }) else files()
     algorithm = Checksum.Algorithm.SHA256
     outputDir = file("$buildDir/checksums")
 }
@@ -945,7 +874,7 @@ val skikoJvmRuntimeJar by project.tasks.registering(Jar::class) {
         it.replace(".maybesigned", "")
     }
     if (targetOs.isWindows) {
-        from(files(skiaDir.map { it.resolve("${skiaBinSubdir}/icudtl.dat") }))
+        from(files(skiaJvmBindingsDir.map { it.resolve("${skiaBinSubdir}/icudtl.dat") }))
     }
     from(createChecksums.map { it.outputs.files })
 }
@@ -995,11 +924,6 @@ tasks.withType<Test>().configureEach {
             systemProperty("sun.java2d.uiScale", "1")
         }
     }
-}
-
-fun Task.disable() {
-    enabled = false
-    group = "Disabled tasks"
 }
 
 afterEvaluate {
@@ -1113,4 +1037,37 @@ if (hostOs == OS.Linux && hostArch != Arch.X64) {
 fun Task.projectDirs(vararg relativePaths: String): List<Directory> {
     val projectDir = project.layout.projectDirectory
     return relativePaths.map { path -> projectDir.dir(path) }
+}
+
+/**
+ * Do not call inside tasks.register or tasks.call callback
+ * (tasks' registration during other task's registration is prohibited)
+ */
+fun registerOrGetSkiaDirProvider(os: OS, arch: Arch): Provider<File> {
+    val taskNameSuffix = joinToTitleCamelCase(buildType.id, os.id, arch.id)
+    val skiaRelease = skiko.skiaReleaseFor(os, arch, buildType)
+    val downloadSkia = tasks.registerOrGetTask<Download>("downloadSkia$taskNameSuffix") {
+        onlyIf { !dest.exists() }
+        onlyIfModified(true)
+        val skiaUrl = "https://github.com/JetBrains/skia-pack/releases/download/$skiaRelease.zip"
+        inputs.property("skia.url", skiaUrl)
+        src(skiaUrl)
+        dest(skiko.dependenciesDir.resolve("skia/$skiaRelease.zip"))
+    }.map { it.dest.absoluteFile }
+
+    return if (skiko.skiaDir != null) {
+        tasks.registerOrGetTask<DefaultTask>("skiaDir$taskNameSuffix") {
+            // dummy task to simplify usage of the resulting provider (see `else` branch)
+            // if a file provider is not created from a task provider,
+            // then it cannot be used instead of a task in `dependsOn` clauses of other tasks.
+            // e.g. the resulting `skiaDir` could not be used in `dependsOn` of CppCompile configuration
+            enabled = false
+        }.map { skiko.skiaDir!!.absoluteFile }
+    } else {
+        tasks.registerOrGetTask<Copy>("unzipSkia$taskNameSuffix") {
+            dependsOn(downloadSkia)
+            from(downloadSkia.map { zipTree(it) })
+            into(skiko.dependenciesDir.resolve("skia/$skiaRelease"))
+        }.map { it.destinationDir.absoluteFile }
+    }
 }
