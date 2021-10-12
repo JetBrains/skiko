@@ -1,12 +1,7 @@
 package org.jetbrains.skia
 
 import org.jetbrains.skiko.tests.runTest
-import kotlin.test.Test
-
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertNotEquals
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class BitmapTest {
 
@@ -72,5 +67,19 @@ class BitmapTest {
 
         assertTrue(bitmap.rowBytes > 0)
         assertEquals(5 * bitmap.rowBytes, result.size)
+    }
+
+    @Test
+    fun canInstallPixels() = runTest {
+        val bitmap = Bitmap()
+        bitmap.allocPixels(ImageInfo.makeS32(2, 2, ColorAlphaType.OPAQUE))
+
+        val setArray = byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
+        assertTrue(bitmap.installPixels(setArray))
+
+        val result = bitmap.readPixels()!!
+        assertTrue(bitmap.rowBytes > 0)
+        assertEquals(16, result.size)
+        assertContentEquals(setArray, result)
     }
 }
