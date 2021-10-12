@@ -2,11 +2,7 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.use
 import org.jetbrains.skiko.tests.runTest
-import kotlin.test.Test
-import kotlin.test.assertContentEquals
-
-import kotlin.test.assertEquals
-import kotlin.test.assertNotEquals
+import kotlin.test.*
 
 class DataTest {
 
@@ -41,6 +37,30 @@ class DataTest {
                 assertContentEquals(bytesSubset, data4.bytes)
                 assertNotEquals(data, data4)
             }
+        }
+    }
+
+    @Test
+    fun failsToReadMoreBytesThanPossible() = runTest {
+        val bytes = byteArrayOf(1, 2, 3, 4, 5)
+        val data = Data.makeFromBytes(bytes)
+
+
+        data.use {
+            assertFailsWith<IllegalStateException> {
+                it.getBytes(2, 10)
+            }
+
+            assertFailsWith<IllegalStateException> {
+                it.getBytes(0, 6)
+            }
+
+            assertContentEquals(bytes, it.getBytes(0, 5))
+            assertContentEquals(bytes.takeLast(4).toByteArray(), it.getBytes(1, 4))
+            assertContentEquals(bytes.takeLast(3).toByteArray(), it.getBytes(2, 3))
+            assertContentEquals(bytes.takeLast(2).toByteArray(), it.getBytes(3, 2))
+            assertContentEquals(bytes.takeLast(1).toByteArray(), it.getBytes(4, 1))
+            assertContentEquals(byteArrayOf(), it.getBytes(5, 0))
         }
     }
 }

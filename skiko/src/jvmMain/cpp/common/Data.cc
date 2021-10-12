@@ -24,7 +24,7 @@ extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_DataKt__1nToByteBuf
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_DataKt__1nBytes
-  (JNIEnv* env, jclass jclass, jlong ptr, jlong offset, jlong length, jbyteArray destBytes) {
+  (JNIEnv* env, jclass jclass, jlong ptr, jint offset, jint length, jbyteArray destBytes) {
     SkData* instance = reinterpret_cast<SkData*>(static_cast<uintptr_t>(ptr));
     const jbyte* bytes = reinterpret_cast<const jbyte*>(instance->bytes() + offset);
     env->SetByteArrayRegion(destBytes, 0, (jsize) length, bytes);

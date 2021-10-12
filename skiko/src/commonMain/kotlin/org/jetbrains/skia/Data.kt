@@ -53,6 +53,9 @@ class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     fun getBytes(offset: Int, length: Int): ByteArray {
         return try {
             Stats.onNativeCall()
+            check(_nSize(_ptr) >= offset + length) {
+                "Data=${_ptr}: Can't getBytes with offset=$offset and length=$length"
+            }
             withResult(ByteArray(length)) {
                 _nBytes(_ptr, offset, length, it)
             }
