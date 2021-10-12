@@ -144,9 +144,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
     val rowBytes: Int
         get() = try {
             Stats.onNativeCall()
-            _nGetRowBytes(_ptr).also {
-                println("Row bytes = $it")
-            }
+            _nGetRowBytes(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -918,12 +916,11 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
         srcY: Int = 0
     ): ByteArray? {
         return try {
-            Stats.onNativeCall()
             val size = min(dstInfo.height, height - srcY) * rowBytes
-            var readResult = 0.toByte()
 
-            val result = withResult(ByteArray(size)) {
-                readResult = _nReadPixels(
+            Stats.onNativeCall()
+            withNullableResult(ByteArray(size)) {
+                _nReadPixels(
                     _ptr,
                     dstInfo.width,
                     dstInfo.height,
@@ -936,7 +933,6 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
                     it
                 )
             }
-            if (readResult > 0) result else null
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(dstInfo.colorInfo.colorSpace)
@@ -972,19 +968,15 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
     fun extractAlpha(dst: Bitmap, paint: Paint?): IPoint? {
         return try {
             Stats.onNativeCall()
-            var isResultNotNull = false
-            val resultArray = withResult(IntArray(3)) {
-                isResultNotNull = _nExtractAlpha(
+            withNullableResult(IntArray(2)) {
+                _nExtractAlpha(
                     ptr = _ptr,
                     dstPtr = getPtr(dst),
                     paintPtr = getPtr(paint),
                     iPointResultIntArray = it
-                ) == 1.toByte()
-            }
-            if (isResultNotNull) {
-                IPoint(x = resultArray[1], y = resultArray[2])
-            } else {
-                null
+                )
+            }?.let {
+                IPoint(x = it[0], y = it[1])
             }
         } finally {
             reachabilityBarrier(this)
@@ -1200,11 +1192,11 @@ private external fun _nReadPixels(
     srcX: Int,
     srcY: Int,
     resultBytes: InteropPointer
-): Byte
+): Boolean
 
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nExtractAlpha")
-private external fun _nExtractAlpha(ptr: NativePointer, dstPtr: NativePointer, paintPtr: NativePointer, iPointResultIntArray: InteropPointer): Byte
+private external fun _nExtractAlpha(ptr: NativePointer, dstPtr: NativePointer, paintPtr: NativePointer, iPointResultIntArray: InteropPointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nPeekPixels")
 private external fun _nPeekPixels(ptr: NativePointer): ByteBuffer?

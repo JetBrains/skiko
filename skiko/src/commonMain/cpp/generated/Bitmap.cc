@@ -152,27 +152,15 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_Bitmap__1nAllocPixelsRowBytes
 
 SKIKO_EXPORT KBoolean org_jetbrains_skia_Bitmap__1nInstallPixels
   (KNativePointer ptr, KInt width, KInt height, KInt colorType, KInt alphaType, KNativePointer colorSpacePtr, KByte* pixelsArr, KInt rowBytes) {
-    TODO("implement org_jetbrains_skia_Bitmap__1nInstallPixels");
+  SkBitmap* instance = reinterpret_cast<SkBitmap*>(ptr);
+  SkColorSpace* colorSpace = reinterpret_cast<SkColorSpace*>(colorSpacePtr);
+  SkImageInfo imageInfo = SkImageInfo::Make(width,
+                                            height,
+                                            static_cast<SkColorType>(colorType),
+                                            static_cast<SkAlphaType>(alphaType),
+                                            sk_ref_sp<SkColorSpace>(colorSpace));
+  return instance->installPixels(imageInfo, pixelsArr, rowBytes, nullptr, nullptr);
 }
-
-#if 0
-SKIKO_EXPORT KBoolean org_jetbrains_skia_Bitmap__1nInstallPixels
-  (KNativePointer ptr, KInt width, KInt height, KInt colorType, KInt alphaType, KNativePointer colorSpacePtr, KByte* pixelsArr, KNativePointer rowBytes) {
-    SkBitmap* instance = reinterpret_cast<SkBitmap*>((ptr));
-    SkColorSpace* colorSpace = reinterpret_cast<SkColorSpace*>((colorSpacePtr));
-    SkImageInfo imageInfo = SkImageInfo::Make(width,
-                                              height,
-                                              static_cast<SkColorType>(colorType),
-                                              static_cast<SkAlphaType>(alphaType),
-                                              sk_ref_sp<SkColorSpace>(colorSpace));
-
-    jsize len = env->GetArrayLength(pixelsArr);
-    KByte* pixels = new KByte[len];
-    env->GetByteArrayRegion(pixelsArr, 0, len, pixels);
-    return instance->installPixels(imageInfo, pixels, rowBytes, deleteJBytes, nullptr);
-}
-#endif
-
 
 SKIKO_EXPORT KBoolean org_jetbrains_skia_Bitmap__1nAllocPixels
   (KNativePointer ptr) {
@@ -252,8 +240,8 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_Bitmap__1nExtractSubset
 }
 
 
-// returns 1 if readBytes contain array contains successfully read bytes. returns 0 otherwise
-SKIKO_EXPORT KByte org_jetbrains_skia_Bitmap__1nReadPixels
+// returns true if readBytes array contains successfully read bytes. returns false otherwise
+SKIKO_EXPORT KBoolean org_jetbrains_skia_Bitmap__1nReadPixels
   (KNativePointer ptr, KInt width, KInt height, KInt colorType,
   KInt alphaType, KNativePointer colorSpacePtr, KInt rowBytes, KInt srcX, KInt srcY, KByte* resultBytes
   ) {
@@ -266,13 +254,13 @@ SKIKO_EXPORT KByte org_jetbrains_skia_Bitmap__1nReadPixels
                                               sk_ref_sp<SkColorSpace>(colorSpace));
 
     if (instance->readPixels(imageInfo, resultBytes, rowBytes, srcX, srcY)) {
-        return 1;
+        return true;
     } else {
-        return 0;
+        return false;
     }
 }
 
-SKIKO_EXPORT KByte org_jetbrains_skia_Bitmap__1nExtractAlpha
+SKIKO_EXPORT KBoolean org_jetbrains_skia_Bitmap__1nExtractAlpha
   (KNativePointer ptr, KNativePointer dstPtr, KNativePointer paintPtr, KInt* result) {
 
   SkBitmap* instance = reinterpret_cast<SkBitmap*>(ptr);
@@ -283,9 +271,9 @@ SKIKO_EXPORT KByte org_jetbrains_skia_Bitmap__1nExtractAlpha
   if (instance->extractAlpha(dst, paint, &offset)) {
       result[0] = offset.fX;
       result[1] = offset.fY;
-      return 1;
+      return true;
   } else {
-     return 0;
+     return false;
   }
 }
 

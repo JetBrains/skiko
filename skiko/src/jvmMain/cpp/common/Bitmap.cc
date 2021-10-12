@@ -232,8 +232,8 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapKt__1nExtrac
     return instance->extractSubset(dst, {left, top, right, bottom});
 }
 
-// returns 1 if readBytes contain array contains successfully read bytes. returns 0 otherwise
-extern "C" JNIEXPORT jbyte JNICALL Java_org_jetbrains_skia_BitmapKt__1nReadPixels
+// returns true if readBytes array contains successfully read bytes. returns false otherwise
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapKt__1nReadPixels
   (JNIEnv* env, jclass jclass, jlong ptr, jint width, jint height, jint colorType, jint alphaType, jlong colorSpacePtr, jint rowBytes, jint srcX, jint srcY, jbyteArray readBytes) {
     jbyte *result_bytes = env->GetByteArrayElements(readBytes, NULL);
 
@@ -246,13 +246,13 @@ extern "C" JNIEXPORT jbyte JNICALL Java_org_jetbrains_skia_BitmapKt__1nReadPixel
                                               sk_ref_sp<SkColorSpace>(colorSpace));
     if (instance->readPixels(imageInfo, result_bytes, rowBytes, srcX, srcY)) {
         env->ReleaseByteArrayElements(readBytes, result_bytes, 0);
-        return 1;
+        return true;
     } else {
-        return 0;
+        return false;
     }
 }
 
-extern "C" JNIEXPORT jbyte JNICALL Java_org_jetbrains_skia_BitmapKt__1nExtractAlpha
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapKt__1nExtractAlpha
   (JNIEnv* env, jclass jclass, jlong ptr, jlong dstPtr, jlong paintPtr, jintArray resultPoint) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(ptr));
     SkBitmap* dst = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(dstPtr));
@@ -264,9 +264,9 @@ extern "C" JNIEXPORT jbyte JNICALL Java_org_jetbrains_skia_BitmapKt__1nExtractAl
         result_int[0] = offset.fX;
         result_int[1] = offset.fY;
         env->ReleaseIntArrayElements(resultPoint, result_int, 0);
-        return 1;
+        return true;
     } else {
-        return 0;
+        return false;
     }
 }
 
