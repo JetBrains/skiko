@@ -37,91 +37,80 @@ SKIKO_EXPORT KFloat org_jetbrains_skia_PathMeasure__1nGetLength
 }
 
 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_PathMeasure__1nGetPosition
-  (KNativePointer ptr, KFloat distance) {
-    TODO("implement org_jetbrains_skia_PathMeasure__1nGetPosition");
-}
-     
-#if 0 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_PathMeasure__1nGetPosition
-  (KNativePointer ptr, KFloat distance) {
+SKIKO_EXPORT KBoolean org_jetbrains_skia_PathMeasure__1nGetPosition
+  (KNativePointer ptr, KFloat distance, KFloat* data) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>((ptr));
     SkPoint position;
-    if (instance->getPosTan(distance, &position, nullptr))
-        return skija::Point::fromSkPoint(env, position);
-    else
-        return nullptr;
-}
-#endif
+    if (instance->getPosTan(distance, &position, nullptr)) {
+        data[0] = position.fX;
+        data[1] = position.fY;
+        return true;
+    }
 
-
-
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_PathMeasure__1nGetTangent
-  (KNativePointer ptr, KFloat distance) {
-    TODO("implement org_jetbrains_skia_PathMeasure__1nGetTangent");
+    return false;
 }
      
-#if 0 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_PathMeasure__1nGetTangent
-  (KNativePointer ptr, KFloat distance) {
+SKIKO_EXPORT KBoolean org_jetbrains_skia_PathMeasure__1nGetTangent
+  (KNativePointer ptr, KFloat distance, KFloat* data) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>((ptr));
     SkVector tangent;
-    if (instance->getPosTan(distance, nullptr, &tangent))
-        return skija::Point::fromSkPoint(env, tangent);
-    else
-        return nullptr;
-}
-#endif
 
+    if (instance->getPosTan(distance, nullptr, &tangent)) {
+        data[0] = tangent.fX;
+        data[1] = tangent.fY;
+        return true;
+    }
 
-
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_PathMeasure__1nGetRSXform
-  (KNativePointer ptr, KFloat distance) {
-    TODO("implement org_jetbrains_skia_PathMeasure__1nGetRSXform");
+    return false;
 }
      
-#if 0 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_PathMeasure__1nGetRSXform
-  (KNativePointer ptr, KFloat distance) {
+SKIKO_EXPORT KBoolean org_jetbrains_skia_PathMeasure__1nGetRSXform
+  (KNativePointer ptr, KFloat distance, KFloat* data) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>((ptr));
     SkPoint position;
     SkVector tangent;
-    if (instance->getPosTan(distance, &position, &tangent))
-        return env->NewObject(skija::RSXform::cls, skija::RSXform::ctor, tangent.fX, tangent.fY, position.fX, position.fY);
-    else
-        return nullptr;
-}
-#endif
+    if (instance->getPosTan(distance, &position, &tangent)) {
+        data[0] = tangent.fX;
+        data[1] = tangent.fY;
+        data[2] = position.fX;
+        data[3] = position.fY;
+        return true;
+    }
 
-
-
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_PathMeasure__1nGetMatrix
-  (KNativePointer ptr, KFloat distance, KBoolean getPosition, KBoolean getTangent) {
-    TODO("implement org_jetbrains_skia_PathMeasure__1nGetMatrix");
+    return false;
 }
      
-#if 0 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_PathMeasure__1nGetMatrix
-  (KNativePointer ptr, KFloat distance, KBoolean getPosition, KBoolean getTangent) {
-    SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>((ptr));
-    SkMatrix matrix;
-    int flags = 0;
-    
-    if (getPosition)
-        flags |= SkPathMeasure::MatrixFlags::kGetPosition_MatrixFlag;
-    if (getTangent)
-        flags |= SkPathMeasure::MatrixFlags::kGetTangent_MatrixFlag;
+SKIKO_EXPORT KBoolean org_jetbrains_skia_PathMeasure__1nGetMatrix
+  (KNativePointer ptr, KFloat distance, KBoolean getPosition, KBoolean getTangent, KFloat* data) {
+  SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>((ptr));
+  SkMatrix matrix;
+  int flags = 0;
 
-    if (instance->getMatrix(distance, &matrix, static_cast<SkPathMeasure::MatrixFlags>(flags))) {
-        std::vector<float> floats(9);
-        matrix.get9(floats.data());
-        return javaFloatArray(env, floats);
-    } else
-        return nullptr;
+  if (getPosition)
+      flags |= SkPathMeasure::MatrixFlags::kGetPosition_MatrixFlag;
+  if (getTangent)
+      flags |= SkPathMeasure::MatrixFlags::kGetTangent_MatrixFlag;
+
+  if (instance->getMatrix(distance, &matrix, static_cast<SkPathMeasure::MatrixFlags>(flags))) {
+      float* f;
+      matrix.get9(f);
+
+      data[0] = data[0];
+      data[1] = data[1];
+      data[2] = data[2];
+      data[3] = data[3];
+      data[4] = data[4];
+      data[5] = data[5];
+      data[6] = data[6];
+      data[7] = data[7];
+      data[8] = data[8];
+
+      return true;
+  }
+
+  return false;
 }
-#endif
-
-
+     
 SKIKO_EXPORT KBoolean org_jetbrains_skia_PathMeasure__1nGetSegment
   (KNativePointer ptr, KFloat startD, KFloat endD, KNativePointer dstPtr, KBoolean startWithMoveTo) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>((ptr));

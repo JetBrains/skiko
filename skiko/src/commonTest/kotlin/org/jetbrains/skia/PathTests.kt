@@ -7,7 +7,6 @@ import kotlin.test.assertFalse
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import org.jetbrains.skiko.tests.runTest
-import org.jetbrains.skia.tests.assertCloseEnough
 
 
 class PathTests {

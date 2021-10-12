@@ -34,39 +34,50 @@ extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_PathMeasureKt__1nGet
     return instance->getLength();
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_PathMeasureKt__1nGetPosition
-  (JNIEnv* env, jclass jclass, jlong ptr, jfloat distance) {
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathMeasureKt__1nGetPosition
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloat distance, jfloatArray data) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>(static_cast<uintptr_t>(ptr));
     SkPoint position;
-    if (instance->getPosTan(distance, &position, nullptr))
-        return skija::Point::fromSkPoint(env, position);
-    else
-        return nullptr;
+    if (instance->getPosTan(distance, &position, nullptr)) {
+        jfloat d[2] = { position.fX, position.fY };
+        env->SetFloatArrayRegion(data, 0, 2, d);
+        return true;
+    }
+
+    return false;
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_PathMeasureKt__1nGetTangent
-  (JNIEnv* env, jclass jclass, jlong ptr, jfloat distance) {
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathMeasureKt__1nGetTangent
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloat distance, jfloatArray data) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>(static_cast<uintptr_t>(ptr));
     SkVector tangent;
-    if (instance->getPosTan(distance, nullptr, &tangent))
-        return skija::Point::fromSkPoint(env, tangent);
-    else
-        return nullptr;
+    if (instance->getPosTan(distance, nullptr, &tangent)) {
+        jfloat d[2] = { tangent.fX, tangent.fY };
+        env->SetFloatArrayRegion(data, 0, 2, d);
+        return true;
+    }
+
+    return false;
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_PathMeasureKt__1nGetRSXform
-  (JNIEnv* env, jclass jclass, jlong ptr, jfloat distance) {
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathMeasureKt__1nGetRSXform
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloat distance, jfloatArray data) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>(static_cast<uintptr_t>(ptr));
     SkPoint position;
     SkVector tangent;
-    if (instance->getPosTan(distance, &position, &tangent))
-        return env->NewObject(skija::RSXform::cls, skija::RSXform::ctor, tangent.fX, tangent.fY, position.fX, position.fY);
-    else
-        return nullptr;
+    if (instance->getPosTan(distance, &position, &tangent)) {
+        jfloat d[4] = {
+            tangent.fX, tangent.fY, position.fX, position.fY
+        };
+        env->SetFloatArrayRegion(data, 0, 4, d);
+        return true;
+    }
+
+    return false;
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_PathMeasureKt__1nGetMatrix
-  (JNIEnv* env, jclass jclass, jlong ptr, jfloat distance, jboolean getPosition, jboolean getTangent) {
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathMeasureKt__1nGetMatrix
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloat distance, jboolean getPosition, jboolean getTangent, jfloatArray data) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>(static_cast<uintptr_t>(ptr));
     SkMatrix matrix;
     int flags = 0;
@@ -77,11 +88,27 @@ extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_PathMeasureKt__1nGe
         flags |= SkPathMeasure::MatrixFlags::kGetTangent_MatrixFlag;
 
     if (instance->getMatrix(distance, &matrix, static_cast<SkPathMeasure::MatrixFlags>(flags))) {
-        std::vector<float> floats(9);
-        matrix.get9(floats.data());
-        return javaFloatArray(env, floats);
-    } else
-        return nullptr;
+        float* floats;
+        matrix.get9(floats);
+
+        jfloat d[9] = {
+          floats[0],
+          floats[1],
+          floats[2],
+          floats[3],
+          floats[4],
+          floats[5],
+          floats[6],
+          floats[7],
+          floats[8]
+        };
+
+        env->SetFloatArrayRegion(data, 0, 9, d);
+
+        return true;
+    }
+
+    return false;
 }
 
 extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathMeasureKt__1nGetSegment

@@ -1,16 +1,45 @@
-package org.jetbrains.skiko
+package org.jetbrains.skia
 
-import org.jetbrains.skia.Matrix33
-import org.jetbrains.skia.Path
-import org.jetbrains.skia.PathMeasure
-import org.jetbrains.skia.Point
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import org.jetbrains.skia.tests.assertCloseEnough
+import org.jetbrains.skia.impl.use
+import org.jetbrains.skiko.tests.runTest
+import kotlin.test.Ignore
 
 class PathMeasureTest {
+
     @Test
-    fun pathMeasureTest() {
+    fun getRSXformTest() = runTest {
+        Path().moveTo(0f, 0f).lineTo(40f, 0f).moveTo(0f, 40f).lineTo(10f, 50f).use { path ->
+            PathMeasure(path, false).use { measure ->
+                assertEquals(RSXform(1.0f, 0f, 0.5f, 0f), measure.getRSXform(0.5f))
+            }
+        }
+    }
+
+    @Test
+    fun getTangent() = runTest {
+        Path().moveTo(0f, 0f).lineTo(20f, 0f).moveTo(0f, 40f).lineTo(30f, 50f).use { path ->
+            PathMeasure(path, false).use { measure ->
+                assertEquals(Point(1f, 0f), measure.getTangent(2f))
+            }
+        }
+    }
+
+    @Test
+    fun getPosition() = runTest {
+        Path().moveTo(0f, 10f).lineTo(20f, 0f).moveTo(0f, 40f).lineTo(30f, 50f).use { path ->
+            PathMeasure(path, false).use { measure ->
+                assertCloseEnough(Point(0.89442724f, 9.552787f), measure.getPosition(1f))
+            }
+        }
+    }
+
+
+    @Test
+    @Ignore
+    fun pathMeasureTest() = runTest {
         Path().moveTo(0f, 0f).lineTo(40f, 0f).moveTo(0f, 40f).lineTo(10f, 50f).use { path ->
             PathMeasure(path, false).use { measure ->
                 Path().lineTo(10f, 10f).use { path2 ->
