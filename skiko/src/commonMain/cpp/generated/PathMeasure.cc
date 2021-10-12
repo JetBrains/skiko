@@ -38,12 +38,12 @@ SKIKO_EXPORT KFloat org_jetbrains_skia_PathMeasure__1nGetLength
 
 
 SKIKO_EXPORT KBoolean org_jetbrains_skia_PathMeasure__1nGetPosition
-  (KNativePointer ptr, KFloat distance, KInt* data) {
+  (KNativePointer ptr, KFloat distance, KFloat* data) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>((ptr));
     SkPoint position;
     if (instance->getPosTan(distance, &position, nullptr)) {
-        data[0] = rawBits(position.fX);
-        data[1] = rawBits(position.fY);
+        data[0] = position.fX;
+        data[1] = position.fY;
         return true;
     }
 
@@ -51,13 +51,13 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_PathMeasure__1nGetPosition
 }
      
 SKIKO_EXPORT KBoolean org_jetbrains_skia_PathMeasure__1nGetTangent
-  (KNativePointer ptr, KFloat distance, KInt* data) {
+  (KNativePointer ptr, KFloat distance, KFloat* data) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>((ptr));
     SkVector tangent;
 
     if (instance->getPosTan(distance, nullptr, &tangent)) {
-        data[0] = rawBits(tangent.fX);
-        data[1] = rawBits(tangent.fY);
+        data[0] = tangent.fX;
+        data[1] = tangent.fY;
         return true;
     }
 
@@ -65,15 +65,15 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_PathMeasure__1nGetTangent
 }
      
 SKIKO_EXPORT KBoolean org_jetbrains_skia_PathMeasure__1nGetRSXform
-  (KNativePointer ptr, KFloat distance, KInt* data) {
+  (KNativePointer ptr, KFloat distance, KFloat* data) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>((ptr));
     SkPoint position;
     SkVector tangent;
     if (instance->getPosTan(distance, &position, &tangent)) {
-        data[0] = rawBits(tangent.fX);
-        data[1] = rawBits(tangent.fY);
-        data[2] = rawBits(position.fX);
-        data[3] = rawBits(position.fY);
+        data[0] = tangent.fX;
+        data[1] = tangent.fY;
+        data[2] = position.fX;
+        data[3] = position.fY;
         return true;
     }
 
@@ -81,7 +81,7 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_PathMeasure__1nGetRSXform
 }
      
 SKIKO_EXPORT KBoolean org_jetbrains_skia_PathMeasure__1nGetMatrix
-  (KNativePointer ptr, KFloat distance, KBoolean getPosition, KBoolean getTangent, KInt* data) {
+  (KNativePointer ptr, KFloat distance, KBoolean getPosition, KBoolean getTangent, KFloat* data) {
   SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>((ptr));
   SkMatrix matrix;
   int flags = 0;
@@ -95,15 +95,15 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_PathMeasure__1nGetMatrix
       float* f;
       matrix.get9(f);
 
-      data[0] = rawBits(data[0]);
-      data[1] = rawBits(data[1]);
-      data[2] = rawBits(data[2]);
-      data[3] = rawBits(data[3]);
-      data[4] = rawBits(data[4]);
-      data[5] = rawBits(data[5]);
-      data[6] = rawBits(data[6]);
-      data[7] = rawBits(data[7]);
-      data[8] = rawBits(data[8]);
+      data[0] = data[0];
+      data[1] = data[1];
+      data[2] = data[2];
+      data[3] = data[3];
+      data[4] = data[4];
+      data[5] = data[5];
+      data[6] = data[6];
+      data[7] = data[7];
+      data[8] = data[8];
 
       return true;
   }

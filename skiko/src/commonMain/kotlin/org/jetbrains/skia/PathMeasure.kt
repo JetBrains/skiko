@@ -80,9 +80,8 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
     fun getPosition(distance: Float): Point? {
         return try {
             Stats.onNativeCall()
-            withNullableResult(IntArray(2)) { _nGetPosition(_ptr, distance, it) }?.let { points ->
-                Point(Float.fromBits(points[0]), Float.fromBits(points[1]))
-
+            withNullableResult(FloatArray(2)) { _nGetPosition(_ptr, distance, it) }?.let { points ->
+                Point(points[0], points[1])
             }
         } finally {
             reachabilityBarrier(this)
@@ -98,8 +97,8 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
     fun getTangent(distance: Float): Point? {
         return try {
             Stats.onNativeCall()
-            withNullableResult(IntArray(2)) { _nGetTangent(_ptr, distance, it) }?.let { points ->
-                Point(Float.fromBits(points[0]), Float.fromBits(points[1]))
+            withNullableResult(FloatArray(2)) { _nGetTangent(_ptr, distance, it) }?.let { points ->
+                Point(points[0], points[1])
             }
         } finally {
             reachabilityBarrier(this)
@@ -115,14 +114,14 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
     fun getRSXform(distance: Float): RSXform? {
         return try {
             Stats.onNativeCall()
-            withNullableResult(IntArray(4)) {
+            withNullableResult(FloatArray(4)) {
                 _nGetRSXform(_ptr, distance, it)
             }?.let { data ->
                 RSXform(
-                    Float.fromBits(data[0]),
-                    Float.fromBits(data[1]),
-                    Float.fromBits(data[2]),
-                    Float.fromBits(data[3])
+                    data[0],
+                    data[1],
+                    data[2],
+                    data[3]
                 )
             }
         } finally {
@@ -139,19 +138,19 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
     fun getMatrix(distance: Float, getPosition: Boolean, getTangent: Boolean): Matrix33? {
         return try {
             Stats.onNativeCall()
-            withNullableResult(IntArray(9)) {
+            withNullableResult(FloatArray(9)) {
                 _nGetMatrix(_ptr, distance, getPosition, getTangent, it)
             }?.let { data ->
                 Matrix33(
-                    Float.fromBits(data[0]),
-                    Float.fromBits(data[1]),
-                    Float.fromBits(data[2]),
-                    Float.fromBits(data[3]),
-                    Float.fromBits(data[4]),
-                    Float.fromBits(data[5]),
-                    Float.fromBits(data[6]),
-                    Float.fromBits(data[7]),
-                    Float.fromBits(data[8])
+                    data[0],
+                    data[1],
+                    data[2],
+                    data[3],
+                    data[4],
+                    data[5],
+                    data[6],
+                    data[7],
+                    data[8]
                 )
             }
         } finally {
@@ -211,7 +210,7 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
     }
 }
 
-private inline fun withNullableResult(result: IntArray, block: (InteropPointer) -> Boolean): IntArray? = interopScope {
+private inline fun withNullableResult(result: FloatArray, block: (InteropPointer) -> Boolean): FloatArray? = interopScope {
     val handle = toInterop(result)
     val blockResult = block(handle)
     if (blockResult) {
