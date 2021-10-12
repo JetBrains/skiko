@@ -36,7 +36,7 @@ SKIKO_EXPORT void org_jetbrains_skia_Bitmap__1nSwap
 
 
 SKIKO_EXPORT void org_jetbrains_skia_Bitmap__1nGetImageInfo
-  (KNativePointer ptr, KInt* imageInfoResult, KNativePointerArray colorSpacePtrs) {
+  (KNativePointer ptr, KInt* imageInfoResult, KNativePointer* colorSpacePtrsArray) {
 
   SkBitmap* instance = reinterpret_cast<SkBitmap*>(ptr);
   SkImageInfo imageInfo = instance->info();
@@ -46,8 +46,7 @@ SKIKO_EXPORT void org_jetbrains_skia_Bitmap__1nGetImageInfo
   imageInfoResult[2] = static_cast<int>(imageInfo.colorType());
   imageInfoResult[3] = static_cast<int>(imageInfo.alphaType());
 
-  KNativePointer* arr = static_cast<KNativePointer*>(colorSpacePtrs);
-  arr[0] = reinterpret_cast<KNativePointer>(imageInfo.colorSpace());
+  colorSpacePtrsArray[0] = imageInfo.refColorSpace().release();
 }
 
 #if 0
