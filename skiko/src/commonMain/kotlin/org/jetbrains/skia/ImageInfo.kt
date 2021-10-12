@@ -48,8 +48,8 @@ class ImageInfo(val colorInfo: ColorInfo, val width: Int, val height: Int) {
      * specifies getBytesPerPixel(). Bitmap maximum value for row bytes must fit
      * in 31 bits.
      */
-    val minRowBytes: Long
-        get() = (width * bytesPerPixel).toLong()
+    val minRowBytes: Int
+        get() = (width * bytesPerPixel)
 
     val colorType: ColorType
         get() = colorInfo.colorType
@@ -172,7 +172,7 @@ class ImageInfo(val colorInfo: ColorInfo, val width: Int, val height: Int) {
      *
      * @see [https://fiddle.skia.org/c/@ImageInfo_computeByteSize](https://fiddle.skia.org/c/@ImageInfo_computeByteSize)
      */
-    fun computeByteSize(rowBytes: Long): Long {
+    fun computeByteSize(rowBytes: Int): Int {
         return if (0 == height) 0 else (height - 1) * rowBytes + width * bytesPerPixel
     }
 
@@ -185,7 +185,7 @@ class ImageInfo(val colorInfo: ColorInfo, val width: Int, val height: Int) {
      *
      * @return  least memory required by pixel buffer
      */
-    fun computeMinByteSize(): Long {
+    fun computeMinByteSize(): Int {
         return computeByteSize(minRowBytes)
     }
 

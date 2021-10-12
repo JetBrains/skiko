@@ -144,7 +144,9 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
     val rowBytes: Int
         get() = try {
             Stats.onNativeCall()
-            _nGetRowBytes(_ptr)
+            _nGetRowBytes(_ptr).also {
+                println("Row bytes = $it")
+            }
         } finally {
             reachabilityBarrier(this)
         }
@@ -386,7 +388,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
      *
      * @see [https://fiddle.skia.org/c/@Bitmap_setInfo](https://fiddle.skia.org/c/@Bitmap_setInfo)
      */
-    fun setImageInfo(imageInfo: ImageInfo, rowBytes: Long): Boolean {
+    fun setImageInfo(imageInfo: ImageInfo, rowBytes: Int): Boolean {
         return try {
             _imageInfo = null
             Stats.onNativeCall()
@@ -463,7 +465,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
      * @param rowBytes  size of pixel row or larger; may be zero
      * @return          true if pixel storage is allocated
      */
-    fun allocPixels(info: ImageInfo, rowBytes: Long): Boolean {
+    fun allocPixels(info: ImageInfo, rowBytes: Int): Boolean {
         return try {
             _imageInfo = null
             Stats.onNativeCall()
@@ -1109,7 +1111,7 @@ private external fun _nSetImageInfo(
     colorType: Int,
     alphaType: Int,
     colorSpacePtr: NativePointer,
-    rowBytes: Long
+    rowBytes: Int
 ): Boolean
 
 
@@ -1133,7 +1135,7 @@ private external fun _nAllocPixelsRowBytes(
     colorType: Int,
     alphaType: Int,
     colorSpacePtr: NativePointer,
-    rowBytes: Long
+    rowBytes: Int
 ): Boolean
 
 
