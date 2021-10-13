@@ -237,12 +237,9 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapKt__1nReadPi
                                               static_cast<SkColorType>(colorType),
                                               static_cast<SkAlphaType>(alphaType),
                                               sk_ref_sp<SkColorSpace>(colorSpace));
-    if (instance->readPixels(imageInfo, result_bytes, rowBytes, srcX, srcY)) {
-        env->ReleaseByteArrayElements(readBytes, result_bytes, 0);
-        return true;
-    } else {
-        return false;
-    }
+    jboolean result = instance->readPixels(imageInfo, result_bytes, rowBytes, srcX, srcY);
+    env->ReleaseByteArrayElements(readBytes, result_bytes, 0);
+    return result;
 }
 
 extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapKt__1nExtractAlpha
@@ -253,14 +250,14 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapKt__1nExtrac
     SkIPoint offset;
 
     jint *result_int = env->GetIntArrayElements(resultPoint, NULL);
-    if (instance->extractAlpha(dst, paint, &offset)) {
+    jboolean result = instance->extractAlpha(dst, paint, &offset);
+
+    if (result) {
         result_int[0] = offset.fX;
         result_int[1] = offset.fY;
-        env->ReleaseIntArrayElements(resultPoint, result_int, 0);
-        return true;
-    } else {
-        return false;
     }
+    env->ReleaseIntArrayElements(resultPoint, result_int, 0);
+    return result;
 }
 
 extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_BitmapKt__1nPeekPixels
