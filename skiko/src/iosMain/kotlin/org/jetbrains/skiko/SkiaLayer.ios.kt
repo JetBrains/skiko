@@ -3,20 +3,26 @@ package org.jetbrains.skiko
 import kotlinx.cinterop.*
 import org.jetbrains.skia.PictureRecorder
 import org.jetbrains.skia.Rect
+import org.jetbrains.skiko.context.MetalContextHandler
+import org.jetbrains.skiko.redrawer.MetalRedrawer
 import org.jetbrains.skiko.redrawer.Redrawer
 import platform.Foundation.*
 import platform.UIKit.*
 
 actual open class SkiaLayer actual constructor(
-    properties: SkiaLayerProperties
+    val properties: SkiaLayerProperties
 ) {
-    var width: Int = 0
-    var height: Int = 0
+    var width: Float = 0f
+    var height: Float = 0f
 
-    constructor(width: Int, height: Int) : this(
+    constructor(width: Float, height: Float) : this(
         makeDefaultSkiaLayerProperties()) {
         this.width = width
         this.height = height
+    }
+
+    fun isShowing(): Boolean {
+        return true
     }
 
     actual var renderApi: GraphicsApi
@@ -40,22 +46,21 @@ actual open class SkiaLayer actual constructor(
 
     lateinit var view: UIView
 
-    fun initLayer() {
+    fun initLayer(view: UIView) {
         println("SkiaLayer.initLayer")
-        //redrawer = createNativeRedrawer(this, renderApi, properties)
+        this.view = view
+        redrawer = MetalRedrawer(this, properties)
         redrawer?.redrawImmediately()
     }
 
     var renderer: SkiaRenderer? = null
-    private var redrawer: Redrawer? = null
+    internal var redrawer: MetalRedrawer? = null
     private var picture: PictureHolder? = null
     private val pictureRecorder = PictureRecorder()
+    private val contextHandler = MetalContextHandler(this)
 
     fun update(nanoTime: Long) {
         println("SkiaLayer.update")
-
-        val width = 800f
-        val height = 600f
 
         val pictureWidth = (width * contentScale).coerceAtLeast(0.0F)
         val pictureHeight = (height * contentScale).coerceAtLeast(0.0F)
@@ -66,5 +71,28 @@ actual open class SkiaLayer actual constructor(
 
         val picture = pictureRecorder.finishRecordingAsPicture()
         this.picture = PictureHolder(picture, pictureWidth.toInt(), pictureHeight.toInt())
+    }
+
+    private var initedCanvas = false
+
+    fun draw() {
+        println("SkiaLayer.draw")
+        contextHandler.apply {
+            if (!initedCanvas) {
+                if (!initContext()) {
+                    error("initContext() failure")
+                    return
+                }
+                initCanvas()
+                initedCanvas = true
+            }
+            clearCanvas()
+            val picture = picture
+            println("SkiaLayer.draw: picture=$picture")
+            if (picture != null) {
+                drawOnCanvas(picture.instance)
+            }
+            flush()
+        }
     }
 }

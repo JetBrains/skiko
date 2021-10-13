@@ -275,7 +275,7 @@ val skiaDir: Provider<File> = run {
 val skiaBinSubdir = "out/${buildType.id}-${targetOs.id}-${targetArch.id}"
 
 val Project.supportNative: Boolean
-   get() = properties.get("skiko.native.enabled") == "true"
+   get() = true // properties.get("skiko.native.enabled") == "true"
 
 val Project.supportWasm: Boolean
     get() = properties.get("skiko.wasm.enabled") == "true"
@@ -393,6 +393,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(kotlin("stdlib-common"))
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
             }
         }
         val commonTest by getting {

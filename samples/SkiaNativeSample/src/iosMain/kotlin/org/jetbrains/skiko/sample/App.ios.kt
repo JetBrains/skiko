@@ -4,6 +4,7 @@ package org.jetbrains.skiko.sample
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
 import kotlinx.cinterop.*
+import kotlinx.coroutines.runBlocking
 import platform.UIKit.*
 import platform.Foundation.*
 
@@ -14,12 +15,14 @@ fun main() {
 }
 
 fun runSkikoMain(args: Array<String> = emptyArray()) {
-    memScoped {
-        val argc = args.size + 1
-        val argv = (arrayOf("skikoApp") + args).map { it.cstr.ptr }.toCValues()
+    runBlocking {
+        memScoped {
+            val argc = args.size + 1
+            val argv = (arrayOf("skikoApp") + args).map { it.cstr.ptr }.toCValues()
 
-        autoreleasepool {
-            UIApplicationMain(argc, argv, null, NSStringFromClass(SkikoAppDelegate))
+            autoreleasepool {
+                UIApplicationMain(argc, argv, null, NSStringFromClass(SkikoAppDelegate))
+            }
         }
     }
 }
