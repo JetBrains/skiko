@@ -134,10 +134,10 @@ extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_paragraph_Para
     auto conv = skija::UtfIndicesConverter(*text);
     for (int i = 0; i < res.size(); ++i) {
         LineMetrics lm = res[i];
-        size_t startIndex = conv.from8To16(lm.fStartIndex);
-        size_t endExcludingWhitespaces = conv.from8To16(lm.fEndExcludingWhitespaces);
-        size_t endIndex = conv.from8To16(lm.fEndIndex);
-        size_t endIncludingNewline = conv.from8To16(lm.fEndIncludingNewline);
+        size_t startIndex = lm.fStartIndex;
+        size_t endExcludingWhitespaces = lm.fEndExcludingWhitespaces;
+        size_t endIndex = lm.fEndIndex;
+        size_t endIncludingNewline = lm.fEndIncludingNewline;
         jobject lmObj = env->NewObject(skija::paragraph::LineMetrics::cls, skija::paragraph::LineMetrics::ctor, startIndex, endIndex, endExcludingWhitespaces, endIncludingNewline, lm.fHardBreak, lm.fAscent, lm.fDescent, lm.fUnscaledAscent, lm.fHeight, lm.fWidth, lm.fLeft, lm.fBaseline, lm.fLineNumber);
         env->SetObjectArrayElement(resArray, i, lmObj);
         env->DeleteLocalRef(lmObj);
