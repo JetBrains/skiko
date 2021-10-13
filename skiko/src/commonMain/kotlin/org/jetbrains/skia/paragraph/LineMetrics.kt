@@ -12,13 +12,8 @@ class LineMetrics(
      * The index in the text buffer the line ends.
      */
     val endIndex: Int,
-    /**
-     * The index in the text buffer the line ends.
-     */
+
     val endExcludingWhitespaces: Int,
-    /**
-     * The index in the text buffer the line begins.
-     */
     val endIncludingNewline: Int,
     val isHardBreak: Boolean,
     /**
