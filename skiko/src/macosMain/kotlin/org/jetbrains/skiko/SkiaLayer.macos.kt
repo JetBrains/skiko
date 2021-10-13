@@ -15,16 +15,10 @@ actual open class SkiaLayer actual constructor(
         get() = _contentScale
 
     actual var fullscreen: Boolean
-        get() = false
-        set(value) {
-            if (value) throw IllegalArgumentException("fullscreen unsupported")
-        }
+        get() = TODO("Not yet implemented")
+        set(value) {}
 
-    actual var transparency: Boolean
-        get() = false
-        set(value) {
-            if (value) throw IllegalArgumentException("transparency unsupported")
-        }
+    actual var transparency: Boolean = false
 
     val nsView = NSView(NSMakeRect(0.0, 0.0, 640.0, 480.0))
     var _contentScale: Float = 1.0f
