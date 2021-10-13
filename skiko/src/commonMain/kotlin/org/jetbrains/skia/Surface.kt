@@ -39,7 +39,7 @@ class Surface : RefCnt {
         fun makeRasterDirect(
             imageInfo: ImageInfo,
             pixelsPtr: NativePointer,
-            rowBytes: NativePointer
+            rowBytes: Int
         ): Surface {
             return makeRasterDirect(imageInfo, pixelsPtr, rowBytes, null)
         }
@@ -50,9 +50,11 @@ class Surface : RefCnt {
         ): Surface {
             return try {
                 Stats.onNativeCall()
-                val ptr = _nMakeRasterDirectWithPixmap(
-                    getPtr(pixmap), surfaceProps
-                )
+                val ptr = interopScope {
+                    _nMakeRasterDirectWithPixmap(
+                        getPtr(pixmap), toInterop(surfaceProps?.packToIntArray())
+                    )
+                }
                 require(ptr != NullPointer) {
                     "Failed Surface.makeRasterDirect($pixmap, $surfaceProps)"
                 }
@@ -94,21 +96,23 @@ class Surface : RefCnt {
         fun makeRasterDirect(
             imageInfo: ImageInfo,
             pixelsPtr: NativePointer,
-            rowBytes: NativePointer,
+            rowBytes: Int,
             surfaceProps: SurfaceProps?
         ): Surface {
             return try {
                 Stats.onNativeCall()
-                val ptr = _nMakeRasterDirect(
-                    imageInfo.width,
-                    imageInfo.height,
-                    imageInfo.colorInfo.colorType.ordinal,
-                    imageInfo.colorInfo.alphaType.ordinal,
-                    getPtr(imageInfo.colorInfo.colorSpace),
-                    pixelsPtr,
-                    rowBytes,
-                    surfaceProps
-                )
+                val ptr = interopScope {
+                    _nMakeRasterDirect(
+                        imageInfo.width,
+                        imageInfo.height,
+                        imageInfo.colorInfo.colorType.ordinal,
+                        imageInfo.colorInfo.alphaType.ordinal,
+                        getPtr(imageInfo.colorInfo.colorSpace),
+                        pixelsPtr,
+                        rowBytes,
+                        toInterop(surfaceProps?.packToIntArray())
+                    )
+                }
                 require(ptr != NullPointer) {
                     "Failed Surface.makeRasterDirect($imageInfo, $pixelsPtr, $rowBytes, $surfaceProps)"
                 }
@@ -135,7 +139,7 @@ class Surface : RefCnt {
          * @return              new Surface
          */
         fun makeRaster(imageInfo: ImageInfo): Surface {
-            return makeRaster(imageInfo, NullPointer, null)
+            return makeRaster(imageInfo, imageInfo.minRowBytes, null)
         }
 
         /**
@@ -162,7 +166,7 @@ class Surface : RefCnt {
          */
         fun makeRaster(
             imageInfo: ImageInfo,
-            rowBytes: NativePointer
+            rowBytes: Int
         ): Surface {
             return makeRaster(imageInfo, rowBytes, null)
         }
@@ -193,20 +197,22 @@ class Surface : RefCnt {
          */
         fun makeRaster(
             imageInfo: ImageInfo,
-            rowBytes: NativePointer,
+            rowBytes: Int,
             surfaceProps: SurfaceProps?
         ): Surface {
             return try {
                 Stats.onNativeCall()
-                val ptr = _nMakeRaster(
-                    imageInfo.width,
-                    imageInfo.height,
-                    imageInfo.colorInfo.colorType.ordinal,
-                    imageInfo.colorInfo.alphaType.ordinal,
-                    getPtr(imageInfo.colorInfo.colorSpace),
-                    rowBytes,
-                    surfaceProps
-                )
+                val ptr = interopScope {
+                    _nMakeRaster(
+                        imageInfo.width,
+                        imageInfo.height,
+                        imageInfo.colorInfo.colorType.ordinal,
+                        imageInfo.colorInfo.alphaType.ordinal,
+                        getPtr(imageInfo.colorInfo.colorSpace),
+                        rowBytes,
+                        toInterop(surfaceProps?.packToIntArray())
+                    )
+                }
                 require(ptr != NullPointer) {
                     "Failed Surface.makeRaster($imageInfo, $rowBytes, $surfaceProps)"
                 }
@@ -1011,13 +1017,13 @@ private external fun _nMakeRasterDirect(
     alphaType: Int,
     colorSpacePtr: NativePointer,
     pixelsPtr: NativePointer,
-    rowBytes: NativePointer,
-    surfaceProps: SurfaceProps?
+    rowBytes: Int,
+    surfaceProps: InteropPointer
 ): NativePointer
 
 
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeRasterDirectWithPixmap")
-private external fun _nMakeRasterDirectWithPixmap(pixmapPtr: NativePointer, surfaceProps: SurfaceProps?): NativePointer
+private external fun _nMakeRasterDirectWithPixmap(pixmapPtr: NativePointer, surfaceProps: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeRaster")
 private external fun _nMakeRaster(
@@ -1026,8 +1032,8 @@ private external fun _nMakeRaster(
     colorType: Int,
     alphaType: Int,
     colorSpacePtr: NativePointer,
-    rowBytes: NativePointer,
-    surfaceProps: SurfaceProps?
+    rowBytes: Int,
+    surfaceProps: InteropPointer
 ): NativePointer
 
 

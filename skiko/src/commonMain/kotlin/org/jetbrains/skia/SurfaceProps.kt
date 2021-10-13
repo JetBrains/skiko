@@ -44,4 +44,8 @@ class SurfaceProps constructor(
     fun withPixelGeometry(_pixelGeometry: PixelGeometry): SurfaceProps {
         return if (pixelGeometry == _pixelGeometry) this else SurfaceProps(isDeviceIndependentFonts, _pixelGeometry)
     }
+
+    internal fun packToIntArray(): IntArray {
+        return intArrayOf(_getFlags(), _getPixelGeometryOrdinal())
+    }
 }
