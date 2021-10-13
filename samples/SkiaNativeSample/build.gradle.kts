@@ -6,7 +6,7 @@ val coroutinesVersion = "1.5.2"
 
 repositories {
     mavenLocal()
-    jcenter()
+    mavenCentral()
     maven("https://dl.bintray.com/kotlin/kotlin-eap")
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
@@ -56,6 +56,7 @@ kotlin {
                     freeCompilerArgs += listOf(
                         "-linker-option", "-framework", "-linker-option", "Metal",
                         "-linker-option", "-framework", "-linker-option", "CoreText",
+                        "-linker-option", "-framework", "-linker-option", "CoreGraphics"
                     )
                 }
             }
