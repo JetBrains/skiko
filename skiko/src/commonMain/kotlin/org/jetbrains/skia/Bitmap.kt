@@ -904,7 +904,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
         srcY: Int = 0
     ): ByteArray? {
         return try {
-            val size = min(dstInfo.height, height - srcY) * rowBytes
+            val size = min(dstInfo.height, height - srcY) * dstRowBytes
 
             Stats.onNativeCall()
             withNullableResult(ByteArray(size)) {
