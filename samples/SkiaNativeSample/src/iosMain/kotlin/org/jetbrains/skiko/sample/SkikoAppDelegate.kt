@@ -1,6 +1,7 @@
 package org.jetbrains.skiko.sample
 
 import kotlinx.cinterop.*
+import kotlinx.coroutines.runBlocking
 import platform.Foundation.*
 import platform.UIKit.*
 
@@ -21,5 +22,6 @@ class SkikoAppDelegate : UIResponder, UIApplicationDelegateProtocol {
         window!!.rootViewController = SkikoViewController()
         window!!.makeKeyAndVisible()
         return true
+        runBlocking {  }
     }
 }

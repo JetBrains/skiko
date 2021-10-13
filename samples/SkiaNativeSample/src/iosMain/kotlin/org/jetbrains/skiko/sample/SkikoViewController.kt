@@ -1,6 +1,7 @@
 package org.jetbrains.skiko.sample
 
 import kotlinx.cinterop.*
+import kotlinx.coroutines.runBlocking
 import org.jetbrains.skiko.GenericRenderer
 import org.jetbrains.skiko.SkiaLayer
 import platform.CoreGraphics.CGRect
@@ -27,9 +28,12 @@ class SkikoViewController : UIViewController {
         view.setFrame(CGRectMake(0.0, 0.0, width, height))
 
         val layer = SkiaLayer(width.toFloat(), height.toFloat())
-        layer.renderer = GenericRenderer(layer) {
-                canvas, w, h, nanoTime -> displayScene(canvas, nanoTime)
+        layer.renderer = GenericRenderer(layer) { canvas, w, h, nanoTime ->
+            displayScene(canvas, nanoTime)
         }
         layer.initLayer(view)
+        runBlocking {
+
+        }
     }
 }

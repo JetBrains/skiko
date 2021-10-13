@@ -4,7 +4,10 @@ import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.autoreleasepool
 import kotlinx.cinterop.objcPtr
 import kotlinx.cinterop.usePinned
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.jetbrains.skia.BackendRenderTarget
 import org.jetbrains.skia.DirectContext
 import org.jetbrains.skiko.FrameDispatcher
@@ -36,6 +39,16 @@ internal class MetalRedrawer(
         if (layer.isShowing()) {
             update(getTimeNanos())
             draw()
+        }
+    }
+
+    private val frameDispatcher2 = CoroutineScope(Dispatchers.Main).launch {
+        println("launched alt dispatcher")
+        while (true) {
+            println("next forced frame")
+            update(getTimeNanos())
+            draw()
+            delay(16)
         }
     }
 
@@ -116,7 +129,6 @@ class MetalLayer(
         this.opaque = true
         this.frame = skiaLayer.view.frame
         skiaLayer.view.layer.addSublayer(this)
-        presentsWithTransaction = true
     }
 
     fun draw()  {
