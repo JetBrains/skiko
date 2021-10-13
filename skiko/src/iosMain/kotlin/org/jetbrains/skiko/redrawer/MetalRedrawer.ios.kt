@@ -13,13 +13,11 @@ import org.jetbrains.skiko.SkiaLayerProperties
 import platform.CoreGraphics.CGColorCreate
 import platform.CoreGraphics.CGColorSpaceCreateDeviceRGB
 import platform.CoreGraphics.CGContextRef
-import platform.CoreGraphics.CGRectMake
 import platform.Metal.MTLCreateSystemDefaultDevice
 import platform.Metal.MTLDeviceProtocol
 import platform.Metal.MTLPixelFormatBGRA8Unorm
 import platform.QuartzCore.CAMetalDrawableProtocol
 import platform.QuartzCore.CAMetalLayer
-import platform.QuartzCore.CATransaction
 import platform.QuartzCore.kCAGravityTopLeft
 import kotlin.system.getTimeNanos
 
@@ -87,7 +85,6 @@ internal class MetalRedrawer(
         autoreleasepool {
             performDraw()
         }
-        metalLayer.setNeedsDisplay()
     }
 
     fun finishFrame() {
@@ -102,7 +99,7 @@ internal class MetalRedrawer(
 }
 
 class MetalLayer(
-    private val layer: SkiaLayer,
+    private val skiaLayer: SkiaLayer,
     theDevice: MTLDeviceProtocol
 ) : CAMetalLayer() {
     init {
@@ -116,22 +113,16 @@ class MetalLayer(
             this.backgroundColor =
                 CGColorCreate(CGColorSpaceCreateDeviceRGB(), it.addressOf(0))
         }
-        this.opaque = false
-        this.frame = layer.view.frame
-        layer.view.layer.addSublayer(this)
+        this.opaque = true
+        this.frame = skiaLayer.view.frame
+        skiaLayer.view.layer.addSublayer(this)
+        presentsWithTransaction = true
     }
 
     fun draw()  {
-        println("MetalDrawer.draw")
-        layer.update(getTimeNanos())
-        layer.draw()
-    }
-
-    fun setFrame(x: Int, y: Int, width: Int, height: Int) {
-        CATransaction.begin()
-        CATransaction.setDisableActions(true)
-        this.frame = CGRectMake(x.toDouble(), y.toDouble(), width.toDouble(), height.toDouble())
-        CATransaction.commit()
+        println("MetalLayer.draw")
+        skiaLayer.update(getTimeNanos())
+        skiaLayer.draw()
     }
 
     fun dispose() {

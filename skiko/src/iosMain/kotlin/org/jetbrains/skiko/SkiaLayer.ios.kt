@@ -1,6 +1,8 @@
 package org.jetbrains.skiko
 
 import kotlinx.cinterop.*
+import org.jetbrains.skia.Color
+import org.jetbrains.skia.Paint
 import org.jetbrains.skia.PictureRecorder
 import org.jetbrains.skia.Rect
 import org.jetbrains.skiko.context.MetalContextHandler
@@ -68,7 +70,6 @@ actual open class SkiaLayer actual constructor(
         val bounds = Rect.makeWH(pictureWidth, pictureHeight)
         val canvas = pictureRecorder.beginRecording(bounds)
         renderer?.onRender(canvas, pictureWidth.toInt(), pictureHeight.toInt(), nanoTime)
-
         val picture = pictureRecorder.finishRecordingAsPicture()
         this.picture = PictureHolder(picture, pictureWidth.toInt(), pictureHeight.toInt())
     }

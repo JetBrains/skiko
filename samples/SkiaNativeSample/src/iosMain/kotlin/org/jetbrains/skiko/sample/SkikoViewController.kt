@@ -1,6 +1,7 @@
 package org.jetbrains.skiko.sample
 
 import kotlinx.cinterop.*
+import org.jetbrains.skiko.GenericRenderer
 import org.jetbrains.skiko.SkiaLayer
 import platform.CoreGraphics.CGRect
 import platform.CoreGraphics.CGRectMake
@@ -25,18 +26,10 @@ class SkikoViewController : UIViewController {
         }
         view.setFrame(CGRectMake(0.0, 0.0, width, height))
 
-        val skikoView = UIView().apply {
-            setFrame(CGRectMake(0.0, 0.0, width, height))
-            backgroundColor = UIColor.blueColor
-            view.addSubview(this@apply)
-            translatesAutoresizingMaskIntoConstraints = false
-            leadingAnchor.constraintEqualToAnchor(view.leadingAnchor).active = true
-            topAnchor.constraintEqualToAnchor(view.topAnchor).active = true
-            widthAnchor.constraintEqualToAnchor(view.widthAnchor).active = true
-            heightAnchor.constraintEqualToAnchor(view.heightAnchor).active = true
-        }
-
         val layer = SkiaLayer(width.toFloat(), height.toFloat())
+        layer.renderer = GenericRenderer(layer) {
+                canvas, w, h, nanoTime -> displayScene(canvas, nanoTime)
+        }
         layer.initLayer(view)
     }
 }
