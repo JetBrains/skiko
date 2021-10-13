@@ -1,4 +1,4 @@
-package org.jetbrains.skiko
+package org.jetbrains.skiko.sample
 
 import kotlinx.cinterop.*
 import platform.Foundation.*
@@ -21,16 +21,5 @@ class SkikoAppDelegate : UIResponder, UIApplicationDelegateProtocol {
         window!!.rootViewController = SkikoViewController()
         window!!.makeKeyAndVisible()
         return true
-    }
-}
-
-fun runSkikoMain(args: Array<String> = emptyArray()) {
-    memScoped {
-        val argc = args.size + 1
-        val argv = (arrayOf("skikoApp") + args).map { it.cstr.ptr }.toCValues()
-
-        autoreleasepool {
-            UIApplicationMain(argc, argv, null, NSStringFromClass(SkikoAppDelegate))
-        }
     }
 }

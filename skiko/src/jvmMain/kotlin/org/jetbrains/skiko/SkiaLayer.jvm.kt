@@ -28,6 +28,7 @@ actual open class SkiaLayer internal constructor(
     private val properties: SkiaLayerProperties = makeDefaultSkiaLayerProperties(),
     private val renderFactory: RenderFactory
 ) : JPanel() {
+
     companion object {
         init {
             Library.load()
@@ -42,6 +43,11 @@ actual open class SkiaLayer internal constructor(
     actual var transparency: Boolean = false
 
     internal val backedLayer: HardwareLayer
+
+    actual constructor(
+        properties: SkiaLayerProperties
+    ) : this(null, properties, RenderFactory.Default)
+
 
     constructor(
         properties: SkiaLayerProperties = makeDefaultSkiaLayerProperties(),
@@ -311,7 +317,7 @@ actual open class SkiaLayer internal constructor(
     /**
      * Redraw on the next animation Frame (on vsync signal if vsync is enabled).
      */
-    fun needRedraw() {
+    actual fun needRedraw() {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         check(!isDisposed) { "SkiaLayer is disposed" }
         redrawer?.needRedraw()

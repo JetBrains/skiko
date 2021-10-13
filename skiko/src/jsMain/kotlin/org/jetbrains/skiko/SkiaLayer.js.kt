@@ -1,6 +1,8 @@
 package org.jetbrains.skiko
 
-actual open class SkiaLayer {
+actual open class SkiaLayer actual constructor(
+    properties: SkiaLayerProperties
+) {
     actual var renderApi: GraphicsApi = GraphicsApi.WEBGL
     actual val contentScale: Float
         get() = 1.0f
@@ -10,4 +12,7 @@ actual open class SkiaLayer {
     actual var transparency: Boolean
         get() = false
         set(value) = throw Exception("Transparency is not supported!")
+    actual fun needRedraw() {
+        TODO("unimplemented")
+    }
 }
