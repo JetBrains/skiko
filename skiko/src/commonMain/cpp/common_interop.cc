@@ -157,4 +157,15 @@ namespace skija {
             colorSpacePtrsArray[0] = imageInfo.refColorSpace().release();
         }
     }
+
+    namespace SurfaceProps {
+        std::unique_ptr<SkSurfaceProps> toSkSurfaceProps(KInt* surfacePropsInts) {
+            if (surfacePropsInts == nullptr) {
+                return std::unique_ptr<SkSurfaceProps>(nullptr);
+            }
+            int flags = surfacePropsInts[0];
+            SkPixelGeometry geom = static_cast<SkPixelGeometry>(surfacePropsInts[1]);
+            return std::make_unique<SkSurfaceProps>(flags, geom);
+        }
+    }
 }

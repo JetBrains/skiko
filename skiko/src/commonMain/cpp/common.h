@@ -59,6 +59,10 @@ namespace skija {
     namespace ImageInfo {
        void writeImageInfoForInterop(SkImageInfo imageInfo, KInt* imageInfoResult, KNativePointer* colorSpacePtrsArray);
     }
+
+    namespace SurfaceProps {
+        std::unique_ptr<SkSurfaceProps> toSkSurfaceProps(KInt* surfacePropsInts);
+    }
 }
 
 std::unique_ptr<SkMatrix> skMatrix(KFloat* matrixArray);
