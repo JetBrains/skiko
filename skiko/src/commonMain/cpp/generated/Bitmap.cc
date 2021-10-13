@@ -40,13 +40,7 @@ SKIKO_EXPORT void org_jetbrains_skia_Bitmap__1nGetImageInfo
 
   SkBitmap* instance = reinterpret_cast<SkBitmap*>(ptr);
   SkImageInfo imageInfo = instance->info();
-
-  imageInfoResult[0] = instance->width();
-  imageInfoResult[1] = instance->height();
-  imageInfoResult[2] = static_cast<int>(imageInfo.colorType());
-  imageInfoResult[3] = static_cast<int>(imageInfo.alphaType());
-
-  colorSpacePtrsArray[0] = imageInfo.refColorSpace().release();
+  skija::ImageInfo::writeImageInfoForInterop(imageInfo, imageInfoResult, colorSpacePtrsArray);
 }
 
 #if 0

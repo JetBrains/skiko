@@ -298,7 +298,7 @@ namespace skija {
 
     namespace FontMgr {
         jclass cls;
-        
+
         void onLoad(JNIEnv* env) {
             jclass local = env->FindClass("org/jetbrains/skia/FontMgr");
             cls  = static_cast<jclass>(env->NewGlobalRef(local));
@@ -326,7 +326,7 @@ namespace skija {
         jfieldID  value;
 
         void onLoad(JNIEnv* env) {
-            jclass local = env->FindClass("org/jetbrains/skia/FontVariation");    
+            jclass local = env->FindClass("org/jetbrains/skia/FontVariation");
             cls   = static_cast<jclass>(env->NewGlobalRef(local));
             ctor = env->GetMethodID(cls, "<init>", "(IF)V");
             tag   = env->GetFieldID(cls, "_tag", "I");
@@ -358,7 +358,7 @@ namespace skija {
         jmethodID ctor;
 
         void onLoad(JNIEnv* env) {
-            jclass local = env->FindClass("org/jetbrains/skia/ImageInfo");    
+            jclass local = env->FindClass("org/jetbrains/skia/ImageInfo");
             cls   = static_cast<jclass>(env->NewGlobalRef(local));
             ctor = env->GetMethodID(cls, "<init>", "(IIIIJ)V");
         }
@@ -374,6 +374,19 @@ namespace skija {
                 static_cast<jint>(info.colorType()),
                 static_cast<jint>(info.alphaType()),
                 reinterpret_cast<jlong>(info.refColorSpace().release()));
+        }
+
+        void writeImageInfoForInterop(JNIEnv* env, SkImageInfo imageInfo, jintArray imageInfoResult, jlongArray colorSpaceResultPtr) {
+            jint *result_int = env->GetIntArrayElements(imageInfoResult, NULL);
+            result_int[0] = imageInfo.width();
+            result_int[1] = imageInfo.height();
+            result_int[2] = static_cast<int>(imageInfo.colorType());
+            result_int[3] = static_cast<int>(imageInfo.alphaType());
+            env->ReleaseIntArrayElements(imageInfoResult, result_int, 0);
+
+            jlong *result_long = env->GetLongArrayElements(colorSpaceResultPtr, NULL);
+            result_long[0] = reinterpret_cast<jlong>(imageInfo.refColorSpace().release());
+            env->ReleaseLongArrayElements(colorSpaceResultPtr, result_long, 0);
         }
     }
 
@@ -406,7 +419,7 @@ namespace skija {
         jfieldID left;
         jfieldID top;
         jfieldID right;
-        jfieldID bottom;    
+        jfieldID bottom;
 
         void onLoad(JNIEnv* env) {
             jclass local = env->FindClass("org/jetbrains/skia/IRect");
@@ -432,9 +445,9 @@ namespace skija {
                 return std::unique_ptr<SkIRect>(nullptr);
             else {
                 return std::unique_ptr<SkIRect>(new SkIRect{
-                    env->GetIntField(obj, left), 
-                    env->GetIntField(obj, top), 
-                    env->GetIntField(obj, right), 
+                    env->GetIntField(obj, left),
+                    env->GetIntField(obj, top),
+                    env->GetIntField(obj, right),
                     env->GetIntField(obj, bottom)
                 });
             }
@@ -577,9 +590,9 @@ namespace skija {
                 return std::unique_ptr<SkRect>(nullptr);
             else {
                 SkRect* rect = new SkRect();
-                rect->setLTRB(env->GetFloatField(rectObj, left), 
-                              env->GetFloatField(rectObj, top), 
-                              env->GetFloatField(rectObj, right), 
+                rect->setLTRB(env->GetFloatField(rectObj, left),
+                              env->GetFloatField(rectObj, top),
+                              env->GetFloatField(rectObj, right),
                               env->GetFloatField(rectObj, bottom));
                 if (java::lang::Throwable::exceptionThrown(env))
                     return std::unique_ptr<SkRect>(nullptr);
@@ -776,7 +789,7 @@ namespace skija {
         RRect::onLoad(env);
         RSXform::onLoad(env);
         SurfaceProps::onLoad(env);
-        
+
         impl::Native::onLoad(env);
     }
 
@@ -828,17 +841,17 @@ std::unique_ptr<SkM44> skM44(JNIEnv* env, jfloatArray matrixArray) {
 //
 // Normal UTF-8:
 //
-// 1      U+     0..    7F  7     0xxxxxxx                     
-// 2      U+    80..   7FF  11    110xxxxx    10xxxxxx                 
-// 3      U+   800..  FFFF  16    1110xxxx    10xxxxxx    10xxxxxx             
-// 4      U+ 10000..10FFFF  21    11110xxx    10xxxxxx    10xxxxxx    10xxxxxx             
+// 1      U+     0..    7F  7     0xxxxxxx
+// 2      U+    80..   7FF  11    110xxxxx    10xxxxxx
+// 3      U+   800..  FFFF  16    1110xxxx    10xxxxxx    10xxxxxx
+// 4      U+ 10000..10FFFF  21    11110xxx    10xxxxxx    10xxxxxx    10xxxxxx
 //
 // Modified UTF-8 (Java):
 //
-// 1      U+     1..    7F  7     0xxxxxxx                     
-// 2      U+     0                11000000    10000000                 
-// 2      U+    80..   7FF  11    110xxxxx    10xxxxxx                 
-// 3      U+   800..  FFFF  16    1110xxxx    10xxxxxx    10xxxxxx             
+// 1      U+     1..    7F  7     0xxxxxxx
+// 2      U+     0                11000000    10000000
+// 2      U+    80..   7FF  11    110xxxxx    10xxxxxx
+// 3      U+   800..  FFFF  16    1110xxxx    10xxxxxx    10xxxxxx
 // 6      U+ 10000..10FFFF  20    11101101    1010xxxx    10xxxxxx    11101101    1011xxxx    10xxxxxx  (+ 0x10000)
 
 size_t utfToUtf8(unsigned char *data, size_t len) {
@@ -891,8 +904,8 @@ size_t utfToUtf8(unsigned char *data, size_t len) {
             SkASSERT((byte5 & 0b11110000) == 0b10110000);
             SkASSERT((byte6 & 0b11000000) == 0b10000000);
             uint32_t codepoint = (((byte2 & 0b00001111) << 16) |
-                                  ((byte3 & 0b00111111) << 10) | 
-                                  ((byte5 & 0b00001111) << 6) | 
+                                  ((byte3 & 0b00111111) << 10) |
+                                  ((byte5 & 0b00001111) << 6) |
                                    (byte6 & 0b00111111))
                                  + 0x10000;
             // Four-byte UTF-8

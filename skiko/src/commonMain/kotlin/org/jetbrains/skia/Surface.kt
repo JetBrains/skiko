@@ -1,11 +1,7 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.RefCnt
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.reachabilityBarrier
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.getPtr
 
 class Surface : RefCnt {
     companion object {
@@ -573,8 +569,10 @@ class Surface : RefCnt {
      */
     val imageInfo: ImageInfo
         get() = try {
-            Stats.onNativeCall()
-            Surface_nGetImageInfo(_ptr)
+            ImageInfo.createUsing(
+                _ptr = _ptr,
+                _nGetImageInfo = ::Surface_nGetImageInfo
+            )
         } finally {
             reachabilityBarrier(this)
         }
@@ -994,7 +992,7 @@ private external fun Surface_nGetWidth(ptr: NativePointer): Int
 private external fun Surface_nGetHeight(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nGetImageInfo")
-private external fun Surface_nGetImageInfo(ptr: NativePointer): ImageInfo
+private external fun Surface_nGetImageInfo(ptr: NativePointer, imageInfo: InteropPointer, colorSpacePtrs: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nReadPixels")
 private external fun Surface_nReadPixels(ptr: NativePointer, bitmapPtr: NativePointer, srcX: Int, srcY: Int): Boolean

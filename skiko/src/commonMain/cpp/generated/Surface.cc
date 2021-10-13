@@ -15,8 +15,8 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeRasterDirect
 {
     TODO("implement org_jetbrains_skia_Surface__1nMakeRasterDirect");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeRasterDirect
   (KInteropPointer __Kinstance,
     KInt width, KInt height, KInt colorType, KInt alphaType, KNativePointer colorSpacePtr,
@@ -48,8 +48,8 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeRasterDirectWithPi
 {
     TODO("implement org_jetbrains_skia_Surface__1nMakeRasterDirectWithPixmap");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeRasterDirectWithPixmap
   (KInteropPointer __Kinstance,
     KNativePointer pixmapPtr, KInteropPointer surfacePropsObj)
@@ -72,8 +72,8 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeRaster
 {
     TODO("implement org_jetbrains_skia_Surface__1nMakeRaster");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeRaster
   (KInteropPointer __Kinstance,
     KInt width, KInt height, KInt colorType, KInt alphaType, KNativePointer colorSpacePtr,
@@ -138,8 +138,8 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeFromMTKView
   (KNativePointer contextPtr, KNativePointer mtkViewPtr, KInt surfaceOrigin, KInt sampleCount, KInt colorType, KNativePointer colorSpacePtr, KInteropPointer surfacePropsObj) {
     TODO("implement org_jetbrains_skia_Surface__1nMakeFromMTKView");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeFromMTKView
   (KNativePointer contextPtr, KNativePointer mtkViewPtr, KInt surfaceOrigin, KInt sampleCount, KInt colorType, KNativePointer colorSpacePtr, KInteropPointer surfacePropsObj) {
     GrDirectContext* context = reinterpret_cast<GrDirectContext*>((contextPtr));
@@ -172,8 +172,8 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeRenderTarget
 {
     TODO("implement org_jetbrains_skia_Surface__1nMakeRenderTarget");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeRenderTarget
   (KNativePointer contextPtr, KBoolean budgeted,
     KInt width, KInt height, KInt colorType, KInt alphaType, KNativePointer colorSpacePtr,
@@ -290,24 +290,12 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_Surface__1nUnique
 }
 
 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Surface__1nGetImageInfo
-  (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_Surface__1nGetImageInfo");
+SKIKO_EXPORT void org_jetbrains_skia_Surface__1nGetImageInfo
+  (KNativePointer ptr, KInt* imageInfoResult, KNativePointer* colorSpacePtrsArray) {
+  SkSurface* surface = reinterpret_cast<SkSurface*>((ptr));
+  SkImageInfo imageInfo = surface->imageInfo();
+  skija::ImageInfo::writeImageInfoForInterop(imageInfo, imageInfoResult, colorSpacePtrsArray);
 }
-     
-#if 0 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Surface__1nGetImageInfo
-  (KNativePointer ptr) {
-    SkSurface* surface = reinterpret_cast<SkSurface*>((ptr));
-    const SkImageInfo& info = surface->imageInfo();
-    return env->NewObject(skija::ImageInfo::cls, skija::ImageInfo::ctor,
-        info.width(),
-        info.height(),
-        static_cast<KInt>(info.colorType()),
-        static_cast<KInt>(info.alphaType()),
-        reinterpret_cast<KNativePointer>(info.refColorSpace().release()));
-}
-#endif
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeSurface

@@ -5,7 +5,7 @@
 #include "interop.hh"
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nMakeRaster
-  (JNIEnv* env, jclass jclass, jint width, jint height, jint colorType, jint alphaType, jlong colorSpacePtr, jbyteArray bytesArr, jlong rowBytes) {
+  (JNIEnv* env, jclass jclass, jint width, jint height, jint colorType, jint alphaType, jlong colorSpacePtr, jbyteArray bytesArr, jint rowBytes) {
     SkColorSpace* colorSpace = reinterpret_cast<SkColorSpace*>(static_cast<uintptr_t>(colorSpacePtr));
     SkImageInfo imageInfo = SkImageInfo::Make(width,
                                               height,
@@ -19,7 +19,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nMakeRaster
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nMakeRasterData
-  (JNIEnv* env, jclass jclass, jint width, jint height, jint colorType, jint alphaType, jlong colorSpacePtr, jlong dataPtr, jlong rowBytes) {
+  (JNIEnv* env, jclass jclass, jint width, jint height, jint colorType, jint alphaType, jlong colorSpacePtr, jlong dataPtr, jint rowBytes) {
     SkColorSpace* colorSpace = reinterpret_cast<SkColorSpace*>(static_cast<uintptr_t>(colorSpacePtr));
     SkImageInfo imageInfo = SkImageInfo::Make(width,
                                               height,
@@ -46,8 +46,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nMakeFromPi
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nMakeFromEncoded
-  (JNIEnv* env, jclass jclass, jbyteArray encodedArray) {
-    jsize encodedLen = env->GetArrayLength(encodedArray);
+  (JNIEnv* env, jclass jclass, jbyteArray encodedArray, jint encodedLen) {
     jbyte* encoded = env->GetByteArrayElements(encodedArray, 0);
     sk_sp<SkData> encodedData = SkData::MakeWithCopy(encoded, encodedLen);
     env->ReleaseByteArrayElements(encodedArray, encoded, 0);
@@ -57,10 +56,14 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nMakeFromEn
     return reinterpret_cast<jlong>(image.release());
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_ImageKt_Image_1nGetImageInfo
-  (JNIEnv* env, jclass jclass, jlong ptr) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_ImageKt_Image_1nGetImageInfo
+  (JNIEnv* env, jclass jclass, jlong ptr, jintArray imageInfoResult, jlongArray colorSpaceResultPtr) {
     SkImage* instance = reinterpret_cast<SkImage*>(static_cast<uintptr_t>(ptr));
-    return skija::ImageInfo::toJava(env, instance->imageInfo());
+
+    SkImageInfo imageInfo = instance->imageInfo();
+    skija::ImageInfo::writeImageInfoForInterop(
+        env, imageInfo, imageInfoResult, colorSpaceResultPtr
+    );
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nEncodeToData

@@ -26,7 +26,7 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
          *
          * @see [https://fiddle.skia.org/c/@Image_MakeRasterCopy](https://fiddle.skia.org/c/@Image_MakeRasterCopy)
          */
-        fun makeRaster(imageInfo: ImageInfo, bytes: ByteArray, rowBytes: NativePointer): Image {
+        fun makeRaster(imageInfo: ImageInfo, bytes: ByteArray, rowBytes: Int): Image {
             return try {
                 Stats.onNativeCall()
                 val ptr = interopScope {
@@ -66,7 +66,7 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
          * @param rowBytes   how many bytes in a row
          * @return           Image
          */
-        fun makeRaster(imageInfo: ImageInfo, data: Data, rowBytes: NativePointer): Image {
+        fun makeRaster(imageInfo: ImageInfo, data: Data, rowBytes: Int): Image {
             return try {
                 Stats.onNativeCall()
                 val ptr = _nMakeRasterData(
@@ -134,7 +134,7 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
         fun makeFromEncoded(bytes: ByteArray?): Image {
             Stats.onNativeCall()
             val ptr = interopScope {
-                _nMakeFromEncoded(toInterop(bytes))
+                _nMakeFromEncoded(toInterop(bytes), bytes?.size ?: 0)
             }
             require(ptr != NullPointer) { "Failed to Image::makeFromEncoded" }
             return Image(ptr)
@@ -158,8 +158,10 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
             if (_imageInfo == null) {
                 commonSynchronized(this) {
                     if (_imageInfo == null) {
-                        Stats.onNativeCall()
-                        _imageInfo = Image_nGetImageInfo(_ptr)
+                        _imageInfo = ImageInfo.createUsing(
+                            _ptr = _ptr,
+                            _nGetImageInfo = ::Image_nGetImageInfo
+                        )
                     }
                 }
             }
@@ -368,7 +370,7 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
 }
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nGetImageInfo")
-private external fun Image_nGetImageInfo(ptr: NativePointer): ImageInfo?
+private external fun Image_nGetImageInfo(ptr: NativePointer, imageInfo: InteropPointer, colorSpacePtrs: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeShader")
 private external fun Image_nMakeShader(ptr: NativePointer, tmx: Int, tmy: Int, samplingMode: Long, localMatrix: InteropPointer): NativePointer
@@ -384,7 +386,7 @@ private external fun _nMakeRaster(
     alphaType: Int,
     colorSpacePtr: NativePointer,
     pixels: InteropPointer,
-    rowBytes: NativePointer
+    rowBytes: Int
 ): NativePointer
 
 
@@ -396,7 +398,7 @@ private external fun _nMakeRasterData(
     alphaType: Int,
     colorSpacePtr: NativePointer,
     dataPtr: NativePointer,
-    rowBytes: NativePointer
+    rowBytes: Int
 ): NativePointer
 
 
@@ -407,7 +409,7 @@ private external fun _nMakeFromBitmap(bitmapPtr: NativePointer): NativePointer
 private external fun _nMakeFromPixmap(pixmapPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeFromEncoded")
-private external fun _nMakeFromEncoded(bytes: InteropPointer): NativePointer
+private external fun _nMakeFromEncoded(bytes: InteropPointer, encodedLength: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nEncodeToData")
 private external fun _nEncodeToData(ptr: NativePointer, format: Int, quality: Int): NativePointer

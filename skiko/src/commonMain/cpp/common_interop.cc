@@ -1,5 +1,6 @@
 #include "common.h"
 #include "src/utils/SkUTF.h"
+#include "include/core/SkImageInfo.h"
 #include <stdio.h>
 
 KLong packTwoInts(int32_t a, int32_t b) {
@@ -143,6 +144,17 @@ namespace skija {
 
         KInt toKotlin(const SkFontStyle& fs) {
             return (static_cast<int>(fs.slant()) << 24)| (fs.width() << 16) | fs.weight();
+        }
+    }
+
+    namespace ImageInfo {
+        void writeImageInfoForInterop(SkImageInfo imageInfo, KInt* imageInfoResult, KNativePointer* colorSpacePtrsArray) {
+            imageInfoResult[0] = imageInfo.width();
+            imageInfoResult[1] = imageInfo.height();
+            imageInfoResult[2] = static_cast<int>(imageInfo.colorType());
+            imageInfoResult[3] = static_cast<int>(imageInfo.alphaType());
+
+            colorSpacePtrsArray[0] = imageInfo.refColorSpace().release();
         }
     }
 }
