@@ -237,7 +237,7 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapKt__1nReadPi
                                               static_cast<SkColorType>(colorType),
                                               static_cast<SkAlphaType>(alphaType),
                                               sk_ref_sp<SkColorSpace>(colorSpace));
-    jboolean result = instance->readPixels(imageInfo, result_bytes, rowBytes, srcX, srcY));
+    jboolean result = instance->readPixels(imageInfo, result_bytes, rowBytes, srcX, srcY);
     env->ReleaseByteArrayElements(readBytes, result_bytes, 0);
     return result;
 }
