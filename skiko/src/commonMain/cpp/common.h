@@ -55,6 +55,10 @@ namespace skija {
         SkFontStyle fromKotlin(KInt style);
         KInt toKotlin(const SkFontStyle& fs);
     }
+
+    namespace ImageInfo {
+       void writeImageInfoForInterop(SkImageInfo imageInfo, KInt* imageInfoResult, KNativePointer* colorSpacePtrsArray);
+    }
 }
 
 std::unique_ptr<SkMatrix> skMatrix(KFloat* matrixArray);

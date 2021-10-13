@@ -224,16 +224,14 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_SurfaceKt__1nUniqu
     return surface->unique();
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_SurfaceKt_Surface_1nGetImageInfo
-  (JNIEnv* env, jclass jclass, jlong ptr) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_SurfaceKt_Surface_1nGetImageInfo
+  (JNIEnv* env, jclass jclass, jlong ptr, jintArray imageInfoResult, jlongArray colorSpaceResultPtr) {
     SkSurface* surface = reinterpret_cast<SkSurface*>(static_cast<uintptr_t>(ptr));
-    const SkImageInfo& info = surface->imageInfo();
-    return env->NewObject(skija::ImageInfo::cls, skija::ImageInfo::ctor,
-        info.width(),
-        info.height(),
-        static_cast<jint>(info.colorType()),
-        static_cast<jint>(info.alphaType()),
-        reinterpret_cast<jlong>(info.refColorSpace().release()));
+    SkImageInfo imageInfo = surface->imageInfo();
+
+    skija::ImageInfo::writeImageInfoForInterop(
+        env, imageInfo, imageInfoResult, colorSpaceResultPtr
+    );
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_SurfaceKt__1nMakeSurface

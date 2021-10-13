@@ -158,22 +158,10 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
             if (_imageInfo == null) {
                 commonSynchronized(this) {
                     if (_imageInfo == null) {
-                        Stats.onNativeCall()
-                        var colorSpacePtr: NativePointer? = null
-
-                        _imageInfo = withResult(IntArray(4)) { intArrayPointer ->
-                            colorSpacePtr = withResult(NativePointerArray(1)) { nativePointerArrayPtr ->
-                                Image_nGetImageInfo(_ptr, intArrayPointer, nativePointerArrayPtr)
-                            }[0]
-                        }.let {
-                            ImageInfo(
-                                width = it[0],
-                                height = it[1],
-                                colorType = it[2],
-                                alphaType = it[3],
-                                colorSpace = colorSpacePtr!!
-                            )
-                        }
+                        _imageInfo = ImageInfo.createUsing(
+                            _ptr = _ptr,
+                            _nGetImageInfo = ::Image_nGetImageInfo
+                        )
                     }
                 }
             }

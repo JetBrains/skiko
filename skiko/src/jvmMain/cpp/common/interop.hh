@@ -185,6 +185,7 @@ namespace skija {
         void onLoad(JNIEnv* env);
         void onUnload(JNIEnv* env);
         jobject toJava(JNIEnv* env, const SkImageInfo& imageInfo);
+        void writeImageInfoForInterop(JNIEnv* env, SkImageInfo imageInfo, jintArray imageInfoResult, jlongArray colorSpaceResultPtr);
     }
 
     namespace IPoint {

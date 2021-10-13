@@ -70,22 +70,10 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
     override val imageInfo: ImageInfo
         get() = try {
             if (_imageInfo == null) {
-                Stats.onNativeCall()
-                var colorSpacePtr: NativePointer? = null
-
-                _imageInfo = withResult(IntArray(4)) { intArrayPointer ->
-                    colorSpacePtr = withResult(NativePointerArray(1)) { nativePointerArrayPtr ->
-                        _nGetImageInfo(_ptr, intArrayPointer, nativePointerArrayPtr)
-                    }[0]
-                }.let {
-                    ImageInfo(
-                        width = it[0],
-                        height = it[1],
-                        colorType = it[2],
-                        alphaType = it[3],
-                        colorSpace = colorSpacePtr!!
-                    )
-                }
+                _imageInfo = ImageInfo.createUsing(
+                    _ptr = _ptr,
+                    _nGetImageInfo = ::_nGetImageInfo
+                )
             }
             _imageInfo!!
         } finally {

@@ -1,10 +1,6 @@
-package org.jetbrains.skiko
+package org.jetbrains.skia
 
-import org.jetbrains.skia.Bitmap
-import org.jetbrains.skia.ContentChangeMode
-import org.jetbrains.skia.IRect
-import org.jetbrains.skia.ImageInfo
-import org.jetbrains.skia.Surface
+import org.jetbrains.skia.impl.use
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -12,6 +8,7 @@ import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
 class SurfaceTest {
+
     @Test
     fun surfaceTest() {
         assertFailsWith<IllegalArgumentException> {

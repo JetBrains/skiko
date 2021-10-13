@@ -2,6 +2,10 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.NativePointerArray
+import org.jetbrains.skia.impl.InteropPointer
+import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.impl.withResult
 
 /**
  *
@@ -278,6 +282,27 @@ class ImageInfo(val colorInfo: ColorInfo, val width: Int, val height: Int) {
          */
         fun makeUnknown(width: Int, height: Int): ImageInfo {
             return ImageInfo(ColorInfo(ColorType.UNKNOWN, ColorAlphaType.UNKNOWN, null), width, height)
+        }
+
+        fun createUsing(
+            _ptr: NativePointer,
+            _nGetImageInfo: (_ptr: NativePointer, intArrayPointer: InteropPointer, nativePointerArrayPtr: InteropPointer) -> Unit
+        ): ImageInfo {
+            Stats.onNativeCall()
+            var colorSpacePtr: NativePointer? = null
+            return withResult(IntArray(4)) { intArrayPointer ->
+                colorSpacePtr = withResult(NativePointerArray(1)) { nativePointerArrayPtr ->
+                    _nGetImageInfo(_ptr, intArrayPointer, nativePointerArrayPtr)
+                }[0]
+            }.let {
+                ImageInfo(
+                    width = it[0],
+                    height = it[1],
+                    colorType = it[2],
+                    alphaType = it[3],
+                    colorSpace = colorSpacePtr!!
+                )
+            }
         }
     }
 }

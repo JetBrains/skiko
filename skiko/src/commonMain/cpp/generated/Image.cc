@@ -57,16 +57,9 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nMakeFromEncoded
 
 SKIKO_EXPORT void org_jetbrains_skia_Image__1nGetImageInfo
   (KNativePointer ptr, KInt* imageInfoResult, KNativePointer* colorSpacePtrsArray) {
-
   SkImage* instance = reinterpret_cast<SkImage*>((ptr));
   SkImageInfo imageInfo = instance->imageInfo();
-
-  imageInfoResult[0] = instance->width();
-  imageInfoResult[1] = instance->height();
-  imageInfoResult[2] = static_cast<int>(imageInfo.colorType());
-  imageInfoResult[3] = static_cast<int>(imageInfo.alphaType());
-
-  colorSpacePtrsArray[0] = imageInfo.refColorSpace().release();
+  skija::ImageInfo::writeImageInfoForInterop(imageInfo, imageInfoResult, colorSpacePtrsArray);
 }
 
 
