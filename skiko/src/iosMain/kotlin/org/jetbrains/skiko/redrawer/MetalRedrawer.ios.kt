@@ -6,10 +6,7 @@ import kotlinx.cinterop.objcPtr
 import kotlinx.cinterop.usePinned
 import org.jetbrains.skia.BackendRenderTarget
 import org.jetbrains.skia.DirectContext
-import org.jetbrains.skiko.AppDispatcher
-import org.jetbrains.skiko.FrameDispatcher
-import org.jetbrains.skiko.SkiaLayer
-import org.jetbrains.skiko.SkiaLayerProperties
+import org.jetbrains.skiko.*
 import platform.CoreGraphics.CGColorCreate
 import platform.CoreGraphics.CGColorSpaceCreateDeviceRGB
 import platform.CoreGraphics.CGContextRef
@@ -31,7 +28,7 @@ internal class MetalRedrawer(
     private var currentDrawable: CAMetalDrawableProtocol? = null
     private val metalLayer = MetalLayer(this.layer, device)
 
-    private val frameDispatcher = FrameDispatcher(AppDispatcher) {
+    private val frameDispatcher = FrameDispatcher(SkikoDispatchers.Main) {
         if (layer.isShowing()) {
             update(getTimeNanos())
             draw()
@@ -61,15 +58,8 @@ internal class MetalRedrawer(
 
     override fun redrawImmediately() {
         check(!isDisposed) { "MetalRedrawer is disposed" }
-        metalLayer.setNeedsDisplay()
         update(getTimeNanos())
-        performDraw()
-    }
-
-    private fun performDraw() {
-        if (!isDisposed) {
-            layer.draw()
-        }
+        draw()
     }
 
     private fun update(nanoTime: Long) {
@@ -79,7 +69,9 @@ internal class MetalRedrawer(
     private fun draw() {
         // TODO: maybe make flush async as in JVM version.
         autoreleasepool {
-            performDraw()
+            if (!isDisposed) {
+                layer.draw()
+            }
         }
     }
 
@@ -128,15 +120,11 @@ class MetalLayer(
 
     @Suppress("unused")
     private fun performDraw() {
-        try {
-            draw()
-        } catch (e: Throwable) {
-            e.printStackTrace()
-        }
+        draw()
     }
 
     override fun drawInContext(ctx: CGContextRef?) {
-        performDraw()
+        draw()
         super.drawInContext(ctx)
     }
 }

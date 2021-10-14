@@ -4,8 +4,10 @@ import kotlinx.cinterop.interpretCPointer
 import kotlinx.coroutines.*
 import platform.CoreFoundation.*
 import platform.darwin.dispatch_async
+import platform.darwin.dispatch_get_global_queue
 import platform.darwin.dispatch_get_main_queue
 import platform.darwin.dispatch_queue_t
+import platform.posix.QOS_CLASS_BACKGROUND
 import kotlin.coroutines.CoroutineContext
 import kotlin.native.concurrent.AtomicNativePtr
 import kotlin.native.concurrent.freeze
@@ -14,8 +16,13 @@ import kotlin.native.internal.NativePtr
 // This is the only dispatcher that shall be used in Skiko on iOS.
 // Current (as of 1.5.2) dispatchers in kotlinx.coroutines are not usable
 // for needs of Skiko.
-@SharedImmutable
-internal val AppDispatcher: CoroutineDispatcher = NsQueueDispatcher(dispatch_get_main_queue())
+object SkikoDispatchers {
+    val Main: CoroutineDispatcher = NsQueueDispatcher(dispatch_get_main_queue())
+    val IO: CoroutineDispatcher = NsQueueDispatcher(
+        dispatch_get_global_queue(
+            QOS_CLASS_BACKGROUND.toLong(), 0)
+    )
+}
 
 @OptIn(InternalCoroutinesApi::class)
 internal class NsQueueDispatcher(

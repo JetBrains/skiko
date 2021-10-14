@@ -4,7 +4,7 @@ import kotlinx.cinterop.*
 import platform.UIKit.*
 
 class SkikoAppDelegate : UIResponder, UIApplicationDelegateProtocol {
-    companion object : UIResponderMeta(), UIApplicationDelegateProtocolMeta {}
+    companion object : UIResponderMeta(), UIApplicationDelegateProtocolMeta
 
     @ObjCObjectBase.OverrideInit
     constructor() : super()
