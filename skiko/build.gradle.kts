@@ -275,7 +275,7 @@ val skiaDir: Provider<File> = run {
 val skiaBinSubdir = "out/${buildType.id}-${targetOs.id}-${targetArch.id}"
 
 val Project.supportNative: Boolean
-   get() = true // properties.get("skiko.native.enabled") == "true"
+   get() = properties.get("skiko.native.enabled") == "true"
 
 val Project.supportWasm: Boolean
     get() = properties.get("skiko.wasm.enabled") == "true"

@@ -1,14 +1,9 @@
 package org.jetbrains.skiko
 
-import kotlinx.cinterop.*
-import org.jetbrains.skia.Color
-import org.jetbrains.skia.Paint
 import org.jetbrains.skia.PictureRecorder
 import org.jetbrains.skia.Rect
 import org.jetbrains.skiko.context.MetalContextHandler
 import org.jetbrains.skiko.redrawer.MetalRedrawer
-import org.jetbrains.skiko.redrawer.Redrawer
-import platform.Foundation.*
 import platform.UIKit.*
 
 actual open class SkiaLayer actual constructor(

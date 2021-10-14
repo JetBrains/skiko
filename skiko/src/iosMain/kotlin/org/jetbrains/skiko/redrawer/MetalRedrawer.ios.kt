@@ -4,7 +4,6 @@ import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.autoreleasepool
 import kotlinx.cinterop.objcPtr
 import kotlinx.cinterop.usePinned
-import kotlinx.coroutines.*
 import org.jetbrains.skia.BackendRenderTarget
 import org.jetbrains.skia.DirectContext
 import org.jetbrains.skiko.AppDispatcher
@@ -20,10 +19,6 @@ import platform.Metal.MTLPixelFormatBGRA8Unorm
 import platform.QuartzCore.CAMetalDrawableProtocol
 import platform.QuartzCore.CAMetalLayer
 import platform.QuartzCore.kCAGravityTopLeft
-import platform.darwin.dispatch_async
-import platform.darwin.dispatch_get_main_queue
-import platform.darwin.dispatch_queue_t
-import kotlin.coroutines.CoroutineContext
 import kotlin.system.getTimeNanos
 
 internal class MetalRedrawer(
