@@ -30,8 +30,7 @@ internal class MetalContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
         val w = (layer.width * scale).toInt().coerceAtLeast(0)
         val h = (layer.height * scale).toInt().coerceAtLeast(0)
 
-        renderTarget = metalRedrawer.makeRenderTarget(w, h) ?:
-            throw IllegalArgumentException("Cannot create Metal render target")
+        renderTarget = metalRedrawer.makeRenderTarget(w, h)
 
         surface = Surface.makeFromBackendRenderTarget(
             context!!,

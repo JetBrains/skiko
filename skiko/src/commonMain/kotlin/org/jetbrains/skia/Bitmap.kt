@@ -920,7 +920,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
 
             Stats.onNativeCall()
             withNullableResult(ByteArray(size)) {
-                _nx§els(
+                _nReadPixels(
                     _ptr,
                     dstInfo.width,
                     dstInfo.height,

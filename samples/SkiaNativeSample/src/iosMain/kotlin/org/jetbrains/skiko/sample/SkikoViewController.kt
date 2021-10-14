@@ -32,8 +32,5 @@ class SkikoViewController : UIViewController {
             displayScene(canvas, nanoTime)
         }
         layer.initLayer(view)
-        runBlocking {
-
-        }
     }
 }

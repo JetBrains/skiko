@@ -4,12 +4,10 @@ import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.autoreleasepool
 import kotlinx.cinterop.objcPtr
 import kotlinx.cinterop.usePinned
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.jetbrains.skia.BackendRenderTarget
 import org.jetbrains.skia.DirectContext
+import org.jetbrains.skiko.AppDispatcher
 import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaLayerProperties
@@ -22,6 +20,10 @@ import platform.Metal.MTLPixelFormatBGRA8Unorm
 import platform.QuartzCore.CAMetalDrawableProtocol
 import platform.QuartzCore.CAMetalLayer
 import platform.QuartzCore.kCAGravityTopLeft
+import platform.darwin.dispatch_async
+import platform.darwin.dispatch_get_main_queue
+import platform.darwin.dispatch_queue_t
+import kotlin.coroutines.CoroutineContext
 import kotlin.system.getTimeNanos
 
 internal class MetalRedrawer(
@@ -34,29 +36,18 @@ internal class MetalRedrawer(
     private var currentDrawable: CAMetalDrawableProtocol? = null
     private val metalLayer = MetalLayer(this.layer, device)
 
-    private val frameDispatcher = FrameDispatcher(Dispatchers.Main) {
-        println("FrameDispatcher next frame")
+    private val frameDispatcher = FrameDispatcher(AppDispatcher) {
         if (layer.isShowing()) {
             update(getTimeNanos())
             draw()
         }
     }
 
-    private val frameDispatcher2 = CoroutineScope(Dispatchers.Main).launch {
-        println("launched alt dispatcher")
-        while (true) {
-            println("next forced frame")
-            update(getTimeNanos())
-            draw()
-            delay(16)
-        }
-    }
-
     fun makeContext() = DirectContext.makeMetal(device.objcPtr(), queue.objcPtr())
 
-    fun makeRenderTarget(width: Int, height: Int): BackendRenderTarget? {
-        currentDrawable = metalLayer.nextDrawable() ?: return null
-        return BackendRenderTarget.makeMetal(width, height, currentDrawable?.texture.objcPtr())
+    fun makeRenderTarget(width: Int, height: Int): BackendRenderTarget {
+        currentDrawable = metalLayer.nextDrawable()!!
+        return BackendRenderTarget.makeMetal(width, height, currentDrawable!!.texture.objcPtr())
     }
 
     override fun dispose() {
@@ -69,13 +60,11 @@ internal class MetalRedrawer(
     }
 
     override fun needRedraw() {
-        println("MetalRedrawer.needRedraw")
         check(!isDisposed) { "MetalRedrawer is disposed" }
         frameDispatcher.scheduleFrame()
     }
 
     override fun redrawImmediately() {
-        println("MetalRedrawer.redrawImmediately")
         check(!isDisposed) { "MetalRedrawer is disposed" }
         metalLayer.setNeedsDisplay()
         update(getTimeNanos())
@@ -93,7 +82,6 @@ internal class MetalRedrawer(
     }
 
     private fun draw() {
-        println("MetalRedrawer.draw")
         // TODO: maybe make flush async as in JVM version.
         autoreleasepool {
             performDraw()
@@ -101,12 +89,14 @@ internal class MetalRedrawer(
     }
 
     fun finishFrame() {
-        currentDrawable?.let {
-            val commandBuffer = queue.commandBuffer()!!
-            commandBuffer.label = "Present"
-            commandBuffer.presentDrawable(it)
-            commandBuffer.commit()
-            currentDrawable = null
+        autoreleasepool {
+            currentDrawable?.let {
+                val commandBuffer = queue.commandBuffer()!!
+                commandBuffer.label = "Present"
+                commandBuffer.presentDrawable(it)
+                commandBuffer.commit()
+                currentDrawable = null
+            }
         }
     }
 }
@@ -132,7 +122,6 @@ class MetalLayer(
     }
 
     fun draw()  {
-        println("MetalLayer.draw")
         skiaLayer.update(getTimeNanos())
         skiaLayer.draw()
     }
@@ -144,7 +133,6 @@ class MetalLayer(
 
     @Suppress("unused")
     private fun performDraw() {
-        println("MetalDrawer.performDraw")
         try {
             draw()
         } catch (e: Throwable) {
@@ -153,7 +141,6 @@ class MetalLayer(
     }
 
     override fun drawInContext(ctx: CGContextRef?) {
-        println("MetalLayer::drawInContext")
         performDraw()
         super.drawInContext(ctx)
     }

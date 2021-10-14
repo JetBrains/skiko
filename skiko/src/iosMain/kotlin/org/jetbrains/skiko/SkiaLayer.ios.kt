@@ -62,8 +62,6 @@ actual open class SkiaLayer actual constructor(
     private val contextHandler = MetalContextHandler(this)
 
     fun update(nanoTime: Long) {
-        println("SkiaLayer.update")
-
         val pictureWidth = (width * contentScale).coerceAtLeast(0.0F)
         val pictureHeight = (height * contentScale).coerceAtLeast(0.0F)
 
@@ -74,22 +72,15 @@ actual open class SkiaLayer actual constructor(
         this.picture = PictureHolder(picture, pictureWidth.toInt(), pictureHeight.toInt())
     }
 
-    private var initedCanvas = false
-
     fun draw() {
-        println("SkiaLayer.draw")
         contextHandler.apply {
-            if (!initedCanvas) {
-                if (!initContext()) {
-                    error("initContext() failure")
-                    return
-                }
-                initCanvas()
-                initedCanvas = true
+            if (!initContext()) {
+                error("initContext() failure")
+                return
             }
+            initCanvas()
             clearCanvas()
             val picture = picture
-            println("SkiaLayer.draw: picture=$picture")
             if (picture != null) {
                 drawOnCanvas(picture.instance)
             }

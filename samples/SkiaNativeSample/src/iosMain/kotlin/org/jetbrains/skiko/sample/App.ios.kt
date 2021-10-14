@@ -18,7 +18,6 @@ fun runSkikoMain(args: Array<String> = emptyArray()) {
     memScoped {
         val argc = args.size + 1
         val argv = (arrayOf("skikoApp") + args).map { it.cstr.ptr }.toCValues()
-
         autoreleasepool {
             UIApplicationMain(argc, argv, null, NSStringFromClass(SkikoAppDelegate))
         }

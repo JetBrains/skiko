@@ -22,6 +22,5 @@ class SkikoAppDelegate : UIResponder, UIApplicationDelegateProtocol {
         window!!.rootViewController = SkikoViewController()
         window!!.makeKeyAndVisible()
         return true
-        runBlocking {  }
     }
 }
