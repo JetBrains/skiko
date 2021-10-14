@@ -87,11 +87,11 @@ class SurfaceTest {
         }
     }
 
-    @Test @Ignore // ignored because it fails on macos and js - Surface ptr is null, need to fix. Works on JVM
+    @Test
     fun canMakeRasterDirectUsingPixmap() = runTest {
         interopScope {
-            val imageInfo = ImageInfo.makeN32Premul(5, 5)
-            val addr = allocateBytesForPixels(50 * imageInfo.minRowBytes)
+            val imageInfo = ImageInfo.makeN32Premul(20, 20)
+            val addr = allocateBytesForPixels(20 * imageInfo.minRowBytes)
             val pixmap = Pixmap.make(imageInfo, addr, imageInfo.minRowBytes)
             val surface = Surface.makeRasterDirect(pixmap)
 
