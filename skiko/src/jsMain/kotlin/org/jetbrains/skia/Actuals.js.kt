@@ -7,7 +7,7 @@ actual fun <R> commonSynchronized(lock: Any, block: () -> R) {
     block()
 }
 
-actual fun String.intCodePoints(): IntArray = TODO()
+actual fun String.intCodePoints(): IntArray = toList().map { it.code }.toIntArray()
 
 actual class Pattern {
     actual fun split(input: CharSequence): Array<String?>? = TODO()
