@@ -9,9 +9,10 @@ import org.jetbrains.skiko.GraphicsApi
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.hostArch
 import org.jetbrains.skiko.hostOs
+import org.jetbrains.skiko.OS
 
 internal abstract class ContextHandler(val layer: SkiaLayer) {
-    open val clearColor = if (layer.transparency) 0 else -1
+    open val clearColor = if (layer.transparency || hostOs == OS.MacOS) 0 else -1
     var context: DirectContext? = null
     var renderTarget: BackendRenderTarget? = null
     var surface: Surface? = null
@@ -21,7 +22,7 @@ internal abstract class ContextHandler(val layer: SkiaLayer) {
     abstract fun initCanvas()
 
     fun clearCanvas() {
-        val color = if (layer.fullscreen) -1 else clearColor
+        val color = if (layer.fullscreen && hostOs != OS.MacOS) -1 else clearColor
         canvas?.clear(color)
     }
 

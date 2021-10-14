@@ -118,6 +118,8 @@ fun createWindow(title: String, exitOnClose: Boolean) = SwingUtilities.invokeLat
             window.background = java.awt.Color(0, 0, 0, 0)
         }
         window.layer.transparency = true
+    } else {
+        window.layer.background = java.awt.Color.WHITE
     }
 
     // MANDATORY: set window preferred size before calling pack()
