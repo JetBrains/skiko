@@ -485,9 +485,9 @@ class SkiaWindowTest {
             val lineMetrics = paragraph.lineMetrics
             assertTrue(lineMetrics.isNotEmpty())
             assertEquals(0, lineMetrics.first().startIndex)
-            assertEquals(4, lineMetrics.first().endIndex)
-            assertEquals(4, lineMetrics.first().endExcludingWhitespaces)
-            assertEquals(4, lineMetrics.first().endIncludingNewline)
+            assertEquals(5, lineMetrics.first().endIndex)
+            assertEquals(5, lineMetrics.first().endExcludingWhitespaces)
+            assertEquals(5, lineMetrics.first().endIncludingNewline)
             assertEquals(true, lineMetrics.first().isHardBreak)
             assertEquals(0, lineMetrics.first().lineNumber)
 
