@@ -45,7 +45,6 @@ class TypefaceTest {
         val inter500: Typeface = interV.makeClone(FontVariation("wght", 500f))
         assertNotEquals(inter500, interV)
         assertContentEquals(FontVariation.parse("wght=500 slnt=0"), inter500.variations)
-        val inter400: Typeface = interV.makeClone(FontVariation("wght", 400f))
 
         assertNotEquals(inter.uniqueId, interV.uniqueId)
         assertNotEquals(inter, interV)
