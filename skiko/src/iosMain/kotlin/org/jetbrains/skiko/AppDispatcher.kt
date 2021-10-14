@@ -11,6 +11,10 @@ import kotlin.native.concurrent.AtomicNativePtr
 import kotlin.native.concurrent.freeze
 import kotlin.native.internal.NativePtr
 
+// This is the only dispatcher that shall be used in Skiko on iOS.
+// Current (as of 1.5.2) dispatchers in kotlinx.coroutines are not usable
+// for needs of Skiko.
+@SharedImmutable
 internal val AppDispatcher: CoroutineDispatcher = NsQueueDispatcher(dispatch_get_main_queue())
 
 @OptIn(InternalCoroutinesApi::class)
