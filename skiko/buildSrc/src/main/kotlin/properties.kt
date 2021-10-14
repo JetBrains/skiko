@@ -31,6 +31,15 @@ fun compilerForTarget(os: OS, arch: Arch): String =
 fun linkerForTarget(os: OS, arch: Arch): String =
     if (os.isWindows) "link.exe" else compilerForTarget(os, arch)
 
+val OS.dynamicLibExt: String
+    get() = when (this) {
+        OS.Linux -> ".so"
+        OS.Windows -> ".dll"
+        OS.MacOS, OS.IOS -> ".dylib"
+        OS.Wasm -> ".wasm"
+    }
+
+
 enum class Arch(val id: String) {
     X64("x64"),
     Arm64("arm64"),
