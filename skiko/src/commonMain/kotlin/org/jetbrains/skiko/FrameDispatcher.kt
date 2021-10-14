@@ -56,7 +56,7 @@ class FrameDispatcher(
     fun scheduleFrame() {
         if (!frameScheduled) {
             frameScheduled = true
-            frameChannel.offer(Unit)
+            frameChannel.trySend(Unit).isSuccess
         }
     }
 }

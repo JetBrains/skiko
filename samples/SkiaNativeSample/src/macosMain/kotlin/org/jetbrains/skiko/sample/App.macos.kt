@@ -12,7 +12,7 @@ fun main() {
     NSApp?.run()
 }
 
-fun createWindow()  {
+fun createWindow() {
     val layer = SkiaLayer()
     layer.renderer = GenericRenderer(layer) {
             canvas, w, h, nanoTime -> displayScene(canvas, nanoTime)

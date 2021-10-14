@@ -6,7 +6,7 @@ val coroutinesVersion = "1.5.2"
 
 repositories {
     mavenLocal()
-    jcenter()
+    mavenCentral()
     maven("https://dl.bintray.com/kotlin/kotlin-eap")
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
@@ -56,6 +56,7 @@ kotlin {
                     freeCompilerArgs += listOf(
                         "-linker-option", "-framework", "-linker-option", "Metal",
                         "-linker-option", "-framework", "-linker-option", "CoreText",
+                        "-linker-option", "-framework", "-linker-option", "CoreGraphics"
                     )
                 }
             }
@@ -122,6 +123,19 @@ project.tasks.register<Exec>("runIosSim") {
     )
     argumentProviders.add {
         val out = fileTree(binTask.get().outputs.files.files.single()) { include("*.kexe") }
+        listOf(out.single { it.name.endsWith(".kexe") }.absolutePath)
+    }
+}
+
+project.tasks.register<Exec>("run") {
+    workingDir = project.buildDir
+    val binTask = project.tasks.named("linkDebugExecutable${hostOs.capitalize()}${hostArch.capitalize()}")
+    dependsOn(binTask)
+    // Hacky approach.
+    commandLine = listOf("bash", "-c")
+    argumentProviders.add {
+        val out = fileTree(binTask.get().outputs.files.files.single()) { include("*.kexe") }
+        println("Run $out")
         listOf(out.single { it.name.endsWith(".kexe") }.absolutePath)
     }
 }
