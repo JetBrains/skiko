@@ -56,7 +56,7 @@ internal object SkikoProperties {
             OS.MacOS -> return GraphicsApi.METAL
             OS.Linux -> return GraphicsApi.OPENGL
             OS.Windows -> return GraphicsApi.DIRECT3D
-            OS.JS -> TODO("commonize me")
+            OS.JS, OS.Ios -> TODO("commonize me")
         }
     }
 
