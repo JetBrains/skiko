@@ -1,5 +1,6 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.SkikoByteBuffer
 import org.jetbrains.skia.impl.interopScope
 import org.jetbrains.skia.impl.use
 import org.jetbrains.skiko.tests.allocateBytesForPixels
@@ -99,6 +100,23 @@ class SurfaceTest {
             writePixelsBitmap.setImageInfo(ImageInfo.makeN32Premul(10, 10))
             writePixelsBitmap.allocPixels()
             surface.writePixels(writePixelsBitmap, 0, 0)
+        }
+    }
+
+    @Test
+    fun skikoByteBuffer() = runTest {
+        interopScope {
+            val addr = allocateBytesForPixels(500)
+            val skikoByteBuffer = SkikoByteBuffer(addr, 500)
+
+            assertEquals(0, skikoByteBuffer[0])
+            assertEquals(0, skikoByteBuffer[1])
+
+            skikoByteBuffer[0] = 1
+            skikoByteBuffer[1] = 2
+
+            assertEquals(1, skikoByteBuffer[0])
+            assertEquals(2, skikoByteBuffer[1])
         }
     }
 }

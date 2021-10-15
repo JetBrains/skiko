@@ -66,7 +66,7 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapKt__1nSetAlp
     return instance->setAlphaType(static_cast<SkAlphaType>(alphaType));
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BitmapKt__1nComputeByteSize
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BitmapKt__1nComputeByteSize
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(ptr));
     return instance->computeByteSize();

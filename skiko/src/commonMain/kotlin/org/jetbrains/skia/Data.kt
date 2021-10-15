@@ -105,10 +105,10 @@ class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
         }
     }
 
-    fun toByteBuffer(): ByteBuffer {
+    fun toByteBuffer(): SkikoByteBuffer {
         return try {
             Stats.onNativeCall()
-            _nToByteBuffer(_ptr)
+            SkikoByteBuffer(_nToByteBuffer(_ptr), size)
         } finally {
             reachabilityBarrier(this)
         }
@@ -133,7 +133,7 @@ private external fun _nBytes(ptr: NativePointer, offset: Int, length: Int, destB
 private external fun _nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Data__1nToByteBuffer")
-private external fun _nToByteBuffer(ptr: NativePointer): ByteBuffer
+private external fun _nToByteBuffer(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Data__1nMakeFromBytes")
 private external fun _nMakeFromBytes(bytes: InteropPointer, offset: Int, length: Int): NativePointer

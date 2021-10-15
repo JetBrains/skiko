@@ -1,9 +1,11 @@
 package org.jetbrains.skiko
 
 import org.jetbrains.skia.*
+import org.jetbrains.skia.impl.SkikoByteBuffer
 import org.jetbrains.skiko.util.ScreenshotTestRule
 import org.junit.Rule
 import org.junit.Test
+import java.nio.ByteBuffer
 
 class CanvasTest {
     @get:Rule

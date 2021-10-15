@@ -240,8 +240,8 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
         }
     }
 
-    val buffer: ByteBuffer?
-        get() = BufferUtil.getByteBufferFromPointer(addr, computeByteSize())
+    val buffer: SkikoByteBuffer?
+        get() = SkikoByteBuffer(addr, computeByteSize())
 
     private object _FinalizerHolder {
         val PTR = Pixmap_nGetFinalizer()

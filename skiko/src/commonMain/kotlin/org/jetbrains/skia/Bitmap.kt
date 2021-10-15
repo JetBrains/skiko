@@ -192,7 +192,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
      *
      * @return  size in bytes of image buffer
      */
-    fun computeByteSize(): NativePointer {
+    fun computeByteSize(): Int {
         return try {
             Stats.onNativeCall()
             _nComputeByteSize(_ptr)
@@ -981,10 +981,15 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
      *
      * @see [https://fiddle.skia.org/c/@Bitmap_peekPixels](https://fiddle.skia.org/c/@Bitmap_peekPixels)
      */
-    fun peekPixels(): ByteBuffer? {
+    fun peekPixels(): SkikoByteBuffer? {
         return try {
             Stats.onNativeCall()
-            _nPeekPixels(_ptr)
+            val bufferPtr = _nPeekPixels(_ptr)
+            if (bufferPtr != NullPointer) {
+                SkikoByteBuffer(bufferPtr, computeByteSize())
+            } else {
+                null
+            }
         } finally {
             reachabilityBarrier(this)
         }
@@ -1063,7 +1068,7 @@ private external fun _nGetRowBytes(ptr: NativePointer): Int
 private external fun _nSetAlphaType(ptr: NativePointer, alphaType: Int): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nComputeByteSize")
-private external fun _nComputeByteSize(ptr: NativePointer): NativePointer
+private external fun _nComputeByteSize(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nIsImmutable")
 private external fun _nIsImmutable(ptr: NativePointer): Boolean
@@ -1187,7 +1192,7 @@ private external fun _nReadPixels(
 private external fun _nExtractAlpha(ptr: NativePointer, dstPtr: NativePointer, paintPtr: NativePointer, iPointResultIntArray: InteropPointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nPeekPixels")
-private external fun _nPeekPixels(ptr: NativePointer): ByteBuffer?
+private external fun _nPeekPixels(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nMakeShader")
 private external fun _nMakeShader(ptr: NativePointer, tmx: Int, tmy: Int, samplingMode: Long, localMatrix: InteropPointer): NativePointer
