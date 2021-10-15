@@ -1,8 +1,6 @@
 package org.jetbrains.skiko
 
-actual open class SkiaLayer actual constructor(
-    properties: SkiaLayerProperties
-)  {
+actual open class SkiaLayer(properties: SkiaLayerProperties)  {
     actual var renderApi: GraphicsApi
         get() = TODO("Not yet implemented")
         set(value) {}
@@ -17,4 +15,5 @@ actual open class SkiaLayer actual constructor(
     actual fun needRedraw() {
         TODO("unimplemented")
     }
+    actual var renderer: SkiaRenderer? = null
 }

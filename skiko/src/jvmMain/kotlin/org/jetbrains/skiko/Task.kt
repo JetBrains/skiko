@@ -22,7 +22,7 @@ internal class Task {
      */
     fun finish() {
         if (!done.getAndSet(true)) {
-            onFinish.offer(Unit)
+            onFinish.trySend(Unit)
         }
     }
 }

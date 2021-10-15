@@ -42,7 +42,6 @@ abstract class CanvasRenderer constructor(htmlCanvas: HTMLCanvasElement, val wid
             GL.makeContextCurrent(contextPointer)
             drawFrame(timestamp)
             surface.flushAndSubmit()
-            draw()
         }
     }
 }
