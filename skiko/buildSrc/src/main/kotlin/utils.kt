@@ -2,6 +2,7 @@ import org.gradle.api.Task
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.kotlin.dsl.register
+import java.util.*
 
 // Utils, that are not needed in scripts can be placed to internal/utils
 
@@ -15,10 +16,7 @@ inline fun <reified T : Task> TaskContainer.registerOrGetTask(
 }
 
 fun joinToTitleCamelCase(vararg parts: String): String =
-    parts.joinToString(separator = "") { part ->
-        if (part.isEmpty()) part
-        else buildString {
-            append(part.first().toTitleCase())
-            append(part.substring(1))
-        }
-    }
+    parts.joinToString(separator = "") { toTitleCase(it) }
+
+fun toTitleCase(s: String): String =
+    s.capitalize(Locale.ROOT)
