@@ -329,10 +329,10 @@ class Font : Managed {
      *
      * @return  the corresponding glyph IDs for each character.
      */
-    fun getUTF32Glyphs(uni: IntArray?): ShortArray {
+    fun getUTF32Glyphs(uni: IntArray): ShortArray {
         return try {
             Stats.onNativeCall()
-            _nGetUTF32Glyphs(_ptr, uni)
+            _nGetUTF32Glyphs(_ptr, uni, uni.size)
         } finally {
             reachabilityBarrier(this)
         }
@@ -640,7 +640,7 @@ private external fun _nGetStringGlyphs(ptr: NativePointer, str: String?): ShortA
 private external fun _nGetUTF32Glyph(ptr: NativePointer, uni: Int): Short
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetUTF32Glyphs")
-private external fun _nGetUTF32Glyphs(ptr: NativePointer, uni: IntArray?): ShortArray
+private external fun _nGetUTF32Glyphs(ptr: NativePointer, uni: IntArray?, uniCount: Int): ShortArray
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetStringGlyphsCount")
 private external fun _nGetStringGlyphsCount(ptr: NativePointer, str: String?): Int

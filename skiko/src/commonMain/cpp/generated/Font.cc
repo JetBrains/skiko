@@ -233,7 +233,7 @@ SKIKO_EXPORT KShort* org_jetbrains_skia_Font__1nGetStringGlyphs
 
 
 SKIKO_EXPORT KShort* org_jetbrains_skia_Font__1nGetUTF32Glyphs
-  (KNativePointer ptr, KInt* uniArr) {
+  (KNativePointer ptr, KInt* uniArr, KInt uniCount) {
     TODO("implement org_jetbrains_skia_Font__1nGetUTF32Glyphs");
 }
      
