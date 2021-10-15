@@ -7,8 +7,8 @@ import org.jetbrains.skiko.redrawer.Redrawer
 import platform.AppKit.NSView
 import platform.Foundation.NSMakeRect
 
-actual open class SkiaLayer actual constructor(
-    private val properties: SkiaLayerProperties
+actual open class SkiaLayer(
+    private val properties: SkiaLayerProperties = makeDefaultSkiaLayerProperties()
 ) {
     actual var renderApi: GraphicsApi = GraphicsApi.OPENGL
     actual val contentScale: Float
@@ -29,7 +29,7 @@ actual open class SkiaLayer actual constructor(
     val nsView = NSView(NSMakeRect(0.0, 0.0, 640.0, 480.0))
     var _contentScale: Float = 1.0f
 
-    var renderer: SkiaRenderer? = null
+    actual var renderer: SkiaRenderer? = null
 
     private var contextHandler = MacOSOpenGLContextHandler(this)
 

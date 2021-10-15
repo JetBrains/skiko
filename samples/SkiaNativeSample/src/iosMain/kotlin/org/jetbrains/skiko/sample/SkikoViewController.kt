@@ -26,11 +26,8 @@ class SkikoViewController : UIViewController {
             this.size.width to this.size.height
         }
         view.setFrame(CGRectMake(0.0, 0.0, width, height))
-
         val layer = SkiaLayer(width.toFloat(), height.toFloat())
-        layer.renderer = GenericRenderer(layer) { canvas, w, h, nanoTime ->
-            displayScene(canvas, nanoTime)
-        }
+        layer.renderer = GenericRenderer(layer, makeApp())
         layer.initLayer(view)
     }
 }

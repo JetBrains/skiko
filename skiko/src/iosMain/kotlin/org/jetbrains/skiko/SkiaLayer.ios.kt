@@ -6,18 +6,11 @@ import org.jetbrains.skiko.context.MetalContextHandler
 import org.jetbrains.skiko.redrawer.MetalRedrawer
 import platform.UIKit.*
 
-actual open class SkiaLayer actual constructor(
-    val properties: SkiaLayerProperties
-) {
-    var width: Float = 0f
-    var height: Float = 0f
-
-    constructor(width: Float, height: Float) : this(
-        makeDefaultSkiaLayerProperties()) {
-        this.width = width
-        this.height = height
-    }
-
+actual open class SkiaLayer(
+    var width: Float, var height: Float,
+    val properties: SkiaLayerProperties = makeDefaultSkiaLayerProperties()
+)
+{
     fun isShowing(): Boolean {
         return true
     }
@@ -50,7 +43,7 @@ actual open class SkiaLayer actual constructor(
         redrawer?.redrawImmediately()
     }
 
-    var renderer: SkiaRenderer? = null
+    actual var renderer: SkiaRenderer? = null
     internal var redrawer: MetalRedrawer? = null
     private var picture: PictureHolder? = null
     private val pictureRecorder = PictureRecorder()

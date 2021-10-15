@@ -26,7 +26,7 @@ import javax.swing.SwingUtilities.isEventDispatchThread
 actual open class SkiaLayer internal constructor(
     externalAccessibleFactory: ((Component) -> Accessible)? = null,
     private val properties: SkiaLayerProperties = makeDefaultSkiaLayerProperties(),
-    private val renderFactory: RenderFactory
+    private val renderFactory: RenderFactory = RenderFactory.Default
 ) : JPanel() {
 
     companion object {
@@ -43,11 +43,6 @@ actual open class SkiaLayer internal constructor(
     actual var transparency: Boolean = false
 
     internal val backedLayer: HardwareLayer
-
-    actual constructor(
-        properties: SkiaLayerProperties
-    ) : this(null, properties, RenderFactory.Default)
-
 
     constructor(
         properties: SkiaLayerProperties = makeDefaultSkiaLayerProperties(),
@@ -128,7 +123,7 @@ actual open class SkiaLayer internal constructor(
             backedLayer.fullscreen = value
         }
 
-    var renderer: SkiaRenderer? = null
+    actual var renderer: SkiaRenderer? = null
     val clipComponents = mutableListOf<ClipRectangle>()
 
     @Volatile

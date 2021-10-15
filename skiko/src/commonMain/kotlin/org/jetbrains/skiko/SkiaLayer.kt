@@ -3,11 +3,13 @@ package org.jetbrains.skiko
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.Picture
 
-expect open class SkiaLayer(properties: SkiaLayerProperties = makeDefaultSkiaLayerProperties()) {
+expect open class SkiaLayer {
     var renderApi: GraphicsApi
     val contentScale: Float
     var fullscreen: Boolean
     var transparency: Boolean
+
+    var renderer: SkiaRenderer?
 
     fun needRedraw()
 }
@@ -18,12 +20,12 @@ interface SkiaRenderer {
 
 open class GenericRenderer(
     val layer: SkiaLayer,
-    val displayScene: (Canvas, Int, Int, Long) -> Unit
+    val app: SkiaRenderer
 ): SkiaRenderer {
     override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
         val contentScale = layer.contentScale
         canvas.scale(contentScale, contentScale)
-        displayScene(canvas, (width / contentScale).toInt(), (height / contentScale).toInt(), nanoTime)
+        app.onRender(canvas, (width / contentScale).toInt(), (height / contentScale).toInt(), nanoTime)
         layer.needRedraw()
     }
 }

@@ -6,13 +6,13 @@ import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
 import kotlinx.cinterop.*
 
+fun makeApp() = BouncingBalls()
+
 fun main() {
     NSApplication.sharedApplication()
     val layer = SkiaLayer()
-    layer.renderer = GenericRenderer(layer) {
-            canvas, w, h, nanoTime -> displayScene(canvas, nanoTime)
-    }
     val window = SkiaWindow(layer)
+    layer.renderer = GenericRenderer(layer, makeApp())
     window.nsWindow.orderFrontRegardless()
     NSApp?.run()
 }
