@@ -8,15 +8,11 @@ import kotlinx.cinterop.*
 
 fun main() {
     NSApplication.sharedApplication()
-    createWindow()
-    NSApp?.run()
-}
-
-fun createWindow() {
     val layer = SkiaLayer()
     layer.renderer = GenericRenderer(layer) {
             canvas, w, h, nanoTime -> displayScene(canvas, nanoTime)
     }
     val window = SkiaWindow(layer)
     window.nsWindow.orderFrontRegardless()
+    NSApp?.run()
 }

@@ -20,7 +20,7 @@ internal class RendezvousBroadcastChannel<T> {
      */
     suspend fun sendAll(value: T) {
         onRequest.receive()
-        val receiversCopy = synchronized(receivers) {
+        val receiversCopy = maybeSynchronized(receivers) {
             mutableListOf<Continuation<T>>().apply {
                 addAll(receivers)
                 receivers.clear()
@@ -37,7 +37,7 @@ internal class RendezvousBroadcastChannel<T> {
      * Can be called concurrently from multiple threads.
      */
     suspend fun receive(): T = suspendCancellableCoroutine { continuation ->
-        synchronized(receivers) {
+        maybeSynchronized(receivers) {
             receivers.add(continuation)
         }
         onRequest.trySend(Unit)

@@ -33,6 +33,18 @@ if (project.hasProperty("skiko.version")) {
     version = project.properties["skiko.version"] as String
 }
 
+val resourcesDir = "$buildDir/resources"
+val skikoWasm by configurations.creating
+
+dependencies {
+    skikoWasm("org.jetbrains.skiko:skiko-js-wasm-runtime:$version")
+}
+
+val unzipTask = tasks.register("unzipWasm", Copy::class) {
+    destinationDir = file(resourcesDir)
+    from(skikoWasm.map { zipTree(it) })
+}
+
 kotlin {
     val targets = mutableListOf<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>()
     val nativeHostTarget = when (host) {
@@ -46,6 +58,11 @@ kotlin {
     if (hostOs == "macos") {
         targets.add(iosX64())
         targets.add(iosArm64())
+    }
+
+    js(IR) {
+        browser()
+        binaries.executable()
     }
 
     targets.forEach {
@@ -75,6 +92,12 @@ kotlin {
             dependsOn(commonMain)
         }
 
+        val jsMain by getting {
+            dependsOn(commonMain)
+            resources.setSrcDirs(resources.srcDirs)
+            resources.srcDirs(unzipTask.map { it.destinationDir })
+        }
+
         val macosMain by creating {
             dependsOn(nativeMain)
         }
@@ -92,7 +115,7 @@ kotlin {
                 }
                 macosArm64Main
             }
-            else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
+            else -> throw GradleException("Host OS is not supported")
         }
 
         if (hostOs == "macos") {
@@ -138,6 +161,10 @@ project.tasks.register<Exec>("run") {
         println("Run $out")
         listOf(out.single { it.name.endsWith(".kexe") }.absolutePath)
     }
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().configureEach {
+    dependsOn(unzipTask)
 }
 
 // Create Xcode integration tasks.
