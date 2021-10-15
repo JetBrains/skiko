@@ -1,5 +1,22 @@
 package org.jetbrains.skiko.sample
 
+import kotlinx.browser.document
+import kotlinx.browser.window
+import org.jetbrains.skia.Canvas
+import org.jetbrains.skia.Color4f
+import org.jetbrains.skia.Paint
+import org.jetbrains.skia.PaintMode
+import org.jetbrains.skia.Rect
+import org.jetbrains.skiko.wasm.api.CanvasRenderer
+import org.jetbrains.skiko.wasm.onWasmReady
+import org.w3c.dom.HTMLCanvasElement
+
+private data class Circle(var x: Float, var y: Float, var r: Float)
+
+private fun Canvas.draw(circle: Circle, paint: Paint) {
+    drawCircle(circle.x, circle.y, circle.r, paint)
+}
+
 private class DemoApp(htmlCanvas: HTMLCanvasElement) : CanvasRenderer(htmlCanvas) {
     private val paint = Paint()
 
@@ -16,8 +33,6 @@ private class DemoApp(htmlCanvas: HTMLCanvasElement) : CanvasRenderer(htmlCanvas
 fun main() {
     onWasmReady {
         val syncNow = window.performance.now()
-        BouncingBallsApp(document.getElementById("c") as HTMLCanvasElement, syncNow).draw()
-        BouncingBallsApp(document.getElementById("b") as HTMLCanvasElement, syncNow).draw()
         DemoApp(document.getElementById("a") as HTMLCanvasElement).draw()
     }
 }
