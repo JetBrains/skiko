@@ -71,7 +71,6 @@ actual open class SkiaLayer actual constructor(
         contextHandler.apply {
             if (!initContext()) {
                 error("initContext() failure")
-                return
             }
             initCanvas()
             clearCanvas()

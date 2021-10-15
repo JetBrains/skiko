@@ -39,7 +39,7 @@ internal actual fun makeDefaultRenderFactory(): RenderFactory {
                 GraphicsApi.DIRECT_SOFTWARE -> LinuxSoftwareRedrawer(layer, properties)
                 else -> LinuxOpenGLRedrawer(layer, properties)
             }
-            OS.JS -> {
+            OS.JS, OS.Ios -> {
                 TODO("Commonize me")
             }
         }
