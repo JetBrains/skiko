@@ -8,5 +8,5 @@ pluginManagement {
     }
     
 }
-rootProject.name = "SkiaNativeSample"
+rootProject.name = "SkiaMultiplatformSample"
 
