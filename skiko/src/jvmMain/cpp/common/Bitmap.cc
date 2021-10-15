@@ -133,7 +133,7 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapKt__1nAllocP
 }
 
 extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapKt__1nInstallPixels
-  (JNIEnv* env, jclass jclass, jlong ptr, jint width, jint height, jint colorType, jint alphaType, jlong colorSpacePtr, jbyteArray pixelsArr, jint rowBytes) {
+  (JNIEnv* env, jclass jclass, jlong ptr, jint width, jint height, jint colorType, jint alphaType, jlong colorSpacePtr, jbyteArray pixelsArr, jint rowBytes, jint pixelsLen) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(ptr));
     SkColorSpace* colorSpace = reinterpret_cast<SkColorSpace*>(static_cast<uintptr_t>(colorSpacePtr));
     SkImageInfo imageInfo = SkImageInfo::Make(width,
@@ -142,9 +142,8 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapKt__1nInstal
                                               static_cast<SkAlphaType>(alphaType),
                                               sk_ref_sp<SkColorSpace>(colorSpace));
 
-    jsize len = env->GetArrayLength(pixelsArr);
-    jbyte* pixels = new jbyte[len];
-    env->GetByteArrayRegion(pixelsArr, 0, len, pixels);
+    jbyte* pixels = new jbyte[pixelsLen];
+    env->GetByteArrayRegion(pixelsArr, 0, pixelsLen, pixels);
     return instance->installPixels(imageInfo, pixels, rowBytes, deleteJBytes, nullptr);
 }
 

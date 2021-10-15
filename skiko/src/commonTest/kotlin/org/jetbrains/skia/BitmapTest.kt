@@ -69,6 +69,23 @@ class BitmapTest {
         assertEquals(5 * bitmap.rowBytes, result.size)
     }
 
+    @Test //fixed bug https://github.com/JetBrains/skiko/pull/266
+    fun canReadPixelsWithGivenRowBytes() = runTest {
+        val bitmap = Bitmap()
+        bitmap.allocPixels(ImageInfo.makeS32(15, 15, ColorAlphaType.OPAQUE))
+
+        val newImageInfo = ImageInfo.makeS32(5, 5, ColorAlphaType.OPAQUE)
+
+        val result = bitmap.readPixels(
+            srcY = 1, srcX = 1,
+            dstInfo = newImageInfo,
+            dstRowBytes = newImageInfo.minRowBytes
+        )!!
+
+        assertTrue(newImageInfo.minRowBytes > 0 && newImageInfo.minRowBytes < bitmap.rowBytes)
+        assertEquals(newImageInfo.minRowBytes * 5, result.size)
+    }
+
     @Test
     fun canInstallPixels() = runTest {
         val bitmap = Bitmap()
@@ -79,7 +96,7 @@ class BitmapTest {
 
         val result = bitmap.readPixels()!!
         assertTrue(bitmap.rowBytes > 0)
-        assertEquals(16, result.size)
+        assertEquals(setArray.size, result.size)
         assertContentEquals(setArray, result)
     }
 }

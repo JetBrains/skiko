@@ -571,7 +571,8 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
                     info.colorInfo.alphaType.ordinal,
                     getPtr(info.colorInfo.colorSpace),
                     toInterop(pixels),
-                    rowBytes
+                    rowBytes,
+                    pixels?.size ?: 0
                 )
             }
         } finally {
@@ -1128,7 +1129,8 @@ private external fun _nInstallPixels(
     alphaType: Int,
     colorSpacePtr: NativePointer,
     pixels: InteropPointer,
-    rowBytes: Int
+    rowBytes: Int,
+    pixelsLen: Int
 ): Boolean
 
 
