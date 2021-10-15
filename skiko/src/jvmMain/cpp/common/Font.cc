@@ -220,14 +220,14 @@ extern "C" JNIEXPORT jshortArray JNICALL Java_org_jetbrains_skia_FontKt__1nGetSt
     return javaShortArray(env, glyphs);
 }
 
-extern "C" JNIEXPORT jshortArray JNICALL Java_org_jetbrains_skia_FontKt__1nGetUTF32Glyphs
-  (JNIEnv* env, jclass jclass, jlong ptr, jintArray uniArr, jint uniCount) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nGetUTF32Glyphs
+  (JNIEnv* env, jclass jclass, jlong ptr, jintArray uniArr, jint uniCount, jshortArray glyphsActual) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     std::vector<jshort> glyphs(uniCount);
     jint* uni = env->GetIntArrayElements(uniArr, nullptr);
     instance->unicharsToGlyphs(reinterpret_cast<SkUnichar*>(uni), uniCount, reinterpret_cast<SkGlyphID*>(glyphs.data()));
     env->ReleaseIntArrayElements(uniArr, uni, 0);
-    return javaShortArray(env, glyphs);
+    env->SetShortArrayRegion(glyphsActual, 0, uniCount, glyphs.data());
 }
 
 extern "C" JNIEXPORT jshort JNICALL Java_org_jetbrains_skia_FontKt__1nGetUTF32Glyph
