@@ -2,6 +2,9 @@ package org.jetbrains.skiko
 
 import org.jetbrains.skiko.wasm.api.CanvasRenderer
 import org.w3c.dom.HTMLCanvasElement
+import org.w3c.dom.events.InputEvent
+import org.w3c.dom.events.KeyboardEvent
+import org.w3c.dom.events.MouseEvent
 
 actual open class SkiaLayer(properties: SkiaLayerProperties = makeDefaultSkiaLayerProperties()
 ) {
@@ -23,6 +26,8 @@ actual open class SkiaLayer(properties: SkiaLayerProperties = makeDefaultSkiaLay
 
     actual var renderer: SkiaRenderer? = null
 
+    actual var eventProcessor: SkikoEventProcessor? = null
+
     fun setCanvas(htmlCanvas: HTMLCanvasElement) {
         state = object: CanvasRenderer(htmlCanvas) {
             override fun drawFrame(currentTimestamp: Double) {
@@ -31,9 +36,52 @@ actual open class SkiaLayer(properties: SkiaLayerProperties = makeDefaultSkiaLay
                 renderer?.onRender(canvas, width, height, currentNanos.toLong())
             }
         }
+        // See https://www.w3schools.com/jsref/dom_obj_event.asp
+        htmlCanvas.addEventListener("click", {
+            event ->
+            event as MouseEvent
+            eventProcessor?.onMouseEvent(SkikoMouseEvent(
+                event.x.toInt(), event.y.toInt(),
+                MouseButtons.LEFT,
+                event
+            ))
+        })
+        htmlCanvas.addEventListener("mousemove", {
+                event ->
+            event as MouseEvent
+            eventProcessor?.onMouseEvent(SkikoMouseEvent(
+                event.x.toInt(), event.y.toInt(),
+                0,
+                event
+            ))
+        })
+        htmlCanvas.addEventListener("keydown", {
+                event ->
+            event as KeyboardEvent
+            eventProcessor?.onKeyboardEvent(
+                    SkikoKeyboardEvent(
+                    event.keyCode,
+                    true,
+                    event
+                )
+            )
+        })
+        htmlCanvas.addEventListener("keyup", {
+                event ->
+            event as KeyboardEvent
+            eventProcessor?.onKeyboardEvent(SkikoKeyboardEvent(
+                event.keyCode,
+                false,
+                event
+            ))
+        })
     }
 
     fun draw() {
         state?.draw()
     }
 }
+
+actual typealias SkikoPlatformInputEvent = InputEvent
+actual typealias SkikoPlatformKeyboardEvent = KeyboardEvent
+actual typealias SkikoPlatformMouseEvent = MouseEvent

@@ -16,4 +16,10 @@ actual open class SkiaLayer(properties: SkiaLayerProperties)  {
         TODO("unimplemented")
     }
     actual var renderer: SkiaRenderer? = null
+    actual var eventProcessor: SkikoEventProcessor? = null
 }
+
+// TODO: do properly
+actual typealias SkikoPlatformInputEvent = Any
+actual typealias SkikoPlatformKeyboardEvent = Any
+actual typealias SkikoPlatformMouseEvent = Any

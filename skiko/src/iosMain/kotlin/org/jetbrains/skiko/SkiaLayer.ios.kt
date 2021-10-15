@@ -37,13 +37,14 @@ actual open class SkiaLayer(
     lateinit var view: UIView
 
     fun initLayer(view: UIView) {
-        println("SkiaLayer.initLayer")
         this.view = view
         redrawer = MetalRedrawer(this, properties)
         redrawer?.redrawImmediately()
     }
 
     actual var renderer: SkiaRenderer? = null
+    actual var eventProcessor: SkikoEventProcessor? = null
+
     internal var redrawer: MetalRedrawer? = null
     private var picture: PictureHolder? = null
     private val pictureRecorder = PictureRecorder()
@@ -75,3 +76,8 @@ actual open class SkiaLayer(
         }
     }
 }
+
+// TODO: do properly
+actual typealias SkikoPlatformInputEvent = Any
+actual typealias SkikoPlatformKeyboardEvent = Any
+actual typealias SkikoPlatformMouseEvent = Any

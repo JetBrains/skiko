@@ -5,6 +5,7 @@ import org.jetbrains.skiko.context.*
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.redrawer.Redrawer
 import platform.AppKit.NSView
+import platform.AppKit.NSWindow
 import platform.Foundation.NSMakeRect
 
 actual open class SkiaLayer(
@@ -30,6 +31,7 @@ actual open class SkiaLayer(
     var _contentScale: Float = 1.0f
 
     actual var renderer: SkiaRenderer? = null
+    actual var eventProcessor: SkikoEventProcessor? = null
 
     private var contextHandler = MacOSOpenGLContextHandler(this)
 
@@ -38,8 +40,8 @@ actual open class SkiaLayer(
     private var picture: PictureHolder? = null
     private val pictureRecorder = PictureRecorder()
 
-    fun initLayer() {
-        println("SkiaLayer.initLayer")
+    fun initLayer(window: NSWindow) {
+        window.contentView!!.addSubview(nsView)
         redrawer = createNativeRedrawer(this, GraphicsApi.OPENGL, properties)
         redrawer?.redrawImmediately()
     }
@@ -95,3 +97,7 @@ actual open class SkiaLayer(
     }
 }
 
+// TODO: do properly
+actual typealias SkikoPlatformInputEvent = Any
+actual typealias SkikoPlatformKeyboardEvent = Any
+actual typealias SkikoPlatformMouseEvent = Any

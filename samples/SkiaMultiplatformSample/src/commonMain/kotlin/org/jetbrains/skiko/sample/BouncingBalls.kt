@@ -1,12 +1,12 @@
 package org.jetbrains.skiko.sample
 
 import org.jetbrains.skia.*
-import org.jetbrains.skiko.SkiaRenderer
+import org.jetbrains.skiko.*
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
-class BouncingBalls: SkiaRenderer {
+class BouncingBalls: SkiaRenderer, SkikoEventProcessor {
     private data class Circle(var x: Float, var y: Float, var r: Float)
 
     companion object {
@@ -92,5 +92,17 @@ class BouncingBalls: SkiaRenderer {
             ball.recalculate(width, height, dtime.toFloat())
             canvas.drawCircle(ball.circle.x, ball.circle.y, ball.circle.r, paint)
         }
+    }
+
+    override fun onInputEvent(event: SkikoInputEvent) {
+        println("onInput: $event")
+    }
+
+    override fun onKeyboardEvent(event: SkikoKeyboardEvent) {
+        println("onKeyboard: $event")
+    }
+
+    override fun onMouseEvent(event: SkikoMouseEvent) {
+        println("onMouse: $event")
     }
 }

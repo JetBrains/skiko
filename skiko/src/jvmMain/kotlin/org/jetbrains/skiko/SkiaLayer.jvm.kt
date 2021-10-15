@@ -124,6 +124,8 @@ actual open class SkiaLayer internal constructor(
         }
 
     actual var renderer: SkiaRenderer? = null
+    actual var eventProcessor: SkikoEventProcessor? = null
+
     val clipComponents = mutableListOf<ClipRectangle>()
 
     @Volatile
@@ -443,3 +445,8 @@ actual open class SkiaLayer internal constructor(
         return rounded.toInt()
     }
 }
+
+// TODO: do properly
+actual typealias SkikoPlatformInputEvent = Any
+actual typealias SkikoPlatformKeyboardEvent = Any
+actual typealias SkikoPlatformMouseEvent = Any
