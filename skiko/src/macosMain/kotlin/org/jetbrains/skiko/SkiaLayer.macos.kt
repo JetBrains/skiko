@@ -6,6 +6,7 @@ import org.jetbrains.skia.*
 import org.jetbrains.skiko.redrawer.Redrawer
 import platform.AppKit.NSView
 import platform.AppKit.NSWindow
+import platform.AppKit.NSWindowDelegateProtocol
 import platform.Foundation.NSMakeRect
 
 actual open class SkiaLayer(
@@ -100,4 +101,4 @@ actual open class SkiaLayer(
 // TODO: do properly
 actual typealias SkikoPlatformInputEvent = Any
 actual typealias SkikoPlatformKeyboardEvent = Any
-actual typealias SkikoPlatformMouseEvent = Any
+actual typealias SkikoPlatformPointerEvent = Any

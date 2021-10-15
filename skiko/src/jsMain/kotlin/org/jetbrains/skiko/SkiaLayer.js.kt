@@ -5,6 +5,7 @@ import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.events.InputEvent
 import org.w3c.dom.events.KeyboardEvent
 import org.w3c.dom.events.MouseEvent
+import org.w3c.dom.pointerevents.PointerEvent
 
 actual open class SkiaLayer(properties: SkiaLayerProperties = makeDefaultSkiaLayerProperties()
 ) {
@@ -15,10 +16,14 @@ actual open class SkiaLayer(properties: SkiaLayerProperties = makeDefaultSkiaLay
         get() = 1.0f
     actual var fullscreen: Boolean
         get() = false
-        set(value) = throw Exception("Fullscreen is not supported!")
+        set(value) {
+            if (value) throw Exception("Fullscreen is not supported!")
+        }
     actual var transparency: Boolean
         get() = false
-        set(value) = throw Exception("Transparency is not supported!")
+        set(value) {
+            if (value) throw Exception("Transparency is not supported!")
+        }
 
     actual fun needRedraw() {
         draw()
@@ -37,26 +42,23 @@ actual open class SkiaLayer(properties: SkiaLayerProperties = makeDefaultSkiaLay
             }
         }
         // See https://www.w3schools.com/jsref/dom_obj_event.asp
-        htmlCanvas.addEventListener("click", {
-            event ->
-            event as MouseEvent
+        htmlCanvas.addEventListener("click", { event ->
+            event as PointerEvent
             eventProcessor?.onMouseEvent(SkikoMouseEvent(
                 event.x.toInt(), event.y.toInt(),
                 MouseButtons.LEFT,
                 event
             ))
         })
-        htmlCanvas.addEventListener("mousemove", {
-                event ->
+        htmlCanvas.addEventListener("mousemove", { event ->
             event as MouseEvent
             eventProcessor?.onMouseEvent(SkikoMouseEvent(
                 event.x.toInt(), event.y.toInt(),
                 0,
-                event
+                null
             ))
         })
-        htmlCanvas.addEventListener("keydown", {
-                event ->
+        htmlCanvas.addEventListener("keydown", { event ->
             event as KeyboardEvent
             eventProcessor?.onKeyboardEvent(
                     SkikoKeyboardEvent(
@@ -66,8 +68,7 @@ actual open class SkiaLayer(properties: SkiaLayerProperties = makeDefaultSkiaLay
                 )
             )
         })
-        htmlCanvas.addEventListener("keyup", {
-                event ->
+        htmlCanvas.addEventListener("keyup", { event ->
             event as KeyboardEvent
             eventProcessor?.onKeyboardEvent(SkikoKeyboardEvent(
                 event.keyCode,
@@ -84,4 +85,4 @@ actual open class SkiaLayer(properties: SkiaLayerProperties = makeDefaultSkiaLay
 
 actual typealias SkikoPlatformInputEvent = InputEvent
 actual typealias SkikoPlatformKeyboardEvent = KeyboardEvent
-actual typealias SkikoPlatformMouseEvent = MouseEvent
+actual typealias SkikoPlatformPointerEvent = PointerEvent

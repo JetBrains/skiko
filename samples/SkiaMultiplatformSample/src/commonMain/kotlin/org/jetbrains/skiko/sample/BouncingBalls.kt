@@ -82,7 +82,7 @@ class BouncingBalls: SkiaRenderer, SkikoEventProcessor {
         Color4f(1f, 0f, 0f, 0.8f).asPaint(),
         Color4f(1f, 0f, 1f, 0.8f).asPaint(),
         Color4f(0f, 1f, 1f, 0.8f).asPaint()
-    ))
+    )).toMutableList()
 
     override fun onRender(canvas: Canvas, width: Int, height: Int, currentTimestamp: Long) {
         val dtime = (currentTimestamp - prevTimestamp)
@@ -103,6 +103,10 @@ class BouncingBalls: SkiaRenderer, SkikoEventProcessor {
     }
 
     override fun onMouseEvent(event: SkikoMouseEvent) {
+        if (event.buttonMask and MouseButtons.LEFT != 0 ) {
+            data +=
+                BouncingBall(Circle(200f, 50f, 25f), 172f, PI / 4) to Color4f(1f, 0f, 0f, 0.8f).asPaint()
+        }
         println("onMouse: $event")
     }
 }

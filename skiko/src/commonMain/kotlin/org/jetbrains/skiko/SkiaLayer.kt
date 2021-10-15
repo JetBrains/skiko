@@ -34,12 +34,11 @@ data class SkikoKeyboardEvent(
     val platform: SkikoPlatformKeyboardEvent?
 )
 
-
-expect class SkikoPlatformMouseEvent
+expect class SkikoPlatformPointerEvent
 data class SkikoMouseEvent(
     val x: Int, val y: Int,
     val buttonMask: Int,
-    val platform: SkikoPlatformMouseEvent?
+    val platform: SkikoPlatformPointerEvent?
 )
 
 interface SkikoEventProcessor {
