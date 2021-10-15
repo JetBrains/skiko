@@ -55,3 +55,9 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_tests_TestHelpersKt__
     result_double[4] = 10000000.9991;
     env->ReleaseDoubleArrayElements(jdarray, result_double, 0);
 }
+
+
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_tests_TestHelpersKt__1nGetPointerFromByteBuffer
+  (JNIEnv *env, jclass, jobject buffer) {
+    return reinterpret_cast<jlong>(env->GetDirectBufferAddress(buffer));
+}

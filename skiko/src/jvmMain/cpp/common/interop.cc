@@ -748,6 +748,17 @@ namespace skija {
                 std::unique_ptr<SkSurfaceProps>(nullptr);
             return std::make_unique<SkSurfaceProps>(flags, geom);
         }
+
+        std::unique_ptr<SkSurfaceProps> toSkSurfaceProps(JNIEnv* env, jintArray surfacePropsInts) {
+            if (surfacePropsInts == nullptr) {
+                return std::unique_ptr<SkSurfaceProps>(nullptr);
+            }
+            jint *ints = env->GetIntArrayElements(surfacePropsInts, NULL);
+            uint32_t flags = ints[0];
+            SkPixelGeometry geom = static_cast<SkPixelGeometry>(ints[1]);
+            env->ReleaseIntArrayElements(surfacePropsInts, ints, 0);
+            return std::make_unique<SkSurfaceProps>(flags, geom);
+        }
     }
 
     namespace impl {

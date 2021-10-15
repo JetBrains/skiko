@@ -19,8 +19,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Pixmap__1nMakeNull
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Pixmap__1nMake
-  (KInteropPointer __Kinstance,
-  KInt width, KInt height, KInt colorType, KInt alphaType, KNativePointer colorSpacePtr, KNativePointer pixelsPtr, KInt rowBytes) {
+  (KInt width, KInt height, KInt colorType, KInt alphaType, KNativePointer colorSpacePtr, KNativePointer pixelsPtr, KInt rowBytes) {
     SkColorSpace* colorSpace = interopToPtr<SkColorSpace*>(colorSpacePtr);
     SkImageInfo imageInfo = SkImageInfo::Make(width,
                                           height,

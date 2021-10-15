@@ -1,11 +1,10 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.interopScope
 import org.jetbrains.skia.impl.use
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
-import kotlin.test.assertNotEquals
-import kotlin.test.assertTrue
+import org.jetbrains.skiko.tests.allocateBytesForPixels
+import org.jetbrains.skiko.tests.runTest
+import kotlin.test.*
 
 class SurfaceTest {
 
@@ -55,6 +54,51 @@ class SurfaceTest {
 
             val context = surface.recordingContext
             assertEquals(context, null)
+        }
+    }
+
+    @Test
+    fun canMakeRaster() = runTest {
+        val imageInfo = ImageInfo.makeN32Premul(100, 100)
+        val surface1 = Surface.makeRaster(
+            imageInfo, imageInfo.minRowBytes, SurfaceProps()
+        )
+
+        assertEquals(100, surface1.width)
+        assertEquals(100, surface1.height)
+
+        val surface2 = Surface.makeRaster(
+            imageInfo, imageInfo.minRowBytes, null
+        )
+    }
+
+    @Test
+    fun canMakeRasterDirect() = runTest {
+        interopScope {
+            val imageInfo = ImageInfo.makeN32Premul(25, 25)
+            val addr = allocateBytesForPixels(25 * imageInfo.minRowBytes)
+            val surface = Surface.makeRasterDirect(imageInfo, addr, imageInfo.minRowBytes)
+
+            val writePixelsBitmap = Bitmap()
+            writePixelsBitmap.setImageInfo(ImageInfo.makeN32Premul(10, 20))
+            writePixelsBitmap.allocPixels()
+
+            surface.writePixels(writePixelsBitmap, 0, 0)
+        }
+    }
+
+    @Test
+    fun canMakeRasterDirectUsingPixmap() = runTest {
+        interopScope {
+            val imageInfo = ImageInfo.makeN32Premul(20, 20)
+            val addr = allocateBytesForPixels(20 * imageInfo.minRowBytes)
+            val pixmap = Pixmap.make(imageInfo, addr, imageInfo.minRowBytes)
+            val surface = Surface.makeRasterDirect(pixmap)
+
+            val writePixelsBitmap = Bitmap()
+            writePixelsBitmap.setImageInfo(ImageInfo.makeN32Premul(10, 10))
+            writePixelsBitmap.allocPixels()
+            surface.writePixels(writePixelsBitmap, 0, 0)
         }
     }
 }

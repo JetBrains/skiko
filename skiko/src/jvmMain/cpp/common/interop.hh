@@ -294,6 +294,7 @@ namespace skija {
         extern jmethodID _getPixelGeometryOrdinal;
         void onLoad(JNIEnv* env);
         std::unique_ptr<SkSurfaceProps> toSkSurfaceProps(JNIEnv* env, jobject surfacePropsObj);
+        std::unique_ptr<SkSurfaceProps> toSkSurfaceProps(JNIEnv* env, jintArray surfacePropsInts);
     }
 
     namespace SamplingMode {
