@@ -10,7 +10,7 @@ import kotlin.test.Test
 
 class SvgTest {
     @Test
-    fun `svg smoke`() {
+    fun svg_smoke() {
         val svgText = """
             <svg version="1.1"
                  width="300" height="200"

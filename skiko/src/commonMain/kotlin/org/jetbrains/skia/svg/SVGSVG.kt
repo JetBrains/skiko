@@ -42,7 +42,7 @@ class SVGSVG internal constructor(ptr: NativePointer) : SVGContainer(ptr) {
         set(value) {
             setY(value)
         }
-    
+
     fun setY(length: SVGLength): SVGSVG {
         return try {
             Stats.onNativeCall()
@@ -105,7 +105,7 @@ class SVGSVG internal constructor(ptr: NativePointer) : SVGContainer(ptr) {
         }
         set(value) = try {
             Stats.onNativeCall()
-            SVGSVG_nSetViewBox(_ptr, value!!.left, value.top, value.right, viewBox!!.bottom)
+            SVGSVG_nSetViewBox(_ptr, value!!.left, value.top, value.right, value.bottom)
         } finally {
             reachabilityBarrier(this)
         }
