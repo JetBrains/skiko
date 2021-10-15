@@ -5,6 +5,7 @@ actual val hostOs: OS by lazy {
         OsFamily.MACOSX -> OS.MacOS
         OsFamily.LINUX -> OS.Linux
         OsFamily.WINDOWS -> OS.Windows
+        OsFamily.IOS -> OS.Ios
         else -> throw Error("Unsupported OS ${Platform.osFamily}")
     }
 }
