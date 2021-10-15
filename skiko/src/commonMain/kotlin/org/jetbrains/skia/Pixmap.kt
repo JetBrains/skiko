@@ -27,8 +27,8 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
         reachabilityBarrier(info.colorInfo.colorSpace)
     }
 
-    fun reset(info: ImageInfo, buffer: ByteBuffer, rowBytes: Int) {
-        reset(info, BufferUtil.getPointerFromByteBuffer(buffer), rowBytes)
+    fun reset(info: ImageInfo, buffer: SkikoByteBuffer, rowBytes: Int) {
+        reset(info, buffer.addr, rowBytes)
     }
 
     fun setColorSpace(colorSpace: ColorSpace?) {
@@ -54,8 +54,8 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
         }
     }
 
-    fun extractSubset(buffer: ByteBuffer, area: IRect): Boolean {
-        return extractSubset(BufferUtil.getPointerFromByteBuffer(buffer), area)
+    fun extractSubset(buffer: SkikoByteBuffer, area: IRect): Boolean {
+        return extractSubset(buffer.addr, area)
     }
 
     val info: ImageInfo
@@ -248,8 +248,8 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
     }
 
     companion object {
-        fun make(info: ImageInfo, buffer: ByteBuffer, rowBytes: Int): Pixmap {
-            return make(info, BufferUtil.getPointerFromByteBuffer(buffer), rowBytes)
+        fun make(info: ImageInfo, buffer: SkikoByteBuffer, rowBytes: Int): Pixmap {
+            return make(info, buffer.addr, rowBytes)
         }
 
         fun make(info: ImageInfo, addr: NativePointer, rowBytes: Int): Pixmap {

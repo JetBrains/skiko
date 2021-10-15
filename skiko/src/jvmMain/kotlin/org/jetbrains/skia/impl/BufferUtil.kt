@@ -1,9 +1,8 @@
 package org.jetbrains.skia.impl
 
-import org.jetbrains.skia.ByteBuffer
-import org.jetbrains.skia.ExternalSymbolName
+import java.nio.ByteBuffer
 
-object BufferUtil {
+internal object BufferUtil {
     fun getByteBufferFromPointer(ptr: NativePointer, size: Int): ByteBuffer {
         return _nGetByteBufferFromPointer(ptr, size)
             ?: throw IllegalArgumentException("JNI direct buffer access not support by current JVM!")
@@ -17,8 +16,6 @@ object BufferUtil {
 }
 
 
-@ExternalSymbolName("org_jetbrains_skia_BufferUtil__1nGetByteBufferFromPointer")
 private external fun _nGetByteBufferFromPointer(ptr: NativePointer, size: Int): ByteBuffer?
 
-@ExternalSymbolName("org_jetbrains_skia_BufferUtil__1nGetPointerFromByteBuffer")
 private external fun _nGetPointerFromByteBuffer(buffer: ByteBuffer?): NativePointer

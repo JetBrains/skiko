@@ -27,7 +27,7 @@ fun Bitmap.toBufferedImage(): BufferedImage {
         else -> throw UnsupportedOperationException("unsupported color type ${this.colorInfo.colorType}")
     }
     val raster = Raster.createInterleavedRaster(
-        DirectDataBuffer(pixels!!),
+        DirectDataBuffer(pixels!!.backingByteBuffer),
         this.width,
         this.height,
         this.width * 4,
