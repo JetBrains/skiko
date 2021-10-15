@@ -142,9 +142,12 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_Bitmap__1nAllocPixelsRowBytes
     return instance->tryAllocPixels(imageInfo, rowBytes);
 }
 
+void deletePixelsBytes(void* addr, void*) {
+    free(addr);
+}
 
 SKIKO_EXPORT KBoolean org_jetbrains_skia_Bitmap__1nInstallPixels
-  (KNativePointer ptr, KInt width, KInt height, KInt colorType, KInt alphaType, KNativePointer colorSpacePtr, KByte* pixelsArr, KInt rowBytes) {
+  (KNativePointer ptr, KInt width, KInt height, KInt colorType, KInt alphaType, KNativePointer colorSpacePtr, KByte* pixelsArr, KInt rowBytes, KInt pixelsLen) {
   SkBitmap* instance = reinterpret_cast<SkBitmap*>(ptr);
   SkColorSpace* colorSpace = reinterpret_cast<SkColorSpace*>(colorSpacePtr);
   SkImageInfo imageInfo = SkImageInfo::Make(width,
@@ -152,7 +155,11 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_Bitmap__1nInstallPixels
                                             static_cast<SkColorType>(colorType),
                                             static_cast<SkAlphaType>(alphaType),
                                             sk_ref_sp<SkColorSpace>(colorSpace));
-  return instance->installPixels(imageInfo, pixelsArr, rowBytes, nullptr, nullptr);
+
+  KNativePointer copyPtr = malloc(pixelsLen);
+  void* copy = memcpy(copyPtr, pixelsArr, pixelsLen);
+
+  return instance->installPixels(imageInfo, copy, rowBytes, deletePixelsBytes, nullptr);
 }
 
 SKIKO_EXPORT KBoolean org_jetbrains_skia_Bitmap__1nAllocPixels
