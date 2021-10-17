@@ -16,7 +16,15 @@ expect open class SkiaLayer {
     fun needRedraw()
 }
 
-object MouseButtons {
+fun SkiaLayer.setApp(renderer: SkiaRenderer) {
+    this.renderer = renderer
+    if (renderer is SkikoEventProcessor) {
+        this.eventProcessor = renderer
+    }
+}
+
+object SkikoMouseButtons {
+    const val NONE = 0
     const val LEFT = 1 shl 0
     const val RIGHT = 1 shl 1
     const val MIDDLE = 1 shl 2
@@ -28,18 +36,32 @@ data class SkikoInputEvent(
     val platform: SkikoPlatformInputEvent?
 )
 
+enum class SkikoKeyboardEventKind {
+    UP, DOWN
+}
 expect class SkikoPlatformKeyboardEvent
 data class SkikoKeyboardEvent(
-    val code: Int, val pressed: Boolean,
+    val code: Int,
+    val kind: SkikoKeyboardEventKind,
     val platform: SkikoPlatformKeyboardEvent?
 )
 
+enum class SkikoMouseEventKind {
+    UP, DOWN, MOVE
+}
 expect class SkikoPlatformPointerEvent
 data class SkikoMouseEvent(
     val x: Int, val y: Int,
     val buttonMask: Int,
+    val kind: SkikoMouseEventKind,
     val platform: SkikoPlatformPointerEvent?
 )
+
+val SkikoMouseEvent.isLeftClick: Boolean
+    get() = (buttonMask and SkikoMouseButtons.LEFT) != 0 && (kind == SkikoMouseEventKind.UP)
+
+val SkikoMouseEvent.isRightClick: Boolean
+    get() = (buttonMask and SkikoMouseButtons.RIGHT) != 0 && (kind == SkikoMouseEventKind.UP)
 
 interface SkikoEventProcessor {
     fun onKeyboardEvent(event: SkikoKeyboardEvent)
@@ -54,7 +76,7 @@ interface SkiaRenderer {
 open class GenericSkikoApp(
     val layer: SkiaLayer,
     val appRenderer: SkiaRenderer,
-    val appEventProcessor: SkikoEventProcessor? = null
+    val appEventProcessor: SkikoEventProcessor? = if (appRenderer is SkikoEventProcessor) appRenderer else null
 ): SkiaRenderer, SkikoEventProcessor {
     override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
         val contentScale = layer.contentScale

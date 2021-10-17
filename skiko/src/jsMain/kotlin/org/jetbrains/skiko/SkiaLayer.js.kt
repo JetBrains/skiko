@@ -42,11 +42,21 @@ actual open class SkiaLayer(properties: SkiaLayerProperties = makeDefaultSkiaLay
             }
         }
         // See https://www.w3schools.com/jsref/dom_obj_event.asp
-        htmlCanvas.addEventListener("click", { event ->
+        htmlCanvas.addEventListener("mousedown", { event ->
             event as PointerEvent
             eventProcessor?.onMouseEvent(SkikoMouseEvent(
                 event.x.toInt(), event.y.toInt(),
-                MouseButtons.LEFT,
+                SkikoMouseButtons.LEFT,
+                SkikoMouseEventKind.DOWN,
+                event
+            ))
+        })
+        htmlCanvas.addEventListener("mouseup", { event ->
+            event as PointerEvent
+            eventProcessor?.onMouseEvent(SkikoMouseEvent(
+                event.x.toInt(), event.y.toInt(),
+                SkikoMouseButtons.LEFT,
+                SkikoMouseEventKind.UP,
                 event
             ))
         })
@@ -54,7 +64,8 @@ actual open class SkiaLayer(properties: SkiaLayerProperties = makeDefaultSkiaLay
             event as MouseEvent
             eventProcessor?.onMouseEvent(SkikoMouseEvent(
                 event.x.toInt(), event.y.toInt(),
-                0,
+                SkikoMouseButtons.NONE,
+                SkikoMouseEventKind.MOVE,
                 null
             ))
         })
@@ -62,18 +73,14 @@ actual open class SkiaLayer(properties: SkiaLayerProperties = makeDefaultSkiaLay
             event as KeyboardEvent
             eventProcessor?.onKeyboardEvent(
                     SkikoKeyboardEvent(
-                    event.keyCode,
-                    true,
-                    event
+                    event.keyCode, SkikoKeyboardEventKind.DOWN, event
                 )
             )
         })
         htmlCanvas.addEventListener("keyup", { event ->
             event as KeyboardEvent
             eventProcessor?.onKeyboardEvent(SkikoKeyboardEvent(
-                event.keyCode,
-                false,
-                event
+                event.keyCode, SkikoKeyboardEventKind.UP, event
             ))
         })
     }

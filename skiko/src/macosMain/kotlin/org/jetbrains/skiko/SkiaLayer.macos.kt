@@ -4,9 +4,7 @@ import kotlinx.cinterop.useContents
 import org.jetbrains.skiko.context.*
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.redrawer.Redrawer
-import platform.AppKit.NSView
-import platform.AppKit.NSWindow
-import platform.AppKit.NSWindowDelegateProtocol
+import platform.AppKit.*
 import platform.Foundation.NSMakeRect
 
 actual open class SkiaLayer(
@@ -28,7 +26,7 @@ actual open class SkiaLayer(
             if (value) throw IllegalArgumentException("transparency unsupported")
         }
 
-    val nsView = NSView(NSMakeRect(0.0, 0.0, 640.0, 480.0))
+    lateinit var nsView: NSView
     var _contentScale: Float = 1.0f
 
     actual var renderer: SkiaRenderer? = null
@@ -41,7 +39,56 @@ actual open class SkiaLayer(
     private var picture: PictureHolder? = null
     private val pictureRecorder = PictureRecorder()
 
+    private fun eventToMouse(event: NSEvent, kind: SkikoMouseEventKind): SkikoMouseEvent {
+        val buttons = when (event.buttonNumber.toInt()) {
+            0 -> SkikoMouseButtons.LEFT
+            1 -> SkikoMouseButtons.RIGHT
+            else -> SkikoMouseButtons.NONE
+        }
+        var (x, y) = event.locationInWindow.useContents {
+            this.x to this.y
+        }
+        // Translate.
+        nsView.frame.useContents {
+           y = size.height - y
+        }
+        return SkikoMouseEvent(x.toInt(), y.toInt(), buttons, kind, event)
+    }
+
+    private fun eventToKeyboard(event: NSEvent, kind: SkikoKeyboardEventKind): SkikoKeyboardEvent {
+         return SkikoKeyboardEvent(event.keyCode.toInt(), kind, event)
+    }
+
     fun initLayer(window: NSWindow) {
+        val (width, height) = window.contentLayoutRect.useContents {
+            this.size.width to this.size.height
+        }
+        nsView = object : NSView(NSMakeRect(0.0, 0.0, width, height)) {
+            private var trackingArea : NSTrackingArea? = null
+            override fun acceptsFirstResponder(): Boolean {
+                return true
+            }
+            override fun updateTrackingAreas() {
+                trackingArea?.let { removeTrackingArea(it) }
+                trackingArea = NSTrackingArea(rect = bounds, options = NSMouseMoved, owner = null, userInfo = null)
+                addTrackingArea(trackingArea!!)
+            }
+            override fun mouseDown(event: NSEvent) {
+                eventProcessor?.onMouseEvent(eventToMouse(event, SkikoMouseEventKind.DOWN))
+            }
+            override fun mouseUp(event: NSEvent) {
+                eventProcessor?.onMouseEvent(eventToMouse(event, SkikoMouseEventKind.UP))
+            }
+            override fun mouseMoved(event: NSEvent) {
+                eventProcessor?.onMouseEvent(eventToMouse(event, SkikoMouseEventKind.MOVE))
+            }
+            override fun keyDown(event: NSEvent) {
+                eventProcessor?.onKeyboardEvent(eventToKeyboard(event, SkikoKeyboardEventKind.DOWN))
+            }
+            override fun keyUp(event: NSEvent) {
+                eventProcessor?.onKeyboardEvent(eventToKeyboard(event, SkikoKeyboardEventKind.UP))
+            }
+        }
         window.contentView!!.addSubview(nsView)
         redrawer = createNativeRedrawer(this, GraphicsApi.OPENGL, properties)
         redrawer?.redrawImmediately()
@@ -58,8 +105,6 @@ actual open class SkiaLayer(
     }
 
     fun update(nanoTime: Long) {
-        println("SkiaLayer.update")
-
         val width = nsView.frame.useContents { size.width }
         val height = nsView.frame.useContents { size.height }
 
@@ -77,7 +122,6 @@ actual open class SkiaLayer(
     private var initedCanvas = false
 
     fun draw() {
-        println("SkiaLayer.draw")
         contextHandler.apply {
             if (!initedCanvas) {
                 if (!initContext()) {
@@ -89,7 +133,6 @@ actual open class SkiaLayer(
             }
             clearCanvas()
             val picture = picture
-            println("SkiaLayer.draw: picture=$picture")
             if (picture != null) {
                 drawOnCanvas(picture.instance)
             }
@@ -99,6 +142,6 @@ actual open class SkiaLayer(
 }
 
 // TODO: do properly
-actual typealias SkikoPlatformInputEvent = Any
-actual typealias SkikoPlatformKeyboardEvent = Any
-actual typealias SkikoPlatformPointerEvent = Any
+actual typealias SkikoPlatformInputEvent = NSEvent
+actual typealias SkikoPlatformKeyboardEvent = NSEvent
+actual typealias SkikoPlatformPointerEvent = NSEvent

@@ -103,9 +103,13 @@ class BouncingBalls: SkiaRenderer, SkikoEventProcessor {
     }
 
     override fun onMouseEvent(event: SkikoMouseEvent) {
-        if (event.buttonMask and MouseButtons.LEFT != 0 ) {
-            data +=
-                BouncingBall(Circle(200f, 50f, 25f), 172f, PI / 4) to Color4f(1f, 0f, 0f, 0.8f).asPaint()
+        if (event.isLeftClick) {
+            val paint = Color4f(1f, 0f, 0f, 0.8f).asPaint()
+            data += BouncingBall(
+                Circle(event.x.toFloat(), event.y.toFloat(), 25f), 172f, PI / 4) to paint
+        }
+        if (event.isRightClick && data.size > 0) {
+            data.removeLast()
         }
         println("onMouse: $event")
     }

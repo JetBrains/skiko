@@ -103,8 +103,6 @@ class MacosGLLayer(val layer: SkiaLayer, setNeedsDisplayOnBoundsChange: Boolean)
         displayTime: CPointer<CVTimeStamp>?
     ) {
         CGLSetCurrentContext(ctx);
-        println("MacosGLLayer::drawInCGLContext")
-
         performDraw()
 
         //context.flush() // TODO: I thought the below should call context.flush().

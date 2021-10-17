@@ -11,8 +11,7 @@ fun main() {
         val skiaLayer = SkiaLayer()
         val game = BouncingBalls()
         val app = GenericSkikoApp(skiaLayer, game, game)
-        skiaLayer.renderer = app
-        skiaLayer.eventProcessor = app
+        skiaLayer.setApp(app)
         val canvas = document.getElementById("SkikoTarget") as HTMLCanvasElement
         skiaLayer.setCanvas(canvas)
         skiaLayer.draw()

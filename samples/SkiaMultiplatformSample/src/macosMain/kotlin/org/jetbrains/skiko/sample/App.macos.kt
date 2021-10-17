@@ -21,8 +21,8 @@ fun main() {
         styleMask = windowStyle,
         backing =  NSBackingStoreBuffered,
         defer = true)
-    val app = makeApp()
-    skiaLayer.renderer = GenericSkikoApp(skiaLayer, app, app)
+    val app = GenericSkikoApp(skiaLayer, makeApp())
+    skiaLayer.setApp(app)
     skiaLayer.initLayer(window)
     window.orderFrontRegardless()
     NSApp?.run()

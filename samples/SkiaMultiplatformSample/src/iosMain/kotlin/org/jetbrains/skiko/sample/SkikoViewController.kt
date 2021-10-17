@@ -29,8 +29,7 @@ class SkikoViewController : UIViewController {
         }
         view.setFrame(CGRectMake(0.0, 0.0, width, height))
         val layer = SkiaLayer(width.toFloat(), height.toFloat())
-        val app = makeApp()
-        layer.renderer = GenericSkikoApp(layer, app, if (app is SkikoEventProcessor) app else null)
+        layer.setApp(GenericSkikoApp(layer, makeApp()))
         layer.initLayer(view)
     }
 }
