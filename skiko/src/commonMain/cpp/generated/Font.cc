@@ -18,7 +18,10 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Font__1nGetFinalizer
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Font__1nMakeDefault
   () {
+    std::cout << "SK FONT #0" << "\r\n" ;
     SkFont* obj = new SkFont();
+    std::cout << "SK FONT #2 " << obj << "\r\n" ;
+    std::cout << "SK FONT #3 " << reinterpret_cast<KNativePointer>(obj) << "\r\n" ;
     return reinterpret_cast<KNativePointer>(obj);
 }
 
@@ -234,8 +237,14 @@ SKIKO_EXPORT KShort* org_jetbrains_skia_Font__1nGetStringGlyphs
 
 SKIKO_EXPORT KShort* org_jetbrains_skia_Font__1nGetUTF32Glyphs
   (KNativePointer ptr, KInt* uni, KInt uniCount, KShort* glyphs) {
+    std::cout << "GL32 #0 "  << "\r\n";
     SkFont* instance = reinterpret_cast<SkFont*>(ptr);
+    std::cout << "GL32 #1 " << instance  << "\r\n";
     instance->unicharsToGlyphs(reinterpret_cast<SkUnichar*>(uni), uniCount, reinterpret_cast<SkGlyphID*>(glyphs));
+    for (int i = 0; i < uniCount; i++) {
+        std::cout << "GL32 UNI [" << i << "] " << uni[i]  << "\r\n";
+        std::cout << "GL32 LOOP [" << i << "] " << glyphs[i]  << "\r\n";
+    }
 }
      
 

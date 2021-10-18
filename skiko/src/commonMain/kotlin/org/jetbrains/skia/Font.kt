@@ -8,6 +8,7 @@ import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.interopScope
 import org.jetbrains.skia.impl.withResult
 
 class Font : Managed {
@@ -334,8 +335,10 @@ class Font : Managed {
     fun getUTF32Glyphs(uni: IntArray): ShortArray {
         return try {
             Stats.onNativeCall()
-            withResult(ShortArray(uni.size)) {
-                _nGetUTF32Glyphs(_ptr, uni, uni.size, it)
+            interopScope {
+                withResult(ShortArray(uni.size)) {
+                    _nGetUTF32Glyphs(_ptr, toInterop(uni), uni.size, it)
+                }
             }
         } finally {
             reachabilityBarrier(this)
@@ -644,7 +647,7 @@ private external fun _nGetStringGlyphs(ptr: NativePointer, str: String?): ShortA
 private external fun _nGetUTF32Glyph(ptr: NativePointer, uni: Int): Short
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetUTF32Glyphs")
-private external fun _nGetUTF32Glyphs(ptr: NativePointer, uni: IntArray?, uniCount: Int, glyphs: InteropPointer)
+private external fun _nGetUTF32Glyphs(ptr: NativePointer, uni: InteropPointer, uniCount: Int, glyphs: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetStringGlyphsCount")
 private external fun _nGetStringGlyphsCount(ptr: NativePointer, str: String?): Int
