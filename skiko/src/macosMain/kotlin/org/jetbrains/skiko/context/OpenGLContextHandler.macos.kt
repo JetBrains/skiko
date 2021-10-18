@@ -9,7 +9,6 @@ import platform.OpenGLCommon.GLenum
 
 internal class MacOSOpenGLContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
     override fun initContext(): Boolean {
-        println("MacOSOpenGLContextHandler.initContext")
         try {
             if (context == null) {
                 context = DirectContext.makeGL()
@@ -33,7 +32,6 @@ internal class MacOSOpenGLContextHandler(layer: SkiaLayer) : ContextHandler(laye
     }
 
     override fun initCanvas() {
-        println("MacOSOpenGLContextHandler.initCanvas")
         val scale = layer.contentScale
         val w = (layer.nsView.frame.useContents { size.width } * scale).toInt().coerceAtLeast(0)
         val h = (layer.nsView.frame.useContents { size.height } * scale).toInt().coerceAtLeast(0)

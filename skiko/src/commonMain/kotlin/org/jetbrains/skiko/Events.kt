@@ -24,20 +24,20 @@ data class SkikoKeyboardEvent(
     val platform: SkikoPlatformKeyboardEvent?
 )
 
-enum class SkikoMouseEventKind {
+enum class SkikoPointerEventKind {
     UP, DOWN, MOVE
 }
 expect class SkikoPlatformPointerEvent
-data class SkikoMouseEvent(
-    val x: Int, val y: Int,
+data class SkikoPointerEvent(
+    val x: Double, val y: Double,
     val buttonMask: Int,
-    val kind: SkikoMouseEventKind,
+    val kind: SkikoPointerEventKind,
     val platform: SkikoPlatformPointerEvent?
 )
 
-val SkikoMouseEvent.isLeftClick: Boolean
-    get() = (buttonMask and SkikoMouseButtons.LEFT) != 0 && (kind == SkikoMouseEventKind.UP)
+val SkikoPointerEvent.isLeftClick: Boolean
+    get() = (buttonMask and SkikoMouseButtons.LEFT) != 0 && (kind == SkikoPointerEventKind.UP)
 
-val SkikoMouseEvent.isRightClick: Boolean
-    get() = (buttonMask and SkikoMouseButtons.RIGHT) != 0 && (kind == SkikoMouseEventKind.UP)
+val SkikoPointerEvent.isRightClick: Boolean
+    get() = (buttonMask and SkikoMouseButtons.RIGHT) != 0 && (kind == SkikoPointerEventKind.UP)
 

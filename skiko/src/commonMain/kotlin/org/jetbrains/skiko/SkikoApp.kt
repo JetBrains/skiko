@@ -5,7 +5,7 @@ import org.jetbrains.skia.Canvas
 interface SkikoApp {
     // Input
     fun onKeyboardEvent(event: SkikoKeyboardEvent)
-    fun onMouseEvent(event: SkikoMouseEvent)
+    fun onPointerEvent(event: SkikoPointerEvent)
     fun onInputEvent(event: SkikoInputEvent)
 
     // Rendering
@@ -13,8 +13,9 @@ interface SkikoApp {
 }
 
 open class GenericSkikoApp(
-    val layer: SkiaLayer,
-    val app: SkikoApp): SkikoApp {
+        val layer: SkiaLayer,
+        val app: SkikoApp
+    ): SkikoApp {
 
     init {
         layer.setApp(this)
@@ -36,8 +37,8 @@ open class GenericSkikoApp(
         app.onKeyboardEvent(event)
     }
 
-    override fun onMouseEvent(event: SkikoMouseEvent) {
-        app.onMouseEvent(event)
+    override fun onPointerEvent(event: SkikoPointerEvent) {
+        app.onPointerEvent(event)
     }
 }
 
@@ -49,6 +50,6 @@ abstract class NoInputSkikoApp: SkikoApp {
     override fun onKeyboardEvent(event: SkikoKeyboardEvent) {
     }
 
-    override fun onMouseEvent(event: SkikoMouseEvent) {
+    override fun onPointerEvent(event: SkikoPointerEvent) {
     }
 }

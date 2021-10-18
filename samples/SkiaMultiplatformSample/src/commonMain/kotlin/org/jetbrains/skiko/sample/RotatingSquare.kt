@@ -24,7 +24,7 @@ class RotatingSquare : SkikoApp {
         println("onKeyboard: $event")
     }
 
-    override fun onMouseEvent(event: SkikoMouseEvent) {
+    override fun onPointerEvent(event: SkikoPointerEvent) {
         println("onMouse: $event")
     }
 }

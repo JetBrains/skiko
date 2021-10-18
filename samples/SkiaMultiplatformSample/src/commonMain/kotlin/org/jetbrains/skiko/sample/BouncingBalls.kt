@@ -102,7 +102,7 @@ class BouncingBalls: SkikoApp {
         println("onKeyboard: $event")
     }
 
-    override fun onMouseEvent(event: SkikoMouseEvent) {
+    override fun onPointerEvent(event: SkikoPointerEvent) {
         if (event.isLeftClick) {
             val paint = Color4f(1f, 0f, 0f, 0.8f).asPaint()
             data += BouncingBall(
@@ -112,7 +112,7 @@ class BouncingBalls: SkikoApp {
             data.removeLast()
         }
         // To avoid log spamming
-        if (event.kind != SkikoMouseEventKind.MOVE)
+        //if (event.kind != SkikoMouseEventKind.MOVE)
             println("onMouse: $event")
     }
 }

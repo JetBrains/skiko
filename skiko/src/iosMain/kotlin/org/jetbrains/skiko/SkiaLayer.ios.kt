@@ -61,13 +61,13 @@ actual open class SkiaLayer(
                     x to y
                 }
                 // TODO: rework events using https://developer.apple.com/documentation/uikit/uiresponder/1621142-touchesbegan?language=objc
-                app?.onMouseEvent(
-                    SkikoMouseEvent(x.toInt(), y.toInt(),
-                        SkikoMouseButtons.LEFT, SkikoMouseEventKind.DOWN,
+                app?.onPointerEvent(
+                    SkikoPointerEvent(x, y,
+                        SkikoMouseButtons.LEFT, SkikoPointerEventKind.DOWN,
                         null))
-                app?.onMouseEvent(
-                    SkikoMouseEvent(x.toInt(), y.toInt(),
-                        SkikoMouseButtons.LEFT, SkikoMouseEventKind.UP,
+                app?.onPointerEvent(
+                    SkikoPointerEvent(x, y,
+                        SkikoMouseButtons.LEFT, SkikoPointerEventKind.UP,
                 null))
             }
 

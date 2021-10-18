@@ -38,11 +38,14 @@ actual open class SkiaLayer(
     private var picture: PictureHolder? = null
     private val pictureRecorder = PictureRecorder()
 
-    private fun eventToMouse(event: NSEvent, kind: SkikoMouseEventKind): SkikoMouseEvent {
-        val buttons = when (event.buttonNumber.toInt()) {
-            0 -> SkikoMouseButtons.LEFT
-            1 -> SkikoMouseButtons.RIGHT
-            else -> SkikoMouseButtons.NONE
+    private fun eventToMouse(event: NSEvent, kind: SkikoPointerEventKind): SkikoPointerEvent {
+        var buttons = SkikoMouseButtons.NONE
+        val mask = event.buttonMask.toInt()
+        if ((mask and 1) != 0 || event.buttonNumber == 0L) {
+            buttons = buttons or SkikoMouseButtons.LEFT
+        }
+        if ((mask and 2) != 0 || event.buttonNumber == 1L) {
+            buttons = buttons or SkikoMouseButtons.RIGHT
         }
         var (x, y) = event.locationInWindow.useContents {
             this.x to this.y
@@ -51,7 +54,7 @@ actual open class SkiaLayer(
         nsView.frame.useContents {
            y = size.height - y
         }
-        return SkikoMouseEvent(x.toInt(), y.toInt(), buttons, kind, event)
+        return SkikoPointerEvent(x, y, buttons, kind, event)
     }
 
     private fun eventToKeyboard(event: NSEvent, kind: SkikoKeyboardEventKind): SkikoKeyboardEvent {
@@ -71,21 +74,30 @@ actual open class SkiaLayer(
                 updateTrackingAreas()
             }
             override fun updateTrackingAreas() {
-                println("update tracking areas!")
+                bounds.useContents {
+                    println("update tracking areas to ${this.size.width} ${this.size.height}")
+                }
                 trackingArea?.let { removeTrackingArea(it) }
                 trackingArea = NSTrackingArea(rect = bounds,
                     options = NSMouseMoved or NSTrackingActiveAlways, // NSTrackingActiveInActiveApp,
-                    owner = this, userInfo = null)
-                addTrackingArea(trackingArea!!)
+                    owner = nsView, userInfo = null)
+                nsView.addTrackingArea(trackingArea!!)
+            }
+
+            override fun rightMouseDown(event: NSEvent) {
+                app?.onPointerEvent(eventToMouse(event, SkikoPointerEventKind.DOWN))
+            }
+            override fun rightMouseUp(event: NSEvent) {
+                app?.onPointerEvent(eventToMouse(event, SkikoPointerEventKind.UP))
             }
             override fun mouseDown(event: NSEvent) {
-                app?.onMouseEvent(eventToMouse(event, SkikoMouseEventKind.DOWN))
+                app?.onPointerEvent(eventToMouse(event, SkikoPointerEventKind.DOWN))
             }
             override fun mouseUp(event: NSEvent) {
-                app?.onMouseEvent(eventToMouse(event, SkikoMouseEventKind.UP))
+                app?.onPointerEvent(eventToMouse(event, SkikoPointerEventKind.UP))
             }
             override fun mouseMoved(event: NSEvent) {
-                app?.onMouseEvent(eventToMouse(event, SkikoMouseEventKind.MOVE))
+                app?.onPointerEvent(eventToMouse(event, SkikoPointerEventKind.MOVE))
             }
             override fun keyDown(event: NSEvent) {
                 app?.onKeyboardEvent(eventToKeyboard(event, SkikoKeyboardEventKind.DOWN))
