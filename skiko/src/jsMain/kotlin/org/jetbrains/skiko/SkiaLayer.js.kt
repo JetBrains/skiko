@@ -29,22 +29,21 @@ actual open class SkiaLayer(properties: SkiaLayerProperties = makeDefaultSkiaLay
         draw()
     }
 
-    actual var renderer: SkiaRenderer? = null
-
-    actual var eventProcessor: SkikoEventProcessor? = null
+    actual var app: SkikoApp? = null
 
     fun setCanvas(htmlCanvas: HTMLCanvasElement) {
         state = object: CanvasRenderer(htmlCanvas) {
             override fun drawFrame(currentTimestamp: Double) {
+                println("drawFrame!")
                 // currentTimestamp is milliseconds.
                 val currentNanos = currentTimestamp * 1000000
-                renderer?.onRender(canvas, width, height, currentNanos.toLong())
+                app?.onRender(canvas, width, height, currentNanos.toLong())
             }
         }
         // See https://www.w3schools.com/jsref/dom_obj_event.asp
         htmlCanvas.addEventListener("mousedown", { event ->
-            event as PointerEvent
-            eventProcessor?.onMouseEvent(SkikoMouseEvent(
+            event as MouseEvent
+            app?.onMouseEvent(SkikoMouseEvent(
                 event.x.toInt(), event.y.toInt(),
                 SkikoMouseButtons.LEFT,
                 SkikoMouseEventKind.DOWN,
@@ -52,8 +51,8 @@ actual open class SkiaLayer(properties: SkiaLayerProperties = makeDefaultSkiaLay
             ))
         })
         htmlCanvas.addEventListener("mouseup", { event ->
-            event as PointerEvent
-            eventProcessor?.onMouseEvent(SkikoMouseEvent(
+            event as MouseEvent
+            app?.onMouseEvent(SkikoMouseEvent(
                 event.x.toInt(), event.y.toInt(),
                 SkikoMouseButtons.LEFT,
                 SkikoMouseEventKind.UP,
@@ -62,7 +61,7 @@ actual open class SkiaLayer(properties: SkiaLayerProperties = makeDefaultSkiaLay
         })
         htmlCanvas.addEventListener("mousemove", { event ->
             event as MouseEvent
-            eventProcessor?.onMouseEvent(SkikoMouseEvent(
+            app?.onMouseEvent(SkikoMouseEvent(
                 event.x.toInt(), event.y.toInt(),
                 SkikoMouseButtons.NONE,
                 SkikoMouseEventKind.MOVE,
@@ -71,7 +70,7 @@ actual open class SkiaLayer(properties: SkiaLayerProperties = makeDefaultSkiaLay
         })
         htmlCanvas.addEventListener("keydown", { event ->
             event as KeyboardEvent
-            eventProcessor?.onKeyboardEvent(
+            app?.onKeyboardEvent(
                     SkikoKeyboardEvent(
                     event.keyCode, SkikoKeyboardEventKind.DOWN, event
                 )
@@ -79,7 +78,7 @@ actual open class SkiaLayer(properties: SkiaLayerProperties = makeDefaultSkiaLay
         })
         htmlCanvas.addEventListener("keyup", { event ->
             event as KeyboardEvent
-            eventProcessor?.onKeyboardEvent(SkikoKeyboardEvent(
+            app?.onKeyboardEvent(SkikoKeyboardEvent(
                 event.keyCode, SkikoKeyboardEventKind.UP, event
             ))
         })
@@ -92,4 +91,4 @@ actual open class SkiaLayer(properties: SkiaLayerProperties = makeDefaultSkiaLay
 
 actual typealias SkikoPlatformInputEvent = InputEvent
 actual typealias SkikoPlatformKeyboardEvent = KeyboardEvent
-actual typealias SkikoPlatformPointerEvent = PointerEvent
+actual typealias SkikoPlatformPointerEvent = MouseEvent

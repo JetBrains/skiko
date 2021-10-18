@@ -15,8 +15,7 @@ actual open class SkiaLayer(properties: SkiaLayerProperties)  {
     actual fun needRedraw() {
         TODO("unimplemented")
     }
-    actual var renderer: SkiaRenderer? = null
-    actual var eventProcessor: SkikoEventProcessor? = null
+    actual var app: SkikoApp? = null
 }
 
 // TODO: do properly

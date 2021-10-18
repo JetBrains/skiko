@@ -11,10 +11,8 @@ import platform.UIKit.*
 import platform.darwin.NSObject
 
 actual open class SkiaLayer(
-    var width: Float, var height: Float,
     val properties: SkiaLayerProperties = makeDefaultSkiaLayerProperties()
-)
-{
+) {
     fun isShowing(): Boolean {
         return true
     }
@@ -38,25 +36,41 @@ actual open class SkiaLayer(
         redrawer?.needRedraw()
     }
 
+    val width: Float
+       get() = view.frame.useContents {
+           return@useContents size.width.toFloat()
+       }
+
+    val height: Float
+        get() = view.frame.useContents {
+            return@useContents size.height.toFloat()
+        }
+
     lateinit var view: UIView
+    // We need to keep reference to controller as Objective-C will only keep weak reference here.
     lateinit private var controller: NSObject
 
-    fun initLayer(view: UIView) {
-        this.view = view
+    fun initLayer(viewController: SkikoViewController) {
+        this.view = viewController.view
+
         // See https://developer.apple.com/documentation/uikit/touches_presses_and_gestures/using_responders_and_the_responder_chain_to_handle_events?language=objc
         controller = object : NSObject() {
             @ObjCAction
             fun onTap(sender: UITapGestureRecognizer) {
-                println("tap!")
                 val (x, y) = sender.locationInView(view).useContents {
                     x to y
                 }
-                println("rec=$x $y")
-                eventProcessor?.onMouseEvent(
+                // TODO: rework events using https://developer.apple.com/documentation/uikit/uiresponder/1621142-touchesbegan?language=objc
+                app?.onMouseEvent(
+                    SkikoMouseEvent(x.toInt(), y.toInt(),
+                        SkikoMouseButtons.LEFT, SkikoMouseEventKind.DOWN,
+                        null))
+                app?.onMouseEvent(
                     SkikoMouseEvent(x.toInt(), y.toInt(),
                         SkikoMouseButtons.LEFT, SkikoMouseEventKind.UP,
                 null))
             }
+
         }
         // We have ':' in selector to take care of function argument.
         view.addGestureRecognizer(UITapGestureRecognizer(controller, NSSelectorFromString("onTap:")))
@@ -64,8 +78,7 @@ actual open class SkiaLayer(
         redrawer?.redrawImmediately()
     }
 
-    actual var renderer: SkiaRenderer? = null
-    actual var eventProcessor: SkikoEventProcessor? = null
+    actual var app: SkikoApp? = null
 
     internal var redrawer: MetalRedrawer? = null
     private var picture: PictureHolder? = null
@@ -78,7 +91,7 @@ actual open class SkiaLayer(
 
         val bounds = Rect.makeWH(pictureWidth, pictureHeight)
         val canvas = pictureRecorder.beginRecording(bounds)
-        renderer?.onRender(canvas, pictureWidth.toInt(), pictureHeight.toInt(), nanoTime)
+        app?.onRender(canvas, pictureWidth.toInt(), pictureHeight.toInt(), nanoTime)
         val picture = pictureRecorder.finishRecordingAsPicture()
         this.picture = PictureHolder(picture, pictureWidth.toInt(), pictureHeight.toInt())
     }
@@ -100,6 +113,6 @@ actual open class SkiaLayer(
 }
 
 // TODO: do properly
-actual typealias SkikoPlatformInputEvent = Any
-actual typealias SkikoPlatformKeyboardEvent = Any
-actual typealias SkikoPlatformPointerEvent = Any
+actual typealias SkikoPlatformInputEvent = UIEvent
+actual typealias SkikoPlatformKeyboardEvent = UIEvent
+actual typealias SkikoPlatformPointerEvent = UIEvent

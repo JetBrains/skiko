@@ -11,7 +11,6 @@ fun makeApp() = BouncingBalls()
 
 fun main() {
     NSApplication.sharedApplication()
-    val skiaLayer = SkiaLayer()
     val windowStyle = NSWindowStyleMaskTitled or
                 NSWindowStyleMaskMiniaturizable or
                 NSWindowStyleMaskClosable or
@@ -21,8 +20,8 @@ fun main() {
         styleMask = windowStyle,
         backing =  NSBackingStoreBuffered,
         defer = true)
-    val app = GenericSkikoApp(skiaLayer, makeApp())
-    skiaLayer.setApp(app)
+    val skiaLayer = SkiaLayer()
+    GenericSkikoApp(skiaLayer, makeApp())
     skiaLayer.initLayer(window)
     window.orderFrontRegardless()
     NSApp?.run()

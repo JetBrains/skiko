@@ -2,11 +2,13 @@
 package org.jetbrains.skiko.sample
 
 import kotlinx.cinterop.*
-import org.jetbrains.skiko.SkiaRenderer
+import org.jetbrains.skiko.GenericSkikoApp
+import org.jetbrains.skiko.SkikoApp
+import org.jetbrains.skiko.SkikoViewController
 import platform.UIKit.*
 import platform.Foundation.*
 
-fun makeApp(): SkiaRenderer = BouncingBalls()
+fun makeApp(): SkikoApp = BouncingBalls()
 
 fun main() {
     val args = emptyArray<String>()
@@ -19,3 +21,26 @@ fun main() {
     }
 }
 
+class SkikoAppDelegate : UIResponder, UIApplicationDelegateProtocol {
+    companion object : UIResponderMeta(), UIApplicationDelegateProtocolMeta
+
+    @ObjCObjectBase.OverrideInit
+    constructor() : super()
+
+    private var _window: UIWindow? = null
+    override fun window() = _window
+    override fun setWindow(window: UIWindow?) {
+        _window = window
+    }
+
+    override fun application(application: UIApplication, didFinishLaunchingWithOptions: Map<Any?, *>?): Boolean {
+        window = UIWindow(frame = UIScreen.mainScreen.bounds)
+        window!!.rootViewController = SkikoViewController().apply {
+            setAppFactory {
+                GenericSkikoApp(it, makeApp())
+            }
+        }
+        window!!.makeKeyAndVisible()
+        return true
+    }
+}

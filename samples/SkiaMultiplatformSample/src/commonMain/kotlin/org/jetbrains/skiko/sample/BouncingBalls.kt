@@ -6,7 +6,7 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
-class BouncingBalls: SkiaRenderer, SkikoEventProcessor {
+class BouncingBalls: SkikoApp {
     private data class Circle(var x: Float, var y: Float, var r: Float)
 
     companion object {
@@ -111,6 +111,8 @@ class BouncingBalls: SkiaRenderer, SkikoEventProcessor {
         if (event.isRightClick && data.size > 0) {
             data.removeLast()
         }
-        println("onMouse: $event")
+        // To avoid log spamming
+        if (event.kind != SkikoMouseEventKind.MOVE)
+            println("onMouse: $event")
     }
 }

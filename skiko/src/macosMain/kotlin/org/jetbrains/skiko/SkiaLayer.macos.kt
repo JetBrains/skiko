@@ -29,8 +29,7 @@ actual open class SkiaLayer(
     lateinit var nsView: NSView
     var _contentScale: Float = 1.0f
 
-    actual var renderer: SkiaRenderer? = null
-    actual var eventProcessor: SkikoEventProcessor? = null
+    actual var app: SkikoApp? = null
 
     private var contextHandler = MacOSOpenGLContextHandler(this)
 
@@ -80,19 +79,19 @@ actual open class SkiaLayer(
                 addTrackingArea(trackingArea!!)
             }
             override fun mouseDown(event: NSEvent) {
-                eventProcessor?.onMouseEvent(eventToMouse(event, SkikoMouseEventKind.DOWN))
+                app?.onMouseEvent(eventToMouse(event, SkikoMouseEventKind.DOWN))
             }
             override fun mouseUp(event: NSEvent) {
-                eventProcessor?.onMouseEvent(eventToMouse(event, SkikoMouseEventKind.UP))
+                app?.onMouseEvent(eventToMouse(event, SkikoMouseEventKind.UP))
             }
             override fun mouseMoved(event: NSEvent) {
-                eventProcessor?.onMouseEvent(eventToMouse(event, SkikoMouseEventKind.MOVE))
+                app?.onMouseEvent(eventToMouse(event, SkikoMouseEventKind.MOVE))
             }
             override fun keyDown(event: NSEvent) {
-                eventProcessor?.onKeyboardEvent(eventToKeyboard(event, SkikoKeyboardEventKind.DOWN))
+                app?.onKeyboardEvent(eventToKeyboard(event, SkikoKeyboardEventKind.DOWN))
             }
             override fun keyUp(event: NSEvent) {
-                eventProcessor?.onKeyboardEvent(eventToKeyboard(event, SkikoKeyboardEventKind.UP))
+                app?.onKeyboardEvent(eventToKeyboard(event, SkikoKeyboardEventKind.UP))
             }
         }
         window.contentView!!.addSubview(nsView)
@@ -119,7 +118,7 @@ actual open class SkiaLayer(
 
         val bounds = Rect.makeWH(pictureWidth.toFloat(), pictureHeight.toFloat())
         val canvas = pictureRecorder.beginRecording(bounds)
-        renderer?.onRender(canvas, pictureWidth.toInt(), pictureHeight.toInt(), nanoTime)
+        app?.onRender(canvas, pictureWidth.toInt(), pictureHeight.toInt(), nanoTime)
 
         val picture = pictureRecorder.finishRecordingAsPicture()
         this.picture = PictureHolder(picture, pictureWidth.toInt(), pictureHeight.toInt())

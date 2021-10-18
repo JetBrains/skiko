@@ -9,18 +9,13 @@ expect open class SkiaLayer {
     var fullscreen: Boolean
     var transparency: Boolean
 
-    var renderer: SkiaRenderer?
-
-    var eventProcessor: SkikoEventProcessor?
+    var app: SkikoApp?
 
     fun needRedraw()
 }
 
-fun SkiaLayer.setApp(renderer: SkiaRenderer) {
-    this.renderer = renderer
-    if (renderer is SkikoEventProcessor) {
-        this.eventProcessor = renderer
-    }
+fun SkiaLayer.setApp(app: SkikoApp) {
+    this.app = app
 }
 
 object SkikoMouseButtons {
@@ -69,32 +64,41 @@ interface SkikoEventProcessor {
     fun onInputEvent(event: SkikoInputEvent)
 }
 
-interface SkiaRenderer {
+interface SkikoApp {
+    // Input
+    fun onKeyboardEvent(event: SkikoKeyboardEvent)
+    fun onMouseEvent(event: SkikoMouseEvent)
+    fun onInputEvent(event: SkikoInputEvent)
+
+    // Rendering
     fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long)
 }
 
 open class GenericSkikoApp(
     val layer: SkiaLayer,
-    val appRenderer: SkiaRenderer,
-    val appEventProcessor: SkikoEventProcessor? = if (appRenderer is SkikoEventProcessor) appRenderer else null
-): SkiaRenderer, SkikoEventProcessor {
+    val app: SkikoApp): SkikoApp {
+
+    init {
+        layer.app = app
+    }
+
     override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
         val contentScale = layer.contentScale
         canvas.scale(contentScale, contentScale)
-        appRenderer.onRender(canvas, (width / contentScale).toInt(), (height / contentScale).toInt(), nanoTime)
+        app.onRender(canvas, (width / contentScale).toInt(), (height / contentScale).toInt(), nanoTime)
         layer.needRedraw()
     }
 
     override fun onInputEvent(event: SkikoInputEvent) {
-        appEventProcessor?.onInputEvent(event)
+        app.onInputEvent(event)
     }
 
     override fun onKeyboardEvent(event: SkikoKeyboardEvent) {
-        appEventProcessor?.onKeyboardEvent(event)
+        app.onKeyboardEvent(event)
     }
 
     override fun onMouseEvent(event: SkikoMouseEvent) {
-        appEventProcessor?.onMouseEvent(event)
+        app.onMouseEvent(event)
     }
 }
 

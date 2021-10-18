@@ -10,8 +10,7 @@ fun main() {
     onWasmReady {
         val skiaLayer = SkiaLayer()
         val game = BouncingBalls()
-        val app = GenericSkikoApp(skiaLayer, game, game)
-        skiaLayer.setApp(app)
+        val app = GenericSkikoApp(skiaLayer, game)
         val canvas = document.getElementById("SkikoTarget") as HTMLCanvasElement
         skiaLayer.setCanvas(canvas)
         skiaLayer.draw()

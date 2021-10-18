@@ -163,7 +163,7 @@ class SkiaWindowTest {
             window.setLocation(200, 200)
             window.setSize(40, 20)
             window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
-            window.layer.renderer = object : SkiaRenderer {
+            window.layer.renderer = object : SkikoApp {
                 override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
                     renderCount++
                 }
@@ -262,7 +262,7 @@ class SkiaWindowTest {
             setSize(400, 200)
             preferredSize = Dimension(400, 200)
             defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
-            layer.renderer = object : SkiaRenderer {
+            layer.renderer = object : SkikoApp {
                 override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
                 }
             }
@@ -424,7 +424,7 @@ class SkiaWindowTest {
             window.setLocation(200, 200)
             window.setSize(400, 200)
             window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
-            window.layer.renderer = object : SkiaRenderer {
+            window.layer.renderer = object : SkikoApp {
                 override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
                     drawCount++
 
@@ -470,7 +470,7 @@ class SkiaWindowTest {
 
             val paragraph by lazy { paragraph(window.layer.contentScale * 40, "=-+Нп") }
 
-            window.layer.renderer = object : SkiaRenderer {
+            window.layer.renderer = object : SkikoApp {
                 override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
                     paragraph.layout(Float.POSITIVE_INFINITY)
                     paragraph.paint(canvas, 0f, 0f)
@@ -502,7 +502,7 @@ class SkiaWindowTest {
         var rectWidth: Int,
         var rectHeight: Int,
         private val rectColor: Color
-    ) : SkiaRenderer {
+    ) : SkikoApp {
         override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
             val dpi = layer.contentScale
             canvas.drawRect(Rect(0f, 0f, width.toFloat(), height.toFloat()), Paint().apply {
@@ -518,7 +518,7 @@ class SkiaWindowTest {
         private val layer: SkiaLayer,
         private val pixelsPerSecond: Double,
         private val size: Double
-    ) : SkiaRenderer {
+    ) : SkikoApp {
         private var oldNanoTime = Long.MAX_VALUE
         private var x = 0.0
 
