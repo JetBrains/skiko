@@ -127,6 +127,9 @@ class SkikoProperties(private val myProject: Project) {
     val isRelease: Boolean
         get() = myProject.findProperty("deploy.release") == "true"
 
+    val signArtifacts: Boolean
+        get() = myProject.findProperty("deploy.sign") == "true"
+
     val buildType: SkiaBuildType
         get() = if (myProject.findProperty("skiko.debug") == "true") SkiaBuildType.DEBUG else SkiaBuildType.RELEASE
 
