@@ -12,6 +12,7 @@ fun main() {
         val game = BouncingBalls()
         skiaLayer.skikoView = GenericSkikoView(skiaLayer, game)
         val canvas = document.getElementById("SkikoTarget") as HTMLCanvasElement
+        canvas.setAttribute("tabindex", "0")
         skiaLayer.setCanvas(canvas)
         skiaLayer.needRedraw()
     }
