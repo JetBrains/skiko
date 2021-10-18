@@ -85,6 +85,7 @@ class BouncingBalls: SkikoView {
     )).toMutableList()
 
     override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+        canvas.clear(-1)
         val dtime = (nanoTime - prevTimestamp)
         prevTimestamp = nanoTime
 

@@ -127,6 +127,60 @@ actual open class SkiaLayer internal constructor(
 
     fun setWindow(window: SkiaWindow) {
         window.add(this)
+        backedLayer.addMouseListener(object : MouseAdapter() {
+            override fun mousePressed(e: MouseEvent?) {
+                e!!
+                skikoView?.onPointerEvent(
+                    SkikoPointerEvent(e.x.toDouble(), e.y.toDouble(),
+                        if (e.button == 0) SkikoMouseButtons.LEFT else SkikoMouseButtons.RIGHT,
+                        SkikoPointerEventKind.DOWN,
+                        e
+                    )
+                )
+            }
+            override fun mouseReleased(e: MouseEvent?) {
+                e!!
+                skikoView?.onPointerEvent(
+                    SkikoPointerEvent(e.x.toDouble(), e.y.toDouble(),
+                        if (e.button == 1) SkikoMouseButtons.LEFT else SkikoMouseButtons.RIGHT,
+                        SkikoPointerEventKind.UP,
+                        e
+                    )
+                )
+            }
+        })
+        backedLayer.addMouseMotionListener(object : MouseMotionAdapter() {
+            override fun mouseMoved(e: MouseEvent?) {
+                e!!
+                skikoView?.onPointerEvent(
+                    SkikoPointerEvent(e.x.toDouble(), e.y.toDouble(),
+                        SkikoMouseButtons.NONE,
+                        SkikoPointerEventKind.MOVE,
+                        e
+                    )
+                )
+            }
+        })
+        backedLayer.addKeyListener(object : KeyAdapter() {
+            override fun keyPressed(e: KeyEvent?) {
+                e!!
+                skikoView?.onKeyboardEvent(
+                    SkikoKeyboardEvent(e.keyCode,
+                        SkikoKeyboardEventKind.DOWN,
+                        e
+                    )
+                )
+            }
+            override fun keyReleased(e: KeyEvent?) {
+                e!!
+                skikoView?.onKeyboardEvent(
+                    SkikoKeyboardEvent(e.keyCode,
+                        SkikoKeyboardEventKind.UP,
+                        e
+                    )
+                )
+            }
+        })
         window.preferredSize = Dimension(800, 600)
         window.pack()
     }
