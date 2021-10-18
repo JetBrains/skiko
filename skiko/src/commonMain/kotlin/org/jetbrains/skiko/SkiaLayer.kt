@@ -1,6 +1,5 @@
 package org.jetbrains.skiko
 
-import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.Picture
 
 expect open class SkiaLayer {
@@ -9,13 +8,9 @@ expect open class SkiaLayer {
     var fullscreen: Boolean
     var transparency: Boolean
 
-    var app: SkikoApp?
+    var skikoView: SkikoView?
 
     fun needRedraw()
-}
-
-fun SkiaLayer.setApp(app: SkikoApp) {
-    this.app = app
 }
 
 internal class PictureHolder(val instance: Picture, val width: Int, val height: Int)

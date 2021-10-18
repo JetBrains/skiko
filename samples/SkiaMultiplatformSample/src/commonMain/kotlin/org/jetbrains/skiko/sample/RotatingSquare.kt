@@ -3,7 +3,7 @@ package org.jetbrains.skiko.sample
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
 
-class RotatingSquare : SkikoApp {
+class RotatingSquare : SkikoView {
     override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
         val angleDeg = (nanoTime / 5_000_000) % 360
         val paint = Paint().apply { color = Color.GREEN }

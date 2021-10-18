@@ -55,7 +55,7 @@ class SkiaWindowTest {
             window.setSize(400, 200)
             window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
             val app = RectRenderer(window.layer, 200, 100, Color.RED)
-            window.layer.app = app
+            window.layer.skikoView = app
             window.isUndecorated = true
             window.isVisible = true
 
@@ -79,7 +79,7 @@ class SkiaWindowTest {
             window.preferredSize = Dimension(400, 200)
             window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
             val app = RectRenderer(window.layer, 200, 100, Color.RED)
-            window.layer.app = app
+            window.layer.skikoView = app
             window.isUndecorated = true
             window.pack()
             window.paint(window.graphics)
@@ -104,7 +104,7 @@ class SkiaWindowTest {
             window.setLocation(200, 200)
             window.setSize(40, 20)
             window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
-            window.layer.app = RectRenderer(window.layer, 20, 10, Color.RED)
+            window.layer.skikoView = RectRenderer(window.layer, 20, 10, Color.RED)
             window.isUndecorated = true
             window.isVisible = true
             delay(1000)
@@ -124,7 +124,7 @@ class SkiaWindowTest {
             setLocation(200,200)
             setSize(400, 200)
             defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
-            layer.app = RectRenderer(layer, 200, 100, color)
+            layer.skikoView = RectRenderer(layer, 200, 100, color)
             isUndecorated = true
             isVisible = true
         }
@@ -163,7 +163,7 @@ class SkiaWindowTest {
             window.setLocation(200, 200)
             window.setSize(40, 20)
             window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
-            window.layer.app = object : NoInputSkikoApp() {
+            window.layer.skikoView = object : NoInputSkikoView() {
                 override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
                     renderCount++
                 }
@@ -194,7 +194,7 @@ class SkiaWindowTest {
             setLocation(200,200)
             setSize(40, 20)
             defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
-            layer.app = if (isAnimated) {
+            layer.skikoView = if (isAnimated) {
                 AnimatedBoxRenderer(layer, pixelsPerSecond = 20.0, size = 20.0)
             } else {
                 RectRenderer(layer, 20, 10, Color.RED)
@@ -238,7 +238,7 @@ class SkiaWindowTest {
             setLocation(200,200)
             setSize(400, 200)
             defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
-            layer.app = AnimatedBoxRenderer(layer, pixelsPerSecond = 20.0, size = 20.0)
+            layer.skikoView = AnimatedBoxRenderer(layer, pixelsPerSecond = 20.0, size = 20.0)
             isVisible = true
         }
 
@@ -262,7 +262,7 @@ class SkiaWindowTest {
             setSize(400, 200)
             preferredSize = Dimension(400, 200)
             defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
-            layer.app = object : NoInputSkikoApp() {
+            layer.skikoView = object : NoInputSkikoView() {
                 override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
                 }
             }
@@ -365,7 +365,7 @@ class SkiaWindowTest {
             window.setSize(400, 200)
             window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
             val app = RectRenderer(window.layer, 200, 100, Color.RED)
-            window.layer.app = app
+            window.layer.skikoView = app
             window.isUndecorated = true
             window.isVisible = true
 
@@ -424,7 +424,7 @@ class SkiaWindowTest {
             window.setLocation(200, 200)
             window.setSize(400, 200)
             window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
-            window.layer.app = object : NoInputSkikoApp() {
+            window.layer.skikoView = object : NoInputSkikoView() {
                 override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
                     drawCount++
 
@@ -470,7 +470,7 @@ class SkiaWindowTest {
 
             val paragraph by lazy { paragraph(window.layer.contentScale * 40, "=-+Нп") }
 
-            window.layer.app = object : NoInputSkikoApp() {
+            window.layer.skikoView = object : NoInputSkikoView() {
                 override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
                     paragraph.layout(Float.POSITIVE_INFINITY)
                     paragraph.paint(canvas, 0f, 0f)
@@ -502,7 +502,7 @@ class SkiaWindowTest {
         var rectWidth: Int,
         var rectHeight: Int,
         private val rectColor: Color
-    ) : NoInputSkikoApp() {
+    ) : NoInputSkikoView() {
         override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
             val dpi = layer.contentScale
             canvas.drawRect(Rect(0f, 0f, width.toFloat(), height.toFloat()), Paint().apply {
@@ -518,7 +518,7 @@ class SkiaWindowTest {
         private val layer: SkiaLayer,
         private val pixelsPerSecond: Double,
         private val size: Double
-    ) : NoInputSkikoApp() {
+    ) : NoInputSkikoView() {
         private var oldNanoTime = Long.MAX_VALUE
         private var x = 0.0
 

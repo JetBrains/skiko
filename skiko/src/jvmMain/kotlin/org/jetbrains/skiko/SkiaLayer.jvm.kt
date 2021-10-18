@@ -122,7 +122,7 @@ actual open class SkiaLayer internal constructor(
             backedLayer.fullscreen = value
         }
 
-    actual var app: SkikoApp? = null
+    actual var skikoView: SkikoView? = null
 
     val clipComponents = mutableListOf<ClipRectangle>()
 
@@ -340,7 +340,7 @@ actual open class SkiaLayer internal constructor(
 
         try {
             isRendering = true
-            app?.onRender(canvas, pictureWidth, pictureHeight, nanoTime)
+            skikoView?.onRender(canvas, pictureWidth, pictureHeight, nanoTime)
         } finally {
             isRendering = false
         }

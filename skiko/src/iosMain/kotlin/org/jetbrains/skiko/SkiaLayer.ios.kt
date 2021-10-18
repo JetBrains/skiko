@@ -61,11 +61,11 @@ actual open class SkiaLayer(
                     x to y
                 }
                 // TODO: rework events using https://developer.apple.com/documentation/uikit/uiresponder/1621142-touchesbegan?language=objc
-                app?.onPointerEvent(
+                skikoView?.onPointerEvent(
                     SkikoPointerEvent(x, y,
                         SkikoMouseButtons.LEFT, SkikoPointerEventKind.DOWN,
                         null))
-                app?.onPointerEvent(
+                skikoView?.onPointerEvent(
                     SkikoPointerEvent(x, y,
                         SkikoMouseButtons.LEFT, SkikoPointerEventKind.UP,
                 null))
@@ -78,7 +78,7 @@ actual open class SkiaLayer(
         redrawer?.redrawImmediately()
     }
 
-    actual var app: SkikoApp? = null
+    actual var skikoView: SkikoView? = null
 
     internal var redrawer: MetalRedrawer? = null
     private var picture: PictureHolder? = null
@@ -91,7 +91,7 @@ actual open class SkiaLayer(
 
         val bounds = Rect.makeWH(pictureWidth, pictureHeight)
         val canvas = pictureRecorder.beginRecording(bounds)
-        app?.onRender(canvas, pictureWidth.toInt(), pictureHeight.toInt(), nanoTime)
+        skikoView?.onRender(canvas, pictureWidth.toInt(), pictureHeight.toInt(), nanoTime)
         val picture = pictureRecorder.finishRecordingAsPicture()
         this.picture = PictureHolder(picture, pictureWidth.toInt(), pictureHeight.toInt())
     }

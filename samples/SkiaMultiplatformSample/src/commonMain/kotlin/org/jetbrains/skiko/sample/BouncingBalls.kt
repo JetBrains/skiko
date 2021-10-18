@@ -6,7 +6,7 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
-class BouncingBalls: SkikoApp {
+class BouncingBalls: SkikoView {
     private data class Circle(var x: Float, var y: Float, var r: Float)
 
     companion object {

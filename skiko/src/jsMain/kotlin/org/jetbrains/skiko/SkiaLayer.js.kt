@@ -5,7 +5,6 @@ import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.events.InputEvent
 import org.w3c.dom.events.KeyboardEvent
 import org.w3c.dom.events.MouseEvent
-import org.w3c.dom.pointerevents.PointerEvent
 
 actual open class SkiaLayer(properties: SkiaLayerProperties = makeDefaultSkiaLayerProperties()
 ) {
@@ -29,17 +28,22 @@ actual open class SkiaLayer(properties: SkiaLayerProperties = makeDefaultSkiaLay
         draw()
     }
 
-    actual var app: SkikoApp? = null
+    actual var skikoView: SkikoView? = null
 
     fun translatePointerEvent(
         event: MouseEvent,
-        buttons: Int,
+        buttons: Boolean,
         kind: SkikoPointerEventKind
     ): SkikoPointerEvent {
+        var mask = SkikoMouseButtons.NONE
+        if (buttons && event.button.toInt() == 0)
+            mask = mask or SkikoMouseButtons.LEFT
+        // https://www.w3schools.com/jsref/event_button.asp
+        if (buttons && event.button.toInt() == 2)
+            mask = mask or SkikoMouseButtons.RIGHT
         return SkikoPointerEvent(
             event.offsetX, event.offsetY,
-            buttons, kind,
-            if (event is PointerEvent) event else null
+            mask, kind, event
         )
     }
 
@@ -48,35 +52,33 @@ actual open class SkiaLayer(properties: SkiaLayerProperties = makeDefaultSkiaLay
             override fun drawFrame(currentTimestamp: Double) {
                 // currentTimestamp is in milliseconds.
                 val currentNanos = currentTimestamp * 1_000_000
-                app?.onRender(canvas, width, height, currentNanos.toLong())
+                skikoView?.onRender(canvas, width, height, currentNanos.toLong())
             }
         }
         // See https://www.w3schools.com/jsref/dom_obj_event.asp
         // https://developer.mozilla.org/en-US/docs/Web/API/Pointer_events
         htmlCanvas.addEventListener("pointerdown", { event ->
-            event as PointerEvent
-            app?.onPointerEvent(translatePointerEvent(
-                event, SkikoMouseButtons.LEFT, SkikoPointerEventKind.DOWN))
+            event as MouseEvent
+            skikoView?.onPointerEvent(translatePointerEvent(
+                event, true, SkikoPointerEventKind.DOWN))
         })
         htmlCanvas.addEventListener("pointerup", { event ->
-            event as PointerEvent
-            app?.onPointerEvent(translatePointerEvent(
-                event, SkikoMouseButtons.LEFT, SkikoPointerEventKind.UP))
+            event as MouseEvent
+            var mask = SkikoMouseButtons.NONE
+            skikoView?.onPointerEvent(translatePointerEvent(
+                event, true, SkikoPointerEventKind.UP))
         })
         htmlCanvas.addEventListener("pointermove", { event ->
-            event as PointerEvent
-            app?.onPointerEvent(translatePointerEvent(
-                event, SkikoMouseButtons.NONE, SkikoPointerEventKind.MOVE))
+            event as MouseEvent
+            skikoView?.onPointerEvent(translatePointerEvent(
+                event, false, SkikoPointerEventKind.MOVE))
         })
         htmlCanvas.addEventListener("contextmenu", { event ->
-            event as MouseEvent
-            app?.onPointerEvent(translatePointerEvent(
-                event, SkikoMouseButtons.RIGHT, SkikoPointerEventKind.DOWN))
             event.preventDefault()
         })
         htmlCanvas.addEventListener("keydown", { event ->
             event as KeyboardEvent
-            app?.onKeyboardEvent(
+            skikoView?.onKeyboardEvent(
                     SkikoKeyboardEvent(
                     event.keyCode, SkikoKeyboardEventKind.DOWN, event
                 )
@@ -84,7 +86,7 @@ actual open class SkiaLayer(properties: SkiaLayerProperties = makeDefaultSkiaLay
         })
         htmlCanvas.addEventListener("keyup", { event ->
             event as KeyboardEvent
-            app?.onKeyboardEvent(SkikoKeyboardEvent(
+            skikoView?.onKeyboardEvent(SkikoKeyboardEvent(
                 event.keyCode, SkikoKeyboardEventKind.UP, event
             ))
         })
@@ -97,4 +99,5 @@ actual open class SkiaLayer(properties: SkiaLayerProperties = makeDefaultSkiaLay
 
 actual typealias SkikoPlatformInputEvent = InputEvent
 actual typealias SkikoPlatformKeyboardEvent = KeyboardEvent
-actual typealias SkikoPlatformPointerEvent = PointerEvent
+//  MouseEvent is base class of PointerEvent
+actual typealias SkikoPlatformPointerEvent = MouseEvent

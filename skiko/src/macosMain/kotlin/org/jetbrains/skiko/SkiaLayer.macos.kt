@@ -29,7 +29,7 @@ actual open class SkiaLayer(
     lateinit var nsView: NSView
     var _contentScale: Float = 1.0f
 
-    actual var app: SkikoApp? = null
+    actual var skikoView: SkikoView? = null
 
     private var contextHandler = MacOSOpenGLContextHandler(this)
 
@@ -85,25 +85,25 @@ actual open class SkiaLayer(
             }
 
             override fun rightMouseDown(event: NSEvent) {
-                app?.onPointerEvent(eventToMouse(event, SkikoPointerEventKind.DOWN))
+                skikoView?.onPointerEvent(eventToMouse(event, SkikoPointerEventKind.DOWN))
             }
             override fun rightMouseUp(event: NSEvent) {
-                app?.onPointerEvent(eventToMouse(event, SkikoPointerEventKind.UP))
+                skikoView?.onPointerEvent(eventToMouse(event, SkikoPointerEventKind.UP))
             }
             override fun mouseDown(event: NSEvent) {
-                app?.onPointerEvent(eventToMouse(event, SkikoPointerEventKind.DOWN))
+                skikoView?.onPointerEvent(eventToMouse(event, SkikoPointerEventKind.DOWN))
             }
             override fun mouseUp(event: NSEvent) {
-                app?.onPointerEvent(eventToMouse(event, SkikoPointerEventKind.UP))
+                skikoView?.onPointerEvent(eventToMouse(event, SkikoPointerEventKind.UP))
             }
             override fun mouseMoved(event: NSEvent) {
-                app?.onPointerEvent(eventToMouse(event, SkikoPointerEventKind.MOVE))
+                skikoView?.onPointerEvent(eventToMouse(event, SkikoPointerEventKind.MOVE))
             }
             override fun keyDown(event: NSEvent) {
-                app?.onKeyboardEvent(eventToKeyboard(event, SkikoKeyboardEventKind.DOWN))
+                skikoView?.onKeyboardEvent(eventToKeyboard(event, SkikoKeyboardEventKind.DOWN))
             }
             override fun keyUp(event: NSEvent) {
-                app?.onKeyboardEvent(eventToKeyboard(event, SkikoKeyboardEventKind.UP))
+                skikoView?.onKeyboardEvent(eventToKeyboard(event, SkikoKeyboardEventKind.UP))
             }
         }
         window.contentView!!.addSubview(nsView)
@@ -130,7 +130,7 @@ actual open class SkiaLayer(
 
         val bounds = Rect.makeWH(pictureWidth.toFloat(), pictureHeight.toFloat())
         val canvas = pictureRecorder.beginRecording(bounds)
-        app?.onRender(canvas, pictureWidth.toInt(), pictureHeight.toInt(), nanoTime)
+        skikoView?.onRender(canvas, pictureWidth.toInt(), pictureHeight.toInt(), nanoTime)
 
         val picture = pictureRecorder.finishRecordingAsPicture()
         this.picture = PictureHolder(picture, pictureWidth.toInt(), pictureHeight.toInt())

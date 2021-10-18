@@ -2,7 +2,7 @@ package org.jetbrains.skiko
 
 import org.jetbrains.skia.Canvas
 
-interface SkikoApp {
+interface SkikoView {
     // Input
     fun onKeyboardEvent(event: SkikoKeyboardEvent)
     fun onPointerEvent(event: SkikoPointerEvent)
@@ -12,14 +12,10 @@ interface SkikoApp {
     fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long)
 }
 
-open class GenericSkikoApp(
+open class GenericSkikoView(
         val layer: SkiaLayer,
-        val app: SkikoApp
-    ): SkikoApp {
-
-    init {
-        layer.setApp(this)
-    }
+        val app: SkikoView
+    ): SkikoView {
 
     override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
         val contentScale = layer.contentScale
@@ -42,7 +38,7 @@ open class GenericSkikoApp(
     }
 }
 
-abstract class NoInputSkikoApp: SkikoApp {
+abstract class NoInputSkikoView: SkikoView {
 
     override fun onInputEvent(event: SkikoInputEvent) {
     }

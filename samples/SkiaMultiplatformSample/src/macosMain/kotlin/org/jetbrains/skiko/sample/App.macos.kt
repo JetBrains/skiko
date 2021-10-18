@@ -21,7 +21,7 @@ fun main() {
         backing = NSBackingStoreBuffered,
         defer = true)
     val skiaLayer = SkiaLayer()
-    GenericSkikoApp(skiaLayer, makeApp())
+    skiaLayer.skikoView = GenericSkikoView(skiaLayer, makeApp())
     skiaLayer.initLayer(window)
     window.orderFrontRegardless()
     NSApp?.run()

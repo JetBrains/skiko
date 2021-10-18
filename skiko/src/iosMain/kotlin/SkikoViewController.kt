@@ -1,7 +1,6 @@
 package org.jetbrains.skiko
 
 import kotlinx.cinterop.ExportObjCClass
-import kotlinx.cinterop.ObjCAction
 import kotlinx.cinterop.useContents
 import platform.CoreGraphics.CGRectMake
 import platform.Foundation.NSCoder
@@ -28,8 +27,8 @@ class SkikoViewController : UIViewController {
         super.touchesEnded(touches, withEvent)
     }
 
-    internal lateinit var appFactory: (SkiaLayer) -> SkikoApp
-    fun setAppFactory(appFactory: (SkiaLayer) -> SkikoApp) {
+    internal lateinit var appFactory: (SkiaLayer) -> SkikoView
+    fun setAppFactory(appFactory: (SkiaLayer) -> SkikoView) {
         this.appFactory = appFactory
     }
 
@@ -40,7 +39,7 @@ class SkikoViewController : UIViewController {
             this.size.width to this.size.height
         }
         val layer = SkiaLayer().apply {
-            setApp(appFactory(this))
+            skikoView = appFactory(this)
         }
         view.setFrame(CGRectMake(0.0, 0.0, width, height))
         layer.initLayer(this)
