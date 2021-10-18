@@ -15,5 +15,10 @@ actual open class SkiaLayer(properties: SkiaLayerProperties)  {
     actual fun needRedraw() {
         TODO("unimplemented")
     }
-    actual var renderer: SkiaRenderer? = null
+    actual var skikoView: SkikoView? = null
 }
+
+// TODO: do properly
+actual typealias SkikoPlatformInputEvent = Any
+actual typealias SkikoPlatformKeyboardEvent = Any
+actual typealias SkikoPlatformPointerEvent = Any

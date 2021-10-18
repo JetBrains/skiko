@@ -8,7 +8,6 @@ import org.jetbrains.skia.ColorType
 import org.jetbrains.skia.ColorSpace
 import org.jetbrains.skia.ClipMode
 import org.jetbrains.skia.ImageInfo
-import org.jetbrains.skia.Picture
 import org.jetbrains.skia.PictureRecorder
 import org.jetbrains.skia.Rect
 import org.jetbrains.skiko.context.ContextHandler
@@ -123,7 +122,8 @@ actual open class SkiaLayer internal constructor(
             backedLayer.fullscreen = value
         }
 
-    actual var renderer: SkiaRenderer? = null
+    actual var skikoView: SkikoView? = null
+
     val clipComponents = mutableListOf<ClipRectangle>()
 
     @Volatile
@@ -340,7 +340,7 @@ actual open class SkiaLayer internal constructor(
 
         try {
             isRendering = true
-            renderer?.onRender(canvas, pictureWidth, pictureHeight, nanoTime)
+            skikoView?.onRender(canvas, pictureWidth, pictureHeight, nanoTime)
         } finally {
             isRendering = false
         }
@@ -443,3 +443,8 @@ actual open class SkiaLayer internal constructor(
         return rounded.toInt()
     }
 }
+
+// InputEvent is abstract, so we wrap to match modality.
+actual class SkikoPlatformInputEvent(val wrapped: InputEvent)
+actual typealias SkikoPlatformKeyboardEvent = KeyEvent
+actual typealias SkikoPlatformPointerEvent = MouseEvent

@@ -2,10 +2,9 @@ package org.jetbrains.skiko.sample.js
 
 import kotlinx.browser.document
 import org.jetbrains.skia.Canvas
-import org.jetbrains.skia.Color4f
 import org.jetbrains.skia.Paint
 import org.jetbrains.skia.Rect
-import org.jetbrains.skiko.GenericRenderer
+import org.jetbrains.skiko.GenericSkikoApp
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaRenderer
 import org.jetbrains.skiko.wasm.onWasmReady
@@ -34,7 +33,7 @@ fun main() {
             } else {
                 BouncingBalls()
             }
-            skiaLayer.renderer = GenericRenderer(skiaLayer, app)
+            skiaLayer.renderer = GenericSkikoApp(skiaLayer, app)
             skiaLayer.setCanvas(canvas)
             skiaLayer.draw()
         }

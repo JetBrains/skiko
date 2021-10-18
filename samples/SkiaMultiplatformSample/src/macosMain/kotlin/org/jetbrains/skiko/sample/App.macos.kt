@@ -5,14 +5,24 @@ import platform.AppKit.*
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
 import kotlinx.cinterop.*
+import platform.Foundation.NSMakeRect
 
 fun makeApp() = BouncingBalls()
 
 fun main() {
     NSApplication.sharedApplication()
-    val layer = SkiaLayer()
-    val window = SkiaWindow(layer)
-    layer.renderer = GenericRenderer(layer, makeApp())
-    window.nsWindow.orderFrontRegardless()
+    val windowStyle = NSWindowStyleMaskTitled or
+                NSWindowStyleMaskMiniaturizable or
+                NSWindowStyleMaskClosable or
+                NSWindowStyleMaskResizable
+    val window = NSWindow(
+        contentRect = NSMakeRect(0.0, 0.0, 640.0, 480.0),
+        styleMask = windowStyle,
+        backing = NSBackingStoreBuffered,
+        defer = true)
+    val skiaLayer = SkiaLayer()
+    skiaLayer.skikoView = GenericSkikoView(skiaLayer, makeApp())
+    skiaLayer.initLayer(window)
+    window.orderFrontRegardless()
     NSApp?.run()
 }

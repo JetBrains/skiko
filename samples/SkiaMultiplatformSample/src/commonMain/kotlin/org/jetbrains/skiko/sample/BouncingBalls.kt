@@ -1,12 +1,12 @@
 package org.jetbrains.skiko.sample
 
 import org.jetbrains.skia.*
-import org.jetbrains.skiko.SkiaRenderer
+import org.jetbrains.skiko.*
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
-class BouncingBalls: SkiaRenderer {
+class BouncingBalls: SkikoView {
     private data class Circle(var x: Float, var y: Float, var r: Float)
 
     companion object {
@@ -82,7 +82,7 @@ class BouncingBalls: SkiaRenderer {
         Color4f(1f, 0f, 0f, 0.8f).asPaint(),
         Color4f(1f, 0f, 1f, 0.8f).asPaint(),
         Color4f(0f, 1f, 1f, 0.8f).asPaint()
-    ))
+    )).toMutableList()
 
     override fun onRender(canvas: Canvas, width: Int, height: Int, currentTimestamp: Long) {
         val dtime = (currentTimestamp - prevTimestamp)
@@ -92,5 +92,27 @@ class BouncingBalls: SkiaRenderer {
             ball.recalculate(width, height, dtime.toFloat())
             canvas.drawCircle(ball.circle.x, ball.circle.y, ball.circle.r, paint)
         }
+    }
+
+    override fun onInputEvent(event: SkikoInputEvent) {
+        println("onInput: $event")
+    }
+
+    override fun onKeyboardEvent(event: SkikoKeyboardEvent) {
+        println("onKeyboard: $event")
+    }
+
+    override fun onPointerEvent(event: SkikoPointerEvent) {
+        if (event.isLeftClick) {
+            val paint = Color4f(1f, 0f, 0f, 0.8f).asPaint()
+            data += BouncingBall(
+                Circle(event.x.toFloat(), event.y.toFloat(), 25f), 172f, PI / 4) to paint
+        }
+        if (event.isRightClick && data.size > 0) {
+            data.removeLast()
+        }
+        // To avoid log spamming
+        //if (event.kind != SkikoMouseEventKind.MOVE)
+            println("onMouse: $event")
     }
 }

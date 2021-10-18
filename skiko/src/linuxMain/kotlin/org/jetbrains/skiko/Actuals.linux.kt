@@ -7,7 +7,6 @@ internal actual fun createNativeContextHandler(layer: SkiaLayer, renderApi: Grap
     TODO()
 }
 
-
 internal actual fun createNativeRedrawer(
     layer: SkiaLayer,
     renderApi: GraphicsApi,
