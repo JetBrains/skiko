@@ -18,7 +18,7 @@ fun main() {
     val window = NSWindow(
         contentRect = NSMakeRect(0.0, 0.0, 640.0, 480.0),
         styleMask = windowStyle,
-        backing =  NSBackingStoreBuffered,
+        backing = NSBackingStoreBuffered,
         defer = true)
     val skiaLayer = SkiaLayer()
     GenericSkikoApp(skiaLayer, makeApp())

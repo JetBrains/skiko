@@ -5,7 +5,6 @@ import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.events.InputEvent
 import org.w3c.dom.events.KeyboardEvent
 import org.w3c.dom.events.MouseEvent
-import org.w3c.dom.pointerevents.PointerEvent
 
 actual open class SkiaLayer(properties: SkiaLayerProperties = makeDefaultSkiaLayerProperties()
 ) {
@@ -31,42 +30,41 @@ actual open class SkiaLayer(properties: SkiaLayerProperties = makeDefaultSkiaLay
 
     actual var app: SkikoApp? = null
 
+    fun translateMouseEvent(
+        event: MouseEvent, canvas: HTMLCanvasElement,
+        buttons: Int,
+        kind: SkikoMouseEventKind
+    ): SkikoMouseEvent {
+        val rect = canvas.getBoundingClientRect()
+        return SkikoMouseEvent(
+            (event.x - rect.x).toInt(), (event.y - rect.y).toInt(),
+            buttons, kind, event
+        )
+    }
+
     fun setCanvas(htmlCanvas: HTMLCanvasElement) {
         state = object: CanvasRenderer(htmlCanvas) {
             override fun drawFrame(currentTimestamp: Double) {
-                println("drawFrame!")
-                // currentTimestamp is milliseconds.
-                val currentNanos = currentTimestamp * 1000000
+                // currentTimestamp is in milliseconds.
+                val currentNanos = currentTimestamp * 1_000_000
                 app?.onRender(canvas, width, height, currentNanos.toLong())
             }
         }
         // See https://www.w3schools.com/jsref/dom_obj_event.asp
         htmlCanvas.addEventListener("mousedown", { event ->
             event as MouseEvent
-            app?.onMouseEvent(SkikoMouseEvent(
-                event.x.toInt(), event.y.toInt(),
-                SkikoMouseButtons.LEFT,
-                SkikoMouseEventKind.DOWN,
-                event
-            ))
+            app?.onMouseEvent(translateMouseEvent(
+                event, htmlCanvas, SkikoMouseButtons.LEFT, SkikoMouseEventKind.DOWN))
         })
         htmlCanvas.addEventListener("mouseup", { event ->
             event as MouseEvent
-            app?.onMouseEvent(SkikoMouseEvent(
-                event.x.toInt(), event.y.toInt(),
-                SkikoMouseButtons.LEFT,
-                SkikoMouseEventKind.UP,
-                event
-            ))
+            app?.onMouseEvent(translateMouseEvent(
+                event, htmlCanvas, SkikoMouseButtons.LEFT, SkikoMouseEventKind.UP))
         })
         htmlCanvas.addEventListener("mousemove", { event ->
             event as MouseEvent
-            app?.onMouseEvent(SkikoMouseEvent(
-                event.x.toInt(), event.y.toInt(),
-                SkikoMouseButtons.NONE,
-                SkikoMouseEventKind.MOVE,
-                null
-            ))
+            app?.onMouseEvent(translateMouseEvent(
+                event, htmlCanvas, SkikoMouseButtons.NONE, SkikoMouseEventKind.MOVE))
         })
         htmlCanvas.addEventListener("keydown", { event ->
             event as KeyboardEvent
