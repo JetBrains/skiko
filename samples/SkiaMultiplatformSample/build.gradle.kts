@@ -36,7 +36,6 @@ if (project.hasProperty("skiko.version")) {
 val resourcesDir = "$buildDir/resources"
 val skikoWasm by configurations.creating
 val skikoRuntimeJar by configurations.creating
-val kotlinRuntimeJar by configurations.creating
 
 dependencies {
     skikoWasm("org.jetbrains.skiko:skiko-js-wasm-runtime:$version")
