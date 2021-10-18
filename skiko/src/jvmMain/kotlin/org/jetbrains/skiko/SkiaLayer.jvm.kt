@@ -132,7 +132,7 @@ actual open class SkiaLayer internal constructor(
                 e!!
                 skikoView?.onPointerEvent(
                     SkikoPointerEvent(e.x.toDouble(), e.y.toDouble(),
-                        if (e.button == 0) SkikoMouseButtons.LEFT else SkikoMouseButtons.RIGHT,
+                        if (e.button == 1) SkikoMouseButtons.LEFT else SkikoMouseButtons.RIGHT,
                         SkikoPointerEventKind.DOWN,
                         e
                     )
@@ -181,7 +181,6 @@ actual open class SkiaLayer internal constructor(
                 )
             }
         })
-        window.preferredSize = Dimension(800, 600)
         window.pack()
     }
 

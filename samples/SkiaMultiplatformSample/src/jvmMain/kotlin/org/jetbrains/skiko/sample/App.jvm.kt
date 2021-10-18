@@ -4,6 +4,7 @@ import org.jetbrains.skiko.GenericSkikoView
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaWindow
 
+import java.awt.Dimension
 import javax.swing.*
 
 fun main() {
@@ -13,6 +14,7 @@ fun main() {
         val window = SkiaWindow()
         window.defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
         window.title = "Skiko example"
+        window.preferredSize = Dimension(800, 600)
         skiaLayer.setWindow(window)
         skiaLayer.needRedraw()
         window.isVisible = true
