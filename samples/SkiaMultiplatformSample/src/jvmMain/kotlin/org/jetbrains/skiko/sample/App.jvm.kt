@@ -9,10 +9,12 @@ import javax.swing.*
 fun main() {
     val skiaLayer = SkiaLayer()
     skiaLayer.skikoView = GenericSkikoView(skiaLayer, BouncingBalls())
-    val window = SkiaWindow()
-    window.defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
-    window.title = "Skiko example"
-    skiaLayer.setWindow(window)
-    skiaLayer.needRedraw()
-    window.isVisible = true
+    SwingUtilities.invokeLater {
+        val window = SkiaWindow()
+        window.defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
+        window.title = "Skiko example"
+        skiaLayer.setWindow(window)
+        skiaLayer.needRedraw()
+        window.isVisible = true
+    }
 }
