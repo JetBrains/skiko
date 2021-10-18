@@ -1,5 +1,7 @@
 package org.jetbrains.skia.impl
 
+import org.khronos.webgl.ArrayBufferView
+
 actual abstract class Native actual constructor(ptr: NativePointer) {
     actual var _ptr: NativePointer
 
@@ -193,68 +195,66 @@ private external fun stringToUTF8(str: String, outPtr: NativePointer, maxBytesTo
 
 private external fun UTF8ToString(ptr: NativePointer): String
 
-private external val HEAPU8: ByteArray
+private external interface HEAP<T> {
+    fun set(src: T, dest: NativePointer)
+    fun subarray(startIndex: Int, endIndex: Int): ArrayBufferView
+}
+private external object HEAPU8: HEAP<ByteArray> {
+    override fun set(src: ByteArray, dest: NativePointer) = definedExternally
+    override fun subarray(startIndex: Int, endIndex: Int): ArrayBufferView = definedExternally
+}
 
+private external object HEAPU16: HEAP<CharArray> {
+    override fun set(src: CharArray, dest: NativePointer) = definedExternally
+    fun set(src: ShortArray, dest: NativePointer): Unit = definedExternally
+    override fun subarray(startIndex: Int, endIndex: Int): ArrayBufferView = definedExternally
+}
+
+private external object HEAPU32: HEAP<IntArray> {
+    override fun set(src: IntArray, dest: NativePointer) = definedExternally
+    override fun subarray(startIndex: Int, endIndex: Int): ArrayBufferView = definedExternally
+}
+
+private external object HEAPF32: HEAP<FloatArray> {
+    override fun set(src: FloatArray, dest: NativePointer) = definedExternally
+    override fun subarray(startIndex: Int, endIndex: Int): ArrayBufferView = definedExternally
+}
+
+private external object HEAPF64: HEAP<DoubleArray> {
+    override fun set(src: DoubleArray, dest: NativePointer) = definedExternally
+    override fun subarray(startIndex: Int, endIndex: Int): ArrayBufferView = definedExternally
+}
 
 // Data copying routines.
-private fun toWasm(dest: NativePointer, src: ByteArray) {
-    val index = dest
-    js("HEAPU8.set(src, index)")
-}
-
-private fun toWasm(dest: NativePointer, src: CharArray) {
-    val index = dest / 2
-    js("HEAPU16.set(src, index)")
-}
-
-private fun toWasm(dest: NativePointer, src: ShortArray) {
-    val index = dest / 2
-    js("HEAPU16.set(src, index)")
-}
-
-private fun toWasm(dest: NativePointer, src: FloatArray) {
-    val index = dest / 4
-    js("HEAPF32.set(src, index)")
-}
-
-private fun toWasm(dest: NativePointer, src: DoubleArray) {
-    val index = dest / 8
-    js("HEAPF64.set(src, index)")
-}
-
-private fun toWasm(dest: NativePointer, src: IntArray) {
-    val index = dest / 4
-    js("HEAPU32.set(src, index)")
-}
+private fun toWasm(dest: NativePointer, src: ByteArray): Unit = HEAPU8.set(src, dest)
+private fun toWasm(dest: NativePointer, src: CharArray): Unit = HEAPU16.set(src, dest / 2)
+private fun toWasm(dest: NativePointer, src: ShortArray): Unit = HEAPU16.set(src, dest / 2)
+private fun toWasm(dest: NativePointer, src: FloatArray): Unit = HEAPF32.set(src, dest / 4)
+private fun toWasm(dest: NativePointer, src: DoubleArray): Unit = HEAPF64.set(src, dest / 8)
+private fun toWasm(dest: NativePointer, src: IntArray): Unit = HEAPU32.set(src, dest / 4)
 
 private fun fromWasm(src: NativePointer, result: ByteArray) {
-    val startIndex = src
-    val endIndex = startIndex + result.size
-    js("result.set(HEAPU8.subarray(startIndex, endIndex))")
+    result.asDynamic().set(HEAPU8.subarray(src, src + result.size))
 }
 
 private fun fromWasm(src: NativePointer, result: ShortArray) {
     val startIndex = src / 2
-    val endIndex = startIndex + result.size
-    js("result.set(HEAPU16.subarray(startIndex, endIndex))")
+    result.asDynamic().set(HEAPU16.subarray(startIndex, startIndex + result.size))
 }
 
 private fun fromWasm(src: NativePointer, result: IntArray) {
     val startIndex = src / 4
-    val endIndex = startIndex + result.size
-    js("result.set(HEAPU32.subarray(startIndex, endIndex))")
+    result.asDynamic().set(HEAPU32.subarray(startIndex, startIndex + result.size))
 }
 
 private fun fromWasm(src: NativePointer, result: FloatArray) {
     val startIndex = src / 4
-    val endIndex = startIndex + result.size
-    js("result.set(HEAPF32.subarray(startIndex, endIndex))")
+    result.asDynamic().set(HEAPF32.subarray(startIndex, startIndex + result.size))
 }
 
 private fun fromWasm(src: NativePointer, result: DoubleArray) {
     val startIndex = src / 8
-    val endIndex = startIndex + result.size
-    js("result.set(HEAPF64.subarray(startIndex, endIndex))")
+    result.asDynamic().set(HEAPF64.subarray(startIndex, startIndex + result.size))
 }
 
 actual class NativePointerArray actual constructor(size: Int) {
