@@ -2,6 +2,7 @@ plugins {
     kotlin("multiplatform") version "1.5.31"
 }
 
+val kotlinVersion = "1.5.31"
 val coroutinesVersion = "1.5.2"
 
 repositories {
@@ -35,9 +36,12 @@ if (project.hasProperty("skiko.version")) {
 
 val resourcesDir = "$buildDir/resources"
 val skikoWasm by configurations.creating
+val skikoRuntimeJar by configurations.creating
+val kotlinRuntimeJar by configurations.creating
 
 dependencies {
     skikoWasm("org.jetbrains.skiko:skiko-js-wasm-runtime:$version")
+    skikoRuntimeJar("org.jetbrains.skiko:skiko-jvm-runtime-macos-x64:$version")
 }
 
 val unzipTask = tasks.register("unzipWasm", Copy::class) {
@@ -58,6 +62,12 @@ kotlin {
     if (hostOs == "macos") {
         targets.add(iosX64())
         targets.add(iosArm64())
+    }
+
+    jvm {
+        compilations.all {
+            kotlinOptions.jvmTarget = "11"
+        }
     }
 
     js(IR) {
@@ -89,6 +99,10 @@ kotlin {
         }
 
         val nativeMain by creating {
+            dependsOn(commonMain)
+        }
+
+        val jvmMain by getting {
             dependsOn(commonMain)
         }
 
@@ -150,7 +164,7 @@ project.tasks.register<Exec>("runIosSim") {
     }
 }
 
-project.tasks.register<Exec>("run") {
+project.tasks.register<Exec>("runNative") {
     workingDir = project.buildDir
     val binTask = project.tasks.named("linkDebugExecutable${hostOs.capitalize()}${hostArch.capitalize()}")
     dependsOn(binTask)
@@ -162,6 +176,28 @@ project.tasks.register<Exec>("run") {
         listOf(out.single { it.name.endsWith(".kexe") }.absolutePath)
     }
 }
+
+project.tasks.register<JavaExec>("runJvm") {
+    val kotlinTask =  project.tasks.named("compileKotlinJvm")
+    dependsOn(kotlinTask)
+    systemProperty("skiko.fps.enabled", "true")
+    systemProperty("skiko.linux.autodpi", "true")
+    systemProperty("skiko.hardwareInfo.enabled", "true")
+    systemProperty("skiko.win.exception.logger.enabled", "true")
+    systemProperty("skiko.win.exception.handler.enabled", "true")
+    jvmArgs?.add("-ea")
+    System.getProperties().entries
+        .associate {
+            (it.key as String) to (it.value as String)
+        }
+        .filterKeys { it.startsWith("skiko.") }
+        .forEach { systemProperty(it.key, it.value) }
+    mainClass.set("org.jetbrains.skiko.sample.App_jvmKt")
+    classpath(kotlinTask.get().outputs.files.files)
+    classpath(kotlin.jvm().compilations["main"].runtimeDependencyFiles.files)
+    classpath(skikoRuntimeJar)
+}
+
 
 tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().configureEach {
     dependsOn(unzipTask)

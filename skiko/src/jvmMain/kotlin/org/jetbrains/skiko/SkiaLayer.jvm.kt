@@ -14,6 +14,7 @@ import org.jetbrains.skiko.context.ContextHandler
 import org.jetbrains.skiko.redrawer.Redrawer
 import java.awt.Color
 import java.awt.Component
+import java.awt.Dimension
 import java.awt.Graphics
 import java.awt.event.*
 import java.awt.im.InputMethodRequests
@@ -123,6 +124,12 @@ actual open class SkiaLayer internal constructor(
         }
 
     actual var skikoView: SkikoView? = null
+
+    fun setWindow(window: SkiaWindow) {
+        window.add(this)
+        window.preferredSize = Dimension(800, 600)
+        window.pack()
+    }
 
     val clipComponents = mutableListOf<ClipRectangle>()
 

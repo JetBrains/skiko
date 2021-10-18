@@ -84,9 +84,9 @@ class BouncingBalls: SkikoView {
         Color4f(0f, 1f, 1f, 0.8f).asPaint()
     )).toMutableList()
 
-    override fun onRender(canvas: Canvas, width: Int, height: Int, currentTimestamp: Long) {
-        val dtime = (currentTimestamp - prevTimestamp)
-        prevTimestamp = currentTimestamp
+    override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+        val dtime = (nanoTime - prevTimestamp)
+        prevTimestamp = nanoTime
 
         data.forEach { (ball, paint) ->
             ball.recalculate(width, height, dtime.toFloat())
