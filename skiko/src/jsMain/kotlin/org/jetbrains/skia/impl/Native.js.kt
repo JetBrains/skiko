@@ -204,9 +204,8 @@ private external object HEAPU8: HEAP<ByteArray> {
     override fun subarray(startIndex: Int, endIndex: Int): ArrayBufferView = definedExternally
 }
 
-private external object HEAPU16: HEAP<CharArray> {
-    override fun set(src: CharArray, dest: NativePointer) = definedExternally
-    fun set(src: ShortArray, dest: NativePointer): Unit = definedExternally
+private external object HEAPU16: HEAP<ShortArray> {
+    override fun set(src: ShortArray, dest: NativePointer): Unit = definedExternally
     override fun subarray(startIndex: Int, endIndex: Int): ArrayBufferView = definedExternally
 }
 
@@ -227,7 +226,6 @@ private external object HEAPF64: HEAP<DoubleArray> {
 
 // Data copying routines.
 private fun toWasm(dest: NativePointer, src: ByteArray): Unit = HEAPU8.set(src, dest)
-private fun toWasm(dest: NativePointer, src: CharArray): Unit = HEAPU16.set(src, dest / 2)
 private fun toWasm(dest: NativePointer, src: ShortArray): Unit = HEAPU16.set(src, dest / 2)
 private fun toWasm(dest: NativePointer, src: FloatArray): Unit = HEAPF32.set(src, dest / 4)
 private fun toWasm(dest: NativePointer, src: DoubleArray): Unit = HEAPF64.set(src, dest / 8)
