@@ -1,10 +1,14 @@
 package org.jetbrains.skiko
 
+import kotlinx.cinterop.ObjCAction
+import kotlinx.cinterop.useContents
 import org.jetbrains.skia.PictureRecorder
 import org.jetbrains.skia.Rect
 import org.jetbrains.skiko.context.MetalContextHandler
 import org.jetbrains.skiko.redrawer.MetalRedrawer
+import platform.Foundation.NSSelectorFromString
 import platform.UIKit.*
+import platform.darwin.NSObject
 
 actual open class SkiaLayer(
     var width: Float, var height: Float,
@@ -35,9 +39,27 @@ actual open class SkiaLayer(
     }
 
     lateinit var view: UIView
+    lateinit private var controller: NSObject
 
     fun initLayer(view: UIView) {
         this.view = view
+        // See https://developer.apple.com/documentation/uikit/touches_presses_and_gestures/using_responders_and_the_responder_chain_to_handle_events?language=objc
+        controller = object : NSObject() {
+            @ObjCAction
+            fun onTap(sender: UITapGestureRecognizer) {
+                println("tap!")
+                val (x, y) = sender.locationInView(view).useContents {
+                    x to y
+                }
+                println("rec=$x $y")
+                eventProcessor?.onMouseEvent(
+                    SkikoMouseEvent(x.toInt(), y.toInt(),
+                        SkikoMouseButtons.LEFT, SkikoMouseEventKind.UP,
+                null))
+            }
+        }
+        // We have ':' in selector to take care of function argument.
+        view.addGestureRecognizer(UITapGestureRecognizer(controller, NSSelectorFromString("onTap:")))
         redrawer = MetalRedrawer(this, properties)
         redrawer?.redrawImmediately()
     }

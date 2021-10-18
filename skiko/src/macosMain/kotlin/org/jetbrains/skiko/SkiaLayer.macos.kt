@@ -68,9 +68,15 @@ actual open class SkiaLayer(
             override fun acceptsFirstResponder(): Boolean {
                 return true
             }
+            override fun viewWillMoveToWindow(newWindow: NSWindow?) {
+                updateTrackingAreas()
+            }
             override fun updateTrackingAreas() {
+                println("update tracking areas!")
                 trackingArea?.let { removeTrackingArea(it) }
-                trackingArea = NSTrackingArea(rect = bounds, options = NSMouseMoved, owner = null, userInfo = null)
+                trackingArea = NSTrackingArea(rect = bounds,
+                    options = NSMouseMoved or NSTrackingActiveAlways, // NSTrackingActiveInActiveApp,
+                    owner = this, userInfo = null)
                 addTrackingArea(trackingArea!!)
             }
             override fun mouseDown(event: NSEvent) {

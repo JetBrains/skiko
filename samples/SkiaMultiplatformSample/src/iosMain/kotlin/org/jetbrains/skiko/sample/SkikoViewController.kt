@@ -1,12 +1,9 @@
 package org.jetbrains.skiko.sample
 
 import kotlinx.cinterop.*
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.skiko.GenericRenderer
 import org.jetbrains.skiko.GenericSkikoApp
 import org.jetbrains.skiko.SkiaLayer
-import org.jetbrains.skiko.SkikoEventProcessor
-import platform.CoreGraphics.CGRect
+import org.jetbrains.skiko.setApp
 import platform.CoreGraphics.CGRectMake
 import platform.Foundation.*
 import platform.UIKit.*
