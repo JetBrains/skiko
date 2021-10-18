@@ -4,9 +4,9 @@ import org.jetbrains.skia.Canvas
 
 interface SkikoView {
     // Input
-    fun onKeyboardEvent(event: SkikoKeyboardEvent)
-    fun onPointerEvent(event: SkikoPointerEvent)
-    fun onInputEvent(event: SkikoInputEvent)
+    fun onKeyboardEvent(event: SkikoKeyboardEvent) = Unit
+    fun onPointerEvent(event: SkikoPointerEvent) = Unit
+    fun onInputEvent(event: SkikoInputEvent) = Unit
 
     // Rendering
     fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long)
@@ -35,17 +35,5 @@ open class GenericSkikoView(
 
     override fun onPointerEvent(event: SkikoPointerEvent) {
         app.onPointerEvent(event)
-    }
-}
-
-abstract class NoInputSkikoView: SkikoView {
-
-    override fun onInputEvent(event: SkikoInputEvent) {
-    }
-
-    override fun onKeyboardEvent(event: SkikoKeyboardEvent) {
-    }
-
-    override fun onPointerEvent(event: SkikoPointerEvent) {
     }
 }
