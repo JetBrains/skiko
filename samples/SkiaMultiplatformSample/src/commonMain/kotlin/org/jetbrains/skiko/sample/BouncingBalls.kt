@@ -113,7 +113,7 @@ class BouncingBalls: SkikoView {
             data.removeLast()
         }
         // To avoid log spamming
-        //if (event.kind != SkikoMouseEventKind.MOVE)
+        if (event.kind != SkikoPointerEventKind.MOVE)
             println("onMouse: $event")
     }
 }

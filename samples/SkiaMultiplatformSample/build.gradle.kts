@@ -40,7 +40,7 @@ val kotlinRuntimeJar by configurations.creating
 
 dependencies {
     skikoWasm("org.jetbrains.skiko:skiko-js-wasm-runtime:$version")
-    skikoRuntimeJar("org.jetbrains.skiko:skiko-jvm-runtime-macos-x64:$version")
+    skikoRuntimeJar("org.jetbrains.skiko:skiko-jvm-runtime-$hostOs-$hostArch:$version")
 }
 
 val unzipTask = tasks.register("unzipWasm", Copy::class) {
