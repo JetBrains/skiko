@@ -1,12 +1,20 @@
 package org.jetbrains.skiko.sample
 
 import org.jetbrains.skia.*
+import org.jetbrains.skia.paragraph.FontCollection
+import org.jetbrains.skia.paragraph.ParagraphBuilder
+import org.jetbrains.skia.paragraph.ParagraphStyle
+import org.jetbrains.skia.paragraph.TextStyle
 import org.jetbrains.skiko.SkiaRenderer
+import org.jetbrains.skiko.currentSystemTheme
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.PI
 
 class Clocks: SkiaRenderer {
+    private val fontCollection = FontCollection()
+        .setDefaultFontManager(FontMgr.default)
+
     override fun onRender(canvas: Canvas, width: Int, height: Int, currentTimestamp: Long) {
         val watchFill = Paint().apply { color = 0xFFFFFFFF.toInt() }
         val watchStroke = Paint().apply {
@@ -55,5 +63,14 @@ class Clocks: SkiaRenderer {
                         stroke)
             }
         }
+
+        val style = ParagraphStyle()
+        val paragraph = ParagraphBuilder(style, fontCollection)
+            .pushStyle(TextStyle().setColor(0xFF000000.toInt()))
+            .addText("Graphics API: Metal ✿ﾟ $currentSystemTheme")
+            .popStyle()
+            .build()
+        paragraph.layout(Float.POSITIVE_INFINITY)
+        paragraph.paint(canvas, 5f, 5f)
     }
 }
