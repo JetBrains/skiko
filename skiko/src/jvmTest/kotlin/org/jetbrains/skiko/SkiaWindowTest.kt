@@ -472,6 +472,7 @@ class SkiaWindowTest {
 
             window.layer.skikoView = object : SkikoView {
                 override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+                    canvas.clear(Color.WHITE.rgb)
                     paragraph.layout(Float.POSITIVE_INFINITY)
                     paragraph.paint(canvas, 0f, 0f)
                 }
