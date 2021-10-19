@@ -8,7 +8,6 @@ import org.jetbrains.skia.paragraph.TextStyle
 import org.jetbrains.skiko.SkikoView
 import org.jetbrains.skiko.SkikoPointerEvent
 import org.jetbrains.skiko.isLeftClick
-import org.jetbrains.skiko.currentSystemTheme
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.PI
@@ -69,16 +68,7 @@ class Clocks: SkikoView {
             }
         }
 
-
         val style = ParagraphStyle()
-        val title = ParagraphBuilder(style, fontCollection)
-            .pushStyle(TextStyle().setColor(0xFF000000.toInt()))
-            .addText("Graphics API: Metal ✿ﾟ $currentSystemTheme")
-            .popStyle()
-            .build()
-        title.layout(Float.POSITIVE_INFINITY)
-        title.paint(canvas, 5f, 5f)
-
         val frames = ParagraphBuilder(style, fontCollection)
             .pushStyle(TextStyle().setColor(0xFFFFAA0A.toInt()).setFontSize(25f))
             .addText("Frames: ${frame++}")
