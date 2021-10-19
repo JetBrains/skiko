@@ -2,6 +2,7 @@ package org.jetbrains.skiko
 
 import javax.swing.JFrame
 
+@Deprecated("Will be removed soon")
 open class SkiaWindow(
     properties: SkiaLayerProperties = makeDefaultSkiaLayerProperties(),
     layerFactory: () -> SkiaLayer = { SkiaLayer(properties) }
@@ -21,6 +22,12 @@ open class SkiaWindow(
         layer.backedLayer.useDrawingSurfacePlatformInfo {
             platformOperations.disableTitleBar(it)
         }
+    }
+}
+
+fun SkiaLayer.disableTitleBar() {
+    backedLayer.useDrawingSurfacePlatformInfo {
+        platformOperations.disableTitleBar(it)
     }
 }
 

@@ -35,11 +35,9 @@ if (project.hasProperty("skiko.version")) {
 
 val resourcesDir = "$buildDir/resources"
 val skikoWasm by configurations.creating
-val skikoRuntimeJar by configurations.creating
 
 dependencies {
     skikoWasm("org.jetbrains.skiko:skiko-js-wasm-runtime:$version")
-    skikoRuntimeJar("org.jetbrains.skiko:skiko-jvm-runtime-$hostOs-$hostArch:$version")
 }
 
 val unzipTask = tasks.register("unzipWasm", Copy::class) {
@@ -102,6 +100,9 @@ kotlin {
 
         val jvmMain by getting {
             dependsOn(commonMain)
+            dependencies {
+                implementation("org.jetbrains.skiko:skiko-jvm-runtime-$hostOs-$hostArch:$version")
+            }
         }
 
         val jsMain by getting {
@@ -191,11 +192,9 @@ project.tasks.register<JavaExec>("runJvm") {
         .filterKeys { it.startsWith("skiko.") }
         .forEach { systemProperty(it.key, it.value) }
     mainClass.set("org.jetbrains.skiko.sample.App_jvmKt")
-    classpath(kotlinTask.get().outputs.files.files)
-    classpath(kotlin.jvm().compilations["main"].runtimeDependencyFiles.files)
-    classpath(skikoRuntimeJar)
+    classpath(kotlinTask.get().outputs)
+    classpath(kotlin.jvm().compilations["main"].runtimeDependencyFiles)
 }
-
 
 tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().configureEach {
     dependsOn(unzipTask)

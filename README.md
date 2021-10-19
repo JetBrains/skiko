@@ -31,11 +31,38 @@ i.e. something like this
         else -> error("Unsupported arch: $osArch")
     }
 
-    val version = "0.4.12"
+    val version = "0.5.2"
     val target = "${targetOs}-${targetArch}"
     dependencies {
         implementation("org.jetbrains.skiko:skiko-jvm-runtime-$target:$version")
     }
+```
+
+Simple example for Kotlin/JVM
+```kotlin
+fun main() {
+    val skiaLayer = SkiaLayer()
+    skiaLayer.skikoView = GenericSkikoView(skiaLayer, object : SkikoView {
+        val paint = Paint().apply {
+            color = Color.RED
+        }
+        override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+            canvas.clear(Color.CYAN)
+            val ts = nanoTime / 5_000_000
+            canvas.drawCircle( (ts % width).toFloat(), (ts % height).toFloat(), 20f, paint )
+        }
+    })
+    SwingUtilities.invokeLater {
+        val window = JFrame("Skiko example").apply {
+            defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
+            preferredSize = Dimension(800, 600)
+        }
+        skiaLayer.attachTo(window.contentPane)
+        skiaLayer.needRedraw()
+        window.pack()
+        window.isVisible = true
+    }
+}
 ```
 
 To use latest development snapshot use version `0.0.0-SNAPSHOT`.
