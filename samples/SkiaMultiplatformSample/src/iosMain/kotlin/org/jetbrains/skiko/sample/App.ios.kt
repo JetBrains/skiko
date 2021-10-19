@@ -8,7 +8,7 @@ import org.jetbrains.skiko.SkikoViewController
 import platform.UIKit.*
 import platform.Foundation.*
 
-fun makeApp(): SkikoView = BouncingBalls()
+fun makeApp(): SkikoView = Clocks()
 
 fun main() {
     val args = emptyArray<String>()

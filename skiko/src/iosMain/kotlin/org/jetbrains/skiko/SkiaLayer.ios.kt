@@ -22,7 +22,7 @@ actual open class SkiaLayer(
         set(value) { throw UnsupportedOperationException() }
 
     actual val contentScale: Float
-        get() = 1.0f
+        get() = view.contentScaleFactor.toFloat()
 
     actual var fullscreen: Boolean
         get() = true
@@ -88,8 +88,11 @@ actual open class SkiaLayer(
     private val contextHandler = MetalContextHandler(this)
 
     fun update(nanoTime: Long) {
-        val pictureWidth = (width * contentScale).coerceAtLeast(0.0F)
-        val pictureHeight = (height * contentScale).coerceAtLeast(0.0F)
+        val (w, h) = view.frame.useContents {
+            size.width to size.height
+        }
+        val pictureWidth = (w.toFloat() * contentScale).coerceAtLeast(0.0F)
+        val pictureHeight = (h.toFloat() * contentScale).coerceAtLeast(0.0F)
 
         val bounds = Rect.makeWH(pictureWidth, pictureHeight)
         val canvas = pictureRecorder.beginRecording(bounds)

@@ -4,6 +4,7 @@ import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.autoreleasepool
 import kotlinx.cinterop.objcPtr
 import kotlinx.cinterop.usePinned
+import kotlinx.cinterop.useContents
 import org.jetbrains.skia.BackendRenderTarget
 import org.jetbrains.skia.DirectContext
 import org.jetbrains.skiko.*
@@ -17,6 +18,7 @@ import platform.QuartzCore.CAMetalDrawableProtocol
 import platform.QuartzCore.CAMetalLayer
 import platform.QuartzCore.kCAGravityTopLeft
 import kotlin.system.getTimeNanos
+import platform.CoreGraphics.CGSizeMake
 
 internal class MetalRedrawer(
     private val layer: SkiaLayer,
@@ -26,7 +28,11 @@ internal class MetalRedrawer(
     internal val device = MTLCreateSystemDefaultDevice()!!
     private val queue = device.newCommandQueue()!!
     private var currentDrawable: CAMetalDrawableProtocol? = null
-    private val metalLayer = MetalLayer(this.layer, device)
+    private val metalLayer = MetalLayer()
+
+    init {
+        metalLayer.init(this.layer, device)
+    }
 
     private val frameDispatcher = FrameDispatcher(SkikoDispatchers.Main) {
         if (layer.isShowing()) {
@@ -48,7 +54,13 @@ internal class MetalRedrawer(
     }
 
     override fun syncSize() {
-        println("TODO: implement syncSize()")
+        metalLayer.contentsScale = layer.contentScale.toDouble()
+        val (w, h) = layer.view.frame.useContents {
+            size.width to size.height
+        }
+        metalLayer.frame = layer.view.frame
+        metalLayer.init(layer, device)
+        metalLayer.drawableSize = CGSizeMake(w * metalLayer.contentsScale, h * metalLayer.contentsScale)
     }
 
     override fun needRedraw() {
@@ -88,11 +100,15 @@ internal class MetalRedrawer(
     }
 }
 
-class MetalLayer(
-    private val skiaLayer: SkiaLayer,
-    theDevice: MTLDeviceProtocol
-) : CAMetalLayer() {
-    init {
+class MetalLayer : CAMetalLayer {
+    private lateinit var skiaLayer: SkiaLayer
+
+    @OverrideInit
+    constructor(): super()
+    @OverrideInit
+    constructor(layer: Any): super(layer)
+
+    fun init(skiaLayer: SkiaLayer, theDevice: MTLDeviceProtocol) {
         this.setNeedsDisplayOnBoundsChange(true)
         this.removeAllAnimations()
         // TODO: looks like a bug in K/N interop.

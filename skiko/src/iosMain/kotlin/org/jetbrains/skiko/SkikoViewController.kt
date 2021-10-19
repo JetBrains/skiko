@@ -8,6 +8,7 @@ import platform.UIKit.UIEvent
 import platform.UIKit.UIScreen
 import platform.UIKit.UIViewController
 import platform.UIKit.setFrame
+import platform.UIKit.contentScaleFactor
 
 @ExportObjCClass
 class SkikoViewController : UIViewController {
@@ -41,6 +42,7 @@ class SkikoViewController : UIViewController {
         val layer = SkiaLayer().apply {
             skikoView = appFactory(this)
         }
+        view.contentScaleFactor = UIScreen.mainScreen.scale
         view.setFrame(CGRectMake(0.0, 0.0, width, height))
         layer.attachTo(this.view)
     }
