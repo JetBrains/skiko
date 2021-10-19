@@ -1,11 +1,5 @@
 package org.jetbrains.skiko
 
-enum class SystemTheme {
-    DARK,
-    LIGHT,
-    UNKNOWN
-}
-
 val currentSystemTheme: SystemTheme
     get() = when (getCurrentSystemTheme()) {
         0 -> SystemTheme.LIGHT

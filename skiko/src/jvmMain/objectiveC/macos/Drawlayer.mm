@@ -188,7 +188,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_osxDisableT
     });
 }
 
-JNIEXPORT jint JNICALL Java_org_jetbrains_skiko_SystemThemeKt_getCurrentSystemTheme(JNIEnv *env, jobject topLevel)
+JNIEXPORT jint JNICALL Java_org_jetbrains_skiko_SystemTheme_1jvmKt_getCurrentSystemTheme(JNIEnv *env, jobject topLevel)
 {
     NSString *osxMode = [[NSUserDefaults standardUserDefaults] stringForKey:@"AppleInterfaceStyle"];
     if ([@"Dark" isEqualToString:osxMode]) {

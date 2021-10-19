@@ -1,5 +1,6 @@
 package org.jetbrains.skiko.context
 
+import kotlinx.cinterop.useContents
 import org.jetbrains.skia.ColorSpace
 import org.jetbrains.skia.Surface
 import org.jetbrains.skia.SurfaceColorFormat
@@ -23,12 +24,27 @@ internal class MetalContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
         return true
     }
 
+    private var currentWidth = 0
+    private var currentHeight = 0
+    private fun isSizeChanged(width: Int, height: Int): Boolean {
+        if (width != currentWidth || height != currentHeight) {
+            currentWidth = width
+            currentHeight = height
+            return true
+        }
+        return false
+    }
+
     override fun initCanvas() {
         disposeCanvas()
-
         val scale = layer.contentScale
-        val w = (layer.width * scale).toInt().coerceAtLeast(0)
-        val h = (layer.height * scale).toInt().coerceAtLeast(0)
+        val (w, h) = layer.view.frame.useContents {
+            (size.width * scale).toInt().coerceAtLeast(0) to (size.height * scale).toInt().coerceAtLeast(0)
+        }
+
+        if (isSizeChanged(w, h)) {
+            metalRedrawer.syncSize()
+        }
 
         renderTarget = metalRedrawer.makeRenderTarget(w, h)
 
