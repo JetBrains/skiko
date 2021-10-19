@@ -6,12 +6,17 @@ import org.jetbrains.skia.paragraph.ParagraphBuilder
 import org.jetbrains.skia.paragraph.ParagraphStyle
 import org.jetbrains.skia.paragraph.TextStyle
 import org.jetbrains.skiko.SkikoView
+import org.jetbrains.skiko.SkikoPointerEvent
+import org.jetbrains.skiko.isLeftClick
 import org.jetbrains.skiko.currentSystemTheme
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.PI
 
 class Clocks: SkikoView {
+    private var frame = 0
+    private var xpos = 0.0
+    private var ypos = 0.0
     private val fontCollection = FontCollection()
         .setDefaultFontManager(FontMgr.default)
 
@@ -30,7 +35,7 @@ class Clocks: SkikoView {
         val watchFillHover = Paint().apply { color = 0xFFE4FF01.toInt() }
         for (x in 0 .. (width - 50) step 50) {
             for (y in 20 .. (height - 50) step 50) {
-                val hover = false//xpos > x + 0 && xpos < x + 50 && ypos > y + 0 && ypos < y + 50
+                val hover = xpos > x + 0 && xpos < x + 50 && ypos > y + 0 && ypos < y + 50
                 val fill = if (hover) watchFillHover else watchFill
                 val stroke = if (x > width / 2) watchStrokeAA else watchStroke
                 canvas.drawOval(Rect.makeXYWH(x + 5f, y + 5f, 40f, 40f), fill)
@@ -64,13 +69,29 @@ class Clocks: SkikoView {
             }
         }
 
+
         val style = ParagraphStyle()
-        val paragraph = ParagraphBuilder(style, fontCollection)
+        val title = ParagraphBuilder(style, fontCollection)
             .pushStyle(TextStyle().setColor(0xFF000000.toInt()))
             .addText("Graphics API: Metal ✿ﾟ $currentSystemTheme")
             .popStyle()
             .build()
-        paragraph.layout(Float.POSITIVE_INFINITY)
-        paragraph.paint(canvas, 5f, 5f)
+        title.layout(Float.POSITIVE_INFINITY)
+        title.paint(canvas, 5f, 5f)
+
+        val frames = ParagraphBuilder(style, fontCollection)
+            .pushStyle(TextStyle().setColor(0xFFFFAA0A.toInt()).setFontSize(25f))
+            .addText("Frames: ${frame++}")
+            .popStyle()
+            .build()
+        frames.layout(Float.POSITIVE_INFINITY)
+        frames.paint(canvas, xpos.toFloat(), ypos.toFloat())
+    }
+
+    override fun onPointerEvent(event: SkikoPointerEvent) {
+        if (event.isLeftClick) {
+            xpos = event.x
+            ypos = event.y
+        }
     }
 }
