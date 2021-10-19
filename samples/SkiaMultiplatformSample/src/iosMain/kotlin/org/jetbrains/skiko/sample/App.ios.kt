@@ -6,7 +6,7 @@ import org.jetbrains.skiko.SkiaRenderer
 import platform.UIKit.*
 import platform.Foundation.*
 
-fun makeApp(): SkiaRenderer = BouncingBalls()
+fun makeApp(): SkiaRenderer = Clocks()
 
 fun main() {
     val args = emptyArray<String>()

@@ -17,6 +17,8 @@ import platform.QuartzCore.CAMetalDrawableProtocol
 import platform.QuartzCore.CAMetalLayer
 import platform.QuartzCore.kCAGravityTopLeft
 import kotlin.system.getTimeNanos
+import kotlinx.cinterop.*
+import platform.CoreGraphics.CGSizeMake
 
 internal class MetalRedrawer(
     private val layer: SkiaLayer,
@@ -48,7 +50,12 @@ internal class MetalRedrawer(
     }
 
     override fun syncSize() {
-        println("TODO: implement syncSize()")
+        metalLayer.contentsScale = layer.contentScale.toDouble()
+        val (w, h) = layer.view.frame.useContents {
+            size.width to size.height
+        }
+        metalLayer.frame = layer.view.frame
+        metalLayer.drawableSize = CGSizeMake(w * metalLayer.contentsScale, h * metalLayer.contentsScale)
     }
 
     override fun needRedraw() {
