@@ -119,7 +119,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     fun drawPoints(coords: FloatArray, paint: Paint): Canvas {
         Stats.onNativeCall()
         interopScope {
-            _nDrawPoints(_ptr, 0 /* SkCanvas::PointMode::kPoints_PointMode */, toInterop(coords), getPtr(paint))
+            _nDrawPoints(_ptr, 0 /* SkCanvas::PointMode::kPoints_PointMode */, coords.size, toInterop(coords), getPtr(paint))
         }
         reachabilityBarrier(paint)
         return this
@@ -178,7 +178,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     fun drawLines(coords: FloatArray, paint: Paint): Canvas {
         Stats.onNativeCall()
         interopScope {
-            _nDrawPoints(_ptr, 1 /* SkCanvas::PointMode::kLines_PointMode */, toInterop(coords), getPtr(paint))
+            _nDrawPoints(_ptr, 1 /* SkCanvas::PointMode::kLines_PointMode */, coords.size, toInterop(coords),getPtr(paint))
         }
         reachabilityBarrier(paint)
         return this
@@ -235,7 +235,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     fun drawPolygon(coords: FloatArray, paint: Paint): Canvas {
         Stats.onNativeCall()
         interopScope {
-            _nDrawPoints(_ptr, 2 /* SkCanvas::PointMode::kPolygon_PointMode */, toInterop(coords), getPtr(paint))
+            _nDrawPoints(_ptr, 2 /* SkCanvas::PointMode::kPolygon_PointMode */, coords.size, toInterop(coords), getPtr(paint))
         }
         reachabilityBarrier(paint)
         return this
@@ -595,9 +595,11 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
             _nDrawVertices(
                 _ptr,
                 0 /* kTriangles_VertexMode */,
+                positions.size,
                 toInterop(Point.flattenArray(positions)),
                 toInterop(colors),
                 toInterop(Point.flattenArray(texCoords)),
+                indices?.size ?: 0,
                 toInterop(indices),
                 mode.ordinal,
                 getPtr(paint)
@@ -700,9 +702,11 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
             _nDrawVertices(
                 _ptr,
                 1 /* kTriangleStrip_VertexMode */,
+                positions.size,
                 toInterop(Point.flattenArray(positions)),
                 toInterop(colors),
                 toInterop(Point.flattenArray(texCoords)),
+                indices?.size ?: 0,
                 toInterop(indices),
                 mode.ordinal,
                 getPtr(paint)
@@ -805,9 +809,11 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
             _nDrawVertices(
                 _ptr,
                 2 /* kTriangleFan_VertexMode */,
+                positions.size,
                 toInterop(Point.flattenArray(positions)),
                 toInterop(colors),
                 toInterop(Point.flattenArray(texCoords)),
+                indices?.size ?: 0,
                 toInterop(indices),
                 mode.ordinal,
                 getPtr(paint)
@@ -866,9 +872,11 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
             _nDrawVertices(
                 _ptr,
                 vertexMode.ordinal,
+                points,
                 toInterop(positions),
                 toInterop(colors),
                 toInterop(texCoords),
+                indices?.size ?: 0,
                 toInterop(indices),
                 mode.ordinal,
                 getPtr(paint)
@@ -1470,7 +1478,7 @@ private external fun _nMakeFromBitmap(bitmapPtr: NativePointer, flags: Int, pixe
 private external fun _nDrawPoint(ptr: NativePointer, x: Float, y: Float, paintPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawPoints")
-private external fun _nDrawPoints(ptr: NativePointer, mode: Int, coords: InteropPointer, paintPtr: NativePointer)
+private external fun _nDrawPoints(ptr: NativePointer, mode: Int, coordsCount: Int, coords: InteropPointer, paintPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawLine")
 private external fun _nDrawLine(ptr: NativePointer, x0: Float, y0: Float, x1: Float, y1: Float, paintPtr: NativePointer)
@@ -1582,9 +1590,11 @@ private external fun _nDrawPicture(ptr: NativePointer, picturePtr: NativePointer
 private external fun _nDrawVertices(
     ptr: NativePointer,
     verticesMode: Int,
+    vertexCount: Int,
     cubics: InteropPointer,
     colors: InteropPointer,
     texCoords: InteropPointer,
+    indexCount: Int,
     indices: InteropPointer,
     blendMode: Int,
     paintPtr: NativePointer
