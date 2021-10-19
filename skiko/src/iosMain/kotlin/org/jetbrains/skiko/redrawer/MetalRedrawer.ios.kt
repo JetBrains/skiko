@@ -28,7 +28,11 @@ internal class MetalRedrawer(
     internal val device = MTLCreateSystemDefaultDevice()!!
     private val queue = device.newCommandQueue()!!
     private var currentDrawable: CAMetalDrawableProtocol? = null
-    private val metalLayer = MetalLayer(this.layer, device)
+    private val metalLayer = MetalLayer()
+
+    init {
+        metalLayer.init(this.layer, device)
+    }
 
     private val frameDispatcher = FrameDispatcher(SkikoDispatchers.Main) {
         if (layer.isShowing()) {
@@ -55,6 +59,7 @@ internal class MetalRedrawer(
             size.width to size.height
         }
         metalLayer.frame = layer.view.frame
+        metalLayer.init(layer, device)
         metalLayer.drawableSize = CGSizeMake(w * metalLayer.contentsScale, h * metalLayer.contentsScale)
     }
 
@@ -95,11 +100,15 @@ internal class MetalRedrawer(
     }
 }
 
-class MetalLayer(
-    private val skiaLayer: SkiaLayer,
-    theDevice: MTLDeviceProtocol
-) : CAMetalLayer() {
-    init {
+class MetalLayer : CAMetalLayer {
+    private lateinit var skiaLayer: SkiaLayer
+
+    @OverrideInit
+    constructor(): super()
+    @OverrideInit
+    constructor(layer: Any): super(layer)
+
+    fun init(skiaLayer: SkiaLayer, theDevice: MTLDeviceProtocol) {
         this.setNeedsDisplayOnBoundsChange(true)
         this.removeAllAnimations()
         // TODO: looks like a bug in K/N interop.
