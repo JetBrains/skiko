@@ -19,6 +19,7 @@ import java.awt.event.*
 import java.awt.im.InputMethodRequests
 import java.util.concurrent.CancellationException
 import javax.accessibility.Accessible
+import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.SwingUtilities.isEventDispatchThread
 
@@ -123,6 +124,69 @@ actual open class SkiaLayer internal constructor(
         }
 
     actual var skikoView: SkikoView? = null
+
+    actual fun attachTo(container: Any) {
+        attachTo(container as JComponent)
+    }
+
+    fun attachTo(jComponent: JComponent) {
+        jComponent.add(this)
+        backedLayer.addMouseListener(object : MouseAdapter() {
+            override fun mousePressed(e: MouseEvent?) {
+                e!!
+                skikoView?.onPointerEvent(
+                    SkikoPointerEvent(e.x.toDouble(), e.y.toDouble(),
+                        if (e.button == 1) SkikoMouseButtons.LEFT else SkikoMouseButtons.RIGHT,
+                        SkikoPointerEventKind.DOWN,
+                        e
+                    )
+                )
+            }
+            override fun mouseReleased(e: MouseEvent?) {
+                e!!
+                skikoView?.onPointerEvent(
+                    SkikoPointerEvent(e.x.toDouble(), e.y.toDouble(),
+                        if (e.button == 1) SkikoMouseButtons.LEFT else SkikoMouseButtons.RIGHT,
+                        SkikoPointerEventKind.UP,
+                        e
+                    )
+                )
+            }
+        })
+        backedLayer.addMouseMotionListener(object : MouseMotionAdapter() {
+            override fun mouseMoved(e: MouseEvent?) {
+                e!!
+                skikoView?.onPointerEvent(
+                    SkikoPointerEvent(e.x.toDouble(), e.y.toDouble(),
+                        SkikoMouseButtons.NONE,
+                        SkikoPointerEventKind.MOVE,
+                        e
+                    )
+                )
+            }
+        })
+        backedLayer.addKeyListener(object : KeyAdapter() {
+            override fun keyPressed(e: KeyEvent?) {
+                e!!
+                skikoView?.onKeyboardEvent(
+                    SkikoKeyboardEvent(e.keyCode,
+                        SkikoKeyboardEventKind.DOWN,
+                        e
+                    )
+                )
+            }
+            override fun keyReleased(e: KeyEvent?) {
+                e!!
+                skikoView?.onKeyboardEvent(
+                    SkikoKeyboardEvent(
+                        e.keyCode,
+                        SkikoKeyboardEventKind.UP,
+                        e
+                    )
+                )
+            }
+        })
+    }
 
     val clipComponents = mutableListOf<ClipRectangle>()
 

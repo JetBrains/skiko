@@ -47,7 +47,11 @@ actual open class SkiaLayer(properties: SkiaLayerProperties = makeDefaultSkiaLay
         )
     }
 
-    fun setCanvas(htmlCanvas: HTMLCanvasElement) {
+    actual fun attachTo(container: Any) {
+        attachTo(container as HTMLCanvasElement)
+    }
+
+    fun attachTo(htmlCanvas: HTMLCanvasElement) {
         state = object: CanvasRenderer(htmlCanvas) {
             override fun drawFrame(currentTimestamp: Double) {
                 // currentTimestamp is in milliseconds.

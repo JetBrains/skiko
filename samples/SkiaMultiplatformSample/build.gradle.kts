@@ -1,5 +1,5 @@
 plugins {
-    kotlin("multiplatform") version "1.5.31"
+    kotlin("multiplatform") version "1.6.0-RC"
 }
 
 val coroutinesVersion = "1.5.2"
@@ -60,6 +60,12 @@ kotlin {
         targets.add(iosArm64())
     }
 
+    jvm {
+        compilations.all {
+            kotlinOptions.jvmTarget = "11"
+        }
+    }
+
     js(IR) {
         browser()
         binaries.executable()
@@ -90,6 +96,13 @@ kotlin {
 
         val nativeMain by creating {
             dependsOn(commonMain)
+        }
+
+        val jvmMain by getting {
+            dependsOn(commonMain)
+            dependencies {
+                implementation("org.jetbrains.skiko:skiko-jvm-runtime-$hostOs-$hostArch:$version")
+            }
         }
 
         val jsMain by getting {
@@ -150,7 +163,7 @@ project.tasks.register<Exec>("runIosSim") {
     }
 }
 
-project.tasks.register<Exec>("run") {
+project.tasks.register<Exec>("runNative") {
     workingDir = project.buildDir
     val binTask = project.tasks.named("linkDebugExecutable${hostOs.capitalize()}${hostArch.capitalize()}")
     dependsOn(binTask)
@@ -161,6 +174,26 @@ project.tasks.register<Exec>("run") {
         println("Run $out")
         listOf(out.single { it.name.endsWith(".kexe") }.absolutePath)
     }
+}
+
+project.tasks.register<JavaExec>("runJvm") {
+    val kotlinTask =  project.tasks.named("compileKotlinJvm")
+    dependsOn(kotlinTask)
+    systemProperty("skiko.fps.enabled", "true")
+    systemProperty("skiko.linux.autodpi", "true")
+    systemProperty("skiko.hardwareInfo.enabled", "true")
+    systemProperty("skiko.win.exception.logger.enabled", "true")
+    systemProperty("skiko.win.exception.handler.enabled", "true")
+    jvmArgs?.add("-ea")
+    System.getProperties().entries
+        .associate {
+            (it.key as String) to (it.value as String)
+        }
+        .filterKeys { it.startsWith("skiko.") }
+        .forEach { systemProperty(it.key, it.value) }
+    mainClass.set("org.jetbrains.skiko.sample.App_jvmKt")
+    classpath(kotlinTask.get().outputs)
+    classpath(kotlin.jvm().compilations["main"].runtimeDependencyFiles)
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().configureEach {

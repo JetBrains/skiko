@@ -13,7 +13,7 @@ fun main() {
         skiaLayer.skikoView = GenericSkikoView(skiaLayer, game)
         val canvas = document.getElementById("SkikoTarget") as HTMLCanvasElement
         canvas.setAttribute("tabindex", "0")
-        skiaLayer.setCanvas(canvas)
+        skiaLayer.attachTo(canvas)
         skiaLayer.needRedraw()
     }
 }

@@ -49,9 +49,11 @@ actual open class SkiaLayer(
     lateinit var view: UIView
     // We need to keep reference to controller as Objective-C will only keep weak reference here.
     lateinit private var controller: NSObject
-
-    fun initLayer(viewController: SkikoViewController) {
-        this.view = viewController.view
+    actual fun attachTo(container: Any) {
+        attachTo(container as UIView)
+    }
+    fun attachTo(view: UIView) {
+        this.view = view
 
         // See https://developer.apple.com/documentation/uikit/touches_presses_and_gestures/using_responders_and_the_responder_chain_to_handle_events?language=objc
         controller = object : NSObject() {

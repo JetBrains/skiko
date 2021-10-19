@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 
 plugins {
-    kotlin("multiplatform") version "1.5.31" // "1.6.0-M1"
+    kotlin("multiplatform") version "1.5.31"
     `maven-publish`
     id("org.gradle.crypto.checksum") version "1.1.0"
     id("de.undercouch.download") version "4.1.1"
@@ -202,8 +202,13 @@ val linkWasm = tasks.register<LinkSkikoWasmTask>("linkWasm") {
 
 val skiaBinSubdir = "out/${buildType.id}-${targetOs.id}-${targetArch.id}"
 
+internal val Project.isInIdea: Boolean
+    get() {
+        return System.getProperty("idea.active")?.toBoolean() == true
+    }
+
 val Project.supportNative: Boolean
-   get() = properties.get("skiko.native.enabled") == "true"
+   get() = (properties.get("skiko.native.enabled") == "true") || isInIdea
 
 val Project.supportWasm: Boolean
     get() = properties.get("skiko.wasm.enabled") == "true"
