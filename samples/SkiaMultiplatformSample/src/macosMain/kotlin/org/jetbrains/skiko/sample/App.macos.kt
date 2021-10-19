@@ -22,7 +22,7 @@ fun main() {
         defer = true)
     val skiaLayer = SkiaLayer()
     skiaLayer.skikoView = GenericSkikoView(skiaLayer, makeApp())
-    skiaLayer.initLayer(window)
+    skiaLayer.attachTo(window)
     window.orderFrontRegardless()
     NSApp?.run()
 }
