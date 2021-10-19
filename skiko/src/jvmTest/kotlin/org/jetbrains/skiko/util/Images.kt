@@ -1,5 +1,6 @@
 package org.jetbrains.skiko.util
 
+import org.jetbrains.skia.ByteBuffer
 import org.jetbrains.skia.Image
 import org.jetbrains.skia.Pixmap
 import java.awt.Color
@@ -12,8 +13,20 @@ fun isContentSame(img1: Image, img2: Image, sensitivity: Double): Boolean {
     if (img1.width == img2.width && img1.height == img2.height) {
         val pixMap1 = Pixmap()
         val pixMap2 = Pixmap()
-        img1.readPixels(pixMap1, 0, 0, false)
-        img2.readPixels(pixMap2, 0, 0, false)
+
+        pixMap1.reset(
+            img1.imageInfo,
+            ByteBuffer.allocateDirect(img1.bytesPerPixel * img1.width * img1.height),
+            img1.bytesPerPixel * img1.width
+        )
+        pixMap2.reset(
+            img2.imageInfo,
+            ByteBuffer.allocateDirect(img2.bytesPerPixel * img2.width * img2.height),
+            img2.bytesPerPixel * img2.width
+        )
+        check(img1.readPixels(pixMap1, 0, 0, false))
+        check(img2.readPixels(pixMap2, 0, 0, false))
+
         for (y in 0 until img1.height) {
             for (x in 0 until img1.width) {
                 val color1 = Color(pixMap1.getColor(x, y))
