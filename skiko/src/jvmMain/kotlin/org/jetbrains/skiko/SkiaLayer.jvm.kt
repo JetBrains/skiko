@@ -14,12 +14,12 @@ import org.jetbrains.skiko.context.ContextHandler
 import org.jetbrains.skiko.redrawer.Redrawer
 import java.awt.Color
 import java.awt.Component
-import java.awt.Dimension
 import java.awt.Graphics
 import java.awt.event.*
 import java.awt.im.InputMethodRequests
 import java.util.concurrent.CancellationException
 import javax.accessibility.Accessible
+import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.SwingUtilities.isEventDispatchThread
 
@@ -125,8 +125,12 @@ actual open class SkiaLayer internal constructor(
 
     actual var skikoView: SkikoView? = null
 
-    fun setWindow(window: SkiaWindow) {
-        window.add(this)
+    actual fun attachTo(container: Any) {
+        attachTo(container as JComponent)
+    }
+
+    fun attachTo(jComponent: JComponent) {
+        jComponent.add(this)
         backedLayer.addMouseListener(object : MouseAdapter() {
             override fun mousePressed(e: MouseEvent?) {
                 e!!
@@ -174,14 +178,14 @@ actual open class SkiaLayer internal constructor(
             override fun keyReleased(e: KeyEvent?) {
                 e!!
                 skikoView?.onKeyboardEvent(
-                    SkikoKeyboardEvent(e.keyCode,
+                    SkikoKeyboardEvent(
+                        e.keyCode,
                         SkikoKeyboardEventKind.UP,
                         e
                     )
                 )
             }
         })
-        window.pack()
     }
 
     val clipComponents = mutableListOf<ClipRectangle>()

@@ -42,6 +42,6 @@ class SkikoViewController : UIViewController {
             skikoView = appFactory(this)
         }
         view.setFrame(CGRectMake(0.0, 0.0, width, height))
-        layer.initLayer(this)
+        layer.attachTo(this)
     }
 }

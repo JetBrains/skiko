@@ -60,8 +60,10 @@ actual open class SkiaLayer(
     private fun eventToKeyboard(event: NSEvent, kind: SkikoKeyboardEventKind): SkikoKeyboardEvent {
          return SkikoKeyboardEvent(event.keyCode.toInt(), kind, event)
     }
-
-    fun initLayer(window: NSWindow) {
+    actual fun attachTo(container: Any) {
+        attachTo(container as NSWindow)
+    }
+    fun attachTo(window: NSWindow) {
         val (width, height) = window.contentLayoutRect.useContents {
             this.size.width to this.size.height
         }

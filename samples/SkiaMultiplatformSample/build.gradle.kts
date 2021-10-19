@@ -1,5 +1,5 @@
 plugins {
-    kotlin("multiplatform") version "1.5.31"
+    kotlin("multiplatform") version "1.6.0-RC"
 }
 
 val coroutinesVersion = "1.5.2"

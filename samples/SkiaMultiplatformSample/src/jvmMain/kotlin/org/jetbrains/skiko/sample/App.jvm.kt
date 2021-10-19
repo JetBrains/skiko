@@ -15,8 +15,9 @@ fun main() {
         window.defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
         window.title = "Skiko example"
         window.preferredSize = Dimension(800, 600)
-        skiaLayer.setWindow(window)
+        skiaLayer.attachTo(window.contentPane)
         skiaLayer.needRedraw()
+        window.pack()
         window.isVisible = true
     }
 }
