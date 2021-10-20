@@ -69,11 +69,11 @@ val compileWasm = tasks.register<CompileSkikoCppTask>("compileWasm") {
     buildTargetArch.set(osArch.second)
     buildVariant.set(buildType)
 
-    val srcDirs = projectDirs("src/jsMain/cpp", "src/commonMain/cpp") +
-        if (skiko.includeTestHelpers) projectDirs("src/commonTest/cpp") else emptyList()
+    val srcDirs = projectDirs("src/jsMain/cpp", "src/nativeJsMain/cpp") +
+        if (skiko.includeTestHelpers) projectDirs("src/nativeJsTest/cpp") else emptyList()
     sourceRoots.set(srcDirs)
 
-    includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp"))
+    includeHeadersNonRecursive(projectDir.resolve("src/nativeJsMain/cpp"))
     includeHeadersNonRecursive(skiaHeadersDirs(skiaWasmDir.get()))
 
     flags.set(listOf(
@@ -148,11 +148,11 @@ fun registerNativeBridgesTask(os: OS, arch: Arch): TaskProvider<CompileSkikoCppT
             else -> throw GradleException("$os not yet supported")
         }
 
-        val srcDirs = projectDirs("src/nativeMain/cpp", "src/commonMain/cpp") +
-                if (skiko.includeTestHelpers) projectDirs("src/commonTest/cpp") else emptyList()
+        val srcDirs = projectDirs("src/nativeNativeJs/cpp", "src/nativeJsMain/cpp") +
+                if (skiko.includeTestHelpers) projectDirs("src/nativeJsTest/cpp") else emptyList()
         sourceRoots.set(srcDirs)
 
-        includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp"))
+        includeHeadersNonRecursive(projectDir.resolve("src/nativeJsMain/cpp"))
         includeHeadersNonRecursive(skiaHeadersDirs(unpackedSkia))
     }
 }
