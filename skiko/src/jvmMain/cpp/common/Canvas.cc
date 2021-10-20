@@ -31,7 +31,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawPoint
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawPoints
-  (JNIEnv* env, jclass jclass, jlong canvasPtr, int mode, jfloatArray coords, jlong paintPtr) {
+  (JNIEnv* env, jclass jclass, jlong canvasPtr, int mode, jint _coordsCount, jfloatArray coords, jlong paintPtr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
     SkCanvas::PointMode skMode = static_cast<SkCanvas::PointMode>(mode);
@@ -154,7 +154,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawPictur
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawVertices
-  (JNIEnv* env, jclass jclass, jlong ptr, jint verticesMode, jfloatArray positionsArr, jintArray colorsArr, jfloatArray texCoordsArr, jshortArray indexArr, jint blendMode, jlong paintPtr) {
+  (JNIEnv* env, jclass jclass, jlong ptr, jint verticesMode, jint _vertexCount, jfloatArray positionsArr, jintArray colorsArr, jfloatArray texCoordsArr, jint _indexCount, jshortArray indexArr, jint blendMode, jlong paintPtr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>   (static_cast<uintptr_t>(ptr));
     int indexCount = indexArr == nullptr ? 0 : env->GetArrayLength(indexArr);
     jfloat* positions = env->GetFloatArrayElements(positionsArr, 0);
