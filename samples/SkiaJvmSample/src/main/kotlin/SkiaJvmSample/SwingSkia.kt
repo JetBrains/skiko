@@ -10,10 +10,7 @@ import java.awt.event.ComponentEvent
 import java.awt.event.MouseEvent
 import java.awt.event.MouseMotionAdapter
 import javax.swing.*
-
-private val state = State()
-private var mouseX = 0
-private var mouseY = 0
+import org.jetbrains.skiko.GenericSkikoView
 
 fun Button(
     text: String,
@@ -35,8 +32,6 @@ fun SwingSkia() = SwingUtilities.invokeLater {
     val window = JFrame()
     window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
     window.title = "SwingSkiaWindow"
-
-    state.text = window.title
 
     var panel = getSkiaPanel()
     
@@ -87,6 +82,8 @@ fun SwingSkia() = SwingUtilities.invokeLater {
 
 private fun getSkiaPanel(): SkiaPanel {
     val panel = SkiaPanel()
+    val clocks = ClocksJvm(panel.layer)
+    panel.layer.skikoView = GenericSkikoView(panel.layer, clocks)
     val btnPanelOK = JPanel()
     btnPanelOK.setLayout(BorderLayout(0, 0))
     btnPanelOK.setBackground(Color.white)
@@ -103,11 +100,10 @@ private fun getSkiaPanel(): SkiaPanel {
             panel.repaint()
         }
     })
-    panel.layer.renderer = Renderer(panel.layer) { renderer, w, h, nanoTime -> displayScene(renderer, w, h, nanoTime, mouseX, mouseY, state) }
     panel.layer.addMouseMotionListener(object : MouseMotionAdapter() {
         override fun mouseMoved(event: MouseEvent) {
-            mouseX = event.x
-            mouseY = event.y
+            clocks.xpos = event.x
+            clocks.ypos = event.y
         }
     })
     return panel
