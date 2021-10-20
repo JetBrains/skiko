@@ -8,6 +8,8 @@ import org.jetbrains.skia.paragraph.TextStyle
 import org.jetbrains.skiko.SkikoView
 import org.jetbrains.skiko.SkikoPointerEvent
 import org.jetbrains.skiko.isLeftClick
+import org.jetbrains.skiko.currentSystemTheme
+import org.jetbrains.skiko.SystemTheme
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.PI
@@ -20,18 +22,24 @@ class Clocks: SkikoView {
         .setDefaultFontManager(FontMgr.default)
 
     override fun onRender(canvas: Canvas, width: Int, height: Int, currentTimestamp: Long) {
-        val watchFill = Paint().apply { color = 0xFFFFFFFF.toInt() }
+        val surfaceColor = if(currentSystemTheme == SystemTheme.DARK) 0xFF000000.toInt() else 0xFFFFFFFF.toInt()
+        val onSurfaceColor = if(currentSystemTheme == SystemTheme.DARK) 0xFFFFFFFF.toInt() else 0xFF000000.toInt()
+        val onHoverColor = if(currentSystemTheme == SystemTheme.DARK) 0xFF87A200.toInt() else 0xFFE4FF01.toInt()
+
+        canvas.clear(surfaceColor)
+
+        val watchFill = Paint().apply { color = surfaceColor }
         val watchStroke = Paint().apply {
-               color = 0xFF000000.toInt()
+               color = onSurfaceColor
                mode = PaintMode.STROKE
                strokeWidth = 1f
         }
         val watchStrokeAA = Paint().apply {
-          color = 0xFF000000.toInt()
+          color = onSurfaceColor
           mode = PaintMode.STROKE
           strokeWidth = 1f
         }
-        val watchFillHover = Paint().apply { color = 0xFFE4FF01.toInt() }
+        val watchFillHover = Paint().apply { color = onHoverColor }
         for (x in 0 .. (width - 50) step 50) {
             for (y in 20 .. (height - 50) step 50) {
                 val hover = xpos > x + 0 && xpos < x + 50 && ypos > y + 0 && ypos < y + 50
@@ -70,7 +78,7 @@ class Clocks: SkikoView {
 
         val style = ParagraphStyle()
         val frames = ParagraphBuilder(style, fontCollection)
-            .pushStyle(TextStyle().setColor(0xFFFFAA0A.toInt()).setFontSize(25f))
+            .pushStyle(TextStyle().setColor(onSurfaceColor).setFontSize(25f))
             .addText("Frames: ${frame++}")
             .popStyle()
             .build()
