@@ -22,6 +22,7 @@ import javax.accessibility.Accessible
 import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.SwingUtilities.isEventDispatchThread
+import javax.swing.UIManager
 
 actual open class SkiaLayer internal constructor(
     externalAccessibleFactory: ((Component) -> Accessible)? = null,
@@ -40,7 +41,17 @@ actual open class SkiaLayer internal constructor(
         ContentScale,
     }
 
-    actual var transparency: Boolean = false
+    private var _transparency: Boolean = false
+    actual var transparency: Boolean
+        get() = _transparency
+        set(value) {
+            _transparency = value
+            if (!value) {
+                background = UIManager.getColor("Panel.background")
+            } else {
+                background = Color(0, 0, 0, 0)
+            }
+        }
 
     internal val backedLayer: HardwareLayer
 
@@ -54,7 +65,6 @@ actual open class SkiaLayer internal constructor(
 
     init {
         isOpaque = false
-        background = Color(0, 0, 0, 0)
         layout = null
         backedLayer = object : HardwareLayer(externalAccessibleFactory) {
             override fun paint(g: Graphics) {
