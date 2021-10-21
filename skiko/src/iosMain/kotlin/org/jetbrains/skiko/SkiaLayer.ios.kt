@@ -55,6 +55,7 @@ actual open class SkiaLayer(
     }
     fun attachTo(view: UIView) {
         this.view = view
+        contextHandler = MetalContextHandler(this)
         pictureRecorder = PictureRecorder()
         // See https://developer.apple.com/documentation/uikit/touches_presses_and_gestures/using_responders_and_the_responder_chain_to_handle_events?language=objc
         controller = object : NSObject() {
@@ -87,6 +88,7 @@ actual open class SkiaLayer(
         if (!isDisposed) {
             redrawer?.dispose()
             redrawer = null
+            contextHandler?.dispose()
             picture?.instance?.close()
             picture = null
             pictureRecorder?.close()
@@ -99,7 +101,7 @@ actual open class SkiaLayer(
     internal var redrawer: MetalRedrawer? = null
     private var picture: PictureHolder? = null
     private var pictureRecorder: PictureRecorder? = null
-    private val contextHandler = MetalContextHandler(this)
+    private var contextHandler: MetalContextHandler? = null
 
     fun update(nanoTime: Long) {
         val (w, h) = view!!.frame.useContents {
@@ -116,7 +118,7 @@ actual open class SkiaLayer(
     }
 
     fun draw() {
-        contextHandler.apply {
+        contextHandler?.apply {
             if (!initContext()) {
                 error("initContext() failure")
             }
