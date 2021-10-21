@@ -8,6 +8,24 @@ import kotlin.native.internal.NativePtr
 actual abstract class Native actual constructor(ptr: NativePointer) {
     actual var _ptr: NativePointer
 
+    override fun equals(other: Any?): Boolean {
+        return try {
+            if (this === other) return true
+            if (null == other) return false
+            if (!this::class.isInstance(other)) return false
+            val nOther = other as Native
+            if (_ptr == nOther._ptr) true else _nativeEquals(nOther)
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(other)
+        }
+    }
+
+    // FIXME two different pointers might point to equal objects
+    override fun hashCode(): Int {
+        return _ptr.toLong().hashCode()
+    }
+
     actual open fun _nativeEquals(other: Native?): Boolean = this._ptr == other?._ptr ?: Native.NullPointer
 
     actual companion object {
