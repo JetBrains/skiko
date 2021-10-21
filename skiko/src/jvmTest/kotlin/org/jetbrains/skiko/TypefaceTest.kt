@@ -15,11 +15,12 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import org.jetbrains.skia.tests.makeFromResource
+import org.jetbrains.skiko.tests.runTest
 
 class TypefaceTest {
 
     @Test
-    fun typefaceTest() {
+    fun typefaceTest() = runTest {
         val inter = Typeface.makeFromResource("InterHinted-Regular.ttf")
         val interV = Typeface.makeFromResource("Inter-V.ttf")
         val jbMono = Typeface.makeFromResource("JetBrainsMono-Regular.ttf")

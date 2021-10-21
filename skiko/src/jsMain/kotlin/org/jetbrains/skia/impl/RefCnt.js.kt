@@ -6,7 +6,7 @@ actual abstract class RefCnt : Managed {
     actual protected constructor(ptr: NativePointer): super(ptr, _FinalizerHolder.PTR, true)
     actual protected constructor(ptr: NativePointer, allowClose: Boolean): super(ptr, _FinalizerHolder.PTR, allowClose)
 
-    val refCount: Int
+    actual val refCount: Int
         get() {
             Stats.onNativeCall()
             return _nGetRefCount(_ptr)

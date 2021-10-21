@@ -8,10 +8,11 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import org.jetbrains.skia.tests.makeFromResource
+import org.jetbrains.skiko.tests.runTest
 
 class FontMgrTest {
     @Test
-    fun fontMgrTest() {
+    fun fontMgrTest() = runTest {
         val fontManager = TypefaceFontProvider()
 
         val jbMono = Typeface.makeFromResource("JetBrainsMono-Regular.ttf")

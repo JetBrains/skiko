@@ -6,6 +6,7 @@ import org.jetbrains.skia.Typeface
 import org.jetbrains.skia.paragraph.FontCollection
 import org.jetbrains.skia.paragraph.TypefaceFontProvider
 import org.jetbrains.skia.tests.makeFromResource
+import org.jetbrains.skiko.tests.runTest
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
@@ -13,7 +14,7 @@ import kotlin.test.assertEquals
 class FontCollectionTest {
 
     @Test
-    fun fontCollectionTest() {
+    fun fontCollectionTest() = runTest {
         val fm = TypefaceFontProvider()
         val jbMono = Typeface.makeFromResource("JetBrainsMono-Regular.ttf", 0)
 

@@ -9,15 +9,22 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import org.jetbrains.skia.tests.makeFromResource
 import org.jetbrains.skia.tests.assertCloseEnough
+import org.jetbrains.skiko.tests.runTest
 
 class TextLineTest {
-    private var inter36: Font = Font(Typeface.makeFromResource("InterHinted-Regular.ttf"), 36f)
-    private var firaCode36: Font = Font(Typeface.makeFromResource("FiraCode-Regular.ttf"), 36f)
-    private var jbMono36: Font = Font(Typeface.makeFromResource("JetBrainsMono-Regular.ttf"), 36f)
+    private var inter36: suspend () -> Font = suspend {
+        Font(Typeface.makeFromResource("InterHinted-Regular.ttf"), 36f)
+    }
+    private var firaCode36: suspend () -> Font = suspend {
+        Font(Typeface.makeFromResource("FiraCode-Regular.ttf"), 36f)
+    }
+    private var jbMono36: suspend () -> Font = suspend {
+        Font(Typeface.makeFromResource("JetBrainsMono-Regular.ttf"), 36f)
+    }
 
     @Test
-    fun getOffsetAtCoordTest() {
-        TextLine.make("abc", inter36).use { line ->
+    fun getOffsetAtCoordTest() = runTest {
+        TextLine.make("abc", inter36()).use { line ->
             assertContentEquals(shortArrayOf(503, 574, 581), line.glyphs)
             assertEquals(0, line.getOffsetAtCoord(-10f)) // before “a”
             assertEquals(0, line.getOffsetAtCoord(0f)) // beginning of “a”
@@ -38,8 +45,8 @@ class TextLineTest {
     }
 
     @Test
-    fun getLeftOffsetAtCoordTest() {
-        TextLine.make("abc", inter36).use { line ->
+    fun getLeftOffsetAtCoordTest() = runTest {
+        TextLine.make("abc", inter36()).use { line ->
             assertEquals(0, line.getLeftOffsetAtCoord(-10f)) // before “a”
             assertEquals(0, line.getLeftOffsetAtCoord(0f)) // beginning of “a”
             assertEquals(0, line.getLeftOffsetAtCoord(5f)) // left half of “a”
@@ -59,8 +66,8 @@ class TextLineTest {
     }
 
     @Test
-    fun getCoordAtOffsetTest() {
-        TextLine.make("abc", inter36).use { line ->
+    fun getCoordAtOffsetTest() = runTest {
+        TextLine.make("abc", inter36()).use { line ->
             assertCloseEnough(0f, line.getCoordAtOffset(0))
             assertCloseEnough(20f, line.getCoordAtOffset(1))
             assertCloseEnough(42f, line.getCoordAtOffset(2))
@@ -69,8 +76,8 @@ class TextLineTest {
     }
 
     @Test
-    fun ligaturesTest() {
-        TextLine.make("<=>->", inter36).use { line ->
+    fun ligaturesTest() = runTest {
+        TextLine.make("<=>->", inter36()).use { line ->
             assertContentEquals(shortArrayOf(1712, 1701), line.glyphs)
 
             assertEquals(0, line.getOffsetAtCoord(0f))
@@ -90,12 +97,12 @@ class TextLineTest {
     }
 
     @Test
-    fun combiningTest() {
+    fun combiningTest() = runTest {
         // u   U+0075  LATIN SMALL LETTER U
         // ̈    U+0308  COMBINING DIAERESIS
         // a   U+0061  LATIN SMALL LETTER A
         // ̧    U+0327  COMBINING CEDILLA
-        TextLine.make("üa̧", inter36).use { line ->
+        TextLine.make("üa̧", inter36()).use { line ->
             assertContentEquals(shortArrayOf(898 /* ü */, 503 /* a */, 1664 /* ̧  */), line.glyphs)
 
             assertEquals(0, line.getOffsetAtCoord(0f))
@@ -113,8 +120,8 @@ class TextLineTest {
             assertCloseEnough(41f, line.getCoordAtOffset(4))
         }
 
-        TextLine.make("ă", jbMono36).use { line -> }
-        TextLine.make("aa̧", jbMono36).use { line ->
+        TextLine.make("ă", jbMono36()).use { line -> }
+        TextLine.make("aa̧", jbMono36()).use { line ->
             // JetBrains Mono supports “a” but not “ ̧ ”
             // Second grapheme cluster should fall back together, second “a” should resolve to different glyph
             assertNotEquals(line.glyphs.get(0), line.glyphs.get(1))
@@ -122,9 +129,9 @@ class TextLineTest {
     }
 
     @Test
-    fun emojiTest() {
-        TextLine.make("☺", firaCode36).use { misc ->
-            TextLine.make("☺️", firaCode36).use { emoji ->
+    fun emojiTest() = runTest {
+        TextLine.make("☺", firaCode36()).use { misc ->
+            TextLine.make("☺️", firaCode36()).use { emoji ->
                 assertContentEquals(shortArrayOf(1706), misc.glyphs)
                 assertEquals(1, emoji.glyphs.size)
                 assertNotEquals(misc.glyphs.get(0), emoji.glyphs.get(0))
