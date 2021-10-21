@@ -47,15 +47,15 @@ val unzipTask = tasks.register("unzipWasm", Copy::class) {
 
 kotlin {
     val targets = mutableListOf<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>()
-    val nativeHostTarget = when (host) {
-        "macos-x64" -> macosX64()
-        "macos-arm64" -> macosArm64()
-        else -> throw GradleException("Host OS is not supported yet")
-    }
-
-    targets.add(nativeHostTarget)
 
     if (hostOs == "macos") {
+        val nativeHostTarget = when (host) {
+            "macos-x64" -> macosX64()
+            "macos-arm64" -> macosArm64()
+            else -> throw GradleException("Host OS is not supported yet")
+        }
+        targets.add(nativeHostTarget)
+
         targets.add(iosX64())
         targets.add(iosArm64())
     }
@@ -115,23 +115,23 @@ kotlin {
             dependsOn(nativeMain)
         }
 
-        val archTargetMain = when (host) {
-            "macos-x64" -> {
-                val macosX64Main by getting {
-                    dependsOn(macosMain)
-                }
-                macosX64Main
-            }
-            "macos-arm64" -> {
-                val macosArm64Main by getting {
-                    dependsOn(macosMain)
-                }
-                macosArm64Main
-            }
-            else -> throw GradleException("Host OS is not supported")
-        }
 
         if (hostOs == "macos") {
+            val archTargetMain = when (host) {
+                "macos-x64" -> {
+                    val macosX64Main by getting {
+                        dependsOn(macosMain)
+                    }
+                    macosX64Main
+                }
+                "macos-arm64" -> {
+                    val macosArm64Main by getting {
+                        dependsOn(macosMain)
+                    }
+                    macosArm64Main
+                }
+                else -> throw GradleException("Host OS is not supported")
+            }
             val iosMain by creating {
                 dependsOn(nativeMain)
             }
@@ -200,59 +200,62 @@ tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().configureEach 
     dependsOn(unzipTask)
 }
 
-// Create Xcode integration tasks.
-val sdkName: String? = System.getenv("SDK_NAME")
-
 enum class Target(val simulator: Boolean, val key: String) {
     WATCHOS_X86(true, "watchos"), WATCHOS_ARM64(false, "watchos"),
     IOS_X64(true, "iosX64"), IOS_ARM64(false, "iosArm64")
 }
 
-val target = sdkName.orEmpty().let {
-    when {
-        it.startsWith("iphoneos") -> Target.IOS_ARM64
-        it.startsWith("iphonesimulator") -> Target.IOS_X64
-        it.startsWith("watchos") -> Target.WATCHOS_ARM64
-        it.startsWith("watchsimulator") -> Target.WATCHOS_X86
-        else -> Target.IOS_X64
-    }
-}
 
-val targetBuildDir: String? = System.getenv("TARGET_BUILD_DIR")
-val executablePath: String? = System.getenv("EXECUTABLE_PATH")
-val buildType = System.getenv("CONFIGURATION")?.let {
-    org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType.valueOf(it.toUpperCase())
-} ?: org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType.DEBUG
+if (hostOs == "macos") {
+// Create Xcode integration tasks.
+    val sdkName: String? = System.getenv("SDK_NAME")
 
-val currentTarget = kotlin.targets[target.key] as org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-val kotlinBinary = currentTarget.binaries.getExecutable(buildType)
-val xcodeIntegrationGroup = "Xcode integration"
-
-val packForXCode = if (sdkName == null || targetBuildDir == null || executablePath == null) {
-    // The build is launched not by Xcode ->
-    // We cannot create a copy task and just show a meaningful error message.
-    tasks.create("packForXCode").doLast {
-        throw IllegalStateException("Please run the task from Xcode")
-    }
-} else {
-    // Otherwise copy the executable into the Xcode output directory.
-    tasks.create("packForXCode", Copy::class.java) {
-        dependsOn(kotlinBinary.linkTask)
-
-        destinationDir = file(targetBuildDir)
-
-        val dsymSource = kotlinBinary.outputFile.absolutePath + ".dSYM"
-        val dsymDestination = File(executablePath).parentFile.name + ".dSYM"
-        val oldExecName = kotlinBinary.outputFile.name
-        val newExecName = File(executablePath).name
-
-        from(dsymSource) {
-            into(dsymDestination)
-            rename(oldExecName, newExecName)
+    val target = sdkName.orEmpty().let {
+        when {
+            it.startsWith("iphoneos") -> Target.IOS_ARM64
+            it.startsWith("iphonesimulator") -> Target.IOS_X64
+            it.startsWith("watchos") -> Target.WATCHOS_ARM64
+            it.startsWith("watchsimulator") -> Target.WATCHOS_X86
+            else -> Target.IOS_X64
         }
+    }
 
-        from(kotlinBinary.outputFile) {
-            rename { executablePath }
+    val targetBuildDir: String? = System.getenv("TARGET_BUILD_DIR")
+    val executablePath: String? = System.getenv("EXECUTABLE_PATH")
+    val buildType = System.getenv("CONFIGURATION")?.let {
+        org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType.valueOf(it.toUpperCase())
+    } ?: org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType.DEBUG
+
+    val currentTarget = kotlin.targets[target.key] as org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+    val kotlinBinary = currentTarget.binaries.getExecutable(buildType)
+    val xcodeIntegrationGroup = "Xcode integration"
+
+    val packForXCode = if (sdkName == null || targetBuildDir == null || executablePath == null) {
+        // The build is launched not by Xcode ->
+        // We cannot create a copy task and just show a meaningful error message.
+        tasks.create("packForXCode").doLast {
+            throw IllegalStateException("Please run the task from Xcode")
+        }
+    } else {
+        // Otherwise copy the executable into the Xcode output directory.
+        tasks.create("packForXCode", Copy::class.java) {
+            dependsOn(kotlinBinary.linkTask)
+
+            destinationDir = file(targetBuildDir)
+
+            val dsymSource = kotlinBinary.outputFile.absolutePath + ".dSYM"
+            val dsymDestination = File(executablePath).parentFile.name + ".dSYM"
+            val oldExecName = kotlinBinary.outputFile.name
+            val newExecName = File(executablePath).name
+
+            from(dsymSource) {
+                into(dsymDestination)
+                rename(oldExecName, newExecName)
+            }
+
+            from(kotlinBinary.outputFile) {
+                rename { executablePath }
+            }
         }
     }
 }
