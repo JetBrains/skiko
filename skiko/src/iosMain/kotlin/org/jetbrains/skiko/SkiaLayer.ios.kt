@@ -89,6 +89,7 @@ actual open class SkiaLayer(
             redrawer?.dispose()
             redrawer = null
             contextHandler?.dispose()
+            contextHandler = null
             picture?.instance?.close()
             picture = null
             pictureRecorder?.close()
