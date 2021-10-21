@@ -10,7 +10,7 @@ plugins {
     id("de.undercouch.download") version "4.1.1"
 }
 
-val coroutinesVersion = "1.5.2"
+val coroutinesVersion = "1.5.2-native-mt"
 
 fun targetSuffix(os: OS, arch: Arch): String {
     return "${os.id}_${arch.id}"
@@ -362,7 +362,7 @@ kotlin {
             val nativeMain by creating {
                 dependsOn(commonMain)
                 dependencies {
-                    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
+                    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
                 }
             }
             val nativeTest by creating {
