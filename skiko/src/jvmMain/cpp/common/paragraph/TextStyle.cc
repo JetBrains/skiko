@@ -196,7 +196,7 @@ extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_paragraph_Text
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nSetFontFamilies
-  (JNIEnv* env, jclass jclass, jlong ptr, jobjectArray familiesArray) {
+  (JNIEnv* env, jclass jclass, jlong ptr, jobjectArray familiesArray, int familiesArraySize) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     instance->setFontFamilies(skStringVector(env, familiesArray));
 }

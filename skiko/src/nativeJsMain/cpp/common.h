@@ -68,6 +68,7 @@ namespace skija {
 std::unique_ptr<SkMatrix> skMatrix(KFloat* matrixArray);
 std::unique_ptr<SkM44> skM44(KFloat* matrixArray);
 SkString skString(KNativePointer str);
+std::vector<SkString> skStringVector(KInteropPointerArray arr, KInt size);
 
 template <typename T>
 inline T interopToPtr(KNativePointer ptr) {
