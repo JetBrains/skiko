@@ -19,7 +19,7 @@ class Clocks: SkikoView {
     private val fontCollection = FontCollection()
         .setDefaultFontManager(FontMgr.default)
 
-    override fun onRender(canvas: Canvas, width: Int, height: Int, currentTimestamp: Long) {
+    override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
         val watchFill = Paint().apply { color = 0xFFFFFFFF.toInt() }
         val watchStroke = Paint().apply {
                color = 0xFF000000.toInt()
@@ -50,7 +50,7 @@ class Clocks: SkikoView {
                     )
                     angle += (2.0 * PI / 12.0).toFloat()
                 }
-                val time = (currentTimestamp / 1E6) % 60000 +
+                val time = (nanoTime / 1E6) % 60000 +
                         (x.toFloat() / width * 5000).toLong() +
                         (y.toFloat() / width * 5000).toLong()
 

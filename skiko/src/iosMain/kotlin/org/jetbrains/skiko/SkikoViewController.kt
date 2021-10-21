@@ -48,8 +48,8 @@ class SkikoViewController : UIViewController {
         skikoLayer.attachTo(this.view)
     }
 
-    override fun viewDidUnload() {
-        super.viewDidUnload()
+    // viewDidUnload() is deprecated and not called.
+    override fun viewDidDisappear(animated: Boolean) {
         skikoLayer.detach()
     }
 }

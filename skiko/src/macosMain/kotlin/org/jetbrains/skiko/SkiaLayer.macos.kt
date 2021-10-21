@@ -1,11 +1,16 @@
 package org.jetbrains.skiko
 
+import kotlinx.cinterop.ObjCAction
 import kotlinx.cinterop.useContents
 import org.jetbrains.skiko.context.*
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.redrawer.Redrawer
 import platform.AppKit.*
 import platform.Foundation.NSMakeRect
+import platform.Foundation.NSNotificationCenter
+import platform.Foundation.NSSelectorFromString
+import platform.Foundation.addObserver
+import platform.darwin.NSObject
 
 actual open class SkiaLayer(
     private val properties: SkiaLayerProperties = makeDefaultSkiaLayerProperties()
@@ -105,10 +110,16 @@ actual open class SkiaLayer(
                 skikoView?.onKeyboardEvent(eventToKeyboard(event, SkikoKeyboardEventKind.UP))
             }
 
-            override fun viewDidChangeEffectiveAppearance() {
-                super.viewDidChangeEffectiveAppearance()
+            @ObjCAction
+            open fun onWindowClose(arg: NSObject?) {
+                detach()
+                val center = NSNotificationCenter.defaultCenter()
+                center.removeObserver(nsView)
             }
         }
+        val center = NSNotificationCenter.defaultCenter()
+        center.addObserver(nsView, NSSelectorFromString("onWindowClose:"),
+            NSWindowWillCloseNotification!!, window)
         window.contentView!!.addSubview(nsView)
         redrawer = createNativeRedrawer(this, GraphicsApi.OPENGL, properties)
         redrawer?.redrawImmediately()

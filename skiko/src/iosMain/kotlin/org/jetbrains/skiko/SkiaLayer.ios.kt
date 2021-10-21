@@ -6,6 +6,7 @@ import org.jetbrains.skia.PictureRecorder
 import org.jetbrains.skia.Rect
 import org.jetbrains.skiko.context.MetalContextHandler
 import org.jetbrains.skiko.redrawer.MetalRedrawer
+import platform.Foundation.NSNotificationCenter
 import platform.Foundation.NSSelectorFromString
 import platform.UIKit.*
 import platform.darwin.NSObject
@@ -76,6 +77,7 @@ actual open class SkiaLayer(
         }
         // We have ':' in selector to take care of function argument.
         view.addGestureRecognizer(UITapGestureRecognizer(controller, NSSelectorFromString("onTap:")))
+        // TODO: maybe add observer for view.viewDidDisappear() to detach us?
         redrawer = MetalRedrawer(this, properties)
         redrawer?.redrawImmediately()
     }
