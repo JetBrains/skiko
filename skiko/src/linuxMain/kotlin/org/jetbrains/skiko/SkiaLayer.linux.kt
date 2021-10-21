@@ -18,6 +18,9 @@ actual open class SkiaLayer(properties: SkiaLayerProperties)  {
     actual fun attachTo(container: Any) {
         TODO("unimplemented")
     }
+    actual fun detach() {
+        TODO("unimplemented")
+    }
     actual var skikoView: SkikoView? = null
 }
 

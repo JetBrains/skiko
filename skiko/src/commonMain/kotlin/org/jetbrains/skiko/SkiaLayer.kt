@@ -12,6 +12,8 @@ expect open class SkiaLayer {
 
     // Actual type of attach container is platform-specific.
     fun attachTo(container: Any)
+    fun detach()
+
     fun needRedraw()
 }
 

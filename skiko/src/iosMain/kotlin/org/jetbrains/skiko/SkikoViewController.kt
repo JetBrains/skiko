@@ -33,17 +33,23 @@ class SkikoViewController : UIViewController {
         this.appFactory = appFactory
     }
 
+    private lateinit var skikoLayer: SkiaLayer
     override fun viewDidLoad() {
         super.viewDidLoad()
 
         val (width, height) = UIScreen.mainScreen.bounds.useContents {
             this.size.width to this.size.height
         }
-        val layer = SkiaLayer().apply {
+        skikoLayer = SkiaLayer().apply {
             skikoView = appFactory(this)
         }
         view.contentScaleFactor = UIScreen.mainScreen.scale
         view.setFrame(CGRectMake(0.0, 0.0, width, height))
-        layer.attachTo(this.view)
+        skikoLayer.attachTo(this.view)
+    }
+
+    override fun viewDidUnload() {
+        super.viewDidUnload()
+        skikoLayer.detach()
     }
 }

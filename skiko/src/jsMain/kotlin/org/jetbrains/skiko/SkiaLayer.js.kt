@@ -48,10 +48,14 @@ actual open class SkiaLayer(properties: SkiaLayerProperties = makeDefaultSkiaLay
     }
 
     actual fun attachTo(container: Any) {
-        attachTo(container as HTMLCanvasElement)
+        attachTo(container as HTMLCanvasElement, false)
     }
 
-    fun attachTo(htmlCanvas: HTMLCanvasElement) {
+    actual fun detach() {
+        // TODO: when switch to the frame dispatcher - stop it here.
+    }
+
+    fun attachTo(htmlCanvas: HTMLCanvasElement, autoDetach: Boolean = true) {
         state = object: CanvasRenderer(htmlCanvas) {
             override fun drawFrame(currentTimestamp: Double) {
                 // currentTimestamp is in milliseconds.

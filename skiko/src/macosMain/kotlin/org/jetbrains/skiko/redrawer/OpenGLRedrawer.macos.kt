@@ -18,10 +18,6 @@ internal class MacOsOpenGLRedrawer(
     private val layer: SkiaLayer,
     private val properties: SkiaLayerProperties
 ) : Redrawer {
-    init {
-        println("create MacOsOpenGLRedrawer")
-    }
-
     private val drawLayer = MacosGLLayer(layer, setNeedsDisplayOnBoundsChange = true)
 
     override fun dispose() { 

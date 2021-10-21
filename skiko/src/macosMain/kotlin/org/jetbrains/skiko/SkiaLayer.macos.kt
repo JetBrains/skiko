@@ -76,12 +76,9 @@ actual open class SkiaLayer(
                 updateTrackingAreas()
             }
             override fun updateTrackingAreas() {
-                bounds.useContents {
-                    println("update tracking areas to ${this.size.width} ${this.size.height}")
-                }
                 trackingArea?.let { removeTrackingArea(it) }
                 trackingArea = NSTrackingArea(rect = bounds,
-                    options = NSMouseMoved or NSTrackingActiveAlways, // NSTrackingActiveInActiveApp,
+                    options = NSMouseMoved or NSTrackingActiveInActiveApp,
                     owner = nsView, userInfo = null)
                 nsView.addTrackingArea(trackingArea!!)
             }
@@ -107,13 +104,17 @@ actual open class SkiaLayer(
             override fun keyUp(event: NSEvent) {
                 skikoView?.onKeyboardEvent(eventToKeyboard(event, SkikoKeyboardEventKind.UP))
             }
+
+            override fun viewDidChangeEffectiveAppearance() {
+                super.viewDidChangeEffectiveAppearance()
+            }
         }
         window.contentView!!.addSubview(nsView)
         redrawer = createNativeRedrawer(this, GraphicsApi.OPENGL, properties)
         redrawer?.redrawImmediately()
     }
 
-    fun disposeLayer() {
+    actual fun detach() {
         redrawer?.dispose()
         redrawer = null
         initedCanvas = false
