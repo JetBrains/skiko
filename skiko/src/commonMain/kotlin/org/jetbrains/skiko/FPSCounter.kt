@@ -5,19 +5,13 @@ import kotlin.math.roundToInt
 class FPSCounter(
     private val periodSeconds: Double,
     private val showLongFrames: Boolean,
-    private val getLongFrameMillis: () -> Double
+    private val getLongFrameMillis: () -> Double = {
+        1.5 * 1000 / 60
+    }
 ) {
     private val times = mutableListOf<Long>()
     private var lastLogTime = currentNanoTime()
     private var lastTime = currentNanoTime()
-
-    constructor(periodSeconds: Double,  showLongFrames: Boolean): this(
-        periodSeconds = periodSeconds,
-        showLongFrames = showLongFrames,
-        getLongFrameMillis = {
-            1.5 * 1000 / 60
-        }
-    )
 
     fun tick() {
         val time = currentNanoTime()
