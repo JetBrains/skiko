@@ -1029,7 +1029,7 @@ publishing {
 
         create<MavenPublication>("skikoJvmRuntime") {
             pomNameForPublication[name] = "Skiko JVM Runtime for ${targetOs.name} ${targetArch.name}"
-            artifactId = SkikoArtifacts.runtimeArtifactIdFor(targetOs, targetArch)
+            artifactId = SkikoArtifacts.jvmRuntimeArtifactIdFor(targetOs, targetArch)
             afterEvaluate {
                 artifact(skikoJvmRuntimeJar.map { it.archiveFile.get() })
                 var jvmSourcesArtifact: Any? = null

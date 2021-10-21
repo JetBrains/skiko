@@ -16,11 +16,11 @@ val skikoArtifactIds: List<String> =
     listOf(
         SkikoArtifacts.commonArtifactId,
         SkikoArtifacts.jvmArtifactId,
-        SkikoArtifacts.runtimeArtifactIdFor(OS.Windows, Arch.X64),
-        SkikoArtifacts.runtimeArtifactIdFor(OS.Linux, Arch.X64),
-        SkikoArtifacts.runtimeArtifactIdFor(OS.Linux, Arch.Arm64),
-        SkikoArtifacts.runtimeArtifactIdFor(OS.MacOS, Arch.X64),
-        SkikoArtifacts.runtimeArtifactIdFor(OS.MacOS, Arch.Arm64),
+        SkikoArtifacts.jvmRuntimeArtifactIdFor(OS.Windows, Arch.X64),
+        SkikoArtifacts.jvmRuntimeArtifactIdFor(OS.Linux, Arch.X64),
+        SkikoArtifacts.jvmRuntimeArtifactIdFor(OS.Linux, Arch.Arm64),
+        SkikoArtifacts.jvmRuntimeArtifactIdFor(OS.MacOS, Arch.X64),
+        SkikoArtifacts.jvmRuntimeArtifactIdFor(OS.MacOS, Arch.Arm64),
     )
 
 val githubArtifacts by configurations.creating
