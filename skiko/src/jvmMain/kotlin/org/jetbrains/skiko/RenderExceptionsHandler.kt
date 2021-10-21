@@ -1,15 +1,9 @@
 package org.jetbrains.skiko
 
 import java.io.File
-import java.lang.RuntimeException
 import java.text.SimpleDateFormat
 import java.util.Date
 import kotlin.jvm.JvmStatic
-
-internal class RenderException(
-    message: String? = null,
-    cause: Exception? = null
-) : RuntimeException(message, cause)
 
 internal class RenderExceptionsHandler {
     companion object {

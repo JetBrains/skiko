@@ -8,7 +8,7 @@ import org.jetbrains.skiko.RenderException
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.redrawer.AngleRedrawer
 
-internal class AngleContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
+internal class AngleContextHandler(layer: SkiaLayer) : JvmContextHandler(layer) {
     val angleRedrawer: AngleRedrawer
         get() = layer.redrawer!! as AngleRedrawer
 

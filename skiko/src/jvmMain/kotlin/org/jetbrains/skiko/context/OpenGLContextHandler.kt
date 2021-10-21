@@ -10,7 +10,7 @@ import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.makeGLContext
 import org.jetbrains.skiko.makeGLRenderTarget
 
-internal class OpenGLContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
+internal class OpenGLContextHandler(layer: SkiaLayer) : JvmContextHandler(layer) {
     override fun initContext(): Boolean {
         try {
             if (context == null) {
@@ -72,14 +72,5 @@ internal class OpenGLContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
             "Vendor: ${gl.glGetString(gl.GL_VENDOR)}\n" +
             "Model: ${gl.glGetString(gl.GL_RENDERER)}\n" +
             "Total VRAM: ${gl.glGetIntegerv(gl.GL_TOTAL_MEMORY) / 1024} MB\n"
-    }
-
-    fun disposeInOpenGLContext() {
-        super.dispose()
-    }
-
-    // dispose should be called only in the OpenGL context.
-    // TODO remove in https://github.com/JetBrains/skiko/pull/300
-    override open fun dispose() {
     }
 }

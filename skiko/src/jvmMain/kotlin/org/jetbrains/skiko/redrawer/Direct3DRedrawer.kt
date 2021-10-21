@@ -6,11 +6,15 @@ import kotlinx.coroutines.withContext
 import org.jetbrains.skia.DirectContext
 import org.jetbrains.skia.Surface
 import org.jetbrains.skiko.*
+import org.jetbrains.skiko.context.AngleContextHandler
+import org.jetbrains.skiko.context.Direct3DContextHandler
 
 internal class Direct3DRedrawer(
     private val layer: SkiaLayer,
     private val properties: SkiaLayerProperties
 ) : Redrawer {
+    private val contextHandler = Direct3DContextHandler(layer)
+    override val renderInfo: String get() = contextHandler.rendererInfo()
 
     private var isDisposed = false
     private var drawLock = Any()
@@ -29,8 +33,9 @@ internal class Direct3DRedrawer(
     }
 
     override fun dispose() = synchronized(drawLock) {
-        disposeDevice(device)
         frameDispatcher.cancel()
+        contextHandler.dispose()
+        disposeDevice(device)
         isDisposed = true
     }
 
@@ -61,7 +66,7 @@ internal class Direct3DRedrawer(
 
     private fun drawAndSwap(withVsync: Boolean) = synchronized(drawLock) {
         if (!isDisposed) {
-            layer.draw()
+            contextHandler.draw()
             swap(device, withVsync)
         }
     }

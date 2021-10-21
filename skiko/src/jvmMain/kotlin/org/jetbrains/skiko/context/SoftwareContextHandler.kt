@@ -18,7 +18,7 @@ import java.awt.image.DataBufferByte
 import java.awt.image.Raster
 import java.awt.image.WritableRaster
 
-internal class SoftwareContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
+internal class SoftwareContextHandler(layer: SkiaLayer) : JvmContextHandler(layer) {
     override val clearColor = if (layer.transparency && hostOs == OS.MacOS) 0 else -1
 
     val colorModel = ComponentColorModel(
@@ -59,9 +59,7 @@ internal class SoftwareContextHandler(layer: SkiaLayer) : ContextHandler(layer) 
         canvas = Canvas(storage)
     }
 
-    override fun drawOnCanvas(picture: Picture) {
-        super.drawOnCanvas(picture)
-
+    override fun flush() {
         val scale = layer.contentScale
         val w = (layer.width * scale).toInt().coerceAtLeast(0)
         val h = (layer.height * scale).toInt().coerceAtLeast(0)
@@ -86,9 +84,5 @@ internal class SoftwareContextHandler(layer: SkiaLayer) : ContextHandler(layer) 
             }
             graphics?.drawImage(image!!, 0, 0, layer.width, layer.height, null)
         }
-    }
-
-    override fun flush() {
-        // Raster does not need to flush canvas
     }
 }

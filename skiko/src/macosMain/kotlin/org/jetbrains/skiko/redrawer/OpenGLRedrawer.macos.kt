@@ -6,6 +6,7 @@ import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaLayerProperties
 import org.jetbrains.skiko.SkikoDispatchers
+import org.jetbrains.skiko.context.MacOSOpenGLContextHandler
 import platform.CoreFoundation.CFTimeInterval
 import platform.CoreGraphics.CGRectMake
 import platform.CoreVideo.CVTimeStamp
@@ -20,6 +21,9 @@ internal class MacOsOpenGLRedrawer(
     private val skiaLayer: SkiaLayer,
     private val properties: SkiaLayerProperties
 ) : Redrawer {
+    private val contextHandler = MacOSOpenGLContextHandler(layer)
+    override val renderInfo: String get() = contextHandler.rendererInfo()
+
     private val glLayer = MacosGLLayer()
 
     init {
@@ -30,7 +34,8 @@ internal class MacOsOpenGLRedrawer(
         redrawImmediately()
     }
 
-    override fun dispose() { 
+    override fun dispose() {
+        contextHandler.dispose()
         glLayer.dispose()
     }
 
@@ -44,6 +49,7 @@ internal class MacOsOpenGLRedrawer(
                 size.height.toInt().coerceAtLeast(0)
             )
         }
+        contextHandler.initedCanvas = false
     }
 
     private fun syncContentScale() {

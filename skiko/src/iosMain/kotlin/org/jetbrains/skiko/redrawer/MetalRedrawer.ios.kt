@@ -8,6 +8,7 @@ import kotlinx.cinterop.useContents
 import org.jetbrains.skia.BackendRenderTarget
 import org.jetbrains.skia.DirectContext
 import org.jetbrains.skiko.*
+import org.jetbrains.skiko.context.MetalContextHandler
 import platform.CoreGraphics.CGColorCreate
 import platform.CoreGraphics.CGColorSpaceCreateDeviceRGB
 import platform.CoreGraphics.CGContextRef
@@ -24,6 +25,9 @@ internal class MetalRedrawer(
     private val layer: SkiaLayer,
     private val properties: SkiaLayerProperties
 ) : Redrawer {
+    private val contextHandler = MetalContextHandler(layer)
+    override val renderInfo: String get() = contextHandler.rendererInfo()
+
     private var isDisposed = false
     internal val device = MTLCreateSystemDefaultDevice()!!
     private val queue = device.newCommandQueue()!!
@@ -51,6 +55,7 @@ internal class MetalRedrawer(
     override fun dispose() {
         if (!isDisposed) {
             frameDispatcher.cancel()
+            contextHandler.dispose()
             metalLayer.dispose()
             isDisposed = true
         }
@@ -133,7 +138,7 @@ class MetalLayer : CAMetalLayer {
 
     override fun drawInContext(ctx: CGContextRef?) {
         skiaLayer.update(getTimeNanos())
-        skiaLayer.draw()
+        contextHandler.draw()
         super.drawInContext(ctx)
     }
 }

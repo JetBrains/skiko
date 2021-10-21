@@ -6,11 +6,15 @@ import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.context.OpenGLContextHandler
+import org.jetbrains.skiko.context.SoftwareContextHandler
 
 internal class WindowsOpenGLRedrawer(
     private val layer: SkiaLayer,
     private val properties: SkiaLayerProperties
 ) : Redrawer {
+    private val contextHandler = OpenGLContextHandler(layer)
+    override val renderInfo: String get() = contextHandler.rendererInfo()
+
     private val device = layer.backedLayer.useDrawingSurfacePlatformInfo(::getDevice)
     private val context = createContext(device, layer.contentHandle, layer.transparency).also {
         if (it == 0L) {
@@ -35,8 +39,7 @@ internal class WindowsOpenGLRedrawer(
     override fun dispose() {
         check(!isDisposed) { "WindowsOpenGLRedrawer is disposed" }
         makeCurrent()
-        // TODO remove in https://github.com/JetBrains/skiko/pull/300
-        (layer.contextHandler as OpenGLContextHandler).disposeInOpenGLContext()
+        contextHandler.dispose()
         deleteContext(context)
         isDisposed = true
     }
@@ -61,7 +64,7 @@ internal class WindowsOpenGLRedrawer(
     }
 
     private fun draw() {
-        layer.inDrawScope(layer::draw)
+        layer.inDrawScope(contextHandler::draw)
     }
 
     private fun makeCurrent() = makeCurrent(device, context)

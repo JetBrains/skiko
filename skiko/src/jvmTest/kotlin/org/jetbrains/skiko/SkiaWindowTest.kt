@@ -11,11 +11,10 @@ import org.jetbrains.skia.paragraph.FontCollection
 import org.jetbrains.skia.paragraph.ParagraphBuilder
 import org.jetbrains.skia.paragraph.ParagraphStyle
 import org.jetbrains.skia.paragraph.TextStyle
-import org.jetbrains.skiko.context.ContextHandler
+import org.jetbrains.skiko.context.JvmContextHandler
 import org.jetbrains.skiko.redrawer.Redrawer
 import org.jetbrains.skiko.util.ScreenshotTestRule
 import org.jetbrains.skiko.util.swingTest
-import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Assume.assumeTrue
 import org.junit.Rule
@@ -174,7 +173,7 @@ class SkiaWindowTest {
     @Test
     fun `render three windows`() = swingTest {
         fun window(color: Color) = SkiaWindow().apply {
-            setLocation(200,200)
+            setLocation(200, 200)
             setSize(400, 200)
             defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
             layer.skikoView = RectRenderer(layer, 200, 100, color)
@@ -244,7 +243,7 @@ class SkiaWindowTest {
     @Test(timeout = 60000)
     fun `stress test - open multiple windows`() = swingTest {
         fun window(isAnimated: Boolean) = SkiaWindow().apply {
-            setLocation(200,200)
+            setLocation(200, 200)
             setSize(40, 20)
             defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
             layer.skikoView = if (isAnimated) {
@@ -288,7 +287,7 @@ class SkiaWindowTest {
         fun openWindow() = SkiaWindow(
             properties = SkiaLayerProperties(isVsyncEnabled = false, isVsyncFramelimitFallbackEnabled = true)
         ).apply {
-            setLocation(200,200)
+            setLocation(200, 200)
             setSize(400, 200)
             defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
             layer.skikoView = AnimatedBoxRenderer(layer, pixelsPerSecond = 20.0, size = 20.0)
@@ -311,7 +310,7 @@ class SkiaWindowTest {
         fun openWindow() = SkiaWindow(
             properties = SkiaLayerProperties(isVsyncEnabled = false, isVsyncFramelimitFallbackEnabled = true)
         ).apply {
-            setLocation(200,200)
+            setLocation(200, 200)
             setSize(400, 200)
             preferredSize = Dimension(400, 200)
             defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
@@ -336,22 +335,20 @@ class SkiaWindowTest {
     fun `fallback to software renderer, fail on init context`() = swingTest {
         testFallbackToSoftware(
             object : RenderFactory {
-                override fun createContextHandler(
-                    layer: SkiaLayer,
-                    renderApi: GraphicsApi
-                ) = object : ContextHandler(layer) {
-                    override fun initContext() = false
-                    override fun initCanvas() = Unit
-                }
-
                 override fun createRedrawer(
                     layer: SkiaLayer,
                     renderApi: GraphicsApi,
                     properties: SkiaLayerProperties
-                ): Redrawer = object : Redrawer {
+                ) = object : Redrawer {
+                    private val contextHandler = object : JvmContextHandler(layer) {
+                        override fun initContext() = false
+                        override fun initCanvas() = Unit
+                    }
+
                     override fun dispose() = Unit
                     override fun needRedraw() = Unit
-                    override fun redrawImmediately() = layer.inDrawScope { layer.draw() }
+                    override fun redrawImmediately() = layer.inDrawScope(contextHandler::draw)
+                    override val renderInfo = ""
                 }
             }
         )
@@ -361,19 +358,11 @@ class SkiaWindowTest {
     fun `fallback to software renderer, fail on create redrawer`() = swingTest {
         testFallbackToSoftware(
             object : RenderFactory {
-                override fun createContextHandler(
-                    layer: SkiaLayer,
-                    renderApi: GraphicsApi
-                ) = object : ContextHandler(layer) {
-                    override fun initContext() = true
-                    override fun initCanvas() = Unit
-                }
-
                 override fun createRedrawer(
                     layer: SkiaLayer,
                     renderApi: GraphicsApi,
                     properties: SkiaLayerProperties
-                ) =  throw RenderException()
+                ) = throw RenderException()
             }
         )
     }
@@ -382,14 +371,6 @@ class SkiaWindowTest {
     fun `fallback to software renderer, fail on draw`() = swingTest {
         testFallbackToSoftware(
             object : RenderFactory {
-                override fun createContextHandler(
-                    layer: SkiaLayer,
-                    renderApi: GraphicsApi
-                ) = object : ContextHandler(layer) {
-                    override fun initContext() = true
-                    override fun initCanvas() = Unit
-                }
-
                 override fun createRedrawer(
                     layer: SkiaLayer,
                     renderApi: GraphicsApi,
@@ -400,6 +381,7 @@ class SkiaWindowTest {
                     override fun redrawImmediately() = layer.inDrawScope {
                         throw RenderException()
                     }
+                    override val renderInfo = ""
                 }
             }
         )
@@ -439,14 +421,6 @@ class SkiaWindowTest {
     private class OverrideNonSoftwareRenderFactory(
         private val nonSoftwareRenderFactory: RenderFactory
     ) : RenderFactory {
-        override fun createContextHandler(layer: SkiaLayer, renderApi: GraphicsApi): ContextHandler {
-            return if (renderApi == GraphicsApi.SOFTWARE) {
-                RenderFactory.Default.createContextHandler(layer, renderApi)
-            } else {
-                nonSoftwareRenderFactory.createContextHandler(layer, renderApi)
-            }
-        }
-
         override fun createRedrawer(
             layer: SkiaLayer,
             renderApi: GraphicsApi,
