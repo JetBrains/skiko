@@ -23,7 +23,7 @@ actual open class SkiaLayer(
         set(value) { throw UnsupportedOperationException() }
 
     actual val contentScale: Float
-        get() = view!!.contentScaleFactor?.toFloat()
+        get() = view!!.contentScaleFactor.toFloat()
 
     actual var fullscreen: Boolean
         get() = true

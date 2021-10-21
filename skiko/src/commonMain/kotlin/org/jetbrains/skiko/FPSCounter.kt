@@ -1,19 +1,26 @@
 package org.jetbrains.skiko
 
-import java.awt.Component
 import kotlin.math.roundToInt
 
-internal class FPSCounter(
+class FPSCounter(
     private val periodSeconds: Double,
     private val showLongFrames: Boolean,
     private val getLongFrameMillis: () -> Double
 ) {
     private val times = mutableListOf<Long>()
-    private var lastLogTime = System.nanoTime()
-    private var lastTime = System.nanoTime()
+    private var lastLogTime = currentNanoTime()
+    private var lastTime = currentNanoTime()
+
+    constructor(periodSeconds: Double,  showLongFrames: Boolean): this(
+        periodSeconds = periodSeconds,
+        showLongFrames = showLongFrames,
+        getLongFrameMillis = {
+            1.5 * 1000 / 60
+        }
+    )
 
     fun tick() {
-        val time = System.nanoTime()
+        val time = currentNanoTime()
         val timestamp = time.nanosToMillis().toLong()
         val frameTime = time - lastTime
         lastTime = time
@@ -21,7 +28,7 @@ internal class FPSCounter(
         times.add(frameTime)
 
         if (showLongFrames && frameTime > getLongFrameMillis().millisToNanos()) {
-            println("[%d] Long frame %.2f ms".format(timestamp, frameTime.nanosToMillis()))
+            println("$timestamp Long frame ${frameTime.nanosToMillis()} ms")
         }
 
         if ((time - lastLogTime) > periodSeconds.secondsToNanos()) {
@@ -39,21 +46,4 @@ internal class FPSCounter(
     private fun Long.nanosToMillis(): Double = this / nanosPerMillis
     private fun Double.millisToNanos(): Long = (this * nanosPerMillis).toLong()
     private fun Double.secondsToNanos(): Long = (this * nanosPerSecond).toLong()
-}
-
-internal fun defaultFPSCounter(
-    component: Component
-): FPSCounter? = with(SkikoProperties) {
-    if (!SkikoProperties.fpsEnabled) return@with null
-
-    // it is slow on Linux (100ms), so we cache it. Also refreshRate available only after window is visible
-    val refreshRate by lazy { component.graphicsConfiguration.device.displayMode.refreshRate }
-
-    FPSCounter(
-        periodSeconds = fpsPeriodSeconds,
-        showLongFrames = fpsLongFramesShow,
-        getLongFrameMillis = {
-            fpsLongFramesMillis ?: 1.5 * 1000 / refreshRate
-        }
-    )
 }
