@@ -55,10 +55,11 @@ internal class MetalRedrawer(
 
     override fun syncSize() {
         metalLayer.contentsScale = layer.contentScale.toDouble()
-        val (w, h) = layer.view.frame.useContents {
+        val osView = layer.view!!
+        val (w, h) = osView.frame.useContents {
             size.width to size.height
         }
-        metalLayer.frame = layer.view.frame
+        metalLayer.frame = osView.frame
         metalLayer.init(layer, device)
         metalLayer.drawableSize = CGSizeMake(w * metalLayer.contentsScale, h * metalLayer.contentsScale)
     }
@@ -120,8 +121,10 @@ class MetalLayer : CAMetalLayer {
                 CGColorCreate(CGColorSpaceCreateDeviceRGB(), it.addressOf(0))
         }
         this.opaque = true
-        this.frame = skiaLayer.view.frame
-        skiaLayer.view.layer.addSublayer(this)
+        skiaLayer.view?.let {
+            this.frame = it.frame
+            it.layer.addSublayer(this)
+        }
     }
 
     fun draw()  {

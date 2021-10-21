@@ -6,6 +6,7 @@ import org.jetbrains.skia.PictureRecorder
 import org.jetbrains.skia.Rect
 import org.jetbrains.skiko.context.MetalContextHandler
 import org.jetbrains.skiko.redrawer.MetalRedrawer
+import platform.Foundation.NSNotificationCenter
 import platform.Foundation.NSSelectorFromString
 import platform.UIKit.*
 import platform.darwin.NSObject
@@ -22,7 +23,7 @@ actual open class SkiaLayer(
         set(value) { throw UnsupportedOperationException() }
 
     actual val contentScale: Float
-        get() = view.contentScaleFactor.toFloat()
+        get() = view!!.contentScaleFactor?.toFloat()
 
     actual var fullscreen: Boolean
         get() = true
@@ -37,16 +38,16 @@ actual open class SkiaLayer(
     }
 
     val width: Float
-       get() = view.frame.useContents {
+       get() = view!!.frame.useContents {
            return@useContents size.width.toFloat()
        }
 
     val height: Float
-        get() = view.frame.useContents {
+        get() = view!!.frame.useContents {
             return@useContents size.height.toFloat()
         }
 
-    lateinit var view: UIView
+    internal var view: UIView? = null
     // We need to keep reference to controller as Objective-C will only keep weak reference here.
     lateinit private var controller: NSObject
     actual fun attachTo(container: Any) {
@@ -54,7 +55,8 @@ actual open class SkiaLayer(
     }
     fun attachTo(view: UIView) {
         this.view = view
-
+        contextHandler = MetalContextHandler(this)
+        pictureRecorder = PictureRecorder()
         // See https://developer.apple.com/documentation/uikit/touches_presses_and_gestures/using_responders_and_the_responder_chain_to_handle_events?language=objc
         controller = object : NSObject() {
             @ObjCAction
@@ -76,33 +78,48 @@ actual open class SkiaLayer(
         }
         // We have ':' in selector to take care of function argument.
         view.addGestureRecognizer(UITapGestureRecognizer(controller, NSSelectorFromString("onTap:")))
+        // TODO: maybe add observer for view.viewDidDisappear() to detach us?
         redrawer = MetalRedrawer(this, properties)
         redrawer?.redrawImmediately()
     }
 
+    private var isDisposed = false
+    actual fun detach() {
+        if (!isDisposed) {
+            redrawer?.dispose()
+            redrawer = null
+            contextHandler?.dispose()
+            contextHandler = null
+            picture?.instance?.close()
+            picture = null
+            pictureRecorder?.close()
+            pictureRecorder = null
+            isDisposed = true
+        }
+    }
     actual var skikoView: SkikoView? = null
 
     internal var redrawer: MetalRedrawer? = null
     private var picture: PictureHolder? = null
-    private val pictureRecorder = PictureRecorder()
-    private val contextHandler = MetalContextHandler(this)
+    private var pictureRecorder: PictureRecorder? = null
+    private var contextHandler: MetalContextHandler? = null
 
     fun update(nanoTime: Long) {
-        val (w, h) = view.frame.useContents {
+        val (w, h) = view!!.frame.useContents {
             size.width to size.height
         }
         val pictureWidth = (w.toFloat() * contentScale).coerceAtLeast(0.0F)
         val pictureHeight = (h.toFloat() * contentScale).coerceAtLeast(0.0F)
 
         val bounds = Rect.makeWH(pictureWidth, pictureHeight)
-        val canvas = pictureRecorder.beginRecording(bounds)
+        val canvas = pictureRecorder!!.beginRecording(bounds)
         skikoView?.onRender(canvas, pictureWidth.toInt(), pictureHeight.toInt(), nanoTime)
-        val picture = pictureRecorder.finishRecordingAsPicture()
+        val picture = pictureRecorder!!.finishRecordingAsPicture()
         this.picture = PictureHolder(picture, pictureWidth.toInt(), pictureHeight.toInt())
     }
 
     fun draw() {
-        contextHandler.apply {
+        contextHandler?.apply {
             if (!initContext()) {
                 error("initContext() failure")
             }

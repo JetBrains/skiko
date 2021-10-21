@@ -84,6 +84,15 @@ actual open class SkiaLayer internal constructor(
         }
     }
 
+    override fun removeNotify() {
+        dispose()
+        super.removeNotify()
+    }
+
+    actual fun detach() {
+        dispose()
+    }
+
     private var isInited = false
     private var isRendering = false
 
@@ -256,9 +265,8 @@ actual open class SkiaLayer internal constructor(
 
     open fun dispose() {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
-        check(!isDisposed) { "SkiaLayer is disposed" }
 
-        if (isInited) {
+        if (isInited && !isDisposed) {
             redrawer?.dispose()  // we should dispose redrawer first (to cancel `draw` in rendering thread)
             contextHandler?.dispose()
             picture?.instance?.close()
@@ -506,6 +514,16 @@ actual open class SkiaLayer internal constructor(
         }
         return rounded.toInt()
     }
+}
+
+fun SkiaLayer.disableTitleBar() {
+    backedLayer.useDrawingSurfacePlatformInfo {
+        platformOperations.disableTitleBar(it)
+    }
+}
+
+fun orderEmojiAndSymbolsPopup() {
+    platformOperations.orderEmojiAndSymbolsPopup()
 }
 
 // InputEvent is abstract, so we wrap to match modality.
