@@ -6,8 +6,9 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 plugins {
     kotlin("multiplatform") version "1.5.31"
     `maven-publish`
+    signing
     id("org.gradle.crypto.checksum") version "1.1.0"
-    id("de.undercouch.download") version "4.1.1"
+    id("de.undercouch.download")
 }
 
 val coroutinesVersion = "1.5.2"
@@ -958,6 +959,16 @@ afterEvaluate {
     }
 }
 
+val emptySourcesJar by tasks.registering(Jar::class) {
+    archiveClassifier.set("sources")
+}
+
+val emptyJavadocJar by tasks.registering(Jar::class) {
+    archiveClassifier.set("javadoc")
+}
+
+
+
 publishing {
     repositories {
         configureEach {
@@ -981,35 +992,85 @@ publishing {
         }
     }
     publications {
+        val pomNameForPublication = HashMap<String, String>()
+        pomNameForPublication["kotlinMultiplatform"] = "Skiko MPP"
+        kotlin.targets.forEach {
+            pomNameForPublication[it.name] = "Skiko ${toTitleCase(it.name)}"
+        }
         configureEach {
             this as MavenPublication
             groupId = "org.jetbrains.skiko"
+
+            // Necessary for publishing to Maven Central
+            artifact(emptyJavadocJar)
+
             pom {
-                name.set("Skiko")
                 description.set("Kotlin Skia bindings")
-                url.set("http://www.github.com/JetBrains/skiko")
                 licenses {
                     license {
                         name.set("The Apache License, Version 2.0")
                         url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
                     }
                 }
+                val repoUrl = "https://www.github.com/JetBrains/skiko"
+                url.set(repoUrl)
+                scm {
+                    url.set(repoUrl)
+                    val repoConnection = "scm:git:$repoUrl.git"
+                    connection.set(repoConnection)
+                    developerConnection.set(repoConnection)
+                }
+                developers {
+                    developer {
+                        name.set("Compose Multiplatform Team")
+                        organization.set("JetBrains")
+                        organizationUrl.set("https://www.jetbrains.com")
+                    }
+                }
             }
         }
 
         create<MavenPublication>("skikoJvmRuntime") {
-            artifactId = SkikoArtifacts.runtimeArtifactIdFor(targetOs, targetArch)
+            pomNameForPublication[name] = "Skiko JVM Runtime for ${targetOs.name} ${targetArch.name}"
+            artifactId = SkikoArtifacts.jvmRuntimeArtifactIdFor(targetOs, targetArch)
             afterEvaluate {
                 artifact(skikoJvmRuntimeJar.map { it.archiveFile.get() })
+                var jvmSourcesArtifact: Any? = null
+                kotlin.jvm().mavenPublication {
+                    jvmSourcesArtifact = artifacts.find { it.classifier == "sources" }
+                }
+                if (jvmSourcesArtifact == null) {
+                    error("Could not find sources jar artifact for JVM target")
+                } else {
+                    artifact(jvmSourcesArtifact)
+                }
             }
         }
 
         if (supportWasm) {
             create<MavenPublication>("skikoWasmRuntime") {
+                pomNameForPublication[name] = "Skiko WASM Runtime"
                 artifactId = SkikoArtifacts.jsWasmArtifactId
                 artifact(skikoWasmJar.get())
+                artifact(emptySourcesJar)
             }
         }
+
+        val publicationsWithoutPomNames = publications.filter { it.name !in pomNameForPublication }
+        if (publicationsWithoutPomNames.isNotEmpty()) {
+            error("Publications with unknown POM names: ${publicationsWithoutPomNames.joinToString { "'$it'" }}")
+        }
+        configureEach {
+            this as MavenPublication
+            pom.name.set(pomNameForPublication[name]!!)
+        }
+    }
+}
+
+if (skiko.isCIBuild || skiko.signArtifacts) {
+    signing {
+        sign(publishing.publications)
+        useInMemoryPgpKeys(skiko.signArtifactsKey, skiko.signArtifactsPassword)
     }
 }
 

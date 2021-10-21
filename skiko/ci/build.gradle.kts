@@ -1,4 +1,5 @@
 import org.kohsuke.github.*
+import org.jetbrains.compose.internal.gradle.publishing.*
 
 val skiko = SkikoProperties(project)
 val GITHUB_REPO = "JetBrains/skiko"
@@ -7,25 +8,28 @@ fun connectToGitHub() =
         .withOAuthToken(System.getenv("SKIKO_GH_RELEASE_TOKEN"))
         .build()
 
-
 repositories {
     maven(skiko.composeRepoUrl)
 }
 
-val skikoArtifacts by configurations.creating
+val skikoArtifactIds: List<String> =
+    listOf(
+        SkikoArtifacts.commonArtifactId,
+        SkikoArtifacts.jvmArtifactId,
+        SkikoArtifacts.jvmRuntimeArtifactIdFor(OS.Windows, Arch.X64),
+        SkikoArtifacts.jvmRuntimeArtifactIdFor(OS.Linux, Arch.X64),
+        SkikoArtifacts.jvmRuntimeArtifactIdFor(OS.Linux, Arch.Arm64),
+        SkikoArtifacts.jvmRuntimeArtifactIdFor(OS.MacOS, Arch.X64),
+        SkikoArtifacts.jvmRuntimeArtifactIdFor(OS.MacOS, Arch.Arm64),
+    )
+
+val githubArtifacts by configurations.creating
 dependencies {
-    fun skikoDep(artifact: String) {
-        skikoArtifacts("org.jetbrains.skiko:$artifact:${skiko.deployVersion}") {
+    for (artifactId in skikoArtifactIds) {
+        githubArtifacts("org.jetbrains.skiko:$artifactId:${skiko.deployVersion}") {
             isTransitive = false
         }
     }
-
-    skikoDep(SkikoArtifacts.jvmArtifactId)
-    skikoDep(SkikoArtifacts.runtimeArtifactIdFor(OS.Windows, Arch.X64))
-    skikoDep(SkikoArtifacts.runtimeArtifactIdFor(OS.Linux, Arch.X64))
-    skikoDep(SkikoArtifacts.runtimeArtifactIdFor(OS.Linux, Arch.Arm64))
-    skikoDep(SkikoArtifacts.runtimeArtifactIdFor(OS.MacOS, Arch.X64))
-    skikoDep(SkikoArtifacts.runtimeArtifactIdFor(OS.MacOS, Arch.Arm64))
 }
 
 val createGithubRelease by tasks.registering {
@@ -40,7 +44,7 @@ val createGithubRelease by tasks.registering {
             .commitish(githubCommit)
             .create()
 
-        skikoArtifacts
+        githubArtifacts
             .filter { it.extension == "jar" }
             .forEach { release.uploadAsset(it, "application/zip") }
     }
@@ -52,4 +56,39 @@ val deleteGithubRelease by tasks.registering {
         val repo = gh.getRepository(GITHUB_REPO)
         repo.listReleases().firstOrNull { it.tagName == "v${skiko.releaseGithubVersion}" }?.delete()
     }
+}
+
+fun skikoMavenModules(version: Provider<String>): Provider<List<ModuleToUpload>> =
+    version.map { version ->
+        val artifactsDir = buildDir.resolve("skiko-artifacts")
+
+        skikoArtifactIds.map { artifactId ->
+            val skikoGroupId = "org.jetbrains.skiko"
+            ModuleToUpload(
+                groupId = skikoGroupId,
+                artifactId = artifactId,
+                version = version,
+                localDir = artifactsDir.resolve("$version/$skikoGroupId/$artifactId")
+            )
+        }
+    }
+
+val downloadSkikoArtifactsFromComposeDev by tasks.registering(DownloadFromSpaceMavenRepoTask::class) {
+    modulesToDownload.set(skikoMavenModules(skiko.mavenCentral.version))
+    spaceRepoUrl.set("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+}
+
+val uploadSkikoArtifactsToMavenCentral by tasks.registering(UploadToSonatypeTask::class) {
+    dependsOn(downloadSkikoArtifactsFromComposeDev)
+
+    val central = skiko.mavenCentral
+    version.set(central.version)
+    modulesToUpload.set(skikoMavenModules(central.version))
+
+    sonatypeServer.set("https://oss.sonatype.org")
+    user.set(central.user)
+    password.set(central.password)
+    autoCommitOnSuccess.set(central.autoCommitOnSuccess)
+    autoDropOnError.set(central.autoDropOnError)
+    stagingProfileName.set("org.jetbrains.skiko")
 }
