@@ -16,7 +16,7 @@ class PaintTest {
     @Test
     fun filterQuality() {
         // macOs has different results
-        assumeTrue(hostOs.isWindows || hostOs.isLinux)
+        assumeTrue(hostOs.isWindows)
 
         val surface = Surface.makeRasterN32Premul(16, 16)
 
