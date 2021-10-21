@@ -8,11 +8,12 @@ import org.jetbrains.skiko.FrameLimiter
 import org.jetbrains.skiko.RenderException
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaLayerProperties
+import org.jetbrains.skiko.context.DirectSoftwareContextHandler
 
 internal abstract class AbstractDirectSoftwareRedrawer(
     private val layer: SkiaLayer,
     private val properties: SkiaLayerProperties
-) : Redrawer {
+) : Redrawer(DirectSoftwareContextHandler(layer)) {
     private val frameJob = Job()
     private val frameLimiter = FrameLimiter(CoroutineScope(Dispatchers.IO + frameJob), layer.backedLayer)
     private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
@@ -22,7 +23,7 @@ internal abstract class AbstractDirectSoftwareRedrawer(
 
         if (layer.isShowing) {
             layer.update(System.nanoTime())
-            layer.inDrawScope(layer::draw)
+            layer.inDrawScope(contextHandler::draw)
         }
     }
 
@@ -34,7 +35,7 @@ internal abstract class AbstractDirectSoftwareRedrawer(
 
     override fun redrawImmediately() {
         layer.update(System.nanoTime())
-        layer.inDrawScope(layer::draw)
+        layer.inDrawScope(contextHandler::draw)
     }
 
     open fun resize(width: Int, height: Int) = resize(device, width, height)
@@ -47,8 +48,9 @@ internal abstract class AbstractDirectSoftwareRedrawer(
     }
     open fun finishFrame() = finishFrame(device)
     override fun dispose() {
-        disposeDevice(device)
         frameDispatcher.cancel()
+        super.dispose()
+        disposeDevice(device)
         runBlocking {
             frameJob.cancelAndJoin()
         }  

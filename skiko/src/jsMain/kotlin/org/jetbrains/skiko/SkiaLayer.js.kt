@@ -103,6 +103,10 @@ actual open class SkiaLayer(properties: SkiaLayerProperties = makeDefaultSkiaLay
     fun draw() {
         state?.draw()
     }
+
+    internal actual fun <T : Any> lockPicture(action: (PictureHolder) -> T): T? {
+        TODO()
+    }
 }
 
 actual typealias SkikoPlatformInputEvent = InputEvent

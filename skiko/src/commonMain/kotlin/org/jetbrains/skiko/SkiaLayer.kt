@@ -15,6 +15,8 @@ expect open class SkiaLayer {
     fun detach()
 
     fun needRedraw()
+
+    internal fun <T : Any> lockPicture(action: (PictureHolder) -> T): T?
 }
 
 

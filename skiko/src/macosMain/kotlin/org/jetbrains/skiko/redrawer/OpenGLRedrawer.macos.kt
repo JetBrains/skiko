@@ -6,6 +6,7 @@ import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaLayerProperties
 import org.jetbrains.skiko.SkikoDispatchers
+import org.jetbrains.skiko.context.MacOSOpenGLContextHandler
 import platform.CoreFoundation.CFTimeInterval
 import platform.CoreGraphics.CGRectMake
 import platform.CoreVideo.CVTimeStamp
@@ -19,14 +20,15 @@ import kotlin.system.getTimeNanos
 internal class MacOsOpenGLRedrawer(
     private val skiaLayer: SkiaLayer,
     private val properties: SkiaLayerProperties
-) : Redrawer {
+) : Redrawer(MacOSOpenGLContextHandler(skiaLayer)) {
     private val glLayer = MacosGLLayer(skiaLayer)
 
     private val frameDispatcher = FrameDispatcher(SkikoDispatchers.Main) {
         redrawImmediately()
     }
 
-    override fun dispose() { 
+    override fun dispose() {
+        super.dispose()
         glLayer.dispose()
     }
 

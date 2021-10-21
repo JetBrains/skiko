@@ -7,11 +7,12 @@ import org.jetbrains.skia.DirectContext
 import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaLayerProperties
+import org.jetbrains.skiko.context.AngleContextHandler
 
 internal class AngleRedrawer(
     private val layer: SkiaLayer,
     private val properties: SkiaLayerProperties
-) : Redrawer {
+) : Redrawer(AngleContextHandler(layer)) {
 
     private var isDisposed = false
     private var device: Long = 0
@@ -25,6 +26,7 @@ internal class AngleRedrawer(
 
     override fun dispose() {
         frameDispatcher.cancel()
+        super.dispose()
         disposeDevice(device)
         isDisposed = true
     }
@@ -45,7 +47,7 @@ internal class AngleRedrawer(
     }
 
     private fun draw() {
-        layer.draw()
+        contextHandler.draw()
     }
 
     fun createDevice(): Long {
