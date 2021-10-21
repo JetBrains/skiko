@@ -27,6 +27,22 @@ import javax.swing.WindowConstants
 import kotlin.random.Random
 import kotlin.test.assertTrue
 
+internal open class SkiaWindow(
+    properties: SkiaLayerProperties = makeDefaultSkiaLayerProperties(),
+    layerFactory: () -> SkiaLayer = { SkiaLayer(properties) }
+) : JFrame() {
+    val layer = layerFactory()
+
+    init {
+        contentPane.add(layer)
+    }
+
+    override fun dispose() {
+        layer.dispose()
+        super.dispose()
+    }
+}
+
 @Suppress("BlockingMethodInNonBlockingContext", "SameParameterValue")
 class SkiaWindowTest {
     private val fontCollection = FontCollection()
