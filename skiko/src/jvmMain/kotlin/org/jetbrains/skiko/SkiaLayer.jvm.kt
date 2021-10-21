@@ -46,7 +46,7 @@ actual open class SkiaLayer internal constructor(
         get() = _transparency
         set(value) {
             _transparency = value
-            if (!value && hostOs == OS.MacOS) {
+            if (!value) {
                 background = UIManager.getColor("Panel.background")
             } else {
                 background = Color(0, 0, 0, 0)
