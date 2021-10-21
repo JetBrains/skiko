@@ -64,7 +64,7 @@ internal class MacOsOpenGLRedrawer(
     }
 }
 
-class MacosGLLayer : CAOpenGLLayer {
+internal class MacosGLLayer : CAOpenGLLayer {
     private lateinit var layer: SkiaLayer
     @OverrideInit
     constructor(): super()
