@@ -20,7 +20,11 @@ internal class MacOsOpenGLRedrawer(
     private val skiaLayer: SkiaLayer,
     private val properties: SkiaLayerProperties
 ) : Redrawer {
-    private val glLayer = MacosGLLayer(skiaLayer)
+    private val glLayer = MacosGLLayer()
+
+    init {
+        glLayer.init(skiaLayer)
+    }
 
     private val frameDispatcher = FrameDispatcher(SkikoDispatchers.Main) {
         redrawImmediately()
@@ -31,7 +35,7 @@ internal class MacOsOpenGLRedrawer(
     }
 
     override fun syncSize() {
-        // TODO: What do we really do here?
+        syncContentScale()
         skiaLayer.nsView.frame.useContents {
             glLayer.setFrame(
                 origin.x.toInt(),
@@ -40,6 +44,14 @@ internal class MacOsOpenGLRedrawer(
                 size.height.toInt().coerceAtLeast(0)
             )
         }
+    }
+
+    private fun syncContentScale() {
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        glLayer.contentsScale = skiaLayer.nsView.window!!.backingScaleFactor
+        CATransaction.commit()
+        CATransaction.flush()
     }
 
     override fun needRedraw() {
@@ -52,22 +64,29 @@ internal class MacOsOpenGLRedrawer(
     }
 }
 
-internal class MacosGLLayer(val layer: SkiaLayer) : CAOpenGLLayer() {
-    init {
+class MacosGLLayer : CAOpenGLLayer {
+    private lateinit var layer: SkiaLayer
+    @OverrideInit
+    constructor(): super()
+    @OverrideInit
+    constructor(layer: Any): super(layer)
+
+    fun init(layer: SkiaLayer) {
+        this.layer = layer
         this.setNeedsDisplayOnBoundsChange(true)
         this.removeAllAnimations()
         this.setAutoresizingMask(kCALayerWidthSizable or kCALayerHeightSizable )
         layer.nsView.layer = this
         layer.nsView.wantsLayer = true
+        this.contentsGravity = kCAGravityTopLeft;
     }
 
     fun setFrame(x: Int, y: Int, width: Int, height: Int) {
-        val newY = layer.nsView.frame.useContents { size.height } - y - height
-
         CATransaction.begin()
         CATransaction.setDisableActions(true)
-        this.frame = CGRectMake(x.toDouble(), newY, width.toDouble(), height.toDouble())
+        this.frame = CGRectMake(x.toDouble(), y.toDouble(), width.toDouble(), height.toDouble())
         CATransaction.commit()
+        CATransaction.flush()
     }
 
     fun dispose() {

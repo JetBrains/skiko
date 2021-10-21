@@ -7,17 +7,19 @@ import org.jetbrains.skia.*
 import org.jetbrains.skiko.redrawer.Redrawer
 import platform.AppKit.*
 import platform.Foundation.NSMakeRect
+import platform.Foundation.NSNotification
 import platform.Foundation.NSNotificationCenter
 import platform.Foundation.NSSelectorFromString
 import platform.Foundation.addObserver
 import platform.darwin.NSObject
+import platform.CoreGraphics.CGRectMake
 
 actual open class SkiaLayer(
     private val properties: SkiaLayerProperties = makeDefaultSkiaLayerProperties()
 ) {
     actual var renderApi: GraphicsApi = GraphicsApi.OPENGL
     actual val contentScale: Float
-        get() = _contentScale
+        get() = if (this::nsView.isInitialized) nsView.window!!.backingScaleFactor.toFloat() else 1.0f
 
     actual var fullscreen: Boolean
         get() = false
@@ -32,7 +34,6 @@ actual open class SkiaLayer(
         }
 
     lateinit var nsView: NSView
-    var _contentScale: Float = 1.0f
 
     actual var skikoView: SkikoView? = null
 
@@ -123,8 +124,26 @@ actual open class SkiaLayer(
         val center = NSNotificationCenter.defaultCenter()
         center.addObserver(nsView, NSSelectorFromString("onWindowClose:"),
             NSWindowWillCloseNotification!!, window)
+        window.delegate = object : NSObject(), NSWindowDelegateProtocol {
+            override fun windowDidResize(notification: NSNotification) {
+                val (w, h) = window.contentView!!.frame.useContents {
+                    size.width to size.height
+                }
+                nsView.frame = CGRectMake(0.0, 0.0, w, h)
+                redrawer?.syncSize()
+                initedCanvas = false
+                redrawer?.redrawImmediately()
+            }
+
+            override fun windowDidChangeBackingProperties(notification: NSNotification) {
+                redrawer?.syncSize()
+                initedCanvas = false
+                redrawer?.redrawImmediately()
+            }
+        }
         window.contentView!!.addSubview(nsView)
         redrawer = createNativeRedrawer(this, GraphicsApi.OPENGL, properties).apply {
+            syncSize()
             needRedraw()
         }
     }
