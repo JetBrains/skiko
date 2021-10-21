@@ -14,7 +14,9 @@ import org.jetbrains.skia.paragraph.TextStyle
 import org.jetbrains.skiko.context.JvmContextHandler
 import org.jetbrains.skiko.redrawer.Redrawer
 import org.jetbrains.skiko.util.ScreenshotTestRule
-import org.jetbrains.skiko.util.swingTest
+import org.jetbrains.skiko.util.UiTestScope
+import org.jetbrains.skiko.util.UiTestWindow
+import org.jetbrains.skiko.util.uiTest
 import org.junit.Assert.assertEquals
 import org.junit.Assume.assumeTrue
 import org.junit.Rule
@@ -27,24 +29,8 @@ import javax.swing.WindowConstants
 import kotlin.random.Random
 import kotlin.test.assertTrue
 
-internal open class SkiaWindow(
-    properties: SkiaLayerProperties = makeDefaultSkiaLayerProperties(),
-    layerFactory: () -> SkiaLayer = { SkiaLayer(properties) }
-) : JFrame() {
-    val layer = layerFactory()
-
-    init {
-        contentPane.add(layer)
-    }
-
-    override fun dispose() {
-        layer.dispose()
-        super.dispose()
-    }
-}
-
 @Suppress("BlockingMethodInNonBlockingContext", "SameParameterValue")
-class SkiaWindowTest {
+class SkiaLayerTest {
     private val fontCollection = FontCollection()
         .setDefaultFontManager(FontMgr.default)
 
@@ -64,7 +50,7 @@ class SkiaWindowTest {
     val screenshots = ScreenshotTestRule()
 
     @Test
-    fun `should not leak native windows`() = swingTest {
+    fun `should not leak native windows`() = uiTest {
         assumeTrue(hostOs.isMacOS)
 
         suspend fun createAndDisposeWindow() {
@@ -100,8 +86,8 @@ class SkiaWindowTest {
     }
 
     @Test
-    fun `render single window`() = swingTest {
-        val window = SkiaWindow()
+    fun `render single window`() = uiTest {
+        val window = UiTestWindow()
         try {
             window.setLocation(200, 200)
             window.setSize(400, 200)
@@ -124,8 +110,8 @@ class SkiaWindowTest {
     }
 
     @Test
-    fun `render single window before window show`() = swingTest {
-        val window = SkiaWindow()
+    fun `render single window before window show`() = uiTest {
+        val window = UiTestWindow()
         try {
             window.setLocation(200, 200)
             window.preferredSize = Dimension(400, 200)
@@ -150,8 +136,8 @@ class SkiaWindowTest {
     }
 
     @Test
-    fun `resize window`() = swingTest {
-        val window = SkiaWindow()
+    fun `resize window`() = uiTest {
+        val window = UiTestWindow()
         try {
             window.setLocation(200, 200)
             window.setSize(40, 20)
@@ -171,8 +157,8 @@ class SkiaWindowTest {
     }
 
     @Test
-    fun `render three windows`() = swingTest {
-        fun window(color: Color) = SkiaWindow().apply {
+    fun `render three windows`() = uiTest {
+        fun window(color: Color) = UiTestWindow().apply {
             setLocation(200, 200)
             setSize(400, 200)
             defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
@@ -207,10 +193,10 @@ class SkiaWindowTest {
     }
 
     @Test
-    fun `should call onRender after init, after resize, and only once after needRedraw`() = swingTest {
+    fun `should call onRender after init, after resize, and only once after needRedraw`() = uiTest {
         var renderCount = 0
 
-        val window = SkiaWindow()
+        val window = UiTestWindow()
         try {
             window.setLocation(200, 200)
             window.setSize(40, 20)
@@ -241,8 +227,8 @@ class SkiaWindowTest {
     }
 
     @Test(timeout = 60000)
-    fun `stress test - open multiple windows`() = swingTest {
-        fun window(isAnimated: Boolean) = SkiaWindow().apply {
+    fun `stress test - open multiple windows`() = uiTest {
+        fun window(isAnimated: Boolean) = UiTestWindow().apply {
             setLocation(200, 200)
             setSize(40, 20)
             defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
@@ -256,7 +242,7 @@ class SkiaWindowTest {
         }
 
         val random = Random(31415926)
-        val openedWindows = mutableListOf<SkiaWindow>()
+        val openedWindows = mutableListOf<UiTestWindow>()
 
         repeat(10) {
             val needOpen = random.nextDouble() > 0.5f
@@ -283,8 +269,8 @@ class SkiaWindowTest {
     }
 
     @Test(timeout = 60000)
-    fun `stress test - resize and paint immediately`() = swingTest {
-        fun openWindow() = SkiaWindow(
+    fun `stress test - resize and paint immediately`() = uiTest {
+        fun openWindow() = UiTestWindow(
             properties = SkiaLayerProperties(isVsyncEnabled = false, isVsyncFramelimitFallbackEnabled = true)
         ).apply {
             setLocation(200, 200)
@@ -306,8 +292,8 @@ class SkiaWindowTest {
     }
 
     @Test(timeout = 60000)
-    fun `stress test - open and paint immediately`() = swingTest {
-        fun openWindow() = SkiaWindow(
+    fun `stress test - open and paint immediately`() = uiTest {
+        fun openWindow() = UiTestWindow(
             properties = SkiaLayerProperties(isVsyncEnabled = false, isVsyncFramelimitFallbackEnabled = true)
         ).apply {
             setLocation(200, 200)
@@ -332,7 +318,7 @@ class SkiaWindowTest {
     }
 
     @Test(timeout = 60000)
-    fun `fallback to software renderer, fail on init context`() = swingTest {
+    fun `fallback to software renderer, fail on init context`() = uiTest {
         testFallbackToSoftware(
             object : RenderFactory {
                 override fun createRedrawer(
@@ -355,7 +341,7 @@ class SkiaWindowTest {
     }
 
     @Test(timeout = 60000)
-    fun `fallback to software renderer, fail on create redrawer`() = swingTest {
+    fun `fallback to software renderer, fail on create redrawer`() = uiTest {
         testFallbackToSoftware(
             object : RenderFactory {
                 override fun createRedrawer(
@@ -368,7 +354,7 @@ class SkiaWindowTest {
     }
 
     @Test(timeout = 60000)
-    fun `fallback to software renderer, fail on draw`() = swingTest {
+    fun `fallback to software renderer, fail on draw`() = uiTest {
         testFallbackToSoftware(
             object : RenderFactory {
                 override fun createRedrawer(
@@ -387,13 +373,9 @@ class SkiaWindowTest {
         )
     }
 
-    private suspend fun testFallbackToSoftware(nonSoftwareRenderFactory: RenderFactory) {
-        val window = SkiaWindow(
-            layerFactory = {
-                SkiaLayer(
-                    renderFactory = OverrideNonSoftwareRenderFactory(nonSoftwareRenderFactory)
-                )
-            }
+    private suspend fun UiTestScope.testFallbackToSoftware(nonSoftwareRenderFactory: RenderFactory) {
+        val window = UiTestWindow(
+            renderFactory = OverrideNonSoftwareRenderFactory(nonSoftwareRenderFactory)
         )
         try {
             window.setLocation(200, 200)
@@ -412,7 +394,7 @@ class SkiaWindowTest {
             delay(1000)
             screenshots.assert(window.bounds, "frame2", "testFallbackToSoftware")
 
-            assertEquals(GraphicsApi.SOFTWARE, window.layer.renderApi)
+            assertEquals(GraphicsApi.AWT_SOFTWARE, window.layer.renderApi)
         } finally {
             window.close()
         }
@@ -426,7 +408,7 @@ class SkiaWindowTest {
             renderApi: GraphicsApi,
             properties: SkiaLayerProperties
         ): Redrawer {
-            return if (renderApi == GraphicsApi.SOFTWARE) {
+            return if (renderApi == GraphicsApi.AWT_SOFTWARE) {
                 RenderFactory.Default.createRedrawer(layer, renderApi, properties)
             } else {
                 nonSoftwareRenderFactory.createRedrawer(layer, renderApi, properties)
@@ -435,12 +417,12 @@ class SkiaWindowTest {
     }
 
     @Test(timeout = 20000)
-    fun `render continuously empty content without vsync`() = swingTest {
+    fun `render continuously empty content without vsync`() = uiTest {
         val targetDrawCount = 500
         var drawCount = 0
         val onDrawCompleted = CompletableDeferred<Unit>()
 
-        val window = SkiaWindow(
+        val window = UiTestWindow(
             properties = SkiaLayerProperties(
                 isVsyncEnabled = false,
                 isVsyncFramelimitFallbackEnabled = true
@@ -486,10 +468,10 @@ class SkiaWindowTest {
         testRenderText(OS.MacOS)
     }
 
-    private fun testRenderText(os: OS) = swingTest {
+    private fun testRenderText(os: OS) = uiTest {
         assumeTrue(hostOs == os)
 
-        val window = SkiaWindow()
+        val window = UiTestWindow()
         try {
             window.setLocation(200, 200)
             window.setSize(400, 200)

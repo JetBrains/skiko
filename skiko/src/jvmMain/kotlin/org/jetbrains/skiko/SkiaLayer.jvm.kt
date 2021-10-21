@@ -17,7 +17,7 @@ import javax.swing.UIManager
 
 actual open class SkiaLayer internal constructor(
     externalAccessibleFactory: ((Component) -> Accessible)? = null,
-    private val properties: SkiaLayerProperties = makeDefaultSkiaLayerProperties(),
+    private val properties: SkiaLayerProperties = SkiaLayerProperties(),
     private val renderFactory: RenderFactory = RenderFactory.Default
 ) : JPanel() {
 
@@ -47,8 +47,8 @@ actual open class SkiaLayer internal constructor(
     internal val backedLayer: HardwareLayer
 
     constructor(
-        properties: SkiaLayerProperties = makeDefaultSkiaLayerProperties(),
-        externalAccessibleFactory: ((Component) -> Accessible)? = null
+        properties: SkiaLayerProperties = SkiaLayerProperties(),
+        externalAccessibleFactory: ((Component) -> Accessible)? = null,
     ) : this(externalAccessibleFactory, properties, RenderFactory.Default)
 
     val canvas: java.awt.Canvas
@@ -200,7 +200,7 @@ actual open class SkiaLayer internal constructor(
     @Volatile
     private var isDisposed = false
     internal var redrawer: Redrawer? = null
-    private val fallbackRenderApiQueue = SkikoProperties.fallbackRenderApiQueue.toMutableList()
+    private val fallbackRenderApiQueue = SkikoProperties.fallbackRenderApiQueue(properties.renderApi).toMutableList()
     private var renderApi_ = fallbackRenderApiQueue[0]
     actual var renderApi: GraphicsApi
         get() = renderApi_

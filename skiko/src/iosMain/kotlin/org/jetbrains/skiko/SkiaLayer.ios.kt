@@ -13,7 +13,7 @@ import platform.UIKit.*
 import platform.darwin.NSObject
 
 actual open class SkiaLayer(
-    val properties: SkiaLayerProperties = makeDefaultSkiaLayerProperties()
+    val properties: SkiaLayerProperties = SkiaLayerProperties()
 ) {
     fun isShowing(): Boolean {
         return true
@@ -82,7 +82,7 @@ actual open class SkiaLayer(
         // We have ':' in selector to take care of function argument.
         view.addGestureRecognizer(UITapGestureRecognizer(controller, NSSelectorFromString("onTap:")))
         // TODO: maybe add observer for view.viewDidDisappear() to detach us?
-        redrawer = MetalRedrawer(this, properties).apply {
+        redrawer = MetalRedrawer(this).apply {
             needRedraw()
         }
     }

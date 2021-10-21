@@ -15,7 +15,7 @@ import platform.darwin.NSObject
 import platform.CoreGraphics.CGRectMake
 
 actual open class SkiaLayer(
-    private val properties: SkiaLayerProperties = makeDefaultSkiaLayerProperties()
+    private val properties: SkiaLayerProperties = SkiaLayerProperties()
 ) {
     actual var renderApi: GraphicsApi = GraphicsApi.OPENGL
     actual val contentScale: Float
