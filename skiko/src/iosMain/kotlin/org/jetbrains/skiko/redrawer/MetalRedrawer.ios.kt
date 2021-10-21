@@ -36,7 +36,7 @@ internal class MetalRedrawer(
 
     private val frameDispatcher = FrameDispatcher(SkikoDispatchers.Main) {
         if (layer.isShowing()) {
-            update(getTimeNanos())
+            layer.update(getTimeNanos())
             draw()
         }
     }
@@ -71,12 +71,8 @@ internal class MetalRedrawer(
 
     override fun redrawImmediately() {
         check(!isDisposed) { "MetalRedrawer is disposed" }
-        update(getTimeNanos())
+        layer.update(getTimeNanos())
         draw()
-    }
-
-    private fun update(nanoTime: Long) {
-        layer.update(nanoTime)
     }
 
     private fun draw() {

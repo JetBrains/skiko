@@ -383,14 +383,17 @@ kotlin {
                 }
             }
             if (hostOs == OS.MacOS) {
-                val macosMain by creating {
+                val darwinMain by creating {
                     dependsOn(nativeMain)
+                }
+                val macosMain by creating {
+                    dependsOn(darwinMain)
                 }
                 val macosTest by creating {
                     dependsOn(nativeTest)
                 }
                 val iosMain by creating {
-                    dependsOn(nativeMain)
+                    dependsOn(darwinMain)
                 }
                 val iosTest by creating {
                     dependsOn(nativeTest)

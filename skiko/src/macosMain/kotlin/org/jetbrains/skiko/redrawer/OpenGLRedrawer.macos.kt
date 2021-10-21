@@ -2,8 +2,10 @@ package org.jetbrains.skiko.redrawer
 
 import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.useContents
+import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaLayerProperties
+import org.jetbrains.skiko.SkikoDispatchers
 import platform.CoreFoundation.CFTimeInterval
 import platform.CoreGraphics.CGRectMake
 import platform.CoreVideo.CVTimeStamp
@@ -19,6 +21,10 @@ internal class MacOsOpenGLRedrawer(
     private val properties: SkiaLayerProperties
 ) : Redrawer {
     private val drawLayer = MacosGLLayer(layer, setNeedsDisplayOnBoundsChange = true)
+
+    private val frameDispatcher = FrameDispatcher(SkikoDispatchers.Main) {
+        redrawImmediately()
+    }
 
     override fun dispose() { 
         drawLayer.dispose()
@@ -37,19 +43,20 @@ internal class MacOsOpenGLRedrawer(
     }
 
     override fun needRedraw() {
+        frameDispatcher.scheduleFrame()
     }
 
     override fun redrawImmediately() {
-        layer.update(getTimeNanos())
+        drawLayer.setNeedsDisplay()
+        layer.nsView.setNeedsDisplay(true)
     }
 }
 
-class MacosGLLayer(val layer: SkiaLayer, setNeedsDisplayOnBoundsChange: Boolean) : CAOpenGLLayer() {
+internal class MacosGLLayer(val layer: SkiaLayer, setNeedsDisplayOnBoundsChange: Boolean) : CAOpenGLLayer() {
     init {
         this.setNeedsDisplayOnBoundsChange(setNeedsDisplayOnBoundsChange)
         this.removeAllAnimations()
         this.setAutoresizingMask(kCALayerWidthSizable or kCALayerHeightSizable )
-        this.setAsynchronous(true)
         layer.nsView.layer = this
         layer.nsView.wantsLayer = true
     }
@@ -73,16 +80,6 @@ class MacosGLLayer(val layer: SkiaLayer, setNeedsDisplayOnBoundsChange: Boolean)
         // TODO: anything else to dispose the layer?
     }
 
-    @Suppress("unused") 
-    private fun performDraw() {
-        try {
-            draw()
-        } catch (e: Throwable) {
-            e.printStackTrace()
-        }
-        //display.finish()
-    }
-
     override fun canDrawInCGLContext(
         ctx: CGLContextObj?,
         pixelFormat: CGLPixelFormatObj?,
@@ -98,10 +95,15 @@ class MacosGLLayer(val layer: SkiaLayer, setNeedsDisplayOnBoundsChange: Boolean)
         forLayerTime: CFTimeInterval,
         displayTime: CPointer<CVTimeStamp>?
     ) {
+        println("drawInCGLContext")
         CGLSetCurrentContext(ctx);
-        performDraw()
+        try {
+            draw()
+        } catch (e: Throwable) {
+            e.printStackTrace()
+            throw e
+        }
 
-        //context.flush() // TODO: I thought the below should call context.flush().
         super.drawInCGLContext(ctx, pixelFormat,forLayerTime, displayTime)
     }
 }

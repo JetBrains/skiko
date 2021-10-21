@@ -50,9 +50,11 @@ actual open class SkiaLayer(
     internal var view: UIView? = null
     // We need to keep reference to controller as Objective-C will only keep weak reference here.
     lateinit private var controller: NSObject
+
     actual fun attachTo(container: Any) {
         attachTo(container as UIView)
     }
+
     fun attachTo(view: UIView) {
         this.view = view
         contextHandler = MetalContextHandler(this)
@@ -79,8 +81,9 @@ actual open class SkiaLayer(
         // We have ':' in selector to take care of function argument.
         view.addGestureRecognizer(UITapGestureRecognizer(controller, NSSelectorFromString("onTap:")))
         // TODO: maybe add observer for view.viewDidDisappear() to detach us?
-        redrawer = MetalRedrawer(this, properties)
-        redrawer?.redrawImmediately()
+        redrawer = MetalRedrawer(this, properties).apply {
+            needRedraw()
+        }
     }
 
     private var isDisposed = false

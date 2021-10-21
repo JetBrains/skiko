@@ -74,6 +74,9 @@ actual open class SkiaLayer(
         }
         nsView = object : NSView(NSMakeRect(0.0, 0.0, width, height)) {
             private var trackingArea : NSTrackingArea? = null
+            override fun wantsUpdateLayer(): Boolean {
+                return true
+            }
             override fun acceptsFirstResponder(): Boolean {
                 return true
             }
@@ -121,8 +124,9 @@ actual open class SkiaLayer(
         center.addObserver(nsView, NSSelectorFromString("onWindowClose:"),
             NSWindowWillCloseNotification!!, window)
         window.contentView!!.addSubview(nsView)
-        redrawer = createNativeRedrawer(this, GraphicsApi.OPENGL, properties)
-        redrawer?.redrawImmediately()
+        redrawer = createNativeRedrawer(this, GraphicsApi.OPENGL, properties).apply {
+            needRedraw()
+        }
     }
 
     actual fun detach() {
