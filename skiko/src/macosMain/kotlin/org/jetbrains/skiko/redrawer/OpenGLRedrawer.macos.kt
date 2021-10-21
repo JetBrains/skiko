@@ -17,23 +17,23 @@ import platform.QuartzCore.*
 import kotlin.system.getTimeNanos
 
 internal class MacOsOpenGLRedrawer(
-    private val layer: SkiaLayer,
+    private val skiaLayer: SkiaLayer,
     private val properties: SkiaLayerProperties
 ) : Redrawer {
-    private val drawLayer = MacosGLLayer(layer, setNeedsDisplayOnBoundsChange = true)
+    private val glLayer = MacosGLLayer(skiaLayer)
 
     private val frameDispatcher = FrameDispatcher(SkikoDispatchers.Main) {
         redrawImmediately()
     }
 
     override fun dispose() { 
-        drawLayer.dispose()
+        glLayer.dispose()
     }
 
     override fun syncSize() {
         // TODO: What do we really do here?
-        layer.nsView.frame.useContents {
-            drawLayer.setFrame(
+        skiaLayer.nsView.frame.useContents {
+            glLayer.setFrame(
                 origin.x.toInt(),
                 origin.y.toInt(),
                 size.width.toInt().coerceAtLeast(0),
@@ -47,14 +47,14 @@ internal class MacOsOpenGLRedrawer(
     }
 
     override fun redrawImmediately() {
-        drawLayer.setNeedsDisplay()
-        layer.nsView.setNeedsDisplay(true)
+        glLayer.setNeedsDisplay()
+        skiaLayer.nsView.setNeedsDisplay(true)
     }
 }
 
-internal class MacosGLLayer(val layer: SkiaLayer, setNeedsDisplayOnBoundsChange: Boolean) : CAOpenGLLayer() {
+internal class MacosGLLayer(val layer: SkiaLayer) : CAOpenGLLayer() {
     init {
-        this.setNeedsDisplayOnBoundsChange(setNeedsDisplayOnBoundsChange)
+        this.setNeedsDisplayOnBoundsChange(true)
         this.removeAllAnimations()
         this.setAutoresizingMask(kCALayerWidthSizable or kCALayerHeightSizable )
         layer.nsView.layer = this

@@ -49,8 +49,11 @@ internal class MetalRedrawer(
     }
 
     override fun dispose() {
-        frameDispatcher.cancel()
-        isDisposed = true
+        if (!isDisposed) {
+            frameDispatcher.cancel()
+            metalLayer.dispose()
+            isDisposed = true
+        }
     }
 
     override fun syncSize() {
@@ -123,23 +126,14 @@ class MetalLayer : CAMetalLayer {
         }
     }
 
-    fun draw()  {
-        skiaLayer.update(getTimeNanos())
-        skiaLayer.draw()
-    }
-
     fun dispose() {
         this.removeFromSuperlayer()
         // TODO: anything else to dispose the layer?
     }
 
-    @Suppress("unused")
-    private fun performDraw() {
-        draw()
-    }
-
     override fun drawInContext(ctx: CGContextRef?) {
-        draw()
+        skiaLayer.update(getTimeNanos())
+        skiaLayer.draw()
         super.drawInContext(ctx)
     }
 }
