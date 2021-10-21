@@ -1,11 +1,9 @@
 package org.jetbrains.skiko.paragraph
 
+import org.jetbrains.skia.impl.use
 import org.jetbrains.skia.paragraph.TextStyle
 import org.jetbrains.skia.paragraph.TextStyleAttribute
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class TextStyleTest {
 
@@ -25,8 +23,8 @@ class TextStyleTest {
                     TextStyleAttribute.WORD_SPACING,
                     TextStyleAttribute.FONT_EXACT
                 )) {
-                    assertEquals(true, ts1.equals(attr, ts2), "$attr")
-                    assertEquals(true, ts2.equals(attr, ts1), "$attr")
+                    assertTrue(ts1.equals(attr, ts2), "$attr")
+                    assertTrue(ts2.equals(attr, ts1), "$attr")
                 }
             }
         }
@@ -38,5 +36,16 @@ class TextStyleTest {
         assertTrue(
             TextStyle().setColor(-0x33cd00).equals(TextStyleAttribute.BACKGROUND, TextStyle().setColor(-0xff33cd))
         )
+
+        TextStyle().use { ts1 ->
+            TextStyle().use { ts2 ->
+                ts1.fontFamilies = arrayOf("foo", "qux")
+                ts2.fontFamilies = arrayOf("foo", "qux")
+                assertEquals(ts1, ts2)
+                ts1.fontFamilies = arrayOf("foo", "qux")
+                ts2.fontFamilies = arrayOf("bar", "zig")
+                assertNotEquals(ts1, ts2)
+            }
+        }
     }
 }
