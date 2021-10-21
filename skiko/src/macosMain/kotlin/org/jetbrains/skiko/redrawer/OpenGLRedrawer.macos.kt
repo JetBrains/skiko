@@ -61,11 +61,6 @@ internal class MacosGLLayer(val layer: SkiaLayer, setNeedsDisplayOnBoundsChange:
         layer.nsView.wantsLayer = true
     }
 
-    fun draw()  { 
-        layer.update(getTimeNanos())
-        layer.draw()
-    }
-
     fun setFrame(x: Int, y: Int, width: Int, height: Int) {
         val newY = layer.nsView.frame.useContents { size.height } - y - height
 
@@ -95,10 +90,10 @@ internal class MacosGLLayer(val layer: SkiaLayer, setNeedsDisplayOnBoundsChange:
         forLayerTime: CFTimeInterval,
         displayTime: CPointer<CVTimeStamp>?
     ) {
-        println("drawInCGLContext")
         CGLSetCurrentContext(ctx);
         try {
-            draw()
+            layer.update(getTimeNanos())
+            layer.draw()
         } catch (e: Throwable) {
             e.printStackTrace()
             throw e
