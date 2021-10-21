@@ -2,14 +2,13 @@ import de.undercouch.gradle.tasks.download.Download
 import org.gradle.crypto.checksum.Checksum
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
-import java.util.Locale
 
 plugins {
     kotlin("multiplatform") version "1.5.31"
     `maven-publish`
     signing
     id("org.gradle.crypto.checksum") version "1.1.0"
-    id("de.undercouch.download") version "4.1.1"
+    id("de.undercouch.download")
 }
 
 val coroutinesVersion = "1.5.2"
@@ -965,6 +964,8 @@ val emptyJavadocJar by tasks.registering(Jar::class) {
     archiveClassifier.set("javadoc")
 }
 
+
+
 publishing {
     repositories {
         configureEach {
@@ -996,9 +997,6 @@ publishing {
         configureEach {
             this as MavenPublication
             groupId = "org.jetbrains.skiko"
-            if (skiko.signArtifacts) {
-                signing.sign(this)
-            }
 
             // Necessary for publishing to Maven Central
             artifact(emptyJavadocJar)
@@ -1063,6 +1061,13 @@ publishing {
             this as MavenPublication
             pom.name.set(pomNameForPublication[name]!!)
         }
+    }
+}
+
+if (skiko.isCIBuild || skiko.signArtifacts) {
+    signing {
+        sign(publishing.publications)
+        useInMemoryPgpKeys(skiko.signArtifactsKey, skiko.signArtifactsPassword)
     }
 }
 

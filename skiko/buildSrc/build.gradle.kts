@@ -9,4 +9,6 @@ repositories {
 dependencies {
     implementation(kotlin("stdlib"))
     compileOnly(gradleApi())
+
+    api(project(":publishing"))
 }

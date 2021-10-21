@@ -1,4 +1,5 @@
 import org.gradle.api.Project
+import org.gradle.api.provider.Provider
 import java.io.File
 
 enum class OS(
@@ -130,6 +131,14 @@ class SkikoProperties(private val myProject: Project) {
     val signArtifacts: Boolean
         get() = myProject.findProperty("deploy.sign") == "true"
 
+    val signArtifactsKey: String
+        get() = System.getenv("MAVEN_ARTIFACTS_SIGN_KEY")
+            ?: error("Environment variable 'MAVEN_ARTIFACTS_SIGN_KEY' is not specified")
+
+    val signArtifactsPassword: String
+        get() = System.getenv("MAVEN_ARTIFACTS_SIGN_PASSWORD")
+            ?: error("Environment variable 'MAVEN_ARTIFACTS_SIGN_PASSWORD' is not specified")
+
     val buildType: SkiaBuildType
         get() = if (myProject.findProperty("skiko.debug") == "true") SkiaBuildType.DEBUG else SkiaBuildType.RELEASE
 
@@ -180,10 +189,56 @@ class SkikoProperties(private val myProject: Project) {
 
     val dependenciesDir: File
         get() = myProject.rootProject.projectDir.resolve("dependencies")
+
+    val mavenCentral = MavenCentralProperties(myProject)
+}
+
+class MavenCentralProperties(private val myProject: Project) {
+    private fun propertyProvider(
+        property: String,
+        envVar: String? = null,
+        defaultValue: String? = null
+    ): Provider<String> {
+        val providers = myProject.providers
+        var result = providers.gradleProperty(property)
+        if (envVar != null) {
+            result = result.orElse(providers.environmentVariable(envVar))
+        }
+        if (defaultValue != null) {
+            result = result.orElse(defaultValue)
+        } else {
+            result = result.orElse(providers.provider {
+                val envVarMessage = if (envVar != null) " or '$envVar' environment variable" else ""
+                error("Provide value for '$property' Gradle property$envVarMessage")
+            })
+        }
+        return result
+    }
+
+    private fun environmentVariable(variable: String) =
+        myProject.providers.environmentVariable(variable)
+
+    val version: Provider<String> =
+        propertyProvider("maven.central.version")
+
+    val user: Provider<String> =
+        propertyProvider("maven.central.user", envVar = "MAVEN_CENTRAL_USER")
+
+    val password: Provider<String> =
+        propertyProvider("maven.central.password", envVar = "MAVEN_CENTRAL_PASSWORD")
+
+    val autoCommitOnSuccess: Provider<Boolean> =
+        propertyProvider("maven.central.staging.auto.commit", defaultValue = "false")
+            .map { it.toBoolean() }
+
+    val autoDropOnError: Provider<Boolean> =
+        propertyProvider("maven.central.staging.auto.drop", defaultValue = "false")
+            .map { it.toBoolean() }
 }
 
 object SkikoArtifacts {
     // names are also used in samples, e.g. samples/SkijaInjectSample/build.gradle
+    val commonArtifactId = "skiko"
     val jvmArtifactId = "skiko-jvm"
     val jsWasmArtifactId = "skiko-js-wasm-runtime"
     fun runtimeArtifactIdFor(os: OS, arch: Arch) =
