@@ -6,8 +6,10 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
-class BouncingBalls: SkikoView {
+class BouncingBalls(private val withFps: Boolean = false): SkikoView {
     private data class Circle(var x: Float, var y: Float, var r: Float)
+
+    private val fpsCounter = FPSCounter(2.0, true)
 
     companion object {
         private fun moveCircle(c: Circle, s: Float, angle: Float, width: Int, height: Int, r: Float) {
@@ -85,6 +87,8 @@ class BouncingBalls: SkikoView {
     )).toMutableList()
 
     override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+        if (withFps) fpsCounter.tick()
+
         canvas.clear(-1)
         val dtime = (nanoTime - prevTimestamp)
         prevTimestamp = nanoTime

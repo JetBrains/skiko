@@ -36,7 +36,7 @@ internal class MetalRedrawer(
 
     private val frameDispatcher = FrameDispatcher(SkikoDispatchers.Main) {
         if (layer.isShowing()) {
-            update(getTimeNanos())
+            layer.update(getTimeNanos())
             draw()
         }
     }
@@ -49,8 +49,11 @@ internal class MetalRedrawer(
     }
 
     override fun dispose() {
-        frameDispatcher.cancel()
-        isDisposed = true
+        if (!isDisposed) {
+            frameDispatcher.cancel()
+            metalLayer.dispose()
+            isDisposed = true
+        }
     }
 
     override fun syncSize() {
@@ -71,12 +74,8 @@ internal class MetalRedrawer(
 
     override fun redrawImmediately() {
         check(!isDisposed) { "MetalRedrawer is disposed" }
-        update(getTimeNanos())
+        layer.update(getTimeNanos())
         draw()
-    }
-
-    private fun update(nanoTime: Long) {
-        layer.update(nanoTime)
     }
 
     private fun draw() {
@@ -127,23 +126,14 @@ class MetalLayer : CAMetalLayer {
         }
     }
 
-    fun draw()  {
-        skiaLayer.update(getTimeNanos())
-        skiaLayer.draw()
-    }
-
     fun dispose() {
         this.removeFromSuperlayer()
         // TODO: anything else to dispose the layer?
     }
 
-    @Suppress("unused")
-    private fun performDraw() {
-        draw()
-    }
-
     override fun drawInContext(ctx: CGContextRef?) {
-        draw()
+        skiaLayer.update(getTimeNanos())
+        skiaLayer.draw()
         super.drawInContext(ctx)
     }
 }

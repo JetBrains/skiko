@@ -2,8 +2,10 @@ package org.jetbrains.skiko.redrawer
 
 import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.useContents
+import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaLayerProperties
+import org.jetbrains.skiko.SkikoDispatchers
 import platform.CoreFoundation.CFTimeInterval
 import platform.CoreGraphics.CGRectMake
 import platform.CoreVideo.CVTimeStamp
@@ -15,19 +17,23 @@ import platform.QuartzCore.*
 import kotlin.system.getTimeNanos
 
 internal class MacOsOpenGLRedrawer(
-    private val layer: SkiaLayer,
+    private val skiaLayer: SkiaLayer,
     private val properties: SkiaLayerProperties
 ) : Redrawer {
-    private val drawLayer = MacosGLLayer(layer, setNeedsDisplayOnBoundsChange = true)
+    private val glLayer = MacosGLLayer(skiaLayer)
+
+    private val frameDispatcher = FrameDispatcher(SkikoDispatchers.Main) {
+        redrawImmediately()
+    }
 
     override fun dispose() { 
-        drawLayer.dispose()
+        glLayer.dispose()
     }
 
     override fun syncSize() {
         // TODO: What do we really do here?
-        layer.nsView.frame.useContents {
-            drawLayer.setFrame(
+        skiaLayer.nsView.frame.useContents {
+            glLayer.setFrame(
                 origin.x.toInt(),
                 origin.y.toInt(),
                 size.width.toInt().coerceAtLeast(0),
@@ -37,26 +43,22 @@ internal class MacOsOpenGLRedrawer(
     }
 
     override fun needRedraw() {
+        frameDispatcher.scheduleFrame()
     }
 
     override fun redrawImmediately() {
-        layer.update(getTimeNanos())
+        glLayer.setNeedsDisplay()
+        skiaLayer.nsView.setNeedsDisplay(true)
     }
 }
 
-class MacosGLLayer(val layer: SkiaLayer, setNeedsDisplayOnBoundsChange: Boolean) : CAOpenGLLayer() {
+internal class MacosGLLayer(val layer: SkiaLayer) : CAOpenGLLayer() {
     init {
-        this.setNeedsDisplayOnBoundsChange(setNeedsDisplayOnBoundsChange)
+        this.setNeedsDisplayOnBoundsChange(true)
         this.removeAllAnimations()
         this.setAutoresizingMask(kCALayerWidthSizable or kCALayerHeightSizable )
-        this.setAsynchronous(true)
         layer.nsView.layer = this
         layer.nsView.wantsLayer = true
-    }
-
-    fun draw()  { 
-        layer.update(getTimeNanos())
-        layer.draw()
     }
 
     fun setFrame(x: Int, y: Int, width: Int, height: Int) {
@@ -71,16 +73,6 @@ class MacosGLLayer(val layer: SkiaLayer, setNeedsDisplayOnBoundsChange: Boolean)
     fun dispose() {
         this.removeFromSuperlayer()
         // TODO: anything else to dispose the layer?
-    }
-
-    @Suppress("unused") 
-    private fun performDraw() {
-        try {
-            draw()
-        } catch (e: Throwable) {
-            e.printStackTrace()
-        }
-        //display.finish()
     }
 
     override fun canDrawInCGLContext(
@@ -99,9 +91,14 @@ class MacosGLLayer(val layer: SkiaLayer, setNeedsDisplayOnBoundsChange: Boolean)
         displayTime: CPointer<CVTimeStamp>?
     ) {
         CGLSetCurrentContext(ctx);
-        performDraw()
+        try {
+            layer.update(getTimeNanos())
+            layer.draw()
+        } catch (e: Throwable) {
+            e.printStackTrace()
+            throw e
+        }
 
-        //context.flush() // TODO: I thought the below should call context.flush().
         super.drawInCGLContext(ctx, pixelFormat,forLayerTime, displayTime)
     }
 }

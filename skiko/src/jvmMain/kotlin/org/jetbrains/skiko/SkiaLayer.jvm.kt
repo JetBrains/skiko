@@ -526,6 +526,20 @@ fun orderEmojiAndSymbolsPopup() {
     platformOperations.orderEmojiAndSymbolsPopup()
 }
 
+internal fun defaultFPSCounter(
+    component: Component
+): FPSCounter? = with(SkikoProperties) {
+    if (!SkikoProperties.fpsEnabled) return@with null
+
+    // it is slow on Linux (100ms), so we cache it. Also refreshRate available only after window is visible
+    val refreshRate by lazy { component.graphicsConfiguration.device.displayMode.refreshRate }
+    FPSCounter(
+        periodSeconds = fpsPeriodSeconds,
+        showLongFrames = fpsLongFramesShow,
+        getLongFrameMillis = { fpsLongFramesMillis ?: 1.5 * 1000 / refreshRate }
+    )
+}
+
 // InputEvent is abstract, so we wrap to match modality.
 actual class SkikoPlatformInputEvent(val wrapped: InputEvent)
 actual typealias SkikoPlatformKeyboardEvent = KeyEvent

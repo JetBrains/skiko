@@ -7,7 +7,7 @@ import org.jetbrains.skiko.*
 import kotlinx.cinterop.*
 import platform.Foundation.NSMakeRect
 
-fun makeApp() = BouncingBalls()
+fun makeApp() = BouncingBalls(true)
 
 fun main() {
     NSApplication.sharedApplication()
