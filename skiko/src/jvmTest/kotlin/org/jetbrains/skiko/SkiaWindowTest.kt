@@ -1,8 +1,7 @@
 package org.jetbrains.skiko
 
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.yield
+import kotlinx.coroutines.*
+import kotlinx.coroutines.swing.Swing
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.FontMgr
 import org.jetbrains.skia.Paint
@@ -14,7 +13,7 @@ import org.jetbrains.skia.paragraph.TextStyle
 import org.jetbrains.skiko.context.ContextHandler
 import org.jetbrains.skiko.redrawer.Redrawer
 import org.jetbrains.skiko.util.ScreenshotTestRule
-import org.jetbrains.skiko.util.swingTest
+import org.jetbrains.skiko.util.uiTest
 import org.junit.Assert.assertEquals
 import org.junit.Assume.assumeTrue
 import org.junit.Rule
@@ -64,7 +63,7 @@ class SkiaWindowTest {
     val screenshots = ScreenshotTestRule()
 
     @Test
-    fun `render single window`() = swingTest {
+    fun `render single window`() = uiTest {
         val window = SkiaWindow()
         try {
             window.setLocation(200, 200)
@@ -88,7 +87,7 @@ class SkiaWindowTest {
     }
 
     @Test
-    fun `render single window before window show`() = swingTest {
+    fun `render single window before window show`() = uiTest {
         val window = SkiaWindow()
         try {
             window.setLocation(200, 200)
@@ -114,7 +113,7 @@ class SkiaWindowTest {
     }
 
     @Test
-    fun `resize window`() = swingTest {
+    fun `resize window`() = uiTest {
         val window = SkiaWindow()
         try {
             window.setLocation(200, 200)
@@ -135,7 +134,7 @@ class SkiaWindowTest {
     }
 
     @Test
-    fun `render three windows`() = swingTest {
+    fun `render three windows`() = uiTest {
         fun window(color: Color) = SkiaWindow().apply {
             setLocation(200,200)
             setSize(400, 200)
@@ -171,7 +170,7 @@ class SkiaWindowTest {
     }
 
     @Test
-    fun `should call onRender after init, after resize, and only once after needRedraw`() = swingTest {
+    fun `should call onRender after init, after resize, and only once after needRedraw`() = uiTest {
         var renderCount = 0
 
         val window = SkiaWindow()
@@ -205,7 +204,7 @@ class SkiaWindowTest {
     }
 
     @Test(timeout = 60000)
-    fun `stress test - open multiple windows`() = swingTest {
+    fun `stress test - open multiple windows`() = uiTest {
         fun window(isAnimated: Boolean) = SkiaWindow().apply {
             setLocation(200,200)
             setSize(40, 20)
@@ -247,7 +246,7 @@ class SkiaWindowTest {
     }
 
     @Test(timeout = 60000)
-    fun `stress test - resize and paint immediately`() = swingTest {
+    fun `stress test - resize and paint immediately`() = uiTest {
         fun openWindow() = SkiaWindow(
             properties = SkiaLayerProperties(isVsyncEnabled = false, isVsyncFramelimitFallbackEnabled = true)
         ).apply {
@@ -270,7 +269,7 @@ class SkiaWindowTest {
     }
 
     @Test(timeout = 60000)
-    fun `stress test - open and paint immediately`() = swingTest {
+    fun `stress test - open and paint immediately`() = uiTest {
         fun openWindow() = SkiaWindow(
             properties = SkiaLayerProperties(isVsyncEnabled = false, isVsyncFramelimitFallbackEnabled = true)
         ).apply {
@@ -296,7 +295,7 @@ class SkiaWindowTest {
     }
 
     @Test(timeout = 60000)
-    fun `fallback to software renderer, fail on init context`() = swingTest {
+    fun `fallback to software renderer, fail on init context`() = uiTest {
         testFallbackToSoftware(
             object : RenderFactory {
                 override fun createContextHandler(
@@ -321,7 +320,7 @@ class SkiaWindowTest {
     }
 
     @Test(timeout = 60000)
-    fun `fallback to software renderer, fail on create redrawer`() = swingTest {
+    fun `fallback to software renderer, fail on create redrawer`() = uiTest {
         testFallbackToSoftware(
             object : RenderFactory {
                 override fun createContextHandler(
@@ -342,7 +341,7 @@ class SkiaWindowTest {
     }
 
     @Test(timeout = 60000)
-    fun `fallback to software renderer, fail on draw`() = swingTest {
+    fun `fallback to software renderer, fail on draw`() = uiTest {
         testFallbackToSoftware(
             object : RenderFactory {
                 override fun createContextHandler(
@@ -424,7 +423,7 @@ class SkiaWindowTest {
     }
 
     @Test(timeout = 20000)
-    fun `render continuously empty content without vsync`() = swingTest {
+    fun `render continuously empty content without vsync`() = uiTest {
         val targetDrawCount = 500
         var drawCount = 0
         val onDrawCompleted = CompletableDeferred<Unit>()
@@ -475,7 +474,7 @@ class SkiaWindowTest {
         testRenderText(OS.MacOS)
     }
 
-    private fun testRenderText(os: OS) = swingTest {
+    private fun testRenderText(os: OS) = uiTest {
         assumeTrue(hostOs == os)
 
         val window = SkiaWindow()

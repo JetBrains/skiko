@@ -3,7 +3,7 @@ package org.jetbrains.skiko
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.delay
 import org.jetbrains.skia.*
-import org.jetbrains.skiko.util.swingTest
+import org.jetbrains.skiko.util.uiTest
 import org.junit.Test
 import java.awt.Point
 import java.awt.event.WindowEvent
@@ -100,19 +100,35 @@ native crash in SkiaWindowTest "render single window"
                 return "$deviatedStr deviate by $percentTStr%"
             }
 
-            val deviated1 = deviated(expectedDeviatePercent1)
-            val deviated2 = deviated(expectedDeviatePercent2)
-            val deviated3 = deviated(expectedDeviatePercent3)
-            val deviatedTerminal = deviated(expectedDeviatePercentTerminal)
-
-            println(deviateMessage(expectedDeviatePercent1, deviated1 - deviated2 - deviated3 - deviatedTerminal))
-            println(deviateMessage(expectedDeviatePercent2, deviated2 - deviated3 - deviatedTerminal))
-            println(deviateMessage(expectedDeviatePercent3, deviated3 - deviatedTerminal))
-
-            if (deviatedTerminal.size > deviatedTerminalCount) {
-                throw AssertionError(deviateMessage(expectedDeviatePercentTerminal, deviatedTerminal))
+            if (
+                SkikoProperties.renderApi == GraphicsApi.SOFTWARE ||
+                SkikoProperties.renderApi == GraphicsApi.DIRECT_SOFTWARE
+            ) {
+                val slowFrames = frameTimeDeltas.filter { it > 1E9 / 55 }
+                val fastFrames = frameTimeDeltas.filter { it < expectedFrameNanos * 0.5 }
+                if (slowFrames.size > deviatedTerminalCount) {
+                    val str = slowFrames.map { String.format("%.1f", it / 1E6) }
+                    throw AssertionError("Framerate is too low:\n$str")
+                }
+                if (fastFrames.size > deviatedTerminalCount) {
+                    val str = fastFrames.map { String.format("%.1f", it / 1E6) }
+                    throw AssertionError("Framerate is too high:\n$str")
+                }
             } else {
-                println(deviateMessage(expectedDeviatePercentTerminal, deviatedTerminal))
+                val deviated1 = deviated(expectedDeviatePercent1)
+                val deviated2 = deviated(expectedDeviatePercent2)
+                val deviated3 = deviated(expectedDeviatePercent3)
+                val deviatedTerminal = deviated(expectedDeviatePercentTerminal)
+
+                println(deviateMessage(expectedDeviatePercent1, deviated1 - deviated2 - deviated3 - deviatedTerminal))
+                println(deviateMessage(expectedDeviatePercent2, deviated2 - deviated3 - deviatedTerminal))
+                println(deviateMessage(expectedDeviatePercent3, deviated3 - deviatedTerminal))
+
+                if (deviatedTerminal.size > deviatedTerminalCount) {
+                    throw AssertionError(deviateMessage(expectedDeviatePercentTerminal, deviatedTerminal))
+                } else {
+                    println(deviateMessage(expectedDeviatePercentTerminal, deviatedTerminal))
+                }
             }
 
             println()
@@ -132,7 +148,7 @@ native crash in SkiaWindowTest "render single window"
     }
 
     @Test
-    fun `FPS is near display refresh rate (multiple windows)`() = swingTest {
+    fun `FPS is near display refresh rate (multiple windows)`() = uiTest {
         val windows = (1..3).map { index ->
             TestWindow(width = 40, height = 20, frameCount = 300, deviatedTerminalCount = 20).apply {
                 toFront()
@@ -167,7 +183,7 @@ j  org.jetbrains.skiko.redrawer.MacOsRedrawer$drawLayer$1.draw()V+7
 
      */
     //@Test
-    fun `check FPS (elementary picture)`() = swingTest {
+    fun `check FPS (elementary picture)`() = uiTest {
         // we don't count FPS straightforward because in window mode there is always vsync (we can get rid of it only in exclusive fullscreen mode)
         // FPS will be capped by display's refresh rate.
         //

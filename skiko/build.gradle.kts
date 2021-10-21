@@ -924,7 +924,9 @@ tasks.withType<Test>().configureEach {
         systemProperty("skiko.jar.path", jar.absolutePath)
 
         systemProperty("skiko.test.screenshots.dir", File(project.projectDir, "src/jvmTest/screenshots").absolutePath)
-        systemProperty("skiko.test.window.test.enabled", System.getProperty("skiko.test.window.test.enabled", "false"))
+        systemProperty("skiko.test.ui.enabled", System.getProperty("skiko.test.ui.enabled", "false"))
+        // TODO make "true" by default after we fix all tests
+        systemProperty("skiko.test.ui.allRenderApi", System.getProperty("skiko.test.ui.allRenderApi", "false"))
 
         // Tests should be deterministic, so disable scaling.
         // On MacOs we need the actual scale, otherwise we will have aliased screenshots because of scaling.

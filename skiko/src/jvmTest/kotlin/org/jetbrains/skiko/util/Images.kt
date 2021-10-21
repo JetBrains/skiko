@@ -1,8 +1,8 @@
 package org.jetbrains.skiko.util
 
+import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.ByteBuffer
 import org.jetbrains.skia.Image
-import org.jetbrains.skia.Pixmap
 import java.awt.Color
 import java.io.InputStream
 import kotlin.math.abs
@@ -11,26 +11,12 @@ fun isContentSame(img1: Image, img2: Image, sensitivity: Double): Boolean {
     require(sensitivity in 0.0..1.0)
     val sensitivity255 = (sensitivity * 255).toInt()
     if (img1.width == img2.width && img1.height == img2.height) {
-        val pixMap1 = Pixmap()
-        val pixMap2 = Pixmap()
-
-        pixMap1.reset(
-            img1.imageInfo,
-            ByteBuffer.allocateDirect(img1.bytesPerPixel * img1.width * img1.height),
-            img1.bytesPerPixel * img1.width
-        )
-        pixMap2.reset(
-            img2.imageInfo,
-            ByteBuffer.allocateDirect(img2.bytesPerPixel * img2.width * img2.height),
-            img2.bytesPerPixel * img2.width
-        )
-        check(img1.readPixels(pixMap1, 0, 0, false))
-        check(img2.readPixels(pixMap2, 0, 0, false))
-
+        val pixels1 = Bitmap.makeFromImage(img1).readPixels()!!.toIntArray()
+        val pixels2 = Bitmap.makeFromImage(img2).readPixels()!!.toIntArray()
         for (y in 0 until img1.height) {
             for (x in 0 until img1.width) {
-                val color1 = Color(pixMap1.getColor(x, y))
-                val color2 = Color(pixMap2.getColor(x, y))
+                val color1 = Color(pixels1[y * img1.width + x])
+                val color2 = Color(pixels2[y * img1.width + x])
                 if (abs(color1.red - color2.red) > sensitivity255) {
                     return false
                 }
@@ -49,6 +35,13 @@ fun isContentSame(img1: Image, img2: Image, sensitivity: Double): Boolean {
         return false
     }
     return true
+}
+
+private fun ByteArray.toIntArray(): IntArray {
+    val buf = ByteBuffer.wrap(this).asIntBuffer()
+    val array = IntArray(buf.remaining())
+    buf.get(array)
+    return array
 }
 
 fun loadResourceImage(path: String) = useResource(path, ::loadImage)
