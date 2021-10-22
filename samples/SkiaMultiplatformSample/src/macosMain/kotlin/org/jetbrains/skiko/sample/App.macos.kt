@@ -6,11 +6,17 @@ import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
 import kotlinx.cinterop.*
 import platform.Foundation.NSMakeRect
+import platform.darwin.NSObject
 
-fun makeApp() = BouncingBalls(true)
+fun makeApp() = Clocks()
 
 fun main() {
-    NSApplication.sharedApplication()
+    val app = NSApplication.sharedApplication()
+    app.delegate = object: NSObject(), NSApplicationDelegateProtocol {
+        override fun applicationShouldTerminateAfterLastWindowClosed(sender: NSApplication): Boolean {
+            return true
+        }
+    }
     val windowStyle = NSWindowStyleMaskTitled or
                 NSWindowStyleMaskMiniaturizable or
                 NSWindowStyleMaskClosable or
@@ -24,5 +30,5 @@ fun main() {
     skiaLayer.skikoView = GenericSkikoView(skiaLayer, makeApp())
     skiaLayer.attachTo(window)
     window.orderFrontRegardless()
-    NSApp?.run()
+    app.run()
 }
