@@ -1,10 +1,7 @@
 package org.jetbrains.skiko
 
 import org.jetbrains.skia.Data
-import org.jetbrains.skia.FontFamilyName
 import org.jetbrains.skia.FontStyle
-import org.jetbrains.skia.FontVariation
-import org.jetbrains.skia.FontVariationAxis
 import org.jetbrains.skia.Typeface
 import org.jetbrains.skia.tests.makeFromResource
 import org.jetbrains.skiko.tests.runTest
@@ -13,12 +10,12 @@ import kotlin.test.*
 class TypefaceTest {
 
     @Test
-    fun typefaceCommonizedTest() = runTest {
+    fun typefaceTest() = runTest {
         // TODO Commonize array and string results and uncomment
-        val inter = Typeface.makeFromResource("./InterHinted-Regular.ttf")
-        val interV = Typeface.makeFromResource("./Inter-V.ttf")
-        val jbMono = Typeface.makeFromResource("./JetBrainsMono-Regular.ttf")
-        val jbMonoBold = Typeface.makeFromData(Data.makeFromResource("./JetBrainsMono-Bold.ttf"))
+        val inter = Typeface.makeFromResource("./fonts/InterHinted-Regular.ttf")
+        val interV = Typeface.makeFromResource("./fonts/Inter-V.ttf")
+        val jbMono = Typeface.makeFromResource("./fonts/JetBrainsMono-Regular.ttf")
+        val jbMonoBold = Typeface.makeFromData(Data.makeFromResource("./fonts/JetBrainsMono-Bold.ttf"))
 
         assertEquals(FontStyle.NORMAL, inter.fontStyle)
         assertFalse(inter.isBold)

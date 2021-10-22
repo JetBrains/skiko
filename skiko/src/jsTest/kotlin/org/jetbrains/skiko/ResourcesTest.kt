@@ -14,7 +14,7 @@ class ResourcesTest {
 
     @Test
     fun loadFromPathExternTest() = runTest {
-        val url = resourceURL("./FiraCode-Regular.ttf")
+        val url = resourceURL("./fonts/FiraCode-Regular.ttf")
         val res = loadBytesFromPath(url).sliceArray(0..9)
         assertContentEquals(byteArrayOf(
             0x00, 0x01, 0x00, 0x00, 0x00, 0x12, 0x01, 0x00, 0x00, 0x04
@@ -29,7 +29,7 @@ class ResourcesTest {
 
     @Test
     fun loadResourceExternTest() = runTest {
-        val res = loadResourceAsBytes("./FiraCode-Regular.ttf").sliceArray(0..9)
+        val res = loadResourceAsBytes("./fonts/FiraCode-Regular.ttf").sliceArray(0..9)
         assertContentEquals(byteArrayOf(
             0x00, 0x01, 0x00, 0x00, 0x00, 0x12, 0x01, 0x00, 0x00, 0x04
         ), res)
@@ -38,7 +38,7 @@ class ResourcesTest {
     @Test
     fun loadFromPathByNonLiteralPathTest() = runTest {
         suspend fun loadFont(style: String): ByteArray {
-            val url = resourceURL("./FiraCode-$style.ttf")
+            val url = resourceURL("./fonts/FiraCode-$style.ttf")
             val res = loadBytesFromPath(url).sliceArray(0..9)
 
             return res

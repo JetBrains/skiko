@@ -16,10 +16,10 @@ class FontCollectionTest {
     @Test
     fun fontCollectionTest() = runTest {
         val fm = TypefaceFontProvider()
-        val jbMono = Typeface.makeFromResource("JetBrainsMono-Regular.ttf", 0)
+        val jbMono = Typeface.makeFromResource("./fonts/JetBrainsMono-Regular.ttf", 0)
 
         fm.registerTypeface(jbMono)
-        val inter = Typeface.makeFromResource("InterHinted-Regular.ttf", 0)
+        val inter = Typeface.makeFromResource("./fonts/InterHinted-Regular.ttf", 0)
         fm.registerTypeface(inter, "Interface")
 
         // FontCollection
