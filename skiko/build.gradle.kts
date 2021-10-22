@@ -425,6 +425,9 @@ kotlin {
                 val iosArm64Main by getting {
                     dependsOn(iosMain)
                 }
+                val iosArm64Test by getting {
+                    dependsOn(iosTest)
+                }
             }
         }
     }
