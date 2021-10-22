@@ -2,7 +2,8 @@ package org.jetbrains.skia.tests
 
 import org.jetbrains.skia.Data
 import org.jetbrains.skia.Typeface
-import platform.Foundation.NSURL
+import platform.posix.realpath
+import kotlinx.cinterop.usePinned
 
 private const val RESOURCES_PATH = "src/commonTest/resources"
 
