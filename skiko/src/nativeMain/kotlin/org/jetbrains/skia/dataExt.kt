@@ -1,7 +1,5 @@
 package org.jetbrains.skia
 
-import org.jetbrains.skia.impl.InteropPointer
-import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.interopScope
 

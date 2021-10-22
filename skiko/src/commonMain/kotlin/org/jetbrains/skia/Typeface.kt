@@ -25,26 +25,7 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             Stats.onNativeCall()
             return Typeface(_nMakeFromName(name, style._value))
         }
-        /**
-         * @return  a new typeface given a file
-         * @throws IllegalArgumentException  If the file does not exist, or is not a valid font file
-         */
-        /**
-         * @return  a new typeface given a file
-         * @throws IllegalArgumentException  If the file does not exist, or is not a valid font file
-         */
-        fun makeFromFile(path: String, index: Int = 0): Typeface {
-            Stats.onNativeCall()
-            interopScope {
-                val ptr = _nMakeFromFile(toInterop(path), index)
-                require(ptr != NullPointer) { "Failed to create Typeface from path=\"$path\" index=$index" }
-                return Typeface(ptr)
-            }
-        }
-        /**
-         * @return  a new typeface given a Data
-         * @throws IllegalArgumentException  If the data is null, or is not a valid font file
-         */
+
         /**
          * @return  a new typeface given a Data
          * @throws IllegalArgumentException  If the data is null, or is not a valid font file
@@ -385,7 +366,7 @@ private external fun _nGetVariationAxes(ptr: NativePointer): Array<FontVariation
 private external fun _nMakeFromName(name: String?, fontStyle: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeFromFile")
-private external fun _nMakeFromFile(path: InteropPointer, index: Int): NativePointer
+internal external fun _nMakeFromFile(path: InteropPointer, index: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeFromData")
 private external fun _nMakeFromData(dataPtr: NativePointer, index: Int): NativePointer
