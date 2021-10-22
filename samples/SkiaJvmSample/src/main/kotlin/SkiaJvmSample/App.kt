@@ -4,6 +4,7 @@ import kotlinx.coroutines.*
 import org.jetbrains.skiko.*
 import java.awt.Color
 import java.awt.Dimension
+import java.awt.Rectangle
 import java.awt.Toolkit
 import java.awt.event.*
 import javax.swing.*
@@ -23,6 +24,7 @@ fun createWindow(title: String, exitOnClose: Boolean) = SwingUtilities.invokeLat
     val clocks = ClocksJvm(skiaLayer)
 
     val window = JFrame(title)
+    JdkEx.setHasCustomDecoration(window)
     window.defaultCloseOperation =
         if (exitOnClose) WindowConstants.EXIT_ON_CLOSE else WindowConstants.DISPOSE_ON_CLOSE
     window.title = title
@@ -117,4 +119,6 @@ fun createWindow(title: String, exitOnClose: Boolean) = SwingUtilities.invokeLat
     window.pack()
     skiaLayer.paint(window.graphics)
     window.isVisible = true
+    JdkEx.setCustomDecorationTitleBarHeight(window, 80)
+    JdkEx.setCustomDecorationHitTestSpots(window, listOf(Rectangle(0,0, 200, 80)))
 }
