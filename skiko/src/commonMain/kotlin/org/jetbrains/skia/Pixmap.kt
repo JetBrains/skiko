@@ -2,15 +2,21 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 
-class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
+class Pixmap internal constructor(
+    ptr: NativePointer,
+    // hold the reference to the java object to avoid its native buffer cleanup on finalization
+    private var javaBuffer: ByteBuffer? = null,
+    managed: Boolean
+) :
     Managed(ptr, _FinalizerHolder.PTR, managed) {
-    constructor() : this(_nMakeNull(), true) {
+    constructor() : this(_nMakeNull(), null,true) {
         Stats.onNativeCall()
     }
 
     fun reset() {
         Stats.onNativeCall()
         Pixmap_nReset(_ptr)
+        javaBuffer = null
         reachabilityBarrier(this)
     }
 
@@ -23,11 +29,13 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
             info.colorInfo.alphaType.ordinal,
             getPtr(info.colorInfo.colorSpace), addr, rowBytes
         )
+        javaBuffer = null
         reachabilityBarrier(this)
         reachabilityBarrier(info.colorInfo.colorSpace)
     }
 
     fun reset(info: ImageInfo, buffer: ByteBuffer, rowBytes: Int) {
+        javaBuffer = buffer
         reset(info, BufferUtil.getPointerFromByteBuffer(buffer), rowBytes)
     }
 
@@ -55,7 +63,11 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
     }
 
     fun extractSubset(buffer: ByteBuffer, area: IRect): Boolean {
-        return extractSubset(BufferUtil.getPointerFromByteBuffer(buffer), area)
+        try {
+            return extractSubset(BufferUtil.getPointerFromByteBuffer(buffer), area)
+        } finally {
+            reachabilityBarrier(buffer)
+        }
     }
 
     val info: ImageInfo
@@ -240,7 +252,7 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
         }
     }
 
-    val buffer: ByteBuffer?
+    val buffer: ByteBuffer
         get() = BufferUtil.getByteBufferFromPointer(addr, computeByteSize())
 
     private object _FinalizerHolder {
@@ -249,10 +261,14 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
 
     companion object {
         fun make(info: ImageInfo, buffer: ByteBuffer, rowBytes: Int): Pixmap {
-            return make(info, BufferUtil.getPointerFromByteBuffer(buffer), rowBytes)
+            return make(info, BufferUtil.getPointerFromByteBuffer(buffer), buffer, rowBytes)
         }
 
         fun make(info: ImageInfo, addr: NativePointer, rowBytes: Int): Pixmap {
+            return make(info, addr, buffer = null, rowBytes)
+        }
+
+        private fun make(info: ImageInfo, addr: NativePointer, buffer: ByteBuffer?, rowBytes: Int): Pixmap {
             return try {
                 val ptr = Pixmap_nMake(
                     info.width, info.height,
@@ -261,7 +277,7 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
                     getPtr(info.colorInfo.colorSpace), addr, rowBytes
                 )
                 require(ptr != NullPointer) { "Failed to create Pixmap." }
-                Pixmap(ptr, true)
+                Pixmap(ptr, buffer, true)
             } finally {
                 reachabilityBarrier(info.colorInfo.colorSpace)
             }
