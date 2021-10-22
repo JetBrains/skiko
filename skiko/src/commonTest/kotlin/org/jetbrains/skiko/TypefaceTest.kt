@@ -12,7 +12,7 @@ class TypefaceTest {
     @Test
     fun typefaceTest() = runTest {
         // TODO Commonize array and string results and uncomment
-        val inter = Typeface.makeFromResource("./fonts/InterHinted-Regular.ttf")
+        val inter = Typeface.makeFromResource("./fonts/Inter-Hinted-Regular.ttf")
         val interV = Typeface.makeFromResource("./fonts/Inter-V.ttf")
         val jbMono = Typeface.makeFromResource("./fonts/JetBrainsMono-Regular.ttf")
         val jbMonoBold = Typeface.makeFromData(Data.makeFromResource("./fonts/JetBrainsMono-Bold.ttf"))

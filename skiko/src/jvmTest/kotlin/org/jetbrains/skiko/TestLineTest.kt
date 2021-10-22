@@ -13,7 +13,7 @@ import org.jetbrains.skiko.tests.runTest
 
 class TextLineTest {
     private var inter36: suspend () -> Font = suspend {
-        Font(Typeface.makeFromResource("./fonts/InterHinted-Regular.ttf"), 36f)
+        Font(Typeface.makeFromResource("./fonts/Inter-Hinted-Regular.ttf"), 36f)
     }
     private var firaCode36: suspend () -> Font = suspend {
         Font(Typeface.makeFromResource("./fonts/FiraCode-Regular.ttf"), 36f)

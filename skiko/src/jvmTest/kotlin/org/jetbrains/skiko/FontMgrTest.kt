@@ -21,7 +21,7 @@ class FontMgrTest {
         val jbMonoBold = Typeface.makeFromResource("./fonts/JetBrainsMono-Bold.ttf")
         fontManager.registerTypeface(jbMonoBold)
 
-        val inter: Typeface = Typeface.makeFromResource("./fonts/InterHinted-Regular.ttf")
+        val inter: Typeface = Typeface.makeFromResource("./fonts/Inter-Hinted-Regular.ttf")
         fontManager.registerTypeface(inter, "Interface")
 
         assertEquals(2, fontManager.familiesCount)
