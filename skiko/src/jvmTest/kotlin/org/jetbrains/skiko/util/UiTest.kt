@@ -12,10 +12,8 @@ import java.awt.GraphicsEnvironment
 
 fun uiTest(block: suspend CoroutineScope.() -> Unit) {
     assumeFalse(GraphicsEnvironment.isHeadless())
-    assumeTrue(System.getProperty("skiko.test.ui.enabled", "false") == "true")
 
     runBlocking(Dispatchers.Swing) {
-        if (System.getProperty("skiko.test.ui.allRenderApi", "true") == "true") {
             SkikoProperties.fallbackRenderApiQueue.forEach {
                 withRenderApi(it) {
                     println("Testing $it renderApi")
@@ -23,9 +21,6 @@ fun uiTest(block: suspend CoroutineScope.() -> Unit) {
                     block()
                 }
             }
-        } else {
-            block()
-        }
     }
 }
 

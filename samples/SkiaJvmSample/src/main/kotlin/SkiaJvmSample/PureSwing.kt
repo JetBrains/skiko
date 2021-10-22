@@ -11,7 +11,6 @@ fun pureSwing() {
 
     window.contentPane.add(Button("Skiko").apply {
         addActionListener {
-            createWindow("Skiko", false)
         }
     }, BorderLayout.NORTH)
     window.contentPane.add(Button("Swing").apply {
