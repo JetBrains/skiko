@@ -18,17 +18,6 @@ class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
         }
 
         /**
-         * Create a new dataref the file with the specified path.
-         * If the file cannot be opened, this returns null.
-         */
-        fun makeFromFileName(path: String?): Data {
-            Stats.onNativeCall()
-            interopScope {
-                return Data(_nMakeFromFileName(toInterop(path)))
-            }
-        }
-
-        /**
          * Returns a new empty dataref (or a reference to a shared empty dataref).
          * New or shared, the caller must see that [.close] is eventually called.
          */
@@ -141,7 +130,7 @@ private external fun _nToByteBuffer(ptr: NativePointer): ByteBuffer
 private external fun _nMakeFromBytes(bytes: InteropPointer, offset: Int, length: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Data__1nMakeFromFileName")
-private external fun _nMakeFromFileName(path: InteropPointer): NativePointer
+internal external fun _nMakeFromFileName(path: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Data__1nMakeSubset")
 private external fun _nMakeSubset(ptr: NativePointer, offset: Int, length: Int): NativePointer

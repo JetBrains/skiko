@@ -2,6 +2,7 @@ package org.jetbrains.skia.tests
 
 import org.jetbrains.skia.Data
 import org.jetbrains.skia.Typeface
+import org.jetbrains.skia.makeFromFileName
 
 private const val RESOURCES_PATH = "src/commonTest/resources"
 
