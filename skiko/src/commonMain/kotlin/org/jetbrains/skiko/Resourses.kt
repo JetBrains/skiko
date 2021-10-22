@@ -1,3 +1,3 @@
 package org.jetbrains.skiko
 
-//expect suspend fun resourceBytes(resourcePath: String): ByteArray
+expect suspend fun loadBytesFromPath(path: String): ByteArray

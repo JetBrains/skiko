@@ -2,13 +2,9 @@ package org.jetbrains.skiko
 
 import kotlinx.browser.window
 import kotlinx.coroutines.await
-import org.jetbrains.skia.ExternalSymbolName
 import org.khronos.webgl.Int8Array
 
-@ExternalSymbolName("require")
-external fun resourceURL(resource: String): String
-
-suspend fun loadBytesFromPath(path: String): ByteArray {
+actual suspend fun loadBytesFromPath(path: String): ByteArray {
     val arrayBuffer = window.fetch(path)
         .await()
         .arrayBuffer()
@@ -17,6 +13,3 @@ suspend fun loadBytesFromPath(path: String): ByteArray {
     return byteArray.unsafeCast<ByteArray>()
 }
 
-suspend inline fun loadResourceAsBytes(resourcePath: String): ByteArray {
-    return loadBytesFromPath(resourceURL(resourcePath))
-}
