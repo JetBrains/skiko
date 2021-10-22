@@ -5,7 +5,7 @@ import org.jetbrains.skia.impl.*
 class Pixmap internal constructor(
     ptr: NativePointer,
     // hold the reference to the java object to avoid its native buffer cleanup on finalization
-    private var javaBuffer: ByteBuffer? = null,
+     var javaBuffer: ByteBuffer? = null,
     managed: Boolean
 ) :
     Managed(ptr, _FinalizerHolder.PTR, managed) {
@@ -35,8 +35,8 @@ class Pixmap internal constructor(
     }
 
     fun reset(info: ImageInfo, buffer: ByteBuffer, rowBytes: Int) {
-        javaBuffer = buffer
         reset(info, BufferUtil.getPointerFromByteBuffer(buffer), rowBytes)
+        javaBuffer = buffer
     }
 
     fun setColorSpace(colorSpace: ColorSpace?) {
