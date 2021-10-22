@@ -14,7 +14,9 @@ actual abstract class Native actual constructor(ptr: NativePointer) {
 
     override fun hashCode(): Int = _ptr
 
-    actual open fun _nativeEquals(other: Native?): Boolean = TODO()
+    actual open fun _nativeEquals(other: Native?): Boolean {
+        return false
+    }
 
     actual companion object {
         actual val NullPointer: NativePointer

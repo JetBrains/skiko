@@ -19,7 +19,9 @@ actual abstract class Native actual constructor(ptr: NativePointer) {
         return _ptr.toLong().hashCode()
     }
 
-    actual open fun _nativeEquals(other: Native?): Boolean = this._ptr == other?._ptr ?: Native.NullPointer
+    actual open fun _nativeEquals(other: Native?): Boolean {
+        return false
+    }
 
     actual companion object {
         actual val NullPointer: NativePointer
