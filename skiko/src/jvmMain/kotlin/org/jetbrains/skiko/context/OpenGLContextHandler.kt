@@ -73,4 +73,13 @@ internal class OpenGLContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
             "Model: ${gl.glGetString(gl.GL_RENDERER)}\n" +
             "Total VRAM: ${gl.glGetIntegerv(gl.GL_TOTAL_MEMORY) / 1024} MB\n"
     }
+
+    fun disposeInOpenGLContext() {
+        super.dispose()
+    }
+
+    // dispose should be called only in the OpenGL context.
+    // TODO remove in https://github.com/JetBrains/skiko/pull/300
+    override open fun dispose() {
+    }
 }

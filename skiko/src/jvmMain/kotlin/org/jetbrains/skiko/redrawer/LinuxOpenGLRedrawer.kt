@@ -3,6 +3,7 @@ package org.jetbrains.skiko.redrawer
 import kotlinx.coroutines.*
 import kotlinx.coroutines.swing.Swing
 import org.jetbrains.skiko.*
+import org.jetbrains.skiko.context.OpenGLContextHandler
 
 internal class LinuxOpenGLRedrawer(
     private val layer: SkiaLayer,
@@ -51,6 +52,8 @@ internal class LinuxOpenGLRedrawer(
             // makeCurrent is mandatory to destroy context, otherwise, OpenGL will destroy wrong context (from another window).
             // see the official example: https://www.khronos.org/opengl/wiki/Tutorial:_OpenGL_3.0_Context_Creation_(GLX)
             it.makeCurrent(context)
+            // TODO remove in https://github.com/JetBrains/skiko/pull/300
+            (layer.contextHandler as OpenGLContextHandler).disposeInOpenGLContext()
             it.destroyContext(context)
         }
         runBlocking {

@@ -212,7 +212,7 @@ actual open class SkiaLayer internal constructor(
     @Volatile
     private var isDisposed = false
     internal var redrawer: Redrawer? = null
-    private var contextHandler: ContextHandler? = null
+    internal var contextHandler: ContextHandler? = null
     private val fallbackRenderApiQueue = SkikoProperties.fallbackRenderApiQueue.toMutableList()
     private var renderApi_ = fallbackRenderApiQueue[0]
     actual var renderApi: GraphicsApi
