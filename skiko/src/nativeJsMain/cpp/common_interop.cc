@@ -111,6 +111,19 @@ SkString skString(KInteropPointer s) {
     }
 }
 
+std::vector<SkString> skStringVector(KInteropPointerArray arr, KInt len) {
+    if (arr == nullptr) {
+        return std::vector<SkString>(0);
+    } else {
+        std::vector<SkString> res(len);
+        char** strings = reinterpret_cast<char**>(arr);
+        for (KInt i = 0; i < len; ++i) {
+            res[i] = skString(strings[i]);
+        }
+        return res;
+    }
+}
+
 namespace skija {
     namespace RRect {
         SkRRect toSkRRect(KFloat left, KFloat top, KFloat right, KFloat bottom, KFloat* radii, KInt radiiSize) {

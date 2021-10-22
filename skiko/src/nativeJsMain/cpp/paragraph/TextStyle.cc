@@ -241,17 +241,10 @@ SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_paragraph_TextStyle__1nGetF
 
 
 SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nSetFontFamilies
-  (KNativePointer ptr, KInteropPointerArray familiesArray) {
-    TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nSetFontFamilies");
-}
-     
-#if 0 
-SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nSetFontFamilies
-  (KNativePointer ptr, KInteropPointerArray familiesArray) {
+  (KNativePointer ptr, KInteropPointerArray familiesArray, KInt familiesArraySize) {
     TextStyle* instance = reinterpret_cast<TextStyle*>((ptr));
-    instance->setFontFamilies(skStringVector(env, familiesArray));
+    instance->setFontFamilies(skStringVector(familiesArray, familiesArraySize));
 }
-#endif
 
 
 

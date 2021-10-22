@@ -238,7 +238,7 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     fun setFontFamilies(families: Array<String>?): TextStyle {
         Stats.onNativeCall()
         interopScope {
-            _nSetFontFamilies(_ptr, toInterop(families))
+            _nSetFontFamilies(_ptr, toInterop(families), families?.size ?: 0)
         }
         return this
     }
@@ -466,7 +466,7 @@ private external fun _nAddFontFeature(ptr: NativePointer, name: String?, value: 
 private external fun _nClearFontFeatures(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetFontFamilies")
-private external fun _nSetFontFamilies(ptr: NativePointer, families: InteropPointer)
+private external fun _nSetFontFamilies(ptr: NativePointer, families: InteropPointer, familiesSize: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetLetterSpacing")
 private external fun _nGetLetterSpacing(ptr: NativePointer): Float

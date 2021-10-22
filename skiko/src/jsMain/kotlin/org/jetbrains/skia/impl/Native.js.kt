@@ -5,7 +5,18 @@ import org.khronos.webgl.ArrayBufferView
 actual abstract class Native actual constructor(ptr: NativePointer) {
     actual var _ptr: NativePointer
 
-    actual open fun _nativeEquals(other: Native?): Boolean = TODO()
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (null == other) return false
+        if (other !is Native) return false
+        return if (_ptr == other._ptr) true else _nativeEquals(other)
+    }
+
+    override fun hashCode(): Int = _ptr
+
+    actual open fun _nativeEquals(other: Native?): Boolean {
+        return false
+    }
 
     actual companion object {
         actual val NullPointer: NativePointer
