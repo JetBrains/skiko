@@ -1,12 +1,7 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.RefCnt
-import org.jetbrains.skia.impl.Native
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.reachabilityBarrier
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.getPtr
 
 class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
@@ -40,9 +35,11 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
          */
         fun makeFromFile(path: String, index: Int = 0): Typeface {
             Stats.onNativeCall()
-            val ptr = _nMakeFromFile(path, index)
-            require(ptr != NullPointer) { "Failed to create Typeface from path=\"$path\" index=$index" }
-            return Typeface(ptr)
+            interopScope {
+                val ptr = _nMakeFromFile(toInterop(path), index)
+                require(ptr != NullPointer) { "Failed to create Typeface from path=\"$path\" index=$index" }
+                return Typeface(ptr)
+            }
         }
         /**
          * @return  a new typeface given a Data
@@ -388,7 +385,7 @@ private external fun _nGetVariationAxes(ptr: NativePointer): Array<FontVariation
 private external fun _nMakeFromName(name: String?, fontStyle: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeFromFile")
-private external fun _nMakeFromFile(path: String?, index: Int): NativePointer
+private external fun _nMakeFromFile(path: InteropPointer, index: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeFromData")
 private external fun _nMakeFromData(dataPtr: NativePointer, index: Int): NativePointer
