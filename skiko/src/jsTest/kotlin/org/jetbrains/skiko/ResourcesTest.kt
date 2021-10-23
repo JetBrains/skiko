@@ -9,7 +9,7 @@ class ResourcesTest {
     @Test
     fun loadFromPathInlineTest() = runTest {
         val bytes = loadBytesFromPath(resourcePath("./hello_world.txt"))
-        assertContentEquals("Hello, world!\n".encodeToByteArray(), bytes)
+        assertContentEquals("Hello, world!".encodeToByteArray(), bytes)
     }
 
     @Test
@@ -24,7 +24,7 @@ class ResourcesTest {
     @Test
     fun loadResourceInlineTest() = runTest {
         val bytes = loadResourceAsBytes("./hello_world.txt")
-        assertContentEquals("Hello, world!\n".encodeToByteArray(), bytes)
+        assertContentEquals("Hello, world!".encodeToByteArray(), bytes)
     }
 
     @Test
