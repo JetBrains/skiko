@@ -17,6 +17,15 @@ class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
             )
         }
 
+        fun makeWithoutCopy(memoryAddr: NativePointer, length: Int): Data {
+            Stats.onNativeCall()
+            return Data(
+                interopScope {
+                    _nMakeWithoutCopy(memoryAddr, length)
+                }
+            )
+        }
+
         /**
          * Returns a new empty dataref (or a reference to a shared empty dataref).
          * New or shared, the caller must see that [.close] is eventually called.
@@ -96,10 +105,10 @@ class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
         }
     }
 
-    fun toByteBuffer(): ByteBuffer {
+    fun writableData(): NativePointer {
         return try {
             Stats.onNativeCall()
-            _nToByteBuffer(_ptr)
+            _nWritableData(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -123,11 +132,11 @@ private external fun _nBytes(ptr: NativePointer, offset: Int, length: Int, destB
 @ExternalSymbolName("org_jetbrains_skia_Data__1nEquals")
 private external fun _nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
 
-@ExternalSymbolName("org_jetbrains_skia_Data__1nToByteBuffer")
-private external fun _nToByteBuffer(ptr: NativePointer): ByteBuffer
-
 @ExternalSymbolName("org_jetbrains_skia_Data__1nMakeFromBytes")
 private external fun _nMakeFromBytes(bytes: InteropPointer, offset: Int, length: Int): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Data__1nMakeWithoutCopy")
+private external fun _nMakeWithoutCopy(memoryAddr: NativePointer, length: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Data__1nMakeFromFileName")
 internal external fun _nMakeFromFileName(path: InteropPointer): NativePointer
@@ -137,3 +146,6 @@ private external fun _nMakeSubset(ptr: NativePointer, offset: Int, length: Int):
 
 @ExternalSymbolName("org_jetbrains_skia_Data__1nMakeEmpty")
 private external fun _nMakeEmpty(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Data__1nWritableData")
+private external fun _nWritableData(dataPtr: NativePointer): NativePointer

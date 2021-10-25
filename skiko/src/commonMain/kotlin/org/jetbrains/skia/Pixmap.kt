@@ -27,8 +27,8 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
         reachabilityBarrier(info.colorInfo.colorSpace)
     }
 
-    fun reset(info: ImageInfo, buffer: ByteBuffer, rowBytes: Int) {
-        reset(info, BufferUtil.getPointerFromByteBuffer(buffer), rowBytes)
+    fun reset(info: ImageInfo, buffer: Data, rowBytes: Int) {
+        reset(info, buffer.writableData(), rowBytes)
     }
 
     fun setColorSpace(colorSpace: ColorSpace?) {
@@ -54,8 +54,8 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
         }
     }
 
-    fun extractSubset(buffer: ByteBuffer, area: IRect): Boolean {
-        return extractSubset(BufferUtil.getPointerFromByteBuffer(buffer), area)
+    fun extractSubset(buffer: Data, area: IRect): Boolean {
+        return extractSubset(buffer.writableData(), area)
     }
 
     val info: ImageInfo
@@ -240,16 +240,16 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
         }
     }
 
-    val buffer: ByteBuffer?
-        get() = BufferUtil.getByteBufferFromPointer(addr, computeByteSize())
+    val buffer: Data
+        get() = Data.makeWithoutCopy(addr, computeByteSize())
 
     private object _FinalizerHolder {
         val PTR = Pixmap_nGetFinalizer()
     }
 
     companion object {
-        fun make(info: ImageInfo, buffer: ByteBuffer, rowBytes: Int): Pixmap {
-            return make(info, BufferUtil.getPointerFromByteBuffer(buffer), rowBytes)
+        fun make(info: ImageInfo, buffer: Data, rowBytes: Int): Pixmap {
+            return make(info, buffer.writableData(), rowBytes)
         }
 
         fun make(info: ImageInfo, addr: NativePointer, rowBytes: Int): Pixmap {

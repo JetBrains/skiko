@@ -1,6 +1,5 @@
 package org.jetbrains.skiko.tests
 
-import org.jetbrains.skia.ByteBuffer
 import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.*
 
@@ -36,12 +35,6 @@ class TestHelpers {
         }
     }
 
-    fun getPointerFromByteBuffer(buffer: ByteBuffer): NativePointer {
-        val result = _nGetPointerFromByteBuffer(buffer)
-        require(result != Native.NullPointer) { "The given buffer " + buffer + "is not a direct buffer or current JVM doesn't support JNI direct buffer access!" }
-        return result
-    }
-
     init {
         Library.staticLoad()
     }
@@ -61,6 +54,3 @@ private external fun _nFillIntArrayOf5(interopPointer: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skiko_tests_TestHelpers__1nFillDoubleArrayOf5")
 private external fun _nFillDoubleArrayOf5(interopPointer: InteropPointer)
-
-@ExternalSymbolName("org_jetbrains_skiko_tests_TestHelpers__1nGetPointerFromByteBuffer")
-private external fun _nGetPointerFromByteBuffer(buffer: ByteBuffer?): NativePointer

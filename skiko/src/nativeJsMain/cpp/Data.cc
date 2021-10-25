@@ -19,22 +19,6 @@ SKIKO_EXPORT KInt org_jetbrains_skia_Data__1nSize
     return instance->size();
 }
 
-
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Data__1nToByteBuffer
-  (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_Data__1nToByteBuffer");
-}
-
-#if 0
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Data__1nToByteBuffer
-  (KNativePointer ptr) {
-    SkData* instance = reinterpret_cast<SkData*>((ptr));
-    return env->NewDirectByteBuffer(instance->writable_data(), instance->size());
-}
-#endif
-
-
-
 SKIKO_EXPORT void org_jetbrains_skia_Data__1nBytes
   (KNativePointer ptr, int offset, int length, KByte* destBytes) {
     SkData* instance = reinterpret_cast<SkData*>(ptr);
@@ -58,6 +42,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Data__1nMakeFromBytes
     return instance;
 }
 
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_Data__1nMakeWithoutCopy
+    (KNativePointer memoryAddr, KInt length) {
+
+    SkData* instance = SkData::MakeWithoutCopy(reinterpret_cast<void*>(memoryAddr), length).release();
+    return reinterpret_cast<KNativePointer>(instance);
+}
+
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Data__1nMakeFromFileName
   (KInteropPointer pathStr) {
     SkString path = skString(pathStr);
@@ -76,4 +67,10 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Data__1nMakeSubset
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Data__1nMakeEmpty() {
     SkData* instance = SkData::MakeEmpty().release();
     return reinterpret_cast<KNativePointer>(instance);
+}
+
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_Data__1nWritableData
+  (KNativePointer ptr) {
+    SkData* instance = reinterpret_cast<SkData*>(ptr);
+    return reinterpret_cast<KNativePointer>(instance->writable_data());
 }

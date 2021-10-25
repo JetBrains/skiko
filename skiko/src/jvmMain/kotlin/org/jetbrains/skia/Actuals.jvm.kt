@@ -2,8 +2,6 @@ package org.jetbrains.skia
 
 import java.util.*
 
-actual typealias ByteBuffer = java.nio.ByteBuffer
-
 actual fun <R> commonSynchronized(lock: Any, block: () -> R) {
     synchronized(lock, block)
 }

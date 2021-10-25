@@ -5,6 +5,7 @@ import org.jetbrains.skia.ColorAlphaType
 import org.jetbrains.skia.ColorType
 import org.jetbrains.skia.ImageInfo
 import org.jetbrains.skia.Image
+import org.jetbrains.skia.impl.BufferUtil
 import java.awt.Transparency
 import java.awt.color.ColorSpace
 import java.awt.image.*
@@ -19,6 +20,33 @@ private class DirectDataBuffer(val backing: ByteBuffer): DataBuffer(TYPE_BYTE, b
     }
 }
 
+fun Bitmap.toBufferedImage(): BufferedImage {
+    val pixelsNativePointer = this.peekPixels()!!.addr
+    val pixelsBuffer = BufferUtil.getByteBufferFromPointer(pixelsNativePointer, this.rowBytes * this.height)
+
+    val order = when (this.colorInfo.colorType) {
+        ColorType.RGB_888X -> intArrayOf(0, 1, 2, 3)
+        ColorType.BGRA_8888 -> intArrayOf(2, 1, 0, 3)
+        else -> throw UnsupportedOperationException("unsupported color type ${this.colorInfo.colorType}")
+    }
+    val raster = Raster.createInterleavedRaster(
+        DirectDataBuffer(pixelsBuffer),
+        this.width,
+        this.height,
+        this.width * 4,
+        4,
+        order,
+        null
+    )
+    val colorModel = ComponentColorModel(
+        ColorSpace.getInstance(ColorSpace.CS_sRGB),
+        true,
+        false,
+        Transparency.TRANSLUCENT,
+        DataBuffer.TYPE_BYTE
+    )
+   return BufferedImage(colorModel, raster!!, false, null)
+}
 
 fun BufferedImage.toBitmap(): Bitmap {
     val bytesPerPixel = 4
