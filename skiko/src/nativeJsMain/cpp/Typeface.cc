@@ -9,16 +9,9 @@
 
 SKIKO_EXPORT KInt org_jetbrains_skia_Typeface__1nGetFontStyle
   (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_Typeface__1nGetFontStyle");
-}
-     
-#if 0 
-SKIKO_EXPORT KInt org_jetbrains_skia_Typeface__1nGetFontStyle
-  (KNativePointer ptr) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>((ptr));
-    return skija::FontStyle::toJava(instance->fontStyle());
+    return skija::FontStyle::toKotlin(instance->fontStyle());
 }
-#endif
 
 
 SKIKO_EXPORT KBoolean org_jetbrains_skia_Typeface__1nIsFixedPitch
@@ -139,18 +132,11 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Typeface__1nMakeFromName
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Typeface__1nMakeFromFile
   (KInteropPointer pathStr, KInt index) {
-    TODO("implement org_jetbrains_skia_Typeface__1nMakeFromFile");
-}
-     
-#if 0 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_Typeface__1nMakeFromFile
-  (KInteropPointer pathStr, KInt index) {
-    SkString path = skString(env, pathStr);
+    SkString path = skString(pathStr);
     sk_sp<SkTypeface> instance = SkTypeface::MakeFromFile(path.c_str(), index);
     SkTypeface* ptr = setDefaultVariationCoords(instance).release();
     return reinterpret_cast<KNativePointer>(ptr);
 }
-#endif
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Typeface__1nMakeFromData

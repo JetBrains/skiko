@@ -3,24 +3,26 @@ package org.jetbrains.skiko
 import org.jetbrains.skia.Data
 import org.jetbrains.skia.FontStyle
 import org.jetbrains.skia.Typeface
+import org.jetbrains.skia.makeFromFileName
 import org.jetbrains.skia.paragraph.TypefaceFontProvider
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import org.jetbrains.skia.tests.makeFromResource
+import org.jetbrains.skiko.tests.runTest
 
 class FontMgrTest {
     @Test
-    fun fontMgrTest() {
+    fun fontMgrTest() = runTest {
         val fontManager = TypefaceFontProvider()
 
-        val jbMono = Typeface.makeFromResource("JetBrainsMono-Regular.ttf")
+        val jbMono = Typeface.makeFromResource("./fonts/JetBrainsMono-Regular.ttf")
         fontManager.registerTypeface(jbMono)
 
-        val jbMonoBold = Typeface.makeFromResource("JetBrainsMono-Bold.ttf")
+        val jbMonoBold = Typeface.makeFromResource("./fonts/JetBrainsMono-Bold.ttf")
         fontManager.registerTypeface(jbMonoBold)
 
-        val inter: Typeface = Typeface.makeFromResource("InterHinted-Regular.ttf")
+        val inter: Typeface = Typeface.makeFromResource("./fonts/Inter-Hinted-Regular.ttf")
         fontManager.registerTypeface(inter, "Interface")
 
         assertEquals(2, fontManager.familiesCount)
@@ -84,7 +86,7 @@ class FontMgrTest {
             fontManager.matchFamilyStyleCharacter("JetBrains Mono", FontStyle.BOLD, arrayOf("en-US"), 65 /* A */)
         )
 
-        Data.makeFromFileName("src/jvmTest/resources/fonts/JetBrainsMono-Italic.ttf").use { data ->
+        Data.makeFromFileName("src/commonTest/resources/fonts/JetBrainsMono-Italic.ttf").use { data ->
             fontManager.makeFromData(data).use {
                 fontManager.matchFamily("JetBrains Mono").use { styleSet ->
                     assertEquals(2, fontManager.familiesCount)

@@ -60,7 +60,10 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Data__1nMakeFromBytes
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Data__1nMakeFromFileName
   (KInteropPointer pathStr) {
-    TODO("implement org_jetbrains_skia_Data__1nMakeFromFileName");
+    SkString path = skString(pathStr);
+    sk_sp<SkData> instance = SkData::MakeFromFileName(path.c_str());
+    SkData* ptr = instance.release();
+    return reinterpret_cast<KNativePointer>(ptr);
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Data__1nMakeSubset

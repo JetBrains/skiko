@@ -387,17 +387,20 @@ kotlin {
                 val darwinMain by creating {
                     dependsOn(nativeMain)
                 }
+                val darwinTest by creating {
+                    dependsOn(nativeTest)
+                }
                 val macosMain by creating {
                     dependsOn(darwinMain)
                 }
                 val macosTest by creating {
-                    dependsOn(nativeTest)
+                    dependsOn(darwinTest)
                 }
                 val iosMain by creating {
                     dependsOn(darwinMain)
                 }
                 val iosTest by creating {
-                    dependsOn(nativeTest)
+                    dependsOn(darwinTest)
                 }
                 val macosArch = when (targetArch) {
                     Arch.X64 -> {

@@ -13,13 +13,6 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_paragraph_TypefaceFontProvider__1
     return reinterpret_cast<KNativePointer>(instance);
 }
 
-
-SKIKO_EXPORT void org_jetbrains_skia_paragraph_TypefaceFontProvider__1nRegisterTypeface
-  (KNativePointer ptr, KNativePointer typefacePtr, KInteropPointer aliasStr) {
-    TODO("implement org_jetbrains_skia_paragraph_TypefaceFontProvider__1nRegisterTypeface");
-}
-     
-#if 0 
 SKIKO_EXPORT void org_jetbrains_skia_paragraph_TypefaceFontProvider__1nRegisterTypeface
   (KNativePointer ptr, KNativePointer typefacePtr, KInteropPointer aliasStr) {
     TypefaceFontProvider* instance = reinterpret_cast<TypefaceFontProvider*>((ptr));
@@ -27,7 +20,6 @@ SKIKO_EXPORT void org_jetbrains_skia_paragraph_TypefaceFontProvider__1nRegisterT
     if (aliasStr == nullptr)
         instance->registerTypeface(sk_ref_sp(typeface));
     else
-        instance->registerTypeface(sk_ref_sp(typeface), skString(env, aliasStr));
+        instance->registerTypeface(sk_ref_sp(typeface), skString(aliasStr));
 }
-#endif
 
