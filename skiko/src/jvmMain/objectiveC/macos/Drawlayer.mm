@@ -177,7 +177,7 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getContentHandle(
     return (jlong)window;
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_osxDisableTitleBar(JNIEnv *env, jobject properties, jlong platformInfoPtr)
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_osxDisableTitleBar(JNIEnv *env, jobject properties, jlong platformInfoPtr, jfloat customHeaderHeight)
 {
     NSWindow* window = findWindow(platformInfoPtr);
     if (window == nil) return;
@@ -185,6 +185,28 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_osxDisableT
         [window setTitlebarAppearsTransparent:YES];
         [window setTitleVisibility:NSWindowTitleHidden];
         [window setStyleMask:[window styleMask]|NSWindowStyleMaskFullSizeContentView];
+
+        NSButton *closeButton = [window standardWindowButton:NSWindowCloseButton];
+        NSButton *minButton = [window standardWindowButton:NSWindowMiniaturizeButton];
+        NSButton *zoomButton = [window standardWindowButton:NSWindowZoomButton];
+        const CGFloat dx = [minButton frame].origin.x - [closeButton frame].origin.x;
+        const CGFloat buttonHeight = [closeButton frame].size.height;
+        const CGFloat correctionPixel = 1.0f; // todo[unterhofer] No idea why we need this
+        const CGFloat padding = (customHeaderHeight - buttonHeight) / 2.0f + correctionPixel;
+
+        NSView *titlebarView = closeButton.superview;
+        NSArray* windowButtons = @[ closeButton, minButton, zoomButton ];
+        for (NSUInteger i = 0; i < windowButtons.count; i++) {
+            NSView* button = [windowButtons objectAtIndex:i];
+            CGRect rect = [button frame];
+            button.translatesAutoresizingMaskIntoConstraints = NO;
+            [titlebarView addConstraints:@[
+                [NSLayoutConstraint constraintWithItem:button attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:titlebarView attribute:NSLayoutAttributeTop multiplier:1 constant:padding],
+                [NSLayoutConstraint constraintWithItem:button attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:titlebarView attribute:NSLayoutAttributeLeft multiplier:1 constant:(padding + i * dx)]
+            ]];
+        }
+
+        // todo[unterhofer] adjust the height of the draggable area
     });
 }
 
