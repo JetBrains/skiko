@@ -81,19 +81,17 @@ SKIKO_EXPORT void org_jetbrains_skia_Paint__1nSetColor
 }
 
 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Paint__1nGetColor4f
-  (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_Paint__1nGetColor4f");
-}
-
-#if 0
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Paint__1nGetColor4f
-  (KNativePointer ptr) {
+SKIKO_EXPORT void org_jetbrains_skia_Paint__1nGetColor4f
+  (KNativePointer ptr, KInteropPointer result) {
     SkPaint* instance = reinterpret_cast<SkPaint*>((ptr));
+    float* res = reinterpret_cast<float*>(result);
     SkColor4f color = instance->getColor4f();
-    return env->NewObject(skija::Color4f::cls, skija::Color4f::ctor, color.fR, color.fG, color.fB, color.fA);
+
+    res[0] = color.fR;
+    res[1] = color.fG;
+    res[2] = color.fB;
+    res[3] = color.fA;
 }
-#endif
 
 
 SKIKO_EXPORT void org_jetbrains_skia_Paint__1nSetColor4f

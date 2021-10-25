@@ -80,11 +80,12 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PaintKt__1nSetColor
     instance->setColor(color);
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_PaintKt__1nGetColor4f
-  (JNIEnv* env, jclass jclass, jlong ptr) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PaintKt__1nGetColor4f
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray result) {
     SkPaint* instance = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(ptr));
     SkColor4f color = instance->getColor4f();
-    return env->NewObject(skija::Color4f::cls, skija::Color4f::ctor, color.fR, color.fG, color.fB, color.fA);
+    float data[4] { color.fR, color.fG, color.fB, color.fA };
+    env->SetFloatArrayRegion(result, 0, 4, data);
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PaintKt__1nSetColor4f

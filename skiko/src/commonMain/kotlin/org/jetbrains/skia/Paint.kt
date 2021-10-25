@@ -1,12 +1,7 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.Managed
-import org.jetbrains.skia.impl.Native
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.reachabilityBarrier
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.getPtr
 import kotlin.math.round
 
 class Paint : Managed {
@@ -187,7 +182,9 @@ class Paint : Managed {
     var color4f: Color4f
         get() = try {
             Stats.onNativeCall()
-            _nGetColor4f(_ptr)
+            Color4f(withResult(FloatArray(4)) {
+                _nGetColor4f(_ptr, it)
+            })
         } finally {
             reachabilityBarrier(this)
         }
@@ -644,7 +641,7 @@ private external fun _nSetMode(ptr: NativePointer, value: Int)
 private external fun Paint_nGetColor(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetColor4f")
-private external fun _nGetColor4f(ptr: NativePointer): Color4f
+private external fun _nGetColor4f(ptr: NativePointer, arr: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetColor")
 private external fun _nSetColor(ptr: NativePointer, argb: Int)
