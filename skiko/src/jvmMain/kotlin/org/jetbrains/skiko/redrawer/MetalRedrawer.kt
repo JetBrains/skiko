@@ -9,7 +9,6 @@ import org.jetbrains.skia.BackendRenderTarget
 import org.jetbrains.skia.DirectContext
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.context.MetalContextHandler
-import org.jetbrains.skiko.context.OpenGLContextHandler
 import javax.swing.SwingUtilities.*
 
 internal class MetalRedrawer(

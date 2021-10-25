@@ -48,7 +48,6 @@ internal class MacOsOpenGLRedrawer(
                 size.height.toInt().coerceAtLeast(0)
             )
         }
-        contextHandler.initedCanvas = false
     }
 
     private fun syncContentScale() {
@@ -70,21 +69,22 @@ internal class MacOsOpenGLRedrawer(
 }
 
 internal class MacosGLLayer : CAOpenGLLayer {
-    private lateinit var layer: SkiaLayer
+    private lateinit var skiaLayer: SkiaLayer
     private lateinit var contextHandler: ContextHandler
+
     @OverrideInit
     constructor(): super()
     @OverrideInit
     constructor(layer: Any): super(layer)
 
     fun init(layer: SkiaLayer, contextHandler: ContextHandler) {
-        this.layer = layer
+        skiaLayer = layer
         this.contextHandler = contextHandler
         this.setNeedsDisplayOnBoundsChange(true)
         this.removeAllAnimations()
         this.setAutoresizingMask(kCALayerWidthSizable or kCALayerHeightSizable )
-        layer.nsView.layer = this
-        layer.nsView.wantsLayer = true
+        skiaLayer.nsView.layer = this
+        skiaLayer.nsView.wantsLayer = true
         this.contentsGravity = kCAGravityTopLeft;
     }
 
@@ -118,7 +118,7 @@ internal class MacosGLLayer : CAOpenGLLayer {
     ) {
         CGLSetCurrentContext(ctx);
         try {
-            layer.update(getTimeNanos())
+            skiaLayer.update(getTimeNanos())
             contextHandler.draw()
         } catch (e: Throwable) {
             e.printStackTrace()

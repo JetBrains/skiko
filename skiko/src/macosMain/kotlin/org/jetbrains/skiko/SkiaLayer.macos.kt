@@ -2,7 +2,6 @@ package org.jetbrains.skiko
 
 import kotlinx.cinterop.ObjCAction
 import kotlinx.cinterop.useContents
-import org.jetbrains.skiko.context.*
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.redrawer.MacOsOpenGLRedrawer
 import org.jetbrains.skiko.redrawer.Redrawer
@@ -15,7 +14,11 @@ import platform.Foundation.addObserver
 import platform.darwin.NSObject
 import platform.CoreGraphics.CGRectMake
 
-actual open class SkiaLayer {
+actual open class SkiaLayer() {
+    fun isShowing(): Boolean {
+        return true
+    }
+
     actual var renderApi: GraphicsApi = GraphicsApi.OPENGL
     actual val contentScale: Float
         get() = if (this::nsView.isInitialized) nsView.window!!.backingScaleFactor.toFloat() else 1.0f
@@ -36,7 +39,7 @@ actual open class SkiaLayer {
 
     actual var skikoView: SkikoView? = null
 
-    private var redrawer: Redrawer? = null
+    internal var redrawer: Redrawer? = null
 
     private var picture: PictureHolder? = null
     private val pictureRecorder = PictureRecorder()
@@ -137,7 +140,7 @@ actual open class SkiaLayer {
             }
         }
         window.contentView!!.addSubview(nsView)
-        redrawer = MacOsOpenGLRedrawer(this).apply {
+        redrawer = createNativeRedrawer(this, renderApi).apply {
             syncSize()
             needRedraw()
         }
