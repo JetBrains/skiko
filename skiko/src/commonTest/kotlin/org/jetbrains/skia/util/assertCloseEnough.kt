@@ -1,5 +1,6 @@
 package org.jetbrains.skia.tests
 
+import org.jetbrains.skia.Color4f
 import org.jetbrains.skia.Matrix33
 import org.jetbrains.skia.Point
 import kotlin.math.abs
@@ -18,4 +19,12 @@ internal fun assertCloseEnough(expected: Point, actual: Point?, epsilon: Float =
 
 internal fun assertCloseEnough(expected: Matrix33, actual: Matrix33?, epsilon: Float = EPSILON) {
     expected.mat.zip(actual!!.mat).forEach { (a, b) -> assertCloseEnough(a, b, epsilon) }
+}
+
+
+internal fun assertCloseEnough(expected: Color4f, actual: Color4f?, epsilon: Float = EPSILON) {
+    assertCloseEnough(expected.r, actual!!.r, epsilon)
+    assertCloseEnough(expected.g, actual.g, epsilon)
+    assertCloseEnough(expected.b, actual.b, epsilon)
+    assertCloseEnough(expected.a, actual.a, epsilon)
 }
