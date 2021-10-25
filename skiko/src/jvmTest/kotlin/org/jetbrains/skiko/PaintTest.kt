@@ -49,6 +49,21 @@ class PaintTest {
     }
 
     @Test
+    fun canDrawShader() {
+        val surface = Surface.makeRasterN32Premul(16, 16)
+        val rect = Rect(1.0f, 1.0f, 15.0f, 15.0f)
+
+        surface.canvas.drawRect(
+            r = rect,
+            paint = Paint().apply {
+                shader = Shader.makeLinearGradient(rect.left, rect.top, rect.right, rect.bottom, intArrayOf(Color.RED, Color.BLUE))
+            }
+        )
+
+        screenshots.assert(surface.makeImageSnapshot())
+    }
+
+    @Test
     fun paintTest() {
         // TODO: ported from skija and we need address the commented out assertions
         val paintA = Paint().apply { color = 0x12345678 }

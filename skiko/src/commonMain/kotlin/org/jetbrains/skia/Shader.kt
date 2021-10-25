@@ -44,6 +44,7 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                         y1,
                         toInterop(colors),
                         toInterop(positions),
+                        colors.size,
                         style.tileMode.ordinal,
                         style._getFlags(),
                         toInterop(style._getMatrixArray())
@@ -86,6 +87,7 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                             toInterop(Color4f.flattenArray(colors)),
                             getPtr(cs),
                             toInterop(positions),
+                            colors.size,
                             style.tileMode.ordinal,
                             style._getFlags(),
                             toInterop(style._getMatrixArray())
@@ -134,6 +136,7 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                         r,
                         toInterop(colors),
                         toInterop(positions),
+                        colors.size,
                         style.tileMode.ordinal,
                         style._getFlags(),
                         toInterop(style._getMatrixArray())
@@ -174,6 +177,7 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                             toInterop(Color4f.flattenArray(colors)),
                             getPtr(cs),
                             toInterop(positions),
+                            colors.size,
                             style.tileMode.ordinal,
                             style._getFlags(),
                             toInterop(style._getMatrixArray())
@@ -237,6 +241,7 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                         r1,
                         toInterop(colors),
                         toInterop(positions),
+                        colors.size,
                         style.tileMode.ordinal,
                         style._getFlags(),
                         toInterop(style._getMatrixArray())
@@ -285,6 +290,7 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                             toInterop(Color4f.flattenArray(colors)),
                             getPtr(cs),
                             toInterop(positions),
+                            colors.size,
                             style.tileMode.ordinal,
                             style._getFlags(),
                             toInterop(style._getMatrixArray())
@@ -358,6 +364,7 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                         endAngle,
                         toInterop(colors),
                         toInterop(positions),
+                        colors.size,
                         style.tileMode.ordinal,
                         style._getFlags(),
                         toInterop(style._getMatrixArray())
@@ -401,6 +408,7 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                             toInterop(Color4f.flattenArray(colors)),
                             getPtr(cs),
                             toInterop(positions),
+                            colors.size,
                             style.tileMode.ordinal,
                             style._getFlags(),
                             toInterop(style._getMatrixArray())
@@ -461,18 +469,13 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             baseFrequencyY: Float,
             numOctaves: Int,
             seed: Float,
-            tiles: Array<ISize>
+            tileSize: ISize = ISize.makeEmpty()
         ): Shader {
             return try {
-                val arr = IntArray(tiles.size * 2)
-                for (i in tiles.indices) {
-                    arr[i * 2] = tiles[i].width
-                    arr[i * 2 + 1] = tiles[i].height
-                }
                 Stats.onNativeCall()
                 Shader(
                     interopScope {
-                        _nMakeFractalNoise(baseFrequencyX, baseFrequencyY, numOctaves, seed, toInterop(arr))
+                        _nMakeFractalNoise(baseFrequencyX, baseFrequencyY, numOctaves, seed, tileSize.width, tileSize.height)
                     }
                 )
             } finally {
@@ -485,18 +488,13 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             baseFrequencyY: Float,
             numOctaves: Int,
             seed: Float,
-            tiles: Array<ISize>
+            tileSize: ISize = ISize.makeEmpty()
         ): Shader {
             return try {
-                val arr = IntArray(tiles.size * 2)
-                for (i in tiles.indices) {
-                    arr[i * 2] = tiles[i].width
-                    arr[i * 2 + 1] = tiles[i].height
-                }
                 Stats.onNativeCall()
                 Shader(
                     interopScope {
-                        _nMakeTurbulence(baseFrequencyX, baseFrequencyY, numOctaves, seed, toInterop(arr))
+                        _nMakeTurbulence(baseFrequencyX, baseFrequencyY, numOctaves, seed, tileSize.width, tileSize.height)
                     }
                 )
             } finally {
@@ -533,6 +531,7 @@ private external fun _nMakeLinearGradient(
     y1: Float,
     colors: InteropPointer,
     positions: InteropPointer,
+    count: Int,
     tileType: Int,
     flags: Int,
     matrix: InteropPointer
@@ -548,6 +547,7 @@ private external fun _nMakeLinearGradientCS(
     colors: InteropPointer,
     colorSpacePtr: NativePointer,
     positions: InteropPointer,
+    count: Int,
     tileType: Int,
     flags: Int,
     matrix: InteropPointer
@@ -561,6 +561,7 @@ private external fun _nMakeRadialGradient(
     r: Float,
     colors: InteropPointer,
     positions: InteropPointer,
+    count: Int,
     tileType: Int,
     flags: Int,
     matrix: InteropPointer
@@ -575,6 +576,7 @@ private external fun _nMakeRadialGradientCS(
     colors: InteropPointer,
     colorSpacePtr: NativePointer,
     positions: InteropPointer,
+    count: Int,
     tileType: Int,
     flags: Int,
     matrix: InteropPointer
@@ -591,6 +593,7 @@ private external fun _nMakeTwoPointConicalGradient(
     r1: Float,
     colors: InteropPointer,
     positions: InteropPointer,
+    count: Int,
     tileType: Int,
     flags: Int,
     matrix: InteropPointer
@@ -608,6 +611,7 @@ private external fun _nMakeTwoPointConicalGradientCS(
     colors: InteropPointer,
     colorSpacePtr: NativePointer,
     positions: InteropPointer,
+    count: Int,
     tileType: Int,
     flags: Int,
     matrix: InteropPointer
@@ -622,6 +626,7 @@ private external fun _nMakeSweepGradient(
     endAngle: Float,
     colors: InteropPointer,
     positions: InteropPointer,
+    count: Int,
     tileType: Int,
     flags: Int,
     matrix: InteropPointer
@@ -637,6 +642,7 @@ private external fun _nMakeSweepGradientCS(
     colors: InteropPointer,
     colorSpacePtr: NativePointer,
     positions: InteropPointer,
+    count: Int,
     tileType: Int,
     flags: Int,
     matrix: InteropPointer
@@ -649,7 +655,8 @@ private external fun _nMakeFractalNoise(
     baseFrequencyY: Float,
     numOctaves: Int,
     seed: Float,
-    tiles: InteropPointer
+    tileWidth: Int,
+    tileHeight: Int,
 ): NativePointer
 
 
@@ -659,7 +666,8 @@ private external fun _nMakeTurbulence(
     baseFrequencyY: Float,
     numOctaves: Int,
     seed: Float,
-    tiles: InteropPointer
+    tileWidth: Int,
+    tileHeight: Int,
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeColor")
