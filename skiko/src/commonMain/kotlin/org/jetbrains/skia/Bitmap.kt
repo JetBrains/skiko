@@ -975,17 +975,21 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
     }
 
     /**
-     * If pixel address is available, return ByteBuffer wrapping it.
-     * If pixel address is not available, return null.
+     * Create a pixmap and copy buffer contents into it
      *
-     * @return  ByteBuffer with direct access to pixels, or null
+     * @return Pixamp with copied pixels, or null
      *
      * @see [https://fiddle.skia.org/c/@Bitmap_peekPixels](https://fiddle.skia.org/c/@Bitmap_peekPixels)
      */
-    fun peekPixels(): ByteBuffer? {
+    fun peekPixels(): Pixmap? {
         return try {
             Stats.onNativeCall()
-            _nPeekPixels(_ptr)
+            val res = _nPeekPixels(_ptr)
+            if (res == NullPointer) {
+                null
+            } else {
+                Pixmap(res, true)
+            }
         } finally {
             reachabilityBarrier(this)
         }
@@ -1189,7 +1193,7 @@ private external fun _nReadPixels(
 private external fun _nExtractAlpha(ptr: NativePointer, dstPtr: NativePointer, paintPtr: NativePointer, iPointResultIntArray: InteropPointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nPeekPixels")
-private external fun _nPeekPixels(ptr: NativePointer): ByteBuffer?
+private external fun _nPeekPixels(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nMakeShader")
 private external fun _nMakeShader(ptr: NativePointer, tmx: Int, tmy: Int, samplingMode: Long, localMatrix: InteropPointer): NativePointer

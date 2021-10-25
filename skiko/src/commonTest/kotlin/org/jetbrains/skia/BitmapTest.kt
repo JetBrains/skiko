@@ -1,5 +1,7 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skiko.KotlinBackend
+import org.jetbrains.skiko.kotlinBackend
 import org.jetbrains.skiko.tests.runTest
 import kotlin.test.*
 
@@ -67,6 +69,18 @@ class BitmapTest {
 
         assertTrue(bitmap.rowBytes > 0)
         assertEquals(5 * bitmap.rowBytes, result.size)
+    }
+    @Test
+    fun canPeekPixels() = runTest {
+        val bitmap = Bitmap()
+        bitmap.allocPixels(ImageInfo.makeS32(10, 10, ColorAlphaType.OPAQUE))
+        val result = bitmap.peekPixels()!!
+
+        assertEquals(10 * 4, result.rowBytes)
+        assertEquals(10 * 10 * 4, result.computeByteSize())
+        if (kotlinBackend == KotlinBackend.JVM) {
+            assertEquals(bitmap.imageInfo, result.info)
+        }
     }
 
     @Test //fixed bug https://github.com/JetBrains/skiko/pull/266

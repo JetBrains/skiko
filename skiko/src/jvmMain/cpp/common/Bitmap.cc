@@ -259,14 +259,16 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_BitmapKt__1nExtrac
     return result;
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_BitmapKt__1nPeekPixels
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BitmapKt__1nPeekPixels
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(ptr));
-    SkPixmap pixmap;
-    if (instance->peekPixels(&pixmap))
-        return env->NewDirectByteBuffer(pixmap.writable_addr(), pixmap.rowBytes() * pixmap.height());
-    else
-        return nullptr;
+    SkPixmap* pixmap = new SkPixmap();
+    if (instance->peekPixels(pixmap))
+        return ptrToJlong(pixmap);
+    else {
+        delete pixmap;
+        return 0;
+    }
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BitmapKt__1nMakeShader
