@@ -279,7 +279,14 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_Bitmap__1nExtractAlpha
 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Bitmap__1nPeekPixels
   (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_Bitmap__1nPeekPixels");
+    SkBitmap* instance = reinterpret_cast<SkBitmap*>(ptr);
+    SkPixmap* pixmap = new SkPixmap();
+    if (instance->peekPixels(pixmap)) {
+        return reinterpret_cast<KNativePointer>(pixmap);
+    } else {
+        delete pixmap;
+        return nullptr;
+    }
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Bitmap__1nMakeShader
