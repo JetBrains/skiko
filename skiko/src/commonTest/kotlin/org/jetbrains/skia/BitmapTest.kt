@@ -115,14 +115,14 @@ class BitmapTest {
     }
 
     @Test
-    fun canPeekPixels() = runTest {
+    fun canPeekPixelsAndCompare() = runTest {
         val bitmap = Bitmap()
         bitmap.allocPixels(ImageInfo.makeS32(2, 2, ColorAlphaType.OPAQUE))
 
         val setArray = byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
         assertTrue(bitmap.installPixels(setArray))
 
-        val data = Data.makeWithoutCopy(bitmap.peekPixels(), bitmap.rowBytes * bitmap.height)
+        val data = Data.makeWithoutCopy(bitmap.peekPixels()!!.addr, bitmap.rowBytes * bitmap.height)
         assertEquals(setArray.size, data.size)
 
         val dataBytes = data.bytes

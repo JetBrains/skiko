@@ -246,15 +246,19 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
     }
 
     /**
-     * If pixel address is available, return [NativePointer].
-     * If pixel address is not available, return [NullPointer].
+     * If pixel address is available, return [Pixmap].
+     * If pixel address is not available, return null.
      *
      * @see [https://fiddle.skia.org/c/@Image_peekPixels](https://fiddle.skia.org/c/@Image_peekPixels)
      */
-    fun peekPixels(): NativePointer {
+    fun peekPixels(): Pixmap? {
         return try {
             Stats.onNativeCall()
-            Image_nPeekPixels(_ptr)
+            Image_nPeekPixels(_ptr).takeIf {
+                it != NullPointer
+            }?.let {
+                Pixmap(it, true)
+            }
         } finally {
             reachabilityBarrier(this)
         }

@@ -84,15 +84,16 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nMakeShader
     return reinterpret_cast<KNativePointer>(shader.release());
 }
 
-// returns the pointer to writable bytes of pixels
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Image__1nPeekPixels
   (KNativePointer ptr) {
-  SkImage* instance = reinterpret_cast<SkImage*>((ptr));
-  SkPixmap pixmap;
-  if (instance->peekPixels(&pixmap))
-      return reinterpret_cast<KInteropPointer>(pixmap.writable_addr());
-  else
-      return 0;
+  SkImage* instance = reinterpret_cast<SkImage*>(ptr);
+  SkPixmap* pixmap = new SkPixmap();
+  if (instance->peekPixels(pixmap)) {
+      return reinterpret_cast<KNativePointer>(pixmap);
+  } else {
+      delete pixmap;
+      return nullptr;
+  }
 }
 
 SKIKO_EXPORT KBoolean org_jetbrains_skia_Image__1nPeekPixelsToPixmap

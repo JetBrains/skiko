@@ -88,7 +88,7 @@ class ImageTest {
 
         val image = Image.makeRaster(imageInfo, bytes, 5)
 
-        val pixels = Data.makeWithoutCopy(image.peekPixels(), imageInfo.height * imageInfo.minRowBytes).bytes
+        val pixels = Data.makeWithoutCopy(image.peekPixels()!!.addr, imageInfo.height * imageInfo.minRowBytes).bytes
 
         assertContentEquals(bytes, pixels)
     }
