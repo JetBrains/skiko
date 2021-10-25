@@ -1,11 +1,16 @@
 package org.jetbrains.skiko
 
 import kotlinx.cinterop.addressOf
+import kotlinx.cinterop.toKString
 import kotlinx.cinterop.usePinned
 import platform.posix.*
 
 actual suspend fun loadBytesFromPath(path: String): ByteArray {
-    val file = fopen(path, "r") ?: throw Error("Can not open file '$path'")
+    val file = fopen(path, "r") ?: run {
+        val error = strerror(errno)?.toKString() ?: "Unknown error"
+        throw Error("Can not open file '$path': $error")
+    }
+
     val size = file.let {
         fseek(it, 0, SEEK_END)
         val size = ftell(it)

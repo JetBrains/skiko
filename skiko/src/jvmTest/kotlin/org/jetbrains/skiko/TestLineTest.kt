@@ -12,13 +12,13 @@ import org.jetbrains.skia.tests.assertCloseEnough
 import org.jetbrains.skiko.tests.runTest
 
 class TextLineTest {
-    private var inter36: suspend () -> Font = suspend {
+    private val inter36: suspend () -> Font = suspend {
         Font(Typeface.makeFromResource("./fonts/Inter-Hinted-Regular.ttf"), 36f)
     }
-    private var firaCode36: suspend () -> Font = suspend {
+    private val firaCode36: suspend () -> Font = suspend {
         Font(Typeface.makeFromResource("./fonts/FiraCode-Regular.ttf"), 36f)
     }
-    private var jbMono36: suspend () -> Font = suspend {
+    private val jbMono36: suspend () -> Font = suspend {
         Font(Typeface.makeFromResource("./fonts/JetBrainsMono-Regular.ttf"), 36f)
     }
 
