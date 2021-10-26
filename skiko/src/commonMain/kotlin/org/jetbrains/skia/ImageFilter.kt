@@ -149,16 +149,18 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         ): ImageFilter {
             return try {
                 Stats.onNativeCall()
-                ImageFilter(
-                    _nMakeDisplacementMap(
-                        x.ordinal,
-                        y.ordinal,
-                        scale,
-                        getPtr(displacement),
-                        getPtr(color),
-                        crop
+                interopScope {
+                    ImageFilter(
+                        _nMakeDisplacementMap(
+                            x.ordinal,
+                            y.ordinal,
+                            scale,
+                            getPtr(displacement),
+                            getPtr(color),
+                            toInterop(crop?.serializeToIntArray())
+                        )
                     )
-                )
+                }
             } finally {
                 reachabilityBarrier(displacement)
                 reachabilityBarrier(color)
@@ -660,7 +662,7 @@ private external fun _nMakeDisplacementMap(
     scale: Float,
     displacement: NativePointer,
     color: NativePointer,
-    crop: IRect?
+    crop: InteropPointer
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDropShadow")

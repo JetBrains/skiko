@@ -63,12 +63,12 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilterKt__1nMake
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilterKt__1nMakeDisplacementMap
-  (JNIEnv* env, jclass jclass, jint xChanInt, jint yChanInt, jfloat scale, jlong displacementPtr, jlong colorPtr, jobject cropObj) {
+  (JNIEnv* env, jclass jclass, jint xChanInt, jint yChanInt, jfloat scale, jlong displacementPtr, jlong colorPtr, jintArray cropInts) {
     SkColorChannel xChan = static_cast<SkColorChannel>(xChanInt);
     SkColorChannel yChan = static_cast<SkColorChannel>(yChanInt);
     SkImageFilter* displacement = reinterpret_cast<SkImageFilter*>(static_cast<uintptr_t>(displacementPtr));
     SkImageFilter* color = reinterpret_cast<SkImageFilter*>(static_cast<uintptr_t>(colorPtr));
-    std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
+    std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropInts);
     SkImageFilter* ptr = SkImageFilters::DisplacementMap(xChan, yChan, scale, sk_ref_sp(displacement), sk_ref_sp(color), crop.get()).release();
     return reinterpret_cast<jlong>(ptr);
 }

@@ -106,4 +106,20 @@ class ImageFilterTest {
             outer = outer
         )
     }
+
+    @Test
+    fun displacementMap() = imageFilterTest {
+        val colorFilter = ImageFilter.makeColorFilter(
+            f = ColorFilter.luma,
+            input = null, crop = null
+        )
+        ImageFilter.makeDisplacementMap(
+            x = ColorChannel.R,
+            y = ColorChannel.G,
+            scale = 2f,
+            displacement = null,
+            color = colorFilter,
+            crop = null
+        )
+    }
 }

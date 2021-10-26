@@ -64,24 +64,16 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeCompose
     return reinterpret_cast<KNativePointer>(ptr);
 }
 
-
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeDisplacementMap
-  (KInt xChanInt, KInt yChanInt, KFloat scale, KNativePointer displacementPtr, KNativePointer colorPtr, KInteropPointer cropObj) {
-    TODO("implement org_jetbrains_skia_ImageFilter__1nMakeDisplacementMap");
-}
-
-#if 0
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeDisplacementMap
-  (KInt xChanInt, KInt yChanInt, KFloat scale, KNativePointer displacementPtr, KNativePointer colorPtr, KInteropPointer cropObj) {
+  (KInt xChanInt, KInt yChanInt, KFloat scale, KNativePointer displacementPtr, KNativePointer colorPtr, KInt* cropRectInts) {
     SkColorChannel xChan = static_cast<SkColorChannel>(xChanInt);
     SkColorChannel yChan = static_cast<SkColorChannel>(yChanInt);
     SkImageFilter* displacement = reinterpret_cast<SkImageFilter*>((displacementPtr));
     SkImageFilter* color = reinterpret_cast<SkImageFilter*>((colorPtr));
-    std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
+    std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(cropRectInts);
     SkImageFilter* ptr = SkImageFilters::DisplacementMap(xChan, yChan, scale, sk_ref_sp(displacement), sk_ref_sp(color), crop.get()).release();
     return reinterpret_cast<KNativePointer>(ptr);
 }
-#endif
 
 
 
