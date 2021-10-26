@@ -91,4 +91,19 @@ class ImageFilterTest {
             input = null, crop = null
         )
     }
+
+    @Test
+    fun compose() = imageFilterTest {
+        val inner = ImageFilter.makeBlur(
+            1f, 1f, FilterTileMode.CLAMP, crop = IRect(5, 5, 10, 10)
+        )
+        val outer = ImageFilter.makeColorFilter(
+            f = ColorFilter.luma,
+            input = null, crop = null
+        )
+        ImageFilter.makeCompose(
+            inner = inner,
+            outer = outer
+        )
+    }
 }
