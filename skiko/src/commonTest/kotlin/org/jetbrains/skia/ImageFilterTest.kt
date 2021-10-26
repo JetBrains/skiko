@@ -122,4 +122,12 @@ class ImageFilterTest {
             crop = null
         )
     }
+
+    @Test
+    fun dropShadow() = imageFilterTest {
+        ImageFilter.makeDropShadow(
+            dx = 2f, dy = 2f, sigmaX = 2f, sigmaY = 2f, color = Color.BLACK,
+            input = null, crop = null
+        )
+    }
 }
