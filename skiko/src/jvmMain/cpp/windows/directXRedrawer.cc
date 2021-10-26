@@ -302,8 +302,26 @@ extern "C"
         {
             return 0;
         }
+
+        D3D_FEATURE_LEVEL maxSupportedFeatureLevel = D3D_FEATURE_LEVEL_11_0;
+        D3D_FEATURE_LEVEL featureLevels[] = {
+            D3D_FEATURE_LEVEL_12_1,
+            D3D_FEATURE_LEVEL_12_0,
+            D3D_FEATURE_LEVEL_11_1,
+            D3D_FEATURE_LEVEL_11_0
+        };
+
+        for (int i = 0; i < _countof(featureLevels); i++)
+        {
+            if (SUCCEEDED(D3D12CreateDevice(hardwareAdapter.get(), featureLevels[i], _uuidof(ID3D12Device), nullptr)))
+            {
+                maxSupportedFeatureLevel = featureLevels[i];
+                break;
+            }
+        }
+
         gr_cp<ID3D12Device> device;
-        if (!SUCCEEDED(D3D12CreateDevice(hardwareAdapter.get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&device))))
+        if (!SUCCEEDED(D3D12CreateDevice(hardwareAdapter.get(), maxSupportedFeatureLevel, IID_PPV_ARGS(&device))))
         {
             return 0;
         }
