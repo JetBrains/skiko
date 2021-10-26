@@ -14,13 +14,16 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         ): ImageFilter {
             return try {
                 Stats.onNativeCall()
-                ImageFilter(
-                    _nMakeAlphaThreshold(
-                        getPtr(
-                            r
-                        ), innerMin, outerMax, getPtr(input), crop
+                interopScope {
+                    ImageFilter(
+                        _nMakeAlphaThreshold(
+                            getPtr(r),
+                            innerMin, outerMax, getPtr(input),
+                            toInterop(crop?.serializeToIntArray())
+                        )
                     )
-                )
+                }
+
             } finally {
                 reachabilityBarrier(r)
                 reachabilityBarrier(input)
@@ -622,7 +625,7 @@ private external fun _nMakeAlphaThreshold(
     innerMin: Float,
     outerMax: Float,
     input: NativePointer,
-    crop: IRect?
+    crop: InteropPointer
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeArithmetic")

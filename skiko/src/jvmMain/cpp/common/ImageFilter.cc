@@ -9,10 +9,10 @@
 #include "interop.hh"
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilterKt__1nMakeAlphaThreshold
-  (JNIEnv* env, jclass jclass, jlong regionPtr, jfloat innerMin, jfloat outerMax, jlong inputPtr, jobject cropObj) {
+  (JNIEnv* env, jclass jclass, jlong regionPtr, jfloat innerMin, jfloat outerMax, jlong inputPtr, jintArray cropInts) {
     SkRegion* region = reinterpret_cast<SkRegion*>(static_cast<uintptr_t>(regionPtr));
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>(static_cast<uintptr_t>(inputPtr));
-    std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
+    std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropInts);
     SkImageFilter* ptr = SkImageFilters::AlphaThreshold(*region, innerMin, outerMax, sk_ref_sp(input), crop.get()).release();
     return reinterpret_cast<jlong>(ptr);
 }
