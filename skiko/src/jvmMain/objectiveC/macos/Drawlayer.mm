@@ -84,6 +84,16 @@ LayerHandler * findByObject(JNIEnv *env, jobject object)
 - (void)mouseDown:(NSEvent *)event
 {
     [self.window performWindowDragWithEvent:event];
+    [super mouseDown:event];
+}
+
+- (void)mouseUp:(NSEvent *)event
+{
+    if (event.clickCount >= 2)
+    {
+        [self.window performZoom:nil];
+    }
+    [super mouseUp:event];
 }
 
 @end
