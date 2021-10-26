@@ -27,11 +27,11 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilterKt__1nMake
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilterKt__1nMakeBlend
-  (JNIEnv* env, jclass jclass, jint blendModeInt, jlong bgPtr, jlong fgPtr, jobject cropObj) {
+  (JNIEnv* env, jclass jclass, jint blendModeInt, jlong bgPtr, jlong fgPtr, jintArray cropInts) {
     SkBlendMode blendMode = static_cast<SkBlendMode>(blendModeInt);
     SkImageFilter* bg = reinterpret_cast<SkImageFilter*>(static_cast<uintptr_t>(bgPtr));
     SkImageFilter* fg = reinterpret_cast<SkImageFilter*>(static_cast<uintptr_t>(fgPtr));
-    std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
+    std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropInts);
     SkImageFilter* ptr = SkImageFilters::Blend(blendMode, sk_ref_sp(bg), sk_ref_sp(fg), crop.get()).release();
     return reinterpret_cast<jlong>(ptr);
 }

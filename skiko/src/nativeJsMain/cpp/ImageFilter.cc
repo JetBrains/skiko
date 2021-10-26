@@ -29,21 +29,14 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeArithmetic
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeBlend
-  (KInt blendModeInt, KNativePointer bgPtr, KNativePointer fgPtr, KInteropPointer cropObj) {
-    TODO("implement org_jetbrains_skia_ImageFilter__1nMakeBlend");
-}
-
-#if 0
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeBlend
-  (KInt blendModeInt, KNativePointer bgPtr, KNativePointer fgPtr, KInteropPointer cropObj) {
+  (KInt blendModeInt, KNativePointer bgPtr, KNativePointer fgPtr, KInt* cropInts) {
     SkBlendMode blendMode = static_cast<SkBlendMode>(blendModeInt);
     SkImageFilter* bg = reinterpret_cast<SkImageFilter*>((bgPtr));
     SkImageFilter* fg = reinterpret_cast<SkImageFilter*>((fgPtr));
-    std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
+    std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(cropInts);
     SkImageFilter* ptr = SkImageFilters::Blend(blendMode, sk_ref_sp(bg), sk_ref_sp(fg), crop.get()).release();
     return reinterpret_cast<KNativePointer>(ptr);
 }
-#endif
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeBlur
   (KFloat sigmaX, KFloat sigmaY, KInt tileModeInt, KNativePointer inputPtr, KInt* cropRectInts) {

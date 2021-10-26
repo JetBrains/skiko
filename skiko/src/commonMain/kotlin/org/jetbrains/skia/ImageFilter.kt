@@ -65,14 +65,16 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         fun makeBlend(blendMode: BlendMode, bg: ImageFilter?, fg: ImageFilter?, crop: IRect?): ImageFilter {
             return try {
                 Stats.onNativeCall()
-                ImageFilter(
-                    _nMakeBlend(
-                        blendMode.ordinal,
-                        getPtr(bg),
-                        getPtr(fg),
-                        crop
+                interopScope {
+                    ImageFilter(
+                        _nMakeBlend(
+                            blendMode.ordinal,
+                            getPtr(bg),
+                            getPtr(fg),
+                            toInterop(crop?.serializeToIntArray())
+                        )
                     )
-                )
+                }
             } finally {
                 reachabilityBarrier(bg)
                 reachabilityBarrier(fg)
@@ -643,7 +645,7 @@ private external fun _nMakeArithmetic(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeBlend")
-private external fun _nMakeBlend(blendMode: Int, bg: NativePointer, fg: NativePointer, crop: IRect?): NativePointer
+private external fun _nMakeBlend(blendMode: Int, bg: NativePointer, fg: NativePointer, crop: InteropPointer): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeBlur")
 private external fun _nMakeBlur(sigmaX: Float, sigmaY: Float, tileMode: Int, input: NativePointer, crop: InteropPointer): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeColorFilter")

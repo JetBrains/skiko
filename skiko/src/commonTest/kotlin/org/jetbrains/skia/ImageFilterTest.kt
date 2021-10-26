@@ -65,6 +65,19 @@ class ImageFilterTest {
     }
 
     @Test
+    fun blend() = imageFilterTest {
+        val region = Region().apply {
+            setRect(IRect(5, 5, 10, 10))
+        }
+        ImageFilter.makeBlend(
+            blendMode = BlendMode.COLOR,
+            bg = ImageFilter.makeBlur(2f, 2f, mode = FilterTileMode.CLAMP),
+            fg = ImageFilter.makeAlphaThreshold(r = region, innerMin = 0.5f, outerMax = 0.5f, input = null, crop = null),
+            crop = null
+        )
+    }
+
+    @Test
     fun blur() = imageFilterTest {
         ImageFilter.makeBlur(
             1f, 1f, FilterTileMode.CLAMP, crop = IRect(5, 5, 10, 10)
