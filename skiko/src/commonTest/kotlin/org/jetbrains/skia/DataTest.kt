@@ -1,5 +1,6 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.Native.Companion.NullPointer
 import org.jetbrains.skia.impl.use
 import org.jetbrains.skiko.tests.runTest
 import kotlin.test.*
@@ -62,5 +63,28 @@ class DataTest {
             assertContentEquals(bytes.takeLast(1).toByteArray(), it.getBytes(4, 1))
             assertContentEquals(byteArrayOf(), it.getBytes(5, 0))
         }
+    }
+
+    @Test
+    fun memorySuppliedToMakeDataWithoutCopyDoesntGetCleanedUp() = runTest {
+        val bytes = byteArrayOf(1, 2, 3, 4, 5)
+        val originalData = Data.makeFromBytes(bytes)
+        val originalDataPtr = originalData._ptr
+
+        // `use()` calls `close()` in the end
+        val copiedData = Data.makeWithoutCopy(originalData.writableData(), 5).use {
+            assertNotEquals(NullPointer, it._ptr)
+            assertContentEquals(bytes, it.bytes)
+            it
+        }
+
+        assertEquals(NullPointer, copiedData._ptr)
+        assertEquals(originalDataPtr, originalData._ptr)
+
+        assertContentEquals(
+            bytes,
+            originalData.bytes,
+            message = "Memory is not expected to get cleaned up because Data.makeWithoutCopy uses NoopReleaseProc as a ReleaseProc"
+        )
     }
 }

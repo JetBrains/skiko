@@ -4,6 +4,13 @@ import org.jetbrains.skia.impl.*
 
 class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
     Managed(ptr, _FinalizerHolder.PTR, managed) {
+
+    /**
+     * A reference to the underlying memory to prevent it from being cleaned up by GC.
+     *  It's used in [reset] and [make].
+     */
+    private var underlyingMemoryOwner: Managed? = null
+
     constructor() : this(_nMakeNull(), true) {
         Stats.onNativeCall()
     }
@@ -11,10 +18,11 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
     fun reset() {
         Stats.onNativeCall()
         Pixmap_nReset(_ptr)
+        underlyingMemoryOwner = null
         reachabilityBarrier(this)
     }
 
-    fun reset(info: ImageInfo, addr: NativePointer, rowBytes: Int) {
+    fun reset(info: ImageInfo, addr: NativePointer, rowBytes: Int, underlyingMemoryOwner: Managed? = null) {
         Stats.onNativeCall()
         _nResetWithInfo(
             _ptr,
@@ -23,12 +31,13 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
             info.colorInfo.alphaType.ordinal,
             getPtr(info.colorInfo.colorSpace), addr, rowBytes
         )
+        this.underlyingMemoryOwner = underlyingMemoryOwner
         reachabilityBarrier(this)
         reachabilityBarrier(info.colorInfo.colorSpace)
     }
 
     fun reset(info: ImageInfo, buffer: Data, rowBytes: Int) {
-        reset(info, buffer.writableData(), rowBytes)
+        reset(info = info, addr = buffer.writableData(), rowBytes = rowBytes, underlyingMemoryOwner = buffer)
     }
 
     fun setColorSpace(colorSpace: ColorSpace?) {
@@ -54,8 +63,8 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
         }
     }
 
-    fun extractSubset(buffer: Data, area: IRect): Boolean {
-        return extractSubset(buffer.writableData(), area)
+    fun extractSubset(subset: Pixmap, area: IRect): Boolean {
+        return extractSubset(subset._ptr, area)
     }
 
     val info: ImageInfo
@@ -241,7 +250,11 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
     }
 
     val buffer: Data
-        get() = Data.makeWithoutCopy(addr, computeByteSize())
+        get() = (underlyingMemoryOwner as? Data) ?: Data.makeWithoutCopy(
+            memoryAddr = addr,
+            length = computeByteSize(),
+            underlyingMemoryOwner = this
+        )
 
     private object _FinalizerHolder {
         val PTR = Pixmap_nGetFinalizer()
@@ -249,10 +262,10 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
 
     companion object {
         fun make(info: ImageInfo, buffer: Data, rowBytes: Int): Pixmap {
-            return make(info, buffer.writableData(), rowBytes)
+            return make(info, buffer.writableData(), rowBytes, underlyingMemoryOwner = buffer)
         }
 
-        fun make(info: ImageInfo, addr: NativePointer, rowBytes: Int): Pixmap {
+        fun make(info: ImageInfo, addr: NativePointer, rowBytes: Int, underlyingMemoryOwner: Managed? = null): Pixmap {
             return try {
                 val ptr = Pixmap_nMake(
                     info.width, info.height,
@@ -261,7 +274,9 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
                     getPtr(info.colorInfo.colorSpace), addr, rowBytes
                 )
                 require(ptr != NullPointer) { "Failed to create Pixmap." }
-                Pixmap(ptr, true)
+                Pixmap(ptr, true).also {
+                    it.underlyingMemoryOwner = underlyingMemoryOwner
+                }
             } finally {
                 reachabilityBarrier(info.colorInfo.colorSpace)
             }

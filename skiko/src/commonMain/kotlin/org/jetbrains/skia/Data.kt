@@ -7,6 +7,13 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
  * Data holds an immutable data buffer.
  */
 class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
+
+    /**
+     * A reference to the underlying memory owner to prevent it from being cleaned by GC until Data instance finalization.
+     *  It's used in [makeWithoutCopy].
+     */
+    private var underlyingMemoryOwner: Managed? = null
+
     companion object {
         fun makeFromBytes(bytes: ByteArray, offset: Int = 0, length: Int = bytes.size): Data {
             Stats.onNativeCall()
@@ -17,13 +24,22 @@ class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
             )
         }
 
-        fun makeWithoutCopy(memoryAddr: NativePointer, length: Int): Data {
+        /**
+         * makeWithoutCopy uses NoopReleaseProc as a ReleaseProc, therefore memory needs to be cleaned up by caller side
+         * (or by [underlyingMemoryOwner] if provided).
+         *
+         * @param underlyingMemoryOwner - is stored in Data instance to prevent underlying memory getting cleaned by GC in cases when
+         * [underlyingMemoryOwner] doesn't have any other references.
+         */
+        fun makeWithoutCopy(memoryAddr: NativePointer, length: Int, underlyingMemoryOwner: Managed? = null): Data {
             Stats.onNativeCall()
             return Data(
                 interopScope {
                     _nMakeWithoutCopy(memoryAddr, length)
                 }
-            )
+            ).also {
+                it.underlyingMemoryOwner = underlyingMemoryOwner
+            }
         }
 
         /**
