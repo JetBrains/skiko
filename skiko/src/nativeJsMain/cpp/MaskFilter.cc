@@ -24,19 +24,10 @@ SKIKO_EXPORT KInteropPointer org_jetbrains_skia_MaskFilter__1nMakeShader
 
 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_MaskFilter__1nMakeTable
-  (KByte* tableArray) {
-    TODO("implement org_jetbrains_skia_MaskFilter__1nMakeTable");
-}
-     
-#if 0 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_MaskFilter__1nMakeTable
-  (KByte* tableArray) {
-    KByte* table = env->GetByteArrayElements(tableArray, 0);
+  (KByte* table) {
     SkMaskFilter* ptr = SkTableMaskFilter::Create(reinterpret_cast<uint8_t*>(table));
-    env->ReleaseByteArrayElements(tableArray, table, 0);
     return reinterpret_cast<KInteropPointer>(ptr);
 }
-#endif
 
 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_MaskFilter__1nMakeGamma

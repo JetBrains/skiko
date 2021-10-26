@@ -19,7 +19,9 @@ class MaskFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
-        fun makeTable(table: ByteArray?): MaskFilter {
+        fun makeTable(table: ByteArray): MaskFilter {
+            require(table.size == 256) { "Expected 256 elements, got " + table.size }
+
             Stats.onNativeCall()
             return MaskFilter(
                 interopScope {
