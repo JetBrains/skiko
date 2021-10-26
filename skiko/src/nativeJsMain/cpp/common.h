@@ -64,6 +64,10 @@ namespace skija {
     namespace SurfaceProps {
         std::unique_ptr<SkSurfaceProps> toSkSurfaceProps(KInt* surfacePropsInts);
     }
+
+    namespace IRect {
+        std::unique_ptr<SkIRect> toSkIRect(KInt* rectInts);
+    }
 }
 
 std::unique_ptr<SkMatrix> skMatrix(KFloat* matrixArray);

@@ -452,6 +452,19 @@ namespace skija {
                 });
             }
         }
+
+        std::unique_ptr<SkIRect> toSkIRect(JNIEnv* env, jintArray rectInts) {
+            if (rectInts == nullptr)
+                return std::unique_ptr<SkIRect>(nullptr);
+            else {
+                jint *ints = env->GetIntArrayElements(rectInts, NULL);
+                auto result = std::unique_ptr<SkIRect>(new SkIRect{
+                    ints[0], ints[1], ints[2], ints[3]
+                });
+                env->ReleaseIntArrayElements(rectInts, ints, NULL);
+                return result;
+            }
+        }
     }
 
     namespace Path {
