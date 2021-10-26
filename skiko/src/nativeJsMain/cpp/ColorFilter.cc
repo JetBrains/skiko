@@ -28,36 +28,16 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorFilter__1nMakeBlend
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorFilter__1nMakeMatrix
-  (KFloat* rowMajorArray) {
-    TODO("implement org_jetbrains_skia_ColorFilter__1nMakeMatrix");
-}
-     
-#if 0 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorFilter__1nMakeMatrix
-  (KFloat* rowMajorArray) {
-    KFloat* rowMajor = env->GetFloatArrayElements(rowMajorArray, 0);
+  (KFloat* rowMajor) {
     SkColorFilter* ptr = SkColorFilters::Matrix(rowMajor).release();
-    env->ReleaseFloatArrayElements(rowMajorArray, rowMajor, 0);
     return reinterpret_cast<KNativePointer>(ptr);
 }
-#endif
-
-
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorFilter__1nMakeHSLAMatrix
-  (KFloat* rowMajorArray) {
-    TODO("implement org_jetbrains_skia_ColorFilter__1nMakeHSLAMatrix");
-}
-     
-#if 0 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorFilter__1nMakeHSLAMatrix
-  (KFloat* rowMajorArray) {
-    KFloat* rowMajor = env->GetFloatArrayElements(rowMajorArray, 0);
+  (KFloat* rowMajor) {
     SkColorFilter* ptr = SkColorFilters::HSLAMatrix(rowMajor).release();
-    env->ReleaseFloatArrayElements(rowMajorArray, rowMajor, 0);
     return reinterpret_cast<KNativePointer>(ptr);
 }
-#endif
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorFilter__1nGetLinearToSRGBGamma
@@ -95,54 +75,25 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorFilter__1nMakeHighContrast
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorFilter__1nMakeTable
-  (KByte* tableArray) {
-    TODO("implement org_jetbrains_skia_ColorFilter__1nMakeTable");
-}
-     
-#if 0 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorFilter__1nMakeTable
-  (KByte* tableArray) {
-    KByte* table = env->GetByteArrayElements(tableArray, 0);
+  (KByte* table) {
     SkColorFilter* ptr = SkTableColorFilter::Make(reinterpret_cast<uint8_t*>(table)).release();
-    env->ReleaseByteArrayElements(tableArray, table, 0);
     return reinterpret_cast<KNativePointer>(ptr);
 }
-#endif
 
 typedef void* KInteropPointer;
 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_ColorFilter__nMakeTableARGB
-  (uint8_t* arrayA,
-   KInt arrayASize,
-   uint8_t* arrayR,
-   KInt arrayRSize,
-   uint8_t* arrayG,
-   KInt arrayGSize,
-   uint8_t* arrayB,
-   KInt arrayBSize
-) {
-    SkColorFilter* ptr = SkTableColorFilter::MakeARGB(arrayA, arrayR, arrayG, arrayB).release();
-    return ptr;
-}
 
-#if 0 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorFilter__1nMakeTableARGB
-  (KByte* arrayA, KByte* arrayR, KByte* arrayG, KByte* arrayB) {
-    KByte* a = arrayA ? env->GetByteArrayElements(arrayA, 0) : nullptr;
-    KByte* r = arrayR ? env->GetByteArrayElements(arrayR, 0) : nullptr;
-    KByte* g = arrayG ? env->GetByteArrayElements(arrayG, 0) : nullptr;
-    KByte* b = arrayB ? env->GetByteArrayElements(arrayB, 0) : nullptr;
-
-    SkColorFilter* ptr = SkTableColorFilter::MakeARGB(reinterpret_cast<uint8_t*>(a), reinterpret_cast<uint8_t*>(r), reinterpret_cast<uint8_t*>(g), reinterpret_cast<uint8_t*>(b)).release();
-    
-    if (arrayA) env->ReleaseByteArrayElements(arrayA, a, 0);
-    if (arrayR) env->ReleaseByteArrayElements(arrayR, r, 0);
-    if (arrayG) env->ReleaseByteArrayElements(arrayG, g, 0);
-    if (arrayB) env->ReleaseByteArrayElements(arrayB, b, 0);
+  (KByte* a, KByte* r, KByte* g, KByte* b) {
+    SkColorFilter* ptr = SkTableColorFilter::MakeARGB(
+        reinterpret_cast<uint8_t*>(a),
+        reinterpret_cast<uint8_t*>(r),
+        reinterpret_cast<uint8_t*>(g),
+        reinterpret_cast<uint8_t*>(b)
+    ).release();
     
     return reinterpret_cast<KNativePointer>(ptr);
 }
-#endif
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorFilter__1nMakeOverdraw

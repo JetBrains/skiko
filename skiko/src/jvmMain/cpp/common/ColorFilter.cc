@@ -84,20 +84,21 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilterKt__1nMake
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilterKt__1nMakeTableARGB(
     JNIEnv* env, jclass jclass,
     jbyteArray arrayA,
-    jint arrayASize,
     jbyteArray arrayR,
-    jint arrayRSize,
     jbyteArray arrayG,
-    jint arrayGSize,
-    jbyteArray arrayB,
-    jint arrayBSize
+    jbyteArray arrayB
  ) {
     jbyte* a = arrayA ? env->GetByteArrayElements(arrayA, 0) : nullptr;
     jbyte* r = arrayR ? env->GetByteArrayElements(arrayR, 0) : nullptr;
     jbyte* g = arrayG ? env->GetByteArrayElements(arrayG, 0) : nullptr;
     jbyte* b = arrayB ? env->GetByteArrayElements(arrayB, 0) : nullptr;
 
-    SkColorFilter* ptr = SkTableColorFilter::MakeARGB(reinterpret_cast<uint8_t*>(a), reinterpret_cast<uint8_t*>(r), reinterpret_cast<uint8_t*>(g), reinterpret_cast<uint8_t*>(b)).release();
+    SkColorFilter* ptr = SkTableColorFilter::MakeARGB(
+        reinterpret_cast<uint8_t*>(a),
+        reinterpret_cast<uint8_t*>(r),
+        reinterpret_cast<uint8_t*>(g),
+        reinterpret_cast<uint8_t*>(b)
+    ).release();
     
     if (arrayA) env->ReleaseByteArrayElements(arrayA, a, 0);
     if (arrayR) env->ReleaseByteArrayElements(arrayR, r, 0);
