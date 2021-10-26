@@ -48,21 +48,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeBlur
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeColorFilter
-  (KNativePointer colorFilterPtr, KNativePointer inputPtr, KInteropPointer cropObj) {
-    TODO("implement org_jetbrains_skia_ImageFilter__1nMakeColorFilter");
-}
-
-#if 0
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeColorFilter
-  (KNativePointer colorFilterPtr, KNativePointer inputPtr, KInteropPointer cropObj) {
+  (KNativePointer colorFilterPtr, KNativePointer inputPtr, KInt* cropRectInts) {
     SkColorFilter* colorFilter = reinterpret_cast<SkColorFilter*>((colorFilterPtr));
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>((inputPtr));
-    std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
+    std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(cropRectInts);
     SkImageFilter* ptr = SkImageFilters::ColorFilter(sk_ref_sp(colorFilter), sk_ref_sp(input), crop.get()).release();
     return reinterpret_cast<KNativePointer>(ptr);
 }
-#endif
-
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeCompose
   (KNativePointer outerPtr, KNativePointer innerPtr) {

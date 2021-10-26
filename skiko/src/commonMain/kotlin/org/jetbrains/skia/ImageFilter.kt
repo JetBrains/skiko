@@ -109,13 +109,14 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         fun makeColorFilter(f: ColorFilter?, input: ImageFilter?, crop: IRect?): ImageFilter {
             return try {
                 Stats.onNativeCall()
-                ImageFilter(
-                    _nMakeColorFilter(
-                        getPtr(
-                            f
-                        ), getPtr(input), crop
+                interopScope {
+                    ImageFilter(
+                        _nMakeColorFilter(
+                            getPtr(f), getPtr(input),
+                            toInterop(crop?.serializeToIntArray())
+                        )
                     )
-                )
+                }
             } finally {
                 reachabilityBarrier(f)
                 reachabilityBarrier(input)
@@ -649,7 +650,7 @@ private external fun _nMakeBlend(blendMode: Int, bg: NativePointer, fg: NativePo
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeBlur")
 private external fun _nMakeBlur(sigmaX: Float, sigmaY: Float, tileMode: Int, input: NativePointer, crop: InteropPointer): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeColorFilter")
-private external fun _nMakeColorFilter(colorFilterPtr: NativePointer, input: NativePointer, crop: IRect?): NativePointer
+private external fun _nMakeColorFilter(colorFilterPtr: NativePointer, input: NativePointer, crop: InteropPointer): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeCompose")
 private external fun _nMakeCompose(outer: NativePointer, inner: NativePointer): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDisplacementMap")

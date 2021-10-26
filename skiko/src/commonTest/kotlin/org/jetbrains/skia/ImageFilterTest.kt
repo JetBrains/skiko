@@ -83,4 +83,12 @@ class ImageFilterTest {
             1f, 1f, FilterTileMode.CLAMP, crop = IRect(5, 5, 10, 10)
         )
     }
+
+    @Test
+    fun colorFilter() = imageFilterTest {
+        ImageFilter.makeColorFilter(
+            f = ColorFilter.luma,
+            input = null, crop = null
+        )
+    }
 }
