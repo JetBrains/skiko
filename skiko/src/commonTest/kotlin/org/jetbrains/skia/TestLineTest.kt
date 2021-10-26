@@ -3,6 +3,9 @@ package org.jetbrains.skiko
 import org.jetbrains.skia.Font
 import org.jetbrains.skia.TextLine
 import org.jetbrains.skia.Typeface
+import org.jetbrains.skia.impl.use
+import org.jetbrains.skia.test.annotations.SkipJsTarget
+import org.jetbrains.skia.test.annotations.SkipNativeTarget
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
@@ -11,6 +14,8 @@ import org.jetbrains.skia.tests.makeFromResource
 import org.jetbrains.skia.tests.assertCloseEnough
 import org.jetbrains.skiko.tests.runTest
 
+@SkipJsTarget
+@SkipNativeTarget
 class TextLineTest {
     private val inter36: suspend () -> Font = suspend {
         Font(Typeface.makeFromResource("./fonts/Inter-Hinted-Regular.ttf"), 36f)
