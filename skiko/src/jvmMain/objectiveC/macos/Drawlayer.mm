@@ -76,6 +76,18 @@ LayerHandler * findByObject(JNIEnv *env, jobject object)
     return NULL;
 }
 
+@interface WindowDragView : NSView
+@end
+
+@implementation WindowDragView
+
+- (void)mouseDown:(NSEvent *)event
+{
+    [self.window performWindowDragWithEvent:event];
+}
+
+@end
+
 extern "C"
 {
 
@@ -186,27 +198,68 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_osxDisableT
         [window setTitleVisibility:NSWindowTitleHidden];
         [window setStyleMask:[window styleMask]|NSWindowStyleMaskFullSizeContentView];
 
-        NSButton *closeButton = [window standardWindowButton:NSWindowCloseButton];
-        NSButton *minButton = [window standardWindowButton:NSWindowMiniaturizeButton];
-        NSButton *zoomButton = [window standardWindowButton:NSWindowZoomButton];
-        const CGFloat dx = [minButton frame].origin.x - [closeButton frame].origin.x;
-        const CGFloat buttonHeight = [closeButton frame].size.height;
-        const CGFloat correctionPixel = 1.0f; // todo[unterhofer] No idea why we need this
-        const CGFloat padding = (customHeaderHeight - buttonHeight) / 2.0f + correctionPixel;
+        NSView* themeFrame = window.contentView.superview;
+        NSView* titlebarContainer = themeFrame.subviews[1];
+        NSView* titlebar = titlebarContainer.subviews[0];
+        NSView* titlebarDecoration = titlebarContainer.subviews[1];
+        NSView* titlebarVisualEffect = titlebar.subviews[0];
+        NSView* titlebarBackground = titlebar.subviews[1];
+        NSView* dragger = [[WindowDragView alloc] init];
+        [titlebarBackground addSubview:dragger];
 
-        NSView *titlebarView = closeButton.superview;
-        NSArray* windowButtons = @[ closeButton, minButton, zoomButton ];
+        titlebarContainer.translatesAutoresizingMaskIntoConstraints = NO;
+        titlebarDecoration.translatesAutoresizingMaskIntoConstraints = NO;
+        titlebar.translatesAutoresizingMaskIntoConstraints = NO;
+        titlebarVisualEffect.translatesAutoresizingMaskIntoConstraints = NO;
+        titlebarBackground.translatesAutoresizingMaskIntoConstraints = NO;
+        dragger.translatesAutoresizingMaskIntoConstraints = NO;
+
+        [NSLayoutConstraint activateConstraints:@[
+            [titlebarBackground.leftAnchor constraintEqualToAnchor:themeFrame.leftAnchor],
+            [titlebarBackground.rightAnchor constraintEqualToAnchor:themeFrame.rightAnchor],
+            [titlebarBackground.topAnchor constraintEqualToAnchor:themeFrame.topAnchor],
+            [titlebarBackground.heightAnchor constraintEqualToConstant:customHeaderHeight],
+
+            [titlebarVisualEffect.leftAnchor constraintEqualToAnchor:titlebarBackground.leftAnchor],
+            [titlebarVisualEffect.rightAnchor constraintEqualToAnchor:titlebarBackground.rightAnchor],
+            [titlebarVisualEffect.topAnchor constraintEqualToAnchor:titlebarBackground.topAnchor],
+            [titlebarVisualEffect.bottomAnchor constraintEqualToAnchor:titlebarBackground.bottomAnchor],
+
+            [titlebar.leftAnchor constraintEqualToAnchor:titlebarBackground.leftAnchor],
+            [titlebar.widthAnchor constraintEqualToAnchor:titlebarBackground.widthAnchor],
+            [titlebar.topAnchor constraintEqualToAnchor:titlebarBackground.topAnchor],
+            [titlebar.heightAnchor constraintEqualToAnchor:titlebarBackground.heightAnchor],
+
+            [titlebarDecoration.leftAnchor constraintEqualToAnchor:titlebarBackground.leftAnchor],
+            [titlebarDecoration.widthAnchor constraintEqualToAnchor:titlebarBackground.widthAnchor],
+            [titlebarDecoration.topAnchor constraintEqualToAnchor:titlebarBackground.topAnchor],
+            [titlebarDecoration.heightAnchor constraintEqualToAnchor:titlebarBackground.heightAnchor],
+
+            [titlebarContainer.leftAnchor constraintEqualToAnchor:titlebar.leftAnchor],
+            [titlebarContainer.rightAnchor constraintEqualToAnchor:titlebar.rightAnchor],
+            [titlebarContainer.topAnchor constraintEqualToAnchor:titlebar.topAnchor],
+            [titlebarContainer.heightAnchor constraintEqualToAnchor:titlebar.heightAnchor],
+
+            [dragger.leftAnchor constraintEqualToAnchor:titlebarBackground.leftAnchor],
+            [dragger.rightAnchor constraintEqualToAnchor:titlebarBackground.rightAnchor],
+            [dragger.topAnchor constraintEqualToAnchor:titlebarBackground.topAnchor],
+            [dragger.bottomAnchor constraintEqualToAnchor:titlebarBackground.bottomAnchor],
+        ]];
+
+        NSView* closeButtonView = [window standardWindowButton:NSWindowCloseButton];
+        NSView* miniaturizeButtonView = [window standardWindowButton:NSWindowMiniaturizeButton];
+        NSView* zoomButtonView = [window standardWindowButton:NSWindowZoomButton];
+        CGFloat horizontalButtonOffset = 20.0;
+
+        NSArray* windowButtons = @[ closeButtonView, miniaturizeButtonView, zoomButtonView ];
         for (NSUInteger i = 0; i < windowButtons.count; i++) {
             NSView* button = [windowButtons objectAtIndex:i];
-            CGRect rect = [button frame];
             button.translatesAutoresizingMaskIntoConstraints = NO;
-            [titlebarView addConstraints:@[
-                [NSLayoutConstraint constraintWithItem:button attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:titlebarView attribute:NSLayoutAttributeTop multiplier:1 constant:padding],
-                [NSLayoutConstraint constraintWithItem:button attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:titlebarView attribute:NSLayoutAttributeLeft multiplier:1 constant:(padding + i * dx)]
+            [NSLayoutConstraint activateConstraints:@[
+                [button.centerYAnchor constraintEqualToAnchor:titlebar.centerYAnchor],
+                [button.centerXAnchor constraintEqualToAnchor:titlebar.leftAnchor constant:(customHeaderHeight/2.0 + (i * horizontalButtonOffset))],
             ]];
         }
-
-        // todo[unterhofer] adjust the height of the draggable area
     });
 }
 
