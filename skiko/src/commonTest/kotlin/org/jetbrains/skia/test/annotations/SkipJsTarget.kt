@@ -1,3 +1,3 @@
 package org.jetbrains.skia.test.annotations
 
-expect annotation class SkipJvmTarget
+expect annotation class SkipJsTarget
