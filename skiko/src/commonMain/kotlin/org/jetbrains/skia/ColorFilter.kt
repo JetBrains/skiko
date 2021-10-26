@@ -82,10 +82,11 @@ class ColorFilter : RefCnt {
             require(b == null || b.size == 256) { "Expected 256 elements in b[], got " + b!!.size }
             interopScope {
                 return ColorFilter(_nMakeTableARGB(
-                    toInterop(a), a?.size ?: 0,
-                    toInterop(r), r?.size ?: 0,
-                    toInterop(g), g?.size ?: 0,
-                    toInterop(b), a?.size ?: 0))
+                    toInterop(a),
+                    toInterop(r),
+                    toInterop(g),
+                    toInterop(b),
+                ))
             }
         }
 
@@ -144,10 +145,10 @@ private external fun _nMakeOverdraw(c0: Int, c1: Int, c2: Int, c3: Int, c4: Int,
 @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nGetLuma")
 private external fun _nGetLuma(): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_ColorFilter__nMakeTableARGB")
+@ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeTableARGB")
 private external fun _nMakeTableARGB(
-    a: InteropPointer, aSize: Int,
-    r: InteropPointer, rSize: Int,
-    g: InteropPointer, gSize: Int,
-    b: InteropPointer, bSize: Int
+    a: InteropPointer,
+    r: InteropPointer,
+    g: InteropPointer,
+    b: InteropPointer,
 ): NativePointer
