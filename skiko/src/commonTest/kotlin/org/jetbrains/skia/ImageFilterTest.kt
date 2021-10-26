@@ -9,7 +9,7 @@ import kotlin.test.assertEquals
 class ImageFilterTest {
 
     private val originalBytes: ByteArray by lazy {
-         renderAndReturnBytes()
+        renderAndReturnBytes(imageFilter = null)
     }
 
     private fun renderAndReturnBytes(imageFilter: ImageFilter? = null): ByteArray {
@@ -51,6 +51,25 @@ class ImageFilterTest {
         assertContentDifferent(
             array1 = originalBytes,
             array2 = pixelsBytesWithAlphaThreshold,
+            message = "pixels with applied ImageFilter should be different"
+        )
+    }
+
+    @Test
+    fun arithmetic() = runTest {
+        val pixelsBytesWithArithmetic = renderAndReturnBytes(
+            ImageFilter.makeArithmetic(
+                k1 = 0.5f, k2 = 0.5f, k3 = 0.5f, k4 = 0.5f, enforcePMColor = true,
+                bg = null, fg = null, crop = null
+            )
+        )
+
+        assertEquals(originalBytes.size, pixelsBytesWithArithmetic.size)
+
+        // we don't check the actual content of the pixels, we only assume they're different when ImageFilter applied
+        assertContentDifferent(
+            array1 = originalBytes,
+            array2 = pixelsBytesWithArithmetic,
             message = "pixels with applied ImageFilter should be different"
         )
     }
