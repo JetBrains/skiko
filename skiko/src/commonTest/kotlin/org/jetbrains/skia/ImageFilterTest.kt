@@ -31,64 +31,43 @@ class ImageFilterTest {
         }
     }
 
-    @Test
-    fun alphaThreshold() = runTest {
-        val pixelsBytesWithAlphaThreshold = renderAndReturnBytes(
-            ImageFilter.makeAlphaThreshold(
-                Region().apply {
-                    setRect(IRect(5, 5, 10, 10))
-                },
-                innerMin = 0.9f,
-                outerMax = 0.2f,
-                input = null,
-                crop = null
-            )
-        )
-
-        assertEquals(originalBytes.size, pixelsBytesWithAlphaThreshold.size)
+    private fun imageFilterTest(imageFilter: () -> ImageFilter) = runTest {
+        val modifiedPixels = renderAndReturnBytes(imageFilter = imageFilter())
+        assertEquals(originalBytes.size, modifiedPixels.size)
 
         // we don't check the actual content of the pixels, we only assume they're different when ImageFilter applied
         assertContentDifferent(
             array1 = originalBytes,
-            array2 = pixelsBytesWithAlphaThreshold,
+            array2 = modifiedPixels,
             message = "pixels with applied ImageFilter should be different"
         )
     }
 
     @Test
-    fun arithmetic() = runTest {
-        val pixelsBytesWithArithmetic = renderAndReturnBytes(
-            ImageFilter.makeArithmetic(
-                k1 = 0.5f, k2 = 0.5f, k3 = 0.5f, k4 = 0.5f, enforcePMColor = true,
-                bg = null, fg = null, crop = null
-            )
-        )
-
-        assertEquals(originalBytes.size, pixelsBytesWithArithmetic.size)
-
-        // we don't check the actual content of the pixels, we only assume they're different when ImageFilter applied
-        assertContentDifferent(
-            array1 = originalBytes,
-            array2 = pixelsBytesWithArithmetic,
-            message = "pixels with applied ImageFilter should be different"
+    fun alphaThreshold() = imageFilterTest {
+        ImageFilter.makeAlphaThreshold(
+            Region().apply {
+                setRect(IRect(5, 5, 10, 10))
+            },
+            innerMin = 0.9f,
+            outerMax = 0.2f,
+            input = null,
+            crop = null
         )
     }
 
     @Test
-    fun blur() = runTest {
-        val pixelsBytesWithBlur = renderAndReturnBytes(
-            ImageFilter.makeBlur(
-                1f, 1f, FilterTileMode.CLAMP, crop = IRect(5, 5, 10, 10)
-            )
+    fun arithmetic() = imageFilterTest {
+        ImageFilter.makeArithmetic(
+            k1 = 0.5f, k2 = 0.5f, k3 = 0.5f, k4 = 0.5f, enforcePMColor = true,
+            bg = null, fg = null, crop = null
         )
+    }
 
-        assertEquals(originalBytes.size, pixelsBytesWithBlur.size)
-
-        // we don't check the actual content of the pixels, we only assume they're different when ImageFilter applied
-        assertContentDifferent(
-            array1 = originalBytes,
-            array2 = pixelsBytesWithBlur,
-            message = "pixels with applied ImageFilter should be different"
+    @Test
+    fun blur() = imageFilterTest {
+        ImageFilter.makeBlur(
+            1f, 1f, FilterTileMode.CLAMP, crop = IRect(5, 5, 10, 10)
         )
     }
 }
