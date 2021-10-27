@@ -149,4 +149,14 @@ class ImageFilterTest {
             Image.makeFromBitmap(bitmap)
         )
     }
+
+    @Test
+    fun makeMagnifier() = imageFilterTest {
+        ImageFilter.makeMagnifier(
+            r = Rect(0f, 0f, 15f, 15f),
+            input = null,
+            crop = null,
+            inset = 2f
+        )
+    }
 }

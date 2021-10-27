@@ -256,17 +256,19 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         fun makeMagnifier(r: Rect, inset: Float, input: ImageFilter?, crop: IRect?): ImageFilter {
             return try {
                 Stats.onNativeCall()
-                ImageFilter(
-                    _nMakeMagnifier(
-                        r.left,
-                        r.top,
-                        r.right,
-                        r.bottom,
-                        inset,
-                        getPtr(input),
-                        crop
+                interopScope {
+                    ImageFilter(
+                        _nMakeMagnifier(
+                            r.left,
+                            r.top,
+                            r.right,
+                            r.bottom,
+                            inset,
+                            getPtr(input),
+                            toInterop(crop?.serializeToIntArray())
+                        )
                     )
-                )
+                }
             } finally {
                 reachabilityBarrier(input)
             }
@@ -714,7 +716,7 @@ private external fun _nMakeMagnifier(
     b: Float,
     inset: Float,
     input: NativePointer,
-    crop: IRect?
+    crop: InteropPointer
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMatrixConvolution")
