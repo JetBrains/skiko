@@ -246,17 +246,19 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
     }
 
     /**
-     * If pixel address is available, return ByteBuffer wrapping it.
+     * If pixel address is available, return [Pixmap].
      * If pixel address is not available, return null.
-     *
-     * @return  ByteBuffer with direct access to pixels, or null
      *
      * @see [https://fiddle.skia.org/c/@Image_peekPixels](https://fiddle.skia.org/c/@Image_peekPixels)
      */
-    fun peekPixels(): ByteBuffer? {
+    fun peekPixels(): Pixmap? {
         return try {
             Stats.onNativeCall()
-            Image_nPeekPixels(_ptr)
+            Image_nPeekPixels(_ptr).takeIf {
+                it != NullPointer
+            }?.let {
+                Pixmap(it, true)
+            }
         } finally {
             reachabilityBarrier(this)
         }
@@ -376,7 +378,7 @@ private external fun Image_nGetImageInfo(ptr: NativePointer, imageInfo: InteropP
 private external fun Image_nMakeShader(ptr: NativePointer, tmx: Int, tmy: Int, samplingMode: Long, localMatrix: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nPeekPixels")
-private external fun Image_nPeekPixels(ptr: NativePointer): ByteBuffer?
+private external fun Image_nPeekPixels(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeRaster")
 private external fun _nMakeRaster(

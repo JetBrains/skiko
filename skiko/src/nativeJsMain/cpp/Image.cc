@@ -84,25 +84,17 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nMakeShader
     return reinterpret_cast<KNativePointer>(shader.release());
 }
 
-
-
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Image__1nPeekPixels
   (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_Image__1nPeekPixels");
+  SkImage* instance = reinterpret_cast<SkImage*>(ptr);
+  SkPixmap* pixmap = new SkPixmap();
+  if (instance->peekPixels(pixmap)) {
+      return reinterpret_cast<KNativePointer>(pixmap);
+  } else {
+      delete pixmap;
+      return nullptr;
+  }
 }
-
-#if 0
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Image__1nPeekPixels
-  (KNativePointer ptr) {
-    SkImage* instance = reinterpret_cast<SkImage*>((ptr));
-    SkPixmap pixmap;
-    if (instance->peekPixels(&pixmap))
-        return env->NewDirectByteBuffer(pixmap.writable_addr(), pixmap.rowBytes() * pixmap.height());
-    else
-        return nullptr;
-}
-#endif
-
 
 SKIKO_EXPORT KBoolean org_jetbrains_skia_Image__1nPeekPixelsToPixmap
   (KNativePointer ptr, KNativePointer pixmapPtr) {

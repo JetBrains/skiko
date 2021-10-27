@@ -46,6 +46,13 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DataKt__1nMakeFromByt
     return reinterpret_cast<jlong>(instance);
 }
 
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DataKt__1nMakeWithoutCopy
+    (JNIEnv* env, jclass jclass, jlong memoryAddr, jint length) {
+
+    SkData* instance = SkData::MakeWithoutCopy(reinterpret_cast<void*>(memoryAddr), length).release();
+    return reinterpret_cast<jlong>(instance);
+}
+
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DataKt__1nMakeFromFileName
   (JNIEnv* env, jclass jclass, jstring pathStr) {
     SkString path = skString(env, pathStr);
@@ -64,4 +71,16 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DataKt__1nMakeEmpty
   (JNIEnv* env, jclass jclass) {
     SkData* instance = SkData::MakeEmpty().release();
     return reinterpret_cast<jlong>(instance);
+}
+
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DataKt__1nMakeUninitialized
+  (JNIEnv* env, jclass jclass, jint length) {
+    SkData* instance = SkData::MakeUninitialized(length).release();
+    return reinterpret_cast<jlong>(instance);
+}
+
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DataKt__1nWritableData
+  (JNIEnv* env, jclass jclass, jlong ptr) {
+    SkData* instance = reinterpret_cast<SkData*>(static_cast<uintptr_t>(ptr));
+    return reinterpret_cast<jlong>(instance->writable_data());
 }

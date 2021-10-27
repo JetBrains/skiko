@@ -1,7 +1,6 @@
 package org.jetbrains.skia
 
 actual abstract class OutputStream
-actual abstract class ByteBuffer
 
 actual fun <R> commonSynchronized(lock: Any, block: () -> R) {
     block()

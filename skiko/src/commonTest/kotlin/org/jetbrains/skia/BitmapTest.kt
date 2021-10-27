@@ -113,4 +113,21 @@ class BitmapTest {
         assertEquals(setArray.size, result.size)
         assertContentEquals(setArray, result)
     }
+
+    @Test
+    fun canPeekPixelsAndCompare() = runTest {
+        val bitmap = Bitmap()
+        bitmap.allocPixels(ImageInfo.makeS32(2, 2, ColorAlphaType.OPAQUE))
+
+        val setArray = byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
+        assertTrue(bitmap.installPixels(setArray))
+
+        val dataBytes = bitmap.peekPixels()!!.buffer.bytes
+        assertEquals(setArray.size, dataBytes.size)
+
+
+        setArray.forEachIndexed { ix, value ->
+            assertEquals(value, dataBytes[ix])
+        }
+    }
 }

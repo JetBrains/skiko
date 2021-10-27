@@ -1,7 +1,5 @@
 package org.jetbrains.skia
 
-expect abstract class ByteBuffer
-
 expect fun <R> commonSynchronized(lock: Any, block: () -> R)
 
 expect fun String.intCodePoints(): IntArray

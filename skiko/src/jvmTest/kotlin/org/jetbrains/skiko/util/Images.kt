@@ -1,6 +1,6 @@
 package org.jetbrains.skiko.util
 
-import org.jetbrains.skia.ByteBuffer
+import org.jetbrains.skia.Data
 import org.jetbrains.skia.Image
 import org.jetbrains.skia.Pixmap
 import java.awt.Color
@@ -16,12 +16,12 @@ fun isContentSame(img1: Image, img2: Image, sensitivity: Double): Boolean {
 
         pixMap1.reset(
             img1.imageInfo,
-            ByteBuffer.allocateDirect(img1.bytesPerPixel * img1.width * img1.height),
+            Data.makeUninitialized(img1.bytesPerPixel * img1.width * img1.height),
             img1.bytesPerPixel * img1.width
         )
         pixMap2.reset(
             img2.imageInfo,
-            ByteBuffer.allocateDirect(img2.bytesPerPixel * img2.width * img2.height),
+            Data.makeUninitialized(img2.bytesPerPixel * img2.width * img2.height),
             img2.bytesPerPixel * img2.width
         )
         check(img1.readPixels(pixMap1, 0, 0, false))
