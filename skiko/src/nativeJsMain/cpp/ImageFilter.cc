@@ -124,30 +124,17 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeMatrixTransfor
     return reinterpret_cast<KNativePointer>(ptr);
 }
 
-
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeMerge
-  (KNativePointerArray filtersArray, KInteropPointer cropObj) {
-    TODO("implement org_jetbrains_skia_ImageFilter__1nMakeMerge");
-}
-
-#if 0
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeMerge
-  (KNativePointerArray filtersArray, KInteropPointer cropObj) {
-    KNativePointer* f = env->GetLongArrayElements(filtersArray, 0);
-    jsize len = env->GetArrayLength(filtersArray);
-    std::vector<sk_sp<SkImageFilter>> filters(len);
-    for (int i = 0; i < len; ++i) {
-        SkImageFilter* fi = reinterpret_cast<SkImageFilter*>((f[i]));
+  (KNativePointer* filtersArray, KInt filtersArraySize, KInt* cropRectInts) {
+    std::vector<sk_sp<SkImageFilter>> filters(filtersArraySize);
+    for (int i = 0; i < filtersArraySize; ++i) {
+        SkImageFilter* fi = reinterpret_cast<SkImageFilter*>(filtersArray[i]);
         filters[i] = sk_ref_sp(fi);
     }
-    env->ReleaseLongArrayElements(filtersArray, f, 0);
-    std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
-    SkImageFilter* ptr = SkImageFilters::Merge(filters.data(), len, crop.get()).release();
+    std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(cropRectInts);
+    SkImageFilter* ptr = SkImageFilters::Merge(filters.data(), filtersArraySize, crop.get()).release();
     return reinterpret_cast<KNativePointer>(ptr);
 }
-#endif
-
-
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeOffset
   (KFloat dx, KFloat dy, KNativePointer inputPtr, KInteropPointer cropObj) {

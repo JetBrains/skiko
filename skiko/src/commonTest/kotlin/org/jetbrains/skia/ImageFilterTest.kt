@@ -186,4 +186,28 @@ class ImageFilterTest {
             input = null
         )
     }
+
+    @Test
+    fun makeMerge() = runTest {
+        val filter1 = ImageFilter.makeMagnifier(
+            r = Rect(0f, 0f, 15f, 15f),
+            input = null,
+            crop = null,
+            inset = 2f
+        )
+
+        val filter2 = ImageFilter.makeColorFilter(
+            f = ColorFilter.luma,
+            input = null, crop = null
+        )
+
+        val filter3 = ImageFilter.makeBlur(
+            1f, 1f, FilterTileMode.CLAMP, crop = IRect(5, 5, 10, 10)
+        )
+
+        ImageFilter.makeMerge(
+            filters = arrayOf(filter1, filter2, filter3),
+            crop = IRect(2, 2, 12, 12)
+        )
+    }
 }
