@@ -614,24 +614,22 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         ): ImageFilter {
             return try {
                 Stats.onNativeCall()
-                ImageFilter(
-                    _nMakeSpotLitSpecular(
-                        x0,
-                        y0,
-                        z0,
-                        x1,
-                        y1,
-                        z1,
-                        falloffExponent,
-                        cutoffAngle,
-                        lightColor,
-                        surfaceScale,
-                        ks,
-                        shininess,
-                        getPtr(input),
-                        crop
+                interopScope {
+                    ImageFilter(
+                        _nMakeSpotLitSpecular(
+                            x0, y0, z0,
+                            x1, y1, z1,
+                            falloffExponent,
+                            cutoffAngle,
+                            lightColor,
+                            surfaceScale,
+                            ks,
+                            shininess,
+                            getPtr(input),
+                            toInterop(crop?.serializeToIntArray())
+                        )
                     )
-                )
+                }
             } finally {
                 reachabilityBarrier(input)
             }
@@ -854,5 +852,5 @@ private external fun _nMakeSpotLitSpecular(
     ks: Float,
     shininess: Float,
     input: NativePointer,
-    crop: IRect?
+    crop: InteropPointer
 ): NativePointer

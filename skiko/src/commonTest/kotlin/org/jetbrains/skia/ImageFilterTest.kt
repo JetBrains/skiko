@@ -289,4 +289,14 @@ class ImageFilterTest {
             crop = IRect(0, 0, 15, 15)
         )
     }
+
+    @Test
+    fun makeSpotLitSpecular() = imageFilterTest {
+        ImageFilter.makeSpotLitSpecular(
+            x0 = 0f, y0 = 0f, z0 = 0f, x1 = 10f, y1 = 10f, z1 = 10f,
+            falloffExponent = 2f, cutoffAngle = 0f, lightColor = Color.RED,
+            surfaceScale = 2f, ks = 1f, input = null, crop = IRect(0, 0, 15, 15),
+            shininess = 1f
+        )
+    }
 }
