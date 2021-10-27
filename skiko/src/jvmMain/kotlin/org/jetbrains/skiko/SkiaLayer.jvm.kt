@@ -527,9 +527,7 @@ actual open class SkiaLayer internal constructor(
 }
 
 fun SkiaLayer.disableTitleBar(customHeaderHeight: Float) {
-    backedLayer.useDrawingSurfacePlatformInfo { platformInfo ->
-        platformOperations.disableTitleBar(platformInfo, customHeaderHeight)
-    }
+    backedLayer.disableTitleBar(customHeaderHeight)
 }
 
 fun orderEmojiAndSymbolsPopup() {
