@@ -73,6 +73,12 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DataKt__1nMakeEmpty
     return reinterpret_cast<jlong>(instance);
 }
 
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DataKt__1nMakeUninitialized
+  (JNIEnv* env, jclass jclass, jint length) {
+    SkData* instance = SkData::MakeUninitialized(length).release();
+    return reinterpret_cast<jlong>(instance);
+}
+
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DataKt__1nWritableData
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkData* instance = reinterpret_cast<SkData*>(static_cast<uintptr_t>(ptr));

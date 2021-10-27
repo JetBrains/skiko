@@ -69,6 +69,11 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Data__1nMakeEmpty() {
     return reinterpret_cast<KNativePointer>(instance);
 }
 
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_Data__1nMakeUninitialized(KInt length) {
+    SkData* instance = SkData::MakeUninitialized(length).release();
+    return reinterpret_cast<KNativePointer>(instance);
+}
+
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Data__1nWritableData
   (KNativePointer ptr) {
     SkData* instance = reinterpret_cast<SkData*>(ptr);

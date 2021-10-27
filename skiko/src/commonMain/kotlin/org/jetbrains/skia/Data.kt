@@ -31,7 +31,7 @@ class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
          * @param underlyingMemoryOwner - is stored in Data instance to prevent underlying memory getting cleaned by GC in cases when
          * [underlyingMemoryOwner] doesn't have any other references.
          */
-        fun makeWithoutCopy(memoryAddr: NativePointer, length: Int, underlyingMemoryOwner: Managed? = null): Data {
+        fun makeWithoutCopy(memoryAddr: NativePointer, length: Int, underlyingMemoryOwner: Managed): Data {
             Stats.onNativeCall()
             return Data(
                 interopScope {
@@ -49,6 +49,11 @@ class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
         fun makeEmpty(): Data {
             Stats.onNativeCall()
             return Data(_nMakeEmpty())
+        }
+
+        fun makeUninitialized(length: Int): Data {
+            Stats.onNativeCall()
+            return Data(_nMakeUninitialized(length))
         }
 
         init {
@@ -162,6 +167,9 @@ private external fun _nMakeSubset(ptr: NativePointer, offset: Int, length: Int):
 
 @ExternalSymbolName("org_jetbrains_skia_Data__1nMakeEmpty")
 private external fun _nMakeEmpty(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Data__1nMakeUninitialized")
+private external fun _nMakeUninitialized(length: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Data__1nWritableData")
 private external fun _nWritableData(dataPtr: NativePointer): NativePointer

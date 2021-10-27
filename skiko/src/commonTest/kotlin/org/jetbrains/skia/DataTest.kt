@@ -72,7 +72,11 @@ class DataTest {
         val originalDataPtr = originalData._ptr
 
         // `use()` calls `close()` in the end
-        val copiedData = Data.makeWithoutCopy(originalData.writableData(), 5).use {
+        val copiedData = Data.makeWithoutCopy(
+            memoryAddr = originalData.writableData(),
+            length = 5,
+            underlyingMemoryOwner = originalData
+        ).use {
             assertNotEquals(NullPointer, it._ptr)
             assertContentEquals(bytes, it.bytes)
             it
@@ -85,6 +89,33 @@ class DataTest {
             bytes,
             originalData.bytes,
             message = "Memory is not expected to get cleaned up because Data.makeWithoutCopy uses NoopReleaseProc as a ReleaseProc"
+        )
+    }
+
+    @Test
+    fun canMakeUninitialized() = runTest {
+        val data = Data.makeUninitialized(100)
+        assertEquals(100, data.bytes.size)
+
+        println(data.bytes.joinToString())
+
+        val imageInfo = ImageInfo.makeN32Premul(5, 5)
+        val pixmap = Pixmap.make(imageInfo, data, imageInfo.minRowBytes)
+        val surface = Surface.makeRasterDirect(pixmap)
+
+        surface.canvas.clear(Color.WHITE)
+        // check that data contains all white pixels
+        assertContentEquals(
+            expected = ByteArray(100) { -1 },
+            actual = data.bytes
+        )
+
+        surface.canvas.clear(Color.BLACK)
+        // check that data contains all black pixels
+        assertContentEquals(
+            // every 4th byte is -1, the rest is 0 for Color.BLACK
+            expected = ByteArray(100) { if ((it + 1) % 4 == 0) -1 else 0 },
+            actual = data.bytes
         )
     }
 }
