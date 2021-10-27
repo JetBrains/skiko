@@ -38,9 +38,11 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_RegionKt_Region_1n
     return instance->isComplex();
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_RegionKt_Region_1nGetBounds(JNIEnv* env, jclass jclass, jlong ptr) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_RegionKt_Region_1nGetBounds(JNIEnv* env, jclass jclass, jlong ptr, jintArray ltrbArray) {
     SkRegion* instance = reinterpret_cast<SkRegion*>(static_cast<uintptr_t>(ptr));
-    return skija::IRect::fromSkIRect(env, instance->getBounds());
+    SkIRect bounds = instance->getBounds();
+    jint ltrb[4] { bounds.left(), bounds.top(), bounds.right(), bounds.bottom() };
+    env->SetIntArrayRegion(ltrbArray, 0, 4, ltrb);
 }
 
 extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_RegionKt_Region_1nComputeRegionComplexity(JNIEnv* env, jclass jclass, jlong ptr) {
@@ -64,7 +66,7 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_RegionKt_Region_1n
     return instance->setRect({left, top, right, bottom});
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_RegionKt_Region_1nSetRects(JNIEnv* env, jclass jclass, jlong ptr, jintArray coords) {
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_RegionKt_Region_1nSetRects(JNIEnv* env, jclass jclass, jlong ptr, jintArray coords, jint _count) {
     SkRegion* instance = reinterpret_cast<SkRegion*>(static_cast<uintptr_t>(ptr));
     int len = env->GetArrayLength(coords);
     std::vector<SkIRect> rects(len / 4);
