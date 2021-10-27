@@ -254,4 +254,12 @@ class ImageFilterTest {
             surfaceScale = 2f, kd = 1f, input = null, crop = IRect(5, 5, 10, 10)
         )
     }
+
+    @Test
+    fun makePointLitDiffuse() = imageFilterTest {
+        ImageFilter.makePointLitDiffuse(
+            x = 2f, y = 2f, z = 2f, lightColor = Color.RED,
+            surfaceScale = 2f, kd = 1f, input = null, crop = IRect(5, 5, 10, 10)
+        )
+    }
 }
