@@ -239,4 +239,11 @@ class ImageFilterTest {
             rx = 10f, ry = 10f, input = null, crop = null
         )
     }
+
+    @Test
+    fun makeErode() = runTest {
+        ImageFilter.makeErode(
+            rx = 5f, ry = 5f, input = null, crop = null
+        )
+    }
 }

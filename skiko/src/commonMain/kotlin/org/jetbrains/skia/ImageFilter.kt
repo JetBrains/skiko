@@ -423,14 +423,15 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         fun makeErode(rx: Float, ry: Float, input: ImageFilter?, crop: IRect?): ImageFilter {
             return try {
                 Stats.onNativeCall()
-                ImageFilter(
-                    _nMakeErode(
-                        rx,
-                        ry,
-                        getPtr(input),
-                        crop
+                interopScope {
+                    ImageFilter(
+                        _nMakeErode(
+                            rx, ry,
+                            getPtr(input),
+                            toInterop(crop?.serializeToIntArray())
+                        )
                     )
-                )
+                }
             } finally {
                 reachabilityBarrier(input)
             }
@@ -770,7 +771,7 @@ private external fun _nMakeTile(
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDilate")
 private external fun _nMakeDilate(rx: Float, ry: Float, input: NativePointer, crop: InteropPointer): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeErode")
-private external fun _nMakeErode(rx: Float, ry: Float, input: NativePointer, crop: IRect?): NativePointer
+private external fun _nMakeErode(rx: Float, ry: Float, input: NativePointer, crop: InteropPointer): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDistantLitDiffuse")
 private external fun _nMakeDistantLitDiffuse(
     x: Float,
