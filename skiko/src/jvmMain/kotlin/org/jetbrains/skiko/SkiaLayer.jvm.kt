@@ -528,7 +528,7 @@ actual open class SkiaLayer internal constructor(
 
 fun SkiaLayer.disableTitleBar() {
     backedLayer.useDrawingSurfacePlatformInfo {
-        platformOperations.disableTitleBar(it)
+        platformOperations.disableTitleBar(backedLayer)
     }
 }
 

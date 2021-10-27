@@ -15,6 +15,7 @@ import org.jetbrains.skiko.context.ContextHandler
 import org.jetbrains.skiko.redrawer.Redrawer
 import org.jetbrains.skiko.util.ScreenshotTestRule
 import org.jetbrains.skiko.util.swingTest
+import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Assume.assumeTrue
 import org.junit.Rule
@@ -62,6 +63,35 @@ class SkiaWindowTest {
 
     @get:Rule
     val screenshots = ScreenshotTestRule()
+
+    @Test
+    fun `should not leak native windows`() = swingTest {
+        assumeTrue(hostOs.isMacOS)
+
+        var initialWindowCount = -1
+
+        repeat(30) {
+            val layer = SkiaLayer()
+            val frame = JFrame()
+            frame.contentPane.add(layer)
+            frame.size = Dimension(200, 200)
+            frame.isVisible = true
+            delay(30)
+            layer.dispose()
+            frame.dispose()
+
+            // take into account invisible cached windows after the first SkiaLayer creation
+            if (initialWindowCount < 0) {
+                initialWindowCount = getApplicationWindowCount()
+            }
+        }
+
+        val actualWindowCount = getApplicationWindowCount()
+        assertTrue(
+            initialWindowCount >= actualWindowCount,
+            "initialWindowCount=$initialWindowCount, actualWindowCount=$actualWindowCount"
+        )
+    }
 
     @Test
     fun `render single window`() = swingTest {

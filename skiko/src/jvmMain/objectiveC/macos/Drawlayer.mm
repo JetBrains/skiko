@@ -12,7 +12,7 @@
 
 @property jobject canvasGlobalRef;
 @property (retain, strong) CALayer *container;
-@property (retain, strong) NSWindow *window;
+@property (assign) NSWindow *window;
 
 @end
 
@@ -35,7 +35,6 @@
 -(void) dealloc {
     self.canvasGlobalRef = NULL;
     [self.container release];
-    [self.window release];
     [super dealloc];
 }
 
@@ -120,29 +119,33 @@ NSWindow *findWindow(jlong platformInfoPtr)
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_nativeInit(JNIEnv *env, jobject canvas, jlong platformInfoPtr)
 {
-    if (layerStorage == nil)
-    {
-        layerStorage = [[NSMutableSet alloc] init];
+    @autoreleasepool {
+        if (layerStorage == nil)
+        {
+            layerStorage = [[NSMutableSet alloc] init];
+        }
+
+        LayerHandler *layer = [[LayerHandler alloc] init];
+        NSObject<JAWT_SurfaceLayers>* dsi_mac = (__bridge NSObject<JAWT_SurfaceLayers> *) platformInfoPtr;
+        layer.container = [dsi_mac windowLayer];
+        jobject canvasGlobalRef = env->NewGlobalRef(canvas);
+        [layer setCanvasGlobalRef: canvasGlobalRef];
+        layer.window = findWindow(platformInfoPtr);
+
+        [layerStorage addObject: layer];
     }
-
-    LayerHandler *layersSet = [[LayerHandler alloc] init];
-    NSObject<JAWT_SurfaceLayers>* dsi_mac = (__bridge NSObject<JAWT_SurfaceLayers> *) platformInfoPtr;
-    layersSet.container = [dsi_mac windowLayer];
-    jobject canvasGlobalRef = env->NewGlobalRef(canvas);
-    [layersSet setCanvasGlobalRef: canvasGlobalRef];
-    layersSet.window = findWindow(platformInfoPtr);
-
-    [layerStorage addObject: layersSet];
 }
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_nativeDispose(JNIEnv *env, jobject canvas)
 {
-    LayerHandler *layer = findByObject(env, canvas);
-    if (layer != NULL)
-    {
-        [layerStorage removeObject: layer];
-        env->DeleteGlobalRef(layer.canvasGlobalRef);
-        [layer release];
+    @autoreleasepool {
+        LayerHandler *layer = findByObject(env, canvas);
+        if (layer != NULL)
+        {
+            [layerStorage removeObject: layer];
+            env->DeleteGlobalRef(layer.canvasGlobalRef);
+            [layer release];
+        }
     }
 }
 
@@ -165,22 +168,22 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_osxSetFulls
     }
 }
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getWindowHandle(JNIEnv *env, jobject canvas, jlong platformInfoPtr)
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getWindowHandle(JNIEnv *env, jobject component, jlong platformInfoPtr)
 {
-    NSWindow* window = findWindow(platformInfoPtr);
-    return (jlong)window;
+    LayerHandler *layer = findByObject(env, component);
+    return (jlong)layer.window;
 }
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getContentHandle(JNIEnv *env, jobject canvas, jlong platformInfoPtr)
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getContentHandle(JNIEnv *env, jobject component, jlong platformInfoPtr)
 {
-    NSWindow* window = findWindow(platformInfoPtr);
-    return (jlong)window;
+    LayerHandler *layer = findByObject(env, component);
+    return (jlong)layer.window;
 }
 
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_osxDisableTitleBar(JNIEnv *env, jobject properties, jlong platformInfoPtr)
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_osxDisableTitleBar(JNIEnv *env, jobject obj, jobject component)
 {
-    NSWindow* window = findWindow(platformInfoPtr);
-    if (window == nil) return;
+    LayerHandler *layer = findByObject(env, component);
+    NSWindow *window = layer.window;
     dispatch_sync(dispatch_get_main_queue(), ^{
         [window setTitlebarAppearsTransparent:YES];
         [window setTitleVisibility:NSWindowTitleHidden];
