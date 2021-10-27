@@ -84,19 +84,12 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeDropShadow
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeDropShadowOnly
-  (KFloat dx, KFloat dy, KFloat sigmaX, KFloat sigmaY, KInt color, KNativePointer inputPtr, KInteropPointer cropObj) {
-    TODO("implement org_jetbrains_skia_ImageFilter__1nMakeDropShadowOnly");
-}
-
-#if 0
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeDropShadowOnly
-  (KFloat dx, KFloat dy, KFloat sigmaX, KFloat sigmaY, KInt color, KNativePointer inputPtr, KInteropPointer cropObj) {
+  (KFloat dx, KFloat dy, KFloat sigmaX, KFloat sigmaY, KInt color, KNativePointer inputPtr, KInt* cropRectInts) {
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>((inputPtr));
-    std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
+    std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(cropRectInts);
     SkImageFilter* ptr = SkImageFilters::DropShadowOnly(dx, dy, sigmaX, sigmaY, color, sk_ref_sp(input), crop.get()).release();
     return reinterpret_cast<KNativePointer>(ptr);
 }
-#endif
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeImage
