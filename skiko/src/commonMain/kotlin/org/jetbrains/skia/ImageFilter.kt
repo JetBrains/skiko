@@ -351,14 +351,15 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         fun makeOffset(dx: Float, dy: Float, input: ImageFilter?, crop: IRect?): ImageFilter {
             return try {
                 Stats.onNativeCall()
-                ImageFilter(
-                    _nMakeOffset(
-                        dx,
-                        dy,
-                        getPtr(input),
-                        crop
+                interopScope {
+                    ImageFilter(
+                        _nMakeOffset(
+                            dx, dy,
+                            getPtr(input),
+                            toInterop(crop?.serializeToIntArray())
+                        )
                     )
-                )
+                }
             } finally {
                 reachabilityBarrier(input)
             }
@@ -745,7 +746,7 @@ private external fun _nMakeMatrixTransform(matrix: InteropPointer, samplingModeV
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMerge")
 private external fun _nMakeMerge(filters: InteropPointer, filtersLength: Int, crop: InteropPointer): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeOffset")
-private external fun _nMakeOffset(dx: Float, dy: Float, input: NativePointer, crop: IRect?): NativePointer
+private external fun _nMakeOffset(dx: Float, dy: Float, input: NativePointer, crop: InteropPointer): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakePaint")
 private external fun _nMakePaint(paint: NativePointer, crop: IRect?): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakePicture")

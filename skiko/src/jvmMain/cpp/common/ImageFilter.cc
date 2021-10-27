@@ -138,9 +138,9 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilterKt__1nMake
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilterKt__1nMakeOffset
-  (JNIEnv* env, jclass jclass, jfloat dx, jfloat dy, jlong inputPtr, jobject cropObj) {
+  (JNIEnv* env, jclass jclass, jfloat dx, jfloat dy, jlong inputPtr, jintArray cropInts) {
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>(static_cast<uintptr_t>(inputPtr));
-    std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
+    std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropInts);
     SkImageFilter* ptr = SkImageFilters::Offset(dx, dy, sk_ref_sp(input), crop.get()).release();
     return reinterpret_cast<jlong>(ptr);
 }

@@ -210,4 +210,9 @@ class ImageFilterTest {
             crop = IRect(2, 2, 12, 12)
         )
     }
+
+    @Test
+    fun makeOffset() = runTest {
+        ImageFilter.makeOffset(dx = 2f, dy = 2f, input = null, crop = null)
+    }
 }
