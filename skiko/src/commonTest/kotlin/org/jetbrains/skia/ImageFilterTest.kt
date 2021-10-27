@@ -138,4 +138,15 @@ class ImageFilterTest {
             color = Color.BLACK, input = null, crop = null
         )
     }
+
+    @Test
+    fun makeImage() = imageFilterTest {
+        val bitmap = Bitmap()
+        bitmap.setImageInfo(ImageInfo.makeN32Premul(5, 5))
+        bitmap.installPixels(ByteArray(100) { -1 })
+
+        ImageFilter.makeImage(
+            Image.makeFromBitmap(bitmap)
+        )
+    }
 }
