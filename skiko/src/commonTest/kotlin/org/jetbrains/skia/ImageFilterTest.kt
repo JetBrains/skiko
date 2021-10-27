@@ -3,6 +3,7 @@ package org.jetbrains.skia
 import org.jetbrains.skia.impl.use
 import org.jetbrains.skia.util.assertContentDifferent
 import org.jetbrains.skiko.tests.runTest
+import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -174,6 +175,15 @@ class ImageFilterTest {
             convolveAlpha = true,
             input = null,
             crop = null
+        )
+    }
+
+    @Test // TODO: use SamplingMode._packAs2Ints after PR(316) gets merged
+    fun makeMatrixTransform() = imageFilterTest {
+        ImageFilter.makeMatrixTransform(
+            Matrix33.makeTranslate(2f, 2f),
+            mode = SamplingMode.LINEAR,
+            input = null
         )
     }
 }
