@@ -7,7 +7,7 @@ import javax.swing.SwingUtilities
 internal interface PlatformOperations {
     fun isFullscreen(component: Component): Boolean
     fun setFullscreen(component: Component, value: Boolean)
-    fun disableTitleBar(platformInfo: Long)
+    fun disableTitleBar(component: Component, headerHeight: Float)
     fun orderEmojiAndSymbolsPopup()
     fun getDpiScale(component: Component): Float
 }
@@ -27,8 +27,8 @@ internal val platformOperations: PlatformOperations by lazy {
                     return component.graphicsConfiguration.defaultTransform.scaleX.toFloat()
                 }
 
-                override fun disableTitleBar(platformInfo: Long) {
-                    osxDisableTitleBar(platformInfo)
+                override fun disableTitleBar(component: Component, headerHeight: Float) {
+                    osxDisableTitleBar(component, headerHeight)
                 }
 
                 override fun orderEmojiAndSymbolsPopup() {
@@ -49,7 +49,7 @@ internal val platformOperations: PlatformOperations by lazy {
                     device.setFullScreenWindow(if (value) window else null)
                 }
 
-                override fun disableTitleBar(platformInfo: Long) {
+                override fun disableTitleBar(component: Component, headerHeight: Float) {
                 }
 
                 override fun orderEmojiAndSymbolsPopup() {
@@ -74,7 +74,7 @@ internal val platformOperations: PlatformOperations by lazy {
                     device.setFullScreenWindow(if (value) window else null)
                 }
 
-                override fun disableTitleBar(platformInfo: Long) {
+                override fun disableTitleBar(component: Component, headerHeight: Float) {
                 }
 
                 override fun orderEmojiAndSymbolsPopup() {
@@ -94,7 +94,7 @@ internal val platformOperations: PlatformOperations by lazy {
 // OSX
 external private fun osxIsFullscreenNative(component: Component): Boolean
 external private fun osxSetFullscreenNative(component: Component, value: Boolean)
-external private fun osxDisableTitleBar(platformInfo: Long)
+external private fun osxDisableTitleBar(component: Component, headerHeight: Float)
 external private fun osxOrderEmojiAndSymbolsPopup()
 
 // Linux
