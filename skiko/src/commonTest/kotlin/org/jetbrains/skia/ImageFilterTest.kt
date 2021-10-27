@@ -188,7 +188,7 @@ class ImageFilterTest {
     }
 
     @Test
-    fun makeMerge() = runTest {
+    fun makeMerge() = imageFilterTest {
         val filter1 = ImageFilter.makeMagnifier(
             r = Rect(0f, 0f, 15f, 15f),
             input = null,
@@ -212,12 +212,12 @@ class ImageFilterTest {
     }
 
     @Test
-    fun makeOffset() = runTest {
+    fun makeOffset() = imageFilterTest {
         ImageFilter.makeOffset(dx = 2f, dy = 2f, input = null, crop = null)
     }
 
     @Test
-    fun makePaint() = runTest {
+    fun makePaint() = imageFilterTest {
         ImageFilter.makePaint(
             paint = Paint().setStroke(false).setColor4f(Color4f(Color.RED), colorSpace = null),
             crop = null
@@ -225,7 +225,7 @@ class ImageFilterTest {
     }
 
     @Test
-    fun makeTile() = runTest {
+    fun makeTile() = imageFilterTest {
         ImageFilter.makeTile(
             src = Rect(0f, 0f, 3f, 3f),
             dst = Rect(5f, 5f, 19f, 19f),
@@ -234,16 +234,24 @@ class ImageFilterTest {
     }
 
     @Test
-    fun makeDilate() = runTest {
+    fun makeDilate() = imageFilterTest {
         ImageFilter.makeDilate(
             rx = 10f, ry = 10f, input = null, crop = null
         )
     }
 
     @Test
-    fun makeErode() = runTest {
+    fun makeErode() = imageFilterTest {
         ImageFilter.makeErode(
             rx = 5f, ry = 5f, input = null, crop = null
+        )
+    }
+
+    @Test
+    fun makeDistantLitDiffuse() = imageFilterTest {
+        ImageFilter.makeDistantLitDiffuse(
+            x = 2f, y = 2f, z = 2f, lightColor = Color.RED,
+            surfaceScale = 2f, kd = 1f, input = null, crop = IRect(5, 5, 10, 10)
         )
     }
 }

@@ -449,18 +449,18 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         ): ImageFilter {
             return try {
                 Stats.onNativeCall()
-                ImageFilter(
-                    _nMakeDistantLitDiffuse(
-                        x,
-                        y,
-                        z,
-                        lightColor,
-                        surfaceScale,
-                        kd,
-                        getPtr(input),
-                        crop
+                interopScope {
+                    ImageFilter(
+                        _nMakeDistantLitDiffuse(
+                            x, y, z,
+                            lightColor,
+                            surfaceScale,
+                            kd,
+                            getPtr(input),
+                            toInterop(crop?.serializeToIntArray())
+                        )
                     )
-                )
+                }
             } finally {
                 reachabilityBarrier(input)
             }
@@ -781,7 +781,7 @@ private external fun _nMakeDistantLitDiffuse(
     surfaceScale: Float,
     kd: Float,
     input: NativePointer,
-    crop: IRect?
+    crop: InteropPointer
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakePointLitDiffuse")
