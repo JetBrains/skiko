@@ -41,6 +41,8 @@ open class Rect constructor(val left: Float, val top: Float, val right: Float, v
         return IRect(left.toInt(), top.toInt(), right.toInt(), bottom.toInt())
     }
 
+    internal fun toLTRBArray() = floatArrayOf(left, top, right, bottom)
+
     open fun inflate(spread: Float): Rect {
         return if (spread <= 0) makeLTRB(
             left - spread, top - spread, maxOf(
