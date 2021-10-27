@@ -159,10 +159,10 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_Pixmap__1nReadPixelsToPixmapFromPoint
 }
 
 SKIKO_EXPORT KBoolean org_jetbrains_skia_Pixmap__1nScalePixels
-  (KNativePointer ptr, KNativePointer dstPixmapPtr, KLong samplingOptions) {
+  (KNativePointer ptr, KNativePointer dstPixmapPtr, KInt* samplingOptions) {
     SkPixmap* pixmap = interopToPtr<SkPixmap*>(ptr);
     SkPixmap* dstPixmap = interopToPtr<SkPixmap*>(dstPixmapPtr);
-    return static_cast<KBoolean>(pixmap->scalePixels(*dstPixmap, skija::SamplingMode::unpack(samplingOptions)));
+    return static_cast<KBoolean>(pixmap->scalePixels(*dstPixmap, skija::SamplingMode::unpackFrom2Ints(samplingOptions)));
 }
 
 SKIKO_EXPORT KBoolean org_jetbrains_skia_Pixmap__1nErase

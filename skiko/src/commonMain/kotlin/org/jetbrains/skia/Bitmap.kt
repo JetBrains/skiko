@@ -1021,7 +1021,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
                         _ptr,
                         tmx.ordinal,
                         tmy.ordinal,
-                        sampling._pack(),
+                        toInterop(sampling._packAs2Ints()),
                         toInterop(localMatrix?.mat)
                     )
                 }
@@ -1196,4 +1196,4 @@ private external fun _nExtractAlpha(ptr: NativePointer, dstPtr: NativePointer, p
 private external fun _nPeekPixels(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nMakeShader")
-private external fun _nMakeShader(ptr: NativePointer, tmx: Int, tmy: Int, samplingMode: Long, localMatrix: InteropPointer): NativePointer
+private external fun _nMakeShader(ptr: NativePointer, tmx: Int, tmy: Int, samplingMode: InteropPointer, localMatrix: InteropPointer): NativePointer

@@ -7,6 +7,7 @@ package org.jetbrains.skia
  */
 interface SamplingMode {
     fun _pack(): Long
+    fun _packAs2Ints(): IntArray
 
     companion object {
         val DEFAULT: SamplingMode = FilterMipmap(FilterMode.NEAREST, MipmapMode.NONE)

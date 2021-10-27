@@ -96,14 +96,14 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawPath
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawImageRect
-  (JNIEnv* env, jclass jclass, jlong canvasPtr, jlong imagePtr, jfloat sl, jfloat st, jfloat sr, jfloat sb, jfloat dl, jfloat dt, jfloat dr, jfloat db, jlong samplingMode, jlong paintPtr, jboolean strict) {
+  (JNIEnv* env, jclass jclass, jlong canvasPtr, jlong imagePtr, jfloat sl, jfloat st, jfloat sr, jfloat sb, jfloat dl, jfloat dt, jfloat dr, jfloat db, jintArray samplingMode, jlong paintPtr, jboolean strict) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
     SkImage* image = reinterpret_cast<SkImage*>(static_cast<uintptr_t>(imagePtr));
     SkRect src {sl, st, sr, sb};
     SkRect dst {dl, dt, dr, db};
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
     SkCanvas::SrcRectConstraint constraint = strict ? SkCanvas::SrcRectConstraint::kStrict_SrcRectConstraint : SkCanvas::SrcRectConstraint::kFast_SrcRectConstraint;
-    canvas->drawImageRect(image, src, dst, skija::SamplingMode::unpack(samplingMode), paint, constraint);
+    canvas->drawImageRect(image, src, dst, skija::SamplingMode::unpackFrom2Ints(env, samplingMode), paint, constraint);
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawImageNine
@@ -165,14 +165,14 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawVertic
         static_cast<SkVertices::VertexMode>(verticesMode),
         env->GetArrayLength(positionsArr) / 2,
         reinterpret_cast<SkPoint*>(positions),
-        reinterpret_cast<SkPoint*>(texCoords), 
+        reinterpret_cast<SkPoint*>(texCoords),
         reinterpret_cast<SkColor*>(colors),
         indexCount,
         reinterpret_cast<const uint16_t *>(indices));
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
 
     canvas->drawVertices(vertices, static_cast<SkBlendMode>(blendMode), *paint);
-    
+
     if (texCoords != nullptr)
         env->ReleaseFloatArrayElements(texCoordsArr, texCoords, 0);
     if (colors != nullptr)
@@ -189,7 +189,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nDrawPatch
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
 
     canvas->drawPatch(reinterpret_cast<SkPoint*>(cubics), reinterpret_cast<SkColor*>(colors), reinterpret_cast<SkPoint*>(texCoords), static_cast<SkBlendMode>(blendMode), *paint);
-    
+
     if (texCoords != nullptr)
         env->ReleaseFloatArrayElements(texCoordsArr, texCoords, 0);
     env->ReleaseIntArrayElements(colorsArr, colors, 0);

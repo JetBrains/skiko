@@ -72,13 +72,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nEncodeToData
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nMakeShader
-  (KNativePointer ptr, KInt tmx, KInt tmy, KLong samplingMode, KFloat* localMatrixArr) {
+  (KNativePointer ptr, KInt tmx, KInt tmy, KInt* samplingMode, KFloat* localMatrixArr) {
     SkImage* instance = reinterpret_cast<SkImage*>(ptr);
     std::unique_ptr<SkMatrix> localMatrix = skMatrix(localMatrixArr);
     sk_sp<SkShader> shader = instance->makeShader(
         static_cast<SkTileMode>(tmx),
         static_cast<SkTileMode>(tmy),
-        skija::SamplingMode::unpack(samplingMode),
+        skija::SamplingMode::unpackFrom2Ints(samplingMode),
         localMatrix.get()
     );
     return reinterpret_cast<KNativePointer>(shader.release());
@@ -121,9 +121,9 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_Image__1nReadPixelsPixmap
 }
 
 SKIKO_EXPORT KBoolean org_jetbrains_skia_Image__1nScalePixels
-  (KNativePointer ptr, KNativePointer pixmapPtr, KLong samplingOptions, KBoolean cache) {
+  (KNativePointer ptr, KNativePointer pixmapPtr, KInt* samplingOptions, KBoolean cache) {
     SkImage* instance = reinterpret_cast<SkImage*>((ptr));
     SkPixmap* pixmap = reinterpret_cast<SkPixmap*>((pixmapPtr));
     auto cachingHint = cache ? SkImage::CachingHint::kAllow_CachingHint : SkImage::CachingHint::kDisallow_CachingHint;
-    return instance->scalePixels(*pixmap, skija::SamplingMode::unpack(samplingOptions), cachingHint);
+    return instance->scalePixels(*pixmap, skija::SamplingMode::unpackFrom2Ints(samplingOptions), cachingHint);
 }

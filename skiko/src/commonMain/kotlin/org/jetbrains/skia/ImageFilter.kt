@@ -217,22 +217,24 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         fun makeImage(image: Image?, src: Rect, dst: Rect, mode: SamplingMode): ImageFilter {
             return try {
                 Stats.onNativeCall()
-                ImageFilter(
-                    _nMakeImage(
-                        getPtr(
-                            image
-                        ),
-                        src.left,
-                        src.top,
-                        src.right,
-                        src.bottom,
-                        dst.left,
-                        dst.top,
-                        dst.right,
-                        dst.bottom,
-                        mode._pack()
+                interopScope {
+                    ImageFilter(
+                        _nMakeImage(
+                            getPtr(
+                                image
+                            ),
+                            src.left,
+                            src.top,
+                            src.right,
+                            src.bottom,
+                            dst.left,
+                            dst.top,
+                            dst.right,
+                            dst.bottom,
+                            toInterop(mode._packAs2Ints())
+                        )
                     )
-                )
+                }
             } finally {
                 reachabilityBarrier(image)
             }
@@ -301,7 +303,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                     interopScope {
                         _nMakeMatrixTransform(
                             toInterop(matrix.mat),
-                            mode._pack(),
+                            toInterop(mode._packAs2Ints()),
                             getPtr(input)
                         )
                     }
@@ -686,7 +688,7 @@ private external fun _nMakeImage(
     t1: Float,
     r1: Float,
     b1: Float,
-    samplingMode: Long
+    samplingMode: InteropPointer
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMagnifier")
@@ -716,7 +718,7 @@ private external fun _nMakeMatrixConvolution(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMatrixTransform")
-private external fun _nMakeMatrixTransform(matrix: InteropPointer, samplingMode: Long, input: NativePointer): NativePointer
+private external fun _nMakeMatrixTransform(matrix: InteropPointer, samplingMode: InteropPointer, input: NativePointer): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMerge")
 private external fun _nMakeMerge(filters: InteropPointer, crop: IRect?): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeOffset")

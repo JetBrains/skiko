@@ -161,10 +161,10 @@ extern "C" {
     }
 
     JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PixmapKt__1nScalePixels
-      (JNIEnv *env, jclass klass, jlong ptr, jlong dstPixmapPtr, jlong samplingOptions) {
+      (JNIEnv *env, jclass klass, jlong ptr, jlong dstPixmapPtr, jintArray samplingOptions) {
         SkPixmap* pixmap = jlongToPtr<SkPixmap*>(ptr);
         SkPixmap* dstPixmap = jlongToPtr<SkPixmap*>(dstPixmapPtr);
-        return static_cast<jboolean>(pixmap->scalePixels(*dstPixmap, skija::SamplingMode::unpack(samplingOptions)));
+        return static_cast<jboolean>(pixmap->scalePixels(*dstPixmap, skija::SamplingMode::unpackFrom2Ints(env, samplingOptions)));
     }
 
     JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PixmapKt__1nErase

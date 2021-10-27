@@ -299,6 +299,7 @@ namespace skija {
 
     namespace SamplingMode {
             SkSamplingOptions unpack(jlong val);
+            SkSamplingOptions unpackFrom2Ints(JNIEnv* env, jintArray val);
         }
 
     class UtfIndicesConverter {
