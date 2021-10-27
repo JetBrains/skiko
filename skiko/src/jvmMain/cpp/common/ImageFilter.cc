@@ -146,9 +146,9 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilterKt__1nMake
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilterKt__1nMakePaint
-  (JNIEnv* env, jclass jclass, jlong paintPtr, jobject cropObj) {
+  (JNIEnv* env, jclass jclass, jlong paintPtr, jintArray cropInts) {
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
-    std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
+    std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropInts);
     SkImageFilter* ptr = SkImageFilters::Paint(*paint, crop.get()).release();
     return reinterpret_cast<jlong>(ptr);
 }

@@ -215,4 +215,12 @@ class ImageFilterTest {
     fun makeOffset() = runTest {
         ImageFilter.makeOffset(dx = 2f, dy = 2f, input = null, crop = null)
     }
+
+    @Test
+    fun makePaint() = runTest {
+        ImageFilter.makePaint(
+            paint = Paint().setStroke(false).setColor4f(Color4f(Color.RED), colorSpace = null),
+            crop = null
+        )
+    }
 }

@@ -145,19 +145,12 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeOffset
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakePaint
-  (KNativePointer paintPtr, KInteropPointer cropObj) {
-    TODO("implement org_jetbrains_skia_ImageFilter__1nMakePaint");
-}
-
-#if 0
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakePaint
-  (KNativePointer paintPtr, KInteropPointer cropObj) {
+  (KNativePointer paintPtr, KInt* cropRectInts) {
     SkPaint* paint = reinterpret_cast<SkPaint*>((paintPtr));
-    std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
+    std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(cropRectInts);
     SkImageFilter* ptr = SkImageFilters::Paint(*paint, crop.get()).release();
     return reinterpret_cast<KNativePointer>(ptr);
 }
-#endif
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakePicture
