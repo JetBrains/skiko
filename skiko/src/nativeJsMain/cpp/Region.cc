@@ -41,16 +41,15 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_Region__1nIsComplex(KNativePointer ptr)
 }
 
 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Region__1nGetBounds(KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_Region__1nGetBounds(KInteropPointer");
-}
-     
-#if 0 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Region__1nGetBounds(KNativePointer ptr) {
+SKIKO_EXPORT void org_jetbrains_skia_Region__1nGetBounds(KNativePointer ptr, KInteropPointer ltrbArray) {
     SkRegion* instance = reinterpret_cast<SkRegion*>((ptr));
-    return skija::IRect::fromSkIRect(env, instance->getBounds());
+    int* ltrb = reinterpret_cast<int*>(ltrbArray);
+    SkIRect bounds = instance->getBounds();
+    ltrb[0] = bounds.left();
+    ltrb[1] = bounds.top();
+    ltrb[2] = bounds.right();
+    ltrb[3] = bounds.bottom();
 }
-#endif
 
 
 SKIKO_EXPORT KInt org_jetbrains_skia_Region__1nComputeRegionComplexity(KNativePointer ptr) {
@@ -74,24 +73,13 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_Region__1nSetRect(KNativePointer ptr, K
     return instance->setRect({left, top, right, bottom});
 }
 
-
-SKIKO_EXPORT KBoolean org_jetbrains_skia_Region__1nSetRects(KNativePointer ptr, KInt* coords) {
-    TODO("implement org_jetbrains_skia_Region__1nSetRects(KInteropPointer");
-}
-     
-#if 0 
-SKIKO_EXPORT KBoolean org_jetbrains_skia_Region__1nSetRects(KNativePointer ptr, KInt* coords) {
+SKIKO_EXPORT KBoolean org_jetbrains_skia_Region__1nSetRects(KNativePointer ptr, KInt* coords, KInt count) {
     SkRegion* instance = reinterpret_cast<SkRegion*>((ptr));
-    int len = env->GetArrayLength(coords);
-    std::vector<SkIRect> rects(len / 4);
-    KInt* arr = env->GetIntArrayElements(coords, 0);
-    for (int i = 0; i < len; i += 4)
-        rects[i / 4] = {arr[i], arr[i+1], arr[i+2], arr[i+3]};
-    env->ReleaseIntArrayElements(coords, arr, 0);
-    return instance->setRects(rects.data(), len / 4);
+    std::vector<SkIRect> rects(count);
+    for (int i = 0, off = 0; i < count; i++, off += 4)
+        rects[i] = {coords[off], coords[off+1], coords[off+2], coords[off+3]};
+    return instance->setRects(rects.data(), count);
 }
-#endif
-
 
 SKIKO_EXPORT KBoolean org_jetbrains_skia_Region__1nSetRegion(KNativePointer ptr, KNativePointer regionPtr) {
     SkRegion* instance = reinterpret_cast<SkRegion*>((ptr));

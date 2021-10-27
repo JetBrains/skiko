@@ -52,7 +52,10 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
     val bounds: IRect
         get() = try {
             Stats.onNativeCall()
-            Region_nGetBounds(_ptr)
+            val ltrb = withResult(IntArray(4)) {
+                Region_nGetBounds(_ptr, it)
+            }
+            IRect(ltrb[0], ltrb[1], ltrb[2], ltrb[3])
         } finally {
             reachabilityBarrier(this)
         }
@@ -108,7 +111,7 @@ class Region : Managed(Region_nMake(), _FinalizerHolder.PTR) {
             }
             Stats.onNativeCall()
             interopScope {
-                Region_nSetRects(_ptr, toInterop(arr))
+                Region_nSetRects(_ptr, toInterop(arr), rects.size)
             }
         } finally {
             reachabilityBarrier(this)
@@ -335,7 +338,7 @@ private external fun Region_nIsEmpty(ptr: NativePointer): Boolean
 private external fun Region_nIsRect(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Region__1nGetBounds")
-private external fun Region_nGetBounds(ptr: NativePointer): IRect
+private external fun Region_nGetBounds(ptr: NativePointer, ltrb: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Region__1nSet")
 private external fun Region_nSet(ptr: NativePointer, regoinPtr: NativePointer): Boolean
@@ -356,7 +359,7 @@ private external fun Region_nSetEmpty(ptr: NativePointer): Boolean
 private external fun Region_nSetRect(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Region__1nSetRects")
-private external fun Region_nSetRects(ptr: NativePointer, rects: InteropPointer): Boolean
+private external fun Region_nSetRects(ptr: NativePointer, rects: InteropPointer, count: Int): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Region__1nSetRegion")
 private external fun Region_nSetRegion(ptr: NativePointer, regionPtr: NativePointer): Boolean
