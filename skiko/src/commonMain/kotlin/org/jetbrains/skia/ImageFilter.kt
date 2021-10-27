@@ -578,19 +578,19 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         ): ImageFilter {
             return try {
                 Stats.onNativeCall()
-                ImageFilter(
-                    _nMakePointLitSpecular(
-                        x,
-                        y,
-                        z,
-                        lightColor,
-                        surfaceScale,
-                        ks,
-                        shininess,
-                        getPtr(input),
-                        crop
+                interopScope {
+                    ImageFilter(
+                        _nMakePointLitSpecular(
+                            x, y, z,
+                            lightColor,
+                            surfaceScale,
+                            ks,
+                            shininess,
+                            getPtr(input),
+                            toInterop(crop?.serializeToIntArray())
+                        )
                     )
-                )
+                }
             } finally {
                 reachabilityBarrier(input)
             }
@@ -836,7 +836,7 @@ private external fun _nMakePointLitSpecular(
     ks: Float,
     shininess: Float,
     input: NativePointer,
-    crop: IRect?
+    crop: InteropPointer
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeSpotLitSpecular")
