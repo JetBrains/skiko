@@ -226,28 +226,28 @@ class Shaper internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
 }
 
 
-@ExternalSymbolName("org_jetbrains_skia_Shaper__1nGetFinalizer")
+@ExternalSymbolName("org_jetbrains_skia_shaper_Shaper__1nGetFinalizer")
 private external fun Shaper_nGetFinalizer(): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_Shaper__1nMake")
+@ExternalSymbolName("org_jetbrains_skia_shaper_Shaper__1nMake")
 private external fun Shaper_nMake(fontMgrPtr: NativePointer): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_Shaper__1nMakePrimitive")
+@ExternalSymbolName("org_jetbrains_skia_shaper_Shaper__1nMakePrimitive")
 private external fun _nMakePrimitive(): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_Shaper__1nMakeShaperDrivenWrapper")
+@ExternalSymbolName("org_jetbrains_skia_shaper_Shaper__1nMakeShaperDrivenWrapper")
 private external fun _nMakeShaperDrivenWrapper(fontMgrPtr: NativePointer): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_Shaper__1nMakeShapeThenWrap")
+@ExternalSymbolName("org_jetbrains_skia_shaper_Shaper__1nMakeShapeThenWrap")
 private external fun _nMakeShapeThenWrap(fontMgrPtr: NativePointer): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_Shaper__1nMakeShapeDontWrapOrReorder")
+@ExternalSymbolName("org_jetbrains_skia_shaper_Shaper__1nMakeShapeDontWrapOrReorder")
 private external fun _nMakeShapeDontWrapOrReorder(fontMgrPtr: NativePointer): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_Shaper__1nMakeCoreText")
+@ExternalSymbolName("org_jetbrains_skia_shaper_Shaper__1nMakeCoreText")
 private external fun _nMakeCoreText(): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_Shaper__1nShapeBlob")
+@ExternalSymbolName("org_jetbrains_skia_shaper_Shaper__1nShapeBlob")
 private external fun _nShapeBlob(
     ptr: NativePointer,
     text: String?,
@@ -259,10 +259,10 @@ private external fun _nShapeBlob(
 ): NativePointer
 
 
-@ExternalSymbolName("org_jetbrains_skia_Shaper__1nShapeLine")
+@ExternalSymbolName("org_jetbrains_skia_shaper_Shaper__1nShapeLine")
 private external fun _nShapeLine(ptr: NativePointer, text: String?, fontPtr: NativePointer, opts: ShapingOptions?): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_Shaper__1nShape")
+@ExternalSymbolName("org_jetbrains_skia_shaper_Shaper__1nShape")
 private external fun _nShape(
     ptr: NativePointer,
     textPtr: NativePointer,
