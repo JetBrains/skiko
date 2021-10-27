@@ -302,7 +302,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                             tileMode.ordinal,
                             convolveAlpha,
                             getPtr(input),
-                            crop
+                            toInterop(crop?.serializeToIntArray())
                         )
                     }
                 )
@@ -731,7 +731,7 @@ private external fun _nMakeMatrixConvolution(
     tileMode: Int,
     convolveAlpha: Boolean,
     input: NativePointer,
-    crop: IRect?
+    crop: InteropPointer
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMatrixTransform")

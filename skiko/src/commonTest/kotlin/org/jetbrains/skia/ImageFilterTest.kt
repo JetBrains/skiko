@@ -159,4 +159,21 @@ class ImageFilterTest {
             inset = 2f
         )
     }
+
+    @Test
+    fun makeMatrixConvolution() = imageFilterTest {
+        ImageFilter.makeMatrixConvolution(
+            kernelH = 2,
+            kernelW = 2,
+            kernel = floatArrayOf(0.5f, 1f, 0.2f, 1.2f),
+            gain = 1f,
+            bias = 0f,
+            offsetX = 1,
+            offsetY = 1,
+            tileMode = FilterTileMode.CLAMP,
+            convolveAlpha = true,
+            input = null,
+            crop = null
+        )
+    }
 }

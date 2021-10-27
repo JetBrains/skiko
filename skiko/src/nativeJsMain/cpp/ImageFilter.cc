@@ -107,26 +107,14 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeMagnifier
     return reinterpret_cast<KNativePointer>(ptr);
 }
 
-
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeMatrixConvolution
-  (KInt kernelW, KInt kernelH, KFloat* kernelArray, KFloat gain, KFloat bias, KInt offsetX, KInt offsetY, KInt tileModeInt, KBoolean convolveAlpha, KNativePointer inputPtr, KInteropPointer cropObj) {
-    TODO("implement org_jetbrains_skia_ImageFilter__1nMakeMatrixConvolution");
-}
-
-#if 0
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeMatrixConvolution
-  (KInt kernelW, KInt kernelH, KFloat* kernelArray, KFloat gain, KFloat bias, KInt offsetX, KInt offsetY, KInt tileModeInt, KBoolean convolveAlpha, KNativePointer inputPtr, KInteropPointer cropObj) {
-    KFloat* kernel = env->GetFloatArrayElements(kernelArray, 0);
+  (KInt kernelW, KInt kernelH, KFloat* kernelArray, KFloat gain, KFloat bias, KInt offsetX, KInt offsetY, KInt tileModeInt, KBoolean convolveAlpha, KNativePointer inputPtr, KInt* cropRectInts) {
     SkTileMode tileMode = static_cast<SkTileMode>(tileModeInt);
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>((inputPtr));
-    std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
-    SkImageFilter* ptr = SkImageFilters::MatrixConvolution(SkISize{kernelW, kernelH}, kernel, gain, bias, SkIPoint{offsetX, offsetY}, tileMode, convolveAlpha, sk_ref_sp(input), crop.get()).release();
-    env->ReleaseFloatArrayElements(kernelArray, kernel, 0);
+    std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(cropRectInts);
+    SkImageFilter* ptr = SkImageFilters::MatrixConvolution(SkISize{kernelW, kernelH}, kernelArray, gain, bias, SkIPoint{offsetX, offsetY}, tileMode, convolveAlpha, sk_ref_sp(input), crop.get()).release();
     return reinterpret_cast<KNativePointer>(ptr);
 }
-#endif
-
-
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeMatrixTransform
   (KFloat* matrixArray, KInt samplingModeVal1, KInt samplingModeVal2, KNativePointer inputPtr) {
