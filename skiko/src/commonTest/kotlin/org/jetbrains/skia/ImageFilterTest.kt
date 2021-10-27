@@ -223,4 +223,13 @@ class ImageFilterTest {
             crop = null
         )
     }
+
+    @Test
+    fun makeTile() = runTest {
+        ImageFilter.makeTile(
+            src = Rect(0f, 0f, 3f, 3f),
+            dst = Rect(5f, 5f, 19f, 19f),
+            input = null
+        )
+    }
 }
