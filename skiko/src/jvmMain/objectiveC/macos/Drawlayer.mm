@@ -192,41 +192,15 @@
     return (masks & NSWindowStyleMaskFullScreen) != 0;
 }
 
-- (void) resetHeaderAndEnableFullscreen
-{
-    [self resetHeader];
-    [self.window toggleFullScreen:nil];
-}
-
-- (void) disableFullScreenAndSetupCustomHeader
-{
-    [self.window toggleFullScreen:nil];
-    [self setupCustomHeader];
-}
-
 - (void) makeFullscreen: (BOOL) value
 {
     if (value && !self.isFullScreen)
     {
-        if (_titlebarDisabled) {
-            // todo[unterhofer] This isn't the only way to go into full screen mode. We will probably need to move this into JBR to hook into windowWillEnterFullScreen
-            [self performSelectorOnMainThread:@selector(resetHeaderAndEnableFullscreen) withObject:nil waitUntilDone:NO];
-        }
-        else
-        {
-            [self.window performSelectorOnMainThread:@selector(toggleFullScreen:) withObject:nil waitUntilDone:NO];
-        }
+        [self.window performSelectorOnMainThread:@selector(toggleFullScreen:) withObject:nil waitUntilDone:NO];
     }
     else if (!value && self.isFullScreen)
     {
-        if (_titlebarDisabled) {
-            // todo[unterhofer] This isn't the only way to go into full screen mode. We will probably need to move this into JBR to hook into windowWillEnterFullScreen
-            [self performSelectorOnMainThread:@selector(disableFullScreenAndSetupCustomHeader) withObject:nil waitUntilDone:NO];
-        }
-        else
-        {
-            [self.window performSelectorOnMainThread:@selector(toggleFullScreen:) withObject:nil waitUntilDone:NO];
-        }
+        [self.window performSelectorOnMainThread:@selector(toggleFullScreen:) withObject:nil waitUntilDone:NO];
     }
 }
 
