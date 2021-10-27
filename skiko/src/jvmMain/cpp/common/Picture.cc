@@ -41,10 +41,11 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PictureKt__1nPlayback
     }
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_PictureKt__1nGetCullRect
-  (JNIEnv* env, jclass jclass, jlong ptr) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PictureKt__1nGetCullRect
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray ltrbArray) {
     SkPicture* instance = reinterpret_cast<SkPicture*>(static_cast<uintptr_t>(ptr));
-    return skija::Rect::fromSkRect(env, instance->cullRect());
+    SkRect cullRect = instance->cullRect();
+    env->SetFloatArrayRegion(ltrbArray, 0, 4, reinterpret_cast<const jfloat*>(cullRect.asScalars()));
 }
 
 extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_PictureKt__1nGetUniqueId
@@ -80,13 +81,21 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PictureKt__1nGetAppro
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PictureKt__1nMakeShader
-  (JNIEnv* env, jclass jclass, jlong ptr, jint tmxValue, jint tmyValue, jint filterModeValue, jfloatArray localMatrixArr, jobject tileRectObj) {
+  (JNIEnv* env, jclass jclass, jlong ptr, jint tmxValue, jint tmyValue, jint filterModeValue, jfloatArray localMatrixArr, jfloatArray tileRectLTRB) {
     SkPicture* instance = reinterpret_cast<SkPicture*>(static_cast<uintptr_t>(ptr));
     SkTileMode tmx = static_cast<SkTileMode>(tmxValue);
     SkTileMode tmy = static_cast<SkTileMode>(tmyValue);
     SkFilterMode filterMode = static_cast<SkFilterMode>(filterModeValue);
     std::unique_ptr<SkMatrix> localMatrix = skMatrix(env, localMatrixArr);
-    std::unique_ptr<SkRect> tileRect = skija::Rect::toSkRect(env, tileRectObj);
-    SkShader* shader = instance->makeShader(tmx, tmy, filterMode, localMatrix.get(), tileRect.get()).release();
+    jfloat* tile = tileRectLTRB == nullptr ? nullptr : env->GetFloatArrayElements(tileRectLTRB, 0);
+    SkRect tileRect;
+    SkRect* tileRectPtr = nullptr;
+    if (tile != nullptr) {
+        tileRect.setLTRB(tile[0], tile[1], tile[2], tile[2]);
+        tileRectPtr = &tileRect;
+    }
+    SkShader* shader = instance->makeShader(tmx, tmy, filterMode, localMatrix.get(), tileRectPtr).release();
+    if (tile != nullptr)
+        env->ReleaseFloatArrayElements(tileRectLTRB, tile, 0);
     return reinterpret_cast<jlong>(shader);
 }

@@ -99,7 +99,10 @@ class Picture internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     val cullRect: Rect
         get() = try {
             Stats.onNativeCall()
-            _nGetCullRect(_ptr)
+            val ltrb = withResult(FloatArray(4)) {
+                _nGetCullRect(_ptr, it)
+            }
+            Rect(ltrb[0], ltrb[1], ltrb[2], ltrb[3])
         } finally {
             reachabilityBarrier(this)
         }
@@ -207,9 +210,10 @@ class Picture internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         return try {
             Stats.onNativeCall()
             val arr = localMatrix?.mat
+            val ltrbArray = tileRect?.toLTRBArray()
             Shader(
                 interopScope {
-                    _nMakeShader(_ptr, tmx.ordinal, tmy.ordinal, mode.ordinal, toInterop(arr), tileRect)
+                    _nMakeShader(_ptr, tmx.ordinal, tmy.ordinal, mode.ordinal, toInterop(arr), toInterop(ltrbArray))
                 }
             )
         } finally {
@@ -226,7 +230,7 @@ private external fun Picture_nMakeFromData(dataPtr: NativePointer /*, SkDeserial
 private external fun _nPlayback(ptr: NativePointer, canvasPtr: NativePointer, abort: BooleanSupplier?)
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nGetCullRect")
-private external fun _nGetCullRect(ptr: NativePointer): Rect
+private external fun _nGetCullRect(ptr: NativePointer, ltbr: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nGetUniqueId")
 private external fun _nGetUniqueId(ptr: NativePointer): Int
@@ -250,5 +254,5 @@ private external fun _nMakeShader(
     tmy: Int,
     filterMode: Int,
     localMatrix: InteropPointer,
-    tileRect: Rect?
+    tileRect: InteropPointer
 ): NativePointer
