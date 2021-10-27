@@ -271,4 +271,13 @@ class ImageFilterTest {
             surfaceScale = 2f, kd = 1f, input = null, crop = IRect(0, 0, 15, 15)
         )
     }
+
+    @Test
+    fun makeDistantLitSpecular() = imageFilterTest {
+        ImageFilter.makeDistantLitSpecular(
+            x = 1f, y = 1f, z = 10f, lightColor = Color.RED,
+            surfaceScale = 2f, ks = 1f, shininess = 1f, input = null,
+            crop = IRect(0, 0, 15, 15)
+        )
+    }
 }

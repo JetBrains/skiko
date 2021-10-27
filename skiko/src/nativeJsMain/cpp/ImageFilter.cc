@@ -207,23 +207,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeSpotLitDiffuse
     return reinterpret_cast<KNativePointer>(ptr);
 }
 
-
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeDistantLitSpecular
-  (KFloat x, KFloat y, KFloat z, KInt lightColor, KFloat surfaceScale, KFloat ks, KFloat shininess, KNativePointer inputPtr, KInteropPointer cropObj) {
-    TODO("implement org_jetbrains_skia_ImageFilter__1nMakeDistantLitSpecular");
-}
-
-#if 0
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeDistantLitSpecular
-  (KFloat x, KFloat y, KFloat z, KInt lightColor, KFloat surfaceScale, KFloat ks, KFloat shininess, KNativePointer inputPtr, KInteropPointer cropObj) {
+  (KFloat x, KFloat y, KFloat z, KInt lightColor, KFloat surfaceScale, KFloat ks, KFloat shininess, KNativePointer inputPtr, KInt* cropRectInts) {
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>((inputPtr));
-    std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
+    std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(cropRectInts);
     SkImageFilter* ptr = SkImageFilters::DistantLitSpecular(SkPoint3{x, y, z}, lightColor, surfaceScale, ks, shininess, sk_ref_sp(input), crop.get()).release();
     return reinterpret_cast<KNativePointer>(ptr);
 }
-#endif
-
-
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakePointLitSpecular
   (KFloat x, KFloat y, KFloat z, KInt lightColor, KFloat surfaceScale, KFloat ks, KFloat shininess, KNativePointer inputPtr, KInteropPointer cropObj) {
