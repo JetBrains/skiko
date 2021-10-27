@@ -168,9 +168,9 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilterKt__1nMake
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilterKt__1nMakeDilate
-  (JNIEnv* env, jclass jclass, float rx, jfloat ry, jlong inputPtr, jobject cropObj) {
+  (JNIEnv* env, jclass jclass, float rx, jfloat ry, jlong inputPtr, jintArray cropInts) {
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>(static_cast<uintptr_t>(inputPtr));
-    std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropObj);
+    std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropInts);
     SkImageFilter* ptr = SkImageFilters::Dilate(rx, ry, sk_ref_sp(input), crop.get()).release();
     return reinterpret_cast<jlong>(ptr);
 }

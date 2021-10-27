@@ -232,4 +232,11 @@ class ImageFilterTest {
             input = null
         )
     }
+
+    @Test
+    fun makeDilate() = runTest {
+        ImageFilter.makeDilate(
+            rx = 10f, ry = 10f, input = null, crop = null
+        )
+    }
 }
