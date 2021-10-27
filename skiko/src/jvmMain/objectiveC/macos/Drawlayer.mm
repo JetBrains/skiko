@@ -67,10 +67,10 @@
     [super dealloc];
 }
 
-- (void) setupCustomHeader
+- (void) setUpCustomHeader
 {
     NSView* themeFrame = self.window.contentView.superview;
-    NSView* titlebarContainer = themeFrame.subviews[1];
+    NSView* titlebarContainer = [self.window standardWindowButton:NSWindowCloseButton].superview.superview;
     NSView* titlebar = titlebarContainer.subviews[0];
     NSView* titlebarDecoration = titlebarContainer.subviews[1];
     NSView* titlebarVisualEffect = titlebar.subviews[0];
@@ -135,8 +135,7 @@
 
 - (void) resetHeader
 {
-    NSView* themeFrame = self.window.contentView.superview;
-    NSView* titlebarContainer = themeFrame.subviews[1];
+    NSView* titlebarContainer = [self.window standardWindowButton:NSWindowCloseButton].superview.superview;
     NSView* titlebar = titlebarContainer.subviews[0];
     NSView* titlebarDecoration = titlebarContainer.subviews[1];
     NSView* titlebarVisualEffect = titlebar.subviews[0];
@@ -155,6 +154,11 @@
     [dragger removeFromSuperview];
 }
 
+- (void) setWindowControlsHidden: (BOOL) hidden
+{
+    [self.window standardWindowButton:NSWindowCloseButton].superview.hidden = hidden;
+}
+
 - (void) disableTitlebar: (CGFloat) customHeaderHeight
 {
     _customHeaderHeight = customHeaderHeight;
@@ -164,9 +168,21 @@
         [self.window setStyleMask:[self.window styleMask]|NSWindowStyleMaskFullSizeContentView];
 
         if (!self.isFullScreen) {
-            [self setupCustomHeader];
+            [self setUpCustomHeader];
         }
     });
+    NSNotificationCenter* defaultCenter = [NSNotificationCenter defaultCenter];
+    NSOperationQueue* mainQueue = [NSOperationQueue mainQueue];
+    [defaultCenter addObserverForName:NSWindowWillEnterFullScreenNotification object:self.window queue:mainQueue usingBlock:^(NSNotification* notification) {
+        [self resetHeader];
+    }];
+    [defaultCenter addObserverForName:NSWindowWillExitFullScreenNotification object:self.window queue:mainQueue usingBlock:^(NSNotification* notification) {
+        [self setWindowControlsHidden:YES];
+    }];
+    [defaultCenter addObserverForName:NSWindowDidExitFullScreenNotification object:self.window queue:mainQueue usingBlock:^(NSNotification* notification) {
+        [self setUpCustomHeader];
+        [self setWindowControlsHidden:NO];
+    }];
     _titlebarDisabled = YES;
 }
 
