@@ -1,8 +1,8 @@
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.use
-import org.jetbrains.skia.test.annotations.SkipJsTarget
-import org.jetbrains.skia.test.annotations.SkipNativeTarget
+import org.jetbrains.skiko.tests.SkipJsTarget
+import org.jetbrains.skiko.tests.SkipNativeTarget
 import kotlin.test.Test
 import kotlin.test.assertTrue
 import kotlin.test.assertFalse

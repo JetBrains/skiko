@@ -15,3 +15,9 @@ actual fun runTest(block: suspend () -> Unit): dynamic = GlobalScope.promise {
 actual fun InteropScope.allocateBytesForPixels(size: Int): NativePointer {
     return toInterop(ByteArray(size))
 }
+
+actual typealias SkipJsTarget = kotlin.test.Ignore
+
+actual annotation class SkipJvmTarget
+
+actual annotation class SkipNativeTarget

@@ -5,8 +5,8 @@ import org.jetbrains.skia.paragraph.FontCollection
 import org.jetbrains.skia.paragraph.LineMetrics
 import org.jetbrains.skia.paragraph.ParagraphBuilder
 import org.jetbrains.skia.paragraph.ParagraphStyle
-import org.jetbrains.skia.test.annotations.SkipJsTarget
-import org.jetbrains.skia.test.annotations.SkipNativeTarget
+import org.jetbrains.skiko.tests.SkipJsTarget
+import org.jetbrains.skiko.tests.SkipNativeTarget
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

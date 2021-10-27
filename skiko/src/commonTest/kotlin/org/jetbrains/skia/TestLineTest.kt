@@ -4,8 +4,8 @@ import org.jetbrains.skia.Font
 import org.jetbrains.skia.TextLine
 import org.jetbrains.skia.Typeface
 import org.jetbrains.skia.impl.use
-import org.jetbrains.skia.test.annotations.SkipJsTarget
-import org.jetbrains.skia.test.annotations.SkipNativeTarget
+import org.jetbrains.skiko.tests.SkipJsTarget
+import org.jetbrains.skiko.tests.SkipNativeTarget
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals

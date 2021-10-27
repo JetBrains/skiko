@@ -11,3 +11,9 @@ actual fun runTest(block: suspend () -> Unit) {
 actual fun InteropScope.allocateBytesForPixels(size: Int): NativePointer {
     return toInterop(ByteArray(size))
 }
+
+actual annotation class SkipJsTarget
+
+actual annotation class SkipJvmTarget
+
+actual typealias SkipNativeTarget = kotlin.test.Ignore

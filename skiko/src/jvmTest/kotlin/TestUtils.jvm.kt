@@ -12,3 +12,9 @@ actual fun runTest(block: suspend () -> Unit) {
 actual fun InteropScope.allocateBytesForPixels(size: Int): NativePointer {
     return TestHelpers().getPointerFromByteBuffer(ByteBuffer.allocateDirect(size))
 }
+
+actual annotation class SkipJsTarget
+
+actual typealias SkipJvmTarget = org.junit.Ignore
+
+actual annotation class SkipNativeTarget
