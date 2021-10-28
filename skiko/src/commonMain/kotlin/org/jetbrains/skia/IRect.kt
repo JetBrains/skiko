@@ -29,6 +29,11 @@ class IRect internal constructor(val left: Int, val top: Int, val right: Int, va
         return Rect(left.toFloat(), top.toFloat(), right.toFloat(), bottom.toFloat())
     }
 
+    // This is a helper to pass IRect instance through interop border
+    internal fun serializeToIntArray(): IntArray {
+        return intArrayOf(left, top, right, bottom)
+    }
+
     override fun equals(other: Any?): Boolean {
         if (other === this) return true
         if (other !is IRect) return false

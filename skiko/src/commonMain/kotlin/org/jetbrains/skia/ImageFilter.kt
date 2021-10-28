@@ -14,13 +14,16 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         ): ImageFilter {
             return try {
                 Stats.onNativeCall()
-                ImageFilter(
-                    _nMakeAlphaThreshold(
-                        getPtr(
-                            r
-                        ), innerMin, outerMax, getPtr(input), crop
+                interopScope {
+                    ImageFilter(
+                        _nMakeAlphaThreshold(
+                            getPtr(r),
+                            innerMin, outerMax, getPtr(input),
+                            toInterop(crop?.serializeToIntArray())
+                        )
                     )
-                )
+                }
+
             } finally {
                 reachabilityBarrier(r)
                 reachabilityBarrier(input)
@@ -39,18 +42,20 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         ): ImageFilter {
             return try {
                 Stats.onNativeCall()
-                ImageFilter(
-                    _nMakeArithmetic(
-                        k1,
-                        k2,
-                        k3,
-                        k4,
-                        enforcePMColor,
-                        getPtr(bg),
-                        getPtr(fg),
-                        crop
+                interopScope {
+                    ImageFilter(
+                        _nMakeArithmetic(
+                            k1,
+                            k2,
+                            k3,
+                            k4,
+                            enforcePMColor,
+                            getPtr(bg),
+                            getPtr(fg),
+                            toInterop(crop?.serializeToIntArray())
+                        )
                     )
-                )
+                }
             } finally {
                 reachabilityBarrier(bg)
                 reachabilityBarrier(fg)
@@ -60,14 +65,16 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         fun makeBlend(blendMode: BlendMode, bg: ImageFilter?, fg: ImageFilter?, crop: IRect?): ImageFilter {
             return try {
                 Stats.onNativeCall()
-                ImageFilter(
-                    _nMakeBlend(
-                        blendMode.ordinal,
-                        getPtr(bg),
-                        getPtr(fg),
-                        crop
+                interopScope {
+                    ImageFilter(
+                        _nMakeBlend(
+                            blendMode.ordinal,
+                            getPtr(bg),
+                            getPtr(fg),
+                            toInterop(crop?.serializeToIntArray())
+                        )
                     )
-                )
+                }
             } finally {
                 reachabilityBarrier(bg)
                 reachabilityBarrier(fg)
@@ -83,15 +90,17 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         ): ImageFilter {
             return try {
                 Stats.onNativeCall()
-                ImageFilter(
-                    _nMakeBlur(
-                        sigmaX,
-                        sigmaY,
-                        mode.ordinal,
-                        getPtr(input),
-                        crop
+                interopScope {
+                    ImageFilter(
+                        _nMakeBlur(
+                            sigmaX,
+                            sigmaY,
+                            mode.ordinal,
+                            getPtr(input),
+                            toInterop(crop?.serializeToIntArray())
+                        )
                     )
-                )
+                }
             } finally {
                 reachabilityBarrier(input)
             }
@@ -100,13 +109,14 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         fun makeColorFilter(f: ColorFilter?, input: ImageFilter?, crop: IRect?): ImageFilter {
             return try {
                 Stats.onNativeCall()
-                ImageFilter(
-                    _nMakeColorFilter(
-                        getPtr(
-                            f
-                        ), getPtr(input), crop
+                interopScope {
+                    ImageFilter(
+                        _nMakeColorFilter(
+                            getPtr(f), getPtr(input),
+                            toInterop(crop?.serializeToIntArray())
+                        )
                     )
-                )
+                }
             } finally {
                 reachabilityBarrier(f)
                 reachabilityBarrier(input)
@@ -139,16 +149,18 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         ): ImageFilter {
             return try {
                 Stats.onNativeCall()
-                ImageFilter(
-                    _nMakeDisplacementMap(
-                        x.ordinal,
-                        y.ordinal,
-                        scale,
-                        getPtr(displacement),
-                        getPtr(color),
-                        crop
+                interopScope {
+                    ImageFilter(
+                        _nMakeDisplacementMap(
+                            x.ordinal,
+                            y.ordinal,
+                            scale,
+                            getPtr(displacement),
+                            getPtr(color),
+                            toInterop(crop?.serializeToIntArray())
+                        )
                     )
-                )
+                }
             } finally {
                 reachabilityBarrier(displacement)
                 reachabilityBarrier(color)
@@ -166,17 +178,19 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         ): ImageFilter {
             return try {
                 Stats.onNativeCall()
-                ImageFilter(
-                    _nMakeDropShadow(
-                        dx,
-                        dy,
-                        sigmaX,
-                        sigmaY,
-                        color,
-                        getPtr(input),
-                        crop
+                interopScope {
+                    ImageFilter(
+                        _nMakeDropShadow(
+                            dx,
+                            dy,
+                            sigmaX,
+                            sigmaY,
+                            color,
+                            getPtr(input),
+                            toInterop(crop?.serializeToIntArray())
+                        )
                     )
-                )
+                }
             } finally {
                 reachabilityBarrier(input)
             }
@@ -193,17 +207,19 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         ): ImageFilter {
             return try {
                 Stats.onNativeCall()
-                ImageFilter(
-                    _nMakeDropShadowOnly(
-                        dx,
-                        dy,
-                        sigmaX,
-                        sigmaY,
-                        color,
-                        getPtr(input),
-                        crop
+                interopScope {
+                    ImageFilter(
+                        _nMakeDropShadowOnly(
+                            dx,
+                            dy,
+                            sigmaX,
+                            sigmaY,
+                            color,
+                            getPtr(input),
+                            toInterop(crop?.serializeToIntArray())
+                        )
                     )
-                )
+                }
             } finally {
                 reachabilityBarrier(input)
             }
@@ -240,17 +256,19 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         fun makeMagnifier(r: Rect, inset: Float, input: ImageFilter?, crop: IRect?): ImageFilter {
             return try {
                 Stats.onNativeCall()
-                ImageFilter(
-                    _nMakeMagnifier(
-                        r.left,
-                        r.top,
-                        r.right,
-                        r.bottom,
-                        inset,
-                        getPtr(input),
-                        crop
+                interopScope {
+                    ImageFilter(
+                        _nMakeMagnifier(
+                            r.left,
+                            r.top,
+                            r.right,
+                            r.bottom,
+                            inset,
+                            getPtr(input),
+                            toInterop(crop?.serializeToIntArray())
+                        )
                     )
-                )
+                }
             } finally {
                 reachabilityBarrier(input)
             }
@@ -284,7 +302,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                             tileMode.ordinal,
                             convolveAlpha,
                             getPtr(input),
-                            crop
+                            toInterop(crop?.serializeToIntArray())
                         )
                     }
                 )
@@ -317,7 +335,13 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                     Stats.onNativeCall()
                     val filterPtrs = NativePointerArray(filters.size)
                     for (i in filters.indices) filterPtrs[i] = getPtr(filters[i])
-                    ImageFilter(_nMakeMerge(toInterop(filterPtrs), crop))
+                    ImageFilter(
+                        _nMakeMerge(
+                            filters = toInterop(filterPtrs),
+                            filtersLength = filters.size,
+                            crop = toInterop(crop?.serializeToIntArray())
+                        )
+                    )
                 } finally {
                     reachabilityBarrier(filters)
                 }
@@ -327,14 +351,15 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         fun makeOffset(dx: Float, dy: Float, input: ImageFilter?, crop: IRect?): ImageFilter {
             return try {
                 Stats.onNativeCall()
-                ImageFilter(
-                    _nMakeOffset(
-                        dx,
-                        dy,
-                        getPtr(input),
-                        crop
+                interopScope {
+                    ImageFilter(
+                        _nMakeOffset(
+                            dx, dy,
+                            getPtr(input),
+                            toInterop(crop?.serializeToIntArray())
+                        )
                     )
-                )
+                }
             } finally {
                 reachabilityBarrier(input)
             }
@@ -343,13 +368,14 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         fun makePaint(paint: Paint?, crop: IRect?): ImageFilter {
             return try {
                 Stats.onNativeCall()
-                ImageFilter(
-                    _nMakePaint(
-                        getPtr(
-                            paint
-                        ), crop
+                interopScope {
+                    ImageFilter(
+                        _nMakePaint(
+                            paint = getPtr(paint),
+                            crop = toInterop(crop?.serializeToIntArray())
+                        )
                     )
-                )
+                }
             } finally {
                 reachabilityBarrier(paint)
             }
@@ -379,14 +405,16 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         fun makeDilate(rx: Float, ry: Float, input: ImageFilter?, crop: IRect?): ImageFilter {
             return try {
                 Stats.onNativeCall()
-                ImageFilter(
-                    _nMakeDilate(
-                        rx,
-                        ry,
-                        getPtr(input),
-                        crop
+                interopScope {
+                    ImageFilter(
+                        _nMakeDilate(
+                            rx,
+                            ry,
+                            getPtr(input),
+                            toInterop(crop?.serializeToIntArray())
+                        )
                     )
-                )
+                }
             } finally {
                 reachabilityBarrier(input)
             }
@@ -395,14 +423,15 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         fun makeErode(rx: Float, ry: Float, input: ImageFilter?, crop: IRect?): ImageFilter {
             return try {
                 Stats.onNativeCall()
-                ImageFilter(
-                    _nMakeErode(
-                        rx,
-                        ry,
-                        getPtr(input),
-                        crop
+                interopScope {
+                    ImageFilter(
+                        _nMakeErode(
+                            rx, ry,
+                            getPtr(input),
+                            toInterop(crop?.serializeToIntArray())
+                        )
                     )
-                )
+                }
             } finally {
                 reachabilityBarrier(input)
             }
@@ -420,18 +449,18 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         ): ImageFilter {
             return try {
                 Stats.onNativeCall()
-                ImageFilter(
-                    _nMakeDistantLitDiffuse(
-                        x,
-                        y,
-                        z,
-                        lightColor,
-                        surfaceScale,
-                        kd,
-                        getPtr(input),
-                        crop
+                interopScope {
+                    ImageFilter(
+                        _nMakeDistantLitDiffuse(
+                            x, y, z,
+                            lightColor,
+                            surfaceScale,
+                            kd,
+                            getPtr(input),
+                            toInterop(crop?.serializeToIntArray())
+                        )
                     )
-                )
+                }
             } finally {
                 reachabilityBarrier(input)
             }
@@ -449,18 +478,18 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         ): ImageFilter {
             return try {
                 Stats.onNativeCall()
-                ImageFilter(
-                    _nMakePointLitDiffuse(
-                        x,
-                        y,
-                        z,
-                        lightColor,
-                        surfaceScale,
-                        kd,
-                        getPtr(input),
-                        crop
+                interopScope {
+                    ImageFilter(
+                        _nMakePointLitDiffuse(
+                            x, y, z,
+                            lightColor,
+                            surfaceScale,
+                            kd,
+                            getPtr(input),
+                            toInterop(crop?.serializeToIntArray())
+                        )
                     )
-                )
+                }
             } finally {
                 reachabilityBarrier(input)
             }
@@ -483,23 +512,21 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         ): ImageFilter {
             return try {
                 Stats.onNativeCall()
-                ImageFilter(
-                    _nMakeSpotLitDiffuse(
-                        x0,
-                        y0,
-                        z0,
-                        x1,
-                        y1,
-                        z1,
-                        falloffExponent,
-                        cutoffAngle,
-                        lightColor,
-                        surfaceScale,
-                        kd,
-                        getPtr(input),
-                        crop
+                interopScope {
+                    ImageFilter(
+                        _nMakeSpotLitDiffuse(
+                            x0, y0, z0,
+                            x1, y1, z1,
+                            falloffExponent,
+                            cutoffAngle,
+                            lightColor,
+                            surfaceScale,
+                            kd,
+                            getPtr(input),
+                            toInterop(crop?.serializeToIntArray())
+                        )
                     )
-                )
+                }
             } finally {
                 reachabilityBarrier(input)
             }
@@ -518,19 +545,21 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         ): ImageFilter {
             return try {
                 Stats.onNativeCall()
-                ImageFilter(
-                    _nMakeDistantLitSpecular(
-                        x,
-                        y,
-                        z,
-                        lightColor,
-                        surfaceScale,
-                        ks,
-                        shininess,
-                        getPtr(input),
-                        crop
+                interopScope {
+                    ImageFilter(
+                        _nMakeDistantLitSpecular(
+                            x,
+                            y,
+                            z,
+                            lightColor,
+                            surfaceScale,
+                            ks,
+                            shininess,
+                            getPtr(input),
+                            toInterop(crop?.serializeToIntArray())
+                        )
                     )
-                )
+                }
             } finally {
                 reachabilityBarrier(input)
             }
@@ -549,19 +578,19 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         ): ImageFilter {
             return try {
                 Stats.onNativeCall()
-                ImageFilter(
-                    _nMakePointLitSpecular(
-                        x,
-                        y,
-                        z,
-                        lightColor,
-                        surfaceScale,
-                        ks,
-                        shininess,
-                        getPtr(input),
-                        crop
+                interopScope {
+                    ImageFilter(
+                        _nMakePointLitSpecular(
+                            x, y, z,
+                            lightColor,
+                            surfaceScale,
+                            ks,
+                            shininess,
+                            getPtr(input),
+                            toInterop(crop?.serializeToIntArray())
+                        )
                     )
-                )
+                }
             } finally {
                 reachabilityBarrier(input)
             }
@@ -585,24 +614,22 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         ): ImageFilter {
             return try {
                 Stats.onNativeCall()
-                ImageFilter(
-                    _nMakeSpotLitSpecular(
-                        x0,
-                        y0,
-                        z0,
-                        x1,
-                        y1,
-                        z1,
-                        falloffExponent,
-                        cutoffAngle,
-                        lightColor,
-                        surfaceScale,
-                        ks,
-                        shininess,
-                        getPtr(input),
-                        crop
+                interopScope {
+                    ImageFilter(
+                        _nMakeSpotLitSpecular(
+                            x0, y0, z0,
+                            x1, y1, z1,
+                            falloffExponent,
+                            cutoffAngle,
+                            lightColor,
+                            surfaceScale,
+                            ks,
+                            shininess,
+                            getPtr(input),
+                            toInterop(crop?.serializeToIntArray())
+                        )
                     )
-                )
+                }
             } finally {
                 reachabilityBarrier(input)
             }
@@ -620,7 +647,7 @@ private external fun _nMakeAlphaThreshold(
     innerMin: Float,
     outerMax: Float,
     input: NativePointer,
-    crop: IRect?
+    crop: InteropPointer
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeArithmetic")
@@ -632,15 +659,15 @@ private external fun _nMakeArithmetic(
     enforcePMColor: Boolean,
     bg: NativePointer,
     fg: NativePointer,
-    crop: IRect?
+    crop: InteropPointer?
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeBlend")
-private external fun _nMakeBlend(blendMode: Int, bg: NativePointer, fg: NativePointer, crop: IRect?): NativePointer
+private external fun _nMakeBlend(blendMode: Int, bg: NativePointer, fg: NativePointer, crop: InteropPointer): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeBlur")
-private external fun _nMakeBlur(sigmaX: Float, sigmaY: Float, tileMode: Int, input: NativePointer, crop: IRect?): NativePointer
+private external fun _nMakeBlur(sigmaX: Float, sigmaY: Float, tileMode: Int, input: NativePointer, crop: InteropPointer): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeColorFilter")
-private external fun _nMakeColorFilter(colorFilterPtr: NativePointer, input: NativePointer, crop: IRect?): NativePointer
+private external fun _nMakeColorFilter(colorFilterPtr: NativePointer, input: NativePointer, crop: InteropPointer): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeCompose")
 private external fun _nMakeCompose(outer: NativePointer, inner: NativePointer): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDisplacementMap")
@@ -650,7 +677,7 @@ private external fun _nMakeDisplacementMap(
     scale: Float,
     displacement: NativePointer,
     color: NativePointer,
-    crop: IRect?
+    crop: InteropPointer
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDropShadow")
@@ -661,7 +688,7 @@ private external fun _nMakeDropShadow(
     sigmaY: Float,
     color: Int,
     input: NativePointer,
-    crop: IRect?
+    crop: InteropPointer
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDropShadowOnly")
@@ -672,7 +699,7 @@ private external fun _nMakeDropShadowOnly(
     sigmaY: Float,
     color: Int,
     input: NativePointer,
-    crop: IRect?
+    crop: InteropPointer
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeImage")
@@ -698,7 +725,7 @@ private external fun _nMakeMagnifier(
     b: Float,
     inset: Float,
     input: NativePointer,
-    crop: IRect?
+    crop: InteropPointer
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMatrixConvolution")
@@ -713,17 +740,17 @@ private external fun _nMakeMatrixConvolution(
     tileMode: Int,
     convolveAlpha: Boolean,
     input: NativePointer,
-    crop: IRect?
+    crop: InteropPointer
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMatrixTransform")
 private external fun _nMakeMatrixTransform(matrix: InteropPointer, samplingModeVal1: Int, samplingModeVal2: Int, input: NativePointer): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMerge")
-private external fun _nMakeMerge(filters: InteropPointer, crop: IRect?): NativePointer
+private external fun _nMakeMerge(filters: InteropPointer, filtersLength: Int, crop: InteropPointer): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeOffset")
-private external fun _nMakeOffset(dx: Float, dy: Float, input: NativePointer, crop: IRect?): NativePointer
+private external fun _nMakeOffset(dx: Float, dy: Float, input: NativePointer, crop: InteropPointer): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakePaint")
-private external fun _nMakePaint(paint: NativePointer, crop: IRect?): NativePointer
+private external fun _nMakePaint(paint: NativePointer, crop: InteropPointer): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakePicture")
 private external fun _nMakePicture(picture: NativePointer, l: Float, t: Float, r: Float, b: Float): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeTile")
@@ -740,9 +767,9 @@ private external fun _nMakeTile(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDilate")
-private external fun _nMakeDilate(rx: Float, ry: Float, input: NativePointer, crop: IRect?): NativePointer
+private external fun _nMakeDilate(rx: Float, ry: Float, input: NativePointer, crop: InteropPointer): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeErode")
-private external fun _nMakeErode(rx: Float, ry: Float, input: NativePointer, crop: IRect?): NativePointer
+private external fun _nMakeErode(rx: Float, ry: Float, input: NativePointer, crop: InteropPointer): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDistantLitDiffuse")
 private external fun _nMakeDistantLitDiffuse(
     x: Float,
@@ -752,7 +779,7 @@ private external fun _nMakeDistantLitDiffuse(
     surfaceScale: Float,
     kd: Float,
     input: NativePointer,
-    crop: IRect?
+    crop: InteropPointer
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakePointLitDiffuse")
@@ -764,7 +791,7 @@ private external fun _nMakePointLitDiffuse(
     surfaceScale: Float,
     kd: Float,
     input: NativePointer,
-    crop: IRect?
+    crop: InteropPointer
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeSpotLitDiffuse")
@@ -781,7 +808,7 @@ private external fun _nMakeSpotLitDiffuse(
     surfaceScale: Float,
     kd: Float,
     input: NativePointer,
-    crop: IRect?
+    crop: InteropPointer
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDistantLitSpecular")
@@ -794,7 +821,7 @@ private external fun _nMakeDistantLitSpecular(
     ks: Float,
     shininess: Float,
     input: NativePointer,
-    crop: IRect?
+    crop: InteropPointer
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakePointLitSpecular")
@@ -807,7 +834,7 @@ private external fun _nMakePointLitSpecular(
     ks: Float,
     shininess: Float,
     input: NativePointer,
-    crop: IRect?
+    crop: InteropPointer
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeSpotLitSpecular")
@@ -825,5 +852,5 @@ private external fun _nMakeSpotLitSpecular(
     ks: Float,
     shininess: Float,
     input: NativePointer,
-    crop: IRect?
+    crop: InteropPointer
 ): NativePointer

@@ -196,4 +196,16 @@ namespace skija {
             return std::make_unique<SkSurfaceProps>(flags, geom);
         }
     }
+
+    namespace IRect {
+        std::unique_ptr<SkIRect> toSkIRect(KInt* rectInts) {
+            if (rectInts == nullptr)
+                return std::unique_ptr<SkIRect>(nullptr);
+            else {
+                return std::unique_ptr<SkIRect>(new SkIRect{
+                    rectInts[0], rectInts[1], rectInts[2], rectInts[3]
+                });
+            }
+        }
+    }
 }
