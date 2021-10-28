@@ -7,6 +7,9 @@ class FilterMipmap constructor(
 
     override fun _pack() = filterMode.ordinal.toLong() shl 32 or mipmapMode.ordinal.toLong()
 
+    override fun _packedInt1(): Int = filterMode.ordinal
+    override fun _packedInt2(): Int = mipmapMode.ordinal
+
     override fun equals(other: Any?): Boolean {
         if (other === this) return true
         if (other !is FilterMipmap) return false

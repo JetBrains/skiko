@@ -428,7 +428,8 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
             dst.top,
             dst.right,
             dst.bottom,
-            samplingMode._pack(),
+            samplingMode._packedInt1(),
+            samplingMode._packedInt2(),
             getPtr(paint),
             strict
         )
@@ -1550,7 +1551,8 @@ private external fun _nDrawImageRect(
     dt: Float,
     dr: Float,
     db: Float,
-    samplingMode: Long,
+    samplingModeVal1: Int,
+    samplingModeVal2: Int,
     paintPtr: NativePointer,
     strict: Boolean
 )

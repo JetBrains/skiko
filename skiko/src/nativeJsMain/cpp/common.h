@@ -31,6 +31,7 @@ KLong packISize(SkISize p);
 namespace skija {
     namespace SamplingMode {
         SkSamplingOptions unpack(KLong val);
+        SkSamplingOptions unpackFrom2Ints(KInt val1, KInt val2);
     }
 
     class UtfIndicesConverter {

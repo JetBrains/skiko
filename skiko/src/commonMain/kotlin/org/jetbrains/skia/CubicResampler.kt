@@ -25,6 +25,9 @@ class CubicResampler(val b: Float, val c: Float) : SamplingMode {
 
     override fun _pack(): Long = (0x8L shl 60) or ((b.toBits().toULong() shl 32) or c.toBits().toULong()).toLong()
 
+    override fun _packedInt1(): Int = b.toBits() or (0x8 shl 28)
+    override fun _packedInt2(): Int = c.toBits()
+
     override fun equals(other: Any?): Boolean {
         if (other === this) return true
         if (other !is CubicResampler) return false
