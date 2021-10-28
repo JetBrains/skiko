@@ -1,9 +1,6 @@
-package org.jetbrains.skiko
+package org.jetbrains.skia
 
-import org.jetbrains.skia.Path
-import org.jetbrains.skia.PathSegmentMask
-import org.jetbrains.skia.PathVerb
-import org.jetbrains.skia.Point
+import org.jetbrains.skia.impl.Native.Companion.NullPointer
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
@@ -83,7 +80,7 @@ class PathTest {
                     null
                 ), verbs
             )
-            assertNotEquals(0L, p.approximateBytesUsed)
+            assertNotEquals(NullPointer, p.approximateBytesUsed)
             assertEquals(PathSegmentMask.LINE, p.segmentMasks)
         }
     }

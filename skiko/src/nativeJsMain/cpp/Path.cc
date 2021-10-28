@@ -189,36 +189,19 @@ SKIKO_EXPORT KInt org_jetbrains_skia_Path__1nGetPointsCount(KNativePointer ptr) 
     return instance->countPoints();
 }
 
-
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Path__1nGetPoint(KNativePointer ptr, KInt index) {
-    TODO("implement org_jetbrains_skia_Path__1nGetPoint(KInteropPointer");
-}
-     
-#if 0 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Path__1nGetPoint(KNativePointer ptr, KInt index) {
+SKIKO_EXPORT void org_jetbrains_skia_Path__1nGetPoint(KNativePointer ptr, KInt index, KInteropPointer resultArray) {
     SkPath* instance = reinterpret_cast<SkPath*>((ptr));
     SkPoint p = instance->getPoint(index);
-    return skija::Point::fromSkPoint(env, p);
+    float* result = reinterpret_cast<float*>(resultArray);
+    result[0] = p.x();
+    result[1] = p.y();
 }
-#endif
 
-
-
-SKIKO_EXPORT KInt org_jetbrains_skia_Path__1nGetPoints(KNativePointer ptr, KInteropPointerArray pointsArray, KInt max) {
-    TODO("implement org_jetbrains_skia_Path__1nGetPoints(KInteropPointer");
-}
-     
-#if 0 
-SKIKO_EXPORT KInt org_jetbrains_skia_Path__1nGetPoints(KNativePointer ptr, KInteropPointerArray pointsArray, KInt max) {
+SKIKO_EXPORT KInt org_jetbrains_skia_Path__1nGetPoints(KNativePointer ptr, KInteropPointer pointsArray, KInt max) {
     SkPath* instance = reinterpret_cast<SkPath*>((ptr));
-    std::vector<SkPoint> p(std::min<KInt>(max, instance->countPoints()));
-    int count = instance->getPoints(p.data(), max);
-    for (int i = 0; i < max && i < count; ++ i)
-        env->SetObjectArrayElement(pointsArray, i, skija::Point::fromSkPoint(env, p[i]));
-    return count;
+    SkPoint* points = reinterpret_cast<SkPoint*>(pointsArray);
+    return instance->getPoints(points, max);
 }
-#endif
-
 
 SKIKO_EXPORT KInt org_jetbrains_skia_Path__1nCountVerbs(KNativePointer ptr) {
     SkPath* instance = reinterpret_cast<SkPath*>((ptr));
@@ -226,19 +209,9 @@ SKIKO_EXPORT KInt org_jetbrains_skia_Path__1nCountVerbs(KNativePointer ptr) {
 }
 
 SKIKO_EXPORT KInt org_jetbrains_skia_Path__1nGetVerbs(KNativePointer ptr, KByte* verbsArray, KInt max) {
-    TODO("implement org_jetbrains_skia_Path__1nGetVerbs(KInteropPointer");
-}
-     
-#if 0 
-SKIKO_EXPORT KInt org_jetbrains_skia_Path__1nGetVerbs(KNativePointer ptr, KByte* verbsArray, KInt max) {
     SkPath* instance = reinterpret_cast<SkPath*>((ptr));
-    KByte* verbs = verbsArray == nullptr ? nullptr : env->GetByteArrayElements(verbsArray, 0);
-    int count = instance->getVerbs(reinterpret_cast<uint8_t *>(verbs), max);
-    if (verbsArray != nullptr)
-        env->ReleaseByteArrayElements(verbsArray, verbs, 0);
-    return count;
+    return instance->getVerbs(reinterpret_cast<uint8_t *>(verbsArray), max);
 }
-#endif
 
 
 SKIKO_EXPORT KInt org_jetbrains_skia_Path__1nApproximateBytesUsed(KNativePointer ptr) {
@@ -526,23 +499,21 @@ SKIKO_EXPORT void org_jetbrains_skia_Path__1nTransform
 #endif
 
 
-
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Path__1nGetLastPt
-  (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_Path__1nGetLastPt");
-}
-     
-#if 0 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Path__1nGetLastPt
-  (KNativePointer ptr) {
+SKIKO_EXPORT bool org_jetbrains_skia_Path__1nGetLastPt
+  (KNativePointer ptr, KInteropPointer resultArray) {
     SkPath* instance = reinterpret_cast<SkPath*>((ptr));
+    float* result = reinterpret_cast<float*>(resultArray);
     SkPoint out;
-    if (instance->getLastPt(&out))
-        return skija::Point::fromSkPoint(env, out);
-    else
-        return nullptr;
+    if (instance->getLastPt(&out)) {
+        if (result != nullptr) {
+            result[0] = out.x();
+            result[1] = out.y();
+        }
+        return true;
+    } else {
+        return false;
+    }
 }
-#endif
 
 
 SKIKO_EXPORT void org_jetbrains_skia_Path__1nSetLastPt

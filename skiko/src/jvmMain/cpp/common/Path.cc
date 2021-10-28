@@ -155,18 +155,20 @@ extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_PathKt__1nGetPointsCou
     return instance->countPoints();
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_PathKt__1nGetPoint(JNIEnv* env, jclass jclass, jlong ptr, jint index) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathKt__1nGetPoint(JNIEnv* env, jclass jclass, jlong ptr, jint index, jfloatArray resultArray) {
     SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
     SkPoint p = instance->getPoint(index);
-    return skija::Point::fromSkPoint(env, p);
+    float result[] { p.x(), p.y() };
+    env->SetFloatArrayRegion(resultArray, 0, 2, reinterpret_cast<jfloat*>(result));
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_PathKt__1nGetPoints(JNIEnv* env, jclass jclass, jlong ptr, jobjectArray pointsArray, jint max) {
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_PathKt__1nGetPoints(JNIEnv* env, jclass jclass, jlong ptr, jfloatArray pointsArray, jint max) {
     SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
-    std::vector<SkPoint> p(std::min<jint>(max, instance->countPoints()));
-    int count = instance->getPoints(p.data(), max);
-    for (int i = 0; i < max && i < count; ++ i)
-        env->SetObjectArrayElement(pointsArray, i, skija::Point::fromSkPoint(env, p[i]));
+    jfloat* points = pointsArray == nullptr ? nullptr : env->GetFloatArrayElements(pointsArray, 0);
+    int count = instance->getPoints(reinterpret_cast<SkPoint*>(points), max);
+    if (pointsArray != nullptr) {
+        env->ReleaseFloatArrayElements(pointsArray, points, 0);
+    }
     return count;
 }
 
@@ -409,14 +411,17 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathKt__1nTransform
     instance->transform(*matrix, dst, pc);
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_PathKt__1nGetLastPt
-  (JNIEnv* env, jclass jclass, jlong ptr) {
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_PathKt__1nGetLastPt
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray resultArray) {
     SkPath* instance = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(ptr));
     SkPoint out;
-    if (instance->getLastPt(&out))
-        return skija::Point::fromSkPoint(env, out);
-    else
-        return nullptr;
+    if (instance->getLastPt(&out)) {
+        float result[] { out.x(), out.y() };
+        env->SetFloatArrayRegion(resultArray, 0, 2, reinterpret_cast<jfloat*>(result));
+        return true;
+    } else {
+        return false;
+    }
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PathKt__1nSetLastPt

@@ -2,6 +2,7 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import kotlin.math.min
 
 /**
  *
@@ -561,7 +562,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     fun getPoint(index: Int): Point {
         return try {
             Stats.onNativeCall()
-            _nGetPoint(_ptr, index)
+            Point.fromInteropPointer { _nGetPoint(_ptr, index, it) }
         } finally {
             reachabilityBarrier(this)
         }
@@ -598,9 +599,22 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      */
     fun getPoints(points: Array<Point?>?, max: Int): Int {
         return try {
-            require(if (points == null) max == 0 else true)
+            require(if (points == null) max == 0 else max >= 0)
             Stats.onNativeCall()
-            _nGetPoints(_ptr, points, max)
+            if (points == null) {
+                interopScope {
+                    _nGetPoints(_ptr, toInterop(null as FloatArray?), max)
+                }
+            } else {
+                var result = 0
+                val coords = withResult(FloatArray(max * 2)) {
+                    result = _nGetPoints(_ptr, it, max)
+                }
+                for (i in 0 until min(max, result)) {
+                    points[i] = Point(coords[2 * i], coords[2 * i + 1])
+                }
+                result
+            }
         } finally {
             reachabilityBarrier(this)
         }
@@ -643,7 +657,10 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
             Stats.onNativeCall()
             val out = if (verbs == null) null else ByteArray(max)
             val count = interopScope {
-                _nGetVerbs(_ptr, toInterop(out), max)
+                val ptr = toInterop(out)
+                _nGetVerbs(_ptr, ptr, max).also {
+                    out?.let { ptr.fromInterop(it) }
+                }
             }
             if (verbs != null) for (i in 0 until minOf(count, max)) verbs[i] = PathVerb.values().get(
                 out!![i].toInt()
@@ -1920,7 +1937,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     var lastPt: Point
         get() = try {
             Stats.onNativeCall()
-            _nGetLastPt(_ptr)
+            Point.fromInteropPointer { _nGetLastPt(_ptr, it) }
         } finally {
             reachabilityBarrier(this)
         }
@@ -2213,10 +2230,10 @@ private external fun _nMaybeGetAsLine(ptr: NativePointer): Array<Point>
 private external fun _nGetPointsCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nGetPoint")
-private external fun _nGetPoint(ptr: NativePointer, index: Int): Point
+private external fun _nGetPoint(ptr: NativePointer, index: Int, result: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nGetPoints")
-private external fun _nGetPoints(ptr: NativePointer, points: Array<Point?>?, max: Int): Int
+private external fun _nGetPoints(ptr: NativePointer, points: InteropPointer, max: Int): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nCountVerbs")
 private external fun _nCountVerbs(ptr: NativePointer): Int
@@ -2381,7 +2398,7 @@ private external fun _nOffset(ptr: NativePointer, dx: Float, dy: Float, dst: Nat
 private external fun _nTransform(ptr: NativePointer, matrix: InteropPointer, dst: NativePointer, applyPerspectiveClip: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nGetLastPt")
-private external fun _nGetLastPt(ptr: NativePointer): Point
+private external fun _nGetLastPt(ptr: NativePointer, result: InteropPointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nSetLastPt")
 private external fun _nSetLastPt(ptr: NativePointer, x: Float, y: Float)
