@@ -1,8 +1,14 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.tests.makeFromResource
 import org.jetbrains.skia.util.assertContentSame
 import org.jetbrains.skia.util.imageFromIntArray
+import org.jetbrains.skia.util.printBitmap
+import org.jetbrains.skiko.tests.SkipJsTarget
+import org.jetbrains.skiko.tests.SkipNativeTarget
+import org.jetbrains.skiko.tests.runTest
 import kotlin.test.Test
+import kotlin.test.assertTrue
 
 class CanvasTest {
     @Test
@@ -82,5 +88,34 @@ class CanvasTest {
         ), surface.width)
 
         assertContentSame(expected, surface.makeImageSnapshot(), 0.25)
+    }
+
+    private suspend fun fontInter36() =
+        Font(Typeface.makeFromResource("./fonts/Inter-Hinted-Regular.ttf"), 36f)
+
+    // TODO(karpovich): enable for all platforms
+    @Test @SkipNativeTarget @SkipJsTarget // native and js don't work: resulting image has no changed pixels
+    fun drawString() = runTest {
+        val surface = Surface.makeRasterN32Premul(100, 100)
+
+        val bytes =  Bitmap.makeFromImage(surface.makeImageSnapshot()).readPixels()!!
+        assertTrue {
+            bytes.isNotEmpty() && bytes.all { it == 0.toByte() }
+        }
+
+        surface.canvas.drawString(
+            s = "Hello world!",
+            x = 10f, y = 10f,
+            font = fontInter36(),
+            paint = Paint().apply {
+                color = Color.RED
+                setStroke(false)
+            }
+        )
+
+        val bytes2 =  Bitmap.makeFromImage(surface.makeImageSnapshot()).readPixels()!!
+        assertTrue {
+            bytes2.isNotEmpty() && bytes2.any { it != 0.toByte() }
+        }
     }
 }

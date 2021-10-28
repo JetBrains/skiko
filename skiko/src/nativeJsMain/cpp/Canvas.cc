@@ -124,23 +124,15 @@ SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nDrawRegion
     canvas->drawRegion(*region, *paint);
 }
 
-
 SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nDrawString
   (KNativePointer canvasPtr, KInteropPointer stringObj, KFloat x, KFloat y, KNativePointer skFontPtr, KNativePointer paintPtr) {
-    TODO("implement org_jetbrains_skia_Canvas__1nDrawString");
-}
-
-#if 0
-SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nDrawString
-  (KNativePointer canvasPtr, KInteropPointer stringObj, KFloat x, KFloat y, KNativePointer skFontPtr, KNativePointer paintPtr) {
-    SkCanvas* canvas    = reinterpret_cast<SkCanvas*>   ((canvasPtr));
-    SkString string     = skString(env, stringObj);
-    SkFont* font        = reinterpret_cast<SkFont*>     ((skFontPtr));
-    SkPaint* paint      = reinterpret_cast<SkPaint*>    ((paintPtr));
+    SkCanvas* canvas    = reinterpret_cast<SkCanvas*>(canvasPtr);
+    SkString string     = skString(stringObj);
+    SkFont* font        = reinterpret_cast<SkFont*>(skFontPtr);
+    SkPaint* paint      = reinterpret_cast<SkPaint*>(paintPtr);
 
     canvas->drawString(string, x, y, *font, *paint);
 }
-#endif
 
 
 SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nDrawTextBlob
