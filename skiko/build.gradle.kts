@@ -802,31 +802,33 @@ fun remoteSignCurl(signHost: String, lib: File, out: File) {
     }
 }
 
-fun remoteSignCodesign(signHost: String, lib: File, out: File) {
+fun remoteSignCodesign(fileToSign: File) {
     val user = skiko.signUser ?: error("signUser is null")
     val token = skiko.signToken ?: error("signToken is null")
-    val cmd = """
-        SERVICE_ACCOUNT_TOKEN=$token SERVICE_ACCOUNT_NAME=$user \
-        $projectDir/tools/codesign-client-darwin-x64 ${lib.absolutePath} && \
-        cp ${lib.absolutePath} ${out.absolutePath}
-    """
-    val proc = ProcessBuilder("bash", "-c", cmd)
-        .redirectOutput(ProcessBuilder.Redirect.PIPE)
-        .redirectError(ProcessBuilder.Redirect.PIPE)
-        .start()
+    val cmd = arrayOf(
+        projectDir.resolve("tools/codesign-client-darwin-x64").absolutePath,
+        fileToSign.absolutePath
+    )
+    val procBuilder = ProcessBuilder(*cmd).apply {
+        val env = environment()
+        env["SERVICE_ACCOUNT_NAME"] = user
+        env["SERVICE_ACCOUNT_TOKEN"] = token
+        redirectOutput(ProcessBuilder.Redirect.INHERIT)
+        redirectError(ProcessBuilder.Redirect.INHERIT)
+    }
+    logger.info("Starting remote code sign")
+    val proc = procBuilder.start()
     proc.waitFor(5, TimeUnit.MINUTES)
     if (proc.exitValue() != 0) {
-        val out = proc.inputStream.bufferedReader().readText()
-        val err = proc.errorStream.bufferedReader().readText()
-        println(out)
-        println(err)
-        throw GradleException("Cannot sign $lib: $err")
+        throw GradleException("Failed to sign $fileToSign")
     } else {
-        val outSize = out.length()
-        if (outSize < 200 * 1024) {
-            val content = out.readText()
+        val size = fileToSign.length()
+        if (size < 200 * 1024) {
+            val content = fileToSign.readText()
             println(content)
-            throw GradleException("Output is too short $outSize: ${content.take(200)}...")
+            throw GradleException("Output is too short $size: ${content.take(200)}...")
+        } else {
+            logger.info("Successfully signed $fileToSign")
         }
     }
 }
@@ -856,15 +858,15 @@ val maybeSign by project.tasks.registering {
 
         val libFile = lib.get()
         val outputFile = output.get()
+        libFile.copyTo(outputFile, overwrite = true)
+
         if (targetOs == OS.Linux) {
             // Linux requires additional sealing to run on wider set of platforms.
             val sealer = "$projectDir/tools/sealer-${hostArch.id}"
-            sealBinary(sealer, libFile)
+            sealBinary(sealer, outputFile)
         }
         if (skiko.signHost != null) {
-            remoteSignCodesign(skiko.signHost!!, libFile, outputFile)
-        } else {
-            libFile.copyTo(outputFile, overwrite = true)
+            remoteSignCodesign(outputFile)
         }
     }
 }
