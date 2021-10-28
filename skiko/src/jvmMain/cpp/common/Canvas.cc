@@ -229,13 +229,13 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nResetMatri
     canvas->resetMatrix();
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_CanvasKt__1nGetLocalToDevice
-(JNIEnv* env, jclass jclass, jlong canvasPtr) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nGetLocalToDevice
+(JNIEnv* env, jclass jclass, jlong canvasPtr, jfloatArray resultingMatrix) {
+  jfloat *floats = env->GetFloatArrayElements(resultingMatrix, NULL);
   SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
   SkM44 matrix = canvas->getLocalToDevice();
-  std::vector<float> floats(16);
-  matrix.getRowMajor(floats.data());
-  return javaFloatArray(env, floats);
+  matrix.getRowMajor(floats);
+  env->ReleaseFloatArrayElements(resultingMatrix, floats, 0);
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nClipRect

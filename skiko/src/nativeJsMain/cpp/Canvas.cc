@@ -253,22 +253,12 @@ SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nResetMatrix
 }
 
 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Canvas__1nGetLocalToDevice
-(KNativePointer canvasPtr) {
-    TODO("implement org_jetbrains_skia_Canvas__1nGetLocalToDevice");
+SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nGetLocalToDevice
+(KNativePointer canvasPtr, KFloat* resultingFloats) {
+    SkCanvas* canvas = reinterpret_cast<SkCanvas*>(canvasPtr);
+    SkM44 matrix = canvas->getLocalToDevice();
+    matrix.getRowMajor(resultingFloats);
 }
-
-#if 0
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Canvas__1nGetLocalToDevice
-(KNativePointer canvasPtr) {
-  SkCanvas* canvas = reinterpret_cast<SkCanvas*>((canvasPtr));
-  SkM44 matrix = canvas->getLocalToDevice();
-  std::vector<float> floats(16);
-  matrix.getRowMajor(floats.data());
-  return javaFloatArray(env, floats);
-}
-#endif
-
 
 SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nClipRect
   (KNativePointer canvasPtr, KFloat left, KFloat top, KFloat right, KFloat bottom, KInt mode, KBoolean antiAlias) {

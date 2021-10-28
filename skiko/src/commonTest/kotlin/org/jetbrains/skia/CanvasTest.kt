@@ -3,11 +3,11 @@ package org.jetbrains.skia
 import org.jetbrains.skia.tests.makeFromResource
 import org.jetbrains.skia.util.assertContentSame
 import org.jetbrains.skia.util.imageFromIntArray
-import org.jetbrains.skia.util.printBitmap
 import org.jetbrains.skiko.tests.SkipJsTarget
 import org.jetbrains.skiko.tests.SkipNativeTarget
 import org.jetbrains.skiko.tests.runTest
 import kotlin.test.Test
+import kotlin.test.assertContentEquals
 import kotlin.test.assertTrue
 
 class CanvasTest {
@@ -94,7 +94,8 @@ class CanvasTest {
         Font(Typeface.makeFromResource("./fonts/Inter-Hinted-Regular.ttf"), 36f)
 
     // TODO(karpovich): enable for all platforms
-    @Test @SkipNativeTarget @SkipJsTarget // native and js don't work: resulting image has no changed pixels
+    // native and js don't work: resulting image has no changed pixels (typeface implementations required)
+    @Test @SkipNativeTarget @SkipJsTarget
     fun drawString() = runTest {
         val surface = Surface.makeRasterN32Premul(100, 100)
 
@@ -117,5 +118,23 @@ class CanvasTest {
         assertTrue {
             bytes2.isNotEmpty() && bytes2.any { it != 0.toByte() }
         }
+    }
+
+    @Test
+    fun testLocalToDevice() = runTest {
+        val surface = Surface.makeRasterN32Premul(100, 100)
+
+        val expectedArray = FloatArray(16) { if (it % 5 == 0) 1f else 0f }
+        assertContentEquals(expectedArray, surface.canvas.localToDevice.mat)
+
+        surface.canvas.scale(2f, 2f)
+
+        val expectedAfterScale = floatArrayOf(
+            2.0f, 0.0f, 0.0f, 0.0f, 0.0f, 2.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f
+        )
+        assertContentEquals(expectedAfterScale, surface.canvas.localToDevice.mat)
+
+        surface.canvas.resetMatrix()
+        assertContentEquals(expectedArray, surface.canvas.localToDevice.mat)
     }
 }

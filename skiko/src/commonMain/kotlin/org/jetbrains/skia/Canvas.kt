@@ -1126,7 +1126,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     val localToDevice: Matrix44
         get() = try {
             Stats.onNativeCall()
-            val mat = _nGetLocalToDevice(_ptr)
+            val mat = withResult(FloatArray(16)) { _nGetLocalToDevice(_ptr, it) }
             Matrix44(*mat)
         } finally {
             reachabilityBarrier(this)
@@ -1627,7 +1627,7 @@ private external fun _nDrawPaint(ptr: NativePointer, paintPtr: NativePointer)
 private external fun _nSetMatrix(ptr: NativePointer, matrix: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nGetLocalToDevice")
-private external fun _nGetLocalToDevice(ptr: NativePointer): FloatArray
+private external fun _nGetLocalToDevice(ptr: NativePointer, resultFloats: InteropPointer): FloatArray
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nResetMatrix")
 private external fun _nResetMatrix(ptr: NativePointer)
