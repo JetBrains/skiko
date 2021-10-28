@@ -153,4 +153,41 @@ class CanvasTest {
 
         assertContentEquals(expectedAfterScale, surface.canvas.localToDevice.mat)
     }
+
+    @Test
+    fun drawPatch() = runTest {
+        // source: https://fiddle.skia.org/c/e96c5f9aa21fb97c25058d9e7b9be3a9
+
+        val surface = Surface.makeRasterN32Premul(8, 8)
+
+        val points = arrayOf(
+            3, 1, 4, 2, 5, 1, 7, 3, 6, 4, 7, 5, 5, 7, 4, 6, 3, 7, 1, 5, 2, 4, 1, 3
+        ).toList().chunked(2) {
+            Point(it[0].toFloat(), it[1].toFloat())
+        }
+
+        surface.canvas.drawPatch(
+            cubics = points.toTypedArray(),
+            colors = intArrayOf(Color.RED, Color.BLUE, Color.YELLOW, Color.CYAN),
+            texCoords = null,
+            paint = Paint()
+        )
+
+        val expected = imageFromIntArray(
+            pixArray = intArrayOf(
+                0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(),
+                0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0xffcb0634.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(),
+                0x00000000.toInt(), 0x00000000.toInt(), 0xffb63b49.toInt(), 0xff9b3064.toInt(), 0xff762b8a.toInt(), 0xff4b1cb4.toInt(), 0x00000000.toInt(), 0x00000000.toInt(),
+                0x00000000.toInt(), 0x00000000.toInt(), 0xff8d6e73.toInt(), 0xff866479.toInt(), 0xff7a6386.toInt(), 0xff675698.toInt(), 0xff3632c9.toInt(), 0x00000000.toInt(),
+                0x00000000.toInt(), 0xff36cdc9.toInt(), 0xff67a998.toInt(), 0xff7a9c86.toInt(), 0xff869b79.toInt(), 0xff8d9173.toInt(), 0x00000000.toInt(), 0x00000000.toInt(),
+                0x00000000.toInt(), 0x00000000.toInt(), 0xff4be3b4.toInt(), 0xff76d48a.toInt(), 0xff9bcf64.toInt(), 0xffb6c449.toInt(), 0x00000000.toInt(), 0x00000000.toInt(),
+                0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0xffcbf934.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(),
+                0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(), 0x00000000.toInt(),
+
+                ),
+            imageWidth = 8
+        )
+
+        assertContentSame(expected = expected, got = surface.makeImageSnapshot(), sensitivity = 0.25)
+    }
 }

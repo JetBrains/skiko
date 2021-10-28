@@ -175,30 +175,18 @@ SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nDrawVertices
     canvas->drawVertices(vertices, static_cast<SkBlendMode>(blendMode), *paint);
 }
 
-
-
 SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nDrawPatch
   (KNativePointer ptr, KFloat* cubicsArr, KInt* colorsArr, KFloat* texCoordsArr, KInt blendMode, KNativePointer paintPtr) {
-    TODO("implement org_jetbrains_skia_Canvas__1nDrawPatch");
-}
-
-#if 0
-SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nDrawPatch
-  (KNativePointer ptr, KFloat* cubicsArr, KInt* colorsArr, KFloat* texCoordsArr, KInt blendMode, KNativePointer paintPtr) {
-    SkCanvas* canvas = reinterpret_cast<SkCanvas*>   ((ptr));
-    KFloat* cubics    = env->GetFloatArrayElements(cubicsArr, 0);
-    KInt*   colors    = env->GetIntArrayElements(colorsArr, 0);
-    KFloat* texCoords = texCoordsArr == nullptr ? nullptr : env->GetFloatArrayElements(texCoordsArr, 0);
+    SkCanvas* canvas = reinterpret_cast<SkCanvas*>(ptr);
     SkPaint* paint = reinterpret_cast<SkPaint*>((paintPtr));
-
-    canvas->drawPatch(reinterpret_cast<SkPoint*>(cubics), reinterpret_cast<SkColor*>(colors), reinterpret_cast<SkPoint*>(texCoords), static_cast<SkBlendMode>(blendMode), *paint);
-
-    if (texCoords != nullptr)
-        env->ReleaseFloatArrayElements(texCoordsArr, texCoords, 0);
-    env->ReleaseIntArrayElements(colorsArr, colors, 0);
-    env->ReleaseFloatArrayElements(cubicsArr, cubics, 0);
+    canvas->drawPatch(
+        reinterpret_cast<SkPoint*>(cubicsArr),
+        reinterpret_cast<SkColor*>(colorsArr),
+        reinterpret_cast<SkPoint*>(texCoordsArr),
+        static_cast<SkBlendMode>(blendMode),
+        *paint
+    );
 }
-#endif
 
 
 
