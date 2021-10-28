@@ -7,6 +7,7 @@ import kotlinx.coroutines.withContext
 import org.jetbrains.skia.BackendRenderTarget
 import org.jetbrains.skia.DirectContext
 import org.jetbrains.skiko.*
+import org.jetbrains.skiko.context.MetalContextHandler
 import javax.swing.SwingUtilities.*
 
 internal class MetalRedrawer(
@@ -20,13 +21,16 @@ internal class MetalRedrawer(
     }
     private var isDisposed = false
     private var drawLock = Any()
-    private val device = layer.backedLayer.useDrawingSurfacePlatformInfo {
-        createMetalDevice(layer.windowHandle, layer.transparency, getAdapterPriority(), it)
-    }
+    private var device: Long = 0
     private val windowHandle = layer.windowHandle
 
     init {
-        setVSyncEnabled(device, properties.isVsyncEnabled)
+        autoreleasepool {
+            device = layer.backedLayer.useDrawingSurfacePlatformInfo {
+                createMetalDevice(layer.windowHandle, layer.transparency, getAdapterPriority(), it)
+            }
+            setVSyncEnabled(device, properties.isVsyncEnabled)
+        }
     }
 
     private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
@@ -38,7 +42,10 @@ internal class MetalRedrawer(
 
     override fun dispose() = synchronized(drawLock) {
         frameDispatcher.cancel()
-        disposeDevice(device)
+        autoreleasepool {
+            (layer.contextHandler as? MetalContextHandler)?.disposeInMetalContext()
+            disposeDevice(device)
+        }
         isDisposed = true
     }
 
@@ -49,10 +56,12 @@ internal class MetalRedrawer(
 
     override fun redrawImmediately() {
         check(!isDisposed) { "MetalRedrawer is disposed" }
-        setVSyncEnabled(device, enabled = false)
-        update(System.nanoTime())
-        layer.inDrawScope(::performDraw)
-        setVSyncEnabled(device, properties.isVsyncEnabled)
+        autoreleasepool {
+            setVSyncEnabled(device, enabled = false)
+            update(System.nanoTime())
+            layer.inDrawScope(::performDraw)
+            setVSyncEnabled(device, properties.isVsyncEnabled)
+        }
     }
 
     private fun update(nanoTime: Long) {
@@ -73,11 +82,8 @@ internal class MetalRedrawer(
         // Dispatchers.IO: 50 FPS, 200% CPU
         layer.inDrawScope {
             withContext(Dispatchers.IO) {
-                val handle = startRendering()
-                try {
+                autoreleasepool {
                     performDraw()
-                } finally {
-                    endRendering(handle)
                 }
             }
         }
@@ -96,16 +102,18 @@ internal class MetalRedrawer(
 
     override fun syncSize() = synchronized(drawLock) {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
-        val rootPane = getRootPane(layer)
-        val globalPosition = convertPoint(layer, layer.x, layer.y, rootPane)
-        setContentScale(device, layer.contentScale)
-        resizeLayers(
-            device,
-            globalPosition.x,
-            rootPane.height - globalPosition.y - layer.height,
-            layer.width.coerceAtLeast(0),
-            layer.height.coerceAtLeast(0)
-        )
+        autoreleasepool {
+            val rootPane = getRootPane(layer)
+            val globalPosition = convertPoint(layer, layer.x, layer.y, rootPane)
+            setContentScale(device, layer.contentScale)
+            resizeLayers(
+                device,
+                globalPosition.x,
+                rootPane.height - globalPosition.y - layer.height,
+                layer.width.coerceAtLeast(0),
+                layer.height.coerceAtLeast(0)
+            )
+        }
     }
 
     fun makeContext() = DirectContext(
@@ -144,4 +152,14 @@ internal class MetalRedrawer(
     private external fun getAdapterMemorySize(device: Long): Long
     private external fun startRendering(): Long
     private external fun endRendering(handle: Long)
+
+    // don't forget to wrap all native calls into this. otherwise there can be unpredictable memory leaks
+    private fun <T> autoreleasepool(body: () -> T) : T {
+        val handle = startRendering()
+        return try {
+            body()
+        } finally {
+            endRendering(handle)
+        }
+    }
 }

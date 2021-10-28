@@ -29,7 +29,7 @@
 
 @interface MetalDevice : NSObject
 
-@property (retain, strong) CALayer *container;
+@property (assign) CALayer *container;
 @property (retain, strong) AWTMetalLayer *layer;
 @property (retain, strong) id<MTLDevice> device;
 @property (retain, strong) id<MTLCommandQueue> queue;
@@ -122,6 +122,8 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_startRen
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_endRendering(
     JNIEnv * env, jobject redrawer, jlong handle)
 {
+    [CATransaction commit];
+    [CATransaction flush];
     objc_autoreleasePoolPop((void*)handle);
 }
 
@@ -213,7 +215,7 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
     CGFloat transparent[] = { 0.0f, 0.0f, 0.0f, 0.0f };
     device.layer.backgroundColor = CGColorCreate(CGColorSpaceCreateDeviceRGB(), transparent);
     device.layer.opaque = NO;
-    
+
     if (transparency)
     {
         NSWindow* window = (NSWindow*)windowPtr;
