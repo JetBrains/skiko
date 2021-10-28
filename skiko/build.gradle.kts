@@ -847,7 +847,7 @@ val maybeSign by project.tasks.registering {
     inputs.files(lib)
 
     val outputDir = project.layout.buildDirectory.dir("maybe-signed")
-    val output = outputDir.map { it.asFile.resolve(lib.get().name + ".maybesigned") }
+    val output = outputDir.map { it.asFile.resolve(lib.get().name) }
     outputs.files(output)
 
     doLast {
@@ -884,10 +884,6 @@ val skikoJvmRuntimeJar by project.tasks.registering(Jar::class) {
     archiveBaseName.set("skiko-$target")
     from(skikoJvmJar.map { zipTree(it.archiveFile) })
     from(maybeSign.map { it.outputs.files })
-    rename {
-        // Not just suffix, as could be in middle of SHA256.
-        it.replace(".maybesigned", "")
-    }
     if (targetOs.isWindows) {
         from(files(skiaJvmBindingsDir.map { it.resolve("${skiaBinSubdir}/icudtl.dat") }))
     }
