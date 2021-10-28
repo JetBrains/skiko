@@ -810,6 +810,7 @@ fun remoteSignCodesign(fileToSign: File) {
         fileToSign.absolutePath
     )
     val procBuilder = ProcessBuilder(*cmd).apply {
+        directory(fileToSign.parentFile)
         val env = environment()
         env["SERVICE_ACCOUNT_NAME"] = user
         env["SERVICE_ACCOUNT_TOKEN"] = token
