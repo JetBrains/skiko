@@ -272,9 +272,9 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BitmapKt__1nPeekPixel
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BitmapKt__1nMakeShader
-  (JNIEnv* env, jclass jclass, jlong ptr, jint tmx, jint tmy, jintArray samplingMode, jfloatArray localMatrixArr) {
+  (JNIEnv* env, jclass jclass, jlong ptr, jint tmx, jint tmy, jint samplingModeVal1, jint samplingModeVal2, jfloatArray localMatrixArr) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(ptr));
     std::unique_ptr<SkMatrix> localMatrix = skMatrix(env, localMatrixArr);
-    sk_sp<SkShader> shader = instance->makeShader(static_cast<SkTileMode>(tmx), static_cast<SkTileMode>(tmy), skija::SamplingMode::unpackFrom2Ints(env, samplingMode), localMatrix.get());
+    sk_sp<SkShader> shader = instance->makeShader(static_cast<SkTileMode>(tmx), static_cast<SkTileMode>(tmy), skija::SamplingMode::unpackFrom2Ints(env, samplingModeVal1, samplingModeVal2), localMatrix.get());
     return reinterpret_cast<jlong>(shader.release());
 }

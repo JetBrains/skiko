@@ -235,7 +235,8 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
                         _ptr,
                         tmx.ordinal,
                         tmy.ordinal,
-                        toInterop(sampling._packAs2Ints()),
+                        sampling._packedInt1(),
+                        sampling._packedInt2(),
                         toInterop(localMatrix?.mat)
                     )
                 }
@@ -358,14 +359,13 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
 
     fun scalePixels(dst: Pixmap, samplingMode: SamplingMode, cache: Boolean): Boolean {
         return try {
-            interopScope {
-                _nScalePixels(
-                    _ptr,
-                    getPtr(dst),
-                    toInterop(samplingMode._packAs2Ints()),
-                    cache
-                )
-            }
+            _nScalePixels(
+                _ptr,
+                getPtr(dst),
+                samplingMode._packedInt1(),
+                samplingMode._packedInt2(),
+                cache
+            )
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(dst)
@@ -377,7 +377,7 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
 private external fun Image_nGetImageInfo(ptr: NativePointer, imageInfo: InteropPointer, colorSpacePtrs: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeShader")
-private external fun Image_nMakeShader(ptr: NativePointer, tmx: Int, tmy: Int, samplingMode: InteropPointer, localMatrix: InteropPointer): NativePointer
+private external fun Image_nMakeShader(ptr: NativePointer, tmx: Int, tmy: Int, samplingModeVal1: Int, samplingModeVal2: Int, localMatrix: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nPeekPixels")
 private external fun Image_nPeekPixels(ptr: NativePointer): NativePointer
@@ -422,7 +422,7 @@ private external fun _nEncodeToData(ptr: NativePointer, format: Int, quality: In
 private external fun _nPeekPixelsToPixmap(ptr: NativePointer, pixmapPtr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nScalePixels")
-private external fun _nScalePixels(ptr: NativePointer, pixmapPtr: NativePointer, samplingOptions: InteropPointer, cache: Boolean): Boolean
+private external fun _nScalePixels(ptr: NativePointer, pixmapPtr: NativePointer, samplingOptionsVal1: Int, samplingOptionsVal2: Int, cache: Boolean): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nReadPixelsBitmap")
 private external fun _nReadPixelsBitmap(

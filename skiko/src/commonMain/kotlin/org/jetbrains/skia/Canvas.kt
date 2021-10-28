@@ -417,23 +417,22 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         strict: Boolean
     ): Canvas {
         Stats.onNativeCall()
-        interopScope {
-            _nDrawImageRect(
-                _ptr,
-                getPtr(image),
-                src.left,
-                src.top,
-                src.right,
-                src.bottom,
-                dst.left,
-                dst.top,
-                dst.right,
-                dst.bottom,
-                toInterop(samplingMode._packAs2Ints()),
-                getPtr(paint),
-                strict
-            )
-        }
+        _nDrawImageRect(
+            _ptr,
+            getPtr(image),
+            src.left,
+            src.top,
+            src.right,
+            src.bottom,
+            dst.left,
+            dst.top,
+            dst.right,
+            dst.bottom,
+            samplingMode._packedInt1(),
+            samplingMode._packedInt2(),
+            getPtr(paint),
+            strict
+        )
         reachabilityBarrier(image)
         reachabilityBarrier(paint)
         return this
@@ -1552,7 +1551,8 @@ private external fun _nDrawImageRect(
     dt: Float,
     dr: Float,
     db: Float,
-    samplingMode: InteropPointer,
+    samplingModeVal1: Int,
+    samplingModeVal2: Int,
     paintPtr: NativePointer,
     strict: Boolean
 )

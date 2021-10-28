@@ -96,14 +96,14 @@ SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nDrawPath
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nDrawImageRect
-  (KNativePointer canvasPtr, KNativePointer imagePtr, KFloat sl, KFloat st, KFloat sr, KFloat sb, KFloat dl, KFloat dt, KFloat dr, KFloat db, KInt* samplingMode, KNativePointer paintPtr, KBoolean strict) {
+  (KNativePointer canvasPtr, KNativePointer imagePtr, KFloat sl, KFloat st, KFloat sr, KFloat sb, KFloat dl, KFloat dt, KFloat dr, KFloat db, KInt samplingModeVal1, KInt samplingModeVal2, KNativePointer paintPtr, KBoolean strict) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>((canvasPtr));
     SkImage* image = reinterpret_cast<SkImage*>((imagePtr));
     SkRect src {sl, st, sr, sb};
     SkRect dst {dl, dt, dr, db};
     SkPaint* paint = reinterpret_cast<SkPaint*>((paintPtr));
     SkCanvas::SrcRectConstraint constraint = strict ? SkCanvas::SrcRectConstraint::kStrict_SrcRectConstraint : SkCanvas::SrcRectConstraint::kFast_SrcRectConstraint;
-    canvas->drawImageRect(image, src, dst, skija::SamplingMode::unpackFrom2Ints(samplingMode), paint, constraint);
+    canvas->drawImageRect(image, src, dst, skija::SamplingMode::unpackFrom2Ints(samplingModeVal1, samplingModeVal2), paint, constraint);
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nDrawImageNine

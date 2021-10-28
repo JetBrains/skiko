@@ -19,9 +19,8 @@ class SamplingModeTest {
                 assertEquals(filterMode.ordinal, l1)
                 assertEquals(mipmapMode.ordinal, l2)
 
-                val ints = samplingMode._packAs2Ints()
-                assertEquals(l1, ints[0])
-                assertEquals(l2, ints[1])
+                assertEquals(l1, samplingMode._packedInt1())
+                assertEquals(l2, samplingMode._packedInt2())
             }
         }
     }
@@ -43,8 +42,9 @@ class SamplingModeTest {
                 assertEquals(((long and 0x7FFFFFFFFFFFFFFF) shr 32).toInt(), bBits)
                 assertEquals((long and 0xFFFFFFFF).toInt() , cBits)
 
-                val ints = samplingMode._packAs2Ints()
-                assertEquals(long, (ints[0].toULong() shl 32 or ints[1].toULong()).toLong())
+                val int1 = samplingMode._packedInt1()
+                val int2 = samplingMode._packedInt2()
+                assertEquals(long, (int1.toULong() shl 32 or int2.toULong()).toLong())
             }
         }
     }

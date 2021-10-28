@@ -30,16 +30,16 @@ namespace skija {
             }
         }
 
-        SkSamplingOptions unpackFrom2Ints(KInt* twoInts) {
-            if (0x80000000 & twoInts[0]) {
-                uint64_t val1 = twoInts[0] & 0x7FFFFFFF;
-                uint64_t val = (val1 << 32) | twoInts[1];
+        SkSamplingOptions unpackFrom2Ints(KInt samplingModeVal1, KInt samplingModeVal2) {
+            if (0x80000000 & samplingModeVal1) {
+                uint64_t val1 = samplingModeVal1 & 0x7FFFFFFF;
+                uint64_t val = (val1 << 32) | samplingModeVal2;
 
                 float* ptr = reinterpret_cast<float*>(&val);
                 return SkSamplingOptions(SkCubicResampler {ptr[1], ptr[0]});
             } else {
-                int32_t filter = twoInts[0];
-                int32_t mipmap = twoInts[1];
+                int32_t filter = samplingModeVal1;
+                int32_t mipmap = samplingModeVal2;
 
                 return SkSamplingOptions(static_cast<SkFilterMode>(filter), static_cast<SkMipmapMode>(mipmap));
             }

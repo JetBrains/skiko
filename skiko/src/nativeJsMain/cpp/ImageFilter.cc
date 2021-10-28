@@ -163,9 +163,9 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeDropShadowOnly
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeImage
-  (KNativePointer imagePtr, KFloat l0, KFloat t0, KFloat r0, KFloat b0, KFloat l1, KFloat t1, KFloat r1, KFloat b1, KInt* samplingMode) {
+  (KNativePointer imagePtr, KFloat l0, KFloat t0, KFloat r0, KFloat b0, KFloat l1, KFloat t1, KFloat r1, KFloat b1, KInt samplingModeVal1, KInt samplingModeVal2) {
     SkImage* image = reinterpret_cast<SkImage*>((imagePtr));
-    SkImageFilter* ptr = SkImageFilters::Image(sk_ref_sp(image), SkRect{l0, t0, r0, b0}, SkRect{l1, t1, r1, b1}, skija::SamplingMode::unpackFrom2Ints(samplingMode)).release();
+    SkImageFilter* ptr = SkImageFilters::Image(sk_ref_sp(image), SkRect{l0, t0, r0, b0}, SkRect{l1, t1, r1, b1}, skija::SamplingMode::unpackFrom2Ints(samplingModeVal1, samplingModeVal2)).release();
     return reinterpret_cast<KNativePointer>(ptr);
 }
 
@@ -208,16 +208,16 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeMatrixConvolut
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeMatrixTransform
-  (KFloat* matrixArray, KNativePointer samplingMode, KNativePointer inputPtr) {
+  (KFloat* matrixArray, KInt samplingModeVal1, KInt samplingModeVal2, KNativePointer inputPtr) {
     TODO("implement org_jetbrains_skia_ImageFilter__1nMakeMatrixTransform");
 }
 
 #if 0
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeMatrixTransform
-  (KFloat* matrixArray, KNativePointer samplingMode, KNativePointer inputPtr) {
+  (KFloat* matrixArray, KInt samplingModeVal1, KInt samplingModeVal2, KNativePointer inputPtr) {
     std::unique_ptr<SkMatrix> matrix = skMatrix(env, matrixArray);
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>((inputPtr));
-    SkImageFilter* ptr = SkImageFilters::MatrixTransform(*matrix, skija::SamplingMode::unpack(samplingMode), sk_ref_sp(input)).release();
+    SkImageFilter* ptr = SkImageFilters::MatrixTransform(*matrix, skija::SamplingMode::unpackFrom2Ints(samplingModeVal1, samplingModeVal2), sk_ref_sp(input)).release();
     return reinterpret_cast<KNativePointer>(ptr);
 }
 #endif

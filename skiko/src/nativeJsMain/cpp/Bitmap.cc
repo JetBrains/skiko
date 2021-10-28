@@ -290,13 +290,13 @@ SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Bitmap__1nPeekPixels
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Bitmap__1nMakeShader
-  (KNativePointer ptr, KInt tmx, KInt tmy, KLong samplingMode, KFloat* localMatrixArr) {
+  (KNativePointer ptr, KInt tmx, KInt tmy, KInt samplingModeValue1, KInt samplingModeValue2, KFloat* localMatrixArr) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>(ptr);
     std::unique_ptr<SkMatrix> localMatrix = skMatrix(localMatrixArr);
     sk_sp<SkShader> shader = instance->makeShader(
         static_cast<SkTileMode>(tmx),
         static_cast<SkTileMode>(tmy),
-        skija::SamplingMode::unpack(samplingMode),
+        skija::SamplingMode::unpackFrom2Ints(samplingModeValue1, samplingModeValue2),
         localMatrix.get()
     );
     return reinterpret_cast<KNativePointer>(shader.release());

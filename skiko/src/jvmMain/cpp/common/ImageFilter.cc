@@ -90,9 +90,9 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilterKt__1nMake
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilterKt__1nMakeImage
-  (JNIEnv* env, jclass jclass, jlong imagePtr, jfloat l0, jfloat t0, jfloat r0, jfloat b0, jfloat l1, jfloat t1, jfloat r1, jfloat b1, jintArray samplingMode) {
+  (JNIEnv* env, jclass jclass, jlong imagePtr, jfloat l0, jfloat t0, jfloat r0, jfloat b0, jfloat l1, jfloat t1, jfloat r1, jfloat b1, jint samplingModeVal1, jint samplingModeVal2) {
     SkImage* image = reinterpret_cast<SkImage*>(static_cast<uintptr_t>(imagePtr));
-    SkImageFilter* ptr = SkImageFilters::Image(sk_ref_sp(image), SkRect{l0, t0, r0, b0}, SkRect{l1, t1, r1, b1}, skija::SamplingMode::unpackFrom2Ints(env, samplingMode)).release();
+    SkImageFilter* ptr = SkImageFilters::Image(sk_ref_sp(image), SkRect{l0, t0, r0, b0}, SkRect{l1, t1, r1, b1}, skija::SamplingMode::unpackFrom2Ints(env, samplingModeVal1, samplingModeVal2)).release();
     return reinterpret_cast<jlong>(ptr);
 }
 
@@ -116,10 +116,10 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilterKt__1nMake
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilterKt__1nMakeMatrixTransform
-  (JNIEnv* env, jclass jclass, jfloatArray matrixArray, jintArray samplingMode, jlong inputPtr) {
+  (JNIEnv* env, jclass jclass, jfloatArray matrixArray, jint samplingModeVal1, jint samplingModeVal2, jlong inputPtr) {
     std::unique_ptr<SkMatrix> matrix = skMatrix(env, matrixArray);
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>(static_cast<uintptr_t>(inputPtr));
-    SkImageFilter* ptr = SkImageFilters::MatrixTransform(*matrix, skija::SamplingMode::unpackFrom2Ints(env, samplingMode), sk_ref_sp(input)).release();
+    SkImageFilter* ptr = SkImageFilters::MatrixTransform(*matrix, skija::SamplingMode::unpackFrom2Ints(env, samplingModeVal1, samplingModeVal2), sk_ref_sp(input)).release();
     return reinterpret_cast<jlong>(ptr);
 }
 

@@ -74,10 +74,10 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nEncodeToDa
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt_Image_1nMakeShader
-  (JNIEnv* env, jclass jclass, jlong ptr, jint tmx, jint tmy, jintArray sampling, jfloatArray localMatrixArr) {
+  (JNIEnv* env, jclass jclass, jlong ptr, jint tmx, jint tmy, jint samplingVal1, jint samplingVal2, jfloatArray localMatrixArr) {
     SkImage* instance = reinterpret_cast<SkImage*>(static_cast<uintptr_t>(ptr));
     std::unique_ptr<SkMatrix> localMatrix = skMatrix(env, localMatrixArr);
-    sk_sp<SkShader> shader = instance->makeShader(static_cast<SkTileMode>(tmx), static_cast<SkTileMode>(tmy), skija::SamplingMode::unpackFrom2Ints(env, sampling), localMatrix.get());
+    sk_sp<SkShader> shader = instance->makeShader(static_cast<SkTileMode>(tmx), static_cast<SkTileMode>(tmy), skija::SamplingMode::unpackFrom2Ints(env, samplingVal1, samplingVal2), localMatrix.get());
     return reinterpret_cast<jlong>(shader.release());
 }
 
@@ -119,9 +119,9 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_ImageKt__1nReadPix
 }
 
 extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_ImageKt__1nScalePixels
-  (JNIEnv* env, jclass jclass, jlong ptr, jlong pixmapPtr, jintArray samplingOptions, jboolean cache) {
+  (JNIEnv* env, jclass jclass, jlong ptr, jlong pixmapPtr, jint samplingOptionsVal1, jint samplingOptionsVal2, jboolean cache) {
     SkImage* instance = reinterpret_cast<SkImage*>(static_cast<uintptr_t>(ptr));
     SkPixmap* pixmap = reinterpret_cast<SkPixmap*>(static_cast<uintptr_t>(pixmapPtr));
     auto cachingHint = cache ? SkImage::CachingHint::kAllow_CachingHint : SkImage::CachingHint::kDisallow_CachingHint;
-    return instance->scalePixels(*pixmap, skija::SamplingMode::unpackFrom2Ints(env, samplingOptions), cachingHint);
+    return instance->scalePixels(*pixmap, skija::SamplingMode::unpackFrom2Ints(env, samplingOptionsVal1, samplingOptionsVal2), cachingHint);
 }

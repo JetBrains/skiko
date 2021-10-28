@@ -213,13 +213,12 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
     fun scalePixels(dstPixmap: Pixmap?, samplingMode: SamplingMode): Boolean {
         Stats.onNativeCall()
         return try {
-            interopScope {
-                _nScalePixels(
-                    _ptr,
-                    getPtr(dstPixmap),
-                    toInterop(samplingMode._packAs2Ints())
-                )
-            }
+            _nScalePixels(
+                _ptr,
+                getPtr(dstPixmap),
+                samplingMode._packedInt1(),
+                samplingMode._packedInt2()
+            )
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(dstPixmap)
@@ -394,7 +393,7 @@ private external fun _nReadPixelsToPixmap(ptr: NativePointer, dstPixmapPtr: Nati
 private external fun _nReadPixelsToPixmapFromPoint(ptr: NativePointer, dstPixmapPtr: NativePointer, srcX: Int, srcY: Int): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nScalePixels")
-private external fun _nScalePixels(ptr: NativePointer, dstPixmapPtr: NativePointer, samplingOptions: InteropPointer): Boolean
+private external fun _nScalePixels(ptr: NativePointer, dstPixmapPtr: NativePointer, samplingOptionsVal1: Int, samplingOptionsVal2: Int): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nErase")
 private external fun _nErase(ptr: NativePointer, color: Int): Boolean
