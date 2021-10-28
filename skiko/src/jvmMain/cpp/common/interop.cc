@@ -541,6 +541,15 @@ namespace skija {
             }
             return res;
         }
+
+        void copyToInterop(JNIEnv* env, const SkPoint& point, jfloatArray pointer) {
+            jfloat* xy = pointer == nullptr ? nullptr : env->GetFloatArrayElements(pointer, 0);
+            if (xy != nullptr) {
+                xy[0] = point.x();
+                xy[1] = point.y();
+                env->ReleaseFloatArrayElements(pointer, xy, 0);
+            }
+        }
     }
 
     namespace PaintFilterCanvas {
@@ -620,6 +629,17 @@ namespace skija {
 
         jobject fromSkRect(JNIEnv* env, const SkRect& rect) {
             return fromLTRB(env, rect.fLeft, rect.fTop, rect.fRight, rect.fBottom);
+        }
+
+        void copyToInterop(JNIEnv* env, const SkRect& rect, jfloatArray pointer) {
+            jfloat* ltrb = pointer == nullptr ? nullptr : env->GetFloatArrayElements(pointer, 0);
+            if (ltrb != nullptr) {
+                ltrb[0] = rect.left();
+                ltrb[1] = rect.top();
+                ltrb[2] = rect.right();
+                ltrb[3] = rect.bottom();
+                env->ReleaseFloatArrayElements(pointer, ltrb, 0);
+            }
         }
     }
 
@@ -722,6 +742,27 @@ namespace skija {
             }
 
             return nullptr;
+        }
+
+        void copyToInterop(JNIEnv* env, const SkRRect& rect, jfloatArray pointer) {
+            jfloat* ltrb = pointer == nullptr ? nullptr : env->GetFloatArrayElements(pointer, 0);
+            if (ltrb != nullptr) {
+                ltrb[0] = rect.rect().left();
+                ltrb[1] = rect.rect().top();
+                ltrb[2] = rect.rect().right();
+                ltrb[3] = rect.rect().bottom();
+
+                ltrb[4] = rect.radii(SkRRect::kUpperLeft_Corner).x();
+                ltrb[5] = rect.radii(SkRRect::kUpperLeft_Corner).y();
+                ltrb[6] = rect.radii(SkRRect::kUpperRight_Corner).x();
+                ltrb[7] = rect.radii(SkRRect::kUpperRight_Corner).y();
+                ltrb[8] = rect.radii(SkRRect::kLowerRight_Corner).x();
+                ltrb[9] = rect.radii(SkRRect::kLowerRight_Corner).y();
+                ltrb[10] = rect.radii(SkRRect::kLowerLeft_Corner).x();
+                ltrb[11] = rect.radii(SkRRect::kLowerLeft_Corner).y();
+
+                env->ReleaseFloatArrayElements(pointer, ltrb, 0);
+            }
         }
     }
 

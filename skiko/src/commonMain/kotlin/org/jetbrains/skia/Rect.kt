@@ -1,6 +1,8 @@
 package org.jetbrains.skia
 
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.InteropPointer
+import org.jetbrains.skia.impl.withResult
 import kotlin.jvm.JvmStatic
 
 open class Rect constructor(val left: Float, val top: Float, val right: Float, val bottom: Float) {
@@ -102,6 +104,17 @@ open class Rect constructor(val left: Float, val top: Float, val right: Float, v
             require(w >= 0) { "Rect::makeXYWH expected w >= 0, got: $w" }
             require(h >= 0) { "Rect::makeXYWH expected h >= 0, got: $h" }
             return Rect(l, t, l + w, t + h)
+        }
+
+        internal fun fromInteropPointer(block: (InteropPointer) -> Unit): Rect {
+            val result = withResult(FloatArray(4), block)
+            return Rect(result[0], result[1], result[2], result[3])
+        }
+
+        internal fun fromInteropPointerNullable(block: (InteropPointer) -> Boolean): Rect? {
+            var result = true
+            val rect = fromInteropPointer { result = block(it) }
+            return if (result) { rect } else { null }
         }
     }
 }

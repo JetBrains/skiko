@@ -239,6 +239,8 @@ namespace skija {
         jobject make(JNIEnv* env, float x, float y);
         jobject fromSkPoint(JNIEnv* env, const SkPoint& p);
         jobjectArray fromSkPoints(JNIEnv* env, const std::vector<SkPoint>& ps);
+
+        void copyToInterop(JNIEnv* env, const SkPoint& point, jfloatArray pointer);
     }
 
     namespace PaintFilterCanvas {
@@ -262,6 +264,8 @@ namespace skija {
         std::unique_ptr<SkRect> toSkRect(JNIEnv* env, jobject rect);
         jobject fromLTRB(JNIEnv* env, float left, float top, float right, float bottom);
         jobject fromSkRect(JNIEnv* env, const SkRect& rect);
+
+        void copyToInterop(JNIEnv* env, const SkRect& rect, jfloatArray pointer);
     }
 
     namespace RRect {
@@ -280,6 +284,8 @@ namespace skija {
         void onUnload(JNIEnv* env);
         SkRRect toSkRRect(JNIEnv* env, jfloat left, jfloat top, jfloat right, jfloat bottom, jfloatArray jradii);
         jobject fromSkRRect(JNIEnv* env, const SkRRect& rect);
+
+        void copyToInterop(JNIEnv* env, const SkRRect& rect, jfloatArray pointer);
     }
 
     namespace RSXform {

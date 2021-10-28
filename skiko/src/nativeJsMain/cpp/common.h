@@ -48,6 +48,18 @@ namespace skija {
         uint32_t from8To16(size_t i8);
     };
 
+    namespace Rect {
+        void copyToInterop(const SkRect& rect, KInteropPointer pointer);
+    }
+
+    namespace RRect {
+        void copyToInterop(const SkRRect& rect, KInteropPointer pointer);
+    }
+
+    namespace Point {
+        void copyToInterop(const SkPoint& rect, KInteropPointer pointer);
+    }
+
     namespace RRect {
         SkRRect toSkRRect(KFloat left, KFloat top, KFloat right, KFloat bottom, KFloat* jradii, KInt size);
     }

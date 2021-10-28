@@ -140,6 +140,48 @@ std::vector<SkString> skStringVector(KInteropPointerArray arr, KInt len) {
 }
 
 namespace skija {
+    namespace Rect {
+        void copyToInterop(const SkRect& rect, KInteropPointer pointer) {
+            float* ltrb = reinterpret_cast<float*>(pointer);
+            if (ltrb != nullptr) {
+                ltrb[0] = rect.left();
+                ltrb[1] = rect.top();
+                ltrb[2] = rect.right();
+                ltrb[3] = rect.bottom();
+            }
+        }
+    }
+    namespace RRect {
+        void copyToInterop(const SkRRect& rect, KInteropPointer pointer) {
+            float* ltrb = reinterpret_cast<float*>(pointer);
+            if (ltrb != nullptr) {
+                ltrb[0] = rect.rect().left();
+                ltrb[1] = rect.rect().top();
+                ltrb[2] = rect.rect().right();
+                ltrb[3] = rect.rect().bottom();
+
+                ltrb[4] = rect.radii(SkRRect::kUpperLeft_Corner).x();
+                ltrb[5] = rect.radii(SkRRect::kUpperLeft_Corner).y();
+                ltrb[6] = rect.radii(SkRRect::kUpperRight_Corner).x();
+                ltrb[7] = rect.radii(SkRRect::kUpperRight_Corner).y();
+                ltrb[8] = rect.radii(SkRRect::kLowerRight_Corner).x();
+                ltrb[9] = rect.radii(SkRRect::kLowerRight_Corner).y();
+                ltrb[10] = rect.radii(SkRRect::kLowerLeft_Corner).x();
+                ltrb[11] = rect.radii(SkRRect::kLowerLeft_Corner).y();
+            }
+        }
+    }
+
+    namespace Point {
+        void copyToInterop(const SkPoint& point, KInteropPointer pointer) {
+            float* xy = reinterpret_cast<float*>(pointer);
+            if (xy != nullptr) {
+                xy[0] = point.x();
+                xy[1] = point.y();
+            }
+        }
+    }
+
     namespace RRect {
         SkRRect toSkRRect(KFloat left, KFloat top, KFloat right, KFloat bottom, KFloat* radii, KInt radiiSize) {
             SkRect rect {left, top, right, bottom};
