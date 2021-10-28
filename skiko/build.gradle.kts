@@ -822,12 +822,27 @@ fun remoteSignCodesign(fileToSign: File) {
     if (proc.exitValue() != 0) {
         throw GradleException("Failed to sign $fileToSign")
     } else {
-        val size = fileToSign.length()
+        val signedDir = fileToSign.parentFile.resolve("signed")
+        val signedFile = signedDir.resolve(fileToSign.name)
+        check(signedFile.exists()) {
+            buildString {
+                appendLine("Signed file does not exist: $signedFile")
+                appendLine("Other files in $signedDir:")
+                signedDir.list()?.let { names ->
+                    names.forEach {
+                        appendLine("  * $it")
+                    }
+                }
+            }
+        }
+        val size = signedFile.length()
         if (size < 200 * 1024) {
-            val content = fileToSign.readText()
+            val content = signedFile.readText()
             println(content)
             throw GradleException("Output is too short $size: ${content.take(200)}...")
         } else {
+            signedFile.copyTo(fileToSign, overwrite = true)
+            signedFile.delete()
             logger.info("Successfully signed $fileToSign")
         }
     }
