@@ -137,4 +137,20 @@ class CanvasTest {
         surface.canvas.resetMatrix()
         assertContentEquals(expectedArray, surface.canvas.localToDevice.mat)
     }
+
+    @Test
+    fun testSetMatrix() = runTest {
+        val surface = Surface.makeRasterN32Premul(100, 100)
+
+        val expectedArray = FloatArray(16) { if (it % 5 == 0) 1f else 0f }
+        assertContentEquals(expectedArray, surface.canvas.localToDevice.mat)
+
+        surface.canvas.setMatrix(Matrix33.makeScale(2f, 2f))
+
+        val expectedAfterScale = floatArrayOf(
+            2.0f, 0.0f, 0.0f, 0.0f, 0.0f, 2.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f
+        )
+
+        assertContentEquals(expectedAfterScale, surface.canvas.localToDevice.mat)
+    }
 }

@@ -230,21 +230,12 @@ SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nDrawPaint
     canvas->drawPaint(*paint);
 }
 
-
-SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nSetMatrix
-  (KNativePointer canvasPtr, KFloat* matrixArr) {
-    TODO("implement org_jetbrains_skia_Canvas__1nSetMatrix");
-}
-
-#if 0
 SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nSetMatrix
   (KNativePointer canvasPtr, KFloat* matrixArr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>((canvasPtr));
-    std::unique_ptr<SkMatrix> matrix = skMatrix(env, matrixArr);
+    std::unique_ptr<SkMatrix> matrix = skMatrix(matrixArr);
     canvas->setMatrix(*matrix);
 }
-#endif
-
 
 SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nResetMatrix
   (KNativePointer canvasPtr) {
