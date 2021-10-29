@@ -34,38 +34,20 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_PathEffect__1nMakePath1D
     return reinterpret_cast<KNativePointer>(ptr);
 }
 
-
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_PathEffect__1nMakePath2D
   (KFloat* matrixArr, KNativePointer pathPtr) {
-    TODO("implement org_jetbrains_skia_PathEffect__1nMakePath2D");
-}
-     
-#if 0 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_PathEffect__1nMakePath2D
-  (KFloat* matrixArr, KNativePointer pathPtr) {
-    std::unique_ptr<SkMatrix> m = skMatrix(env, matrixArr);
+    std::unique_ptr<SkMatrix> m = skMatrix(matrixArr);
     SkPath* path = reinterpret_cast<SkPath*>((pathPtr));
     SkPathEffect* ptr = SkPath2DPathEffect::Make(*m, *path).release();
     return reinterpret_cast<KNativePointer>(ptr);
 }
-#endif
-
-
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_PathEffect__1nMakeLine2D
   (KFloat width, KFloat* matrixArr) {
-    TODO("implement org_jetbrains_skia_PathEffect__1nMakeLine2D");
-}
-     
-#if 0 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_PathEffect__1nMakeLine2D
-  (KFloat width, KFloat* matrixArr) {
-    std::unique_ptr<SkMatrix> m = skMatrix(env, matrixArr);
+    std::unique_ptr<SkMatrix> m = skMatrix(matrixArr);
     SkPathEffect* ptr = SkLine2DPathEffect::Make(width, *m).release();
     return reinterpret_cast<KNativePointer>(ptr);
 }
-#endif
-
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_PathEffect__1nMakeCorner
   (KFloat radius) {
@@ -73,10 +55,10 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_PathEffect__1nMakeCorner
     return reinterpret_cast<KNativePointer>(ptr);
 }
 
-
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_PathEffect__1nMakeDash
-  (KFloat* intervalsArray, KFloat phase) {
-    TODO("implement org_jetbrains_skia_PathEffect__1nMakeDash");
+  (KFloat* intervalsArray, KInt count, KFloat phase) {
+    SkPathEffect* ptr = SkDashPathEffect::Make(reinterpret_cast<float*>(intervalsArray), count, phase).release();
+    return reinterpret_cast<KNativePointer>(ptr);
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_PathEffect__1nMakeDiscrete
