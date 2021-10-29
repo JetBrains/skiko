@@ -57,7 +57,7 @@ private external fun _nFillIntArrayOf5(interopPointer: InteropPointer)
 @ExternalSymbolName("org_jetbrains_skiko_tests_TestHelpers__1nFillDoubleArrayOf5")
 private external fun _nFillDoubleArrayOf5(interopPointer: InteropPointer)
 
-@ExternalSymbolName("org_jetbrains_skiko_tests_TestHelpers__1nReturnString")
-private external fun nStringByIndex(index: Int): NativePointer
+@ExternalSymbolName("org_jetbrains_skiko_tests_TestHelpers__1nStringByIndex")
+private external fun _nStringByIndex(index: Int): NativePointer
 
-internal fun returnNativeString(index: Int): NativePointer = nStringByIndex(index)
+internal fun nativeStringByIndex(index: Int): NativePointer = _nStringByIndex(index)

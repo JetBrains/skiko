@@ -1,10 +1,7 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.Managed
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.reachabilityBarrier
-import org.jetbrains.skia.impl.NativePointer
 
 class ManagedString internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
@@ -20,7 +17,10 @@ class ManagedString internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
     override fun toString(): String {
         return try {
             Stats.onNativeCall()
-            _nToString(_ptr)
+            val size = _nStringSize(_ptr)
+            withResult(ByteArray(size)) {
+                _nStringData(_ptr, it, size)
+            }.decodeToString()
         } finally {
             reachabilityBarrier(this)
         }
@@ -61,8 +61,11 @@ private external fun ManagedString_nGetFinalizer(): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_ManagedString__1nMake")
 private external fun _nMake(s: String?): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_ManagedString__1nToString")
-private external fun _nToString(ptr: NativePointer): String
+@ExternalSymbolName("org_jetbrains_skia_ManagedString__1nStringSize")
+private external fun _nStringSize(ptr: NativePointer): Int
+
+@ExternalSymbolName("org_jetbrains_skia_ManagedString__1nStringData")
+private external fun _nStringData(ptr: NativePointer, result: InteropPointer, size: Int): String
 
 @ExternalSymbolName("org_jetbrains_skia_ManagedString__1nInsert")
 private external fun _nInsert(ptr: NativePointer, offset: Int, s: String?)
