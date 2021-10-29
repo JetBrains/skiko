@@ -2,6 +2,31 @@
 #include "interop.hh"
 #include "unicode/ubrk.h"
 
+/*
+ * In this implementation errors are handled on JNI side, so
+ * the result is a pointer to an object, and other operations
+ * are No-op's
+*/
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_BreakIteratorKt_1Result_nDelete
+  (JNIEnv* env, jclass jclass, jlong ptr) {
+  // No-op
+}
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BreakIteratorKt_1Result_nGetData
+  (JNIEnv* env, jclass jclass, jlong ptr) {
+    return ptr;
+}
+
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BreakIteratorKt_1Result_nGetErrorLength
+  (JNIEnv* env, jclass jclass, jlong ptr) {
+    return 0;
+}
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_BreakIteratorKt_1Result_nGetError
+  (JNIEnv* env, jclass jclass, jlong ptr, jbyteArray dst, jint size)  {
+  // No-op
+}
+
+
 static void deleteBreakIterator(UBreakIterator* instance) {
   ubrk_close(instance);
 }

@@ -1,11 +1,43 @@
 
 // This file has been auto generated.
 
+#include <cstring>
 #include "unicode/ubrk.h"
 #include "common.h"
 
+struct BreakIteratorResult {
+    void* data;
+    UErrorCode code;
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_BreakIterator_Result_1nDelete(KNativePointer ptr) {
+    delete reinterpret_cast<BreakIteratorResult*>(ptr);
+}
+
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_BreakIterator_Result_1nGetData(KNativePointer ptr) {
+    auto res = reinterpret_cast<BreakIteratorResult*>(ptr);
+    return reinterpret_cast<KNativePointer>(ptr->data);
+}
+
+SKIKO_EXPORT KInt org_jetbrains_skia_BreakIterator_Result_1nGetErrorLength(KNativePointer ptr) {
+    auto res = reinterpret_cast<BreakIteratorResult*>(ptr);
+    if (U_FAILURE(res->code)) {
+        return static_cast<KInt>(strlen(u_errorName(res->code));
+    } else {
+        return 0;
+    }
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_BreakIterator_Result_1nGetError(KNativePointer ptr, KInteropPointer dst, KInt count) {
+    auto res = reinterpret_cast<BreakIteratorResult*>(ptr);
+    auto dest = reinterpret_cast<char*>(dst);
+    if (U_FAILURE(res->code)) {
+        strncpy(dest, u_errorName(res->code), static_cast<std::size_t>(count));
+    }
+}
+
 static void deleteBreakIterator(UBreakIterator* instance) {
-  ubrk_close(instance);
+    ubrk_close(instance);
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_BreakIterator__1nGetFinalizer() {
@@ -15,13 +47,24 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_BreakIterator__1nGetFinalizer() {
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_BreakIterator__1nMake
   (KInt type, KInteropPointer localeStr) {
-    TODO("implement org_jetbrains_skia_BreakIterator__1nMake");
+    BreakIteratorResult res = new { nullptr, U_ZERO_ERROR };
+    if (localeStr == nullptr)
+      res->data = ubrk_open(static_cast<UBreakIteratorType>(type), uloc_getDefault(), nullptr, 0, &res->code);
+    else {
+      SkString locale = skString(localeStr);
+      res->data = ubrk_open(static_cast<UBreakIteratorType>(type), locale.c_str(), nullptr, 0, &res->code);
+    }
+
+    return reinterpret_cast<KNativePointer>(res);
 }
      
 
 SKIKO_EXPORT KInt org_jetbrains_skia_BreakIterator__1nClone
   (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_BreakIterator__1nClone");
+    UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(ptr);
+    BreakIteratorResult res = new { nullptr, U_ZERO_ERROR };
+    res->data = ubrk_safeClone(instance, nullptr, 0, &res->code);
+    return reinterpret_cast<KNativePointer>(res);
 }
 
 
@@ -103,16 +146,14 @@ SKIKO_EXPORT void org_jetbrains_skia_BreakIterator__1nSetText
   (KNativePointer ptr, KNativePointer textPtr) {
     TODO("implement org_jetbrains_skia_BreakIterator__1nSetText");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT void org_jetbrains_skia_BreakIterator__1nSetText
-  (KNativePointer ptr, KNativePointer textPtr) {
+  (KNativePointer ptr, KInteropPointer textPtr, KInt size) {
     UBreakIterator* instance = reinterpret_cast<UBreakIterator*>((ptr));
-    std::vector<KChar>* text = reinterpret_cast<std::vector<KChar>*>((textPtr));
-    UErrorCode status = U_ZERO_ERROR;
-    ubrk_setText(instance, reinterpret_cast<UChar *>(text->data()), text->size(), &status);
-    if (U_FAILURE(status))
-      env->ThrowNew(java::lang::RuntimeException::cls, u_errorName(status));
+    BreakIteratorResult res = new { nullptr, U_ZERO_ERROR };
+    std::u16string* text = reinterpret_cast<std::u16string*>(textPtr);
+    ubrk_setText(instance, text->data() , size, &res->code);
 }
 #endif
 

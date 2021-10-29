@@ -1,11 +1,7 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.Managed
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.reachabilityBarrier
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.getPtr
 
 /**
  *
@@ -258,7 +254,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
          */
         fun makeCharacterInstance(locale: String? = null): BreakIterator {
             Stats.onNativeCall()
-            return BreakIterator(_nMake(0, locale)) // UBRK_CHARACTER
+            return makeFromResult(_nMake(0, locale)) // UBRK_CHARACTER
         }
         /**
          * Returns a new BreakIterator instance for word breaks for the given locale.
@@ -268,7 +264,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
          */
         fun makeWordInstance(locale: String? = null): BreakIterator {
             Stats.onNativeCall()
-            return BreakIterator(_nMake(1, locale)) // UBRK_WORD
+            return makeFromResult(_nMake(1, locale)) // UBRK_WORD
         }
         /**
          * Returns a new BreakIterator instance for line breaks for the given locale.
@@ -278,7 +274,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
          */
         fun makeLineInstance(locale: String? = null): BreakIterator {
             Stats.onNativeCall()
-            return BreakIterator(_nMake(2, locale)) // UBRK_LINE
+            return makeFromResult(_nMake(2, locale)) // UBRK_LINE
         }
         /**
          * Returns a new BreakIterator instance for sentence breaks for the given locale.
@@ -288,7 +284,21 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
          */
         fun makeSentenceInstance(locale: String? = null): BreakIterator {
             Stats.onNativeCall()
-            return BreakIterator(_nMake(3, locale)) // UBRK_SENTENCE
+            return makeFromResult(_nMake(3, locale)) // UBRK_SENTENCE
+        }
+
+        private fun makeFromResult(ptr: NativePointer): BreakIterator {
+            val errLength = Result_nGetErrorLength(ptr)
+            return if (errLength == 0) {
+                BreakIterator(Result_nGetData(ptr)).also {
+                    Result_nDelete(ptr)
+                }
+            } else {
+                val error = withResult(ByteArray(errLength)) { Result_nGetError(ptr, it, errLength) }
+                    .decodeToString()
+                Result_nDelete(ptr)
+                throw Error(error)
+            }
         }
 
         init {
@@ -307,7 +317,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
      */
     fun clone(): BreakIterator {
         Stats.onNativeCall()
-        return BreakIterator(_nClone(_ptr))
+        return makeFromResult(_nClone(_ptr))
     }
 
     /**
@@ -557,3 +567,16 @@ private external fun _nGetRuleStatuses(ptr: NativePointer): IntArray
 
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nSetText")
 private external fun _nSetText(ptr: NativePointer, textPtr: NativePointer)
+
+// Result
+@ExternalSymbolName("org_jetbrains_skia_BreakIterator_Result_1nGetData")
+private external fun Result_nGetData(ptr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_BreakIterator_Result_1nDelete")
+private external fun Result_nDelete(ptr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_BreakIterator_Result_1nGetErrorLength")
+private external fun Result_nGetErrorLength(ptr: NativePointer): Int
+
+@ExternalSymbolName("org_jetbrains_skia_BreakIterator_Result_1nGetError")
+private external fun Result_nGetError(ptr: NativePointer, dst: InteropPointer, count: Int)
