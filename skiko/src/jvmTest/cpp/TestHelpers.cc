@@ -67,7 +67,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_tests_TestHelpersKt_
         case 0: return ptrToJlong(new SkString("Hello"));
         case 1: return ptrToJlong(new SkString("Привет"));
         case 2: return ptrToJlong(new SkString("你好"));
-        default: assert(false);
+        default: return 0;
     }
 }
 
