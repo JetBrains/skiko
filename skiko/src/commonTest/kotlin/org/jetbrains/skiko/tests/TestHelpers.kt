@@ -2,6 +2,8 @@ package org.jetbrains.skiko.tests
 
 import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.*
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 class TestHelpers {
 
@@ -54,3 +56,8 @@ private external fun _nFillIntArrayOf5(interopPointer: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skiko_tests_TestHelpers__1nFillDoubleArrayOf5")
 private external fun _nFillDoubleArrayOf5(interopPointer: InteropPointer)
+
+@ExternalSymbolName("org_jetbrains_skiko_tests_TestHelpers__1nReturnString")
+private external fun nStringByIndex(index: Int): NativePointer
+
+internal fun returnNativeString(index: Int): NativePointer = nStringByIndex(index)
