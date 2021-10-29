@@ -1,5 +1,7 @@
 #include <jni.h>
 
+#include "SkString.h"
+
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_tests_TestHelpersKt__1nFillByteArrayOf5
 (JNIEnv* env, jclass jclass, jbyteArray jbarray) {
     jbyte *result_bytes = env->GetByteArrayElements(jbarray, NULL);
@@ -10,7 +12,6 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_tests_TestHelpersKt__
     result_bytes[4] = 5;
     env->ReleaseByteArrayElements(jbarray, result_bytes, 0);
 }
-
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_tests_TestHelpersKt__1nFillFloatArrayOf5
 (JNIEnv* env, jclass jclass, jfloatArray jfarray) {
@@ -55,3 +56,18 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skiko_tests_TestHelpersKt__
     result_double[4] = 10000000.9991;
     env->ReleaseDoubleArrayElements(jdarray, result_double, 0);
 }
+
+static inline jlong ptrToJlong(void* ptr) {
+    return static_cast<jlong>(reinterpret_cast<uintptr_t>(ptr));
+}
+
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_tests_TestHelpersKt__1nStringByIndex
+(JNIEnv* env, jclass jclass, jint index) {
+    switch (index) {
+        case 0: return ptrToJlong(new SkString("Hello"));
+        case 1: return ptrToJlong(new SkString("Привет"));
+        case 2: return ptrToJlong(new SkString("你好"));
+        default: return 0;
+    }
+}
+

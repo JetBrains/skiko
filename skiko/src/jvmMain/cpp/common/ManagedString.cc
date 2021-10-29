@@ -17,10 +17,20 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ManagedStringKt__1nMa
     return reinterpret_cast<jlong>(text);
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_ManagedStringKt__1nToString
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_ManagedStringKt__1nStringSize
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkString* instance = reinterpret_cast<SkString*>(static_cast<uintptr_t>(ptr));
-    return javaString(env, *instance);
+    return instance->size();
+}
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_ManagedStringKt__1nStringData
+  (JNIEnv* env, jclass jclass, jlong ptr, jbyteArray array, jint size) {
+    SkString* instance = reinterpret_cast<SkString*>(static_cast<uintptr_t>(ptr));
+    jbyte* bytes = env->GetByteArrayElements(array, NULL);
+    if (bytes != nullptr) {
+        memcpy(bytes, instance->c_str(), size);
+        env->ReleaseByteArrayElements(array, bytes, 0);
+    }
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_ManagedStringKt__1nInsert
