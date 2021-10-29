@@ -19,13 +19,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ManagedString__1nMake
     return reinterpret_cast<KNativePointer>(text);
 }
 
-SKIKO_EXPORT KInt Java_org_jetbrains_skia_ManagedStringKt__1nStringSize
+SKIKO_EXPORT KInt org_jetbrains_skia_ManagedString__nStringSize
   (KNativePointer ptr) {
     SkString* instance = reinterpret_cast<SkString*>(ptr);
     return instance->size();
 }
 
-SKIKO_EXPORT void Java_org_jetbrains_skia_ManagedStringKt__1nStringData
+SKIKO_EXPORT void org_jetbrains_skia_ManagedString__nStringData
   (KNativePointer ptr, KByte* bytes, KInt size) {
     SkString* instance = reinterpret_cast<SkString*>(ptr);
     memcpy(bytes, instance->c_str(), size);

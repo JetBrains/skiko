@@ -61,10 +61,10 @@ private external fun ManagedString_nGetFinalizer(): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_ManagedString__1nMake")
 private external fun _nMake(s: String?): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_ManagedString__1nStringSize")
+@ExternalSymbolName("org_jetbrains_skia_ManagedString__nStringSize")
 private external fun _nStringSize(ptr: NativePointer): Int
 
-@ExternalSymbolName("org_jetbrains_skia_ManagedString__1nStringData")
+@ExternalSymbolName("org_jetbrains_skia_ManagedString__nStringData")
 private external fun _nStringData(ptr: NativePointer, result: InteropPointer, size: Int): String
 
 @ExternalSymbolName("org_jetbrains_skia_ManagedString__1nInsert")

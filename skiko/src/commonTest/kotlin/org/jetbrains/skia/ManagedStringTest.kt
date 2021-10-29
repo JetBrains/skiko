@@ -16,5 +16,9 @@ class ManagedStringTest {
             nativeStringByIndex(1)
         }
         assertEquals("Привет", s2)
+        val s3 = withStringResult {
+            nativeStringByIndex(2)
+        }
+        assertEquals("你好", s3)
     }
 }

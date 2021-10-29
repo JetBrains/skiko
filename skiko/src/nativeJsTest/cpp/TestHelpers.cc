@@ -45,3 +45,12 @@ SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nFillDoubleArrayOf5(KN
     doubles[3] = 3.1415;
     doubles[4] = 10000000.9991;
 }
+
+SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__nStringByIndex(KInt index) {
+    switch (index) {
+        case 0: return new SkString("Hello");
+        case 1: return new SkString("Привет");
+        case 2: return new SkString("你好");
+        default: TODO("unknown");
+    }
+}
