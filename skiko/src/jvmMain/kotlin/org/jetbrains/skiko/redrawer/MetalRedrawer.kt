@@ -1,5 +1,6 @@
 package org.jetbrains.skiko.redrawer
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.swing.Swing
@@ -81,6 +82,8 @@ internal class MetalRedrawer(
                 }
             }
         }
+        if (isDisposed) throw CancellationException()
+
         // When window is not visible - it doesn't make sense to redraw fast to avoid battery drain.
         // In theory, we could be more precise, and just suspend rendering in
         // `NSWindowDidChangeOcclusionStateNotification`, but current approach seems to work as well in practise.

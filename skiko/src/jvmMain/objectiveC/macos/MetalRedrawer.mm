@@ -29,7 +29,7 @@
 
 @interface MetalDevice : NSObject
 
-@property (retain, strong) CALayer *container;
+@property (weak) CALayer *container;
 @property (retain, strong) AWTMetalLayer *layer;
 @property (retain, strong) id<MTLDevice> device;
 @property (retain, strong) id<MTLCommandQueue> queue;
@@ -71,15 +71,6 @@
     return self;
 }
 
--(void)dealloc {
-    [self.layer removeFromSuperlayer];
-    [self.layer release];
-    [self.device release];
-    [self.queue release];
-    [self.drawableHandle release];
-    [super dealloc];
-}
-
 @end
 
 extern "C"
@@ -88,24 +79,24 @@ extern "C"
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_makeMetalContext(
     JNIEnv* env, jobject redrawer, jlong devicePtr)
 {
-    MetalDevice *device = (MetalDevice *) devicePtr;
+    MetalDevice *device = (__bridge MetalDevice *) (void*) devicePtr;
     GrMtlBackendContext backendContext = {};
-    backendContext.fDevice.retain((GrMTLHandle) device.device);
-    backendContext.fQueue.retain((GrMTLHandle) device.queue);
+    backendContext.fDevice.retain((__bridge GrMTLHandle) device.device);
+    backendContext.fQueue.retain((__bridge GrMTLHandle) device.queue);
     return (jlong) GrDirectContext::MakeMetal(backendContext).release();
 }
 
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_makeMetalRenderTarget(
     JNIEnv * env, jobject redrawer, jlong devicePtr, jint width, jint height)
 {
-    MetalDevice *device = (MetalDevice *) devicePtr;
+    MetalDevice *device = (__bridge MetalDevice *) (void *) devicePtr;
     GrBackendRenderTarget* renderTarget = NULL;
 
     id<CAMetalDrawable> currentDrawable = [device.layer nextDrawable];
     if (!currentDrawable) return 0;
     device.drawableHandle = currentDrawable;
     GrMtlTextureInfo info;
-    info.fTexture.retain(currentDrawable.texture);
+    info.fTexture.retain((__bridge void *)currentDrawable.texture);
     renderTarget = new GrBackendRenderTarget(width, height, 0, info);
     return (jlong) renderTarget;
 }
@@ -187,7 +178,7 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
 {
     MetalDevice *device = [MetalDevice new];
 
-    NSObject<JAWT_SurfaceLayers>* dsi_mac = (__bridge NSObject<JAWT_SurfaceLayers> *) platformInfoPtr;
+    NSObject<JAWT_SurfaceLayers>* dsi_mac = (__bridge NSObject<JAWT_SurfaceLayers> *) (void*) platformInfoPtr;
 
     CALayer *container = [dsi_mac windowLayer];
     [container removeAllAnimations];
@@ -213,20 +204,20 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
     CGFloat transparent[] = { 0.0f, 0.0f, 0.0f, 0.0f };
     device.layer.backgroundColor = CGColorCreate(CGColorSpaceCreateDeviceRGB(), transparent);
     device.layer.opaque = NO;
-    
+
     if (transparency)
     {
-        NSWindow* window = (NSWindow*)windowPtr;
+        NSWindow* window = (__bridge NSWindow*) (void *) windowPtr;
         window.hasShadow = NO;
     }
 
-    return (jlong) device;
+    return (jlong) (__bridge_retained void *) device;
 }
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_resizeLayers(
     JNIEnv *env, jobject redrawer, jlong devicePtr, jint x, jint y, jint width, jint height)
 {
-    MetalDevice *device = (MetalDevice *) devicePtr;
+    MetalDevice *device = (__bridge MetalDevice *) (void *) devicePtr;
     float scale = device.layer.contentsScale;
     CGRect frame = CGRectMake(x, y, width, height);
     CGSize drawableSize = CGSizeMake(width * scale, height * scale);
@@ -244,7 +235,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_resizeLay
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_setContentScale(JNIEnv *env, jobject obj, jlong devicePtr, jfloat contentScale)
 {
-    MetalDevice *device = (MetalDevice *) devicePtr;
+    MetalDevice *device = (__bridge MetalDevice *) (void *) devicePtr;
     if (!device || !device.layer || device.layer.contentsScale == contentScale) {
         return;
     }
@@ -259,14 +250,14 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_setConten
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_setVSyncEnabled(JNIEnv *env, jobject obj, jlong devicePtr, jboolean enabled)
 {
-    MetalDevice *device = (MetalDevice *) devicePtr;
+    MetalDevice *device = (__bridge MetalDevice *) (void *) devicePtr;
     device.layer.displaySyncEnabled = enabled;
 }
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_finishFrame(
     JNIEnv *env, jobject redrawer, jlong devicePtr)
 {
-    MetalDevice *device = (MetalDevice *) devicePtr;
+    MetalDevice *device = (__bridge MetalDevice *) (void *) devicePtr;
 
     id<CAMetalDrawable> currentDrawable = device.drawableHandle;
 
@@ -282,15 +273,15 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_finishFra
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_disposeDevice(
     JNIEnv *env, jobject redrawer, jlong devicePtr)
 {
-    MetalDevice *device = (MetalDevice *) devicePtr;
+    MetalDevice *device = (__bridge_transfer MetalDevice *) (void *) devicePtr;
     env->DeleteGlobalRef(device.layer.javaRef);
-    [device release];
+    [device.layer removeFromSuperlayer];
 }
 
 JNIEXPORT jstring JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_getAdapterName(
     JNIEnv *env, jobject redrawer, jlong devicePtr)
 {
-    MetalDevice *device = (MetalDevice *) devicePtr;
+    MetalDevice *device = (__bridge MetalDevice *) (void *) devicePtr;
     const char *currentAdapterName = [[device.device name] cStringUsingEncoding:NSASCIIStringEncoding];
     jstring result = env->NewStringUTF(currentAdapterName);
     return result;
@@ -299,14 +290,14 @@ JNIEXPORT jstring JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_getAda
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_getAdapterMemorySize(
     JNIEnv *env, jobject redrawer, jlong devicePtr)
 {
-    MetalDevice *device = (MetalDevice *) devicePtr;
+    MetalDevice *device = (__bridge MetalDevice *) (void *) devicePtr;
     uint64_t totalMemory = [device.device recommendedMaxWorkingSetSize];
     return (jlong)totalMemory;
 }
 
 JNIEXPORT jboolean JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_isOccluded(
     JNIEnv *env, jobject redrawer, jlong windowPtr) {
-    NSWindow* window = (NSWindow*)windowPtr;
+    NSWindow* window = (__bridge NSWindow*) (void *) windowPtr;
     return ([window occlusionState] & NSWindowOcclusionStateVisible) == 0;
 }
 

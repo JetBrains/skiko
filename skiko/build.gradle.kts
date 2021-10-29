@@ -710,6 +710,7 @@ project.tasks.register<Exec>("objcCompile") {
         "-I$skiaDir",
         "-I$skiaDir/include",
         "-I$skiaDir/include/gpu",
+        "-fobjc-arc",
         "-DSK_METAL",
         "-std=c++17",
         "-c",
