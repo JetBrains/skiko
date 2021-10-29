@@ -74,12 +74,7 @@ internal class MetalRedrawer(
         // Dispatchers.IO: 50 FPS, 200% CPU
         layer.inDrawScope {
             withContext(Dispatchers.IO) {
-                val handle = startRendering()
-                try {
-                    performDraw()
-                } finally {
-                    endRendering(handle)
-                }
+                performDraw()
             }
         }
         if (isDisposed) throw CancellationException()
@@ -93,7 +88,12 @@ internal class MetalRedrawer(
 
     private fun performDraw() = synchronized(drawLock) {
         if (!isDisposed) {
-            layer.draw()
+            val handle = startRendering()
+            try {
+                layer.draw()
+            } finally {
+                endRendering(handle)
+            }
         }
     }
 

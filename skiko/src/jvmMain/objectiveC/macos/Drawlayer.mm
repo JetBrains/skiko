@@ -273,80 +273,96 @@ NSWindow *findWindow(jlong platformInfoPtr)
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_nativeInit(JNIEnv *env, jobject canvas, jlong platformInfoPtr)
 {
-    if (layerStorage == nil)
-    {
-        layerStorage = [[NSMutableSet alloc] init];
+    @autoreleasepool {
+        if (layerStorage == nil)
+        {
+            layerStorage = [[NSMutableSet alloc] init];
+        }
+
+        LayerHandler *layer = [[LayerHandler alloc] init];
+        NSObject<JAWT_SurfaceLayers>* dsi_mac = (__bridge NSObject<JAWT_SurfaceLayers> *) (void*) platformInfoPtr;
+        layer.container = [dsi_mac windowLayer];
+        jobject canvasGlobalRef = env->NewGlobalRef(canvas);
+        [layer setCanvasGlobalRef: canvasGlobalRef];
+        layer.window = findWindow(platformInfoPtr);
+
+        [layerStorage addObject: layer];
     }
-
-    LayerHandler *layer = [[LayerHandler alloc] init];
-    NSObject<JAWT_SurfaceLayers>* dsi_mac = (__bridge NSObject<JAWT_SurfaceLayers> *) (void*) platformInfoPtr;
-    layer.container = [dsi_mac windowLayer];
-    jobject canvasGlobalRef = env->NewGlobalRef(canvas);
-    [layer setCanvasGlobalRef: canvasGlobalRef];
-    layer.window = findWindow(platformInfoPtr);
-
-    [layerStorage addObject: layer];
 }
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_HardwareLayer_nativeDispose(JNIEnv *env, jobject canvas)
 {
-    LayerHandler *layer = findByObject(env, canvas);
-    if (layer != NULL)
-    {
-        [layerStorage removeObject: layer];
-        env->DeleteGlobalRef(layer.canvasGlobalRef);
+    @autoreleasepool {
+        LayerHandler *layer = findByObject(env, canvas);
+        if (layer != NULL)
+        {
+            [layerStorage removeObject: layer];
+            env->DeleteGlobalRef(layer.canvasGlobalRef);
+        }
     }
 }
 
 JNIEXPORT jboolean JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_osxIsFullscreenNative(JNIEnv *env, jobject properties, jobject component)
 {
-    LayerHandler *layer = findByObject(env, component);
-    if (layer != NULL)
-    {
-        return [layer isFullScreen];
+    @autoreleasepool {
+        LayerHandler *layer = findByObject(env, component);
+        if (layer != NULL)
+        {
+            return [layer isFullScreen];
+        }
+        return false;
     }
-    return false;
 }
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_osxSetFullscreenNative(JNIEnv *env, jobject properties, jobject component, jboolean value)
 {
-    LayerHandler *layer = findByObject(env, component);
-    if (layer != NULL)
-    {
-        [layer makeFullscreen:value];
+    @autoreleasepool {
+        LayerHandler *layer = findByObject(env, component);
+        if (layer != NULL)
+        {
+            [layer makeFullscreen:value];
+        }
     }
 }
 
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getWindowHandle(JNIEnv *env, jobject component, jlong platformInfoPtr)
 {
-    LayerHandler *layer = findByObject(env, component);
-    return (jlong) (__bridge void*) layer.window;
+    @autoreleasepool {
+        LayerHandler *layer = findByObject(env, component);
+        return (jlong) (__bridge void*) layer.window;
+    }
 }
 
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getContentHandle(JNIEnv *env, jobject component, jlong platformInfoPtr)
 {
-    LayerHandler *layer = findByObject(env, component);
-    return (jlong) (__bridge void*) layer.window;
+    @autoreleasepool {
+        LayerHandler *layer = findByObject(env, component);
+        return (jlong) (__bridge void*) layer.window;
+    }
 }
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_osxDisableTitleBar(JNIEnv *env, jobject properties, jobject component, jfloat customHeaderHeight)
 {
-    LayerHandler *layer = findByObject(env, component);
-    if (layer != NULL)
-    {
-        [layer disableTitlebar:((CGFloat) customHeaderHeight)];
+    @autoreleasepool {
+        LayerHandler *layer = findByObject(env, component);
+        if (layer != NULL)
+        {
+            [layer disableTitlebar:((CGFloat) customHeaderHeight)];
+        }
     }
 }
 
 JNIEXPORT jint JNICALL Java_org_jetbrains_skiko_SystemTheme_1jvmKt_getCurrentSystemTheme(JNIEnv *env, jobject topLevel)
 {
-    NSString *osxMode = [[NSUserDefaults standardUserDefaults] stringForKey:@"AppleInterfaceStyle"];
-    if ([@"Dark" isEqualToString:osxMode]) {
-        // Dark.
-        return 1;
-    } else {
-        // Light.
-        return 0;
+    @autoreleasepool {
+        NSString *osxMode = [[NSUserDefaults standardUserDefaults] stringForKey:@"AppleInterfaceStyle"];
+        if ([@"Dark" isEqualToString:osxMode]) {
+            // Dark.
+            return 1;
+        } else {
+            // Light.
+            return 0;
+        }
     }
 }
 
