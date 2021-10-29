@@ -1,4 +1,5 @@
 #include <jni.h>
+#include <stdlib.h>
 
 #include "SkString.h"
 
@@ -71,3 +72,21 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_tests_TestHelpersKt_
     }
 }
 
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_tests_TestHelpersKt__1nWriteArraysOfInts
+(JNIEnv* env, jclass jclass, jobjectArray arrayOfIntArray) {
+    // hardcoded length is ok for testing purposes
+    jsize len = 3; //(*env)->GetArrayLength(env, arrayOfIntArray);
+
+    int *mem = reinterpret_cast<int*>(malloc(3 * 4 * 4)); // 3 arrays. each array consists of 4 ints
+
+    for (int i = 0; i < len; i++) {
+        jintArray array = (jintArray) env->GetObjectArrayElement(arrayOfIntArray, i);
+        jint *result_int = env->GetIntArrayElements(array, NULL);
+        for (int j = 0; j < 4; j++) {
+            mem[(i * 4) + j] = result_int[j];
+        }
+        env->ReleaseIntArrayElements(array, result_int, 0);
+    }
+
+    return reinterpret_cast<jlong>(mem);
+}
