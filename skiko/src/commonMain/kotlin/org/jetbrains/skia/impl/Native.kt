@@ -1,5 +1,7 @@
 package org.jetbrains.skia.impl
 
+import org.jetbrains.skia.ManagedString
+
 expect class NativePointer
 
 expect class InteropPointer
@@ -104,6 +106,12 @@ inline fun withResult(result: NativePointerArray, block: (InteropPointer) -> Uni
     block(handle)
     handle.fromInterop(result)
     result
+}
+
+@Suppress("NON_PUBLIC_CALL_FROM_PUBLIC_INLINE")
+inline fun withStringResult(block: () -> NativePointer): String {
+    val string = ManagedString(block())
+    return string.toString()
 }
 
 interface ArrayInteropDecoder<T> {

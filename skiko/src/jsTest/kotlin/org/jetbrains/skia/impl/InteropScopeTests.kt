@@ -110,7 +110,7 @@ class InteropScopeTests {
                 it + 1
             }.map {
                 val charArray = CharArray(2)
-                (npa[it] as InteropPointer).fromInterop(charArray)
+                npa[it].fromInterop(charArray)
                 charArray.concatToString()
             }.take(3).toList().toTypedArray()
 
