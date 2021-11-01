@@ -1,5 +1,8 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.InteropPointer
+import org.jetbrains.skia.impl.withResult
+
 class Point(val x: Float, val y: Float) {
 
     fun offset(dx: Float, dy: Float): Point {
@@ -58,6 +61,11 @@ class Point(val x: Float, val y: Float) {
             val arr = arrayOfNulls<Point>(pts.size / 2)
             for (i in 0 until pts.size / 2) arr[i] = Point(pts[i * 2], pts[i * 2 + 1])
             return arr
+        }
+
+        internal fun fromInteropPointer(block: (InteropPointer) -> Unit): Point {
+            val result = withResult(FloatArray(2), block)
+            return Point(result[0], result[1])
         }
     }
 }
