@@ -124,23 +124,15 @@ SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nDrawRegion
     canvas->drawRegion(*region, *paint);
 }
 
-
 SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nDrawString
   (KNativePointer canvasPtr, KInteropPointer stringObj, KFloat x, KFloat y, KNativePointer skFontPtr, KNativePointer paintPtr) {
-    TODO("implement org_jetbrains_skia_Canvas__1nDrawString");
-}
-
-#if 0
-SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nDrawString
-  (KNativePointer canvasPtr, KInteropPointer stringObj, KFloat x, KFloat y, KNativePointer skFontPtr, KNativePointer paintPtr) {
-    SkCanvas* canvas    = reinterpret_cast<SkCanvas*>   ((canvasPtr));
-    SkString string     = skString(env, stringObj);
-    SkFont* font        = reinterpret_cast<SkFont*>     ((skFontPtr));
-    SkPaint* paint      = reinterpret_cast<SkPaint*>    ((paintPtr));
+    SkCanvas* canvas    = reinterpret_cast<SkCanvas*>(canvasPtr);
+    SkString string     = skString(stringObj);
+    SkFont* font        = reinterpret_cast<SkFont*>(skFontPtr);
+    SkPaint* paint      = reinterpret_cast<SkPaint*>(paintPtr);
 
     canvas->drawString(string, x, y, *font, *paint);
 }
-#endif
 
 
 SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nDrawTextBlob
@@ -183,30 +175,18 @@ SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nDrawVertices
     canvas->drawVertices(vertices, static_cast<SkBlendMode>(blendMode), *paint);
 }
 
-
-
 SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nDrawPatch
   (KNativePointer ptr, KFloat* cubicsArr, KInt* colorsArr, KFloat* texCoordsArr, KInt blendMode, KNativePointer paintPtr) {
-    TODO("implement org_jetbrains_skia_Canvas__1nDrawPatch");
-}
-
-#if 0
-SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nDrawPatch
-  (KNativePointer ptr, KFloat* cubicsArr, KInt* colorsArr, KFloat* texCoordsArr, KInt blendMode, KNativePointer paintPtr) {
-    SkCanvas* canvas = reinterpret_cast<SkCanvas*>   ((ptr));
-    KFloat* cubics    = env->GetFloatArrayElements(cubicsArr, 0);
-    KInt*   colors    = env->GetIntArrayElements(colorsArr, 0);
-    KFloat* texCoords = texCoordsArr == nullptr ? nullptr : env->GetFloatArrayElements(texCoordsArr, 0);
+    SkCanvas* canvas = reinterpret_cast<SkCanvas*>(ptr);
     SkPaint* paint = reinterpret_cast<SkPaint*>((paintPtr));
-
-    canvas->drawPatch(reinterpret_cast<SkPoint*>(cubics), reinterpret_cast<SkColor*>(colors), reinterpret_cast<SkPoint*>(texCoords), static_cast<SkBlendMode>(blendMode), *paint);
-
-    if (texCoords != nullptr)
-        env->ReleaseFloatArrayElements(texCoordsArr, texCoords, 0);
-    env->ReleaseIntArrayElements(colorsArr, colors, 0);
-    env->ReleaseFloatArrayElements(cubicsArr, cubics, 0);
+    canvas->drawPatch(
+        reinterpret_cast<SkPoint*>(cubicsArr),
+        reinterpret_cast<SkColor*>(colorsArr),
+        reinterpret_cast<SkPoint*>(texCoordsArr),
+        static_cast<SkBlendMode>(blendMode),
+        *paint
+    );
 }
-#endif
 
 
 
@@ -238,21 +218,12 @@ SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nDrawPaint
     canvas->drawPaint(*paint);
 }
 
-
-SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nSetMatrix
-  (KNativePointer canvasPtr, KFloat* matrixArr) {
-    TODO("implement org_jetbrains_skia_Canvas__1nSetMatrix");
-}
-
-#if 0
 SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nSetMatrix
   (KNativePointer canvasPtr, KFloat* matrixArr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>((canvasPtr));
-    std::unique_ptr<SkMatrix> matrix = skMatrix(env, matrixArr);
+    std::unique_ptr<SkMatrix> matrix = skMatrix(matrixArr);
     canvas->setMatrix(*matrix);
 }
-#endif
-
 
 SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nResetMatrix
   (KNativePointer canvasPtr) {
@@ -261,22 +232,12 @@ SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nResetMatrix
 }
 
 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Canvas__1nGetLocalToDevice
-(KNativePointer canvasPtr) {
-    TODO("implement org_jetbrains_skia_Canvas__1nGetLocalToDevice");
+SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nGetLocalToDevice
+(KNativePointer canvasPtr, KFloat* resultingFloats) {
+    SkCanvas* canvas = reinterpret_cast<SkCanvas*>(canvasPtr);
+    SkM44 matrix = canvas->getLocalToDevice();
+    matrix.getRowMajor(resultingFloats);
 }
-
-#if 0
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Canvas__1nGetLocalToDevice
-(KNativePointer canvasPtr) {
-  SkCanvas* canvas = reinterpret_cast<SkCanvas*>((canvasPtr));
-  SkM44 matrix = canvas->getLocalToDevice();
-  std::vector<float> floats(16);
-  matrix.getRowMajor(floats.data());
-  return javaFloatArray(env, floats);
-}
-#endif
-
 
 SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nClipRect
   (KNativePointer canvasPtr, KFloat left, KFloat top, KFloat right, KFloat bottom, KInt mode, KBoolean antiAlias) {
