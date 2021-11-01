@@ -46,7 +46,7 @@ namespace skija {
 
             void onLoad(JNIEnv* env) {
                 jclass local = env->FindClass("org/jetbrains/skia/shaper/HbIcuScriptRunIterator");
-                cls  = static_cast<jclass>(env->NewGlobalRef(local));            
+                cls  = static_cast<jclass>(env->NewGlobalRef(local));
             }
 
             void onUnload(JNIEnv* env) {
@@ -60,7 +60,7 @@ namespace skija {
 
             void onLoad(JNIEnv* env) {
                 jclass local = env->FindClass("org/jetbrains/skia/shaper/IcuBidiRunIterator");
-                cls  = static_cast<jclass>(env->NewGlobalRef(local));            
+                cls  = static_cast<jclass>(env->NewGlobalRef(local));
             }
 
             void onUnload(JNIEnv* env) {
@@ -124,7 +124,7 @@ namespace skija {
             jobject toJava(JNIEnv* env, const SkShaper::RunHandler::RunInfo& info, size_t begin, size_t end) {
                 SkFont* font = new SkFont(info.fFont);
                 return env->NewObject(
-                    cls, 
+                    cls,
                     ctor,
                     reinterpret_cast<jlong>(font),
                     info.fBidiLevel,
@@ -172,6 +172,10 @@ namespace skija {
             std::vector<SkShaper::Feature> getFeatures(JNIEnv* env, jobject opts) {
                 return skija::FontFeature::fromJavaArray(env, (jobjectArray) env->GetObjectField(opts, _features));
             }
+
+            std::vector<SkShaper::Feature> getFeaturesFromIntsArray(JNIEnv* env, jintArray featuresArray, jint featuresLen) {
+                return skija::FontFeature::fromIntArray(env, featuresArray, featuresLen);
+            }
         }
 
         namespace TextBlobBuilderRunHandler {
@@ -186,7 +190,7 @@ namespace skija {
                 env->DeleteGlobalRef(cls);
             }
        }
-       
+
        void onLoad(JNIEnv* env) {
             BidiRun::onLoad(env);
             FontMgrRunIterator::onLoad(env);
@@ -214,7 +218,7 @@ namespace skija {
 
         std::shared_ptr<UBreakIterator> graphemeBreakIterator(SkString& text) {
             UErrorCode status = U_ZERO_ERROR;
-            
+
             ICUUText utext(utext_openUTF8(nullptr, text.c_str(), text.size(), &status));
             if (U_FAILURE(status)) {
                 SkDEBUGF("utext_openUTF8 error: %s", u_errorName(status));
@@ -236,7 +240,7 @@ namespace skija {
                 return nullptr;
             }
 
-            return graphemeIter;    
+            return graphemeIter;
         }
     }
 }

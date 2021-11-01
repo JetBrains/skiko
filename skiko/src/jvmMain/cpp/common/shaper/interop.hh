@@ -57,7 +57,7 @@ namespace skija {
             extern jmethodID runOffset;
             extern jmethodID commitRun;
             extern jmethodID commitLine;
-            
+
             void onLoad(JNIEnv* env);
             void onUnload(JNIEnv* env);
         }
@@ -89,6 +89,7 @@ namespace skija {
 
             void onLoad(JNIEnv* env);
             std::vector<SkShaper::Feature> getFeatures(JNIEnv* env, jobject opts);
+            std::vector<SkShaper::Feature> getFeaturesFromIntsArray(JNIEnv* env, jintArray featuresArray, jint featuresLen);
         }
 
         namespace TextBlobBuilderRunHandler {
@@ -97,9 +98,9 @@ namespace skija {
             void onLoad(JNIEnv* env);
             void onUnload(JNIEnv* env);
         }
-       
+
         void onLoad(JNIEnv* env);
-        void onUnload(JNIEnv* env);        
+        void onUnload(JNIEnv* env);
 
         using ICUUText = std::unique_ptr<UText, SkFunctionWrapper<decltype(utext_close), utext_close>>;
         std::shared_ptr<UBreakIterator> graphemeBreakIterator(SkString& text);

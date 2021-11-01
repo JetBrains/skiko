@@ -3,13 +3,9 @@ package org.jetbrains.skia.shaper
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.*
-import org.jetbrains.skia.impl.Managed
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.reachabilityBarrier
-import org.jetbrains.skia.impl.use
 import org.jetbrains.skia.ExternalSymbolName
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.FontFeature.Companion.arrayOfFontFeaturesToInterop
+import org.jetbrains.skia.impl.*
 
 /**
  * Shapes text using HarfBuzz and places the shaped text into a
@@ -110,15 +106,19 @@ class Shaper internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
     fun shape(text: String?, font: Font?, opts: ShapingOptions, width: Float, offset: Point): TextBlob? {
         return try {
             Stats.onNativeCall()
-            val ptr = _nShapeBlob(
-                _ptr,
-                text,
-                getPtr(font),
-                opts,
-                width,
-                offset.x,
-                offset.y
-            )
+            val ptr = interopScope {
+                _nShapeBlob(
+                    _ptr,
+                    text,
+                    getPtr(font),
+                    optsFeaturesLen = opts.features?.size ?: 0,
+                    optsFeaturesIntArray = arrayOfFontFeaturesToInterop(opts.features),
+                    optsBooleanProps = opts._booleanPropsToInt(),
+                    width = width,
+                    offsetX = offset.x,
+                    offsetY = offset.y
+                )
+            }
             if (NullPointer == ptr) null else TextBlob(ptr)
         } finally {
             reachabilityBarrier(this)
@@ -185,31 +185,39 @@ class Shaper internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
         runHandler: RunHandler
     ): Shaper {
         Stats.onNativeCall()
-        _nShape(
-            _ptr,
-            getPtr(textUtf8),
-            fontIter,
-            bidiIter,
-            scriptIter,
-            langIter,
-            opts,
-            width,
-            runHandler
-        )
+        interopScope {
+            _nShape(
+                _ptr,
+                getPtr(textUtf8),
+                fontIter,
+                bidiIter,
+                scriptIter,
+                langIter,
+                optsFeaturesLen = opts.features?.size ?: 0,
+                optsFeaturesIntArray = arrayOfFontFeaturesToInterop(opts.features),
+                optsBooleanProps = opts._booleanPropsToInt(),
+                width = width,
+                runHandler = runHandler
+            )
+        }
         return this
     }
 
     fun shapeLine(text: String?, font: Font?, opts: ShapingOptions): TextLine {
         return try {
             Stats.onNativeCall()
-            TextLine(
-                _nShapeLine(
-                    _ptr,
-                    text,
-                    getPtr(font),
-                    opts
+            interopScope {
+                TextLine(
+                    _nShapeLine(
+                        _ptr,
+                        text,
+                        getPtr(font),
+                        optsFeaturesLen = opts.features?.size ?: 0,
+                        optsFeatures = arrayOfFontFeaturesToInterop(opts.features),
+                        optsBooleanProps = opts._booleanPropsToInt()
+                    )
                 )
-            )
+            }
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(font)
@@ -252,7 +260,9 @@ private external fun _nShapeBlob(
     ptr: NativePointer,
     text: String?,
     fontPtr: NativePointer,
-    opts: ShapingOptions?,
+    optsFeaturesLen: Int,
+    optsFeaturesIntArray: InteropPointer,
+    optsBooleanProps: Int,
     width: Float,
     offsetX: Float,
     offsetY: Float
@@ -260,7 +270,14 @@ private external fun _nShapeBlob(
 
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper__1nShapeLine")
-private external fun _nShapeLine(ptr: NativePointer, text: String?, fontPtr: NativePointer, opts: ShapingOptions?): NativePointer
+private external fun _nShapeLine(
+    ptr: NativePointer,
+    text: String?,
+    fontPtr: NativePointer,
+    optsFeaturesLen: Int,
+    optsFeatures: InteropPointer,
+    optsBooleanProps: Int
+): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper__1nShape")
 private external fun _nShape(
@@ -270,7 +287,9 @@ private external fun _nShape(
     bidiIter: Iterator<BidiRun?>?,
     scriptIter: Iterator<ScriptRun?>?,
     langIter: Iterator<LanguageRun?>?,
-    opts: ShapingOptions?,
+    optsFeaturesLen: Int,
+    optsFeaturesIntArray: InteropPointer,
+    optsBooleanProps: Int,
     width: Float,
     runHandler: RunHandler?
 )
