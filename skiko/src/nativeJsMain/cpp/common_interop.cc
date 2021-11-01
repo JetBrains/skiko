@@ -1,6 +1,7 @@
 #include "common.h"
 #include "src/utils/SkUTF.h"
 #include "include/core/SkImageInfo.h"
+#include "TextStyle.h"
 #include <stdio.h>
 
 KLong packTwoInts(int32_t a, int32_t b) {
@@ -42,6 +43,40 @@ namespace skija {
                 int32_t mipmap = samplingModeVal2;
 
                 return SkSamplingOptions(static_cast<SkFilterMode>(filter), static_cast<SkMipmapMode>(mipmap));
+            }
+        }
+    }
+
+    namespace FontFeature {
+        std::vector<SkShaper::Feature> fromIntArray(KInt* array, KInt featuresLen) {
+            std::vector<SkShaper::Feature> features(featuresLen);
+            for (int i = 0; i < featuresLen; ++i) {
+                int j = i * 4;
+                features[i] = {
+                    static_cast<SkFourByteTag>(array[j]),
+                    static_cast<uint32_t>(array[j + 1]),
+                    static_cast<size_t>(array[j + 2]),
+                    static_cast<size_t>(array[j + 3])
+                };
+            }
+            return features;
+        }
+
+        void writeToIntArray(std::vector<skia::textlayout::FontFeature> features, int* resultArr) {
+            for (int i = 0; i < features.size(); ++i) {
+                int j = i * 2;
+                resultArr[j] = skija::FontFeature::FourByteTag::fromString(features[i].fName);
+                resultArr[j + 1] = features[i].fValue;;
+            }
+        }
+
+        namespace FourByteTag {
+            int fromString(SkString str) {
+                int code1 = (int)str[0];
+                int code2 = (int)str[1];
+                int code3 = (int)str[2];
+                int code4 = (int)str[3];
+                return (code1 & 0xFF << 24) | (code2 & 0xFF << 16) | (code3 & 0xFF << 8) | (code4 & 0xFF);
             }
         }
     }
