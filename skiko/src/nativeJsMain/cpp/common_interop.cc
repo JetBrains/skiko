@@ -255,12 +255,13 @@ namespace skija {
     }
 
     namespace SurfaceProps {
-        std::unique_ptr<SkSurfaceProps> toSkSurfaceProps(KInt* surfacePropsInts) {
+        std::unique_ptr<SkSurfaceProps> toSkSurfaceProps(KInteropPointer surfacePropsInts) {
             if (surfacePropsInts == nullptr) {
                 return std::unique_ptr<SkSurfaceProps>(nullptr);
             }
-            int flags = surfacePropsInts[0];
-            SkPixelGeometry geom = static_cast<SkPixelGeometry>(surfacePropsInts[1]);
+            KInt* surfaceProps = reinterpret_cast<KInt*>(surfacePropsInts);
+            int flags = surfaceProps[0];
+            SkPixelGeometry geom = static_cast<SkPixelGeometry>(surfaceProps[1]);
             return std::make_unique<SkSurfaceProps>(flags, geom);
         }
     }

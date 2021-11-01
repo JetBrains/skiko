@@ -81,7 +81,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeFromBackendRenderT
     SkColorType skColorType = static_cast<SkColorType>(colorType);
     sk_sp<SkColorSpace> colorSpace = sk_ref_sp<SkColorSpace>(reinterpret_cast<SkColorSpace*>((colorSpacePtr)));
 
-    // std::unique_ptr<SkSurfaceProps> surfaceProps = skija::SurfaceProps::toSkSurfaceProps(env, surfacePropsObj);
+    // std::unique_ptr<SkSurfaceProps> surfaceProps = skija::SurfaceProps::toSkSurfaceProps(surfacePropsObj);
 
     sk_sp<SkSurface> surface = SkSurface::MakeFromBackendRenderTarget(
         static_cast<GrRecordingContext*>(context),
@@ -98,22 +98,15 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeFromBackendRenderT
     return reinterpret_cast<KNativePointer>(surface.release());
 }
 
-
-
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeFromMTKView
   (KNativePointer contextPtr, KNativePointer mtkViewPtr, KInt surfaceOrigin, KInt sampleCount, KInt colorType, KNativePointer colorSpacePtr, KInteropPointer surfacePropsObj) {
-    TODO("implement org_jetbrains_skia_Surface__1nMakeFromMTKView");
-}
-
-#if 0
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeFromMTKView
-  (KNativePointer contextPtr, KNativePointer mtkViewPtr, KInt surfaceOrigin, KInt sampleCount, KInt colorType, KNativePointer colorSpacePtr, KInteropPointer surfacePropsObj) {
+#ifdef __APPLE__
     GrDirectContext* context = reinterpret_cast<GrDirectContext*>((contextPtr));
     GrMTLHandle* mtkView = reinterpret_cast<GrMTLHandle*>((mtkViewPtr));
     GrSurfaceOrigin grSurfaceOrigin = static_cast<GrSurfaceOrigin>(surfaceOrigin);
     SkColorType skColorType = static_cast<SkColorType>(colorType);
     sk_sp<SkColorSpace> colorSpace = sk_ref_sp<SkColorSpace>(reinterpret_cast<SkColorSpace*>((colorSpacePtr)));
-    std::unique_ptr<SkSurfaceProps> surfaceProps = skija::SurfaceProps::toSkSurfaceProps(env, surfacePropsObj);
+    std::unique_ptr<SkSurfaceProps> surfaceProps = skija::SurfaceProps::toSkSurfaceProps(surfacePropsObj);
 
     sk_sp<SkSurface> surface = SkSurface::MakeFromMTKView(
         static_cast<GrRecordingContext*>(context),
@@ -124,22 +117,11 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeFromMTKView
         colorSpace,
         surfaceProps.get());
     return reinterpret_cast<KNativePointer>(surface.release());
-}
-#endif
-
-
-
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeRenderTarget
-  (KNativePointer contextPtr, KBoolean budgeted,
-    KInt width, KInt height, KInt colorType, KInt alphaType, KNativePointer colorSpacePtr,
-    KInt sampleCount, KInt surfaceOrigin,
-    KInteropPointer surfacePropsObj,
-    KBoolean shouldCreateWithMips)
-{
-    TODO("implement org_jetbrains_skia_Surface__1nMakeRenderTarget");
+#else // __APPLE__
+    return static_cast<KNativePointer>(nullptr);
+#endif // __APPLE__
 }
 
-#if 0
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeRenderTarget
   (KNativePointer contextPtr, KBoolean budgeted,
     KInt width, KInt height, KInt colorType, KInt alphaType, KNativePointer colorSpacePtr,
@@ -154,7 +136,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeRenderTarget
                                               static_cast<SkColorType>(colorType),
                                               static_cast<SkAlphaType>(alphaType),
                                               sk_ref_sp<SkColorSpace>(colorSpace));
-    std::unique_ptr<SkSurfaceProps> surfaceProps = skija::SurfaceProps::toSkSurfaceProps(env, surfacePropsObj);
+    std::unique_ptr<SkSurfaceProps> surfaceProps = skija::SurfaceProps::toSkSurfaceProps(surfacePropsObj);
 
     sk_sp<SkSurface> instance = SkSurface::MakeRenderTarget(
       context, budgeted ? SkBudgeted::kYes : SkBudgeted::kNo,
@@ -164,8 +146,6 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeRenderTarget
       shouldCreateWithMips);
     return reinterpret_cast<KNativePointer>(instance.release());
 }
-#endif
-
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeNull
   (KInt width, KInt height) {

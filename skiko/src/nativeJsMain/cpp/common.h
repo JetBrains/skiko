@@ -67,7 +67,7 @@ namespace skija {
     }
 
     namespace SurfaceProps {
-        std::unique_ptr<SkSurfaceProps> toSkSurfaceProps(KInt* surfacePropsInts);
+        std::unique_ptr<SkSurfaceProps> toSkSurfaceProps(KInteropPointer surfacePropsInts);
     }
 
     namespace IRect {
