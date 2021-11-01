@@ -91,8 +91,8 @@ SKIKO_EXPORT KInteropPointer org_jetbrains_skia_paragraph_TextStyle__1nGetDecora
   (KNativePointer ptr) {
     TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nGetDecorationStyle");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_paragraph_TextStyle__1nGetDecorationStyle
   (KNativePointer ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>((ptr));
@@ -104,7 +104,7 @@ SKIKO_EXPORT KInteropPointer org_jetbrains_skia_paragraph_TextStyle__1nGetDecora
       d.fMode == TextDecorationMode::kGaps,
       d.fColor,
       static_cast<KInt>(d.fStyle),
-      d.fThicknessMultiplier); 
+      d.fThicknessMultiplier);
 }
 #endif
 
@@ -139,8 +139,8 @@ SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_paragraph_TextStyle__1nGetS
   (KNativePointer ptr) {
     TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nGetShadows");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_paragraph_TextStyle__1nGetShadows
   (KNativePointer ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>((ptr));
@@ -168,36 +168,27 @@ SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nClearShadows
     instance->resetShadows();
 }
 
-
-SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_paragraph_TextStyle__1nGetFontFeatures
+SKIKO_EXPORT KInt org_jetbrains_skia_paragraph_TextStyle__1nGetFontFeaturesSize
   (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nGetFontFeatures");
+    TextStyle* instance = reinterpret_cast<TextStyle*>(ptr);
+    std::vector<FontFeature> fontFeatures = instance->getFontFeatures();
+    return static_cast<KInt>(fontFeatures.size());
 }
-     
-#if 0 
-SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_paragraph_TextStyle__1nGetFontFeatures
-  (KNativePointer ptr) {
+
+SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nGetFontFeatures
+  (KNativePointer ptr, KInt* resultArr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>((ptr));
     std::vector<FontFeature> fontFeatures = instance->getFontFeatures();
-    KInteropPointerArray fontFeaturesArr = env->NewObjectArray((jsize) fontFeatures.size(), skija::FontFeature::cls, nullptr);
-    for (int i = 0; i < fontFeatures.size(); ++i) {
-        const FontFeature& ff = fontFeatures[i];
-        auto featureObj = env->NewObject(skija::FontFeature::cls, skija::FontFeature::ctor, javaString(env, ff.fName), ff.fValue);
-        env->SetObjectArrayElement(fontFeaturesArr, i, featureObj);
-        env->DeleteLocalRef(featureObj);
-    }
-    return fontFeaturesArr;
+    skija::FontFeature::writeToIntArray(fontFeatures, resultArr);
 }
-#endif
-
 
 
 SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nAddFontFeature
   (KNativePointer ptr, KInteropPointer nameStr, KInt value) {
     TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nAddFontFeature");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nAddFontFeature
   (KNativePointer ptr, KInteropPointer nameStr, KInt value) {
     TextStyle* instance = reinterpret_cast<TextStyle*>((ptr));
@@ -229,8 +220,8 @@ SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_paragraph_TextStyle__1nGetF
   (KNativePointer ptr) {
     TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nGetFontFamilies");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_paragraph_TextStyle__1nGetFontFamilies
   (KNativePointer ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>((ptr));
@@ -252,8 +243,8 @@ SKIKO_EXPORT KInteropPointer org_jetbrains_skia_paragraph_TextStyle__1nGetHeight
   (KNativePointer ptr) {
     TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nGetHeight");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_paragraph_TextStyle__1nGetHeight
   (KNativePointer ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>((ptr));
@@ -311,8 +302,8 @@ SKIKO_EXPORT KInteropPointer org_jetbrains_skia_paragraph_TextStyle__1nGetLocale
   (KNativePointer ptr) {
     TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nGetLocale");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_paragraph_TextStyle__1nGetLocale
   (KNativePointer ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>((ptr));
@@ -326,8 +317,8 @@ SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nSetLocale
   (KNativePointer ptr, KInteropPointer locale) {
     TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nSetLocale");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nSetLocale
   (KNativePointer ptr, KInteropPointer locale) {
     TextStyle* instance = reinterpret_cast<TextStyle*>((ptr));
@@ -353,8 +344,8 @@ SKIKO_EXPORT KInteropPointer org_jetbrains_skia_paragraph_TextStyle__1nGetFontMe
   (KNativePointer ptr) {
     TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nGetFontMetrics");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_paragraph_TextStyle__1nGetFontMetrics
   (KNativePointer ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>((ptr));
