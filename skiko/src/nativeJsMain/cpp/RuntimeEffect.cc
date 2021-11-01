@@ -5,25 +5,17 @@
 #include "common.h"
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_RuntimeEffect__1nMakeShader
-    (KNativePointer ptr, KNativePointer uniformPtr, KNativePointer childrenPtrsArr, KFloat* localMatrixArr, KBoolean isOpaque) {
-    TODO("implement org_jetbrains_skia_RuntimeEffect__1nMakeShader");
-}
+    (KNativePointer ptr, KNativePointer uniformPtr, KNativePointerArray childrenPtrsArr, KInt childCount, KFloat* localMatrixArr, KBoolean isOpaque) {
+    SkRuntimeEffect* runtimeEffect = reinterpret_cast<SkRuntimeEffect*>(ptr);
+    SkData* uniform = reinterpret_cast<SkData*>(uniformPtr);
+    std::unique_ptr<SkMatrix> localMatrix = skMatrix(localMatrixArr);
 
-#if 0 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_RuntimeEffect__1nMakeShader
-    (KNativePointer ptr, KNativePointer uniformPtr, KNativePointerArray childrenPtrsArr, KFloat* localMatrixArr, KBoolean isOpaque) {
-    SkRuntimeEffect* runtimeEffect = KNativePointerToPtr<SkRuntimeEffect*>(ptr);
-    SkData* uniform = KNativePointerToPtr<SkData*>(uniformPtr);
-    std::unique_ptr<SkMatrix> localMatrix = skMatrix(env, localMatrixArr);
-
-    jsize childCount = env->GetArrayLength(childrenPtrsArr);
-    KNativePointer* childrenPtrs = env->GetLongArrayElements(childrenPtrsArr, 0);
+    KNativePointer* childrenPtrs = reinterpret_cast<KNativePointer*>(childrenPtrsArr);
     std::vector<sk_sp<SkShader>> children(childCount);
     for (size_t i = 0; i < childCount; i++) {
-        SkShader* si = KNativePointerToPtr<SkShader*>(childrenPtrs[i]);
+        SkShader* si = reinterpret_cast<SkShader*>(childrenPtrs[i]);
         children[i] = sk_ref_sp(si);
     }
-    env->ReleaseLongArrayElements(childrenPtrsArr, childrenPtrs, 0);
 
     sk_sp<SkShader> shader = runtimeEffect->makeShader(sk_ref_sp<SkData>(uniform),
                                                        children.data(),
@@ -32,7 +24,6 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_RuntimeEffect__1nMakeShader
                                                        isOpaque);
     return reinterpret_cast<KNativePointer>(shader.release());
 }
-#endif
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_RuntimeEffect__1nMakeForShader
     (KInteropPointer sksl) {

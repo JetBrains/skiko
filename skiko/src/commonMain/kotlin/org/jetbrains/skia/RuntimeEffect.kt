@@ -5,12 +5,12 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 
 class RuntimeEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
-        fun makeForShader(sksl: String?): RuntimeEffect {
+        fun makeForShader(sksl: String): RuntimeEffect {
             Stats.onNativeCall()
             return makeFromResultPtr(_nMakeForShader(sksl))
         }
 
-        fun makeForColorFilter(sksl: String?): RuntimeEffect {
+        fun makeForColorFilter(sksl: String): RuntimeEffect {
             Stats.onNativeCall()
             return makeFromResultPtr(_nMakeForColorFilter(sksl))
         }
@@ -30,7 +30,7 @@ class RuntimeEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         for (i in 0 until childCount) childrenPtrs[i] = getPtr(children!![i])
         val matrix = localMatrix?.mat
         return interopScope {
-            Shader(_nMakeShader(_ptr, getPtr(uniforms), toInterop(childrenPtrs), toInterop(matrix), isOpaque))
+            Shader(_nMakeShader(_ptr, getPtr(uniforms), toInterop(childrenPtrs), childCount, toInterop(matrix), isOpaque))
         }
     }
 }
@@ -41,7 +41,7 @@ internal expect fun RuntimeEffect.Companion.makeFromResultPtr(ptr: NativePointer
 @ExternalSymbolName("org_jetbrains_skia_RuntimeEffect__1nMakeShader")
 private external fun _nMakeShader(
     runtimeEffectPtr: NativePointer, uniformPtr: NativePointer, childrenPtrs: InteropPointer,
-    localMatrix: InteropPointer, isOpaque: Boolean
+    childCount: Int, localMatrix: InteropPointer, isOpaque: Boolean
 ): NativePointer
 
 
