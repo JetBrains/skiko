@@ -2,6 +2,7 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import kotlin.math.min
 
 /**
  *
@@ -29,11 +30,17 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
  */
 class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR), Iterable<PathSegment?> {
     companion object {
-        fun makeFromSVGString(svg: String): Path {
-            val res = _nMakeFromSVGString(svg)
-            return if (res == NullPointer) throw IllegalArgumentException("Failed to parse SVG Path string: $svg") else Path(
-                res
-            )
+        fun makeFromSVGString(svg: String): Path  {
+            Stats.onNativeCall()
+            val result = interopScope {
+                _nMakeFromSVGString(toInterop(svg))
+            }
+
+            if (result == NullPointer) {
+                throw IllegalArgumentException("Failed to parse SVG Path string: $svg")
+            } else {
+                return Path(result)
+            }
         }
 
         /**
@@ -140,7 +147,12 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
          */
         fun convertConicToQuads(p0: Point, p1: Point, p2: Point, w: Float, pow2: Int): Array<Point> {
             Stats.onNativeCall()
-            return _nConvertConicToQuads(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, w, pow2)
+            val maxResultPointCount = (1 + 2 * (1 shl pow2)) // See Skia docs
+            var pointCount = 0
+            val coords = withResult(FloatArray(maxResultPointCount * 2)) {
+                pointCount = _nConvertConicToQuads(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, w, pow2, it)
+            }
+            return Array(pointCount) { Point(coords[2 * it], coords[2 * it + 1]) }
         }
 
         /**
@@ -190,13 +202,17 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
          *
          * @see [https://fiddle.skia.org/c/@Path_readFromMemory](https://fiddle.skia.org/c/@Path_readFromMemory)
          */
-        fun makeFromBytes(data: ByteArray?): Path {
+        fun makeFromBytes(data: ByteArray): Path {
             Stats.onNativeCall()
-            return Path(
-                interopScope {
-                    _nMakeFromBytes(toInterop(data))
-                }
-            )
+            val result = interopScope {
+                _nMakeFromBytes(toInterop(data), data.size)
+            }
+
+            if (result == NullPointer) {
+                throw IllegalArgumentException("Failed to parse serialized Path")
+            } else {
+                return Path(result)
+            }
         }
 
         init {
@@ -335,10 +351,10 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      *
      * @see [https://fiddle.skia.org/c/@Path_isOval](https://fiddle.skia.org/c/@Path_isOval)
      */
-    val isOval: Rect
+    val isOval: Rect?
         get() = try {
             Stats.onNativeCall()
-            _nIsOval(_ptr)
+            Rect.fromInteropPointerNullable { _nIsOval(_ptr, it) }
         } finally {
             reachabilityBarrier(this)
         }
@@ -350,10 +366,10 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      *
      * @see [https://fiddle.skia.org/c/@Path_isRRect](https://fiddle.skia.org/c/@Path_isRRect)
      */
-    val isRRect: RRect
+    val isRRect: RRect?
         get() = try {
             Stats.onNativeCall()
-            _nIsRRect(_ptr)
+            RRect.fromInteropPointerNullable { _nIsRRect(_ptr, it) }
         } finally {
             reachabilityBarrier(this)
         }
@@ -444,7 +460,8 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     val isFinite: Boolean
         get() = try {
             Stats.onNativeCall()
-            _nIsFinite(_ptr)
+            // TODO For some reason this method returns 0 instead of false in JS target, investigate
+            !!_nIsFinite(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -521,10 +538,17 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      *
      * @see [https://fiddle.skia.org/c/@Path_isLine](https://fiddle.skia.org/c/@Path_isLine)
      */
-    val asLine: Array<Point>
+    val asLine: Array<Point>?
         get() = try {
             Stats.onNativeCall()
-            _nMaybeGetAsLine(_ptr)
+            // HACK Use a temporary Rect as a buffer to store two points
+            val rectBuffer = Rect.fromInteropPointerNullable { _nMaybeGetAsLine(_ptr, it) }
+            rectBuffer?.run {
+                arrayOf(
+                    Point(left, top),
+                    Point(right, bottom)
+                )
+            }
         } finally {
             reachabilityBarrier(this)
         }
@@ -561,7 +585,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     fun getPoint(index: Int): Point {
         return try {
             Stats.onNativeCall()
-            _nGetPoint(_ptr, index)
+            Point.fromInteropPointer { _nGetPoint(_ptr, index, it) }
         } finally {
             reachabilityBarrier(this)
         }
@@ -598,9 +622,22 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      */
     fun getPoints(points: Array<Point?>?, max: Int): Int {
         return try {
-            require(if (points == null) max == 0 else true)
+            require(if (points == null) max == 0 else max >= 0)
             Stats.onNativeCall()
-            _nGetPoints(_ptr, points, max)
+            if (points == null) {
+                interopScope {
+                    _nGetPoints(_ptr, toInterop(null as FloatArray?), max)
+                }
+            } else {
+                var result = 0
+                val coords = withResult(FloatArray(max * 2)) {
+                    result = _nGetPoints(_ptr, it, max)
+                }
+                for (i in 0 until min(max, result)) {
+                    points[i] = Point(coords[2 * i], coords[2 * i + 1])
+                }
+                result
+            }
         } finally {
             reachabilityBarrier(this)
         }
@@ -643,7 +680,10 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
             Stats.onNativeCall()
             val out = if (verbs == null) null else ByteArray(max)
             val count = interopScope {
-                _nGetVerbs(_ptr, toInterop(out), max)
+                val ptr = toInterop(out)
+                _nGetVerbs(_ptr, ptr, max).also {
+                    out?.let { ptr.fromInterop(it) }
+                }
             }
             if (verbs != null) for (i in 0 until minOf(count, max)) verbs[i] = PathVerb.values().get(
                 out!![i].toInt()
@@ -705,7 +745,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     val bounds: Rect
         get() = try {
             Stats.onNativeCall()
-            _nGetBounds(_ptr)
+            Rect.fromInteropPointer { _nGetBounds(_ptr, it) }
         } finally {
             reachabilityBarrier(this)
         }
@@ -753,7 +793,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     fun computeTightBounds(): Rect {
         return try {
             Stats.onNativeCall()
-            _nComputeTightBounds(_ptr)
+            Rect.fromInteropPointer { _nComputeTightBounds(_ptr, it) }
         } finally {
             reachabilityBarrier(this)
         }
@@ -1440,10 +1480,10 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      *
      * @see [https://fiddle.skia.org/c/@Path_isRect](https://fiddle.skia.org/c/@Path_isRect)
      */
-    val isRect: Rect
+    val isRect: Rect?
         get() = try {
             Stats.onNativeCall()
-            _nIsRect(_ptr)
+            Rect.fromInteropPointerNullable { _nIsRect(_ptr, it) }
         } finally {
             reachabilityBarrier(this)
         }
@@ -1673,7 +1713,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
         require(pts.size % 2 == 0) { "Expected even amount of pts, got " + pts.size }
         Stats.onNativeCall()
         interopScope {
-            _nAddPoly(_ptr, toInterop(pts), close)
+            _nAddPoly(_ptr, toInterop(pts), pts.size / 2, close)
         }
         return this
     }
@@ -1920,7 +1960,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     var lastPt: Point
         get() = try {
             Stats.onNativeCall()
-            _nGetLastPt(_ptr)
+            Point.fromInteropPointer { _nGetLastPt(_ptr, it) }
         } finally {
             reachabilityBarrier(this)
         }
@@ -2068,7 +2108,13 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     fun serializeToBytes(): ByteArray {
         return try {
             Stats.onNativeCall()
-            _nSerializeToBytes(_ptr)
+            val size = interopScope { _nSerializeToBytes(_ptr, toInterop(null as ByteArray?)) }
+            if (size == -1) {
+                throw Error("Path is too big")
+            }
+            withResult(ByteArray(size)) {
+                _nSerializeToBytes(_ptr, it)
+            }
         } finally {
             reachabilityBarrier(this)
         }
@@ -2142,7 +2188,7 @@ private external fun Path_nSwap(ptr: NativePointer, otherPtr: NativePointer)
 private external fun Path_nGetGenerationId(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nMakeFromSVGString")
-private external fun _nMakeFromSVGString(s: String?): NativePointer
+private external fun _nMakeFromSVGString(svg: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nIsInterpolatable")
 private external fun _nIsInterpolatable(ptr: NativePointer, comparePtr: NativePointer): Boolean
@@ -2160,10 +2206,10 @@ private external fun _nSetFillMode(ptr: NativePointer, fillMode: Int)
 private external fun _nIsConvex(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nIsOval")
-private external fun _nIsOval(ptr: NativePointer): Rect
+private external fun _nIsOval(ptr: NativePointer, rect: InteropPointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nIsRRect")
-private external fun _nIsRRect(ptr: NativePointer): RRect
+private external fun _nIsRRect(ptr: NativePointer, rrect: InteropPointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nRewind")
 private external fun _nRewind(ptr: NativePointer)
@@ -2207,16 +2253,16 @@ private external fun _nIsCubicDegenerate(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nMaybeGetAsLine")
-private external fun _nMaybeGetAsLine(ptr: NativePointer): Array<Point>
+private external fun _nMaybeGetAsLine(ptr: NativePointer, rectBuffer: InteropPointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nGetPointsCount")
 private external fun _nGetPointsCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nGetPoint")
-private external fun _nGetPoint(ptr: NativePointer, index: Int): Point
+private external fun _nGetPoint(ptr: NativePointer, index: Int, result: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nGetPoints")
-private external fun _nGetPoints(ptr: NativePointer, points: Array<Point?>?, max: Int): Int
+private external fun _nGetPoints(ptr: NativePointer, points: InteropPointer, max: Int): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nCountVerbs")
 private external fun _nCountVerbs(ptr: NativePointer): Int
@@ -2228,13 +2274,13 @@ private external fun _nGetVerbs(ptr: NativePointer, verbs: InteropPointer, max: 
 private external fun _nApproximateBytesUsed(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nGetBounds")
-private external fun _nGetBounds(ptr: NativePointer): Rect
+private external fun _nGetBounds(ptr: NativePointer, rect: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nUpdateBoundsCache")
 private external fun _nUpdateBoundsCache(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nComputeTightBounds")
-private external fun _nComputeTightBounds(ptr: NativePointer): Rect
+private external fun _nComputeTightBounds(ptr: NativePointer, rect: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nConservativelyContainsRect")
 private external fun _nConservativelyContainsRect(ptr: NativePointer, l: Float, t: Float, r: Float, b: Float): Boolean
@@ -2326,12 +2372,13 @@ private external fun _nConvertConicToQuads(
     x2: Float,
     y2: Float,
     w: Float,
-    pow2: Int
-): Array<Point>
+    pow2: Int,
+    result: InteropPointer
+): Int
 
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nIsRect")
-private external fun _nIsRect(ptr: NativePointer): Rect
+private external fun _nIsRect(ptr: NativePointer, rect: InteropPointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nAddRect")
 private external fun _nAddRect(ptr: NativePointer, l: Float, t: Float, r: Float, b: Float, dir: Int, start: Int)
@@ -2360,7 +2407,7 @@ private external fun _nAddRRect(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nAddPoly")
-private external fun _nAddPoly(ptr: NativePointer, coords: InteropPointer, close: Boolean)
+private external fun _nAddPoly(ptr: NativePointer, coords: InteropPointer, count: Int, close: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nAddPath")
 private external fun _nAddPath(ptr: NativePointer, srcPtr: NativePointer, extend: Boolean)
@@ -2381,7 +2428,7 @@ private external fun _nOffset(ptr: NativePointer, dx: Float, dy: Float, dst: Nat
 private external fun _nTransform(ptr: NativePointer, matrix: InteropPointer, dst: NativePointer, applyPerspectiveClip: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nGetLastPt")
-private external fun _nGetLastPt(ptr: NativePointer): Point
+private external fun _nGetLastPt(ptr: NativePointer, result: InteropPointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nSetLastPt")
 private external fun _nSetLastPt(ptr: NativePointer, x: Float, y: Float)
@@ -2399,13 +2446,13 @@ private external fun _nDump(ptr: NativePointer)
 private external fun _nDumpHex(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nSerializeToBytes")
-private external fun _nSerializeToBytes(ptr: NativePointer): ByteArray
+private external fun _nSerializeToBytes(ptr: NativePointer, dst: InteropPointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nMakeCombining")
 private external fun _nMakeCombining(onePtr: NativePointer, twoPtr: NativePointer, op: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nMakeFromBytes")
-private external fun _nMakeFromBytes(data: InteropPointer): NativePointer
+private external fun _nMakeFromBytes(data: InteropPointer, size: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nIsValid")
 private external fun _nIsValid(ptr: NativePointer): Boolean

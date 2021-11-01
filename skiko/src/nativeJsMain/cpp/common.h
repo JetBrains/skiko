@@ -19,6 +19,7 @@
 #include "SkShaper.h"
 #include "SkString.h"
 #include "SkSurfaceProps.h"
+#include "TextStyle.h"
 
 #include "types.h"
 
@@ -48,6 +49,18 @@ namespace skija {
         uint32_t from8To16(size_t i8);
     };
 
+    namespace Rect {
+        void copyToInterop(const SkRect& rect, KInteropPointer pointer);
+    }
+
+    namespace RRect {
+        void copyToInterop(const SkRRect& rect, KInteropPointer pointer);
+    }
+
+    namespace Point {
+        void copyToInterop(const SkPoint& rect, KInteropPointer pointer);
+    }
+
     namespace RRect {
         SkRRect toSkRRect(KFloat left, KFloat top, KFloat right, KFloat bottom, KFloat* jradii, KInt size);
     }
@@ -67,6 +80,18 @@ namespace skija {
 
     namespace IRect {
         std::unique_ptr<SkIRect> toSkIRect(KInt* rectInts);
+    }
+
+    namespace FontFeature {
+        // every feature is encoded as 4 ints
+        std::vector<SkShaper::Feature> fromIntArray(KInt* array, KInt featuresLen);
+
+        // caller needs to ensure the resultArr size is sufficient (every feature is encoded as 2 ints)
+        void writeToIntArray(std::vector<skia::textlayout::FontFeature> features, int* resultArr);
+
+        namespace FourByteTag {
+            int fromString(SkString str);
+        }
     }
 }
 

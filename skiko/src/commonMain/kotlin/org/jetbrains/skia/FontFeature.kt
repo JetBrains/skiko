@@ -1,8 +1,11 @@
 package org.jetbrains.skia
 
-class FontFeature(val _tag: Int, val value: Int, val start: Long, val end: Long) {
+import org.jetbrains.skia.impl.InteropPointer
+import org.jetbrains.skia.impl.InteropScope
 
-    constructor(feature: String, value: Int, start: Long, end: Long) : this(
+class FontFeature(val _tag: Int, val value: Int, val start: UInt, val end: UInt) {
+
+    constructor(feature: String, value: Int, start: UInt, end: UInt) : this(
         FourByteTag.fromString(feature),
         value,
         start,
@@ -30,8 +33,8 @@ class FontFeature(val _tag: Int, val value: Int, val start: Long, val end: Long)
 
     override fun toString(): String {
         var range = ""
-        if (start > 0 || end < Long.MAX_VALUE) {
-            range = "[" + (if (start > 0) start else "") + ":" + (if (end < Long.MAX_VALUE) end else "") + "]"
+        if (start > 0u || end < UInt.MAX_VALUE) {
+            range = "[" + (if (start > 0u) start else "") + ":" + (if (end < UInt.MAX_VALUE) end else "") + "]"
         }
         var valuePrefix = ""
         var valueSuffix = ""
@@ -53,14 +56,25 @@ class FontFeature(val _tag: Int, val value: Int, val start: Long, val end: Long)
         var result = 1
         result = result * PRIME + (_tag.hashCode())
         result = result * PRIME + value
-        result = result * PRIME + (start ushr 32 xor start).toInt()
-        result = result * PRIME + (end ushr 32 xor end).toInt()
+        result = result * PRIME + (start shr 16 xor start).toInt()
+        result = result * PRIME + (end shr 16 xor end).toInt()
         return result
     }
 
+    internal fun toInteropIntArray(): IntArray {
+        return intArrayOf(_tag, value, start.toInt(), end.toInt())
+    }
+
+    internal fun InteropScope.toInterop(): InteropPointer {
+        return toInterop(toInteropIntArray())
+    }
+
     companion object {
-        const val GLOBAL_START: Long = 0
-        const val GLOBAL_END = Long.MAX_VALUE
+        const val GLOBAL_START: UInt = 0u
+        // according to https://github.com/google/skia/blob/main/modules/skshaper/src/SkShaper_harfbuzz.cpp#L48
+        // define HB_FEATURE_GLOBAL_END ((unsigned int) -1)
+        const val GLOBAL_END: UInt = UInt.MAX_VALUE
+
         val EMPTY = arrayOfNulls<FontFeature>(0)
         val _splitPattern = compilePattern("\\s+")
         val _featurePattern =
@@ -71,13 +85,37 @@ class FontFeature(val _tag: Int, val value: Int, val start: Long, val end: Long)
             require(m.matches()) { "Can’t parse FontFeature: $s" }
             val value = if (m.group("value") != null) m.group("value")!!
                 .toInt() else if (m.group("sign") == null) 1 else if ("-" == m.group("sign")) 0 else 1
-            val start = if (m.group("start") == null) 0 else m.group("start")!!.toLong()
-            val end = if (m.group("end") == null) Long.MAX_VALUE else m.group("end")!!.toLong()
+            val start = if (m.group("start") == null) 0u else m.group("start")!!.toUInt()
+            val end = if (m.group("end") == null) UInt.MAX_VALUE else m.group("end")!!.toUInt()
             return FontFeature(m.group("tag")!!, value, start, end)
         }
 
         fun parse(str: String): Array<FontFeature?> {
             return _splitPattern.split(str)?.map { s -> parseOne(s!!) }?.toTypedArray() ?: emptyArray()
+        }
+
+        internal fun InteropScope.toInterop(fontFeatures: Array<FontFeature>?): InteropPointer {
+            val ints = fontFeatures?.flatMap {
+                it.toInteropIntArray().toList()
+            }?.toIntArray()
+
+            return toInterop(ints)
+        }
+
+        /**
+         * This function can be used to convert IntArray to FontFeatures.
+         * Every FontFeature is represented by 2 ints (_tag, value)
+         */
+        internal fun fromInteropEncodedBy2Ints(fontFeatures: IntArray): Array<FontFeature> {
+            val featuresCount = fontFeatures.size / 2
+
+            return Array(featuresCount) {
+                val j = it * 2
+                FontFeature(
+                    fontFeatures[j], fontFeatures[j + 1],
+                    GLOBAL_START, GLOBAL_END
+                )
+            }
         }
     }
 }

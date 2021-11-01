@@ -1,9 +1,7 @@
-package org.jetbrains.skiko
+package org.jetbrains.skia
 
-import org.jetbrains.skia.Path
-import org.jetbrains.skia.PathSegmentMask
-import org.jetbrains.skia.PathVerb
-import org.jetbrains.skia.Point
+import org.jetbrains.skia.impl.Native.Companion.NullPointer
+import org.jetbrains.skia.tests.assertCloseEnough
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
@@ -83,9 +81,16 @@ class PathTest {
                     null
                 ), verbs
             )
-            assertNotEquals(0L, p.approximateBytesUsed)
+            assertNotEquals(NullPointer, p.approximateBytesUsed)
             assertEquals(PathSegmentMask.LINE, p.segmentMasks)
         }
     }
 
+    @Test
+    fun canGetBounds() {
+        val path = Path().lineTo(40f, 40f).lineTo(40f, 0f).lineTo(0f, 40f).lineTo(0f, 0f).closePath()
+        val bounds = Rect(0.0f, 0.0f, 40.0f, 40.0f)
+        assertCloseEnough(bounds, path.bounds)
+        assertCloseEnough(bounds, path.computeTightBounds())
+    }
 }

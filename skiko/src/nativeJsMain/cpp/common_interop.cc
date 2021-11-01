@@ -1,6 +1,7 @@
 #include "common.h"
 #include "src/utils/SkUTF.h"
 #include "include/core/SkImageInfo.h"
+#include "TextStyle.h"
 #include <stdio.h>
 
 KLong packTwoInts(int32_t a, int32_t b) {
@@ -42,6 +43,40 @@ namespace skija {
                 int32_t mipmap = samplingModeVal2;
 
                 return SkSamplingOptions(static_cast<SkFilterMode>(filter), static_cast<SkMipmapMode>(mipmap));
+            }
+        }
+    }
+
+    namespace FontFeature {
+        std::vector<SkShaper::Feature> fromIntArray(KInt* array, KInt featuresLen) {
+            std::vector<SkShaper::Feature> features(featuresLen);
+            for (int i = 0; i < featuresLen; ++i) {
+                int j = i * 4;
+                features[i] = {
+                    static_cast<SkFourByteTag>(array[j]),
+                    static_cast<uint32_t>(array[j + 1]),
+                    static_cast<size_t>(array[j + 2]),
+                    static_cast<size_t>(array[j + 3])
+                };
+            }
+            return features;
+        }
+
+        void writeToIntArray(std::vector<skia::textlayout::FontFeature> features, int* resultArr) {
+            for (int i = 0; i < features.size(); ++i) {
+                int j = i * 2;
+                resultArr[j] = skija::FontFeature::FourByteTag::fromString(features[i].fName);
+                resultArr[j + 1] = features[i].fValue;;
+            }
+        }
+
+        namespace FourByteTag {
+            int fromString(SkString str) {
+                int code1 = (int)str[0];
+                int code2 = (int)str[1];
+                int code3 = (int)str[2];
+                int code4 = (int)str[3];
+                return (code1 & 0xFF << 24) | (code2 & 0xFF << 16) | (code3 & 0xFF << 8) | (code4 & 0xFF);
             }
         }
     }
@@ -140,6 +175,48 @@ std::vector<SkString> skStringVector(KInteropPointerArray arr, KInt len) {
 }
 
 namespace skija {
+    namespace Rect {
+        void copyToInterop(const SkRect& rect, KInteropPointer pointer) {
+            float* ltrb = reinterpret_cast<float*>(pointer);
+            if (ltrb != nullptr) {
+                ltrb[0] = rect.left();
+                ltrb[1] = rect.top();
+                ltrb[2] = rect.right();
+                ltrb[3] = rect.bottom();
+            }
+        }
+    }
+    namespace RRect {
+        void copyToInterop(const SkRRect& rect, KInteropPointer pointer) {
+            float* ltrb = reinterpret_cast<float*>(pointer);
+            if (ltrb != nullptr) {
+                ltrb[0] = rect.rect().left();
+                ltrb[1] = rect.rect().top();
+                ltrb[2] = rect.rect().right();
+                ltrb[3] = rect.rect().bottom();
+
+                ltrb[4] = rect.radii(SkRRect::kUpperLeft_Corner).x();
+                ltrb[5] = rect.radii(SkRRect::kUpperLeft_Corner).y();
+                ltrb[6] = rect.radii(SkRRect::kUpperRight_Corner).x();
+                ltrb[7] = rect.radii(SkRRect::kUpperRight_Corner).y();
+                ltrb[8] = rect.radii(SkRRect::kLowerRight_Corner).x();
+                ltrb[9] = rect.radii(SkRRect::kLowerRight_Corner).y();
+                ltrb[10] = rect.radii(SkRRect::kLowerLeft_Corner).x();
+                ltrb[11] = rect.radii(SkRRect::kLowerLeft_Corner).y();
+            }
+        }
+    }
+
+    namespace Point {
+        void copyToInterop(const SkPoint& point, KInteropPointer pointer) {
+            float* xy = reinterpret_cast<float*>(pointer);
+            if (xy != nullptr) {
+                xy[0] = point.x();
+                xy[1] = point.y();
+            }
+        }
+    }
+
     namespace RRect {
         SkRRect toSkRRect(KFloat left, KFloat top, KFloat right, KFloat bottom, KFloat* radii, KInt radiiSize) {
             SkRect rect {left, top, right, bottom};
