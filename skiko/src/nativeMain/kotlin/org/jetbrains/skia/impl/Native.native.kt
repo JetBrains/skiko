@@ -58,7 +58,8 @@ actual class InteropScope actual constructor() {
     actual fun toInterop(string: String?): InteropPointer {
         return if (string != null) {
             // encodeToByteArray encodes to utf8
-            val pinned = string.encodeToByteArray().pin()
+            val utf8 = string.encodeToByteArray()
+            val pinned = utf8.copyOf(utf8.size + 1).pin()
             elements.add(pinned)
             val result = pinned.addressOf(0).rawValue
             result
