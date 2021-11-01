@@ -1,11 +1,14 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.interopScope
 import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.impl.withStringResult
 
 open class FontMgr : RefCnt {
     companion object {
@@ -27,7 +30,9 @@ open class FontMgr : RefCnt {
     fun getFamilyName(index: Int): String {
         return try {
             Stats.onNativeCall()
-            _nGetFamilyName(_ptr, index)
+            withStringResult {
+                _nGetFamilyName(_ptr, index)
+            }
         } finally {
             reachabilityBarrier(this)
         }
@@ -57,7 +62,7 @@ open class FontMgr : RefCnt {
     fun matchFamily(familyName: String?): FontStyleSet {
         return try {
             Stats.onNativeCall()
-            FontStyleSet(_nMatchFamily(_ptr, familyName))
+            interopScope { FontStyleSet(_nMatchFamily(_ptr, toInterop(familyName)))  }
         } finally {
             reachabilityBarrier(this)
         }
@@ -116,7 +121,7 @@ open class FontMgr : RefCnt {
     ): Typeface? {
         return try {
             Stats.onNativeCall()
-            val ptr = _nMatchFamilyStyleCharacter(_ptr, familyName, style._value, bcp47, character)
+            val ptr = _nMatchFamilyStyleCharacter(_ptr, familyName, style._value, bcp47, bcp47?.size ?: 0, character)
             if (ptr == NullPointer) null else Typeface(ptr)
         } finally {
             reachabilityBarrier(this)
@@ -163,13 +168,13 @@ open class FontMgr : RefCnt {
 private external fun _nGetFamiliesCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nGetFamilyName")
-private external fun _nGetFamilyName(ptr: NativePointer, index: Int): String
+private external fun _nGetFamilyName(ptr: NativePointer, index: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMakeStyleSet")
 private external fun _nMakeStyleSet(ptr: NativePointer, index: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMatchFamily")
-private external fun _nMatchFamily(ptr: NativePointer, familyName: String?): NativePointer
+private external fun _nMatchFamily(ptr: NativePointer, familyName: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMatchFamilyStyle")
 private external fun _nMatchFamilyStyle(ptr: NativePointer, familyName: String?, fontStyle: Int): NativePointer
@@ -180,6 +185,7 @@ private external fun _nMatchFamilyStyleCharacter(
     familyName: String?,
     fontStyle: Int,
     bcp47: Array<String?>?,
+    bcp47size: Int,
     character: Int
 ): NativePointer
 

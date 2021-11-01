@@ -56,6 +56,13 @@ class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
             return Data(_nMakeUninitialized(length))
         }
 
+        fun makeFromFileName(path: String?): Data {
+            Stats.onNativeCall()
+            interopScope {
+                return Data(_nMakeFromFileName(toInterop(path)))
+            }
+        }
+
         init {
             staticLoad()
         }

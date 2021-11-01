@@ -5,6 +5,7 @@ import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.withStringResult
 
 class FontStyleSet internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
@@ -39,7 +40,9 @@ class FontStyleSet internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     fun getStyleName(index: Int): String {
         return try {
             Stats.onNativeCall()
-            _nGetStyleName(_ptr, index)
+            withStringResult {
+                _nGetStyleName(_ptr, index)
+            }
         } finally {
             reachabilityBarrier(this)
         }
@@ -77,7 +80,7 @@ private external fun _nCount(ptr: NativePointer): Int
 private external fun _nGetStyle(ptr: NativePointer, index: Int): Int
 
 @ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nGetStyleName")
-private external fun _nGetStyleName(ptr: NativePointer, index: Int): String
+private external fun _nGetStyleName(ptr: NativePointer, index: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_FontStyleSet__1nGetTypeface")
 private external fun _nGetTypeface(ptr: NativePointer, index: Int): NativePointer

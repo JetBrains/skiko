@@ -6,8 +6,10 @@ import org.jetbrains.skia.FontMgr
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.interopScope
 
 class TypefaceFontProvider : FontMgr(TypefaceFontProvider_nMake()) {
     companion object {
@@ -19,11 +21,13 @@ class TypefaceFontProvider : FontMgr(TypefaceFontProvider_nMake()) {
     fun registerTypeface(typeface: Typeface?, alias: String? = null): TypefaceFontProvider {
         return try {
             Stats.onNativeCall()
-            _nRegisterTypeface(
-                _ptr,
-                getPtr(typeface),
-                alias
-            )
+            interopScope {
+                _nRegisterTypeface(
+                    _ptr,
+                    getPtr(typeface),
+                    toInterop(alias)
+                )
+            }
             this
         } finally {
             reachabilityBarrier(typeface)
@@ -40,4 +44,4 @@ class TypefaceFontProvider : FontMgr(TypefaceFontProvider_nMake()) {
 private external fun TypefaceFontProvider_nMake(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TypefaceFontProvider__1nRegisterTypeface")
-private external fun _nRegisterTypeface(ptr: NativePointer, typefacePtr: NativePointer, alias: String?): NativePointer
+private external fun _nRegisterTypeface(ptr: NativePointer, typefacePtr: NativePointer, alias: InteropPointer): NativePointer
