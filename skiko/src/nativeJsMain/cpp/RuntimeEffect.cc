@@ -30,50 +30,46 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_RuntimeEffect__1nMakeShader
                                                        childCount,
                                                        localMatrix.get(),
                                                        isOpaque);
-    return ptrToKNativePointer(shader.release());
+    return reinterpret_cast<KNativePointer>(shader.release());
 }
 #endif
-
-
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_RuntimeEffect__1nMakeForShader
     (KInteropPointer sksl) {
-    TODO("implement org_jetbrains_skia_RuntimeEffect__1nMakeForShader");
+    SkString skslProper = skString(sksl);
+    SkRuntimeEffect::Result* result = new SkRuntimeEffect::Result {
+        std::move(SkRuntimeEffect::MakeForShader(skslProper))
+    };
+    return reinterpret_cast<KNativePointer>(result);
 }
-     
-#if 0 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_RuntimeEffect__1nMakeForShader
-    (KInteropPointer sksl) {
-    SkString skslProper = skString(env, sksl);
-    SkRuntimeEffect::Result result = SkRuntimeEffect::MakeForShader(skslProper);
-    if (result.errorText.isEmpty()) {
-        sk_sp<SkRuntimeEffect> effect = result.effect;
-        return ptrToKNativePointer(effect.release());
-    } else {
-        env->ThrowNew(java::lang::RuntimeException::cls, result.errorText.c_str());
-        return 0;
-    }
-}
-#endif
-
-
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_RuntimeEffect__1nMakeForColorFilter
     (KInteropPointer sksl) {
-    TODO("implement org_jetbrains_skia_RuntimeEffect__1nMakeForColorFilter");
+    SkString skslProper = skString(sksl);
+    SkRuntimeEffect::Result* result = new SkRuntimeEffect::Result {
+        std::move(SkRuntimeEffect::MakeForColorFilter(skslProper))
+    };
+    return reinterpret_cast<KNativePointer>(result);
 }
-     
-#if 0 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_RuntimeEffect__1nMakeForColorFilter
-    (KInteropPointer sksl) {
-    SkString skslProper = skString(env, sksl);
-    SkRuntimeEffect::Result result = SkRuntimeEffect::MakeForColorFilter(skslProper);
-    if (result.errorText.isEmpty()) {
-        return ptrToKNativePointer(result.effect.release());
+
+// Result
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_RuntimeEffect__1Result_nGetPtr
+  (KNativePointer ptr) {
+    auto result = reinterpret_cast<SkRuntimeEffect::Result*>(ptr);
+    return reinterpret_cast<KNativePointer>(result->effect.release());
+}
+
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_RuntimeEffect__1Result_nGetError
+  (KNativePointer ptr) {
+    auto result = reinterpret_cast<SkRuntimeEffect::Result*>(ptr);
+    if (result->errorText.isEmpty()) {
+        return static_cast<KNativePointer>(nullptr);
     } else {
-        env->ThrowNew(java::lang::RuntimeException::cls, result.errorText.c_str());
-        return 0;
+        return reinterpret_cast<KNativePointer>(&(result->errorText));
     }
 }
-#endif
 
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_RuntimeEffect__1Result_nDestroy
+  (KNativePointer ptr) {
+    delete reinterpret_cast<SkRuntimeEffect::Result*>(ptr);
+}

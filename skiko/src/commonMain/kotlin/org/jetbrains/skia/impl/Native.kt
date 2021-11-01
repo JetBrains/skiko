@@ -109,8 +109,8 @@ inline fun withResult(result: NativePointerArray, block: (InteropPointer) -> Uni
 }
 
 @Suppress("NON_PUBLIC_CALL_FROM_PUBLIC_INLINE")
-inline fun withStringResult(block: () -> NativePointer): String {
-    val string = ManagedString(block())
+inline fun withStringResult(managed: Boolean = true, block: () -> NativePointer): String {
+    val string = ManagedString(block(), managed)
     return string.toString()
 }
 

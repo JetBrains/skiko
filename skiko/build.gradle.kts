@@ -351,7 +351,20 @@ kotlin {
             }
         }
 
+        val nativeJsMain by creating {
+            dependsOn(commonMain)
+        }
+
+        val nativeJsTest by creating {
+            dependsOn(commonTest)
+        }
+
+        val jsMain by getting {
+            dependsOn(nativeJsMain)
+        }
+
         val jsTest by getting {
+            dependsOn(nativeJsTest)
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
                 implementation(kotlin("test-js"))
@@ -361,13 +374,13 @@ kotlin {
         if (supportNative) {
             // See https://kotlinlang.org/docs/mpp-share-on-platforms.html#configure-the-hierarchical-structure-manually
             val nativeMain by creating {
-                dependsOn(commonMain)
+                dependsOn(nativeJsMain)
                 dependencies {
                     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
                 }
             }
             val nativeTest by creating {
-                dependsOn(commonTest)
+                dependsOn(nativeJsTest)
             }
             if (hostOs == OS.Linux) {
                 val linuxMain by creating {
