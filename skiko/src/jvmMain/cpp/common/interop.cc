@@ -240,8 +240,8 @@ namespace skija {
             ctor = env->GetMethodID(cls, "<init>", "(Ljava/lang/String;I)V");
             tag   = env->GetFieldID(cls, "_tag",   "I");
             value = env->GetFieldID(cls, "value", "I");
-            start = env->GetFieldID(cls, "start", "J");
-            end   = env->GetFieldID(cls, "end",   "J");
+            start = env->GetFieldID(cls, "start", "I");
+            end   = env->GetFieldID(cls, "end",   "I");
         }
 
         void onUnload(JNIEnv* env) {
@@ -255,8 +255,8 @@ namespace skija {
                 skija::AutoLocal<jobject> featureObj(env, env->GetObjectArrayElement(featuresArr, i));
                 features[i] = {static_cast<SkFourByteTag>(env->GetIntField(featureObj.get(), skija::FontFeature::tag)),
                                static_cast<uint32_t>(env->GetIntField(featureObj.get(), skija::FontFeature::value)),
-                               static_cast<size_t>(env->GetLongField(featureObj.get(), skija::FontFeature::start)),
-                               static_cast<size_t>(env->GetLongField(featureObj.get(), skija::FontFeature::end))};
+                               static_cast<size_t>(env->GetIntField(featureObj.get(), skija::FontFeature::start)),
+                               static_cast<size_t>(env->GetIntField(featureObj.get(), skija::FontFeature::end))};
             }
             return features;
         }
