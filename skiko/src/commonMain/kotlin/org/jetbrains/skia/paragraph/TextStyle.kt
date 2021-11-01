@@ -53,7 +53,7 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         set(value) {
             setColor(value)
         }
-    
+
     fun setColor(color: Int): TextStyle {
         Stats.onNativeCall()
         _nSetColor(_ptr, color)
@@ -71,7 +71,7 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         set(value) {
             setForeground(value)
         }
-    
+
     fun setForeground(paint: Paint?): TextStyle {
         return try {
             Stats.onNativeCall()
@@ -120,7 +120,7 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         set(value) {
             setDecorationStyle(value)
         }
-    
+
     fun setDecorationStyle(d: DecorationStyle): TextStyle {
         Stats.onNativeCall()
         _nSetDecorationStyle(
@@ -146,7 +146,7 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         set(value) {
             setFontStyle(value)
         }
-    
+
     fun setFontStyle(s: FontStyle): TextStyle {
         Stats.onNativeCall()
         TextStyle_nSetFontStyle(_ptr, s._value)
@@ -181,7 +181,13 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     val fontFeatures: Array<FontFeature>
         get() = try {
             Stats.onNativeCall()
-            _nGetFontFeatures(_ptr)
+
+            val size = _nGetFontFeaturesSize(_ptr)
+            withResult(IntArray(size * 2)) {
+                _nGetFontFeatures(_ptr, it)
+            }.let {
+                FontFeature.fromInteropEncodedBy2Ints(it)
+            }
         } finally {
             reachabilityBarrier(this)
         }
@@ -213,7 +219,7 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         set(value) {
             setFontSize(value)
         }
-    
+
     fun setFontSize(size: Float): TextStyle {
         Stats.onNativeCall()
         TextStyle_nSetFontSize(_ptr, size)
@@ -253,7 +259,7 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         set(value) {
             setHeight(value)
         }
-    
+
     fun setHeight(height: Float?): TextStyle {
         Stats.onNativeCall()
         if (height == null) TextStyle_nSetHeight(_ptr, false, 0f) else TextStyle_nSetHeight(_ptr, true, height)
@@ -287,7 +293,7 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         set(value) {
             setWordSpacing(value)
         }
-    
+
     fun setWordSpacing(wordSpacing: Float): TextStyle {
         Stats.onNativeCall()
         _nSetWordSpacing(_ptr, wordSpacing)
@@ -305,7 +311,7 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         set(value) {
             setTypeface(value)
         }
-    
+
     fun setTypeface(typeface: Typeface?): TextStyle {
         return try {
             Stats.onNativeCall()
@@ -346,7 +352,7 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         set(value) {
             setBaselineMode(value)
         }
-    
+
     fun setBaselineMode(baseline: BaselineMode): TextStyle {
         Stats.onNativeCall()
         _nSetBaselineMode(_ptr, baseline.ordinal)
@@ -457,7 +463,10 @@ private external fun _nAddShadow(ptr: NativePointer, color: Int, offsetX: Float,
 private external fun _nClearShadows(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetFontFeatures")
-private external fun _nGetFontFeatures(ptr: NativePointer): Array<FontFeature>
+private external fun _nGetFontFeatures(ptr: NativePointer, resultIntsArray: InteropPointer)
+
+@ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetFontFeaturesSize")
+private external fun _nGetFontFeaturesSize(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nAddFontFeature")
 private external fun _nAddFontFeature(ptr: NativePointer, name: String?, value: Int)

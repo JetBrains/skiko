@@ -97,7 +97,7 @@ extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_paragraph_TextStyle
       d.fMode == TextDecorationMode::kGaps,
       d.fColor,
       static_cast<jint>(d.fStyle),
-      d.fThicknessMultiplier); 
+      d.fThicknessMultiplier);
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nSetDecorationStyle
@@ -151,18 +151,21 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_
     instance->resetShadows();
 }
 
-extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nGetFontFeatures
-  (JNIEnv* env, jclass jclass, jlong ptr) {
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nGetFontFeaturesSize
+(JNIEnv* env, jclass jclass, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     std::vector<FontFeature> fontFeatures = instance->getFontFeatures();
-    jobjectArray fontFeaturesArr = env->NewObjectArray((jsize) fontFeatures.size(), skija::FontFeature::cls, nullptr);
-    for (int i = 0; i < fontFeatures.size(); ++i) {
-        const FontFeature& ff = fontFeatures[i];
-        auto featureObj = env->NewObject(skija::FontFeature::cls, skija::FontFeature::ctor, javaString(env, ff.fName), ff.fValue);
-        env->SetObjectArrayElement(fontFeaturesArr, i, featureObj);
-        env->DeleteLocalRef(featureObj);
-    }
-    return fontFeaturesArr;
+    return static_cast<jint>(fontFeatures.size());
+}
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nGetFontFeatures
+  (JNIEnv* env, jclass jclass, jlong ptr, jintArray resultArr) {
+    TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
+    std::vector<FontFeature> fontFeatures = instance->getFontFeatures();
+
+    jint* ints = env->GetIntArrayElements(resultArr, NULL);
+    skija::FontFeature::writeToIntArray(fontFeatures, reinterpret_cast<int*>(ints));
+    env->ReleaseIntArrayElements(resultArr, ints, 0);
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nAddFontFeature

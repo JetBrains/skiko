@@ -54,7 +54,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathEffectKt__1nMakeC
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PathEffectKt__1nMakeDash
-  (JNIEnv* env, jclass jclass, jfloatArray intervalsArray, jfloat phase) {
+  (JNIEnv* env, jclass jclass, jfloatArray intervalsArray, jint _count, jfloat phase) {
     jsize len = env->GetArrayLength(intervalsArray);
     jfloat* intervals = env->GetFloatArrayElements(intervalsArray, 0);
     SkPathEffect* ptr = SkDashPathEffect::Make(intervals, len, phase).release();

@@ -5,7 +5,7 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 
 class PathEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
-        fun makePath1D(path: Path?, advance: Float, phase: Float, style: Style): PathEffect {
+        fun makePath1D(path: Path, advance: Float, phase: Float, style: Style): PathEffect {
             return try {
                 Stats.onNativeCall()
                 PathEffect(
@@ -21,7 +21,7 @@ class PathEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
-        fun makePath2D(matrix: Matrix33, path: Path?): PathEffect {
+        fun makePath2D(matrix: Matrix33, path: Path): PathEffect {
             return try {
                 Stats.onNativeCall()
                 PathEffect(
@@ -51,11 +51,11 @@ class PathEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             return PathEffect(_nMakeCorner(radius))
         }
 
-        fun makeDash(intervals: FloatArray?, phase: Float): PathEffect {
+        fun makeDash(intervals: FloatArray, phase: Float): PathEffect {
             Stats.onNativeCall()
             return PathEffect(
                 interopScope {
-                    _nMakeDash(toInterop(intervals), phase)
+                    _nMakeDash(toInterop(intervals), intervals.size, phase)
                 }
             )
         }
@@ -121,7 +121,7 @@ private external fun _nMakeLine2D(width: Float, matrix: InteropPointer): NativeP
 private external fun _nMakeCorner(radius: Float): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_PathEffect__1nMakeDash")
-private external fun _nMakeDash(intervals: InteropPointer, phase: Float): NativePointer
+private external fun _nMakeDash(intervals: InteropPointer, count: Int, phase: Float): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_PathEffect__1nMakeDiscrete")
 private external fun _nMakeDiscrete(segLength: Float, dev: Float, seed: Int): NativePointer

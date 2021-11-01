@@ -1,5 +1,7 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.InteropPointer
+import org.jetbrains.skia.impl.withResult
 import kotlin.jvm.JvmStatic
 import kotlin.math.abs
 
@@ -32,14 +34,18 @@ class RRect internal constructor(l: Float, t: Float, r: Float, b: Float, val rad
     }
 
     override fun toString(): String {
-        return "RRect(_left=$left, _top=$top, _right=$right, _bottom=$bottom, _radii=$radii)"
+        return "RRect(_left=$left, _top=$top, _right=$right, _bottom=$bottom, _radii=${radii.joinToString()})"
     }
 
     override fun equals(other: Any?): Boolean {
         if (other === this) return true
         if (other !is RRect) return false
         if (!super.equals(other)) return false
-        return radii.contentEquals(other.radii)
+        return if (radii.size == other.radii.size) {
+            radii.contentEquals(other.radii)
+        } else {
+            normalizeRadii(radii).contentEquals(normalizeRadii(other.radii))
+        }
     }
 
     override fun hashCode(): Int {
@@ -146,5 +152,27 @@ class RRect internal constructor(l: Float, t: Float, r: Float, b: Float, val rad
         fun makePillXYWH(l: Float, t: Float, w: Float, h: Float): RRect {
             return RRect(l, t, l + w, t + h, floatArrayOf(minOf(w, h) / 2.0f))
         }
+
+        internal fun fromInteropPointer(block: (InteropPointer) -> Unit): RRect {
+            val result = withResult(FloatArray(12 /* 4 dimensions + 4 radii * 2 */), block)
+            return RRect(result[0], result[1], result[2], result[3], result.copyOfRange(4, 12))
+        }
+
+        internal fun fromInteropPointerNullable(block: (InteropPointer) -> Boolean): RRect? {
+            var result = true
+            val rect = fromInteropPointer { result = block(it) }
+            return if (result) { rect } else { null }
+        }
+    }
+}
+
+private fun normalizeRadii(radii: FloatArray): FloatArray {
+    return when (radii.size) {
+        0 -> FloatArray(8) { 0.0f }
+        1 -> FloatArray(8) { radii[0] }      // All are the same
+        2 -> FloatArray(8) { radii[it % 2] } // Corresponding values are same for each corner
+        4 -> FloatArray(8) { radii[it / 2] } // Horizontal and vertical are same for each corner
+        8 -> radii
+        else -> throw Error("illegal radii array")
     }
 }

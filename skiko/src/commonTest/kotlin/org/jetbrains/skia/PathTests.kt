@@ -1,8 +1,7 @@
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.use
-import org.jetbrains.skiko.tests.SkipJsTarget
-import org.jetbrains.skiko.tests.SkipNativeTarget
+import org.jetbrains.skia.tests.assertContentCloseEnough
 import kotlin.test.Test
 import kotlin.test.assertTrue
 import kotlin.test.assertFalse
@@ -69,8 +68,6 @@ class PathTests {
 
 
     @Test
-    @SkipJsTarget
-    @SkipNativeTarget
     fun isShapeTest() {
         for (dir in PathDirection.values()) {
             for (start in 0..3) {
@@ -124,8 +121,6 @@ class PathTests {
     }
 
     @Test
-    @SkipJsTarget
-    @SkipNativeTarget
     fun checksTest() {
         Path().lineTo(40f, 40f).lineTo(40f, 0f).lineTo(0f, 40f).lineTo(0f, 0f).closePath().use { p ->
             assertFalse(p.isEmpty)
@@ -174,8 +169,6 @@ class PathTests {
     }
 
     @Test
-    @SkipJsTarget
-    @SkipNativeTarget
     fun swapTest() {
         Path().lineTo(40f, 40f).lineTo(40f, 0f).lineTo(0f, 40f).lineTo(0f, 0f).closePath().use { p1 ->
             Path().lineTo(0f, 0f).lineTo(20f, 20f).use { p2 ->
@@ -187,8 +180,6 @@ class PathTests {
     }
 
     @Test
-    @SkipJsTarget
-    @SkipNativeTarget
     fun containsTest() {
         Path().addRRect(RRect.makeLTRB(10f, 20f, 54f, 120f, 10f, 20f)).use { p ->
             assertTrue(p.conservativelyContainsRect(Rect.makeLTRB(10f, 40f, 54f, 80f)))
@@ -202,8 +193,6 @@ class PathTests {
     }
 
     @Test
-    @SkipJsTarget
-    @SkipNativeTarget
     fun utilsTest() {
         assertFalse(Path.isLineDegenerate(Point(0f, 0f), Point(10f, 0f), false))
         assertTrue(Path.isLineDegenerate(Point(0f, 0f), Point(0f, 0f), true))
@@ -213,11 +202,11 @@ class PathTests {
         assertTrue(Path.isQuadDegenerate(Point(0f, 0f), Point(0f, 0f), Point(0f, 0f), false))
         assertFalse(Path.isCubicDegenerate(Point(0f, 0f), Point(10f, 0f), Point(0f, 0f), Point(0f, 0f), false))
         assertTrue(Path.isCubicDegenerate(Point(0f, 0f), Point(0f, 0f), Point(0f, 0f), Point(0f, 0f), false))
-        assertContentEquals(
+        assertContentCloseEnough(
             arrayOf(Point(0f, 20f), Point(6.666667f, 13.333334f)),
             Path.convertConicToQuads(Point(0f, 20f), Point(20f, 0f), Point(40f, 20f), 0.5f, 1)
         )
-        assertContentEquals(
+        assertContentCloseEnough(
             arrayOf(
                 Point(0f, 20f),
                 Point(3.0940108f, 16.905989f),
@@ -238,12 +227,15 @@ class PathTests {
     }
 
     @Test
-    @SkipJsTarget
-    @SkipNativeTarget
     fun serializeTest() {
         Path().lineTo(40f, 40f).lineTo(40f, 0f).lineTo(0f, 40f).lineTo(0f, 0f).closePath().use { p ->
             val p2: Path = Path.makeFromBytes(p.serializeToBytes())
             assertEquals(p, p2)
         }
+    }
+
+    @Test
+    fun svgTest() {
+        Path.makeFromSVGString("M0 0 L10 10 Z").use {  }
     }
 }

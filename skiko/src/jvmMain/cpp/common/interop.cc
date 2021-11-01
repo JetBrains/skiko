@@ -7,6 +7,7 @@
 #include "shaper/interop.hh"
 #include "src/utils/SkUTF.h"
 #include "paragraph/interop.hh"
+#include "TextStyle.h"
 
 namespace java {
     namespace io {
@@ -239,8 +240,8 @@ namespace skija {
             ctor = env->GetMethodID(cls, "<init>", "(Ljava/lang/String;I)V");
             tag   = env->GetFieldID(cls, "_tag",   "I");
             value = env->GetFieldID(cls, "value", "I");
-            start = env->GetFieldID(cls, "start", "J");
-            end   = env->GetFieldID(cls, "end",   "J");
+            start = env->GetFieldID(cls, "start", "I");
+            end   = env->GetFieldID(cls, "end",   "I");
         }
 
         void onUnload(JNIEnv* env) {
@@ -254,10 +255,47 @@ namespace skija {
                 skija::AutoLocal<jobject> featureObj(env, env->GetObjectArrayElement(featuresArr, i));
                 features[i] = {static_cast<SkFourByteTag>(env->GetIntField(featureObj.get(), skija::FontFeature::tag)),
                                static_cast<uint32_t>(env->GetIntField(featureObj.get(), skija::FontFeature::value)),
-                               static_cast<size_t>(env->GetLongField(featureObj.get(), skija::FontFeature::start)),
-                               static_cast<size_t>(env->GetLongField(featureObj.get(), skija::FontFeature::end))};
+                               static_cast<size_t>(env->GetIntField(featureObj.get(), skija::FontFeature::start)),
+                               static_cast<size_t>(env->GetIntField(featureObj.get(), skija::FontFeature::end))};
             }
             return features;
+        }
+
+        // every feature is encoded as 4 ints
+        std::vector<SkShaper::Feature> fromIntArray(JNIEnv* env, jintArray array, jint featuresLen) {
+            jint* ints = env->GetIntArrayElements(array, NULL);
+            std::vector<SkShaper::Feature> features(featuresLen);
+            for (int i = 0; i < featuresLen; ++i) {
+                int j = i * 4;
+                features[i] = {
+                    static_cast<SkFourByteTag>(ints[j]),
+                    static_cast<uint32_t>(ints[j + 1]),
+                    static_cast<size_t>(ints[j + 2]),
+                    static_cast<size_t>(ints[j + 3])
+                };
+            }
+            env->ReleaseIntArrayElements(array, ints, 0);
+
+            return features;
+        }
+
+        // every FontFeature is represented by 2 ints in resultArr
+        void writeToIntArray(std::vector<skia::textlayout::FontFeature> features, int* resultArr) {
+            for (int i = 0; i < features.size(); ++i) {
+                int j = i * 2;
+                resultArr[j] = skija::FontFeature::FourByteTag::fromString(features[i].fName);
+                resultArr[j + 1] = features[i].fValue;;
+            }
+        }
+
+        namespace FourByteTag {
+            int fromString(SkString str) {
+                int code1 = (int)str[0];
+                int code2 = (int)str[1];
+                int code3 = (int)str[2];
+                int code4 = (int)str[3];
+                return (code1 & 0xFF << 24) | (code2 & 0xFF << 16) | (code3 & 0xFF << 8) | (code4 & 0xFF);
+            }
         }
     }
 
@@ -541,6 +579,15 @@ namespace skija {
             }
             return res;
         }
+
+        void copyToInterop(JNIEnv* env, const SkPoint& point, jfloatArray pointer) {
+            jfloat* xy = pointer == nullptr ? nullptr : env->GetFloatArrayElements(pointer, 0);
+            if (xy != nullptr) {
+                xy[0] = point.x();
+                xy[1] = point.y();
+                env->ReleaseFloatArrayElements(pointer, xy, 0);
+            }
+        }
     }
 
     namespace PaintFilterCanvas {
@@ -620,6 +667,17 @@ namespace skija {
 
         jobject fromSkRect(JNIEnv* env, const SkRect& rect) {
             return fromLTRB(env, rect.fLeft, rect.fTop, rect.fRight, rect.fBottom);
+        }
+
+        void copyToInterop(JNIEnv* env, const SkRect& rect, jfloatArray pointer) {
+            jfloat* ltrb = pointer == nullptr ? nullptr : env->GetFloatArrayElements(pointer, 0);
+            if (ltrb != nullptr) {
+                ltrb[0] = rect.left();
+                ltrb[1] = rect.top();
+                ltrb[2] = rect.right();
+                ltrb[3] = rect.bottom();
+                env->ReleaseFloatArrayElements(pointer, ltrb, 0);
+            }
         }
     }
 
@@ -722,6 +780,27 @@ namespace skija {
             }
 
             return nullptr;
+        }
+
+        void copyToInterop(JNIEnv* env, const SkRRect& rect, jfloatArray pointer) {
+            jfloat* ltrb = pointer == nullptr ? nullptr : env->GetFloatArrayElements(pointer, 0);
+            if (ltrb != nullptr) {
+                ltrb[0] = rect.rect().left();
+                ltrb[1] = rect.rect().top();
+                ltrb[2] = rect.rect().right();
+                ltrb[3] = rect.rect().bottom();
+
+                ltrb[4] = rect.radii(SkRRect::kUpperLeft_Corner).x();
+                ltrb[5] = rect.radii(SkRRect::kUpperLeft_Corner).y();
+                ltrb[6] = rect.radii(SkRRect::kUpperRight_Corner).x();
+                ltrb[7] = rect.radii(SkRRect::kUpperRight_Corner).y();
+                ltrb[8] = rect.radii(SkRRect::kLowerRight_Corner).x();
+                ltrb[9] = rect.radii(SkRRect::kLowerRight_Corner).y();
+                ltrb[10] = rect.radii(SkRRect::kLowerLeft_Corner).x();
+                ltrb[11] = rect.radii(SkRRect::kLowerLeft_Corner).y();
+
+                env->ReleaseFloatArrayElements(pointer, ltrb, 0);
+            }
         }
     }
 
