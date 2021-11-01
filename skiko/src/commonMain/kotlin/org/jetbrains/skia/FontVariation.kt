@@ -31,13 +31,16 @@ class FontVariation(val _tag: Int, val value: Float) {
 
         internal val _splitPattern = compilePattern("\\s+")
 
-        internal val _variationPattern = compilePattern("(?<tag>[a-z0-9]{4})=(?<value>\\d+)")
+        internal val _variationPattern = compilePattern("([a-z0-9]{4})=(\\d+)")
+
+        private val groupsIx = mapOf("tag" to 1, "value" to 2)
 
         fun parseOne(s: String): FontVariation {
             val m = _variationPattern.matcher(s)
             require(m.matches()) { "Can’t parse FontVariation: $s" }
-            val value = m.group("value")!!.toFloat()
-            return FontVariation(m.group("tag")!!, value)
+            val value = m.group(groupsIx["value"]!!)!!.toFloat()
+            val tag = m.group(groupsIx["tag"]!!)!!
+            return FontVariation(tag, value)
         }
 
         fun parse(str: String): Array<FontVariation> {

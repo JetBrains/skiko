@@ -78,16 +78,20 @@ class FontFeature(val _tag: Int, val value: Int, val start: UInt, val end: UInt)
         val EMPTY = arrayOfNulls<FontFeature>(0)
         val _splitPattern = compilePattern("\\s+")
         val _featurePattern =
-            compilePattern("(?<sign>[-+])?(?<tag>[a-z0-9]{4})(?:\\[(?<start>\\d+)?:(?<end>\\d+)?\\])?(?:=(?<value>\\d+))?")
+            compilePattern("([-+])?([a-z0-9]{4})(?:\\[(\\d+)?:(\\d+)?\\])?(?:=(\\d+))?")
+
+        private val groupsIx = mapOf(
+            "sign" to 1, "tag" to 2, "start" to 3, "end" to 4, "value" to 5
+        )
 
         fun parseOne(s: String): FontFeature {
             val m = _featurePattern.matcher(s)
             require(m.matches()) { "Can’t parse FontFeature: $s" }
-            val value = if (m.group("value") != null) m.group("value")!!
-                .toInt() else if (m.group("sign") == null) 1 else if ("-" == m.group("sign")) 0 else 1
-            val start = if (m.group("start") == null) 0u else m.group("start")!!.toUInt()
-            val end = if (m.group("end") == null) UInt.MAX_VALUE else m.group("end")!!.toUInt()
-            return FontFeature(m.group("tag")!!, value, start, end)
+            val value = if (m.group(groupsIx["value"]!!) != null) m.group(groupsIx["value"]!!)!!
+                .toInt() else if (m.group(groupsIx["sign"]!!) == null) 1 else if ("-" == m.group(groupsIx["sign"]!!)) 0 else 1
+            val start = if (m.group(groupsIx["start"]!!) == null) 0u else m.group(groupsIx["start"]!!)!!.toUInt()
+            val end = if (m.group(groupsIx["end"]!!) == null) UInt.MAX_VALUE else m.group(groupsIx["end"]!!)!!.toUInt()
+            return FontFeature(m.group(groupsIx["tag"]!!)!!, value, start, end)
         }
 
         fun parse(str: String): Array<FontFeature?> {

@@ -14,7 +14,9 @@ expect class Pattern {
 }
 
 expect class Matcher {
+    @Deprecated("Not supported in k/n. Consider using group(ix: Int)")
     fun group(name: String): String?
+    fun group(ix: Int): String?
     fun matches(): Boolean
 }
 
