@@ -164,7 +164,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_
     std::vector<FontFeature> fontFeatures = instance->getFontFeatures();
 
     jint* ints = env->GetIntArrayElements(resultArr, NULL);
-    skija::FontFeature::writeToIntArray(fontFeatures, ints);
+    skija::FontFeature::writeToIntArray(fontFeatures, reinterpret_cast<int*>(ints));
     env->ReleaseIntArrayElements(resultArr, ints, 0);
 }
 
