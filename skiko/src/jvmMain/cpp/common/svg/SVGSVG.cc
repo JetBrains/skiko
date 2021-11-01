@@ -7,50 +7,51 @@
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_1nGetX
   (JNIEnv* env, jclass jclass, jlong ptr, jintArray jresult) {
     SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>(static_cast<uintptr_t>(ptr));
-    auto x = instance->getX();
-    jint result[2] = { rawBits(x.value()), (jint)x.unit() };
-    env->SetIntArrayRegion(jresult, 0, 2, result);
+    return skija::svg::SVGLength::copyToInterop(env, instance->getX(), jresult);
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_1nGetY
   (JNIEnv* env, jclass jclass, jlong ptr, jintArray jresult) {
     SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>(static_cast<uintptr_t>(ptr));
-    auto y = instance->getY();
-    jint result[2] = { rawBits(y.value()), (jint)y.unit() };
-    env->SetIntArrayRegion(jresult, 0, 2, result);
+    return skija::svg::SVGLength::copyToInterop(env, instance->getY(), jresult);
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_1nGetWidth
-  (JNIEnv* env, jclass jclass, jlong ptr) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_1nGetWidth
+  (JNIEnv* env, jclass jclass, jlong ptr, jintArray jresult) {
     SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>(static_cast<uintptr_t>(ptr));
-    return skija::svg::SVGLength::toJava(env, instance->getWidth());
+    return skija::svg::SVGLength::copyToInterop(env, instance->getWidth(), jresult);
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_1nGetHeight
-  (JNIEnv* env, jclass jclass, jlong ptr) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_1nGetHeight
+  (JNIEnv* env, jclass jclass, jlong ptr, jintArray jresult) {
     SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>(static_cast<uintptr_t>(ptr));
-    return skija::svg::SVGLength::toJava(env, instance->getHeight());
+    return skija::svg::SVGLength::copyToInterop(env, instance->getHeight(), jresult);
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_1nGetPreserveAspectRatio
-  (JNIEnv* env, jclass jclass, jlong ptr) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_1nGetPreserveAspectRatio
+  (JNIEnv* env, jclass jclass, jlong ptr, jintArray jresult) {
     SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>(static_cast<uintptr_t>(ptr));
-    return skija::svg::SVGPreserveAspectRatio::toJava(env, instance->getPreserveAspectRatio());
+    return skija::svg::SVGPreserveAspectRatio::copyToInterop(env, instance->getPreserveAspectRatio(), jresult);
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_1nGetViewBox
-  (JNIEnv* env, jclass jclass, jlong ptr) {
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_1nGetViewBox
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray result) {
     SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>(static_cast<uintptr_t>(ptr));
     SkTLazy<SkSVGViewBoxType> viewBox = instance->getViewBox();
-    return viewBox.isValid() ? skija::Rect::fromSkRect(env, *viewBox.get()) : nullptr;
+    if (viewBox.isValid()) {
+        skija::Rect::copyToInterop(env, *viewBox.get(), result);
+        return true;
+    } else {
+        return false;
+    }
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_1nGetIntrinsicSize
-  (JNIEnv* env, jclass jclass, jlong ptr, float width, float height, float dpi) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_1nGetIntrinsicSize
+  (JNIEnv* env, jclass jclass, jlong ptr, float width, float height, float dpi, jfloatArray result) {
     SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>(static_cast<uintptr_t>(ptr));
     SkSVGLengthContext lc({width, height}, dpi);
     SkSize size = instance->intrinsicSize(lc);
-    return skija::Point::fromSkPoint(env, {size.width(), size.height()});
+    skija::Point::copyToInterop(env, {size.width(), size.height()}, result);
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_svg_SVGSVGKt_SVGSVG_1nSetX

@@ -1,6 +1,15 @@
 package org.jetbrains.skia.svg
 
+import org.jetbrains.skia.impl.InteropPointer
+import org.jetbrains.skia.impl.withResult
+
 class SVGLength(val value: Float, val unit: SVGLengthUnit) {
+    companion object {
+        internal fun fromInterop(block: (InteropPointer) -> Unit)
+            = withResult(IntArray(2), block).let {
+                SVGLength(Float.fromBits(it[0]), it[1])
+            }
+    }
 
     internal constructor(value: Float, unit: Int) : this(value, SVGLengthUnit.values()[unit])
 

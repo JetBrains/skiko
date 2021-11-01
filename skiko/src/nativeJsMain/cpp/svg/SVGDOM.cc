@@ -24,21 +24,12 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_svg_SVGDOM__1nGetRoot
     return reinterpret_cast<KNativePointer>(root);
 }
 
-
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_svg_SVGDOM__1nGetContainerSize
-  (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_svg_SVGDOM__1nGetContainerSize");
-}
-     
-#if 0 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_svg_SVGDOM__1nGetContainerSize
-  (KNativePointer ptr) {
+SKIKO_EXPORT void org_jetbrains_skia_svg_SVGDOM__1nGetContainerSize
+  (KNativePointer ptr, KInteropPointer dst) {
     SkSVGDOM* instance = reinterpret_cast<SkSVGDOM*>((ptr));
     const SkSize& size = instance->containerSize();
-    return skija::Point::make(env, size.fWidth, size.fHeight);
+    skija::Point::copyToInterop({size.fWidth, size.fHeight}, dst);
 }
-#endif
-
 
 SKIKO_EXPORT void org_jetbrains_skia_svg_SVGDOM__1nSetContainerSize
   (KNativePointer ptr, KFloat width, KFloat height) {

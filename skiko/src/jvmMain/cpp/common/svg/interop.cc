@@ -1,4 +1,5 @@
 #include <jni.h>
+#include "../interop.hh"
 #include "interop.hh"
 
 namespace skija {
@@ -20,6 +21,11 @@ namespace skija {
             jobject toJava(JNIEnv* env, SkSVGLength length) {
                 return env->NewObject(cls, ctor, length.value(), static_cast<jint>(length.unit()));
             }
+
+            void copyToInterop(JNIEnv* env, const SkSVGLength& length, jintArray dst) {
+                jint result[2] = { rawBits(length.value()), static_cast<jint>(length.unit()) };
+                env->SetIntArrayRegion(dst, 0, 2, result);
+            }
         }
 
         namespace SVGPreserveAspectRatio {
@@ -38,6 +44,11 @@ namespace skija {
 
             jobject toJava(JNIEnv* env, SkSVGPreserveAspectRatio ratio) {
                 return env->NewObject(cls, ctor, static_cast<jint>(ratio.fAlign), static_cast<jint>(ratio.fScale));
+            }
+
+            void copyToInterop(JNIEnv* env, const SkSVGPreserveAspectRatio& aspectRatio, jintArray dst) {
+                jint data[2] { static_cast<jint>(aspectRatio.fAlign), static_cast<jint>(aspectRatio.fScale) };
+                env->SetIntArrayRegion(dst, 0, 2, data);
             }
         }
 

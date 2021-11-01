@@ -19,6 +19,7 @@
 #include "SkShaper.h"
 #include "SkString.h"
 #include "SkSurfaceProps.h"
+#include "SkSVGTypes.h"
 #include "TextStyle.h"
 
 #include "types.h"
@@ -91,6 +92,16 @@ namespace skija {
 
         namespace FourByteTag {
             int fromString(SkString str);
+        }
+    }
+
+    namespace svg {
+        namespace SVGLength {
+            void copyToInterop(const SkSVGLength& length, KInteropPointer dst);
+        }
+
+        namespace SVGPreserveAspectRatio {
+            void copyToInterop(const SkSVGPreserveAspectRatio& aspectRatio, KInteropPointer dst);
         }
     }
 }

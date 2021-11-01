@@ -10,6 +10,7 @@ namespace skija {
             void onLoad(JNIEnv* env);
             void onUnload(JNIEnv* env);
             jobject toJava(JNIEnv* env, SkSVGLength length);
+            void copyToInterop(JNIEnv* env, const SkSVGLength& length, jintArray dst);
         }
 
         namespace SVGPreserveAspectRatio {
@@ -18,6 +19,7 @@ namespace skija {
             void onLoad(JNIEnv* env);
             void onUnload(JNIEnv* env);
             jobject toJava(JNIEnv* env, SkSVGPreserveAspectRatio ratio);
+            void copyToInterop(JNIEnv* env, const SkSVGPreserveAspectRatio& aspectRatio, jintArray dst);
         }
 
         void onLoad(JNIEnv* env);
