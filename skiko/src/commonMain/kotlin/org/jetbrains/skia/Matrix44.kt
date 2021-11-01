@@ -1,5 +1,8 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.InteropPointer
+import org.jetbrains.skia.impl.withResult
+
 /**
  *
  * 4x4 matrix used by SkCanvas and other parts of Skia.
@@ -53,6 +56,11 @@ class Matrix44(vararg mat: Float) {
 
     companion object {
         val IDENTITY = Matrix44(1f, 0f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1f)
+
+        internal fun fromInteropPointer(block: (InteropPointer) -> Unit): Matrix44 {
+            val result = withResult(FloatArray(16), block)
+            return Matrix44(*result)
+        }
     }
 
     /**

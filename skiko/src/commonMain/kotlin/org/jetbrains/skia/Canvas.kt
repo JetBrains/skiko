@@ -1126,8 +1126,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     val localToDevice: Matrix44
         get() = try {
             Stats.onNativeCall()
-            val mat = withResult(FloatArray(16)) { _nGetLocalToDevice(_ptr, it) }
-            Matrix44(*mat)
+            Matrix44.fromInteropPointer { interopPointer -> _nGetLocalToDevice(_ptr, interopPointer) }
         } finally {
             reachabilityBarrier(this)
         }
