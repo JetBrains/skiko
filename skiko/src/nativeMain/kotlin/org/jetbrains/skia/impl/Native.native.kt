@@ -59,6 +59,7 @@ actual class InteropScope actual constructor() {
         return if (string != null) {
             // encodeToByteArray encodes to utf8
             val utf8 = string.encodeToByteArray()
+            // TODO Remove array copy, use `skString(data, length)` instead of `skString(data)`
             val pinned = utf8.copyOf(utf8.size + 1).pin()
             elements.add(pinned)
             val result = pinned.addressOf(0).rawValue
