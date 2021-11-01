@@ -60,7 +60,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_RuntimeEffect__1Result_nGetError
     }
 }
 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_RuntimeEffect__1Result_nDestroy
+SKIKO_EXPORT void org_jetbrains_skia_RuntimeEffect__1Result_nDestroy
   (KNativePointer ptr) {
     delete reinterpret_cast<SkRuntimeEffect::Result*>(ptr);
 }

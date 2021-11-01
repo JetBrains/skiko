@@ -7,12 +7,16 @@ class RuntimeEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
         fun makeForShader(sksl: String): RuntimeEffect {
             Stats.onNativeCall()
-            return makeFromResultPtr(_nMakeForShader(sksl))
+            return interopScope {
+                makeFromResultPtr(_nMakeForShader(toInterop(sksl)))
+            }
         }
 
         fun makeForColorFilter(sksl: String): RuntimeEffect {
             Stats.onNativeCall()
-            return makeFromResultPtr(_nMakeForColorFilter(sksl))
+            return interopScope {
+                makeFromResultPtr(_nMakeForColorFilter(toInterop(sksl)))
+            }
         }
 
         init {
@@ -46,10 +50,10 @@ private external fun _nMakeShader(
 
 
 @ExternalSymbolName("org_jetbrains_skia_RuntimeEffect__1nMakeForShader")
-private external fun _nMakeForShader(sksl: String?): NativePointer
+private external fun _nMakeForShader(sksl: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_RuntimeEffect__1nMakeForColorFilter")
-private external fun _nMakeForColorFilter(sksl: String?): NativePointer
+private external fun _nMakeForColorFilter(sksl: InteropPointer): NativePointer
 
 //  The functions below can be used only in JS and native targets
 
