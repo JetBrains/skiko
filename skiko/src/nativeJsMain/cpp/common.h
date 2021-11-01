@@ -21,6 +21,10 @@
 #include "SkSurfaceProps.h"
 #include "SkSVGTypes.h"
 #include "TextStyle.h"
+#include "SkFont.h"
+#include "SkShaper.h"
+#include "SkLoadICU.h"
+#include "unicode/ubrk.h"
 
 #include "types.h"
 
@@ -93,6 +97,17 @@ namespace skija {
         namespace FourByteTag {
             int fromString(SkString str);
         }
+    }
+
+    namespace shaper {
+        namespace ShapingOptions {
+            std::vector<SkShaper::Feature> getFeaturesFromIntsArray(KInt* featuresArray, KInt featuresLen) {
+                return skija::FontFeature::fromIntArray(featuresArray, featuresLen);
+            }
+        }
+
+        using ICUUText = std::unique_ptr<UText, SkFunctionWrapper<decltype(utext_close), utext_close>>;
+        std::shared_ptr<UBreakIterator> graphemeBreakIterator(SkString& text);
     }
 
     namespace AnimationFrameInfo {
