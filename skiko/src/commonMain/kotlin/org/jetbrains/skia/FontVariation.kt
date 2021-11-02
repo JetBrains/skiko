@@ -31,18 +31,23 @@ class FontVariation(val _tag: Int, val value: Float) {
 
         internal val _splitPattern = compilePattern("\\s+")
 
-        internal val _variationPattern = compilePattern("(?<tag>[a-z0-9]{4})=(?<value>\\d+)")
+        internal val _variationPattern = compilePattern("([a-z0-9]{4})=(\\d+)")
+
+        // We can't use named groups (not supported in k/n), so we use numeric groups.
+        // These constants are group indexes of _variationPattern:
+        private const val tagIx = 1
+        private const val valueIx = 2
 
         fun parseOne(s: String): FontVariation {
             val m = _variationPattern.matcher(s)
             require(m.matches()) { "Can’t parse FontVariation: $s" }
-            val value = m.group("value")!!.toFloat()
-            return FontVariation(m.group("tag")!!, value)
+            val value = m.group(valueIx)!!.toFloat()
+            val tag = m.group(tagIx)!!
+            return FontVariation(tag, value)
         }
 
         fun parse(str: String): Array<FontVariation> {
-            return _splitPattern.split(str)!!.map { s -> parseOne(s!!) }
-                .toTypedArray()
+            return _splitPattern.split(str).map { s -> parseOne(s) }.toTypedArray()
         }
     }
 }

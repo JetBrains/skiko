@@ -9,12 +9,13 @@ expect fun defaultLanguageTag(): String
 expect abstract class OutputStream
 
 expect class Pattern {
-    fun split(input: CharSequence): Array<String?>?
+    fun split(input: CharSequence): Array<String>
     fun matcher(input: CharSequence): Matcher
 }
 
 expect class Matcher {
-    fun group(name: String): String?
+    // Named groups are not supported in k/n. That's why we can use only numeric groups
+    fun group(ix: Int): String?
     fun matches(): Boolean
 }
 
