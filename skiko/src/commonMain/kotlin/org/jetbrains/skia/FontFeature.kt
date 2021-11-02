@@ -80,22 +80,26 @@ class FontFeature(val _tag: Int, val value: Int, val start: UInt, val end: UInt)
         val _featurePattern =
             compilePattern("([-+])?([a-z0-9]{4})(?:\\[(\\d+)?:(\\d+)?\\])?(?:=(\\d+))?")
 
-        private val groupsIx = mapOf(
-            "sign" to 1, "tag" to 2, "start" to 3, "end" to 4, "value" to 5
-        )
+        // We can't use named groups (not supported in k/n), so we use numeric groups.
+        // These constants are group indexes of _featurePattern:
+        private const val signIx = 1
+        private const val tagIx = 2
+        private const val startIx = 3
+        private const val endIx = 4
+        private const val valueIx = 5
 
         fun parseOne(s: String): FontFeature {
             val m = _featurePattern.matcher(s)
             require(m.matches()) { "Can’t parse FontFeature: $s" }
-            val value = if (m.group(groupsIx["value"]!!) != null) m.group(groupsIx["value"]!!)!!
-                .toInt() else if (m.group(groupsIx["sign"]!!) == null) 1 else if ("-" == m.group(groupsIx["sign"]!!)) 0 else 1
-            val start = if (m.group(groupsIx["start"]!!) == null) 0u else m.group(groupsIx["start"]!!)!!.toUInt()
-            val end = if (m.group(groupsIx["end"]!!) == null) UInt.MAX_VALUE else m.group(groupsIx["end"]!!)!!.toUInt()
-            return FontFeature(m.group(groupsIx["tag"]!!)!!, value, start, end)
+            val value = if (m.group(valueIx) != null) m.group(valueIx)!!
+                .toInt() else if (m.group(signIx) == null) 1 else if ("-" == m.group(signIx)) 0 else 1
+            val start = if (m.group(startIx) == null) 0u else m.group(startIx)!!.toUInt()
+            val end = if (m.group(endIx) == null) GLOBAL_END else m.group(endIx)!!.toUInt()
+            return FontFeature(m.group(tagIx)!!, value, start, end)
         }
 
         fun parse(str: String): Array<FontFeature?> {
-            return _splitPattern.split(str)?.map { s -> parseOne(s!!) }?.toTypedArray() ?: emptyArray()
+            return _splitPattern.split(str).map { s -> parseOne(s) }.toTypedArray()
         }
 
         internal fun InteropScope.toInterop(fontFeatures: Array<FontFeature>?): InteropPointer {
