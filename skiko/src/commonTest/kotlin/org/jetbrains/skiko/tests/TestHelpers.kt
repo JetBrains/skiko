@@ -37,6 +37,19 @@ class TestHelpers {
         }
     }
 
+    fun writeArrayOfIntArrays(array: Array<IntArray>): NativePointer {
+        require(array.size == 3) {
+            "For testing purposes, the length of the array should be 3"
+        }
+        return interopScope {
+            _nWriteArraysOfInts(
+                toInteropForArraysOfPointers(
+                    array.map { toInterop(it) }.toTypedArray()
+                )
+            )
+        }
+    }
+
     init {
         Library.staticLoad()
     }
@@ -56,6 +69,9 @@ private external fun _nFillIntArrayOf5(interopPointer: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skiko_tests_TestHelpers__1nFillDoubleArrayOf5")
 private external fun _nFillDoubleArrayOf5(interopPointer: InteropPointer)
+
+@ExternalSymbolName("org_jetbrains_skiko_tests_TestHelpers__1nWriteArraysOfInts")
+private external fun _nWriteArraysOfInts(interopPointer: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skiko_tests_TestHelpers__nStringByIndex")
 private external fun _nStringByIndex(index: Int): NativePointer

@@ -190,6 +190,10 @@ actual class InteropScope actual constructor() {
         return result
     }
 
+    actual fun toInteropForArraysOfPointers(interopPointers: Array<InteropPointer>): InteropPointer {
+        return toInterop(interopPointers.toIntArray())
+    }
+
     actual fun release()  {
         elements.forEach {
             _free(it)

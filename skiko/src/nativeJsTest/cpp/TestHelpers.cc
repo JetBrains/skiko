@@ -54,3 +54,20 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__nStringByInde
         default: TODO("unknown");
     }
 }
+
+SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nWriteArraysOfInts(KNativePointer* arrayOfIntArray) {
+    // hardcoded length is ok for testing purposes
+    size_t len = 3; //(*env)->GetArrayLength(env, arrayOfIntArray);
+
+    int *mem = reinterpret_cast<int *>(malloc(3 * 4 * 4)); // 3 arrays. each array consists of 4 ints
+
+    for (int i = 0; i < len; i++) {
+        KNativePointer* array = reinterpret_cast<KNativePointer*>(arrayOfIntArray[i]);
+        int *ints = reinterpret_cast<int*>(array);
+        for (int j = 0; j < 4; j++) {
+            mem[(i * 4) + j] = ints[j];
+        }
+    }
+
+    return reinterpret_cast<KNativePointer>(mem);
+}
