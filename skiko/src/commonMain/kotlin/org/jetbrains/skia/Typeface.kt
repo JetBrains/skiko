@@ -101,12 +101,14 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         get() = try {
             Stats.onNativeCall()
             val axisCount = _nGetVariationAxesCount(_ptr)
+            println("AXIS COUNT => ${axisCount} => ${axisCount * 4}")
             if (axisCount == 0) {
                 null
             } else {
-                withResult(FloatArray(axisCount * 4)) {
+                val axisData = withResult(FloatArray(axisCount * 4)) {
                     _nGetVariationAxes(_ptr, it, axisCount)
                 }
+                println("AXIS DATA ${axisData.joinToString("::")}")
                 arrayOf()
             }
         } finally {
