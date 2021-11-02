@@ -108,8 +108,12 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                 val axisData = withResult(FloatArray(axisCount * 4)) {
                     _nGetVariationAxes(_ptr, it, axisCount)
                 }
-                println("AXIS DATA ${axisData.joinToString("::")}")
-                arrayOf()
+                (0 until axisCount).map { i ->
+                    val j = 4 * i
+                    FontVariationAxis(axisData[j].toInt(), axisData[j + 1], axisData[j + 2], axisData[j + 3], false)
+                }.toTypedArray().also {
+                    println(it.joinToString(" :: "))
+                }
             }
         } finally {
             reachabilityBarrier(this)

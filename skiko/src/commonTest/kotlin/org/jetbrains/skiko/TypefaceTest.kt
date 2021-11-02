@@ -51,7 +51,9 @@ class TypefaceTest {
         val axes = arrayOf(
             FontVariationAxis("wght", 100f, 400f, 900f),
             FontVariationAxis("slnt", -10f, 0f, 0f)
-        )
+        ).also {
+            println("CHECK ${it.joinToString(" :: ")}")
+        }
         assertContentEquals(axes, interV.variationAxes)
 //
 //        val inter500: Typeface = interV.makeClone(FontVariation("wght", 500f))
