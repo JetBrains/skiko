@@ -39,21 +39,17 @@ class TypefaceTest {
     }
 
     @Test
-    @SkipJsTarget
-    @SkipNativeTarget
     fun fontVariationTest() = runTest {
         val inter = Typeface.makeFromResource("./fonts/Inter-Hinted-Regular.ttf")
         val interV = Typeface.makeFromResource("./fonts/Inter-V.ttf")
         val jbMono = Typeface.makeFromResource("./fonts/JetBrainsMono-Regular.ttf")
 
-//        assertNull(inter.variationAxes)
+        assertNull(inter.variationAxes)
 //        assertNull(inter.variations)
         val axes = arrayOf(
             FontVariationAxis("wght", 100f, 400f, 900f),
             FontVariationAxis("slnt", -10f, 0f, 0f)
-        ).also {
-            println("CHECK ${it.joinToString(" :: ")}")
-        }
+        )
         assertContentEquals(axes, interV.variationAxes)
 //
 //        val inter500: Typeface = interV.makeClone(FontVariation("wght", 500f))

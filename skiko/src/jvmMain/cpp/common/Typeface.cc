@@ -41,14 +41,14 @@ extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetVaria
 
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetVariationAxes
-  (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray axisData, jint count) {
+  (JNIEnv* env, jclass jclass, jlong ptr, jintArray axisData, jint count) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     if (count > 0) {
         std::vector<SkFontParameters::Variation::Axis> params(count);
         instance->getVariationDesignParameters(params.data(), count);
         for (int i = 0; i < count; ++i) {
-            jfloat p[4] = { params[i].tag, params[i].min, params[i].def, params[i].max};
-            env->SetFloatArrayRegion(axisData, 4 * i, 4, p);
+            jint p[4] = { params[i].tag, rawBits(params[i].min), rawBits(params[i].def), rawBits(params[i].max)};
+            env->SetIntArrayRegion(axisData, 4 * i, 4, p);
         }
     }
 }

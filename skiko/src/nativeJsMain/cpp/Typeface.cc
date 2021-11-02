@@ -46,10 +46,24 @@ SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_Typeface__1nGetVariations
 #endif
 
 
-
-SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_Typeface__1nGetVariationAxes
+SKIKO_EXPORT KInt org_jetbrains_skia_Typeface__1nGetVariationAxesCount
   (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_Typeface__1nGetVariationAxes");
+    SkTypeface* instance = reinterpret_cast<SkTypeface*>(ptr);
+    return instance->getVariationDesignParameters(nullptr, 0);
+}
+
+
+SKIKO_EXPORT void org_jetbrains_skia_Typeface__1nGetVariationAxes
+  (KNativePointer ptr, int* axis, int count) {
+    SkTypeface* instance = reinterpret_cast<SkTypeface*>(ptr);
+    if (count > 0) {
+        std::vector<SkFontParameters::Variation::Axis> params(count);
+        instance->getVariationDesignParameters(params.data(), count);
+        for (int i = 0; i < count; ++i) {
+            int p[4] = { static_cast<int>(params[i].tag), rawBits(params[i].min), rawBits(params[i].def), rawBits(params[i].max)};
+            memcpy(p, axis + 4 * i, 4);
+        }
+    }
 }
      
 #if 0 
