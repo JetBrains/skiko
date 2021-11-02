@@ -10,7 +10,9 @@ class ManagedString internal constructor(ptr: NativePointer, managed: Boolean = 
         }
     }
 
-    constructor(s: String?) : this(_nMake(s)) {
+    constructor(s: String?) : this(
+        interopScope {  _nMake(toInterop(s)) }
+    ) {
         Stats.onNativeCall()
     }
 
@@ -28,13 +30,17 @@ class ManagedString internal constructor(ptr: NativePointer, managed: Boolean = 
 
     fun insert(offset: Int, s: String): ManagedString {
         Stats.onNativeCall()
-        _nInsert(_ptr, offset, s)
+        interopScope {
+            _nInsert(_ptr, offset, toInterop(s))
+        }
         return this
     }
 
     fun append(s: String): ManagedString {
         Stats.onNativeCall()
-        _nAppend(_ptr, s)
+        interopScope {
+            _nAppend(_ptr, toInterop(s))
+        }
         return this
     }
 
@@ -59,7 +65,7 @@ class ManagedString internal constructor(ptr: NativePointer, managed: Boolean = 
 private external fun ManagedString_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ManagedString__1nMake")
-private external fun _nMake(s: String?): NativePointer
+private external fun _nMake(s: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ManagedString__nStringSize")
 private external fun _nStringSize(ptr: NativePointer): Int
@@ -68,10 +74,10 @@ private external fun _nStringSize(ptr: NativePointer): Int
 private external fun _nStringData(ptr: NativePointer, result: InteropPointer, size: Int): String
 
 @ExternalSymbolName("org_jetbrains_skia_ManagedString__1nInsert")
-private external fun _nInsert(ptr: NativePointer, offset: Int, s: String?)
+private external fun _nInsert(ptr: NativePointer, offset: Int, s: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_ManagedString__1nAppend")
-private external fun _nAppend(ptr: NativePointer, s: String?)
+private external fun _nAppend(ptr: NativePointer, s: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_ManagedString__1nRemoveSuffix")
 private external fun _nRemoveSuffix(ptr: NativePointer, from: Int)
