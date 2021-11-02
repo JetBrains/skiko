@@ -59,7 +59,7 @@ namespace skija {
     }
 
     namespace Point {
-        void copyToInterop(const SkPoint& rect, KInteropPointer pointer);
+        void copyToInterop(const SkPoint& point, KInteropPointer pointer);
     }
 
     namespace RRect {

@@ -4,27 +4,18 @@ package org.jetbrains.skia.skottie
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.sksg.InvalidationController
 import org.jetbrains.skia.*
-import org.jetbrains.skia.impl.Managed
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.*
 
 class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
         fun makeFromString(data: String): Animation {
             Stats.onNativeCall()
-            val ptr = _nMakeFromString(data)
-            require(ptr != NullPointer) { "Failed to create Animation from string=\"$data\"" }
-            return Animation(ptr)
-        }
-
-        fun makeFromFile(path: String): Animation {
-            Stats.onNativeCall()
-            val ptr = _nMakeFromFile(path)
-            require(ptr != NullPointer) { "Failed to create Animation from path=\"$path\"" }
-            return Animation(ptr)
+            interopScope {
+                val ptr = _nMakeFromString(toInterop(data))
+                require(ptr != NullPointer) { "Failed to create Animation from string=\"$data\"" }
+                return Animation(ptr)
+            }
         }
 
         fun makeFromData(data: Data): Animation {
@@ -261,7 +252,7 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     val version: String
         get() = try {
             Stats.onNativeCall()
-            _nGetVersion(_ptr)
+            withStringReferenceResult { _nGetVersion(_ptr) }
         } finally {
             reachabilityBarrier(this)
         }
@@ -270,7 +261,7 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     val size: Point
         get() {
             if (_size == null) {
-                _size = _nGetSize(_ptr)
+                _size = Point.fromInteropPointer { _nGetSize(_ptr, it) }
             }
             return _size!!
         }
@@ -285,10 +276,10 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
 private external fun _nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nMakeFromString")
-private external fun _nMakeFromString(data: String?): NativePointer
+private external fun _nMakeFromString(data: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nMakeFromFile")
-private external fun _nMakeFromFile(path: String?): NativePointer
+internal external fun _nMakeFromFile(path: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nMakeFromData")
 private external fun _nMakeFromData(dataPtr: NativePointer): NativePointer
@@ -327,7 +318,7 @@ private external fun _nGetInPoint(ptr: NativePointer): Float
 private external fun _nGetOutPoint(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetVersion")
-private external fun _nGetVersion(ptr: NativePointer): String
+private external fun _nGetVersion(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetSize")
-private external fun _nGetSize(ptr: NativePointer): Point?
+private external fun _nGetSize(ptr: NativePointer, dst: InteropPointer)
