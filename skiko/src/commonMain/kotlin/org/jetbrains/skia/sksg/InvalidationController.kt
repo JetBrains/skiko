@@ -2,10 +2,7 @@ package org.jetbrains.skia.sksg
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.*
-import org.jetbrains.skia.impl.Managed
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.impl.*
 import kotlin.jvm.JvmStatic
 
 /**
@@ -29,21 +26,24 @@ class InvalidationController internal constructor(ptr: NativePointer) : Managed(
 
     fun invalidate(left: Float, top: Float, right: Float, bottom: Float, matrix: Matrix33?): InvalidationController {
         Stats.onNativeCall()
-        InvalidationController_nInvalidate(
-            _ptr,
-            left,
-            top,
-            right,
-            bottom,
-            matrix?.mat ?: Matrix33.IDENTITY.mat
-        )
+        interopScope {
+            val mat = matrix?.mat ?: Matrix33.IDENTITY.mat
+            InvalidationController_nInvalidate(
+                _ptr,
+                left,
+                top,
+                right,
+                bottom,
+                toInterop(mat)
+            )
+        }
         return this
     }
 
     val bounds: Rect
         get() = try {
             Stats.onNativeCall()
-            InvalidationController_nGetBounds(_ptr)
+            Rect.fromInteropPointer { InvalidationController_nGetBounds(_ptr, it) }
         } finally {
             reachabilityBarrier(this)
         }
@@ -61,8 +61,8 @@ private external fun InvalidationController_nGetFinalizer(): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_sksg_InvalidationController_nMake")
 private external fun InvalidationController_nMake(): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_sksg_InvalidationController_nInvalidate")
-private external fun InvalidationController_nInvalidate(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float, matrix: FloatArray?)
+private external fun InvalidationController_nInvalidate(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float, matrix: InteropPointer)
 @ExternalSymbolName("org_jetbrains_skia_sksg_InvalidationController_nGetBounds")
-private external fun InvalidationController_nGetBounds(ptr: NativePointer): Rect
+private external fun InvalidationController_nGetBounds(ptr: NativePointer, result: InteropPointer)
 @ExternalSymbolName("org_jetbrains_skia_sksg_InvalidationController_nReset")
 private external fun InvalidationController_nReset(ptr: NativePointer)
