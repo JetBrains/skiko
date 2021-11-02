@@ -313,7 +313,9 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     val familyName: String
         get() = try {
             Stats.onNativeCall()
-            _nGetFamilyName(_ptr)
+            withStringResult {
+                _nGetFamilyName(_ptr)
+            }
         } finally {
             reachabilityBarrier(this)
         }
@@ -399,4 +401,4 @@ private external fun _nGetKerningPairAdjustments(ptr: NativePointer, glyphs: Sho
 private external fun _nGetFamilyNames(ptr: NativePointer): Array<FontFamilyName>
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetFamilyName")
-private external fun _nGetFamilyName(ptr: NativePointer): String
+private external fun _nGetFamilyName(ptr: NativePointer): NativePointer

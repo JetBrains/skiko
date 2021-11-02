@@ -24,12 +24,12 @@ extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_FontStyleSetKt__1nGetS
     return fontStyle.weight() + (fontStyle.width() << 16) + (fontStyle.slant() << 24);
 }
 
-extern "C" JNIEXPORT jstring JNICALL Java_org_jetbrains_skia_FontStyleSetKt__1nGetStyleName
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontStyleSetKt__1nGetStyleName
   (JNIEnv* env, jclass jclass, jlong ptr, jint index) {
     SkFontStyleSet* instance = reinterpret_cast<SkFontStyleSet*>(static_cast<uintptr_t>(ptr));
     SkString style;
     instance->getStyle(index, nullptr, &style);
-    return javaString(env, style);
+    return reinterpret_cast<jlong>(new SkString(style));
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontStyleSetKt__1nGetTypeface

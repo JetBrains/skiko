@@ -14,7 +14,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_FontStyleSet__1nMakeEmpty
 
 SKIKO_EXPORT KInt org_jetbrains_skia_FontStyleSet__1nCount
   (KNativePointer ptr) {
-    SkFontStyleSet* instance = reinterpret_cast<SkFontStyleSet*>((ptr));
+    SkFontStyleSet* instance = reinterpret_cast<SkFontStyleSet*>(ptr);
     return instance->count();
 }
 
@@ -29,20 +29,12 @@ SKIKO_EXPORT KInt org_jetbrains_skia_FontStyleSet__1nGetStyle
 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_FontStyleSet__1nGetStyleName
   (KNativePointer ptr, KInt index) {
-    TODO("implement org_jetbrains_skia_FontStyleSet__1nGetStyleName");
-}
-     
-#if 0 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_FontStyleSet__1nGetStyleName
-  (KNativePointer ptr, KInt index) {
     SkFontStyleSet* instance = reinterpret_cast<SkFontStyleSet*>((ptr));
     SkString style;
     instance->getStyle(index, nullptr, &style);
-    return javaString(env, style);
+    return new SkString(style);
 }
-#endif
-
-
+     
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_FontStyleSet__1nGetTypeface
   (KNativePointer ptr, KInt index) {
     SkFontStyleSet* instance = reinterpret_cast<SkFontStyleSet*>((ptr));
@@ -50,18 +42,9 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_FontStyleSet__1nGetTypeface
     return reinterpret_cast<KNativePointer>(typeface);
 }
 
-
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_FontStyleSet__1nMatchStyle
-  (KNativePointer ptr, KInt fontStyle) {
-    TODO("implement org_jetbrains_skia_FontStyleSet__1nMatchStyle");
-}
-     
-#if 0 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_FontStyleSet__1nMatchStyle
   (KNativePointer ptr, KInt fontStyle) {
     SkFontStyleSet* instance = reinterpret_cast<SkFontStyleSet*>((ptr));
-    SkTypeface* typeface = instance->matchStyle(skija::FontStyle::fromJava(fontStyle));
+    SkTypeface* typeface = instance->matchStyle(skija::FontStyle::fromKotlin(fontStyle));
     return reinterpret_cast<KNativePointer>(typeface);
 }
-#endif
-

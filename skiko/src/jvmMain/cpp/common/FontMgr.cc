@@ -11,12 +11,12 @@ extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_FontMgrKt__1nGetFamili
     return instance->countFamilies();
 }
 
-extern "C" JNIEXPORT jstring JNICALL Java_org_jetbrains_skia_FontMgrKt__1nGetFamilyName
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrKt__1nGetFamilyName
   (JNIEnv* env, jclass jclass, jlong ptr, jint index) {
     SkFontMgr* instance = reinterpret_cast<SkFontMgr*>(static_cast<uintptr_t>(ptr));
     SkString familyName;
     instance->getFamilyName(index, &familyName);
-    return javaString(env, familyName);
+    return reinterpret_cast<jlong>(new SkString(familyName));
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrKt__1nMakeStyleSet
@@ -43,7 +43,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrKt__1nMatchFam
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrKt__1nMatchFamilyStyleCharacter
-  (JNIEnv* env, jclass jclass, jlong ptr, jstring familyNameStr, jint fontStyle, jobjectArray bcp47Array, jint character) {
+  (JNIEnv* env, jclass jclass, jlong ptr, jstring familyNameStr, jint fontStyle, jobjectArray bcp47Array, jint bcp47size, jint character) {
     SkFontMgr* instance = reinterpret_cast<SkFontMgr*>(static_cast<uintptr_t>(ptr));
 
     SkString familyName = skString(env, familyNameStr);

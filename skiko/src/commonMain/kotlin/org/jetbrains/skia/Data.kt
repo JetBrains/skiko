@@ -140,7 +140,6 @@ class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
     }
 }
 
-
 @ExternalSymbolName("org_jetbrains_skia_Data__1nGetFinalizer")
 private external fun Data_nGetFinalizer(): NativePointer
 
