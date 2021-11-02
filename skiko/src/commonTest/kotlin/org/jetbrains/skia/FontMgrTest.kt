@@ -93,7 +93,6 @@ class FontMgrTest {
 
 
     @Test
-    @SkipNativeTarget
     @SkipJsTarget
     fun makeFromDataTest() {
         Data.makeFromFileName("src/commonTest/resources/fonts/JetBrainsMono-Italic.ttf").use { data ->

@@ -288,20 +288,11 @@ SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_Typeface__1nGetFamilyNames
 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Typeface__1nGetFamilyName
   (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_Typeface__1nGetFamilyName");
-}
-     
-#if 0 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Typeface__1nGetFamilyName
-  (KNativePointer ptr) {
-    SkTypeface* instance = reinterpret_cast<SkTypeface*>((ptr));
+    SkTypeface* instance = reinterpret_cast<SkTypeface*>(ptr);
     SkString name;
     instance->getFamilyName(&name);
-    return javaString(env, name);
+    return new SkString(name);
 }
-#endif
-
-
 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Typeface__1nGetBounds
   (KNativePointer ptr) {

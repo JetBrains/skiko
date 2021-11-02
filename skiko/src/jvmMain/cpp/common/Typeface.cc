@@ -208,12 +208,12 @@ extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_TypefaceKt__1n
     return res;
 }
 
-extern "C" JNIEXPORT jstring JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetFamilyName
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetFamilyName
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     SkString name;
     instance->getFamilyName(&name);
-    return javaString(env, name);
+    return reinterpret_cast<jlong>(new SkString(name));
 }
 
 extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_TypefaceKt_Typeface_1nGetBounds
