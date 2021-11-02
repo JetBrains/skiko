@@ -27,10 +27,10 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_sksg_InvalidationContr
     instance->inval(bounds, *matrix.get());
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_sksg_InvalidationControllerKt_InvalidationController_1nGetBounds
-  (JNIEnv* env, jclass jclass, jlong ptr) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_sksg_InvalidationControllerKt_InvalidationController_1nGetBounds
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray result) {
     InvalidationController* instance = reinterpret_cast<InvalidationController*>(static_cast<uintptr_t>(ptr));
-    return skija::Rect::fromSkRect(env, instance->bounds());
+    skija::Rect::copyToInterop(env, instance->bounds(), result);
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_sksg_InvalidationControllerKt_InvalidationController_1nReset
