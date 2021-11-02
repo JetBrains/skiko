@@ -88,8 +88,9 @@
     NSView* titlebarDecoration = titlebarContainer.subviews[1];
 
     // The following two views are only there on Big Sur and forward
-    NSView* titlebarVisualEffect = [titlebar.subviews[0] isKindOfClass:[NSVisualEffectView class]] ? titlebar.subviews[0] : nil;
-    NSView* titlebarBackground = [titlebar.subviews[1] isMemberOfClass:[NSView class]] ? titlebar.subviews[1] : nil;
+    BOOL runningAtLeastBigSur = [NSProcessInfo.processInfo isOperatingSystemAtLeastVersion:{ .majorVersion = 11, .minorVersion = 0, .patchVersion = 0 }];
+    NSView* titlebarVisualEffect = runningAtLeastBigSur ? titlebar.subviews[0] : nil;
+    NSView* titlebarBackground = runningAtLeastBigSur ? titlebar.subviews[1] : nil;
 
     NSView* dragger = [[WindowDragView alloc] init];
     [titlebar addSubview:dragger];
@@ -104,18 +105,18 @@
         [titlebar.heightAnchor constraintEqualToConstant:_customHeaderHeight], // This is the important one
     ]];
 
-    for (NSView* view in @[titlebarContainer, titlebarDecoration, titlebarVisualEffect, titlebarBackground, dragger])
+    NSArray* viewsToChange = runningAtLeastBigSur
+        ? @[titlebarContainer, titlebarDecoration, titlebarVisualEffect, titlebarBackground, dragger]
+        : @[titlebarContainer, titlebarDecoration, dragger];
+    for (NSView* view in viewsToChange)
     {
-        if (view != nil)
-        {
-            view.translatesAutoresizingMaskIntoConstraints = NO;
-            [newConstraints addObjectsFromArray:@[
-                [view.leftAnchor constraintEqualToAnchor:titlebar.leftAnchor],
-                [view.rightAnchor constraintEqualToAnchor:titlebar.rightAnchor],
-                [view.topAnchor constraintEqualToAnchor:titlebar.topAnchor],
-                [view.bottomAnchor constraintEqualToAnchor:titlebar.bottomAnchor],
-            ]];
-        }
+        view.translatesAutoresizingMaskIntoConstraints = NO;
+        [newConstraints addObjectsFromArray:@[
+            [view.leftAnchor constraintEqualToAnchor:titlebar.leftAnchor],
+            [view.rightAnchor constraintEqualToAnchor:titlebar.rightAnchor],
+            [view.topAnchor constraintEqualToAnchor:titlebar.topAnchor],
+            [view.bottomAnchor constraintEqualToAnchor:titlebar.bottomAnchor],
+        ]];
     }
 
     NSView* closeButtonView = [self.window standardWindowButton:NSWindowCloseButton];
@@ -143,21 +144,21 @@
     NSView* titlebarDecoration = titlebarContainer.subviews[1];
 
     // The following two views are only there on Big Sur and forward
-    NSView* titlebarVisualEffect = [titlebar.subviews[0] isKindOfClass:[NSVisualEffectView class]] ? titlebar.subviews[0] : nil;
-    NSView* titlebarBackground = [titlebar.subviews[1] isMemberOfClass:[NSView class]] ? titlebar.subviews[1] : nil;
+    BOOL runningAtLeastBigSur = [NSProcessInfo.processInfo isOperatingSystemAtLeastVersion:{ .majorVersion = 11, .minorVersion = 0, .patchVersion = 0 }];
+    NSView* titlebarVisualEffect = runningAtLeastBigSur ? titlebar.subviews[0] : nil;
+    NSView* titlebarBackground = runningAtLeastBigSur ? titlebar.subviews[1] : nil;
 
     NSView* closeButtonView = [self.window standardWindowButton:NSWindowCloseButton];
     NSView* miniaturizeButtonView = [self.window standardWindowButton:NSWindowMiniaturizeButton];
     NSView* zoomButtonView = [self.window standardWindowButton:NSWindowZoomButton];
 
-    NSArray* changedViews = @[titlebarContainer, titlebarDecoration, titlebar, titlebarVisualEffect, titlebarBackground, closeButtonView, miniaturizeButtonView, zoomButtonView];
+    NSArray* changedViews = runningAtLeastBigSur
+        ? @[titlebarContainer, titlebarDecoration, titlebar, titlebarVisualEffect, titlebarBackground, closeButtonView, miniaturizeButtonView, zoomButtonView]
+        : @[titlebarContainer, titlebarDecoration, titlebar, closeButtonView, miniaturizeButtonView, zoomButtonView];
     for (NSView* changedView in changedViews)
     {
-        if (changedView != nil)
-        {
-            [changedView removeConstraints:changedView.constraints];
-            changedView.translatesAutoresizingMaskIntoConstraints = YES;
-        }
+        [changedView removeConstraints:changedView.constraints];
+        changedView.translatesAutoresizingMaskIntoConstraints = YES;
     }
     NSView* dragger = titlebar.subviews[titlebar.subviews.count - 1];
     [dragger removeFromSuperview];
