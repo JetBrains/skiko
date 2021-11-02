@@ -33,6 +33,13 @@ extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_TypefaceKt__1n
         return nullptr;
 }
 
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetVariationAxesCount
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloat* axisData) {
+    SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
+    return instance->getVariationDesignParameters(nullptr, 0);
+}
+
+
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetVariationAxes
   (JNIEnv* env, jclass jclass, jlong ptr, jfloat* axisData) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
