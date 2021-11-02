@@ -13,10 +13,6 @@ import kotlin.test.assertEquals
 class AnimationTestJVM {
     @Test
     fun canCreateFromFile() {
-        if (kotlinBackend == KotlinBackend.JS) {
-            return
-        }
-
         val animation = Animation.makeFromFile(
             resourcePath("./skottie/test_animation01.json")
         )
