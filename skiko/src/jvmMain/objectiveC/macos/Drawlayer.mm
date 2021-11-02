@@ -157,11 +157,14 @@
         : @[titlebarContainer, titlebarDecoration, titlebar, closeButtonView, miniaturizeButtonView, zoomButtonView];
     for (NSView* changedView in changedViews)
     {
-        [changedView removeConstraints:changedView.constraints];
+        [NSLayoutConstraint deactivateConstraints:changedView.constraints];
         changedView.translatesAutoresizingMaskIntoConstraints = YES;
     }
-    NSView* dragger = titlebar.subviews[titlebar.subviews.count - 1];
-    [dragger removeFromSuperview];
+
+    if (titlebar.subviews.count > 0 && [titlebar.subviews[titlebar.subviews.count - 1] isKindOfClass:[WindowDragView class]]) {
+        WindowDragView* dragger = titlebar.subviews[titlebar.subviews.count - 1];
+        [dragger removeFromSuperview];
+    }
 }
 
 - (void) setWindowControlsHidden: (BOOL) hidden
