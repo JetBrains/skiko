@@ -56,13 +56,6 @@ class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
             return Data(_nMakeUninitialized(length))
         }
 
-        fun makeFromFileName(path: String?): Data {
-            Stats.onNativeCall()
-            interopScope {
-                return Data(_nMakeFromFileName(toInterop(path)))
-            }
-        }
-
         init {
             staticLoad()
         }
@@ -146,7 +139,6 @@ class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
         val PTR = Data_nGetFinalizer()
     }
 }
-
 
 @ExternalSymbolName("org_jetbrains_skia_Data__1nGetFinalizer")
 private external fun Data_nGetFinalizer(): NativePointer
