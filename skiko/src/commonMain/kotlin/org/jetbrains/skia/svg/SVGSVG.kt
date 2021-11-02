@@ -15,10 +15,7 @@ class SVGSVG internal constructor(ptr: NativePointer) : SVGContainer(ptr) {
     var x: SVGLength
         get() = try {
             Stats.onNativeCall()
-            val result = withResult(IntArray(2)) {
-                SVGSVG_nGetX(_ptr, it)
-            }
-            SVGLength(Float.fromBits(result[0]), result[1])
+            SVGLength.fromInterop { SVGSVG_nGetX(_ptr, it) }
         } finally {
             reachabilityBarrier(this)
         }
@@ -32,10 +29,7 @@ class SVGSVG internal constructor(ptr: NativePointer) : SVGContainer(ptr) {
     var y: SVGLength
         get() = try {
             Stats.onNativeCall()
-            val result = withResult(IntArray(2)) {
-                SVGSVG_nGetY(_ptr, it)
-            }
-            SVGLength(Float.fromBits(result[0]), result[1])
+            SVGLength.fromInterop { SVGSVG_nGetY(_ptr, it) }
         } finally {
             reachabilityBarrier(this)
         }
@@ -56,7 +50,7 @@ class SVGSVG internal constructor(ptr: NativePointer) : SVGContainer(ptr) {
     var width: SVGLength
         get() = try {
             Stats.onNativeCall()
-            SVGSVG_nGetWidth(_ptr)
+            SVGLength.fromInterop { SVGSVG_nGetWidth(_ptr, it) }
         } finally {
             reachabilityBarrier(this)
         }
@@ -70,7 +64,7 @@ class SVGSVG internal constructor(ptr: NativePointer) : SVGContainer(ptr) {
     var height: SVGLength
         get() = try {
             Stats.onNativeCall()
-            SVGSVG_nGetHeight(_ptr)
+            SVGLength.fromInterop { SVGSVG_nGetHeight(_ptr, it) }
         } finally {
             reachabilityBarrier(this)
         }
@@ -85,7 +79,7 @@ class SVGSVG internal constructor(ptr: NativePointer) : SVGContainer(ptr) {
     var preserveAspectRatio: SVGPreserveAspectRatio
         get() = try {
             Stats.onNativeCall()
-            SVGSVG_nGetPreserveAspectRatio(_ptr)
+            SVGPreserveAspectRatio.fromInterop { SVGSVG_nGetPreserveAspectRatio(_ptr, it) }
         } finally {
             reachabilityBarrier(this)
         }
@@ -99,7 +93,7 @@ class SVGSVG internal constructor(ptr: NativePointer) : SVGContainer(ptr) {
     var viewBox: Rect?
         get() = try {
             Stats.onNativeCall()
-            SVGSVG_nGetViewBox(_ptr)
+            Rect.fromInteropPointerNullable { SVGSVG_nGetViewBox(_ptr, it) }
         } finally {
             reachabilityBarrier(this)
         }
@@ -113,7 +107,7 @@ class SVGSVG internal constructor(ptr: NativePointer) : SVGContainer(ptr) {
     fun getIntrinsicSize(lc: SVGLengthContext): Point {
         return try {
             Stats.onNativeCall()
-            SVGSVG_nGetIntrinsicSize(_ptr, lc.width, lc.height, lc.dpi)
+            Point.fromInteropPointer { SVGSVG_nGetIntrinsicSize(_ptr, lc.width, lc.height, lc.dpi, it) }
         } finally {
             reachabilityBarrier(this)
         }
@@ -127,19 +121,19 @@ private external fun SVGSVG_nGetX(ptr: NativePointer, result: InteropPointer)
 private external fun SVGSVG_nGetY(ptr: NativePointer, result: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nGetWidth")
-private external fun SVGSVG_nGetWidth(ptr: NativePointer): SVGLength
+private external fun SVGSVG_nGetWidth(ptr: NativePointer, result: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nGetHeight")
-private external fun SVGSVG_nGetHeight(ptr: NativePointer): SVGLength
+private external fun SVGSVG_nGetHeight(ptr: NativePointer, result: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nGetPreserveAspectRatio")
-private external fun SVGSVG_nGetPreserveAspectRatio(ptr: NativePointer): SVGPreserveAspectRatio
+private external fun SVGSVG_nGetPreserveAspectRatio(ptr: NativePointer, result: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nGetViewBox")
-private external fun SVGSVG_nGetViewBox(ptr: NativePointer): Rect?
+private external fun SVGSVG_nGetViewBox(ptr: NativePointer, result: InteropPointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nGetIntrinsicSize")
-private external fun SVGSVG_nGetIntrinsicSize(ptr: NativePointer, width: Float, height: Float, dpi: Float): Point
+private external fun SVGSVG_nGetIntrinsicSize(ptr: NativePointer, width: Float, height: Float, dpi: Float, result: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nSetX")
 private external fun SVGSVG_nSetX(ptr: NativePointer, value: Float, unit: Int)

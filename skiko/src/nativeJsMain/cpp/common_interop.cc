@@ -285,4 +285,22 @@ namespace skija {
             }
         }
     }
+
+    namespace svg {
+        namespace SVGLength {
+            void copyToInterop(const SkSVGLength& length, KInteropPointer dst) {
+                KInt* result = reinterpret_cast<KInt*>(dst);
+                result[0] = rawBits(length.value());
+                result[1] = static_cast<KInt>(length.unit());
+            }
+        }
+
+        namespace SVGPreserveAspectRatio {
+            void copyToInterop(const SkSVGPreserveAspectRatio& aspectRatio, KInteropPointer dst) {
+                KInt* result = reinterpret_cast<KInt*>(dst);
+                result[0] = static_cast<KInt>(aspectRatio.fAlign);
+                result[1] = static_cast<KInt>(aspectRatio.fScale);
+            }
+        }
+    }
 }

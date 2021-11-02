@@ -11,107 +11,51 @@ SKIKO_EXPORT KInt org_jetbrains_skia_svg_SVGSVG__1nGetTag
     return static_cast<KInt>(instance->tag());
 }
 
-
-SKIKO_EXPORT void org_jetbrains_skia_svg_SVGSVG__1nGetX(KNativePointer ptr, KInt* result) {
+SKIKO_EXPORT void org_jetbrains_skia_svg_SVGSVG__1nGetX(KNativePointer ptr, KInteropPointer result) {
     SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>(ptr);
-    auto x = instance->getX();
-    result[0] = rawBits(x.value());
-    result[1] = static_cast<KInt>(x.unit());
+    return skija::svg::SVGLength::copyToInterop(instance->getX(), result);
 }
 
-SKIKO_EXPORT void org_jetbrains_skia_svg_SVGSVG__1nGetY(KNativePointer ptr, KInt* result) {
-      SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>(ptr);
-      auto y = instance->getY();
-      result[0] = rawBits(y.value());
-      result[1] = static_cast<KInt>(y.unit());
+SKIKO_EXPORT void org_jetbrains_skia_svg_SVGSVG__1nGetY(KNativePointer ptr, KInteropPointer result) {
+    SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>(ptr);
+    return skija::svg::SVGLength::copyToInterop(instance->getY(), result);
 }
-     
-#if 0 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_svg_SVGSVG__1nGetY
-  (KNativePointer ptr) {
+
+SKIKO_EXPORT void org_jetbrains_skia_svg_SVGSVG__1nGetHeight(KNativePointer ptr, KInteropPointer result) {
+    SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>(ptr);
+    return skija::svg::SVGLength::copyToInterop(instance->getHeight(), result);
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_svg_SVGSVG__1nGetWidth(KNativePointer ptr, KInteropPointer result) {
+    SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>(ptr);
+    return skija::svg::SVGLength::copyToInterop(instance->getWidth(), result);
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_svg_SVGSVG__1nGetPreserveAspectRatio
+  (KNativePointer ptr, KInteropPointer result) {
     SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>((ptr));
-    return skija::svg::SVGLength::toJava(env, instance->getY());
+    return skija::svg::SVGPreserveAspectRatio::copyToInterop(instance->getPreserveAspectRatio(), result);
 }
-#endif
 
-
-
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_svg_SVGSVG__1nGetWidth
-  (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_svg_SVGSVG__1nGetWidth");
-}
-     
-#if 0 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_svg_SVGSVG__1nGetWidth
-  (KNativePointer ptr) {
-    SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>((ptr));
-    return skija::svg::SVGLength::toJava(env, instance->getWidth());
-}
-#endif
-
-
-
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_svg_SVGSVG__1nGetHeight
-  (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_svg_SVGSVG__1nGetHeight");
-}
-     
-#if 0 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_svg_SVGSVG__1nGetHeight
-  (KNativePointer ptr) {
-    SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>((ptr));
-    return skija::svg::SVGLength::toJava(env, instance->getHeight());
-}
-#endif
-
-
-
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_svg_SVGSVG__1nGetPreserveAspectRatio
-  (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_svg_SVGSVG__1nGetPreserveAspectRatio");
-}
-     
-#if 0 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_svg_SVGSVG__1nGetPreserveAspectRatio
-  (KNativePointer ptr) {
-    SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>((ptr));
-    return skija::svg::SVGPreserveAspectRatio::toJava(env, instance->getPreserveAspectRatio());
-}
-#endif
-
-
-
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_svg_SVGSVG__1nGetViewBox
-  (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_svg_SVGSVG__1nGetViewBox");
-}
-     
-#if 0 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_svg_SVGSVG__1nGetViewBox
-  (KNativePointer ptr) {
+SKIKO_EXPORT KBoolean org_jetbrains_skia_svg_SVGSVG__1nGetViewBox
+  (KNativePointer ptr, KInteropPointer result) {
     SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>((ptr));
     SkTLazy<SkSVGViewBoxType> viewBox = instance->getViewBox();
-    return viewBox.isValid() ? skija::Rect::fromSkRect(env, *viewBox.get()) : nullptr;
+    if (viewBox.isValid()) {
+        skija::Rect::copyToInterop(*viewBox.get(), result);
+        return true;
+    } else {
+        return false;
+    }
 }
-#endif
 
-
-
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_svg_SVGSVG__1nGetIntrinsicSize
-  (KNativePointer ptr, float width, float height, float dpi) {
-    TODO("implement org_jetbrains_skia_svg_SVGSVG__1nGetIntrinsicSize");
-}
-     
-#if 0 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_svg_SVGSVG__1nGetIntrinsicSize
-  (KNativePointer ptr, float width, float height, float dpi) {
+SKIKO_EXPORT void org_jetbrains_skia_svg_SVGSVG__1nGetIntrinsicSize
+  (KNativePointer ptr, float width, float height, float dpi, KInteropPointer result) {
     SkSVGSVG* instance = reinterpret_cast<SkSVGSVG*>((ptr));
     SkSVGLengthContext lc({width, height}, dpi);
     SkSize size = instance->intrinsicSize(lc);
-    return skija::Point::fromSkPoint(env, {size.width(), size.height()});
+    skija::Point::copyToInterop({size.width(), size.height()}, result);
 }
-#endif
-
 
 SKIKO_EXPORT void org_jetbrains_skia_svg_SVGSVG__1nSetX
   (KNativePointer ptr, float value, int unit) {

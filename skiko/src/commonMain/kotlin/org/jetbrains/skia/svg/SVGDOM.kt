@@ -1,13 +1,9 @@
 package org.jetbrains.skia.svg
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.*
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.*
 
 class SVGDOM internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
@@ -36,7 +32,7 @@ class SVGDOM internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     @get:Deprecated("")
     val containerSize: Point
         get() = try {
-            SVGDOM_nGetContainerSize(_ptr)
+            Point.fromInteropPointer { SVGDOM_nGetContainerSize(_ptr, it) }
         } finally {
             reachabilityBarrier(this)
         }
@@ -70,7 +66,7 @@ private external fun SVGDOM_nMakeFromData(dataPtr: NativePointer): NativePointer
 private external fun SVGDOM_nGetRoot(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nGetContainerSize")
-private external fun SVGDOM_nGetContainerSize(ptr: NativePointer): Point
+private external fun SVGDOM_nGetContainerSize(ptr: NativePointer, dst: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nSetContainerSize")
 private external fun SVGDOM_nSetContainerSize(ptr: NativePointer, width: Float, height: Float)

@@ -1,12 +1,11 @@
 package org.jetbrains.skia
 
-import org.jetbrains.skia.svg.SVGDOM
-import org.jetbrains.skia.svg.SVGLengthContext
-import org.jetbrains.skia.svg.SVGLengthUnit
-import org.jetbrains.skia.svg.SVGTag
+import org.jetbrains.skia.svg.*
+import org.jetbrains.skia.tests.assertCloseEnough
 import org.jetbrains.skiko.KotlinBackend
 import org.jetbrains.skiko.kotlinBackend
 import kotlin.test.Test
+import kotlin.test.assertEquals
 
 class SvgTest {
     @Test
@@ -33,17 +32,17 @@ class SvgTest {
         val e = dom.root!!
         require(e.x.unit == SVGLengthUnit.NUMBER)
         require(e.y.unit == SVGLengthUnit.NUMBER)
-        if (kotlinBackend == KotlinBackend.JVM) {
-            // TODO: disabled for other platforms until all methods implemented in JS/Native.
-            require(e.width.unit == SVGLengthUnit.NUMBER)
-            require(e.height.unit == SVGLengthUnit.NUMBER)
-            require(e.viewBox == null)
-            require(e.tag == SVGTag.SVG)
-            // e.viewBox = Rect(0f, 1f, 100f, 200f)
-            // assert(e.viewBox!!.top == 1f)
-            require(e.getIntrinsicSize(SVGLengthContext(100f, 100f)).x == 300f)
-            e.viewBox = Rect.makeXYWH(0f, 1f, 2f, 3f)
-            require(e.viewBox == Rect.makeXYWH(0f, 1f, 2f, 3f))
-        }
+        require(e.width.unit == SVGLengthUnit.NUMBER)
+        require(e.height.unit == SVGLengthUnit.NUMBER)
+        require(e.viewBox == null)
+        require(e.tag == SVGTag.SVG)
+        e.viewBox = Rect(0f, 1f, 100f, 200f)
+        assertCloseEnough(Rect(0f, 1f, 100f, 200f), e.viewBox)
+        val aspectRatio = SVGPreserveAspectRatio(SVGPreserveAspectRatioAlign.XMIN_YMIN, SVGPreserveAspectRatioScale.MEET)
+        e.preserveAspectRatio = aspectRatio
+        assertEquals(aspectRatio, e.preserveAspectRatio)
+        require(e.getIntrinsicSize(SVGLengthContext(100f, 100f)).x == 300f)
+        e.viewBox = Rect.makeXYWH(0f, 1f, 2f, 3f)
+        require(e.viewBox == Rect.makeXYWH(0f, 1f, 2f, 3f))
     }
 }

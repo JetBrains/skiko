@@ -1,9 +1,19 @@
 package org.jetbrains.skia.svg
 
+import org.jetbrains.skia.impl.InteropPointer
+import org.jetbrains.skia.impl.withResult
+
 class SVGPreserveAspectRatio(align: SVGPreserveAspectRatioAlign, scale: SVGPreserveAspectRatioScale) {
     internal val _align: SVGPreserveAspectRatioAlign
 
     internal val _scale: SVGPreserveAspectRatioScale
+
+    companion object {
+        internal fun fromInterop(block: (InteropPointer) -> Unit) =
+            withResult(IntArray(2), block).let {
+                SVGPreserveAspectRatio(it[0], it[1])
+            }
+    }
 
     internal constructor(align: Int, scale: Int) : this(
         SVGPreserveAspectRatioAlign.valueOf(align),

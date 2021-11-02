@@ -22,11 +22,11 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_svg_SVGDOMKt_SVGDOM_1
     return reinterpret_cast<jlong>(root);
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_svg_SVGDOMKt_SVGDOM_1nGetContainerSize
-  (JNIEnv* env, jclass jclass, jlong ptr) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_svg_SVGDOMKt_SVGDOM_1nGetContainerSize
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray dst) {
     SkSVGDOM* instance = reinterpret_cast<SkSVGDOM*>(static_cast<uintptr_t>(ptr));
     const SkSize& size = instance->containerSize();
-    return skija::Point::make(env, size.fWidth, size.fHeight);
+    skija::Point::copyToInterop(env, {size.fWidth, size.fHeight}, dst);
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_svg_SVGDOMKt_SVGDOM_1nSetContainerSize
