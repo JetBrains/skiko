@@ -100,7 +100,10 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     val variationAxes: Array<FontVariationAxis>?
         get() = try {
             Stats.onNativeCall()
-            _nGetVariationAxes(_ptr)
+            val a = withResult(FloatArray(3)) {
+                _nGetVariationAxes(_ptr, it)
+            }
+            null
         } finally {
             reachabilityBarrier(this)
         }
@@ -362,7 +365,7 @@ private external fun _nIsFixedPitch(ptr: NativePointer): Boolean
 private external fun _nGetVariations(ptr: NativePointer): Array<FontVariation>?
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetVariationAxes")
-private external fun _nGetVariationAxes(ptr: NativePointer): Array<FontVariationAxis>?
+private external fun _nGetVariationAxes(ptr: NativePointer, axisData: InteropPointer): Array<FontVariationAxis>?
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeFromName")
 private external fun _nMakeFromName(name: String?, fontStyle: Int): NativePointer

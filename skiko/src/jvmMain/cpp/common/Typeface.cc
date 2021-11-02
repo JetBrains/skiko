@@ -34,14 +34,18 @@ extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_TypefaceKt__1n
 }
 
 extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetVariationAxes
-  (JNIEnv* env, jclass jclass, jlong ptr) {
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloat* axisData) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     int count = instance->getVariationDesignParameters(nullptr, 0);
     if (count > 0) {
         std::vector<SkFontParameters::Variation::Axis> params(count);
         instance->getVariationDesignParameters(params.data(), count);
         jobjectArray res = env->NewObjectArray(count, skija::FontVariationAxis::cls, nullptr);
-        for (int i=0; i < count; ++i) {
+        for (int i = 0; i < count; ++i) {
+            axisData[i] = params[i].tag;
+            axisData[i + 1] = params[i].min;
+            axisData[i + 2] = params[i].def;
+            axisData[i + 3] = params[i].max;
             jobject var = env->NewObject(skija::FontVariationAxis::cls, skija::FontVariationAxis::ctor, params[i].tag, params[i].min, params[i].def, params[i].max, params[i].isHidden());
             env->SetObjectArrayElement(res, i, var);
         }
