@@ -26,10 +26,11 @@ config.webpack.output = Object.assign(config.webpack.output || {}, {
 config.webpack.module.rules.push(
     {
         test: /\.(ttf|woff|woff2)$/,
-        type: 'asset/resource',
-        generator: {
-            filename: "assets/fonts/[name][ext]"
-        }
+        type: 'asset/resource'
+    },
+    {
+        test: /\.(png|jpg|gif)$/,
+        type: 'asset/resource'
     },
     {
         test: /\.txt$/,
