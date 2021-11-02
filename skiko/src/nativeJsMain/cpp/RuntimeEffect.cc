@@ -29,7 +29,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_RuntimeEffect__1nMakeForShader
     (KInteropPointer sksl) {
     SkString skslProper = skString(sksl);
     SkRuntimeEffect::Result* result = new SkRuntimeEffect::Result {
-        std::move(SkRuntimeEffect::MakeForShader(skslProper))
+        SkRuntimeEffect::MakeForShader(skslProper)
     };
     return reinterpret_cast<KNativePointer>(result);
 }
@@ -38,7 +38,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_RuntimeEffect__1nMakeForColorFilt
     (KInteropPointer sksl) {
     SkString skslProper = skString(sksl);
     SkRuntimeEffect::Result* result = new SkRuntimeEffect::Result {
-        std::move(SkRuntimeEffect::MakeForColorFilter(skslProper))
+        SkRuntimeEffect::MakeForColorFilter(skslProper)
     };
     return reinterpret_cast<KNativePointer>(result);
 }
