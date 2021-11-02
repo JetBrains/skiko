@@ -105,7 +105,7 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                 null
             } else {
                 withResult(FloatArray(axisCount * 4)) {
-                    _nGetVariationAxes(_ptr, it)
+                    _nGetVariationAxes(_ptr, it, axisCount)
                 }
                 arrayOf()
             }
@@ -373,7 +373,7 @@ private external fun _nGetVariations(ptr: NativePointer): Array<FontVariation>?
 private external fun _nGetVariationAxesCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetVariationAxes")
-private external fun _nGetVariationAxes(ptr: NativePointer, axisData: InteropPointer)
+private external fun _nGetVariationAxes(ptr: NativePointer, axisData: InteropPointer, axisCount: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeFromName")
 private external fun _nMakeFromName(name: String?, fontStyle: Int): NativePointer
