@@ -109,7 +109,7 @@ class Shaper internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
             val ptr = interopScope {
                 _nShapeBlob(
                     _ptr,
-                    text,
+                    ManagedString(text)._ptr,
                     getPtr(font),
                     optsFeaturesLen = opts.features?.size ?: 0,
                     optsFeaturesIntArray = arrayOfFontFeaturesToInterop(opts.features),
@@ -258,7 +258,7 @@ private external fun _nMakeCoreText(): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper__1nShapeBlob")
 private external fun _nShapeBlob(
     ptr: NativePointer,
-    text: String?,
+    text: NativePointer,
     fontPtr: NativePointer,
     optsFeaturesLen: Int,
     optsFeaturesIntArray: InteropPointer,

@@ -56,9 +56,9 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt_Shape
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nShapeBlob
-  (JNIEnv* env, jclass jclass, jlong ptr, jstring textObj, jlong fontPtr, jint optsFeaturesLen, jintArray optsFeatures, jint optsBooleanProps, jfloat width, jfloat offsetX, jfloat offsetY) {
+  (JNIEnv* env, jclass jclass, jlong ptr, jlong textPtr, jlong fontPtr, jint optsFeaturesLen, jintArray optsFeatures, jint optsBooleanProps, jfloat width, jfloat offsetX, jfloat offsetY) {
     SkShaper* instance = reinterpret_cast<SkShaper*>(static_cast<uintptr_t>(ptr));
-    SkString text = skString(env, textObj);
+    SkString text = *(reinterpret_cast<SkString*>(static_cast<uintptr_t>(textPtr)));
     std::shared_ptr<UBreakIterator> graphemeIter = skija::shaper::graphemeBreakIterator(text);
     if (!graphemeIter) return 0;
     SkFont* font = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(fontPtr));

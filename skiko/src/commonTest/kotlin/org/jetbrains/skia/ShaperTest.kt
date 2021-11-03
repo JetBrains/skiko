@@ -17,9 +17,7 @@ class ShaperTest {
 
     @Test
     fun canShapeLine() = runTest {
-        val shaper = Shaper.make(FontMgr.default)
-
-        val textLine = shaper.shapeLine(
+        val textLine = Shaper.make().shapeLine(
             text = "Abc123", font = fontInter36()
         )
 
@@ -31,7 +29,7 @@ class ShaperTest {
         )
     }
 
-    @Test @SkipJsTarget @SkipNativeTarget
+    @Test
     fun canShapeTextBlob() = runTest {
         val textBlob = Shaper.make().shape(
             text = "text",
@@ -40,9 +38,10 @@ class ShaperTest {
         )
 
         assertNotEquals(null, textBlob)
+        assertEquals(4, textBlob!!.glyphsLength)
         assertContentEquals(
             expected = shortArrayOf(882, 611, 943, 882),
-            actual = textBlob!!.glyphs
+            actual = textBlob.glyphs
         )
     }
 
