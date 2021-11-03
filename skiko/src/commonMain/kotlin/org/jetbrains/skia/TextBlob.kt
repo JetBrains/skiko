@@ -191,11 +191,20 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
     val glyphs: ShortArray
         get() = try {
             Stats.onNativeCall()
-            _nGetGlyphs(_ptr)
+            withResult(ShortArray(glyphsLength)) {
+                _nGetGlyphs(_ptr, it)
+            }
         } finally {
             reachabilityBarrier(this)
         }
 
+    internal val glyphsLength: Int
+        get() = try {
+            Stats.onNativeCall()
+            _nGetGlyphsLength(_ptr)
+        } finally {
+            reachabilityBarrier(this)
+        }
     /**
      *
      * Return result depends on how blob was constructed.
@@ -325,8 +334,11 @@ private external fun _nMakeFromPos(glyphs: InteropPointer, pos: InteropPointer, 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromRSXform")
 private external fun _nMakeFromRSXform(glyphs: InteropPointer, xform: InteropPointer, fontPtr: NativePointer): NativePointer
 
+@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetGlyphsLength")
+private external fun _nGetGlyphsLength(ptr: NativePointer): Int
+
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetGlyphs")
-private external fun _nGetGlyphs(ptr: NativePointer): ShortArray
+private external fun _nGetGlyphs(ptr: NativePointer, result: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetPositions")
 private external fun _nGetPositions(ptr: NativePointer): FloatArray
