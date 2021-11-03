@@ -20,6 +20,14 @@ internal class LinuxSoftwareRedrawer(
         }
     }
 
+    override fun dispose() = layer.backedLayer.lockLinuxDrawingSurface {
+        super.dispose()
+    }
+
+    override fun draw() = layer.backedLayer.lockLinuxDrawingSurface {
+        super.draw()
+    }
+
     override fun redrawImmediately() = layer.backedLayer.lockLinuxDrawingSurface {
         super.redrawImmediately()
     }

@@ -40,7 +40,7 @@ internal class DirectSoftwareContextHandler(layer: SkiaLayer) : JvmContextHandle
         if (isSizeChanged(w, h)) {
             disposeCanvas()
             softwareRedrawer.resize(w, h)
-            surface = softwareRedrawer.getSurface()
+            surface = softwareRedrawer.acquireSurface()
             canvas = surface!!.canvas
         }
     }

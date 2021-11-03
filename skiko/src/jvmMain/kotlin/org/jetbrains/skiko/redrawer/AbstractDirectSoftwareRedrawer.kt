@@ -26,7 +26,7 @@ internal abstract class AbstractDirectSoftwareRedrawer(
 
         if (layer.isShowing) {
             layer.update(System.nanoTime())
-            layer.inDrawScope(contextHandler::draw)
+            draw()
         }
     }
 
@@ -36,14 +36,16 @@ internal abstract class AbstractDirectSoftwareRedrawer(
         frameDispatcher.scheduleFrame()
     }
 
+    protected open fun draw() = layer.inDrawScope(contextHandler::draw)
+
     override fun redrawImmediately() {
         layer.update(System.nanoTime())
         layer.inDrawScope(contextHandler::draw)
     }
 
     open fun resize(width: Int, height: Int) = resize(device, width, height)
-    fun getSurface(): Surface {
-        val surface = getSurface(device)
+    fun acquireSurface(): Surface {
+        val surface = acquireSurface(device)
         if (surface == 0L) {
             throw RenderException("Failed to create Surface")
         }
@@ -60,7 +62,7 @@ internal abstract class AbstractDirectSoftwareRedrawer(
     }
 
     private external fun resize(devicePtr: Long, width: Int, height: Int)
-    private external fun getSurface(devicePtr: Long): Long
+    private external fun acquireSurface(devicePtr: Long): Long
     private external fun finishFrame(devicePtr: Long)
     private external fun disposeDevice(devicePtr: Long)
 }

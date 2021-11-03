@@ -12,7 +12,6 @@ public:
     Display* display;
     Window window;
     GC gc;
-    SkAutoMalloc surfaceMemory;
     sk_sp<SkSurface> surface;
     unsigned int depth = 0;
     SkColorType colorSpace = kUnknown_SkColorType;
@@ -80,10 +79,11 @@ extern "C"
         device->surface = SkSurface::MakeRaster(info);
     }
 
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_AbstractDirectSoftwareRedrawer_getSurface(
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_AbstractDirectSoftwareRedrawer_acquireSurface(
         JNIEnv *env, jobject redrawer, jlong devicePtr)
     {
         SoftwareDevice *device = fromJavaPointer<SoftwareDevice *>(devicePtr);
+        device->surface.get()->ref();
         return toJavaPointer(device->surface.get());
     }
 
