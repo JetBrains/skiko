@@ -16,7 +16,7 @@ public:
         const uint16_t* fGlyphs;
         const SkPoint*  fPos;
         std::vector<SkScalar> fBreakPositions;
-        std::vector<SkScalar> fBreakOffsets;
+        std::vector<uint32_t> fBreakOffsets;
 
         Run(const SkFont& font,
             uint8_t bidiLevel,
@@ -44,7 +44,7 @@ public:
     SkScalar fWidth = 0;
     std::vector<Run> fRuns;
     sk_sp<SkTextBlob> fBlob;
-    
+
     TextLine() {
     }
 

@@ -85,44 +85,81 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TextLineKt_TextLine_1n
     SkASSERTF(idx == instance->fGlyphCount, "TextLine.cc: idx = %d != instance->fGlyphCount = %d", idx, instance->fGlyphCount);
 }
 
-extern "C" JNIEXPORT jfloatArray JNICALL Java_org_jetbrains_skia_TextLineKt_TextLine_1nGetPositions
-  (JNIEnv* env, jclass jclass, jlong ptr) {
+// Ensure resultArray has sufficient length (glyphCount * 2)
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TextLineKt_TextLine_1nGetPositions
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray resultArray) {
     TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
-    std::vector<jfloat> positions(2 * instance->fGlyphCount);
+    jfloat* positions = env->GetFloatArrayElements(resultArray, NULL);
     size_t idx = 0;
     for (auto& run: instance->fRuns) {
-        memcpy(positions.data() + idx, run.fPos, run.fGlyphCount * sizeof(SkPoint));
+        memcpy(positions + idx, run.fPos, run.fGlyphCount * sizeof(SkPoint));
         idx += 2 * run.fGlyphCount;
     }
+    env->ReleaseFloatArrayElements(resultArray, positions, 0);
     SkASSERTF(idx == 2 * instance->fGlyphCount, "TextLine.cc: idx = %d != 2 * instance->fGlyphCount = %d", idx, 2 * instance->fGlyphCount);
-    return javaFloatArray(env, positions);
 }
 
-extern "C" JNIEXPORT jfloatArray JNICALL Java_org_jetbrains_skia_TextLineKt__1nGetRunPositions
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TextLineKt__1nGetRunPositionsCount
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
-    std::vector<jfloat> positions(instance->fRuns.size());
-    for (size_t idx = 0; idx < positions.size(); ++idx)
+    return instance->fRuns.size();
+}
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TextLineKt__1nGetRunPositions
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray resultArray) {
+    TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
+    jfloat* positions = env->GetFloatArrayElements(resultArray, NULL);
+
+    size_t size = instance->fRuns.size();
+    for (size_t idx = 0; idx < size; ++idx)
         positions[idx] = instance->fRuns[idx].fPosition;
-    return javaFloatArray(env, positions);
+
+    env->ReleaseFloatArrayElements(resultArray, positions, 0);
 }
 
-extern "C" JNIEXPORT jfloatArray JNICALL Java_org_jetbrains_skia_TextLineKt__1nGetBreakPositions
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TextLineKt__1nGetBreakPositionsCount
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
-    std::vector<jfloat> positions;
+    size_t count = 0;
     for (auto& run: instance->fRuns)
-        positions.insert(positions.end(), run.fBreakPositions.begin(), run.fBreakPositions.end());
-    return javaFloatArray(env, positions);
+        count += run.fBreakPositions.size();
+    return count;
 }
 
-extern "C" JNIEXPORT jintArray JNICALL Java_org_jetbrains_skia_TextLineKt__1nGetBreakOffsets
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TextLineKt__1nGetBreakPositions
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray resultArray) {
+    TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
+    jfloat* positions = env->GetFloatArrayElements(resultArray, NULL);
+    size_t added = 0;
+    for (auto& run: instance->fRuns) {
+        size_t count = run.fBreakPositions.size();
+        std::memcpy(positions + added, run.fBreakPositions.data(), count * sizeof(SkScalar));
+        added += count;
+    }
+    env->ReleaseFloatArrayElements(resultArray, positions, 0);
+}
+
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TextLineKt__1nGetBreakOffsetsCount
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
-    std::vector<jint> offsets;
+    size_t count = 0;
     for (auto& run: instance->fRuns)
-        offsets.insert(offsets.end(), run.fBreakOffsets.begin(), run.fBreakOffsets.end());
-    return javaIntArray(env, offsets);
+        count += run.fBreakOffsets.size();
+    return count;
+}
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TextLineKt__1nGetBreakOffsets
+  (JNIEnv* env, jclass jclass, jlong ptr, jintArray resultArray) {
+    TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
+    jint* offsets = env->GetIntArrayElements(resultArray, NULL);
+
+    size_t added = 0;
+    for (auto& run: instance->fRuns) {
+        size_t count = run.fBreakOffsets.size();
+        std::memcpy(offsets + added, run.fBreakOffsets.data(), count * sizeof(uint32_t));
+        added += count;
+    }
+    env->ReleaseIntArrayElements(resultArray, offsets, 0);
 }
 
 extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TextLineKt__1nGetOffsetAtCoord
