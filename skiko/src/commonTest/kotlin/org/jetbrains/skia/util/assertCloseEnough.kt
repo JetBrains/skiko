@@ -11,7 +11,7 @@ import kotlin.test.assertTrue
 private const val EPSILON = 0.00001f
 
 internal fun assertCloseEnough(expected: Float, actual: Float, epsilon: Float = EPSILON) {
-    assertTrue(abs(expected - actual) < epsilon)
+    assertTrue(abs(expected - actual) < epsilon, message = "expected=$expected, actual=$actual, eps=$epsilon")
 }
 
 internal fun assertCloseEnough(expected: Point, actual: Point?, epsilon: Float = EPSILON) {
