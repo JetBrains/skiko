@@ -2,13 +2,14 @@ import de.undercouch.gradle.tasks.download.Download
 import org.gradle.crypto.checksum.Checksum
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
+import org.jetbrains.compose.internal.publishing.MavenCentralProperties
 
 plugins {
     kotlin("multiplatform") version "1.5.31"
     `maven-publish`
     signing
     id("org.gradle.crypto.checksum") version "1.1.0"
-    id("de.undercouch.download")
+    id("de.undercouch.download") version "4.1.2"
 }
 
 val coroutinesVersion = "1.5.2"
@@ -1098,10 +1099,11 @@ publishing {
     }
 }
 
-if (skiko.isCIBuild || skiko.signArtifacts) {
+val mavenCentral = MavenCentralProperties(project)
+if (skiko.isCIBuild || mavenCentral.signArtifacts) {
     signing {
         sign(publishing.publications)
-        useInMemoryPgpKeys(skiko.signArtifactsKey, skiko.signArtifactsPassword)
+        useInMemoryPgpKeys(mavenCentral.signArtifactsKey.get(), mavenCentral.signArtifactsPassword.get())
     }
 }
 
