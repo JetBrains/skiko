@@ -1,5 +1,5 @@
 #include "SkShaper.h"
-#include "../include/FontRunIterator.hh"
+#include "FontRunIterator.hh"
 #include "src/utils/SkUTF.h"
 #include "unicode/uchar.h"
 #include <iostream>
