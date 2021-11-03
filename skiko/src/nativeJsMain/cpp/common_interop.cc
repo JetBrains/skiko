@@ -82,6 +82,12 @@ namespace skija {
     }
 
     namespace shaper {
+        namespace ShapingOptions {
+            std::vector<SkShaper::Feature> getFeaturesFromIntsArray(KInt* featuresArray, KInt featuresLen) {
+                return skija::FontFeature::fromIntArray(featuresArray, featuresLen);
+            }
+        }
+
         std::shared_ptr<UBreakIterator> graphemeBreakIterator(SkString& text) {
             UErrorCode status = U_ZERO_ERROR;
             ICUUText utext(utext_openUTF8(nullptr, text.c_str(), text.size(), &status));
