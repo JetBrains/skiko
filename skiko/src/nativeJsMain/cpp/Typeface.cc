@@ -145,24 +145,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Typeface__1nMakeClone
 
 
 SKIKO_EXPORT KShort* org_jetbrains_skia_Typeface__1nGetUTF32Glyphs
-  (KNativePointer ptr, KInt* uniArr) {
-    TODO("implement org_jetbrains_skia_Typeface__1nGetUTF32Glyphs");
+  (KNativePointer ptr, KInt* uni, KInt count, KShort* res) {
+    SkTypeface* instance = reinterpret_cast<SkTypeface*>(ptr);
+    std::vector<short> glyphs(count);
+    instance->unicharsToGlyphs(reinterpret_cast<SkUnichar*>(uni), count, reinterpret_cast<SkGlyphID*>(glyphs.data()));
+    memcpy(res, glyphs.data(), glyphs.size() * sizeof(short));
 }
      
-#if 0 
-SKIKO_EXPORT KShort* org_jetbrains_skia_Typeface__1nGetUTF32Glyphs
-  (KNativePointer ptr, KInt* uniArr) {
-    SkTypeface* instance = reinterpret_cast<SkTypeface*>((ptr));
-    KInt count = env->GetArrayLength(uniArr);
-    std::vector<short> glyphs(count);
-    KInt* uni = env->GetIntArrayElements(uniArr, nullptr);
-    instance->unicharsToGlyphs(reinterpret_cast<SkUnichar*>(uni), count, reinterpret_cast<SkGlyphID*>(glyphs.data()));
-    env->ReleaseIntArrayElements(uniArr, uni, 0);
-    return javaShortArray(env, glyphs);
-}
-#endif
-
-
 SKIKO_EXPORT KShort org_jetbrains_skia_Typeface__1nGetUTF32Glyph
   (KNativePointer ptr, KInt uni) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>((ptr));

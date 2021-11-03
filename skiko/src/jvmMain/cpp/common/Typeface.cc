@@ -118,15 +118,14 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TypefaceKt__1nMakeClo
     return reinterpret_cast<jlong>(clone);
 }
 
-extern "C" JNIEXPORT jshortArray JNICALL Java_org_jetbrains_skia_TypefaceKt_Typeface_1nGetUTF32Glyphs
-  (JNIEnv* env, jclass jclass, jlong ptr, jintArray uniArr) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TypefaceKt_Typeface_1nGetUTF32Glyphs
+  (JNIEnv* env, jclass jclass, jlong ptr, jintArray uniArr, jint count, jshortArray res) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
-    jint count = env->GetArrayLength(uniArr);
     std::vector<short> glyphs(count);
     jint* uni = env->GetIntArrayElements(uniArr, nullptr);
     instance->unicharsToGlyphs(reinterpret_cast<SkUnichar*>(uni), count, reinterpret_cast<SkGlyphID*>(glyphs.data()));
     env->ReleaseIntArrayElements(uniArr, uni, 0);
-    return javaShortArray(env, glyphs);
+    env->SetShortArrayRegion(res, 0, count, glyphs.data());
 }
 
 extern "C" JNIEXPORT jshort JNICALL Java_org_jetbrains_skia_TypefaceKt_Typeface_1nGetUTF32Glyph

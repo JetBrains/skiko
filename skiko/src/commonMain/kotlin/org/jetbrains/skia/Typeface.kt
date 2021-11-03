@@ -204,7 +204,11 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     fun getUTF32Glyphs(uni: IntArray?): ShortArray {
         return try {
             Stats.onNativeCall()
-            Typeface_nGetUTF32Glyphs(_ptr, uni)
+            if (uni != null) {
+                withResult(ShortArray(uni.size)) {
+                    Typeface_nGetUTF32Glyphs(_ptr, uni, uni.size, it)
+                }
+            } else shortArrayOf()
         } finally {
             reachabilityBarrier(this)
         }
@@ -370,7 +374,7 @@ private external fun Typeface_nEquals(ptr: NativePointer, otherPtr: NativePointe
 private external fun Typeface_nMakeDefault(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUTF32Glyphs")
-private external fun Typeface_nGetUTF32Glyphs(ptr: NativePointer, uni: IntArray?): ShortArray
+private external fun Typeface_nGetUTF32Glyphs(ptr: NativePointer, uni: IntArray?, count: Int, glyphs: InteropPointer): ShortArray
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUTF32Glyph")
 private external fun Typeface_nGetUTF32Glyph(ptr: NativePointer, unichar: Int): Short
