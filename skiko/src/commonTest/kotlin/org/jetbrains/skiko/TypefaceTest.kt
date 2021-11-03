@@ -60,28 +60,28 @@ class TypefaceTest {
 //        assertContentEquals(shortArrayOf(394, 713, 677, 503), inter.getUTF32Glyphs(Skia))
 //        assertContentEquals(shortArrayOf(394, 713, 677, 503), inter.getStringGlyphs("Skia"))
 //
-//        assertContentEquals(
-//            arrayOf(
-//                "GDEF",
-//                "GPOS",
-//                "GSUB",
-//                "OS/2",
-//                "cmap",
-//                "cvt ",
-//                "fpgm",
-//                "gasp",
-//                "glyf",
-//                "head",
-//                "hhea",
-//                "hmtx",
-//                "loca",
-//                "maxp",
-//                "name",
-//                "post",
-//                "prep"
-//            ), inter.tableTags
-//        )
-//
+        assertContentEquals(
+            arrayOf(
+                "GDEF",
+                "GPOS",
+                "GSUB",
+                "OS/2",
+                "cmap",
+                "cvt ",
+                "fpgm",
+                "gasp",
+                "glyf",
+                "head",
+                "hhea",
+                "hmtx",
+                "loca",
+                "maxp",
+                "name",
+                "post",
+                "prep"
+            ), inter.tableTags
+        )
+
 //
 //        assertNull(jbMono.getKerningPairAdjustments(null))
 //        assertNull(jbMono.getKerningPairAdjustments(jbMono.getStringGlyphs("TAV")))

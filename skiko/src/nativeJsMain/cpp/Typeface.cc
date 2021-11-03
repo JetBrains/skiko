@@ -181,23 +181,19 @@ SKIKO_EXPORT KInt org_jetbrains_skia_Typeface__1nGetTablesCount
     return instance->countTables();
 }
 
-
-SKIKO_EXPORT KInt* org_jetbrains_skia_Typeface__1nGetTableTags
+SKIKO_EXPORT KInt org_jetbrains_skia_Typeface__1nGetTableTagsCount
   (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_Typeface__1nGetTableTags");
+    SkTypeface* instance = reinterpret_cast<SkTypeface*>(ptr);
+    return instance->countTables();
 }
-     
-#if 0 
-SKIKO_EXPORT KInt* org_jetbrains_skia_Typeface__1nGetTableTags
-  (KNativePointer ptr) {
-    SkTypeface* instance = reinterpret_cast<SkTypeface*>((ptr));
-    int count = instance->countTables();
-    std::vector<KInt> tags(count);
+
+SKIKO_EXPORT void org_jetbrains_skia_Typeface__1nGetTableTags
+  (KNativePointer ptr, KInt* res, KInt count) {
+    SkTypeface* instance = reinterpret_cast<SkTypeface*>(ptr);
+    std::vector<int> tags(count);
     instance->getTableTags(reinterpret_cast<SkFontTableTag*>(tags.data()));
-    return javaIntArray(env, tags);
+    memcpy(res, tags.data(), tags.size());
 }
-#endif
-
 
 SKIKO_EXPORT KInt org_jetbrains_skia_Typeface__1nGetTableSize
   (KNativePointer ptr, KInt tag) {

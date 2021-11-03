@@ -147,13 +147,18 @@ extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetTable
     return instance->countTables();
 }
 
-extern "C" JNIEXPORT jintArray JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetTableTags
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetTableTagsCount
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
-    int count = instance->countTables();
+    return instance->countTables();
+}
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetTableTags
+  (JNIEnv* env, jclass jclass, jlong ptr, jintArray res, jint count) {
+    SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     std::vector<jint> tags(count);
     instance->getTableTags(reinterpret_cast<SkFontTableTag*>(tags.data()));
-    return javaIntArray(env, tags);
+    env->SetIntArrayRegion(res, 0, count, tags.data());
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetTableSize

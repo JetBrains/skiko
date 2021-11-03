@@ -251,7 +251,12 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     val tableTags: Array<String>
         get() = try {
             Stats.onNativeCall()
-            _nGetTableTags(_ptr)!!.map { tag -> FourByteTag.toString(tag) }.toTypedArray()
+            val count = _nGetTableTagsCount(_ptr)
+            if (count > 0) {
+                withResult(IntArray(count)) {
+                    _nGetTableTags(_ptr, it, count)
+                }.toList().map { FourByteTag.toString(it) }.toTypedArray()
+            } else emptyArray()
         } finally {
             reachabilityBarrier(this)
         }
@@ -409,8 +414,11 @@ private external fun _nGetGlyphsCount(ptr: NativePointer): Int
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetTablesCount")
 private external fun _nGetTablesCount(ptr: NativePointer): Int
 
+@ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetTableTagsCount")
+private external fun _nGetTableTagsCount(ptr: NativePointer): Int
+
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetTableTags")
-private external fun _nGetTableTags(ptr: NativePointer): IntArray?
+private external fun _nGetTableTags(ptr: NativePointer, tags: InteropPointer, count: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetTableSize")
 private external fun _nGetTableSize(ptr: NativePointer, tag: Int): NativePointer
