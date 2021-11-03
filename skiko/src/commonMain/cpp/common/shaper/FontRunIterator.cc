@@ -1,5 +1,5 @@
 #include "SkShaper.h"
-#include "FontRunIterator.hh"
+#include "../include/FontRunIterator.hh"
 #include "src/utils/SkUTF.h"
 #include "unicode/uchar.h"
 #include <iostream>
@@ -51,7 +51,7 @@ void FontRunIterator::consume() {
             }
         }
     }
-    
+
     while (clusterStart < fEnd) {
         clusterStart = clusterEnd;
         clusterEnd = fBegin + ubrk_following(fGraphemeIter.get(), clusterStart - fBegin);
