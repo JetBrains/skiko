@@ -63,10 +63,10 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nShapeBlob
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nShapeLine
-  (KNativePointer ptr, KInteropPointer textObj, KNativePointer fontPtr, KInt optsFeaturesLen, KInt* optsFeatures, KInt optsBooleanProps) {
+  (KNativePointer ptr, KNativePointer textManagedStringPtr, KNativePointer fontPtr, KInt optsFeaturesLen, KInt* optsFeatures, KInt optsBooleanProps) {
     SkShaper* instance = reinterpret_cast<SkShaper*>(ptr);
 
-    SkString text = skString(textObj);
+    SkString text = *(reinterpret_cast<SkString*>(textManagedStringPtr));
     std::shared_ptr<UBreakIterator> graphemeIter = skija::shaper::graphemeBreakIterator(text);
     if (!graphemeIter) return 0;
 
@@ -98,13 +98,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nShapeLine
     if (!languageRunIter) return 0;
 
     TextLine* line;
-//    if (text.size() == 0)
-//        line = new TextLine(*font);
-//    else {
-//        TextLineRunHandler rh(text, graphemeIter);
-//        instance->shape(text.c_str(), text.size(), *fontRunIter, *bidiRunIter, *scriptRunIter, *languageRunIter, features.data(), features.size(), std::numeric_limits<float>::infinity(), &rh);
-//        line = rh.makeLine().release();
-//    }
+    if (text.size() == 0)
+        line = new TextLine(*font);
+    else {
+        TextLineRunHandler rh(text, graphemeIter);
+        instance->shape(text.c_str(), text.size(), *fontRunIter, *bidiRunIter, *scriptRunIter, *languageRunIter, features.data(), features.size(), std::numeric_limits<float>::infinity(), &rh);
+        line = rh.makeLine().release();
+    }
     return reinterpret_cast<KNativePointer>(line);
 }
 SKIKO_EXPORT void org_jetbrains_skia_shaper_Shaper__1nShape

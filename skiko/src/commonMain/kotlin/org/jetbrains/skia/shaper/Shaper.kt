@@ -210,7 +210,7 @@ class Shaper internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
                 TextLine(
                     _nShapeLine(
                         _ptr,
-                        text,
+                        ManagedString(text)._ptr,
                         getPtr(font),
                         optsFeaturesLen = opts.features?.size ?: 0,
                         optsFeatures = arrayOfFontFeaturesToInterop(opts.features),
@@ -272,7 +272,7 @@ private external fun _nShapeBlob(
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper__1nShapeLine")
 private external fun _nShapeLine(
     ptr: NativePointer,
-    text: String?,
+    text: NativePointer,
     fontPtr: NativePointer,
     optsFeaturesLen: Int,
     optsFeatures: InteropPointer,

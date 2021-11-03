@@ -99,7 +99,19 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
         get() {
             Stats.onNativeCall()
             return try {
-                TextLine_nGetGlyphs(_ptr)
+                withResult(ShortArray(glyphsLength)) {
+                    TextLine_nGetGlyphs(_ptr, it)
+                }
+            } finally {
+                reachabilityBarrier(this)
+            }
+        }
+
+    internal val glyphsLength: Int
+        get() {
+            Stats.onNativeCall()
+            return try {
+                TextLine_nGetGlyphsLength(_ptr)
             } finally {
                 reachabilityBarrier(this)
             }
@@ -204,8 +216,11 @@ private external fun TextLine_nGetWidth(ptr: NativePointer): Float
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetHeight")
 private external fun TextLine_nGetHeight(ptr: NativePointer): Float
 
+@ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetGlyphsLength")
+private external fun TextLine_nGetGlyphsLength(ptr: NativePointer): Int
+
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetGlyphs")
-private external fun TextLine_nGetGlyphs(ptr: NativePointer): ShortArray
+private external fun TextLine_nGetGlyphs(ptr: NativePointer, resultGlyphs: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetPositions")
 private external fun TextLine_nGetPositions(ptr: NativePointer): FloatArray

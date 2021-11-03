@@ -98,10 +98,11 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nSh
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nShapeLine
-  (JNIEnv* env, jclass jclass, jlong ptr, jstring textObj, jlong fontPtr, jint optsFeaturesLen, jintArray optsFeatures, jint optsBooleanProps) {
+  (JNIEnv* env, jclass jclass, jlong ptr, jlong textPtr, jlong fontPtr, jint optsFeaturesLen, jintArray optsFeatures, jint optsBooleanProps) {
     SkShaper* instance = reinterpret_cast<SkShaper*>(static_cast<uintptr_t>(ptr));
 
-    SkString text = skString(env, textObj);
+    SkString text = *(reinterpret_cast<SkString*>(static_cast<uintptr_t>(textPtr)));
+
     std::shared_ptr<UBreakIterator> graphemeIter = skija::shaper::graphemeBreakIterator(text);
     if (!graphemeIter) return 0;
 

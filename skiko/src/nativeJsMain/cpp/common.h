@@ -101,9 +101,7 @@ namespace skija {
 
     namespace shaper {
         namespace ShapingOptions {
-            std::vector<SkShaper::Feature> getFeaturesFromIntsArray(KInt* featuresArray, KInt featuresLen) {
-                return skija::FontFeature::fromIntArray(featuresArray, featuresLen);
-            }
+            std::vector<SkShaper::Feature> getFeaturesFromIntsArray(KInt* featuresArray, KInt featuresLen);
         }
 
         using ICUUText = std::unique_ptr<UText, SkFunctionWrapper<decltype(utext_close), utext_close>>;

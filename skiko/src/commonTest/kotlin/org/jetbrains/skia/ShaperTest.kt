@@ -7,10 +7,9 @@ import org.jetbrains.skiko.tests.SkipNativeTarget
 import org.jetbrains.skiko.tests.runTest
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
+import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
-@SkipJsTarget
-@SkipNativeTarget
 class ShaperTest {
 
     private suspend fun fontInter36() =
@@ -18,9 +17,13 @@ class ShaperTest {
 
     @Test
     fun canShapeLine() = runTest {
-        val textLine = Shaper.make().shapeLine(
+        val shaper = Shaper.make(FontMgr.default)
+
+        val textLine = shaper.shapeLine(
             text = "Abc123", font = fontInter36()
         )
+
+        assertEquals(6, textLine.glyphsLength)
 
         assertContentEquals(
             expected = shortArrayOf(2, 574, 581, 1292, 1293, 1295),
@@ -28,7 +31,7 @@ class ShaperTest {
         )
     }
 
-    @Test
+    @Test @SkipJsTarget @SkipNativeTarget
     fun canShapeTextBlob() = runTest {
         val textBlob = Shaper.make().shape(
             text = "text",
