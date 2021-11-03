@@ -6,6 +6,7 @@ import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaLayerProperties
 import org.jetbrains.skiko.SkikoDispatchers
+import org.jetbrains.skiko.context.ContextHandler
 import org.jetbrains.skiko.context.MacOSOpenGLContextHandler
 import platform.CoreFoundation.CFTimeInterval
 import platform.CoreGraphics.CGRectMake
@@ -21,13 +22,13 @@ internal class MacOsOpenGLRedrawer(
     private val skiaLayer: SkiaLayer,
     private val properties: SkiaLayerProperties
 ) : Redrawer {
-    private val contextHandler = MacOSOpenGLContextHandler(layer)
+    private val contextHandler = MacOSOpenGLContextHandler(skiaLayer)
     override val renderInfo: String get() = contextHandler.rendererInfo()
 
     private val glLayer = MacosGLLayer()
 
     init {
-        glLayer.init(skiaLayer)
+        glLayer.init(skiaLayer, contextHandler)
     }
 
     private val frameDispatcher = FrameDispatcher(SkikoDispatchers.Main) {
@@ -72,13 +73,15 @@ internal class MacOsOpenGLRedrawer(
 
 internal class MacosGLLayer : CAOpenGLLayer {
     private lateinit var layer: SkiaLayer
+    private lateinit var contextHandler: ContextHandler
     @OverrideInit
     constructor(): super()
     @OverrideInit
     constructor(layer: Any): super(layer)
 
-    fun init(layer: SkiaLayer) {
+    fun init(layer: SkiaLayer, contextHandler: ContextHandler) {
         this.layer = layer
+        this.contextHandler = contextHandler
         this.setNeedsDisplayOnBoundsChange(true)
         this.removeAllAnimations()
         this.setAutoresizingMask(kCALayerWidthSizable or kCALayerHeightSizable )
@@ -118,7 +121,7 @@ internal class MacosGLLayer : CAOpenGLLayer {
         CGLSetCurrentContext(ctx);
         try {
             layer.update(getTimeNanos())
-            layer.draw()
+            contextHandler.draw()
         } catch (e: Throwable) {
             e.printStackTrace()
             throw e

@@ -2,6 +2,7 @@ package org.jetbrains.skiko
 
 import kotlinx.cinterop.ObjCAction
 import kotlinx.cinterop.useContents
+import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.PictureRecorder
 import org.jetbrains.skia.Rect
 import org.jetbrains.skiko.context.MetalContextHandler
