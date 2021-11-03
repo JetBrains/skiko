@@ -65,9 +65,11 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_Pixmap__1nExtractSubset
 }
 
 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Pixmap__1nGetInfo
-  (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_Pixmap__1nGetInfo");
+SKIKO_EXPORT void org_jetbrains_skia_Pixmap__1nGetInfo
+  (KNativePointer ptr, KInt* imageInfoResult, KNativePointer* colorSpacePtrsArray) {
+    SkPixmap* instance = reinterpret_cast<SkPixmap*>(ptr);
+    SkImageInfo imageInfo = instance->info();
+    skija::ImageInfo::writeImageInfoForInterop(imageInfo, imageInfoResult, colorSpacePtrsArray);
 }
 
 SKIKO_EXPORT KInt org_jetbrains_skia_Pixmap__1nGetRowBytes

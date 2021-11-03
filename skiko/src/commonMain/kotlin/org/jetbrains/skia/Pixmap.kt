@@ -11,11 +11,14 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
      */
     private var underlyingMemoryOwner: Managed? = null
 
+    private var _imageInfo: ImageInfo ? = null
+
     constructor() : this(_nMakeNull(), true) {
         Stats.onNativeCall()
     }
 
     fun reset() {
+        _imageInfo = null
         Stats.onNativeCall()
         Pixmap_nReset(_ptr)
         underlyingMemoryOwner = null
@@ -23,6 +26,7 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
     }
 
     fun reset(info: ImageInfo, addr: NativePointer, rowBytes: Int, underlyingMemoryOwner: Managed? = null) {
+        _imageInfo = null
         Stats.onNativeCall()
         _nResetWithInfo(
             _ptr,
@@ -37,10 +41,12 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
     }
 
     fun reset(info: ImageInfo, buffer: Data, rowBytes: Int) {
+        _imageInfo = null
         reset(info = info, addr = buffer.writableData(), rowBytes = rowBytes, underlyingMemoryOwner = buffer)
     }
 
     fun setColorSpace(colorSpace: ColorSpace?) {
+        _imageInfo = null
         Stats.onNativeCall()
         _nSetColorSpace(_ptr, getPtr(colorSpace))
         reachabilityBarrier(this)
@@ -49,7 +55,6 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
 
     fun extractSubset(subsetPtr: NativePointer, area: IRect): Boolean {
         return try {
-            Stats.onNativeCall()
             Pixmap_nExtractSubset(
                 _ptr,
                 subsetPtr,
@@ -71,7 +76,13 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
         get() {
             Stats.onNativeCall()
             return try {
-                _nGetInfo(_ptr)
+                if (_imageInfo == null) {
+                    _imageInfo = ImageInfo.createUsing(
+                        _ptr = _ptr,
+                        _nGetImageInfo = ::_nGetInfo
+                    )
+                }
+                _imageInfo!!
             } finally {
                 reachabilityBarrier(this)
             }
@@ -183,6 +194,7 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
     }
 
     fun readPixels(pixmap: Pixmap?): Boolean {
+        pixmap?._imageInfo = null
         Stats.onNativeCall()
         return try {
             _nReadPixelsToPixmap(
@@ -196,6 +208,7 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
     }
 
     fun readPixels(pixmap: Pixmap?, srcX: Int, srcY: Int): Boolean {
+        pixmap?._imageInfo = null
         Stats.onNativeCall()
         return try {
             _nReadPixelsToPixmapFromPoint(
@@ -341,7 +354,7 @@ private external fun _nResetWithInfo(
 private external fun _nSetColorSpace(ptr: NativePointer, colorSpacePtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nGetInfo")
-private external fun _nGetInfo(ptr: NativePointer): ImageInfo
+private external fun _nGetInfo(ptr: NativePointer, imageInfo: InteropPointer, colorSpacePtrs: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nGetAddr")
 private external fun _nGetAddr(ptr: NativePointer): NativePointer
