@@ -7,7 +7,7 @@ import javax.swing.*
 
 fun main() {
     val skiaLayer = SkiaLayer()
-    skiaLayer.skikoView = GenericSkikoView(skiaLayer, BouncingBalls())
+    skiaLayer.addView( GenericSkikoView(skiaLayer, Clocks()))
     SwingUtilities.invokeLater {
         val window = JFrame("Skiko example").apply {
             defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE

@@ -9,6 +9,7 @@ import org.jetbrains.skia.impl.BufferUtil
 import java.awt.Transparency
 import java.awt.color.ColorSpace
 import java.awt.image.*
+import java.awt.event.*
 import java.nio.ByteBuffer
 
 private class DirectDataBuffer(val backing: ByteBuffer): DataBuffer(TYPE_BYTE, backing.limit()) {
@@ -75,4 +76,60 @@ fun BufferedImage.toBitmap(): Bitmap {
 
 fun BufferedImage.toImage(): Image {
     return Image.makeFromBitmap(toBitmap())
+}
+
+fun toSkikoEvent(e: MouseEvent): SkikoPointerEvent {
+    return SkikoPointerEvent(
+        e.x.toDouble(),
+        e.y.toDouble(),
+        when(e.button) {
+            MouseEvent.BUTTON1 -> SkikoMouseButtons.LEFT
+            MouseEvent.BUTTON2 -> SkikoMouseButtons.RIGHT
+            MouseEvent.BUTTON3 -> SkikoMouseButtons.MIDDLE
+            else -> SkikoMouseButtons.NONE
+        },
+        when(e.id) {
+            MouseEvent.MOUSE_PRESSED -> SkikoPointerEventKind.DOWN
+            MouseEvent.MOUSE_RELEASED -> SkikoPointerEventKind.UP
+            MouseEvent.MOUSE_DRAGGED -> SkikoPointerEventKind.DRAG
+            MouseEvent.MOUSE_MOVED -> SkikoPointerEventKind.MOVE
+            MouseEvent.MOUSE_ENTERED -> SkikoPointerEventKind.ENTER
+            MouseEvent.MOUSE_EXITED -> SkikoPointerEventKind.EXIT
+            else -> SkikoPointerEventKind.UNKNOWN
+        },
+        e
+    )
+}
+
+fun toSkikoEvent(e: MouseWheelEvent): SkikoPointerEvent {
+    return SkikoPointerEvent(
+        e.x.toDouble(),
+        e.y.toDouble(),
+        SkikoMouseButtons.NONE,
+        when(e.id) {
+            MouseEvent.MOUSE_WHEEL-> SkikoPointerEventKind.SCROLL
+            else -> SkikoPointerEventKind.UNKNOWN
+        },
+        e
+    )
+}
+
+fun toSkikoEvent(e: KeyEvent): SkikoKeyboardEvent {
+    return SkikoKeyboardEvent(
+        e.keyCode,
+        when(e.id) {
+            KeyEvent.KEY_PRESSED -> SkikoKeyboardEventKind.DOWN
+            KeyEvent.KEY_RELEASED -> SkikoKeyboardEventKind.UP
+            KeyEvent.KEY_TYPED -> SkikoKeyboardEventKind.TYPE
+            else -> SkikoKeyboardEventKind.UNKNOWN
+        },
+        e
+    )
+}
+
+fun toSkikoEvent(e: InputMethodEvent): SkikoInputEvent {
+    return SkikoInputEvent(
+        "",
+        e
+    )
 }

@@ -35,9 +35,10 @@ class SkikoAppDelegate : UIResponder, UIApplicationDelegateProtocol {
 
     override fun application(application: UIApplication, didFinishLaunchingWithOptions: Map<Any?, *>?): Boolean {
         window = UIWindow(frame = UIScreen.mainScreen.bounds)
-        window!!.rootViewController = SkikoViewController().apply {
+        val skikoView = makeApp()
+        window!!.rootViewController = SkikoViewController(skikoView).apply {
             setAppFactory { layer ->
-                GenericSkikoView(layer, makeApp()).also {
+                GenericSkikoView(layer, skikoView).also {
                     layer.skikoView = it
                 }
             }
