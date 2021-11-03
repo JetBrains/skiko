@@ -156,7 +156,6 @@ actual open class SkiaLayer internal constructor(
         skikoView = view
         addMouseListener(object : MouseAdapter() {
             override fun mousePressed(e: MouseEvent) {
-                println("press")
                 skikoView?.onPointerEvent(toSkikoEvent(e))
             }
             override fun mouseReleased(e: MouseEvent) {
