@@ -192,7 +192,7 @@ SKIKO_EXPORT void org_jetbrains_skia_Typeface__1nGetTableTags
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(ptr);
     std::vector<int> tags(count);
     instance->getTableTags(reinterpret_cast<SkFontTableTag*>(tags.data()));
-    memcpy(res, tags.data(), tags.size());
+    memcpy(res, tags.data(), tags.size() * sizeof(KInt));
 }
 
 SKIKO_EXPORT KInt org_jetbrains_skia_Typeface__1nGetTableSize
