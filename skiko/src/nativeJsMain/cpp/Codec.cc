@@ -77,7 +77,7 @@ SKIKO_EXPORT void org_jetbrains_skia_Codec__1nGetFrameInfo
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Codec__1nGetFramesInfo
   (KNativePointer ptr) {
     SkCodec* instance = reinterpret_cast<SkCodec*>((ptr));
-    auto infos = new std::vector<SkCodec::FrameInfo> { instance->getFrameInfo() };
+    auto* infos = new std::vector<SkCodec::FrameInfo> { instance->getFrameInfo() };
     return reinterpret_cast<KNativePointer>(infos);
 }
 
@@ -88,13 +88,13 @@ SKIKO_EXPORT void org_jetbrains_skia_Codec__1nFramesInfo_Delete
 
 SKIKO_EXPORT KInt org_jetbrains_skia_Codec__1nFramesInfo_GetSize
   (KNativePointer ptr) {
-    auto infos = reinterpret_cast<std::vector<SkCodec::FrameInfo>*>(ptr);
+    auto* infos = reinterpret_cast<std::vector<SkCodec::FrameInfo>*>(ptr);
     return static_cast<KInt>(infos->size());
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_Codec__1nFramesInfo_GetInfos
   (KNativePointer ptr, KInteropPointer result) {
-    auto infos = reinterpret_cast<std::vector<SkCodec::FrameInfo>*>(ptr);
+    auto* infos = reinterpret_cast<std::vector<SkCodec::FrameInfo>*>(ptr);
     skija::AnimationFrameInfo::copyToInterop(*infos, result);
 }
 

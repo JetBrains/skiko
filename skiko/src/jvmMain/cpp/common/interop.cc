@@ -523,7 +523,7 @@ namespace skija {
             if (rectInts == nullptr)
                 return std::unique_ptr<SkIRect>(nullptr);
             else {
-                jint *ints = env->GetIntArrayElements(rectInts, 0);
+                jint *ints = env->GetIntArrayElements(rectInts, nullptr);
                 auto result = std::unique_ptr<SkIRect>(new SkIRect{
                     ints[0], ints[1], ints[2], ints[3]
                 });
