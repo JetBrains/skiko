@@ -19,33 +19,18 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_skottie_Animation__1nGetFinalizer
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_skottie_Animation__1nMakeFromString
   (KInteropPointer dataStr) {
-    TODO("implement org_jetbrains_skia_skottie_Animation__1nMakeFromString");
-}
-     
-#if 0 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_skottie_Animation__1nMakeFromString
-  (KInteropPointer dataStr) {
-    SkString data = skString(env, dataStr);
+    SkString data = skString(dataStr);
     sk_sp<Animation> instance = Animation::Make(data.c_str(), data.size());
     return reinterpret_cast<KNativePointer>(instance.release());
 }
-#endif
-
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_skottie_Animation__1nMakeFromFile
   (KInteropPointer pathStr) {
-    TODO("implement org_jetbrains_skia_skottie_Animation__1nMakeFromFile");
-}
-     
-#if 0 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_skottie_Animation__1nMakeFromFile
-  (KInteropPointer pathStr) {
-    SkString path = skString(env, pathStr);
+    SkString path = skString(pathStr);
     sk_sp<Animation> instance = Animation::MakeFromFile(path.c_str());
     return reinterpret_cast<KNativePointer>(instance.release());
 }
-#endif
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_skottie_Animation__1nMakeFromData
@@ -112,30 +97,16 @@ SKIKO_EXPORT KFloat org_jetbrains_skia_skottie_Animation__1nGetOutPoint
 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_skottie_Animation__1nGetVersion
   (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_skottie_Animation__1nGetVersion");
-}
-     
-#if 0 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_skottie_Animation__1nGetVersion
-  (KNativePointer ptr) {
     Animation* instance = reinterpret_cast<Animation*>((ptr));
-    return javaString(env, instance->version());
+    const SkString* version = &instance->version();
+    return reinterpret_cast<KInteropPointer>(const_cast<SkString*>(version));
 }
-#endif
 
 
-
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_skottie_Animation__1nGetSize
-  (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_skottie_Animation__1nGetSize");
-}
-     
-#if 0 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_skottie_Animation__1nGetSize
-  (KNativePointer ptr) {
+SKIKO_EXPORT void org_jetbrains_skia_skottie_Animation__1nGetSize
+  (KNativePointer ptr, KInteropPointer dst) {
     Animation* instance = reinterpret_cast<Animation*>((ptr));
     const SkSize& size = instance->size();
-    return skija::Point::make(env, size.fWidth, size.fHeight);
+    return skija::Point::copyToInterop({ size.fWidth, size.fHeight }, dst);
 }
-#endif
 
