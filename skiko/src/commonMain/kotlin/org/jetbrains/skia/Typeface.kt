@@ -105,12 +105,12 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             if (axisCount == 0) {
                 null
             } else {
-                val axisData = withResult(IntArray(axisCount * 4)) {
+                val axisData = withResult(IntArray(axisCount * 5)) {
                     _nGetVariationAxes(_ptr, it, axisCount)
                 }
                 (0 until axisCount).map { i ->
-                    val j = 4 * i
-                    FontVariationAxis(axisData[j], Float.fromBits(axisData[j + 1]), Float.fromBits(axisData[j + 2]), Float.fromBits(axisData[j + 3]), false)
+                    val j = 5 * i
+                    FontVariationAxis(axisData[j], Float.fromBits(axisData[j + 1]), Float.fromBits(axisData[j + 2]), Float.fromBits(axisData[j + 3]), axisData[j + 4] != 0)
                 }.toTypedArray()
             }
         } finally {
