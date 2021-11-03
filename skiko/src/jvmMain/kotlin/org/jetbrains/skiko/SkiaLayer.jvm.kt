@@ -53,7 +53,7 @@ actual open class SkiaLayer internal constructor(
             }
         }
 
-    internal val backedLayer: HardwareLayer
+    internal var backedLayer: HardwareLayer
 
     constructor(
         properties: SkiaLayerProperties = makeDefaultSkiaLayerProperties(),
@@ -95,9 +95,20 @@ actual open class SkiaLayer internal constructor(
     }
 
     override fun removeNotify() {
-        dispose()
+        disposeSkiaResources()
+        isDisposed = true
         super.removeNotify()
     }
+
+    override fun addNotify() {
+        super.addNotify()
+        if (isInited) {
+            isDisposed = false
+            pictureRecorder = PictureRecorder()
+            initSkiaResources()
+        }
+    }
+
 
     actual fun detach() {
         dispose()
@@ -229,7 +240,7 @@ actual open class SkiaLayer internal constructor(
 
     @Volatile
     private var picture: PictureHolder? = null
-    private val pictureRecorder = PictureRecorder()
+    private var pictureRecorder = PictureRecorder()
     private val pictureLock = Any()
 
     private fun findNextWorkingRenderApi() {
@@ -240,9 +251,7 @@ actual open class SkiaLayer internal constructor(
                 renderApi = fallbackRenderApiQueue.removeAt(0)
                 contextHandler?.dispose()
                 redrawer?.dispose()
-                contextHandler = renderFactory.createContextHandler(this, renderApi)
-                redrawer = renderFactory.createRedrawer(this, renderApi, properties)
-                redrawer?.syncSize()
+                initSkiaResources()
             } catch (e: RenderException) {
                 println(e.message)
                 thrown = true
@@ -275,15 +284,25 @@ actual open class SkiaLayer internal constructor(
 
     open fun dispose() {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
-
         if (isInited && !isDisposed) {
-            redrawer?.dispose()  // we should dispose redrawer first (to cancel `draw` in rendering thread)
-            contextHandler?.dispose()
-            picture?.instance?.close()
-            pictureRecorder.close()
+            disposeSkiaResources()
             backedLayer.dispose()
             isDisposed = true
         }
+    }
+
+    private fun disposeSkiaResources() {
+        redrawer?.dispose()  // we should dispose redrawer first (to cancel `draw` in rendering thread)
+        contextHandler?.dispose()
+        picture?.instance?.close()
+        picture = null
+        pictureRecorder.close()
+    }
+
+    private fun initSkiaResources() {
+        contextHandler = renderFactory.createContextHandler(this, renderApi)
+        redrawer = renderFactory.createRedrawer(this, renderApi, properties)
+        redrawer?.syncSize()
     }
 
     override fun setBounds(x: Int, y: Int, width: Int, height: Int) {
