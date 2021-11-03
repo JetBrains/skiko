@@ -45,7 +45,7 @@ class TypefaceTest {
         val jbMono = Typeface.makeFromResource("./fonts/JetBrainsMono-Regular.ttf")
 
         assertNull(inter.variationAxes)
-//        assertNull(inter.variations)
+        assertNull(inter.variations)
         val axes = arrayOf(
             FontVariationAxis("wght", 100f, 400f, 900f),
             FontVariationAxis("slnt", -10f, 0f, 0f)

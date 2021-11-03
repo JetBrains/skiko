@@ -20,30 +20,24 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_Typeface__1nIsFixedPitch
     return instance->isFixedPitch();
 }
 
+SKIKO_EXPORT KInt org_jetbrains_skia_Typeface__1nGetVariationsCount
+  (KNativePointer ptr) {
+    SkTypeface* instance = reinterpret_cast<SkTypeface*>(ptr);
+    return instance->getVariationDesignPosition(nullptr, 0);
+}
 
 SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_Typeface__1nGetVariations
-  (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_Typeface__1nGetVariations");
-}
-     
-#if 0 
-SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_Typeface__1nGetVariations
-  (KNativePointer ptr) {
-    SkTypeface* instance = reinterpret_cast<SkTypeface*>((ptr));
-    int count = instance->getVariationDesignPosition(nullptr, 0);
+  (KNativePointer ptr, KInt* res, KInt count) {
+    SkTypeface* instance = reinterpret_cast<SkTypeface*>(ptr);
     if (count > 0) {
         std::vector<SkFontArguments::VariationPosition::Coordinate> coords(count);
         instance->getVariationDesignPosition(coords.data(), count);
-        KInteropPointerArray res = env->NewObjectArray(count, skija::FontVariation::cls, nullptr);
         for (int i=0; i < count; ++i) {
-            KInteropPointer var = env->NewObject(skija::FontVariation::cls, skija::FontVariation::ctor, coords[i].axis, coords[i].value);
-            env->SetObjectArrayElement(res, i, var);
+             int r[2] = {static_cast<int>(coords[i].axis), rawBits(coords[i].value)};
+             memcpy(res + 2 * i, r, sizeof r);
         }
-        return res;
-    } else
-        return nullptr;
+    }
 }
-#endif
 
 
 SKIKO_EXPORT KInt org_jetbrains_skia_Typeface__1nGetVariationAxesCount
@@ -67,26 +61,6 @@ SKIKO_EXPORT void org_jetbrains_skia_Typeface__1nGetVariationAxes
     }
 }
      
-#if 0 
-SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_Typeface__1nGetVariationAxes
-  (KNativePointer ptr) {
-    SkTypeface* instance = reinterpret_cast<SkTypeface*>((ptr));
-    int count = instance->getVariationDesignParameters(nullptr, 0);
-    if (count > 0) {
-        std::vector<SkFontParameters::Variation::Axis> params(count);
-        instance->getVariationDesignParameters(params.data(), count);
-        KInteropPointerArray res = env->NewObjectArray(count, skija::FontVariationAxis::cls, nullptr);
-        for (int i=0; i < count; ++i) {
-            KInteropPointer var = env->NewObject(skija::FontVariationAxis::cls, skija::FontVariationAxis::ctor, params[i].tag, params[i].min, params[i].def, params[i].max, params[i].isHidden());
-            env->SetObjectArrayElement(res, i, var);
-        }
-        return res;
-    } else
-        return nullptr;
-}
-#endif
-
-
 SKIKO_EXPORT KInt org_jetbrains_skia_Typeface__1nGetUniqueId
   (KNativePointer ptr) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>((ptr));

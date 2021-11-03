@@ -89,7 +89,16 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     val variations: Array<FontVariation>?
         get() = try {
             Stats.onNativeCall()
-            _nGetVariations(_ptr)
+            val count = _nGetVariationsCount(_ptr)
+            if (count > 0) {
+                val variationsData = withResult(IntArray(count * 2)) {
+                    _nGetVariations(_ptr, it, count)
+                }
+                (0 until count).map { i ->
+                    val j = 2 * i
+                    FontVariation(variationsData[j], Float.fromBits(variationsData[j + 1]))
+                }.toTypedArray()
+            } else null
         } finally {
             reachabilityBarrier(this)
         }
@@ -370,8 +379,11 @@ private external fun _nGetFontStyle(ptr: NativePointer): Int
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nIsFixedPitch")
 private external fun _nIsFixedPitch(ptr: NativePointer): Boolean
 
+@ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetVariationsCount")
+private external fun _nGetVariationsCount(ptr: NativePointer): Int
+
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetVariations")
-private external fun _nGetVariations(ptr: NativePointer): Array<FontVariation>?
+private external fun _nGetVariations(ptr: NativePointer, variations: InteropPointer, count: Int): Array<FontVariation>?
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetVariationAxesCount")
 private external fun _nGetVariationAxesCount(ptr: NativePointer): Int
