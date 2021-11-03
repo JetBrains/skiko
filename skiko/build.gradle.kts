@@ -70,11 +70,12 @@ val compileWasm = tasks.register<CompileSkikoCppTask>("compileWasm") {
     buildTargetArch.set(osArch.second)
     buildVariant.set(buildType)
 
-    val srcDirs = projectDirs("src/jsMain/cpp", "src/nativeJsMain/cpp") +
+    val srcDirs = projectDirs("src/commonMain/cpp/common", "src/jsMain/cpp", "src/nativeJsMain/cpp") +
         if (skiko.includeTestHelpers) projectDirs("src/nativeJsTest/cpp") else emptyList()
     sourceRoots.set(srcDirs)
 
     includeHeadersNonRecursive(projectDir.resolve("src/nativeJsMain/cpp"))
+    includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp/common/include"))
     includeHeadersNonRecursive(skiaHeadersDirs(skiaWasmDir.get()))
 
     flags.set(listOf(
@@ -149,11 +150,12 @@ fun registerNativeBridgesTask(os: OS, arch: Arch): TaskProvider<CompileSkikoCppT
             else -> throw GradleException("$os not yet supported")
         }
 
-        val srcDirs = projectDirs("src/nativeNativeJs/cpp", "src/nativeJsMain/cpp") +
+        val srcDirs = projectDirs("src/commonMain/cpp/common", "src/nativeNativeJs/cpp", "src/nativeJsMain/cpp") +
                 if (skiko.includeTestHelpers) projectDirs("src/nativeJsTest/cpp") else emptyList()
         sourceRoots.set(srcDirs)
 
         includeHeadersNonRecursive(projectDir.resolve("src/nativeJsMain/cpp"))
+        includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp/common/include"))
         includeHeadersNonRecursive(skiaHeadersDirs(unpackedSkia))
     }
 }
@@ -544,6 +546,7 @@ val compileJvmBindings = tasks.register<CompileSkikoCppTask>("compileJvmBindings
     buildVariant.set(buildType)
 
     val srcDirs = projectDirs(
+        "src/commonMain/cpp/common",
         "src/jvmMain/cpp/common",
         "src/jvmMain/cpp/${targetOs.id}",
         "src/jvmTest/cpp"
@@ -553,6 +556,7 @@ val compileJvmBindings = tasks.register<CompileSkikoCppTask>("compileJvmBindings
     includeHeadersNonRecursive(jdkHome.resolve("include"))
     includeHeadersNonRecursive(skiaHeadersDirs(skiaJvmBindingsDir.get()))
     includeHeadersNonRecursive(projectDir.resolve("src/jvmMain/cpp/include"))
+    includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp/common/include"))
 
     compiler.set(compilerForTarget(targetOs, targetArch))
 
