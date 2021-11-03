@@ -59,9 +59,10 @@ SKIKO_EXPORT void org_jetbrains_skia_Typeface__1nGetVariationAxes
     if (count > 0) {
         std::vector<SkFontParameters::Variation::Axis> params(count);
         instance->getVariationDesignParameters(params.data(), count);
-        for (int i = 0; i < count; ++i) {
+        for (int i = 0,  j = 0; i < count; ++i) {
             int p[4] = { static_cast<int>(params[i].tag), rawBits(params[i].min), rawBits(params[i].def), rawBits(params[i].max)};
-            memcpy(p, axis + 4 * i, 4);
+            memcpy(axis + 4 * i, p, sizeof p);
+
         }
     }
 }
