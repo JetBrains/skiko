@@ -144,12 +144,10 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Typeface__1nMakeClone
 
 
 
-SKIKO_EXPORT KShort* org_jetbrains_skia_Typeface__1nGetUTF32Glyphs
+SKIKO_EXPORT void org_jetbrains_skia_Typeface__1nGetUTF32Glyphs
   (KNativePointer ptr, KInt* uni, KInt count, KShort* res) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(ptr);
-    std::vector<short> glyphs(count);
-    instance->unicharsToGlyphs(reinterpret_cast<SkUnichar*>(uni), count, reinterpret_cast<SkGlyphID*>(glyphs.data()));
-    memcpy(res, glyphs.data(), glyphs.size() * sizeof(short));
+    instance->unicharsToGlyphs(reinterpret_cast<SkUnichar*>(uni), count, reinterpret_cast<SkGlyphID*>(res));
 }
      
 SKIKO_EXPORT KShort org_jetbrains_skia_Typeface__1nGetUTF32Glyph

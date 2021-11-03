@@ -206,7 +206,7 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             Stats.onNativeCall()
             if (uni != null) {
                 withResult(ShortArray(uni.size)) {
-                    Typeface_nGetUTF32Glyphs(_ptr, uni, uni.size, it)
+                    Typeface_nGetUTF32Glyphs(_ptr, interopScope { toInterop(uni) }, uni.size, it)
                 }
             } else shortArrayOf()
         } finally {
@@ -374,7 +374,7 @@ private external fun Typeface_nEquals(ptr: NativePointer, otherPtr: NativePointe
 private external fun Typeface_nMakeDefault(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUTF32Glyphs")
-private external fun Typeface_nGetUTF32Glyphs(ptr: NativePointer, uni: IntArray?, count: Int, glyphs: InteropPointer): ShortArray
+private external fun Typeface_nGetUTF32Glyphs(ptr: NativePointer, uni: InteropPointer, count: Int, glyphs: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUTF32Glyph")
 private external fun Typeface_nGetUTF32Glyph(ptr: NativePointer, unichar: Int): Short
