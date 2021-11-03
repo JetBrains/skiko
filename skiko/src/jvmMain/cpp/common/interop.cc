@@ -177,6 +177,34 @@ namespace skija {
                                          IRect::fromSkIRect(env, i.fFrameRect));
             return java::lang::Throwable::exceptionThrown(env) ? nullptr : res;
         }
+
+        void copyToInteropAtIndex(JNIEnv* env, const SkCodec::FrameInfo& info, jintArray dst, jsize index) {
+            jint repr[11] {
+                    info.fRequiredFrame,
+                    info.fDuration,
+                    static_cast<jint>(info.fFullyReceived),
+                    static_cast<jint>(info.fAlphaType),
+                    static_cast<jint>(info.fHasAlphaWithinBounds),
+                    static_cast<jint>(info.fDisposalMethod),
+                    static_cast<jint>(info.fBlend),
+                    info.fFrameRect.left(),
+                    info.fFrameRect.top(),
+                    info.fFrameRect.right(),
+                    info.fFrameRect.bottom()
+            };
+            env->SetIntArrayRegion(dst, index * 11, 11, repr);
+        }
+
+        void copyToInterop(JNIEnv* env, const SkCodec::FrameInfo& info, jintArray dst) {
+            copyToInteropAtIndex(env, info, dst, 0);
+        }
+
+        void copyToInterop(JNIEnv* env, const std::vector<SkCodec::FrameInfo>& infos, jintArray dst) {
+            jsize i = 0;
+            for (const auto& info : infos) {
+                copyToInteropAtIndex(env, info, dst, i++);
+            }
+        }
     }
 
     namespace Color4f {
@@ -495,11 +523,11 @@ namespace skija {
             if (rectInts == nullptr)
                 return std::unique_ptr<SkIRect>(nullptr);
             else {
-                jint *ints = env->GetIntArrayElements(rectInts, NULL);
+                jint *ints = env->GetIntArrayElements(rectInts, nullptr);
                 auto result = std::unique_ptr<SkIRect>(new SkIRect{
                     ints[0], ints[1], ints[2], ints[3]
                 });
-                env->ReleaseIntArrayElements(rectInts, ints, NULL);
+                env->ReleaseIntArrayElements(rectInts, ints, 0);
                 return result;
             }
         }

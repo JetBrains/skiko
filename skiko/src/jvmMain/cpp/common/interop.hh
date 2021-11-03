@@ -85,6 +85,8 @@ namespace skija {
         void onLoad(JNIEnv* env);
         void onUnload(JNIEnv* env);
         jobject toJava(JNIEnv* env, const SkCodec::FrameInfo& i);
+        void copyToInterop(JNIEnv* env, const SkCodec::FrameInfo& info, jintArray dst);
+        void copyToInterop(JNIEnv* env, const std::vector<SkCodec::FrameInfo>& infos, jintArray dst);
     }
 
     template <typename T>
