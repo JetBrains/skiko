@@ -22,20 +22,12 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Codec__1nMakeFromData
     return reinterpret_cast<KNativePointer>(instance.release());
 }
 
-
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Codec__1nGetImageInfo
-  (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_Codec__1nGetImageInfo");
+SKIKO_EXPORT void org_jetbrains_skia_Codec__1nGetImageInfo
+  (KNativePointer ptr, KInt* imageInfoResult, KNativePointer* colorSpacePtrsArray) {
+    auto instance = reinterpret_cast<SkCodec*>(ptr);
+    SkImageInfo imageInfo = instance->getInfo();
+    skija::ImageInfo::writeImageInfoForInterop(imageInfo, imageInfoResult, colorSpacePtrsArray);
 }
-     
-#if 0 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Codec__1nGetImageInfo
-  (KNativePointer ptr) {
-    SkCodec* instance = reinterpret_cast<SkCodec*>((ptr));
-    return skija::ImageInfo::toJava(env, instance->getInfo());
-}
-#endif
-
 
 SKIKO_EXPORT KInt org_jetbrains_skia_Codec__1nGetSize
   (KNativePointer ptr) {
@@ -73,45 +65,38 @@ SKIKO_EXPORT KInt org_jetbrains_skia_Codec__1nGetFrameCount
 }
 
 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Codec__1nGetFrameInfo
-  (KNativePointer ptr, KInt frame) {
-    TODO("implement org_jetbrains_skia_Codec__1nGetFrameInfo");
-}
-     
-#if 0 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Codec__1nGetFrameInfo
-  (KNativePointer ptr, KInt frame) {
-    SkCodec* instance = reinterpret_cast<SkCodec*>((ptr));
-    SkCodec::FrameInfo info;
+SKIKO_EXPORT void org_jetbrains_skia_Codec__1nGetFrameInfo
+  (KNativePointer ptr, KInt frame, KInteropPointer result) {
+    auto* instance = reinterpret_cast<SkCodec*>((ptr));
+    SkCodec::FrameInfo info{};
     instance->getFrameInfo(frame, &info);
-    return skija::AnimationFrameInfo::toJava(env, info);
+    skija::AnimationFrameInfo::copyToInterop(info, result);
 }
-#endif
 
 
-
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Codec__1nGetFramesInfo
-  (KNativePointer ptr, KInt frame) {
-    TODO("implement org_jetbrains_skia_Codec__1nGetFramesInfo");
-}
-     
-#if 0 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Codec__1nGetFramesInfo
-  (KNativePointer ptr, KInt frame) {
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_Codec__1nGetFramesInfo
+  (KNativePointer ptr) {
     SkCodec* instance = reinterpret_cast<SkCodec*>((ptr));
-    SkCodec::FrameInfo info;
-    std::vector<SkCodec::FrameInfo> frames = instance->getFrameInfo();
-    KInteropPointerArray res = env->NewObjectArray(frames.size(), skija::AnimationFrameInfo::cls, nullptr);
-    if (java::lang::Throwable::exceptionThrown(env))
-        return nullptr;
-    for (int i = 0; i < frames.size(); ++i) {
-        skija::AutoLocal<KInteropPointer> infoObj(env, skija::AnimationFrameInfo::toJava(env, frames[i]));
-        env->SetObjectArrayElement(res, i, infoObj.get());
-    }
-    return res;
+    auto* infos = new std::vector<SkCodec::FrameInfo> { instance->getFrameInfo() };
+    return reinterpret_cast<KNativePointer>(infos);
 }
-#endif
 
+SKIKO_EXPORT void org_jetbrains_skia_Codec__1nFramesInfo_Delete
+  (KNativePointer ptr) {
+    delete reinterpret_cast<std::vector<SkCodec::FrameInfo>*>(ptr);
+}
+
+SKIKO_EXPORT KInt org_jetbrains_skia_Codec__1nFramesInfo_GetSize
+  (KNativePointer ptr) {
+    auto* infos = reinterpret_cast<std::vector<SkCodec::FrameInfo>*>(ptr);
+    return static_cast<KInt>(infos->size());
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_Codec__1nFramesInfo_GetInfos
+  (KNativePointer ptr, KInteropPointer result) {
+    auto* infos = reinterpret_cast<std::vector<SkCodec::FrameInfo>*>(ptr);
+    skija::AnimationFrameInfo::copyToInterop(*infos, result);
+}
 
 SKIKO_EXPORT KInt org_jetbrains_skia_Codec__1nGetRepetitionCount
   (KNativePointer ptr) {

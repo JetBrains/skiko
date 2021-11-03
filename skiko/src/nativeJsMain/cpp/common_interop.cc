@@ -286,6 +286,37 @@ namespace skija {
         }
     }
 
+    namespace AnimationFrameInfo {
+        static void copyToInteropAtIndex(const SkCodec::FrameInfo& info, KInt* repr, size_t index) {
+            repr += (index * 11);
+            repr[0] = info.fRequiredFrame;
+            repr[1] = info.fDuration;
+            repr[2] = static_cast<KInt>(info.fFullyReceived);
+            repr[3] = static_cast<KInt>(info.fAlphaType);
+            repr[4] = static_cast<KInt>(info.fHasAlphaWithinBounds);
+            repr[5] = static_cast<KInt>(info.fDisposalMethod);
+            repr[6] = static_cast<KInt>(info.fBlend);
+            repr[7] = info.fFrameRect.left();
+            repr[8] = info.fFrameRect.top();
+            repr[9] = info.fFrameRect.right();
+            repr[10] = info.fFrameRect.bottom();
+        }
+
+        void copyToInterop(const SkCodec::FrameInfo& info, KInteropPointer dst) {
+            KInt* repr = reinterpret_cast<KInt*>(dst);
+            copyToInteropAtIndex(info, repr, 0);
+        }
+
+        void copyToInterop(const std::vector<SkCodec::FrameInfo>& infos, KInteropPointer dst) {
+            KInt* repr = reinterpret_cast<KInt*>(dst);
+            size_t i = 0;
+            for (const auto& info : infos) {
+                copyToInteropAtIndex(info, repr, i++);
+            }
+        }
+
+    }
+
     namespace svg {
         namespace SVGLength {
             void copyToInterop(const SkSVGLength& length, KInteropPointer dst) {

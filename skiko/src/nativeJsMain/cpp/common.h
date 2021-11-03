@@ -95,6 +95,11 @@ namespace skija {
         }
     }
 
+    namespace AnimationFrameInfo {
+        void copyToInterop(const SkCodec::FrameInfo& info, KInteropPointer dst);
+        void copyToInterop(const std::vector<SkCodec::FrameInfo>& infos, KInteropPointer dst);
+    }
+
     namespace svg {
         namespace SVGLength {
             void copyToInterop(const SkSVGLength& length, KInteropPointer dst);
