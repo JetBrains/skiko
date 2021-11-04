@@ -53,7 +53,7 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
                 Stats.onNativeCall()
                 val ptr =
                     interopScope {
-                        _nMakeFromPos(toInterop(glyphs), toInterop(floatPos), getPtr(font))
+                        _nMakeFromPos(toInterop(glyphs), glyphs.size, toInterop(floatPos), getPtr(font))
                     }
                 if (ptr == NullPointer) null else TextBlob(ptr)
             } finally {
@@ -222,7 +222,9 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
     val positions: FloatArray
         get() = try {
             Stats.onNativeCall()
-            _nGetPositions(_ptr)
+            withResult(FloatArray(_nGetPositionsLength(_ptr))) {
+                _nGetPositions(_ptr, it)
+            }
         } finally {
             reachabilityBarrier(this)
         }
@@ -329,7 +331,7 @@ private external fun _nGetIntercepts(ptr: NativePointer, lower: Float, upper: Fl
 private external fun _nMakeFromPosH(glyphs: InteropPointer, xpos: InteropPointer, ypos: Float, fontPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromPos")
-private external fun _nMakeFromPos(glyphs: InteropPointer, pos: InteropPointer, fontPtr: NativePointer): NativePointer
+private external fun _nMakeFromPos(glyphs: InteropPointer, glyphsLen: Int, pos: InteropPointer, fontPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromRSXform")
 private external fun _nMakeFromRSXform(glyphs: InteropPointer, xform: InteropPointer, fontPtr: NativePointer): NativePointer
@@ -340,8 +342,11 @@ private external fun _nGetGlyphsLength(ptr: NativePointer): Int
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetGlyphs")
 private external fun _nGetGlyphs(ptr: NativePointer, result: InteropPointer)
 
+@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetPositionsLength")
+private external fun _nGetPositionsLength(ptr: NativePointer): Int
+
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetPositions")
-private external fun _nGetPositions(ptr: NativePointer): FloatArray
+private external fun _nGetPositions(ptr: NativePointer, resultArray: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetClusters")
 private external fun _nGetClusters(ptr: NativePointer): IntArray?
