@@ -72,17 +72,6 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nShapeBlob
     bool aproximateSpaces = (optsBooleanProps & 0x02) != 0;
     bool isLeftToRight = (optsBooleanProps & 0x04) != 0;
 
-    std::unique_ptr<SkShaper::FontRunIterator> fontRunIter(new FontRunIterator(
-        text.c_str(),
-        text.size(),
-        *font,
-        SkFontMgr::RefDefault(),
-        graphemeIter,
-        aproximateSpaces,
-        aproximatePunctuation
-    ));
-    if (!fontRunIter) return 0;
-
     uint8_t defaultBiDiLevel = isLeftToRight ? UBIDI_DEFAULT_LTR : UBIDI_DEFAULT_RTL;
     std::unique_ptr<SkShaper::BiDiRunIterator> bidiRunIter(SkShaper::MakeBiDiRunIterator(text.c_str(), text.size(), defaultBiDiLevel));
     if (!bidiRunIter) return 0;
@@ -93,8 +82,18 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nShapeBlob
     std::unique_ptr<SkShaper::LanguageRunIterator> languageRunIter(SkShaper::MakeStdLanguageRunIterator(text.c_str(), text.size()));
     if (!languageRunIter) return 0;
 
+     FontRunIterator fontRunIter(
+        text.c_str(),
+        text.size(),
+        *font,
+        SkFontMgr::RefDefault(),
+        graphemeIter,
+        aproximateSpaces,
+        aproximatePunctuation
+    );
+
     SkTextBlobBuilderRunHandler rh(text.c_str(), {offsetX, offsetY});
-    instance->shape(text.c_str(), text.size(), *fontRunIter, *bidiRunIter, *scriptRunIter, *languageRunIter, features.data(), features.size(), width, &rh);
+    instance->shape(text.c_str(), text.size(), fontRunIter, *bidiRunIter, *scriptRunIter, *languageRunIter, features.data(), features.size(), width, &rh);
     SkTextBlob* blob = rh.makeBlob().release();
 
     return reinterpret_cast<KNativePointer>(blob);
@@ -120,16 +119,6 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nShapeLine
     bool aproximateSpaces = (optsBooleanProps & 0x02) != 0;
     bool isLeftToRight = (optsBooleanProps & 0x04) != 0;
 
-    std::unique_ptr<SkShaper::FontRunIterator> fontRunIter(new FontRunIterator(
-        text.c_str(),
-        text.size(),
-        *font,
-        SkFontMgr::RefDefault(),
-        graphemeIter,
-        aproximateSpaces,
-        aproximatePunctuation));
-    if (!fontRunIter) return 0;
-
     uint8_t defaultBiDiLevel = isLeftToRight ? UBIDI_DEFAULT_LTR : UBIDI_DEFAULT_RTL;
     std::unique_ptr<SkShaper::BiDiRunIterator> bidiRunIter(SkShaper::MakeBiDiRunIterator(text.c_str(), text.size(), defaultBiDiLevel));
     if (!bidiRunIter) return 0;
@@ -140,8 +129,17 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nShapeLine
     std::unique_ptr<SkShaper::LanguageRunIterator> languageRunIter(SkShaper::MakeStdLanguageRunIterator(text.c_str(), text.size()));
     if (!languageRunIter) return 0;
 
+    FontRunIterator fontRunIter(
+        text.c_str(),
+        text.size(),
+        *font,
+        SkFontMgr::RefDefault(),
+        graphemeIter,
+        aproximateSpaces,
+        aproximatePunctuation);
+
     TextLineRunHandler rh(text, graphemeIter);
-    instance->shape(text.c_str(), text.size(), *fontRunIter, *bidiRunIter, *scriptRunIter, *languageRunIter, features.data(), features.size(), std::numeric_limits<float>::infinity(), &rh);
+    instance->shape(text.c_str(), text.size(), fontRunIter, *bidiRunIter, *scriptRunIter, *languageRunIter, features.data(), features.size(), std::numeric_limits<float>::infinity(), &rh);
     return reinterpret_cast<KNativePointer>(rh.makeLine().release());
 }
 
