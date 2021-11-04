@@ -60,7 +60,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nMake
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nShapeBlob
   (KNativePointer ptr, KNativePointer textPtr, KNativePointer fontPtr, KInt optsFeaturesLen, KInt* optsFeatures, KInt optsBooleanProps, KFloat width, KFloat offsetX, KFloat offsetY) {
     SkShaper* instance = reinterpret_cast<SkShaper*>(ptr);
-    SkString text = *(reinterpret_cast<SkString*>(textPtr));
+    SkString& text = *(reinterpret_cast<SkString*>(textPtr));
 
     std::shared_ptr<UBreakIterator> graphemeIter = skija::shaper::graphemeBreakIterator(text);
     if (!graphemeIter) return 0;
@@ -68,9 +68,9 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nShapeBlob
 
     std::vector<SkShaper::Feature> features = skija::shaper::ShapingOptions::getFeaturesFromIntsArray(optsFeatures, optsFeaturesLen);
 
-    bool aproximatePunctuation = optsBooleanProps & 0x01;
-    bool aproximateSpaces = optsBooleanProps & 0x02;
-    bool isLeftToRight = optsBooleanProps & 0x04;
+    bool aproximatePunctuation = (optsBooleanProps & 0x01) != 0;
+    bool aproximateSpaces = (optsBooleanProps & 0x02) != 0;
+    bool isLeftToRight = (optsBooleanProps & 0x04) != 0;
 
     std::unique_ptr<SkShaper::FontRunIterator> fontRunIter(new FontRunIterator(
         text.c_str(),
@@ -104,16 +104,21 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nShapeLine
   (KNativePointer ptr, KNativePointer textManagedStringPtr, KNativePointer fontPtr, KInt optsFeaturesLen, KInt* optsFeatures, KInt optsBooleanProps) {
     SkShaper* instance = reinterpret_cast<SkShaper*>(ptr);
 
-    SkString text = *(reinterpret_cast<SkString*>(textManagedStringPtr));
+    SkString& text = *(reinterpret_cast<SkString*>(textManagedStringPtr));
+    SkFont* font = reinterpret_cast<SkFont*>(fontPtr);
+
+    if (text.size() == 0) {
+        return reinterpret_cast<KNativePointer>(new TextLine(*font));
+    }
+
     std::shared_ptr<UBreakIterator> graphemeIter = skija::shaper::graphemeBreakIterator(text);
     if (!graphemeIter) return 0;
 
-    SkFont* font = reinterpret_cast<SkFont*>(fontPtr);
     std::vector<SkShaper::Feature> features = skija::shaper::ShapingOptions::getFeaturesFromIntsArray(optsFeatures, optsFeaturesLen);
 
-    bool aproximatePunctuation = optsBooleanProps & 0x01;
-    bool aproximateSpaces = optsBooleanProps & 0x02;
-    bool isLeftToRight = optsBooleanProps & 0x04;
+    bool aproximatePunctuation = (optsBooleanProps & 0x01) != 0;
+    bool aproximateSpaces = (optsBooleanProps & 0x02) != 0;
+    bool isLeftToRight = (optsBooleanProps & 0x04) != 0;
 
     std::unique_ptr<SkShaper::FontRunIterator> fontRunIter(new FontRunIterator(
         text.c_str(),
@@ -135,16 +140,11 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nShapeLine
     std::unique_ptr<SkShaper::LanguageRunIterator> languageRunIter(SkShaper::MakeStdLanguageRunIterator(text.c_str(), text.size()));
     if (!languageRunIter) return 0;
 
-    TextLine* line;
-    if (text.size() == 0)
-        line = new TextLine(*font);
-    else {
-        TextLineRunHandler rh(text, graphemeIter);
-        instance->shape(text.c_str(), text.size(), *fontRunIter, *bidiRunIter, *scriptRunIter, *languageRunIter, features.data(), features.size(), std::numeric_limits<float>::infinity(), &rh);
-        line = rh.makeLine().release();
-    }
-    return reinterpret_cast<KNativePointer>(line);
+    TextLineRunHandler rh(text, graphemeIter);
+    instance->shape(text.c_str(), text.size(), *fontRunIter, *bidiRunIter, *scriptRunIter, *languageRunIter, features.data(), features.size(), std::numeric_limits<float>::infinity(), &rh);
+    return reinterpret_cast<KNativePointer>(rh.makeLine().release());
 }
+
 SKIKO_EXPORT void org_jetbrains_skia_shaper_Shaper__1nShape
   (KNativePointer ptr, KNativePointer textPtr, KInteropPointer fontRunIterObj, KInteropPointer bidiRunIterObj, KInteropPointer scriptRunIterObj, KInteropPointer languageRunIterObj, KInteropPointer opts, KFloat width, KInteropPointer runHandlerObj)
 {

@@ -146,13 +146,22 @@ SKIKO_EXPORT KInt org_jetbrains_skia_TextLine__1nGetGlyphsLength
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_TextLine__1nGetGlyphs
-  (KNativePointer ptr, KInteropPointer glyphs) {
+  (KNativePointer ptr, KInteropPointer glyphs, KInt resultLength) {
     TextLine* instance = reinterpret_cast<TextLine*>((ptr));
+
     size_t idx = 0;
+    size_t freeBytesN = resultLength * sizeof(uint16_t);
+
     KShort* glyphsPtr = reinterpret_cast<KShort*>(glyphs);
     for (auto& run: instance->fRuns) {
-        memcpy(glyphsPtr + idx, run.fGlyphs, run.fGlyphCount * sizeof(uint16_t));
-        idx += run.fGlyphCount;
+        size_t addBytesLen = run.fGlyphCount * sizeof(uint16_t);
+        if (freeBytesN - addBytesLen >= 0) {
+            memcpy(&glyphsPtr[idx], run.fGlyphs, addBytesLen);
+            idx += run.fGlyphCount;
+            freeBytesN -= addBytesLen;
+        } else {
+            SkDEBUGFAIL("Incorrect resultGlyphs size");
+        }
     }
     SkASSERTF(idx == instance->fGlyphCount, "TextLine.cc: idx = %d != instance->fGlyphCount = %d", idx, instance->fGlyphCount);
 }

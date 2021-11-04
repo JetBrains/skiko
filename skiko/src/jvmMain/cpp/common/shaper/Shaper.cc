@@ -58,16 +58,16 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt_Shape
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nShapeBlob
   (JNIEnv* env, jclass jclass, jlong ptr, jlong textPtr, jlong fontPtr, jint optsFeaturesLen, jintArray optsFeatures, jint optsBooleanProps, jfloat width, jfloat offsetX, jfloat offsetY) {
     SkShaper* instance = reinterpret_cast<SkShaper*>(static_cast<uintptr_t>(ptr));
-    SkString text = *(reinterpret_cast<SkString*>(static_cast<uintptr_t>(textPtr)));
+    SkString& text = *(reinterpret_cast<SkString*>(static_cast<uintptr_t>(textPtr)));
     std::shared_ptr<UBreakIterator> graphemeIter = skija::shaper::graphemeBreakIterator(text);
     if (!graphemeIter) return 0;
     SkFont* font = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(fontPtr));
 
     std::vector<SkShaper::Feature> features = skija::shaper::ShapingOptions::getFeaturesFromIntsArray(env, optsFeatures, optsFeaturesLen);
 
-    bool aproximatePunctuation = optsBooleanProps & 0x01;
-    bool aproximateSpaces = optsBooleanProps & 0x02;
-    bool isLeftToRight = optsBooleanProps & 0x04;
+    bool aproximatePunctuation = (optsBooleanProps & 0x01) != 0;
+    bool aproximateSpaces = (optsBooleanProps & 0x02) != 0;
+    bool isLeftToRight = (optsBooleanProps & 0x04) != 0;
 
     std::unique_ptr<SkShaper::FontRunIterator> fontRunIter(new FontRunIterator(
         text.c_str(),
@@ -101,17 +101,21 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nSh
   (JNIEnv* env, jclass jclass, jlong ptr, jlong textPtr, jlong fontPtr, jint optsFeaturesLen, jintArray optsFeatures, jint optsBooleanProps) {
     SkShaper* instance = reinterpret_cast<SkShaper*>(static_cast<uintptr_t>(ptr));
 
-    SkString text = *(reinterpret_cast<SkString*>(static_cast<uintptr_t>(textPtr)));
+    SkString& text = *(reinterpret_cast<SkString*>(static_cast<uintptr_t>(textPtr)));
+    SkFont* font = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(fontPtr));
+
+    if (text.size() == 0) {
+        return reinterpret_cast<jlong>(new TextLine(*font));
+    }
 
     std::shared_ptr<UBreakIterator> graphemeIter = skija::shaper::graphemeBreakIterator(text);
     if (!graphemeIter) return 0;
 
-    SkFont* font = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(fontPtr));
     std::vector<SkShaper::Feature> features = skija::shaper::ShapingOptions::getFeaturesFromIntsArray(env, optsFeatures, optsFeaturesLen);
 
-    bool aproximatePunctuation = optsBooleanProps & 0x01;
-    bool aproximateSpaces = optsBooleanProps & 0x02;
-    bool isLeftToRight = optsBooleanProps & 0x04;
+    bool aproximatePunctuation = (optsBooleanProps & 0x01) != 0;
+    bool aproximateSpaces = (optsBooleanProps & 0x02) != 0;
+    bool isLeftToRight = (optsBooleanProps & 0x04) != 0;
 
     std::unique_ptr<SkShaper::FontRunIterator> fontRunIter(new FontRunIterator(
         text.c_str(),
@@ -133,15 +137,10 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nSh
     std::unique_ptr<SkShaper::LanguageRunIterator> languageRunIter(SkShaper::MakeStdLanguageRunIterator(text.c_str(), text.size()));
     if (!languageRunIter) return 0;
 
-    TextLine* line;
-    if (text.size() == 0)
-        line = new TextLine(*font);
-    else {
-        TextLineRunHandler rh(text, graphemeIter);
-        instance->shape(text.c_str(), text.size(), *fontRunIter, *bidiRunIter, *scriptRunIter, *languageRunIter, features.data(), features.size(), std::numeric_limits<float>::infinity(), &rh);
-        line = rh.makeLine().release();
-    }
-    return reinterpret_cast<jlong>(line);
+    TextLineRunHandler rh(text, graphemeIter);
+    instance->shape(text.c_str(), text.size(), *fontRunIter, *bidiRunIter, *scriptRunIter, *languageRunIter, features.data(), features.size(), std::numeric_limits<float>::infinity(), &rh);
+
+    return reinterpret_cast<jlong>(rh.makeLine().release());
 }
 
 template <typename RunIteratorSubclass>

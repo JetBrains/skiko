@@ -72,14 +72,22 @@ extern "C" JNIEXPORT jint Java_org_jetbrains_skia_TextLineKt_TextLine_1nGetGlyph
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TextLineKt_TextLine_1nGetGlyphs
-  (JNIEnv* env, jclass jclass, jlong ptr, jshortArray resultGlyphs) {
+  (JNIEnv* env, jclass jclass, jlong ptr, jshortArray resultGlyphs, jint resultLength) {
     TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
     jshort* glyphs = env->GetShortArrayElements(resultGlyphs, nullptr);
 
     size_t idx = 0;
+    size_t freeBytesN = resultLength * sizeof(uint16_t);
+
     for (auto& run: instance->fRuns) {
-        memcpy(glyphs + idx, run.fGlyphs, run.fGlyphCount * sizeof(uint16_t));
-        idx += run.fGlyphCount;
+        size_t addBytesLen = run.fGlyphCount * sizeof(uint16_t);
+        if (freeBytesN - addBytesLen >= 0) {
+            memcpy(&glyphs[idx], run.fGlyphs, addBytesLen);
+            idx += run.fGlyphCount;
+            freeBytesN -= addBytesLen;
+        } else {
+            SkDEBUGFAIL("Incorrect resultGlyphs size");
+        }
     }
     env->ReleaseShortArrayElements(resultGlyphs, glyphs, 0);
     SkASSERTF(idx == instance->fGlyphCount, "TextLine.cc: idx = %d != instance->fGlyphCount = %d", idx, instance->fGlyphCount);

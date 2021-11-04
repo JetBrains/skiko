@@ -31,6 +31,7 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
                 reachabilityBarrier(this)
             }
         }
+
     val capHeight: Float
         get() {
             Stats.onNativeCall()
@@ -40,6 +41,7 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
                 reachabilityBarrier(this)
             }
         }
+
     val xHeight: Float
         get() {
             Stats.onNativeCall()
@@ -49,6 +51,7 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
                 reachabilityBarrier(this)
             }
         }
+
     val descent: Float
         get() {
             Stats.onNativeCall()
@@ -58,6 +61,7 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
                 reachabilityBarrier(this)
             }
         }
+
     val leading: Float
         get() {
             Stats.onNativeCall()
@@ -67,6 +71,7 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
                 reachabilityBarrier(this)
             }
         }
+
     val width: Float
         get() {
             Stats.onNativeCall()
@@ -76,6 +81,7 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
                 reachabilityBarrier(this)
             }
         }
+
     val height: Float
         get() {
             Stats.onNativeCall()
@@ -85,6 +91,7 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
                 reachabilityBarrier(this)
             }
         }
+
     val textBlob: TextBlob?
         get() {
             Stats.onNativeCall()
@@ -95,12 +102,14 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
                 reachabilityBarrier(this)
             }
         }
+
     val glyphs: ShortArray
         get() {
             Stats.onNativeCall()
             return try {
-                withResult(ShortArray(glyphsLength)) {
-                    TextLine_nGetGlyphs(_ptr, it)
+                val length = glyphsLength
+                withResult(ShortArray(length)) {
+                    TextLine_nGetGlyphs(_ptr, it, length)
                 }
             } finally {
                 reachabilityBarrier(this)
@@ -220,7 +229,7 @@ private external fun TextLine_nGetHeight(ptr: NativePointer): Float
 private external fun TextLine_nGetGlyphsLength(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetGlyphs")
-private external fun TextLine_nGetGlyphs(ptr: NativePointer, resultGlyphs: InteropPointer)
+private external fun TextLine_nGetGlyphs(ptr: NativePointer, resultGlyphs: InteropPointer, resultLength: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetPositions")
 private external fun TextLine_nGetPositions(ptr: NativePointer): FloatArray
