@@ -82,11 +82,10 @@ class TypefaceTest {
             ), inter.tableTags
         )
 
-//
         assertNull(jbMono.getKerningPairAdjustments(null))
-//        assertNull(jbMono.getKerningPairAdjustments(jbMono.getStringGlyphs("TAV")))
-//
-//        assertContentEquals(arrayOf(FontFamilyName("Inter", "en-US")), interV.familyNames)
+        assertNull(jbMono.getKerningPairAdjustments(jbMono.getStringGlyphs("TAV")))
+
+    //        assertContentEquals(arrayOf(FontFamilyName("Inter", "en-US")), interV.familyNames)
 //        assertEquals("Inter", interV.familyName)
     }
 

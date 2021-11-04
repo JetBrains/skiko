@@ -320,7 +320,11 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     fun getKerningPairAdjustments(glyphs: ShortArray?): IntArray? {
         return try {
             Stats.onNativeCall()
-            _nGetKerningPairAdjustments(_ptr, glyphs)
+            if (glyphs != null) {
+                _nGetKerningPairAdjustments(_ptr, glyphs, glyphs.size)
+            } else {
+                null
+            }
         } finally {
             reachabilityBarrier(this)
         }
@@ -434,7 +438,7 @@ private external fun _nGetTableData(ptr: NativePointer, tag: Int): NativePointer
 private external fun _nGetUnitsPerEm(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetKerningPairAdjustments")
-private external fun _nGetKerningPairAdjustments(ptr: NativePointer, glyphs: ShortArray?): IntArray?
+private external fun _nGetKerningPairAdjustments(ptr: NativePointer, glyphs: ShortArray, count: Int): IntArray?
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetFamilyNames")
 private external fun _nGetFamilyNames(ptr: NativePointer): Array<FontFamilyName>

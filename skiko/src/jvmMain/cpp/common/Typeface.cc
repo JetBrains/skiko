@@ -180,9 +180,8 @@ extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetUnits
 }
 
 extern "C" JNIEXPORT jintArray JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetKerningPairAdjustments
-  (JNIEnv* env, jclass jclass, jlong ptr, jshortArray glyphsArr) {
+  (JNIEnv* env, jclass jclass, jlong ptr, jshortArray glyphsArr, jint count) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
-    int count = glyphsArr == nullptr ? 0 : env->GetArrayLength(glyphsArr);
     if (count > 0) {
         std::vector<jint> adjustments(count);
         jshort* glyphs = env->GetShortArrayElements(glyphsArr, nullptr);
