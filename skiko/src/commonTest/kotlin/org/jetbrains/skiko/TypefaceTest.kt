@@ -58,7 +58,7 @@ class TypefaceTest {
 //
         val Skia = intArrayOf(83, 107, 105, 97)
         assertContentEquals(shortArrayOf(394, 713, 677, 503), inter.getUTF32Glyphs(Skia))
-//        assertContentEquals(shortArrayOf(394, 713, 677, 503), inter.getStringGlyphs("Skia"))
+        assertContentEquals(shortArrayOf(394, 713, 677, 503), inter.getStringGlyphs("Skia"))
 //
         assertContentEquals(
             arrayOf(
@@ -86,7 +86,7 @@ class TypefaceTest {
         assertNull(jbMono.getKerningPairAdjustments(null))
         assertNull(jbMono.getKerningPairAdjustments(jbMono.getStringGlyphs("TAV")))
 
-//        assertContentEquals(arrayOf(FontFamilyName("Inter", "en-US")), interV.familyNames)
+        assertContentEquals(arrayOf(FontFamilyName("Inter", "en-US")), interV.familyNames)
         assertEquals("Inter", interV.familyName)
     }
 
