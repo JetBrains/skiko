@@ -321,10 +321,10 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         return try {
             Stats.onNativeCall()
             if (glyphs != null) {
-                _nGetKerningPairAdjustments(_ptr, glyphs, glyphs.size)
-            } else {
-                null
-            }
+                if (glyphs.size > 0) {
+                    _nGetKerningPairAdjustments(_ptr, glyphs, glyphs.size)
+                } else null
+            } else null
         } finally {
             reachabilityBarrier(this)
         }
