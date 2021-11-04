@@ -99,17 +99,17 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TypefaceKt__1nMakeFro
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TypefaceKt__1nMakeClone
-  (JNIEnv* env, jclass jclass, jlong typefacePtr, jobjectArray variations, jint variationsCount, jint collectionIndex) {
+  (JNIEnv* env, jclass jclass, jlong typefacePtr, jintArray variationsArr, jint variationsCount, jint collectionIndex) {
     SkTypeface* typeface = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(typefacePtr));
     std::vector<SkFontArguments::VariationPosition::Coordinate> coordinates(variationsCount);
-    for (int i=0; i < variationsCount; ++i) {
-        jobject jvar = env->GetObjectArrayElement(variations, i);
+    jint* variations = env->GetIntArrayElements(variationsArr, 0);
+    for (int i=0; i < variationsCount; i+=2) {
         coordinates[i] = {
-            static_cast<SkFourByteTag>(env->GetIntField(jvar, skija::FontVariation::tag)),
-            env->GetFloatField(jvar, skija::FontVariation::value)
+            variations[i],
+            fromBits(variations[i+1])
         };
-        env->DeleteLocalRef(jvar);
     }
+    env->ReleaseIntArrayElements(variationsArr, variations, 0);
     SkFontArguments arg = SkFontArguments()
                             .setCollectionIndex(collectionIndex)
                             .setVariationDesignPosition({coordinates.data(), variationsCount});

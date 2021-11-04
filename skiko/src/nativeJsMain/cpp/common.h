@@ -143,5 +143,14 @@ static inline KInt rawBits(KFloat f) {
     u.f = f;
     return u.i;
 }
+
+static inline KFloat fromBits(KInt i) {
+    union {
+        KFloat f;
+        KInt i;
+    } u;
+    u.i = i;
+    return u.f;
+}
 #endif /* SKIKO_COMMON_H */
 

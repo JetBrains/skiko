@@ -396,3 +396,12 @@ static inline jint rawBits(jfloat f) {
     u.f = f;
     return u.i;
 }
+
+static inline jfloat fromBits(jint i) {
+    union {
+        jfloat f;
+        jint i;
+    } u;
+    u.i = i;
+    return u.f;
+}
