@@ -98,14 +98,20 @@ class FontFeature(val _tag: Int, val value: Int, val start: UInt, val end: UInt)
             return FontFeature(m.group(tagIx)!!, value, start, end)
         }
 
-        fun parse(str: String): Array<FontFeature?> {
+        fun parse(str: String): Array<FontFeature> {
             return _splitPattern.split(str).map { s -> parseOne(s) }.toTypedArray()
         }
 
-        internal fun InteropScope.toInterop(fontFeatures: Array<FontFeature>?): InteropPointer {
-            val ints = fontFeatures?.flatMap {
-                it.toInteropIntArray().toList()
-            }?.toIntArray()
+        internal fun InteropScope.arrayOfFontFeaturesToInterop(fontFeatures: Array<FontFeature>?): InteropPointer {
+            val ints = IntArray(4 * (fontFeatures?.size ?: 0))
+
+            fontFeatures?.forEachIndexed { ix, fontFeature ->
+                val j = ix * 4
+                ints[j] = fontFeature._tag
+                ints[j + 1] = fontFeature.value
+                ints[j + 2] = fontFeature.start.toInt()
+                ints[j + 3] = fontFeature.end.toInt()
+            }
 
             return toInterop(ints)
         }

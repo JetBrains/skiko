@@ -5,28 +5,24 @@
 #include <iostream>
 #include "SkShaper.h"
 #include "common.h"
+#include "TextLine.hh"
 
+static void unrefTextLine(TextLine* ptr) {
+    ptr->unref();
+}
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_TextLine__1nGetFinalizer
   () {
-    TODO("implement org_jetbrains_skia_TextLine__1nGetFinalizer");
+    return reinterpret_cast<KNativePointer>(&unrefTextLine);
 }
-     
-#if 0 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_TextLine__1nGetFinalizer
-  () {
-    return reinterpret_cast<KNativePointer>((&unrefTextLine));
-}
-#endif
-
 
 
 SKIKO_EXPORT KFloat org_jetbrains_skia_TextLine__1nGetAscent
   (KNativePointer ptr) {
     TODO("implement org_jetbrains_skia_TextLine__1nGetAscent");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KFloat org_jetbrains_skia_TextLine__1nGetAscent
   (KNativePointer ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>((ptr));
@@ -40,8 +36,8 @@ SKIKO_EXPORT KFloat org_jetbrains_skia_TextLine__1nGetCapHeight
   (KNativePointer ptr) {
     TODO("implement org_jetbrains_skia_TextLine__1nGetCapHeight");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KFloat org_jetbrains_skia_TextLine__1nGetCapHeight
   (KNativePointer ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>((ptr));
@@ -55,8 +51,8 @@ SKIKO_EXPORT KFloat org_jetbrains_skia_TextLine__1nGetXHeight
   (KNativePointer ptr) {
     TODO("implement org_jetbrains_skia_TextLine__1nGetXHeight");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KFloat org_jetbrains_skia_TextLine__1nGetXHeight
   (KNativePointer ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>((ptr));
@@ -70,8 +66,8 @@ SKIKO_EXPORT KFloat org_jetbrains_skia_TextLine__1nGetDescent
   (KNativePointer ptr) {
     TODO("implement org_jetbrains_skia_TextLine__1nGetDescent");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KFloat org_jetbrains_skia_TextLine__1nGetDescent
   (KNativePointer ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>((ptr));
@@ -85,8 +81,8 @@ SKIKO_EXPORT KFloat org_jetbrains_skia_TextLine__1nGetLeading
   (KNativePointer ptr) {
     TODO("implement org_jetbrains_skia_TextLine__1nGetLeading");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KFloat org_jetbrains_skia_TextLine__1nGetLeading
   (KNativePointer ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>((ptr));
@@ -100,8 +96,8 @@ SKIKO_EXPORT KFloat org_jetbrains_skia_TextLine__1nGetWidth
   (KNativePointer ptr) {
     TODO("implement org_jetbrains_skia_TextLine__1nGetWidth");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KFloat org_jetbrains_skia_TextLine__1nGetWidth
   (KNativePointer ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>((ptr));
@@ -115,8 +111,8 @@ SKIKO_EXPORT KFloat org_jetbrains_skia_TextLine__1nGetHeight
   (KNativePointer ptr) {
     TODO("implement org_jetbrains_skia_TextLine__1nGetHeight");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KFloat org_jetbrains_skia_TextLine__1nGetHeight
   (KNativePointer ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>((ptr));
@@ -130,8 +126,8 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_TextLine__1nGetTextBlob
   (KNativePointer ptr) {
     TODO("implement org_jetbrains_skia_TextLine__1nGetTextBlob");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_TextLine__1nGetTextBlob
   (KNativePointer ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>((ptr));
@@ -143,35 +139,40 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_TextLine__1nGetTextBlob
 #endif
 
 
-
-SKIKO_EXPORT KShort* org_jetbrains_skia_TextLine__1nGetGlyphs
-  (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_TextLine__1nGetGlyphs");
-}
-     
-#if 0 
-SKIKO_EXPORT KShort* org_jetbrains_skia_TextLine__1nGetGlyphs
+SKIKO_EXPORT KInt org_jetbrains_skia_TextLine__1nGetGlyphsLength
   (KNativePointer ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>((ptr));
-    std::vector<KShort> glyphs(instance->fGlyphCount);
+    return instance->fGlyphCount;
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_TextLine__1nGetGlyphs
+  (KNativePointer ptr, KInteropPointer glyphs, KInt resultLength) {
+    TextLine* instance = reinterpret_cast<TextLine*>((ptr));
+
     size_t idx = 0;
+    size_t freeBytesN = resultLength * sizeof(uint16_t);
+
+    KShort* glyphsPtr = reinterpret_cast<KShort*>(glyphs);
     for (auto& run: instance->fRuns) {
-        memcpy(glyphs.data() + idx, run.fGlyphs, run.fGlyphCount * sizeof(uint16_t));
-        idx += run.fGlyphCount;
+        size_t addBytesLen = run.fGlyphCount * sizeof(uint16_t);
+        if (freeBytesN - addBytesLen >= 0) {
+            memcpy(&glyphsPtr[idx], run.fGlyphs, addBytesLen);
+            idx += run.fGlyphCount;
+            freeBytesN -= addBytesLen;
+        } else {
+            SkDEBUGFAIL("Incorrect resultGlyphs size");
+        }
     }
     SkASSERTF(idx == instance->fGlyphCount, "TextLine.cc: idx = %d != instance->fGlyphCount = %d", idx, instance->fGlyphCount);
-    return javaShortArray(env, glyphs);
 }
-#endif
-
 
 
 SKIKO_EXPORT KFloat* org_jetbrains_skia_TextLine__1nGetPositions
   (KNativePointer ptr) {
     TODO("implement org_jetbrains_skia_TextLine__1nGetPositions");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KFloat* org_jetbrains_skia_TextLine__1nGetPositions
   (KNativePointer ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>((ptr));
@@ -192,8 +193,8 @@ SKIKO_EXPORT KFloat* org_jetbrains_skia_TextLine__1nGetRunPositions
   (KNativePointer ptr) {
     TODO("implement org_jetbrains_skia_TextLine__1nGetRunPositions");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KFloat* org_jetbrains_skia_TextLine__1nGetRunPositions
   (KNativePointer ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>((ptr));
@@ -210,8 +211,8 @@ SKIKO_EXPORT KFloat* org_jetbrains_skia_TextLine__1nGetBreakPositions
   (KNativePointer ptr) {
     TODO("implement org_jetbrains_skia_TextLine__1nGetBreakPositions");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KFloat* org_jetbrains_skia_TextLine__1nGetBreakPositions
   (KNativePointer ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>((ptr));
@@ -228,8 +229,8 @@ SKIKO_EXPORT KInt* org_jetbrains_skia_TextLine__1nGetBreakOffsets
   (KNativePointer ptr) {
     TODO("implement org_jetbrains_skia_TextLine__1nGetBreakOffsets");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KInt* org_jetbrains_skia_TextLine__1nGetBreakOffsets
   (KNativePointer ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>((ptr));
@@ -246,8 +247,8 @@ SKIKO_EXPORT KInt org_jetbrains_skia_TextLine__1nGetOffsetAtCoord
   (KNativePointer ptr, KFloat x) {
     TODO("implement org_jetbrains_skia_TextLine__1nGetOffsetAtCoord");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KInt org_jetbrains_skia_TextLine__1nGetOffsetAtCoord
   (KNativePointer ptr, KFloat x) {
     TextLine* instance = reinterpret_cast<TextLine*>((ptr));
@@ -275,8 +276,8 @@ SKIKO_EXPORT KInt org_jetbrains_skia_TextLine__1nGetLeftOffsetAtCoord
   (KNativePointer ptr, KFloat x) {
     TODO("implement org_jetbrains_skia_TextLine__1nGetLeftOffsetAtCoord");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KInt org_jetbrains_skia_TextLine__1nGetLeftOffsetAtCoord
   (KNativePointer ptr, KFloat x) {
     TextLine* instance = reinterpret_cast<TextLine*>((ptr));
@@ -302,8 +303,8 @@ SKIKO_EXPORT KFloat org_jetbrains_skia_TextLine__1nGetCoordAtOffset
   (KNativePointer ptr, KInt offset16) {
     TODO("implement org_jetbrains_skia_TextLine__1nGetCoordAtOffset");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KFloat org_jetbrains_skia_TextLine__1nGetCoordAtOffset
   (KNativePointer ptr, KInt offset16) {
     TextLine* instance = reinterpret_cast<TextLine*>((ptr));
