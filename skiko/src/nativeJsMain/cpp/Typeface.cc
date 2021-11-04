@@ -202,33 +202,24 @@ SKIKO_EXPORT KInt org_jetbrains_skia_Typeface__1nGetUnitsPerEm
 }
 
 
-SKIKO_EXPORT KInt* org_jetbrains_skia_Typeface__1nGetKerningPairAdjustments
-  (KNativePointer ptr, KShort* glyphsArr) {
-    TODO("implement org_jetbrains_skia_Typeface__1nGetKerningPairAdjustments");
+SKIKO_EXPORT bool org_jetbrains_skia_Typeface__1nGetKerningPairAdjustments
+  (KNativePointer ptr, KShort* glyphs, KInt count, KInt* res) {
+  SkTypeface* instance = reinterpret_cast<SkTypeface*>(ptr);
+  if (count > 0) {
+      std::vector<int> adjustments(count);
+      bool hasAdjustments = instance->getKerningPairAdjustments(
+        reinterpret_cast<SkGlyphID*>(glyphs), count,
+        reinterpret_cast<int32_t*>(adjustments.data())
+      );
+      if (hasAdjustments) {
+          memcpy(res, adjustments.data(), adjustments.size() * sizeof(int));
+      }
+      return hasAdjustments;
+  }
+
+  return false;
 }
      
-#if 0 
-SKIKO_EXPORT KInt* org_jetbrains_skia_Typeface__1nGetKerningPairAdjustments
-  (KNativePointer ptr, KShort* glyphsArr) {
-    SkTypeface* instance = reinterpret_cast<SkTypeface*>((ptr));
-    int count = glyphsArr == nullptr ? 0 : env->GetArrayLength(glyphsArr);
-    if (count > 0) {
-        std::vector<KInt> adjustments(count);
-        KShort* glyphs = env->GetShortArrayElements(glyphsArr, nullptr);
-        bool res = instance->getKerningPairAdjustments(
-          reinterpret_cast<SkGlyphID*>(glyphs), count,
-            reinterpret_cast<int32_t*>(adjustments.data()));
-        env->ReleaseShortArrayElements(glyphsArr, glyphs, 0);
-        return res ? javaIntArray(env, adjustments) : nullptr;
-    } else {
-        bool res = instance->getKerningPairAdjustments(nullptr, 0, nullptr);
-        return res ? javaIntArray(env, std::vector<KInt>(0)) : nullptr;
-    }
-}
-#endif
-
-
-
 SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_Typeface__1nGetFamilyNames
   (KNativePointer ptr) {
     TODO("implement org_jetbrains_skia_Typeface__1nGetFamilyNames");

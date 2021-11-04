@@ -179,27 +179,24 @@ extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetUnits
     return instance->getUnitsPerEm();
 }
 
-extern "C" JNIEXPORT jintArray JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetKerningPairAdjustments
-  (JNIEnv* env, jclass jclass, jlong ptr, jshortArray glyphsArr, jint count) {
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetKerningPairAdjustments
+  (JNIEnv* env, jclass jclass, jlong ptr, jshortArray glyphsArr, jint count, jintArray res) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     if (count > 0) {
         std::vector<jint> adjustments(count);
         jshort* glyphs = env->GetShortArrayElements(glyphsArr, nullptr);
-        bool res = instance->getKerningPairAdjustments(
+        bool hasAdjustments = instance->getKerningPairAdjustments(
           reinterpret_cast<SkGlyphID*>(glyphs), count,
-            reinterpret_cast<int32_t*>(adjustments.data()));
+          reinterpret_cast<int32_t*>(adjustments.data())
+        );
         env->ReleaseShortArrayElements(glyphsArr, glyphs, 0);
-        if (res)
-            return javaIntArray(env, adjustments);
-        else
-            return nullptr;
-    } else {
-        bool res = instance->getKerningPairAdjustments(nullptr, 0, nullptr);
-        if (res)
-            return javaIntArray(env, std::vector<jint>(0));
-        else
-            return nullptr;
+        if (hasAdjustments) {
+            env->SetIntArrayRegion(res, 0, count, adjustments.data());
+        }
+        return hasAdjustments;
     }
+
+    return false;
 }
 
 extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetFamilyNames
