@@ -116,33 +116,21 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Typeface__1nMakeFromData
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Typeface__1nMakeClone
-  (KNativePointer typefacePtr, KInteropPointerArray variations, KInt collectionIndex) {
-    TODO("implement org_jetbrains_skia_Typeface__1nMakeClone");
-}
-     
-#if 0 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_Typeface__1nMakeClone
-  (KNativePointer typefacePtr, KInteropPointerArray variations, KInt collectionIndex) {
-    SkTypeface* typeface = reinterpret_cast<SkTypeface*>((typefacePtr));
-    int variationCount = env->GetArrayLength(variations);
-    std::vector<SkFontArguments::VariationPosition::Coordinate> coordinates(variationCount);
-    for (int i=0; i < variationCount; ++i) {
-        KInteropPointer jvar = env->GetObjectArrayElement(variations, i);
+  (KNativePointer typefacePtr, KInt* variations, KInt variationsCount, KInt collectionIndex) {
+    SkTypeface* typeface = reinterpret_cast<SkTypeface*>(typefacePtr);
+    std::vector<SkFontArguments::VariationPosition::Coordinate> coordinates(variationsCount);
+    for (int i=0; i < variationsCount; i+=2) {
         coordinates[i] = {
-            static_cast<SkFourByteTag>(env->GetIntField(jvar, skija::FontVariation::tag)),
-            env->GetFloatField(jvar, skija::FontVariation::value)
+            static_cast<SkFourByteTag>(variations[i]),
+            fromBits(variations[i+1])
         };
-        env->DeleteLocalRef(jvar);
     }
     SkFontArguments arg = SkFontArguments()
                             .setCollectionIndex(collectionIndex)
-                            .setVariationDesignPosition({coordinates.data(), variationCount});
+                            .setVariationDesignPosition({coordinates.data(), variationsCount});
     SkTypeface* clone = typeface->makeClone(arg).release();
     return reinterpret_cast<KNativePointer>(clone);
 }
-#endif
-
-
 
 SKIKO_EXPORT void org_jetbrains_skia_Typeface__1nGetUTF32Glyphs
   (KNativePointer ptr, KInt* uni, KInt count, KShort* res) {
