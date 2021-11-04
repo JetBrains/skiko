@@ -177,7 +177,7 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         return try {
             if (variations.size == 0) return this
             Stats.onNativeCall()
-            val ptr = _nMakeClone(_ptr, variations, collectionIndex)
+            val ptr = _nMakeClone(_ptr, variations, variations.size, collectionIndex)
             require(ptr != NullPointer) {
                 "Failed to clone Typeface $this with $variations"
             }
@@ -416,7 +416,7 @@ internal external fun _nMakeFromFile(path: InteropPointer, index: Int): NativePo
 private external fun _nMakeFromData(dataPtr: NativePointer, index: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeClone")
-private external fun _nMakeClone(ptr: NativePointer, variations: Array<FontVariation>?, collectionIndex: Int): NativePointer
+private external fun _nMakeClone(ptr: NativePointer, variations: Array<FontVariation>, variationsCount: Int, collectionIndex: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetGlyphsCount")
 private external fun _nGetGlyphsCount(ptr: NativePointer): Int

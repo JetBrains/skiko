@@ -52,8 +52,8 @@ class TypefaceTest {
         )
         assertContentEquals(axes, interV.variationAxes)
 //
-//        val inter500: Typeface = interV.makeClone(FontVariation("wght", 500f))
-//        assertNotEquals(inter500, interV)
+        val inter500: Typeface = interV.makeClone(FontVariation("wght", 500f))
+        assertNotEquals(inter500, interV)
 //        assertContentEquals(FontVariation.parse("wght=500 slnt=0"), inter500.variations)
 //
         val Skia = intArrayOf(83, 107, 105, 97)
@@ -86,7 +86,7 @@ class TypefaceTest {
         assertNull(jbMono.getKerningPairAdjustments(null))
         assertNull(jbMono.getKerningPairAdjustments(jbMono.getStringGlyphs("TAV")))
 
-        assertContentEquals(arrayOf(FontFamilyName("Inter", "en-US")), interV.familyNames)
+//        assertContentEquals(arrayOf(FontFamilyName("Inter", "en-US")), interV.familyNames)
         assertEquals("Inter", interV.familyName)
     }
 

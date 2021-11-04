@@ -99,11 +99,10 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TypefaceKt__1nMakeFro
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TypefaceKt__1nMakeClone
-  (JNIEnv* env, jclass jclass, jlong typefacePtr, jobjectArray variations, jint collectionIndex) {
+  (JNIEnv* env, jclass jclass, jlong typefacePtr, jobjectArray variations, jint variationsCount, jint collectionIndex) {
     SkTypeface* typeface = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(typefacePtr));
-    int variationCount = env->GetArrayLength(variations);
-    std::vector<SkFontArguments::VariationPosition::Coordinate> coordinates(variationCount);
-    for (int i=0; i < variationCount; ++i) {
+    std::vector<SkFontArguments::VariationPosition::Coordinate> coordinates(variationsCount);
+    for (int i=0; i < variationsCount; ++i) {
         jobject jvar = env->GetObjectArrayElement(variations, i);
         coordinates[i] = {
             static_cast<SkFourByteTag>(env->GetIntField(jvar, skija::FontVariation::tag)),
@@ -113,7 +112,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TypefaceKt__1nMakeClo
     }
     SkFontArguments arg = SkFontArguments()
                             .setCollectionIndex(collectionIndex)
-                            .setVariationDesignPosition({coordinates.data(), variationCount});
+                            .setVariationDesignPosition({coordinates.data(), variationsCount});
     SkTypeface* clone = typeface->makeClone(arg).release();
     return reinterpret_cast<jlong>(clone);
 }
