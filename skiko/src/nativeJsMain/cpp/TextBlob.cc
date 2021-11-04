@@ -7,6 +7,7 @@
 #include "SkSerialProcs.h"
 #include "SkTextBlob.h"
 #include "common.h"
+#include "RunRecordClone.hh"
 
 static void unrefTextBlob(SkTextBlob* ptr) {
     ptr->unref();
@@ -40,8 +41,18 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_TextBlob__1nMakeFromPosH
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_TextBlob__1nMakeFromPos
-  (KShort* glyphsArr, KFloat* posArr, KNativePointer fontPtr ) {
-    TODO("implement org_jetbrains_skia_TextBlob__1nMakeFromPos");
+  (KShort* glyphsArr, KInt glyphsLen, KFloat* posArr, KNativePointer fontPtr ) {
+    SkFont* font = reinterpret_cast<SkFont*>(fontPtr);
+
+    SkTextBlob* instance = SkTextBlob::MakeFromPosText(
+        glyphsArr,
+        glyphsLen * sizeof(KShort),
+        reinterpret_cast<SkPoint*>(posArr),
+        *font,
+        SkTextEncoding::kGlyphID
+    ).release();
+
+    return reinterpret_cast<KNativePointer>(instance);
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_TextBlob__1nMakeFromRSXform
@@ -88,9 +99,35 @@ SKIKO_EXPORT void org_jetbrains_skia_TextBlob__1nGetGlyphs
     }
 }
 
-SKIKO_EXPORT KFloat* org_jetbrains_skia_TextBlob__1nGetPositions
+SKIKO_EXPORT KInt org_jetbrains_skia_TextBlob__1nGetPositionsLength
   (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_TextBlob__1nGetPositions");
+    SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(ptr);
+    SkTextBlob::Iter iter(*instance);
+    SkTextBlob::Iter::Run run;
+    KInt count = 0;
+    while (iter.next(&run)) {
+        // run.fGlyphIndices points directly to runRecord.glyphBuffer(), which comes directly after RunRecord itself
+        auto runRecord = reinterpret_cast<const RunRecordClone*>(run.fGlyphIndices) - 1;
+        unsigned scalarsPerGlyph = RunRecordClone::ScalarsPerGlyph(runRecord->positioning());
+        count += run.fGlyphCount * scalarsPerGlyph;
+    }
+    return count;
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_TextBlob__1nGetPositions
+  (KNativePointer ptr, KFloat* resultArray) {
+    SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(ptr);
+    SkTextBlob::Iter iter(*instance);
+    SkTextBlob::Iter::Run run;
+    size_t stored = 0;
+
+    while (iter.next(&run)) {
+        // run.fGlyphIndices points directly to runRecord.glyphBuffer(), which comes directly after RunRecord itself
+        auto runRecord = reinterpret_cast<const RunRecordClone*>(run.fGlyphIndices) - 1;
+        unsigned scalarsPerGlyph = RunRecordClone::ScalarsPerGlyph(runRecord->positioning());
+        memcpy(&resultArray[stored], runRecord->posBuffer(), run.fGlyphCount * scalarsPerGlyph * sizeof(SkScalar));
+        stored += run.fGlyphCount * scalarsPerGlyph;
+    }
 }
 
 SKIKO_EXPORT KInt* org_jetbrains_skia_TextBlob__1nGetClusters

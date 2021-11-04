@@ -5,6 +5,7 @@
 #include "SkSerialProcs.h"
 #include "SkTextBlob.h"
 #include "interop.hh"
+#include "RunRecordClone.hh"
 
 static void unrefTextBlob(SkTextBlob* ptr) {
     ptr->unref();
@@ -55,13 +56,18 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TextBlobKt__1nMakeFro
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TextBlobKt__1nMakeFromPos
-  (JNIEnv* env, jclass jclass, jshortArray glyphsArr, jfloatArray posArr, jlong fontPtr ) {
-    jsize len = env->GetArrayLength(glyphsArr);
+  (JNIEnv* env, jclass jclass, jshortArray glyphsArr, jint glyphsLen, jfloatArray posArr, jlong fontPtr ) {
     jshort* glyphs = env->GetShortArrayElements(glyphsArr, nullptr);
     jfloat* pos = env->GetFloatArrayElements(posArr, nullptr);
     SkFont* font = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(fontPtr));
 
-    SkTextBlob* instance = SkTextBlob::MakeFromPosText(glyphs, len * sizeof(jshort), reinterpret_cast<SkPoint*>(pos), *font, SkTextEncoding::kGlyphID).release();
+    SkTextBlob* instance = SkTextBlob::MakeFromPosText(
+        glyphs,
+        glyphsLen * sizeof(jshort),
+        reinterpret_cast<SkPoint*>(pos),
+        *font,
+        SkTextEncoding::kGlyphID
+    ).release();
 
     env->ReleaseShortArrayElements(glyphsArr, glyphs, 0);
     env->ReleaseFloatArrayElements(posArr, pos, 0);
@@ -98,70 +104,6 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TextBlobKt_TextBlob_1
     return reinterpret_cast<jlong>(instance);
 }
 
-// Must match SkTextBlobPriv.h
-//
-// Extended Textblob runs have more data after the Pos[] array:
-//
-//    -------------------------------------------------------------------------
-//    ... | RunRecord | Glyphs[] | Pos[] | TextSize | Clusters[] | Text[] | ...
-//    -------------------------------------------------------------------------
-class RunRecordClone {
-public:
-    SkFont    fFont;
-    uint32_t  fCount;
-    SkPoint   fOffset;
-    uint32_t  fFlags;
-
-    uint16_t* glyphBuffer() const {
-        // Glyphs are stored immediately following the record.
-        return reinterpret_cast<uint16_t*>(const_cast<RunRecordClone*>(this) + 1);
-    }
-
-    SkScalar* posBuffer() const {
-        // Position scalars follow the (aligned) glyph buffer.
-        return reinterpret_cast<SkScalar*>(reinterpret_cast<uint8_t*>(this->glyphBuffer()) +
-                                           SkAlign4(fCount * sizeof(uint16_t)));
-    }
-
-    uint32_t* textSizePtr() const {
-        // textSize follows the position buffer.
-        return (uint32_t*)(&this->posBuffer()[fCount * ScalarsPerGlyph(positioning())]);
-    }
-
-    uint32_t textSize() const {
-        return isExtended() ? *this->textSizePtr() : 0;
-    }
-
-    uint32_t* clusterBuffer() const {
-        // clusters follow the textSize.
-        return isExtended() ? 1 + this->textSizePtr() : nullptr;
-    }
-
-    char* textBuffer() const {
-        return isExtended()
-               ? reinterpret_cast<char*>(this->clusterBuffer() + fCount)
-               : nullptr;
-    }
-
-    uint8_t positioning() const {
-        return fFlags & 0x3; // kPositioning_Mask
-    }
-
-    bool isExtended() const {
-        return fFlags & 0x8; // kExtended_Flag
-    }
-
-    static unsigned ScalarsPerGlyph(uint8_t pos) {
-        const uint8_t gScalarsPerPositioning[] = {
-            0,  // kDefault_Positioning
-            1,  // kHorizontal_Positioning
-            2,  // kFull_Positioning
-            4,  // kRSXform_Positioning
-        };
-        return gScalarsPerPositioning[pos];
-    }
-};
-
 extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGetGlyphsLength
   (JNIEnv* env, jclass jclass, jlong ptr) {
 
@@ -190,22 +132,39 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGetGlyph
     env->ReleaseShortArrayElements(resultArray, shorts, 0);
 }
 
-extern "C" JNIEXPORT jfloatArray JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGetPositions
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGetPositionsLength
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(static_cast<uintptr_t>(ptr));
     SkTextBlob::Iter iter(*instance);
     SkTextBlob::Iter::Run run;
-    std::vector<jfloat> positions;
-    size_t stored = 0;
+    jint count = 0;
     while (iter.next(&run)) {
         // run.fGlyphIndices points directly to runRecord.glyphBuffer(), which comes directly after RunRecord itself
         auto runRecord = reinterpret_cast<const RunRecordClone*>(run.fGlyphIndices) - 1;
         unsigned scalarsPerGlyph = RunRecordClone::ScalarsPerGlyph(runRecord->positioning());
-        positions.resize(stored + run.fGlyphCount * scalarsPerGlyph);
+        count += run.fGlyphCount * scalarsPerGlyph;
+    }
+    return count;
+}
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGetPositions
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray resultArray) {
+    SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(static_cast<uintptr_t>(ptr));
+    SkTextBlob::Iter iter(*instance);
+    SkTextBlob::Iter::Run run;
+    size_t stored = 0;
+
+    jfloat* positions = env->GetFloatArrayElements(resultArray, 0);
+
+    while (iter.next(&run)) {
+        // run.fGlyphIndices points directly to runRecord.glyphBuffer(), which comes directly after RunRecord itself
+        auto runRecord = reinterpret_cast<const RunRecordClone*>(run.fGlyphIndices) - 1;
+        unsigned scalarsPerGlyph = RunRecordClone::ScalarsPerGlyph(runRecord->positioning());
         memcpy(&positions[stored], runRecord->posBuffer(), run.fGlyphCount * scalarsPerGlyph * sizeof(SkScalar));
         stored += run.fGlyphCount * scalarsPerGlyph;
     }
-    return javaFloatArray(env, positions);
+
+    env->ReleaseFloatArrayElements(resultArray, positions, 0);
 }
 
 extern "C" JNIEXPORT jintArray JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGetClusters
