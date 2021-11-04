@@ -51,15 +51,15 @@ class TypefaceTest {
             FontVariationAxis("slnt", -10f, 0f, 0f)
         )
         assertContentEquals(axes, interV.variationAxes)
-//
+
         val inter500: Typeface = interV.makeClone(FontVariation("wght", 500f))
         assertNotEquals(inter500, interV)
-//        assertContentEquals(FontVariation.parse("wght=500 slnt=0"), inter500.variations)
-//
+        assertContentEquals(FontVariation.parse("wght=500 slnt=0"), inter500.variations)
+
         val Skia = intArrayOf(83, 107, 105, 97)
         assertContentEquals(shortArrayOf(394, 713, 677, 503), inter.getUTF32Glyphs(Skia))
         assertContentEquals(shortArrayOf(394, 713, 677, 503), inter.getStringGlyphs("Skia"))
-//
+
         assertContentEquals(
             arrayOf(
                 "GDEF",
