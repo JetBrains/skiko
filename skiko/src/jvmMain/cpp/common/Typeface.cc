@@ -190,10 +190,16 @@ extern "C" JNIEXPORT jintArray JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGet
           reinterpret_cast<SkGlyphID*>(glyphs), count,
             reinterpret_cast<int32_t*>(adjustments.data()));
         env->ReleaseShortArrayElements(glyphsArr, glyphs, 0);
-        return res ? javaIntArray(env, adjustments) : nullptr;
+        if (res)
+            return javaIntArray(env, adjustments);
+        else
+            return nullptr;
     } else {
         bool res = instance->getKerningPairAdjustments(nullptr, 0, nullptr);
-        return res ? javaIntArray(env, std::vector<jint>(0)) : nullptr;
+        if (res)
+            return javaIntArray(env, std::vector<jint>(0));
+        else
+            return nullptr;
     }
 }
 
