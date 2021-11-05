@@ -82,8 +82,16 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_TextBlob__1nMakeFromPos
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_TextBlob__1nMakeFromRSXform
-  (KShort* glyphsArr, KFloat* xformArr, KNativePointer fontPtr ) {
-    TODO("implement org_jetbrains_skia_TextBlob__1nMakeFromRSXform");
+  (KShort* glyphsArr, KInt glyphsLen, KFloat* xformArr, KNativePointer fontPtr ) {
+   SkFont* font = reinterpret_cast<SkFont*>(fontPtr);
+
+   SkTextBlob* instance = SkTextBlob::MakeFromRSXform(
+        glyphsArr, glyphsLen * sizeof(short),
+        reinterpret_cast<SkRSXform*>(xformArr),
+        *font, SkTextEncoding::kGlyphID
+   ).release();
+
+   return reinterpret_cast<KNativePointer>(instance);
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_TextBlob__1nSerializeToData

@@ -86,13 +86,12 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TextBlobKt__1nMakeFro
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TextBlobKt__1nMakeFromRSXform
-  (JNIEnv* env, jclass jclass, jshortArray glyphsArr, jfloatArray xformArr, jlong fontPtr ) {
-    jsize len = env->GetArrayLength(glyphsArr);
+  (JNIEnv* env, jclass jclass, jshortArray glyphsArr, jint glyphsLen, jfloatArray xformArr, jlong fontPtr ) {
     jshort* glyphs = env->GetShortArrayElements(glyphsArr, nullptr);
     jfloat* xform = env->GetFloatArrayElements(xformArr, nullptr);
     SkFont* font = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(fontPtr));
 
-    SkTextBlob* instance = SkTextBlob::MakeFromRSXform(glyphs, len * sizeof(jshort), reinterpret_cast<SkRSXform*>(xform), *font, SkTextEncoding::kGlyphID).release();
+    SkTextBlob* instance = SkTextBlob::MakeFromRSXform(glyphs, glyphsLen * sizeof(jshort), reinterpret_cast<SkRSXform*>(xform), *font, SkTextEncoding::kGlyphID).release();
 
     env->ReleaseShortArrayElements(glyphsArr, glyphs, 0);
     env->ReleaseFloatArrayElements(xformArr, xform, 0);

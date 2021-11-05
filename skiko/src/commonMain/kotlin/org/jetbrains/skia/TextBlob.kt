@@ -76,6 +76,7 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
                 val ptr = interopScope {
                     _nMakeFromRSXform(
                         toInterop(glyphs),
+                        glyphs.size,
                         toInterop(floatXform),
                         getPtr(font)
                     )
@@ -347,7 +348,7 @@ private external fun _nMakeFromPosH(glyphs: InteropPointer, glyphsLen: Int, xpos
 private external fun _nMakeFromPos(glyphs: InteropPointer, glyphsLen: Int, pos: InteropPointer, fontPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromRSXform")
-private external fun _nMakeFromRSXform(glyphs: InteropPointer, xform: InteropPointer, fontPtr: NativePointer): NativePointer
+private external fun _nMakeFromRSXform(glyphs: InteropPointer, glyphsLen: Int, xform: InteropPointer, fontPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetGlyphsLength")
 private external fun _nGetGlyphsLength(ptr: NativePointer): Int
