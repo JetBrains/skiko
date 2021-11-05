@@ -13,5 +13,7 @@ namespace skikoMpp {
         std::unique_ptr<SkRect> getTightBounds(SkTextBlob* instance);
         int getPositionsLength(SkTextBlob* instance);
         void getPositions(SkTextBlob* instance, float* resultArray);
+        void getGlyphs(SkTextBlob* instance, short* resultArray);
+        int getGlyphsLength(SkTextBlob* instance);
     }
 }

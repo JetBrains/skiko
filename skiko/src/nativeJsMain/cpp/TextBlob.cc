@@ -93,26 +93,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_TextBlob__1nMakeFromData
 SKIKO_EXPORT KInt org_jetbrains_skia_TextBlob__1nGetGlyphsLength
   (KNativePointer ptr) {
       SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(ptr);
-      SkTextBlob::Iter iter(*instance);
-      SkTextBlob::Iter::Run run;
-      int stored = 0;
-      while (iter.next(&run)) {
-          stored += run.fGlyphCount;
-      }
-      return stored;
+      return skikoMpp::textblob::getGlyphsLength(instance);
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_TextBlob__1nGetGlyphs
   (KNativePointer ptr, KShort* resultArray) {
     SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(ptr);
-    SkTextBlob::Iter iter(*instance);
-    SkTextBlob::Iter::Run run;
-
-    size_t stored = 0;
-    while (iter.next(&run)) {
-        memcpy(resultArray + stored, run.fGlyphIndices, run.fGlyphCount * sizeof(uint16_t));
-        stored += run.fGlyphCount;
-    }
+    skikoMpp::textblob::getGlyphs(instance, resultArray);
 }
 
 SKIKO_EXPORT KInt org_jetbrains_skia_TextBlob__1nGetPositionsLength
