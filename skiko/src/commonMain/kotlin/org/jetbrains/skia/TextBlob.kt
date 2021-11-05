@@ -258,8 +258,9 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
     val tightBounds: Rect
         get() = try {
             Stats.onNativeCall()
-            val res = _nGetTightBounds(_ptr) ?: throw IllegalArgumentException()
-            res
+            Rect.fromInteropPointerNullable {
+                _nGetTightBounds(_ptr, it)
+            } ?: throw IllegalArgumentException()
         } finally {
             reachabilityBarrier(this)
         }
@@ -360,7 +361,7 @@ private external fun _nGetPositions(ptr: NativePointer, resultArray: InteropPoin
 private external fun _nGetClusters(ptr: NativePointer): IntArray?
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetTightBounds")
-private external fun _nGetTightBounds(ptr: NativePointer): Rect?
+private external fun _nGetTightBounds(ptr: NativePointer, resultArray: InteropPointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetBlockBounds")
 private external fun _nGetBlockBounds(ptr: NativePointer): Rect?
