@@ -88,5 +88,26 @@ namespace skikoMpp {
                 stored += run.fGlyphCount * scalarsPerGlyph;
             }
         }
+
+        void getGlyphs(SkTextBlob* instance, short* resultArray) {
+            SkTextBlob::Iter iter(*instance);
+            SkTextBlob::Iter::Run run;
+
+            size_t stored = 0;
+            while (iter.next(&run)) {
+                memcpy(&resultArray[stored], run.fGlyphIndices, run.fGlyphCount * sizeof(uint16_t));
+                stored += run.fGlyphCount;
+            }
+        }
+
+        int getGlyphsLength(SkTextBlob* instance) {
+            SkTextBlob::Iter iter(*instance);
+            SkTextBlob::Iter::Run run;
+            int stored = 0;
+            while (iter.next(&run)) {
+                stored += run.fGlyphCount;
+            }
+            return stored;
+        }
     }
 }

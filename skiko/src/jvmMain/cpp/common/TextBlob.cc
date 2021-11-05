@@ -117,29 +117,15 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TextBlobKt_TextBlob_1
 
 extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGetGlyphsLength
   (JNIEnv* env, jclass jclass, jlong ptr) {
-
   SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(static_cast<uintptr_t>(ptr));
-  SkTextBlob::Iter iter(*instance);
-  SkTextBlob::Iter::Run run;
-  jint stored = 0;
-  while (iter.next(&run)) {
-      stored += run.fGlyphCount;
-  }
-  return stored;
+  return skikoMpp::textblob::getGlyphsLength(instance);
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGetGlyphs
   (JNIEnv* env, jclass jclass, jlong ptr, jshortArray resultArray) {
     SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(static_cast<uintptr_t>(ptr));
-    SkTextBlob::Iter iter(*instance);
-    SkTextBlob::Iter::Run run;
-
-    size_t stored = 0;
     jshort * shorts = env->GetShortArrayElements(resultArray, nullptr);
-    while (iter.next(&run)) {
-        memcpy(shorts + stored, run.fGlyphIndices, run.fGlyphCount * sizeof(uint16_t));
-        stored += run.fGlyphCount;
-    }
+    skikoMpp::textblob::getGlyphs(instance, shorts);
     env->ReleaseShortArrayElements(resultArray, shorts, 0);
 }
 
