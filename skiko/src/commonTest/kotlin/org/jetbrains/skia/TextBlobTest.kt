@@ -3,11 +3,9 @@ package org.jetbrains.skia
 import org.jetbrains.skia.tests.assertCloseEnough
 import org.jetbrains.skia.tests.assertContentCloseEnough
 import org.jetbrains.skia.tests.makeFromResource
+import org.jetbrains.skiko.kotlinBackend
 import org.jetbrains.skiko.tests.runTest
-import kotlin.test.Test
-import kotlin.test.assertContentEquals
-import kotlin.test.assertEquals
-import kotlin.test.assertNotEquals
+import kotlin.test.*
 
 class TextBlobTest {
 
@@ -63,6 +61,24 @@ class TextBlobTest {
             actual = textBlob.getIntercepts(lowerBound = 0f, upperBound = 1f),
             epsilon = 0.02f // smaller values don't work on k/js :(
         )
+
+        if (kotlinBackend.isNotJs()) {
+            assertCloseEnough(
+                expected = Rect(2f, -28f, 234.97159f, 9f),
+                actual = textBlob.tightBounds,
+                epsilon = eps
+            )
+        } else {
+            //TODO(karpovich): can we avoid such a difference between targets?
+            assertEquals(
+                expected = Rect(3f, -26f, 234f, 7f),
+                actual = textBlob.tightBounds,
+            )
+        }
+
+//        assertFailsWith<IllegalArgumentException> {
+//            textBlob.clusters
+//        }
 
 //        val data = textBlob.serializeToData()
 //        val blobFromData = TextBlob.makeFromData(data)!!
