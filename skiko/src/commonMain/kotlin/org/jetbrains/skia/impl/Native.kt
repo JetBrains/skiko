@@ -41,6 +41,7 @@ expect class InteropScope() {
     fun toInterop(stringArray: Array<String>?): InteropPointer
     fun InteropPointer.fromInteropNativePointerArray(): NativePointerArray
     inline fun <reified T> InteropPointer.fromInterop(decoder: ArrayInteropDecoder<T>): Array<T>
+    fun toInteropForArraysOfPointers(interopPointers: Array<InteropPointer>): InteropPointer
     fun release()
 }
 
@@ -108,9 +109,24 @@ inline fun withResult(result: NativePointerArray, block: (InteropPointer) -> Uni
     result
 }
 
+
+/**
+ * Creates String from SkString* result and deletes SkString*.
+ */
 @Suppress("NON_PUBLIC_CALL_FROM_PUBLIC_INLINE")
 inline fun withStringResult(block: () -> NativePointer): String {
     val string = ManagedString(block())
+    return string.toString()
+}
+
+/**
+ * Creates String from SkString* result. Caller must ensure pointer to be valid.
+ * It is caller responsibility to destroy underlying SkString. Use it if pointer
+ * is received from reference (SkString&)
+ */
+@Suppress("NON_PUBLIC_CALL_FROM_PUBLIC_INLINE")
+inline fun withStringReferenceResult(block: () -> NativePointer): String {
+    val string = ManagedString(block(), false)
     return string.toString()
 }
 

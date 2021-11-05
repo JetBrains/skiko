@@ -190,6 +190,10 @@ actual class InteropScope actual constructor() {
         TODO("implement native fromInteropNativePointerArray")
     }
 
+    actual fun toInteropForArraysOfPointers(interopPointers: Array<InteropPointer>): InteropPointer {
+        return toInterop(interopPointers.map { it.toLong() }.toLongArray())
+    }
+
     actual fun release()  {
         elements.forEach {
             it.unpin()

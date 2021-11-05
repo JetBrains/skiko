@@ -190,6 +190,10 @@ actual class InteropScope actual constructor() {
         return result
     }
 
+    actual fun toInteropForArraysOfPointers(interopPointers: Array<InteropPointer>): InteropPointer {
+        return toInterop(interopPointers.toIntArray())
+    }
+
     actual fun release()  {
         elements.forEach {
             _free(it)
@@ -211,28 +215,28 @@ private external interface HEAP<T> {
     fun subarray(startIndex: Int, endIndex: Int): ArrayBufferView
 }
 private external object HEAPU8: HEAP<ByteArray> {
-    override fun set(src: ByteArray, dest: NativePointer) = definedExternally
-    override fun subarray(startIndex: Int, endIndex: Int): ArrayBufferView = definedExternally
+    override fun set(src: ByteArray, dest: NativePointer)
+    override fun subarray(startIndex: Int, endIndex: Int): ArrayBufferView
 }
 
 private external object HEAPU16: HEAP<ShortArray> {
-    override fun set(src: ShortArray, dest: NativePointer): Unit = definedExternally
-    override fun subarray(startIndex: Int, endIndex: Int): ArrayBufferView = definedExternally
+    override fun set(src: ShortArray, dest: NativePointer)
+    override fun subarray(startIndex: Int, endIndex: Int): ArrayBufferView
 }
 
 private external object HEAPU32: HEAP<IntArray> {
-    override fun set(src: IntArray, dest: NativePointer) = definedExternally
-    override fun subarray(startIndex: Int, endIndex: Int): ArrayBufferView = definedExternally
+    override fun set(src: IntArray, dest: NativePointer)
+    override fun subarray(startIndex: Int, endIndex: Int): ArrayBufferView
 }
 
 private external object HEAPF32: HEAP<FloatArray> {
-    override fun set(src: FloatArray, dest: NativePointer) = definedExternally
-    override fun subarray(startIndex: Int, endIndex: Int): ArrayBufferView = definedExternally
+    override fun set(src: FloatArray, dest: NativePointer)
+    override fun subarray(startIndex: Int, endIndex: Int): ArrayBufferView
 }
 
 private external object HEAPF64: HEAP<DoubleArray> {
-    override fun set(src: DoubleArray, dest: NativePointer) = definedExternally
-    override fun subarray(startIndex: Int, endIndex: Int): ArrayBufferView = definedExternally
+    override fun set(src: DoubleArray, dest: NativePointer)
+    override fun subarray(startIndex: Int, endIndex: Int): ArrayBufferView
 }
 
 // Data copying routines.

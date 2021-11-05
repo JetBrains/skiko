@@ -33,17 +33,10 @@ SKIKO_EXPORT void org_jetbrains_skia_ManagedString__nStringData
 
 SKIKO_EXPORT void org_jetbrains_skia_ManagedString__1nInsert
   (KNativePointer ptr, KInt offset, KInteropPointer s) {
-    TODO("implement org_jetbrains_skia_ManagedString__1nInsert");
-}
-     
-#if 0 
-SKIKO_EXPORT void org_jetbrains_skia_ManagedString__1nInsert
-  (KNativePointer ptr, KInt offset, KInteropPointer s) {
-    SkString* instance = reinterpret_cast<SkString*>((ptr));
+    SkString* instance = reinterpret_cast<SkString*>(ptr);
     skija::UtfIndicesConverter conv(*instance);
-    instance->insert(conv.from16To8(offset), skString(env, s));
+    instance->insert(conv.from16To8(offset), skString(s));
 }
-#endif
 
 SKIKO_EXPORT void org_jetbrains_skia_ManagedString__1nAppend
   (KNativePointer ptr, KInteropPointer s) {

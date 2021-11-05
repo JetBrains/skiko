@@ -1,11 +1,7 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.Managed
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.reachabilityBarrier
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.getPtr
 
 class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR), IHasImageInfo {
     companion object {
@@ -48,8 +44,10 @@ class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHo
     override val imageInfo: ImageInfo
         get() = try {
             if (_imageInfo == null) {
-                Stats.onNativeCall()
-                _imageInfo = Codec_nGetImageInfo(_ptr)
+                _imageInfo = ImageInfo.createUsing(
+                    _ptr = _ptr,
+                    _nGetImageInfo = ::Codec_nGetImageInfo
+                )
             }
             _imageInfo!!
         } finally {
@@ -289,7 +287,7 @@ class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHo
     fun getFrameInfo(frame: Int): AnimationFrameInfo {
         return try {
             Stats.onNativeCall()
-            _nGetFrameInfo(_ptr, frame)
+            AnimationFrameInfo.fromInteropPointer { _nGetFrameInfo(_ptr, frame, it) }
         } finally {
             reachabilityBarrier(this)
         }
@@ -312,7 +310,17 @@ class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHo
     val framesInfo: Array<AnimationFrameInfo>
         get() = try {
             Stats.onNativeCall()
-            _nGetFramesInfo(_ptr)
+            val buffer = _nGetFramesInfo(_ptr)
+            val size = FramesInfo_nGetSize(buffer)
+            if (size > 0) {
+                AnimationFrameInfo.fromInteropArrayPointer(size) {
+                    FramesInfo_nGetInfos(buffer, it)
+                }
+            } else {
+                arrayOf()
+            }.also {
+                FramesInfo_nDelete(buffer)
+            }
         } finally {
             reachabilityBarrier(this)
         }
@@ -353,7 +361,7 @@ class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHo
 private external fun Codec_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetImageInfo")
-private external fun Codec_nGetImageInfo(ptr: NativePointer): ImageInfo?
+private external fun Codec_nGetImageInfo(ptr: NativePointer, imageInfo: InteropPointer, colorSpacePtrs: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nReadPixels")
 private external fun Codec_nReadPixels(ptr: NativePointer, bitmapPtr: NativePointer, frame: Int, priorFrame: Int): Int
@@ -374,10 +382,19 @@ private external fun _nGetEncodedImageFormat(ptr: NativePointer): Int
 private external fun _nGetFrameCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetFrameInfo")
-private external fun _nGetFrameInfo(ptr: NativePointer, frame: Int): AnimationFrameInfo
+private external fun _nGetFrameInfo(ptr: NativePointer, frame: Int, result: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetFramesInfo")
-private external fun _nGetFramesInfo(ptr: NativePointer): Array<AnimationFrameInfo>
+private external fun _nGetFramesInfo(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetRepetitionCount")
 private external fun _nGetRepetitionCount(ptr: NativePointer): Int
+
+@ExternalSymbolName("org_jetbrains_skia_Codec__1nFramesInfo_Delete")
+private external fun FramesInfo_nDelete(ptr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_Codec__1nFramesInfo_GetSize")
+private external fun FramesInfo_nGetSize(ptr: NativePointer): Int
+
+@ExternalSymbolName("org_jetbrains_skia_Codec__1nFramesInfo_GetInfos")
+private external fun FramesInfo_nGetInfos(ptr: NativePointer, result: InteropPointer)

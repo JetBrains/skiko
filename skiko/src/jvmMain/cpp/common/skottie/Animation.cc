@@ -90,15 +90,16 @@ extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_skottie_AnimationKt_
     return (jfloat) instance->outPoint();
 }
 
-extern "C" JNIEXPORT jstring JNICALL Java_org_jetbrains_skia_skottie_AnimationKt__1nGetVersion
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_skottie_AnimationKt__1nGetVersion
   (JNIEnv* env, jclass jclass, jlong ptr) {
     Animation* instance = reinterpret_cast<Animation*>(static_cast<uintptr_t>(ptr));
-    return javaString(env, instance->version());
+    const SkString* version = &instance->version();
+    return reinterpret_cast<jlong>(const_cast<SkString*>(version));
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_skottie_AnimationKt__1nGetSize
-  (JNIEnv* env, jclass jclass, jlong ptr) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_skottie_AnimationKt__1nGetSize
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray dst) {
     Animation* instance = reinterpret_cast<Animation*>(static_cast<uintptr_t>(ptr));
     const SkSize& size = instance->size();
-    return skija::Point::make(env, size.fWidth, size.fHeight);
+    skija::Point::copyToInterop(env, {size.fWidth, size.fHeight}, dst);
 }

@@ -29,8 +29,7 @@ jobs:
       - shell: bash
         run: |
           cd $GITHUB_WORKSPACE/skiko
-          ./gradlew jvmTest
-          ./gradlew publishToMavenLocal
+          ./gradlew -Pskiko.native.enabled=true jvmTest
           ./gradlew -Pskiko.native.enabled=true macosX64Test iosX64Test
           ./gradlew -Pskiko.native.enabled=true publishToMavenLocal
       - uses: actions/upload-artifact@v2

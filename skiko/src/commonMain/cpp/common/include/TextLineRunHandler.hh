@@ -1,7 +1,5 @@
 #include <iostream>
-#include <jni.h>
-#include "../interop.hh"
-#include "../TextLine.hh"
+#include "TextLine.hh"
 #include "SkShaper.h"
 #include "SkTextBlob.h"
 #include "unicode/ubrk.h"
@@ -75,7 +73,7 @@ public:
             // if one glyph includes multiple grapheme clusters (ligature, e.g. <->), accumulate
             if ((glyph < info.glyphCount ? fGlyphOffsets[glyph] : info.utf8Range.end()) > offset)
                 ++graphemesInGlyph;
-            
+
             // when boundaries meet, distribute break positions evenly inside glyph
             else {
                 SkScalar glyphRight = glyph < info.glyphCount ? run.fPos[glyph].fX : fPosition + info.fAdvance.fX;

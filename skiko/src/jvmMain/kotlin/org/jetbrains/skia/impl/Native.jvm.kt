@@ -77,6 +77,7 @@ actual open class InteropScope actual constructor() {
         NativePointerArray((this as LongArray).size, this)
     actual inline fun <reified T> InteropPointer.fromInterop(decoder: ArrayInteropDecoder<T>): Array<T> =
         this@fromInterop as Array<T>
+    actual fun toInteropForArraysOfPointers(interopPointers: Array<InteropPointer>): InteropPointer = interopPointers
     actual fun release() {}
 }
 

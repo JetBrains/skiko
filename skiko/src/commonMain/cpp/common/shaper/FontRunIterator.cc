@@ -51,7 +51,7 @@ void FontRunIterator::consume() {
             }
         }
     }
-    
+
     while (clusterStart < fEnd) {
         clusterStart = clusterEnd;
         clusterEnd = fBegin + ubrk_following(fGraphemeIter.get(), clusterStart - fBegin);

@@ -1,5 +1,8 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.InteropPointer
+import org.jetbrains.skia.impl.withResult
+
 /**
  * Information about individual frames in a multi-framed image.
  */
@@ -66,6 +69,32 @@ class AnimationFrameInfo(
      */
     internal var frameRect: IRect
 ) {
+    companion object {
+        private const val REPR_SIZE = 11
+
+        private fun fromIntArray(repr: IntArray, index: Int = 0): AnimationFrameInfo {
+            val offset = index * REPR_SIZE
+            return AnimationFrameInfo(
+                repr[offset + 0],
+                repr[offset + 1],
+                repr[offset + 2] != 0,
+                repr[offset + 3],
+                repr[offset + 4] != 0,
+                repr[offset + 5],
+                repr[offset + 6],
+                IRect(repr[offset + 7], repr[offset + 8], repr[offset + 9], repr[offset + 10])
+            )
+        }
+
+        internal fun fromInteropPointer(block: (InteropPointer) -> Unit): AnimationFrameInfo {
+            return fromIntArray(withResult(IntArray(REPR_SIZE), block))
+        }
+
+        internal fun fromInteropArrayPointer(size: Int, block: (InteropPointer) -> Unit): Array<AnimationFrameInfo> {
+            val repr = withResult(IntArray(REPR_SIZE * size), block)
+            return Array(size) { fromIntArray(repr, it) }
+        }
+    }
     internal constructor(
         requiredFrame: Int,
         duration: Int,

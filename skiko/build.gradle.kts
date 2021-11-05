@@ -70,11 +70,12 @@ val compileWasm = tasks.register<CompileSkikoCppTask>("compileWasm") {
     buildTargetArch.set(osArch.second)
     buildVariant.set(buildType)
 
-    val srcDirs = projectDirs("src/jsMain/cpp", "src/nativeJsMain/cpp") +
+    val srcDirs = projectDirs("src/commonMain/cpp/common", "src/jsMain/cpp", "src/nativeJsMain/cpp") +
         if (skiko.includeTestHelpers) projectDirs("src/nativeJsTest/cpp") else emptyList()
     sourceRoots.set(srcDirs)
 
     includeHeadersNonRecursive(projectDir.resolve("src/nativeJsMain/cpp"))
+    includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp/common/include"))
     includeHeadersNonRecursive(skiaHeadersDirs(skiaWasmDir.get()))
 
     flags.set(listOf(
@@ -149,11 +150,12 @@ fun registerNativeBridgesTask(os: OS, arch: Arch): TaskProvider<CompileSkikoCppT
             else -> throw GradleException("$os not yet supported")
         }
 
-        val srcDirs = projectDirs("src/nativeNativeJs/cpp", "src/nativeJsMain/cpp") +
+        val srcDirs = projectDirs("src/commonMain/cpp/common", "src/nativeNativeJs/cpp", "src/nativeJsMain/cpp") +
                 if (skiko.includeTestHelpers) projectDirs("src/nativeJsTest/cpp") else emptyList()
         sourceRoots.set(srcDirs)
 
         includeHeadersNonRecursive(projectDir.resolve("src/nativeJsMain/cpp"))
+        includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp/common/include"))
         includeHeadersNonRecursive(skiaHeadersDirs(unpackedSkia))
     }
 }
@@ -351,7 +353,20 @@ kotlin {
             }
         }
 
+        val nativeJsMain by creating {
+            dependsOn(commonMain)
+        }
+
+        val nativeJsTest by creating {
+            dependsOn(commonTest)
+        }
+
+        val jsMain by getting {
+            dependsOn(nativeJsMain)
+        }
+
         val jsTest by getting {
+            dependsOn(nativeJsTest)
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
                 implementation(kotlin("test-js"))
@@ -361,13 +376,13 @@ kotlin {
         if (supportNative) {
             // See https://kotlinlang.org/docs/mpp-share-on-platforms.html#configure-the-hierarchical-structure-manually
             val nativeMain by creating {
-                dependsOn(commonMain)
+                dependsOn(nativeJsMain)
                 dependencies {
                     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
                 }
             }
             val nativeTest by creating {
-                dependsOn(commonTest)
+                dependsOn(nativeJsTest)
             }
             if (hostOs == OS.Linux) {
                 val linuxMain by creating {
@@ -531,6 +546,7 @@ val compileJvmBindings = tasks.register<CompileSkikoCppTask>("compileJvmBindings
     buildVariant.set(buildType)
 
     val srcDirs = projectDirs(
+        "src/commonMain/cpp/common",
         "src/jvmMain/cpp/common",
         "src/jvmMain/cpp/${targetOs.id}",
         "src/jvmTest/cpp"
@@ -540,6 +556,7 @@ val compileJvmBindings = tasks.register<CompileSkikoCppTask>("compileJvmBindings
     includeHeadersNonRecursive(jdkHome.resolve("include"))
     includeHeadersNonRecursive(skiaHeadersDirs(skiaJvmBindingsDir.get()))
     includeHeadersNonRecursive(projectDir.resolve("src/jvmMain/cpp/include"))
+    includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp/common/include"))
 
     compiler.set(compilerForTarget(targetOs, targetArch))
 
@@ -710,6 +727,7 @@ project.tasks.register<Exec>("objcCompile") {
         "-I$skiaDir",
         "-I$skiaDir/include",
         "-I$skiaDir/include/gpu",
+        "-fobjc-arc",
         "-DSK_METAL",
         "-std=c++17",
         "-c",

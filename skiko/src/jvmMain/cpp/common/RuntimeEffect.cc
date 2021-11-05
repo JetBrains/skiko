@@ -9,6 +9,7 @@ Java_org_jetbrains_skia_RuntimeEffectKt__1nMakeShader(JNIEnv* env,
                                                      jlong ptr,
                                                      jlong uniformPtr,
                                                      jlongArray childrenPtrsArr,
+                                                     jint _childCount,
                                                      jfloatArray localMatrixArr,
                                                      jboolean isOpaque) {
     SkRuntimeEffect* runtimeEffect = jlongToPtr<SkRuntimeEffect*>(ptr);

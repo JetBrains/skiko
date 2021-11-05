@@ -43,12 +43,12 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_TextBlob__1nMakeFromPos
   (KShort* glyphsArr, KFloat* posArr, KNativePointer fontPtr ) {
     TODO("implement org_jetbrains_skia_TextBlob__1nMakeFromPos");
 }
-     
+
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_TextBlob__1nMakeFromRSXform
   (KShort* glyphsArr, KFloat* xformArr, KNativePointer fontPtr ) {
     TODO("implement org_jetbrains_skia_TextBlob__1nMakeFromRSXform");
 }
-     
+
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_TextBlob__1nSerializeToData
   (KNativePointer ptr) {
     SkTextBlob* instance = reinterpret_cast<SkTextBlob*>((ptr));
@@ -63,10 +63,29 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_TextBlob__1nMakeFromData
     return reinterpret_cast<KNativePointer>(instance);
 }
 
-
-SKIKO_EXPORT KShort* org_jetbrains_skia_TextBlob__1nGetGlyphs
+SKIKO_EXPORT KInt org_jetbrains_skia_TextBlob__1nGetGlyphsLength
   (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_TextBlob__1nGetGlyphs");
+      SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(ptr);
+      SkTextBlob::Iter iter(*instance);
+      SkTextBlob::Iter::Run run;
+      int stored = 0;
+      while (iter.next(&run)) {
+          stored += run.fGlyphCount;
+      }
+      return stored;
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_TextBlob__1nGetGlyphs
+  (KNativePointer ptr, KShort* resultArray) {
+    SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(ptr);
+    SkTextBlob::Iter iter(*instance);
+    SkTextBlob::Iter::Run run;
+
+    size_t stored = 0;
+    while (iter.next(&run)) {
+        memcpy(resultArray + stored, run.fGlyphIndices, run.fGlyphCount * sizeof(uint16_t));
+        stored += run.fGlyphCount;
+    }
 }
 
 SKIKO_EXPORT KFloat* org_jetbrains_skia_TextBlob__1nGetPositions
@@ -78,12 +97,12 @@ SKIKO_EXPORT KInt* org_jetbrains_skia_TextBlob__1nGetClusters
   (KNativePointer ptr) {
     TODO("implement org_jetbrains_skia_TextBlob__1nGetClusters");
 }
-     
+
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_TextBlob__1nGetTightBounds
   (KNativePointer ptr) {
     TODO("implement org_jetbrains_skia_TextBlob__1nGetTightBounds");
 }
-     
+
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_TextBlob__1nGetBlockBounds
   (KNativePointer ptr) {
     TODO("implement org_jetbrains_skia_TextBlob__1nGetBlockBounds");
