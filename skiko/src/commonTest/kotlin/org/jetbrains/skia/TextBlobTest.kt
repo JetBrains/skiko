@@ -76,6 +76,12 @@ class TextBlobTest {
             )
         }
 
+        assertCloseEnough(
+            expected = Rect(0f, -34.875f, 235.30681f, 8.692932f),
+            actual = textBlob.blockBounds.also { println(it) },
+            epsilon = 0.2f // smaller values don't work on k/js :(
+        )
+
 //        assertFailsWith<IllegalArgumentException> {
 //            textBlob.clusters
 //        }

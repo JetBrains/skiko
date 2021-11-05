@@ -173,9 +173,37 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_TextBlob__1nGetTightBounds
     return true;
 }
 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_TextBlob__1nGetBlockBounds
-  (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_TextBlob__1nGetBlockBounds");
+SKIKO_EXPORT KBoolean org_jetbrains_skia_TextBlob__1nGetBlockBounds
+  (KNativePointer ptr, KFloat* resultArray) {
+    SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(ptr);
+    SkTextBlob::Iter iter(*instance);
+    SkTextBlob::Iter::Run run;
+    auto bounds = SkRect::MakeEmpty();
+    SkFontMetrics metrics;
+
+    while (iter.next(&run)) {
+        // run.fGlyphIndices points directly to runRecord.glyphBuffer(), which comes directly after RunRecord itself
+        auto runRecord = reinterpret_cast<const RunRecordClone*>(run.fGlyphIndices) - 1;
+        if (runRecord->positioning() != 2) // kFull_Positioning
+            return false;
+
+        SkScalar* posBuffer = runRecord->posBuffer();
+        const SkFont& font = runRecord->fFont;
+        font.getMetrics(&metrics);
+
+        SkScalar lastLeft = posBuffer[(run.fGlyphCount - 1) * 2];
+        SkScalar lastWidth;
+        if (run.fGlyphCount > 1 && SkScalarNearlyEqual(posBuffer[(run.fGlyphCount - 2) * 2], lastLeft))
+            lastWidth = 0;
+        else
+            font.getWidths(&run.fGlyphIndices[run.fGlyphCount - 1], 1, &lastWidth);
+
+        auto runBounds = SkRect::MakeLTRB(posBuffer[0], posBuffer[1] + metrics.fAscent, lastLeft + lastWidth, posBuffer[1] + metrics.fDescent);
+        bounds.join(runBounds);
+    }
+
+    skikoMpp::skrect::serializeAs4Floats(bounds, resultArray);
+    return true;
 }
 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_TextBlob__1nGetFirstBaseline

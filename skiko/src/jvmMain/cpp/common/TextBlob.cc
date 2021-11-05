@@ -231,8 +231,8 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGetT
     return true;
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGetBlockBounds
-  (JNIEnv* env, jclass jclass, jlong ptr) {
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGetBlockBounds
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray resultArray) {
     SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(static_cast<uintptr_t>(ptr));
     SkTextBlob::Iter iter(*instance);
     SkTextBlob::Iter::Run run;
@@ -243,7 +243,7 @@ extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGetBl
         // run.fGlyphIndices points directly to runRecord.glyphBuffer(), which comes directly after RunRecord itself
         auto runRecord = reinterpret_cast<const RunRecordClone*>(run.fGlyphIndices) - 1;
         if (runRecord->positioning() != 2) // kFull_Positioning
-            return nullptr;
+            return false;
 
         SkScalar* posBuffer = runRecord->posBuffer();
         const SkFont& font = runRecord->fFont;
@@ -259,7 +259,11 @@ extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGetBl
         auto runBounds = SkRect::MakeLTRB(posBuffer[0], posBuffer[1] + metrics.fAscent, lastLeft + lastWidth, posBuffer[1] + metrics.fDescent);
         bounds.join(runBounds);
     }
-    return skija::Rect::fromSkRect(env, bounds);
+
+    jfloat* floats = env->GetFloatArrayElements(resultArray, 0);
+    skikoMpp::skrect::serializeAs4Floats(bounds, floats);
+    env->ReleaseFloatArrayElements(resultArray, floats, 0);
+    return true;
 }
 
 extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGetFirstBaseline
