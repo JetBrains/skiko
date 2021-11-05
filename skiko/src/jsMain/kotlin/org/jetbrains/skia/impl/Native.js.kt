@@ -211,7 +211,7 @@ private external interface HEAP<T> {
     fun subarray(startIndex: Int, endIndex: Int): ArrayBufferView
 }
 private external object HEAPU8: HEAP<ByteArray> {
-    override fun set(src: ByteArray, dest: NativePointer) = definedExternally
+    override fun set(src: ByteArray, dest: NativePointer): Unit = definedExternally
     override fun subarray(startIndex: Int, endIndex: Int): ArrayBufferView = definedExternally
 }
 
@@ -221,17 +221,17 @@ private external object HEAPU16: HEAP<ShortArray> {
 }
 
 private external object HEAPU32: HEAP<IntArray> {
-    override fun set(src: IntArray, dest: NativePointer) = definedExternally
+    override fun set(src: IntArray, dest: NativePointer): Unit = definedExternally
     override fun subarray(startIndex: Int, endIndex: Int): ArrayBufferView = definedExternally
 }
 
 private external object HEAPF32: HEAP<FloatArray> {
-    override fun set(src: FloatArray, dest: NativePointer) = definedExternally
+    override fun set(src: FloatArray, dest: NativePointer): Unit = definedExternally
     override fun subarray(startIndex: Int, endIndex: Int): ArrayBufferView = definedExternally
 }
 
 private external object HEAPF64: HEAP<DoubleArray> {
-    override fun set(src: DoubleArray, dest: NativePointer) = definedExternally
+    override fun set(src: DoubleArray, dest: NativePointer): Unit = definedExternally
     override fun subarray(startIndex: Int, endIndex: Int): ArrayBufferView = definedExternally
 }
 
