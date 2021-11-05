@@ -86,7 +86,9 @@ class TypefaceTest {
         assertNull(jbMono.getKerningPairAdjustments(null))
         assertNull(jbMono.getKerningPairAdjustments(jbMono.getStringGlyphs("TAV")))
 
-//        assertContentEquals(arrayOf(FontFamilyName("Inter", "en-US")), interV.familyNames)
+        if (kotlinBackend == KotlinBackend.JVM) {
+            assertContentEquals(arrayOf(FontFamilyName("Inter", "en-US")), interV.familyNames)
+        }
         assertEquals("Inter", interV.familyName)
     }
 
