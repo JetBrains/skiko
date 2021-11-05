@@ -42,5 +42,24 @@ namespace skikoMpp {
 
             return std::unique_ptr<SkRect>(bounds);
         }
+
+        std::unique_ptr<SkRect> getTightBounds(SkTextBlob* instance) {
+            SkTextBlob::Iter iter(*instance);
+            SkTextBlob::Iter::Run run;
+            auto bounds = new SkRect();
+            SkRect tmpBounds;
+            while (iter.next(&run)) {
+                // run.fGlyphIndices points directly to runRecord.glyphBuffer(), which comes directly after RunRecord itself
+                auto runRecord = reinterpret_cast<const RunRecordClone*>(run.fGlyphIndices) - 1;
+                if (runRecord->positioning() != 2) // kFull_Positioning
+                    return std::unique_ptr<SkRect>(nullptr);
+
+                runRecord->fFont.measureText(runRecord->glyphBuffer(), run.fGlyphCount * sizeof(uint16_t), SkTextEncoding::kGlyphID, &tmpBounds, nullptr);
+                SkScalar* posBuffer = runRecord->posBuffer();
+                tmpBounds.offset(posBuffer[0], posBuffer[1]);
+                bounds->join(tmpBounds);
+            }
+            return std::unique_ptr<SkRect>(bounds);
+        }
     }
 }
