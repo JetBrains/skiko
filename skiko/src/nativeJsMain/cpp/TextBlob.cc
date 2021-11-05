@@ -52,8 +52,18 @@ SKIKO_EXPORT void org_jetbrains_skia_TextBlob__1nGetIntercepts
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_TextBlob__1nMakeFromPosH
-  (KShort* glyphsArr, KFloat* xposArr, KFloat ypos, KNativePointer fontPtr) {
-    TODO("implement org_jetbrains_skia_TextBlob__1nMakeFromPosH");
+  (KShort* glyphsArr, KInt glyphsLen, KFloat* xposArr, KFloat ypos, KNativePointer fontPtr) {
+    SkFont* font = reinterpret_cast<SkFont*>(fontPtr);
+
+    SkTextBlob* instance = SkTextBlob::MakeFromPosTextH(
+        glyphsArr,
+        glyphsLen * sizeof(short),
+        xposArr, ypos,
+        *font,
+        SkTextEncoding::kGlyphID
+    ).release();
+
+    return reinterpret_cast<KNativePointer>(instance);
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_TextBlob__1nMakeFromPos

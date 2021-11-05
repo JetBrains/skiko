@@ -52,13 +52,12 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGetInter
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TextBlobKt__1nMakeFromPosH
-  (JNIEnv* env, jclass jclass, jshortArray glyphsArr, jfloatArray xposArr, jfloat ypos, jlong fontPtr) {
-    jsize len = env->GetArrayLength(glyphsArr);
+  (JNIEnv* env, jclass jclass, jshortArray glyphsArr, jint glyphsLen, jfloatArray xposArr, jfloat ypos, jlong fontPtr) {
     jshort* glyphs = env->GetShortArrayElements(glyphsArr, nullptr);
     jfloat* xpos = env->GetFloatArrayElements(xposArr, nullptr);
     SkFont* font = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(fontPtr));
 
-    SkTextBlob* instance = SkTextBlob::MakeFromPosTextH(glyphs, len * sizeof(jshort), xpos, ypos, *font, SkTextEncoding::kGlyphID).release();
+    SkTextBlob* instance = SkTextBlob::MakeFromPosTextH(glyphs, glyphsLen * sizeof(jshort), xpos, ypos, *font, SkTextEncoding::kGlyphID).release();
 
     env->ReleaseShortArrayElements(glyphsArr, glyphs, 0);
     env->ReleaseFloatArrayElements(xposArr, xpos, 0);
