@@ -118,32 +118,13 @@ SKIKO_EXPORT void org_jetbrains_skia_TextBlob__1nGetGlyphs
 SKIKO_EXPORT KInt org_jetbrains_skia_TextBlob__1nGetPositionsLength
   (KNativePointer ptr) {
     SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(ptr);
-    SkTextBlob::Iter iter(*instance);
-    SkTextBlob::Iter::Run run;
-    KInt count = 0;
-    while (iter.next(&run)) {
-        // run.fGlyphIndices points directly to runRecord.glyphBuffer(), which comes directly after RunRecord itself
-        auto runRecord = reinterpret_cast<const RunRecordClone*>(run.fGlyphIndices) - 1;
-        unsigned scalarsPerGlyph = RunRecordClone::ScalarsPerGlyph(runRecord->positioning());
-        count += run.fGlyphCount * scalarsPerGlyph;
-    }
-    return count;
+    return skikoMpp::textblob::getPositionsLength(instance);
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_TextBlob__1nGetPositions
   (KNativePointer ptr, KFloat* resultArray) {
     SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(ptr);
-    SkTextBlob::Iter iter(*instance);
-    SkTextBlob::Iter::Run run;
-    size_t stored = 0;
-
-    while (iter.next(&run)) {
-        // run.fGlyphIndices points directly to runRecord.glyphBuffer(), which comes directly after RunRecord itself
-        auto runRecord = reinterpret_cast<const RunRecordClone*>(run.fGlyphIndices) - 1;
-        unsigned scalarsPerGlyph = RunRecordClone::ScalarsPerGlyph(runRecord->positioning());
-        memcpy(&resultArray[stored], runRecord->posBuffer(), run.fGlyphCount * scalarsPerGlyph * sizeof(SkScalar));
-        stored += run.fGlyphCount * scalarsPerGlyph;
-    }
+    skikoMpp::textblob::getPositions(instance, resultArray);
 }
 
 SKIKO_EXPORT KInt* org_jetbrains_skia_TextBlob__1nGetClusters

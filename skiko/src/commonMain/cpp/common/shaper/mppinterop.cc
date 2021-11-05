@@ -61,5 +61,32 @@ namespace skikoMpp {
             }
             return std::unique_ptr<SkRect>(bounds);
         }
+
+        int getPositionsLength(SkTextBlob* instance) {
+            SkTextBlob::Iter iter(*instance);
+            SkTextBlob::Iter::Run run;
+            int count = 0;
+            while (iter.next(&run)) {
+                // run.fGlyphIndices points directly to runRecord.glyphBuffer(), which comes directly after RunRecord itself
+                auto runRecord = reinterpret_cast<const RunRecordClone*>(run.fGlyphIndices) - 1;
+                unsigned scalarsPerGlyph = RunRecordClone::ScalarsPerGlyph(runRecord->positioning());
+                count += run.fGlyphCount * scalarsPerGlyph;
+            }
+            return count;
+        }
+
+        void getPositions(SkTextBlob* instance, float* resultArray) {
+            SkTextBlob::Iter iter(*instance);
+            SkTextBlob::Iter::Run run;
+            size_t stored = 0;
+
+            while (iter.next(&run)) {
+                // run.fGlyphIndices points directly to runRecord.glyphBuffer(), which comes directly after RunRecord itself
+                auto runRecord = reinterpret_cast<const RunRecordClone*>(run.fGlyphIndices) - 1;
+                unsigned scalarsPerGlyph = RunRecordClone::ScalarsPerGlyph(runRecord->positioning());
+                memcpy(&resultArray[stored], runRecord->posBuffer(), run.fGlyphCount * scalarsPerGlyph * sizeof(SkScalar));
+                stored += run.fGlyphCount * scalarsPerGlyph;
+            }
+        }
     }
 }
