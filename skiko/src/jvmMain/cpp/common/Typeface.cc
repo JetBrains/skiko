@@ -29,7 +29,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetVaria
         std::vector<SkFontArguments::VariationPosition::Coordinate> coords(count);
         instance->getVariationDesignPosition(coords.data(), count);
         for (int i=0; i < count; ++i) {
-             jint r[2] = {coords[i].axis, rawBits(coords[i].value)};
+             jint r[2] = {static_cast<jint>(coords[i].axis), rawBits(coords[i].value)};
              env->SetIntArrayRegion(res, 2 * i, 2, r);
         }
     }
@@ -49,7 +49,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetVaria
         std::vector<SkFontParameters::Variation::Axis> params(count);
         instance->getVariationDesignParameters(params.data(), count);
         for (int i = 0; i < count; ++i) {
-            jint p[5] = { params[i].tag, rawBits(params[i].min), rawBits(params[i].def), rawBits(params[i].max), params[i].isHidden()};
+            jint p[5] = { static_cast<jint>(params[i].tag), rawBits(params[i].min), rawBits(params[i].def), rawBits(params[i].max), params[i].isHidden()};
             env->SetIntArrayRegion(axisData, 5 * i, 5, p);
         }
     }
@@ -105,7 +105,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TypefaceKt__1nMakeClo
     jint* variations = env->GetIntArrayElements(variationsArr, 0);
     for (int i=0; i < variationsCount; i+=2) {
         coordinates[i] = {
-            variations[i],
+            static_cast<SkFourByteTag>(variations[i]),
             fromBits(variations[i+1])
         };
     }
