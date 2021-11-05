@@ -109,5 +109,34 @@ namespace skikoMpp {
             }
             return stored;
         }
+
+        bool getFirstBaseline(SkTextBlob* instance, float* resultArray) {
+            SkTextBlob::Iter iter(*instance);
+            SkTextBlob::Iter::Run run;
+            if (iter.next(&run)) {
+                auto runRecord = reinterpret_cast<const RunRecordClone*>(run.fGlyphIndices) - 1;
+                if (runRecord->positioning() != 2) // kFull_Positioning
+                    return false;
+                resultArray[0] = runRecord->posBuffer()[1];
+                return true;
+            }
+            return false;
+        }
+
+        bool getLastBaseline(SkTextBlob* instance, float* resultArray) {
+            SkTextBlob::Iter iter(*instance);
+            SkTextBlob::Iter::Run run;
+            SkScalar baseline = 0;
+            while (iter.next(&run)) {
+                // run.fGlyphIndices points directly to runRecord.glyphBuffer(), which comes directly after RunRecord itself
+                auto runRecord = reinterpret_cast<const RunRecordClone*>(run.fGlyphIndices) - 1;
+                if (runRecord->positioning() != 2) // kFull_Positioning
+                    return false;
+
+                baseline = std::max(baseline, runRecord->posBuffer()[1]);
+            }
+            resultArray[0] = baseline;
+            return true;
+        }
     }
 }

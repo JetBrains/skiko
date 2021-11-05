@@ -199,35 +199,20 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGetB
     return true;
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGetFirstBaseline
-  (JNIEnv* env, jclass jclass, jlong ptr) {
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGetFirstBaseline
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray resultArray) {
     SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(static_cast<uintptr_t>(ptr));
-    SkTextBlob::Iter iter(*instance);
-    SkTextBlob::Iter::Run run;
-    while (iter.next(&run)) {
-        // run.fGlyphIndices points directly to runRecord.glyphBuffer(), which comes directly after RunRecord itself
-        auto runRecord = reinterpret_cast<const RunRecordClone*>(run.fGlyphIndices) - 1;
-        if (runRecord->positioning() != 2) // kFull_Positioning
-            return nullptr;
-
-        return javaFloat(env, runRecord->posBuffer()[1]);
-    }
-    return nullptr;
+    jfloat* floats = env->GetFloatArrayElements(resultArray, 0);
+    auto hasValue = skikoMpp::textblob::getFirstBaseline(instance, floats);
+    env->ReleaseFloatArrayElements(resultArray, floats, 0);
+    return hasValue;
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGetLastBaseline
-  (JNIEnv* env, jclass jclass, jlong ptr) {
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGetLastBaseline
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray resultArray) {
     SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(static_cast<uintptr_t>(ptr));
-    SkTextBlob::Iter iter(*instance);
-    SkTextBlob::Iter::Run run;
-    SkScalar baseline = 0;
-    while (iter.next(&run)) {
-        // run.fGlyphIndices points directly to runRecord.glyphBuffer(), which comes directly after RunRecord itself
-        auto runRecord = reinterpret_cast<const RunRecordClone*>(run.fGlyphIndices) - 1;
-        if (runRecord->positioning() != 2) // kFull_Positioning
-            return nullptr;
-
-        baseline = std::max(baseline, runRecord->posBuffer()[1]);
-    }
-    return javaFloat(env, baseline);
+    jfloat* floats = env->GetFloatArrayElements(resultArray, 0);
+    auto hasValue = skikoMpp::textblob::getLastBaseline(instance, floats);
+    env->ReleaseFloatArrayElements(resultArray, floats, 0);
+    return hasValue;
 }

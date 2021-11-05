@@ -290,8 +290,9 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
     val firstBaseline: Float
         get() = try {
             Stats.onNativeCall()
-            val res = _nGetFirstBaseline(_ptr) ?: throw IllegalArgumentException()
-            res
+            withNullableResult(FloatArray(1)) {
+                _nGetFirstBaseline(_ptr, it)
+            }?.firstOrNull() ?: throw IllegalArgumentException()
         } finally {
             reachabilityBarrier(this)
         }
@@ -305,8 +306,9 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
     val lastBaseline: Float
         get() = try {
             Stats.onNativeCall()
-            val res = _nGetLastBaseline(_ptr) ?: throw IllegalArgumentException()
-            res
+            withNullableResult(FloatArray(1)) {
+                _nGetLastBaseline(_ptr, it)
+            }?.firstOrNull() ?: throw IllegalArgumentException()
         } finally {
             reachabilityBarrier(this)
         }
@@ -368,7 +370,7 @@ private external fun _nGetTightBounds(ptr: NativePointer, resultArray: InteropPo
 private external fun _nGetBlockBounds(ptr: NativePointer, resultArray: InteropPointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetFirstBaseline")
-private external fun _nGetFirstBaseline(ptr: NativePointer): Float?
+private external fun _nGetFirstBaseline(ptr: NativePointer, resultArray: InteropPointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetLastBaseline")
-private external fun _nGetLastBaseline(ptr: NativePointer): Float?
+private external fun _nGetLastBaseline(ptr: NativePointer, resultArray: InteropPointer): Boolean

@@ -1,13 +1,7 @@
 package org.jetbrains.skia
 
-import org.jetbrains.skia.impl.InteropPointer
+import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.Managed
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.getPtr
-import org.jetbrains.skia.impl.interopScope
-import org.jetbrains.skia.impl.reachabilityBarrier
 
 class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
@@ -207,17 +201,6 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
 
     internal object _FinalizerHolder {
         val PTR = PathMeasure_nGetFinalizer()
-    }
-}
-
-private inline fun withNullableResult(result: FloatArray, block: (InteropPointer) -> Boolean): FloatArray? = interopScope {
-    val handle = toInterop(result)
-    val blockResult = block(handle)
-    if (blockResult) {
-        handle.fromInterop(result)
-        result
-    } else {
-        null
     }
 }
 

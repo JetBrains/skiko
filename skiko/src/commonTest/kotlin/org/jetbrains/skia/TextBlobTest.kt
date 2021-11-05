@@ -82,6 +82,9 @@ class TextBlobTest {
             epsilon = 0.2f // smaller values don't work on k/js :(
         )
 
+        assertEquals(0f, textBlob.firstBaseline)
+        assertEquals(0f, textBlob.lastBaseline)
+
 //        assertFailsWith<IllegalArgumentException> {
 //            textBlob.clusters
 //        }
