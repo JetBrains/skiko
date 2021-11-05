@@ -206,8 +206,10 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         return try {
             Stats.onNativeCall()
             if (uni != null) {
-                withResult(ShortArray(uni.size)) {
-                    Typeface_nGetUTF32Glyphs(_ptr, interopScope { toInterop(uni) }, uni.size, it)
+                interopScope {
+                    withResult(ShortArray(uni.size)) {
+                        Typeface_nGetUTF32Glyphs(_ptr, toInterop(uni), uni.size, it)
+                    }
                 }
             } else shortArrayOf()
         } finally {
