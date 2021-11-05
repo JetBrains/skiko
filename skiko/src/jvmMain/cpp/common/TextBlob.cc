@@ -5,6 +5,7 @@
 #include "SkSerialProcs.h"
 #include "SkTextBlob.h"
 #include "interop.hh"
+#include "mppinterop.h"
 #include "RunRecordClone.hh"
 
 static void unrefTextBlob(SkTextBlob* ptr) {
@@ -16,11 +17,14 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TextBlobKt_TextBlob_1
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&unrefTextBlob));
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_TextBlobKt__1nBounds
-  (JNIEnv* env, jclass jclass, jlong ptr) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TextBlobKt__1nBounds
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray resultRect) {
     SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(static_cast<uintptr_t>(ptr));
     SkRect bounds = instance->bounds();
-    return skija::Rect::fromSkRect(env, instance->bounds());
+
+    jfloat* floats = env->GetFloatArrayElements(resultRect, 0);
+    skikoMpp::skrect::serializeAs4Floats(bounds, floats);
+    env->ReleaseFloatArrayElements(resultRect, floats, 0);
 }
 
 extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TextBlobKt_TextBlob_1nGetUniqueId
@@ -29,15 +33,22 @@ extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TextBlobKt_TextBlob_1n
     return instance->uniqueID();
 }
 
-extern "C" JNIEXPORT jfloatArray JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGetIntercepts
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGetInterceptsLength
   (JNIEnv* env, jclass jclass, jlong ptr, jfloat lower, jfloat upper, jlong paintPtr) {
+      SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(static_cast<uintptr_t>(ptr));
+      std::vector<float> bounds {lower, upper};
+      SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
+      int len = instance->getIntercepts(bounds.data(), nullptr, paint);
+      return len;
+}
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGetIntercepts
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloat lower, jfloat upper, jlong paintPtr, jfloatArray resultArray) {
     SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(static_cast<uintptr_t>(ptr));
-    std::vector<float> bounds {lower, upper};
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
-    int len = instance->getIntercepts(bounds.data(), nullptr, paint);
-    std::vector<float> intervals(len);
-    instance->getIntercepts(bounds.data(), intervals.data(), paint);
-    return javaFloatArray(env, intervals);
+    jfloat* floats = env->GetFloatArrayElements(resultArray, 0);
+    std::vector<float> bounds {lower, upper};
+    instance->getIntercepts(bounds.data(), floats, paint);
+    env->ReleaseFloatArrayElements(resultArray, floats, 0);
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TextBlobKt__1nMakeFromPosH

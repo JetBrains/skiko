@@ -8,6 +8,7 @@
 #include "SkTextBlob.h"
 #include "common.h"
 #include "RunRecordClone.hh"
+#include "mppinterop.h"
 
 static void unrefTextBlob(SkTextBlob* ptr) {
     ptr->unref();
@@ -19,9 +20,11 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_TextBlob__1nGetFinalizer
 }
 
 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_TextBlob__1nBounds
-  (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_TextBlob__1nBounds");
+SKIKO_EXPORT void org_jetbrains_skia_TextBlob__1nBounds
+  (KNativePointer ptr, KInteropPointer resultFloats) {
+    SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(ptr);
+    SkRect bounds = instance->bounds();
+    skikoMpp::skrect::serializeAs4Floats(bounds, reinterpret_cast<float*>(resultFloats));
 }
 
 SKIKO_EXPORT KInt org_jetbrains_skia_TextBlob__1nGetUniqueId
@@ -30,9 +33,22 @@ SKIKO_EXPORT KInt org_jetbrains_skia_TextBlob__1nGetUniqueId
     return instance->uniqueID();
 }
 
-SKIKO_EXPORT KFloat* org_jetbrains_skia_TextBlob__1nGetIntercepts
-  (KNativePointer ptr, KFloat lower, KFloat upper, KNativePointer paintPtr) {
-    TODO("implement org_jetbrains_skia_TextBlob__1nGetIntercepts");
+SKIKO_EXPORT KInt org_jetbrains_skia_TextBlob__1nGetInterceptsLength
+    (KNativePointer ptr, KFloat lower, KFloat upper, KNativePointer paintPtr) {
+
+    SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(ptr);
+    SkPaint* paint = reinterpret_cast<SkPaint*>(paintPtr);
+    std::vector<float> bounds {lower, upper};
+    int len = instance->getIntercepts(bounds.data(), nullptr, paint);
+    return len;
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_TextBlob__1nGetIntercepts
+  (KNativePointer ptr, KFloat lower, KFloat upper, KNativePointer paintPtr, KFloat* resultArray) {
+    SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(ptr);
+    SkPaint* paint = reinterpret_cast<SkPaint*>(paintPtr);
+    std::vector<float> bounds {lower, upper};
+    instance->getIntercepts(bounds.data(), resultArray, paint);
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_TextBlob__1nMakeFromPosH
