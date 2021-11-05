@@ -4,28 +4,40 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.swing.Swing
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.context.OpenGLContextHandler
+import java.util.concurrent.Executors
 
 internal class LinuxOpenGLRedrawer(
     private val layer: SkiaLayer,
     private val properties: SkiaLayerProperties
 ) : Redrawer {
     private var isDisposed = false
-    private var context = 0L
-    private val swapInterval = if (properties.isVsyncEnabled) 1 else 0
 
-    init {
-    	layer.backedLayer.lockLinuxDrawingSurface {
-            context = it.createContext(layer.transparency)
-            if (context == 0L) {
-                throw RenderException("Cannot create Linux GL context")
-            }
-            it.makeCurrent(context)
-            if (!isVideoCardSupported(layer.renderApi)) {
-                throw RenderException("Cannot create Linux GL context")
-            }
-            it.setSwapInterval(swapInterval)
+    private var context = 0L
+    private val defaultSwapInterval = if (properties.isVsyncEnabled) 1 else 0
+    private var swapInterval = -1
+
+    private fun LinuxDrawingSurface.setSwapIntervalFast(swapInterval: Int) {
+        if (this@LinuxOpenGLRedrawer.swapInterval != swapInterval) {
+            setSwapInterval(swapInterval)
         }
     }
+
+    init {
+        runBlocking {
+            inDrawThread {
+                context = it.createContext(layer.transparency)
+                if (context == 0L) {
+                    throw RenderException("Cannot create Linux GL context")
+                }
+                it.makeCurrent(context)
+                if (!isVideoCardSupported(layer.renderApi)) {
+                    throw RenderException("Cannot create Linux GL context")
+                }
+                it.setSwapIntervalFast(defaultSwapInterval)
+            }
+        }
+    }
+
     private val frameJob = Job()
     @Volatile
     private var frameLimit = 0.0
@@ -48,13 +60,16 @@ internal class LinuxOpenGLRedrawer(
 
     override fun dispose() {
         check(!isDisposed) { "LinuxOpenGLRedrawer is disposed" }
-        layer.backedLayer.lockLinuxDrawingSurface {
-            // makeCurrent is mandatory to destroy context, otherwise, OpenGL will destroy wrong context (from another window).
-            // see the official example: https://www.khronos.org/opengl/wiki/Tutorial:_OpenGL_3.0_Context_Creation_(GLX)
-            it.makeCurrent(context)
-            // TODO remove in https://github.com/JetBrains/skiko/pull/300
-            (layer.contextHandler as OpenGLContextHandler).disposeInOpenGLContext()
-            it.destroyContext(context)
+
+        runBlocking {
+            inDrawThread {
+                // makeCurrent is mandatory to destroy context, otherwise, OpenGL will destroy wrong context (from another window).
+                // see the official example: https://www.khronos.org/opengl/wiki/Tutorial:_OpenGL_3.0_Context_Creation_(GLX)
+                it.makeCurrent(context)
+                // TODO remove in https://github.com/JetBrains/skiko/pull/300
+                (layer.contextHandler as OpenGLContextHandler).disposeInOpenGLContext()
+                it.destroyContext(context)
+            }
         }
         runBlocking {
             frameJob.cancelAndJoin()
@@ -68,23 +83,38 @@ internal class LinuxOpenGLRedrawer(
         frameDispatcher.scheduleFrame()
     }
 
-    override fun redrawImmediately() = layer.backedLayer.lockLinuxDrawingSurface {
+    override fun redrawImmediately() {
         check(!isDisposed) { "LinuxOpenGLRedrawer is disposed" }
         update(System.nanoTime())
-        it.makeCurrent(context)
-        draw()
-        it.setSwapInterval(0)
-        it.swapBuffers()
-        OpenGLApi.instance.glFinish()
-        it.setSwapInterval(swapInterval)
+        runBlocking {
+            draw(withVsync = false)
+        }
     }
 
     private fun update(nanoTime: Long) {
         layer.update(nanoTime)
     }
 
-    private fun draw() {
-        layer.inDrawScope(layer::draw)
+    private suspend fun draw(withVsync: Boolean) {
+        layer.inDrawScope {
+            inDrawThread {
+                it.makeCurrent(context)
+                layer.draw()
+                it.setSwapIntervalFast(if (withVsync) defaultSwapInterval else 0)
+                it.swapBuffers()
+                OpenGLApi.instance.glFinish()
+            }
+        }
+    }
+
+    private suspend fun inDrawThread(body: (LinuxDrawingSurface) -> Unit) {
+        withContext(drawDispatcher) {
+            if (!isDisposed) {
+                layer.backedLayer.lockLinuxDrawingSurface {
+                    body(it)
+                }
+            }
+        }
     }
 
     companion object {
@@ -94,6 +124,12 @@ internal class LinuxOpenGLRedrawer(
             .asSequence()
             .filterNot(LinuxOpenGLRedrawer::isDisposed)
             .filter { it.layer.isShowing }
+
+        private val drawDispatcher = Executors.newSingleThreadExecutor {
+            Thread(it).apply {
+                isDaemon = true
+            }
+        }.asCoroutineDispatcher()
 
         private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
             toRedrawCopy.addAll(toRedraw)
@@ -105,46 +141,25 @@ internal class LinuxOpenGLRedrawer(
             val nanoTime = System.nanoTime()
 
             for (redrawer in toRedrawVisible) {
-                try {
-                    redrawer.update(nanoTime)
-                } catch (e: CancellationException) {
-                    // continue
-                }
+                redrawer.update(nanoTime)
             }
 
-            val drawingSurfaces = toRedrawVisible.associateWith { lockLinuxDrawingSurface(it.layer.backedLayer) }
-            try {
-                for (redrawer in toRedrawVisible) {
-                    drawingSurfaces[redrawer]!!.makeCurrent(redrawer.context)
-                    redrawer.draw()
-                }
+            // TODO(demin): How can we properly synchronize multiple windows with multiple displays?
+            //  I checked, and without vsync there is no tearing. Is it only my case (Ubuntu, Nvidia, X11),
+            //  or Ubuntu write all the screen content into an intermediate buffer? If so, then we probably only
+            //  need a frame limiter.
 
-                // TODO(demin): How can we properly synchronize multiple windows with multiple displays?
-                //  I checked, and without vsync there is no tearing. Is it only my case (Ubuntu, Nvidia, X11),
-                //  or Ubuntu write all the screen content into an intermediate buffer? If so, then we probably only
-                //  need a frame limiter.
+            // Synchronize with vsync only for the fastest monitor, for the single window.
+            // Otherwise, 5 windows will wait for vsync 5 times.
+            val vsyncRedrawer = toRedrawVisible
+                .filter { it.properties.isVsyncEnabled }
+                .maxByOrNull { it.frameLimit }
 
-                // Synchronize with vsync only for the fastest monitor, for the single window.
-                // Otherwise, 5 windows will wait for vsync 5 times.
-                val vsyncRedrawer = toRedrawVisible
-                    .filter { it.properties.isVsyncEnabled }
-                    .maxByOrNull { it.frameLimit }
-
-                for (redrawer in toRedrawVisible.filter { it != vsyncRedrawer }) {
-                    drawingSurfaces[redrawer]!!.makeCurrent(redrawer.context)
-                    drawingSurfaces[redrawer]!!.setSwapInterval(0)
-                    drawingSurfaces[redrawer]!!.swapBuffers()
-                    OpenGLApi.instance.glFinish()
-                }
-
-                if (vsyncRedrawer != null) {
-                    drawingSurfaces[vsyncRedrawer]!!.makeCurrent(vsyncRedrawer.context)
-                    drawingSurfaces[vsyncRedrawer]!!.setSwapInterval(1)
-                    drawingSurfaces[vsyncRedrawer]!!.swapBuffers()
-                    OpenGLApi.instance.glFinish()
-                }
-            } finally {
-                drawingSurfaces.values.forEach(::unlockLinuxDrawingSurface)
+            for (redrawer in toRedrawVisible.filter { it != vsyncRedrawer }) {
+                redrawer.draw(withVsync = false)
+            }
+            if (vsyncRedrawer?.isDisposed != true && vsyncRedrawer?.layer?.isShowing == true) {
+                vsyncRedrawer.draw(withVsync = true)
             }
 
             // Without clearing we will have a memory leak
