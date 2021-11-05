@@ -178,7 +178,7 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             if (variations.size == 0) return this
             Stats.onNativeCall()
             val variationsData = variations.asList().flatMap { listOf(it._tag, it.value.toRawBits())}.toIntArray()
-            val ptr = _nMakeClone(_ptr, interopScope { toInterop(variationsData) }, 2 * variations.size, collectionIndex)
+            val ptr = interopScope { _nMakeClone(_ptr, toInterop(variationsData), 2 * variations.size, collectionIndex) }
             require(ptr != NullPointer) {
                 "Failed to clone Typeface $this with $variations"
             }
