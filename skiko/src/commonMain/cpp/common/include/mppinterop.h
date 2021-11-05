@@ -15,5 +15,7 @@ namespace skikoMpp {
         void getPositions(SkTextBlob* instance, float* resultArray);
         void getGlyphs(SkTextBlob* instance, short* resultArray);
         int getGlyphsLength(SkTextBlob* instance);
+        bool getFirstBaseline(SkTextBlob* instance, float* resultArray);
+        bool getLastBaseline(SkTextBlob* instance, float* resultArray);
     }
 }

@@ -140,12 +140,12 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_TextBlob__1nGetBlockBounds
     return true;
 }
 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_TextBlob__1nGetFirstBaseline
-  (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_TextBlob__1nGetFirstBaseline");
+SKIKO_EXPORT KBoolean org_jetbrains_skia_TextBlob__1nGetFirstBaseline
+  (KNativePointer ptr, KFloat* resultArray) {
+  return skikoMpp::textblob::getFirstBaseline(reinterpret_cast<SkTextBlob*>(ptr), resultArray);
 }
 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_TextBlob__1nGetLastBaseline
-  (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_TextBlob__1nGetLastBaseline");
+SKIKO_EXPORT KBoolean org_jetbrains_skia_TextBlob__1nGetLastBaseline
+  (KNativePointer ptr, KFloat* resultArray) {
+  return skikoMpp::textblob::getLastBaseline(reinterpret_cast<SkTextBlob*>(ptr), resultArray);
 }
