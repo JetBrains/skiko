@@ -26,7 +26,7 @@ SKIKO_EXPORT KInt org_jetbrains_skia_Typeface__1nGetVariationsCount
     return instance->getVariationDesignPosition(nullptr, 0);
 }
 
-SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_Typeface__1nGetVariations
+SKIKO_EXPORT void org_jetbrains_skia_Typeface__1nGetVariations
   (KNativePointer ptr, KInt* res, KInt count) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(ptr);
     if (count > 0) {
@@ -38,7 +38,6 @@ SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_Typeface__1nGetVariations
         }
     }
 }
-
 
 SKIKO_EXPORT KInt org_jetbrains_skia_Typeface__1nGetVariationAxesCount
   (KNativePointer ptr) {
@@ -84,19 +83,6 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Typeface__1nMakeFromName
     TODO("implement org_jetbrains_skia_Typeface__1nMakeFromName");
 }
      
-#if 0 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_Typeface__1nMakeFromName
-  (KInteropPointer nameStr, KInt styleValue) {
-    SkString name = skString(env, nameStr);
-    SkFontStyle style = skija::FontStyle::fromJava(styleValue);
-    sk_sp<SkTypeface> instance = SkTypeface::MakeFromName(name.c_str(), style);
-    SkTypeface* ptr = instance.release();
-    return reinterpret_cast<KNativePointer>(ptr);
-}
-#endif
-
-
-
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Typeface__1nMakeFromFile
   (KInteropPointer pathStr, KInt index) {
     SkString path = skString(pathStr);

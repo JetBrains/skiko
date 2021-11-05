@@ -401,7 +401,7 @@ private external fun _nIsFixedPitch(ptr: NativePointer): Boolean
 private external fun _nGetVariationsCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetVariations")
-private external fun _nGetVariations(ptr: NativePointer, variations: InteropPointer, count: Int): Array<FontVariation>?
+private external fun _nGetVariations(ptr: NativePointer, variations: InteropPointer, count: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetVariationAxesCount")
 private external fun _nGetVariationAxesCount(ptr: NativePointer): Int
