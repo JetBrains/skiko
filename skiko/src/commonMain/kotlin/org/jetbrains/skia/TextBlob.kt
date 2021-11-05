@@ -110,7 +110,9 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
     val bounds: Rect
         get() = try {
             Stats.onNativeCall()
-            _nBounds(_ptr)
+            Rect.fromInteropPointer {
+                _nBounds(_ptr, it)
+            }
         } finally {
             reachabilityBarrier(this)
         }
@@ -143,7 +145,7 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
      * @return           intersections; may be null
      */
     fun getIntercepts(lowerBound: Float, upperBound: Float): FloatArray? {
-        return getIntercepts(lowerBound, upperBound)
+        return getIntercepts(lowerBound, upperBound, null)
     }
 
     /**
@@ -164,12 +166,15 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
     fun getIntercepts(lowerBound: Float, upperBound: Float, paint: Paint?): FloatArray? {
         return try {
             Stats.onNativeCall()
-            _nGetIntercepts(
-                _ptr,
-                lowerBound,
-                upperBound,
-                getPtr(paint)
-            )
+            withResult(FloatArray(_nGetInterceptsLength(_ptr, lowerBound, upperBound, getPtr(paint)))) {
+                _nGetIntercepts(
+                    ptr = _ptr,
+                    lower = lowerBound,
+                    upper = upperBound,
+                    paintPtr = getPtr(paint),
+                    resultArray = it
+                )
+            }
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(paint)
@@ -322,10 +327,13 @@ private external fun TextBlob_nSerializeToData(ptr: NativePointer /*, SkSerialPr
 private external fun TextBlob_nMakeFromData(dataPtr: NativePointer /*, SkDeserialProcs */): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nBounds")
-private external fun _nBounds(ptr: NativePointer): Rect
+private external fun _nBounds(ptr: NativePointer, resultRect: InteropPointer)
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetInterceptsLength")
+private external fun _nGetInterceptsLength(ptr: NativePointer, lower: Float, upper: Float, paintPtr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetIntercepts")
-private external fun _nGetIntercepts(ptr: NativePointer, lower: Float, upper: Float, paintPtr: NativePointer): FloatArray?
+private external fun _nGetIntercepts(ptr: NativePointer, lower: Float, upper: Float, paintPtr: NativePointer, resultArray: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nMakeFromPosH")
 private external fun _nMakeFromPosH(glyphs: InteropPointer, xpos: InteropPointer, ypos: Float, fontPtr: NativePointer): NativePointer
