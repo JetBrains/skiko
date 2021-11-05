@@ -1,5 +1,6 @@
 #include "mppinterop.h"
 #include "RunRecordClone.hh"
+#include "src/utils/SkUTF.h"
 
 namespace skikoMpp {
     namespace skrect {
@@ -138,5 +139,90 @@ namespace skikoMpp {
             resultArray[0] = baseline;
             return true;
         }
+
+        int getClustersLength(SkTextBlob* instance) {
+            SkTextBlob::Iter iter(*instance);
+            SkTextBlob::Iter::Run run;
+            size_t count = 0;
+            while (iter.next(&run)) {
+                auto runRecord = reinterpret_cast<const RunRecordClone*>(run.fGlyphIndices) - 1;
+                if (!runRecord->isExtended())
+                    return 0;
+                count += run.fGlyphCount;
+            }
+            return count;
+        }
+
+        bool getClusters(SkTextBlob* instance, int* clusters) { // implementation was taken from skija
+            SkTextBlob::Iter iter(*instance);
+            SkTextBlob::Iter::Run run;
+            size_t stored = 0;
+            // uint32_t cluster8 = 0;
+            uint32_t runStart16 = 0;
+
+            while (iter.next(&run)) {
+                // run.fGlyphIndices points directly to runRecord.glyphBuffer(), which comes directly after RunRecord itself
+                auto runRecord = reinterpret_cast<const RunRecordClone*>(run.fGlyphIndices) - 1;
+                if (!runRecord->isExtended()) {
+                    return false;
+                }
+
+                skija::UtfIndicesConverter conv(runRecord->textBuffer(), runRecord->textSize());
+                uint32_t* clusterBuffer = runRecord->clusterBuffer();
+                for (int i = 0; i < run.fGlyphCount; ++i)
+                    clusters[stored + i] = runStart16 + conv.from8To16(clusterBuffer[i]);
+                runStart16 += conv.from8To16(runRecord->textSize());
+                // memcpy(&clusters[stored], runRecord->clusterBuffer(), run.fGlyphCount * sizeof(uint32_t));
+
+                stored += run.fGlyphCount;
+            }
+            return true;
+        }
+    }
+}
+
+
+namespace skija {
+    UtfIndicesConverter::UtfIndicesConverter(const char* chars8, size_t len8):
+      fStart8(chars8),
+      fPtr8(chars8),
+      fEnd8(chars8 + len8),
+      fPos16(0)
+    {}
+
+    UtfIndicesConverter::UtfIndicesConverter(const SkString& str):
+      skija::UtfIndicesConverter::UtfIndicesConverter(str.c_str(), str.size())
+    {}
+
+    size_t UtfIndicesConverter::from16To8(uint32_t i16) {
+        if (i16 >= fPos16) {
+            // if new i16 >= last fPos16, continue from where we started
+        } else {
+            fPtr8 = fStart8;
+            fPos16 = 0;
+        }
+
+        while (fPtr8 < fEnd8 && fPos16 < i16) {
+            SkUnichar u = SkUTF::NextUTF8(&fPtr8, fEnd8);
+            fPos16 += (uint32_t) SkUTF::ToUTF16(u);
+        }
+
+        return fPtr8 - fStart8;
+    }
+
+    uint32_t UtfIndicesConverter::from8To16(size_t i8) {
+        if (i8 >= (size_t) (fPtr8 - fStart8)) {
+            // if new i8 >= last fPtr8, continue from where we started
+        } else {
+            fPtr8 = fStart8;
+            fPos16 = 0;
+        }
+
+        while (fPtr8 < fEnd8 && (size_t) (fPtr8 - fStart8) < i8) {
+            SkUnichar u = SkUTF::NextUTF8(&fPtr8, fEnd8);
+            fPos16 += (uint32_t) SkUTF::ToUTF16(u);
+        }
+
+        return fPos16;
     }
 }

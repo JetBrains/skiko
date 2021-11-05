@@ -87,6 +87,11 @@ class TextBlobTest {
         assertEquals(0f, textBlob.firstBaseline)
         assertEquals(0f, textBlob.lastBaseline)
 
+        assertFailsWith<IllegalArgumentException> {
+            // this TextBlob doesn't have such information
+            textBlob.clusters
+        }
+
         val data = textBlob.serializeToData()
         val blobFromData = TextBlob.makeFromData(data)!!
         assertContentEquals(expected = glyphs, actual = blobFromData.glyphs)

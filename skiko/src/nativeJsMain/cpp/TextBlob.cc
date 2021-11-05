@@ -132,9 +132,16 @@ SKIKO_EXPORT void org_jetbrains_skia_TextBlob__1nGetPositions
     skikoMpp::textblob::getPositions(instance, resultArray);
 }
 
-SKIKO_EXPORT KInt* org_jetbrains_skia_TextBlob__1nGetClusters
+SKIKO_EXPORT KInt org_jetbrains_skia_TextBlob__1nGetClustersLength
   (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_TextBlob__1nGetClusters");
+    SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(ptr);
+    return skikoMpp::textblob::getClustersLength(instance);
+}
+
+SKIKO_EXPORT KBoolean org_jetbrains_skia_TextBlob__1nGetClusters
+  (KNativePointer ptr, KInt* clusters) {
+    SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(ptr);
+    return skikoMpp::textblob::getClusters(instance, clusters);
 }
 
 SKIKO_EXPORT KBoolean org_jetbrains_skia_TextBlob__1nGetTightBounds

@@ -142,32 +142,21 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGetPosit
     env->ReleaseFloatArrayElements(resultArray, positions, 0);
 }
 
-extern "C" JNIEXPORT jintArray JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGetClusters
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGetClustersLength
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(static_cast<uintptr_t>(ptr));
-    SkTextBlob::Iter iter(*instance);
-    SkTextBlob::Iter::Run run;
-    std::vector<jint> clusters;
-    size_t stored = 0;
-    // uint32_t cluster8 = 0;
-    uint32_t runStart16 = 0;
-    while (iter.next(&run)) {
-        // run.fGlyphIndices points directly to runRecord.glyphBuffer(), which comes directly after RunRecord itself
-        auto runRecord = reinterpret_cast<const RunRecordClone*>(run.fGlyphIndices) - 1;
-        if (!runRecord->isExtended())
-            return nullptr;
+    return skikoMpp::textblob::getClustersLength(instance);
+}
 
-        skija::UtfIndicesConverter conv(runRecord->textBuffer(), runRecord->textSize());
-        clusters.resize(stored + run.fGlyphCount);
-        uint32_t* clusterBuffer = runRecord->clusterBuffer();
-        for (int i = 0; i < run.fGlyphCount; ++i)
-            clusters[stored + i] = runStart16 + conv.from8To16(clusterBuffer[i]);
-        runStart16 += conv.from8To16(runRecord->textSize());
-        // memcpy(&clusters[stored], runRecord->clusterBuffer(), run.fGlyphCount * sizeof(uint32_t));
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGetClusters
+  (JNIEnv* env, jclass jclass, jlong ptr, jintArray resultArray) {
+    SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(static_cast<uintptr_t>(ptr));
 
-        stored += run.fGlyphCount;
-    }
-    return javaIntArray(env, clusters);
+    jint* clusters = env->GetIntArrayElements(resultArray, 0);
+    auto hasValue = skikoMpp::textblob::getClusters(instance, clusters);
+    env->ReleaseIntArrayElements(resultArray, clusters, 0);
+
+    return hasValue;
 }
 
 extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGetTightBounds
