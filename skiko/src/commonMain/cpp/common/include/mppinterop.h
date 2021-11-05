@@ -10,5 +10,6 @@ namespace skikoMpp {
 
     namespace textblob {
         std::unique_ptr<SkRect> getBlockBounds(SkTextBlob* instance);
+        std::unique_ptr<SkRect> getTightBounds(SkTextBlob* instance);
     }
 }
