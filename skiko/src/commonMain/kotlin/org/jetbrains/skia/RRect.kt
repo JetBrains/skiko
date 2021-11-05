@@ -1,6 +1,7 @@
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.InteropPointer
+import org.jetbrains.skia.impl.InteropScope
 import org.jetbrains.skia.impl.withResult
 import kotlin.jvm.JvmStatic
 import kotlin.math.abs
@@ -153,7 +154,7 @@ class RRect internal constructor(l: Float, t: Float, r: Float, b: Float, val rad
             return RRect(l, t, l + w, t + h, floatArrayOf(minOf(w, h) / 2.0f))
         }
 
-        internal fun fromInteropPointer(block: (InteropPointer) -> Unit): RRect {
+        internal fun fromInteropPointer(block: InteropScope.(InteropPointer) -> Unit): RRect {
             val result = withResult(FloatArray(12 /* 4 dimensions + 4 radii * 2 */), block)
             return RRect(result[0], result[1], result[2], result[3], result.copyOfRange(4, 12))
         }

@@ -2,6 +2,7 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.InteropPointer
+import org.jetbrains.skia.impl.InteropScope
 import org.jetbrains.skia.impl.withResult
 import kotlin.jvm.JvmStatic
 
@@ -106,7 +107,7 @@ open class Rect constructor(val left: Float, val top: Float, val right: Float, v
             return Rect(l, t, l + w, t + h)
         }
 
-        internal fun fromInteropPointer(block: (InteropPointer) -> Unit): Rect {
+        internal fun fromInteropPointer(block: InteropScope.(InteropPointer) -> Unit): Rect {
             val result = withResult(FloatArray(4), block)
             return Rect(result[0], result[1], result[2], result[3])
         }
