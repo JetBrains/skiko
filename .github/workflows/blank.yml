@@ -33,6 +33,7 @@ jobs:
           ./gradlew -Pskiko.native.enabled=true macosX64Test iosX64Test
           ./gradlew -Pskiko.native.enabled=true publishToMavenLocal
       - uses: actions/upload-artifact@v2
+        if: ${{ true }}
         with:
           name: test-reports-macos
           path: ./skiko/build/reports/tests
@@ -66,6 +67,7 @@ jobs:
           ./gradlew -Pskiko.native.enabled=true -i linuxX64Test jvmTest
           ./gradlew publishToMavenLocal
       - uses: actions/upload-artifact@v2
+        if: ${{ true }}
         with:
           name: test-reports-linux
           path: ./skiko/build/reports/tests
@@ -103,6 +105,7 @@ jobs:
            ./gradlew -Pskiko.wasm.enabled=true jsTest
            ./gradlew -Pskiko.wasm.enabled=true publishSkikoWasmRuntimePublicationToMavenLocal
        - uses: actions/upload-artifact@v2
+         if: ${{ true }}
          with:
            name: test-reports-js
            path: ./skiko/build/reports/tests
@@ -124,6 +127,7 @@ jobs:
           ./gradlew jvmTest
           ./gradlew publishToMavenLocal
       - uses: actions/upload-artifact@v2
+        if: ${{ true }}
         with:
           name: test-reports-windows
           path: ./skiko/build/reports/tests
