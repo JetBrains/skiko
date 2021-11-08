@@ -215,6 +215,7 @@ class TextBlobTest {
             epsilon = eps
         )
 
+        // These values are not available for this textBlob
         assertFailsWith<IllegalArgumentException> { textBlob.tightBounds }
         assertFailsWith<IllegalArgumentException> { textBlob.blockBounds }
         assertFailsWith<IllegalArgumentException> { textBlob.firstBaseline }
