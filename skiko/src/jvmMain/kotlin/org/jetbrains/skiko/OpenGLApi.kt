@@ -1,5 +1,7 @@
 package org.jetbrains.skiko
 
+import org.jetbrains.skia.impl.Library
+
 /**
  * The minimum required OpenGL constants and functions for Skia to work.
  * PS. In further development we should find a common pattern of using OpenGL,

@@ -7,6 +7,7 @@ import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
 import org.jetbrains.skia.BackendRenderTarget
 import org.jetbrains.skia.DirectContext
+import org.jetbrains.skia.impl.Library
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.context.MetalContextHandler
 import org.jetbrains.skiko.context.OpenGLContextHandler
