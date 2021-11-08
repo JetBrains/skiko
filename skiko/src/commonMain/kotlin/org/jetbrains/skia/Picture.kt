@@ -73,10 +73,11 @@ class Picture internal constructor(ptr: NativePointer) : RefCnt(ptr) {
      *
      * @see [https://fiddle.skia.org/c/@Picture_playback](https://fiddle.skia.org/c/@Picture_playback)
      */
-    fun playback(canvas: Canvas?, abort: BooleanSupplier? = null): Picture {
+    fun playback(canvas: Canvas?, abort: (() -> Boolean)? = null): Picture {
         return try {
             Stats.onNativeCall()
-            _nPlayback(_ptr, getPtr(canvas), abort)
+            val cb = registerAbortCallback(abort)
+            runPlayback(_ptr, getPtr(canvas), cb)
             this
         } finally {
             reachabilityBarrier(canvas)
@@ -222,12 +223,8 @@ class Picture internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     }
 }
 
-
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nMakeFromData")
 private external fun Picture_nMakeFromData(dataPtr: NativePointer /*, SkDeserialProcs */): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Picture__1nPlayback")
-private external fun _nPlayback(ptr: NativePointer, canvasPtr: NativePointer, abort: BooleanSupplier?)
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nGetCullRect")
 private external fun _nGetCullRect(ptr: NativePointer, ltbr: InteropPointer)
@@ -256,3 +253,9 @@ private external fun _nMakeShader(
     localMatrix: InteropPointer,
     tileRect: InteropPointer
 ): NativePointer
+
+expect class AbortCallback
+
+internal expect fun registerAbortCallback(abort: (() -> Boolean)?): AbortCallback
+
+internal expect fun runPlayback(ptr: NativePointer, canvasPtr: NativePointer, abort: AbortCallback)

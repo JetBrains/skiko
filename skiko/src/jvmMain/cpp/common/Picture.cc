@@ -29,7 +29,7 @@ private:
     jobject supplier;
 };
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PictureKt__1nPlayback
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_Picture_1jvmKt_runPlayback
   (JNIEnv* env, jclass jclass, jlong ptr, jlong canvasPtr, jobject abort) {
     SkPicture* instance = reinterpret_cast<SkPicture*>(static_cast<uintptr_t>(ptr));
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));

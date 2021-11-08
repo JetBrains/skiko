@@ -1,5 +1,7 @@
 package org.jetbrains.skia
 
+import kotlinx.cinterop.staticCFunction
+
 actual abstract class OutputStream
 
 actual fun <R> commonSynchronized(lock: Any, block: () -> R) {
