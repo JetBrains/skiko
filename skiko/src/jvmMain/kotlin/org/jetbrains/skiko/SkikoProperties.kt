@@ -36,8 +36,8 @@ internal object SkikoProperties {
 
     internal fun parseRenderApi(text: String?): GraphicsApi {
         when(text) {
-            "AWT_SOFTWARE" -> return GraphicsApi.SOFTWARE
-            "DIRECT_SOFTWARE", "SOFTWARE" -> return GraphicsApi.DIRECT_SOFTWARE
+            "SOFTWARE" -> return GraphicsApi.SOFTWARE
+            "DIRECT_SOFTWARE" -> return GraphicsApi.DIRECT_SOFTWARE
             "OPENGL" -> return GraphicsApi.OPENGL
             "DIRECT3D" -> {
                 return if (hostOs == OS.Windows) GraphicsApi.DIRECT3D
