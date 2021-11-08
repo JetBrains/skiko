@@ -1,5 +1,5 @@
 import org.kohsuke.github.*
-import org.jetbrains.compose.internal.gradle.publishing.*
+import org.jetbrains.compose.internal.publishing.*
 
 val skiko = SkikoProperties(project)
 val GITHUB_REPO = "JetBrains/skiko"
@@ -73,22 +73,22 @@ fun skikoMavenModules(version: Provider<String>): Provider<List<ModuleToUpload>>
         }
     }
 
+val mavenCentral = MavenCentralProperties(project)
 val downloadSkikoArtifactsFromComposeDev by tasks.registering(DownloadFromSpaceMavenRepoTask::class) {
-    modulesToDownload.set(skikoMavenModules(skiko.mavenCentral.version))
+    modulesToDownload.set(skikoMavenModules(mavenCentral.version))
     spaceRepoUrl.set("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
 val uploadSkikoArtifactsToMavenCentral by tasks.registering(UploadToSonatypeTask::class) {
     dependsOn(downloadSkikoArtifactsFromComposeDev)
 
-    val central = skiko.mavenCentral
-    version.set(central.version)
-    modulesToUpload.set(skikoMavenModules(central.version))
+    version.set(mavenCentral.version)
+    modulesToUpload.set(skikoMavenModules(mavenCentral.version))
 
     sonatypeServer.set("https://oss.sonatype.org")
-    user.set(central.user)
-    password.set(central.password)
-    autoCommitOnSuccess.set(central.autoCommitOnSuccess)
-    autoDropOnError.set(central.autoDropOnError)
+    user.set(mavenCentral.user)
+    password.set(mavenCentral.password)
+    autoCommitOnSuccess.set(mavenCentral.autoCommitOnSuccess)
+    autoDropOnError.set(mavenCentral.autoDropOnError)
     stagingProfileName.set("org.jetbrains.skiko")
 }
