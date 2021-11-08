@@ -102,3 +102,11 @@ or by running `cmd` as administrator:
 ```
 setx /M SKIKO_VSBT_PATH "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools"
 ```
+
+#### Running UI tests
+Add `-Dskiko.test.ui.enabled=true` to enable UI tests (integration tests, which run in the native window). Each UI test will be run on every available Graphics API of the current target.
+
+For example, if we want to include UI tests when we test JVM target, call this:
+```
+./gradlew jvmTest -Dskiko.test.ui.enabled=true
+```
