@@ -1,4 +1,5 @@
 #include <iostream>
+#include <limits>
 #include <jni.h>
 #include <vector>
 #include "../interop.hh"
@@ -295,11 +296,27 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_
         m.fXMax,
         m.fXHeight,
         m.fCapHeight,
-        m.fUnderlineThickness,
-        m.fUnderlinePosition,
-        m.fStrikeoutThickness,
-        m.fStrikeoutPosition
+        std::numeric_limits<float>::quiet_NaN(),
+        std::numeric_limits<float>::quiet_NaN(),
+        std::numeric_limits<float>::quiet_NaN(),
+        std::numeric_limits<float>::quiet_NaN()
     };
+
+    SkScalar thickness;
+    SkScalar position;
+    if (m.hasUnderlineThickness(&thickness)) {
+        f[11] = thickness;
+    }
+    if (m.hasUnderlinePosition(&position)) {
+        f[12] = position;
+    }
+    if (m.hasStrikeoutThickness(&thickness)) {
+        f[13] = thickness;
+    }
+    if (m.hasStrikeoutPosition(&position)) {
+        f[14] = position;
+    }
+
     env->SetFloatArrayRegion(fontMetrics, 0, 15, f);
 }
 

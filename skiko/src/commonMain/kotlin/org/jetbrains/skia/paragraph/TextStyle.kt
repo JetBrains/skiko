@@ -359,6 +359,8 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         return this
     }
 
+    private inline fun Float.asNumberOrNull(): Float? = if (isNaN()) null else this
+
     val fontMetrics: FontMetrics
         get() = try {
             Stats.onNativeCall()
@@ -377,10 +379,10 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
                 fontMetricsData[8],
                 fontMetricsData[9],
                 fontMetricsData[10],
-                fontMetricsData[11],
-                fontMetricsData[12],
-                fontMetricsData[13],
-                fontMetricsData[14]
+                fontMetricsData[11].asNumberOrNull(),
+                fontMetricsData[12].asNumberOrNull(),
+                fontMetricsData[13].asNumberOrNull(),
+                fontMetricsData[14].asNumberOrNull()
             )
         } finally {
             reachabilityBarrier(this)
@@ -404,7 +406,6 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         val PTR = TextStyle_nGetFinalizer()
     }
 }
-
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetFinalizer")
 private external fun TextStyle_nGetFinalizer(): NativePointer

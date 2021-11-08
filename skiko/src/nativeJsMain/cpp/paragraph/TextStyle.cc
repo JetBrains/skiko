@@ -2,6 +2,7 @@
 // This file has been auto generated.
 
 #include <iostream>
+#include <limits>
 #include <vector>
 #include "TextStyle.h"
 using namespace std;
@@ -356,10 +357,25 @@ SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nGetFontMetrics
     fontMetrics[8] = m.fXMax;
     fontMetrics[9] = m.fXHeight;
     fontMetrics[10] = m.fCapHeight;
-    fontMetrics[11] = m.fUnderlineThickness;
-    fontMetrics[12] = m.fUnderlinePosition;
-    fontMetrics[13] = m.fStrikeoutThickness;
-    fontMetrics[14] = m.fStrikeoutPosition;
+    fontMetrics[11] = std::numeric_limits<float>::quiet_NaN();
+    fontMetrics[12] = std::numeric_limits<float>::quiet_NaN();
+    fontMetrics[13] = std::numeric_limits<float>::quiet_NaN();
+    fontMetrics[14] = std::numeric_limits<float>::quiet_NaN();
+
+    SkScalar thickness;
+    SkScalar position;
+    if (m.hasUnderlineThickness(&thickness)) {
+        fontMetrics[11] = thickness;
+    }
+    if (m.hasUnderlinePosition(&position)) {
+        fontMetrics[12] = position;
+    }
+    if (m.hasStrikeoutThickness(&thickness)) {
+        fontMetrics[13] = thickness;
+    }
+    if (m.hasStrikeoutPosition(&position)) {
+        fontMetrics[14] = position;
+    }
 }
 
 SKIKO_EXPORT KBoolean org_jetbrains_skia_paragraph_TextStyle__1nIsPlaceholder
