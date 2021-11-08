@@ -20,7 +20,7 @@ class TextBlobTest {
     private val eps = when (kotlinBackend) {
         KotlinBackend.JS -> 0.02f
         KotlinBackend.Native -> 0.02f
-        else -> 0.005f
+        else -> 0.02f
     }
 
     @Test
