@@ -72,18 +72,10 @@ SKIKO_EXPORT void org_jetbrains_skia_paragraph_StrutStyle__1nGetFontStyle
 
 SKIKO_EXPORT void org_jetbrains_skia_paragraph_StrutStyle__1nSetFontStyle
   (KNativePointer ptr, KInt style) {
-    TODO("implement org_jetbrains_skia_paragraph_StrutStyle__1nSetFontStyle");
+    StrutStyle* instance = reinterpret_cast<StrutStyle*>(ptr);
+    instance->setFontStyle(skija::FontStyle::fromKotlin(style));
 }
      
-#if 0 
-SKIKO_EXPORT void org_jetbrains_skia_paragraph_StrutStyle__1nSetFontStyle
-  (KNativePointer ptr, KInt style) {
-    StrutStyle* instance = reinterpret_cast<StrutStyle*>(ptr);
-    instance->setFontStyle(skija::FontStyle::fromJava(style));
-}
-#endif
-
-
 SKIKO_EXPORT KFloat org_jetbrains_skia_paragraph_StrutStyle__1nGetFontSize
   (KNativePointer ptr) {
     StrutStyle* instance = reinterpret_cast<StrutStyle*>(ptr);

@@ -12,6 +12,10 @@ class StrutStyleTests {
     fun strutStyleTest() {
         StrutStyle().use { strutStyle ->
             assertEquals(FontStyle(400, 5, FontSlant.UPRIGHT), strutStyle.fontStyle)
+
+            strutStyle.fontStyle = FontStyle(300, 4, FontSlant.ITALIC)
+
+            assertEquals(FontStyle(300, 4, FontSlant.ITALIC), strutStyle.fontStyle)
         }
     }
 }
