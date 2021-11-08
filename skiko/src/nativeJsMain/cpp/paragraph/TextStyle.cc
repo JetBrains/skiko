@@ -90,7 +90,7 @@ SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nSetBackground
 
 SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nGetDecorationStyle
   (KNativePointer ptr, KInt* res) {
-    TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
+    TextStyle* instance = reinterpret_cast<TextStyle*>(ptr);
     Decoration d = instance->getDecoration();
 
     res[0] = 0;
