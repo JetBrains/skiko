@@ -255,10 +255,10 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_
     instance->setTypeface(sk_ref_sp(typeface));
 }
 
-extern "C" JNIEXPORT jstring JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nGetLocale
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nGetLocale
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
-    return javaString(env, instance->getLocale());
+    return reinterpret_cast<jlong>(new SkString(instance->getLocale()));
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nSetLocale

@@ -328,7 +328,9 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     var locale: String
         get() = try {
             Stats.onNativeCall()
-            _nGetLocale(_ptr)
+            withStringResult {
+                _nGetLocale(_ptr)
+            }
         } finally {
             reachabilityBarrier(this)
         }
@@ -516,7 +518,7 @@ private external fun _nGetTypeface(ptr: NativePointer): NativePointer
 private external fun _nSetTypeface(ptr: NativePointer, typefacePtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetLocale")
-private external fun _nGetLocale(ptr: NativePointer): String
+private external fun _nGetLocale(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetLocale")
 private external fun _nSetLocale(ptr: NativePointer, locale: String?)
