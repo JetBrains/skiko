@@ -25,7 +25,7 @@ actual open class SkiaLayer(properties: SkiaLayerProperties = makeDefaultSkiaLay
         }
 
     actual fun needRedraw() {
-        draw()
+        state?.draw()
     }
 
     actual var skikoView: SkikoView? = null
@@ -98,10 +98,6 @@ actual open class SkiaLayer(properties: SkiaLayerProperties = makeDefaultSkiaLay
                 event.keyCode, SkikoKeyboardEventKind.UP, event
             ))
         })
-    }
-
-    fun draw() {
-        state?.draw()
     }
 }
 

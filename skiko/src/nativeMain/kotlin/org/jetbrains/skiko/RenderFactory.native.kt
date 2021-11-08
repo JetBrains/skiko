@@ -13,10 +13,6 @@ internal expect fun createNativeRedrawer(
 
 internal actual fun makeDefaultRenderFactory(): RenderFactory {
     return object : RenderFactory {
-        override fun createContextHandler(layer: SkiaLayer, renderApi: GraphicsApi): ContextHandler {
-            return createNativeContextHandler(layer, renderApi)
-        }
-
         override fun createRedrawer(
             layer: SkiaLayer,
             renderApi: GraphicsApi,

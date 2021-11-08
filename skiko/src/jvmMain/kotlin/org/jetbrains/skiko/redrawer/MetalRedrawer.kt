@@ -8,12 +8,17 @@ import kotlinx.coroutines.withContext
 import org.jetbrains.skia.BackendRenderTarget
 import org.jetbrains.skia.DirectContext
 import org.jetbrains.skiko.*
+import org.jetbrains.skiko.context.MetalContextHandler
+import org.jetbrains.skiko.context.OpenGLContextHandler
 import javax.swing.SwingUtilities.*
 
 internal class MetalRedrawer(
     private val layer: SkiaLayer,
     private val properties: SkiaLayerProperties
 ) : Redrawer {
+    private val contextHandler = MetalContextHandler(layer)
+    override val renderInfo: String get() = contextHandler.rendererInfo()
+
     companion object {
         init {
             Library.load()
@@ -39,6 +44,7 @@ internal class MetalRedrawer(
 
     override fun dispose() = synchronized(drawLock) {
         frameDispatcher.cancel()
+        contextHandler.dispose()
         disposeDevice(device)
         isDisposed = true
     }
@@ -90,7 +96,7 @@ internal class MetalRedrawer(
         if (!isDisposed) {
             val handle = startRendering()
             try {
-                layer.draw()
+                contextHandler.draw()
             } finally {
                 endRendering(handle)
             }

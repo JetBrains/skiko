@@ -5,9 +5,8 @@ import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.getPtr
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.redrawer.AbstractDirectSoftwareRedrawer
-import java.lang.ref.Reference
 
-internal class DirectSoftwareContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
+internal class DirectSoftwareContextHandler(layer: SkiaLayer) : JvmContextHandler(layer) {
     var isInited = false
 
     val softwareRedrawer: AbstractDirectSoftwareRedrawer

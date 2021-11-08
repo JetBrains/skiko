@@ -5,41 +5,33 @@ import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.DirectContext
 import org.jetbrains.skia.Picture
 import org.jetbrains.skia.Surface
-import org.jetbrains.skiko.GraphicsApi
-import org.jetbrains.skiko.SkiaLayer
-import org.jetbrains.skiko.hostArch
-import org.jetbrains.skiko.hostOs
-import org.jetbrains.skiko.OS
+import org.jetbrains.skiko.*
+import org.jetbrains.skiko.RenderException
 
-internal abstract class ContextHandler(val layer: SkiaLayer) {
-    open val clearColor = if (layer.transparency || hostOs == OS.MacOS) 0 else -1
-    var context: DirectContext? = null
-    var renderTarget: BackendRenderTarget? = null
-    var surface: Surface? = null
-    var canvas: Canvas? = null
+internal abstract class ContextHandler(
+    protected val layer: SkiaLayer,
+    private val drawContent: Canvas.() -> Unit
+) {
+    // TODO can we simplify clearColor logic? is there a reason why SoftwareContextHandler has opposite logic?
+    protected open val clearColor = if (layer.transparency || hostOs == OS.MacOS) 0 else -1
+    protected var context: DirectContext? = null
+    protected var renderTarget: BackendRenderTarget? = null
+    protected var surface: Surface? = null
+    protected var canvas: Canvas? = null
 
-    abstract fun initContext(): Boolean
-    abstract fun initCanvas()
+    protected abstract fun initContext(): Boolean
+    protected abstract fun initCanvas()
 
-    fun clearCanvas() {
-        val color = if (layer.fullscreen && hostOs != OS.MacOS) -1 else clearColor
-        canvas?.clear(color)
-    }
-
-    open fun drawOnCanvas(picture: Picture) {
-        canvas?.drawPicture(picture)
-    }
-
-    open fun flush() {
+    protected open fun flush() {
         context?.flush()
     }
 
     open fun dispose() {
         disposeCanvas()
-        destroyContext()
+        context?.close()
     }
 
-    open fun disposeCanvas() {
+    protected open fun disposeCanvas() {
         surface?.close()
         renderTarget?.close()
     }
@@ -49,7 +41,16 @@ internal abstract class ContextHandler(val layer: SkiaLayer) {
                 "OS: ${hostOs.id} ${hostArch.id}\n"
     }
 
-    protected open fun destroyContext() {
-        context?.close()
+    // throws RenderException if initialization of graphic context was not successful
+    fun draw() {
+        if (!initContext()) {
+            throw RenderException("Cannot init graphic context")
+        }
+        initCanvas()
+        canvas?.apply {
+            clear(if (layer.fullscreen && hostOs != OS.MacOS) -1 else clearColor)
+            drawContent()
+        }
+        flush()
     }
 }

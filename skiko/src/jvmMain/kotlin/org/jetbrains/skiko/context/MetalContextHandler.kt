@@ -7,7 +7,7 @@ import org.jetbrains.skia.SurfaceOrigin
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.redrawer.MetalRedrawer
 
-internal class MetalContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
+internal class MetalContextHandler(layer: SkiaLayer) : JvmContextHandler(layer) {
     val metalRedrawer: MetalRedrawer
         get() = layer.redrawer!! as MetalRedrawer
 

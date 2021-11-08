@@ -7,7 +7,7 @@ import platform.OpenGL.GL_DRAW_FRAMEBUFFER_BINDING
 import platform.OpenGL.glGetIntegerv
 import platform.OpenGLCommon.GLenum
 
-internal class MacOSOpenGLContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
+internal class MacOSOpenGLContextHandler(layer: SkiaLayer) : ContextHandler(layer, layer::draw) {
     override fun initContext(): Boolean {
         try {
             if (context == null) {
@@ -31,13 +31,16 @@ internal class MacOSOpenGLContextHandler(layer: SkiaLayer) : ContextHandler(laye
         return result
     }
 
-    override fun initCanvas() {
-        val scale = layer.contentScale
-        val w = (layer.nsView.frame.useContents { size.width } * scale).toInt().coerceAtLeast(0)
-        val h = (layer.nsView.frame.useContents { size.height } * scale).toInt().coerceAtLeast(0)
+    var initedCanvas = false
 
-        val fbId = openglGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING.toUInt())
-        renderTarget = BackendRenderTarget.makeGL(
+    override fun initCanvas() {
+        if (!initedCanvas) {
+            val scale = layer.contentScale
+            val w = (layer.nsView.frame.useContents { size.width } * scale).toInt().coerceAtLeast(0)
+            val h = (layer.nsView.frame.useContents { size.height } * scale).toInt().coerceAtLeast(0)
+
+            val fbId = openglGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING.toUInt())
+            renderTarget = BackendRenderTarget.makeGL(
                 w,
                 h,
                 0,
@@ -45,7 +48,7 @@ internal class MacOSOpenGLContextHandler(layer: SkiaLayer) : ContextHandler(laye
                 fbId.toInt(),
                 FramebufferFormat.GR_GL_RGBA8
             )
-        surface = Surface.makeFromBackendRenderTarget(
+            surface = Surface.makeFromBackendRenderTarget(
                 context!!,
                 renderTarget!!,
                 SurfaceOrigin.BOTTOM_LEFT,
@@ -53,7 +56,10 @@ internal class MacOSOpenGLContextHandler(layer: SkiaLayer) : ContextHandler(laye
                 ColorSpace.sRGB
             )
 
-        canvas = surface?.canvas
-            ?: error("Could not obtain Canvas from Surface")
+            canvas = surface?.canvas
+                ?: error("Could not obtain Canvas from Surface")
+
+            initedCanvas = true
+        }
     }
 }

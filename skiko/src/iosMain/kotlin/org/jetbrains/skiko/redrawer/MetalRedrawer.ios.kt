@@ -8,6 +8,8 @@ import kotlinx.cinterop.useContents
 import org.jetbrains.skia.BackendRenderTarget
 import org.jetbrains.skia.DirectContext
 import org.jetbrains.skiko.*
+import org.jetbrains.skiko.context.ContextHandler
+import org.jetbrains.skiko.context.MetalContextHandler
 import platform.CoreGraphics.CGColorCreate
 import platform.CoreGraphics.CGColorSpaceCreateDeviceRGB
 import platform.CoreGraphics.CGContextRef
@@ -24,6 +26,9 @@ internal class MetalRedrawer(
     private val layer: SkiaLayer,
     private val properties: SkiaLayerProperties
 ) : Redrawer {
+    private val contextHandler = MetalContextHandler(layer)
+    override val renderInfo: String get() = contextHandler.rendererInfo()
+
     private var isDisposed = false
     internal val device = MTLCreateSystemDefaultDevice()!!
     private val queue = device.newCommandQueue()!!
@@ -31,7 +36,7 @@ internal class MetalRedrawer(
     private val metalLayer = MetalLayer()
 
     init {
-        metalLayer.init(this.layer, device)
+        metalLayer.init(this.layer, contextHandler, device)
     }
 
     private val frameDispatcher = FrameDispatcher(SkikoDispatchers.Main) {
@@ -51,6 +56,7 @@ internal class MetalRedrawer(
     override fun dispose() {
         if (!isDisposed) {
             frameDispatcher.cancel()
+            contextHandler.dispose()
             metalLayer.dispose()
             isDisposed = true
         }
@@ -63,7 +69,7 @@ internal class MetalRedrawer(
             size.width to size.height
         }
         metalLayer.frame = osView.frame
-        metalLayer.init(layer, device)
+        metalLayer.init(layer, contextHandler, device)
         metalLayer.drawableSize = CGSizeMake(w * metalLayer.contentsScale, h * metalLayer.contentsScale)
     }
 
@@ -82,7 +88,7 @@ internal class MetalRedrawer(
         // TODO: maybe make flush async as in JVM version.
         autoreleasepool {
             if (!isDisposed) {
-                layer.draw()
+                contextHandler.draw()
             }
         }
     }
@@ -100,15 +106,22 @@ internal class MetalRedrawer(
     }
 }
 
-class MetalLayer : CAMetalLayer {
+internal class MetalLayer : CAMetalLayer {
     private lateinit var skiaLayer: SkiaLayer
+    private lateinit var contextHandler: ContextHandler
 
     @OverrideInit
     constructor(): super()
     @OverrideInit
     constructor(layer: Any): super(layer)
 
-    fun init(skiaLayer: SkiaLayer, theDevice: MTLDeviceProtocol) {
+    fun init(
+        skiaLayer: SkiaLayer,
+        contextHandler: ContextHandler,
+        theDevice: MTLDeviceProtocol
+    ) {
+        this.skiaLayer = skiaLayer
+        this.contextHandler = contextHandler
         this.setNeedsDisplayOnBoundsChange(true)
         this.removeAllAnimations()
         // TODO: looks like a bug in K/N interop.
@@ -133,7 +146,7 @@ class MetalLayer : CAMetalLayer {
 
     override fun drawInContext(ctx: CGContextRef?) {
         skiaLayer.update(getTimeNanos())
-        skiaLayer.draw()
+        contextHandler.draw()
         super.drawInContext(ctx)
     }
 }

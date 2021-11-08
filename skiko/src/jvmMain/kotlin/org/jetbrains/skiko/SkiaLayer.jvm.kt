@@ -1,15 +1,6 @@
 package org.jetbrains.skiko
 
-import org.jetbrains.skia.Canvas
-import org.jetbrains.skia.Bitmap
-import org.jetbrains.skia.ColorAlphaType
-import org.jetbrains.skia.ColorInfo
-import org.jetbrains.skia.ColorType
-import org.jetbrains.skia.ColorSpace
-import org.jetbrains.skia.ClipMode
-import org.jetbrains.skia.ImageInfo
-import org.jetbrains.skia.PictureRecorder
-import org.jetbrains.skia.Rect
+import org.jetbrains.skia.*
 import org.jetbrains.skiko.context.ContextHandler
 import org.jetbrains.skiko.redrawer.Redrawer
 import java.awt.Color
@@ -209,7 +200,6 @@ actual open class SkiaLayer internal constructor(
     @Volatile
     private var isDisposed = false
     internal var redrawer: Redrawer? = null
-    internal var contextHandler: ContextHandler? = null
     private val fallbackRenderApiQueue = SkikoProperties.fallbackRenderApiQueue.toMutableList()
     private var renderApi_ = fallbackRenderApiQueue[0]
     actual var renderApi: GraphicsApi
@@ -219,10 +209,10 @@ actual open class SkiaLayer internal constructor(
             notifyChange(PropertyKind.Renderer)
         }
     val renderInfo: String
-        get() = if (contextHandler?.context == null)
-            "ContextHandler hasn't been initialized yet."
+        get() = if (redrawer == null)
+            "SkiaLayer isn't initialized yet"
         else
-            contextHandler!!.rendererInfo()
+            redrawer!!.renderInfo
 
     @Volatile
     private var picture: PictureHolder? = null
@@ -235,9 +225,7 @@ actual open class SkiaLayer internal constructor(
             thrown = false
             try {
                 renderApi = fallbackRenderApiQueue.removeAt(0)
-                contextHandler?.dispose()
                 redrawer?.dispose()
-                contextHandler = renderFactory.createContextHandler(this, renderApi)
                 redrawer = renderFactory.createRedrawer(this, renderApi, properties)
                 redrawer?.syncSize()
             } catch (e: RenderException) {
@@ -251,7 +239,7 @@ actual open class SkiaLayer internal constructor(
         }
     }
 
-    protected open fun init(recreation: Boolean = false) {
+    private fun init(recreation: Boolean = false) {
         isDisposed = false
         backedLayer.init()
         pictureRecorder = PictureRecorder()
@@ -281,8 +269,6 @@ actual open class SkiaLayer internal constructor(
             // we should dispose redrawer first (to cancel `draw` in rendering thread)
             redrawer?.dispose()
             redrawer = null
-            contextHandler?.dispose()
-            contextHandler = null
             picture?.instance?.close()
             picture = null
             pictureRecorder?.close()
@@ -413,6 +399,7 @@ actual open class SkiaLayer internal constructor(
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         check(!isDisposed) { "SkiaLayer is disposed" }
 
+        FrameWatcher.nextFrame()
         fpsCounter?.tick()
 
         val pictureWidth = (width * contentScale).toInt().coerceAtLeast(0)
@@ -459,49 +446,37 @@ actual open class SkiaLayer internal constructor(
         }
     }
 
-    // can be called from non-swing thread
-    // throws exception if initialization of graphic context was not successful
-    internal fun draw() {
-        contextHandler?.apply {
-            if (!initContext()) {
-                throw RenderException("Cannot init graphic context")
-            }
-            initCanvas()
-        }
-
+    internal fun draw(canvas: Canvas) {
         check(!isDisposed) { "SkiaLayer is disposed" }
-        contextHandler?.apply {
-            clearCanvas()
-            synchronized(pictureLock) {
-                val picture = picture
-                if (picture != null) {
-                    drawOnCanvas(picture.instance)
-                }
-            }
-            flush()
+        lockPicture {
+            canvas.drawPicture(it.instance)
         }
-        FrameWatcher.nextFrame()
+    }
+
+    private fun <T : Any> lockPicture(action: (PictureHolder) -> T): T? {
+        return synchronized(pictureLock) {
+            val picture = picture
+            if (picture != null) {
+                action(picture)
+            } else {
+                null
+            }
+        }
     }
 
     // Captures current layer as bitmap.
     fun screenshot(): Bitmap? {
-        return contextHandler?.let {
-            synchronized(pictureLock) {
-                val picture = picture
-                if (picture != null) {
-                    val store = Bitmap()
-                    val ci = ColorInfo(
-                        ColorType.BGRA_8888, ColorAlphaType.OPAQUE, ColorSpace.sRGB)
-                    store.setImageInfo(ImageInfo(ci, picture.width, picture.height))
-                    store.allocN32Pixels(picture.width, picture.height)
-                    val canvas = Canvas(store)
-                    canvas.drawPicture(picture.instance)
-                    store.setImmutable()
-                    store
-                } else {
-                    null
-                }
-            }
+        check(!isDisposed) { "SkiaLayer is disposed" }
+        return lockPicture { picture ->
+            val store = Bitmap()
+            val ci = ColorInfo(
+                ColorType.BGRA_8888, ColorAlphaType.OPAQUE, ColorSpace.sRGB)
+            store.setImageInfo(ImageInfo(ci, picture.width, picture.height))
+            store.allocN32Pixels(picture.width, picture.height)
+            val canvas = Canvas(store)
+            canvas.drawPicture(picture.instance)
+            store.setImmutable()
+            store
         }
     }
 

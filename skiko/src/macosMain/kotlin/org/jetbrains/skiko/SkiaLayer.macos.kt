@@ -37,8 +37,6 @@ actual open class SkiaLayer(
 
     actual var skikoView: SkikoView? = null
 
-    private var contextHandler = MacOSOpenGLContextHandler(this)
-
     private var redrawer: Redrawer? = null
 
     private var picture: PictureHolder? = null
@@ -131,13 +129,11 @@ actual open class SkiaLayer(
                 }
                 nsView.frame = CGRectMake(0.0, 0.0, w, h)
                 redrawer?.syncSize()
-                initedCanvas = false
                 redrawer?.redrawImmediately()
             }
 
             override fun windowDidChangeBackingProperties(notification: NSNotification) {
                 redrawer?.syncSize()
-                initedCanvas = false
                 redrawer?.redrawImmediately()
             }
         }
@@ -151,14 +147,13 @@ actual open class SkiaLayer(
     actual fun detach() {
         redrawer?.dispose()
         redrawer = null
-        initedCanvas = false
     }
 
     actual fun needRedraw() {
         redrawer?.needRedraw()
     }
 
-    fun update(nanoTime: Long) {
+    internal fun update(nanoTime: Long) {
         val width = nsView.frame.useContents { size.width }
         val height = nsView.frame.useContents { size.height }
 
@@ -173,24 +168,9 @@ actual open class SkiaLayer(
         this.picture = PictureHolder(picture, pictureWidth.toInt(), pictureHeight.toInt())
     }
 
-    private var initedCanvas = false
-
-    fun draw() {
-        contextHandler.apply {
-            if (!initedCanvas) {
-                if (!initContext()) {
-                    error("initContext() failure")
-                    return
-                }
-                initCanvas()
-                initedCanvas = true
-            }
-            clearCanvas()
-            val picture = picture
-            if (picture != null) {
-                drawOnCanvas(picture.instance)
-            }
-            flush()
+    internal fun draw(canvas: Canvas) {
+        picture?.also {
+            canvas.drawPicture(it.instance)
         }
     }
 }

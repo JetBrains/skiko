@@ -35,7 +35,7 @@ fun main() {
             }
             skiaLayer.renderer = GenericSkikoApp(skiaLayer, app)
             skiaLayer.setCanvas(canvas)
-            skiaLayer.draw()
+            skiaLayer.needRedraw()
         }
     }
 }

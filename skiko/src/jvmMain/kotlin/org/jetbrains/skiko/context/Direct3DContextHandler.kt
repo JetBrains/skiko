@@ -7,7 +7,7 @@ import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.redrawer.Direct3DRedrawer
 import java.lang.ref.Reference
 
-internal class Direct3DContextHandler(layer: SkiaLayer) : ContextHandler(layer) {
+internal class Direct3DContextHandler(layer: SkiaLayer) : JvmContextHandler(layer) {
     private val bufferCount = 2
     private var surfaces: Array<Surface?> = arrayOfNulls(bufferCount)
 
@@ -83,10 +83,6 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : ContextHandler(layer) 
             Reference.reachabilityFence(context!!)
             Reference.reachabilityFence(surface!!)
         }
-    }
-
-    override fun destroyContext() {
-        context?.close()
     }
 
     override fun disposeCanvas() {

@@ -2,6 +2,7 @@ package org.jetbrains.skiko
 
 import kotlinx.cinterop.ObjCAction
 import kotlinx.cinterop.useContents
+import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.PictureRecorder
 import org.jetbrains.skia.Rect
 import org.jetbrains.skiko.context.MetalContextHandler
@@ -121,18 +122,10 @@ actual open class SkiaLayer(
         this.picture = PictureHolder(picture, pictureWidth.toInt(), pictureHeight.toInt())
     }
 
-    fun draw() {
-        contextHandler?.apply {
-            if (!initContext()) {
-                error("initContext() failure")
-            }
-            initCanvas()
-            clearCanvas()
-            val picture = picture
-            if (picture != null) {
-                drawOnCanvas(picture.instance)
-            }
-            flush()
+    internal fun draw(canvas: Canvas) {
+        check(!isDisposed) { "SkiaLayer is disposed" }
+        picture?.also {
+            canvas.drawPicture(it.instance)
         }
     }
 }
