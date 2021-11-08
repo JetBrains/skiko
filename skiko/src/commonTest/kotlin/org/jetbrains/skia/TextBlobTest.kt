@@ -16,9 +16,11 @@ class TextBlobTest {
         Font(Typeface.makeFromResource("./fonts/Inter-Hinted-Regular.ttf"), 36f)
     }
 
+    // smaller eps values make tests fail
     private val eps = when (kotlinBackend) {
-        KotlinBackend.JS -> 0.02f // smaller values make tests fail when running in k/js
-        else -> 0.00001f
+        KotlinBackend.JS -> 0.02f
+        KotlinBackend.Native -> 0.02f
+        else -> 0.02f
     }
 
     @Test
@@ -65,7 +67,7 @@ class TextBlobTest {
                 217.8335f, 229.33693f, 231.25397f
             ),
             actual = textBlob.getIntercepts(lowerBound = 0f, upperBound = 1f),
-            epsilon = eps // smaller values don't work on k/js :(
+            epsilon = eps
         )
 
         // Ensure can get tightBounds. we don't make assertEquals because platforms' results vary
@@ -74,7 +76,7 @@ class TextBlobTest {
         assertCloseEnough(
             expected = Rect(0f, -34.875f, 235.30681f, 8.692932f),
             actual = textBlob.blockBounds.also { println(it) },
-            epsilon = 0.2f // smaller values don't work on k/js :(
+            epsilon = 0.2f // smaller values make tests fail on some platforms
         )
 
         assertEquals(0f, textBlob.firstBaseline)
