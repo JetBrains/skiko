@@ -394,7 +394,7 @@ class SkiaLayerTest {
             delay(1000)
             screenshots.assert(window.bounds, "frame2", "testFallbackToSoftware")
 
-            assertEquals(GraphicsApi.AWT_SOFTWARE, window.layer.renderApi)
+            assertEquals(GraphicsApi.SOFTWARE, window.layer.renderApi)
         } finally {
             window.close()
         }
@@ -408,7 +408,7 @@ class SkiaLayerTest {
             renderApi: GraphicsApi,
             properties: SkiaLayerProperties
         ): Redrawer {
-            return if (renderApi == GraphicsApi.AWT_SOFTWARE) {
+            return if (renderApi == GraphicsApi.SOFTWARE) {
                 RenderFactory.Default.createRedrawer(layer, renderApi, properties)
             } else {
                 nonSoftwareRenderFactory.createRedrawer(layer, renderApi, properties)

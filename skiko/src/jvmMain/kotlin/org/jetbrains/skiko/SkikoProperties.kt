@@ -36,8 +36,8 @@ internal object SkikoProperties {
 
     internal fun parseRenderApi(text: String?): GraphicsApi {
         when(text) {
-            "AWT_SOFTWARE" -> return GraphicsApi.AWT_SOFTWARE
-            "DIRECT_SOFTWARE", "SOFTWARE" -> return GraphicsApi.SOFTWARE
+            "AWT_SOFTWARE" -> return GraphicsApi.SOFTWARE
+            "DIRECT_SOFTWARE", "SOFTWARE" -> return GraphicsApi.DIRECT_SOFTWARE
             "OPENGL" -> return GraphicsApi.OPENGL
             "DIRECT3D" -> {
                 return if (hostOs == OS.Windows) GraphicsApi.DIRECT3D
@@ -62,9 +62,9 @@ internal object SkikoProperties {
 
     fun fallbackRenderApiQueue(initialApi: GraphicsApi) : List<GraphicsApi> {
         var fallbackApis = when (hostOs) {
-            OS.Linux -> listOf(GraphicsApi.OPENGL, GraphicsApi.SOFTWARE, GraphicsApi.AWT_SOFTWARE)
-            OS.MacOS -> listOf(GraphicsApi.METAL, GraphicsApi.AWT_SOFTWARE)
-            OS.Windows -> listOf(GraphicsApi.DIRECT3D, GraphicsApi.OPENGL, GraphicsApi.SOFTWARE, GraphicsApi.AWT_SOFTWARE)
+            OS.Linux -> listOf(GraphicsApi.OPENGL, GraphicsApi.DIRECT_SOFTWARE, GraphicsApi.SOFTWARE)
+            OS.MacOS -> listOf(GraphicsApi.METAL, GraphicsApi.SOFTWARE)
+            OS.Windows -> listOf(GraphicsApi.DIRECT3D, GraphicsApi.OPENGL, GraphicsApi.DIRECT_SOFTWARE, GraphicsApi.SOFTWARE)
             OS.JS, OS.Ios -> TODO("commonize me")
         }
 

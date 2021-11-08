@@ -80,8 +80,8 @@ class SkiaLayerPerformanceTest {
             }
 
             if (
-                renderApi == GraphicsApi.AWT_SOFTWARE ||
-                renderApi == GraphicsApi.SOFTWARE
+                renderApi == GraphicsApi.SOFTWARE ||
+                renderApi == GraphicsApi.DIRECT_SOFTWARE
             ) {
                 val slowFrames = frameTimeDeltas.filter { it > 1E9 / 55 }
                 val fastFrames = frameTimeDeltas.filter { it < expectedFrameNanos * 0.5 }
