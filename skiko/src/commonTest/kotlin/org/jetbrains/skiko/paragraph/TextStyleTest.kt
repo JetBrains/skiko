@@ -5,6 +5,7 @@ import org.jetbrains.skia.impl.use
 import org.jetbrains.skia.paragraph.TextStyle
 import org.jetbrains.skia.paragraph.TextStyleAttribute
 import org.jetbrains.skiko.tests.SkipJsTarget
+import org.jetbrains.skiko.tests.SkipNativeTarget
 import kotlin.test.*
 
 class TextStyleTest {
@@ -54,7 +55,7 @@ class TextStyleTest {
     //TODO: We either need separate test for js platform if we want to test default metrics or just need to come up with a different, better test
     @Test
     @SkipJsTarget
-    fun textStyleFontMetrics() {
+    fun textStyleFontMetricsTest() {
         TextStyle().use { textStyle ->
             val defaultFontMetrics = FontMetrics(
                 top = -17.253906f,
@@ -75,6 +76,16 @@ class TextStyleTest {
             )
 
             assertEquals(defaultFontMetrics, textStyle.fontMetrics)
+        }
+    }
+
+    @Test
+    @SkipJsTarget
+    @SkipNativeTarget
+    fun textStyleLocaleTest() {
+        TextStyle().use { textStyle ->
+            textStyle.locale = "fr_FR.UTF-8"
+            assertEquals("fr_FR.UTF-8", textStyle.locale)
         }
     }
 }
