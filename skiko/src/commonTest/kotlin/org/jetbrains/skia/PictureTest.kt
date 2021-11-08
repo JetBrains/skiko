@@ -16,7 +16,7 @@ class PictureTest {
     }
 
     @Test
-    fun canGetGullRect() {
+    fun canGetCullRect() {
         val size = Rect(0.0f, 0.0f, 32.0f, 32.0f)
         val pic = Picture.makePlaceholder(size)
         val cullRect = pic.cullRect
