@@ -299,34 +299,18 @@ SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nSetTypeface
 }
 
 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_paragraph_TextStyle__1nGetLocale
-  (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nGetLocale");
-}
-
-#if 0
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_paragraph_TextStyle__1nGetLocale
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_paragraph_TextStyle__1nGetLocale
   (KNativePointer ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(ptr);
-    return javaString(env, instance->getLocale());
+    return reinterpret_cast<KNativePointer>(new SkString(instance->getLocale()));
 }
-#endif
-
-
 
 SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nSetLocale
   (KNativePointer ptr, KInteropPointer locale) {
-    TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nSetLocale");
-}
-
-#if 0
-SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nSetLocale
-  (KNativePointer ptr, KInteropPointer locale) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(ptr);
-    instance->setLocale(skString(env, locale));
+    std::cout << "TEXT STYLE: " << skString(locale).c_str() << "\r\n";
+    instance->setLocale(skString(locale));
 }
-#endif
-
 
 SKIKO_EXPORT KInt org_jetbrains_skia_paragraph_TextStyle__1nGetBaselineMode
   (KNativePointer ptr) {

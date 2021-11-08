@@ -80,8 +80,6 @@ class TextStyleTest {
     }
 
     @Test
-    @SkipJsTarget
-    @SkipNativeTarget
     fun textStyleLocaleTest() {
         TextStyle().use { textStyle ->
             textStyle.locale = "fr_FR.UTF-8"

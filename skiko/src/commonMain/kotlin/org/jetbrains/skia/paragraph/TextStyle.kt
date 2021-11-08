@@ -340,7 +340,9 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
 
     fun setLocale(locale: String?): TextStyle {
         Stats.onNativeCall()
-        _nSetLocale(_ptr, locale)
+        interopScope {
+            _nSetLocale(_ptr, toInterop(locale))
+        }
         return this
     }
 
@@ -521,7 +523,7 @@ private external fun _nSetTypeface(ptr: NativePointer, typefacePtr: NativePointe
 private external fun _nGetLocale(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetLocale")
-private external fun _nSetLocale(ptr: NativePointer, locale: String?)
+private external fun _nSetLocale(ptr: NativePointer, locale: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetBaselineMode")
 private external fun _nGetBaselineMode(ptr: NativePointer): Int
