@@ -162,7 +162,7 @@ SKIKO_EXPORT void org_jetbrains_skia_TextLine__1nGetBreakOffsets
     size_t added = 0;
     for (auto& run: instance->fRuns) {
         size_t count = run.fBreakOffsets.size();
-        std::memcpy(resultArray + added, run.fBreakOffsets.data(), count * sizeof(uint32_t));
+        std::memcpy(&resultArray[added], run.fBreakOffsets.data(), count * sizeof(KInt));
         added += count;
     }
 }

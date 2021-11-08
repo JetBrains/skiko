@@ -146,7 +146,7 @@ class TextLineTest {
             TextLine.make("☺️", firaCode36()).use { emoji ->
                 assertContentEquals(shortArrayOf(1706), misc.glyphs)
                 assertEquals(1, emoji.glyphs.size)
-                if (kotlinBackend.isNotJs()) { // TODO(karpovich): figure out why js gives different result
+                if (kotlinBackend.isNotJs()) { // TODO(karpovich): try with a FontMngr without fallbacks
                     assertNotEquals(misc.glyphs[0], emoji.glyphs[0])
                 }
             }
