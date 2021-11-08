@@ -88,33 +88,19 @@ actual open class SkiaLayer internal constructor(
             if (it.changeFlags and HierarchyEvent.SHOWING_CHANGED.toLong() != 0L) {
                 checkShowing()
             }
-            if (it.changeFlags and HierarchyEvent.DISPLAYABILITY_CHANGED.toLong() != 0L) {
-                checkInit()
-            }
         }
     }
 
     override fun removeNotify() {
-        redrawer?.dispose()  // we should dispose redrawer first (to cancel `draw` in rendering thread)
-        redrawer = null
-        contextHandler?.dispose()
-        contextHandler = null
-        picture?.instance?.close()
-        picture = null
-        pictureRecorder.close()
-        isDisposed = true
+        dispose()
         super.removeNotify()
     }
 
     override fun addNotify() {
         super.addNotify()
-        if (isInited) {
-            isDisposed = false
-            pictureRecorder = PictureRecorder()
-            contextHandler = renderFactory.createContextHandler(this, renderApi)
-            redrawer = renderFactory.createRedrawer(this, renderApi, properties)
-            redrawer?.syncSize()
-        }
+        backedLayer.defineContentScale()
+        checkShowing()
+        init(isInited)
     }
 
 
@@ -124,14 +110,6 @@ actual open class SkiaLayer internal constructor(
 
     private var isInited = false
     private var isRendering = false
-
-    private fun checkInit() {
-        if (!isInited && isDisplayable) {
-            backedLayer.defineContentScale()
-            checkShowing()
-            init()
-        }
-    }
 
     private fun checkShowing() {
         isShowingCached = super.isShowing()
@@ -273,8 +251,13 @@ actual open class SkiaLayer internal constructor(
         }
     }
 
-    protected open fun init() {
+    protected open fun init(recreation: Boolean = false) {
         backedLayer.init()
+        isDisposed = false
+        if (recreation) {
+            pictureRecorder = PictureRecorder()
+            fallbackRenderApiQueue.add(0, renderApi)
+        }
         findNextWorkingRenderApi()
         isInited = true
     }
@@ -296,7 +279,9 @@ actual open class SkiaLayer internal constructor(
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         if (isInited && !isDisposed) {
             redrawer?.dispose()  // we should dispose redrawer first (to cancel `draw` in rendering thread)
+            redrawer = null
             contextHandler?.dispose()
+            contextHandler = null
             picture?.instance?.close()
             picture = null
             pictureRecorder.close()
