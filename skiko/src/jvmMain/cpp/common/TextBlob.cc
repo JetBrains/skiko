@@ -162,19 +162,32 @@ public:
     }
 };
 
-extern "C" JNIEXPORT jshortArray JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGetGlyphs
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGetGlyphsLength
   (JNIEnv* env, jclass jclass, jlong ptr) {
+
+  SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(static_cast<uintptr_t>(ptr));
+  SkTextBlob::Iter iter(*instance);
+  SkTextBlob::Iter::Run run;
+  jint stored = 0;
+  while (iter.next(&run)) {
+      stored += run.fGlyphCount;
+  }
+  return stored;
+}
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGetGlyphs
+  (JNIEnv* env, jclass jclass, jlong ptr, jshortArray resultArray) {
     SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(static_cast<uintptr_t>(ptr));
     SkTextBlob::Iter iter(*instance);
     SkTextBlob::Iter::Run run;
-    std::vector<jshort> glyphs;
+
     size_t stored = 0;
+    jshort * shorts = env->GetShortArrayElements(resultArray, nullptr);
     while (iter.next(&run)) {
-        glyphs.resize(stored + run.fGlyphCount);
-        memcpy(&glyphs[stored], run.fGlyphIndices, run.fGlyphCount * sizeof(uint16_t));
+        memcpy(shorts + stored, run.fGlyphIndices, run.fGlyphCount * sizeof(uint16_t));
         stored += run.fGlyphCount;
     }
-    return javaShortArray(env, glyphs);
+    env->ReleaseShortArrayElements(resultArray, shorts, 0);
 }
 
 extern "C" JNIEXPORT jfloatArray JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGetPositions
@@ -209,7 +222,7 @@ extern "C" JNIEXPORT jintArray JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGet
         auto runRecord = reinterpret_cast<const RunRecordClone*>(run.fGlyphIndices) - 1;
         if (!runRecord->isExtended())
             return nullptr;
-        
+
         skija::UtfIndicesConverter conv(runRecord->textBuffer(), runRecord->textSize());
         clusters.resize(stored + run.fGlyphCount);
         uint32_t* clusterBuffer = runRecord->clusterBuffer();
@@ -217,7 +230,7 @@ extern "C" JNIEXPORT jintArray JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGet
             clusters[stored + i] = runStart16 + conv.from8To16(clusterBuffer[i]);
         runStart16 += conv.from8To16(runRecord->textSize());
         // memcpy(&clusters[stored], runRecord->clusterBuffer(), run.fGlyphCount * sizeof(uint32_t));
-        
+
         stored += run.fGlyphCount;
     }
     return javaIntArray(env, clusters);
@@ -235,7 +248,7 @@ extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGetTi
         auto runRecord = reinterpret_cast<const RunRecordClone*>(run.fGlyphIndices) - 1;
         if (runRecord->positioning() != 2) // kFull_Positioning
             return nullptr;
-        
+
         runRecord->fFont.measureText(runRecord->glyphBuffer(), run.fGlyphCount * sizeof(uint16_t), SkTextEncoding::kGlyphID, &tmpBounds, nullptr);
         SkScalar* posBuffer = runRecord->posBuffer();
         tmpBounds.offset(posBuffer[0], posBuffer[1]);
@@ -251,7 +264,7 @@ extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGetBl
     SkTextBlob::Iter::Run run;
     auto bounds = SkRect::MakeEmpty();
     SkFontMetrics metrics;
-    
+
     while (iter.next(&run)) {
         // run.fGlyphIndices points directly to runRecord.glyphBuffer(), which comes directly after RunRecord itself
         auto runRecord = reinterpret_cast<const RunRecordClone*>(run.fGlyphIndices) - 1;
@@ -261,14 +274,14 @@ extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGetBl
         SkScalar* posBuffer = runRecord->posBuffer();
         const SkFont& font = runRecord->fFont;
         font.getMetrics(&metrics);
-        
+
         SkScalar lastLeft = posBuffer[(run.fGlyphCount - 1) * 2];
         SkScalar lastWidth;
         if (run.fGlyphCount > 1 && SkScalarNearlyEqual(posBuffer[(run.fGlyphCount - 2) * 2], lastLeft))
             lastWidth = 0;
         else
             font.getWidths(&run.fGlyphIndices[run.fGlyphCount - 1], 1, &lastWidth);
-        
+
         auto runBounds = SkRect::MakeLTRB(posBuffer[0], posBuffer[1] + metrics.fAscent, lastLeft + lastWidth, posBuffer[1] + metrics.fDescent);
         bounds.join(runBounds);
     }

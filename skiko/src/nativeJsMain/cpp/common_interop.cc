@@ -80,6 +80,40 @@ namespace skija {
             }
         }
     }
+
+    namespace shaper {
+        namespace ShapingOptions {
+            std::vector<SkShaper::Feature> getFeaturesFromIntsArray(KInt* featuresArray, KInt featuresLen) {
+                return skija::FontFeature::fromIntArray(featuresArray, featuresLen);
+            }
+        }
+
+        std::shared_ptr<UBreakIterator> graphemeBreakIterator(SkString& text) {
+            UErrorCode status = U_ZERO_ERROR;
+            ICUUText utext(utext_openUTF8(nullptr, text.c_str(), text.size(), &status));
+            if (U_FAILURE(status)) {
+                SkDEBUGF("utext_openUTF8 error: %s", u_errorName(status));
+                return nullptr;
+            }
+
+            std::shared_ptr<UBreakIterator> graphemeIter(
+                ubrk_open(static_cast<UBreakIteratorType>(UBreakIteratorType::UBRK_CHARACTER), uloc_getDefault(), nullptr, 0, &status),
+                [](UBreakIterator* p) { ubrk_close(p); }
+            );
+            if (U_FAILURE(status)) {
+                SkDEBUGF("ubrk_open error: %s", u_errorName(status));
+                return nullptr;
+            }
+
+            ubrk_setUText(graphemeIter.get(), utext.get(), &status);
+            if (U_FAILURE(status)) {
+                SkDEBUGF("ubrk_setUText error: %s", u_errorName(status));
+                return nullptr;
+            }
+
+            return graphemeIter;
+        }
+    }
 }
 
 skija::UtfIndicesConverter::UtfIndicesConverter(const char* chars8, size_t len8):
@@ -284,6 +318,37 @@ namespace skija {
                 });
             }
         }
+    }
+
+    namespace AnimationFrameInfo {
+        static void copyToInteropAtIndex(const SkCodec::FrameInfo& info, KInt* repr, size_t index) {
+            repr += (index * 11);
+            repr[0] = info.fRequiredFrame;
+            repr[1] = info.fDuration;
+            repr[2] = static_cast<KInt>(info.fFullyReceived);
+            repr[3] = static_cast<KInt>(info.fAlphaType);
+            repr[4] = static_cast<KInt>(info.fHasAlphaWithinBounds);
+            repr[5] = static_cast<KInt>(info.fDisposalMethod);
+            repr[6] = static_cast<KInt>(info.fBlend);
+            repr[7] = info.fFrameRect.left();
+            repr[8] = info.fFrameRect.top();
+            repr[9] = info.fFrameRect.right();
+            repr[10] = info.fFrameRect.bottom();
+        }
+
+        void copyToInterop(const SkCodec::FrameInfo& info, KInteropPointer dst) {
+            KInt* repr = reinterpret_cast<KInt*>(dst);
+            copyToInteropAtIndex(info, repr, 0);
+        }
+
+        void copyToInterop(const std::vector<SkCodec::FrameInfo>& infos, KInteropPointer dst) {
+            KInt* repr = reinterpret_cast<KInt*>(dst);
+            size_t i = 0;
+            for (const auto& info : infos) {
+                copyToInteropAtIndex(info, repr, i++);
+            }
+        }
+
     }
 
     namespace svg {

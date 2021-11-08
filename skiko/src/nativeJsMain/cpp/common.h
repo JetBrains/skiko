@@ -21,6 +21,10 @@
 #include "SkSurfaceProps.h"
 #include "SkSVGTypes.h"
 #include "TextStyle.h"
+#include "SkFont.h"
+#include "SkShaper.h"
+#include "SkLoadICU.h"
+#include "unicode/ubrk.h"
 
 #include "types.h"
 
@@ -59,7 +63,7 @@ namespace skija {
     }
 
     namespace Point {
-        void copyToInterop(const SkPoint& rect, KInteropPointer pointer);
+        void copyToInterop(const SkPoint& point, KInteropPointer pointer);
     }
 
     namespace RRect {
@@ -93,6 +97,20 @@ namespace skija {
         namespace FourByteTag {
             int fromString(SkString str);
         }
+    }
+
+    namespace shaper {
+        namespace ShapingOptions {
+            std::vector<SkShaper::Feature> getFeaturesFromIntsArray(KInt* featuresArray, KInt featuresLen);
+        }
+
+        using ICUUText = std::unique_ptr<UText, SkFunctionWrapper<decltype(utext_close), utext_close>>;
+        std::shared_ptr<UBreakIterator> graphemeBreakIterator(SkString& text);
+    }
+
+    namespace AnimationFrameInfo {
+        void copyToInterop(const SkCodec::FrameInfo& info, KInteropPointer dst);
+        void copyToInterop(const std::vector<SkCodec::FrameInfo>& infos, KInteropPointer dst);
     }
 
     namespace svg {

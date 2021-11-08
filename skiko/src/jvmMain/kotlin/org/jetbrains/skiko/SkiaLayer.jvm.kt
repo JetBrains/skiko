@@ -79,9 +79,6 @@ actual open class SkiaLayer internal constructor(
             if (it.changeFlags and HierarchyEvent.SHOWING_CHANGED.toLong() != 0L) {
                 checkShowing()
             }
-            if (it.changeFlags and HierarchyEvent.DISPLAYABILITY_CHANGED.toLong() != 0L) {
-                checkInit()
-            }
         }
     }
 
@@ -90,20 +87,20 @@ actual open class SkiaLayer internal constructor(
         super.removeNotify()
     }
 
+    override fun addNotify() {
+        super.addNotify()
+        backedLayer.defineContentScale()
+        checkShowing()
+        init(isInited)
+    }
+
+
     actual fun detach() {
         dispose()
     }
 
     private var isInited = false
     private var isRendering = false
-
-    private fun checkInit() {
-        if (!isInited && isDisplayable) {
-            backedLayer.defineContentScale()
-            checkShowing()
-            init()
-        }
-    }
 
     private fun checkShowing() {
         isShowingCached = super.isShowing()
@@ -219,7 +216,7 @@ actual open class SkiaLayer internal constructor(
 
     @Volatile
     private var picture: PictureHolder? = null
-    private val pictureRecorder = PictureRecorder()
+    private var pictureRecorder: PictureRecorder? = null
     private val pictureLock = Any()
 
     private fun findNextWorkingRenderApi() {
@@ -242,8 +239,13 @@ actual open class SkiaLayer internal constructor(
         }
     }
 
-    protected open fun init() {
+    protected open fun init(recreation: Boolean = false) {
+        isDisposed = false
         backedLayer.init()
+        pictureRecorder = PictureRecorder()
+        if (recreation) {
+            fallbackRenderApiQueue.add(0, renderApi)
+        }
         findNextWorkingRenderApi()
         isInited = true
     }
@@ -263,11 +265,14 @@ actual open class SkiaLayer internal constructor(
 
     open fun dispose() {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
-
         if (isInited && !isDisposed) {
+            // we should dispose redrawer first (to cancel `draw` in rendering thread)
             redrawer?.dispose()
+            redrawer = null
             picture?.instance?.close()
-            pictureRecorder.close()
+            picture = null
+            pictureRecorder?.close()
+            pictureRecorder = null
             backedLayer.dispose()
             isDisposed = true
         }
@@ -401,7 +406,7 @@ actual open class SkiaLayer internal constructor(
         val pictureHeight = (height * contentScale).toInt().coerceAtLeast(0)
 
         val bounds = Rect.makeWH(pictureWidth.toFloat(), pictureHeight.toFloat())
-        val canvas = pictureRecorder.beginRecording(bounds)
+        val canvas = pictureRecorder!!.beginRecording(bounds)
 
         // clipping
         for (component in clipComponents) {
@@ -419,7 +424,7 @@ actual open class SkiaLayer internal constructor(
         if (!isDisposed) {
             synchronized(pictureLock) {
                 picture?.instance?.close()
-                val picture = pictureRecorder.finishRecordingAsPicture()
+                val picture = pictureRecorder!!.finishRecordingAsPicture()
                 this.picture = PictureHolder(picture, pictureWidth, pictureHeight)
             }
         }

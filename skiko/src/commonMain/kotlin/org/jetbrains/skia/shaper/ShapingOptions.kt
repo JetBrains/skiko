@@ -5,7 +5,7 @@ import org.jetbrains.skia.FontMgr
 
 class ShapingOptions(
     internal val fontMgr: FontMgr?,
-    internal val features: Array<FontFeature?>?,
+    internal val features: Array<FontFeature>?,
     internal val isLeftToRight: Boolean,
     /**
      * If enabled, fallback font runs will not be broken by whitespace from original font
@@ -17,18 +17,26 @@ class ShapingOptions(
     internal val isApproximatePunctuation: Boolean
 ) {
 
+    internal fun _booleanPropsToInt(): Int {
+        var i = 0
+        if (isLeftToRight) i = i or 0x04
+        if (isApproximateSpaces) i = i or 0x02
+        if (isApproximatePunctuation) i = i or 0x01
+        return i
+    }
+
     /**
      * If enabled, fallback font runs will not be broken by whitespace from original font
      */
     /**
      * If enabled, fallback font runs will not be broken by punctuation from original font
      */
-    fun withFeatures(features: Array<FontFeature?>?): ShapingOptions {
+    fun withFeatures(features: Array<FontFeature>?): ShapingOptions {
         return ShapingOptions(fontMgr, features, isLeftToRight, isApproximateSpaces, isApproximatePunctuation)
     }
 
     fun withFeatures(featuresString: String?): ShapingOptions {
-        return if (featuresString == null) withFeatures(null as Array<FontFeature?>?) else withFeatures(
+        return if (featuresString == null) withFeatures(null as Array<FontFeature>?) else withFeatures(
             FontFeature.Companion.parse(
                 featuresString
             )

@@ -65,17 +65,32 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TextLineKt__1nGetText
     return reinterpret_cast<jlong>(instance->fBlob.get());
 }
 
-extern "C" JNIEXPORT jshortArray JNICALL Java_org_jetbrains_skia_TextLineKt_TextLine_1nGetGlyphs
+extern "C" JNIEXPORT jint Java_org_jetbrains_skia_TextLineKt_TextLine_1nGetGlyphsLength
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
-    std::vector<jshort> glyphs(instance->fGlyphCount);
+    return instance->fGlyphCount;
+}
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TextLineKt_TextLine_1nGetGlyphs
+  (JNIEnv* env, jclass jclass, jlong ptr, jshortArray resultGlyphs, jint resultLength) {
+    TextLine* instance = reinterpret_cast<TextLine*>(static_cast<uintptr_t>(ptr));
+    jshort* glyphs = env->GetShortArrayElements(resultGlyphs, nullptr);
+
     size_t idx = 0;
+    size_t freeBytesN = resultLength * sizeof(uint16_t);
+
     for (auto& run: instance->fRuns) {
-        memcpy(glyphs.data() + idx, run.fGlyphs, run.fGlyphCount * sizeof(uint16_t));
-        idx += run.fGlyphCount;
+        size_t addBytesLen = run.fGlyphCount * sizeof(uint16_t);
+        if (freeBytesN - addBytesLen >= 0) {
+            memcpy(&glyphs[idx], run.fGlyphs, addBytesLen);
+            idx += run.fGlyphCount;
+            freeBytesN -= addBytesLen;
+        } else {
+            SkDEBUGFAIL("Incorrect resultGlyphs size");
+        }
     }
+    env->ReleaseShortArrayElements(resultGlyphs, glyphs, 0);
     SkASSERTF(idx == instance->fGlyphCount, "TextLine.cc: idx = %d != instance->fGlyphCount = %d", idx, instance->fGlyphCount);
-    return javaShortArray(env, glyphs);
 }
 
 extern "C" JNIEXPORT jfloatArray JNICALL Java_org_jetbrains_skia_TextLineKt_TextLine_1nGetPositions

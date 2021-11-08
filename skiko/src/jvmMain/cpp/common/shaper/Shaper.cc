@@ -56,64 +56,67 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt_Shape
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nShapeBlob
-  (JNIEnv* env, jclass jclass, jlong ptr, jstring textObj, jlong fontPtr, jobject opts, jfloat width, jfloat offsetX, jfloat offsetY) {
+  (JNIEnv* env, jclass jclass, jlong ptr, jlong textPtr, jlong fontPtr, jint optsFeaturesLen, jintArray optsFeatures, jint optsBooleanProps, jfloat width, jfloat offsetX, jfloat offsetY) {
     SkShaper* instance = reinterpret_cast<SkShaper*>(static_cast<uintptr_t>(ptr));
-    SkString text = skString(env, textObj);
+    SkString& text = *(reinterpret_cast<SkString*>(static_cast<uintptr_t>(textPtr)));
     std::shared_ptr<UBreakIterator> graphemeIter = skija::shaper::graphemeBreakIterator(text);
     if (!graphemeIter) return 0;
     SkFont* font = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(fontPtr));
-    std::vector<SkShaper::Feature> features = skija::shaper::ShapingOptions::getFeatures(env, opts);
 
-    std::unique_ptr<SkShaper::FontRunIterator> fontRunIter(new FontRunIterator(
+    std::vector<SkShaper::Feature> features = skija::shaper::ShapingOptions::getFeaturesFromIntsArray(env, optsFeatures, optsFeaturesLen);
+
+    bool aproximatePunctuation = (optsBooleanProps & 0x01) != 0;
+    bool aproximateSpaces = (optsBooleanProps & 0x02) != 0;
+    bool isLeftToRight = (optsBooleanProps & 0x04) != 0;
+
+    uint8_t defaultBiDiLevel = isLeftToRight ? UBIDI_DEFAULT_LTR : UBIDI_DEFAULT_RTL;
+    std::unique_ptr<SkShaper::BiDiRunIterator> bidiRunIter(SkShaper::MakeBiDiRunIterator(text.c_str(), text.size(), defaultBiDiLevel));
+    if (!bidiRunIter) return 0;
+
+    std::unique_ptr<SkShaper::ScriptRunIterator> scriptRunIter(SkShaper::MakeHbIcuScriptRunIterator(text.c_str(), text.size()));
+    if (!scriptRunIter) return 0;
+
+    std::unique_ptr<SkShaper::LanguageRunIterator> languageRunIter(SkShaper::MakeStdLanguageRunIterator(text.c_str(), text.size()));
+    if (!languageRunIter) return 0;
+
+    FontRunIterator fontRunIter(
         text.c_str(),
         text.size(),
         *font,
         SkFontMgr::RefDefault(),
         graphemeIter,
-        env->GetBooleanField(opts, skija::shaper::ShapingOptions::_approximateSpaces),
-        env->GetBooleanField(opts, skija::shaper::ShapingOptions::_approximatePunctuation)
-    ));
-    if (!fontRunIter) return 0;
-
-    uint8_t defaultBiDiLevel = env->GetBooleanField(opts, skija::shaper::ShapingOptions::_leftToRight) ? UBIDI_DEFAULT_LTR : UBIDI_DEFAULT_RTL;
-    std::unique_ptr<SkShaper::BiDiRunIterator> bidiRunIter(SkShaper::MakeBiDiRunIterator(text.c_str(), text.size(), defaultBiDiLevel));
-    if (!bidiRunIter) return 0;
-
-    std::unique_ptr<SkShaper::ScriptRunIterator> scriptRunIter(SkShaper::MakeHbIcuScriptRunIterator(text.c_str(), text.size()));
-    if (!scriptRunIter) return 0;
-
-    std::unique_ptr<SkShaper::LanguageRunIterator> languageRunIter(SkShaper::MakeStdLanguageRunIterator(text.c_str(), text.size()));
-    if (!languageRunIter) return 0;
+        aproximateSpaces,
+        aproximatePunctuation
+    );
 
     SkTextBlobBuilderRunHandler rh(text.c_str(), {offsetX, offsetY});
-    instance->shape(text.c_str(), text.size(), *fontRunIter, *bidiRunIter, *scriptRunIter, *languageRunIter, features.data(), features.size(), width, &rh);
+    instance->shape(text.c_str(), text.size(), fontRunIter, *bidiRunIter, *scriptRunIter, *languageRunIter, features.data(), features.size(), width, &rh);
     SkTextBlob* blob = rh.makeBlob().release();
-    
+
     return reinterpret_cast<jlong>(blob);
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nShapeLine
-  (JNIEnv* env, jclass jclass, jlong ptr, jstring textObj, jlong fontPtr, jobject opts) {
+  (JNIEnv* env, jclass jclass, jlong ptr, jlong textPtr, jlong fontPtr, jint optsFeaturesLen, jintArray optsFeatures, jint optsBooleanProps) {
     SkShaper* instance = reinterpret_cast<SkShaper*>(static_cast<uintptr_t>(ptr));
 
-    SkString text = skString(env, textObj);
+    SkString& text = *(reinterpret_cast<SkString*>(static_cast<uintptr_t>(textPtr)));
+    SkFont* font = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(fontPtr));
+
+    if (text.size() == 0) {
+        return reinterpret_cast<jlong>(new TextLine(*font));
+    }
+
     std::shared_ptr<UBreakIterator> graphemeIter = skija::shaper::graphemeBreakIterator(text);
     if (!graphemeIter) return 0;
 
-    SkFont* font = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(fontPtr));
-    std::vector<SkShaper::Feature> features = skija::shaper::ShapingOptions::getFeatures(env, opts);
+    std::vector<SkShaper::Feature> features = skija::shaper::ShapingOptions::getFeaturesFromIntsArray(env, optsFeatures, optsFeaturesLen);
 
-    std::unique_ptr<SkShaper::FontRunIterator> fontRunIter(new FontRunIterator(
-        text.c_str(),
-        text.size(),
-        *font,
-        SkFontMgr::RefDefault(),
-        graphemeIter, 
-        env->GetBooleanField(opts, skija::shaper::ShapingOptions::_approximateSpaces),
-        env->GetBooleanField(opts, skija::shaper::ShapingOptions::_approximatePunctuation)));
-    if (!fontRunIter) return 0;
+    bool aproximatePunctuation = (optsBooleanProps & 0x01) != 0;
+    bool aproximateSpaces = (optsBooleanProps & 0x02) != 0;
+    bool isLeftToRight = (optsBooleanProps & 0x04) != 0;
 
-    uint8_t defaultBiDiLevel = env->GetBooleanField(opts, skija::shaper::ShapingOptions::_leftToRight) ? UBIDI_DEFAULT_LTR : UBIDI_DEFAULT_RTL;
+    uint8_t defaultBiDiLevel = isLeftToRight ? UBIDI_DEFAULT_LTR : UBIDI_DEFAULT_RTL;
     std::unique_ptr<SkShaper::BiDiRunIterator> bidiRunIter(SkShaper::MakeBiDiRunIterator(text.c_str(), text.size(), defaultBiDiLevel));
     if (!bidiRunIter) return 0;
 
@@ -123,15 +126,19 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nSh
     std::unique_ptr<SkShaper::LanguageRunIterator> languageRunIter(SkShaper::MakeStdLanguageRunIterator(text.c_str(), text.size()));
     if (!languageRunIter) return 0;
 
-    TextLine* line;
-    if (text.size() == 0)
-        line = new TextLine(*font);
-    else {
-        TextLineRunHandler rh(text, graphemeIter);
-        instance->shape(text.c_str(), text.size(), *fontRunIter, *bidiRunIter, *scriptRunIter, *languageRunIter, features.data(), features.size(), std::numeric_limits<float>::infinity(), &rh);
-        line = rh.makeLine().release();
-    }
-    return reinterpret_cast<jlong>(line);
+    FontRunIterator fontRunIter(
+        text.c_str(),
+        text.size(),
+        *font,
+        SkFontMgr::RefDefault(),
+        graphemeIter,
+        aproximateSpaces,
+        aproximatePunctuation);
+
+    TextLineRunHandler rh(text, graphemeIter);
+    instance->shape(text.c_str(), text.size(), fontRunIter, *bidiRunIter, *scriptRunIter, *languageRunIter, features.data(), features.size(), std::numeric_limits<float>::infinity(), &rh);
+
+    return reinterpret_cast<jlong>(rh.makeLine().release());
 }
 
 template <typename RunIteratorSubclass>
@@ -160,7 +167,7 @@ public:
     size_t endOfCurrentRun() const override {
         return fEndOfRun;
     }
-    
+
     bool atEnd() const override {
         return !fHasNext;
     }
@@ -177,7 +184,7 @@ protected:
 
 class SkijaFontRunIterator: public SkijaRunIterator<SkShaper::FontRunIterator> {
 public:
-    SkijaFontRunIterator(JNIEnv* env, jobject obj, SkString text): 
+    SkijaFontRunIterator(JNIEnv* env, jobject obj, SkString text):
       SkijaRunIterator<SkShaper::FontRunIterator>(env, obj, text)
     {}
 
@@ -198,7 +205,7 @@ protected:
 
 class SkijaBidiRunIterator: public SkijaRunIterator<SkShaper::BiDiRunIterator> {
 public:
-    SkijaBidiRunIterator(JNIEnv* env, jobject obj, SkString& text): 
+    SkijaBidiRunIterator(JNIEnv* env, jobject obj, SkString& text):
       SkijaRunIterator<SkShaper::BiDiRunIterator>(env, obj, text)
     {}
 
@@ -210,7 +217,7 @@ public:
         fLevel = fEnv->GetIntField(runObj, skija::shaper::BidiRun::_level) & 0xFF;
         return fEnv->GetIntField(runObj, skija::shaper::BidiRun::_end);
     }
-    
+
 protected:
     uint8_t fLevel;
 };
@@ -229,7 +236,7 @@ public:
         fScript = fEnv->GetIntField(runObj, skija::shaper::ScriptRun::_scriptTag);
         return fEnv->GetIntField(runObj, skija::shaper::ScriptRun::_end);
     }
-    
+
 protected:
     uint32_t fScript;
 };
@@ -249,7 +256,7 @@ public:
         fLang = skString(fEnv, langObj);
         return fEnv->GetIntField(runObj, skija::shaper::LanguageRun::_end);
     }
-    
+
 protected:
     SkString fLang;
 };
@@ -329,7 +336,7 @@ private:
 };
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nShape
-  (JNIEnv* env, jclass jclass, jlong ptr, jlong textPtr, jobject fontRunIterObj, jobject bidiRunIterObj, jobject scriptRunIterObj, jobject languageRunIterObj, jobject opts, jfloat width, jobject runHandlerObj)
+  (JNIEnv* env, jclass jclass, jlong ptr, jlong textPtr, jobject fontRunIterObj, jobject bidiRunIterObj, jobject scriptRunIterObj, jobject languageRunIterObj, jint optsFeaturesLen, jintArray optsFeatures, jint optsBooleanProps, jfloat width, jobject runHandlerObj)
 {
     SkShaper* instance = reinterpret_cast<SkShaper*>(static_cast<uintptr_t>(ptr));
     SkString* text = reinterpret_cast<SkString*>(static_cast<uintptr_t>(textPtr));
@@ -348,11 +355,11 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nSha
     std::unique_ptr<SkijaScriptRunIterator> localScriptRunIter;
     if (nativeScriptRunIter == nullptr)
         localScriptRunIter.reset(new SkijaScriptRunIterator(env, scriptRunIterObj, *text));
-    
+
     auto languageRunIter = SkijaLanguageRunIterator(env, languageRunIterObj, *text);
 
-    std::vector<SkShaper::Feature> features = skija::shaper::ShapingOptions::getFeatures(env, opts);
-    
+    std::vector<SkShaper::Feature> features = skija::shaper::ShapingOptions::getFeaturesFromIntsArray(env, optsFeatures, optsFeaturesLen);
+
     auto nativeRunHandler = (SkShaper::RunHandler*) skija::impl::Native::fromJava(env, runHandlerObj, skija::shaper::TextBlobBuilderRunHandler::cls);
     std::unique_ptr<SkijaRunHandler> localRunHandler;
     if (nativeRunHandler == nullptr)
