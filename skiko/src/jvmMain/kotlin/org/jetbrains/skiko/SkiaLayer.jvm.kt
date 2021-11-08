@@ -239,7 +239,7 @@ actual open class SkiaLayer internal constructor(
         }
     }
 
-    protected open fun init(recreation: Boolean = false) {
+    private fun init(recreation: Boolean = false) {
         isDisposed = false
         backedLayer.init()
         pictureRecorder = PictureRecorder()
