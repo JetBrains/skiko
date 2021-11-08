@@ -148,59 +148,58 @@ actual open class SkiaLayer internal constructor(
 
     fun attachTo(jComponent: JComponent) {
         jComponent.add(this)
-        backedLayer.addMouseListener(object : MouseAdapter() {
-            override fun mousePressed(e: MouseEvent?) {
-                e!!
-                skikoView?.onPointerEvent(
-                    SkikoPointerEvent(e.x.toDouble(), e.y.toDouble(),
-                        if (e.button == 1) SkikoMouseButtons.LEFT else SkikoMouseButtons.RIGHT,
-                        SkikoPointerEventKind.DOWN,
-                        e
-                    )
-                )
+    }
+
+    fun addView(view: SkikoView) {
+        skikoView = view
+        addMouseListener(object : MouseAdapter() {
+            override fun mousePressed(e: MouseEvent) {
+                skikoView?.onPointerEvent(toSkikoEvent(e))
             }
-            override fun mouseReleased(e: MouseEvent?) {
-                e!!
-                skikoView?.onPointerEvent(
-                    SkikoPointerEvent(e.x.toDouble(), e.y.toDouble(),
-                        if (e.button == 1) SkikoMouseButtons.LEFT else SkikoMouseButtons.RIGHT,
-                        SkikoPointerEventKind.UP,
-                        e
-                    )
-                )
+            override fun mouseReleased(e: MouseEvent) {
+                skikoView?.onPointerEvent(toSkikoEvent(e))
+            }
+            override fun mouseEntered(e: MouseEvent) {
+                skikoView?.onPointerEvent(toSkikoEvent(e))
+            }
+            override fun mouseExited(e: MouseEvent) {
+                skikoView?.onPointerEvent(toSkikoEvent(e))
             }
         })
-        backedLayer.addMouseMotionListener(object : MouseMotionAdapter() {
-            override fun mouseMoved(e: MouseEvent?) {
-                e!!
-                skikoView?.onPointerEvent(
-                    SkikoPointerEvent(e.x.toDouble(), e.y.toDouble(),
-                        SkikoMouseButtons.NONE,
-                        SkikoPointerEventKind.MOVE,
-                        e
-                    )
-                )
+
+        addMouseMotionListener(object : MouseMotionAdapter() {
+            override fun mouseDragged(e: MouseEvent) {
+                skikoView?.onPointerEvent(toSkikoEvent(e))
+            }
+            override fun mouseMoved(e: MouseEvent) {
+                skikoView?.onPointerEvent(toSkikoEvent(e))
             }
         })
-        backedLayer.addKeyListener(object : KeyAdapter() {
-            override fun keyPressed(e: KeyEvent?) {
-                e!!
-                skikoView?.onKeyboardEvent(
-                    SkikoKeyboardEvent(e.keyCode,
-                        SkikoKeyboardEventKind.DOWN,
-                        e
-                    )
-                )
+
+        addMouseWheelListener(object : MouseWheelListener {
+            override fun mouseWheelMoved(e: MouseWheelEvent) {
+                skikoView?.onPointerEvent(toSkikoEvent(e))
             }
-            override fun keyReleased(e: KeyEvent?) {
-                e!!
-                skikoView?.onKeyboardEvent(
-                    SkikoKeyboardEvent(
-                        e.keyCode,
-                        SkikoKeyboardEventKind.UP,
-                        e
-                    )
-                )
+        })
+
+        addKeyListener(object : KeyAdapter() {
+            override fun keyPressed(e: KeyEvent) {
+                skikoView?.onKeyboardEvent(toSkikoEvent(e))
+            }
+            override fun keyReleased(e: KeyEvent) {
+                skikoView?.onKeyboardEvent(toSkikoEvent(e))
+            }
+            override fun keyTyped(e: KeyEvent) {
+                skikoView?.onKeyboardEvent(toSkikoEvent(e))
+            }
+        })
+
+        addInputMethodListener(object : InputMethodListener {
+            override fun caretPositionChanged(e: InputMethodEvent) {
+                skikoView?.onInputEvent(toSkikoEvent(e))
+            }
+            override fun inputMethodTextChanged(e: InputMethodEvent) {
+                skikoView?.onInputEvent(toSkikoEvent(e))
             }
         })
     }
@@ -540,6 +539,7 @@ internal fun defaultFPSCounter(
 }
 
 // InputEvent is abstract, so we wrap to match modality.
-actual class SkikoPlatformInputEvent(val wrapped: InputEvent)
+actual typealias SkikoGesturePlatformEvent = Any
+actual typealias SkikoPlatformInputEvent = InputMethodEvent
 actual typealias SkikoPlatformKeyboardEvent = KeyEvent
 actual typealias SkikoPlatformPointerEvent = MouseEvent

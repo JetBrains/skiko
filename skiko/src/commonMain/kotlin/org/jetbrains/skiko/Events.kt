@@ -8,6 +8,28 @@ object SkikoMouseButtons {
     const val MIDDLE = 1 shl 2
 }
 
+enum class SkikoGestureEventKind {
+    PRESS, TAP, PAN, PINCH, ROTATION, LONGPRESS, SWIPE, UNKNOWN
+}
+enum class SkikoGestureEventDirection {
+    UP, DOWN, LEFT, RIGHT, UNKNOWN
+}
+enum class SkikoGestureEventState {
+    PRESSED, STARTED, CHANGED, ENDED, UNKNOWN
+}
+expect class SkikoGesturePlatformEvent
+data class SkikoGestureEvent(
+    val x: Double, val y: Double,
+    val velocity: Double = 0.0,
+    val direction: SkikoGestureEventDirection = SkikoGestureEventDirection.UNKNOWN,
+    val interval: Long = 0,
+    val rotation: Double = 0.0,
+    val scale: Double = 1.0,
+    val kind: SkikoGestureEventKind,
+    val state: SkikoGestureEventState = SkikoGestureEventState.UNKNOWN,
+    val platform: SkikoGesturePlatformEvent? = null
+)
+
 expect class SkikoPlatformInputEvent
 data class SkikoInputEvent(
     val input: String,
@@ -15,7 +37,7 @@ data class SkikoInputEvent(
 )
 
 enum class SkikoKeyboardEventKind {
-    UP, DOWN
+    UP, DOWN, TYPE, UNKNOWN
 }
 expect class SkikoPlatformKeyboardEvent
 data class SkikoKeyboardEvent(
@@ -25,7 +47,7 @@ data class SkikoKeyboardEvent(
 )
 
 enum class SkikoPointerEventKind {
-    UP, DOWN, MOVE
+    UP, DOWN, MOVE, DRAG, SCROLL, ENTER, EXIT, UNKNOWN
 }
 expect class SkikoPlatformPointerEvent
 data class SkikoPointerEvent(

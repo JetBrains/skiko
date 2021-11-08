@@ -5,6 +5,7 @@ import kotlinx.cinterop.useContents
 import platform.CoreGraphics.CGRectMake
 import platform.Foundation.NSCoder
 import platform.UIKit.UIEvent
+import platform.UIKit.UITouch
 import platform.UIKit.UIScreen
 import platform.UIKit.UIViewController
 import platform.UIKit.setFrame
@@ -19,12 +20,20 @@ class SkikoViewController : UIViewController {
     constructor(coder: NSCoder) : super(coder)
 
     override fun touchesBegan(touches: Set<*>, withEvent: UIEvent?) {
-        println("touchesBegan: $withEvent")
         super.touchesBegan(touches, withEvent)
+        val sender = (touches.elementAt(0) as UITouch)
+        val (x, y) = sender.locationInView(null).useContents { x to y }
+        skikoLayer.skikoView?.onGestureEvent(
+            SkikoGestureEvent(
+                x = x,
+                y = y,
+                kind = SkikoGestureEventKind.PRESS,
+                state = SkikoGestureEventState.PRESSED
+            )
+        )
     }
 
     override fun touchesEnded(touches: Set<*>, withEvent: UIEvent?) {
-        println("touchesEnded $withEvent")
         super.touchesEnded(touches, withEvent)
     }
 

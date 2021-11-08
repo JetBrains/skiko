@@ -62,23 +62,95 @@ actual open class SkiaLayer {
         controller = object : NSObject() {
             @ObjCAction
             fun onTap(sender: UITapGestureRecognizer) {
-                val (x, y) = sender.locationInView(view).useContents {
-                    x to y
-                }
-                // TODO: rework events using https://developer.apple.com/documentation/uikit/uiresponder/1621142-touchesbegan?language=objc
-                skikoView?.onPointerEvent(
-                    SkikoPointerEvent(x, y,
-                        SkikoMouseButtons.LEFT, SkikoPointerEventKind.DOWN,
-                        null))
-                skikoView?.onPointerEvent(
-                    SkikoPointerEvent(x, y,
-                        SkikoMouseButtons.LEFT, SkikoPointerEventKind.UP,
-                null))
+                val (x, y) = sender.locationInView(view).useContents { x to y }
+                skikoView?.onGestureEvent(
+                    SkikoGestureEvent(
+                        x = x,
+                        y = y,
+                        kind = SkikoGestureEventKind.TAP,
+                        state = toSkikoGestureState(sender.state)
+                    )
+                )
+            }
+
+            @ObjCAction
+            fun onLongPress(sender: UILongPressGestureRecognizer) {
+                val (x, y) = sender.locationInView(view).useContents { x to y }
+                skikoView?.onGestureEvent(
+                    SkikoGestureEvent(
+                        x = x,
+                        y = y,
+                        kind = SkikoGestureEventKind.LONGPRESS,
+                        state = toSkikoGestureState(sender.state)
+                    )
+                )
+            }
+
+            @ObjCAction
+            fun onPinch(sender: UIPinchGestureRecognizer) {
+                val (x, y) = sender.locationInView(view).useContents { x to y }
+                skikoView?.onGestureEvent(
+                    SkikoGestureEvent(
+                        x = x,
+                        y = y,
+                        kind = SkikoGestureEventKind.PINCH,
+                        scale = sender.scale,
+                        velocity = sender.velocity,
+                        state = toSkikoGestureState(sender.state)
+                    )
+                )
+            }
+
+            @ObjCAction
+            fun onRotation(sender: UIRotationGestureRecognizer) {
+                val (x, y) = sender.locationInView(view).useContents { x to y }
+                skikoView?.onGestureEvent(
+                    SkikoGestureEvent(
+                        x = x,
+                        y = y,
+                        kind = SkikoGestureEventKind.ROTATION,
+                        rotation = sender.rotation,
+                        velocity = sender.velocity,
+                        state = toSkikoGestureState(sender.state)
+                    )
+                )
+            }
+
+            @ObjCAction
+            fun onSwipe(sender: UISwipeGestureRecognizer) {
+                val (x, y) = sender.locationInView(view).useContents { x to y }
+                skikoView?.onGestureEvent(
+                    SkikoGestureEvent(
+                        x = x,
+                        y = y,
+                        kind = SkikoGestureEventKind.SWIPE,
+                        direction = toSkikoGestureDirection(sender.direction),
+                        state = toSkikoGestureState(sender.state)
+                    )
+                )
+            }
+
+            @ObjCAction
+            fun onPan(sender: UIPanGestureRecognizer) {
+                val (x, y) = sender.locationInView(view).useContents { x to y }
+                skikoView?.onGestureEvent(
+                    SkikoGestureEvent(
+                        x = x,
+                        y = y,
+                        kind = SkikoGestureEventKind.PAN,
+                        state = toSkikoGestureState(sender.state)
+                    )
+                )
             }
 
         }
         // We have ':' in selector to take care of function argument.
         view.addGestureRecognizer(UITapGestureRecognizer(controller, NSSelectorFromString("onTap:")))
+        view.addGestureRecognizer(UILongPressGestureRecognizer(controller, NSSelectorFromString("onLongPress:")))
+        view.addGestureRecognizer(UIPinchGestureRecognizer(controller, NSSelectorFromString("onPinch:")))
+        view.addGestureRecognizer(UIRotationGestureRecognizer(controller, NSSelectorFromString("onRotation:")))
+        view.addGestureRecognizer(UISwipeGestureRecognizer(controller, NSSelectorFromString("onSwipe:")))
+        view.addGestureRecognizer(UIPanGestureRecognizer(controller, NSSelectorFromString("onPan:")))
         // TODO: maybe add observer for view.viewDidDisappear() to detach us?
         redrawer = MetalRedrawer(this).apply {
             needRedraw()
@@ -129,6 +201,7 @@ actual open class SkiaLayer {
 }
 
 // TODO: do properly
+actual typealias SkikoGesturePlatformEvent = UIEvent
 actual typealias SkikoPlatformInputEvent = UIEvent
 actual typealias SkikoPlatformKeyboardEvent = UIEvent
 actual typealias SkikoPlatformPointerEvent = UIEvent

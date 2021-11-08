@@ -7,6 +7,7 @@ interface SkikoView {
     fun onKeyboardEvent(event: SkikoKeyboardEvent) = Unit
     fun onPointerEvent(event: SkikoPointerEvent) = Unit
     fun onInputEvent(event: SkikoInputEvent) = Unit
+    fun onGestureEvent(event: SkikoGestureEvent) = Unit
 
     // Rendering
     fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long)
@@ -35,5 +36,9 @@ open class GenericSkikoView(
 
     override fun onPointerEvent(event: SkikoPointerEvent) {
         app.onPointerEvent(event)
+    }
+
+    override fun onGestureEvent(event: SkikoGestureEvent) {
+        app.onGestureEvent(event)
     }
 }

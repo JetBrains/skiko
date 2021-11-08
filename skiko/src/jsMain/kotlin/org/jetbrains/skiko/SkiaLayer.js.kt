@@ -100,6 +100,7 @@ actual open class SkiaLayer {
     }
 }
 
+actual typealias SkikoGesturePlatformEvent = Any
 actual typealias SkikoPlatformInputEvent = InputEvent
 actual typealias SkikoPlatformKeyboardEvent = KeyboardEvent
 //  MouseEvent is base class of PointerEvent
