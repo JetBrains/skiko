@@ -4,6 +4,7 @@ import org.jetbrains.skia.FontMetrics
 import org.jetbrains.skia.impl.use
 import org.jetbrains.skia.paragraph.TextStyle
 import org.jetbrains.skia.paragraph.TextStyleAttribute
+import org.jetbrains.skiko.tests.SkipJsTarget
 import kotlin.test.*
 
 class TextStyleTest {
@@ -50,7 +51,9 @@ class TextStyleTest {
         }
     }
 
+    //TODO: We either need separate test for js platform if we want to test default metrics or just need to come up with a different, better test
     @Test
+    @SkipJsTarget
     fun textStyleFontMetrics() {
         TextStyle().use { textStyle ->
             val defaultFontMetrics = FontMetrics(

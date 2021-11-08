@@ -278,12 +278,29 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_
     instance->setTextBaseline(static_cast<TextBaseline>(baselineModeValue));
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nGetFontMetrics
-  (JNIEnv* env, jclass jclass, jlong ptr) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nGetFontMetrics
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray fontMetrics) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     SkFontMetrics m;
     instance->getFontMetrics(&m);
-    return skija::FontMetrics::toJava(env, m);
+    float f[15] = {
+        m.fTop,
+        m.fAscent,
+        m.fDescent,
+        m.fBottom,
+        m.fLeading,
+        m.fAvgCharWidth,
+        m.fMaxCharWidth,
+        m.fXMin,
+        m.fXMax,
+        m.fXHeight,
+        m.fCapHeight,
+        m.fUnderlineThickness,
+        m.fUnderlinePosition,
+        m.fStrikeoutThickness,
+        m.fStrikeoutPosition
+    };
+    env->SetFloatArrayRegion(fontMetrics, 0, 15, f);
 }
 
 extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nIsPlaceholder

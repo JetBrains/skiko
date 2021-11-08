@@ -362,7 +362,26 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     val fontMetrics: FontMetrics
         get() = try {
             Stats.onNativeCall()
-            _nGetFontMetrics(_ptr)
+            val fontMetricsData = withResult(FloatArray(15)) {
+                _nGetFontMetrics(_ptr, it)
+            }
+            FontMetrics(
+                fontMetricsData[0],
+                fontMetricsData[1],
+                fontMetricsData[2],
+                fontMetricsData[3],
+                fontMetricsData[4],
+                fontMetricsData[5],
+                fontMetricsData[6],
+                fontMetricsData[7],
+                fontMetricsData[8],
+                fontMetricsData[9],
+                fontMetricsData[10],
+                fontMetricsData[11],
+                fontMetricsData[12],
+                fontMetricsData[13],
+                fontMetricsData[14]
+            )
         } finally {
             reachabilityBarrier(this)
         }
@@ -508,7 +527,7 @@ private external fun _nGetBaselineMode(ptr: NativePointer): Int
 private external fun _nSetBaselineMode(ptr: NativePointer, mode: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetFontMetrics")
-private external fun _nGetFontMetrics(ptr: NativePointer): FontMetrics
+private external fun _nGetFontMetrics(ptr: NativePointer, fontMetrics: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nIsPlaceholder")
 private external fun _nIsPlaceholder(ptr: NativePointer): Boolean
