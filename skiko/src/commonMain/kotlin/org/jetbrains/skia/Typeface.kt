@@ -111,7 +111,7 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         get() = try {
             Stats.onNativeCall()
             val axisCount = _nGetVariationAxesCount(_ptr)
-            if (axisCount == 0) {
+            if (axisCount <= 0) {
                 null
             } else {
                 val axisData = withResult(IntArray(axisCount * 5)) {
