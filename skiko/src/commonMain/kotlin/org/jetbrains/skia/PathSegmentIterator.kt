@@ -57,7 +57,7 @@ class PathSegmentIterator internal constructor(val _path: Path?, ptr: NativePoin
     }
 
     private fun nextSegment() = pathSegmentFromIntArray(withResult(IntArray(10)) {
-        PathSegmentIterator_nNext(this._ptr, it)
+        PathSegmentIterator_nNext(this@PathSegmentIterator._ptr, it)
     })
 }
 

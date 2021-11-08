@@ -1,6 +1,7 @@
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.InteropPointer
+import org.jetbrains.skia.impl.InteropScope
 import org.jetbrains.skia.impl.withResult
 
 /**
@@ -86,15 +87,16 @@ class AnimationFrameInfo(
             )
         }
 
-        internal fun fromInteropPointer(block: (InteropPointer) -> Unit): AnimationFrameInfo {
+        internal fun fromInteropPointer(block: InteropScope.(InteropPointer) -> Unit): AnimationFrameInfo {
             return fromIntArray(withResult(IntArray(REPR_SIZE), block))
         }
 
-        internal fun fromInteropArrayPointer(size: Int, block: (InteropPointer) -> Unit): Array<AnimationFrameInfo> {
+        internal fun fromInteropArrayPointer(size: Int, block: InteropScope.(InteropPointer) -> Unit): Array<AnimationFrameInfo> {
             val repr = withResult(IntArray(REPR_SIZE * size), block)
             return Array(size) { fromIntArray(repr, it) }
         }
     }
+
     internal constructor(
         requiredFrame: Int,
         duration: Int,
@@ -114,6 +116,7 @@ class AnimationFrameInfo(
         BlendMode.values()[blendModeOrdinal],
         frameRect
     )
+
     override fun equals(other: Any?): Boolean {
         if (other === this) return true
         if (other !is AnimationFrameInfo) return false
