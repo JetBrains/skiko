@@ -4,6 +4,7 @@ import kotlinx.cinterop.ObjCAction
 import kotlinx.cinterop.useContents
 import org.jetbrains.skiko.context.*
 import org.jetbrains.skia.*
+import org.jetbrains.skiko.redrawer.MacOsOpenGLRedrawer
 import org.jetbrains.skiko.redrawer.Redrawer
 import platform.AppKit.*
 import platform.Foundation.NSMakeRect
@@ -14,9 +15,7 @@ import platform.Foundation.addObserver
 import platform.darwin.NSObject
 import platform.CoreGraphics.CGRectMake
 
-actual open class SkiaLayer(
-    private val properties: SkiaLayerProperties = makeDefaultSkiaLayerProperties()
-) {
+actual open class SkiaLayer {
     actual var renderApi: GraphicsApi = GraphicsApi.OPENGL
     actual val contentScale: Float
         get() = if (this::nsView.isInitialized) nsView.window!!.backingScaleFactor.toFloat() else 1.0f
@@ -138,7 +137,7 @@ actual open class SkiaLayer(
             }
         }
         window.contentView!!.addSubview(nsView)
-        redrawer = createNativeRedrawer(this, GraphicsApi.OPENGL, properties).apply {
+        redrawer = MacOsOpenGLRedrawer(this).apply {
             syncSize()
             needRedraw()
         }

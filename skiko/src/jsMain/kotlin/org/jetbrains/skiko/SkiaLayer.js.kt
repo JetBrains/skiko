@@ -6,8 +6,7 @@ import org.w3c.dom.events.InputEvent
 import org.w3c.dom.events.KeyboardEvent
 import org.w3c.dom.events.MouseEvent
 
-actual open class SkiaLayer(properties: SkiaLayerProperties = makeDefaultSkiaLayerProperties()
-) {
+actual open class SkiaLayer {
     private var state: CanvasRenderer? = null
 
     actual var renderApi: GraphicsApi = GraphicsApi.WEBGL

@@ -17,7 +17,7 @@ import javax.swing.UIManager
 
 actual open class SkiaLayer internal constructor(
     externalAccessibleFactory: ((Component) -> Accessible)? = null,
-    private val properties: SkiaLayerProperties = makeDefaultSkiaLayerProperties(),
+    private val properties: SkiaLayerProperties,
     private val renderFactory: RenderFactory = RenderFactory.Default
 ) : JPanel() {
 
@@ -47,9 +47,19 @@ actual open class SkiaLayer internal constructor(
     internal val backedLayer: HardwareLayer
 
     constructor(
-        properties: SkiaLayerProperties = makeDefaultSkiaLayerProperties(),
-        externalAccessibleFactory: ((Component) -> Accessible)? = null
-    ) : this(externalAccessibleFactory, properties, RenderFactory.Default)
+        externalAccessibleFactory: ((Component) -> Accessible)? = null,
+        isVsyncEnabled: Boolean = SkikoProperties.vsyncEnabled,
+        isVsyncFramelimitFallbackEnabled: Boolean = SkikoProperties.vsyncFramelimitFallbackEnabled,
+        renderApi: GraphicsApi = SkikoProperties.renderApi,
+    ) : this(
+        externalAccessibleFactory,
+        SkiaLayerProperties(
+            isVsyncEnabled,
+            isVsyncFramelimitFallbackEnabled,
+            renderApi
+        ),
+        RenderFactory.Default
+    )
 
     val canvas: java.awt.Canvas
         get() = backedLayer
@@ -200,7 +210,7 @@ actual open class SkiaLayer internal constructor(
     @Volatile
     private var isDisposed = false
     internal var redrawer: Redrawer? = null
-    private val fallbackRenderApiQueue = SkikoProperties.fallbackRenderApiQueue.toMutableList()
+    private val fallbackRenderApiQueue = SkikoProperties.fallbackRenderApiQueue(properties.renderApi).toMutableList()
     private var renderApi_ = fallbackRenderApiQueue[0]
     actual var renderApi: GraphicsApi
         get() = renderApi_
