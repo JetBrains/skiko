@@ -7,6 +7,62 @@
 #include "SkShader.h"
 #include "common.h"
 
+
+#ifndef __EMSCRIPTEN__
+
+typedef bool((*InteropCallback)(const void*));
+typedef void((*InteropDisposeCallback)(const void*));
+
+class KotlinAbortCallback: public SkPicture::AbortCallback {
+public:
+    KotlinAbortCallback(InteropCallback cb, InteropDisposeCallback drop, void* data) : cb(cb), drop(drop), data(data) {}
+
+    virtual ~KotlinAbortCallback() override {
+        drop(data);
+    }
+
+    KotlinAbortCallback(const KotlinAbortCallback&) = delete;
+    KotlinAbortCallback(KotlinAbortCallback&&) = delete;
+    KotlinAbortCallback& operator=(const KotlinAbortCallback&) = delete;
+    KotlinAbortCallback& operator=(KotlinAbortCallback&&) = delete;
+
+    bool abort() override {
+        return cb(data);
+    }
+private:
+    void * data;
+    InteropCallback cb;
+    InteropDisposeCallback drop;
+};
+
+#else // __EMSCRIPTEN__
+
+typedef KInt InteropCallback;
+
+class KotlinAbortCallback: public SkPicture::AbortCallback {
+public:
+    KotlinAbortCallback(InteropCallback cb) : cb(cb) {}
+    virtual ~KotlinAbortCallback() override {
+        EM_ASM({ _releaseCallback($0) }, cb);
+    }
+
+    KotlinAbortCallback(const KotlinAbortCallback&) = delete;
+    KotlinAbortCallback(KotlinAbortCallback&&) = delete;
+    KotlinAbortCallback& operator=(const KotlinAbortCallback&) = delete;
+    KotlinAbortCallback& operator=(KotlinAbortCallback&&) = delete;
+
+    bool abort() override {
+        int value = EM_ASM_INT({
+            return _callCallback($0)[0] ? 1 : 0;
+        }, cb);
+        return value == 1;
+    }
+private:
+    InteropCallback cb;
+};
+
+#endif // __EMSCRIPTEN__
+
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Picture__1nMakeFromData
   (KNativePointer dataPtr) {
     SkData* data = reinterpret_cast<SkData*>((dataPtr));
@@ -14,21 +70,36 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Picture__1nMakeFromData
     return reinterpret_cast<KNativePointer>(instance);
 }
 
+#ifndef __EMSCRIPTEN__
 
 SKIKO_EXPORT void org_jetbrains_skia_Picture__1nPlayback
-  (KNativePointer ptr, KNativePointer canvasPtr, KInteropPointer abort) {
+  (KNativePointer ptr, KNativePointer canvasPtr, InteropCallback abort, InteropDisposeCallback drop, void* data) {
     SkPicture* instance = reinterpret_cast<SkPicture*>((ptr));
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>((canvasPtr));
-    if (abort == nullptr) {
+    if (data == nullptr) {
         instance->playback(canvas, nullptr);
     } else {
-#if 0
-        BooleanSupplierAbort callback(env, abort);
-        instance->playback(canvas, &callback);
-#endif
-        TODO("implement org_jetbrains_skia_Picture__1nPlayback with callback");
+        KotlinAbortCallback abortCallback(abort, drop, data);
+        instance->playback(canvas, &abortCallback);
     }
 }
+
+#else // __EMSCRIPTEN__
+
+SKIKO_EXPORT void org_jetbrains_skia_Picture__1nPlayback
+  (KNativePointer ptr, KNativePointer canvasPtr, InteropCallback abort) {
+    SkPicture* instance = reinterpret_cast<SkPicture*>((ptr));
+    SkCanvas* canvas = reinterpret_cast<SkCanvas*>((canvasPtr));
+    if (abort == 0) {
+        instance->playback(canvas, nullptr);
+    } else {
+        KotlinAbortCallback abortCallback(abort);
+        instance->playback(canvas, &abortCallback);
+    }
+}
+
+#endif // __EMSCRIPTEN__
+
 
 SKIKO_EXPORT void org_jetbrains_skia_Picture__1nGetCullRect
   (KNativePointer ptr, KInteropPointer ltrbArray) {
@@ -81,8 +152,14 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Picture__1nMakeShader
     SkTileMode tmy = static_cast<SkTileMode>(tmyValue);
     SkFilterMode filterMode = static_cast<SkFilterMode>(filterModeValue);
     std::unique_ptr<SkMatrix> localMatrix = skMatrix(localMatrixArr);
-    std::unique_ptr<SkRect> tileRect = skija::Rect::fromKotlinLTRB(tileRectLTRB);
-    SkShader* shader = instance->makeShader(tmx, tmy, filterMode, localMatrix.get(), tileRect.get()).release();
+    float* ltrb = reinterpret_cast<float*>(tileRectLTRB);
+    SkShader* shader;
+    if (ltrb) {
+        SkRect tileRect = SkRect::MakeLTRB(ltrb[0], ltrb[1], ltrb[2], ltrb[3]);
+        shader = instance->makeShader(tmx, tmy, filterMode, localMatrix.get(), &tileRect).release();
+    } else {
+        shader = instance->makeShader(tmx, tmy, filterMode, localMatrix.get(), nullptr).release();
+    }
     return reinterpret_cast<KNativePointer>(shader);
 }
 
