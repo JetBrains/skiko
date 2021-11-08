@@ -12,9 +12,7 @@ import platform.Foundation.NSSelectorFromString
 import platform.UIKit.*
 import platform.darwin.NSObject
 
-actual open class SkiaLayer(
-    val properties: SkiaLayerProperties = SkiaLayerProperties()
-) {
+actual open class SkiaLayer {
     fun isShowing(): Boolean {
         return true
     }
