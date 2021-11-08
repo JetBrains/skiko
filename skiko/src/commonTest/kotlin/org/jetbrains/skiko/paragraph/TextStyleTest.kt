@@ -1,7 +1,10 @@
 package org.jetbrains.skiko.paragraph
 
+import org.jetbrains.skia.Color
 import org.jetbrains.skia.FontMetrics
 import org.jetbrains.skia.impl.use
+import org.jetbrains.skia.paragraph.DecorationLineStyle
+import org.jetbrains.skia.paragraph.DecorationStyle
 import org.jetbrains.skia.paragraph.TextStyle
 import org.jetbrains.skia.paragraph.TextStyleAttribute
 import org.jetbrains.skiko.tests.SkipJsTarget
@@ -86,4 +89,34 @@ class TextStyleTest {
             assertEquals("fr_FR.UTF-8", textStyle.locale)
         }
     }
+
+    @Test
+    @SkipJsTarget
+    @SkipNativeTarget
+    fun textDecorationStyleTest() {
+        TextStyle().use { textStyle ->
+            textStyle.decorationStyle = DecorationStyle(
+                underline = true,
+                overline = true,
+                lineThrough = false,
+                gaps = true,
+                color = Color.BLUE,
+                lineStyle = DecorationLineStyle.DASHED.ordinal,
+                thicknessMultiplier = 2f
+            )
+
+            val expectedTextStyle = DecorationStyle(
+                underline = true,
+                overline = true,
+                lineThrough = false,
+                gaps = true,
+                color = Color.BLUE,
+                lineStyle = DecorationLineStyle.DASHED.ordinal,
+                thicknessMultiplier = 2f
+            )
+
+            assertEquals(expectedTextStyle, textStyle.decorationStyle)
+        }
+    }
+
 }
