@@ -1,6 +1,7 @@
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
+import org.jetbrains.skiko.maybeSynchronized
 
 class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
     Managed(ptr, _FinalizerHolder.PTR, managed) {
@@ -11,26 +12,35 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
      */
     private var underlyingMemoryOwner: Managed? = null
 
+    private var _imageInfo: ImageInfo ? = null
+    private val _imageInfoLock = Unit
+
     constructor() : this(_nMakeNull(), true) {
         Stats.onNativeCall()
     }
 
     fun reset() {
         Stats.onNativeCall()
-        Pixmap_nReset(_ptr)
+        maybeSynchronized(_imageInfoLock) {
+            _imageInfo = null
+            Pixmap_nReset(_ptr)
+        }
         underlyingMemoryOwner = null
         reachabilityBarrier(this)
     }
 
     fun reset(info: ImageInfo, addr: NativePointer, rowBytes: Int, underlyingMemoryOwner: Managed? = null) {
         Stats.onNativeCall()
-        _nResetWithInfo(
-            _ptr,
-            info.width, info.height,
-            info.colorInfo.colorType.ordinal,
-            info.colorInfo.alphaType.ordinal,
-            getPtr(info.colorInfo.colorSpace), addr, rowBytes
-        )
+        maybeSynchronized(_imageInfoLock) {
+            _imageInfo = null
+            _nResetWithInfo(
+                _ptr,
+                info.width, info.height,
+                info.colorInfo.colorType.ordinal,
+                info.colorInfo.alphaType.ordinal,
+                getPtr(info.colorInfo.colorSpace), addr, rowBytes
+            )
+        }
         this.underlyingMemoryOwner = underlyingMemoryOwner
         reachabilityBarrier(this)
         reachabilityBarrier(info.colorInfo.colorSpace)
@@ -42,14 +52,16 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
 
     fun setColorSpace(colorSpace: ColorSpace?) {
         Stats.onNativeCall()
-        _nSetColorSpace(_ptr, getPtr(colorSpace))
+        maybeSynchronized(_imageInfoLock) {
+            _imageInfo = null
+            _nSetColorSpace(_ptr, getPtr(colorSpace))
+        }
         reachabilityBarrier(this)
         reachabilityBarrier(colorSpace)
     }
 
     fun extractSubset(subsetPtr: NativePointer, area: IRect): Boolean {
         return try {
-            Stats.onNativeCall()
             Pixmap_nExtractSubset(
                 _ptr,
                 subsetPtr,
@@ -71,7 +83,15 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
         get() {
             Stats.onNativeCall()
             return try {
-                _nGetInfo(_ptr)
+                maybeSynchronized(_imageInfoLock) {
+                    if (_imageInfo == null) {
+                        _imageInfo = ImageInfo.createUsing(
+                            _ptr = _ptr,
+                            _nGetImageInfo = ::_nGetInfo
+                        )
+                    }
+                    _imageInfo!!
+                }
             } finally {
                 reachabilityBarrier(this)
             }
@@ -185,25 +205,31 @@ class Pixmap internal constructor(ptr: NativePointer, managed: Boolean) :
     fun readPixels(pixmap: Pixmap?): Boolean {
         Stats.onNativeCall()
         return try {
-            _nReadPixelsToPixmap(
-                _ptr,
-                getPtr(pixmap)
-            )
+            maybeSynchronized(_imageInfoLock) {
+                _imageInfo = null
+                _nReadPixelsToPixmap(
+                    _ptr,
+                    getPtr(pixmap)
+                )
+            }
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(pixmap)
         }
     }
 
-    fun readPixels(pixmap: Pixmap?, srcX: Int, srcY: Int): Boolean {
+    fun readPixels(pixmap: Pixmap, srcX: Int, srcY: Int): Boolean {
         Stats.onNativeCall()
         return try {
-            _nReadPixelsToPixmapFromPoint(
-                _ptr,
-                getPtr(pixmap),
-                srcX,
-                srcY
-            )
+            maybeSynchronized(pixmap._imageInfoLock) {
+                pixmap._imageInfo = null
+                _nReadPixelsToPixmapFromPoint(
+                    _ptr,
+                    getPtr(pixmap),
+                    srcX,
+                    srcY
+                )
+            }
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(pixmap)
@@ -341,7 +367,7 @@ private external fun _nResetWithInfo(
 private external fun _nSetColorSpace(ptr: NativePointer, colorSpacePtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nGetInfo")
-private external fun _nGetInfo(ptr: NativePointer): ImageInfo
+private external fun _nGetInfo(ptr: NativePointer, imageInfo: InteropPointer, colorSpacePtrs: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Pixmap__1nGetAddr")
 private external fun _nGetAddr(ptr: NativePointer): NativePointer

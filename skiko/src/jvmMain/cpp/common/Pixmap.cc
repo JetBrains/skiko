@@ -64,11 +64,14 @@ extern "C" {
         return pixmap->extractSubset(dst, { l, t, w, h });
     }
 
-    JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_PixmapKt__1nGetInfo
-      (JNIEnv *env, jclass klass, jlong ptr) {
-        SkPixmap* pixmap = jlongToPtr<SkPixmap*>(ptr);
-        const SkImageInfo& imageInfo = pixmap->info();
-        return skija::ImageInfo::toJava(env, imageInfo);
+    JNIEXPORT void JNICALL Java_org_jetbrains_skia_PixmapKt__1nGetInfo
+      (JNIEnv* env, jclass jclass, jlong ptr, jintArray imageInfoResult, jlongArray colorSpaceResultPtr) {
+        SkPixmap* instance = reinterpret_cast<SkPixmap*>(static_cast<uintptr_t>(ptr));
+        SkImageInfo imageInfo = instance->info();
+
+        skija::ImageInfo::writeImageInfoForInterop(
+                env, imageInfo, imageInfoResult, colorSpaceResultPtr
+        );
     }
 
     JNIEXPORT jint JNICALL Java_org_jetbrains_skia_PixmapKt_Pixmap_1nGetRowBytes
