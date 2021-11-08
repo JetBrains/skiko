@@ -13,11 +13,6 @@ import platform.UIKit.contentScaleFactor
 
 @ExportObjCClass
 class SkikoViewController : UIViewController {
-    private var skikoView: SkikoView? = null
-    constructor(skikoView: SkikoView? = null) : this() {
-        this.skikoView = skikoView
-    }
-
     @OverrideInit
     constructor() : super(nibName = null, bundle = null)
 
@@ -28,7 +23,7 @@ class SkikoViewController : UIViewController {
         super.touchesBegan(touches, withEvent)
         val sender = (touches.elementAt(0) as UITouch)
         val (x, y) = sender.locationInView(null).useContents { x to y }
-        skikoView?.onGestureEvent(
+        skikoLayer.skikoView?.onGestureEvent(
             SkikoGestureEvent(
                 x = x,
                 y = y,
