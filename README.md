@@ -110,3 +110,4 @@ For example, if we want to include UI tests when we test JVM target, call this:
 ```
 ./gradlew jvmTest -Dskiko.test.ui.enabled=true
 ```
+Don't run any background tasks, click mouse, and press keys during the tests. Otherwise, they probably fail.
