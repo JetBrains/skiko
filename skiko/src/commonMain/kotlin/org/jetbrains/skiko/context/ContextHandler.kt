@@ -10,7 +10,7 @@ import org.jetbrains.skiko.RenderException
 
 internal abstract class ContextHandler(
     protected val layer: SkiaLayer,
-    private val drawContent: (Canvas) -> Unit
+    private val drawContent: Canvas.() -> Unit
 ) {
     // TODO can we simplify clearColor logic? is there a reason why SoftwareContextHandler has opposite logic?
     protected open val clearColor = if (layer.transparency || hostOs == OS.MacOS) 0 else -1
@@ -47,8 +47,10 @@ internal abstract class ContextHandler(
             throw RenderException("Cannot init graphic context")
         }
         initCanvas()
-        canvas?.clear(if (layer.fullscreen && hostOs != OS.MacOS) -1 else clearColor)
-        canvas?.let(drawContent)
+        canvas?.apply {
+            clear(if (layer.fullscreen && hostOs != OS.MacOS) -1 else clearColor)
+            drawContent()
+        }
         flush()
     }
 }
