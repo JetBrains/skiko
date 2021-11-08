@@ -14,53 +14,49 @@ import org.jetbrains.skiko.isLeftClick
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.PI
+import kotlin.math.pow
 
 class Clocks: SkikoView {
     private var frame = 0
-    private var xpos = 0.0f
-    private var ypos = 0.0f
-    private var xOffset = 0.0f
-    private var yOffset = 0.0f
-    private var scale = 1.0f
-    private var rotate = 0.0f
+    private var xpos = 0.0
+    private var ypos = 0.0
+    private var xOffset = 0.0
+    private var yOffset = 0.0
+    private var scale = 1.0
+    private var k = scale
+    private var rotate = 0.0
     private val fontCollection = FontCollection()
         .setDefaultFontManager(FontMgr.default)
 
-    override fun onRender(canvas: Canvas, w: Int, h: Int, nanoTime: Long) {
-        val xOffset = xOffset
-        val yOffset = yOffset
-        val xpos = xpos * scale + xOffset * scale
-        val ypos = ypos * scale + yOffset * scale
-        val width = (w * scale).toInt() + xOffset.toInt()
-        val height = (h * scale).toInt() + yOffset.toInt()
+    override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+        canvas.translate(xOffset.toFloat(), yOffset.toFloat())
+        canvas.scale(scale.toFloat(), scale.toFloat())
         val watchFill = Paint().apply { color = 0xFFFFFFFF.toInt() }
         val watchStroke = Paint().apply {
                color = 0xFF000000.toInt()
                mode = PaintMode.STROKE
-               strokeWidth = 1f * scale
+               strokeWidth = 1f
         }
         val watchStrokeAA = Paint().apply {
           color = 0xFF000000.toInt()
           mode = PaintMode.STROKE
-          strokeWidth = 1f * scale
+          strokeWidth = 1f
         }
         val watchFillHover = Paint().apply { color = 0xFFE4FF01.toInt() }
-        val clockSize = 40f * scale
-        val clockOffset = 5f * scale
-        for (x in xOffset.toInt() .. (width - (50 * scale).toInt()) step (50 * scale).toInt()) {
-            for (y in yOffset.toInt() .. (height - (50 * scale).toInt()) step (50 * scale).toInt()) {
-                val hover = xpos / scale > x && xpos / scale < x + (50 * scale).toInt() && ypos / scale > y && ypos / scale < y + (50 * scale).toInt()
+        for (x in 0 .. width - 50 step 50) {
+            for (y in 20 .. height - 50 step 50) {
+                val hover = xpos / scale > x && xpos / scale < x + 50 && ypos / scale > y && ypos / scale < y + 50
                 val fill = if (hover) watchFillHover else watchFill
                 val stroke = if (x > width / 2) watchStrokeAA else watchStroke
-                canvas.drawOval(Rect.makeXYWH(x + clockOffset, y + clockOffset, clockSize, clockSize), fill)
-                canvas.drawOval(Rect.makeXYWH(x + clockOffset, y + clockOffset, clockSize, clockSize), stroke)
+                canvas.drawOval(Rect.makeXYWH(x + 5f, y + 5f, 40f, 40f), fill)
+                canvas.drawOval(Rect.makeXYWH(x + 5f, y + 5f, 40f, 40f), stroke)
                 var angle = 0f
                 while (angle < 2f * PI) {
                     canvas.drawLine(
-                            (x + 25 * scale - 17 * sin(angle) * scale),
-                            (y + 25 * scale + 17 * cos(angle) * scale),
-                            (x + 25 * scale - 20 * sin(angle) * scale),
-                            (y + 25 * scale + 20 * cos(angle) * scale),
+                            (x + 25 - 17 * sin(angle)),
+                            (y + 25 + 17 * cos(angle)),
+                            (x + 25 - 20 * sin(angle)),
+                            (y + 25 + 20 * cos(angle)),
                             stroke
                     )
                     angle += (2.0 * PI / 12.0).toFloat()
@@ -71,18 +67,18 @@ class Clocks: SkikoView {
 
                 val angle1 = (time.toFloat() / 5000 * 2f * PI).toFloat()
                 canvas.drawLine(
-                        x + 25f * scale,
-                        y + 25f * scale,
-                        x + 25f * scale - 15f * sin(angle1) * scale,
-                        y + 25f * scale + 15 * cos(angle1) * scale,
+                        x + 25f,
+                        y + 25f,
+                        x + 25f - 15f * sin(angle1),
+                        y + 25f + 15 * cos(angle1),
                         stroke)
 
                 val angle2 = (time / 60000 * 2f * PI).toFloat()
                 canvas.drawLine(
-                        x + 25f * scale,
-                        y + 25f * scale,
-                        x + 25f * scale - 10f * sin(angle2) * scale,
-                        y + 25f * scale + 10f * cos(angle2) * scale,
+                        x + 25f,
+                        y + 25f,
+                        x + 25f - 10f * sin(angle2),
+                        y + 25f + 10f * cos(angle2),
                         stroke)
             }
         }
@@ -94,13 +90,13 @@ class Clocks: SkikoView {
             .popStyle()
             .build()
         frames.layout(Float.POSITIVE_INFINITY)
-        frames.paint(canvas, xpos / scale, ypos / scale)
+        frames.paint(canvas, (xpos / scale).toFloat(), (ypos / scale).toFloat())
     }
 
     override fun onPointerEvent(event: SkikoPointerEvent) {
         if (event.isLeftClick) {
-            xpos = event.x.toFloat()
-            ypos = event.y.toFloat()
+            xpos = event.x
+            ypos = event.y
         }
     }
 
@@ -108,18 +104,21 @@ class Clocks: SkikoView {
         when (event.kind) {
             SkikoGestureEventKind.PRESS,
             SkikoGestureEventKind.TAP -> {
-                xpos = event.x.toFloat() - xOffset
-                ypos = event.y.toFloat() - yOffset
+                xpos = event.x - xOffset
+                ypos = event.y - yOffset
             }
             SkikoGestureEventKind.PINCH -> {
-                scale = event.scale.toFloat()
+                if (event.state == SkikoGestureEventState.STARTED) {
+                    k = scale
+                }
+                scale = k * event.scale
             }
             SkikoGestureEventKind.PAN -> {
-                xOffset = event.x.toFloat() - xpos.toFloat()
-                yOffset = event.y.toFloat() - ypos.toFloat()
+                xOffset = event.x - xpos
+                yOffset = event.y - ypos
             }
             SkikoGestureEventKind.ROTATION -> {
-                rotate = (event.rotation * PI).toFloat()
+                rotate = (event.rotation * PI)
             }
             else -> {}
         }

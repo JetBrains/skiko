@@ -15,7 +15,7 @@ enum class SkikoGestureEventDirection {
     UP, DOWN, LEFT, RIGHT, UNKNOWN
 }
 enum class SkikoGestureEventState {
-    PRESS, STARTED, CHANGED, ENDED, UNKNOWN
+    PRESSED, STARTED, CHANGED, ENDED, UNKNOWN
 }
 expect class SkikoGesturePlatformEvent
 data class SkikoGestureEvent(

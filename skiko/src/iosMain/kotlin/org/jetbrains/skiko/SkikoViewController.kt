@@ -33,7 +33,7 @@ class SkikoViewController : UIViewController {
                 x = x,
                 y = y,
                 kind = SkikoGestureEventKind.PRESS,
-                state = SkikoGestureEventState.PRESS
+                state = SkikoGestureEventState.PRESSED
             )
         )
     }

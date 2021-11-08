@@ -14,7 +14,7 @@ fun toSkikoGestureDirection(direction: UISwipeGestureRecognizerDirection) : Skik
 
 fun toSkikoGestureState(state: UIGestureRecognizerState ) : SkikoGestureEventState  {
     return when(state) {
-        UIGestureRecognizerStatePossible -> SkikoGestureEventState.PRESS
+        UIGestureRecognizerStatePossible -> SkikoGestureEventState.PRESSED
         UIGestureRecognizerStateBegan -> SkikoGestureEventState.STARTED
         UIGestureRecognizerStateChanged -> SkikoGestureEventState.CHANGED
         UIGestureRecognizerStateEnded -> SkikoGestureEventState.ENDED
