@@ -123,7 +123,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGetGlyph
   (JNIEnv* env, jclass jclass, jlong ptr, jshortArray resultArray) {
     SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(static_cast<uintptr_t>(ptr));
     jshort * shorts = env->GetShortArrayElements(resultArray, nullptr);
-    skikoMpp::textblob::getGlyphs(instance, shorts);
+    skikoMpp::textblob::getGlyphs(instance, reinterpret_cast<short*>(shorts));
     env->ReleaseShortArrayElements(resultArray, shorts, 0);
 }
 
@@ -138,7 +138,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGetPosit
     SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(static_cast<uintptr_t>(ptr));
 
     jfloat* positions = env->GetFloatArrayElements(resultArray, 0);
-    skikoMpp::textblob::getPositions(instance, positions);
+    skikoMpp::textblob::getPositions(instance, reinterpret_cast<float*>(positions));
     env->ReleaseFloatArrayElements(resultArray, positions, 0);
 }
 
@@ -153,7 +153,7 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGetC
     SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(static_cast<uintptr_t>(ptr));
 
     jint* clusters = env->GetIntArrayElements(resultArray, 0);
-    auto hasValue = skikoMpp::textblob::getClusters(instance, clusters);
+    auto hasValue = skikoMpp::textblob::getClusters(instance, reinterpret_cast<int*>(clusters));
     env->ReleaseIntArrayElements(resultArray, clusters, 0);
 
     return hasValue;
@@ -190,7 +190,7 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGetF
   (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray resultArray) {
     SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(static_cast<uintptr_t>(ptr));
     jfloat* floats = env->GetFloatArrayElements(resultArray, 0);
-    auto hasValue = skikoMpp::textblob::getFirstBaseline(instance, floats);
+    auto hasValue = skikoMpp::textblob::getFirstBaseline(instance, reinterpret_cast<float*>(floats));
     env->ReleaseFloatArrayElements(resultArray, floats, 0);
     return hasValue;
 }
@@ -199,7 +199,7 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGetL
   (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray resultArray) {
     SkTextBlob* instance = reinterpret_cast<SkTextBlob*>(static_cast<uintptr_t>(ptr));
     jfloat* floats = env->GetFloatArrayElements(resultArray, 0);
-    auto hasValue = skikoMpp::textblob::getLastBaseline(instance, floats);
+    auto hasValue = skikoMpp::textblob::getLastBaseline(instance, reinterpret_cast<float*>(floats));
     env->ReleaseFloatArrayElements(resultArray, floats, 0);
     return hasValue;
 }
