@@ -133,7 +133,45 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
         get() {
             Stats.onNativeCall()
             return try {
-                TextLine_nGetPositions(_ptr)
+                withResult(FloatArray(glyphsLength * 2)) {
+                    TextLine_nGetPositions(_ptr, it)
+                }
+            } finally {
+                reachabilityBarrier(this)
+            }
+        }
+
+    internal val runPositions: FloatArray?
+        get() {
+            Stats.onNativeCall()
+            return try {
+                withResult(FloatArray(_nGetRunPositionsCount(_ptr))) {
+                    _nGetRunPositions(_ptr, it)
+                }
+            } finally {
+                reachabilityBarrier(this)
+            }
+        }
+
+    internal val breakPositions: FloatArray?
+        get() {
+            Stats.onNativeCall()
+            return try {
+                withResult(FloatArray(_nGetBreakPositionsCount(_ptr))) {
+                    _nGetBreakPositions(_ptr, it)
+                }
+            } finally {
+                reachabilityBarrier(this)
+            }
+        }
+
+    internal val breakOffsets: IntArray
+        get() {
+            Stats.onNativeCall()
+            return try {
+                withResult(IntArray(_nGetBreakOffsetsCount(_ptr))) {
+                    _nGetBreakOffsets(_ptr, it)
+                }
             } finally {
                 reachabilityBarrier(this)
             }
@@ -232,7 +270,7 @@ private external fun TextLine_nGetGlyphsLength(ptr: NativePointer): Int
 private external fun TextLine_nGetGlyphs(ptr: NativePointer, resultGlyphs: InteropPointer, resultLength: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetPositions")
-private external fun TextLine_nGetPositions(ptr: NativePointer): FloatArray
+private external fun TextLine_nGetPositions(ptr: NativePointer, resultArray: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetAscent")
 private external fun _nGetAscent(ptr: NativePointer): Float
@@ -253,13 +291,22 @@ private external fun _nGetLeading(ptr: NativePointer): Float
 private external fun _nGetTextBlob(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetRunPositions")
-private external fun _nGetRunPositions(ptr: NativePointer): FloatArray?
+private external fun _nGetRunPositions(ptr: NativePointer, resultArray: InteropPointer)
+
+@ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetRunPositionsCount")
+private external fun _nGetRunPositionsCount(ptr: NativePointer): Int
+
+@ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetBreakPositionsCount")
+private external fun _nGetBreakPositionsCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetBreakPositions")
-private external fun _nGetBreakPositions(ptr: NativePointer): FloatArray?
+private external fun _nGetBreakPositions(ptr: NativePointer, result: InteropPointer)
+
+@ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetBreakOffsetsCount")
+private external fun _nGetBreakOffsetsCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetBreakOffsets")
-private external fun _nGetBreakOffsets(ptr: NativePointer): IntArray?
+private external fun _nGetBreakOffsets(ptr: NativePointer, result: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_TextLine__1nGetOffsetAtCoord")
 private external fun _nGetOffsetAtCoord(ptr: NativePointer, x: Float): Int

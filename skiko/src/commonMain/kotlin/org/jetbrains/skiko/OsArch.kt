@@ -28,7 +28,10 @@ enum class Arch(val id: String) {
 enum class KotlinBackend(val id: String) {
     JVM("jvm"),
     JS("js"),
-    Native("native")
+    Native("native"),
+    ;
+
+    fun isNotJs() = this != JS
 }
 
 expect val hostOs: OS

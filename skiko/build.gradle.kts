@@ -187,6 +187,7 @@ val linkWasm = tasks.register<LinkSkikoWasmTask>("linkWasm") {
         "-l", "GL",
         "-s", "USE_WEBGL2=1",
         "-s", "OFFSCREEN_FRAMEBUFFER=1",
+        "-s", "ALLOW_MEMORY_GROWTH=1", // TODO: Is there a better way? Should we use `-s INITIAL_MEMORY=X`?
         "--bind",
     ))
 
