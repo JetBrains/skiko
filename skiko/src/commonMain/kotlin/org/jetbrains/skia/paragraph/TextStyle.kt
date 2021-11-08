@@ -266,7 +266,8 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     var height: Float?
         get() = try {
             Stats.onNativeCall()
-            TextStyle_nGetHeight(_ptr)
+            val height = TextStyle_nGetHeight(_ptr)
+            if (height.isNaN()) null else height
         } finally {
             reachabilityBarrier(this)
         }
@@ -450,7 +451,7 @@ private external fun TextStyle_nSetFontSize(ptr: NativePointer, size: Float)
 private external fun TextStyle_nGetFontFamilies(ptr: NativePointer): Array<String>
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetHeight")
-private external fun TextStyle_nGetHeight(ptr: NativePointer): Float?
+private external fun TextStyle_nGetHeight(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetHeight")
 private external fun TextStyle_nSetHeight(ptr: NativePointer, override: Boolean, height: Float)

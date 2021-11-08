@@ -222,10 +222,10 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_
     instance->setFontFamilies(skStringVector(env, familiesArray));
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_TextStyle_1nGetHeight
+extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_TextStyle_1nGetHeight
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
-    return instance->getHeightOverride() ? javaFloat(env, instance->getHeight()) : nullptr;
+    return instance->getHeightOverride() ? static_cast<jfloat>(instance->getHeight()) : std::numeric_limits<jfloat>::quiet_NaN();
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_TextStyle_1nSetHeight

@@ -245,19 +245,11 @@ SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nSetFontFamilies
 
 
 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_paragraph_TextStyle__1nGetHeight
-  (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nGetHeight");
-}
-
-#if 0
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_paragraph_TextStyle__1nGetHeight
+SKIKO_EXPORT KFloat org_jetbrains_skia_paragraph_TextStyle__1nGetHeight
   (KNativePointer ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(ptr);
-    return instance->getHeightOverride() ? javaFloat(env, instance->getHeight()) : nullptr;
+    return instance->getHeightOverride() ? instance->getHeight() : std::numeric_limits<KFloat>::quiet_NaN();
 }
-#endif
-
 
 SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nSetHeight
   (KNativePointer ptr, KBoolean override, KFloat height) {
