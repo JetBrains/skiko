@@ -23,8 +23,7 @@ import kotlin.system.getTimeNanos
 import platform.CoreGraphics.CGSizeMake
 
 internal class MetalRedrawer(
-    private val layer: SkiaLayer,
-    private val properties: SkiaLayerProperties
+    private val layer: SkiaLayer
 ) : Redrawer {
     private val contextHandler = MetalContextHandler(layer)
     override val renderInfo: String get() = contextHandler.rendererInfo()

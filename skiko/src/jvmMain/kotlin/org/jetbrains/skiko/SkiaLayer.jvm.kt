@@ -17,7 +17,7 @@ import javax.swing.UIManager
 
 actual open class SkiaLayer internal constructor(
     externalAccessibleFactory: ((Component) -> Accessible)? = null,
-    private val properties: SkiaLayerProperties = SkiaLayerProperties(),
+    private val properties: SkiaLayerProperties,
     private val renderFactory: RenderFactory = RenderFactory.Default
 ) : JPanel() {
 
@@ -47,9 +47,19 @@ actual open class SkiaLayer internal constructor(
     internal val backedLayer: HardwareLayer
 
     constructor(
-        properties: SkiaLayerProperties = SkiaLayerProperties(),
         externalAccessibleFactory: ((Component) -> Accessible)? = null,
-    ) : this(externalAccessibleFactory, properties, RenderFactory.Default)
+        isVsyncEnabled: Boolean = SkikoProperties.vsyncEnabled,
+        isVsyncFramelimitFallbackEnabled: Boolean = SkikoProperties.vsyncFramelimitFallbackEnabled,
+        renderApi: GraphicsApi = SkikoProperties.renderApi,
+    ) : this(
+        externalAccessibleFactory,
+        SkiaLayerProperties(
+            isVsyncEnabled,
+            isVsyncFramelimitFallbackEnabled,
+            renderApi
+        ),
+        RenderFactory.Default
+    )
 
     val canvas: java.awt.Canvas
         get() = backedLayer

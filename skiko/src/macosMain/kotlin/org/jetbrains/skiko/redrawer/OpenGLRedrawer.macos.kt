@@ -4,7 +4,6 @@ import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.useContents
 import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.SkiaLayer
-import org.jetbrains.skiko.SkiaLayerProperties
 import org.jetbrains.skiko.SkikoDispatchers
 import org.jetbrains.skiko.context.ContextHandler
 import org.jetbrains.skiko.context.MacOSOpenGLContextHandler
@@ -19,8 +18,7 @@ import platform.QuartzCore.*
 import kotlin.system.getTimeNanos
 
 internal class MacOsOpenGLRedrawer(
-    private val skiaLayer: SkiaLayer,
-    private val properties: SkiaLayerProperties
+    private val skiaLayer: SkiaLayer
 ) : Redrawer {
     private val contextHandler = MacOSOpenGLContextHandler(skiaLayer)
     override val renderInfo: String get() = contextHandler.rendererInfo()

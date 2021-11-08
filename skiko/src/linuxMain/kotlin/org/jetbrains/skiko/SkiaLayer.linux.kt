@@ -1,6 +1,6 @@
 package org.jetbrains.skiko
 
-actual open class SkiaLayer(properties: SkiaLayerProperties)  {
+actual open class SkiaLayer  {
     actual var renderApi: GraphicsApi
         get() = TODO("Not yet implemented")
         set(value) {}
