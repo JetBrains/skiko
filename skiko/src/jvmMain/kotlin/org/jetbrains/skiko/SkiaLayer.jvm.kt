@@ -226,7 +226,7 @@ actual open class SkiaLayer internal constructor(
 
     @Volatile
     private var picture: PictureHolder? = null
-    private var pictureRecorder = PictureRecorder()
+    private var pictureRecorder: PictureRecorder? = null
     private val pictureLock = Any()
 
     private fun findNextWorkingRenderApi() {
@@ -252,10 +252,10 @@ actual open class SkiaLayer internal constructor(
     }
 
     protected open fun init(recreation: Boolean = false) {
-        backedLayer.init()
         isDisposed = false
+        backedLayer.init()
+        pictureRecorder = PictureRecorder()
         if (recreation) {
-            pictureRecorder = PictureRecorder()
             fallbackRenderApiQueue.add(0, renderApi)
         }
         findNextWorkingRenderApi()
@@ -278,13 +278,15 @@ actual open class SkiaLayer internal constructor(
     open fun dispose() {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         if (isInited && !isDisposed) {
-            redrawer?.dispose()  // we should dispose redrawer first (to cancel `draw` in rendering thread)
+            // we should dispose redrawer first (to cancel `draw` in rendering thread)
+            redrawer?.dispose()
             redrawer = null
             contextHandler?.dispose()
             contextHandler = null
             picture?.instance?.close()
             picture = null
-            pictureRecorder.close()
+            pictureRecorder?.close()
+            pictureRecorder = null
             backedLayer.dispose()
             isDisposed = true
         }
@@ -417,7 +419,7 @@ actual open class SkiaLayer internal constructor(
         val pictureHeight = (height * contentScale).toInt().coerceAtLeast(0)
 
         val bounds = Rect.makeWH(pictureWidth.toFloat(), pictureHeight.toFloat())
-        val canvas = pictureRecorder.beginRecording(bounds)
+        val canvas = pictureRecorder!!.beginRecording(bounds)
 
         // clipping
         for (component in clipComponents) {
@@ -435,7 +437,7 @@ actual open class SkiaLayer internal constructor(
         if (!isDisposed) {
             synchronized(pictureLock) {
                 picture?.instance?.close()
-                val picture = pictureRecorder.finishRecordingAsPicture()
+                val picture = pictureRecorder!!.finishRecordingAsPicture()
                 this.picture = PictureHolder(picture, pictureWidth, pictureHeight)
             }
         }
