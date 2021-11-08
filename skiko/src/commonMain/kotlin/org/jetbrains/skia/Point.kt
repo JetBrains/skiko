@@ -2,7 +2,6 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.InteropScope
-import org.jetbrains.skia.impl.InteropScopeContext
 import org.jetbrains.skia.impl.withResult
 
 class Point(val x: Float, val y: Float) {
@@ -65,7 +64,7 @@ class Point(val x: Float, val y: Float) {
             return arr
         }
 
-        internal fun fromInteropPointer(block: InteropScopeContext): Point {
+        internal fun fromInteropPointer(block: InteropScope.(InteropPointer) -> Unit): Point {
             val result = withResult(FloatArray(2), block)
             return Point(result[0], result[1])
         }

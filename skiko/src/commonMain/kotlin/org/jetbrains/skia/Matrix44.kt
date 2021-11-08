@@ -2,7 +2,6 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.InteropScope
-import org.jetbrains.skia.impl.InteropScopeContext
 import org.jetbrains.skia.impl.withResult
 
 /**
@@ -59,7 +58,7 @@ class Matrix44(vararg mat: Float) {
     companion object {
         val IDENTITY = Matrix44(1f, 0f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1f)
 
-        internal fun fromInteropPointer(block: InteropScopeContext): Matrix44 {
+        internal fun fromInteropPointer(block: InteropScope.(InteropPointer) -> Unit): Matrix44 {
             val result = withResult(FloatArray(16), block)
             return Matrix44(*result)
         }
