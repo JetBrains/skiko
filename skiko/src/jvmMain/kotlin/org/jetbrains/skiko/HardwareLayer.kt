@@ -14,7 +14,7 @@ internal open class HardwareLayer(
 ) : Canvas() {
     companion object {
         init {
-            Library.load()
+            Library.staticLoad()
         }
     }
 

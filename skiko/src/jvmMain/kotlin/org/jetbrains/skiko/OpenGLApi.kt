@@ -29,7 +29,7 @@ class OpenGLApi private constructor() {
 
     companion object {
         init {
-            Library.load()
+            Library.staticLoad()
         }
         val instance = OpenGLApi()
     }

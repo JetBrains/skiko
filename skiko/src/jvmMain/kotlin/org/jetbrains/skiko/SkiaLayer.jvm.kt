@@ -24,7 +24,7 @@ actual open class SkiaLayer internal constructor(
 
     companion object {
         init {
-            Library.load()
+            Library.staticLoad()
         }
     }
 

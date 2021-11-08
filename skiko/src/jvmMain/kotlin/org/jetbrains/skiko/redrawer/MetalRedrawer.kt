@@ -22,7 +22,7 @@ internal class MetalRedrawer(
 
     companion object {
         init {
-            Library.load()
+            Library.staticLoad()
         }
     }
     private var isDisposed = false
