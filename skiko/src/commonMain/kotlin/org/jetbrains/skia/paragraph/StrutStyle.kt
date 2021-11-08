@@ -7,8 +7,10 @@ import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.withResult
 
 class StrutStyle internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
@@ -48,7 +50,10 @@ class StrutStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finali
     var fontStyle: FontStyle
         get() = try {
             Stats.onNativeCall()
-            FontStyle(_nGetFontStyle(_ptr))
+            val fontStyleData = withResult(IntArray(3)) {
+                _nGetFontStyle(_ptr, it)
+            }
+            FontStyle(fontStyleData[0], fontStyleData[1], FontSlant.values()[fontStyleData[2]])
         } finally {
             reachabilityBarrier(this)
         }
@@ -195,7 +200,7 @@ private external fun _nGetFontFamilies(ptr: NativePointer): Array<String>
 private external fun _nSetFontFamilies(ptr: NativePointer, families: Array<String?>?)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nGetFontStyle")
-private external fun _nGetFontStyle(ptr: NativePointer): Int
+private external fun _nGetFontStyle(ptr: NativePointer, fontStyleData: InteropPointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetFontStyle")
 private external fun _nSetFontStyle(ptr: NativePointer, value: Int)

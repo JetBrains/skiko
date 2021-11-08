@@ -42,10 +42,12 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleKt
     instance->setFontFamilies(skStringVector(env, familiesArr));
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleKt__1nGetFontStyle
-  (JNIEnv* env, jclass jclass, jlong ptr) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleKt__1nGetFontStyle
+  (JNIEnv* env, jclass jclass, jlong ptr, jintArray fontStyleData) {
     StrutStyle* instance = reinterpret_cast<StrutStyle*>(static_cast<uintptr_t>(ptr));
-    return skija::FontStyle::toJava(instance->getFontStyle());
+    SkFontStyle fontStyle = instance->getFontStyle();
+    jint res[3] = { fontStyle.weight(), fontStyle.width(), fontStyle.slant() };
+    env->SetIntArrayRegion(fontStyleData, 0, 3, res);
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleKt__1nSetFontStyle

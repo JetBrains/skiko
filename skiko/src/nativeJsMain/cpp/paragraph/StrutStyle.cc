@@ -61,20 +61,14 @@ SKIKO_EXPORT void org_jetbrains_skia_paragraph_StrutStyle__1nSetFontFamilies
 
 
 
-SKIKO_EXPORT KInt org_jetbrains_skia_paragraph_StrutStyle__1nGetFontStyle
-  (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_paragraph_StrutStyle__1nGetFontStyle");
+SKIKO_EXPORT void org_jetbrains_skia_paragraph_StrutStyle__1nGetFontStyle
+  (KNativePointer ptr, KInt* fontStyleData) {
+  StrutStyle* instance = reinterpret_cast<StrutStyle*>(ptr);
+  SkFontStyle fontStyle = instance->getFontStyle();
+  fontStyleData[0] = fontStyle.weight();
+  fontStyleData[1] = fontStyle.width();
+  fontStyleData[2] = fontStyle.slant();
 }
-     
-#if 0 
-SKIKO_EXPORT KInt org_jetbrains_skia_paragraph_StrutStyle__1nGetFontStyle
-  (KNativePointer ptr) {
-    StrutStyle* instance = reinterpret_cast<StrutStyle*>((ptr));
-    return skija::FontStyle::toJava(instance->getFontStyle());
-}
-#endif
-
-
 
 SKIKO_EXPORT void org_jetbrains_skia_paragraph_StrutStyle__1nSetFontStyle
   (KNativePointer ptr, KInt style) {
