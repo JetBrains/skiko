@@ -11,7 +11,7 @@ internal class AbortCallbackValue(@JsName("value") var value: Boolean?)
 internal actual fun registerAbortCallback(abort: (() -> Boolean)?): AbortCallback {
     if (abort == null) { return 0 }
 
-    val data = AbortCallbackValue(null) // We use array instead of structs due to field name mangling
+    val data = AbortCallbackValue(null)
     return _registerCallback({ data.value = abort() }, data)
 }
 
