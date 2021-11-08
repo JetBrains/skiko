@@ -6,11 +6,13 @@ actual typealias AbortCallback = Int
 
 private external fun _registerCallback(cb: () -> Unit, data: Any?): AbortCallback
 
+internal class AbortCallbackValue(@JsName("value") var value: Boolean?)
+
 internal actual fun registerAbortCallback(abort: (() -> Boolean)?): AbortCallback {
     if (abort == null) { return 0 }
 
-    val data = arrayOf<Boolean?>(null) // We use array instead of structs due to field name mangling
-    return _registerCallback({ data[0] = abort() }, data)
+    val data = AbortCallbackValue(null) // We use array instead of structs due to field name mangling
+    return _registerCallback({ data.value = abort() }, data)
 }
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nPlayback")

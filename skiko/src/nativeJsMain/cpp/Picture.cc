@@ -53,7 +53,7 @@ public:
 
     bool abort() override {
         int value = EM_ASM_INT({
-            return _callCallback($0)[0] ? 1 : 0;
+            return _callCallback($0).value ? 1 : 0;
         }, cb);
         return value == 1;
     }
