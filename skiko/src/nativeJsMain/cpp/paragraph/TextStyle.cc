@@ -88,27 +88,32 @@ SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nSetBackground
 }
 
 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_paragraph_TextStyle__1nGetDecorationStyle
-  (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nGetDecorationStyle");
-}
-
-#if 0
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_paragraph_TextStyle__1nGetDecorationStyle
-  (KNativePointer ptr) {
-    TextStyle* instance = reinterpret_cast<TextStyle*>(ptr);
+SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nGetDecorationStyle
+  (KNativePointer ptr, KInt* res) {
+    TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     Decoration d = instance->getDecoration();
-    return env->NewObject(skija::paragraph::DecorationStyle::cls, skija::paragraph::DecorationStyle::ctor,
-      (d.fType & TextDecoration::kUnderline) != 0,
-      (d.fType & TextDecoration::kOverline) != 0,
-      (d.fType & TextDecoration::kLineThrough) != 0,
-      d.fMode == TextDecorationMode::kGaps,
-      d.fColor,
-      static_cast<KInt>(d.fStyle),
-      d.fThicknessMultiplier);
-}
-#endif
 
+    res[0] = 0;
+    if ((d.fType & TextDecoration::kUnderline) != 0) {
+        res[0] = res[0] | (1 << 0);
+    }
+
+    if ((d.fType & TextDecoration::kOverline) != 0) {
+        res[0] = res[0] | (1 << 1);
+    }
+
+    if ((d.fType & TextDecoration::kLineThrough) != 0) {
+        res[0] = res[0] | (1 << 2);
+    }
+
+    if (d.fMode == TextDecorationMode::kGaps) {
+        res[0] = res[0] | (1 << 3);
+    }
+
+    res[1] = d.fColor;
+    res[2] = static_cast<KInt>(d.fStyle);
+    res[3] = rawBits(d.fThicknessMultiplier);
+}
 
 SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nSetDecorationStyle
   (KNativePointer ptr, KBoolean underline, KBoolean overline, KBoolean lineThrough, KBoolean gaps, KInt color, KInt style, KFloat thicknessMultiplier) {

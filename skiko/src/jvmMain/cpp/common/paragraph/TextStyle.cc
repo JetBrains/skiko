@@ -87,18 +87,35 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_
     }
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nGetDecorationStyle
-  (JNIEnv* env, jclass jclass, jlong ptr) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nGetDecorationStyle
+  (JNIEnv* env, jclass jclass, jlong ptr, jintArray res) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     Decoration d = instance->getDecoration();
-    return env->NewObject(skija::paragraph::DecorationStyle::cls, skija::paragraph::DecorationStyle::ctor,
-      (d.fType & TextDecoration::kUnderline) != 0,
-      (d.fType & TextDecoration::kOverline) != 0,
-      (d.fType & TextDecoration::kLineThrough) != 0,
-      d.fMode == TextDecorationMode::kGaps,
-      d.fColor,
-      static_cast<jint>(d.fStyle),
-      d.fThicknessMultiplier);
+
+    jint r[4] = {
+        0,
+        d.fColor,
+        static_cast<jint>(d.fStyle),
+        rawBits(d.fThicknessMultiplier)
+    };
+
+    if ((d.fType & TextDecoration::kUnderline) != 0) {
+        r[0] = r[0] | (1 << 0);
+    }
+
+    if ((d.fType & TextDecoration::kOverline) != 0) {
+        r[0] = r[0] | (1 << 1);
+    }
+
+    if ((d.fType & TextDecoration::kLineThrough) != 0) {
+        r[0] = r[0] | (1 << 2);
+    }
+
+    if (d.fMode == TextDecorationMode::kGaps) {
+        r[0] = r[0] | (1 << 3);
+    }
+
+    env->SetIntArrayRegion(res, 0, 4, r);
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nSetDecorationStyle

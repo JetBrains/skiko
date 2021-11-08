@@ -110,10 +110,24 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         }
     }
 
-    var decorationStyle: org.jetbrains.skia.paragraph.DecorationStyle
+    var decorationStyle: DecorationStyle
         get() = try {
             Stats.onNativeCall()
-            _nGetDecorationStyle(_ptr)
+            val decorationStyleData = withResult(IntArray(4)) {
+                _nGetDecorationStyle(_ptr, it)
+            }
+
+            val decorationStyleFlags = decorationStyleData[0]
+
+            DecorationStyle(
+                underline = ((decorationStyleFlags shr 0) and 1) == 1,
+                overline = ((decorationStyleFlags shr 1) and 1) == 1,
+                lineThrough = ((decorationStyleFlags shr 2) and 1) == 1,
+                gaps = ((decorationStyleFlags shr 3) and 1) == 1,
+                color = decorationStyleData[1],
+                lineStyle = decorationStyleData[2],
+                thicknessMultiplier = Float.fromBits(decorationStyleData[3])
+            )
         } finally {
             reachabilityBarrier(this)
         }
@@ -463,7 +477,7 @@ private external fun _nGetBackground(ptr: NativePointer): NativePointer
 private external fun _nSetBackground(ptr: NativePointer, paintPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetDecorationStyle")
-private external fun _nGetDecorationStyle(ptr: NativePointer): DecorationStyle
+private external fun _nGetDecorationStyle(ptr: NativePointer, decorationStyle: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetDecorationStyle")
 private external fun _nSetDecorationStyle(

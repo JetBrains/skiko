@@ -91,8 +91,6 @@ class TextStyleTest {
     }
 
     @Test
-    @SkipJsTarget
-    @SkipNativeTarget
     fun textDecorationStyleTest() {
         TextStyle().use { textStyle ->
             textStyle.decorationStyle = DecorationStyle(
