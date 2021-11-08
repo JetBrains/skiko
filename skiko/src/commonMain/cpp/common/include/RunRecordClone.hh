@@ -52,12 +52,17 @@ public:
     }
 
     static unsigned ScalarsPerGlyph(uint8_t pos) {
-        const uint8_t gScalarsPerPositioning[] = {
-            0,  // kDefault_Positioning
-            1,  // kHorizontal_Positioning
-            2,  // kFull_Positioning
-            4,  // kRSXform_Positioning
-        };
-        return gScalarsPerPositioning[pos];
+        uint8_t res = 0;
+        switch(pos) {
+            case 0: // kDefault_Positioning
+            case 1: // kHorizontal_Positioning
+            case 2: // kFull_Positioning
+                res = pos;
+                break;
+            case 3: // kRSXform_Positioning
+                res = 4;
+                break;
+        }
+        return res;
     }
 };

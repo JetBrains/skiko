@@ -3,6 +3,7 @@ package org.jetbrains.skia
 import org.jetbrains.skia.tests.assertCloseEnough
 import org.jetbrains.skia.tests.assertContentCloseEnough
 import org.jetbrains.skia.tests.makeFromResource
+import org.jetbrains.skiko.KotlinBackend
 import org.jetbrains.skiko.kotlinBackend
 import org.jetbrains.skiko.tests.runTest
 import kotlin.math.cos
@@ -15,7 +16,10 @@ class TextBlobTest {
         Font(Typeface.makeFromResource("./fonts/Inter-Hinted-Regular.ttf"), 36f)
     }
 
-    private val eps = 0.001f // only this value works for kotlin/js
+    private val eps = when (kotlinBackend) {
+        KotlinBackend.JS -> 0.02f // smaller values make tests fail when running in k/js
+        else -> 0.00001f
+    }
 
     @Test
     fun canMakeFromPos() = runTest {
@@ -61,7 +65,7 @@ class TextBlobTest {
                 217.8335f, 229.33693f, 231.25397f
             ),
             actual = textBlob.getIntercepts(lowerBound = 0f, upperBound = 1f),
-            epsilon = 0.02f // smaller values don't work on k/js :(
+            epsilon = eps // smaller values don't work on k/js :(
         )
 
         // Ensure can get tightBounds. we don't make assertEquals because platforms' results vary
@@ -142,7 +146,7 @@ class TextBlobTest {
                 181.40268f, 189.04546f, 192.0625f, 198.04546f, 201.0625f, 210.14375f, 219.9017f, 228.26941f, 232.32149f
             ),
             actual = textBlob.getIntercepts(lowerBound = 0f, upperBound = 1f)!!,
-            epsilon = 0.02f // smaller values don't work on k/js :(
+            epsilon = eps
         )
 
         assertFailsWith<IllegalArgumentException> { textBlob.tightBounds }
