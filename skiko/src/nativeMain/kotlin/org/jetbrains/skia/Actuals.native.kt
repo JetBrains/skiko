@@ -6,7 +6,7 @@ actual fun <R> commonSynchronized(lock: Any, block: () -> R) {
     block()
 }
 
-actual fun String.intCodePoints(): IntArray = toList().map { it.code }.toIntArray()
+actual fun String.intCodePoints(): IntArray = IntArray(this.length) { this[it].code }
 
 actual class Pattern constructor(regex: String) {
     private val _regex = Regex(regex)
