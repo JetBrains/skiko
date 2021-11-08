@@ -2,6 +2,7 @@
 #include <jni.h>
 #include "SkTextBlob.h"
 #include "interop.hh"
+#include "mppinterop.h"
 
 static void deleteTextBlobBuilder(SkTextBlobBuilder* ptr) {
     delete ptr;
@@ -24,13 +25,18 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TextBlobBuilderKt__1n
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TextBlobBuilderKt__1nAppendRun
-  (JNIEnv* env, jclass jclass, jlong ptr, jlong fontPtr, jshortArray glyphsArr, jfloat x, jfloat y, jobject boundsObj) {
+  (JNIEnv* env, jclass jclass, jlong ptr, jlong fontPtr, jshortArray glyphsArr, jint glyphsLen, jfloat x, jfloat y, jfloatArray rectFloats) {
     SkTextBlobBuilder* instance = reinterpret_cast<SkTextBlobBuilder*>(static_cast<uintptr_t>(ptr));
     SkFont* font = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(fontPtr));
-    jsize len = env->GetArrayLength(glyphsArr);
-    std::unique_ptr<SkRect> bounds = skija::Rect::toSkRect(env, boundsObj);
-    SkTextBlobBuilder::RunBuffer run = instance->allocRun(*font, len, x, y, bounds.get());
-    env->GetShortArrayRegion(glyphsArr, 0, len, reinterpret_cast<jshort*>(run.glyphs));
+
+    jfloat* skRectFloats = rectFloats != NULL ? env->GetFloatArrayElements(rectFloats, NULL) : NULL;
+    std::unique_ptr<SkRect> bounds = skikoMpp::skrect::toSkRect(reinterpret_cast<float*>(skRectFloats));
+    if (rectFloats != NULL) {
+        env->ReleaseFloatArrayElements(rectFloats, skRectFloats, 0);
+    }
+
+    SkTextBlobBuilder::RunBuffer run = instance->allocRun(*font, glyphsLen, x, y, bounds.get());
+    env->GetShortArrayRegion(glyphsArr, 0, glyphsLen, reinterpret_cast<jshort*>(run.glyphs));
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TextBlobBuilderKt__1nAppendRunPosH

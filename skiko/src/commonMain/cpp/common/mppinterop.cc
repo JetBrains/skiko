@@ -10,6 +10,19 @@ namespace skikoMpp {
             result[2] = rect.fRight;
             result[3] = rect.fBottom;
         }
+
+        std::unique_ptr<SkRect> toSkRect(float* topLeftRightBottom) {
+            if (topLeftRightBottom == nullptr) {
+                return std::unique_ptr<SkRect>(nullptr);
+            } else {
+                SkRect* rect = new SkRect();
+                rect->setLTRB(
+                    topLeftRightBottom[0], topLeftRightBottom[1],
+                    topLeftRightBottom[2], topLeftRightBottom[3]
+                );
+                return std::unique_ptr<SkRect>(rect);
+            }
+        }
     }
 
     namespace textblob {
