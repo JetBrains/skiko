@@ -25,6 +25,14 @@ class FontTests {
 
             assertContentEquals(floatArrayOf(0f, 7f, 14f, 21f, 28f), font.getXPositions(glyphs))
             assertContentEquals(floatArrayOf(3f, 10f, 17f, 24f, 31f), font.getXPositions(glyphs, 3f))
+
+            assertContentEquals(arrayOf(
+                Point(0f, 0f),
+                Point(7f, 0f),
+                Point(14f, 0f),
+                Point(21f, 0f),
+                Point(28f, 0f),
+            ), font.getPositions(glyphs))
         }
     }
 }
