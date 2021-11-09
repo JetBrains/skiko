@@ -359,25 +359,11 @@ SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_Font__1nGetPositions
 #endif
 
 
-
-SKIKO_EXPORT KFloat* org_jetbrains_skia_Font__1nGetXPositions
-  (KNativePointer ptr, KShort* glyphsArr, KFloat dx) {
-    TODO("implement org_jetbrains_skia_Font__1nGetXPositions");
-}
-
-#if 0
-SKIKO_EXPORT KFloat* org_jetbrains_skia_Font__1nGetXPositions
-  (KNativePointer ptr, KShort* glyphsArr, KFloat dx) {
+SKIKO_EXPORT void org_jetbrains_skia_Font__1nGetXPositions
+  (KNativePointer ptr, KShort* glyphs, KFloat dx, KInt count, KFloat* positions) {
     SkFont* instance = reinterpret_cast<SkFont*>(ptr);
-    int count = env->GetArrayLength(glyphsArr);
-    std::vector<KFloat> positions(count);
-    KShort* glyphs = env->GetShortArrayElements(glyphsArr, nullptr);
-    instance->getXPos(reinterpret_cast<SkGlyphID*>(glyphs), count, positions.data(), dx);
-    env->ReleaseShortArrayElements(glyphsArr, glyphs, 0);
-    return javaFloatArray(env, positions);
+    instance->getXPos(reinterpret_cast<SkGlyphID*>(glyphs), count, positions, dx);
 }
-#endif
-
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Font__1nGetPath
   (KNativePointer ptr, KShort glyph) {

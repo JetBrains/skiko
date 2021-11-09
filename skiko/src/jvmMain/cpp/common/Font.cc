@@ -311,15 +311,14 @@ extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_FontKt__1nGetP
     return skija::Point::fromSkPoints(env, positions);
 }
 
-extern "C" JNIEXPORT jfloatArray JNICALL Java_org_jetbrains_skia_FontKt__1nGetXPositions
-  (JNIEnv* env, jclass jclass, jlong ptr, jshortArray glyphsArr, jfloat dx) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nGetXPositions
+  (JNIEnv* env, jclass jclass, jlong ptr, jshortArray glyphsArr, jfloat dx, jint count, jfloatArray res) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
-    int count = env->GetArrayLength(glyphsArr);
     std::vector<jfloat> positions(count);
     jshort* glyphs = env->GetShortArrayElements(glyphsArr, nullptr);
     instance->getXPos(reinterpret_cast<SkGlyphID*>(glyphs), count, positions.data(), dx);
     env->ReleaseShortArrayElements(glyphsArr, glyphs, 0);
-    return javaFloatArray(env, positions);
+    env->SetFloatArrayRegion(res, 0, count, positions.data());
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontKt__1nGetPath
