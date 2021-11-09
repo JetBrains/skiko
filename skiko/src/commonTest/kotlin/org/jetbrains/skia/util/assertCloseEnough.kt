@@ -37,25 +37,27 @@ internal fun assertCloseEnough(expected: Rect, actual: Rect?, epsilon: Float = E
     assertCloseEnough(expected.bottom, actual.bottom, epsilon)
 }
 
+private fun fail(message: String) {
+    throw AssertionError(message)
+}
+
 internal fun assertContentCloseEnough(expected: FloatArray, actual: FloatArray?, epsilon: Float = EPSILON) {
-    if (actual == null) {
-        throw AssertionError("expected $expected, got null")
-    }
+    assertNotNull(actual)
 
     for (i in expected.indices) {
         if (abs(expected[i] - actual[i]) > epsilon) {
-            throw AssertionError("results differ at index$i, expected ${expected[i]}, got ${actual[i]}")
+            fail("results differ at index$i, expected ${expected[i]}, got ${actual[i]}")
         }
     }
 }
 
-internal fun assertContentCloseEnough(expected: Array<Point>, actual: Array<Point>?, epsilon: Float = EPSILON) {
+internal fun assertContentCloseEnough(expected: Array<Point>, actual: Array<Point>, epsilon: Float = EPSILON) {
     assertNotNull(actual)
     for (i in expected.indices) {
         try {
             assertCloseEnough(expected[i], actual[i], epsilon)
         } catch (e: AssertionError) {
-            throw AssertionError("results differ at index $i, ${e.message}")
+            fail("results differ at index $i, ${e.message}")
         }
     }
 }
