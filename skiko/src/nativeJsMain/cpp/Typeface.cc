@@ -239,4 +239,3 @@ SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Typeface__1nGetBounds
     return skija::Rect::fromSkRect(env, instance->getBounds());
 }
 #endif
-

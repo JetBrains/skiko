@@ -198,24 +198,19 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetK
     return false;
 }
 
-extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetFamilyNames
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetFamilyNames
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     SkTypeface::LocalizedStrings* iter = instance->createFamilyNameIterator();
     std::vector<SkTypeface::LocalizedString> names;
     SkTypeface::LocalizedString name;
+    std::vector<jlong>* res = new std::vector<jlong>();
     while (iter->next(&name)) {
-        names.push_back(name);
+        res->push_back(reinterpret_cast<jlong>(new SkString(name.fString)));
+        res->push_back(reinterpret_cast<jlong>(new SkString(name.fLanguage)));
     }
-    iter->unref();
-    jobjectArray res = env->NewObjectArray((jsize) names.size(), skija::FontFamilyName::cls, nullptr);
-    for (int i = 0; i < names.size(); ++i) {
-        skija::AutoLocal<jstring> nameStr(env, javaString(env, names[i].fString));
-        skija::AutoLocal<jstring> langStr(env, javaString(env, names[i].fLanguage));
-        skija::AutoLocal<jobject> obj(env, env->NewObject(skija::FontFamilyName::cls, skija::FontFamilyName::ctor, nameStr.get(), langStr.get()));
-        env->SetObjectArrayElement(res, i, obj.get());
-    }
-    return res;
+
+    return reinterpret_cast<jlong>(res);
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetFamilyName
@@ -231,3 +226,22 @@ extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_TypefaceKt_Typeface
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     return skija::Rect::fromSkRect(env, instance->getBounds());
 }
+
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TypefaceKt_StdVectorDecoder_1nGetArraySize
+    (JNIEnv* env, jclass jclass, jlong ptr) {
+        std::vector<jlong>* vect = reinterpret_cast<std::vector<jlong> *>(ptr);
+        return static_cast<jint>(vect->size());
+    }
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TypefaceKt_StdVectorDecoder_1nDisposeArray
+    (JNIEnv* env, jclass jclass, jlong ptr) {
+        std::vector<jlong>* vect = reinterpret_cast<std::vector<jlong> *>(ptr);
+        delete vect;
+    }
+
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TypefaceKt_StdVectorDecoder_1nGetArrayElement
+    (JNIEnv* env, jclass jclass, jlong ptr, jint index) {
+        std::vector<jlong>* vect = reinterpret_cast<std::vector<jlong> *>(ptr);
+        return vect->at(index);
+    }
+
