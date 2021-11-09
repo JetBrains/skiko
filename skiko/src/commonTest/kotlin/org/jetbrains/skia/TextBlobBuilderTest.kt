@@ -189,10 +189,7 @@ class TextBlobBuilderTest {
             actual = textBlob.glyphs
         )
 
-        assertCloseEnough(
-            expected = Rect(-1f, -28f, 138.784098f, 152f),
-            actual = textBlob.bounds.also { println(it) },
-            epsilon = 0.2f
-        )
+        // We don't make assertions because bounds vary on platforms. So at least ensure this doesn't throw an exception.
+        val bounds = textBlob.bounds
     }
 }
