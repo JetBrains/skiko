@@ -453,12 +453,7 @@ class Font : Managed {
      * Retrieves the positions for each glyph.
      */
     fun getPositions(glyphs: ShortArray?): Array<Point> {
-        return try {
-            Stats.onNativeCall()
-            _nGetPositions(_ptr, glyphs, 0f, 0f)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        return getPositions(glyphs, Point(0f, 0f))
     }
 
     /**
