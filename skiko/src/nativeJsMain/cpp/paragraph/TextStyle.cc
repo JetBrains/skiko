@@ -305,7 +305,6 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_paragraph_TextStyle__1nGetLocale
 SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nSetLocale
   (KNativePointer ptr, KInteropPointer locale) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(ptr);
-    std::cout << "TEXT STYLE: " << skString(locale).c_str() << "\r\n";
     instance->setLocale(skString(locale));
 }
 
