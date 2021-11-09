@@ -25,6 +25,7 @@
 #include "SkShaper.h"
 #include "SkLoadICU.h"
 #include "unicode/ubrk.h"
+#include "mppinterop.h"
 
 #include "types.h"
 
@@ -39,20 +40,6 @@ namespace skija {
         SkSamplingOptions unpack(KLong val);
         SkSamplingOptions unpackFrom2Ints(KInt val1, KInt val2);
     }
-
-    class UtfIndicesConverter {
-    public:
-        UtfIndicesConverter(const char* chars8, size_t len8);
-        UtfIndicesConverter(const SkString& s);
-
-        const char* fStart8;
-        const char* fPtr8;
-        const char* fEnd8;
-        uint32_t fPos16;
-
-        size_t from16To8(uint32_t i16);
-        uint32_t from8To16(size_t i8);
-    };
 
     namespace Rect {
         void copyToInterop(const SkRect& rect, KInteropPointer pointer);
@@ -160,6 +147,15 @@ static inline KInt rawBits(KFloat f) {
     } u;
     u.f = f;
     return u.i;
+}
+
+static inline KFloat fromBits(KInt i) {
+    union {
+        KFloat f;
+        KInt i;
+    } u;
+    u.i = i;
+    return u.f;
 }
 
 // Callback support

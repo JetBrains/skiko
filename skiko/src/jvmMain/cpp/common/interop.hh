@@ -18,6 +18,7 @@
 #include "SkString.h"
 #include "SkSurfaceProps.h"
 #include "TextStyle.h"
+#include "mppinterop.h"
 
 namespace java {
     namespace io {
@@ -321,20 +322,6 @@ namespace skija {
             SkSamplingOptions unpackFrom2Ints(JNIEnv* env, jint val1, jint val2);
         }
 
-    class UtfIndicesConverter {
-        public:
-            UtfIndicesConverter(const char* chars8, size_t len8);
-            UtfIndicesConverter(const SkString& s);
-
-            const char* fStart8;
-            const char* fPtr8;
-            const char* fEnd8;
-            uint32_t fPos16;
-
-            size_t from16To8(uint32_t i16);
-            uint32_t from8To16(size_t i8);
-    };
-
     namespace impl {
         namespace Native {
             extern jfieldID _ptr;
@@ -397,4 +384,13 @@ static inline jint rawBits(jfloat f) {
     } u;
     u.f = f;
     return u.i;
+}
+
+static inline jfloat fromBits(jint i) {
+    union {
+        jfloat f;
+        jint i;
+    } u;
+    u.i = i;
+    return u.f;
 }

@@ -711,33 +711,35 @@ val linkJvmBindings = tasks.register<LinkSkikoTask>("linkJvmBindings") {
     flags.set(listOf(*osFlags))
 }
 
-// Very hacky way to compile Objective-C sources and add the
-// resulting object files into the final library.
-project.tasks.register<Exec>("objcCompile") {
-    val inputDir = "$projectDir/src/jvmMain/objectiveC/${targetOs.id}"
-    val outDir = "$buildDir/objc/$target"
-    val names = File(inputDir).listFiles()!!.map { it.name.removeSuffix(".mm") }
-    val srcs = names.map { "$inputDir/$it.mm" }.toTypedArray()
-    val outs = names.map { "$outDir/$it.o" }.toTypedArray()
-    workingDir = File(outDir)
-    val skiaDir = skiaJvmBindingsDir.get().absolutePath
-    commandLine = listOf(
-        "clang",
-        *targetOs.clangFlags,
-        "-I$jdkHome/include",
-        "-I$jdkHome/include/darwin",
-        "-I$skiaDir",
-        "-I$skiaDir/include",
-        "-I$skiaDir/include/gpu",
-        "-fobjc-arc",
-        "-DSK_METAL",
-        "-std=c++17",
-        "-c",
-        *srcs
-    )
-    file(outDir).mkdirs()
-    inputs.files(srcs)
-    outputs.files(outs)
+if (hostOs == OS.MacOS) {
+    // Very hacky way to compile Objective-C sources and add the
+    // resulting object files into the final library.
+    project.tasks.register<Exec>("objcCompile") {
+        val inputDir = "$projectDir/src/jvmMain/objectiveC/${targetOs.id}"
+        val outDir = "$buildDir/objc/$target"
+        val names = File(inputDir).listFiles()!!.map { it.name.removeSuffix(".mm") }
+        val srcs = names.map { "$inputDir/$it.mm" }.toTypedArray()
+        val outs = names.map { "$outDir/$it.o" }.toTypedArray()
+        workingDir = File(outDir)
+        val skiaDir = skiaJvmBindingsDir.get().absolutePath
+        commandLine = listOf(
+            "clang",
+            *targetOs.clangFlags,
+            "-I$jdkHome/include",
+            "-I$jdkHome/include/darwin",
+            "-I$skiaDir",
+            "-I$skiaDir/include",
+            "-I$skiaDir/include/gpu",
+            "-fobjc-arc",
+            "-DSK_METAL",
+            "-std=c++17",
+            "-c",
+            *srcs
+        )
+        file(outDir).mkdirs()
+        inputs.files(srcs)
+        outputs.files(outs)
+    }
 }
 
 val generateVersion = project.tasks.register("generateVersion") {
@@ -963,8 +965,7 @@ tasks.withType<Test>().configureEach {
 
         systemProperty("skiko.test.screenshots.dir", File(project.projectDir, "src/jvmTest/screenshots").absolutePath)
         systemProperty("skiko.test.ui.enabled", System.getProperty("skiko.test.ui.enabled", "false"))
-        // TODO make "all" by default after we fix all tests
-        systemProperty("skiko.test.ui.renderApi", System.getProperty("skiko.test.ui.renderApi", "default"))
+        systemProperty("skiko.test.ui.renderApi", System.getProperty("skiko.test.ui.renderApi", "all"))
 
         // Tests should be deterministic, so disable scaling.
         // On MacOs we need the actual scale, otherwise we will have aliased screenshots because of scaling.
