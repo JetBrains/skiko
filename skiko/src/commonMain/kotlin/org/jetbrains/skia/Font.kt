@@ -340,7 +340,7 @@ class Font : Managed {
                 shortArrayOf()
             } else {
                 withResult(ShortArray(uni.size)) {
-                    _nGetUTF32Glyphs(_ptr, uni, uni.size, it)
+                    _nGetUTF32Glyphs(_ptr, toInterop(uni), uni.size, it)
                 }
             }
         } finally {
