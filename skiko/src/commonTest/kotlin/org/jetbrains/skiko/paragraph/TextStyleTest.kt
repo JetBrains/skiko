@@ -118,8 +118,6 @@ class TextStyleTest {
     }
 
     @Test
-    @SkipJsTarget
-    @SkipNativeTarget
     fun textStyleHeightTest() {
         TextStyle().use { textStyle ->
             assertNull(textStyle.height)
