@@ -94,7 +94,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_
 
     jint r[4] = {
         0,
-        d.fColor,
+        static_cast<jint>(d.fColor),
         static_cast<jint>(d.fStyle),
         rawBits(d.fThicknessMultiplier)
     };

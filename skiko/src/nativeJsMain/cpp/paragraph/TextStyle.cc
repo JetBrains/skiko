@@ -110,7 +110,7 @@ SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nGetDecorationStyle
         res[0] = res[0] | (1 << 3);
     }
 
-    res[1] = d.fColor;
+    res[1] = static_cast<KInt>(d.fColor);
     res[2] = static_cast<KInt>(d.fStyle);
     res[3] = rawBits(d.fThicknessMultiplier);
 }
