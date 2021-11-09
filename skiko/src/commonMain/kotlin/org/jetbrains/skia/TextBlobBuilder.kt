@@ -130,14 +130,17 @@ class TextBlobBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _F
         return try {
             require(glyphs.size == xs.size) { "glyphs.length " + glyphs.size + " != xs.length " + xs.size }
             Stats.onNativeCall()
-            _nAppendRunPosH(
-                _ptr,
-                getPtr(font),
-                glyphs,
-                xs,
-                y,
-                bounds
-            )
+            interopScope {
+                _nAppendRunPosH(
+                    _ptr,
+                    getPtr(font),
+                    toInterop(glyphs),
+                    glyphs.size,
+                    toInterop(xs),
+                    y,
+                    toInterop(bounds?.serializeToFloatArray())
+                )
+            }
             this
         } finally {
             reachabilityBarrier(font)
@@ -243,10 +246,11 @@ private external fun _nAppendRun(
 private external fun _nAppendRunPosH(
     ptr: NativePointer,
     fontPtr: NativePointer,
-    glyphs: ShortArray?,
-    xs: FloatArray?,
+    glyphs: InteropPointer,
+    glyphsLen: Int,
+    xs: InteropPointer,
     y: Float,
-    bounds: Rect?
+    bounds: InteropPointer
 )
 
 

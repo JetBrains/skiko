@@ -77,6 +77,11 @@ class TextBlobBuilderTest {
             actual = textBlob.glyphs
         )
 
+        assertContentEquals(
+            expected = FloatArray(glyphs.size) { (it + 1) * 10f  },
+            actual = textBlob.positions
+        )
+
         assertCloseEnough(
             expected = Rect(0f, 0f, 50f, 40f),
             textBlob.bounds

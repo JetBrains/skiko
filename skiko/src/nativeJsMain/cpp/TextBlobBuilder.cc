@@ -37,24 +37,16 @@ SKIKO_EXPORT void org_jetbrains_skia_TextBlobBuilder__1nAppendRun
 
 
 SKIKO_EXPORT void org_jetbrains_skia_TextBlobBuilder__1nAppendRunPosH
-  (KNativePointer ptr, KNativePointer fontPtr, KShort* glyphsArr, KFloat* xsArr, KFloat y, KInteropPointer boundsObj) {
-    TODO("implement org_jetbrains_skia_TextBlobBuilder__1nAppendRunPosH");
-}
-
-#if 0
-SKIKO_EXPORT void org_jetbrains_skia_TextBlobBuilder__1nAppendRunPosH
-  (KNativePointer ptr, KNativePointer fontPtr, KShort* glyphsArr, KFloat* xsArr, KFloat y, KInteropPointer boundsObj) {
+  (KNativePointer ptr, KNativePointer fontPtr, KShort* glyphsArr, KInt glyphsLen, KFloat* xsArr, KFloat y, KFloat* rectFloats) {
     SkTextBlobBuilder* instance = reinterpret_cast<SkTextBlobBuilder*>((ptr));
     SkFont* font = reinterpret_cast<SkFont*>((fontPtr));
-    jsize len = env->GetArrayLength(glyphsArr);
-    std::unique_ptr<SkRect> bounds = skija::Rect::toSkRect(env, boundsObj);
-    SkTextBlobBuilder::RunBuffer run = instance->allocRunPosH(*font, len, y, bounds.get());
-    env->GetShortArrayRegion(glyphsArr, 0, len, reinterpret_cast<KShort*>(run.glyphs));
-    env->GetFloatArrayRegion(xsArr, 0, len, reinterpret_cast<KFloat*>(run.pos));
+
+    std::unique_ptr<SkRect> bounds = skikoMpp::skrect::toSkRect(reinterpret_cast<float*>(rectFloats));
+    SkTextBlobBuilder::RunBuffer run = instance->allocRunPosH(*font, glyphsLen, y, bounds.get());
+
+    memcpy(run.glyphs, glyphsArr, glyphsLen * sizeof(KShort));
+    memcpy(run.pos, xsArr, glyphsLen * sizeof(KFloat));
 }
-#endif
-
-
 
 SKIKO_EXPORT void org_jetbrains_skia_TextBlobBuilder__1nAppendRunPos
   (KNativePointer ptr, KNativePointer fontPtr, KShort* glyphsArr, KFloat* posArr, KInteropPointer boundsObj) {
