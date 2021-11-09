@@ -299,10 +299,8 @@ extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_FontKt__1nGetB
 }
 
 extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_FontKt__1nGetPositions
-  (JNIEnv* env, jclass jclass, jlong ptr, jshortArray glyphsArr, jfloat dx, jfloat dy) {
+  (JNIEnv* env, jclass jclass, jlong ptr, jshortArray glyphsArr, jint count, jfloat dx, jfloat dy) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
-
-    int count = env->GetArrayLength(glyphsArr);
     std::vector<SkPoint> positions(count);
     jshort* glyphs = env->GetShortArrayElements(glyphsArr, nullptr);
     instance->getPos(reinterpret_cast<SkGlyphID*>(glyphs), count, positions.data(), {dx, dy});
