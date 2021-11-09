@@ -220,15 +220,14 @@ extern "C" JNIEXPORT jshortArray JNICALL Java_org_jetbrains_skia_FontKt__1nGetSt
     return javaShortArray(env, glyphs);
 }
 
-extern "C" JNIEXPORT jshortArray JNICALL Java_org_jetbrains_skia_FontKt__1nGetUTF32Glyphs
-  (JNIEnv* env, jclass jclass, jlong ptr, jintArray uniArr) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nGetUTF32Glyphs
+  (JNIEnv* env, jclass jclass, jlong ptr, jintArray uniArr, jint uniArrLen, jshortArray resultGlyphs) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
-    int count = env->GetArrayLength(uniArr);
-    std::vector<jshort> glyphs(count);
+    jshort* shorts = env->GetShortArrayElements(resultGlyphs, nullptr);
     jint* uni = env->GetIntArrayElements(uniArr, nullptr);
-    instance->unicharsToGlyphs(reinterpret_cast<SkUnichar*>(uni), count, reinterpret_cast<SkGlyphID*>(glyphs.data()));
+    instance->unicharsToGlyphs(reinterpret_cast<SkUnichar*>(uni), uniArrLen, reinterpret_cast<SkGlyphID*>(shorts));
     env->ReleaseIntArrayElements(uniArr, uni, 0);
-    return javaShortArray(env, glyphs);
+    env->ReleaseShortArrayElements(resultGlyphs, shorts, 0);
 }
 
 extern "C" JNIEXPORT jshort JNICALL Java_org_jetbrains_skia_FontKt__1nGetUTF32Glyph
@@ -303,7 +302,7 @@ extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_FontKt__1nGetB
 extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_FontKt__1nGetPositions
   (JNIEnv* env, jclass jclass, jlong ptr, jshortArray glyphsArr, jfloat dx, jfloat dy) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
-    
+
     int count = env->GetArrayLength(glyphsArr);
     std::vector<SkPoint> positions(count);
     jshort* glyphs = env->GetShortArrayElements(glyphsArr, nullptr);
@@ -335,7 +334,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontKt__1nGetPath
 extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_FontKt__1nGetPaths
   (JNIEnv* env, jclass jclass, jlong ptr, jshortArray glyphsArr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
-    
+
     int count = env->GetArrayLength(glyphsArr);
     jshort* glyphs = env->GetShortArrayElements(glyphsArr, nullptr);
 
