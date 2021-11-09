@@ -181,14 +181,10 @@ SKIKO_EXPORT bool org_jetbrains_skia_Typeface__1nGetKerningPairAdjustments
   SkTypeface* instance = reinterpret_cast<SkTypeface*>(ptr);
   if (count > 0) {
       std::vector<int> adjustments(count);
-      bool hasAdjustments = instance->getKerningPairAdjustments(
+      return instance->getKerningPairAdjustments(
         reinterpret_cast<SkGlyphID*>(glyphs), count,
-        reinterpret_cast<int32_t*>(adjustments.data())
+        reinterpret_cast<int32_t*>(res)
       );
-      if (hasAdjustments) {
-          memcpy(res, adjustments.data(), adjustments.size() * sizeof(int));
-      }
-      return hasAdjustments;
   }
 
   return false;
