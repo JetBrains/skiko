@@ -227,7 +227,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nGetUTF32Glyp
     jint* uni = env->GetIntArrayElements(uniArr, nullptr);
     instance->unicharsToGlyphs(reinterpret_cast<SkUnichar*>(uni), uniArrLen, reinterpret_cast<SkGlyphID*>(shorts));
     env->ReleaseIntArrayElements(uniArr, uni, 0);
-    env->ReleaseShortArrayElements(resultGlyphs, shorts, 0);
+    env->SetShortArrayRegion(res, 0, count, glyphs.data());
 }
 
 extern "C" JNIEXPORT jshort JNICALL Java_org_jetbrains_skia_FontKt__1nGetUTF32Glyph

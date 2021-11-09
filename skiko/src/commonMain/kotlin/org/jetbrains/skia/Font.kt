@@ -2,6 +2,15 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skia.impl.InteropPointer
+import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skia.impl.Managed
+import org.jetbrains.skia.impl.Native
+import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.withResult
 
 class Font : Managed {
     companion object {
@@ -327,8 +336,12 @@ class Font : Managed {
     fun getUTF32Glyphs(uni: IntArray?): ShortArray {
         return try {
             Stats.onNativeCall()
-            withResult(ShortArray(uni?.size ?: 0)) {
-                _nGetUTF32Glyphs(_ptr, toInterop(uni), uni?.size ?: 0, it)
+            if (uni == null) {
+                shortArrayOf()
+            } else {
+                withResult(ShortArray(uni.size)) {
+                    _nGetUTF32Glyphs(_ptr, uni, uni.size, it)
+                }
             }
         } finally {
             reachabilityBarrier(this)
