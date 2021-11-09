@@ -462,7 +462,12 @@ class Font : Managed {
     fun getPositions(glyphs: ShortArray?, offset: Point): Array<Point> {
         return try {
             Stats.onNativeCall()
-            _nGetPositions(_ptr, glyphs, offset.x, offset.y)
+            if (glyphs == null) {
+                emptyArray()
+            } else {
+                _nGetPositions(_ptr, glyphs, glyphs.size, offset.x, offset.y)
+
+            }
         } finally {
             reachabilityBarrier(this)
         }
@@ -670,7 +675,7 @@ private external fun _nGetWidths(ptr: NativePointer, glyphs: InteropPointer, cou
 private external fun _nGetBounds(ptr: NativePointer, glyphs: ShortArray?, paintPtr: NativePointer): Array<Rect>
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetPositions")
-private external fun _nGetPositions(ptr: NativePointer, glyphs: ShortArray?, x: Float, y: Float): Array<Point>
+private external fun _nGetPositions(ptr: NativePointer, glyphs: ShortArray?, count: Int, x: Float, y: Float): Array<Point>
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetXPositions")
 private external fun _nGetXPositions(ptr: NativePointer, glyphs: InteropPointer, x: Float, count: Int, positions: InteropPointer)
