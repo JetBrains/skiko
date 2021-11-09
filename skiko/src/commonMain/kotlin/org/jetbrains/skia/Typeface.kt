@@ -341,7 +341,15 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     val familyNames: Array<FontFamilyName>
         get() = try {
             Stats.onNativeCall()
-            _nGetFamilyNames(_ptr)
+            val resPtr = _nGetFamilyNames(_ptr)
+            val size = StdVectorDecoder_nGetArraySize(resPtr)
+            (0 until size / 2).map { i ->
+                val a = StdVectorDecoder_nGetArrayElement(resPtr, 2*i)
+                val b = StdVectorDecoder_nGetArrayElement(resPtr, 2*i + 1)
+                FontFamilyName(ManagedString(a).toString(), ManagedString(b).toString())
+            }.toTypedArray().also {
+                StdVectorDecoder_nDisposeArray(resPtr)
+            }
         } finally {
             reachabilityBarrier(this)
         }
@@ -372,6 +380,23 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             reachabilityBarrier(this)
         }
 }
+
+//private class StdVectorDecoder : ArrayInteropDecoder<List<NativePointer>> {
+//    override fun getArrayElement(array: InteropPointer, index: Int): List<NativePointer> {
+//        TODO("Not yet implemented")
+//    }
+//
+//    override fun getArraySize(array: InteropPointer): Int = StdVectorDecoder_nGetArraySize(array)
+//    override fun disposeArray(array: InteropPointer) = StdVectorDecoder_nDisposeArray(array)
+//}
+
+@ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetArraySize")
+private external fun StdVectorDecoder_nGetArraySize(array: NativePointer): Int
+@ExternalSymbolName("org_jetbrains_skia_Typeface__1nDisposeArray")
+private external fun StdVectorDecoder_nDisposeArray(array: NativePointer)
+@ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetArrayElement")
+private external fun StdVectorDecoder_nGetArrayElement(array: NativePointer, index: Int): NativePointer
+
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUniqueId")
 private external fun Typeface_nGetUniqueId(ptr: NativePointer): Int
@@ -446,7 +471,7 @@ private external fun _nGetUnitsPerEm(ptr: NativePointer): Int
 private external fun _nGetKerningPairAdjustments(ptr: NativePointer, glyphs: ShortArray, count: Int, adjustments: InteropPointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetFamilyNames")
-private external fun _nGetFamilyNames(ptr: NativePointer): Array<FontFamilyName>
+private external fun _nGetFamilyNames(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetFamilyName")
 private external fun _nGetFamilyName(ptr: NativePointer): NativePointer
