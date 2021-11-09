@@ -18,7 +18,10 @@ class FontTests {
             assertEquals(12f, font.size)
             assertCloseEnough(14.880001f, font.spacing)
 
-            assertContentEquals(shortArrayOf(17, 18, 19, 20, 21), font.getStringGlyphs("ABCDE"))
+            val glyphs = font.getStringGlyphs("ABCDE")
+            assertContentEquals(shortArrayOf(17, 18, 19, 20, 21), glyphs)
+
+            assertContentEquals(floatArrayOf(7f, 7f, 7f, 7f, 7f), font.getWidths(glyphs))
         }
     }
 }

@@ -311,21 +311,6 @@ SKIKO_EXPORT KFloat* org_jetbrains_skia_Font__1nGetWidths
     TODO("implement org_jetbrains_skia_Font__1nGetWidths");
 }
 
-#if 0
-SKIKO_EXPORT KFloat* org_jetbrains_skia_Font__1nGetWidths
-  (KNativePointer ptr, KShort* glyphsArr) {
-    SkFont* instance = reinterpret_cast<SkFont*>(ptr);
-    int count = env->GetArrayLength(glyphsArr);
-    std::vector<KFloat> widths(count);
-    KShort* glyphs = env->GetShortArrayElements(glyphsArr, nullptr);
-    instance->getWidths(reinterpret_cast<SkGlyphID*>(glyphs), count, widths.data());
-    env->ReleaseShortArrayElements(glyphsArr, glyphs, 0);
-    return javaFloatArray(env, widths);
-}
-#endif
-
-
-
 SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_Font__1nGetBounds
   (KNativePointer ptr, KShort* glyphsArr, KNativePointer paintPtr) {
     TODO("implement org_jetbrains_skia_Font__1nGetBounds");
