@@ -33,8 +33,8 @@ SKIKO_EXPORT void org_jetbrains_skia_Typeface__1nGetVariations
         std::vector<SkFontArguments::VariationPosition::Coordinate> coords(count);
         instance->getVariationDesignPosition(coords.data(), count);
         for (int i=0; i < count; ++i) {
-             int r[2] = {static_cast<int>(coords[i].axis), rawBits(coords[i].value)};
-             memcpy(res + 2 * i, r, sizeof r);
+             res[2*i] = static_cast<KInt>(coords[i].axis);
+             res[2*i + 1] = rawBits(coords[i].value);
         }
     }
 }
