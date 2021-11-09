@@ -22,6 +22,9 @@ class FontTests {
             assertContentEquals(shortArrayOf(17, 18, 19, 20, 21), glyphs)
 
             assertContentEquals(floatArrayOf(7f, 7f, 7f, 7f, 7f), font.getWidths(glyphs))
+
+            assertContentEquals(floatArrayOf(0f, 7f, 14f, 21f, 28f), font.getXPositions(glyphs))
+            assertContentEquals(floatArrayOf(3f, 10f, 17f, 24f, 31f), font.getXPositions(glyphs, 3f))
         }
     }
 }

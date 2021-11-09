@@ -474,12 +474,18 @@ class Font : Managed {
     }
 
     /**
-     * Retrieves the x-positions for each glyph.
+     * Retrieves the x-positions for each glyph, beginning at the specified origin.
      */
     fun getXPositions(glyphs: ShortArray?): FloatArray {
         return try {
             Stats.onNativeCall()
-            _nGetXPositions(_ptr, glyphs, 0f)
+            if (glyphs == null) {
+                floatArrayOf()
+            } else {
+                withResult(FloatArray(glyphs.size)) {
+                    _nGetXPositions(_ptr, toInterop(glyphs), 0f, glyphs.size, it)
+                }
+            }
         } finally {
             reachabilityBarrier(this)
         }
@@ -491,7 +497,13 @@ class Font : Managed {
     fun getXPositions(glyphs: ShortArray?, offset: Float): FloatArray {
         return try {
             Stats.onNativeCall()
-            _nGetXPositions(_ptr, glyphs, offset)
+            if (glyphs == null) {
+                floatArrayOf()
+            } else {
+                withResult(FloatArray(glyphs.size)) {
+                    _nGetXPositions(_ptr, toInterop(glyphs), offset, glyphs.size, it)
+                }
+            }
         } finally {
             reachabilityBarrier(this)
         }
@@ -677,7 +689,7 @@ private external fun _nGetBounds(ptr: NativePointer, glyphs: ShortArray?, paintP
 private external fun _nGetPositions(ptr: NativePointer, glyphs: ShortArray?, x: Float, y: Float): Array<Point>
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetXPositions")
-private external fun _nGetXPositions(ptr: NativePointer, glyphs: ShortArray?, x: Float): FloatArray
+private external fun _nGetXPositions(ptr: NativePointer, glyphs: InteropPointer, x: Float, count: Int, positions: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetPath")
 private external fun _nGetPath(ptr: NativePointer, glyph: Short): NativePointer
