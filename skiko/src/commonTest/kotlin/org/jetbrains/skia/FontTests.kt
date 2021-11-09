@@ -3,8 +3,6 @@ package org.jetbrains.skia
 import org.jetbrains.skia.impl.use
 import org.jetbrains.skia.tests.assertCloseEnough
 import org.jetbrains.skia.tests.makeFromResource
-import org.jetbrains.skiko.tests.SkipJsTarget
-import org.jetbrains.skiko.tests.SkipNativeTarget
 import org.jetbrains.skiko.tests.runTest
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
@@ -33,6 +31,14 @@ class FontTests {
                 Point(21f, 0f),
                 Point(28f, 0f),
             ), font.getPositions(glyphs))
+
+            assertContentEquals(arrayOf(
+                Point(3f, 2f),
+                Point(10f, 2f),
+                Point(17f, 2f),
+                Point(24f, 2f),
+                Point(31f, 2f),
+            ), font.getPositions(glyphs, Point(3f, 2f)))
         }
     }
 }
