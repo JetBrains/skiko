@@ -20,58 +20,46 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_Typeface__1nIsFixedPitch
     return instance->isFixedPitch();
 }
 
-
-SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_Typeface__1nGetVariations
+SKIKO_EXPORT KInt org_jetbrains_skia_Typeface__1nGetVariationsCount
   (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_Typeface__1nGetVariations");
+    SkTypeface* instance = reinterpret_cast<SkTypeface*>(ptr);
+    return instance->getVariationDesignPosition(nullptr, 0);
 }
-     
-#if 0 
-SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_Typeface__1nGetVariations
-  (KNativePointer ptr) {
-    SkTypeface* instance = reinterpret_cast<SkTypeface*>((ptr));
-    int count = instance->getVariationDesignPosition(nullptr, 0);
+
+SKIKO_EXPORT void org_jetbrains_skia_Typeface__1nGetVariations
+  (KNativePointer ptr, KInt* res, KInt count) {
+    SkTypeface* instance = reinterpret_cast<SkTypeface*>(ptr);
     if (count > 0) {
         std::vector<SkFontArguments::VariationPosition::Coordinate> coords(count);
         instance->getVariationDesignPosition(coords.data(), count);
-        KInteropPointerArray res = env->NewObjectArray(count, skija::FontVariation::cls, nullptr);
         for (int i=0; i < count; ++i) {
-            KInteropPointer var = env->NewObject(skija::FontVariation::cls, skija::FontVariation::ctor, coords[i].axis, coords[i].value);
-            env->SetObjectArrayElement(res, i, var);
+             res[2*i] = static_cast<KInt>(coords[i].axis);
+             res[2*i + 1] = rawBits(coords[i].value);
         }
-        return res;
-    } else
-        return nullptr;
+    }
 }
-#endif
 
-
-
-SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_Typeface__1nGetVariationAxes
+SKIKO_EXPORT KInt org_jetbrains_skia_Typeface__1nGetVariationAxesCount
   (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_Typeface__1nGetVariationAxes");
+    SkTypeface* instance = reinterpret_cast<SkTypeface*>(ptr);
+    return instance->getVariationDesignParameters(nullptr, 0);
 }
-     
-#if 0 
-SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_Typeface__1nGetVariationAxes
-  (KNativePointer ptr) {
-    SkTypeface* instance = reinterpret_cast<SkTypeface*>((ptr));
-    int count = instance->getVariationDesignParameters(nullptr, 0);
+
+
+SKIKO_EXPORT void org_jetbrains_skia_Typeface__1nGetVariationAxes
+  (KNativePointer ptr, int* axis, int count) {
+    SkTypeface* instance = reinterpret_cast<SkTypeface*>(ptr);
     if (count > 0) {
         std::vector<SkFontParameters::Variation::Axis> params(count);
         instance->getVariationDesignParameters(params.data(), count);
-        KInteropPointerArray res = env->NewObjectArray(count, skija::FontVariationAxis::cls, nullptr);
-        for (int i=0; i < count; ++i) {
-            KInteropPointer var = env->NewObject(skija::FontVariationAxis::cls, skija::FontVariationAxis::ctor, params[i].tag, params[i].min, params[i].def, params[i].max, params[i].isHidden());
-            env->SetObjectArrayElement(res, i, var);
+        for (int i = 0,  j = 0; i < count; ++i) {
+            int p[5] = { static_cast<int>(params[i].tag), rawBits(params[i].min), rawBits(params[i].def), rawBits(params[i].max), params[i].isHidden()};
+            memcpy(axis + 5 * i, p, sizeof p);
+
         }
-        return res;
-    } else
-        return nullptr;
+    }
 }
-#endif
-
-
+     
 SKIKO_EXPORT KInt org_jetbrains_skia_Typeface__1nGetUniqueId
   (KNativePointer ptr) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>((ptr));
@@ -95,19 +83,6 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Typeface__1nMakeFromName
     TODO("implement org_jetbrains_skia_Typeface__1nMakeFromName");
 }
      
-#if 0 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_Typeface__1nMakeFromName
-  (KInteropPointer nameStr, KInt styleValue) {
-    SkString name = skString(env, nameStr);
-    SkFontStyle style = skija::FontStyle::fromJava(styleValue);
-    sk_sp<SkTypeface> instance = SkTypeface::MakeFromName(name.c_str(), style);
-    SkTypeface* ptr = instance.release();
-    return reinterpret_cast<KNativePointer>(ptr);
-}
-#endif
-
-
-
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Typeface__1nMakeFromFile
   (KInteropPointer pathStr, KInt index) {
     SkString path = skString(pathStr);
@@ -127,53 +102,28 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Typeface__1nMakeFromData
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Typeface__1nMakeClone
-  (KNativePointer typefacePtr, KInteropPointerArray variations, KInt collectionIndex) {
-    TODO("implement org_jetbrains_skia_Typeface__1nMakeClone");
-}
-     
-#if 0 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_Typeface__1nMakeClone
-  (KNativePointer typefacePtr, KInteropPointerArray variations, KInt collectionIndex) {
-    SkTypeface* typeface = reinterpret_cast<SkTypeface*>((typefacePtr));
-    int variationCount = env->GetArrayLength(variations);
-    std::vector<SkFontArguments::VariationPosition::Coordinate> coordinates(variationCount);
-    for (int i=0; i < variationCount; ++i) {
-        KInteropPointer jvar = env->GetObjectArrayElement(variations, i);
+  (KNativePointer typefacePtr, KInt* variations, KInt variationsCount, KInt collectionIndex) {
+    SkTypeface* typeface = reinterpret_cast<SkTypeface*>(typefacePtr);
+    std::vector<SkFontArguments::VariationPosition::Coordinate> coordinates(variationsCount);
+    for (int i=0; i < variationsCount; i+=2) {
         coordinates[i] = {
-            static_cast<SkFourByteTag>(env->GetIntField(jvar, skija::FontVariation::tag)),
-            env->GetFloatField(jvar, skija::FontVariation::value)
+            static_cast<SkFourByteTag>(variations[i]),
+            fromBits(variations[i+1])
         };
-        env->DeleteLocalRef(jvar);
     }
     SkFontArguments arg = SkFontArguments()
                             .setCollectionIndex(collectionIndex)
-                            .setVariationDesignPosition({coordinates.data(), variationCount});
+                            .setVariationDesignPosition({coordinates.data(), variationsCount});
     SkTypeface* clone = typeface->makeClone(arg).release();
     return reinterpret_cast<KNativePointer>(clone);
 }
-#endif
 
-
-
-SKIKO_EXPORT KShort* org_jetbrains_skia_Typeface__1nGetUTF32Glyphs
-  (KNativePointer ptr, KInt* uniArr) {
-    TODO("implement org_jetbrains_skia_Typeface__1nGetUTF32Glyphs");
+SKIKO_EXPORT void org_jetbrains_skia_Typeface__1nGetUTF32Glyphs
+  (KNativePointer ptr, KInt* uni, KInt count, KShort* res) {
+    SkTypeface* instance = reinterpret_cast<SkTypeface*>(ptr);
+    instance->unicharsToGlyphs(reinterpret_cast<SkUnichar*>(uni), count, reinterpret_cast<SkGlyphID*>(res));
 }
      
-#if 0 
-SKIKO_EXPORT KShort* org_jetbrains_skia_Typeface__1nGetUTF32Glyphs
-  (KNativePointer ptr, KInt* uniArr) {
-    SkTypeface* instance = reinterpret_cast<SkTypeface*>((ptr));
-    KInt count = env->GetArrayLength(uniArr);
-    std::vector<short> glyphs(count);
-    KInt* uni = env->GetIntArrayElements(uniArr, nullptr);
-    instance->unicharsToGlyphs(reinterpret_cast<SkUnichar*>(uni), count, reinterpret_cast<SkGlyphID*>(glyphs.data()));
-    env->ReleaseIntArrayElements(uniArr, uni, 0);
-    return javaShortArray(env, glyphs);
-}
-#endif
-
-
 SKIKO_EXPORT KShort org_jetbrains_skia_Typeface__1nGetUTF32Glyph
   (KNativePointer ptr, KInt uni) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>((ptr));
@@ -192,23 +142,19 @@ SKIKO_EXPORT KInt org_jetbrains_skia_Typeface__1nGetTablesCount
     return instance->countTables();
 }
 
-
-SKIKO_EXPORT KInt* org_jetbrains_skia_Typeface__1nGetTableTags
+SKIKO_EXPORT KInt org_jetbrains_skia_Typeface__1nGetTableTagsCount
   (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_Typeface__1nGetTableTags");
+    SkTypeface* instance = reinterpret_cast<SkTypeface*>(ptr);
+    return instance->countTables();
 }
-     
-#if 0 
-SKIKO_EXPORT KInt* org_jetbrains_skia_Typeface__1nGetTableTags
-  (KNativePointer ptr) {
-    SkTypeface* instance = reinterpret_cast<SkTypeface*>((ptr));
-    int count = instance->countTables();
-    std::vector<KInt> tags(count);
+
+SKIKO_EXPORT void org_jetbrains_skia_Typeface__1nGetTableTags
+  (KNativePointer ptr, KInt* res, KInt count) {
+    SkTypeface* instance = reinterpret_cast<SkTypeface*>(ptr);
+    std::vector<int> tags(count);
     instance->getTableTags(reinterpret_cast<SkFontTableTag*>(tags.data()));
-    return javaIntArray(env, tags);
+    memcpy(res, tags.data(), tags.size() * sizeof(KInt));
 }
-#endif
-
 
 SKIKO_EXPORT KInt org_jetbrains_skia_Typeface__1nGetTableSize
   (KNativePointer ptr, KInt tag) {
@@ -230,33 +176,20 @@ SKIKO_EXPORT KInt org_jetbrains_skia_Typeface__1nGetUnitsPerEm
 }
 
 
-SKIKO_EXPORT KInt* org_jetbrains_skia_Typeface__1nGetKerningPairAdjustments
-  (KNativePointer ptr, KShort* glyphsArr) {
-    TODO("implement org_jetbrains_skia_Typeface__1nGetKerningPairAdjustments");
+SKIKO_EXPORT bool org_jetbrains_skia_Typeface__1nGetKerningPairAdjustments
+  (KNativePointer ptr, KShort* glyphs, KInt count, KInt* res) {
+  SkTypeface* instance = reinterpret_cast<SkTypeface*>(ptr);
+  if (count > 0) {
+      std::vector<int> adjustments(count);
+      return instance->getKerningPairAdjustments(
+        reinterpret_cast<SkGlyphID*>(glyphs), count,
+        reinterpret_cast<int32_t*>(res)
+      );
+  }
+
+  return false;
 }
      
-#if 0 
-SKIKO_EXPORT KInt* org_jetbrains_skia_Typeface__1nGetKerningPairAdjustments
-  (KNativePointer ptr, KShort* glyphsArr) {
-    SkTypeface* instance = reinterpret_cast<SkTypeface*>((ptr));
-    int count = glyphsArr == nullptr ? 0 : env->GetArrayLength(glyphsArr);
-    if (count > 0) {
-        std::vector<KInt> adjustments(count);
-        KShort* glyphs = env->GetShortArrayElements(glyphsArr, nullptr);
-        bool res = instance->getKerningPairAdjustments(
-          reinterpret_cast<SkGlyphID*>(glyphs), count,
-            reinterpret_cast<int32_t*>(adjustments.data()));
-        env->ReleaseShortArrayElements(glyphsArr, glyphs, 0);
-        return res ? javaIntArray(env, adjustments) : nullptr;
-    } else {
-        bool res = instance->getKerningPairAdjustments(nullptr, 0, nullptr);
-        return res ? javaIntArray(env, std::vector<KInt>(0)) : nullptr;
-    }
-}
-#endif
-
-
-
 SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_Typeface__1nGetFamilyNames
   (KNativePointer ptr) {
     TODO("implement org_jetbrains_skia_Typeface__1nGetFamilyNames");
