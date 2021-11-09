@@ -269,15 +269,14 @@ extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_FontKt__1nMeasureTex
     return width;
 }
 
-extern "C" JNIEXPORT jfloatArray JNICALL Java_org_jetbrains_skia_FontKt__1nGetWidths
-  (JNIEnv* env, jclass jclass, jlong ptr, jshortArray glyphsArr) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nGetWidths
+  (JNIEnv* env, jclass jclass, jlong ptr, jshortArray glyphsArr, jint count, jfloatArray res) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
-    int count = env->GetArrayLength(glyphsArr);
     std::vector<jfloat> widths(count);
     jshort* glyphs = env->GetShortArrayElements(glyphsArr, nullptr);
     instance->getWidths(reinterpret_cast<SkGlyphID*>(glyphs), count, widths.data());
     env->ReleaseShortArrayElements(glyphsArr, glyphs, 0);
-    return javaFloatArray(env, widths);
+    env->SetFloatArrayRegion(res, 0, count, widths.data());
 }
 
 extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_FontKt__1nGetBounds

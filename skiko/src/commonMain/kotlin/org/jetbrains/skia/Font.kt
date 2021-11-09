@@ -413,7 +413,13 @@ class Font : Managed {
     fun getWidths(glyphs: ShortArray?): FloatArray {
         return try {
             Stats.onNativeCall()
-            _nGetWidths(_ptr, glyphs)
+            if (glyphs == null) {
+                return floatArrayOf()
+            } else {
+                withResult(FloatArray(glyphs.size)) {
+                    _nGetWidths(_ptr, toInterop(glyphs), glyphs.size, it)
+                }
+            }
         } finally {
             reachabilityBarrier(this)
         }
@@ -662,7 +668,7 @@ private external fun _nMeasureText(ptr: NativePointer, str: String?, paintPtr: N
 private external fun _nMeasureTextWidth(ptr: NativePointer, str: String?, paintPtr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetWidths")
-private external fun _nGetWidths(ptr: NativePointer, glyphs: ShortArray?): FloatArray
+private external fun _nGetWidths(ptr: NativePointer, glyphs: InteropPointer, count: Int, width: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetBounds")
 private external fun _nGetBounds(ptr: NativePointer, glyphs: ShortArray?, paintPtr: NativePointer): Array<Rect>
