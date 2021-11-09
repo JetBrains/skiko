@@ -1,6 +1,7 @@
 package org.jetbrains.skia.impl
 
 import java.lang.ref.Reference
+import java.util.function.BooleanSupplier
 
 actual abstract class Native actual constructor(ptr: NativePointer) {
     actual var _ptr: NativePointer
@@ -78,6 +79,7 @@ actual open class InteropScope actual constructor() {
     actual inline fun <reified T> InteropPointer.fromInterop(decoder: ArrayInteropDecoder<T>): Array<T> =
         this@fromInterop as Array<T>
     actual fun toInteropForArraysOfPointers(interopPointers: Array<InteropPointer>): InteropPointer = interopPointers
+    actual fun toInterop(callback: (() -> Boolean)?) = callback?.let { BooleanSupplier(it) as Any }
     actual fun release() {}
 }
 

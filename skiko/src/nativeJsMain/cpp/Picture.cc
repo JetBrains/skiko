@@ -7,61 +7,15 @@
 #include "SkShader.h"
 #include "common.h"
 
-
-#ifndef __EMSCRIPTEN__
-
-typedef bool((*InteropCallback)(const void*));
-typedef void((*InteropDisposeCallback)(const void*));
-
 class KotlinAbortCallback: public SkPicture::AbortCallback {
 public:
-    KotlinAbortCallback(InteropCallback cb, InteropDisposeCallback drop, void* data) : cb(cb), drop(drop), data(data) {}
-
-    virtual ~KotlinAbortCallback() override {
-        drop(data);
-    }
-
-    KotlinAbortCallback(const KotlinAbortCallback&) = delete;
-    KotlinAbortCallback(KotlinAbortCallback&&) = delete;
-    KotlinAbortCallback& operator=(const KotlinAbortCallback&) = delete;
-    KotlinAbortCallback& operator=(KotlinAbortCallback&&) = delete;
-
+    KotlinAbortCallback(KInteropPointer data) : callback(data) {}
     bool abort() override {
-        return cb(data);
+        return static_cast<bool>(callback());
     }
 private:
-    void * data;
-    InteropCallback cb;
-    InteropDisposeCallback drop;
+    KBooleanCallback callback;
 };
-
-#else // __EMSCRIPTEN__
-
-typedef KInt InteropCallback;
-
-class KotlinAbortCallback: public SkPicture::AbortCallback {
-public:
-    KotlinAbortCallback(InteropCallback cb) : cb(cb) {}
-    virtual ~KotlinAbortCallback() override {
-        EM_ASM({ _releaseCallback($0) }, cb);
-    }
-
-    KotlinAbortCallback(const KotlinAbortCallback&) = delete;
-    KotlinAbortCallback(KotlinAbortCallback&&) = delete;
-    KotlinAbortCallback& operator=(const KotlinAbortCallback&) = delete;
-    KotlinAbortCallback& operator=(KotlinAbortCallback&&) = delete;
-
-    bool abort() override {
-        int value = EM_ASM_INT({
-            return _callCallback($0).value ? 1 : 0;
-        }, cb);
-        return value == 1;
-    }
-private:
-    InteropCallback cb;
-};
-
-#endif // __EMSCRIPTEN__
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Picture__1nMakeFromData
   (KNativePointer dataPtr) {
@@ -70,36 +24,17 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Picture__1nMakeFromData
     return reinterpret_cast<KNativePointer>(instance);
 }
 
-#ifndef __EMSCRIPTEN__
-
 SKIKO_EXPORT void org_jetbrains_skia_Picture__1nPlayback
-  (KNativePointer ptr, KNativePointer canvasPtr, InteropCallback abort, InteropDisposeCallback drop, void* data) {
+  (KNativePointer ptr, KNativePointer canvasPtr, KInteropPointer abort) {
     SkPicture* instance = reinterpret_cast<SkPicture*>((ptr));
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>((canvasPtr));
-    if (data == nullptr) {
-        instance->playback(canvas, nullptr);
-    } else {
-        KotlinAbortCallback abortCallback(abort, drop, data);
-        instance->playback(canvas, &abortCallback);
-    }
-}
-
-#else // __EMSCRIPTEN__
-
-SKIKO_EXPORT void org_jetbrains_skia_Picture__1nPlayback
-  (KNativePointer ptr, KNativePointer canvasPtr, InteropCallback abort) {
-    SkPicture* instance = reinterpret_cast<SkPicture*>((ptr));
-    SkCanvas* canvas = reinterpret_cast<SkCanvas*>((canvasPtr));
-    if (abort == 0) {
-        instance->playback(canvas, nullptr);
-    } else {
+    if (abort) {
         KotlinAbortCallback abortCallback(abort);
         instance->playback(canvas, &abortCallback);
+    } else {
+        instance->playback(canvas, nullptr);
     }
 }
-
-#endif // __EMSCRIPTEN__
-
 
 SKIKO_EXPORT void org_jetbrains_skia_Picture__1nGetCullRect
   (KNativePointer ptr, KInteropPointer ltrbArray) {

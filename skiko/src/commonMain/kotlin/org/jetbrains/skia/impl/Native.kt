@@ -42,6 +42,7 @@ expect class InteropScope() {
     fun InteropPointer.fromInteropNativePointerArray(): NativePointerArray
     inline fun <reified T> InteropPointer.fromInterop(decoder: ArrayInteropDecoder<T>): Array<T>
     fun toInteropForArraysOfPointers(interopPointers: Array<InteropPointer>): InteropPointer
+    fun toInterop(callback: (() -> Boolean)?): InteropPointer
     fun release()
 }
 

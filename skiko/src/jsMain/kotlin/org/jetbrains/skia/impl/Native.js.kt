@@ -194,12 +194,26 @@ actual class InteropScope actual constructor() {
         return toInterop(interopPointers.toIntArray())
     }
 
+    actual fun toInterop(callback: (() -> Boolean)?): InteropPointer {
+        if (callback == null) { return 0 }
+
+        val data = CallbackData<Boolean>(null)
+        return _registerCallback({ data.value = callback() }, data)
+    }
+
     actual fun release()  {
         elements.forEach {
             _free(it)
         }
     }
 }
+
+// Callbacks
+private class CallbackData<T>(@JsName("value") var value: T?)
+
+// See `setup.js`
+private external fun _registerCallback(cb: () -> Unit, data: Any?): Int
+
 
 // Those functions are defined by Emscripten.
 private external fun _malloc(size: Int): NativePointer

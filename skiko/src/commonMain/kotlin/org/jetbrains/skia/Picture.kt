@@ -76,8 +76,9 @@ class Picture internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     fun playback(canvas: Canvas?, abort: (() -> Boolean)? = null): Picture {
         return try {
             Stats.onNativeCall()
-            val cb = registerAbortCallback(abort)
-            runPlayback(_ptr, getPtr(canvas), cb)
+            interopScope {
+                _nPlayback(_ptr, getPtr(canvas), toInterop(abort))
+            }
             this
         } finally {
             reachabilityBarrier(canvas)
@@ -254,8 +255,5 @@ private external fun _nMakeShader(
     tileRect: InteropPointer
 ): NativePointer
 
-expect class AbortCallback
-
-internal expect fun registerAbortCallback(abort: (() -> Boolean)?): AbortCallback
-
-internal expect fun runPlayback(ptr: NativePointer, canvasPtr: NativePointer, abort: AbortCallback)
+@ExternalSymbolName("org_jetbrains_skia_Picture__1nPlayback")
+private external fun _nPlayback(ptr: NativePointer, canvasPtr: NativePointer, data: InteropPointer)
