@@ -1,10 +1,10 @@
 var {_callCallback, _registerCallback, _releaseCallback, _createLocalCallbackScope, _releaseLocalCallbackScope} = (() => {
     const CB_NULL = {
-        callback: () => throw new RangeError("attempted to call a callback at index 0"),
+        callback: () => { throw new RangeError("attempted to call a callback at index 0") },
         data: null
     };
     const CB_UNDEFINED = {
-        callback: () => throw new RangeError("attempted to call a uninitialized callback"),
+        callback: () => { throw new RangeError("attempted to call a uninitialized callback") },
         data: null
     };
 

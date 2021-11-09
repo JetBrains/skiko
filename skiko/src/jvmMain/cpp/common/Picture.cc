@@ -14,19 +14,16 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PictureKt_Picture_1nM
 
 class BooleanSupplierAbort: public SkPicture::AbortCallback {
 public:
-    BooleanSupplierAbort(JNIEnv* env, jobject supplier) {
-        this->env = env;
-        this->supplier = supplier;
-    }
+    BooleanSupplierAbort(JNIEnv* env, jobject supplier) : callback(env, supplier) {}
+
     bool abort() override {
-        bool res = env->CallBooleanMethod(supplier, java::util::function::BooleanSupplier::apply);
-        if (java::lang::Throwable::exceptionThrown(env))
+        bool res = static_cast<bool>(callback());
+        if (callback.isExceptionThrown())
           return false;
         return res;
     }
 private:
-    JNIEnv* env;
-    jobject supplier;
+    JBooleanCallback callback;
 };
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PictureKt__1nPlayback

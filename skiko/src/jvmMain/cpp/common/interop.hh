@@ -394,3 +394,27 @@ static inline jfloat fromBits(jint i) {
     u.i = i;
     return u.f;
 }
+
+// Callback support
+
+template<typename T>
+class JCallback {
+public:
+    JCallback (JNIEnv* env, jobject supplier) : env(env), supplier(supplier) { };
+
+    JCallback(const JCallback&) = delete;
+    JCallback(JCallback&&) = delete;
+    JCallback& operator=(const JCallback&) = delete;
+    JCallback& operator=(JCallback&&) = delete;
+
+    T operator()();
+
+    bool isExceptionThrown() {
+        return java::lang::Throwable::exceptionThrown(env);
+    }
+private:
+    JNIEnv* env;
+    jobject supplier;
+};
+
+typedef JCallback<jboolean> JBooleanCallback;

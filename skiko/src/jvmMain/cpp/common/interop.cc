@@ -1202,3 +1202,10 @@ namespace skija {
         }
     }
 }
+
+// Callback support
+// When implementing callbacks ensure that `java::util::function::*Supplier::*` is implemented above
+template<>
+jboolean JCallback<jboolean>::operator()() {
+    return env->CallBooleanMethod(supplier, java::util::function::BooleanSupplier::apply);
+}
