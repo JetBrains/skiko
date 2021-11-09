@@ -72,11 +72,10 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TextBlobBuilderKt__1nA
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TextBlobBuilderKt__1nAppendRunRSXform
-  (JNIEnv* env, jclass jclass, jlong ptr, jlong fontPtr, jshortArray glyphsArr, jfloatArray xformArr) {
+  (JNIEnv* env, jclass jclass, jlong ptr, jlong fontPtr, jshortArray glyphsArr, jint glyphsLen, jfloatArray xformArr) {
     SkTextBlobBuilder* instance = reinterpret_cast<SkTextBlobBuilder*>(static_cast<uintptr_t>(ptr));
     SkFont* font = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(fontPtr));
-    jsize len = env->GetArrayLength(glyphsArr);
-    SkTextBlobBuilder::RunBuffer run = instance->allocRunRSXform(*font, len);
-    env->GetShortArrayRegion(glyphsArr, 0, len, reinterpret_cast<jshort*>(run.glyphs));
-    env->GetFloatArrayRegion(xformArr, 0, len * 4, reinterpret_cast<jfloat*>(run.pos));
+    SkTextBlobBuilder::RunBuffer run = instance->allocRunRSXform(*font, glyphsLen);
+    env->GetShortArrayRegion(glyphsArr, 0, glyphsLen, reinterpret_cast<jshort*>(run.glyphs));
+    env->GetFloatArrayRegion(xformArr, 0, glyphsLen * 4, reinterpret_cast<jfloat*>(run.pos));
 }

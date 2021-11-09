@@ -62,19 +62,12 @@ SKIKO_EXPORT void org_jetbrains_skia_TextBlobBuilder__1nAppendRunPos
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_TextBlobBuilder__1nAppendRunRSXform
-  (KNativePointer ptr, KNativePointer fontPtr, KShort* glyphsArr, KFloat* xformArr) {
-    TODO("implement org_jetbrains_skia_TextBlobBuilder__1nAppendRunRSXform");
-}
-
-#if 0
-SKIKO_EXPORT void org_jetbrains_skia_TextBlobBuilder__1nAppendRunRSXform
-  (KNativePointer ptr, KNativePointer fontPtr, KShort* glyphsArr, KFloat* xformArr) {
+  (KNativePointer ptr, KNativePointer fontPtr, KShort* glyphsArr, KInt glyphsLen, KFloat* xformArr) {
     SkTextBlobBuilder* instance = reinterpret_cast<SkTextBlobBuilder*>((ptr));
     SkFont* font = reinterpret_cast<SkFont*>((fontPtr));
-    jsize len = env->GetArrayLength(glyphsArr);
-    SkTextBlobBuilder::RunBuffer run = instance->allocRunRSXform(*font, len);
-    env->GetShortArrayRegion(glyphsArr, 0, len, reinterpret_cast<KShort*>(run.glyphs));
-    env->GetFloatArrayRegion(xformArr, 0, len * 4, reinterpret_cast<KFloat*>(run.pos));
-}
-#endif
 
+    SkTextBlobBuilder::RunBuffer run = instance->allocRunRSXform(*font, glyphsLen);
+
+    memcpy(run.glyphs, glyphsArr, glyphsLen * sizeof(KShort));
+    memcpy(run.pos, xformArr, 4 * glyphsLen * sizeof(KFloat)); // 4 floats per position
+}
