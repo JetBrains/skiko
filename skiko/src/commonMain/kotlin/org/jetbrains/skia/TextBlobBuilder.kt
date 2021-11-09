@@ -184,8 +184,9 @@ class TextBlobBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _F
                     _ptr,
                     getPtr(font),
                     toInterop(glyphs),
+                    glyphs.size,
                     toInterop(floatPos),
-                    bounds
+                    toInterop(bounds?.serializeToFloatArray())
                 )
             }
             this
@@ -255,7 +256,12 @@ private external fun _nAppendRunPosH(
 
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nAppendRunPos")
-private external fun _nAppendRunPos(ptr: NativePointer, fontPtr: NativePointer, glyphs: InteropPointer, pos: InteropPointer, bounds: Rect?)
+private external fun _nAppendRunPos(
+    ptr: NativePointer, fontPtr: NativePointer,
+    glyphs: InteropPointer, glyphsLen: Int,
+    pos: InteropPointer,
+    bounds: InteropPointer
+)
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nAppendRunRSXform")
 private external fun _nAppendRunRSXform(ptr: NativePointer, fontPtr: NativePointer, glyphs: InteropPointer, xform: InteropPointer)

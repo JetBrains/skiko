@@ -45,28 +45,21 @@ SKIKO_EXPORT void org_jetbrains_skia_TextBlobBuilder__1nAppendRunPosH
     SkTextBlobBuilder::RunBuffer run = instance->allocRunPosH(*font, glyphsLen, y, bounds.get());
 
     memcpy(run.glyphs, glyphsArr, glyphsLen * sizeof(KShort));
-    memcpy(run.pos, xsArr, glyphsLen * sizeof(KFloat));
+    memcpy(run.pos, xsArr, glyphsLen * sizeof(KFloat)); // 1 float per position
 }
+
 
 SKIKO_EXPORT void org_jetbrains_skia_TextBlobBuilder__1nAppendRunPos
-  (KNativePointer ptr, KNativePointer fontPtr, KShort* glyphsArr, KFloat* posArr, KInteropPointer boundsObj) {
-    TODO("implement org_jetbrains_skia_TextBlobBuilder__1nAppendRunPos");
+  (KNativePointer ptr, KNativePointer fontPtr, KShort* glyphsArr, KInt glyphsLen, KFloat* posArr, KFloat* rectFloats) {
+    SkTextBlobBuilder* instance = reinterpret_cast<SkTextBlobBuilder*>(ptr);
+    SkFont* font = reinterpret_cast<SkFont*>(fontPtr);
+
+    std::unique_ptr<SkRect> bounds = skikoMpp::skrect::toSkRect(reinterpret_cast<float*>(rectFloats));
+    SkTextBlobBuilder::RunBuffer run = instance->allocRunPos(*font, glyphsLen, bounds.get());
+
+    memcpy(run.glyphs, glyphsArr, glyphsLen * sizeof(KShort));
+    memcpy(run.pos, posArr, 2 * glyphsLen * sizeof(KFloat)); // 2 floats per position
 }
-
-#if 0
-SKIKO_EXPORT void org_jetbrains_skia_TextBlobBuilder__1nAppendRunPos
-  (KNativePointer ptr, KNativePointer fontPtr, KShort* glyphsArr, KFloat* posArr, KInteropPointer boundsObj) {
-    SkTextBlobBuilder* instance = reinterpret_cast<SkTextBlobBuilder*>((ptr));
-    SkFont* font = reinterpret_cast<SkFont*>((fontPtr));
-    jsize len = env->GetArrayLength(glyphsArr);
-    std::unique_ptr<SkRect> bounds = skija::Rect::toSkRect(env, boundsObj);
-    SkTextBlobBuilder::RunBuffer run = instance->allocRunPos(*font, len, bounds.get());
-    env->GetShortArrayRegion(glyphsArr, 0, len, reinterpret_cast<KShort*>(run.glyphs));
-    env->GetFloatArrayRegion(posArr, 0, len * 2, reinterpret_cast<KFloat*>(run.pos));
-}
-#endif
-
-
 
 SKIKO_EXPORT void org_jetbrains_skia_TextBlobBuilder__1nAppendRunRSXform
   (KNativePointer ptr, KNativePointer fontPtr, KShort* glyphsArr, KFloat* xformArr) {

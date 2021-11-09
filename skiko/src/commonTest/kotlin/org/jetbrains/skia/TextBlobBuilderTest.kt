@@ -95,18 +95,25 @@ class TextBlobBuilderTest {
         val glyphs = font.getStringGlyphs(str)
         assertEquals(str.length, glyphs.size)
 
+        val positions = FloatArray(glyphs.size * 2) {
+            if (it % 2 == 1) it + 1f else (it + 1) * 10f
+        }.toList().chunked(2).map { Point(it[0], it[1]) }.toTypedArray()
+
         val textBlob = TextBlobBuilder().appendRunPos(
             font = font,
             glyphs = glyphs,
             bounds = Rect(0f, 0f, 150f, 40f),
-            pos = FloatArray(glyphs.size * 2) {
-                if (it % 2 == 1) 1f else (it + 1) * 10f
-            }.toList().chunked(2).map { Point(it[0], it[1]) }.toTypedArray()
+            pos = positions
         ).build()!!
 
         assertContentEquals(
             expected = shortArrayOf(1983, 830, 1213, 1205, 638, 1231, 1326, 161, 611, 721, 721, 773, 1326),
             actual = textBlob.glyphs
+        )
+
+        assertContentEquals(
+            expected = positions,
+            actual = textBlob.positions.toList().chunked(2).map { Point(it[0], it[1]) }.toTypedArray()
         )
 
         assertCloseEnough(
