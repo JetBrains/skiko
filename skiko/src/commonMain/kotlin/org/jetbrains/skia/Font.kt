@@ -477,18 +477,7 @@ class Font : Managed {
      * Retrieves the x-positions for each glyph, beginning at the specified origin.
      */
     fun getXPositions(glyphs: ShortArray?): FloatArray {
-        return try {
-            Stats.onNativeCall()
-            if (glyphs == null) {
-                floatArrayOf()
-            } else {
-                withResult(FloatArray(glyphs.size)) {
-                    _nGetXPositions(_ptr, toInterop(glyphs), 0f, glyphs.size, it)
-                }
-            }
-        } finally {
-            reachabilityBarrier(this)
-        }
+        return getXPositions(glyphs, 0f)
     }
 
     /**
