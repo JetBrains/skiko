@@ -75,7 +75,7 @@ class TextBlobTest {
 
         assertCloseEnough(
             expected = Rect(0f, -34.875f, 235.30681f, 8.692932f),
-            actual = textBlob.blockBounds.also { println(it) },
+            actual = textBlob.blockBounds,
             epsilon = 0.2f // smaller values make tests fail on some platforms
         )
 
@@ -211,7 +211,7 @@ class TextBlobTest {
                 46.92145f, -10.1182f, 0.75322014f, -3.1100905f, 49.761448f, 12.051522f, 2.1579552f, -2.6274006f,
                 42.03841f, 34.527283f
             ),
-            actual = textBlob.positions.also { println(it.joinToString()) },
+            actual = textBlob.positions,
             epsilon = eps
         )
 

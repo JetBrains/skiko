@@ -97,8 +97,6 @@ class DataTest {
         val data = Data.makeUninitialized(100)
         assertEquals(100, data.bytes.size)
 
-        println(data.bytes.joinToString())
-
         val imageInfo = ImageInfo.makeN32Premul(5, 5)
         val pixmap = Pixmap.make(imageInfo, data, imageInfo.minRowBytes)
         val surface = Surface.makeRasterDirect(pixmap)
