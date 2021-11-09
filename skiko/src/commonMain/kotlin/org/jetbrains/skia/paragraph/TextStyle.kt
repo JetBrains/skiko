@@ -110,6 +110,20 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         }
     }
 
+    private inline fun IntArray.asDecorationStyle(): DecorationStyle {
+        val decorationStyleFlags = this[0]
+
+        return DecorationStyle(
+            underline = ((decorationStyleFlags shr 0) and 1) == 1,
+            overline = ((decorationStyleFlags shr 1) and 1) == 1,
+            lineThrough = ((decorationStyleFlags shr 2) and 1) == 1,
+            gaps = ((decorationStyleFlags shr 3) and 1) == 1,
+            color = this[1],
+            lineStyle = this[2],
+            thicknessMultiplier = Float.fromBits(this[3])
+        )
+    }
+
     var decorationStyle: DecorationStyle
         get() = try {
             Stats.onNativeCall()
@@ -117,17 +131,7 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
                 _nGetDecorationStyle(_ptr, it)
             }
 
-            val decorationStyleFlags = decorationStyleData[0]
-
-            DecorationStyle(
-                underline = ((decorationStyleFlags shr 0) and 1) == 1,
-                overline = ((decorationStyleFlags shr 1) and 1) == 1,
-                lineThrough = ((decorationStyleFlags shr 2) and 1) == 1,
-                gaps = ((decorationStyleFlags shr 3) and 1) == 1,
-                color = decorationStyleData[1],
-                lineStyle = decorationStyleData[2],
-                thicknessMultiplier = Float.fromBits(decorationStyleData[3])
-            )
+            decorationStyleData.asDecorationStyle()
         } finally {
             reachabilityBarrier(this)
         }
