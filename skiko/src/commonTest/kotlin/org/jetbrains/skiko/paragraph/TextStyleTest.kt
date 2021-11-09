@@ -55,33 +55,6 @@ class TextStyleTest {
         }
     }
 
-    //TODO: We either need separate test for js platform if we want to test default metrics or just need to come up with a different, better test
-    @Test
-    @SkipJsTarget
-    fun textStyleFontMetricsTest() {
-        TextStyle().use { textStyle ->
-            val defaultFontMetrics = FontMetrics(
-                top = -17.253906f,
-                ascent = -12.995117f,
-                descent = 3.3017578f,
-                bottom = 6.4804688f,
-                leading = 0f,
-                avgCharWidth = 7.095703f,
-                maxCharWidth = 39.395508f,
-                xMin = -14.287109f,
-                xMax = 25.108398f,
-                xHeight = 8.0f,
-                capHeight = 10.0f,
-                underlineThickness = 0.6152344f,
-                underlinePosition = 0.2734375f,
-                strikeoutThickness = 0.6972656f,
-                strikeoutPosition = -3.6230469f,
-            )
-
-            assertEquals(defaultFontMetrics, textStyle.fontMetrics)
-        }
-    }
-
     @Test
     fun textStyleLocaleTest() {
         TextStyle().use { textStyle ->
