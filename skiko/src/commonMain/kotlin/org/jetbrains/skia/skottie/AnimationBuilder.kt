@@ -1,14 +1,11 @@
 @file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia.skottie
 
-import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.*
-import org.jetbrains.skia.impl.Managed
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.Data
 import org.jetbrains.skia.ExternalSymbolName
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.FontMgr
+import org.jetbrains.skia.impl.*
+import org.jetbrains.skia.impl.Library.Companion.staticLoad
 
 class AnimationBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
@@ -63,7 +60,7 @@ class AnimationBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _
     fun buildFromString(data: String): Animation {
         return try {
             Stats.onNativeCall()
-            val ptr = _nBuildFromString(_ptr, data)
+            val ptr = interopScope { _nBuildFromString(_ptr, toInterop(data)) }
             require(ptr != NullPointer) { "Failed to create Animation from string: \"$data\"" }
             Animation(ptr)
         } finally {
@@ -74,7 +71,7 @@ class AnimationBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _
     fun buildFromFile(path: String): Animation {
         return try {
             Stats.onNativeCall()
-            val ptr = _nBuildFromFile(_ptr, path)
+            val ptr = interopScope { _nBuildFromFile(_ptr, toInterop(path)) }
             require(ptr != NullPointer) { "Failed to create Animation from path: $path" }
             Animation(ptr)
         } finally {
@@ -108,10 +105,10 @@ private external fun _nSetFontManager(ptr: NativePointer, fontMgrPtr: NativePoin
 private external fun _nSetLogger(ptr: NativePointer, loggerPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromString")
-private external fun _nBuildFromString(ptr: NativePointer, data: String?): NativePointer
+private external fun _nBuildFromString(ptr: NativePointer, data: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromFile")
-private external fun _nBuildFromFile(ptr: NativePointer, path: String?): NativePointer
+private external fun _nBuildFromFile(ptr: NativePointer, path: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromData")
 private external fun _nBuildFromData(ptr: NativePointer, dataPtr: NativePointer): NativePointer

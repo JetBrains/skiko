@@ -35,39 +35,21 @@ SKIKO_EXPORT void org_jetbrains_skia_skottie_AnimationBuilder__1nSetLogger
     instance->setLogger(logger);
 }
 
-
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromString
-  (KNativePointer ptr, KInteropPointer dataStr) {
-    TODO("implement org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromString");
-}
-     
-#if 0 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromString
   (KNativePointer ptr, KInteropPointer dataStr) {
     Animation::Builder* instance = reinterpret_cast<Animation::Builder*>((ptr));
-    SkString data = skString(env, dataStr);
+    SkString data = skString(dataStr);
     sk_sp<Animation> animation = instance->make(data.c_str(), data.size());
     return reinterpret_cast<KNativePointer>(animation.release());
 }
-#endif
 
-
-
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromFile
-  (KNativePointer ptr, KInteropPointer pathStr) {
-    TODO("implement org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromFile");
-}
-     
-#if 0 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromFile
   (KNativePointer ptr, KInteropPointer pathStr) {
     Animation::Builder* instance = reinterpret_cast<Animation::Builder*>((ptr));
-    SkString path = skString(env, pathStr);
+    SkString path = skString(pathStr);
     sk_sp<Animation> animation = instance->makeFromFile(path.c_str());
     return reinterpret_cast<KNativePointer>(animation.release());
 }
-#endif
-
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromData
   (KNativePointer ptr, KNativePointer dataPtr) {
