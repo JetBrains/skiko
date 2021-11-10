@@ -21,6 +21,7 @@ class FontTests {
             assertContentEquals(shortArrayOf(17, 18, 19, 20, 21), glyphs)
 
             assertEquals(6, font.getStringGlyphsCount("EЙ를üẞ無"))
+            assertEquals(49f, font.measureTextWidth("EЙ를üẞՇ無"))
 
             assertContentEquals(floatArrayOf(7f, 7f, 7f, 7f, 7f), font.getWidths(glyphs))
 
