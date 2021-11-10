@@ -466,7 +466,7 @@ class Font : Managed {
                 emptyArray()
             } else {
                 val positionsData = withResult(FloatArray(glyphs.size * 2)) {
-                    _nGetPositions(_ptr, glyphs, glyphs.size, offset.x, offset.y, it)
+                    _nGetPositions(_ptr, toInterop(glyphs), glyphs.size, offset.x, offset.y, it)
                 }
                 (0 until glyphs.size).map { i ->
                     Point(positionsData[2*i], positionsData[2*i + 1])
@@ -679,7 +679,7 @@ private external fun _nGetWidths(ptr: NativePointer, glyphs: InteropPointer, cou
 private external fun _nGetBounds(ptr: NativePointer, glyphs: ShortArray?, paintPtr: NativePointer): Array<Rect>
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetPositions")
-private external fun _nGetPositions(ptr: NativePointer, glyphs: ShortArray?, count: Int, x: Float, y: Float, positions: InteropPointer)
+private external fun _nGetPositions(ptr: NativePointer, glyphs: InteropPointer, count: Int, x: Float, y: Float, positions: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetXPositions")
 private external fun _nGetXPositions(ptr: NativePointer, glyphs: InteropPointer, x: Float, count: Int, positions: InteropPointer)
