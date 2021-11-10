@@ -655,9 +655,6 @@ private external fun _nSetScaleX(ptr: NativePointer, value: Float)
 @ExternalSymbolName("org_jetbrains_skia_Font__1nSetSkewX")
 private external fun _nSetSkewX(ptr: NativePointer, value: Float)
 
-@ExternalSymbolName("org_jetbrains_skia_Font__1nGetStringGlyphs")
-private external fun _nGetStringGlyphs(ptr: NativePointer, str: String?): ShortArray?
-
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetUTF32Glyph")
 private external fun _nGetUTF32Glyph(ptr: NativePointer, uni: Int): Short
 

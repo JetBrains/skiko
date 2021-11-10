@@ -210,26 +210,6 @@ SKIKO_EXPORT void org_jetbrains_skia_Font__1nSetSkewX
     instance->setSkewX(value);
 }
 
-
-SKIKO_EXPORT KShort* org_jetbrains_skia_Font__1nGetStringGlyphs
-  (KNativePointer ptr, KInteropPointer str) {
-    TODO("implement org_jetbrains_skia_Font__1nGetStringGlyphs");
-}
-
-#if 0
-SKIKO_EXPORT KShort* org_jetbrains_skia_Font__1nGetStringGlyphs
-  (KNativePointer ptr, KInteropPointer str) {
-    SkFont* instance = reinterpret_cast<SkFont*>(ptr);
-    jsize len = env->GetStringLength(str);
-    const KChar* chars = env->GetStringCritical(str, nullptr);
-    int count = instance->textToGlyphs(chars, len * sizeof(KChar), SkTextEncoding::kUTF16, nullptr, 0);
-    std::vector<short> glyphs(count);
-    instance->textToGlyphs(chars, len * sizeof(KChar), SkTextEncoding::kUTF16, reinterpret_cast<SkGlyphID*>(glyphs.data()), count);
-    env->ReleaseStringCritical(str, chars);
-    return javaShortArray(env, glyphs);
-}
-#endif
-
 SKIKO_EXPORT void org_jetbrains_skia_Font__1nGetUTF32Glyphs
   (KNativePointer ptr, KInt* uniArr, KInt uniArrLen, KShort* resultGlyphs) {
     SkFont* instance = reinterpret_cast<SkFont*>(ptr);
