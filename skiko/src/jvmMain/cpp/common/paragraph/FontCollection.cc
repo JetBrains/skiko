@@ -7,6 +7,30 @@
 using namespace std;
 using namespace skia::textlayout;
 
+
+using namespace std;
+
+//SKIKO_EXPORT KInt org_jetbrains_skia_vectorinterop_1nGetSize
+//    (KNativePointer vectorPtr) {
+//
+//    vector<KNativePointer>* pointers = reinterpret_cast<vector<KNativePointer>*>(vectorPtr);
+//    return pointers->size();
+//}
+
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_paragraph_FontCollectionKt__1nGetVectorSize
+    (JNIEnv* env, jclass jclass, jlong vectorPtr) {
+
+    vector<jlong>* pointers = reinterpret_cast<vector<jlong>*>(vectorPtr);
+    return pointers->size();
+}
+
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_FontCollectionKt__1nCreateVectorOfSize
+    (JNIEnv* env, jclass jclass, jint size) {
+
+    std::vector<int>* v = new vector<int>(size);
+    return reinterpret_cast<jlong>(v);
+}
+
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_FontCollectionKt__1nMake
   (JNIEnv* env, jclass jclass) {
     FontCollection* ptr = new FontCollection();
@@ -60,19 +84,18 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_FontCollect
 }
 
 extern "C" JNIEXPORT jlongArray JNICALL Java_org_jetbrains_skia_paragraph_FontCollectionKt__1nFindTypefaces
-  (JNIEnv* env, jclass jclass, jlong ptr, jobjectArray familyNamesArray, jint fontStyle) {
+  (JNIEnv* env, jclass jclass, jlong ptr, jlongArray familyNamesArray, jint familyNamesLen, jint fontStyle) {
     FontCollection* instance = reinterpret_cast<FontCollection*>(static_cast<uintptr_t>(ptr));
 
-    jsize len = env->GetArrayLength(familyNamesArray);
-    vector<SkString> familyNames(len);
-    for (int i = 0; i < len; ++i) {
-        jstring str = static_cast<jstring>(env->GetObjectArrayElement(familyNamesArray, i));
-        familyNames.push_back(skString(env, str));
-        env->DeleteLocalRef(str);
+    vector<SkString> familyNames(familyNamesLen);
+    jlong* familyNamesPtr = env->GetLongArrayElements(familyNamesArray, nullptr);
+    for (int i = 0; i < familyNamesLen; ++i) {
+        familyNames.push_back(reinterpret_cast<SkString>(*(familyNames[i])));
     }
+    env->ReleaseLongArrayElements(familyNamesArray, familyNamesPtr, 0);
 
     vector<sk_sp<SkTypeface>> found = instance->findTypefaces(familyNames, skija::FontStyle::fromJava(fontStyle));
-    vector<jlong> res(found.size());
+    vector<jlong>* = new res(found.size());
     for (int i = 0; i < found.size(); ++i)
         res[i] = reinterpret_cast<jlong>(found[i].release());
 

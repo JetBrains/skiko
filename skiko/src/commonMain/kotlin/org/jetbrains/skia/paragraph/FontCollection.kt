@@ -86,11 +86,13 @@ class FontCollection internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             reachabilityBarrier(this)
         }
 
-    fun findTypefaces(familyNames: Array<String>?, style: FontStyle): Array<Typeface?> {
+    fun findTypefaces(familyNames: Array<String>, style: FontStyle): Array<Typeface?> {
         return try {
             Stats.onNativeCall()
             val ptrs = interopScope {
-                _nFindTypefaces(_ptr, toInterop(familyNames), style._value).fromInteropNativePointerArray()
+                val managedStrings = ManagedString.fromArray(familyNames)
+                val familyNamesPtrs = ManagedString.toInteropArray(managedStrings)
+                _nFindTypefaces(_ptr, toInterop(familyNamesPtrs), familyNamesPtrs.size, style._value).fromInteropNativePointerArray()
             }
             val res = arrayOfNulls<Typeface>(ptrs.size)
             for (i in 0 until ptrs.size) res[i] = Typeface(ptrs[i])
@@ -157,7 +159,7 @@ private external fun _nSetDefaultFontManager(ptr: NativePointer, fontManagerPtr:
 private external fun _nGetFallbackManager(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nFindTypefaces")
-private external fun _nFindTypefaces(ptr: NativePointer, familyNames: InteropPointer, fontStyle: Int): InteropPointer
+private external fun _nFindTypefaces(ptr: NativePointer, familyNames: InteropPointer, familyNamesLen: Int, fontStyle: Int): InteropPointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nDefaultFallbackChar")
 private external fun _nDefaultFallbackChar(ptr: NativePointer, unicode: Int, fontStyle: Int, locale: String?): NativePointer

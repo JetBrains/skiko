@@ -1,17 +1,15 @@
-package org.jetbrains.skia
+package org.jetbrains.skia.paragraph
 
+import org.jetbrains.skia.FontMgr
+import org.jetbrains.skia.FontStyle
 import org.jetbrains.skia.impl.use
-import org.jetbrains.skia.paragraph.FontCollection
-import org.jetbrains.skia.paragraph.LineMetrics
-import org.jetbrains.skia.paragraph.ParagraphBuilder
-import org.jetbrains.skia.paragraph.ParagraphStyle
 import org.jetbrains.skiko.tests.SkipJsTarget
 import org.jetbrains.skiko.tests.SkipNativeTarget
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-@SkipJsTarget
-@SkipNativeTarget
+//@SkipJsTarget
+//@SkipNativeTarget
 class ParagraphTest {
     private val fontCollection = FontCollection().setDefaultFontManager(FontMgr.default)
 

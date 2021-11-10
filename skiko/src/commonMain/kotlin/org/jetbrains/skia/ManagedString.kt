@@ -8,6 +8,18 @@ class ManagedString internal constructor(ptr: NativePointer, managed: Boolean = 
         init {
             staticLoad()
         }
+
+        internal fun fromArray(strings: Array<String>): Array<ManagedString> {
+            return Array(strings.size) {
+                ManagedString(strings[it])
+            }
+        }
+
+        internal fun toInteropArray(strings: Array<ManagedString>): NativePointerArray {
+            return NativePointerArray(strings.size).apply {
+                strings.forEachIndexed { index, s -> set(index, s._ptr)}
+            }
+        }
     }
 
     constructor(s: String?) : this(
