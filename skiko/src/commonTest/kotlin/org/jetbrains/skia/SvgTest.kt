@@ -37,7 +37,7 @@ class SvgTest {
         require(e.viewBox == null)
         require(e.tag == SVGTag.SVG)
         e.viewBox = Rect(0f, 1f, 100f, 200f)
-        assertCloseEnough(Rect(0f, 1f, 100f, 200f), e.viewBox)
+        assertCloseEnough(Rect(0f, 1f, 100f, 200f), e.viewBox!!)
         val aspectRatio = SVGPreserveAspectRatio(SVGPreserveAspectRatioAlign.XMIN_YMIN, SVGPreserveAspectRatioScale.MEET)
         e.preserveAspectRatio = aspectRatio
         assertEquals(aspectRatio, e.preserveAspectRatio)

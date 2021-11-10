@@ -66,7 +66,7 @@ class TextBlobTest {
                 102.99094f, 132.33693f, 134.25397f, 141.45454f, 158.58522f, 173.29857f, 179.27502f, 212.21196f,
                 217.8335f, 229.33693f, 231.25397f
             ),
-            actual = textBlob.getIntercepts(lowerBound = 0f, upperBound = 1f),
+            actual = textBlob.getIntercepts(lowerBound = 0f, upperBound = 1f)!!,
             epsilon = eps
         )
 
