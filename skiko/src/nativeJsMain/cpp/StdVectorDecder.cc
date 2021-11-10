@@ -1,9 +1,9 @@
 #include "common.h"
 
-SKIKO_EXPORT KLong org_jetbrains_skia_StdVectorDecoder__1nGetArraySize
+SKIKO_EXPORT KInt org_jetbrains_skia_StdVectorDecoder__1nGetArraySize
     (KNativePointer ptr) {
-        std::vector<KLong>* vect = reinterpret_cast<std::vector<KLong> *>(ptr);
-        return static_cast<KLong>(vect->size());
+        std::vector<KNativePointer>* vect = reinterpret_cast<std::vector<KNativePointer> *>(ptr);
+        return vect->size();
     }
 
 SKIKO_EXPORT void org_jetbrains_skia_StdVectorDecoder__1nDisposeArray
@@ -12,8 +12,8 @@ SKIKO_EXPORT void org_jetbrains_skia_StdVectorDecoder__1nDisposeArray
         delete vect;
     }
 
-SKIKO_EXPORT KLong org_jetbrains_skia_StdVectorDecoder__1nGetArrayElement
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_StdVectorDecoder__1nGetArrayElement
     (KNativePointer ptr, KInt index) {
-        std::vector<KLong>* vect = reinterpret_cast<std::vector<KLong> *>(ptr);
+        std::vector<KNativePointer>* vect = reinterpret_cast<std::vector<KNativePointer> *>(ptr);
         return vect->at(index);
     }
