@@ -78,21 +78,18 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PictureKt__1nGetAppro
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PictureKt__1nMakeShader
-  (JNIEnv* env, jclass jclass, jlong ptr, jint tmxValue, jint tmyValue, jint filterModeValue, jfloatArray localMatrixArr, jfloatArray tileRectLTRB) {
+  (JNIEnv* env, jclass jclass, jlong ptr, jint tmxValue, jint tmyValue, jint filterModeValue, jfloatArray localMatrixArr, jboolean hasTile, jfloat tileLeft, jfloat tileTop, jfloat tileRight, jfloat tileBottom) {
     SkPicture* instance = reinterpret_cast<SkPicture*>(static_cast<uintptr_t>(ptr));
     SkTileMode tmx = static_cast<SkTileMode>(tmxValue);
     SkTileMode tmy = static_cast<SkTileMode>(tmyValue);
     SkFilterMode filterMode = static_cast<SkFilterMode>(filterModeValue);
     std::unique_ptr<SkMatrix> localMatrix = skMatrix(env, localMatrixArr);
-    jfloat* tile = tileRectLTRB == nullptr ? nullptr : env->GetFloatArrayElements(tileRectLTRB, 0);
-    SkRect tileRect;
-    SkRect* tileRectPtr = nullptr;
-    if (tile != nullptr) {
-        tileRect.setLTRB(tile[0], tile[1], tile[2], tile[2]);
-        tileRectPtr = &tileRect;
+    SkShader* shader;
+    if (hasTile) {
+        SkRect tileRect = SkRect::MakeLTRB(tileLeft, tileRight, tileBottom, tileTop);
+        shader = instance->makeShader(tmx, tmy, filterMode, localMatrix.get(), &tileRect).release();
+    } else {
+        shader = instance->makeShader(tmx, tmy, filterMode, localMatrix.get(), nullptr).release();
     }
-    SkShader* shader = instance->makeShader(tmx, tmy, filterMode, localMatrix.get(), tileRectPtr).release();
-    if (tile != nullptr)
-        env->ReleaseFloatArrayElements(tileRectLTRB, tile, 0);
     return reinterpret_cast<jlong>(shader);
 }

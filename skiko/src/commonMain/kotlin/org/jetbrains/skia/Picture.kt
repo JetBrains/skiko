@@ -101,10 +101,7 @@ class Picture internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     val cullRect: Rect
         get() = try {
             Stats.onNativeCall()
-            val ltrb = withResult(FloatArray(4)) {
-                _nGetCullRect(_ptr, it)
-            }
-            Rect(ltrb[0], ltrb[1], ltrb[2], ltrb[3])
+            Rect.fromInteropPointer { _nGetCullRect(_ptr, it) }
         } finally {
             reachabilityBarrier(this)
         }
@@ -212,10 +209,20 @@ class Picture internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         return try {
             Stats.onNativeCall()
             val arr = localMatrix?.mat
-            val ltrbArray = tileRect?.toLTRBArray()
             Shader(
                 interopScope {
-                    _nMakeShader(_ptr, tmx.ordinal, tmy.ordinal, mode.ordinal, toInterop(arr), toInterop(ltrbArray))
+                    _nMakeShader(
+                        _ptr,
+                        tmx.ordinal,
+                        tmy.ordinal,
+                        mode.ordinal,
+                        toInterop(arr),
+                        tileRect != null,
+                        tileRect?.left ?: 0f,
+                        tileRect?.top ?: 0f,
+                        tileRect?.right ?: 0f,
+                        tileRect?.bottom ?: 0f
+                    )
                 }
             )
         } finally {
@@ -228,7 +235,7 @@ class Picture internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 private external fun Picture_nMakeFromData(dataPtr: NativePointer /*, SkDeserialProcs */): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nGetCullRect")
-private external fun _nGetCullRect(ptr: NativePointer, ltbr: InteropPointer)
+private external fun _nGetCullRect(ptr: NativePointer, ltrb: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nGetUniqueId")
 private external fun _nGetUniqueId(ptr: NativePointer): Int
@@ -252,7 +259,11 @@ private external fun _nMakeShader(
     tmy: Int,
     filterMode: Int,
     localMatrix: InteropPointer,
-    tileRect: InteropPointer
+    hasTile: Boolean,
+    tileL: Float,
+    tileT: Float,
+    tileR: Float,
+    tileB: Float,
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nPlayback")
