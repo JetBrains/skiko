@@ -3,6 +3,7 @@ import org.gradle.crypto.checksum.Checksum
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 import org.jetbrains.compose.internal.publishing.MavenCentralProperties
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 plugins {
     kotlin("multiplatform") version "1.5.31"
@@ -43,21 +44,25 @@ repositories {
 val windowsSdkPaths: WindowsSdkPaths by lazy {
     findWindowsSdkPathsForCurrentOS(gradle)
 }
+fun canBeCompiledOnHost(targetOS: OS, targetArch: Arch): Boolean =
+    when (targetOS) {
+        OS.Linux -> hostOs == OS.Linux
+        OS.Windows -> hostOs == OS.Windows
+        OS.Wasm -> hostOs == OS.MacOS || hostOs == OS.Linux
+        OS.MacOS, OS.IOS -> hostOs == OS.MacOS
+    }
 
-val crossTargets = listOf(
-    OS.Wasm to Arch.Wasm,
-    OS.IOS to Arch.X64,
-    OS.IOS to Arch.Arm64,
-    OS.MacOS to Arch.X64,
-    OS.MacOS to Arch.Arm64,
-    OS.Linux to Arch.X64
-)
-
-class NativeCompilationInfo(val target: org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget) {
-    var linkTask: Provider<Exec>? = null
+tasks.all {
+    if (this is CompileSkikoCppTask) {
+        doFirst {
+            val taskTargetOs = buildTargetOS.get()
+            val taskTargetArch = buildTargetArch.get()
+            if (!canBeCompiledOnHost(taskTargetOs, taskTargetArch)) {
+                error("Target '$taskTargetOs-$taskTargetArch' is not enabled on host '$hostOs-$hostArch'")
+            }
+        }
+    }
 }
-
-val allNativeTargets = mutableMapOf<Pair<OS, Arch>, NativeCompilationInfo>()
 
 val skiaWasmDir = registerOrGetSkiaDirProvider(OS.Wasm, Arch.Wasm)
 
@@ -85,7 +90,7 @@ val compileWasm = tasks.register<CompileSkikoCppTask>("compileWasm") {
     ))
 }
 
-fun registerNativeBridgesTask(os: OS, arch: Arch): TaskProvider<CompileSkikoCppTask> {
+fun compileNativeBridgesTask(os: OS, arch: Arch): TaskProvider<CompileSkikoCppTask> {
     val skiaNativeDir = registerOrGetSkiaDirProvider(os, arch)
 
     return tasks.register<CompileSkikoCppTask>("${os.id}_${arch.id}_CrossCompile") {
@@ -238,93 +243,11 @@ kotlin {
         binaries.executable()
     }
 
-    if (supportNative) {
-        when ("${hostOs.id}-${hostArch.id}") {
-            "macos-x64" -> allNativeTargets[OS.MacOS to Arch.X64] = NativeCompilationInfo(macosX64())
-            "macos-arm64" -> allNativeTargets[OS.MacOS to Arch.Arm64] = NativeCompilationInfo(macosArm64())
-            "linux-x64" -> allNativeTargets[OS.Linux to Arch.X64] = NativeCompilationInfo(linuxX64())
-        }
-
-        if (hostOs == OS.MacOS) {
-            allNativeTargets[OS.IOS to Arch.Arm64] = NativeCompilationInfo(iosArm64())
-            allNativeTargets[OS.IOS to Arch.X64] = NativeCompilationInfo(iosX64())
-        }
-
-        for ((osArch, compilation) in allNativeTargets) {
-            val targetString = "${osArch.first.id}-${osArch.second.id}"
-
-            val unzipper = registerOrGetSkiaDirProvider(osArch.first, osArch.second)
-            val unpackedSkia = unzipper.get()
-            val skiaDir = unpackedSkia.absolutePath
-
-            val bridgesLibrary = "$buildDir/nativeBridges/static/$targetString/skiko-native-bridges-$targetString.a"
-            val allLibraries = skiaStaticLibraries(skiaDir, targetString) + bridgesLibrary
-
-            compilation.target.compilations.all {
-                val skiaBinDir = "$skiaDir/out/${buildType.id}-${osArch.first.id}-${osArch.second.id}"
-                kotlinOptions {
-                    val linkerFlags = when (osArch.first) {
-                        OS.MacOS -> listOf("-linker-option", "-framework", "-linker-option", "Metal",
-                            "-linker-option", "-framework", "-linker-option", "CoreGraphics",
-                            "-linker-option", "-framework", "-linker-option", "CoreText",
-                            "-linker-option", "-framework", "-linker-option", "CoreServices"
-                            )
-                        OS.IOS -> listOf("-linker-option", "-framework", "-linker-option", "Metal",
-                            "-linker-option", "-framework", "-linker-option", "CoreGraphics",
-                            "-linker-option", "-framework", "-linker-option", "CoreText")
-                        OS.Linux -> listOf(
-                            "-linker-option", "-L/usr/lib/x86_64-linux-gnu",
-                            "-linker-option", "-lfontconfig",
-                            "-linker-option", "-lGL",
-                            // TODO: an ugly hack, Linux linker searches only unresolved symbols.
-                            "-linker-option", "$skiaBinDir/libskshaper.a",
-                            "-linker-option", "$skiaBinDir/libskunicode.a",
-                            "-linker-option", "$skiaBinDir/libskia.a"
-                            )
-                        else -> emptyList()
-                    }
-                    freeCompilerArgs = allLibraries.map { listOf("-include-binary", it) }.flatten() + linkerFlags
-                }
-            }
-
-            val crossCompileTask = registerNativeBridgesTask(osArch.first, osArch.second)
-
-            val info = allNativeTargets[osArch]!!
-            info.linkTask = project.tasks.register<Exec>("linkNativeBridges$targetString") {
-                dependsOn(crossCompileTask)
-                val objectFilesDir = crossCompileTask.map { it.outDir.get() }
-                val objectFiles = project.fileTree(objectFilesDir) {
-                    include("**/*.o")
-                }
-                inputs.files(objectFiles)
-
-                val outDir = "$buildDir/nativeBridges/static/$targetString"
-                val staticLib = "$outDir/skiko-native-bridges-$targetString.a"
-                workingDir = File(outDir)
-                if (osArch.first == OS.Linux) {
-                    executable = "ar"
-                    argumentProviders.add {
-                        listOf(
-                            "-crs",
-                            staticLib
-                        )
-                    }
-                } else {
-                    executable = "libtool"
-                    argumentProviders.add {
-                        listOf(
-                            "-static",
-                            "-o",
-                            staticLib
-                        )
-                    }
-                }
-                argumentProviders.add { objectFiles.files.map { it.absolutePath } }
-                file(outDir).mkdirs()
-                outputs.dir(outDir)
-            }
-        }
-    }
+    configureNativeTarget(OS.MacOS, Arch.X64, macosX64())
+    configureNativeTarget(OS.MacOS, Arch.Arm64, macosArm64())
+    configureNativeTarget(OS.Linux, Arch.X64, linuxX64())
+    configureNativeTarget(OS.IOS, Arch.Arm64, iosArm64())
+    configureNativeTarget(OS.IOS, Arch.X64, iosX64())
 
     sourceSets {
         val commonMain by getting {
@@ -375,89 +298,139 @@ kotlin {
             }
         }
 
-        if (supportNative) {
-            // See https://kotlinlang.org/docs/mpp-share-on-platforms.html#configure-the-hierarchical-structure-manually
-            val nativeMain by creating {
-                dependsOn(nativeJsMain)
-                dependencies {
-                    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
-                }
-            }
-            val nativeTest by creating {
-                dependsOn(nativeJsTest)
-            }
-            if (hostOs == OS.Linux) {
-                val linuxMain by creating {
-                    dependsOn(nativeMain)
-                }
-                val linuxTest by creating {
-                    dependsOn(nativeTest)
-                }
-                when (targetArch) {
-                    Arch.X64 -> {
-                        val linuxX64Main by getting {
-                            dependsOn(linuxMain)
-                        }
-                        val linuxX64Test by getting {
-                            dependsOn(linuxTest)
-                        }
-                    }
-                }
-            }
-            if (hostOs == OS.MacOS) {
-                val darwinMain by creating {
-                    dependsOn(nativeMain)
-                }
-                val darwinTest by creating {
-                    dependsOn(nativeTest)
-                }
-                val macosMain by creating {
-                    dependsOn(darwinMain)
-                }
-                val macosTest by creating {
-                    dependsOn(darwinTest)
-                }
-                val iosMain by creating {
-                    dependsOn(darwinMain)
-                }
-                val iosTest by creating {
-                    dependsOn(darwinTest)
-                }
-                val macosArch = when (targetArch) {
-                    Arch.X64 -> {
-                        val macosX64Main by getting {
-                            dependsOn(macosMain)
-                        }
-                        val macosX64Test by getting {
-                            dependsOn(macosTest)
-                        }
-                        macosX64Main to macosX64Test
-                    }
-                    Arch.Arm64 -> {
-                        val macosArm64Main by getting {
-                            dependsOn(macosMain)
-                        }
-                        val macosArm64Test by getting {
-                            dependsOn(macosTest)
-                        }
-                        macosArm64Main to macosArm64Test
-                    }
-                    else -> throw GradleException("Unsupported arch $targetArch for macOS")
-                }
-                val iosX64Main by getting {
-                    dependsOn(iosMain)
-                }
-                val iosX64Test by getting {
-                    dependsOn(iosTest)
-                }
-                val iosArm64Main by getting {
-                    dependsOn(iosMain)
-                }
-                val iosArm64Test by getting {
-                    dependsOn(iosTest)
-                }
+        // See https://kotlinlang.org/docs/mpp-share-on-platforms.html#configure-the-hierarchical-structure-manually
+        val nativeMain by creating {
+            dependsOn(nativeJsMain)
+            dependencies {
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
             }
         }
+        val nativeTest by creating {
+            dependsOn(nativeJsTest)
+        }
+        val linuxMain by creating {
+            dependsOn(nativeMain)
+        }
+        val linuxTest by creating {
+            dependsOn(nativeTest)
+        }
+        val linuxX64Main by getting {
+            dependsOn(linuxMain)
+        }
+        val linuxX64Test by getting {
+            dependsOn(linuxTest)
+        }
+        val darwinMain by creating {
+            dependsOn(nativeMain)
+        }
+        val darwinTest by creating {
+            dependsOn(nativeTest)
+        }
+        val macosMain by creating {
+            dependsOn(darwinMain)
+        }
+        val macosTest by creating {
+            dependsOn(darwinTest)
+        }
+        val iosMain by creating {
+            dependsOn(darwinMain)
+        }
+        val iosTest by creating {
+            dependsOn(darwinTest)
+        }
+        val macosX64Main by getting {
+            dependsOn(macosMain)
+        }
+        val macosX64Test by getting {
+            dependsOn(macosTest)
+        }
+        val macosArm64Main by getting {
+            dependsOn(macosMain)
+        }
+        val macosArm64Test by getting {
+            dependsOn(macosTest)
+        }
+        val iosX64Main by getting {
+            dependsOn(iosMain)
+        }
+        val iosX64Test by getting {
+            dependsOn(iosTest)
+        }
+        val iosArm64Main by getting {
+            dependsOn(iosMain)
+        }
+        val iosArm64Test by getting {
+            dependsOn(iosTest)
+        }
+    }
+}
+
+fun configureNativeTarget(os: OS, arch: Arch, target: KotlinNativeTarget) {
+    val targetString = "${os.id}-${arch.id}"
+
+    val unzipper = registerOrGetSkiaDirProvider(os, arch)
+    val unpackedSkia = unzipper.get()
+    val skiaDir = unpackedSkia.absolutePath
+
+    val bridgesLibrary = "$buildDir/nativeBridges/static/$targetString/skiko-native-bridges-$targetString.a"
+    val allLibraries = skiaStaticLibraries(skiaDir, targetString) + bridgesLibrary
+
+    target.compilations.all {
+        val skiaBinDir = "$skiaDir/out/${buildType.id}-$targetString"
+        kotlinOptions {
+            val linkerFlags = when (os) {
+                OS.MacOS -> listOf("-linker-option", "-framework", "-linker-option", "Metal",
+                    "-linker-option", "-framework", "-linker-option", "CoreGraphics",
+                    "-linker-option", "-framework", "-linker-option", "CoreText",
+                    "-linker-option", "-framework", "-linker-option", "CoreServices"
+                )
+                OS.IOS -> listOf("-linker-option", "-framework", "-linker-option", "Metal",
+                    "-linker-option", "-framework", "-linker-option", "CoreGraphics",
+                    "-linker-option", "-framework", "-linker-option", "CoreText")
+                OS.Linux -> listOf(
+                    "-linker-option", "-L/usr/lib/x86_64-linux-gnu",
+                    "-linker-option", "-lfontconfig",
+                    "-linker-option", "-lGL",
+                    // TODO: an ugly hack, Linux linker searches only unresolved symbols.
+                    "-linker-option", "$skiaBinDir/libskshaper.a",
+                    "-linker-option", "$skiaBinDir/libskunicode.a",
+                    "-linker-option", "$skiaBinDir/libskia.a"
+                )
+                else -> emptyList()
+            }
+            freeCompilerArgs = allLibraries.map { listOf("-include-binary", it) }.flatten() + linkerFlags
+        }
+    }
+
+    val crossCompileTask = compileNativeBridgesTask(os, arch)
+
+    val linkTask = project.tasks.register<Exec>("linkNativeBridges$targetString") {
+        dependsOn(crossCompileTask)
+        val objectFilesDir = crossCompileTask.map { it.outDir.get() }
+        val objectFiles = project.fileTree(objectFilesDir) {
+            include("**/*.o")
+        }
+        inputs.files(objectFiles)
+        val outDir = "$buildDir/nativeBridges/static/$targetString"
+        val staticLib = "$outDir/skiko-native-bridges-$targetString.a"
+        workingDir = File(outDir)
+        when (os) {
+            OS.Linux -> {
+                executable = "ar"
+                argumentProviders.add { listOf("-crs", staticLib) }
+            }
+            OS.MacOS, OS.IOS -> {
+                executable = "libtool"
+                argumentProviders.add { listOf("-static", "-o", staticLib) }
+            }
+            else -> error("Unexpected OS for native bridges linking: $os")
+        }
+        argumentProviders.add { objectFiles.files.map { it.absolutePath } }
+        file(outDir).mkdirs()
+        outputs.dir(outDir)
+    }
+    target.compilations.all {
+        compileKotlinTask.dependsOn(linkTask)
     }
 }
 
@@ -628,6 +601,37 @@ val compileJvmBindings = tasks.register<CompileSkikoCppTask>("compileJvmBindings
     )
 }
 
+if (hostOs == OS.MacOS) {
+    // Very hacky way to compile Objective-C sources and add the
+    // resulting object files into the final library.
+    project.tasks.register<Exec>("objcCompile") {
+        val inputDir = "$projectDir/src/jvmMain/objectiveC/${targetOs.id}"
+        val outDir = "$buildDir/objc/$target"
+        val names = File(inputDir).listFiles()!!.map { it.name.removeSuffix(".mm") }
+        val srcs = names.map { "$inputDir/$it.mm" }.toTypedArray()
+        val outs = names.map { "$outDir/$it.o" }.toTypedArray()
+        workingDir = File(outDir)
+        val skiaDir = skiaJvmBindingsDir.get().absolutePath
+        commandLine = listOf(
+            "clang",
+            *targetOs.clangFlags,
+            "-I$jdkHome/include",
+            "-I$jdkHome/include/darwin",
+            "-I$skiaDir",
+            "-I$skiaDir/include",
+            "-I$skiaDir/include/gpu",
+            "-fobjc-arc",
+            "-DSK_METAL",
+            "-std=c++17",
+            "-c",
+            *srcs
+        )
+        file(outDir).mkdirs()
+        inputs.files(srcs)
+        outputs.files(outs)
+    }
+}
+
 val linkJvmBindings = tasks.register<LinkSkikoTask>("linkJvmBindings") {
     val skiaBinDir = skiaJvmBindingsDir.get().absolutePath + "/" + skiaBinSubdir
     val osFlags: Array<String>
@@ -715,35 +719,33 @@ val linkJvmBindings = tasks.register<LinkSkikoTask>("linkJvmBindings") {
     flags.set(listOf(*osFlags))
 }
 
-if (hostOs == OS.MacOS) {
-    // Very hacky way to compile Objective-C sources and add the
-    // resulting object files into the final library.
-    project.tasks.register<Exec>("objcCompile") {
-        val inputDir = "$projectDir/src/jvmMain/objectiveC/${targetOs.id}"
-        val outDir = "$buildDir/objc/$target"
-        val names = File(inputDir).listFiles()!!.map { it.name.removeSuffix(".mm") }
-        val srcs = names.map { "$inputDir/$it.mm" }.toTypedArray()
-        val outs = names.map { "$outDir/$it.o" }.toTypedArray()
-        workingDir = File(outDir)
-        val skiaDir = skiaJvmBindingsDir.get().absolutePath
-        commandLine = listOf(
-            "clang",
-            *targetOs.clangFlags,
-            "-I$jdkHome/include",
-            "-I$jdkHome/include/darwin",
-            "-I$skiaDir",
-            "-I$skiaDir/include",
-            "-I$skiaDir/include/gpu",
-            "-fobjc-arc",
-            "-DSK_METAL",
-            "-std=c++17",
-            "-c",
-            *srcs
-        )
-        file(outDir).mkdirs()
-        inputs.files(srcs)
-        outputs.files(outs)
-    }
+// Very hacky way to compile Objective-C sources and add the
+// resulting object files into the final library.
+project.tasks.register<Exec>("objcCompile") {
+    val inputDir = "$projectDir/src/jvmMain/objectiveC/${targetOs.id}"
+    val outDir = "$buildDir/objc/$target"
+    val names = File(inputDir).listFiles()!!.map { it.name.removeSuffix(".mm") }
+    val srcs = names.map { "$inputDir/$it.mm" }.toTypedArray()
+    val outs = names.map { "$outDir/$it.o" }.toTypedArray()
+    workingDir = File(outDir)
+    val skiaDir = skiaJvmBindingsDir.get().absolutePath
+    commandLine = listOf(
+        "clang",
+        *targetOs.clangFlags,
+        "-I$jdkHome/include",
+        "-I$jdkHome/include/darwin",
+        "-I$skiaDir",
+        "-I$skiaDir/include",
+        "-I$skiaDir/include/gpu",
+        "-fobjc-arc",
+        "-DSK_METAL",
+        "-std=c++17",
+        "-c",
+        *srcs
+    )
+    file(outDir).mkdirs()
+    inputs.files(srcs)
+    outputs.files(outs)
 }
 
 val generateVersion = project.tasks.register("generateVersion") {
@@ -794,7 +796,6 @@ fun sealBinary(sealer: String, lib: File) {
     }
     println("Sealed!")
 }
-
 
 fun remoteSignCurl(signHost: String, lib: File, out: File) {
     println("Remote signing $lib on $signHost")
@@ -1011,8 +1012,6 @@ val emptyJavadocJar by tasks.registering(Jar::class) {
     archiveClassifier.set("javadoc")
 }
 
-
-
 publishing {
     repositories {
         configureEach {
@@ -1091,13 +1090,11 @@ publishing {
             }
         }
 
-        if (supportWasm) {
-            create<MavenPublication>("skikoWasmRuntime") {
-                pomNameForPublication[name] = "Skiko WASM Runtime"
-                artifactId = SkikoArtifacts.jsWasmArtifactId
-                artifact(skikoWasmJar.get())
-                artifact(emptySourcesJar)
-            }
+        create<MavenPublication>("skikoWasmRuntime") {
+            pomNameForPublication[name] = "Skiko WASM Runtime"
+            artifactId = SkikoArtifacts.jsWasmArtifactId
+            artifact(skikoWasmJar.get())
+            artifact(emptySourcesJar)
         }
 
         val publicationsWithoutPomNames = publications.filter { it.name !in pomNameForPublication }
@@ -1131,12 +1128,6 @@ afterEvaluate {
     tasks.withType<KotlinNativeCompile>().configureEach {
         dependsOn(generateVersion)
         source(generatedKotlin)
-        // TDOD: do we need this 'if'?
-        if (supportNative) {
-            val compilationInfoKey = allNativeTargets.keys.singleOrNull { "${it.first.id}_${it.second.id}" == this.target }
-                ?: throw GradleException("No cross-target for ${this.target}")
-            dependsOn(allNativeTargets[compilationInfoKey]!!.linkTask)
-        }
     }
 }
 
