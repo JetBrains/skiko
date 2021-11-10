@@ -400,12 +400,33 @@ static inline jfloat fromBits(jint i) {
 template<typename T>
 class JCallback {
 public:
-    JCallback (JNIEnv* env, jobject supplier) : env(env), supplier(supplier) { };
+    JCallback (JNIEnv* env, jobject supplier) : env(env), supplier(env->NewGlobalRef(supplier)) {
+        env->GetJavaVM(&javaVM);
+    }
+
+    ~JCallback() {
+        if (supplier != nullptr) {
+            JNIEnv* localEnv;
+            if (javaVM->GetEnv(reinterpret_cast<void**>(&localEnv), SKIKO_JNI_VERSION) == JNI_OK) {
+                localEnv->DeleteGlobalRef(supplier);
+            }
+        }
+    }
 
     JCallback(const JCallback&) = delete;
-    JCallback(JCallback&&) = delete;
     JCallback& operator=(const JCallback&) = delete;
-    JCallback& operator=(JCallback&&) = delete;
+
+    JCallback(JCallback&& other) noexcept {
+        std::swap(env, other.env);
+        std::swap(javaVM, other.javaVM);
+        std::swap(supplier, other.supplier);
+    }
+    JCallback& operator=(JCallback&& other) {
+        std::swap(env, other.env);
+        std::swap(javaVM, other.javaVM);
+        std::swap(supplier, other.supplier);
+        return this;
+    }
 
     T operator()();
 
@@ -414,6 +435,7 @@ public:
     }
 private:
     JNIEnv* env;
+    JavaVM* javaVM;
     jobject supplier;
 };
 
