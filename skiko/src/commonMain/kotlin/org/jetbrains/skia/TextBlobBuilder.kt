@@ -51,30 +51,10 @@ class TextBlobBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _F
      * @param text    Text to append in this run
      * @param x       horizontal offset within the blob
      * @param y       vertical offset within the blob
-     * @return        this
-     */
-    fun appendRun(font: Font, text: String, x: Float, y: Float): TextBlobBuilder {
-        return appendRun(font, font.getStringGlyphs(text), x, y, null)
-    }
-
-    /**
-     *
-     * Glyphs are positioned on a baseline at (x, y), using font metrics to
-     * determine their relative placement.
-     *
-     *
-     * bounds defines an optional bounding box, used to suppress drawing when TextBlob
-     * bounds does not intersect Surface bounds. If bounds is null, TextBlob bounds
-     * is computed from (x, y) and glyphs metrics.
-     *
-     * @param font    Font used for this run
-     * @param text    Text to append in this run
-     * @param x       horizontal offset within the blob
-     * @param y       vertical offset within the blob
      * @param bounds  optional run bounding box
      * @return        this
      */
-    fun appendRun(font: Font, text: String, x: Float, y: Float, bounds: Rect?): TextBlobBuilder {
+    fun appendRun(font: Font, text: String, x: Float, y: Float, bounds: Rect? = null): TextBlobBuilder {
         return appendRun(font, font.getStringGlyphs(text), x, y, bounds)
     }
 
@@ -103,9 +83,10 @@ class TextBlobBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _F
                     _ptr,
                     getPtr(font),
                     toInterop(glyphs),
+                    glyphs?.size ?: 0,
                     x,
                     y,
-                    bounds
+                    toInterop(bounds?.serializeToFloatArray())
                 )
             }
             this
@@ -149,14 +130,17 @@ class TextBlobBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _F
         return try {
             require(glyphs.size == xs.size) { "glyphs.length " + glyphs.size + " != xs.length " + xs.size }
             Stats.onNativeCall()
-            _nAppendRunPosH(
-                _ptr,
-                getPtr(font),
-                glyphs,
-                xs,
-                y,
-                bounds
-            )
+            interopScope {
+                _nAppendRunPosH(
+                    _ptr,
+                    getPtr(font),
+                    toInterop(glyphs),
+                    glyphs.size,
+                    toInterop(xs),
+                    y,
+                    toInterop(bounds?.serializeToFloatArray())
+                )
+            }
             this
         } finally {
             reachabilityBarrier(font)
@@ -200,8 +184,9 @@ class TextBlobBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _F
                     _ptr,
                     getPtr(font),
                     toInterop(glyphs),
+                    glyphs.size,
                     toInterop(floatPos),
-                    bounds
+                    toInterop(bounds?.serializeToFloatArray())
                 )
             }
             this
@@ -226,6 +211,7 @@ class TextBlobBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _F
                     _ptr,
                     getPtr(font),
                     toInterop(glyphs),
+                    glyphs.size,
                     toInterop(floatXform)
                 )
             }
@@ -251,21 +237,36 @@ private external fun TextBlobBuilder_nMake(): NativePointer
 private external fun _nBuild(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nAppendRun")
-private external fun _nAppendRun(ptr: NativePointer, fontPtr: NativePointer, glyphs: InteropPointer, x: Float, y: Float, bounds: Rect?)
+private external fun _nAppendRun(
+    ptr: NativePointer, fontPtr: NativePointer,
+    glyphs: InteropPointer, glyphsLen: Int,
+    x: Float, y: Float,
+    bounds: InteropPointer
+)
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nAppendRunPosH")
 private external fun _nAppendRunPosH(
     ptr: NativePointer,
     fontPtr: NativePointer,
-    glyphs: ShortArray?,
-    xs: FloatArray?,
+    glyphs: InteropPointer,
+    glyphsLen: Int,
+    xs: InteropPointer,
     y: Float,
-    bounds: Rect?
+    bounds: InteropPointer
 )
 
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nAppendRunPos")
-private external fun _nAppendRunPos(ptr: NativePointer, fontPtr: NativePointer, glyphs: InteropPointer, pos: InteropPointer, bounds: Rect?)
+private external fun _nAppendRunPos(
+    ptr: NativePointer, fontPtr: NativePointer,
+    glyphs: InteropPointer, glyphsLen: Int,
+    pos: InteropPointer,
+    bounds: InteropPointer
+)
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilder__1nAppendRunRSXform")
-private external fun _nAppendRunRSXform(ptr: NativePointer, fontPtr: NativePointer, glyphs: InteropPointer, xform: InteropPointer)
+private external fun _nAppendRunRSXform(
+    ptr: NativePointer, fontPtr: NativePointer,
+    glyphs: InteropPointer, glyphsLen: Int,
+    xform: InteropPointer
+)

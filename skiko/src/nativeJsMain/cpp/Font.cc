@@ -215,8 +215,8 @@ SKIKO_EXPORT KShort* org_jetbrains_skia_Font__1nGetStringGlyphs
   (KNativePointer ptr, KInteropPointer str) {
     TODO("implement org_jetbrains_skia_Font__1nGetStringGlyphs");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KShort* org_jetbrains_skia_Font__1nGetStringGlyphs
   (KNativePointer ptr, KInteropPointer str) {
     SkFont* instance = reinterpret_cast<SkFont*>((ptr));
@@ -230,25 +230,14 @@ SKIKO_EXPORT KShort* org_jetbrains_skia_Font__1nGetStringGlyphs
 }
 #endif
 
-
-
-SKIKO_EXPORT KShort* org_jetbrains_skia_Font__1nGetUTF32Glyphs
-  (KNativePointer ptr, KInt* uniArr) {
-    TODO("implement org_jetbrains_skia_Font__1nGetUTF32Glyphs");
+SKIKO_EXPORT void org_jetbrains_skia_Font__1nGetUTF32Glyphs
+  (KNativePointer ptr, KInt* uniArr, KInt uniArrLen, KShort* resultGlyphs) {
+    SkFont* instance = reinterpret_cast<SkFont*>(ptr);
+    instance->unicharsToGlyphs(
+        reinterpret_cast<SkUnichar*>(uniArr), uniArrLen,
+        reinterpret_cast<SkGlyphID*>(resultGlyphs)
+    );
 }
-     
-#if 0 
-SKIKO_EXPORT KShort* org_jetbrains_skia_Font__1nGetUTF32Glyphs
-  (KNativePointer ptr, KInt* uniArr) {
-    SkFont* instance = reinterpret_cast<SkFont*>((ptr));
-    int count = env->GetArrayLength(uniArr);
-    std::vector<KShort> glyphs(count);
-    KInt* uni = env->GetIntArrayElements(uniArr, nullptr);
-    instance->unicharsToGlyphs(reinterpret_cast<SkUnichar*>(uni), count, reinterpret_cast<SkGlyphID*>(glyphs.data()));
-    env->ReleaseIntArrayElements(uniArr, uni, 0);
-    return javaShortArray(env, glyphs);
-}
-#endif
 
 
 SKIKO_EXPORT KShort org_jetbrains_skia_Font__1nGetUTF32Glyph
@@ -262,8 +251,8 @@ SKIKO_EXPORT KInt org_jetbrains_skia_Font__1nGetStringGlyphsCount
   (KNativePointer ptr, KInteropPointer str) {
     TODO("implement org_jetbrains_skia_Font__1nGetStringGlyphsCount");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KInt org_jetbrains_skia_Font__1nGetStringGlyphsCount
   (KNativePointer ptr, KInteropPointer str) {
     SkFont* instance = reinterpret_cast<SkFont*>((ptr));
@@ -281,8 +270,8 @@ SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Font__1nMeasureText
   (KNativePointer ptr, KInteropPointer str, KNativePointer paintPtr) {
     TODO("implement org_jetbrains_skia_Font__1nMeasureText");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Font__1nMeasureText
   (KNativePointer ptr, KInteropPointer str, KNativePointer paintPtr) {
     SkFont* instance = reinterpret_cast<SkFont*>((ptr));
@@ -302,8 +291,8 @@ SKIKO_EXPORT KFloat org_jetbrains_skia_Font__1nMeasureTextWidth
   (KNativePointer ptr, KInteropPointer str, KNativePointer paintPtr) {
     TODO("implement org_jetbrains_skia_Font__1nMeasureTextWidth");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KFloat org_jetbrains_skia_Font__1nMeasureTextWidth
   (KNativePointer ptr, KInteropPointer str, KNativePointer paintPtr) {
     SkFont* instance = reinterpret_cast<SkFont*>((ptr));
@@ -322,8 +311,8 @@ SKIKO_EXPORT KFloat* org_jetbrains_skia_Font__1nGetWidths
   (KNativePointer ptr, KShort* glyphsArr) {
     TODO("implement org_jetbrains_skia_Font__1nGetWidths");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KFloat* org_jetbrains_skia_Font__1nGetWidths
   (KNativePointer ptr, KShort* glyphsArr) {
     SkFont* instance = reinterpret_cast<SkFont*>((ptr));
@@ -342,8 +331,8 @@ SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_Font__1nGetBounds
   (KNativePointer ptr, KShort* glyphsArr, KNativePointer paintPtr) {
     TODO("implement org_jetbrains_skia_Font__1nGetBounds");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_Font__1nGetBounds
   (KNativePointer ptr, KShort* glyphsArr, KNativePointer paintPtr) {
     SkFont* instance = reinterpret_cast<SkFont*>((ptr));
@@ -370,12 +359,12 @@ SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_Font__1nGetPositions
   (KNativePointer ptr, KShort* glyphsArr, KFloat dx, KFloat dy) {
     TODO("implement org_jetbrains_skia_Font__1nGetPositions");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_Font__1nGetPositions
   (KNativePointer ptr, KShort* glyphsArr, KFloat dx, KFloat dy) {
     SkFont* instance = reinterpret_cast<SkFont*>((ptr));
-    
+
     int count = env->GetArrayLength(glyphsArr);
     std::vector<SkPoint> positions(count);
     KShort* glyphs = env->GetShortArrayElements(glyphsArr, nullptr);
@@ -392,8 +381,8 @@ SKIKO_EXPORT KFloat* org_jetbrains_skia_Font__1nGetXPositions
   (KNativePointer ptr, KShort* glyphsArr, KFloat dx) {
     TODO("implement org_jetbrains_skia_Font__1nGetXPositions");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KFloat* org_jetbrains_skia_Font__1nGetXPositions
   (KNativePointer ptr, KShort* glyphsArr, KFloat dx) {
     SkFont* instance = reinterpret_cast<SkFont*>((ptr));
@@ -420,12 +409,12 @@ SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_Font__1nGetPaths
   (KNativePointer ptr, KShort* glyphsArr) {
     TODO("implement org_jetbrains_skia_Font__1nGetPaths");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_Font__1nGetPaths
   (KNativePointer ptr, KShort* glyphsArr) {
     SkFont* instance = reinterpret_cast<SkFont*>((ptr));
-    
+
     int count = env->GetArrayLength(glyphsArr);
     KShort* glyphs = env->GetShortArrayElements(glyphsArr, nullptr);
 
@@ -458,8 +447,8 @@ SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Font__1nGetMetrics
   (KNativePointer ptr, KShort* glyphsArr) {
     TODO("implement org_jetbrains_skia_Font__1nGetMetrics");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Font__1nGetMetrics
   (KNativePointer ptr, KShort* glyphsArr) {
     SkFont* instance = reinterpret_cast<SkFont*>((ptr));
@@ -474,8 +463,8 @@ SKIKO_EXPORT KFloat org_jetbrains_skia_Font__1nGetSpacing
   (KNativePointer ptr, KShort* glyphsArr) {
     TODO("implement org_jetbrains_skia_Font__1nGetSpacing");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KFloat org_jetbrains_skia_Font__1nGetSpacing
   (KNativePointer ptr, KShort* glyphsArr) {
     SkFont* instance = reinterpret_cast<SkFont*>((ptr));

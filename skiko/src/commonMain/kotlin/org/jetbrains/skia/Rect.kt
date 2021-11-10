@@ -53,6 +53,11 @@ open class Rect constructor(val left: Float, val top: Float, val right: Float, v
         )
     }
 
+    // This is a helper to pass Rect instance through interop border
+    internal fun serializeToFloatArray(): FloatArray {
+        return floatArrayOf(left, top, right, bottom)
+    }
+
     val isEmpty: Boolean
         get() = right == left || top == bottom
 
