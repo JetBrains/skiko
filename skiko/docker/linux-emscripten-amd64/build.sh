@@ -1,0 +1,1 @@
+docker build -t skiko-build-emscripten-ubuntu-2004-amd64:latest .
