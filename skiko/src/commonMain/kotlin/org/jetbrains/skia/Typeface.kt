@@ -2,7 +2,6 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skiko.kotlinBackend
 
 class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
@@ -339,21 +338,24 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
      * @return  all of the family names specified by the font
      */
     val familyNames: Array<FontFamilyName>
-        get() = try {
-            Stats.onNativeCall()
-            val resPtr = _nGetFamilyNames(_ptr)
-            val size = StdVectorDecoder_nGetArraySize(resPtr)
-            (0 until size / 2).map { i ->
-                val a = StdVectorDecoder_nGetArrayElement(resPtr, 2*i)
-                val b = StdVectorDecoder_nGetArrayElement(resPtr, 2*i + 1)
-                FontFamilyName(ManagedString(a).toString(), ManagedString(b).toString())
-            }.toTypedArray().also {
-                StdVectorDecoder_nDisposeArray(resPtr)
+        get() {
+            var resPtr: NativePointer? = null
+            try {
+                Stats.onNativeCall()
+                resPtr = _nGetFamilyNames(_ptr)
+                val size = StdVectorDecoder_nGetArraySize(resPtr)
+                return (0 until size / 2).map { i ->
+                    val name = StdVectorDecoder_nGetArrayElement(resPtr, 2*i)
+                    val language = StdVectorDecoder_nGetArrayElement(resPtr, 2*i + 1)
+                    FontFamilyName(ManagedString(name).toString(), ManagedString(language).toString())
+                }.toTypedArray()
+            } finally {
+                resPtr?.let {
+                    StdVectorDecoder_nDisposeArray(resPtr)
+                }
+                reachabilityBarrier(this)
             }
-        } finally {
-            reachabilityBarrier(this)
         }
-
     /**
      * @return  the family name for this typeface. The language of the name is whatever the host platform chooses
      */
