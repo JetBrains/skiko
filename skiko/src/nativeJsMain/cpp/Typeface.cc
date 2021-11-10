@@ -205,30 +205,6 @@ SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Typeface__1nGetFamilyNames
 
     return reinterpret_cast<KInteropPointer>(res);
 }
-     
-#if 0 
-SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_Typeface__1nGetFamilyNames
-  (KNativePointer ptr) {
-    SkTypeface* instance = reinterpret_cast<SkTypeface*>((ptr));
-    SkTypeface::LocalizedStrings* iter = instance->createFamilyNameIterator();
-    std::vector<SkTypeface::LocalizedString> names;
-    SkTypeface::LocalizedString name;
-    while (iter->next(&name)) {
-        names.push_back(name);
-    }
-    iter->unref();
-    KInteropPointerArray res = env->NewObjectArray((jsize) names.size(), skija::FontFamilyName::cls, nullptr);
-    for (int i = 0; i < names.size(); ++i) {
-        skija::AutoLocal<KInteropPointer> nameStr(env, javaString(env, names[i].fString));
-        skija::AutoLocal<KInteropPointer> langStr(env, javaString(env, names[i].fLanguage));
-        skija::AutoLocal<KInteropPointer> obj(env, env->NewObject(skija::FontFamilyName::cls, skija::FontFamilyName::ctor, nameStr.get(), langStr.get()));
-        env->SetObjectArrayElement(res, i, obj.get());
-    }
-    return res;
-}
-#endif
-
-
 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Typeface__1nGetFamilyName
   (KNativePointer ptr) {
