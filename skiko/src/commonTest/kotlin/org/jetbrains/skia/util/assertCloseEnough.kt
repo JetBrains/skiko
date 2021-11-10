@@ -59,7 +59,7 @@ internal fun <T> assertContentEquivalent(expected: Iterator<T>, actual: Iterator
         val a = expected.next()
         val b = actual.next()
         if (!eq(a, b)) {
-            fail("results differ at index$count, expected $a, got $b")
+            fail("results differ at index $count, expected $a, got $b")
         }
         count++
     }
