@@ -68,17 +68,6 @@ class AnimationBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _
         }
     }
 
-    fun buildFromFile(path: String): Animation {
-        return try {
-            Stats.onNativeCall()
-            val ptr = interopScope { _nBuildFromFile(_ptr, toInterop(path)) }
-            require(ptr != NullPointer) { "Failed to create Animation from path: $path" }
-            Animation(ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
-
     fun buildFromData(data: Data): Animation {
         return try {
             Stats.onNativeCall()
@@ -108,7 +97,7 @@ private external fun _nSetLogger(ptr: NativePointer, loggerPtr: NativePointer)
 private external fun _nBuildFromString(ptr: NativePointer, data: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromFile")
-private external fun _nBuildFromFile(ptr: NativePointer, path: InteropPointer): NativePointer
+internal external fun _nBuildFromFile(ptr: NativePointer, path: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromData")
 private external fun _nBuildFromData(ptr: NativePointer, dataPtr: NativePointer): NativePointer
