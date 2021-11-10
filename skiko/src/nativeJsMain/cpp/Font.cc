@@ -245,25 +245,11 @@ SKIKO_EXPORT KShort org_jetbrains_skia_Font__1nGetUTF32Glyph
     return instance->unicharToGlyph(uni);
 }
 
-
 SKIKO_EXPORT KInt org_jetbrains_skia_Font__1nGetStringGlyphsCount
-  (KNativePointer ptr, KInteropPointer str) {
-    TODO("implement org_jetbrains_skia_Font__1nGetStringGlyphsCount");
+  (KNativePointer ptr, KInteropPointer str, KInt len) {
+  SkFont* instance = reinterpret_cast<SkFont*>(ptr);
+  return instance->countText(skString(str).c_str(), len * sizeof(KChar), SkTextEncoding::kUTF16);
 }
-
-#if 0
-SKIKO_EXPORT KInt org_jetbrains_skia_Font__1nGetStringGlyphsCount
-  (KNativePointer ptr, KInteropPointer str) {
-    SkFont* instance = reinterpret_cast<SkFont*>(ptr);
-    jsize len = env->GetStringLength(str);
-    const KChar* chars = env->GetStringCritical(str, nullptr);
-    int count = instance->countText(chars, len * sizeof(KChar), SkTextEncoding::kUTF16);
-    env->ReleaseStringCritical(str, chars);
-    return count;
-}
-#endif
-
-
 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Font__1nMeasureText
   (KNativePointer ptr, KInteropPointer str, KNativePointer paintPtr) {

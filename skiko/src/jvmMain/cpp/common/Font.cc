@@ -237,13 +237,9 @@ extern "C" JNIEXPORT jshort JNICALL Java_org_jetbrains_skia_FontKt__1nGetUTF32Gl
 }
 
 extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_FontKt__1nGetStringGlyphsCount
-  (JNIEnv* env, jclass jclass, jlong ptr, jstring str) {
+  (JNIEnv* env, jclass jclass, jlong ptr, jstring str, jint len) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
-    jsize len = env->GetStringLength(str);
-    const jchar* chars = env->GetStringCritical(str, nullptr);
-    int count = instance->countText(chars, len * sizeof(jchar), SkTextEncoding::kUTF16);
-    env->ReleaseStringCritical(str, chars);
-    return count;
+    return instance->countText(skString(env, str).c_str(), len * sizeof(jchar), SkTextEncoding::kUTF16);
 }
 
 extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_FontKt__1nMeasureText

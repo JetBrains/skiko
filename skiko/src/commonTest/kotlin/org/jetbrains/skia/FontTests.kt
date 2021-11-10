@@ -20,6 +20,8 @@ class FontTests {
             val glyphs = font.getStringGlyphs("ABCDE")
             assertContentEquals(shortArrayOf(17, 18, 19, 20, 21), glyphs)
 
+            assertEquals(6, font.getStringGlyphsCount("EЙ를üẞ無"))
+
             assertContentEquals(floatArrayOf(7f, 7f, 7f, 7f, 7f), font.getWidths(glyphs))
 
             assertContentEquals(floatArrayOf(0f, 7f, 14f, 21f, 28f), font.getXPositions(glyphs))
