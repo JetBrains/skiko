@@ -3,7 +3,6 @@
 #include "include/core/SkImageInfo.h"
 #include "TextStyle.h"
 #include <stdio.h>
-#include <iostream>
 
 KLong packTwoInts(int32_t a, int32_t b) {
     return (uint64_t (a) << 32) | b;
@@ -348,7 +347,7 @@ KBoolean callBooleanCallback(KInteropPointer cb) {
 static SkikoDisposeCallback disposeCallbackImpl = nullptr;
 static SkikoCallBooleanCallback callBooleanCallbackImpl = nullptr;
 
-SKIKO_EXPORT void skiko_initCallbacks(KOpaquePointer callBoolean, KOpaquePointer callVoid, KOpaquePointer dispose) {
+SKIKO_EXPORT void skiko_initCallbacks(KOpaquePointer callBoolean, KOpaquePointer dispose) {
     callBooleanCallbackImpl = reinterpret_cast<SkikoCallBooleanCallback>(callBoolean);
     disposeCallbackImpl = reinterpret_cast<SkikoDisposeCallback>(dispose);
 }
