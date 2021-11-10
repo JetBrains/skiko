@@ -259,23 +259,20 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nGetWidths
     env->SetFloatArrayRegion(res, 0, count, widths.data());
 }
 
-extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_FontKt__1nGetBounds
-  (JNIEnv* env, jclass jclass, jlong ptr, jshortArray glyphsArr, jlong paintPtr) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nGetBounds
+  (JNIEnv* env, jclass jclass, jlong ptr, jshortArray glyphsArr, jint count, jlong paintPtr, jfloatArray res) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
-    int count = env->GetArrayLength(glyphsArr);
     std::vector<SkRect> bounds(count);
     jshort* glyphs = env->GetShortArrayElements(glyphsArr, nullptr);
     instance->getBounds(reinterpret_cast<SkGlyphID*>(glyphs), count, bounds.data(), paint);
     env->ReleaseShortArrayElements(glyphsArr, glyphs, 0);
 
-    jobjectArray res = env->NewObjectArray(count, skija::Rect::cls, nullptr);
     for (int i = 0; i < count; ++i) {
-        skija::AutoLocal<jobject> boundsObj(env, skija::Rect::fromSkRect(env, bounds[i]));
-        env->SetObjectArrayElement(res, i, boundsObj.get());
+        SkRect b = bounds[i];
+        float r[4] = {b.left(), b.right(), b.top(), b.bottom()};
+        env->SetFloatArrayRegion(res, 4*i, 4, r);
     }
-
-    return res;
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nGetPositions

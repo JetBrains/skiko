@@ -263,33 +263,21 @@ SKIKO_EXPORT KFloat* org_jetbrains_skia_Font__1nGetWidths
     TODO("implement org_jetbrains_skia_Font__1nGetWidths");
 }
 
-SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_Font__1nGetBounds
-  (KNativePointer ptr, KShort* glyphsArr, KNativePointer paintPtr) {
-    TODO("implement org_jetbrains_skia_Font__1nGetBounds");
-}
-
-#if 0
-SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_Font__1nGetBounds
-  (KNativePointer ptr, KShort* glyphsArr, KNativePointer paintPtr) {
+SKIKO_EXPORT void org_jetbrains_skia_Font__1nGetBounds
+  (KNativePointer ptr, KShort* glyphs, KInt count, KNativePointer paintPtr, KFloat* res) {
     SkFont* instance = reinterpret_cast<SkFont*>(ptr);
     SkPaint* paint = reinterpret_cast<SkPaint*>(paintPtr);
-    int count = env->GetArrayLength(glyphsArr);
     std::vector<SkRect> bounds(count);
-    KShort* glyphs = env->GetShortArrayElements(glyphsArr, nullptr);
     instance->getBounds(reinterpret_cast<SkGlyphID*>(glyphs), count, bounds.data(), paint);
-    env->ReleaseShortArrayElements(glyphsArr, glyphs, 0);
 
-    KInteropPointerArray res = env->NewObjectArray(count, skija::Rect::cls, nullptr);
     for (int i = 0; i < count; ++i) {
-        skija::AutoLocal<KInteropPointer> boundsObj(env, skija::Rect::fromSkRect(env, bounds[i]));
-        env->SetObjectArrayElement(res, i, boundsObj.get());
+        SkRect b = bounds[i];
+        res[4*i] = b.left();
+        res[4*i + 1] = b.right();
+        res[4*i + 2] = b.top();
+        res[4*i + 3] = b.bottom();
     }
-
-    return res;
 }
-#endif
-
-
 
 SKIKO_EXPORT void org_jetbrains_skia_Font__1nGetPositions
   (KNativePointer ptr, KShort* glyphs, KInt count, KFloat dx, KFloat dy, KFloat* res) {
