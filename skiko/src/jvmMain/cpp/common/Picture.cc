@@ -12,9 +12,9 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PictureKt_Picture_1nM
     return reinterpret_cast<jlong>(instance);
 }
 
-class BooleanSupplierAbort: public SkPicture::AbortCallback {
+class JAbortCallback: public SkPicture::AbortCallback {
 public:
-    BooleanSupplierAbort(JNIEnv* env, jobject supplier) : callback(env, supplier) {}
+    JAbortCallback(JNIEnv* env, jobject supplier) : callback(env, supplier) {}
 
     bool abort() override {
         bool res = static_cast<bool>(callback());
@@ -33,7 +33,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PictureKt__1nPlayback
     if (abort == nullptr) {
         instance->playback(canvas, nullptr);
     } else {
-        BooleanSupplierAbort callback(env, abort);
+        JAbortCallback callback(env, abort);
         instance->playback(canvas, &callback);
     }
 }

@@ -30,6 +30,13 @@ namespace java {
     }
 
     namespace lang {
+        namespace Boolean {
+            extern jclass cls;
+            extern jmethodID booleanValue;
+            void onLoad(JNIEnv* env);
+            void onUnload(JNIEnv* env);
+        }
+
         namespace Float {
             extern jclass cls;
             extern jmethodID ctor;
@@ -63,15 +70,6 @@ namespace java {
             extern jmethodID hasNext;
             void onLoad(JNIEnv* env);
             void onUnload(JNIEnv* env);
-        }
-
-        namespace function {
-            namespace BooleanSupplier {
-                extern jclass cls;
-                extern jmethodID apply;
-                void onLoad(JNIEnv* env);
-                void onUnload(JNIEnv* env);
-            }
         }
     }
 
@@ -335,6 +333,22 @@ namespace skija {
     void onUnload(JNIEnv* env);
 }
 
+namespace kotlin {
+    namespace jvm {
+        namespace functions {
+            namespace Function0 {
+                extern jclass cls;
+                extern jmethodID invoke;
+                void onLoad(JNIEnv* env);
+                void onUnload(JNIEnv* env);
+            }
+        }
+    }
+
+    void onLoad(JNIEnv* env);
+    void onUnload(JNIEnv* env);
+}
+
 std::unique_ptr<SkMatrix> skMatrix(JNIEnv* env, jfloatArray arr);
 std::unique_ptr<SkM44> skM44(JNIEnv* env, jfloatArray arr);
 
@@ -395,20 +409,23 @@ static inline jfloat fromBits(jint i) {
     return u.f;
 }
 
+template<typename T>
+T jObjectConvert(JNIEnv* env, jobject obj);
+
 // Callback support
 
 template<typename T>
 class JCallback {
 public:
-    JCallback (JNIEnv* env, jobject supplier) : env(env), supplier(env->NewGlobalRef(supplier)) {
+    JCallback (JNIEnv* env, jobject callback) : env(env), callback(env->NewGlobalRef(callback)) {
         env->GetJavaVM(&javaVM);
     }
 
     ~JCallback() {
-        if (supplier != nullptr) {
+        if (callback != nullptr) {
             JNIEnv* localEnv;
-            if (javaVM->GetEnv(reinterpret_cast<void**>(&localEnv), SKIKO_JNI_VERSION) == JNI_OK) {
-                localEnv->DeleteGlobalRef(supplier);
+            if (javaVM->GetEnv(AS_JNI_ENV_PTR(&localEnv), SKIKO_JNI_VERSION) == JNI_OK) {
+                localEnv->DeleteGlobalRef(callback);
             }
         }
     }
@@ -419,16 +436,19 @@ public:
     JCallback(JCallback&& other) noexcept {
         std::swap(env, other.env);
         std::swap(javaVM, other.javaVM);
-        std::swap(supplier, other.supplier);
+        std::swap(callback, other.callback);
     }
     JCallback& operator=(JCallback&& other) {
         std::swap(env, other.env);
         std::swap(javaVM, other.javaVM);
-        std::swap(supplier, other.supplier);
+        std::swap(callback, other.callback);
         return this;
     }
 
-    T operator()();
+    T operator()() {
+        jobject res = env->CallObjectMethod(callback, kotlin::jvm::functions::Function0::invoke);
+        return jObjectConvert<T>(env, res);
+    }
 
     bool isExceptionThrown() {
         return java::lang::Throwable::exceptionThrown(env);
@@ -436,7 +456,7 @@ public:
 private:
     JNIEnv* env;
     JavaVM* javaVM;
-    jobject supplier;
+    jobject callback;
 };
 
 typedef JCallback<jboolean> JBooleanCallback;

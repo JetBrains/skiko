@@ -25,6 +25,21 @@ namespace java {
     }
 
     namespace lang {
+        namespace Boolean {
+            jclass cls;
+            jmethodID booleanValue;
+
+            void onLoad(JNIEnv* env) {
+                jclass local = env->FindClass("java/lang/Boolean");
+                cls  = static_cast<jclass>(env->NewGlobalRef(local));
+                booleanValue = env->GetMethodID(cls, "booleanValue", "()Z");
+            }
+
+            void onUnload(JNIEnv* env) {
+                env->DeleteGlobalRef(cls);
+            }
+        }
+
         namespace Float {
             jclass cls;
             jmethodID ctor;
@@ -103,41 +118,24 @@ namespace java {
                 env->DeleteGlobalRef(cls);
             }
         }
-
-        namespace function {
-            namespace BooleanSupplier {
-                jclass cls;
-                jmethodID apply;
-
-                void onLoad(JNIEnv* env) {
-                    jclass local = env->FindClass("java/util/function/BooleanSupplier");
-                    cls   = static_cast<jclass>(env->NewGlobalRef(local));
-                    apply = env->GetMethodID(cls, "getAsBoolean", "()Z");
-                }
-
-                void onUnload(JNIEnv* env) {
-                    env->DeleteGlobalRef(cls);
-                }
-            }
-        }
     }
 
     void onLoad(JNIEnv* env) {
         io::OutputStream::onLoad(env);
+        lang::Boolean::onLoad(env);
         lang::Float::onLoad(env);
         lang::RuntimeException::onLoad(env);
         lang::String::onLoad(env);
         lang::Throwable::onLoad(env);
         util::Iterator::onLoad(env);
-        util::function::BooleanSupplier::onLoad(env);
     }
 
     void onUnload(JNIEnv* env) {
-        util::function::BooleanSupplier::onUnload(env);
         util::Iterator::onUnload(env);
         lang::String::onUnload(env);
         lang::RuntimeException::onUnload(env);
         lang::Float::onUnload(env);
+        lang::Boolean::onUnload(env);
     }
 }
 
@@ -1203,9 +1201,35 @@ namespace skija {
     }
 }
 
-// Callback support
-// When implementing callbacks ensure that `java::util::function::*Supplier::*` is implemented above
+namespace kotlin {
+    namespace jvm {
+        namespace functions {
+            namespace Function0 {
+                jclass cls;
+                jmethodID invoke;
+
+                void onLoad(JNIEnv* env) {
+                    jclass local = env->FindClass("kotlin/jvm/functions/Function0");
+                    cls   = static_cast<jclass>(env->NewGlobalRef(local));
+                    invoke = env->GetMethodID(cls, "invoke", "()Ljava/lang/Object;");
+                }
+
+                void onUnload(JNIEnv* env) {
+                    env->DeleteGlobalRef(cls);
+                }
+            }
+        }
+    }
+
+    void onLoad(JNIEnv* env) {
+        jvm::functions::Function0::onLoad(env);
+    }
+    void onUnload(JNIEnv* env) {
+        jvm::functions::Function0::onUnload(env);
+    }
+}
+
 template<>
-jboolean JCallback<jboolean>::operator()() {
-    return env->CallBooleanMethod(supplier, java::util::function::BooleanSupplier::apply);
+jboolean jObjectConvert(JNIEnv* env, jobject obj) {
+    return env->CallBooleanMethod(obj, java::lang::Boolean::booleanValue);
 }
