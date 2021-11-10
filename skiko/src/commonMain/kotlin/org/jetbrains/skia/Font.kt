@@ -10,6 +10,7 @@ import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.interopScope
 import org.jetbrains.skia.impl.withResult
 
 class Font : Managed {
@@ -366,7 +367,7 @@ class Font : Managed {
     fun getStringGlyphsCount(s: String?): Int {
         return try {
             Stats.onNativeCall()
-            _nGetStringGlyphsCount(_ptr, s)
+            interopScope { _nGetStringGlyphsCount(_ptr, toInterop(s), s?.length ?: 0) }
         } finally {
             reachabilityBarrier(this)
         }
@@ -664,7 +665,7 @@ private external fun _nGetUTF32Glyph(ptr: NativePointer, uni: Int): Short
 private external fun _nGetUTF32Glyphs(ptr: NativePointer, uni: InteropPointer, uniArrLen: Int, resultGlyphs: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetStringGlyphsCount")
-private external fun _nGetStringGlyphsCount(ptr: NativePointer, str: String?): Int
+private external fun _nGetStringGlyphsCount(ptr: NativePointer, str: InteropPointer, len: Int): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nMeasureText")
 private external fun _nMeasureText(ptr: NativePointer, str: String?, paintPtr: NativePointer): Rect
