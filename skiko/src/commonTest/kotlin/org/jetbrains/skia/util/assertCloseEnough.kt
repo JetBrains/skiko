@@ -4,10 +4,12 @@ import org.jetbrains.skia.Color4f
 import org.jetbrains.skia.Matrix33
 import org.jetbrains.skia.Point
 import org.jetbrains.skia.Rect
+import org.jetbrains.skiko.KotlinBackend
+import org.jetbrains.skiko.kotlinBackend
 import kotlin.math.abs
 import kotlin.test.assertTrue
 
-private const val EPSILON = 0.00001f
+private val EPSILON = if (kotlinBackend == KotlinBackend.JS) 0.00001f else 0.00000001f
 
 private inline fun Float.isCloseEnoughTo(b: Float, epsilon: Float) = abs(this - b) < epsilon
 private inline fun Point.isCloseEnoughTo(b: Point, epsilon: Float) =
@@ -57,7 +59,7 @@ internal fun <T> assertContentEquivalent(expected: Iterator<T>, actual: Iterator
         val a = expected.next()
         val b = actual.next()
         if (!eq(a, b)) {
-            fail("results differ at index$count, expected ${a}, got ${b}")
+            fail("results differ at index$count, expected $a, got $b")
         }
         count++
     }
