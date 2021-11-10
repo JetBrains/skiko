@@ -69,7 +69,7 @@ internal fun <T> assertContentEquivalent(expected: Iterator<T>, actual: Iterator
     }
 
     if (actual.hasNext()) {
-        fail("actual $actual has more items than actual $expected (which has $expected)")
+        fail("actual $actual has more items than actual $expected (which has $count)")
     }
 }
 
