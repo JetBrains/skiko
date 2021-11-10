@@ -1210,7 +1210,7 @@ namespace kotlin {
 
                 void onLoad(JNIEnv* env) {
                     jclass local = env->FindClass("kotlin/jvm/functions/Function0");
-                    cls   = static_cast<jclass>(env->NewGlobalRef(local));
+                    cls = static_cast<jclass>(env->NewGlobalRef(local));
                     invoke = env->GetMethodID(cls, "invoke", "()Ljava/lang/Object;");
                 }
 
