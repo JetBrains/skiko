@@ -3,6 +3,7 @@
 #include "include/core/SkImageInfo.h"
 #include "TextStyle.h"
 #include <stdio.h>
+#include <iostream>
 
 KLong packTwoInts(int32_t a, int32_t b) {
     return (uint64_t (a) << 32) | b;
@@ -329,25 +330,7 @@ namespace skija {
 
 // Callback support
 
-#ifndef __EMSCRIPTEN__
-
-static SkikoDisposeCallback disposeCallbackImpl = nullptr;
-static SkikoCallBooleanCallback callBooleanCallbackImpl = nullptr;
-
-SKIKO_EXPORT void skiko_initCallbacks(KOpaquePointer callBoolean, KOpaquePointer dispose) {
-    callBooleanCallbackImpl = reinterpret_cast<SkikoCallBooleanCallback>(callBoolean);
-    disposeCallbackImpl = reinterpret_cast<SkikoDisposeCallback>(dispose);
-}
-
-void disposeCallback(KInteropPointer cb) {
-    disposeCallbackImpl(cb);
-}
-
-KBoolean callBooleanCallback(KInteropPointer cb) {
-    return callBooleanCallbackImpl(cb);
-}
-
-#else // __EMSCRIPTEN__
+#ifdef __EMSCRIPTEN__
 
 void disposeCallback(KInteropPointer cb) {
     EM_ASM({ _releaseCallback($0) }, cb);
@@ -358,6 +341,24 @@ KBoolean callBooleanCallback(KInteropPointer cb) {
         return _callCallback($0).value ? 1 : 0;
     }, cb);
     return static_cast<KBoolean>(value);
+}
+
+#else // __EMSCRIPTEN__
+
+static SkikoDisposeCallback disposeCallbackImpl = nullptr;
+static SkikoCallBooleanCallback callBooleanCallbackImpl = nullptr;
+
+SKIKO_EXPORT void skiko_initCallbacks(KOpaquePointer callBoolean, KOpaquePointer callVoid, KOpaquePointer dispose) {
+    callBooleanCallbackImpl = reinterpret_cast<SkikoCallBooleanCallback>(callBoolean);
+    disposeCallbackImpl = reinterpret_cast<SkikoDisposeCallback>(dispose);
+}
+
+void disposeCallback(KInteropPointer cb) {
+    disposeCallbackImpl(cb);
+}
+
+KBoolean callBooleanCallback(KInteropPointer cb) {
+    return callBooleanCallbackImpl(cb);
 }
 
 #endif // __EMSCRIPTEN__
