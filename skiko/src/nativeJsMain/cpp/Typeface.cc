@@ -190,9 +190,20 @@ SKIKO_EXPORT bool org_jetbrains_skia_Typeface__1nGetKerningPairAdjustments
   return false;
 }
      
-SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_Typeface__1nGetFamilyNames
+SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Typeface__1nGetFamilyNames
   (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_Typeface__1nGetFamilyNames");
+    SkTypeface* instance = reinterpret_cast<SkTypeface*>(ptr);
+    SkTypeface::LocalizedStrings* iter = instance->createFamilyNameIterator();
+    std::vector<SkTypeface::LocalizedString> names;
+    SkTypeface::LocalizedString name;
+    std::vector<KInteropPointer>* res = new std::vector<KInteropPointer>();
+
+    while (iter->next(&name)) {
+        res->push_back(reinterpret_cast<KInteropPointer>(new SkString(name.fString)));
+        res->push_back(reinterpret_cast<KInteropPointer>(new SkString(name.fLanguage)));
+    }
+
+    return reinterpret_cast<KInteropPointer>(res);
 }
      
 #if 0 

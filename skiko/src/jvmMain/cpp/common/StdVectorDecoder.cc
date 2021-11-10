@@ -1,7 +1,6 @@
 #include <jni.h>
 #include "interop.hh"
 
-
 extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_StdVectorDecoderKt_StdVectorDecoder_1nGetArraySize
     (JNIEnv* env, jclass jclass, jlong ptr) {
         std::vector<jlong>* vect = reinterpret_cast<std::vector<jlong> *>(ptr);
