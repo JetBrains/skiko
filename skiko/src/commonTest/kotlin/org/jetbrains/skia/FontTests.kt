@@ -61,6 +61,16 @@ class FontTests {
                     Point(31f, 2f),
                 ), font.getPositions(glyphs, Point(3f, 2f))
             )
+
+            assertContentEquals(
+                arrayOf(
+                    Rect(0.0f, -9.0f, 7.0f, 0.0f),
+                    Rect(1.0f, -9.0f, 7.0f, 0.0f),
+                    Rect(1.0f, -9.0f, 7.0f, 0.0f),
+                    Rect(1.0f, -9.0f, 7.0f, 0.0f),
+                    Rect(1.0f, -9.0f, 7.0f, 0.0f)
+                ), font.getBounds(glyphs)
+            )
         }
     }
 }
