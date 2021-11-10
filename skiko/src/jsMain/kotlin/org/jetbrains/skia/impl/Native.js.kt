@@ -195,12 +195,28 @@ actual class InteropScope actual constructor() {
         return toInterop(interopPointers.toIntArray())
     }
 
-    actual fun toInterop(callback: (() -> Boolean)?): InteropPointer {
+    actual fun booleanCallback(callback: (() -> Boolean)?): InteropPointer {
         if (callback == null) { return 0 }
         initCallbacks()
 
         val data = CallbackData<Boolean>(null)
-        return _registerCallback({ data.value = callback() }, data)
+        return _registerCallback({ data.value = callback() }, data, global = false)
+    }
+
+    actual fun callback(callback: (() -> Unit)?): InteropPointer {
+        if (callback == null) { return 0 }
+        initCallbacks()
+
+        return _registerCallback({ callback() }, null, global = false)
+    }
+
+    actual fun virtual(method: () -> Unit): InteropPointer {
+        return _registerCallback({ method() }, null, global = true)
+    }
+
+    actual fun virtualBoolean(method: () -> Boolean): InteropPointer {
+        val data = CallbackData<Boolean>(null)
+        return _registerCallback({ data.value = method() }, data, global = true);
     }
 
     actual fun release()  {
@@ -229,7 +245,7 @@ actual class InteropScope actual constructor() {
 private class CallbackData<T>(@JsName("value") var value: T?)
 
 // See `setup.js`
-private external fun _registerCallback(cb: () -> Unit, data: Any?): Int
+private external fun _registerCallback(cb: () -> Unit, data: Any?, global: Boolean): Int
 private external fun _createLocalCallbackScope()
 private external fun _releaseLocalCallbackScope()
 

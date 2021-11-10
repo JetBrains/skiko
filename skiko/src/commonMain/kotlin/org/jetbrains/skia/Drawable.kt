@@ -12,7 +12,7 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
  * allow for clients of the drawable that may want to cache the results, the drawable must
  * change its generation id whenever its internal state changes such that it will draw differently.
  */
-abstract class Drawable : RefCnt(Drawable_nMake()) {
+abstract class Drawable : Managed(Drawable_nMake(), _FinalizerHolder.PTR) {
     companion object {
         init {
             staticLoad()
@@ -115,15 +115,19 @@ abstract class Drawable : RefCnt(Drawable_nMake()) {
         onDraw(Canvas(canvasPtr, false, this))
     }
 
+    private object _FinalizerHolder {
+        val PTR = Drawable_nGetFinalizer()
+    }
+
     init {
-        Stats.onNativeCall()
-        Stats.onNativeCall()
-        Drawable_nInit(this, _ptr)
+        doInit(_ptr)
     }
 }
 
-@ExternalSymbolName("org_jetbrains_skia_Drawable__1nInit")
-private external fun Drawable_nInit(drawable: Drawable, ptr: NativePointer)
+internal expect fun Drawable.doInit(ptr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_Drawable__1nGetFinalizer")
+private external fun Drawable_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Drawable__1nMake")
 private external fun Drawable_nMake(): NativePointer
@@ -139,3 +143,14 @@ private external fun _nMakePictureSnapshot(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Drawable__1nNotifyDrawingChanged")
 private external fun _nNotifyDrawingChanged(ptr: NativePointer)
+
+// For Native/JS usage only
+
+@ExternalSymbolName("org_jetbrains_skia_Drawable__1nInit")
+internal external fun Drawable_nInit(ptr: NativePointer, onGetBounds: InteropPointer, onDraw: InteropPointer)
+
+@ExternalSymbolName("org_jetbrains_skia_Drawable__1nGetOnDrawCanvas")
+internal external fun _nGetOnDrawCanvas(ptr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Drawable__1nSetBounds")
+internal external fun _nSetBounds(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float)

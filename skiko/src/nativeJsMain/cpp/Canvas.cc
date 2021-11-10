@@ -188,23 +188,13 @@ SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nDrawPatch
     );
 }
 
-
-
-SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nDrawDrawable
-  (KNativePointer ptr, KNativePointer drawablePtr, KFloat* matrixArr) {
-    TODO("implement org_jetbrains_skia_Canvas__1nDrawDrawable");
-}
-
-#if 0
 SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nDrawDrawable
   (KNativePointer ptr, KNativePointer drawablePtr, KFloat* matrixArr) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>((ptr));
     SkDrawable* drawable = reinterpret_cast<SkDrawable*>((drawablePtr));
-    std::unique_ptr<SkMatrix> matrix = skMatrix(env, matrixArr);
+    std::unique_ptr<SkMatrix> matrix = skMatrix(matrixArr);
     canvas->drawDrawable(drawable, matrix.get());
 }
-#endif
-
 
 SKIKO_EXPORT void org_jetbrains_skia_Canvas__1nClear(KNativePointer ptr, KInt color) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>((ptr));

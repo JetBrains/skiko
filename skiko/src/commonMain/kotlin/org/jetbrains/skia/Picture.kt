@@ -77,7 +77,7 @@ class Picture internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         return try {
             Stats.onNativeCall()
             interopScope {
-                _nPlayback(_ptr, getPtr(canvas), toInterop(abort))
+                _nPlayback(_ptr, getPtr(canvas), booleanCallback(abort))
             }
             this
         } finally {

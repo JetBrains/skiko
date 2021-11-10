@@ -10,14 +10,14 @@ public:
 
     ~SkijaDrawableImpl() {
         JNIEnv* env;
-        if (fJavaVM->GetEnv(reinterpret_cast<void**>(&env), SKIKO_JNI_VERSION) == JNI_OK)
-          env->DeleteWeakGlobalRef(fObject);
+        if (fJavaVM->GetEnv(AS_JNI_ENV_PTR(&env), SKIKO_JNI_VERSION) == JNI_OK)
+          env->DeleteGlobalRef(fObject);
     }
 
     void init(JNIEnv* e, jobject o) {
         fEnv = e;
         fEnv->GetJavaVM(&fJavaVM);
-        fObject = fEnv->NewWeakGlobalRef(o);
+        fObject = fEnv->NewGlobalRef(o);
     }
 
 protected:
@@ -38,13 +38,21 @@ private:
     jobject fObject;
 };
 
+static void deleteDrawable(SkijaDrawableImpl* drawable) {
+    delete drawable;
+}
+
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DrawableKt_Drawable_1nGetFinalizer() {
+    return reinterpret_cast<jlong>(&deleteDrawable);
+}
+
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DrawableKt_Drawable_1nMake
   (JNIEnv* env, jclass jclass) {
     SkijaDrawableImpl* instance = new SkijaDrawableImpl();
     return reinterpret_cast<jlong>(instance);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_DrawableKt_Drawable__1nInit
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_Drawable_1jvmKt_Drawable_1nInit
   (JNIEnv* env,  jclass jclass, jobject jthis, jlong ptr) {
     SkijaDrawableImpl* instance = reinterpret_cast<SkijaDrawableImpl*>(static_cast<uintptr_t>(ptr));
     instance->init(env, jthis);

@@ -26,6 +26,7 @@ actual abstract class Native actual constructor(ptr: NativePointer) {
         init {
             initCallbacks(
                 staticCFunction(::callBooleanCallback),
+                staticCFunction(::callVoidCallback),
                 staticCFunction(::disposeCallback),
             )
         }
@@ -200,11 +201,20 @@ actual class InteropScope actual constructor() {
         return toInterop(interopPointers.map { it.toLong() }.toLongArray())
     }
 
-    actual fun toInterop(callback: (() -> Boolean)?): InteropPointer
+    actual fun booleanCallback(callback: (() -> Boolean)?): InteropPointer
         = callback?.let {
             val ptr = StableRef.create(it).asCPointer()
             NativePtr.NULL.plus(ptr.toLong())
         } ?: NativePtr.NULL
+
+    actual fun callback(callback: (() -> Unit)?): InteropPointer
+        = callback?.let {
+            val ptr = StableRef.create(it).asCPointer()
+            NativePtr.NULL.plus(ptr.toLong())
+        } ?: NativePtr.NULL
+
+    actual fun virtual(method: () -> Unit) = callback(method)
+    actual fun virtualBoolean(method: () -> Boolean) = booleanCallback(method)
 
     actual fun release()  {
         elements.forEach {
@@ -232,6 +242,10 @@ actual class NativePointerArray actual constructor(size: Int) {
 
 // Callbacks support
 
+private fun callVoidCallback(ptr: COpaquePointer) {
+    ptr.asStableRef<() -> Unit>().get().invoke()
+}
+
 private fun callBooleanCallback(ptr: COpaquePointer): Boolean {
     return ptr.asStableRef<() -> Boolean>().get().invoke()
 }
@@ -241,4 +255,4 @@ private fun disposeCallback(ptr: COpaquePointer) {
 }
 
 @ExternalSymbolName("skiko_initCallbacks")
-private external fun initCallbacks(callBoolean: COpaquePointer, dispose: COpaquePointer)
+private external fun initCallbacks(callBoolean: COpaquePointer, callVoid: COpaquePointer, dispose: COpaquePointer)
