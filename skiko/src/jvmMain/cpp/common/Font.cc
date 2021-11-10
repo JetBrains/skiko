@@ -243,14 +243,10 @@ extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_FontKt__1nMeasureTe
 }
 
 extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_FontKt__1nMeasureTextWidth
-  (JNIEnv* env, jclass jclass, jlong ptr, jstring str, jlong paintPtr) {
+  (JNIEnv* env, jclass jclass, jlong ptr, jstring str, jint len, jlong paintPtr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
-    jsize len = env->GetStringLength(str);
-    const jchar* chars = env->GetStringCritical(str, nullptr);
-    float width = instance->measureText(chars, len * sizeof(jchar), SkTextEncoding::kUTF16, nullptr, paint);
-    env->ReleaseStringCritical(str, chars);
-    return width;
+    return instance->measureText(skString(env, str).c_str(), len * sizeof(jchar), SkTextEncoding::kUTF16, nullptr, paint);
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nGetWidths
