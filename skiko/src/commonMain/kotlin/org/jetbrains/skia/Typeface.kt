@@ -381,23 +381,6 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         }
 }
 
-//private class StdVectorDecoder : ArrayInteropDecoder<List<NativePointer>> {
-//    override fun getArrayElement(array: InteropPointer, index: Int): List<NativePointer> {
-//        TODO("Not yet implemented")
-//    }
-//
-//    override fun getArraySize(array: InteropPointer): Int = StdVectorDecoder_nGetArraySize(array)
-//    override fun disposeArray(array: InteropPointer) = StdVectorDecoder_nDisposeArray(array)
-//}
-
-@ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetArraySize")
-private external fun StdVectorDecoder_nGetArraySize(array: NativePointer): Int
-@ExternalSymbolName("org_jetbrains_skia_Typeface__1nDisposeArray")
-private external fun StdVectorDecoder_nDisposeArray(array: NativePointer)
-@ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetArrayElement")
-private external fun StdVectorDecoder_nGetArrayElement(array: NativePointer, index: Int): NativePointer
-
-
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUniqueId")
 private external fun Typeface_nGetUniqueId(ptr: NativePointer): Int
 
