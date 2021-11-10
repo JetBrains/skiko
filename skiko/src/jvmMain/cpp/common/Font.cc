@@ -208,18 +208,6 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nSetSkewX
     instance->setSkewX(value);
 }
 
-extern "C" JNIEXPORT jshortArray JNICALL Java_org_jetbrains_skia_FontKt__1nGetStringGlyphs
-  (JNIEnv* env, jclass jclass, jlong ptr, jstring str) {
-    SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
-    jsize len = env->GetStringLength(str);
-    const jchar* chars = env->GetStringCritical(str, nullptr);
-    int count = instance->textToGlyphs(chars, len * sizeof(jchar), SkTextEncoding::kUTF16, nullptr, 0);
-    std::vector<short> glyphs(count);
-    instance->textToGlyphs(chars, len * sizeof(jchar), SkTextEncoding::kUTF16, reinterpret_cast<SkGlyphID*>(glyphs.data()), count);
-    env->ReleaseStringCritical(str, chars);
-    return javaShortArray(env, glyphs);
-}
-
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nGetUTF32Glyphs
   (JNIEnv* env, jclass jclass, jlong ptr, jintArray uniArr, jint uniArrLen, jshortArray resultGlyphs) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
