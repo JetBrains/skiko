@@ -173,3 +173,18 @@ class DecorationStyle(
         this.thicknessMultiplier = thicknessMultiplier
     }
 }
+
+
+internal fun DecorationStyle.Companion.fromRawData(rawData: IntArray): DecorationStyle {
+    val decorationStyleFlags = rawData[0]
+
+    return DecorationStyle(
+        underline = ((decorationStyleFlags shr 0) and 1) == 1,
+        overline = ((decorationStyleFlags shr 1) and 1) == 1,
+        lineThrough = ((decorationStyleFlags shr 2) and 1) == 1,
+        gaps = ((decorationStyleFlags shr 3) and 1) == 1,
+        color = rawData[1],
+        lineStyle = rawData[2],
+        thicknessMultiplier = Float.fromBits(rawData[3])
+    )
+}
