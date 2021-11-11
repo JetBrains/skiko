@@ -230,15 +230,16 @@ extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_FontKt__1nGetStringGly
     return instance->countText(skString(env, str).c_str(), len * sizeof(jchar), SkTextEncoding::kUTF16);
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_FontKt__1nMeasureText
-  (JNIEnv* env, jclass jclass, jlong ptr, jstring str, jint len, jlong paintPtr) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nMeasureText
+  (JNIEnv* env, jclass jclass, jlong ptr, jstring str, jint len, jlong paintPtr, jfloatArray res) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
     const jchar* chars = env->GetStringCritical(str, nullptr);
     SkRect bounds;
     instance->measureText(chars, len * sizeof(jchar), SkTextEncoding::kUTF16, &bounds, paint);
     env->ReleaseStringCritical(str, chars);
-    return skija::Rect::fromSkRect(env, bounds);
+    jfloat r[4] = {bounds.left(), bounds.top(), bounds.right(), bounds.bottom()};
+    env->SetFloatArrayRegion(res, 0, 4, r);
 }
 
 extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_FontKt__1nMeasureTextWidth
