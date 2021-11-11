@@ -71,6 +71,8 @@ class FontTests {
                     Rect(1.0f, -9.0f, 7.0f, 0.0f)
                 ), font.getBounds(glyphs)
             )
+
+            assertEquals(Rect(1f, -12f, 21f, 0f), font.measureText("ЕЁЫ"))
         }
     }
 }
