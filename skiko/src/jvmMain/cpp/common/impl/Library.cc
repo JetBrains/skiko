@@ -17,6 +17,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_impl_Library__1nAfterL
   (JNIEnv* env, jclass jclass) {
     env->EnsureLocalCapacity(64);
     java::onLoad(env);
+    kotlin::onLoad(env);
     skija::onLoad(env);
     skija::shaper::onLoad(env);
     skija::skottie::onLoad(env);
@@ -34,5 +35,6 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
     skija::skottie::onUnload(env);
     skija::shaper::onUnload(env);
     skija::onUnload(env);
+    kotlin::onUnload(env);
     java::onUnload(env);
 }

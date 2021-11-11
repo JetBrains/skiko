@@ -1,8 +1,7 @@
 package org.jetbrains.skia.impl
 
-import kotlinx.cinterop.Pinned
-import kotlinx.cinterop.addressOf
-import kotlinx.cinterop.pin
+import kotlinx.cinterop.*
+import org.jetbrains.skia.ExternalSymbolName
 import kotlin.native.internal.NativePtr
 
 actual abstract class Native actual constructor(ptr: NativePointer) {
@@ -24,6 +23,13 @@ actual abstract class Native actual constructor(ptr: NativePointer) {
     }
 
     actual companion object {
+        init {
+            initCallbacks(
+                staticCFunction(::callBooleanCallback),
+                staticCFunction(::disposeCallback),
+            )
+        }
+
         actual val NullPointer: NativePointer
             get() = NativePtr.NULL
     }
@@ -194,6 +200,12 @@ actual class InteropScope actual constructor() {
         return toInterop(interopPointers.map { it.toLong() }.toLongArray())
     }
 
+    actual fun toInterop(callback: (() -> Boolean)?): InteropPointer
+        = callback?.let {
+            val ptr = StableRef.create(it).asCPointer()
+            NativePtr.NULL.plus(ptr.toLong())
+        } ?: NativePtr.NULL
+
     actual fun release()  {
         elements.forEach {
             it.unpin()
@@ -217,3 +229,16 @@ actual class NativePointerArray actual constructor(size: Int) {
     actual val size: Int
         get() = backing.size
 }
+
+// Callbacks support
+
+private fun callBooleanCallback(ptr: COpaquePointer): Boolean {
+    return ptr.asStableRef<() -> Boolean>().get().invoke()
+}
+
+private fun disposeCallback(ptr: COpaquePointer) {
+    ptr.asStableRef<Any>().dispose()
+}
+
+@ExternalSymbolName("skiko_initCallbacks")
+private external fun initCallbacks(callBoolean: COpaquePointer, dispose: COpaquePointer)

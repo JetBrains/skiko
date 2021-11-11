@@ -73,10 +73,12 @@ class Picture internal constructor(ptr: NativePointer) : RefCnt(ptr) {
      *
      * @see [https://fiddle.skia.org/c/@Picture_playback](https://fiddle.skia.org/c/@Picture_playback)
      */
-    fun playback(canvas: Canvas?, abort: BooleanSupplier? = null): Picture {
+    fun playback(canvas: Canvas?, abort: (() -> Boolean)? = null): Picture {
         return try {
             Stats.onNativeCall()
-            _nPlayback(_ptr, getPtr(canvas), abort)
+            interopScope {
+                _nPlayback(_ptr, getPtr(canvas), toInterop(abort))
+            }
             this
         } finally {
             reachabilityBarrier(canvas)
@@ -99,7 +101,7 @@ class Picture internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     val cullRect: Rect
         get() = try {
             Stats.onNativeCall()
-            _nGetCullRect(_ptr)
+            Rect.fromInteropPointer { _nGetCullRect(_ptr, it) }
         } finally {
             reachabilityBarrier(this)
         }
@@ -209,7 +211,18 @@ class Picture internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             val arr = localMatrix?.mat
             Shader(
                 interopScope {
-                    _nMakeShader(_ptr, tmx.ordinal, tmy.ordinal, mode.ordinal, toInterop(arr), tileRect)
+                    _nMakeShader(
+                        _ptr,
+                        tmx.ordinal,
+                        tmy.ordinal,
+                        mode.ordinal,
+                        toInterop(arr),
+                        tileRect != null,
+                        tileRect?.left ?: 0f,
+                        tileRect?.top ?: 0f,
+                        tileRect?.right ?: 0f,
+                        tileRect?.bottom ?: 0f
+                    )
                 }
             )
         } finally {
@@ -218,15 +231,11 @@ class Picture internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     }
 }
 
-
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nMakeFromData")
 private external fun Picture_nMakeFromData(dataPtr: NativePointer /*, SkDeserialProcs */): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_Picture__1nPlayback")
-private external fun _nPlayback(ptr: NativePointer, canvasPtr: NativePointer, abort: BooleanSupplier?)
-
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nGetCullRect")
-private external fun _nGetCullRect(ptr: NativePointer): Rect
+private external fun _nGetCullRect(ptr: NativePointer, ltrb: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nGetUniqueId")
 private external fun _nGetUniqueId(ptr: NativePointer): Int
@@ -250,5 +259,12 @@ private external fun _nMakeShader(
     tmy: Int,
     filterMode: Int,
     localMatrix: InteropPointer,
-    tileRect: Rect?
+    hasTile: Boolean,
+    tileL: Float,
+    tileT: Float,
+    tileR: Float,
+    tileB: Float,
 ): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Picture__1nPlayback")
+private external fun _nPlayback(ptr: NativePointer, canvasPtr: NativePointer, data: InteropPointer)

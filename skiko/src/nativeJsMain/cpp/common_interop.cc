@@ -127,9 +127,9 @@ std::unique_ptr<SkMatrix> skMatrix(KFloat* matrixArray) {
         return std::unique_ptr<SkMatrix>(nullptr);
     else {
         KFloat* m = matrixArray;
-        SkMatrix* ptr = new SkMatrix();
+        std::unique_ptr<SkMatrix> ptr = std::make_unique<SkMatrix>();
         ptr->setAll(m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8]);
-        return std::unique_ptr<SkMatrix>(ptr);
+        return ptr;
     }
 }
 
@@ -326,3 +326,39 @@ namespace skija {
         }
     }
 }
+
+// Callback support
+
+#ifdef __EMSCRIPTEN__
+
+void disposeCallback(KInteropPointer cb) {
+    EM_ASM({ _releaseCallback($0) }, cb);
+}
+
+KBoolean callBooleanCallback(KInteropPointer cb) {
+    int value = EM_ASM_INT({
+        return _callCallback($0).value ? 1 : 0;
+    }, cb);
+    return static_cast<KBoolean>(value);
+}
+
+#else // __EMSCRIPTEN__
+
+static SkikoDisposeCallback disposeCallbackImpl = nullptr;
+static SkikoCallBooleanCallback callBooleanCallbackImpl = nullptr;
+
+SKIKO_EXPORT void skiko_initCallbacks(KOpaquePointer callBoolean, KOpaquePointer dispose) {
+    callBooleanCallbackImpl = reinterpret_cast<SkikoCallBooleanCallback>(callBoolean);
+    disposeCallbackImpl = reinterpret_cast<SkikoDisposeCallback>(dispose);
+}
+
+void disposeCallback(KInteropPointer cb) {
+    disposeCallbackImpl(cb);
+}
+
+KBoolean callBooleanCallback(KInteropPointer cb) {
+    return callBooleanCallbackImpl(cb);
+}
+
+#endif // __EMSCRIPTEN__
+

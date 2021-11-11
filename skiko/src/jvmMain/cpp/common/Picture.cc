@@ -12,21 +12,18 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PictureKt_Picture_1nM
     return reinterpret_cast<jlong>(instance);
 }
 
-class BooleanSupplierAbort: public SkPicture::AbortCallback {
+class JAbortCallback: public SkPicture::AbortCallback {
 public:
-    BooleanSupplierAbort(JNIEnv* env, jobject supplier) {
-        this->env = env;
-        this->supplier = supplier;
-    }
+    JAbortCallback(JNIEnv* env, jobject supplier) : callback(env, supplier) {}
+
     bool abort() override {
-        bool res = env->CallBooleanMethod(supplier, java::util::function::BooleanSupplier::apply);
-        if (java::lang::Throwable::exceptionThrown(env))
+        bool res = static_cast<bool>(callback());
+        if (callback.isExceptionThrown())
           return false;
         return res;
     }
 private:
-    JNIEnv* env;
-    jobject supplier;
+    JBooleanCallback callback;
 };
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PictureKt__1nPlayback
@@ -36,15 +33,16 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PictureKt__1nPlayback
     if (abort == nullptr) {
         instance->playback(canvas, nullptr);
     } else {
-        BooleanSupplierAbort callback(env, abort);
+        JAbortCallback callback(env, abort);
         instance->playback(canvas, &callback);
     }
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_PictureKt__1nGetCullRect
-  (JNIEnv* env, jclass jclass, jlong ptr) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PictureKt__1nGetCullRect
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray ltrbArray) {
     SkPicture* instance = reinterpret_cast<SkPicture*>(static_cast<uintptr_t>(ptr));
-    return skija::Rect::fromSkRect(env, instance->cullRect());
+    SkRect cullRect = instance->cullRect();
+    env->SetFloatArrayRegion(ltrbArray, 0, 4, reinterpret_cast<const jfloat*>(cullRect.asScalars()));
 }
 
 extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_PictureKt__1nGetUniqueId
@@ -80,13 +78,18 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PictureKt__1nGetAppro
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PictureKt__1nMakeShader
-  (JNIEnv* env, jclass jclass, jlong ptr, jint tmxValue, jint tmyValue, jint filterModeValue, jfloatArray localMatrixArr, jobject tileRectObj) {
+  (JNIEnv* env, jclass jclass, jlong ptr, jint tmxValue, jint tmyValue, jint filterModeValue, jfloatArray localMatrixArr, jboolean hasTile, jfloat tileLeft, jfloat tileTop, jfloat tileRight, jfloat tileBottom) {
     SkPicture* instance = reinterpret_cast<SkPicture*>(static_cast<uintptr_t>(ptr));
     SkTileMode tmx = static_cast<SkTileMode>(tmxValue);
     SkTileMode tmy = static_cast<SkTileMode>(tmyValue);
     SkFilterMode filterMode = static_cast<SkFilterMode>(filterModeValue);
     std::unique_ptr<SkMatrix> localMatrix = skMatrix(env, localMatrixArr);
-    std::unique_ptr<SkRect> tileRect = skija::Rect::toSkRect(env, tileRectObj);
-    SkShader* shader = instance->makeShader(tmx, tmy, filterMode, localMatrix.get(), tileRect.get()).release();
+    SkShader* shader;
+    if (hasTile) {
+        SkRect tileRect = SkRect::MakeLTRB(tileLeft, tileRight, tileBottom, tileTop);
+        shader = instance->makeShader(tmx, tmy, filterMode, localMatrix.get(), &tileRect).release();
+    } else {
+        shader = instance->makeShader(tmx, tmy, filterMode, localMatrix.get(), nullptr).release();
+    }
     return reinterpret_cast<jlong>(shader);
 }

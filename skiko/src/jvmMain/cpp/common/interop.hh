@@ -30,6 +30,13 @@ namespace java {
     }
 
     namespace lang {
+        namespace Boolean {
+            extern jclass cls;
+            extern jmethodID booleanValue;
+            void onLoad(JNIEnv* env);
+            void onUnload(JNIEnv* env);
+        }
+
         namespace Float {
             extern jclass cls;
             extern jmethodID ctor;
@@ -63,15 +70,6 @@ namespace java {
             extern jmethodID hasNext;
             void onLoad(JNIEnv* env);
             void onUnload(JNIEnv* env);
-        }
-
-        namespace function {
-            namespace BooleanSupplier {
-                extern jclass cls;
-                extern jmethodID apply;
-                void onLoad(JNIEnv* env);
-                void onUnload(JNIEnv* env);
-            }
         }
     }
 
@@ -335,6 +333,22 @@ namespace skija {
     void onUnload(JNIEnv* env);
 }
 
+namespace kotlin {
+    namespace jvm {
+        namespace functions {
+            namespace Function0 {
+                extern jclass cls;
+                extern jmethodID invoke;
+                void onLoad(JNIEnv* env);
+                void onUnload(JNIEnv* env);
+            }
+        }
+    }
+
+    void onLoad(JNIEnv* env);
+    void onUnload(JNIEnv* env);
+}
+
 std::unique_ptr<SkMatrix> skMatrix(JNIEnv* env, jfloatArray arr);
 std::unique_ptr<SkM44> skM44(JNIEnv* env, jfloatArray arr);
 
@@ -394,3 +408,55 @@ static inline jfloat fromBits(jint i) {
     u.i = i;
     return u.f;
 }
+
+template<typename T>
+T jObjectConvert(JNIEnv* env, jobject obj);
+
+// Callback support
+
+template<typename T>
+class JCallback {
+public:
+    JCallback (JNIEnv* env, jobject callback) : env(env), callback(env->NewGlobalRef(callback)) {
+        env->GetJavaVM(&javaVM);
+    }
+
+    ~JCallback() {
+        if (callback != nullptr) {
+            JNIEnv* localEnv;
+            if (javaVM->GetEnv(AS_JNI_ENV_PTR(&localEnv), SKIKO_JNI_VERSION) == JNI_OK) {
+                localEnv->DeleteGlobalRef(callback);
+            }
+        }
+    }
+
+    JCallback(const JCallback&) = delete;
+    JCallback& operator=(const JCallback&) = delete;
+
+    JCallback(JCallback&& other) noexcept {
+        std::swap(env, other.env);
+        std::swap(javaVM, other.javaVM);
+        std::swap(callback, other.callback);
+    }
+    JCallback& operator=(JCallback&& other) {
+        std::swap(env, other.env);
+        std::swap(javaVM, other.javaVM);
+        std::swap(callback, other.callback);
+        return this;
+    }
+
+    T operator()() {
+        jobject res = env->CallObjectMethod(callback, kotlin::jvm::functions::Function0::invoke);
+        return jObjectConvert<T>(env, res);
+    }
+
+    bool isExceptionThrown() {
+        return java::lang::Throwable::exceptionThrown(env);
+    }
+private:
+    JNIEnv* env;
+    JavaVM* javaVM;
+    jobject callback;
+};
+
+typedef JCallback<jboolean> JBooleanCallback;

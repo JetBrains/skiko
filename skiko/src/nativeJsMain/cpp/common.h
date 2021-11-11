@@ -157,5 +157,33 @@ static inline KFloat fromBits(KInt i) {
     u.i = i;
     return u.f;
 }
+
+// Callback support
+typedef void (*SkikoDisposeCallback)(KInteropPointer);
+typedef KBoolean (*SkikoCallBooleanCallback)(KInteropPointer);
+typedef void* KOpaquePointer;
+
+void disposeCallback(KInteropPointer cb);
+KBoolean callBooleanCallback(KInteropPointer cb);
+
+template <typename T, T(*Apply)(KInteropPointer)>
+class KCallback {
+public:
+    explicit KCallback(KInteropPointer data) : data(data) {}
+
+    virtual ~KCallback() { disposeCallback(data); }
+
+    KCallback(const KCallback&) = delete;
+    KCallback(KCallback&&) = delete;
+    KCallback& operator=(const KCallback&) = delete;
+    KCallback& operator=(KCallback&&) = delete;
+
+    T operator()() const { return Apply(data); }
+private:
+    KInteropPointer data;
+};
+
+typedef KCallback<KBoolean, callBooleanCallback> KBooleanCallback;
+
 #endif /* SKIKO_COMMON_H */
 

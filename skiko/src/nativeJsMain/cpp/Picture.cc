@@ -7,6 +7,16 @@
 #include "SkShader.h"
 #include "common.h"
 
+class KotlinAbortCallback: public SkPicture::AbortCallback {
+public:
+    KotlinAbortCallback(KInteropPointer data) : callback(data) {}
+    bool abort() override {
+        return static_cast<bool>(callback());
+    }
+private:
+    KBooleanCallback callback;
+};
+
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Picture__1nMakeFromData
   (KNativePointer dataPtr) {
     SkData* data = reinterpret_cast<SkData*>((dataPtr));
@@ -14,41 +24,28 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Picture__1nMakeFromData
     return reinterpret_cast<KNativePointer>(instance);
 }
 
-
-SKIKO_EXPORT void org_jetbrains_skia_Picture__1nPlayback
-  (KNativePointer ptr, KNativePointer canvasPtr, KInteropPointer abort) {
-    TODO("implement org_jetbrains_skia_Picture__1nPlayback");
-}
-     
-#if 0 
 SKIKO_EXPORT void org_jetbrains_skia_Picture__1nPlayback
   (KNativePointer ptr, KNativePointer canvasPtr, KInteropPointer abort) {
     SkPicture* instance = reinterpret_cast<SkPicture*>((ptr));
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>((canvasPtr));
-    if (abort == nullptr) {
-        instance->playback(canvas, nullptr);
+    if (abort) {
+        KotlinAbortCallback abortCallback(abort);
+        instance->playback(canvas, &abortCallback);
     } else {
-        BooleanSupplierAbort callback(env, abort);
-        instance->playback(canvas, &callback);
+        instance->playback(canvas, nullptr);
     }
 }
-#endif
 
-
-
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Picture__1nGetCullRect
-  (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_Picture__1nGetCullRect");
-}
-     
-#if 0 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Picture__1nGetCullRect
-  (KNativePointer ptr) {
+SKIKO_EXPORT void org_jetbrains_skia_Picture__1nGetCullRect
+  (KNativePointer ptr, KInteropPointer ltrbArray) {
     SkPicture* instance = reinterpret_cast<SkPicture*>((ptr));
-    return skija::Rect::fromSkRect(env, instance->cullRect());
+    SkRect cullRect = instance->cullRect();
+    float* ltrb = reinterpret_cast<float*>(ltrbArray);
+    ltrb[0] = cullRect.left();
+    ltrb[1] = cullRect.top();
+    ltrb[2] = cullRect.right();
+    ltrb[3] = cullRect.bottom();
 }
-#endif
-
 
 SKIKO_EXPORT KInt org_jetbrains_skia_Picture__1nGetUniqueId
   (KNativePointer ptr) {
@@ -84,21 +81,19 @@ SKIKO_EXPORT KLong org_jetbrains_skia_Picture__1nGetApproximateBytesUsed
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Picture__1nMakeShader
-  (KNativePointer ptr, KInt tmxValue, KInt tmyValue, KInt filterModeValue, KFloat* localMatrixArr, KInteropPointer tileRectObj) {
-    TODO("implement org_jetbrains_skia_Picture__1nMakeShader");
-}
-     
-#if 0 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_Picture__1nMakeShader
-  (KNativePointer ptr, KInt tmxValue, KInt tmyValue, KInt filterModeValue, KFloat* localMatrixArr, KInteropPointer tileRectObj) {
+  (KNativePointer ptr, KInt tmxValue, KInt tmyValue, KInt filterModeValue, KFloat* localMatrixArr, KBoolean hasTile, KFloat tileLeft, KFloat tileTop, KFloat tileRight, KFloat tileBottom) {
     SkPicture* instance = reinterpret_cast<SkPicture*>((ptr));
     SkTileMode tmx = static_cast<SkTileMode>(tmxValue);
     SkTileMode tmy = static_cast<SkTileMode>(tmyValue);
     SkFilterMode filterMode = static_cast<SkFilterMode>(filterModeValue);
-    std::unique_ptr<SkMatrix> localMatrix = skMatrix(env, localMatrixArr);
-    std::unique_ptr<SkRect> tileRect = skija::Rect::toSkRect(env, tileRectObj);
-    SkShader* shader = instance->makeShader(tmx, tmy, filterMode, localMatrix.get(), tileRect.get()).release();
+    std::unique_ptr<SkMatrix> localMatrix = skMatrix(localMatrixArr);
+    SkShader* shader;
+    if (hasTile) {
+        SkRect tileRect = SkRect::MakeLTRB(tileLeft, tileRight, tileBottom, tileTop);
+        shader = instance->makeShader(tmx, tmy, filterMode, localMatrix.get(), &tileRect).release();
+    } else {
+        shader = instance->makeShader(tmx, tmy, filterMode, localMatrix.get(), nullptr).release();
+    }
     return reinterpret_cast<KNativePointer>(shader);
 }
-#endif
 

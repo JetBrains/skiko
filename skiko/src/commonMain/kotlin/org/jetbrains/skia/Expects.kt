@@ -21,15 +21,6 @@ expect class Matcher {
 
 expect fun compilePattern(regex: String): Pattern
 
-interface BooleanSupplier {
-    /**
-     * Gets a result.
-     *
-     * @return a result
-     */
-    val asBoolean: Boolean
-}
-
 @OptIn(ExperimentalMultiplatform::class)
 @OptionalExpectation
 expect annotation class ExternalSymbolName(val name: String)

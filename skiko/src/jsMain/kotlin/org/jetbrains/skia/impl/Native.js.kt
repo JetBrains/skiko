@@ -51,6 +51,7 @@ actual inline fun <T> interopScope(block: InteropScope.() -> T): T {
 
 actual class InteropScope actual constructor() {
     private val elements = mutableListOf<NativePointer>()
+    private var callbacksInitialized = false
 
     actual fun toInterop(string: String?): InteropPointer {
         return if (string != null) {
@@ -194,12 +195,44 @@ actual class InteropScope actual constructor() {
         return toInterop(interopPointers.toIntArray())
     }
 
+    actual fun toInterop(callback: (() -> Boolean)?): InteropPointer {
+        if (callback == null) { return 0 }
+        initCallbacks()
+
+        val data = CallbackData<Boolean>(null)
+        return _registerCallback({ data.value = callback() }, data)
+    }
+
     actual fun release()  {
         elements.forEach {
             _free(it)
         }
+        releaseCallbacks()
+    }
+
+    private inline fun initCallbacks() {
+        if (!callbacksInitialized) {
+            _createLocalCallbackScope()
+            callbacksInitialized = true
+        }
+    }
+
+    private inline fun releaseCallbacks() {
+        if (callbacksInitialized) {
+            _releaseLocalCallbackScope()
+            callbacksInitialized = false
+        }
     }
 }
+
+// Callbacks
+private class CallbackData<T>(@JsName("value") var value: T?)
+
+// See `setup.js`
+private external fun _registerCallback(cb: () -> Unit, data: Any?): Int
+private external fun _createLocalCallbackScope()
+private external fun _releaseLocalCallbackScope()
+
 
 // Those functions are defined by Emscripten.
 private external fun _malloc(size: Int): NativePointer

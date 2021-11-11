@@ -78,6 +78,7 @@ actual open class InteropScope actual constructor() {
     actual inline fun <reified T> InteropPointer.fromInterop(decoder: ArrayInteropDecoder<T>): Array<T> =
         this@fromInterop as Array<T>
     actual fun toInteropForArraysOfPointers(interopPointers: Array<InteropPointer>): InteropPointer = interopPointers
+    actual fun toInterop(callback: (() -> Boolean)?) = callback as Any?
     actual fun release() {}
 }
 
