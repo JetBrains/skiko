@@ -154,4 +154,26 @@ class FontMetrics(
     override fun toString(): String {
         return "FontMetrics(_top=$top, _ascent=$ascent, _descent=$descent, _bottom=$bottom, _leading=$leading, _avgCharWidth=$avgCharWidth, _maxCharWidth=$maxCharWidth, _xMin=$xMin, _xMax=$xMax, _xHeight=$xHeight, _capHeight=$capHeight, _underlineThickness=$underlineThickness, _underlinePosition=$underlinePosition, _strikeoutThickness=$strikeoutThickness, _strikeoutPosition=$strikeoutPosition)"
     }
+
+    companion object
 }
+
+private inline fun Float.asNumberOrNull(): Float? = if (isNaN()) null else this
+
+internal fun FontMetrics.Companion.fromRawData(rawData: FloatArray) = FontMetrics(
+        rawData[0],
+        rawData[1],
+        rawData[2],
+        rawData[3],
+        rawData[4],
+        rawData[5],
+        rawData[6],
+        rawData[7],
+        rawData[8],
+        rawData[9],
+        rawData[10],
+        rawData[11].asNumberOrNull(),
+        rawData[12].asNumberOrNull(),
+        rawData[13].asNumberOrNull(),
+        rawData[14].asNumberOrNull()
+    )

@@ -382,31 +382,13 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         return this
     }
 
-    private inline fun Float.asNumberOrNull(): Float? = if (isNaN()) null else this
 
     val fontMetrics: FontMetrics
         get() = try {
             Stats.onNativeCall()
-            val fontMetricsData = withResult(FloatArray(15)) {
+            FontMetrics.fromRawData(withResult(FloatArray(15)) {
                 _nGetFontMetrics(_ptr, it)
-            }
-            FontMetrics(
-                fontMetricsData[0],
-                fontMetricsData[1],
-                fontMetricsData[2],
-                fontMetricsData[3],
-                fontMetricsData[4],
-                fontMetricsData[5],
-                fontMetricsData[6],
-                fontMetricsData[7],
-                fontMetricsData[8],
-                fontMetricsData[9],
-                fontMetricsData[10],
-                fontMetricsData[11].asNumberOrNull(),
-                fontMetricsData[12].asNumberOrNull(),
-                fontMetricsData[13].asNumberOrNull(),
-                fontMetricsData[14].asNumberOrNull()
-            )
+            })
         } finally {
             reachabilityBarrier(this)
         }
