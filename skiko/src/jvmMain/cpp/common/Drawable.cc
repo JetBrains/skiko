@@ -83,3 +83,9 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_DrawableKt__1nNotifyDr
     SkijaDrawableImpl* instance = reinterpret_cast<SkijaDrawableImpl*>(static_cast<uintptr_t>(ptr));
     return instance->notifyDrawingChanged();
 }
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_DrawableKt_Drawable_1nGetBounds
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray result) {
+    SkijaDrawableImpl* instance = reinterpret_cast<SkijaDrawableImpl*>(static_cast<uintptr_t>(ptr));
+    skija::Rect::copyToInterop(env, instance->getBounds(), result);
+}

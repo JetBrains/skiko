@@ -2,6 +2,7 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skiko.maybeSynchronized
 
 /**
  *
@@ -19,7 +20,8 @@ abstract class Drawable : Managed(Drawable_nMake(), _FinalizerHolder.PTR) {
         }
     }
 
-    internal var _bounds: Rect? = null
+    private var _bounds: Rect? = null
+    private val boundsLock = Unit
 
     /**
      * Draws into the specified content. The drawing sequence will be balanced upon return
@@ -93,8 +95,10 @@ abstract class Drawable : Managed(Drawable_nMake(), _FinalizerHolder.PTR) {
      */
     val bounds: Rect
         get() {
-            if (_bounds == null) _bounds = onGetBounds()
-            return _bounds!!
+            maybeSynchronized(boundsLock) {
+                if (_bounds == null) _bounds = Rect.fromInteropPointer { Drawable_nGetBounds(_ptr, it) }
+                return _bounds!!
+            }
         }
 
     /**
@@ -103,15 +107,18 @@ abstract class Drawable : Managed(Drawable_nMake(), _FinalizerHolder.PTR) {
      * in response to its internal state changing.
      */
     fun notifyDrawingChanged(): Drawable {
-        Stats.onNativeCall()
-        _nNotifyDrawingChanged(_ptr)
-        _bounds = null
+        maybeSynchronized(boundsLock) {
+            Stats.onNativeCall()
+            _nNotifyDrawingChanged(_ptr)
+            _bounds = null
+        }
         return this
     }
 
     abstract fun onDraw(canvas: Canvas?)
     abstract fun onGetBounds(): Rect
-    fun _onDraw(canvasPtr: NativePointer) {
+
+    private fun _onDraw(canvasPtr: NativePointer) {
         onDraw(Canvas(canvasPtr, false, this))
     }
 
@@ -143,6 +150,9 @@ private external fun _nMakePictureSnapshot(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Drawable__1nNotifyDrawingChanged")
 private external fun _nNotifyDrawingChanged(ptr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_Drawable__1nGetBounds")
+private external fun Drawable_nGetBounds(ptr: NativePointer, result: InteropPointer)
 
 // For Native/JS usage only
 

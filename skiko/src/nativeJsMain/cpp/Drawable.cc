@@ -48,6 +48,12 @@ SKIKO_EXPORT void org_jetbrains_skia_Drawable__1nSetBounds
     instance->bounds().setLTRB(left, top, right, bottom);
 }
 
+SKIKO_EXPORT void org_jetbrains_skia_Drawable__1nGetBounds
+  (KNativePointer ptr, KInteropPointer result) {
+    SkikoDrawable* instance = reinterpret_cast<SkikoDrawable*>(ptr);
+    skija::Rect::copyToInterop(instance->getBounds(), result);
+}
+
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Drawable__1nGetOnDrawCanvas
   (KNativePointer ptr) {
     SkikoDrawable* instance = reinterpret_cast<SkikoDrawable*>(ptr);
