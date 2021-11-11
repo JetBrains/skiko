@@ -226,9 +226,9 @@ SKIKO_EXPORT KShort org_jetbrains_skia_Font__1nGetUTF32Glyph
 }
 
 SKIKO_EXPORT KInt org_jetbrains_skia_Font__1nGetStringGlyphsCount
-  (KNativePointer ptr, KInteropPointer str, KInt len) {
+  (KNativePointer ptr, char* str, KInt len) {
   SkFont* instance = reinterpret_cast<SkFont*>(ptr);
-  return instance->countText(skString(str).c_str(), len * sizeof(KChar), SkTextEncoding::kUTF16);
+  return instance->countText(str, len * sizeof(KChar), SkTextEncoding::kUTF16);
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_Font__1nMeasureText
@@ -236,7 +236,7 @@ SKIKO_EXPORT void org_jetbrains_skia_Font__1nMeasureText
     SkFont* instance = reinterpret_cast<SkFont*>(ptr);
     SkPaint* paint = reinterpret_cast<SkPaint*>(paintPtr);
     SkRect bounds;
-    instance->measureText(skString(str).c_str(), len * sizeof(KChar), SkTextEncoding::kUTF16, &bounds, paint);
+    instance->measureText(str, len * sizeof(KChar), SkTextEncoding::kUTF16, &bounds, paint);
 
     res[0] = bounds.left();
     res[1] = bounds.top();
