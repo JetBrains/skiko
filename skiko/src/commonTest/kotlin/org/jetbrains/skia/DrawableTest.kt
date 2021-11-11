@@ -1,5 +1,6 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.tests.assertCloseEnough
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -21,5 +22,7 @@ class DrawableTest {
         val pixels = Bitmap.makeFromImage(surface.makeImageSnapshot())
         assertEquals(Color.RED, pixels.getColor(8, 8))
         assertEquals(Color.TRANSPARENT, pixels.getColor(2, 2))
+
+        assertCloseEnough(Rect(0f, 0f, 16f, 16f), cross.bounds)
     }
 }
