@@ -111,6 +111,23 @@
         ]];
     }
 
+    // In some scenarios, we still have an `NSTextField` inside the `NSTitlebar` containing the window title, even
+    // though we called `setTitleVisibility` with `NSWindowTitleHidden`. We need to make it zero size because otherwise,
+    // it would swallow click events.
+    NSUInteger potentialTitleIndex = runningAtLeastBigSur ? 2 : 0;
+    NSTextField* title =
+        [titlebar.subviews[potentialTitleIndex] isKindOfClass:[NSTextField class]]
+            ? titlebar.subviews[potentialTitleIndex]
+            : nil;
+    if (title != nil)
+    {
+        title.translatesAutoresizingMaskIntoConstraints = NO;
+        [newConstraints addObjectsFromArray:@[
+            [title.heightAnchor constraintEqualToConstant:0],
+            [title.widthAnchor constraintEqualToConstant:0],
+        ]];
+    }
+
     NSView* closeButtonView = [self.window standardWindowButton:NSWindowCloseButton];
     NSView* miniaturizeButtonView = [self.window standardWindowButton:NSWindowMiniaturizeButton];
     NSView* zoomButtonView = [self.window standardWindowButton:NSWindowZoomButton];
@@ -153,8 +170,24 @@
         changedView.translatesAutoresizingMaskIntoConstraints = YES;
     }
 
-    if (titlebar.subviews.count > 0 && [titlebar.subviews[titlebar.subviews.count - 1] isKindOfClass:[WindowDragView class]]) {
-        WindowDragView* dragger = titlebar.subviews[titlebar.subviews.count - 1];
+    NSUInteger potentialTitleIndex = runningAtLeastBigSur ? 2 : 0;
+    NSTextField* title =
+        [titlebar.subviews[potentialTitleIndex] isKindOfClass:[NSTextField class]]
+            ? titlebar.subviews[potentialTitleIndex]
+            : nil;
+    if (title != nil)
+    {
+        [NSLayoutConstraint deactivateConstraints:title.constraints];
+        title.translatesAutoresizingMaskIntoConstraints = YES;
+    }
+
+    NSUInteger draggerIndex =
+        [titlebar.subviews indexOfObjectPassingTest:^(NSView* subview, NSUInteger index, BOOL* stop)
+        {
+            return [subview isKindOfClass:[WindowDragView class]];
+        }];
+    if (draggerIndex != NSNotFound) {
+        WindowDragView* dragger = titlebar.subviews[draggerIndex];
         [dragger removeFromSuperview];
     }
 }
