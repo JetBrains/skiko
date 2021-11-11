@@ -231,10 +231,9 @@ extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_FontKt__1nGetStringGly
 }
 
 extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_FontKt__1nMeasureText
-  (JNIEnv* env, jclass jclass, jlong ptr, jstring str, jlong paintPtr) {
+  (JNIEnv* env, jclass jclass, jlong ptr, jstring str, jint len, jlong paintPtr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
-    jsize len = env->GetStringLength(str);
     const jchar* chars = env->GetStringCritical(str, nullptr);
     SkRect bounds;
     instance->measureText(chars, len * sizeof(jchar), SkTextEncoding::kUTF16, &bounds, paint);
