@@ -246,10 +246,10 @@ SKIKO_EXPORT void org_jetbrains_skia_Font__1nMeasureText
 
 
 SKIKO_EXPORT KFloat org_jetbrains_skia_Font__1nMeasureTextWidth
-  (KNativePointer ptr, KInteropPointer str, KInt len, KNativePointer paintPtr) {
+  (KNativePointer ptr, char* str, KInt len, KNativePointer paintPtr) {
     SkFont* instance = reinterpret_cast<SkFont*>(ptr);
     SkPaint* paint = reinterpret_cast<SkPaint*>(paintPtr);
-    return instance->measureText(skString(str).c_str(), len * sizeof(KChar), SkTextEncoding::kUTF16, nullptr, paint);
+    return instance->measureText(str, len * sizeof(KChar), SkTextEncoding::kUTF16, nullptr, paint);
 }
 
 
