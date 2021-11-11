@@ -382,7 +382,11 @@ class Font : Managed {
     fun measureText(s: String?, p: Paint? = null): Rect {
         return try {
             Stats.onNativeCall()
-            _nMeasureText(_ptr, s, s?.length ?: 0, getPtr(p))
+            withResult(FloatArray(4)) {
+                _nMeasureText(_ptr, toInterop(s), s?.length ?: 0, getPtr(p), it)
+            }.let { rect ->
+                Rect(rect[0], rect[1], rect[2], rect[3])
+            }
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(p)
@@ -680,7 +684,7 @@ private external fun _nGetUTF32Glyphs(ptr: NativePointer, uni: InteropPointer, u
 private external fun _nGetStringGlyphsCount(ptr: NativePointer, str: InteropPointer, len: Int): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nMeasureText")
-private external fun _nMeasureText(ptr: NativePointer, str: String?, len: Int, paintPtr: NativePointer): Rect
+private external fun _nMeasureText(ptr: NativePointer, str: InteropPointer, len: Int, paintPtr: NativePointer, rect: InteropPointer): Rect
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nMeasureTextWidth")
 private external fun _nMeasureTextWidth(ptr: NativePointer, str: InteropPointer, len: Int, paintPtr: NativePointer): Float
