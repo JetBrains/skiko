@@ -1,4 +1,5 @@
 #include <iostream>
+#include <limits>
 #include <jni.h>
 #include <vector>
 #include "../interop.hh"
@@ -86,18 +87,35 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_
     }
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nGetDecorationStyle
-  (JNIEnv* env, jclass jclass, jlong ptr) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nGetDecorationStyle
+  (JNIEnv* env, jclass jclass, jlong ptr, jintArray res) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     Decoration d = instance->getDecoration();
-    return env->NewObject(skija::paragraph::DecorationStyle::cls, skija::paragraph::DecorationStyle::ctor,
-      (d.fType & TextDecoration::kUnderline) != 0,
-      (d.fType & TextDecoration::kOverline) != 0,
-      (d.fType & TextDecoration::kLineThrough) != 0,
-      d.fMode == TextDecorationMode::kGaps,
-      d.fColor,
-      static_cast<jint>(d.fStyle),
-      d.fThicknessMultiplier);
+
+    jint r[4] = {
+        0,
+        static_cast<jint>(d.fColor),
+        static_cast<jint>(d.fStyle),
+        rawBits(d.fThicknessMultiplier)
+    };
+
+    if ((d.fType & TextDecoration::kUnderline) != 0) {
+        r[0] = r[0] | (1 << 0);
+    }
+
+    if ((d.fType & TextDecoration::kOverline) != 0) {
+        r[0] = r[0] | (1 << 1);
+    }
+
+    if ((d.fType & TextDecoration::kLineThrough) != 0) {
+        r[0] = r[0] | (1 << 2);
+    }
+
+    if (d.fMode == TextDecorationMode::kGaps) {
+        r[0] = r[0] | (1 << 3);
+    }
+
+    env->SetIntArrayRegion(res, 0, 4, r);
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nSetDecorationStyle
@@ -204,10 +222,10 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_
     instance->setFontFamilies(skStringVector(env, familiesArray));
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_TextStyle_1nGetHeight
+extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_TextStyle_1nGetHeight
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
-    return instance->getHeightOverride() ? javaFloat(env, instance->getHeight()) : nullptr;
+    return instance->getHeightOverride() ? static_cast<jfloat>(instance->getHeight()) : std::numeric_limits<jfloat>::quiet_NaN();
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_TextStyle_1nSetHeight
@@ -254,10 +272,10 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_
     instance->setTypeface(sk_ref_sp(typeface));
 }
 
-extern "C" JNIEXPORT jstring JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nGetLocale
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nGetLocale
   (JNIEnv* env, jclass jclass, jlong ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
-    return javaString(env, instance->getLocale());
+    return reinterpret_cast<jlong>(new SkString(instance->getLocale()));
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nSetLocale
@@ -278,12 +296,45 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_
     instance->setTextBaseline(static_cast<TextBaseline>(baselineModeValue));
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nGetFontMetrics
-  (JNIEnv* env, jclass jclass, jlong ptr) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nGetFontMetrics
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray fontMetrics) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     SkFontMetrics m;
     instance->getFontMetrics(&m);
-    return skija::FontMetrics::toJava(env, m);
+    float f[15] = {
+        m.fTop,
+        m.fAscent,
+        m.fDescent,
+        m.fBottom,
+        m.fLeading,
+        m.fAvgCharWidth,
+        m.fMaxCharWidth,
+        m.fXMin,
+        m.fXMax,
+        m.fXHeight,
+        m.fCapHeight,
+        std::numeric_limits<float>::quiet_NaN(),
+        std::numeric_limits<float>::quiet_NaN(),
+        std::numeric_limits<float>::quiet_NaN(),
+        std::numeric_limits<float>::quiet_NaN()
+    };
+
+    SkScalar thickness;
+    SkScalar position;
+    if (m.hasUnderlineThickness(&thickness)) {
+        f[11] = thickness;
+    }
+    if (m.hasUnderlinePosition(&position)) {
+        f[12] = position;
+    }
+    if (m.hasStrikeoutThickness(&thickness)) {
+        f[13] = thickness;
+    }
+    if (m.hasStrikeoutPosition(&position)) {
+        f[14] = position;
+    }
+
+    env->SetFloatArrayRegion(fontMetrics, 0, 15, f);
 }
 
 extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nIsPlaceholder

@@ -110,10 +110,12 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         }
     }
 
-    var decorationStyle: org.jetbrains.skia.paragraph.DecorationStyle
+    var decorationStyle: DecorationStyle
         get() = try {
             Stats.onNativeCall()
-            _nGetDecorationStyle(_ptr)
+            DecorationStyle.fromInteropPointer {
+                _nGetDecorationStyle(_ptr, it)
+            }
         } finally {
             reachabilityBarrier(this)
         }
@@ -252,7 +254,8 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     var height: Float?
         get() = try {
             Stats.onNativeCall()
-            TextStyle_nGetHeight(_ptr)
+            val height = TextStyle_nGetHeight(_ptr)
+            if (height.isNaN()) null else height
         } finally {
             reachabilityBarrier(this)
         }
@@ -328,7 +331,9 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     var locale: String
         get() = try {
             Stats.onNativeCall()
-            _nGetLocale(_ptr)
+            withStringResult {
+                _nGetLocale(_ptr)
+            }
         } finally {
             reachabilityBarrier(this)
         }
@@ -338,7 +343,9 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
 
     fun setLocale(locale: String?): TextStyle {
         Stats.onNativeCall()
-        _nSetLocale(_ptr, locale)
+        interopScope {
+            _nSetLocale(_ptr, toInterop(locale))
+        }
         return this
     }
 
@@ -359,10 +366,13 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         return this
     }
 
+
     val fontMetrics: FontMetrics
         get() = try {
             Stats.onNativeCall()
-            _nGetFontMetrics(_ptr)
+            FontMetrics.fromInteropPointer {
+                _nGetFontMetrics(_ptr, it)
+            }
         } finally {
             reachabilityBarrier(this)
         }
@@ -385,7 +395,6 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         val PTR = TextStyle_nGetFinalizer()
     }
 }
-
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetFinalizer")
 private external fun TextStyle_nGetFinalizer(): NativePointer
@@ -412,7 +421,7 @@ private external fun TextStyle_nSetFontSize(ptr: NativePointer, size: Float)
 private external fun TextStyle_nGetFontFamilies(ptr: NativePointer): Array<String>
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetHeight")
-private external fun TextStyle_nGetHeight(ptr: NativePointer): Float?
+private external fun TextStyle_nGetHeight(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetHeight")
 private external fun TextStyle_nSetHeight(ptr: NativePointer, override: Boolean, height: Float)
@@ -439,7 +448,7 @@ private external fun _nGetBackground(ptr: NativePointer): NativePointer
 private external fun _nSetBackground(ptr: NativePointer, paintPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetDecorationStyle")
-private external fun _nGetDecorationStyle(ptr: NativePointer): DecorationStyle
+private external fun _nGetDecorationStyle(ptr: NativePointer, decorationStyle: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetDecorationStyle")
 private external fun _nSetDecorationStyle(
@@ -496,10 +505,10 @@ private external fun _nGetTypeface(ptr: NativePointer): NativePointer
 private external fun _nSetTypeface(ptr: NativePointer, typefacePtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetLocale")
-private external fun _nGetLocale(ptr: NativePointer): String
+private external fun _nGetLocale(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetLocale")
-private external fun _nSetLocale(ptr: NativePointer, locale: String?)
+private external fun _nSetLocale(ptr: NativePointer, locale: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetBaselineMode")
 private external fun _nGetBaselineMode(ptr: NativePointer): Int
@@ -508,7 +517,7 @@ private external fun _nGetBaselineMode(ptr: NativePointer): Int
 private external fun _nSetBaselineMode(ptr: NativePointer, mode: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetFontMetrics")
-private external fun _nGetFontMetrics(ptr: NativePointer): FontMetrics
+private external fun _nGetFontMetrics(ptr: NativePointer, fontMetrics: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nIsPlaceholder")
 private external fun _nIsPlaceholder(ptr: NativePointer): Boolean
