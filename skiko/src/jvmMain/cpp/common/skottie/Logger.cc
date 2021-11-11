@@ -4,18 +4,18 @@
 
 using namespace skottie;
 
-class SkijaLoggerImpl: public Logger {
+class SkikoLogger: public Logger {
 public:
-    SkijaLoggerImpl() {
+    SkikoLogger() {
     }
 
-    ~SkijaLoggerImpl() {
-        fEnv->DeleteWeakGlobalRef(fObject);
+    ~SkikoLogger() {
+        fEnv->DeleteGlobalRef(fObject);
     }
 
     void init(JNIEnv* e, jobject o) {
         fEnv = e;
-        fObject = fEnv->NewWeakGlobalRef(o);
+        fObject = fEnv->NewGlobalRef(o);
     }
 
 public:
@@ -39,12 +39,12 @@ private:
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_skottie_LoggerKt__1nMake
   (JNIEnv* env, jclass jclass) {
-    SkijaLoggerImpl* instance = new SkijaLoggerImpl();
+    SkikoLogger* instance = new SkikoLogger();
     return reinterpret_cast<jlong>(instance);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_skottie_LoggerKt__1nInit
-  (JNIEnv* env, jobject jthis, jlong ptr) {
-    SkijaLoggerImpl* instance = reinterpret_cast<SkijaLoggerImpl*>(static_cast<uintptr_t>(ptr));
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_skottie_Logger_1jvmKt__1nInit
+  (JNIEnv* env, jclass jclass, jobject jthis, jlong ptr) {
+    SkikoLogger* instance = reinterpret_cast<SkikoLogger*>(static_cast<uintptr_t>(ptr));
     instance->init(env, jthis);
 }
