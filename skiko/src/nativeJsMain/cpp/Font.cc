@@ -339,20 +339,43 @@ SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_Font__1nGetPaths
 
 
 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Font__1nGetMetrics
-  (KNativePointer ptr, KShort* glyphsArr) {
-    TODO("implement org_jetbrains_skia_Font__1nGetMetrics");
-}
-
-#if 0
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Font__1nGetMetrics
-  (KNativePointer ptr, KShort* glyphsArr) {
+SKIKO_EXPORT void org_jetbrains_skia_Font__1nGetMetrics
+  (KNativePointer ptr, KFloat* fontMetrics) {
     SkFont* instance = reinterpret_cast<SkFont*>(ptr);
     SkFontMetrics m;
     instance->getMetrics(&m);
-    return skija::FontMetrics::toJava(env, m);
+
+    fontMetrics[0] = m.fTop;
+    fontMetrics[1] = m.fAscent;
+    fontMetrics[2] = m.fDescent;
+    fontMetrics[3] = m.fBottom;
+    fontMetrics[4] = m.fLeading;
+    fontMetrics[5] = m.fAvgCharWidth;
+    fontMetrics[6] = m.fMaxCharWidth;
+    fontMetrics[7] = m.fXMin;
+    fontMetrics[8] = m.fXMax;
+    fontMetrics[9] = m.fXHeight;
+    fontMetrics[10] = m.fCapHeight;
+    fontMetrics[11] = std::numeric_limits<float>::quiet_NaN();
+    fontMetrics[12] = std::numeric_limits<float>::quiet_NaN();
+    fontMetrics[13] = std::numeric_limits<float>::quiet_NaN();
+    fontMetrics[14] = std::numeric_limits<float>::quiet_NaN();
+
+    SkScalar thickness;
+    SkScalar position;
+    if (m.hasUnderlineThickness(&thickness)) {
+        fontMetrics[11] = thickness;
+    }
+    if (m.hasUnderlinePosition(&position)) {
+        fontMetrics[12] = position;
+    }
+    if (m.hasStrikeoutThickness(&thickness)) {
+        fontMetrics[13] = thickness;
+    }
+    if (m.hasStrikeoutPosition(&position)) {
+        fontMetrics[14] = position;
+    }
 }
-#endif
 
 
 SKIKO_EXPORT KFloat org_jetbrains_skia_Font__1nGetSpacing
