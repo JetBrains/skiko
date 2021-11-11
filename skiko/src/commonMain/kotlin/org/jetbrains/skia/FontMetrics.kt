@@ -1,5 +1,9 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.InteropPointer
+import org.jetbrains.skia.impl.InteropScope
+import org.jetbrains.skia.impl.withResult
+
 class FontMetrics(
     /**
      * greatest extent above origin of any glyph bounding box, typically negative; deprecated with variable fonts
@@ -160,7 +164,7 @@ class FontMetrics(
 
 private inline fun Float.asNumberOrNull(): Float? = if (isNaN()) null else this
 
-internal fun FontMetrics.Companion.fromRawData(rawData: FloatArray) = FontMetrics(
+private fun FontMetrics.Companion.fromRawData(rawData: FloatArray) = FontMetrics(
         rawData[0],
         rawData[1],
         rawData[2],
@@ -177,3 +181,6 @@ internal fun FontMetrics.Companion.fromRawData(rawData: FloatArray) = FontMetric
         rawData[13].asNumberOrNull(),
         rawData[14].asNumberOrNull()
     )
+
+
+internal fun FontMetrics.Companion.fromInteropPointer(block: InteropScope.(InteropPointer) -> Unit) = fromRawData(withResult(FloatArray(15), block))

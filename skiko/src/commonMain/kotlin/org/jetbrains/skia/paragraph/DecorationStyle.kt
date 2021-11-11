@@ -1,5 +1,9 @@
 package org.jetbrains.skia.paragraph
 
+import org.jetbrains.skia.impl.InteropPointer
+import org.jetbrains.skia.impl.InteropScope
+import org.jetbrains.skia.impl.withResult
+
 class DecorationStyle(
     val _underline: Boolean,
     val _overline: Boolean,
@@ -175,7 +179,7 @@ class DecorationStyle(
 }
 
 
-internal fun DecorationStyle.Companion.fromRawData(rawData: IntArray): DecorationStyle {
+private fun DecorationStyle.Companion.fromRawData(rawData: IntArray): DecorationStyle {
     val decorationStyleFlags = rawData[0]
 
     return DecorationStyle(
@@ -188,3 +192,5 @@ internal fun DecorationStyle.Companion.fromRawData(rawData: IntArray): Decoratio
         thicknessMultiplier = Float.fromBits(rawData[3])
     )
 }
+
+internal fun DecorationStyle.Companion.fromInteropPointer(block: InteropScope.(InteropPointer) -> Unit) = fromRawData(withResult(IntArray(4), block))

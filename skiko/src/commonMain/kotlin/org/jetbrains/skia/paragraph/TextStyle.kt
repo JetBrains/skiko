@@ -113,9 +113,9 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     var decorationStyle: DecorationStyle
         get() = try {
             Stats.onNativeCall()
-            DecorationStyle.fromRawData(withResult(IntArray(4)) {
+            DecorationStyle.fromInteropPointer {
                 _nGetDecorationStyle(_ptr, it)
-            })
+            }
         } finally {
             reachabilityBarrier(this)
         }
@@ -370,9 +370,9 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     val fontMetrics: FontMetrics
         get() = try {
             Stats.onNativeCall()
-            FontMetrics.fromRawData(withResult(FloatArray(15)) {
+            FontMetrics.fromInteropPointer {
                 _nGetFontMetrics(_ptr, it)
-            })
+            }
         } finally {
             reachabilityBarrier(this)
         }
