@@ -334,6 +334,8 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_
         f[14] = position;
     }
 
+    std::cout << f[0] << " :: " << f[1]  << " :: " << f[2] << "\r\n";
+
     env->SetFloatArrayRegion(fontMetrics, 0, 15, f);
 }
 

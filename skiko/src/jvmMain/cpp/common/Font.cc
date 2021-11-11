@@ -339,12 +339,46 @@ extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_FontKt__1nGetP
     return ctx.paths;
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_FontKt__1nGetMetrics
-  (JNIEnv* env, jclass jclass, jlong ptr, jshortArray glyphsArr) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nGetMetrics
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray res) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     SkFontMetrics m;
     instance->getMetrics(&m);
-    return skija::FontMetrics::toJava(env, m);
+
+    float f[15] = {
+            m.fTop,
+            m.fAscent,
+            m.fDescent,
+            m.fBottom,
+            m.fLeading,
+            m.fAvgCharWidth,
+            m.fMaxCharWidth,
+            m.fXMin,
+            m.fXMax,
+            m.fXHeight,
+            m.fCapHeight,
+            std::numeric_limits<float>::quiet_NaN(),
+            std::numeric_limits<float>::quiet_NaN(),
+            std::numeric_limits<float>::quiet_NaN(),
+            std::numeric_limits<float>::quiet_NaN()
+        };
+
+    SkScalar thickness;
+    SkScalar position;
+    if (m.hasUnderlineThickness(&thickness)) {
+        f[11] = thickness;
+    }
+    if (m.hasUnderlinePosition(&position)) {
+        f[12] = position;
+    }
+    if (m.hasStrikeoutThickness(&thickness)) {
+        f[13] = thickness;
+    }
+    if (m.hasStrikeoutPosition(&position)) {
+        f[14] = position;
+    }
+
+    env->SetFloatArrayRegion(res, 0, 15, f);
 }
 
 extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_FontKt__1nGetSpacing
