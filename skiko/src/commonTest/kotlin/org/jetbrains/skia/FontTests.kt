@@ -73,6 +73,24 @@ class FontTests {
             )
 
             assertEquals(Rect(1f, -12f, 21f, 0f), font.measureText("ЕЁЫ"))
+
+            assertEquals(FontMetrics(
+                -11.64f,
+                -11.64f,
+                3.2400002f,
+                3.2400002f,
+                0f,
+                7.2000003f,
+                29.460001f,
+                -20.880001f,
+                8.58f,
+                6.6000004f,
+                8.64f,
+                0.54f,
+                1.4399999f,
+                0.54f,
+                -3.8999999f
+            ), font.metrics)
         }
     }
 }
