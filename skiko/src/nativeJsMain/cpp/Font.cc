@@ -231,24 +231,19 @@ SKIKO_EXPORT KInt org_jetbrains_skia_Font__1nGetStringGlyphsCount
   return instance->countText(skString(str).c_str(), len * sizeof(KChar), SkTextEncoding::kUTF16);
 }
 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Font__1nMeasureText
-  (KNativePointer ptr, KInteropPointer str, KNativePointer paintPtr) {
-    TODO("implement org_jetbrains_skia_Font__1nMeasureText");
-}
-
-#if 0
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Font__1nMeasureText
-  (KNativePointer ptr, KInteropPointer str, KNativePointer paintPtr) {
+SKIKO_EXPORT void org_jetbrains_skia_Font__1nMeasureText
+  (KNativePointer ptr, KInteropPointer str, KInt len, KNativePointer paintPtr, KFloat* res) {
     SkFont* instance = reinterpret_cast<SkFont*>(ptr);
     SkPaint* paint = reinterpret_cast<SkPaint*>(paintPtr);
-    jsize len = env->GetStringLength(str);
-    const KChar* chars = env->GetStringCritical(str, nullptr);
     SkRect bounds;
-    instance->measureText(chars, len * sizeof(KChar), SkTextEncoding::kUTF16, &bounds, paint);
-    env->ReleaseStringCritical(str, chars);
-    return skija::Rect::fromSkRect(env, bounds);
+    instance->measureText(skString(str).c_str(), len * sizeof(KChar), SkTextEncoding::kUTF16, &bounds, paint);
+
+    res[0] = bounds.left();
+    res[1] = bounds.top();
+    res[2] = bounds.right();
+    res[3] = bounds.bottom();
 }
-#endif
+
 
 SKIKO_EXPORT KFloat org_jetbrains_skia_Font__1nMeasureTextWidth
   (KNativePointer ptr, KInteropPointer str, KInt len, KNativePointer paintPtr) {
