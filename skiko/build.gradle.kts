@@ -393,11 +393,15 @@ kotlin {
                 val linuxTest by creating {
                     dependsOn(nativeTest)
                 }
-                val linuxX64Main by getting {
-                    dependsOn(linuxMain)
-                }
-                val linuxX64Test by getting {
-                    dependsOn(linuxTest)
+                when (targetArch) {
+                    Arch.X64 -> {
+                        val linuxX64Main by getting {
+                            dependsOn(linuxMain)
+                        }
+                        val linuxX64Test by getting {
+                            dependsOn(linuxTest)
+                        }
+                    }
                 }
             }
             if (hostOs == OS.MacOS) {
