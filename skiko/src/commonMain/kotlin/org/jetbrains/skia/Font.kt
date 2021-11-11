@@ -555,7 +555,9 @@ class Font : Managed {
     val metrics: FontMetrics
         get() = try {
             Stats.onNativeCall()
-            _nGetMetrics(_ptr)
+            FontMetrics.fromInteropPointer {
+                _nGetMetrics(_ptr, it)
+            }
         } finally {
             reachabilityBarrier(this)
         }
@@ -708,7 +710,7 @@ private external fun _nGetPath(ptr: NativePointer, glyph: Short): NativePointer
 private external fun _nGetPaths(ptr: NativePointer, glyphs: ShortArray?): Array<Path>
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetMetrics")
-private external fun _nGetMetrics(ptr: NativePointer): FontMetrics
+private external fun _nGetMetrics(ptr: NativePointer, metrics: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetSpacing")
 private external fun _nGetSpacing(ptr: NativePointer): Float
