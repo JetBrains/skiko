@@ -446,8 +446,8 @@ public:
     }
 
     T operator()() {
-        jobject res = env->CallObjectMethod(callback, kotlin::jvm::functions::Function0::invoke);
-        return jObjectConvert<T>(env, res);
+        skija::AutoLocal<jobject> res(env, env->CallObjectMethod(callback, kotlin::jvm::functions::Function0::invoke));
+        return jObjectConvert<T>(env, res.get());
     }
 
     bool isExceptionThrown() {
