@@ -210,6 +210,8 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetFami
         res->push_back(reinterpret_cast<jlong>(new SkString(name.fLanguage)));
     }
 
+    res->push_back(Java_org_jetbrains_skia_ManagedStringKt_ManagedString_1nGetFinalizer(env, jclass));
+
     return reinterpret_cast<jlong>(res);
 }
 

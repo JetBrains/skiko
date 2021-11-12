@@ -2,13 +2,9 @@
 #include "interop.hh"
 #include "SkString.h"
 
-static void deleteString(SkString* instance) {
-    delete instance;
-}
-
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ManagedStringKt_ManagedString_1nGetFinalizer
   (JNIEnv* env, jclass jclass) {
-    return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteString));
+    return static_cast<jlong>(reinterpret_cast<uintptr_t>(&skikoMpp::finalizers::deleteString));
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ManagedStringKt__1nMake

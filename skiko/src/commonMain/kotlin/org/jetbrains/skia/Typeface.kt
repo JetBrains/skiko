@@ -343,10 +343,10 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             try {
                 Stats.onNativeCall()
                 resPtr = _nGetFamilyNames(_ptr)
-                val size = StdVectorDecoder_nGetArraySize(resPtr)
+                val size = StdVectorDecoder_nGetArraySize(resPtr) - 1
                 return (0 until size / 2).map { i ->
-                    val name = StdVectorDecoder_nGetArrayElement(resPtr, 2*i)
-                    val language = StdVectorDecoder_nGetArrayElement(resPtr, 2*i + 1)
+                    val name = StdVectorDecoder_nReleaseElement(resPtr, 2*i)
+                    val language = StdVectorDecoder_nReleaseElement(resPtr, 2*i + 1)
                     FontFamilyName(ManagedString(name).toString(), ManagedString(language).toString())
                 }.toTypedArray()
             } finally {

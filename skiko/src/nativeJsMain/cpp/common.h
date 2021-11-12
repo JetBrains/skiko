@@ -205,3 +205,4 @@ typedef KCallback<void, callVoidCallback> KVoidCallback;
 
 #endif /* SKIKO_COMMON_H */
 
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_ManagedString__1nGetFinalizer();

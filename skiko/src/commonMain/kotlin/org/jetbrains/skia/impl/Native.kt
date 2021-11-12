@@ -135,8 +135,7 @@ inline fun withResult(result: NativePointerArray, block: InteropScope.(InteropPo
  */
 @Suppress("NON_PUBLIC_CALL_FROM_PUBLIC_INLINE")
 inline fun withStringResult(block: () -> NativePointer): String {
-    val string = ManagedString(block())
-    return string.toString()
+    return  ManagedString(block()).use { it.toString() }
 }
 
 /**

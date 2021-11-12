@@ -203,6 +203,8 @@ SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Typeface__1nGetFamilyNames
         res->push_back(reinterpret_cast<KInteropPointer>(new SkString(name.fLanguage)));
     }
 
+    res->push_back(org_jetbrains_skia_ManagedString__1nGetFinalizer());
+
     return reinterpret_cast<KInteropPointer>(res);
 }
 

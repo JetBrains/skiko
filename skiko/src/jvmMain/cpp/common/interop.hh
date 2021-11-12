@@ -409,6 +409,7 @@ static inline jfloat fromBits(jint i) {
     return u.f;
 }
 
+<<<<<<< HEAD
 template<typename T>
 T jObjectConvert(JNIEnv* env, jobject obj);
 
@@ -460,3 +461,5 @@ private:
 };
 
 typedef JCallback<jboolean> JBooleanCallback;
+
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ManagedStringKt_ManagedString_1nGetFinalizer(JNIEnv* env, jclass jclass);

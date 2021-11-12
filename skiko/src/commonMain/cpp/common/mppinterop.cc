@@ -192,6 +192,10 @@ namespace skikoMpp {
             return true;
         }
     }
+
+    namespace finalizers {
+        static void deleteString(void* instance);
+    }
 }
 
 
