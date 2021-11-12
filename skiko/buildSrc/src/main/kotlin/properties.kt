@@ -1,6 +1,8 @@
 import org.gradle.api.Project
-import org.gradle.api.provider.Provider
 import java.io.File
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashSet
 
 enum class OS(
     val id: String,
@@ -178,6 +180,47 @@ class SkikoProperties(private val myProject: Project) {
 
     val dependenciesDir: File
         get() = myProject.rootProject.projectDir.resolve("dependencies")
+
+    val requestedPlatforms: Set<SkikoPlatform>
+        get() {
+            val envVar = "SKIKO_PLATFORMS"
+            val skikoPlatformsFromEnv = System.getenv(envVar)
+            val projectProperty = "skiko.platforms"
+            val skikoPlatformsFromProject = myProject.findProperty(projectProperty) as? String
+            val skikoPlatforms = when {
+                skikoPlatformsFromEnv != null -> {
+                    myProject.logger.info("Using skiko platforms requested via '$envVar': '$skikoPlatformsFromEnv'")
+                    skikoPlatformsFromEnv
+                }
+                skikoPlatformsFromProject != null -> {
+                    myProject.logger.info("Using skiko platforms requested via '$projectProperty': '$skikoPlatformsFromProject'")
+                    skikoPlatformsFromProject
+                }
+                else -> {
+                    // Kotlin requires to define at least one target https://youtrack.jetbrains.com/issue/KT-45877
+                    myProject.logger.info("Using the default skiko platform: 'jvm'")
+                    "jvm"
+                }
+            }
+            val result = EnumSet.noneOf(SkikoPlatform::class.java)
+            val unknownPlatforms = ArrayList<String>()
+            for (platformName in skikoPlatforms.split(",").map { it.trim() }) {
+                if (platformName.equals("all", ignoreCase = true)) {
+                    result.addAll(SkikoPlatform.values())
+                } else {
+                    val platform = SkikoPlatform.values().firstOrNull { it.id.equals(platformName, ignoreCase = true) }
+                    if (platform == null) {
+                        unknownPlatforms.add(platformName)
+                    } else {
+                        result.add(platform)
+                    }
+                }
+            }
+            if (unknownPlatforms.isNotEmpty()) {
+                error("Unknown requested platforms: ${unknownPlatforms.joinToString(", ") { "'$it'" }}")
+            }
+            return result
+        }
 }
 
 object SkikoArtifacts {
