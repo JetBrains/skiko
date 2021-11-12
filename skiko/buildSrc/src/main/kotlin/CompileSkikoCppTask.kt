@@ -180,7 +180,7 @@ abstract class CompileSkikoCppTask : AbstractSkikoNativeToolTask() {
             if (file.isFile) return file
         }
 
-        error("Could not find compiler '$compilerNameOrFile' in PATH")
+        error("Could not find compiler '$compilerNameOrFile' in PATH: $paths")
     }
 
     override fun cleanStaleOutput(mode: ToolMode.NonIncremental) {
