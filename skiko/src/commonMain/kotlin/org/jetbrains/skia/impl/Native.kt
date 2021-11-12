@@ -150,6 +150,16 @@ inline fun withStringReferenceResult(block: () -> NativePointer): String {
     return string.toString()
 }
 
+@Suppress("NON_PUBLIC_CALL_FROM_PUBLIC_INLINE")
+inline fun withStringReferenceNullableResult(block: () -> NativePointer): String? {
+    val ptr = block()
+    if (ptr == Native.NullPointer) return null
+
+    val string = ManagedString(ptr, false)
+    return string.toString()
+}
+
+
 interface ArrayInteropDecoder<T> {
     fun getArrayElement(array: InteropPointer, index: Int): T
     fun getArraySize(array: InteropPointer): Int

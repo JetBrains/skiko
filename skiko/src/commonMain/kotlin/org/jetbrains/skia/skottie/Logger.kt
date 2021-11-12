@@ -1,11 +1,12 @@
 @file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia.skottie
 
+import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.ExternalSymbolName
-import org.jetbrains.skia.impl.NativePointer
 
 /**
  *
@@ -19,17 +20,30 @@ abstract class Logger : RefCnt(_nMake()) {
         }
     }
 
-    abstract fun log(level: LogLevel?, message: String?, json: String?)
+    abstract fun log(level: LogLevel, message: String, json: String?)
 
     init {
         Stats.onNativeCall()
         Stats.onNativeCall()
-        _nInit(_ptr)
+        doInit(_ptr)
     }
 }
+
+internal expect fun Logger.doInit(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_Logger__1nMake")
 private external fun _nMake(): NativePointer
 
+// Native/JS only
+
 @ExternalSymbolName("org_jetbrains_skia_skottie_Logger__1nInit")
-external fun _nInit(ptr: NativePointer)
+internal external fun Logger_nInit(ptr: NativePointer, onLog: InteropPointer)
+
+@ExternalSymbolName("org_jetbrains_skia_skottie_Logger__1nGetLogMessage")
+internal external fun Logger_nGetLogMessage(ptr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_skottie_Logger__1nGetLogJson")
+internal external fun Logger_nGetLogJson(ptr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_skottie_Logger__1nGetLogLevel")
+internal external fun Logger_nGetLogLevel(ptr: NativePointer): Int
