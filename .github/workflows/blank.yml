@@ -29,9 +29,9 @@ jobs:
       - shell: bash
         run: |
           cd $GITHUB_WORKSPACE/skiko
-          ./gradlew -Pskiko.native.enabled=true jvmTest
-          ./gradlew -Pskiko.native.enabled=true macosX64Test iosX64Test
-          ./gradlew -Pskiko.native.enabled=true publishToMavenLocal
+          export SKIKO_PLATFORMS=jvm,macosX64,iosx64
+          ./gradlew --info check
+          ./gradlew --info publishToMavenLocal
       - uses: actions/upload-artifact@v2
         with:
           name: test-reports-macos
@@ -63,8 +63,9 @@ jobs:
           sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 60 --slave /usr/bin/g++ g++ /usr/bin/g++-9
           sudo update-alternatives --config gcc
           sudo apt-get install ninja-build fontconfig libfontconfig1-dev libglu1-mesa-dev libxrandr-dev zip -y
-          ./gradlew -Pskiko.native.enabled=true -i linuxX64Test jvmTest
-          ./gradlew publishToMavenLocal
+          export SKIKO_PLATFORMS=jvm,linuxX64Test
+          ./gradlew --info check
+          ./gradlew --info publishToMavenLocal
       - uses: actions/upload-artifact@v2
         with:
           name: test-reports-linux
@@ -100,8 +101,9 @@ jobs:
            ./emsdk activate 2.0.29
            source ./emsdk_env.sh
            cd ..
-           ./gradlew -Pskiko.wasm.enabled=true jsTest
-           ./gradlew -Pskiko.wasm.enabled=true publishSkikoWasmRuntimePublicationToMavenLocal
+           export SKIKO_PLATFORMS=js
+           ./gradlew --info check
+           ./gradlew --info publishToMavenLocal
        - uses: actions/upload-artifact@v2
          with:
            name: test-reports-js
@@ -121,8 +123,9 @@ jobs:
       - shell: bash
         run: |
           cd ./skiko
-          ./gradlew jvmTest
-          ./gradlew publishToMavenLocal
+          export SKIKO_PLATFORMS=jvm
+          ./gradlew --info check
+          ./gradlew --info publishToMavenLocal
       - uses: actions/upload-artifact@v2
         with:
           name: test-reports-windows
