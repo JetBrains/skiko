@@ -9,6 +9,10 @@
 #include "mtl/GrMtlBackendContext.h"
 #endif
 
+#ifdef SK_DIRECT3D
+#include "d3d/GrD3DBackendContext.h"
+#endif
+
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeGL
   () {
     return reinterpret_cast<KNativePointer>(GrDirectContext::MakeGL().release());
@@ -25,12 +29,22 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeMetal
     sk_sp<GrDirectContext> instance = GrDirectContext::MakeMetal(backendContext);
     return reinterpret_cast<KNativePointer>(instance.release());
 }
-#endif
+#endif // SK_METAL
 
+#ifdef SK_DIRECT3D
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeDirect3D
   (KNativePointer adapterPtr, KNativePointer devicePtr, KNativePointer queuePtr) {
-    TODO("implement org_jetbrains_skia_DirectContext__1nMakeDirect3D");
+    GrD3DBackendContext backendContext = {};
+    IDXGIAdapter1* adapter = reinterpret_cast<IDXGIAdapter1*>(adapterPtr);
+    ID3D12Device* device = reinterpret_cast<ID3D12Device*>(devicePtr);
+    ID3D12CommandQueue* queue = reinterpret_cast<ID3D12CommandQueue*>(queuePtr);
+    backendContext.fAdapter.retain(adapter);
+    backendContext.fDevice.retain(device);
+    backendContext.fQueue.retain(queue);
+    sk_sp<GrDirectContext> instance = GrDirectContext::MakeDirect3D(backendContext);
+    return reinterpret_cast<jlong>(instance.release());
 }
+#endif // SK_DIRECT3D
 
 SKIKO_EXPORT void org_jetbrains_skia_DirectContext__1nFlush
   (KNativePointer ptr) {
