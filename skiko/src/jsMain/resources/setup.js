@@ -11,20 +11,23 @@ var {_callCallback, _registerCallback, _releaseCallback, _createLocalCallbackSco
 
     class Scope {
         constructor() {
-            this.callbackMap = [CB_NULL];
+            this.nextId = 1;
+            this.callbackMap = new Map();
+            this.callbackMap.set(0, CB_NULL);
         }
 
         addCallback(callback, data) {
-            this.callbackMap.push({callback, data});
-            return this.callbackMap.length - 1;
+            let id = this.nextId++;
+            this.callbackMap.set(id, {callback, data});
+            return id;
         }
 
         getCallback(id) {
-            return this.callbackMap[id] || CB_UNDEFINED
+            return this.callbackMap.get(id) || CB_UNDEFINED;
         }
 
         deleteCallback(id) {
-            this.callbackMap[id] = CB_UNDEFINED
+            this.callbackMap.delete(id);
         }
 
         release() {
@@ -36,8 +39,8 @@ var {_callCallback, _registerCallback, _releaseCallback, _createLocalCallbackSco
     let scope = GLOBAL_SCOPE;
 
     return {
-        _callCallback(callbackId) {
-            let callback = scope.getCallback(callbackId);
+        _callCallback(callbackId, global = false) {
+            let callback = (global ? GLOBAL_SCOPE : scope).getCallback(callbackId);
             try {
                 callback.callback();
                 return callback.data;
@@ -45,11 +48,11 @@ var {_callCallback, _registerCallback, _releaseCallback, _createLocalCallbackSco
                 console.error(e)
             }
         },
-        _registerCallback(callback, data = null) {
-            return scope.addCallback(callback, data);
+        _registerCallback(callback, data = null, global = false) {
+            return (global ? GLOBAL_SCOPE : scope).addCallback(callback, data);
         },
-        _releaseCallback(callbackId) {
-            scope.deleteCallback(callbackId);
+        _releaseCallback(callbackId, global = false) {
+            (global ? GLOBAL_SCOPE : scope).deleteCallback(callbackId);
         },
         _createLocalCallbackScope() {
             if (scope !== GLOBAL_SCOPE) {

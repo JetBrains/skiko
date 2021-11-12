@@ -81,7 +81,9 @@ val compileWasm = tasks.register<CompileSkikoCppTask>("compileWasm") {
 
     flags.set(listOf(
         *skiaPreprocessorFlags(),
-        "-DSKIKO_WASM"
+        "-DSKIKO_WASM",
+        "-fno-rtti",
+        "-fno-exceptions"
     ))
 }
 

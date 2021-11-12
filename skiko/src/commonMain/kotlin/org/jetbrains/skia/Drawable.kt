@@ -2,6 +2,7 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skiko.maybeSynchronized
 
 /**
  *
@@ -12,14 +13,15 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
  * allow for clients of the drawable that may want to cache the results, the drawable must
  * change its generation id whenever its internal state changes such that it will draw differently.
  */
-abstract class Drawable : RefCnt(Drawable_nMake()) {
+abstract class Drawable : Managed(Drawable_nMake(), _FinalizerHolder.PTR) {
     companion object {
         init {
             staticLoad()
         }
     }
 
-    internal var _bounds: Rect? = null
+    private var _bounds: Rect? = null
+    private val boundsLock = Unit
 
     /**
      * Draws into the specified content. The drawing sequence will be balanced upon return
@@ -93,8 +95,10 @@ abstract class Drawable : RefCnt(Drawable_nMake()) {
      */
     val bounds: Rect
         get() {
-            if (_bounds == null) _bounds = onGetBounds()
-            return _bounds!!
+            maybeSynchronized(boundsLock) {
+                if (_bounds == null) _bounds = Rect.fromInteropPointer { Drawable_nGetBounds(_ptr, it) }
+                return _bounds!!
+            }
         }
 
     /**
@@ -103,27 +107,34 @@ abstract class Drawable : RefCnt(Drawable_nMake()) {
      * in response to its internal state changing.
      */
     fun notifyDrawingChanged(): Drawable {
-        Stats.onNativeCall()
-        _nNotifyDrawingChanged(_ptr)
-        _bounds = null
+        maybeSynchronized(boundsLock) {
+            Stats.onNativeCall()
+            _nNotifyDrawingChanged(_ptr)
+            _bounds = null
+        }
         return this
     }
 
     abstract fun onDraw(canvas: Canvas?)
     abstract fun onGetBounds(): Rect
-    fun _onDraw(canvasPtr: NativePointer) {
+
+    private fun _onDraw(canvasPtr: NativePointer) {
         onDraw(Canvas(canvasPtr, false, this))
     }
 
+    private object _FinalizerHolder {
+        val PTR = Drawable_nGetFinalizer()
+    }
+
     init {
-        Stats.onNativeCall()
-        Stats.onNativeCall()
-        Drawable_nInit(this, _ptr)
+        doInit(_ptr)
     }
 }
 
-@ExternalSymbolName("org_jetbrains_skia_Drawable__1nInit")
-private external fun Drawable_nInit(drawable: Drawable, ptr: NativePointer)
+internal expect fun Drawable.doInit(ptr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_Drawable__1nGetFinalizer")
+private external fun Drawable_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Drawable__1nMake")
 private external fun Drawable_nMake(): NativePointer
@@ -139,3 +150,17 @@ private external fun _nMakePictureSnapshot(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Drawable__1nNotifyDrawingChanged")
 private external fun _nNotifyDrawingChanged(ptr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_Drawable__1nGetBounds")
+private external fun Drawable_nGetBounds(ptr: NativePointer, result: InteropPointer)
+
+// For Native/JS usage only
+
+@ExternalSymbolName("org_jetbrains_skia_Drawable__1nInit")
+internal external fun Drawable_nInit(ptr: NativePointer, onGetBounds: InteropPointer, onDraw: InteropPointer)
+
+@ExternalSymbolName("org_jetbrains_skia_Drawable__1nGetOnDrawCanvas")
+internal external fun _nGetOnDrawCanvas(ptr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Drawable__1nSetBounds")
+internal external fun _nSetBounds(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float)

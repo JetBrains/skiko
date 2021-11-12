@@ -342,13 +342,21 @@ KBoolean callBooleanCallback(KInteropPointer cb) {
     return static_cast<KBoolean>(value);
 }
 
+void callVoidCallback(KInteropPointer cb) {
+    EM_ASM({
+        _callCallback($0);
+    }, cb);
+}
+
 #else // __EMSCRIPTEN__
 
 static SkikoDisposeCallback disposeCallbackImpl = nullptr;
 static SkikoCallBooleanCallback callBooleanCallbackImpl = nullptr;
+static SkikoCallVoidCallback callVoidCallbackImpl = nullptr;
 
-SKIKO_EXPORT void skiko_initCallbacks(KOpaquePointer callBoolean, KOpaquePointer dispose) {
+SKIKO_EXPORT void skiko_initCallbacks(KOpaquePointer callBoolean, KOpaquePointer callVoid, KOpaquePointer dispose) {
     callBooleanCallbackImpl = reinterpret_cast<SkikoCallBooleanCallback>(callBoolean);
+    callVoidCallbackImpl = reinterpret_cast<SkikoCallVoidCallback>(callVoid);
     disposeCallbackImpl = reinterpret_cast<SkikoDisposeCallback>(dispose);
 }
 
@@ -358,6 +366,10 @@ void disposeCallback(KInteropPointer cb) {
 
 KBoolean callBooleanCallback(KInteropPointer cb) {
     return callBooleanCallbackImpl(cb);
+}
+
+void callVoidCallback(KInteropPointer cb) {
+    return callVoidCallbackImpl(cb);
 }
 
 #endif // __EMSCRIPTEN__
