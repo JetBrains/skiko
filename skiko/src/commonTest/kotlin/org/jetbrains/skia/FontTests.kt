@@ -72,7 +72,7 @@ class FontTests {
                 ), font.getBounds(glyphs)
             )
 
-            assertEquals(FontMetrics(
+            assertCloseEnough(FontMetrics(
                 -11.64f,
                 -11.64f,
                 3.2400002f,
