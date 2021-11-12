@@ -155,7 +155,6 @@ inline fun withStringReferenceNullableResult(block: () -> NativePointer): String
     val ptr = block()
     if (ptr == Native.NullPointer) return null
 
-    println("PTR $ptr")
     val string = ManagedString(ptr, false)
     return string.toString()
 }
