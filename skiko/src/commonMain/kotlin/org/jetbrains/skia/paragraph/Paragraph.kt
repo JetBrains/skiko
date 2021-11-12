@@ -108,13 +108,15 @@ class Paragraph internal constructor(ptr: NativePointer, text: ManagedString?) :
     ): Array<TextBox> {
         return try {
             Stats.onNativeCall()
-            _nGetRectsForRange(_ptr, start, end, rectHeightMode.ordinal, rectWidthMode.ordinal)
+            interopScope {
+                _nGetRectsForRange(_ptr, start, end, rectHeightMode.ordinal, rectWidthMode.ordinal).fromInterop(TextBox)
+            }
         } finally {
             reachabilityBarrier(this)
         }
     }
 
-    val rectsForPlaceholders: Array<org.jetbrains.skia.paragraph.TextBox>
+    val rectsForPlaceholders: Array<TextBox>
         get() = try {
             Stats.onNativeCall()
             interopScope {
@@ -305,7 +307,7 @@ private external fun _nGetRectsForRange(
     end: Int,
     rectHeightMode: Int,
     rectWidthMode: Int
-): Array<TextBox>
+): InteropPointer
 
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nGetRectsForPlaceholders")
