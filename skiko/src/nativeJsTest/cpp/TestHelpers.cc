@@ -71,3 +71,84 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nWriteArrays
 
     return reinterpret_cast<KNativePointer>(mem);
 }
+
+struct SkikoTestGlContext;
+SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nCreateTestGlContext();
+SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nDeleteTestGlContext(KNativePointer ptr);
+SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nMakeGlContextCurrent(KNativePointer ptr);
+SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nGlContextSwapBuffers(KNativePointer ptr);
+
+SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nGlContextGetFinalizer() {
+    return reinterpret_cast<KNativePointer>(org_jetbrains_skiko_tests_TestHelpers__1nDeleteTestGlContext);
+}
+
+#ifdef SK_GL
+#ifdef __linux__
+
+#define SKIKO_TEST_GL_INCLUDED
+
+#include <EGL/egl.h>
+
+struct SkikoTestGlContext {
+    EGLDisplay display;
+    EGLSurface surface;
+    EGLContext context;
+};
+
+SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nCreateTestGlContext() {
+    EGLDisplay display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+    eglInitialize(display, nullptr, nullptr);
+
+    EGLConfig config;
+    EGLint configCount;
+    const EGLint attributes[] {
+        EGL_RED_SIZE, 8,
+        EGL_GREEN_SIZE, 8,
+        EGL_BLUE_SIZE, 8,
+        EGL_ALPHA_SIZE, 8,
+        EGL_NONE
+    };
+    eglChooseConfig(display, attributes, &config, 1, &configCount);
+    EGLContext context = eglCreateContext(display, config, EGL_NO_CONTEXT, nullptr);
+
+    EGLint surfaceAttributes[] {
+        EGL_WIDTH, 1280,
+        EGL_HEIGHT, 720,
+        EGL_NONE
+    };
+    EGLSurface surface = eglCreatePbufferSurface(display, context, surfaceAttributes);
+
+    SkikoTestGlContext* result = new { display, surface, context };
+    return reinterpret_cast<KNativePointer>(result);
+}
+
+SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nDeleteTestGlContext(KNativePointer ptr) {
+    auto* instance = reinterpret_cast<SkikoTestGlContext*>(ptr);
+    eglMakeCurrent(instance->display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+    eglDestroySurface(instance->display, instance->surface);
+    eglDestroyContext(instance->display, instance->context);
+    delete instance;
+}
+
+SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nMakeGlContextCurrent(KNativePointer ptr) {
+    auto* instance = reinterpret_cast<SkikoTestGlContext*>(ptr);
+    eglMakeCurrent(instance->display, instance->surface, instance->surface, instance->context);
+}
+
+SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nGlContextSwapBuffers(KNativePointer ptr) {
+    auto* instance = reinterpret_cast<SkikoTestGlContext*>(ptr);
+    eglSwapBuffers(instance->display, instance->surface);
+}
+
+#endif // __linux__
+#endif // SK_GL
+
+#ifndef SKIKO_TEST_GL_INCLUDED
+SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nCreateTestGlContext() {
+    TODO("OpenGl context is not supported for this platform");
+}
+
+SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nDeleteTestGlContext(KNativePointer ptr) {}
+SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nMakeGlContextCurrent(KNativePointer ptr) {}
+SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nGlContextSwapBuffers(KNativePointer ptr) {}
+#endif // SKIKO_TEST_GL_INCLUDED

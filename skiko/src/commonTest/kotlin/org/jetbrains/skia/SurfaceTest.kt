@@ -4,6 +4,7 @@ import org.jetbrains.skia.impl.interopScope
 import org.jetbrains.skia.impl.use
 import org.jetbrains.skiko.OS
 import org.jetbrains.skiko.hostOs
+import org.jetbrains.skiko.tests.TestGlContext
 import org.jetbrains.skiko.tests.allocateBytesForPixels
 import org.jetbrains.skiko.tests.runTest
 import kotlin.test.*
@@ -111,15 +112,17 @@ class SurfaceTest {
             return
         }
 
-        val ctx = DirectContext.makeGL()
-        val imageInfo = ImageInfo.makeN32Premul(16, 16)
-        val surface = Surface.makeRenderTarget(ctx, budgeted = false, imageInfo)
+        val pixels = TestGlContext.run {
+            val ctx = DirectContext.makeGL()
+            val imageInfo = ImageInfo.makeN32Premul(16, 16)
+            val surface = Surface.makeRenderTarget(ctx, budgeted = false, imageInfo)
 
-        surface.canvas.drawRect(
-            r = Rect(4f, 4f, 12f, 12f),
-            paint = Paint().apply { color = Color.RED }
-        )
-        val pixels = Bitmap.makeFromImage(surface.makeImageSnapshot())
+            surface.canvas.drawRect(
+                r = Rect(4f, 4f, 12f, 12f),
+                paint = Paint().apply { color = Color.RED }
+            )
+            Bitmap.makeFromImage(surface.makeImageSnapshot())
+        }
 
         assertEquals(Color.RED, pixels.getColor(8, 8))
     }
