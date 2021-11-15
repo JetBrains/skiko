@@ -18,6 +18,12 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeGL
     return reinterpret_cast<KNativePointer>(GrDirectContext::MakeGL().release());
 }
 
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeGLWithInterface
+  (KNativePointer ptr) {
+    sk_sp<GrGLInterface> iface = sk_ref_sp(reinterpret_cast<GrGLInterface*>(ptr));
+    return reinterpret_cast<KNativePointer>(GrDirectContext::MakeGL(iface).release());
+}
+
 #ifdef SK_METAL
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeMetal
   (long devicePtr, long queuePtr) {

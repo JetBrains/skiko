@@ -79,6 +79,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nCreateTestG
 SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nDeleteTestGlContext(KNativePointer ptr);
 SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nMakeGlContextCurrent(KNativePointer ptr);
 SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nGlContextSwapBuffers(KNativePointer ptr);
+SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nGetGrGlInterface(KNativePointer ptr);
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nGlContextGetFinalizer() {
     return reinterpret_cast<KNativePointer>(org_jetbrains_skiko_tests_TestHelpers__1nDeleteTestGlContext);
@@ -93,10 +94,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nGlContextGe
 #include <EGL/eglext.h>
 #include <iostream>
 
+#include "include/gpu/gl/egl/GrGLMakeEGLInterface.h"
+
 struct SkikoTestGlContext {
     EGLDisplay display;
     EGLSurface surface;
     EGLContext context;
+    sk_sp<const GrGlInterface> glInterface;
 };
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nCreateTestGlContext() {
@@ -115,7 +119,6 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nCreateTestG
     };
     eglChooseConfig(display, attributes, &config, 1, &configCount);
     eglBindAPI(EGL_OPENGL_API);
-    std::cerr << "EGL config count " << configCount << std::endl;
     EGLContext context = eglCreateContext(display, config, EGL_NO_CONTEXT, nullptr);
     if (context == EGL_NO_CONTEXT) {
         TODO("Failed to create context");
@@ -131,7 +134,8 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nCreateTestG
         TODO("Failed to create surface");
     }
 
-    SkikoTestGlContext* result = new SkikoTestGlContext { display, surface, context };
+    auto glInterface = GrGlMakeEGLInterface();
+    SkikoTestGlContext* result = new SkikoTestGlContext { display, surface, context, glInterface };
     return reinterpret_cast<KNativePointer>(result);
 }
 
@@ -140,6 +144,7 @@ SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nDeleteTestGlContext(K
     eglMakeCurrent(instance->display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
     eglDestroySurface(instance->display, instance->surface);
     eglDestroyContext(instance->display, instance->context);
+    eglTerminate(instance->display);
     delete instance;
 }
 
@@ -151,6 +156,12 @@ SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nMakeGlContextCurrent(
 SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nGlContextSwapBuffers(KNativePointer ptr) {
     auto* instance = reinterpret_cast<SkikoTestGlContext*>(ptr);
     eglSwapBuffers(instance->display, instance->surface);
+}
+
+SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nGetGrGlInterface(KNativePointer ptr) {
+    auto* instance = reinterpret_cast<SkikoTestGlContext*>(ptr);
+    auto glInterface = *(instance->glInterface);
+    return reinterpret_cast<KNativePointer>(glInterface.release());
 }
 
 #endif // __linux__
@@ -165,4 +176,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nCreateTestG
 SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nDeleteTestGlContext(KNativePointer ptr) {}
 SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nMakeGlContextCurrent(KNativePointer ptr) {}
 SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nGlContextSwapBuffers(KNativePointer ptr) {}
+SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nGetGrGlInterface(KNativePointer ptr) {
+    return reinterpret_cast<KNativePointer>(nullptr);
+}
 #endif // SKIKO_TEST_GL_INCLUDED

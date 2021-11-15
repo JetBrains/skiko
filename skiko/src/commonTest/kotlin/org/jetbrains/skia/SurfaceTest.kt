@@ -113,7 +113,7 @@ class SurfaceTest {
         }
 
         val pixels = TestGlContext.run {
-            val ctx = DirectContext.makeGL()
+            val ctx = DirectContext.makeGL(glInterface)
             val imageInfo = ImageInfo.makeN32Premul(16, 16)
             val surface = Surface.makeRenderTarget(ctx, budgeted = false, imageInfo)
 
