@@ -59,7 +59,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_FontCollect
     return reinterpret_cast<jlong>(instance->getFallbackManager().release());
 }
 
-extern "C" JNIEXPORT jlongArray JNICALL Java_org_jetbrains_skia_paragraph_FontCollectionKt__1nFindTypefaces
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_FontCollectionKt__1nFindTypefaces
   (JNIEnv* env, jclass jclass, jlong ptr, jobjectArray familyNamesArray, jsize len, jint fontStyle) {
     FontCollection* instance = reinterpret_cast<FontCollection*>(static_cast<uintptr_t>(ptr));
 
@@ -71,13 +71,12 @@ extern "C" JNIEXPORT jlongArray JNICALL Java_org_jetbrains_skia_paragraph_FontCo
     }
 
     vector<sk_sp<SkTypeface>> found = instance->findTypefaces(familyNames, skija::FontStyle::fromJava(fontStyle));
-    vector<jlong> res(found.size());
-    for (int i = 0; i < found.size(); ++i)
-        res[i] = reinterpret_cast<jlong>(found[i].release());
 
-    jlongArray resArray = env->NewLongArray((jsize) found.size());
-    env->SetLongArrayRegion(resArray, 0, (jsize) found.size(), res.data());
-    return resArray;
+    std::vector<jlong>* res = new std::vector<jlong>();
+    for (auto& f : found)
+        res->push_back(reinterpret_cast<jlong>(f.release()));
+
+    return reinterpret_cast<jlong>(res);
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_FontCollectionKt__1nDefaultFallbackChar
