@@ -162,7 +162,7 @@ SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nGlContextSwapBuffers(
 SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nGetGrGlInterface(KNativePointer ptr) {
     auto* instance = reinterpret_cast<SkikoTestGlContext*>(ptr);
     sk_sp<const GrGLInterface> glInterface = instance->glInterface;
-    return reinterpret_cast<KNativePointer>(const_cast<GrGLInterface*>(glInterface.release());
+    return reinterpret_cast<KNativePointer>(const_cast<GrGLInterface*>(glInterface.release()));
 }
 
 #endif // __linux__
