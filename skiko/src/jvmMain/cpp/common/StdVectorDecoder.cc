@@ -20,9 +20,9 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_StdVectorDecoderKt_Std
     (JNIEnv* env, jclass jclass, jlong ptr, jlong disposePtr) {
         std::vector<void*>* vec = reinterpret_cast<std::vector<void*> *>(ptr);
 
-        void (*dctr)(SkString*) = reinterpret_cast<void (*)(SkString*)>(disposePtr);
+        void (*dctr)(void*) = reinterpret_cast<void (*)(void*)>(disposePtr);
         while (!vec->empty()){
-            SkString* res = reinterpret_cast<SkString*>(vec->back());
+            auto res = vec->back();
             if (res != nullptr) {
                 dctr(res);
             }

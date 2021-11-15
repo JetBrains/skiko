@@ -18,9 +18,9 @@ SKIKO_EXPORT void org_jetbrains_skia_StdVectorDecoder__1nDisposeArray
     (KNativePointer ptr, KNativePointer disposePtr) {
         std::vector<KNativePointer>* vec = reinterpret_cast<std::vector<KNativePointer> *>(ptr);
 
-        void (*dctr)(SkString*) = reinterpret_cast<void (*)(SkString*)>(disposePtr);
+        void (*dctr)(void*) = reinterpret_cast<void (*)(void*)>(disposePtr);
         while (!vec->empty()){
-            SkString* res = reinterpret_cast<SkString*>(vec->back());
+            auto res = vec->back();
             if (res != nullptr) {
                 dctr(res);
             }
