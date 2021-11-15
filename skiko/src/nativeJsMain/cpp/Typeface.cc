@@ -190,35 +190,22 @@ SKIKO_EXPORT bool org_jetbrains_skia_Typeface__1nGetKerningPairAdjustments
   return false;
 }
      
-SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_Typeface__1nGetFamilyNames
+SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Typeface__1nGetFamilyNames
   (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_Typeface__1nGetFamilyNames");
-}
-     
-#if 0 
-SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_Typeface__1nGetFamilyNames
-  (KNativePointer ptr) {
-    SkTypeface* instance = reinterpret_cast<SkTypeface*>((ptr));
+    SkTypeface* instance = reinterpret_cast<SkTypeface*>(ptr);
     SkTypeface::LocalizedStrings* iter = instance->createFamilyNameIterator();
     std::vector<SkTypeface::LocalizedString> names;
     SkTypeface::LocalizedString name;
+    std::vector<KInteropPointer>* res = new std::vector<KInteropPointer>();
+
     while (iter->next(&name)) {
-        names.push_back(name);
+        res->push_back(reinterpret_cast<KInteropPointer>(new SkString(name.fString)));
+        res->push_back(reinterpret_cast<KInteropPointer>(new SkString(name.fLanguage)));
     }
-    iter->unref();
-    KInteropPointerArray res = env->NewObjectArray((jsize) names.size(), skija::FontFamilyName::cls, nullptr);
-    for (int i = 0; i < names.size(); ++i) {
-        skija::AutoLocal<KInteropPointer> nameStr(env, javaString(env, names[i].fString));
-        skija::AutoLocal<KInteropPointer> langStr(env, javaString(env, names[i].fLanguage));
-        skija::AutoLocal<KInteropPointer> obj(env, env->NewObject(skija::FontFamilyName::cls, skija::FontFamilyName::ctor, nameStr.get(), langStr.get()));
-        env->SetObjectArrayElement(res, i, obj.get());
-    }
-    return res;
+
+    return reinterpret_cast<KInteropPointer>(res);
 }
-#endif
-
-
-
+     
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Typeface__1nGetFamilyName
   (KNativePointer ptr) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(ptr);
