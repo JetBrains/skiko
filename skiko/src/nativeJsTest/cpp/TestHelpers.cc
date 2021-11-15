@@ -111,6 +111,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nCreateTestG
         EGL_NONE
     };
     eglChooseConfig(display, attributes, &config, 1, &configCount);
+    eglBindAPI(EGL_OPENGL_API);
     std::cerr << "EGL config count " << configCount << std::endl;
     EGLContext context = eglCreateContext(display, config, EGL_NO_CONTEXT, nullptr);
     if (context == EGL_NO_CONTEXT) {
