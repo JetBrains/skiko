@@ -339,17 +339,21 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
      * @return  all of the family names specified by the font
      */
     val familyNames: Array<FontFamilyName>
-        get() = try {
-            Stats.onNativeCall()
-            val arrayDecoder = ArrayDecoder(_nGetFamilyNames(_ptr, ManagedString_nGetFinalizer()))
-            val size = arrayDecoder.size - 1
-            (0 until size / 2).map { i ->
-                val name = arrayDecoder.release(2 * i + 1)
-                val language = arrayDecoder.release(2 * i + 2)
-                FontFamilyName(ManagedString(name).toString(), ManagedString(language).toString())
-            }.toTypedArray()
-        } finally {
-            reachabilityBarrier(this)
+        get() {
+            var arrayDecoder: ArrayDecoder? = null
+            return try {
+                Stats.onNativeCall()
+                arrayDecoder = ArrayDecoder(_nGetFamilyNames(_ptr), ManagedString_nGetFinalizer())
+                val size = arrayDecoder.size
+                (0 until size / 2).map { i ->
+                    val name = arrayDecoder.release(2 * i)
+                    val language = arrayDecoder.release(2 * i + 1)
+                    FontFamilyName(ManagedString(name).toString(), ManagedString(language).toString())
+                }.toTypedArray()
+            } finally {
+                arrayDecoder?.dispose()
+                reachabilityBarrier(this)
+            }
         }
 
     /**
@@ -452,7 +456,7 @@ private external fun _nGetUnitsPerEm(ptr: NativePointer): Int
 private external fun _nGetKerningPairAdjustments(ptr: NativePointer, glyphs: ShortArray, count: Int, adjustments: InteropPointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetFamilyNames")
-private external fun _nGetFamilyNames(ptr: NativePointer, disposePtr: NativePointer): NativePointer
+private external fun _nGetFamilyNames(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetFamilyName")
 private external fun _nGetFamilyName(ptr: NativePointer): NativePointer

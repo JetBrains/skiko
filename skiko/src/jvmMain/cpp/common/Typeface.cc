@@ -199,14 +199,12 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetK
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetFamilyNames
-  (JNIEnv* env, jclass jclass, jlong ptr, jlong disposePtr) {
+  (JNIEnv* env, jclass jclass, jlong ptr) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
     SkTypeface::LocalizedStrings* iter = instance->createFamilyNameIterator();
     std::vector<SkTypeface::LocalizedString> names;
     SkTypeface::LocalizedString name;
     std::vector<jlong>* res = new std::vector<jlong>();
-
-    res->push_back(disposePtr);
 
     while (iter->next(&name)) {
         res->push_back(reinterpret_cast<jlong>(new SkString(name.fString)));

@@ -1,5 +1,6 @@
 #include <jni.h>
 #include "interop.hh"
+#include <iostream>
 
 extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_StdVectorDecoderKt_StdVectorDecoder_1nGetArraySize
     (JNIEnv* env, jclass jclass, jlong ptr) {
@@ -16,11 +17,10 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_StdVectorDecoderKt_St
     }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_StdVectorDecoderKt_StdVectorDecoder_1nDisposeArray
-    (JNIEnv* env, jclass jclass, jlong ptr) {
+    (JNIEnv* env, jclass jclass, jlong ptr, jlong disposePtr) {
         std::vector<jlong>* vec = reinterpret_cast<std::vector<jlong> *>(ptr);
 
-        void (*dctr)(SkString*) = reinterpret_cast<void (*)(SkString*)>(vec->back());
-        vec->pop_back();
+        void (*dctr)(SkString*) = reinterpret_cast<void (*)(SkString*)>(disposePtr);
         while (!vec->empty()){
             SkString* res = reinterpret_cast<SkString*>(vec->back());
             if (res != nullptr) {
