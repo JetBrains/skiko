@@ -94,13 +94,14 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nGlContextGe
 #include <EGL/eglext.h>
 #include <iostream>
 
+#include "include/gpu/gl/GrGLInterface.h"
 #include "include/gpu/gl/egl/GrGLMakeEGLInterface.h"
 
 struct SkikoTestGlContext {
     EGLDisplay display;
     EGLSurface surface;
     EGLContext context;
-    sk_sp<const GrGlInterface> glInterface;
+    sk_sp<const GrGLInterface> glInterface;
 };
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nCreateTestGlContext() {
@@ -134,7 +135,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nCreateTestG
         TODO("Failed to create surface");
     }
 
-    auto glInterface = GrGlMakeEGLInterface();
+    auto glInterface = GrGLMakeEGLInterface();
     SkikoTestGlContext* result = new SkikoTestGlContext { display, surface, context, glInterface };
     return reinterpret_cast<KNativePointer>(result);
 }
@@ -160,7 +161,7 @@ SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nGlContextSwapBuffers(
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nGetGrGlInterface(KNativePointer ptr) {
     auto* instance = reinterpret_cast<SkikoTestGlContext*>(ptr);
-    auto glInterface = *(instance->glInterface);
+    sk_sp<const GrGLInterface> glInterface = *(instance->glInterface);
     return reinterpret_cast<KNativePointer>(glInterface.release());
 }
 
