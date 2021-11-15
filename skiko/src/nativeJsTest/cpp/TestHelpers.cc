@@ -51,7 +51,9 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__nStringByInde
         case 0: return new SkString("Hello");
         case 1: return new SkString("Привет");
         case 2: return new SkString("你好");
-        default: TODO("unknown");
+        default:
+            TODO("unknown");
+            return nullptr;
     }
 }
 
@@ -118,7 +120,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nCreateTestG
     };
     EGLSurface surface = eglCreatePbufferSurface(display, context, surfaceAttributes);
 
-    SkikoTestGlContext* result = new { display, surface, context };
+    SkikoTestGlContext* result = new SkikoTestGlContext { display, surface, context };
     return reinterpret_cast<KNativePointer>(result);
 }
 
@@ -146,6 +148,7 @@ SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nGlContextSwapBuffers(
 #ifndef SKIKO_TEST_GL_INCLUDED
 SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nCreateTestGlContext() {
     TODO("OpenGl context is not supported for this platform");
+    return nullptr;
 }
 
 SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nDeleteTestGlContext(KNativePointer ptr) {}
