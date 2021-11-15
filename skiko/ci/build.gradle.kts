@@ -95,6 +95,5 @@ val uploadSkikoArtifactsToMavenCentral by tasks.registering(UploadToSonatypeTask
     user.set(mavenCentral.user)
     password.set(mavenCentral.password)
     autoCommitOnSuccess.set(mavenCentral.autoCommitOnSuccess)
-    autoDropOnError.set(mavenCentral.autoDropOnError)
     stagingProfileName.set("org.jetbrains.skiko")
 }
