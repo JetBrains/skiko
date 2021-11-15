@@ -3,24 +3,34 @@ package org.jetbrains.skia
 import org.jetbrains.skia.impl.use
 import org.jetbrains.skia.paragraph.*
 import org.jetbrains.skia.tests.assertCloseEnough
+import org.jetbrains.skia.tests.assertContentCloseEnough
+import org.jetbrains.skia.tests.makeFromResource
 import org.jetbrains.skiko.tests.SkipJsTarget
 import org.jetbrains.skiko.tests.SkipNativeTarget
-import kotlin.test.*
+import org.jetbrains.skiko.tests.runTest
+import kotlin.test.Test
+import kotlin.test.assertContentEquals
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class ParagraphTest {
-    private val fontCollection = FontCollection().setDefaultFontManager(FontMgr.default)
+    private val fontCollection = suspend {
+        FontCollection().setDefaultFontManager(TypefaceFontProvider().apply {
+            registerTypeface(Typeface.makeFromResource("./fonts/Inter-Hinted-Regular.ttf"), "Inter")
+        })
+    }
 
     @Test
     @SkipJsTarget
     @SkipNativeTarget
-    fun findTypefaces() {
-        fontCollection.findTypefaces(emptyArray(), FontStyle.NORMAL)
+    fun findTypefaces() = runTest {
+        fontCollection().findTypefaces(emptyArray(), FontStyle.NORMAL)
     }
 
-    private fun singleLineMetrics(text: String): LineMetrics {
+    private suspend fun singleLineMetrics(text: String): LineMetrics {
         val style = ParagraphStyle()
 
-        return ParagraphBuilder(style, fontCollection).use {
+        return ParagraphBuilder(style, fontCollection()).use {
             it.addText(text)
             it.build()
         }.layout(Float.POSITIVE_INFINITY).lineMetrics.first()
@@ -29,7 +39,7 @@ class ParagraphTest {
     @Test
     @SkipJsTarget
     @SkipNativeTarget
-    fun layoutParagraph() {
+    fun layoutParagraph() = runTest {
         singleLineMetrics("aa").let { lineMetrics -> // latin
             assertEquals(0, lineMetrics.startIndex)
             assertEquals(2, lineMetrics.endIndex)
@@ -45,25 +55,28 @@ class ParagraphTest {
     }
 
     @Test
-    @SkipJsTarget
-    fun canCreate() {
+    fun canCreate() = runTest {
         val style = ParagraphStyle().apply {
             height = 40.0f
             maxLinesCount = 2
+            textStyle = TextStyle().apply {
+                fontFamilies = arrayOf("Inter")
+                fontSize = 14.0f
+            }
         }
         val text = "Hello,\r\n Пользователь1!"
-        var paragraph = ParagraphBuilder(style, fontCollection).use {
+        var paragraph = ParagraphBuilder(style, fontCollection()).use {
             it.addText(text)
             it.build()
         }.layout(100.0f)
 
-        assertCloseEnough(100.0f, paragraph.maxWidth)
-        assertCloseEnough(100.78f, paragraph.minIntrinsicWidth)
-        assertCloseEnough(108.55f, paragraph.maxIntrinsicWidth)
-        assertCloseEnough(10.780273f, paragraph.alphabeticBaseline)
-        assertCloseEnough(14.0f, paragraph.ideographicBaseline)
-        assertCloseEnough(96.87891f, paragraph.longestLine)
-        assertCloseEnough(28.0f, paragraph.height)
+        assertCloseEnough(100.0f, paragraph.maxWidth,0.01f)
+        assertCloseEnough(102.63f, paragraph.minIntrinsicWidth,0.01f)
+        assertCloseEnough(110.47f, paragraph.maxIntrinsicWidth,0.01f)
+        assertCloseEnough(13.5625f, paragraph.alphabeticBaseline, 0.01f)
+        assertCloseEnough(16.943085f, paragraph.ideographicBaseline, 0.01f)
+        assertCloseEnough(92.3125f, paragraph.longestLine,0.01f)
+        assertCloseEnough(34.0f, paragraph.height)
         assertTrue(paragraph.didExceedMaxLines())
 
         assertEquals(IRange(0, 5), paragraph.getWordBoundary(0))
@@ -73,9 +86,9 @@ class ParagraphTest {
 
         assertContentEquals(arrayOf(), paragraph.rectsForPlaceholders)
 
-        assertContentEquals(arrayOf(
-            TextBox(Rect(3.89f, 14.0f, 96.88f, 28.0f), Direction.LTR)
-        ), paragraph.getRectsForRange(9, 22, RectHeightMode.TIGHT, RectWidthMode.TIGHT))
+        assertContentCloseEnough(arrayOf(
+            TextBox(Rect(3.94f, 17.06f, 92.31f, 34.0f), Direction.LTR)
+        ), paragraph.getRectsForRange(9, 22, RectHeightMode.TIGHT, RectWidthMode.TIGHT),0.01f)
 
         paragraph = paragraph
             .updateFontSize(9, 22, 48.0f)
@@ -84,9 +97,9 @@ class ParagraphTest {
             .updateAlignment(Alignment.RIGHT)
             .markDirty()
 
-        assertContentEquals(arrayOf(
-            TextBox(Rect(3.89f, 14.0f, 96.88f, 28.0f), Direction.LTR)
-        ), paragraph.getRectsForRange(9, 22, RectHeightMode.TIGHT, RectWidthMode.TIGHT))
+        assertContentCloseEnough(arrayOf(
+            TextBox(Rect(3.94f, 17.06f, 92.31f, 34.0f), Direction.LTR)
+        ), paragraph.getRectsForRange(9, 22, RectHeightMode.TIGHT, RectWidthMode.TIGHT),0.01f)
 
         assertEquals(
             PositionWithAffinity(5, Affinity.UPSTREAM),
