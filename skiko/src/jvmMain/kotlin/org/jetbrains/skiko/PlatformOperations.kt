@@ -2,6 +2,8 @@ package org.jetbrains.skiko
 
 import java.awt.Component
 import java.awt.Window
+import java.awt.event.ComponentAdapter
+import java.awt.event.ComponentEvent
 import javax.swing.SwingUtilities
 
 internal interface PlatformOperations {
@@ -20,6 +22,17 @@ internal val platformOperations: PlatformOperations by lazy {
                 }
 
                 override fun setFullscreen(component: Component, value: Boolean) {
+                    // MacOS specific: if fullscreen is set before the window is visible,
+                    // we will add a listener to set fullscreen after the window is visible
+                    val window = SwingUtilities.getRoot(component) as Window
+                    if (value && !window.isVisible) {
+                        window.addComponentListener(object : ComponentAdapter() {
+                            override fun componentShown(e: ComponentEvent) {
+                                println("show window")
+                                osxSetFullscreenNative(component, value)
+                            }
+                        })
+                    }
                     osxSetFullscreenNative(component, value)
                 }
 
