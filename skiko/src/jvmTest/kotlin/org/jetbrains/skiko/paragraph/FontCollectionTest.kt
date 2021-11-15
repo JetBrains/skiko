@@ -75,13 +75,5 @@ class FontCollectionTest {
             assertEquals(refCnt, t1.refCount)
         }
 
-        val typefaces = fontCollection.findTypefaces(arrayOf("JetBrains Mono"), FontStyle.ITALIC)
-
-        typefaces.first()!!.let { typeface ->
-            assertEquals("JetBrains Mono", typeface.familyName)
-            assertEquals(FontStyle.NORMAL, typeface.fontStyle)
-        }
-
-
     }
 }
