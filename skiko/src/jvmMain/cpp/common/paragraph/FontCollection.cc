@@ -60,10 +60,9 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_FontCollect
 }
 
 extern "C" JNIEXPORT jlongArray JNICALL Java_org_jetbrains_skia_paragraph_FontCollectionKt__1nFindTypefaces
-  (JNIEnv* env, jclass jclass, jlong ptr, jobjectArray familyNamesArray, jint fontStyle) {
+  (JNIEnv* env, jclass jclass, jlong ptr, jobjectArray familyNamesArray, jsize len, jint fontStyle) {
     FontCollection* instance = reinterpret_cast<FontCollection*>(static_cast<uintptr_t>(ptr));
 
-    jsize len = env->GetArrayLength(familyNamesArray);
     vector<SkString> familyNames(len);
     for (int i = 0; i < len; ++i) {
         jstring str = static_cast<jstring>(env->GetObjectArrayElement(familyNamesArray, i));
