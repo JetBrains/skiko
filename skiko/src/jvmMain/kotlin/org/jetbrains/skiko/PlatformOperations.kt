@@ -28,7 +28,6 @@ internal val platformOperations: PlatformOperations by lazy {
                     if (value && !window.isVisible) {
                         window.addComponentListener(object : ComponentAdapter() {
                             override fun componentShown(e: ComponentEvent) {
-                                println("show window")
                                 osxSetFullscreenNative(component, value)
                             }
                         })
