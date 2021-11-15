@@ -419,6 +419,12 @@ fun configureNativeTarget(os: OS, arch: Arch, target: KotlinNativeTarget) {
     target.compilations.all {
         compileKotlinTask.dependsOn(linkTask)
     }
+    publishing.publications.configureEach {
+        this as MavenPublication
+        if (name == target.name) {
+            artifactId = SkikoArtifacts.nativeArtifactIdFor(os, arch)
+        }
+    }
 }
 
 tasks.withType(JavaCompile::class.java).configureEach {
