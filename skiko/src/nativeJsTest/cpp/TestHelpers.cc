@@ -100,7 +100,7 @@ struct SkikoTestGlContext {
 };
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nCreateTestGlContext() {
-    EGLDisplay display = eglGetPlatformDisplay(EGL_PLATFORM_SURFACELESS_MESA, nullptr, nullptr);
+    EGLDisplay display = eglGetPlatformDisplay(EGL_PLATFORM_SURFACELESS_MESA, EGL_DEFAULT_DISPLAY, nullptr);
     eglInitialize(display, nullptr, nullptr);
 
     EGLConfig config;
@@ -124,7 +124,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nCreateTestG
         EGL_HEIGHT, 720,
         EGL_NONE
     };
-    EGLSurface surface = eglCreatePbufferSurface(display, context, surfaceAttributes);
+    EGLSurface surface = eglCreatePbufferSurface(display, config, surfaceAttributes);
     if (surface == EGL_NO_SURFACE) {
         TODO("Failed to create surface");
     }
