@@ -90,6 +90,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nGlContextGe
 #define SKIKO_TEST_GL_INCLUDED
 
 #include <EGL/egl.h>
+#include <EGL/eglext.h>
 #include <iostream>
 
 struct SkikoTestGlContext {
@@ -99,9 +100,7 @@ struct SkikoTestGlContext {
 };
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nCreateTestGlContext() {
-    std::cerr << "Client extensions " << eglQueryString(EGL_NO_DISPLAY, EGL_EXTENSIONS) << std::endl;
-
-    EGLDisplay display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+    EGLDisplay display = eglGetDisplay(EGL_PLATFORM_SURFACELESS_MESA, nullptr, nullptr);
     eglInitialize(display, nullptr, nullptr);
 
     EGLConfig config;
