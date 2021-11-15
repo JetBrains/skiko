@@ -20,8 +20,8 @@ class ClocksJvm(private val layer: SkiaLayer): SkikoView {
     }
 
     private var frame = 0
-    var xpos = 0
-    var ypos = 0
+    var xpos = 0.0
+    var ypos = 0.0
     private val fontCollection = FontCollection()
         .setDefaultFontManager(FontMgr.default)
 
@@ -99,5 +99,23 @@ class ClocksJvm(private val layer: SkiaLayer): SkikoView {
         val picture = pictureRecorder.finishRecordingAsPicture()
         canvas.drawPicture(picture, null, Paint())
         canvas.drawLine(left, top + rectH, left + rectW, top, Paint())
+    }
+
+    override fun onPointerEvent(event: SkikoPointerEvent) {
+        when (event.kind) {
+            SkikoPointerEventKind.MOVE -> {
+                xpos = event.x
+                ypos = event.y
+            }
+            else -> { println("PointerEvent: ${event.modifiers} + ${event.kind} + ${event.buttons}") }
+        }
+    }
+
+    override fun onInputEvent(event: SkikoInputEvent) {
+        // TODO: provide examplec
+    }
+
+    override fun onKeyboardEvent(event: SkikoKeyboardEvent) {
+        println("KeyboardEvent: ${event.kind} ${event.modifiers} + ${event.code}")
     }
 }

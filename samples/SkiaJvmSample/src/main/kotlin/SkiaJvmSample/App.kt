@@ -14,7 +14,10 @@ import javax.imageio.ImageIO
 fun main() {
     val windows = 1
     repeat(windows) {
-        createWindow("window $it", windows == 1)
+        when (System.getProperty("skiko.interop")) {
+            "true" -> SwingSkia()
+            else -> createWindow("window $it", windows == 1)
+        }
     }
 }
 
@@ -91,14 +94,7 @@ fun createWindow(title: String, exitOnClose: Boolean) = SwingUtilities.invokeLat
         println("Changed renderer for $layer: new value is ${layer.renderApi}")
     }
 
-    skiaLayer.skikoView = GenericSkikoView(skiaLayer, clocks)
-
-    skiaLayer.addMouseMotionListener(object : MouseMotionAdapter() {
-        override fun mouseMoved(event: MouseEvent) {
-            clocks.xpos = event.x
-            clocks.ypos = event.y
-        }
-    })
+    skiaLayer.addView(GenericSkikoView(skiaLayer, clocks))
 
     // Window transparency
     if (System.getProperty("skiko.transparency") == "true") {
