@@ -99,9 +99,9 @@ struct SkikoTestGlContext {
 };
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nCreateTestGlContext() {
-    sd::cerr << "Client extensions " << eglQueryString(EGL_NO_DISPLAY, EGL_EXTENSIONS) << std::endl;
+    std::cerr << "Client extensions " << eglQueryString(EGL_NO_DISPLAY, EGL_EXTENSIONS) << std::endl;
 
-    EGLDisplay display = eglGetPlatformDisplay(EGL_PLATFORM_SURFACELESS_MESA, nullptr, nullptr);
+    EGLDisplay display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
     eglInitialize(display, nullptr, nullptr);
 
     EGLConfig config;
