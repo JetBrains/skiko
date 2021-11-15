@@ -90,6 +90,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nGlContextGe
 #define SKIKO_TEST_GL_INCLUDED
 
 #include <EGL/egl.h>
+#include <iostream>
 
 struct SkikoTestGlContext {
     EGLDisplay display;
