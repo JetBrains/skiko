@@ -19,6 +19,14 @@ class ParagraphTest {
             registerTypeface(Typeface.makeFromResource("./fonts/Inter-Hinted-Regular.ttf"), "Inter")
         })
     }
+    private val style = ParagraphStyle().apply {
+        height = 40.0f
+        maxLinesCount = 2
+        textStyle = TextStyle().apply {
+            fontFamilies = arrayOf("Inter")
+            fontSize = 14.0f
+        }
+    }
 
     @Test
     @SkipJsTarget
@@ -28,8 +36,6 @@ class ParagraphTest {
     }
 
     private suspend fun singleLineMetrics(text: String): LineMetrics {
-        val style = ParagraphStyle()
-
         return ParagraphBuilder(style, fontCollection()).use {
             it.addText(text)
             it.build()
@@ -56,14 +62,6 @@ class ParagraphTest {
 
     @Test
     fun canCreate() = runTest {
-        val style = ParagraphStyle().apply {
-            height = 40.0f
-            maxLinesCount = 2
-            textStyle = TextStyle().apply {
-                fontFamilies = arrayOf("Inter")
-                fontSize = 14.0f
-            }
-        }
         val text = "Hello,\r\n Пользователь1!"
         var paragraph = ParagraphBuilder(style, fontCollection()).use {
             it.addText(text)
