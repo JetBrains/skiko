@@ -107,11 +107,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nCreateTestG
         EGL_RED_SIZE, 8,
         EGL_GREEN_SIZE, 8,
         EGL_BLUE_SIZE, 8,
-        EGL_ALPHA_SIZE, 8,
         EGL_NONE
     };
     eglChooseConfig(display, attributes, &config, 1, &configCount);
     EGLContext context = eglCreateContext(display, config, EGL_NO_CONTEXT, nullptr);
+    if (context == EGL_NO_CONTEXT) {
+        TODO("Failed to create context");
+    }
 
     EGLint surfaceAttributes[] {
         EGL_WIDTH, 1280,
@@ -119,6 +121,9 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nCreateTestG
         EGL_NONE
     };
     EGLSurface surface = eglCreatePbufferSurface(display, context, surfaceAttributes);
+    if (surface == EGL_NO_SURFACE) {
+        TODO("Failed to create surface");
+    }
 
     SkikoTestGlContext* result = new SkikoTestGlContext { display, surface, context };
     return reinterpret_cast<KNativePointer>(result);
