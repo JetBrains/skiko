@@ -227,11 +227,13 @@ kotlin {
     }
 
     if (supportNative) {
-        configureNativeTarget(OS.MacOS, Arch.X64, macosX64())
-        configureNativeTarget(OS.MacOS, Arch.Arm64, macosArm64())
         configureNativeTarget(OS.Linux, Arch.X64, linuxX64())
-        configureNativeTarget(OS.IOS, Arch.Arm64, iosArm64())
-        configureNativeTarget(OS.IOS, Arch.X64, iosX64())
+        if (hostOs == OS.MacOS) {
+            configureNativeTarget(OS.MacOS, Arch.X64, macosX64())
+            configureNativeTarget(OS.MacOS, Arch.Arm64, macosArm64())
+            configureNativeTarget(OS.IOS, Arch.Arm64, iosArm64())
+            configureNativeTarget(OS.IOS, Arch.X64, iosX64())
+        }
     }
 
     sourceSets {
@@ -306,47 +308,49 @@ kotlin {
             val linuxX64Test by getting {
                 dependsOn(linuxTest)
             }
-            val darwinMain by creating {
-                dependsOn(nativeMain)
-            }
-            val darwinTest by creating {
-                dependsOn(nativeTest)
-            }
-            val macosMain by creating {
-                dependsOn(darwinMain)
-            }
-            val macosTest by creating {
-                dependsOn(darwinTest)
-            }
-            val iosMain by creating {
-                dependsOn(darwinMain)
-            }
-            val iosTest by creating {
-                dependsOn(darwinTest)
-            }
-            val macosX64Main by getting {
-                dependsOn(macosMain)
-            }
-            val macosX64Test by getting {
-                dependsOn(macosTest)
-            }
-            val macosArm64Main by getting {
-                dependsOn(macosMain)
-            }
-            val macosArm64Test by getting {
-                dependsOn(macosTest)
-            }
-            val iosX64Main by getting {
-                dependsOn(iosMain)
-            }
-            val iosX64Test by getting {
-                dependsOn(iosTest)
-            }
-            val iosArm64Main by getting {
-                dependsOn(iosMain)
-            }
-            val iosArm64Test by getting {
-                dependsOn(iosTest)
+            if (hostOs == OS.MacOS) {
+                val darwinMain by creating {
+                    dependsOn(nativeMain)
+                }
+                val darwinTest by creating {
+                    dependsOn(nativeTest)
+                }
+                val macosMain by creating {
+                    dependsOn(darwinMain)
+                }
+                val macosTest by creating {
+                    dependsOn(darwinTest)
+                }
+                val iosMain by creating {
+                    dependsOn(darwinMain)
+                }
+                val iosTest by creating {
+                    dependsOn(darwinTest)
+                }
+                val macosX64Main by getting {
+                    dependsOn(macosMain)
+                }
+                val macosX64Test by getting {
+                    dependsOn(macosTest)
+                }
+                val macosArm64Main by getting {
+                    dependsOn(macosMain)
+                }
+                val macosArm64Test by getting {
+                    dependsOn(macosTest)
+                }
+                val iosX64Main by getting {
+                    dependsOn(iosMain)
+                }
+                val iosX64Test by getting {
+                    dependsOn(iosTest)
+                }
+                val iosArm64Main by getting {
+                    dependsOn(iosMain)
+                }
+                val iosArm64Test by getting {
+                    dependsOn(iosTest)
+                }
             }
         }
     }
