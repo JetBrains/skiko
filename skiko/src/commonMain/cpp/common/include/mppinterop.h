@@ -24,7 +24,7 @@ namespace skikoMpp {
     }
 
     namespace finalizers {
-        void deleteString(SkString* instance);
+        void deleteString(void* instance);
     }
 }
 

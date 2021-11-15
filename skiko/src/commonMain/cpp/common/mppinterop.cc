@@ -1,6 +1,7 @@
 #include "mppinterop.h"
 #include "RunRecordClone.hh"
 #include "src/utils/SkUTF.h"
+#include <iostream>
 
 namespace skikoMpp {
     namespace skrect {
@@ -194,8 +195,8 @@ namespace skikoMpp {
     }
 
     namespace finalizers {
-        void deleteString(SkString* instance) {
-            delete instance;
+        void deleteString(void* instance) {
+            delete reinterpret_cast<SkString*>(instance);
         }
     }
 }
