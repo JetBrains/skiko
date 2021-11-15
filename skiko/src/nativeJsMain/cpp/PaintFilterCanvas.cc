@@ -7,33 +7,58 @@
 #include "SkPaintFilterCanvas.h"
 #include "common.h"
 
+class SkijaPaintFilterCanvas : public SkPaintFilterCanvas {
+public:
+    SkijaPaintFilterCanvas(
+        SkCanvas* canvas,
+        bool unrollDrawable
+    ) : SkPaintFilterCanvas(canvas), unrollDrawable(unrollDrawable), _onFilter(nullptr), _onFilterPaint(nullptr) {}
 
-SKIKO_EXPORT void org_jetbrains_skia_PaintFilterCanvas__1nAttachToJava
-  (KNativePointer canvasPtr, KBoolean unrollDrawable) {
-    TODO("implement org_jetbrains_skia_PaintFilterCanvas__1nAttachToJava");
-}
-     
-#if 0 
-SKIKO_EXPORT void org_jetbrains_skia_PaintFilterCanvas__1nAttachToJava
-  (KNativePointer canvasPtr, KBoolean unrollDrawable) {
+    SkPaint* onFilterPaint() const {
+        return _onFilterPaint;
+    }
+
+    void init(KInteropPointer onFilter) {
+        _onFilter = KBooleanCallback(onFilter);
+    }
+protected:
+    bool onFilter(SkPaint& paint) const override {
+        _onFilterPaint = &paint;
+        KBoolean result = _onFilter();
+        _onFilterPaint = nullptr;
+        return static_cast<bool>(result);
+    }
+
+    void onDrawDrawable(SkDrawable* drawable, const SkMatrix* matrix) override {
+        if (unrollDrawable) {
+            drawable->draw(this, matrix);
+        } else {
+            SkPaintFilterCanvas::onDrawDrawable(drawable, matrix);
+        }
+    }
+
+private:
+    KBooleanCallback _onFilter;
+    mutable SkPaint* _onFilterPaint;
+    bool unrollDrawable;
+};
+
+SKIKO_EXPORT void org_jetbrains_skia_PaintFilterCanvas__1nInit
+  (KNativePointer canvasPtr, KInteropPointer onFilter) {
     SkijaPaintFilterCanvas* canvas = reinterpret_cast<SkijaPaintFilterCanvas*>((canvasPtr));
-    canvas->jobj = skija::PaintFilterCanvas::attach(env, jobj);
+    canvas->init(onFilter);
 }
-#endif
 
-
-
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_PaintFilterCanvas__1nMake
-  (KNativePointer canvasPtr, KBoolean unrollDrawable) {
-    TODO("implement org_jetbrains_skia_PaintFilterCanvas__1nMake");
-}
-     
-#if 0 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_PaintFilterCanvas__1nMake
   (KNativePointer canvasPtr, KBoolean unrollDrawable) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>((canvasPtr));
     SkijaPaintFilterCanvas* filterCanvas = new SkijaPaintFilterCanvas(canvas, unrollDrawable);
     return reinterpret_cast<KNativePointer>(filterCanvas);
 }
-#endif
+
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_PaintFilterCanvas__1nGetOnFilterPaint
+  (KNativePointer canvasPtr) {
+    SkijaPaintFilterCanvas* canvas = reinterpret_cast<SkijaPaintFilterCanvas*>((canvasPtr));
+    return reinterpret_cast<KNativePointer>(canvas->onFilterPaint());
+}
 
