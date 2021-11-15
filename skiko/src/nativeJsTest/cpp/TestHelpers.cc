@@ -100,7 +100,7 @@ struct SkikoTestGlContext {
 };
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nCreateTestGlContext() {
-    EGLDisplay display = eglGetDisplay(EGL_PLATFORM_SURFACELESS_MESA, nullptr, nullptr);
+    EGLDisplay display = eglGetPlatformDisplay(EGL_PLATFORM_SURFACELESS_MESA, nullptr, nullptr);
     eglInitialize(display, nullptr, nullptr);
 
     EGLConfig config;
