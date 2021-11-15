@@ -3,14 +3,12 @@
 
 #include "SkString.h"
 #include "common.h"
+#include "mppinterop.h"
 
-static void deleteString(SkString* instance) {
-    delete instance;
-}
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ManagedString__1nGetFinalizer
   () {
-    return reinterpret_cast<KNativePointer>((&deleteString));
+    return reinterpret_cast<KNativePointer>(&skikoMpp::finalizers::deleteString);
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ManagedString__1nMake
