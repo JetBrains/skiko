@@ -10,7 +10,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_StdVectorDecoder__1nReleaseElemen
     (KNativePointer ptr, KInt index) {
         std::vector<KNativePointer>* vec = reinterpret_cast<std::vector<KNativePointer> *>(ptr);
         auto res = (*vec)[index];
-        (*vec)[index] = 0;
+        (*vec)[index] = nullptr;
         return res;
     }
 

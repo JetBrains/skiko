@@ -11,7 +11,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_StdVectorDecoderKt_St
     (JNIEnv* env, jclass jclass, jlong ptr, jint index) {
         std::vector<void*>* vec = reinterpret_cast<std::vector<void*> *>(ptr);
         auto res = (*vec)[index];
-        (*vec)[index] = 0;
+        (*vec)[index] = nullptr;
         return reinterpret_cast<jlong>(res);
     }
 
