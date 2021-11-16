@@ -6,6 +6,10 @@
 #include "SkSurface.h"
 #include "common.h"
 
+#ifdef SK_METAL
+#include "include/gpu/mtl/GrMtlTypes.h"
+#endif
+
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeRasterDirect
   (KInt width, KInt height, KInt colorType, KInt alphaType, KNativePointer colorSpacePtr,
