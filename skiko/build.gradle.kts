@@ -345,6 +345,8 @@ kotlin {
 }
 
 fun configureNativeTarget(os: OS, arch: Arch, target: KotlinNativeTarget) {
+    if (!os.isCompatibleWithHost) return
+
     val targetString = "${os.id}-${arch.id}"
 
     val unzipper = registerOrGetSkiaDirProvider(os, arch)
