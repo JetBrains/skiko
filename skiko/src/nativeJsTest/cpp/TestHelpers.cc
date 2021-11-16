@@ -105,6 +105,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nCreateTestG
    const int glxContextAttribs[] {
         GLX_DRAWABLE_TYPE, GLX_PBUFFER_BIT,
         GLX_RENDER_TYPE, GLX_RGBA_BIT,
+        GLX_DOUBLEBUFFER, True,
         GLX_RED_SIZE, 8,
         GLX_GREEN_SIZE, 8,
         GLX_BLUE_SIZE, 8,
