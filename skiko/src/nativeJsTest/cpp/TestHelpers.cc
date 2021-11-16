@@ -138,8 +138,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nCreateTestG
 SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nDeleteTestGlContext(KNativePointer ptr) {
     auto* instance = reinterpret_cast<SkikoTestGlContext*>(ptr);
     glXMakeContextCurrent(instance->display, None, None, nullptr);
-    glXSwapBuffers(instance->display, instance->surface);
-    glXDestroyGLXPixmap(instance->display, instance->surface);
+    glXDestroyPbuffer(instance->display, instance->surface);
     glXDestroyContext(instance->display, instance->context);
     XCloseDisplay(instance->display);
     delete instance;
