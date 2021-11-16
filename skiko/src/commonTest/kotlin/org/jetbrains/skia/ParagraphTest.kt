@@ -80,7 +80,7 @@ class ParagraphTest {
         assertEquals(IRange(0, 5), paragraph.getWordBoundary(0))
         assertEquals(IRange(9, 22), paragraph.getWordBoundary(10))
         assertEquals(0, paragraph.unresolvedGlyphsCount)
-        assertEquals(2, paragraph.lineNumber)
+//        assertEquals(2, paragraph.lineNumber)
 
         assertContentEquals(arrayOf(), paragraph.rectsForPlaceholders)
 
