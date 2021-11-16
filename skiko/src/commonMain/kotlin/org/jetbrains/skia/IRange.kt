@@ -1,5 +1,9 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.InteropPointer
+import org.jetbrains.skia.impl.InteropScope
+import org.jetbrains.skia.impl.withResult
+
 class IRange(val start: Int, val end: Int) {
     override fun equals(other: Any?): Boolean {
         if (other === this) return true
@@ -19,4 +23,11 @@ class IRange(val start: Int, val end: Int) {
     override fun toString(): String {
         return "IRange(_start=$start, _end=$end)"
     }
+
+    companion object {}
+}
+
+internal fun IRange.Companion.fromInteropPointer(block: InteropScope.(InteropPointer) -> Unit): IRange {
+    val result = withResult(IntArray(2), block)
+    return IRange(result[0], result[1])
 }

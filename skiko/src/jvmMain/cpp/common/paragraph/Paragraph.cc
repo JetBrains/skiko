@@ -117,11 +117,15 @@ extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_paragraph_ParagraphKt_
         return -p.position-1;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_ParagraphKt__1nGetWordBoundary
-  (JNIEnv* env, jclass jclass, jlong ptr, jint offset) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_ParagraphKt__1nGetWordBoundary
+  (JNIEnv* env, jclass jclass, jlong ptr, jint offset, jintArray resultArray) {
     Paragraph* instance = reinterpret_cast<Paragraph*>(static_cast<uintptr_t>(ptr));
     SkRange<size_t> range = instance->getWordBoundary(offset);
-    return packTwoInts(range.start & 0xFFFFFFFF, range.end & 0xFFFFFFFF);
+    jint result[] {
+        static_cast<jint>(range.start & 0xFFFFFFFF),
+        static_cast<jint>(range.end & 0xFFFFFFFF)
+    };
+    env->SetIntArrayRegion(resultArray, 0, 2, result);
 }
 
 extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_paragraph_ParagraphKt__1nGetLineMetrics

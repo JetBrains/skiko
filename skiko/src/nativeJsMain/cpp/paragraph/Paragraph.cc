@@ -102,11 +102,13 @@ SKIKO_EXPORT KInt org_jetbrains_skia_paragraph_Paragraph__1nGetGlyphPositionAtCo
         return -p.position-1;
 }
 
-SKIKO_EXPORT KLong org_jetbrains_skia_paragraph_Paragraph__1nGetWordBoundary
-  (KNativePointer ptr, KInt offset) {
+SKIKO_EXPORT void org_jetbrains_skia_paragraph_Paragraph__1nGetWordBoundary
+  (KNativePointer ptr, KInt offset, KInteropPointer resultPtr) {
     Paragraph* instance = reinterpret_cast<Paragraph*>((ptr));
     SkRange<size_t> range = instance->getWordBoundary(offset);
-    return packTwoInts(range.start & 0xFFFFFFFF, range.end & 0xFFFFFFFF);
+    KInt* result = reinterpret_cast<KInt*>(resultPtr);
+    result[0] = range.start & 0xFFFFFFFF;
+    result[1] = range.end & 0xFFFFFFFF;
 }
 
 
