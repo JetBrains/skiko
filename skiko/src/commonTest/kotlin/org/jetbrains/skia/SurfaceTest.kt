@@ -2,8 +2,10 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.interopScope
 import org.jetbrains.skia.impl.use
+import org.jetbrains.skiko.KotlinBackend
 import org.jetbrains.skiko.OS
 import org.jetbrains.skiko.hostOs
+import org.jetbrains.skiko.kotlinBackend
 import org.jetbrains.skiko.tests.TestGlContext
 import org.jetbrains.skiko.tests.allocateBytesForPixels
 import org.jetbrains.skiko.tests.runTest
@@ -107,7 +109,7 @@ class SurfaceTest {
 
     @Test
     fun canMakeRenderTarget() {
-        if (hostOs != OS.Linux) {
+        if (hostOs != OS.Linux || kotlinBackend != KotlinBackend.Native) {
             // TODO implement for other platforms and render targets
             return
         }

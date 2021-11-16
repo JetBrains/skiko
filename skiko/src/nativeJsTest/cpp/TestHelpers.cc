@@ -96,7 +96,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nGlContextGe
 #include "include/gpu/gl/egl/GrGLMakeEGLInterface.h"
 
 struct SkikoTestGlContext {
-    Display display;
+    Display* display;
     GLXDrawable surface;
     GLXContext context;
 };
@@ -137,7 +137,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nCreateTestG
 
 SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nDeleteTestGlContext(KNativePointer ptr) {
     auto* instance = reinterpret_cast<SkikoTestGlContext*>(ptr);
-    glXMakeContextCurrent(display, None, None, nullptr);
+    glXMakeContextCurrent(instance->display, None, None, nullptr);
     glXSwapBuffers(instance->display, instance->surface);
     glXDestroyGLXPixmap(instance->display, instance->surface);
     glXDestroyContext(instance->display, instance->context);
@@ -152,7 +152,7 @@ SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nMakeGlContextCurrent(
 
 SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nGlContextSwapBuffers(KNativePointer ptr) {
     auto* instance = reinterpret_cast<SkikoTestGlContext*>(ptr);
-    glxSwapBuffers(instance->display, instance->surface);
+    glXSwapBuffers(instance->display, instance->surface);
 }
 
 #endif // __linux__
