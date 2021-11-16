@@ -138,6 +138,11 @@ inline fun withStringResult(block: () -> NativePointer): String {
     return ManagedString(block()).use { it.toString() }
 }
 
+@Suppress("NON_PUBLIC_CALL_FROM_PUBLIC_INLINE")
+inline fun withStringResult(pointer: NativePointer): String {
+    return ManagedString(pointer).use { it.toString() }
+}
+
 /**
  * Creates String from SkString* result. Caller must ensure pointer to be valid.
  * It is caller responsibility to destroy underlying SkString. Use it if pointer

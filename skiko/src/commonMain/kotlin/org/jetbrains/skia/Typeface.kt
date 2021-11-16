@@ -346,9 +346,9 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                 arrayDecoder = ArrayDecoder(_nGetFamilyNames(_ptr), ManagedString_nGetFinalizer())
                 val size = arrayDecoder.size
                 (0 until size / 2).map { i ->
-                    val name = arrayDecoder.release(2 * i)
-                    val language = arrayDecoder.release(2 * i + 1)
-                    FontFamilyName(ManagedString(name).toString(), ManagedString(language).toString())
+                    val name = withStringResult(arrayDecoder.release(2 * i))
+                    val language = withStringResult(arrayDecoder.release(2 * i + 1))
+                    FontFamilyName(name, language)
                 }.toTypedArray()
             } finally {
                 arrayDecoder?.dispose()
