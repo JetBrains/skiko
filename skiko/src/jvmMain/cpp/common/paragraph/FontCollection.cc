@@ -63,14 +63,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_FontCollect
   (JNIEnv* env, jclass jclass, jlong ptr, jobjectArray familyNamesArray, jsize len, jint fontStyle) {
     FontCollection* instance = reinterpret_cast<FontCollection*>(static_cast<uintptr_t>(ptr));
 
-    vector<SkString> familyNames(len);
-    for (int i = 0; i < len; ++i) {
-        jstring str = static_cast<jstring>(env->GetObjectArrayElement(familyNamesArray, i));
-        familyNames.push_back(skString(env, str));
-        env->DeleteLocalRef(str);
-    }
-
-    vector<sk_sp<SkTypeface>> found = instance->findTypefaces(familyNames, skija::FontStyle::fromJava(fontStyle));
+    vector<sk_sp<SkTypeface>> found = instance->findTypefaces(skStringVector(env, familyNamesArray), skija::FontStyle::fromJava(fontStyle));
 
     std::vector<jlong>* res = new std::vector<jlong>();
     for (auto& f : found)
