@@ -19,15 +19,6 @@ fun targetSuffix(os: OS, arch: Arch): String {
     return "${os.id}_${arch.id}"
 }
 
-buildscript {
-    dependencies {
-        classpath("org.kohsuke:github-api:1.116")
-    }
-    repositories {
-        mavenCentral()
-    }
-}
-
 val skiko = SkikoProperties(rootProject)
 val buildType = skiko.buildType
 val generatedKotlin = "$buildDir/kotlin/commonMain"
