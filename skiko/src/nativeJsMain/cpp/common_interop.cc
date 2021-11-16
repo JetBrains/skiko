@@ -122,6 +122,14 @@ void TODO(const char* message) {
     abort();
 }
 
+void SKIKO_ASSERT(bool condition, const char* message){
+    if (!condition) {
+        printf("ASSERTION FAILED: %s\n", message);
+        fflush(stdout);
+        abort();
+    }
+}
+
 std::unique_ptr<SkMatrix> skMatrix(KFloat* matrixArray) {
     if (matrixArray == nullptr)
         return std::unique_ptr<SkMatrix>(nullptr);

@@ -129,8 +129,11 @@ KNativePointer ptrToInterop(T* ptr) {
 #ifdef __clang__
 __attribute__((noreturn))
 void TODO(const char*);
+__attribute__((noreturn))
+void SKIKO_ASSERT(bool, const char*);
 #else
 void TODO(const char*);
+void SKIKO_ASSERT(bool, const char*);
 #endif
 
 #ifdef SKIKO_WASM

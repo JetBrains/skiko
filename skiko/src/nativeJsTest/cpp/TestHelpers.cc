@@ -79,7 +79,6 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nCreateTestG
 SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nDeleteTestGlContext(KNativePointer ptr);
 SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nMakeGlContextCurrent(KNativePointer ptr);
 SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nGlContextSwapBuffers(KNativePointer ptr);
-//SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nGetGrGlInterface(KNativePointer ptr);
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nGlContextGetFinalizer() {
     return reinterpret_cast<KNativePointer>(org_jetbrains_skiko_tests_TestHelpers__1nDeleteTestGlContext);
@@ -119,16 +118,18 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nCreateTestG
     };
 
     Display* display = XOpenDisplay(nullptr);
-    if (display == nullptr) TODO("Failed to connect to Xserver");
+    SKIKO_ASSERT(display, "Failed to connect to Xserver");
 
     int numConfigs = 0;
     GLXFBConfig* fbConfigs = glXChooseFBConfig(display, DefaultScreen(display), glxContextAttribs, &numConfigs);
-    if (fbConfigs == nullptr || numConfigs == 0) TODO("No suitable fbconfig available");
+    SKIKO_ASSERT(fbConfigs != nullptr && numConfigs > 0, "No suitable fbconfig available");
 
     GLXDrawable surface = glXCreatePbuffer(display, fbConfigs[0], glxPBufferAttribs);
-    if (!surface) TODO("Failed to create surface");
+    SKIKO_ASSERT(surface, "Failed to create surface");
+
     GLXContext context = glXCreateNewContext(display, fbConfigs[0], GLX_RGBA_TYPE, nullptr, True);
-    if (!context) TODO("Failed to create context");
+    SKIKO_ASSERT(context, "Failed to create context");
+
     XFree(fbConfigs);
 
     return reinterpret_cast<KInteropPointer>(new SkikoTestGlContext { display, surface, context });
