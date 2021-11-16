@@ -89,14 +89,13 @@ class FontCollection internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     fun findTypefaces(familyNames: Array<String>?, style: FontStyle): Array<Typeface?> {
         return try {
             Stats.onNativeCall()
-
-            val arrayDecoder = ArrayDecoder(interopScope {
+            arrayDecoderScope({  ArrayDecoder(interopScope {
                 _nFindTypefaces(_ptr, toInterop(familyNames), familyNames?.size ?: 0, style._value)
-            }, NullPointer)
-
-            (0 until arrayDecoder.size).map { i ->
-                Typeface(arrayDecoder.release(i))
-            }.toTypedArray()
+            }, NullPointer) }) { arrayDecoder ->
+                (0 until arrayDecoder.size).map { i ->
+                    Typeface(arrayDecoder.release(i))
+                }.toTypedArray()
+            }
         } finally {
             reachabilityBarrier(this)
         }
