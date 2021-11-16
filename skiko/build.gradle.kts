@@ -1,9 +1,9 @@
 import de.undercouch.gradle.tasks.download.Download
 import org.gradle.crypto.checksum.Checksum
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 import org.jetbrains.compose.internal.publishing.MavenCentralProperties
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 
 plugins {
     kotlin("multiplatform") version "1.5.31"
@@ -378,7 +378,9 @@ fun configureNativeTarget(os: OS, arch: Arch, target: KotlinNativeTarget) {
                     "-linker-option", "-L/usr/lib/x86_64-linux-gnu",
                     "-linker-option", "-lfontconfig",
                     "-linker-option", "-lGL",
-                    "-linker-option", "-lEGL", // TODO This used for test purposes only, maybe replace with dlopen/dlsym
+                    // TODO This used for test purposes only, maybe replace with dlopen/dlsym
+                    "-linker-option", "-lX11",
+                    "-linker-option", "-lGLX",
                     // TODO: an ugly hack, Linux linker searches only unresolved symbols.
                     "-linker-option", "$skiaBinDir/libskshaper.a",
                     "-linker-option", "$skiaBinDir/libskunicode.a",
