@@ -97,24 +97,23 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nGlContextGe
 
 struct SkikoTestGlContext {
     Display* display;
-    GLXDrawable surface;
+    GLXWindow surface;
     GLXContext context;
+    Window window;
 };
+
+static Bool waitForWindow(Display *dpy, XEvent *event, XPointer arg) {
+  return (event->xmap.window == (Window)arg) && (event->type == MapNotify);
+}
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nCreateTestGlContext() {
    const int glxContextAttribs[] {
-        GLX_DRAWABLE_TYPE, GLX_PBUFFER_BIT,
+        GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
         GLX_RENDER_TYPE, GLX_RGBA_BIT,
         GLX_DOUBLEBUFFER, True,
         GLX_RED_SIZE, 8,
         GLX_GREEN_SIZE, 8,
         GLX_BLUE_SIZE, 8,
-        None
-    };
-
-    const int glxPBufferAttribs[] {
-        GLX_PBUFFER_WIDTH, 1280,
-        GLX_PBUFFER_HEIGHT, 720,
         None
     };
 
@@ -124,23 +123,39 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nCreateTestG
     int numConfigs = 0;
     GLXFBConfig* fbConfigs = glXChooseFBConfig(display, DefaultScreen(display), glxContextAttribs, &numConfigs);
     SKIKO_ASSERT(fbConfigs != nullptr && numConfigs > 0, "No suitable fbconfig available");
-
-    GLXDrawable surface = glXCreatePbuffer(display, fbConfigs[0], glxPBufferAttribs);
-    SKIKO_ASSERT(surface, "Failed to create surface");
-
-    GLXContext context = glXCreateNewContext(display, fbConfigs[0], GLX_RGBA_TYPE, nullptr, True);
-    SKIKO_ASSERT(context, "Failed to create context");
-
+    GLXFBConfig fbConfig = fbConfigs[0];
     XFree(fbConfigs);
 
-    return reinterpret_cast<KInteropPointer>(new SkikoTestGlContext { display, surface, context });
+    XVisualInfo* visual = glXGetVisualFromFBConfig(display, fbConfig);
+    XSetWindowAttributes setWindowAttributes;
+    setWindowAttributes.event_mask = StructureNotifyMask;
+    setWindowAttributes.border_pixel = 0;
+    setWindowAttributes.colormap = XCreateColormap(display, RootWindow(display, visual->screen), visual->visual, AllocNone);
+    int setWindowAttributesMask = CWBorderPixel | CWColormap | CWEventMask;
+
+    Window window = XCreateWindow(display, RootWindow(display, visual->screen),
+        0, 0, 1280, 720, 0, visual->depth, InputOutput, visual->visual,
+        setWindowAttributesMask, &setWindowAttributes);
+
+    GLXWindow surface = glXCreateWindow(display, fbConfig, window, nullptr);
+    SKIKO_ASSERT(surface, "Failed to create surface");
+
+    GLXContext context = glXCreateNewContext(display, fbConfig, GLX_RGBA_TYPE, nullptr, True);
+    SKIKO_ASSERT(context, "Failed to create context");
+
+    XMapWindow(display, window);
+    XEvent event;
+    XIfEvent(display, &event, waitForWindow, (XPointer)window);
+
+    return reinterpret_cast<KInteropPointer>(new SkikoTestGlContext { display, surface, context, window });
 }
 
 SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nDeleteTestGlContext(KNativePointer ptr) {
     auto* instance = reinterpret_cast<SkikoTestGlContext*>(ptr);
     glXMakeContextCurrent(instance->display, None, None, nullptr);
-    glXDestroyPbuffer(instance->display, instance->surface);
+    glXDestroyWindow(instance->display, instance->surface);
     glXDestroyContext(instance->display, instance->context);
+    XDestroyWindow(instance->display, instance->window);
     XCloseDisplay(instance->display);
     delete instance;
 }
