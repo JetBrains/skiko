@@ -1,7 +1,6 @@
 package org.jetbrains.skiko.tests
 
 import org.jetbrains.skia.ExternalSymbolName
-import org.jetbrains.skia.GrGlInterface
 import org.jetbrains.skia.impl.*
 
 internal class TestGlContext : Managed(TestGlContext_nCreate(), FinalizerHolder.PTR) {
@@ -16,9 +15,6 @@ internal class TestGlContext : Managed(TestGlContext_nCreate(), FinalizerHolder.
     fun swapBuffers() {
         TestGlContext_nSwapBuffers(_ptr)
     }
-
-    val glInterface: GrGlInterface
-        get() = GrGlInterface(TestGlContext_nGetGrGlInterface(_ptr))
 
     companion object {
         inline fun <T> run(block: TestGlContext.() -> T): T {
@@ -117,6 +113,4 @@ private external fun TestGlContext_nMakeCurrent(ptr: NativePointer)
 @ExternalSymbolName("org_jetbrains_skiko_tests_TestHelpers__1nGlContextSwapBuffers")
 private external fun TestGlContext_nSwapBuffers(ptr: NativePointer)
 
-@ExternalSymbolName("org_jetbrains_skiko_tests_TestHelpers__1nGetGrGlInterface")
-private external fun TestGlContext_nGetGrGlInterface(ptr: NativePointer): NativePointer
 

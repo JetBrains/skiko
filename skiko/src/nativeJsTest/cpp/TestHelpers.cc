@@ -79,7 +79,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nCreateTestG
 SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nDeleteTestGlContext(KNativePointer ptr);
 SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nMakeGlContextCurrent(KNativePointer ptr);
 SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nGlContextSwapBuffers(KNativePointer ptr);
-SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nGetGrGlInterface(KNativePointer ptr);
+//SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nGetGrGlInterface(KNativePointer ptr);
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nGlContextGetFinalizer() {
     return reinterpret_cast<KNativePointer>(org_jetbrains_skiko_tests_TestHelpers__1nDeleteTestGlContext);
@@ -90,79 +90,68 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nGlContextGe
 
 #define SKIKO_TEST_GL_INCLUDED
 
-#include <EGL/egl.h>
-#include <EGL/eglext.h>
+#include <GL/glx.h>
 #include <iostream>
 
 #include "include/gpu/gl/GrGLInterface.h"
 #include "include/gpu/gl/egl/GrGLMakeEGLInterface.h"
 
 struct SkikoTestGlContext {
-    EGLDisplay display;
-    EGLSurface surface;
-    EGLContext context;
-    sk_sp<const GrGLInterface> glInterface;
+    Display display;
+    GLXDrawable surface;
+    GLXContext context;
 };
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nCreateTestGlContext() {
-    EGLDisplay display = eglGetPlatformDisplay(EGL_PLATFORM_SURFACELESS_MESA, EGL_DEFAULT_DISPLAY, nullptr);
-    eglInitialize(display, nullptr, nullptr);
-
-    EGLConfig config;
-    EGLint configCount;
-    const EGLint attributes[] {
-        EGL_SURFACE_TYPE, EGL_PBUFFER_BIT,
-        EGL_RED_SIZE, 8,
-        EGL_GREEN_SIZE, 8,
-        EGL_BLUE_SIZE, 8,
-        EGL_RENDERABLE_TYPE, EGL_OPENGL_BIT,
-        EGL_NONE
+   const int glxContextAttribs[] {
+        GLX_DRAWABLE_TYPE, GLX_PBUFFER_BIT,
+        GLX_RENDER_TYPE, GLX_RGBA_BIT,
+        GLX_RED_SIZE, 8,
+        GLX_GREEN_SIZE, 8,
+        GLX_BLUE_SIZE, 8,
+        None
     };
-    eglChooseConfig(display, attributes, &config, 1, &configCount);
-    eglBindAPI(EGL_OPENGL_API);
-    EGLContext context = eglCreateContext(display, config, EGL_NO_CONTEXT, nullptr);
-    if (context == EGL_NO_CONTEXT) {
-        TODO("Failed to create context");
-    }
 
-    EGLint surfaceAttributes[] {
-        EGL_WIDTH, 1280,
-        EGL_HEIGHT, 720,
-        EGL_NONE
+    const int glxPBufferAttribs[] {
+        GLX_PBUFFER_WIDTH, 1280,
+        GLX_PBUFFER_HEIGHT, 720,
+        None
     };
-    EGLSurface surface = eglCreatePbufferSurface(display, config, surfaceAttributes);
-    if (surface == EGL_NO_SURFACE) {
-        TODO("Failed to create surface");
-    }
 
-    auto glInterface = GrGLMakeEGLInterface();
-    SkikoTestGlContext* result = new SkikoTestGlContext { display, surface, context, glInterface };
-    return reinterpret_cast<KNativePointer>(result);
+    Display* display = XOpenDisplay(nullptr);
+    if (display == nullptr) TODO("Failed to connect to Xserver");
+
+    int numConfigs = 0;
+    GLXFBConfig* fbConfigs = glXChooseFBConfig(display, DefaultScreen(display), glxContextAttribs, &numConfigs);
+    if (fbConfigs == nullptr || numConfigs == 0) TODO("No suitable fbconfig available");
+
+    GLXDrawable surface = glXCreatePbuffer(display, fbConfigs[0], glxPBufferAttribs);
+    if (!surface) TODO("Failed to create surface");
+    GLXContext context = glXCreateNewContext(display, fbConfigs[0], GLX_RGBA_TYPE, nullptr, True);
+    if (!context) TODO("Failed to create context");
+    XFree(fbConfigs);
+
+    return reinterpret_cast<KInteropPointer>(new SkikoTestGlContext { display, surface, context });
 }
 
 SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nDeleteTestGlContext(KNativePointer ptr) {
     auto* instance = reinterpret_cast<SkikoTestGlContext*>(ptr);
-    eglMakeCurrent(instance->display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
-    eglDestroySurface(instance->display, instance->surface);
-    eglDestroyContext(instance->display, instance->context);
-    eglTerminate(instance->display);
+    glXMakeContextCurrent(display, None, None, nullptr);
+    glXSwapBuffers(instance->display, instance->surface);
+    glXDestroyGLXPixmap(instance->display, instance->surface);
+    glXDestroyContext(instance->display, instance->context);
+    XCloseDisplay(instance->display);
     delete instance;
 }
 
 SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nMakeGlContextCurrent(KNativePointer ptr) {
     auto* instance = reinterpret_cast<SkikoTestGlContext*>(ptr);
-    eglMakeCurrent(instance->display, instance->surface, instance->surface, instance->context);
+    glXMakeContextCurrent(instance->display, instance->surface, instance->surface, instance->context);
 }
 
 SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nGlContextSwapBuffers(KNativePointer ptr) {
     auto* instance = reinterpret_cast<SkikoTestGlContext*>(ptr);
-    eglSwapBuffers(instance->display, instance->surface);
-}
-
-SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nGetGrGlInterface(KNativePointer ptr) {
-    auto* instance = reinterpret_cast<SkikoTestGlContext*>(ptr);
-    sk_sp<const GrGLInterface> glInterface = instance->glInterface;
-    return reinterpret_cast<KNativePointer>(const_cast<GrGLInterface*>(glInterface.release()));
+    glxSwapBuffers(instance->display, instance->surface);
 }
 
 #endif // __linux__
@@ -177,7 +166,4 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nCreateTestG
 SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nDeleteTestGlContext(KNativePointer ptr) {}
 SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nMakeGlContextCurrent(KNativePointer ptr) {}
 SKIKO_EXPORT void org_jetbrains_skiko_tests_TestHelpers__1nGlContextSwapBuffers(KNativePointer ptr) {}
-SKIKO_EXPORT KNativePointer org_jetbrains_skiko_tests_TestHelpers__1nGetGrGlInterface(KNativePointer ptr) {
-    return reinterpret_cast<KNativePointer>(nullptr);
-}
 #endif // SKIKO_TEST_GL_INCLUDED

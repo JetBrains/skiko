@@ -6,18 +6,11 @@ import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 
-internal class GrGlInterface(ptr: NativePointer): RefCnt(ptr)
-
 class DirectContext internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
         fun makeGL(): DirectContext {
             Stats.onNativeCall()
             return DirectContext(_nMakeGL())
-        }
-
-        internal fun makeGL(glInterface: GrGlInterface): DirectContext {
-            Stats.onNativeCall()
-            return DirectContext(_nMakeGL(glInterface._ptr))
         }
 
         fun makeMetal(devicePtr: NativePointer, queuePtr: NativePointer): DirectContext {
@@ -124,9 +117,6 @@ private external fun DirectContext_nFlush(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeGL")
 private external fun _nMakeGL(): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeGLWithInterface")
-private external fun _nMakeGL(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeMetal")
 private external fun _nMakeMetal(devicePtr: NativePointer, queuePtr: NativePointer): NativePointer
