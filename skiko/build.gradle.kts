@@ -38,32 +38,94 @@ val windowsSdkPaths: WindowsSdkPaths by lazy {
     findWindowsSdkPathsForCurrentOS(gradle)
 }
 
-val skiaWasmDir = registerOrGetSkiaDirProvider(OS.Wasm, Arch.Wasm)
+if (supportWasm) {
+    val skiaWasmDir = registerOrGetSkiaDirProvider(OS.Wasm, Arch.Wasm)
 
-val compileWasm = tasks.register<CompileSkikoCppTask>("compileWasm") {
-    val osArch = OS.Wasm to Arch.Wasm
+    val compileWasm by tasks.registering(CompileSkikoCppTask::class) {
+        val osArch = OS.Wasm to Arch.Wasm
 
-    dependsOn(skiaWasmDir)
+        dependsOn(skiaWasmDir)
 
-    compiler.set(compilerForTarget(OS.Wasm, Arch.Wasm))
-    buildTargetOS.set(osArch.first)
-    buildTargetArch.set(osArch.second)
-    buildVariant.set(buildType)
+        compiler.set(compilerForTarget(OS.Wasm, Arch.Wasm))
+        buildTargetOS.set(osArch.first)
+        buildTargetArch.set(osArch.second)
+        buildVariant.set(buildType)
 
-    val srcDirs = projectDirs("src/commonMain/cpp/common", "src/jsMain/cpp", "src/nativeJsMain/cpp") +
-        if (skiko.includeTestHelpers) projectDirs("src/nativeJsTest/cpp") else emptyList()
-    sourceRoots.set(srcDirs)
+        val srcDirs = projectDirs("src/commonMain/cpp/common", "src/jsMain/cpp", "src/nativeJsMain/cpp") +
+                if (skiko.includeTestHelpers) projectDirs("src/nativeJsTest/cpp") else emptyList()
+        sourceRoots.set(srcDirs)
 
-    includeHeadersNonRecursive(projectDir.resolve("src/nativeJsMain/cpp"))
-    includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp/common/include"))
-    includeHeadersNonRecursive(skiaHeadersDirs(skiaWasmDir.get()))
+        includeHeadersNonRecursive(projectDir.resolve("src/nativeJsMain/cpp"))
+        includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp/common/include"))
+        includeHeadersNonRecursive(skiaHeadersDirs(skiaWasmDir.get()))
 
-    flags.set(listOf(
-        *skiaPreprocessorFlags(),
-        "-DSKIKO_WASM",
-        "-fno-rtti",
-        "-fno-exceptions"
-    ))
+        flags.set(listOf(
+            *skiaPreprocessorFlags(),
+            "-DSKIKO_WASM",
+            "-fno-rtti",
+            "-fno-exceptions"
+        ))
+    }
+
+    val linkWasm by tasks.registering(LinkSkikoWasmTask::class) {
+        val osArch = OS.Wasm to Arch.Wasm
+
+        dependsOn(compileWasm)
+        dependsOn(skiaWasmDir)
+        val unpackedSkia = skiaWasmDir.get()
+
+        linker.set(linkerForTarget(OS.Wasm, Arch.Wasm))
+        buildTargetOS.set(osArch.first)
+        buildTargetArch.set(osArch.second)
+        buildVariant.set(buildType)
+
+        libFiles = project.fileTree(unpackedSkia)  { include("**/*.a") }
+        objectFiles = project.fileTree(compileWasm.map { it.outDir.get() }) {
+            include("**/*.o")
+        }
+
+        libOutputFileName.set("skiko.wasm")
+        jsOutputFileName.set("skiko.js")
+
+        skikoJsPrefix.set(project.layout.projectDirectory.file("src/jsMain/resources/setup.js"))
+
+        flags.set(listOf(
+            "-l", "GL",
+            "-s", "USE_WEBGL2=1",
+            "-s", "OFFSCREEN_FRAMEBUFFER=1",
+            "-s", "ALLOW_MEMORY_GROWTH=1", // TODO: Is there a better way? Should we use `-s INITIAL_MEMORY=X`?
+            "--bind",
+        ))
+
+        doLast {
+            // skiko.js file is directly referenced in karma.config.d/wasm.js
+            // so symbols must be replaced right after linking
+            val jsFiles = outDir.asFile.get().walk()
+                .filter { it.isFile && it.name.endsWith(".js") }
+
+            for (jsFile in jsFiles) {
+                val originalContent = jsFile.readText()
+                val newContent = originalContent.replace("_org_jetbrains", "org_jetbrains")
+                jsFile.writeText(newContent)
+            }
+        }
+    }
+
+    val skikoWasmJar by project.tasks.registering(Jar::class) {
+        dependsOn(linkWasm)
+        // We produce jar that contains .js of wrapper/bindings and .wasm with Skia + bindings.
+        val wasmOutDir = linkWasm.map { it.outDir }
+
+        from(wasmOutDir) {
+            include("*.wasm")
+            include("*.js")
+        }
+
+        archiveBaseName.set("skiko-wasm")
+        doLast {
+            println("Wasm and JS at: ${archiveFile.get().asFile.absolutePath}")
+        }
+    }
 }
 
 fun compileNativeBridgesTask(os: OS, arch: Arch): TaskProvider<CompileSkikoCppTask> {
@@ -142,50 +204,6 @@ fun compileNativeBridgesTask(os: OS, arch: Arch): TaskProvider<CompileSkikoCppTa
     }
 }
 
-val linkWasm = tasks.register<LinkSkikoWasmTask>("linkWasm") {
-    val osArch = OS.Wasm to Arch.Wasm
-
-    dependsOn(compileWasm)
-    dependsOn(skiaWasmDir)
-    val unpackedSkia = skiaWasmDir.get()
-
-    linker.set(linkerForTarget(OS.Wasm, Arch.Wasm))
-    buildTargetOS.set(osArch.first)
-    buildTargetArch.set(osArch.second)
-    buildVariant.set(buildType)
-
-    libFiles = project.fileTree(unpackedSkia)  { include("**/*.a") }
-    objectFiles = project.fileTree(compileWasm.map { it.outDir.get() }) {
-        include("**/*.o")
-    }
-
-    libOutputFileName.set("skiko.wasm")
-    jsOutputFileName.set("skiko.js")
-
-    skikoJsPrefix.set(project.layout.projectDirectory.file("src/jsMain/resources/setup.js"))
-
-    flags.set(listOf(
-        "-l", "GL",
-        "-s", "USE_WEBGL2=1",
-        "-s", "OFFSCREEN_FRAMEBUFFER=1",
-        "-s", "ALLOW_MEMORY_GROWTH=1", // TODO: Is there a better way? Should we use `-s INITIAL_MEMORY=X`?
-        "--bind",
-    ))
-
-    doLast {
-        // skiko.js file is directly referenced in karma.config.d/wasm.js
-        // so symbols must be replaced right after linking
-        val jsFiles = outDir.asFile.get().walk()
-            .filter { it.isFile && it.name.endsWith(".js") }
-
-        for (jsFile in jsFiles) {
-            val originalContent = jsFile.readText()
-            val newContent = originalContent.replace("_org_jetbrains", "org_jetbrains")
-            jsFile.writeText(newContent)
-        }
-    }
-}
-
 val skiaBinSubdir = "out/${buildType.id}-${targetOs.id}-${targetArch.id}"
 
 internal val Project.isInIdea: Boolean
@@ -206,16 +224,18 @@ kotlin {
         }
     }
 
-    js(IR) {
-        browser() {
-            testTask {
-                dependsOn(linkWasm)
-                useKarma {
-                    useChromeHeadless()
+    if (supportWasm) {
+        js(IR) {
+            browser() {
+                testTask {
+                    dependsOn("linkWasm")
+                    useKarma {
+                        useChromeHeadless()
+                    }
                 }
             }
+            binaries.executable()
         }
-        binaries.executable()
     }
 
     if (supportNative) {
@@ -255,90 +275,94 @@ kotlin {
             }
         }
 
-        val nativeJsMain by creating {
-            dependsOn(commonMain)
-        }
-
-        val nativeJsTest by creating {
-            dependsOn(commonTest)
-        }
-
-        val jsMain by getting {
-            dependsOn(nativeJsMain)
-        }
-
-        val jsTest by getting {
-            dependsOn(nativeJsTest)
-            dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
-                implementation(kotlin("test-js"))
+        if (supportWasm || supportNative) {
+            val nativeJsMain by creating {
+                dependsOn(commonMain)
             }
-        }
 
-        if (supportNative) {
-            // See https://kotlinlang.org/docs/mpp-share-on-platforms.html#configure-the-hierarchical-structure-manually
-            val nativeMain by creating {
-                dependsOn(nativeJsMain)
-                dependencies {
-                    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
+            val nativeJsTest by creating {
+                dependsOn(commonTest)
+            }
+
+            if (supportWasm) {
+                val jsMain by getting {
+                    dependsOn(nativeJsMain)
+                }
+
+                val jsTest by getting {
+                    dependsOn(nativeJsTest)
+                    dependencies {
+                        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
+                        implementation(kotlin("test-js"))
+                    }
                 }
             }
-            val nativeTest by creating {
-                dependsOn(nativeJsTest)
-            }
-            val linuxMain by creating {
-                dependsOn(nativeMain)
-            }
-            val linuxTest by creating {
-                dependsOn(nativeTest)
-            }
-            val linuxX64Main by getting {
-                dependsOn(linuxMain)
-            }
-            val linuxX64Test by getting {
-                dependsOn(linuxTest)
-            }
-            val darwinMain by creating {
-                dependsOn(nativeMain)
-            }
-            val darwinTest by creating {
-                dependsOn(nativeTest)
-            }
-            val macosMain by creating {
-                dependsOn(darwinMain)
-            }
-            val macosTest by creating {
-                dependsOn(darwinTest)
-            }
-            val iosMain by creating {
-                dependsOn(darwinMain)
-            }
-            val iosTest by creating {
-                dependsOn(darwinTest)
-            }
-            val macosX64Main by getting {
-                dependsOn(macosMain)
-            }
-            val macosX64Test by getting {
-                dependsOn(macosTest)
-            }
-            val macosArm64Main by getting {
-                dependsOn(macosMain)
-            }
-            val macosArm64Test by getting {
-                dependsOn(macosTest)
-            }
-            val iosX64Main by getting {
-                dependsOn(iosMain)
-            }
-            val iosX64Test by getting {
-                dependsOn(iosTest)
-            }
-            val iosArm64Main by getting {
-                dependsOn(iosMain)
-            }
-            val iosArm64Test by getting {
-                dependsOn(iosTest)
+
+            if (supportNative) {
+                // See https://kotlinlang.org/docs/mpp-share-on-platforms.html#configure-the-hierarchical-structure-manually
+                val nativeMain by creating {
+                    dependsOn(nativeJsMain)
+                    dependencies {
+                        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
+                    }
+                }
+                val nativeTest by creating {
+                    dependsOn(nativeJsTest)
+                }
+                val linuxMain by creating {
+                    dependsOn(nativeMain)
+                }
+                val linuxTest by creating {
+                    dependsOn(nativeTest)
+                }
+                val linuxX64Main by getting {
+                    dependsOn(linuxMain)
+                }
+                val linuxX64Test by getting {
+                    dependsOn(linuxTest)
+                }
+                val darwinMain by creating {
+                    dependsOn(nativeMain)
+                }
+                val darwinTest by creating {
+                    dependsOn(nativeTest)
+                }
+                val macosMain by creating {
+                    dependsOn(darwinMain)
+                }
+                val macosTest by creating {
+                    dependsOn(darwinTest)
+                }
+                val iosMain by creating {
+                    dependsOn(darwinMain)
+                }
+                val iosTest by creating {
+                    dependsOn(darwinTest)
+                }
+                val macosX64Main by getting {
+                    dependsOn(macosMain)
+                }
+                val macosX64Test by getting {
+                    dependsOn(macosTest)
+                }
+                val macosArm64Main by getting {
+                    dependsOn(macosMain)
+                }
+                val macosArm64Test by getting {
+                    dependsOn(macosTest)
+                }
+                val iosX64Main by getting {
+                    dependsOn(iosMain)
+                }
+                val iosX64Test by getting {
+                    dependsOn(iosTest)
+                }
+                val iosArm64Main by getting {
+                    dependsOn(iosMain)
+                }
+                val iosArm64Test by getting {
+                    dependsOn(iosTest)
+                }
             }
         }
     }
@@ -901,22 +925,6 @@ val skikoJvmRuntimeJar by project.tasks.registering(Jar::class) {
     from(createChecksums.map { it.outputs.files })
 }
 
-val skikoWasmJar by project.tasks.registering(Jar::class) {
-    dependsOn(linkWasm)
-    // We produce jar that contains .js of wrapper/bindings and .wasm with Skia + bindings.
-    val wasmOutDir = linkWasm.map { it.outDir }
-
-    from(wasmOutDir) {
-        include("*.wasm")
-        include("*.js")
-    }
-
-    archiveBaseName.set("skiko-wasm")
-    doLast {
-        println("Wasm and JS at: ${archiveFile.get().asFile.absolutePath}")
-    }
-}
-
 val skikoRuntimeDirForTests by project.tasks.registering(Copy::class) {
     dependsOn(skikoJvmRuntimeJar)
     from(zipTree(skikoJvmRuntimeJar.flatMap { it.archiveFile })) {
@@ -1062,7 +1070,7 @@ publishing {
             create<MavenPublication>("skikoWasmRuntime") {
                 pomNameForPublication[name] = "Skiko WASM Runtime"
                 artifactId = SkikoArtifacts.jsWasmArtifactId
-                artifact(skikoWasmJar.get())
+                artifact(tasks.named("skikoWasmJar").get())
                 artifact(emptySourcesJar)
             }
         }
