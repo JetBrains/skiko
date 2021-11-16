@@ -51,7 +51,7 @@ internal abstract class AbstractDirectSoftwareRedrawer(
         }
         return Surface(surface)
     }
-    open fun finishFrame() = finishFrame(device)
+    open fun finishFrame(surface: Long) = finishFrame(device, surface)
     override fun dispose() {
         frameDispatcher.cancel()
         contextHandler.dispose()
@@ -63,6 +63,6 @@ internal abstract class AbstractDirectSoftwareRedrawer(
 
     private external fun resize(devicePtr: Long, width: Int, height: Int)
     private external fun acquireSurface(devicePtr: Long): Long
-    private external fun finishFrame(devicePtr: Long)
+    private external fun finishFrame(devicePtr: Long, surfacePtr: Long)
     private external fun disposeDevice(devicePtr: Long)
 }
