@@ -1,7 +1,10 @@
 package org.jetbrains.skia.paragraph
 
-import org.jetbrains.skia.*
-import org.jetbrains.skia.impl.*
+import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.Rect
+import org.jetbrains.skia.impl.ArrayInteropDecoder
+import org.jetbrains.skia.impl.InteropPointer
+import org.jetbrains.skia.impl.interopScope
 
 class TextBox(val rect: Rect, direction: Direction) {
     val _direction: Direction
@@ -42,7 +45,11 @@ class TextBox(val rect: Rect, direction: Direction) {
             val rect = FloatArray(4)
             val direction = IntArray(1)
             interopScope {
-                TextBox_nGetArrayElement(array, index, toInterop(rect), toInterop(direction))
+                val rectPtr = toInterop(rect)
+                val directionPtr = toInterop(direction)
+                TextBox_nGetArrayElement(array, index, rectPtr, directionPtr)
+                rectPtr.fromInterop(rect)
+                directionPtr.fromInterop(direction)
             }
             return TextBox(rect[0], rect[1], rect[2], rect[3], direction[0])
         }

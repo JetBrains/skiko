@@ -62,7 +62,7 @@ class ParagraphTest {
 
     @Test
     fun canCreate() = runTest {
-        val text = "Hello,\r\n Пользователь1!"
+        val text = "Hello,\n Пользователь1!"
         var paragraph = ParagraphBuilder(style, fontCollection()).use {
             it.addText(text)
             it.build()
@@ -78,26 +78,26 @@ class ParagraphTest {
         assertTrue(paragraph.didExceedMaxLines())
 
         assertEquals(IRange(0, 5), paragraph.getWordBoundary(0))
-        assertEquals(IRange(9, 22), paragraph.getWordBoundary(10))
-//        assertEquals(0, paragraph.unresolvedGlyphsCount)
+        assertEquals(IRange(8, 21), paragraph.getWordBoundary(10))
+        assertEquals(0, paragraph.unresolvedGlyphsCount)
         assertEquals(2, paragraph.lineNumber)
 
         assertContentEquals(arrayOf(), paragraph.rectsForPlaceholders)
 
         assertContentCloseEnough(arrayOf(
             TextBox(Rect(3.94f, 17.06f, 92.31f, 34.0f), Direction.LTR)
-        ), paragraph.getRectsForRange(9, 22, RectHeightMode.TIGHT, RectWidthMode.TIGHT),0.01f)
+        ), paragraph.getRectsForRange(8, 21, RectHeightMode.TIGHT, RectWidthMode.TIGHT),0.01f)
 
         paragraph = paragraph
-            .updateFontSize(9, 22, 48.0f)
-            .updateForegroundPaint(9, 22, Paint().apply { color = Color.RED })
-            .updateBackgroundPaint(9, 22, Paint().apply { color = Color.BLACK })
+            .updateFontSize(8, 21, 48.0f)
+            .updateForegroundPaint(8, 21, Paint().apply { color = Color.RED })
+            .updateBackgroundPaint(8, 21, Paint().apply { color = Color.BLACK })
             .updateAlignment(Alignment.RIGHT)
             .markDirty()
 
         assertContentCloseEnough(arrayOf(
             TextBox(Rect(3.94f, 17.06f, 92.31f, 34.0f), Direction.LTR)
-        ), paragraph.getRectsForRange(9, 22, RectHeightMode.TIGHT, RectWidthMode.TIGHT),0.01f)
+        ), paragraph.getRectsForRange(8, 21, RectHeightMode.TIGHT, RectWidthMode.TIGHT),0.01f)
 
         assertEquals(
             PositionWithAffinity(5, Affinity.UPSTREAM),
