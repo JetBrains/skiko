@@ -62,7 +62,7 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     val fontStyle: FontStyle
         get() = try {
             Stats.onNativeCall()
-            org.jetbrains.skia.FontStyle(_nGetFontStyle(_ptr))
+            FontStyle(_nGetFontStyle(_ptr))
         } finally {
             reachabilityBarrier(this)
         }

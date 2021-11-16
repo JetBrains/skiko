@@ -20,11 +20,15 @@ actual abstract class RefCnt : Managed {
     }
 
     private object _FinalizerHolder {
-        val PTR = _nGetFinalizer()
+        val PTR = RefCnt_nGetFinalizer()
+    }
+
+    actual companion object {
+        actual fun _nGetFinalizer(): NativePointer = RefCnt_nGetFinalizer()
     }
 }
 
 @ExternalSymbolName("org_jetbrains_skia_impl_RefCnt__getFinalizer")
-private external fun _nGetFinalizer(): NativePointer
+private external fun RefCnt_nGetFinalizer(): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_impl_RefCnt__getRefCount")
 private external fun _nGetRefCount(ptr: NativePointer): Int

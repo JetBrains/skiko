@@ -74,5 +74,6 @@ class FontCollectionTest {
             }
             assertEquals(refCnt, t1.refCount)
         }
+
     }
 }
