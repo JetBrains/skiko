@@ -123,7 +123,7 @@ class SurfaceTest {
                 r = Rect(4f, 4f, 12f, 12f),
                 paint = Paint().apply { color = Color.RED }
             )
-            Bitmap.makeFromImage(surface.makeImageSnapshot())
+            Bitmap.makeFromImage(surface.makeImageSnapshot(), ctx)
         }
 
         assertEquals(Color.RED, pixels.getColor(8, 8))

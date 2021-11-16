@@ -286,6 +286,15 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
         return readPixels(null, dst, srcX, srcY, false)
     }
 
+    fun readPixels(context: DirectContext, dst: Bitmap): Boolean {
+        return readPixels(context, dst, 0, 0, false)
+    }
+
+    fun readPixels(context: DirectContext, dst: Bitmap, srcX: Int, srcY: Int): Boolean {
+        return readPixels(context, dst, srcX, srcY, false)
+    }
+
+
     /**
      *
      * Copies Rect of pixels from Image to Bitmap. Copy starts at offset (srcX, srcY),
