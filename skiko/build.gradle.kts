@@ -758,152 +758,37 @@ val generateVersion = project.tasks.register("generateVersion") {
     }
 }
 
-fun localSign(signer: String, lib: File): File {
-    println("Local signing $lib as $signer")
-    val proc = ProcessBuilder("codesign", "-f", "-s", signer, lib.absolutePath)
-        .redirectOutput(ProcessBuilder.Redirect.PIPE)
-        .redirectError(ProcessBuilder.Redirect.PIPE)
-        .start()
-    proc.waitFor(5, TimeUnit.MINUTES)
-    if (proc.exitValue() != 0) {
-        val out = proc.inputStream.bufferedReader().readText()
-        val err = proc.errorStream.bufferedReader().readText()
-        println(out)
-        println(err)
-        throw GradleException("Cannot sign $lib: $err")
-    }
-    return lib
-}
-
-// See https://github.com/olonho/sealer.
-fun sealBinary(sealer: String, lib: File) {
-    println("Sealing $lib by $sealer")
-    val proc = ProcessBuilder(sealer, "-f", lib.absolutePath, "-p", "Java_")
-        .redirectOutput(ProcessBuilder.Redirect.INHERIT)
-        .redirectError(ProcessBuilder.Redirect.INHERIT)
-        .start()
-    proc.waitFor(2, TimeUnit.MINUTES)
-    if (proc.exitValue() != 0) {
-        throw GradleException("Cannot seal $lib")
-    }
-    println("Sealed!")
-}
-
-fun remoteSignCurl(signHost: String, lib: File, out: File) {
-    println("Remote signing $lib on $signHost")
-    val user = skiko.signUser ?: error("signUser is null")
-    val token = skiko.signToken ?: error("signToken is null")
-    val cmd = """
-        TOKEN=`curl -fsSL --user $user:$token --url "$signHost/auth" | grep token | cut -d '"' -f4` \
-        && curl --no-keepalive --http1.1 --data-binary @${lib.absolutePath} \
-        -H "Authorization: Bearer ${'$'}TOKEN" \
-        -H "Content-Type:application/x-mac-app-bin" \
-        "$signHost/sign?name=${lib.name}" -o "${out.absolutePath}"
-    """.trimIndent()
-    val proc = ProcessBuilder("bash", "-c", cmd)
-        .redirectOutput(ProcessBuilder.Redirect.PIPE)
-        .redirectError(ProcessBuilder.Redirect.PIPE)
-        .start()
-    proc.waitFor(5, TimeUnit.MINUTES)
-    if (proc.exitValue() != 0) {
-        val out = proc.inputStream.bufferedReader().readText()
-        val err = proc.errorStream.bufferedReader().readText()
-        println(out)
-        println(err)
-        throw GradleException("Cannot sign $lib: $err")
-    } else {
-        val outSize = out.length()
-        if (outSize < 200 * 1024) {
-            val content = out.readText()
-            println(content)
-            throw GradleException("Output is too short $outSize: ${content.take(200)}...")
-        }
-    }
-}
-
-fun remoteSignCodesign(fileToSign: File) {
-    val user = skiko.signUser ?: error("signUser is null")
-    val token = skiko.signToken ?: error("signToken is null")
-    val cmd = arrayOf(
-        projectDir.resolve("tools/codesign-client-darwin-x64").absolutePath,
-        fileToSign.absolutePath
-    )
-    val procBuilder = ProcessBuilder(*cmd).apply {
-        directory(fileToSign.parentFile)
-        val env = environment()
-        env["SERVICE_ACCOUNT_NAME"] = user
-        env["SERVICE_ACCOUNT_TOKEN"] = token
-        redirectOutput(ProcessBuilder.Redirect.INHERIT)
-        redirectError(ProcessBuilder.Redirect.INHERIT)
-    }
-    logger.info("Starting remote code sign")
-    val proc = procBuilder.start()
-    proc.waitFor(5, TimeUnit.MINUTES)
-    if (proc.exitValue() != 0) {
-        throw GradleException("Failed to sign $fileToSign")
-    } else {
-        val signedDir = fileToSign.parentFile.resolve("signed")
-        val signedFile = signedDir.resolve(fileToSign.name)
-        check(signedFile.exists()) {
-            buildString {
-                appendLine("Signed file does not exist: $signedFile")
-                appendLine("Other files in $signedDir:")
-                signedDir.list()?.let { names ->
-                    names.forEach {
-                        appendLine("  * $it")
-                    }
-                }
-            }
-        }
-        val size = signedFile.length()
-        if (size < 200 * 1024) {
-            val content = signedFile.readText()
-            println(content)
-            throw GradleException("Output is too short $size: ${content.take(200)}...")
-        } else {
-            signedFile.copyTo(fileToSign, overwrite = true)
-            signedFile.delete()
-            logger.info("Successfully signed $fileToSign")
-        }
-    }
-}
-
 val skikoJvmJar: Provider<Jar> by tasks.registering(Jar::class) {
     archiveBaseName.set("skiko-jvm")
         from(kotlin.jvm().compilations["main"].output.allOutputs)
 }
 
-val maybeSign by project.tasks.registering {
+val maybeSign by project.tasks.registering(SealAndSignSharedLibraryTask::class) {
     dependsOn(linkJvmBindings)
 
-    val lib = linkJvmBindings.map { task ->
-        task.outDir.get().asFile.walk().single { file -> file.name.endsWith(targetOs.dynamicLibExt) }
+    val linkOutputFile = linkJvmBindings.map { task ->
+        task.outDir.get().asFile.walk().single { it.name.endsWith(targetOs.dynamicLibExt) }.absoluteFile
     }
-    inputs.files(lib)
+    libFile.set(project.layout.file(linkOutputFile))
+    outDir.set(project.layout.buildDirectory.dir("maybe-signed"))
 
-    val outputDir = project.layout.buildDirectory.dir("maybe-signed")
-    val output = outputDir.map { it.asFile.resolve(lib.get().name) }
-    outputs.files(output)
-
-    doLast {
-        outputDir.get().asFile.apply {
-            deleteRecursively()
-            mkdirs()
-        }
-
-        val libFile = lib.get()
-        val outputFile = output.get()
-        libFile.copyTo(outputFile, overwrite = true)
-
-        if (targetOs == OS.Linux) {
-            // Linux requires additional sealing to run on wider set of platforms.
-            val sealer = "$projectDir/tools/sealer-${hostArch.id}"
-            sealBinary(sealer, outputFile)
-        }
-        if (skiko.signHost != null) {
-            remoteSignCodesign(outputFile)
+    val toolsDir = project.layout.projectDirectory.dir("tools")
+    if (targetOs == OS.Linux) {
+        // Linux requires additional sealing to run on wider set of platforms.
+        // See https://github.com/olonho/sealer.
+        when (targetArch) {
+            Arch.X64 -> sealer.set(toolsDir.file("sealer-x64"))
+            Arch.Arm64 -> sealer.set(toolsDir.file("sealer-arm64"))
+            else -> error("Unexpected combination of '$targetArch' and '$targetOs'")
         }
     }
+
+    if (hostOs == OS.MacOS) {
+        codesignClient.set(toolsDir.file("codesign-client-darwin-x64"))
+    }
+    signHost.set(skiko.signHost)
+    signUser.set(skiko.signUser)
+    signToken.set(skiko.signToken)
 }
 
 val createChecksums by project.tasks.registering(org.gradle.crypto.checksum.Checksum::class) {
@@ -1116,11 +1001,6 @@ if (hostOs == OS.Linux && hostArch != Arch.X64) {
     rootProject.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin::class.java) {
         rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>().download = false
     }
-}
-
-fun Task.projectDirs(vararg relativePaths: String): List<Directory> {
-    val projectDir = project.layout.projectDirectory
-    return relativePaths.map { path -> projectDir.dir(path) }
 }
 
 /**

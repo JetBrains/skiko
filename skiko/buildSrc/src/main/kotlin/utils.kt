@@ -1,4 +1,5 @@
 import org.gradle.api.Task
+import org.gradle.api.file.Directory
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.kotlin.dsl.register
@@ -20,3 +21,8 @@ fun joinToTitleCamelCase(vararg parts: String): String =
 
 fun toTitleCase(s: String): String =
     s.capitalize(Locale.ROOT)
+
+fun Task.projectDirs(vararg relativePaths: String): List<Directory> {
+    val projectDir = project.layout.projectDirectory
+    return relativePaths.map { path -> projectDir.dir(path) }
+}
