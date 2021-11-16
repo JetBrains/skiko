@@ -104,7 +104,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeFromBackendRenderT
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeFromMTKView
   (KNativePointer contextPtr, KNativePointer mtkViewPtr, KInt surfaceOrigin, KInt sampleCount, KInt colorType, KNativePointer colorSpacePtr, KInteropPointer surfacePropsObj) {
-#ifdef __APPLE__
+#ifdef SK_METAL
     GrDirectContext* context = reinterpret_cast<GrDirectContext*>((contextPtr));
     GrMTLHandle* mtkView = reinterpret_cast<GrMTLHandle*>((mtkViewPtr));
     GrSurfaceOrigin grSurfaceOrigin = static_cast<GrSurfaceOrigin>(surfaceOrigin);
@@ -121,9 +121,9 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeFromMTKView
         colorSpace,
         surfaceProps.get());
     return reinterpret_cast<KNativePointer>(surface.release());
-#else // __APPLE__
+#else // SK_METAL
     return static_cast<KNativePointer>(nullptr);
-#endif // __APPLE__
+#endif // SK_METAL
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeRenderTarget
