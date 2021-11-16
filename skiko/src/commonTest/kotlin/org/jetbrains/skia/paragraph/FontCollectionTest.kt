@@ -17,8 +17,6 @@ import kotlin.test.assertEquals
 class FontCollectionTest {
 
     @Test
-    @SkipNativeTarget
-    @SkipJsTarget
     fun fontCollectionTest() = runTest {
         val fm = TypefaceFontProvider()
         val jbMono = Typeface.makeFromResource("./fonts/JetBrainsMono-Regular.ttf", 0)
