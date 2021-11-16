@@ -68,12 +68,11 @@ extern "C"
         JNIEnv *env, jobject redrawer, jlong devicePtr)
     {
         SoftwareDevice *device = fromJavaPointer<SoftwareDevice *>(devicePtr);
-        device->surface.get()->ref();
-        return toJavaPointer(device->surface.get());
+        return toJavaPointer(device->surface.release());
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_AbstractDirectSoftwareRedrawer_finishFrame(
-        JNIEnv *env, jobject redrawer, jlong devicePtr)
+        JNIEnv *env, jobject redrawer, jlong devicePtr, jlong surfacePtr)
     {
         __try
         {

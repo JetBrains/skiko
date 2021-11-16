@@ -36,8 +36,8 @@ internal class LinuxSoftwareRedrawer(
         super.resize(width, height)
     }
 
-    override fun finishFrame() = layer.backedLayer.lockLinuxDrawingSurface {
-        super.finishFrame()
+    override fun finishFrame(surface: Long) = layer.backedLayer.lockLinuxDrawingSurface {
+        super.finishFrame(surface)
     }
 
     private external fun createDevice(display: Long, window: Long, width: Int, height: Int): Long
