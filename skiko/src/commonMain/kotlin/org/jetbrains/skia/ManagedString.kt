@@ -62,7 +62,7 @@ class ManagedString internal constructor(ptr: NativePointer, managed: Boolean = 
 }
 
 @ExternalSymbolName("org_jetbrains_skia_ManagedString__1nGetFinalizer")
-private external fun ManagedString_nGetFinalizer(): NativePointer
+internal external fun ManagedString_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ManagedString__1nMake")
 private external fun _nMake(s: InteropPointer): NativePointer

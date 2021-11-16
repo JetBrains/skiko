@@ -22,6 +22,10 @@ namespace skikoMpp {
         int getClustersLength(SkTextBlob* instance);
         bool getClusters(SkTextBlob* instance, int* clusters);
     }
+
+    namespace finalizers {
+        void deleteString(void* instance);
+    }
 }
 
 namespace skija {
