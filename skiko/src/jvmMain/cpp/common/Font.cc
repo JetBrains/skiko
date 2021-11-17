@@ -283,13 +283,13 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nGetPositions
     instance->getPos(reinterpret_cast<SkGlyphID*>(glyphs), count, positions.data(), {dx, dy});
     env->ReleaseShortArrayElements(glyphsArr, glyphs, 0);
 
-    float r[count * 2];
+    std::vector<jfloat> r(count * 2);
     for (int i = 0; i < count; i++) {
         r[2*i] = positions[i].fX;
         r[2*i + 1] = positions[i].fY;
     }
 
-    env->SetFloatArrayRegion(res, 0, count * 2, r);
+    env->SetFloatArrayRegion(res, 0, count * 2, r.data());
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nGetXPositions
