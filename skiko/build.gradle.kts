@@ -364,29 +364,36 @@ fun configureNativeTarget(os: OS, arch: Arch, target: KotlinNativeTarget) {
 
     target.compilations.all {
         val skiaBinDir = "$skiaDir/out/${buildType.id}-$targetString"
+        this.
         kotlinOptions {
             val linkerFlags = when (os) {
-                OS.MacOS -> listOf("-linker-option", "-framework", "-linker-option", "Metal",
+                OS.MacOS -> mutableListOf("-linker-option", "-framework", "-linker-option", "Metal",
                     "-linker-option", "-framework", "-linker-option", "CoreGraphics",
                     "-linker-option", "-framework", "-linker-option", "CoreText",
                     "-linker-option", "-framework", "-linker-option", "CoreServices"
                 )
-                OS.IOS -> listOf("-linker-option", "-framework", "-linker-option", "Metal",
+                OS.IOS -> mutableListOf("-linker-option", "-framework", "-linker-option", "Metal",
                     "-linker-option", "-framework", "-linker-option", "CoreGraphics",
                     "-linker-option", "-framework", "-linker-option", "CoreText")
-                OS.Linux -> listOf(
+                OS.Linux -> mutableListOf(
                     "-linker-option", "-L/usr/lib/x86_64-linux-gnu",
                     "-linker-option", "-lfontconfig",
                     "-linker-option", "-lGL",
-                    // TODO This used for test purposes only, maybe replace with dlopen/dlsym
-                    "-linker-option", "-lX11",
-                    "-linker-option", "-lGLX",
                     // TODO: an ugly hack, Linux linker searches only unresolved symbols.
                     "-linker-option", "$skiaBinDir/libskshaper.a",
                     "-linker-option", "$skiaBinDir/libskunicode.a",
                     "-linker-option", "$skiaBinDir/libskia.a"
                 )
-                else -> emptyList()
+                else -> mutableListOf()
+            }
+            if (skiko.includeTestHelpers) {
+                linkerFlags.addAll(when (os) {
+                    OS.Linux -> listOf(
+                        "-linker-option", "-lX11",
+                        "-linker-option", "-lGLX",
+                    )
+                    else -> emptyList()
+                })
             }
             freeCompilerArgs = allLibraries.map { listOf("-include-binary", it) }.flatten() + linkerFlags
         }

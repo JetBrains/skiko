@@ -37,9 +37,9 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeMetal
 }
 #endif // SK_METAL
 
-#ifdef SK_DIRECT3D
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeDirect3D
   (KNativePointer adapterPtr, KNativePointer devicePtr, KNativePointer queuePtr) {
+#ifdef SK_DIRECT3D
     GrD3DBackendContext backendContext = {};
     IDXGIAdapter1* adapter = reinterpret_cast<IDXGIAdapter1*>(adapterPtr);
     ID3D12Device* device = reinterpret_cast<ID3D12Device*>(devicePtr);
@@ -48,9 +48,11 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeDirect3D
     backendContext.fDevice.retain(device);
     backendContext.fQueue.retain(queue);
     sk_sp<GrDirectContext> instance = GrDirectContext::MakeDirect3D(backendContext);
-    return reinterpret_cast<jlong>(instance.release());
-}
+    return reinterpret_cast<KNativePointer>(instance.release());
+#else // SK_DIRECT3D
+    return nullptr;
 #endif // SK_DIRECT3D
+}
 
 SKIKO_EXPORT void org_jetbrains_skia_DirectContext__1nFlush
   (KNativePointer ptr) {
