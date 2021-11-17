@@ -16,22 +16,13 @@ internal interface PlatformOperations {
 
 internal val platformOperations: PlatformOperations by lazy {
     when (hostOs) {
-        OS.MacOS -> object: PlatformOperations {
+        OS.MacOS -> {
+            object: PlatformOperations {
                 override fun isFullscreen(component: Component): Boolean {
                     return osxIsFullscreenNative(component)
                 }
 
                 override fun setFullscreen(component: Component, value: Boolean) {
-                    // MacOS specific: if fullscreen is set before the window is visible,
-                    // we will add a listener to set fullscreen after the window is visible
-                    val window = SwingUtilities.getRoot(component) as Window
-                    if (value && !window.isVisible) {
-                        window.addComponentListener(object : ComponentAdapter() {
-                            override fun componentShown(e: ComponentEvent) {
-                                osxSetFullscreenNative(component, value)
-                            }
-                        })
-                    }
                     osxSetFullscreenNative(component, value)
                 }
 
@@ -46,6 +37,7 @@ internal val platformOperations: PlatformOperations by lazy {
                 override fun orderEmojiAndSymbolsPopup() {
                     osxOrderEmojiAndSymbolsPopup()
                 }
+            }
         }
         OS.Windows -> {
             object: PlatformOperations {
