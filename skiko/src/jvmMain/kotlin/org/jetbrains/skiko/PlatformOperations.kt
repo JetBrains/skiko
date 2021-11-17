@@ -12,21 +12,23 @@ internal open class FullscreenAdapter(
     private var _isFullscreenDispatched = false
     private var _isFullscreen: Boolean = false
     var fullscreen: Boolean
-        get() = backedLayer.fullscreen
+        get() = _isFullscreen
         set(value) {
             _isFullscreen = value
-            val window = SwingUtilities.getRoot(backedLayer) as Window
-            if (window.isVisible) {
-                backedLayer.fullscreen = value
-            } else {
+            val window = SwingUtilities.getRoot(backedLayer)
+            if ( window == null || !window.isVisible) {
                 _isFullscreenDispatched = value
+            } else {
+                backedLayer.fullscreen = value
             }
         }
 
     override fun componentShown(e: ComponentEvent) {
-        if (_isFullscreenDispatched) {
-            backedLayer.fullscreen = _isFullscreenDispatched
-        }
+        backedLayer.fullscreen = _isFullscreenDispatched
+    }
+
+    override fun componentHidden(e: ComponentEvent) {
+        _isFullscreenDispatched = _isFullscreen
     }
 
     override fun componentResized(e: ComponentEvent) {
