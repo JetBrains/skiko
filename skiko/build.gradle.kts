@@ -1,5 +1,7 @@
 import de.undercouch.gradle.tasks.download.Download
 import org.gradle.crypto.checksum.Checksum
+import org.gradle.api.tasks.testing.AbstractTestTask
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.compose.internal.publishing.MavenCentralProperties
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -207,7 +209,6 @@ kotlin {
     js(IR) {
         browser() {
             testTask {
-                testLogging.showStandardStreams = true
                 dependsOn(linkWasm)
                 useKarma {
                     useChromeHeadless()
@@ -1142,5 +1143,14 @@ fun registerOrGetSkiaDirProvider(os: OS, arch: Arch): Provider<File> {
             from(downloadSkia.map { zipTree(it) })
             into(skiko.dependenciesDir.resolve("skia/$skiaRelease"))
         }.map { it.destinationDir.absoluteFile }
+    }
+}
+
+tasks.withType<AbstractTestTask> {
+    testLogging {
+        events("FAILED", "SKIPPED")
+        exceptionFormat = TestExceptionFormat.FULL
+        showStandardStreams = true
+        showStackTraces = true
     }
 }
