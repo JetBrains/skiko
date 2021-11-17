@@ -382,10 +382,8 @@ class Font : Managed {
     fun measureText(s: String?, p: Paint? = null): Rect {
         return try {
             Stats.onNativeCall()
-            withResult(FloatArray(4)) {
+            Rect.fromInteropPointer() {
                 _nMeasureText(_ptr, toInterop(s), s?.length ?: 0, getPtr(p), it)
-            }.let { rect ->
-                Rect(rect[0], rect[1], rect[2], rect[3])
             }
         } finally {
             reachabilityBarrier(this)
@@ -451,7 +449,7 @@ class Font : Managed {
             if (glyphs == null) {
                 emptyArray()
             } else {
-                withResult(FloatArray(glyphs.size * 4))  {
+                Rect.fromInteropPointer(glyphs.size * 4) {
                     _nGetBounds(
                         _ptr,
                         toInterop(glyphs),
@@ -459,9 +457,7 @@ class Font : Managed {
                         getPtr(p),
                         it
                     )
-                }.toList().chunked(4).map { (left, top, right, bottom) ->
-                    Rect(left, right, top, bottom)
-                }.toTypedArray()
+                }
             }
         } finally {
             reachabilityBarrier(this)
