@@ -283,7 +283,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nGetPositions
     instance->getPos(reinterpret_cast<SkGlyphID*>(glyphs), count, positions.data(), {dx, dy});
     env->ReleaseShortArrayElements(glyphsArr, glyphs, 0);
 
-    jfloat r[count * 2];
+    float r[count * 2];
     for (int i = 0; i < count; i++) {
         r[2*i] = positions[i].fX;
         r[2*i + 1] = positions[i].fY;
