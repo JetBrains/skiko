@@ -1,10 +1,10 @@
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.RefCnt
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
-import org.jetbrains.skia.impl.NativePointer
 
 class DirectContext internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
@@ -25,7 +25,7 @@ class DirectContext internal constructor(ptr: NativePointer) : RefCnt(ptr) {
          * For more information refer to skia GrDirectContext class.
          *
          * @param adapterPtr    pointer to IDXGIAdapter1 object; must be not zero
-         * @param devicePtr     pointer to ID3D12Device objetc, which is created with
+         * @param devicePtr     pointer to ID3D12Device object, which is created with
          * provided adapter in adapterPtr; must be not zero
          * @param queuePtr      Pointer to ID3D12CommandQueue object, which
          * is created with provided device in devicePtr with

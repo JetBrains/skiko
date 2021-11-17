@@ -1,9 +1,9 @@
 import de.undercouch.gradle.tasks.download.Download
 import org.gradle.crypto.checksum.Checksum
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 import org.jetbrains.compose.internal.publishing.MavenCentralProperties
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 
 plugins {
     kotlin("multiplatform") version "1.5.31"
@@ -355,17 +355,18 @@ fun configureNativeTarget(os: OS, arch: Arch, target: KotlinNativeTarget) {
 
     target.compilations.all {
         val skiaBinDir = "$skiaDir/out/${buildType.id}-$targetString"
+        this.
         kotlinOptions {
             val linkerFlags = when (os) {
-                OS.MacOS -> listOf("-linker-option", "-framework", "-linker-option", "Metal",
+                OS.MacOS -> mutableListOf("-linker-option", "-framework", "-linker-option", "Metal",
                     "-linker-option", "-framework", "-linker-option", "CoreGraphics",
                     "-linker-option", "-framework", "-linker-option", "CoreText",
                     "-linker-option", "-framework", "-linker-option", "CoreServices"
                 )
-                OS.IOS -> listOf("-linker-option", "-framework", "-linker-option", "Metal",
+                OS.IOS -> mutableListOf("-linker-option", "-framework", "-linker-option", "Metal",
                     "-linker-option", "-framework", "-linker-option", "CoreGraphics",
                     "-linker-option", "-framework", "-linker-option", "CoreText")
-                OS.Linux -> listOf(
+                OS.Linux -> mutableListOf(
                     "-linker-option", "-L/usr/lib/x86_64-linux-gnu",
                     "-linker-option", "-lfontconfig",
                     "-linker-option", "-lGL",
@@ -374,7 +375,16 @@ fun configureNativeTarget(os: OS, arch: Arch, target: KotlinNativeTarget) {
                     "-linker-option", "$skiaBinDir/libskunicode.a",
                     "-linker-option", "$skiaBinDir/libskia.a"
                 )
-                else -> emptyList()
+                else -> mutableListOf()
+            }
+            if (skiko.includeTestHelpers) {
+                linkerFlags.addAll(when (os) {
+                    OS.Linux -> listOf(
+                        "-linker-option", "-lX11",
+                        "-linker-option", "-lGLX",
+                    )
+                    else -> emptyList()
+                })
             }
             freeCompilerArgs = allLibraries.map { listOf("-include-binary", it) }.flatten() + linkerFlags
         }
