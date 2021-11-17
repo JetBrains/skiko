@@ -14,7 +14,7 @@ import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 
 private fun isNativeMac() = (hostOs == OS.MacOS) && (kotlinBackend == KotlinBackend.Native)
-private val COARSE_EPSILON = if (isNativeMac()) 2.01f else 10e-5f
+private val COARSE_EPSILON = if (isNativeMac()) 2.01f else if (kotlinBackend == KotlinBackend.JS) 10e-5f else 10e-8f
 
 class FontTests {
     @Test
