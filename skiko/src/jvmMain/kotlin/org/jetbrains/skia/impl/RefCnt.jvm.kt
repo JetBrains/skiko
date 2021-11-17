@@ -23,10 +23,12 @@ actual abstract class RefCnt : Managed {
         val PTR = _nGetFinalizer()
     }
 
-    actual companion object {
+    companion object {
         @JvmStatic
-        actual external fun _nGetFinalizer(): NativePointer
+        external fun _nGetFinalizer(): NativePointer
         @JvmStatic
         external fun _nGetRefCount(ptr: NativePointer): Int
     }
 }
+
+actual fun RefCnt_nGetFinalizer() = RefCnt._nGetFinalizer()

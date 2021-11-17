@@ -91,7 +91,7 @@ class FontCollection internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             Stats.onNativeCall()
             arrayDecoderScope({  ArrayDecoder(interopScope {
                 _nFindTypefaces(_ptr, toInterop(familyNames), familyNames?.size ?: 0, style._value)
-            }, _nGetFinalizer()) }) { arrayDecoder ->
+            }, RefCnt_nGetFinalizer()) }) { arrayDecoder ->
                 (0 until arrayDecoder.size).map { i ->
                     Typeface(arrayDecoder.release(i))
                 }.toTypedArray()
