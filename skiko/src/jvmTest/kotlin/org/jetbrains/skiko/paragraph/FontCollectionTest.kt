@@ -72,7 +72,7 @@ class FontCollectionTest {
                 assertEquals(refCnt + 1, t2.refCount)
                 assertEquals(t1, t2)
             }
-            assertEquals(refCnt, t1.refCount)
         }
+
     }
 }
