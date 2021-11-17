@@ -1,9 +1,8 @@
 package org.jetbrains.skia.paragraph
 
-import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.*
-import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.*
+import org.jetbrains.skia.impl.Library.Companion.staticLoad
 
 class Paragraph internal constructor(ptr: NativePointer, text: ManagedString?) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
@@ -108,13 +107,15 @@ class Paragraph internal constructor(ptr: NativePointer, text: ManagedString?) :
     ): Array<TextBox> {
         return try {
             Stats.onNativeCall()
-            _nGetRectsForRange(_ptr, start, end, rectHeightMode.ordinal, rectWidthMode.ordinal)
+            interopScope {
+                _nGetRectsForRange(_ptr, start, end, rectHeightMode.ordinal, rectWidthMode.ordinal).fromInterop(TextBox)
+            }
         } finally {
             reachabilityBarrier(this)
         }
     }
 
-    val rectsForPlaceholders: Array<org.jetbrains.skia.paragraph.TextBox>
+    val rectsForPlaceholders: Array<TextBox>
         get() = try {
             Stats.onNativeCall()
             interopScope {
@@ -142,7 +143,7 @@ class Paragraph internal constructor(ptr: NativePointer, text: ManagedString?) :
     fun getWordBoundary(offset: Int): IRange {
         return try {
             Stats.onNativeCall()
-            toIRange(_nGetWordBoundary(_ptr, offset))
+            IRange.fromInteropPointer { _nGetWordBoundary(_ptr, offset, it) }
         } finally {
             reachabilityBarrier(this)
         }
@@ -305,7 +306,7 @@ private external fun _nGetRectsForRange(
     end: Int,
     rectHeightMode: Int,
     rectWidthMode: Int
-): Array<TextBox>
+): InteropPointer
 
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nGetRectsForPlaceholders")
@@ -315,7 +316,7 @@ private external fun _nGetRectsForPlaceholders(ptr: NativePointer): InteropPoint
 private external fun _nGetGlyphPositionAtCoordinate(ptr: NativePointer, dx: Float, dy: Float): Int
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nGetWordBoundary")
-private external fun _nGetWordBoundary(ptr: NativePointer, offset: Int): Long
+private external fun _nGetWordBoundary(ptr: NativePointer, offset: Int, result: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nGetLineMetrics")
 private external fun _nGetLineMetrics(ptr: NativePointer, textPtr: NativePointer): InteropPointer

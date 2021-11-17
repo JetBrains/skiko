@@ -4,6 +4,7 @@ import org.jetbrains.skia.Color4f
 import org.jetbrains.skia.Matrix33
 import org.jetbrains.skia.Point
 import org.jetbrains.skia.Rect
+import org.jetbrains.skia.paragraph.TextBox
 import org.jetbrains.skiko.KotlinBackend
 import org.jetbrains.skiko.kotlinBackend
 import kotlin.math.abs
@@ -25,11 +26,19 @@ private inline fun Rect.isCloseEnoughTo(rect: Rect, epsilon: Float): Boolean =
     left.isCloseEnoughTo(rect.left, epsilon) && right.isCloseEnoughTo(rect.right, epsilon)
             && top.isCloseEnoughTo(rect.top, epsilon) && bottom.isCloseEnoughTo(rect.bottom, epsilon)
 
+private inline fun TextBox.isCloseEnoughTo(textBox: TextBox, epsilon: Float = EPSILON): Boolean {
+    return (direction == textBox.direction) && rect.isCloseEnoughTo(textBox.rect, epsilon)
+}
+
 internal fun assertCloseEnough(expected: Float, actual: Float, epsilon: Float = EPSILON) {
     assertTrue(expected.isCloseEnoughTo(actual, epsilon), message = "expected=$expected, actual=$actual, eps=$epsilon")
 }
 
 internal fun assertCloseEnough(expected: Point, actual: Point, epsilon: Float = EPSILON) {
+    assertTrue(expected.isCloseEnoughTo(actual, epsilon), message = "expected=$expected, actual=$actual, eps=$epsilon")
+}
+
+internal fun assertCloseEnough(expected: TextBox, actual: TextBox, epsilon: Float = EPSILON) {
     assertTrue(expected.isCloseEnoughTo(actual, epsilon), message = "expected=$expected, actual=$actual, eps=$epsilon")
 }
 
@@ -78,5 +87,9 @@ internal fun assertContentCloseEnough(expected: FloatArray, actual: FloatArray, 
 }
 
 internal fun assertContentCloseEnough(expected: Array<Point>, actual: Array<Point>, epsilon: Float = EPSILON) {
+    assertContentEquivalent(expected.iterator(), actual.iterator()) { a, b -> a.isCloseEnoughTo(b, epsilon) }
+}
+
+internal fun assertContentCloseEnough(expected: Array<TextBox>, actual: Array<TextBox>, epsilon: Float = EPSILON) {
     assertContentEquivalent(expected.iterator(), actual.iterator()) { a, b -> a.isCloseEnoughTo(b, epsilon) }
 }
