@@ -13,8 +13,8 @@ import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 
-private fun isNativeMac() = (hostOs == OS.MacOS) && (kotlinBackend == KotlinBackend.Native)
-private val COARSE_EPSILON = if (isNativeMac()) 2.01f else if (kotlinBackend == KotlinBackend.JS) 10e-5f else 10e-8f
+private fun isMacOrIOS() = (hostOs == OS.MacOS) || (hostOs == OS.Ios)
+private val COARSE_EPSILON = if (isMacOrIOS()) 2.4f else if (kotlinBackend == KotlinBackend.JS) 10e-5f else 10e-8f
 
 class FontTests {
     @Test
@@ -84,7 +84,7 @@ class FontTests {
                 assertCloseEnough(expected, actual, COARSE_EPSILON)
             }
 
-            if (!isNativeMac()) {
+            if (!isMacOrIOS()) {
                 assertEquals(26, firstGlyphPath.pointsCount)
 
                 assertCloseEnough(FontMetrics(
