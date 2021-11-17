@@ -126,14 +126,8 @@ KNativePointer ptrToInterop(T* ptr) {
     return ptr;
 }
 
-#if defined(__clang__) || defined(_MSC_VER)
-#define SKIKO_NO_RETURN __attribute__((noreturn))
-#else
-#define SKIKO_NO_RETURN __declspec(noreturn)
-#endif
-
-SKIKO_NO_RETURN void TODO(const char*);
-SKIKO_NO_RETURN void SKIKO_ASSERT(bool, const char*);
+[[ noreturn ]] void TODO(const char*);
+void SKIKO_ASSERT(bool, const char*);
 
 #ifdef SKIKO_WASM
 #include <emscripten.h>
