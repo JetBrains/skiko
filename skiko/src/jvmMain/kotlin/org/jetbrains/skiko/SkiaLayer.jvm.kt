@@ -94,36 +94,19 @@ actual open class SkiaLayer internal constructor(
         }
     }
 
-    private var fullscreenDispatcher = object : ComponentAdapter() {
-        var isFullscreenDispatched: Boolean = false
-        override fun componentShown(e: ComponentEvent) {
-            if (isFullscreenDispatched) {
-                backedLayer.fullscreen = isFullscreenDispatched
-                isFullscreenDispatched = false
-            }
-        }
-        override fun componentResized(e: ComponentEvent) {
-            _isFullscreen = backedLayer.fullscreen
-        }
-    }
+    private var fullscreenAdapter = FullscreenAdapter(backedLayer)
 
     override fun removeNotify() {
         val window = SwingUtilities.getRoot(this) as Window
-        window.removeComponentListener(fullscreenDispatcher.also {
-            it.isFullscreenDispatched = false
-        })
+        window.removeComponentListener(fullscreenAdapter)
         dispose()
         super.removeNotify()
     }
 
     override fun addNotify() {
         super.addNotify()
-        if (hostOs == OS.MacOS) {
-            // MacOS specific: if fullscreen is set before the window is visible,
-            // we will add a listener to set fullscreen after the window is visible
-            val window = SwingUtilities.getRoot(this) as Window
-            window.addComponentListener(fullscreenDispatcher)
-        }
+        val window = SwingUtilities.getRoot(this) as Window
+        window.addComponentListener(fullscreenAdapter)
         backedLayer.defineContentScale()
         checkShowing()
         init(isInited)
@@ -159,13 +142,10 @@ actual open class SkiaLayer internal constructor(
     val windowHandle: Long
         get() = backedLayer.windowHandle
 
-    private var _isFullscreen = false
     actual var fullscreen: Boolean
-        get() = _isFullscreen
+        get() = fullscreenAdapter.fullscreen
         set(value) {
-            _isFullscreen = value
-            fullscreenDispatcher.isFullscreenDispatched = value
-            backedLayer.fullscreen = value
+            fullscreenAdapter.fullscreen = value
         }
 
     actual var skikoView: SkikoView? = null

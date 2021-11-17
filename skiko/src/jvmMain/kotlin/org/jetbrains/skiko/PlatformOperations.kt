@@ -6,6 +6,34 @@ import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import javax.swing.SwingUtilities
 
+internal open class FullscreenAdapter(
+    val backedLayer: HardwareLayer
+): ComponentAdapter() {
+    private var _isFullscreenDispatched = false
+    private var _isFullscreen: Boolean = false
+    var fullscreen: Boolean
+        get() = backedLayer.fullscreen
+        set(value) {
+            _isFullscreen = value
+            val window = SwingUtilities.getRoot(backedLayer) as Window
+            if (window.isVisible) {
+                backedLayer.fullscreen = value
+            } else {
+                _isFullscreenDispatched = value
+            }
+        }
+
+    override fun componentShown(e: ComponentEvent) {
+        if (_isFullscreenDispatched) {
+            backedLayer.fullscreen = _isFullscreenDispatched
+        }
+    }
+
+    override fun componentResized(e: ComponentEvent) {
+        _isFullscreen = backedLayer.fullscreen
+    }
+}
+
 internal interface PlatformOperations {
     fun isFullscreen(component: Component): Boolean
     fun setFullscreen(component: Component, value: Boolean)
