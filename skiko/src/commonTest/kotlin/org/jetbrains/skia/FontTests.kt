@@ -13,8 +13,8 @@ import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 
-private fun isMacOrIOS() = (hostOs == OS.MacOS) || (hostOs == OS.Ios)
-private val COARSE_EPSILON = if (isMacOrIOS()) 2.4f else if (kotlinBackend == KotlinBackend.JS) 10e-5f else 10e-8f
+private fun isLinux() = (hostOs == OS.Linux)
+private val COARSE_EPSILON = if (isLinux()) 2.4f else if (kotlinBackend == KotlinBackend.JS) 10e-5f else 10e-6f
 
 class FontTests {
     @Test
@@ -29,12 +29,12 @@ class FontTests {
             assertContentEquals(shortArrayOf(17, 18, 19, 20, 21), glyphs)
 
             assertEquals(6, font.getStringGlyphsCount("EЙ를üẞ無"))
-            assertCloseEnough(49f, font.measureTextWidth("EЙ를üẞՇ無"), COARSE_EPSILON)
+            assertCloseEnough(50.4f, font.measureTextWidth("EЙ를üẞՇ無"), COARSE_EPSILON)
 
-            assertContentCloseEnough(floatArrayOf(7f, 7f, 7f, 7f, 7f), font.getWidths(glyphs), COARSE_EPSILON)
+            assertContentCloseEnough(floatArrayOf(7.2f, 7.2f, 7.2f, 7.2f, 7.2f), font.getWidths(glyphs), COARSE_EPSILON)
 
-            assertContentCloseEnough(floatArrayOf(0f, 7f, 14f, 21f, 28f), font.getXPositions(glyphs), COARSE_EPSILON)
-            assertContentCloseEnough(floatArrayOf(3f, 10f, 17f, 24f, 31f), font.getXPositions(glyphs, 3f), COARSE_EPSILON)
+            assertContentCloseEnough(floatArrayOf(0f, 7.2f, 14.4f, 21.6f, 28.8f), font.getXPositions(glyphs), COARSE_EPSILON)
+            assertContentCloseEnough(floatArrayOf(3f, 10.2f, 17.4f, 24.6f, 31.8f), font.getXPositions(glyphs, 3f), COARSE_EPSILON)
 
             val firstGlyphPath = font.getPath(glyphs[0])!!
             assertContentCloseEnough(
@@ -47,16 +47,16 @@ class FontTests {
                 ),
                 // TODO: investigate why we have nullable points at all
                 (firstGlyphPath.points.toList() as List<Point>).subList(0, 5),
-                COARSE_EPSILON
+                10e-3f
             )
 
             assertContentCloseEnough(
                 arrayOf(
                     Point(0f, 0f),
-                    Point(7f, 0f),
-                    Point(14f, 0f),
-                    Point(21f, 0f),
-                    Point(28f, 0f),
+                    Point(7.2f, 0f),
+                    Point(14.4f, 0f),
+                    Point(21.6f, 0f),
+                    Point(28.8f, 0f),
                 ), font.getPositions(glyphs),
                 COARSE_EPSILON
             )
@@ -64,28 +64,28 @@ class FontTests {
             assertContentCloseEnough(
                 arrayOf(
                     Point(3f, 2f),
-                    Point(10f, 2f),
-                    Point(17f, 2f),
-                    Point(24f, 2f),
-                    Point(31f, 2f),
+                    Point(10.2f, 2f),
+                    Point(17.4f, 2f),
+                    Point(24.6f, 2f),
+                    Point(31.8f, 2f),
                 ), font.getPositions(glyphs, Point(3f, 2f)),
                 COARSE_EPSILON
             )
 
             val expectedGlyphBounds = arrayOf(
-                Rect(0.0f, -9.0f, 7.0f, 0.0f),
-                Rect(1.0f, -9.0f, 7.0f, 0.0f),
-                Rect(1.0f, -9.0f, 7.0f, 0.0f),
-                Rect(1.0f, -9.0f, 7.0f, 0.0f),
-                Rect(1.0f, -9.0f, 7.0f, 0.0f)
+                Rect(-1f, -10.0f, 8.0f, 1.0f),
+                Rect(0f, -10.0f, 8.0f, 1.0f),
+                Rect(0f, -10.0f, 8.0f, 2.0f),
+                Rect(0f, -10.0f, 8.0f, 1.0f),
+                Rect(0f, -10.0f, 8.0f, 1.0f),
             )
 
             expectedGlyphBounds.zip(font.getBounds(glyphs)).forEach { (expected, actual) ->
                 assertCloseEnough(expected, actual, COARSE_EPSILON)
             }
 
-            if (!isMacOrIOS()) {
-                assertEquals(26, firstGlyphPath.pointsCount)
+            if (!isLinux()) {
+                assertEquals(24, firstGlyphPath.pointsCount)
 
                 assertCloseEnough(FontMetrics(
                     -11.64f,
@@ -93,7 +93,7 @@ class FontTests {
                     3.2400002f,
                     3.2400002f,
                     0f,
-                    7.2000003f,
+                    29.460001f,
                     29.460001f,
                     -20.880001f,
                     8.58f,
@@ -101,9 +101,9 @@ class FontTests {
                     8.64f,
                     0.54f,
                     1.4399999f,
-                    0.54f,
-                    -3.8999999f
-                ), font.metrics, COARSE_EPSILON)
+                    null,
+                    null
+                ), font.metrics, 10e-3f)
 
             }
 
