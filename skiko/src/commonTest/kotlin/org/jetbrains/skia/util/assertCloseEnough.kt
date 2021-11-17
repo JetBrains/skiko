@@ -113,6 +113,10 @@ internal fun assertContentCloseEnough(expected: Array<Point>, actual: Array<Poin
     assertContentEquivalent(expected.iterator(), actual.iterator()) { a, b -> a.isCloseEnoughTo(b, epsilon) }
 }
 
+internal fun assertContentCloseEnough(expected: List<Point>, actual: List<Point>, epsilon: Float = EPSILON) {
+    assertContentEquivalent(expected.iterator(), actual.iterator()) { a, b -> a.isCloseEnoughTo(b, epsilon) }
+}
+
 internal fun assertContentCloseEnough(expected: Array<TextBox>, actual: Array<TextBox>, epsilon: Float = EPSILON) {
     assertContentEquivalent(expected.iterator(), actual.iterator()) { a, b -> a.isCloseEnoughTo(b, epsilon) }
 }

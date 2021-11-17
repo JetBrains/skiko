@@ -3,7 +3,6 @@ package org.jetbrains.skia
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.InteropPointer
-import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats

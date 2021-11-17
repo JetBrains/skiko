@@ -253,9 +253,10 @@ SKIKO_EXPORT KFloat org_jetbrains_skia_Font__1nMeasureTextWidth
 }
 
 
-SKIKO_EXPORT KFloat* org_jetbrains_skia_Font__1nGetWidths
-  (KNativePointer ptr, KShort* glyphsArr) {
-    TODO("implement org_jetbrains_skia_Font__1nGetWidths");
+SKIKO_EXPORT void org_jetbrains_skia_Font__1nGetWidths
+  (KNativePointer ptr, KShort* glyphs, KInt count, KFloat* widths) {
+    SkFont* instance = reinterpret_cast<SkFont*>(ptr);
+    instance->getWidths(reinterpret_cast<SkGlyphID*>(glyphs), count, widths);
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_Font__1nGetBounds
