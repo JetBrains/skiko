@@ -1,7 +1,7 @@
 package org.jetbrains.skiko
 
 // Clicked mouse buttons bitmask.
-class SkikoMouseButtons(val value: Int) {
+inline class SkikoMouseButtons(val value: Int) {
     companion object {
         val NONE = SkikoMouseButtons(0)
         val LEFT = SkikoMouseButtons(1)
@@ -25,7 +25,7 @@ class SkikoMouseButtons(val value: Int) {
     }
 
     override fun toString(): String {
-        return mutableListOf<String>().apply {
+        val result = mutableListOf<String>().apply {
             if (has(SkikoMouseButtons.LEFT)) {
                 add("LEFT")
             }
@@ -50,14 +50,12 @@ class SkikoMouseButtons(val value: Int) {
             if (has(SkikoMouseButtons.BUTTON_8)) {
                 add("BUTTON_8")
             }
-            if (isEmpty()) {
-                add("NONE")
-            }
-        }.toString()
+        }
+        return if (!result.isEmpty()) result.toString() else ""
     }
 }
 
-class SkikoInputModifiers(val value: Int) {
+inline class SkikoInputModifiers(val value: Int) {
     companion object {
         val EMPTY = SkikoInputModifiers(0)
         val META = SkikoInputModifiers(1)
@@ -74,7 +72,7 @@ class SkikoInputModifiers(val value: Int) {
     }
 
     override fun toString(): String {
-        return mutableListOf<String>().apply {
+        val result = mutableListOf<String>().apply {
             if (has(SkikoInputModifiers.META)) {
                 add("META")
             }
@@ -87,10 +85,8 @@ class SkikoInputModifiers(val value: Int) {
             if (has(SkikoInputModifiers.SHIFT)) {
                 add("SHIFT")
             }
-            if (isEmpty()) {
-                add("EMPTY")
-            }
-        }.toString()
+        }
+        return if (!result.isEmpty()) result.toString() else ""
     }
 }
 

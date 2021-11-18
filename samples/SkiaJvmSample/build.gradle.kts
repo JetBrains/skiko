@@ -77,7 +77,7 @@ tasks.register("runWithTransparency") {
 }
 
 tasks.register("runInterop") {
-    additionalArguments += mapOf("skiko.interop" to "true")
+    additionalArguments += mapOf("skiko.swing.interop" to "true")
     dependsOn(casualRun)
 }
 

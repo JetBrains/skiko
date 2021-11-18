@@ -30,7 +30,7 @@ fun toSkikoEvent(
     )
 }
 
-fun toSkikoMouseButtons(event: MouseEvent, pressed: Boolean): SkikoMouseButtons {
+private fun toSkikoMouseButtons(event: MouseEvent, pressed: Boolean): SkikoMouseButtons {
     // https://www.w3schools.com/jsref/event_button.asp
     var result = 0
     if (pressed && event.button.toInt() == 0) {
@@ -45,7 +45,7 @@ fun toSkikoMouseButtons(event: MouseEvent, pressed: Boolean): SkikoMouseButtons 
     return SkikoMouseButtons(result)
 }
 
-fun toSkikoModifiers(event: MouseEvent): SkikoInputModifiers {
+private fun toSkikoModifiers(event: MouseEvent): SkikoInputModifiers {
     var result = 0
     if (event.altKey) {
         result = result.or(SkikoInputModifiers.ALT.value)
@@ -62,7 +62,7 @@ fun toSkikoModifiers(event: MouseEvent): SkikoInputModifiers {
     return SkikoInputModifiers(result)
 }
 
-fun toSkikoModifiers(event: KeyboardEvent): SkikoInputModifiers {
+private fun toSkikoModifiers(event: KeyboardEvent): SkikoInputModifiers {
     var result = 0
     if (event.altKey) {
         result = result.or(SkikoInputModifiers.ALT.value)

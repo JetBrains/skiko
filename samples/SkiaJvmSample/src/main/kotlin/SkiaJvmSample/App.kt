@@ -11,8 +11,8 @@ import java.io.File
 import java.nio.file.Files
 import javax.imageio.ImageIO
 
-fun main() {
-    val windows = 1
+fun main(args: Array<String>) {
+    val windows = parseArgs(args)
     repeat(windows) {
         when (System.getProperty("skiko.interop")) {
             "true" -> SwingSkia()
@@ -115,4 +115,18 @@ fun createWindow(title: String, exitOnClose: Boolean) = SwingUtilities.invokeLat
     window.pack()
     skiaLayer.paint(window.graphics)
     window.isVisible = true
+}
+
+private fun parseArgs(args: Array<String>): Int {
+    var windows = 1
+    for(arg in args) {
+        try {
+            windows = arg.toInt()
+            break      
+        }
+        catch(e: NumberFormatException) {
+            println("The passed argument:($arg) is not a integer number!")
+        }
+    }
+    return windows
 }

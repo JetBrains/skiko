@@ -103,19 +103,20 @@ class ClocksJvm(private val layer: SkiaLayer): SkikoView {
 
     override fun onPointerEvent(event: SkikoPointerEvent) {
         when (event.kind) {
+            SkikoPointerEventKind.DOWN,
             SkikoPointerEventKind.MOVE -> {
                 xpos = event.x
                 ypos = event.y
             }
-            else -> { println("PointerEvent: ${event.modifiers} + ${event.kind} + ${event.buttons}") }
         }
+        // TODO: provide example that covers all features of pointer event
     }
 
     override fun onInputEvent(event: SkikoInputEvent) {
-        // TODO: provide examplec
+        // TODO: provide example that covers all features of text input event
     }
 
     override fun onKeyboardEvent(event: SkikoKeyboardEvent) {
-        println("KeyboardEvent: ${event.kind} ${event.modifiers} + ${event.code}")
+        // TODO: provide example that covers all features of keyboard event
     }
 }

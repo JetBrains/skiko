@@ -37,7 +37,7 @@ fun toSkikoEvent(
     )
 }
 
-fun toSkikoMouseButtons(event: NSEvent): SkikoMouseButtons {
+private fun toSkikoMouseButtons(event: NSEvent): SkikoMouseButtons {
     var result = 0
     val mask = event.buttonMask.toInt()
     if ((mask and 1) != 0 || event.buttonNumber == 0L) {
@@ -49,6 +49,6 @@ fun toSkikoMouseButtons(event: NSEvent): SkikoMouseButtons {
     return SkikoMouseButtons(result)
 }
 
-fun toSkikoModifiers(event: NSEvent): SkikoInputModifiers {
+private fun toSkikoModifiers(event: NSEvent): SkikoInputModifiers {
     return SkikoInputModifiers.EMPTY
 }
