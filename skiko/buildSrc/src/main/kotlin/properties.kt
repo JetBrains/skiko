@@ -17,6 +17,14 @@ enum class OS(
         get() = this == Windows
 }
 
+val OS.isCompatibleWithHost: Boolean
+    get() = when (this) {
+        OS.Linux -> hostOs == OS.Linux
+        OS.Windows -> hostOs == OS.Windows
+        OS.MacOS, OS.IOS -> hostOs == OS.MacOS
+        OS.Wasm -> true
+    }
+
 fun compilerForTarget(os: OS, arch: Arch): String =
     when (os) {
         OS.Linux -> when (arch) {
