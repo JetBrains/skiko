@@ -311,10 +311,9 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontKt__1nGetPath
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontKt__1nGetPaths
-  (JNIEnv* env, jclass jclass, jlong ptr, jshortArray glyphsArr) {
+  (JNIEnv* env, jclass jclass, jlong ptr, jshortArray glyphsArr, jint count) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
 
-    int count = env->GetArrayLength(glyphsArr);
     jshort* glyphs = env->GetShortArrayElements(glyphsArr, nullptr);
 
     struct Ctx {

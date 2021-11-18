@@ -539,7 +539,7 @@ class Font : Managed {
             Stats.onNativeCall()
             arrayDecoderScope({
                 ArrayDecoder(
-                    interopScope { _nGetPaths(_ptr, toInterop(glyphs)) }, Path_nGetFinalizer()
+                    interopScope { _nGetPaths(_ptr, toInterop(glyphs), glyphs?.size ?: 0) }, Path_nGetFinalizer()
                 )
             }) { arrayDecoder ->
                 (0 until arrayDecoder.size).map { i->
@@ -710,7 +710,7 @@ private external fun _nGetXPositions(ptr: NativePointer, glyphs: InteropPointer,
 private external fun _nGetPath(ptr: NativePointer, glyph: Short): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetPaths")
-private external fun _nGetPaths(ptr: NativePointer, glyphs: InteropPointer): NativePointer
+private external fun _nGetPaths(ptr: NativePointer, glyphs: InteropPointer, count: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetMetrics")
 private external fun _nGetMetrics(ptr: NativePointer, metrics: InteropPointer)
