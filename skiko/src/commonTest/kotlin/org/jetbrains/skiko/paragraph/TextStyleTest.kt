@@ -1,14 +1,11 @@
 package org.jetbrains.skiko.paragraph
 
 import org.jetbrains.skia.Color
-import org.jetbrains.skia.FontMetrics
 import org.jetbrains.skia.impl.use
 import org.jetbrains.skia.paragraph.DecorationLineStyle
 import org.jetbrains.skia.paragraph.DecorationStyle
 import org.jetbrains.skia.paragraph.TextStyle
 import org.jetbrains.skia.paragraph.TextStyleAttribute
-import org.jetbrains.skiko.tests.SkipJsTarget
-import org.jetbrains.skiko.tests.SkipNativeTarget
 import kotlin.test.*
 
 class TextStyleTest {
@@ -96,6 +93,15 @@ class TextStyleTest {
             assertNull(textStyle.height)
             textStyle.height = 4f
             assertEquals(4f, textStyle.height)
+        }
+    }
+
+    @Test
+    fun textStyleBaselineTest() {
+        TextStyle().use { textStyle ->
+            assertEquals(0.0f, textStyle.baselineShift)
+            textStyle.baselineShift = 4f
+            assertEquals(4f, textStyle.baselineShift)
         }
     }
 
