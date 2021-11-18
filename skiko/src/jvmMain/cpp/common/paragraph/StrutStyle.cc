@@ -33,11 +33,17 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_paragraph_StrutSty
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleKt__1nGetFontFamilies
   (JNIEnv* env, jclass jclass, jlong ptr) {
     StrutStyle* instance = reinterpret_cast<StrutStyle*>(static_cast<uintptr_t>(ptr));
-    return javaStringArray(env, instance->getFontFamilies());
+
+    std::vector<jlong>* res = new std::vector<jlong>();
+    for (auto& fontFamily : instance->getFontFamilies()) {
+        res->push_back(reinterpret_cast<jlong>(new SkString(fontFamily)));
+    }
+
+    return reinterpret_cast<jlong>(res);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleKt__1nSetFontFamilies
-  (JNIEnv* env, jclass jclass, jlong ptr, jobjectArray familiesArr) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleKt_StrutStyle_1nSetFontFamilies
+  (JNIEnv* env, jclass jclass, jlong ptr, jobjectArray familiesArr, jint familiesCount) {
     StrutStyle* instance = reinterpret_cast<StrutStyle*>(static_cast<uintptr_t>(ptr));
     instance->setFontFamilies(skStringVector(env, familiesArr));
 }

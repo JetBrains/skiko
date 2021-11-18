@@ -18,7 +18,9 @@ class StrutStyleTests {
 
             assertEquals(FontStyle(300, 4, FontSlant.ITALIC), strutStyle.fontStyle)
 
-            assertContentEquals(arrayOf(), strutStyle.fontFamilies)
+
+            strutStyle.setFontFamilies(arrayOf("MonacoShmonaco"))
+            assertContentEquals(arrayOf("MonacoShmonaco"), strutStyle.fontFamilies)
         }
     }
 }
