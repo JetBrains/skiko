@@ -212,10 +212,10 @@ internal val Project.isInIdea: Boolean
     }
 
 val Project.supportNative: Boolean
-   get() = (properties.get("skiko.native.enabled") == "true") || isInIdea
+   get() = findProperty("skiko.native.enabled") == "true" || isInIdea
 
 val Project.supportWasm: Boolean
-    get() = properties.get("skiko.wasm.enabled") == "true"
+    get() = findProperty("skiko.wasm.enabled") == "true" || isInIdea
 
 kotlin {
     jvm {
