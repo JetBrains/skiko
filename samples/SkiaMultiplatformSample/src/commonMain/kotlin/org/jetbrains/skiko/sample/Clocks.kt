@@ -5,12 +5,7 @@ import org.jetbrains.skia.paragraph.FontCollection
 import org.jetbrains.skia.paragraph.ParagraphBuilder
 import org.jetbrains.skia.paragraph.ParagraphStyle
 import org.jetbrains.skia.paragraph.TextStyle
-import org.jetbrains.skiko.SkikoView
-import org.jetbrains.skiko.SkikoPointerEvent
-import org.jetbrains.skiko.SkikoGestureEvent
-import org.jetbrains.skiko.SkikoGestureEventKind
-import org.jetbrains.skiko.SkikoGestureEventState
-import org.jetbrains.skiko.isLeftClick
+import org.jetbrains.skiko.*
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.PI
@@ -94,10 +89,21 @@ class Clocks: SkikoView {
     }
 
     override fun onPointerEvent(event: SkikoPointerEvent) {
-        if (event.isLeftClick) {
-            xpos = event.x
-            ypos = event.y
+        when (event.kind) {
+            SkikoPointerEventKind.MOVE -> {
+                xpos = event.x
+                ypos = event.y
+            }
+            else -> { println("PointerEvent: ${event.modifiers} + ${event.kind} + ${event.buttons}") }
         }
+    }
+
+    override fun onInputEvent(event: SkikoInputEvent) {
+        // TODO: provide examplec
+    }
+
+    override fun onKeyboardEvent(event: SkikoKeyboardEvent) {
+        println("KeyboardEvent: ${event.kind} ${event.modifiers} + ${event.code}")
     }
 
     override fun onGestureEvent(event: SkikoGestureEvent) {

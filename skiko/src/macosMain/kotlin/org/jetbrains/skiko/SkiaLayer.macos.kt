@@ -41,28 +41,6 @@ actual open class SkiaLayer {
     private var picture: PictureHolder? = null
     private val pictureRecorder = PictureRecorder()
 
-    private fun eventToMouse(event: NSEvent, kind: SkikoPointerEventKind): SkikoPointerEvent {
-        var buttons = SkikoMouseButtons.NONE
-        val mask = event.buttonMask.toInt()
-        if ((mask and 1) != 0 || event.buttonNumber == 0L) {
-            buttons = buttons or SkikoMouseButtons.LEFT
-        }
-        if ((mask and 2) != 0 || event.buttonNumber == 1L) {
-            buttons = buttons or SkikoMouseButtons.RIGHT
-        }
-        var (x, y) = event.locationInWindow.useContents {
-            this.x to this.y
-        }
-        // Translate.
-        nsView.frame.useContents {
-           y = size.height - y
-        }
-        return SkikoPointerEvent(x, y, buttons, kind, event)
-    }
-
-    private fun eventToKeyboard(event: NSEvent, kind: SkikoKeyboardEventKind): SkikoKeyboardEvent {
-         return SkikoKeyboardEvent(event.keyCode.toInt(), kind, event)
-    }
     actual fun attachTo(container: Any) {
         attachTo(container as NSWindow)
     }
@@ -90,25 +68,25 @@ actual open class SkiaLayer {
             }
 
             override fun rightMouseDown(event: NSEvent) {
-                skikoView?.onPointerEvent(eventToMouse(event, SkikoPointerEventKind.DOWN))
+                skikoView?.onPointerEvent(toSkikoEvent(event, SkikoPointerEventKind.DOWN, nsView))
             }
             override fun rightMouseUp(event: NSEvent) {
-                skikoView?.onPointerEvent(eventToMouse(event, SkikoPointerEventKind.UP))
+                skikoView?.onPointerEvent(toSkikoEvent(event, SkikoPointerEventKind.UP, nsView))
             }
             override fun mouseDown(event: NSEvent) {
-                skikoView?.onPointerEvent(eventToMouse(event, SkikoPointerEventKind.DOWN))
+                skikoView?.onPointerEvent(toSkikoEvent(event, SkikoPointerEventKind.DOWN, nsView))
             }
             override fun mouseUp(event: NSEvent) {
-                skikoView?.onPointerEvent(eventToMouse(event, SkikoPointerEventKind.UP))
+                skikoView?.onPointerEvent(toSkikoEvent(event, SkikoPointerEventKind.UP, nsView))
             }
             override fun mouseMoved(event: NSEvent) {
-                skikoView?.onPointerEvent(eventToMouse(event, SkikoPointerEventKind.MOVE))
+                skikoView?.onPointerEvent(toSkikoEvent(event, SkikoPointerEventKind.MOVE, nsView))
             }
             override fun keyDown(event: NSEvent) {
-                skikoView?.onKeyboardEvent(eventToKeyboard(event, SkikoKeyboardEventKind.DOWN))
+                skikoView?.onKeyboardEvent(toSkikoEvent(event, SkikoKeyboardEventKind.DOWN))
             }
             override fun keyUp(event: NSEvent) {
-                skikoView?.onKeyboardEvent(eventToKeyboard(event, SkikoKeyboardEventKind.UP))
+                skikoView?.onKeyboardEvent(toSkikoEvent(event, SkikoKeyboardEventKind.UP))
             }
 
             @ObjCAction
