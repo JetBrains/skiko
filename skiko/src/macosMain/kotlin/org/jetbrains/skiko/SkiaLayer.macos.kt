@@ -65,7 +65,10 @@ actual open class SkiaLayer() {
             override fun updateTrackingAreas() {
                 trackingArea?.let { removeTrackingArea(it) }
                 trackingArea = NSTrackingArea(rect = bounds,
-                    options = NSMouseMoved or NSTrackingActiveInActiveApp,
+                    options = NSTrackingActiveAlways or
+                        NSTrackingMouseEnteredAndExited or
+                        NSTrackingMouseMoved or
+                        NSTrackingInVisibleRect,
                     owner = nsView, userInfo = null)
                 nsView.addTrackingArea(trackingArea!!)
             }
@@ -84,6 +87,9 @@ actual open class SkiaLayer() {
             }
             override fun mouseMoved(event: NSEvent) {
                 skikoView?.onPointerEvent(toSkikoEvent(event, SkikoPointerEventKind.MOVE, nsView))
+            }
+            override fun mouseDragged(event: NSEvent) {
+                skikoView?.onPointerEvent(toSkikoEvent(event, SkikoPointerEventKind.DRAG, nsView))
             }
             override fun keyDown(event: NSEvent) {
                 skikoView?.onKeyboardEvent(toSkikoEvent(event, SkikoKeyboardEventKind.DOWN))

@@ -102,6 +102,7 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
                 xpos = event.x
                 ypos = event.y
             }
+            else -> {}
         }
         // TODO: provide example that covers all features of pointer event
     }
@@ -111,6 +112,7 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
     }
 
     override fun onKeyboardEvent(event: SkikoKeyboardEvent) {
+        println(event.kind)
         // TODO: provide example that covers all features of keyboard event
     }
 
