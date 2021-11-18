@@ -2,6 +2,15 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skia.impl.InteropPointer
+import org.jetbrains.skia.impl.Managed
+import org.jetbrains.skia.impl.Native
+import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.interopScope
+import org.jetbrains.skia.impl.withResult
 
 class Font : Managed {
     companion object {
@@ -327,8 +336,12 @@ class Font : Managed {
     fun getUTF32Glyphs(uni: IntArray?): ShortArray {
         return try {
             Stats.onNativeCall()
-            withResult(ShortArray(uni?.size ?: 0)) {
-                _nGetUTF32Glyphs(_ptr, toInterop(uni), uni?.size ?: 0, it)
+            if (uni == null) {
+                shortArrayOf()
+            } else {
+                withResult(ShortArray(uni.size)) {
+                    _nGetUTF32Glyphs(_ptr, toInterop(uni), uni.size, it)
+                }
             }
         } finally {
             reachabilityBarrier(this)
@@ -353,7 +366,7 @@ class Font : Managed {
     fun getStringGlyphsCount(s: String?): Int {
         return try {
             Stats.onNativeCall()
-            _nGetStringGlyphsCount(_ptr, s)
+            interopScope { _nGetStringGlyphsCount(_ptr, toInterop(s), s?.length ?: 0) }
         } finally {
             reachabilityBarrier(this)
         }
@@ -368,7 +381,9 @@ class Font : Managed {
     fun measureText(s: String?, p: Paint? = null): Rect {
         return try {
             Stats.onNativeCall()
-            _nMeasureText(_ptr, s, getPtr(p))
+            Rect.fromInteropPointer() {
+                _nMeasureText(_ptr, toInterop(s), s?.length ?: 0, getPtr(p), it)
+            }
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(p)
@@ -383,11 +398,15 @@ class Font : Managed {
     fun measureTextWidth(s: String?, p: Paint?): Float {
         return try {
             Stats.onNativeCall()
-            _nMeasureTextWidth(
-                _ptr,
-                s,
-                getPtr(p)
-            )
+            interopScope {
+                _nMeasureTextWidth(
+                    _ptr,
+                    toInterop(s),
+                    s?.length ?: 0,
+                    getPtr(p)
+                )
+            }
+
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(p)
@@ -400,7 +419,13 @@ class Font : Managed {
     fun getWidths(glyphs: ShortArray?): FloatArray {
         return try {
             Stats.onNativeCall()
-            _nGetWidths(_ptr, glyphs)
+            if (glyphs == null) {
+                return floatArrayOf()
+            } else {
+                withResult(FloatArray(glyphs.size)) {
+                    _nGetWidths(_ptr, toInterop(glyphs), glyphs.size, it)
+                }
+            }
         } finally {
             reachabilityBarrier(this)
         }
@@ -419,11 +444,20 @@ class Font : Managed {
     fun getBounds(glyphs: ShortArray?, p: Paint?): Array<Rect> {
         return try {
             Stats.onNativeCall()
-            _nGetBounds(
-                _ptr,
-                glyphs,
-                getPtr(p)
-            )
+
+            if (glyphs == null) {
+                emptyArray()
+            } else {
+                Rect.fromInteropPointer(glyphs.size * 4) {
+                    _nGetBounds(
+                        _ptr,
+                        toInterop(glyphs),
+                        glyphs.size,
+                        getPtr(p),
+                        it
+                    )
+                }
+            }
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(p)
@@ -434,12 +468,7 @@ class Font : Managed {
      * Retrieves the positions for each glyph.
      */
     fun getPositions(glyphs: ShortArray?): Array<Point> {
-        return try {
-            Stats.onNativeCall()
-            _nGetPositions(_ptr, glyphs, 0f, 0f)
-        } finally {
-            reachabilityBarrier(this)
-        }
+        return getPositions(glyphs, Point(0f, 0f))
     }
 
     /**
@@ -448,19 +477,16 @@ class Font : Managed {
     fun getPositions(glyphs: ShortArray?, offset: Point): Array<Point> {
         return try {
             Stats.onNativeCall()
-            _nGetPositions(_ptr, glyphs, offset.x, offset.y)
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
-
-    /**
-     * Retrieves the x-positions for each glyph.
-     */
-    fun getXPositions(glyphs: ShortArray?): FloatArray {
-        return try {
-            Stats.onNativeCall()
-            _nGetXPositions(_ptr, glyphs, 0f)
+            if (glyphs == null) {
+                emptyArray()
+            } else {
+                val positionsData = withResult(FloatArray(glyphs.size * 2)) {
+                    _nGetPositions(_ptr, toInterop(glyphs), glyphs.size, offset.x, offset.y, it)
+                }
+                (0 until glyphs.size).map { i ->
+                    Point(positionsData[2*i], positionsData[2*i + 1])
+                }.toTypedArray()
+            }
         } finally {
             reachabilityBarrier(this)
         }
@@ -469,10 +495,23 @@ class Font : Managed {
     /**
      * Retrieves the x-positions for each glyph, beginning at the specified origin.
      */
+    fun getXPositions(glyphs: ShortArray?): FloatArray {
+        return getXPositions(glyphs, 0f)
+    }
+
+    /**
+     * Retrieves the x-positions for each glyph, beginning at the specified origin.
+     */
     fun getXPositions(glyphs: ShortArray?, offset: Float): FloatArray {
         return try {
             Stats.onNativeCall()
-            _nGetXPositions(_ptr, glyphs, offset)
+            if (glyphs == null) {
+                floatArrayOf()
+            } else {
+                withResult(FloatArray(glyphs.size)) {
+                    _nGetXPositions(_ptr, toInterop(glyphs), offset, glyphs.size, it)
+                }
+            }
         } finally {
             reachabilityBarrier(this)
         }
@@ -511,7 +550,9 @@ class Font : Managed {
     val metrics: FontMetrics
         get() = try {
             Stats.onNativeCall()
-            _nGetMetrics(_ptr)
+            FontMetrics.fromInteropPointer {
+                _nGetMetrics(_ptr, it)
+            }
         } finally {
             reachabilityBarrier(this)
         }
@@ -630,9 +671,6 @@ private external fun _nSetScaleX(ptr: NativePointer, value: Float)
 @ExternalSymbolName("org_jetbrains_skia_Font__1nSetSkewX")
 private external fun _nSetSkewX(ptr: NativePointer, value: Float)
 
-@ExternalSymbolName("org_jetbrains_skia_Font__1nGetStringGlyphs")
-private external fun _nGetStringGlyphs(ptr: NativePointer, str: String?): ShortArray?
-
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetUTF32Glyph")
 private external fun _nGetUTF32Glyph(ptr: NativePointer, uni: Int): Short
 
@@ -640,25 +678,25 @@ private external fun _nGetUTF32Glyph(ptr: NativePointer, uni: Int): Short
 private external fun _nGetUTF32Glyphs(ptr: NativePointer, uni: InteropPointer, uniArrLen: Int, resultGlyphs: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetStringGlyphsCount")
-private external fun _nGetStringGlyphsCount(ptr: NativePointer, str: String?): Int
+private external fun _nGetStringGlyphsCount(ptr: NativePointer, str: InteropPointer, len: Int): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nMeasureText")
-private external fun _nMeasureText(ptr: NativePointer, str: String?, paintPtr: NativePointer): Rect
+private external fun _nMeasureText(ptr: NativePointer, str: InteropPointer, len: Int, paintPtr: NativePointer, rect: InteropPointer): Rect
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nMeasureTextWidth")
-private external fun _nMeasureTextWidth(ptr: NativePointer, str: String?, paintPtr: NativePointer): Float
+private external fun _nMeasureTextWidth(ptr: NativePointer, str: InteropPointer, len: Int, paintPtr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetWidths")
-private external fun _nGetWidths(ptr: NativePointer, glyphs: ShortArray?): FloatArray
+private external fun _nGetWidths(ptr: NativePointer, glyphs: InteropPointer, count: Int, width: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetBounds")
-private external fun _nGetBounds(ptr: NativePointer, glyphs: ShortArray?, paintPtr: NativePointer): Array<Rect>
+private external fun _nGetBounds(ptr: NativePointer, glyphs: InteropPointer, count: Int, paintPtr: NativePointer, bounds: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetPositions")
-private external fun _nGetPositions(ptr: NativePointer, glyphs: ShortArray?, x: Float, y: Float): Array<Point>
+private external fun _nGetPositions(ptr: NativePointer, glyphs: InteropPointer, count: Int, x: Float, y: Float, positions: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetXPositions")
-private external fun _nGetXPositions(ptr: NativePointer, glyphs: ShortArray?, x: Float): FloatArray
+private external fun _nGetXPositions(ptr: NativePointer, glyphs: InteropPointer, x: Float, count: Int, positions: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetPath")
 private external fun _nGetPath(ptr: NativePointer, glyph: Short): NativePointer
@@ -667,7 +705,7 @@ private external fun _nGetPath(ptr: NativePointer, glyph: Short): NativePointer
 private external fun _nGetPaths(ptr: NativePointer, glyphs: ShortArray?): Array<Path>
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetMetrics")
-private external fun _nGetMetrics(ptr: NativePointer): FontMetrics
+private external fun _nGetMetrics(ptr: NativePointer, metrics: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetSpacing")
 private external fun _nGetSpacing(ptr: NativePointer): Float

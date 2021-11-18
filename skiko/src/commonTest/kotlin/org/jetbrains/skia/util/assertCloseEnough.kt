@@ -1,6 +1,7 @@
 package org.jetbrains.skia.tests
 
 import org.jetbrains.skia.Color4f
+import org.jetbrains.skia.FontMetrics
 import org.jetbrains.skia.Matrix33
 import org.jetbrains.skia.Point
 import org.jetbrains.skia.Rect
@@ -12,7 +13,9 @@ import kotlin.test.assertTrue
 
 private val EPSILON = if (kotlinBackend == KotlinBackend.JS) 0.00001f else 0.00000001f
 
-private inline fun Float.isCloseEnoughTo(b: Float, epsilon: Float) = abs(this - b) < epsilon
+private inline fun Float?.isCloseEnoughTo(b: Float?, epsilon: Float) =
+    if (this == null) b == null else if (b == null) false else abs(this - b) < epsilon
+
 private inline fun Point.isCloseEnoughTo(b: Point, epsilon: Float) =
     x.isCloseEnoughTo(b.x, epsilon) && y.isCloseEnoughTo(b.y, epsilon)
 
@@ -21,6 +24,22 @@ private inline fun Color4f.isCloseEnoughTo(otherColor: Color4f, epsilon: Float) 
         otherColor.g,
         epsilon
     ) && b.isCloseEnoughTo(otherColor.b, epsilon) && a.isCloseEnoughTo(otherColor.a, epsilon)
+
+private inline fun FontMetrics.isCloseEnoughTo(b: FontMetrics, epsilon: Float) =
+        top.isCloseEnoughTo(b.top, epsilon) &&
+        ascent.isCloseEnoughTo(b.ascent, epsilon) &&
+        descent.isCloseEnoughTo(b.descent, epsilon) &&
+        bottom.isCloseEnoughTo(b.bottom, epsilon) &&
+        leading.isCloseEnoughTo(b.leading, epsilon) &&
+        avgCharWidth.isCloseEnoughTo(b.avgCharWidth, epsilon) &&
+        maxCharWidth.isCloseEnoughTo(b.maxCharWidth, epsilon) &&
+        xMin.isCloseEnoughTo(b.xMin, epsilon) &&
+        xHeight.isCloseEnoughTo(b.xHeight, epsilon) &&
+        capHeight.isCloseEnoughTo(b.capHeight, epsilon) &&
+        underlineThickness.isCloseEnoughTo(b.underlineThickness, epsilon) &&
+        underlinePosition.isCloseEnoughTo(b.underlinePosition, epsilon) &&
+        strikeoutThickness.isCloseEnoughTo(b.strikeoutThickness, epsilon) &&
+        strikeoutPosition.isCloseEnoughTo(b.strikeoutPosition, epsilon)
 
 private inline fun Rect.isCloseEnoughTo(rect: Rect, epsilon: Float): Boolean =
     left.isCloseEnoughTo(rect.left, epsilon) && right.isCloseEnoughTo(rect.right, epsilon)
@@ -39,6 +58,10 @@ internal fun assertCloseEnough(expected: Point, actual: Point, epsilon: Float = 
 }
 
 internal fun assertCloseEnough(expected: TextBox, actual: TextBox, epsilon: Float = EPSILON) {
+    assertTrue(expected.isCloseEnoughTo(actual, epsilon), message = "expected=$expected, actual=$actual, eps=$epsilon")
+}
+
+internal fun assertCloseEnough(expected: FontMetrics, actual: FontMetrics, epsilon: Float = EPSILON) {
     assertTrue(expected.isCloseEnoughTo(actual, epsilon), message = "expected=$expected, actual=$actual, eps=$epsilon")
 }
 
@@ -87,6 +110,10 @@ internal fun assertContentCloseEnough(expected: FloatArray, actual: FloatArray, 
 }
 
 internal fun assertContentCloseEnough(expected: Array<Point>, actual: Array<Point>, epsilon: Float = EPSILON) {
+    assertContentEquivalent(expected.iterator(), actual.iterator()) { a, b -> a.isCloseEnoughTo(b, epsilon) }
+}
+
+internal fun assertContentCloseEnough(expected: List<Point>, actual: List<Point>, epsilon: Float = EPSILON) {
     assertContentEquivalent(expected.iterator(), actual.iterator()) { a, b -> a.isCloseEnoughTo(b, epsilon) }
 }
 

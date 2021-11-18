@@ -2,6 +2,7 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.InteropScope
+import org.jetbrains.skia.impl.getPtr
 import org.jetbrains.skia.impl.withResult
 import kotlin.jvm.JvmStatic
 
@@ -114,6 +115,13 @@ open class Rect constructor(val left: Float, val top: Float, val right: Float, v
         internal fun fromInteropPointer(block: InteropScope.(InteropPointer) -> Unit): Rect {
             val result = withResult(FloatArray(4), block)
             return Rect(result[0], result[1], result[2], result[3])
+        }
+
+        internal fun fromInteropPointer(size: Int, block: InteropScope.(InteropPointer) -> Unit): Array<Rect> {
+            val result = withResult(FloatArray(size), block)
+            return result.toList().chunked(4).map { (left, top, right, bottom) ->
+                Rect(left, right, top, bottom)
+            }.toTypedArray()
         }
 
         internal fun fromInteropPointerNullable(block: (InteropPointer) -> Boolean): Rect? {

@@ -208,26 +208,14 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nSetSkewX
     instance->setSkewX(value);
 }
 
-extern "C" JNIEXPORT jshortArray JNICALL Java_org_jetbrains_skia_FontKt__1nGetStringGlyphs
-  (JNIEnv* env, jclass jclass, jlong ptr, jstring str) {
-    SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
-    jsize len = env->GetStringLength(str);
-    const jchar* chars = env->GetStringCritical(str, nullptr);
-    int count = instance->textToGlyphs(chars, len * sizeof(jchar), SkTextEncoding::kUTF16, nullptr, 0);
-    std::vector<short> glyphs(count);
-    instance->textToGlyphs(chars, len * sizeof(jchar), SkTextEncoding::kUTF16, reinterpret_cast<SkGlyphID*>(glyphs.data()), count);
-    env->ReleaseStringCritical(str, chars);
-    return javaShortArray(env, glyphs);
-}
-
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nGetUTF32Glyphs
   (JNIEnv* env, jclass jclass, jlong ptr, jintArray uniArr, jint uniArrLen, jshortArray resultGlyphs) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
-    jshort* shorts = env->GetShortArrayElements(resultGlyphs, nullptr);
+    std::vector<jshort> glyphs(uniArrLen);
     jint* uni = env->GetIntArrayElements(uniArr, nullptr);
-    instance->unicharsToGlyphs(reinterpret_cast<SkUnichar*>(uni), uniArrLen, reinterpret_cast<SkGlyphID*>(shorts));
+    instance->unicharsToGlyphs(reinterpret_cast<SkUnichar*>(uni), uniArrLen, reinterpret_cast<SkGlyphID*>(glyphs.data()));
     env->ReleaseIntArrayElements(uniArr, uni, 0);
-    env->ReleaseShortArrayElements(resultGlyphs, shorts, 0);
+    env->SetShortArrayRegion(resultGlyphs, 0, uniArrLen, glyphs.data());
 }
 
 extern "C" JNIEXPORT jshort JNICALL Java_org_jetbrains_skia_FontKt__1nGetUTF32Glyph
@@ -237,90 +225,81 @@ extern "C" JNIEXPORT jshort JNICALL Java_org_jetbrains_skia_FontKt__1nGetUTF32Gl
 }
 
 extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_FontKt__1nGetStringGlyphsCount
-  (JNIEnv* env, jclass jclass, jlong ptr, jstring str) {
+  (JNIEnv* env, jclass jclass, jlong ptr, jstring str, jint len) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
-    jsize len = env->GetStringLength(str);
-    const jchar* chars = env->GetStringCritical(str, nullptr);
-    int count = instance->countText(chars, len * sizeof(jchar), SkTextEncoding::kUTF16);
-    env->ReleaseStringCritical(str, chars);
-    return count;
+    return instance->countText(skString(env, str).c_str(), len * sizeof(jchar), SkTextEncoding::kUTF16);
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_FontKt__1nMeasureText
-  (JNIEnv* env, jclass jclass, jlong ptr, jstring str, jlong paintPtr) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nMeasureText
+  (JNIEnv* env, jclass jclass, jlong ptr, jstring str, jint len, jlong paintPtr, jfloatArray res) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
-    jsize len = env->GetStringLength(str);
     const jchar* chars = env->GetStringCritical(str, nullptr);
     SkRect bounds;
     instance->measureText(chars, len * sizeof(jchar), SkTextEncoding::kUTF16, &bounds, paint);
     env->ReleaseStringCritical(str, chars);
-    return skija::Rect::fromSkRect(env, bounds);
+    jfloat r[4] = {bounds.left(), bounds.top(), bounds.right(), bounds.bottom()};
+    env->SetFloatArrayRegion(res, 0, 4, r);
 }
 
 extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_FontKt__1nMeasureTextWidth
-  (JNIEnv* env, jclass jclass, jlong ptr, jstring str, jlong paintPtr) {
+  (JNIEnv* env, jclass jclass, jlong ptr, jstring str, jint len, jlong paintPtr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
-    jsize len = env->GetStringLength(str);
-    const jchar* chars = env->GetStringCritical(str, nullptr);
-    float width = instance->measureText(chars, len * sizeof(jchar), SkTextEncoding::kUTF16, nullptr, paint);
-    env->ReleaseStringCritical(str, chars);
-    return width;
+    return instance->measureText(skString(env, str).c_str(), len * sizeof(jchar), SkTextEncoding::kUTF16, nullptr, paint);
 }
 
-extern "C" JNIEXPORT jfloatArray JNICALL Java_org_jetbrains_skia_FontKt__1nGetWidths
-  (JNIEnv* env, jclass jclass, jlong ptr, jshortArray glyphsArr) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nGetWidths
+  (JNIEnv* env, jclass jclass, jlong ptr, jshortArray glyphsArr, jint count, jfloatArray res) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
-    int count = env->GetArrayLength(glyphsArr);
     std::vector<jfloat> widths(count);
     jshort* glyphs = env->GetShortArrayElements(glyphsArr, nullptr);
     instance->getWidths(reinterpret_cast<SkGlyphID*>(glyphs), count, widths.data());
     env->ReleaseShortArrayElements(glyphsArr, glyphs, 0);
-    return javaFloatArray(env, widths);
+    env->SetFloatArrayRegion(res, 0, count, widths.data());
 }
 
-extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_FontKt__1nGetBounds
-  (JNIEnv* env, jclass jclass, jlong ptr, jshortArray glyphsArr, jlong paintPtr) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nGetBounds
+  (JNIEnv* env, jclass jclass, jlong ptr, jshortArray glyphsArr, jint count, jlong paintPtr, jfloatArray res) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
-    int count = env->GetArrayLength(glyphsArr);
     std::vector<SkRect> bounds(count);
     jshort* glyphs = env->GetShortArrayElements(glyphsArr, nullptr);
     instance->getBounds(reinterpret_cast<SkGlyphID*>(glyphs), count, bounds.data(), paint);
     env->ReleaseShortArrayElements(glyphsArr, glyphs, 0);
 
-    jobjectArray res = env->NewObjectArray(count, skija::Rect::cls, nullptr);
     for (int i = 0; i < count; ++i) {
-        skija::AutoLocal<jobject> boundsObj(env, skija::Rect::fromSkRect(env, bounds[i]));
-        env->SetObjectArrayElement(res, i, boundsObj.get());
+        SkRect b = bounds[i];
+        float r[4] = {b.left(), b.right(), b.top(), b.bottom()};
+        env->SetFloatArrayRegion(res, 4*i, 4, r);
     }
-
-    return res;
 }
 
-extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_FontKt__1nGetPositions
-  (JNIEnv* env, jclass jclass, jlong ptr, jshortArray glyphsArr, jfloat dx, jfloat dy) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nGetPositions
+  (JNIEnv* env, jclass jclass, jlong ptr, jshortArray glyphsArr, jint count, jfloat dx, jfloat dy, jfloatArray res) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
-
-    int count = env->GetArrayLength(glyphsArr);
     std::vector<SkPoint> positions(count);
     jshort* glyphs = env->GetShortArrayElements(glyphsArr, nullptr);
     instance->getPos(reinterpret_cast<SkGlyphID*>(glyphs), count, positions.data(), {dx, dy});
     env->ReleaseShortArrayElements(glyphsArr, glyphs, 0);
 
-    return skija::Point::fromSkPoints(env, positions);
+    std::vector<jfloat> r(count * 2);
+    for (int i = 0; i < count; i++) {
+        r[2*i] = positions[i].fX;
+        r[2*i + 1] = positions[i].fY;
+    }
+
+    env->SetFloatArrayRegion(res, 0, count * 2, r.data());
 }
 
-extern "C" JNIEXPORT jfloatArray JNICALL Java_org_jetbrains_skia_FontKt__1nGetXPositions
-  (JNIEnv* env, jclass jclass, jlong ptr, jshortArray glyphsArr, jfloat dx) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nGetXPositions
+  (JNIEnv* env, jclass jclass, jlong ptr, jshortArray glyphsArr, jfloat dx, jint count, jfloatArray res) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
-    int count = env->GetArrayLength(glyphsArr);
     std::vector<jfloat> positions(count);
     jshort* glyphs = env->GetShortArrayElements(glyphsArr, nullptr);
     instance->getXPos(reinterpret_cast<SkGlyphID*>(glyphs), count, positions.data(), dx);
     env->ReleaseShortArrayElements(glyphsArr, glyphs, 0);
-    return javaFloatArray(env, positions);
+    env->SetFloatArrayRegion(res, 0, count, positions.data());
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontKt__1nGetPath
@@ -360,12 +339,46 @@ extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_FontKt__1nGetP
     return ctx.paths;
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_FontKt__1nGetMetrics
-  (JNIEnv* env, jclass jclass, jlong ptr, jshortArray glyphsArr) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nGetMetrics
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray res) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     SkFontMetrics m;
     instance->getMetrics(&m);
-    return skija::FontMetrics::toJava(env, m);
+
+    float f[15] = {
+            m.fTop,
+            m.fAscent,
+            m.fDescent,
+            m.fBottom,
+            m.fLeading,
+            m.fAvgCharWidth,
+            m.fMaxCharWidth,
+            m.fXMin,
+            m.fXMax,
+            m.fXHeight,
+            m.fCapHeight,
+            std::numeric_limits<float>::quiet_NaN(),
+            std::numeric_limits<float>::quiet_NaN(),
+            std::numeric_limits<float>::quiet_NaN(),
+            std::numeric_limits<float>::quiet_NaN()
+        };
+
+    SkScalar thickness;
+    SkScalar position;
+    if (m.hasUnderlineThickness(&thickness)) {
+        f[11] = thickness;
+    }
+    if (m.hasUnderlinePosition(&position)) {
+        f[12] = position;
+    }
+    if (m.hasStrikeoutThickness(&thickness)) {
+        f[13] = thickness;
+    }
+    if (m.hasStrikeoutPosition(&position)) {
+        f[14] = position;
+    }
+
+    env->SetFloatArrayRegion(res, 0, 15, f);
 }
 
 extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_FontKt__1nGetSpacing
