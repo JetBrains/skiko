@@ -365,6 +365,7 @@ fun configureNativeTarget(os: OS, arch: Arch, target: KotlinNativeTarget) {
                 )
                 OS.IOS -> mutableListOf("-linker-option", "-framework", "-linker-option", "Metal",
                     "-linker-option", "-framework", "-linker-option", "CoreGraphics",
+                    "-linker-option", "-framework", "-linker-option", "UIKit",
                     "-linker-option", "-framework", "-linker-option", "CoreText")
                 OS.Linux -> mutableListOf(
                     "-linker-option", "-L/usr/lib/x86_64-linux-gnu",
