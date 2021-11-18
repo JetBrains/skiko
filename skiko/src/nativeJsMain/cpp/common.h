@@ -67,7 +67,7 @@ namespace skija {
     }
 
     namespace SurfaceProps {
-        std::unique_ptr<SkSurfaceProps> toSkSurfaceProps(KInt* surfacePropsInts);
+        std::unique_ptr<SkSurfaceProps> toSkSurfaceProps(KInteropPointer surfacePropsInts);
     }
 
     namespace IRect {
@@ -126,12 +126,8 @@ KNativePointer ptrToInterop(T* ptr) {
     return ptr;
 }
 
-#ifdef __clang__
-__attribute__((noreturn))
-void TODO(const char*);
-#else
-void TODO(const char*);
-#endif
+[[ noreturn ]] void TODO(const char*);
+void SKIKO_ASSERT(bool, const char*);
 
 #ifdef SKIKO_WASM
 #include <emscripten.h>

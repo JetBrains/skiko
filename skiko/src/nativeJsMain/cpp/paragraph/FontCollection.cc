@@ -60,10 +60,21 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_paragraph_FontCollection__1nGetFa
     return reinterpret_cast<KNativePointer>(instance->getFallbackManager().release());
 }
 
+static SkFontStyle fromKotlin(KInt style) {
+   return SkFontStyle(style & 0xFFFF, (style >> 16) & 0xFF, static_cast<SkFontStyle::Slant>((style >> 24) & 0xFF));
+}
 
-SKIKO_EXPORT KNativePointerArray org_jetbrains_skia_paragraph_FontCollection__1nFindTypefaces
-  (KNativePointer ptr, KInteropPointerArray familyNamesArray, KInt fontStyle) {
-    TODO("implement org_jetbrains_skia_paragraph_FontCollection__1nFindTypefaces");
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_paragraph_FontCollection__1nFindTypefaces
+  (KNativePointer ptr, KInteropPointerArray familyNamesArray, KInt len, KInt fontStyle) {
+    FontCollection* instance = reinterpret_cast<FontCollection*>(ptr);
+
+    vector<sk_sp<SkTypeface>> found = instance->findTypefaces(skStringVector(familyNamesArray, len), fromKotlin(fontStyle));
+
+    std::vector<KNativePointer>* res = new std::vector<KNativePointer>();
+    for (auto& f : found)
+        res->push_back(reinterpret_cast<KNativePointer>(f.release()));
+
+    return reinterpret_cast<KNativePointer>(res);
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_paragraph_FontCollection__1nDefaultFallbackChar

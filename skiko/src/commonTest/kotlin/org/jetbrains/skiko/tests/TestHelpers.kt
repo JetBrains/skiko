@@ -2,8 +2,31 @@ package org.jetbrains.skiko.tests
 
 import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.*
-import kotlin.test.Test
-import kotlin.test.assertEquals
+
+internal class TestGlContext : Managed(TestGlContext_nCreate(), FinalizerHolder.PTR) {
+    private object FinalizerHolder {
+        val PTR = TestGlContext_nGetFinalizer()
+    }
+
+    fun makeCurrent() {
+        TestGlContext_nMakeCurrent(_ptr)
+    }
+
+    fun swapBuffers() {
+        TestGlContext_nSwapBuffers(_ptr)
+    }
+
+    companion object {
+        inline fun <T> run(block: TestGlContext.() -> T): T {
+           return TestGlContext().use {
+                it.makeCurrent()
+                val result = it.block()
+                it.swapBuffers()
+               result
+            }
+        }
+    }
+}
 
 class TestHelpers {
 
@@ -77,3 +100,17 @@ private external fun _nWriteArraysOfInts(interopPointer: InteropPointer): Native
 private external fun _nStringByIndex(index: Int): NativePointer
 
 internal fun nativeStringByIndex(index: Int): NativePointer = _nStringByIndex(index)
+
+@ExternalSymbolName("org_jetbrains_skiko_tests_TestHelpers__1nCreateTestGlContext")
+private external fun TestGlContext_nCreate(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skiko_tests_TestHelpers__1nGlContextGetFinalizer")
+private external fun TestGlContext_nGetFinalizer(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skiko_tests_TestHelpers__1nMakeGlContextCurrent")
+private external fun TestGlContext_nMakeCurrent(ptr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skiko_tests_TestHelpers__1nGlContextSwapBuffers")
+private external fun TestGlContext_nSwapBuffers(ptr: NativePointer)
+
+

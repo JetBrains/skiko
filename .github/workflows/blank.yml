@@ -84,7 +84,9 @@ jobs:
           sudo apt-get install gcc-9 g++-9 -y
           sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 60 --slave /usr/bin/g++ g++ /usr/bin/g++-9
           sudo update-alternatives --config gcc
-          sudo apt-get install ninja-build fontconfig libfontconfig1-dev libglu1-mesa-dev libxrandr-dev zip -y
+          sudo apt-get install ninja-build fontconfig libfontconfig1-dev libglu1-mesa-dev libxrandr-dev zip xvfb -y
+          sudo Xvfb :0 -screen 0 1280x720x24 &
+          export DISPLAY=:0
           ./gradlew -Pskiko.native.enabled=true -i linuxX64Test jvmTest
           ./gradlew publishToMavenLocal
       - uses: actions/upload-artifact@v2

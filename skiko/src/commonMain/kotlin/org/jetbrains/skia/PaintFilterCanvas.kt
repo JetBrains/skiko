@@ -1,15 +1,12 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.getPtr
-import org.jetbrains.skia.impl.reachabilityBarrier
 
 /**
  * A utility proxy base class for implementing draw/paint filters.
  */
-abstract class PaintFilterCanvas(canvas: Canvas, unrollDrawable: Boolean) :
+abstract class PaintFilterCanvas(private val canvas: Canvas, unrollDrawable: Boolean) :
     Canvas(PaintFilterCanvas_nMake(getPtr(canvas), unrollDrawable), true, canvas) {
     companion object {
         init {
@@ -37,15 +34,21 @@ abstract class PaintFilterCanvas(canvas: Canvas, unrollDrawable: Boolean) :
      */
     init {
         Stats.onNativeCall()
-        _nAttachToJava(_ptr)
+        doInit(_ptr)
         Stats.onNativeCall()
         reachabilityBarrier(canvas)
     }
 }
 
+internal expect fun PaintFilterCanvas.doInit(ptr: NativePointer)
+
 @ExternalSymbolName("org_jetbrains_skia_PaintFilterCanvas__1nMake")
 private external fun PaintFilterCanvas_nMake(canvasPtr: NativePointer, unrollDrawable: Boolean): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_PaintFilterCanvas__1nAttachToJava")
-external fun _nAttachToJava(canvasPtr: NativePointer)
+// Native/JS only
 
+@ExternalSymbolName("org_jetbrains_skia_PaintFilterCanvas__1nInit")
+internal external fun PaintFilterCanvas_nInit(ptr: NativePointer, onFilter: InteropPointer)
+
+@ExternalSymbolName("org_jetbrains_skia_PaintFilterCanvas__1nGetOnFilterPaint")
+internal external fun PaintFilterCanvas_nGetOnFilterPaint(ptr: NativePointer): NativePointer

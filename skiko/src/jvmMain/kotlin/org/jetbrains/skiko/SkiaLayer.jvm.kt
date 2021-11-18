@@ -8,10 +8,12 @@ import java.awt.Component
 import java.awt.Graphics
 import java.awt.event.*
 import java.awt.im.InputMethodRequests
+import java.awt.Window
 import java.util.concurrent.CancellationException
 import javax.accessibility.Accessible
 import javax.swing.JComponent
 import javax.swing.JPanel
+import javax.swing.SwingUtilities
 import javax.swing.SwingUtilities.isEventDispatchThread
 import javax.swing.UIManager
 
@@ -92,13 +94,19 @@ actual open class SkiaLayer internal constructor(
         }
     }
 
+    private var fullscreenAdapter = FullscreenAdapter(backedLayer)
+
     override fun removeNotify() {
+        val window = SwingUtilities.getRoot(this) as Window
+        window.removeComponentListener(fullscreenAdapter)
         dispose()
         super.removeNotify()
     }
 
     override fun addNotify() {
         super.addNotify()
+        val window = SwingUtilities.getRoot(this) as Window
+        window.addComponentListener(fullscreenAdapter)
         backedLayer.defineContentScale()
         checkShowing()
         init(isInited)
@@ -135,9 +143,9 @@ actual open class SkiaLayer internal constructor(
         get() = backedLayer.windowHandle
 
     actual var fullscreen: Boolean
-        get() = backedLayer.fullscreen
+        get() = fullscreenAdapter.fullscreen
         set(value) {
-            backedLayer.fullscreen = value
+            fullscreenAdapter.fullscreen = value
         }
 
     actual var skikoView: SkikoView? = null

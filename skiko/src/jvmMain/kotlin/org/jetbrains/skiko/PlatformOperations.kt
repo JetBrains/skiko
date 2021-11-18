@@ -2,7 +2,39 @@ package org.jetbrains.skiko
 
 import java.awt.Component
 import java.awt.Window
+import java.awt.event.ComponentAdapter
+import java.awt.event.ComponentEvent
 import javax.swing.SwingUtilities
+
+internal open class FullscreenAdapter(
+    val backedLayer: HardwareLayer
+): ComponentAdapter() {
+    private var _isFullscreenDispatched = false
+    private var _isFullscreen: Boolean = false
+    var fullscreen: Boolean
+        get() = _isFullscreen
+        set(value) {
+            _isFullscreen = value
+            val window = SwingUtilities.getRoot(backedLayer)
+            if ( window == null || !window.isVisible) {
+                _isFullscreenDispatched = value
+            } else {
+                backedLayer.fullscreen = value
+            }
+        }
+
+    override fun componentShown(e: ComponentEvent) {
+        backedLayer.fullscreen = _isFullscreenDispatched
+    }
+
+    override fun componentHidden(e: ComponentEvent) {
+        _isFullscreenDispatched = _isFullscreen
+    }
+
+    override fun componentResized(e: ComponentEvent) {
+        _isFullscreen = backedLayer.fullscreen
+    }
+}
 
 internal interface PlatformOperations {
     fun isFullscreen(component: Component): Boolean
@@ -14,7 +46,8 @@ internal interface PlatformOperations {
 
 internal val platformOperations: PlatformOperations by lazy {
     when (hostOs) {
-        OS.MacOS -> object: PlatformOperations {
+        OS.MacOS -> {
+            object: PlatformOperations {
                 override fun isFullscreen(component: Component): Boolean {
                     return osxIsFullscreenNative(component)
                 }
@@ -34,6 +67,7 @@ internal val platformOperations: PlatformOperations by lazy {
                 override fun orderEmojiAndSymbolsPopup() {
                     osxOrderEmojiAndSymbolsPopup()
                 }
+            }
         }
         OS.Windows -> {
             object: PlatformOperations {

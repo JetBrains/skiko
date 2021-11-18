@@ -11,7 +11,7 @@ import kotlin.math.sin
 import kotlin.math.PI
 import kotlin.math.pow
 
-class Clocks: SkikoView {
+class Clocks(private val layer: SkiaLayer): SkikoView {
     private var frame = 0
     private var xpos = 0.0
     private var ypos = 0.0
@@ -79,6 +79,13 @@ class Clocks: SkikoView {
         }
 
         val style = ParagraphStyle()
+        val renderInfo = ParagraphBuilder(style, fontCollection)
+            .pushStyle(TextStyle().setColor(0xFF000000.toInt()))
+            .addText("Graphics API: ${layer.renderApi} ✿ﾟ ${currentSystemTheme}")
+            .popStyle()
+            .build()
+        renderInfo.layout(Float.POSITIVE_INFINITY)
+        renderInfo.paint(canvas, 5f, 5f)
         val frames = ParagraphBuilder(style, fontCollection)
             .pushStyle(TextStyle().setColor(0xff9BC730L.toInt()).setFontSize(20f))
             .addText("Frames: ${frame++}\nAngle: $rotate")

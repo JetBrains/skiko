@@ -78,27 +78,12 @@ SKIKO_EXPORT void org_jetbrains_skia_paragraph_Paragraph__1nPaint
     instance->paint(canvas, x, y);
 }
 
-
-SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_paragraph_Paragraph__1nGetRectsForRange
-  (KNativePointer ptr, KInt start, KInt end, KInt rectHeightStyle, KInt rectWidthStyle) {
-    TODO("implement org_jetbrains_skia_paragraph_Paragraph__1nGetRectsForRange");
-}
-     
-#if 0 
 SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_paragraph_Paragraph__1nGetRectsForRange
   (KNativePointer ptr, KInt start, KInt end, KInt rectHeightStyle, KInt rectWidthStyle) {
     Paragraph* instance = reinterpret_cast<Paragraph*>((ptr));
-    std::vector<TextBox> rects = instance->getRectsForRange(start, end, static_cast<RectHeightStyle>(rectHeightStyle), static_cast<RectWidthStyle>(rectWidthStyle));
-    KInteropPointerArray rectsArray = env->NewObjectArray((jsize) rects.size(), skija::paragraph::TextBox::cls, nullptr);
-    for (int i = 0; i < rects.size(); ++i) {
-        TextBox box = rects[i];
-        KInteropPointer boxObj = env->NewObject(skija::paragraph::TextBox::cls, skija::paragraph::TextBox::ctor, box.rect.fLeft, box.rect.fTop, box.rect.fRight, box.rect.fBottom, static_cast<KInt>(box.direction));
-        env->SetObjectArrayElement(rectsArray, i, boxObj);
-        env->DeleteLocalRef(boxObj);
-    }
-    return rectsArray;
+    std::vector<TextBox> *rects = new std::vector<TextBox>(instance->getRectsForRange(start, end, static_cast<RectHeightStyle>(rectHeightStyle), static_cast<RectWidthStyle>(rectWidthStyle)));
+    return rects;
 }
-#endif
 
 SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_paragraph_Paragraph__1nGetRectsForPlaceholders
   (KNativePointer ptr) {
@@ -117,11 +102,13 @@ SKIKO_EXPORT KInt org_jetbrains_skia_paragraph_Paragraph__1nGetGlyphPositionAtCo
         return -p.position-1;
 }
 
-SKIKO_EXPORT KLong org_jetbrains_skia_paragraph_Paragraph__1nGetWordBoundary
-  (KNativePointer ptr, KInt offset) {
+SKIKO_EXPORT void org_jetbrains_skia_paragraph_Paragraph__1nGetWordBoundary
+  (KNativePointer ptr, KInt offset, KInteropPointer resultPtr) {
     Paragraph* instance = reinterpret_cast<Paragraph*>((ptr));
     SkRange<size_t> range = instance->getWordBoundary(offset);
-    return packTwoInts(range.start & 0xFFFFFFFF, range.end & 0xFFFFFFFF);
+    KInt* result = reinterpret_cast<KInt*>(resultPtr);
+    result[0] = range.start & 0xFFFFFFFF;
+    result[1] = range.end & 0xFFFFFFFF;
 }
 
 

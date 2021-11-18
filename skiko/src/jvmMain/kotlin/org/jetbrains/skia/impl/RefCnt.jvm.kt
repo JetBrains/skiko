@@ -30,3 +30,5 @@ actual abstract class RefCnt : Managed {
         external fun _nGetRefCount(ptr: NativePointer): Int
     }
 }
+
+actual fun RefCnt_nGetFinalizer() = RefCnt._nGetFinalizer()

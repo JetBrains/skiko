@@ -1,6 +1,7 @@
 #include "mppinterop.h"
 #include "RunRecordClone.hh"
 #include "src/utils/SkUTF.h"
+#include <iostream>
 
 namespace skikoMpp {
     namespace skrect {
@@ -190,6 +191,12 @@ namespace skikoMpp {
                 stored += run.fGlyphCount;
             }
             return true;
+        }
+    }
+
+    namespace finalizers {
+        void deleteString(void* instance) {
+            delete reinterpret_cast<SkString*>(instance);
         }
     }
 }
