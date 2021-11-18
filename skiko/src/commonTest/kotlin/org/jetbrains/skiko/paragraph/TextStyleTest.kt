@@ -5,6 +5,7 @@ import org.jetbrains.skia.FontMetrics
 import org.jetbrains.skia.impl.use
 import org.jetbrains.skia.paragraph.DecorationLineStyle
 import org.jetbrains.skia.paragraph.DecorationStyle
+import org.jetbrains.skia.paragraph.Shadow
 import org.jetbrains.skia.paragraph.TextStyle
 import org.jetbrains.skia.paragraph.TextStyleAttribute
 import org.jetbrains.skiko.tests.SkipJsTarget
@@ -96,6 +97,20 @@ class TextStyleTest {
             assertNull(textStyle.height)
             textStyle.height = 4f
             assertEquals(4f, textStyle.height)
+        }
+    }
+
+    @Test
+    fun textShadowsTest() {
+        TextStyle().use { textStyle ->
+
+            textStyle.addShadow(Shadow(200, 0.2f, 0.4f, 1.4))
+            textStyle.addShadows(arrayOf(Shadow(100, 0.3f, 0.1f, 2.0)))
+
+            assertContentEquals(arrayOf(
+                Shadow(200, 0.2f, 0.4f, 1.4),
+                Shadow(100, 0.3f, 0.1f, 2.0)
+            ), textStyle.shadows)
         }
     }
 
