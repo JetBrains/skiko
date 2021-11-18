@@ -310,7 +310,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontKt__1nGetPath
     return reinterpret_cast<jlong>(path);
 }
 
-extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_FontKt__1nGetPaths
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontKt__1nGetPaths
   (JNIEnv* env, jclass jclass, jlong ptr, jshortArray glyphsArr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
 
@@ -318,25 +318,20 @@ extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_FontKt__1nGetP
     jshort* glyphs = env->GetShortArrayElements(glyphsArr, nullptr);
 
     struct Ctx {
-        jobjectArray paths;
-        jsize        idx;
-        JNIEnv*      env;
-    } ctx = { env->NewObjectArray(count, skija::Path::cls, nullptr), 0, env };
+        std::vector<jlong>* paths;
+    } ctx = { new std::vector<jlong>() };
 
     instance->getPaths(reinterpret_cast<SkGlyphID*>(glyphs), count, [](const SkPath* orig, const SkMatrix& mx, void* voidCtx) {
         Ctx* ctx = static_cast<Ctx*>(voidCtx);
         if (orig) {
             SkPath* path = new SkPath();
             orig->transform(mx, path);
-            jobject pathObj = ctx->env->NewObject(skija::Path::cls, skija::Path::ctor, reinterpret_cast<jlong>(path));
-            ctx->env->SetObjectArrayElement(ctx->paths, ctx->idx, pathObj);
-            ctx->env->DeleteLocalRef(pathObj);
-            ++ctx->idx;
+            ctx->paths->push_back(reinterpret_cast<jlong>(path));
         }
     }, &ctx);
 
     env->ReleaseShortArrayElements(glyphsArr, glyphs, 0);
-    return ctx.paths;
+    return reinterpret_cast<jlong>(ctx.paths);
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nGetMetrics
