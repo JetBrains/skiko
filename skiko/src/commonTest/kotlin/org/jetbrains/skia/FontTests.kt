@@ -13,8 +13,8 @@ import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 
-private fun isLinux() = (hostOs == OS.Linux)
-private val COARSE_EPSILON = if (isLinux()) 2.4f else if (kotlinBackend == KotlinBackend.JS) 10e-5f else 10e-6f
+private fun isLinuxOrJs() = (hostOs == OS.Linux) || (hostOs == OS.JS)
+private val COARSE_EPSILON = 2.4f
 
 class FontTests {
     @Test
@@ -84,8 +84,9 @@ class FontTests {
                 assertCloseEnough(expected, actual, COARSE_EPSILON)
             }
 
-            if (!isLinux()) {
-                assertEquals(24, firstGlyphPath.pointsCount)
+            assertEquals(26, firstGlyphPath.pointsCount)
+
+            if (isLinuxOrJs()) {
 
                 assertCloseEnough(FontMetrics(
                     -11.64f,
@@ -93,7 +94,25 @@ class FontTests {
                     3.2400002f,
                     3.2400002f,
                     0f,
+                    7.2000003f,
                     29.460001f,
+                    -20.880001f,
+                    8.58f,
+                    6.6000004f,
+                    8.64f,
+                    0.54f,
+                    1.4399999f,
+                    0.54f,
+                    -3.8999999f
+                ), font.metrics, 10e-3f)
+            } else {
+                assertCloseEnough(FontMetrics(
+                    -11.64f,
+                    -11.64f,
+                    3.2400002f,
+                    3.2400002f,
+                    0f,
+                    if (kotlinBackend == KotlinBackend.JS)  7.2000003f else 29.460001f,
                     29.460001f,
                     -20.880001f,
                     8.58f,
@@ -106,7 +125,6 @@ class FontTests {
                 ), font.metrics, 10e-3f)
 
             }
-
 
 //            assertEquals(Rect(1f, -12f, 21f, 0f), font.measureText("ЕЁЫ"))
 
