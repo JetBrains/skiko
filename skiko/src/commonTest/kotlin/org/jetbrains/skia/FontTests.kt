@@ -84,9 +84,9 @@ class FontTests {
                 assertCloseEnough(expected, actual, COARSE_EPSILON)
             }
 
-            assertEquals(26, firstGlyphPath.pointsCount)
 
             if (isLinuxOrJs()) {
+                assertEquals(26, firstGlyphPath.pointsCount)
 
                 assertCloseEnough(FontMetrics(
                     -11.64f,
@@ -106,13 +106,15 @@ class FontTests {
                     -3.8999999f
                 ), font.metrics, 10e-3f)
             } else {
+                assertEquals(24, firstGlyphPath.pointsCount)
+
                 assertCloseEnough(FontMetrics(
                     -11.64f,
                     -11.64f,
                     3.2400002f,
                     3.2400002f,
                     0f,
-                    if (kotlinBackend == KotlinBackend.JS)  7.2000003f else 29.460001f,
+                    29.460001f,
                     29.460001f,
                     -20.880001f,
                     8.58f,
