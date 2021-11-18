@@ -30,7 +30,7 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_paragraph_StrutSty
     return *instance == *other;
 }
 
-extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleKt__1nGetFontFamilies
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleKt__1nGetFontFamilies
   (JNIEnv* env, jclass jclass, jlong ptr) {
     StrutStyle* instance = reinterpret_cast<StrutStyle*>(static_cast<uintptr_t>(ptr));
     return javaStringArray(env, instance->getFontFamilies());
