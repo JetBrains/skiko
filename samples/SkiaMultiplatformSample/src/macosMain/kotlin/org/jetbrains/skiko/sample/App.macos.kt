@@ -8,7 +8,7 @@ import kotlinx.cinterop.*
 import platform.Foundation.NSMakeRect
 import platform.darwin.NSObject
 
-fun makeApp() = Clocks()
+fun makeApp(skiaLayer: SkiaLayer) = Clocks(skiaLayer)
 
 fun main() {
     val app = NSApplication.sharedApplication()
@@ -27,7 +27,7 @@ fun main() {
         backing = NSBackingStoreBuffered,
         defer = true)
     val skiaLayer = SkiaLayer()
-    skiaLayer.skikoView = GenericSkikoView(skiaLayer, makeApp())
+    skiaLayer.skikoView = GenericSkikoView(skiaLayer, makeApp(skiaLayer))
     skiaLayer.attachTo(window)
     window.orderFrontRegardless()
     app.run()

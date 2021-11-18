@@ -3,12 +3,13 @@ package org.jetbrains.skiko.sample
 
 import kotlinx.cinterop.*
 import org.jetbrains.skiko.GenericSkikoView
+import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkikoView
 import org.jetbrains.skiko.SkikoViewController
 import platform.UIKit.*
 import platform.Foundation.*
 
-fun makeApp(): SkikoView = Clocks()
+fun makeApp(skiaLayer: SkiaLayer) = Clocks(skiaLayer)
 
 fun main() {
     val args = emptyArray<String>()
@@ -37,7 +38,7 @@ class SkikoAppDelegate : UIResponder, UIApplicationDelegateProtocol {
         window = UIWindow(frame = UIScreen.mainScreen.bounds)
         window!!.rootViewController = SkikoViewController().apply {
             setAppFactory { layer ->
-                GenericSkikoView(layer, makeApp()).also {
+                GenericSkikoView(layer, makeApp(layer)).also {
                     layer.skikoView = it
                 }
             }
