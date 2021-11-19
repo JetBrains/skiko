@@ -35,9 +35,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: test-reports-macos
-          path: |
-            ./skiko/build/reports/tests
-            ./skiko/src/jvmTest/screenshots/**/*_actual.png
+          path: ./skiko/build/reports/tests
           retention-days: 5
 
    ios:
@@ -94,9 +92,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: test-reports-linux
-          path: |
-            ./skiko/build/reports/tests
-            ./skiko/src/jvmTest/screenshots/**/*_actual.png
+          path: ./skiko/build/reports/tests
           retention-days: 5
 
    js:
@@ -154,7 +150,5 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: test-reports-windows
-          path: |
-            ./skiko/build/reports/tests
-            ./skiko/src/jvmTest/screenshots/**/*_actual.png
+          path: ./skiko/build/reports/tests
           retention-days: 5
