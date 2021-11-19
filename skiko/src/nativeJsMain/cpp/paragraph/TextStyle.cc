@@ -163,22 +163,6 @@ SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nGetShadows
     }
 }
 
-#if 0
-SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_paragraph_TextStyle__1nGetShadows
-  (KNativePointer ptr) {
-    TextStyle* instance = reinterpret_cast<TextStyle*>(ptr);
-    std::vector<TextShadow> shadows = instance->getShadows();
-    KInteropPointerArray shadowsArr = env->NewObjectArray((jsize) shadows.size(), skija::paragraph::Shadow::cls, nullptr);
-    for (int i = 0; i < shadows.size(); ++i) {
-        const TextShadow& s = shadows[i];
-        skija::AutoLocal<KInteropPointer> shadowObj(env, env->NewObject(skija::paragraph::Shadow::cls, skija::paragraph::Shadow::ctor, s.fColor, s.fOffset.fX, s.fOffset.fY, s.fBlurSigma));
-        env->SetObjectArrayElement(shadowsArr, i, shadowObj.get());
-    }
-    return shadowsArr;
-}
-#endif
-
-
 SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nAddShadow
   (KNativePointer ptr, KInt color, KFloat offsetX, KFloat offsetY, KDouble blurSigma) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(ptr);
