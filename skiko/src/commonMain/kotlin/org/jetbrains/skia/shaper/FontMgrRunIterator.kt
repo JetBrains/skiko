@@ -1,13 +1,14 @@
 @file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia.shaper
 
-import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.*
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.Font
+import org.jetbrains.skia.ManagedString
+import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.reachabilityBarrier
 
 class FontMgrRunIterator(text: ManagedString?, manageText: Boolean, font: Font?, opts: ShapingOptions) :
     ManagedRunIterator<FontRun?>(
@@ -43,8 +44,8 @@ class FontMgrRunIterator(text: ManagedString?, manageText: Boolean, font: Font?,
     }
 }
 
-@ExternalSymbolName("org_jetbrains_skia_FontMgrRunIterator__1nMake")
+@ExternalSymbolName("org_jetbrains_skia_shaper_FontMgrRunIterator__1nMake")
 private external fun _nMake(textPtr: NativePointer, fontPtr: NativePointer, opts: ShapingOptions?): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_FontMgrRunIterator__1nGetCurrentFont")
+@ExternalSymbolName("org_jetbrains_skia_shaper_FontMgrRunIterator__1nGetCurrentFont")
 private external fun _nGetCurrentFont(ptr: NativePointer): NativePointer

@@ -144,7 +144,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nShapeLine
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_shaper_Shaper__1nShape
-  (KNativePointer ptr, KNativePointer textPtr, KInteropPointer fontRunIterObj, KInteropPointer bidiRunIterObj, KInteropPointer scriptRunIterObj, KInteropPointer languageRunIterObj, KInteropPointer opts, KFloat width, KInteropPointer runHandlerObj)
+  (KNativePointer ptr, KNativePointer textPtr, KInteropPointer fontRunIterObj, KInteropPointer bidiRunIterObj, KInteropPointer scriptRunIterObj, KInteropPointer languageRunIterObj, KInt optsFeaturesLen, KInt* optsFeatures, KInt optsBooleanProps, KFloat width, KInteropPointer runHandlerObj)
 {
     TODO("implement org_jetbrains_skia_shaper_Shaper__1nShape");
 }
