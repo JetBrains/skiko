@@ -141,9 +141,26 @@ SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nSetFontStyle
     instance->setFontStyle(skija::FontStyle::fromKotlin(fontStyleValue));
 }
 
-SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_paragraph_TextStyle__1nGetShadows
+SKIKO_EXPORT KInt org_jetbrains_skia_paragraph_TextStyle__1nGetShadowsCount
   (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nGetShadows");
+    TextStyle* instance = reinterpret_cast<TextStyle*>(ptr);
+    return static_cast<KInt>(instance->getShadows().size());
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nGetShadows
+  (KNativePointer ptr, KInt* res) {
+    TextStyle* instance = reinterpret_cast<TextStyle*>(ptr);
+    std::vector<TextShadow> shadows = instance->getShadows();
+
+    for (int i = 0; i < shadows.size(); ++i) {
+        const TextShadow& s = shadows[i];
+        long blurSigma = rawBits(s.fBlurSigma);
+        res[5*i] = s.fColor;
+        res[5*i + 1] = rawBits(s.fOffset.fX);
+        res[5*i + 2] = rawBits(s.fOffset.fY);
+        res[5*i + 3] = (KInt)(blurSigma >> 32);
+        res[5*i + 4] = (KInt)blurSigma;
+    }
 }
 
 #if 0
