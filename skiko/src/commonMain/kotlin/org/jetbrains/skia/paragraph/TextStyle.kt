@@ -1,9 +1,9 @@
 package org.jetbrains.skia.paragraph
 
-import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.*
-import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.*
+import org.jetbrains.skia.impl.Library.Companion.staticLoad
+
 
 class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
@@ -155,10 +155,15 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         return this
     }
 
-    val shadows: Array<org.jetbrains.skia.paragraph.Shadow>
+    val shadows: Array<Shadow>
         get() = try {
             Stats.onNativeCall()
-            _nGetShadows(_ptr)
+            withResult(IntArray(_nGetShadowsCount(_ptr) * 5)) {
+                _nGetShadows(_ptr, it)
+            }.toList().chunked(5).map { (color, offsetX, offsetY, blurSigmaA, blurSigmaB) ->
+                val blurSigma = (blurSigmaA.toLong() shl 32) or (blurSigmaB.toLong() and 0xFFFFFFFFL)
+                Shadow(color, Float.fromBits(offsetX), Float.fromBits(offsetY), blurSigma.toDouble())
+            }.toTypedArray()
         } finally {
             reachabilityBarrier(this)
         }
@@ -462,8 +467,11 @@ private external fun _nSetDecorationStyle(
     thicknessMultiplier: Float
 )
 
+@ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetShadowsCount")
+private external fun _nGetShadowsCount(ptr: NativePointer): Int
+
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetShadows")
-private external fun _nGetShadows(ptr: NativePointer): Array<Shadow>
+private external fun _nGetShadows(ptr: NativePointer, res: InteropPointer): InteropPointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nAddShadow")
 private external fun _nAddShadow(ptr: NativePointer, color: Int, offsetX: Float, offsetY: Float, blurSigma: Double)

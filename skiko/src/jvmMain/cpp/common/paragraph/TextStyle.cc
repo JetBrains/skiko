@@ -144,17 +144,23 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_
     instance->setFontStyle(skija::FontStyle::fromJava(fontStyleValue));
 }
 
-extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nGetShadows
-  (JNIEnv* env, jclass jclass, jlong ptr) {
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nGetShadowsCount
+    (JNIEnv* env, jclass jclass, jlong ptr) {
+        TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
+        return static_cast<jint>(instance->getShadows().size());
+    }
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nGetShadows
+  (JNIEnv* env, jclass jclass, jlong ptr, jintArray res) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(static_cast<uintptr_t>(ptr));
     std::vector<TextShadow> shadows = instance->getShadows();
-    jobjectArray shadowsArr = env->NewObjectArray((jsize) shadows.size(), skija::paragraph::Shadow::cls, nullptr);
+
     for (int i = 0; i < shadows.size(); ++i) {
         const TextShadow& s = shadows[i];
-        skija::AutoLocal<jobject> shadowObj(env, env->NewObject(skija::paragraph::Shadow::cls, skija::paragraph::Shadow::ctor, s.fColor, s.fOffset.fX, s.fOffset.fY, s.fBlurSigma));
-        env->SetObjectArrayElement(shadowsArr, i, shadowObj.get());
+        jlong blurSigma = (jlong)s.fBlurSigma;
+        jint r[5] = {static_cast<jint>(s.fColor), rawBits(s.fOffset.fX), rawBits(s.fOffset.fY), (jint)(blurSigma >> 32), (jint)blurSigma };
+        env->SetIntArrayRegion(res, 5 * i, 5, r);
     }
-    return shadowsArr;
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt__1nAddShadow
