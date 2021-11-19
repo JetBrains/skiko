@@ -12,7 +12,7 @@ import org.jetbrains.skia.impl.reachabilityBarrier
 
 class FontMgrRunIterator(text: ManagedString?, manageText: Boolean, font: Font?, opts: ShapingOptions) :
     ManagedRunIterator<FontRun?>(
-        _nMake(getPtr(text), getPtr(font), opts), text, manageText
+        _nMake(getPtr(text), getPtr(font), getPtr(opts.fontMgr), opts._booleanPropsToInt()), text, manageText
     ) {
     companion object {
         init {
@@ -45,7 +45,7 @@ class FontMgrRunIterator(text: ManagedString?, manageText: Boolean, font: Font?,
 }
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_FontMgrRunIterator__1nMake")
-private external fun _nMake(textPtr: NativePointer, fontPtr: NativePointer, opts: ShapingOptions?): NativePointer
+private external fun _nMake(textPtr: NativePointer, fontPtr: NativePointer, fontMgrPtr: NativePointer, optsBooleanProps: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_FontMgrRunIterator__1nGetCurrentFont")
 private external fun _nGetCurrentFont(ptr: NativePointer): NativePointer
