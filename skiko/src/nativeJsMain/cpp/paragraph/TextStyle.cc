@@ -258,6 +258,18 @@ SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nSetHeight
     instance->setHeight(height);
 }
 
+SKIKO_EXPORT KFloat org_jetbrains_skia_paragraph_TextStyle__1nGetBaselineShift
+  (KNativePointer ptr) {
+    TextStyle* instance = reinterpret_cast<TextStyle*>(ptr);
+    return instance->getBaselineShift();
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nSetBaselineShift
+  (KNativePointer ptr, KFloat baselineShift) {
+    TextStyle* instance = reinterpret_cast<TextStyle*>(ptr);
+    instance->setBaselineShift(baselineShift);
+}
+
 SKIKO_EXPORT KFloat org_jetbrains_skia_paragraph_TextStyle__1nGetLetterSpacing
   (KNativePointer ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(ptr);
