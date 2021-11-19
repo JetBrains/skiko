@@ -3,6 +3,8 @@ package org.jetbrains.skiko.tests.org.jetbrains.skiko.paragraph
 import org.jetbrains.skia.*
 import org.jetbrains.skia.paragraph.*
 import org.jetbrains.skia.tests.makeFromResource
+import org.jetbrains.skiko.OS
+import org.jetbrains.skiko.hostOs
 import org.jetbrains.skiko.tests.runTest
 import org.jetbrains.skiko.util.ScreenshotTestRule
 import org.junit.Rule
@@ -14,6 +16,10 @@ class TextStyleTest {
 
     @Test
     fun canApplyBaselineShift() = runTest {
+        if (hostOs != OS.MacOS) {
+            return@runTest
+        }
+
         val fontCollection = FontCollection().apply {
             setDefaultFontManager(TypefaceFontProvider().apply {
                 val inter = Typeface.makeFromResource("./fonts/Inter-Hinted-Regular.ttf", 0)
