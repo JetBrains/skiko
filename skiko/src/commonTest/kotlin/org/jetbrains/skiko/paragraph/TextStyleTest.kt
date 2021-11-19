@@ -1,15 +1,15 @@
 package org.jetbrains.skiko.paragraph
 
 import org.jetbrains.skia.Color
-import org.jetbrains.skia.FontMetrics
 import org.jetbrains.skia.impl.use
 import org.jetbrains.skia.paragraph.DecorationLineStyle
 import org.jetbrains.skia.paragraph.DecorationStyle
 import org.jetbrains.skia.paragraph.Shadow
 import org.jetbrains.skia.paragraph.TextStyle
 import org.jetbrains.skia.paragraph.TextStyleAttribute
-import org.jetbrains.skiko.tests.SkipJsTarget
-import org.jetbrains.skiko.tests.SkipNativeTarget
+import org.jetbrains.skia.tests.assertContentCloseEnough
+import org.jetbrains.skiko.KotlinBackend
+import org.jetbrains.skiko.kotlinBackend
 import kotlin.test.*
 
 class TextStyleTest {
@@ -107,10 +107,10 @@ class TextStyleTest {
             textStyle.addShadow(Shadow(200, 0.2f, 0.4f, 1.4))
             textStyle.addShadows(arrayOf(Shadow(100, 0.3f, 0.1f, 2.0)))
 
-            assertContentEquals(arrayOf(
+            assertContentCloseEnough(arrayOf(
                 Shadow(200, 0.2f, 0.4f, 1.4),
                 Shadow(100, 0.3f, 0.1f, 2.0)
-            ), textStyle.shadows)
+            ), textStyle.shadows, if (kotlinBackend == KotlinBackend.JS) 0.00001f else 0f)
         }
     }
 
