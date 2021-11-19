@@ -158,12 +158,9 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     val shadows: Array<Shadow>
         get() = try {
             Stats.onNativeCall()
-            withResult(IntArray(_nGetShadowsCount(_ptr) * 5)) {
+            Shadow.fromInteropPointer(_nGetShadowsCount(_ptr) * 5) {
                 _nGetShadows(_ptr, it)
-            }.toList().chunked(5).map { (color, offsetX, offsetY, blurSigmaA, blurSigmaB) ->
-                val blurSigma = (blurSigmaA.toLong() shl 32) or (blurSigmaB.toLong() and 0xFFFFFFFFL)
-                Shadow(color, Float.fromBits(offsetX), Float.fromBits(offsetY), Double.fromBits(blurSigma))
-            }.toTypedArray()
+            }
         } finally {
             reachabilityBarrier(this)
         }
