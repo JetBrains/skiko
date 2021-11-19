@@ -81,7 +81,16 @@ SKIKO_EXPORT void org_jetbrains_skia_paragraph_Paragraph__1nPaint
 SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_paragraph_Paragraph__1nGetRectsForRange
   (KNativePointer ptr, KInt start, KInt end, KInt rectHeightStyle, KInt rectWidthStyle) {
     Paragraph* instance = reinterpret_cast<Paragraph*>((ptr));
-    std::vector<TextBox> *rects = new std::vector<TextBox>(instance->getRectsForRange(start, end, static_cast<RectHeightStyle>(rectHeightStyle), static_cast<RectWidthStyle>(rectWidthStyle)));
+    std::vector<TextBox> originalRects = instance->getRectsForRange(start, end, static_cast<RectHeightStyle>(rectHeightStyle), static_cast<RectWidthStyle>(rectWidthStyle));
+    std::vector<TextBox> *rects = new std::vector<TextBox>();
+    for (TextBox& box : originalRects) {
+        // TODO fix https://github.com/JetBrains/compose-jb/issues/1308 another way, we just masking the issue
+        // (but experiments show, that the result of GetRectsForRange is correct after that)
+        if (isnan(box.rect.fLeft) || isnan(box.rect.fTop) || isnan(box.rect.fRight) || isnan(box.rect.fBottom)) {
+            continue;
+        }
+        rects->push_back(box);
+    }
     return rects;
 }
 
