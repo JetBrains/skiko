@@ -154,7 +154,7 @@ SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nGetShadows
 
     for (int i = 0; i < shadows.size(); ++i) {
         const TextShadow& s = shadows[i];
-        long blurSigma = rawBits(s.fBlurSigma);
+        KLong blurSigma = rawBits(s.fBlurSigma);
         res[5*i] = s.fColor;
         res[5*i + 1] = rawBits(s.fOffset.fX);
         res[5*i + 2] = rawBits(s.fOffset.fY);

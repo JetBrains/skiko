@@ -145,9 +145,9 @@ static inline KInt rawBits(KFloat f) {
     return u.i;
 }
 
-static inline KLong rawBits(double d) {
+static inline KLong rawBits(KDouble d) {
     union {
-        double d;
+        KDouble d;
         KLong l;
     } u;
     u.d = d;
