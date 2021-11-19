@@ -192,17 +192,9 @@ SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nGetFontFeatures
 
 SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nAddFontFeature
   (KNativePointer ptr, KInteropPointer nameStr, KInt value) {
-    TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nAddFontFeature");
-}
-
-#if 0
-SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nAddFontFeature
-  (KNativePointer ptr, KInteropPointer nameStr, KInt value) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(ptr);
-    instance->addFontFeature(skString(env, nameStr), value);
+    instance->addFontFeature(skString(nameStr), value);
 }
-#endif
-
 
 SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nClearFontFeatures
   (KNativePointer ptr) {

@@ -1,6 +1,7 @@
 package org.jetbrains.skiko.paragraph
 
 import org.jetbrains.skia.Color
+import org.jetbrains.skia.FontFeature
 import org.jetbrains.skia.impl.use
 import org.jetbrains.skia.paragraph.DecorationLineStyle
 import org.jetbrains.skia.paragraph.DecorationStyle
@@ -54,6 +55,19 @@ class TextStyleTest {
                 ts2.fontFamilies = arrayOf("bar", "zig")
                 assertNotEquals(ts1, ts2)
             }
+        }
+    }
+
+    @Test
+    fun textStyleAddFontFeatureTest() {
+        TextStyle().use { textStyle ->
+            textStyle.addFontFeature(FontFeature("FONT", true))
+            textStyle.addFontFeatures(arrayOf(FontFeature("TONF", true), FontFeature("IDDI", false)))
+            assertContentEquals(arrayOf(
+                FontFeature(84, 1, 0u, 4294967295u),
+                FontFeature(70, 1, 0u, 4294967295u),
+                FontFeature(73, 0, 0u, 4294967295u),
+            ),  textStyle.fontFeatures)
         }
     }
 

@@ -197,7 +197,9 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
 
     fun addFontFeature(f: FontFeature): TextStyle {
         Stats.onNativeCall()
-        _nAddFontFeature(_ptr, f.tag, f.value)
+        interopScope {
+            _nAddFontFeature(_ptr, toInterop(f.tag), f.value)
+        }
         return this
     }
 
@@ -507,7 +509,7 @@ private external fun _nGetFontFeatures(ptr: NativePointer, resultIntsArray: Inte
 private external fun _nGetFontFeaturesSize(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nAddFontFeature")
-private external fun _nAddFontFeature(ptr: NativePointer, name: String?, value: Int)
+private external fun _nAddFontFeature(ptr: NativePointer, name: InteropPointer, value: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nClearFontFeatures")
 private external fun _nClearFontFeatures(ptr: NativePointer)
