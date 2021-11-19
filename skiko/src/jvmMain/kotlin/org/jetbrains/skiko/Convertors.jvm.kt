@@ -82,12 +82,8 @@ fun toSkikoEvent(e: MouseEvent): SkikoPointerEvent {
     return SkikoPointerEvent(
         e.x.toDouble(),
         e.y.toDouble(),
-        when(e.button) {
-            MouseEvent.BUTTON1 -> SkikoMouseButtons.LEFT
-            MouseEvent.BUTTON2 -> SkikoMouseButtons.RIGHT
-            MouseEvent.BUTTON3 -> SkikoMouseButtons.MIDDLE
-            else -> SkikoMouseButtons.NONE
-        },
+        toSkikoMouseButtons(e.modifiersEx),
+        toSkikoModifiers(e.modifiersEx),
         when(e.id) {
             MouseEvent.MOUSE_PRESSED -> SkikoPointerEventKind.DOWN
             MouseEvent.MOUSE_RELEASED -> SkikoPointerEventKind.UP
@@ -105,7 +101,8 @@ fun toSkikoEvent(e: MouseWheelEvent): SkikoPointerEvent {
     return SkikoPointerEvent(
         e.x.toDouble(),
         e.y.toDouble(),
-        SkikoMouseButtons.NONE,
+        toSkikoMouseButtons(e.modifiersEx),
+        toSkikoModifiers(e.modifiersEx),
         when(e.id) {
             MouseEvent.MOUSE_WHEEL-> SkikoPointerEventKind.SCROLL
             else -> SkikoPointerEventKind.UNKNOWN
@@ -117,6 +114,7 @@ fun toSkikoEvent(e: MouseWheelEvent): SkikoPointerEvent {
 fun toSkikoEvent(e: KeyEvent): SkikoKeyboardEvent {
     return SkikoKeyboardEvent(
         e.keyCode,
+        toSkikoModifiers(e.modifiersEx),
         when(e.id) {
             KeyEvent.KEY_PRESSED -> SkikoKeyboardEventKind.DOWN
             KeyEvent.KEY_RELEASED -> SkikoKeyboardEventKind.UP
@@ -129,7 +127,38 @@ fun toSkikoEvent(e: KeyEvent): SkikoKeyboardEvent {
 
 fun toSkikoEvent(e: InputMethodEvent): SkikoInputEvent {
     return SkikoInputEvent(
-        "",
+        "", // TODO: this parameter should be reconsidered
         e
     )
+}
+
+private fun toSkikoMouseButtons(buttons: Int): SkikoMouseButtons {
+    var result = 0
+    if (buttons and InputEvent.BUTTON1_DOWN_MASK != 0) {
+        result = result.or(SkikoMouseButtons.LEFT.value)
+    }
+    if (buttons and InputEvent.BUTTON2_DOWN_MASK != 0) {
+        result = result.or(SkikoMouseButtons.RIGHT.value)
+    }
+    if (buttons and InputEvent.BUTTON3_DOWN_MASK != 0) {
+        result = result.or(SkikoMouseButtons.MIDDLE.value)
+    }
+    return SkikoMouseButtons(result)
+}
+
+private fun toSkikoModifiers(modifiers: Int): SkikoInputModifiers {
+    var result = 0
+    if (modifiers and InputEvent.ALT_DOWN_MASK != 0) {
+        result = result.or(SkikoInputModifiers.ALT.value)
+    }
+    if (modifiers and InputEvent.SHIFT_DOWN_MASK != 0) {
+        result = result.or(SkikoInputModifiers.SHIFT.value)
+    }
+    if (modifiers and InputEvent.CTRL_DOWN_MASK != 0) {
+        result = result.or(SkikoInputModifiers.CONTROL.value)
+    }
+    if (modifiers and InputEvent.META_DOWN_MASK != 0) {
+        result = result.or(SkikoInputModifiers.META.value)
+    }
+    return SkikoInputModifiers(result)
 }

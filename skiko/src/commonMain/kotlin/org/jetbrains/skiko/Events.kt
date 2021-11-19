@@ -1,11 +1,93 @@
 package org.jetbrains.skiko
 
 // Clicked mouse buttons bitmask.
-object SkikoMouseButtons {
-    const val NONE = 0
-    const val LEFT = 1 shl 0
-    const val RIGHT = 1 shl 1
-    const val MIDDLE = 1 shl 2
+inline class SkikoMouseButtons(val value: Int) {
+    companion object {
+        val NONE = SkikoMouseButtons(0)
+        val LEFT = SkikoMouseButtons(1)
+        val RIGHT = SkikoMouseButtons(2)
+        val MIDDLE = SkikoMouseButtons(4)
+        val BUTTON_1 = SkikoMouseButtons(1)
+        val BUTTON_2 = SkikoMouseButtons(2)
+        val BUTTON_3 = SkikoMouseButtons(4)
+        val BUTTON_4 = SkikoMouseButtons(8)
+        val BUTTON_5 = SkikoMouseButtons(16)
+        val BUTTON_6 = SkikoMouseButtons(32)
+        val BUTTON_7 = SkikoMouseButtons(64)
+        val BUTTON_8 = SkikoMouseButtons(128)
+    }
+
+    fun has(value: SkikoMouseButtons): Boolean {
+        if (value.value and this.value != 0) {
+            return true
+        }
+        return false
+    }
+
+    override fun toString(): String {
+        val result = mutableListOf<String>().apply {
+            if (has(SkikoMouseButtons.LEFT)) {
+                add("LEFT")
+            }
+            if (has(SkikoMouseButtons.RIGHT)) {
+                add("RIGHT")
+            }
+            if (has(SkikoMouseButtons.MIDDLE)) {
+                add("MIDDLE")
+            }
+            if (has(SkikoMouseButtons.BUTTON_4)) {
+                add("BUTTON_4")
+            }
+            if (has(SkikoMouseButtons.BUTTON_5)) {
+                add("BUTTON_5")
+            }
+            if (has(SkikoMouseButtons.BUTTON_6)) {
+                add("BUTTON_6")
+            }
+            if (has(SkikoMouseButtons.BUTTON_7)) {
+                add("BUTTON_7")
+            }
+            if (has(SkikoMouseButtons.BUTTON_8)) {
+                add("BUTTON_8")
+            }
+        }
+        return if (!result.isEmpty()) result.toString() else ""
+    }
+}
+
+inline class SkikoInputModifiers(val value: Int) {
+    companion object {
+        val EMPTY = SkikoInputModifiers(0)
+        val META = SkikoInputModifiers(1)
+        val CONTROL = SkikoInputModifiers(2)
+        val ALT = SkikoInputModifiers(4)
+        val SHIFT = SkikoInputModifiers(8)
+    }
+
+    fun has(value: SkikoInputModifiers): Boolean {
+        if (value.value and this.value != 0) {
+            return true
+        }
+        return false
+    }
+
+    override fun toString(): String {
+        val result = mutableListOf<String>().apply {
+            if (has(SkikoInputModifiers.META)) {
+                add("META")
+            }
+            if (has(SkikoInputModifiers.CONTROL)) {
+                add("CONTROL")
+            }
+            if (has(SkikoInputModifiers.ALT)) {
+                add("ALT")
+            }
+            if (has(SkikoInputModifiers.SHIFT)) {
+                add("SHIFT")
+            }
+        }
+        return if (!result.isEmpty()) result.toString() else ""
+    }
 }
 
 enum class SkikoGestureEventKind {
@@ -22,7 +104,6 @@ data class SkikoGestureEvent(
     val x: Double, val y: Double,
     val velocity: Double = 0.0,
     val direction: SkikoGestureEventDirection = SkikoGestureEventDirection.UNKNOWN,
-    val interval: Long = 0,
     val rotation: Double = 0.0,
     val scale: Double = 1.0,
     val kind: SkikoGestureEventKind,
@@ -42,6 +123,7 @@ enum class SkikoKeyboardEventKind {
 expect class SkikoPlatformKeyboardEvent
 data class SkikoKeyboardEvent(
     val code: Int,
+    val modifiers: SkikoInputModifiers = SkikoInputModifiers.EMPTY,
     val kind: SkikoKeyboardEventKind,
     val platform: SkikoPlatformKeyboardEvent?
 )
@@ -52,14 +134,18 @@ enum class SkikoPointerEventKind {
 expect class SkikoPlatformPointerEvent
 data class SkikoPointerEvent(
     val x: Double, val y: Double,
-    val buttonMask: Int,
+    val buttons: SkikoMouseButtons = SkikoMouseButtons.NONE,
+    val modifiers: SkikoInputModifiers = SkikoInputModifiers.EMPTY,
     val kind: SkikoPointerEventKind,
     val platform: SkikoPlatformPointerEvent?
 )
 
 val SkikoPointerEvent.isLeftClick: Boolean
-    get() = (buttonMask and SkikoMouseButtons.LEFT) != 0 && (kind == SkikoPointerEventKind.UP)
+    get() = buttons.has(SkikoMouseButtons.LEFT) && (kind == SkikoPointerEventKind.UP)
 
 val SkikoPointerEvent.isRightClick: Boolean
-    get() = (buttonMask and SkikoMouseButtons.RIGHT) != 0 && (kind == SkikoPointerEventKind.UP)
+    get() = buttons.has(SkikoMouseButtons.RIGHT) && (kind == SkikoPointerEventKind.UP)
+
+val SkikoPointerEvent.isMiddleClick: Boolean
+    get() = buttons.has(SkikoMouseButtons.MIDDLE) && (kind == SkikoPointerEventKind.UP)
 

@@ -29,23 +29,6 @@ actual open class SkiaLayer {
 
     actual var skikoView: SkikoView? = null
 
-    fun translatePointerEvent(
-        event: MouseEvent,
-        buttons: Boolean,
-        kind: SkikoPointerEventKind
-    ): SkikoPointerEvent {
-        var mask = SkikoMouseButtons.NONE
-        if (buttons && event.button.toInt() == 0)
-            mask = mask or SkikoMouseButtons.LEFT
-        // https://www.w3schools.com/jsref/event_button.asp
-        if (buttons && event.button.toInt() == 2)
-            mask = mask or SkikoMouseButtons.RIGHT
-        return SkikoPointerEvent(
-            event.offsetX, event.offsetY,
-            mask, kind, event
-        )
-    }
-
     actual fun attachTo(container: Any) {
         attachTo(container as HTMLCanvasElement, false)
     }
@@ -66,36 +49,26 @@ actual open class SkiaLayer {
         // https://developer.mozilla.org/en-US/docs/Web/API/Pointer_events
         htmlCanvas.addEventListener("pointerdown", { event ->
             event as MouseEvent
-            skikoView?.onPointerEvent(translatePointerEvent(
-                event, true, SkikoPointerEventKind.DOWN))
+            skikoView?.onPointerEvent(toSkikoEvent(event, true, SkikoPointerEventKind.DOWN))
         })
         htmlCanvas.addEventListener("pointerup", { event ->
             event as MouseEvent
-            var mask = SkikoMouseButtons.NONE
-            skikoView?.onPointerEvent(translatePointerEvent(
-                event, true, SkikoPointerEventKind.UP))
+            skikoView?.onPointerEvent(toSkikoEvent(event, true, SkikoPointerEventKind.UP))
         })
         htmlCanvas.addEventListener("pointermove", { event ->
             event as MouseEvent
-            skikoView?.onPointerEvent(translatePointerEvent(
-                event, false, SkikoPointerEventKind.MOVE))
+            skikoView?.onPointerEvent(toSkikoEvent(event, false, SkikoPointerEventKind.MOVE))
         })
         htmlCanvas.addEventListener("contextmenu", { event ->
             event.preventDefault()
         })
         htmlCanvas.addEventListener("keydown", { event ->
             event as KeyboardEvent
-            skikoView?.onKeyboardEvent(
-                    SkikoKeyboardEvent(
-                    event.keyCode, SkikoKeyboardEventKind.DOWN, event
-                )
-            )
+            skikoView?.onKeyboardEvent(toSkikoEvent(event, SkikoKeyboardEventKind.DOWN))
         })
         htmlCanvas.addEventListener("keyup", { event ->
             event as KeyboardEvent
-            skikoView?.onKeyboardEvent(SkikoKeyboardEvent(
-                event.keyCode, SkikoKeyboardEventKind.UP, event
-            ))
+            skikoView?.onKeyboardEvent(toSkikoEvent(event, SkikoKeyboardEventKind.UP))
         })
     }
 }

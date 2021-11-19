@@ -5,14 +5,7 @@ import org.jetbrains.skia.paragraph.FontCollection
 import org.jetbrains.skia.paragraph.ParagraphBuilder
 import org.jetbrains.skia.paragraph.ParagraphStyle
 import org.jetbrains.skia.paragraph.TextStyle
-import org.jetbrains.skiko.currentSystemTheme
-import org.jetbrains.skiko.SkiaLayer
-import org.jetbrains.skiko.SkikoView
-import org.jetbrains.skiko.SkikoPointerEvent
-import org.jetbrains.skiko.SkikoGestureEvent
-import org.jetbrains.skiko.SkikoGestureEventKind
-import org.jetbrains.skiko.SkikoGestureEventState
-import org.jetbrains.skiko.isLeftClick
+import org.jetbrains.skiko.*
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.PI
@@ -103,10 +96,24 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
     }
 
     override fun onPointerEvent(event: SkikoPointerEvent) {
-        if (event.isLeftClick) {
-            xpos = event.x
-            ypos = event.y
+        when (event.kind) {
+            SkikoPointerEventKind.DOWN,
+            SkikoPointerEventKind.MOVE -> {
+                xpos = event.x
+                ypos = event.y
+            }
+            else -> {}
         }
+        // TODO: provide example that covers all features of pointer event
+    }
+
+    override fun onInputEvent(event: SkikoInputEvent) {
+        // TODO: provide example that covers all features of text input event
+    }
+
+    override fun onKeyboardEvent(event: SkikoKeyboardEvent) {
+        println(event.kind)
+        // TODO: provide example that covers all features of keyboard event
     }
 
     override fun onGestureEvent(event: SkikoGestureEvent) {
