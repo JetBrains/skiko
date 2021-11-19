@@ -214,16 +214,12 @@ SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Typeface__1nGetFamilyName
     return new SkString(name);
 }
 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Typeface__1nGetBounds
-  (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_Typeface__1nGetBounds");
+SKIKO_EXPORT void org_jetbrains_skia_Typeface__1nGetBounds
+  (KNativePointer ptr, KFloat* bounds) {
+    SkTypeface* instance = reinterpret_cast<SkTypeface*>(ptr);
+    SkRect b = instance->getBounds();
+    bounds[0] = b.left();
+    bounds[1] = b.top();
+    bounds[2] = b.right();
+    bounds[3] = b.bottom();
 }
-     
-#if 0 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Typeface__1nGetBounds
-  (KNativePointer ptr) {
-    SkTypeface* instance = reinterpret_cast<SkTypeface*>((ptr));
-    return skija::Rect::fromSkRect(env, instance->getBounds());
-}
-#endif
-

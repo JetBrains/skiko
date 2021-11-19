@@ -395,7 +395,9 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     val bounds: Rect
         get() = try {
             Stats.onNativeCall()
-            Typeface_nGetBounds(_ptr)
+            Rect.fromInteropPointer {
+                Typeface_nGetBounds(_ptr, it)
+            }
         } finally {
             reachabilityBarrier(this)
         }
@@ -422,7 +424,7 @@ private external fun Typeface_nGetUTF32Glyphs(
 private external fun Typeface_nGetUTF32Glyph(ptr: NativePointer, unichar: Int): Short
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetBounds")
-private external fun Typeface_nGetBounds(ptr: NativePointer): Rect
+private external fun Typeface_nGetBounds(ptr: NativePointer, bounds: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetFontStyle")
 private external fun _nGetFontStyle(ptr: NativePointer): Int

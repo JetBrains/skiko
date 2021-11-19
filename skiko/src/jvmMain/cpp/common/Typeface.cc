@@ -222,8 +222,10 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetFami
     return reinterpret_cast<jlong>(new SkString(name));
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_TypefaceKt_Typeface_1nGetBounds
-  (JNIEnv* env, jclass jclass, jlong ptr) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TypefaceKt_Typeface_1nGetBounds
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray res) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
-    return skija::Rect::fromSkRect(env, instance->getBounds());
+    SkRect b = instance->getBounds();
+    float r[4] = {b.left(), b.top(), b.right(), b.bottom()};
+    env->SetFloatArrayRegion(res, 0, 4, r);
 }
