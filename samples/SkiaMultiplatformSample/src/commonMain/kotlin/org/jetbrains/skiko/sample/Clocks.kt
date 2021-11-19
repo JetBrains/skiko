@@ -85,7 +85,7 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
             .popStyle()
             .build()
         renderInfo.layout(Float.POSITIVE_INFINITY)
-        renderInfo.paint(canvas, 5f, 5f)
+        renderInfo.paint(canvas, 5f, 50f)
         val frames = ParagraphBuilder(style, fontCollection)
             .pushStyle(TextStyle().setColor(0xff9BC730L.toInt()).setFontSize(20f))
             .addText("Frames: ${frame++}\nAngle: $rotate")
