@@ -86,6 +86,11 @@ extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_paragraph_Para
     jobjectArray rectsArray = env->NewObjectArray((jsize) rects.size(), skija::paragraph::TextBox::cls, nullptr);
     for (int i = 0; i < rects.size(); ++i) {
         TextBox box = rects[i];
+        // TODO fix https://github.com/JetBrains/compose-jb/issues/1308 another way, we just masking the issue
+        // (but experiments show, that the result of GetRectsForRange is correct after that)
+        if (isnan(box.rect.fLeft) || isnan(box.rect.fTop) || isnan(box.rect.fRight) || isnan(box.rect.fBottom)) {
+            continue;
+        }
         jobject boxObj = env->NewObject(skija::paragraph::TextBox::cls, skija::paragraph::TextBox::ctor, box.rect.fLeft, box.rect.fTop, box.rect.fRight, box.rect.fBottom, static_cast<jint>(box.direction));
         env->SetObjectArrayElement(rectsArray, i, boxObj);
         env->DeleteLocalRef(boxObj);
