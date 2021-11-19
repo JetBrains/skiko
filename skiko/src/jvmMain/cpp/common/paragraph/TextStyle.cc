@@ -157,7 +157,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_TextStyleKt_
 
     for (int i = 0; i < shadows.size(); ++i) {
         const TextShadow& s = shadows[i];
-        jlong blurSigma = (jlong)s.fBlurSigma;
+        jlong blurSigma = rawBits(s.fBlurSigma);
         jint r[5] = {static_cast<jint>(s.fColor), rawBits(s.fOffset.fX), rawBits(s.fOffset.fY), (jint)(blurSigma >> 32), (jint)blurSigma };
         env->SetIntArrayRegion(res, 5 * i, 5, r);
     }
