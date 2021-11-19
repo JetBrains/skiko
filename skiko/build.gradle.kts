@@ -38,32 +38,94 @@ val windowsSdkPaths: WindowsSdkPaths by lazy {
     findWindowsSdkPathsForCurrentOS(gradle)
 }
 
-val skiaWasmDir = registerOrGetSkiaDirProvider(OS.Wasm, Arch.Wasm)
+if (supportWasm) {
+    val skiaWasmDir = registerOrGetSkiaDirProvider(OS.Wasm, Arch.Wasm)
 
-val compileWasm = tasks.register<CompileSkikoCppTask>("compileWasm") {
-    val osArch = OS.Wasm to Arch.Wasm
+    val compileWasm by tasks.registering(CompileSkikoCppTask::class) {
+        val osArch = OS.Wasm to Arch.Wasm
 
-    dependsOn(skiaWasmDir)
+        dependsOn(skiaWasmDir)
 
-    compiler.set(compilerForTarget(OS.Wasm, Arch.Wasm))
-    buildTargetOS.set(osArch.first)
-    buildTargetArch.set(osArch.second)
-    buildVariant.set(buildType)
+        compiler.set(compilerForTarget(OS.Wasm, Arch.Wasm))
+        buildTargetOS.set(osArch.first)
+        buildTargetArch.set(osArch.second)
+        buildVariant.set(buildType)
 
-    val srcDirs = projectDirs("src/commonMain/cpp/common", "src/jsMain/cpp", "src/nativeJsMain/cpp") +
-        if (skiko.includeTestHelpers) projectDirs("src/nativeJsTest/cpp") else emptyList()
-    sourceRoots.set(srcDirs)
+        val srcDirs = projectDirs("src/commonMain/cpp/common", "src/jsMain/cpp", "src/nativeJsMain/cpp") +
+                if (skiko.includeTestHelpers) projectDirs("src/nativeJsTest/cpp") else emptyList()
+        sourceRoots.set(srcDirs)
 
-    includeHeadersNonRecursive(projectDir.resolve("src/nativeJsMain/cpp"))
-    includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp/common/include"))
-    includeHeadersNonRecursive(skiaHeadersDirs(skiaWasmDir.get()))
+        includeHeadersNonRecursive(projectDir.resolve("src/nativeJsMain/cpp"))
+        includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp/common/include"))
+        includeHeadersNonRecursive(skiaHeadersDirs(skiaWasmDir.get()))
 
-    flags.set(listOf(
-        *skiaPreprocessorFlags(),
-        "-DSKIKO_WASM",
-        "-fno-rtti",
-        "-fno-exceptions"
-    ))
+        flags.set(listOf(
+            *skiaPreprocessorFlags(),
+            "-DSKIKO_WASM",
+            "-fno-rtti",
+            "-fno-exceptions"
+        ))
+    }
+
+    val linkWasm by tasks.registering(LinkSkikoWasmTask::class) {
+        val osArch = OS.Wasm to Arch.Wasm
+
+        dependsOn(compileWasm)
+        dependsOn(skiaWasmDir)
+        val unpackedSkia = skiaWasmDir.get()
+
+        linker.set(linkerForTarget(OS.Wasm, Arch.Wasm))
+        buildTargetOS.set(osArch.first)
+        buildTargetArch.set(osArch.second)
+        buildVariant.set(buildType)
+
+        libFiles = project.fileTree(unpackedSkia)  { include("**/*.a") }
+        objectFiles = project.fileTree(compileWasm.map { it.outDir.get() }) {
+            include("**/*.o")
+        }
+
+        libOutputFileName.set("skiko.wasm")
+        jsOutputFileName.set("skiko.js")
+
+        skikoJsPrefix.set(project.layout.projectDirectory.file("src/jsMain/resources/setup.js"))
+
+        flags.set(listOf(
+            "-l", "GL",
+            "-s", "USE_WEBGL2=1",
+            "-s", "OFFSCREEN_FRAMEBUFFER=1",
+            "-s", "ALLOW_MEMORY_GROWTH=1", // TODO: Is there a better way? Should we use `-s INITIAL_MEMORY=X`?
+            "--bind",
+        ))
+
+        doLast {
+            // skiko.js file is directly referenced in karma.config.d/wasm.js
+            // so symbols must be replaced right after linking
+            val jsFiles = outDir.asFile.get().walk()
+                .filter { it.isFile && it.name.endsWith(".js") }
+
+            for (jsFile in jsFiles) {
+                val originalContent = jsFile.readText()
+                val newContent = originalContent.replace("_org_jetbrains", "org_jetbrains")
+                jsFile.writeText(newContent)
+            }
+        }
+    }
+
+    val skikoWasmJar by project.tasks.registering(Jar::class) {
+        dependsOn(linkWasm)
+        // We produce jar that contains .js of wrapper/bindings and .wasm with Skia + bindings.
+        val wasmOutDir = linkWasm.map { it.outDir }
+
+        from(wasmOutDir) {
+            include("*.wasm")
+            include("*.js")
+        }
+
+        archiveBaseName.set("skiko-wasm")
+        doLast {
+            println("Wasm and JS at: ${archiveFile.get().asFile.absolutePath}")
+        }
+    }
 }
 
 fun compileNativeBridgesTask(os: OS, arch: Arch): TaskProvider<CompileSkikoCppTask> {
@@ -142,50 +204,6 @@ fun compileNativeBridgesTask(os: OS, arch: Arch): TaskProvider<CompileSkikoCppTa
     }
 }
 
-val linkWasm = tasks.register<LinkSkikoWasmTask>("linkWasm") {
-    val osArch = OS.Wasm to Arch.Wasm
-
-    dependsOn(compileWasm)
-    dependsOn(skiaWasmDir)
-    val unpackedSkia = skiaWasmDir.get()
-
-    linker.set(linkerForTarget(OS.Wasm, Arch.Wasm))
-    buildTargetOS.set(osArch.first)
-    buildTargetArch.set(osArch.second)
-    buildVariant.set(buildType)
-
-    libFiles = project.fileTree(unpackedSkia)  { include("**/*.a") }
-    objectFiles = project.fileTree(compileWasm.map { it.outDir.get() }) {
-        include("**/*.o")
-    }
-
-    libOutputFileName.set("skiko.wasm")
-    jsOutputFileName.set("skiko.js")
-
-    skikoJsPrefix.set(project.layout.projectDirectory.file("src/jsMain/resources/setup.js"))
-
-    flags.set(listOf(
-        "-l", "GL",
-        "-s", "USE_WEBGL2=1",
-        "-s", "OFFSCREEN_FRAMEBUFFER=1",
-        "-s", "ALLOW_MEMORY_GROWTH=1", // TODO: Is there a better way? Should we use `-s INITIAL_MEMORY=X`?
-        "--bind",
-    ))
-
-    doLast {
-        // skiko.js file is directly referenced in karma.config.d/wasm.js
-        // so symbols must be replaced right after linking
-        val jsFiles = outDir.asFile.get().walk()
-            .filter { it.isFile && it.name.endsWith(".js") }
-
-        for (jsFile in jsFiles) {
-            val originalContent = jsFile.readText()
-            val newContent = originalContent.replace("_org_jetbrains", "org_jetbrains")
-            jsFile.writeText(newContent)
-        }
-    }
-}
-
 val skiaBinSubdir = "out/${buildType.id}-${targetOs.id}-${targetArch.id}"
 
 internal val Project.isInIdea: Boolean
@@ -194,10 +212,10 @@ internal val Project.isInIdea: Boolean
     }
 
 val Project.supportNative: Boolean
-   get() = (properties.get("skiko.native.enabled") == "true") || isInIdea
+   get() = findProperty("skiko.native.enabled") == "true" || isInIdea
 
 val Project.supportWasm: Boolean
-    get() = properties.get("skiko.wasm.enabled") == "true"
+    get() = findProperty("skiko.wasm.enabled") == "true" || isInIdea
 
 kotlin {
     jvm {
@@ -206,16 +224,18 @@ kotlin {
         }
     }
 
-    js(IR) {
-        browser() {
-            testTask {
-                dependsOn(linkWasm)
-                useKarma {
-                    useChromeHeadless()
+    if (supportWasm) {
+        js(IR) {
+            browser() {
+                testTask {
+                    dependsOn("linkWasm")
+                    useKarma {
+                        useChromeHeadless()
+                    }
                 }
             }
+            binaries.executable()
         }
-        binaries.executable()
     }
 
     if (supportNative) {
@@ -255,96 +275,102 @@ kotlin {
             }
         }
 
-        val nativeJsMain by creating {
-            dependsOn(commonMain)
-        }
-
-        val nativeJsTest by creating {
-            dependsOn(commonTest)
-        }
-
-        val jsMain by getting {
-            dependsOn(nativeJsMain)
-        }
-
-        val jsTest by getting {
-            dependsOn(nativeJsTest)
-            dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
-                implementation(kotlin("test-js"))
+        if (supportWasm || supportNative) {
+            val nativeJsMain by creating {
+                dependsOn(commonMain)
             }
-        }
 
-        if (supportNative) {
-            // See https://kotlinlang.org/docs/mpp-share-on-platforms.html#configure-the-hierarchical-structure-manually
-            val nativeMain by creating {
-                dependsOn(nativeJsMain)
-                dependencies {
-                    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
+            val nativeJsTest by creating {
+                dependsOn(commonTest)
+            }
+
+            if (supportWasm) {
+                val jsMain by getting {
+                    dependsOn(nativeJsMain)
+                }
+
+                val jsTest by getting {
+                    dependsOn(nativeJsTest)
+                    dependencies {
+                        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
+                        implementation(kotlin("test-js"))
+                    }
                 }
             }
-            val nativeTest by creating {
-                dependsOn(nativeJsTest)
-            }
-            val linuxMain by creating {
-                dependsOn(nativeMain)
-            }
-            val linuxTest by creating {
-                dependsOn(nativeTest)
-            }
-            val linuxX64Main by getting {
-                dependsOn(linuxMain)
-            }
-            val linuxX64Test by getting {
-                dependsOn(linuxTest)
-            }
-            val darwinMain by creating {
-                dependsOn(nativeMain)
-            }
-            val darwinTest by creating {
-                dependsOn(nativeTest)
-            }
-            val macosMain by creating {
-                dependsOn(darwinMain)
-            }
-            val macosTest by creating {
-                dependsOn(darwinTest)
-            }
-            val iosMain by creating {
-                dependsOn(darwinMain)
-            }
-            val iosTest by creating {
-                dependsOn(darwinTest)
-            }
-            val macosX64Main by getting {
-                dependsOn(macosMain)
-            }
-            val macosX64Test by getting {
-                dependsOn(macosTest)
-            }
-            val macosArm64Main by getting {
-                dependsOn(macosMain)
-            }
-            val macosArm64Test by getting {
-                dependsOn(macosTest)
-            }
-            val iosX64Main by getting {
-                dependsOn(iosMain)
-            }
-            val iosX64Test by getting {
-                dependsOn(iosTest)
-            }
-            val iosArm64Main by getting {
-                dependsOn(iosMain)
-            }
-            val iosArm64Test by getting {
-                dependsOn(iosTest)
+
+            if (supportNative) {
+                // See https://kotlinlang.org/docs/mpp-share-on-platforms.html#configure-the-hierarchical-structure-manually
+                val nativeMain by creating {
+                    dependsOn(nativeJsMain)
+                    dependencies {
+                        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
+                    }
+                }
+                val nativeTest by creating {
+                    dependsOn(nativeJsTest)
+                }
+                val linuxMain by creating {
+                    dependsOn(nativeMain)
+                }
+                val linuxTest by creating {
+                    dependsOn(nativeTest)
+                }
+                val linuxX64Main by getting {
+                    dependsOn(linuxMain)
+                }
+                val linuxX64Test by getting {
+                    dependsOn(linuxTest)
+                }
+                val darwinMain by creating {
+                    dependsOn(nativeMain)
+                }
+                val darwinTest by creating {
+                    dependsOn(nativeTest)
+                }
+                val macosMain by creating {
+                    dependsOn(darwinMain)
+                }
+                val macosTest by creating {
+                    dependsOn(darwinTest)
+                }
+                val iosMain by creating {
+                    dependsOn(darwinMain)
+                }
+                val iosTest by creating {
+                    dependsOn(darwinTest)
+                }
+                val macosX64Main by getting {
+                    dependsOn(macosMain)
+                }
+                val macosX64Test by getting {
+                    dependsOn(macosTest)
+                }
+                val macosArm64Main by getting {
+                    dependsOn(macosMain)
+                }
+                val macosArm64Test by getting {
+                    dependsOn(macosTest)
+                }
+                val iosX64Main by getting {
+                    dependsOn(iosMain)
+                }
+                val iosX64Test by getting {
+                    dependsOn(iosTest)
+                }
+                val iosArm64Main by getting {
+                    dependsOn(iosMain)
+                }
+                val iosArm64Test by getting {
+                    dependsOn(iosTest)
+                }
             }
         }
     }
 }
 
 fun configureNativeTarget(os: OS, arch: Arch, target: KotlinNativeTarget) {
+    if (!os.isCompatibleWithHost) return
+
     val targetString = "${os.id}-${arch.id}"
 
     val unzipper = registerOrGetSkiaDirProvider(os, arch)
@@ -366,6 +392,7 @@ fun configureNativeTarget(os: OS, arch: Arch, target: KotlinNativeTarget) {
                 )
                 OS.IOS -> mutableListOf("-linker-option", "-framework", "-linker-option", "Metal",
                     "-linker-option", "-framework", "-linker-option", "CoreGraphics",
+                    "-linker-option", "-framework", "-linker-option", "UIKit",
                     "-linker-option", "-framework", "-linker-option", "CoreText")
                 OS.Linux -> mutableListOf(
                     "-linker-option", "-L/usr/lib/x86_64-linux-gnu",
@@ -732,157 +759,42 @@ val generateVersion = project.tasks.register("generateVersion") {
     }
 }
 
-fun localSign(signer: String, lib: File): File {
-    println("Local signing $lib as $signer")
-    val proc = ProcessBuilder("codesign", "-f", "-s", signer, lib.absolutePath)
-        .redirectOutput(ProcessBuilder.Redirect.PIPE)
-        .redirectError(ProcessBuilder.Redirect.PIPE)
-        .start()
-    proc.waitFor(5, TimeUnit.MINUTES)
-    if (proc.exitValue() != 0) {
-        val out = proc.inputStream.bufferedReader().readText()
-        val err = proc.errorStream.bufferedReader().readText()
-        println(out)
-        println(err)
-        throw GradleException("Cannot sign $lib: $err")
-    }
-    return lib
-}
-
-// See https://github.com/olonho/sealer.
-fun sealBinary(sealer: String, lib: File) {
-    println("Sealing $lib by $sealer")
-    val proc = ProcessBuilder(sealer, "-f", lib.absolutePath, "-p", "Java_")
-        .redirectOutput(ProcessBuilder.Redirect.INHERIT)
-        .redirectError(ProcessBuilder.Redirect.INHERIT)
-        .start()
-    proc.waitFor(2, TimeUnit.MINUTES)
-    if (proc.exitValue() != 0) {
-        throw GradleException("Cannot seal $lib")
-    }
-    println("Sealed!")
-}
-
-fun remoteSignCurl(signHost: String, lib: File, out: File) {
-    println("Remote signing $lib on $signHost")
-    val user = skiko.signUser ?: error("signUser is null")
-    val token = skiko.signToken ?: error("signToken is null")
-    val cmd = """
-        TOKEN=`curl -fsSL --user $user:$token --url "$signHost/auth" | grep token | cut -d '"' -f4` \
-        && curl --no-keepalive --http1.1 --data-binary @${lib.absolutePath} \
-        -H "Authorization: Bearer ${'$'}TOKEN" \
-        -H "Content-Type:application/x-mac-app-bin" \
-        "$signHost/sign?name=${lib.name}" -o "${out.absolutePath}"
-    """.trimIndent()
-    val proc = ProcessBuilder("bash", "-c", cmd)
-        .redirectOutput(ProcessBuilder.Redirect.PIPE)
-        .redirectError(ProcessBuilder.Redirect.PIPE)
-        .start()
-    proc.waitFor(5, TimeUnit.MINUTES)
-    if (proc.exitValue() != 0) {
-        val out = proc.inputStream.bufferedReader().readText()
-        val err = proc.errorStream.bufferedReader().readText()
-        println(out)
-        println(err)
-        throw GradleException("Cannot sign $lib: $err")
-    } else {
-        val outSize = out.length()
-        if (outSize < 200 * 1024) {
-            val content = out.readText()
-            println(content)
-            throw GradleException("Output is too short $outSize: ${content.take(200)}...")
-        }
-    }
-}
-
-fun remoteSignCodesign(fileToSign: File) {
-    val user = skiko.signUser ?: error("signUser is null")
-    val token = skiko.signToken ?: error("signToken is null")
-    val cmd = arrayOf(
-        projectDir.resolve("tools/codesign-client-darwin-x64").absolutePath,
-        fileToSign.absolutePath
-    )
-    val procBuilder = ProcessBuilder(*cmd).apply {
-        directory(fileToSign.parentFile)
-        val env = environment()
-        env["SERVICE_ACCOUNT_NAME"] = user
-        env["SERVICE_ACCOUNT_TOKEN"] = token
-        redirectOutput(ProcessBuilder.Redirect.INHERIT)
-        redirectError(ProcessBuilder.Redirect.INHERIT)
-    }
-    logger.info("Starting remote code sign")
-    val proc = procBuilder.start()
-    proc.waitFor(5, TimeUnit.MINUTES)
-    if (proc.exitValue() != 0) {
-        throw GradleException("Failed to sign $fileToSign")
-    } else {
-        val signedDir = fileToSign.parentFile.resolve("signed")
-        val signedFile = signedDir.resolve(fileToSign.name)
-        check(signedFile.exists()) {
-            buildString {
-                appendLine("Signed file does not exist: $signedFile")
-                appendLine("Other files in $signedDir:")
-                signedDir.list()?.let { names ->
-                    names.forEach {
-                        appendLine("  * $it")
-                    }
-                }
-            }
-        }
-        val size = signedFile.length()
-        if (size < 200 * 1024) {
-            val content = signedFile.readText()
-            println(content)
-            throw GradleException("Output is too short $size: ${content.take(200)}...")
-        } else {
-            signedFile.copyTo(fileToSign, overwrite = true)
-            signedFile.delete()
-            logger.info("Successfully signed $fileToSign")
-        }
-    }
-}
-
 val skikoJvmJar: Provider<Jar> by tasks.registering(Jar::class) {
     archiveBaseName.set("skiko-jvm")
         from(kotlin.jvm().compilations["main"].output.allOutputs)
 }
 
-val maybeSign by project.tasks.registering {
+val maybeSign by project.tasks.registering(SealAndSignSharedLibraryTask::class) {
     dependsOn(linkJvmBindings)
 
-    val lib = linkJvmBindings.map { task ->
-        task.outDir.get().asFile.walk().single { file -> file.name.endsWith(targetOs.dynamicLibExt) }
+    val linkOutputFile = linkJvmBindings.map { task ->
+        task.outDir.get().asFile.walk().single { it.name.endsWith(targetOs.dynamicLibExt) }.absoluteFile
     }
-    inputs.files(lib)
+    libFile.set(project.layout.file(linkOutputFile))
+    outDir.set(project.layout.buildDirectory.dir("maybe-signed"))
 
-    val outputDir = project.layout.buildDirectory.dir("maybe-signed")
-    val output = outputDir.map { it.asFile.resolve(lib.get().name) }
-    outputs.files(output)
-
-    doLast {
-        outputDir.get().asFile.apply {
-            deleteRecursively()
-            mkdirs()
-        }
-
-        val libFile = lib.get()
-        val outputFile = output.get()
-        libFile.copyTo(outputFile, overwrite = true)
-
-        if (targetOs == OS.Linux) {
-            // Linux requires additional sealing to run on wider set of platforms.
-            val sealer = "$projectDir/tools/sealer-${hostArch.id}"
-            sealBinary(sealer, outputFile)
-        }
-        if (skiko.signHost != null) {
-            remoteSignCodesign(outputFile)
+    val toolsDir = project.layout.projectDirectory.dir("tools")
+    if (targetOs == OS.Linux) {
+        // Linux requires additional sealing to run on wider set of platforms.
+        // See https://github.com/olonho/sealer.
+        when (targetArch) {
+            Arch.X64 -> sealer.set(toolsDir.file("sealer-x64"))
+            Arch.Arm64 -> sealer.set(toolsDir.file("sealer-arm64"))
+            else -> error("Unexpected combination of '$targetArch' and '$targetOs'")
         }
     }
+
+    if (hostOs == OS.MacOS) {
+        codesignClient.set(toolsDir.file("codesign-client-darwin-x64"))
+    }
+    signHost.set(skiko.signHost)
+    signUser.set(skiko.signUser)
+    signToken.set(skiko.signToken)
 }
 
 val createChecksums by project.tasks.registering(org.gradle.crypto.checksum.Checksum::class) {
     dependsOn(maybeSign)
-    files = project.files(maybeSign.map { it.outputs.files }) +
+    files = project.files(maybeSign.flatMap { it.outputFiles }) +
             if (targetOs.isWindows) files(skiaJvmBindingsDir.map { it.resolve("${skiaBinSubdir}/icudtl.dat") }) else files()
     algorithm = Checksum.Algorithm.SHA256
     outputDir = file("$buildDir/checksums")
@@ -892,27 +804,11 @@ val skikoJvmRuntimeJar by project.tasks.registering(Jar::class) {
     dependsOn(createChecksums)
     archiveBaseName.set("skiko-$target")
     from(skikoJvmJar.map { zipTree(it.archiveFile) })
-    from(maybeSign.map { it.outputs.files })
+    from(maybeSign.flatMap { it.outputFiles })
     if (targetOs.isWindows) {
         from(files(skiaJvmBindingsDir.map { it.resolve("${skiaBinSubdir}/icudtl.dat") }))
     }
     from(createChecksums.map { it.outputs.files })
-}
-
-val skikoWasmJar by project.tasks.registering(Jar::class) {
-    dependsOn(linkWasm)
-    // We produce jar that contains .js of wrapper/bindings and .wasm with Skia + bindings.
-    val wasmOutDir = linkWasm.map { it.outDir }
-
-    from(wasmOutDir) {
-        include("*.wasm")
-        include("*.js")
-    }
-
-    archiveBaseName.set("skiko-wasm")
-    doLast {
-        println("Wasm and JS at: ${archiveFile.get().asFile.absolutePath}")
-    }
 }
 
 val skikoRuntimeDirForTests by project.tasks.registering(Copy::class) {
@@ -1060,7 +956,7 @@ publishing {
             create<MavenPublication>("skikoWasmRuntime") {
                 pomNameForPublication[name] = "Skiko WASM Runtime"
                 artifactId = SkikoArtifacts.jsWasmArtifactId
-                artifact(skikoWasmJar.get())
+                artifact(tasks.named("skikoWasmJar").get())
                 artifact(emptySourcesJar)
             }
         }
@@ -1106,11 +1002,6 @@ if (hostOs == OS.Linux && hostArch != Arch.X64) {
     rootProject.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin::class.java) {
         rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>().download = false
     }
-}
-
-fun Task.projectDirs(vararg relativePaths: String): List<Directory> {
-    val projectDir = project.layout.projectDirectory
-    return relativePaths.map { path -> projectDir.dir(path) }
 }
 
 /**

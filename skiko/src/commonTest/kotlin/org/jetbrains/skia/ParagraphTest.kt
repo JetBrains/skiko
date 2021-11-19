@@ -105,4 +105,17 @@ class ParagraphTest {
         )
     }
 
+    @Test
+    fun getRectsForRange() {
+        val fontCollection = FontCollection().setDefaultFontManager(FontMgr.default)
+
+        repeat(1000) { // the bug is flaky, and isn't always reproducible
+            val para = ParagraphBuilder(ParagraphStyle(), fontCollection).use {
+                it.addText("xxx\r\nxxx")
+                it.build()
+            }.layout(Float.POSITIVE_INFINITY)
+
+            para.getRectsForRange(2, 8, RectHeightMode.MAX, RectWidthMode.MAX)
+        }
+    }
 }

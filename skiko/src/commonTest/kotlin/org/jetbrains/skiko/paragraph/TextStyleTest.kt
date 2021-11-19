@@ -108,10 +108,21 @@ class TextStyleTest {
             textStyle.addShadow(Shadow(200, 0.2f, 0.4f, 1.4))
             textStyle.addShadows(arrayOf(Shadow(100, 0.3f, 0.1f, 2.0)))
 
-            assertContentCloseEnough(arrayOf(
-                Shadow(200, 0.2f, 0.4f, 1.4),
-                Shadow(100, 0.3f, 0.1f, 2.0)
-            ), textStyle.shadows, if (kotlinBackend == KotlinBackend.JS) 0.00001f else 0f)
+            assertContentCloseEnough(
+                arrayOf(
+                    Shadow(200, 0.2f, 0.4f, 1.4),
+                    Shadow(100, 0.3f, 0.1f, 2.0)
+                ), textStyle.shadows, if (kotlinBackend == KotlinBackend.JS) 0.00001f else 0f
+            )
+
+        }
+    }
+
+    fun textStyleBaselineTest() {
+        TextStyle().use { textStyle ->
+            assertEquals(0.0f, textStyle.baselineShift)
+            textStyle.baselineShift = 4f
+            assertEquals(4f, textStyle.baselineShift)
         }
     }
 

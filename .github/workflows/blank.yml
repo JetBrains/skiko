@@ -29,9 +29,9 @@ jobs:
       - shell: bash
         run: |
           cd $GITHUB_WORKSPACE/skiko
-          ./gradlew -Pskiko.native.enabled=true jvmTest
-          ./gradlew -Pskiko.native.enabled=true macosX64Test
-          ./gradlew -Pskiko.native.enabled=true publishToMavenLocal
+          ./gradlew --stacktrace --info -Pskiko.native.enabled=true jvmTest
+          ./gradlew --stacktrace --info -Pskiko.native.enabled=true macosX64Test
+          ./gradlew --stacktrace --info -Pskiko.native.enabled=true publishToMavenLocal
       - uses: actions/upload-artifact@v2
         with:
           name: test-reports-macos
@@ -52,8 +52,8 @@ jobs:
       - shell: bash
         run: |
           cd $GITHUB_WORKSPACE/skiko
-          ./gradlew -Pskiko.native.enabled=true iosX64Test
-          ./gradlew -Pskiko.native.enabled=true publishToMavenLocal
+          ./gradlew --stacktrace --info -Pskiko.native.enabled=true iosX64Test
+          ./gradlew --stacktrace --info -Pskiko.native.enabled=true publishToMavenLocal
       - uses: actions/upload-artifact@v2
         with:
           name: test-reports-macos
@@ -87,8 +87,8 @@ jobs:
           sudo apt-get install ninja-build fontconfig libfontconfig1-dev libglu1-mesa-dev libxrandr-dev zip xvfb -y
           sudo Xvfb :0 -screen 0 1280x720x24 &
           export DISPLAY=:0
-          ./gradlew -Pskiko.native.enabled=true -i linuxX64Test jvmTest
-          ./gradlew publishToMavenLocal
+          ./gradlew --stacktrace --info -Pskiko.native.enabled=true linuxX64Test jvmTest
+          ./gradlew --stacktrace --info publishToMavenLocal
       - uses: actions/upload-artifact@v2
         with:
           name: test-reports-linux
@@ -124,8 +124,8 @@ jobs:
            ./emsdk activate 2.0.29
            source ./emsdk_env.sh
            cd ..
-           ./gradlew -Pskiko.wasm.enabled=true jsTest
-           ./gradlew -Pskiko.wasm.enabled=true publishSkikoWasmRuntimePublicationToMavenLocal
+           ./gradlew --stacktrace --info -Pskiko.wasm.enabled=true jsTest
+           ./gradlew --stacktrace --info -Pskiko.wasm.enabled=true publishSkikoWasmRuntimePublicationToMavenLocal
        - uses: actions/upload-artifact@v2
          with:
            name: test-reports-js
@@ -145,8 +145,8 @@ jobs:
       - shell: bash
         run: |
           cd ./skiko
-          ./gradlew jvmTest
-          ./gradlew publishToMavenLocal
+          ./gradlew --stacktrace --info jvmTest
+          ./gradlew --stacktrace --info publishToMavenLocal
       - uses: actions/upload-artifact@v2
         with:
           name: test-reports-windows

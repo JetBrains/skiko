@@ -4,7 +4,6 @@ import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 
-
 class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
         init {
@@ -290,6 +289,23 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         return this
     }
 
+    var baselineShift: Float
+        get() = try {
+            Stats.onNativeCall()
+            TextStyle_nGetBaselineShift(_ptr)
+        } finally {
+            reachabilityBarrier(this)
+        }
+        set(value) {
+            setBaselineShift(value)
+        }
+
+    fun setBaselineShift(baselineShift: Float): TextStyle {
+        Stats.onNativeCall()
+        TextStyle_nSetBaselineShift(_ptr, baselineShift)
+        return this
+    }
+
     var wordSpacing: Float
         get() = try {
             Stats.onNativeCall()
@@ -429,6 +445,12 @@ private external fun TextStyle_nGetHeight(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetHeight")
 private external fun TextStyle_nSetHeight(ptr: NativePointer, override: Boolean, height: Float)
+
+@ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetBaselineShift")
+private external fun TextStyle_nGetBaselineShift(ptr: NativePointer): Float
+
+@ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetBaselineShift")
+private external fun TextStyle_nSetBaselineShift(ptr: NativePointer, baselineShift: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nAttributeEquals")
 private external fun _nAttributeEquals(ptr: NativePointer, attribute: Int, otherPtr: NativePointer): Boolean

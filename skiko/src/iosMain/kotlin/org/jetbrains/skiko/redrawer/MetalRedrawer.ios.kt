@@ -40,7 +40,6 @@ internal class MetalRedrawer(
 
     private val frameDispatcher = FrameDispatcher(SkikoDispatchers.Main) {
         if (layer.isShowing()) {
-            layer.update(getTimeNanos())
             draw()
         }
     }
@@ -79,7 +78,6 @@ internal class MetalRedrawer(
 
     override fun redrawImmediately() {
         check(!isDisposed) { "MetalRedrawer is disposed" }
-        layer.update(getTimeNanos())
         draw()
     }
 
@@ -144,7 +142,6 @@ internal class MetalLayer : CAMetalLayer {
     }
 
     override fun drawInContext(ctx: CGContextRef?) {
-        skiaLayer.update(getTimeNanos())
         contextHandler.draw()
         super.drawInContext(ctx)
     }
