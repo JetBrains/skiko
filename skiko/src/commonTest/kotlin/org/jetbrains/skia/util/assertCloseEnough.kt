@@ -5,6 +5,7 @@ import org.jetbrains.skia.FontMetrics
 import org.jetbrains.skia.Matrix33
 import org.jetbrains.skia.Point
 import org.jetbrains.skia.Rect
+import org.jetbrains.skia.paragraph.Shadow
 import org.jetbrains.skia.paragraph.TextBox
 import org.jetbrains.skiko.KotlinBackend
 import org.jetbrains.skiko.kotlinBackend
@@ -14,10 +15,16 @@ import kotlin.test.assertTrue
 private val EPSILON = if (kotlinBackend == KotlinBackend.JS) 0.00001f else 0.00000001f
 
 private inline fun Float?.isCloseEnoughTo(b: Float?, epsilon: Float) =
-    if (this == null) b == null else if (b == null) false else abs(this - b) < epsilon
+    if (this == null) b == null else if (b == null) false else if (epsilon == 0f) this == b else abs(this - b) < epsilon
 
 private inline fun Point.isCloseEnoughTo(b: Point, epsilon: Float) =
     x.isCloseEnoughTo(b.x, epsilon) && y.isCloseEnoughTo(b.y, epsilon)
+
+private inline fun Shadow.isCloseEnoughTo(b: Shadow, epsilon: Float) =
+    (color == b.color)
+        && (offsetX.isCloseEnoughTo(b.offsetX, epsilon))
+        && (offsetY.isCloseEnoughTo(b.offsetY, epsilon))
+        && (blurSigma == b.blurSigma)
 
 private inline fun Color4f.isCloseEnoughTo(otherColor: Color4f, epsilon: Float) =
     r.isCloseEnoughTo(otherColor.r, epsilon) && g.isCloseEnoughTo(
@@ -118,5 +125,9 @@ internal fun assertContentCloseEnough(expected: List<Point>, actual: List<Point>
 }
 
 internal fun assertContentCloseEnough(expected: Array<TextBox>, actual: Array<TextBox>, epsilon: Float = EPSILON) {
+    assertContentEquivalent(expected.iterator(), actual.iterator()) { a, b -> a.isCloseEnoughTo(b, epsilon) }
+}
+
+internal fun assertContentCloseEnough(expected: Array<Shadow>, actual: Array<Shadow>, epsilon: Float = EPSILON) {
     assertContentEquivalent(expected.iterator(), actual.iterator()) { a, b -> a.isCloseEnoughTo(b, epsilon) }
 }

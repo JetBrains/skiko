@@ -141,26 +141,27 @@ SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nSetFontStyle
     instance->setFontStyle(skija::FontStyle::fromKotlin(fontStyleValue));
 }
 
-SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_paragraph_TextStyle__1nGetShadows
-  (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nGetShadows");
-}
-
-#if 0
-SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_paragraph_TextStyle__1nGetShadows
+SKIKO_EXPORT KInt org_jetbrains_skia_paragraph_TextStyle__1nGetShadowsCount
   (KNativePointer ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(ptr);
+    return static_cast<KInt>(instance->getShadows().size());
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nGetShadows
+  (KNativePointer ptr, KInt* res) {
+    TextStyle* instance = reinterpret_cast<TextStyle*>(ptr);
     std::vector<TextShadow> shadows = instance->getShadows();
-    KInteropPointerArray shadowsArr = env->NewObjectArray((jsize) shadows.size(), skija::paragraph::Shadow::cls, nullptr);
+
     for (int i = 0; i < shadows.size(); ++i) {
         const TextShadow& s = shadows[i];
-        skija::AutoLocal<KInteropPointer> shadowObj(env, env->NewObject(skija::paragraph::Shadow::cls, skija::paragraph::Shadow::ctor, s.fColor, s.fOffset.fX, s.fOffset.fY, s.fBlurSigma));
-        env->SetObjectArrayElement(shadowsArr, i, shadowObj.get());
+        KLong blurSigma = rawBits(s.fBlurSigma);
+        res[5*i] = s.fColor;
+        res[5*i + 1] = rawBits(s.fOffset.fX);
+        res[5*i + 2] = rawBits(s.fOffset.fY);
+        res[5*i + 3] = (KInt)(blurSigma >> 32);
+        res[5*i + 4] = (KInt)blurSigma;
     }
-    return shadowsArr;
 }
-#endif
-
 
 SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nAddShadow
   (KNativePointer ptr, KInt color, KFloat offsetX, KFloat offsetY, KDouble blurSigma) {
@@ -222,19 +223,15 @@ SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nSetFontSize
 }
 
 
-SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_paragraph_TextStyle__1nGetFontFamilies
-  (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_paragraph_TextStyle__1nGetFontFamilies");
-}
-
-#if 0
-SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_paragraph_TextStyle__1nGetFontFamilies
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_paragraph_TextStyle__1nGetFontFamilies
   (KNativePointer ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(ptr);
-    return javaStringArray(env, instance->getFontFamilies());
+    std::vector<KNativePointer>* res = new std::vector<KNativePointer>();
+    for (auto& f : instance->getFontFamilies()) {
+        res->push_back(reinterpret_cast<KNativePointer>(new SkString(f)));
+    }
+    return reinterpret_cast<KNativePointer>(res);
 }
-#endif
-
 
 
 SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nSetFontFamilies
@@ -242,7 +239,6 @@ SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nSetFontFamilies
     TextStyle* instance = reinterpret_cast<TextStyle*>(ptr);
     instance->setFontFamilies(skStringVector(familiesArray, familiesArraySize));
 }
-
 
 
 SKIKO_EXPORT KFloat org_jetbrains_skia_paragraph_TextStyle__1nGetHeight

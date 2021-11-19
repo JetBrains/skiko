@@ -1,6 +1,9 @@
 package org.jetbrains.skia.paragraph
 
 import org.jetbrains.skia.Point
+import org.jetbrains.skia.impl.InteropPointer
+import org.jetbrains.skia.impl.InteropScope
+import org.jetbrains.skia.impl.withResult
 
 class Shadow(val color: Int, val offsetX: Float, val offsetY: Float, val blurSigma: Double) {
 
@@ -48,4 +51,13 @@ class Shadow(val color: Int, val offsetX: Float, val offsetY: Float, val blurSig
     fun withBlurSigma(_blurSigma: Double): Shadow {
         return if (blurSigma == _blurSigma) this else Shadow(color, offsetX, offsetY, _blurSigma)
     }
+
+    companion object
+}
+
+fun Shadow.Companion.fromInteropPointer(size: Int, block: InteropScope.(InteropPointer) -> Unit): Array<Shadow> {
+    return withResult(IntArray(size), block).toList().chunked(5).map { (color, offsetX, offsetY, blurSigmaA, blurSigmaB) ->
+        val blurSigma = (blurSigmaA.toLong() shl 32) or (blurSigmaB.toLong() and 0xFFFFFFFFL)
+        Shadow(color, Float.fromBits(offsetX), Float.fromBits(offsetY), Double.fromBits(blurSigma))
+    }.toTypedArray()
 }
