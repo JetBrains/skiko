@@ -1,9 +1,11 @@
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.FileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.internal.file.FileOperations
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -26,6 +28,12 @@ abstract class SealAndSignSharedLibraryTask : DefaultTask() {
 
     @get:OutputDirectory
     abstract val outDir: DirectoryProperty
+
+    @get:Internal
+    val outputFiles: Provider<List<File>>
+        get() = outDir.map { outDir ->
+            outDir.asFile.listFiles().orEmpty().filter { it.isFile }
+        }
 
     @get:Optional
     @get:Input

@@ -793,7 +793,7 @@ val maybeSign by project.tasks.registering(SealAndSignSharedLibraryTask::class) 
 
 val createChecksums by project.tasks.registering(org.gradle.crypto.checksum.Checksum::class) {
     dependsOn(maybeSign)
-    files = project.files(maybeSign.map { it.outputs.files }) +
+    files = project.files(maybeSign.flatMap { it.outputFiles }) +
             if (targetOs.isWindows) files(skiaJvmBindingsDir.map { it.resolve("${skiaBinSubdir}/icudtl.dat") }) else files()
     algorithm = Checksum.Algorithm.SHA256
     outputDir = file("$buildDir/checksums")
@@ -803,7 +803,7 @@ val skikoJvmRuntimeJar by project.tasks.registering(Jar::class) {
     dependsOn(createChecksums)
     archiveBaseName.set("skiko-$target")
     from(skikoJvmJar.map { zipTree(it.archiveFile) })
-    from(maybeSign.map { it.outputs.files })
+    from(maybeSign.flatMap { it.outputFiles })
     if (targetOs.isWindows) {
         from(files(skiaJvmBindingsDir.map { it.resolve("${skiaBinSubdir}/icudtl.dat") }))
     }
