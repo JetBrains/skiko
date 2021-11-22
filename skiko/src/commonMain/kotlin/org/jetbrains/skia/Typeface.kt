@@ -33,7 +33,7 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
          */
         fun makeFromName(name: String?, style: FontStyle): Typeface {
             Stats.onNativeCall()
-            return Typeface(_nMakeFromName(name, style._value))
+            return interopScope { Typeface(_nMakeFromName(toInterop(name), style._value)) }
         }
 
         /**
@@ -445,7 +445,7 @@ private external fun _nGetVariationAxesCount(ptr: NativePointer): Int
 private external fun _nGetVariationAxes(ptr: NativePointer, axisData: InteropPointer, axisCount: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeFromName")
-private external fun _nMakeFromName(name: String?, fontStyle: Int): NativePointer
+private external fun _nMakeFromName(name: InteropPointer, fontStyle: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeFromFile")
 internal external fun _nMakeFromFile(path: InteropPointer, index: Int): NativePointer

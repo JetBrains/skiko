@@ -80,7 +80,10 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Typeface__1nMakeDefault
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Typeface__1nMakeFromName
   (KInteropPointer nameStr, KInt styleValue) {
-    TODO("implement org_jetbrains_skia_Typeface__1nMakeFromName");
+    SkString name = skString(nameStr);
+    SkFontStyle style = skija::FontStyle::fromKotlin(styleValue);
+    sk_sp<SkTypeface> instance = SkTypeface::MakeFromName(name.c_str(), style);
+    return reinterpret_cast<KNativePointer>(instance.release());
 }
      
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Typeface__1nMakeFromFile
