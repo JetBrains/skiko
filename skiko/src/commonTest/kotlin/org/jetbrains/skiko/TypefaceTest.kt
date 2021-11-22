@@ -38,7 +38,7 @@ class TypefaceTest {
         assertTrue(inter.getTableData("loca")!!.size > 0)
         assertEquals(2816, inter.unitsPerEm)
 
-        assertCloseEnough(Rect(left=-0.7386364f, top=-1.0909091f, right=2.5830965f, bottom=0.31960228f), inter.bounds)
+        assertCloseEnough(Rect(left=-0.7386364f, top=-1.0909091f, right=2.5830965f, bottom=0.31960228f), inter.bounds, 10e-4f)
     }
 
     @Test
