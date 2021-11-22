@@ -16,7 +16,7 @@ class FontCollection internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         Stats.onNativeCall()
     }
 
-    val fontManagersCount: NativePointer
+    val fontManagersCount: Int
         get() = try {
             Stats.onNativeCall()
             _nGetFontManagersCount(_ptr)
@@ -140,7 +140,7 @@ class FontCollection internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 private external fun _nMake(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nGetFontManagersCount")
-private external fun _nGetFontManagersCount(ptr: NativePointer): NativePointer
+private external fun _nGetFontManagersCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nSetAssetFontManager")
 private external fun _nSetAssetFontManager(ptr: NativePointer, fontManagerPtr: NativePointer): NativePointer

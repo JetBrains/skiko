@@ -13,7 +13,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_FontCollect
     return reinterpret_cast<jlong>(ptr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_FontCollectionKt__1nGetFontManagersCount
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_paragraph_FontCollectionKt__1nGetFontManagersCount
   (JNIEnv* env, jclass jclass, jlong ptr) {
     FontCollection* instance = reinterpret_cast<FontCollection*>(static_cast<uintptr_t>(ptr));
     return instance->getFontManagersCount();

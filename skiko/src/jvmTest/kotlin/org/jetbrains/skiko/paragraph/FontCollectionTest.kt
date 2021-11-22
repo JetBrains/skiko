@@ -25,7 +25,7 @@ class FontCollectionTest {
         // FontCollection
         val fontCollection = FontCollection()
         fontCollection.setAssetFontManager(fm)
-        assertEquals(1L, fontCollection.fontManagersCount)
+        assertEquals(1, fontCollection.fontManagersCount)
         assertEquals(2, jbMono.refCount)
 
         fontCollection.findTypefaces(arrayOf("JetBrains Mono"), FontStyle.NORMAL)[0]!!.use { jbMono2 ->
@@ -55,7 +55,7 @@ class FontCollectionTest {
 
         val defaultFM = FontMgr.default
         fontCollection.setDefaultFontManager(defaultFM)
-        assertEquals(2L, fontCollection.fontManagersCount)
+        assertEquals(2, fontCollection.fontManagersCount)
 
 //        assertEquals(3, defaultFM.refCount)
 
