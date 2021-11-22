@@ -494,7 +494,7 @@ private external fun _nSetDecorationStyle(
 private external fun _nGetShadowsCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetShadows")
-private external fun _nGetShadows(ptr: NativePointer, res: InteropPointer): InteropPointer
+private external fun _nGetShadows(ptr: NativePointer, res: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nAddShadow")
 private external fun _nAddShadow(ptr: NativePointer, color: Int, offsetX: Float, offsetY: Float, blurSigma: Double)
