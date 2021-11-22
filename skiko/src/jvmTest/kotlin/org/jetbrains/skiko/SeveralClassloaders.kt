@@ -71,14 +71,12 @@ private fun newInstance(loader: ClassLoader, fqName: String, vararg args: Any): 
 
 class SeveralClassloaders {
     @Test
-    @Ignore("there's a bug that manifests itself in breaking the rest of tests on MacOS if this is executed")
     fun `load skiko in several classloaders (with skiko path)`()  {
         check(skikoLibraryPath != null)
         doTest()
     }
 
     @Test
-    @Ignore("there's a bug that manifests itself in breaking the rest of tests on MacOS if this is executed")
     fun `load skiko in several classloaders (without skiko path)`()  {
         val oldValue = skikoLibraryPath!!
         skikoLibraryPath = null
