@@ -19,7 +19,7 @@ actual open class SkiaLayer() {
         return true
     }
 
-    actual var renderApi: GraphicsApi = GraphicsApi.OPENGL
+    actual var renderApi: GraphicsApi = GraphicsApi.METAL
     actual val contentScale: Float
         get() = if (this::nsView.isInitialized) nsView.window!!.backingScaleFactor.toFloat() else 1.0f
 
