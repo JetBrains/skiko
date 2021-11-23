@@ -16,7 +16,7 @@ class U16String internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         }
     }
 
-    constructor(s: String?) : this(U16String_nMake(s)) {
+    constructor(s: String?) : this(U16String_nMake(s, s?.length ?: 0)) {
         Stats.onNativeCall()
     }
 
@@ -36,7 +36,7 @@ class U16String internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
 
 
 @ExternalSymbolName("org_jetbrains_skia_U16String__1nMake")
-private external fun U16String_nMake(s: String?): NativePointer
+private external fun U16String_nMake(s: String?, len: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_U16String__1nGetFinalizer")
 private external fun U16String_nGetFinalizer(): NativePointer
