@@ -254,8 +254,8 @@ private fun callBooleanCallback(ptr: COpaquePointer): Boolean {
     return ptr.asStableRef<() -> Boolean>().get().invoke()
 }
 
-private fun callIntCallback(ptr: COpaquePointer) {
-    ptr.asStableRef<() -> Int>().get().invoke()
+private fun callIntCallback(ptr: COpaquePointer): Int {
+    return ptr.asStableRef<() -> Int>().get().invoke()
 }
 
 private fun callNativePtrCallback(ptr: COpaquePointer): Long {

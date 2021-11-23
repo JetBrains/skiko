@@ -174,14 +174,19 @@ template<typename T, typename CurrentCallback>
 class SkikoRunIterator: public T, public SkikoRunIteratorBase {
     static_assert(std::is_base_of<SkShaper::RunIterator, T>::value, "");
 public:
-    SkikoRunIterator() : _onCurrent(nullptr), _onAtEnd(nullptr), _onEndOfCurrentRun(nullptr), _onConsume(nullptr) {}
+    SkikoRunIterator(const SkString& text) :
+        _onCurrent(nullptr),
+        _onAtEnd(nullptr),
+        _onEndOfCurrentRun(nullptr),
+        _onConsume(nullptr),
+        _indicesConverter(text) {}
 
     void consume() override {
         _onConsume();
     }
     
     size_t endOfCurrentRun() const override {
-        return static_cast<size_t>(_onEndOfCurrentRun());
+        return _indicesConverter.from16To8(_onEndOfCurrentRun());
     }
     
     bool atEnd() const override {
@@ -200,27 +205,40 @@ private:
     KVoidCallback _onConsume;
     KIntCallback  _onEndOfCurrentRun;
     KBooleanCallback _onAtEnd;
+    mutable skija::UtfIndicesConverter _indicesConverter;
 };
 
 class SkikoFontRunIterator : public SkikoRunIterator<SkShaper::FontRunIterator, KNativePointerCallback> {
+public:
+    SkikoFontRunIterator(const SkString& text) : SkikoRunIterator<SkShaper::FontRunIterator, KNativePointerCallback>(text) {}
+
     const SkFont& currentFont() const override {
         return *reinterpret_cast<SkFont*>(_onCurrent());
     }
 };
 
 class SkikoBiDiRunIterator : public SkikoRunIterator<SkShaper::BiDiRunIterator, KIntCallback> {
+public:
+    SkikoBiDiRunIterator(const SkString& text) : SkikoRunIterator<SkShaper::BiDiRunIterator, KIntCallback>(text) {}
+
     uint8_t currentLevel() const override {
         return static_cast<uint8_t>(_onCurrent());
     }
 };
 
 class SkikoScriptRunIterator : public SkikoRunIterator<SkShaper::ScriptRunIterator, KIntCallback>  {
+public:
+    SkikoScriptRunIterator(const SkString& text) : SkikoRunIterator<SkShaper::ScriptRunIterator, KIntCallback>(text) {}
+
     SkFourByteTag currentScript() const override {
         return static_cast<SkFourByteTag>(_onCurrent());
     }
 };
 
 class SkikoLanguageRunIterator : public SkikoRunIterator<SkShaper::LanguageRunIterator, KInteropPointerCallback>  {
+public:
+    SkikoLanguageRunIterator(const SkString& text) : SkikoRunIterator<SkShaper::LanguageRunIterator, KInteropPointerCallback>(text) {}
+
     const char* currentLanguage() const override {
         return reinterpret_cast<char *>(_onCurrent());
     }
@@ -234,16 +252,17 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper_RunIterator_1nGetFi
     return reinterpret_cast<KNativePointer>(deleteRunIterator);
 }
 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper_RunIterator_1nCreateRunIterator(KInt type) {
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper_RunIterator_1nCreateRunIterator(KInt type, KNativePointer textPtr) {
+    const auto& text = *(reinterpret_cast<SkString*>(textPtr));
     switch (type) {
         case 1: // FontRunIterator
-            return reinterpret_cast<KNativePointer>(new SkikoFontRunIterator());
+            return reinterpret_cast<KNativePointer>(new SkikoFontRunIterator(text));
         case 2: // BiDiRunIterator
-            return reinterpret_cast<KNativePointer>(new SkikoBiDiRunIterator());
+            return reinterpret_cast<KNativePointer>(new SkikoBiDiRunIterator(text));
         case 3: // ScriptRunIterator
-            return reinterpret_cast<KNativePointer>(new SkikoScriptRunIterator());
+            return reinterpret_cast<KNativePointer>(new SkikoScriptRunIterator(text));
         case 4: // LanguageRunIterator
-            return reinterpret_cast<KNativePointer>(new SkikoLanguageRunIterator());
+            return reinterpret_cast<KNativePointer>(new SkikoLanguageRunIterator(text));
         default:
             TODO("unsupported run iterator type");
     }

@@ -15,10 +15,10 @@ internal actual fun Shaper.doShape(
     width: Float,
     runHandler: RunHandler
 ) {
-    val managedFontIter = toManaged(fontIter)
-    val managedBidiIter = toManaged(bidiIter)
-    val managedScriptIter = toManaged(scriptIter)
-    val managedLangIter = toManaged(langIter)
+    val managedFontIter = toManaged(fontIter, textUtf8)
+    val managedBidiIter = toManaged(bidiIter, textUtf8)
+    val managedScriptIter = toManaged(scriptIter, textUtf8)
+    val managedLangIter = toManaged(langIter, textUtf8)
     val managedRunHandler = RunHandlerImpl(runHandler)
     try {
         interopScope {
@@ -46,14 +46,14 @@ internal actual fun Shaper.doShape(
     }
 }
 
-private fun toManaged(iter: Iterator<FontRun?>): Managed =
-    if (iter is ManagedRunIterator<FontRun?>) { iter } else { RunIteratorBase.fromIterator(iter) }
-private fun toManaged(iter: Iterator<LanguageRun?>): Managed =
-    if (iter is ManagedRunIterator<LanguageRun?>) { iter } else { RunIteratorBase.fromIterator(iter) }
-private fun toManaged(iter: Iterator<BidiRun?>): Managed =
-    if (iter is ManagedRunIterator<BidiRun?>) { iter } else { RunIteratorBase.fromIterator(iter) }
-private fun toManaged(iter: Iterator<ScriptRun?>): Managed =
-    if (iter is ManagedRunIterator<ScriptRun?>) { iter } else { RunIteratorBase.fromIterator(iter) }
+private fun toManaged(iter: Iterator<FontRun?>, text: ManagedString): Managed =
+    if (iter is ManagedRunIterator<FontRun?>) { iter } else { RunIteratorBase.fromIterator(iter, text) }
+private fun toManaged(iter: Iterator<LanguageRun?>, text: ManagedString): Managed =
+    if (iter is ManagedRunIterator<LanguageRun?>) { iter } else { RunIteratorBase.fromIterator(iter, text) }
+private fun toManaged(iter: Iterator<BidiRun?>, text: ManagedString): Managed =
+    if (iter is ManagedRunIterator<BidiRun?>) { iter } else { RunIteratorBase.fromIterator(iter, text) }
+private fun toManaged(iter: Iterator<ScriptRun?>, text: ManagedString): Managed =
+    if (iter is ManagedRunIterator<ScriptRun?>) { iter } else { RunIteratorBase.fromIterator(iter, text) }
 
 abstract class RunIteratorBase protected constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     private object _FinalizerHolder {
@@ -79,17 +79,17 @@ abstract class RunIteratorBase protected constructor(ptr: NativePointer) : Manag
     protected abstract fun InteropScope.getOnCurrentCallback(): InteropPointer
 
     companion object {
-        fun fromIterator(iterator: Iterator<BidiRun?>): RunIteratorBase =
-            IteratorBasedBidiRunIterator(RunIterator_nCreateRunIterator(BIDI_RUN_ITERATOR_TYPE), iterator)
+        fun fromIterator(iterator: Iterator<BidiRun?>, text: ManagedString): RunIteratorBase =
+            IteratorBasedBidiRunIterator(RunIterator_nCreateRunIterator(BIDI_RUN_ITERATOR_TYPE, getPtr(text)), iterator)
 
-        fun fromIterator(iterator: Iterator<FontRun?>): RunIteratorBase =
-            IteratorBasedFontRunIterator(RunIterator_nCreateRunIterator(FONT_RUN_ITERATOR_TYPE), iterator)
+        fun fromIterator(iterator: Iterator<FontRun?>, text: ManagedString): RunIteratorBase =
+            IteratorBasedFontRunIterator(RunIterator_nCreateRunIterator(FONT_RUN_ITERATOR_TYPE, getPtr(text)), iterator)
 
-        fun fromIterator(iterator: Iterator<ScriptRun?>): RunIteratorBase =
-            IteratorBasedScriptRunIterator(RunIterator_nCreateRunIterator(SCRIPT_RUN_ITERATOR_TYPE), iterator)
+        fun fromIterator(iterator: Iterator<ScriptRun?>, text: ManagedString): RunIteratorBase =
+            IteratorBasedScriptRunIterator(RunIterator_nCreateRunIterator(SCRIPT_RUN_ITERATOR_TYPE, getPtr(text)), iterator)
 
-        fun fromIterator(iterator: Iterator<LanguageRun?>): RunIteratorBase =
-            IteratorBasedLanguageRunIterator(RunIterator_nCreateRunIterator(LANGUAGE_RUN_ITERATOR_TYPE), iterator)
+        fun fromIterator(iterator: Iterator<LanguageRun?>, text: ManagedString): RunIteratorBase =
+            IteratorBasedLanguageRunIterator(RunIterator_nCreateRunIterator(LANGUAGE_RUN_ITERATOR_TYPE, getPtr(text)), iterator)
     }
 }
 

@@ -295,7 +295,7 @@ internal external fun Shaper_nShape(
 internal external fun RunIterator_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunIterator_1nCreateRunIterator")
-internal external fun RunIterator_nCreateRunIterator(type: Int): NativePointer
+internal external fun RunIterator_nCreateRunIterator(type: Int, textPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunIterator_1nInitRunIterator")
 internal external fun RunIterator_nInitRunIterator(

@@ -190,7 +190,7 @@ public:
         other.data = t;
     }
 
-    KCallback& operator=(KCallback&& other) {
+    KCallback& operator=(KCallback&& other) noexcept {
         std::swap(data, other.data);
         return *this;
     }
