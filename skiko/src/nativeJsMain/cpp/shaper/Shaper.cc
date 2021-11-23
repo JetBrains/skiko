@@ -171,7 +171,7 @@ public:
 };
 
 template<typename T, typename CurrentCallback>
-class RunIteratorImpl: public T, public virtual RunIteratorImplBase {
+class RunIteratorImpl: public T, public RunIteratorImplBase {
     static_assert(std::is_base_of<SkShaper::RunIterator, T>::value, "");
 public:
     RunIteratorImpl() : _onCurrent(0), _onAtEnd(0), _onEndOfCurrentRun(0), _onConsume(0) {}
@@ -207,16 +207,19 @@ class FontRunIteratorImpl : public RunIteratorImpl<SkShaper::FontRunIterator, KN
         return *reinterpret_cast<SkFont*>(_onCurrent());
     }
 };
+
 class BiDiRunIteratorImpl : public RunIteratorImpl<SkShaper::BiDiRunIterator, KIntCallback> {
     uint8_t currentLevel() const override {
         return static_cast<uint8_t>(_onCurrent());
     }
 };
+
 class ScriptRunIteratorImpl : public RunIteratorImpl<SkShaper::ScriptRunIterator, KIntCallback>  {
     SkFourByteTag currentScript() const override {
         return static_cast<SkFourByteTag>(_onCurrent());
     }
 };
+
 class LanguageRunIteratorImpl : public RunIteratorImpl<SkShaper::LanguageRunIterator, KInteropPointerCallback>  {
     const char* currentLanguage() const override {
         return reinterpret_cast<char *>(_onCurrent());
@@ -248,6 +251,6 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper_RunIterator_1nCreat
 
 SKIKO_EXPORT void org_jetbrains_skia_shaper_Shaper_RunIterator_1nInitRunIterator
   (KNativePointer ptr, KInteropPointer onConsume, KInteropPointer onEndOfCurrentRun, KInteropPointer onAtEnd, KInteropPointer onCurrent) {
-    auto* iter = reinterpret_cast<RunIteratorImplBase*>(ptr);
+    auto* iter = static_cast<RunIteratorImplBase*>(reinterpret_cast<FontRunIteratorImpl*>(ptr));
     iter->init(onConsume, onEndOfCurrentRun, onAtEnd, onCurrent);
 }
