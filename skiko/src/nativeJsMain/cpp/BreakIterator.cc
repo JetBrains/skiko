@@ -15,7 +15,18 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_BreakIterator__1nGetFinalizer() {
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_BreakIterator__1nMake
   (KInt type, KInteropPointer localeStr) {
-    TODO("implement org_jetbrains_skia_BreakIterator__1nMake");
+    UErrorCode status = U_ZERO_ERROR;
+    UBreakIterator* instance;
+    if (localeStr == nullptr)
+      instance = ubrk_open(static_cast<UBreakIteratorType>(type), uloc_getDefault(), nullptr, 0, &status);
+    else {
+      instance = ubrk_open(static_cast<UBreakIteratorType>(type), skString(localeStr).c_str(), nullptr, 0, &status);
+    }
+
+    if (U_FAILURE(status))
+      return 0;
+    else
+      return reinterpret_cast<KNativePointer>(instance);
 }
      
 
