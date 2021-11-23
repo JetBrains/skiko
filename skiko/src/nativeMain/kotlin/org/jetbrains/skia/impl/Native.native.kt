@@ -26,6 +26,8 @@ actual abstract class Native actual constructor(ptr: NativePointer) {
         init {
             initCallbacks(
                 staticCFunction(::callBooleanCallback),
+                staticCFunction(::callIntCallback),
+                staticCFunction(::callNativePtrCallback),
                 staticCFunction(::callVoidCallback),
                 staticCFunction(::disposeCallback),
             )
@@ -201,18 +203,16 @@ actual class InteropScope actual constructor() {
         return toInterop(interopPointers.map { it.toLong() }.toLongArray())
     }
 
-    actual fun booleanCallback(callback: (() -> Boolean)?): InteropPointer
-        = callback?.let {
-            val ptr = StableRef.create(it).asCPointer()
-            NativePtr.NULL.plus(ptr.toLong())
-        } ?: NativePtr.NULL
+    actual fun booleanCallback(callback: (() -> Boolean)?) = callback<Boolean>(callback)
 
-    actual fun callback(callback: (() -> Unit)?): InteropPointer
-        = callback?.let {
-            val ptr = StableRef.create(it).asCPointer()
-            NativePtr.NULL.plus(ptr.toLong())
-        } ?: NativePtr.NULL
+    actual fun callback(callback: (() -> Unit)?) = callback<Unit>(callback)
 
+    actual fun <T> callback(callback: (() -> T)?): InteropPointer = callback?.let {
+        val ptr = StableRef.create(it).asCPointer()
+        NativePtr.NULL.plus(ptr.toLong())
+    } ?: NativePtr.NULL
+
+    actual fun <T> virtual(method: () -> T) = callback(method)
     actual fun virtual(method: () -> Unit) = callback(method)
     actual fun virtualBoolean(method: () -> Boolean) = booleanCallback(method)
 
@@ -250,9 +250,23 @@ private fun callBooleanCallback(ptr: COpaquePointer): Boolean {
     return ptr.asStableRef<() -> Boolean>().get().invoke()
 }
 
+private fun callIntCallback(ptr: COpaquePointer) {
+    ptr.asStableRef<() -> Int>().get().invoke()
+}
+
+private fun callNativePtrCallback(ptr: COpaquePointer): NativePointer {
+    return ptr.asStableRef<() -> NativePointer>().get().invoke()
+}
+
 private fun disposeCallback(ptr: COpaquePointer) {
     ptr.asStableRef<Any>().dispose()
 }
 
 @ExternalSymbolName("skiko_initCallbacks")
-private external fun initCallbacks(callBoolean: COpaquePointer, callVoid: COpaquePointer, dispose: COpaquePointer)
+private external fun initCallbacks(
+    callBoolean: COpaquePointer,
+    callInt: COpaquePointer,
+    callNativePointer: COpaquePointer,
+    callVoid: COpaquePointer,
+    dispose: COpaquePointer
+)

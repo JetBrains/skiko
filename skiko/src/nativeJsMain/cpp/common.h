@@ -158,11 +158,15 @@ static inline KFloat fromBits(KInt i) {
 typedef void (*SkikoDisposeCallback)(KInteropPointer);
 typedef void (*SkikoCallVoidCallback)(KInteropPointer);
 typedef KBoolean (*SkikoCallBooleanCallback)(KInteropPointer);
+typedef KInt (*SkikoCallIntCallback)(KInteropPointer);
+typedef KNativePointer (*SkikoCallNativePointerCallback)(KInteropPointer);
 typedef void* KOpaquePointer;
 
 void disposeCallback(KInteropPointer cb);
 void callVoidCallback(KInteropPointer cb);
 KBoolean callBooleanCallback(KInteropPointer cb);
+KInt callIntCallback(KInteropPointer cb);
+KNativePointer callNativePointerCallback(KInteropPointer cb);
 
 template <typename T, T(*Apply)(KInteropPointer)>
 class KCallback {
@@ -198,6 +202,8 @@ private:
 
 typedef KCallback<KBoolean, callBooleanCallback> KBooleanCallback;
 typedef KCallback<void, callVoidCallback> KVoidCallback;
+typedef KCallback<KInt, callIntCallback> KIntCallback;
+typedef KCallback<KNativePointer, callNativePointerCallback> KNativePointerCallback;
 
 #endif /* SKIKO_COMMON_H */
 

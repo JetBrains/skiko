@@ -210,7 +210,19 @@ actual class InteropScope actual constructor() {
         return _registerCallback({ callback() }, null, global = false)
     }
 
+    actual fun <T> callback(callback: (() -> T)?): InteropPointer {
+        if (callback == null) { return 0 }
+        initCallbacks()
+
+        val data = CallbackData<T>(null)
+        return _registerCallback({ callback() }, null, global = false)
+    }
+
     actual fun virtual(method: () -> Unit): InteropPointer {
+        return _registerCallback({ method() }, null, global = true)
+    }
+
+    actual fun <T> virtual(method: () -> T): InteropPointer {
         return _registerCallback({ method() }, null, global = true)
     }
 

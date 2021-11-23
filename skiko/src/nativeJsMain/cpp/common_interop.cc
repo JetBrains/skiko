@@ -351,6 +351,20 @@ KBoolean callBooleanCallback(KInteropPointer cb) {
     return static_cast<KBoolean>(value);
 }
 
+KInt callIntCallback(KInteropPointer cb) {
+    int value = EM_ASM_INT({
+        return _callCallback($0).value;
+    }, cb);
+    return static_cast<KInt>(value);
+}
+
+KNativePointer callNativePointerCallback(KInteropPointer cb) {
+    int value = EM_ASM_INT({
+        return _callCallback($0).value;
+    }, cb);
+    return static_cast<KNativePointer>(value);
+}
+
 void callVoidCallback(KInteropPointer cb) {
     EM_ASM({
         _callCallback($0);
@@ -362,9 +376,13 @@ void callVoidCallback(KInteropPointer cb) {
 static SkikoDisposeCallback disposeCallbackImpl = nullptr;
 static SkikoCallBooleanCallback callBooleanCallbackImpl = nullptr;
 static SkikoCallVoidCallback callVoidCallbackImpl = nullptr;
+static SkikoCallIntCallback callIntCallbackImpl = nullptr;
+static SkikoCallNativePointerCallback callNativePointerCallbackImpl = nullptr;
 
-SKIKO_EXPORT void skiko_initCallbacks(KOpaquePointer callBoolean, KOpaquePointer callVoid, KOpaquePointer dispose) {
+SKIKO_EXPORT void skiko_initCallbacks(KOpaquePointer callBoolean, KOpaquePointer callInt, KOpaquePointer callNativePointer, KOpaquePointer callVoid, KOpaquePointer dispose) {
     callBooleanCallbackImpl = reinterpret_cast<SkikoCallBooleanCallback>(callBoolean);
+    callIntCallbackImpl = reinterpret_cast<SkikoCallIntCallback>(callInt);
+    callNativePointerCallbackImpl = reinterpret_cast<SkikoCallNativePointerCallback>(callNativePointer);
     callVoidCallbackImpl = reinterpret_cast<SkikoCallVoidCallback>(callVoid);
     disposeCallbackImpl = reinterpret_cast<SkikoDisposeCallback>(dispose);
 }
@@ -377,6 +395,13 @@ KBoolean callBooleanCallback(KInteropPointer cb) {
     return callBooleanCallbackImpl(cb);
 }
 
+KInt callIntCallback(KInteropPointer cb) {
+    return callIntCallbackImpl(cb);
+}
+
+KNativePointer callNativePointerCallback(KInteropPointer cb) {
+    return callNativePointerCallbackImpl(cb);
+}
 void callVoidCallback(KInteropPointer cb) {
     return callVoidCallbackImpl(cb);
 }
