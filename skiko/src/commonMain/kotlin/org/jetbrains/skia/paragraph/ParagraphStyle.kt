@@ -102,12 +102,11 @@ class ParagraphStyle : Managed(ParagraphStyle_nMake(), _FinalizerHolder.PTR) {
             reachabilityBarrier(this)
         }
 
-    var ellipsis: String
+    var ellipsis: String?
         get() = try {
             Stats.onNativeCall()
-            withStringResult {
-                _nGetEllipsis(_ptr)
-            }
+            val ellipsis = _nGetEllipsis(_ptr)
+            if (ellipsis == NullPointer) null else withStringResult { ellipsis }
         } finally {
             reachabilityBarrier(this)
         }
