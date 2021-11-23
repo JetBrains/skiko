@@ -95,10 +95,10 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_ParagraphSty
     instance->setMaxLines(count);
 }
 
-extern "C" JNIEXPORT jstring JNICALL Java_org_jetbrains_skia_paragraph_ParagraphStyleKt__1nGetEllipsis
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_ParagraphStyleKt__1nGetEllipsis
   (JNIEnv* env, jclass jclass, jlong ptr) {
     ParagraphStyle* instance = reinterpret_cast<ParagraphStyle*>(static_cast<uintptr_t>(ptr));
-    return instance->ellipsized() ? javaString(env, instance->getEllipsis()) : nullptr;
+    return instance->ellipsized() ? reinterpret_cast<jlong>(new SkString(instance->getEllipsis())) : 0;
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_ParagraphStyleKt__1nSetEllipsis
