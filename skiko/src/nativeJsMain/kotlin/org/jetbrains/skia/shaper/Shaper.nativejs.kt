@@ -47,7 +47,7 @@ private fun <T> toManaged(iter: Iterator<T>): Managed =
 
 abstract class RunIteratorBase protected constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     private object _FinalizerHolder {
-        val PTR = RunIteratorBase_nGetFinalizer()
+        val PTR = RunIterator_nGetFinalizer()
     }
 
     abstract fun consume()
@@ -56,10 +56,10 @@ abstract class RunIteratorBase protected constructor(ptr: NativePointer) : Manag
 
     init {
         interopScope {
-            RunIteratorBase_nInitRunIterator (
+            RunIterator_nInitRunIterator (
                 _ptr,
                 onConsume = virtual { this@RunIteratorBase.consume() },
-                onEndOfCurrentRun = virtual { this@RunIteratorBase.endOfCurrentRun() },
+                onEndOfCurrentRun = virtualInt { this@RunIteratorBase.endOfCurrentRun() },
                 onAtEnd = virtualBoolean { this@RunIteratorBase.atEnd() },
                 onCurrent = getOnCurrentCallback(),
             )
@@ -70,16 +70,16 @@ abstract class RunIteratorBase protected constructor(ptr: NativePointer) : Manag
 
     companion object {
         fun fromIterator(iterator: Iterator<BidiRun?>): RunIteratorBase =
-            IteratorBasedBidiRunIterator(RunIteratorBase_nCreateRunIterator(BIDI_RUN_ITERATOR_TYPE), iterator)
+            IteratorBasedBidiRunIterator(RunIterator_nCreateRunIterator(BIDI_RUN_ITERATOR_TYPE), iterator)
 
         fun fromIterator(iterator: Iterator<FontRun?>): RunIteratorBase =
-            IteratorBasedFontRunIterator(RunIteratorBase_nCreateRunIterator(FONT_RUN_ITERATOR_TYPE), iterator)
+            IteratorBasedFontRunIterator(RunIterator_nCreateRunIterator(FONT_RUN_ITERATOR_TYPE), iterator)
 
         fun fromIterator(iterator: Iterator<ScriptRun?>): RunIteratorBase =
-            IteratorBasedScriptRunIterator(RunIteratorBase_nCreateRunIterator(SCRIPT_RUN_ITERATOR_TYPE), iterator)
+            IteratorBasedScriptRunIterator(RunIterator_nCreateRunIterator(SCRIPT_RUN_ITERATOR_TYPE), iterator)
 
         fun fromIterator(iterator: Iterator<LanguageRun?>): RunIteratorBase =
-            IteratorBasedLanguageRunIterator(RunIteratorBase_nCreateRunIterator(LANGUAGE_RUN_ITERATOR_TYPE), iterator)
+            IteratorBasedLanguageRunIterator(RunIterator_nCreateRunIterator(LANGUAGE_RUN_ITERATOR_TYPE), iterator)
 
         fun fromIterator(iterator: Iterator<Any?>): RunIteratorBase = TODO("Not implemented for type")
     }
@@ -88,19 +88,19 @@ abstract class RunIteratorBase protected constructor(ptr: NativePointer) : Manag
 abstract class FontRunIterator protected constructor(ptr: NativePointer): RunIteratorBase(ptr) {
     abstract fun currentFont(): FontRun?
 
-    override fun InteropScope.getOnCurrentCallback() = virtual<NativePointer> { getPtr(currentFont()?.font) }
+    override fun InteropScope.getOnCurrentCallback() = virtualNativePointer { getPtr(currentFont()?.font) }
 }
 
 abstract class BiDiRunIterator protected constructor(ptr: NativePointer): RunIteratorBase(ptr) {
     abstract fun currentLevel(): BidiRun?
 
-    override fun InteropScope.getOnCurrentCallback() = virtual<Int> { currentLevel()?.level ?: 0 }
+    override fun InteropScope.getOnCurrentCallback() = virtualInt { currentLevel()?.level ?: 0 }
 }
 
 abstract class ScriptRunIterator protected constructor(ptr: NativePointer): RunIteratorBase(ptr) {
     abstract fun currentScript(): ScriptRun?
 
-    override fun InteropScope.getOnCurrentCallback() = virtual<Int> { currentScript()?.scriptTag ?: 0 }
+    override fun InteropScope.getOnCurrentCallback() = virtualInt { currentScript()?.scriptTag ?: 0 }
 }
 
 abstract class LanguageRunIterator protected constructor(ptr: NativePointer): RunIteratorBase(ptr) {
@@ -116,7 +116,7 @@ abstract class LanguageRunIterator protected constructor(ptr: NativePointer): Ru
         return interopScope!!.toInterop(currentLanguage()?.language)
     }
 
-    override fun InteropScope.getOnCurrentCallback() = virtual<InteropPointer> { langToInterop() }
+    override fun InteropScope.getOnCurrentCallback() = virtualInteropPointer { langToInterop() }
 }
 
 class IteratorBasedFontRunIterator internal constructor(ptr: NativePointer, val iterator: Iterator<FontRun?>) : FontRunIterator(ptr) {
@@ -156,17 +156,6 @@ class IteratorBasedLanguageRunIterator internal constructor(ptr: NativePointer, 
 }
 
 private const val FONT_RUN_ITERATOR_TYPE: Int = 1
-private const val BIDI_RUN_ITERATOR_TYPE: Int = 1
-private const val SCRIPT_RUN_ITERATOR_TYPE: Int = 1
-private const val LANGUAGE_RUN_ITERATOR_TYPE: Int = 1
-
-private external fun RunIteratorBase_nGetFinalizer(): NativePointer
-private external fun RunIteratorBase_nCreateRunIterator(type: Int): NativePointer
-private external fun RunIteratorBase_nInitRunIterator(
-    ptr: NativePointer,
-    onConsume: InteropPointer,
-    onEndOfCurrentRun: InteropPointer,
-    onAtEnd: InteropPointer,
-    onCurrent: InteropPointer
-)
-
+private const val BIDI_RUN_ITERATOR_TYPE: Int = 2
+private const val SCRIPT_RUN_ITERATOR_TYPE: Int = 3
+private const val LANGUAGE_RUN_ITERATOR_TYPE: Int = 4

@@ -289,3 +289,18 @@ internal external fun Shaper_nShape(
     width: Float,
     runHandler: InteropPointer
 )
+
+// Native/JS only
+@ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunIterator_1nGetFinalizer")
+internal external fun RunIterator_nGetFinalizer(): NativePointer
+@ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunIterator_1nCreateRunIterator")
+internal external fun RunIterator_nCreateRunIterator(type: Int): NativePointer
+@ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunIterator_1nInitRunIterator")
+internal external fun RunIterator_nInitRunIterator(
+    ptr: NativePointer,
+    onConsume: InteropPointer,
+    onEndOfCurrentRun: InteropPointer,
+    onAtEnd: InteropPointer,
+    onCurrent: InteropPointer
+)
+

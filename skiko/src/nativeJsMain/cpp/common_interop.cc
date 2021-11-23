@@ -365,6 +365,13 @@ KNativePointer callNativePointerCallback(KInteropPointer cb) {
     return static_cast<KNativePointer>(value);
 }
 
+KInteropPointer callInteropPointerCallback(KInteropPointer cb) {
+    int value = EM_ASM_INT({
+        return _callCallback($0).value;
+    }, cb);
+    return static_cast<KInteropPointer>(value);
+}
+
 void callVoidCallback(KInteropPointer cb) {
     EM_ASM({
         _callCallback($0);
@@ -402,6 +409,11 @@ KInt callIntCallback(KInteropPointer cb) {
 KNativePointer callNativePointerCallback(KInteropPointer cb) {
     return callNativePointerCallbackImpl(cb);
 }
+
+KInteropPointer callInteropPointerCallback(KInteropPointer cb) {
+    return callNativePointerCallbackImpl(cb);
+}
+
 void callVoidCallback(KInteropPointer cb) {
     return callVoidCallbackImpl(cb);
 }

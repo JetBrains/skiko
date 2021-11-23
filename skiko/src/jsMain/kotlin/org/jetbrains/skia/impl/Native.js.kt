@@ -195,13 +195,18 @@ actual class InteropScope actual constructor() {
         return toInterop(interopPointers.toIntArray())
     }
 
-    actual fun booleanCallback(callback: (() -> Boolean)?): InteropPointer {
+    private fun <T> callbackImpl(callback: (() -> T)?): InteropPointer {
         if (callback == null) { return 0 }
         initCallbacks()
 
-        val data = CallbackData<Boolean>(null)
+        val data = CallbackData<T>(null)
         return _registerCallback({ data.value = callback() }, data, global = false)
     }
+
+    actual fun booleanCallback(callback: (() -> Boolean)?) = callbackImpl(callback)
+    actual fun intCallback(callback: (() -> Int)?) = callbackImpl(callback)
+    actual fun nativePointerCallback(callback: (() -> NativePointer)?) = callbackImpl(callback)
+    actual fun interopPointerCallback(callback: (() -> InteropPointer)?) = callbackImpl(callback)
 
     actual fun callback(callback: (() -> Unit)?): InteropPointer {
         if (callback == null) { return 0 }
@@ -210,26 +215,19 @@ actual class InteropScope actual constructor() {
         return _registerCallback({ callback() }, null, global = false)
     }
 
-    actual fun <T> callback(callback: (() -> T)?): InteropPointer {
-        if (callback == null) { return 0 }
-        initCallbacks()
-
+    private fun <T> virtualImpl(method: () -> T): InteropPointer {
         val data = CallbackData<T>(null)
-        return _registerCallback({ callback() }, null, global = false)
+        return _registerCallback({ method() }, data, global = true)
     }
 
     actual fun virtual(method: () -> Unit): InteropPointer {
         return _registerCallback({ method() }, null, global = true)
     }
 
-    actual fun <T> virtual(method: () -> T): InteropPointer {
-        return _registerCallback({ method() }, null, global = true)
-    }
-
-    actual fun virtualBoolean(method: () -> Boolean): InteropPointer {
-        val data = CallbackData<Boolean>(null)
-        return _registerCallback({ data.value = method() }, data, global = true);
-    }
+    actual fun virtualBoolean(method: () -> Boolean) = virtualImpl(method)
+    actual fun virtualInt(method: () -> Int) = virtualImpl(method)
+    actual fun virtualNativePointer(method: () -> NativePointer) = virtualImpl(method)
+    actual fun virtualInteropPointer(method: () -> InteropPointer) = virtualImpl(method)
 
     actual fun release()  {
         elements.forEach {

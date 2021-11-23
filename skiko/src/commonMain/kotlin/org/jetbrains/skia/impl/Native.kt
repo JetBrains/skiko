@@ -44,13 +44,17 @@ expect class InteropScope() {
     fun toInteropForArraysOfPointers(interopPointers: Array<InteropPointer>): InteropPointer
 
     // Callbacks
-    fun <T> callback(callback: (() -> T)?): InteropPointer
     fun callback(callback: (() -> Unit)?): InteropPointer
+    fun intCallback(callback: (() -> Int)?): InteropPointer
+    fun nativePointerCallback(callback: (() -> NativePointer)?): InteropPointer
+    fun interopPointerCallback(callback: (() -> InteropPointer)?): InteropPointer
     fun booleanCallback(callback: (() -> Boolean)?): InteropPointer
 
     // Virtual methods
-    fun <T> virtual(method: () -> T): InteropPointer
     fun virtual(method: () -> Unit): InteropPointer
+    fun virtualInt(method: () -> Int): InteropPointer
+    fun virtualNativePointer(method: () -> NativePointer): InteropPointer
+    fun virtualInteropPointer(method: () -> InteropPointer): InteropPointer
     fun virtualBoolean(method: () -> Boolean): InteropPointer
 
     fun release()

@@ -203,24 +203,28 @@ actual class InteropScope actual constructor() {
         return toInterop(interopPointers.map { it.toLong() }.toLongArray())
     }
 
-    actual fun booleanCallback(callback: (() -> Boolean)?) = callback<Boolean>(callback)
+    actual fun callback(callback: (() -> Unit)?) = callbackImpl(callback)
+    actual fun intCallback(callback: (() -> Int)?) = callbackImpl(callback)
+    actual fun nativePointerCallback(callback: (() -> NativePointer)?) = callbackImpl(callback)
+    actual fun interopPointerCallback(callback: (() -> InteropPointer)?) = callbackImpl(callback)
+    actual fun booleanCallback(callback: (() -> Boolean)?) = callbackImpl(callback)
 
-    actual fun callback(callback: (() -> Unit)?) = callback<Unit>(callback)
-
-    actual fun <T> callback(callback: (() -> T)?): InteropPointer = callback?.let {
-        val ptr = StableRef.create(it).asCPointer()
-        NativePtr.NULL.plus(ptr.toLong())
-    } ?: NativePtr.NULL
-
-    actual fun <T> virtual(method: () -> T) = callback(method)
-    actual fun virtual(method: () -> Unit) = callback(method)
-    actual fun virtualBoolean(method: () -> Boolean) = booleanCallback(method)
+    actual fun virtual(method: () -> Unit) = callbackImpl(method)
+    actual fun virtualInt(method: () -> Int) = callbackImpl(method)
+    actual fun virtualNativePointer(method: () -> NativePointer) = callbackImpl(method)
+    actual fun virtualInteropPointer(method: () -> InteropPointer) = callbackImpl(method)
+    actual fun virtualBoolean(method: () -> Boolean) = callbackImpl(method)
 
     actual fun release()  {
         elements.forEach {
             it.unpin()
         }
     }
+
+    private fun <T> callbackImpl(callback: (() -> T)?): InteropPointer = callback?.let {
+        val ptr = StableRef.create(it).asCPointer()
+        NativePtr.NULL.plus(ptr.toLong())
+    } ?: NativePtr.NULL
 
     private val elements = mutableListOf<Pinned<*>>()
 }
@@ -254,8 +258,8 @@ private fun callIntCallback(ptr: COpaquePointer) {
     ptr.asStableRef<() -> Int>().get().invoke()
 }
 
-private fun callNativePtrCallback(ptr: COpaquePointer): NativePointer {
-    return ptr.asStableRef<() -> NativePointer>().get().invoke()
+private fun callNativePtrCallback(ptr: COpaquePointer): Long {
+    return ptr.asStableRef<() -> NativePointer>().get().invoke().toLong()
 }
 
 private fun disposeCallback(ptr: COpaquePointer) {
