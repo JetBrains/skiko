@@ -6,8 +6,10 @@ import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.interopScope
 
 class ParagraphStyle : Managed(ParagraphStyle_nMake(), _FinalizerHolder.PTR) {
     companion object {
@@ -108,7 +110,9 @@ class ParagraphStyle : Managed(ParagraphStyle_nMake(), _FinalizerHolder.PTR) {
         }
         set(value) = try {
             Stats.onNativeCall()
-            _nSetEllipsis(_ptr, value)
+            interopScope {
+                _nSetEllipsis(_ptr, toInterop(value))
+            }
         } finally {
             reachabilityBarrier(this)
         }
@@ -219,7 +223,7 @@ private external fun _nSetMaxLinesCount(ptr: NativePointer, maxLines: Int)
 private external fun _nGetEllipsis(ptr: NativePointer): String
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetEllipsis")
-private external fun _nSetEllipsis(ptr: NativePointer, ellipsis: String?)
+private external fun _nSetEllipsis(ptr: NativePointer, ellipsis: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetHeight")
 private external fun _nSetHeight(ptr: NativePointer, height: Float)
