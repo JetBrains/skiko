@@ -1,11 +1,10 @@
 @file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia.shaper
 
-import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.*
-import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.FontFeature.Companion.arrayOfFontFeaturesToInterop
 import org.jetbrains.skia.impl.*
+import org.jetbrains.skia.impl.Library.Companion.staticLoad
 
 /**
  * Shapes text using HarfBuzz and places the shaped text into a
@@ -283,13 +282,13 @@ private external fun _nShapeLine(
 private external fun _nShape(
     ptr: NativePointer,
     textPtr: NativePointer,
-    fontIter: Iterator<FontRun?>?,
-    bidiIter: Iterator<BidiRun?>?,
-    scriptIter: Iterator<ScriptRun?>?,
-    langIter: Iterator<LanguageRun?>?,
+    fontIter: InteropPointer,
+    bidiIter: InteropPointer,
+    scriptIter: InteropPointer,
+    langIter: InteropPointer,
     optsFeaturesLen: Int,
     optsFeaturesIntArray: InteropPointer,
     optsBooleanProps: Int,
     width: Float,
-    runHandler: RunHandler?
+    runHandler: InteropPointer
 )
