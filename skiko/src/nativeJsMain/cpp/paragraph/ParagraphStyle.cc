@@ -95,20 +95,11 @@ SKIKO_EXPORT void org_jetbrains_skia_paragraph_ParagraphStyle__1nSetMaxLinesCoun
     instance->setMaxLines(count);
 }
 
-
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_paragraph_ParagraphStyle__1nGetEllipsis
   (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_paragraph_ParagraphStyle__1nGetEllipsis");
+    ParagraphStyle* instance = reinterpret_cast<ParagraphStyle*>(ptr);
+     return instance->ellipsized() ? new SkString(instance->getEllipsis()) : nullptr;
 }
-     
-#if 0 
-SKIKO_EXPORT KInteropPointer org_jetbrains_skia_paragraph_ParagraphStyle__1nGetEllipsis
-  (KNativePointer ptr) {
-    ParagraphStyle* instance = reinterpret_cast<ParagraphStyle*>((ptr));
-    return instance->ellipsized() ? javaString(env, instance->getEllipsis()) : nullptr;
-}
-#endif
-
 
 SKIKO_EXPORT void org_jetbrains_skia_paragraph_ParagraphStyle__1nSetEllipsis
   (KNativePointer ptr, KInteropPointer ellipsis) {
