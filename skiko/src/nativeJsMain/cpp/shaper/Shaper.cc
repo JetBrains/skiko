@@ -164,17 +164,17 @@ SKIKO_EXPORT void org_jetbrains_skia_shaper_Shaper__1nShape
     instance->shape(text.c_str(), text.size(), *fontRunIter, *bidiRunIter, *scriptRunIter, *languageRunIter, features.data(), features.size(), std::numeric_limits<float>::infinity(), runHandler);
 }
 
-class RunIteratorImplBase {
+class SkikoRunIteratorBase {
 public:
-    virtual ~RunIteratorImplBase() {}
+    virtual ~SkikoRunIteratorBase() {}
     virtual void init(KInteropPointer onConsume, KInteropPointer onEndOfCurrentRun, KInteropPointer onAtEnd, KInteropPointer onCurrent) = 0;
 };
 
 template<typename T, typename CurrentCallback>
-class RunIteratorImpl: public T, public RunIteratorImplBase {
+class SkikoRunIterator: public T, public SkikoRunIteratorBase {
     static_assert(std::is_base_of<SkShaper::RunIterator, T>::value, "");
 public:
-    RunIteratorImpl() : _onCurrent(0), _onAtEnd(0), _onEndOfCurrentRun(0), _onConsume(0) {}
+    SkikoRunIterator() : _onCurrent(nullptr), _onAtEnd(nullptr), _onEndOfCurrentRun(nullptr), _onConsume(nullptr) {}
 
     void consume() override {
         _onConsume();
@@ -202,25 +202,25 @@ private:
     KBooleanCallback _onAtEnd;
 };
 
-class FontRunIteratorImpl : public RunIteratorImpl<SkShaper::FontRunIterator, KNativePointerCallback> {
+class SkikoFontRunIterator : public SkikoRunIterator<SkShaper::FontRunIterator, KNativePointerCallback> {
     const SkFont& currentFont() const override {
         return *reinterpret_cast<SkFont*>(_onCurrent());
     }
 };
 
-class BiDiRunIteratorImpl : public RunIteratorImpl<SkShaper::BiDiRunIterator, KIntCallback> {
+class SkikoBiDiRunIterator : public SkikoRunIterator<SkShaper::BiDiRunIterator, KIntCallback> {
     uint8_t currentLevel() const override {
         return static_cast<uint8_t>(_onCurrent());
     }
 };
 
-class ScriptRunIteratorImpl : public RunIteratorImpl<SkShaper::ScriptRunIterator, KIntCallback>  {
+class SkikoScriptRunIterator : public SkikoRunIterator<SkShaper::ScriptRunIterator, KIntCallback>  {
     SkFourByteTag currentScript() const override {
         return static_cast<SkFourByteTag>(_onCurrent());
     }
 };
 
-class LanguageRunIteratorImpl : public RunIteratorImpl<SkShaper::LanguageRunIterator, KInteropPointerCallback>  {
+class SkikoLanguageRunIterator : public SkikoRunIterator<SkShaper::LanguageRunIterator, KInteropPointerCallback>  {
     const char* currentLanguage() const override {
         return reinterpret_cast<char *>(_onCurrent());
     }
@@ -237,13 +237,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper_RunIterator_1nGetFi
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper_RunIterator_1nCreateRunIterator(KInt type) {
     switch (type) {
         case 1: // FontRunIterator
-            return reinterpret_cast<KNativePointer>(new FontRunIteratorImpl());
+            return reinterpret_cast<KNativePointer>(new SkikoFontRunIterator());
         case 2: // BiDiRunIterator
-            return reinterpret_cast<KNativePointer>(new BiDiRunIteratorImpl());
+            return reinterpret_cast<KNativePointer>(new SkikoBiDiRunIterator());
         case 3: // ScriptRunIterator
-            return reinterpret_cast<KNativePointer>(new ScriptRunIteratorImpl());
+            return reinterpret_cast<KNativePointer>(new SkikoScriptRunIterator());
         case 4: // LanguageRunIterator
-            return reinterpret_cast<KNativePointer>(new LanguageRunIteratorImpl());
+            return reinterpret_cast<KNativePointer>(new SkikoLanguageRunIterator());
         default:
             TODO("unsupported run iterator type");
     }
@@ -251,6 +251,162 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper_RunIterator_1nCreat
 
 SKIKO_EXPORT void org_jetbrains_skia_shaper_Shaper_RunIterator_1nInitRunIterator
   (KNativePointer ptr, KInteropPointer onConsume, KInteropPointer onEndOfCurrentRun, KInteropPointer onAtEnd, KInteropPointer onCurrent) {
-    auto* iter = static_cast<RunIteratorImplBase*>(reinterpret_cast<FontRunIteratorImpl*>(ptr));
+    auto* iter = static_cast<SkikoRunIteratorBase*>(reinterpret_cast<SkikoFontRunIterator*>(ptr));
     iter->init(onConsume, onEndOfCurrentRun, onAtEnd, onCurrent);
+}
+
+// Run Handler
+class SkikoRunHandler : public SkShaper::RunHandler {
+public:
+    SkikoRunHandler() :
+        _onBeginLine(nullptr),
+        _onRunInfo(nullptr),
+        _onCommitRunInfo(nullptr),
+        _onRunOffset(nullptr),
+        _onCommitRun(nullptr),
+        _onCommitLine(nullptr),
+        _runInfo(nullptr) {}
+
+    void init(
+        KInteropPointer onBeginLine,
+        KInteropPointer onRunInfo,
+        KInteropPointer onCommitRunInfo,
+        KInteropPointer onRunOffset,
+        KInteropPointer onCommitRun,
+        KInteropPointer onCommitLine
+    ) {
+        _onBeginLine = KVoidCallback(onBeginLine);
+        _onRunInfo = KVoidCallback(onRunInfo);
+        _onCommitRunInfo = KVoidCallback(onCommitRunInfo);
+        _onRunOffset = KVoidCallback(onRunOffset);
+        _onCommitRun = KVoidCallback(onCommitRun);
+        _onCommitLine = KVoidCallback(onCommitLine);
+    }
+
+    void beginLine() override {
+        _onBeginLine();
+    }
+
+    void runInfo(const RunInfo& info) override {
+        _runInfo = &info;
+        _onRunInfo();
+        _runInfo = nullptr;
+    }
+
+    void commitRunInfo() override {
+        _onCommitRunInfo();
+    }
+
+    Buffer runBuffer(const RunInfo& info) override {
+        _glyphs    = std::vector<SkGlyphID>(info.glyphCount);
+        _positions = std::vector<SkPoint>(info.glyphCount);
+        _clusters  = std::vector<uint32_t>(info.glyphCount);
+
+        _runInfo = &info;
+        _onRunOffset();
+        _runInfo = nullptr;
+
+        return {
+            _glyphs.data(),
+            _positions.data(),
+            nullptr,
+            _clusters.data(),
+            _point
+        };
+    }
+
+    void commitRunBuffer(const RunInfo& info) override {
+        _runInfo = &info;
+        _onCommitRun();
+        _runInfo = nullptr;
+    }
+
+    virtual void commitLine() override {
+        _onCommitLine();
+    }
+
+    void setOffset(KFloat x, KFloat y) {
+        _point = { x, y };
+    }
+
+    const std::vector<SkGlyphID>& glyphs() const { return _glyphs; }
+    const std::vector<SkPoint>& positions() const { return _positions; }
+    const std::vector<uint32_t>& clusters() const { return _clusters; }
+
+    const RunInfo& runInfo() const { return *_runInfo; }
+private:
+    KVoidCallback _onBeginLine;
+    KVoidCallback _onRunInfo;
+    KVoidCallback _onCommitRunInfo;
+    KVoidCallback _onRunOffset;
+    KVoidCallback _onCommitRun;
+    KVoidCallback _onCommitLine;
+
+    SkPoint _point;
+    std::vector<SkGlyphID> _glyphs;
+    std::vector<SkPoint> _positions;
+    std::vector<uint32_t> _clusters;
+
+    const RunInfo* _runInfo;
+};
+
+static void deleteRunHandler(SkikoRunHandler* runIterator) {
+    delete runIterator;
+}
+
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper_RunHandler_1nGetFinalizer() {
+    return reinterpret_cast<KNativePointer>(deleteRunHandler);
+}
+
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper_RunHandler_1nGetRunInfo
+  (KNativePointer ptr, KInteropPointer fields) {
+    auto* instance = reinterpret_cast<SkikoRunHandler*>(ptr);
+    KInt* repr = reinterpret_cast<KInt*>(fields);
+    repr[0] = instance->runInfo().fBidiLevel;
+    repr[1] = rawBits(instance->runInfo().fAdvance.x());
+    repr[2] = rawBits(instance->runInfo().fAdvance.y());
+    repr[3] = instance->runInfo().glyphCount;
+    repr[4] = instance->runInfo().utf8Range.begin();
+    repr[5] = instance->runInfo().utf8Range.size();
+
+    auto* font = const_cast<SkFont*>(&(instance->runInfo().fFont));
+    return reinterpret_cast<KNativePointer>(font);
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_shaper_Shaper_RunHandler_1nGetGlyphs
+  (KNativePointer ptr, KInteropPointer result) {
+    auto* instance = reinterpret_cast<SkikoRunHandler*>(ptr);
+    auto& src = instance->glyphs();
+    std::copy(src.cbegin(), src.cend(), reinterpret_cast<SkGlyphID*>(result));
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_shaper_Shaper_RunHandler_1nGetPositions
+  (KNativePointer ptr, KInteropPointer result) {
+    auto* instance = reinterpret_cast<SkikoRunHandler*>(ptr);
+    auto& src = instance->positions();
+    std::copy(src.cbegin(), src.cend(), reinterpret_cast<SkPoint*>(result));
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_shaper_Shaper_RunHandler_1nGetClusters
+  (KNativePointer ptr, KInteropPointer result) {
+    auto* instance = reinterpret_cast<SkikoRunHandler*>(ptr);
+    auto& src = instance->clusters();
+    std::copy(src.cbegin(), src.cend(), reinterpret_cast<uint32_t*>(result));
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_shaper_Shaper_RunHandler_1nSetOffset
+  (KNativePointer ptr, KFloat x, KFloat y) {
+    auto* instance = reinterpret_cast<SkikoRunHandler*>(ptr);
+    instance->setOffset(x, y);
+}
+
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper_RunHandler_1nCreate() {
+    return reinterpret_cast<KNativePointer>(new SkikoRunHandler());
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_shaper_Shaper_RunHandler_1nInit
+  (KNativePointer ptr, KInteropPointer onBeginLine, KInteropPointer onRunInfo, KInteropPointer onCommitRunInfo, KInteropPointer onRunOffset, KInteropPointer onCommitRun, KInteropPointer onCommitLine)
+{
+    auto* instance = reinterpret_cast<SkikoRunHandler*>(ptr);
+    instance->init(onBeginLine, onRunInfo, onCommitRunInfo, onRunOffset, onCommitRun, onCommitLine);
 }

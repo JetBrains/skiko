@@ -293,8 +293,10 @@ internal external fun Shaper_nShape(
 // Native/JS only
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunIterator_1nGetFinalizer")
 internal external fun RunIterator_nGetFinalizer(): NativePointer
+
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunIterator_1nCreateRunIterator")
 internal external fun RunIterator_nCreateRunIterator(type: Int): NativePointer
+
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunIterator_1nInitRunIterator")
 internal external fun RunIterator_nInitRunIterator(
     ptr: NativePointer,
@@ -304,3 +306,34 @@ internal external fun RunIterator_nInitRunIterator(
     onCurrent: InteropPointer
 )
 
+@ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunHandler_1nCreate")
+internal external fun RunHandler_nCreate(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunHandler_1nGetFinalizer")
+internal external fun RunHandler_nGetFinalizer(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunHandler_1nInit")
+internal external fun RunHandler_nInit(
+    ptr: NativePointer,
+    onBeginLine: InteropPointer,
+    onRunInfo: InteropPointer,
+    onCommitRunInfo: InteropPointer,
+    onRunOffset: InteropPointer,
+    onCommitRun: InteropPointer,
+    onCommitLine: InteropPointer
+)
+
+@ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunHandler_1nGetGlyphs")
+internal external fun RunHandler_nGetGlyphs(ptr: NativePointer, result: InteropPointer)
+
+@ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunHandler_1nGetClusters")
+internal external fun RunHandler_nGetClusters(ptr: NativePointer, result: InteropPointer)
+
+@ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunHandler_1nGetPositions")
+internal external fun RunHandler_nGetPositions(ptr: NativePointer, result: InteropPointer)
+
+@ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunHandler_1nSetOffset")
+internal external fun RunHandler_nSetOffset(ptr: NativePointer, x: Float, y: Float)
+
+@ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunHandler_1nGetRunInfo")
+internal external fun RunHandler_nGetRunInfo(ptr: NativePointer, result: InteropPointer): NativePointer
