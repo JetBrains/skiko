@@ -157,7 +157,7 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     val shadows: Array<Shadow>
         get() = try {
             Stats.onNativeCall()
-            Shadow.fromInteropPointer(_nGetShadowsCount(_ptr) * 5) {
+            Shadow.fromInteropPointer(_nGetShadowsCount(_ptr)) {
                 _nGetShadows(_ptr, it)
             }
         } finally {

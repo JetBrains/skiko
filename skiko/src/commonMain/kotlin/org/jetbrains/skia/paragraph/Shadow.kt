@@ -55,8 +55,8 @@ class Shadow(val color: Int, val offsetX: Float, val offsetY: Float, val blurSig
     companion object
 }
 
-fun Shadow.Companion.fromInteropPointer(size: Int, block: InteropScope.(InteropPointer) -> Unit): Array<Shadow> {
-    return withResult(IntArray(size), block).toList().chunked(5).map { (color, offsetX, offsetY, blurSigmaA, blurSigmaB) ->
+fun Shadow.Companion.fromInteropPointer(shadowsCount: Int, block: InteropScope.(InteropPointer) -> Unit): Array<Shadow> {
+    return withResult(IntArray(shadowsCount * 5), block).toList().chunked(5).map { (color, offsetX, offsetY, blurSigmaA, blurSigmaB) ->
         val blurSigma = (blurSigmaA.toLong() shl 32) or (blurSigmaB.toLong() and 0xFFFFFFFFL)
         Shadow(color, Float.fromBits(offsetX), Float.fromBits(offsetY), Double.fromBits(blurSigma))
     }.toTypedArray()
