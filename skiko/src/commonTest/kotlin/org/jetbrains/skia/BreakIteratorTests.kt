@@ -10,5 +10,8 @@ class BreakIteratorTests {
         val boundary = BreakIterator.makeWordInstance()
         boundary.setText("家捷克的软件开发公司")
         assertEquals(U16String("家捷克的软件开发公司").toString(), boundary._text.toString())
+
+        assertEquals(0, boundary.first())
+        assertEquals(10, boundary.last())
     }
 }
