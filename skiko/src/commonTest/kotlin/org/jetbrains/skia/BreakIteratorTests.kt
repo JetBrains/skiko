@@ -9,7 +9,7 @@ private fun BreakIterator.asSequence() = generateSequence { next().let { n -> if
 class BreakIteratorTests {
 
     @Test
-    fun breakIteratorTest() {
+    fun breakIteratorWordInstanceTest() {
         val boundary = BreakIterator.makeWordInstance()
         boundary.setText("家捷克的软件开发公司 ,software development company")
 
@@ -17,6 +17,16 @@ class BreakIteratorTests {
 
         assertEquals(0, boundary.first())
         assertEquals(40, boundary.last())
+    }
 
+    @Test
+    fun breakIteratorSentenceInstanceTest() {
+        val boundary = BreakIterator.makeSentenceInstance()
+        boundary.setText("""
+            Skiko (short for Skia for Kotlin) is the graphical library exposing significant part of Skia library APIs to Kotlin, along with the gluing code for rendering context. 
+            At the moment, Linux(x86_64 and arm64), Windows(x86_64) and macOS(x86_64 and arm64) builds for Kotlin/JVM are available.
+        """.trimIndent())
+
+        assertContentEquals(listOf(168, 288), boundary.asSequence().toList())
     }
 }
