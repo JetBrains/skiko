@@ -42,8 +42,14 @@ internal actual fun Shaper.doShape(
     }
 }
 
-private fun <T> toManaged(iter: Iterator<T>): Managed =
-    if (iter is ManagedRunIterator<T>) { iter } else { RunIteratorBase.fromIterator(iter) }
+private fun toManaged(iter: Iterator<FontRun?>): Managed =
+    if (iter is ManagedRunIterator<FontRun?>) { iter } else { RunIteratorBase.fromIterator(iter) }
+private fun toManaged(iter: Iterator<LanguageRun?>): Managed =
+    if (iter is ManagedRunIterator<LanguageRun?>) { iter } else { RunIteratorBase.fromIterator(iter) }
+private fun toManaged(iter: Iterator<BidiRun?>): Managed =
+    if (iter is ManagedRunIterator<BidiRun?>) { iter } else { RunIteratorBase.fromIterator(iter) }
+private fun toManaged(iter: Iterator<ScriptRun?>): Managed =
+    if (iter is ManagedRunIterator<ScriptRun?>) { iter } else { RunIteratorBase.fromIterator(iter) }
 
 abstract class RunIteratorBase protected constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     private object _FinalizerHolder {
@@ -80,8 +86,6 @@ abstract class RunIteratorBase protected constructor(ptr: NativePointer) : Manag
 
         fun fromIterator(iterator: Iterator<LanguageRun?>): RunIteratorBase =
             IteratorBasedLanguageRunIterator(RunIterator_nCreateRunIterator(LANGUAGE_RUN_ITERATOR_TYPE), iterator)
-
-        fun fromIterator(iterator: Iterator<Any?>): RunIteratorBase = TODO("Not implemented for type")
     }
 }
 
