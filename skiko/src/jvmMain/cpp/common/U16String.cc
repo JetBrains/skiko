@@ -13,9 +13,9 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_U16StringKt_U16String
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_U16StringKt_U16String_1nMake
-  (JNIEnv* env, jclass jclass, jstring str, jint len) {
+  (JNIEnv* env, jclass jclass, jcharArray chars, jint len) {
     std::vector<jchar>* instance = new std::vector<jchar>(len);
-    env->GetStringRegion(str, 0, len, instance->data());
+    env->GetCharArrayRegion(chars, 0, len, instance->data());
     return reinterpret_cast<jlong>(instance);
 }
 

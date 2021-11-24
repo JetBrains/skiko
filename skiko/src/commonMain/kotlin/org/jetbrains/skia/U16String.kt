@@ -18,7 +18,7 @@ class U16String internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         }
     }
 
-    constructor(s: String?) : this(interopScope { U16String_nMake(toInterop(s), s?.length ?: 0) }) {
+    constructor(s: String?) : this(interopScope { U16String_nMake(toInterop(s?.toCharArray()),s?.length ?: 0) }) {
         Stats.onNativeCall()
     }
 
@@ -38,7 +38,7 @@ class U16String internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
 
 
 @ExternalSymbolName("org_jetbrains_skia_U16String__1nMake")
-private external fun U16String_nMake(s: InteropPointer, len: Int): NativePointer
+private external fun U16String_nMake(chars: InteropPointer, len: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_U16String__1nGetFinalizer")
 private external fun U16String_nGetFinalizer(): NativePointer
