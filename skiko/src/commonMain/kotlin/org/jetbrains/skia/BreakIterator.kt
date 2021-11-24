@@ -1,11 +1,13 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.interopScope
 
 /**
  *
@@ -299,7 +301,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
     internal var _text: U16String? = null
     override fun close() {
         super.close()
-        if (_text != null) _text!!.close()
+        _text?.close()
     }
 
     /**
@@ -502,8 +504,8 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
     fun setText(text: String?) {
         try {
             Stats.onNativeCall()
-            _text = U16String(text)
-            _nSetText(_ptr, getPtr(_text), text?.length ?: 0)
+            _text?.close()
+            _text = interopScope { U16String(_nSetText(_ptr, toInterop(text), text?.length ?: 0)) }
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(_text)
@@ -556,4 +558,4 @@ private external fun _nGetRuleStatus(ptr: NativePointer): Int
 private external fun _nGetRuleStatuses(ptr: NativePointer): IntArray
 
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nSetText")
-private external fun _nSetText(ptr: NativePointer, textPtr: NativePointer, len: Int)
+private external fun _nSetText(ptr: NativePointer, textStr: InteropPointer, len: Int): NativePointer
