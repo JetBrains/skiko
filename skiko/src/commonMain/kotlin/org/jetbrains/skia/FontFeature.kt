@@ -45,7 +45,7 @@ class FontFeature(val _tag: Int, val value: Int, val start: UInt, val end: UInt)
     override fun equals(other: Any?): Boolean {
         if (other === this) return true
         if (other !is FontFeature) return false
-        if (this.tag != other) return false
+        if (this.tag != other.tag) return false
         if (value != other.value) return false
         if (start != other.start) return false
         return end == other.end

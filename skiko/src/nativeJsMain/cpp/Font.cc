@@ -303,42 +303,25 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Font__1nGetPath
 }
 
 
-SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_Font__1nGetPaths
-  (KNativePointer ptr, KShort* glyphsArr) {
-    TODO("implement org_jetbrains_skia_Font__1nGetPaths");
-}
-
-#if 0
-SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_Font__1nGetPaths
-  (KNativePointer ptr, KShort* glyphsArr) {
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_Font__1nGetPaths
+  (KNativePointer ptr, KShort* glyphs, KInt count) {
     SkFont* instance = reinterpret_cast<SkFont*>(ptr);
-    int count = env->GetArrayLength(glyphsArr);
-    KShort* glyphs = env->GetShortArrayElements(glyphsArr, nullptr);
 
     struct Ctx {
-        KInteropPointerArray paths;
-        jsize        idx;
-        JNIEnv*      env;
-    } ctx = { env->NewObjectArray(count, skija::Path::cls, nullptr), 0, env };
+        std::vector<KNativePointer>* paths;
+    } ctx = { new std::vector<KNativePointer>() };
 
     instance->getPaths(reinterpret_cast<SkGlyphID*>(glyphs), count, [](const SkPath* orig, const SkMatrix& mx, void* voidCtx) {
         Ctx* ctx = static_cast<Ctx*>(voidCtx);
         if (orig) {
             SkPath* path = new SkPath();
             orig->transform(mx, path);
-            KInteropPointer pathObj = ctx->env->NewObject(skija::Path::cls, skija::Path::ctor, reinterpret_cast<KNativePointer>(path));
-            ctx->env->SetObjectArrayElement(ctx->paths, ctx->idx, pathObj);
-            ctx->env->DeleteLocalRef(pathObj);
-            ++ctx->idx;
+            ctx->paths->push_back(reinterpret_cast<KNativePointer>(path));
         }
     }, &ctx);
 
-    env->ReleaseShortArrayElements(glyphsArr, glyphs, 0);
-    return ctx.paths;
+    return reinterpret_cast<KNativePointer>(ctx.paths);
 }
-#endif
-
-
 
 SKIKO_EXPORT void org_jetbrains_skia_Font__1nGetMetrics
   (KNativePointer ptr, KFloat* fontMetrics) {

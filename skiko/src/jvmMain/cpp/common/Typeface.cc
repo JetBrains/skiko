@@ -78,8 +78,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TypefaceKt__1nMakeFro
     SkString name = skString(env, nameStr);
     SkFontStyle style = skija::FontStyle::fromJava(styleValue);
     sk_sp<SkTypeface> instance = SkTypeface::MakeFromName(name.c_str(), style);
-    SkTypeface* ptr = instance.release();
-    return reinterpret_cast<jlong>(ptr);
+    return reinterpret_cast<jlong>(instance.release());
 }
     
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TypefaceKt__1nMakeFromFile
@@ -222,8 +221,10 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TypefaceKt__1nGetFami
     return reinterpret_cast<jlong>(new SkString(name));
 }
 
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_TypefaceKt_Typeface_1nGetBounds
-  (JNIEnv* env, jclass jclass, jlong ptr) {
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_TypefaceKt_Typeface_1nGetBounds
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray res) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(static_cast<uintptr_t>(ptr));
-    return skija::Rect::fromSkRect(env, instance->getBounds());
+    SkRect b = instance->getBounds();
+    float r[4] = {b.left(), b.top(), b.right(), b.bottom()};
+    env->SetFloatArrayRegion(res, 0, 4, r);
 }

@@ -2164,7 +2164,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
 
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nGetFinalizer")
-private external fun Path_nGetFinalizer(): NativePointer
+internal external fun Path_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Path__1nMake")
 private external fun Path_nMake(): NativePointer

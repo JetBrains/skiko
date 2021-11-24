@@ -154,10 +154,12 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         return this
     }
 
-    val shadows: Array<org.jetbrains.skia.paragraph.Shadow>
+    val shadows: Array<Shadow>
         get() = try {
             Stats.onNativeCall()
-            _nGetShadows(_ptr)
+            Shadow.fromInteropPointer(_nGetShadowsCount(_ptr)) {
+                _nGetShadows(_ptr, it)
+            }
         } finally {
             reachabilityBarrier(this)
         }
@@ -195,7 +197,9 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
 
     fun addFontFeature(f: FontFeature): TextStyle {
         Stats.onNativeCall()
-        _nAddFontFeature(_ptr, f.tag, f.value)
+        interopScope {
+            _nAddFontFeature(_ptr, toInterop(f.tag), f.value)
+        }
         return this
     }
 
@@ -230,7 +234,9 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     var fontFamilies: Array<String>
         get() = try {
             Stats.onNativeCall()
-            TextStyle_nGetFontFamilies(_ptr)
+            arrayDecoderScope({ ArrayDecoder(TextStyle_nGetFontFamilies(_ptr), ManagedString_nGetFinalizer()) }) { arrayDecoder ->
+                (0 until arrayDecoder.size).map { i -> withStringResult(arrayDecoder.release(i)) }
+            }.toTypedArray()
         } finally {
             reachabilityBarrier(this)
         }
@@ -434,7 +440,7 @@ private external fun TextStyle_nGetFontSize(ptr: NativePointer): Float
 private external fun TextStyle_nSetFontSize(ptr: NativePointer, size: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetFontFamilies")
-private external fun TextStyle_nGetFontFamilies(ptr: NativePointer): Array<String>
+private external fun TextStyle_nGetFontFamilies(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetHeight")
 private external fun TextStyle_nGetHeight(ptr: NativePointer): Float
@@ -484,8 +490,11 @@ private external fun _nSetDecorationStyle(
     thicknessMultiplier: Float
 )
 
+@ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetShadowsCount")
+private external fun _nGetShadowsCount(ptr: NativePointer): Int
+
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetShadows")
-private external fun _nGetShadows(ptr: NativePointer): Array<Shadow>
+private external fun _nGetShadows(ptr: NativePointer, res: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nAddShadow")
 private external fun _nAddShadow(ptr: NativePointer, color: Int, offsetX: Float, offsetY: Float, blurSigma: Double)
@@ -500,7 +509,7 @@ private external fun _nGetFontFeatures(ptr: NativePointer, resultIntsArray: Inte
 private external fun _nGetFontFeaturesSize(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nAddFontFeature")
-private external fun _nAddFontFeature(ptr: NativePointer, name: String?, value: Int)
+private external fun _nAddFontFeature(ptr: NativePointer, name: InteropPointer, value: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nClearFontFeatures")
 private external fun _nClearFontFeatures(ptr: NativePointer)

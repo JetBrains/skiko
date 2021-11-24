@@ -400,6 +400,15 @@ static inline jint rawBits(jfloat f) {
     return u.i;
 }
 
+static inline jlong rawBits(jdouble d) {
+    union {
+        jdouble d;
+        jlong l;
+    } u;
+    u.d = d;
+    return u.l;
+}
+
 static inline jfloat fromBits(jint i) {
     union {
         jfloat f;
