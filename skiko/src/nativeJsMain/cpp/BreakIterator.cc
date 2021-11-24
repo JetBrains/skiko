@@ -109,10 +109,13 @@ SKIKO_EXPORT KInt* org_jetbrains_skia_BreakIterator__1nGetRuleStatuses
 #endif
 
 
-SKIKO_EXPORT void org_jetbrains_skia_BreakIterator__1nSetText
-  (KNativePointer ptr, KNativePointer textPtr) {
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_BreakIterator__1nSetText
+  (KNativePointer ptr, KChar* textArr, KInt len) {
     UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(ptr);
-    std::vector<KChar>* text = reinterpret_cast<std::vector<KChar>*>(textPtr);
+    std::vector<KChar>* text = new std::vector<KChar>(len);
+    memcpy(text->data(), textArr, len * sizeof(KChar));
+
     UErrorCode status = U_ZERO_ERROR;
-    ubrk_setText(instance, reinterpret_cast<UChar *>(text->data()), text->size(), &status);
+    ubrk_setText(instance, reinterpret_cast<UChar *>(text->data()), len, &status);
+    return reinterpret_cast<KNativePointer>(text);
 }
