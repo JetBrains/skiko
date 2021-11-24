@@ -183,14 +183,15 @@ public:
 
     void consume() override {
         _onConsume();
+        _endOfCurrentRun = _indicesConverter.from16To8(_onEndOfCurrentRun());
     }
     
     size_t endOfCurrentRun() const override {
-        return _indicesConverter.from16To8(_onEndOfCurrentRun());
+        return _endOfCurrentRun;
     }
     
     bool atEnd() const override {
-        return static_cast<bool>(_onAtEnd());  
+        return static_cast<bool>(_onAtEnd());
     }
     
     virtual void init(KInteropPointer onConsume, KInteropPointer onEndOfCurrentRun, KInteropPointer onAtEnd, KInteropPointer onCurrent) {
@@ -205,7 +206,8 @@ private:
     KVoidCallback _onConsume;
     KIntCallback  _onEndOfCurrentRun;
     KBooleanCallback _onAtEnd;
-    mutable skija::UtfIndicesConverter _indicesConverter;
+    skija::UtfIndicesConverter _indicesConverter;
+    size_t _endOfCurrentRun = 0;
 };
 
 class SkikoFontRunIterator : public SkikoRunIterator<SkShaper::FontRunIterator, KNativePointerCallback> {

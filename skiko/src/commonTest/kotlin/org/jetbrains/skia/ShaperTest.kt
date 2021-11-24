@@ -6,7 +6,10 @@ import org.jetbrains.skia.shaper.Shaper
 import org.jetbrains.skia.shaper.ShapingOptions
 import org.jetbrains.skia.tests.makeFromResource
 import org.jetbrains.skiko.tests.runTest
-import kotlin.test.*
+import kotlin.test.Test
+import kotlin.test.assertContentEquals
+import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
 
 class ShaperTest {
 
@@ -62,7 +65,6 @@ class ShaperTest {
             runHandler = object : RunHandler {
                 override fun beginLine() {
                     callCount.beginLine += 1
-                    assertFalse(callCount.beginLine > 10)
                 }
 
                 override fun runInfo(info: RunInfo?) {
