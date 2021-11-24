@@ -503,7 +503,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
         try {
             Stats.onNativeCall()
             _text = U16String(text)
-            _nSetText(_ptr, getPtr(_text))
+            _nSetText(_ptr, getPtr(_text), text?.length ?: 0)
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(_text)
@@ -556,4 +556,4 @@ private external fun _nGetRuleStatus(ptr: NativePointer): Int
 private external fun _nGetRuleStatuses(ptr: NativePointer): IntArray
 
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nSetText")
-private external fun _nSetText(ptr: NativePointer, textPtr: NativePointer)
+private external fun _nSetText(ptr: NativePointer, textPtr: NativePointer, len: Int)
