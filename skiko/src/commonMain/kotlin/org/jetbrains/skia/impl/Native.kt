@@ -23,6 +23,7 @@ fun getPtr(n: Native?): NativePointer = n?._ptr ?: Native.NullPointer
 
 expect class InteropScope() {
     fun toInterop(string: String?): InteropPointer
+    fun toInterop(array: CharArray?): InteropPointer
     fun InteropPointer.fromInterop(result: CharArray)
     fun toInterop(array: ByteArray?): InteropPointer
     fun InteropPointer.fromInterop(result: ByteArray)
