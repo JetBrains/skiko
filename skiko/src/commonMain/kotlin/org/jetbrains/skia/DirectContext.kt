@@ -109,10 +109,8 @@ class DirectContext internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     }
 }
 
-fun <R> DirectContext.use(block: (ctx: DirectContext) -> R): R {
-    return (this as Managed).use {
-        block(this).also { abandon() }
-    }
+fun <R> DirectContext.useContext(block: (ctx: DirectContext) -> R): R = use {
+    block(this).also { abandon() }
 }
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nFlush")
