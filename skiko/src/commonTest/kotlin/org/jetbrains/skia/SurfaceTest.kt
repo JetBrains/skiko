@@ -115,15 +115,16 @@ class SurfaceTest {
         }
 
         val pixels = TestGlContext.run {
-            val ctx = DirectContext.makeGL()
-            val imageInfo = ImageInfo.makeN32Premul(16, 16)
-            val surface = Surface.makeRenderTarget(ctx, budgeted = false, imageInfo)
+            DirectContext.makeGL().useContext { ctx ->
+                val imageInfo = ImageInfo.makeN32Premul(16, 16)
+                val surface = Surface.makeRenderTarget(ctx, budgeted = false, imageInfo)
 
-            surface.canvas.drawRect(
-                r = Rect(4f, 4f, 12f, 12f),
-                paint = Paint().apply { color = Color.RED }
-            )
-            Bitmap.makeFromImage(surface.makeImageSnapshot(), ctx)
+                surface.canvas.drawRect(
+                    r = Rect(4f, 4f, 12f, 12f),
+                    paint = Paint().apply { color = Color.RED }
+                )
+                Bitmap.makeFromImage(surface.makeImageSnapshot(), ctx)
+            }
         }
 
         assertEquals(Color.RED, pixels.getColor(8, 8))
