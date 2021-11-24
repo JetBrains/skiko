@@ -1,10 +1,7 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.RefCnt
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.reachabilityBarrier
 
 class DirectContext internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
@@ -109,6 +106,12 @@ class DirectContext internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         } finally {
             reachabilityBarrier(this)
         }
+    }
+}
+
+fun <R> DirectContext.use(block: (ctx: DirectContext) -> R): R {
+    return (this as Managed).use {
+        block(this).also { abandon() }
     }
 }
 
