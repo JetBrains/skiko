@@ -14,8 +14,10 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_U16String__1nGetFinalizer() {
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_U16String__1nMake
-  (KInteropPointer str) {
-    TODO("implement org_jetbrains_skia_U16String__1nMake");
+  (KChar* chars, KInt len) {
+    std::vector<KChar>* instance = new std::vector<KChar>(len);
+    memcpy(instance->data(), chars, len);
+    return reinterpret_cast<KNativePointer>(instance);
 }
 
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_U16String__1nToString
