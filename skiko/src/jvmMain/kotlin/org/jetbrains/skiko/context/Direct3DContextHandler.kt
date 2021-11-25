@@ -10,15 +10,7 @@ import java.lang.ref.Reference
 internal class Direct3DContextHandler(layer: SkiaLayer) : JvmContextHandler(layer) {
     private val bufferCount = 2
     private var surfaces: Array<Surface?> = arrayOfNulls(bufferCount)
-    private fun isSurfacesNull(): Boolean {
-        var result = 0
-        for (item in surfaces) {
-            if (item == null) {
-                result++
-            }
-        }
-        return bufferCount == result
-    }
+    private fun isSurfacesNull() = surfaces.filterNotNull().isEmpty()
 
     private val directXRedrawer: Direct3DRedrawer
         get() = layer.redrawer!! as Direct3DRedrawer
