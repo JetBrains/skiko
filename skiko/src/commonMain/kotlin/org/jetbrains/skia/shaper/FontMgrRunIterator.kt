@@ -3,6 +3,7 @@ package org.jetbrains.skia.shaper
 
 import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.Font
+import org.jetbrains.skia.FontMgr
 import org.jetbrains.skia.ManagedString
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.NativePointer
@@ -19,6 +20,9 @@ class FontMgrRunIterator(text: ManagedString?, manageText: Boolean, font: Font?,
             staticLoad()
         }
     }
+
+    private val _font: Font? = font
+    private val _fontMgr: FontMgr? = opts.fontMgr
 
     constructor(text: String?, font: Font?, opts: ShapingOptions) : this(ManagedString(text), true, font, opts)
     constructor(text: String?, font: Font?) : this(ManagedString(text), true, font, ShapingOptions.DEFAULT)
