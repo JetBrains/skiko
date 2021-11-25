@@ -266,6 +266,8 @@ private external fun _malloc(size: Int): NativePointer
 
 private external fun _free(ptr: NativePointer)
 
+private external fun lengthBytesUTF8(str: String): Int
+
 private external fun stringToUTF8(str: String, outPtr: NativePointer, maxBytesToWrite: Int)
 
 private external fun UTF8ToString(ptr: NativePointer): String

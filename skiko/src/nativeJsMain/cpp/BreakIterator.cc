@@ -114,7 +114,6 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_BreakIterator__1nSetText
     UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(ptr);
     std::vector<UChar>* text = new std::vector<UChar>(textArr, textArr + len);
 
-    UErrorCode status = U_ZERO_ERROR;
-    ubrk_setText(instance, text->data(), len, &status);
+    ubrk_setText(instance, text->data(), len, U_ZERO_ERROR);
     return reinterpret_cast<KNativePointer>(text);
 }
