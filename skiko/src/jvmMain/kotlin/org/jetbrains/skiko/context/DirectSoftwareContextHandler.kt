@@ -38,7 +38,7 @@ internal class DirectSoftwareContextHandler(layer: SkiaLayer) : JvmContextHandle
         val scale = layer.contentScale
         val w = (layer.width * scale).toInt().coerceAtLeast(0)
         val h = (layer.height * scale).toInt().coerceAtLeast(0)
-        if (isSizeChanged(w, h)) {
+        if (isSizeChanged(w, h) || surface == null) {
             disposeCanvas()
             softwareRedrawer.resize(w, h)
             surface = softwareRedrawer.acquireSurface()
