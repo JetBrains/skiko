@@ -164,14 +164,8 @@ SKIKO_EXPORT void org_jetbrains_skia_shaper_Shaper__1nShape
     instance->shape(text.c_str(), text.size(), *fontRunIter, *bidiRunIter, *scriptRunIter, *languageRunIter, features.data(), features.size(), std::numeric_limits<float>::infinity(), runHandler);
 }
 
-class SkikoRunIteratorBase {
-public:
-    virtual ~SkikoRunIteratorBase() {}
-    virtual void init(KInteropPointer onConsume, KInteropPointer onEndOfCurrentRun, KInteropPointer onAtEnd, KInteropPointer onCurrent) = 0;
-};
-
 template<typename T, typename CurrentCallback>
-class SkikoRunIterator: public T, public SkikoRunIteratorBase {
+class SkikoRunIterator: public T {
     static_assert(std::is_base_of<SkShaper::RunIterator, T>::value, "");
 public:
     SkikoRunIterator(const SkString& text) :
@@ -194,7 +188,7 @@ public:
         return static_cast<bool>(_onAtEnd());
     }
     
-    virtual void init(KInteropPointer onConsume, KInteropPointer onEndOfCurrentRun, KInteropPointer onAtEnd, KInteropPointer onCurrent) {
+    void init(KInteropPointer onConsume, KInteropPointer onEndOfCurrentRun, KInteropPointer onAtEnd, KInteropPointer onCurrent) {
         _onConsume = KVoidCallback(onConsume);
         _onEndOfCurrentRun = KIntCallback(onEndOfCurrentRun);
         _onAtEnd = KBooleanCallback(onAtEnd);
@@ -202,6 +196,11 @@ public:
     }
 protected:
     CurrentCallback _onCurrent;
+
+    typename CurrentCallback::return_type current() const {
+        auto current = _onCurrent();
+        return current;
+    }
 private:
     KVoidCallback _onConsume;
     KIntCallback  _onEndOfCurrentRun;
@@ -215,7 +214,7 @@ public:
     SkikoFontRunIterator(const SkString& text) : SkikoRunIterator<SkShaper::FontRunIterator, KNativePointerCallback>(text) {}
 
     const SkFont& currentFont() const override {
-        return *reinterpret_cast<SkFont*>(_onCurrent());
+        return *reinterpret_cast<SkFont*>(current());
     }
 };
 
@@ -224,7 +223,7 @@ public:
     SkikoBiDiRunIterator(const SkString& text) : SkikoRunIterator<SkShaper::BiDiRunIterator, KIntCallback>(text) {}
 
     uint8_t currentLevel() const override {
-        return static_cast<uint8_t>(_onCurrent());
+        return static_cast<uint8_t>(current());
     }
 };
 
@@ -233,7 +232,7 @@ public:
     SkikoScriptRunIterator(const SkString& text) : SkikoRunIterator<SkShaper::ScriptRunIterator, KIntCallback>(text) {}
 
     SkFourByteTag currentScript() const override {
-        return static_cast<SkFourByteTag>(_onCurrent());
+        return static_cast<SkFourByteTag>(current());
     }
 };
 
@@ -242,7 +241,7 @@ public:
     SkikoLanguageRunIterator(const SkString& text) : SkikoRunIterator<SkShaper::LanguageRunIterator, KInteropPointerCallback>(text) {}
 
     const char* currentLanguage() const override {
-        return reinterpret_cast<char *>(_onCurrent());
+        return reinterpret_cast<char *>(current());
     }
 };
 
@@ -271,9 +270,31 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper_RunIterator_1nCreat
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_shaper_Shaper_RunIterator_1nInitRunIterator
-  (KNativePointer ptr, KInteropPointer onConsume, KInteropPointer onEndOfCurrentRun, KInteropPointer onAtEnd, KInteropPointer onCurrent) {
-    auto* iter = static_cast<SkikoRunIteratorBase*>(reinterpret_cast<SkikoFontRunIterator*>(ptr));
-    iter->init(onConsume, onEndOfCurrentRun, onAtEnd, onCurrent);
+  (KNativePointer ptr, KInt type, KInteropPointer onConsume, KInteropPointer onEndOfCurrentRun, KInteropPointer onAtEnd, KInteropPointer onCurrent) {
+    switch (type) {
+        case 1: {// FontRunIterator
+            auto *runIter = reinterpret_cast<SkikoFontRunIterator *>(ptr);
+            runIter->init(onConsume, onEndOfCurrentRun, onAtEnd, onCurrent);
+            break;
+        }
+        case 2: {// BiDiRunIterator
+            auto *runIter = reinterpret_cast<SkikoBiDiRunIterator *>(ptr);
+            runIter->init(onConsume, onEndOfCurrentRun, onAtEnd, onCurrent);
+            break;
+        }
+        case 3: {// ScriptRunIterator
+            auto *runIter = reinterpret_cast<SkikoScriptRunIterator *>(ptr);
+            runIter->init(onConsume, onEndOfCurrentRun, onAtEnd, onCurrent);
+            break;
+        }
+        case 4: {// LanguageRunIterator
+            auto *runIter = reinterpret_cast<SkikoLanguageRunIterator *>(ptr);
+            runIter->init(onConsume, onEndOfCurrentRun, onAtEnd, onCurrent);
+            break;
+        }
+        default:
+            TODO("unsupported run iterator type");
+    }
 }
 
 // Run Handler
@@ -371,8 +392,8 @@ private:
     const RunInfo* _runInfo;
 };
 
-static void deleteRunHandler(SkikoRunHandler* runIterator) {
-    delete runIterator;
+static void deleteRunHandler(SkikoRunHandler* runHandler) {
+    delete runHandler;
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper_RunHandler_1nGetFinalizer() {

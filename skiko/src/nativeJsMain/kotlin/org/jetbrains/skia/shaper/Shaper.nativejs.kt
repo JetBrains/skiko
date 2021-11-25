@@ -56,7 +56,7 @@ private fun toManaged(iter: Iterator<BidiRun?>, text: ManagedString): Managed =
 private fun toManaged(iter: Iterator<ScriptRun?>, text: ManagedString): Managed =
     if (iter is ManagedRunIterator<ScriptRun?>) { iter } else { RunIteratorBase.fromIterator(iter, text) }
 
-sealed class RunIteratorBase(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
+sealed class RunIteratorBase(type: Int, ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     private object _FinalizerHolder {
         val PTR = RunIterator_nGetFinalizer()
     }
@@ -69,6 +69,7 @@ sealed class RunIteratorBase(ptr: NativePointer) : Managed(ptr, _FinalizerHolder
         interopScope {
             RunIterator_nInitRunIterator (
                 _ptr,
+                type,
                 onConsume = virtual { this@RunIteratorBase.consume() },
                 onEndOfCurrentRun = virtualInt { this@RunIteratorBase.endOfCurrentRun() },
                 onAtEnd = virtualBoolean { this@RunIteratorBase.atEnd() },
@@ -94,25 +95,25 @@ sealed class RunIteratorBase(ptr: NativePointer) : Managed(ptr, _FinalizerHolder
     }
 }
 
-private sealed class FontRunIterator(ptr: NativePointer): RunIteratorBase(ptr) {
+private sealed class FontRunIterator(ptr: NativePointer): RunIteratorBase(FONT_RUN_ITERATOR_TYPE, ptr) {
     abstract fun currentFont(): FontRun?
 
     override fun InteropScope.getOnCurrentCallback() = virtualNativePointer { getPtr(currentFont()?.font) }
 }
 
-private sealed class BiDiRunIterator(ptr: NativePointer): RunIteratorBase(ptr) {
+private sealed class BiDiRunIterator(ptr: NativePointer): RunIteratorBase(BIDI_RUN_ITERATOR_TYPE, ptr) {
     abstract fun currentLevel(): BidiRun?
 
     override fun InteropScope.getOnCurrentCallback() = virtualInt { currentLevel()?.level ?: 0 }
 }
 
-private sealed class ScriptRunIterator(ptr: NativePointer): RunIteratorBase(ptr) {
+private sealed class ScriptRunIterator(ptr: NativePointer): RunIteratorBase(SCRIPT_RUN_ITERATOR_TYPE, ptr) {
     abstract fun currentScript(): ScriptRun?
 
     override fun InteropScope.getOnCurrentCallback() = virtualInt { currentScript()?.scriptTag ?: 0 }
 }
 
-private sealed class LanguageRunIterator(ptr: NativePointer): RunIteratorBase(ptr) {
+private sealed class LanguageRunIterator(ptr: NativePointer): RunIteratorBase(LANGUAGE_RUN_ITERATOR_TYPE, ptr) {
     abstract fun currentLanguage(): LanguageRun?
     abstract fun currentLanguageInterop(): InteropPointer
 

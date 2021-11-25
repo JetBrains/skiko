@@ -300,6 +300,7 @@ internal external fun RunIterator_nCreateRunIterator(type: Int, textPtr: NativeP
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunIterator_1nInitRunIterator")
 internal external fun RunIterator_nInitRunIterator(
     ptr: NativePointer,
+    type: Int,
     onConsume: InteropPointer,
     onEndOfCurrentRun: InteropPointer,
     onAtEnd: InteropPointer,

@@ -173,6 +173,8 @@ KInteropPointer callInteropPointerCallback(KInteropPointer cb);
 template <typename T, T(*Apply)(KInteropPointer)>
 class KCallback {
 public:
+    using return_type = T;
+
     explicit KCallback(KInteropPointer data) : data(data) {}
 
     virtual ~KCallback() {
