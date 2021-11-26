@@ -61,6 +61,7 @@ if (supportWasm) {
 
         flags.set(listOf(
             *skiaPreprocessorFlags(),
+            *buildType.clangFlags,
             "-DSKIKO_WASM",
             "-fno-rtti",
             "-fno-exceptions"
@@ -143,36 +144,30 @@ fun compileNativeBridgesTask(os: OS, arch: Arch): TaskProvider<CompileSkikoCppTa
         when (os)  {
             OS.IOS -> {
                 val sdkRoot = "/Applications/Xcode.app/Contents/Developer/Platforms"
-                val iosFlags = listOf(
-                    "-std=c++17",
+                val iosArchFlags = when (arch) {
+                    Arch.Arm64 -> arrayOf(
+                        "-target", "arm64-apple-ios",
+                        "-isysroot", "$sdkRoot/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk"
+                    )
+                    Arch.X64 -> arrayOf(
+                        "-target", "x86_64-apple-ios-simulator",
+                        "-isysroot", "$sdkRoot/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk"
+                    )
+                    else -> throw GradleException("Unsupported arch: $arch")
+                }
+                flags.set(listOf(
+                    *iosArchFlags,
+                    *buildType.clangFlags,
                     "-stdlib=libc++",
                     "-DSK_SHAPER_CORETEXT_AVAILABLE",
                     "-DSK_BUILD_FOR_IOS",
-                    "-DSK_METAL"
-                )
-                when (arch) {
-                    Arch.Arm64 ->
-                        flags.set(
-                            listOf(
-                                "-target", "arm64-apple-ios",
-                                "-isysroot", "$sdkRoot/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk"
-                            ) +
-                            iosFlags +
-                            skiaPreprocessorFlags()
-                        )
-                    Arch.X64 -> flags.set(
-                            listOf(
-                                "-target", "x86_64-apple-ios-simulator",
-                                "-isysroot", "$sdkRoot/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk")
-                            + iosFlags
-                            + skiaPreprocessorFlags()
-                        )
-                    else -> throw GradleException("Unsupported arch: $arch")
-                }
+                    "-DSK_METAL",
+                    *skiaPreprocessorFlags(),
+                ))
             }
             OS.MacOS -> {
                 flags.set(listOf(
-                    "-std=c++17",
+                    *buildType.clangFlags,
                     "-DSK_SHAPER_CORETEXT_AVAILABLE",
                     "-DSK_BUILD_FOR_MAC",
                     "-DSK_METAL",
@@ -181,7 +176,7 @@ fun compileNativeBridgesTask(os: OS, arch: Arch): TaskProvider<CompileSkikoCppTa
             }
             OS.Linux -> {
                 flags.set(listOf(
-                    "-std=c++17",
+                    *buildType.clangFlags,
                     "-fno-rtti",
                     "-fno-exceptions",
                     "-fvisibility=hidden",
@@ -721,9 +716,12 @@ if (hostOs == OS.MacOS) {
         val outs = names.map { "$outDir/$it.o" }.toTypedArray()
         workingDir = File(outDir)
         val skiaDir = skiaJvmBindingsDir.get().absolutePath
+        dependsOn(skiaJvmBindingsDir)
+
         commandLine = listOf(
             "clang",
             *targetOs.clangFlags,
+            *buildType.clangFlags,
             "-I$jdkHome/include",
             "-I$jdkHome/include/darwin",
             "-I$skiaDir",
@@ -731,7 +729,6 @@ if (hostOs == OS.MacOS) {
             "-I$skiaDir/include/gpu",
             "-fobjc-arc",
             "-DSK_METAL",
-            "-std=c++17",
             "-c",
             *srcs
         )
