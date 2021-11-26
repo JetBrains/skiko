@@ -81,30 +81,23 @@ fun SwingSkia() = SwingUtilities.invokeLater {
 }
 
 private fun getSkiaPanel(): SkiaPanel {
-    val panel = SkiaPanel()
-    val clocks = ClocksJvm(panel.layer)
-    panel.layer.skikoView = GenericSkikoView(panel.layer, clocks)
-    val btnPanelOK = JPanel()
-    btnPanelOK.setLayout(BorderLayout(0, 0))
-    btnPanelOK.setBackground(Color.white)
-    btnPanelOK.add(JButton("OK"))
-    val btnCancel = JButton("Cancel")
-    panel.add(btnPanelOK)
-    panel.add(btnCancel)
-    panel.addComponentListener(object : ComponentAdapter() {
-        override fun componentResized(e: ComponentEvent) {
-            btnPanelOK.setBounds(panel.width - 200, panel.height - 100, 200, 40)
-            btnCancel.setBounds(panel.width - 200, panel.height - 50, 200, 40)
-            panel.invalidate()
-            panel.validate()
-            panel.repaint()
-        }
-    })
-    panel.layer.addMouseMotionListener(object : MouseMotionAdapter() {
-        override fun mouseMoved(event: MouseEvent) {
-            clocks.xpos = event.x
-            clocks.ypos = event.y
-        }
-    })
-    return panel
+    return SkiaPanel().apply {
+        layer.addView(GenericSkikoView(layer, ClocksJvm(layer)))
+        val btnPanelOK = JPanel()
+        btnPanelOK.setLayout(BorderLayout(0, 0))
+        btnPanelOK.setBackground(Color.white)
+        btnPanelOK.add(JButton("OK"))
+        val btnCancel = JButton("Cancel")
+        add(btnPanelOK)
+        add(btnCancel)
+        addComponentListener(object : ComponentAdapter() {
+            override fun componentResized(e: ComponentEvent) {
+                btnPanelOK.setBounds(width - 200, height - 100, 200, 40)
+                btnCancel.setBounds(width - 200, height - 50, 200, 40)
+                invalidate()
+                validate()
+                repaint()
+            }
+        })
+    }
 }

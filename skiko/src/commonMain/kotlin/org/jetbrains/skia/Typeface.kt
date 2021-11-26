@@ -33,7 +33,7 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
          */
         fun makeFromName(name: String?, style: FontStyle): Typeface {
             Stats.onNativeCall()
-            return Typeface(_nMakeFromName(name, style._value))
+            return interopScope { Typeface(_nMakeFromName(toInterop(name), style._value)) }
         }
 
         /**
@@ -395,7 +395,9 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     val bounds: Rect
         get() = try {
             Stats.onNativeCall()
-            Typeface_nGetBounds(_ptr)
+            Rect.fromInteropPointer {
+                Typeface_nGetBounds(_ptr, it)
+            }
         } finally {
             reachabilityBarrier(this)
         }
@@ -422,7 +424,7 @@ private external fun Typeface_nGetUTF32Glyphs(
 private external fun Typeface_nGetUTF32Glyph(ptr: NativePointer, unichar: Int): Short
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetBounds")
-private external fun Typeface_nGetBounds(ptr: NativePointer): Rect
+private external fun Typeface_nGetBounds(ptr: NativePointer, bounds: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetFontStyle")
 private external fun _nGetFontStyle(ptr: NativePointer): Int
@@ -443,7 +445,7 @@ private external fun _nGetVariationAxesCount(ptr: NativePointer): Int
 private external fun _nGetVariationAxes(ptr: NativePointer, axisData: InteropPointer, axisCount: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeFromName")
-private external fun _nMakeFromName(name: String?, fontStyle: Int): NativePointer
+private external fun _nMakeFromName(name: InteropPointer, fontStyle: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeFromFile")
 internal external fun _nMakeFromFile(path: InteropPointer, index: Int): NativePointer

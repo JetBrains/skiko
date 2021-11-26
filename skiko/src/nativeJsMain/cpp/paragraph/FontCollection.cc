@@ -79,7 +79,8 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_paragraph_FontCollection__1nFindT
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_paragraph_FontCollection__1nDefaultFallbackChar
   (KNativePointer ptr, KInt unicode, KInt fontStyle, KInteropPointer locale) {
-    TODO("implement org_jetbrains_skia_paragraph_FontCollection__1nDefaultFallbackChar");
+    FontCollection* instance = reinterpret_cast<FontCollection*>(ptr);
+    return reinterpret_cast<KNativePointer>(instance->defaultFallback(unicode, skija::FontStyle::fromKotlin(fontStyle), skString(locale)).release());
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_paragraph_FontCollection__1nDefaultFallback

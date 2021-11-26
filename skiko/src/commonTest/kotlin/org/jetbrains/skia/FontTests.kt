@@ -51,6 +51,8 @@ class FontTests {
                 10e-3f
             )
 
+            assertContentEquals(font.getPath(glyphs[0])!!.points,  font.getPaths(glyphs)[0].points)
+
             assertContentCloseEnough(
                 arrayOf(
                     Point(0f, 0f),

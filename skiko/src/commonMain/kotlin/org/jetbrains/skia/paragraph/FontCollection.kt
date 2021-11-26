@@ -16,7 +16,7 @@ class FontCollection internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         Stats.onNativeCall()
     }
 
-    val fontManagersCount: NativePointer
+    val fontManagersCount: Int
         get() = try {
             Stats.onNativeCall()
             _nGetFontManagersCount(_ptr)
@@ -104,7 +104,7 @@ class FontCollection internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     fun defaultFallback(unicode: Int, style: FontStyle, locale: String?): Typeface? {
         return try {
             Stats.onNativeCall()
-            val ptr = _nDefaultFallbackChar(_ptr, unicode, style._value, locale)
+            val ptr = interopScope { _nDefaultFallbackChar(_ptr, unicode, style._value, toInterop(locale)) }
             if (ptr == NullPointer) null else Typeface(ptr)
         } finally {
             reachabilityBarrier(this)
@@ -140,7 +140,7 @@ class FontCollection internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 private external fun _nMake(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nGetFontManagersCount")
-private external fun _nGetFontManagersCount(ptr: NativePointer): NativePointer
+private external fun _nGetFontManagersCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nSetAssetFontManager")
 private external fun _nSetAssetFontManager(ptr: NativePointer, fontManagerPtr: NativePointer): NativePointer
@@ -161,7 +161,7 @@ private external fun _nGetFallbackManager(ptr: NativePointer): NativePointer
 private external fun _nFindTypefaces(ptr: NativePointer, familyNames: InteropPointer, len: Int, fontStyle: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nDefaultFallbackChar")
-private external fun _nDefaultFallbackChar(ptr: NativePointer, unicode: Int, fontStyle: Int, locale: String?): NativePointer
+private external fun _nDefaultFallbackChar(ptr: NativePointer, unicode: Int, fontStyle: Int, locale: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nDefaultFallback")
 private external fun _nDefaultFallback(ptr: NativePointer): NativePointer

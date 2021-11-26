@@ -10,7 +10,9 @@ import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.interopScope
 import org.jetbrains.skia.impl.withResult
+import org.jetbrains.skia.impl.withStringResult
 
 class StrutStyle internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
@@ -36,14 +38,18 @@ class StrutStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finali
     val fontFamilies: Array<String>
         get() = try {
             Stats.onNativeCall()
-            _nGetFontFamilies(_ptr)
+            arrayDecoderScope({ArrayDecoder(_nGetFontFamilies(_ptr), ManagedString_nGetFinalizer())}) { arrayDecoder ->
+                (0 until arrayDecoder.size).map {  i -> withStringResult(arrayDecoder.release(i)) }.toTypedArray()
+            }
         } finally {
             reachabilityBarrier(this)
         }
 
-    fun setFontFamilies(families: Array<String?>?): StrutStyle {
+    fun setFontFamilies(families: Array<String>): StrutStyle {
         Stats.onNativeCall()
-        _nSetFontFamilies(_ptr, families)
+        interopScope {
+            StrutStyle_nSetFontFamilies(_ptr, toInterop(families), families.size)
+        }
         return this
     }
 
@@ -194,10 +200,10 @@ private external fun StrutStyle_nSetHeight(ptr: NativePointer, value: Float)
 private external fun StrutStyle_nSetEnabled(ptr: NativePointer, value: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nGetFontFamilies")
-private external fun _nGetFontFamilies(ptr: NativePointer): Array<String>
+private external fun _nGetFontFamilies(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetFontFamilies")
-private external fun _nSetFontFamilies(ptr: NativePointer, families: Array<String?>?)
+private external fun StrutStyle_nSetFontFamilies(ptr: NativePointer, families: InteropPointer, familiesCount: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nGetFontStyle")
 private external fun _nGetFontStyle(ptr: NativePointer, fontStyleData: InteropPointer): Int

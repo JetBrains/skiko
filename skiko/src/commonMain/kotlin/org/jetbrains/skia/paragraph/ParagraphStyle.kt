@@ -6,8 +6,11 @@ import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.interopScope
+import org.jetbrains.skia.impl.withStringResult
 
 class ParagraphStyle : Managed(ParagraphStyle_nMake(), _FinalizerHolder.PTR) {
     companion object {
@@ -99,16 +102,19 @@ class ParagraphStyle : Managed(ParagraphStyle_nMake(), _FinalizerHolder.PTR) {
             reachabilityBarrier(this)
         }
 
-    var ellipsis: String
+    var ellipsis: String?
         get() = try {
             Stats.onNativeCall()
-            _nGetEllipsis(_ptr)
+            val ellipsis = _nGetEllipsis(_ptr)
+            if (ellipsis == NullPointer) null else withStringResult { ellipsis }
         } finally {
             reachabilityBarrier(this)
         }
         set(value) = try {
             Stats.onNativeCall()
-            _nSetEllipsis(_ptr, value)
+            interopScope {
+                _nSetEllipsis(_ptr, toInterop(value))
+            }
         } finally {
             reachabilityBarrier(this)
         }
@@ -216,10 +222,10 @@ private external fun _nGetMaxLinesCount(ptr: NativePointer): Int
 private external fun _nSetMaxLinesCount(ptr: NativePointer, maxLines: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetEllipsis")
-private external fun _nGetEllipsis(ptr: NativePointer): String
+private external fun _nGetEllipsis(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetEllipsis")
-private external fun _nSetEllipsis(ptr: NativePointer, ellipsis: String?)
+private external fun _nSetEllipsis(ptr: NativePointer, ellipsis: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetHeight")
 private external fun _nSetHeight(ptr: NativePointer, height: Float)

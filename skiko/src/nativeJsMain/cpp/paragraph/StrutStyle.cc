@@ -31,36 +31,25 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_paragraph_StrutStyle__1nEquals
 }
 
 
-SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_paragraph_StrutStyle__1nGetFontFamilies
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_paragraph_StrutStyle__1nGetFontFamilies
   (KNativePointer ptr) {
-    TODO("implement org_jetbrains_skia_paragraph_StrutStyle__1nGetFontFamilies");
-}
-     
-#if 0 
-SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_paragraph_StrutStyle__1nGetFontFamilies
-  (KNativePointer ptr) {
-    StrutStyle* instance = reinterpret_cast<StrutStyle*>((ptr));
-    return javaStringArray(env, instance->getFontFamilies());
-}
-#endif
-
-
-
-SKIKO_EXPORT void org_jetbrains_skia_paragraph_StrutStyle__1nSetFontFamilies
-  (KNativePointer ptr, KInteropPointerArray familiesArr) {
-    TODO("implement org_jetbrains_skia_paragraph_StrutStyle__1nSetFontFamilies");
-}
-     
-#if 0 
-SKIKO_EXPORT void org_jetbrains_skia_paragraph_StrutStyle__1nSetFontFamilies
-  (KNativePointer ptr, KInteropPointerArray familiesArr) {
     StrutStyle* instance = reinterpret_cast<StrutStyle*>(ptr);
-    instance->setFontFamilies(skStringVector(env, familiesArr));
+
+    std::vector<KNativePointer>* res = new std::vector<KNativePointer>();
+    for (auto& fontFamily : instance->getFontFamilies()) {
+        res->push_back(reinterpret_cast<KNativePointer>(new SkString(fontFamily)));
+    }
+
+    return reinterpret_cast<KNativePointer>(res);
 }
-#endif
+     
 
-
-
+SKIKO_EXPORT void org_jetbrains_skia_paragraph_StrutStyle__1nSetFontFamilies
+  (KNativePointer ptr, KInteropPointerArray familiesArr, KInt familiesCount) {
+    StrutStyle* instance = reinterpret_cast<StrutStyle*>(ptr);
+    instance->setFontFamilies(skStringVector(familiesArr, familiesCount));
+}
+     
 SKIKO_EXPORT void org_jetbrains_skia_paragraph_StrutStyle__1nGetFontStyle
   (KNativePointer ptr, KInt* fontStyleData) {
   StrutStyle* instance = reinterpret_cast<StrutStyle*>(ptr);

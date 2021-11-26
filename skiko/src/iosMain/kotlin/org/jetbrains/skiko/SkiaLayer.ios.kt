@@ -11,6 +11,7 @@ import platform.Foundation.NSNotificationCenter
 import platform.Foundation.NSSelectorFromString
 import platform.UIKit.*
 import platform.darwin.NSObject
+import kotlin.system.getTimeNanos
 
 actual open class SkiaLayer {
     fun isShowing(): Boolean {
@@ -57,7 +58,6 @@ actual open class SkiaLayer {
     fun attachTo(view: UIView) {
         this.view = view
         contextHandler = MetalContextHandler(this)
-        pictureRecorder = PictureRecorder()
         // See https://developer.apple.com/documentation/uikit/touches_presses_and_gestures/using_responders_and_the_responder_chain_to_handle_events?language=objc
         controller = object : NSObject() {
             @ObjCAction
@@ -164,39 +164,23 @@ actual open class SkiaLayer {
             redrawer = null
             contextHandler?.dispose()
             contextHandler = null
-            picture?.instance?.close()
-            picture = null
-            pictureRecorder?.close()
-            pictureRecorder = null
             isDisposed = true
         }
     }
     actual var skikoView: SkikoView? = null
 
     internal var redrawer: MetalRedrawer? = null
-    private var picture: PictureHolder? = null
-    private var pictureRecorder: PictureRecorder? = null
     private var contextHandler: MetalContextHandler? = null
 
-    fun update(nanoTime: Long) {
+    internal fun draw(canvas: Canvas) {
+        check(!isDisposed) { "SkiaLayer is disposed" }
         val (w, h) = view!!.frame.useContents {
             size.width to size.height
         }
         val pictureWidth = (w.toFloat() * contentScale).coerceAtLeast(0.0F)
         val pictureHeight = (h.toFloat() * contentScale).coerceAtLeast(0.0F)
 
-        val bounds = Rect.makeWH(pictureWidth, pictureHeight)
-        val canvas = pictureRecorder!!.beginRecording(bounds)
-        skikoView?.onRender(canvas, pictureWidth.toInt(), pictureHeight.toInt(), nanoTime)
-        val picture = pictureRecorder!!.finishRecordingAsPicture()
-        this.picture = PictureHolder(picture, pictureWidth.toInt(), pictureHeight.toInt())
-    }
-
-    internal fun draw(canvas: Canvas) {
-        check(!isDisposed) { "SkiaLayer is disposed" }
-        picture?.also {
-            canvas.drawPicture(it.instance)
-        }
+        skikoView?.onRender(canvas, pictureWidth.toInt(), pictureHeight.toInt(), getTimeNanos())
     }
 }
 

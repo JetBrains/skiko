@@ -1,10 +1,7 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.RefCnt
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.reachabilityBarrier
 
 class DirectContext internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
@@ -110,6 +107,10 @@ class DirectContext internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             reachabilityBarrier(this)
         }
     }
+}
+
+fun <R> DirectContext.useContext(block: (ctx: DirectContext) -> R): R = use {
+    block(this).also { abandon() }
 }
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nFlush")

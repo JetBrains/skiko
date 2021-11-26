@@ -11,10 +11,13 @@ import java.io.File
 import java.nio.file.Files
 import javax.imageio.ImageIO
 
-fun main() {
-    val windows = 1
+fun main(args: Array<String>) {
+    val windows = parseArgs(args)
     repeat(windows) {
-        createWindow("window $it", windows == 1)
+        when (System.getProperty("skiko.interop")) {
+            "true" -> SwingSkia()
+            else -> createWindow("window $it", windows == 1)
+        }
     }
 }
 
@@ -91,14 +94,7 @@ fun createWindow(title: String, exitOnClose: Boolean) = SwingUtilities.invokeLat
         println("Changed renderer for $layer: new value is ${layer.renderApi}")
     }
 
-    skiaLayer.skikoView = GenericSkikoView(skiaLayer, clocks)
-
-    skiaLayer.addMouseMotionListener(object : MouseMotionAdapter() {
-        override fun mouseMoved(event: MouseEvent) {
-            clocks.xpos = event.x
-            clocks.ypos = event.y
-        }
-    })
+    skiaLayer.addView(GenericSkikoView(skiaLayer, clocks))
 
     // Window transparency
     if (System.getProperty("skiko.transparency") == "true") {
@@ -119,4 +115,18 @@ fun createWindow(title: String, exitOnClose: Boolean) = SwingUtilities.invokeLat
     window.pack()
     skiaLayer.paint(window.graphics)
     window.isVisible = true
+}
+
+private fun parseArgs(args: Array<String>): Int {
+    var windows = 1
+    for(arg in args) {
+        try {
+            windows = arg.toInt()
+            break      
+        }
+        catch(e: NumberFormatException) {
+            println("The passed argument:($arg) is not a integer number!")
+        }
+    }
+    return windows
 }

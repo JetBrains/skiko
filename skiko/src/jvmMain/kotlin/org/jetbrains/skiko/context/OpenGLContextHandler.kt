@@ -42,7 +42,7 @@ internal class OpenGLContextHandler(layer: SkiaLayer) : JvmContextHandler(layer)
         val w = (layer.width * scale).toInt().coerceAtLeast(0)
         val h = (layer.height * scale).toInt().coerceAtLeast(0)
 
-        if (isSizeChanged(w, h)) {
+        if (isSizeChanged(w, h) || surface == null) {
             disposeCanvas()
             val gl = OpenGLApi.instance
             val fbId = gl.glGetIntegerv(gl.GL_DRAW_FRAMEBUFFER_BINDING)
