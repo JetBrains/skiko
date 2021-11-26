@@ -19,6 +19,9 @@ class BreakIteratorTests {
 
         assertEquals(0, boundary.first())
         assertEquals(40, boundary.last())
+
+        val boundaryCloned = boundary.clone()
+        assertContentEquals(boundary.asSequence().toList(), boundaryCloned.asSequence().toList())
     }
 
     @Test
