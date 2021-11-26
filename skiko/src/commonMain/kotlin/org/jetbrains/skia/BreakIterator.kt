@@ -505,7 +505,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
         try {
             Stats.onNativeCall()
             _text?.close()
-            _text = interopScope { U16String(_nSetText(_ptr, toInterop(text?.toCharArray()), text?.length ?: 0)) }
+            _text = interopScope { U16String(_nSetText(_ptr, toInterop(text?.let { ShortArray(text.length) { text[it].code.toShort() } }), text?.length ?: 0)) }
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(_text)
