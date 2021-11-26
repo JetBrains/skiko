@@ -22,6 +22,7 @@ extern "C"
             surface->flush(SkSurface::BackendSurfaceAccess::kPresent, GrFlushInfo());
             context->flush({});
             context->submit(true);
+            logJavaException(env, __FUNCTION__, 0);
         }
         __except(EXCEPTION_EXECUTE_HANDLER) {
             auto code = GetExceptionCode();
