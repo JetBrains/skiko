@@ -64,22 +64,6 @@ actual class InteropScope actual constructor() {
         }
     }
 
-    actual fun toInterop(array: CharArray?): InteropPointer {
-        return if (array != null && array.isNotEmpty()) {
-            val data = _malloc(array.size)
-            elements.add(data)
-            toWasm(data, array)
-            data
-        } else {
-            0
-        }
-    }
-
-    actual fun InteropPointer.fromInterop(result: CharArray) {
-        val tmp = UTF8ToString(this@fromInterop)
-        tmp.toCharArray().copyInto(result)
-    }
-
     actual fun toInterop(array: ByteArray?): InteropPointer {
         return if (array != null && array.isNotEmpty()) {
             val data = _malloc(array.size)

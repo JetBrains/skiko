@@ -76,19 +76,6 @@ actual class InteropScope actual constructor() {
         }
     }
 
-    actual fun toInterop(array: CharArray?): InteropPointer {
-        return if (array != null && array.isNotEmpty()) {
-            val pinned = array.pin()
-            elements.add(pinned)
-            val result = pinned.addressOf(0).rawValue
-            result
-        } else {
-            NativePtr.NULL
-        }
-    }
-
-    actual fun InteropPointer.fromInterop(result: CharArray) {}
-
     actual fun toInterop(array: ByteArray?): InteropPointer {
         return if (array != null && array.isNotEmpty()) {
             val pinned = array.pin()
