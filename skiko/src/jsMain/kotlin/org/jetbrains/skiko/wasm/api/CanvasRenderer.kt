@@ -12,8 +12,8 @@ import org.jetbrains.skiko.wasm.CreateWebGLContext
 import org.jetbrains.skiko.wasm.GL
 import org.w3c.dom.HTMLCanvasElement
 
-fun Surface.Companion.createFromGL(width: Int, height: Int) = makeFromBackendRenderTarget(
-    DirectContext.makeGL(),
+fun Surface.Companion.createFromGL(context: DirectContext, width: Int, height: Int) = makeFromBackendRenderTarget(
+    context,
     BackendRenderTarget.makeGL(
         width, height, 1, 8, 0, 0x8058
     ),
@@ -29,8 +29,8 @@ abstract class CanvasRenderer constructor(htmlCanvas: HTMLCanvasElement, val wid
     init {
         GL.makeContextCurrent(contextPointer)
     }
-
-    private val surface = Surface.createFromGL(width, height)
+    private val context = DirectContext.makeGL()
+    private val surface = Surface.createFromGL(context, width, height)
     val canvas: Canvas
         get() = surface.canvas
 
@@ -39,8 +39,10 @@ abstract class CanvasRenderer constructor(htmlCanvas: HTMLCanvasElement, val wid
     fun draw() {
         window.requestAnimationFrame { timestamp ->
             GL.makeContextCurrent(contextPointer)
+            canvas.clear(-1)
             drawFrame(timestamp)
             surface.flushAndSubmit()
+            context.flush()
         }
     }
 }

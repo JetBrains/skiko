@@ -26,6 +26,7 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
     override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
         canvas.translate(xOffset.toFloat(), yOffset.toFloat())
         canvas.scale(scale.toFloat(), scale.toFloat())
+        canvas.rotate(rotate.toFloat(), (width / 2).toFloat(), (height / 2).toFloat())
         val watchFill = Paint().apply { color = 0xFFFFFFFF.toInt() }
         val watchStroke = Paint().apply {
                color = 0xFF000000.toInt()
@@ -40,7 +41,11 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
         val watchFillHover = Paint().apply { color = 0xFFE4FF01.toInt() }
         for (x in 0 .. width - 50 step 50) {
             for (y in 20 .. height - 50 step 50) {
-                val hover = xpos / scale > x && xpos / scale < x + 50 && ypos / scale > y && ypos / scale < y + 50
+                val hover = 
+                    (xpos - xOffset) / scale > x &&
+                    (xpos - xOffset) / scale < x + 50 &&
+                    (ypos - yOffset) / scale > y &&
+                    (ypos - yOffset) / scale < y + 50
                 val fill = if (hover) watchFillHover else watchFill
                 val stroke = if (x > width / 2) watchStrokeAA else watchStroke
                 canvas.drawOval(Rect.makeXYWH(x + 5f, y + 5f, 40f, 40f), fill)
@@ -92,7 +97,9 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
             .popStyle()
             .build()
         frames.layout(Float.POSITIVE_INFINITY)
-        frames.paint(canvas, (xpos / scale).toFloat(), (ypos / scale).toFloat())
+        frames.paint(canvas, ((xpos - xOffset) / scale).toFloat(), ((ypos - yOffset) / scale).toFloat())
+
+        canvas.resetMatrix()
     }
 
     override fun onPointerEvent(event: SkikoPointerEvent) {
@@ -102,9 +109,25 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
                 xpos = event.x
                 ypos = event.y
             }
-            else -> {}
+            SkikoPointerEventKind.DRAG -> {
+                xOffset += event.x - xpos
+                yOffset += event.y - ypos
+                xpos = event.x
+                ypos = event.y
+            }
+            SkikoPointerEventKind.SCROLL -> {
+                when (event.modifiers) {
+                    SkikoInputModifiers.CONTROL -> {
+                        rotate += if (event.y < 0) -5.0 else 5.0
+                    }
+                    else -> {
+                        if (event.y != 0.0) {
+                            scale *= if (event.y < 0) 0.9 else 1.1
+                        }
+                    }
+                }
+            }
         }
-        // TODO: provide example that covers all features of pointer event
     }
 
     override fun onInputEvent(event: SkikoInputEvent) {
@@ -112,8 +135,35 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
     }
 
     override fun onKeyboardEvent(event: SkikoKeyboardEvent) {
-        println(event.kind)
-        // TODO: provide example that covers all features of keyboard event
+        if (event.kind == SkikoKeyboardEventKind.DOWN) {
+            when (event.key) {
+                SkikoKey.KEY_NUMPAD_ADD,
+                SkikoKey.KEY_I -> scale *= 1.1
+                SkikoKey.KEY_NUMPAD_SUBTRACT,
+                SkikoKey.KEY_O -> scale *= 0.9
+                SkikoKey.KEY_R -> {
+                    if (event.modifiers == SkikoInputModifiers.SHIFT) {
+                        rotate -= 5.0
+                    } else {
+                        rotate += 5.0
+                    }
+                }
+                SkikoKey.KEY_NUMPAD_4,
+                SkikoKey.KEY_LEFT -> xOffset -= 5.0
+                SkikoKey.KEY_NUMPAD_8,
+                SkikoKey.KEY_UP -> yOffset -= 5.0
+                SkikoKey.KEY_NUMPAD_6,
+                SkikoKey.KEY_RIGHT -> xOffset += 5.0
+                SkikoKey.KEY_NUMPAD_2,
+                SkikoKey.KEY_DOWN -> yOffset += 5.0
+                SkikoKey.KEY_SPACE -> {
+                    xOffset = 0.0
+                    yOffset = 0.0
+                    rotate = 0.0
+                    scale = 1.0
+                }
+            }
+        }
     }
 
     override fun onGestureEvent(event: SkikoGestureEvent) {
@@ -134,7 +184,7 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
                 yOffset = event.y - ypos
             }
             SkikoGestureEventKind.ROTATION -> {
-                rotate = (event.rotation * PI)
+                rotate = event.rotation * 180.0 / PI
             }
             else -> {}
         }
