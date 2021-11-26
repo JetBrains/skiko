@@ -84,21 +84,4 @@ class InteropScopeTests {
             assertContentEquals(array, readArray)
         }
     }
-
-    @Test
-    fun toInteropStringArray() = runTest {
-        interopScope {
-            val array = arrayOf("s1", "s2", "s3")
-            val interopPointer = toInterop(array)
-
-            val npa = NativePointerArray(array.size)
-            interopPointer.fromInterop(npa)
-
-            val res = (0 until npa.size).map { i ->
-                withStringResult { npa[i] }
-            }.toTypedArray()
-
-            assertContentEquals(array, res)
-        }
-    }
 }
