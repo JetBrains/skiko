@@ -127,6 +127,7 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
                     }
                 }
             }
+            else -> {}
         }
     }
 
@@ -162,6 +163,7 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
                     rotate = 0.0
                     scale = 1.0
                 }
+                else -> {}
             }
         }
     }
