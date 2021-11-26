@@ -94,7 +94,7 @@ class InteropScopeTests {
             val npa = NativePointerArray(array.size)
             interopPointer.fromInterop(npa)
 
-            val res = (0 until array.size).map { i ->
+            val res = (0 until npa.size).map { i ->
                 withStringResult { npa[i] }
             }.toTypedArray()
 
