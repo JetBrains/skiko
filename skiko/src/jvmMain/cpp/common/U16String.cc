@@ -11,9 +11,3 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_U16StringKt_U16String
   (JNIEnv* env, jclass jclass) {
     return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteU16String));
 }
-
-extern "C" JNIEXPORT jobject JNICALL Java_org_jetbrains_skia_U16StringKt_U16String_1nToString
-  (JNIEnv* env, jclass jclass, jlong ptr) {
-    std::vector<jchar>* instance = reinterpret_cast<std::vector<jchar>*>(static_cast<uintptr_t>(ptr));
-    return env->NewString(instance->data(), instance->size());
-}

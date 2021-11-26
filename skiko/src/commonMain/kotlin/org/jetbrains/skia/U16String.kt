@@ -2,8 +2,6 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Managed
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.impl.NativePointer
 
 /**
@@ -16,15 +14,6 @@ class U16String internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         }
     }
 
-    override fun toString(): String {
-        return try {
-            Stats.onNativeCall()
-            U16String_nToString(_ptr)
-        } finally {
-            reachabilityBarrier(this)
-        }
-    }
-
     private object _FinalizerHolder {
         val PTR = U16String_nGetFinalizer()
     }
@@ -32,6 +21,3 @@ class U16String internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
 
 @ExternalSymbolName("org_jetbrains_skia_U16String__1nGetFinalizer")
 private external fun U16String_nGetFinalizer(): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_U16String__1nToString")
-private external fun U16String_nToString(ptr: NativePointer): String
