@@ -9,7 +9,7 @@ import org.w3c.dom.HTMLCanvasElement
 fun main() {
     onWasmReady {
         val skiaLayer = SkiaLayer()
-        val game = BouncingBalls()
+        val game = Clocks(skiaLayer)
         skiaLayer.skikoView = GenericSkikoView(skiaLayer, game)
         val canvas = document.getElementById("SkikoTarget") as HTMLCanvasElement
         canvas.setAttribute("tabindex", "0")

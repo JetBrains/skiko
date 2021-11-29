@@ -18,9 +18,53 @@ fun toSkikoEvent(
     return SkikoPointerEvent(
         xpos,
         ypos,
-        toSkikoMouseButtons(event),
+        toSkikoMouseButtons(event, kind),
         toSkikoModifiers(event),
         kind,
+        event
+    )
+}
+
+fun toSkikoEvent(
+    event: NSEvent,
+    button: SkikoMouseButtons,
+    kind: SkikoPointerEventKind,
+    view: NSView
+): SkikoPointerEvent {
+    var (xpos, ypos) = event.locationInWindow.useContents {
+        x to y
+    }
+    // Translate.
+    view.frame.useContents {
+       ypos = size.height - ypos
+    }
+    var buttons: SkikoMouseButtons
+    if (kind == SkikoPointerEventKind.DOWN) {
+        buttonsFlags = buttonsFlags.or(button.value)
+        buttons = SkikoMouseButtons(buttonsFlags)
+    } else {
+        buttons = SkikoMouseButtons(buttonsFlags)
+        buttonsFlags = buttonsFlags.xor(button.value)
+    }
+    return SkikoPointerEvent(
+        xpos,
+        ypos,
+        buttons,
+        toSkikoModifiers(event),
+        kind,
+        event
+    )
+}
+
+fun toSkikoScrollEvent(
+    event: NSEvent
+): SkikoPointerEvent {
+    return SkikoPointerEvent(
+        event.deltaX,
+        event.deltaY,
+        SkikoMouseButtons.NONE,
+        toSkikoModifiers(event),
+        SkikoPointerEventKind.SCROLL,
         event
     )
 }
@@ -30,25 +74,106 @@ fun toSkikoEvent(
     kind: SkikoKeyboardEventKind
 ): SkikoKeyboardEvent {
     return SkikoKeyboardEvent(
-        event.keyCode.toInt(),
+        SkikoKey.valueOf(event.keyCode.toInt()),
         toSkikoModifiers(event),
         kind,
         event
     )
 }
 
-private fun toSkikoMouseButtons(event: NSEvent): SkikoMouseButtons {
-    var result = 0
-    val mask = event.buttonMask.toInt()
-    if ((mask and 1) != 0 || event.buttonNumber == 0L) {
-        result = result.or(SkikoMouseButtons.LEFT.value)
+private val actionAllKeyUpFlag = 256.toULong() // MacOS specific
+private var modifierKeyUpFlag = actionAllKeyUpFlag
+fun toSkikoEvent(
+    event: NSEvent
+): SkikoKeyboardEvent {
+    // NSView.keyDown(NSEvent)/keyUp(NSEvent) does not work with modifier keys,
+    // so we need to use NSView.flagsChanged(NSEvent)
+    // and convert modifier key event to regular key event.
+    // Unfortunately, NSEvent does not give us any information about the type of action,
+    // so we need to check it manually.
+    val action = event.modifierFlags and NSEventModifierFlagDeviceIndependentFlagsMask.inv()
+    var kind = SkikoKeyboardEventKind.DOWN
+    val key = SkikoKey.valueOf(event.keyCode.toInt())
+    if (action >= modifierKeyUpFlag) {
+        kind = SkikoKeyboardEventKind.DOWN
+    } else {
+        kind = SkikoKeyboardEventKind.UP
     }
-    if ((mask and 2) != 0 || event.buttonNumber == 1L) {
-        result = result.or(SkikoMouseButtons.RIGHT.value)
+    modifierKeyUpFlag = action
+    if (modifierKeyUpFlag == actionAllKeyUpFlag) {
+        kind = SkikoKeyboardEventKind.UP
     }
-    return SkikoMouseButtons(result)
+    return SkikoKeyboardEvent(
+        SkikoKey.valueOf(event.keyCode.toInt()),
+        toSkikoModifiers(event),
+        kind,
+        event
+    )
+}
+
+private var buttonsFlags = 0
+private fun toSkikoMouseButtons(
+    event: NSEvent,
+    kind: SkikoPointerEventKind
+): SkikoMouseButtons {
+    val button = event.buttonNumber.toInt()
+    if (kind == SkikoPointerEventKind.DOWN) {
+        buttonsFlags = buttonsFlags.or(getSkikoButtonValue(button))
+        return SkikoMouseButtons(buttonsFlags)
+    }
+    return SkikoMouseButtons(buttonsFlags).also {
+        buttonsFlags = buttonsFlags.xor(getSkikoButtonValue(button))
+    }
+}
+
+private fun getSkikoButtonValue(button: Int): Int {
+    return when (button) {
+        2 -> SkikoMouseButtons.MIDDLE.value
+        3 -> SkikoMouseButtons.BUTTON_4.value
+        4 -> SkikoMouseButtons.BUTTON_5.value
+        5 -> SkikoMouseButtons.BUTTON_6.value
+        6 -> SkikoMouseButtons.BUTTON_7.value
+        7 -> SkikoMouseButtons.BUTTON_8.value
+        else -> 0
+    }
 }
 
 private fun toSkikoModifiers(event: NSEvent): SkikoInputModifiers {
-    return SkikoInputModifiers.EMPTY
+    var result = 0
+    val modifiers = event.modifierFlags
+    if (modifiers and NSEventModifierFlagOption != 0.toULong()) {
+        result = result.or(SkikoInputModifiers.ALT.value)
+    }
+    if (modifiers and NSEventModifierFlagShift != 0.toULong()) {
+        result = result.or(SkikoInputModifiers.SHIFT.value)
+    }
+    if (modifiers and NSEventModifierFlagControl != 0.toULong()) {
+        result = result.or(SkikoInputModifiers.CONTROL.value)
+    }
+    if (modifiers and NSEventModifierFlagCommand != 0.toULong()) {
+        result = result.or(SkikoInputModifiers.META.value)
+    }
+    return SkikoInputModifiers(result)
 }
+
+private fun keyToModifier(key: SkikoKey): ULong {
+    return when (key) {
+        SkikoKey.KEY_LEFT_ALT,
+        SkikoKey.KEY_RIGHT_ALT -> {
+            NSEventModifierFlagOption
+        }
+        SkikoKey.KEY_LEFT_SHIFT,
+        SkikoKey.KEY_RIGHT_SHIFT -> {
+            NSEventModifierFlagShift
+        }
+        SkikoKey.KEY_LEFT_CONTROL,
+        SkikoKey.KEY_RIGHT_CONTROL -> {
+            NSEventModifierFlagControl
+        }
+        SkikoKey.KEY_LEFT_META,
+        SkikoKey.KEY_RIGHT_META -> {
+            NSEventModifierFlagCommand
+        }
+        else -> 0.toULong()
+    }
+} 
