@@ -1,5 +1,5 @@
 plugins {
-    kotlin("multiplatform") version "1.6.0-RC"
+    kotlin("multiplatform") version "1.6.0"
 }
 
 val coroutinesVersion = "1.5.2"
@@ -7,7 +7,6 @@ val coroutinesVersion = "1.5.2"
 repositories {
     mavenLocal()
     mavenCentral()
-    maven("https://dl.bintray.com/kotlin/kotlin-eap")
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
