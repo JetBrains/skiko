@@ -115,7 +115,13 @@ class ParagraphTest {
                 it.build()
             }.layout(Float.POSITIVE_INFINITY)
 
-            para.getRectsForRange(2, 8, RectHeightMode.MAX, RectWidthMode.MAX)
+            val rects = para.getRectsForRange(2, 8, RectHeightMode.MAX, RectWidthMode.MAX)
+            for (rect in rects) {
+                rect.rect.left
+                rect.rect.right
+                rect.rect.top
+                rect.rect.bottom
+            }
         }
     }
 }
