@@ -161,7 +161,7 @@ SKIKO_EXPORT void org_jetbrains_skia_shaper_Shaper__1nShape
     auto* bidiRunIter = reinterpret_cast<SkShaper::BiDiRunIterator*>(bidiRunIterObj);
     auto* runHandler = reinterpret_cast<SkShaper::RunHandler*>(runHandlerObj);
 
-    instance->shape(text.c_str(), text.size(), *fontRunIter, *bidiRunIter, *scriptRunIter, *languageRunIter, features.data(), features.size(), std::numeric_limits<float>::infinity(), runHandler);
+    instance->shape(text.c_str(), text.size(), *fontRunIter, *bidiRunIter, *scriptRunIter, *languageRunIter, features.data(), features.size(), width, runHandler);
 }
 
 template<typename T, typename CurrentCallback>
