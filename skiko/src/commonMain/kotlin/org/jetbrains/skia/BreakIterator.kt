@@ -260,7 +260,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
          */
         fun makeCharacterInstance(locale: String? = null): BreakIterator {
             Stats.onNativeCall()
-            return BreakIterator(_nMake(0, locale)) // UBRK_CHARACTER
+            return BreakIterator(interopScope { _nMake(0, toInterop(locale))  }) // UBRK_CHARACTER
         }
         /**
          * Returns a new BreakIterator instance for word breaks for the given locale.
@@ -270,7 +270,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
          */
         fun makeWordInstance(locale: String? = null): BreakIterator {
             Stats.onNativeCall()
-            return BreakIterator(_nMake(1, locale)) // UBRK_WORD
+            return BreakIterator(interopScope { _nMake(1, toInterop(locale)) }) // UBRK_WORD
         }
         /**
          * Returns a new BreakIterator instance for line breaks for the given locale.
@@ -280,7 +280,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
          */
         fun makeLineInstance(locale: String? = null): BreakIterator {
             Stats.onNativeCall()
-            return BreakIterator(_nMake(2, locale)) // UBRK_LINE
+            return BreakIterator(interopScope { _nMake(2, toInterop(locale)) }) // UBRK_LINE
         }
         /**
          * Returns a new BreakIterator instance for sentence breaks for the given locale.
@@ -290,7 +290,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
          */
         fun makeSentenceInstance(locale: String? = null): BreakIterator {
             Stats.onNativeCall()
-            return BreakIterator(_nMake(3, locale)) // UBRK_SENTENCE
+            return BreakIterator(interopScope { _nMake(3, toInterop(locale)) }) // UBRK_SENTENCE
         }
 
         init {
@@ -522,7 +522,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
 private external fun BreakIterator_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nMake")
-private external fun _nMake(type: Int, locale: String?): NativePointer
+private external fun _nMake(type: Int, locale: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nClone")
 private external fun _nClone(ptr: NativePointer): NativePointer

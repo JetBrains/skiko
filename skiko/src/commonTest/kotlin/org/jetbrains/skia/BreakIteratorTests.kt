@@ -7,7 +7,6 @@ import kotlin.test.assertEquals
 
 private fun BreakIterator.asSequence() = generateSequence { next().let { n -> if (n == -1) null else n } }
 
-@SkipJsTarget
 class BreakIteratorTests {
 
     @Test
