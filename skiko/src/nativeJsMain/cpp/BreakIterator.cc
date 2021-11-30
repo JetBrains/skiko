@@ -34,7 +34,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_BreakIterator__1nClone
   (KNativePointer ptr) {
     UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(ptr);
     UErrorCode status = U_ZERO_ERROR;
-    UBreakIterator* clone = ubrk_safeClone(instance, nullptr, 0, &status);
+    UBreakIterator* clone = ubrk_clone(instance, &status);
     if (U_FAILURE(status)) {
       return 0;
     } else
