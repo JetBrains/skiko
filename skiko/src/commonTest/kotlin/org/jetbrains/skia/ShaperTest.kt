@@ -4,14 +4,10 @@ import org.jetbrains.skia.shaper.RunHandler
 import org.jetbrains.skia.shaper.RunInfo
 import org.jetbrains.skia.shaper.Shaper
 import org.jetbrains.skia.shaper.ShapingOptions
-import org.jetbrains.skia.tests.assertCloseEnough
 import org.jetbrains.skia.tests.assertContentCloseEnough
 import org.jetbrains.skia.tests.makeFromResource
 import org.jetbrains.skiko.tests.runTest
-import kotlin.test.Test
-import kotlin.test.assertContentEquals
-import kotlin.test.assertEquals
-import kotlin.test.assertNotEquals
+import kotlin.test.*
 
 class ShaperTest {
 
@@ -67,7 +63,7 @@ class ShaperTest {
 
 
         val commitRuns = mutableListOf<CommitRunArgs>()
-        val runInfos = mutableListOf<RunInfo?>();
+        val runInfos = mutableListOf<RunInfo?>()
 
         Shaper.make().shape(
             text = "text\ntext text\r\ntext",
@@ -117,22 +113,21 @@ class ShaperTest {
         assertEquals(4, callCount.commitRun)
         assertEquals(4, callCount.commitLine)
 
+        assertTrue(runInfos[2]!!.advance.x > 80.0f)
+        assertEquals(10, runInfos[2]?.rangeBegin)
+        assertEquals(16, runInfos[2]?.rangeEnd)
+        assertEquals(6, runInfos[2]?.glyphCount)
 
-        assertCloseEnough(Point(85.28407f, 0.0f), runInfos[2]?.advance!!, 0.01f);
-        assertEquals(10, runInfos[2]?.rangeBegin);
-        assertEquals(16, runInfos[2]?.rangeEnd);
-        assertEquals(6, runInfos[2]?.glyphCount);
-
+        // For some reasons \r and \n are handled differently on macos and ios, so they are ignored during tests
         assertContentEquals(intArrayOf(10, 11, 12, 13, 14, 15), commitRuns[2].clusters)
-        assertContentEquals(shortArrayOf(882, 611, 943, 882, 1673, 1673), commitRuns[2].glyphs)
+        assertContentEquals(shortArrayOf(882, 611, 943, 882), commitRuns[2].glyphs?.sliceArray(0..3))
         @Suppress("UNCHECKED_CAST")
         assertContentCloseEnough(arrayOf(
             Point(0.0f, 0.0f),
             Point(12.795441f, 0.0f),
             Point(33.284073f, 0.0f),
             Point(52.284073f, 0.0f),
-            Point(65.28407f, 0.0f),
-            Point(75.28407f, 0.0f)
-        ), commitRuns[2].positions!! as Array<Point>, 0.01f)
+            Point(65.28407f, 0.0f)
+        ), commitRuns[2].positions!!.sliceArray(0..4) as Array<Point>, 0.01f)
     }
 }
