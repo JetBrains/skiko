@@ -1218,6 +1218,10 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         return concat(Matrix33.makeRotate(deg))
     }
 
+    fun rotate(deg: Float, x: Float, y: Float): Canvas {
+        return concat(Matrix33.makeRotate(deg, x, y))
+    }
+
     fun skew(sx: Float, sy: Float): Canvas {
         return concat(Matrix33.makeSkew(sx, sy))
     }

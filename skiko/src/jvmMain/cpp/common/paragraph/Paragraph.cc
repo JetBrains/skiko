@@ -82,15 +82,20 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_ParagraphKt_
 extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_paragraph_ParagraphKt__1nGetRectsForRange
   (JNIEnv* env, jclass jclass, jlong ptr, jint start, jint end, jint rectHeightStyle, jint rectWidthStyle) {
     Paragraph* instance = reinterpret_cast<Paragraph*>(static_cast<uintptr_t>(ptr));
-    std::vector<TextBox> rects = instance->getRectsForRange(start, end, static_cast<RectHeightStyle>(rectHeightStyle), static_cast<RectWidthStyle>(rectWidthStyle));
-    jobjectArray rectsArray = env->NewObjectArray((jsize) rects.size(), skija::paragraph::TextBox::cls, nullptr);
-    for (int i = 0; i < rects.size(); ++i) {
-        TextBox box = rects[i];
+    std::vector<TextBox> originalRects = instance->getRectsForRange(start, end, static_cast<RectHeightStyle>(rectHeightStyle), static_cast<RectWidthStyle>(rectWidthStyle));
+    std::vector<TextBox> rects;
+    for (TextBox& box : originalRects) {
         // TODO fix https://github.com/JetBrains/compose-jb/issues/1308 another way, we just masking the issue
         // (but experiments show, that the result of GetRectsForRange is correct after that)
         if (isnan(box.rect.fLeft) || isnan(box.rect.fTop) || isnan(box.rect.fRight) || isnan(box.rect.fBottom)) {
             continue;
         }
+        rects.push_back(box);
+    }
+
+    jobjectArray rectsArray = env->NewObjectArray((jsize) rects.size(), skija::paragraph::TextBox::cls, nullptr);
+    for (int i = 0; i < rects.size(); ++i) {
+        TextBox box = rects[i];
         jobject boxObj = env->NewObject(skija::paragraph::TextBox::cls, skija::paragraph::TextBox::ctor, box.rect.fLeft, box.rect.fTop, box.rect.fRight, box.rect.fBottom, static_cast<jint>(box.direction));
         env->SetObjectArrayElement(rectsArray, i, boxObj);
         env->DeleteLocalRef(boxObj);

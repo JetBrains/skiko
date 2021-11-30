@@ -10,6 +10,7 @@ import java.awt.Transparency
 import java.awt.color.ColorSpace
 import java.awt.image.*
 import java.awt.event.*
+import java.awt.event.KeyEvent.*
 import java.nio.ByteBuffer
 
 private class DirectDataBuffer(val backing: ByteBuffer): DataBuffer(TYPE_BYTE, backing.limit()) {
@@ -78,13 +79,13 @@ fun BufferedImage.toImage(): Image {
     return Image.makeFromBitmap(toBitmap())
 }
 
-fun toSkikoEvent(e: MouseEvent): SkikoPointerEvent {
+fun toSkikoEvent(event: MouseEvent): SkikoPointerEvent {
     return SkikoPointerEvent(
-        e.x.toDouble(),
-        e.y.toDouble(),
-        toSkikoMouseButtons(e.modifiersEx),
-        toSkikoModifiers(e.modifiersEx),
-        when(e.id) {
+        event.x.toDouble(),
+        event.y.toDouble(),
+        toSkikoMouseButtons(event.modifiersEx),
+        toSkikoModifiers(event.modifiersEx),
+        when(event.id) {
             MouseEvent.MOUSE_PRESSED -> SkikoPointerEventKind.DOWN
             MouseEvent.MOUSE_RELEASED -> SkikoPointerEventKind.UP
             MouseEvent.MOUSE_DRAGGED -> SkikoPointerEventKind.DRAG
@@ -93,42 +94,61 @@ fun toSkikoEvent(e: MouseEvent): SkikoPointerEvent {
             MouseEvent.MOUSE_EXITED -> SkikoPointerEventKind.EXIT
             else -> SkikoPointerEventKind.UNKNOWN
         },
-        e
+        event
     )
 }
 
-fun toSkikoEvent(e: MouseWheelEvent): SkikoPointerEvent {
+fun toSkikoEvent(event: MouseWheelEvent): SkikoPointerEvent {
+    val scrollAmount = event.getPreciseWheelRotation()
+    val modifiers = toSkikoModifiers(event.modifiersEx)
+    val isShiftPressed = modifiers.has(SkikoInputModifiers.SHIFT)
+    val x = if (isShiftPressed) scrollAmount else 0.0
+    val y = if (isShiftPressed) 0.0 else scrollAmount
     return SkikoPointerEvent(
-        e.x.toDouble(),
-        e.y.toDouble(),
-        toSkikoMouseButtons(e.modifiersEx),
-        toSkikoModifiers(e.modifiersEx),
-        when(e.id) {
+        x,
+        y,
+        toSkikoMouseButtons(event.modifiersEx),
+        modifiers,
+        when(event.id) {
             MouseEvent.MOUSE_WHEEL-> SkikoPointerEventKind.SCROLL
             else -> SkikoPointerEventKind.UNKNOWN
         },
-        e
+        event
     )
 }
 
-fun toSkikoEvent(e: KeyEvent): SkikoKeyboardEvent {
+fun toSkikoEvent(event: KeyEvent): SkikoKeyboardEvent {
+    var key = event.keyCode
+    val side = event.getKeyLocation()
+    if (side == KEY_LOCATION_RIGHT) {
+        if (
+            key == SkikoKey.KEY_LEFT_CONTROL.value ||
+            key == SkikoKey.KEY_LEFT_SHIFT.value ||
+            key == SkikoKey.KEY_LEFT_META.value
+        )
+        key = key.or(0x80000000.toInt())
+    }
+    if (side == KEY_LOCATION_NUMPAD) {
+        if (key == SkikoKey.KEY_ENTER.value) {
+            key = key.or(0x80000000.toInt())
+        }
+    }
     return SkikoKeyboardEvent(
-        e.keyCode,
-        toSkikoModifiers(e.modifiersEx),
-        when(e.id) {
+        SkikoKey.valueOf(key),
+        toSkikoModifiers(event.modifiersEx),
+        when(event.id) {
             KeyEvent.KEY_PRESSED -> SkikoKeyboardEventKind.DOWN
             KeyEvent.KEY_RELEASED -> SkikoKeyboardEventKind.UP
-            KeyEvent.KEY_TYPED -> SkikoKeyboardEventKind.TYPE
             else -> SkikoKeyboardEventKind.UNKNOWN
         },
-        e
+        event
     )
 }
 
-fun toSkikoEvent(e: InputMethodEvent): SkikoInputEvent {
+fun toSkikoEvent(event: InputMethodEvent): SkikoInputEvent {
     return SkikoInputEvent(
         "", // TODO: this parameter should be reconsidered
-        e
+        event
     )
 }
 

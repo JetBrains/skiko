@@ -59,7 +59,7 @@ abstract class SealAndSignSharedLibraryTask : DefaultTask() {
         libFile.copyTo(outputFile, overwrite = true)
 
         sealer.orNull?.let { sealer ->
-            sealBinary(sealer.asFile, libFile)
+            sealBinary(sealer.asFile, outputFile)
         }
 
         val signHost = signHost.orNull
