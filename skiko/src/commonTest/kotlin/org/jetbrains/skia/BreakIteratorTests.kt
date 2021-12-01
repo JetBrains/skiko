@@ -1,5 +1,7 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skiko.OS
+import org.jetbrains.skiko.hostOs
 import org.jetbrains.skiko.tests.SkipJsTarget
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
@@ -11,6 +13,11 @@ class BreakIteratorTests {
 
     @Test
     fun breakIteratorWordInstanceTest() {
+        // Wasm and iOS builds of Skia do not include required data to implement those iterators,
+        // see `third_party/externals/icu/flutter/README.md`.
+        if (hostOs == OS.JS || hostOs == OS.Ios)
+            return
+
         val boundary = BreakIterator.makeWordInstance()
         boundary.setText("家捷克的软件开发公司 ,software development company")
 
@@ -25,6 +32,10 @@ class BreakIteratorTests {
 
     @Test
     fun breakIteratorSentenceInstanceTest() {
+        // Wasm and iOS builds of Skia do not include required data to implement those iterators,
+        // see `third_party/externals/icu/flutter/README.md`.
+        if (hostOs == OS.JS)
+            return
         val boundary = BreakIterator.makeSentenceInstance()
         boundary.setText("""
             Skiko (short for Skia for Kotlin) is the graphical library exposing significant part of Skia library APIs to Kotlin, along with the gluing code for rendering context.

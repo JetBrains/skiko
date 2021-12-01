@@ -270,7 +270,9 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
          */
         fun makeWordInstance(locale: String? = null): BreakIterator {
             Stats.onNativeCall()
-            return BreakIterator(interopScope { _nMake(1, toInterop(locale)) }) // UBRK_WORD
+            return BreakIterator(interopScope { _nMake(1, toInterop(locale)).also {
+                if (it == NullPointer) throw IllegalArgumentException("Cannot create word iterator")
+            } }) // UBRK_WORD
         }
         /**
          * Returns a new BreakIterator instance for line breaks for the given locale.
@@ -280,7 +282,9 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
          */
         fun makeLineInstance(locale: String? = null): BreakIterator {
             Stats.onNativeCall()
-            return BreakIterator(interopScope { _nMake(2, toInterop(locale)) }) // UBRK_LINE
+            return BreakIterator(interopScope { _nMake(2, toInterop(locale)).also {
+                if (it == NullPointer) throw IllegalArgumentException("Cannot create line iterator")
+            } }) // UBRK_LINE
         }
         /**
          * Returns a new BreakIterator instance for sentence breaks for the given locale.
@@ -290,7 +294,9 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
          */
         fun makeSentenceInstance(locale: String? = null): BreakIterator {
             Stats.onNativeCall()
-            return BreakIterator(interopScope { _nMake(3, toInterop(locale)) }) // UBRK_SENTENCE
+            return BreakIterator(interopScope { _nMake(3, toInterop(locale)).also {
+                if (it == NullPointer) throw IllegalArgumentException("Cannot create sentence iterator")
+            } }) // UBRK_SENTENCE
         }
 
         init {
