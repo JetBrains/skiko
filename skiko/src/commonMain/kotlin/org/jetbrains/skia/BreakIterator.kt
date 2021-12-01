@@ -4,10 +4,11 @@ import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.InteropScope
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Managed
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.impl.Native.Companion.NullPointer
 import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.interopScope
+import org.jetbrains.skia.impl.reachabilityBarrier
 
 /**
  *
@@ -260,7 +261,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
          */
         fun makeCharacterInstance(locale: String? = null): BreakIterator {
             Stats.onNativeCall()
-            return BreakIterator(interopScope { _nMake(0, toInterop(locale))  }) // UBRK_CHARACTER
+            return BreakIterator(withErrorGuard { _nMake(0, toInterop(locale), it)  }) // UBRK_CHARACTER
         }
         /**
          * Returns a new BreakIterator instance for word breaks for the given locale.
@@ -270,9 +271,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
          */
         fun makeWordInstance(locale: String? = null): BreakIterator {
             Stats.onNativeCall()
-            return BreakIterator(interopScope { _nMake(1, toInterop(locale)).also {
-                if (it == NullPointer) throw IllegalArgumentException("Cannot create word iterator")
-            } }) // UBRK_WORD
+            return BreakIterator(withErrorGuard { _nMake(1, toInterop(locale), it) }) // UBRK_WORD
         }
         /**
          * Returns a new BreakIterator instance for line breaks for the given locale.
@@ -282,9 +281,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
          */
         fun makeLineInstance(locale: String? = null): BreakIterator {
             Stats.onNativeCall()
-            return BreakIterator(interopScope { _nMake(2, toInterop(locale)).also {
-                if (it == NullPointer) throw IllegalArgumentException("Cannot create line iterator")
-            } }) // UBRK_LINE
+            return BreakIterator(withErrorGuard { _nMake(2, toInterop(locale), it) }) // UBRK_LINE
         }
         /**
          * Returns a new BreakIterator instance for sentence breaks for the given locale.
@@ -294,9 +291,9 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
          */
         fun makeSentenceInstance(locale: String? = null): BreakIterator {
             Stats.onNativeCall()
-            return BreakIterator(interopScope { _nMake(3, toInterop(locale)).also {
-                if (it == NullPointer) throw IllegalArgumentException("Cannot create sentence iterator")
-            } }) // UBRK_SENTENCE
+            return BreakIterator(withErrorGuard {
+                _nMake(3, toInterop(locale), it)
+            }) // UBRK_SENTENCE
         }
 
         init {
@@ -533,9 +530,14 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
 private fun withErrorGuard(block: InteropScope.(InteropPointer) -> NativePointer): NativePointer {
     val errorCode = IntArray(1)
     return interopScope {
-        val res = block.invoke(this, toInterop(errorCode))
+        val handle = toInterop(errorCode)
+        val res = block.invoke(this, handle)
+        handle.fromInterop(errorCode)
         if (errorCode[0] > 0) {
             throw RuntimeException("ubrk_* operation failed with status ${errorCode}")
+        }
+        if (res == NullPointer) {
+            throw IllegalArgumentException("fail")
         }
         res
     }
@@ -545,7 +547,7 @@ private fun withErrorGuard(block: InteropScope.(InteropPointer) -> NativePointer
 private external fun BreakIterator_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nMake")
-private external fun _nMake(type: Int, locale: InteropPointer): NativePointer
+private external fun _nMake(type: Int, locale: InteropPointer, errorCode: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nClone")
 private external fun _nClone(ptr: NativePointer): NativePointer
