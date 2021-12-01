@@ -364,13 +364,6 @@ kotlin {
 }
 
 fun configureNativeTarget(os: OS, arch: Arch, target: KotlinNativeTarget) {
-    publishing.publications.configureEach {
-        this as MavenPublication
-        if (name == target.name) {
-            artifactId = SkikoArtifacts.nativeArtifactIdFor(os, arch)
-        }
-    }
-
     if (!os.isCompatibleWithHost) return
 
     val targetString = "${os.id}-${arch.id}"
