@@ -1,12 +1,12 @@
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.InteropPointer
+import org.jetbrains.skia.impl.InteropScope
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.getPtr
 import org.jetbrains.skia.impl.interopScope
 
 /**
@@ -511,7 +511,14 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
         try {
             Stats.onNativeCall()
             _text?.close()
-            _text = interopScope { U16String(_nSetText(_ptr, toInterop(text?.let { ShortArray(text.length) { text[it].code.toShort() } }), text?.length ?: 0)) }
+            _text = U16String(withErrorGuard {
+                _nSetText(
+                    _ptr,
+                    toInterop(text?.let { ShortArray(text.length) { text[it].code.toShort() } }),
+                    text?.length ?: 0,
+                    it
+                )
+            })
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(_text)
@@ -523,6 +530,16 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
     }
 }
 
+private fun withErrorGuard(block: InteropScope.(InteropPointer) -> NativePointer): NativePointer {
+    val errorCode = IntArray(1)
+    return interopScope {
+        val res = block.invoke(this, toInterop(errorCode))
+        if (errorCode[0] > 0) {
+            throw RuntimeException("ubrk_* operation failed with status ${errorCode}")
+        }
+        res
+    }
+}
 
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nGetFinalizer")
 private external fun BreakIterator_nGetFinalizer(): NativePointer
@@ -564,4 +581,4 @@ private external fun _nGetRuleStatus(ptr: NativePointer): Int
 private external fun _nGetRuleStatuses(ptr: NativePointer): IntArray
 
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nSetText")
-private external fun _nSetText(ptr: NativePointer, textStr: InteropPointer, len: Int): NativePointer
+private external fun _nSetText(ptr: NativePointer, textStr: InteropPointer, len: Int, errorCode: InteropPointer): NativePointer
