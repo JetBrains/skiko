@@ -195,6 +195,11 @@ object SkikoArtifacts {
     val jsWasmArtifactId = "skiko-js-wasm-runtime"
     fun jvmRuntimeArtifactIdFor(os: OS, arch: Arch) =
         "skiko-jvm-runtime-${targetId(os, arch)}"
+
+    // Using custom name like skiko-<Os>-<Arch> (with a dash)
+    // does not seem possible (at least without adding a dash to a target's tasks),
+    // so we're using the default naming pattern instead.
+    // See https://youtrack.jetbrains.com/issue/KT-50001.
     fun nativeArtifactIdFor(os: OS, arch: Arch) =
-        "skiko-${targetId(os, arch)}"
+        "skiko-${os.id}${arch.id}"
 }
