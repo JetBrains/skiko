@@ -261,7 +261,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
          */
         fun makeCharacterInstance(locale: String? = null): BreakIterator {
             Stats.onNativeCall()
-            return BreakIterator(withErrorGuard { _nMake(0, toInterop(locale), it)  }) // UBRK_CHARACTER
+            return BreakIterator(withErrorGuard("Failed to create character iterator") { _nMake(0, toInterop(locale), it)  }) // UBRK_CHARACTER
         }
         /**
          * Returns a new BreakIterator instance for word breaks for the given locale.
@@ -271,7 +271,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
          */
         fun makeWordInstance(locale: String? = null): BreakIterator {
             Stats.onNativeCall()
-            return BreakIterator(withErrorGuard { _nMake(1, toInterop(locale), it) }) // UBRK_WORD
+            return BreakIterator(withErrorGuard("Failed to create word iterator") { _nMake(1, toInterop(locale), it) }) // UBRK_WORD
         }
         /**
          * Returns a new BreakIterator instance for line breaks for the given locale.
@@ -281,7 +281,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
          */
         fun makeLineInstance(locale: String? = null): BreakIterator {
             Stats.onNativeCall()
-            return BreakIterator(withErrorGuard { _nMake(2, toInterop(locale), it) }) // UBRK_LINE
+            return BreakIterator(withErrorGuard("Failed to create line iterator")  { _nMake(2, toInterop(locale), it) }) // UBRK_LINE
         }
         /**
          * Returns a new BreakIterator instance for sentence breaks for the given locale.
@@ -291,7 +291,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
          */
         fun makeSentenceInstance(locale: String? = null): BreakIterator {
             Stats.onNativeCall()
-            return BreakIterator(withErrorGuard {
+            return BreakIterator(withErrorGuard("Failed to create sentence iterator")  {
                 _nMake(3, toInterop(locale), it)
             }) // UBRK_SENTENCE
         }
@@ -508,7 +508,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
         try {
             Stats.onNativeCall()
             _text?.close()
-            _text = U16String(withErrorGuard {
+            _text = U16String(withErrorGuard("Failed to setText") {
                 _nSetText(
                     _ptr,
                     toInterop(text?.let { ShortArray(text.length) { text[it].code.toShort() } }),
@@ -527,17 +527,17 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
     }
 }
 
-private fun withErrorGuard(block: InteropScope.(InteropPointer) -> NativePointer): NativePointer {
+private fun withErrorGuard(message: String, block: InteropScope.(InteropPointer) -> NativePointer): NativePointer {
     val errorCode = IntArray(1)
     return interopScope {
         val handle = toInterop(errorCode)
         val res = block.invoke(this, handle)
         handle.fromInterop(errorCode)
         if (errorCode[0] > 0) {
-            throw RuntimeException("ubrk_* operation failed with status ${errorCode}")
+            throw RuntimeException("$message; ubrk_* operation failed with status ${errorCode}")
         }
         if (res == NullPointer) {
-            throw IllegalArgumentException("fail")
+            throw IllegalArgumentException(message)
         }
         res
     }
