@@ -1,11 +1,10 @@
 @file:Suppress("NESTED_EXTERNAL_DECLARATION")
 package org.jetbrains.skia.shaper
 
-import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.*
-import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.FontFeature.Companion.arrayOfFontFeaturesToInterop
 import org.jetbrains.skia.impl.*
+import org.jetbrains.skia.impl.Library.Companion.staticLoad
 
 /**
  * Shapes text using HarfBuzz and places the shaped text into a
@@ -185,21 +184,7 @@ class Shaper internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
         runHandler: RunHandler
     ): Shaper {
         Stats.onNativeCall()
-        interopScope {
-            _nShape(
-                _ptr,
-                getPtr(textUtf8),
-                fontIter,
-                bidiIter,
-                scriptIter,
-                langIter,
-                optsFeaturesLen = opts.features?.size ?: 0,
-                optsFeaturesIntArray = arrayOfFontFeaturesToInterop(opts.features),
-                optsBooleanProps = opts._booleanPropsToInt(),
-                width = width,
-                runHandler = runHandler
-            )
-        }
+        doShape(textUtf8, fontIter, bidiIter, scriptIter, langIter, opts, width, runHandler)
         return this
     }
 
@@ -232,6 +217,17 @@ class Shaper internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
         val PTR = Shaper_nGetFinalizer()
     }
 }
+
+internal expect fun Shaper.doShape(
+    textUtf8: ManagedString,
+    fontIter: Iterator<FontRun?>,
+    bidiIter: Iterator<BidiRun?>,
+    scriptIter: Iterator<ScriptRun?>,
+    langIter: Iterator<LanguageRun?>,
+    opts: ShapingOptions,
+    width: Float,
+    runHandler: RunHandler
+)
 
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper__1nGetFinalizer")
@@ -280,16 +276,65 @@ private external fun _nShapeLine(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_Shaper__1nShape")
-private external fun _nShape(
+internal external fun Shaper_nShape(
     ptr: NativePointer,
     textPtr: NativePointer,
-    fontIter: Iterator<FontRun?>?,
-    bidiIter: Iterator<BidiRun?>?,
-    scriptIter: Iterator<ScriptRun?>?,
-    langIter: Iterator<LanguageRun?>?,
+    fontIter: InteropPointer,
+    bidiIter: InteropPointer,
+    scriptIter: InteropPointer,
+    langIter: InteropPointer,
     optsFeaturesLen: Int,
     optsFeaturesIntArray: InteropPointer,
     optsBooleanProps: Int,
     width: Float,
-    runHandler: RunHandler?
+    runHandler: InteropPointer
 )
+
+// Native/JS only
+@ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunIterator_1nGetFinalizer")
+internal external fun RunIterator_nGetFinalizer(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunIterator_1nCreateRunIterator")
+internal external fun RunIterator_nCreateRunIterator(type: Int, textPtr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunIterator_1nInitRunIterator")
+internal external fun RunIterator_nInitRunIterator(
+    ptr: NativePointer,
+    type: Int,
+    onConsume: InteropPointer,
+    onEndOfCurrentRun: InteropPointer,
+    onAtEnd: InteropPointer,
+    onCurrent: InteropPointer
+)
+
+@ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunHandler_1nCreate")
+internal external fun RunHandler_nCreate(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunHandler_1nGetFinalizer")
+internal external fun RunHandler_nGetFinalizer(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunHandler_1nInit")
+internal external fun RunHandler_nInit(
+    ptr: NativePointer,
+    onBeginLine: InteropPointer,
+    onRunInfo: InteropPointer,
+    onCommitRunInfo: InteropPointer,
+    onRunOffset: InteropPointer,
+    onCommitRun: InteropPointer,
+    onCommitLine: InteropPointer
+)
+
+@ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunHandler_1nGetGlyphs")
+internal external fun RunHandler_nGetGlyphs(ptr: NativePointer, result: InteropPointer)
+
+@ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunHandler_1nGetClusters")
+internal external fun RunHandler_nGetClusters(ptr: NativePointer, result: InteropPointer)
+
+@ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunHandler_1nGetPositions")
+internal external fun RunHandler_nGetPositions(ptr: NativePointer, result: InteropPointer)
+
+@ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunHandler_1nSetOffset")
+internal external fun RunHandler_nSetOffset(ptr: NativePointer, x: Float, y: Float)
+
+@ExternalSymbolName("org_jetbrains_skia_shaper_Shaper_RunHandler_1nGetRunInfo")
+internal external fun RunHandler_nGetRunInfo(ptr: NativePointer, result: InteropPointer): NativePointer

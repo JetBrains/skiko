@@ -1,11 +1,12 @@
 package org.jetbrains.skia.shaper
 
-import org.jetbrains.skia.*
+import org.jetbrains.skia.Font
+import org.jetbrains.skia.Point
 import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.NativePointer
 
 class RunInfo(
-    var _fontPtr: NativePointer, val bidiLevel: Int, val advanceX: Float, val advanceY: Float, val glyphCount: NativePointer,
+    var _fontPtr: NativePointer, val bidiLevel: Int, val advanceX: Float, val advanceY: Float, val glyphCount: Int,
     /**
      * WARN does not work in Shaper.makeCoreText https://bugs.chromium.org/p/skia/issues/detail?id=10899
      */

@@ -335,7 +335,7 @@ private:
     std::vector<jint> fClusters;
 };
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nShape
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_shaper_ShaperKt_Shaper_1nShape
   (JNIEnv* env, jclass jclass, jlong ptr, jlong textPtr, jobject fontRunIterObj, jobject bidiRunIterObj, jobject scriptRunIterObj, jobject languageRunIterObj, jint optsFeaturesLen, jintArray optsFeatures, jint optsBooleanProps, jfloat width, jobject runHandlerObj)
 {
     SkShaper* instance = reinterpret_cast<SkShaper*>(static_cast<uintptr_t>(ptr));

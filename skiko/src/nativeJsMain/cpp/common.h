@@ -167,15 +167,23 @@ static inline KFloat fromBits(KInt i) {
 typedef void (*SkikoDisposeCallback)(KInteropPointer);
 typedef void (*SkikoCallVoidCallback)(KInteropPointer);
 typedef KBoolean (*SkikoCallBooleanCallback)(KInteropPointer);
+typedef KInt (*SkikoCallIntCallback)(KInteropPointer);
+typedef KNativePointer (*SkikoCallNativePointerCallback)(KInteropPointer);
+typedef KInteropPointer (*SkikoCallInteropPointerCallback)(KInteropPointer);
 typedef void* KOpaquePointer;
 
 void disposeCallback(KInteropPointer cb);
 void callVoidCallback(KInteropPointer cb);
 KBoolean callBooleanCallback(KInteropPointer cb);
+KInt callIntCallback(KInteropPointer cb);
+KNativePointer callNativePointerCallback(KInteropPointer cb);
+KInteropPointer callInteropPointerCallback(KInteropPointer cb);
 
 template <typename T, T(*Apply)(KInteropPointer)>
 class KCallback {
 public:
+    using return_type = T;
+
     explicit KCallback(KInteropPointer data) : data(data) {}
 
     virtual ~KCallback() {
@@ -193,7 +201,7 @@ public:
         other.data = t;
     }
 
-    KCallback& operator=(KCallback&& other) {
+    KCallback& operator=(KCallback&& other) noexcept {
         std::swap(data, other.data);
         return *this;
     }
@@ -207,6 +215,9 @@ private:
 
 typedef KCallback<KBoolean, callBooleanCallback> KBooleanCallback;
 typedef KCallback<void, callVoidCallback> KVoidCallback;
+typedef KCallback<KInt, callIntCallback> KIntCallback;
+typedef KCallback<KNativePointer, callNativePointerCallback> KNativePointerCallback;
+typedef KCallback<KInteropPointer, callInteropPointerCallback> KInteropPointerCallback;
 
 #endif /* SKIKO_COMMON_H */
 

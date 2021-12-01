@@ -26,6 +26,8 @@ actual abstract class Native actual constructor(ptr: NativePointer) {
         init {
             initCallbacks(
                 staticCFunction(::callBooleanCallback),
+                staticCFunction(::callIntCallback),
+                staticCFunction(::callNativePtrCallback),
                 staticCFunction(::callVoidCallback),
                 staticCFunction(::disposeCallback),
             )
@@ -201,26 +203,28 @@ actual class InteropScope actual constructor() {
         return toInterop(interopPointers.map { it.toLong() }.toLongArray())
     }
 
-    actual fun booleanCallback(callback: (() -> Boolean)?): InteropPointer
-        = callback?.let {
-            val ptr = StableRef.create(it).asCPointer()
-            NativePtr.NULL.plus(ptr.toLong())
-        } ?: NativePtr.NULL
+    actual fun callback(callback: (() -> Unit)?) = callbackImpl(callback)
+    actual fun intCallback(callback: (() -> Int)?) = callbackImpl(callback)
+    actual fun nativePointerCallback(callback: (() -> NativePointer)?) = callbackImpl(callback)
+    actual fun interopPointerCallback(callback: (() -> InteropPointer)?) = callbackImpl(callback)
+    actual fun booleanCallback(callback: (() -> Boolean)?) = callbackImpl(callback)
 
-    actual fun callback(callback: (() -> Unit)?): InteropPointer
-        = callback?.let {
-            val ptr = StableRef.create(it).asCPointer()
-            NativePtr.NULL.plus(ptr.toLong())
-        } ?: NativePtr.NULL
-
-    actual fun virtual(method: () -> Unit) = callback(method)
-    actual fun virtualBoolean(method: () -> Boolean) = booleanCallback(method)
+    actual fun virtual(method: () -> Unit) = callbackImpl(method)
+    actual fun virtualInt(method: () -> Int) = callbackImpl(method)
+    actual fun virtualNativePointer(method: () -> NativePointer) = callbackImpl(method)
+    actual fun virtualInteropPointer(method: () -> InteropPointer) = callbackImpl(method)
+    actual fun virtualBoolean(method: () -> Boolean) = callbackImpl(method)
 
     actual fun release()  {
         elements.forEach {
             it.unpin()
         }
     }
+
+    private fun <T> callbackImpl(callback: (() -> T)?): InteropPointer = callback?.let {
+        val ptr = StableRef.create(it).asCPointer()
+        NativePtr.NULL.plus(ptr.toLong())
+    } ?: NativePtr.NULL
 
     private val elements = mutableListOf<Pinned<*>>()
 }
@@ -250,9 +254,23 @@ private fun callBooleanCallback(ptr: COpaquePointer): Boolean {
     return ptr.asStableRef<() -> Boolean>().get().invoke()
 }
 
+private fun callIntCallback(ptr: COpaquePointer): Int {
+    return ptr.asStableRef<() -> Int>().get().invoke()
+}
+
+private fun callNativePtrCallback(ptr: COpaquePointer): Long {
+    return ptr.asStableRef<() -> NativePointer>().get().invoke().toLong()
+}
+
 private fun disposeCallback(ptr: COpaquePointer) {
     ptr.asStableRef<Any>().dispose()
 }
 
 @ExternalSymbolName("skiko_initCallbacks")
-private external fun initCallbacks(callBoolean: COpaquePointer, callVoid: COpaquePointer, dispose: COpaquePointer)
+private external fun initCallbacks(
+    callBoolean: COpaquePointer,
+    callInt: COpaquePointer,
+    callNativePointer: COpaquePointer,
+    callVoid: COpaquePointer,
+    dispose: COpaquePointer
+)

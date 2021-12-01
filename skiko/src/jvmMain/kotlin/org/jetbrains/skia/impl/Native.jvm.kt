@@ -80,9 +80,15 @@ actual open class InteropScope actual constructor() {
     actual fun toInteropForArraysOfPointers(interopPointers: Array<InteropPointer>): InteropPointer = interopPointers
 
     actual fun callback(callback: (() -> Unit)?) = callback as Any?
+    actual fun intCallback(callback: (() -> Int)?) = callback as Any?
+    actual fun nativePointerCallback(callback: (() -> NativePointer)?) = callback as Any?
+    actual fun interopPointerCallback(callback: (() -> InteropPointer)?) = callback as Any?
     actual fun booleanCallback(callback: (() -> Boolean)?) = callback as Any?
 
     actual fun virtual(method: () -> Unit) = callback(method)
+    actual fun virtualInt(method: () -> Int) = intCallback(method)
+    actual fun virtualNativePointer(method: () -> NativePointer) = nativePointerCallback(method)
+    actual fun virtualInteropPointer(method: () -> InteropPointer) = interopPointerCallback(method)
     actual fun virtualBoolean(method: () -> Boolean) = booleanCallback(method)
 
     actual fun release() {}

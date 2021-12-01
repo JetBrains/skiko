@@ -113,7 +113,7 @@ namespace skija {
             void onLoad(JNIEnv* env) {
                 jclass local = env->FindClass("org/jetbrains/skia/shaper/RunInfo");
                 cls  = static_cast<jclass>(env->NewGlobalRef(local));
-                ctor = env->GetMethodID(cls, "<init>", "(JIFFJII)V");
+                ctor = env->GetMethodID(cls, "<init>", "(JIFFIII)V");
                 _fontPtr = env->GetFieldID(cls, "_fontPtr", "J");
             }
 

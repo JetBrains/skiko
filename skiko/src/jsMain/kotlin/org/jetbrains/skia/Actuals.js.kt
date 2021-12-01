@@ -1,5 +1,7 @@
 package org.jetbrains.skia
 
+import kotlinx.browser.window
+
 actual abstract class OutputStream
 
 actual fun <R> commonSynchronized(lock: Any, block: () -> R) {
@@ -27,7 +29,13 @@ actual class Matcher constructor(private val regex: Regex, private val input: Ch
     actual fun matches(): Boolean = matches
 }
 
-actual fun defaultLanguageTag(): String = TODO()
+@Suppress("RedundantNullableReturnType")
+val LANG: String by lazy {
+    val lang: String? = window.navigator.language
+    if (lang == null || lang.isEmpty()) { "en-US" } else { lang }
+}
+
+actual fun defaultLanguageTag(): String = LANG
 
 actual fun compilePattern(regex: String): Pattern = Pattern(regex)
 
