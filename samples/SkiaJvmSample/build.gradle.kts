@@ -56,6 +56,7 @@ val casualRun = tasks.named<JavaExec>("run") {
     systemProperty("skiko.win.exception.logger.enabled", "true")
     systemProperty("skiko.win.exception.handler.enabled", "true")
     jvmArgs?.add("-ea")
+    // jvmArgs?.add("-Xcheck:jni")
     // Use systemProperty("skiko.library.path", "/tmp") to test loader.
     System.getProperties().entries
         .associate {
