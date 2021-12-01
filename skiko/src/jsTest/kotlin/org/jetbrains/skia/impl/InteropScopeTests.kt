@@ -13,18 +13,6 @@ class InteropScopeTests {
     }
 
     @Test
-    fun toInteropString() = runTest {
-        interopScope {
-            val s = "HelloWorld!ПриветМир!"
-            val interopPointer = toInterop(s)
-
-            val readArray = CharArray(s.length)
-            interopPointer.fromInterop(readArray)
-            assertContentEquals(s.toCharArray(), readArray)
-        }
-    }
-
-    @Test
     fun toInteropFloatArray() = runTest {
         interopScope {
             val array = floatArrayOf(Float.MIN_VALUE, 2f, -1f, 0f, 1f, Float.MAX_VALUE)
@@ -94,27 +82,6 @@ class InteropScopeTests {
             val readArray = DoubleArray(5)
             interopPointer.fromInterop(readArray)
             assertContentEquals(array, readArray)
-        }
-    }
-
-    @Test
-    fun toInteropStringArray() = runTest {
-        interopScope {
-            val array = arrayOf("s1", "s2", "s3")
-            val interopPointer = toInterop(array)
-
-            val npa = NativePointerArray(3)
-            interopPointer.fromInterop(npa)
-
-            val res = generateSequence(0) {
-                it + 1
-            }.map {
-                val charArray = CharArray(2)
-                npa[it].fromInterop(charArray)
-                charArray.concatToString()
-            }.take(3).toList().toTypedArray()
-
-            assertContentEquals(array, res)
         }
     }
 }

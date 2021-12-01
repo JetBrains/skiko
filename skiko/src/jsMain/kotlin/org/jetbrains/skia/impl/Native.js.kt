@@ -64,11 +64,6 @@ actual class InteropScope actual constructor() {
         }
     }
 
-    actual fun InteropPointer.fromInterop(result: CharArray) {
-        val tmp = UTF8ToString(this@fromInterop)
-        tmp.toCharArray().copyInto(result)
-    }
-
     actual fun toInterop(array: ByteArray?): InteropPointer {
         return if (array != null && array.isNotEmpty()) {
             val data = _malloc(array.size)
@@ -265,6 +260,8 @@ private external fun _malloc(size: Int): NativePointer
 
 private external fun _free(ptr: NativePointer)
 
+private external fun lengthBytesUTF8(str: String): Int
+
 private external fun stringToUTF8(str: String, outPtr: NativePointer, maxBytesToWrite: Int)
 
 private external fun UTF8ToString(ptr: NativePointer): String
@@ -280,6 +277,7 @@ private external object HEAPU8: HEAP<ByteArray> {
 
 private external object HEAPU16: HEAP<ShortArray> {
     override fun set(src: ShortArray, dest: NativePointer)
+    fun set(src: CharArray, dest: NativePointer)
     override fun subarray(startIndex: Int, endIndex: Int): ArrayBufferView
 }
 
@@ -301,6 +299,7 @@ private external object HEAPF64: HEAP<DoubleArray> {
 // Data copying routines.
 private fun toWasm(dest: NativePointer, src: ByteArray): Unit = HEAPU8.set(src, dest)
 private fun toWasm(dest: NativePointer, src: ShortArray): Unit = HEAPU16.set(src, dest / 2)
+private fun toWasm(dest: NativePointer, src: CharArray): Unit = HEAPU16.set(src, dest / 2)
 private fun toWasm(dest: NativePointer, src: FloatArray): Unit = HEAPF32.set(src, dest / 4)
 private fun toWasm(dest: NativePointer, src: DoubleArray): Unit = HEAPF64.set(src, dest / 8)
 private fun toWasm(dest: NativePointer, src: IntArray): Unit = HEAPU32.set(src, dest / 4)

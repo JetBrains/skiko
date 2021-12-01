@@ -57,7 +57,6 @@ actual inline fun <T> interopScope(block: InteropScope.() -> T): T {
 
 actual open class InteropScope actual constructor() {
     actual fun toInterop(string: String?): InteropPointer = string
-    actual fun InteropPointer.fromInterop(result: CharArray) {}
     actual fun toInterop(array: ByteArray?): InteropPointer = array
     actual fun InteropPointer.fromInterop(result: ByteArray) {}
     actual fun toInterop(array: ShortArray?): InteropPointer = array

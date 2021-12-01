@@ -32,7 +32,7 @@ extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nClo
   (JNIEnv* env, jclass jclass, jlong ptr) {
     UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
     UErrorCode status = U_ZERO_ERROR;
-    UBreakIterator* clone = ubrk_safeClone(instance, nullptr, 0, &status);
+    UBreakIterator* clone = ubrk_clone(instance, &status);
     if (U_FAILURE(status)) {
       env->ThrowNew(java::lang::RuntimeException::cls, u_errorName(status));
       return 0;
@@ -108,12 +108,17 @@ extern "C" JNIEXPORT jintArray JNICALL Java_org_jetbrains_skia_BreakIteratorKt__
     return javaIntArray(env, vec);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nSetText
-  (JNIEnv* env, jclass jclass, jlong ptr, jlong textPtr) {
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nSetText
+  (JNIEnv* env, jclass jclass, jlong ptr, jcharArray textArr, jint len) {
     UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
-    std::vector<jchar>* text = reinterpret_cast<std::vector<jchar>*>(static_cast<uintptr_t>(textPtr));
+
+    std::vector<jchar>* text = new std::vector<jchar>(len);
+    env->GetCharArrayRegion(textArr, 0, len, text->data());
+
     UErrorCode status = U_ZERO_ERROR;
-    ubrk_setText(instance, reinterpret_cast<UChar *>(text->data()), text->size(), &status);
+    ubrk_setText(instance, reinterpret_cast<UChar *>(text->data()), len, &status);
     if (U_FAILURE(status))
       env->ThrowNew(java::lang::RuntimeException::cls, u_errorName(status));
+
+    return reinterpret_cast<jlong>(text);
 }
