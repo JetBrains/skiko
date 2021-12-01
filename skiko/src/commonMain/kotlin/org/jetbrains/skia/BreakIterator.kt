@@ -312,7 +312,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
      */
     fun clone(): BreakIterator {
         Stats.onNativeCall()
-        return BreakIterator(_nClone(_ptr))
+        return BreakIterator(withErrorGuard("Failed to clone") { _nClone(_ptr, it) })
     }
 
     /**
@@ -550,7 +550,7 @@ private external fun BreakIterator_nGetFinalizer(): NativePointer
 private external fun _nMake(type: Int, locale: InteropPointer, errorCode: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nClone")
-private external fun _nClone(ptr: NativePointer): NativePointer
+private external fun _nClone(ptr: NativePointer, errorCode: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nCurrent")
 private external fun _nCurrent(ptr: NativePointer): Int
