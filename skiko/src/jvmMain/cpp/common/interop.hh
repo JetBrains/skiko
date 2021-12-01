@@ -61,6 +61,13 @@ namespace java {
             void onLoad(JNIEnv* env);
             bool exceptionThrown(JNIEnv* env);
         }
+
+        namespace System {
+            extern jclass cls;
+            extern jmethodID getProperty;
+            void onLoad(JNIEnv* env);
+            void onUnload(JNIEnv* env);
+        }
     }
 
     namespace util {

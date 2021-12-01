@@ -1,14 +1,12 @@
 #if SK_BUILD_FOR_WIN
 
 #include "exceptions_handler.h"
+#include "../common/interop.hh"
 
 bool isHandleException(JNIEnv *env)
 {
-    jclass systemClass = env->FindClass("java/lang/System");
-    jmethodID getPropertyMethod = env->GetStaticMethodID(systemClass, "getProperty", "(Ljava/lang/String;)Ljava/lang/String;");
-
     jstring propertyName = env->NewStringUTF("skiko.win.exception.handler.enabled");
-    jstring propertyString = (jstring)env->CallStaticObjectMethod(systemClass, getPropertyMethod, propertyName);
+    jstring propertyString = (jstring)env->CallStaticObjectMethod(java::lang::System::cls, java::lang::System::getProperty, propertyName);
     if (propertyString == 0)
     {
         return false;
