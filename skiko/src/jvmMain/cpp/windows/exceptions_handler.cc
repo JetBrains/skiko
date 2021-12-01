@@ -72,7 +72,7 @@ void logJavaException(JNIEnv *env, const char *function, DWORD sehCode)
     {
         char buffer[200];
         int result = snprintf(
-            buffer, 200, "Native exception in [%s]:\nSEH description: %s\n", function, getDescription(sehCode));
+            buffer, sizeof(buffer) - 1, "Native exception in [%s]:\nSEH description: %s\n", function, getDescription(sehCode));
         jclass logClass = env->FindClass("org/jetbrains/skiko/RenderExceptionsHandler");
         jmethodID logMethod = env->GetStaticMethodID(logClass, "logAndThrow", "(Ljava/lang/String;)V");
         env->CallStaticVoidMethod(logClass, logMethod, env->NewStringUTF(buffer));
