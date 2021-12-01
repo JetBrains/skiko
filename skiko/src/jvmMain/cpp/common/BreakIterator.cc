@@ -11,7 +11,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BreakIteratorKt_Break
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nMake
-  (JNIEnv* env, jclass jclass, jint type, jstring localeStr, jintArray errorCode) {
+  (JNIEnv* env, jclass jclass, jint type, jstring localeStr) {
     UErrorCode status = U_ZERO_ERROR;
     UBreakIterator* instance;
     if (localeStr == nullptr)
@@ -20,24 +20,21 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nMa
       SkString locale = skString(env, localeStr);
       instance = ubrk_open(static_cast<UBreakIteratorType>(type), locale.c_str(), nullptr, 0, &status);
     }
-
-    jint errorCodeArr[1] = { status };
-    env->SetIntArrayRegion(errorCode, 0, 0, errorCodeArr);
+    
     if (U_FAILURE(status)) {
+      env->ThrowNew(java::lang::RuntimeException::cls, u_errorName(status));
       return 0;
     } else
       return reinterpret_cast<jlong>(instance);
 }
 
 extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nClone
-  (JNIEnv* env, jclass jclass, jlong ptr, jintArray errorCode) {
+  (JNIEnv* env, jclass jclass, jlong ptr) {
     UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
     UErrorCode status = U_ZERO_ERROR;
     UBreakIterator* clone = ubrk_clone(instance, &status);
-
-    jint errorCodeArr[1] = { status };
-    env->SetIntArrayRegion(errorCode, 0, 0, errorCodeArr);
     if (U_FAILURE(status)) {
+      env->ThrowNew(java::lang::RuntimeException::cls, u_errorName(status));
       return 0;
     } else
       return reinterpret_cast<jlong>(clone);
@@ -112,7 +109,7 @@ extern "C" JNIEXPORT jintArray JNICALL Java_org_jetbrains_skia_BreakIteratorKt__
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nSetText
-  (JNIEnv* env, jclass jclass, jlong ptr, jcharArray textArr, jint len, jintArray errorCode) {
+  (JNIEnv* env, jclass jclass, jlong ptr, jcharArray textArr, jint len) {
     UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(static_cast<uintptr_t>(ptr));
 
     std::vector<jchar>* text = new std::vector<jchar>(len);
@@ -120,9 +117,8 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nSe
 
     UErrorCode status = U_ZERO_ERROR;
     ubrk_setText(instance, reinterpret_cast<UChar *>(text->data()), len, &status);
-
-    jint errorCodeArr[1] = { status };
-    env->SetIntArrayRegion(errorCode, 0, 0, errorCodeArr);
+    if (U_FAILURE(status))
+      env->ThrowNew(java::lang::RuntimeException::cls, u_errorName(status));
 
     return reinterpret_cast<jlong>(text);
 }
