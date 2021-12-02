@@ -1,25 +1,12 @@
 #if SK_BUILD_FOR_WIN
 
 #include "exceptions_handler.h"
-
-static JavaVM *jvm = NULL;
+#include "../common/interop.hh"
 
 bool isHandleException(JNIEnv *env)
 {
-    static jclass systemClass = NULL;
-    if (!systemClass)
-    {
-        systemClass = env->FindClass("java/lang/System");
-    }
-
-    static jmethodID getPropertyMethod = NULL;
-    if (!getPropertyMethod)
-    {
-        getPropertyMethod = env->GetStaticMethodID(systemClass, "getProperty", "(Ljava/lang/String;)Ljava/lang/String;");
-    }
-
     jstring propertyName = env->NewStringUTF("skiko.win.exception.handler.enabled");
-    jstring propertyString = (jstring)env->CallStaticObjectMethod(systemClass, getPropertyMethod, propertyName);
+    jstring propertyString = (jstring)env->CallStaticObjectMethod(java::lang::System::cls, java::lang::System::getProperty, propertyName);
     if (propertyString == 0)
     {
         return false;
@@ -81,29 +68,13 @@ const char *getDescription(DWORD code)
 
 void logJavaException(JNIEnv *env, const char *function, DWORD sehCode)
 {
-    char buffer[200];
-    int result = snprintf(
-        buffer, 200, "Native exception in [%s]:\nSEH description: %s\n", function, getDescription(sehCode));
-
-    if (jvm == NULL)
-    {
-        env->GetJavaVM(&jvm);
-    }
-
     if (isHandleException(env))
     {
-        static jclass logClass = NULL;
-        if (!logClass)
-        {
-            logClass = env->FindClass("org/jetbrains/skiko/RenderExceptionsHandler");
-        }
-
-        static jmethodID logMethod = NULL;
-        if (!logMethod)
-        {
-            logMethod = env->GetStaticMethodID(logClass, "logAndThrow", "(Ljava/lang/String;)V");
-        }
-
+        char buffer[200];
+        int result = snprintf(
+            buffer, sizeof(buffer) - 1, "Native exception in [%s]:\nSEH description: %s\n", function, getDescription(sehCode));
+        jclass logClass = env->FindClass("org/jetbrains/skiko/RenderExceptionsHandler");
+        jmethodID logMethod = env->GetStaticMethodID(logClass, "logAndThrow", "(Ljava/lang/String;)V");
         env->CallStaticVoidMethod(logClass, logMethod, env->NewStringUTF(buffer));
     }
 }

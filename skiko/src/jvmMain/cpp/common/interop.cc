@@ -99,6 +99,19 @@ namespace java {
                     return false;
             }
         }
+
+        namespace System {
+            jclass cls;
+            jmethodID getProperty;
+            void onLoad(JNIEnv* env) {
+                jclass local = env->FindClass("java/lang/System");
+                cls = static_cast<jclass>(env->NewGlobalRef(local));
+                getProperty = env->GetStaticMethodID(cls, "getProperty", "(Ljava/lang/String;)Ljava/lang/String;");
+            }
+            void onUnload(JNIEnv* env) {
+                env->DeleteGlobalRef(cls);
+            }
+        }
     }
 
     namespace util {
@@ -127,6 +140,7 @@ namespace java {
         lang::RuntimeException::onLoad(env);
         lang::String::onLoad(env);
         lang::Throwable::onLoad(env);
+        lang::System::onLoad(env);
         util::Iterator::onLoad(env);
     }
 
@@ -136,6 +150,7 @@ namespace java {
         lang::RuntimeException::onUnload(env);
         lang::Float::onUnload(env);
         lang::Boolean::onUnload(env);
+        lang::System::onUnload(env);
     }
 }
 
