@@ -534,7 +534,7 @@ private fun withErrorGuard(message: String, block: InteropScope.(InteropPointer)
         val res = block.invoke(this, handle)
         handle.fromInterop(errorCode)
         if (errorCode[0] > 0) {
-            throw RuntimeException("$message; ubrk_* operation failed with status ${errorCode}")
+            throw RuntimeException("$message; operation failed with status ${errorCode}")
         }
         if (res == NullPointer) {
             throw IllegalArgumentException(message)
