@@ -12,18 +12,18 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BreakIteratorKt_Break
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nMake
   (JNIEnv* env, jclass jclass, jint type, jstring localeStr, jintArray errorCode) {
-    UErrorCode status = U_ZERO_ERROR;
+    UErrorCode errorCodes[1] = { U_ZERO_ERROR };
     UBreakIterator* instance;
     if (localeStr == nullptr)
-      instance = ubrk_open(static_cast<UBreakIteratorType>(type), uloc_getDefault(), nullptr, 0, &status);
+      instance = ubrk_open(static_cast<UBreakIteratorType>(type), uloc_getDefault(), nullptr, 0, errorCodes);
     else {
       SkString locale = skString(env, localeStr);
-      instance = ubrk_open(static_cast<UBreakIteratorType>(type), locale.c_str(), nullptr, 0, &status);
+      instance = ubrk_open(static_cast<UBreakIteratorType>(type), locale.c_str(), nullptr, 0, errorCodes);
     }
 
-    jint errorCodes[1] = { status };
-    env->SetIntArrayRegion(errorCode, 0, 1, errorCodes);
-    if (U_FAILURE(status)) {
+    env->SetIntArrayRegion(errorCode, 0, 1, reinterpret_cast<jint*>(errorCodes));
+
+    if (U_FAILURE(errorCodes[0])) {
       return 0;
     } else
       return reinterpret_cast<jlong>(instance);
@@ -116,11 +116,10 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BreakIteratorKt__1nSe
     std::vector<jchar>* text = new std::vector<jchar>(len);
     env->GetCharArrayRegion(textArr, 0, len, text->data());
 
-    UErrorCode status = U_ZERO_ERROR;
-    ubrk_setText(instance, reinterpret_cast<UChar *>(text->data()), len, &status);
+    UErrorCode errorCodes[1] = { U_ZERO_ERROR };
+    ubrk_setText(instance, reinterpret_cast<UChar *>(text->data()), len, errorCodes);
 
-    jint errorCodes[1] = { status };
-    env->SetIntArrayRegion(errorCode, 0, 1, errorCodes);
+    env->SetIntArrayRegion(errorCode, 0, 1, reinterpret_cast<jint*>(errorCodes));
 
     return reinterpret_cast<jlong>(text);
 }
