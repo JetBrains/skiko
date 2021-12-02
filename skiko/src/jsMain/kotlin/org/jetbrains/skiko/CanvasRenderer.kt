@@ -1,4 +1,4 @@
-package org.jetbrains.skiko.wasm.api
+package org.jetbrains.skiko
 
 import kotlinx.browser.window
 import org.jetbrains.skia.BackendRenderTarget
@@ -12,16 +12,6 @@ import org.jetbrains.skiko.wasm.CreateWebGLContext
 import org.jetbrains.skiko.wasm.GL
 import org.w3c.dom.HTMLCanvasElement
 
-fun Surface.Companion.createFromGL(context: DirectContext, width: Int, height: Int) = makeFromBackendRenderTarget(
-    context,
-    BackendRenderTarget.makeGL(
-        width, height, 1, 8, 0, 0x8058
-    ),
-    SurfaceOrigin.BOTTOM_LEFT,
-    SurfaceColorFormat.RGBA_8888,
-    ColorSpace.sRGB
-)
-
 abstract class CanvasRenderer constructor(htmlCanvas: HTMLCanvasElement, val width: Int, val height: Int) {
     constructor(canvas: HTMLCanvasElement): this(canvas, canvas.width, canvas.height)
     private val contextPointer = CreateWebGLContext(htmlCanvas)
@@ -30,13 +20,21 @@ abstract class CanvasRenderer constructor(htmlCanvas: HTMLCanvasElement, val wid
         GL.makeContextCurrent(contextPointer)
     }
     private val context = DirectContext.makeGL()
-    private val surface = Surface.createFromGL(context, width, height)
+    private val surface = Surface.makeFromBackendRenderTarget(
+        context,
+        BackendRenderTarget.makeGL(
+            width, height, 1, 8, 0, 0x8058
+        ),
+        SurfaceOrigin.BOTTOM_LEFT,
+        SurfaceColorFormat.RGBA_8888,
+        ColorSpace.sRGB
+    )
     val canvas: Canvas
         get() = surface.canvas
 
     abstract fun drawFrame(currentTimestamp: Double)
 
-    fun draw() {
+    fun needRedraw() {
         window.requestAnimationFrame { timestamp ->
             GL.makeContextCurrent(contextPointer)
             canvas.clear(-1)
