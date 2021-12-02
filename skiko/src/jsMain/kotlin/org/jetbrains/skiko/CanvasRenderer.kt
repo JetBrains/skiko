@@ -34,8 +34,15 @@ abstract class CanvasRenderer constructor(htmlCanvas: HTMLCanvasElement, val wid
 
     abstract fun drawFrame(currentTimestamp: Double)
 
+    private var redrawScheduled = false
+
     fun needRedraw() {
+        if (redrawScheduled) {
+            return
+        }
+        redrawScheduled = true
         window.requestAnimationFrame { timestamp ->
+            redrawScheduled = false
             GL.makeContextCurrent(contextPointer)
             canvas.clear(-1)
             drawFrame(timestamp)
