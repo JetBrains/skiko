@@ -1,6 +1,5 @@
 package org.jetbrains.skiko
 
-import kotlinx.browser.window
 import org.jetbrains.skia.BackendRenderTarget
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.ColorSpace
@@ -32,15 +31,13 @@ abstract class CanvasRenderer constructor(htmlCanvas: HTMLCanvasElement, val wid
     val canvas: Canvas
         get() = surface.canvas
 
-    abstract fun drawFrame(currentTimestamp: Double)
+    abstract fun drawFrame()
 
     fun needRedraw() {
-        window.requestAnimationFrame { timestamp ->
-            GL.makeContextCurrent(contextPointer)
-            canvas.clear(-1)
-            drawFrame(timestamp)
-            surface.flushAndSubmit()
-            context.flush()
-        }
+        GL.makeContextCurrent(contextPointer)
+        canvas.clear(-1)
+        drawFrame()
+        surface.flushAndSubmit()
+        context.flush()
     }
 }

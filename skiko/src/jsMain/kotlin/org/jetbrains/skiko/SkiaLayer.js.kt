@@ -1,10 +1,14 @@
 package org.jetbrains.skiko
 
+import kotlinx.browser.window
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Runnable
 import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.events.InputEvent
 import org.w3c.dom.events.KeyboardEvent
 import org.w3c.dom.events.MouseEvent
 import org.w3c.dom.events.WheelEvent
+import kotlin.coroutines.CoroutineContext
 
 actual open class SkiaLayer {
     private var state: CanvasRenderer? = null
@@ -23,8 +27,25 @@ actual open class SkiaLayer {
             if (value) throw Exception("Transparency is not supported!")
         }
 
-    actual fun needRedraw() {
+    private var currentAnimationFrameTime: Double = 0.0
+
+    private inner class AnimationFramesCoroutineDispatcher : CoroutineDispatcher() {
+        override fun dispatch(context: CoroutineContext, block: Runnable) {
+            window.requestAnimationFrame {
+                currentAnimationFrameTime = it
+                block.run()
+            }
+        }
+    }
+
+    private val frameDispatcher = FrameDispatcher(
+        AnimationFramesCoroutineDispatcher()
+    ) {
         state?.needRedraw()
+    }
+
+    actual fun needRedraw() {
+        frameDispatcher.scheduleFrame()
     }
 
     actual var skikoView: SkikoView? = null
@@ -41,9 +62,9 @@ actual open class SkiaLayer {
 
     fun attachTo(htmlCanvas: HTMLCanvasElement, autoDetach: Boolean = true) {
         state = object: CanvasRenderer(htmlCanvas) {
-            override fun drawFrame(currentTimestamp: Double) {
-                // currentTimestamp is in milliseconds.
-                val currentNanos = currentTimestamp * 1_000_000
+            override fun drawFrame() {
+                // currentAnimationFrameTime is in milliseconds.
+                val currentNanos = currentAnimationFrameTime * 1_000_000
                 skikoView?.onRender(canvas, width, height, currentNanos.toLong())
             }
         }
