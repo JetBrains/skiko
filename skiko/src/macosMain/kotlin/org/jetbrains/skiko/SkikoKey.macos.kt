@@ -1,35 +1,5 @@
 package org.jetbrains.skiko
 
-actual open class SkiaLayer  {
-    actual var renderApi: GraphicsApi
-        get() = TODO("Not yet implemented")
-        set(value) {}
-    actual val contentScale: Float
-        get() = TODO("Not yet implemented")
-    actual var fullscreen: Boolean
-        get() = TODO("Not yet implemented")
-        set(value) {}
-    actual var transparency: Boolean
-        get() = TODO("Not yet implemented")
-        set(value) {}
-    actual fun needRedraw() {
-        TODO("unimplemented")
-    }
-    actual fun attachTo(container: Any) {
-        TODO("unimplemented")
-    }
-    actual fun detach() {
-        TODO("unimplemented")
-    }
-    actual var skikoView: SkikoView? = null
-}
-
-// TODO: do properly
-actual typealias SkikoGesturePlatformEvent = Any
-actual typealias SkikoPlatformInputEvent = Any
-actual typealias SkikoPlatformKeyboardEvent = Any
-actual typealias SkikoPlatformPointerEvent = Any
-
 actual enum class SkikoKey(val value: Int) {
     KEY_UNKNOWN(-1),
     KEY_A(0),
@@ -93,7 +63,7 @@ actual enum class SkikoKey(val value: Int) {
     KEY_RIGHT_SHIFT(60),
     KEY_RIGHT_ALT(61),
     KEY_RIGHT_CONTROL(62),
-    KEY_MENU(444),
+    KEY_MENU(110),
     KEY_UP(126),
     KEY_DOWN(125),
     KEY_LEFT(123),

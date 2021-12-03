@@ -10,14 +10,51 @@ import platform.UIKit.UIScreen
 import platform.UIKit.UIViewController
 import platform.UIKit.setFrame
 import platform.UIKit.contentScaleFactor
+import platform.UIKit.UIKeyInputProtocol
+import platform.UIKit.UIPress
+import platform.UIKit.UIPressesEvent
 
 @ExportObjCClass
-class SkikoViewController : UIViewController {
+class SkikoViewController : UIViewController, UIKeyInputProtocol {
     @OverrideInit
     constructor() : super(nibName = null, bundle = null)
 
     @OverrideInit
     constructor(coder: NSCoder) : super(coder)
+
+    override fun canBecomeFirstResponder() = true
+    private var inputText: String = ""
+    override fun hasText(): Boolean {
+        return inputText.length > 0
+    }
+    override fun insertText(theText: String) {
+        inputText += theText
+        skikoLayer.skikoView?.onInputEvent(toSkikoTypeEvent(theText))
+    }
+    override fun deleteBackward() {
+        inputText = inputText.dropLast(1)
+        skikoLayer.skikoView?.onInputEvent(toSkikoTypeEvent("\b"))
+    }
+    override fun pressesBegan(presses: Set<*>, withEvent: UIPressesEvent?) {
+        if (withEvent != null) {
+            for (press in withEvent.allPresses) {
+                skikoLayer.skikoView?.onKeyboardEvent(
+                    toSkikoKeyboardEvent(press as UIPress, SkikoKeyboardEventKind.DOWN)
+                )
+            }
+        }
+        super.pressesBegan(presses, withEvent)
+    }
+    override fun pressesEnded(presses: Set<*>, withEvent: UIPressesEvent?) {
+        if (withEvent != null) {
+            for (press in withEvent.allPresses) {
+                skikoLayer.skikoView?.onKeyboardEvent(
+                    toSkikoKeyboardEvent(press as UIPress, SkikoKeyboardEventKind.UP)
+                )
+            }
+        }
+        super.pressesEnded(presses, withEvent)
+    }
 
     override fun touchesBegan(touches: Set<*>, withEvent: UIEvent?) {
         super.touchesBegan(touches, withEvent)

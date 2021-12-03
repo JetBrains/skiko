@@ -63,6 +63,7 @@ actual enum class SkikoKey(val value: Int) {
     KEY_RIGHT_SHIFT(0x80000000.toInt() or 16),
     KEY_RIGHT_ALT(225),
     KEY_RIGHT_CONTROL(0x80000000.toInt() or 17),
+    KEY_MENU(93),
     KEY_UP(38),
     KEY_DOWN(40),
     KEY_LEFT(37),
@@ -104,7 +105,7 @@ actual enum class SkikoKey(val value: Int) {
     KEY_NUMPAD_SUBTRACT(109),
     KEY_NUMPAD_MULTIPLY(106),
     KEY_NUMPAD_DIVIDE(111),
-    KEY_NUMPAD_DECIMAC(110);
+    KEY_NUMPAD_DECIMAL(110);
 
     companion object {
         fun valueOf(value: Int): SkikoKey {
