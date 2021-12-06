@@ -23,18 +23,21 @@ class SkikoViewController : UIViewController, UIKeyInputProtocol {
     constructor(coder: NSCoder) : super(coder)
 
     override fun canBecomeFirstResponder() = true
+
     private var inputText: String = ""
     override fun hasText(): Boolean {
         return inputText.length > 0
     }
+
     override fun insertText(theText: String) {
         inputText += theText
         skikoLayer.skikoView?.onInputEvent(toSkikoTypeEvent(theText))
     }
+
     override fun deleteBackward() {
         inputText = inputText.dropLast(1)
-        skikoLayer.skikoView?.onInputEvent(toSkikoTypeEvent("\b"))
     }
+
     override fun pressesBegan(presses: Set<*>, withEvent: UIPressesEvent?) {
         if (withEvent != null) {
             for (press in withEvent.allPresses) {
@@ -45,6 +48,7 @@ class SkikoViewController : UIViewController, UIKeyInputProtocol {
         }
         super.pressesBegan(presses, withEvent)
     }
+
     override fun pressesEnded(presses: Set<*>, withEvent: UIPressesEvent?) {
         if (withEvent != null) {
             for (press in withEvent.allPresses) {
