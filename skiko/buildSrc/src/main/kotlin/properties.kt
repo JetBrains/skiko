@@ -118,8 +118,6 @@ fun findTargetArch() = when (System.getProperty("skiko.target.os.arch")) {
 val targetOs = findTargetOs() ?: hostOs
 val targetArch = findTargetArch() ?: hostArch
 
-val target = targetId(targetOs, targetArch)
-
 fun targetId(os: OS, arch: Arch) =
     "${os.id}-${arch.id}"
 

@@ -525,13 +525,21 @@ val skiaJvmBindingsDir: Provider<File> = registerOrGetSkiaDirProvider(targetOs, 
 
 val compileJvmBindings = createCompileJvmBindingsTask(targetOs, targetArch, skiaJvmBindingsDir)
 val linkJvmBindings = createLinkJvmBindings(targetOs, targetArch, skiaJvmBindingsDir, compileJvmBindings)
+val maybeSign = maybeSignTask(targetOs, targetArch, linkJvmBindings)
+val createChecksums =  createChecksumsTask(targetOs, targetArch, maybeSign)
+val skikoJvmRuntimeJar = skikoJvmRuntimeJarTask(targetOs, targetArch, maybeSign, createChecksums)
+val skikoRuntimeDirForTests = skikoRuntimeDirForTestsTask(targetOs, targetArch, skikoJvmRuntimeJar)
 
 if (supportAndroid) {
+    val os = OS.Android
     for (arch in arrayOf(Arch.X64, Arch.Arm64)) {
-        val skiaAndroidBindingsDir = registerOrGetSkiaDirProvider(OS.Android, arch)
-        val compileAndroidBindings = createCompileJvmBindingsTask(OS.Android, arch, skiaAndroidBindingsDir)
+        val skiaAndroidBindingsDir = registerOrGetSkiaDirProvider(os, arch)
+        val compileAndroidBindings = createCompileJvmBindingsTask(os, arch, skiaAndroidBindingsDir)
         val linkAndroidBindings =
             createLinkJvmBindings(OS.Android, arch, skiaAndroidBindingsDir, compileAndroidBindings)
+        val maybeSignAndroid = maybeSignTask(os, arch, linkAndroidBindings)
+        val createChecksumsAndroid =  createChecksumsTask(os, arch, maybeSignAndroid)
+        val skikoJvmRuntimeJarAndroid = skikoJvmRuntimeJarTask(os, arch, maybeSignAndroid, createChecksumsAndroid)
     }
 }
 
@@ -662,7 +670,8 @@ fun createLinkJvmBindings(targetOs: OS, targetArch: Arch,
                           skiaJvmBindingsDir: Provider<File>,
                           compileTask: TaskProvider<CompileSkikoCppTask>) =
     tasks.register<LinkSkikoTask>("linkJvmBindings-${targetOs.id}-${targetArch.id}") {
-        val skiaBinSubdir = "out/${buildType.id}-${targetOs.id}-${targetArch.id}"
+        val target = targetId(targetOs, targetArch)
+        val skiaBinSubdir = "out/${buildType.id}-$target"
         val skiaBinDir = skiaJvmBindingsDir.get().absolutePath + "/" + skiaBinSubdir
         val osFlags: Array<String>
 
@@ -757,7 +766,9 @@ fun createLinkJvmBindings(targetOs: OS, targetArch: Arch,
 if (hostOs == OS.MacOS) {
     // Very hacky way to compile Objective-C sources and add the
     // resulting object files into the final library.
+    // TODO: rewrite using SkikoCompileTask
     project.tasks.register<Exec>("objcCompile") {
+        val target = targetId(targetOs, targetArch)
         val inputDir = "$projectDir/src/jvmMain/objectiveC/${targetOs.id}"
         val outDir = "$buildDir/objc/$target"
         val names = File(inputDir).listFiles()!!.map { it.name.removeSuffix(".mm") }
@@ -787,7 +798,9 @@ if (hostOs == OS.MacOS) {
     }
 }
 
-val generateVersion = project.tasks.register("generateVersion") {
+val generateVersion = generateVersionTask(targetOs, targetArch)
+
+fun generateVersionTask(targetOs: OS, targetArch: Arch) = project.tasks.register("generateVersion") {
     val outDir = generatedKotlin
     file(outDir).mkdirs()
     val out = "$outDir/Version.kt"
@@ -805,12 +818,13 @@ val generateVersion = project.tasks.register("generateVersion") {
     }
 }
 
-val skikoJvmJar: Provider<Jar> by tasks.registering(Jar::class) {
+val skikoJvmJar: Provider<Jar> by project.tasks.registering(Jar::class) {
     archiveBaseName.set("skiko-jvm")
-        from(kotlin.jvm().compilations["main"].output.allOutputs)
+    from(kotlin.jvm().compilations["main"].output.allOutputs)
 }
 
-val maybeSign by project.tasks.registering(SealAndSignSharedLibraryTask::class) {
+fun maybeSignTask(targetOs: OS, targetArch: Arch, linkJvmBindings: Provider<LinkSkikoTask>) =
+    project.tasks.register<SealAndSignSharedLibraryTask>("maybeSign-${targetOs.id}-${targetArch.id}") {
     dependsOn(linkJvmBindings)
 
     val linkOutputFile = linkJvmBindings.map { task ->
@@ -838,7 +852,7 @@ val maybeSign by project.tasks.registering(SealAndSignSharedLibraryTask::class) 
     signToken.set(skiko.signToken)
 }
 
-val createChecksums by project.tasks.registering(org.gradle.crypto.checksum.Checksum::class) {
+fun createChecksumsTask(targetOs: OS, targetArch: Arch, maybeSign: Provider<SealAndSignSharedLibraryTask>) = project.tasks.register<Checksum>("createChecksums-${targetOs.id}-${targetArch.id}") {
     val skiaBinSubdir = "out/${buildType.id}-${targetOs.id}-${targetArch.id}"
     dependsOn(maybeSign)
     files = project.files(maybeSign.flatMap { it.outputFiles }) +
@@ -847,8 +861,12 @@ val createChecksums by project.tasks.registering(org.gradle.crypto.checksum.Chec
     outputDir = file("$buildDir/checksums")
 }
 
-val skikoJvmRuntimeJar by project.tasks.registering(Jar::class) {
-    val skiaBinSubdir = "out/${buildType.id}-${targetOs.id}-${targetArch.id}"
+fun skikoJvmRuntimeJarTask(targetOs: OS, targetArch: Arch,
+                           maybeSign: Provider<SealAndSignSharedLibraryTask>,
+                           createChecksums: Provider<Checksum>) =
+  project.tasks.register<Jar>("skikoJvmRuntimeJar-${targetOs.id}-${targetArch.id}") {
+    val target = targetId(targetOs, targetArch)
+    val skiaBinSubdir = "out/${buildType.id}-$target"
     dependsOn(createChecksums)
     archiveBaseName.set("skiko-$target")
     from(skikoJvmJar.map { zipTree(it.archiveFile) })
@@ -859,7 +877,9 @@ val skikoJvmRuntimeJar by project.tasks.registering(Jar::class) {
     from(createChecksums.map { it.outputs.files })
 }
 
-val skikoRuntimeDirForTests by project.tasks.registering(Copy::class) {
+fun skikoRuntimeDirForTestsTask(targetOs: OS, targetArch: Arch,
+                                skikoJvmRuntimeJar: Provider<Jar>) =
+  project.tasks.register<Copy>("skikoRuntimeDirForTests-${targetOs.id}-${targetArch.id}") {
     dependsOn(skikoJvmRuntimeJar)
     from(zipTree(skikoJvmRuntimeJar.flatMap { it.archiveFile })) {
         include("*.so")
@@ -869,6 +889,7 @@ val skikoRuntimeDirForTests by project.tasks.registering(Copy::class) {
     }
     destinationDir = project.buildDir.resolve("skiko-runtime-for-tests")
 }
+
 tasks.withType<Test>().configureEach {
     dependsOn(skikoRuntimeDirForTests)
     dependsOn(skikoJvmRuntimeJar)
