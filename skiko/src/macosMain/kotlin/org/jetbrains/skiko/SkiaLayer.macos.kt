@@ -4,6 +4,7 @@ import kotlinx.cinterop.ObjCAction
 import kotlinx.cinterop.useContents
 import kotlinx.cinterop.CValue
 import kotlinx.cinterop.COpaquePointer
+import kotlinx.cinterop.convert
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.redrawer.MacOsOpenGLRedrawer
 import org.jetbrains.skiko.redrawer.Redrawer
@@ -123,14 +124,14 @@ actual open class SkiaLayer() {
             
             private var keyEvent: NSEvent? = null
             private var markedText: String = ""
-            private val kEmptyRange = NSMakeRange(NSNotFound.toULong(), 0.toULong())
+            private val kEmptyRange = NSMakeRange(NSNotFound.convert(), 0)
             override fun attributedSubstringForProposedRange(range: CValue<NSRange>, actualRange: NSRangePointer?) = null
             override fun hasMarkedText(): Boolean {
                 return markedText.length > 0
             }
             override fun markedRange(): CValue<NSRange> {
                 if (markedText.length > 0) {
-                    return NSMakeRange(0.toULong(), (markedText.length - 1).toULong())
+                    return NSMakeRange(0, (markedText.length - 1).convert())
                 }
                 return kEmptyRange
             }
