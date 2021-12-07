@@ -3,6 +3,7 @@
 
 #include "unicode/ubrk.h"
 #include "common.h"
+#include <iostream>
 
 static void deleteBreakIterator(UBreakIterator* instance) {
   ubrk_close(instance);
@@ -14,7 +15,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_BreakIterator__1nGetFinalizer() {
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_BreakIterator__1nMake
-  (KInt type, KInteropPointer localeStr) {
+  (KInt type, KInteropPointer localeStr, KInt* errorCode) {
     UErrorCode status = U_ZERO_ERROR;
     UBreakIterator* instance;
     if (localeStr == nullptr)
@@ -23,6 +24,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_BreakIterator__1nMake
       instance = ubrk_open(static_cast<UBreakIteratorType>(type), skString(localeStr).c_str(), nullptr, 0, &status);
     }
 
+    errorCode[0] = status;
     if (U_FAILURE(status))
       return 0;
     else
@@ -31,10 +33,12 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_BreakIterator__1nMake
      
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_BreakIterator__1nClone
-  (KNativePointer ptr) {
+  (KNativePointer ptr, KInt* errorCode) {
     UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(ptr);
     UErrorCode status = U_ZERO_ERROR;
     UBreakIterator* clone = ubrk_clone(instance, &status);
+
+    errorCode[0] = status;
     if (U_FAILURE(status)) {
       return 0;
     } else
@@ -116,11 +120,12 @@ SKIKO_EXPORT KInt* org_jetbrains_skia_BreakIterator__1nGetRuleStatuses
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_BreakIterator__1nSetText
-  (KNativePointer ptr, KChar* textArr, KInt len) {
+  (KNativePointer ptr, KChar* textArr, KInt len, KInt* errorCode) {
     UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(ptr);
     std::vector<UChar>* text = new std::vector<UChar>(textArr, textArr + len);
 
     UErrorCode status = U_ZERO_ERROR;
     ubrk_setText(instance, text->data(), len, &status);
+    errorCode[0] = status;
     return reinterpret_cast<KNativePointer>(text);
 }

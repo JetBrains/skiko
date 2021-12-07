@@ -1,13 +1,14 @@
 package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.InteropPointer
+import org.jetbrains.skia.impl.InteropScope
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Managed
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.impl.Native.Companion.NullPointer
 import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.interopScope
+import org.jetbrains.skia.impl.reachabilityBarrier
 
 /**
  *
@@ -260,7 +261,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
          */
         fun makeCharacterInstance(locale: String? = null): BreakIterator {
             Stats.onNativeCall()
-            return BreakIterator(interopScope { _nMake(0, toInterop(locale))  }) // UBRK_CHARACTER
+            return BreakIterator(withErrorGuard("Failed to create character iterator") { _nMake(0, toInterop(locale), it)  }) // UBRK_CHARACTER
         }
         /**
          * Returns a new BreakIterator instance for word breaks for the given locale.
@@ -270,9 +271,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
          */
         fun makeWordInstance(locale: String? = null): BreakIterator {
             Stats.onNativeCall()
-            return BreakIterator(interopScope { _nMake(1, toInterop(locale)).also {
-                if (it == NullPointer) throw IllegalArgumentException("Cannot create word iterator")
-            } }) // UBRK_WORD
+            return BreakIterator(withErrorGuard("Failed to create word iterator") { _nMake(1, toInterop(locale), it) }) // UBRK_WORD
         }
         /**
          * Returns a new BreakIterator instance for line breaks for the given locale.
@@ -282,9 +281,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
          */
         fun makeLineInstance(locale: String? = null): BreakIterator {
             Stats.onNativeCall()
-            return BreakIterator(interopScope { _nMake(2, toInterop(locale)).also {
-                if (it == NullPointer) throw IllegalArgumentException("Cannot create line iterator")
-            } }) // UBRK_LINE
+            return BreakIterator(withErrorGuard("Failed to create line iterator")  { _nMake(2, toInterop(locale), it) }) // UBRK_LINE
         }
         /**
          * Returns a new BreakIterator instance for sentence breaks for the given locale.
@@ -294,9 +291,9 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
          */
         fun makeSentenceInstance(locale: String? = null): BreakIterator {
             Stats.onNativeCall()
-            return BreakIterator(interopScope { _nMake(3, toInterop(locale)).also {
-                if (it == NullPointer) throw IllegalArgumentException("Cannot create sentence iterator")
-            } }) // UBRK_SENTENCE
+            return BreakIterator(withErrorGuard("Failed to create sentence iterator")  {
+                _nMake(3, toInterop(locale), it)
+            }) // UBRK_SENTENCE
         }
 
         init {
@@ -315,7 +312,7 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
      */
     fun clone(): BreakIterator {
         Stats.onNativeCall()
-        return BreakIterator(_nClone(_ptr))
+        return BreakIterator(withErrorGuard("Failed to clone") { _nClone(_ptr, it) })
     }
 
     /**
@@ -511,7 +508,14 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
         try {
             Stats.onNativeCall()
             _text?.close()
-            _text = interopScope { U16String(_nSetText(_ptr, toInterop(text?.let { ShortArray(text.length) { text[it].code.toShort() } }), text?.length ?: 0)) }
+            _text = U16String(withErrorGuard("Failed to setText") {
+                _nSetText(
+                    _ptr,
+                    toInterop(text?.let { ShortArray(text.length) { text[it].code.toShort() } }),
+                    text?.length ?: 0,
+                    it
+                )
+            })
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(_text)
@@ -523,15 +527,30 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
     }
 }
 
+private fun withErrorGuard(message: String, block: InteropScope.(InteropPointer) -> NativePointer): NativePointer {
+    val errorCode = IntArray(1)
+    return interopScope {
+        val handle = toInterop(errorCode)
+        val res = block.invoke(this, handle)
+        handle.fromInterop(errorCode)
+        if (errorCode[0] > 0) {
+            throw RuntimeException("$message; operation failed with status ${errorCode}")
+        }
+        if (res == NullPointer) {
+            throw IllegalArgumentException(message)
+        }
+        res
+    }
+}
 
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nGetFinalizer")
 private external fun BreakIterator_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nMake")
-private external fun _nMake(type: Int, locale: InteropPointer): NativePointer
+private external fun _nMake(type: Int, locale: InteropPointer, errorCode: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nClone")
-private external fun _nClone(ptr: NativePointer): NativePointer
+private external fun _nClone(ptr: NativePointer, errorCode: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nCurrent")
 private external fun _nCurrent(ptr: NativePointer): Int
@@ -564,4 +583,4 @@ private external fun _nGetRuleStatus(ptr: NativePointer): Int
 private external fun _nGetRuleStatuses(ptr: NativePointer): IntArray
 
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nSetText")
-private external fun _nSetText(ptr: NativePointer, textStr: InteropPointer, len: Int): NativePointer
+private external fun _nSetText(ptr: NativePointer, textStr: InteropPointer, len: Int, errorCode: InteropPointer): NativePointer
