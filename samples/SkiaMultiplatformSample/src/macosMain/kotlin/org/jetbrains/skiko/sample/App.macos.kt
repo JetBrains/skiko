@@ -40,9 +40,8 @@ fun main() {
         backing = NSBackingStoreBuffered,
         defer = false
     ) {
-        override fun canBecomeKeyWindow(): Boolean {
-            return true
-        }
+        override fun canBecomeKeyWindow() = true
+        override fun canBecomeMainWindow() = true
     }
     val skiaLayer = SkiaLayer()
     skiaLayer.skikoView = GenericSkikoView(skiaLayer, makeApp(skiaLayer))

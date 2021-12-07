@@ -81,6 +81,17 @@ fun toSkikoEvent(
     )
 }
 
+fun toSkikoTypeEvent(
+    character: String,
+    event: NSEvent,
+): SkikoInputEvent {
+    return SkikoInputEvent(
+        character,
+        SkikoKeyboardEventKind.TYPE,
+        event
+    )
+}
+
 private val actionAllKeyUpFlag = 256.toULong() // MacOS specific
 private var modifierKeyUpFlag = actionAllKeyUpFlag
 fun toSkikoEvent(

@@ -12,6 +12,7 @@ import kotlin.math.PI
 import kotlin.math.pow
 
 class Clocks(private val layer: SkiaLayer): SkikoView {
+    private val platformYOffset = if (hostOs == OS.Ios) 50f else 5f
     private var frame = 0
     private var xpos = 0.0
     private var ypos = 0.0
@@ -22,6 +23,8 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
     private var rotate = 0.0
     private val fontCollection = FontCollection()
         .setDefaultFontManager(FontMgr.default)
+    private val style = ParagraphStyle()
+    private var inputText = ""
 
     override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
         canvas.translate(xOffset.toFloat(), yOffset.toFloat())
@@ -40,7 +43,7 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
         }
         val watchFillHover = Paint().apply { color = 0xFFE4FF01.toInt() }
         for (x in 0 .. width - 50 step 50) {
-            for (y in 20 .. height - 50 step 50) {
+            for (y in 30 + platformYOffset.toInt() .. height - 50 step 50) {
                 val hover = 
                     (xpos - xOffset) / scale > x &&
                     (xpos - xOffset) / scale < x + 50 &&
@@ -83,14 +86,22 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
             }
         }
 
-        val style = ParagraphStyle()
         val renderInfo = ParagraphBuilder(style, fontCollection)
             .pushStyle(TextStyle().setColor(0xFF000000.toInt()))
             .addText("Graphics API: ${layer.renderApi} ✿ﾟ ${currentSystemTheme}")
             .popStyle()
             .build()
         renderInfo.layout(Float.POSITIVE_INFINITY)
-        renderInfo.paint(canvas, 5f, 50f)
+        renderInfo.paint(canvas, 5f, platformYOffset)
+
+        val input = ParagraphBuilder(style, fontCollection)
+            .pushStyle(TextStyle().setColor(0xFF000000.toInt()))
+            .addText("TextInput: $inputText")
+            .popStyle()
+            .build()
+        input.layout(Float.POSITIVE_INFINITY)
+        input.paint(canvas, 5f, platformYOffset + 20f)
+        
         val frames = ParagraphBuilder(style, fontCollection)
             .pushStyle(TextStyle().setColor(0xff9BC730L.toInt()).setFontSize(20f))
             .addText("Frames: ${frame++}\nAngle: $rotate")
@@ -132,20 +143,30 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
     }
 
     override fun onInputEvent(event: SkikoInputEvent) {
-        // TODO: provide example that covers all features of text input event
+        if (event.input != "\b") {
+            inputText += event.input
+        }
     }
 
     override fun onKeyboardEvent(event: SkikoKeyboardEvent) {
         if (event.kind == SkikoKeyboardEventKind.DOWN) {
             when (event.key) {
-                SkikoKey.KEY_NUMPAD_ADD,
-                SkikoKey.KEY_I -> scale *= 1.1
-                SkikoKey.KEY_NUMPAD_SUBTRACT,
-                SkikoKey.KEY_O -> scale *= 0.9
+                SkikoKey.KEY_NUMPAD_ADD -> scale *= 1.1
+                SkikoKey.KEY_I -> {
+                    if (event.modifiers == SkikoInputModifiers.CONTROL) {
+                        scale *= 1.1
+                    }
+                }
+                SkikoKey.KEY_NUMPAD_SUBTRACT -> scale *= 0.9
+                SkikoKey.KEY_O -> {
+                    if (event.modifiers == SkikoInputModifiers.CONTROL) {
+                        scale *= 0.9
+                    }
+                }
                 SkikoKey.KEY_R -> {
                     if (event.modifiers == SkikoInputModifiers.SHIFT) {
                         rotate -= 5.0
-                    } else {
+                    } else if (event.modifiers == SkikoInputModifiers.CONTROL) {
                         rotate += 5.0
                     }
                 }
@@ -162,6 +183,11 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
                     yOffset = 0.0
                     rotate = 0.0
                     scale = 1.0
+                }
+                SkikoKey.KEY_BACKSPACE -> {
+                    if (inputText.isNotEmpty()) {
+                        inputText = inputText.dropLast(1)
+                    }
                 }
                 else -> {}
             }

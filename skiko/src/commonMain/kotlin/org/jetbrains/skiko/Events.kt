@@ -153,6 +153,7 @@ expect enum class SkikoKey {
     KEY_RIGHT_SHIFT,
     KEY_RIGHT_ALT,
     KEY_RIGHT_CONTROL,
+    KEY_MENU,
     KEY_UP,
     KEY_DOWN,
     KEY_LEFT,
@@ -194,7 +195,7 @@ expect enum class SkikoKey {
     KEY_NUMPAD_SUBTRACT,
     KEY_NUMPAD_MULTIPLY,
     KEY_NUMPAD_DIVIDE,
-    KEY_NUMPAD_DECIMAC;
+    KEY_NUMPAD_DECIMAL;
 }
 
 enum class SkikoGestureEventKind {
@@ -221,6 +222,7 @@ data class SkikoGestureEvent(
 expect class SkikoPlatformInputEvent
 data class SkikoInputEvent(
     val input: String,
+    val kind: SkikoKeyboardEventKind,
     val platform: SkikoPlatformInputEvent?
 )
 

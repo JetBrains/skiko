@@ -3,6 +3,7 @@ package org.jetbrains.skiko
 import org.w3c.dom.events.MouseEvent
 import org.w3c.dom.events.KeyboardEvent
 import org.w3c.dom.events.WheelEvent
+import org.w3c.dom.events.InputEvent
 
 fun toSkikoEvent(
     event: MouseEvent,
@@ -36,18 +37,8 @@ fun toSkikoEvent(
     event: KeyboardEvent,
     kind: SkikoKeyboardEventKind
 ): SkikoKeyboardEvent {
-    var key = event.keyCode
-    val side = event.location
-    if (side == KeyboardEvent.DOM_KEY_LOCATION_RIGHT) {
-        if (
-            key == SkikoKey.KEY_LEFT_CONTROL.value ||
-            key == SkikoKey.KEY_LEFT_SHIFT.value ||
-            key == SkikoKey.KEY_LEFT_META.value
-        )
-        key = key.or(0x80000000.toInt())
-    }
     return SkikoKeyboardEvent(
-        SkikoKey.valueOf(key),
+        SkikoKey.valueOf(toSkikoKey(event)),
         toSkikoModifiers(event),
         kind,
         event
@@ -118,4 +109,18 @@ private fun toSkikoModifiers(event: KeyboardEvent): SkikoInputModifiers {
         result = result.or(SkikoInputModifiers.META.value)
     }
     return SkikoInputModifiers(result)
+}
+
+private fun toSkikoKey(event: KeyboardEvent): Int {
+    var key = event.keyCode
+    val side = event.location
+    if (side == KeyboardEvent.DOM_KEY_LOCATION_RIGHT) {
+        if (
+            key == SkikoKey.KEY_LEFT_CONTROL.value ||
+            key == SkikoKey.KEY_LEFT_SHIFT.value ||
+            key == SkikoKey.KEY_LEFT_META.value
+        )
+        key = key.or(0x80000000.toInt())
+    }
+    return key
 }

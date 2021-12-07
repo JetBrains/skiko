@@ -145,9 +145,18 @@ fun toSkikoEvent(event: KeyEvent): SkikoKeyboardEvent {
     )
 }
 
+fun toSkikoTypeEvent(event: KeyEvent): SkikoInputEvent {
+    return SkikoInputEvent(
+        event.keyChar.toString(),
+        SkikoKeyboardEventKind.TYPE,
+        event
+    )
+}
+
 fun toSkikoEvent(event: InputMethodEvent): SkikoInputEvent {
     return SkikoInputEvent(
-        "", // TODO: this parameter should be reconsidered
+        "",
+        SkikoKeyboardEventKind.TYPE,
         event
     )
 }
@@ -181,4 +190,23 @@ private fun toSkikoModifiers(modifiers: Int): SkikoInputModifiers {
         result = result.or(SkikoInputModifiers.META.value)
     }
     return SkikoInputModifiers(result)
+}
+
+private fun toSkikoKey(event: KeyEvent): Int {
+    var key = event.keyCode
+    val side = event.getKeyLocation()
+    if (side == KEY_LOCATION_RIGHT) {
+        if (
+            key == SkikoKey.KEY_LEFT_CONTROL.value ||
+            key == SkikoKey.KEY_LEFT_SHIFT.value ||
+            key == SkikoKey.KEY_LEFT_META.value
+        )
+        key = key.or(0x80000000.toInt())
+    }
+    if (side == KEY_LOCATION_NUMPAD) {
+        if (key == SkikoKey.KEY_ENTER.value) {
+            key = key.or(0x80000000.toInt())
+        }
+    }
+    return key
 }
