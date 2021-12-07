@@ -440,7 +440,7 @@ public:
     ~JCallback() {
         if (callback != nullptr) {
             JNIEnv* localEnv;
-            if (javaVM->GetEnv(AS_JNI_ENV_PTR(&localEnv), SKIKO_JNI_VERSION) == JNI_OK) {
+            if (javaVM->GetEnv(reinterpret_cast<void**>(&localEnv), SKIKO_JNI_VERSION) == JNI_OK) {
                 localEnv->DeleteGlobalRef(callback);
             }
         }

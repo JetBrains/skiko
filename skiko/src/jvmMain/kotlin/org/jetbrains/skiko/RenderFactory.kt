@@ -32,6 +32,7 @@ private fun makeDefaultRenderFactory(): RenderFactory {
                 GraphicsApi.SOFTWARE_FAST -> LinuxSoftwareRedrawer(layer, properties)
                 else -> LinuxOpenGLRedrawer(layer, properties)
             }
+            OS.Android -> TODO()
             OS.JS, OS.Ios -> {
                 TODO("Commonize me")
             }
