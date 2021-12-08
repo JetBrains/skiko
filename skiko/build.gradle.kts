@@ -257,8 +257,9 @@ kotlin {
         }
         val jvmMain by getting {
             dependencies {
-                implementation(kotlin("stdlib-jdk8"))
+                implementation(kotlin("stdlib"))
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:$coroutinesVersion")
+                if (supportAndroid) implementation(files(androidJar()))
             }
 
         }
@@ -266,7 +267,6 @@ kotlin {
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
                 implementation(kotlin("test-junit"))
-
                 implementation(kotlin("test"))
             }
         }
@@ -530,6 +530,8 @@ val createChecksums =  createChecksumsTask(targetOs, targetArch, maybeSign)
 val skikoJvmRuntimeJar = skikoJvmRuntimeJarTask(targetOs, targetArch, maybeSign, createChecksums)
 val skikoRuntimeDirForTests = skikoRuntimeDirForTestsTask(targetOs, targetArch, skikoJvmRuntimeJar)
 
+val allJvmRuntimeJars = mutableListOf(skikoJvmRuntimeJar)
+
 if (supportAndroid) {
     val os = OS.Android
     for (arch in arrayOf(Arch.X64, Arch.Arm64)) {
@@ -540,17 +542,22 @@ if (supportAndroid) {
         val maybeSignAndroid = maybeSignTask(os, arch, linkAndroidBindings)
         val createChecksumsAndroid =  createChecksumsTask(os, arch, maybeSignAndroid)
         val skikoJvmRuntimeJarAndroid = skikoJvmRuntimeJarTask(os, arch, maybeSignAndroid, createChecksumsAndroid)
+        allJvmRuntimeJars += skikoJvmRuntimeJarAndroid
     }
 }
 
-fun androidClangFor(targetArch: Arch): String {
-    val androidHome = when (hostOs) {
-        OS.MacOS -> File("${System.getProperty("user.home")}/Library/Android/sdk")
-        OS.Linux -> File("${System.getProperty("user.home")}/.android")
-        else -> throw GradleException("unsupported $hostOs")
-    }
-    val ndkVersion = "23.0.7599858"
-    val androidVersion = "android29"
+fun androidHome() = when (hostOs) {
+    OS.MacOS -> File("${System.getProperty("user.home")}/Library/Android/sdk")
+    OS.Linux -> File("${System.getProperty("user.home")}/.android")
+    else -> throw GradleException("unsupported $hostOs")
+}
+
+fun androidClangFor(targetArch: Arch, version: String = "30"): String {
+    val androidHome = androidHome()
+    val ndkVersion =
+        arrayOf("ndk/23.0.7599858", "ndk-bundle").find {
+            androidHome.resolve(it).exists()
+        }!!
     val androidArch = when (targetArch) {
         Arch.Arm64 -> "aarch64"
         Arch.X64 -> "x86_64"
@@ -561,8 +568,13 @@ fun androidClangFor(targetArch: Arch): String {
         OS.Linux -> "linux-x86_64"
         else -> throw GradleException("unsupported $hostOs")
     }
-    val ndkDir = File(androidHome, "/ndk/$ndkVersion/toolchains/llvm/prebuilt/$hostOsArch")
-    return ndkDir.resolve("bin/$androidArch-linux-$androidVersion-clang++").absolutePath
+    val ndkDir = File(androidHome, "/$ndkVersion/toolchains/llvm/prebuilt/$hostOsArch")
+    return ndkDir.resolve("bin/$androidArch-linux-android$version-clang++").absolutePath
+}
+
+fun androidJar(version: String = "30"): String {
+    val androidHome = androidHome()
+    return androidHome.resolve("platforms/android-$version/android.jar").absolutePath
 }
 
 fun createCompileJvmBindingsTask(targetOs: OS, targetArch: Arch, skiaJvmBindingsDir: Provider<File>) =
@@ -1008,7 +1020,9 @@ publishing {
             pomNameForPublication[name] = "Skiko JVM Runtime for ${targetOs.name} ${targetArch.name}"
             artifactId = SkikoArtifacts.jvmRuntimeArtifactIdFor(targetOs, targetArch)
             afterEvaluate {
-                artifact(skikoJvmRuntimeJar.map { it.archiveFile.get() })
+                allJvmRuntimeJars.forEach { jar ->
+                    artifact(jar.map { it.archiveFile.get() })
+                }
                 var jvmSourcesArtifact: Any? = null
                 kotlin.jvm().mavenPublication {
                     jvmSourcesArtifact = artifacts.find { it.classifier == "sources" }
