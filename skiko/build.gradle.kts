@@ -530,7 +530,7 @@ val createChecksums =  createChecksumsTask(targetOs, targetArch, maybeSign)
 val skikoJvmRuntimeJar = skikoJvmRuntimeJarTask(targetOs, targetArch, maybeSign, createChecksums)
 val skikoRuntimeDirForTests = skikoRuntimeDirForTestsTask(targetOs, targetArch, skikoJvmRuntimeJar)
 
-val allJvmRuntimeJars = mutableListOf(skikoJvmRuntimeJar)
+val allJvmRuntimeJars = mutableMapOf((targetOs to targetArch) to skikoJvmRuntimeJar)
 
 if (supportAndroid) {
     val os = OS.Android
@@ -542,7 +542,7 @@ if (supportAndroid) {
         val maybeSignAndroid = maybeSignTask(os, arch, linkAndroidBindings)
         val createChecksumsAndroid =  createChecksumsTask(os, arch, maybeSignAndroid)
         val skikoJvmRuntimeJarAndroid = skikoJvmRuntimeJarTask(os, arch, maybeSignAndroid, createChecksumsAndroid)
-        allJvmRuntimeJars += skikoJvmRuntimeJarAndroid
+        allJvmRuntimeJars[os to arch] = skikoJvmRuntimeJarAndroid
     }
 }
 
@@ -877,16 +877,17 @@ fun skikoJvmRuntimeJarTask(targetOs: OS, targetArch: Arch,
                            maybeSign: Provider<SealAndSignSharedLibraryTask>,
                            createChecksums: Provider<Checksum>) =
   project.tasks.register<Jar>("skikoJvmRuntimeJar-${targetOs.id}-${targetArch.id}") {
-    val target = targetId(targetOs, targetArch)
-    val skiaBinSubdir = "out/${buildType.id}-$target"
-    dependsOn(createChecksums)
-    archiveBaseName.set("skiko-$target")
-    from(skikoJvmJar.map { zipTree(it.archiveFile) })
-    from(maybeSign.flatMap { it.outputFiles })
-    if (targetOs.isWindows) {
-        from(files(skiaJvmBindingsDir.map { it.resolve("${skiaBinSubdir}/icudtl.dat") }))
-    }
-    from(createChecksums.map { it.outputs.files })
+      dependsOn(maybeSign)
+      dependsOn(createChecksums)
+      val target = targetId(targetOs, targetArch)
+      val skiaBinSubdir = "out/${buildType.id}-$target"
+      archiveBaseName.set("skiko-$target")
+      from(skikoJvmJar.map { zipTree(it.archiveFile) })
+      from(maybeSign.flatMap { it.outputFiles })
+      if (targetOs.isWindows) {
+          from(files(skiaJvmBindingsDir.map { it.resolve("${skiaBinSubdir}/icudtl.dat") }))
+      }
+      from(createChecksums.map { it.outputs.files })
 }
 
 fun skikoRuntimeDirForTestsTask(targetOs: OS, targetArch: Arch,
@@ -1016,21 +1017,23 @@ publishing {
             }
         }
 
-        create<MavenPublication>("skikoJvmRuntime") {
-            pomNameForPublication[name] = "Skiko JVM Runtime for ${targetOs.name} ${targetArch.name}"
-            artifactId = SkikoArtifacts.jvmRuntimeArtifactIdFor(targetOs, targetArch)
-            afterEvaluate {
-                allJvmRuntimeJars.forEach { jar ->
-                    artifact(jar.map { it.archiveFile.get() })
-                }
-                var jvmSourcesArtifact: Any? = null
-                kotlin.jvm().mavenPublication {
-                    jvmSourcesArtifact = artifacts.find { it.classifier == "sources" }
-                }
-                if (jvmSourcesArtifact == null) {
-                    error("Could not find sources jar artifact for JVM target")
-                } else {
-                    artifact(jvmSourcesArtifact)
+        allJvmRuntimeJars.forEach { entry ->
+            val os = entry.key.first
+            val arch = entry.key.second
+            create<MavenPublication>("skikoJvmRuntime${targetId(os, arch)}") {
+                pomNameForPublication[name] = "Skiko JVM Runtime for ${os.name} ${arch.name}"
+                artifactId = SkikoArtifacts.jvmRuntimeArtifactIdFor(os, arch)
+                afterEvaluate {
+                    artifact(entry.value.map { it.archiveFile.get() })
+                    var jvmSourcesArtifact: Any? = null
+                    kotlin.jvm().mavenPublication {
+                        jvmSourcesArtifact = artifacts.find { it.classifier == "sources" }
+                    }
+                    if (jvmSourcesArtifact == null) {
+                        error("Could not find sources jar artifact for JVM target")
+                    } else {
+                        artifact(jvmSourcesArtifact)
+                    }
                 }
             }
         }
