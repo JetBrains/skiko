@@ -264,5 +264,6 @@ afterEvaluate {
     extensions.configure<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension> {
         versions.webpackDevServer.version = "4.0.0"
         versions.webpackCli.version = "4.9.0"
+        nodeVersion = "16.0.0"
     }
 }

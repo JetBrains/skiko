@@ -1,7 +1,6 @@
 package org.jetbrains.skiko
 
 import kotlinx.browser.window
-import org.khronos.webgl.WebGLRenderingContext
 import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.events.InputEvent
 import org.w3c.dom.events.KeyboardEvent
@@ -42,11 +41,12 @@ actual open class SkiaLayer {
     private var isPointerPressed = false
 
     fun attachTo(htmlCanvas: HTMLCanvasElement, autoDetach: Boolean = true) {
-        val desiredWidth = htmlCanvas.width
-        val desiredHeight = htmlCanvas.height
-
-        if (htmlCanvas.asDynamic().skikoScaled == undefined) {
-            val scale = contentScale
+        val scale = contentScale
+        if (scale != 1f && htmlCanvas.asDynamic().skikoScaled == undefined) {
+            val desiredWidth = htmlCanvas.width
+            val desiredHeight = htmlCanvas.height
+            // Scale canvas to allow high DPI rendering as suggested in
+            // https://www.khronos.org/webgl/wiki/HandlingHighDPI.
             htmlCanvas.asDynamic().skikoScaled = true
             htmlCanvas.style.width = "${desiredWidth}px"
             htmlCanvas.style.height = "${desiredHeight}px"
