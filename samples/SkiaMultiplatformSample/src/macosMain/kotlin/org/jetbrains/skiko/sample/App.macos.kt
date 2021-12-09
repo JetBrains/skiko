@@ -2,12 +2,8 @@ package org.jetbrains.skiko.sample
 
 import platform.AppKit.*
 
-import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
-import kotlinx.cinterop.*
 import platform.Foundation.NSMakeRect
-import platform.Foundation.NSBundle
-import platform.Foundation.NSNotification
 import platform.Foundation.NSSelectorFromString
 import platform.darwin.NSObject
 

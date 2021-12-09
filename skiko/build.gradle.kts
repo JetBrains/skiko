@@ -255,11 +255,18 @@ kotlin {
                 implementation(kotlin("test-annotations-common"))
             }
         }
+
+        val androidMain by creating {
+            dependencies {
+                if (supportAndroid) implementation(files(androidJar()))
+            }
+        }
+
         val jvmMain by getting {
+            if (supportAndroid) dependsOn(androidMain)
             dependencies {
                 implementation(kotlin("stdlib"))
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:$coroutinesVersion")
-                if (supportAndroid) implementation(files(androidJar()))
             }
 
         }
