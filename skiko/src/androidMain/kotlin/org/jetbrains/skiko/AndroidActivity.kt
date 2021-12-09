@@ -7,44 +7,44 @@ import android.opengl.GLSurfaceView
 import android.os.Bundle
 import javax.microedition.khronos.opengles.GL10
 
-class OpenGLES20Activity : Activity() {
+class  SkikoGLES20Activity : Activity() {
     private lateinit var gLView: GLSurfaceView
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // Create a GLSurfaceView instance and set it
         // as the ContentView for this Activity.
-        gLView = MyGLSurfaceView(this)
+        gLView = SkikoGLSurfaceView(this)
         setContentView(gLView)
     }
 }
 
-class MyGLSurfaceView(context: Context) : GLSurfaceView(context) {
-    private val renderer: MyGLRenderer
+class SkikoGLSurfaceView(context: Context) : GLSurfaceView(context) {
+    private val renderer: SkikoAndroidGLRenderer
 
     init {
         // Create an OpenGL ES 2.0 context
         setEGLContextClientVersion(2)
 
-        renderer = MyGLRenderer()
+        renderer = SkikoAndroidGLRenderer()
 
         // Set the Renderer for drawing on the GLSurfaceView
         setRenderer(renderer)
     }
 }
 
-class MyGLRenderer : GLSurfaceView.Renderer {
-    override fun onSurfaceCreated(unused: GL10?, p1: javax.microedition.khronos.egl.EGLConfig?) {
+class SkikoAndroidGLRenderer : GLSurfaceView.Renderer {
+    override fun onSurfaceCreated(gl: GL10?, config: javax.microedition.khronos.egl.EGLConfig?) {
         // Set the background frame color
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f)
     }
 
-    override fun onDrawFrame(unused: GL10) {
+    override fun onDrawFrame(gl: GL10) {
         // Redraw background color
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
     }
 
-    override fun onSurfaceChanged(unused: GL10, width: Int, height: Int) {
+    override fun onSurfaceChanged(gl: GL10, width: Int, height: Int) {
         GLES20.glViewport(0, 0, width, height)
     }
 }
