@@ -1,5 +1,7 @@
 package org.jetbrains.skiko
 
+import kotlinx.browser.window
+import org.khronos.webgl.WebGLRenderingContext
 import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.events.InputEvent
 import org.w3c.dom.events.KeyboardEvent
@@ -11,7 +13,7 @@ actual open class SkiaLayer {
 
     actual var renderApi: GraphicsApi = GraphicsApi.WEBGL
     actual val contentScale: Float
-        get() = 1.0f
+        get() = window.devicePixelRatio.toFloat()
     actual var fullscreen: Boolean
         get() = false
         set(value) {
@@ -40,6 +42,18 @@ actual open class SkiaLayer {
     private var isPointerPressed = false
 
     fun attachTo(htmlCanvas: HTMLCanvasElement, autoDetach: Boolean = true) {
+        val desiredWidth = htmlCanvas.width
+        val desiredHeight = htmlCanvas.height
+
+        if (htmlCanvas.asDynamic().skikoScaled == undefined) {
+            val scale = contentScale
+            htmlCanvas.asDynamic().skikoScaled = true
+            htmlCanvas.style.width = "${desiredWidth}px"
+            htmlCanvas.style.height = "${desiredHeight}px"
+            htmlCanvas.width = (desiredWidth * scale).toInt()
+            htmlCanvas.height = (desiredHeight * scale).toInt()
+        }
+
         state = object: CanvasRenderer(htmlCanvas) {
             override fun drawFrame(currentTimestamp: Double) {
                 // currentTimestamp is in milliseconds.
