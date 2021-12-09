@@ -10,7 +10,7 @@ import java.lang.ref.Reference
 internal class DirectSoftwareContextHandler(layer: SkiaLayer) : JvmContextHandler(layer) {
     var isInited = false
 
-    val softwareRedrawer: AbstractDirectSoftwareRedrawer
+    private val softwareRedrawer: AbstractDirectSoftwareRedrawer
         get() = layer.redrawer!! as AbstractDirectSoftwareRedrawer
 
     private var currentWidth = 0

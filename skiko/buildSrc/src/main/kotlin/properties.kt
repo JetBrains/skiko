@@ -6,6 +6,7 @@ enum class OS(
     val clangFlags: Array<String>
 ) {
     Linux("linux", arrayOf()),
+    Android("android", arrayOf()),
     Windows("windows", arrayOf()),
     MacOS("macos", arrayOf("-mmacosx-version-min=10.13")),
     Wasm("wasm", arrayOf()),
@@ -22,6 +23,7 @@ val OS.isCompatibleWithHost: Boolean
         OS.Windows -> hostOs == OS.Windows
         OS.MacOS, OS.IOS -> hostOs == OS.MacOS
         OS.Wasm -> true
+        OS.Android -> true
     }
 
 fun compilerForTarget(os: OS, arch: Arch): String =
@@ -31,6 +33,7 @@ fun compilerForTarget(os: OS, arch: Arch): String =
             Arch.Arm64 -> "clang++"
             Arch.Wasm -> "Unexpected combination: $os & $arch"
         }
+        OS.Android -> "clang++"
         OS.Windows -> "cl.exe"
         OS.MacOS, OS.IOS -> "clang++"
         OS.Wasm -> "emcc"
@@ -41,7 +44,7 @@ fun linkerForTarget(os: OS, arch: Arch): String =
 
 val OS.dynamicLibExt: String
     get() = when (this) {
-        OS.Linux -> ".so"
+        OS.Linux, OS.Android -> ".so"
         OS.Windows -> ".dll"
         OS.MacOS, OS.IOS -> ".dylib"
         OS.Wasm -> ".wasm"
@@ -114,8 +117,6 @@ fun findTargetArch() = when (System.getProperty("skiko.target.os.arch")) {
 
 val targetOs = findTargetOs() ?: hostOs
 val targetArch = findTargetArch() ?: hostArch
-
-val target = targetId(targetOs, targetArch)
 
 fun targetId(os: OS, arch: Arch) =
     "${os.id}-${arch.id}"

@@ -19,8 +19,8 @@ internal fun makeMetalContext() = DirectContext(
     makeMetalContextNative().also { if (it == 0L) TODO("not yet supported") }
 )
 
-external private fun makeGLRenderTargetNative(width: Int, height: Int, sampleCnt: Int, stencilBits: Int, fbId: Int, fbFormat: Int): Long
-external private fun makeGLContextNative(): Long
+private external fun makeGLRenderTargetNative(width: Int, height: Int, sampleCnt: Int, stencilBits: Int, fbId: Int, fbFormat: Int): Long
+private external fun makeGLContextNative(): Long
 
-external private fun makeMetalRenderTargetNative(width: Int, height: Int, sampleCnt: Int): Long
-external private fun makeMetalContextNative(): Long
+private external fun makeMetalRenderTargetNative(width: Int, height: Int, sampleCnt: Int): Long
+private external fun makeMetalContextNative(): Long

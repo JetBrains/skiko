@@ -5,12 +5,11 @@
 
 class SkijaDrawableImpl: public SkDrawable {
 public:
-    SkijaDrawableImpl() {
-    }
+    SkijaDrawableImpl() {}
 
     ~SkijaDrawableImpl() {
         JNIEnv* env;
-        if (fJavaVM->GetEnv(AS_JNI_ENV_PTR(&env), SKIKO_JNI_VERSION) == JNI_OK)
+        if (fJavaVM->GetEnv(reinterpret_cast<void**>(&env), SKIKO_JNI_VERSION) == JNI_OK)
           env->DeleteGlobalRef(fObject);
     }
 

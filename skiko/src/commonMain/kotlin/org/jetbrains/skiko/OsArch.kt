@@ -1,6 +1,7 @@
 package org.jetbrains.skiko
 
 enum class OS(val id: String) {
+    Android("android"),
     Linux("linux"),
     Windows("windows"),
     MacOS("macos"),

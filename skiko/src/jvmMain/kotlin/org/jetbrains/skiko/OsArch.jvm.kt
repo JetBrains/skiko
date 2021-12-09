@@ -4,8 +4,9 @@ actual val hostOs: OS by lazy {
     val osName = System.getProperty("os.name")
     when {
         osName == "Mac OS X" -> OS.MacOS
-        osName == "Linux" -> OS.Linux
         osName.startsWith("Win") -> OS.Windows
+        "The Android Project" == System.getProperty("java.specification.vendor") -> OS.Android
+        osName == "Linux" -> OS.Linux
         else -> throw Error("Unknown OS $osName")
     }
 }

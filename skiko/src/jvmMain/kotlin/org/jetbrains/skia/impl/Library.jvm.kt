@@ -8,7 +8,7 @@ actual class Library {
         var loaded = AtomicBoolean(false)
         @JvmStatic
         actual fun staticLoad() {
-            if (!loaded.compareAndExchange(false, true)) {
+            if (loaded.compareAndSet(false, true)) {
               Library.load()
             }
         }

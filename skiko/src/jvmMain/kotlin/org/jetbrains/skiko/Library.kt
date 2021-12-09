@@ -53,7 +53,7 @@ object Library {
     // localization resource on platforms where it is needed.
     @Synchronized
     fun load() {
-        if (loaded.compareAndExchange(false, true)) return
+        if (!loaded.compareAndSet(false, true)) return
 
         // Find/unpack a usable copy of the native library.
         findAndLoad()
