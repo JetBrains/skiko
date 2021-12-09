@@ -119,31 +119,6 @@ internal val platformOperations: PlatformOperations by lazy {
                 }
             }
         }
-        OS.Linux -> {
-            object: PlatformOperations {
-                override fun isFullscreen(component: Component): Boolean {
-                    val window = SwingUtilities.getRoot(component) as Window
-                    val device = window.graphicsConfiguration.device
-                    return device.getFullScreenWindow() == window
-                }
-
-                override fun setFullscreen(component: Component, value: Boolean) {
-                    val window = SwingUtilities.getRoot(component) as Window
-                    val device = window.graphicsConfiguration.device
-                    device.setFullScreenWindow(if (value) window else null)
-                }
-
-                override fun disableTitleBar(component: Component, headerHeight: Float) {
-                }
-
-                override fun orderEmojiAndSymbolsPopup() {
-                }
-
-                override fun getDpiScale(component: Component): Float {
-                    return component.graphicsConfiguration.defaultTransform.scaleX.toFloat()
-                }
-            }
-        }
         OS.Android -> TODO()
         OS.JS, OS.Ios -> {
             TODO("Commonize me")

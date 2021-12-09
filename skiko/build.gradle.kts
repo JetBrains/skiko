@@ -211,7 +211,7 @@ val Project.supportWasm: Boolean
     get() = findProperty("skiko.wasm.enabled") == "true" || isInIdea
 
 val Project.supportAndroid: Boolean
-    get() = findProperty("skiko.android.enabled") == "true" || isInIdea
+    get() = findProperty("skiko.android.enabled") == "true"
 
 kotlin {
     jvm {
@@ -256,14 +256,14 @@ kotlin {
             }
         }
 
-        val androidMain by creating {
+        /*
+        val androidMain by getting {
             dependencies {
-                if (supportAndroid) implementation(files(androidJar()))
+                compileOnly(files(androidJar()))
             }
-        }
+        } */
 
         val jvmMain by getting {
-            if (supportAndroid) dependsOn(androidMain)
             dependencies {
                 implementation(kotlin("stdlib"))
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:$coroutinesVersion")
@@ -529,12 +529,11 @@ fun skiaStaticLibraries(skiaDir: String, targetString: String): List<String> {
 }
 
 val skiaJvmBindingsDir: Provider<File> = registerOrGetSkiaDirProvider(targetOs, targetArch)
-
 val compileJvmBindings = createCompileJvmBindingsTask(targetOs, targetArch, skiaJvmBindingsDir)
 val linkJvmBindings = createLinkJvmBindings(targetOs, targetArch, skiaJvmBindingsDir, compileJvmBindings)
 val maybeSign = maybeSignTask(targetOs, targetArch, linkJvmBindings)
-val createChecksums =  createChecksumsTask(targetOs, targetArch, maybeSign)
-val skikoJvmRuntimeJar = skikoJvmRuntimeJarTask(targetOs, targetArch, maybeSign, createChecksums)
+val createChecksums =  createChecksumsTask(targetOs, targetArch, maybeSign, skiaJvmBindingsDir)
+val skikoJvmRuntimeJar = skikoJvmRuntimeJarTask(targetOs, targetArch, maybeSign, createChecksums, skiaJvmBindingsDir)
 val skikoRuntimeDirForTests = skikoRuntimeDirForTestsTask(targetOs, targetArch, skikoJvmRuntimeJar)
 
 val allJvmRuntimeJars = mutableMapOf((targetOs to targetArch) to skikoJvmRuntimeJar)
@@ -547,8 +546,8 @@ if (supportAndroid) {
         val linkAndroidBindings =
             createLinkJvmBindings(OS.Android, arch, skiaAndroidBindingsDir, compileAndroidBindings)
         val maybeSignAndroid = maybeSignTask(os, arch, linkAndroidBindings)
-        val createChecksumsAndroid =  createChecksumsTask(os, arch, maybeSignAndroid)
-        val skikoJvmRuntimeJarAndroid = skikoJvmRuntimeJarTask(os, arch, maybeSignAndroid, createChecksumsAndroid)
+        val createChecksumsAndroid = createChecksumsTask(os, arch, maybeSignAndroid, skiaAndroidBindingsDir)
+        val skikoJvmRuntimeJarAndroid = skikoJvmRuntimeJarTask(os, arch, maybeSignAndroid, createChecksumsAndroid, skiaAndroidBindingsDir)
         allJvmRuntimeJars[os to arch] = skikoJvmRuntimeJarAndroid
     }
 }
@@ -837,7 +836,7 @@ fun generateVersionTask(targetOs: OS, targetArch: Arch) = project.tasks.register
     }
 }
 
-val skikoJvmJar: Provider<Jar> by project.tasks.registering(Jar::class) {
+val skikoJvmJar by project.tasks.registering(Jar::class) {
     archiveBaseName.set("skiko-jvm")
     from(kotlin.jvm().compilations["main"].output.allOutputs)
 }
@@ -871,28 +870,33 @@ fun maybeSignTask(targetOs: OS, targetArch: Arch, linkJvmBindings: Provider<Link
     signToken.set(skiko.signToken)
 }
 
-fun createChecksumsTask(targetOs: OS, targetArch: Arch, maybeSign: Provider<SealAndSignSharedLibraryTask>) = project.tasks.register<Checksum>("createChecksums-${targetOs.id}-${targetArch.id}") {
-    val skiaBinSubdir = "out/${buildType.id}-${targetOs.id}-${targetArch.id}"
-    dependsOn(maybeSign)
-    files = project.files(maybeSign.flatMap { it.outputFiles }) +
-            if (targetOs.isWindows) files(skiaJvmBindingsDir.map { it.resolve("${skiaBinSubdir}/icudtl.dat") }) else files()
-    algorithm = Checksum.Algorithm.SHA256
-    outputDir = file("$buildDir/checksums")
-}
+fun createChecksumsTask(targetOs: OS, targetArch: Arch,
+                        maybeSign: Provider<SealAndSignSharedLibraryTask>,
+                        bindingsDir: Provider<File>) =
+    project.tasks.register<Checksum>("createChecksums-${targetOs.id}-${targetArch.id}") {
+        val skiaBinSubdir = "out/${buildType.id}-${targetOs.id}-${targetArch.id}"
+        dependsOn(maybeSign)
+        files = project.files(maybeSign.flatMap { it.outputFiles }) +
+                if (targetOs.isWindows) files(bindingsDir.map { it.resolve("${skiaBinSubdir}/icudtl.dat") }) else files()
+        algorithm = Checksum.Algorithm.SHA256
+        outputDir = file("$buildDir/checksums")
+    }
 
 fun skikoJvmRuntimeJarTask(targetOs: OS, targetArch: Arch,
                            maybeSign: Provider<SealAndSignSharedLibraryTask>,
-                           createChecksums: Provider<Checksum>) =
+                           createChecksums: Provider<Checksum>,
+                           bindingsDir: Provider<File>) =
   project.tasks.register<Jar>("skikoJvmRuntimeJar-${targetOs.id}-${targetArch.id}") {
       dependsOn(maybeSign)
       dependsOn(createChecksums)
+      dependsOn(skikoJvmJar)
       val target = targetId(targetOs, targetArch)
       val skiaBinSubdir = "out/${buildType.id}-$target"
       archiveBaseName.set("skiko-$target")
       from(skikoJvmJar.map { zipTree(it.archiveFile) })
       from(maybeSign.flatMap { it.outputFiles })
       if (targetOs.isWindows) {
-          from(files(skiaJvmBindingsDir.map { it.resolve("${skiaBinSubdir}/icudtl.dat") }))
+          from(files(bindingsDir.map { it.resolve("${skiaBinSubdir}/icudtl.dat") }))
       }
       from(createChecksums.map { it.outputs.files })
 }
