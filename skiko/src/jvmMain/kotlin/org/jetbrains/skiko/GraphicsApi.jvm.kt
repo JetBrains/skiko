@@ -19,7 +19,7 @@ internal fun isVideoCardSupported(renderApi: GraphicsApi): Boolean {
                 if (it == null) { return false }
             }
             adaptersList.forEach {
-                if (adapter.startsWith(it)) {
+                if (adapter?.startsWith(it) == true) {
                     return false
                 }
             }
