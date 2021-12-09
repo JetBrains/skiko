@@ -1,13 +1,13 @@
 package org.jetbrains.skiko.redrawer
 
 import kotlinx.coroutines.*
-import kotlinx.coroutines.swing.Swing
 import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.FrameLimiter
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaLayerProperties
-import org.jetbrains.skiko.context.MetalContextHandler
 import org.jetbrains.skiko.context.SoftwareContextHandler
+
+expect val MainUIDispatcher: MainCoroutineDispatcher
 
 internal class SoftwareRedrawer(
     private val layer: SkiaLayer,
@@ -19,7 +19,7 @@ internal class SoftwareRedrawer(
     private val frameJob = Job()
     private val frameLimiter = FrameLimiter(CoroutineScope(Dispatchers.IO + frameJob), layer.backedLayer)
 
-    private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
+    private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
         if (properties.isVsyncEnabled && properties.isVsyncFramelimitFallbackEnabled) {
             frameLimiter.awaitNextFrame()
         }

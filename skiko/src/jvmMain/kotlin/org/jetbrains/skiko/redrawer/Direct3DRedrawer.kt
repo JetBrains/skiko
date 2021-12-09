@@ -25,7 +25,7 @@ internal class Direct3DRedrawer(
         }
     }
 
-    private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
+    private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
         if (layer.isShowing) {
             update(System.nanoTime())
             draw()

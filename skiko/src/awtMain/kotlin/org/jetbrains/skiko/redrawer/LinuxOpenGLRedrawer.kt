@@ -1,7 +1,6 @@
 package org.jetbrains.skiko.redrawer
 
 import kotlinx.coroutines.*
-import kotlinx.coroutines.swing.Swing
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.context.OpenGLContextHandler
 
@@ -97,7 +96,7 @@ internal class LinuxOpenGLRedrawer(
             .filterNot(LinuxOpenGLRedrawer::isDisposed)
             .filter { it.layer.isShowing }
 
-        private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
+        private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
             toRedrawCopy.addAll(toRedraw)
             toRedraw.clear()
 
