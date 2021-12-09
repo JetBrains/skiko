@@ -6,7 +6,6 @@ import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.context.OpenGLContextHandler
-import org.jetbrains.skiko.context.SoftwareContextHandler
 
 internal class WindowsOpenGLRedrawer(
     private val layer: SkiaLayer,
