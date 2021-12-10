@@ -40,27 +40,25 @@ actual open class SkiaLayer {
 
     private var isPointerPressed = false
 
+    private var desiredWidth = 0
+    private var desiredHeight = 0
+
     fun attachTo(htmlCanvas: HTMLCanvasElement, autoDetach: Boolean = true) {
-        val scale = contentScale
-        if (scale != 1f && htmlCanvas.asDynamic().skikoScaled == undefined) {
-            val desiredWidth = htmlCanvas.width
-            val desiredHeight = htmlCanvas.height
-            // Scale canvas to allow high DPI rendering as suggested in
-            // https://www.khronos.org/webgl/wiki/HandlingHighDPI.
-            htmlCanvas.asDynamic().skikoScaled = true
-            htmlCanvas.style.width = "${desiredWidth}px"
-            htmlCanvas.style.height = "${desiredHeight}px"
-            htmlCanvas.width = (desiredWidth * scale).toInt()
-            htmlCanvas.height = (desiredHeight * scale).toInt()
-        }
+        // Scale canvas to allow high DPI rendering as suggested in
+        // https://www.khronos.org/webgl/wiki/HandlingHighDPI.
+        desiredWidth = htmlCanvas.width
+        desiredHeight = htmlCanvas.height
+        htmlCanvas.style.width = "${desiredWidth}px"
+        htmlCanvas.style.height = "${desiredHeight}px"
+        setOnChangeScaleNotifier()
 
         state = object: CanvasRenderer(htmlCanvas) {
             override fun drawFrame(currentTimestamp: Double) {
                 // currentTimestamp is in milliseconds.
                 val currentNanos = currentTimestamp * 1_000_000
-                skikoView?.onRender(canvas, width, height, currentNanos.toLong())
+                skikoView?.onRender(canvas!!, width, height, currentNanos.toLong())
             }
-        }
+        }.apply { initCanvas(desiredWidth, desiredHeight, contentScale) }
         // See https://www.w3schools.com/jsref/dom_obj_event.asp
         // https://developer.mozilla.org/en-US/docs/Web/API/Pointer_events
         htmlCanvas.addEventListener("pointerdown", { event ->
@@ -97,7 +95,15 @@ actual open class SkiaLayer {
             skikoView?.onKeyboardEvent(toSkikoEvent(event, SkikoKeyboardEventKind.UP))
         })
     }
+
+    private fun setOnChangeScaleNotifier() {
+        state?.initCanvas(desiredWidth, desiredHeight, contentScale)
+        window.matchMedia("(resolution: ${contentScale}dppx)").addEventListener("change", { setOnChangeScaleNotifier() }, true)
+        onContentScaleChanged?.invoke(contentScale)
+    }
 }
+
+var onContentScaleChanged: ((Float) -> Unit)? = null
 
 actual typealias SkikoGesturePlatformEvent = Any
 actual typealias SkikoPlatformInputEvent = InputEvent
