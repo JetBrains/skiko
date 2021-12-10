@@ -253,7 +253,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(kotlin("stdlib-common"))
+                implementation(kotlin("stdlib"))
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
             }
         }
@@ -272,8 +272,10 @@ kotlin {
         } */
 
         val jvmMain by creating {
+            dependsOn(commonMain)
             dependencies {
                 implementation(kotlin("stdlib"))
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:$coroutinesVersion")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:$coroutinesVersion")
             }
         }
