@@ -157,6 +157,8 @@ actual open class SkiaLayer internal constructor(
         jComponent.add(this)
     }
 
+    private var keyEvent: KeyEvent? = null
+
     fun addView(view: SkikoView) {
         skikoView = view
         addMouseListener(object : MouseAdapter() {
@@ -191,22 +193,24 @@ actual open class SkiaLayer internal constructor(
 
         addKeyListener(object : KeyAdapter() {
             override fun keyPressed(e: KeyEvent) {
+                keyEvent = e
                 skikoView?.onKeyboardEvent(toSkikoEvent(e))
             }
             override fun keyReleased(e: KeyEvent) {
+                keyEvent = e
                 skikoView?.onKeyboardEvent(toSkikoEvent(e))
             }
             override fun keyTyped(e: KeyEvent) {
-                skikoView?.onInputEvent(toSkikoTypeEvent(e))
+                skikoView?.onInputEvent(toSkikoTypeEvent(e, keyEvent))
             }
         })
 
         addInputMethodListener(object : InputMethodListener {
             override fun caretPositionChanged(e: InputMethodEvent) {
-                skikoView?.onInputEvent(toSkikoEvent(e))
+                skikoView?.onInputEvent(toSkikoTypeEvent(e, keyEvent))
             }
             override fun inputMethodTextChanged(e: InputMethodEvent) {
-                skikoView?.onInputEvent(toSkikoEvent(e))
+                skikoView?.onInputEvent(toSkikoTypeEvent(e, keyEvent))
             }
         })
     }
@@ -546,6 +550,7 @@ internal fun defaultFPSCounter(
 }
 
 // InputEvent is abstract, so we wrap to match modality.
+actual typealias SkikoTouchPlatformEvent = Any
 actual typealias SkikoGesturePlatformEvent = Any
 actual typealias SkikoPlatformInputEvent = Any
 actual typealias SkikoPlatformKeyboardEvent = KeyEvent

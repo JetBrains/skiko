@@ -94,6 +94,7 @@ fun toSkikoEvent(event: MouseEvent): SkikoPointerEvent {
             MouseEvent.MOUSE_EXITED -> SkikoPointerEventKind.EXIT
             else -> SkikoPointerEventKind.UNKNOWN
         },
+        event.`when`,
         event
     )
 }
@@ -113,49 +114,52 @@ fun toSkikoEvent(event: MouseWheelEvent): SkikoPointerEvent {
             MouseEvent.MOUSE_WHEEL-> SkikoPointerEventKind.SCROLL
             else -> SkikoPointerEventKind.UNKNOWN
         },
+        event.`when`,
         event
     )
 }
 
 fun toSkikoEvent(event: KeyEvent): SkikoKeyboardEvent {
-    var key = event.keyCode
-    val side = event.getKeyLocation()
-    if (side == KEY_LOCATION_RIGHT) {
-        if (
-            key == SkikoKey.KEY_LEFT_CONTROL.value ||
-            key == SkikoKey.KEY_LEFT_SHIFT.value ||
-            key == SkikoKey.KEY_LEFT_META.value
-        )
-        key = key.or(0x80000000.toInt())
-    }
-    if (side == KEY_LOCATION_NUMPAD) {
-        if (key == SkikoKey.KEY_ENTER.value) {
-            key = key.or(0x80000000.toInt())
-        }
-    }
     return SkikoKeyboardEvent(
-        SkikoKey.valueOf(key),
+        SkikoKey.valueOf(toSkikoKey(event)),
         toSkikoModifiers(event.modifiersEx),
         when(event.id) {
             KeyEvent.KEY_PRESSED -> SkikoKeyboardEventKind.DOWN
             KeyEvent.KEY_RELEASED -> SkikoKeyboardEventKind.UP
             else -> SkikoKeyboardEventKind.UNKNOWN
         },
+        event.`when`,
         event
     )
 }
 
-fun toSkikoTypeEvent(event: KeyEvent): SkikoInputEvent {
+fun toSkikoTypeEvent(typeEvent: KeyEvent, keyEvent: KeyEvent?): SkikoInputEvent {
+    var key: Int = -1
+    var modifiers = SkikoInputModifiers.EMPTY
+    if (keyEvent != null) {
+        key = toSkikoKey(keyEvent)
+        modifiers = toSkikoModifiers(keyEvent.modifiersEx)
+    }
     return SkikoInputEvent(
-        event.keyChar.toString(),
+        typeEvent.keyChar.toString(),
+        SkikoKey.valueOf(key),
+        modifiers,
         SkikoKeyboardEventKind.TYPE,
-        event
+        typeEvent
     )
 }
 
-fun toSkikoEvent(event: InputMethodEvent): SkikoInputEvent {
+fun toSkikoTypeEvent(event: InputMethodEvent, keyEvent: KeyEvent?): SkikoInputEvent {
+    var key: Int = -1
+    var modifiers = SkikoInputModifiers.EMPTY
+    if (keyEvent != null) {
+        key = toSkikoKey(keyEvent)
+        modifiers = toSkikoModifiers(keyEvent.modifiersEx)
+    }
     return SkikoInputEvent(
         "",
+        SkikoKey.valueOf(key),
+        modifiers,
         SkikoKeyboardEventKind.TYPE,
         event
     )

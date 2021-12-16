@@ -194,9 +194,16 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
         }
     }
 
+    override fun onTouchEvent(events: Set<SkikoTouchEvent>) {
+        val event = events.first()
+        if (event.kind == SkikoTouchEventKind.STARTED) {
+            xpos = event.x - xOffset
+            ypos = event.y - yOffset
+        }
+    }
+
     override fun onGestureEvent(event: SkikoGestureEvent) {
         when (event.kind) {
-            SkikoGestureEventKind.PRESS,
             SkikoGestureEventKind.TAP -> {
                 xpos = event.x - xOffset
                 ypos = event.y - yOffset

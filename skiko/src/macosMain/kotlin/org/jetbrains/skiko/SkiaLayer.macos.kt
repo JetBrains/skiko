@@ -111,14 +111,16 @@ actual open class SkiaLayer() {
                 skikoView?.onPointerEvent(toSkikoScrollEvent(event))
             }
             override fun keyDown(event: NSEvent) {
-                skikoView?.onKeyboardEvent(toSkikoEvent(event, SkikoKeyboardEventKind.DOWN))
                 keyEvent = event
+                skikoView?.onKeyboardEvent(toSkikoEvent(event, SkikoKeyboardEventKind.DOWN))
                 interpretKeyEvents(listOf(event))
             }
             override fun flagsChanged(event: NSEvent) {
+                keyEvent = event
                 skikoView?.onKeyboardEvent(toSkikoEvent(event))
             }
             override fun keyUp(event: NSEvent) {
+                keyEvent = event
                 skikoView?.onKeyboardEvent(toSkikoEvent(event, SkikoKeyboardEventKind.UP))
             }
             
@@ -151,7 +153,7 @@ actual open class SkiaLayer() {
                 } else {
                     character = string as String
                 }
-                skikoView?.onInputEvent(toSkikoTypeEvent(character, keyEvent!!))
+                skikoView?.onInputEvent(toSkikoTypeEvent(character, keyEvent))
             }
             override fun setMarkedText(string: Any, selectedRange: CValue<NSRange>, replacementRange: CValue<NSRange>) {
                 if (string is NSAttributedString) {
@@ -232,6 +234,7 @@ actual open class SkiaLayer() {
 }
 
 // TODO: do properly
+actual typealias SkikoTouchPlatformEvent = NSEvent
 actual typealias SkikoGesturePlatformEvent = NSEvent
 actual typealias SkikoPlatformInputEvent = NSEvent
 actual typealias SkikoPlatformKeyboardEvent = NSEvent

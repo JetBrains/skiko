@@ -24,6 +24,7 @@ class SkikoViewController : UIViewController, UIKeyInputProtocol {
 
     override fun canBecomeFirstResponder() = true
 
+    private var keyEvent: UIPress? = null
     private var inputText: String = ""
     override fun hasText(): Boolean {
         return inputText.length > 0
@@ -31,7 +32,7 @@ class SkikoViewController : UIViewController, UIKeyInputProtocol {
 
     override fun insertText(theText: String) {
         inputText += theText
-        skikoLayer.skikoView?.onInputEvent(toSkikoTypeEvent(theText))
+        skikoLayer.skikoView?.onInputEvent(toSkikoTypeEvent(theText, keyEvent))
     }
 
     override fun deleteBackward() {
@@ -41,8 +42,9 @@ class SkikoViewController : UIViewController, UIKeyInputProtocol {
     override fun pressesBegan(presses: Set<*>, withEvent: UIPressesEvent?) {
         if (withEvent != null) {
             for (press in withEvent.allPresses) {
+                keyEvent = press as UIPress
                 skikoLayer.skikoView?.onKeyboardEvent(
-                    toSkikoKeyboardEvent(press as UIPress, SkikoKeyboardEventKind.DOWN)
+                    toSkikoKeyboardEvent(press, SkikoKeyboardEventKind.DOWN)
                 )
             }
         }
@@ -52,8 +54,9 @@ class SkikoViewController : UIViewController, UIKeyInputProtocol {
     override fun pressesEnded(presses: Set<*>, withEvent: UIPressesEvent?) {
         if (withEvent != null) {
             for (press in withEvent.allPresses) {
+                keyEvent = press as UIPress
                 skikoLayer.skikoView?.onKeyboardEvent(
-                    toSkikoKeyboardEvent(press as UIPress, SkikoKeyboardEventKind.UP)
+                    toSkikoKeyboardEvent(press, SkikoKeyboardEventKind.UP)
                 )
             }
         }
@@ -62,20 +65,58 @@ class SkikoViewController : UIViewController, UIKeyInputProtocol {
 
     override fun touchesBegan(touches: Set<*>, withEvent: UIEvent?) {
         super.touchesBegan(touches, withEvent)
-        val sender = (touches.elementAt(0) as UITouch)
-        val (x, y) = sender.locationInView(null).useContents { x to y }
-        skikoLayer.skikoView?.onGestureEvent(
-            SkikoGestureEvent(
-                x = x,
-                y = y,
-                kind = SkikoGestureEventKind.PRESS,
-                state = SkikoGestureEventState.PRESSED
+        val events: MutableSet<SkikoTouchEvent> = mutableSetOf()
+        for (touch in touches) {
+            val event = touch as UITouch
+            val (x, y) = event.locationInView(null).useContents { x to y }
+            val timestamp = (event.timestamp * 1_000).toLong()
+            events.add(
+                SkikoTouchEvent(x, y, SkikoTouchEventKind.STARTED, timestamp, event)
             )
-        )
+        }
+        skikoLayer.skikoView?.onTouchEvent(events)
     }
 
     override fun touchesEnded(touches: Set<*>, withEvent: UIEvent?) {
         super.touchesEnded(touches, withEvent)
+        val events: MutableSet<SkikoTouchEvent> = mutableSetOf()
+        for (touch in touches) {
+            val event = touch as UITouch
+            val (x, y) = event.locationInView(null).useContents { x to y }
+            val timestamp = (event.timestamp * 1_000).toLong()
+            events.add(
+                SkikoTouchEvent(x, y, SkikoTouchEventKind.ENDED, timestamp, event)
+            )
+        }
+        skikoLayer.skikoView?.onTouchEvent(events)
+    }
+
+    override fun touchesMoved(touches: Set<*>, withEvent: UIEvent?) {
+        super.touchesMoved(touches, withEvent)
+        val events: MutableSet<SkikoTouchEvent> = mutableSetOf()
+        for (touch in touches) {
+            val event = touch as UITouch
+            val (x, y) = event.locationInView(null).useContents { x to y }
+            val timestamp = (event.timestamp * 1_000).toLong()
+            events.add(
+                SkikoTouchEvent(x, y, SkikoTouchEventKind.MOVED, timestamp, event)
+            )
+        }
+        skikoLayer.skikoView?.onTouchEvent(events)
+    }
+
+    override fun touchesCancelled(touches: Set<*>, withEvent: UIEvent?) {
+        super.touchesCancelled(touches, withEvent)
+        val events: MutableSet<SkikoTouchEvent> = mutableSetOf()
+        for (touch in touches) {
+            val event = touch as UITouch
+            val (x, y) = event.locationInView(null).useContents { x to y }
+            val timestamp = (event.timestamp * 1_000).toLong()
+            events.add(
+                SkikoTouchEvent(x, y, SkikoTouchEventKind.CANCELLED, timestamp, event)
+            )
+        }
+        skikoLayer.skikoView?.onTouchEvent(events)
     }
 
     internal lateinit var appFactory: (SkiaLayer) -> SkikoView

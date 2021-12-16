@@ -16,6 +16,7 @@ fun toSkikoEvent(
         toSkikoMouseButtons(event, buttons),
         toSkikoModifiers(event),
         kind,
+        event.timeStamp.toLong(),
         event
     )
 }
@@ -29,6 +30,7 @@ fun toSkikoDragEvent(
         toSkikoMouseButtons(event, true),
         toSkikoModifiers(event),
         SkikoPointerEventKind.DRAG,
+        event.timeStamp.toLong(),
         event
     )
 }
@@ -41,6 +43,7 @@ fun toSkikoEvent(
         SkikoKey.valueOf(toSkikoKey(event)),
         toSkikoModifiers(event),
         kind,
+        event.timeStamp.toLong(),
         event
     )
 }
@@ -55,6 +58,7 @@ fun toSkikoScrollEvent(
         toSkikoMouseButtons(event, buttons),
         toSkikoModifiers(event),
         SkikoPointerEventKind.SCROLL,
+        event.timeStamp.toLong(),
         event
     )
 }

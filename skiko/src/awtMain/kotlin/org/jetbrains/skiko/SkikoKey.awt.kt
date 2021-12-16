@@ -5,7 +5,7 @@ import java.awt.event.KeyEvent.*
 actual enum class SkikoKey(val value: Int) {
     KEY_UNKNOWN(-1),
     KEY_A(VK_A),
-    KEY_S(VK_B),
+    KEY_S(VK_S),
     KEY_D(VK_D),
     KEY_F(VK_F),
     KEY_H(VK_H),
