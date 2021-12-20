@@ -1,7 +1,6 @@
 package org.jetbrains.skiko
 
 import org.jetbrains.skia.*
-import org.jetbrains.skiko.context.ContextHandler
 import org.jetbrains.skiko.redrawer.Redrawer
 import java.awt.Color
 import java.awt.Component

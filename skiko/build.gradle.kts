@@ -214,9 +214,17 @@ val Project.supportAndroid: Boolean
     get() = findProperty("skiko.android.enabled") == "true"
 
 kotlin {
-    jvm {
+    jvm("awt") {
         compilations.all {
             kotlinOptions.jvmTarget = "11"
+        }
+    }
+
+    if (supportAndroid) {
+        jvm("android") {
+            compilations.all {
+                kotlinOptions.jvmTarget = "11"
+            }
         }
     }
 
@@ -245,7 +253,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(kotlin("stdlib-common"))
+                implementation(kotlin("stdlib"))
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
             }
         }
@@ -259,22 +267,51 @@ kotlin {
         /*
         val androidMain by getting {
             dependencies {
-                compileOnly(files(androidJar()))
+
             }
         } */
 
-        val jvmMain by getting {
+        val jvmMain by creating {
+            dependsOn(commonMain)
             dependencies {
                 implementation(kotlin("stdlib"))
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:$coroutinesVersion")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:$coroutinesVersion")
             }
-
         }
-        val jvmTest by getting {
+
+        val awtMain by getting {
+            dependsOn(jvmMain)
+            dependencies {
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:$coroutinesVersion")
+            }
+        }
+
+        if (supportAndroid) {
+            val androidMain by getting {
+                dependsOn(jvmMain)
+                dependencies {
+                    compileOnly(files(androidJar()))
+                    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion")
+                }
+            }
+        }
+
+        val jvmTest by creating {
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
                 implementation(kotlin("test-junit"))
                 implementation(kotlin("test"))
+            }
+        }
+
+        val awtTest by getting {
+            dependsOn(jvmTest)
+        }
+
+        if (supportAndroid) {
+            val androidTest by getting {
+                dependsOn(jvmTest)
             }
         }
 
@@ -838,7 +875,7 @@ fun generateVersionTask(targetOs: OS, targetArch: Arch) = project.tasks.register
 
 val skikoJvmJar by project.tasks.registering(Jar::class) {
     archiveBaseName.set("skiko-jvm")
-    from(kotlin.jvm().compilations["main"].output.allOutputs)
+    from(kotlin.jvm("awt").compilations["main"].output.allOutputs)
 }
 
 fun maybeSignTask(targetOs: OS, targetArch: Arch, linkJvmBindings: Provider<LinkSkikoTask>) =
@@ -1037,7 +1074,7 @@ publishing {
                 afterEvaluate {
                     artifact(entry.value.map { it.archiveFile.get() })
                     var jvmSourcesArtifact: Any? = null
-                    kotlin.jvm().mavenPublication {
+                    kotlin.jvm("awt").mavenPublication {
                         jvmSourcesArtifact = artifacts.find { it.classifier == "sources" }
                     }
                     if (jvmSourcesArtifact == null) {

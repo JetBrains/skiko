@@ -74,13 +74,13 @@ internal val platformOperations: PlatformOperations by lazy {
                 override fun isFullscreen(component: Component): Boolean {
                     val window = SwingUtilities.getRoot(component) as Window
                     val device = window.graphicsConfiguration.device
-                    return device.getFullScreenWindow() == window
+                    return device.fullScreenWindow == window
                 }
 
                 override fun setFullscreen(component: Component, value: Boolean) {
                     val window = SwingUtilities.getRoot(component) as Window
                     val device = window.graphicsConfiguration.device
-                    device.setFullScreenWindow(if (value) window else null)
+                    device.fullScreenWindow = if (value) window else null
                 }
 
                 override fun disableTitleBar(component: Component, headerHeight: Float) {
@@ -99,13 +99,13 @@ internal val platformOperations: PlatformOperations by lazy {
                 override fun isFullscreen(component: Component): Boolean {
                     val window = SwingUtilities.getRoot(component) as Window
                     val device = window.graphicsConfiguration.device
-                    return device.getFullScreenWindow() == window
+                    return device.fullScreenWindow == window
                 }
 
                 override fun setFullscreen(component: Component, value: Boolean) {
                     val window = SwingUtilities.getRoot(component) as Window
                     val device = window.graphicsConfiguration.device
-                    device.setFullScreenWindow(if (value) window else null)
+                    device.fullScreenWindow = if (value) window else null
                 }
 
                 override fun disableTitleBar(component: Component, headerHeight: Float) {

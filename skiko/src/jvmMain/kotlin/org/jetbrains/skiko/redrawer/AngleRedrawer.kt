@@ -20,7 +20,7 @@ internal class AngleRedrawer(
     private var isDisposed = false
     private var device: Long = 0
 
-    private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
+    private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
         if (layer.isShowing) {
             update(System.nanoTime())
             draw()

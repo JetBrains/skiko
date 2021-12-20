@@ -1,6 +1,6 @@
 package org.jetbrains.skiko
 
-import javax.swing.UIManager
+expect fun setSystemLookAndFeel()
 
 internal object Setup {
     fun init(
@@ -22,7 +22,7 @@ internal object Setup {
         try {
             if (globalLAF) {
                 // Setup menu look and feel.
-                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
+                setSystemLookAndFeel()
             }
             if (useScreenMenuBar) {
                 System.setProperty("apple.laf.useScreenMenuBar", "true")

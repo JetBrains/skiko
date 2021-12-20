@@ -1,11 +1,16 @@
 package org.jetbrains.skiko
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.awt.Canvas
 import java.awt.Component
 import java.awt.Graphics
 import java.awt.event.InputMethodEvent
 import javax.accessibility.Accessible
 import javax.accessibility.AccessibleContext
+import kotlin.time.ExperimentalTime
 
 internal open class HardwareLayer(
     externalAccessibleFactory: ((Component) -> Accessible)? = null
@@ -81,4 +86,51 @@ internal open class HardwareLayer(
         val res = _externalAccessible?.accessibleContext
         return res ?: super.getAccessibleContext()
     }
+}
+
+/**
+ * HardwareLayer should not dispose native resources while [scope] is active.
+ *
+ * So wait for scope cancellation in dispose method:
+ * ```
+ *  runBlocking {
+ *      frameJob.cancelAndJoin()
+ *  }
+ * ```
+ *
+ * Can be accessed from multiple threads.
+ */
+@OptIn(ExperimentalTime::class)
+@Suppress("UNUSED_PARAMETER")
+internal fun FrameLimiter(
+    scope: CoroutineScope,
+    component: HardwareLayer,
+    onNewFrameLimit: (frameLimit: Double) -> Unit = {}
+): FrameLimiter {
+    val state = object {
+        @Volatile
+        var frameLimit = MinMainstreamMonitorRefreshRate
+    }
+
+    val frames = Channel<Unit>(Channel.CONFLATED)
+    frames.trySend(Unit)
+
+    scope.launch {
+        while (true) {
+            frames.receive()
+            // TODO will lockLinuxDrawingSurface inside getDisplayRefreshRate can cause draw lock too?
+            // it takes 2ms on my machine on Linux (0.01ms on macOs, 0.1ms on Windows)
+            state.frameLimit = component.getDisplayRefreshRate()
+            onNewFrameLimit(state.frameLimit)
+            delay(1000)
+        }
+    }
+
+    return FrameLimiter(
+        scope,
+        frameMillis = {
+            frames.trySend(Unit)
+            (1000 / state.frameLimit).toLong()
+        }
+    )
 }

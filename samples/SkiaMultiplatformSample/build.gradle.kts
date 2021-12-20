@@ -110,10 +110,13 @@ kotlin {
             resources.srcDirs(unzipTask.map { it.destinationDir })
         }
 
-        val macosMain by creating {
+        val darwinMain by creating {
             dependsOn(nativeMain)
         }
 
+        val macosMain by creating {
+            dependsOn(darwinMain)
+        }
 
         if (hostOs == "macos") {
             val archTargetMain = when (host) {
@@ -132,7 +135,7 @@ kotlin {
                 else -> throw GradleException("Host OS is not supported")
             }
             val iosMain by creating {
-                dependsOn(nativeMain)
+                dependsOn(darwinMain)
             }
             val iosX64Main by getting {
                 dependsOn(iosMain)

@@ -23,7 +23,7 @@ class OpenGLApi private constructor() {
     external fun glEnable(flag: Int)
     external fun glBindTexture(target: Int, texture: Int)
     external fun glGetIntegerv(pname: Int): Int
-    external fun glGetString(value: Int): String
+    external fun glGetString(value: Int): String?
 
     companion object {
         init {

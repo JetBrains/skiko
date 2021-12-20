@@ -29,7 +29,7 @@ jobs:
       - shell: bash
         run: |
           cd $GITHUB_WORKSPACE/skiko
-          ./gradlew --stacktrace --info -Pskiko.native.enabled=true jvmTest
+          ./gradlew --stacktrace --info -Pskiko.native.enabled=true awtTest
           ./gradlew --stacktrace --info -Pskiko.native.enabled=true macosX64Test
           ./gradlew --stacktrace --info -Pskiko.native.enabled=true publishToMavenLocal
       - uses: actions/upload-artifact@v2
@@ -87,7 +87,7 @@ jobs:
           sudo apt-get install ninja-build fontconfig libfontconfig1-dev libglu1-mesa-dev libxrandr-dev zip xvfb -y
           sudo Xvfb :0 -screen 0 1280x720x24 &
           export DISPLAY=:0
-          ./gradlew --stacktrace --info -Pskiko.native.enabled=true linuxX64Test jvmTest
+          ./gradlew --stacktrace --info -Pskiko.native.enabled=true linuxX64Test awtTest
           ./gradlew --stacktrace --info publishToMavenLocal
       - uses: actions/upload-artifact@v2
         with:
@@ -145,7 +145,7 @@ jobs:
       - shell: bash
         run: |
           cd ./skiko
-          ./gradlew --stacktrace --info jvmTest
+          ./gradlew --stacktrace --info awtTest
           ./gradlew --stacktrace --info publishToMavenLocal
       - uses: actions/upload-artifact@v2
         with:

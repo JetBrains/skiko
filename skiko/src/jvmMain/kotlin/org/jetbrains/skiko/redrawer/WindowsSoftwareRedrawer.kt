@@ -5,8 +5,8 @@ import org.jetbrains.skiko.SkiaLayerProperties
 import org.jetbrains.skiko.RenderException
 
 internal class WindowsSoftwareRedrawer(
-    private val layer: SkiaLayer,
-    private val properties: SkiaLayerProperties
+    layer: SkiaLayer,
+    properties: SkiaLayerProperties
 ) : AbstractDirectSoftwareRedrawer(layer, properties) {
 
     init {

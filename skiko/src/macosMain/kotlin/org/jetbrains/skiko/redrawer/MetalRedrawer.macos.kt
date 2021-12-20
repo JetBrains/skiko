@@ -65,13 +65,13 @@ internal class MacOsMetalRedrawer(
 
     override fun syncSize() {
         syncContentScale()
-        val osView = skiaLayer.nsView!!
-        val (w, h) = osView.frame.useContents {
+        val osFrame = skiaLayer.nsView.frame
+        val (w, h) = osFrame.useContents {
             size.width to size.height
         }
         CATransaction.begin()
         CATransaction.setDisableActions(true)
-        metalLayer.frame = osView.frame
+        metalLayer.frame = osFrame
         metalLayer.init(skiaLayer, contextHandler, device)
         metalLayer.drawableSize = CGSizeMake(w * metalLayer.contentsScale, h * metalLayer.contentsScale)
         CATransaction.commit()
