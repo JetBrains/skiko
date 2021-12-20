@@ -411,6 +411,8 @@ actual open class SkiaLayer internal constructor(
     @Suppress("LeakingThis")
     private val fpsCounter = defaultFPSCounter(this)
 
+    private var lastSystemTheme = SystemTheme.UNKNOWN
+
     internal fun update(nanoTime: Long) {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         check(!isDisposed) { "SkiaLayer is disposed" }
@@ -427,6 +429,13 @@ actual open class SkiaLayer internal constructor(
         // clipping
         for (component in clipComponents) {
             canvas.clipRectBy(component)
+        }
+
+        // TODO: could be pretty inefficient, better add listener
+        val currentTheme = currentSystemTheme
+        if (lastSystemTheme != currentTheme) {
+            lastSystemTheme = currentTheme
+            skikoView?.onAppearanceChange()
         }
 
         try {

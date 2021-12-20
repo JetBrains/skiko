@@ -217,4 +217,8 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
             else -> {}
         }
     }
+
+    override fun onAppearanceChange() {
+        println("Change in appearance: new theme is $currentSystemTheme")
+    }
 }

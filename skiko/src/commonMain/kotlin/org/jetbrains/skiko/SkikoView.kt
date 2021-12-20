@@ -11,6 +11,9 @@ interface SkikoView {
 
     // Rendering
     fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long)
+
+    // System-wide appearance change event
+    fun onAppearanceChange() = Unit
 }
 
 open class GenericSkikoView(
@@ -40,5 +43,9 @@ open class GenericSkikoView(
 
     override fun onGestureEvent(event: SkikoGestureEvent) {
         app.onGestureEvent(event)
+    }
+
+    override fun onAppearanceChange() {
+        app.onAppearanceChange()
     }
 }
