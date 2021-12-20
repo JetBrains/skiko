@@ -12,25 +12,44 @@ import org.jetbrains.skiko.wasm.CreateWebGLContext
 import org.jetbrains.skiko.wasm.GL
 import org.w3c.dom.HTMLCanvasElement
 
-abstract class CanvasRenderer constructor(htmlCanvas: HTMLCanvasElement, val width: Int, val height: Int) {
-    constructor(canvas: HTMLCanvasElement): this(canvas, canvas.width, canvas.height)
+abstract class CanvasRenderer constructor(val htmlCanvas: HTMLCanvasElement) {
     private val contextPointer = CreateWebGLContext(htmlCanvas)
+    private val context: DirectContext
+    private var surface: Surface? = null
+    private var renderTarget: BackendRenderTarget? = null
+    var canvas: Canvas? = null
+
+    val width: Int
+        get() = htmlCanvas.width
+    val height: Int
+        get() = htmlCanvas.height
 
     init {
         GL.makeContextCurrent(contextPointer)
+        context = DirectContext.makeGL()
     }
-    private val context = DirectContext.makeGL()
-    private val surface = Surface.makeFromBackendRenderTarget(
-        context,
-        BackendRenderTarget.makeGL(
-            width, height, 1, 8, 0, 0x8058
-        ),
-        SurfaceOrigin.BOTTOM_LEFT,
-        SurfaceColorFormat.RGBA_8888,
-        ColorSpace.sRGB
-    )
-    val canvas: Canvas
-        get() = surface.canvas
+
+    fun initCanvas(desiredWidth: Int, desiredHeight: Int, scale: Float) {
+        disposeCanvas()
+        htmlCanvas.width = (desiredWidth * scale).toInt()
+        htmlCanvas.height = (desiredHeight * scale).toInt()
+        renderTarget = BackendRenderTarget.makeGL(width, height, 1, 8, 0, 0x8058)
+        surface = Surface.makeFromBackendRenderTarget(
+            context,
+            renderTarget!!,
+            SurfaceOrigin.BOTTOM_LEFT,
+            SurfaceColorFormat.RGBA_8888,
+            ColorSpace.sRGB
+        )
+        canvas = surface!!.canvas
+    }
+
+    fun disposeCanvas() {
+        surface?.close()
+        surface = null
+        renderTarget?.close()
+        renderTarget = null
+    }
 
     abstract fun drawFrame(currentTimestamp: Double)
 
@@ -44,9 +63,9 @@ abstract class CanvasRenderer constructor(htmlCanvas: HTMLCanvasElement, val wid
         window.requestAnimationFrame { timestamp ->
             redrawScheduled = false
             GL.makeContextCurrent(contextPointer)
-            canvas.clear(-1)
+            canvas?.clear(-1)
             drawFrame(timestamp)
-            surface.flushAndSubmit()
+            surface?.flushAndSubmit()
             context.flush()
         }
     }
