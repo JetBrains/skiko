@@ -689,7 +689,7 @@ private external fun _nGetUTF32Glyphs(ptr: NativePointer, uni: InteropPointer, u
 private external fun _nGetStringGlyphsCount(ptr: NativePointer, str: InteropPointer, len: Int): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nMeasureText")
-private external fun _nMeasureText(ptr: NativePointer, str: InteropPointer, len: Int, paintPtr: NativePointer, rect: InteropPointer): Rect
+private external fun _nMeasureText(ptr: NativePointer, str: InteropPointer, len: Int, paintPtr: NativePointer, rect: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nMeasureTextWidth")
 private external fun _nMeasureTextWidth(ptr: NativePointer, str: InteropPointer, len: Int, paintPtr: NativePointer): Float

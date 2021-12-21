@@ -333,7 +333,6 @@ private external fun _nGetUnresolvedGlyphsCount(ptr: NativePointer): Int
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nUpdateAlignment")
 private external fun _nUpdateAlignment(ptr: NativePointer, Align: Int)
 
-
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nUpdateFontSize")
 private external fun _nUpdateFontSize(ptr: NativePointer, from: Int, to: Int, size: Float, textPtr: NativePointer)
 

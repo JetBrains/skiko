@@ -1630,7 +1630,7 @@ private external fun _nDrawPaint(ptr: NativePointer, paintPtr: NativePointer)
 private external fun _nSetMatrix(ptr: NativePointer, matrix: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nGetLocalToDevice")
-private external fun _nGetLocalToDevice(ptr: NativePointer, resultFloats: InteropPointer): FloatArray
+private external fun _nGetLocalToDevice(ptr: NativePointer, resultFloats: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nResetMatrix")
 private external fun _nResetMatrix(ptr: NativePointer)
