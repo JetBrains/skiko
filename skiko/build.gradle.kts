@@ -856,7 +856,10 @@ if (hostOs == OS.MacOS) {
 
 val generateVersion = generateVersionTask(targetOs, targetArch)
 
-fun generateVersionTask(targetOs: OS, targetArch: Arch) = project.tasks.register("generateVersion") {
+fun Project.generateVersionTask(
+    targetOs: OS,
+    targetArch: Arch
+) = registerSkikoTask<DefaultTask>("generateVersion", targetOs, targetArch) {
     val outDir = generatedKotlin
     file(outDir).mkdirs()
     val out = "$outDir/Version.kt"
@@ -879,8 +882,11 @@ val skikoJvmJar by project.tasks.registering(Jar::class) {
     from(kotlin.jvm("awt").compilations["main"].output.allOutputs)
 }
 
-fun maybeSignTask(targetOs: OS, targetArch: Arch, linkJvmBindings: Provider<LinkSkikoTask>) =
-    project.tasks.register<SealAndSignSharedLibraryTask>("maybeSign-${targetOs.id}-${targetArch.id}") {
+fun maybeSignTask(
+    targetOs: OS,
+    targetArch: Arch,
+    linkJvmBindings: Provider<LinkSkikoTask>
+) = project.registerSkikoTask<SealAndSignSharedLibraryTask>("maybeSign", targetOs, targetArch) {
     dependsOn(linkJvmBindings)
 
     val linkOutputFile = linkJvmBindings.map { task ->
@@ -908,10 +914,12 @@ fun maybeSignTask(targetOs: OS, targetArch: Arch, linkJvmBindings: Provider<Link
     signToken.set(skiko.signToken)
 }
 
-fun createChecksumsTask(targetOs: OS, targetArch: Arch,
-                        maybeSign: Provider<SealAndSignSharedLibraryTask>,
-                        bindingsDir: Provider<File>) =
-    project.tasks.register<Checksum>("createChecksums-${targetOs.id}-${targetArch.id}") {
+fun createChecksumsTask(
+    targetOs: OS,
+    targetArch: Arch,
+    maybeSign: Provider<SealAndSignSharedLibraryTask>,
+    bindingsDir: Provider<File>
+) = project.registerSkikoTask<Checksum>("createChecksums", targetOs, targetArch) {
         val skiaBinSubdir = "out/${buildType.id}-${targetOs.id}-${targetArch.id}"
         dependsOn(maybeSign)
         files = project.files(maybeSign.flatMap { it.outputFiles }) +
@@ -920,11 +928,13 @@ fun createChecksumsTask(targetOs: OS, targetArch: Arch,
         outputDir = file("$buildDir/checksums")
     }
 
-fun skikoJvmRuntimeJarTask(targetOs: OS, targetArch: Arch,
-                           maybeSign: Provider<SealAndSignSharedLibraryTask>,
-                           createChecksums: Provider<Checksum>,
-                           bindingsDir: Provider<File>) =
-  project.tasks.register<Jar>("skikoJvmRuntimeJar-${targetOs.id}-${targetArch.id}") {
+fun skikoJvmRuntimeJarTask(
+    targetOs: OS,
+    targetArch: Arch,
+    maybeSign: Provider<SealAndSignSharedLibraryTask>,
+    createChecksums: Provider<Checksum>,
+    bindingsDir: Provider<File>
+) = project.registerSkikoTask<Jar>("skikoJvmRuntimeJar", targetOs, targetArch) {
       dependsOn(maybeSign)
       dependsOn(createChecksums)
       dependsOn(skikoJvmJar)
