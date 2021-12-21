@@ -467,7 +467,7 @@ fun configureNativeTarget(os: OS, arch: Arch, target: KotlinNativeTarget) {
 
     val crossCompileTask = compileNativeBridgesTask(os, arch)
 
-    val linkTask = project.registerSkikoTask<Exec>("linkNativeBridges", targetOs, targetArch) {
+    val linkTask = project.registerSkikoTask<Exec>("linkNativeBridges", os, arch) {
         dependsOn(crossCompileTask)
         val objectFilesDir = crossCompileTask.map { it.outDir.get() }
         val objectFiles = project.fileTree(objectFilesDir) {
@@ -871,7 +871,11 @@ fun KotlinTarget.generateVersion(
 ) {
     val targetName = this.name
     val generatedDir = project.layout.buildDirectory.dir("generated/$targetName")
-    val generateVersionTask = project.registerSkikoTask<DefaultTask>("generateVersion", targetOs, targetArch) {
+    val generateVersionTask = project.registerSkikoTask<DefaultTask>(
+        "generateVersion${toTitleCase(platformType.name)}",
+        targetOs,
+        targetArch
+    ) {
         inputs.property("buildType", buildType.id)
         outputs.dir(generatedDir)
         doFirst {

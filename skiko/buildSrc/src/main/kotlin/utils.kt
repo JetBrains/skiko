@@ -29,7 +29,7 @@ inline fun <reified T : Task> Project.registerSkikoTask(
     targetArch: Arch,
     crossinline fn: T.() -> Unit
 ): TaskProvider<T> {
-    val taskName = joinToTitleCamelCase(actionName, targetOs.id, targetArch.id)
+    val taskName = actionName + joinToTitleCamelCase(targetOs.id, targetArch.id)
     return registerSkikoTask(taskName, fn)
 }
 
