@@ -71,7 +71,7 @@ private external fun _nMake(s: InteropPointer): NativePointer
 private external fun _nStringSize(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_ManagedString__nStringData")
-private external fun _nStringData(ptr: NativePointer, result: InteropPointer, size: Int): String
+private external fun _nStringData(ptr: NativePointer, result: InteropPointer, size: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_ManagedString__1nInsert")
 private external fun _nInsert(ptr: NativePointer, offset: Int, s: InteropPointer)

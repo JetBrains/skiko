@@ -121,7 +121,7 @@ SKIKO_EXPORT void org_jetbrains_skia_paragraph_Paragraph__1nGetWordBoundary
 }
 
 
-SKIKO_EXPORT KInteropPointerArray org_jetbrains_skia_paragraph_Paragraph__1nGetLineMetrics
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_paragraph_Paragraph__1nGetLineMetrics
   (KNativePointer ptr, KNativePointer textPtr) {
     Paragraph* instance = reinterpret_cast<Paragraph*>((ptr));
     SkString* text = reinterpret_cast<SkString*>((textPtr));
