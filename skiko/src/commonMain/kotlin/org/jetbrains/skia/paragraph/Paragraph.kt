@@ -299,7 +299,6 @@ private external fun _nLayout(ptr: NativePointer, width: Float)
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nPaint")
 private external fun _nPaint(ptr: NativePointer, canvasPtr: NativePointer, x: Float, y: Float): NativePointer
 
-// TODO: fix signature.
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nGetRectsForRange")
 private external fun _nGetRectsForRange(
     ptr: NativePointer,
@@ -310,7 +309,6 @@ private external fun _nGetRectsForRange(
 ): InteropPointer
 
 
-// TODO: fix signature.
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nGetRectsForPlaceholders")
 private external fun _nGetRectsForPlaceholders(ptr: NativePointer): InteropPointer
 
@@ -320,7 +318,6 @@ private external fun _nGetGlyphPositionAtCoordinate(ptr: NativePointer, dx: Floa
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nGetWordBoundary")
 private external fun _nGetWordBoundary(ptr: NativePointer, offset: Int, result: InteropPointer)
 
-// TODO: fix signature.
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nGetLineMetrics")
 private external fun _nGetLineMetrics(ptr: NativePointer, textPtr: NativePointer): InteropPointer
 
@@ -335,7 +332,6 @@ private external fun _nGetUnresolvedGlyphsCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nUpdateAlignment")
 private external fun _nUpdateAlignment(ptr: NativePointer, Align: Int)
-
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nUpdateFontSize")
 private external fun _nUpdateFontSize(ptr: NativePointer, from: Int, to: Int, size: Float, textPtr: NativePointer)
