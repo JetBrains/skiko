@@ -100,7 +100,7 @@ kotlin {
         val jvmMain by getting {
             dependsOn(commonMain)
             dependencies {
-                implementation("org.jetbrains.skiko:skiko-jvm-runtime-$hostOs-$hostArch:$version")
+                implementation("org.jetbrains.skiko:skiko-awt-runtime-$hostOs-$hostArch:$version")
             }
         }
 

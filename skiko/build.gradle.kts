@@ -905,7 +905,7 @@ fun KotlinTarget.generateVersion(
 }
 
 val skikoJvmJar by project.tasks.registering(Jar::class) {
-    archiveBaseName.set("skiko-jvm")
+    archiveBaseName.set("skiko-awt")
     from(kotlin.jvm("awt").compilations["main"].output.allOutputs)
 }
 

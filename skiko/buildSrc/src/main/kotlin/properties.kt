@@ -191,11 +191,11 @@ class SkikoProperties(private val myProject: Project) {
 object SkikoArtifacts {
     // names are also used in samples, e.g. samples/SkijaInjectSample/build.gradle
     val commonArtifactId = "skiko"
-    val jvmArtifactId = "skiko-jvm"
+    val jvmArtifactId = "skiko-awt"
     val jsArtifactId = "skiko-js"
     val jsWasmArtifactId = "skiko-js-wasm-runtime"
     fun jvmRuntimeArtifactIdFor(os: OS, arch: Arch) =
-        "skiko-jvm-runtime-${targetId(os, arch)}"
+        "skiko-awt-runtime-${targetId(os, arch)}"
 
     // Using custom name like skiko-<Os>-<Arch> (with a dash)
     // does not seem possible (at least without adding a dash to a target's tasks),
