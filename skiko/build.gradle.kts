@@ -3,6 +3,7 @@ import org.gradle.crypto.checksum.Checksum
 import org.gradle.api.tasks.testing.AbstractTestTask
 import org.jetbrains.compose.internal.publishing.MavenCentralProperties
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
@@ -23,7 +24,6 @@ fun targetSuffix(os: OS, arch: Arch): String {
 
 val skiko = SkikoProperties(rootProject)
 val buildType = skiko.buildType
-val generatedKotlin = "$buildDir/kotlin/commonMain"
 
 allprojects {
     group = "org.jetbrains.skiko"
@@ -132,7 +132,7 @@ if (supportWasm) {
 fun compileNativeBridgesTask(os: OS, arch: Arch): TaskProvider<CompileSkikoCppTask> {
     val skiaNativeDir = registerOrGetSkiaDirProvider(os, arch)
 
-    return tasks.register<CompileSkikoCppTask>("${os.id}_${arch.id}_CrossCompile") {
+    return project.registerSkikoTask<CompileSkikoCppTask>("compileNativeBridges", os, arch) {
         dependsOn(skiaNativeDir)
         val unpackedSkia = skiaNativeDir.get()
 
@@ -218,13 +218,17 @@ kotlin {
         compilations.all {
             kotlinOptions.jvmTarget = "11"
         }
+        generateVersion(targetOs, targetArch)
     }
 
     if (supportAndroid) {
+        // todo: use android target
         jvm("android") {
             compilations.all {
                 kotlinOptions.jvmTarget = "11"
             }
+            // todo: what is the actual target arch? what does "jvm(android)" target even mean?
+            generateVersion(OS.Android, targetArch)
         }
     }
 
@@ -239,6 +243,7 @@ kotlin {
                 }
             }
             binaries.executable()
+            generateVersion(OS.Wasm, Arch.Wasm)
         }
     }
 
@@ -411,6 +416,8 @@ kotlin {
 fun configureNativeTarget(os: OS, arch: Arch, target: KotlinNativeTarget) {
     if (!os.isCompatibleWithHost) return
 
+    target.generateVersion(os, arch)
+
     val targetString = "${os.id}-${arch.id}"
 
     val unzipper = registerOrGetSkiaDirProvider(os, arch)
@@ -460,7 +467,7 @@ fun configureNativeTarget(os: OS, arch: Arch, target: KotlinNativeTarget) {
 
     val crossCompileTask = compileNativeBridgesTask(os, arch)
 
-    val linkTask = project.tasks.register<Exec>("linkNativeBridges$targetString") {
+    val linkTask = project.registerSkikoTask<Exec>("linkNativeBridges", os, arch) {
         dependsOn(crossCompileTask)
         val objectFilesDir = crossCompileTask.map { it.outDir.get() }
         val objectFiles = project.fileTree(objectFilesDir) {
@@ -620,8 +627,11 @@ fun androidJar(version: String = "30"): String {
     return androidHome.resolve("platforms/android-$version/android.jar").absolutePath
 }
 
-fun createCompileJvmBindingsTask(targetOs: OS, targetArch: Arch, skiaJvmBindingsDir: Provider<File>) =
-    tasks.register<CompileSkikoCppTask>("compileJvmBindings-${targetOs.id}-${targetArch.id}") {
+fun createCompileJvmBindingsTask(
+    targetOs: OS,
+    targetArch: Arch,
+    skiaJvmBindingsDir: Provider<File>
+) = project.registerSkikoTask<CompileSkikoCppTask>("compileJvmBindings", targetOs, targetArch) {
     // Prefer 'java.home' system property to simplify overriding from Intellij.
     // When used from command-line, it is effectively equal to JAVA_HOME.
     if (JavaVersion.current() < JavaVersion.VERSION_11) {
@@ -721,10 +731,12 @@ fun createCompileJvmBindingsTask(targetOs: OS, targetArch: Arch, skiaJvmBindings
     )
 }
 
-fun createLinkJvmBindings(targetOs: OS, targetArch: Arch,
-                          skiaJvmBindingsDir: Provider<File>,
-                          compileTask: TaskProvider<CompileSkikoCppTask>) =
-    tasks.register<LinkSkikoTask>("linkJvmBindings-${targetOs.id}-${targetArch.id}") {
+fun createLinkJvmBindings(
+    targetOs: OS,
+    targetArch: Arch,
+    skiaJvmBindingsDir: Provider<File>,
+    compileTask: TaskProvider<CompileSkikoCppTask>
+) = project.registerSkikoTask<LinkSkikoTask>("linkJvmBindings", targetOs, targetArch) {
         val target = targetId(targetOs, targetArch)
         val skiaBinSubdir = "out/${buildType.id}-$target"
         val skiaBinDir = skiaJvmBindingsDir.get().absolutePath + "/" + skiaBinSubdir
@@ -853,23 +865,42 @@ if (hostOs == OS.MacOS) {
     }
 }
 
-val generateVersion = generateVersionTask(targetOs, targetArch)
+fun KotlinTarget.generateVersion(
+    targetOs: OS,
+    targetArch: Arch
+) {
+    val targetName = this.name
+    val generatedDir = project.layout.buildDirectory.dir("generated/$targetName")
+    val generateVersionTask = project.registerSkikoTask<DefaultTask>(
+        "generateVersion${toTitleCase(platformType.name)}",
+        targetOs,
+        targetArch
+    ) {
+        inputs.property("buildType", buildType.id)
+        outputs.dir(generatedDir)
+        doFirst {
+            val outDir = generatedDir.get().asFile
+            outDir.deleteRecursively()
+            outDir.mkdirs()
+            val out = "$outDir/Version.kt"
 
-fun generateVersionTask(targetOs: OS, targetArch: Arch) = project.tasks.register("generateVersion") {
-    val outDir = generatedKotlin
-    file(outDir).mkdirs()
-    val out = "$outDir/Version.kt"
-    outputs.dir(outDir)
-    doFirst {
-        val target = "${targetOs.id}-${targetArch.id}"
-        val skiaTag = project.property("dependencies.skia.$target") as String
-        File(out).writeText("""
-        package org.jetbrains.skiko
-        object Version {
-          val skiko = "${skiko.deployVersion}"
-          val skia = "${skiaTag}"
+            val target = "${targetOs.id}-${targetArch.id}"
+            val skiaTag = project.property("dependencies.skia.$target") as String
+            File(out).writeText("""
+                package org.jetbrains.skiko
+                object Version {
+                  val skiko = "${skiko.deployVersion}"
+                  val skia = "${skiaTag}"
+                }
+                """.trimIndent()
+            )
         }
-        """.trimIndent())
+    }
+
+    val compilation = compilations["main"] ?: error("Could not find 'main' compilation for target '$this'")
+    compilation.compileKotlinTaskProvider.configure {
+        dependsOn(generateVersionTask)
+        (this as AbstractCompile).source(generatedDir.get().asFile)
     }
 }
 
@@ -878,8 +909,11 @@ val skikoJvmJar by project.tasks.registering(Jar::class) {
     from(kotlin.jvm("awt").compilations["main"].output.allOutputs)
 }
 
-fun maybeSignTask(targetOs: OS, targetArch: Arch, linkJvmBindings: Provider<LinkSkikoTask>) =
-    project.tasks.register<SealAndSignSharedLibraryTask>("maybeSign-${targetOs.id}-${targetArch.id}") {
+fun maybeSignTask(
+    targetOs: OS,
+    targetArch: Arch,
+    linkJvmBindings: Provider<LinkSkikoTask>
+) = project.registerSkikoTask<SealAndSignSharedLibraryTask>("maybeSign", targetOs, targetArch) {
     dependsOn(linkJvmBindings)
 
     val linkOutputFile = linkJvmBindings.map { task ->
@@ -907,10 +941,12 @@ fun maybeSignTask(targetOs: OS, targetArch: Arch, linkJvmBindings: Provider<Link
     signToken.set(skiko.signToken)
 }
 
-fun createChecksumsTask(targetOs: OS, targetArch: Arch,
-                        maybeSign: Provider<SealAndSignSharedLibraryTask>,
-                        bindingsDir: Provider<File>) =
-    project.tasks.register<Checksum>("createChecksums-${targetOs.id}-${targetArch.id}") {
+fun createChecksumsTask(
+    targetOs: OS,
+    targetArch: Arch,
+    maybeSign: Provider<SealAndSignSharedLibraryTask>,
+    bindingsDir: Provider<File>
+) = project.registerSkikoTask<Checksum>("createChecksums", targetOs, targetArch) {
         val skiaBinSubdir = "out/${buildType.id}-${targetOs.id}-${targetArch.id}"
         dependsOn(maybeSign)
         files = project.files(maybeSign.flatMap { it.outputFiles }) +
@@ -919,11 +955,13 @@ fun createChecksumsTask(targetOs: OS, targetArch: Arch,
         outputDir = file("$buildDir/checksums")
     }
 
-fun skikoJvmRuntimeJarTask(targetOs: OS, targetArch: Arch,
-                           maybeSign: Provider<SealAndSignSharedLibraryTask>,
-                           createChecksums: Provider<Checksum>,
-                           bindingsDir: Provider<File>) =
-  project.tasks.register<Jar>("skikoJvmRuntimeJar-${targetOs.id}-${targetArch.id}") {
+fun skikoJvmRuntimeJarTask(
+    targetOs: OS,
+    targetArch: Arch,
+    maybeSign: Provider<SealAndSignSharedLibraryTask>,
+    createChecksums: Provider<Checksum>,
+    bindingsDir: Provider<File>
+) = project.registerSkikoTask<Jar>("skikoJvmRuntimeJar", targetOs, targetArch) {
       dependsOn(maybeSign)
       dependsOn(createChecksums)
       dependsOn(skikoJvmJar)
@@ -938,9 +976,11 @@ fun skikoJvmRuntimeJarTask(targetOs: OS, targetArch: Arch,
       from(createChecksums.map { it.outputs.files })
 }
 
-fun skikoRuntimeDirForTestsTask(targetOs: OS, targetArch: Arch,
-                                skikoJvmRuntimeJar: Provider<Jar>) =
-  project.tasks.register<Copy>("skikoRuntimeDirForTests-${targetOs.id}-${targetArch.id}") {
+fun skikoRuntimeDirForTestsTask(
+    targetOs: OS,
+    targetArch: Arch,
+    skikoJvmRuntimeJar: Provider<Jar>
+) = project.registerSkikoTask<Copy>("skikoRuntimeDirForTests", targetOs, targetArch) {
     dependsOn(skikoJvmRuntimeJar)
     from(zipTree(skikoJvmRuntimeJar.flatMap { it.archiveFile })) {
         include("*.so")
@@ -1068,12 +1108,13 @@ publishing {
         allJvmRuntimeJars.forEach { entry ->
             val os = entry.key.first
             val arch = entry.key.second
-            create<MavenPublication>("skikoJvmRuntime${targetId(os, arch)}") {
+            create<MavenPublication>("skikoJvmRuntime${toTitleCase(os.id)}${toTitleCase(arch.id)}") {
                 pomNameForPublication[name] = "Skiko JVM Runtime for ${os.name} ${arch.name}"
                 artifactId = SkikoArtifacts.jvmRuntimeArtifactIdFor(os, arch)
                 afterEvaluate {
                     artifact(entry.value.map { it.archiveFile.get() })
                     var jvmSourcesArtifact: Any? = null
+                    // todo: use correct sources jar for each jvm source set
                     kotlin.jvm("awt").mavenPublication {
                         jvmSourcesArtifact = artifacts.find { it.classifier == "sources" }
                     }
@@ -1116,16 +1157,9 @@ if (skiko.isCIBuild || mavenCentral.signArtifacts) {
 
 afterEvaluate {
     tasks.withType<KotlinCompile>().configureEach { // this one is actually KotlinJvmCompile
-        dependsOn(generateVersion)
-        source(generatedKotlin)
-
         if (name == "compileTestKotlinJvm") {
             kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
         }
-    }
-    tasks.withType<KotlinNativeCompile>().configureEach {
-        dependsOn(generateVersion)
-        source(generatedKotlin)
     }
 }
 
