@@ -1069,7 +1069,7 @@ publishing {
         allJvmRuntimeJars.forEach { entry ->
             val os = entry.key.first
             val arch = entry.key.second
-            create<MavenPublication>("skikoJvmRuntime${targetId(os, arch)}") {
+            create<MavenPublication>("skikoJvmRuntime${toTitleCase(os.id)}${toTitleCase(arch.id)}") {
                 pomNameForPublication[name] = "Skiko JVM Runtime for ${os.name} ${arch.name}"
                 artifactId = SkikoArtifacts.jvmRuntimeArtifactIdFor(os, arch)
                 afterEvaluate {
