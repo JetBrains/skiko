@@ -221,6 +221,7 @@ kotlin {
     }
 
     if (supportAndroid) {
+        // todo: use android target
         jvm("android") {
             compilations.all {
                 kotlinOptions.jvmTarget = "11"
@@ -1074,6 +1075,7 @@ publishing {
                 afterEvaluate {
                     artifact(entry.value.map { it.archiveFile.get() })
                     var jvmSourcesArtifact: Any? = null
+                    // todo: use correct sources jar for each jvm source set
                     kotlin.jvm("awt").mavenPublication {
                         jvmSourcesArtifact = artifacts.find { it.classifier == "sources" }
                     }
