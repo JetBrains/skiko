@@ -3,6 +3,7 @@ import org.gradle.crypto.checksum.Checksum
 import org.gradle.api.tasks.testing.AbstractTestTask
 import org.jetbrains.compose.internal.publishing.MavenCentralProperties
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
@@ -23,7 +24,6 @@ fun targetSuffix(os: OS, arch: Arch): String {
 
 val skiko = SkikoProperties(rootProject)
 val buildType = skiko.buildType
-val generatedKotlin = "$buildDir/kotlin/commonMain"
 
 allprojects {
     group = "org.jetbrains.skiko"
@@ -218,6 +218,7 @@ kotlin {
         compilations.all {
             kotlinOptions.jvmTarget = "11"
         }
+        generateVersion(targetOs, targetArch)
     }
 
     if (supportAndroid) {
@@ -226,6 +227,8 @@ kotlin {
             compilations.all {
                 kotlinOptions.jvmTarget = "11"
             }
+            // todo: what is the actual target arch? what does "jvm(android)" target even mean?
+            generateVersion(OS.Android, targetArch)
         }
     }
 
@@ -240,6 +243,7 @@ kotlin {
                 }
             }
             binaries.executable()
+            generateVersion(OS.Wasm, Arch.Wasm)
         }
     }
 
@@ -411,6 +415,8 @@ kotlin {
 
 fun configureNativeTarget(os: OS, arch: Arch, target: KotlinNativeTarget) {
     if (!os.isCompatibleWithHost) return
+
+    target.generateVersion(os, arch)
 
     val targetString = "${os.id}-${arch.id}"
 
@@ -859,26 +865,38 @@ if (hostOs == OS.MacOS) {
     }
 }
 
-val generateVersion = generateVersionTask(targetOs, targetArch)
-
-fun Project.generateVersionTask(
+fun KotlinTarget.generateVersion(
     targetOs: OS,
     targetArch: Arch
-) = registerSkikoTask<DefaultTask>("generateVersion", targetOs, targetArch) {
-    val outDir = generatedKotlin
-    file(outDir).mkdirs()
-    val out = "$outDir/Version.kt"
-    outputs.dir(outDir)
-    doFirst {
-        val target = "${targetOs.id}-${targetArch.id}"
-        val skiaTag = project.property("dependencies.skia.$target") as String
-        File(out).writeText("""
-        package org.jetbrains.skiko
-        object Version {
-          val skiko = "${skiko.deployVersion}"
-          val skia = "${skiaTag}"
+) {
+    val targetName = this.name
+    val generatedDir = project.layout.buildDirectory.dir("generated/$targetName")
+    val generateVersionTask = project.registerSkikoTask<DefaultTask>("generateVersion", targetOs, targetArch) {
+        inputs.property("buildType", buildType.id)
+        outputs.dir(generatedDir)
+        doFirst {
+            val outDir = generatedDir.get().asFile
+            outDir.deleteRecursively()
+            outDir.mkdirs()
+            val out = "$outDir/Version.kt"
+
+            val target = "${targetOs.id}-${targetArch.id}"
+            val skiaTag = project.property("dependencies.skia.$target") as String
+            File(out).writeText("""
+                package org.jetbrains.skiko
+                object Version {
+                  val skiko = "${skiko.deployVersion}"
+                  val skia = "${skiaTag}"
+                }
+                """.trimIndent()
+            )
         }
-        """.trimIndent())
+    }
+
+    val compilation = compilations["main"] ?: error("Could not find 'main' compilation for target '$this'")
+    compilation.compileKotlinTaskProvider.configure {
+        dependsOn(generateVersionTask)
+        (this as AbstractCompile).source(generatedDir.get().asFile)
     }
 }
 
@@ -1135,16 +1153,9 @@ if (skiko.isCIBuild || mavenCentral.signArtifacts) {
 
 afterEvaluate {
     tasks.withType<KotlinCompile>().configureEach { // this one is actually KotlinJvmCompile
-        dependsOn(generateVersion)
-        source(generatedKotlin)
-
         if (name == "compileTestKotlinJvm") {
             kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
         }
-    }
-    tasks.withType<KotlinNativeCompile>().configureEach {
-        dependsOn(generateVersion)
-        source(generatedKotlin)
     }
 }
 
