@@ -132,7 +132,7 @@ if (supportWasm) {
 fun compileNativeBridgesTask(os: OS, arch: Arch): TaskProvider<CompileSkikoCppTask> {
     val skiaNativeDir = registerOrGetSkiaDirProvider(os, arch)
 
-    return tasks.register<CompileSkikoCppTask>("${os.id}_${arch.id}_CrossCompile") {
+    return project.registerSkikoTask<CompileSkikoCppTask>("compileNativeBridges", os, arch) {
         dependsOn(skiaNativeDir)
         val unpackedSkia = skiaNativeDir.get()
 
@@ -461,7 +461,7 @@ fun configureNativeTarget(os: OS, arch: Arch, target: KotlinNativeTarget) {
 
     val crossCompileTask = compileNativeBridgesTask(os, arch)
 
-    val linkTask = project.tasks.register<Exec>("linkNativeBridges$targetString") {
+    val linkTask = project.registerSkikoTask<Exec>("linkNativeBridges", targetOs, targetArch) {
         dependsOn(crossCompileTask)
         val objectFilesDir = crossCompileTask.map { it.outDir.get() }
         val objectFiles = project.fileTree(objectFilesDir) {
@@ -621,8 +621,11 @@ fun androidJar(version: String = "30"): String {
     return androidHome.resolve("platforms/android-$version/android.jar").absolutePath
 }
 
-fun createCompileJvmBindingsTask(targetOs: OS, targetArch: Arch, skiaJvmBindingsDir: Provider<File>) =
-    tasks.register<CompileSkikoCppTask>("compileJvmBindings-${targetOs.id}-${targetArch.id}") {
+fun createCompileJvmBindingsTask(
+    targetOs: OS,
+    targetArch: Arch,
+    skiaJvmBindingsDir: Provider<File>
+) = project.registerSkikoTask<CompileSkikoCppTask>("compileJvmBindings", targetOs, targetArch) {
     // Prefer 'java.home' system property to simplify overriding from Intellij.
     // When used from command-line, it is effectively equal to JAVA_HOME.
     if (JavaVersion.current() < JavaVersion.VERSION_11) {
@@ -722,10 +725,12 @@ fun createCompileJvmBindingsTask(targetOs: OS, targetArch: Arch, skiaJvmBindings
     )
 }
 
-fun createLinkJvmBindings(targetOs: OS, targetArch: Arch,
-                          skiaJvmBindingsDir: Provider<File>,
-                          compileTask: TaskProvider<CompileSkikoCppTask>) =
-    tasks.register<LinkSkikoTask>("linkJvmBindings-${targetOs.id}-${targetArch.id}") {
+fun createLinkJvmBindings(
+    targetOs: OS,
+    targetArch: Arch,
+    skiaJvmBindingsDir: Provider<File>,
+    compileTask: TaskProvider<CompileSkikoCppTask>
+) = project.registerSkikoTask<LinkSkikoTask>("linkJvmBindings", targetOs, targetArch) {
         val target = targetId(targetOs, targetArch)
         val skiaBinSubdir = "out/${buildType.id}-$target"
         val skiaBinDir = skiaJvmBindingsDir.get().absolutePath + "/" + skiaBinSubdir
@@ -949,9 +954,11 @@ fun skikoJvmRuntimeJarTask(
       from(createChecksums.map { it.outputs.files })
 }
 
-fun skikoRuntimeDirForTestsTask(targetOs: OS, targetArch: Arch,
-                                skikoJvmRuntimeJar: Provider<Jar>) =
-  project.tasks.register<Copy>("skikoRuntimeDirForTests-${targetOs.id}-${targetArch.id}") {
+fun skikoRuntimeDirForTestsTask(
+    targetOs: OS,
+    targetArch: Arch,
+    skikoJvmRuntimeJar: Provider<Jar>
+) = project.registerSkikoTask<Copy>("skikoRuntimeDirForTests", targetOs, targetArch) {
     dependsOn(skikoJvmRuntimeJar)
     from(zipTree(skikoJvmRuntimeJar.flatMap { it.archiveFile })) {
         include("*.so")
