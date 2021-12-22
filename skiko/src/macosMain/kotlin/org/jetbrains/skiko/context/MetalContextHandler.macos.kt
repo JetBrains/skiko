@@ -25,6 +25,8 @@ internal class MacOsMetalContextHandler(layer: SkiaLayer) : ContextHandler(layer
     }
 
     override fun initCanvas() {
+        disposeCanvas()
+
         val scale = layer.contentScale
         val w = (layer.nsView.frame.useContents { size.width } * scale).toInt().coerceAtLeast(0)
         val h = (layer.nsView.frame.useContents { size.height } * scale).toInt().coerceAtLeast(0)
