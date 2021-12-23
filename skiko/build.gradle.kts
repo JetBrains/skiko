@@ -1214,10 +1214,6 @@ tasks.withType<AbstractTestTask> {
     }
 }
 
-afterEvaluate {
-    extensions.configure<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension> {
-        versions.webpackDevServer.version = "4.0.0"
-        versions.webpackCli.version = "4.9.0"
-        nodeVersion = "16.0.0"
-    }
+rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin> {
+    rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>().nodeVersion = "16.0.0"
 }
