@@ -36,7 +36,7 @@ i.e. something like this
     val version = "0.5.3"
     val target = "${targetOs}-${targetArch}"
     dependencies {
-        implementation("org.jetbrains.skiko:skiko-jvm-runtime-$target:$version")
+        implementation("org.jetbrains.skiko:skiko-awt-runtime-$target:$version")
     }
 ```
 
