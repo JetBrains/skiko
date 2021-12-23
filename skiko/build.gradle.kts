@@ -9,7 +9,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
-    kotlin("multiplatform") version "1.5.31"
+    kotlin("multiplatform") version "1.6.10"
     `maven-publish`
     signing
     id("org.gradle.crypto.checksum") version "1.1.0"
@@ -1211,5 +1211,13 @@ tasks.withType<AbstractTestTask> {
         exceptionFormat = TestExceptionFormat.FULL
         showStandardStreams = true
         showStackTraces = true
+    }
+}
+
+afterEvaluate {
+    extensions.configure<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension> {
+        versions.webpackDevServer.version = "4.0.0"
+        versions.webpackCli.version = "4.9.0"
+        nodeVersion = "16.0.0"
     }
 }
