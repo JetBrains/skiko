@@ -9,7 +9,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
-    kotlin("multiplatform") version "1.5.31"
+    kotlin("multiplatform") version "1.6.10"
     `maven-publish`
     signing
     id("org.gradle.crypto.checksum") version "1.1.0"
@@ -1213,4 +1213,8 @@ tasks.withType<AbstractTestTask> {
         showStandardStreams = true
         showStackTraces = true
     }
+}
+
+rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin> {
+    rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>().nodeVersion = "16.0.0"
 }
