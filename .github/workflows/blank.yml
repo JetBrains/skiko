@@ -28,10 +28,10 @@ jobs:
           java-version: '11'
       - shell: bash
         run: |
-          cd $GITHUB_WORKSPACE/skiko
-          ./gradlew --stacktrace --info -Pskiko.native.enabled=true awtTest
-          ./gradlew --stacktrace --info -Pskiko.native.enabled=true macosX64Test
-          ./gradlew --stacktrace --info -Pskiko.native.enabled=true publishToMavenLocal
+          ./gradlew --stacktrace --info -Pskiko.native.enabled=true :skiko:awtTest
+          ./gradlew --stacktrace --info -Pskiko.native.enabled=true :skiko:macosX64Test
+          ./gradlew --stacktrace --info -Pskiko.native.enabled=true :skiko:publishToMavenLocal
+          ./gradlew --stacktrace --info :SkiaJvmSample:installDist # check jvm sample works
       - uses: actions/upload-artifact@v2
         with:
           name: test-reports-macos
@@ -51,9 +51,9 @@ jobs:
           java-version: '11'
       - shell: bash
         run: |
-          cd $GITHUB_WORKSPACE/skiko
-          ./gradlew --stacktrace --info -Pskiko.native.enabled=true iosX64Test
-          ./gradlew --stacktrace --info -Pskiko.native.enabled=true publishToMavenLocal
+          ./gradlew --stacktrace --info -Pskiko.native.enabled=true :skiko:iosX64Test
+          ./gradlew --stacktrace --info -Pskiko.native.enabled=true :skiko:publishToMavenLocal
+          # TODO run iOS specific tests on iPhone simulator
       - uses: actions/upload-artifact@v2
         with:
           name: test-reports-macos
@@ -73,7 +73,6 @@ jobs:
       # Runs a set of commands using the runners shell
       - shell: bash
         run: |
-          cd ./skiko
           # TODO: simplify installation of compilers.
           sudo apt-get update -y
           sudo apt-get install build-essential software-properties-common -y
@@ -87,8 +86,9 @@ jobs:
           sudo apt-get install ninja-build fontconfig libfontconfig1-dev libglu1-mesa-dev libxrandr-dev zip xvfb -y
           sudo Xvfb :0 -screen 0 1280x720x24 &
           export DISPLAY=:0
-          ./gradlew --stacktrace --info -Pskiko.native.enabled=true linuxX64Test awtTest
-          ./gradlew --stacktrace --info publishToMavenLocal
+          ./gradlew --stacktrace --info -Pskiko.native.enabled=true :skiko:linuxX64Test :skiko:awtTest
+          ./gradlew --stacktrace --info :skiko:publishToMavenLocal
+          ./gradlew --stacktrace --info :SkiaJvmSample:installDist # check jvm sample works
       - uses: actions/upload-artifact@v2
         with:
           name: test-reports-linux
@@ -144,9 +144,9 @@ jobs:
           java-version: '11'
       - shell: bash
         run: |
-          cd ./skiko
-          ./gradlew --stacktrace --info awtTest
-          ./gradlew --stacktrace --info publishToMavenLocal
+          ./gradlew --stacktrace --info :skiko:awtTest
+          ./gradlew --stacktrace --info :skiko:publishToMavenLocal
+          ./gradlew --stacktrace --info :SkiaJvmSample:installDist # check jvm sample works
       - uses: actions/upload-artifact@v2
         with:
           name: test-reports-windows
