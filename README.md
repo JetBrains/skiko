@@ -115,5 +115,5 @@ For example, if we want to include UI tests when we test JVM target, call this:
 Don't run any background tasks, click mouse, or press keys during the tests. Otherwise, they probably fail.
 
 #### Run samples
- - First follow the instruction here: [Building JVM bindings](#Building JVM bindings)
+ - First follow the instruction here: [Building JVM bindings](#building-jvm-bindings)
  - `./gradlew :SkiaJvmSample:run`  
