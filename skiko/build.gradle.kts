@@ -601,8 +601,6 @@ fun skiaStaticLibraries(skiaDir: String, targetString: String): List<String> {
 }
 
 val allJvmRuntimeJars = mutableMapOf<Pair<OS, Arch>, TaskProvider<Jar>>()
-val allMaybeSignTasks = mutableMapOf<Pair<OS, Arch>, TaskProvider<SealAndSignSharedLibraryTask>>()
-val allChecksumTasks = mutableMapOf<Pair<OS, Arch>, TaskProvider<Checksum>>()
 
 val skikoJvmRuntimeJar = createSkikoJvmJarTask(hostOs, hostArch)
 val skikoRuntimeDirForTests = skikoRuntimeDirForTestsTask(hostOs, hostArch, skikoJvmRuntimeJar)
