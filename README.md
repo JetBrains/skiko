@@ -72,7 +72,7 @@ To use latest development snapshot use version `0.0.0-SNAPSHOT`.
 ## Building JVM bindings
 
 * Set JAVA_HOME to location of JDK, at least version 11
-* `cd skiko && ./gradlew publishToMavenLocal` will build the artefact and publish it to local Maven repo
+* `./gradlew :skiko:publishToMavenLocal` will build the artifact and publish it to local Maven repo
 
 To build with debug symbols and debug Skia build use `-Pskiko.debug=true` Gradle argument.
 
@@ -113,3 +113,7 @@ For example, if we want to include UI tests when we test JVM target, call this:
 ./gradlew awtTest -Dskiko.test.ui.enabled=true
 ```
 Don't run any background tasks, click mouse, or press keys during the tests. Otherwise, they probably fail.
+
+#### Run samples
+ - First follow the instruction here: [Building JVM bindings](#building-jvm-bindings)
+ - `./gradlew :SkiaJvmSample:run`  
