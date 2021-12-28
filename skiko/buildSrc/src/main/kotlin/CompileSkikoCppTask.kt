@@ -15,7 +15,13 @@ import java.util.*
 import java.util.concurrent.Callable
 import kotlin.collections.HashSet
 
-abstract class CompileSkikoCppTask : AbstractSkikoNativeToolTask() {
+abstract class CompileSkikoCppTask() : AbstractSkikoNativeToolTask() {
+    @get:Internal
+    open val srcExtensions: Array<String> = arrayOf("cc")
+
+    @get:Internal
+    open val headerExtensions: Array<String> = arrayOf("h", "hh")
+
     @get:Input
     abstract val flags: ListProperty<String>
 
@@ -34,7 +40,9 @@ abstract class CompileSkikoCppTask : AbstractSkikoNativeToolTask() {
         project.files(Callable {
             val sources = project.objects.fileCollection()
             for (sourceRoot in sourceRoots.get()) {
-                sources.from(project.fileTree(sourceRoot) { include("**/*.cc") })
+                for (srcExtension in srcExtensions) {
+                    sources.from(project.fileTree(sourceRoot) { include("**/*.$srcExtension") })
+                }
             }
             sources
         })
@@ -53,15 +61,17 @@ abstract class CompileSkikoCppTask : AbstractSkikoNativeToolTask() {
             for (dir in headersDirs) {
                 headers.from(project.fileTree(dir) {
                     // headers from include dirs should be included non-recursively
-                    include("*.h")
-                    include("*.hh")
+                    for (headerExtension in headerExtensions) {
+                        include("*.$headerExtension")
+                    }
                 })
             }
             for (sourceRoot in sourceRoots.get()) {
                 headers.from(project.fileTree(sourceRoot) {
                     // headers from source roots should be included recursively
-                    include("**/*.h")
-                    include("**/*.hh")
+                    for (headerExtension in headerExtensions) {
+                        include("*.$headerExtension")
+                    }
                 })
             }
             headers
@@ -256,3 +266,9 @@ abstract class CompileSkikoCppTask : AbstractSkikoNativeToolTask() {
         }
 }
 
+abstract class CompileSkikoObjCTask : CompileSkikoCppTask() {
+    override val srcExtensions = arrayOf("mm")
+
+    override val outDirNameForTool: String
+        get() = "compileObjC"
+}

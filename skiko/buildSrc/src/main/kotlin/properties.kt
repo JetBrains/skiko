@@ -100,26 +100,7 @@ val hostArch by lazy {
     }
 }
 
-fun findTargetOs() = when (System.getProperty("skiko.target.os.name")) {
-        "linux" -> OS.Linux
-        "macos" -> OS.MacOS
-        "windows" -> OS.Windows
-        "wasm" -> OS.Wasm
-        else -> null
-    }
-
-fun findTargetArch() = when (System.getProperty("skiko.target.os.arch")) {
-    "x64" -> Arch.X64
-    "arm64" -> Arch.Arm64
-    "wasm" -> Arch.Wasm
-    else -> null
-}
-
-val targetOs = findTargetOs() ?: hostOs
-val targetArch = findTargetArch() ?: hostArch
-
-fun targetId(os: OS, arch: Arch) =
-    "${os.id}-${arch.id}"
+fun targetId(os: OS, arch: Arch) = "${os.id}-${arch.id}"
 
 val jdkHome = System.getProperty("java.home") ?: error("'java.home' is null")
 
