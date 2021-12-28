@@ -448,6 +448,7 @@ fun configureNativeTarget(os: OS, arch: Arch, target: KotlinNativeTarget) {
             if (skiko.includeTestHelpers) {
                 linkerFlags.addAll(when (os) {
                     OS.Linux -> listOf(
+                        "-linker-option", "-lX11",
                         "-linker-option", "-lGLX",
                     )
                     else -> emptyList()
