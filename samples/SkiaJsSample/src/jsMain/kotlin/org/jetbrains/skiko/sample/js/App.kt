@@ -4,6 +4,7 @@ import kotlinx.browser.document
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.Paint
 import org.jetbrains.skia.Rect
+import org.jetbrains.skiko.GenericSkikoView
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkikoView
 import org.jetbrains.skiko.wasm.onWasmReady
@@ -32,7 +33,7 @@ fun main() {
             } else {
                 BouncingBalls()
             }
-            skiaLayer.skikoView = app
+            skiaLayer.skikoView = GenericSkikoView(skiaLayer, app)
             skiaLayer.attachTo(canvas)
             skiaLayer.needRedraw()
         }
