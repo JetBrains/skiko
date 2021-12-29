@@ -62,7 +62,6 @@ if (supportWasm) {
         flags.set(listOf(
             *skiaPreprocessorFlags(OS.Wasm),
             *buildType.clangFlags,
-            "-DSKIKO_WASM",
             "-fno-rtti",
             "-fno-exceptions"
         ))
