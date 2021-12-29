@@ -1,12 +1,10 @@
 package org.jetbrains.skiko.redrawer
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
 import org.jetbrains.skia.DirectContext
 import org.jetbrains.skia.Surface
 import org.jetbrains.skiko.*
-import org.jetbrains.skiko.context.AngleContextHandler
 import org.jetbrains.skiko.context.Direct3DContextHandler
 
 internal class Direct3DRedrawer(

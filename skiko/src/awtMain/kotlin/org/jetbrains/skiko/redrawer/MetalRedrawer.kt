@@ -3,7 +3,6 @@ package org.jetbrains.skiko.redrawer
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
 import org.jetbrains.skia.BackendRenderTarget
 import org.jetbrains.skia.DirectContext
@@ -34,7 +33,7 @@ internal class MetalRedrawer(
         setVSyncEnabled(device, properties.isVsyncEnabled)
     }
 
-    private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
+    private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
         if (layer.isShowing) {
             update(System.nanoTime())
             draw()

@@ -1,5 +1,6 @@
 package org.jetbrains.skiko
 
+import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.Picture
 
 expect open class SkiaLayer {
@@ -15,6 +16,8 @@ expect open class SkiaLayer {
     fun detach()
 
     fun needRedraw()
+
+    internal fun draw(canvas: Canvas)
 }
 
 

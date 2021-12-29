@@ -4,7 +4,6 @@ import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.ColorAlphaType
 import org.jetbrains.skia.ImageInfo
-import org.jetbrains.skia.Picture
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.hostOs
 import org.jetbrains.skiko.OS

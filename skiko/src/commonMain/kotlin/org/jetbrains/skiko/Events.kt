@@ -1,7 +1,10 @@
 package org.jetbrains.skiko
 
+import kotlin.jvm.JvmInline
+
 // Clicked mouse buttons bitmask.
-inline class SkikoMouseButtons(val value: Int) {
+@JvmInline
+value class SkikoMouseButtons(val value: Int) {
     companion object {
         val NONE = SkikoMouseButtons(0)
         val LEFT = SkikoMouseButtons(1)
@@ -55,7 +58,8 @@ inline class SkikoMouseButtons(val value: Int) {
     }
 }
 
-inline class SkikoInputModifiers(val value: Int) {
+@JvmInline
+value class SkikoInputModifiers(val value: Int) {
     companion object {
         val EMPTY = SkikoInputModifiers(0)
         val META = SkikoInputModifiers(1)

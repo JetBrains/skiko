@@ -25,7 +25,7 @@ import platform.Foundation.addObserver
 import platform.darwin.NSObject
 import platform.CoreGraphics.CGRectMake
 
-actual open class SkiaLayer() {
+actual open class SkiaLayer {
     fun isShowing(): Boolean {
         return true
     }
