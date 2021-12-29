@@ -4,12 +4,12 @@ import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.Color4f
 import org.jetbrains.skia.Paint
 import org.jetbrains.skia.PaintMode
-import org.jetbrains.skiko.SkiaRenderer
+import org.jetbrains.skiko.SkikoView
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
-class BouncingBalls: SkiaRenderer {
+class BouncingBalls: SkikoView {
     private data class Circle(var x: Float, var y: Float, var r: Float)
 
     companion object {
@@ -87,9 +87,9 @@ class BouncingBalls: SkiaRenderer {
         Color4f(0f, 1f, 1f, 0.8f).asPaint()
     ))
 
-    override fun onRender(canvas: Canvas, width: Int, height: Int, currentTimestamp: Long) {
-        val dtime = (currentTimestamp - prevTimestamp)
-        prevTimestamp = currentTimestamp
+    override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+        val dtime = (nanoTime - prevTimestamp)
+        prevTimestamp = nanoTime
 
         data.forEach { (ball, paint) ->
             ball.recalculate(width, height, dtime.toFloat())
