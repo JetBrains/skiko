@@ -4,16 +4,16 @@ import kotlinx.browser.document
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.Paint
 import org.jetbrains.skia.Rect
-import org.jetbrains.skiko.GenericSkikoApp
+import org.jetbrains.skiko.GenericSkikoView
 import org.jetbrains.skiko.SkiaLayer
-import org.jetbrains.skiko.SkiaRenderer
+import org.jetbrains.skiko.SkikoView
 import org.jetbrains.skiko.wasm.onWasmReady
 import org.w3c.dom.HTMLCanvasElement
 
-private class DemoApp: SkiaRenderer {
+private class DemoApp: SkikoView {
     private val paint = Paint()
 
-    override fun onRender(canvas: Canvas, width: Int, height: Int, currentTimestamp: Long) {
+    override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
         canvas.drawCircle(200f, 50f, 25f, paint)
         canvas.drawLine(100f, 100f, 200f, 200f, paint)
 
@@ -33,8 +33,8 @@ fun main() {
             } else {
                 BouncingBalls()
             }
-            skiaLayer.renderer = GenericSkikoApp(skiaLayer, app)
-            skiaLayer.setCanvas(canvas)
+            skiaLayer.skikoView = GenericSkikoView(skiaLayer, app)
+            skiaLayer.attachTo(canvas)
             skiaLayer.needRedraw()
         }
     }
