@@ -60,9 +60,8 @@ if (supportWasm) {
         includeHeadersNonRecursive(skiaHeadersDirs(skiaWasmDir.get()))
 
         flags.set(listOf(
-            *skiaPreprocessorFlags(),
+            *skiaPreprocessorFlags(OS.Wasm),
             *buildType.clangFlags,
-            "-DSKIKO_WASM",
             "-fno-rtti",
             "-fno-exceptions"
         ))
@@ -159,19 +158,13 @@ fun compileNativeBridgesTask(os: OS, arch: Arch): TaskProvider<CompileSkikoCppTa
                     *iosArchFlags,
                     *buildType.clangFlags,
                     "-stdlib=libc++",
-                    "-DSK_SHAPER_CORETEXT_AVAILABLE",
-                    "-DSK_BUILD_FOR_IOS",
-                    "-DSK_METAL",
-                    *skiaPreprocessorFlags(),
+                    *skiaPreprocessorFlags(OS.IOS),
                 ))
             }
             OS.MacOS -> {
                 flags.set(listOf(
                     *buildType.clangFlags,
-                    "-DSK_SHAPER_CORETEXT_AVAILABLE",
-                    "-DSK_BUILD_FOR_MAC",
-                    "-DSK_METAL",
-                    *skiaPreprocessorFlags()
+                    *skiaPreprocessorFlags(OS.MacOS)
                 ))
             }
             OS.Linux -> {
@@ -181,9 +174,8 @@ fun compileNativeBridgesTask(os: OS, arch: Arch): TaskProvider<CompileSkikoCppTa
                     "-fno-exceptions",
                     "-fvisibility=hidden",
                     "-fvisibility-inlines-hidden",
-                    "-DSK_BUILD_FOR_LINUX",
                     "-D_GLIBCXX_USE_CXX11_ABI=0",
-                    *skiaPreprocessorFlags()
+                    *skiaPreprocessorFlags(OS.Linux)
                 ))
             }
             else -> throw GradleException("$os not yet supported")
@@ -218,7 +210,7 @@ kotlin {
         compilations.all {
             kotlinOptions.jvmTarget = "11"
         }
-        generateVersion(targetOs, targetArch)
+        generateVersion(hostOs, hostArch)
     }
 
     if (supportAndroid) {
@@ -227,8 +219,8 @@ kotlin {
             compilations.all {
                 kotlinOptions.jvmTarget = "11"
             }
-            // todo: what is the actual target arch? what does "jvm(android)" target even mean?
-            generateVersion(OS.Android, targetArch)
+            // TODO: seems incorrect.
+            generateVersion(OS.Android, Arch.Arm64)
         }
     }
 
@@ -467,6 +459,7 @@ fun configureNativeTarget(os: OS, arch: Arch, target: KotlinNativeTarget) {
 
     val crossCompileTask = compileNativeBridgesTask(os, arch)
 
+    // TODO: move to LinkSkikoTask.
     val linkTask = project.registerSkikoTask<Exec>("linkNativeBridges", os, arch) {
         dependsOn(crossCompileTask)
         val objectFilesDir = crossCompileTask.map { it.outDir.get() }
@@ -525,8 +518,8 @@ fun skiaHeadersDirs(skiaDir: File): List<File> =
 fun includeHeadersFlags(headersDirs: List<File>) =
     headersDirs.map { "-I${it.absolutePath}" }.toTypedArray()
 
-fun skiaPreprocessorFlags(): Array<String> {
-    return listOf(
+fun skiaPreprocessorFlags(os: OS): Array<String> {
+    val base = listOf(
         "-DSK_ALLOW_STATIC_GLOBAL_INITIALIZERS=1",
         "-DSK_FORCE_DISTANCE_FIELD_TEXT=0",
         "-DSK_GAMMA_APPLY_TO_A8",
@@ -541,7 +534,42 @@ fun skiaPreprocessorFlags(): Array<String> {
         "-DU_DISABLE_RENAMING",
         "-DSK_USING_THIRD_PARTY_ICU",
         *buildType.flags
-    ).toTypedArray()
+    )
+
+    val perOs = when (os) {
+        OS.MacOS -> listOf(
+            "-DSK_SHAPER_CORETEXT_AVAILABLE",
+            "-DSK_BUILD_FOR_MAC",
+            "-DSK_METAL"
+        )
+        OS.IOS -> listOf(
+            "-DSK_BUILD_FOR_IOS",
+            "-DSK_SHAPER_CORETEXT_AVAILABLE",
+            "-DSK_METAL"
+        )
+        OS.Windows -> listOf(
+            "-DSK_BUILD_FOR_WIN",
+            "-D_CRT_SECURE_NO_WARNINGS",
+            "-D_HAS_EXCEPTIONS=0",
+            "-DWIN32_LEAN_AND_MEAN",
+            "-DNOMINMAX",
+            "-DSK_GAMMA_APPLY_TO_A8",
+            "-DSK_DIRECT3D"
+        )
+        OS.Linux -> listOf(
+            "-DSK_BUILD_FOR_LINUX",
+            "-D_GLIBCXX_USE_CXX11_ABI=0"
+        )
+        OS.Wasm -> listOf(
+            "-DSKIKO_WASM"
+        )
+        OS.Android -> listOf(
+            "-DSK_BUILD_FOR_ANDROID"
+        )
+        else -> TODO("unsupported $os")
+    }
+
+    return (base + perOs).toTypedArray()
 }
 
 fun skiaStaticLibraries(skiaDir: String, targetString: String): List<String> {
@@ -572,28 +600,64 @@ fun skiaStaticLibraries(skiaDir: String, targetString: String): List<String> {
     }
 }
 
-val skiaJvmBindingsDir: Provider<File> = registerOrGetSkiaDirProvider(targetOs, targetArch)
-val compileJvmBindings = createCompileJvmBindingsTask(targetOs, targetArch, skiaJvmBindingsDir)
-val linkJvmBindings = createLinkJvmBindings(targetOs, targetArch, skiaJvmBindingsDir, compileJvmBindings)
-val maybeSign = maybeSignTask(targetOs, targetArch, linkJvmBindings)
-val createChecksums =  createChecksumsTask(targetOs, targetArch, maybeSign, skiaJvmBindingsDir)
-val skikoJvmRuntimeJar = skikoJvmRuntimeJarTask(targetOs, targetArch, maybeSign, createChecksums, skiaJvmBindingsDir)
-val skikoRuntimeDirForTests = skikoRuntimeDirForTestsTask(targetOs, targetArch, skikoJvmRuntimeJar)
+val allJvmRuntimeJars = mutableMapOf<Pair<OS, Arch>, TaskProvider<Jar>>()
 
-val allJvmRuntimeJars = mutableMapOf((targetOs to targetArch) to skikoJvmRuntimeJar)
+val skikoJvmRuntimeJar = createSkikoJvmJarTask(hostOs, hostArch)
+val skikoRuntimeDirForTests = skikoRuntimeDirForTestsTask(hostOs, hostArch, skikoJvmRuntimeJar)
 
 if (supportAndroid) {
     val os = OS.Android
     for (arch in arrayOf(Arch.X64, Arch.Arm64)) {
-        val skiaAndroidBindingsDir = registerOrGetSkiaDirProvider(os, arch)
-        val compileAndroidBindings = createCompileJvmBindingsTask(os, arch, skiaAndroidBindingsDir)
-        val linkAndroidBindings =
-            createLinkJvmBindings(OS.Android, arch, skiaAndroidBindingsDir, compileAndroidBindings)
-        val maybeSignAndroid = maybeSignTask(os, arch, linkAndroidBindings)
-        val createChecksumsAndroid = createChecksumsTask(os, arch, maybeSignAndroid, skiaAndroidBindingsDir)
-        val skikoJvmRuntimeJarAndroid = skikoJvmRuntimeJarTask(os, arch, maybeSignAndroid, createChecksumsAndroid, skiaAndroidBindingsDir)
-        allJvmRuntimeJars[os to arch] = skikoJvmRuntimeJarAndroid
+        createSkikoJvmJarTask(os, arch)
     }
+}
+
+fun createSkikoJvmJarTask(os: OS, arch: Arch): TaskProvider<Jar> {
+    val skiaBindingsDir = registerOrGetSkiaDirProvider(os, arch)
+    val compileBindings = createCompileJvmBindingsTask(os, arch, skiaBindingsDir)
+    val objcCompile = if (os == OS.MacOS) createObjcCompileTask(os, arch, skiaBindingsDir) else null
+    val linkBindings =
+        createLinkJvmBindings(os, arch, skiaBindingsDir, compileBindings, objcCompile)
+    val maybeSign = maybeSignTask(os, arch, linkBindings)
+    val createChecksums = createChecksumsTask(os, arch, maybeSign, skiaBindingsDir)
+    val skikoJvmRuntimeJar = skikoJvmRuntimeJarTask(os, arch, maybeSign, createChecksums, skiaBindingsDir)
+    allJvmRuntimeJars[os to arch] = skikoJvmRuntimeJar
+    return skikoJvmRuntimeJar
+}
+
+fun createObjcCompileTask(
+    os: OS,
+    arch: Arch,
+    skiaJvmBindingsDir: Provider<File>
+) = registerSkikoTask<CompileSkikoObjCTask>("objcCompile", os, arch) {
+    dependsOn(skiaJvmBindingsDir)
+
+    val srcDirs = projectDirs(
+        "src/jvmMain/objectiveC/${os.id}"
+    )
+    sourceRoots.set(srcDirs)
+    val jdkHome = File(System.getProperty("java.home") ?: error("'java.home' is null"))
+
+    includeHeadersNonRecursive(jdkHome.resolve("include"))
+    includeHeadersNonRecursive(jdkHome.resolve("include/darwin"))
+    includeHeadersNonRecursive(skiaHeadersDirs(skiaJvmBindingsDir.get()))
+    includeHeadersNonRecursive(projectDir.resolve("src/jvmMain/cpp/include"))
+    includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp/common/include"))
+
+    compiler.set("clang")
+    buildVariant.set(buildType)
+    buildTargetOS.set(os)
+    buildTargetArch.set(arch)
+    flags.set(
+        listOf(
+            "-fobjc-arc",
+            "-arch", if (arch == Arch.Arm64) "arm64" else "x86_64",
+            *os.clangFlags,
+            *buildType.clangFlags,
+            *skiaPreprocessorFlags(os),
+            "-fPIC"
+        )
+    )
 }
 
 fun androidHome() = when (hostOs) {
@@ -668,10 +732,7 @@ fun createCompileJvmBindingsTask(
                 "-fPIC",
                 "-stdlib=libc++",
                 "-fvisibility=hidden",
-                "-fvisibility-inlines-hidden",
-                "-DSK_SHAPER_CORETEXT_AVAILABLE",
-                "-DSK_BUILD_FOR_MAC",
-                "-DSK_METAL",
+                "-fvisibility-inlines-hidden"
             )
         }
         OS.Linux -> {
@@ -682,9 +743,7 @@ fun createCompileJvmBindingsTask(
                 "-fno-rtti",
                 "-fno-exceptions",
                 "-fvisibility=hidden",
-                "-fvisibility-inlines-hidden",
-                "-DSK_BUILD_FOR_LINUX",
-                "-D_GLIBCXX_USE_CXX11_ABI=0",
+                "-fvisibility-inlines-hidden"
             )
         }
         OS.Windows -> {
@@ -694,13 +753,6 @@ fun createCompileJvmBindingsTask(
             osFlags = arrayOf(
                 "/nologo",
                 *buildType.msvcCompilerFlags,
-                "-DSK_BUILD_FOR_WIN",
-                "-D_CRT_SECURE_NO_WARNINGS",
-                "-D_HAS_EXCEPTIONS=0",
-                "-DWIN32_LEAN_AND_MEAN",
-                "-DNOMINMAX",
-                "-DSK_GAMMA_APPLY_TO_A8",
-                "-DSK_DIRECT3D",
                 "/utf-8",
                 "/GR-", // no-RTTI.
                 // LATER. Ange rendering arguments:
@@ -716,8 +768,7 @@ fun createCompileJvmBindingsTask(
                 "-fno-rtti",
                 "-fno-exceptions",
                 "-fvisibility=hidden",
-                "-fPIC",
-                "-DSK_BUILD_FOR_ANDROID"
+                "-fPIC"
             )
         }
         OS.Wasm, OS.IOS -> error("Should not reach here")
@@ -725,7 +776,7 @@ fun createCompileJvmBindingsTask(
 
     flags.set(
         listOf(
-            *skiaPreprocessorFlags(),
+            *skiaPreprocessorFlags(targetOs),
             *osFlags
         )
     )
@@ -735,7 +786,8 @@ fun createLinkJvmBindings(
     targetOs: OS,
     targetArch: Arch,
     skiaJvmBindingsDir: Provider<File>,
-    compileTask: TaskProvider<CompileSkikoCppTask>
+    compileTask: TaskProvider<CompileSkikoCppTask>,
+    objcCompileTask: TaskProvider<CompileSkikoObjCTask>?
 ) = project.registerSkikoTask<LinkSkikoTask>("linkJvmBindings", targetOs, targetArch) {
         val target = targetId(targetOs, targetArch)
         val skiaBinSubdir = "out/${buildType.id}-$target"
@@ -750,7 +802,6 @@ fun createLinkJvmBindings(
         objectFiles = fileTree(compileTask.map { it.outDir.get() }) {
             include("**/*.o")
         }
-
         val libNamePrefix = if (targetOs.isWindows) "skiko" else "libskiko"
         libOutputFileName.set("$libNamePrefix-${targetOs.id}-${targetArch.id}${targetOs.dynamicLibExt}")
         buildTargetOS.set(targetOs)
@@ -760,13 +811,13 @@ fun createLinkJvmBindings(
 
         when (targetOs) {
             OS.MacOS -> {
-                dependsOn("objcCompile")
-                objectFiles += fileTree("$buildDir/objc/$target") {
+                dependsOn(objcCompileTask!!)
+                objectFiles += fileTree(objcCompileTask.map { it.outDir.get() }) {
                     include("**/*.o")
                 }
-
                 osFlags = arrayOf(
                     *targetOs.clangFlags,
+                    "-arch", if (targetArch == Arch.Arm64) "arm64" else "x86_64",
                     "-shared",
                     "-dead_strip",
                     "-lobjc",
@@ -830,41 +881,6 @@ fun createLinkJvmBindings(
         }
         flags.set(listOf(*osFlags))
     }
-
-if (hostOs == OS.MacOS) {
-    // Very hacky way to compile Objective-C sources and add the
-    // resulting object files into the final library.
-    // TODO: rewrite using SkikoCompileTask
-    project.tasks.register<Exec>("objcCompile") {
-        val target = targetId(targetOs, targetArch)
-        val inputDir = "$projectDir/src/jvmMain/objectiveC/${targetOs.id}"
-        val outDir = "$buildDir/objc/$target"
-        val names = File(inputDir).listFiles()!!.map { it.name.removeSuffix(".mm") }
-        val srcs = names.map { "$inputDir/$it.mm" }.toTypedArray()
-        val outs = names.map { "$outDir/$it.o" }.toTypedArray()
-        workingDir = File(outDir)
-        val skiaDir = skiaJvmBindingsDir.get().absolutePath
-        dependsOn(skiaJvmBindingsDir)
-
-        commandLine = listOf(
-            "clang",
-            *targetOs.clangFlags,
-            *buildType.clangFlags,
-            "-I$jdkHome/include",
-            "-I$jdkHome/include/darwin",
-            "-I$skiaDir",
-            "-I$skiaDir/include",
-            "-I$skiaDir/include/gpu",
-            "-fobjc-arc",
-            "-DSK_METAL",
-            "-c",
-            *srcs
-        )
-        file(outDir).mkdirs()
-        inputs.files(srcs)
-        outputs.files(outs)
-    }
-}
 
 fun KotlinTarget.generateVersion(
     targetOs: OS,
@@ -948,13 +964,14 @@ fun createChecksumsTask(
     maybeSign: Provider<SealAndSignSharedLibraryTask>,
     bindingsDir: Provider<File>
 ) = project.registerSkikoTask<Checksum>("createChecksums", targetOs, targetArch) {
-        val skiaBinSubdir = "out/${buildType.id}-${targetOs.id}-${targetArch.id}"
-        dependsOn(maybeSign)
-        files = project.files(maybeSign.flatMap { it.outputFiles }) +
-                if (targetOs.isWindows) files(bindingsDir.map { it.resolve("${skiaBinSubdir}/icudtl.dat") }) else files()
-        algorithm = Checksum.Algorithm.SHA256
-        outputDir = file("$buildDir/checksums")
-    }
+
+    val skiaBinSubdir = "out/${buildType.id}-${targetOs.id}-${targetArch.id}"
+    dependsOn(maybeSign)
+    files = project.files(maybeSign.flatMap { it.outputFiles }) +
+            if (targetOs.isWindows) files(bindingsDir.map { it.resolve("${skiaBinSubdir}/icudtl.dat") }) else files()
+    algorithm = Checksum.Algorithm.SHA256
+    outputDir = file("$buildDir/checksums-${targetOs.id}-${targetArch.id}")
+}
 
 fun skikoJvmRuntimeJarTask(
     targetOs: OS,
@@ -1164,15 +1181,6 @@ afterEvaluate {
     }
 }
 
-// Kotlin/JS has a bug preventing compilation on non-x86 Linux machines,
-// see https://youtrack.jetbrains.com/issue/KT-48631
-// It always downloads and uses x86 version, so on those architectures
-if (hostOs == OS.Linux && hostArch != Arch.X64) {
-    rootProject.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin::class.java) {
-        rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>().download = false
-    }
-}
-
 /**
  * Do not call inside tasks.register or tasks.call callback
  * (tasks' registration during other task's registration is prohibited)
@@ -1216,5 +1224,12 @@ tasks.withType<AbstractTestTask> {
 }
 
 rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin> {
-    rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>().nodeVersion = "16.0.0"
+    val nodeExtension = rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>()
+    nodeExtension.nodeVersion = "16.0.0"
+    // Kotlin/JS has a bug preventing compilation on non-x86 Linux machines,
+    // see https://youtrack.jetbrains.com/issue/KT-48631
+    // It always downloads and uses x86 version, so on those architectures
+    if (hostOs == OS.Linux && hostArch != Arch.X64) {
+        nodeExtension.download = false
+    }
 }
