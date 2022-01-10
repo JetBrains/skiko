@@ -259,7 +259,10 @@ enum class SkikoPointerEventKind {
 
 expect class SkikoPlatformPointerEvent
 data class SkikoPointerEvent(
-    val x: Double, val y: Double,
+    val x: Double,
+    val y: Double,
+    val deltaX: Double = 0.0,
+    val deltaY: Double = 0.0,
     val buttons: SkikoMouseButtons = SkikoMouseButtons.NONE,
     val modifiers: SkikoInputModifiers = SkikoInputModifiers.EMPTY,
     val kind: SkikoPointerEventKind,

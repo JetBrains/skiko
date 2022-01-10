@@ -108,7 +108,7 @@ actual open class SkiaLayer() {
                 skikoView?.onPointerEvent(toSkikoEvent(event, SkikoPointerEventKind.DRAG, nsView))
             }
             override fun scrollWheel(event: NSEvent) {
-                skikoView?.onPointerEvent(toSkikoScrollEvent(event))
+                skikoView?.onPointerEvent(toSkikoScrollEvent(event, nsView))
             }
             override fun keyDown(event: NSEvent) {
                 keyEvent = event

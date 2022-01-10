@@ -81,11 +81,11 @@ fun BufferedImage.toImage(): Image {
 
 fun toSkikoEvent(event: MouseEvent): SkikoPointerEvent {
     return SkikoPointerEvent(
-        event.x.toDouble(),
-        event.y.toDouble(),
-        toSkikoMouseButtons(event.modifiersEx),
-        toSkikoModifiers(event.modifiersEx),
-        when(event.id) {
+        x = event.x.toDouble(),
+        y = event.y.toDouble(),
+        buttons = toSkikoMouseButtons(event.modifiersEx),
+        modifiers = toSkikoModifiers(event.modifiersEx),
+        kind = when(event.id) {
             MouseEvent.MOUSE_PRESSED -> SkikoPointerEventKind.DOWN
             MouseEvent.MOUSE_RELEASED -> SkikoPointerEventKind.UP
             MouseEvent.MOUSE_DRAGGED -> SkikoPointerEventKind.DRAG
@@ -94,8 +94,8 @@ fun toSkikoEvent(event: MouseEvent): SkikoPointerEvent {
             MouseEvent.MOUSE_EXITED -> SkikoPointerEventKind.EXIT
             else -> SkikoPointerEventKind.UNKNOWN
         },
-        event.`when`,
-        event
+        timestamp = event.`when`,
+        platform = event
     )
 }
 
@@ -103,19 +103,21 @@ fun toSkikoEvent(event: MouseWheelEvent): SkikoPointerEvent {
     val scrollAmount = event.getPreciseWheelRotation()
     val modifiers = toSkikoModifiers(event.modifiersEx)
     val isShiftPressed = modifiers.has(SkikoInputModifiers.SHIFT)
-    val x = if (isShiftPressed) scrollAmount else 0.0
-    val y = if (isShiftPressed) 0.0 else scrollAmount
+    val deltaX = if (isShiftPressed) scrollAmount else 0.0
+    val deltaY = if (isShiftPressed) 0.0 else scrollAmount
     return SkikoPointerEvent(
-        x,
-        y,
-        toSkikoMouseButtons(event.modifiersEx),
-        modifiers,
-        when(event.id) {
+        x = event.x.toDouble(),
+        y = event.y.toDouble(),
+        deltaX = deltaX,
+        deltaY = deltaY,
+        buttons = toSkikoMouseButtons(event.modifiersEx),
+        modifiers = modifiers,
+        kind = when(event.id) {
             MouseEvent.MOUSE_WHEEL-> SkikoPointerEventKind.SCROLL
             else -> SkikoPointerEventKind.UNKNOWN
         },
-        event.`when`,
-        event
+        timestamp = event.`when`,
+        platform = event
     )
 }
 

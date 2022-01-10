@@ -129,11 +129,11 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
             SkikoPointerEventKind.SCROLL -> {
                 when (event.modifiers) {
                     SkikoInputModifiers.CONTROL -> {
-                        rotate += if (event.y < 0) -5.0 else 5.0
+                        rotate += if (event.deltaY < 0) -5.0 else 5.0
                     }
                     else -> {
                         if (event.y != 0.0) {
-                            scale *= if (event.y < 0) 0.9 else 1.1
+                            scale *= if (event.deltaY < 0) 0.9 else 1.1
                         }
                     }
                 }
