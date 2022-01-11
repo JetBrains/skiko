@@ -46,8 +46,8 @@ internal class Direct3DRedrawer(
 
     override fun redrawImmediately() {
         check(!isDisposed) { "Direct3DRedrawer is disposed" }
-        layer.update(System.nanoTime())
         layer.inDrawScope {
+        layer.update(System.nanoTime())
             drawAndSwap(withVsync = false)
         }
     }

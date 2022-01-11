@@ -71,13 +71,15 @@ internal class LinuxOpenGLRedrawer(
 
     override fun redrawImmediately() = layer.backedLayer.lockLinuxDrawingSurface {
         check(!isDisposed) { "LinuxOpenGLRedrawer is disposed" }
-        update(System.nanoTime())
-        it.makeCurrent(context)
-        draw()
-        it.setSwapInterval(0)
-        it.swapBuffers()
-        OpenGLApi.instance.glFinish()
-        it.setSwapInterval(swapInterval)
+        layer.inDrawScope {
+            update(System.nanoTime())
+            it.makeCurrent(context)
+            contextHandler.draw()
+            it.setSwapInterval(0)
+            it.swapBuffers()
+            OpenGLApi.instance.glFinish()
+            it.setSwapInterval(swapInterval)
+        }
     }
 
     private fun update(nanoTime: Long) {
