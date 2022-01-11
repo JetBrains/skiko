@@ -55,10 +55,12 @@ internal class MetalRedrawer(
 
     override fun redrawImmediately() {
         check(!isDisposed) { "MetalRedrawer is disposed" }
-        setVSyncEnabled(device, enabled = false)
-        update(System.nanoTime())
-        layer.inDrawScope(::performDraw)
-        setVSyncEnabled(device, properties.isVsyncEnabled)
+        layer.inDrawScope {
+            setVSyncEnabled(device, enabled = false)
+            update(System.nanoTime())
+            performDraw()
+            setVSyncEnabled(device, properties.isVsyncEnabled)
+        }
     }
 
     private fun update(nanoTime: Long) {

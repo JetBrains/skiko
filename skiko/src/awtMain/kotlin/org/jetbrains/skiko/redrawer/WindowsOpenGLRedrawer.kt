@@ -51,11 +51,13 @@ internal class WindowsOpenGLRedrawer(
 
     override fun redrawImmediately() {
         check(!isDisposed) { "WindowsOpenGLRedrawer is disposed" }
-        update(System.nanoTime())
-        makeCurrent()
-        draw()
-        swapBuffers()
-        OpenGLApi.instance.glFinish()
+        layer.inDrawScope {
+            update(System.nanoTime())
+            makeCurrent()
+            contextHandler.draw()
+            swapBuffers()
+            OpenGLApi.instance.glFinish()
+        }
     }
 
     private fun update(nanoTime: Long) {
