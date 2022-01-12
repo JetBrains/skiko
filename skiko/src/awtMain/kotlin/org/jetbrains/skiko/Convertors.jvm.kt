@@ -1,10 +1,6 @@
 package org.jetbrains.skiko
 
-import org.jetbrains.skia.Bitmap
-import org.jetbrains.skia.ColorAlphaType
-import org.jetbrains.skia.ColorType
-import org.jetbrains.skia.ImageInfo
-import org.jetbrains.skia.Image
+import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.BufferUtil
 import java.awt.Transparency
 import java.awt.color.ColorSpace
@@ -209,4 +205,10 @@ private fun toSkikoKey(event: KeyEvent): Int {
         }
     }
     return key
+}
+
+suspend fun java.awt.Font.toSkikoTypeface(): Typeface? {
+    val file = AwtFontManager.findFontFile(this) ?: return null
+    val data = file.readBytes()
+    return Typeface.makeFromData(Data.makeFromBytes(data))
 }

@@ -5,7 +5,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.awt.Font
 import java.awt.FontFormatException
-import java.awt.GraphicsEnvironment
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
@@ -26,11 +25,8 @@ object AwtFontManager {
         }
     }
 
-    private val systemFontNames: Array<String>
-        get() = GraphicsEnvironment.getLocalGraphicsEnvironment().availableFontFamilyNames
-
-    private val systemFontsPaths: Array<String> by lazy {
-        when (hostOs) {
+    private fun systemFontsPaths(): Array<String> {
+        return when (hostOs) {
             OS.Windows -> {
                 val winPath = System.getenv("WINDIR")
                 val localAppPath = System.getenv("LOCALAPPDATA")
@@ -68,9 +64,9 @@ object AwtFontManager {
         }
     }
 
-    private val systemFontFiles: List<File> by lazy {
+    private fun systemFontFiles(): List<File> {
         val extensions = arrayOf("ttf", "TTF")
-        val paths = systemFontsPaths
+        val paths = systemFontsPaths()
         val files = mutableListOf<File>()
         for (i in paths.indices) {
             val fontDirectory = File(paths[i])
@@ -79,11 +75,11 @@ object AwtFontManager {
                 files.add(it)
             }
         }
-        files
+        return files
     }
 
     private fun cacheSystemFonts() {
-        val fontFiles = systemFontFiles
+        val fontFiles = systemFontFiles()
         for (file in fontFiles) {
             try {
                 if (!fontsMap.containsValue(file.absoluteFile)) {
@@ -97,20 +93,63 @@ object AwtFontManager {
         }
     }
 
-    fun findFontFile(font: Font): File? {
+    /**
+     * Find font file path from an AWT font.
+     * As font finding is long IO-intensive process, this operation checks if given font
+     * is already known to the font manager. This may change in the future.
+     *
+     * @param font - AWT font for which we need to know the path
+     * @return - path to font, if known
+     */
+    fun findAvailableFontFile(font: Font): File? {
         return fontsMap[font.family]
     }
 
+    /**
+     * Show all fonts currently known to AWT font manager. As font indexing could take time,
+     * may have not all elements.
+     */
+    fun listCurrentFontFiles(): List<File> {
+        return fontsMap.values.toList()
+    }
+
+    /**
+     * Show all fonts known to AWT font manager.
+     */
+    suspend fun listFontFiles(): List<File> {
+        waitAllFontsCached()
+        return fontsMap.values.toList()
+    }
+
+
+    /**
+     * Find font file path from an AWT font.
+     *  As font finding is long IO-intensive process, this operation may suspend for pretty long time..
+     */
+    suspend fun findFontFile(font: Font): File? {
+        waitAllFontsCached()
+        return fontsMap[font.family]
+    }
+
+    /**
+     * If all AWT fonts were indexed.
+     */
     val allFontsCached: Boolean
         get() = allFontsCachedImpl
 
-    fun whenAllCachedBlocking(continuation: () -> Unit) {
+    /**
+     * Call continuation only when all AWT fonts are cached.
+     */
+    fun whenAllFontsCachedBlocking(continuation: () -> Unit) {
         // TODO: avoid busy loop
         while (!allFontsCachedImpl) {}
         continuation()
     }
 
-    suspend fun waitCached() {
+    /**
+     * Suspend until all AWT fonts were cached.
+     */
+    suspend fun waitAllFontsCached() {
         if (!allFontsCachedImpl) {
             waitChannel.receive()
         }
