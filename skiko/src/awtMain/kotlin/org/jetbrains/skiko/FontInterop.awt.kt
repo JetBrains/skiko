@@ -16,10 +16,13 @@ object AwtFontManager {
     @Volatile
     private var allFontsCachedImpl = false
 
+    private val waitChannel = RendezvousBroadcastChannel<Int>()
+
     init {
         GlobalScope.launch(Dispatchers.IO) {
             cacheSystemFonts()
             allFontsCachedImpl = true
+            waitChannel.sendAll(1)
         }
     }
 
@@ -101,9 +104,15 @@ object AwtFontManager {
     val allFontsCached: Boolean
         get() = allFontsCachedImpl
 
-    fun whenAllCached(continuation: () -> Unit) {
+    fun whenAllCachedBlocking(continuation: () -> Unit) {
         // TODO: avoid busy loop
         while (!allFontsCachedImpl) {}
         continuation()
+    }
+
+    suspend fun waitCached() {
+        if (!allFontsCachedImpl) {
+            waitChannel.receive()
+        }
     }
 }
