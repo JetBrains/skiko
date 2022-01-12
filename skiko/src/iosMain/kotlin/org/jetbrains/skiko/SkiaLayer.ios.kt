@@ -172,7 +172,7 @@ actual open class SkiaLayer {
     internal var redrawer: MetalRedrawer? = null
     private var contextHandler: MetalContextHandler? = null
 
-    internal fun draw(canvas: Canvas) {
+    internal actual fun draw(canvas: Canvas) {
         check(!isDisposed) { "SkiaLayer is disposed" }
         val (w, h) = view!!.frame.useContents {
             size.width to size.height

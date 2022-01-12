@@ -1,11 +1,28 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        google()
+        mavenCentral()
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    }
+
+    dependencies {
+        classpath("com.android.tools.build:gradle:7.1.0-beta05")
+        // __KOTLIN_COMPOSE_VERSION__
+        classpath(kotlin("gradle-plugin", version = "1.6.10"))
+    }
+}
+
 plugins {
     kotlin("multiplatform") version "1.6.10"
+    id("com.android.application") version "7.1.0-beta05"
 }
 
 val coroutinesVersion = "1.5.2"
 
 repositories {
     mavenLocal()
+    google()
     mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
@@ -110,6 +127,10 @@ kotlin {
             resources.srcDirs(unzipTask.map { it.destinationDir })
         }
 
+        val androidMain by creating {
+            dependsOn(commonMain)
+        }
+
         val darwinMain by creating {
             dependsOn(nativeMain)
         }
@@ -144,6 +165,18 @@ kotlin {
                 dependsOn(iosMain)
             }
         }
+    }
+}
+
+android {
+    compileSdkVersion(30)
+    defaultConfig {
+        applicationId = "org.gradle.samples"
+        minSdkVersion(16)
+        targetSdkVersion(30)
+        versionCode = 1
+        versionName = "1.0"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 }
 

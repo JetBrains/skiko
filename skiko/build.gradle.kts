@@ -213,10 +213,13 @@ kotlin {
     }
 
     if (supportAndroid) {
-        // todo: use android target
         jvm("android") {
             compilations.all {
                 kotlinOptions.jvmTarget = "11"
+            }
+            // We need an additional attribute to distinguish between JVM variants.
+            attributes {
+                attributes.attribute(Attribute.of("ui", String::class.java), "android")
             }
             // TODO: seems incorrect.
             generateVersion(OS.Android, Arch.Arm64)
@@ -225,7 +228,7 @@ kotlin {
 
     if (supportWasm) {
         js(IR) {
-            browser() {
+            browser {
                 testTask {
                     dependsOn("linkWasm")
                     useKarma {

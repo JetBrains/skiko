@@ -1,7 +1,6 @@
 package org.jetbrains.skiko
 
 import org.jetbrains.skiko.redrawer.Redrawer
-import javax.swing.UIManager
 
 actual fun setSystemLookAndFeel(): Unit = TODO()
 
