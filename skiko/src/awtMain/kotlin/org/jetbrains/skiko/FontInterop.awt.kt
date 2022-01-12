@@ -8,12 +8,12 @@ import java.io.FileInputStream
 import java.io.IOException
 import java.util.concurrent.ConcurrentHashMap
 
-class AwtFontManager {
+class AwtFontManager(fontPaths: Array<String> = emptyArray()) {
     private var fontsMap = ConcurrentHashMap<String, File>()
     @Volatile
     private var allFontsCachedImpl = false
     private val waitChannel = RendezvousBroadcastChannel<Int>()
-    private var customFontPaths = mutableListOf<String>()
+    private var customFontPaths = mutableListOf(*fontPaths)
     private var cacheJob: Job? = null
 
     init {
@@ -100,6 +100,7 @@ class AwtFontManager {
      * @param font - AWT font for which we need to know the path
      * @return path to font, if known
      */
+    @DelicateSkikoApi
     fun findAvailableFontFile(font: Font): File? {
         return fontsMap[font.family]
     }
@@ -112,6 +113,7 @@ class AwtFontManager {
      *
      * @return list of currently known fonts
      */
+    @DelicateSkikoApi
     fun listAvailableFontFiles(): List<File> {
         return fontsMap.values.toList()
     }
@@ -124,7 +126,6 @@ class AwtFontManager {
         waitAllFontsCached()
         return fontsMap.values.toList()
     }
-
 
     /**
      * Find font file path from an AWT font.
@@ -176,6 +177,7 @@ class AwtFontManager {
      * If all AWT fonts were cached. Check this property before using non-suspend version
      * of font conversion APIs.
      */
+    @DelicateSkikoApi
     val allFontsCached: Boolean
         get() = allFontsCachedImpl
 
@@ -183,6 +185,7 @@ class AwtFontManager {
      * Call continuation only when all AWT fonts are cached.
      * Please avoid this API and prefer suspend operations.
      */
+    @DelicateSkikoApi
     fun whenAllFontsCachedBlocking(continuation: () -> Unit) {
         // TODO: avoid busy loop
         while (!allFontsCachedImpl) {}

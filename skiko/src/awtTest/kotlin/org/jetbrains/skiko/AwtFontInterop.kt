@@ -15,6 +15,7 @@ class AwtFontInterop {
         Assume.assumeTrue(hostOs != OS.Linux)
     }
 
+    @OptIn(DelicateSkikoApi::class)
     @Test
     fun canFindAvailableFont() = fontManager.whenAllFontsCachedBlocking {
         assumeOk()
@@ -48,6 +49,7 @@ class AwtFontInterop {
         }
     }
 
+    @OptIn(DelicateSkikoApi::class)
     @Test
     fun nonExistentFont() = fontManager.whenAllFontsCachedBlocking {
         assumeOk()
