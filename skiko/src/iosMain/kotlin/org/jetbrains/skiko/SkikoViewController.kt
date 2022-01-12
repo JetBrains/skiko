@@ -65,7 +65,7 @@ class SkikoViewController : UIViewController, UIKeyInputProtocol {
 
     override fun touchesBegan(touches: Set<*>, withEvent: UIEvent?) {
         super.touchesBegan(touches, withEvent)
-        val events: MutableSet<SkikoTouchEvent> = mutableSetOf()
+        val events: MutableList<SkikoTouchEvent> = mutableListOf()
         for (touch in touches) {
             val event = touch as UITouch
             val (x, y) = event.locationInView(null).useContents { x to y }
@@ -74,12 +74,12 @@ class SkikoViewController : UIViewController, UIKeyInputProtocol {
                 SkikoTouchEvent(x, y, SkikoTouchEventKind.STARTED, timestamp, event)
             )
         }
-        skikoLayer.skikoView?.onTouchEvent(events)
+        skikoLayer.skikoView?.onTouchEvent(events.toTypedArray())
     }
 
     override fun touchesEnded(touches: Set<*>, withEvent: UIEvent?) {
         super.touchesEnded(touches, withEvent)
-        val events: MutableSet<SkikoTouchEvent> = mutableSetOf()
+        val events: MutableList<SkikoTouchEvent> = mutableListOf()
         for (touch in touches) {
             val event = touch as UITouch
             val (x, y) = event.locationInView(null).useContents { x to y }
@@ -88,12 +88,12 @@ class SkikoViewController : UIViewController, UIKeyInputProtocol {
                 SkikoTouchEvent(x, y, SkikoTouchEventKind.ENDED, timestamp, event)
             )
         }
-        skikoLayer.skikoView?.onTouchEvent(events)
+        skikoLayer.skikoView?.onTouchEvent(events.toTypedArray())
     }
 
     override fun touchesMoved(touches: Set<*>, withEvent: UIEvent?) {
         super.touchesMoved(touches, withEvent)
-        val events: MutableSet<SkikoTouchEvent> = mutableSetOf()
+        val events: MutableList<SkikoTouchEvent> = mutableListOf()
         for (touch in touches) {
             val event = touch as UITouch
             val (x, y) = event.locationInView(null).useContents { x to y }
@@ -102,12 +102,12 @@ class SkikoViewController : UIViewController, UIKeyInputProtocol {
                 SkikoTouchEvent(x, y, SkikoTouchEventKind.MOVED, timestamp, event)
             )
         }
-        skikoLayer.skikoView?.onTouchEvent(events)
+        skikoLayer.skikoView?.onTouchEvent(events.toTypedArray())
     }
 
     override fun touchesCancelled(touches: Set<*>, withEvent: UIEvent?) {
         super.touchesCancelled(touches, withEvent)
-        val events: MutableSet<SkikoTouchEvent> = mutableSetOf()
+        val events: MutableList<SkikoTouchEvent> = mutableListOf()
         for (touch in touches) {
             val event = touch as UITouch
             val (x, y) = event.locationInView(null).useContents { x to y }
@@ -116,7 +116,7 @@ class SkikoViewController : UIViewController, UIKeyInputProtocol {
                 SkikoTouchEvent(x, y, SkikoTouchEventKind.CANCELLED, timestamp, event)
             )
         }
-        skikoLayer.skikoView?.onTouchEvent(events)
+        skikoLayer.skikoView?.onTouchEvent(events.toTypedArray())
     }
 
     internal lateinit var appFactory: (SkiaLayer) -> SkikoView
