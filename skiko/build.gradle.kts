@@ -308,6 +308,9 @@ kotlin {
 
         val awtTest by getting {
             dependsOn(jvmTest)
+            dependencies {
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:$coroutinesVersion")
+            }
         }
 
         if (supportAndroid) {
@@ -1031,6 +1034,8 @@ tasks.withType<Test>().configureEach {
         systemProperty("skiko.jar.path", jar.absolutePath)
 
         systemProperty("skiko.test.screenshots.dir", File(project.projectDir, "src/jvmTest/screenshots").absolutePath)
+        systemProperty("skiko.test.font.dir", File(project.projectDir, "src/commonTest/resources/fonts").absolutePath)
+
         systemProperty("skiko.test.ui.enabled", System.getProperty("skiko.test.ui.enabled", "false"))
         systemProperty("skiko.test.ui.renderApi", System.getProperty("skiko.test.ui.renderApi", "all"))
 
