@@ -73,17 +73,16 @@ class AwtFontManager(fontPaths: Array<String> = emptyArray()) {
     }
 
     private suspend fun cacheAllFonts() {
+        fontsMap.clear()
         val fontFiles = findFontFiles(customFontPaths) + findFontFiles(systemFontsPaths())
         for (file in fontFiles) {
             try {
-                if (!fontsMap.containsValue(file.absoluteFile)) {
-                    val f = FileInputStream(file.absolutePath).use {
-                        Font.createFont(Font.TRUETYPE_FONT, it)
-                    }
-                    yield()
-                    val name = f.family
-                    fontsMap[name] = file.absoluteFile
+                val f = FileInputStream(file.absolutePath).use {
+                    Font.createFont(Font.TRUETYPE_FONT, it)
                 }
+                val name = f.family
+                fontsMap[name] = file.absoluteFile
+                yield()
             } catch (e: FontFormatException) {
             } catch (e: IOException) {
             }
