@@ -8,7 +8,7 @@ import java.io.FileInputStream
 import java.io.IOException
 import java.util.concurrent.ConcurrentHashMap
 
-object AwtFontManager {
+class AwtFontManager {
     private var fontsMap = ConcurrentHashMap<String, File>()
     @Volatile
     private var allFontsCachedImpl = false
@@ -196,5 +196,9 @@ object AwtFontManager {
         if (!allFontsCachedImpl) {
             waitChannel.receive()
         }
+    }
+
+    companion object {
+        val DEFAULT by lazy { AwtFontManager() }
     }
 }

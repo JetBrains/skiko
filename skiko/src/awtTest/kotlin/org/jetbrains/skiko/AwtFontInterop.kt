@@ -8,16 +8,18 @@ import java.awt.Font
 import java.awt.GraphicsEnvironment
 
 class AwtFontInterop {
-    fun assumeOk() {
+    private val fontManager = AwtFontManager()
+
+    private fun assumeOk() {
         Assume.assumeFalse(GraphicsEnvironment.isHeadless())
         Assume.assumeTrue(hostOs != OS.Linux)
     }
 
     @Test
-    fun canFindAvailableFont() = AwtFontManager.whenAllFontsCachedBlocking {
+    fun canFindAvailableFont() = fontManager.whenAllFontsCachedBlocking {
         assumeOk()
         val font = Font("Verdana", Font.BOLD, 12)
-        val path = AwtFontManager.findAvailableFontFile(font)
+        val path = fontManager.findAvailableFontFile(font)
         assertTrue("Font must be found", path != null)
         path!!
         assertTrue("Font must be file", path.exists() && path.isFile)
@@ -28,7 +30,7 @@ class AwtFontInterop {
         runTest {
             assumeOk()
             val font = Font("Verdana", Font.BOLD, 12)
-            val path = AwtFontManager.findFontFile(font)
+            val path = fontManager.findFontFile(font)
             assertTrue("Font must be found", path != null)
             path!!
             assertTrue("Font must be file", path.exists() && path.isFile)
@@ -39,7 +41,7 @@ class AwtFontInterop {
     fun canFindFamily() {
         runTest {
             assumeOk()
-            val path = AwtFontManager.findFontFamilyFile("Verdana")
+            val path = fontManager.findFontFamilyFile("Verdana")
             assertTrue("Font must be found", path != null)
             path!!
             assertTrue("Font must be file", path.exists() && path.isFile)
@@ -47,10 +49,10 @@ class AwtFontInterop {
     }
 
     @Test
-    fun nonExistentFont() = AwtFontManager.whenAllFontsCachedBlocking {
+    fun nonExistentFont() = fontManager.whenAllFontsCachedBlocking {
         assumeOk()
         val font = Font("XXXYYY745", Font.BOLD, 12)
-        val path = AwtFontManager.findAvailableFontFile(font)
+        val path = fontManager.findAvailableFontFile(font)
         assertTrue("Font must not be found", path == null)
     }
 
@@ -71,7 +73,7 @@ class AwtFontInterop {
     fun listAllFonts() {
         runTest {
             assumeOk()
-            val fontFiles = AwtFontManager.listFontFiles()
+            val fontFiles = fontManager.listFontFiles()
             assertTrue("There must be fonts", fontFiles.isNotEmpty())
         }
     }
@@ -81,9 +83,9 @@ class AwtFontInterop {
         runTest {
             assumeOk()
             val resDir = System.getProperty("skiko.test.font.dir")!!
-            AwtFontManager.addCustomPath(resDir)
-            AwtFontManager.invalidate()
-            val path = AwtFontManager.findFontFamilyFile("JetBrains Mono")
+            fontManager.addCustomPath(resDir)
+            fontManager.invalidate()
+            val path = fontManager.findFontFamilyFile("JetBrains Mono")
             assertTrue("Custom font must be found", path != null)
             path!!
             assertTrue("Font must be file", path.exists() && path.isFile)
