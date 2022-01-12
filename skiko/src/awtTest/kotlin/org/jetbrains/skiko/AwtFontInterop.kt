@@ -7,7 +7,7 @@ import java.awt.Font
 
 class AwtFontInterop {
     @Test
-    fun canFindFont() = AwtFontManager.whenAllFontsCachedBlocking {
+    fun canFindAvailableFont() = AwtFontManager.whenAllFontsCachedBlocking {
         val font = Font("Verdana", Font.BOLD, 12)
         val path = AwtFontManager.findAvailableFontFile(font)
         assertTrue("Font must be found", path != null)
@@ -16,7 +16,7 @@ class AwtFontInterop {
     }
 
     @Test
-    fun canFindFontSuspend() {
+    fun canFindFont() {
         runTest {
             val font = Font("Verdana", Font.BOLD, 12)
             val path = AwtFontManager.findFontFile(font)

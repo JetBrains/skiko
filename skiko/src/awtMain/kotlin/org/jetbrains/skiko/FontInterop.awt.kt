@@ -3,6 +3,7 @@ package org.jetbrains.skiko
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.yield
 import java.awt.Font
 import java.awt.FontFormatException
 import java.io.File
@@ -65,25 +66,27 @@ object AwtFontManager {
     }
 
     private fun systemFontFiles(): List<File> {
-        val extensions = arrayOf("ttf", "TTF")
         val paths = systemFontsPaths()
         val files = mutableListOf<File>()
         for (i in paths.indices) {
             val fontDirectory = File(paths[i])
             if (!fontDirectory.exists()) break
-            fontDirectory.walk().filter { it.isFile && it.extension in extensions }.forEach {
+            fontDirectory.walk().filter { it.isFile && it.extension.lowercase() == "ttf" }.forEach {
                 files.add(it)
             }
         }
         return files
     }
 
-    private fun cacheSystemFonts() {
+    private suspend fun cacheSystemFonts() {
         val fontFiles = systemFontFiles()
         for (file in fontFiles) {
             try {
                 if (!fontsMap.containsValue(file.absoluteFile)) {
-                    val f = Font.createFont(Font.TRUETYPE_FONT, FileInputStream(file.absolutePath))
+                    val f = FileInputStream(file.absolutePath).use {
+                        Font.createFont(Font.TRUETYPE_FONT, it)
+                    }
+                    yield()
                     val name = f.family
                     fontsMap[name] = file.absoluteFile
                 }
@@ -99,7 +102,7 @@ object AwtFontManager {
      * is already known to the font manager. This may change in the future.
      *
      * @param font - AWT font for which we need to know the path
-     * @return - path to font, if known
+     * @return path to font, if known
      */
     fun findAvailableFontFile(font: Font): File? {
         return fontsMap[font.family]
@@ -108,6 +111,7 @@ object AwtFontManager {
     /**
      * Show all fonts currently known to AWT font manager. As font indexing could take time,
      * may have not all elements.
+     * @return list of currently known fonts
      */
     fun listCurrentFontFiles(): List<File> {
         return fontsMap.values.toList()
@@ -115,6 +119,7 @@ object AwtFontManager {
 
     /**
      * Show all fonts known to AWT font manager.
+     * @return list of known fonts
      */
     suspend fun listFontFiles(): List<File> {
         waitAllFontsCached()
@@ -124,7 +129,9 @@ object AwtFontManager {
 
     /**
      * Find font file path from an AWT font.
-     *  As font finding is long IO-intensive process, this operation may suspend for pretty long time..
+     * As font finding is long IO-intensive process, this operation may suspend for pretty long time.
+     * @param font - which AWT font to look for
+     * @return path to the font file or null, if not found
      */
     suspend fun findFontFile(font: Font): File? {
         waitAllFontsCached()
@@ -132,13 +139,25 @@ object AwtFontManager {
     }
 
     /**
-     * If all AWT fonts were indexed.
+     * Find font file path from the family name.
+     * As font finding is long IO-intensive process, this operation may suspend for pretty long time.
+     * @param family - which AWT font to look for
+     * @return path to the font file or null, if not found
+     */
+    suspend fun findFontFamilyFile(family: String): File? {
+        waitAllFontsCached()
+        return fontsMap[family]
+    }
+
+    /**
+     * If all AWT fonts were cached.
      */
     val allFontsCached: Boolean
         get() = allFontsCachedImpl
 
     /**
      * Call continuation only when all AWT fonts are cached.
+     * Please avoid this API and prefer suspend operations.
      */
     fun whenAllFontsCachedBlocking(continuation: () -> Unit) {
         // TODO: avoid busy loop
@@ -149,7 +168,7 @@ object AwtFontManager {
     /**
      * Suspend until all AWT fonts were cached.
      */
-    suspend fun waitAllFontsCached() {
+    private suspend fun waitAllFontsCached() {
         if (!allFontsCachedImpl) {
             waitChannel.receive()
         }
