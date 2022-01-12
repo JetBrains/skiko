@@ -1,9 +1,6 @@
 package org.jetbrains.skiko
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.yield
+import kotlinx.coroutines.*
 import java.awt.Font
 import java.awt.FontFormatException
 import java.io.File
@@ -15,29 +12,26 @@ object AwtFontManager {
     private var fontsMap = ConcurrentHashMap<String, File>()
     @Volatile
     private var allFontsCachedImpl = false
-
     private val waitChannel = RendezvousBroadcastChannel<Int>()
+    private var customFontPaths = mutableListOf<String>()
+    private var cacheJob: Job? = null
 
     init {
-        GlobalScope.launch(Dispatchers.IO) {
-            cacheSystemFonts()
-            allFontsCachedImpl = true
-            waitChannel.sendAll(1)
-        }
+        invalidate()
     }
 
-    private fun systemFontsPaths(): Array<String> {
+    private fun systemFontsPaths(): List<String> {
         return when (hostOs) {
             OS.Windows -> {
                 val winPath = System.getenv("WINDIR")
                 val localAppPath = System.getenv("LOCALAPPDATA")
-                arrayOf(
+                listOf(
                     "$winPath\\Fonts",
                     "$localAppPath\\Microsoft\\Windows\\Fonts"
                 )
             }
             OS.MacOS -> {
-                arrayOf(
+                listOf(
                     System.getProperty("user.home") + File.separator + "Library/Fonts",
                     "/Library/Fonts",
                     "/System/Library/Fonts"
@@ -57,7 +51,7 @@ object AwtFontManager {
                         resultList.add(path)
                     }
                 }
-                resultList.toTypedArray()
+                resultList
             }
             else -> {
                 throw RuntimeException("Unknown OS: $hostOs")
@@ -65,8 +59,7 @@ object AwtFontManager {
         }
     }
 
-    private fun systemFontFiles(): List<File> {
-        val paths = systemFontsPaths()
+    private fun findFontFiles(paths: List<String>): List<File> {
         val files = mutableListOf<File>()
         paths.forEach { path ->
             val fontDirectory = File(path)
@@ -79,8 +72,8 @@ object AwtFontManager {
         return files
     }
 
-    private suspend fun cacheSystemFonts() {
-        val fontFiles = systemFontFiles()
+    private suspend fun cacheAllFonts() {
+        val fontFiles = findFontFiles(customFontPaths) + findFontFiles(systemFontsPaths())
         for (file in fontFiles) {
             try {
                 if (!fontsMap.containsValue(file.absoluteFile)) {
@@ -153,6 +146,30 @@ object AwtFontManager {
     suspend fun findFontFamilyFile(family: String): File? {
         waitAllFontsCached()
         return fontsMap[family]
+    }
+
+    /**
+     * Invalidate cache and start caching again. Maybe useful to re-read fonts
+     * when changed.
+     */
+    fun invalidate() {
+        cacheJob?.let {
+            it.cancel()
+        }
+        allFontsCachedImpl = false
+        cacheJob = GlobalScope.launch(Dispatchers.IO) {
+            cacheAllFonts()
+            allFontsCachedImpl = true
+            waitChannel.sendAll(1)
+        }
+    }
+
+    /**
+     * Add custom directory to font search paths. Call [invalidate]
+     * for operation to take effect.
+     */
+    fun addCustomPath(path: String) {
+        customFontPaths += path
     }
 
     /**
