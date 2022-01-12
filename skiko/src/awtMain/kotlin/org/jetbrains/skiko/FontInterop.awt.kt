@@ -68,11 +68,12 @@ object AwtFontManager {
     private fun systemFontFiles(): List<File> {
         val paths = systemFontsPaths()
         val files = mutableListOf<File>()
-        for (i in paths.indices) {
-            val fontDirectory = File(paths[i])
-            if (!fontDirectory.exists()) break
-            fontDirectory.walk().filter { it.isFile && it.extension.lowercase() == "ttf" }.forEach {
-                files.add(it)
+        paths.forEach { path ->
+            val fontDirectory = File(path)
+            if (fontDirectory.exists()) {
+                fontDirectory.walk().filter { it.isFile && it.extension.lowercase() == "ttf" }.forEach {
+                    files.add(it)
+                }
             }
         }
         return files
@@ -99,7 +100,9 @@ object AwtFontManager {
     /**
      * Find font file path from an AWT font.
      * As font finding is long IO-intensive process, this operation checks if given font
-     * is already known to the font manager. This may change in the future.
+     * is already known to the font manager.
+     *
+     * If you want stable and predictable result it's better use [findFontFile] or check [allFontsCached].
      *
      * @param font - AWT font for which we need to know the path
      * @return path to font, if known
@@ -111,9 +114,12 @@ object AwtFontManager {
     /**
      * Show all fonts currently known to AWT font manager. As font indexing could take time,
      * may have not all elements.
+     *
+     * If you want stable and predictable result it's better use [listFontFiles] or check [allFontsCached].
+     *
      * @return list of currently known fonts
      */
-    fun listCurrentFontFiles(): List<File> {
+    fun listAvailableFontFiles(): List<File> {
         return fontsMap.values.toList()
     }
 
@@ -150,7 +156,8 @@ object AwtFontManager {
     }
 
     /**
-     * If all AWT fonts were cached.
+     * If all AWT fonts were cached. Check this property before using non-suspend version
+     * of font conversion APIs.
      */
     val allFontsCached: Boolean
         get() = allFontsCachedImpl
