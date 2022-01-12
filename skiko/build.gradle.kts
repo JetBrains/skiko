@@ -308,6 +308,9 @@ kotlin {
 
         val awtTest by getting {
             dependsOn(jvmTest)
+            dependencies {
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:$coroutinesVersion")
+            }
         }
 
         if (supportAndroid) {
