@@ -9,6 +9,7 @@ actual typealias SkikoGesturePlatformEvent = MotionEvent
 actual typealias SkikoPlatformPointerEvent = MotionEvent
 // TODO: most likely wrong.
 actual typealias SkikoPlatformInputEvent = Any
+actual typealias SkikoTouchPlatformEvent = Any
 actual typealias SkikoPlatformKeyboardEvent = KeyEvent
 
 actual open class SkiaLayer {
