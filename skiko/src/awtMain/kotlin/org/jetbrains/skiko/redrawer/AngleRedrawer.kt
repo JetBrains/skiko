@@ -1,14 +1,11 @@
 package org.jetbrains.skiko.redrawer
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.swing.Swing
 import org.jetbrains.skia.BackendRenderTarget
 import org.jetbrains.skia.DirectContext
 import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaLayerProperties
 import org.jetbrains.skiko.context.AngleContextHandler
-import org.jetbrains.skiko.context.DirectSoftwareContextHandler
 
 internal class AngleRedrawer(
     private val layer: SkiaLayer,

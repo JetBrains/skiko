@@ -2,7 +2,6 @@ package org.jetbrains.skiko.redrawer
 
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.context.OpenGLContextHandler
@@ -79,7 +78,7 @@ internal class WindowsOpenGLRedrawer(
             .filterNot(WindowsOpenGLRedrawer::isDisposed)
             .filter { it.layer.isShowing }
 
-        private val frameDispatcher = FrameDispatcher(Dispatchers.Swing) {
+        private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
             toRedrawCopy.addAll(toRedraw)
             toRedraw.clear()
 

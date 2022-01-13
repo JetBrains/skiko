@@ -1,5 +1,7 @@
 package org.jetbrains.skiko
 
+import org.jetbrains.skia.Canvas
+
 actual open class SkiaLayer  {
     actual var renderApi: GraphicsApi
         get() = TODO("Not yet implemented")
@@ -21,6 +23,11 @@ actual open class SkiaLayer  {
     actual fun detach() {
         TODO("unimplemented")
     }
+
+    internal actual fun draw(canvas: Canvas) {
+        TODO("unimplemented")
+    }
+
     actual var skikoView: SkikoView? = null
 }
 

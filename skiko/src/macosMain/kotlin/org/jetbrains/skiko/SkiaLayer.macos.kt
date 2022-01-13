@@ -25,7 +25,7 @@ import platform.Foundation.addObserver
 import platform.darwin.NSObject
 import platform.CoreGraphics.CGRectMake
 
-actual open class SkiaLayer() {
+actual open class SkiaLayer {
     fun isShowing(): Boolean {
         return true
     }
@@ -226,7 +226,7 @@ actual open class SkiaLayer() {
         this.picture = PictureHolder(picture, pictureWidth.toInt(), pictureHeight.toInt())
     }
 
-    internal fun draw(canvas: Canvas) {
+    internal actual fun draw(canvas: Canvas) {
         picture?.also {
             canvas.drawPicture(it.instance)
         }

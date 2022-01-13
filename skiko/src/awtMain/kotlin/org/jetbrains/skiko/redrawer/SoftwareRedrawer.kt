@@ -7,8 +7,6 @@ import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaLayerProperties
 import org.jetbrains.skiko.context.SoftwareContextHandler
 
-expect val MainUIDispatcher: MainCoroutineDispatcher
-
 internal class SoftwareRedrawer(
     private val layer: SkiaLayer,
     private val properties: SkiaLayerProperties

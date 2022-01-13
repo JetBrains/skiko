@@ -202,12 +202,7 @@ val Project.supportWasm: Boolean
     get() = findProperty("skiko.wasm.enabled") == "true" || isInIdea
 
 val Project.supportAndroid: Boolean
-    get() = findProperty("skiko.android.enabled") == "true"
-
-val skikoAwtJar by project.tasks.registering(Jar::class) {
-    archiveBaseName.set("skiko-awt")
-    from(kotlin.jvm("awt").compilations["main"].output.allOutputs)
-}
+    get() = findProperty("skiko.android.enabled") == "true" // || isInIdea
 
 kotlin {
     jvm("awt") {
@@ -218,10 +213,13 @@ kotlin {
     }
 
     if (supportAndroid) {
-        // todo: use android target
         jvm("android") {
             compilations.all {
                 kotlinOptions.jvmTarget = "11"
+            }
+            // We need an additional attribute to distinguish between JVM variants.
+            attributes {
+                attributes.attribute(Attribute.of("ui", String::class.java), "android")
             }
             // TODO: seems incorrect.
             generateVersion(OS.Android, Arch.Arm64)
@@ -230,7 +228,7 @@ kotlin {
 
     if (supportWasm) {
         js(IR) {
-            browser() {
+            browser {
                 testTask {
                     dependsOn("linkWasm")
                     useKarma {
@@ -265,19 +263,11 @@ kotlin {
             }
         }
 
-        /*
-        val androidMain by getting {
-            dependencies {
-
-            }
-        } */
-
         val jvmMain by creating {
             dependsOn(commonMain)
             dependencies {
                 implementation(kotlin("stdlib"))
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:$coroutinesVersion")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:$coroutinesVersion")
             }
         }
 
@@ -609,17 +599,25 @@ fun skiaStaticLibraries(skiaDir: String, targetString: String): List<String> {
 
 val allJvmRuntimeJars = mutableMapOf<Pair<OS, Arch>, TaskProvider<Jar>>()
 
-val skikoJvmRuntimeJar = createSkikoJvmJarTask(hostOs, hostArch)
+val skikoAwtJar by project.tasks.registering(Jar::class) {
+    archiveBaseName.set("skiko-awt")
+    from(kotlin.jvm("awt").compilations["main"].output.allOutputs)
+}
+val skikoJvmRuntimeJar = createSkikoJvmJarTask(hostOs, hostArch, skikoAwtJar)
 val skikoRuntimeDirForTests = skikoRuntimeDirForTestsTask(hostOs, hostArch, skikoJvmRuntimeJar)
 
 if (supportAndroid) {
     val os = OS.Android
+    val skikoAndroidJar by project.tasks.registering(Jar::class) {
+        archiveBaseName.set("skiko-android")
+        from(kotlin.jvm("android").compilations["main"].output.allOutputs)
+    }
     for (arch in arrayOf(Arch.X64, Arch.Arm64)) {
-        createSkikoJvmJarTask(os, arch)
+        createSkikoJvmJarTask(os, arch, skikoAndroidJar)
     }
 }
 
-fun createSkikoJvmJarTask(os: OS, arch: Arch): TaskProvider<Jar> {
+fun createSkikoJvmJarTask(os: OS, arch: Arch, commonJar: TaskProvider<Jar>): TaskProvider<Jar> {
     val skiaBindingsDir = registerOrGetSkiaDirProvider(os, arch)
     val compileBindings = createCompileJvmBindingsTask(os, arch, skiaBindingsDir)
     val objcCompile = if (os == OS.MacOS) createObjcCompileTask(os, arch, skiaBindingsDir) else null
@@ -651,7 +649,7 @@ fun createSkikoJvmJarTask(os: OS, arch: Arch): TaskProvider<Jar> {
         nativeFiles.add(nativeLib2)
         nativeFiles.add(createChecksums2.map { it.outputs.files.singleFile })
     }
-    val skikoJvmRuntimeJar = skikoJvmRuntimeJarTask(os, arch, skikoAwtJar, nativeFiles)
+    val skikoJvmRuntimeJar = skikoJvmRuntimeJarTask(os, arch, commonJar, nativeFiles)
     allJvmRuntimeJars[os to arch] = skikoJvmRuntimeJar
     return skikoJvmRuntimeJar
 }

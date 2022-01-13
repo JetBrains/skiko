@@ -1,6 +1,7 @@
 package org.jetbrains.skiko
 
 import kotlinx.browser.window
+import org.jetbrains.skia.Canvas
 import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.events.InputEvent
 import org.w3c.dom.events.KeyboardEvent
@@ -100,6 +101,10 @@ actual open class SkiaLayer {
         state?.initCanvas(desiredWidth, desiredHeight, contentScale)
         window.matchMedia("(resolution: ${contentScale}dppx)").addEventListener("change", { setOnChangeScaleNotifier() }, true)
         onContentScaleChanged?.invoke(contentScale)
+    }
+
+    internal actual fun draw(canvas: Canvas) {
+        skikoView?.onRender(canvas, state!!.width, state!!.height, currentNanoTime())
     }
 }
 
