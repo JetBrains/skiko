@@ -15,13 +15,15 @@ fun toSkikoEvent(
     view.frame.useContents {
        ypos = size.height - ypos
     }
+    val timestamp = (event.timestamp * 1_000).toLong()
     return SkikoPointerEvent(
-        xpos,
-        ypos,
-        toSkikoMouseButtons(event, kind),
-        toSkikoModifiers(event),
-        kind,
-        event
+        x = xpos,
+        y = ypos,
+        buttons = toSkikoMouseButtons(event, kind),
+        modifiers = toSkikoModifiers(event),
+        kind = kind,
+        timestamp = timestamp,
+        platform = event
     )
 }
 
@@ -38,6 +40,7 @@ fun toSkikoEvent(
     view.frame.useContents {
        ypos = size.height - ypos
     }
+    val timestamp = (event.timestamp * 1_000).toLong()
     var buttons: SkikoMouseButtons
     if (kind == SkikoPointerEventKind.DOWN) {
         buttonsFlags = buttonsFlags.or(button.value)
@@ -47,25 +50,38 @@ fun toSkikoEvent(
         buttonsFlags = buttonsFlags.xor(button.value)
     }
     return SkikoPointerEvent(
-        xpos,
-        ypos,
-        buttons,
-        toSkikoModifiers(event),
-        kind,
-        event
+        x = xpos,
+        y = ypos,
+        buttons = buttons,
+        modifiers = toSkikoModifiers(event),
+        kind = kind,
+        timestamp = timestamp,
+        platform = event
     )
 }
 
 fun toSkikoScrollEvent(
-    event: NSEvent
+    event: NSEvent,
+    view: NSView
 ): SkikoPointerEvent {
+    var (xpos, ypos) = event.locationInWindow.useContents {
+        x to y
+    }
+    // Translate.
+    view.frame.useContents {
+       ypos = size.height - ypos
+    }
+    val timestamp = (event.timestamp * 1_000).toLong()
     return SkikoPointerEvent(
-        event.deltaX,
-        event.deltaY,
-        SkikoMouseButtons.NONE,
-        toSkikoModifiers(event),
-        SkikoPointerEventKind.SCROLL,
-        event
+        x = xpos,
+        y = ypos,
+        deltaX = event.deltaX,
+        deltaY = event.deltaY,
+        buttons = SkikoMouseButtons.NONE,
+        modifiers = toSkikoModifiers(event),
+        kind = SkikoPointerEventKind.SCROLL,
+        timestamp = timestamp,
+        platform = event
     )
 }
 
@@ -73,20 +89,26 @@ fun toSkikoEvent(
     event: NSEvent,
     kind: SkikoKeyboardEventKind
 ): SkikoKeyboardEvent {
+    val timestamp = (event.timestamp * 1_000).toLong()
     return SkikoKeyboardEvent(
         SkikoKey.valueOf(event.keyCode.toInt()),
         toSkikoModifiers(event),
         kind,
+        timestamp,
         event
     )
 }
 
 fun toSkikoTypeEvent(
     character: String,
-    event: NSEvent,
+    event: NSEvent?,
 ): SkikoInputEvent {
+    val key = if (event != null) SkikoKey.valueOf(event.keyCode.toInt()) else SkikoKey.KEY_UNKNOWN
+    val modifiers = if (event != null) toSkikoModifiers(event) else SkikoInputModifiers.EMPTY
     return SkikoInputEvent(
         character,
+        key,
+        modifiers,
         SkikoKeyboardEventKind.TYPE,
         event
     )
@@ -114,10 +136,12 @@ fun toSkikoEvent(
     if (modifierKeyUpFlag == actionAllKeyUpFlag) {
         kind = SkikoKeyboardEventKind.UP
     }
+    val timestamp = (event.timestamp * 1_000).toLong()
     return SkikoKeyboardEvent(
         SkikoKey.valueOf(event.keyCode.toInt()),
         toSkikoModifiers(event),
         kind,
+        timestamp,
         event
     )
 }

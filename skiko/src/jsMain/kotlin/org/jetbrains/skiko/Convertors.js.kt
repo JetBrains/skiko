@@ -11,12 +11,13 @@ fun toSkikoEvent(
     kind: SkikoPointerEventKind
 ): SkikoPointerEvent {
     return SkikoPointerEvent(
-        event.offsetX,
-        event.offsetY,
-        toSkikoMouseButtons(event, buttons),
-        toSkikoModifiers(event),
-        kind,
-        event
+        x = event.offsetX,
+        y = event.offsetY,
+        buttons = toSkikoMouseButtons(event, buttons),
+        modifiers = toSkikoModifiers(event),
+        kind = kind,
+        timestamp = event.timeStamp.toLong(),
+        platform = event
     )
 }
 
@@ -24,12 +25,13 @@ fun toSkikoDragEvent(
     event: MouseEvent
 ): SkikoPointerEvent {
     return SkikoPointerEvent(
-        event.offsetX,
-        event.offsetY,
-        toSkikoMouseButtons(event, true),
-        toSkikoModifiers(event),
-        SkikoPointerEventKind.DRAG,
-        event
+        x = event.offsetX,
+        y = event.offsetY,
+        buttons = toSkikoMouseButtons(event, true),
+        modifiers = toSkikoModifiers(event),
+        kind = SkikoPointerEventKind.DRAG,
+        timestamp = event.timeStamp.toLong(),
+        platform = event
     )
 }
 
@@ -41,6 +43,7 @@ fun toSkikoEvent(
         SkikoKey.valueOf(toSkikoKey(event)),
         toSkikoModifiers(event),
         kind,
+        event.timeStamp.toLong(),
         event
     )
 }
@@ -50,12 +53,15 @@ fun toSkikoScrollEvent(
     buttons: Boolean
 ): SkikoPointerEvent {
     return SkikoPointerEvent(
-        event.deltaX,
-        event.deltaY,
-        toSkikoMouseButtons(event, buttons),
-        toSkikoModifiers(event),
-        SkikoPointerEventKind.SCROLL,
-        event
+        x = event.offsetX,
+        y = event.offsetY,
+        deltaX = event.deltaX,
+        deltaY = event.deltaY,
+        buttons = toSkikoMouseButtons(event, buttons),
+        modifiers = toSkikoModifiers(event),
+        kind = SkikoPointerEventKind.SCROLL,
+        timestamp = event.timeStamp.toLong(),
+        platform = event
     )
 }
 

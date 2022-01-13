@@ -199,7 +199,7 @@ expect enum class SkikoKey {
 }
 
 enum class SkikoGestureEventKind {
-    PRESS, TAP, PAN, PINCH, ROTATION, LONGPRESS, SWIPE, UNKNOWN
+    TAP, PAN, PINCH, ROTATION, LONGPRESS, SWIPE, UNKNOWN
 }
 enum class SkikoGestureEventDirection {
     UP, DOWN, LEFT, RIGHT, UNKNOWN
@@ -209,7 +209,8 @@ enum class SkikoGestureEventState {
 }
 expect class SkikoGesturePlatformEvent
 data class SkikoGestureEvent(
-    val x: Double, val y: Double,
+    val x: Double,
+    val y: Double,
     val velocity: Double = 0.0,
     val direction: SkikoGestureEventDirection = SkikoGestureEventDirection.UNKNOWN,
     val rotation: Double = 0.0,
@@ -219,9 +220,23 @@ data class SkikoGestureEvent(
     val platform: SkikoGesturePlatformEvent? = null
 )
 
+enum class SkikoTouchEventKind {
+    STARTED, ENDED, MOVED, CANCELLED, UNKNOWN
+}
+expect class SkikoTouchPlatformEvent
+data class SkikoTouchEvent(
+    val x: Double,
+    val y: Double,
+    val kind: SkikoTouchEventKind = SkikoTouchEventKind.UNKNOWN,
+    val timestamp: Long = 0,
+    val platform: SkikoTouchPlatformEvent? = null
+)
+
 expect class SkikoPlatformInputEvent
 data class SkikoInputEvent(
     val input: String,
+    val key: SkikoKey,
+    val modifiers: SkikoInputModifiers = SkikoInputModifiers.EMPTY,
     val kind: SkikoKeyboardEventKind,
     val platform: SkikoPlatformInputEvent?
 )
@@ -234,6 +249,7 @@ data class SkikoKeyboardEvent(
     val key: SkikoKey,
     val modifiers: SkikoInputModifiers = SkikoInputModifiers.EMPTY,
     val kind: SkikoKeyboardEventKind,
+    val timestamp: Long = 0,
     val platform: SkikoPlatformKeyboardEvent?
 )
 
@@ -243,10 +259,14 @@ enum class SkikoPointerEventKind {
 
 expect class SkikoPlatformPointerEvent
 data class SkikoPointerEvent(
-    val x: Double, val y: Double,
+    val x: Double,
+    val y: Double,
+    val deltaX: Double = 0.0,
+    val deltaY: Double = 0.0,
     val buttons: SkikoMouseButtons = SkikoMouseButtons.NONE,
     val modifiers: SkikoInputModifiers = SkikoInputModifiers.EMPTY,
     val kind: SkikoPointerEventKind,
+    val timestamp: Long = 0,
     val platform: SkikoPlatformPointerEvent?
 )
 

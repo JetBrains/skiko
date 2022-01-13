@@ -105,6 +105,7 @@ actual open class SkiaLayer {
 
 var onContentScaleChanged: ((Float) -> Unit)? = null
 
+actual typealias SkikoTouchPlatformEvent = Any
 actual typealias SkikoGesturePlatformEvent = Any
 actual typealias SkikoPlatformInputEvent = InputEvent
 actual typealias SkikoPlatformKeyboardEvent = KeyboardEvent

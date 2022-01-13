@@ -22,11 +22,15 @@ fun toSkikoGestureState(state: UIGestureRecognizerState ) : SkikoGestureEventSta
     }
 }
 
-fun toSkikoTypeEvent(character: String): SkikoInputEvent {
+fun toSkikoTypeEvent(character: String, event: UIPress?): SkikoInputEvent {
+    val key = if (event != null) SkikoKey.valueOf(event.key!!.keyCode) else SkikoKey.KEY_UNKNOWN
+    val modifiers = if (event != null) toSkikoModifiers(event) else SkikoInputModifiers.EMPTY
     return SkikoInputEvent(
         character,
+        key,
+        modifiers,
         SkikoKeyboardEventKind.TYPE,
-        UIEvent()
+        event
     )
 }
 
@@ -34,10 +38,12 @@ fun toSkikoKeyboardEvent(
     event: UIPress,
     kind: SkikoKeyboardEventKind
 ): SkikoKeyboardEvent {
+    val timestamp = (event.timestamp * 1_000).toLong()
     return SkikoKeyboardEvent(
         SkikoKey.valueOf(event.key!!.keyCode),
         toSkikoModifiers(event),
         kind,
+        timestamp,
         event
     )
 }
