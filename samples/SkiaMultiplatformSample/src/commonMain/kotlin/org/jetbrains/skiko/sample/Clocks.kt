@@ -197,16 +197,16 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
     override fun onTouchEvent(events: Array<SkikoTouchEvent>) {
         val event = events.first()
         if (event.kind == SkikoTouchEventKind.STARTED) {
-            xpos = event.x - xOffset
-            ypos = event.y - yOffset
+            xpos = event.x
+            ypos = event.y
         }
     }
 
     override fun onGestureEvent(event: SkikoGestureEvent) {
         when (event.kind) {
             SkikoGestureEventKind.TAP -> {
-                xpos = event.x - xOffset
-                ypos = event.y - yOffset
+                xpos = event.x
+                ypos = event.y
             }
             SkikoGestureEventKind.PINCH -> {
                 if (event.state == SkikoGestureEventState.STARTED) {
@@ -215,8 +215,10 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
                 scale = k * event.scale
             }
             SkikoGestureEventKind.PAN -> {
-                xOffset = event.x - xpos
-                yOffset = event.y - ypos
+                xOffset += event.x - xpos
+                yOffset += event.y - ypos
+                xpos = event.x
+                ypos = event.y
             }
             SkikoGestureEventKind.ROTATION -> {
                 rotate = event.rotation * 180.0 / PI
