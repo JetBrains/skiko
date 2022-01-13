@@ -7,7 +7,7 @@ actual enum class SkikoKey(val value: Int) {
     KEY_UNKNOWN(KEYCODE_UNKNOWN),
     KEY_A(KEYCODE_A),
     KEY_S(KEYCODE_S),
-    KEY_D(KEYCODE_A),
+    KEY_D(KEYCODE_D),
     KEY_F(KEYCODE_F),
     KEY_H(KEYCODE_H),
     KEY_G(KEYCODE_G),
