@@ -1,34 +1,26 @@
-package SkiaJvmSample
+package SkiaAwtSample
 
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
-import java.awt.event.ActionEvent
-import java.awt.event.ActionListener
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
-import java.awt.event.MouseEvent
-import java.awt.event.MouseMotionAdapter
 import javax.swing.*
 import org.jetbrains.skiko.GenericSkikoView
 
-fun Button(
+fun makeButton(
     text: String,
     action: (() -> Unit)? = null
 ): JButton {
     val button = JButton(text)
-    button.setToolTipText("Tooltip for $text button.")
-    button.setPreferredSize(Dimension(100, 100))
-    button.addActionListener(object : ActionListener {
-        public override fun actionPerformed(e: ActionEvent) {
-            action?.invoke()
-        }
-    })
+    button.toolTipText = "Tooltip for $text button."
+    button.preferredSize = Dimension(100, 100)
+    button.addActionListener { action?.invoke() }
 
     return button
 }
 
-fun SwingSkia() = SwingUtilities.invokeLater {
+fun swingSkia() = SwingUtilities.invokeLater {
     val window = JFrame()
     window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
     window.title = "SwingSkiaWindow"
@@ -36,7 +28,7 @@ fun SwingSkia() = SwingUtilities.invokeLater {
     var panel = getSkiaPanel()
     
     window.contentPane.add(
-        Button(
+        makeButton(
             text = "Fullscreen",
             action = {
                 panel.layer.fullscreen = !panel.layer.fullscreen
@@ -45,7 +37,7 @@ fun SwingSkia() = SwingUtilities.invokeLater {
         BorderLayout.NORTH
     )
     window.contentPane.add(
-        Button(
+        makeButton(
             text = "Add SP",
             action = {
                 window.contentPane.remove(panel) 
@@ -57,7 +49,7 @@ fun SwingSkia() = SwingUtilities.invokeLater {
         BorderLayout.WEST
     )
     window.contentPane.add(
-        Button(
+        makeButton(
             text = "Remove SP",
             action = {
                 window.contentPane.remove(panel)
@@ -66,7 +58,7 @@ fun SwingSkia() = SwingUtilities.invokeLater {
         BorderLayout.EAST
     )
     window.contentPane.add(
-        Button(
+        makeButton(
             text = "New Window",
             action = {
                 createWindow("ComposeWindow", false)
@@ -77,15 +69,15 @@ fun SwingSkia() = SwingUtilities.invokeLater {
     window.contentPane.add(panel, BorderLayout.CENTER)
 
     window.setSize(800, 600)
-    window.setVisible(true)
+    window.isVisible = true
 }
 
 private fun getSkiaPanel(): SkiaPanel {
     return SkiaPanel().apply {
-        layer.addView(GenericSkikoView(layer, ClocksJvm(layer)))
+        layer.addView(GenericSkikoView(layer, ClocksAwt(layer)))
         val btnPanelOK = JPanel()
-        btnPanelOK.setLayout(BorderLayout(0, 0))
-        btnPanelOK.setBackground(Color.white)
+        btnPanelOK.layout = BorderLayout(0, 0)
+        btnPanelOK.background = Color.white
         btnPanelOK.add(JButton("OK"))
         val btnCancel = JButton("Cancel")
         add(btnPanelOK)
