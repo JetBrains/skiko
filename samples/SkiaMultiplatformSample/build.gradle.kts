@@ -201,7 +201,7 @@ project.tasks.register<JavaExec>("runAwt") {
     systemProperty("skiko.hardwareInfo.enabled", "true")
     systemProperty("skiko.win.exception.logger.enabled", "true")
     systemProperty("skiko.win.exception.handler.enabled", "true")
-    jvmArgs.add("-ea")
+    jvmArgs?.add("-ea")
     System.getProperties().entries
         .associate {
             (it.key as String) to (it.value as String)
