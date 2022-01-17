@@ -14,7 +14,7 @@ import javax.imageio.ImageIO
 fun main(args: Array<String>) {
     val windows = parseArgs(args)
     repeat(windows) {
-        when (System.getProperty("skiko.interop")) {
+        when (System.getProperty("skiko.swing.interop")) {
             "true" -> swingSkia()
             else -> createWindow("window $it", windows == 1)
         }
