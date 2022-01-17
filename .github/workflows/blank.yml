@@ -31,7 +31,7 @@ jobs:
           ./gradlew --stacktrace --info -Pskiko.native.enabled=true :skiko:awtTest
           ./gradlew --stacktrace --info -Pskiko.native.enabled=true :skiko:macosX64Test
           ./gradlew --stacktrace --info -Pskiko.native.enabled=true :skiko:publishToMavenLocal
-          ./gradlew --stacktrace --info :SkiaJvmSample:installDist # check jvm sample works
+          ./gradlew --stacktrace --info :SkiaAwtSample:installDist # check AWT sample works
       - uses: actions/upload-artifact@v2
         with:
           name: test-reports-macos
@@ -88,7 +88,7 @@ jobs:
           export DISPLAY=:0
           ./gradlew --stacktrace --info -Pskiko.native.enabled=true :skiko:linuxX64Test :skiko:awtTest
           ./gradlew --stacktrace --info :skiko:publishToMavenLocal
-          ./gradlew --stacktrace --info :SkiaJvmSample:installDist # check jvm sample works
+          ./gradlew --stacktrace --info :SkiaAwtSample:installDist # check jvm sample works
       - uses: actions/upload-artifact@v2
         with:
           name: test-reports-linux
@@ -146,7 +146,7 @@ jobs:
         run: |
           ./gradlew --stacktrace --info :skiko:awtTest
           ./gradlew --stacktrace --info :skiko:publishToMavenLocal
-          ./gradlew --stacktrace --info :SkiaJvmSample:installDist # check jvm sample works
+          ./gradlew --stacktrace --info :SkiaAwtSample:installDist # check jvm sample works
       - uses: actions/upload-artifact@v2
         with:
           name: test-reports-windows
