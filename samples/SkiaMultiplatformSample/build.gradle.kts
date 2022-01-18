@@ -74,7 +74,7 @@ kotlin {
         targets.add(iosArm64())
     }
 
-    jvm {
+    jvm("awt") {
         compilations.all {
             kotlinOptions.jvmTarget = "11"
         }
@@ -112,7 +112,7 @@ kotlin {
             dependsOn(commonMain)
         }
 
-        val jvmMain by getting {
+        val awtMain by getting {
             dependsOn(commonMain)
             dependencies {
                 implementation("org.jetbrains.skiko:skiko-awt-runtime-$hostOs-$hostArch:$version")
@@ -193,8 +193,8 @@ project.tasks.register<Exec>("runNative") {
     }
 }
 
-project.tasks.register<JavaExec>("runJvm") {
-    val kotlinTask =  project.tasks.named("compileKotlinJvm")
+project.tasks.register<JavaExec>("runAwt") {
+    val kotlinTask =  project.tasks.named("compileKotlinAwt")
     dependsOn(kotlinTask)
     systemProperty("skiko.fps.enabled", "true")
     systemProperty("skiko.linux.autodpi", "true")
@@ -208,9 +208,9 @@ project.tasks.register<JavaExec>("runJvm") {
         }
         .filterKeys { it.startsWith("skiko.") }
         .forEach { systemProperty(it.key, it.value) }
-    mainClass.set("org.jetbrains.skiko.sample.App_jvmKt")
+    mainClass.set("org.jetbrains.skiko.sample.App_awtKt")
     classpath(kotlinTask.get().outputs)
-    classpath(kotlin.jvm().compilations["main"].runtimeDependencyFiles)
+    classpath(kotlin.jvm("awt").compilations["main"].runtimeDependencyFiles)
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().configureEach {

@@ -1,4 +1,4 @@
-package SkiaJvmSample
+package SkiaAwtSample
 
 import kotlinx.coroutines.*
 import org.jetbrains.skiko.*
@@ -14,8 +14,8 @@ import javax.imageio.ImageIO
 fun main(args: Array<String>) {
     val windows = parseArgs(args)
     repeat(windows) {
-        when (System.getProperty("skiko.interop")) {
-            "true" -> SwingSkia()
+        when (System.getProperty("skiko.swing.interop")) {
+            "true" -> swingSkia()
             else -> createWindow("window $it", windows == 1)
         }
     }
@@ -23,7 +23,7 @@ fun main(args: Array<String>) {
 
 fun createWindow(title: String, exitOnClose: Boolean) = SwingUtilities.invokeLater {
     val skiaLayer = SkiaLayer()
-    val clocks = ClocksJvm(skiaLayer)
+    val clocks = ClocksAwt(skiaLayer)
 
     val window = JFrame(title)
     window.defaultCloseOperation =
@@ -63,6 +63,7 @@ fun createWindow(title: String, exitOnClose: Boolean) = SwingUtilities.invokeLat
     miTakeScreenshot.addActionListener(object : ActionListener {
         override fun actionPerformed(actionEvent: ActionEvent?) {
             val screenshot = skiaLayer.screenshot()!!
+            @OptIn(DelicateCoroutinesApi::class)
             GlobalScope.launch(Dispatchers.IO) {
                 val image = screenshot.toBufferedImage()
                 ImageIO.write(image, "png", File(defaultScreenshotPath))

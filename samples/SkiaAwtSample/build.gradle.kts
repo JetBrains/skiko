@@ -44,7 +44,7 @@ dependencies {
 }
 
 application {
-    mainClass.set("SkiaJvmSample.AppKt")
+    mainClass.set("SkiaAwtSample.AppKt")
 }
 
 val additionalArguments = mutableMapOf<String, String>()

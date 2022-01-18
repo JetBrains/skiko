@@ -1,4 +1,4 @@
-package SkiaJvmSample
+package SkiaAwtSample
 
 import org.jetbrains.skiko.*
 import org.jetbrains.skia.*
@@ -10,22 +10,22 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.PI
 
-class ClocksJvm(private val layer: SkiaLayer): SkikoView {
-    val typeface = Typeface.makeFromFile("fonts/JetBrainsMono-Regular.ttf")
-    val font = Font(typeface, 40f)
-    val paint = Paint().apply {
+class ClocksAwt(private val layer: SkiaLayer): SkikoView {
+    private val typeface = Typeface.makeFromFile("fonts/JetBrainsMono-Regular.ttf")
+    private val font = Font(typeface, 40f)
+    private val paint = Paint().apply {
             color = 0xff9BC730L.toInt()
             mode = PaintMode.FILL
             strokeWidth = 1f
     }
 
     private var frame = 0
-    var xpos = 0.0
-    var ypos = 0.0
+    private var xpos = 0.0
+    private var ypos = 0.0
     private val fontCollection = FontCollection()
         .setDefaultFontManager(FontMgr.default)
 
-    override fun onRender(canvas: Canvas, width: Int, height: Int, currentTimestamp: Long) {
+    override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
         val watchFill = Paint().apply { color = 0xFFFFFFFF.toInt() }
         val watchStroke = Paint().apply {
                color = 0xFF000000.toInt()
@@ -56,7 +56,7 @@ class ClocksJvm(private val layer: SkiaLayer): SkikoView {
                     )
                     angle += (2.0 * PI / 12.0).toFloat()
                 }
-                val time = (currentTimestamp / 1E6) % 60000 +
+                val time = (nanoTime / 1E6) % 60000 +
                         (x.toFloat() / width * 5000).toLong() +
                         (y.toFloat() / width * 5000).toLong()
 
@@ -80,7 +80,7 @@ class ClocksJvm(private val layer: SkiaLayer): SkikoView {
         val style = ParagraphStyle()
         val renderInfo = ParagraphBuilder(style, fontCollection)
             .pushStyle(TextStyle().setColor(0xFF000000.toInt()))
-            .addText("Graphics API: ${layer.renderApi} ✿ﾟ ${currentSystemTheme}")
+            .addText("Graphics API: ${layer.renderApi} ✿ﾟ $currentSystemTheme")
             .popStyle()
             .build()
         renderInfo.layout(Float.POSITIVE_INFINITY)
@@ -108,6 +108,7 @@ class ClocksJvm(private val layer: SkiaLayer): SkikoView {
                 xpos = event.x
                 ypos = event.y
             }
+            else -> {}
         }
         // TODO: provide example that covers all features of pointer event
     }

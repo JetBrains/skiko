@@ -116,4 +116,4 @@ Don't run any background tasks, click mouse, or press keys during the tests. Oth
 
 #### Run samples
  - First follow the instruction here: [Building JVM bindings](#building-jvm-bindings)
- - `./gradlew :SkiaJvmSample:run`  
+ - `./gradlew :SkiaAwtSample:run`
