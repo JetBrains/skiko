@@ -6,6 +6,7 @@ import org.jetbrains.skiko.GenericSkikoView
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkikoView
 import org.jetbrains.skiko.SkikoViewController
+import org.jetbrains.skiko.SkikoGestureEventKind
 import platform.UIKit.*
 import platform.Foundation.*
 
@@ -36,7 +37,7 @@ class SkikoAppDelegate : UIResponder, UIApplicationDelegateProtocol {
 
     override fun application(application: UIApplication, didFinishLaunchingWithOptions: Map<Any?, *>?): Boolean {
         window = UIWindow(frame = UIScreen.mainScreen.bounds)
-        window!!.rootViewController = SkikoViewController().apply {
+        window!!.rootViewController = SkikoViewController(SkikoGestureEventKind.values()).apply {
             setAppFactory { layer ->
                 GenericSkikoView(layer, makeApp(layer)).also {
                     layer.skikoView = it

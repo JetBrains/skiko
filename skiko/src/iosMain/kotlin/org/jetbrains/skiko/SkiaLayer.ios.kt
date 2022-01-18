@@ -14,6 +14,12 @@ import platform.darwin.NSObject
 import kotlin.system.getTimeNanos
 
 actual open class SkiaLayer {
+    private val gestures: Array<SkikoGestureEventKind>?
+
+    constructor(gestures: Array<SkikoGestureEventKind>? = null) {
+        this.gestures = gestures
+    }
+
     fun isShowing(): Boolean {
         return true
     }
@@ -142,15 +148,29 @@ actual open class SkiaLayer {
                     )
                 )
             }
-
         }
-        // We have ':' in selector to take care of function argument.
-        view.addGestureRecognizer(UITapGestureRecognizer(controller, NSSelectorFromString("onTap:")))
-        view.addGestureRecognizer(UILongPressGestureRecognizer(controller, NSSelectorFromString("onLongPress:")))
-        view.addGestureRecognizer(UIPinchGestureRecognizer(controller, NSSelectorFromString("onPinch:")))
-        view.addGestureRecognizer(UIRotationGestureRecognizer(controller, NSSelectorFromString("onRotation:")))
-        view.addGestureRecognizer(UISwipeGestureRecognizer(controller, NSSelectorFromString("onSwipe:")))
-        view.addGestureRecognizer(UIPanGestureRecognizer(controller, NSSelectorFromString("onPan:")))
+
+        if (!gestures.isNullOrEmpty()) {
+            // We have ':' in selector to take care of function argument.
+            if (gestures.contains(SkikoGestureEventKind.TAP)) {
+                view.addGestureRecognizer(UITapGestureRecognizer(controller, NSSelectorFromString("onTap:")))
+            }
+            if (gestures.contains(SkikoGestureEventKind.LONGPRESS)) {
+                view.addGestureRecognizer(UILongPressGestureRecognizer(controller, NSSelectorFromString("onLongPress:")))
+            }
+            if (gestures.contains(SkikoGestureEventKind.PINCH)) {
+                view.addGestureRecognizer(UIPinchGestureRecognizer(controller, NSSelectorFromString("onPinch:")))
+            }
+            if (gestures.contains(SkikoGestureEventKind.ROTATION)) {
+                view.addGestureRecognizer(UIRotationGestureRecognizer(controller, NSSelectorFromString("onRotation:")))
+            }
+            if (gestures.contains(SkikoGestureEventKind.SWIPE)) {
+                view.addGestureRecognizer(UISwipeGestureRecognizer(controller, NSSelectorFromString("onSwipe:")))
+            }
+            if (gestures.contains(SkikoGestureEventKind.PAN)) {
+                view.addGestureRecognizer(UIPanGestureRecognizer(controller, NSSelectorFromString("onPan:")))
+            }
+        }
         // TODO: maybe add observer for view.viewDidDisappear() to detach us?
         redrawer = MetalRedrawer(this).apply {
             needRedraw()

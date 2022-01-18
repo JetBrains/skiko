@@ -16,11 +16,17 @@ import platform.UIKit.UIPressesEvent
 
 @ExportObjCClass
 class SkikoViewController : UIViewController, UIKeyInputProtocol {
+    private var gestures: Array<SkikoGestureEventKind>? = null
+
     @OverrideInit
     constructor() : super(nibName = null, bundle = null)
 
     @OverrideInit
     constructor(coder: NSCoder) : super(coder)
+
+    constructor(gestures: Array<SkikoGestureEventKind>? = null) : this() {
+        this.gestures = gestures
+    }
 
     override fun canBecomeFirstResponder() = true
 
@@ -131,7 +137,7 @@ class SkikoViewController : UIViewController, UIKeyInputProtocol {
         val (width, height) = UIScreen.mainScreen.bounds.useContents {
             this.size.width to this.size.height
         }
-        skikoLayer = SkiaLayer().apply {
+        skikoLayer = SkiaLayer(gestures).apply {
             skikoView = appFactory(this)
         }
         view.contentScaleFactor = UIScreen.mainScreen.scale
