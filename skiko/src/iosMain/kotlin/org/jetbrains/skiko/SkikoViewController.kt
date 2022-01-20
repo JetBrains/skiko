@@ -1,12 +1,15 @@
 package org.jetbrains.skiko
 
+import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExportObjCClass
 import kotlinx.cinterop.useContents
+import platform.CoreGraphics.CGRect
 import platform.CoreGraphics.CGRectMake
 import platform.Foundation.NSCoder
 import platform.UIKit.UIEvent
 import platform.UIKit.UITouch
 import platform.UIKit.UIScreen
+import platform.UIKit.UIView
 import platform.UIKit.UIViewController
 import platform.UIKit.setFrame
 import platform.UIKit.contentScaleFactor
@@ -15,22 +18,63 @@ import platform.UIKit.UIPress
 import platform.UIKit.UIPressesEvent
 
 @ExportObjCClass
-class SkikoViewController : UIViewController, UIKeyInputProtocol {
-    private var gestures: Array<SkikoGestureEventKind>? = null
-
+class SkikoViewController : UIViewController {
     @OverrideInit
     constructor() : super(nibName = null, bundle = null)
-
     @OverrideInit
     constructor(coder: NSCoder) : super(coder)
 
-    constructor(gestures: Array<SkikoGestureEventKind>? = null) : this() {
-        this.gestures = gestures
+    constructor(skikoUIView: SkikoUIView) : this() {
+        this.skikoUIView = skikoUIView
     }
 
-    override fun canBecomeFirstResponder() = true
+    private var skikoUIView: SkikoUIView? = null
 
-    private var keyEvent: UIPress? = null
+    override fun loadView() {
+        if (skikoUIView == null) {
+            super.loadView()
+        } else {
+            this.view = skikoUIView!!.load()
+        }
+    }
+
+    // viewDidUnload() is deprecated and not called.
+    override fun viewDidDisappear(animated: Boolean) {
+        skikoUIView?.detach()
+    }
+}
+
+@ExportObjCClass
+class SkikoUIView : UIView, UIKeyInputProtocol {
+    @OverrideInit
+    constructor(frame: CValue<CGRect>) : super(frame)
+    @OverrideInit
+    constructor(coder: NSCoder) : super(coder)
+
+    private var skiaLayer: SkiaLayer? = null
+
+    constructor(skiaLayer: SkiaLayer, frame: CValue<CGRect> = CGRectMake(0.0, 0.0, 1.0, 1.0)) : super(frame) {
+        this.skiaLayer = skiaLayer
+    }
+
+    fun detach() = skiaLayer?.detach()
+
+    fun load(): SkikoUIView {
+        val (width, height) = UIScreen.mainScreen.bounds.useContents {
+            this.size.width to this.size.height
+        }
+        setFrame(CGRectMake(0.0, 0.0, width, height))
+        contentScaleFactor = UIScreen.mainScreen.scale
+        skiaLayer?.attachTo(this)
+
+        return this
+    }
+
+    fun showScreenKeyboard() = becomeFirstResponder()
+    fun hideScreenKeyboard() = resignFirstResponder()
+    fun isScreenKeyboardOpen() = isFirstResponder
+
+    var keyEvent: UIPress? = null
     private var inputText: String = ""
     override fun hasText(): Boolean {
         return inputText.length > 0
@@ -38,18 +82,20 @@ class SkikoViewController : UIViewController, UIKeyInputProtocol {
 
     override fun insertText(theText: String) {
         inputText += theText
-        skikoLayer.skikoView?.onInputEvent(toSkikoTypeEvent(theText, keyEvent))
+        skiaLayer?.skikoView?.onInputEvent(toSkikoTypeEvent(theText, keyEvent))
     }
 
     override fun deleteBackward() {
         inputText = inputText.dropLast(1)
     }
 
+    override fun canBecomeFirstResponder() = true
+
     override fun pressesBegan(presses: Set<*>, withEvent: UIPressesEvent?) {
         if (withEvent != null) {
             for (press in withEvent.allPresses) {
                 keyEvent = press as UIPress
-                skikoLayer.skikoView?.onKeyboardEvent(
+                skiaLayer?.skikoView?.onKeyboardEvent(
                     toSkikoKeyboardEvent(press, SkikoKeyboardEventKind.DOWN)
                 )
             }
@@ -61,7 +107,7 @@ class SkikoViewController : UIViewController, UIKeyInputProtocol {
         if (withEvent != null) {
             for (press in withEvent.allPresses) {
                 keyEvent = press as UIPress
-                skikoLayer.skikoView?.onKeyboardEvent(
+                skiaLayer?.skikoView?.onKeyboardEvent(
                     toSkikoKeyboardEvent(press, SkikoKeyboardEventKind.UP)
                 )
             }
@@ -80,7 +126,7 @@ class SkikoViewController : UIViewController, UIKeyInputProtocol {
                 SkikoTouchEvent(x, y, SkikoTouchEventKind.STARTED, timestamp, event)
             )
         }
-        skikoLayer.skikoView?.onTouchEvent(events.toTypedArray())
+        skiaLayer?.skikoView?.onTouchEvent(events.toTypedArray())
     }
 
     override fun touchesEnded(touches: Set<*>, withEvent: UIEvent?) {
@@ -94,7 +140,7 @@ class SkikoViewController : UIViewController, UIKeyInputProtocol {
                 SkikoTouchEvent(x, y, SkikoTouchEventKind.ENDED, timestamp, event)
             )
         }
-        skikoLayer.skikoView?.onTouchEvent(events.toTypedArray())
+        skiaLayer?.skikoView?.onTouchEvent(events.toTypedArray())
     }
 
     override fun touchesMoved(touches: Set<*>, withEvent: UIEvent?) {
@@ -108,7 +154,7 @@ class SkikoViewController : UIViewController, UIKeyInputProtocol {
                 SkikoTouchEvent(x, y, SkikoTouchEventKind.MOVED, timestamp, event)
             )
         }
-        skikoLayer.skikoView?.onTouchEvent(events.toTypedArray())
+        skiaLayer?.skikoView?.onTouchEvent(events.toTypedArray())
     }
 
     override fun touchesCancelled(touches: Set<*>, withEvent: UIEvent?) {
@@ -122,31 +168,6 @@ class SkikoViewController : UIViewController, UIKeyInputProtocol {
                 SkikoTouchEvent(x, y, SkikoTouchEventKind.CANCELLED, timestamp, event)
             )
         }
-        skikoLayer.skikoView?.onTouchEvent(events.toTypedArray())
-    }
-
-    internal lateinit var appFactory: (SkiaLayer) -> SkikoView
-    fun setAppFactory(appFactory: (SkiaLayer) -> SkikoView) {
-        this.appFactory = appFactory
-    }
-
-    private lateinit var skikoLayer: SkiaLayer
-    override fun viewDidLoad() {
-        super.viewDidLoad()
-
-        val (width, height) = UIScreen.mainScreen.bounds.useContents {
-            this.size.width to this.size.height
-        }
-        skikoLayer = SkiaLayer(gestures).apply {
-            skikoView = appFactory(this)
-        }
-        view.contentScaleFactor = UIScreen.mainScreen.scale
-        view.setFrame(CGRectMake(0.0, 0.0, width, height))
-        skikoLayer.attachTo(this.view)
-    }
-
-    // viewDidUnload() is deprecated and not called.
-    override fun viewDidDisappear(animated: Boolean) {
-        skikoLayer.detach()
+        skiaLayer?.skikoView?.onTouchEvent(events.toTypedArray())
     }
 }
