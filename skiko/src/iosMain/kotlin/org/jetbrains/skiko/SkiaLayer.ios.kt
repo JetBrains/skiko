@@ -24,6 +24,16 @@ actual open class SkiaLayer {
         return true
     }
 
+    fun showScreenKeyboard() {
+        view?.becomeFirstResponder()
+    }
+
+    fun hideScreenKeyboard() { view?.resignFirstResponder() }
+
+    fun isScreenKeyboardOpen(): Boolean {
+        return if (view == null) false else view!!.isFirstResponder
+    }
+
     actual var renderApi: GraphicsApi
         get() = GraphicsApi.METAL
         set(value) { throw UnsupportedOperationException() }
