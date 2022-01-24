@@ -628,7 +628,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
      */
     fun drawTriangleFan(
         positions: Array<Point>,
-        colors: IntArray?,
+        colors: IntArray? = null,
         texCoords: Array<Point>? = null,
         indices: ShortArray? = null,
         blendMode: BlendMode,
@@ -683,9 +683,9 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     fun drawVertices(
         vertexMode: VertexMode,
         positions: FloatArray,
-        colors: IntArray?,
-        texCoords: FloatArray?,
-        indices: ShortArray?,
+        colors: IntArray? = null,
+        texCoords: FloatArray? = null,
+        indices: ShortArray? = null,
         blendMode: BlendMode,
         paint: Paint
     ): Canvas {
