@@ -603,8 +603,8 @@ val skikoAwtJar by project.tasks.registering(Jar::class) {
     archiveBaseName.set("skiko-awt")
     from(kotlin.jvm("awt").compilations["main"].output.allOutputs)
 }
-val skikoJvmRuntimeJar = createSkikoJvmJarTask(hostOs, hostArch, skikoAwtJar)
-val skikoRuntimeDirForTests = skikoRuntimeDirForTestsTask(hostOs, hostArch, skikoJvmRuntimeJar)
+val skikoAwtRuntimeJar = createSkikoJvmJarTask(hostOs, hostArch, skikoAwtJar)
+val skikoRuntimeDirForTests = skikoRuntimeDirForTestsTask(hostOs, hostArch, skikoAwtRuntimeJar)
 
 if (supportAndroid) {
     val os = OS.Android
@@ -1024,11 +1024,11 @@ fun skikoRuntimeDirForTestsTask(
 
 tasks.withType<Test>().configureEach {
     dependsOn(skikoRuntimeDirForTests)
-    dependsOn(skikoJvmRuntimeJar)
+    dependsOn(skikoAwtRuntimeJar)
     options {
         val dir = skikoRuntimeDirForTests.map { it.destinationDir }.get()
         systemProperty("skiko.library.path", dir)
-        val jar = skikoJvmRuntimeJar.get().outputs.files.files.single { it.name.endsWith(".jar")}
+        val jar = skikoAwtRuntimeJar.get().outputs.files.files.single { it.name.endsWith(".jar")}
         systemProperty("skiko.jar.path", jar.absolutePath)
 
         systemProperty("skiko.test.screenshots.dir", File(project.projectDir, "src/jvmTest/screenshots").absolutePath)
@@ -1148,7 +1148,7 @@ publishing {
                     artifact(entry.value.map { it.archiveFile.get() })
                     var jvmSourcesArtifact: Any? = null
                     // todo: use correct sources jar for each jvm source set
-                    kotlin.jvm("awt").mavenPublication {
+                    kotlin.jvm(if (os == OS.Android) "android" else "awt").mavenPublication {
                         jvmSourcesArtifact = artifacts.find { it.classifier == "sources" }
                     }
                     if (jvmSourcesArtifact == null) {
