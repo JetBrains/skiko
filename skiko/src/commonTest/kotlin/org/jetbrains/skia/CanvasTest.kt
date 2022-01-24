@@ -36,9 +36,9 @@ class CanvasTest {
             VertexMode.TRIANGLES,
             positions,
             colors,
-            positions,
+            null,
             indices,
-            BlendMode.SRC_OVER,
+            BlendMode.DST_OVER,
             Paint()
         )
 
@@ -170,6 +170,7 @@ class CanvasTest {
             cubics = points.toTypedArray(),
             colors = intArrayOf(Color.RED, Color.BLUE, Color.YELLOW, Color.CYAN),
             texCoords = null,
+            blendMode = BlendMode.DST_OVER,
             paint = Paint()
         )
 

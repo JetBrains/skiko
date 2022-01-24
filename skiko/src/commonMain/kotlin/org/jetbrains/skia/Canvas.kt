@@ -488,11 +488,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         return this
     }
 
-    fun drawPicture(picture: Picture): Canvas {
-        return drawPicture(picture, null, null)
-    }
-
-    fun drawPicture(picture: Picture, matrix: Matrix33?, paint: Paint?): Canvas {
+    fun drawPicture(picture: Picture, matrix: Matrix33? = null, paint: Paint? = null): Canvas {
         Stats.onNativeCall()
         interopScope {
             _nDrawPicture(_ptr, getPtr(picture), toInterop(matrix?.mat), getPtr(paint))
@@ -507,29 +503,6 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
      * Draws a triangle mesh, using clip and Matrix.
      *
      *
-     * If paint contains an Shader, the shader is mapped using the vertices' positions.
-     *
-     *
-     * If vertices colors are defined in vertices, and Paint paint contains Shader,
-     * BlendMode mode combines vertices colors with Shader.
-     *
-     * @param positions  triangle mesh to draw
-     * @param colors     color array, one for each corner; may be null
-     * @param paint      specifies the Shader, used as Vertices texture
-     *
-     * @see [https://fiddle.skia.org/c/@Canvas_drawVertices](https://fiddle.skia.org/c/@Canvas_drawVertices)
-     *
-     * @see [https://fiddle.skia.org/c/@Canvas_drawVertices_2](https://fiddle.skia.org/c/@Canvas_drawVertices_2)
-     */
-    fun drawTriangles(positions: Array<Point>, colors: IntArray?, paint: Paint): Canvas {
-        return drawTriangles(positions, colors, null, null, BlendMode.MODULATE, paint)
-    }
-
-    /**
-     *
-     * Draws a triangle mesh, using clip and Matrix.
-     *
-     *
      * If paint contains an Shader and vertices does not contain texCoords, the shader
      * is mapped using the vertices' positions.
      *
@@ -541,6 +514,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
      * @param colors     color array, one for each corner; may be null
      * @param texCoords  Point array of texture coordinates, mapping Shader to corners; may be null
      * @param indices    with which indices points should be drawn; may be null
+     * @param blendMode  combines vertices colors with Shader, if both are present
      * @param paint      specifies the Shader, used as Vertices texture
      *
      * @see [https://fiddle.skia.org/c/@Canvas_drawVertices](https://fiddle.skia.org/c/@Canvas_drawVertices)
@@ -549,43 +523,10 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
      */
     fun drawTriangles(
         positions: Array<Point>,
-        colors: IntArray?,
-        texCoords: Array<Point>?,
-        indices: ShortArray?,
-        paint: Paint
-    ): Canvas {
-        return drawTriangles(positions, colors, texCoords, indices, BlendMode.MODULATE, paint)
-    }
-
-    /**
-     *
-     * Draws a triangle mesh, using clip and Matrix.
-     *
-     *
-     * If paint contains an Shader and vertices does not contain texCoords, the shader
-     * is mapped using the vertices' positions.
-     *
-     *
-     * If vertices colors are defined in vertices, and Paint paint contains Shader,
-     * BlendMode mode combines vertices colors with Shader.
-     *
-     * @param positions  triangle mesh to draw
-     * @param colors     color array, one for each corner; may be null
-     * @param texCoords  Point array of texture coordinates, mapping Shader to corners; may be null
-     * @param indices    with which indices points should be drawn; may be null
-     * @param mode       combines vertices colors with Shader, if both are present
-     * @param paint      specifies the Shader, used as Vertices texture
-     *
-     * @see [https://fiddle.skia.org/c/@Canvas_drawVertices](https://fiddle.skia.org/c/@Canvas_drawVertices)
-     *
-     * @see [https://fiddle.skia.org/c/@Canvas_drawVertices_2](https://fiddle.skia.org/c/@Canvas_drawVertices_2)
-     */
-    fun drawTriangles(
-        positions: Array<Point>,
-        colors: IntArray?,
-        texCoords: Array<Point>?,
-        indices: ShortArray?,
-        mode: BlendMode,
+        colors: IntArray? = null,
+        texCoords: Array<Point>? = null,
+        indices: ShortArray? = null,
+        blendMode: BlendMode,
         paint: Paint
     ): Canvas {
         require(positions.size % 3 == 0) { "Expected positions.length % 3 == 0, got: " + positions.size }
@@ -602,7 +543,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
                 toInterop(Point.flattenArray(texCoords)),
                 indices?.size ?: 0,
                 toInterop(indices),
-                mode.ordinal,
+                blendMode.ordinal,
                 getPtr(paint)
             )
         }
@@ -615,29 +556,6 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
      * Draws a triangle strip mesh, using clip and Matrix.
      *
      *
-     * If paint contains an Shader, the shader is mapped using the vertices' positions.
-     *
-     *
-     * If vertices colors are defined in vertices, and Paint paint contains Shader,
-     * BlendMode mode combines vertices colors with Shader.
-     *
-     * @param positions  triangle mesh to draw
-     * @param colors     color array, one for each corner; may be null
-     * @param paint      specifies the Shader, used as Vertices texture
-     *
-     * @see [https://fiddle.skia.org/c/@Canvas_drawVertices](https://fiddle.skia.org/c/@Canvas_drawVertices)
-     *
-     * @see [https://fiddle.skia.org/c/@Canvas_drawVertices_2](https://fiddle.skia.org/c/@Canvas_drawVertices_2)
-     */
-    fun drawTriangleStrip(positions: Array<Point>, colors: IntArray?, paint: Paint): Canvas {
-        return drawTriangleStrip(positions, colors, null, null, BlendMode.MODULATE, paint)
-    }
-
-    /**
-     *
-     * Draws a triangle strip mesh, using clip and Matrix.
-     *
-     *
      * If paint contains an Shader and vertices does not contain texCoords, the shader
      * is mapped using the vertices' positions.
      *
@@ -649,6 +567,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
      * @param colors     color array, one for each corner; may be null
      * @param texCoords  Point array of texture coordinates, mapping Shader to corners; may be null
      * @param indices    with which indices points should be drawn; may be null
+     * @param blendMode  combines vertices colors with Shader, if both are present
      * @param paint      specifies the Shader, used as Vertices texture
      *
      * @see [https://fiddle.skia.org/c/@Canvas_drawVertices](https://fiddle.skia.org/c/@Canvas_drawVertices)
@@ -657,43 +576,10 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
      */
     fun drawTriangleStrip(
         positions: Array<Point>,
-        colors: IntArray?,
-        texCoords: Array<Point>?,
-        indices: ShortArray?,
-        paint: Paint
-    ): Canvas {
-        return drawTriangleStrip(positions, colors, texCoords, indices, BlendMode.MODULATE, paint)
-    }
-
-    /**
-     *
-     * Draws a triangle strip mesh, using clip and Matrix.
-     *
-     *
-     * If paint contains an Shader and vertices does not contain texCoords, the shader
-     * is mapped using the vertices' positions.
-     *
-     *
-     * If vertices colors are defined in vertices, and Paint paint contains Shader,
-     * BlendMode mode combines vertices colors with Shader.
-     *
-     * @param positions  triangle mesh to draw
-     * @param colors     color array, one for each corner; may be null
-     * @param texCoords  Point array of texture coordinates, mapping Shader to corners; may be null
-     * @param indices    with which indices points should be drawn; may be null
-     * @param mode       combines vertices colors with Shader, if both are present
-     * @param paint      specifies the Shader, used as Vertices texture
-     *
-     * @see [https://fiddle.skia.org/c/@Canvas_drawVertices](https://fiddle.skia.org/c/@Canvas_drawVertices)
-     *
-     * @see [https://fiddle.skia.org/c/@Canvas_drawVertices_2](https://fiddle.skia.org/c/@Canvas_drawVertices_2)
-     */
-    fun drawTriangleStrip(
-        positions: Array<Point>,
-        colors: IntArray?,
-        texCoords: Array<Point>?,
-        indices: ShortArray?,
-        mode: BlendMode,
+        colors: IntArray? = null,
+        texCoords: Array<Point>? = null,
+        indices: ShortArray? = null,
+        blendMode: BlendMode,
         paint: Paint
     ): Canvas {
         require(colors == null || colors.size == positions.size) { "Expected colors.length == positions.length, got: " + colors!!.size + " != " + positions.size }
@@ -709,7 +595,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
                 toInterop(Point.flattenArray(texCoords)),
                 indices?.size ?: 0,
                 toInterop(indices),
-                mode.ordinal,
+                blendMode.ordinal,
                 getPtr(paint)
             )
         }
@@ -722,29 +608,6 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
      * Draws a triangle fan mesh, using clip and Matrix.
      *
      *
-     * If paint contains an Shader, the shader is mapped using the vertices' positions.
-     *
-     *
-     * If vertices colors are defined in vertices, and Paint paint contains Shader,
-     * BlendMode mode combines vertices colors with Shader.
-     *
-     * @param positions  triangle mesh to draw
-     * @param colors     color array, one for each corner; may be null
-     * @param paint      specifies the Shader, used as Vertices texture
-     *
-     * @see [https://fiddle.skia.org/c/@Canvas_drawVertices](https://fiddle.skia.org/c/@Canvas_drawVertices)
-     *
-     * @see [https://fiddle.skia.org/c/@Canvas_drawVertices_2](https://fiddle.skia.org/c/@Canvas_drawVertices_2)
-     */
-    fun drawTriangleFan(positions: Array<Point>, colors: IntArray?, paint: Paint): Canvas {
-        return drawTriangleFan(positions, colors, null, null, BlendMode.MODULATE, paint)
-    }
-
-    /**
-     *
-     * Draws a triangle fan mesh, using clip and Matrix.
-     *
-     *
      * If paint contains an Shader and vertices does not contain texCoords, the shader
      * is mapped using the vertices' positions.
      *
@@ -756,6 +619,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
      * @param colors     color array, one for each corner; may be null
      * @param texCoords  Point array of texture coordinates, mapping Shader to corners; may be null
      * @param indices    with which indices points should be drawn; may be null
+     * @param blendMode  combines vertices colors with Shader, if both are present
      * @param paint      specifies the Shader, used as Vertices texture
      *
      * @see [https://fiddle.skia.org/c/@Canvas_drawVertices](https://fiddle.skia.org/c/@Canvas_drawVertices)
@@ -764,43 +628,10 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
      */
     fun drawTriangleFan(
         positions: Array<Point>,
-        colors: IntArray?,
-        texCoords: Array<Point>?,
-        indices: ShortArray?,
-        paint: Paint
-    ): Canvas {
-        return drawTriangleFan(positions, colors, texCoords, indices, BlendMode.MODULATE, paint)
-    }
-
-    /**
-     *
-     * Draws a triangle fan mesh, using clip and Matrix.
-     *
-     *
-     * If paint contains an Shader and vertices does not contain texCoords, the shader
-     * is mapped using the vertices' positions.
-     *
-     *
-     * If vertices colors are defined in vertices, and Paint paint contains Shader,
-     * BlendMode mode combines vertices colors with Shader.
-     *
-     * @param positions  triangle mesh to draw
-     * @param colors     color array, one for each corner; may be null
-     * @param texCoords  Point array of texture coordinates, mapping Shader to corners; may be null
-     * @param indices    with which indices points should be drawn; may be null
-     * @param mode       combines vertices colors with Shader, if both are present
-     * @param paint      specifies the Shader, used as Vertices texture
-     *
-     * @see [https://fiddle.skia.org/c/@Canvas_drawVertices](https://fiddle.skia.org/c/@Canvas_drawVertices)
-     *
-     * @see [https://fiddle.skia.org/c/@Canvas_drawVertices_2](https://fiddle.skia.org/c/@Canvas_drawVertices_2)
-     */
-    fun drawTriangleFan(
-        positions: Array<Point>,
-        colors: IntArray?,
-        texCoords: Array<Point>?,
-        indices: ShortArray?,
-        mode: BlendMode,
+        colors: IntArray? = null,
+        texCoords: Array<Point>? = null,
+        indices: ShortArray? = null,
+        blendMode: BlendMode,
         paint: Paint
     ): Canvas {
         require(colors == null || colors.size == positions.size) { "Expected colors.length == positions.length, got: " + colors!!.size + " != " + positions.size }
@@ -816,7 +647,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
                 toInterop(Point.flattenArray(texCoords)),
                 indices?.size ?: 0,
                 toInterop(indices),
-                mode.ordinal,
+                blendMode.ordinal,
                 getPtr(paint)
             )
         }
@@ -841,7 +672,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
      * @param colors     color array, one for each corner; may be null
      * @param texCoords  flattened Point array of texture coordinates, mapping Shader to corners; may be null
      * @param indices    with which indices points should be drawn; may be null
-     * @param mode       combines vertices colors with Shader, if both are present
+     * @param blendMode  combines vertices colors with Shader, if both are present
      * @param paint      specifies the Shader, used as Vertices texture
      *
      * @see [https://fiddle.skia.org/c/@Canvas_drawVertices](https://fiddle.skia.org/c/@Canvas_drawVertices)
@@ -852,10 +683,10 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     fun drawVertices(
         vertexMode: VertexMode,
         positions: FloatArray,
-        colors: IntArray?,
-        texCoords: FloatArray?,
-        indices: ShortArray?,
-        mode: BlendMode,
+        colors: IntArray? = null,
+        texCoords: FloatArray? = null,
+        indices: ShortArray? = null,
+        blendMode: BlendMode,
         paint: Paint
     ): Canvas {
         require(positions.size % 2 == 0) {
@@ -879,80 +710,12 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
                 toInterop(texCoords),
                 indices?.size ?: 0,
                 toInterop(indices),
-                mode.ordinal,
+                blendMode.ordinal,
                 getPtr(paint)
             )
         }
         reachabilityBarrier(paint)
         return this
-    }
-
-    /**
-     *
-     * Draws a Coons patch: the interpolation of four cubics with shared corners,
-     * associating a color, and optionally a texture SkPoint, with each corner.
-     *
-     *
-     * Coons patch uses clip and Matrix, paint Shader, ColorFilter,
-     * alpha, ImageFilter, and BlendMode. If Shader is provided it is treated
-     * as Coons patch texture.
-     *
-     *
-     * Point array cubics specifies four Path cubic starting at the top-left corner,
-     * in clockwise order, sharing every fourth point. The last Path cubic ends at the
-     * first point.
-     *
-     *
-     * Color array color associates colors with corners in top-left, top-right,
-     * bottom-right, bottom-left order.
-     *
-     *
-     * @param cubics     Path cubic array, sharing common points
-     * @param colors     color array, one for each corner
-     * @param paint      Shader, ColorFilter, BlendMode, used to draw
-     * @return           this
-     *
-     * @see [https://fiddle.skia.org/c/4cf70f8d194867d053d7e177e5088445](https://fiddle.skia.org/c/4cf70f8d194867d053d7e177e5088445)
-     */
-    fun drawPatch(cubics: Array<Point>, colors: IntArray, paint: Paint): Canvas {
-        return drawPatch(cubics, colors, null, paint)
-    }
-
-    /**
-     *
-     * Draws a Coons patch: the interpolation of four cubics with shared corners,
-     * associating a color, and optionally a texture SkPoint, with each corner.
-     *
-     *
-     * Coons patch uses clip and Matrix, paint Shader, ColorFilter,
-     * alpha, ImageFilter, and BlendMode. If Shader is provided it is treated
-     * as Coons patch texture.
-     *
-     *
-     * Point array cubics specifies four Path cubic starting at the top-left corner,
-     * in clockwise order, sharing every fourth point. The last Path cubic ends at the
-     * first point.
-     *
-     *
-     * Color array color associates colors with corners in top-left, top-right,
-     * bottom-right, bottom-left order.
-     *
-     *
-     * If paint contains Shader, Point array texCoords maps Shader as texture to
-     * corners in top-left, top-right, bottom-right, bottom-left order. If texCoords is
-     * nullptr, Shader is mapped using positions (derived from cubics).
-     *
-     * @param cubics     Path cubic array, sharing common points
-     * @param colors     color array, one for each corner
-     * @param texCoords  Point array of texture coordinates, mapping Shader to corners;
-     * may be null
-     * @param paint      Shader, ColorFilter, BlendMode, used to draw
-     * @return           this
-     *
-     * @see [https://fiddle.skia.org/c/4cf70f8d194867d053d7e177e5088445](https://fiddle.skia.org/c/4cf70f8d194867d053d7e177e5088445)
-     */
-    fun drawPatch(cubics: Array<Point>, colors: IntArray, texCoords: Array<Point>?, paint: Paint): Canvas {
-        return drawPatch(cubics, colors, texCoords, BlendMode.MODULATE, paint)
     }
 
     /**
@@ -984,7 +747,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
      * @param colors     color array, one for each corner
      * @param texCoords  Point array of texture coordinates, mapping Shader to corners;
      * may be null
-     * @param mode       BlendMode for colors, and for Shader if paint has one
+     * @param blendMode  BlendMode for colors, and for Shader if paint has one
      * @param paint      Shader, ColorFilter, BlendMode, used to draw
      * @return           this
      *
@@ -993,8 +756,8 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     fun drawPatch(
         cubics: Array<Point>,
         colors: IntArray,
-        texCoords: Array<Point>?,
-        mode: BlendMode,
+        texCoords: Array<Point>? = null,
+        blendMode: BlendMode,
         paint: Paint
     ): Canvas {
         require(cubics.size == 12) { "Expected cubics.length == 12, got: " + cubics.size }
@@ -1007,7 +770,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
                 toInterop(Point.flattenArray(cubics)),
                 toInterop(colors),
                 toInterop(Point.flattenArray(texCoords)),
-                mode.ordinal,
+                blendMode.ordinal,
                 getPtr(paint)
             )
         }
