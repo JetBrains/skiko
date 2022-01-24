@@ -1,11 +1,11 @@
 package org.jetbrains.skia.shaper
 
 class BidiRun(
-    internal val end: Int,
+    val end: Int,
     /**
      * The unicode bidi embedding level (even ltr, odd rtl)
      */
-    internal val level: Int
+    val level: Int
 ) {
     /**
      * The unicode bidi embedding level (even ltr, odd rtl)
