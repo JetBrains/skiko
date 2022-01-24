@@ -488,11 +488,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         return this
     }
 
-    fun drawPicture(picture: Picture): Canvas {
-        return drawPicture(picture, null, null)
-    }
-
-    fun drawPicture(picture: Picture, matrix: Matrix33?, paint: Paint?): Canvas {
+    fun drawPicture(picture: Picture, matrix: Matrix33? = null, paint: Paint? = null): Canvas {
         Stats.onNativeCall()
         interopScope {
             _nDrawPicture(_ptr, getPtr(picture), toInterop(matrix?.mat), getPtr(paint))
@@ -518,7 +514,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
      * @param colors     color array, one for each corner; may be null
      * @param texCoords  Point array of texture coordinates, mapping Shader to corners; may be null
      * @param indices    with which indices points should be drawn; may be null
-     * @param mode       combines vertices colors with Shader, if both are present
+     * @param blendMode  combines vertices colors with Shader, if both are present
      * @param paint      specifies the Shader, used as Vertices texture
      *
      * @see [https://fiddle.skia.org/c/@Canvas_drawVertices](https://fiddle.skia.org/c/@Canvas_drawVertices)
@@ -530,7 +526,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         colors: IntArray? = null,
         texCoords: Array<Point>? = null,
         indices: ShortArray? = null,
-        mode: BlendMode,
+        blendMode: BlendMode,
         paint: Paint
     ): Canvas {
         require(positions.size % 3 == 0) { "Expected positions.length % 3 == 0, got: " + positions.size }
@@ -547,7 +543,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
                 toInterop(Point.flattenArray(texCoords)),
                 indices?.size ?: 0,
                 toInterop(indices),
-                mode.ordinal,
+                blendMode.ordinal,
                 getPtr(paint)
             )
         }
@@ -571,7 +567,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
      * @param colors     color array, one for each corner; may be null
      * @param texCoords  Point array of texture coordinates, mapping Shader to corners; may be null
      * @param indices    with which indices points should be drawn; may be null
-     * @param mode       combines vertices colors with Shader, if both are present
+     * @param blendMode  combines vertices colors with Shader, if both are present
      * @param paint      specifies the Shader, used as Vertices texture
      *
      * @see [https://fiddle.skia.org/c/@Canvas_drawVertices](https://fiddle.skia.org/c/@Canvas_drawVertices)
@@ -583,7 +579,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         colors: IntArray? = null,
         texCoords: Array<Point>? = null,
         indices: ShortArray? = null,
-        mode: BlendMode,
+        blendMode: BlendMode,
         paint: Paint
     ): Canvas {
         require(colors == null || colors.size == positions.size) { "Expected colors.length == positions.length, got: " + colors!!.size + " != " + positions.size }
@@ -599,7 +595,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
                 toInterop(Point.flattenArray(texCoords)),
                 indices?.size ?: 0,
                 toInterop(indices),
-                mode.ordinal,
+                blendMode.ordinal,
                 getPtr(paint)
             )
         }
@@ -623,7 +619,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
      * @param colors     color array, one for each corner; may be null
      * @param texCoords  Point array of texture coordinates, mapping Shader to corners; may be null
      * @param indices    with which indices points should be drawn; may be null
-     * @param mode       combines vertices colors with Shader, if both are present
+     * @param blendMode  combines vertices colors with Shader, if both are present
      * @param paint      specifies the Shader, used as Vertices texture
      *
      * @see [https://fiddle.skia.org/c/@Canvas_drawVertices](https://fiddle.skia.org/c/@Canvas_drawVertices)
@@ -635,7 +631,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         colors: IntArray?,
         texCoords: Array<Point>? = null,
         indices: ShortArray? = null,
-        mode: BlendMode,
+        blendMode: BlendMode,
         paint: Paint
     ): Canvas {
         require(colors == null || colors.size == positions.size) { "Expected colors.length == positions.length, got: " + colors!!.size + " != " + positions.size }
@@ -651,7 +647,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
                 toInterop(Point.flattenArray(texCoords)),
                 indices?.size ?: 0,
                 toInterop(indices),
-                mode.ordinal,
+                blendMode.ordinal,
                 getPtr(paint)
             )
         }
@@ -676,7 +672,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
      * @param colors     color array, one for each corner; may be null
      * @param texCoords  flattened Point array of texture coordinates, mapping Shader to corners; may be null
      * @param indices    with which indices points should be drawn; may be null
-     * @param mode       combines vertices colors with Shader, if both are present
+     * @param blendMode  combines vertices colors with Shader, if both are present
      * @param paint      specifies the Shader, used as Vertices texture
      *
      * @see [https://fiddle.skia.org/c/@Canvas_drawVertices](https://fiddle.skia.org/c/@Canvas_drawVertices)
@@ -690,7 +686,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         colors: IntArray?,
         texCoords: FloatArray?,
         indices: ShortArray?,
-        mode: BlendMode,
+        blendMode: BlendMode,
         paint: Paint
     ): Canvas {
         require(positions.size % 2 == 0) {
@@ -714,7 +710,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
                 toInterop(texCoords),
                 indices?.size ?: 0,
                 toInterop(indices),
-                mode.ordinal,
+                blendMode.ordinal,
                 getPtr(paint)
             )
         }
@@ -751,7 +747,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
      * @param colors     color array, one for each corner
      * @param texCoords  Point array of texture coordinates, mapping Shader to corners;
      * may be null
-     * @param mode       BlendMode for colors, and for Shader if paint has one
+     * @param blendMode  BlendMode for colors, and for Shader if paint has one
      * @param paint      Shader, ColorFilter, BlendMode, used to draw
      * @return           this
      *
@@ -761,7 +757,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         cubics: Array<Point>,
         colors: IntArray,
         texCoords: Array<Point>? = null,
-        mode: BlendMode,
+        blendMode: BlendMode,
         paint: Paint
     ): Canvas {
         require(cubics.size == 12) { "Expected cubics.length == 12, got: " + cubics.size }
@@ -774,7 +770,7 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
                 toInterop(Point.flattenArray(cubics)),
                 toInterop(colors),
                 toInterop(Point.flattenArray(texCoords)),
-                mode.ordinal,
+                blendMode.ordinal,
                 getPtr(paint)
             )
         }

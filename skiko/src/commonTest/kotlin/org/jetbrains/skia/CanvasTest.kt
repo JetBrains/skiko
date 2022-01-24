@@ -170,7 +170,7 @@ class CanvasTest {
             cubics = points.toTypedArray(),
             colors = intArrayOf(Color.RED, Color.BLUE, Color.YELLOW, Color.CYAN),
             texCoords = null,
-            mode = BlendMode.DST_OVER,
+            blendMode = BlendMode.DST_OVER,
             paint = Paint()
         )
 
