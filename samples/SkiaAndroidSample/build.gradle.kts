@@ -27,6 +27,7 @@ val skikoNativeArm64 by configurations.creating
 
 val jniDir = "${projectDir.absolutePath}/src/main/jniLibs"
 
+// TODO: filter .so files only.
 val unzipTaskX64 = tasks.register("unzipNativeX64", Copy::class) {
     destinationDir = file("$jniDir/x86_64")
     from(skikoNativeX64.map { zipTree(it) })

@@ -1,25 +1,28 @@
 package org.jetbrains.skiko
 
 import android.content.Context
+import android.opengl.GLES30
 import android.opengl.GLSurfaceView
 import android.util.Log
 import android.widget.LinearLayout
 import kotlinx.coroutines.Dispatchers
 import org.jetbrains.skia.*
+import java.nio.IntBuffer
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
 class SkikoSurfaceView(context: Context, layer: SkiaLayer) : GLSurfaceView(context) {
-    private val renderer = SkikoSurfaceRender(layer)
+    private val renderer = SkikoSurfaceRender(layer, this.holder.surface)
     init {
         layoutParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+        setEGLConfigChooser (8, 8, 8, 0, 16, 8)
+        setEGLContextClientVersion(2)
+        //renderMode = RENDERMODE_WHEN_DIRTY
         setRenderer(renderer)
-        renderMode = RENDERMODE_WHEN_DIRTY
     }
 
     private val frameDispatcher = FrameDispatcher(Dispatchers.Main) {
-        // draw()
         println("dispatch frame")
         renderer.update()
         requestRender()
@@ -30,7 +33,7 @@ class SkikoSurfaceView(context: Context, layer: SkiaLayer) : GLSurfaceView(conte
     }
 }
 
-class SkikoSurfaceRender(private val layer: SkiaLayer) : GLSurfaceView.Renderer {
+class SkikoSurfaceRender(private val layer: SkiaLayer, val androidSurface: android.view.Surface) : GLSurfaceView.Renderer {
     private var width: Int = 0
     private var height: Int = 0
 
@@ -71,7 +74,7 @@ class SkikoSurfaceRender(private val layer: SkiaLayer) : GLSurfaceView.Renderer 
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
         gl!!
         Log.d("GL","SkikoSurfaceRender.onSurfaceCreated: $gl")
-        gl.glClearColor(0.0f, 1.0f, 0.0f, 0.0f)
+        gl.glClearColor(1.0f, 0.0f, 1.0f, 0.5f)
         gl.glClear(GL10.GL_COLOR_BUFFER_BIT)
     }
 
@@ -81,7 +84,8 @@ class SkikoSurfaceRender(private val layer: SkiaLayer) : GLSurfaceView.Renderer 
         Log.d("GL", "SkikoSurfaceRender.onSurfaceChanged: $width x $height")
         this.width = width
         this.height = height
-/*
+
+        /*
         gl.glViewport(0, 0, width, height)
         gl.glMatrixMode(GL10.GL_PROJECTION)
         gl.glLoadIdentity()
@@ -91,14 +95,14 @@ class SkikoSurfaceRender(private val layer: SkiaLayer) : GLSurfaceView.Renderer 
             0.1f, 100.0f
         )
         gl.glMatrixMode(GL10.GL_MODELVIEW)
- */
-        initCanvas()
+        */
+        initCanvas(gl)
     }
 
     // This method is called from GL rendering thread, it shall render Skia picture.
     override fun onDrawFrame(gl: GL10?) {
         gl!!
-        Log.d("GL", "SkikoSurfaceRender.onDrawFrame: XXX 4: $width x $height")
+        Log.d("GL", "SkikoSurfaceRender.onDrawFrame: XXX 5: $width x $height")
         gl.glClear(GL10.GL_COLOR_BUFFER_BIT)
 
         lockPicture {
@@ -112,10 +116,11 @@ class SkikoSurfaceRender(private val layer: SkiaLayer) : GLSurfaceView.Renderer 
     private var surface: Surface? = null
     private var canvas: Canvas? = null
 
-    private fun initCanvas() {
+    private fun initCanvas(gl: GL10) {
         disposeCanvas()
-        val gl = OpenGLApi.instance
-        val fbId = gl.glGetIntegerv(gl.GL_DRAW_FRAMEBUFFER_BINDING)
+        val intBuf1 = IntBuffer.allocate(1)
+        gl.glGetIntegerv(GLES30.GL_DRAW_FRAMEBUFFER_BINDING, intBuf1)
+        val fbId = intBuf1[0]
         renderTarget = makeGLRenderTarget(
             width,
             height,
