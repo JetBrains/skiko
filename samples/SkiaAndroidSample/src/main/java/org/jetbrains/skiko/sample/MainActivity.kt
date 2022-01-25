@@ -28,6 +28,7 @@ class MainActivity : AppCompatActivity() {
         val skiaLayer = SkiaLayer()
         skiaLayer.skikoView = GenericSkikoView(skiaLayer, RotatingSquare())
         skiaLayer.attachTo(holder)
+        layout.addView(holder)
 
         val button = Button(this)
         button.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
