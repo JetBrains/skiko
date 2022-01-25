@@ -74,6 +74,11 @@ object Library {
         val platformName = System.mapLibraryName(name)
         val icu = if (hostOs.isWindows) "icudtl.dat" else null
 
+        if (hostOs == OS.Android) {
+            System.loadLibrary("skiko-$hostId")
+            return
+        }
+
         // First try: system property is set.
         if (skikoLibraryPath != null) {
             val library = File(File(skikoLibraryPath), platformName)

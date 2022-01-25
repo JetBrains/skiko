@@ -1,14 +1,14 @@
 package org.jetbrains.skiko.sample
 
+import android.app.Activity
 import android.os.Bundle
 import android.widget.LinearLayout
-import androidx.appcompat.app.AppCompatActivity
 import org.jetbrains.skia.impl.Log
 import org.jetbrains.skiko.GenericSkikoView
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.Version
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.debug("onCreate: ${Version.skia}")

@@ -901,7 +901,10 @@ fun createLinkJvmBindings(
             }
             OS.Android -> {
                 osFlags = arrayOf(
-                    "-shared"
+                    "-shared",
+                    "-static-libstdc++",
+                    "-lGLESv3",
+                    "-lEGL"
                 )
                 linker.set(androidClangFor(targetArch))
             }

@@ -22,21 +22,40 @@ plugins {
     kotlin("android") version "1.6.10"
 }
 
+val skikoNativeX64 by configurations.creating
+val skikoNativeArm64 by configurations.creating
+
+val jniDir = "${projectDir.absolutePath}/src/main/jniLibs"
+
+val unzipTaskX64 = tasks.register("unzipNativeX64", Copy::class) {
+    destinationDir = file("$jniDir/x86_64")
+    from(skikoNativeX64.map { zipTree(it) })
+}
+
+val unzipTaskArm64 = tasks.register("unzipNativeArm64", Copy::class) {
+    destinationDir = file("$jniDir/arm64-v8a")
+    from(skikoNativeArm64.map { zipTree(it) })
+}
+
 android {
     compileSdk = 31
 
     defaultConfig {
-        minSdk = 26
+        minSdk = 27
         targetSdk = 31
         versionCode = 1
         versionName = "1.0"
 
         applicationId = "org.jetbrains.skiko.sample"
+
+        ndk {
+            abiFilters += listOf("x86_64", "arm64-v8a")
+        }
     }
 
     buildTypes {
         debug {
-            this.isDebuggable = true
+            isDebuggable = true
         }
     }
 
@@ -55,7 +74,14 @@ var version = if (project.hasProperty("skiko.version")) {
 dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0")
 
-    implementation("androidx.appcompat:appcompat:1.4.1")
+    // TODO: fix me, use skiko-android dep
+    implementation("org.jetbrains.skiko:skiko-android-runtime-x64:$version")
+    
+    skikoNativeX64("org.jetbrains.skiko:skiko-android-runtime-x64:$version")
+    skikoNativeArm64("org.jetbrains.skiko:skiko-android-runtime-arm64:$version")
+}
 
-    implementation("org.jetbrains.skiko:skiko-android-runtime-arm64:$version")
+tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompile>().configureEach {
+    dependsOn(unzipTaskX64)
+    dependsOn(unzipTaskArm64)
 }

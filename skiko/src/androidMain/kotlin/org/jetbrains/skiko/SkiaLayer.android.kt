@@ -45,7 +45,7 @@ actual open class SkiaLayer {
     }
 
     fun attachTo(container: ViewGroup) {
-        val view = SkikoSurfaceView(container.context)
+        val view = SkikoSurfaceView(container.context, this)
         container.addView(view)
 
         this.container = container
@@ -60,13 +60,10 @@ actual open class SkiaLayer {
     }
 
     actual fun needRedraw() {
-        TODO("Implement needRedraw()")
+        glView?.apply {
+            scheduleFrame()
+        }
     }
-
-    internal var redrawer: Redrawer? = null
-
-    var width: Int = 0
-    var height: Int = 0
 
     internal actual fun draw(canvas: Canvas): Unit = TODO()
 }

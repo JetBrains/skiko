@@ -1,5 +1,6 @@
 package org.jetbrains.skia.impl
 
+/*
 import java.lang.ref.Cleaner
 
 actual abstract class Managed actual constructor(ptr: Long, finalizer: Long, managed: Boolean) : Native(ptr),
@@ -43,4 +44,15 @@ actual abstract class Managed actual constructor(ptr: Long, finalizer: Long, man
             _cleanable = _cleaner.register(this, CleanerThunk(className, ptr, finalizer))
         }
     }
-}
+} */
+
+// TODO: rewrite using finaliazation queues on Android
+actual abstract class Managed actual constructor(ptr: Long, finalizer: Long, managed: Boolean) : Native(ptr),
+    AutoCloseable {
+    actual override fun close() {
+        _ptr = 0
+    }
+
+    actual open val isClosed: Boolean
+        get() = _ptr == 0L
+ }
