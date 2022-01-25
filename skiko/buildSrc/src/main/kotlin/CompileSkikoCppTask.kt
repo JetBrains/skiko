@@ -142,8 +142,9 @@ abstract class CompileSkikoCppTask() : AbstractSkikoNativeToolTask() {
             submittedWorks.add(workId)
 
             val workArgs = args.copy {
-                arg("-o", outputFile)
-                arg(value = sourceFile)
+                // Replace slash for Windows paths
+                arg("-o", outputFile.absolutePath.replace("\\", "/"))
+                arg(value = sourceFile.absolutePath.replace("\\", "/"))
             }
 
             val argFile = run {

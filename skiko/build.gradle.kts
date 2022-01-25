@@ -717,7 +717,11 @@ fun androidClangFor(targetArch: Arch, version: String = "30"): String {
         else -> throw GradleException("unsupported $hostOs")
     }
     val ndkDir = File(androidHome, "/$ndkVersion/toolchains/llvm/prebuilt/$hostOsArch")
-    return ndkDir.resolve("bin/$androidArch-linux-android$version-clang++").absolutePath
+    var clang = ndkDir.resolve("bin/$androidArch-linux-android$version-clang++").absolutePath
+    if (hostOs.isWindows) {
+        clang += ".cmd"
+    }
+    return clang
 }
 
 fun androidJar(version: String = "30"): String {
