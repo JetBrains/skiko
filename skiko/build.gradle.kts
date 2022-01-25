@@ -689,10 +689,14 @@ fun createObjcCompileTask(
     )
 }
 
-fun androidHome() = when (hostOs) {
-    OS.MacOS -> File("${System.getProperty("user.home")}/Library/Android/sdk")
-    OS.Linux -> File("${System.getProperty("user.home")}/.android")
-    else -> throw GradleException("unsupported $hostOs")
+fun androidHome(): File {
+    val envPath = System.getenv("ANDROID_SDK_ROOT")
+    return when {
+        envPath != null -> File(envPath)
+        hostOs == OS.MacOS -> File("${System.getProperty("user.home")}/Library/Android/sdk")
+        hostOs == OS.Linux -> File("${System.getProperty("user.home")}/.android")
+        else -> throw GradleException("unsupported $hostOs. Alternative is to define Android SDK in ANDROID_SDK_ROOT environment variable")
+    }
 }
 
 fun androidClangFor(targetArch: Arch, version: String = "30"): String {
@@ -709,6 +713,7 @@ fun androidClangFor(targetArch: Arch, version: String = "30"): String {
     val hostOsArch = when (hostOs) {
         OS.MacOS -> "darwin-x86_64"
         OS.Linux -> "linux-x86_64"
+        OS.Windows -> "windows-x86_64"
         else -> throw GradleException("unsupported $hostOs")
     }
     val ndkDir = File(androidHome, "/$ndkVersion/toolchains/llvm/prebuilt/$hostOsArch")
