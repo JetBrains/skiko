@@ -202,7 +202,7 @@ val Project.supportWasm: Boolean
     get() = findProperty("skiko.wasm.enabled") == "true" || isInIdea
 
 val Project.supportAndroid: Boolean
-    get() = findProperty("skiko.android.enabled") == "true" // || isInIdea
+    get() = findProperty("skiko.android.enabled") == "true"  || isInIdea
 
 kotlin {
     jvm("awt") {
