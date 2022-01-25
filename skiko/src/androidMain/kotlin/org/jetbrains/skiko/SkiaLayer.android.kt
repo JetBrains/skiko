@@ -1,7 +1,5 @@
 package org.jetbrains.skiko
 
-import android.app.PendingIntent.getActivity
-import android.content.Context
 import android.view.*
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skiko.redrawer.Redrawer
@@ -15,7 +13,8 @@ actual typealias SkikoTouchPlatformEvent = Any
 actual typealias SkikoPlatformKeyboardEvent = KeyEvent
 
 actual open class SkiaLayer {
-    private lateinit var view: SkikoSurfaceView
+    private var glView: SkikoSurfaceView? = null
+    private var container: ViewGroup? = null
 
     actual var renderApi: GraphicsApi = GraphicsApi.OPENGL
     actual val contentScale: Float
@@ -39,18 +38,25 @@ actual open class SkiaLayer {
     actual fun attachTo(container: Any) {
         when (container) {
             is ViewGroup -> {
-                attachTo(container, 1000, 1600) //bounds.width() - insets.right - insets.left, bounds.height() - insets.top - insets.bottom)
+                attachTo(container)
             }
             else -> error("Cannot attach to $container")
         }
     }
 
-    fun attachTo(container: ViewGroup, width: Int, height: Int) {
-        this.view = SkikoSurfaceView(container.context, width, height)
-        container.addView(this.view)
+    fun attachTo(container: ViewGroup) {
+        val view = SkikoSurfaceView(container.context, container.width, container.height)
+        container.addView(view)
+
+        this.container = container
+        this.glView = view
     }
 
     actual fun detach() {
+        this.container?.let {
+            it.removeView(this.glView)
+            this.glView = null
+        }
     }
 
     actual fun needRedraw() {

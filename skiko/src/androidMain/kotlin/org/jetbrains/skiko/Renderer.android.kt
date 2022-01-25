@@ -3,6 +3,7 @@ package org.jetbrains.skiko
 import android.content.Context
 import android.opengl.GLSurfaceView
 import android.widget.LinearLayout
+import kotlinx.coroutines.Dispatchers
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
@@ -13,6 +14,11 @@ class SkikoSurfaceView(context: Context, width: Int, height: Int) : GLSurfaceVie
             LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
         holder.setFixedSize(width, height)
         setRenderer(renderer)
+    }
+
+    private val frameDispatcher = FrameDispatcher(Dispatchers.Main) {
+        // draw()
+        println("dispatch frame")
     }
 }
 class SkikoSurfaceRender : GLSurfaceView.Renderer {
@@ -26,5 +32,6 @@ class SkikoSurfaceRender : GLSurfaceView.Renderer {
 
     override fun onDrawFrame(p0: GL10?) {
         println("SkikoSurfaceRender.onDrawFrame")
+
     }
 }
