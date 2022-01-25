@@ -23,12 +23,13 @@ class SkikoSurfaceView(context: Context, layer: SkiaLayer) : GLSurfaceView(conte
     }
 
     private val frameDispatcher = FrameDispatcher(Dispatchers.Main) {
-        println("dispatch frame")
+        Log.d("GL", "dispatch frame")
         renderer.update()
         requestRender()
     }
 
     fun scheduleFrame() {
+        Log.d("GL", "scheduleFrame")
         frameDispatcher.scheduleFrame()
     }
 }
@@ -55,6 +56,7 @@ class SkikoSurfaceRender(private val layer: SkiaLayer, val androidSurface: andro
 
     // This method is called from the main thread.
     fun update() {
+        Log.d("GL", "update")
         layer.skikoView?.let {
             val bounds = Rect.makeWH(width.toFloat(), width.toFloat())
             val canvas = pictureRecorder.beginRecording(bounds)
@@ -74,7 +76,7 @@ class SkikoSurfaceRender(private val layer: SkiaLayer, val androidSurface: andro
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
         gl!!
         Log.d("GL","SkikoSurfaceRender.onSurfaceCreated: $gl")
-        gl.glClearColor(1.0f, 0.0f, 1.0f, 0.5f)
+        gl.glClearColor(0f, 0.0f, 1.0f, 0f)
         gl.glClear(GL10.GL_COLOR_BUFFER_BIT)
     }
 
@@ -84,31 +86,21 @@ class SkikoSurfaceRender(private val layer: SkiaLayer, val androidSurface: andro
         Log.d("GL", "SkikoSurfaceRender.onSurfaceChanged: $width x $height")
         this.width = width
         this.height = height
-
-        /*
-        gl.glViewport(0, 0, width, height)
-        gl.glMatrixMode(GL10.GL_PROJECTION)
-        gl.glLoadIdentity()
-        GLU.gluPerspective(
-            gl, 45.0f,
-            width.toFloat() / height.toFloat(),
-            0.1f, 100.0f
-        )
-        gl.glMatrixMode(GL10.GL_MODELVIEW)
-        */
         initCanvas(gl)
     }
 
     // This method is called from GL rendering thread, it shall render Skia picture.
     override fun onDrawFrame(gl: GL10?) {
         gl!!
-        Log.d("GL", "SkikoSurfaceRender.onDrawFrame: XXX 5: $width x $height")
+        Log.d("GL", "SkikoSurfaceRender.onDrawFrame: XXX 5: $width x $height: $canvas")
         gl.glClear(GL10.GL_COLOR_BUFFER_BIT)
 
         lockPicture {
             canvas?.drawPicture(it.instance)
             Unit
         }
+
+        context?.flush()
     }
 
     private var context: DirectContext? = null

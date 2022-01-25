@@ -702,9 +702,9 @@ fun androidHome(): File {
 fun androidClangFor(targetArch: Arch, version: String = "30"): String {
     val androidHome = androidHome()
     val ndkVersion =
-        arrayOf("ndk/23.0.7599858", "ndk-bundle").find {
+        arrayOf(*(file("$androidHome/ndk").list().map { "ndk/$it" }).toTypedArray(), "ndk-bundle").find {
             androidHome.resolve(it).exists()
-        }!!
+        } ?: throw GradleException("Cannot find NDK, is it installed (Tools/SDK Manager)?")
     val androidArch = when (targetArch) {
         Arch.Arm64 -> "aarch64"
         Arch.X64 -> "x86_64"

@@ -50,6 +50,8 @@ actual open class SkiaLayer {
 
         this.container = container
         this.glView = view
+
+        needRedraw()
     }
 
     actual fun detach() {
