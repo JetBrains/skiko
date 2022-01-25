@@ -30,6 +30,14 @@ android {
         targetSdk = 31
         versionCode = 1
         versionName = "1.0"
+
+        applicationId = "org.jetbrains.skiko.sample"
+    }
+
+    buildTypes {
+        debug {
+            this.isDebuggable = true
+        }
     }
 
     compileOptions {
@@ -49,5 +57,5 @@ dependencies {
 
     implementation("androidx.appcompat:appcompat:1.4.1")
 
-    implementation("org.jetbrains.skiko:skiko-android-runtime-x64:$version")
+    implementation("org.jetbrains.skiko:skiko-android-runtime-arm64:$version")
 }

@@ -45,7 +45,7 @@ actual open class SkiaLayer {
     }
 
     fun attachTo(container: ViewGroup) {
-        val view = SkikoSurfaceView(container.context, container.width, container.height)
+        val view = SkikoSurfaceView(container.context)
         container.addView(view)
 
         this.container = container
