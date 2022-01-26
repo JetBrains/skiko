@@ -603,8 +603,8 @@ val skikoAwtJar by project.tasks.registering(Jar::class) {
     archiveBaseName.set("skiko-awt")
     from(kotlin.jvm("awt").compilations["main"].output.allOutputs)
 }
-val skikoJvmRuntimeJar = createSkikoJvmJarTask(hostOs, hostArch, skikoAwtJar)
-val skikoRuntimeDirForTests = skikoRuntimeDirForTestsTask(hostOs, hostArch, skikoJvmRuntimeJar)
+val skikoAwtRuntimeJar = createSkikoJvmJarTask(hostOs, hostArch, skikoAwtJar)
+val skikoRuntimeDirForTests = skikoRuntimeDirForTestsTask(hostOs, hostArch, skikoAwtRuntimeJar)
 
 if (supportAndroid) {
     val os = OS.Android
@@ -689,18 +689,17 @@ fun createObjcCompileTask(
     )
 }
 
-fun androidHome() = when (hostOs) {
-    OS.MacOS -> File("${System.getProperty("user.home")}/Library/Android/sdk")
-    OS.Linux -> File("${System.getProperty("user.home")}/.android")
-    else -> throw GradleException("unsupported $hostOs")
+fun androidHome(): File {
+    val envPath = System.getenv("ANDROID_SDK_ROOT")
+    return when {
+        envPath != null -> File(envPath)
+        hostOs == OS.MacOS -> File("${System.getProperty("user.home")}/Library/Android/sdk")
+        hostOs == OS.Linux -> File("${System.getProperty("user.home")}/.android")
+        else -> throw GradleException("unsupported $hostOs. Alternative is to define Android SDK in ANDROID_SDK_ROOT environment variable")
+    }
 }
 
 fun androidClangFor(targetArch: Arch, version: String = "30"): String {
-    val androidHome = androidHome()
-    val ndkVersion =
-        arrayOf("ndk/23.0.7599858", "ndk-bundle").find {
-            androidHome.resolve(it).exists()
-        }!!
     val androidArch = when (targetArch) {
         Arch.Arm64 -> "aarch64"
         Arch.X64 -> "x86_64"
@@ -709,10 +708,25 @@ fun androidClangFor(targetArch: Arch, version: String = "30"): String {
     val hostOsArch = when (hostOs) {
         OS.MacOS -> "darwin-x86_64"
         OS.Linux -> "linux-x86_64"
+        OS.Windows -> "windows-x86_64"
         else -> throw GradleException("unsupported $hostOs")
     }
-    val ndkDir = File(androidHome, "/$ndkVersion/toolchains/llvm/prebuilt/$hostOsArch")
-    return ndkDir.resolve("bin/$androidArch-linux-android$version-clang++").absolutePath
+    val ndkHome = if (System.getenv("ANDROID_NDK_HOME").isNullOrEmpty()) {
+        val androidHome = androidHome()
+        val ndkVersion =
+            arrayOf(*(file("$androidHome/ndk").list().map { "ndk/$it" }.sortedDescending()).toTypedArray(), "ndk-bundle").find {
+                androidHome.resolve(it).exists()
+            } ?: throw GradleException("Cannot find NDK, is it installed (Tools/SDK Manager)?")
+        "$androidHome/$ndkVersion"
+    } else {
+        System.getenv("ANDROID_NDK_HOME")
+    }
+    val ndkDir = File(ndkHome, "/toolchains/llvm/prebuilt/$hostOsArch")
+    var clang = ndkDir.resolve("bin/$androidArch-linux-android$version-clang++").absolutePath
+    if (hostOs.isWindows) {
+        clang += ".cmd"
+    }
+    return clang
 }
 
 fun androidJar(version: String = "30"): String {
@@ -901,7 +915,10 @@ fun createLinkJvmBindings(
             }
             OS.Android -> {
                 osFlags = arrayOf(
-                    "-shared"
+                    "-shared",
+                    "-static-libstdc++",
+                    "-lGLESv3",
+                    "-lEGL"
                 )
                 linker.set(androidClangFor(targetArch))
             }
@@ -1024,11 +1041,11 @@ fun skikoRuntimeDirForTestsTask(
 
 tasks.withType<Test>().configureEach {
     dependsOn(skikoRuntimeDirForTests)
-    dependsOn(skikoJvmRuntimeJar)
+    dependsOn(skikoAwtRuntimeJar)
     options {
         val dir = skikoRuntimeDirForTests.map { it.destinationDir }.get()
         systemProperty("skiko.library.path", dir)
-        val jar = skikoJvmRuntimeJar.get().outputs.files.files.single { it.name.endsWith(".jar")}
+        val jar = skikoAwtRuntimeJar.get().outputs.files.files.single { it.name.endsWith(".jar")}
         systemProperty("skiko.jar.path", jar.absolutePath)
 
         systemProperty("skiko.test.screenshots.dir", File(project.projectDir, "src/jvmTest/screenshots").absolutePath)
@@ -1148,7 +1165,7 @@ publishing {
                     artifact(entry.value.map { it.archiveFile.get() })
                     var jvmSourcesArtifact: Any? = null
                     // todo: use correct sources jar for each jvm source set
-                    kotlin.jvm("awt").mavenPublication {
+                    kotlin.jvm(if (os == OS.Android) "android" else "awt").mavenPublication {
                         jvmSourcesArtifact = artifacts.find { it.classifier == "sources" }
                     }
                     if (jvmSourcesArtifact == null) {

@@ -1,5 +1,5 @@
 package org.jetbrains.skiko
 
-val currentSystemTheme: SystemTheme
-    // TODO: getting actual OS system theme
+actual val currentSystemTheme: SystemTheme
+    // TODO: getting actual OS/browser system theme
     get() = SystemTheme.UNKNOWN

@@ -70,8 +70,14 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: '11'
+      - uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r21e
+      - uses: android-actions/setup-android@v2
       # Runs a set of commands using the runners shell
       - shell: bash
+        env:
+          ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
         run: |
           # TODO: simplify installation of compilers.
           sudo apt-get update -y
@@ -89,6 +95,7 @@ jobs:
           ./gradlew --stacktrace --info -Pskiko.native.enabled=true :skiko:linuxX64Test :skiko:awtTest
           ./gradlew --stacktrace --info :skiko:publishToMavenLocal
           ./gradlew --stacktrace --info :SkiaAwtSample:installDist # check jvm sample works
+          ./gradlew -Pskiko.android.enabled=true :skiko:publishSkikoJvmRuntimeAndroidX64PublicationToMavenLocal :skiko:publishSkikoJvmRuntimeAndroidArm64PublicationToMavenLocal :skiko:publishAndroidPublicationToMavenLocal
       - uses: actions/upload-artifact@v2
         with:
           name: test-reports-linux

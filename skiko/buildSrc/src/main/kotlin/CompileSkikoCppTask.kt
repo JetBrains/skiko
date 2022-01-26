@@ -142,8 +142,9 @@ abstract class CompileSkikoCppTask() : AbstractSkikoNativeToolTask() {
             submittedWorks.add(workId)
 
             val workArgs = args.copy {
-                arg("-o", outputFile)
-                arg(value = sourceFile)
+                // Replace slash for Windows paths
+                arg("-o", outputFile.absolutePath.replace("\\", "/"))
+                arg(value = sourceFile.absolutePath.replace("\\", "/"))
             }
 
             val argFile = run {
@@ -260,7 +261,7 @@ abstract class CompileSkikoCppTask() : AbstractSkikoNativeToolTask() {
     override fun configureArgs() =
         super.configureArgs().apply {
             arg("-c")
-            repeatedArg("-I", headersDirs)
+            repeatedArg("-I", headersDirs.map { it.absolutePath.replace("\\", "/") })
             // todo: ensure that flags do not start with '-I' (all headers should be added via [headersDirs])
             rawArgs(flags.get())
         }

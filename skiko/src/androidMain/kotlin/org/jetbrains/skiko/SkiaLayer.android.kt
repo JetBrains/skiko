@@ -1,9 +1,7 @@
 package org.jetbrains.skiko
 
-import android.view.KeyEvent
-import android.view.MotionEvent
+import android.view.*
 import org.jetbrains.skia.Canvas
-import org.jetbrains.skiko.redrawer.Redrawer
 
 actual typealias SkikoGesturePlatformEvent = MotionEvent
 actual typealias SkikoPlatformPointerEvent = MotionEvent
@@ -13,14 +11,17 @@ actual typealias SkikoTouchPlatformEvent = Any
 actual typealias SkikoPlatformKeyboardEvent = KeyEvent
 
 actual open class SkiaLayer {
+    private var glView: SkikoSurfaceView? = null
+    private var container: ViewGroup? = null
+
     actual var renderApi: GraphicsApi = GraphicsApi.OPENGL
     actual val contentScale: Float
-        get() = 1.0f
+        get() = container?.context?.resources?.displayMetrics?.density?: 1.0f
 
     actual var fullscreen: Boolean
-        get() = false
+        get() = true
         set(value) {
-            if (value) throw IllegalArgumentException("fullscreen unsupported")
+            if (value) throw IllegalArgumentException("changing fullscreen is unsupported")
         }
 
     actual var transparency: Boolean
@@ -29,24 +30,41 @@ actual open class SkiaLayer {
             if (value) throw IllegalArgumentException("transparency unsupported")
         }
 
-
     actual var skikoView: SkikoView? = null
 
     actual fun attachTo(container: Any) {
-        TODO("Implement attachTo()")
+        when (container) {
+            is ViewGroup -> {
+                attachTo(container)
+            }
+            else -> error("Cannot attach to $container")
+        }
+    }
+
+    fun attachTo(container: ViewGroup) {
+        initDefaultContext(container.context)
+
+        val view = SkikoSurfaceView(container.context, this)
+        container.addView(view)
+
+        this.container = container
+        this.glView = view
+
+        needRedraw()
     }
 
     actual fun detach() {
+        this.container?.let {
+            it.removeView(this.glView)
+            this.glView = null
+        }
     }
 
     actual fun needRedraw() {
-        TODO("Implement needRedraw()")
+        glView?.apply {
+            scheduleFrame()
+        }
     }
-
-    internal var redrawer: Redrawer? = null
-
-    var width: Int = 0
-    var height: Int = 0
 
     internal actual fun draw(canvas: Canvas): Unit = TODO()
 }
