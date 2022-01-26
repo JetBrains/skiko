@@ -44,20 +44,46 @@ actual open class SkiaLayer {
     private var desiredWidth = 0
     private var desiredHeight = 0
 
+    companion object {
+        private val SPECIAL_KEYS = setOf(
+            "Unidentified",
+            "Alt",
+            "AltGraph",
+            "Backspace",
+            "CapsLock",
+            "Control",
+            "Fn",
+            "FnLock",
+            "Hyper",
+            "Meta",
+            "NumLock",
+            "ScrollLock",
+            "Shift",
+            "Super",
+            "Symbol",
+            "SymbolLock"
+        )
+    }
+
     fun toSkikoTypeEvent(
         character: String,
         event: KeyboardEvent?,
-    ): SkikoInputEvent {
-        val key = if (event != null) SkikoKey.valueOf(event.keyCode) else SkikoKey.KEY_UNKNOWN
-//        val modifiers = if (event != null) toSkikoModifiers(event) else SkikoInputModifiers.EMPTY
-        val modifiers = SkikoInputModifiers.EMPTY
-        return SkikoInputEvent(
-            character,
-            key,
-            modifiers,
-            SkikoKeyboardEventKind.TYPE,
+    ): SkikoInputEvent? {
+        return if (SPECIAL_KEYS.contains(character)) {
             null
-        )
+        } else {
+            val key = if (event != null) SkikoKey.valueOf(event.keyCode) else SkikoKey.KEY_UNKNOWN
+//        val modifiers = if (event != null) toSkikoModifiers(event) else SkikoInputModifiers.EMPTY
+            val modifiers = SkikoInputModifiers.EMPTY
+            SkikoInputEvent(
+                character,
+                key,
+                modifiers,
+                SkikoKeyboardEventKind.TYPE,
+                null
+            )
+        }
+
     }
 
 
@@ -108,7 +134,10 @@ actual open class SkiaLayer {
             event as KeyboardEvent
             skikoView?.onKeyboardEvent(toSkikoEvent(event, SkikoKeyboardEventKind.DOWN))
             console.log(event)
-            skikoView?.onInputEvent(toSkikoTypeEvent(event.key, event))
+
+            toSkikoTypeEvent(event.key, event)?.let { inputEvent ->
+                skikoView?.onInputEvent(inputEvent)
+            }
         })
         htmlCanvas.addEventListener("keyup", { event ->
             event as KeyboardEvent
