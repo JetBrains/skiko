@@ -202,7 +202,7 @@ val Project.supportWasm: Boolean
     get() = findProperty("skiko.wasm.enabled") == "true" || isInIdea
 
 val Project.supportAndroid: Boolean
-    get() = findProperty("skiko.android.enabled") == "true"  || isInIdea
+    get() = findProperty("skiko.android.enabled") == "true" // || isInIdea
 
 kotlin {
     jvm("awt") {
@@ -702,7 +702,7 @@ fun androidHome(): File {
 fun androidClangFor(targetArch: Arch, version: String = "30"): String {
     val androidHome = androidHome()
     val ndkVersion =
-        arrayOf(*(file("$androidHome/ndk").list().map { "ndk/$it" }).toTypedArray(), "ndk-bundle").find {
+        arrayOf(*(file("$androidHome/ndk").list().map { "ndk/$it" }.sortedDescending()).toTypedArray(), "ndk-bundle").find {
             androidHome.resolve(it).exists()
         } ?: throw GradleException("Cannot find NDK, is it installed (Tools/SDK Manager)?")
     val androidArch = when (targetArch) {

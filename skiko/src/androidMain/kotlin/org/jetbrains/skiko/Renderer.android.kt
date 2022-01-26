@@ -3,7 +3,6 @@ package org.jetbrains.skiko
 import android.content.Context
 import android.opengl.GLES30
 import android.opengl.GLSurfaceView
-import android.util.Log
 import android.widget.LinearLayout
 import kotlinx.coroutines.Dispatchers
 import org.jetbrains.skia.*
@@ -86,10 +85,6 @@ private class SkikoSurfaceRender(private val layer: SkiaLayer) : GLSurfaceView.R
 
     // This method is called from GL rendering thread, it shall render Skia picture.
     override fun onDrawFrame(gl: GL10?) {
-        gl!!
-        Log.d("GL", "SkikoSurfaceRender.onDrawFrame: XXX 5: $width x $height: $canvas")
-        gl.glClear(GL10.GL_COLOR_BUFFER_BIT)
-
         lockPicture {
             canvas?.drawPicture(it.instance)
             Unit
