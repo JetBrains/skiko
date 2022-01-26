@@ -1,6 +1,6 @@
 package org.jetbrains.skiko
 
-val currentSystemTheme: SystemTheme
+actual val currentSystemTheme: SystemTheme
     get() = when (getCurrentSystemTheme()) {
         0 -> SystemTheme.LIGHT
         1 -> SystemTheme.DARK
@@ -8,4 +8,4 @@ val currentSystemTheme: SystemTheme
     }
 
 // Common
-external private fun getCurrentSystemTheme(): Int
+private external fun getCurrentSystemTheme(): Int

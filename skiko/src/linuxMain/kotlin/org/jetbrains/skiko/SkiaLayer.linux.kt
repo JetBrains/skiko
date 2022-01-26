@@ -37,3 +37,6 @@ actual typealias SkikoGesturePlatformEvent = Any
 actual typealias SkikoPlatformInputEvent = Any
 actual typealias SkikoPlatformKeyboardEvent = Any
 actual typealias SkikoPlatformPointerEvent = Any
+
+actual val currentSystemTheme: SystemTheme
+    get() = SystemTheme.UNKNOWN
