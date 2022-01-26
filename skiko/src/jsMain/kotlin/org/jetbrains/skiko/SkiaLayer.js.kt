@@ -44,6 +44,23 @@ actual open class SkiaLayer {
     private var desiredWidth = 0
     private var desiredHeight = 0
 
+    fun toSkikoTypeEvent(
+        character: String,
+        event: KeyboardEvent?,
+    ): SkikoInputEvent {
+        val key = if (event != null) SkikoKey.valueOf(event.keyCode) else SkikoKey.KEY_UNKNOWN
+//        val modifiers = if (event != null) toSkikoModifiers(event) else SkikoInputModifiers.EMPTY
+        val modifiers = SkikoInputModifiers.EMPTY
+        return SkikoInputEvent(
+            character,
+            key,
+            modifiers,
+            SkikoKeyboardEventKind.TYPE,
+            null
+        )
+    }
+
+
     fun attachTo(htmlCanvas: HTMLCanvasElement, autoDetach: Boolean = true) {
         // Scale canvas to allow high DPI rendering as suggested in
         // https://www.khronos.org/webgl/wiki/HandlingHighDPI.
@@ -90,6 +107,8 @@ actual open class SkiaLayer {
         htmlCanvas.addEventListener("keydown", { event ->
             event as KeyboardEvent
             skikoView?.onKeyboardEvent(toSkikoEvent(event, SkikoKeyboardEventKind.DOWN))
+            console.log(event)
+            skikoView?.onInputEvent(toSkikoTypeEvent(event.key, event))
         })
         htmlCanvas.addEventListener("keyup", { event ->
             event as KeyboardEvent
