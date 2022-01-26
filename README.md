@@ -4,9 +4,15 @@
 
 Skiko (short for Skia for Kotlin) is the graphical library exposing significant part
 of [Skia library](https://skia.org) APIs to Kotlin, along with the gluing code for rendering context.
-Linux(x86_64 and arm64), Windows(x86_64) and macOS(x86_64 and arm64) builds for Kotlin/JVM are available.
-JS + WebAssembly build for Kotlin/JS are available.
-iOS arm64/x64 and macOS arm64/x64 builds for Kotlin/Native are available.
+
+Supported platforms:
+   * Kotlin/JVM on Linux(x86_64 and arm64)
+   * Kotlin/JVM on Windows(x86_64)
+   * Kotlin/JVM on macOS(x86_64 and arm64)
+   * Kotlin/JVM on Android(x86_64 and arm64)
+   * Kotlin/JS + WebAssembly in browsers
+   * Kotlin/Native on iOS(arm64 and x64)
+   * Kotlin/Native on macOS (arm64 and x64)
 
 ## Using as dependency
 
