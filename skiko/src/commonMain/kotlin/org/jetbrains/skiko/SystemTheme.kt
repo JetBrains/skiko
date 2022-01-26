@@ -5,3 +5,5 @@ enum class SystemTheme {
     LIGHT,
     UNKNOWN
 }
+
+expect val currentSystemTheme: SystemTheme

@@ -12,29 +12,27 @@ import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
 class SkikoSurfaceView(context: Context, layer: SkiaLayer) : GLSurfaceView(context) {
-    private val renderer = SkikoSurfaceRender(layer, this.holder.surface)
+    private val renderer = SkikoSurfaceRender(layer)
     init {
         layoutParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-        setEGLConfigChooser (8, 8, 8, 0, 16, 8)
+        setEGLConfigChooser (8, 8, 8, 0, 24, 8)
         setEGLContextClientVersion(2)
-        //renderMode = RENDERMODE_WHEN_DIRTY
+        // setRenderMode(RENDERMODE_WHEN_DIRTY)
         setRenderer(renderer)
     }
 
     private val frameDispatcher = FrameDispatcher(Dispatchers.Main) {
-        Log.d("GL", "dispatch frame")
         renderer.update()
         requestRender()
     }
 
     fun scheduleFrame() {
-        Log.d("GL", "scheduleFrame")
         frameDispatcher.scheduleFrame()
     }
 }
 
-class SkikoSurfaceRender(private val layer: SkiaLayer, val androidSurface: android.view.Surface) : GLSurfaceView.Renderer {
+private class SkikoSurfaceRender(private val layer: SkiaLayer) : GLSurfaceView.Renderer {
     private var width: Int = 0
     private var height: Int = 0
 
@@ -56,7 +54,6 @@ class SkikoSurfaceRender(private val layer: SkiaLayer, val androidSurface: andro
 
     // This method is called from the main thread.
     fun update() {
-        Log.d("GL", "update")
         layer.skikoView?.let {
             val bounds = Rect.makeWH(width.toFloat(), width.toFloat())
             val canvas = pictureRecorder.beginRecording(bounds)
@@ -75,15 +72,13 @@ class SkikoSurfaceRender(private val layer: SkiaLayer, val androidSurface: andro
     // This method is called from GL rendering thread.
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
         gl!!
-        Log.d("GL","SkikoSurfaceRender.onSurfaceCreated: $gl")
-        gl.glClearColor(0f, 0.0f, 1.0f, 0f)
+        gl.glClearColor(0f, 0f, 0f, 0f)
         gl.glClear(GL10.GL_COLOR_BUFFER_BIT)
     }
 
     // This method is called from GL rendering thread.
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
         gl!!
-        Log.d("GL", "SkikoSurfaceRender.onSurfaceChanged: $width x $height")
         this.width = width
         this.height = height
         initCanvas(gl)

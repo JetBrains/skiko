@@ -2,8 +2,6 @@ package org.jetbrains.skiko
 
 import android.view.*
 import org.jetbrains.skia.Canvas
-import org.jetbrains.skiko.redrawer.Redrawer
-
 
 actual typealias SkikoGesturePlatformEvent = MotionEvent
 actual typealias SkikoPlatformPointerEvent = MotionEvent
@@ -18,12 +16,12 @@ actual open class SkiaLayer {
 
     actual var renderApi: GraphicsApi = GraphicsApi.OPENGL
     actual val contentScale: Float
-        get() = 1.0f
+        get() = container?.context?.resources?.displayMetrics?.density?: 1.0f
 
     actual var fullscreen: Boolean
-        get() = false
+        get() = true
         set(value) {
-            if (value) throw IllegalArgumentException("fullscreen unsupported")
+            if (value) throw IllegalArgumentException("changing fullscreen is unsupported")
         }
 
     actual var transparency: Boolean
@@ -31,7 +29,6 @@ actual open class SkiaLayer {
         set(value) {
             if (value) throw IllegalArgumentException("transparency unsupported")
         }
-
 
     actual var skikoView: SkikoView? = null
 
@@ -45,6 +42,8 @@ actual open class SkiaLayer {
     }
 
     fun attachTo(container: ViewGroup) {
+        initDefaultContext(container.context)
+
         val view = SkikoSurfaceView(container.context, this)
         container.addView(view)
 

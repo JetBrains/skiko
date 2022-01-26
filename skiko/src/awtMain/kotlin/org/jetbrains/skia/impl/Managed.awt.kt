@@ -2,17 +2,17 @@ package org.jetbrains.skia.impl
 
 import java.lang.ref.Cleaner
 
-actual abstract class Managed actual constructor(ptr: Long, finalizer: Long, managed: Boolean) : Native(ptr),
-    AutoCloseable {
-    private var _cleanable: Cleaner.Cleanable? = null
+actual abstract class Managed actual constructor(ptr: Long, finalizer: Long, managed: Boolean)
+    : Native(ptr), AutoCloseable {
+    private var cleanable: Cleaner.Cleanable? = null
     actual override fun close() {
         if (0L == _ptr)
             throw RuntimeException("Object already closed: $javaClass, _ptr=$_ptr")
-        else if (null == _cleanable)
+        else if (null == cleanable)
             throw RuntimeException("Object is not managed in JVM, can't close(): $javaClass, _ptr=$_ptr")
         else {
-            _cleanable!!.clean()
-            _cleanable = null
+            cleanable!!.clean()
+            cleanable = null
             _ptr = 0
         }
     }
@@ -20,17 +20,17 @@ actual abstract class Managed actual constructor(ptr: Long, finalizer: Long, man
     actual open val isClosed: Boolean
         get() = _ptr == 0L
 
-    class CleanerThunk(var _className: String, var _ptr: Long, var _finalizerPtr: Long) : Runnable {
+    class CleanerThunk(var className: String, var ptr: Long, var finalizerPtr: Long) : Runnable {
         override fun run() {
-            Log.trace { "Cleaning " + _className + " " + java.lang.Long.toString(_ptr, 16) }
-            Stats.onDeallocated(_className)
+            Log.trace { "Cleaning $className ${java.lang.Long.toString(ptr, 16)}" }
+            Stats.onDeallocated(className)
             Stats.onNativeCall()
-            _nInvokeFinalizer(_finalizerPtr, _ptr)
+            _nInvokeFinalizer(finalizerPtr, ptr)
         }
     }
 
     companion object {
-        var _cleaner = Cleaner.create()
+        var CLEANER = Cleaner.create()
         @JvmStatic external fun _nInvokeFinalizer(finalizer: Long, ptr: Long)
     }
 
@@ -40,7 +40,7 @@ actual abstract class Managed actual constructor(ptr: Long, finalizer: Long, man
             assert(finalizer != 0L) { "Managed finalizer is 0" }
             val className = javaClass.simpleName
             Stats.onAllocated(className)
-            _cleanable = _cleaner.register(this, CleanerThunk(className, ptr, finalizer))
+            cleanable = CLEANER.register(this, CleanerThunk(className, ptr, finalizer))
         }
     }
 }

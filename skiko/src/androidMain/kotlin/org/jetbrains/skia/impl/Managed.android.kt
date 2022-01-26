@@ -4,9 +4,11 @@ import java.lang.ref.PhantomReference
 import java.lang.ref.ReferenceQueue
 import kotlin.concurrent.thread
 
-// Android doesn't have Cleaner API, so use less fancy phantom references + finalization queue.
+// Android doesn't have Cleaner API, so use explicit phantom references + finalization queue.
+// Consider using this on all JVM platforms eventually.
 actual abstract class Managed actual constructor(
-    ptr: Long, finalizer: Long, managed: Boolean) : Native(ptr), AutoCloseable {
+    ptr: Long, finalizer: Long, managed: Boolean
+) : Native(ptr), AutoCloseable {
 
     actual override fun close() {
         if (0L == _ptr)
@@ -36,7 +38,9 @@ actual abstract class Managed actual constructor(
 
     companion object {
         private val CLEANER = Cleaner()
-        @JvmStatic external fun _nInvokeFinalizer(finalizer: Long, ptr: Long)
+
+        @JvmStatic
+        external fun _nInvokeFinalizer(finalizer: Long, ptr: Long)
     }
 
     init {
@@ -73,7 +77,6 @@ private class CleanableImpl(managed: Managed, action: Runnable, cleaner: Cleaner
     }
 
     override fun clean() {
-        android.util.Log.e("MM", "Remove!")
         if (remove()) {
             super.clear()
             action.run()
@@ -109,10 +112,11 @@ private class CleanableImpl(managed: Managed, action: Runnable, cleaner: Cleaner
 
 private class Cleaner {
     val queue = ReferenceQueue<Managed>()
-    var list: Cleanable = object: Cleanable {
+    var list: Cleanable = object : Cleanable {
         override fun clean() {
             TODO("Must not be called")
         }
+
         override var prev: Cleanable? = null
         override var next: Cleanable? = null
     }
@@ -123,7 +127,6 @@ private class Cleaner {
     init {
         thread(start = true, isDaemon = true, name = "Reference Cleaner") {
             while (!stopped) {
-                android.util.Log.e("MM", "next ref")
                 val ref = queue.remove(60 * 1000L) as Cleanable?
                 try {
                     ref?.clean()
@@ -134,7 +137,6 @@ private class Cleaner {
     }
 
     fun register(managed: Managed, action: Runnable): Cleanable {
-        android.util.Log.e("MM", "register: $managed")
         return CleanableImpl(managed, action, this)
     }
 
