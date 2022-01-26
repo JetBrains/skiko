@@ -700,11 +700,6 @@ fun androidHome(): File {
 }
 
 fun androidClangFor(targetArch: Arch, version: String = "30"): String {
-    val androidHome = androidHome()
-    val ndkVersion =
-        arrayOf(*(file("$androidHome/ndk").list().map { "ndk/$it" }.sortedDescending()).toTypedArray(), "ndk-bundle").find {
-            androidHome.resolve(it).exists()
-        } ?: throw GradleException("Cannot find NDK, is it installed (Tools/SDK Manager)?")
     val androidArch = when (targetArch) {
         Arch.Arm64 -> "aarch64"
         Arch.X64 -> "x86_64"
@@ -716,7 +711,17 @@ fun androidClangFor(targetArch: Arch, version: String = "30"): String {
         OS.Windows -> "windows-x86_64"
         else -> throw GradleException("unsupported $hostOs")
     }
-    val ndkDir = File(androidHome, "/$ndkVersion/toolchains/llvm/prebuilt/$hostOsArch")
+    val ndkHome = if (System.getenv("ANDROID_NDK_HOME").isNullOrEmpty()) {
+        val androidHome = androidHome()
+        val ndkVersion =
+            arrayOf(*(file("$androidHome/ndk").list().map { "ndk/$it" }.sortedDescending()).toTypedArray(), "ndk-bundle").find {
+                androidHome.resolve(it).exists()
+            } ?: throw GradleException("Cannot find NDK, is it installed (Tools/SDK Manager)?")
+        "$androidHome/$ndkVersion"
+    } else {
+        System.getenv("ANDROID_NDK_HOME")
+    }
+    val ndkDir = File(ndkHome, "/toolchains/llvm/prebuilt/$hostOsArch")
     var clang = ndkDir.resolve("bin/$androidArch-linux-android$version-clang++").absolutePath
     if (hostOs.isWindows) {
         clang += ".cmd"
