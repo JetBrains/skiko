@@ -123,7 +123,7 @@ actual open class SkiaLayer {
                 keyEvent = event
                 skikoView?.onKeyboardEvent(toSkikoEvent(event, SkikoKeyboardEventKind.UP))
             }
-            
+
             private var keyEvent: NSEvent? = null
             private var markedText: String = ""
             private val kEmptyRange = NSMakeRange(NSNotFound.convert(), 0)
@@ -147,11 +147,9 @@ actual open class SkiaLayer {
                 return NSMakeRect(x, y, 0.0, 0.0)
             }
             override fun insertText(string: Any, replacementRange: CValue<NSRange>) {
-                var character = ""
-                if (string is NSAttributedString) {
-                    character = string.string
-                } else {
-                    character = string as String
+                val character = when(string) {
+                    is NSAttributedString -> string.string
+                    else -> string as String
                 }
                 skikoView?.onInputEvent(toSkikoTypeEvent(character, keyEvent))
             }
