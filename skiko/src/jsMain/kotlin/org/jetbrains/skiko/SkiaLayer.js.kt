@@ -65,6 +65,32 @@ actual open class SkiaLayer {
         )
     }
 
+    private fun toSkikoModifiers(event: KeyboardEvent?): SkikoInputModifiers {
+        return if(event == null) {
+            SkikoInputModifiers.EMPTY
+        } else {
+            var result = 0
+
+            if (event.shiftKey) {
+                result = result.or(SkikoInputModifiers.SHIFT.value)
+            }
+
+            if (event.ctrlKey) {
+                result = result.or(SkikoInputModifiers.CONTROL.value)
+            }
+
+            if (event.metaKey) {
+                result = result.or(SkikoInputModifiers.META.value)
+            }
+
+            if (event.altKey) {
+                result = result.or(SkikoInputModifiers.ALT.value)
+            }
+
+            SkikoInputModifiers(result)
+        }
+    }
+
     fun toSkikoTypeEvent(
         character: String,
         event: KeyboardEvent?,
@@ -73,8 +99,7 @@ actual open class SkiaLayer {
             null
         } else {
             val key = if (event != null) SkikoKey.valueOf(event.keyCode) else SkikoKey.KEY_UNKNOWN
-//        val modifiers = if (event != null) toSkikoModifiers(event) else SkikoInputModifiers.EMPTY
-            val modifiers = SkikoInputModifiers.EMPTY
+            val modifiers = toSkikoModifiers(event)
             SkikoInputEvent(
                 character,
                 key,
