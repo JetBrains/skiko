@@ -44,73 +44,6 @@ actual open class SkiaLayer {
     private var desiredWidth = 0
     private var desiredHeight = 0
 
-    companion object {
-        private val SPECIAL_KEYS = setOf(
-            "Unidentified",
-            "Alt",
-            "AltGraph",
-            "Backspace",
-            "CapsLock",
-            "Control",
-            "Fn",
-            "FnLock",
-            "Hyper",
-            "Meta",
-            "NumLock",
-            "ScrollLock",
-            "Shift",
-            "Super",
-            "Symbol",
-            "SymbolLock"
-        )
-    }
-
-    private fun toSkikoModifiers(event: KeyboardEvent?): SkikoInputModifiers {
-        return if(event == null) {
-            SkikoInputModifiers.EMPTY
-        } else {
-            var result = 0
-
-            if (event.shiftKey) {
-                result = result.or(SkikoInputModifiers.SHIFT.value)
-            }
-
-            if (event.ctrlKey) {
-                result = result.or(SkikoInputModifiers.CONTROL.value)
-            }
-
-            if (event.metaKey) {
-                result = result.or(SkikoInputModifiers.META.value)
-            }
-
-            if (event.altKey) {
-                result = result.or(SkikoInputModifiers.ALT.value)
-            }
-
-            SkikoInputModifiers(result)
-        }
-    }
-
-    fun toSkikoTypeEvent(
-        character: String,
-        event: KeyboardEvent?,
-    ): SkikoInputEvent? {
-        return if (SPECIAL_KEYS.contains(character)) {
-            null
-        } else {
-            val key = if (event != null) SkikoKey.valueOf(event.keyCode) else SkikoKey.KEY_UNKNOWN
-            val modifiers = toSkikoModifiers(event)
-            SkikoInputEvent(
-                character,
-                key,
-                modifiers,
-                SkikoKeyboardEventKind.TYPE,
-                null
-            )
-        }
-
-    }
-
 
     fun attachTo(htmlCanvas: HTMLCanvasElement, autoDetach: Boolean = true) {
         // Scale canvas to allow high DPI rendering as suggested in
@@ -158,7 +91,6 @@ actual open class SkiaLayer {
         htmlCanvas.addEventListener("keydown", { event ->
             event as KeyboardEvent
             skikoView?.onKeyboardEvent(toSkikoEvent(event, SkikoKeyboardEventKind.DOWN))
-            console.log(event)
 
             toSkikoTypeEvent(event.key, event)?.let { inputEvent ->
                 skikoView?.onInputEvent(inputEvent)
