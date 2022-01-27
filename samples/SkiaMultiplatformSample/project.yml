@@ -27,3 +27,19 @@ targets:
       ENABLE_BITCODE: "YES"
       ONLY_ACTIVE_ARCH: "NO"
       VALID_ARCHS: "arm64"
+  SkikoSampleMacOS:
+    type: application
+    platform: macOS
+    deploymentTarget: "11.5"
+    prebuildScripts:
+      - script: cd "$SRCROOT" && ./gradlew -p . packForXcode
+        name: GradleCompile
+    info:
+      path: plists/MacOS/Info.plist
+      properties:
+        UILaunchStoryboardName: ""
+    sources:
+      - "src/"
+    settings:
+      LIBRARY_SEARCH_PATHS: "$(inherited)"
+      ENABLE_BITCODE: "YES"

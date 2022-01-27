@@ -1,13 +1,27 @@
 package org.jetbrains.skiko.sample
 
+import kotlinx.coroutines.*
 import platform.AppKit.*
 
 import org.jetbrains.skiko.*
-import platform.Foundation.NSMakeRect
-import platform.Foundation.NSSelectorFromString
-import platform.darwin.NSObject
+import org.jetbrains.skiko.notifications.Notification
+import platform.Foundation.*
+import platform.darwin.*
 
-fun makeApp(skiaLayer: SkiaLayer) = Clocks(skiaLayer)
+fun makeApp(skiaLayer: SkiaLayer) = object : Clocks(skiaLayer) {
+    override fun onKeyboardEvent(event: SkikoKeyboardEvent) {
+        super.onKeyboardEvent(event)
+        if (event.kind == SkikoKeyboardEventKind.DOWN) when (event.key) {
+            SkikoKey.KEY_N -> runBlocking {
+                Notification(
+                    title = "Hello",
+                    body = "It works!"
+                ).send()
+            }
+            else -> {}
+        }
+    }
+}
 
 fun main() {
     val app = NSApplication.sharedApplication()
@@ -20,7 +34,7 @@ fun main() {
     appMenuItem.setSubmenu(appMenu)
     appMenu.addItemWithTitle("About $appName", NSSelectorFromString("orderFrontStandardAboutPanel:"), "a")
     appMenu.addItemWithTitle("Quit $appName", NSSelectorFromString("terminate:"), "q")
-    
+
     app.delegate = object: NSObject(), NSApplicationDelegateProtocol {
         override fun applicationShouldTerminateAfterLastWindowClosed(sender: NSApplication): Boolean {
             return true

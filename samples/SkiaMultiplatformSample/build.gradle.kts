@@ -219,7 +219,8 @@ tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().configureEach 
 
 enum class Target(val simulator: Boolean, val key: String) {
     WATCHOS_X86(true, "watchos"), WATCHOS_ARM64(false, "watchos"),
-    IOS_X64(true, "iosX64"), IOS_ARM64(false, "iosArm64")
+    IOS_X64(true, "iosX64"), IOS_ARM64(false, "iosArm64"),
+    MACOS_X64(false, "macosX64")
 }
 
 
@@ -229,6 +230,7 @@ if (hostOs == "macos") {
 
     val target = sdkName.orEmpty().let {
         when {
+            it.startsWith("macosx") -> Target.MACOS_X64
             it.startsWith("iphoneos") -> Target.IOS_ARM64
             it.startsWith("iphonesimulator") -> Target.IOS_X64
             it.startsWith("watchos") -> Target.WATCHOS_ARM64
