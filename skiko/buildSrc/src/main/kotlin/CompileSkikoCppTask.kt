@@ -261,7 +261,7 @@ abstract class CompileSkikoCppTask() : AbstractSkikoNativeToolTask() {
     override fun configureArgs() =
         super.configureArgs().apply {
             arg("-c")
-            repeatedArg("-I", headersDirs.map { it.absolutePath.replace("\\", "/") })
+            repeatedArg("-I", headersDirs)
             // todo: ensure that flags do not start with '-I' (all headers should be added via [headersDirs])
             rawArgs(flags.get())
         }
