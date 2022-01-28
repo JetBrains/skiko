@@ -203,7 +203,7 @@ expect enum class SkikoKey {
 }
 
 enum class SkikoGestureEventKind {
-    TAP, PAN, PINCH, ROTATION, LONGPRESS, SWIPE, UNKNOWN
+    TAP, DOUBLETAP, LONGPRESS, PAN, PINCH, ROTATION, SWIPE, UNKNOWN
 }
 enum class SkikoGestureEventDirection {
     UP, DOWN, LEFT, RIGHT, UNKNOWN

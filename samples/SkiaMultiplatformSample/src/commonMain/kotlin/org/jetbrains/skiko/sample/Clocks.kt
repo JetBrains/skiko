@@ -113,6 +113,13 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
         canvas.resetMatrix()
     }
 
+    private fun reset() {
+        xOffset = 0.0
+        yOffset = 0.0
+        rotate = 0.0
+        scale = 1.0
+    }
+
     override fun onPointerEvent(event: SkikoPointerEvent) {
         when (event.kind) {
             SkikoPointerEventKind.DOWN,
@@ -153,20 +160,23 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
             when (event.key) {
                 SkikoKey.KEY_NUMPAD_ADD -> scale *= 1.1
                 SkikoKey.KEY_I -> {
-                    if (event.modifiers == SkikoInputModifiers.CONTROL) {
+                    if (event.modifiers == SkikoInputModifiers.SHIFT) {
                         scale *= 1.1
                     }
                 }
                 SkikoKey.KEY_NUMPAD_SUBTRACT -> scale *= 0.9
                 SkikoKey.KEY_O -> {
-                    if (event.modifiers == SkikoInputModifiers.CONTROL) {
+                    if (event.modifiers == SkikoInputModifiers.SHIFT) {
                         scale *= 0.9
                     }
                 }
                 SkikoKey.KEY_R -> {
                     if (event.modifiers == SkikoInputModifiers.SHIFT) {
                         rotate -= 5.0
-                    } else if (event.modifiers == SkikoInputModifiers.CONTROL) {
+                    }
+                }
+                SkikoKey.KEY_L -> {
+                    if (event.modifiers == SkikoInputModifiers.SHIFT) {
                         rotate += 5.0
                     }
                 }
@@ -178,12 +188,7 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
                 SkikoKey.KEY_RIGHT -> xOffset += 5.0
                 SkikoKey.KEY_NUMPAD_2,
                 SkikoKey.KEY_DOWN -> yOffset += 5.0
-                SkikoKey.KEY_SPACE -> {
-                    xOffset = 0.0
-                    yOffset = 0.0
-                    rotate = 0.0
-                    scale = 1.0
-                }
+                SkikoKey.KEY_SPACE -> { reset() }
                 SkikoKey.KEY_BACKSPACE -> {
                     if (inputText.isNotEmpty()) {
                         inputText = inputText.dropLast(1)
@@ -208,6 +213,7 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
                 xpos = event.x
                 ypos = event.y
             }
+            SkikoGestureEventKind.DOUBLETAP -> { reset() }
             SkikoGestureEventKind.PINCH -> {
                 if (event.state == SkikoGestureEventState.STARTED) {
                     k = scale

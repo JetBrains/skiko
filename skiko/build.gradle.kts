@@ -918,7 +918,9 @@ fun createLinkJvmBindings(
                     "-shared",
                     "-static-libstdc++",
                     "-lGLESv3",
-                    "-lEGL"
+                    "-lEGL",
+                    "-llog",
+                    "-landroid"
                 )
                 linker.set(androidClangFor(targetArch))
             }

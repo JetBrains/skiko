@@ -67,10 +67,10 @@ actual enum class SkikoKey(val value: Int) {
     KEY_RIGHT_ALT(KEYCODE_ALT_RIGHT),
     KEY_RIGHT_CONTROL(KEYCODE_CTRL_RIGHT),
     KEY_MENU(KEYCODE_UNKNOWN),
-    KEY_UP(KEYCODE_SYSTEM_NAVIGATION_UP),
-    KEY_DOWN(KEYCODE_SYSTEM_NAVIGATION_DOWN),
-    KEY_LEFT(KEYCODE_SYSTEM_NAVIGATION_LEFT),
-    KEY_RIGHT(KEYCODE_SYSTEM_NAVIGATION_RIGHT),
+    KEY_UP(KEYCODE_DPAD_UP),
+    KEY_DOWN(KEYCODE_DPAD_DOWN),
+    KEY_LEFT(KEYCODE_DPAD_LEFT),
+    KEY_RIGHT(KEYCODE_DPAD_RIGHT),
     KEY_F1(KEYCODE_F1),
     KEY_F2(KEYCODE_F2),
     KEY_F3(KEYCODE_F3),
@@ -109,4 +109,11 @@ actual enum class SkikoKey(val value: Int) {
     KEY_NUMPAD_MULTIPLY(KEYCODE_NUMPAD_MULTIPLY),
     KEY_NUMPAD_DIVIDE(KEYCODE_NUMPAD_DIVIDE),
     KEY_NUMPAD_DECIMAL(KEYCODE_UNKNOWN);
+
+    companion object {
+        fun valueOf(value: Int): SkikoKey {
+            val key = SkikoKey.values().firstOrNull { it.value == value }
+            return key ?: SkikoKey.KEY_UNKNOWN
+        }
+    }
 }

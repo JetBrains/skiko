@@ -90,6 +90,19 @@ actual open class SkiaLayer {
             }
 
             @ObjCAction
+            fun onDoubleTap(sender: UITapGestureRecognizer) {
+                val (x, y) = sender.locationInView(view).useContents { x to y }
+                skikoView?.onGestureEvent(
+                    SkikoGestureEvent(
+                        x = x,
+                        y = y,
+                        kind = SkikoGestureEventKind.DOUBLETAP,
+                        state = toSkikoGestureState(sender.state)
+                    )
+                )
+            }
+
+            @ObjCAction
             fun onLongPress(sender: UILongPressGestureRecognizer) {
                 val (x, y) = sender.locationInView(view).useContents { x to y }
                 skikoView?.onGestureEvent(
@@ -164,6 +177,13 @@ actual open class SkiaLayer {
             // We have ':' in selector to take care of function argument.
             if (gestures.contains(SkikoGestureEventKind.TAP)) {
                 view.addGestureRecognizer(UITapGestureRecognizer(controller, NSSelectorFromString("onTap:")))
+            }
+            if (gestures.contains(SkikoGestureEventKind.DOUBLETAP)) {
+                view.addGestureRecognizer(
+                    UITapGestureRecognizer(controller, NSSelectorFromString("onDoubleTap:")).apply {
+                        numberOfTapsRequired = 2.toULong()
+                    }
+                )
             }
             if (gestures.contains(SkikoGestureEventKind.LONGPRESS)) {
                 view.addGestureRecognizer(UILongPressGestureRecognizer(controller, NSSelectorFromString("onLongPress:")))
