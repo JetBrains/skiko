@@ -1,31 +1,44 @@
 package org.jetbrains.skiko.notifications
 
+import kotlinx.coroutines.withContext
+import org.jetbrains.skiko.SkikoDispatchers
 import platform.Foundation.NSError
 import platform.Foundation.NSUUID
 import platform.UserNotifications.*
-import platform.darwin.dispatch_async
-import platform.darwin.dispatch_block_t
-import platform.darwin.dispatch_get_main_queue
-import kotlin.native.concurrent.freeze
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
-internal actual suspend fun sendNotification(notification: Notification) {
-    val nc = UNUserNotificationCenter.currentNotificationCenter().freeze()
-    val sendNotification: dispatch_block_t = {
-        val callback = { granted: Boolean, err: NSError? ->
+@Suppress("NAME_SHADOWING")
+internal actual suspend fun sendNotification(notification: Notification) = withContext(SkikoDispatchers.IO) {
+    val nc = UNUserNotificationCenter.currentNotificationCenter()
+    val options = UNAuthorizationOptionAlert or UNAuthorizationOptionSound or UNAuthorizationOptionBadge
+
+    val sent = suspendCoroutine<Boolean> { cont ->
+        nc.requestAuthorizationWithOptions(options) { granted: Boolean, err: NSError? ->
             if (granted) {
-                val content = UNMutableNotificationContent().apply {
-                    setBody(notification.body)
-                    setTitle(notification.title)
+                with(notification) {
+                    val request = UNNotificationRequest.requestWithIdentifier(id, content, null)
+                    nc.addNotificationRequest(request) { err: NSError? ->
+                        err?.let { println("Sent with error: $it") }
+                        cont.resume(err == null)
+                    }
                 }
-                val id = NSUUID().UUIDString
-                val request = UNNotificationRequest.requestWithIdentifier(id, content, null)
-                val callback = { _: NSError? -> }
-                nc.addNotificationRequest(request, callback.freeze())
+            } else {
+                println("No auth: $err")
+                cont.resume(false)
             }
         }
-        val options = UNAuthorizationOptionAlert or UNAuthorizationOptionSound or UNAuthorizationOptionBadge
-        nc.requestAuthorizationWithOptions(options, callback.freeze())
     }
-    dispatch_async(dispatch_get_main_queue(), sendNotification.freeze())
+    println("Sent: $sent")
 }
 
+private val Notification.content by lazy {
+    UNMutableNotificationContent().apply {
+        setBody(body)
+        setTitle(title)
+    }
+}
+
+private val Notification.id by lazy {
+    NSUUID().UUIDString
+}

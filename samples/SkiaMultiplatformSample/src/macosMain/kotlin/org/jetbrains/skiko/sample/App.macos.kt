@@ -12,11 +12,12 @@ fun makeApp(skiaLayer: SkiaLayer) = object : Clocks(skiaLayer) {
     override fun onKeyboardEvent(event: SkikoKeyboardEvent) {
         super.onKeyboardEvent(event)
         if (event.kind == SkikoKeyboardEventKind.DOWN) when (event.key) {
-            SkikoKey.KEY_N -> runBlocking {
+            SkikoKey.KEY_N -> CoroutineScope(SkikoDispatchers.Main).launch {
                 Notification(
                     title = "Hello",
                     body = "It works!"
                 ).send()
+                println("After notification sent")
             }
             else -> {}
         }
