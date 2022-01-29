@@ -28,7 +28,7 @@ extern "C"
         return (jlong) dsi_win->hwnd;
     }
 
-    JNIEXPORT jint JNICALL Java_org_jetbrains_skiko_SystemTheme_1jvmKt_getCurrentSystemTheme(JNIEnv *env, jobject topLevel)
+    JNIEXPORT jint JNICALL Java_org_jetbrains_skiko_SystemTheme_1awtKt_getCurrentSystemTheme(JNIEnv *env, jobject topLevel)
     {
         auto subkey = L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize";
         auto name = L"AppsUseLightTheme";
