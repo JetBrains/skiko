@@ -40,7 +40,8 @@ class SkikoAppDelegate : UIResponder, UIApplicationDelegateProtocol {
         window = UIWindow(frame = UIScreen.mainScreen.bounds)
         window!!.rootViewController = SkikoViewController(
             SkikoUIView(
-                SkiaLayer(SkikoGestureEventKind.values()).apply {
+                SkiaLayer().apply {
+                    gesturesToListen = SkikoGestureEventKind.values()
                     skikoView = GenericSkikoView(this, makeApp(this))
                 }
             )

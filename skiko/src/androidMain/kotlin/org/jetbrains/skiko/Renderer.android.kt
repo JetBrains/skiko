@@ -4,13 +4,15 @@ import android.content.Context
 import android.opengl.GLES30
 import android.opengl.GLSurfaceView
 import android.widget.LinearLayout
+import android.view.MotionEvent
+import android.view.KeyEvent
 import kotlinx.coroutines.Dispatchers
 import org.jetbrains.skia.*
 import java.nio.IntBuffer
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
-class SkikoSurfaceView(context: Context, layer: SkiaLayer) : GLSurfaceView(context) {
+class SkikoSurfaceView(context: Context, val layer: SkiaLayer) : GLSurfaceView(context) {
     private val renderer = SkikoSurfaceRender(layer)
     init {
         layoutParams = LinearLayout.LayoutParams(
@@ -28,6 +30,37 @@ class SkikoSurfaceView(context: Context, layer: SkiaLayer) : GLSurfaceView(conte
 
     fun scheduleFrame() {
         frameDispatcher.scheduleFrame()
+    }
+
+    internal val gesturesDetector = SkikoGesturesDetector(context, layer)
+
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        val events: MutableList<SkikoTouchEvent> = mutableListOf()
+        val count = event.pointerCount
+        for (index in 0 .. count - 1) {
+            events.add(toSkikoTouchEvent(event, index, layer.contentScale))
+        }
+        layer.skikoView?.onTouchEvent(events.toTypedArray())
+        return true
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+        layer.skikoView?.onKeyboardEvent(
+            toSkikoKeyboardEvent(event, keyCode, SkikoKeyboardEventKind.DOWN)
+        )
+        if (event.unicodeChar != 0) {
+            layer.skikoView?.onInputEvent(
+                toSkikoTypeEvent(event, keyCode)
+            )
+        }
+        return true
+    }
+
+    override fun onKeyUp(keyCode: Int, event: KeyEvent): Boolean {
+        layer.skikoView?.onKeyboardEvent(
+            toSkikoKeyboardEvent(event, keyCode, SkikoKeyboardEventKind.UP)
+        )
+        return true
     }
 }
 
@@ -86,6 +119,7 @@ private class SkikoSurfaceRender(private val layer: SkiaLayer) : GLSurfaceView.R
     // This method is called from GL rendering thread, it shall render Skia picture.
     override fun onDrawFrame(gl: GL10?) {
         lockPicture {
+            canvas?.clear(-1)
             canvas?.drawPicture(it.instance)
             Unit
         }

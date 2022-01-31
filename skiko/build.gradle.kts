@@ -713,8 +713,10 @@ fun androidClangFor(targetArch: Arch, version: String = "30"): String {
     }
     val ndkHome = if (System.getenv("ANDROID_NDK_HOME").isNullOrEmpty()) {
         val androidHome = androidHome()
+        val ndkDir1 = file("$androidHome/ndk")
+        val candidates1 = if (ndkDir1.exists()) ndkDir1.list() else emptyArray()
         val ndkVersion =
-            arrayOf(*(file("$androidHome/ndk").list().map { "ndk/$it" }.sortedDescending()).toTypedArray(), "ndk-bundle").find {
+            arrayOf(*(candidates1.map { "ndk/$it" }.sortedDescending()).toTypedArray(), "ndk-bundle").find {
                 androidHome.resolve(it).exists()
             } ?: throw GradleException("Cannot find NDK, is it installed (Tools/SDK Manager)?")
         "$androidHome/$ndkVersion"
@@ -729,9 +731,14 @@ fun androidClangFor(targetArch: Arch, version: String = "30"): String {
     return clang
 }
 
-fun androidJar(version: String = "30"): String {
+fun androidJar(askedVersion: String = ""): String {
     val androidHome = androidHome()
-    return androidHome.resolve("platforms/android-$version/android.jar").absolutePath
+    val version = if (askedVersion.isEmpty()) {
+        File(androidHome, "platforms").list().sortedArrayDescending().first()
+    } else {
+        "android-$askedVersion"
+    }
+    return androidHome.resolve("platforms/$version/android.jar").absolutePath
 }
 
 fun createCompileJvmBindingsTask(
@@ -918,7 +925,9 @@ fun createLinkJvmBindings(
                     "-shared",
                     "-static-libstdc++",
                     "-lGLESv3",
-                    "-lEGL"
+                    "-lEGL",
+                    "-llog",
+                    "-landroid"
                 )
                 linker.set(androidClangFor(targetArch))
             }

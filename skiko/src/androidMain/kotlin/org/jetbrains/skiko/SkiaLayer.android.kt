@@ -1,16 +1,35 @@
 package org.jetbrains.skiko
 
+import android.content.Context
 import android.view.*
+import android.view.inputmethod.InputMethodManager
 import org.jetbrains.skia.Canvas
 
 actual typealias SkikoGesturePlatformEvent = MotionEvent
 actual typealias SkikoPlatformPointerEvent = MotionEvent
-// TODO: most likely wrong.
-actual typealias SkikoPlatformInputEvent = Any
-actual typealias SkikoTouchPlatformEvent = Any
+actual typealias SkikoTouchPlatformEvent = MotionEvent
+actual typealias SkikoPlatformInputEvent = KeyEvent
 actual typealias SkikoPlatformKeyboardEvent = KeyEvent
 
 actual open class SkiaLayer {
+
+    var gesturesToListen: Array<SkikoGestureEventKind>? = null
+        set(value) {
+            field = value
+            initGestures()
+        }
+
+    private fun initGestures() {
+        glView?.let { view ->
+            view.gesturesDetector.setGesturesToListen(gesturesToListen)
+            if (gesturesToListen != null) {
+                view.setOnTouchListener { _, event ->
+                    view.gesturesDetector.onTouchEvent(event)
+                }
+            }
+        }
+    }
+
     private var glView: SkikoSurfaceView? = null
     private var container: ViewGroup? = null
 
@@ -41,6 +60,27 @@ actual open class SkiaLayer {
         }
     }
 
+    private var _isKeyboardVisible = false
+
+    fun showScreenKeyboard() {
+        if (glView != null) {
+            val imm = glView!!.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
+            _isKeyboardVisible = true
+        }
+    }
+
+    fun hideScreenKeyboard() {
+        if (glView != null) {
+            val imm = glView!!.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(glView!!.windowToken, 0)
+            _isKeyboardVisible = false
+        }
+    }
+
+    fun isScreenKeyboardOpen() = _isKeyboardVisible
+
+
     fun attachTo(container: ViewGroup) {
         initDefaultContext(container.context)
 
@@ -49,6 +89,9 @@ actual open class SkiaLayer {
 
         this.container = container
         this.glView = view
+        initGestures()
+
+        view.setFocusableInTouchMode(true)
 
         needRedraw()
     }
