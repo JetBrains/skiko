@@ -44,7 +44,6 @@ actual open class SkiaLayer {
     private var desiredWidth = 0
     private var desiredHeight = 0
 
-
     fun attachTo(htmlCanvas: HTMLCanvasElement, autoDetach: Boolean = true) {
         // Scale canvas to allow high DPI rendering as suggested in
         // https://www.khronos.org/webgl/wiki/HandlingHighDPI.
@@ -117,9 +116,7 @@ var onContentScaleChanged: ((Float) -> Unit)? = null
 
 actual typealias SkikoTouchPlatformEvent = Any
 actual typealias SkikoGesturePlatformEvent = Any
-actual typealias SkikoPlatformInputEvent = InputEvent
+actual typealias SkikoPlatformInputEvent = KeyboardEvent
 actual typealias SkikoPlatformKeyboardEvent = KeyboardEvent
 //  MouseEvent is base class of PointerEvent
 actual typealias SkikoPlatformPointerEvent = MouseEvent
-
-

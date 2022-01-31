@@ -21,7 +21,42 @@ private val SPECIAL_KEYS = setOf(
     "Shift",
     "Super",
     "Symbol",
-    "SymbolLock"
+    "SymbolLock",
+    "F1",
+    "F2",
+    "F3",
+    "F4",
+    "F5",
+    "F6",
+    "F7",
+    "F8",
+    "F9",
+    "F10",
+    "F11",
+    "F12",
+    "F13",
+    "F14",
+    "F15",
+    "F16",
+    "F17",
+    "F18",
+    "F19",
+    "F20",
+    "F21",
+    "F22",
+    "ArrowLeft",
+    "ArrowUp",
+    "ArrowRight",
+    "ArrowDown",
+    "Help",
+    "Home",
+    "Delete",
+    "End",
+    "PageUp",
+    "PageDown",
+    "Escape",
+    "Clear",
+    "Clear"
 )
 
 fun toSkikoEvent(
@@ -61,14 +96,19 @@ fun toSkikoTypeEvent(
     return if (SPECIAL_KEYS.contains(character)) {
         null
     } else {
+        val input = when (character) {
+            "Enter" -> "\n"
+            "Tab" -> "\t"
+            else -> character
+        }
         val key = if (event != null) SkikoKey.valueOf(event.keyCode) else SkikoKey.KEY_UNKNOWN
         val modifiers = if  (event != null) toSkikoModifiers(event) else SkikoInputModifiers.EMPTY
         SkikoInputEvent(
-            character,
+            input,
             key,
             modifiers,
             SkikoKeyboardEventKind.TYPE,
-            null
+            event
         )
     }
 }
