@@ -90,6 +90,10 @@ actual open class SkiaLayer {
         htmlCanvas.addEventListener("keydown", { event ->
             event as KeyboardEvent
             skikoView?.onKeyboardEvent(toSkikoEvent(event, SkikoKeyboardEventKind.DOWN))
+
+            toSkikoTypeEvent(event.key, event)?.let { inputEvent ->
+                skikoView?.onInputEvent(inputEvent)
+            }
         })
         htmlCanvas.addEventListener("keyup", { event ->
             event as KeyboardEvent
@@ -112,9 +116,7 @@ var onContentScaleChanged: ((Float) -> Unit)? = null
 
 actual typealias SkikoTouchPlatformEvent = Any
 actual typealias SkikoGesturePlatformEvent = Any
-actual typealias SkikoPlatformInputEvent = InputEvent
+actual typealias SkikoPlatformInputEvent = KeyboardEvent
 actual typealias SkikoPlatformKeyboardEvent = KeyboardEvent
 //  MouseEvent is base class of PointerEvent
 actual typealias SkikoPlatformPointerEvent = MouseEvent
-
-

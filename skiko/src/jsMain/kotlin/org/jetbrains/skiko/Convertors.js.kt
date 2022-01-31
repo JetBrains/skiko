@@ -5,6 +5,60 @@ import org.w3c.dom.events.KeyboardEvent
 import org.w3c.dom.events.WheelEvent
 import org.w3c.dom.events.InputEvent
 
+private val SPECIAL_KEYS = setOf(
+    "Unidentified",
+    "Alt",
+    "AltGraph",
+    "Backspace",
+    "CapsLock",
+    "Control",
+    "Fn",
+    "FnLock",
+    "Hyper",
+    "Meta",
+    "NumLock",
+    "ScrollLock",
+    "Shift",
+    "Super",
+    "Symbol",
+    "SymbolLock",
+    "F1",
+    "F2",
+    "F3",
+    "F4",
+    "F5",
+    "F6",
+    "F7",
+    "F8",
+    "F9",
+    "F10",
+    "F11",
+    "F12",
+    "F13",
+    "F14",
+    "F15",
+    "F16",
+    "F17",
+    "F18",
+    "F19",
+    "F20",
+    "F21",
+    "F22",
+    "ArrowLeft",
+    "ArrowUp",
+    "ArrowRight",
+    "ArrowDown",
+    "Help",
+    "Home",
+    "Delete",
+    "End",
+    "PageUp",
+    "PageDown",
+    "Escape",
+    "Clear",
+    "Clear"
+)
+
 fun toSkikoEvent(
     event: MouseEvent,
     buttons: Boolean,
@@ -34,6 +88,31 @@ fun toSkikoDragEvent(
         platform = event
     )
 }
+
+fun toSkikoTypeEvent(
+    character: String,
+    event: KeyboardEvent?,
+): SkikoInputEvent? {
+    return if (SPECIAL_KEYS.contains(character)) {
+        null
+    } else {
+        val input = when (character) {
+            "Enter" -> "\n"
+            "Tab" -> "\t"
+            else -> character
+        }
+        val key = if (event != null) SkikoKey.valueOf(event.keyCode) else SkikoKey.KEY_UNKNOWN
+        val modifiers = if  (event != null) toSkikoModifiers(event) else SkikoInputModifiers.EMPTY
+        SkikoInputEvent(
+            input,
+            key,
+            modifiers,
+            SkikoKeyboardEventKind.TYPE,
+            event
+        )
+    }
+}
+
 
 fun toSkikoEvent(
     event: KeyboardEvent,
