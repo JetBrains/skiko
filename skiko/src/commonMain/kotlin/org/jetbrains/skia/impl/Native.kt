@@ -23,21 +23,36 @@ fun getPtr(n: Native?): NativePointer = n?._ptr ?: Native.NullPointer
 
 expect class InteropScope() {
     fun toInterop(string: String?): InteropPointer
+
     fun toInterop(array: ByteArray?): InteropPointer
+    fun toInteropForResult(array: ByteArray?): InteropPointer
     fun InteropPointer.fromInterop(result: ByteArray)
+
     fun toInterop(array: ShortArray?): InteropPointer
+    fun toInteropForResult(array: ShortArray?): InteropPointer
     fun InteropPointer.fromInterop(result: ShortArray)
+
     fun toInterop(array: IntArray?): InteropPointer
+    fun toInteropForResult(array: IntArray?): InteropPointer
     fun InteropPointer.fromInterop(result: IntArray)
+
     fun toInterop(array: LongArray?): InteropPointer
     fun InteropPointer.fromInterop(result: LongArray)
+
     fun toInterop(array: FloatArray?): InteropPointer
+    fun toInteropForResult(array: FloatArray?): InteropPointer
     fun InteropPointer.fromInterop(result: FloatArray)
+
     fun toInterop(array: DoubleArray?): InteropPointer
+    fun toInteropForResult(array: DoubleArray?): InteropPointer
     fun InteropPointer.fromInterop(result: DoubleArray)
+
     fun toInterop(array: NativePointerArray?): InteropPointer
+    fun toInteropForResult(array: NativePointerArray?): InteropPointer
     fun InteropPointer.fromInterop(result: NativePointerArray)
+
     fun toInterop(stringArray: Array<String>?): InteropPointer
+
     fun InteropPointer.fromInteropNativePointerArray(): NativePointerArray
     inline fun <reified T> InteropPointer.fromInterop(decoder: ArrayInteropDecoder<T>): Array<T>
     fun toInteropForArraysOfPointers(interopPointers: Array<InteropPointer>): InteropPointer
@@ -62,14 +77,14 @@ expect class InteropScope() {
 expect inline fun <T> interopScope(block: InteropScope.() -> T): T
 
 inline fun withResult(result: ByteArray, block: InteropScope.(InteropPointer) -> Unit): ByteArray = interopScope {
-    val handle = toInterop(result)
+    val handle = toInteropForResult(result)
     block(handle)
     handle.fromInterop(result)
     result
 }
 
 inline fun withNullableResult(result: ByteArray, block: InteropScope.(InteropPointer) -> Boolean): ByteArray? = interopScope {
-    val handle = toInterop(result)
+    val handle = toInteropForResult(result)
     return if (block(handle)) {
         handle.fromInterop(result)
         result
@@ -79,14 +94,14 @@ inline fun withNullableResult(result: ByteArray, block: InteropScope.(InteropPoi
 }
 
 inline fun withResult(result: FloatArray, block: InteropScope.(InteropPointer) -> Unit): FloatArray = interopScope {
-    val handle = toInterop(result)
+    val handle = toInteropForResult(result)
     block(handle)
     handle.fromInterop(result)
     result
 }
 
 inline fun withNullableResult(result: FloatArray, block: InteropScope.(InteropPointer) -> Boolean): FloatArray? = interopScope {
-    val handle = toInterop(result)
+    val handle = toInteropForResult(result)
     val blockResult = block(handle)
     if (blockResult) {
         handle.fromInterop(result)
@@ -97,14 +112,14 @@ inline fun withNullableResult(result: FloatArray, block: InteropScope.(InteropPo
 }
 
 inline fun withResult(result: IntArray, block: InteropScope.(InteropPointer) -> Unit): IntArray = interopScope {
-    val handle = toInterop(result)
+    val handle = toInteropForResult(result)
     block(handle)
     handle.fromInterop(result)
     result
 }
 
 inline fun withNullableResult(result: IntArray, block: InteropScope.(InteropPointer) -> Boolean): IntArray? = interopScope {
-    val handle = toInterop(result)
+    val handle = toInteropForResult(result)
     return if (block(handle)) {
         handle.fromInterop(result)
         result
@@ -114,21 +129,21 @@ inline fun withNullableResult(result: IntArray, block: InteropScope.(InteropPoin
 }
 
 inline fun withResult(result: ShortArray, block: InteropScope.(InteropPointer) -> Unit): ShortArray = interopScope {
-    val handle = toInterop(result)
+    val handle = toInteropForResult(result)
     block(handle)
     handle.fromInterop(result)
     result
 }
 
 inline fun withResult(result: DoubleArray, block: InteropScope.(InteropPointer) -> Unit): DoubleArray = interopScope {
-    val handle = toInterop(result)
+    val handle = toInteropForResult(result)
     block(handle)
     handle.fromInterop(result)
     result
 }
 
 inline fun withResult(result: NativePointerArray, block: InteropScope.(InteropPointer) -> Unit): NativePointerArray = interopScope {
-    val handle = toInterop(result)
+    val handle = toInteropForResult(result)
     block(handle)
     handle.fromInterop(result)
     result

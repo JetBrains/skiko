@@ -89,6 +89,8 @@ actual class InteropScope actual constructor() {
         }
     }
 
+    actual fun toInteropForResult(array: ByteArray?): InteropPointer = toInterop(array)
+
     actual fun InteropPointer.fromInterop(result: ByteArray) {}
 
     actual fun toInterop(array: ShortArray?): InteropPointer {
@@ -102,6 +104,8 @@ actual class InteropScope actual constructor() {
         }
     }
 
+    actual fun toInteropForResult(array: ShortArray?): InteropPointer = toInterop(array)
+
     actual fun InteropPointer.fromInterop(result: ShortArray) {}
 
     actual fun toInterop(array: IntArray?): InteropPointer {
@@ -114,6 +118,8 @@ actual class InteropScope actual constructor() {
             NativePtr.NULL
         }
     }
+
+    actual fun toInteropForResult(array: IntArray?): InteropPointer = toInterop(array)
 
     actual fun InteropPointer.fromInterop(result: IntArray) {}
 
@@ -141,6 +147,8 @@ actual class InteropScope actual constructor() {
         }
     }
 
+    actual fun toInteropForResult(array: FloatArray?): InteropPointer = toInterop(array)
+
     actual fun InteropPointer.fromInterop(result: FloatArray) {}
 
     actual fun toInterop(array: DoubleArray?): InteropPointer {
@@ -153,6 +161,8 @@ actual class InteropScope actual constructor() {
             NativePtr.NULL
         }
     }
+
+    actual fun toInteropForResult(array: DoubleArray?): InteropPointer = toInterop(array)
 
     actual fun InteropPointer.fromInterop(result: DoubleArray) {}
 
@@ -167,6 +177,8 @@ actual class InteropScope actual constructor() {
             NativePtr.NULL
         }
     }
+
+    actual fun toInteropForResult(array: NativePointerArray?): InteropPointer = toInterop(array)
 
     actual fun InteropPointer.fromInterop(result: NativePointerArray) {}
 
