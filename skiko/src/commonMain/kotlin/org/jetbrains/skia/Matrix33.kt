@@ -43,17 +43,15 @@ class Matrix33(vararg mat: Float) {
     val mat: FloatArray
     fun makePreScale(sx: Float, sy: Float): Matrix33 {
         return Matrix33(
-            *floatArrayOf(
-                mat[0] * sx,
-                mat[1] * sy,
-                mat[2],
-                mat[3] * sx,
-                mat[4] * sy,
-                mat[5],
-                mat[6] * sx,
-                mat[7] * sy,
-                mat[8]
-            )
+            mat[0] * sx,
+            mat[1] * sy,
+            mat[2],
+            mat[3] * sx,
+            mat[4] * sy,
+            mat[5],
+            mat[6] * sx,
+            mat[7] * sy,
+            mat[8]
         )
     }
 
@@ -84,17 +82,15 @@ class Matrix33(vararg mat: Float) {
      */
     fun makeConcat(other: Matrix33): Matrix33 {
         return Matrix33(
-            *floatArrayOf(
-                mat[0] * other.mat[0] + mat[1] * other.mat[3] + mat[2] * other.mat[6],
-                mat[0] * other.mat[1] + mat[1] * other.mat[4] + mat[2] * other.mat[7],
-                mat[0] * other.mat[2] + mat[1] * other.mat[5] + mat[2] * other.mat[8],
-                mat[3] * other.mat[0] + mat[4] * other.mat[3] + mat[5] * other.mat[6],
-                mat[3] * other.mat[1] + mat[4] * other.mat[4] + mat[5] * other.mat[7],
-                mat[3] * other.mat[2] + mat[4] * other.mat[5] + mat[5] * other.mat[8],
-                mat[6] * other.mat[0] + mat[7] * other.mat[3] + mat[8] * other.mat[6],
-                mat[6] * other.mat[1] + mat[7] * other.mat[4] + mat[8] * other.mat[7],
-                mat[6] * other.mat[2] + mat[7] * other.mat[5] + mat[8] * other.mat[8]
-            )
+            mat[0] * other.mat[0] + mat[1] * other.mat[3] + mat[2] * other.mat[6],
+            mat[0] * other.mat[1] + mat[1] * other.mat[4] + mat[2] * other.mat[7],
+            mat[0] * other.mat[2] + mat[1] * other.mat[5] + mat[2] * other.mat[8],
+            mat[3] * other.mat[0] + mat[4] * other.mat[3] + mat[5] * other.mat[6],
+            mat[3] * other.mat[1] + mat[4] * other.mat[4] + mat[5] * other.mat[7],
+            mat[3] * other.mat[2] + mat[4] * other.mat[5] + mat[5] * other.mat[8],
+            mat[6] * other.mat[0] + mat[7] * other.mat[3] + mat[8] * other.mat[6],
+            mat[6] * other.mat[1] + mat[7] * other.mat[4] + mat[8] * other.mat[7],
+            mat[6] * other.mat[2] + mat[7] * other.mat[5] + mat[8] * other.mat[8]
         )
     }
 
@@ -158,7 +154,7 @@ class Matrix33(vararg mat: Float) {
          * @return    Matrix33 with translation
          */
         fun makeTranslate(dx: Float, dy: Float): Matrix33 {
-            return Matrix33(*floatArrayOf(1f, 0f, dx, 0f, 1f, dy, 0f, 0f, 1f))
+            return Matrix33(1f, 0f, dx, 0f, 1f, dy, 0f, 0f, 1f)
         }
 
         /**
@@ -193,7 +189,7 @@ class Matrix33(vararg mat: Float) {
          * @return   Matrix33 with scale
          */
         fun makeScale(sx: Float, sy: Float): Matrix33 {
-            return Matrix33(*floatArrayOf(sx, 0f, 0f, 0f, sy, 0f, 0f, 0f, 1f))
+            return Matrix33(sx, 0f, 0f, 0f, sy, 0f, 0f, 0f, 1f)
         }
 
         /**
@@ -210,17 +206,15 @@ class Matrix33(vararg mat: Float) {
             if (abs(sin) <= tolerance) sin = 0.0
             if (abs(cos) <= tolerance) cos = 0.0
             return Matrix33(
-                *floatArrayOf(
-                    cos.toFloat(),
-                    (-sin).toFloat(),
-                    0f,
-                    sin.toFloat(),
-                    cos.toFloat(),
-                    0f,
-                    0f,
-                    0f,
-                    1f
-                )
+                cos.toFloat(),
+                (-sin).toFloat(),
+                0f,
+                sin.toFloat(),
+                cos.toFloat(),
+                0f,
+                0f,
+                0f,
+                1f
             )
         }
 
@@ -251,17 +245,15 @@ class Matrix33(vararg mat: Float) {
             if (abs(sin) <= tolerance) sin = 0.0
             if (abs(cos) <= tolerance) cos = 0.0
             return Matrix33(
-                *floatArrayOf(
-                    cos.toFloat(),
-                    (-sin).toFloat(),
-                    (pivotx - pivotx * cos + pivoty * sin).toFloat(),
-                    sin.toFloat(),
-                    cos.toFloat(),
-                    (pivoty - pivoty * cos - pivotx * sin).toFloat(),
-                    0f,
-                    0f,
-                    1f
-                )
+                cos.toFloat(),
+                (-sin).toFloat(),
+                (pivotx - pivotx * cos + pivoty * sin).toFloat(),
+                sin.toFloat(),
+                cos.toFloat(),
+                (pivoty - pivoty * cos - pivotx * sin).toFloat(),
+                0f,
+                0f,
+                1f
             )
         }
 
@@ -280,7 +272,7 @@ class Matrix33(vararg mat: Float) {
          * @return   Matrix33 with skew
          */
         fun makeSkew(sx: Float, sy: Float): Matrix33 {
-            return Matrix33(*floatArrayOf(1f, sx, 0f, sy, 1f, 0f, 0f, 0f, 1f))
+            return Matrix33(1f, sx, 0f, sy, 1f, 0f, 0f, 0f, 1f)
         }
     }
 
