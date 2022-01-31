@@ -207,7 +207,7 @@ val Project.supportAndroid: Boolean
 kotlin {
     jvm("awt") {
         compilations.all {
-            kotlinOptions.jvmTarget = "11"
+            kotlinOptions.jvmTarget = "1.8"
         }
         generateVersion(hostOs, hostArch)
     }
@@ -215,7 +215,7 @@ kotlin {
     if (supportAndroid) {
         jvm("android") {
             compilations.all {
-                kotlinOptions.jvmTarget = "11"
+                kotlinOptions.jvmTarget = "1.8"
             }
             // We need an additional attribute to distinguish between JVM variants.
             attributes {
@@ -485,10 +485,6 @@ fun configureNativeTarget(os: OS, arch: Arch, target: KotlinNativeTarget) {
     target.compilations.all {
         compileKotlinTask.dependsOn(linkTask)
     }
-}
-
-tasks.withType(JavaCompile::class.java).configureEach {
-    this.getOptions().compilerArgs.addAll(listOf("-source", "11", "-target", "11"))
 }
 
 fun skiaHeadersDirs(skiaDir: File): List<File> =
