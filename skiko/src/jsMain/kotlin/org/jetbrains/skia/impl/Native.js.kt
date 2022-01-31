@@ -64,45 +64,64 @@ actual class InteropScope actual constructor() {
         }
     }
 
-    actual fun toInterop(array: ByteArray?): InteropPointer {
+    private fun toInterop(array: ByteArray?, copyArrayToWasm: Boolean): InteropPointer {
         return if (array != null && array.isNotEmpty()) {
             val data = _malloc(array.size)
             elements.add(data)
-            toWasm(data, array)
+            if (copyArrayToWasm) toWasm(data, array)
             data
         } else {
             0
         }
     }
+
+    actual fun toInterop(array: ByteArray?): InteropPointer =
+        toInterop(array = array, copyArrayToWasm = true)
+
+    actual fun toInteropForResult(array: ByteArray?): InteropPointer =
+        toInterop(array = array, copyArrayToWasm = false)
+
     actual fun InteropPointer.fromInterop(result: ShortArray) {
         fromWasm(this@fromInterop, result)
     }
 
-    actual fun toInterop(array: ShortArray?): InteropPointer {
+    private fun toInterop(array: ShortArray?, copyArrayToWasm: Boolean): InteropPointer {
         return if (array != null && array.isNotEmpty()) {
             val data = _malloc(array.size * 2)
             elements.add(data)
-            toWasm(data, array)
+            if (copyArrayToWasm) toWasm(data, array)
             data
         } else {
             0
         }
     }
+
+    actual fun toInterop(array: ShortArray?): InteropPointer =
+        toInterop(array = array, copyArrayToWasm = true)
+
+    actual fun toInteropForResult(array: ShortArray?): InteropPointer =
+        toInterop(array = array, copyArrayToWasm = false)
 
     actual fun InteropPointer.fromInterop(result: IntArray) {
         fromWasm(this@fromInterop, result)
     }
 
-    actual fun toInterop(array: IntArray?): InteropPointer {
+    private fun toInterop(array: IntArray?, copyArrayToWasm: Boolean): InteropPointer {
         return if (array != null && array.isNotEmpty()) {
             val data = _malloc(array.size * 4)
             elements.add(data)
-            toWasm(data, array)
+            if (copyArrayToWasm) toWasm(data, array)
             data
         } else {
             0
         }
     }
+
+    actual fun toInterop(array: IntArray?): InteropPointer =
+        toInterop(array = array, copyArrayToWasm = true)
+
+    actual fun toInteropForResult(array: IntArray?): InteropPointer =
+        toInterop(array = array, copyArrayToWasm = false)
 
     actual fun InteropPointer.fromInterop(result: LongArray) {
         TODO("implement wasm fromInterop(LongArray)")
@@ -116,46 +135,64 @@ actual class InteropScope actual constructor() {
         fromWasm(this@fromInterop, result)
     }
 
-    actual fun toInterop(array: FloatArray?): InteropPointer {
+    private fun toInterop(array: FloatArray?, copyArrayToWasm: Boolean): InteropPointer {
         return if (array != null && array.isNotEmpty()) {
             val data = _malloc(array.size * 4)
             elements.add(data)
-            toWasm(data, array)
+            if (copyArrayToWasm) toWasm(data, array)
             data
         } else {
             0
         }
     }
+
+    actual fun toInterop(array: FloatArray?): InteropPointer =
+        toInterop(array = array, copyArrayToWasm = true)
+
+    actual fun toInteropForResult(array: FloatArray?): InteropPointer =
+        toInterop(array = array, copyArrayToWasm = false)
 
     actual fun InteropPointer.fromInterop(result: DoubleArray) {
         fromWasm(this@fromInterop, result)
     }
 
-    actual fun toInterop(array: DoubleArray?): InteropPointer {
+    private fun toInterop(array: DoubleArray?, copyArrayToWasm: Boolean): InteropPointer {
         return if (array != null && array.isNotEmpty()) {
             val data = _malloc(array.size * 8)
             elements.add(data)
-            toWasm(data, array)
+            if (copyArrayToWasm) toWasm(data, array)
             data
         } else {
             0
         }
     }
+
+    actual fun toInterop(array: DoubleArray?): InteropPointer =
+        toInterop(array = array, copyArrayToWasm = true)
+
+    actual fun toInteropForResult(array: DoubleArray?): InteropPointer =
+        toInterop(array = array, copyArrayToWasm = false)
 
     actual fun InteropPointer.fromInterop(result: ByteArray) {
         fromWasm(this@fromInterop, result)
     }
 
-    actual fun toInterop(array: NativePointerArray?): InteropPointer {
+    private fun toInterop(array: NativePointerArray?, copyArrayToWasm: Boolean): InteropPointer {
         return if (array != null && array.size > 0) {
             val data = _malloc(array.size * 4)
             elements.add(data)
-            toWasm(data, array.backing)
+            if (copyArrayToWasm) toWasm(data, array.backing)
             data
         } else {
             0
         }
     }
+
+    actual fun toInterop(array: NativePointerArray?): InteropPointer =
+        toInterop(array = array, copyArrayToWasm = true)
+
+    actual fun toInteropForResult(array: NativePointerArray?): InteropPointer =
+        toInterop(array = array, copyArrayToWasm = false)
 
     actual fun InteropPointer.fromInterop(result: NativePointerArray) {
         return fromWasm(this@fromInterop, result.backing)
