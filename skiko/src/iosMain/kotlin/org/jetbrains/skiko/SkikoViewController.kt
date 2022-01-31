@@ -65,7 +65,10 @@ class SkikoUIView : UIView, UIKeyInputProtocol {
         }
         setFrame(CGRectMake(0.0, 0.0, width, height))
         contentScaleFactor = UIScreen.mainScreen.scale
-        skiaLayer?.attachTo(this)
+        skiaLayer?.let { layer ->
+            layer.attachTo(this)
+            layer.initGestures()
+        }
 
         return this
     }

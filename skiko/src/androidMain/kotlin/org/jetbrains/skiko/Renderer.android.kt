@@ -17,11 +17,6 @@ class SkikoSurfaceView(context: Context, val layer: SkiaLayer) : GLSurfaceView(c
     init {
         layoutParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-        if (layer.gestures != null) {
-            setOnTouchListener { _, event ->
-                gesturesDetector.onTouchEvent(event)
-            }
-        }
         setEGLConfigChooser (8, 8, 8, 0, 24, 8)
         setEGLContextClientVersion(2)
         // setRenderMode(RENDERMODE_WHEN_DIRTY)
@@ -37,7 +32,7 @@ class SkikoSurfaceView(context: Context, val layer: SkiaLayer) : GLSurfaceView(c
         frameDispatcher.scheduleFrame()
     }
 
-    private val gesturesDetector = SkikoGesturesDetector(context, layer)
+    internal val gesturesDetector = SkikoGesturesDetector(context, layer)
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
         val events: MutableList<SkikoTouchEvent> = mutableListOf()

@@ -12,30 +12,33 @@ internal class SkikoGesturesDetector(
     private val context: Context,
     private val layer: SkiaLayer
 ) {
+    private var gesturesToListen: Array<SkikoGestureEventKind>? = null
+    fun setGesturesToListen(gestures: Array<SkikoGestureEventKind>?) {
+        gesturesToListen = gestures
+    }
+
     private fun containsGesture(
-        gestures: Array<SkikoGestureEventKind>?,
         gesture: SkikoGestureEventKind
     ): Boolean {
-        if (gestures != null) {
-            return gestures.contains(gesture)
+        gesturesToListen?.let { list ->
+            return list.contains(gesture)
         }
         return false
     }
 
     fun onTouchEvent(event: MotionEvent): Boolean {
-        if (containsGesture(layer.gestures, SkikoGestureEventKind.PINCH)) {
+        if (containsGesture(SkikoGestureEventKind.PINCH)) {
             scaleGesture.onTouchEvent(event)
         }
-        if (containsGesture(layer.gestures, SkikoGestureEventKind.ROTATION)) {
+        if (containsGesture(SkikoGestureEventKind.ROTATION)) {
             rotationGesture.onTouchEvent(event)
         }
-        simpleGestures.onTouchEvent(event)
-        return true
+        return simpleGestures.onTouchEvent(event)
     }
 
     private val simpleGestures = GestureDetector(context, object: SimpleOnGestureListener() {
         override fun onSingleTapUp(event: MotionEvent): Boolean {
-            if (!containsGesture(layer.gestures, SkikoGestureEventKind.TAP)) return false
+            if (!containsGesture(SkikoGestureEventKind.TAP)) return false
             val density = layer.contentScale
             layer.skikoView?.onGestureEvent(
                 SkikoGestureEvent(
@@ -49,7 +52,7 @@ internal class SkikoGesturesDetector(
         }
 
         override fun onDoubleTap(event: MotionEvent): Boolean {
-            if (!containsGesture(layer.gestures, SkikoGestureEventKind.DOUBLETAP)) return false
+            if (!containsGesture(SkikoGestureEventKind.DOUBLETAP)) return false
             val density = layer.contentScale
             layer.skikoView?.onGestureEvent(
                 SkikoGestureEvent(
@@ -63,7 +66,7 @@ internal class SkikoGesturesDetector(
         }
 
         override fun onLongPress(event: MotionEvent) {
-            if (!containsGesture(layer.gestures, SkikoGestureEventKind.LONGPRESS)) return
+            if (!containsGesture(SkikoGestureEventKind.LONGPRESS)) return
             val density = layer.contentScale
             layer.skikoView?.onGestureEvent(
                 SkikoGestureEvent(
@@ -81,7 +84,7 @@ internal class SkikoGesturesDetector(
             distanceX: Float,
             distanceY: Float,
         ): Boolean {
-            if (!containsGesture(layer.gestures, SkikoGestureEventKind.PAN)) return false
+            if (!containsGesture(SkikoGestureEventKind.PAN)) return false
             val density = layer.contentScale
             layer.skikoView?.onGestureEvent(
                 SkikoGestureEvent(
@@ -100,7 +103,7 @@ internal class SkikoGesturesDetector(
             velocityX: Float, 
             velocityY: Float
         ): Boolean {
-            if (!containsGesture(layer.gestures, SkikoGestureEventKind.SWIPE)) return false
+            if (!containsGesture(SkikoGestureEventKind.SWIPE)) return false
             var direction = toSkikoGestureDirection(event1, event2, velocityX, velocityY)
             if (direction == SkikoGestureEventDirection.UNKNOWN) {
                 return false

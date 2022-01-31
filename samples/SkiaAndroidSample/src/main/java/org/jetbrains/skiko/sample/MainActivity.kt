@@ -21,7 +21,9 @@ class MainActivity : Activity() {
             //layoutParams = ViewGroup.LayoutParams(1000, 1200)
         }
 
-        val skiaLayer = SkiaLayer(SkikoGestureEventKind.values())
+        val skiaLayer = SkiaLayer().apply {
+            gesturesToListen = SkikoGestureEventKind.values()
+        }
         skiaLayer.skikoView = GenericSkikoView(skiaLayer, Clocks(skiaLayer))
         skiaLayer.attachTo(holder)
         layout.addView(holder)

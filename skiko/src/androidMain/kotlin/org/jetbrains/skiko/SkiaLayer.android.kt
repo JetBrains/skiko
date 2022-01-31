@@ -12,10 +12,22 @@ actual typealias SkikoPlatformInputEvent = KeyEvent
 actual typealias SkikoPlatformKeyboardEvent = KeyEvent
 
 actual open class SkiaLayer {
-    internal val gestures: Array<SkikoGestureEventKind>?
 
-    constructor(gestures: Array<SkikoGestureEventKind>? = null) {
-        this.gestures = gestures
+    var gesturesToListen: Array<SkikoGestureEventKind>? = null
+        set(value) {
+            field = value
+            initGestures()
+        }
+
+    private fun initGestures() {
+        glView?.let { view ->
+            view.gesturesDetector.setGesturesToListen(gesturesToListen)
+            if (gesturesToListen != null) {
+                view.setOnTouchListener { _, event ->
+                    view.gesturesDetector.onTouchEvent(event)
+                }
+            }
+        }
     }
 
     private var glView: SkikoSurfaceView? = null
@@ -77,6 +89,7 @@ actual open class SkiaLayer {
 
         this.container = container
         this.glView = view
+        initGestures()
 
         view.setFocusableInTouchMode(true)
 
