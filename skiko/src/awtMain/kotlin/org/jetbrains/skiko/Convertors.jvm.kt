@@ -79,7 +79,7 @@ fun toSkikoEvent(event: MouseEvent): SkikoPointerEvent {
     return SkikoPointerEvent(
         x = event.x.toDouble(),
         y = event.y.toDouble(),
-        buttons = toSkikoMouseButtons(event.modifiersEx),
+        buttons = toSkikoMouseButtons(event),
         modifiers = toSkikoModifiers(event.modifiersEx),
         kind = when(event.id) {
             MouseEvent.MOUSE_PRESSED -> SkikoPointerEventKind.DOWN
@@ -106,7 +106,7 @@ fun toSkikoEvent(event: MouseWheelEvent): SkikoPointerEvent {
         y = event.y.toDouble(),
         deltaX = deltaX,
         deltaY = deltaY,
-        buttons = toSkikoMouseButtons(event.modifiersEx),
+        buttons = toSkikoMouseButtons(event),
         modifiers = modifiers,
         kind = when(event.id) {
             MouseEvent.MOUSE_WHEEL-> SkikoPointerEventKind.SCROLL
@@ -163,16 +163,17 @@ fun toSkikoTypeEvent(event: InputMethodEvent, keyEvent: KeyEvent?): SkikoInputEv
     )
 }
 
-private fun toSkikoMouseButtons(buttons: Int): SkikoMouseButtons {
+private fun toSkikoMouseButtons(event: MouseEvent): SkikoMouseButtons {
+    val mask = event.modifiersEx
     var result = 0
-    if (buttons and InputEvent.BUTTON1_DOWN_MASK != 0) {
+    if (mask and InputEvent.BUTTON1_DOWN_MASK != 0 || event.button == MouseEvent.BUTTON1) {
         result = result.or(SkikoMouseButtons.LEFT.value)
     }
-    if (buttons and InputEvent.BUTTON2_DOWN_MASK != 0) {
-        result = result.or(SkikoMouseButtons.RIGHT.value)
-    }
-    if (buttons and InputEvent.BUTTON3_DOWN_MASK != 0) {
+    if (mask and InputEvent.BUTTON2_DOWN_MASK != 0 || event.button == MouseEvent.BUTTON2) {
         result = result.or(SkikoMouseButtons.MIDDLE.value)
+    }
+    if (mask and InputEvent.BUTTON3_DOWN_MASK != 0 || event.button == MouseEvent.BUTTON3) {
+        result = result.or(SkikoMouseButtons.RIGHT.value)
     }
     return SkikoMouseButtons(result)
 }
