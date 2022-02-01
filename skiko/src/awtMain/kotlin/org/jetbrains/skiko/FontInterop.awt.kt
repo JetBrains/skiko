@@ -8,8 +8,10 @@ import java.io.FileInputStream
 import java.io.IOException
 import java.util.concurrent.ConcurrentHashMap
 
+private class FontDescriptor(val file: File, val style: Int)
+
 class AwtFontManager(fontPaths: Array<String> = emptyArray()) {
-    private var fontsMap = ConcurrentHashMap<String, File>()
+    private var fontsMap = ConcurrentHashMap<String, MutableList<FontDescriptor>>()
     @Volatile
     private var allFontsCachedImpl = false
     private val waitChannel = RendezvousBroadcastChannel<Int>()
@@ -81,7 +83,11 @@ class AwtFontManager(fontPaths: Array<String> = emptyArray()) {
                     Font.createFont(Font.TRUETYPE_FONT, it)
                 }
                 val name = f.family
-                fontsMap[name] = file.absoluteFile
+
+                val list = fontsMap.computeIfAbsent(name) { mutableListOf() }
+                synchronized(list) {
+                    list.add(FontDescriptor(file.absoluteFile, f.style))
+                }
                 yield()
             } catch (e: FontFormatException) {
             } catch (e: IOException) {
@@ -101,7 +107,10 @@ class AwtFontManager(fontPaths: Array<String> = emptyArray()) {
      */
     @DelicateSkikoApi
     fun findAvailableFontFile(font: Font): File? {
-        return fontsMap[font.family]
+        val list = fontsMap[font.family] ?: return null
+        return synchronized(list) {
+            list.find { it.style == font.style } ?: list.firstOrNull()
+        }?.file
     }
 
     /**
@@ -114,7 +123,7 @@ class AwtFontManager(fontPaths: Array<String> = emptyArray()) {
      */
     @DelicateSkikoApi
     fun listAvailableFontFiles(): List<File> {
-        return fontsMap.values.toList()
+        return fontsMap.values.flatMap { it.map { it.file } }.toList()
     }
 
     /**
@@ -123,7 +132,8 @@ class AwtFontManager(fontPaths: Array<String> = emptyArray()) {
      */
     suspend fun listFontFiles(): List<File> {
         waitAllFontsCached()
-        return fontsMap.values.toList()
+        @OptIn(DelicateSkikoApi::class)
+        return listAvailableFontFiles()
     }
 
     /**
@@ -134,7 +144,8 @@ class AwtFontManager(fontPaths: Array<String> = emptyArray()) {
      */
     suspend fun findFontFile(font: Font): File? {
         waitAllFontsCached()
-        return fontsMap[font.family]
+        @OptIn(DelicateSkikoApi::class)
+        return findAvailableFontFile(font)
     }
 
     /**
@@ -145,7 +156,10 @@ class AwtFontManager(fontPaths: Array<String> = emptyArray()) {
      */
     suspend fun findFontFamilyFile(family: String): File? {
         waitAllFontsCached()
-        return fontsMap[family]
+        val list = fontsMap[family] ?: return null
+        return synchronized(list) {
+            list.firstOrNull()
+        }?.file
     }
 
     /**
