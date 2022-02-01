@@ -75,11 +75,15 @@ fun BufferedImage.toImage(): Image {
     return Image.makeFromBitmap(toBitmap())
 }
 
+private val MouseEventButton4 get() = 4
+private val MouseEventButton5 get() = 5
+
 fun toSkikoEvent(event: MouseEvent): SkikoPointerEvent {
     return SkikoPointerEvent(
         x = event.x.toDouble(),
         y = event.y.toDouble(),
-        buttons = toSkikoMouseButtons(event),
+        pressedButtons = toSkikoPressedMouseButtons(event),
+        button = toSkikoMouseButton(event),
         modifiers = toSkikoModifiers(event.modifiersEx),
         kind = when(event.id) {
             MouseEvent.MOUSE_PRESSED -> SkikoPointerEventKind.DOWN
@@ -106,7 +110,8 @@ fun toSkikoEvent(event: MouseWheelEvent): SkikoPointerEvent {
         y = event.y.toDouble(),
         deltaX = deltaX,
         deltaY = deltaY,
-        buttons = toSkikoMouseButtons(event),
+        pressedButtons = toSkikoPressedMouseButtons(event),
+        button = toSkikoMouseButton(event),
         modifiers = modifiers,
         kind = when(event.id) {
             MouseEvent.MOUSE_WHEEL-> SkikoPointerEventKind.SCROLL
@@ -163,19 +168,41 @@ fun toSkikoTypeEvent(event: InputMethodEvent, keyEvent: KeyEvent?): SkikoInputEv
     )
 }
 
-private fun toSkikoMouseButtons(event: MouseEvent): SkikoMouseButtons {
+private fun toSkikoPressedMouseButtons(event: MouseEvent): SkikoMouseButtons {
     val mask = event.modifiersEx
     var result = 0
-    if (mask and InputEvent.BUTTON1_DOWN_MASK != 0 || event.button == MouseEvent.BUTTON1) {
+    if (mask and InputEvent.BUTTON1_DOWN_MASK != 0
+        || (event.id == MouseEvent.MOUSE_PRESSED && event.button == MouseEvent.BUTTON1)) {
         result = result.or(SkikoMouseButtons.LEFT.value)
     }
-    if (mask and InputEvent.BUTTON2_DOWN_MASK != 0 || event.button == MouseEvent.BUTTON2) {
+    if (mask and InputEvent.BUTTON2_DOWN_MASK != 0
+        || (event.id == MouseEvent.MOUSE_PRESSED && event.button == MouseEvent.BUTTON2)) {
         result = result.or(SkikoMouseButtons.MIDDLE.value)
     }
-    if (mask and InputEvent.BUTTON3_DOWN_MASK != 0 || event.button == MouseEvent.BUTTON3) {
+    if (mask and InputEvent.BUTTON3_DOWN_MASK != 0
+        || (event.id == MouseEvent.MOUSE_PRESSED && event.button == MouseEvent.BUTTON3)) {
         result = result.or(SkikoMouseButtons.RIGHT.value)
     }
+    if (mask and MouseEvent.getMaskForButton(MouseEventButton4) != 0
+        || (event.id == MouseEvent.MOUSE_PRESSED && event.button == MouseEventButton4)) {
+        result = result.or(SkikoMouseButtons.BUTTON_4.value)
+    }
+    if (mask and MouseEvent.getMaskForButton(MouseEventButton5) != 0
+        || (event.id == MouseEvent.MOUSE_PRESSED && event.button == MouseEventButton5)) {
+        result = result.or(SkikoMouseButtons.BUTTON_5.value)
+    }
     return SkikoMouseButtons(result)
+}
+
+private fun toSkikoMouseButton(event: MouseEvent): SkikoMouseButtons {
+    return when (event.button) {
+        MouseEvent.BUTTON1 -> SkikoMouseButtons.LEFT
+        MouseEvent.BUTTON2 -> SkikoMouseButtons.MIDDLE
+        MouseEvent.BUTTON3 -> SkikoMouseButtons.RIGHT
+        MouseEventButton4 -> SkikoMouseButtons.BUTTON_4
+        MouseEventButton5 -> SkikoMouseButtons.BUTTON_5
+        else -> SkikoMouseButtons(event.button)
+    }
 }
 
 private fun toSkikoModifiers(modifiers: Int): SkikoInputModifiers {
