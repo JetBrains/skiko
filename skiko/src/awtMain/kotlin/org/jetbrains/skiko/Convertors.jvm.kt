@@ -213,8 +213,7 @@ private fun toSkikoKey(event: KeyEvent): Int {
     return key
 }
 
-suspend fun java.awt.Font.toSkikoTypeface(): Typeface? {
-    val file = AwtFontManager.DEFAULT.findFontFile(this) ?: return null
-    val data = file.readBytes()
-    return Typeface.makeFromData(Data.makeFromBytes(data))
+suspend fun java.awt.Font.toSkikoTypeface(fontManager: AwtFontManager = AwtFontManager.DEFAULT): Typeface? {
+    val file = fontManager.findFontFile(this) ?: return null
+    return Typeface.makeFromData(Data.makeFromFileName(file.absolutePath))
 }
