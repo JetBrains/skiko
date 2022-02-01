@@ -6,26 +6,38 @@ import android.opengl.GLSurfaceView
 import android.widget.LinearLayout
 import android.view.MotionEvent
 import android.view.KeyEvent
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import org.jetbrains.skia.*
 import java.nio.IntBuffer
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
-class SkikoSurfaceView(context: Context, val layer: SkiaLayer) : GLSurfaceView(context) {
-    private val renderer = SkikoSurfaceRender(layer)
+internal interface FrameManager {
+    fun onFrameCompleted()
+}
+
+class SkikoSurfaceView(context: Context, val layer: SkiaLayer) : GLSurfaceView(context), FrameManager {
+    private val renderer = SkikoSurfaceRender(layer, this)
     init {
         layoutParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
         setEGLConfigChooser (8, 8, 8, 0, 24, 8)
         setEGLContextClientVersion(2)
-        // setRenderMode(RENDERMODE_WHEN_DIRTY)
         setRenderer(renderer)
+        setRenderMode(RENDERMODE_WHEN_DIRTY)
+    }
+
+    private val frameAck = Channel<Unit>(Channel.CONFLATED)
+
+    override fun onFrameCompleted() {
+        frameAck.trySend(Unit)
     }
 
     private val frameDispatcher = FrameDispatcher(Dispatchers.Main) {
         renderer.update()
         requestRender()
+        frameAck.receive()
     }
 
     fun scheduleFrame() {
@@ -37,7 +49,7 @@ class SkikoSurfaceView(context: Context, val layer: SkiaLayer) : GLSurfaceView(c
     override fun onTouchEvent(event: MotionEvent): Boolean {
         val events: MutableList<SkikoTouchEvent> = mutableListOf()
         val count = event.pointerCount
-        for (index in 0 .. count - 1) {
+        for (index in 0 until count) {
             events.add(toSkikoTouchEvent(event, index, layer.contentScale))
         }
         layer.skikoView?.onTouchEvent(events.toTypedArray())
@@ -64,7 +76,7 @@ class SkikoSurfaceView(context: Context, val layer: SkiaLayer) : GLSurfaceView(c
     }
 }
 
-private class SkikoSurfaceRender(private val layer: SkiaLayer) : GLSurfaceView.Renderer {
+private class SkikoSurfaceRender(private val layer: SkiaLayer, private val manager: FrameManager) : GLSurfaceView.Renderer {
     private var width: Int = 0
     private var height: Int = 0
 
@@ -123,8 +135,8 @@ private class SkikoSurfaceRender(private val layer: SkiaLayer) : GLSurfaceView.R
             canvas?.drawPicture(it.instance)
             Unit
         }
-
         context?.flush()
+        manager.onFrameCompleted()
     }
 
     private var context: DirectContext? = null
