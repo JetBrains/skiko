@@ -37,6 +37,7 @@ class SkikoSurfaceView(context: Context, val layer: SkiaLayer) : GLSurfaceView(c
     private val frameDispatcher = FrameDispatcher(Dispatchers.Main) {
         renderer.update()
         requestRender()
+        frameAck.receive()
     }
 
     fun scheduleFrame() {
