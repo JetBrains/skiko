@@ -171,6 +171,9 @@ fun toSkikoTypeEvent(event: InputMethodEvent, keyEvent: KeyEvent?): SkikoInputEv
 private fun toSkikoPressedMouseButtons(event: MouseEvent): SkikoMouseButtons {
     val mask = event.modifiersEx
     var result = 0
+    // We should check [event.button] because of case where [event.modifiersEx] does not provide
+    // info about the pressed mouse button when using touchpad on MacOS 12 (AWT only)
+    // see: https://youtrack.jetbrains.com/issue/COMPOSE-36
     if (mask and InputEvent.BUTTON1_DOWN_MASK != 0
         || (event.id == MouseEvent.MOUSE_PRESSED && event.button == MouseEvent.BUTTON1)) {
         result = result.or(SkikoMouseButtons.LEFT.value)
