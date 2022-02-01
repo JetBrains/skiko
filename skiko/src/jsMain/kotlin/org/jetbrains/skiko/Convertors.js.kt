@@ -61,13 +61,13 @@ private val SPECIAL_KEYS = setOf(
 
 fun toSkikoEvent(
     event: MouseEvent,
-    buttons: Boolean,
     kind: SkikoPointerEventKind
 ): SkikoPointerEvent {
     return SkikoPointerEvent(
         x = event.offsetX,
         y = event.offsetY,
-        buttons = toSkikoMouseButtons(event, buttons),
+        pressedButtons = toSkikoPressedMouseButtons(event, kind),
+        button = toSkikoMouseButton(event),
         modifiers = toSkikoModifiers(event),
         kind = kind,
         timestamp = event.timeStamp.toLong(),
@@ -81,7 +81,8 @@ fun toSkikoDragEvent(
     return SkikoPointerEvent(
         x = event.offsetX,
         y = event.offsetY,
-        buttons = toSkikoMouseButtons(event, true),
+        pressedButtons = SkikoMouseButtons(buttonsFlags),
+        button = toSkikoMouseButton(event),
         modifiers = toSkikoModifiers(event),
         kind = SkikoPointerEventKind.DRAG,
         timestamp = event.timeStamp.toLong(),
@@ -129,14 +130,14 @@ fun toSkikoEvent(
 
 fun toSkikoScrollEvent(
     event: WheelEvent,
-    buttons: Boolean
 ): SkikoPointerEvent {
     return SkikoPointerEvent(
         x = event.offsetX,
         y = event.offsetY,
         deltaX = event.deltaX,
         deltaY = event.deltaY,
-        buttons = toSkikoMouseButtons(event, buttons),
+        pressedButtons = SkikoMouseButtons(buttonsFlags),
+        button = SkikoMouseButtons.NONE,
         modifiers = toSkikoModifiers(event),
         kind = SkikoPointerEventKind.SCROLL,
         timestamp = event.timeStamp.toLong(),
@@ -144,22 +145,34 @@ fun toSkikoScrollEvent(
     )
 }
 
-private fun toSkikoMouseButtons(
+private var buttonsFlags = 0
+private fun toSkikoPressedMouseButtons(
     event: MouseEvent,
-    pressed: Boolean
+    kind: SkikoPointerEventKind
 ): SkikoMouseButtons {
     // https://www.w3schools.com/jsref/event_button.asp
-    var result = 0
-    if (pressed && event.button.toInt() == 0) {
-        result = result.or(SkikoMouseButtons.LEFT.value)
+    val button = event.button.toInt()
+    if (kind == SkikoPointerEventKind.DOWN) {
+        buttonsFlags = buttonsFlags.or(getSkikoButtonValue(button))
+        return SkikoMouseButtons(buttonsFlags)
     }
-    if (pressed && event.button.toInt() == 2) {
-        result = result.or(SkikoMouseButtons.RIGHT.value)
+    buttonsFlags = buttonsFlags.xor(getSkikoButtonValue(button))
+    return SkikoMouseButtons(buttonsFlags)
+}
+
+private fun toSkikoMouseButton(event: MouseEvent): SkikoMouseButtons {
+    return SkikoMouseButtons(getSkikoButtonValue(event.button.toInt()))
+}
+
+private fun getSkikoButtonValue(button: Int): Int {
+    return when (button) {
+        0 -> SkikoMouseButtons.LEFT.value
+        1 -> SkikoMouseButtons.MIDDLE.value
+        2 -> SkikoMouseButtons.RIGHT.value
+        3 -> SkikoMouseButtons.BUTTON_4.value
+        4 -> SkikoMouseButtons.BUTTON_5.value
+        else -> 0
     }
-    if (pressed && event.button.toInt() == 1) {
-        result = result.or(SkikoMouseButtons.MIDDLE.value)
-    }
-    return SkikoMouseButtons(result)
 }
 
 private fun toSkikoModifiers(event: MouseEvent): SkikoInputModifiers {

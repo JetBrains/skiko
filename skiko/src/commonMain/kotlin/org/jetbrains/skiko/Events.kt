@@ -267,7 +267,8 @@ data class SkikoPointerEvent(
     val y: Double,
     val deltaX: Double = 0.0,
     val deltaY: Double = 0.0,
-    val buttons: SkikoMouseButtons = SkikoMouseButtons.NONE,
+    val pressedButtons: SkikoMouseButtons = SkikoMouseButtons.NONE,
+    val button: SkikoMouseButtons = SkikoMouseButtons.NONE,
     val modifiers: SkikoInputModifiers = SkikoInputModifiers.EMPTY,
     val kind: SkikoPointerEventKind,
     val timestamp: Long = 0,
@@ -275,11 +276,11 @@ data class SkikoPointerEvent(
 )
 
 val SkikoPointerEvent.isLeftClick: Boolean
-    get() = buttons.has(SkikoMouseButtons.LEFT) && (kind == SkikoPointerEventKind.UP)
+    get() = button.has(SkikoMouseButtons.LEFT) && (kind == SkikoPointerEventKind.UP)
 
 val SkikoPointerEvent.isRightClick: Boolean
-    get() = buttons.has(SkikoMouseButtons.RIGHT) && (kind == SkikoPointerEventKind.UP)
+    get() = button.has(SkikoMouseButtons.RIGHT) && (kind == SkikoPointerEventKind.UP)
 
 val SkikoPointerEvent.isMiddleClick: Boolean
-    get() = buttons.has(SkikoMouseButtons.MIDDLE) && (kind == SkikoPointerEventKind.UP)
+    get() = button.has(SkikoMouseButtons.MIDDLE) && (kind == SkikoPointerEventKind.UP)
 

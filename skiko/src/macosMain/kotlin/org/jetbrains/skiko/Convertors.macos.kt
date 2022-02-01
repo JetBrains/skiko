@@ -19,7 +19,8 @@ fun toSkikoEvent(
     return SkikoPointerEvent(
         x = xpos,
         y = ypos,
-        buttons = toSkikoMouseButtons(event, kind),
+        pressedButtons = toSkikoPressedMouseButtons(event, kind),
+        button = toSkikoMouseButton(event),
         modifiers = toSkikoModifiers(event),
         kind = kind,
         timestamp = timestamp,
@@ -44,15 +45,15 @@ fun toSkikoEvent(
     var buttons: SkikoMouseButtons
     if (kind == SkikoPointerEventKind.DOWN) {
         buttonsFlags = buttonsFlags.or(button.value)
-        buttons = SkikoMouseButtons(buttonsFlags)
     } else {
-        buttons = SkikoMouseButtons(buttonsFlags)
         buttonsFlags = buttonsFlags.xor(button.value)
     }
+    buttons = SkikoMouseButtons(buttonsFlags)
     return SkikoPointerEvent(
         x = xpos,
         y = ypos,
-        buttons = buttons,
+        pressedButtons = buttons,
+        button = button,
         modifiers = toSkikoModifiers(event),
         kind = kind,
         timestamp = timestamp,
@@ -77,7 +78,8 @@ fun toSkikoScrollEvent(
         y = ypos,
         deltaX = event.deltaX,
         deltaY = event.deltaY,
-        buttons = SkikoMouseButtons.NONE,
+        pressedButtons = SkikoMouseButtons(buttonsFlags),
+        button = SkikoMouseButtons.NONE,
         modifiers = toSkikoModifiers(event),
         kind = SkikoPointerEventKind.SCROLL,
         timestamp = timestamp,
@@ -147,7 +149,7 @@ fun toSkikoEvent(
 }
 
 private var buttonsFlags = 0
-private fun toSkikoMouseButtons(
+private fun toSkikoPressedMouseButtons(
     event: NSEvent,
     kind: SkikoPointerEventKind
 ): SkikoMouseButtons {
@@ -156,9 +158,12 @@ private fun toSkikoMouseButtons(
         buttonsFlags = buttonsFlags.or(getSkikoButtonValue(button))
         return SkikoMouseButtons(buttonsFlags)
     }
-    return SkikoMouseButtons(buttonsFlags).also {
-        buttonsFlags = buttonsFlags.xor(getSkikoButtonValue(button))
-    }
+    buttonsFlags = buttonsFlags.xor(getSkikoButtonValue(button))
+    return SkikoMouseButtons(buttonsFlags)
+}
+
+private fun toSkikoMouseButton(event: NSEvent): SkikoMouseButtons {
+    return SkikoMouseButtons(getSkikoButtonValue(event.buttonNumber.toInt()))
 }
 
 private fun getSkikoButtonValue(button: Int): Int {
