@@ -1051,7 +1051,7 @@ tasks.withType<Test>().configureEach {
         systemProperty("skiko.test.screenshots.dir", File(project.projectDir, "src/jvmTest/screenshots").absolutePath)
         systemProperty("skiko.test.font.dir", File(project.projectDir, "src/commonTest/resources/fonts").absolutePath)
 
-        systemProperty("skiko.test.ui.enabled", System.getProperty("skiko.test.ui.enabled", "false"))
+        systemProperty("skiko.test.ui.enabled", System.getProperty("skiko.test.ui.enabled", "true"))
         systemProperty("skiko.test.ui.renderApi", System.getProperty("skiko.test.ui.renderApi", "all"))
 
         // Tests should be deterministic, so disable scaling.
