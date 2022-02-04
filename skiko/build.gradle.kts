@@ -714,25 +714,31 @@ fun Project.androidClangFor(targetArch: Arch, version: String = "30"): Provider<
     }
     val ndkPath = project.providers
         .environmentVariable("ANDROID_NDK_HOME")
-        .orElse(
-            androidHomePath().map { androidHome ->
-                val ndkDir1 = file("$androidHome/ndk")
-                val candidates1 = if (ndkDir1.exists()) ndkDir1.list() else emptyArray()
-                val ndkVersion =
-                    arrayOf(*(candidates1.map { "ndk/$it" }.sortedDescending()).toTypedArray(), "ndk-bundle").find {
-                        File(androidHome).resolve(it).exists()
-                    } ?: throw GradleException("Cannot find NDK, is it installed (Tools/SDK Manager)?")
-                "$androidHome/$ndkVersion"
+        .orEmpty()
+        .map { ndkHomeEnv ->
+            ndkHomeEnv.ifEmpty {
+                androidHomePath().map { androidHome ->
+                    val ndkDir1 = file("$androidHome/ndk")
+                    val candidates1 = if (ndkDir1.exists()) ndkDir1.list() else emptyArray()
+                    val ndkVersion =
+                        arrayOf(*(candidates1.map { "ndk/$it" }.sortedDescending()).toTypedArray(), "ndk-bundle").find {
+                            File(androidHome).resolve(it).exists()
+                        } ?: throw GradleException("Cannot find NDK, is it installed (Tools/SDK Manager)?")
+                    "$androidHome/$ndkVersion"
+                }
             }
-        )
+        }
     return ndkPath.map { ndkPath ->
         var clangBinaryName = "$androidArch-linux-android$version-clang++"
         if (hostOs.isWindows) {
             clangBinaryName += ".cmd"
         }
-        ("$ndkPath/toolchains/llvm/prebuilt/$hostOsArch/bin/$clangBinaryName")
+        "$ndkPath/toolchains/llvm/prebuilt/$hostOsArch/bin/$clangBinaryName"
     }
 }
+
+fun Provider<String>.orEmpty(): Provider<String> =
+    orElse("")
 
 fun Project.androidJar(askedVersion: String = ""): Provider<File> =
     androidHomePath().map { androidHomePath ->
