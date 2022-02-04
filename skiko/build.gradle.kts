@@ -717,15 +717,14 @@ fun Project.androidClangFor(targetArch: Arch, version: String = "30"): Provider<
         .orEmpty()
         .map { ndkHomeEnv ->
             ndkHomeEnv.ifEmpty {
-                androidHomePath().map { androidHome ->
-                    val ndkDir1 = file("$androidHome/ndk")
-                    val candidates1 = if (ndkDir1.exists()) ndkDir1.list() else emptyArray()
-                    val ndkVersion =
-                        arrayOf(*(candidates1.map { "ndk/$it" }.sortedDescending()).toTypedArray(), "ndk-bundle").find {
-                            File(androidHome).resolve(it).exists()
-                        } ?: throw GradleException("Cannot find NDK, is it installed (Tools/SDK Manager)?")
-                    "$androidHome/$ndkVersion"
-                }
+                val androidHome = androidHomePath().get()
+                val ndkDir1 = file("$androidHome/ndk")
+                val candidates1 = if (ndkDir1.exists()) ndkDir1.list() else emptyArray()
+                val ndkVersion =
+                    arrayOf(*(candidates1.map { "ndk/$it" }.sortedDescending()).toTypedArray(), "ndk-bundle").find {
+                        File(androidHome).resolve(it).exists()
+                    } ?: throw GradleException("Cannot find NDK, is it installed (Tools/SDK Manager)?")
+                "$androidHome/$ndkVersion"
             }
         }
     return ndkPath.map { ndkPath ->
