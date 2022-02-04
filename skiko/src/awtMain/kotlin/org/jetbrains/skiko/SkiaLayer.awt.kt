@@ -90,16 +90,6 @@ actual open class SkiaLayer internal constructor(
         add(backedLayer)
         backedLayer.addHierarchyListener {
             if (it.changeFlags and HierarchyEvent.SHOWING_CHANGED.toLong() != 0L) {
-                if (
-                    vrrDisplayLocker == null
-                    && hostOs == OS.Windows
-                    && (renderApi == GraphicsApi.DIRECT3D || renderApi == GraphicsApi.OPENGL)
-                ) {
-                    vrrDisplayLocker = JPanel().apply {
-                        background = Color(0, 0, 0, 0)
-                    }
-                    add(vrrDisplayLocker, Integer.valueOf(0))
-                }
                 checkShowing()
             }
         }
@@ -259,6 +249,13 @@ actual open class SkiaLayer internal constructor(
                 renderApi = fallbackRenderApiQueue.removeAt(0)
                 redrawer?.dispose()
                 redrawer = renderFactory.createRedrawer(this, renderApi, properties)
+                vrrDisplayLocker?.let { remove(it) }
+                if (hostOs == OS.Windows && (renderApi == GraphicsApi.DIRECT3D || renderApi == GraphicsApi.OPENGL)) {
+                    vrrDisplayLocker = JPanel().apply {
+                        background = Color(0, 0, 0, 0)
+                    }
+                    add(vrrDisplayLocker, Integer.valueOf(0))
+                }
                 redrawer?.syncSize()
             } catch (e: RenderException) {
                 println(e.message)
