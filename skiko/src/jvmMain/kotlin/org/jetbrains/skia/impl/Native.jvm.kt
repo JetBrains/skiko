@@ -57,20 +57,34 @@ actual inline fun <T> interopScope(block: InteropScope.() -> T): T {
 
 actual open class InteropScope actual constructor() {
     actual fun toInterop(string: String?): InteropPointer = string
+
     actual fun toInterop(array: ByteArray?): InteropPointer = array
+    actual fun toInteropForResult(array: ByteArray?): InteropPointer = toInterop(array)
     actual fun InteropPointer.fromInterop(result: ByteArray) {}
+
     actual fun toInterop(array: ShortArray?): InteropPointer = array
+    actual fun toInteropForResult(array: ShortArray?): InteropPointer = toInterop(array)
     actual fun InteropPointer.fromInterop(result: ShortArray) {}
+
     actual fun toInterop(array: IntArray?): InteropPointer = array
+    actual fun toInteropForResult(array: IntArray?): InteropPointer = toInterop(array)
     actual fun InteropPointer.fromInterop(result: IntArray) {}
+
     actual fun toInterop(array: LongArray?): InteropPointer = array
     actual fun InteropPointer.fromInterop(result: LongArray) {}
+
     actual fun toInterop(array: FloatArray?): InteropPointer = array
+    actual fun toInteropForResult(array: FloatArray?): InteropPointer = toInterop(array)
     actual fun InteropPointer.fromInterop(result: FloatArray) {}
+
     actual fun toInterop(array: DoubleArray?): InteropPointer = array
+    actual fun toInteropForResult(array: DoubleArray?): InteropPointer = toInterop(array)
     actual fun InteropPointer.fromInterop(result: DoubleArray) {}
+
     actual fun toInterop(array: NativePointerArray?): InteropPointer = array?.backing
+    actual fun toInteropForResult(array: NativePointerArray?): InteropPointer = toInterop(array)
     actual fun InteropPointer.fromInterop(result: NativePointerArray) {}
+
     actual fun toInterop(stringArray: Array<String>?): InteropPointer = stringArray
     actual fun InteropPointer.fromInteropNativePointerArray(): NativePointerArray =
         NativePointerArray((this as LongArray).size, this)

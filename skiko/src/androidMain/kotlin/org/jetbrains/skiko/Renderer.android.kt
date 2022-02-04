@@ -4,34 +4,79 @@ import android.content.Context
 import android.opengl.GLES30
 import android.opengl.GLSurfaceView
 import android.widget.LinearLayout
-import kotlinx.coroutines.Dispatchers
+import android.view.MotionEvent
+import android.view.KeyEvent
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import org.jetbrains.skia.*
 import java.nio.IntBuffer
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
-class SkikoSurfaceView(context: Context, layer: SkiaLayer) : GLSurfaceView(context) {
-    private val renderer = SkikoSurfaceRender(layer)
+internal interface FrameManager {
+    fun onFrameCompleted()
+}
+
+class SkikoSurfaceView(context: Context, val layer: SkiaLayer) : GLSurfaceView(context), FrameManager {
+    private val renderer = SkikoSurfaceRender(layer, this)
     init {
         layoutParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
         setEGLConfigChooser (8, 8, 8, 0, 24, 8)
         setEGLContextClientVersion(2)
-        // setRenderMode(RENDERMODE_WHEN_DIRTY)
         setRenderer(renderer)
+        setRenderMode(RENDERMODE_WHEN_DIRTY)
+    }
+
+    private val frameAck = Channel<Unit>(Channel.CONFLATED)
+
+    override fun onFrameCompleted() {
+        frameAck.trySend(Unit)
     }
 
     private val frameDispatcher = FrameDispatcher(Dispatchers.Main) {
         renderer.update()
         requestRender()
+        frameAck.receive()
     }
 
     fun scheduleFrame() {
         frameDispatcher.scheduleFrame()
     }
+
+    internal val gesturesDetector = SkikoGesturesDetector(context, layer)
+
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        val events: MutableList<SkikoTouchEvent> = mutableListOf()
+        val count = event.pointerCount
+        for (index in 0 until count) {
+            events.add(toSkikoTouchEvent(event, index, layer.contentScale))
+        }
+        layer.skikoView?.onTouchEvent(events.toTypedArray())
+        return true
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+        layer.skikoView?.onKeyboardEvent(
+            toSkikoKeyboardEvent(event, keyCode, SkikoKeyboardEventKind.DOWN)
+        )
+        if (event.unicodeChar != 0) {
+            layer.skikoView?.onInputEvent(
+                toSkikoTypeEvent(event, keyCode)
+            )
+        }
+        return true
+    }
+
+    override fun onKeyUp(keyCode: Int, event: KeyEvent): Boolean {
+        layer.skikoView?.onKeyboardEvent(
+            toSkikoKeyboardEvent(event, keyCode, SkikoKeyboardEventKind.UP)
+        )
+        return true
+    }
 }
 
-private class SkikoSurfaceRender(private val layer: SkiaLayer) : GLSurfaceView.Renderer {
+private class SkikoSurfaceRender(private val layer: SkiaLayer, private val manager: FrameManager) : GLSurfaceView.Renderer {
     private var width: Int = 0
     private var height: Int = 0
 
@@ -86,11 +131,12 @@ private class SkikoSurfaceRender(private val layer: SkiaLayer) : GLSurfaceView.R
     // This method is called from GL rendering thread, it shall render Skia picture.
     override fun onDrawFrame(gl: GL10?) {
         lockPicture {
+            canvas?.clear(-1)
             canvas?.drawPicture(it.instance)
             Unit
         }
-
         context?.flush()
+        manager.onFrameCompleted()
     }
 
     private var context: DirectContext? = null

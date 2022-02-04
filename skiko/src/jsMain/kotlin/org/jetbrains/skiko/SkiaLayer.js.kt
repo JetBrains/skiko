@@ -62,27 +62,27 @@ actual open class SkiaLayer {
         }.apply { initCanvas(desiredWidth, desiredHeight, contentScale) }
         // See https://www.w3schools.com/jsref/dom_obj_event.asp
         // https://developer.mozilla.org/en-US/docs/Web/API/Pointer_events
-        htmlCanvas.addEventListener("pointerdown", { event ->
+        htmlCanvas.addEventListener("mousedown", { event ->
             event as MouseEvent
             isPointerPressed = true
-            skikoView?.onPointerEvent(toSkikoEvent(event, true, SkikoPointerEventKind.DOWN))
+            skikoView?.onPointerEvent(toSkikoEvent(event, SkikoPointerEventKind.DOWN))
         })
-        htmlCanvas.addEventListener("pointerup", { event ->
+        htmlCanvas.addEventListener("mouseup", { event ->
             event as MouseEvent
             isPointerPressed = false
-            skikoView?.onPointerEvent(toSkikoEvent(event, true, SkikoPointerEventKind.UP))
+            skikoView?.onPointerEvent(toSkikoEvent(event, SkikoPointerEventKind.UP))
         })
-        htmlCanvas.addEventListener("pointermove", { event ->
+        htmlCanvas.addEventListener("mousemove", { event ->
             event as MouseEvent
             if (isPointerPressed) {
                 skikoView?.onPointerEvent(toSkikoDragEvent(event))
             } else {
-                skikoView?.onPointerEvent(toSkikoEvent(event, false, SkikoPointerEventKind.MOVE))
+                skikoView?.onPointerEvent(toSkikoEvent(event, SkikoPointerEventKind.MOVE))
             }
         })
         htmlCanvas.addEventListener("wheel", { event ->
             event as WheelEvent
-            skikoView?.onPointerEvent(toSkikoScrollEvent(event, isPointerPressed))
+            skikoView?.onPointerEvent(toSkikoScrollEvent(event))
         })
         htmlCanvas.addEventListener("contextmenu", { event ->
             event.preventDefault()
@@ -90,6 +90,10 @@ actual open class SkiaLayer {
         htmlCanvas.addEventListener("keydown", { event ->
             event as KeyboardEvent
             skikoView?.onKeyboardEvent(toSkikoEvent(event, SkikoKeyboardEventKind.DOWN))
+
+            toSkikoTypeEvent(event.key, event)?.let { inputEvent ->
+                skikoView?.onInputEvent(inputEvent)
+            }
         })
         htmlCanvas.addEventListener("keyup", { event ->
             event as KeyboardEvent
@@ -112,9 +116,7 @@ var onContentScaleChanged: ((Float) -> Unit)? = null
 
 actual typealias SkikoTouchPlatformEvent = Any
 actual typealias SkikoGesturePlatformEvent = Any
-actual typealias SkikoPlatformInputEvent = InputEvent
+actual typealias SkikoPlatformInputEvent = KeyboardEvent
 actual typealias SkikoPlatformKeyboardEvent = KeyboardEvent
 //  MouseEvent is base class of PointerEvent
 actual typealias SkikoPlatformPointerEvent = MouseEvent
-
-

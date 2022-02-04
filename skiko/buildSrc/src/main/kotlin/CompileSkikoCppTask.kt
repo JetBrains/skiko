@@ -181,17 +181,17 @@ abstract class CompileSkikoCppTask() : AbstractSkikoNativeToolTask() {
     }
 
     private fun findCompilerExecutable(): File {
-        val compilerNameOrFile = compiler.get()
-        val compilerFile = File(compilerNameOrFile)
+        val compilerName = compiler.get()
+        val compilerFile = File(compilerName)
         if (compilerFile.isFile) return compilerFile
 
         val paths = System.getenv("PATH").split(File.pathSeparator)
         for (path in paths) {
-            val file = File(path).resolve(compilerNameOrFile)
+            val file = File(path).resolve(compilerName)
             if (file.isFile) return file
         }
 
-        error("Could not find compiler '$compilerNameOrFile' in PATH: $paths")
+        error("Could not find compiler '$compilerName' in PATH: $paths")
     }
 
     override fun cleanStaleOutput(mode: ToolMode.NonIncremental) {

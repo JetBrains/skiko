@@ -207,7 +207,7 @@ val Project.supportAndroid: Boolean
 kotlin {
     jvm("awt") {
         compilations.all {
-            kotlinOptions.jvmTarget = "11"
+            kotlinOptions.jvmTarget = "1.8"
         }
         generateVersion(hostOs, hostArch)
     }
@@ -215,7 +215,7 @@ kotlin {
     if (supportAndroid) {
         jvm("android") {
             compilations.all {
-                kotlinOptions.jvmTarget = "11"
+                kotlinOptions.jvmTarget = "1.8"
             }
             // We need an additional attribute to distinguish between JVM variants.
             attributes {
@@ -487,10 +487,6 @@ fun configureNativeTarget(os: OS, arch: Arch, target: KotlinNativeTarget) {
     }
 }
 
-tasks.withType(JavaCompile::class.java).configureEach {
-    this.getOptions().compilerArgs.addAll(listOf("-source", "11", "-target", "11"))
-}
-
 fun skiaHeadersDirs(skiaDir: File): List<File> =
     listOf(
         skiaDir,
@@ -689,17 +685,22 @@ fun createObjcCompileTask(
     )
 }
 
-fun androidHome(): File {
-    val envPath = System.getenv("ANDROID_SDK_ROOT")
-    return when {
-        envPath != null -> File(envPath)
-        hostOs == OS.MacOS -> File("${System.getProperty("user.home")}/Library/Android/sdk")
-        hostOs == OS.Linux -> File("${System.getProperty("user.home")}/.android")
-        else -> throw GradleException("unsupported $hostOs. Alternative is to define Android SDK in ANDROID_SDK_ROOT environment variable")
-    }
+fun Project.androidHomePath(): Provider<String> {
+    val androidHomeFromSdkRoot: Provider<String> =
+        project.providers.environmentVariable("ANDROID_SDK_ROOT")
+    val androidHomeFromUserHome: Provider<String> =
+        project.providers.systemProperty("user.home")
+            .map { userHome ->
+                listOf("Library/Android/sdk", ".android/sdk", "Android/sdk")
+                    .map { "$userHome/$it" }
+                    .firstOrNull { File(it).exists() }
+                    ?: error("Define Android SDK via ANDROID_SDK_ROOT")
+            }
+    return androidHomeFromSdkRoot
+        .orElse(androidHomeFromUserHome)
 }
 
-fun androidClangFor(targetArch: Arch, version: String = "30"): String {
+fun Project.androidClangFor(targetArch: Arch, version: String = "30"): Provider<String> {
     val androidArch = when (targetArch) {
         Arch.Arm64 -> "aarch64"
         Arch.X64 -> "x86_64"
@@ -711,28 +712,51 @@ fun androidClangFor(targetArch: Arch, version: String = "30"): String {
         OS.Windows -> "windows-x86_64"
         else -> throw GradleException("unsupported $hostOs")
     }
-    val ndkHome = if (System.getenv("ANDROID_NDK_HOME").isNullOrEmpty()) {
-        val androidHome = androidHome()
-        val ndkVersion =
-            arrayOf(*(file("$androidHome/ndk").list().map { "ndk/$it" }.sortedDescending()).toTypedArray(), "ndk-bundle").find {
-                androidHome.resolve(it).exists()
-            } ?: throw GradleException("Cannot find NDK, is it installed (Tools/SDK Manager)?")
-        "$androidHome/$ndkVersion"
-    } else {
-        System.getenv("ANDROID_NDK_HOME")
+    val ndkPath = project.providers
+        .environmentVariable("ANDROID_NDK_HOME")
+        .orEmpty()
+        .map { ndkHomeEnv ->
+            ndkHomeEnv.ifEmpty {
+                val androidHome = androidHomePath().get()
+                val ndkDir1 = file("$androidHome/ndk")
+                val candidates1 = if (ndkDir1.exists()) ndkDir1.list() else emptyArray()
+                val ndkVersion =
+                    arrayOf(*(candidates1.map { "ndk/$it" }.sortedDescending()).toTypedArray(), "ndk-bundle").find {
+                        File(androidHome).resolve(it).exists()
+                    } ?: throw GradleException("Cannot find NDK, is it installed (Tools/SDK Manager)?")
+                "$androidHome/$ndkVersion"
+            }
+        }
+    return ndkPath.map { ndkPath ->
+        var clangBinaryName = "$androidArch-linux-android$version-clang++"
+        if (hostOs.isWindows) {
+            clangBinaryName += ".cmd"
+        }
+        "$ndkPath/toolchains/llvm/prebuilt/$hostOsArch/bin/$clangBinaryName"
     }
-    val ndkDir = File(ndkHome, "/toolchains/llvm/prebuilt/$hostOsArch")
-    var clang = ndkDir.resolve("bin/$androidArch-linux-android$version-clang++").absolutePath
-    if (hostOs.isWindows) {
-        clang += ".cmd"
-    }
-    return clang
 }
 
-fun androidJar(version: String = "30"): String {
-    val androidHome = androidHome()
-    return androidHome.resolve("platforms/android-$version/android.jar").absolutePath
-}
+fun Provider<String>.orEmpty(): Provider<String> =
+    orElse("")
+
+fun Project.androidJar(askedVersion: String = ""): Provider<File> =
+    androidHomePath().map { androidHomePath ->
+        val androidHome = File(androidHomePath)
+        val version = if (askedVersion.isEmpty()) {
+            val platformsDir = androidHome.resolve("platforms")
+            val versions = platformsDir.list().orEmpty()
+            versions.maxByOrNull { name ->
+                name.removePrefix("android-").toInt()
+            } ?: error(
+                buildString {
+                    appendLine("'$platformsDir' does not contain any directories matching expected 'android-NUMBER' format: ${versions}")
+                }
+            )
+        } else {
+            "android-$askedVersion"
+        }
+        androidHome.resolve("platforms/$version/android.jar")
+    }
 
 fun createCompileJvmBindingsTask(
     targetOs: OS,
@@ -918,7 +942,11 @@ fun createLinkJvmBindings(
                     "-shared",
                     "-static-libstdc++",
                     "-lGLESv3",
-                    "-lEGL"
+                    "-lEGL",
+                    "-llog",
+                    "-landroid",
+                    // Hack to fix problem with linker not always finding certain declarations.
+                    "$skiaBinDir/libskia.a",
                 )
                 linker.set(androidClangFor(targetArch))
             }
