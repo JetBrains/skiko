@@ -944,7 +944,9 @@ fun createLinkJvmBindings(
                     "-lGLESv3",
                     "-lEGL",
                     "-llog",
-                    "-landroid"
+                    "-landroid",
+                    // Hack to fix problem with linker not always finding certain declarations.
+                    "$skiaBinDir/libskia.a",
                 )
                 linker.set(androidClangFor(targetArch))
             }
