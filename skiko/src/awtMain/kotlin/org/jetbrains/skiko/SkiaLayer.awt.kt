@@ -253,6 +253,7 @@ actual open class SkiaLayer internal constructor(
                 if (hostOs == OS.Windows && (renderApi == GraphicsApi.DIRECT3D || renderApi == GraphicsApi.OPENGL)) {
                     vrrDisplayLocker = JPanel().apply {
                         background = Color(0, 0, 0, 0)
+                        setBounds(0, 0, 1, 1)
                     }
                     add(vrrDisplayLocker, Integer.valueOf(0))
                 }
