@@ -71,6 +71,7 @@ jobs:
           distribution: 'adopt'
           java-version: '11'
       - uses: nttld/setup-ndk@v1
+        id: setup-ndk
         with:
           ndk-version: r21e
       - uses: android-actions/setup-android@v2
