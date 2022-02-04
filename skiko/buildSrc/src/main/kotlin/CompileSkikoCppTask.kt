@@ -1,5 +1,4 @@
 import internal.utils.*
-import org.gradle.api.GradleException
 
 import org.gradle.api.file.Directory
 import org.gradle.api.file.FileCollection
@@ -184,8 +183,7 @@ abstract class CompileSkikoCppTask() : AbstractSkikoNativeToolTask() {
     private fun findCompilerExecutable(): File {
         val compilerName = compiler.get()
         val compilerFile = File(compilerName)
-        if (compilerFile.isFile)
-                return compilerFile
+        if (compilerFile.isFile) return compilerFile
 
         val paths = System.getenv("PATH").split(File.pathSeparator)
         for (path in paths) {
