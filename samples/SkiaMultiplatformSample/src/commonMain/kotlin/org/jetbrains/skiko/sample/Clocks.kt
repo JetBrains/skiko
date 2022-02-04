@@ -11,7 +11,7 @@ import kotlin.math.sin
 import kotlin.math.PI
 import kotlin.math.pow
 
-class Clocks(private val layer: SkiaLayer): SkikoView {
+open class Clocks(private val layer: SkiaLayer): SkikoView {
     private val platformYOffset = if (hostOs == OS.Ios) 50f else 5f
     private var frame = 0
     private var xpos = 0.0
