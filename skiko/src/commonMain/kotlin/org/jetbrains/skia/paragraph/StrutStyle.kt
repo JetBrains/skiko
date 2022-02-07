@@ -25,7 +25,7 @@ class StrutStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finali
         Stats.onNativeCall()
     }
 
-    override fun _nativeEquals(other: Native?): Boolean {
+    override fun nativeEquals(other: Native?): Boolean {
         return try {
             Stats.onNativeCall()
             StrutStyle_nEquals(_ptr, getPtr(other))

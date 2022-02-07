@@ -8,7 +8,7 @@ private class FinalizationThunk(private val finalizer: NativePointer, private va
     }
 }
 
-external class FinalizationRegistry(cleanup: (dynamic) -> Unit) {
+internal external class FinalizationRegistry(cleanup: (dynamic) -> Unit) {
     fun register(obj: dynamic, handle: dynamic)
     fun unregister(obj: dynamic)
 }

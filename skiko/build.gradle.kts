@@ -9,6 +9,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
     kotlin("multiplatform") version "1.6.10"
+    id("org.jetbrains.dokka") version "1.6.10"
     `maven-publish`
     signing
     id("org.gradle.crypto.checksum") version "1.1.0"

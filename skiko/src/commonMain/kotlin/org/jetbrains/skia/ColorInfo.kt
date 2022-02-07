@@ -46,11 +46,11 @@ class ColorInfo(val colorType: ColorType, val alphaType: ColorAlphaType, val col
     }
 
     override fun hashCode(): Int {
-        val PRIME = 59
+        val prime = 59
         var result = 1
-        result = result * PRIME + colorType.hashCode()
-        result = result * PRIME + alphaType.hashCode()
-        result = result * PRIME + colorSpace.hashCode()
+        result = result * prime + colorType.hashCode()
+        result = result * prime + alphaType.hashCode()
+        result = result * prime + colorSpace.hashCode()
         return result
     }
 

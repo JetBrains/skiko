@@ -19,7 +19,7 @@ class ParagraphStyle : Managed(ParagraphStyle_nMake(), _FinalizerHolder.PTR) {
         }
     }
 
-    override fun _nativeEquals(other: Native?): Boolean {
+    override fun nativeEquals(other: Native?): Boolean {
         return try {
             Stats.onNativeCall()
             _nEquals(_ptr, getPtr(other))

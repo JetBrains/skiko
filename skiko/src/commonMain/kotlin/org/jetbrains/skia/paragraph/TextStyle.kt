@@ -15,7 +15,7 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
         Stats.onNativeCall()
     }
 
-    override fun _nativeEquals(other: Native?): Boolean {
+    override fun nativeEquals(other: Native?): Boolean {
         return try {
             Stats.onNativeCall()
             TextStyle_nEquals(

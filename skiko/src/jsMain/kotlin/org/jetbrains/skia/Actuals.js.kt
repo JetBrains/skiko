@@ -4,7 +4,7 @@ import kotlinx.browser.window
 
 actual abstract class OutputStream
 
-actual fun <R> commonSynchronized(lock: Any, block: () -> R) {
+internal actual fun <R> commonSynchronized(lock: Any, block: () -> R) {
     block()
 }
 

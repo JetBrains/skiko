@@ -25,7 +25,7 @@ class ArrayDecoder(private val ptr: NativePointer, private val disposePtr: Nativ
         get() = StdVectorDecoder_nGetArraySize(ptr)
 }
 
-inline fun <T> arrayDecoderScope(arrayDecoderBlock: () -> ArrayDecoder, block: (arrayCode: ArrayDecoder) -> T): T {
+internal inline fun <T> arrayDecoderScope(arrayDecoderBlock: () -> ArrayDecoder, block: (arrayCode: ArrayDecoder) -> T): T {
     var arrayDecoder: ArrayDecoder? = null
     return try {
         arrayDecoder = arrayDecoderBlock()

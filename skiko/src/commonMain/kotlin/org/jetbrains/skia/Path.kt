@@ -239,7 +239,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
      * @param other  Path to compare
      * @return   true if this and Path are equivalent
      */
-    override fun _nativeEquals(other: Native?): Boolean {
+    override fun nativeEquals(other: Native?): Boolean {
         return try {
             Path_nEquals(_ptr, getPtr(other))
         } finally {

@@ -1,5 +1,4 @@
-# This is a basic workflow to help you get started with Actions
-
+# Default Skiko CI
 name: CI
 
 # Controls when the action will run.
@@ -7,6 +6,7 @@ on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
     branches: [ master ]
+  # TODO: temporary for faster tests, restore!
   pull_request:
     branches: [ master ]
 
@@ -160,3 +160,4 @@ jobs:
           name: test-reports-windows
           path: ./skiko/build/reports/tests
           retention-days: 5
+

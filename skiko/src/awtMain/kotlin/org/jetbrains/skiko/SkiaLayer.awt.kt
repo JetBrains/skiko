@@ -22,7 +22,7 @@ actual open class SkiaLayer internal constructor(
     private val renderFactory: RenderFactory = RenderFactory.Default
 ) : JPanel() {
 
-    companion object {
+    internal companion object {
         init {
             Library.load()
         }
@@ -527,10 +527,16 @@ actual open class SkiaLayer internal constructor(
     }
 }
 
+/**
+ * Disable showing window title bar.
+ */
 fun SkiaLayer.disableTitleBar(customHeaderHeight: Float) {
     backedLayer.disableTitleBar(customHeaderHeight)
 }
 
+/**
+ * Request to show emoji and symbols popup.
+ */
 fun orderEmojiAndSymbolsPopup() {
     platformOperations.orderEmojiAndSymbolsPopup()
 }

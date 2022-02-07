@@ -87,14 +87,14 @@ class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
 
     override fun equals(other: Any?): Boolean {
         val otherData = other as? Data ?: return false
-        return _nativeEquals(otherData)
+        return nativeEquals(otherData)
     }
 
     /**
      * Returns true if these two objects have the same length and contents,
      * effectively returning 0 == memcmp(...)
      */
-    override fun _nativeEquals(other: Native?): Boolean {
+    override fun nativeEquals(other: Native?): Boolean {
         return try {
             Stats.onNativeCall()
             _nEquals(_ptr, getPtr(other))

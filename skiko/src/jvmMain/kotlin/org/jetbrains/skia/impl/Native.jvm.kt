@@ -3,7 +3,7 @@ package org.jetbrains.skia.impl
 import java.lang.ref.Reference
 
 actual abstract class Native actual constructor(ptr: NativePointer) {
-    actual var _ptr: NativePointer
+    internal actual var _ptr: NativePointer
 
     actual companion object {
         actual val NullPointer: NativePointer
@@ -20,7 +20,7 @@ actual abstract class Native actual constructor(ptr: NativePointer) {
             if (null == other) return false
             if (!javaClass.isInstance(other)) return false
             val nOther = other as Native
-            if (_ptr == nOther._ptr) true else _nativeEquals(nOther)
+            if (_ptr == nOther._ptr) true else nativeEquals(nOther)
         } finally {
             Reference.reachabilityFence(this)
             Reference.reachabilityFence(other)
@@ -32,7 +32,7 @@ actual abstract class Native actual constructor(ptr: NativePointer) {
         return java.lang.Long.hashCode(_ptr)
     }
 
-    actual open fun _nativeEquals(other: Native?): Boolean {
+    internal actual open fun nativeEquals(other: Native?): Boolean {
         return false
     }
 
@@ -42,7 +42,7 @@ actual abstract class Native actual constructor(ptr: NativePointer) {
     }
 }
 
-actual fun reachabilityBarrier(obj: Any?) {
+internal actual fun reachabilityBarrier(obj: Any?) {
     Reference.reachabilityFence(obj)
 }
 
@@ -50,12 +50,12 @@ actual typealias NativePointer = Long
 
 actual typealias InteropPointer = Any?
 
-object theScope: InteropScope()
-actual inline fun <T> interopScope(block: InteropScope.() -> T): T {
+internal object theScope: InteropScope()
+internal actual inline fun <T> interopScope(block: InteropScope.() -> T): T {
     return theScope.block()
 }
 
-actual open class InteropScope actual constructor() {
+internal actual open class InteropScope actual constructor() {
     actual fun toInterop(string: String?): InteropPointer = string
 
     actual fun toInterop(array: ByteArray?): InteropPointer = array

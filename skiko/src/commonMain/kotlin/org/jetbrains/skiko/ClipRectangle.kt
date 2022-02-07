@@ -1,5 +1,8 @@
 package org.jetbrains.skiko
 
+/**
+ * Rectangle used for clipping.
+ */
 interface ClipRectangle {
     val x: Float
     val y: Float
