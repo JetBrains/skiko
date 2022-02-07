@@ -7,11 +7,11 @@ import org.jetbrains.skia.impl.withResult
 
 actual abstract class OutputStream
 
-actual fun <R> commonSynchronized(lock: Any, block: () -> R) {
+internal actual fun <R> commonSynchronized(lock: Any, block: () -> R) {
     block()
 }
 
-actual fun String.intCodePoints(): IntArray = IntArray(this.length) { this[it].code }
+internal actual fun String.intCodePoints(): IntArray = IntArray(this.length) { this[it].code }
 
 actual class Pattern constructor(regex: String) {
     private val _regex = Regex(regex)
@@ -42,9 +42,9 @@ private val LANG by lazy {
     langTag.ifEmpty { "en-US" }
 }
 
-actual fun defaultLanguageTag(): String = LANG
+internal actual fun defaultLanguageTag(): String = LANG
 
-actual fun compilePattern(regex: String): Pattern = Pattern(regex)
+internal actual fun compilePattern(regex: String): Pattern = Pattern(regex)
 
 actual typealias ExternalSymbolName = kotlin.native.SymbolName
 

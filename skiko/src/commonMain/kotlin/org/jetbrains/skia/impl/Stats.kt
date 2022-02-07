@@ -1,5 +1,8 @@
 package org.jetbrains.skia.impl
 
+/**
+ * Statistics of native operations.
+ */
 expect object Stats {
     fun onNativeCall()
 

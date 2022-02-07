@@ -7,8 +7,8 @@ expect class NativePointer
 expect class InteropPointer
 
 expect abstract class Native(ptr: NativePointer) {
-    var _ptr: NativePointer
-    open fun _nativeEquals(other: Native?): Boolean
+    internal var _ptr: NativePointer
+    internal open fun nativeEquals(other: Native?): Boolean
 
     companion object {
         val NullPointer: NativePointer
@@ -17,11 +17,11 @@ expect abstract class Native(ptr: NativePointer) {
     override fun toString(): String
 }
 
-expect fun reachabilityBarrier(obj: Any?)
+internal expect fun reachabilityBarrier(obj: Any?)
 
-fun getPtr(n: Native?): NativePointer = n?._ptr ?: Native.NullPointer
+internal fun getPtr(n: Native?): NativePointer = n?._ptr ?: Native.NullPointer
 
-expect class InteropScope() {
+internal expect class InteropScope() {
     fun toInterop(string: String?): InteropPointer
 
     fun toInterop(array: ByteArray?): InteropPointer
@@ -74,16 +74,16 @@ expect class InteropScope() {
     fun release()
 }
 
-expect inline fun <T> interopScope(block: InteropScope.() -> T): T
+internal expect inline fun <T> interopScope(block: InteropScope.() -> T): T
 
-inline fun withResult(result: ByteArray, block: InteropScope.(InteropPointer) -> Unit): ByteArray = interopScope {
+internal inline fun withResult(result: ByteArray, block: InteropScope.(InteropPointer) -> Unit): ByteArray = interopScope {
     val handle = toInteropForResult(result)
     block(handle)
     handle.fromInterop(result)
     result
 }
 
-inline fun withNullableResult(result: ByteArray, block: InteropScope.(InteropPointer) -> Boolean): ByteArray? = interopScope {
+internal inline fun withNullableResult(result: ByteArray, block: InteropScope.(InteropPointer) -> Boolean): ByteArray? = interopScope {
     val handle = toInteropForResult(result)
     return if (block(handle)) {
         handle.fromInterop(result)
@@ -93,14 +93,14 @@ inline fun withNullableResult(result: ByteArray, block: InteropScope.(InteropPoi
     }
 }
 
-inline fun withResult(result: FloatArray, block: InteropScope.(InteropPointer) -> Unit): FloatArray = interopScope {
+internal inline fun withResult(result: FloatArray, block: InteropScope.(InteropPointer) -> Unit): FloatArray = interopScope {
     val handle = toInteropForResult(result)
     block(handle)
     handle.fromInterop(result)
     result
 }
 
-inline fun withNullableResult(result: FloatArray, block: InteropScope.(InteropPointer) -> Boolean): FloatArray? = interopScope {
+internal inline fun withNullableResult(result: FloatArray, block: InteropScope.(InteropPointer) -> Boolean): FloatArray? = interopScope {
     val handle = toInteropForResult(result)
     val blockResult = block(handle)
     if (blockResult) {
@@ -111,14 +111,14 @@ inline fun withNullableResult(result: FloatArray, block: InteropScope.(InteropPo
     }
 }
 
-inline fun withResult(result: IntArray, block: InteropScope.(InteropPointer) -> Unit): IntArray = interopScope {
+internal inline fun withResult(result: IntArray, block: InteropScope.(InteropPointer) -> Unit): IntArray = interopScope {
     val handle = toInteropForResult(result)
     block(handle)
     handle.fromInterop(result)
     result
 }
 
-inline fun withNullableResult(result: IntArray, block: InteropScope.(InteropPointer) -> Boolean): IntArray? = interopScope {
+internal inline fun withNullableResult(result: IntArray, block: InteropScope.(InteropPointer) -> Boolean): IntArray? = interopScope {
     val handle = toInteropForResult(result)
     return if (block(handle)) {
         handle.fromInterop(result)
@@ -128,21 +128,21 @@ inline fun withNullableResult(result: IntArray, block: InteropScope.(InteropPoin
     }
 }
 
-inline fun withResult(result: ShortArray, block: InteropScope.(InteropPointer) -> Unit): ShortArray = interopScope {
+internal inline fun withResult(result: ShortArray, block: InteropScope.(InteropPointer) -> Unit): ShortArray = interopScope {
     val handle = toInteropForResult(result)
     block(handle)
     handle.fromInterop(result)
     result
 }
 
-inline fun withResult(result: DoubleArray, block: InteropScope.(InteropPointer) -> Unit): DoubleArray = interopScope {
+internal inline fun withResult(result: DoubleArray, block: InteropScope.(InteropPointer) -> Unit): DoubleArray = interopScope {
     val handle = toInteropForResult(result)
     block(handle)
     handle.fromInterop(result)
     result
 }
 
-inline fun withResult(result: NativePointerArray, block: InteropScope.(InteropPointer) -> Unit): NativePointerArray = interopScope {
+internal inline fun withResult(result: NativePointerArray, block: InteropScope.(InteropPointer) -> Unit): NativePointerArray = interopScope {
     val handle = toInteropForResult(result)
     block(handle)
     handle.fromInterop(result)
@@ -153,13 +153,11 @@ inline fun withResult(result: NativePointerArray, block: InteropScope.(InteropPo
 /**
  * Creates String from SkString* result and deletes SkString*.
  */
-@Suppress("NON_PUBLIC_CALL_FROM_PUBLIC_INLINE")
-inline fun withStringResult(block: () -> NativePointer): String {
+internal inline fun withStringResult(block: () -> NativePointer): String {
     return ManagedString(block()).use { it.toString() }
 }
 
-@Suppress("NON_PUBLIC_CALL_FROM_PUBLIC_INLINE")
-inline fun withStringResult(pointer: NativePointer): String {
+internal inline fun withStringResult(pointer: NativePointer): String {
     return ManagedString(pointer).use { it.toString() }
 }
 
@@ -168,14 +166,12 @@ inline fun withStringResult(pointer: NativePointer): String {
  * It is caller responsibility to destroy underlying SkString. Use it if pointer
  * is received from reference (SkString&)
  */
-@Suppress("NON_PUBLIC_CALL_FROM_PUBLIC_INLINE")
-inline fun withStringReferenceResult(block: () -> NativePointer): String {
+internal inline fun withStringReferenceResult(block: () -> NativePointer): String {
     val string = ManagedString(block(), false)
     return string.toString()
 }
 
-@Suppress("NON_PUBLIC_CALL_FROM_PUBLIC_INLINE")
-inline fun withStringReferenceNullableResult(block: () -> NativePointer): String? {
+internal inline fun withStringReferenceNullableResult(block: () -> NativePointer): String? {
     val ptr = block()
     if (ptr == Native.NullPointer) return null
 
@@ -184,7 +180,7 @@ inline fun withStringReferenceNullableResult(block: () -> NativePointer): String
 }
 
 
-interface ArrayInteropDecoder<T> {
+internal interface ArrayInteropDecoder<T> {
     fun getArrayElement(array: InteropPointer, index: Int): T
     fun getArraySize(array: InteropPointer): Int
     fun disposeArray(array: InteropPointer)

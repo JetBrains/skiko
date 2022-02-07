@@ -77,7 +77,7 @@ class Font : Managed {
      * Compares fonts, and returns true if they are equivalent.
      * May return false if Typeface has identical contents but different pointers.
      */
-    override fun _nativeEquals(other: Native?): Boolean {
+    override fun nativeEquals(other: Native?): Boolean {
         return try {
             Font_nEquals(_ptr, getPtr(other))
         } finally {

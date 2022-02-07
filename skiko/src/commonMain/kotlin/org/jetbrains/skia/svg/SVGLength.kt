@@ -40,6 +40,6 @@ class SVGLength(val value: Float, val unit: SVGLengthUnit) {
     }
 
     fun withUnit(_unit: SVGLengthUnit): SVGLength {
-        return if (this.unit === unit) this else SVGLength(value, unit)
+        return if (this.unit === _unit) this else SVGLength(value, unit)
     }
 }

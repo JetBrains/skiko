@@ -659,7 +659,7 @@ private external fun _nMakeArithmetic(
     enforcePMColor: Boolean,
     bg: NativePointer,
     fg: NativePointer,
-    crop: InteropPointer?
+    crop: InteropPointer
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeBlend")

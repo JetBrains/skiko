@@ -134,7 +134,7 @@ class LineMetrics(
         return result
     }
 
-    companion object : ArrayInteropDecoder<LineMetrics> {
+    internal companion object : ArrayInteropDecoder<LineMetrics> {
         override fun getArraySize(array: InteropPointer) = LineMetrics_nGetArraySize(array)
         override fun disposeArray(array: InteropPointer) = LineMetrics_nDisposeArray(array)
         override fun getArrayElement(array: InteropPointer, index: Int): LineMetrics {

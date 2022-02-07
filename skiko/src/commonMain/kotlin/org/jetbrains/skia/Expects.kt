@@ -1,10 +1,10 @@
 package org.jetbrains.skia
 
-expect fun <R> commonSynchronized(lock: Any, block: () -> R)
+internal expect fun <R> commonSynchronized(lock: Any, block: () -> R)
 
-expect fun String.intCodePoints(): IntArray
+internal expect fun String.intCodePoints(): IntArray
 
-expect fun defaultLanguageTag(): String
+internal expect fun defaultLanguageTag(): String
 
 expect abstract class OutputStream
 
@@ -19,7 +19,7 @@ expect class Matcher {
     fun matches(): Boolean
 }
 
-expect fun compilePattern(regex: String): Pattern
+internal expect fun compilePattern(regex: String): Pattern
 
 @OptIn(ExperimentalMultiplatform::class)
 @OptionalExpectation

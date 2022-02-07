@@ -49,7 +49,7 @@ class Paint : Managed {
         }
     }
 
-    override fun _nativeEquals(other: Native?): Boolean {
+    override fun nativeEquals(other: Native?): Boolean {
         return try {
             Paint_nEquals(_ptr, getPtr(other))
         } finally {

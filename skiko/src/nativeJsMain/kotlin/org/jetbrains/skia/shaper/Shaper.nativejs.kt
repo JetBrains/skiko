@@ -78,7 +78,7 @@ sealed class RunIteratorBase(type: Int, ptr: NativePointer) : Managed(ptr, _Fina
         }
     }
 
-    protected abstract fun InteropScope.getOnCurrentCallback(): InteropPointer
+    internal abstract fun InteropScope.getOnCurrentCallback(): InteropPointer
 
     companion object {
         fun fromIterator(iterator: Iterator<BidiRun?>, text: ManagedString): RunIteratorBase =

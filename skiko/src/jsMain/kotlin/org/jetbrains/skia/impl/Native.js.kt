@@ -9,12 +9,12 @@ actual abstract class Native actual constructor(ptr: NativePointer) {
         if (this === other) return true
         if (null == other) return false
         if (other !is Native) return false
-        return if (_ptr == other._ptr) true else _nativeEquals(other)
+        return if (_ptr == other._ptr) true else nativeEquals(other)
     }
 
     override fun hashCode(): Int = _ptr
 
-    actual open fun _nativeEquals(other: Native?): Boolean {
+    internal actual open fun nativeEquals(other: Native?): Boolean {
         return false
     }
 
@@ -33,14 +33,12 @@ actual abstract class Native actual constructor(ptr: NativePointer) {
     }
 }
 
-actual fun reachabilityBarrier(obj: Any?) {
-    // TODO: impl later
-}
+internal actual fun reachabilityBarrier(obj: Any?) {}
 
 actual typealias NativePointer = Int
 actual typealias InteropPointer = Int
 
-actual inline fun <T> interopScope(block: InteropScope.() -> T): T {
+internal actual inline fun <T> interopScope(block: InteropScope.() -> T): T {
     val scope = InteropScope()
     try {
         return scope.block()
@@ -49,7 +47,7 @@ actual inline fun <T> interopScope(block: InteropScope.() -> T): T {
     }
 }
 
-actual class InteropScope actual constructor() {
+internal actual class InteropScope actual constructor() {
     private val elements = mutableListOf<NativePointer>()
     private var callbacksInitialized = false
 
@@ -216,7 +214,7 @@ actual class InteropScope actual constructor() {
 
     actual inline fun <reified T> InteropPointer.fromInterop(decoder: ArrayInteropDecoder<T>): Array<T> {
         val size = decoder.getArraySize(this)
-        val result = Array<T>(size) {
+        val result = Array(size) {
             decoder.getArrayElement(this, it)
         }
         decoder.disposeArray(this)

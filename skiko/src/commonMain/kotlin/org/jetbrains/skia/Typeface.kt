@@ -155,7 +155,7 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     /**
      * @return  true if the two typefaces reference the same underlying font, treating null as the default font
      */
-    override fun _nativeEquals(other: Native?): Boolean {
+    override fun nativeEquals(other: Native?): Boolean {
         return try {
             Typeface_nEquals(_ptr, getPtr(other))
         } finally {
