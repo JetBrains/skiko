@@ -5,10 +5,6 @@ $dokka.location:org.jetbrains.skia.impl//use/TypeParam(bounds=[org.jetbrains.ski
 $dokka.location:org.jetbrains.skia.impl/BufferUtil///PointingToDeclaration/skiko/org.jetbrains.skia.impl/-buffer-util/index.html
 $dokka.location:org.jetbrains.skia.impl/BufferUtil/getByteBufferFromPointer/#kotlin.Long#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia.impl/-buffer-util/get-byte-buffer-from-pointer.html
 $dokka.location:org.jetbrains.skia.impl/BufferUtil/getPointerFromByteBuffer/#java.nio.ByteBuffer/PointingToDeclaration/skiko/org.jetbrains.skia.impl/-buffer-util/get-pointer-from-byte-buffer.html
-$dokka.location:org.jetbrains.skia.impl/FinalizationRegistry///PointingToDeclaration/skiko/org.jetbrains.skia.impl/-finalization-registry/index.html
-$dokka.location:org.jetbrains.skia.impl/FinalizationRegistry/FinalizationRegistry/#kotlin.Function1[kotlin.Any,kotlin.Unit]/PointingToDeclaration/skiko/org.jetbrains.skia.impl/-finalization-registry/-finalization-registry.html
-$dokka.location:org.jetbrains.skia.impl/FinalizationRegistry/register/#kotlin.Any#kotlin.Any/PointingToDeclaration/skiko/org.jetbrains.skia.impl/-finalization-registry/register.html
-$dokka.location:org.jetbrains.skia.impl/FinalizationRegistry/unregister/#kotlin.Any/PointingToDeclaration/skiko/org.jetbrains.skia.impl/-finalization-registry/unregister.html
 $dokka.location:org.jetbrains.skia.impl/InteropPointer///PointingToDeclaration/skiko/org.jetbrains.skia.impl/-interop-pointer/index.html
 $dokka.location:org.jetbrains.skia.impl/Library.Companion///PointingToDeclaration/skiko/org.jetbrains.skia.impl/-library/-companion/index.html
 $dokka.location:org.jetbrains.skia.impl/Library.Companion/_nAfterLoad/#/PointingToDeclaration/skiko/org.jetbrains.skia.impl/-library/-companion/_n-after-load.html
