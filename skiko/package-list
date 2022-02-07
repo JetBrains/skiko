@@ -720,12 +720,12 @@ $dokka.location:org.jetbrains.skia//useContext/org.jetbrains.skia.DirectContext#
 $dokka.location:org.jetbrains.skia/AnimationDisposalMethod.KEEP///PointingToDeclaration/skiko/org.jetbrains.skia/-animation-disposal-method/-k-e-e-p/index.html
 $dokka.location:org.jetbrains.skia/AnimationDisposalMethod.RESTORE_BG_COLOR///PointingToDeclaration/skiko/org.jetbrains.skia/-animation-disposal-method/-r-e-s-t-o-r-e_-b-g_-c-o-l-o-r/index.html
 $dokka.location:org.jetbrains.skia/AnimationDisposalMethod.RESTORE_PREVIOUS///PointingToDeclaration/skiko/org.jetbrains.skia/-animation-disposal-method/-r-e-s-t-o-r-e_-p-r-e-v-i-o-u-s/index.html
-$dokka.location:org.jetbrains.skia/AnimationDisposalMethod._UNUSED///PointingToDeclaration/skiko/org.jetbrains.skia/-animation-disposal-method/_-u-n-u-s-e-d/index.html
+$dokka.location:org.jetbrains.skia/AnimationDisposalMethod.UNUSED///PointingToDeclaration/skiko/org.jetbrains.skia/-animation-disposal-method/-u-n-u-s-e-d/index.html
 $dokka.location:org.jetbrains.skia/AnimationDisposalMethod///PointingToDeclaration/skiko/org.jetbrains.skia/-animation-disposal-method/index.html
 $dokka.location:org.jetbrains.skia/AnimationDisposalMode.KEEP///PointingToDeclaration/skiko/org.jetbrains.skia/-animation-disposal-mode/-k-e-e-p/index.html
 $dokka.location:org.jetbrains.skia/AnimationDisposalMode.RESTORE_BG_COLOR///PointingToDeclaration/skiko/org.jetbrains.skia/-animation-disposal-mode/-r-e-s-t-o-r-e_-b-g_-c-o-l-o-r/index.html
 $dokka.location:org.jetbrains.skia/AnimationDisposalMode.RESTORE_PREVIOUS///PointingToDeclaration/skiko/org.jetbrains.skia/-animation-disposal-mode/-r-e-s-t-o-r-e_-p-r-e-v-i-o-u-s/index.html
-$dokka.location:org.jetbrains.skia/AnimationDisposalMode._UNUSED///PointingToDeclaration/skiko/org.jetbrains.skia/-animation-disposal-mode/_-u-n-u-s-e-d/index.html
+$dokka.location:org.jetbrains.skia/AnimationDisposalMode.UNUSED///PointingToDeclaration/skiko/org.jetbrains.skia/-animation-disposal-mode/-u-n-u-s-e-d/index.html
 $dokka.location:org.jetbrains.skia/AnimationDisposalMode///PointingToDeclaration/skiko/org.jetbrains.skia/-animation-disposal-mode/index.html
 $dokka.location:org.jetbrains.skia/AnimationFrameInfo.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-animation-frame-info/-companion/index.html
 $dokka.location:org.jetbrains.skia/AnimationFrameInfo///PointingToDeclaration/skiko/org.jetbrains.skia/-animation-frame-info/index.html
@@ -1170,7 +1170,7 @@ $dokka.location:org.jetbrains.skia/EncodedOrigin.RIGHT_BOTTOM///PointingToDeclar
 $dokka.location:org.jetbrains.skia/EncodedOrigin.RIGHT_TOP///PointingToDeclaration/skiko/org.jetbrains.skia/-encoded-origin/-r-i-g-h-t_-t-o-p/index.html
 $dokka.location:org.jetbrains.skia/EncodedOrigin.TOP_LEFT///PointingToDeclaration/skiko/org.jetbrains.skia/-encoded-origin/-t-o-p_-l-e-f-t/index.html
 $dokka.location:org.jetbrains.skia/EncodedOrigin.TOP_RIGHT///PointingToDeclaration/skiko/org.jetbrains.skia/-encoded-origin/-t-o-p_-r-i-g-h-t/index.html
-$dokka.location:org.jetbrains.skia/EncodedOrigin._UNUSED///PointingToDeclaration/skiko/org.jetbrains.skia/-encoded-origin/_-u-n-u-s-e-d/index.html
+$dokka.location:org.jetbrains.skia/EncodedOrigin.UNUSED///PointingToDeclaration/skiko/org.jetbrains.skia/-encoded-origin/-u-n-u-s-e-d/index.html
 $dokka.location:org.jetbrains.skia/EncodedOrigin///PointingToDeclaration/skiko/org.jetbrains.skia/-encoded-origin/index.html
 $dokka.location:org.jetbrains.skia/EncodedOrigin/swapsWidthHeight/#/PointingToDeclaration/skiko/org.jetbrains.skia/-encoded-origin/swaps-width-height.html
 $dokka.location:org.jetbrains.skia/EncodedOrigin/toMatrix/#kotlin.Int#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia/-encoded-origin/to-matrix.html
