@@ -10,7 +10,7 @@ actual fun runTest(block: suspend () -> Unit) {
     runBlocking { block() }
 }
 
-actual fun InteropScope.allocateBytesForPixels(size: Int): NativePointer {
+internal actual fun InteropScope.allocateBytesForPixels(size: Int): NativePointer {
     return toInterop(ByteArray(size))
 }
 

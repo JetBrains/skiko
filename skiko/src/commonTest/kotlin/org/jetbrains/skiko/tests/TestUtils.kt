@@ -6,7 +6,7 @@ import org.jetbrains.skia.impl.NativePointer
 
 expect fun runTest(block: suspend () -> Unit)
 
-expect fun InteropScope.allocateBytesForPixels(size: Int): NativePointer
+internal expect fun InteropScope.allocateBytesForPixels(size: Int): NativePointer
 
 expect annotation class SkipNativeTarget
 
