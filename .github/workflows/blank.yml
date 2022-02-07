@@ -170,7 +170,7 @@ jobs:
           distribution: 'adopt'
           java-version: '11'
       - name: Build docs
-        run: bash -c "JAVA_OPTS="-Xmx4g" ./gradlew --no-daemon  -Pskiko.native.enabled=true -Pskiko.wasm.enabled=true -Pskiko.android.enabled=true :skiko:dokkaHtml"
+        run: bash -c 'JAVA_OPTS="-Xmx4g" ./gradlew --no-daemon  -Pskiko.native.enabled=true -Pskiko.wasm.enabled=true -Pskiko.android.enabled=true :skiko:dokkaHtml'
       - name: Publish documentation
         uses: JamesIves/github-pages-deploy-action@releases/v3
         with:
