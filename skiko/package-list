@@ -1,8 +1,6 @@
 $dokka.format:html-v1
 $dokka.linkExtension:html
 $dokka.location:org.jetbrains.skia.impl////PointingToDeclaration/skiko/org.jetbrains.skia.impl/index.html
-$dokka.location:org.jetbrains.skia.impl//RefCnt_nGetFinalizer/#/PointingToDeclaration/skiko/org.jetbrains.skia.impl/-ref-cnt_n-get-finalizer.html
-$dokka.location:org.jetbrains.skia.impl//_nInvokeFinalizer/#NativePtr#NativePtr/PointingToDeclaration/skiko/org.jetbrains.skia.impl/_n-invoke-finalizer.html
 $dokka.location:org.jetbrains.skia.impl//use/TypeParam(bounds=[org.jetbrains.skia.impl.Managed])#kotlin.Function1[TypeParam(bounds=[org.jetbrains.skia.impl.Managed]),TypeParam(bounds=[kotlin.Any?])]/PointingToDeclaration/skiko/org.jetbrains.skia.impl/use.html
 $dokka.location:org.jetbrains.skia.impl/BufferUtil///PointingToDeclaration/skiko/org.jetbrains.skia.impl/-buffer-util/index.html
 $dokka.location:org.jetbrains.skia.impl/BufferUtil/getByteBufferFromPointer/#kotlin.Long#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia.impl/-buffer-util/get-byte-buffer-from-pointer.html
