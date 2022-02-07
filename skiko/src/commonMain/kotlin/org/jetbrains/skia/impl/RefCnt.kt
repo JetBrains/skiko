@@ -13,4 +13,4 @@ expect abstract class RefCnt : Managed {
     val refCount: Int
 }
 
-expect fun RefCnt_nGetFinalizer(): NativePointer
+internal expect fun RefCnt_nGetFinalizer(): NativePointer

@@ -31,4 +31,4 @@ actual abstract class RefCnt : Managed {
     }
 }
 
-actual fun RefCnt_nGetFinalizer() = RefCnt._nGetFinalizer()
+internal actual fun RefCnt_nGetFinalizer() = RefCnt._nGetFinalizer()
