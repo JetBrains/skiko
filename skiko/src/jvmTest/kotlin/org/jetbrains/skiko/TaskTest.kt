@@ -117,7 +117,7 @@ internal class TaskTest {
         }
     }
 
-    @Test(timeout = 5000)
+    @Test(timeout = 10000)
     fun `simulate MacOs layer with another renderings`() {
         runBlocking {
             val job = Job()
