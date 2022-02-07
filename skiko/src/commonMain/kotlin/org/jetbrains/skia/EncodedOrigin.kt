@@ -1,7 +1,7 @@
 package org.jetbrains.skia
 
 enum class EncodedOrigin {
-    _UNUSED,
+    UNUSED,
 
     /**
      * Default
