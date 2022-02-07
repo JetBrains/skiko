@@ -1,6 +1,9 @@
 package org.jetbrains.skia
 
 enum class EncodedOrigin {
+    /**
+     * Do not use
+     */
     UNUSED,
 
     /**

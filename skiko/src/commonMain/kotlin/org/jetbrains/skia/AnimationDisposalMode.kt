@@ -8,6 +8,9 @@ package org.jetbrains.skia
  * Names are based on the GIF 89a spec.
  */
 enum class AnimationDisposalMode {
+    /**
+     * Do not use
+     */
     UNUSED,
 
     /**
