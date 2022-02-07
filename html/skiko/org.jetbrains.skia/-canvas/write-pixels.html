@@ -1,0 +1,41 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>writePixels</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>    <script>const storage = localStorage.getItem("dokka-dark-mode")
+const savedDarkMode = storage ? JSON.parse(storage) : false
+if(savedDarkMode === true){
+    document.getElementsByTagName("html")[0].classList.add("theme-dark")
+}</script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script><link href="../../../styles/style.css" rel="Stylesheet"><link href="../../../styles/jetbrains-mono.css" rel="Stylesheet"><link href="../../../styles/main.css" rel="Stylesheet"><link href="../../../styles/prism.css" rel="Stylesheet"><link href="../../../styles/logo-styles.css" rel="Stylesheet"><script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script><script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script><script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script><script type="text/javascript" src="../../../scripts/main.js" defer="defer"></script><script type="text/javascript" src="../../../scripts/prism.js" async="async"></script>  </head>
+  <body>
+    <div class="navigation-wrapper" id="navigation-wrapper">
+      <div id="leftToggler"><span class="icon-toggler"></span></div>
+      <div class="library-name"><a href="../../../index.html">skiko</a></div>
+      <div>0.0.0-SNAPSHOT</div>
+      <div class="pull-right d-flex">
+        <div class="filter-section" id="filter-section"><button class="platform-tag platform-selector common-like" data-active="" data-filter=":dokkaHtml/commonMain">common</button></div>
+<button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+      </div>
+    </div>
+    <div id="container">
+      <div id="leftColumn">
+        <div id="sideMenu"></div>
+      </div>
+      <div id="main">
+        <div class="main-content" id="content" pageIds="skiko::org.jetbrains.skia/Canvas/writePixels/#org.jetbrains.skia.Bitmap#kotlin.Int#kotlin.Int/PointingToDeclaration//788909594">
+          <div class="breadcrumbs"><a href="../../../index.html">skiko</a>/<a href="../index.html">org.jetbrains.skia</a>/<a href="index.html">Canvas</a>/<a href="write-pixels.html">writePixels</a></div>
+          <div class="cover ">
+            <h1 class="cover"><span>write</span><wbr></wbr><span><span>Pixels</span></span></h1>
+          </div>
+          <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+            <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain" data-active="" data-toggle=":dokkaHtml/commonMain">common</button></div>
+<div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="write-pixels.html"><span class="token function">writePixels</span></a><span class="token punctuation">(</span>bitmap<span class="token operator">: </span><a href="../-bitmap/index.html">Bitmap</a><span class="token punctuation">, </span>x<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span>y<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">Copies Rect from pixels to Canvas. Matrix and clip are ignored. Source Rect corners are (0, 0) and (bitmap.width(), bitmap.height()).</p><p class="paragraph">Destination Rect corners are (x, y) and (imageInfo().width(), imageInfo().height()).</p><p class="paragraph">Copies each readable pixel intersecting both rectangles, without scaling, converting to getImageInfo().getColorType() and getImageInfo().getAlphaType() if required.</p><p class="paragraph">Pixels are writable when BaseDevice is raster, or backed by a GPU. Pixels are not writable when Canvas is returned by Document::beginPage, returned by PictureRecorder::beginRecording, or Canvas is the base of a utility class like DebugCanvas.</p><p class="paragraph">Pixel values are converted only if ColorType and AlphaType do not match. Only pixels within both source and destination rectangles are copied. Canvas pixels outside Rect intersection are unchanged.</p><p class="paragraph">Pass negative values for x or y to offset pixels to the left or above Canvas pixels.</p><p class="paragraph">Does not copy, and returns false if:</p><ul><li><p class="paragraph">Source and destination rectangles do not intersect.</p></li><li><p class="paragraph">bitmap does not have allocated pixels.</p></li><li><p class="paragraph">bitmap pixels could not be converted to Canvas getImageInfo().getColorType() or getImageInfo().getAlphaType().</p></li><li><p class="paragraph">Canvas pixels are not writable; for instance, Canvas is document based.</p></li><li><p class="paragraph">bitmap pixels are inaccessible; for instance, bitmap wraps a texture.</p></li></ul><h4 class="">Return</h4><p class="paragraph">true if pixels were written to Canvas</p><h2 class="">See also</h2><div data-togglable="See also"><div class="table" data-togglable="See also"><div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><div></div></span></div><div><div class="title"><div data-togglable="See also"><p class="paragraph"><a href="https://fiddle.skia.org/c/@State_Stack_b">https://fiddle.skia.org/c/@State_Stack_b</a></p></div></div></div></div></div></div></div><h2 class="">Parameters</h2><div data-togglable="Parameters"><div class="table" data-togglable="Parameters"><div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><div><span><span>bitmap</span></span></div></span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">contains pixels copied to Canvas</p></div></div></div></div></div><div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><div><span><span>x</span></span></div></span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">offset into Canvas writable pixels on x-axis; may be negative</p></div></div></div></div></div><div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><div><span><span>y</span></span></div></span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">offset into Canvas writable pixels on y-axis; may be negative</p></div></div></div></div></div></div></div></div>          </div>
+        </div>
+        <div class="footer"><span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2022 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span></div>
+      </div>
+    </div>
+  </body>
+</html>
+
