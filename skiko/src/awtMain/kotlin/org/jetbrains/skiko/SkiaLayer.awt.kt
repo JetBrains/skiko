@@ -65,8 +65,6 @@ actual open class SkiaLayer internal constructor(
     val canvas: java.awt.Canvas
         get() = backedLayer
 
-    private var vrrDisplayLocker: JPanel? = null
-
     init {
         isOpaque = false
         layout = null
@@ -249,14 +247,6 @@ actual open class SkiaLayer internal constructor(
                 renderApi = fallbackRenderApiQueue.removeAt(0)
                 redrawer?.dispose()
                 redrawer = renderFactory.createRedrawer(this, renderApi, properties)
-                vrrDisplayLocker?.let { remove(it) }
-                if (hostOs == OS.Windows && (renderApi == GraphicsApi.DIRECT3D || renderApi == GraphicsApi.OPENGL)) {
-                    vrrDisplayLocker = JPanel().apply {
-                        background = Color(0, 0, 0, 0)
-                        setBounds(0, 0, 1, 1)
-                    }
-                    add(vrrDisplayLocker, Integer.valueOf(0))
-                }
                 redrawer?.syncSize()
             } catch (e: RenderException) {
                 println(e.message)
@@ -317,7 +307,6 @@ actual open class SkiaLayer internal constructor(
         }
         super.setBounds(x, y, roundedWidth, roundedHeight)
         backedLayer.setSize(roundedWidth, roundedHeight)
-        vrrDisplayLocker?.setBounds(0, 0, 1, 1)
         redrawer?.syncSize()
     }
 
