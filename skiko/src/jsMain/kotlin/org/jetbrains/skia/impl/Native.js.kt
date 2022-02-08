@@ -38,12 +38,18 @@ internal actual fun reachabilityBarrier(obj: Any?) {}
 actual typealias NativePointer = Int
 actual typealias InteropPointer = Int
 
+private val INTEROP_SCOPE = InteropScope()
+private var interopScopeCounter = 0
+
 internal actual inline fun <T> interopScope(block: InteropScope.() -> T): T {
-    val scope = InteropScope()
     try {
-        return scope.block()
+        interopScopeCounter++
+        return INTEROP_SCOPE.block()
     } finally {
-        scope.release()
+        interopScopeCounter--
+        if (interopScopeCounter == 0) {
+            INTEROP_SCOPE.release()
+        }
     }
 }
 
@@ -263,6 +269,7 @@ internal actual class InteropScope actual constructor() {
         elements.forEach {
             _free(it)
         }
+        elements.clear()
         releaseCallbacks()
     }
 
