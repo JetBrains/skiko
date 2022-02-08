@@ -4,20 +4,26 @@ import org.jetbrains.skia.impl.NativePointer
 import org.w3c.dom.HTMLCanvasElement
 import kotlin.js.Promise
 
-external val wasmSetup: Promise<Boolean>
+/**
+ * Invokes a callback [onReady] as soon as onRuntimeInitialized happens.
+ * Calling onWasmReady after onRuntimeInitialized invokes [onReady] as well.
+ * It's safe to call wasm functions within [onReady] callback, or after it was invoked.
+ */
 external fun onWasmReady(onReady: () -> Unit)
 
-external interface GLInterface {
+internal external val wasmSetup: Promise<Boolean>
+
+private external interface GLInterface {
     fun createContext(context: HTMLCanvasElement, contextAttributes: dynamic): NativePointer;
     fun makeContextCurrent(contextPointer: NativePointer): Boolean;
 }
 
-external object GL : GLInterface {
+internal external object GL : GLInterface {
     override fun createContext(context: HTMLCanvasElement, contextAttributes: dynamic): Int = definedExternally
     override fun makeContextCurrent(contextPointer: NativePointer): Boolean = definedExternally
 }
 
-external interface ContextAttributes {
+internal external interface ContextAttributes {
     val alpha: Int?
     val depth: Int?
     val stencil: Int?
@@ -32,7 +38,7 @@ external interface ContextAttributes {
     val majorVersion: Int?
 }
 
-fun ContextAttributes.asJsObject(): dynamic {
+internal fun ContextAttributes.asJsObject(): dynamic {
     val jsObject = js("{}")
     alpha?.let { jsObject.alpha = alpha }
     depth?.let { jsObject.depth = depth }
@@ -50,7 +56,7 @@ fun ContextAttributes.asJsObject(): dynamic {
 }
 
 
-fun CreateWebGLContext(canvas: HTMLCanvasElement, attr: ContextAttributes? = null): NativePointer {
+internal fun createWebGLContext(canvas: HTMLCanvasElement, attr: ContextAttributes? = null): NativePointer {
     val contextAttributes = object : ContextAttributes {
         override val alpha = attr?.alpha ?: 1
         override val depth = attr?.depth ?: 1

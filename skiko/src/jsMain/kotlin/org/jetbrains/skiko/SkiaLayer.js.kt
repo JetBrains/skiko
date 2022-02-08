@@ -8,27 +8,56 @@ import org.w3c.dom.events.KeyboardEvent
 import org.w3c.dom.events.MouseEvent
 import org.w3c.dom.events.WheelEvent
 
+/**
+ * Provides a way to render the content and to receive the input events.
+ * Rendering and events processing should be implemented in [skikoView].
+ *
+ * SkikoLayer needs to be initialized with [HTMLCanvasElement] instance
+ * using [attachTo] method.
+ */
 actual open class SkiaLayer {
     private var state: CanvasRenderer? = null
 
+    /**
+     * [GraphicsApi.WEBGL] is the only supported renderApi for k/js (browser).
+     */
     actual var renderApi: GraphicsApi = GraphicsApi.WEBGL
+
+    /**
+     * See https://developer.mozilla.org/en-US/docs/Web/API/Window/devicePixelRatio
+     */
     actual val contentScale: Float
         get() = window.devicePixelRatio.toFloat()
+
+    /**
+     * Fullscreen is not supported
+     */
     actual var fullscreen: Boolean
         get() = false
         set(value) {
             if (value) throw Exception("Fullscreen is not supported!")
         }
+
+    /**
+     * Transparency is not supported
+     */
     actual var transparency: Boolean
         get() = false
         set(value) {
             if (value) throw Exception("Transparency is not supported!")
         }
 
+    /**
+     * Schedules a drawFrame to the appropriate moment.
+     */
     actual fun needRedraw() {
         state?.needRedraw()
     }
 
+    /**
+     * An implementation of SkikoView with content rendering and
+     * event processing logic.
+     */
     actual var skikoView: SkikoView? = null
 
     actual fun attachTo(container: Any) {
@@ -44,6 +73,10 @@ actual open class SkiaLayer {
     private var desiredWidth = 0
     private var desiredHeight = 0
 
+    /**
+     * Initializes the [CanvasRenderer] and events listeners.
+     * Delegates rendering and events processing to [skikoView].
+     */
     fun attachTo(htmlCanvas: HTMLCanvasElement, autoDetach: Boolean = true) {
         // Scale canvas to allow high DPI rendering as suggested in
         // https://www.khronos.org/webgl/wiki/HandlingHighDPI.
