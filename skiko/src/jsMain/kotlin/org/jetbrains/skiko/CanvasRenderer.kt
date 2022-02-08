@@ -12,15 +12,35 @@ import org.jetbrains.skiko.wasm.createWebGLContext
 import org.jetbrains.skiko.wasm.GL
 import org.w3c.dom.HTMLCanvasElement
 
+/**
+ * CanvasRenderer takes an [HTMLCanvasElement] instance and initializes
+ * skiko's [Canvas] used for drawing (see [initCanvas]).
+ *
+ * After initialization [needRedraw] can be used to schedule a call to [drawFrame].
+ * [drawFrame] has to be implemented to perform the actual drawing on [canvas].
+ */
 abstract class CanvasRenderer constructor(val htmlCanvas: HTMLCanvasElement) {
     private val contextPointer = createWebGLContext(htmlCanvas)
     private val context: DirectContext
     private var surface: Surface? = null
     private var renderTarget: BackendRenderTarget? = null
-    var canvas: Canvas? = null
 
+    /**
+     * An instance of skiko [Canvas] used for drawing.
+     * Created in [initCanvas].
+     */
+    protected var canvas: Canvas? = null
+        private set
+
+    /**
+     * The current width of [htmlCanvas]
+     */
     val width: Int
         get() = htmlCanvas.width
+
+    /**
+     * The current height of [htmlCanvas]
+     */
     val height: Int
         get() = htmlCanvas.height
 
@@ -29,6 +49,14 @@ abstract class CanvasRenderer constructor(val htmlCanvas: HTMLCanvasElement) {
         context = DirectContext.makeGL()
     }
 
+    /**
+     * Initializes the canvas.
+     *
+     * @param desiredWidth - width in pixels
+     * @param desiredHeight - height in pixels
+     * @param scale - a value to adjust the canvas' size
+     * (https://developer.mozilla.org/en-US/docs/Web/API/Window/devicePixelRatio)
+     */
     fun initCanvas(desiredWidth: Int, desiredHeight: Int, scale: Float) {
         disposeCanvas()
         htmlCanvas.width = (desiredWidth * scale).toInt()
@@ -44,17 +72,25 @@ abstract class CanvasRenderer constructor(val htmlCanvas: HTMLCanvasElement) {
         canvas = surface!!.canvas
     }
 
-    fun disposeCanvas() {
+    private fun disposeCanvas() {
         surface?.close()
         surface = null
         renderTarget?.close()
         renderTarget = null
     }
 
+    /**
+     * This function should implement the actual drawing on the canvas.
+     *
+     * @param currentTimestamp - in milliseconds
+     */
     abstract fun drawFrame(currentTimestamp: Double)
 
     private var redrawScheduled = false
 
+    /**
+     * Schedules a call to [drawFrame] to the appropriate moment.
+     */
     fun needRedraw() {
         if (redrawScheduled) {
             return
