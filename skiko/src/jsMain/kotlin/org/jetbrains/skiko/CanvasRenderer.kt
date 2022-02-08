@@ -8,12 +8,12 @@ import org.jetbrains.skia.DirectContext
 import org.jetbrains.skia.Surface
 import org.jetbrains.skia.SurfaceColorFormat
 import org.jetbrains.skia.SurfaceOrigin
-import org.jetbrains.skiko.wasm.CreateWebGLContext
+import org.jetbrains.skiko.wasm.createWebGLContext
 import org.jetbrains.skiko.wasm.GL
 import org.w3c.dom.HTMLCanvasElement
 
 abstract class CanvasRenderer constructor(val htmlCanvas: HTMLCanvasElement) {
-    private val contextPointer = CreateWebGLContext(htmlCanvas)
+    private val contextPointer = createWebGLContext(htmlCanvas)
     private val context: DirectContext
     private var surface: Surface? = null
     private var renderTarget: BackendRenderTarget? = null
