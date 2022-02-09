@@ -188,14 +188,17 @@ class Shaper internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
         return this
     }
 
+    private var managedStringForShapeLine: ManagedString? = null
+
     fun shapeLine(text: String?, font: Font?, opts: ShapingOptions): TextLine {
         return try {
             Stats.onNativeCall()
+            managedStringForShapeLine = ManagedString(text)
             interopScope {
                 TextLine(
                     _nShapeLine(
                         _ptr,
-                        ManagedString(text)._ptr,
+                        managedStringForShapeLine!!._ptr,
                         getPtr(font),
                         optsFeaturesLen = opts.features?.size ?: 0,
                         optsFeatures = arrayOfFontFeaturesToInterop(opts.features),
