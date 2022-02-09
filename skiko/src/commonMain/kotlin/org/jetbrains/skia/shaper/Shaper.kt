@@ -105,10 +105,11 @@ class Shaper internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
     fun shape(text: String?, font: Font?, opts: ShapingOptions, width: Float, offset: Point): TextBlob? {
         return try {
             Stats.onNativeCall()
+            val managedString = ManagedString(text)
             val ptr = interopScope {
                 _nShapeBlob(
                     _ptr,
-                    ManagedString(text)._ptr,
+                    managedString._ptr,
                     getPtr(font),
                     optsFeaturesLen = opts.features?.size ?: 0,
                     optsFeaturesIntArray = arrayOfFontFeaturesToInterop(opts.features),
@@ -191,11 +192,12 @@ class Shaper internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
     fun shapeLine(text: String?, font: Font?, opts: ShapingOptions): TextLine {
         return try {
             Stats.onNativeCall()
+            val managedString = ManagedString(text)
             interopScope {
                 TextLine(
                     _nShapeLine(
                         _ptr,
-                        ManagedString(text)._ptr,
+                        managedString._ptr,
                         getPtr(font),
                         optsFeaturesLen = opts.features?.size ?: 0,
                         optsFeatures = arrayOfFontFeaturesToInterop(opts.features),
