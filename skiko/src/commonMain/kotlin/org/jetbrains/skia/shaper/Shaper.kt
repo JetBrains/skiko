@@ -192,12 +192,12 @@ class Shaper internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
     fun shapeLine(text: String?, font: Font?, opts: ShapingOptions): TextLine {
         return try {
             Stats.onNativeCall()
-            val manageString = ManagedString(text)
+            val managedString = ManagedString(text)
             interopScope {
                 TextLine(
                     _nShapeLine(
                         _ptr,
-                        manageString._ptr,
+                        managedString._ptr,
                         getPtr(font),
                         optsFeaturesLen = opts.features?.size ?: 0,
                         optsFeatures = arrayOfFontFeaturesToInterop(opts.features),
