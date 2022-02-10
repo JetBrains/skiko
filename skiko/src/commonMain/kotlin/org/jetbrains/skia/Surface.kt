@@ -2,6 +2,7 @@ package org.jetbrains.skia
 
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skiko.RenderException
 
 class Surface : RefCnt {
     companion object {
@@ -273,7 +274,7 @@ class Surface : RefCnt {
             colorFormat: SurfaceColorFormat,
             colorSpace: ColorSpace?,
             surfaceProps: SurfaceProps? = null
-        ): Surface {
+        ): Surface? {
             return try {
                 Stats.onNativeCall()
                 val ptr = _nMakeFromBackendRenderTarget(
@@ -284,10 +285,10 @@ class Surface : RefCnt {
                     getPtr(colorSpace),
                     surfaceProps
                 )
-                require(ptr != NullPointer) {
-                    "Failed Surface.makeFromBackendRenderTarget"
-                }
-                Surface(ptr, context, rt)
+                if (ptr == NullPointer)
+                    null
+                else
+                    Surface(ptr, context, rt)
             } finally {
                 reachabilityBarrier(context)
                 reachabilityBarrier(rt)

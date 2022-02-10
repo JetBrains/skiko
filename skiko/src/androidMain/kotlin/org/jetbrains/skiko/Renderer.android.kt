@@ -164,7 +164,7 @@ private class SkikoSurfaceRender(private val layer: SkiaLayer, private val manag
             SurfaceOrigin.BOTTOM_LEFT,
             SurfaceColorFormat.RGBA_8888,
             ColorSpace.sRGB
-        )
+        ) ?: throw RenderException("Cannot create surface")
         canvas = surface!!.canvas
     }
 

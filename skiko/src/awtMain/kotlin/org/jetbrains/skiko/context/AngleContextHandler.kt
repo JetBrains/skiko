@@ -44,7 +44,7 @@ internal class AngleContextHandler(layer: SkiaLayer) : JvmContextHandler(layer) 
             SurfaceOrigin.BOTTOM_LEFT,
             SurfaceColorFormat.RGBA_8888,
             ColorSpace.sRGB
-        )
+        ) ?: throw RenderException("Cannot create surface")
 
         canvas = surface!!.canvas
     }

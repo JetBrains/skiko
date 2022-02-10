@@ -5,6 +5,7 @@ import org.jetbrains.skia.ColorSpace
 import org.jetbrains.skia.Surface
 import org.jetbrains.skia.SurfaceColorFormat
 import org.jetbrains.skia.SurfaceOrigin
+import org.jetbrains.skiko.RenderException
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.redrawer.MacOsMetalRedrawer
 
@@ -39,7 +40,7 @@ internal class MacOsMetalContextHandler(layer: SkiaLayer) : ContextHandler(layer
             SurfaceOrigin.TOP_LEFT,
             SurfaceColorFormat.BGRA_8888,
             ColorSpace.sRGB
-        )
+        ) ?: throw RenderException("Cannot create surface")
 
         canvas = surface!!.canvas
     }
