@@ -68,7 +68,7 @@ abstract class CanvasRenderer constructor(val htmlCanvas: HTMLCanvasElement) {
             SurfaceOrigin.BOTTOM_LEFT,
             SurfaceColorFormat.RGBA_8888,
             ColorSpace.sRGB
-        )
+        ) ?: throw RenderException("Cannot create surface")
         canvas = surface!!.canvas
     }
 

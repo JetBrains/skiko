@@ -5,10 +5,7 @@ import org.jetbrains.skia.FramebufferFormat
 import org.jetbrains.skia.Surface
 import org.jetbrains.skia.SurfaceColorFormat
 import org.jetbrains.skia.SurfaceOrigin
-import org.jetbrains.skiko.OpenGLApi
-import org.jetbrains.skiko.SkiaLayer
-import org.jetbrains.skiko.makeGLContext
-import org.jetbrains.skiko.makeGLRenderTarget
+import org.jetbrains.skiko.*
 
 internal class OpenGLContextHandler(layer: SkiaLayer) : JvmContextHandler(layer) {
     override fun initContext(): Boolean {
@@ -60,7 +57,7 @@ internal class OpenGLContextHandler(layer: SkiaLayer) : JvmContextHandler(layer)
                 SurfaceOrigin.BOTTOM_LEFT,
                 SurfaceColorFormat.RGBA_8888,
                 ColorSpace.sRGB
-            )
+            ) ?: throw RenderException("Cannot create surface")
         }
 
         canvas = surface!!.canvas

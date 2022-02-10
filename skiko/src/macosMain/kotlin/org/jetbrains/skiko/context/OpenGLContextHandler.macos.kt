@@ -2,6 +2,7 @@ package org.jetbrains.skiko.context
 
 import kotlinx.cinterop.*
 import org.jetbrains.skia.*
+import org.jetbrains.skiko.RenderException
 import org.jetbrains.skiko.SkiaLayer
 import platform.OpenGL.GL_DRAW_FRAMEBUFFER_BINDING
 import platform.OpenGL.glGetIntegerv
@@ -62,7 +63,7 @@ internal class MacOSOpenGLContextHandler(layer: SkiaLayer) : ContextHandler(laye
                     SurfaceOrigin.BOTTOM_LEFT,
                     SurfaceColorFormat.RGBA_8888,
                     ColorSpace.sRGB
-                )
+                ) ?: throw RenderException("Cannot create surface")
 
             canvas = surface?.canvas
                 ?: error("Could not obtain Canvas from Surface")
