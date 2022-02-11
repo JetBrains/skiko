@@ -110,6 +110,8 @@ extern "C" JNIEXPORT jobjectArray JNICALL Java_org_jetbrains_skia_paragraph_Para
     jobjectArray rectsArray = env->NewObjectArray((jsize) rects.size(), skija::paragraph::TextBox::cls, nullptr);
     for (int i = 0; i < rects.size(); ++i) {
         TextBox box = rects[i];
+        if (box.rect.fLeft > box.rect.fRight) std::swap(box.rect.fLeft, box.rect.fRight);
+        if (box.rect.fTop > box.rect.fBottom) std::swap(box.rect.fTop, box.rect.fBottom);
         jobject boxObj = env->NewObject(skija::paragraph::TextBox::cls, skija::paragraph::TextBox::ctor, box.rect.fLeft, box.rect.fTop, box.rect.fRight, box.rect.fBottom, static_cast<jint>(box.direction));
         env->SetObjectArrayElement(rectsArray, i, boxObj);
         env->DeleteLocalRef(boxObj);

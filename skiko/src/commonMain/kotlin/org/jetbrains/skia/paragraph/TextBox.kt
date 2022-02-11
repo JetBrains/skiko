@@ -51,6 +51,8 @@ class TextBox(val rect: Rect, direction: Direction) {
                 rectPtr.fromInterop(rect)
                 directionPtr.fromInterop(direction)
             }
+            if (rect[0] > rect[2]) { val min = rect[2]; rect[2] = rect[0]; rect[0] = min; }
+            if (rect[1] > rect[3]) { val min = rect[3]; rect[3] = rect[1]; rect[1] = min; }
             return TextBox(rect[0], rect[1], rect[2], rect[3], direction[0])
         }
         override fun getArraySize(array: InteropPointer) = TextBox_nGetArraySize(array)
