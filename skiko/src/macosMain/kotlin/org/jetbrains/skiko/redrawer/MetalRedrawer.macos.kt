@@ -27,6 +27,11 @@ import platform.QuartzCore.kCALayerWidthSizable
 import kotlin.system.getTimeNanos
 import platform.CoreGraphics.CGSizeMake
 
+/**
+ * Metal [Redrawer] implementation for MacOs.
+ *
+ * See [MacOsMetalContextHandler]
+ */
 internal class MacOsMetalRedrawer(
     private val skiaLayer: SkiaLayer
 ) : Redrawer {
@@ -49,8 +54,16 @@ internal class MacOsMetalRedrawer(
         }
     }
 
-    fun makeContext() = DirectContext.makeMetal(device.objcPtr(), queue.objcPtr())
+    /**
+     * Creates and returns an instances of [DirectContext]
+     */
+    fun makeContext(): DirectContext = DirectContext.makeMetal(device.objcPtr(), queue.objcPtr())
 
+    /**
+     * Creates and returns an instances of [BackendRenderTarget] ready for rendering.
+     *
+     * https://developer.apple.com/documentation/quartzcore/cametallayer/1478172-nextdrawable
+     */
     fun makeRenderTarget(width: Int, height: Int): BackendRenderTarget {
         currentDrawable = metalLayer.nextDrawable()!!
         return BackendRenderTarget.makeMetal(width, height, currentDrawable!!.texture.objcPtr())
@@ -63,6 +76,9 @@ internal class MacOsMetalRedrawer(
         }
     }
 
+    /**
+     * Synchronizes the [metalLayer] size with the size of underlying nsView
+     */
     override fun syncSize() {
         syncContentScale()
         val osFrame = skiaLayer.nsView.frame
@@ -86,11 +102,17 @@ internal class MacOsMetalRedrawer(
         CATransaction.flush()
     }
 
+    /**
+     * Schedules a frame [draw] to an appropriate moment.
+     */
     override fun needRedraw() {
         check(!isDisposed) { "MetalRedrawer is disposed" }
         frameDispatcher.scheduleFrame()
     }
 
+    /**
+     * Invokes [draw] right away.
+     */
     override fun redrawImmediately() {
         check(!isDisposed) { "MetalRedrawer is disposed" }
         draw()

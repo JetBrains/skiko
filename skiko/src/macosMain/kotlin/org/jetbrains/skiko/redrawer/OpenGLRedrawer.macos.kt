@@ -17,6 +17,11 @@ import platform.QuartzCore.CAOpenGLLayer
 import platform.QuartzCore.*
 import kotlin.system.getTimeNanos
 
+/**
+ * OpenGL [Redrawer] implementation for MacOs.
+ *
+ * Not actually used. See [SkiaLayer.renderApi]
+ */
 internal class MacOsOpenGLRedrawer(
     private val skiaLayer: SkiaLayer
 ) : Redrawer {

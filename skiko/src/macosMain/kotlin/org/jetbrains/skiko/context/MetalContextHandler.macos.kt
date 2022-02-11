@@ -9,8 +9,11 @@ import org.jetbrains.skiko.RenderException
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.redrawer.MacOsMetalRedrawer
 
+/**
+ * Metal ContextHandler implementation for MacOs.
+ */
 internal class MacOsMetalContextHandler(layer: SkiaLayer) : ContextHandler(layer, layer::draw) {
-    val metalRedrawer: MacOsMetalRedrawer
+    private val metalRedrawer: MacOsMetalRedrawer
         get() = layer.redrawer!! as MacOsMetalRedrawer
 
     override fun initContext(): Boolean {
