@@ -2,7 +2,7 @@ FROM ubuntu:focal-20211006
 SHELL ["/bin/bash", "-c", "-l"]
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -y && \
-    apt-get install binutils build-essential software-properties-common libdbus-1-dev -y && \
+    apt-get install binutils build-essential software-properties-common -y && \
     apt-get install git curl wget -y && \
     apt-get install python -y && \
     apt-get install openjdk-11-jdk -y
