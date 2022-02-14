@@ -11,6 +11,8 @@ import kotlin.math.sin
 import kotlin.math.PI
 
 class Clocks(private val layer: SkiaLayer): SkikoView {
+    private val withFps = true
+    private val fpsCounter = FPSCounter()
     private val platformYOffset = if (hostOs == OS.Ios) 50f else 5f
     private var frame = 0
     private var xpos = 0.0
@@ -26,28 +28,29 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
     private var inputText = ""
 
     override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+        if (withFps) fpsCounter.tick()
         canvas.translate(xOffset.toFloat(), yOffset.toFloat())
         canvas.scale(scale.toFloat(), scale.toFloat())
         canvas.rotate(rotate.toFloat(), (width / 2).toFloat(), (height / 2).toFloat())
         val watchFill = Paint().apply { color = 0xFFFFFFFF.toInt() }
         val watchStroke = Paint().apply {
-            color = 0xFF000000.toInt()
-            mode = PaintMode.STROKE
-            strokeWidth = 1f
+               color = 0xFF000000.toInt()
+               mode = PaintMode.STROKE
+               strokeWidth = 1f
         }
         val watchStrokeAA = Paint().apply {
-            color = 0xFF000000.toInt()
-            mode = PaintMode.STROKE
-            strokeWidth = 1f
+          color = 0xFF000000.toInt()
+          mode = PaintMode.STROKE
+          strokeWidth = 1f
         }
         val watchFillHover = Paint().apply { color = 0xFFE4FF01.toInt() }
         for (x in 0 .. width - 50 step 50) {
             for (y in 30 + platformYOffset.toInt() .. height - 50 step 50) {
-                val hover =
+                val hover = 
                     (xpos - xOffset) / scale > x &&
-                            (xpos - xOffset) / scale < x + 50 &&
-                            (ypos - yOffset) / scale > y &&
-                            (ypos - yOffset) / scale < y + 50
+                    (xpos - xOffset) / scale < x + 50 &&
+                    (ypos - yOffset) / scale > y &&
+                    (ypos - yOffset) / scale < y + 50
                 val fill = if (hover) watchFillHover else watchFill
                 val stroke = if (x > width / 2) watchStrokeAA else watchStroke
                 canvas.drawOval(Rect.makeXYWH(x + 5f, y + 5f, 40f, 40f), fill)
@@ -55,11 +58,11 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
                 var angle = 0f
                 while (angle < 2f * PI) {
                     canvas.drawLine(
-                        (x + 25 - 17 * sin(angle)),
-                        (y + 25 + 17 * cos(angle)),
-                        (x + 25 - 20 * sin(angle)),
-                        (y + 25 + 20 * cos(angle)),
-                        stroke
+                            (x + 25 - 17 * sin(angle)),
+                            (y + 25 + 17 * cos(angle)),
+                            (x + 25 - 20 * sin(angle)),
+                            (y + 25 + 20 * cos(angle)),
+                            stroke
                     )
                     angle += (2.0 * PI / 12.0).toFloat()
                 }
@@ -69,25 +72,27 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
 
                 val angle1 = (time.toFloat() / 5000 * 2f * PI).toFloat()
                 canvas.drawLine(
-                    x + 25f,
-                    y + 25f,
-                    x + 25f - 15f * sin(angle1),
-                    y + 25f + 15 * cos(angle1),
-                    stroke)
+                        x + 25f,
+                        y + 25f,
+                        x + 25f - 15f * sin(angle1),
+                        y + 25f + 15 * cos(angle1),
+                        stroke)
 
                 val angle2 = (time / 60000 * 2f * PI).toFloat()
                 canvas.drawLine(
-                    x + 25f,
-                    y + 25f,
-                    x + 25f - 10f * sin(angle2),
-                    y + 25f + 10f * cos(angle2),
-                    stroke)
+                        x + 25f,
+                        y + 25f,
+                        x + 25f - 10f * sin(angle2),
+                        y + 25f + 10f * cos(angle2),
+                        stroke)
             }
         }
 
+        val maybeFps = if (withFps) " ${fpsCounter.average}FPS " else ""
+
         val renderInfo = ParagraphBuilder(style, fontCollection)
             .pushStyle(TextStyle().setColor(0xFF000000.toInt()))
-            .addText("Graphics API: ${layer.renderApi} ✿ﾟ ${currentSystemTheme}")
+            .addText("Graphics API: ${layer.renderApi} ✿ﾟ ${currentSystemTheme}${maybeFps}")
             .popStyle()
             .build()
         renderInfo.layout(Float.POSITIVE_INFINITY)
@@ -100,7 +105,7 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
             .build()
         input.layout(Float.POSITIVE_INFINITY)
         input.paint(canvas, 5f, platformYOffset + 20f)
-
+        
         val frames = ParagraphBuilder(style, fontCollection)
             .pushStyle(TextStyle().setColor(0xff9BC730L.toInt()).setFontSize(20f))
             .addText("Frames: ${frame++}\nAngle: $rotate")
