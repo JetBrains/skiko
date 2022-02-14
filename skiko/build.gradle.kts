@@ -911,7 +911,6 @@ fun createLinkJvmBindings(
                     "-lGL",
                     "-lX11",
                     "-lfontconfig",
-                    "-ldbus-1",
                     // A fix for https://github.com/JetBrains/compose-jb/issues/413.
                     // Dynamic position independent linking uses PLT thunks relying on jump targets in GOT (Global Offsets Table).
                     // GOT entries marked as (for example) R_X86_64_JUMP_SLOT in the relocation table. So, if there's code loading
