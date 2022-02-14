@@ -9,9 +9,10 @@ import org.jetbrains.skiko.*
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.PI
-import kotlin.math.pow
 
 class Clocks(private val layer: SkiaLayer): SkikoView {
+    private val withFps = true
+    private val fpsCounter = FPSCounter()
     private val platformYOffset = if (hostOs == OS.Ios) 50f else 5f
     private var frame = 0
     private var xpos = 0.0
@@ -27,6 +28,7 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
     private var inputText = ""
 
     override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+        if (withFps) fpsCounter.tick()
         canvas.translate(xOffset.toFloat(), yOffset.toFloat())
         canvas.scale(scale.toFloat(), scale.toFloat())
         canvas.rotate(rotate.toFloat(), (width / 2).toFloat(), (height / 2).toFloat())
@@ -86,9 +88,11 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
             }
         }
 
+        val maybeFps = if (withFps) " ${fpsCounter.average}FPS " else ""
+
         val renderInfo = ParagraphBuilder(style, fontCollection)
             .pushStyle(TextStyle().setColor(0xFF000000.toInt()))
-            .addText("Graphics API: ${layer.renderApi} ✿ﾟ ${currentSystemTheme}")
+            .addText("Graphics API: ${layer.renderApi} ✿ﾟ ${currentSystemTheme}${maybeFps}")
             .popStyle()
             .build()
         renderInfo.layout(Float.POSITIVE_INFINITY)
