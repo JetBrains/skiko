@@ -2,7 +2,6 @@ import java.io.File
 import java.util.concurrent.TimeUnit
 import org.gradle.api.GradleException
 
-// https://github.com/JetBrains/kotlin-native/issues/3484
 fun runPkgConfig(
     vararg packageNames: String,
 ): List<File> {
