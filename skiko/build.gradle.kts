@@ -806,6 +806,7 @@ fun createCompileJvmBindingsTask(
         }
         OS.Linux -> {
             includeHeadersNonRecursive(jdkHome.resolve("include/linux"))
+            includeHeadersNonRecursive(runPkgConfig("dbus-1"))
             osFlags = arrayOf(
                 *buildType.clangFlags,
                 "-fPIC",

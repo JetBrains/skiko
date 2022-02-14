@@ -88,13 +88,6 @@ extern "C"
         return (float) getDpiScaleByDisplay(dsi_x11->display);
     }
 
-    JNIEXPORT jint JNICALL Java_org_jetbrains_skiko_SystemTheme_1awtKt_getCurrentSystemTheme(JNIEnv *env, jobject topLevel)
-    {
-       // Unknown.
-       return 2;
-    }
-
-
     JNIEXPORT jfloat JNICALL Java_org_jetbrains_skiko_SetupKt_linuxGetSystemDpiScale(JNIEnv *env, jobject layer)
     {
         return (float) getDpiScale();
