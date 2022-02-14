@@ -1,7 +1,9 @@
 package org.jetbrains.skiko
 
 import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
+import android.net.Uri
 import org.jetbrains.skiko.redrawer.Redrawer
 
 actual fun setSystemLookAndFeel(): Unit = TODO()
@@ -45,3 +47,7 @@ actual val currentSystemTheme: SystemTheme
             else -> SystemTheme.UNKNOWN
         }
     }
+
+actual fun openUri(uri: String) {
+    defaultContext!!.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(uri)))
+}

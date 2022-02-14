@@ -1,6 +1,8 @@
 package org.jetbrains.skiko
 
 import org.jetbrains.skiko.redrawer.*
+import java.awt.Desktop
+import java.net.URI
 import javax.swing.UIManager
 
 actual fun setSystemLookAndFeel() = UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
@@ -33,4 +35,8 @@ internal actual fun makeDefaultRenderFactory(): RenderFactory {
             }
         }
     }
+}
+
+actual fun openUri(uri: String) {
+    Desktop.getDesktop().browse(URI(uri))
 }
