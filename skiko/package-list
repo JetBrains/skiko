@@ -2422,6 +2422,9 @@ $dokka.location:org.jetbrains.skiko/DelicateSkikoApi///PointingToDeclaration/sk
 $dokka.location:org.jetbrains.skiko/DelicateSkikoApi/DelicateSkikoApi/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-delicate-skiko-api/-delicate-skiko-api.html
 $dokka.location:org.jetbrains.skiko/FPSCounter///PointingToDeclaration/skiko/org.jetbrains.skiko/-f-p-s-counter/index.html
 $dokka.location:org.jetbrains.skiko/FPSCounter/FPSCounter/#kotlin.Double#kotlin.Boolean#kotlin.Function0[kotlin.Double]/PointingToDeclaration/skiko/org.jetbrains.skiko/-f-p-s-counter/-f-p-s-counter.html
+$dokka.location:org.jetbrains.skiko/FPSCounter/average/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-f-p-s-counter/average.html
+$dokka.location:org.jetbrains.skiko/FPSCounter/max/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-f-p-s-counter/max.html
+$dokka.location:org.jetbrains.skiko/FPSCounter/min/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-f-p-s-counter/min.html
 $dokka.location:org.jetbrains.skiko/FPSCounter/tick/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-f-p-s-counter/tick.html
 $dokka.location:org.jetbrains.skiko/FrameDispatcher///PointingToDeclaration/skiko/org.jetbrains.skiko/-frame-dispatcher/index.html
 $dokka.location:org.jetbrains.skiko/FrameDispatcher/FrameDispatcher/#kotlin.coroutines.CoroutineContext#kotlin.coroutines.SuspendFunction0[kotlin.Unit]/PointingToDeclaration/skiko/org.jetbrains.skiko/-frame-dispatcher/-frame-dispatcher.html
