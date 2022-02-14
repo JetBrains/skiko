@@ -145,7 +145,6 @@ internal class MetalLayer : CAMetalLayer {
             this.backgroundColor =
                 CGColorCreate(CGColorSpaceCreateDeviceRGB(), it.addressOf(0))
         }
-        this.displaySyncEnabled = false
         skiaLayer.nsView.layer = this
         skiaLayer.nsView.wantsLayer = true
         this.contentsGravity = kCAGravityTopLeft;
@@ -158,6 +157,5 @@ internal class MetalLayer : CAMetalLayer {
     override fun drawInContext(ctx: CGContextRef?) {
         skiaLayer.update(getTimeNanos())
         contextHandler.draw()
-        super.drawInContext(ctx)
     }
 }
