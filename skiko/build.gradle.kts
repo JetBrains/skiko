@@ -334,6 +334,11 @@ kotlin {
             }
 
             if (supportNative) {
+                all {
+                    // Really ugly, see https://youtrack.jetbrains.com/issue/KT-46649 why it is required,
+                    // note that setting it per source set still keeps it unset in commonized source sets.
+                    languageSettings.optIn("kotlin.native.SymbolNameIsInternal")
+                }
                 // See https://kotlinlang.org/docs/mpp-share-on-platforms.html#configure-the-hierarchical-structure-manually
                 val nativeMain by creating {
                     dependsOn(nativeJsMain)
@@ -1233,14 +1238,6 @@ if (skiko.isCIBuild || mavenCentral.signArtifacts) {
     signing {
         sign(publishing.publications)
         useInMemoryPgpKeys(mavenCentral.signArtifactsKey.get(), mavenCentral.signArtifactsPassword.get())
-    }
-}
-
-afterEvaluate {
-    tasks.withType<KotlinCompile>().configureEach { // this one is actually KotlinJvmCompile
-        if (name == "compileTestKotlinJvm") {
-            kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
-        }
     }
 }
 

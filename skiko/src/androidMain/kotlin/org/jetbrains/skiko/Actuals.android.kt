@@ -1,8 +1,11 @@
 package org.jetbrains.skiko
 
-import android.content.Context
+import android.content.*
+import android.content.ClipboardManager
 import android.content.res.Configuration
+import android.net.Uri
 import org.jetbrains.skiko.redrawer.Redrawer
+
 
 actual fun setSystemLookAndFeel(): Unit = TODO()
 
@@ -45,3 +48,20 @@ actual val currentSystemTheme: SystemTheme
             else -> SystemTheme.UNKNOWN
         }
     }
+
+internal actual fun URIHandler_openUri(uri: String) {
+    defaultContext!!.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(uri)))
+}
+
+internal actual fun ClipboardManager_setText(text: String) {
+    val clipboard = defaultContext!!.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    val clip = ClipData.newPlainText("", text)
+    clipboard.setPrimaryClip(clip)
+}
+
+internal actual fun ClipboardManager_getText(): String? {
+    val context = defaultContext!!
+    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    val clip = clipboard.primaryClip ?: return null
+    return clip.getItemAt(0)?.text?.toString()
+}
