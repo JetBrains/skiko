@@ -9,7 +9,7 @@ import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.getPtr
 import org.jetbrains.skia.impl.reachabilityBarrier
 
-class IcuBidiRunIterator(text: ManagedString?, manageText: Boolean, bidiLevel: Int) : ManagedRunIterator<BidiRun?>(
+class IcuBidiRunIterator(text: ManagedString, manageText: Boolean, bidiLevel: Int) : ManagedRunIterator<BidiRun?>(
     _nMake(getPtr(text), bidiLevel), text, manageText
 ) {
     companion object {
@@ -18,7 +18,7 @@ class IcuBidiRunIterator(text: ManagedString?, manageText: Boolean, bidiLevel: I
         }
     }
 
-    constructor(text: String?, bidiLevel: Int) : this(ManagedString(text), true, bidiLevel) {}
+    constructor(text: String, bidiLevel: Int) : this(ManagedString(text), true, bidiLevel) {}
 
     override operator fun next(): BidiRun {
         return try {
