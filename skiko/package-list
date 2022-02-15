@@ -2418,6 +2418,10 @@ $dokka.location:org.jetbrains.skiko/ClipRectangle/height/#/PointingToDeclaration
 $dokka.location:org.jetbrains.skiko/ClipRectangle/width/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-clip-rectangle/width.html
 $dokka.location:org.jetbrains.skiko/ClipRectangle/x/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-clip-rectangle/x.html
 $dokka.location:org.jetbrains.skiko/ClipRectangle/y/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-clip-rectangle/y.html
+$dokka.location:org.jetbrains.skiko/ClipboardManager///PointingToDeclaration/skiko/org.jetbrains.skiko/-clipboard-manager/index.html
+$dokka.location:org.jetbrains.skiko/ClipboardManager/ClipboardManager/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-clipboard-manager/-clipboard-manager.html
+$dokka.location:org.jetbrains.skiko/ClipboardManager/getText/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-clipboard-manager/get-text.html
+$dokka.location:org.jetbrains.skiko/ClipboardManager/setText/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-clipboard-manager/set-text.html
 $dokka.location:org.jetbrains.skiko/DelicateSkikoApi///PointingToDeclaration/skiko/org.jetbrains.skiko/-delicate-skiko-api/index.html
 $dokka.location:org.jetbrains.skiko/DelicateSkikoApi/DelicateSkikoApi/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-delicate-skiko-api/-delicate-skiko-api.html
 $dokka.location:org.jetbrains.skiko/FPSCounter///PointingToDeclaration/skiko/org.jetbrains.skiko/-f-p-s-counter/index.html
@@ -2797,6 +2801,9 @@ $dokka.location:org.jetbrains.skiko/SystemTheme.DARK///PointingToDeclaration/sk
 $dokka.location:org.jetbrains.skiko/SystemTheme.LIGHT///PointingToDeclaration/skiko/org.jetbrains.skiko/-system-theme/-l-i-g-h-t/index.html
 $dokka.location:org.jetbrains.skiko/SystemTheme.UNKNOWN///PointingToDeclaration/skiko/org.jetbrains.skiko/-system-theme/-u-n-k-n-o-w-n/index.html
 $dokka.location:org.jetbrains.skiko/SystemTheme///PointingToDeclaration/skiko/org.jetbrains.skiko/-system-theme/index.html
+$dokka.location:org.jetbrains.skiko/URIManager///PointingToDeclaration/skiko/org.jetbrains.skiko/-u-r-i-manager/index.html
+$dokka.location:org.jetbrains.skiko/URIManager/URIManager/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-u-r-i-manager/-u-r-i-manager.html
+$dokka.location:org.jetbrains.skiko/URIManager/openUri/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-u-r-i-manager/open-uri.html
 org.jetbrains.skia
 org.jetbrains.skia.impl
 org.jetbrains.skia.paragraph
