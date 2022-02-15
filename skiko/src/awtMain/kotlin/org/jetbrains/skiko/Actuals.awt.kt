@@ -5,6 +5,7 @@ import java.awt.Desktop
 import java.awt.Toolkit
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection
+import java.awt.datatransfer.UnsupportedFlavorException
 import java.net.URI
 import javax.swing.UIManager
 
@@ -56,5 +57,9 @@ internal actual fun ClipboardManager_setText(text: String) {
     systemClipboard?.setContents(StringSelection(text), null)
 }
 internal actual fun ClipboardManager_getText(): String? {
-    return systemClipboard?.getData(DataFlavor.stringFlavor) as String?
+    return try {
+        systemClipboard?.getData(DataFlavor.stringFlavor) as String?
+    } catch (_: UnsupportedFlavorException) {
+        null
+    }
 }
