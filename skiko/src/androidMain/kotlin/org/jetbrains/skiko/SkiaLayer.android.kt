@@ -109,5 +109,8 @@ actual open class SkiaLayer {
         }
     }
 
+    actual val component: Any?
+        get() = this.container
+
     internal actual fun draw(canvas: Canvas): Unit = TODO()
 }

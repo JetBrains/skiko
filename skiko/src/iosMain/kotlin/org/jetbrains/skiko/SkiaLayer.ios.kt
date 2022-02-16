@@ -42,6 +42,9 @@ actual open class SkiaLayer {
         redrawer?.needRedraw()
     }
 
+    actual val component: Any?
+        get() = this.view
+
     val width: Float
        get() = view!!.frame.useContents {
            return@useContents size.width.toFloat()

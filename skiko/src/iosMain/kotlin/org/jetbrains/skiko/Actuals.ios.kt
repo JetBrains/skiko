@@ -14,3 +14,18 @@ internal actual fun ClipboardManager_setText(text: String) {
 internal actual fun ClipboardManager_getText(): String? {
     return UIPasteboard.generalPasteboard.string
 }
+
+// TODO: not sure if correct.
+actual typealias Cursor = Any
+
+internal actual fun CursorManager_setCursor(component: Any, cursor: Cursor) {}
+
+internal actual fun CursorManager_getCursor(component: Any): Cursor? = null
+
+internal actual fun getCursorById(id: PredefinedCursorsId): Cursor =
+    when (id) {
+        PredefinedCursorsId.DEFAULT -> Any()
+        PredefinedCursorsId.CROSSHAIR -> Any()
+        PredefinedCursorsId.HAND -> Any()
+        PredefinedCursorsId.TEXT -> Any()
+    }

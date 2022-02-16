@@ -147,6 +147,9 @@ actual open class SkiaLayer internal constructor(
             fullscreenAdapter.fullscreen = value
         }
 
+    actual val component: Any?
+        get() = backedLayer
+
     actual var skikoView: SkikoView? = null
 
     actual fun attachTo(container: Any) {

@@ -76,11 +76,18 @@ actual open class SkiaLayer {
     private var desiredWidth = 0
     private var desiredHeight = 0
 
+    actual val component: Any?
+        get() = this.htmlCanvas
+
+    private var htmlCanvas: HTMLCanvasElement? = null
+
     /**
      * Initializes the [CanvasRenderer] and events listeners.
      * Delegates rendering and events processing to [skikoView].
      */
     fun attachTo(htmlCanvas: HTMLCanvasElement, autoDetach: Boolean = true) {
+        this.htmlCanvas = htmlCanvas
+
         // Scale canvas to allow high DPI rendering as suggested in
         // https://www.khronos.org/webgl/wiki/HandlingHighDPI.
         desiredWidth = htmlCanvas.width
