@@ -10,9 +10,8 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.PI
 
-val cursorManager = CursorManager()
-
 class Clocks(private val layer: SkiaLayer): SkikoView {
+    private val cursorManager = CursorManager()
     private val withFps = true
     private val fpsCounter = FPSCounter()
     private val platformYOffset = if (hostOs == OS.Ios) 50f else 5f
