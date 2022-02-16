@@ -46,7 +46,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nMakeCoreText() {
     #ifdef SK_SHAPER_CORETEXT_AVAILABLE
         return reinterpret_cast<KNativePointer>(SkShaper::MakeCoreText().release());
     #else
-        return 0;
+        return nullptr;
     #endif
 }
 
@@ -63,7 +63,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nShapeBlob
     SkString& text = *(reinterpret_cast<SkString*>(textPtr));
 
     std::shared_ptr<UBreakIterator> graphemeIter = skija::shaper::graphemeBreakIterator(text);
-    if (!graphemeIter) return 0;
+    if (!graphemeIter) return nullptr;
     SkFont* font = reinterpret_cast<SkFont*>(fontPtr);
 
     std::vector<SkShaper::Feature> features = skija::shaper::ShapingOptions::getFeaturesFromIntsArray(optsFeatures, optsFeaturesLen);
@@ -74,13 +74,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nShapeBlob
 
     uint8_t defaultBiDiLevel = isLeftToRight ? UBIDI_DEFAULT_LTR : UBIDI_DEFAULT_RTL;
     std::unique_ptr<SkShaper::BiDiRunIterator> bidiRunIter(SkShaper::MakeBiDiRunIterator(text.c_str(), text.size(), defaultBiDiLevel));
-    if (!bidiRunIter) return 0;
+    if (!bidiRunIter) return nullptr;
 
     std::unique_ptr<SkShaper::ScriptRunIterator> scriptRunIter(SkShaper::MakeHbIcuScriptRunIterator(text.c_str(), text.size()));
-    if (!scriptRunIter) return 0;
+    if (!scriptRunIter) return nullptr;
 
     std::unique_ptr<SkShaper::LanguageRunIterator> languageRunIter(SkShaper::MakeStdLanguageRunIterator(text.c_str(), text.size()));
-    if (!languageRunIter) return 0;
+    if (!languageRunIter) return nullptr;
 
      FontRunIterator fontRunIter(
         text.c_str(),
@@ -121,13 +121,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nShapeLine
 
     uint8_t defaultBiDiLevel = isLeftToRight ? UBIDI_DEFAULT_LTR : UBIDI_DEFAULT_RTL;
     std::unique_ptr<SkShaper::BiDiRunIterator> bidiRunIter(SkShaper::MakeBiDiRunIterator(text.c_str(), text.size(), defaultBiDiLevel));
-    if (!bidiRunIter) return 0;
+    if (!bidiRunIter) return nullptr;
 
     std::unique_ptr<SkShaper::ScriptRunIterator> scriptRunIter(SkShaper::MakeHbIcuScriptRunIterator(text.c_str(), text.size()));
-    if (!scriptRunIter) return 0;
+    if (!scriptRunIter) return nullptr;
 
     std::unique_ptr<SkShaper::LanguageRunIterator> languageRunIter(SkShaper::MakeStdLanguageRunIterator(text.c_str(), text.size()));
-    if (!languageRunIter) return 0;
+    if (!languageRunIter) return nullptr;
 
     FontRunIterator fontRunIter(
         text.c_str(),

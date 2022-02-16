@@ -90,19 +90,19 @@ class Shaper internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
         }
     }
 
-    fun shape(text: String?, font: Font?): TextBlob? {
+    fun shape(text: String, font: Font): TextBlob? {
         return shape(text, font, ShapingOptions.DEFAULT, Float.POSITIVE_INFINITY, Point.Companion.ZERO)
     }
 
-    fun shape(text: String?, font: Font?, width: Float): TextBlob? {
+    fun shape(text: String, font: Font, width: Float): TextBlob? {
         return shape(text, font, ShapingOptions.DEFAULT, width, Point.Companion.ZERO)
     }
 
-    fun shape(text: String?, font: Font?, width: Float, offset: Point): TextBlob? {
+    fun shape(text: String, font: Font, width: Float, offset: Point): TextBlob? {
         return shape(text, font, ShapingOptions.DEFAULT, width, offset)
     }
 
-    fun shape(text: String?, font: Font?, opts: ShapingOptions, width: Float, offset: Point): TextBlob? {
+    fun shape(text: String, font: Font, opts: ShapingOptions, width: Float, offset: Point): TextBlob? {
         return try {
             Stats.onNativeCall()
             val managedString = ManagedString(text)
@@ -128,7 +128,7 @@ class Shaper internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
 
     fun shape(
         text: String,
-        font: Font?,
+        font: Font,
         opts: ShapingOptions,
         width: Float,
         runHandler: RunHandler

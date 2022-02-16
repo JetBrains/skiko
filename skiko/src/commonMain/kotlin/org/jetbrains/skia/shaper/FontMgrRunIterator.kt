@@ -11,7 +11,7 @@ import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.getPtr
 import org.jetbrains.skia.impl.reachabilityBarrier
 
-class FontMgrRunIterator(text: ManagedString?, manageText: Boolean, font: Font?, opts: ShapingOptions) :
+class FontMgrRunIterator(text: ManagedString, manageText: Boolean, font: Font, opts: ShapingOptions) :
     ManagedRunIterator<FontRun?>(
         _nMake(getPtr(text), getPtr(font), getPtr(opts.fontMgr), opts._booleanPropsToInt()), text, manageText
     ) {
@@ -21,11 +21,11 @@ class FontMgrRunIterator(text: ManagedString?, manageText: Boolean, font: Font?,
         }
     }
 
-    private val _font: Font? = font
+    private val _font: Font = font
     private val _fontMgr: FontMgr? = opts.fontMgr
 
-    constructor(text: String?, font: Font?, opts: ShapingOptions) : this(ManagedString(text), true, font, opts)
-    constructor(text: String?, font: Font?) : this(ManagedString(text), true, font, ShapingOptions.DEFAULT)
+    constructor(text: String, font: Font, opts: ShapingOptions) : this(ManagedString(text), true, font, opts)
+    constructor(text: String, font: Font) : this(ManagedString(text), true, font, ShapingOptions.DEFAULT)
 
     override operator fun next(): FontRun {
         return try {
