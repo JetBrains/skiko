@@ -60,6 +60,9 @@ actual open class SkiaLayer {
      */
     actual var skikoView: SkikoView? = null
 
+    /**
+     * @param container - should be an instance of [HTMLCanvasElement]
+     */
     actual fun attachTo(container: Any) {
         attachTo(container as HTMLCanvasElement, false)
     }

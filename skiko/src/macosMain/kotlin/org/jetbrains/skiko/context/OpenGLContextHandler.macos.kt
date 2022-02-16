@@ -2,12 +2,18 @@ package org.jetbrains.skiko.context
 
 import kotlinx.cinterop.*
 import org.jetbrains.skia.*
+import org.jetbrains.skiko.GraphicsApi
 import org.jetbrains.skiko.RenderException
 import org.jetbrains.skiko.SkiaLayer
 import platform.OpenGL.GL_DRAW_FRAMEBUFFER_BINDING
 import platform.OpenGL.glGetIntegerv
 import platform.OpenGLCommon.GLenum
 
+/**
+ * OpenGL context handler for MacOs (native).
+ * Not used anymore, unless corresponding [GraphicsApi] is hardcoded in [SkiaLayer].
+ * See [MacOsMetalContextHandler] instead.
+ */
 internal class MacOSOpenGLContextHandler(layer: SkiaLayer) : ContextHandler(layer, layer::draw) {
     override fun initContext(): Boolean {
         try {

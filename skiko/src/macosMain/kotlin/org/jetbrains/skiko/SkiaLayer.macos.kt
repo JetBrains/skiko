@@ -25,39 +25,82 @@ import platform.Foundation.addObserver
 import platform.darwin.NSObject
 import platform.CoreGraphics.CGRectMake
 
+/**
+ * SkiaLayer implementation for macOS.
+ * Supports only [GraphicsApi.METAL]
+ */
 actual open class SkiaLayer {
     fun isShowing(): Boolean {
         return true
     }
 
+    /**
+     * [GraphicsApi.METAL] is the only GraphicsApi supported for macOS.
+     * Setter throws an IllegalArgumentException if the value is not [GraphicsApi.METAL].
+     */
     actual var renderApi: GraphicsApi = GraphicsApi.METAL
+        set(value) {
+            if (value != GraphicsApi.METAL) {
+                throw IllegalArgumentException("$field is not supported in macOS")
+            }
+            field = value
+        }
+
+    /**
+     * The scale factor of [NSWindow]
+     * https://developer.apple.com/documentation/appkit/nswindow/1419459-backingscalefactor
+     */
     actual val contentScale: Float
         get() = if (this::nsView.isInitialized) nsView.window!!.backingScaleFactor.toFloat() else 1.0f
 
+    /**
+     * Fullscreen is not supported
+     */
     actual var fullscreen: Boolean
         get() = false
         set(value) {
             if (value) throw IllegalArgumentException("fullscreen unsupported")
         }
 
+    /**
+     * Transparency is not supported on macOS native.
+     */
     actual var transparency: Boolean
         get() = false
         set(value) {
             if (value) throw IllegalArgumentException("transparency unsupported")
         }
 
+    /**
+     * Underlying [NSView]
+     */
     lateinit var nsView: NSView
 
+    /**
+     * Implements rendering logic and events processing.
+     */
     actual var skikoView: SkikoView? = null
 
     internal var redrawer: Redrawer? = null
 
+    /**
+     * Created/updated by recording in [update].
+     * It's used as a source for drawing on canvas in [draw].
+     */
     private var picture: PictureHolder? = null
     private val pictureRecorder = PictureRecorder()
 
+    /**
+     * @param container - should be an instance of [NSWindow]
+     */
     actual fun attachTo(container: Any) {
         attachTo(container as NSWindow)
     }
+
+    /**
+     * Initializes the [nsView] then adds it to [window]. Initializes events listeners.
+     * Delegates events processing to [skikoView].
+     */
     fun attachTo(window: NSWindow) {
         val (width, height) = window.contentLayoutRect.useContents {
             this.size.width to this.size.height
@@ -205,10 +248,16 @@ actual open class SkiaLayer {
         redrawer = null
     }
 
+    /**
+     * Schedules a frame to an appropriate moment.
+     */
     actual fun needRedraw() {
         redrawer?.needRedraw()
     }
 
+    /**
+     * Updates the [picture] according to current [nanoTime]
+     */
     internal fun update(nanoTime: Long) {
         val width = nsView.frame.useContents { size.width }
         val height = nsView.frame.useContents { size.height }
