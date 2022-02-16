@@ -26,7 +26,7 @@ import platform.darwin.NSObject
 import platform.CoreGraphics.CGRectMake
 
 /**
- * SkiaLayer implementation for MacOs.
+ * SkiaLayer implementation for macOS.
  * Supports only [GraphicsApi.METAL]
  */
 actual open class SkiaLayer {
@@ -35,9 +35,16 @@ actual open class SkiaLayer {
     }
 
     /**
-     * [GraphicsApi.METAL] is the only GraphicsApi supported for MacOs.
+     * [GraphicsApi.METAL] is the only GraphicsApi supported for macOS.
+     * Setter throws an IllegalArgumentException if the value is not [GraphicsApi.METAL].
      */
     actual var renderApi: GraphicsApi = GraphicsApi.METAL
+        set(value) {
+            if (value != GraphicsApi.METAL) {
+                throw IllegalArgumentException("$field is not supported in macOS")
+            }
+            field = value
+        }
 
     /**
      * The scale factor of [NSWindow]
@@ -56,7 +63,7 @@ actual open class SkiaLayer {
         }
 
     /**
-     * Transparency is not supported
+     * Transparency is not supported on macOS native.
      */
     actual var transparency: Boolean
         get() = false
