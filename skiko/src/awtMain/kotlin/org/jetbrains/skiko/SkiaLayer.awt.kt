@@ -525,6 +525,10 @@ actual open class SkiaLayer internal constructor(
         }
         return rounded.toInt()
     }
+
+    fun requestNativeFocusOnAccessible(accessible: Accessible?) {
+        backedLayer.requestNativeFocusOnAccessible(accessible)
+    }
 }
 
 /**
