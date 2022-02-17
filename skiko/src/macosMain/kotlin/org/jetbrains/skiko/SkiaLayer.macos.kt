@@ -76,6 +76,9 @@ actual open class SkiaLayer {
      */
     lateinit var nsView: NSView
 
+    actual val component: Any?
+        get() = this.nsView
+
     /**
      * Implements rendering logic and events processing.
      */

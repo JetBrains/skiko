@@ -4,8 +4,9 @@ import android.content.*
 import android.content.ClipboardManager
 import android.content.res.Configuration
 import android.net.Uri
+import android.view.PointerIcon.*
+import android.view.View
 import org.jetbrains.skiko.redrawer.Redrawer
-
 
 actual fun setSystemLookAndFeel(): Unit = TODO()
 
@@ -65,3 +66,27 @@ internal actual fun ClipboardManager_getText(): String? {
     val clip = clipboard.primaryClip ?: return null
     return clip.getItemAt(0)?.text?.toString()
 }
+
+actual typealias Cursor = android.view.PointerIcon
+
+// TODO: not sure if correct.
+internal actual fun CursorManager_setCursor(component: Any, cursor: Cursor) {
+    if (component is View) {
+        component.pointerIcon = cursor
+    }
+}
+
+internal actual fun CursorManager_getCursor(component: Any): Cursor? =
+    if (component is View) {
+        component.pointerIcon
+    } else {
+        null
+    }
+
+internal actual fun getCursorById(id: PredefinedCursorsId): Cursor =
+    when (id) {
+        PredefinedCursorsId.DEFAULT -> getSystemIcon(defaultContext!!, TYPE_DEFAULT)
+        PredefinedCursorsId.CROSSHAIR -> getSystemIcon(defaultContext!!, TYPE_CROSSHAIR)
+        PredefinedCursorsId.HAND -> getSystemIcon(defaultContext!!, TYPE_HAND)
+        PredefinedCursorsId.TEXT -> getSystemIcon(defaultContext!!, TYPE_TEXT)
+    }

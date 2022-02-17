@@ -1,6 +1,7 @@
 package org.jetbrains.skiko
 
 import org.jetbrains.skiko.redrawer.*
+import java.awt.Component
 import java.awt.Desktop
 import java.awt.Toolkit
 import java.awt.datatransfer.DataFlavor
@@ -63,3 +64,27 @@ internal actual fun ClipboardManager_getText(): String? {
         null
     }
 }
+
+actual typealias Cursor = java.awt.Cursor
+
+internal actual fun CursorManager_setCursor(component: Any, cursor: Cursor) {
+    if (component is Component) {
+        component.cursor = cursor
+    }
+}
+
+internal actual fun CursorManager_getCursor(component: Any): Cursor? {
+    return if (component is Component) {
+        component.cursor
+    } else {
+        null
+    }
+}
+
+internal actual fun getCursorById(id: PredefinedCursorsId): Cursor =
+    when (id) {
+        PredefinedCursorsId.DEFAULT -> Cursor(Cursor.DEFAULT_CURSOR)
+        PredefinedCursorsId.CROSSHAIR -> Cursor(Cursor.CROSSHAIR_CURSOR)
+        PredefinedCursorsId.HAND -> Cursor(Cursor.HAND_CURSOR)
+        PredefinedCursorsId.TEXT -> Cursor(Cursor.TEXT_CURSOR)
+    }

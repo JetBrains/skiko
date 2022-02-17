@@ -11,6 +11,7 @@ import kotlin.math.sin
 import kotlin.math.PI
 
 class Clocks(private val layer: SkiaLayer): SkikoView {
+    private val cursorManager = CursorManager()
     private val withFps = true
     private val fpsCounter = FPSCounter()
     private val platformYOffset = if (hostOs == OS.Ios) 50f else 5f
@@ -128,6 +129,11 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
         when (event.kind) {
             SkikoPointerEventKind.DOWN,
             SkikoPointerEventKind.MOVE -> {
+                if (event.x > 200) {
+                    cursorManager.setCursor(layer.component, PredefinedCursors.HAND)
+                } else {
+                    cursorManager.setCursor(layer.component, PredefinedCursors.DEFAULT)
+                }
                 xpos = event.x
                 ypos = event.y
             }
