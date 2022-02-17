@@ -9,7 +9,7 @@ Supported platforms:
    * Kotlin/JVM on Linux(x86_64 and arm64)
    * Kotlin/JVM on Windows(x86_64)
    * Kotlin/JVM on macOS(x86_64 and arm64)
-   * Kotlin/JVM on Android(x86_64 and arm64)
+   * Kotlin/JVM on Android(x86_64 and arm64), starting with API version 24
    * Kotlin/JS + WebAssembly in browsers
    * Kotlin/Native on iOS(arm64 and x64)
    * Kotlin/Native on macOS (arm64 and x64)
