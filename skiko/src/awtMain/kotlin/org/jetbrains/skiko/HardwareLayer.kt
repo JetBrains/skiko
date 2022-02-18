@@ -101,8 +101,8 @@ internal open class HardwareLayer(
         // and its accessibility context. This timeout is used to deal with concurrency
         // TODO Find more reliable procedure
         resetFocusAccessibleJob?.cancel()
-        GlobalScope.launch(Dispatchers.Swing) {
-            delay(50)
+        resetFocusAccessibleJob = GlobalScope.launch(Dispatchers.Swing) {
+            delay(100)
             _focusedAccessible = null
         }
     }
