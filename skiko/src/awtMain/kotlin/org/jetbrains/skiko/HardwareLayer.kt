@@ -4,12 +4,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.awt.Canvas
-import java.awt.Component
-import java.awt.Graphics
+import java.awt.*
 import java.awt.event.InputMethodEvent
+import java.beans.PropertyChangeEvent
 import javax.accessibility.Accessible
 import javax.accessibility.AccessibleContext
+import javax.swing.Timer
 import kotlin.time.ExperimentalTime
 
 internal open class HardwareLayer(
@@ -82,9 +82,26 @@ internal open class HardwareLayer(
     private external fun getWindowHandle(platformInfo: Long): Long
 
     private val _externalAccessible = externalAccessibleFactory?.invoke(this)
+    private var _focusedAccessible: Accessible? = null
     override fun getAccessibleContext(): AccessibleContext {
-        val res = _externalAccessible?.accessibleContext
+        val res = (_focusedAccessible ?: _externalAccessible)?.accessibleContext
         return res ?: super.getAccessibleContext()
+    }
+
+    val resetFocusAccessibleTimer: Timer = Timer(100) { _focusedAccessible = null }
+
+    fun requestNativeFocusOnAccessible(accessible: Accessible?) {
+        _focusedAccessible = accessible
+
+        val focusManager = KeyboardFocusManager.getCurrentKeyboardFocusManager()
+        val listeners = focusManager.getPropertyChangeListeners("focusOwner")
+        val event = PropertyChangeEvent(focusManager, "focusOwner", null, accessible)
+        listeners.forEach { it.propertyChange(event) }
+
+        // Listener spawns asynchronous notification post procedure, reading current focus owner
+        // and its accessibility context. This timer is used to deal with concurrency
+        // TODO Find more reliable procedure
+        resetFocusAccessibleTimer.restart()
     }
 }
 
