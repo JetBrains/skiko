@@ -4,6 +4,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.swing.Swing
 import java.awt.*
+import java.awt.event.FocusEvent
 import java.awt.event.InputMethodEvent
 import java.beans.PropertyChangeEvent
 import javax.accessibility.Accessible
@@ -92,10 +93,14 @@ internal open class HardwareLayer(
     fun requestNativeFocusOnAccessible(accessible: Accessible?) {
         _focusedAccessible = accessible
 
-        val focusManager = KeyboardFocusManager.getCurrentKeyboardFocusManager()
-        val listeners = focusManager.getPropertyChangeListeners("focusOwner")
-        val event = PropertyChangeEvent(focusManager, "focusOwner", null, accessible)
-        listeners.forEach { it.propertyChange(event) }
+        when (hostOs) {
+            OS.Windows -> requestAccessBridgeFocusOnAccessible()
+            OS.MacOS -> requestMacOSFocusOnAccessible(accessible)
+            else -> {
+                _focusedAccessible = null
+                return
+            }
+        }
 
         // Listener spawns asynchronous notification post procedure, reading current focus owner
         // and its accessibility context. This timeout is used to deal with concurrency
@@ -105,6 +110,18 @@ internal open class HardwareLayer(
             delay(100)
             _focusedAccessible = null
         }
+    }
+
+    private fun requestAccessBridgeFocusOnAccessible() {
+        val focusEvent = FocusEvent(this, FocusEvent.FOCUS_GAINED)
+        focusListeners.forEach { it.focusGained(focusEvent) }
+    }
+
+    private fun requestMacOSFocusOnAccessible(accessible: Accessible?) {
+        val focusManager = KeyboardFocusManager.getCurrentKeyboardFocusManager()
+        val listeners = focusManager.getPropertyChangeListeners("focusOwner")
+        val event = PropertyChangeEvent(focusManager, "focusOwner", null, accessible)
+        listeners.forEach { it.propertyChange(event) }
     }
 }
 
