@@ -1,15 +1,13 @@
 package org.jetbrains.skiko
 
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.swing.Swing
 import java.awt.*
 import java.awt.event.InputMethodEvent
 import java.beans.PropertyChangeEvent
 import javax.accessibility.Accessible
 import javax.accessibility.AccessibleContext
-import javax.swing.Timer
 import kotlin.time.ExperimentalTime
 
 internal open class HardwareLayer(
@@ -35,6 +33,7 @@ internal open class HardwareLayer(
     }
 
     open fun dispose() {
+        resetFocusAccessibleJob?.cancel()
         nativeDispose()
     }
 
@@ -88,7 +87,7 @@ internal open class HardwareLayer(
         return res ?: super.getAccessibleContext()
     }
 
-    val resetFocusAccessibleTimer: Timer = Timer(100) { _focusedAccessible = null }
+    private var resetFocusAccessibleJob: Job? = null
 
     fun requestNativeFocusOnAccessible(accessible: Accessible?) {
         _focusedAccessible = accessible
@@ -99,9 +98,13 @@ internal open class HardwareLayer(
         listeners.forEach { it.propertyChange(event) }
 
         // Listener spawns asynchronous notification post procedure, reading current focus owner
-        // and its accessibility context. This timer is used to deal with concurrency
+        // and its accessibility context. This timeout is used to deal with concurrency
         // TODO Find more reliable procedure
-        resetFocusAccessibleTimer.restart()
+        resetFocusAccessibleJob?.cancel()
+        GlobalScope.launch(Dispatchers.Swing) {
+            delay(50)
+            _focusedAccessible = null
+        }
     }
 }
 
