@@ -1,6 +1,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <jawt_md.h>
 #include <Windows.h>
+#include <shellscalingapi.h>
 #include <cassert>
 #include "jni_helpers.h"
 
@@ -56,5 +57,20 @@ extern "C"
                 // Unknown.
                 return 2;
          }
+    }
+
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getCurrentDPI(JNIEnv *env, jobject canvas, jlong platformInfoPtr)
+    {
+        HWND hwnd = (HWND)Java_org_jetbrains_skiko_HardwareLayer_getWindowHandle(env, canvas, platformInfoPtr);
+        HMONITOR display = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
+        UINT xDpi, yDpi;
+        GetDpiForMonitor(display, MDT_RAW_DPI, &xDpi, &yDpi);
+        long dpi = (long)xDpi;
+        // We can get dpi:0 if we set up multiple displays for content duplication (mirror). 
+        if (dpi == 0) {
+            // get default system dpi
+            dpi = GetDpiForWindow(hwnd);
+        }
+        return dpi;
     }
 } // extern "C"

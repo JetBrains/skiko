@@ -72,8 +72,18 @@ fun createWindow(title: String, exitOnClose: Boolean) = SwingUtilities.invokeLat
         }
     })
 
+    val miDpiState = JMenuItem("Get current DPI")
+    val ctrlD = KeyStroke.getKeyStroke(KeyEvent.VK_D, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx())
+    miDpiState.setAccelerator(ctrlD)
+    miDpiState.addActionListener(object : ActionListener {
+        override fun actionPerformed(actionEvent: ActionEvent?) {
+            println("DPI: ${skiaLayer.currentDPI}")
+        }
+    })
+
     fileMenu.add(miToggleFullscreen)
     fileMenu.add(miFullscreenState)
+    fileMenu.add(miDpiState)
     fileMenu.add(miTakeScreenshot)
 
     val editMenu = JMenu("Edit")

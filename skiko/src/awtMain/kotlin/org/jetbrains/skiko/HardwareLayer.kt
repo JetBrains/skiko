@@ -66,6 +66,8 @@ internal open class HardwareLayer(
 
     val windowHandle: Long
         get() = useDrawingSurfacePlatformInfo(::getWindowHandle)
+    val currentDPI: Long
+        get() = useDrawingSurfacePlatformInfo(::getCurrentDPI)
 
     val contentScale: Float
         get() = _contentScale!!
@@ -80,6 +82,7 @@ internal open class HardwareLayer(
 
     private external fun getContentHandle(platformInfo: Long): Long
     private external fun getWindowHandle(platformInfo: Long): Long
+    private external fun getCurrentDPI(platformInfo: Long): Long
 
     private val _externalAccessible = externalAccessibleFactory?.invoke(this)
     private var _focusedAccessible: Accessible? = null
