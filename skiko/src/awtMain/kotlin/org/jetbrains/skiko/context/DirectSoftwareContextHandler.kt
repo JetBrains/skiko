@@ -38,17 +38,25 @@ internal class DirectSoftwareContextHandler(layer: SkiaLayer) : JvmContextHandle
         val h = (layer.height * scale).toInt().coerceAtLeast(0)
         if (isSizeChanged(w, h) || surface == null) {
             disposeCanvas()
-            softwareRedrawer.resize(w, h)
-            surface = softwareRedrawer.acquireSurface()
-            canvas = surface!!.canvas
+            if (w > 0 && h > 0) {
+                softwareRedrawer.resize(w, h)
+                surface = softwareRedrawer.acquireSurface()
+                canvas = surface!!.canvas
+            } else {
+                surface = null
+                canvas = null
+            }
         }
     }
 
     override fun flush() {
-        try {
-            softwareRedrawer.finishFrame(getPtr(surface!!))
-        } finally {
-            Reference.reachabilityFence(surface!!)
+        val surface = surface
+        if (surface != null) {
+            try {
+                softwareRedrawer.finishFrame(getPtr(surface))
+            } finally {
+                Reference.reachabilityFence(surface)
+            }
         }
     }
 }

@@ -25,6 +25,7 @@ import java.awt.Color
 import java.awt.Dimension
 import java.awt.event.WindowEvent
 import javax.swing.JFrame
+import javax.swing.JLayeredPane
 import javax.swing.WindowConstants
 import kotlin.random.Random
 import kotlin.test.assertTrue
@@ -131,6 +132,55 @@ class SkiaLayerTest {
             delay(1000)
             screenshots.assert(window.bounds, "frame2")
         } finally {
+            window.close()
+        }
+    }
+
+    @Test
+    fun `render empty layer`() = uiTest {
+        val window = JFrame()
+        val layer = SkiaLayer(
+            properties = SkiaLayerProperties(renderApi = renderApi)
+        )
+        var renderedWidth = -1
+        layer.skikoView = object : SkikoView {
+            override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+                renderedWidth = width
+            }
+        }
+        layer.size = Dimension(0, 0)
+        val density = window.graphicsConfiguration.defaultTransform.scaleX
+        try {
+            val panel = JLayeredPane()
+            panel.add(layer)
+            window.contentPane.add(panel)
+            window.setLocation(200, 200)
+            window.size = Dimension(200, 200)
+            window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+            window.isUndecorated = true
+            window.isVisible = true
+            layer.needRedraw()
+            delay(1000)
+            assertEquals(0, renderedWidth)
+
+            renderedWidth = -1
+            layer.needRedraw()
+            delay(1000)
+            assertEquals(0, renderedWidth)
+
+            renderedWidth = -1
+            layer.size = Dimension(30, 40)
+            layer.needRedraw()
+            delay(1000)
+            assertEquals((30 * density).toInt(), renderedWidth)
+
+            renderedWidth = -1
+            layer.size = Dimension(0, 0)
+            layer.needRedraw()
+            delay(1000)
+            assertEquals(0, renderedWidth)
+        } finally {
+            layer.dispose()
             window.close()
         }
     }

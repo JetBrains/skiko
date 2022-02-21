@@ -34,22 +34,28 @@ internal class MetalContextHandler(layer: SkiaLayer) : JvmContextHandler(layer) 
         val w = (layer.width * scale).toInt().coerceAtLeast(0)
         val h = (layer.height * scale).toInt().coerceAtLeast(0)
 
-        renderTarget = metalRedrawer.makeRenderTarget(w, h)
+        if (w > 0 && h > 0) {
+            renderTarget = metalRedrawer.makeRenderTarget(w, h)
 
-        surface = Surface.makeFromBackendRenderTarget(
-            context!!,
-            renderTarget!!,
-            SurfaceOrigin.TOP_LEFT,
-            SurfaceColorFormat.BGRA_8888,
-            ColorSpace.sRGB
-        ) ?: throw RenderException("Cannot create surface")
+            surface = Surface.makeFromBackendRenderTarget(
+                context!!,
+                renderTarget!!,
+                SurfaceOrigin.TOP_LEFT,
+                SurfaceColorFormat.BGRA_8888,
+                ColorSpace.sRGB
+            ) ?: throw RenderException("Cannot create surface")
 
-        canvas = surface!!.canvas
+            canvas = surface!!.canvas
+        } else {
+            renderTarget = null
+            surface = null
+            canvas = null
+        }
     }
 
     override fun flush() {
         super.flush()
-        surface!!.flushAndSubmit()
+        surface?.flushAndSubmit()
         metalRedrawer.finishFrame()
     }
 

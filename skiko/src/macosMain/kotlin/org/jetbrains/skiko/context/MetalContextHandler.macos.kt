@@ -35,23 +35,29 @@ internal class MacOsMetalContextHandler(layer: SkiaLayer) : ContextHandler(layer
         val w = (layer.nsView.frame.useContents { size.width } * scale).toInt().coerceAtLeast(0)
         val h = (layer.nsView.frame.useContents { size.height } * scale).toInt().coerceAtLeast(0)
 
-        renderTarget = metalRedrawer.makeRenderTarget(w, h)
+        if (w > 0 && h > 0) {
+            renderTarget = metalRedrawer.makeRenderTarget(w, h)
 
-        surface = Surface.makeFromBackendRenderTarget(
-            context!!,
-            renderTarget!!,
-            SurfaceOrigin.TOP_LEFT,
-            SurfaceColorFormat.BGRA_8888,
-            ColorSpace.sRGB
-        ) ?: throw RenderException("Cannot create surface")
+            surface = Surface.makeFromBackendRenderTarget(
+                context!!,
+                renderTarget!!,
+                SurfaceOrigin.TOP_LEFT,
+                SurfaceColorFormat.BGRA_8888,
+                ColorSpace.sRGB
+            ) ?: throw RenderException("Cannot create surface")
 
-        canvas = surface!!.canvas
+            canvas = surface!!.canvas
+        } else {
+            renderTarget = null
+            surface = null
+            canvas = null
+        }
     }
 
     override fun flush() {
         // TODO: maybe make flush async as in JVM version.
         super.flush()
-        surface!!.flushAndSubmit()
+        surface?.flushAndSubmit()
         metalRedrawer.finishFrame()
     }
 
