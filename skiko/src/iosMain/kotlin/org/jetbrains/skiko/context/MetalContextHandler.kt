@@ -59,6 +59,10 @@ internal class MetalContextHandler(layer: SkiaLayer) : ContextHandler(layer, lay
             ) ?: throw RenderException("Cannot create surface")
 
             canvas = surface!!.canvas
+        } else {
+            renderTarget = null
+            surface = null
+            canvas = null
         }
     }
 

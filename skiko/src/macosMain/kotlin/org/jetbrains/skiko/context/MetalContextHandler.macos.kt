@@ -47,6 +47,10 @@ internal class MacOsMetalContextHandler(layer: SkiaLayer) : ContextHandler(layer
             ) ?: throw RenderException("Cannot create surface")
 
             canvas = surface!!.canvas
+        } else {
+            renderTarget = null
+            surface = null
+            canvas = null
         }
     }
 
