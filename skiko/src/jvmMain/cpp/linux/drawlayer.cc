@@ -4,9 +4,11 @@
 #include <X11/X.h>
 #include <X11/Xlib.h>
 #include <X11/Xresource.h>
+#include <X11/extensions/Xrandr.h>
 #include <cstdlib>
 #include <unistd.h>
 #include <stdio.h>
+#include <vector>
 #include "jni_helpers.h"
 
 typedef GLXContext (*glXCreateContextAttribsARBProc)(Display *, GLXFBConfig, GLXContext, Bool, const int *);
@@ -91,6 +93,110 @@ extern "C"
     JNIEXPORT jfloat JNICALL Java_org_jetbrains_skiko_SetupKt_linuxGetSystemDpiScale(JNIEnv *env, jobject layer)
     {
         return (float) getDpiScale();
+    }
+
+    struct MonitorInfo {
+        int x;
+        int y;
+        int wPx;
+        int hPx;
+        int wMm;
+        int hMm;
+    };
+
+    int getIntersectSquare(int xR, int yR, int wR, int hR, int xA, int yA, int wA, int hA) {
+        xR = xR - xA;
+        xA = 0;
+        yR = yR - yA;
+        yA = 0;
+        if (xR < 0) {
+            wR = xR + wR;
+            xR = 0;
+        }
+        if (yR < 0) {
+            hR = yR + hR;
+            yR = 0;
+        }
+        if (xR + wR > xA + wA) {
+            wR = wA - xR;
+        }
+        if (yR + hR > yA + hA) {
+            hR = hA - yR;
+        }
+        return wR * hA;
+    }
+
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getCurrentDPI(JNIEnv *env, jobject canvas, jlong platformInfoPtr)
+    {
+        JAWT_X11DrawingSurfaceInfo *dsi_x11 = fromJavaPointer<JAWT_X11DrawingSurfaceInfo *>(platformInfoPtr);
+        Display *display = dsi_x11->display;
+        Window window = (Window)Java_org_jetbrains_skiko_HardwareLayer_getWindowHandle(env, canvas, platformInfoPtr);
+        XRRScreenResources * res = XRRGetScreenResources(display, window);
+        XRRCrtcInfo *crtc_info;
+
+        std::vector<MonitorInfo> monitors; 
+  
+        for (int i = 0; i < res->ncrtc; i++)
+        {
+            XRROutputInfo * output_info = XRRGetOutputInfo(display, res, res->outputs[i]);
+            if (output_info->connection || output_info->crtc == NULL) {
+                XRRFreeOutputInfo(output_info);
+                continue;
+            }
+            XRRCrtcInfo * crtc_info = XRRGetCrtcInfo(display, res, output_info->crtc);
+
+            MonitorInfo minfo;
+
+            minfo.x = crtc_info->x;
+            minfo.y = crtc_info->y;
+            minfo.wPx = crtc_info->width;
+            minfo.hPx = crtc_info->height;
+
+            if (crtc_info->rotation == RR_Rotate_90 || crtc_info->rotation == RR_Rotate_270)
+            {
+                minfo.wMm = output_info->mm_height;
+                minfo.hMm = output_info->mm_width;
+            }
+            else
+            {
+                minfo.wMm = output_info->mm_width;
+                minfo.hMm = output_info->mm_height;
+            }
+            // If XRandr does not provide a physical size, assume the X11 default 96 DPI
+            if (minfo.wMm <= 0 || minfo.hMm <= 0)
+            {
+                minfo.wMm  = (int) (minfo.wPx * 25.4f / 96.f);
+                minfo.hMm = (int) (minfo.hPx * 25.4f / 96.f);
+            }
+
+            monitors.push_back(minfo);
+
+            XRRFreeCrtcInfo(crtc_info);
+            XRRFreeOutputInfo(output_info);
+        }
+        XRRFreeScreenResources(res);
+
+        if (monitors.size() == 1) {
+            return (jlong)(monitors[0].wPx / (monitors[0].wMm / 25.4));
+        }
+
+        // Determining which monitor the current window is located
+        XWindowAttributes xwa;
+        XGetWindowAttributes(display, window, &xwa);
+        int index = 0;
+        int maxIntersectSquare = 0;
+        for (int m = 0; m < monitors.size(); m++) {
+            int intersectSquare = getIntersectSquare(
+                xwa.x, xwa.y, xwa.width, xwa.height,
+                monitors[m].x, monitors[m].y, monitors[m].wPx, monitors[m].hPx
+            );
+            if (maxIntersectSquare < intersectSquare) {
+                maxIntersectSquare = intersectSquare;
+                index = m;
+            }
+        }
+
+        return (jlong)(monitors[index].wPx / (monitors[index].wMm / 25.4));
     }
 
 } // extern "C"

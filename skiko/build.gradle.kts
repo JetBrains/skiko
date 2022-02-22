@@ -451,6 +451,7 @@ fun configureNativeTarget(os: OS, arch: Arch, target: KotlinNativeTarget) {
                 linkerFlags.addAll(when (os) {
                     OS.Linux -> listOf(
                         "-linker-option", "-lX11",
+                        "-linker-option", "-lXrandr",
                         "-linker-option", "-lGLX",
                     )
                     else -> emptyList()
@@ -915,6 +916,7 @@ fun createLinkJvmBindings(
                     "-static-libgcc",
                     "-lGL",
                     "-lX11",
+                    "-lXrandr",
                     "-lfontconfig",
                     // A fix for https://github.com/JetBrains/compose-jb/issues/413.
                     // Dynamic position independent linking uses PLT thunks relying on jump targets in GOT (Global Offsets Table).
