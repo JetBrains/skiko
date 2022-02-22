@@ -71,9 +71,10 @@ internal object SkikoProperties {
         }
 
         val indexOfInitialApi = fallbackApis.indexOf(initialApi)
-        if (indexOfInitialApi >= 0) {
-            fallbackApis = fallbackApis.drop(indexOfInitialApi + 1)
+        require(indexOfInitialApi >= 0) {
+            "$hostOs does not support $initialApi rendering API."
         }
+        fallbackApis = fallbackApis.drop(indexOfInitialApi + 1)
 
         return listOf(initialApi) + fallbackApis
     }
