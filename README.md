@@ -125,7 +125,7 @@ class SkikoAppDelegate : UIResponder, UIApplicationDelegateProtocol {
     }
 }
 ```
-See this [sample](/sample/SkiaMultiplatformSample) for complete example.
+See this [sample](/samples/SkiaMultiplatformSample) for complete example.
 
 To use latest development snapshot use version `0.0.0-SNAPSHOT`.
 
