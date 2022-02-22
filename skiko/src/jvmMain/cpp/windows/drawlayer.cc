@@ -59,13 +59,13 @@ extern "C"
          }
     }
 
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getCurrentDPI(JNIEnv *env, jobject canvas, jlong platformInfoPtr)
+    JNIEXPORT jint JNICALL Java_org_jetbrains_skiko_HardwareLayer_getCurrentDPI(JNIEnv *env, jobject canvas, jlong platformInfoPtr)
     {
         HWND hwnd = (HWND)Java_org_jetbrains_skiko_HardwareLayer_getWindowHandle(env, canvas, platformInfoPtr);
         HMONITOR display = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
-        UINT xDpi, yDpi;
+        UINT xDpi = 0, yDpi = 0;
         GetDpiForMonitor(display, MDT_RAW_DPI, &xDpi, &yDpi);
-        long dpi = (long)xDpi;
+        int dpi = (int)xDpi;
         // We can get dpi:0 if we set up multiple displays for content duplication (mirror). 
         if (dpi == 0) {
             // get default system dpi

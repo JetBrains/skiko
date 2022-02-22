@@ -6,12 +6,94 @@
 #include <X11/Xresource.h>
 #include <X11/extensions/Xrandr.h>
 #include <cstdlib>
+#include <dlfcn.h>
 #include <unistd.h>
 #include <stdio.h>
-#include <vector>
 #include "jni_helpers.h"
+#include <vector>
 
 typedef GLXContext (*glXCreateContextAttribsARBProc)(Display *, GLXFBConfig, GLXContext, Bool, const int *);
+
+static void* loadXrandr() {
+    static void* result = nullptr;
+    if (result != nullptr) return result;
+    result = dlopen("libXrandr.so", RTLD_LAZY | RTLD_LOCAL);
+    return result;
+}
+
+static XRRScreenResources* XRRGetScreenResourcesCurrentDynamic(Display* display, Window window) {
+    typedef XRRScreenResources* (*XRRGetScreenResourcesCurrent_t)(Display*, Window);
+    static XRRGetScreenResourcesCurrent_t func = nullptr;
+    if (!func) {
+        void* lib = loadXrandr();
+        if (!lib) return nullptr;
+        func = (XRRGetScreenResourcesCurrent_t)dlsym(lib, "XRRGetScreenResourcesCurrent");
+    }
+    if (!func) return nullptr;
+    return func(display, window);
+}
+
+static XRRCrtcInfo* XRRGetCrtcInfoDynamic(
+    Display *display, XRRScreenResources *resources, RRCrtc crtc) {
+    typedef XRRCrtcInfo* (*XRRGetCrtcInfo_t)(Display*, XRRScreenResources*, RRCrtc);
+    static XRRGetCrtcInfo_t func = nullptr;
+    if (!func) {
+        void* lib = loadXrandr();
+        if (!lib) return nullptr;
+        func = (XRRGetCrtcInfo_t)dlsym(lib, "XRRGetCrtcInfo");
+    }
+    if (!func) return nullptr;
+    return func(display, resources, crtc);
+}
+
+static XRROutputInfo* XRRGetOutputInfoDynamic(
+    Display *display, XRRScreenResources *resources, RROutput output) {
+    typedef XRROutputInfo* (*XRRGetOutputInfo_t)(Display*, XRRScreenResources*, RROutput);
+    static XRRGetOutputInfo_t func = nullptr;
+    if (!func) {
+        void* lib = loadXrandr();
+        if (!lib) return nullptr;
+        func = (XRRGetOutputInfo_t)dlsym(lib, "XRRGetOutputInfo");
+    }
+    if (!func) return nullptr;
+    return func(display, resources, output);
+}
+
+static void XRRFreeCrtcInfoDynamic(XRRCrtcInfo* crtcInfo) {
+    typedef void (*XRRFreeCrtcInfo_t)(XRRCrtcInfo*);
+    static XRRFreeCrtcInfo_t func = nullptr;
+    if (!func) {
+        void* lib = loadXrandr();
+        if (!lib) return;
+        func = (XRRFreeCrtcInfo_t)dlsym(lib, "XRRFreeCrtcInfo");
+    }
+    if (!func) return;
+    func(crtcInfo);
+}
+
+static void XRRFreeOutputInfoDynamic(XRROutputInfo* outputInfo) {
+    typedef void (*XRRFreeOutputInfo_t)(XRROutputInfo*);
+    static XRRFreeOutputInfo_t func = nullptr;
+    if (!func) {
+        void* lib = loadXrandr();
+        if (!lib) return;
+        func = (XRRFreeOutputInfo_t)dlsym(lib, "XRRFreeOutputInfo");
+    }
+    if (!func) return;
+    func(outputInfo);
+}
+
+static void XRRFreeScreenResourcesDynamic(XRRScreenResources *resources) {
+    typedef void (*XRRFreeScreenResources_t)(XRRScreenResources*);
+    static XRRFreeScreenResources_t func = nullptr;
+    if (!func) {
+        void* lib = loadXrandr();
+        if (!lib) return;
+        func = (XRRFreeScreenResources_t)dlsym(lib, "XRRFreeScreenResources");
+    }
+    if (!func) return;
+    func(resources);
+}
 
 extern "C"
 {
@@ -126,24 +208,24 @@ extern "C"
         return wR * hA;
     }
 
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getCurrentDPI(JNIEnv *env, jobject canvas, jlong platformInfoPtr)
+    JNIEXPORT jint JNICALL Java_org_jetbrains_skiko_HardwareLayer_getCurrentDPI(JNIEnv *env, jobject canvas, jlong platformInfoPtr)
     {
         JAWT_X11DrawingSurfaceInfo *dsi_x11 = fromJavaPointer<JAWT_X11DrawingSurfaceInfo *>(platformInfoPtr);
         Display *display = dsi_x11->display;
         Window window = (Window)Java_org_jetbrains_skiko_HardwareLayer_getWindowHandle(env, canvas, platformInfoPtr);
-        XRRScreenResources * res = XRRGetScreenResources(display, window);
+        XRRScreenResources * res = XRRGetScreenResourcesCurrentDynamic(display, window);
         XRRCrtcInfo *crtc_info;
 
         std::vector<MonitorInfo> monitors; 
   
         for (int i = 0; i < res->ncrtc; i++)
         {
-            XRROutputInfo * output_info = XRRGetOutputInfo(display, res, res->outputs[i]);
+            XRROutputInfo * output_info = XRRGetOutputInfoDynamic(display, res, res->outputs[i]);
             if (output_info->connection || output_info->crtc == NULL) {
-                XRRFreeOutputInfo(output_info);
+                XRRFreeOutputInfoDynamic(output_info);
                 continue;
             }
-            XRRCrtcInfo * crtc_info = XRRGetCrtcInfo(display, res, output_info->crtc);
+            XRRCrtcInfo * crtc_info = XRRGetCrtcInfoDynamic(display, res, output_info->crtc);
 
             MonitorInfo minfo;
 
@@ -171,13 +253,13 @@ extern "C"
 
             monitors.push_back(minfo);
 
-            XRRFreeCrtcInfo(crtc_info);
-            XRRFreeOutputInfo(output_info);
+            XRRFreeCrtcInfoDynamic(crtc_info);
+            XRRFreeOutputInfoDynamic(output_info);
         }
-        XRRFreeScreenResources(res);
+        XRRFreeScreenResourcesDynamic(res);
 
         if (monitors.size() == 1) {
-            return (jlong)(monitors[0].wPx / (monitors[0].wMm / 25.4));
+            return (jint)(monitors[0].wPx / (monitors[0].wMm / 25.4));
         }
 
         // Determining which monitor the current window is open on
@@ -196,7 +278,7 @@ extern "C"
             }
         }
 
-        return (jlong)(monitors[index].wPx / (monitors[index].wMm / 25.4));
+        return (jint)(monitors[index].wPx / (monitors[index].wMm / 25.4));
     }
 
 } // extern "C"

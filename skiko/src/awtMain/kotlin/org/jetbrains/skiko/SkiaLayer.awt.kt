@@ -141,7 +141,7 @@ actual open class SkiaLayer internal constructor(
     val windowHandle: Long
         get() = backedLayer.windowHandle
     
-    val currentDPI: Long
+    val currentDPI: Int
         get() = backedLayer.currentDPI
 
     actual var fullscreen: Boolean

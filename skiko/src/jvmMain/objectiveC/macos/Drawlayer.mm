@@ -399,7 +399,7 @@ JNIEXPORT jint JNICALL Java_org_jetbrains_skiko_SystemTheme_1awtKt_getCurrentSys
     }
 }
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getCurrentDPI(JNIEnv *env, jobject component, jlong platformInfoPtr)
+JNIEXPORT jint JNICALL Java_org_jetbrains_skiko_HardwareLayer_getCurrentDPI(JNIEnv *env, jobject component, jlong platformInfoPtr)
 {
     @autoreleasepool {
         LayerHandler *layer = findByObject(env, component);
@@ -407,7 +407,7 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getCurrentDPI(JNI
         NSDictionary *description = [screen deviceDescription];
         NSSize displayPixelSize = [[description objectForKey:NSDeviceSize] sizeValue];
         CGSize displayPhysicalSize = CGDisplayScreenSize([[description objectForKey:@"NSScreenNumber"] unsignedIntValue]);
-        return (jlong)(displayPixelSize.width / (displayPhysicalSize.width / 25.4));
+        return (jint)(displayPixelSize.width / (displayPhysicalSize.width / 25.4));
     }
 }
 
