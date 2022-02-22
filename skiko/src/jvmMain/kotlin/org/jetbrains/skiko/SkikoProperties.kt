@@ -62,6 +62,26 @@ internal object SkikoProperties {
     }
 
     fun fallbackRenderApiQueue(initialApi: GraphicsApi) : List<GraphicsApi> {
+        when(initialApi) {
+            GraphicsApi.DIRECT3D -> {
+                when(hostOs) {
+                    OS.JS,
+                    OS.Ios,
+                    OS.Android,
+                    OS.Linux,
+                    OS.MacOS -> throw Exception("$hostOs does not support DirectX rendering API.")
+                }
+            }
+            GraphicsApi.METAL -> {
+                when(hostOs) {
+                    OS.JS,
+                    OS.Android,
+                    OS.Linux,
+                    OS.Windows -> throw Exception("$hostOs does not support Metal rendering API.")
+                }
+            }
+        }
+
         var fallbackApis = when (hostOs) {
             OS.Linux -> listOf(GraphicsApi.OPENGL, GraphicsApi.SOFTWARE_FAST, GraphicsApi.SOFTWARE_COMPAT)
             OS.MacOS -> listOf(GraphicsApi.METAL, GraphicsApi.SOFTWARE_COMPAT)
