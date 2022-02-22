@@ -180,7 +180,7 @@ extern "C"
             return (jlong)(monitors[0].wPx / (monitors[0].wMm / 25.4));
         }
 
-        // Determining which monitor the current window is located
+        // Determining which monitor the current window is open on
         XWindowAttributes xwa;
         XGetWindowAttributes(display, window, &xwa);
         int index = 0;

@@ -399,6 +399,18 @@ JNIEXPORT jint JNICALL Java_org_jetbrains_skiko_SystemTheme_1awtKt_getCurrentSys
     }
 }
 
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_HardwareLayer_getCurrentDPI(JNIEnv *env, jobject component, jlong platformInfoPtr)
+{
+    @autoreleasepool {
+        LayerHandler *layer = findByObject(env, component);
+        NSScreen *screen = [layer.window screen];
+        NSDictionary *description = [screen deviceDescription];
+        NSSize displayPixelSize = [[description objectForKey:NSDeviceSize] sizeValue];
+        CGSize displayPhysicalSize = CGDisplayScreenSize([[description objectForKey:@"NSScreenNumber"] unsignedIntValue]);
+        return (jlong)(displayPixelSize.width / (displayPhysicalSize.width / 25.4));
+    }
+}
+
 void getMetalDeviceAndQueue(void** device, void** queue)
 {
     id<MTLDevice> fDevice = MTLCreateSystemDefaultDevice();
