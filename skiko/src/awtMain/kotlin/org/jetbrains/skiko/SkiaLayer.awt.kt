@@ -135,11 +135,25 @@ actual open class SkiaLayer internal constructor(
     actual val contentScale: Float
         get() = backedLayer.contentScale
 
+    /**
+     * Returns the pointer to an OS specific handle (native resource) of the [SkiaLayer].
+     */
     val contentHandle: Long
         get() = backedLayer.contentHandle
 
+    /**
+     * Returns the pointer to an OS specific window handle (native resource)
+     * which the current [SkiaLayer] is attached.
+     */
     val windowHandle: Long
         get() = backedLayer.windowHandle
+
+    /**
+     * Returns the physical DPI value (number of dots per inch)
+     * of the current monitor.
+     */
+    val currentDPI: Int
+        get() = backedLayer.currentDPI
 
     actual var fullscreen: Boolean
         get() = fullscreenAdapter.fullscreen
