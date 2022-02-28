@@ -5,6 +5,7 @@ import java.awt.Font
 import java.awt.FontFormatException
 import java.io.File
 import java.io.FileInputStream
+import java.io.FileOutputStream
 import java.io.IOException
 import java.util.concurrent.ConcurrentHashMap
 
@@ -74,20 +75,31 @@ class AwtFontManager(fontPaths: Array<String> = emptyArray()) {
         return files
     }
 
+    private fun addFontFromFile(file: File): Boolean {
+        val f = try {
+            FileInputStream(file.absolutePath).use {
+                Font.createFont(Font.TRUETYPE_FONT, it)
+            }
+        } catch (e: FontFormatException){
+            return false
+        } catch (e: IOException) {
+            return false
+        }
+        val name = f.family
+
+        val list = fontsMap.computeIfAbsent(name) { mutableListOf() }
+        synchronized(list) {
+            list.add(FontDescriptor(file.absoluteFile, f.style))
+        }
+        return true
+    }
+
     private suspend fun cacheAllFonts() {
         fontsMap.clear()
         val fontFiles = findFontFiles(customFontPaths) + findFontFiles(systemFontsPaths())
         for (file in fontFiles) {
             try {
-                val f = FileInputStream(file.absolutePath).use {
-                    Font.createFont(Font.TRUETYPE_FONT, it)
-                }
-                val name = f.family
-
-                val list = fontsMap.computeIfAbsent(name) { mutableListOf() }
-                synchronized(list) {
-                    list.add(FontDescriptor(file.absoluteFile, f.style))
-                }
+                addFontFromFile(file)
                 yield()
             } catch (e: FontFormatException) {
             } catch (e: IOException) {
@@ -184,6 +196,26 @@ class AwtFontManager(fontPaths: Array<String> = emptyArray()) {
      */
     fun addCustomPath(path: String) {
         customFontPaths += path
+    }
+
+    /**
+     * Add custom resource entry as a font known to this resource manager.
+     *
+     * @return true, if font was found and identified, and false otherwise
+     */
+    fun addResourceFont(resource: String, loader: ClassLoader = Thread.currentThread().contextClassLoader): Boolean {
+        val res = loader.getResourceAsStream(resource) ?: ClassLoader.getSystemResourceAsStream(resource) ?: return false
+        val file = File.createTempFile("tmp", ".ttf")
+        file.deleteOnExit()
+        FileOutputStream(file).use { out ->
+            out.write(res.readAllBytes())
+        }
+        return addFontFromFile(file).also {
+            if (it)
+                customFontPaths += file.absolutePath
+            else
+                file.delete()
+        }
     }
 
     /**
