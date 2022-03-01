@@ -2390,6 +2390,7 @@ $dokka.location:org.jetbrains.skiko/AwtFontManager.Companion/DEFAULT/#/PointingT
 $dokka.location:org.jetbrains.skiko/AwtFontManager///PointingToDeclaration/skiko/org.jetbrains.skiko/-awt-font-manager/index.html
 $dokka.location:org.jetbrains.skiko/AwtFontManager/AwtFontManager/#kotlin.Array[kotlin.String]/PointingToDeclaration/skiko/org.jetbrains.skiko/-awt-font-manager/-awt-font-manager.html
 $dokka.location:org.jetbrains.skiko/AwtFontManager/addCustomPath/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-awt-font-manager/add-custom-path.html
+$dokka.location:org.jetbrains.skiko/AwtFontManager/addResourceFont/#kotlin.String#java.lang.ClassLoader/PointingToDeclaration/skiko/org.jetbrains.skiko/-awt-font-manager/add-resource-font.html
 $dokka.location:org.jetbrains.skiko/AwtFontManager/allFontsCached/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-awt-font-manager/all-fonts-cached.html
 $dokka.location:org.jetbrains.skiko/AwtFontManager/findAvailableFontFile/#java.awt.Font/PointingToDeclaration/skiko/org.jetbrains.skiko/-awt-font-manager/find-available-font-file.html
 $dokka.location:org.jetbrains.skiko/AwtFontManager/findFontFamilyFile/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-awt-font-manager/find-font-family-file.html
