@@ -93,4 +93,19 @@ class AwtFontInterop {
             assertTrue("Font must be file", path.exists() && path.isFile)
         }
     }
+
+    // This test is disabled due to convoluted setup of tests.
+    // @Test
+    fun addCustomResource() {
+        runTest {
+            assumeOk()
+            val fontManager = AwtFontManager()
+            assertTrue("Custom resource must be found",
+                fontManager.addResourceFont("/fonts/JetBrainsMono-Bold.ttf", Library.javaClass.classLoader))
+            val path = fontManager.findFontFamilyFile("JetBrains Mono")
+            assertTrue("Custom font must be found", path != null)
+            path!!
+            assertTrue("Font must be file", path.exists() && path.isFile)
+        }
+    }
 }
