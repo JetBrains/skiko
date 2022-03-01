@@ -43,6 +43,8 @@ class AwtFontManager(fontPaths: Array<String> = emptyArray()) {
             OS.Linux -> {
                 val pathsToCheck = arrayOf(
                     System.getProperty("user.home") + File.separator + ".fonts",
+                    "/usr/share/fonts",
+                    "/usr/local/share/fonts",
                     "/usr/share/fonts/truetype",
                     "/usr/share/fonts/TTF"
                 )
@@ -62,12 +64,18 @@ class AwtFontManager(fontPaths: Array<String> = emptyArray()) {
         }
     }
 
+    private fun isFont(extension: String): Boolean {
+        return extension == "ttf" ||
+               extension == "ttc" ||
+               extension == "otf"
+    }
+
     private fun findFontFiles(paths: List<String>): List<File> {
         val files = mutableListOf<File>()
         paths.forEach { path ->
             val fontDirectory = File(path)
             if (fontDirectory.exists()) {
-                fontDirectory.walk().filter { it.isFile && it.extension.lowercase() == "ttf" }.forEach {
+                fontDirectory.walk().filter { it.isFile && isFont(it.extension.lowercase()) }.forEach {
                     files.add(it)
                 }
             }
