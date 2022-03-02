@@ -148,3 +148,19 @@ SKIKO_EXPORT void org_jetbrains_skia_paragraph_ParagraphStyle__1nDisableHinting
     ParagraphStyle* instance = reinterpret_cast<ParagraphStyle*>((ptr));
     instance->turnHintingOff();
 }
+
+SKIKO_EXPORT void org_jetbrains_skia_paragraph_ParagraphStyle__1nSetTextIndent
+  (KNativePointer ptr, KFloat firstLine, KFloat restLine) {
+    ParagraphStyle* instance = reinterpret_cast<ParagraphStyle*>((ptr));
+    TextIndent indent;
+    indent.setFirstLine(firstLine);
+    indent.setRestLine(restLine);
+    instance->setTextIndent(indent);
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_paragraph_ParagraphStyle__1nGetTextIndent
+  (KNativePointer ptr, KInteropPointer result) {
+    ParagraphStyle* instance = reinterpret_cast<ParagraphStyle*>((ptr));
+    TextIndent* indent = reinterpret_cast<TextIndent*>(result);
+    *indent = instance->getTextIndent();
+}
