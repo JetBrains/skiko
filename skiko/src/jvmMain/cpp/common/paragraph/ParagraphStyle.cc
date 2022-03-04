@@ -148,3 +148,20 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_ParagraphSty
     ParagraphStyle* instance = reinterpret_cast<ParagraphStyle*>(static_cast<uintptr_t>(ptr));
     instance->turnHintingOff();
 }
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_ParagraphStyleKt__1nSetTextIndent
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloat firstLine, jfloat restLine) {
+    ParagraphStyle* instance = reinterpret_cast<ParagraphStyle*>(static_cast<uintptr_t>(ptr));
+    TextIndent indent;
+    indent.setFirstLine(firstLine);
+    indent.setRestLine(restLine);
+    instance->setTextIndent(indent);
+}
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_ParagraphStyleKt__1nGetTextIndent
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloatArray result) {
+    ParagraphStyle* instance = reinterpret_cast<ParagraphStyle*>(static_cast<uintptr_t>(ptr));
+    TextIndent indent = instance->getTextIndent();
+    float resultData[2] = { indent.getFirstLine(), indent.getRestLine() };
+    env->SetFloatArrayRegion(result, 0, 2, resultData);
+}

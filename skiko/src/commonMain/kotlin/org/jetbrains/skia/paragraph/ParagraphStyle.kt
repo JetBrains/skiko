@@ -1,15 +1,12 @@
 package org.jetbrains.skia.paragraph
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.Managed
-import org.jetbrains.skia.impl.Native
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
-import org.jetbrains.skia.impl.InteropPointer
-import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.getPtr
 import org.jetbrains.skia.impl.interopScope
+import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.impl.withResult
 import org.jetbrains.skia.impl.withStringResult
 
 class ParagraphStyle : Managed(ParagraphStyle_nMake(), _FinalizerHolder.PTR) {
@@ -170,6 +167,23 @@ class ParagraphStyle : Managed(ParagraphStyle_nMake(), _FinalizerHolder.PTR) {
         return this
     }
 
+    var textIndent: TextIndent
+        get() = try {
+            Stats.onNativeCall()
+            val indents = withResult(FloatArray(2)) {
+                _nGetTextIndent(_ptr, it)
+            }
+            TextIndent(indents[0], indents[1])
+        } finally {
+            reachabilityBarrier(this)
+        }
+        set(value) = try {
+            Stats.onNativeCall()
+            _nSetTextIndent(_ptr, value.firstLine, value.restLine)
+        } finally {
+            reachabilityBarrier(this)
+        }
+
     internal object _FinalizerHolder {
         val PTR = ParagraphStyle_nGetFinalizer()
     }
@@ -244,3 +258,9 @@ private external fun _nIsHintingEnabled(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nDisableHinting")
 private external fun _nDisableHinting(ptr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetTextIndent")
+private external fun _nSetTextIndent(ptr: NativePointer, firstLine: Float, restLine: Float)
+
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetTextIndent")
+private external fun _nGetTextIndent(ptr: NativePointer, result: InteropPointer)
