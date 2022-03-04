@@ -211,6 +211,7 @@ $dokka.location:org.jetbrains.skia.paragraph/ParagraphStyle/heightMode/#/Pointin
 $dokka.location:org.jetbrains.skia.paragraph/ParagraphStyle/isHintingEnabled/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph-style/is-hinting-enabled.html
 $dokka.location:org.jetbrains.skia.paragraph/ParagraphStyle/maxLinesCount/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph-style/max-lines-count.html
 $dokka.location:org.jetbrains.skia.paragraph/ParagraphStyle/strutStyle/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph-style/strut-style.html
+$dokka.location:org.jetbrains.skia.paragraph/ParagraphStyle/textIndent/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph-style/text-indent.html
 $dokka.location:org.jetbrains.skia.paragraph/ParagraphStyle/textStyle/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph-style/text-style.html
 $dokka.location:org.jetbrains.skia.paragraph/PlaceholderAlignment.ABOVE_BASELINE///PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-placeholder-alignment/-a-b-o-v-e_-b-a-s-e-l-i-n-e/index.html
 $dokka.location:org.jetbrains.skia.paragraph/PlaceholderAlignment.BASELINE///PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-placeholder-alignment/-b-a-s-e-l-i-n-e/index.html
@@ -297,6 +298,10 @@ $dokka.location:org.jetbrains.skia.paragraph/TextBox/equals/#kotlin.Any?/Pointin
 $dokka.location:org.jetbrains.skia.paragraph/TextBox/hashCode/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-box/hash-code.html
 $dokka.location:org.jetbrains.skia.paragraph/TextBox/rect/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-box/rect.html
 $dokka.location:org.jetbrains.skia.paragraph/TextBox/toString/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-box/to-string.html
+$dokka.location:org.jetbrains.skia.paragraph/TextIndent///PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-indent/index.html
+$dokka.location:org.jetbrains.skia.paragraph/TextIndent/TextIndent/#kotlin.Float#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-indent/-text-indent.html
+$dokka.location:org.jetbrains.skia.paragraph/TextIndent/firstLine/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-indent/first-line.html
+$dokka.location:org.jetbrains.skia.paragraph/TextIndent/restLine/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-indent/rest-line.html
 $dokka.location:org.jetbrains.skia.paragraph/TextStyle.Companion///PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-style/-companion/index.html
 $dokka.location:org.jetbrains.skia.paragraph/TextStyle///PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-style/index.html
 $dokka.location:org.jetbrains.skia.paragraph/TextStyle/TextStyle/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-style/-text-style.html
