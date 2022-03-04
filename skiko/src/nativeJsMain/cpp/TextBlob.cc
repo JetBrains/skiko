@@ -9,6 +9,7 @@
 #include "common.h"
 #include "RunRecordClone.hh"
 #include "mppinterop.h"
+#include "TexBlobIter.hh"
 
 static void unrefTextBlob(SkTextBlob* ptr) {
     ptr->unref();
@@ -173,4 +174,41 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_TextBlob__1nGetFirstBaseline
 SKIKO_EXPORT KBoolean org_jetbrains_skia_TextBlob__1nGetLastBaseline
   (KNativePointer ptr, KFloat* resultArray) {
   return skikoMpp::textblob::getLastBaseline(reinterpret_cast<SkTextBlob*>(ptr), resultArray);
+}
+
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_TextBlob_Iter__1nCreate(KNativePointer textBlobPtr) {
+    return new TextBlobIter(reinterpret_cast<SkTextBlob*>(textBlobPtr));
+}
+
+static void deleteTextBlobIter(TextBlobIter* ptr) {
+    delete ptr;
+}
+
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_TextBlob_Iter__1nGetFinalizer() {
+    return reinterpret_cast<KNativePointer>(&deleteTextBlobIter);
+}
+
+SKIKO_EXPORT KBoolean org_jetbrains_skia_TextBlob_Iter__1nFetch(KNativePointer ptr) {
+    TextBlobIter* instance = reinterpret_cast<TextBlobIter*>(ptr);
+    return (KBoolean) instance->fetch();
+}
+
+SKIKO_EXPORT KBoolean org_jetbrains_skia_TextBlob_Iter__1nHasNext(KNativePointer ptr) {
+    TextBlobIter* instance = reinterpret_cast<TextBlobIter*>(ptr);
+    return (KBoolean) instance->hasNext();
+}
+
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_TextBlob_Iter__1nGetTypeface(KNativePointer ptr) {
+    TextBlobIter* instance = reinterpret_cast<TextBlobIter*>(ptr);
+    return (KNativePointer) instance->getTypeface().release();
+}
+
+SKIKO_EXPORT KInt org_jetbrains_skia_TextBlob_Iter__1nGetGlyphCount(KNativePointer ptr) {
+    TextBlobIter* instance = reinterpret_cast<TextBlobIter*>(ptr);
+    return (KInt) instance->getGlyphCount();
+}
+
+SKIKO_EXPORT KInt org_jetbrains_skia_TextBlob_Iter__1nGetGlyphs(KNativePointer ptr, KInteropPointer dst, KInt max) {
+    TextBlobIter* instance = reinterpret_cast<TextBlobIter*>(ptr);
+    return (KInt) instance->writeGlyphs((uint16_t*) dst, max);
 }

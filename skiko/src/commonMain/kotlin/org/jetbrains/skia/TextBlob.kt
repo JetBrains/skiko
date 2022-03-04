@@ -3,7 +3,7 @@ package org.jetbrains.skia
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 
-class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
+class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR), Iterable<TextBlob.TextBlobIter.Run> {
     companion object {
         /**
          * Returns a TextBlob built from a single run of text with x-positions and a single y value.
@@ -319,6 +319,59 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
     private object _FinalizerHolder {
         val PTR = TextBlob_nGetFinalizer()
     }
+
+    override fun iterator(): Iterator<TextBlobIter.Run> = TextBlobIter(this)
+
+    class TextBlobIter(val textBlob: TextBlob) : Iterator<TextBlobIter.Run>, Managed(Iter_nCreate(textBlob._ptr), FinalizerHolder.PTR) {
+        data class Run(val typeface: Typeface, val glyphs: ShortArray) {
+            override fun equals(other: Any?): Boolean {
+                if (this === other) return true
+                if (other == null || this::class != other::class) return false
+
+                other as Run
+
+                if (typeface != other.typeface) return false
+                if (!glyphs.contentEquals(other.glyphs)) return false
+
+                return true
+            }
+
+            override fun hashCode(): Int {
+                var result = typeface.hashCode()
+                result = 31 * result + glyphs.contentHashCode()
+                return result
+            }
+        }
+
+        override fun hasNext(): Boolean {
+            Stats.onNativeCall()
+            try {
+                return Iter_nHasNext(_ptr)
+            } finally {
+                reachabilityBarrier(this)
+            }
+        }
+
+        override fun next(): Run {
+            Stats.onNativeCall()
+            try {
+                val typeface = Typeface(Iter_nGetTypeface(_ptr))
+                val glyphCount = Iter_nGetGlyphCount(_ptr)
+                val glyphs = withResult(ShortArray(glyphCount)) {
+                    Iter_nGetGlyphs(_ptr, it, glyphCount)
+                }
+                Iter_nFetch(_ptr)
+                return Run(typeface, glyphs)
+            } finally {
+                reachabilityBarrier(this)
+            }
+        }
+
+        private object FinalizerHolder {
+            val PTR = Iter_nGetFinalizer()
+        }
+    }
+
 }
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetFinalizer")
@@ -380,3 +433,24 @@ private external fun _nGetFirstBaseline(ptr: NativePointer, resultArray: Interop
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlob__1nGetLastBaseline")
 private external fun _nGetLastBaseline(ptr: NativePointer, resultArray: InteropPointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob_Iter__1nCreate")
+private external fun Iter_nCreate(textBlobPtr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob_Iter__1nGetFinalizer")
+private external fun Iter_nGetFinalizer(): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob_Iter__1nFetch")
+private external fun Iter_nFetch(ptr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob_Iter__1nGetTypeface")
+private external fun Iter_nGetTypeface(ptr: NativePointer): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob_Iter__1nHasNext")
+private external fun Iter_nHasNext(ptr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob_Iter__1nGetGlyphCount")
+private external fun Iter_nGetGlyphCount(ptr: NativePointer): Int
+
+@ExternalSymbolName("org_jetbrains_skia_TextBlob_Iter__1nGetGlyphs")
+private external fun Iter_nGetGlyphs(ptr: NativePointer, glyphs: InteropPointer, max: Int): Int
