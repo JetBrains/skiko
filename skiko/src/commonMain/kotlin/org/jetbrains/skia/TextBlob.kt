@@ -326,14 +326,9 @@ class TextBlob internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
         data class Run(val typeface: Typeface, val glyphs: ShortArray) {
             override fun equals(other: Any?): Boolean {
                 if (this === other) return true
-                if (other == null || this::class != other::class) return false
+                if (other !is Run) return false
 
-                other as Run
-
-                if (typeface != other.typeface) return false
-                if (!glyphs.contentEquals(other.glyphs)) return false
-
-                return true
+                return typeface == other.typeface && glyphs.contentEquals(other.glyphs)
             }
 
             override fun hashCode(): Int {
