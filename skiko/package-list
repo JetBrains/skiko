@@ -2260,6 +2260,17 @@ $dokka.location:org.jetbrains.skia/TextBlob.Companion/makeFromData/#org.jetbrain
 $dokka.location:org.jetbrains.skia/TextBlob.Companion/makeFromPos/#kotlin.ShortArray#kotlin.Array[org.jetbrains.skia.Point]#org.jetbrains.skia.Font?/PointingToDeclaration/skiko/org.jetbrains.skia/-text-blob/-companion/make-from-pos.html
 $dokka.location:org.jetbrains.skia/TextBlob.Companion/makeFromPosH/#kotlin.ShortArray#kotlin.FloatArray#kotlin.Float#org.jetbrains.skia.Font?/PointingToDeclaration/skiko/org.jetbrains.skia/-text-blob/-companion/make-from-pos-h.html
 $dokka.location:org.jetbrains.skia/TextBlob.Companion/makeFromRSXform/#kotlin.ShortArray#kotlin.Array[org.jetbrains.skia.RSXform]#org.jetbrains.skia.Font?/PointingToDeclaration/skiko/org.jetbrains.skia/-text-blob/-companion/make-from-r-s-xform.html
+$dokka.location:org.jetbrains.skia/TextBlob.TextBlobIter.Run///PointingToDeclaration/skiko/org.jetbrains.skia/-text-blob/-text-blob-iter/-run/index.html
+$dokka.location:org.jetbrains.skia/TextBlob.TextBlobIter.Run/Run/#org.jetbrains.skia.Typeface#kotlin.ShortArray/PointingToDeclaration/skiko/org.jetbrains.skia/-text-blob/-text-blob-iter/-run/-run.html
+$dokka.location:org.jetbrains.skia/TextBlob.TextBlobIter.Run/equals/#kotlin.Any?/PointingToDeclaration/skiko/org.jetbrains.skia/-text-blob/-text-blob-iter/-run/equals.html
+$dokka.location:org.jetbrains.skia/TextBlob.TextBlobIter.Run/glyphs/#/PointingToDeclaration/skiko/org.jetbrains.skia/-text-blob/-text-blob-iter/-run/glyphs.html
+$dokka.location:org.jetbrains.skia/TextBlob.TextBlobIter.Run/hashCode/#/PointingToDeclaration/skiko/org.jetbrains.skia/-text-blob/-text-blob-iter/-run/hash-code.html
+$dokka.location:org.jetbrains.skia/TextBlob.TextBlobIter.Run/typeface/#/PointingToDeclaration/skiko/org.jetbrains.skia/-text-blob/-text-blob-iter/-run/typeface.html
+$dokka.location:org.jetbrains.skia/TextBlob.TextBlobIter///PointingToDeclaration/skiko/org.jetbrains.skia/-text-blob/-text-blob-iter/index.html
+$dokka.location:org.jetbrains.skia/TextBlob.TextBlobIter/TextBlobIter/#org.jetbrains.skia.TextBlob/PointingToDeclaration/skiko/org.jetbrains.skia/-text-blob/-text-blob-iter/-text-blob-iter.html
+$dokka.location:org.jetbrains.skia/TextBlob.TextBlobIter/hasNext/#/PointingToDeclaration/skiko/org.jetbrains.skia/-text-blob/-text-blob-iter/has-next.html
+$dokka.location:org.jetbrains.skia/TextBlob.TextBlobIter/next/#/PointingToDeclaration/skiko/org.jetbrains.skia/-text-blob/-text-blob-iter/next.html
+$dokka.location:org.jetbrains.skia/TextBlob.TextBlobIter/textBlob/#/PointingToDeclaration/skiko/org.jetbrains.skia/-text-blob/-text-blob-iter/text-blob.html
 $dokka.location:org.jetbrains.skia/TextBlob///PointingToDeclaration/skiko/org.jetbrains.skia/-text-blob/index.html
 $dokka.location:org.jetbrains.skia/TextBlob/blockBounds/#/PointingToDeclaration/skiko/org.jetbrains.skia/-text-blob/block-bounds.html
 $dokka.location:org.jetbrains.skia/TextBlob/bounds/#/PointingToDeclaration/skiko/org.jetbrains.skia/-text-blob/bounds.html
@@ -2268,6 +2279,7 @@ $dokka.location:org.jetbrains.skia/TextBlob/firstBaseline/#/PointingToDeclaratio
 $dokka.location:org.jetbrains.skia/TextBlob/getIntercepts/#kotlin.Float#kotlin.Float#org.jetbrains.skia.Paint?/PointingToDeclaration/skiko/org.jetbrains.skia/-text-blob/get-intercepts.html
 $dokka.location:org.jetbrains.skia/TextBlob/getIntercepts/#kotlin.Float#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skia/-text-blob/get-intercepts.html
 $dokka.location:org.jetbrains.skia/TextBlob/glyphs/#/PointingToDeclaration/skiko/org.jetbrains.skia/-text-blob/glyphs.html
+$dokka.location:org.jetbrains.skia/TextBlob/iterator/#/PointingToDeclaration/skiko/org.jetbrains.skia/-text-blob/iterator.html
 $dokka.location:org.jetbrains.skia/TextBlob/lastBaseline/#/PointingToDeclaration/skiko/org.jetbrains.skia/-text-blob/last-baseline.html
 $dokka.location:org.jetbrains.skia/TextBlob/positions/#/PointingToDeclaration/skiko/org.jetbrains.skia/-text-blob/positions.html
 $dokka.location:org.jetbrains.skia/TextBlob/serializeToData/#/PointingToDeclaration/skiko/org.jetbrains.skia/-text-blob/serialize-to-data.html
