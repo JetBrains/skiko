@@ -1,5 +1,7 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.paragraph.TypefaceFontProvider
+import org.jetbrains.skia.shaper.Shaper
 import org.jetbrains.skia.tests.assertCloseEnough
 import org.jetbrains.skia.tests.assertContentCloseEnough
 import org.jetbrains.skia.tests.makeFromResource
@@ -230,5 +232,21 @@ class TextBlobTest {
         val data = textBlob.serializeToData()
         val blobFromData = TextBlob.makeFromData(data)!!
         assertContentEquals(expected = glyphs, actual = blobFromData.glyphs)
+    }
+
+    @Test
+    fun iterTest() = runTest {
+        val interFont = inter36()
+        val fontMgr = TypefaceFontProvider().apply {
+            registerTypeface(interFont.typeface, "Inter")
+        }
+        val text = "Hello, world!"
+        val glyphs = shortArrayOf(161, 611, 721, 721, 773, 1398, 1673, 934, 773, 835, 721, 593, 1326)
+        val runs = listOf(
+            TextBlob.TextBlobIter.Run(interFont.typeface!!, glyphs)
+        )
+        val textBlob = Shaper.make(fontMgr).shape(text, interFont)
+
+        assertContentEquals(runs, textBlob!!.toList())
     }
 }

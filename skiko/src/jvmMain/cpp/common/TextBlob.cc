@@ -7,6 +7,7 @@
 #include "interop.hh"
 #include "mppinterop.h"
 #include "RunRecordClone.hh"
+#include "TexBlobIter.hh"
 
 static void unrefTextBlob(SkTextBlob* ptr) {
     ptr->unref();
@@ -202,4 +203,47 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_TextBlobKt__1nGetL
     auto hasValue = skikoMpp::textblob::getLastBaseline(instance, reinterpret_cast<float*>(floats));
     env->ReleaseFloatArrayElements(resultArray, floats, 0);
     return hasValue;
+}
+
+
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TextBlobKt_Iter_1nCreate(JNIEnv* env, jclass jclass, jlong textBlobPtr) {
+    TextBlobIter* result = new TextBlobIter(reinterpret_cast<SkTextBlob*>(textBlobPtr));
+    return static_cast<jlong>(reinterpret_cast<uintptr_t>(result));
+}
+
+static void deleteTextBlobIter(TextBlobIter* ptr) {
+    delete ptr;
+}
+
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TextBlobKt_Iter_1nGetFinalizer(JNIEnv* env, jclass jclass) {
+    return static_cast<jlong>(reinterpret_cast<uintptr_t>(&deleteTextBlobIter));
+}
+
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_TextBlobKt_Iter_1nFetch(JNIEnv* env, jclass jclass, jlong ptr) {
+    TextBlobIter* instance = reinterpret_cast<TextBlobIter*>(static_cast<uintptr_t>(ptr));
+    return (jboolean) instance->fetch();
+}
+
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_TextBlobKt_Iter_1nHasNext(JNIEnv* env, jclass jclass, jlong ptr) {
+    TextBlobIter* instance = reinterpret_cast<TextBlobIter*>(static_cast<uintptr_t>(ptr));
+    return (jboolean) instance->hasNext();
+}
+
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_TextBlobKt_Iter_1nGetTypeface(JNIEnv* env, jclass jclass, jlong ptr) {
+    TextBlobIter* instance = reinterpret_cast<TextBlobIter*>(static_cast<uintptr_t>(ptr));
+    return (jlong) instance->getTypeface().release();
+}
+
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TextBlobKt_Iter_1nGetGlyphCount(JNIEnv* env, jclass jclass, jlong ptr) {
+    TextBlobIter* instance = reinterpret_cast<TextBlobIter*>(static_cast<uintptr_t>(ptr));
+    return (jint) instance->getGlyphCount();
+}
+
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_TextBlobKt_Iter_1nGetGlyphs
+        (JNIEnv* env, jclass jclass, jlong ptr, jshortArray dstArray, jint max) {
+    TextBlobIter* instance = reinterpret_cast<TextBlobIter*>(static_cast<uintptr_t>(ptr));
+    jshort* dst = env->GetShortArrayElements(dstArray, nullptr);
+    int size = instance->writeGlyphs((uint16_t*) dst, max);
+    env->ReleaseShortArrayElements(dstArray, dst, 0);
+    return (jint) size;
 }
