@@ -2,7 +2,7 @@ package org.jetbrains.skiko
 
 import org.jetbrains.skiko.redrawer.*
 
-internal interface RenderFactory {
+internal fun interface RenderFactory {
     fun createRedrawer(layer: SkiaLayer, renderApi: GraphicsApi, properties: SkiaLayerProperties): Redrawer
 
     companion object {
