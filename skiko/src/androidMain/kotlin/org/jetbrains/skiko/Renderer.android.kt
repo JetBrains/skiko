@@ -13,7 +13,7 @@ import java.nio.IntBuffer
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
-internal interface FrameManager {
+internal fun interface FrameManager {
     fun onFrameCompleted()
 }
 
