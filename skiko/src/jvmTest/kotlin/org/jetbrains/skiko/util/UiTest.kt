@@ -1,9 +1,7 @@
 package org.jetbrains.skiko.util
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.swing.Swing
 import org.jetbrains.skiko.*
 import org.junit.Assume.assumeFalse
 import org.junit.Assume.assumeTrue
@@ -16,7 +14,7 @@ internal fun uiTest(block: suspend UiTestScope.() -> Unit) {
 
     val renderApi = System.getProperty("skiko.test.ui.renderApi", "all")
 
-    runBlocking(Dispatchers.Swing) {
+    runBlocking(MainUIDispatcher) {
         if (renderApi == "all") {
             SkikoProperties.fallbackRenderApiQueue(SkikoProperties.renderApi).forEach {
                 println("Testing $it renderApi")

@@ -3,6 +3,7 @@ package org.jetbrains.skiko.redrawer
 import kotlinx.coroutines.*
 import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.FrameLimiter
+import org.jetbrains.skiko.MainUIDispatcher
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaLayerProperties
 import org.jetbrains.skiko.context.SoftwareContextHandler
