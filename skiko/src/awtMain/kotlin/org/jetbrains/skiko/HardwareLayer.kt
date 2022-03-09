@@ -2,7 +2,6 @@ package org.jetbrains.skiko
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.swing.Swing
 import java.awt.*
 import java.awt.event.FocusEvent
 import java.awt.event.InputMethodEvent
@@ -110,7 +109,7 @@ internal open class HardwareLayer(
         // and its accessibility context. This timeout is used to deal with concurrency
         // TODO Find more reliable procedure
         resetFocusAccessibleJob?.cancel()
-        resetFocusAccessibleJob = GlobalScope.launch(Dispatchers.Swing) {
+        resetFocusAccessibleJob = GlobalScope.launch(MainUIDispatcher) {
             delay(100)
             _focusedAccessible = null
         }

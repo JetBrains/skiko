@@ -273,9 +273,6 @@ kotlin {
 
         val awtMain by getting {
             dependsOn(jvmMain)
-            dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:$coroutinesVersion")
-            }
         }
 
         if (supportAndroid) {
@@ -298,9 +295,6 @@ kotlin {
 
         val awtTest by getting {
             dependsOn(jvmTest)
-            dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:$coroutinesVersion")
-            }
         }
 
         if (supportAndroid) {
