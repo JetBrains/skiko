@@ -125,6 +125,12 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
         scale = 1.0
     }
 
+    private fun inputTextDropLast() {
+        if (inputText.isNotEmpty()) {
+            inputText = inputText.dropLast(1)
+        }
+    }
+
     override fun onPointerEvent(event: SkikoPointerEvent) {
         when (event.kind) {
             SkikoPointerEventKind.DOWN,
@@ -160,7 +166,9 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
     }
 
     override fun onInputEvent(event: SkikoInputEvent) {
-        if (event.input != "\b") {
+        if (event.input == "\b") {
+            inputTextDropLast()
+        } else {
             inputText += event.input
         }
     }
@@ -200,9 +208,7 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
                 SkikoKey.KEY_DOWN -> yOffset += 5.0
                 SkikoKey.KEY_SPACE -> { reset() }
                 SkikoKey.KEY_BACKSPACE -> {
-                    if (inputText.isNotEmpty()) {
-                        inputText = inputText.dropLast(1)
-                    }
+                    inputTextDropLast()
                 }
                 else -> {}
             }
