@@ -193,18 +193,26 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
 
     override fun insertText(theText: String) {
         _textStorage += theText
+        val position = UISkikoTextPosition(_textStorage.length.toLong())
+        _selectedTextRange = UISkikoTextRange(position, position)
+        _markedTextRange = null
         skiaLayer?.skikoView?.onInputEvent(toSkikoTypeEvent(theText, keyEvent))
     }
 
     override fun deleteBackward() {
+        println("delete")
         _textStorage = _textStorage.dropLast(1)
+        val position = UISkikoTextPosition(_textStorage.length.toLong())
+        _selectedTextRange = UISkikoTextRange(position, position)
+        _markedTextRange = null
         skiaLayer?.skikoView?.onInputEvent(toSkikoTypeEvent("\b", keyEvent))
     }
 
     override fun textInRange(range: UITextRange): String? {
         val from = ((range as UISkikoTextRange).start() as UISkikoTextPosition).position
         val to = (range.end() as UISkikoTextPosition).position
-        if (_textStorage.isNotEmpty() && from >= 0 && to >=0 && _textStorage.length > to) {
+        println("textInRange $_textStorage $from $to")
+        if (_textStorage.isNotEmpty() && from >= 0 && to >= 0 && _textStorage.length > to) {
             return _textStorage.substring(from.toInt(), to.toInt())
         }
         return null
@@ -218,7 +226,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
 
     override fun setSelectedTextRange(selectedTextRange: UITextRange?) {
         selectedTextRange?.let {
-            _selectedTextRange = it.copy() as UISkikoTextRange
+            _selectedTextRange = it as UISkikoTextRange
         }
     }
 
@@ -239,18 +247,21 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
     }
 
     override fun setMarkedText(markedText: String?, selectedRange: CValue<NSRange>) {
-        val (from, to) = selectedRange.useContents {
+        val (location, lenght) = selectedRange.useContents {
             location to length
         }
+        println("setMarkedText $markedText $location $lenght")
         markedText?.let {
             _markedText = markedText
-            _markedTextRange = UISkikoTextRange(UISkikoTextPosition(from.toLong()), UISkikoTextPosition(to.toLong() + from.toLong()))
+            _markedTextRange = UISkikoTextRange(
+                UISkikoTextPosition(location.toLong()),
+                UISkikoTextPosition(location.toLong() + lenght.toLong())
+            )
             insertText(_markedText)
         }
     }
 
     override fun unmarkText() {
-        _textStorage += _markedText
         _markedText = ""
         _markedTextRange = null
     }
@@ -362,13 +373,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
     }
 
     override fun selectionRectsForRange(range: UITextRange): List<*> {
-        val (x, y) = bounds.useContents {
-            origin.x to origin.y
-        }
-        val (w, h) = bounds.useContents {
-            size.width to size.height
-        }
-        return listOf(CGRectMake(x, y, w, h))
+        return listOf<CGRect>()
     }
 
     override fun closestPositionToPoint(point: CValue<CGPoint>): UITextPosition? {
@@ -390,21 +395,5 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
 
     override fun characterOffsetOfPosition(position: UITextPosition, withinRange: UITextRange): NSInteger {
         return 0
-    }
-
-    override fun textInputView(): UIView {
-        return this
-    }
-
-    override fun shouldChangeTextInRange(range: UITextRange, replacementText: String): Boolean {
-        range as UISkikoTextRange
-        val from = (range.start() as UISkikoTextPosition).position
-        val to = (range.end() as UISkikoTextPosition).position
-        println("shouldChangeTextInRange $replacementText $from $to")
-        return true
-    }
-
-    override fun selectionAffinity(): UITextStorageDirection {
-        return UITextStorageDirectionForward
     }
 }
