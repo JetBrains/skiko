@@ -166,9 +166,7 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
     }
 
     override fun onInputEvent(event: SkikoInputEvent) {
-        if (event.input == "\b") {
-            inputTextDropLast()
-        } else {
+        if (event.input != "\b") {
             inputText += event.input
         }
     }

@@ -112,6 +112,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
                 )
             }
         }
+        if (keyEvent!!.isBackspaceKey()) { keyEvent = null }
         super.pressesEnded(presses, withEvent)
     }
 
@@ -200,18 +201,35 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
     }
 
     override fun deleteBackward() {
-        println("delete")
+        println("deleteBackward")
         _textStorage = _textStorage.dropLast(1)
         val position = UISkikoTextPosition(_textStorage.length.toLong())
         _selectedTextRange = UISkikoTextRange(position, position)
         _markedTextRange = null
-        skiaLayer?.skikoView?.onInputEvent(toSkikoTypeEvent("\b", keyEvent))
+        // Instead of passing type event with \b character we send keyboard Backspace press/release event
+        val backspaceKey = if (keyEvent == null) false else keyEvent!!.isBackspaceKey()
+        if (!backspaceKey) {
+            skiaLayer?.skikoView?.onKeyboardEvent(
+                SkikoKeyboardEvent(
+                    key = SkikoKey.KEY_BACKSPACE,
+                    kind = SkikoKeyboardEventKind.DOWN,
+                    platform = null
+                )
+            )
+            skiaLayer?.skikoView?.onKeyboardEvent(
+                SkikoKeyboardEvent(
+                    key = SkikoKey.KEY_BACKSPACE,
+                    kind = SkikoKeyboardEventKind.UP,
+                    platform = null
+                )
+            )
+        }
     }
 
     override fun textInRange(range: UITextRange): String? {
         val from = ((range as UISkikoTextRange).start() as UISkikoTextPosition).position
         val to = (range.end() as UISkikoTextPosition).position
-        println("textInRange $_textStorage $from $to")
+        // println("textInRange $_textStorage $from $to")
         if (_textStorage.isNotEmpty() && from >= 0 && to >= 0 && _textStorage.length > to) {
             return _textStorage.substring(from.toInt(), to.toInt())
         }
@@ -290,31 +308,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
         inDirection: UITextLayoutDirection,
         offset: NSInteger
     ): UITextPosition? {
-        var p = (position as UISkikoTextPosition).position
-        when (inDirection) {
-            UITextLayoutDirectionUp -> {
-                val caretRect = caretRectForPosition(position)
-                val target = caretRect.useContents { origin }
-                val caretHeight = caretRect.useContents { size.height }
-                target.y = target.y - (caretHeight * (offset - 1)) - (caretHeight * 0.5f)
-                p = (closestPositionToPoint(target.readValue()) as UISkikoTextPosition).position
-            }
-            UITextLayoutDirectionDown -> {
-                val caretRect = caretRectForPosition(position)
-                val target = caretRect.useContents { origin }
-                val caretHeight = caretRect.useContents { size.height }
-                target.y = target.y + (caretHeight * (offset - 1)) - (caretHeight * 1.5f)
-                p = (closestPositionToPoint(target.readValue()) as UISkikoTextPosition).position
-            }
-            UITextLayoutDirectionLeft -> {
-                p -= offset;
-            }
-            UITextLayoutDirectionRight -> {
-                p += offset;
-            }
-        }
-
-        return UISkikoTextPosition(p)
+        return positionFromPosition(position, offset)
     }
 
     override fun comparePosition(position: UITextPosition, toPosition: UITextPosition): NSComparisonResult {
@@ -396,4 +390,11 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
     override fun characterOffsetOfPosition(position: UITextPosition, withinRange: UITextRange): NSInteger {
         return 0
     }
+}
+
+private fun UIPress.isBackspaceKey(): Boolean {
+    key?.let {
+        return it.keyCode == SkikoKey.KEY_BACKSPACE.value
+    }
+    return false
 }
