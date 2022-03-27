@@ -381,6 +381,46 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
+        fun makeRuntimeShader(runtimeShaderBuilder: RuntimeShaderBuilder, shaderName: String, input: ImageFilter?): ImageFilter {
+            return try {
+                Stats.onNativeCall()
+                interopScope {
+                    ImageFilter(
+                        _nMakeRuntimeShader(
+                            runtimeShaderBuilderPtr = getPtr(runtimeShaderBuilder),
+                            childShaderName = shaderName,
+                            input = getPtr(input)
+                        )
+                    )
+                }
+            } finally {
+                reachabilityBarrier(runtimeShaderBuilder)
+                reachabilityBarrier(input)
+            }
+        }
+
+
+        fun makeRuntimeShader(runtimeShaderBuilder: RuntimeShaderBuilder, shaderNames: Array<String?>, inputs: Array<ImageFilter?>): ImageFilter {
+            return try {
+                Stats.onNativeCall()
+                interopScope {
+                    val inputPtrs = NativePointerArray(inputs.size)
+                    for (i in inputs.indices) inputPtrs[i] = getPtr(inputs[i])
+                    ImageFilter(
+                        _nMakeRuntimeShaderFromArray(
+                            runtimeShaderBuilderPtr = getPtr(runtimeShaderBuilder),
+                            childShaderNames = shaderNames,
+                            inputs = toInterop(inputPtrs),
+                            inputLength = inputPtrs.size
+                        )
+                    )
+                }
+            } finally {
+                reachabilityBarrier(runtimeShaderBuilder)
+                reachabilityBarrier(inputs)
+            }
+        }
+
         fun makeTile(src: Rect, dst: Rect, input: ImageFilter?): ImageFilter {
             return try {
                 Stats.onNativeCall()
@@ -753,6 +793,10 @@ private external fun _nMakeOffset(dx: Float, dy: Float, input: NativePointer, cr
 private external fun _nMakePaint(paint: NativePointer, crop: InteropPointer): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakePicture")
 private external fun _nMakePicture(picture: NativePointer, l: Float, t: Float, r: Float, b: Float): NativePointer
+@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeRuntimeShader")
+private external fun _nMakeRuntimeShader(runtimeShaderBuilderPtr: NativePointer, childShaderName: String, input: NativePointer): NativePointer
+@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeRuntimeShaderFromArray")
+private external fun _nMakeRuntimeShaderFromArray(runtimeShaderBuilderPtr: NativePointer, childShaderNames: Array<String?>?, inputs: InteropPointer, inputLength: Int): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeTile")
 private external fun _nMakeTile(
     l0: Float,
