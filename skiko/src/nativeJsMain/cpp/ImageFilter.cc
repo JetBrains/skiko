@@ -165,7 +165,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeRuntimeShader
     SkRuntimeShaderBuilder* runtimeShaderBuilder = reinterpret_cast<SkRuntimeShaderBuilder*>(runtimeShaderBuilderPtr);
     sk_sp<SkImageFilter> input = sk_ref_sp<SkImageFilter>(reinterpret_cast<SkImageFilter*>(inputPtr));
 
-    SkImageFilter* ptr = SkImageFilters::RuntimeShader(*runtimeShaderBuilder, skString(childShaderName).c_str(), input).release();
+    SkImageFilter* ptr = SkImageFilters::RuntimeShader(*runtimeShaderBuilder, reinterpret_cast<char *>(childShaderName), input).release();
     return reinterpret_cast<KNativePointer>(ptr);
 }
 
