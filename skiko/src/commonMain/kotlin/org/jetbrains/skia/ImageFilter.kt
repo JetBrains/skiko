@@ -403,6 +403,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         fun makeRuntimeShader(runtimeShaderBuilder: RuntimeShaderBuilder, shaderNames: Array<String?>, inputs: Array<ImageFilter?>): ImageFilter {
             return try {
                 Stats.onNativeCall()
+                require(shaderNames.size == inputs.size)
                 interopScope {
                     val inputPtrs = NativePointerArray(inputs.size)
                     for (i in inputs.indices) inputPtrs[i] = getPtr(inputs[i])
