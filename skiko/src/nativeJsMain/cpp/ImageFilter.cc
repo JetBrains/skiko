@@ -171,7 +171,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeRuntimeShader
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeRuntimeShaderFromArray
   (KNativePointer runtimeShaderBuilderPtr, KInteropPointerArray childShaderNamesArr, KNativePointerArray inputPtrsArray, KInt inputCount) {
-    SkRuntimeShaderBuilder* runtimeShaderBuilder = reinterpret_cast<SkRuntimeShaderBuilder*>(static_cast<uintptr_t>(runtimeShaderBuilderPtr));
+    SkRuntimeShaderBuilder* runtimeShaderBuilder = reinterpret_cast<SkRuntimeShaderBuilder*>(runtimeShaderBuilderPtr);
 
     KNativePointer* inputPtrs = reinterpret_cast<KNativePointer*>(inputPtrsArray);
     std::vector<sk_sp<SkImageFilter>> inputChildren(inputCount);
