@@ -18,13 +18,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_RuntimeShaderBuilder__1nMakeFromR
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_RuntimeShaderBuilder__1nUniformInt
-  (KNativePointer builderPtr, KInteropPointer uniformNameObj, KInt uniformValue) {
+  (KNativePointer builderPtr, KInteropPointer uniformName, KInt uniformValue) {
     SkRuntimeShaderBuilder* runtimeShaderBuilder = reinterpret_cast<SkRuntimeShaderBuilder*>(builderPtr);
-    runtimeShaderBuilder->uniform(skString(uniformNameObj)) = uniformValue;
+    runtimeShaderBuilder->uniform(skString(uniformName).c_str()) = uniformValue;
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloat
-  (KNativePointer builderPtr, KInteropPointer uniformNameObj, KFloat uniformValue) {
+  (KNativePointer builderPtr, KInteropPointer uniformName, KFloat uniformValue) {
     SkRuntimeShaderBuilder* runtimeShaderBuilder = reinterpret_cast<SkRuntimeShaderBuilder*>(builderPtr);
-    runtimeShaderBuilder->uniform(skString(uniformNameObj)) = uniformValue;
+    runtimeShaderBuilder->uniform(skString(uniformName).c_str()) = uniformValue;
 }
