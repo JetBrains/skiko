@@ -388,7 +388,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                     ImageFilter(
                         _nMakeRuntimeShader(
                             runtimeShaderBuilderPtr = getPtr(runtimeShaderBuilder),
-                            childShaderName = shaderName,
+                            childShaderName = toInterop(shaderName),
                             input = getPtr(input)
                         )
                     )
@@ -795,7 +795,7 @@ private external fun _nMakePaint(paint: NativePointer, crop: InteropPointer): Na
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakePicture")
 private external fun _nMakePicture(picture: NativePointer, l: Float, t: Float, r: Float, b: Float): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeRuntimeShader")
-private external fun _nMakeRuntimeShader(runtimeShaderBuilderPtr: NativePointer, childShaderName: String, input: NativePointer): NativePointer
+private external fun _nMakeRuntimeShader(runtimeShaderBuilderPtr: NativePointer, childShaderName: InteropPointer, input: NativePointer): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeRuntimeShaderFromArray")
 private external fun _nMakeRuntimeShaderFromArray(runtimeShaderBuilderPtr: NativePointer, childShaderNames: Array<String?>?, inputs: InteropPointer, inputLength: Int): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeTile")
