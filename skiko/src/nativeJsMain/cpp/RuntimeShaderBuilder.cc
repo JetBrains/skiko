@@ -6,7 +6,7 @@ static void deleteRuntimeShaderBuilder(SkRuntimeShaderBuilder* builder) {
     delete builder;
 }
 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_RuntimeShaderBuilder_1nGetFinalizer() {
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_RuntimeShaderBuilder__1nGetFinalizer() {
     return reinterpret_cast<KNativePointer>((&deleteRuntimeShaderBuilder));
 }
 
