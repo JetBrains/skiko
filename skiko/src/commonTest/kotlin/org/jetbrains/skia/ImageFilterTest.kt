@@ -3,7 +3,6 @@ package org.jetbrains.skia
 import org.jetbrains.skia.impl.use
 import org.jetbrains.skia.util.assertContentDifferent
 import org.jetbrains.skiko.tests.runTest
-import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -221,6 +220,67 @@ class ImageFilterTest {
         ImageFilter.makePaint(
             paint = Paint().setStroke(false).setColor4f(Color4f(Color.RED), colorSpace = null),
             crop = null
+        )
+    }
+
+    @Test
+    fun makeRuntimeShader() = imageFilterTest {
+        // A simple Skia shader that bumps up the red channel of every non-transparent
+        // pixel to full intensity, and leaves green and blue channels unchanged.
+        val redSksl = """
+            uniform shader content;
+            vec4 main(vec2 coord) {
+                vec4 c = content.eval(coord);
+                return vec4(1.0 * c.a, c.g * c.a, c.b * c.a, c.a);
+            }
+        """
+
+        val redRuntimeEffect = RuntimeEffect.makeForShader(redSksl)
+        val redShaderBuilder = RuntimeShaderBuilder(redRuntimeEffect)
+
+        ImageFilter.makeRuntimeShader(
+            runtimeShaderBuilder = redShaderBuilder,
+            shaderName = "content",
+            input = null
+        )
+    }
+
+
+    @Test
+    fun makeRuntimeShaderFromArrays() = imageFilterTest {
+        // A Skia shader that has two children shaders - one that applies our custom shader logic
+        // on the underlying render node content, and another that is the built in blur. This
+        // shader also has a float uniform that is used to decide which one of these two children
+        // shaders to apply on a given pixel, based on the X coordinate.
+        // This test covers not only ImageFilter.makeRuntimeShader API, but also
+        // RuntimeShaderBuilder.uniform.
+        val compositeSksl = """
+            uniform shader content;
+            uniform shader blurred;
+            uniform float cutoff;
+            vec4 main(vec2 coord) {
+                vec4 c = content.eval(coord);
+                vec4 b = blurred.eval(coord);
+                if (coord.x > cutoff) {
+                    return vec4(1.0 * c.a, c.g * c.a, c.b * c.a, c.a);
+                } else {
+                    return b;
+                }
+            }
+        """
+
+        val compositeRuntimeEffect = RuntimeEffect.makeForShader(compositeSksl)
+        val compositeShaderBuilder = RuntimeShaderBuilder(compositeRuntimeEffect)
+        // Pass a float uniform into our shader
+        compositeShaderBuilder.uniform("cutoff", 10.0f)
+
+        // And use ImageFilter.makeBlur as the second child input to our composite shader
+        val blurImageFilter = ImageFilter.makeBlur(sigmaX = 2.0f, sigmaY = 2.0f, mode = FilterTileMode.DECAL)
+
+        ImageFilter.makeRuntimeShader(
+            runtimeShaderBuilder = compositeShaderBuilder,
+            shaderNames = arrayOf("content", "blurred"),
+            inputs = arrayOf(null, blurImageFilter)
         )
     }
 

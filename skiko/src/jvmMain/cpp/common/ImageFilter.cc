@@ -160,6 +160,37 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilterKt__1nMake
     return reinterpret_cast<jlong>(ptr);
 }
 
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilterKt__1nMakeRuntimeShader
+  (JNIEnv* env, jclass jclass, jlong runtimeShaderBuilderPtr, jstring childShaderName, jlong inputPtr) {
+    SkRuntimeShaderBuilder* runtimeShaderBuilder = reinterpret_cast<SkRuntimeShaderBuilder*>(static_cast<uintptr_t>(runtimeShaderBuilderPtr));
+    SkImageFilter* input = reinterpret_cast<SkImageFilter*>(static_cast<uintptr_t>(inputPtr));
+
+    SkImageFilter* ptr = SkImageFilters::RuntimeShader(*runtimeShaderBuilder, skString(env, childShaderName).c_str(), sk_ref_sp(input)).release();
+    return reinterpret_cast<jlong>(ptr);
+}
+
+extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilterKt__1nMakeRuntimeShaderFromArray
+  (JNIEnv* env, jclass jclass, jlong runtimeShaderBuilderPtr, jobjectArray childShaderNamesArr, jlongArray inputPtrsArray, jint _inputCount) {
+    SkRuntimeShaderBuilder* runtimeShaderBuilder = reinterpret_cast<SkRuntimeShaderBuilder*>(static_cast<uintptr_t>(runtimeShaderBuilderPtr));
+
+    jsize inputCount = env->GetArrayLength(inputPtrsArray);
+    jlong* inputPtrs = env->GetLongArrayElements(inputPtrsArray, 0);
+    std::vector<sk_sp<SkImageFilter>> inputChildren(inputCount);
+    for (int i = 0; i < inputCount; ++i) {
+        SkImageFilter* filter = reinterpret_cast<SkImageFilter*>(static_cast<uintptr_t>(inputPtrs[i]));
+        inputChildren[i] = sk_ref_sp(filter);
+    }
+    env->ReleaseLongArrayElements(inputPtrsArray, inputPtrs, 0);
+
+    std::vector<SkString> childShaderNameStrings = skStringVector(env, childShaderNamesArr);
+    std::vector<const char*> childShaderNames(childShaderNameStrings.size());
+    for (int i = 0; i < inputCount; ++i)
+        childShaderNames[i] = childShaderNameStrings[i].c_str();
+
+    SkImageFilter* ptr = SkImageFilters::RuntimeShader(*runtimeShaderBuilder, childShaderNames.data(), inputChildren.data(), inputCount).release();
+    return reinterpret_cast<jlong>(ptr);
+}
+
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilterKt__1nMakeTile
   (JNIEnv* env, jclass jclass, jfloat l0, jfloat t0, jfloat r0, jfloat b0, jfloat l1, jfloat t1, jfloat r1, jfloat b1, jlong inputPtr) {
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>(static_cast<uintptr_t>(inputPtr));
