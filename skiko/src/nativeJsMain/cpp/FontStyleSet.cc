@@ -1,6 +1,3 @@
-
-// This file has been auto generated.
-
 #include <iostream>
 #include "SkTypeface.h"
 #include "SkFontMgr.h"
@@ -34,7 +31,7 @@ SKIKO_EXPORT KInteropPointer org_jetbrains_skia_FontStyleSet__1nGetStyleName
     instance->getStyle(index, nullptr, &style);
     return new SkString(style);
 }
-     
+
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_FontStyleSet__1nGetTypeface
   (KNativePointer ptr, KInt index) {
     SkFontStyleSet* instance = reinterpret_cast<SkFontStyleSet*>((ptr));

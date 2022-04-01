@@ -1,6 +1,3 @@
-
-// This file has been auto generated.
-
 #include <cstring>
 #include <iostream>
 #include "SkData.h"

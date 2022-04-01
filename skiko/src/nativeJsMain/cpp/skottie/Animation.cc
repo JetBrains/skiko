@@ -1,6 +1,3 @@
-
-// This file has been auto generated.
-
 #include "SkStream.h"
 #include "SkSGInvalidationController.h"
 #include "Skottie.h"

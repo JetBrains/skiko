@@ -1,6 +1,3 @@
-
-// This file has been auto generated.
-
 #include "SkPathMeasure.h"
 #include "common.h"
 
@@ -49,7 +46,7 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_PathMeasure__1nGetPosition
 
     return false;
 }
-     
+
 SKIKO_EXPORT KBoolean org_jetbrains_skia_PathMeasure__1nGetTangent
   (KNativePointer ptr, KFloat distance, KFloat* data) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>((ptr));
@@ -63,7 +60,7 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_PathMeasure__1nGetTangent
 
     return false;
 }
-     
+
 SKIKO_EXPORT KBoolean org_jetbrains_skia_PathMeasure__1nGetRSXform
   (KNativePointer ptr, KFloat distance, KFloat* data) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>((ptr));
@@ -79,7 +76,7 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_PathMeasure__1nGetRSXform
 
     return false;
 }
-     
+
 SKIKO_EXPORT KBoolean org_jetbrains_skia_PathMeasure__1nGetMatrix
   (KNativePointer ptr, KFloat distance, KBoolean getPosition, KBoolean getTangent, KFloat* data) {
   SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>((ptr));
@@ -110,7 +107,7 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_PathMeasure__1nGetMatrix
 
   return false;
 }
-     
+
 SKIKO_EXPORT KBoolean org_jetbrains_skia_PathMeasure__1nGetSegment
   (KNativePointer ptr, KFloat startD, KFloat endD, KNativePointer dstPtr, KBoolean startWithMoveTo) {
     SkPathMeasure* instance = reinterpret_cast<SkPathMeasure*>((ptr));

@@ -1,6 +1,3 @@
-
-// This file has been auto generated.
-
 #include <iostream>
 #include "DartTypes.h"
 #include "Paragraph.h"
@@ -130,7 +127,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_paragraph_Paragraph__1nGetLineMet
     instance->getLineMetrics(*res);
     return res;
 }
-     
+
 SKIKO_EXPORT KInt org_jetbrains_skia_paragraph_Paragraph__1nGetLineNumber
   (KNativePointer ptr) {
     Paragraph* instance = reinterpret_cast<Paragraph*>((ptr));

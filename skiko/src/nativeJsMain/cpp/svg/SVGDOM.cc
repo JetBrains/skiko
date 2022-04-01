@@ -1,6 +1,3 @@
-
-// This file has been auto generated.
-
 #include "SkCanvas.h"
 #include "SkData.h"
 #include "SkStream.h"

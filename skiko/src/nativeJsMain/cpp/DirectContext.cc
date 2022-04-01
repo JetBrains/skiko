@@ -1,6 +1,3 @@
-
-// This file has been auto generated.
-
 #include "GrDirectContext.h"
 #include "include/gpu/gl/GrGLInterface.h"
 #include "common.h"

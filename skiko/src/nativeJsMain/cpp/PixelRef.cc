@@ -1,6 +1,3 @@
-
-// This file has been auto generated.
-
 #include "SkPixelRef.h"
 #include "common.h"
 

@@ -1,6 +1,3 @@
-
-// This file has been auto generated.
-
 #include <string>
 #include "SkString.h"
 #include "common.h"
