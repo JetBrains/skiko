@@ -1,6 +1,3 @@
-
-// This file has been auto generated.
-
 #include <iostream>
 #include "ParagraphStyle.h"
 using namespace std;
@@ -106,7 +103,7 @@ SKIKO_EXPORT void org_jetbrains_skia_paragraph_ParagraphStyle__1nSetEllipsis
     ParagraphStyle* instance = reinterpret_cast<ParagraphStyle*>(ptr);
     instance->setEllipsis(skString(ellipsis));
 }
-     
+
 SKIKO_EXPORT KFloat org_jetbrains_skia_paragraph_ParagraphStyle__1nGetHeight
   (KNativePointer ptr) {
     ParagraphStyle* instance = reinterpret_cast<ParagraphStyle*>((ptr));

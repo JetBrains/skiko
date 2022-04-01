@@ -1,6 +1,3 @@
-
-// This file has been auto generated.
-
 #include <iostream>
 #include "ParagraphCache.h"
 #include "ParagraphStyle.h"

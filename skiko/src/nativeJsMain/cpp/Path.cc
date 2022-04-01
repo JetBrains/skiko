@@ -1,6 +1,3 @@
-
-// This file has been auto generated.
-
 #include <algorithm>
 #include <cfloat>
 #include <iostream>

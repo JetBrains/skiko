@@ -1,6 +1,3 @@
-
-// This file has been auto generated.
-
 #include <iostream>
 #include <vector>
 #include "ParagraphStyle.h"
@@ -42,14 +39,14 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_paragraph_StrutStyle__1nGetFontFa
 
     return reinterpret_cast<KNativePointer>(res);
 }
-     
+
 
 SKIKO_EXPORT void org_jetbrains_skia_paragraph_StrutStyle__1nSetFontFamilies
   (KNativePointer ptr, KInteropPointerArray familiesArr, KInt familiesCount) {
     StrutStyle* instance = reinterpret_cast<StrutStyle*>(ptr);
     instance->setFontFamilies(skStringVector(familiesArr, familiesCount));
 }
-     
+
 SKIKO_EXPORT void org_jetbrains_skia_paragraph_StrutStyle__1nGetFontStyle
   (KNativePointer ptr, KInt* fontStyleData) {
   StrutStyle* instance = reinterpret_cast<StrutStyle*>(ptr);
@@ -64,7 +61,7 @@ SKIKO_EXPORT void org_jetbrains_skia_paragraph_StrutStyle__1nSetFontStyle
     StrutStyle* instance = reinterpret_cast<StrutStyle*>(ptr);
     instance->setFontStyle(skija::FontStyle::fromKotlin(style));
 }
-     
+
 SKIKO_EXPORT KFloat org_jetbrains_skia_paragraph_StrutStyle__1nGetFontSize
   (KNativePointer ptr) {
     StrutStyle* instance = reinterpret_cast<StrutStyle*>(ptr);

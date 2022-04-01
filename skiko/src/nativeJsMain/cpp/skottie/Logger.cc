@@ -1,6 +1,3 @@
-
-// This file has been auto generated.
-
 #include "Skottie.h"
 using namespace skottie;
 #include "common.h"

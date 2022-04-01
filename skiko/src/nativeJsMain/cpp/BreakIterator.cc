@@ -1,6 +1,3 @@
-
-// This file has been auto generated.
-
 #include "unicode/ubrk.h"
 #include "common.h"
 #include <iostream>
@@ -30,7 +27,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_BreakIterator__1nMake
     else
       return reinterpret_cast<KNativePointer>(instance);
 }
-     
+
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_BreakIterator__1nClone
   (KNativePointer ptr, KInt* errorCode) {
@@ -101,8 +98,8 @@ SKIKO_EXPORT KInt org_jetbrains_skia_BreakIterator__1nGetRuleStatus
 }
 
 
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KInt* org_jetbrains_skia_BreakIterator__1nGetRuleStatuses
   (KNativePointer ptr) {
     UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(ptr);

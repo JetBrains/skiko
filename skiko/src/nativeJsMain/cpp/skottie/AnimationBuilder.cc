@@ -1,6 +1,3 @@
-
-// This file has been auto generated.
-
 #include "SkStream.h"
 #include "Skottie.h"
 #include "SkFontMgr.h"
