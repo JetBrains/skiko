@@ -1,6 +1,3 @@
-
-// This file has been auto generated.
-
 #include <iostream>
 #include "SkData.h"
 #include "SkTypeface.h"
@@ -59,7 +56,7 @@ SKIKO_EXPORT void org_jetbrains_skia_Typeface__1nGetVariationAxes
         }
     }
 }
-     
+
 SKIKO_EXPORT KInt org_jetbrains_skia_Typeface__1nGetUniqueId
   (KNativePointer ptr) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>((ptr));
@@ -85,7 +82,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Typeface__1nMakeFromName
     sk_sp<SkTypeface> instance = SkTypeface::MakeFromName(name.c_str(), style);
     return reinterpret_cast<KNativePointer>(instance.release());
 }
-     
+
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Typeface__1nMakeFromFile
   (KInteropPointer pathStr, KInt index) {
     SkString path = skString(pathStr);
@@ -126,7 +123,7 @@ SKIKO_EXPORT void org_jetbrains_skia_Typeface__1nGetUTF32Glyphs
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(ptr);
     instance->unicharsToGlyphs(reinterpret_cast<SkUnichar*>(uni), count, reinterpret_cast<SkGlyphID*>(res));
 }
-     
+
 SKIKO_EXPORT KShort org_jetbrains_skia_Typeface__1nGetUTF32Glyph
   (KNativePointer ptr, KInt uni) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>((ptr));
@@ -192,7 +189,7 @@ SKIKO_EXPORT bool org_jetbrains_skia_Typeface__1nGetKerningPairAdjustments
 
   return false;
 }
-     
+
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Typeface__1nGetFamilyNames
   (KNativePointer ptr) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(ptr);
@@ -208,7 +205,7 @@ SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Typeface__1nGetFamilyNames
 
     return reinterpret_cast<KInteropPointer>(res);
 }
-     
+
 SKIKO_EXPORT KInteropPointer org_jetbrains_skia_Typeface__1nGetFamilyName
   (KNativePointer ptr) {
     SkTypeface* instance = reinterpret_cast<SkTypeface*>(ptr);

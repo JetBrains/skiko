@@ -1,6 +1,3 @@
-
-// This file has been auto generated.
-
 #include <iostream>
 #include "SkData.h"
 #include "SkTypeface.h"
@@ -61,7 +58,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_FontMgr__1nMatchFamilyStyleCharac
 
     return reinterpret_cast<KNativePointer>(typeface);
 }
-     
+
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_FontMgr__1nMakeFromData
   (KNativePointer ptr, KNativePointer dataPtr, KInt ttcIndex) {
     SkFontMgr* instance = reinterpret_cast<SkFontMgr*>((ptr));

@@ -1,6 +1,3 @@
-
-// This file has been auto generated.
-
 #include "SkSVGSVG.h"
 #include "SkSVGRenderContext.h"
 #include "common.h"
