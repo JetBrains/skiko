@@ -32,10 +32,73 @@ class RuntimeShaderBuilder internal constructor(ptr: NativePointer) : Managed(pt
         }
     }
 
+    fun uniform(name: String, value1: Int, value2: Int) {
+        Stats.onNativeCall()
+        interopScope {
+            _nUniformInt2(_ptr, toInterop(name), value1, value2)
+        }
+    }
+
+    fun uniform(name: String, value1: Int, value2: Int, value3: Int) {
+        Stats.onNativeCall()
+        interopScope {
+            _nUniformInt3(_ptr, toInterop(name), value1, value2, value3)
+        }
+    }
+
+    fun uniform(name: String, value1: Int, value2: Int, value3: Int, value4: Int) {
+        Stats.onNativeCall()
+        interopScope {
+            _nUniformInt4(_ptr, toInterop(name), value1, value2, value3, value4)
+        }
+    }
+
     fun uniform(name: String, value: Float) {
         Stats.onNativeCall()
         interopScope {
             _nUniformFloat(_ptr, toInterop(name), value)
+        }
+    }
+
+    fun uniform(name: String, value1: Float, value2: Float) {
+        Stats.onNativeCall()
+        interopScope {
+            _nUniformFloat2(_ptr, toInterop(name), value1, value2)
+        }
+    }
+
+    fun uniform(name: String, value1: Float, value2: Float, value3: Float) {
+        Stats.onNativeCall()
+        interopScope {
+            _nUniformFloat3(_ptr, toInterop(name), value1, value2, value3)
+        }
+    }
+
+    fun uniform(name: String, value1: Float, value2: Float, value3: Float, value4: Float) {
+        Stats.onNativeCall()
+        interopScope {
+            _nUniformFloat4(_ptr, toInterop(name), value1, value2, value3, value4)
+        }
+    }
+
+    fun uniform(name: String, value: Matrix22) {
+        Stats.onNativeCall()
+        interopScope {
+            _nUniformFloatMatrix22(_ptr, toInterop(name), toInterop(value.mat))
+        }
+    }
+
+    fun uniform(name: String, value: Matrix33) {
+        Stats.onNativeCall()
+        interopScope {
+            _nUniformFloatMatrix33(_ptr, toInterop(name), toInterop(value.mat))
+        }
+    }
+
+    fun uniform(name: String, value: Matrix44) {
+        Stats.onNativeCall()
+        interopScope {
+            _nUniformFloatMatrix44(_ptr, toInterop(name), toInterop(value.mat))
         }
     }
 }
@@ -49,5 +112,32 @@ private external fun RuntimeShaderBuilder_nGetFinalizer(): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformInt")
 private external fun _nUniformInt(builderPtr: NativePointer, uniformName: InteropPointer, uniformValue: Int)
 
+@ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformInt2")
+private external fun _nUniformInt2(builderPtr: NativePointer, uniformName: InteropPointer, uniformValue1: Int, uniformValue2: Int)
+
+@ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformInt3")
+private external fun _nUniformInt3(builderPtr: NativePointer, uniformName: InteropPointer, uniformValue1: Int, uniformValue2: Int, uniformValue3: Int)
+
+@ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformInt4")
+private external fun _nUniformInt4(builderPtr: NativePointer, uniformName: InteropPointer, uniformValue1: Int, uniformValue2: Int, uniformValue3: Int, uniformValue4: Int)
+
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloat")
 private external fun _nUniformFloat(builderPtr: NativePointer, uniformName: InteropPointer, uniformValue: Float)
+
+@ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloat2")
+private external fun _nUniformFloat2(builderPtr: NativePointer, uniformName: InteropPointer, uniformValue1: Float, uniformValue2: Float)
+
+@ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloat3")
+private external fun _nUniformFloat3(builderPtr: NativePointer, uniformName: InteropPointer, uniformValue1: Float, uniformValue2: Float, uniformValue3: Float)
+
+@ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloat4")
+private external fun _nUniformFloat4(builderPtr: NativePointer, uniformName: InteropPointer, uniformValue1: Float, uniformValue2: Float, uniformValue3: Float, uniformValue4: Float)
+
+@ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloatMatrix22")
+private external fun _nUniformFloatMatrix22(builderPtr: NativePointer, uniformName: InteropPointer, uniformMatrix22: InteropPointer)
+
+@ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloatMatrix33")
+private external fun _nUniformFloatMatrix33(builderPtr: NativePointer, uniformName: InteropPointer, uniformMatrix33: InteropPointer)
+
+@ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloatMatrix44")
+private external fun _nUniformFloatMatrix44(builderPtr: NativePointer, uniformName: InteropPointer, uniformMatrix44: InteropPointer)
