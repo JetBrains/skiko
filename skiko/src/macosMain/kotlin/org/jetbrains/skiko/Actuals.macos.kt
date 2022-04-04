@@ -8,6 +8,7 @@ internal actual fun URIHandler_openUri(uri: String) {
 }
 
 internal actual fun ClipboardManager_setText(text: String) {
+    NSPasteboard.generalPasteboard.clearContents()
     NSPasteboard.generalPasteboard.setString(string = text, forType = NSPasteboardTypeString)
 }
 
