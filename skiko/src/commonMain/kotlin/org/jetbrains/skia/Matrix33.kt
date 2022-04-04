@@ -30,16 +30,6 @@ class Matrix33(vararg mat: Float) {
      * | persp0  persp1  persp2 |
     `</pre> *
      */
-    /**
-     *
-     * Matrix33 elements are in row-major order.
-     *
-     * <pre>`
-     * | scaleX   skewX  transX |
-     * |  skewY  scaleY  transY |
-     * | persp0  persp1  persp2 |
-    `</pre> *
-     */
     val mat: FloatArray
     fun makePreScale(sx: Float, sy: Float): Matrix33 {
         return Matrix33(
