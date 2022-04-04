@@ -11,7 +11,7 @@ class Matrix22(vararg mat: Float) {
     /**
      * Matrix elements are in row-major order.
      */
-    internal val mat: FloatArray
+    val mat: FloatArray
 
     override fun equals(other: Any?): Boolean {
         if (other === this) return true
@@ -31,6 +31,8 @@ class Matrix22(vararg mat: Float) {
     }
 
     companion object {
+        val IDENTITY = Matrix22(1f, 0f, 0f, 1f)
+
         internal fun fromInteropPointer(block: InteropScope.(InteropPointer) -> Unit): Matrix22 {
             val result = withResult(FloatArray(4), block)
             return Matrix22(*result)

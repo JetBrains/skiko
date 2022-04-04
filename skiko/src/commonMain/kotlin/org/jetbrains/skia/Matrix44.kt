@@ -17,7 +17,7 @@ class Matrix44(vararg mat: Float) {
     /**
      * Matrix elements are in row-major order.
      */
-    internal val mat: FloatArray
+    val mat: FloatArray
 
     /**
      *
