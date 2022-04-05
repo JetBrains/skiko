@@ -535,6 +535,79 @@ class ImageFilterTest {
     }
 
     @Test
+    fun makeRuntimeShaderChildShader() = imageFilterTest {
+        // A simple Skia shader that applies a child shader on part of the input
+        val compositeSksl = """
+            uniform shader content;
+            uniform shader gradient;
+            uniform float cutoff;
+            
+            vec4 main(vec2 coord) {
+                vec4 c = content.eval(coord);
+                vec4 b = gradient.eval(coord);
+                if (coord.x > cutoff) {
+                    return vec4(1.0 * c.a, c.g * c.a, c.b * c.a, c.a);
+                } else {
+                    return vec4(b.r * c.a, b.g * c.a, b.b * c.a, c.a);
+                }
+            }
+            """
+
+        val compositeRuntimeEffect = RuntimeEffect.makeForShader(compositeSksl)
+        val compositeShaderBuilder = RuntimeShaderBuilder(compositeRuntimeEffect)
+        compositeShaderBuilder.uniform("cutoff", 100.0f)
+        compositeShaderBuilder.child(
+            "gradient",
+            Shader.Companion.makeLinearGradient(
+                x0 = 0.0f, y0 = 0.0f,
+                x1 = 200.0f, y1 = 0.0f,
+                colors = intArrayOf(Color.RED, Color.BLUE),
+                style = GradientStyle.DEFAULT
+            )
+        )
+
+        ImageFilter.makeRuntimeShader(
+            runtimeShaderBuilder = compositeShaderBuilder,
+            shaderName = "content",
+            input = null
+        )
+    }
+
+    @Test
+    fun makeRuntimeShaderChildColorFilter() = imageFilterTest {
+        // A simple Skia shader that applies a child color filter on part of the input
+        val compositeSksl = """
+            uniform shader content;
+            uniform colorFilter filter;
+            uniform float cutoff;
+            
+            vec4 main(vec2 coord) {
+                vec4 c = content.eval(coord);
+                vec4 b = filter.eval(c);
+                if (coord.x > cutoff) {
+                    return vec4(1.0 * c.a, c.g * c.a, c.b * c.a, c.a);
+                } else {
+                    return vec4(b.r * c.a, b.g * c.a, b.b * c.a, c.a);
+                }
+            }
+            """
+
+        val compositeRuntimeEffect = RuntimeEffect.makeForShader(compositeSksl)
+        val compositeShaderBuilder = RuntimeShaderBuilder(compositeRuntimeEffect)
+        compositeShaderBuilder.uniform("cutoff", 100.0f)
+        compositeShaderBuilder.child(
+            "filter",
+            ColorFilter.makeHighContrast(grayscale = false, mode = InversionMode.BRIGHTNESS, contrast = 0.7f)
+        )
+
+        ImageFilter.makeRuntimeShader(
+            runtimeShaderBuilder = compositeShaderBuilder,
+            shaderName = "content",
+            input = null
+        )
+    }
+
+    @Test
     fun makeTile() = imageFilterTest {
         ImageFilter.makeTile(
             src = Rect(0f, 0f, 3f, 3f),

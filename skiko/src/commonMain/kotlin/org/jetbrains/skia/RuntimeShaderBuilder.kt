@@ -3,7 +3,6 @@ package org.jetbrains.skia
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Managed
-import org.jetbrains.skia.impl.Native.Companion.NullPointer
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.interopScope
@@ -101,6 +100,20 @@ class RuntimeShaderBuilder internal constructor(ptr: NativePointer) : Managed(pt
             _nUniformFloatMatrix44(_ptr, toInterop(name), toInterop(value.mat))
         }
     }
+
+    fun child(name: String, shader: Shader) {
+        Stats.onNativeCall()
+        interopScope {
+            _nChildShader(_ptr, toInterop(name), getPtr(shader))
+        }
+    }
+
+    fun child(name: String, colorFilter: ColorFilter) {
+        Stats.onNativeCall()
+        interopScope {
+            _nChildColorFilter(_ptr, toInterop(name), getPtr(colorFilter))
+        }
+    }
 }
 
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nMakeFromRuntimeEffect")
@@ -141,3 +154,9 @@ private external fun _nUniformFloatMatrix33(builderPtr: NativePointer, uniformNa
 
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloatMatrix44")
 private external fun _nUniformFloatMatrix44(builderPtr: NativePointer, uniformName: InteropPointer, uniformMatrix44: InteropPointer)
+
+@ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nChildShader")
+private external fun _nChildShader(builderPtr: NativePointer, uniformName: InteropPointer, shaderPtr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nChildColorFilter")
+private external fun _nChildColorFilter(builderPtr: NativePointer, uniformName: InteropPointer, colorFilterPtr: NativePointer)
