@@ -89,3 +89,17 @@ SKIKO_EXPORT void org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloatMatrix4
     SkRuntimeShaderBuilder* runtimeShaderBuilder = reinterpret_cast<SkRuntimeShaderBuilder*>(builderPtr);
     runtimeShaderBuilder->uniform(skString(uniformName).c_str()) = uniformMatrix44;
 }
+
+SKIKO_EXPORT void org_jetbrains_skia_RuntimeShaderBuilder__1nChildShader
+  (KNativePointer builderPtr, KInteropPointer childName, KNativePointer childShaderPtr) {
+    SkRuntimeShaderBuilder* runtimeShaderBuilder = reinterpret_cast<SkRuntimeShaderBuilder*>(builderPtr);
+    sk_sp<SkShader> shader = sk_ref_sp<SkShader>(reinterpret_cast<SkShader*>(childShaderPtr));
+    runtimeShaderBuilder->child(skString(childName).c_str()) = shader;
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_RuntimeShaderBuilder__1nChildColorFilter
+  (KNativePointer builderPtr, KInteropPointer childName, KNativePointer childColorFilterPtr) {
+    SkRuntimeShaderBuilder* runtimeShaderBuilder = reinterpret_cast<SkRuntimeShaderBuilder*>(builderPtr);
+    sk_sp<SkColorFilter> colorFilter = sk_ref_sp<SkColorFilter>(reinterpret_cast<SkColorFilter*>(childColorFilterPtr));
+    runtimeShaderBuilder->child(skString(childName).c_str()) = colorFilter;
+}
