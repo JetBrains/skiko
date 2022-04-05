@@ -2149,6 +2149,8 @@ $dokka.location:org.jetbrains.skia/RuntimeEffect/makeShader/#org.jetbrains.skia.
 $dokka.location:org.jetbrains.skia/RuntimeShaderBuilder.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-runtime-shader-builder/-companion/index.html
 $dokka.location:org.jetbrains.skia/RuntimeShaderBuilder///PointingToDeclaration/skiko/org.jetbrains.skia/-runtime-shader-builder/index.html
 $dokka.location:org.jetbrains.skia/RuntimeShaderBuilder/RuntimeShaderBuilder/#org.jetbrains.skia.RuntimeEffect/PointingToDeclaration/skiko/org.jetbrains.skia/-runtime-shader-builder/-runtime-shader-builder.html
+$dokka.location:org.jetbrains.skia/RuntimeShaderBuilder/child/#kotlin.String#org.jetbrains.skia.ColorFilter/PointingToDeclaration/skiko/org.jetbrains.skia/-runtime-shader-builder/child.html
+$dokka.location:org.jetbrains.skia/RuntimeShaderBuilder/child/#kotlin.String#org.jetbrains.skia.Shader/PointingToDeclaration/skiko/org.jetbrains.skia/-runtime-shader-builder/child.html
 $dokka.location:org.jetbrains.skia/RuntimeShaderBuilder/uniform/#kotlin.String#kotlin.Float#kotlin.Float#kotlin.Float#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skia/-runtime-shader-builder/uniform.html
 $dokka.location:org.jetbrains.skia/RuntimeShaderBuilder/uniform/#kotlin.String#kotlin.Float#kotlin.Float#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skia/-runtime-shader-builder/uniform.html
 $dokka.location:org.jetbrains.skia/RuntimeShaderBuilder/uniform/#kotlin.String#kotlin.Float#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skia/-runtime-shader-builder/uniform.html
