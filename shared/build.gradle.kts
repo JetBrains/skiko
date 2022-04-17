@@ -18,7 +18,20 @@ kotlin {
         binaries {
             framework {
                 baseName = "shared"
+                freeCompilerArgs += listOf(
+                    "-linker-option", "-framework", "-linker-option", "Metal",
+                    "-linker-option", "-framework", "-linker-option", "CoreText",
+                    "-linker-option", "-framework", "-linker-option", "CoreGraphics"
+                )
             }
+//            executable {
+//                entryPoint = "me.user.shared.main"
+//                freeCompilerArgs += listOf(
+//                    "-linker-option", "-framework", "-linker-option", "Metal",
+//                    "-linker-option", "-framework", "-linker-option", "CoreText",
+//                    "-linker-option", "-framework", "-linker-option", "CoreGraphics"
+//                )
+//            }
         }
     }
     sourceSets {
