@@ -4,7 +4,7 @@ plugins {
 
 apple {
     iosApp {
-        productName = "kmmappcode"
+        productName = "SkikoAppCode"
         sceneDelegateClass = "SceneDelegate"
         dependencies {
             implementation(project(":shared"))
