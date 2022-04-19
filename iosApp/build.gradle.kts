@@ -9,9 +9,6 @@ apple {
         sceneDelegateClass = "SceneDelegate"
         launchStoryboard = "LaunchScreen"
 
-        //productInfo["NSAppTransportSecurity"] = mapOf("NSAllowsArbitraryLoads" to true)
-        //buildSettings.OTHER_LDFLAGS("")
-
         dependencies {
             implementation(project(":shared"))
         }
