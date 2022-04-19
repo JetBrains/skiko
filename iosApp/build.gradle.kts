@@ -5,10 +5,7 @@ plugins {
 apple {
     iosApp {
         productName = "kmmappcode"
-
         sceneDelegateClass = "SceneDelegate"
-        launchStoryboard = "LaunchScreen"
-
         dependencies {
             implementation(project(":shared"))
         }
