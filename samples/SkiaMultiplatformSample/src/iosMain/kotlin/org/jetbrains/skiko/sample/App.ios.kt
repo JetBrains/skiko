@@ -11,8 +11,6 @@ import org.jetbrains.skiko.SkikoGestureEventKind
 import platform.UIKit.*
 import platform.Foundation.*
 
-fun makeApp(skiaLayer: SkiaLayer) = Clocks(skiaLayer)
-
 fun main() {
     val args = emptyArray<String>()
     memScoped {
@@ -38,14 +36,7 @@ class SkikoAppDelegate : UIResponder, UIApplicationDelegateProtocol {
 
     override fun application(application: UIApplication, didFinishLaunchingWithOptions: Map<Any?, *>?): Boolean {
         window = UIWindow(frame = UIScreen.mainScreen.bounds)
-        window!!.rootViewController = SkikoViewController(
-            SkikoUIView(
-                SkiaLayer().apply {
-                    gesturesToListen = SkikoGestureEventKind.values()
-                    skikoView = GenericSkikoView(this, makeApp(this))
-                }
-            )
-        )
+        window!!.rootViewController = getSkikoViewContoller()
         window!!.makeKeyAndVisible()
         return true
     }
