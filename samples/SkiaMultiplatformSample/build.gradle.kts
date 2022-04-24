@@ -84,14 +84,6 @@ kotlin {
                         "-linker-option", "-framework", "-linker-option", "CoreGraphics"
                     )
                 }
-//            executable {
-//                entryPoint = "me.user.shared.main"
-//                freeCompilerArgs += listOf(
-//                    "-linker-option", "-framework", "-linker-option", "Metal",
-//                    "-linker-option", "-framework", "-linker-option", "CoreText",
-//                    "-linker-option", "-framework", "-linker-option", "CoreGraphics"
-//                )
-//            }
             }
         }
     }
@@ -269,12 +261,7 @@ if (hostOs == "macos") {
     val kotlinBinary = currentTarget.binaries.getExecutable(buildType)
     val xcodeIntegrationGroup = "Xcode integration"
 
-
-    println("kotlinBinary.outputFile.absolutePath: ${kotlinBinary.outputFile.absolutePath}")
-    println("kotlinBinary.outputFile.name: ${kotlinBinary.outputFile.name}")
-    println("kotlinBinary.linkTask: ${kotlinBinary.linkTask}")
-
-    val packForXCode = if (true && (sdkName == null || targetBuildDir == null || executablePath == null)) {
+    val packForXCode = if (sdkName == null || targetBuildDir == null || executablePath == null) {
         // The build is launched not by Xcode ->
         // We cannot create a copy task and just show a meaningful error message.
         tasks.create("packForXCode").doLast {
