@@ -1,4 +1,3 @@
-include("shared")
 include("iosApp")
 includeBuild("../../skiko") {
     dependencySubstitution {
