@@ -176,25 +176,24 @@ kotlin {
     }
 }
 
-project.tasks.register<Exec>("runIosSim") {
-    val device = "iPhone 11"
-    workingDir = project.buildDir
-    val binTask = project.tasks.named("linkReleaseExecutableIosX64")
-    dependsOn(binTask)
-    commandLine = listOf(
-        "xcrun",
-        "simctl",
-        "spawn",
-        "--standalone",
-        device
-    )
-    argumentProviders.add {
-        val out = fileTree(binTask.get().outputs.files.files.single()) { include("*.kexe") }
-        listOf(out.single { it.name.endsWith(".kexe") }.absolutePath)
-    }
-}
-
 if (hostOs == "macos") {
+    project.tasks.register<Exec>("runIosSim") {
+        val device = "iPhone 11"
+        workingDir = project.buildDir
+        val binTask = project.tasks.named("linkReleaseExecutableIosX64")
+        dependsOn(binTask)
+        commandLine = listOf(
+            "xcrun",
+            "simctl",
+            "spawn",
+            "--standalone",
+            device
+        )
+        argumentProviders.add {
+            val out = fileTree(binTask.get().outputs.files.files.single()) { include("*.kexe") }
+            listOf(out.single { it.name.endsWith(".kexe") }.absolutePath)
+        }
+    }
     project.tasks.register<Exec>("runNative") {
         workingDir = project.buildDir
         val binTask = project.tasks.named("linkDebugExecutable${hostOs.capitalize()}${hostArch.capitalize()}")
