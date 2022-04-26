@@ -194,16 +194,18 @@ project.tasks.register<Exec>("runIosSim") {
     }
 }
 
-project.tasks.register<Exec>("runNative") {
-    workingDir = project.buildDir
-    val binTask = project.tasks.named("linkDebugExecutable${hostOs.capitalize()}${hostArch.capitalize()}")
-    dependsOn(binTask)
-    // Hacky approach.
-    commandLine = listOf("bash", "-c")
-    argumentProviders.add {
-        val out = fileTree(binTask.get().outputs.files.files.single()) { include("*.kexe") }
-        println("Run $out")
-        listOf(out.single { it.name.endsWith(".kexe") }.absolutePath)
+if (hostOs == "macos") {
+    project.tasks.register<Exec>("runNative") {
+        workingDir = project.buildDir
+        val binTask = project.tasks.named("linkDebugExecutable${hostOs.capitalize()}${hostArch.capitalize()}")
+        dependsOn(binTask)
+        // Hacky approach.
+        commandLine = listOf("bash", "-c")
+        argumentProviders.add {
+            val out = fileTree(binTask.get().outputs.files.files.single()) { include("*.kexe") }
+            println("Run $out")
+            listOf(out.single { it.name.endsWith(".kexe") }.absolutePath)
+        }
     }
 }
 
