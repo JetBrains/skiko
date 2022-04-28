@@ -113,7 +113,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
                 )
             }
         }
-        if (keyEvent!!.isBackspaceKey()) { keyEvent = null }
+        if (keyEvent?.isBackspaceKey() == true) { keyEvent = null }
         super.pressesEnded(presses, withEvent)
     }
 
