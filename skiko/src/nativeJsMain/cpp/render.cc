@@ -1,6 +1,3 @@
-
-// This file has been auto generated.
-
 #include "GrBackendSurface.h"
 #include "GrDirectContext.h"
 #include "common.h"
@@ -33,8 +30,8 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skiko_RenderTargetsKt_makeMetalContext
     () {
     TODO("implement org_jetbrains_skiko_RenderTargetsKt_makeMetalContextNative");
 }
-     
-#if 0 
+
+#if 0
 SKIKO_EXPORT KNativePointer org_jetbrains_skiko_RenderTargetsKt_makeMetalContextNative
     () {
 #ifdef SK_METAL

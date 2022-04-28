@@ -1,6 +1,3 @@
-
-// This file has been auto generated.
-
 #include "SkSVGNode.h"
 #include "common.h"
 

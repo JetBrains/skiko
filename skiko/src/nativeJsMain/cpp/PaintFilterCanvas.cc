@@ -1,6 +1,3 @@
-
-// This file has been auto generated.
-
 #include <iostream>
 #include "SkCanvas.h"
 #include "SkDrawable.h"

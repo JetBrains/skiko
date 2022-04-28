@@ -1,6 +1,3 @@
-
-// This file has been auto generated.
-
 #include <iostream>
 #include "SkColorFilter.h"
 #include "SkColorMatrixFilter.h"
@@ -91,7 +88,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorFilter__1nMakeTableARGB
         reinterpret_cast<uint8_t*>(g),
         reinterpret_cast<uint8_t*>(b)
     ).release();
-    
+
     return reinterpret_cast<KNativePointer>(ptr);
 }
 

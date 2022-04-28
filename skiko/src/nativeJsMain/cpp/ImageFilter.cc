@@ -1,6 +1,3 @@
-
-// This file has been auto generated.
-
 #include <iostream>
 #include "SkColorFilter.h"
 #include "SkImageFilter.h"
@@ -157,6 +154,35 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakePicture
   (KNativePointer picturePtr, KFloat l, KFloat t, KFloat r, KFloat b) {
     SkPicture* picture = reinterpret_cast<SkPicture*>((picturePtr));
     SkImageFilter* ptr = SkImageFilters::Picture(sk_ref_sp(picture), SkRect{l, t, r, b}).release();
+    return reinterpret_cast<KNativePointer>(ptr);
+}
+
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeRuntimeShader
+  (KNativePointer runtimeShaderBuilderPtr, KInteropPointer childShaderName, KNativePointer inputPtr) {
+    SkRuntimeShaderBuilder* runtimeShaderBuilder = reinterpret_cast<SkRuntimeShaderBuilder*>(runtimeShaderBuilderPtr);
+    sk_sp<SkImageFilter> input = sk_ref_sp<SkImageFilter>(reinterpret_cast<SkImageFilter*>(inputPtr));
+
+    SkImageFilter* ptr = SkImageFilters::RuntimeShader(*runtimeShaderBuilder, reinterpret_cast<char *>(childShaderName), input).release();
+    return reinterpret_cast<KNativePointer>(ptr);
+}
+
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeRuntimeShaderFromArray
+  (KNativePointer runtimeShaderBuilderPtr, KInteropPointerArray childShaderNamesArr, KNativePointerArray inputPtrsArray, KInt inputCount) {
+    SkRuntimeShaderBuilder* runtimeShaderBuilder = reinterpret_cast<SkRuntimeShaderBuilder*>(runtimeShaderBuilderPtr);
+
+    KNativePointer* inputPtrs = reinterpret_cast<KNativePointer*>(inputPtrsArray);
+    std::vector<sk_sp<SkImageFilter>> inputChildren(inputCount);
+    for (size_t i = 0; i < inputCount; i++) {
+        SkImageFilter* si = reinterpret_cast<SkImageFilter*>(inputPtrs[i]);
+        inputChildren[i] = sk_ref_sp(si);
+    }
+
+    std::vector<SkString> childShaderNameStrings = skStringVector(childShaderNamesArr, inputCount);
+    std::vector<const char*> childShaderNames(childShaderNameStrings.size());
+    for (int i = 0; i < childShaderNames.size(); ++i)
+        childShaderNames[i] = childShaderNameStrings[i].c_str();
+
+    SkImageFilter* ptr = SkImageFilters::RuntimeShader(*runtimeShaderBuilder, childShaderNames.data(), inputChildren.data(), inputCount).release();
     return reinterpret_cast<KNativePointer>(ptr);
 }
 

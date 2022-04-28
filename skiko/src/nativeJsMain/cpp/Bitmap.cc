@@ -1,6 +1,3 @@
-
-// This file has been auto generated.
-
 #include "SkBitmap.h"
 #include "SkPixelRef.h"
 #include "SkSamplingOptions.h"

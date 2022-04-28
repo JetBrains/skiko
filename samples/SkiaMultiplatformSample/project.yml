@@ -21,7 +21,12 @@ targets:
       properties:
         UILaunchStoryboardName: ""
     sources:
-      - "src/"
+      - path: "src/"
+        excludes:
+          - "android*/**"
+          - "awt*/**"
+          - "iosApp*/**"
+          - "js*/**"
     settings:
       LIBRARY_SEARCH_PATHS: "$(inherited)"
       ENABLE_BITCODE: "YES"

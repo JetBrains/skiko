@@ -3,7 +3,6 @@ package org.jetbrains.skia
 import org.jetbrains.skia.impl.use
 import org.jetbrains.skia.util.assertContentDifferent
 import org.jetbrains.skiko.tests.runTest
-import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -221,6 +220,390 @@ class ImageFilterTest {
         ImageFilter.makePaint(
             paint = Paint().setStroke(false).setColor4f(Color4f(Color.RED), colorSpace = null),
             crop = null
+        )
+    }
+
+    @Test
+    fun makeRuntimeShader() = imageFilterTest {
+        // A simple Skia shader that bumps up the red channel of every non-transparent
+        // pixel to full intensity, and leaves green and blue channels unchanged.
+        val sksl = """
+            uniform shader content;
+            vec4 main(vec2 coord) {
+                vec4 c = content.eval(coord);
+                return vec4(1.0 * c.a, c.g * c.a, c.b * c.a, c.a);
+            }
+        """
+
+        val runtimeEffect = RuntimeEffect.makeForShader(sksl)
+        val shaderBuilder = RuntimeShaderBuilder(runtimeEffect)
+
+        ImageFilter.makeRuntimeShader(
+            runtimeShaderBuilder = shaderBuilder,
+            shaderName = "content",
+            input = null
+        )
+    }
+
+    @Test
+    fun makeRuntimeShaderUniformFloat2() = imageFilterTest {
+        // A simple Skia shader that bumps up the red channel and bumps down the green channel
+        // of every pixel. This tests the binding to SkRuntimeShaderBuilder::uniform(kFloat2)
+        val sksl = """
+            uniform shader content;
+            uniform vec2 channels;
+            
+            vec4 main(vec2 coord) {
+                vec4 c = content.eval(coord);
+                return vec4(c.a * (c.r + (1.0 - c.r) * channels.x),
+                   c.a * (c.g * channels.y), c.a * c.b, c.a);
+            }
+        """
+
+        val runtimeEffect = RuntimeEffect.makeForShader(sksl)
+        val shaderBuilder = RuntimeShaderBuilder(runtimeEffect)
+        shaderBuilder.uniform("channels", 0.9f, 0.5f)
+
+        ImageFilter.makeRuntimeShader(
+            runtimeShaderBuilder = shaderBuilder,
+            shaderName = "content",
+            input = null
+        )
+    }
+
+    @Test
+    fun makeRuntimeShaderUniformFloat3() = imageFilterTest {
+        // A simple Skia shader that replaces every pixel with the specified uniform color.
+        // This tests the binding to SkRuntimeShaderBuilder::uniform(kFloat3)
+        val sksl = """
+            uniform shader content;
+            uniform vec3 color;
+            
+            vec4 main(vec2 coord) {
+                return vec4(color, 1.0);
+            }
+        """
+
+        val runtimeEffect = RuntimeEffect.makeForShader(sksl)
+        val shaderBuilder = RuntimeShaderBuilder(runtimeEffect)
+        shaderBuilder.uniform("color", 1.0f, 0.0f, 1.0f)
+
+        ImageFilter.makeRuntimeShader(
+            runtimeShaderBuilder = shaderBuilder,
+            shaderName = "content",
+            input = null
+        )
+    }
+
+    @Test
+    fun makeRuntimeShaderUniformFloat4() = imageFilterTest {
+        // A simple Skia shader that replaces every pixel with the specified uniform color.
+        // This tests the binding to SkRuntimeShaderBuilder::uniform(kFloat4)
+        val sksl = """
+            uniform shader content;
+            uniform vec4 color;
+            
+            vec4 main(vec2 coord) {
+                return color;
+            }
+        """
+
+        val runtimeEffect = RuntimeEffect.makeForShader(sksl)
+        val shaderBuilder = RuntimeShaderBuilder(runtimeEffect)
+        shaderBuilder.uniform("color", 1.0f, 0.0f, 1.0f, 1.0f)
+
+        ImageFilter.makeRuntimeShader(
+            runtimeShaderBuilder = shaderBuilder,
+            shaderName = "content",
+            input = null
+        )
+    }
+
+    @Test
+    fun makeRuntimeShaderUniformInt() = imageFilterTest {
+        // A simple Skia shader that replaces the red channel of every pixel.
+        // This tests the binding to SkRuntimeShaderBuilder::uniform(kInt)
+        val sksl = """
+            uniform shader content;
+            uniform int replace;
+            vec4 main(vec2 coord) {
+                vec4 c = content.eval(coord);
+                return vec4(c.a * float(replace) / 255.0, c.g * c.a, c.b * c.a, c.a);
+            }
+        """
+
+        val runtimeEffect = RuntimeEffect.makeForShader(sksl)
+        val shaderBuilder = RuntimeShaderBuilder(runtimeEffect)
+        shaderBuilder.uniform("replace", 128)
+
+        ImageFilter.makeRuntimeShader(
+            runtimeShaderBuilder = shaderBuilder,
+            shaderName = "content",
+            input = null
+        )
+    }
+
+    @Test
+    fun makeRuntimeShaderUniformInt2() = imageFilterTest {
+        // A simple Skia shader that replaces the red and green channels of every pixel.
+        // This tests the binding to SkRuntimeShaderBuilder::uniform(kInt2)
+        val sksl = """
+            uniform shader content;
+            uniform ivec2 replace;
+            vec4 main(vec2 coord) {
+                vec4 c = content.eval(coord);
+                return vec4(c.a * float(replace.x) / 255.0, c.a * float(replace.y) / 255.0, c.b * c.a, c.a);
+            }
+        """
+
+        val runtimeEffect = RuntimeEffect.makeForShader(sksl)
+        val shaderBuilder = RuntimeShaderBuilder(runtimeEffect)
+        shaderBuilder.uniform("replace", 128, 160)
+
+        ImageFilter.makeRuntimeShader(
+            runtimeShaderBuilder = shaderBuilder,
+            shaderName = "content",
+            input = null
+        )
+    }
+
+    @Test
+    fun makeRuntimeShaderUniformInt3() = imageFilterTest {
+        // A simple Skia shader that replaces the red, green and blue channels of every pixel.
+        // This tests the binding to SkRuntimeShaderBuilder::uniform(kInt3)
+        val sksl = """
+            uniform shader content;
+            uniform ivec3 replace;
+            vec4 main(vec2 coord) {
+                vec4 c = content.eval(coord);
+                return vec4(c.a * float(replace.x) / 255.0, c.a * float(replace.y) / 255.0, 
+                    c.a * float(replace.z) / 255.0, c.a);
+            }
+        """
+
+        val runtimeEffect = RuntimeEffect.makeForShader(sksl)
+        val shaderBuilder = RuntimeShaderBuilder(runtimeEffect)
+        shaderBuilder.uniform("replace", 128, 160, 192)
+
+        ImageFilter.makeRuntimeShader(
+            runtimeShaderBuilder = shaderBuilder,
+            shaderName = "content",
+            input = null
+        )
+    }
+
+    @Test
+    fun makeRuntimeShaderUniformInt4() = imageFilterTest {
+        // A simple Skia shader that all channels of every pixel.
+        // This tests the binding to SkRuntimeShaderBuilder::uniform(kInt4)
+        val sksl = """
+            uniform shader content;
+            uniform ivec4 replace;
+            vec4 main(vec2 coord) {
+                vec4 c = content.eval(coord);
+                float alpha = c.a * float(replace.w) / 255.0;
+                return vec4(alpha * float(replace.x) / 255.0, alpha * float(replace.y) / 255.0, 
+                    alpha * float(replace.z) / 255.0, alpha);
+            }
+        """
+
+        val runtimeEffect = RuntimeEffect.makeForShader(sksl)
+        val shaderBuilder = RuntimeShaderBuilder(runtimeEffect)
+        shaderBuilder.uniform("replace", 128, 160, 192, 100)
+
+        ImageFilter.makeRuntimeShader(
+            runtimeShaderBuilder = shaderBuilder,
+            shaderName = "content",
+            input = null
+        )
+    }
+
+    @Test
+    fun makeRuntimeShaderUniformFloatMatrix2x2() = imageFilterTest {
+        // A simple Skia shader that applies a 2x2 matrix on the red and green channels.
+        // This tests the binding to SkRuntimeShaderBuilder::uniform(kFloat2x2)
+        val sksl = """
+            uniform shader content;
+            uniform mat2 matrix2x2;
+            
+            vec4 main(vec2 coord) {
+                vec4 c = content.eval(coord);
+                vec2 intermediate = c.rg * matrix2x2 + vec2(0.1, 0.1);
+                return vec4(c.a * intermediate[0], c.a * intermediate[1], c.a * c.g, c.a);
+            }
+        """
+
+        val runtimeEffect = RuntimeEffect.makeForShader(sksl)
+        val shaderBuilder = RuntimeShaderBuilder(runtimeEffect)
+        shaderBuilder.uniform("matrix2x2", Matrix22(0.4f, 0.3f, 0.2f, 0.6f))
+
+        ImageFilter.makeRuntimeShader(
+            runtimeShaderBuilder = shaderBuilder,
+            shaderName = "content",
+            input = null
+        )
+    }
+
+    @Test
+    fun makeRuntimeShaderUniformFloatMatrix3x3() = imageFilterTest {
+        // A simple Skia shader that applies a 3x3 matrix on the red, green and blue channels.
+        // This tests the binding to SkRuntimeShaderBuilder::uniform(kFloat3x3)
+        val sksl = """
+            uniform shader content;
+            uniform mat3 matrix3x3;
+            
+            vec4 main(vec2 coord) {
+                vec4 c = content.eval(coord);
+                vec3 intermediate = c.rgb * matrix3x3 + vec3(0.1, 0.1, 0.1);
+                return vec4(c.a * intermediate[0], c.a * intermediate[1], c.a * c.g, c.a);
+            }
+        """
+
+        val runtimeEffect = RuntimeEffect.makeForShader(sksl)
+        val shaderBuilder = RuntimeShaderBuilder(runtimeEffect)
+        shaderBuilder.uniform("matrix3x3", Matrix33(0.4f, 0.3f, 0.2f, 0.6f, 0.1f, 0.2f, 0.3f, 0.2f, 0.1f))
+
+        ImageFilter.makeRuntimeShader(
+            runtimeShaderBuilder = shaderBuilder,
+            shaderName = "content",
+            input = null
+        )
+    }
+
+    @Test
+    fun makeRuntimeShaderUniformFloatMatrix4x4() = imageFilterTest {
+        // A simple Skia shader that applies a 4x4 matrix on all channels.
+        // This tests the binding to SkRuntimeShaderBuilder::uniform(kFloat4x4)
+        val sksl = """
+            uniform shader content;
+            uniform mat4 matrix4x4;
+            
+            vec4 main(vec2 coord) {
+                vec4 c = content.eval(coord);
+                vec4 intermediate = c.rgba * matrix4x4 + vec4(0.1, 0.1, 0.1, 0.1);
+                return intermediate;
+            }
+        """
+
+        val runtimeEffect = RuntimeEffect.makeForShader(sksl)
+        val shaderBuilder = RuntimeShaderBuilder(runtimeEffect)
+        shaderBuilder.uniform("matrix4x4", Matrix44(0.2f, 0.3f, 0.2f, 0.1f, 0.4f, 0.1f, 0.2f, 0.1f, 0.1f, 0.3f, 0.2f, 0.1f, 0.2f, 0.2f, 0.2f, 0.3f))
+
+        ImageFilter.makeRuntimeShader(
+            runtimeShaderBuilder = shaderBuilder,
+            shaderName = "content",
+            input = null
+        )
+    }
+
+    @Test
+    fun makeRuntimeShaderFromArrays() = imageFilterTest {
+        // A Skia shader that has two children shaders - one that applies our custom shader logic
+        // on the underlying render node content, and another that is the built in blur. This
+        // shader also has a float uniform that is used to decide which one of these two children
+        // shaders to apply on a given pixel, based on the X coordinate.
+        // This test covers not only ImageFilter.makeRuntimeShader API, but also
+        // RuntimeShaderBuilder.uniform.
+        val compositeSksl = """
+            uniform shader content;
+            uniform shader blurred;
+            uniform float cutoff;
+            vec4 main(vec2 coord) {
+                vec4 c = content.eval(coord);
+                vec4 b = blurred.eval(coord);
+                if (coord.x > cutoff) {
+                    return vec4(1.0 * c.a, c.g * c.a, c.b * c.a, c.a);
+                } else {
+                    return b;
+                }
+            }
+        """
+
+        val compositeRuntimeEffect = RuntimeEffect.makeForShader(compositeSksl)
+        val compositeShaderBuilder = RuntimeShaderBuilder(compositeRuntimeEffect)
+        // Pass a float uniform into our shader
+        compositeShaderBuilder.uniform("cutoff", 10.0f)
+
+        // And use ImageFilter.makeBlur as the second child input to our composite shader
+        val blurImageFilter = ImageFilter.makeBlur(sigmaX = 2.0f, sigmaY = 2.0f, mode = FilterTileMode.DECAL)
+
+        ImageFilter.makeRuntimeShader(
+            runtimeShaderBuilder = compositeShaderBuilder,
+            shaderNames = arrayOf("content", "blurred"),
+            inputs = arrayOf(null, blurImageFilter)
+        )
+    }
+
+    @Test
+    fun makeRuntimeShaderChildShader() = imageFilterTest {
+        // A simple Skia shader that applies a child shader on part of the input
+        val compositeSksl = """
+            uniform shader content;
+            uniform shader gradient;
+            uniform float cutoff;
+            
+            vec4 main(vec2 coord) {
+                vec4 c = content.eval(coord);
+                vec4 b = gradient.eval(coord);
+                if (coord.x > cutoff) {
+                    return vec4(1.0 * c.a, c.g * c.a, c.b * c.a, c.a);
+                } else {
+                    return vec4(b.r * c.a, b.g * c.a, b.b * c.a, c.a);
+                }
+            }
+            """
+
+        val compositeRuntimeEffect = RuntimeEffect.makeForShader(compositeSksl)
+        val compositeShaderBuilder = RuntimeShaderBuilder(compositeRuntimeEffect)
+        compositeShaderBuilder.uniform("cutoff", 100.0f)
+        compositeShaderBuilder.child(
+            "gradient",
+            Shader.Companion.makeLinearGradient(
+                x0 = 0.0f, y0 = 0.0f,
+                x1 = 200.0f, y1 = 0.0f,
+                colors = intArrayOf(Color.RED, Color.BLUE),
+                style = GradientStyle.DEFAULT
+            )
+        )
+
+        ImageFilter.makeRuntimeShader(
+            runtimeShaderBuilder = compositeShaderBuilder,
+            shaderName = "content",
+            input = null
+        )
+    }
+
+    @Test
+    fun makeRuntimeShaderChildColorFilter() = imageFilterTest {
+        // A simple Skia shader that applies a child color filter on part of the input
+        val compositeSksl = """
+            uniform shader content;
+            uniform colorFilter filter;
+            uniform float cutoff;
+            
+            vec4 main(vec2 coord) {
+                vec4 c = content.eval(coord);
+                vec4 b = filter.eval(c);
+                if (coord.x > cutoff) {
+                    return vec4(1.0 * c.a, c.g * c.a, c.b * c.a, c.a);
+                } else {
+                    return vec4(b.r * c.a, b.g * c.a, b.b * c.a, c.a);
+                }
+            }
+            """
+
+        val compositeRuntimeEffect = RuntimeEffect.makeForShader(compositeSksl)
+        val compositeShaderBuilder = RuntimeShaderBuilder(compositeRuntimeEffect)
+        compositeShaderBuilder.uniform("cutoff", 100.0f)
+        compositeShaderBuilder.child(
+            "filter",
+            ColorFilter.makeHighContrast(grayscale = false, mode = InversionMode.BRIGHTNESS, contrast = 0.7f)
+        )
+
+        ImageFilter.makeRuntimeShader(
+            runtimeShaderBuilder = compositeShaderBuilder,
+            shaderName = "content",
+            input = null
         )
     }
 

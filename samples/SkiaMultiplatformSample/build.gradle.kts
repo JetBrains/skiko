@@ -14,6 +14,7 @@ buildscript {
 
 plugins {
     kotlin("multiplatform") version "1.6.10"
+    id("org.jetbrains.gradle.apple.applePlugin") version "222.849-0.15.1"
 }
 
 val coroutinesVersion = "1.5.2"
@@ -72,6 +73,19 @@ kotlin {
 
         targets.add(iosX64())
         targets.add(iosArm64())
+
+        ios {
+            binaries {
+                framework {
+                    baseName = "shared"
+                    freeCompilerArgs += listOf(
+                        "-linker-option", "-framework", "-linker-option", "Metal",
+                        "-linker-option", "-framework", "-linker-option", "CoreText",
+                        "-linker-option", "-framework", "-linker-option", "CoreGraphics"
+                    )
+                }
+            }
+        }
     }
 
     jvm("awt") {
@@ -149,7 +163,7 @@ kotlin {
                 }
                 else -> throw GradleException("Host OS is not supported")
             }
-            val iosMain by creating {
+            val iosMain by getting {
                 dependsOn(darwinMain)
             }
             val iosX64Main by getting {
@@ -162,34 +176,35 @@ kotlin {
     }
 }
 
-project.tasks.register<Exec>("runIosSim") {
-    val device = "iPhone 11"
-    workingDir = project.buildDir
-    val binTask = project.tasks.named("linkReleaseExecutableIosX64")
-    dependsOn(binTask)
-    commandLine = listOf(
-        "xcrun",
-        "simctl",
-        "spawn",
-        "--standalone",
-        device
-    )
-    argumentProviders.add {
-        val out = fileTree(binTask.get().outputs.files.files.single()) { include("*.kexe") }
-        listOf(out.single { it.name.endsWith(".kexe") }.absolutePath)
+if (hostOs == "macos") {
+    project.tasks.register<Exec>("runIosSim") {
+        val device = "iPhone 11"
+        workingDir = project.buildDir
+        val binTask = project.tasks.named("linkReleaseExecutableIosX64")
+        dependsOn(binTask)
+        commandLine = listOf(
+            "xcrun",
+            "simctl",
+            "spawn",
+            "--standalone",
+            device
+        )
+        argumentProviders.add {
+            val out = fileTree(binTask.get().outputs.files.files.single()) { include("*.kexe") }
+            listOf(out.single { it.name.endsWith(".kexe") }.absolutePath)
+        }
     }
-}
-
-project.tasks.register<Exec>("runNative") {
-    workingDir = project.buildDir
-    val binTask = project.tasks.named("linkDebugExecutable${hostOs.capitalize()}${hostArch.capitalize()}")
-    dependsOn(binTask)
-    // Hacky approach.
-    commandLine = listOf("bash", "-c")
-    argumentProviders.add {
-        val out = fileTree(binTask.get().outputs.files.files.single()) { include("*.kexe") }
-        println("Run $out")
-        listOf(out.single { it.name.endsWith(".kexe") }.absolutePath)
+    project.tasks.register<Exec>("runNative") {
+        workingDir = project.buildDir
+        val binTask = project.tasks.named("linkDebugExecutable${hostOs.capitalize()}${hostArch.capitalize()}")
+        dependsOn(binTask)
+        // Hacky approach.
+        commandLine = listOf("bash", "-c")
+        argumentProviders.add {
+            val out = fileTree(binTask.get().outputs.files.files.single()) { include("*.kexe") }
+            println("Run $out")
+            listOf(out.single { it.name.endsWith(".kexe") }.absolutePath)
+        }
     }
 }
 
@@ -279,4 +294,14 @@ if (hostOs == "macos") {
 
 rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin> {
     rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>().nodeVersion = "16.0.0"
+}
+
+apple {
+    iosApp {
+        productName = "SkikoAppCode"
+        sceneDelegateClass = "SceneDelegate"
+        dependencies {
+            implementation(project(":"))
+        }
+    }
 }

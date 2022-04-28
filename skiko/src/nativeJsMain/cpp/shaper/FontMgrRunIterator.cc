@@ -1,6 +1,3 @@
-
-// This file has been auto generated.
-
 #include "SkFontMgr.h"
 #include "SkShaper.h"
 #include "common.h"
@@ -32,7 +29,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_FontMgrRunIterator__1nMake
     );
     return reinterpret_cast<KNativePointer>(instance);
 }
-     
+
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_FontMgrRunIterator__1nGetCurrentFont
   (KNativePointer ptr) {
     SkShaper::FontRunIterator* instance = reinterpret_cast<SkShaper::FontRunIterator*>(ptr);

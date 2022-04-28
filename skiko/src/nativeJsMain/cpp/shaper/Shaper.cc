@@ -1,6 +1,3 @@
-
-// This file has been auto generated.
-
 #include <iostream>
 #include "SkShaper.h"
 #include "src/utils/SkUTF.h"
@@ -179,15 +176,15 @@ public:
         _onConsume();
         _endOfCurrentRun = _indicesConverter.from16To8(_onEndOfCurrentRun());
     }
-    
+
     size_t endOfCurrentRun() const override {
         return _endOfCurrentRun;
     }
-    
+
     bool atEnd() const override {
         return static_cast<bool>(_onAtEnd());
     }
-    
+
     void init(KInteropPointer onConsume, KInteropPointer onEndOfCurrentRun, KInteropPointer onAtEnd, KInteropPointer onCurrent) {
         _onConsume = KVoidCallback(onConsume);
         _onEndOfCurrentRun = KIntCallback(onEndOfCurrentRun);
