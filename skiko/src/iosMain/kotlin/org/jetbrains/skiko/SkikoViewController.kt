@@ -269,7 +269,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
             location to length
         }
         markedText?.let {
-            deleteBackward()
+//            deleteBackward() //TODO
             _markedTextRange = SkikoTextRange(
                 SkikoTextPosition(location.toLong()),
                 SkikoTextPosition(location.toLong() + length.toLong())
