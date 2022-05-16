@@ -175,6 +175,23 @@ class StrutStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finali
         return this
     }
 
+    var isHalfLeading: Boolean
+        get() = try {
+            Stats.onNativeCall()
+            _nIsHalfLeading(_ptr)
+        } finally {
+            reachabilityBarrier(this)
+        }
+        set(value) {
+            setHalfLeading(value)
+        }
+
+    fun setHalfLeading(value: Boolean): StrutStyle {
+        Stats.onNativeCall()
+        _nSetHalfLeading(_ptr, value)
+        return this
+    }
+
     private object _FinalizerHolder {
         val PTR = StrutStyle_nGetFinalizer()
     }
@@ -237,3 +254,9 @@ private external fun _nIsHeightOverridden(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetHeightOverridden")
 private external fun _nSetHeightOverridden(ptr: NativePointer, value: Boolean)
+
+@ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nIsHalfLeading")
+private external fun _nIsHalfLeading(ptr: NativePointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetHalfLeading")
+private external fun _nSetHalfLeading(ptr: NativePointer, value: Boolean)
