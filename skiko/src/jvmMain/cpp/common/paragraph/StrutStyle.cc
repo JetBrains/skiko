@@ -133,3 +133,15 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleKt
     StrutStyle* instance = reinterpret_cast<StrutStyle*>(static_cast<uintptr_t>(ptr));
     instance->setHeightOverride(value);
 }
+
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleKt__1nIsHalfLeading
+  (JNIEnv* env, jclass jclass, jlong ptr) {
+    StrutStyle* instance = reinterpret_cast<StrutStyle*>(static_cast<uintptr_t>(ptr));
+    return instance->getHalfLeading();
+}
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_StrutStyleKt__1nSetHalfLeading
+  (JNIEnv* env, jclass jclass, jlong ptr, jboolean value) {
+    StrutStyle* instance = reinterpret_cast<StrutStyle*>(static_cast<uintptr_t>(ptr));
+    instance->setHalfLeading(value);
+}
