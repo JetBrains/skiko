@@ -274,6 +274,7 @@ $dokka.location:org.jetbrains.skia.paragraph/StrutStyle/fontSize/#/PointingToDec
 $dokka.location:org.jetbrains.skia.paragraph/StrutStyle/fontStyle/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-strut-style/font-style.html
 $dokka.location:org.jetbrains.skia.paragraph/StrutStyle/height/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-strut-style/height.html
 $dokka.location:org.jetbrains.skia.paragraph/StrutStyle/isEnabled/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-strut-style/is-enabled.html
+$dokka.location:org.jetbrains.skia.paragraph/StrutStyle/isHalfLeading/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-strut-style/is-half-leading.html
 $dokka.location:org.jetbrains.skia.paragraph/StrutStyle/isHeightForced/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-strut-style/is-height-forced.html
 $dokka.location:org.jetbrains.skia.paragraph/StrutStyle/isHeightOverridden/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-strut-style/is-height-overridden.html
 $dokka.location:org.jetbrains.skia.paragraph/StrutStyle/leading/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-strut-style/leading.html
@@ -281,6 +282,7 @@ $dokka.location:org.jetbrains.skia.paragraph/StrutStyle/setEnabled/#kotlin.Boole
 $dokka.location:org.jetbrains.skia.paragraph/StrutStyle/setFontFamilies/#kotlin.Array[kotlin.String]/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-strut-style/set-font-families.html
 $dokka.location:org.jetbrains.skia.paragraph/StrutStyle/setFontSize/#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-strut-style/set-font-size.html
 $dokka.location:org.jetbrains.skia.paragraph/StrutStyle/setFontStyle/#org.jetbrains.skia.FontStyle/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-strut-style/set-font-style.html
+$dokka.location:org.jetbrains.skia.paragraph/StrutStyle/setHalfLeading/#kotlin.Boolean/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-strut-style/set-half-leading.html
 $dokka.location:org.jetbrains.skia.paragraph/StrutStyle/setHeight/#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-strut-style/set-height.html
 $dokka.location:org.jetbrains.skia.paragraph/StrutStyle/setHeightForced/#kotlin.Boolean/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-strut-style/set-height-forced.html
 $dokka.location:org.jetbrains.skia.paragraph/StrutStyle/setHeightOverridden/#kotlin.Boolean/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-strut-style/set-height-overridden.html
@@ -324,6 +326,7 @@ $dokka.location:org.jetbrains.skia.paragraph/TextStyle/fontSize/#/PointingToDecl
 $dokka.location:org.jetbrains.skia.paragraph/TextStyle/fontStyle/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-style/font-style.html
 $dokka.location:org.jetbrains.skia.paragraph/TextStyle/foreground/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-style/foreground.html
 $dokka.location:org.jetbrains.skia.paragraph/TextStyle/height/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-style/height.html
+$dokka.location:org.jetbrains.skia.paragraph/TextStyle/isHalfLeading/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-style/is-half-leading.html
 $dokka.location:org.jetbrains.skia.paragraph/TextStyle/isPlaceholder/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-style/is-placeholder.html
 $dokka.location:org.jetbrains.skia.paragraph/TextStyle/letterSpacing/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-style/letter-spacing.html
 $dokka.location:org.jetbrains.skia.paragraph/TextStyle/locale/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-style/locale.html
@@ -337,6 +340,7 @@ $dokka.location:org.jetbrains.skia.paragraph/TextStyle/setFontFamily/#kotlin.Str
 $dokka.location:org.jetbrains.skia.paragraph/TextStyle/setFontSize/#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-style/set-font-size.html
 $dokka.location:org.jetbrains.skia.paragraph/TextStyle/setFontStyle/#org.jetbrains.skia.FontStyle/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-style/set-font-style.html
 $dokka.location:org.jetbrains.skia.paragraph/TextStyle/setForeground/#org.jetbrains.skia.Paint?/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-style/set-foreground.html
+$dokka.location:org.jetbrains.skia.paragraph/TextStyle/setHalfLeading/#kotlin.Boolean/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-style/set-half-leading.html
 $dokka.location:org.jetbrains.skia.paragraph/TextStyle/setHeight/#kotlin.Float?/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-style/set-height.html
 $dokka.location:org.jetbrains.skia.paragraph/TextStyle/setLetterSpacing/#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-style/set-letter-spacing.html
 $dokka.location:org.jetbrains.skia.paragraph/TextStyle/setLocale/#kotlin.String?/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-style/set-locale.html
