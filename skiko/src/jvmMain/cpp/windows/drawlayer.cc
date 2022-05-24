@@ -67,10 +67,30 @@ extern "C"
         GetDpiForMonitor(display, MDT_RAW_DPI, &xDpi, &yDpi);
         int dpi = (int)xDpi;
         // We can get dpi:0 if we set up multiple displays for content duplication (mirror). 
-        if (dpi == 0) {
-            // get default system dpi
-            dpi = GetDpiForWindow(hwnd);
+        if (dpi == 0) {            
+            // Try to dynamically load GetDpiForWindow - it is not supported prior to Windows 10
+            static bool tryToLoadGetDpiForWindow = true;
+            typedef UINT (WINAPI *GDFW)(HWND);
+            static GDFW getDpiForWindow = nullptr;
+            if(tryToLoadGetDpiForWindow) {
+                HINSTANCE user32dll = LoadLibrary("User32");
+                if(user32dll) {
+                    getDpiForWindow = reinterpret_cast<GDFW>(GetProcAddress(user32dll, "GetDpiForWindow"));
+                }
+                tryToLoadGetDpiForWindow = false;
+            }
+            
+            if(getDpiForWindow) {
+                // get default system dpi
+                dpi = getDpiForWindow(hwnd);
+            }
         }
+        
+        if(dpi == 0) {
+            // If failed to get DPI, assume standard 96
+            dpi = 96;
+        }
+        
         return dpi;
     }
 } // extern "C"
