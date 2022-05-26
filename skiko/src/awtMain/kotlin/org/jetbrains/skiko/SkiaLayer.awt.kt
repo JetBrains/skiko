@@ -83,6 +83,9 @@ actual open class SkiaLayer internal constructor(
                 return this@SkiaLayer.inputMethodRequests
             }
 
+            // check isRequestFocusEnabled manually, because it isn't implemented for Canvas.
+            // But it should be implemented, how it is implemented for JComponent.
+            // See Component.setRequestFocusEnabled description.
             override fun requestFocus(cause: FocusEvent.Cause?) {
                 if (canReceiveFocus(cause)) {
                     super.requestFocus(cause)
