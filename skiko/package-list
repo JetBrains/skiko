@@ -2384,6 +2384,7 @@ $dokka.location:org.jetbrains.skiko.wasm////PointingToDeclaration/skiko/org.jet
 $dokka.location:org.jetbrains.skiko.wasm//onWasmReady/#kotlin.Function0[kotlin.Unit]/PointingToDeclaration/skiko/org.jetbrains.skiko.wasm/on-wasm-ready.html
 $dokka.location:org.jetbrains.skiko////PointingToDeclaration/skiko/org.jetbrains.skiko/index.html
 $dokka.location:org.jetbrains.skiko//MainUIDispatcher/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-main-u-i-dispatcher.html
+$dokka.location:org.jetbrains.skiko//currentNanoTime/#/PointingToDeclaration/skiko/org.jetbrains.skiko/current-nano-time.html
 $dokka.location:org.jetbrains.skiko//currentSystemTheme/#/PointingToDeclaration/skiko/org.jetbrains.skiko/current-system-theme.html
 $dokka.location:org.jetbrains.skiko//disableTitleBar/org.jetbrains.skiko.SkiaLayer#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skiko/disable-title-bar.html
 $dokka.location:org.jetbrains.skiko//hostArch/#/PointingToDeclaration/skiko/org.jetbrains.skiko/host-arch.html
