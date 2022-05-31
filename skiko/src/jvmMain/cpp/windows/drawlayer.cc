@@ -68,14 +68,14 @@ extern "C"
 
         // Try to dynamically load GetDpiForWindow and GetDpiForMonitor - they are only supported from Windows 10 and 8.1 respectively
         static bool dynamicFunctionsLoaded = false;
-        if(!dynamicFunctionsLoaded) {
+        if (!dynamicFunctionsLoaded) {
             HINSTANCE shcoreDll = LoadLibrary("Shcore.dll");
-            if(shcoreDll) {
+            if (shcoreDll) {
                 getDpiForMonitor = reinterpret_cast<GDFM>(GetProcAddress(shcoreDll, "GetDpiForMonitor"));
             }
             
             HINSTANCE user32Dll = LoadLibrary("User32");
-            if(user32Dll) {
+            if (user32Dll) {
                 getDpiForWindow = reinterpret_cast<GDFW>(GetProcAddress(user32Dll, "GetDpiForWindow"));
             }
             
@@ -84,22 +84,22 @@ extern "C"
 
         HWND hwnd = (HWND)Java_org_jetbrains_skiko_HardwareLayer_getWindowHandle(env, canvas, platformInfoPtr);
         int dpi = 0;
-        if(getDpiForMonitor) {
+        if (getDpiForMonitor) {
             HMONITOR display = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
             UINT xDpi = 0, yDpi = 0;
             getDpiForMonitor(display, MDT_RAW_DPI, &xDpi, &yDpi);
-            dpi = (int)xDpi;
+            dpi = (int) xDpi;
         }
         
         // We can get dpi:0 if we set up multiple displays for content duplication (mirror). 
         if (dpi == 0) {            
-            if(getDpiForWindow) {
+            if (getDpiForWindow) {
                 // get default system dpi
                 dpi = getDpiForWindow(hwnd);
             }
         }
         
-        if(dpi == 0) {
+        if (dpi == 0) {
             // If failed to get DPI, assume standard 96
             dpi = 96;
         }
