@@ -1589,7 +1589,7 @@ $dokka.location:org.jetbrains.skia/ISize/toString/#/PointingToDeclaration/skiko
 $dokka.location:org.jetbrains.skia/ISize/width/#/PointingToDeclaration/skiko/org.jetbrains.skia/-i-size/width.html
 $dokka.location:org.jetbrains.skia/Image.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-image/-companion/index.html
 $dokka.location:org.jetbrains.skia/Image.Companion/makeFromBitmap/#org.jetbrains.skia.Bitmap/PointingToDeclaration/skiko/org.jetbrains.skia/-image/-companion/make-from-bitmap.html
-$dokka.location:org.jetbrains.skia/Image.Companion/makeFromEncoded/#kotlin.ByteArray?/PointingToDeclaration/skiko/org.jetbrains.skia/-image/-companion/make-from-encoded.html
+$dokka.location:org.jetbrains.skia/Image.Companion/makeFromEncoded/#kotlin.ByteArray/PointingToDeclaration/skiko/org.jetbrains.skia/-image/-companion/make-from-encoded.html
 $dokka.location:org.jetbrains.skia/Image.Companion/makeFromPixmap/#org.jetbrains.skia.Pixmap/PointingToDeclaration/skiko/org.jetbrains.skia/-image/-companion/make-from-pixmap.html
 $dokka.location:org.jetbrains.skia/Image.Companion/makeRaster/#org.jetbrains.skia.ImageInfo#kotlin.ByteArray#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia/-image/-companion/make-raster.html
 $dokka.location:org.jetbrains.skia/Image.Companion/makeRaster/#org.jetbrains.skia.ImageInfo#org.jetbrains.skia.Data#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia/-image/-companion/make-raster.html
