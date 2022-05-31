@@ -47,8 +47,6 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nMakeFromPi
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nMakeFromEncoded
   (JNIEnv* env, jclass jclass, jbyteArray encodedArray, jint encodedLen) {
-    if (!encodedArray) return 0;
-
     jbyte* encoded = env->GetByteArrayElements(encodedArray, 0);
     sk_sp<SkData> encodedData = SkData::MakeWithCopy(encoded, encodedLen);
     env->ReleaseByteArrayElements(encodedArray, encoded, 0);
