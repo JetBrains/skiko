@@ -138,13 +138,13 @@ private external fun _nSetFontCacheLimit(bytes: Int): Int
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nGetFontCacheUsed")
 private external fun _nGetFontCacheUsed(): Int
 
-@ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nGetFontCountCacheLimit")
+@ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nGetFontCacheCountLimit")
 private external fun _nGetFontCacheCountLimit(): Int
 
-@ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nSetFontCountCacheLimit")
+@ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nSetFontCacheCountLimit")
 private external fun _nSetFontCacheCountLimit(count: Int): Int
 
-@ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nGetFontCountCacheUsed")
+@ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nGetFontCacheCountUsed")
 private external fun _nGetFontCacheCountUsed(): Int
 
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nGetResourceCacheTotalByteLimit")
