@@ -3,8 +3,9 @@ package org.jetbrains.skiko
 import org.jetbrains.skia.*
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skiko.redrawer.Redrawer
-import java.awt.*
 import java.awt.Color
+import java.awt.Component
+import java.awt.Window
 import java.awt.event.*
 import java.awt.im.InputMethodRequests
 import java.util.concurrent.CancellationException
@@ -68,7 +69,7 @@ actual open class SkiaLayer internal constructor(
         isOpaque = false
         layout = null
         backedLayer = object : HardwareLayer(externalAccessibleFactory) {
-            override fun paint(g: Graphics) {
+            override fun paint(g: java.awt.Graphics) {
                 // 1. JPanel.paint is not always called (in rare cases).
                 //    For example if we call 'jframe.isResizable = false` on Ubuntu
                 //
@@ -342,7 +343,7 @@ actual open class SkiaLayer internal constructor(
         redrawer?.syncSize()
     }
 
-    override fun paint(g: Graphics) {
+    override fun paint(g: java.awt.Graphics) {
         super.paint(g)
         if (backedLayer.checkContentScale()) {
             notifyChange(PropertyKind.ContentScale)
