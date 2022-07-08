@@ -228,6 +228,7 @@ kotlin {
 
     if (supportWasm) {
         js(IR) {
+            moduleName = "skiko-kjs" // override the name to avoid name collision with a different skiko.js file
             browser {
                 testTask {
                     dependsOn("linkWasm")
