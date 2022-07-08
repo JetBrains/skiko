@@ -291,6 +291,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_disposeDe
         MetalDevice *device = (__bridge_transfer MetalDevice *) (void *) devicePtr;
         env->DeleteGlobalRef(device.layer.javaRef);
         [device.layer removeFromSuperlayer];
+        [CATransaction flush];
     }
 }
 
