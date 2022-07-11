@@ -98,9 +98,45 @@ class FontFeature(val _tag: Int, val value: Int, val start: UInt, val end: UInt)
             return FontFeature(m.group(tagIx)!!, value, start, end)
         }
 
+        /**
+         * Parse font features, which are separated by spaces. For example:
+         *
+         * smcp=0 frac
+         *
+         * If a value omitted, treat it as "1"
+         *
+         * If [str] is invalid, throws IllegalArgumentException
+         */
         fun parse(str: String): Array<FontFeature> {
             return _splitPattern.split(str).map { s -> parseOne(s) }.toTypedArray()
         }
+
+        /**
+         * Parse font features separated by comma, in W3 style (as in CSS):
+         *
+         * smcp 0, frac
+         *
+         * If a value omitted, treat it as "1"
+         *
+         * See https://www.w3.org/TR/css-fonts-3/#font-feature-settings-prop
+         *
+         * If [str] in invalid format, FontFeature won't be in the result
+         */
+        fun parseW3(str: String): Array<FontFeature> =
+            str
+                .splitToSequence(",")
+                .mapNotNull {
+                    val parts = it.trim().split(" ")
+                    val name = parts[0]
+                    val value = when (val value = parts.getOrNull(1)) {
+                        "on", null -> 1
+                        "off" -> 0
+                        else -> value.toIntOrNull() ?: 1
+                    }
+                    if (name.length == 4) FontFeature(name, value) else null
+                }
+                .toList()
+                .toTypedArray()
 
         internal fun InteropScope.arrayOfFontFeaturesToInterop(fontFeatures: Array<FontFeature>?): InteropPointer {
             val ints = IntArray(4 * (fontFeatures?.size ?: 0))
