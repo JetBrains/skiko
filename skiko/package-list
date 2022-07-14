@@ -1280,6 +1280,7 @@ $dokka.location:org.jetbrains.skia/FontFeature.Companion/_featurePattern/#/Point
 $dokka.location:org.jetbrains.skia/FontFeature.Companion/_splitPattern/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font-feature/-companion/_split-pattern.html
 $dokka.location:org.jetbrains.skia/FontFeature.Companion/parse/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-font-feature/-companion/parse.html
 $dokka.location:org.jetbrains.skia/FontFeature.Companion/parseOne/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-font-feature/-companion/parse-one.html
+$dokka.location:org.jetbrains.skia/FontFeature.Companion/parseW3/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-font-feature/-companion/parse-w3.html
 $dokka.location:org.jetbrains.skia/FontFeature///PointingToDeclaration/skiko/org.jetbrains.skia/-font-feature/index.html
 $dokka.location:org.jetbrains.skia/FontFeature/FontFeature/#kotlin.Int#kotlin.Int#kotlin.UInt#kotlin.UInt/PointingToDeclaration/skiko/org.jetbrains.skia/-font-feature/-font-feature.html
 $dokka.location:org.jetbrains.skia/FontFeature/FontFeature/#kotlin.String#kotlin.Boolean/PointingToDeclaration/skiko/org.jetbrains.skia/-font-feature/-font-feature.html
