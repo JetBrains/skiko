@@ -84,6 +84,47 @@ class PatternMatcherTests {
     }
 
     @Test
+    fun fontFeatureCanBeParsedAsW3() = runTest {
+        FontFeature.parseW3("abcd").apply {
+            assertEquals(1, size)
+            assertEquals("abcd", get(0).tag)
+            assertEquals(1, get(0).value)
+        }
+
+        FontFeature.parseW3("abcd 0").apply {
+            assertEquals(1, size)
+            assertEquals("abcd", get(0).tag)
+            assertEquals(0, get(0).value)
+        }
+
+        FontFeature.parseW3("abcd 0, vfgb").apply {
+            assertEquals(2, size)
+            assertEquals("abcd", get(0).tag)
+            assertEquals(0, get(0).value)
+            assertEquals("vfgb", get(1).tag)
+            assertEquals(1, get(1).value)
+        }
+
+        FontFeature.parseW3("abcd 0, abc, vfgb").apply {
+            assertEquals(2, size)
+            assertEquals("abcd", get(0).tag)
+            assertEquals(0, get(0).value)
+            assertEquals("vfgb", get(1).tag)
+            assertEquals(1, get(1).value)
+        }
+
+        FontFeature.parseW3("abcd vfgb").apply {
+            assertEquals(1, size)
+            assertEquals("abcd", get(0).tag)
+            assertEquals(1, get(0).value)
+        }
+
+        FontFeature.parseW3("").apply {
+            assertEquals(0, size)
+        }
+    }
+
+    @Test
     fun fontVariationCanBeParsed() = runTest {
         val f1 = FontVariation.parseOne("abcd=111")
 
