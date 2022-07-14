@@ -61,16 +61,49 @@ extern "C"
 
     JNIEXPORT jint JNICALL Java_org_jetbrains_skiko_HardwareLayer_getCurrentDPI(JNIEnv *env, jobject canvas, jlong platformInfoPtr)
     {
-        HWND hwnd = (HWND)Java_org_jetbrains_skiko_HardwareLayer_getWindowHandle(env, canvas, platformInfoPtr);
-        HMONITOR display = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
-        UINT xDpi = 0, yDpi = 0;
-        GetDpiForMonitor(display, MDT_RAW_DPI, &xDpi, &yDpi);
-        int dpi = (int)xDpi;
-        // We can get dpi:0 if we set up multiple displays for content duplication (mirror). 
-        if (dpi == 0) {
-            // get default system dpi
-            dpi = GetDpiForWindow(hwnd);
+        typedef HRESULT (STDAPICALLTYPE *GDFM)(HMONITOR, MONITOR_DPI_TYPE, UINT*, UINT*);
+        static GDFM getDpiForMonitor = nullptr;
+        typedef UINT (WINAPI *GDFW)(HWND);
+        static GDFW getDpiForWindow = nullptr;
+
+        // Try to dynamically load GetDpiForWindow and GetDpiForMonitor - they are only supported from Windows 10 and 8.1 respectively
+        static bool dynamicFunctionsLoaded = false;
+        if (!dynamicFunctionsLoaded) {
+            HINSTANCE shcoreDll = LoadLibrary("Shcore.dll");
+            if (shcoreDll) {
+                getDpiForMonitor = reinterpret_cast<GDFM>(GetProcAddress(shcoreDll, "GetDpiForMonitor"));
+            }
+            
+            HINSTANCE user32Dll = LoadLibrary("User32");
+            if (user32Dll) {
+                getDpiForWindow = reinterpret_cast<GDFW>(GetProcAddress(user32Dll, "GetDpiForWindow"));
+            }
+            
+            dynamicFunctionsLoaded = true;
         }
+
+        HWND hwnd = (HWND)Java_org_jetbrains_skiko_HardwareLayer_getWindowHandle(env, canvas, platformInfoPtr);
+        int dpi = 0;
+        if (getDpiForMonitor) {
+            HMONITOR display = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
+            UINT xDpi = 0, yDpi = 0;
+            getDpiForMonitor(display, MDT_RAW_DPI, &xDpi, &yDpi);
+            dpi = (int) xDpi;
+        }
+        
+        // We can get dpi:0 if we set up multiple displays for content duplication (mirror). 
+        if (dpi == 0) {            
+            if (getDpiForWindow) {
+                // get default system dpi
+                dpi = getDpiForWindow(hwnd);
+            }
+        }
+        
+        if (dpi == 0) {
+            // If failed to get DPI, assume standard 96
+            dpi = 96;
+        }
+        
         return dpi;
     }
 } // extern "C"

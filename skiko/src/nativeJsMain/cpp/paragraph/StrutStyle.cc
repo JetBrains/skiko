@@ -133,3 +133,15 @@ SKIKO_EXPORT void org_jetbrains_skia_paragraph_StrutStyle__1nSetHeightOverridden
     StrutStyle* instance = reinterpret_cast<StrutStyle*>(ptr);
     instance->setHeightOverride(value);
 }
+
+SKIKO_EXPORT KBoolean org_jetbrains_skia_paragraph_StrutStyle__1nIsHalfLeading
+  (KNativePointer ptr) {
+    StrutStyle* instance = reinterpret_cast<StrutStyle*>(ptr);
+    return instance->getHalfLeading();
+}
+
+SKIKO_EXPORT void org_jetbrains_skia_paragraph_StrutStyle__1nSetHalfLeading
+  (KNativePointer ptr, KBoolean value) {
+    StrutStyle* instance = reinterpret_cast<StrutStyle*>(ptr);
+    instance->setHalfLeading(value);
+}

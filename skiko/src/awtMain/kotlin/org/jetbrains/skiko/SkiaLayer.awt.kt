@@ -1,13 +1,13 @@
 package org.jetbrains.skiko
 
 import org.jetbrains.skia.*
+import org.jetbrains.skia.Canvas
 import org.jetbrains.skiko.redrawer.Redrawer
 import java.awt.Color
 import java.awt.Component
-import java.awt.Graphics
+import java.awt.Window
 import java.awt.event.*
 import java.awt.im.InputMethodRequests
-import java.awt.Window
 import java.util.concurrent.CancellationException
 import javax.accessibility.Accessible
 import javax.swing.JComponent
@@ -69,7 +69,7 @@ actual open class SkiaLayer internal constructor(
         isOpaque = false
         layout = null
         backedLayer = object : HardwareLayer(externalAccessibleFactory) {
-            override fun paint(g: Graphics) {
+            override fun paint(g: java.awt.Graphics) {
                 // 1. JPanel.paint is not always called (in rare cases).
                 //    For example if we call 'jframe.isResizable = false` on Ubuntu
                 //
@@ -83,6 +83,22 @@ actual open class SkiaLayer internal constructor(
             override fun getInputMethodRequests(): InputMethodRequests? {
                 return this@SkiaLayer.inputMethodRequests
             }
+
+            // check isRequestFocusEnabled manually, because it isn't implemented for Canvas.
+            // But it should be implemented, how it is implemented for JComponent.
+            // See Component.setRequestFocusEnabled description.
+            override fun requestFocus(cause: FocusEvent.Cause?) {
+                if (canReceiveFocus(cause)) {
+                    super.requestFocus(cause)
+                }
+            }
+
+            override fun requestFocusInWindow(cause: FocusEvent.Cause?): Boolean {
+                return canReceiveFocus(cause) && super.requestFocusInWindow(cause)
+            }
+
+            private fun canReceiveFocus(cause: FocusEvent.Cause?) = cause != FocusEvent.Cause.MOUSE_EVENT ||
+                    isRequestFocusEnabled
         }
         @Suppress("LeakingThis")
         add(backedLayer)
@@ -327,7 +343,7 @@ actual open class SkiaLayer internal constructor(
         redrawer?.syncSize()
     }
 
-    override fun paint(g: Graphics) {
+    override fun paint(g: java.awt.Graphics) {
         super.paint(g)
         if (backedLayer.checkContentScale()) {
             notifyChange(PropertyKind.ContentScale)
@@ -366,12 +382,52 @@ actual open class SkiaLayer internal constructor(
         backedLayer.doProcessInputMethodEvent(e)
     }
 
+    override fun addFocusListener(l: FocusListener?) {
+        backedLayer.addFocusListener(l)
+    }
+
+    override fun removeFocusListener(l: FocusListener?) {
+        backedLayer.removeFocusListener(l)
+    }
+
+    override fun setFocusable(focusable: Boolean) {
+        backedLayer.isFocusable = focusable
+    }
+
+    override fun isFocusable(): Boolean {
+        return backedLayer.isFocusable
+    }
+
+    override fun hasFocus(): Boolean {
+        return backedLayer.hasFocus()
+    }
+
+    override fun isFocusOwner(): Boolean {
+        return backedLayer.isFocusOwner
+    }
+
     override fun requestFocus() {
         backedLayer.requestFocus()
     }
 
     override fun requestFocus(cause: FocusEvent.Cause?) {
         backedLayer.requestFocus(cause)
+    }
+
+    override fun requestFocusInWindow(): Boolean {
+        return backedLayer.requestFocusInWindow()
+    }
+
+    override fun requestFocusInWindow(cause: FocusEvent.Cause?): Boolean {
+        return backedLayer.requestFocusInWindow(cause)
+    }
+
+    override fun setFocusTraversalKeysEnabled(focusTraversalKeysEnabled: Boolean) {
+        backedLayer.focusTraversalKeysEnabled = focusTraversalKeysEnabled
+    }
+
+    override fun getFocusTraversalKeysEnabled(): Boolean {
+        return backedLayer.focusTraversalKeysEnabled
     }
 
     override fun addInputMethodListener(l: InputMethodListener) {
@@ -414,10 +470,6 @@ actual open class SkiaLayer internal constructor(
 
     override fun removeKeyListener(l: KeyListener) {
         backedLayer.removeKeyListener(l)
-    }
-
-    override fun setFocusTraversalKeysEnabled(focusTraversalKeysEnabled: Boolean) {
-        backedLayer.focusTraversalKeysEnabled = focusTraversalKeysEnabled
     }
 
     /**

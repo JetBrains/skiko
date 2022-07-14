@@ -131,10 +131,10 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
             }
         }
 
-        fun makeFromEncoded(bytes: ByteArray?): Image {
+        fun makeFromEncoded(bytes: ByteArray): Image {
             Stats.onNativeCall()
             val ptr = interopScope {
-                _nMakeFromEncoded(toInterop(bytes), bytes?.size ?: 0)
+                _nMakeFromEncoded(toInterop(bytes), bytes.size)
             }
             require(ptr != NullPointer) { "Failed to Image::makeFromEncoded" }
             return Image(ptr)
