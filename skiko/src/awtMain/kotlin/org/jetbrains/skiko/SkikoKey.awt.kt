@@ -116,3 +116,5 @@ actual enum class SkikoKey(val value: Int) {
         }
     }
 }
+
+actual val SkikoKey.platformKeyCode: Long get() = value.toLong()

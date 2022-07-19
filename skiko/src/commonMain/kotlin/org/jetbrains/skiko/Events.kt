@@ -202,6 +202,8 @@ expect enum class SkikoKey {
     KEY_NUMPAD_DECIMAL;
 }
 
+expect val SkikoKey.platformKeyCode: Long
+
 enum class SkikoGestureEventKind {
     TAP, DOUBLETAP, LONGPRESS, PAN, PINCH, ROTATION, SWIPE, UNKNOWN
 }

@@ -116,3 +116,5 @@ actual enum class SkikoKey(val value: UIKeyboardHIDUsage) {
         }
     }
 }
+
+actual val SkikoKey.platformKeyCode: Long get() = value

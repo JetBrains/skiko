@@ -90,6 +90,16 @@ class SkikoUIView : UIView, UIKeyInputProtocol {
 
     override fun deleteBackward() {
         inputText = inputText.dropLast(1)
+        val downEvent = SkikoKeyboardEvent(
+            key = SkikoKey.KEY_BACKSPACE,
+            kind = SkikoKeyboardEventKind.DOWN,
+            platform = null
+        )
+        val upEvent = downEvent.copy(
+            kind = SkikoKeyboardEventKind.UP
+        )
+        skiaLayer?.skikoView?.onKeyboardEvent(downEvent)
+        skiaLayer?.skikoView?.onKeyboardEvent(upEvent)
     }
 
     override fun canBecomeFirstResponder() = true
