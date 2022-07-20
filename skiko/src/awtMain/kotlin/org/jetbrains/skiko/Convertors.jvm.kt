@@ -230,14 +230,14 @@ private fun toSkikoKey(event: KeyEvent): Int {
     val side = event.getKeyLocation()
     if (side == KEY_LOCATION_RIGHT) {
         if (
-            key == SkikoKey.KEY_LEFT_CONTROL.value ||
-            key == SkikoKey.KEY_LEFT_SHIFT.value ||
-            key == SkikoKey.KEY_LEFT_META.value
+            key == SkikoKey.KEY_LEFT_CONTROL.platformKeyCode ||
+            key == SkikoKey.KEY_LEFT_SHIFT.platformKeyCode ||
+            key == SkikoKey.KEY_LEFT_META.platformKeyCode
         )
         key = key.or(0x80000000.toInt())
     }
     if (side == KEY_LOCATION_NUMPAD) {
-        if (key == SkikoKey.KEY_ENTER.value) {
+        if (key == SkikoKey.KEY_ENTER.platformKeyCode) {
             key = key.or(0x80000000.toInt())
         }
     }

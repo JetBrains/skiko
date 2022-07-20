@@ -1,6 +1,6 @@
 package org.jetbrains.skiko
 
-actual enum class SkikoKey(val value: Int) {
+actual enum class SkikoKey(actual val platformKeyCode: Int) {
     KEY_UNKNOWN(-1),
     KEY_A(65),
     KEY_S(83),
@@ -109,9 +109,7 @@ actual enum class SkikoKey(val value: Int) {
 
     companion object {
         fun valueOf(value: Int): SkikoKey {
-            return values().firstOrNull { it.value == value } ?: KEY_UNKNOWN
+            return values().firstOrNull { it.platformKeyCode == value } ?: KEY_UNKNOWN
         }
     }
 }
-
-actual val SkikoKey.platformKeyCode: Long get() = value.toLong()

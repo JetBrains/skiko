@@ -2,7 +2,7 @@ package org.jetbrains.skiko
 
 import java.awt.event.KeyEvent.*
 
-actual enum class SkikoKey(val value: Int) {
+actual enum class SkikoKey(actual val platformKeyCode: Int) {
     KEY_UNKNOWN(-1),
     KEY_A(VK_A),
     KEY_S(VK_S),
@@ -111,10 +111,8 @@ actual enum class SkikoKey(val value: Int) {
 
     companion object {
         fun valueOf(value: Int): SkikoKey {
-            val key = SkikoKey.values().firstOrNull { it.value == value }
+            val key = SkikoKey.values().firstOrNull { it.platformKeyCode == value }
             return if (key == null) SkikoKey.KEY_UNKNOWN else key
         }
     }
 }
-
-actual val SkikoKey.platformKeyCode: Long get() = value.toLong()

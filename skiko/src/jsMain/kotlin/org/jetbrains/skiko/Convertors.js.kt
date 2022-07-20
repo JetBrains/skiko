@@ -214,9 +214,9 @@ private fun toSkikoKey(event: KeyboardEvent): Int {
     val side = event.location
     if (side == KeyboardEvent.DOM_KEY_LOCATION_RIGHT) {
         if (
-            key == SkikoKey.KEY_LEFT_CONTROL.value ||
-            key == SkikoKey.KEY_LEFT_SHIFT.value ||
-            key == SkikoKey.KEY_LEFT_META.value
+            key == SkikoKey.KEY_LEFT_CONTROL.platformKeyCode ||
+            key == SkikoKey.KEY_LEFT_SHIFT.platformKeyCode ||
+            key == SkikoKey.KEY_LEFT_META.platformKeyCode
         )
         key = key.or(0x80000000.toInt())
     }
