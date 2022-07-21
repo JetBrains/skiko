@@ -111,15 +111,18 @@ actual enum class SkikoKey(val value: UIKeyboardHIDUsage) {
 
     init {
         if (value > Int.MAX_VALUE) {
-            error("iOS SkikoKey, value = $value > Int.MAX_VALUE")
+            error("iOS SkikoKey, init value = $value > Int.MAX_VALUE")
         }
     }
 
     actual val platformKeyCode get() = value.toInt()
 
     companion object {
-        fun valueOf(platformKeyCode: UIKeyboardHIDUsage): SkikoKey {
-            val key = SkikoKey.values().firstOrNull { it.value == platformKeyCode }
+        fun valueOf(value: UIKeyboardHIDUsage): SkikoKey {
+            if (value > Int.MAX_VALUE) {
+                error("iOS SkikoKey, valueOf value = $value > Int.MAX_VALUE")
+            }
+            val key = SkikoKey.values().firstOrNull { it.value == value }
             return key ?: SkikoKey.KEY_UNKNOWN
         }
     }
