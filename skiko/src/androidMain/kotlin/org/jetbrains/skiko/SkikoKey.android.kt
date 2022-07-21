@@ -111,8 +111,8 @@ actual enum class SkikoKey(actual val platformKeyCode: Int) {
     KEY_NUMPAD_DECIMAL(KEYCODE_UNKNOWN);
 
     companion object {
-        fun valueOf(value: Int): SkikoKey {
-            val key = SkikoKey.values().firstOrNull { it.platformKeyCode == value }
+        fun valueOf(platformKeyCode: Int): SkikoKey {
+            val key = SkikoKey.values().firstOrNull { it.platformKeyCode == platformKeyCode }
             return key ?: SkikoKey.KEY_UNKNOWN
         }
     }
