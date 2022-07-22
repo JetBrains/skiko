@@ -108,10 +108,11 @@ class SkikoProperties(private val myProject: Project) {
     val isCIBuild: Boolean
         get() = myProject.hasProperty("teamcity")
 
+    val planeDeployVersion: String = myProject.property("deploy.version") as String
+
     val deployVersion: String
         get() {
-            val version = myProject.property("deploy.version") as String
-            return if (isRelease) version else "$version-SNAPSHOT"
+            return if (isRelease) planeDeployVersion else "$planeDeployVersion-SNAPSHOT"
         }
 
     val isRelease: Boolean
