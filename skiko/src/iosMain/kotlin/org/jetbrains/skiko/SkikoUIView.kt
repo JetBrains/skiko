@@ -18,33 +18,6 @@ import platform.UIKit.UIPress
 import platform.UIKit.UIPressesEvent
 
 @ExportObjCClass
-class SkikoViewController : UIViewController {
-    @OverrideInit
-    constructor() : super(nibName = null, bundle = null)
-    @OverrideInit
-    constructor(coder: NSCoder) : super(coder)
-
-    constructor(skikoUIView: SkikoUIView) : this() {
-        this.skikoUIView = skikoUIView
-    }
-
-    private var skikoUIView: SkikoUIView? = null
-
-    override fun loadView() {
-        if (skikoUIView == null) {
-            super.loadView()
-        } else {
-            this.view = skikoUIView!!.load()
-        }
-    }
-
-    // viewDidUnload() is deprecated and not called.
-    override fun viewDidDisappear(animated: Boolean) {
-        skikoUIView?.detach()
-    }
-}
-
-@ExportObjCClass
 class SkikoUIView : UIView, UIKeyInputProtocol {
     @OverrideInit
     constructor(frame: CValue<CGRect>) : super(frame)
