@@ -10,7 +10,6 @@ import platform.UIKit.UIEvent
 import platform.UIKit.UITouch
 import platform.UIKit.UIScreen
 import platform.UIKit.UIView
-import platform.UIKit.UIViewController
 import platform.UIKit.setFrame
 import platform.UIKit.contentScaleFactor
 import platform.UIKit.UIKeyInputProtocol
@@ -50,29 +49,32 @@ class SkikoUIView : UIView, UIKeyInputProtocol {
     fun hideScreenKeyboard() = resignFirstResponder()
     fun isScreenKeyboardOpen() = isFirstResponder
 
-    var keyEvent: UIPress? = null
-    private var inputText: String = ""
+    private val pressedKeycodes: MutableSet<Long> = mutableSetOf()
+    @Deprecated("need be deleted")
+    private var inputText: String = ""//todo delete, because it's redundant and may leaks memory
     override fun hasText(): Boolean {
         return inputText.length > 0
     }
 
     override fun insertText(theText: String) {
         inputText += theText
-        skiaLayer?.skikoView?.onInputEvent(toSkikoTypeEvent(theText, keyEvent))
+        skiaLayer?.skikoView?.onInputEvent(toSkikoTypeEvent(theText, null))
     }
 
     override fun deleteBackward() {
         inputText = inputText.dropLast(1)
-        val downEvent = SkikoKeyboardEvent(
-            key = SkikoKey.KEY_BACKSPACE,
-            kind = SkikoKeyboardEventKind.DOWN,
-            platform = null
-        )
-        val upEvent = downEvent.copy(
-            kind = SkikoKeyboardEventKind.UP
-        )
-        skiaLayer?.skikoView?.onKeyboardEvent(downEvent)
-        skiaLayer?.skikoView?.onKeyboardEvent(upEvent)
+        if (!pressedKeycodes.contains(SkikoKey.KEY_BACKSPACE.value)) {
+            val downEvent = SkikoKeyboardEvent(
+                key = SkikoKey.KEY_BACKSPACE,
+                kind = SkikoKeyboardEventKind.DOWN,
+                platform = null
+            )
+            val upEvent = downEvent.copy(
+                kind = SkikoKeyboardEventKind.UP
+            )
+            skiaLayer?.skikoView?.onKeyboardEvent(downEvent)
+            skiaLayer?.skikoView?.onKeyboardEvent(upEvent)
+        }
     }
 
     override fun canBecomeFirstResponder() = true
@@ -80,7 +82,10 @@ class SkikoUIView : UIView, UIKeyInputProtocol {
     override fun pressesBegan(presses: Set<*>, withEvent: UIPressesEvent?) {
         if (withEvent != null) {
             for (press in withEvent.allPresses) {
-                keyEvent = press as UIPress
+                val uiPress = press as UIPress
+                uiPress.key?.let {
+                    pressedKeycodes.add(it.keyCode)
+                }
                 skiaLayer?.skikoView?.onKeyboardEvent(
                     toSkikoKeyboardEvent(press, SkikoKeyboardEventKind.DOWN)
                 )
@@ -92,7 +97,10 @@ class SkikoUIView : UIView, UIKeyInputProtocol {
     override fun pressesEnded(presses: Set<*>, withEvent: UIPressesEvent?) {
         if (withEvent != null) {
             for (press in withEvent.allPresses) {
-                keyEvent = press as UIPress
+                val uiPress = press as UIPress
+                uiPress.key?.let {
+                    pressedKeycodes.remove(it.keyCode)
+                }
                 skiaLayer?.skikoView?.onKeyboardEvent(
                     toSkikoKeyboardEvent(press, SkikoKeyboardEventKind.UP)
                 )
