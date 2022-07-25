@@ -82,8 +82,8 @@ class SkikoUIView : UIView, UIKeyInputProtocol {
     override fun pressesBegan(presses: Set<*>, withEvent: UIPressesEvent?) {
         if (withEvent != null) {
             for (press in withEvent.allPresses) {
-                val uiPress = press as UIPress
-                uiPress.key?.let {
+                val uiPress = press as? UIPress
+                uiPress?.key?.let {
                     pressedKeycodes.add(it.keyCode)
                 }
                 skiaLayer?.skikoView?.onKeyboardEvent(
@@ -97,8 +97,8 @@ class SkikoUIView : UIView, UIKeyInputProtocol {
     override fun pressesEnded(presses: Set<*>, withEvent: UIPressesEvent?) {
         if (withEvent != null) {
             for (press in withEvent.allPresses) {
-                val uiPress = press as UIPress
-                uiPress.key?.let {
+                val uiPress = press as? UIPress
+                uiPress?.key?.let {
                     pressedKeycodes.remove(it.keyCode)
                 }
                 skiaLayer?.skikoView?.onKeyboardEvent(
