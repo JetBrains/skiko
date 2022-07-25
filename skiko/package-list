@@ -2766,7 +2766,8 @@ $dokka.location:org.jetbrains.skiko/SkikoKey.KEY_X///PointingToDeclaration/skik
 $dokka.location:org.jetbrains.skiko/SkikoKey.KEY_Y///PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-key/-k-e-y_-y/index.html
 $dokka.location:org.jetbrains.skiko/SkikoKey.KEY_Z///PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-key/-k-e-y_-z/index.html
 $dokka.location:org.jetbrains.skiko/SkikoKey///PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-key/index.html
-$dokka.location:org.jetbrains.skiko/SkikoKey/value/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-key/[macos]value.html
+$dokka.location:org.jetbrains.skiko/SkikoKey/platformKeyCode/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-key/platform-key-code.html
+$dokka.location:org.jetbrains.skiko/SkikoKey/value/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-key/value.html
 $dokka.location:org.jetbrains.skiko/SkikoKeyboardEvent///PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-keyboard-event/index.html
 $dokka.location:org.jetbrains.skiko/SkikoKeyboardEvent/SkikoKeyboardEvent/#org.jetbrains.skiko.SkikoKey#org.jetbrains.skiko.SkikoInputModifiers#org.jetbrains.skiko.SkikoKeyboardEventKind#kotlin.Long#org.jetbrains.skiko.SkikoPlatformKeyboardEvent?/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-keyboard-event/-skiko-keyboard-event.html
 $dokka.location:org.jetbrains.skiko/SkikoKeyboardEvent/key/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-keyboard-event/key.html
@@ -2854,7 +2855,6 @@ $dokka.location:org.jetbrains.skiko/SkikoUIView/hasText/#/PointingToDeclaration/
 $dokka.location:org.jetbrains.skiko/SkikoUIView/hideScreenKeyboard/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/hide-screen-keyboard.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/insertText/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/insert-text.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/isScreenKeyboardOpen/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/is-screen-keyboard-open.html
-$dokka.location:org.jetbrains.skiko/SkikoUIView/keyEvent/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/key-event.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/load/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/load.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/pressesBegan/#kotlin.collections.Set[*]#UIPressesEvent?/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/presses-began.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/pressesEnded/#kotlin.collections.Set[*]#UIPressesEvent?/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/presses-ended.html
@@ -2876,6 +2876,7 @@ $dokka.location:org.jetbrains.skiko/SkikoViewController/SkikoViewController/#NSC
 $dokka.location:org.jetbrains.skiko/SkikoViewController/SkikoViewController/#org.jetbrains.skiko.SkikoUIView/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-view-controller/-skiko-view-controller.html
 $dokka.location:org.jetbrains.skiko/SkikoViewController/loadView/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-view-controller/load-view.html
 $dokka.location:org.jetbrains.skiko/SkikoViewController/viewDidDisappear/#kotlin.Boolean/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-view-controller/view-did-disappear.html
+$dokka.location:org.jetbrains.skiko/SkikoViewController/viewDidLoad/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-view-controller/view-did-load.html
 $dokka.location:org.jetbrains.skiko/SystemTheme.DARK///PointingToDeclaration/skiko/org.jetbrains.skiko/-system-theme/-d-a-r-k/index.html
 $dokka.location:org.jetbrains.skiko/SystemTheme.LIGHT///PointingToDeclaration/skiko/org.jetbrains.skiko/-system-theme/-l-i-g-h-t/index.html
 $dokka.location:org.jetbrains.skiko/SystemTheme.UNKNOWN///PointingToDeclaration/skiko/org.jetbrains.skiko/-system-theme/-u-n-k-n-o-w-n/index.html
