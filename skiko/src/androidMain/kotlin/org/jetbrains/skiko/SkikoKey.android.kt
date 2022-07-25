@@ -3,7 +3,7 @@ package org.jetbrains.skiko
 import android.view.KeyEvent.*
 
 // See https://developer.android.com/reference/android/view/KeyEvent
-actual enum class SkikoKey(val value: Int) {
+actual enum class SkikoKey(actual val platformKeyCode: Int) {
     KEY_UNKNOWN(KEYCODE_UNKNOWN),
     KEY_A(KEYCODE_A),
     KEY_S(KEYCODE_S),
@@ -111,8 +111,8 @@ actual enum class SkikoKey(val value: Int) {
     KEY_NUMPAD_DECIMAL(KEYCODE_UNKNOWN);
 
     companion object {
-        fun valueOf(value: Int): SkikoKey {
-            val key = SkikoKey.values().firstOrNull { it.value == value }
+        fun valueOf(platformKeyCode: Int): SkikoKey {
+            val key = SkikoKey.values().firstOrNull { it.platformKeyCode == platformKeyCode }
             return key ?: SkikoKey.KEY_UNKNOWN
         }
     }
