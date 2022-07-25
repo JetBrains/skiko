@@ -2,12 +2,6 @@
 package org.jetbrains.skiko.sample
 
 import kotlinx.cinterop.*
-import org.jetbrains.skiko.GenericSkikoView
-import org.jetbrains.skiko.SkiaLayer
-import org.jetbrains.skiko.SkikoView
-import org.jetbrains.skiko.SkikoViewController
-import org.jetbrains.skiko.SkikoUIView
-import org.jetbrains.skiko.SkikoGestureEventKind
 import platform.UIKit.*
 import platform.Foundation.*
 
