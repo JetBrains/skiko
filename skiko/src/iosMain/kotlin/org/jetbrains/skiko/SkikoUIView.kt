@@ -20,6 +20,7 @@ import platform.UIKit.UIPressesEvent
 class SkikoUIView : UIView, UIKeyInputProtocol {
     @OverrideInit
     constructor(frame: CValue<CGRect>) : super(frame)
+
     @OverrideInit
     constructor(coder: NSCoder) : super(coder)
 
@@ -50,6 +51,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol {
     fun isScreenKeyboardOpen() = isFirstResponder
 
     private val pressedKeycodes: MutableSet<Long> = mutableSetOf()
+
     @Deprecated("need be deleted")
     private var inputText: String = ""//todo delete, because it's redundant and may leaks memory
     override fun hasText(): Boolean {
@@ -83,12 +85,14 @@ class SkikoUIView : UIView, UIKeyInputProtocol {
         if (withEvent != null) {
             for (press in withEvent.allPresses) {
                 val uiPress = press as? UIPress
-                uiPress?.key?.let {
-                    pressedKeycodes.add(it.keyCode)
+                if (uiPress != null) {
+                    uiPress.key?.let {
+                        pressedKeycodes.add(it.keyCode)
+                    }
+                    skiaLayer?.skikoView?.onKeyboardEvent(
+                        toSkikoKeyboardEvent(press, SkikoKeyboardEventKind.DOWN)
+                    )
                 }
-                skiaLayer?.skikoView?.onKeyboardEvent(
-                    toSkikoKeyboardEvent(press, SkikoKeyboardEventKind.DOWN)
-                )
             }
         }
         super.pressesBegan(presses, withEvent)
@@ -98,12 +102,14 @@ class SkikoUIView : UIView, UIKeyInputProtocol {
         if (withEvent != null) {
             for (press in withEvent.allPresses) {
                 val uiPress = press as? UIPress
-                uiPress?.key?.let {
-                    pressedKeycodes.remove(it.keyCode)
+                if (uiPress != null) {
+                    uiPress.key?.let {
+                        pressedKeycodes.remove(it.keyCode)
+                    }
+                    skiaLayer?.skikoView?.onKeyboardEvent(
+                        toSkikoKeyboardEvent(press, SkikoKeyboardEventKind.UP)
+                    )
                 }
-                skiaLayer?.skikoView?.onKeyboardEvent(
-                    toSkikoKeyboardEvent(press, SkikoKeyboardEventKind.UP)
-                )
             }
         }
         super.pressesEnded(presses, withEvent)
