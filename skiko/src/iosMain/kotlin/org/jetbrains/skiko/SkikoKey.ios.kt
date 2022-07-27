@@ -109,8 +109,19 @@ actual enum class SkikoKey(val value: UIKeyboardHIDUsage) {
     KEY_NUMPAD_DIVIDE(UIKeyboardHIDUsageKeypadSlash),
     KEY_NUMPAD_DECIMAL(99);
 
+    init {
+        if (value > Int.MAX_VALUE) {
+            error("iOS SkikoKey, init value = $value > Int.MAX_VALUE")
+        }
+    }
+
+    actual val platformKeyCode get() = value.toInt()
+
     companion object {
         fun valueOf(value: UIKeyboardHIDUsage): SkikoKey {
+            if (value > Int.MAX_VALUE) {
+                error("iOS SkikoKey, valueOf value = $value > Int.MAX_VALUE")
+            }
             val key = SkikoKey.values().firstOrNull { it.value == value }
             return key ?: SkikoKey.KEY_UNKNOWN
         }

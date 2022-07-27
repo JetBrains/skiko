@@ -890,6 +890,8 @@ fun createLinkJvmBindings(
                     "-shared",
                     "-dead_strip",
                     "-lobjc",
+                    "-install_name", "./${libOutputFileName.get()}",
+                    "-current_version", skiko.planeDeployVersion,
                     "-framework", "AppKit",
                     "-framework", "CoreFoundation",
                     "-framework", "CoreGraphics",
