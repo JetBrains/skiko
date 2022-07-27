@@ -15,8 +15,8 @@ class MyViewController:UIViewController {
         let textField = MyTextField(frame: CGRect(x: 10, y: 10, width: 200, height: 50))
         textField.text = "Hello TextField"
         textField.contentVerticalAlignment = .top
+        let textField2 = MyTextField2(frame: CGRect(x: 10, y: 10, width: 200, height: 50))
         self.view = textField
-
     }
 }
 
