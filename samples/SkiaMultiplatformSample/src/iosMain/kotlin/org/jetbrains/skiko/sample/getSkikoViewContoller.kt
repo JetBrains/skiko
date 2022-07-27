@@ -6,7 +6,8 @@ import org.jetbrains.skiko.sample.*
 import platform.Foundation.*
 import platform.UIKit.*
 
-fun makeApp(skiaLayer: SkiaLayer) = Clocks(skiaLayer)
+var skikoUiView: SkikoUIView? = null
+fun makeApp(skiaLayer: SkiaLayer) = TextInput({ skikoUiView?.inputText ?: "empty" })
 
 fun getSkikoViewContoller(): UIViewController = SkikoViewController(
     SkikoUIView(
@@ -14,5 +15,7 @@ fun getSkikoViewContoller(): UIViewController = SkikoViewController(
             gesturesToListen = SkikoGestureEventKind.values()
             skikoView = GenericSkikoView(this, makeApp(this))
         }
-    )
+    ).also {
+        skikoUiView = it
+    }
 )

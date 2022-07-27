@@ -49,7 +49,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
     private val pressedKeycodes: MutableSet<Long> = mutableSetOf()
 
     @Deprecated("need be deleted")
-    private var inputText: String = ""//todo delete, because it's redundant and may leaks memory
+    var inputText: String = ""//todo delete, because it's redundant and may leaks memory
     override fun hasText(): Boolean {
         return inputText.length > 0
     }
