@@ -51,13 +51,13 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
     fun getText(): String = inputText + _markedText
 
     @Deprecated("need be deleted")
-    private var inputText: String = ""//todo delete, because it's redundant and may leaks memory
+    private var inputText: String = "qwe"//todo delete, because it's redundant and may leaks memory
     override fun hasText(): Boolean {
         return inputText.length > 0
     }
 
     override fun insertText(theText: String) {
-        println("insertText, theText: $theText")
+        println("insertText: $theText")
         inputText += theText
         val position = SkikoTextPosition(inputText.length.toLong())
         _selectedTextRange = SkikoTextRange(position, position)
@@ -189,13 +189,15 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
     override fun textInRange(range: UITextRange): String? {
         val from = ((range as SkikoTextRange).start() as SkikoTextPosition).position
         val to = (range.end() as SkikoTextPosition).position
-        if (inputText.isNotEmpty() && from >= 0 && to >= 0 && inputText.length > to) {
-            return inputText.substring(from.toInt(), to.toInt())
-        }
-        return null
+        return getText().substring(from.toInt(), to.toInt())
+//        if (inputText.isNotEmpty() && from >= 0 && to >= 0 && inputText.length > to) {
+//            return inputText.substring(from.toInt(), to.toInt())
+//        }
+//        return null
     }
 
     override fun replaceRange(range: UITextRange, withText: String) {
+        println("TODO replaceRange")//todo check
         val start = ((range as SkikoTextRange).start() as SkikoTextPosition).position
         val end = (range.end() as SkikoTextPosition).position
         inputText.replaceRange(start.toInt(), end.toInt(), withText)
@@ -205,36 +207,43 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
         selectedTextRange?.let {
             val start = ((it as SkikoTextRange).start() as SkikoTextPosition).position
             val end = (it.end() as SkikoTextPosition).position
+            println("TODO setSelectedTextRange, start: $start, end: $end")//todo check
             _selectedTextRange = it
         }
     }
 
     override fun selectedTextRange(): UITextRange? {
+        val from = getText().length
+        val to = getText().length
+        return SkikoTextRange(from = from, to = to) //todo now it returns only last available position of caret
         return _selectedTextRange
     }
 
     override fun markedTextRange(): UITextRange? {
-        println("fun markedTextRange, _markedTextRange: ${_markedTextRange?.toStr()}")
         return _markedTextRange
     }
 
     override fun setMarkedTextStyle(markedTextStyle: Map<Any?, *>?) {
+        println("TODO setMarkedTextStyle")//todo
         // do nothing
     }
 
     override fun markedTextStyle(): Map<Any?, *>? {
+        println("TODO markedTextStyle")//todo
         return null
     }
 
     override fun setMarkedText(markedText: String?, selectedRange: CValue<NSRange>) {
         // [markedText] is text about to confirm by user
         // see more: https://developer.apple.com/documentation/uikit/uitextinput?language=objc
-        val (location, length) = selectedRange.useContents {
+        val (locationRelative, lengthRelative) = selectedRange.useContents {
             location to length
         }
-        println("fun setMarkedText, markedText: $markedText, selectedRange: ${selectedRange.toStr()}")
+        val cursor = inputText.lastIndex
+        val location = cursor + 1
+        val length = markedText?.length ?: 0
+
         markedText?.let {
-//            deleteBackward() //TODO
             _markedTextRange = SkikoTextRange(
                 SkikoTextPosition(location.toLong()),
                 SkikoTextPosition(location.toLong() + length.toLong())
@@ -244,12 +253,11 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
                 SkikoTextPosition(location.toLong() + length.toLong())
             )
             _markedText = markedText
-//            insertText(_markedText)
         }
     }
 
     override fun unmarkText() {
-        println("unmarkText")
+        inputText = getText()
         _markedText = ""
         _markedTextRange = null
     }
@@ -259,7 +267,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
     }
 
     override fun endOfDocument(): UITextPosition {
-        return SkikoTextPosition(inputText.length.toLong() - 1)
+        return SkikoTextPosition(getText().length.toLong())
     }
 
     override fun textRangeFromPosition(fromPosition: UITextPosition, toPosition: UITextPosition): UITextRange? {
@@ -278,19 +286,21 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
         inDirection: UITextLayoutDirection,
         offset: NSInteger
     ): UITextPosition? {
+        println("TODO positionFromPosition with inDirection") //todo use inDirection
         return positionFromPosition(position, offset)
     }
 
     override fun comparePosition(position: UITextPosition, toPosition: UITextPosition): NSComparisonResult {
         val from = position as SkikoTextPosition
         val to = toPosition as SkikoTextPosition
-        if (from.position < to.position) {
-            return NSOrderedAscending
+        val result = if (from.position < to.position) {
+            NSOrderedAscending
+        } else if (from.position > to.position) {
+            NSOrderedDescending
+        } else {
+            NSOrderedSame
         }
-        if (from.position > to.position) {
-            return NSOrderedDescending
-        }
-        return NSOrderedSame
+        return result
     }
 
     override fun offsetFromPosition(from: UITextPosition, toPosition: UITextPosition): NSInteger {
@@ -300,6 +310,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
     }
 
     override fun tokenizer(): UITextInputTokenizerProtocol {
+        return UITextInputStringTokenizer()
         if (_tokenizer == null) {
             _tokenizer = UITextInputStringTokenizer(textInput = this)
         }
@@ -307,6 +318,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
     }
 
     override fun positionWithinRange(range: UITextRange, farthestInDirection: UITextLayoutDirection): UITextPosition? {
+        println("TODO positionWithinRange")//todo
         return null
     }
 
@@ -314,6 +326,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
         position: UITextPosition,
         inDirection: UITextLayoutDirection
     ): UITextRange? {
+        println("TODO characterRangeByExtendingPosition")//todo
         return null
     }
 
@@ -321,47 +334,57 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
         position: UITextPosition,
         inDirection: UITextStorageDirection
     ): NSWritingDirection {
+        println("TODO baseWritingDirectionForPosition")//todo
         return NSWritingDirectionLeftToRight
     }
 
     override fun setBaseWritingDirection(writingDirection: NSWritingDirection, forRange: UITextRange) {
-        // do nothing
+        println("TODO setBaseWritingDirection")//todo
     }
 
     override fun firstRectForRange(range: UITextRange): CValue<CGRect> {
+        println("TODO firstRectForRange")//todo
         return CGRectNull.readValue()
     }
 
     override fun caretRectForPosition(position: UITextPosition): CValue<CGRect> {
+        println("TODO caretRectForPosition")//todo
         return bounds
     }
 
     override fun selectionRectsForRange(range: UITextRange): List<*> {
+        println("TODO selectionRectsForRange")//todo
         return listOf<CGRect>()
     }
 
     override fun closestPositionToPoint(point: CValue<CGPoint>): UITextPosition? {
+        println("TODO closestPositionToPoint")
         return SkikoTextPosition(0)
     }
 
     override fun closestPositionToPoint(point: CValue<CGPoint>, withinRange: UITextRange): UITextPosition? {
+        println("TODO closestPositionToPoint")
         return (withinRange as SkikoTextRange).start()
     }
 
     override fun characterRangeAtPoint(point: CValue<CGPoint>): UITextRange? {
+        println("TODO characterRangeAtPoint")
         val position = closestPositionToPoint(point) as SkikoTextPosition
         return SkikoTextRange(position, position)
     }
 
     override fun textStylingAtPosition(position: UITextPosition, inDirection: UITextStorageDirection): Map<Any?, *>? {
+        println("TODO textStylingAtPosition")
         return NSDictionary.dictionary()
     }
 
     override fun characterOffsetOfPosition(position: UITextPosition, withinRange: UITextRange): NSInteger {
+        println("TODO characterOffsetOfPosition")
         return 0
     }
 
     override fun shouldChangeTextInRange(range: UITextRange, replacementText: String): Boolean {
+        println("TODO shouldChangeTextInRange")
         // Here we should decide to replace text in range or not.
         // By default, this method returns true.
         return true
@@ -373,6 +396,10 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
 }
 
 class SkikoTextPosition(val position: Long = 0) : UITextPosition()
+
+fun SkikoTextRange(from: Int, to: Int) =
+    SkikoTextRange(from = SkikoTextPosition(from.toLong()), to = SkikoTextPosition(to.toLong()))
+
 class SkikoTextRange(private val from: SkikoTextPosition, private val to: SkikoTextPosition) : UITextRange() {
     override fun isEmpty() = (to.position - from.position) <= 0
     override fun start(): UITextPosition {
@@ -383,8 +410,9 @@ class SkikoTextRange(private val from: SkikoTextPosition, private val to: SkikoT
         return to
     }
 
-    fun toStr():String = "SkikoTextRange(from: ${from.position}, to: ${to.position})"
+    fun toStr(): String = "SkikoTextRange(from: ${from.position}, to: ${to.position})"
 }
 
+fun CValue<NSRange>.toStr(): String = useContents { "NSRange location: $location, length: $length" }
 
-fun CValue<NSRange>.toStr():String = useContents { "NSRange location: $location, length: $length" }
+//When TextField focus lost - unmark text
