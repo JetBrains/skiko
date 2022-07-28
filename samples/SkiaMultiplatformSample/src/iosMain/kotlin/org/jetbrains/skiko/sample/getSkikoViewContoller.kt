@@ -7,7 +7,7 @@ import platform.Foundation.*
 import platform.UIKit.*
 
 var skikoUiView: SkikoUIView? = null
-fun makeApp(skiaLayer: SkiaLayer) = TextInput({ skikoUiView?.inputText ?: "empty" })
+fun makeApp(skiaLayer: SkiaLayer) = TextInput({ skikoUiView?.getText() ?: "empty" })
 
 fun getSkikoViewContoller(): UIViewController = SkikoViewController(
     SkikoUIView(

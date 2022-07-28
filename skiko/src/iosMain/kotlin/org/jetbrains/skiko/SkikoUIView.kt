@@ -48,13 +48,16 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
 
     private val pressedKeycodes: MutableSet<Long> = mutableSetOf()
 
+    fun getText(): String = inputText + _markedText
+
     @Deprecated("need be deleted")
-    var inputText: String = ""//todo delete, because it's redundant and may leaks memory
+    private var inputText: String = ""//todo delete, because it's redundant and may leaks memory
     override fun hasText(): Boolean {
         return inputText.length > 0
     }
 
     override fun insertText(theText: String) {
+        println("insertText, theText: $theText")
         inputText += theText
         val position = SkikoTextPosition(inputText.length.toLong())
         _selectedTextRange = SkikoTextRange(position, position)
@@ -211,6 +214,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
     }
 
     override fun markedTextRange(): UITextRange? {
+        println("fun markedTextRange, _markedTextRange: ${_markedTextRange?.toStr()}")
         return _markedTextRange
     }
 
@@ -228,6 +232,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
         val (location, length) = selectedRange.useContents {
             location to length
         }
+        println("fun setMarkedText, markedText: $markedText, selectedRange: ${selectedRange.toStr()}")
         markedText?.let {
 //            deleteBackward() //TODO
             _markedTextRange = SkikoTextRange(
@@ -239,11 +244,12 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
                 SkikoTextPosition(location.toLong() + length.toLong())
             )
             _markedText = markedText
-            insertText(_markedText)
+//            insertText(_markedText)
         }
     }
 
     override fun unmarkText() {
+        println("unmarkText")
         _markedText = ""
         _markedTextRange = null
     }
@@ -366,7 +372,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
     }
 }
 
-class SkikoTextPosition(val position: NSInteger = 0) : UITextPosition() {}
+class SkikoTextPosition(val position: Long = 0) : UITextPosition()
 class SkikoTextRange(private val from: SkikoTextPosition, private val to: SkikoTextPosition) : UITextRange() {
     override fun isEmpty() = (to.position - from.position) <= 0
     override fun start(): UITextPosition {
@@ -376,4 +382,9 @@ class SkikoTextRange(private val from: SkikoTextPosition, private val to: SkikoT
     override fun end(): UITextPosition {
         return to
     }
+
+    fun toStr():String = "SkikoTextRange(from: ${from.position}, to: ${to.position})"
 }
+
+
+fun CValue<NSRange>.toStr():String = useContents { "NSRange location: $location, length: $length" }

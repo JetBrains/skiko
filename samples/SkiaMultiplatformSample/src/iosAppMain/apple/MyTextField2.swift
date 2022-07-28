@@ -2,7 +2,6 @@ import UIKit
 import Foundation
 import UIKit
 
-
 public class MyTextField2: UIView {
 
     var textLayer = CATextLayer()
