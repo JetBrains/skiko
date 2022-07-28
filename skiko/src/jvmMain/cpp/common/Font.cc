@@ -227,7 +227,10 @@ extern "C" JNIEXPORT jshort JNICALL Java_org_jetbrains_skia_FontKt__1nGetUTF32Gl
 extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_FontKt__1nGetStringGlyphsCount
   (JNIEnv* env, jclass jclass, jlong ptr, jstring str, jint len) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
-    return instance->countText(skString(env, str).c_str(), len * sizeof(jchar), SkTextEncoding::kUTF16);
+    const jchar* chars = env->GetStringCritical(str, nullptr);
+    jint result = instance->countText(chars, len * sizeof(jchar), SkTextEncoding::kUTF16);
+    env->ReleaseStringCritical(str, chars);
+    return result;
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nMeasureText
@@ -246,7 +249,10 @@ extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_FontKt__1nMeasureTex
   (JNIEnv* env, jclass jclass, jlong ptr, jstring str, jint len, jlong paintPtr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
-    return instance->measureText(skString(env, str).c_str(), len * sizeof(jchar), SkTextEncoding::kUTF16, nullptr, paint);
+    const jchar* chars = env->GetStringCritical(str, nullptr);
+    jfloat result = instance->measureText(chars, len * sizeof(jchar), SkTextEncoding::kUTF16, nullptr, paint);
+    env->ReleaseStringCritical(str, chars);
+    return result;
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nGetWidths
