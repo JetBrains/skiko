@@ -427,6 +427,15 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
     override fun isSecureTextEntry(): Boolean {
         return false//todo change secure to prevent copy text
     }
+
+    override fun autocapitalizationType(): UITextAutocapitalizationType {
+        return UITextAutocapitalizationType.UITextAutocapitalizationTypeSentences
+//        return UITextAutocapitalizationType.UITextAutocapitalizationTypeAllCharacters
+    }
+
+    override fun autocorrectionType(): UITextAutocorrectionType {
+        return UITextAutocorrectionType.UITextAutocorrectionTypeYes
+    }
 }
 
 class SkikoTextPosition(val position: Long = 0) : UITextPosition()
