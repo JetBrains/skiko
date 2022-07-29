@@ -10,7 +10,7 @@ import platform.UIKit.*
 import platform.darwin.NSInteger
 
 @ExportObjCClass
-class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextPasteConfigurationSupportingProtocol {
+class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInputTraitsProtocol, UITextPasteConfigurationSupportingProtocol {
     @OverrideInit
     constructor(frame: CValue<CGRect>) : super(frame)
 
@@ -417,6 +417,11 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextPaste
     override fun setPasteDelegate(pasteDelegate: UITextPasteDelegateProtocol?) {
         println("TODO PASTE setPasteDelegate")
         _pasteDelegate = pasteDelegate
+    }
+
+    override fun keyboardType(): UIKeyboardType {
+        return UIKeyboardTypeDefault
+        return UIKeyboardTypeDecimalPad//todo
     }
 }
 
