@@ -1,9 +1,6 @@
 package org.jetbrains.skiko
 
-import kotlinx.cinterop.CValue
-import kotlinx.cinterop.ExportObjCClass
-import kotlinx.cinterop.readValue
-import kotlinx.cinterop.useContents
+import kotlinx.cinterop.*
 import platform.CoreGraphics.CGPoint
 import platform.CoreGraphics.CGRect
 import platform.CoreGraphics.CGRectMake
@@ -13,7 +10,7 @@ import platform.UIKit.*
 import platform.darwin.NSInteger
 
 @ExportObjCClass
-class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
+class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextPasteConfigurationSupportingProtocol {
     @OverrideInit
     constructor(frame: CValue<CGRect>) : super(frame)
 
@@ -392,6 +389,34 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
 
     override fun textInputView(): UIView {
         return this
+    }
+
+    override fun canPerformAction(action: COpaquePointer?, withSender: Any?): Boolean {
+        println("TODO canPerformAction")
+        return true
+    }
+
+    private var _pasteConfiguration:UIPasteConfiguration? = null
+    private var _pasteDelegate: UITextPasteDelegateProtocol? = null
+    override fun pasteConfiguration(): UIPasteConfiguration? {
+        //https://developer.apple.com/documentation/uikit/uitextpasteconfigurationsupporting
+        println("TODO PASTE pasteConfiguration")
+        return _pasteConfiguration
+    }
+
+    override fun setPasteConfiguration(pasteConfiguration: UIPasteConfiguration?) {
+        println("TODO PASTE setPasteConfiguration")
+        _pasteConfiguration = pasteConfiguration
+    }
+
+    override fun pasteDelegate(): UITextPasteDelegateProtocol? {
+        println("TODO PASTE pasteDelegate")
+        return _pasteDelegate
+    }
+
+    override fun setPasteDelegate(pasteDelegate: UITextPasteDelegateProtocol?) {
+        println("TODO PASTE setPasteDelegate")
+        _pasteDelegate = pasteDelegate
     }
 }
 
