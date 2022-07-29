@@ -423,6 +423,10 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
         return UIKeyboardTypeDefault
         return UIKeyboardTypeDecimalPad//todo
     }
+
+    override fun isSecureTextEntry(): Boolean {
+        return false//todo change secure to prevent copy text
+    }
 }
 
 class SkikoTextPosition(val position: Long = 0) : UITextPosition()
