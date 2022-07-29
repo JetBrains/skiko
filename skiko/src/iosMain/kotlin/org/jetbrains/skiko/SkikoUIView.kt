@@ -194,10 +194,12 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
     }
 
     override fun replaceRange(range: UITextRange, withText: String) {
-        println("TODO replaceRange")//todo check
         val start = ((range as SkikoTextRange).start() as SkikoTextPosition).position
         val end = (range.end() as SkikoTextPosition).position
-        inputText.replaceRange(start.toInt(), end.toInt(), withText)
+        if (end > inputText.lastIndex) {
+            throw Error("TextInput, replaceRange end=$end > inputText.lastIndex=${inputText.lastIndex}")
+        }
+        inputText = inputText.replaceRange(start.toInt(), end.toInt(), withText)
     }
 
     override fun setSelectedTextRange(selectedTextRange: UITextRange?) {
@@ -341,17 +343,22 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
 
     override fun firstRectForRange(range: UITextRange): CValue<CGRect> {
         println("TODO firstRectForRange")//todo
+        return CGRectMake(10.0, 20.0, 30.0, 30.0)
         return CGRectNull.readValue()
     }
 
     override fun caretRectForPosition(position: UITextPosition): CValue<CGRect> {
+        println("TEMP caretRectForPosition")
+        return CGRectMake(10.0, 40.0, 30.0, 30.0)
         println("TODO caretRectForPosition")//todo
         return bounds
     }
 
     override fun selectionRectsForRange(range: UITextRange): List<*> {
         println("TODO selectionRectsForRange")//todo
-        return listOf<CGRect>()
+        return CGRectMake(10.0, 60.0, 30.0, 30.0).useContents {
+            listOf(this)
+        }
     }
 
     override fun closestPositionToPoint(point: CValue<CGPoint>): UITextPosition? {
