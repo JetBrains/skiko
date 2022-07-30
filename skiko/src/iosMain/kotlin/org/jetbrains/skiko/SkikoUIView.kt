@@ -186,11 +186,17 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
     override fun textInRange(range: UITextRange): String? {
         val from = ((range as SkikoTextRange).start() as SkikoTextPosition).position
         val to = (range.end() as SkikoTextPosition).position
-        return getText().substring(from.toInt(), to.toInt())
-//        if (inputText.isNotEmpty() && from >= 0 && to >= 0 && inputText.length > to) {
-//            return inputText.substring(from.toInt(), to.toInt())
-//        }
-//        return null
+        println("TODO FIX textInRange, from: $from, to: $to")
+        val text = getText()
+        val result = if (text.isNotEmpty() && from >= 0 && to >= 0 && text.length > to) {
+            val substring = text.substring(from.toInt(), to.toInt())
+            val result = substring.replace("\n", "")
+            result.ifEmpty { null }
+        } else {
+            null
+        }
+        println("TODO FIX textInRange, inputText: $inputText, markedText: $_markedText, result: $result")
+        return result
     }
 
     override fun replaceRange(range: UITextRange, withText: String) {
@@ -238,6 +244,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
         val (locationRelative, lengthRelative) = selectedRange.useContents {
             location to length
         }
+        println("TEMP setMarkedText, markedText: $markedText, locationRelative: $locationRelative, lengthRelative: $lengthRelative")
         val cursor = inputText.lastIndex
         val location = cursor + 1
         val length = markedText?.length ?: 0
@@ -355,10 +362,9 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
     }
 
     override fun selectionRectsForRange(range: UITextRange): List<*> {
-        println("TODO selectionRectsForRange")//todo
-        return CGRectMake(10.0, 60.0, 30.0, 30.0).useContents {
-            listOf(this)
-        }
+        println("TODO selectionRectsForRange")
+        return emptyList<Any>()
+        return listOf(CGRectMake(10.0, 60.0, 30.0, 30.0)) //todo Exception
     }
 
     override fun closestPositionToPoint(point: CValue<CGPoint>): UITextPosition? {
