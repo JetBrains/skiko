@@ -186,24 +186,22 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
     override fun textInRange(range: UITextRange): String? {
         val from = ((range as SkikoTextRange).start() as SkikoTextPosition).position
         val to = (range.end() as SkikoTextPosition).position
-        println("TODO FIX textInRange, from: $from, to: $to")
         val text = getText()
-        val result = if (text.isNotEmpty() && from >= 0 && to >= 0 && text.length > to) {
+        val result = if (text.isNotEmpty() && from >= 0 && to >= 0 && text.length >= to) {
             val substring = text.substring(from.toInt(), to.toInt())
             val result = substring.replace("\n", "")
             result.ifEmpty { null }
         } else {
             null
         }
-        println("TODO FIX textInRange, inputText: $inputText, markedText: $_markedText, result: $result")
         return result
     }
 
     override fun replaceRange(range: UITextRange, withText: String) {
         val start = ((range as SkikoTextRange).start() as SkikoTextPosition).position
         val end = (range.end() as SkikoTextPosition).position
-        if (end > inputText.lastIndex) {
-            throw Error("TextInput, replaceRange end=$end > inputText.lastIndex=${inputText.lastIndex}")
+        if (end > inputText.length) {
+            throw Error("TextInput, replaceRange end=$end > inputText.lastIndex=${inputText.length}")
         }
         inputText = inputText.replaceRange(start.toInt(), end.toInt(), withText)
     }
@@ -244,7 +242,6 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
         val (locationRelative, lengthRelative) = selectedRange.useContents {
             location to length
         }
-        println("TEMP setMarkedText, markedText: $markedText, locationRelative: $locationRelative, lengthRelative: $lengthRelative")
         val cursor = inputText.lastIndex
         val location = cursor + 1
         val length = markedText?.length ?: 0
@@ -350,21 +347,17 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
 
     override fun firstRectForRange(range: UITextRange): CValue<CGRect> {
         println("TODO firstRectForRange")//todo
-        return CGRectMake(10.0, 20.0, 30.0, 30.0)
         return CGRectNull.readValue()
     }
 
     override fun caretRectForPosition(position: UITextPosition): CValue<CGRect> {
-        println("TEMP caretRectForPosition")
-        return CGRectMake(10.0, 40.0, 30.0, 30.0)
         println("TODO caretRectForPosition")//todo
         return bounds
     }
 
     override fun selectionRectsForRange(range: UITextRange): List<*> {
-        println("TODO selectionRectsForRange")
-        return emptyList<Any>()
-        return listOf(CGRectMake(10.0, 60.0, 30.0, 30.0)) //todo Exception
+        println("TODO selectionRectsForRange")//todo
+        return listOf<CGRect>()
     }
 
     override fun closestPositionToPoint(point: CValue<CGPoint>): UITextPosition? {
