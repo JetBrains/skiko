@@ -216,9 +216,10 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
     }
 
     override fun selectedTextRange(): UITextRange? {
-        val from = getText().length
+        println("TEMP selectedTextRange")
+        val from = 0//getText().length //todo temp
         val to = getText().length
-        return SkikoTextRange(from = from, to = to) //todo now it returns only last available position of caret
+        return SkikoTextRange(from = from, to = to)
         return _selectedTextRange
     }
 
@@ -356,8 +357,8 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
     }
 
     override fun selectionRectsForRange(range: UITextRange): List<*> {
-        println("TODO selectionRectsForRange")//todo
-        return listOf<CGRect>()
+        println("TODO TARGET selectionRectsForRange")//todo
+        return listOf<UITextSelectionRect>(MySelectionRect())
     }
 
     override fun closestPositionToPoint(point: CValue<CGPoint>): UITextPosition? {
@@ -460,6 +461,35 @@ class SkikoTextRange(private val from: SkikoTextPosition, private val to: SkikoT
     }
 
     fun toStr(): String = "SkikoTextRange(from: ${from.position}, to: ${to.position})"
+}
+
+class MySelectionRect():UITextSelectionRect() {
+
+    /**
+     * A Boolean value that indicates whether the rectangle contains the end of the selection.
+     */
+    override fun containsEnd(): Boolean {
+        return false
+    }
+
+    /**
+     * A Boolean value that indicates whether the rectangle contains the start of the selection.
+     */
+    override fun containsStart(): Boolean {
+        return false
+    }
+
+    override fun isVertical(): Boolean {
+        return false
+    }
+
+    override fun rect(): CValue<CGRect> {
+        return CGRectMake(40.0, 150.0, 80.0, 40.0)
+    }
+
+    override fun writingDirection(): NSWritingDirection {
+        return NSWritingDirectionLeftToRight//todo
+    }
 }
 
 fun CValue<NSRange>.toStr(): String = useContents { "NSRange location: $location, length: $length" }
