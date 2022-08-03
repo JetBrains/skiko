@@ -27,7 +27,7 @@ class FrameDispatcher(
     private var frameScheduled = false
 
     private val job = scope.launch {
-        if (true) {
+        if (false) {
             onFrame()
         } else {
             while (true) {
