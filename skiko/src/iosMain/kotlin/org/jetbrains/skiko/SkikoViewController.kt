@@ -44,19 +44,24 @@ class SkikoViewController : UIViewController {
         if (skikoUIView == null) {
             super.loadView()
         } else {
-            val uiView = UIView(CGRectMake(0.0, 0.0, 100.0, 100.0))
-            uiView.backgroundColor = UIColor.blueColor
-            uiView.addInteraction(uiContextMenuInteraction)
-//            this.view = uiView
-            val loaded = skikoUIView!!.load()
-            loaded.backgroundColor = UIColor.greenColor
-            loaded.addInteraction(uiContextMenuInteraction)
-//            this.view = loaded
+            if (true) {
+                val loaded = skikoUIView!!.load()
+                loaded.addInteraction(uiContextMenuInteraction)
+                this.view = loaded
+            } else {
+                val container = UIView(CGRectMake(0.0, 0.0, 100.0, 200.0))
+                this.view = container
 
-            val uiCollectionView = UICollectionView(CGRectMake(0.0, 0.0, 100.0, 200.0), UICollectionViewCompositionalLayout())
-            uiCollectionView.addInteraction(uiContextMenuInteraction)
-            this.view = uiCollectionView
-            uiCollectionView.setBackgroundView(loaded)
+                val loaded = skikoUIView!!.load()
+                loaded.backgroundColor = UIColor.greenColor
+                loaded.addInteraction(uiContextMenuInteraction)
+                container.addSubview(loaded)
+
+                val child = UIView(CGRectMake(0.0, 0.0, 100.0, 200.0))
+                child.backgroundColor = UIColor.blueColor.colorWithAlphaComponent(0.7)
+                child.addInteraction(uiContextMenuInteraction)
+                container.addSubview(child)
+            }
         }
     }
 
