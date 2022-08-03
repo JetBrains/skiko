@@ -27,17 +27,21 @@ class FrameDispatcher(
     private var frameScheduled = false
 
     private val job = scope.launch {
-        while (true) {
-            frameChannel.receive()
-            frameScheduled = false
+        if (true) {
             onFrame()
-            // As per `yield()` documentation:
-            //
-            // For other dispatchers (not == Unconfined) , this function calls [CoroutineDispatcher.dispatch] and
-            // always suspends to be resumed later regardless of the result of [CoroutineDispatcher.isDispatchNeeded].
-            //
-            // What means for Swing dispatcher we'll process all pending events and resume renderer.
-            yield()
+        } else {
+            while (true) {
+                frameChannel.receive()
+                frameScheduled = false
+                onFrame()
+                // As per `yield()` documentation:
+                //
+                // For other dispatchers (not == Unconfined) , this function calls [CoroutineDispatcher.dispatch] and
+                // always suspends to be resumed later regardless of the result of [CoroutineDispatcher.isDispatchNeeded].
+                //
+                // What means for Swing dispatcher we'll process all pending events and resume renderer.
+                yield()
+            }
         }
     }
 
