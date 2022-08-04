@@ -10,8 +10,7 @@ Java_org_jetbrains_skia_RuntimeEffectKt__1nMakeShader(JNIEnv* env,
                                                      jlong uniformPtr,
                                                      jlongArray childrenPtrsArr,
                                                      jint _childCount,
-                                                     jfloatArray localMatrixArr,
-                                                     jboolean isOpaque) {
+                                                     jfloatArray localMatrixArr) {
     SkRuntimeEffect* runtimeEffect = jlongToPtr<SkRuntimeEffect*>(ptr);
     SkData* uniform = jlongToPtr<SkData*>(uniformPtr);
     std::unique_ptr<SkMatrix> localMatrix = skMatrix(env, localMatrixArr);
@@ -28,8 +27,7 @@ Java_org_jetbrains_skia_RuntimeEffectKt__1nMakeShader(JNIEnv* env,
     sk_sp<SkShader> shader = runtimeEffect->makeShader(sk_ref_sp<SkData>(uniform),
                                                        children.data(),
                                                        childCount,
-                                                       localMatrix.get(),
-                                                       isOpaque);
+                                                       localMatrix.get());
     return ptrToJlong(shader.release());
 }
 

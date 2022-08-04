@@ -2,7 +2,7 @@
 #include "common.h"
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_RuntimeEffect__1nMakeShader
-    (KNativePointer ptr, KNativePointer uniformPtr, KNativePointerArray childrenPtrsArr, KInt childCount, KFloat* localMatrixArr, KBoolean isOpaque) {
+    (KNativePointer ptr, KNativePointer uniformPtr, KNativePointerArray childrenPtrsArr, KInt childCount, KFloat* localMatrixArr) {
     SkRuntimeEffect* runtimeEffect = reinterpret_cast<SkRuntimeEffect*>(ptr);
     SkData* uniform = reinterpret_cast<SkData*>(uniformPtr);
     std::unique_ptr<SkMatrix> localMatrix = skMatrix(localMatrixArr);
@@ -17,8 +17,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_RuntimeEffect__1nMakeShader
     sk_sp<SkShader> shader = runtimeEffect->makeShader(sk_ref_sp<SkData>(uniform),
                                                        children.data(),
                                                        childCount,
-                                                       localMatrix.get(),
-                                                       isOpaque);
+                                                       localMatrix.get());
     return reinterpret_cast<KNativePointer>(shader.release());
 }
 

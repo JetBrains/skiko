@@ -183,7 +183,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilterKt__1nMake
     env->ReleaseLongArrayElements(inputPtrsArray, inputPtrs, 0);
 
     std::vector<SkString> childShaderNameStrings = skStringVector(env, childShaderNamesArr);
-    std::vector<const char*> childShaderNames(childShaderNameStrings.size());
+    std::vector<std::string_view> childShaderNames(childShaderNameStrings.size());
     for (int i = 0; i < inputCount; ++i)
         childShaderNames[i] = childShaderNameStrings[i].c_str();
 

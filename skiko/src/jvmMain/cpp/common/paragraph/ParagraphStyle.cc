@@ -48,7 +48,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_ParagraphSt
   (JNIEnv* env, jclass jclass, jlong ptr) {
     ParagraphStyle* instance = reinterpret_cast<ParagraphStyle*>(static_cast<uintptr_t>(ptr));
     const TextStyle& style = instance->getTextStyle();
-    TextStyle* res = new TextStyle(style, style.isPlaceholder());
+    TextStyle* res = new TextStyle(style);
     return reinterpret_cast<jlong>(res);
 }
 

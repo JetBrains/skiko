@@ -178,7 +178,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeRuntimeShaderF
     }
 
     std::vector<SkString> childShaderNameStrings = skStringVector(childShaderNamesArr, inputCount);
-    std::vector<const char*> childShaderNames(childShaderNameStrings.size());
+    std::vector<std::string_view> childShaderNames(childShaderNameStrings.size());
     for (int i = 0; i < childShaderNames.size(); ++i)
         childShaderNames[i] = childShaderNameStrings[i].c_str();
 
