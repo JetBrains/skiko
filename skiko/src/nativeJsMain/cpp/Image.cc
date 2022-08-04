@@ -1,6 +1,7 @@
 #include <iostream>
 #include "SkData.h"
 #include "SkImage.h"
+#include "SkBitmap.h"
 #include "common.h"
 
 

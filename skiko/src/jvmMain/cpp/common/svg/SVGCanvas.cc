@@ -1,4 +1,6 @@
 #include <jni.h>
+#include "SkRect.h"
+#include "SkCanvas.h"
 #include "SkSVGCanvas.h"
 #include "SkStream.h"
 

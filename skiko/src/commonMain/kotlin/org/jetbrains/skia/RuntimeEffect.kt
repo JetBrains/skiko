@@ -25,8 +25,7 @@ class RuntimeEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     }
 
     fun makeShader(
-        uniforms: Data?, children: Array<Shader?>?, localMatrix: Matrix33?,
-        isOpaque: Boolean
+        uniforms: Data?, children: Array<Shader?>?, localMatrix: Matrix33?
     ): Shader {
         Stats.onNativeCall()
         val childCount = children?.size ?: 0
@@ -34,7 +33,7 @@ class RuntimeEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         for (i in 0 until childCount) childrenPtrs[i] = getPtr(children!![i])
         val matrix = localMatrix?.mat
         return interopScope {
-            Shader(_nMakeShader(_ptr, getPtr(uniforms), toInterop(childrenPtrs), childCount, toInterop(matrix), isOpaque))
+            Shader(_nMakeShader(_ptr, getPtr(uniforms), toInterop(childrenPtrs), childCount, toInterop(matrix)))
         }
     }
 }
@@ -45,7 +44,7 @@ internal expect fun RuntimeEffect.Companion.makeFromResultPtr(ptr: NativePointer
 @ExternalSymbolName("org_jetbrains_skia_RuntimeEffect__1nMakeShader")
 private external fun _nMakeShader(
     runtimeEffectPtr: NativePointer, uniformPtr: NativePointer, childrenPtrs: InteropPointer,
-    childCount: Int, localMatrix: InteropPointer, isOpaque: Boolean
+    childCount: Int, localMatrix: InteropPointer
 ): NativePointer
 
 

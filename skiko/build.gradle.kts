@@ -145,10 +145,12 @@ fun compileNativeBridgesTask(os: OS, arch: Arch): TaskProvider<CompileSkikoCppTa
                 val iosArchFlags = when (arch) {
                     Arch.Arm64 -> arrayOf(
                         "-target", "arm64-apple-ios",
+                        "-mios-version-min=11.0",
                         "-isysroot", "$sdkRoot/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk"
                     )
                     Arch.X64 -> arrayOf(
                         "-target", "x86_64-apple-ios-simulator",
+                        "-mios-version-min=11.0",
                         "-isysroot", "$sdkRoot/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk"
                     )
                     else -> throw GradleException("Unsupported arch: $arch")

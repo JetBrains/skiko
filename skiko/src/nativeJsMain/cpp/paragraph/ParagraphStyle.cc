@@ -45,7 +45,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_paragraph_ParagraphStyle__1nGetTe
   (KNativePointer ptr) {
     ParagraphStyle* instance = reinterpret_cast<ParagraphStyle*>((ptr));
     const TextStyle& style = instance->getTextStyle();
-    TextStyle* res = new TextStyle(style, style.isPlaceholder());
+    TextStyle* res = new TextStyle(style);
     return reinterpret_cast<KNativePointer>(res);
 }
 

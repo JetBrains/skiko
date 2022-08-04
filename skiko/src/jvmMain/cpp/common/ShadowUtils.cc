@@ -1,5 +1,6 @@
 #include <jni.h>
 #include "SkShadowUtils.h"
+#include "SkPoint3.h"
 #include "interop.hh"
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_ShadowUtilsKt__1nDrawShadow
@@ -7,7 +8,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_ShadowUtilsKt__1nDrawS
         jfloat lightPosX, jfloat lightPosY, jfloat lightPosZ, jfloat lightRadius, jint ambientColor, jint spotColor, jint flags) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
     SkPath* path = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(pathPtr));
-    SkShadowUtils::DrawShadow(canvas, *path, {zPlaneX, zPlaneY, zPlaneZ}, {lightPosX, lightPosY, lightPosZ}, lightRadius, ambientColor, spotColor, flags);
+    SkShadowUtils::DrawShadow(canvas, *path, SkPoint3::Make(zPlaneX, zPlaneY, zPlaneZ), SkPoint3::Make(lightPosX, lightPosY, lightPosZ), lightRadius, ambientColor, spotColor, flags);
 }
 
 extern "C" JNIEXPORT int JNICALL Java_org_jetbrains_skia_ShadowUtilsKt__1nComputeTonalAmbientColor

@@ -52,16 +52,6 @@ class ParagraphBuilder(style: ParagraphStyle?, fc: FontCollection?) :
         return this
     }
 
-    fun setParagraphStyle(style: ParagraphStyle?): ParagraphBuilder {
-        return try {
-            Stats.onNativeCall()
-            _nSetParagraphStyle(_ptr, getPtr(style))
-            this
-        } finally {
-            reachabilityBarrier(style)
-        }
-    }
-
     fun build(): Paragraph {
         return try {
             Stats.onNativeCall()
@@ -108,9 +98,6 @@ private external fun _nAddPlaceholder(
     baselineMode: Int,
     baseline: Float
 )
-
-@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nSetParagraphStyle")
-private external fun _nSetParagraphStyle(ptr: NativePointer, stylePtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nBuild")
 private external fun _nBuild(ptr: NativePointer): NativePointer
