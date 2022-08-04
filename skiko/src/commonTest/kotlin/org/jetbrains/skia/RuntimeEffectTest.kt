@@ -14,7 +14,7 @@ class RuntimeEffectTest {
             |}""".trimMargin()
 
         val effect = RuntimeEffect.makeForShader(shaderSKSL)
-        val shader = effect.makeShader(null, null, null, true)
+        val shader = effect.makeShader(null, null, null)
 
         val shader2SKSL = """
             |uniform shader input_1;
@@ -23,7 +23,7 @@ class RuntimeEffectTest {
             |}""".trimMargin()
 
         val derivedEffect = RuntimeEffect.makeForShader(shader2SKSL)
-        derivedEffect.makeShader(null, arrayOf(shader), null, false)
+        derivedEffect.makeShader(null, arrayOf(shader), null)
 
         val colorFilterSKSL = """
             |half4 main(half4 inColor) {
