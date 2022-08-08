@@ -2,27 +2,31 @@
 #include <sstream>
 #include <iostream>
 #include "jni_helpers.h"
+#include <dxgi1_4.h>
+#include <dxgi1_6.h>
+#include "GpuChoose.h"
 
 extern "C"
 {
-    JNIEXPORT jstring JNICALL Java_org_jetbrains_skiko_RenderExceptionsHandlerKt_getNativeGraphicsAdapterInfo(
-        JNIEnv *env, jobject object)
-    {
-        std::stringstream stream;
-        std::string actualAdapter;
-
-        for(int i = 0;; i++)
-        {
-            DISPLAY_DEVICE device = {sizeof(device), 0};
-            BOOL result = EnumDisplayDevices(NULL, i, &device, EDD_GET_DEVICE_INTERFACE_NAME);
-            if(!result) break;
-            std::string currentAdapter = std::string(device.DeviceString);
-            if (actualAdapter != currentAdapter) {
-                actualAdapter = currentAdapter;
-                stream << " - " << currentAdapter << std::endl;
+    JNIEXPORT jstring JNICALL Java_org_jetbrains_skiko_HardwareInfoKt_getPreferredGpuName(
+        JNIEnv *env, jobject object, jint priority
+    ) {
+        gr_cp<IDXGIAdapter1> hardwareAdapter;
+        if (!defineHardwareAdapter(
+            (DXGI_GPU_PREFERENCE) priority,
+            &hardwareAdapter,
+            [](IDXGIAdapter1* adapter) {
+                return true;
             }
+        )) {
+            return 0;
         }
-        return env->NewStringUTF(stream.str().c_str());
+
+        DXGI_ADAPTER_DESC1 desc1;
+        hardwareAdapter->GetDesc1(&desc1);
+        std::wstring tmp(desc1.Description);
+        std::string adapterName(tmp.begin(), tmp.end());
+        return env->NewStringUTF(adapterName.c_str());
     }
 
     LONG GetStringRegKey(HKEY hKey, const std::wstring &strValueName, std::wstring &strValue)

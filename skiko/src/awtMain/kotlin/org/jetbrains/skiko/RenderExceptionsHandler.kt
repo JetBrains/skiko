@@ -28,7 +28,7 @@ internal class RenderExceptionsHandler {
                 append("Skiko version: ${Version.skiko}\n")
                 append("OS: $hostFullName\n")
                 append("CPU: ${getNativeCpuInfo()}\n")
-                append("Graphics adapters:\n${getNativeGraphicsAdapterInfo()}\n")
+                append("Graphics adapters:\n${HardwareInfo.preferredGpu()}\n")
                 append("Exception message: ${exception.message}\n")
                 append("Exception stack trace:\n")
                 val stackTrace = exception.stackTrace.filterIndexed { line, _ -> line > 1 }
@@ -42,5 +42,4 @@ internal class RenderExceptionsHandler {
     }
 }
 
-private external fun getNativeGraphicsAdapterInfo(): String
 private external fun getNativeCpuInfo(): String

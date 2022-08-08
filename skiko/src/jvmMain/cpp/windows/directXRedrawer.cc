@@ -17,19 +17,9 @@
 #include <dxgi1_4.h>
 #include <dxgi1_6.h>
 
-const int BuffersCount = 2;
+#include "GpuChoose.h"
 
-// This is a list of not supported graphics cards that have rendering issues (black screen, flickering)
-// with the current Swing/Skia integration.
-// If PC has other graphics cards suitable for DirectX12, one of them will be used. Otherwise,
-// rendering will falls back to OpenGL.
-const std::vector<std::wstring> notSupportedAdapters{
-    L"Intel(R) HD Graphics 520",
-    L"Intel(R) HD Graphics 530",
-    L"Intel(R) HD Graphics 4400",
-    L"NVIDIA GeForce GTX 750 Ti",
-    L"NVIDIA GeForce GTX 960M",
-    L"NVIDIA Quadro M2000M"};
+const int BuffersCount = 2;
 
 class DirectXDevice
 {
@@ -134,48 +124,6 @@ extern "C"
         return impl(pRootSignature, Version, ppBlob, ppErrorBlob);
     }
 
-    HRESULT CreateDXGIFactory1(
-        REFIID riid,
-        void **ppFactory)
-    {
-        typedef HRESULT (*CreateDXGIFactory1_t)(
-            REFIID riid,
-            void **ppFactory);
-        static CreateDXGIFactory1_t impl = nullptr;
-        if (!impl)
-        {
-            auto dxgidll = LoadLibrary(TEXT("Dxgi.dll"));
-            if (!dxgidll)
-                return E_NOTIMPL;
-            impl = (CreateDXGIFactory1_t)GetProcAddress(dxgidll, "CreateDXGIFactory1");
-            if (!impl)
-                return E_NOTIMPL;
-        }
-        return impl(riid, ppFactory);
-    }
-
-    HRESULT CreateDXGIFactory2(
-        UINT Flags,
-        REFIID riid,
-        void **ppFactory)
-    {
-        typedef HRESULT (*CreateDXGIFactory2_t)(
-            UINT Flags,
-            REFIID riid,
-            void **ppFactory);
-        static CreateDXGIFactory2_t impl = nullptr;
-        if (!impl)
-        {
-            auto dxgidll = LoadLibrary(TEXT("Dxgi.dll"));
-            if (!dxgidll)
-                return E_NOTIMPL;
-            impl = (CreateDXGIFactory2_t)GetProcAddress(dxgidll, "CreateDXGIFactory2");
-            if (!impl)
-                return E_NOTIMPL;
-        }
-        return impl(Flags, riid, ppFactory);
-    }
-
     HRESULT D3DCompile(
         LPCVOID pSrcData,
         SIZE_T SrcDataSize,
@@ -214,92 +162,17 @@ extern "C"
         return impl(pSrcData, SrcDataSize, pSourceName, pDefines, pInclude, pEntrypoint, pTarget, Flags1, Flags2, ppCode, ppErrorMsgs);
     }
 
-    bool isNotSupported(IDXGIAdapter1 *hardwareAdapter)
-    {
-        DXGI_ADAPTER_DESC1 desc;
-        hardwareAdapter->GetDesc1(&desc);
-        if ((desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) != 0)
-        {
-            return true;
-        }
-        std::wstring currentAdapterName(desc.Description);
-        for (std::wstring name : notSupportedAdapters)
-        {
-            if (currentAdapterName == name)
-            {
-                fwprintf(stderr, L"Graphics card %s is not supported.\n", name.c_str());
-                return true;
-            }
-        }
-        return false;
-    }
-
-    bool defineHardwareAdapter(DXGI_GPU_PREFERENCE adapterPriority, IDXGIFactory4 *pFactory, IDXGIAdapter1 **ppAdapter)
-    {
-        *ppAdapter = nullptr;
-
-#if defined(__dxgi1_6_h__) && defined(NTDDI_WIN10_RS4)
-        gr_cp<IDXGIFactory6> factory6;
-        if (SUCCEEDED(pFactory->QueryInterface(IID_PPV_ARGS(&factory6))))
-        {
-            for (UINT adapterIndex = 0;; ++adapterIndex)
-            {
-                IDXGIAdapter1 *pAdapter = nullptr;
-                if (!SUCCEEDED(factory6->EnumAdapterByGpuPreference(adapterIndex, adapterPriority, IID_PPV_ARGS(&pAdapter))))
-                {
-                    break;
-                }
-                if (SUCCEEDED(D3D12CreateDevice(pAdapter, D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), nullptr)))
-                {
-                    if (isNotSupported(pAdapter))
-                    {
-                        pAdapter->Release();
-                        continue;
-                    }
-                    *ppAdapter = pAdapter;
-                    return true;
-                }
-                pAdapter->Release();
-            }
-        }
-#endif
-
-        if (*ppAdapter == nullptr)
-        {
-            for (UINT adapterIndex = 0;; ++adapterIndex)
-            {
-                IDXGIAdapter1 *pAdapter = nullptr;
-                if (DXGI_ERROR_NOT_FOUND == pFactory->EnumAdapters1(adapterIndex, &pAdapter))
-                {
-                    break;
-                }
-                if (SUCCEEDED(D3D12CreateDevice(pAdapter, D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), nullptr)))
-                {
-                    if (isNotSupported(pAdapter))
-                    {
-                        pAdapter->Release();
-                        continue;
-                    }
-                    *ppAdapter = pAdapter;
-                    return true;
-                }
-                pAdapter->Release();
-            }
-        }
-        return false;
-    }
-
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_createDirectXDevice(
         JNIEnv *env, jobject redrawer, jint adapterPriority, jlong contentHandle, jboolean transparency)
     {
-        gr_cp<IDXGIFactory4> deviceFactory;
-        if (!SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&deviceFactory))))
-        {
-            return 0;
-        }
         gr_cp<IDXGIAdapter1> hardwareAdapter;
-        if (!defineHardwareAdapter((DXGI_GPU_PREFERENCE) adapterPriority, deviceFactory.get(), &hardwareAdapter))
-        {
+        if (!defineHardwareAdapter(
+            (DXGI_GPU_PREFERENCE) adapterPriority,
+            &hardwareAdapter,
+            [](IDXGIAdapter1* adapter) {
+                return SUCCEEDED(D3D12CreateDevice(adapter, D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), nullptr));
+            }
+        )) {
             return 0;
         }
 
@@ -325,7 +198,6 @@ extern "C"
         {
             return 0;
         }
-        deviceFactory.reset(nullptr);
 
         // Create the command queue
         gr_cp<ID3D12CommandQueue> queue;
