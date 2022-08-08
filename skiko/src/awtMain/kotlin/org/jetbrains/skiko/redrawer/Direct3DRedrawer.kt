@@ -17,7 +17,9 @@ internal class Direct3DRedrawer(
     private var isDisposed = false
     private var drawLock = Any()
 
-    private val device = createDirectXDevice(getAdapterPriority(), layer.contentHandle, layer.transparency).also {
+    private val device = createDirectXDevice(
+        properties.adapterPriority.ordinal, layer.contentHandle, layer.transparency
+    ).also {
         if (it == 0L || !isVideoCardSupported(layer.renderApi)) {
             throw RenderException("Failed to create DirectX12 device.")
         }
@@ -76,16 +78,6 @@ internal class Direct3DRedrawer(
     fun makeSurface(context: Long, width: Int, height: Int, index: Int) = Surface(
         makeDirectXSurface(device, context, width, height, index)
     )
-
-    private fun getAdapterPriority(): Int {
-        val adapterPriority = GpuPriority.parse(System.getProperty("skiko.directx.gpu.priority"))
-        return when (adapterPriority) {
-            GpuPriority.Auto -> 0
-            GpuPriority.Integrated -> 1
-            GpuPriority.Discrete -> 2
-            else -> 0
-        }
-    }
 
     fun resizeBuffers(width: Int, height: Int) = resizeBuffers(device, width, height)
 

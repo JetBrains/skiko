@@ -624,7 +624,8 @@ internal fun defaultFPSCounter(
     FPSCounter(
         periodSeconds = fpsPeriodSeconds,
         showLongFrames = fpsLongFramesShow,
-        getLongFrameMillis = { fpsLongFramesMillis ?: 1.5 * 1000 / refreshRate }
+        getLongFrameMillis = { fpsLongFramesMillis ?: (1.5 * 1000 / refreshRate) },
+        logOnTick = true
     )
 }
 

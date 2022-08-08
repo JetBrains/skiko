@@ -1,37 +1,50 @@
 package org.jetbrains.skiko
 
+import java.lang.System.getProperty
+
 // TODO maybe we can get rid of global properties, and pass SkiaLayerProperties to Window -> ComposeWindow -> SkiaLayer
 @Suppress("SameParameterValue")
-internal object SkikoProperties {
-    val vsyncEnabled: Boolean = property("skiko.vsync.enabled", default = true)
+/**
+ * Global Skiko properties, which are read from system JDK variables orr from environment variables
+ */
+object SkikoProperties {
+    val vsyncEnabled: Boolean get() = getProperty("skiko.vsync.enabled")?.toBoolean() ?: true
 
     /**
      * If vsync is enabled, but platform can't support it (Software renderer, Linux with uninstalled drivers),
      * we enable frame limit by the display refresh rate.
      */
-    val vsyncFramelimitFallbackEnabled: Boolean = property(
-        "skiko.vsync.framelimit.fallback.enabled", default = true
-    )
+    val vsyncFramelimitFallbackEnabled: Boolean get() = getProperty(
+        "skiko.vsync.framelimit.fallback.enabled"
+    )?.toBoolean() ?: true
 
-    val fpsEnabled: Boolean = property("skiko.fps.enabled", default = false)
-    val fpsPeriodSeconds: Double = property("skiko.fps.periodSeconds", default = 2.0)
+    val fpsEnabled: Boolean get() = getProperty("skiko.fps.enabled")?.toBoolean() ?: false
+    val fpsPeriodSeconds: Double get() = getProperty("skiko.fps.periodSeconds")?.toDouble() ?: 2.0
 
     /**
      * Show long frames which is longer than [fpsLongFramesMillis].
      * If [fpsLongFramesMillis] isn't defined will show frames longer than 1.5 * (1000 / displayRefreshRate)
      */
-    val fpsLongFramesShow: Boolean = property("skiko.fps.longFrames.show", default = false)
+    val fpsLongFramesShow: Boolean get() = getProperty("skiko.fps.longFrames.show")?.toBoolean() ?: false
 
-    val fpsLongFramesMillis: Double? = property("skiko.fps.longFrames.millis", default = null)
+    val fpsLongFramesMillis: Double? get() = getProperty("skiko.fps.longFrames.millis")?.toDouble()
 
     val renderApi: GraphicsApi get() {
         val environment = System.getenv("SKIKO_RENDER_API")
-        val property = System.getProperty("skiko.renderApi")
+        val property = getProperty("skiko.renderApi")
         return if (environment != null) {
             parseRenderApi(environment)
         } else {
             parseRenderApi(property)
         }
+    }
+
+    val gpuPriority: GpuPriority get() {
+        val value = getProperty("skiko.gpu.priority") ?:
+            getProperty("skiko.metal.gpu.priority") ?: // for backward compatability
+            getProperty("skiko.directx.gpu.priority")  // for backward compatability
+
+        return value?.let(GpuPriority::parseOrNull) ?: GpuPriority.Auto
     }
 
     internal fun parseRenderApi(text: String?): GraphicsApi {
@@ -61,7 +74,7 @@ internal object SkikoProperties {
         }
     }
 
-    fun fallbackRenderApiQueue(initialApi: GraphicsApi) : List<GraphicsApi> {
+    internal fun fallbackRenderApiQueue(initialApi: GraphicsApi) : List<GraphicsApi> {
         var fallbackApis = when (hostOs) {
             OS.Linux -> listOf(GraphicsApi.OPENGL, GraphicsApi.SOFTWARE_FAST, GraphicsApi.SOFTWARE_COMPAT)
             OS.MacOS -> listOf(GraphicsApi.METAL, GraphicsApi.SOFTWARE_COMPAT)
@@ -78,13 +91,4 @@ internal object SkikoProperties {
 
         return listOf(initialApi) + fallbackApis
     }
-
-    private fun property(name: String, default: Boolean) =
-        System.getProperty(name)?.toBoolean() ?: default
-
-    private fun property(name: String, default: Double) =
-        System.getProperty(name)?.toDouble() ?: default
-
-    private fun property(name: String, default: Double?) =
-        System.getProperty(name)?.toDouble() ?: default
 }

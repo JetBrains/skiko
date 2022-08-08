@@ -25,7 +25,7 @@ internal class MetalRedrawer(
     private var isDisposed = false
     private var drawLock = Any()
     private val device = layer.backedLayer.useDrawingSurfacePlatformInfo {
-        createMetalDevice(layer.windowHandle, layer.transparency, getAdapterPriority(), it)
+        createMetalDevice(layer.windowHandle, layer.transparency, properties.adapterPriority.ordinal, it)
     }
     private val windowHandle = layer.windowHandle
 
@@ -126,16 +126,6 @@ internal class MetalRedrawer(
     )
 
     fun finishFrame() = finishFrame(device)
-
-    fun getAdapterPriority(): Int {
-        val adapterPriority = GpuPriority.parse(System.getProperty("skiko.metal.gpu.priority"))
-        return when (adapterPriority) {
-            GpuPriority.Auto -> 0
-            GpuPriority.Integrated -> 1
-            GpuPriority.Discrete -> 2
-            else -> 0
-        }
-    }
 
     fun getAdapterName(): String = getAdapterName(device)
     fun getAdapterMemorySize(): Long = getAdapterMemorySize(device)
