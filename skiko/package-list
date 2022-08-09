@@ -2493,7 +2493,7 @@ $dokka.location:org.jetbrains.skiko/CursorManager/setCursor/#kotlin.Any?#org.jet
 $dokka.location:org.jetbrains.skiko/DelicateSkikoApi///PointingToDeclaration/skiko/org.jetbrains.skiko/-delicate-skiko-api/index.html
 $dokka.location:org.jetbrains.skiko/DelicateSkikoApi/DelicateSkikoApi/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-delicate-skiko-api/-delicate-skiko-api.html
 $dokka.location:org.jetbrains.skiko/FPSCounter///PointingToDeclaration/skiko/org.jetbrains.skiko/-f-p-s-counter/index.html
-$dokka.location:org.jetbrains.skiko/FPSCounter/FPSCounter/#kotlin.Double#kotlin.Boolean#kotlin.Function0[kotlin.Double]/PointingToDeclaration/skiko/org.jetbrains.skiko/-f-p-s-counter/-f-p-s-counter.html
+$dokka.location:org.jetbrains.skiko/FPSCounter/FPSCounter/#kotlin.Double#kotlin.Boolean#kotlin.Function0[kotlin.Double]#kotlin.Boolean/PointingToDeclaration/skiko/org.jetbrains.skiko/-f-p-s-counter/-f-p-s-counter.html
 $dokka.location:org.jetbrains.skiko/FPSCounter/average/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-f-p-s-counter/average.html
 $dokka.location:org.jetbrains.skiko/FPSCounter/max/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-f-p-s-counter/max.html
 $dokka.location:org.jetbrains.skiko/FPSCounter/min/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-f-p-s-counter/min.html
@@ -2518,7 +2518,7 @@ $dokka.location:org.jetbrains.skiko/GenericSkikoView/onRender/#org.jetbrains.ski
 $dokka.location:org.jetbrains.skiko/GenericSkikoView/onTouchEvent/#kotlin.Array[org.jetbrains.skiko.SkikoTouchEvent]/PointingToDeclaration/skiko/org.jetbrains.skiko/-generic-skiko-view/on-touch-event.html
 $dokka.location:org.jetbrains.skiko/GpuPriority.Auto///PointingToDeclaration/skiko/org.jetbrains.skiko/-gpu-priority/-auto/index.html
 $dokka.location:org.jetbrains.skiko/GpuPriority.Companion///PointingToDeclaration/skiko/org.jetbrains.skiko/-gpu-priority/-companion/index.html
-$dokka.location:org.jetbrains.skiko/GpuPriority.Companion/parse/#kotlin.String?/PointingToDeclaration/skiko/org.jetbrains.skiko/-gpu-priority/-companion/parse.html
+$dokka.location:org.jetbrains.skiko/GpuPriority.Companion/parseOrNull/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-gpu-priority/-companion/parse-or-null.html
 $dokka.location:org.jetbrains.skiko/GpuPriority.Discrete///PointingToDeclaration/skiko/org.jetbrains.skiko/-gpu-priority/-discrete/index.html
 $dokka.location:org.jetbrains.skiko/GpuPriority.Integrated///PointingToDeclaration/skiko/org.jetbrains.skiko/-gpu-priority/-integrated/index.html
 $dokka.location:org.jetbrains.skiko/GpuPriority///PointingToDeclaration/skiko/org.jetbrains.skiko/-gpu-priority/index.html
@@ -2822,6 +2822,15 @@ $dokka.location:org.jetbrains.skiko/SkikoPointerEventKind.SCROLL///PointingToDec
 $dokka.location:org.jetbrains.skiko/SkikoPointerEventKind.UNKNOWN///PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-pointer-event-kind/-u-n-k-n-o-w-n/index.html
 $dokka.location:org.jetbrains.skiko/SkikoPointerEventKind.UP///PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-pointer-event-kind/-u-p/index.html
 $dokka.location:org.jetbrains.skiko/SkikoPointerEventKind///PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-pointer-event-kind/index.html
+$dokka.location:org.jetbrains.skiko/SkikoProperties///PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/index.html
+$dokka.location:org.jetbrains.skiko/SkikoProperties/fpsEnabled/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/fps-enabled.html
+$dokka.location:org.jetbrains.skiko/SkikoProperties/fpsLongFramesMillis/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/fps-long-frames-millis.html
+$dokka.location:org.jetbrains.skiko/SkikoProperties/fpsLongFramesShow/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/fps-long-frames-show.html
+$dokka.location:org.jetbrains.skiko/SkikoProperties/fpsPeriodSeconds/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/fps-period-seconds.html
+$dokka.location:org.jetbrains.skiko/SkikoProperties/gpuPriority/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/gpu-priority.html
+$dokka.location:org.jetbrains.skiko/SkikoProperties/renderApi/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/render-api.html
+$dokka.location:org.jetbrains.skiko/SkikoProperties/vsyncEnabled/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/vsync-enabled.html
+$dokka.location:org.jetbrains.skiko/SkikoProperties/vsyncFramelimitFallbackEnabled/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/vsync-framelimit-fallback-enabled.html
 $dokka.location:org.jetbrains.skiko/SkikoSurfaceView///PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-surface-view/index.html
 $dokka.location:org.jetbrains.skiko/SkikoSurfaceView/SkikoSurfaceView/#android.content.Context#org.jetbrains.skiko.SkiaLayer/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-surface-view/-skiko-surface-view.html
 $dokka.location:org.jetbrains.skiko/SkikoSurfaceView/layer/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-surface-view/layer.html
