@@ -172,6 +172,9 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
         }
     }
 
+    override val input: SkikoInput
+        get() = TODO("Not yet implemented")
+
     override fun onKeyboardEvent(event: SkikoKeyboardEvent) {
         if (event.kind == SkikoKeyboardEventKind.DOWN) {
             when (event.key) {

@@ -135,7 +135,7 @@ actual open class SkiaLayer {
             skikoView?.onKeyboardEvent(toSkikoEvent(event, SkikoKeyboardEventKind.DOWN))
 
             toSkikoTypeEvent(event.key, event)?.let { inputEvent ->
-                skikoView?.onInputEvent(inputEvent)
+                skikoView?.input?.onInputEvent(inputEvent)
             }
         })
         htmlCanvas.addEventListener("keyup", { event ->

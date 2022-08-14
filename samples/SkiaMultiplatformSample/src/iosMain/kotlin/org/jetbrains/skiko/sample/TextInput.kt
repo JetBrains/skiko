@@ -50,6 +50,43 @@ class TextInput(val getText: () -> String) : SkikoView {
 
     }
 
+    override val input: SkikoInput = object : SkikoInput {
+        override fun hasText(): Boolean = true
+
+        override fun insertText(text: String) {
+
+        }
+
+        override fun deleteBackward() {
+
+        }
+
+        override fun endOfDocument(): Long = 1L
+
+        override fun selectedTextRange(): SkikoTextRange? {
+            return null
+        }
+
+        override fun textInRange(range: SkikoTextRange): String? {
+            return null
+        }
+
+        override fun replaceRange(range: SkikoTextRange, text: String) {
+
+        }
+
+        override fun setMarkedText(markedText: String?, selectedRange: SkikoTextRange) {
+
+        }
+
+        override fun markedTextRange(): SkikoTextRange? = null
+
+        override fun unmarkText() {
+
+        }
+
+    }
+
     override fun onKeyboardEvent(event: SkikoKeyboardEvent) {
         if (event.kind == SkikoKeyboardEventKind.DOWN) {
             when (event.key) {

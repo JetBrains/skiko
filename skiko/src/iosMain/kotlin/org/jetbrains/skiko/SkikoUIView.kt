@@ -9,6 +9,8 @@ import platform.Foundation.*
 import platform.UIKit.*
 import platform.darwin.NSInteger
 
+const val LOG_OLD = false
+
 @ExportObjCClass
 class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInputTraitsProtocol, UITextPasteConfigurationSupportingProtocol {
     @OverrideInit
@@ -47,34 +49,44 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
 
     fun getText(): String = inputText + _markedText
 
-    @Deprecated("need be deleted")
-    private var inputText: String = "qwe"//todo delete, because it's redundant and may leaks memory
     override fun hasText(): Boolean {
-        return inputText.length > 0
+        val result = skiaLayer?.skikoView?.input?.hasText() ?: false
+        log()
+        return result
+//        return inputText.length > 0
     }
 
-    override fun insertText(theText: String) {
-        println("insertText: $theText")
-        inputText += theText
-        val position = SkikoTextPosition(inputText.length.toLong())
-        _selectedTextRange = SkikoTextRange(position, position)
-        skiaLayer?.skikoView?.onInputEvent(toSkikoTypeEvent(theText, null))
+    override fun insertText(text: String) {
+        skiaLayer?.skikoView?.input?.insertText(text)
+        if (LOG_OLD) {
+            inputText += text
+            val position = IntermediateTextPosition(inputText.length.toLong())
+            _selectedTextRange = IntermediateTextRange(position, position)
+            skiaLayer?.skikoView?.onInputEvent(toSkikoTypeEvent(text, null))
+            log()
+        }
     }
 
-    override fun deleteBackward() {
-        inputText = inputText.dropLast(1)
-        unmarkText()
-        if (!pressedKeycodes.contains(SkikoKey.KEY_BACKSPACE.value)) {
-            val downEvent = SkikoKeyboardEvent(
-                key = SkikoKey.KEY_BACKSPACE,
-                kind = SkikoKeyboardEventKind.DOWN,
-                platform = null
-            )
-            val upEvent = downEvent.copy(
-                kind = SkikoKeyboardEventKind.UP
-            )
-            skiaLayer?.skikoView?.onKeyboardEvent(downEvent)
-            skiaLayer?.skikoView?.onKeyboardEvent(upEvent)
+    override fun deleteBackward() {//todo delegate to skiaLayer?.skikoView?.input
+//        if (!pressedKeycodes.contains(SkikoKey.KEY_BACKSPACE.value)) {
+            skiaLayer?.skikoView?.input?.deleteBackward()
+//        }
+        if (LOG_OLD) {
+            _unmarkText()
+            inputText = inputText.dropLast(1)
+//            if (!pressedKeycodes.contains(SkikoKey.KEY_BACKSPACE.value)) {
+//                val downEvent = SkikoKeyboardEvent(
+//                    key = SkikoKey.KEY_BACKSPACE,
+//                    kind = SkikoKeyboardEventKind.DOWN,
+//                    platform = null
+//                )
+//                val upEvent = downEvent.copy(
+//                    kind = SkikoKeyboardEventKind.UP
+//                )
+//                skiaLayer?.skikoView?.onKeyboardEvent(downEvent)
+//                skiaLayer?.skikoView?.onKeyboardEvent(upEvent)
+//            }
+            log()
         }
     }
 
@@ -88,9 +100,11 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
                     uiPress.key?.let {
                         pressedKeycodes.add(it.keyCode)
                     }
-                    skiaLayer?.skikoView?.onKeyboardEvent(
-                        toSkikoKeyboardEvent(press, SkikoKeyboardEventKind.DOWN)
-                    )
+                    if (uiPress.key?.keyCode != SkikoKey.KEY_BACKSPACE.value) {
+                        skiaLayer?.skikoView?.onKeyboardEvent(
+                            toSkikoKeyboardEvent(press, SkikoKeyboardEventKind.DOWN)
+                        )
+                    }
                 }
             }
         }
@@ -105,9 +119,11 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
                     uiPress.key?.let {
                         pressedKeycodes.remove(it.keyCode)
                     }
-                    skiaLayer?.skikoView?.onKeyboardEvent(
-                        toSkikoKeyboardEvent(press, SkikoKeyboardEventKind.UP)
-                    )
+                    if (uiPress.key?.keyCode != SkikoKey.KEY_BACKSPACE.value) {
+                        skiaLayer?.skikoView?.onKeyboardEvent(
+                            toSkikoKeyboardEvent(press, SkikoKeyboardEventKind.UP)
+                        )
+                    }
                 }
             }
         }
@@ -170,9 +186,8 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
         skiaLayer?.skikoView?.onTouchEvent(events.toTypedArray())
     }
 
-    private var _markedText: String = ""
-    private var _markedTextRange: SkikoTextRange? = null
-    private var _selectedTextRange: SkikoTextRange = SkikoTextRange(SkikoTextPosition(0), SkikoTextPosition(0))
+    private var _selectedTextRange: IntermediateTextRange =
+        IntermediateTextRange(IntermediateTextPosition(0), IntermediateTextPosition(0))
     private var _tokenizer: UITextInputStringTokenizer? = null
     private var _inputDelegate: UITextInputDelegateProtocol? = null
     override fun inputDelegate(): UITextInputDelegateProtocol? {
@@ -184,105 +199,134 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
     }
 
     override fun textInRange(range: UITextRange): String? {
-        val from = ((range as SkikoTextRange).start() as SkikoTextPosition).position
-        val to = (range.end() as SkikoTextPosition).position
-        val text = getText()
-        val result = if (text.isNotEmpty() && from >= 0 && to >= 0 && text.length >= to) {
-            val substring = text.substring(from.toInt(), to.toInt())
-            val result = substring.replace("\n", "")
-            result.ifEmpty { null }
-        } else {
-            null
+        val result = skiaLayer?.skikoView?.input?.textInRange(range.toSkikoTextRange())
+        if (LOG_OLD) {
+            val from = (range.start() as IntermediateTextPosition).position
+            val to = (range.end() as IntermediateTextPosition).position
+            val text = getText()
+            val oldResult = if (text.isNotEmpty() && from >= 0 && to >= 0 && text.length >= to) {
+                val substring = text.substring(from.toInt(), to.toInt())
+                substring.replace("\n", "").ifEmpty { null }
+            } else {
+                null
+            }
+            log("oldResult: $oldResult")
         }
         return result
     }
 
     override fun replaceRange(range: UITextRange, withText: String) {
-        val start = ((range as SkikoTextRange).start() as SkikoTextPosition).position
-        val end = (range.end() as SkikoTextPosition).position
-        if (end > inputText.length) {
-            throw Error("TextInput, replaceRange end=$end > inputText.lastIndex=${inputText.length}")
+        skiaLayer?.skikoView?.input?.replaceRange(range.toSkikoTextRange(), withText)
+        if (LOG_OLD) {
+            val start = (range.start() as IntermediateTextPosition).position
+            val end = (range.end() as IntermediateTextPosition).position
+            if (end > inputText.length) {
+                throw Error("TextInput, replaceRange end=$end > inputText.lastIndex=${inputText.length}")
+            }
+            inputText = inputText.replaceRange(start.toInt(), end.toInt(), withText)
+            log()
         }
-        inputText = inputText.replaceRange(start.toInt(), end.toInt(), withText)
     }
 
     override fun setSelectedTextRange(selectedTextRange: UITextRange?) {
         selectedTextRange?.let {
-            val start = ((it as SkikoTextRange).start() as SkikoTextPosition).position
-            val end = (it.end() as SkikoTextPosition).position
-            println("TODO setSelectedTextRange, start: $start, end: $end")//todo check
+            val start = ((it as IntermediateTextRange).start() as IntermediateTextPosition).position
+            val end = (it.end() as IntermediateTextPosition).position
+//            println("TODO setSelectedTextRange, start: $start, end: $end")//todo check
             _selectedTextRange = it
         }
     }
 
     override fun selectedTextRange(): UITextRange? {
-        println("TEMP selectedTextRange")
-        val from = 0//getText().length //todo temp
-        val to = getText().length
-        return SkikoTextRange(from = from, to = to)
-        return _selectedTextRange
+        val result = skiaLayer?.skikoView?.input?.selectedTextRange()?.toUITextRange()
+        if (LOG_OLD) {
+            val from = 0//getText().length //todo temp
+            val to = getText().length
+            val oldResult = IntermediateTextRange(start = from, end = to)
+            log("oldResult: ${oldResult.toSkikoTextRange()}")
+        }
+        return result
+//        return _selectedTextRange //todo
     }
 
     override fun markedTextRange(): UITextRange? {
-        return _markedTextRange
+        val result = skiaLayer?.skikoView?.input?.markedTextRange()?.toUITextRange()
+        log("oldResult: $_markedTextRange")
+        return result
     }
 
     override fun setMarkedTextStyle(markedTextStyle: Map<Any?, *>?) {
-        println("TODO setMarkedTextStyle")//todo
+//        println("TODO setMarkedTextStyle")//todo
         // do nothing
     }
 
     override fun markedTextStyle(): Map<Any?, *>? {
-        println("TODO markedTextStyle")//todo
+//        println("TODO markedTextStyle")//todo
         return null
     }
 
     override fun setMarkedText(markedText: String?, selectedRange: CValue<NSRange>) {
-        // [markedText] is text about to confirm by user
-        // see more: https://developer.apple.com/documentation/uikit/uitextinput?language=objc
         val (locationRelative, lengthRelative) = selectedRange.useContents {
-            location to length
+            location.toInt() to length.toInt()
         }
-        val cursor = inputText.lastIndex
-        val location = cursor + 1
-        val length = markedText?.length ?: 0
+        val relativeTextRange = SkikoTextRange(locationRelative, locationRelative + lengthRelative)
+        skiaLayer?.skikoView?.input?.setMarkedText(markedText, relativeTextRange)
+        if (LOG_OLD) {
+            // [markedText] is text about to confirm by user
+            // see more: https://developer.apple.com/documentation/uikit/uitextinput?language=objc
+            val cursor = inputText.lastIndex
+            val location = cursor + 1
+            val length = markedText?.length ?: 0
 
-        markedText?.let {
-            _markedTextRange = SkikoTextRange(
-                SkikoTextPosition(location.toLong()),
-                SkikoTextPosition(location.toLong() + length.toLong())
-            )
-            _selectedTextRange = SkikoTextRange(
-                SkikoTextPosition(location.toLong()),
-                SkikoTextPosition(location.toLong() + length.toLong())
-            )
-            _markedText = markedText
+            markedText?.let {
+                _markedTextRange = IntermediateTextRange(
+                    IntermediateTextPosition(location.toLong()),
+                    IntermediateTextPosition(location.toLong() + length.toLong())
+                )
+                _selectedTextRange = IntermediateTextRange(
+                    IntermediateTextPosition(location.toLong()),
+                    IntermediateTextPosition(location.toLong() + length.toLong())
+                )
+                _markedText = markedText
+            }
+            log()
         }
     }
 
     override fun unmarkText() {
+        skiaLayer?.skikoView?.input?.unmarkText()
+        if (LOG_OLD) {
+            _unmarkText()
+            log()
+        }
+    }
+
+    private fun _unmarkText() {
         inputText = getText()
         _markedText = ""
         _markedTextRange = null
     }
 
     override fun beginningOfDocument(): UITextPosition {
-        return SkikoTextPosition(0)
+        return IntermediateTextPosition(0)
     }
 
     override fun endOfDocument(): UITextPosition {
-        return SkikoTextPosition(getText().length.toLong())
+        val result = IntermediateTextPosition(skiaLayer?.skikoView?.input?.endOfDocument() ?: 0)
+        val oldResult = IntermediateTextPosition(getText().length.toLong())
+        log("oldResult: $oldResult")
+        return result
     }
 
     override fun textRangeFromPosition(fromPosition: UITextPosition, toPosition: UITextPosition): UITextRange? {
-        val from = (fromPosition as SkikoTextPosition)
-        val to = (toPosition as SkikoTextPosition)
-        return SkikoTextRange(from, to)
+        val from = (fromPosition as IntermediateTextPosition)
+        val to = (toPosition as IntermediateTextPosition)
+        return IntermediateTextRange(from, to)
     }
 
     override fun positionFromPosition(position: UITextPosition, offset: NSInteger): UITextPosition? {
-        val p = (position as SkikoTextPosition).position
-        return SkikoTextPosition(p + offset)
+        val p = (position as IntermediateTextPosition).position
+        return IntermediateTextPosition(p + offset)
     }
 
     override fun positionFromPosition(
@@ -290,13 +334,13 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
         inDirection: UITextLayoutDirection,
         offset: NSInteger
     ): UITextPosition? {
-        println("TODO positionFromPosition with inDirection") //todo use inDirection
+//        println("TODO positionFromPosition with inDirection") //todo use inDirection
         return positionFromPosition(position, offset)
     }
 
     override fun comparePosition(position: UITextPosition, toPosition: UITextPosition): NSComparisonResult {
-        val from = position as SkikoTextPosition
-        val to = toPosition as SkikoTextPosition
+        val from = position as IntermediateTextPosition
+        val to = toPosition as IntermediateTextPosition
         val result = if (from.position < to.position) {
             NSOrderedAscending
         } else if (from.position > to.position) {
@@ -308,8 +352,8 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
     }
 
     override fun offsetFromPosition(from: UITextPosition, toPosition: UITextPosition): NSInteger {
-        val fromPosition = from as SkikoTextPosition
-        val to = toPosition as SkikoTextPosition
+        val fromPosition = from as IntermediateTextPosition
+        val to = toPosition as IntermediateTextPosition
         return to.position - fromPosition.position
     }
 
@@ -322,7 +366,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
     }
 
     override fun positionWithinRange(range: UITextRange, farthestInDirection: UITextLayoutDirection): UITextPosition? {
-        println("TODO positionWithinRange")//todo
+//        println("TODO positionWithinRange")//todo
         return null
     }
 
@@ -330,7 +374,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
         position: UITextPosition,
         inDirection: UITextLayoutDirection
     ): UITextRange? {
-        println("TODO characterRangeByExtendingPosition")//todo
+//        println("TODO characterRangeByExtendingPosition")//todo
         return null
     }
 
@@ -338,57 +382,57 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
         position: UITextPosition,
         inDirection: UITextStorageDirection
     ): NSWritingDirection {
-        println("TODO baseWritingDirectionForPosition")//todo
+//        println("TODO baseWritingDirectionForPosition")//todo
         return NSWritingDirectionLeftToRight
     }
 
     override fun setBaseWritingDirection(writingDirection: NSWritingDirection, forRange: UITextRange) {
-        println("TODO setBaseWritingDirection")//todo
+//        println("TODO setBaseWritingDirection")//todo
     }
 
     override fun firstRectForRange(range: UITextRange): CValue<CGRect> {
-        println("TODO firstRectForRange")//todo
+//        println("TODO firstRectForRange")//todo
         return CGRectNull.readValue()
     }
 
     override fun caretRectForPosition(position: UITextPosition): CValue<CGRect> {
-        println("TODO caretRectForPosition")//todo
+
+//        println("TODO caretRectForPosition")//todo
         return bounds
     }
 
     override fun selectionRectsForRange(range: UITextRange): List<*> {
-        println("TODO TARGET selectionRectsForRange")//todo
+//        println("TODO TARGET selectionRectsForRange")//todo
         return listOf<UITextSelectionRect>(MySelectionRect())
     }
 
     override fun closestPositionToPoint(point: CValue<CGPoint>): UITextPosition? {
-        println("TODO closestPositionToPoint")
-        return SkikoTextPosition(0)
+//        println("TODO closestPositionToPoint")
+        return IntermediateTextPosition(0)
     }
 
     override fun closestPositionToPoint(point: CValue<CGPoint>, withinRange: UITextRange): UITextPosition? {
-        println("TODO closestPositionToPoint")
-        return (withinRange as SkikoTextRange).start()
+//        println("TODO closestPositionToPoint")
+        return (withinRange as IntermediateTextRange).start()
     }
 
     override fun characterRangeAtPoint(point: CValue<CGPoint>): UITextRange? {
-        println("TODO characterRangeAtPoint")
-        val position = closestPositionToPoint(point) as SkikoTextPosition
-        return SkikoTextRange(position, position)
+//        println("TODO characterRangeAtPoint")
+        val position = closestPositionToPoint(point) as IntermediateTextPosition
+        return IntermediateTextRange(position, position)
     }
 
     override fun textStylingAtPosition(position: UITextPosition, inDirection: UITextStorageDirection): Map<Any?, *>? {
-        println("TODO textStylingAtPosition")
+//        println("TODO textStylingAtPosition")
         return NSDictionary.dictionary()
     }
 
     override fun characterOffsetOfPosition(position: UITextPosition, withinRange: UITextRange): NSInteger {
-        println("TODO characterOffsetOfPosition")
-        return 0
+        TODO("TODO characterOffsetOfPosition")
     }
 
     override fun shouldChangeTextInRange(range: UITextRange, replacementText: String): Boolean {
-        println("TODO shouldChangeTextInRange")
+//        println("TODO shouldChangeTextInRange")
         // Here we should decide to replace text in range or not.
         // By default, this method returns true.
         return true
@@ -399,11 +443,11 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
     }
 
     override fun canPerformAction(action: COpaquePointer?, withSender: Any?): Boolean {
-        println("TODO canPerformAction")
+        println("TODO canPerformAction, action: ${action}")
         return true
     }
 
-    private var _pasteConfiguration:UIPasteConfiguration? = null
+    private var _pasteConfiguration: UIPasteConfiguration? = null
     private var _pasteDelegate: UITextPasteDelegateProtocol? = null
     override fun pasteConfiguration(): UIPasteConfiguration? {
         //https://developer.apple.com/documentation/uikit/uitextpasteconfigurationsupporting
@@ -443,27 +487,37 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
     override fun autocorrectionType(): UITextAutocorrectionType {
         return UITextAutocorrectionType.UITextAutocorrectionTypeYes
     }
+
+    private var inputText: String = "qwe"
+    private var _markedText: String = ""
+    private var _markedTextRange: IntermediateTextRange? = null
+    private var counter = 0
+
+    private fun log(vararg messages: Any) {
+//        println("/----OLD-begin----------${counter++}\\")
+//        println(messages.map { it.toString() })
+//        println("inputText: $inputText, _markedText: $_markedText, _markedTextRange: ${_markedTextRange?.toSkikoTextRange()}")
+//        println(Exception().stackTraceToString().split("\n")[4].split("        ").last())
+//        println("\\-----OLD-end-----------/")
+//        println("")
+    }
 }
 
-class SkikoTextPosition(val position: Long = 0) : UITextPosition()
+private class IntermediateTextPosition(val position: Long = 0) : UITextPosition()
 
-fun SkikoTextRange(from: Int, to: Int) =
-    SkikoTextRange(from = SkikoTextPosition(from.toLong()), to = SkikoTextPosition(to.toLong()))
+private fun IntermediateTextRange(start: Int, end: Int) =
+    IntermediateTextRange(_start = IntermediateTextPosition(start.toLong()), _end = IntermediateTextPosition(end.toLong()))
 
-class SkikoTextRange(private val from: SkikoTextPosition, private val to: SkikoTextPosition) : UITextRange() {
-    override fun isEmpty() = (to.position - from.position) <= 0
-    override fun start(): UITextPosition {
-        return from
-    }
-
-    override fun end(): UITextPosition {
-        return to
-    }
-
-    fun toStr(): String = "SkikoTextRange(from: ${from.position}, to: ${to.position})"
+private class IntermediateTextRange(
+    private val _start: IntermediateTextPosition,
+    private val _end: IntermediateTextPosition
+) : UITextRange() {
+    override fun isEmpty() = (_end.position - _start.position) <= 0
+    override fun start(): UITextPosition = _start
+    override fun end(): UITextPosition = _end
 }
 
-class MySelectionRect():UITextSelectionRect() {
+class MySelectionRect : UITextSelectionRect() {
 
     /**
      * A Boolean value that indicates whether the rectangle contains the end of the selection.
@@ -492,6 +546,17 @@ class MySelectionRect():UITextSelectionRect() {
     }
 }
 
-fun CValue<NSRange>.toStr(): String = useContents { "NSRange location: $location, length: $length" }
+fun CValue<NSRange>.toStr(): String = useContents { "NSRange location: $location, length: $length " }
 
-//When TextField focus lost - unmark text
+private fun UITextRange.toSkikoTextRange(): SkikoTextRange =
+    SkikoTextRange(
+        start = (start() as IntermediateTextPosition).position.toInt(),
+        end = (end() as IntermediateTextPosition).position.toInt()
+    )
+
+private fun SkikoTextRange.toUITextRange(): UITextRange =
+    IntermediateTextRange(start = start, end = end)
+
+//todo When TextField focus lost - unmark text
+
+
