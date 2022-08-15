@@ -1,10 +1,8 @@
 package org.jetbrains.skiko
 
 import kotlinx.cinterop.*
-import platform.CoreGraphics.CGPoint
-import platform.CoreGraphics.CGRect
-import platform.CoreGraphics.CGRectMake
-import platform.CoreGraphics.CGRectNull
+import org.jetbrains.skiko.data.*
+import platform.CoreGraphics.*
 import platform.Foundation.*
 import platform.UIKit.*
 import platform.darwin.NSInteger
@@ -390,37 +388,53 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
 //        println("TODO setBaseWritingDirection")//todo
     }
 
+    //Working with Geometry and Hit-Testing---------------------------------------------------------------------------
     override fun firstRectForRange(range: UITextRange): CValue<CGRect> {
-//        println("TODO firstRectForRange")//todo
-        return CGRectNull.readValue()
+        val result: SkikoRect? = skiaLayer?.skikoView?.input?.firstRectForRange(range.toSkikoTextRange())
+        return if (result != null) {
+            CGRectMake(result.x, result.y, result.width, result.height)
+        } else {
+            CGRectNull.readValue()
+        }
     }
 
     override fun caretRectForPosition(position: UITextPosition): CValue<CGRect> {
-
-//        println("TODO caretRectForPosition")//todo
-        return bounds
+        val result: SkikoRect? = skiaLayer?.skikoView?.input?.caretRectForPosition(
+            position = (position as IntermediateTextPosition).position
+        )
+        return if (result != null) {
+            CGRectMake(result.x, result.y, result.width, result.height)
+        } else {
+            CGRectNull.readValue()
+        }
     }
 
     override fun selectionRectsForRange(range: UITextRange): List<*> {
-//        println("TODO TARGET selectionRectsForRange")//todo
-        return listOf<UITextSelectionRect>(MySelectionRect())
+        val result: List<SkikoRect>? = skiaLayer?.skikoView?.input?.selectionRectsForRange(range.toSkikoTextRange())
+        return result?.map { MySelectionRect(it) } ?: listOf<UITextSelectionRect>()
     }
 
     override fun closestPositionToPoint(point: CValue<CGPoint>): UITextPosition? {
-//        println("TODO closestPositionToPoint")
-        return IntermediateTextPosition(0)
+        return skiaLayer?.skikoView?.input
+            ?.closestPositionToPoint(point = point.useContents { this.toSkikoPoint() })
+            ?.let { IntermediateTextPosition(it.toLong()) }
     }
 
     override fun closestPositionToPoint(point: CValue<CGPoint>, withinRange: UITextRange): UITextPosition? {
-//        println("TODO closestPositionToPoint")
-        return (withinRange as IntermediateTextRange).start()
+        return skiaLayer?.skikoView?.input
+            ?.closestPositionToPoint(
+                point = point.useContents { this.toSkikoPoint() },
+                range = withinRange.toSkikoTextRange()
+            )?.let { IntermediateTextPosition(it.toLong()) }
     }
 
     override fun characterRangeAtPoint(point: CValue<CGPoint>): UITextRange? {
-//        println("TODO characterRangeAtPoint")
-        val position = closestPositionToPoint(point) as IntermediateTextPosition
-        return IntermediateTextRange(position, position)
+        val skikoPoint = point.useContents { this.toSkikoPoint() }
+        return skiaLayer?.skikoView?.input
+            ?.characterRangeAtPoint(skikoPoint)
+            ?.toUITextRange()
     }
+    //---------------------------------------------------------------------------------------------------------
 
     override fun textStylingAtPosition(position: UITextPosition, inDirection: UITextStorageDirection): Map<Any?, *>? {
 //        println("TODO textStylingAtPosition")
@@ -443,7 +457,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
     }
 
     override fun canPerformAction(action: COpaquePointer?, withSender: Any?): Boolean {
-        println("TODO canPerformAction, action: ${action}")
+//        println("TODO canPerformAction, action: ${action}")
         return true
     }
 
@@ -506,7 +520,10 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
 private class IntermediateTextPosition(val position: Long = 0) : UITextPosition()
 
 private fun IntermediateTextRange(start: Int, end: Int) =
-    IntermediateTextRange(_start = IntermediateTextPosition(start.toLong()), _end = IntermediateTextPosition(end.toLong()))
+    IntermediateTextRange(
+        _start = IntermediateTextPosition(start.toLong()),
+        _end = IntermediateTextPosition(end.toLong())
+    )
 
 private class IntermediateTextRange(
     private val _start: IntermediateTextPosition,
@@ -517,7 +534,7 @@ private class IntermediateTextRange(
     override fun end(): UITextPosition = _end
 }
 
-class MySelectionRect : UITextSelectionRect() {
+class MySelectionRect(val skikoRect: SkikoRect) : UITextSelectionRect() {
 
     /**
      * A Boolean value that indicates whether the rectangle contains the end of the selection.
@@ -538,7 +555,7 @@ class MySelectionRect : UITextSelectionRect() {
     }
 
     override fun rect(): CValue<CGRect> {
-        return CGRectMake(40.0, 150.0, 80.0, 40.0)
+        return skikoRect.toCGRect()
     }
 
     override fun writingDirection(): NSWritingDirection {
@@ -556,6 +573,11 @@ private fun UITextRange.toSkikoTextRange(): SkikoTextRange =
 
 private fun SkikoTextRange.toUITextRange(): UITextRange =
     IntermediateTextRange(start = start, end = end)
+
+fun SkikoRect.toCGRect() = CGRectMake(x, y, width, height)
+
+fun CGPoint.toSkikoPoint(): SkikoPoint = SkikoPoint(x, y)
+fun SkikoPoint.toCGPoint() = CGPointMake(x = x, y = y)
 
 //todo When TextField focus lost - unmark text
 
