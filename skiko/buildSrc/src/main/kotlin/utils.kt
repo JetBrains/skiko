@@ -30,11 +30,7 @@ inline fun <reified T : Task> Project.registerSkikoTask(
     crossinline fn: T.() -> Unit
 ): TaskProvider<T> {
     val taskName = actionName + joinToTitleCamelCase(targetOs.id, targetArch.id)
-    return if (taskName in project.tasks.names) {
-        project.tasks.named(taskName) as TaskProvider<T>
-    } else {
-        registerSkikoTask(taskName, fn)
-    }
+    return registerSkikoTask(taskName, fn)
 }
 
 fun joinToTitleCamelCase(vararg parts: String): String =

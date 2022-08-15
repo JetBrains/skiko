@@ -26,6 +26,9 @@
 #include "SkLoadICU.h"
 #include "unicode/ubrk.h"
 #include "mppinterop.h"
+#include "SkPoint3.h"
+#include "SkCanvas.h"
+#include "SkBitmap.h"
 
 #include "types.h"
 

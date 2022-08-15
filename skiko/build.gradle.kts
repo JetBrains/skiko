@@ -130,7 +130,9 @@ if (supportWasm) {
 fun compileNativeBridgesTask(os: OS, arch: Arch, isArm64Simulator: Boolean): TaskProvider<CompileSkikoCppTask> {
     val skiaNativeDir = registerOrGetSkiaDirProvider(os, arch)
 
-    return project.registerSkikoTask<CompileSkikoCppTask>("compileNativeBridges", os, arch) {
+    val actionName = "compileNativeBridges" + if (isArm64Simulator) "Sim" else ""
+
+    return project.registerSkikoTask<CompileSkikoCppTask>(actionName, os, arch) {
         dependsOn(skiaNativeDir)
         val unpackedSkia = skiaNativeDir.get()
 
@@ -142,16 +144,18 @@ fun compileNativeBridgesTask(os: OS, arch: Arch, isArm64Simulator: Boolean): Tas
         when (os)  {
             OS.IOS -> {
                 val sdkRoot = "/Applications/Xcode.app/Contents/Developer/Platforms"
+                val iphoneOsSdk = "$sdkRoot/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk"
+                val iphoneSimSdk = "$sdkRoot/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk"
                 val iosArchFlags = when (arch) {
                     Arch.Arm64 -> arrayOf(
                         "-target", if (isArm64Simulator) "arm64-apple-ios-simulator" else "arm64-apple-ios",
-                        "-mios-version-min=11.0",
-                        "-isysroot", "$sdkRoot/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk"
+                        "-isysroot", if (isArm64Simulator) iphoneSimSdk else iphoneOsSdk,
+                        "-miphoneos-version-min=11.0"
                     )
                     Arch.X64 -> arrayOf(
                         "-target", "x86_64-apple-ios-simulator",
                         "-mios-version-min=11.0",
-                        "-isysroot", "$sdkRoot/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk"
+                        "-isysroot", iphoneSimSdk
                     )
                     else -> throw GradleException("Unsupported arch: $arch")
                 }
@@ -467,7 +471,8 @@ fun configureNativeTarget(os: OS, arch: Arch, target: KotlinNativeTarget) {
     val crossCompileTask = compileNativeBridgesTask(os, arch, isArm64Simulator = isArm64Simulator)
 
     // TODO: move to LinkSkikoTask.
-    val linkTask = project.registerSkikoTask<Exec>("linkNativeBridges", os, arch) {
+    val actionName = "linkNativeBridges" + if (isArm64Simulator) "Sim" else ""
+    val linkTask = project.registerSkikoTask<Exec>(actionName, os, arch) {
         dependsOn(crossCompileTask)
         val objectFilesDir = crossCompileTask.map { it.outDir.get() }
         val objectFiles = project.fileTree(objectFilesDir) {
@@ -981,9 +986,10 @@ fun KotlinTarget.generateVersion(
     targetArch: Arch
 ) {
     val targetName = this.name
+    val isArm64Simulator = name.contains("iosSimulatorArm64", ignoreCase = true)
     val generatedDir = project.layout.buildDirectory.dir("generated/$targetName")
     val generateVersionTask = project.registerSkikoTask<DefaultTask>(
-        "generateVersion${toTitleCase(platformType.name)}",
+        "generateVersion${toTitleCase(platformType.name)}" +  if (isArm64Simulator) "Sim" else "",
         targetOs,
         targetArch
     ) {
