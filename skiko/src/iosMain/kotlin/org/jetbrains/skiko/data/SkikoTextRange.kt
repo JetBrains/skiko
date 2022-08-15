@@ -1,4 +1,4 @@
-package org.jetbrains.skiko
+package org.jetbrains.skiko.data
 
 /**
  * A range of characters in a text container with a starting index and an ending index in string backing a text-entry object.
