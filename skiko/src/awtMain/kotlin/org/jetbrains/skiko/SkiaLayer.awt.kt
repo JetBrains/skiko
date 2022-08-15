@@ -19,7 +19,8 @@ import javax.swing.UIManager
 actual open class SkiaLayer internal constructor(
     externalAccessibleFactory: ((Component) -> Accessible)? = null,
     private val properties: SkiaLayerProperties,
-    private val renderFactory: RenderFactory = RenderFactory.Default
+    private val renderFactory: RenderFactory = RenderFactory.Default,
+    private val analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
 ) : JPanel() {
 
     internal companion object {
@@ -52,6 +53,7 @@ actual open class SkiaLayer internal constructor(
         isVsyncEnabled: Boolean = SkikoProperties.vsyncEnabled,
         isVsyncFramelimitFallbackEnabled: Boolean = SkikoProperties.vsyncFramelimitFallbackEnabled,
         renderApi: GraphicsApi = SkikoProperties.renderApi,
+        analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty
     ) : this(
         externalAccessibleFactory,
         SkiaLayerProperties(
@@ -59,7 +61,8 @@ actual open class SkiaLayer internal constructor(
             isVsyncFramelimitFallbackEnabled,
             renderApi
         ),
-        RenderFactory.Default
+        RenderFactory.Default,
+        analytics,
     )
 
     val canvas: java.awt.Canvas
@@ -279,7 +282,7 @@ actual open class SkiaLayer internal constructor(
             try {
                 renderApi = fallbackRenderApiQueue.removeAt(0)
                 redrawer?.dispose()
-                redrawer = renderFactory.createRedrawer(this, renderApi, properties)
+                redrawer = renderFactory.createRedrawer(this, renderApi, analytics, properties)
                 redrawer?.syncSize()
             } catch (e: RenderException) {
                 println(e.message)

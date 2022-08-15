@@ -6,8 +6,9 @@ import org.jetbrains.skiko.context.OpenGLContextHandler
 
 internal class LinuxOpenGLRedrawer(
     private val layer: SkiaLayer,
+    analytics: SkiaLayerAnalytics,
     private val properties: SkiaLayerProperties
-) : Redrawer {
+) : AWTRedrawer(layer, analytics, GraphicsApi.OPENGL) {
     private val contextHandler = OpenGLContextHandler(layer)
     override val renderInfo: String get() = contextHandler.rendererInfo()
 
@@ -22,12 +23,17 @@ internal class LinuxOpenGLRedrawer(
                 throw RenderException("Cannot create Linux GL context")
             }
             it.makeCurrent(context)
-            if (!isVideoCardSupported(layer.renderApi)) {
+            if (!isVideoCardSupported(GraphicsApi.OPENGL, adapterName)) {
                 throw RenderException("Cannot create Linux GL context")
             }
+            onDeviceChosen(adapterName)
             it.setSwapInterval(swapInterval)
         }
+        onContextInit()
     }
+
+    private val adapterName get() = OpenGLApi.instance.glGetString(OpenGLApi.instance.GL_RENDERER)
+
     private val frameJob = Job()
     @Volatile
     private var frameLimit = 0.0
@@ -71,8 +77,8 @@ internal class LinuxOpenGLRedrawer(
 
     override fun redrawImmediately() = layer.backedLayer.lockLinuxDrawingSurface {
         check(!isDisposed) { "LinuxOpenGLRedrawer is disposed" }
-        layer.inDrawScope {
-            update(System.nanoTime())
+        update(System.nanoTime())
+        inDrawScope {
             it.makeCurrent(context)
             contextHandler.draw()
             it.setSwapInterval(0)
@@ -82,12 +88,8 @@ internal class LinuxOpenGLRedrawer(
         }
     }
 
-    private fun update(nanoTime: Long) {
-        layer.update(nanoTime)
-    }
-
     private fun draw() {
-        layer.inDrawScope(contextHandler::draw)
+        inDrawScope(contextHandler::draw)
     }
 
     companion object {

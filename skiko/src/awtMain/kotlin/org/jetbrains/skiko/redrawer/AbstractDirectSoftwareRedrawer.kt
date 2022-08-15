@@ -2,18 +2,15 @@ package org.jetbrains.skiko.redrawer
 
 import org.jetbrains.skia.Surface
 import kotlinx.coroutines.*
-import org.jetbrains.skiko.FrameDispatcher
+import org.jetbrains.skiko.*
 import org.jetbrains.skiko.FrameLimiter
-import org.jetbrains.skiko.RenderException
-import org.jetbrains.skiko.MainUIDispatcher
-import org.jetbrains.skiko.SkiaLayer
-import org.jetbrains.skiko.SkiaLayerProperties
 import org.jetbrains.skiko.context.DirectSoftwareContextHandler
 
 internal abstract class AbstractDirectSoftwareRedrawer(
     private val layer: SkiaLayer,
+    analytics: SkiaLayerAnalytics,
     private val properties: SkiaLayerProperties
-) : Redrawer {
+) : AWTRedrawer(layer, analytics, GraphicsApi.SOFTWARE_FAST) {
     private val contextHandler = DirectSoftwareContextHandler(layer)
     override val renderInfo: String get() = contextHandler.rendererInfo()
 
@@ -25,7 +22,7 @@ internal abstract class AbstractDirectSoftwareRedrawer(
         }
 
         if (layer.isShowing) {
-            layer.update(System.nanoTime())
+            update(System.nanoTime())
             draw()
         }
     }
@@ -36,11 +33,11 @@ internal abstract class AbstractDirectSoftwareRedrawer(
         frameDispatcher.scheduleFrame()
     }
 
-    protected open fun draw() = layer.inDrawScope(contextHandler::draw)
+    protected open fun draw() = inDrawScope(contextHandler::draw)
 
     override fun redrawImmediately() {
-        layer.update(System.nanoTime())
-        layer.inDrawScope(contextHandler::draw)
+        update(System.nanoTime())
+        draw()
     }
 
     open fun resize(width: Int, height: Int) = resize(device, width, height)

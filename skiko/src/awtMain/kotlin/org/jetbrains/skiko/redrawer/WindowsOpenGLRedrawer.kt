@@ -8,8 +8,9 @@ import org.jetbrains.skiko.context.OpenGLContextHandler
 
 internal class WindowsOpenGLRedrawer(
     private val layer: SkiaLayer,
+    analytics: SkiaLayerAnalytics,
     private val properties: SkiaLayerProperties
-) : Redrawer {
+) : AWTRedrawer(layer, analytics, GraphicsApi.OPENGL) {
     private val contextHandler = OpenGLContextHandler(layer)
     override val renderInfo: String get() = contextHandler.rendererInfo()
 
@@ -19,11 +20,14 @@ internal class WindowsOpenGLRedrawer(
             throw RenderException("Cannot create Windows GL context")
         }
         makeCurrent(device, it)
-        if (!isVideoCardSupported(layer.renderApi)) {
+        if (!isVideoCardSupported(GraphicsApi.OPENGL, adapterName)) {
             throw RenderException("Cannot create Windows GL context")
         }
+        onDeviceChosen(adapterName)
     }
     private var isDisposed = false
+
+    private val adapterName get() = OpenGLApi.instance.glGetString(OpenGLApi.instance.GL_RENDERER)
 
     init {
         makeCurrent()
@@ -32,6 +36,7 @@ internal class WindowsOpenGLRedrawer(
         // With dwmFlush it is stable (16.6-16.8 ms)
         // GLFW also uses dwmFlush (https://www.glfw.org/docs/3.0/window.html#window_swap)
         setSwapInterval(0)
+        onContextInit()
     }
 
     override fun dispose() {
@@ -50,7 +55,7 @@ internal class WindowsOpenGLRedrawer(
 
     override fun redrawImmediately() {
         check(!isDisposed) { "WindowsOpenGLRedrawer is disposed" }
-        layer.inDrawScope {
+        inDrawScope {
             update(System.nanoTime())
             makeCurrent()
             contextHandler.draw()
@@ -59,12 +64,8 @@ internal class WindowsOpenGLRedrawer(
         }
     }
 
-    private fun update(nanoTime: Long) {
-        layer.update(nanoTime)
-    }
-
     private fun draw() {
-        layer.inDrawScope(contextHandler::draw)
+        inDrawScope(contextHandler::draw)
     }
 
     private fun makeCurrent() = makeCurrent(device, context)

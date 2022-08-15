@@ -33,10 +33,12 @@ internal class UiTestScope(
 ) : CoroutineScope by scope {
     fun UiTestWindow(
         properties: SkiaLayerProperties = SkiaLayerProperties(),
+        analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
         renderFactory: RenderFactory = RenderFactory.Default
     ) = object : UiTestWindow() {
         override val layer: SkiaLayer = SkiaLayer(
             properties = properties.copy(renderApi = renderApi),
+            analytics = analytics,
             renderFactory = renderFactory
         )
 
