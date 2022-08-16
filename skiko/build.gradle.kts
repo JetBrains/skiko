@@ -1082,7 +1082,10 @@ tasks.withType<Test>().configureEach {
         systemProperty("skiko.test.screenshots.dir", File(project.projectDir, "src/jvmTest/screenshots").absolutePath)
         systemProperty("skiko.test.font.dir", File(project.projectDir, "src/commonTest/resources/fonts").absolutePath)
 
-        val canRunUiTests = System.getProperty("os.name") != "Mac OS X"
+        val testingOnCI = System.getProperty("skiko.test.onci", "false").toBoolean()
+        val canRunPerformanceTests = testingOnCI
+        val canRunUiTests = testingOnCI || System.getProperty("os.name") != "Mac OS X"
+        systemProperty("skiko.test.performance.enabled", System.getProperty("skiko.test.performance.enabled", canRunPerformanceTests.toString()))
         systemProperty("skiko.test.ui.enabled", System.getProperty("skiko.test.ui.enabled", canRunUiTests.toString()))
         systemProperty("skiko.test.ui.renderApi", System.getProperty("skiko.test.ui.renderApi", "all"))
 
