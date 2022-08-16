@@ -55,7 +55,8 @@ internal abstract class AbstractDirectSoftwareRedrawer(
         disposeDevice(device)
         runBlocking {
             frameJob.cancelAndJoin()
-        }  
+        }
+        super.dispose()
     }
 
     private external fun resize(devicePtr: Long, width: Int, height: Int)

@@ -41,6 +41,7 @@ internal class SoftwareRedrawer(
         runBlocking {
             frameJob.cancelAndJoin()
         }
+        super.dispose()
     }
 
     override fun needRedraw() {

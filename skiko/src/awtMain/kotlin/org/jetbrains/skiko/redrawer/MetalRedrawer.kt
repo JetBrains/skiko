@@ -23,7 +23,6 @@ internal class MetalRedrawer(
             Library.load()
         }
     }
-    private var isDisposed = false
     private var drawLock = Any()
 
     private val device: Long
@@ -61,7 +60,7 @@ internal class MetalRedrawer(
         frameDispatcher.cancel()
         contextHandler.dispose()
         disposeDevice(device)
-        isDisposed = true
+        super.dispose()
     }
 
     override fun needRedraw() {

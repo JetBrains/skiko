@@ -12,7 +12,6 @@ internal class LinuxOpenGLRedrawer(
     private val contextHandler = OpenGLContextHandler(layer)
     override val renderInfo: String get() = contextHandler.rendererInfo()
 
-    private var isDisposed = false
     private var context = 0L
     private val swapInterval = if (properties.isVsyncEnabled) 1 else 0
 
@@ -66,7 +65,7 @@ internal class LinuxOpenGLRedrawer(
         runBlocking {
             frameJob.cancelAndJoin()
         }
-        isDisposed = true
+        super.dispose()
     }
 
     override fun needRedraw() {

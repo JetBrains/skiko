@@ -25,7 +25,6 @@ internal class WindowsOpenGLRedrawer(
         }
         onDeviceChosen(adapterName)
     }
-    private var isDisposed = false
 
     private val adapterName get() = OpenGLApi.instance.glGetString(OpenGLApi.instance.GL_RENDERER)
 
@@ -44,7 +43,7 @@ internal class WindowsOpenGLRedrawer(
         makeCurrent()
         contextHandler.dispose()
         deleteContext(context)
-        isDisposed = true
+        super.dispose()
     }
 
     override fun needRedraw() {

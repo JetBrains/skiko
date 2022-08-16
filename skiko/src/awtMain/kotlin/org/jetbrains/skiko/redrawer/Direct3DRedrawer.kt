@@ -15,7 +15,6 @@ internal class Direct3DRedrawer(
     private val contextHandler = Direct3DContextHandler(layer)
     override val renderInfo: String get() = contextHandler.rendererInfo()
 
-    private var isDisposed = false
     private var drawLock = Any()
 
     private val device: Long
@@ -48,7 +47,7 @@ internal class Direct3DRedrawer(
         frameDispatcher.cancel()
         contextHandler.dispose()
         disposeDevice(device)
-        isDisposed = true
+        super.dispose()
     }
 
     override fun needRedraw() {
