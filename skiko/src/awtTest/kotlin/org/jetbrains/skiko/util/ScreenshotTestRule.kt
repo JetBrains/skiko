@@ -1,8 +1,6 @@
 package org.jetbrains.skiko.util
 
 import org.jetbrains.skia.Image
-import org.jetbrains.skiko.OS
-import org.jetbrains.skiko.hostOs
 import org.jetbrains.skiko.toImage
 import org.junit.rules.TestRule
 import org.junit.runner.Description
@@ -10,7 +8,6 @@ import org.junit.runners.model.Statement
 import java.awt.Rectangle
 import java.awt.Robot
 import java.io.File
-import javax.imageio.ImageIO
 
 // WARNING!!!
 // macOS has wrong colors ([128, 128, 128] isn't [128, 128, 128] on screenshot). Only white, black, red and green are correct.
