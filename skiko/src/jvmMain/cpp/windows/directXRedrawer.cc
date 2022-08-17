@@ -19,18 +19,6 @@
 
 const int BuffersCount = 2;
 
-// This is a list of not supported graphics cards that have rendering issues (black screen, flickering)
-// with the current Swing/Skia integration.
-// If PC has other graphics cards suitable for DirectX12, one of them will be used. Otherwise,
-// rendering will falls back to OpenGL.
-const std::vector<std::wstring> notSupportedAdapters{
-    L"Intel(R) HD Graphics 520",
-    L"Intel(R) HD Graphics 530",
-    L"Intel(R) HD Graphics 4400",
-    L"NVIDIA GeForce GTX 750 Ti",
-    L"NVIDIA GeForce GTX 960M",
-    L"NVIDIA Quadro M2000M"};
-
 class DirectXDevice
 {
 public:
@@ -214,94 +202,63 @@ extern "C"
         return impl(pSrcData, SrcDataSize, pSourceName, pDefines, pInclude, pEntrypoint, pTarget, Flags1, Flags2, ppCode, ppErrorMsgs);
     }
 
-    bool isNotSupported(IDXGIAdapter1 *hardwareAdapter)
-    {
+    bool isAdapterSupported(JNIEnv *env, jobject redrawer, IDXGIAdapter1 *hardwareAdapter) {
         DXGI_ADAPTER_DESC1 desc;
         hardwareAdapter->GetDesc1(&desc);
-        if ((desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) != 0)
-        {
-            return true;
+        if ((desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) != 0) {
+            return false;
         }
-        std::wstring currentAdapterName(desc.Description);
-        for (std::wstring name : notSupportedAdapters)
-        {
-            if (currentAdapterName == name)
-            {
-                fwprintf(stderr, L"Graphics card %s is not supported.\n", name.c_str());
-                return true;
-            }
-        }
-        return false;
+
+        std::wstring tmp(desc.Description);
+        std::string name(tmp.begin(), tmp.end());
+        jstring jname = env->NewStringUTF(name.c_str());
+
+        static jclass cls = (jclass) env->NewGlobalRef(env->FindClass("org/jetbrains/skiko/redrawer/Direct3DRedrawer"));
+        static jmethodID method = env->GetMethodID(cls, "isAdapterSupported", "(Ljava/lang/String;)Z");
+
+        return env->CallBooleanMethod(redrawer, method, jname);
     }
 
-    bool defineHardwareAdapter(DXGI_GPU_PREFERENCE adapterPriority, IDXGIFactory4 *pFactory, IDXGIAdapter1 **ppAdapter)
-    {
-        *ppAdapter = nullptr;
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_chooseAdapter(
+            JNIEnv *env, jobject redrawer, jint adapterPriority) {
+        gr_cp<IDXGIFactory4> deviceFactory;
+        if (!SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&deviceFactory)))) {
+            return 0;
+        }
 
-#if defined(__dxgi1_6_h__) && defined(NTDDI_WIN10_RS4)
         gr_cp<IDXGIFactory6> factory6;
-        if (SUCCEEDED(pFactory->QueryInterface(IID_PPV_ARGS(&factory6))))
-        {
-            for (UINT adapterIndex = 0;; ++adapterIndex)
-            {
-                IDXGIAdapter1 *pAdapter = nullptr;
-                if (!SUCCEEDED(factory6->EnumAdapterByGpuPreference(adapterIndex, adapterPriority, IID_PPV_ARGS(&pAdapter))))
-                {
-                    break;
-                }
-                if (SUCCEEDED(D3D12CreateDevice(pAdapter, D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), nullptr)))
-                {
-                    if (isNotSupported(pAdapter))
-                    {
-                        pAdapter->Release();
-                        continue;
-                    }
-                    *ppAdapter = pAdapter;
-                    return true;
-                }
-                pAdapter->Release();
-            }
+        if (!SUCCEEDED(deviceFactory->QueryInterface(IID_PPV_ARGS(&factory6)))) {
+            return 0;
         }
-#endif
 
-        if (*ppAdapter == nullptr)
-        {
-            for (UINT adapterIndex = 0;; ++adapterIndex)
-            {
-                IDXGIAdapter1 *pAdapter = nullptr;
-                if (DXGI_ERROR_NOT_FOUND == pFactory->EnumAdapters1(adapterIndex, &pAdapter))
-                {
-                    break;
-                }
-                if (SUCCEEDED(D3D12CreateDevice(pAdapter, D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), nullptr)))
-                {
-                    if (isNotSupported(pAdapter))
-                    {
-                        pAdapter->Release();
-                        continue;
-                    }
-                    *ppAdapter = pAdapter;
-                    return true;
-                }
-                pAdapter->Release();
+        for (UINT adapterIndex = 0;; ++adapterIndex) {
+            IDXGIAdapter1 *adapter = nullptr;
+            if (!SUCCEEDED(factory6->EnumAdapterByGpuPreference(adapterIndex, (DXGI_GPU_PREFERENCE) adapterPriority, IID_PPV_ARGS(&adapter)))) {
+                break;
+            }
+            if (
+                SUCCEEDED(D3D12CreateDevice(adapter, D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), nullptr)) &&
+                isAdapterSupported(env, redrawer, adapter)
+            ) {
+                return toJavaPointer(adapter);
+            } else {
+                adapter->Release();
             }
         }
-        return false;
+
+        return 0;
     }
 
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_createDirectXDevice(
-        JNIEnv *env, jobject redrawer, jint adapterPriority, jlong contentHandle, jboolean transparency)
-    {
+        JNIEnv *env, jobject redrawer, jlong adapterPtr, jlong contentHandle, jboolean transparency) {
         gr_cp<IDXGIFactory4> deviceFactory;
-        if (!SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&deviceFactory))))
-        {
+        if (!SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&deviceFactory)))) {
             return 0;
         }
-        gr_cp<IDXGIAdapter1> hardwareAdapter;
-        if (!defineHardwareAdapter((DXGI_GPU_PREFERENCE) adapterPriority, deviceFactory.get(), &hardwareAdapter))
-        {
+        if (adapterPtr == 0) {
             return 0;
         }
+        gr_cp<IDXGIAdapter1> adapter((IDXGIAdapter1 *) adapterPtr);
 
         D3D_FEATURE_LEVEL maxSupportedFeatureLevel = D3D_FEATURE_LEVEL_11_0;
         D3D_FEATURE_LEVEL featureLevels[] = {
@@ -311,21 +268,17 @@ extern "C"
             D3D_FEATURE_LEVEL_11_0
         };
 
-        for (int i = 0; i < _countof(featureLevels); i++)
-        {
-            if (SUCCEEDED(D3D12CreateDevice(hardwareAdapter.get(), featureLevels[i], _uuidof(ID3D12Device), nullptr)))
-            {
+        for (int i = 0; i < _countof(featureLevels); i++) {
+            if (SUCCEEDED(D3D12CreateDevice(adapter.get(), featureLevels[i], _uuidof(ID3D12Device), nullptr))) {
                 maxSupportedFeatureLevel = featureLevels[i];
                 break;
             }
         }
 
         gr_cp<ID3D12Device> device;
-        if (!SUCCEEDED(D3D12CreateDevice(hardwareAdapter.get(), maxSupportedFeatureLevel, IID_PPV_ARGS(&device))))
-        {
+        if (!SUCCEEDED(D3D12CreateDevice(adapter.get(), maxSupportedFeatureLevel, IID_PPV_ARGS(&device)))) {
             return 0;
         }
-        deviceFactory.reset(nullptr);
 
         // Create the command queue
         gr_cp<ID3D12CommandQueue> queue;
@@ -333,13 +286,12 @@ extern "C"
         queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
         queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
 
-        if (!SUCCEEDED(device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&queue))))
-        {
+        if (!SUCCEEDED(device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&queue)))) {
             return 0;
         }
 
         DirectXDevice *d3dDevice = new DirectXDevice();
-        d3dDevice->backendContext.fAdapter = hardwareAdapter;
+        d3dDevice->backendContext.fAdapter = adapter;
         d3dDevice->backendContext.fDevice = device;
         d3dDevice->backendContext.fQueue = queue;
         d3dDevice->backendContext.fProtectedContext = GrProtected::kNo;
@@ -348,8 +300,7 @@ extern "C"
         d3dDevice->queue = queue;
         d3dDevice->window = (HWND)contentHandle;
 
-        if (transparency)
-        {
+        if (transparency) {
             //TODO: current swapChain does not support transparency
             return 0;
             // HWND wnd = GetAncestor(d3dDevice->window, GA_PARENT);
@@ -493,24 +444,23 @@ extern "C"
         }
     }
 
-    JNIEXPORT jstring JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_getAdapterName(JNIEnv *env, jobject redrawer, jlong devicePtr)
+    JNIEXPORT jstring JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_getAdapterName(JNIEnv *env, jobject redrawer, jlong adapterPtr)
     {
-        DirectXDevice *d3dDevice = fromJavaPointer<DirectXDevice *>(devicePtr);
+        IDXGIAdapter1 *adapter = fromJavaPointer<IDXGIAdapter1 *>(adapterPtr);
 
         DXGI_ADAPTER_DESC1 desc;
-        d3dDevice->backendContext.fAdapter->GetDesc1(&desc);
+        adapter->GetDesc1(&desc);
         std::wstring w_tmp(desc.Description);
         std::string currentAdapterName(w_tmp.begin(), w_tmp.end());
-        jstring result = env->NewStringUTF(currentAdapterName.c_str());
-        return result;
+        return env->NewStringUTF(currentAdapterName.c_str());
     }
 
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_getAdapterMemorySize(JNIEnv *env, jobject redrawer, jlong devicePtr)
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_getAdapterMemorySize(JNIEnv *env, jobject redrawer, jlong adapterPtr)
     {
-        DirectXDevice *d3dDevice = fromJavaPointer<DirectXDevice *>(devicePtr);
+        IDXGIAdapter1 *adapter = fromJavaPointer<IDXGIAdapter1 *>(adapterPtr);
 
         DXGI_ADAPTER_DESC1 desc;
-        d3dDevice->backendContext.fAdapter->GetDesc1(&desc);
+        adapter->GetDesc1(&desc);
         __int64 result = desc.DedicatedVideoMemory;
         return (jlong)result;
     }

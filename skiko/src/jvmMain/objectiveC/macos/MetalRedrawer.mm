@@ -31,7 +31,7 @@
 
 @property (weak) CALayer *container;
 @property (retain, strong) AWTMetalLayer *layer;
-@property (retain, strong) id<MTLDevice> device;
+@property (retain, strong) id<MTLDevice> adapter;
 @property (retain, strong) id<MTLCommandQueue> queue;
 @property (retain, strong) id<CAMetalDrawable> drawableHandle;
 
@@ -63,7 +63,7 @@
     if (self)
     {
         self.layer = nil;
-        self.device = nil;
+        self.adapter = nil;
         self.queue = nil;
         self.drawableHandle = nil;
     }
@@ -82,7 +82,7 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_makeMeta
     @autoreleasepool {
         MetalDevice *device = (__bridge MetalDevice *) (void*) devicePtr;
         GrMtlBackendContext backendContext = {};
-        backendContext.fDevice.retain((__bridge GrMTLHandle) device.device);
+        backendContext.fDevice.retain((__bridge GrMTLHandle) device.adapter);
         backendContext.fQueue.retain((__bridge GrMTLHandle) device.queue);
         return (jlong) GrDirectContext::MakeMetal(backendContext).release();
     }
@@ -177,10 +177,21 @@ id<MTLDevice> MTLCreateIntegratedDevice(int adapterPriority) {
     return gpu;
 }
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMetalDevice(
-    JNIEnv *env, jobject redrawer, jlong windowPtr, jboolean transparency, jint adapterPriority, jlong platformInfoPtr)
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_chooseAdapter(
+    JNIEnv *env, jobject redrawer, jlong adapterPriority)
 {
     @autoreleasepool {
+        id<MTLDevice> adapter = MTLCreateIntegratedDevice(adapterPriority);
+        return (jlong) (__bridge_retained void *) adapter;
+    }
+}
+
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMetalDevice(
+    JNIEnv *env, jobject redrawer, jlong windowPtr, jboolean transparency, jlong adapterPtr, jlong platformInfoPtr)
+{
+    @autoreleasepool {
+        id<MTLDevice> adapter = (__bridge_transfer id<MTLDevice>) (void *) adapterPtr;
+
         MetalDevice *device = [MetalDevice new];
 
         NSObject<JAWT_SurfaceLayers>* dsi_mac = (__bridge NSObject<JAWT_SurfaceLayers> *) (void*) platformInfoPtr;
@@ -194,15 +205,14 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
         [container addSublayer: layer];
         layer.javaRef = env->NewGlobalRef(redrawer);
 
-        id<MTLDevice> fDevice = MTLCreateIntegratedDevice(adapterPriority);
-        id<MTLCommandQueue> fQueue = [fDevice newCommandQueue];
+        id<MTLCommandQueue> fQueue = [adapter newCommandQueue];
 
         device.container = container;
         device.layer = layer;
-        device.device = fDevice;
+        device.adapter = adapter;
         device.queue = fQueue;
 
-        device.layer.device = device.device;
+        device.layer.device = device.adapter;
         device.layer.pixelFormat = MTLPixelFormatBGRA8Unorm;
         device.layer.contentsGravity = kCAGravityTopLeft;
 
@@ -296,22 +306,21 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_disposeDe
 }
 
 JNIEXPORT jstring JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_getAdapterName(
-    JNIEnv *env, jobject redrawer, jlong devicePtr)
+    JNIEnv *env, jobject redrawer, jlong adapterPtr)
 {
     @autoreleasepool {
-        MetalDevice *device = (__bridge MetalDevice *) (void *) devicePtr;
-        const char *currentAdapterName = [[device.device name] cStringUsingEncoding:NSASCIIStringEncoding];
-        jstring result = env->NewStringUTF(currentAdapterName);
-        return result;
+        id<MTLDevice> adapter = (__bridge id<MTLDevice>) (void *) adapterPtr;
+        const char *currentAdapterName = [[adapter name] cStringUsingEncoding:NSASCIIStringEncoding];
+        return env->NewStringUTF(currentAdapterName);
     }
 }
 
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_getAdapterMemorySize(
-    JNIEnv *env, jobject redrawer, jlong devicePtr)
+    JNIEnv *env, jobject redrawer, jlong adapterPtr)
 {
     @autoreleasepool {
-        MetalDevice *device = (__bridge MetalDevice *) (void *) devicePtr;
-        uint64_t totalMemory = [device.device recommendedMaxWorkingSetSize];
+        id<MTLDevice> adapter = (__bridge id<MTLDevice>) (void *) adapterPtr;
+        uint64_t totalMemory = [adapter recommendedMaxWorkingSetSize];
         return (jlong)totalMemory;
     }
 }

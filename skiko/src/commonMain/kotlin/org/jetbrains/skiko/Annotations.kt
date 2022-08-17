@@ -15,3 +15,15 @@ package org.jetbrains.skiko
             " Make sure you fully read and understand documentation of the declaration that is marked as a delicate API."
 )
 annotation class DelicateSkikoApi
+
+/**
+ * Marks declarations that are experimental and don't have stable API yet.
+ */
+@MustBeDocumented
+@Retention(value = AnnotationRetention.BINARY)
+@RequiresOptIn(
+    level = RequiresOptIn.Level.WARNING,
+    message = "This is an experimental API and can be changed in the near future. The behaviour isn't properly tested" +
+            "and can have bugs."
+)
+annotation class ExperimentalSkikoApi

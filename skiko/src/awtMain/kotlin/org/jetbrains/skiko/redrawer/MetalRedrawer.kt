@@ -12,8 +12,9 @@ import javax.swing.SwingUtilities.*
 
 internal class MetalRedrawer(
     private val layer: SkiaLayer,
+    analytics: SkiaLayerAnalytics,
     private val properties: SkiaLayerProperties
-) : Redrawer {
+) : AWTRedrawer(layer, analytics, GraphicsApi.METAL) {
     private val contextHandler = MetalContextHandler(layer)
     override val renderInfo: String get() = contextHandler.rendererInfo()
 
@@ -22,11 +23,22 @@ internal class MetalRedrawer(
             Library.load()
         }
     }
-    private var isDisposed = false
     private var drawLock = Any()
-    private val device = layer.backedLayer.useDrawingSurfacePlatformInfo {
-        createMetalDevice(layer.windowHandle, layer.transparency, properties.adapterPriority.ordinal, it)
+
+    private val device: Long
+    val adapterName: String
+    val adapterMemorySize: Long
+
+    init {
+        val adapter = chooseAdapter(properties.adapterPriority.ordinal)
+        adapterName = getAdapterName(adapter)
+        adapterMemorySize = getAdapterMemorySize(adapter)
+        onDeviceChosen(adapterName)
+        device = layer.backedLayer.useDrawingSurfacePlatformInfo {
+            createMetalDevice(layer.windowHandle, layer.transparency, adapter, it)
+        }
     }
+
     private val windowHandle = layer.windowHandle
 
     init {
@@ -40,11 +52,15 @@ internal class MetalRedrawer(
         }
     }
 
+    init {
+        onContextInit()
+    }
+
     override fun dispose() = synchronized(drawLock) {
         frameDispatcher.cancel()
         contextHandler.dispose()
         disposeDevice(device)
-        isDisposed = true
+        super.dispose()
     }
 
     override fun needRedraw() {
@@ -54,16 +70,12 @@ internal class MetalRedrawer(
 
     override fun redrawImmediately() {
         check(!isDisposed) { "MetalRedrawer is disposed" }
-        layer.inDrawScope {
+        inDrawScope {
             setVSyncEnabled(device, enabled = false)
             update(System.nanoTime())
             performDraw()
             setVSyncEnabled(device, properties.isVsyncEnabled)
         }
-    }
-
-    private fun update(nanoTime: Long) {
-        layer.update(nanoTime)
     }
 
     private suspend fun draw() {
@@ -78,7 +90,7 @@ internal class MetalRedrawer(
         //
         // Executors.newSingleThreadExecutor().asCoroutineDispatcher(): 50 FPS, 150% CPU
         // Dispatchers.IO: 50 FPS, 200% CPU
-        layer.inDrawScope {
+        inDrawScope {
             withContext(Dispatchers.IO) {
                 performDraw()
             }
@@ -127,10 +139,8 @@ internal class MetalRedrawer(
 
     fun finishFrame() = finishFrame(device)
 
-    fun getAdapterName(): String = getAdapterName(device)
-    fun getAdapterMemorySize(): Long = getAdapterMemorySize(device)
-
-    private external fun createMetalDevice(window:Long, transparency: Boolean, adapterPriority: Int, platformInfo: Long): Long
+    private external fun chooseAdapter(adapterPriority: Int): Long
+    private external fun createMetalDevice(window:Long, transparency: Boolean, adapter: Long, platformInfo: Long): Long
     private external fun makeMetalContext(device: Long): Long
     private external fun makeMetalRenderTarget(device: Long, width: Int, height: Int): Long
     private external fun disposeDevice(device: Long)
@@ -139,8 +149,8 @@ internal class MetalRedrawer(
     private external fun setContentScale(device: Long, contentScale: Float)
     private external fun setVSyncEnabled(device: Long, enabled: Boolean)
     private external fun isOccluded(window: Long): Boolean
-    private external fun getAdapterName(device: Long): String
-    private external fun getAdapterMemorySize(device: Long): Long
+    private external fun getAdapterName(adapter: Long): String
+    private external fun getAdapterMemorySize(adapter: Long): Long
     private external fun startRendering(): Long
     private external fun endRendering(handle: Long)
 }

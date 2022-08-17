@@ -26,6 +26,7 @@ internal actual fun makeDefaultRenderFactory(): RenderFactory {
         override fun createRedrawer(
             layer: SkiaLayer,
             renderApi: GraphicsApi,
+            analytics: SkiaLayerAnalytics,
             properties: SkiaLayerProperties
         ): Redrawer = when (hostOs) {
             OS.Android -> AndroidOpenGLRedrawer(layer, properties)
