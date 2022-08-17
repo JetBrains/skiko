@@ -9,6 +9,7 @@ import platform.darwin.NSInteger
 
 const val LOG_OLD = false
 
+@Suppress("CONFLICTING_OVERLOADS")
 @ExportObjCClass
 class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInputTraitsProtocol, UITextPasteConfigurationSupportingProtocol {
     @OverrideInit
@@ -332,7 +333,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
         inDirection: UITextLayoutDirection,
         offset: NSInteger
     ): UITextPosition? {
-//        println("TODO positionFromPosition with inDirection") //todo use inDirection
+        TODO("positionFromPosition with inDirection: ${inDirection.directionToStr()}") //todo use inDirection
         return positionFromPosition(position, offset)
     }
 
@@ -363,29 +364,28 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
         return _tokenizer as UITextInputStringTokenizer
     }
 
-    override fun positionWithinRange(range: UITextRange, farthestInDirection: UITextLayoutDirection): UITextPosition? {
-//        println("TODO positionWithinRange")//todo
-        return null
-    }
+    override fun positionWithinRange(range: UITextRange, atCharacterOffset: NSInteger): UITextPosition? =
+        TODO("positionWithinRange with default super")//super.positionWithinRange(range, atCharacterOffset)
+
+    override fun positionWithinRange(range: UITextRange, farthestInDirection: UITextLayoutDirection): UITextPosition? =
+        TODO("positionWithinRange, farthestInDirection: ${farthestInDirection.directionToStr()}")
 
     override fun characterRangeByExtendingPosition(
         position: UITextPosition,
         inDirection: UITextLayoutDirection
     ): UITextRange? {
-//        println("TODO characterRangeByExtendingPosition")//todo
-        return null
+        TODO("characterRangeByExtendingPosition, inDirection: ${inDirection.directionToStr()}")
     }
 
     override fun baseWritingDirectionForPosition(
         position: UITextPosition,
         inDirection: UITextStorageDirection
     ): NSWritingDirection {
-//        println("TODO baseWritingDirectionForPosition")//todo
-        return NSWritingDirectionLeftToRight
+        return NSWritingDirectionLeftToRight // TODO support RTL text direction
     }
 
     override fun setBaseWritingDirection(writingDirection: NSWritingDirection, forRange: UITextRange) {
-//        println("TODO setBaseWritingDirection")//todo
+        TODO("setBaseWritingDirection, writingDirection: ${writingDirection.directionToStr()}")
     }
 
     //Working with Geometry and Hit-Testing---------------------------------------------------------------------------
@@ -437,16 +437,14 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
     //---------------------------------------------------------------------------------------------------------
 
     override fun textStylingAtPosition(position: UITextPosition, inDirection: UITextStorageDirection): Map<Any?, *>? {
-//        println("TODO textStylingAtPosition")
         return NSDictionary.dictionary()
     }
 
     override fun characterOffsetOfPosition(position: UITextPosition, withinRange: UITextRange): NSInteger {
-        TODO("TODO characterOffsetOfPosition")
+        TODO("characterOffsetOfPosition")
     }
 
     override fun shouldChangeTextInRange(range: UITextRange, replacementText: String): Boolean {
-//        println("TODO shouldChangeTextInRange")
         // Here we should decide to replace text in range or not.
         // By default, this method returns true.
         return true
@@ -457,7 +455,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
     }
 
     override fun canPerformAction(action: COpaquePointer?, withSender: Any?): Boolean {
-//        println("TODO canPerformAction, action: ${action}")
+        //todo context menu with actions
         return true
     }
 
@@ -581,4 +579,10 @@ fun SkikoPoint.toCGPoint() = CGPointMake(x = x, y = y)
 
 //todo When TextField focus lost - unmark text
 
+private fun NSWritingDirection.directionToStr() =
+    when (this) {
+        UITextLayoutDirectionLeft -> "Left"
+        UITextLayoutDirectionRight -> "Right"
+        else -> "unknown direction"
+    }
 

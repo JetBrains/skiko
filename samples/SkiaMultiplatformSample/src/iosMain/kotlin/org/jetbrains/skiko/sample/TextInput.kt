@@ -6,9 +6,7 @@ import org.jetbrains.skia.paragraph.ParagraphBuilder
 import org.jetbrains.skia.paragraph.ParagraphStyle
 import org.jetbrains.skia.paragraph.TextStyle
 import org.jetbrains.skiko.*
-import kotlin.math.cos
-import kotlin.math.sin
-import kotlin.math.PI
+import org.jetbrains.skiko.data.*
 
 class TextInput(val getText: () -> String) : SkikoView {
     private val cursorManager = CursorManager()
@@ -52,39 +50,19 @@ class TextInput(val getText: () -> String) : SkikoView {
 
     override val input: SkikoInput = object : SkikoInput {
         override fun hasText(): Boolean = true
-
-        override fun insertText(text: String) {
-
-        }
-
-        override fun deleteBackward() {
-
-        }
-
-        override fun endOfDocument(): Long = 1L
-
-        override fun selectedTextRange(): SkikoTextRange? {
-            return null
-        }
-
-        override fun textInRange(range: SkikoTextRange): String? {
-            return null
-        }
-
-        override fun replaceRange(range: SkikoTextRange, text: String) {
-
-        }
-
-        override fun setMarkedText(markedText: String?, selectedRange: SkikoTextRange) {
-
-        }
-
+        override fun insertText(text: String) {}
+        override fun deleteBackward() {}
+        override fun endOfDocument(): Long = 10L
+        override fun selectedTextRange(): SkikoTextRange? = null
+        override fun textInRange(range: SkikoTextRange): String? = "qwe"
+        override fun replaceRange(range: SkikoTextRange, text: String){}
+        override fun setMarkedText(markedText: String?, selectedRange: SkikoTextRange){}
         override fun markedTextRange(): SkikoTextRange? = null
-
-        override fun unmarkText() {
-
-        }
-
+        override fun unmarkText() {}
+        override fun firstRectForRange(range: SkikoTextRange): SkikoRect? = null
+        override fun caretRectForPosition(position: Long): SkikoRect? = null
+        override fun selectionRectsForRange(range: SkikoTextRange): List<SkikoRect> = emptyList()
+        override fun closestPositionToPoint(point: SkikoPoint):Int = 0
     }
 
     override fun onKeyboardEvent(event: SkikoKeyboardEvent) {
