@@ -255,6 +255,15 @@ class Paragraph internal constructor(ptr: NativePointer, text: ManagedString?) :
         }
     }
 
+    fun getText(): String {
+        return try {
+            return _text.toString()
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(_text)
+        }
+    }
+
     private object _FinalizerHolder {
         val PTR = Paragraph_nGetFinalizer()
     }
