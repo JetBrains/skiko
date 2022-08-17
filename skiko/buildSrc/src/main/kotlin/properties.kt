@@ -68,14 +68,14 @@ enum class SkiaBuildType(
         "Debug",
         flags = arrayOf("-DSK_DEBUG"),
         clangFlags = arrayOf("-std=c++17", "-g"),
-        msvcCompilerFlags = arrayOf("/Zi"),
+        msvcCompilerFlags = arrayOf("/Zi /std:c++17"),
         msvcLinkerFlags = arrayOf("/DEBUG"),
     ),
     RELEASE(
         id = "Release",
         flags = arrayOf("-DNDEBUG"),
         clangFlags = arrayOf("-std=c++17", "-O3"),
-        msvcCompilerFlags = arrayOf("/O2"),
+        msvcCompilerFlags = arrayOf("/O2 /std:c++17"),
         msvcLinkerFlags = arrayOf("/DEBUG"),
     );
     override fun toString() = id
