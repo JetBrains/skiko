@@ -1,10 +1,12 @@
-package org.jetbrains.skiko
+package org.jetbrains.skiko.tests.org.jetbrains.skiko
 
 import org.jetbrains.skia.*
+import org.jetbrains.skiko.toBitmap
+import org.jetbrains.skiko.toBufferedImage
 import org.junit.Test
 import kotlin.test.assertEquals
 
-class ConvertorsTest {
+class ConvertorsTests {
 
     @Test
     fun canConvertBitmapToBufferedImage() {

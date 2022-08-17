@@ -5,6 +5,7 @@ import java.net.URL
 import java.net.URLClassLoader
 import java.nio.file.Paths
 import kotlin.concurrent.thread
+import kotlin.test.Ignore
 
 private class PlatformAndURLClassLoader(classpath: List<URL>) :
     ClassLoader(getPlatformClassLoader()) {
@@ -68,7 +69,7 @@ private fun newInstance(loader: ClassLoader, fqName: String, vararg args: Any): 
         .newInstance(*args)
 }
 
-class SeveralClassloadersTest {
+class SeveralClassloaders {
     @Test
     fun `load skiko in several classloaders (with skiko path)`()  {
         check(skikoLibraryPath != null)
