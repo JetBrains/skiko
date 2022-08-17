@@ -658,7 +658,7 @@ fun createObjcCompileTask(
     dependsOn(skiaJvmBindingsDir)
 
     val srcDirs = projectDirs(
-        "src/jvmMain/objectiveC/${os.id}"
+        "src/awtMain/objectiveC/${os.id}"
     )
     sourceRoots.set(srcDirs)
     val jdkHome = File(System.getProperty("java.home") ?: error("'java.home' is null"))
@@ -666,7 +666,7 @@ fun createObjcCompileTask(
     includeHeadersNonRecursive(jdkHome.resolve("include"))
     includeHeadersNonRecursive(jdkHome.resolve("include/darwin"))
     includeHeadersNonRecursive(skiaHeadersDirs(skiaJvmBindingsDir.get()))
-    includeHeadersNonRecursive(projectDir.resolve("src/jvmMain/cpp/include"))
+    includeHeadersNonRecursive(projectDir.resolve("src/awtMain/cpp/include"))
     includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp/common/include"))
 
     compiler.set("clang")
@@ -778,12 +778,14 @@ fun createCompileJvmBindingsTask(
     val srcDirs = projectDirs(
         "src/commonMain/cpp/common",
         "src/jvmMain/cpp/common",
-        "src/jvmMain/cpp/${targetOs.id}",
+        "src/awtMain/cpp/common",
+        "src/awtMain/cpp/${targetOs.id}",
         "src/jvmTest/cpp"
     )
     sourceRoots.set(srcDirs)
     if (targetOs != OS.Android) includeHeadersNonRecursive(jdkHome.resolve("include"))
     includeHeadersNonRecursive(skiaHeadersDirs(skiaJvmBindingsDir.get()))
+    includeHeadersNonRecursive(projectDir.resolve("src/awtMain/cpp/include"))
     includeHeadersNonRecursive(projectDir.resolve("src/jvmMain/cpp/include"))
     includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp/common/include"))
 
