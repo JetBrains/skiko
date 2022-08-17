@@ -4,6 +4,7 @@
 #include "exceptions_handler.h"
 #include "window_util.h"
 
+#include "SkColorSpace.h"
 #include "SkSurface.h"
 #include "src/core/SkAutoMalloc.h"
 

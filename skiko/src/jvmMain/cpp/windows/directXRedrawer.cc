@@ -6,6 +6,7 @@
 #include "exceptions_handler.h"
 #include "window_util.h"
 
+#include "SkColorSpace.h"
 #include "GrBackendSurface.h"
 #include "GrDirectContext.h"
 #include "SkSurface.h"
