@@ -2,6 +2,7 @@
 #include <jni.h>
 #include "SkData.h"
 #include "SkImage.h"
+#include "SkBitmap.h"
 #include "interop.hh"
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nMakeRaster
