@@ -192,5 +192,5 @@ object SkikoArtifacts {
     // so we're using the default naming pattern instead.
     // See https://youtrack.jetbrains.com/issue/KT-50001.
     fun nativeArtifactIdFor(os: OS, arch: Arch, isIosSim: Boolean = false) =
-        "skiko-${os.idWithSuffix(isIosSim = isIosSim)}${arch.id}"
+        "skiko-${os.id + if (isIosSim) "simulator" else ""}${arch.id}"
 }
