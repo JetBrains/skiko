@@ -162,6 +162,7 @@ $dokka.location:org.jetbrains.skia.paragraph/Paragraph/close/#/PointingToDeclara
 $dokka.location:org.jetbrains.skia.paragraph/Paragraph/didExceedMaxLines/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph/did-exceed-max-lines.html
 $dokka.location:org.jetbrains.skia.paragraph/Paragraph/getGlyphPositionAtCoordinate/#kotlin.Float#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph/get-glyph-position-at-coordinate.html
 $dokka.location:org.jetbrains.skia.paragraph/Paragraph/getRectsForRange/#kotlin.Int#kotlin.Int#org.jetbrains.skia.paragraph.RectHeightMode#org.jetbrains.skia.paragraph.RectWidthMode/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph/get-rects-for-range.html
+$dokka.location:org.jetbrains.skia.paragraph/Paragraph/getText/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph/get-text.html
 $dokka.location:org.jetbrains.skia.paragraph/Paragraph/getWordBoundary/#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph/get-word-boundary.html
 $dokka.location:org.jetbrains.skia.paragraph/Paragraph/height/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph/height.html
 $dokka.location:org.jetbrains.skia.paragraph/Paragraph/ideographicBaseline/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph/ideographic-baseline.html
@@ -188,7 +189,6 @@ $dokka.location:org.jetbrains.skia.paragraph/ParagraphBuilder/addText/#kotlin.St
 $dokka.location:org.jetbrains.skia.paragraph/ParagraphBuilder/build/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph-builder/build.html
 $dokka.location:org.jetbrains.skia.paragraph/ParagraphBuilder/popStyle/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph-builder/pop-style.html
 $dokka.location:org.jetbrains.skia.paragraph/ParagraphBuilder/pushStyle/#org.jetbrains.skia.paragraph.TextStyle?/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph-builder/push-style.html
-$dokka.location:org.jetbrains.skia.paragraph/ParagraphBuilder/setParagraphStyle/#org.jetbrains.skia.paragraph.ParagraphStyle?/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph-builder/set-paragraph-style.html
 $dokka.location:org.jetbrains.skia.paragraph/ParagraphCache.Companion///PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph-cache/-companion/index.html
 $dokka.location:org.jetbrains.skia.paragraph/ParagraphCache///PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph-cache/index.html
 $dokka.location:org.jetbrains.skia.paragraph/ParagraphCache/abandon/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph-cache/abandon.html
@@ -2163,7 +2163,7 @@ $dokka.location:org.jetbrains.skia/RuntimeEffect.Companion///PointingToDeclarati
 $dokka.location:org.jetbrains.skia/RuntimeEffect.Companion/makeForColorFilter/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-runtime-effect/-companion/make-for-color-filter.html
 $dokka.location:org.jetbrains.skia/RuntimeEffect.Companion/makeForShader/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-runtime-effect/-companion/make-for-shader.html
 $dokka.location:org.jetbrains.skia/RuntimeEffect///PointingToDeclaration/skiko/org.jetbrains.skia/-runtime-effect/index.html
-$dokka.location:org.jetbrains.skia/RuntimeEffect/makeShader/#org.jetbrains.skia.Data?#kotlin.Array[org.jetbrains.skia.Shader?]?#org.jetbrains.skia.Matrix33?#kotlin.Boolean/PointingToDeclaration/skiko/org.jetbrains.skia/-runtime-effect/make-shader.html
+$dokka.location:org.jetbrains.skia/RuntimeEffect/makeShader/#org.jetbrains.skia.Data?#kotlin.Array[org.jetbrains.skia.Shader?]?#org.jetbrains.skia.Matrix33?/PointingToDeclaration/skiko/org.jetbrains.skia/-runtime-effect/make-shader.html
 $dokka.location:org.jetbrains.skia/RuntimeShaderBuilder.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-runtime-shader-builder/-companion/index.html
 $dokka.location:org.jetbrains.skia/RuntimeShaderBuilder///PointingToDeclaration/skiko/org.jetbrains.skia/-runtime-shader-builder/index.html
 $dokka.location:org.jetbrains.skia/RuntimeShaderBuilder/RuntimeShaderBuilder/#org.jetbrains.skia.RuntimeEffect/PointingToDeclaration/skiko/org.jetbrains.skia/-runtime-shader-builder/-runtime-shader-builder.html
