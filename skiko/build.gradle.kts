@@ -828,6 +828,7 @@ fun createCompileJvmBindingsTask(
                 *buildType.msvcCompilerFlags,
                 "/utf-8",
                 "/GR-", // no-RTTI.
+                "/FS", // Due to an error when building in Teamcity. https://docs.microsoft.com/en-us/cpp/build/reference/fs-force-synchronous-pdb-writes
                 // LATER. Ange rendering arguments:
                 // "-I$skiaDir/third_party/externals/angle2/include",
                 // "-I$skiaDir/src/gpu",
