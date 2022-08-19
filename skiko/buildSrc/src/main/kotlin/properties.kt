@@ -112,7 +112,9 @@ class SkikoProperties(private val myProject: Project) {
 
     val deployVersion: String
         get() {
-            return if (isRelease) planeDeployVersion else "$planeDeployVersion-SNAPSHOT"
+            val main = if (isRelease) planeDeployVersion else "$planeDeployVersion-SNAPSHOT"
+            val metadata = if (buildType == SkiaBuildType.DEBUG) "+debug" else ""
+            return main + metadata
         }
 
     val isRelease: Boolean
