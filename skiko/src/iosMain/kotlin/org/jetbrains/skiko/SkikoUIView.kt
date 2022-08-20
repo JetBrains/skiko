@@ -131,58 +131,32 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
 
     override fun touchesBegan(touches: Set<*>, withEvent: UIEvent?) {
         super.touchesBegan(touches, withEvent)
-        val events: MutableList<SkikoTouchEvent> = mutableListOf()
-        for (touch in touches) {
-            val event = touch as UITouch
-            val (x, y) = event.locationInView(null).useContents { x to y }
-            val timestamp = (event.timestamp * 1_000).toLong()
-            events.add(
-                SkikoTouchEvent(x, y, SkikoTouchEventKind.STARTED, timestamp, event)
-            )
-        }
-        skiaLayer?.skikoView?.onTouchEvent(events.toTypedArray())
+        sendTouchEventToSkikoView(touches, SkikoTouchEventKind.STARTED)
     }
 
     override fun touchesEnded(touches: Set<*>, withEvent: UIEvent?) {
         super.touchesEnded(touches, withEvent)
-        val events: MutableList<SkikoTouchEvent> = mutableListOf()
-        for (touch in touches) {
-            val event = touch as UITouch
-            val (x, y) = event.locationInView(null).useContents { x to y }
-            val timestamp = (event.timestamp * 1_000).toLong()
-            events.add(
-                SkikoTouchEvent(x, y, SkikoTouchEventKind.ENDED, timestamp, event)
-            )
-        }
-        skiaLayer?.skikoView?.onTouchEvent(events.toTypedArray())
+        sendTouchEventToSkikoView(touches, SkikoTouchEventKind.ENDED)
     }
 
     override fun touchesMoved(touches: Set<*>, withEvent: UIEvent?) {
         super.touchesMoved(touches, withEvent)
-        val events: MutableList<SkikoTouchEvent> = mutableListOf()
-        for (touch in touches) {
-            val event = touch as UITouch
-            val (x, y) = event.locationInView(null).useContents { x to y }
-            val timestamp = (event.timestamp * 1_000).toLong()
-            events.add(
-                SkikoTouchEvent(x, y, SkikoTouchEventKind.MOVED, timestamp, event)
-            )
-        }
-        skiaLayer?.skikoView?.onTouchEvent(events.toTypedArray())
+        sendTouchEventToSkikoView(touches, SkikoTouchEventKind.MOVED)
     }
 
     override fun touchesCancelled(touches: Set<*>, withEvent: UIEvent?) {
         super.touchesCancelled(touches, withEvent)
-        val events: MutableList<SkikoTouchEvent> = mutableListOf()
-        for (touch in touches) {
-            val event = touch as UITouch
+        sendTouchEventToSkikoView(touches, SkikoTouchEventKind.CANCELLED)
+    }
+
+    private fun sendTouchEventToSkikoView(touches: Set<*>, kind: SkikoTouchEventKind) {
+        val events = touches.map {
+            val event = it as UITouch
             val (x, y) = event.locationInView(null).useContents { x to y }
             val timestamp = (event.timestamp * 1_000).toLong()
-            events.add(
-                SkikoTouchEvent(x, y, SkikoTouchEventKind.CANCELLED, timestamp, event)
-            )
-        }
-        skiaLayer?.skikoView?.onTouchEvent(events.toTypedArray())
+            SkikoTouchEvent(x, y, kind, timestamp, event)
+        }.toTypedArray()
+        skiaLayer?.skikoView?.onTouchEvent(events)
     }
 
     private var _selectedTextRange: IntermediateTextRange =
