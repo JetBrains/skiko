@@ -61,7 +61,7 @@ val unzipTask = tasks.register("unzipWasm", Copy::class) {
 }
 
 kotlin {
-    val targets = mutableListOf<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>()
+    val macOSTargets = mutableListOf<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>()
 
     if (hostOs == "macos") {
         val nativeHostTarget = when (host) {
@@ -69,10 +69,10 @@ kotlin {
             "macos-arm64" -> macosArm64()
             else -> throw GradleException("Host OS is not supported yet")
         }
-        targets.add(nativeHostTarget)
+        macOSTargets.add(nativeHostTarget)
 
-        targets.add(iosX64())
-        targets.add(iosArm64())
+        macOSTargets.add(iosX64())
+        macOSTargets.add(iosArm64())
 
         ios {
             binaries {
@@ -99,7 +99,7 @@ kotlin {
         binaries.executable()
     }
 
-    targets.forEach {
+    macOSTargets.forEach {
         it.apply {
             binaries {
                 executable {
@@ -108,6 +108,19 @@ kotlin {
                         "-linker-option", "-framework", "-linker-option", "Metal",
                         "-linker-option", "-framework", "-linker-option", "CoreText",
                         "-linker-option", "-framework", "-linker-option", "CoreGraphics"
+                    )
+                }
+            }
+        }
+    }
+
+    if (hostOs == "windows") {
+        mingwX64 {
+            binaries {
+                executable {
+                    entryPoint = "org.jetbrains.skiko.sample.main"
+                    freeCompilerArgs += listOf(
+                        "-linker-option", "-lopengl32"
                     )
                 }
             }
@@ -171,6 +184,16 @@ kotlin {
             }
             val iosArm64Main by getting {
                 dependsOn(iosMain)
+            }
+        } else if (hostOs == "windows") {
+            val mingwMain by creating {
+                dependsOn(nativeMain)
+                dependencies {
+                    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
+                }
+            }
+            val mingwX64Main by getting {
+                dependsOn(mingwMain)
             }
         }
     }
