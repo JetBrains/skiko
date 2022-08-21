@@ -1,21 +1,21 @@
 import de.undercouch.gradle.tasks.download.Download
 import org.gradle.crypto.checksum.Checksum
-import org.gradle.api.tasks.testing.AbstractTestTask
 import org.jetbrains.compose.internal.publishing.MavenCentralProperties
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompileTool
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
-    kotlin("multiplatform") version "1.6.10"
-    id("org.jetbrains.dokka") version "1.6.10"
+    kotlin("multiplatform") version "1.7.10"
+    id("org.jetbrains.dokka") version "1.7.10"
     `maven-publish`
     signing
     id("org.gradle.crypto.checksum") version "1.1.0"
     id("de.undercouch.download") version "4.1.2"
 }
 
-val coroutinesVersion = "1.5.2"
+val coroutinesVersion = "1.6.4"
 
 fun targetSuffix(os: OS, arch: Arch): String {
     return "${os.id}_${arch.id}"
@@ -1064,7 +1064,7 @@ fun KotlinTarget.generateVersion(
     val compilation = compilations["main"] ?: error("Could not find 'main' compilation for target '$this'")
     compilation.compileKotlinTaskProvider.configure {
         dependsOn(generateVersionTask)
-        (this as AbstractCompile).source(generatedDir.get().asFile)
+        (this as KotlinCompileTool).source(generatedDir.get().asFile)
     }
 }
 

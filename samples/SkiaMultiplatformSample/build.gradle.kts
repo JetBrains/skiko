@@ -8,16 +8,16 @@ buildscript {
 
     dependencies {
         // __KOTLIN_COMPOSE_VERSION__
-        classpath(kotlin("gradle-plugin", version = "1.6.10"))
+        classpath(kotlin("gradle-plugin", version = "1.7.10"))
     }
 }
 
 plugins {
-    kotlin("multiplatform") version "1.6.10"
+    kotlin("multiplatform") version "1.7.10"
     id("org.jetbrains.gradle.apple.applePlugin") version "222.849-0.15.1"
 }
 
-val coroutinesVersion = "1.5.2"
+val coroutinesVersion = "1.6.4"
 
 repositories {
     mavenLocal()
