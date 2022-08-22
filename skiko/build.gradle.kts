@@ -933,18 +933,20 @@ fun createLinkJvmBindings(
             OS.Windows -> {
                 linker.set(windowsSdkPaths.linker.absolutePath)
                 libDirs.set(windowsSdkPaths.libDirs)
-                osFlags = arrayOf(
-                    *buildType.msvcLinkerFlags,
-                    "/NOLOGO",
-                    "/DLL",
-                    "Advapi32.lib",
-                    "gdi32.lib",
-                    "Dwmapi.lib",
-                    "opengl32.lib",
-                    "shcore.lib",
-                    "user32.lib",
-                    "dxgi.lib",
-                )
+                osFlags = mutableListOf<String>().apply {
+                    addAll(buildType.msvcLinkerFlags)
+                    addAll(arrayOf(
+                        "/NOLOGO",
+                        "/DLL",
+                        "Advapi32.lib",
+                        "gdi32.lib",
+                        "Dwmapi.lib",
+                        "opengl32.lib",
+                        "shcore.lib",
+                        "user32.lib",
+                    ))
+                    if (buildType == SkiaBuildType.DEBUG) add("dxgi.lib")
+                }.toTypedArray()
             }
             OS.Android -> {
                 osFlags = arrayOf(
