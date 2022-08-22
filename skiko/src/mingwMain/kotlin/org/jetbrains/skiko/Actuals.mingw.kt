@@ -1,7 +1,6 @@
 package org.jetbrains.skiko
 
-import platform.windows.SW_SHOWNORMAL
-import platform.windows.ShellExecuteA
+import platform.windows.*
 
 internal actual inline fun <R> maybeSynchronized(lock: Any, block: () -> R): R =
     block()
@@ -20,20 +19,35 @@ internal actual fun ClipboardManager_getText(): String? {
     TODO("Implement ClipboardManager_getText() on Linux")
 }
 
-actual typealias Cursor = Any
+private val cursorCache = mutableMapOf<LPWSTR, HCURSOR>()
+
+actual data class Cursor(val value: LPWSTR)
 
 internal actual fun CursorManager_setCursor(component: Any, cursor: Cursor) {
-    TODO("Implement CursorManager_setCursor on Linux")
+    val c = cursorCache[cursor.value]
+    if (c == null) {
+        val hCursor = LoadCursorW(null, cursor.value) ?: throw Error("Failed to load cursor")
+        cursorCache[cursor.value] = hCursor
+        SetCursor(hCursor)
+    } else {
+        SetCursor(c)
+    }
 }
 
 internal actual fun CursorManager_getCursor(component: Any): Cursor? {
-    TODO("Implement CursorManager_getCursor on Linux")
+    val cursor = GetCursor() ?: return null
+    for (entry in cursorCache) {
+        if(entry.value == cursor) {
+            return Cursor(entry.key)
+        }
+    }
+    return null
 }
 
 internal actual fun getCursorById(id: PredefinedCursorsId): Cursor =
     when (id) {
-        PredefinedCursorsId.DEFAULT -> Any()
-        PredefinedCursorsId.CROSSHAIR -> Any()
-        PredefinedCursorsId.HAND -> Any()
-        PredefinedCursorsId.TEXT -> Any()
+        PredefinedCursorsId.DEFAULT -> Cursor(IDC_ARROW!!)
+        PredefinedCursorsId.CROSSHAIR -> Cursor(IDC_CROSS!!)
+        PredefinedCursorsId.HAND -> Cursor(IDC_HAND!!)
+        PredefinedCursorsId.TEXT -> Cursor(IDC_IBEAM!!)
     }
