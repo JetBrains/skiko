@@ -943,6 +943,7 @@ fun createLinkJvmBindings(
                     "opengl32.lib",
                     "shcore.lib",
                     "user32.lib",
+                    "dxgi.lib",
                 )
             }
             OS.Android -> {
