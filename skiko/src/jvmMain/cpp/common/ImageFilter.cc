@@ -185,7 +185,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilterKt__1nMake
     std::vector<SkString> childShaderNameStrings = skStringVector(env, childShaderNamesArr);
     std::vector<std::string_view> childShaderNames(childShaderNameStrings.size());
     for (int i = 0; i < inputCount; ++i)
-        childShaderNames[i] = std::string_view(childShaderNameStrings[i].c_str());
+        childShaderNames[i] = childShaderNameStrings[i].c_str();
 
     SkImageFilter* ptr = SkImageFilters::RuntimeShader(*runtimeShaderBuilder, childShaderNames.data(), inputChildren.data(), inputCount).release();
     return reinterpret_cast<jlong>(ptr);

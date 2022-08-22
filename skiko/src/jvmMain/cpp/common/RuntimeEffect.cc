@@ -24,8 +24,6 @@ Java_org_jetbrains_skia_RuntimeEffectKt__1nMakeShader(JNIEnv* env,
     }
     env->ReleaseLongArrayElements(childrenPtrsArr, childrenPtrs, 0);
 
-    // isOpaque parameter was removed in Skia: https://skia-review.googlesource.com/c/skia/+/506462/7/RELEASE_NOTES.txt
-    // TODO: We likely should remove it here as well
     sk_sp<SkShader> shader = runtimeEffect->makeShader(sk_ref_sp<SkData>(uniform),
                                                        children.data(),
                                                        childCount,

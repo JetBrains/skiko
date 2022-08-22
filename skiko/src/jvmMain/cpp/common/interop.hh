@@ -18,9 +18,6 @@
 #include "SkString.h"
 #include "SkSurfaceProps.h"
 #include "TextStyle.h"
-#include "SkPoint3.h"
-#include "SkCanvas.h"
-#include "SkBitmap.h"
 #include "mppinterop.h"
 
 namespace java {
