@@ -292,14 +292,22 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
     }
 
     override fun textRangeFromPosition(fromPosition: UITextPosition, toPosition: UITextPosition): UITextRange? {
-        val from = (fromPosition as IntermediateTextPosition)
-        val to = (toPosition as IntermediateTextPosition)
-        return IntermediateTextRange(from, to)
+        val from = (fromPosition as IntermediateTextPosition).position
+        val to = (toPosition as IntermediateTextPosition).position
+        return IntermediateTextRange(
+            IntermediateTextPosition(minOf(from, to)),
+            IntermediateTextPosition(maxOf(from, to))
+        )
     }
 
     override fun positionFromPosition(position: UITextPosition, offset: NSInteger): UITextPosition? {
         val p = (position as IntermediateTextPosition).position
-        return IntermediateTextPosition(p + offset)
+        val result = p + offset
+        return if (result in 0 until getText().length) {
+            IntermediateTextPosition(result)
+        } else {
+            null
+        }
     }
 
     override fun positionFromPosition(
