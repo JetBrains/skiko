@@ -121,9 +121,10 @@ actual enum class SkikoKey(actual val platformKeyCode: Int) {
     KEY_NUMPAD_DECIMAL(0x6E);
 
     companion object {
+
+        private val reverseMap = values().associateBy(SkikoKey::platformKeyCode)
         fun valueOf(platformKeyCode: Int): SkikoKey {
-            val key = SkikoKey.values().firstOrNull { it.platformKeyCode == platformKeyCode }
-            return if (key == null) SkikoKey.KEY_UNKNOWN else key
+            return reverseMap[platformKeyCode] ?: KEY_UNKNOWN
         }
     }
 }

@@ -51,3 +51,6 @@ internal actual fun getCursorById(id: PredefinedCursorsId): Cursor =
         PredefinedCursorsId.HAND -> Cursor(IDC_HAND!!)
         PredefinedCursorsId.TEXT -> Cursor(IDC_IBEAM!!)
     }
+
+actual val currentSystemTheme: SystemTheme
+    get() = SystemTheme.UNKNOWN // TODO Check registry (HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize\AppsUseLightTheme)

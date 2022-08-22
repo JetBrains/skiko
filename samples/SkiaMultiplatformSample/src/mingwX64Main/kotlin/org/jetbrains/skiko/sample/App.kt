@@ -4,25 +4,17 @@ import kotlinx.cinterop.*
 import org.jetbrains.skiko.GenericSkikoView
 import org.jetbrains.skiko.SkiaLayer
 import platform.windows.*
-import kotlin.system.getTimeNanos
 
 fun makeApp(skiaLayer: SkiaLayer) = Clocks(skiaLayer)
 
 lateinit var skiaLayer: SkiaLayer
 
-fun WndProc(hwnd: HWND?, msg: UINT, wParam: WPARAM, lParam: LPARAM): LRESULT {
-    when (msg.toInt()) {
-        WM_SIZE -> {
-            skiaLayer?.syncSize()
-        }
-
-        WM_PAINT -> {
-            skiaLayer?.onWMPaint(getTimeNanos())
-        }
-
-        else -> return DefWindowProcW(hwnd, msg, wParam, lParam)
+fun wndProc(hwnd: HWND?, msg: UINT, wParam: WPARAM, lParam: LPARAM): LRESULT {
+    if(msg == WM_DESTROY.toUInt()) {
+        PostQuitMessage(0)
+        return 0
     }
-    return 0
+    return skiaLayer.windowProc(hwnd, msg, wParam, lParam)
 }
 
 fun main() {
@@ -34,7 +26,7 @@ fun main() {
 
         val wc = alloc<WNDCLASSEX>()
         wc.cbSize = sizeOf<WNDCLASSEX>().toUInt()
-        wc.lpfnWndProc = staticCFunction(::WndProc)
+        wc.lpfnWndProc = staticCFunction(::wndProc)
         wc.style = (CS_HREDRAW or CS_VREDRAW or CS_OWNDC).toUInt()
         wc.cbClsExtra = 0
         wc.cbWndExtra = 0
@@ -66,10 +58,12 @@ fun main() {
     memScoped {
         val msg = alloc<MSG>()
         msg.message = 0u
-        while (msg.message != WM_QUIT.toUInt()) {
-            GetMessage!!(msg.ptr, null, 0u, 0u) > 0
+        while (GetMessage!!(msg.ptr, null, 0u, 0u) > 0) {
+            if(msg.message == WM_QUIT.toUInt()) {
+                break
+            }
             TranslateMessage(msg.ptr)
-            DispatchMessage!!(msg.ptr)
+            DispatchMessageA(msg.ptr)
         }
     }
 
