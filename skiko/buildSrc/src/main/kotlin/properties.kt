@@ -15,6 +15,10 @@ enum class OS(
 
     val isWindows
         get() = this == Windows
+
+    fun idWithSuffix(isIosSim: Boolean = false): String {
+        return id + if (isIosSim) "Sim" else ""
+    }
 }
 
 val OS.isCompatibleWithHost: Boolean
@@ -126,11 +130,11 @@ class SkikoProperties(private val myProject: Project) {
     val includeTestHelpers: Boolean
         get() = !isRelease
 
-    fun skiaReleaseFor(os: OS, arch: Arch, buildType: SkiaBuildType): String {
-        val target = "${os.id}-${arch.id}"
+    fun skiaReleaseFor(os: OS, arch: Arch, buildType: SkiaBuildType, isIosSim: Boolean = false): String {
+        val target = "${os.idWithSuffix(isIosSim = isIosSim)}-${arch.id}"
         val tag = myProject.property("dependencies.skia.$target") as String
         val suffix = if (os == OS.Linux && arch == Arch.X64) "-ubuntu18" else ""
-        return "${tag}/Skia-${tag}-${os.id}-${buildType.id}-${arch.id}$suffix"
+        return "${tag}/Skia-${tag}-${os.idWithSuffix(isIosSim = isIosSim)}-${buildType.id}-${arch.id}$suffix"
     }
 
     val releaseGithubVersion: String
@@ -187,6 +191,6 @@ object SkikoArtifacts {
     // does not seem possible (at least without adding a dash to a target's tasks),
     // so we're using the default naming pattern instead.
     // See https://youtrack.jetbrains.com/issue/KT-50001.
-    fun nativeArtifactIdFor(os: OS, arch: Arch) =
-        "skiko-${os.id}${arch.id}"
+    fun nativeArtifactIdFor(os: OS, arch: Arch, isIosSim: Boolean = false) =
+        "skiko-${os.id + if (isIosSim) "simulator" else ""}${arch.id}"
 }
