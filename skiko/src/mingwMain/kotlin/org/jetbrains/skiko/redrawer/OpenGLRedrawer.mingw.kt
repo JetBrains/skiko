@@ -66,7 +66,7 @@ internal class WindowsOpenGLRedrawer(
     override fun syncSize() {
         memScoped {
             val rect = alloc<RECT>()
-            GetWindowRect(skiaLayer.window, rect.ptr)
+            GetClientRect(skiaLayer.window, rect.ptr)
             val width = rect.right - rect.left
             val height = rect.bottom - rect.top
             skiaLayer.size = width to height
