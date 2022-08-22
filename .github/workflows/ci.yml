@@ -52,6 +52,8 @@ jobs:
       - shell: bash
         run: |
           ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Pskiko.test.onci=true :skiko:iosX64Test
+          # iosSimulatorArm64Test will build the binary but the tests will be skipped due to X64 host machine
+          ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Pskiko.test.onci=true :skiko:iosSimulatorArm64Test
           ./gradlew --stacktrace --info -Pskiko.native.enabled=true :skiko:publishToMavenLocal
           # TODO run iOS specific tests on iPhone simulator
       - uses: actions/upload-artifact@v2
