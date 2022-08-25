@@ -59,7 +59,7 @@ internal actual fun ClipboardManager_setText(text: String) {
 internal actual fun ClipboardManager_getText(): String? {
     return try {
         systemClipboard?.getData(DataFlavor.stringFlavor) as String?
-    } catch (_: Exception) {
+    } catch (_: UnsupportedFlavorException) {
         null
     } catch (_: IOException) {
         null
