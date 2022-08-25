@@ -7,6 +7,7 @@ import java.awt.Toolkit
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection
 import java.awt.datatransfer.UnsupportedFlavorException
+import java.io.IOException
 import java.net.URI
 import javax.swing.UIManager
 
@@ -59,6 +60,8 @@ internal actual fun ClipboardManager_getText(): String? {
     return try {
         systemClipboard?.getData(DataFlavor.stringFlavor) as String?
     } catch (_: UnsupportedFlavorException) {
+        null
+    } catch (_: IOException) {
         null
     }
 }
