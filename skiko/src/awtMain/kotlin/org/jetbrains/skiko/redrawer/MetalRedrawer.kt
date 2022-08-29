@@ -70,11 +70,13 @@ internal class MetalRedrawer(
 
     override fun redrawImmediately() {
         check(!isDisposed) { "MetalRedrawer is disposed" }
+        update(System.nanoTime())
         inDrawScope {
-            setVSyncEnabled(device, enabled = false)
-            update(System.nanoTime())
-            performDraw()
-            setVSyncEnabled(device, properties.isVsyncEnabled)
+            lockDraw {
+                setVSyncEnabled(device, enabled = false)
+                contextHandler.draw()
+                setVSyncEnabled(device, properties.isVsyncEnabled)
+            }
         }
     }
 
@@ -92,7 +94,9 @@ internal class MetalRedrawer(
         // Dispatchers.IO: 50 FPS, 200% CPU
         inDrawScope {
             withContext(Dispatchers.IO) {
-                performDraw()
+                lockDraw {
+                    contextHandler.draw()
+                }
             }
         }
         if (isDisposed) throw CancellationException()
@@ -104,11 +108,11 @@ internal class MetalRedrawer(
             delay(300)
     }
 
-    private fun performDraw() = synchronized(drawLock) {
+    private inline fun lockDraw(body: () -> Unit) = synchronized(drawLock) {
         if (!isDisposed) {
             val handle = startRendering()
             try {
-                contextHandler.draw()
+                body()
             } finally {
                 endRendering(handle)
             }

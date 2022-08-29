@@ -636,6 +636,32 @@ class SkiaLayerTest {
         }
     }
 
+    @Test
+    fun `render immediately`() = uiTest {
+        val window = UiTestWindow()
+        try {
+            var renderCount = 0
+            window.setLocation(200, 200)
+            window.setSize(400, 200)
+            window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+            window.layer.skikoView = object : SkikoView {
+                override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+                    renderCount++
+                }
+            }
+            window.isUndecorated = true
+            window.isVisible = true
+
+            repeat(10) {
+                val renderCountOld = renderCount
+                window.layer.redrawImmediately()
+                assertEquals(renderCountOld + 1, renderCount)
+            }
+        } finally {
+            window.close()
+        }
+    }
+
     private fun testRenderText(os: OS) = uiTest {
         assumeTrue(hostOs == os)
 

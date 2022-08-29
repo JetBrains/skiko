@@ -484,6 +484,17 @@ actual open class SkiaLayer internal constructor(
         redrawer?.needRedraw()
     }
 
+    /**
+     * Redraw content immediately and synchronously, without waiting for the next vsync.
+     *
+     * After we exit this method, the display graphical buffer contain the new drawn content.
+     */
+    fun redrawImmediately() {
+        check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
+        check(!isDisposed) { "SkiaLayer is disposed" }
+        redrawer?.redrawImmediately()
+    }
+
     @Suppress("LeakingThis")
     private val fpsCounter = defaultFPSCounter(this)
 
