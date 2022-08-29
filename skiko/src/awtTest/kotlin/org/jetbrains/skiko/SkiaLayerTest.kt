@@ -655,7 +655,9 @@ class SkiaLayerTest {
             repeat(10) {
                 val renderCountOld = renderCount
                 window.layer.redrawImmediately()
-                assertEquals(renderCountOld + 1, renderCount)
+                // onRender can be called multiple times during redrawImmediately
+                // (when we fallback to another render api)
+                assertTrue(renderCount > renderCountOld)
             }
         } finally {
             window.close()
