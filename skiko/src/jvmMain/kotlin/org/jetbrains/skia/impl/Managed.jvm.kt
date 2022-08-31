@@ -8,22 +8,33 @@ import kotlin.concurrent.thread
 // Consider using this on all JVM platforms eventually.
 actual abstract class Managed actual constructor(
     ptr: Long, finalizer: Long, managed: Boolean
-) : Native(ptr), AutoCloseable {
-
-    actual override fun close() {
-        if (0L == _ptr)
-            throw RuntimeException("Object already closed: $javaClass, _ptr=$_ptr")
-        else if (null == cleanable)
-            throw RuntimeException("Object is not managed in JVM, can't close(): $javaClass, _ptr=$_ptr")
-        else {
-            cleanable!!.clean()
-            cleanable = null
-            _ptr = 0
+) : Native(), AutoCloseable {
+    private var __ptr: NativePointer = ptr.also {
+        require(it != NullPointer) {
+            "Can't wrap NullPointer"
         }
     }
 
+    actual override val _ptr: NativePointer get() = __ptr.also {
+        check(__ptr != NullPointer) {
+            "Object already closed: $javaClass"
+        }
+    }
+
+    actual override fun close() {
+        check(__ptr != NullPointer) {
+            "Object already closed: $javaClass"
+        }
+        check(null != cleanable) {
+            "Object is not managed in JVM, can't close(): $javaClass, _ptr=$__ptr"
+        }
+        cleanable!!.clean()
+        cleanable = null
+        __ptr = 0
+    }
+
     actual open val isClosed: Boolean
-        get() = _ptr == 0L
+        get() = __ptr == 0L
 
     class CleanerThunk(var className: String, var ptr: Long, var finalizerPtr: Long) : Runnable {
         override fun run() {

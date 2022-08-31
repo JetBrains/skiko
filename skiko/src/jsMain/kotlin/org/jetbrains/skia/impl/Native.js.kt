@@ -2,8 +2,8 @@ package org.jetbrains.skia.impl
 
 import org.khronos.webgl.ArrayBufferView
 
-actual abstract class Native actual constructor(ptr: NativePointer) {
-    actual var _ptr: NativePointer
+actual abstract class Native {
+    actual abstract val _ptr: NativePointer
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -25,11 +25,6 @@ actual abstract class Native actual constructor(ptr: NativePointer) {
 
     actual override fun toString(): String {
         return this::class.simpleName + "(_ptr=0x" + _ptr.toString(16) + ")"
-    }
-
-    init {
-        if (ptr == NullPointer) throw RuntimeException("Can't wrap nullptr")
-        _ptr = ptr
     }
 }
 

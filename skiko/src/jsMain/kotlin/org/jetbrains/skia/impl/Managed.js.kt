@@ -26,24 +26,36 @@ private fun unregister(managed: Managed) {
     registry.unregister(managed)
 }
 
-actual abstract class Managed actual constructor(ptr: NativePointer, finalizer: NativePointer, managed: Boolean) : Native(ptr) {
+actual abstract class Managed actual constructor(ptr: NativePointer, finalizer: NativePointer, managed: Boolean) : Native() {
     private var cleaner: FinalizationThunk? = null
 
-    actual open fun close() {
-        if (NullPointer == _ptr)
-            throw RuntimeException("Object already closed: ${this::class.simpleName}, _ptr=$_ptr")
-        else if (null == cleaner)
-            throw RuntimeException("Object is not managed, can't close(): ${this::class.simpleName}, _ptr=$_ptr")
-        else {
-            unregister(this)
-            cleaner!!.clean()
-            cleaner = null
-            _ptr = 0
+    private var __ptr: NativePointer = ptr.also {
+        require(it != NullPointer) {
+            "Can't wrap NullPointer"
         }
     }
 
+    actual override val _ptr: NativePointer get() = __ptr.also {
+        check(__ptr != NullPointer) {
+            "Object already closed: ${this::class.simpleName}"
+        }
+    }
+
+    actual open fun close() {
+        check(__ptr != NullPointer) {
+            "Object already closed: ${this::class.simpleName}"
+        }
+        check(null != cleaner) {
+            "Object is not managed, can't close(): ${this::class.simpleName}, _ptr=$__ptr"
+        }
+        unregister(this)
+        cleaner!!.clean()
+        cleaner = null
+        __ptr = 0
+    }
+
     actual open val isClosed: Boolean
-        get() = _ptr == NullPointer
+        get() = __ptr == NullPointer
 
     init {
         if (managed) {

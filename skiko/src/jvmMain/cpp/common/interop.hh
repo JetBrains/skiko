@@ -329,7 +329,7 @@ namespace skija {
 
     namespace impl {
         namespace Native {
-            extern jfieldID _ptr;
+            extern jmethodID _ptr;
             void onLoad(JNIEnv* env);
             void onUnload(JNIEnv* env);
             void* fromJava(JNIEnv* env, jobject obj, jclass cls);

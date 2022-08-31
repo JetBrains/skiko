@@ -2,8 +2,10 @@ package org.jetbrains.skia.impl
 
 import java.lang.ref.Reference
 
-actual abstract class Native actual constructor(ptr: NativePointer) {
-    internal actual var _ptr: NativePointer
+actual abstract class Native {
+    internal actual abstract val _ptr: NativePointer
+
+    fun getPtr() = _ptr
 
     actual companion object {
         actual val NullPointer: NativePointer
@@ -34,11 +36,6 @@ actual abstract class Native actual constructor(ptr: NativePointer) {
 
     internal actual open fun nativeEquals(other: Native?): Boolean {
         return false
-    }
-
-    init {
-        if (ptr == NullPointer) throw RuntimeException("Can't wrap nullptr")
-        _ptr = ptr
     }
 }
 

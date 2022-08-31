@@ -8,12 +8,14 @@ import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
 
-class ParagraphCache internal constructor(owner: FontCollection, ptr: NativePointer) : Native(ptr) {
+class ParagraphCache internal constructor(owner: FontCollection, ptr: NativePointer) : Native() {
     companion object {
         init {
             staticLoad()
         }
     }
+
+    override val _ptr: NativePointer= ptr
 
     fun abandon() {
         try {

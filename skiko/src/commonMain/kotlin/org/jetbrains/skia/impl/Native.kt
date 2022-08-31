@@ -6,8 +6,8 @@ expect class NativePointer
 
 expect class InteropPointer
 
-expect abstract class Native(ptr: NativePointer) {
-    internal var _ptr: NativePointer
+expect abstract class Native() {
+    internal abstract val _ptr: NativePointer
     internal open fun nativeEquals(other: Native?): Boolean
 
     companion object {

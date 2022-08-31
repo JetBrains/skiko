@@ -4,8 +4,8 @@ import kotlinx.cinterop.*
 import org.jetbrains.skia.ExternalSymbolName
 import kotlin.native.internal.NativePtr
 
-actual abstract class Native actual constructor(ptr: NativePointer) {
-    internal actual var _ptr: NativePointer
+actual abstract class Native {
+    internal actual open val _ptr: NativePointer
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -39,11 +39,6 @@ actual abstract class Native actual constructor(ptr: NativePointer) {
 
     actual override fun toString(): String {
         return this::class.simpleName + "(_ptr=0x" + _ptr.toString() + ")"
-    }
-
-    init {
-        if (ptr == NativePtr.NULL) throw RuntimeException("Can't wrap nullptr")
-        _ptr = ptr
     }
 }
 

@@ -82,7 +82,7 @@ class DataTest {
             it
         }
 
-        assertEquals(NullPointer, copiedData._ptr)
+        assertTrue(copiedData.isClosed)
         assertEquals(originalDataPtr, originalData._ptr)
 
         assertContentEquals(

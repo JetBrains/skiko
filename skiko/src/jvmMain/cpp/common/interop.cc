@@ -896,16 +896,16 @@ namespace skija {
 
     namespace impl {
         namespace Native {
-            jfieldID _ptr;
+            jmethodID _ptr;
 
             void onLoad(JNIEnv* env) {
                 jclass cls = env->FindClass("org/jetbrains/skia/impl/Native");
-                _ptr = env->GetFieldID(cls, "_ptr", "J");
+                _ptr = env->GetMethodID(cls, "getPtr", "()J");
             }
 
             void* fromJava(JNIEnv* env, jobject obj, jclass cls) {
                 if (env->IsInstanceOf(obj, cls)) {
-                    jlong ptr = env->GetLongField(obj, skija::impl::Native::_ptr);
+                    jlong ptr = env->CallLongMethod(obj, skija::impl::Native::_ptr);
                     return reinterpret_cast<void*>(static_cast<uintptr_t>(ptr));
                 }
                 return nullptr;
