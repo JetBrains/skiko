@@ -336,7 +336,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextPaste
     }
 
     override fun setBaseWritingDirection(writingDirection: NSWritingDirection, forRange: UITextRange) {
-        //TODO
+        // TODO support RTL text direction
     }
 
     //Working with Geometry and Hit-Testing. All methods return stubs for now.
