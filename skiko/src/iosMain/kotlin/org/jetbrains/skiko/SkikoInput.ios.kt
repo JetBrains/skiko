@@ -38,7 +38,11 @@ actual interface SkikoInput {
      * If the text-range object is nil, it indicates that there is no current selection.
      * https://developer.apple.com/documentation/uikit/uitextinput/1614541-selectedtextrange
      */
-    fun selectedTextRange(): SkikoTextRange?
+    fun getSelectedTextRange(): SkikoTextRange?
+
+    fun setSelectedTextRange(range: SkikoTextRange?)
+
+    fun selectAll()
 
     /**
      * Returns the text in the specified range.
@@ -83,66 +87,5 @@ actual interface SkikoInput {
      * https://developer.apple.com/documentation/uikit/uitextinput/1614512-unmarktext
      */
     fun unmarkText()
-    
-    //---Working with Geometry and Hit-Testing----------------------------------------------
-    /**
-     * Returns the first rectangle that encloses a range of text in a document.
-     * https://developer.apple.com/documentation/uikit/uitextinput/1614570-firstrect
-     * @param range An object that represents a range of text in a document.
-     * @return The first rectangle in a range of text.
-     * You might use this rectangle to draw a correction rectangle.
-     * The “first” in the name refers the rectangle enclosing the first line
-     * when the range encompasses multiple lines of text.
-     */
-    fun firstRectForRange(range: SkikoTextRange): SkikoRect?
-
-    /**
-     * Returns a rectangle to draw the caret at a specified insertion point.
-     * The system uses this value to calculate the length of the beam—the vertical line representing
-     * the pointer—when using a trackpad to interact with a text input area.
-     * You must implement this method even if text never becomes editable, and an insertion point caret never appears.
-     * @param position An object that identifies a location in a text input area.
-     * https://developer.apple.com/documentation/uikit/uitextinput/1614570-firstrect
-     * @return A rectangle that defines the area for drawing the caret.
-     */
-    fun caretRectForPosition(position: Long): SkikoRect?
-
-    /**
-     * Returns an array of selection rects corresponding to the range of text.
-     * @param range An object representing a range in a document’s text.
-     * @return An array of UITextSelectionRect objects that encompass the selection.
-     */
-    fun selectionRectsForRange(range: SkikoTextRange): List<SkikoRect>
-
-    /**
-     * Returns the character or range of characters that is at a specified point in a document.
-     * https://developer.apple.com/documentation/uikit/uitextinput/1614574-characterrange
-     * @param point A point in the view that is drawing a document’s text.
-     * @return An object representing a range that encloses a character (or characters) at point.
-     */
-    fun characterRangeAtPoint(point: SkikoPoint):SkikoTextRange {
-        //todo default impl maybe redundant
-        val closestPosition = closestPositionToPoint(point)
-        return SkikoTextRange(closestPosition, closestPosition)
-    }
-
-    /**
-     * Returns the position in a document that is closest to a specified point.
-     * https://developer.apple.com/documentation/uikit/uitextinput/1614523-closestposition
-     * @param point A point in the view that is drawing a document’s text.
-     * @return An object locating a position in a document that is closest to point.
-     */
-    fun closestPositionToPoint(point: SkikoPoint):Int
-
-    /**
-     * Returns the position in a document that is closest to a specified point in a specified range.
-     * https://developer.apple.com/documentation/uikit/uitextinput/1614533-closestposition
-     * @param point A point in the view that is drawing a document’s text.
-     * @param range An object representing a range in a document’s text.
-     * @return An object representing the character position in range that is closest to point.
-     */
-    fun closestPositionToPoint(point: SkikoPoint, range :SkikoTextRange):Int {
-        return range.start//todo default impl maybe redundant
-    }
 
 }

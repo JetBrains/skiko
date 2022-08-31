@@ -6,12 +6,12 @@ import platform.CoreGraphics.*
 import platform.Foundation.*
 import platform.UIKit.*
 import platform.darwin.NSInteger
-
-const val LOG_OLD = false
+import kotlin.math.max
+import kotlin.math.min
 
 @Suppress("CONFLICTING_OVERLOADS")
 @ExportObjCClass
-class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInputTraitsProtocol, UITextPasteConfigurationSupportingProtocol {
+class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextPasteConfigurationSupportingProtocol {
     @OverrideInit
     constructor(frame: CValue<CGRect>) : super(frame)
 
@@ -22,6 +22,10 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
 
     constructor(skiaLayer: SkiaLayer, frame: CValue<CGRect> = CGRectNull.readValue()) : super(frame) {
         this.skiaLayer = skiaLayer
+    }
+
+    override fun selectAll(sender: Any?) {
+        skiaLayer?.skikoView?.input?.selectAll()
     }
 
     fun detach() = skiaLayer?.detach()
@@ -46,47 +50,31 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
 
     private val pressedKeycodes: MutableSet<Long> = mutableSetOf()
 
-    fun getText(): String = inputText + _markedText
-
+    /**
+     * A Boolean value that indicates whether the text-entry object has any text.
+     * https://developer.apple.com/documentation/uikit/uikeyinput/1614457-hastext
+     */
     override fun hasText(): Boolean {
-        val result = skiaLayer?.skikoView?.input?.hasText() ?: false
-        log()
-        return result
-//        return inputText.length > 0
+        return skiaLayer?.skikoView?.input?.hasText() ?: false
     }
 
+    /**
+     * Inserts a character into the displayed text.
+     * Add the character text to your class’s backing store at the index corresponding to the cursor and redisplay the text.
+     * https://developer.apple.com/documentation/uikit/uikeyinput/1614543-inserttext
+     * @param text A string object representing the character typed on the system keyboard.
+     */
     override fun insertText(text: String) {
         skiaLayer?.skikoView?.input?.insertText(text)
-        if (LOG_OLD) {
-            inputText += text
-            val position = IntermediateTextPosition(inputText.length.toLong())
-            _selectedTextRange = IntermediateTextRange(position, position)
-            skiaLayer?.skikoView?.onInputEvent(toSkikoTypeEvent(text, null))
-            log()
-        }
     }
 
-    override fun deleteBackward() {//todo delegate to skiaLayer?.skikoView?.input
-//        if (!pressedKeycodes.contains(SkikoKey.KEY_BACKSPACE.value)) {
-            skiaLayer?.skikoView?.input?.deleteBackward()
-//        }
-        if (LOG_OLD) {
-            _unmarkText()
-            inputText = inputText.dropLast(1)
-//            if (!pressedKeycodes.contains(SkikoKey.KEY_BACKSPACE.value)) {
-//                val downEvent = SkikoKeyboardEvent(
-//                    key = SkikoKey.KEY_BACKSPACE,
-//                    kind = SkikoKeyboardEventKind.DOWN,
-//                    platform = null
-//                )
-//                val upEvent = downEvent.copy(
-//                    kind = SkikoKeyboardEventKind.UP
-//                )
-//                skiaLayer?.skikoView?.onKeyboardEvent(downEvent)
-//                skiaLayer?.skikoView?.onKeyboardEvent(upEvent)
-//            }
-            log()
-        }
+    /**
+     * Deletes a character from the displayed text.
+     * Remove the character just before the cursor from your class’s backing store and redisplay the text.
+     * https://developer.apple.com/documentation/uikit/uikeyinput/1614572-deletebackward
+     */
+    override fun deleteBackward() {
+        skiaLayer?.skikoView?.input?.deleteBackward()
     }
 
     override fun canBecomeFirstResponder() = true
@@ -159,9 +147,6 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
         skiaLayer?.skikoView?.onTouchEvent(events)
     }
 
-    private var _selectedTextRange: IntermediateTextRange =
-        IntermediateTextRange(IntermediateTextPosition(0), IntermediateTextPosition(0))
-    private var _tokenizer: UITextInputStringTokenizer? = null
     private var _inputDelegate: UITextInputDelegateProtocol? = null
     override fun inputDelegate(): UITextInputDelegateProtocol? {
         return _inputDelegate
@@ -171,129 +156,107 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
         _inputDelegate = inputDelegate
     }
 
+    /**
+     * Returns the text in the specified range.
+     * https://developer.apple.com/documentation/uikit/uitextinput/1614527-text
+     * @param range A range of text in a document.
+     * @return A substring of a document that falls within the specified range.
+     */
     override fun textInRange(range: UITextRange): String? {
-        val result = skiaLayer?.skikoView?.input?.textInRange(range.toSkikoTextRange())
-        if (LOG_OLD) {
-            val from = (range.start() as IntermediateTextPosition).position
-            val to = (range.end() as IntermediateTextPosition).position
-            val text = getText()
-            val oldResult = if (text.isNotEmpty() && from >= 0 && to >= 0 && text.length >= to) {
-                val substring = text.substring(from.toInt(), to.toInt())
-                substring.replace("\n", "").ifEmpty { null }
-            } else {
-                null
-            }
-            log("oldResult: $oldResult")
-        }
-        return result
+        return skiaLayer?.skikoView?.input?.textInRange(range.toSkikoTextRange())
     }
 
+    /**
+     * Replaces the text in a document that is in the specified range.
+     * https://developer.apple.com/documentation/uikit/uitextinput/1614558-replace
+     * @param range A range of text in a document.
+     * @param text A string to replace the text in range.
+     */
     override fun replaceRange(range: UITextRange, withText: String) {
         skiaLayer?.skikoView?.input?.replaceRange(range.toSkikoTextRange(), withText)
-        if (LOG_OLD) {
-            val start = (range.start() as IntermediateTextPosition).position
-            val end = (range.end() as IntermediateTextPosition).position
-            if (end > inputText.length) {
-                throw Error("TextInput, replaceRange end=$end > inputText.lastIndex=${inputText.length}")
-            }
-            inputText = inputText.replaceRange(start.toInt(), end.toInt(), withText)
-            log()
-        }
     }
 
     override fun setSelectedTextRange(selectedTextRange: UITextRange?) {
         selectedTextRange?.let {
-            val start = ((it as IntermediateTextRange).start() as IntermediateTextPosition).position
-            val end = (it.end() as IntermediateTextPosition).position
-//            println("TODO setSelectedTextRange, start: $start, end: $end")//todo check
-            _selectedTextRange = it
+            skiaLayer?.skikoView?.input?.setSelectedTextRange(selectedTextRange.toSkikoTextRange())
         }
     }
 
+    /**
+     * The range of selected text in a document.
+     * If the text range has a length, it indicates the currently selected text.
+     * If it has zero length, it indicates the caret (insertion point).
+     * If the text-range object is nil, it indicates that there is no current selection.
+     * https://developer.apple.com/documentation/uikit/uitextinput/1614541-selectedtextrange
+     */
     override fun selectedTextRange(): UITextRange? {
-        val result = skiaLayer?.skikoView?.input?.selectedTextRange()?.toUITextRange()
-        if (LOG_OLD) {
-            val from = 0//getText().length //todo temp
-            val to = getText().length
-            val oldResult = IntermediateTextRange(start = from, end = to)
-            log("oldResult: ${oldResult.toSkikoTextRange()}")
-        }
-        return result
-//        return _selectedTextRange //todo
+        return skiaLayer?.skikoView?.input?.getSelectedTextRange()?.toUITextRange()
     }
 
+    /**
+     * The range of currently marked text in a document.
+     * If there is no marked text, the value of the property is nil.
+     * Marked text is provisionally inserted text that requires user confirmation;
+     * it occurs in multistage text input.
+     * The current selection, which can be a caret or an extended range, always occurs within the marked text.
+     * https://developer.apple.com/documentation/uikit/uitextinput/1614489-markedtextrange
+     */
     override fun markedTextRange(): UITextRange? {
-        val result = skiaLayer?.skikoView?.input?.markedTextRange()?.toUITextRange()
-        log("oldResult: $_markedTextRange")
-        return result
+        return skiaLayer?.skikoView?.input?.markedTextRange()?.toUITextRange()
     }
 
     override fun setMarkedTextStyle(markedTextStyle: Map<Any?, *>?) {
-//        println("TODO setMarkedTextStyle")//todo
         // do nothing
     }
 
     override fun markedTextStyle(): Map<Any?, *>? {
-//        println("TODO markedTextStyle")//todo
         return null
     }
 
+    /**
+     * Inserts the provided text and marks it to indicate that it is part of an active input session.
+     * Setting marked text either replaces the existing marked text or,
+     * if none is present, inserts it in place of the current selection.
+     * https://developer.apple.com/documentation/uikit/uitextinput/1614465-setmarkedtext
+     * @param markedText The text to be marked.
+     * @param selectedRange A range within markedText that indicates the current selection.
+     * This range is always relative to markedText.
+     */
     override fun setMarkedText(markedText: String?, selectedRange: CValue<NSRange>) {
         val (locationRelative, lengthRelative) = selectedRange.useContents {
             location.toInt() to length.toInt()
         }
         val relativeTextRange = SkikoTextRange(locationRelative, locationRelative + lengthRelative)
         skiaLayer?.skikoView?.input?.setMarkedText(markedText, relativeTextRange)
-        if (LOG_OLD) {
-            // [markedText] is text about to confirm by user
-            // see more: https://developer.apple.com/documentation/uikit/uitextinput?language=objc
-            val cursor = inputText.lastIndex
-            val location = cursor + 1
-            val length = markedText?.length ?: 0
-
-            markedText?.let {
-                _markedTextRange = IntermediateTextRange(
-                    IntermediateTextPosition(location.toLong()),
-                    IntermediateTextPosition(location.toLong() + length.toLong())
-                )
-                _selectedTextRange = IntermediateTextRange(
-                    IntermediateTextPosition(location.toLong()),
-                    IntermediateTextPosition(location.toLong() + length.toLong())
-                )
-                _markedText = markedText
-            }
-            log()
-        }
     }
 
+    /**
+     * Unmarks the currently marked text.
+     * After this method is called, the value of markedTextRange is nil.
+     * https://developer.apple.com/documentation/uikit/uitextinput/1614512-unmarktext
+     */
     override fun unmarkText() {
         skiaLayer?.skikoView?.input?.unmarkText()
-        if (LOG_OLD) {
-            _unmarkText()
-            log()
-        }
-    }
-
-    private fun _unmarkText() {
-        inputText = getText()
-        _markedText = ""
-        _markedTextRange = null
     }
 
     override fun beginningOfDocument(): UITextPosition {
         return IntermediateTextPosition(0)
     }
 
+    /**
+     * The text position for the end of a document.
+     * https://developer.apple.com/documentation/uikit/uitextinput/1614555-endofdocument
+     */
     override fun endOfDocument(): UITextPosition {
-        val result = IntermediateTextPosition(skiaLayer?.skikoView?.input?.endOfDocument() ?: 0)
-        val oldResult = IntermediateTextPosition(getText().length.toLong())
-        log("oldResult: $oldResult")
-        return result
+        return IntermediateTextPosition(skiaLayer?.skikoView?.input?.endOfDocument() ?: 0)
     }
 
+    /**
+     * Attention! fromPosition and toPosition may be null
+     */
     override fun textRangeFromPosition(fromPosition: UITextPosition, toPosition: UITextPosition): UITextRange? {
-        val from = (fromPosition as IntermediateTextPosition).position
-        val to = (toPosition as IntermediateTextPosition).position
+        val from = (fromPosition as? IntermediateTextPosition)?.position ?: 0
+        val to = (toPosition as? IntermediateTextPosition)?.position ?: 0
         return IntermediateTextRange(
             IntermediateTextPosition(minOf(from, to)),
             IntermediateTextPosition(maxOf(from, to))
@@ -302,9 +265,9 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
 
     override fun positionFromPosition(position: UITextPosition, offset: NSInteger): UITextPosition? {
         val p = (position as IntermediateTextPosition).position
-        val result = p + offset
-        return if (result in 0 until getText().length) {
-            IntermediateTextPosition(result)
+        val endOfDocument = skiaLayer?.skikoView?.input?.endOfDocument()
+        return if (endOfDocument != null) {
+            IntermediateTextPosition(max(min(p + offset, endOfDocument), 0))
         } else {
             null
         }
@@ -315,16 +278,24 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
         inDirection: UITextLayoutDirection,
         offset: NSInteger
     ): UITextPosition? {
-        TODO("positionFromPosition with inDirection: ${inDirection.directionToStr()}") //todo use inDirection
-        return positionFromPosition(position, offset)
+        return when (inDirection) {
+            UITextLayoutDirectionLeft, UITextLayoutDirectionUp -> {
+                positionFromPosition(position, -offset)
+            }
+
+            else -> positionFromPosition(position, offset)
+        }
     }
 
+    /**
+     * Attention! position and toPosition may be null
+     */
     override fun comparePosition(position: UITextPosition, toPosition: UITextPosition): NSComparisonResult {
-        val from = position as IntermediateTextPosition
-        val to = toPosition as IntermediateTextPosition
-        val result = if (from.position < to.position) {
+        val from = (position as? IntermediateTextPosition)?.position ?: 0
+        val to = (toPosition as? IntermediateTextPosition)?.position ?: 0
+        val result = if (from < to) {
             NSOrderedAscending
-        } else if (from.position > to.position) {
+        } else if (from > to) {
             NSOrderedDescending
         } else {
             NSOrderedSame
@@ -340,14 +311,10 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
 
     override fun tokenizer(): UITextInputTokenizerProtocol {
         return UITextInputStringTokenizer()
-        if (_tokenizer == null) {
-            _tokenizer = UITextInputStringTokenizer(textInput = this)
-        }
-        return _tokenizer as UITextInputStringTokenizer
     }
 
     override fun positionWithinRange(range: UITextRange, atCharacterOffset: NSInteger): UITextPosition? =
-        TODO("positionWithinRange with default super")//super.positionWithinRange(range, atCharacterOffset)
+        TODO("positionWithinRange range: $range, atCharacterOffset: $atCharacterOffset")
 
     override fun positionWithinRange(range: UITextRange, farthestInDirection: UITextLayoutDirection): UITextPosition? =
         TODO("positionWithinRange, farthestInDirection: ${farthestInDirection.directionToStr()}")
@@ -367,56 +334,16 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
     }
 
     override fun setBaseWritingDirection(writingDirection: NSWritingDirection, forRange: UITextRange) {
-        TODO("setBaseWritingDirection, writingDirection: ${writingDirection.directionToStr()}")
+        //TODO
     }
 
-    //Working with Geometry and Hit-Testing---------------------------------------------------------------------------
-    override fun firstRectForRange(range: UITextRange): CValue<CGRect> {
-        val result: SkikoRect? = skiaLayer?.skikoView?.input?.firstRectForRange(range.toSkikoTextRange())
-        return if (result != null) {
-            CGRectMake(result.x, result.y, result.width, result.height)
-        } else {
-            CGRectNull.readValue()
-        }
-    }
-
-    override fun caretRectForPosition(position: UITextPosition): CValue<CGRect> {
-        val result: SkikoRect? = skiaLayer?.skikoView?.input?.caretRectForPosition(
-            position = (position as IntermediateTextPosition).position
-        )
-        return if (result != null) {
-            CGRectMake(result.x, result.y, result.width, result.height)
-        } else {
-            CGRectNull.readValue()
-        }
-    }
-
-    override fun selectionRectsForRange(range: UITextRange): List<*> {
-        val result: List<SkikoRect>? = skiaLayer?.skikoView?.input?.selectionRectsForRange(range.toSkikoTextRange())
-        return result?.map { MySelectionRect(it) } ?: listOf<UITextSelectionRect>()
-    }
-
-    override fun closestPositionToPoint(point: CValue<CGPoint>): UITextPosition? {
-        return skiaLayer?.skikoView?.input
-            ?.closestPositionToPoint(point = point.useContents { this.toSkikoPoint() })
-            ?.let { IntermediateTextPosition(it.toLong()) }
-    }
-
-    override fun closestPositionToPoint(point: CValue<CGPoint>, withinRange: UITextRange): UITextPosition? {
-        return skiaLayer?.skikoView?.input
-            ?.closestPositionToPoint(
-                point = point.useContents { this.toSkikoPoint() },
-                range = withinRange.toSkikoTextRange()
-            )?.let { IntermediateTextPosition(it.toLong()) }
-    }
-
-    override fun characterRangeAtPoint(point: CValue<CGPoint>): UITextRange? {
-        val skikoPoint = point.useContents { this.toSkikoPoint() }
-        return skiaLayer?.skikoView?.input
-            ?.characterRangeAtPoint(skikoPoint)
-            ?.toUITextRange()
-    }
-    //---------------------------------------------------------------------------------------------------------
+    //Working with Geometry and Hit-Testing. All methods return stubs for now.
+    override fun firstRectForRange(range: UITextRange): CValue<CGRect> = CGRectNull.readValue()
+    override fun caretRectForPosition(position: UITextPosition): CValue<CGRect> = CGRectNull.readValue()
+    override fun selectionRectsForRange(range: UITextRange): List<*> = listOf<UITextSelectionRect>()
+    override fun closestPositionToPoint(point: CValue<CGPoint>): UITextPosition? = null
+    override fun closestPositionToPoint(point: CValue<CGPoint>, withinRange: UITextRange): UITextPosition? = null
+    override fun characterRangeAtPoint(point: CValue<CGPoint>): UITextRange? = null
 
     override fun textStylingAtPosition(position: UITextPosition, inDirection: UITextStorageDirection): Map<Any?, *>? {
         return NSDictionary.dictionary()
@@ -445,32 +372,31 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
     private var _pasteDelegate: UITextPasteDelegateProtocol? = null
     override fun pasteConfiguration(): UIPasteConfiguration? {
         //https://developer.apple.com/documentation/uikit/uitextpasteconfigurationsupporting
-        println("TODO PASTE pasteConfiguration")
+        //todo uikit copy/paste
         return _pasteConfiguration
     }
 
     override fun setPasteConfiguration(pasteConfiguration: UIPasteConfiguration?) {
-        println("TODO PASTE setPasteConfiguration")
+        //todo uikit copy/paste
         _pasteConfiguration = pasteConfiguration
     }
 
     override fun pasteDelegate(): UITextPasteDelegateProtocol? {
-        println("TODO PASTE pasteDelegate")
+        //todo uikit copy/paste
         return _pasteDelegate
     }
 
     override fun setPasteDelegate(pasteDelegate: UITextPasteDelegateProtocol?) {
-        println("TODO PASTE setPasteDelegate")
+        //todo uikit copy/paste
         _pasteDelegate = pasteDelegate
     }
 
     override fun keyboardType(): UIKeyboardType {
-        return UIKeyboardTypeDefault
-        return UIKeyboardTypeDecimalPad//todo
+        return UIKeyboardTypeDefault //todo keyboardType
     }
 
     override fun isSecureTextEntry(): Boolean {
-        return false//todo change secure to prevent copy text
+        return false //todo secure text to prevent copy
     }
 
     override fun autocapitalizationType(): UITextAutocapitalizationType {
@@ -482,18 +408,40 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextInput
         return UITextAutocorrectionType.UITextAutocorrectionTypeYes
     }
 
-    private var inputText: String = "qwe"
-    private var _markedText: String = ""
-    private var _markedTextRange: IntermediateTextRange? = null
-    private var counter = 0
+    override fun dictationRecognitionFailed() {
+        //todo may be useful
+    }
 
-    private fun log(vararg messages: Any) {
-//        println("/----OLD-begin----------${counter++}\\")
-//        println(messages.map { it.toString() })
-//        println("inputText: $inputText, _markedText: $_markedText, _markedTextRange: ${_markedTextRange?.toSkikoTextRange()}")
-//        println(Exception().stackTraceToString().split("\n")[4].split("        ").last())
-//        println("\\-----OLD-end-----------/")
-//        println("")
+    override fun dictationRecordingDidEnd() {
+        //todo may be useful
+    }
+
+    /**
+     * Call when something changes in text data
+     */
+    fun textWillChange() {
+        _inputDelegate?.textWillChange(this)
+    }
+
+    /**
+     * Call when something changes in text data
+     */
+    fun textDidChange() {
+        _inputDelegate?.textDidChange(this)
+    }
+
+    /**
+     * Call when something changes in text data
+     */
+    fun selectionWillChange() {
+        _inputDelegate?.selectionWillChange(this)
+    }
+
+    /**
+     * Call when something changes in text data
+     */
+    fun selectionDidChange() {
+        _inputDelegate?.selectionDidChange(this)
     }
 }
 
@@ -514,37 +462,6 @@ private class IntermediateTextRange(
     override fun end(): UITextPosition = _end
 }
 
-class MySelectionRect(val skikoRect: SkikoRect) : UITextSelectionRect() {
-
-    /**
-     * A Boolean value that indicates whether the rectangle contains the end of the selection.
-     */
-    override fun containsEnd(): Boolean {
-        return false
-    }
-
-    /**
-     * A Boolean value that indicates whether the rectangle contains the start of the selection.
-     */
-    override fun containsStart(): Boolean {
-        return false
-    }
-
-    override fun isVertical(): Boolean {
-        return false
-    }
-
-    override fun rect(): CValue<CGRect> {
-        return skikoRect.toCGRect()
-    }
-
-    override fun writingDirection(): NSWritingDirection {
-        return NSWritingDirectionLeftToRight//todo
-    }
-}
-
-fun CValue<NSRange>.toStr(): String = useContents { "NSRange location: $location, length: $length " }
-
 private fun UITextRange.toSkikoTextRange(): SkikoTextRange =
     SkikoTextRange(
         start = (start() as IntermediateTextPosition).position.toInt(),
@@ -554,17 +471,11 @@ private fun UITextRange.toSkikoTextRange(): SkikoTextRange =
 private fun SkikoTextRange.toUITextRange(): UITextRange =
     IntermediateTextRange(start = start, end = end)
 
-fun SkikoRect.toCGRect() = CGRectMake(x, y, width, height)
-
-fun CGPoint.toSkikoPoint(): SkikoPoint = SkikoPoint(x, y)
-fun SkikoPoint.toCGPoint() = CGPointMake(x = x, y = y)
-
-//todo When TextField focus lost - unmark text
-
 private fun NSWritingDirection.directionToStr() =
     when (this) {
         UITextLayoutDirectionLeft -> "Left"
         UITextLayoutDirectionRight -> "Right"
+        UITextLayoutDirectionUp -> "Up"
+        UITextLayoutDirectionDown -> "Down"
         else -> "unknown direction"
     }
-
