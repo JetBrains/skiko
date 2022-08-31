@@ -19,6 +19,9 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextPaste
     constructor(coder: NSCoder) : super(coder)
 
     private var skiaLayer: SkiaLayer? = null
+    private var _inputDelegate: UITextInputDelegateProtocol? = null
+    private var _pasteConfiguration: UIPasteConfiguration? = null
+    private var _pasteDelegate: UITextPasteDelegateProtocol? = null
 
     constructor(skiaLayer: SkiaLayer, frame: CValue<CGRect> = CGRectNull.readValue()) : super(frame) {
         this.skiaLayer = skiaLayer
@@ -147,7 +150,6 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextPaste
         skiaLayer?.skikoView?.onTouchEvent(events)
     }
 
-    private var _inputDelegate: UITextInputDelegateProtocol? = null
     override fun inputDelegate(): UITextInputDelegateProtocol? {
         return _inputDelegate
     }
@@ -368,8 +370,6 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextPaste
         return true
     }
 
-    private var _pasteConfiguration: UIPasteConfiguration? = null
-    private var _pasteDelegate: UITextPasteDelegateProtocol? = null
     override fun pasteConfiguration(): UIPasteConfiguration? {
         //https://developer.apple.com/documentation/uikit/uitextpasteconfigurationsupporting
         //todo uikit copy/paste

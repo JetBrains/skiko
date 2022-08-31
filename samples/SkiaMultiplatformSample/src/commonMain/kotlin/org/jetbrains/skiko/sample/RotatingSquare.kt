@@ -20,9 +20,6 @@ class RotatingSquare : SkikoView {
         println("onInput: $event")
     }
 
-    override val input: SkikoInput
-        get() = TODO("Not yet implemented")
-
     override fun onKeyboardEvent(event: SkikoKeyboardEvent) {
         println("onKeyboard: $event")
     }
