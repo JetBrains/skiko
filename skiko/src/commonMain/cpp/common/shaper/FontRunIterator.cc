@@ -26,7 +26,8 @@ void FontRunIterator::consume() {
     SkASSERT(fCurrent < fEnd);
     SkASSERT(!fLanguage || this->endOfCurrentRun() <= fLanguage->endOfCurrentRun());
     const char* clusterStart = fCurrent;
-    const char* clusterEnd = fBegin + ubrk_following(fGraphemeIter.get(), clusterStart - fBegin);
+    int nextBoundaryOffset = ubrk_following(fGraphemeIter.get(), clusterStart - fBegin);
+    const char* clusterEnd = nextBoundaryOffset != UBRK_DONE ? fBegin + nextBoundaryOffset : fEnd;
     UErrorCode status = U_ZERO_ERROR;
 
     // If the starting typeface can handle this character, use it.
@@ -54,7 +55,8 @@ void FontRunIterator::consume() {
 
     while (clusterStart < fEnd) {
         clusterStart = clusterEnd;
-        clusterEnd = fBegin + ubrk_following(fGraphemeIter.get(), clusterStart - fBegin);
+        int nextBoundaryOffset = ubrk_following(fGraphemeIter.get(), clusterStart - fBegin);
+        clusterEnd = nextBoundaryOffset != UBRK_DONE ? fBegin + nextBoundaryOffset : fEnd;
 
         const char* ptr = clusterStart;
         SkUnichar u = utf8_next(&ptr, clusterEnd);
