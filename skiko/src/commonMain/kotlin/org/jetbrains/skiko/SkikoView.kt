@@ -7,7 +7,7 @@ interface SkikoView {
     fun onKeyboardEvent(event: SkikoKeyboardEvent) = Unit
     fun onPointerEvent(event: SkikoPointerEvent) = Unit
 
-    @Deprecated("This method will be removed. Use override val input:PlatformInput")
+    @Deprecated("This method will be removed. Use override val input: SkikoInput")
     fun onInputEvent(event: SkikoInputEvent) = Unit
     val input: SkikoInput
     fun onTouchEvent(events: Array<SkikoTouchEvent>) = Unit
