@@ -23,9 +23,12 @@ internal class Direct3DRedrawer(
 
     init {
         val adapter = chooseAdapter(properties.adapterPriority.ordinal)
-        adapterName = getAdapterName(adapter)
+        if (adapter == 0L) {
+            throw RenderException("Failed to choose DirectX12 adapter.")
+        }
+        adapterName = getAdapterName(0)
         adapterMemorySize = getAdapterMemorySize(adapter)
-        onDeviceChosen(getAdapterName(adapter))
+        onDeviceChosen(adapterName)
         device = createDirectXDevice(adapter, layer.contentHandle, layer.transparency)
         if (device == 0L) {
             throw RenderException("Failed to create DirectX12 device.")
