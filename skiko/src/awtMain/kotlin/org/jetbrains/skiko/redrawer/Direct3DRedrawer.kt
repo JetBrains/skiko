@@ -26,7 +26,7 @@ internal class Direct3DRedrawer(
         if (adapter == 0L) {
             throw RenderException("Failed to choose DirectX12 adapter.")
         }
-        adapterName = getAdapterName(0)
+        adapterName = getAdapterName(adapter)
         adapterMemorySize = getAdapterMemorySize(adapter)
         onDeviceChosen(adapterName)
         device = createDirectXDevice(adapter, layer.contentHandle, layer.transparency)
