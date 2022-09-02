@@ -25,7 +25,7 @@ extern "C"
         }
         __except(EXCEPTION_EXECUTE_HANDLER) {
             auto code = GetExceptionCode();
-            logJavaException(env, __FUNCTION__, code);
+            throwJavaException(env, __FUNCTION__, code);
         }
     }
 }
