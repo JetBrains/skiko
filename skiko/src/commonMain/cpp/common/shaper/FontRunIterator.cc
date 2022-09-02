@@ -15,8 +15,7 @@ static inline SkUnichar utf8_next(const char** ptr, const char* end) {
 bool can_handle_cluster(SkTypeface* typeface, const char* clusterStart, const char* clusterEnd) {
     const char *ptr = clusterStart;
     while (ptr < clusterEnd) {
-        SkUnichar u = SkUTF::NextUTF8(&ptr, clusterEnd);
-        u = u < 0 ? 0xFFFD : u;
+        SkUnichar u = utf8_next(&ptr, clusterEnd);
         if (0 == typeface->unicharToGlyph(u))
             return false;
     }
@@ -24,8 +23,11 @@ bool can_handle_cluster(SkTypeface* typeface, const char* clusterStart, const ch
 }
 
 void FontRunIterator::consume() {
+    SkASSERT(fCurrent < fEnd);
+    SkASSERT(!fLanguage || this->endOfCurrentRun() <= fLanguage->endOfCurrentRun());
     const char* clusterStart = fCurrent;
-    const char* clusterEnd = fBegin + ubrk_following(fGraphemeIter.get(), clusterStart - fBegin);
+    int nextBoundaryOffset = ubrk_following(fGraphemeIter.get(), clusterStart - fBegin);
+    const char* clusterEnd = nextBoundaryOffset != UBRK_DONE ? fBegin + nextBoundaryOffset : fEnd;
     UErrorCode status = U_ZERO_ERROR;
 
     // If the starting typeface can handle this character, use it.
@@ -41,8 +43,7 @@ void FontRunIterator::consume() {
         const char *ptr = clusterStart;
         fCurrentFont = &fFont;
         while (ptr < clusterEnd) {
-            SkUnichar u = SkUTF::NextUTF8(&ptr, clusterEnd);
-            u = u < 0 ? 0xFFFD : u;
+            SkUnichar u = utf8_next(&ptr, clusterEnd);
             sk_sp<SkTypeface> candidate(fFallbackMgr->matchFamilyStyleCharacter(fRequestName, fRequestStyle, &language, languageCount, u));
             if (candidate && can_handle_cluster(candidate.get(), clusterStart, clusterEnd)) {
                 fFallbackFont.setTypeface(std::move(candidate));
@@ -54,7 +55,8 @@ void FontRunIterator::consume() {
 
     while (clusterStart < fEnd) {
         clusterStart = clusterEnd;
-        clusterEnd = fBegin + ubrk_following(fGraphemeIter.get(), clusterStart - fBegin);
+        int nextBoundaryOffset = ubrk_following(fGraphemeIter.get(), clusterStart - fBegin);
+        clusterEnd = nextBoundaryOffset != UBRK_DONE ? fBegin + nextBoundaryOffset : fEnd;
 
         const char* ptr = clusterStart;
         SkUnichar u = utf8_next(&ptr, clusterEnd);
@@ -79,8 +81,7 @@ void FontRunIterator::consume() {
             int languageCount = fLanguage ? 1 : 0;
             const char *ptr = clusterStart;
             while (ptr < clusterEnd) {
-                SkUnichar u = SkUTF::NextUTF8(&ptr, clusterEnd);
-                u = u < 0 ? 0xFFFD : u;
+                SkUnichar u = utf8_next(&ptr, clusterEnd);
                 sk_sp<SkTypeface> candidate(fFallbackMgr->matchFamilyStyleCharacter(fRequestName, fRequestStyle, &language, languageCount, u));
                 if (candidate && can_handle_cluster(candidate.get(), clusterStart, clusterEnd)) {
                     fCurrent = clusterStart;

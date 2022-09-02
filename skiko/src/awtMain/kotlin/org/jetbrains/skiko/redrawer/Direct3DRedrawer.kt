@@ -9,16 +9,25 @@ import org.jetbrains.skiko.context.Direct3DContextHandler
 
 internal class Direct3DRedrawer(
     private val layer: SkiaLayer,
+    analytics: SkiaLayerAnalytics,
     private val properties: SkiaLayerProperties
-) : Redrawer {
+) : AWTRedrawer(layer, analytics, GraphicsApi.DIRECT3D) {
     private val contextHandler = Direct3DContextHandler(layer)
     override val renderInfo: String get() = contextHandler.rendererInfo()
 
-    private var isDisposed = false
     private var drawLock = Any()
 
-    private val device = createDirectXDevice(getAdapterPriority(), layer.contentHandle, layer.transparency).also {
-        if (it == 0L || !isVideoCardSupported(layer.renderApi)) {
+    private val device: Long
+    val adapterName: String
+    val adapterMemorySize: Long
+
+    init {
+        val adapter = chooseAdapter(properties.adapterPriority.ordinal)
+        adapterName = getAdapterName(adapter)
+        adapterMemorySize = getAdapterMemorySize(adapter)
+        onDeviceChosen(getAdapterName(adapter))
+        device = createDirectXDevice(adapter, layer.contentHandle, layer.transparency)
+        if (device == 0L) {
             throw RenderException("Failed to create DirectX12 device.")
         }
     }
@@ -30,11 +39,15 @@ internal class Direct3DRedrawer(
         }
     }
 
+    init {
+        onContextInit()
+    }
+
     override fun dispose() = synchronized(drawLock) {
         frameDispatcher.cancel()
         contextHandler.dispose()
         disposeDevice(device)
-        isDisposed = true
+        super.dispose()
     }
 
     override fun needRedraw() {
@@ -44,18 +57,14 @@ internal class Direct3DRedrawer(
 
     override fun redrawImmediately() {
         check(!isDisposed) { "Direct3DRedrawer is disposed" }
-        layer.inDrawScope {
-        layer.update(System.nanoTime())
+        inDrawScope {
+            update(System.nanoTime())
             drawAndSwap(withVsync = false)
         }
     }
 
-    private fun update(nanoTime: Long) {
-        layer.update(nanoTime)
-    }
-
     private suspend fun draw() {
-        layer.inDrawScope {
+        inDrawScope {
             withContext(Dispatchers.IO) {
                 drawAndSwap(withVsync = properties.isVsyncEnabled)
             }
@@ -77,25 +86,17 @@ internal class Direct3DRedrawer(
         makeDirectXSurface(device, context, width, height, index)
     )
 
-    private fun getAdapterPriority(): Int {
-        val adapterPriority = GpuPriority.parse(System.getProperty("skiko.directx.gpu.priority"))
-        return when (adapterPriority) {
-            GpuPriority.Auto -> 0
-            GpuPriority.Integrated -> 1
-            GpuPriority.Discrete -> 2
-            else -> 0
-        }
-    }
-
     fun resizeBuffers(width: Int, height: Int) = resizeBuffers(device, width, height)
 
     fun getBufferIndex() = getBufferIndex(device)
     fun initSwapChain() = initSwapChain(device)
     fun initFence() = initFence(device)
-    val adapterName get() = getAdapterName(device)
-    val adapterMemorySize get() = getAdapterMemorySize(device)
 
-    private external fun createDirectXDevice(adapterPriority: Int, contentHandle: Long, transparency: Boolean): Long
+    // Called from native code
+    private fun isAdapterSupported(name: String) = isVideoCardSupported(GraphicsApi.DIRECT3D, name)
+
+    private external fun chooseAdapter(adapterPriority: Int): Long
+    private external fun createDirectXDevice(adapter: Long, contentHandle: Long, transparency: Boolean): Long
     private external fun makeDirectXContext(device: Long): Long
     private external fun makeDirectXSurface(device: Long, context: Long, width: Int, height: Int, index: Int): Long
     private external fun resizeBuffers(device: Long, width: Int, height: Int)
@@ -104,6 +105,6 @@ internal class Direct3DRedrawer(
     private external fun getBufferIndex(device: Long): Int
     private external fun initSwapChain(device: Long)
     private external fun initFence(device: Long)
-    private external fun getAdapterName(device: Long): String
-    private external fun getAdapterMemorySize(device: Long): Long
+    private external fun getAdapterName(adapter: Long): String
+    private external fun getAdapterMemorySize(adapter: Long): Long
 }

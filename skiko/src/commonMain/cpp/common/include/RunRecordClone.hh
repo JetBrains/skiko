@@ -11,6 +11,7 @@ public:
     uint32_t  fCount;
     SkPoint   fOffset;
     uint32_t  fFlags;
+    SkDEBUGCODE(unsigned fMagic;)
 
     uint16_t* glyphBuffer() const {
         // Glyphs are stored immediately following the record.

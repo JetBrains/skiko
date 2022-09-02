@@ -7,6 +7,7 @@ import java.awt.Toolkit
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection
 import java.awt.datatransfer.UnsupportedFlavorException
+import java.io.IOException
 import java.net.URI
 import javax.swing.UIManager
 
@@ -17,27 +18,25 @@ internal actual fun makeDefaultRenderFactory(): RenderFactory {
         override fun createRedrawer(
             layer: SkiaLayer,
             renderApi: GraphicsApi,
+            analytics: SkiaLayerAnalytics,
             properties: SkiaLayerProperties
         ): Redrawer = when (hostOs) {
             OS.MacOS -> when (renderApi) {
-                GraphicsApi.SOFTWARE_COMPAT, GraphicsApi.SOFTWARE_FAST -> SoftwareRedrawer(layer, properties)
-                else -> MetalRedrawer(layer, properties)
+                GraphicsApi.SOFTWARE_COMPAT, GraphicsApi.SOFTWARE_FAST -> SoftwareRedrawer(layer, analytics, properties)
+                else -> MetalRedrawer(layer, analytics, properties)
             }
             OS.Windows -> when (renderApi) {
-                GraphicsApi.SOFTWARE_COMPAT -> SoftwareRedrawer(layer, properties)
-                GraphicsApi.SOFTWARE_FAST -> WindowsSoftwareRedrawer(layer, properties)
-                GraphicsApi.OPENGL -> WindowsOpenGLRedrawer(layer, properties)
-                else -> Direct3DRedrawer(layer, properties)
+                GraphicsApi.SOFTWARE_COMPAT -> SoftwareRedrawer(layer, analytics, properties)
+                GraphicsApi.SOFTWARE_FAST -> WindowsSoftwareRedrawer(layer, analytics, properties)
+                GraphicsApi.OPENGL -> WindowsOpenGLRedrawer(layer, analytics, properties)
+                else -> Direct3DRedrawer(layer, analytics, properties)
             }
             OS.Linux -> when (renderApi) {
-                GraphicsApi.SOFTWARE_COMPAT -> SoftwareRedrawer(layer, properties)
-                GraphicsApi.SOFTWARE_FAST -> LinuxSoftwareRedrawer(layer, properties)
-                else -> LinuxOpenGLRedrawer(layer, properties)
+                GraphicsApi.SOFTWARE_COMPAT -> SoftwareRedrawer(layer, analytics, properties)
+                GraphicsApi.SOFTWARE_FAST -> LinuxSoftwareRedrawer(layer, analytics, properties)
+                else -> LinuxOpenGLRedrawer(layer, analytics, properties)
             }
-            OS.Android -> TODO()
-            OS.JS, OS.Ios -> {
-                TODO("Commonize me")
-            }
+            OS.Android, OS.JS, OS.Ios -> throw UnsupportedOperationException("The awt target doesn't support $hostOs")
         }
     }
 }
@@ -61,6 +60,8 @@ internal actual fun ClipboardManager_getText(): String? {
     return try {
         systemClipboard?.getData(DataFlavor.stringFlavor) as String?
     } catch (_: UnsupportedFlavorException) {
+        null
+    } catch (_: IOException) {
         null
     }
 }

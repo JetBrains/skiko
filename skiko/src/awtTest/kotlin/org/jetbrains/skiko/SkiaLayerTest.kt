@@ -28,6 +28,7 @@ import javax.swing.JFrame
 import javax.swing.JLayeredPane
 import javax.swing.WindowConstants
 import kotlin.random.Random
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 @Suppress("BlockingMethodInNonBlockingContext", "SameParameterValue")
@@ -374,6 +375,7 @@ class SkiaLayerTest {
                 override fun createRedrawer(
                     layer: SkiaLayer,
                     renderApi: GraphicsApi,
+                    analytics: SkiaLayerAnalytics,
                     properties: SkiaLayerProperties
                 ) = object : Redrawer {
                     private val contextHandler = object : JvmContextHandler(layer) {
@@ -397,6 +399,7 @@ class SkiaLayerTest {
                 override fun createRedrawer(
                     layer: SkiaLayer,
                     renderApi: GraphicsApi,
+                    analytics: SkiaLayerAnalytics,
                     properties: SkiaLayerProperties
                 ) = throw RenderException()
             }
@@ -410,6 +413,7 @@ class SkiaLayerTest {
                 override fun createRedrawer(
                     layer: SkiaLayer,
                     renderApi: GraphicsApi,
+                    analytics: SkiaLayerAnalytics,
                     properties: SkiaLayerProperties
                 ) = object : Redrawer {
                     override fun dispose() = Unit
@@ -456,12 +460,13 @@ class SkiaLayerTest {
         override fun createRedrawer(
             layer: SkiaLayer,
             renderApi: GraphicsApi,
+            analytics: SkiaLayerAnalytics,
             properties: SkiaLayerProperties
         ): Redrawer {
             return if (renderApi == GraphicsApi.SOFTWARE_COMPAT) {
-                RenderFactory.Default.createRedrawer(layer, renderApi, properties)
+                RenderFactory.Default.createRedrawer(layer, renderApi, analytics, properties)
             } else {
-                nonSoftwareRenderFactory.createRedrawer(layer, renderApi, properties)
+                nonSoftwareRenderFactory.createRedrawer(layer, renderApi, analytics, properties)
             }
         }
     }
@@ -516,6 +521,119 @@ class SkiaLayerTest {
     @Test
     fun `render text (MacOS)`() {
         testRenderText(OS.MacOS)
+    }
+
+    @Test
+    fun analytics() = uiTest {
+        val analytics = object : SkiaLayerAnalytics {
+            val rendererInfo = object {
+                var skikoVersion: String? = null
+                var os: OS? = null
+                var api: GraphicsApi? = null
+
+                var init = 0
+                var deviceChosen = 0
+            }
+
+            val deviceInfo = object {
+                var skikoVersion: String? = null
+                var os: OS? = null
+                var api: GraphicsApi? = null
+                var deviceName: String? = null
+
+                var init = 0
+                var contextInit = 0
+                var beforeFirstFrameRender = 0
+                var afterFirstFrameRender = 0
+            }
+
+            @ExperimentalSkikoApi
+            override fun renderer(
+                skikoVersion: String,
+                os: OS,
+                api: GraphicsApi
+            ) = object : SkiaLayerAnalytics.RendererAnalytics {
+                init {
+                    rendererInfo.skikoVersion = skikoVersion
+                    rendererInfo.os = os
+                    rendererInfo.api = api
+                    rendererInfo.init = 0
+                    rendererInfo.deviceChosen = 0
+                }
+
+                override fun init() {
+                    rendererInfo.init++
+                }
+
+                override fun deviceChosen() {
+                    rendererInfo.deviceChosen++
+                }
+            }
+
+            @ExperimentalSkikoApi
+            override fun device(
+                skikoVersion: String,
+                os: OS,
+                api: GraphicsApi,
+                deviceName: String?
+            ) = object : SkiaLayerAnalytics.DeviceAnalytics {
+                init {
+                    deviceInfo.skikoVersion = skikoVersion
+                    deviceInfo.os = os
+                    deviceInfo.api = api
+                    deviceInfo.deviceName = deviceName
+
+                    deviceInfo.init = 0
+                    deviceInfo.contextInit = 0
+                    deviceInfo.beforeFirstFrameRender = 0
+                    deviceInfo.afterFirstFrameRender = 0
+                }
+
+                override fun init() {
+                    deviceInfo.init++
+                }
+
+                override fun contextInit() {
+                    deviceInfo.contextInit++
+                }
+
+                override fun beforeFirstFrameRender() {
+                    deviceInfo.beforeFirstFrameRender++
+                }
+
+                override fun afterFirstFrameRender() {
+                    deviceInfo.afterFirstFrameRender++
+                }
+            }
+        }
+
+        val window = UiTestWindow(analytics = analytics)
+        try {
+            window.setLocation(200, 200)
+            window.setSize(400, 200)
+            window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+            val app = RectRenderer(window.layer, 200, 100, Color.RED)
+            window.layer.skikoView = app
+            window.isUndecorated = true
+            window.isVisible = true
+
+            delay(1000)
+            assertEquals(Version.skiko, analytics.rendererInfo.skikoVersion)
+            assertEquals(hostOs, analytics.rendererInfo.os)
+            assertNotNull(analytics.rendererInfo.api)
+            assertEquals(1, analytics.rendererInfo.init)
+            assertEquals(1, analytics.rendererInfo.deviceChosen)
+
+            assertEquals(Version.skiko, analytics.deviceInfo.skikoVersion)
+            assertNotNull(analytics.deviceInfo.api)
+            assertNotNull(analytics.deviceInfo.deviceName)
+            assertEquals(1, analytics.deviceInfo.init)
+            assertEquals(1, analytics.deviceInfo.contextInit)
+            assertEquals(1, analytics.deviceInfo.beforeFirstFrameRender)
+            assertEquals(1, analytics.deviceInfo.afterFirstFrameRender)
+        } finally {
+            window.close()
+        }
     }
 
     private fun testRenderText(os: OS) = uiTest {

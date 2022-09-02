@@ -1,3 +1,5 @@
+#include "SkRect.h"
+#include "SkCanvas.h"
 #include "SkSVGCanvas.h"
 #include "SkStream.h"
 #include "common.h"

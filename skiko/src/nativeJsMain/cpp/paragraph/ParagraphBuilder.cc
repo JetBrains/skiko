@@ -48,13 +48,6 @@ SKIKO_EXPORT void org_jetbrains_skia_paragraph_ParagraphBuilder__1nAddPlaceholde
     instance->addPlaceholder({width, height, static_cast<PlaceholderAlignment>(alignment), static_cast<TextBaseline>(baselinePosition), baseline});
 }
 
-SKIKO_EXPORT void org_jetbrains_skia_paragraph_ParagraphBuilder__1nSetParagraphStyle
-  (KNativePointer ptr, KNativePointer stylePtr) {
-    ParagraphBuilder* instance = reinterpret_cast<ParagraphBuilder*>((ptr));
-    ParagraphStyle* style = reinterpret_cast<ParagraphStyle*>((stylePtr));
-    instance->setParagraphStyle(*style);
-}
-
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_paragraph_ParagraphBuilder__1nBuild
   (KNativePointer ptr) {
     ParagraphBuilder* instance = reinterpret_cast<ParagraphBuilder*>((ptr));

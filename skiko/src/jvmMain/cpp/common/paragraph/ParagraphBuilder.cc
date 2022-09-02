@@ -50,13 +50,6 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_ParagraphBui
     instance->addPlaceholder({width, height, static_cast<PlaceholderAlignment>(alignment), static_cast<TextBaseline>(baselinePosition), baseline});
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_ParagraphBuilderKt__1nSetParagraphStyle
-  (JNIEnv* env, jclass jclass, jlong ptr, jlong stylePtr) {
-    ParagraphBuilder* instance = reinterpret_cast<ParagraphBuilder*>(static_cast<uintptr_t>(ptr));
-    ParagraphStyle* style = reinterpret_cast<ParagraphStyle*>(static_cast<uintptr_t>(stylePtr));
-    instance->setParagraphStyle(*style);
-}
-
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_paragraph_ParagraphBuilderKt__1nBuild
   (JNIEnv* env, jclass jclass, jlong ptr) {
     ParagraphBuilder* instance = reinterpret_cast<ParagraphBuilder*>(static_cast<uintptr_t>(ptr));

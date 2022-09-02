@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include "jni_helpers.h"
 
+#include "SkColorSpace.h"
 #include "SkSurface.h"
 #include "src/core/SkAutoMalloc.h"
 

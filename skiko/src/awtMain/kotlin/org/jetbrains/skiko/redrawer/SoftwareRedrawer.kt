@@ -1,17 +1,19 @@
 package org.jetbrains.skiko.redrawer
 
 import kotlinx.coroutines.*
-import org.jetbrains.skiko.FrameDispatcher
+import org.jetbrains.skiko.*
 import org.jetbrains.skiko.FrameLimiter
-import org.jetbrains.skiko.MainUIDispatcher
-import org.jetbrains.skiko.SkiaLayer
-import org.jetbrains.skiko.SkiaLayerProperties
 import org.jetbrains.skiko.context.SoftwareContextHandler
 
 internal class SoftwareRedrawer(
     private val layer: SkiaLayer,
+    analytics: SkiaLayerAnalytics,
     private val properties: SkiaLayerProperties
-) : Redrawer {
+) : AWTRedrawer(layer, analytics, GraphicsApi.SOFTWARE_FAST) {
+    init {
+        onDeviceChosen("Software")
+    }
+
     private val contextHandler = SoftwareContextHandler(layer)
     override val renderInfo: String get() = contextHandler.rendererInfo()
 
@@ -24,9 +26,13 @@ internal class SoftwareRedrawer(
         }
 
         if (layer.isShowing) {
-            layer.update(System.nanoTime())
-            layer.inDrawScope(contextHandler::draw)
+            update(System.nanoTime())
+            inDrawScope(contextHandler::draw)
         }
+    }
+
+    init {
+        onContextInit()
     }
 
     override fun dispose() {
@@ -35,6 +41,7 @@ internal class SoftwareRedrawer(
         runBlocking {
             frameJob.cancelAndJoin()
         }
+        super.dispose()
     }
 
     override fun needRedraw() {
@@ -42,7 +49,7 @@ internal class SoftwareRedrawer(
     }
 
     override fun redrawImmediately() {
-        layer.update(System.nanoTime())
-        layer.inDrawScope(contextHandler::draw)
+        update(System.nanoTime())
+        inDrawScope(contextHandler::draw)
     }
 }

@@ -61,7 +61,7 @@ internal class MetalContextHandler(layer: SkiaLayer) : JvmContextHandler(layer) 
 
     override fun rendererInfo(): String {
         return super.rendererInfo() +
-            "Video card: ${metalRedrawer.getAdapterName()}\n" +
-            "Total VRAM: ${metalRedrawer.getAdapterMemorySize() / 1024 / 1024} MB\n"
+            "Video card: ${metalRedrawer.adapterName}\n" +
+            "Total VRAM: ${metalRedrawer.adapterMemorySize / 1024 / 1024} MB\n"
     }
 }

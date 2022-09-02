@@ -7,7 +7,7 @@ import org.junit.Test
 import java.awt.Font
 import java.awt.GraphicsEnvironment
 
-class AwtFontInterop {
+class AwtFontInteropTest {
     private val fontManager = AwtFontManager()
 
     private fun assumeOk() {

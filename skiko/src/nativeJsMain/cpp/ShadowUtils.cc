@@ -1,4 +1,5 @@
 #include "SkShadowUtils.h"
+#include "SkPoint3.h"
 #include "common.h"
 
 SKIKO_EXPORT void org_jetbrains_skia_ShadowUtils__1nDrawShadow
@@ -6,7 +7,7 @@ SKIKO_EXPORT void org_jetbrains_skia_ShadowUtils__1nDrawShadow
         KFloat lightPosX, KFloat lightPosY, KFloat lightPosZ, KFloat lightRadius, KInt ambientColor, KInt spotColor, KInt flags) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>((canvasPtr));
     SkPath* path = reinterpret_cast<SkPath*>((pathPtr));
-    SkShadowUtils::DrawShadow(canvas, *path, {zPlaneX, zPlaneY, zPlaneZ}, {lightPosX, lightPosY, lightPosZ}, lightRadius, ambientColor, spotColor, flags);
+    SkShadowUtils::DrawShadow(canvas, *path, SkPoint3::Make(zPlaneX, zPlaneY, zPlaneZ), SkPoint3::Make(lightPosX, lightPosY, lightPosZ), lightRadius, ambientColor, spotColor, flags);
 }
 
 SKIKO_EXPORT int org_jetbrains_skia_ShadowUtils__1nComputeTonalAmbientColor

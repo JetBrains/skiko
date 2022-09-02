@@ -5,6 +5,7 @@ import org.jetbrains.skia.*
 import org.jetbrains.skiko.util.UiTestScope
 import org.jetbrains.skiko.util.UiTestWindow
 import org.jetbrains.skiko.util.uiTest
+import org.junit.Assume.assumeTrue
 import org.junit.Test
 import java.awt.Point
 import javax.swing.WindowConstants
@@ -128,6 +129,8 @@ class SkiaLayerPerformanceTest {
 
     @Test
     fun `FPS is near display refresh rate (multiple windows)`() = uiTest {
+        assumeTrue(System.getProperty("skiko.test.performance.enabled", "true") == "true")
+
         val helpers = (1..3).map { index ->
             performanceHelper(width = 40, height = 20, frameCount = 300, deviatedTerminalCount = 20).apply {
                 window.toFront()
