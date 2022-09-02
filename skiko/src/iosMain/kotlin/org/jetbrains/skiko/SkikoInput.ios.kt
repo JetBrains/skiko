@@ -38,9 +38,9 @@ actual interface SkikoInput {
      * If the text-range object is nil, it indicates that there is no current selection.
      * https://developer.apple.com/documentation/uikit/uitextinput/1614541-selectedtextrange
      */
-    fun getSelectedTextRange(): SkikoTextRange?
+    fun getSelectedTextRange(): IntRange?
 
-    fun setSelectedTextRange(range: SkikoTextRange?)
+    fun setSelectedTextRange(range: IntRange?)
 
     fun selectAll()
 
@@ -50,7 +50,7 @@ actual interface SkikoInput {
      * @param range A range of text in a document.
      * @return A substring of a document that falls within the specified range.
      */
-    fun textInRange(range: SkikoTextRange): String?
+    fun textInRange(range: IntRange): String?
 
     /**
      * Replaces the text in a document that is in the specified range.
@@ -58,7 +58,7 @@ actual interface SkikoInput {
      * @param range A range of text in a document.
      * @param text A string to replace the text in range.
      */
-    fun replaceRange(range: SkikoTextRange, text: String)
+    fun replaceRange(range: IntRange, text: String)
 
     /**
      * Inserts the provided text and marks it to indicate that it is part of an active input session.
@@ -69,7 +69,7 @@ actual interface SkikoInput {
      * @param selectedRange A range within markedText that indicates the current selection.
      * This range is always relative to markedText.
      */
-    fun setMarkedText(markedText: String?, selectedRange: SkikoTextRange)
+    fun setMarkedText(markedText: String?, selectedRange: IntRange)
 
     /**
      * The range of currently marked text in a document.
@@ -79,7 +79,7 @@ actual interface SkikoInput {
      * The current selection, which can be a caret or an extended range, always occurs within the marked text.
      * https://developer.apple.com/documentation/uikit/uitextinput/1614489-markedtextrange
      */
-    fun markedTextRange(): SkikoTextRange?
+    fun markedTextRange(): IntRange?
 
     /**
      * Unmarks the currently marked text.

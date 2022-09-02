@@ -228,7 +228,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextPaste
         val (locationRelative, lengthRelative) = selectedRange.useContents {
             location.toInt() to length.toInt()
         }
-        val relativeTextRange = SkikoTextRange(locationRelative, locationRelative + lengthRelative)
+        val relativeTextRange = locationRelative until locationRelative + lengthRelative
         skiaLayer?.skikoView?.input?.setMarkedText(markedText, relativeTextRange)
     }
 
@@ -462,14 +462,14 @@ private class IntermediateTextRange(
     override fun end(): UITextPosition = _end
 }
 
-private fun UITextRange.toSkikoTextRange(): SkikoTextRange =
+private fun UITextRange.toSkikoTextRange(): IntRange =
     SkikoTextRange(
         start = (start() as IntermediateTextPosition).position.toInt(),
         end = (end() as IntermediateTextPosition).position.toInt()
     )
 
-private fun SkikoTextRange.toUITextRange(): UITextRange =
-    IntermediateTextRange(start = start, end = end)
+private fun IntRange.toUITextRange(): UITextRange =
+    IntermediateTextRange(start = start, end = endInclusive + 1)
 
 private fun NSWritingDirection.directionToStr() =
     when (this) {
