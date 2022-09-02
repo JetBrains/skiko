@@ -9,7 +9,7 @@ interface SkikoView {
 
     @Deprecated("This method will be removed. Use override val input: SkikoInput")
     fun onInputEvent(event: SkikoInputEvent) = Unit
-    val input: SkikoInput
+    val input: SkikoInput get() = SkikoInput.Empty
     fun onTouchEvent(events: Array<SkikoTouchEvent>) = Unit
     fun onGestureEvent(event: SkikoGestureEvent) = Unit
 

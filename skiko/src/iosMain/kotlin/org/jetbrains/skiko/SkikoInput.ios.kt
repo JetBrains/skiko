@@ -1,7 +1,5 @@
 package org.jetbrains.skiko
 
-import org.jetbrains.skiko.data.*
-
 actual interface SkikoInput {
     
     /**
@@ -87,5 +85,20 @@ actual interface SkikoInput {
      * https://developer.apple.com/documentation/uikit/uitextinput/1614512-unmarktext
      */
     fun unmarkText()
+
+    actual object Empty : SkikoInput {
+        override fun hasText(): Boolean = false
+        override fun insertText(text: String) = Unit
+        override fun deleteBackward() = Unit
+        override fun endOfDocument(): Long = 0L
+        override fun getSelectedTextRange(): IntRange? = null
+        override fun setSelectedTextRange(range: IntRange?) = Unit
+        override fun selectAll() = Unit
+        override fun textInRange(range: IntRange): String? = null
+        override fun replaceRange(range: IntRange, text: String) = Unit
+        override fun setMarkedText(markedText: String?, selectedRange: IntRange) = Unit
+        override fun markedTextRange(): IntRange? = null
+        override fun unmarkText() = Unit
+    }
 
 }
