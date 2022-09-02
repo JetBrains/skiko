@@ -21,6 +21,7 @@ val skikoArtifactIds: List<String> =
         SkikoArtifacts.nativeArtifactIdFor(OS.IOS, Arch.X64),
         SkikoArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64),
         SkikoArtifacts.nativeArtifactIdFor(OS.Windows, Arch.X64),
+        SkikoArtifacts.nativeArtifactIdFor(OS.IOS, Arch.Arm64, isIosSim = true),
 )
 
 val downloadSkikoArtifactsFromComposeDev by tasks.registering(DownloadFromSpaceMavenRepoTask::class) {
