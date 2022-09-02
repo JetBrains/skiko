@@ -61,6 +61,8 @@ internal actual fun ClipboardManager_getText(): String? {
         systemClipboard?.getData(DataFlavor.stringFlavor) as String?
     } catch (_: UnsupportedFlavorException) {
         null
+    } catch (_: IllegalStateException) {
+        null
     } catch (_: IOException) {
         null
     }
