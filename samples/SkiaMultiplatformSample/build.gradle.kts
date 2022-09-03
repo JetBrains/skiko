@@ -14,7 +14,7 @@ buildscript {
 
 plugins {
     kotlin("multiplatform") version "1.6.10"
-    id("org.jetbrains.gradle.apple.applePlugin") version "222.849-0.15.1"
+    id("org.jetbrains.gradle.apple.applePlugin") version "222.3345.143-0.16"
 }
 
 val coroutinesVersion = "1.5.2"
@@ -61,29 +61,44 @@ val unzipTask = tasks.register("unzipWasm", Copy::class) {
 }
 
 kotlin {
-    val targets = mutableListOf<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>()
-
     if (hostOs == "macos") {
+        val appleNativeTargets = mutableListOf<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>()
         val nativeHostTarget = when (host) {
             "macos-x64" -> macosX64()
             "macos-arm64" -> macosArm64()
             else -> throw GradleException("Host OS is not supported yet")
         }
-        targets.add(nativeHostTarget)
-
-        targets.add(iosX64())
-        targets.add(iosArm64())
-
-        ios {
-            binaries {
-                framework {
-                    baseName = "shared"
-                    freeCompilerArgs += listOf(
-                        "-linker-option", "-framework", "-linker-option", "Metal",
-                        "-linker-option", "-framework", "-linker-option", "CoreText",
-                        "-linker-option", "-framework", "-linker-option", "CoreGraphics"
-                    )
+        appleNativeTargets.add(nativeHostTarget)
+        val iosTarget = when (host) {
+            "macos-x64" -> iosX64()
+            "macos-arm64" -> iosSimulatorArm64()
+            else -> throw GradleException("Host OS is not supported")
+        }
+        appleNativeTargets.add(iosTarget)
+        appleNativeTargets.forEach {
+            // Configure to lauch from Xcode
+            it.apply {
+                binaries {
+                    executable {
+                        entryPoint = "org.jetbrains.skiko.sample.main"
+                        freeCompilerArgs += listOf(
+                            "-linker-option", "-framework", "-linker-option", "Metal",
+                            "-linker-option", "-framework", "-linker-option", "CoreText",
+                            "-linker-option", "-framework", "-linker-option", "CoreGraphics"
+                        )
+                    }
                 }
+            }
+        }
+        iosTarget.binaries {
+            // Configure to launch from AppCode
+            framework {
+                baseName = "shared"
+                freeCompilerArgs += listOf(
+                    "-linker-option", "-framework", "-linker-option", "Metal",
+                    "-linker-option", "-framework", "-linker-option", "CoreText",
+                    "-linker-option", "-framework", "-linker-option", "CoreGraphics"
+                )
             }
         }
     }
@@ -97,21 +112,6 @@ kotlin {
     js(IR) {
         browser()
         binaries.executable()
-    }
-
-    targets.forEach {
-        it.apply {
-            binaries {
-                executable {
-                    entryPoint = "org.jetbrains.skiko.sample.main"
-                    freeCompilerArgs += listOf(
-                        "-linker-option", "-framework", "-linker-option", "Metal",
-                        "-linker-option", "-framework", "-linker-option", "CoreText",
-                        "-linker-option", "-framework", "-linker-option", "CoreGraphics"
-                    )
-                }
-            }
-        }
     }
 
     sourceSets {
@@ -163,47 +163,15 @@ kotlin {
                 }
                 else -> throw GradleException("Host OS is not supported")
             }
-            val iosMain by getting {
+            val iosMain by creating {
                 dependsOn(darwinMain)
             }
-            val iosX64Main by getting {
-                dependsOn(iosMain)
+            val iosSourceSetName = when (host) {
+                "macos-x64" -> "iosX64Main"
+                "macos-arm64" -> "iosSimulatorArm64Main"
+                else -> throw GradleException("Host OS is not supported")
             }
-            val iosArm64Main by getting {
-                dependsOn(iosMain)
-            }
-        }
-    }
-}
-
-if (hostOs == "macos") {
-    project.tasks.register<Exec>("runIosSim") {
-        val device = "iPhone 11"
-        workingDir = project.buildDir
-        val binTask = project.tasks.named("linkReleaseExecutableIosX64")
-        dependsOn(binTask)
-        commandLine = listOf(
-            "xcrun",
-            "simctl",
-            "spawn",
-            "--standalone",
-            device
-        )
-        argumentProviders.add {
-            val out = fileTree(binTask.get().outputs.files.files.single()) { include("*.kexe") }
-            listOf(out.single { it.name.endsWith(".kexe") }.absolutePath)
-        }
-    }
-    project.tasks.register<Exec>("runNative") {
-        workingDir = project.buildDir
-        val binTask = project.tasks.named("linkDebugExecutable${hostOs.capitalize()}${hostArch.capitalize()}")
-        dependsOn(binTask)
-        // Hacky approach.
-        commandLine = listOf("bash", "-c")
-        argumentProviders.add {
-            val out = fileTree(binTask.get().outputs.files.files.single()) { include("*.kexe") }
-            println("Run $out")
-            listOf(out.single { it.name.endsWith(".kexe") }.absolutePath)
+            getByName(iosSourceSetName).dependsOn(iosMain)
         }
     }
 }
@@ -234,7 +202,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().configureEach 
 
 enum class Target(val simulator: Boolean, val key: String) {
     WATCHOS_X86(true, "watchos"), WATCHOS_ARM64(false, "watchos"),
-    IOS_X64(true, "iosX64"), IOS_ARM64(false, "iosArm64")
+    IOS_X64(true, "iosX64"), IOS_ARM64(false, "iosArm64"), IOS_SIMULATOR_ARM64(true, "iosSimulatorArm64")
 }
 
 
@@ -245,10 +213,13 @@ if (hostOs == "macos") {
     val target = sdkName.orEmpty().let {
         when {
             it.startsWith("iphoneos") -> Target.IOS_ARM64
-            it.startsWith("iphonesimulator") -> Target.IOS_X64
             it.startsWith("watchos") -> Target.WATCHOS_ARM64
             it.startsWith("watchsimulator") -> Target.WATCHOS_X86
-            else -> Target.IOS_X64
+            else -> when (host) {
+                "macos-x64" -> Target.IOS_X64
+                "macos-arm64" -> Target.IOS_SIMULATOR_ARM64
+                else -> throw GradleException("Host OS is not supported")
+            }
         }
     }
 
