@@ -18,6 +18,7 @@ plugins {
 }
 
 val coroutinesVersion = "1.5.2"
+val LAUNCH_ON_REAL_DEVICE = false // true, if you want to launch on real device from Xcode
 
 repositories {
     mavenLocal()
@@ -69,6 +70,9 @@ kotlin {
             else -> throw GradleException("Host OS is not supported yet")
         }
         appleNativeTargets.add(nativeHostTarget)
+        if (LAUNCH_ON_REAL_DEVICE) {
+            targets.add(iosArm64())
+        }
         val iosTarget = when (host) {
             "macos-x64" -> iosX64()
             "macos-arm64" -> iosSimulatorArm64()
@@ -172,6 +176,9 @@ kotlin {
                 else -> throw GradleException("Host OS is not supported")
             }
             getByName(iosSourceSetName).dependsOn(iosMain)
+            if (LAUNCH_ON_REAL_DEVICE) {
+                getByName("iosArm64").dependsOn(iosMain)
+            }
         }
     }
 }
