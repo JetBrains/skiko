@@ -1,3 +1,6 @@
+import org.jetbrains.kotlin.gradle.dsl.KotlinNativeBinaryContainer
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+
 buildscript {
     repositories {
         mavenLocal()
@@ -18,7 +21,6 @@ plugins {
 }
 
 val coroutinesVersion = "1.5.2"
-val LAUNCH_ON_REAL_DEVICE = false // true, if you want to launch on real device from Xcode
 
 repositories {
     mavenLocal()
@@ -62,48 +64,20 @@ val unzipTask = tasks.register("unzipWasm", Copy::class) {
 }
 
 kotlin {
-    if (hostOs == "macos") {
-        val appleNativeTargets = mutableListOf<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>()
-        val nativeHostTarget = when (host) {
-            "macos-x64" -> macosX64()
-            "macos-arm64" -> macosArm64()
-            else -> throw GradleException("Host OS is not supported yet")
+    if (hostOs == "macos") { //todo maybe redundant check
+        macosX64() {
+            configureToLaunchFromXcode()
         }
-        appleNativeTargets.add(nativeHostTarget)
-        if (LAUNCH_ON_REAL_DEVICE) {
-            appleNativeTargets.add(iosArm64())
+        macosArm64() {
+            configureToLaunchFromXcode()
         }
-        val iosTarget = when (host) {
-            "macos-x64" -> iosX64()
-            "macos-arm64" -> iosSimulatorArm64()
-            else -> throw GradleException("Host OS is not supported")
+        ios() {
+            configureToLaunchFromAppCode()
+            configureToLaunchFromXcode()
         }
-        appleNativeTargets.add(iosTarget)
-        appleNativeTargets.forEach {
-            // Configure to lauch from Xcode
-            it.apply {
-                binaries {
-                    executable {
-                        entryPoint = "org.jetbrains.skiko.sample.main"
-                        freeCompilerArgs += listOf(
-                            "-linker-option", "-framework", "-linker-option", "Metal",
-                            "-linker-option", "-framework", "-linker-option", "CoreText",
-                            "-linker-option", "-framework", "-linker-option", "CoreGraphics"
-                        )
-                    }
-                }
-            }
-        }
-        iosTarget.binaries {
-            // Configure to launch from AppCode
-            framework {
-                baseName = "shared"
-                freeCompilerArgs += listOf(
-                    "-linker-option", "-framework", "-linker-option", "Metal",
-                    "-linker-option", "-framework", "-linker-option", "CoreText",
-                    "-linker-option", "-framework", "-linker-option", "CoreGraphics"
-                )
-            }
+        iosSimulatorArm64() {
+            configureToLaunchFromAppCode()
+            configureToLaunchFromXcode()
         }
     }
 
@@ -151,33 +125,18 @@ kotlin {
             dependsOn(darwinMain)
         }
 
-        if (hostOs == "macos") {
-            val archTargetMain = when (host) {
-                "macos-x64" -> {
-                    val macosX64Main by getting {
-                        dependsOn(macosMain)
-                    }
-                    macosX64Main
-                }
-                "macos-arm64" -> {
-                    val macosArm64Main by getting {
-                        dependsOn(macosMain)
-                    }
-                    macosArm64Main
-                }
-                else -> throw GradleException("Host OS is not supported")
+        if (hostOs == "macos") { //todo maybe redundant check
+            val macosX64Main by getting {
+                dependsOn(macosMain)
             }
-            val iosMain by creating {
+            val macosArm64Main by getting {
+                dependsOn(macosMain)
+            }
+            val iosMain by getting {
                 dependsOn(darwinMain)
             }
-            val iosSourceSetName = when (host) {
-                "macos-x64" -> "iosX64Main"
-                "macos-arm64" -> "iosSimulatorArm64Main"
-                else -> throw GradleException("Host OS is not supported")
-            }
-            getByName(iosSourceSetName).dependsOn(iosMain)
-            if (LAUNCH_ON_REAL_DEVICE) {
-                getByName("iosArm64").dependsOn(iosMain)
+            val iosSimulatorArm64Main by getting {
+                dependsOn(iosMain)
             }
         }
     }
@@ -317,6 +276,32 @@ apple {
         sceneDelegateClass = "SceneDelegate"
         dependencies {
             implementation(project(":"))
+        }
+    }
+}
+
+fun KotlinNativeTarget.configureToLaunchFromAppCode() {
+    binaries {
+        framework {
+            baseName = "shared"
+            freeCompilerArgs += listOf(
+                "-linker-option", "-framework", "-linker-option", "Metal",
+                "-linker-option", "-framework", "-linker-option", "CoreText",
+                "-linker-option", "-framework", "-linker-option", "CoreGraphics"
+            )
+        }
+    }
+}
+
+fun KotlinNativeTarget.configureToLaunchFromXcode() {
+    binaries {
+        executable {
+            entryPoint = "org.jetbrains.skiko.sample.main"
+            freeCompilerArgs += listOf(
+                "-linker-option", "-framework", "-linker-option", "Metal",
+                "-linker-option", "-framework", "-linker-option", "CoreText",
+                "-linker-option", "-framework", "-linker-option", "CoreGraphics"
+            )
         }
     }
 }
