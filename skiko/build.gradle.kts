@@ -1,21 +1,21 @@
 import de.undercouch.gradle.tasks.download.Download
 import org.gradle.crypto.checksum.Checksum
-import org.gradle.api.tasks.testing.AbstractTestTask
 import org.jetbrains.compose.internal.publishing.MavenCentralProperties
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompileTool
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
-    kotlin("multiplatform") version "1.6.10"
-    id("org.jetbrains.dokka") version "1.6.10"
+    kotlin("multiplatform") version "1.7.10"
+    id("org.jetbrains.dokka") version "1.7.10"
     `maven-publish`
     signing
     id("org.gradle.crypto.checksum") version "1.1.0"
     id("de.undercouch.download") version "4.1.2"
 }
 
-val coroutinesVersion = "1.5.2"
+val coroutinesVersion = "1.6.4"
 
 fun targetSuffix(os: OS, arch: Arch): String {
     return "${os.id}_${arch.id}"
@@ -189,6 +189,17 @@ fun compileNativeBridgesTask(os: OS, arch: Arch, isArm64Simulator: Boolean): Tas
                     *skiaPreprocessorFlags(OS.Linux)
                 ))
             }
+            OS.MinGW -> {
+                flags.set(listOf(
+                    *buildType.clangFlags,
+                    "-fno-rtti",
+                    "-fno-exceptions",
+                    "-fvisibility=hidden",
+                    "-fvisibility-inlines-hidden",
+                    "-D_GLIBCXX_USE_CXX11_ABI=0",
+                    *skiaPreprocessorFlags(OS.Linux)
+                ))
+            }
             else -> throw GradleException("$os not yet supported")
         }
 
@@ -258,6 +269,7 @@ kotlin {
         configureNativeTarget(OS.MacOS, Arch.X64, macosX64())
         configureNativeTarget(OS.MacOS, Arch.Arm64, macosArm64())
         configureNativeTarget(OS.Linux, Arch.X64, linuxX64())
+        configureNativeTarget(OS.MinGW, Arch.X64, mingwX64())
         configureNativeTarget(OS.IOS, Arch.Arm64, iosArm64())
         configureNativeTarget(OS.IOS, Arch.X64, iosX64())
         configureNativeTarget(OS.IOS, Arch.Arm64, iosSimulatorArm64())
@@ -368,6 +380,21 @@ kotlin {
                 val linuxX64Test by getting {
                     dependsOn(linuxTest)
                 }
+                val mingwMain by creating {
+                    dependsOn(nativeJsMain)
+                    dependencies {
+                        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
+                    }
+                }
+                val mingwTest by creating {
+                    dependsOn(nativeTest)
+                }
+                val mingwX64Main by getting {
+                    dependsOn(mingwMain)
+                }
+                val mingwX64Test by getting {
+                    dependsOn(mingwTest)
+                }
                 val darwinMain by creating {
                     dependsOn(nativeMain)
                 }
@@ -434,7 +461,7 @@ fun configureNativeTarget(os: OS, arch: Arch, target: KotlinNativeTarget) {
     val skiaDir = unpackedSkia.absolutePath
 
     val bridgesLibrary = "$buildDir/nativeBridges/static/$targetString/skiko-native-bridges-$targetString.a"
-    val allLibraries = skiaStaticLibraries(skiaDir, targetString) + bridgesLibrary
+    val allLibraries = skiaStaticLibraries(os, skiaDir, targetString) + bridgesLibrary
 
     target.compilations.all {
         val skiaBinDir = "$skiaDir/out/${buildType.id}-$targetString"
@@ -458,6 +485,9 @@ fun configureNativeTarget(os: OS, arch: Arch, target: KotlinNativeTarget) {
                     "-linker-option", "$skiaBinDir/libskshaper.a",
                     "-linker-option", "$skiaBinDir/libskunicode.a",
                     "-linker-option", "$skiaBinDir/libskia.a"
+                )
+                OS.MinGW -> mutableListOf(
+                    "-linker-option", "-lopengl32"
                 )
                 else -> mutableListOf()
             }
@@ -489,7 +519,7 @@ fun configureNativeTarget(os: OS, arch: Arch, target: KotlinNativeTarget) {
         val staticLib = "$outDir/skiko-native-bridges-$targetString.a"
         workingDir = File(outDir)
         when (os) {
-            OS.Linux -> {
+            OS.Linux, OS.MinGW -> {
                 executable = "ar"
                 argumentProviders.add { listOf("-crs", staticLib) }
             }
@@ -504,7 +534,9 @@ fun configureNativeTarget(os: OS, arch: Arch, target: KotlinNativeTarget) {
         outputs.dir(outDir)
     }
     target.compilations.all {
-        compileKotlinTask.dependsOn(linkTask)
+        compileKotlinTaskProvider.configure {
+            dependsOn(linkTask)
+        }
     }
 }
 
@@ -586,30 +618,53 @@ fun skiaPreprocessorFlags(os: OS): Array<String> {
     return (base + perOs).toTypedArray()
 }
 
-fun skiaStaticLibraries(skiaDir: String, targetString: String): List<String> {
+fun skiaStaticLibraries(os: OS, skiaDir: String, targetString: String): List<String> {
     val skiaBinSubdir = "$skiaDir/out/${buildType.id}-$targetString"
-    return listOf(
-        "libskresources.a",
-        "libparticles.a",
-        "libskparagraph.a",
-        "libskia.a",
-        "libicu.a",
-        "libskottie.a",
-        "libsvg.a",
-        "libpng.a",
-        "libfreetype2.a",
-        "libwebp_sse41.a",
-        "libsksg.a",
-        "libskunicode.a",
-        "libwebp.a",
-        "libdng_sdk.a",
-        "libpiex.a",
-        "libharfbuzz.a",
-        "libexpat.a",
-        "libzlib.a",
-        "libjpeg.a",
-        "libskshaper.a"
-    ).map{
+    return when(os) {
+        OS.MinGW -> listOf(
+            "libexpat.a",
+            "libfreetype2.a",
+            "libharfbuzz.a",
+            "libicu.a",
+            "libjpeg.a",
+            "libparticles.a",
+            "libpng.a",
+            "libskcms.a",
+            "libskia.a",
+            "libskottie.a",
+            "libskparagraph.a",
+            "libskresources.a",
+            "libsksg.a",
+            "libskshaper.a",
+            "libskunicode.a",
+            "libsvg.a",
+            "libwebp.a",
+            "libwebp_sse41.a",
+            "libzlib.a",
+        )
+        else -> listOf(
+            "libskresources.a",
+            "libparticles.a",
+            "libskparagraph.a",
+            "libskia.a",
+            "libicu.a",
+            "libskottie.a",
+            "libsvg.a",
+            "libpng.a",
+            "libfreetype2.a",
+            "libwebp_sse41.a",
+            "libsksg.a",
+            "libskunicode.a",
+            "libwebp.a",
+            "libdng_sdk.a",
+            "libpiex.a",
+            "libharfbuzz.a",
+            "libexpat.a",
+            "libzlib.a",
+            "libjpeg.a",
+            "libskshaper.a"
+        )
+    }.map {
         "$skiaBinSubdir/$it"
     }
 }
@@ -864,7 +919,7 @@ fun createCompileJvmBindingsTask(
                 "-fPIC"
             )
         }
-        OS.Wasm, OS.IOS -> error("Should not reach here")
+        OS.Wasm, OS.IOS, OS.MinGW -> error("Should not reach here")
     }
 
     flags.set(
@@ -967,6 +1022,16 @@ fun createLinkJvmBindings(
                     if (buildType == SkiaBuildType.DEBUG) add("dxgi.lib")
                 }.toTypedArray()
             }
+            OS.MinGW -> {
+                osFlags = arrayOf(
+                    "-shared",
+                    "-static-libstdc++",
+                    "-static-libgcc",
+                    "-lGL",
+                    "-lfontconfig",
+                    "-lopengl32"
+                )
+            }
             OS.Android -> {
                 osFlags = arrayOf(
                     "-shared",
@@ -1023,7 +1088,7 @@ fun KotlinTarget.generateVersion(
     val compilation = compilations["main"] ?: error("Could not find 'main' compilation for target '$this'")
     compilation.compileKotlinTaskProvider.configure {
         dependsOn(generateVersionTask)
-        (this as AbstractCompile).source(generatedDir.get().asFile)
+        (this as KotlinCompileTool).source(generatedDir.get().asFile)
     }
 }
 

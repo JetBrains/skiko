@@ -8,6 +8,7 @@ enum class OS(
     Linux("linux", arrayOf()),
     Android("android", arrayOf()),
     Windows("windows", arrayOf()),
+    MinGW("mingw", arrayOf()),
     MacOS("macos", arrayOf("-mmacosx-version-min=10.13")),
     Wasm("wasm", arrayOf()),
     IOS("ios", arrayOf())
@@ -25,6 +26,7 @@ val OS.isCompatibleWithHost: Boolean
     get() = when (this) {
         OS.Linux -> hostOs == OS.Linux
         OS.Windows -> hostOs == OS.Windows
+        OS.MinGW -> hostOs == OS.Windows
         OS.MacOS, OS.IOS -> hostOs == OS.MacOS
         OS.Wasm -> true
         OS.Android -> true
@@ -39,6 +41,7 @@ fun compilerForTarget(os: OS, arch: Arch): String =
         }
         OS.Android -> "clang++"
         OS.Windows -> "cl.exe"
+        OS.MinGW -> "g++.exe"
         OS.MacOS, OS.IOS -> "clang++"
         OS.Wasm -> "emcc"
     }
@@ -50,6 +53,7 @@ val OS.dynamicLibExt: String
     get() = when (this) {
         OS.Linux, OS.Android -> ".so"
         OS.Windows -> ".dll"
+        OS.MinGW -> ".dll"
         OS.MacOS, OS.IOS -> ".dylib"
         OS.Wasm -> ".wasm"
     }
