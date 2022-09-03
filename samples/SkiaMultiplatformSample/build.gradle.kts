@@ -71,7 +71,7 @@ kotlin {
         }
         appleNativeTargets.add(nativeHostTarget)
         if (LAUNCH_ON_REAL_DEVICE) {
-            targets.add(iosArm64())
+            appleNativeTargets.add(iosArm64())
         }
         val iosTarget = when (host) {
             "macos-x64" -> iosX64()
