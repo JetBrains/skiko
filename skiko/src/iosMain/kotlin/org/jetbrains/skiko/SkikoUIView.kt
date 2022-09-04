@@ -1,7 +1,6 @@
 package org.jetbrains.skiko
 
 import kotlinx.cinterop.*
-import org.jetbrains.skiko.data.*
 import platform.CoreGraphics.*
 import platform.Foundation.*
 import platform.UIKit.*
@@ -165,7 +164,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextPaste
      * @return A substring of a document that falls within the specified range.
      */
     override fun textInRange(range: UITextRange): String? {
-        return skiaLayer?.skikoView?.input?.textInRange(range.toSkikoTextRange())
+        return skiaLayer?.skikoView?.input?.textInRange(range.toIntRange())
     }
 
     /**
@@ -175,12 +174,12 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextPaste
      * @param text A string to replace the text in range.
      */
     override fun replaceRange(range: UITextRange, withText: String) {
-        skiaLayer?.skikoView?.input?.replaceRange(range.toSkikoTextRange(), withText)
+        skiaLayer?.skikoView?.input?.replaceRange(range.toIntRange(), withText)
     }
 
     override fun setSelectedTextRange(selectedTextRange: UITextRange?) {
         selectedTextRange?.let {
-            skiaLayer?.skikoView?.input?.setSelectedTextRange(selectedTextRange.toSkikoTextRange())
+            skiaLayer?.skikoView?.input?.setSelectedTextRange(selectedTextRange.toIntRange())
         }
     }
 
@@ -462,11 +461,11 @@ private class IntermediateTextRange(
     override fun end(): UITextPosition = _end
 }
 
-private fun UITextRange.toSkikoTextRange(): IntRange =
-    SkikoTextRange(
-        start = (start() as IntermediateTextPosition).position.toInt(),
-        end = (end() as IntermediateTextPosition).position.toInt()
-    )
+private fun UITextRange.toIntRange(): IntRange {
+    val start = (start() as IntermediateTextPosition).position.toInt()
+    val end = (end() as IntermediateTextPosition).position.toInt()
+    return start until end
+}
 
 private fun IntRange.toUITextRange(): UITextRange =
     IntermediateTextRange(start = start, end = endInclusive + 1)
