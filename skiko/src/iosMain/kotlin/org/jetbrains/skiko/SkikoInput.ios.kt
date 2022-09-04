@@ -48,7 +48,7 @@ actual interface SkikoInput {
      * @param range A range of text in a document.
      * @return A substring of a document that falls within the specified range.
      */
-    fun textInRange(range: IntRange): String?
+    fun textInRange(range: IntRange): String
 
     /**
      * Replaces the text in a document that is in the specified range.
@@ -94,7 +94,7 @@ actual interface SkikoInput {
         override fun getSelectedTextRange(): IntRange? = null
         override fun setSelectedTextRange(range: IntRange?) = Unit
         override fun selectAll() = Unit
-        override fun textInRange(range: IntRange): String? = null
+        override fun textInRange(range: IntRange): String = ""
         override fun replaceRange(range: IntRange, text: String) = Unit
         override fun setMarkedText(markedText: String?, selectedRange: IntRange) = Unit
         override fun markedTextRange(): IntRange? = null
