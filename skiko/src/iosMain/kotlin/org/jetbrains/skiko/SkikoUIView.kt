@@ -89,11 +89,9 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextPaste
                     uiPress.key?.let {
                         pressedKeycodes.add(it.keyCode)
                     }
-                    if (uiPress.key?.keyCode != SkikoKey.KEY_BACKSPACE.value) {
-                        skiaLayer?.skikoView?.onKeyboardEvent(
-                            toSkikoKeyboardEvent(press, SkikoKeyboardEventKind.DOWN)
-                        )
-                    }
+                    skiaLayer?.skikoView?.onKeyboardEvent(
+                        toSkikoKeyboardEvent(press, SkikoKeyboardEventKind.DOWN)
+                    )
                 }
             }
         }
@@ -108,11 +106,9 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextPaste
                     uiPress.key?.let {
                         pressedKeycodes.remove(it.keyCode)
                     }
-                    if (uiPress.key?.keyCode != SkikoKey.KEY_BACKSPACE.value) {
-                        skiaLayer?.skikoView?.onKeyboardEvent(
-                            toSkikoKeyboardEvent(press, SkikoKeyboardEventKind.UP)
-                        )
-                    }
+                    skiaLayer?.skikoView?.onKeyboardEvent(
+                        toSkikoKeyboardEvent(press, SkikoKeyboardEventKind.UP)
+                    )
                 }
             }
         }
