@@ -178,9 +178,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextPaste
     }
 
     override fun setSelectedTextRange(selectedTextRange: UITextRange?) {
-        selectedTextRange?.let {
-            skiaLayer?.skikoView?.input?.setSelectedTextRange(selectedTextRange.toIntRange())
-        }
+        skiaLayer?.skikoView?.input?.setSelectedTextRange(selectedTextRange?.toIntRange())
     }
 
     /**
