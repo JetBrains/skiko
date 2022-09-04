@@ -50,8 +50,6 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextPaste
     fun hideScreenKeyboard() = resignFirstResponder()
     fun isScreenKeyboardOpen() = isFirstResponder
 
-    private val pressedKeycodes: MutableSet<Long> = mutableSetOf()
-
     /**
      * A Boolean value that indicates whether the text-entry object has any text.
      * https://developer.apple.com/documentation/uikit/uikeyinput/1614457-hastext
@@ -86,9 +84,6 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextPaste
             for (press in withEvent.allPresses) {
                 val uiPress = press as? UIPress
                 if (uiPress != null) {
-                    uiPress.key?.let {
-                        pressedKeycodes.add(it.keyCode)
-                    }
                     skiaLayer?.skikoView?.onKeyboardEvent(
                         toSkikoKeyboardEvent(press, SkikoKeyboardEventKind.DOWN)
                     )
@@ -103,9 +98,6 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextPaste
             for (press in withEvent.allPresses) {
                 val uiPress = press as? UIPress
                 if (uiPress != null) {
-                    uiPress.key?.let {
-                        pressedKeycodes.remove(it.keyCode)
-                    }
                     skiaLayer?.skikoView?.onKeyboardEvent(
                         toSkikoKeyboardEvent(press, SkikoKeyboardEventKind.UP)
                     )
