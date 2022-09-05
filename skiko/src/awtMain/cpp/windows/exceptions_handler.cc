@@ -3,20 +3,6 @@
 #include "exceptions_handler.h"
 #include "../common/interop.hh"
 
-bool isHandleException(JNIEnv *env)
-{
-    jstring propertyName = env->NewStringUTF("skiko.win.exception.handler.enabled");
-    jstring propertyString = (jstring)env->CallStaticObjectMethod(java::lang::System::cls, java::lang::System::getProperty, propertyName);
-    if (propertyString == 0)
-    {
-        return false;
-    }
-    const char *property = env->GetStringUTFChars(propertyString, 0);
-    bool result = !strncmp(property, "true", 4);
-    env->ReleaseStringUTFChars(propertyString, property);
-    return result;
-}
-
 const char *getDescription(DWORD code)
 {
     switch (code)
@@ -66,17 +52,14 @@ const char *getDescription(DWORD code)
     }
 }
 
-void logJavaException(JNIEnv *env, const char *function, DWORD sehCode)
+void throwJavaException(JNIEnv *env, const char *function, DWORD sehCode)
 {
-    if (isHandleException(env))
-    {
-        char buffer[200];
-        int result = snprintf(
-            buffer, sizeof(buffer) - 1, "Native exception in [%s]:\nSEH description: %s\n", function, getDescription(sehCode));
-        static jclass logClass = (jclass) env->NewGlobalRef(env->FindClass("org/jetbrains/skiko/RenderExceptionsHandler"));
-        static jmethodID logMethod = env->GetStaticMethodID(logClass, "throwException", "(Ljava/lang/String;)V");
-        env->CallStaticVoidMethod(logClass, logMethod, env->NewStringUTF(buffer));
-    }
+    char buffer[200];
+    int result = snprintf(
+        buffer, sizeof(buffer) - 1, "Native exception in [%s]:\nSEH description: %s\n", function, getDescription(sehCode));
+    static jclass logClass = (jclass) env->NewGlobalRef(env->FindClass("org/jetbrains/skiko/RenderExceptionsHandler"));
+    static jmethodID logMethod = env->GetStaticMethodID(logClass, "throwException", "(Ljava/lang/String;)V");
+    env->CallStaticVoidMethod(logClass, logMethod, env->NewStringUTF(buffer));
 }
 
 #endif
