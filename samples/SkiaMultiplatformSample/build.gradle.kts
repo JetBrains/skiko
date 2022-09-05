@@ -64,7 +64,7 @@ val unzipTask = tasks.register("unzipWasm", Copy::class) {
 }
 
 kotlin {
-    if (hostOs == "macos") { //todo maybe redundant check
+    if (hostOs == "macos") {
         macosX64() {
             configureToLaunchFromXcode()
         }
@@ -125,7 +125,7 @@ kotlin {
             dependsOn(darwinMain)
         }
 
-        if (hostOs == "macos") { //todo maybe redundant check
+        if (hostOs == "macos") {
             val macosX64Main by getting {
                 dependsOn(macosMain)
             }
