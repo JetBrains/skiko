@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+
 buildscript {
     repositories {
         mavenLocal()
@@ -14,7 +16,7 @@ buildscript {
 
 plugins {
     kotlin("multiplatform") version "1.6.10"
-    id("org.jetbrains.gradle.apple.applePlugin") version "222.849-0.15.1"
+    id("org.jetbrains.gradle.apple.applePlugin") version "222.3345.143-0.16"
 }
 
 val coroutinesVersion = "1.5.2"
@@ -61,30 +63,20 @@ val unzipTask = tasks.register("unzipWasm", Copy::class) {
 }
 
 kotlin {
-    val targets = mutableListOf<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>()
-
     if (hostOs == "macos") {
-        val nativeHostTarget = when (host) {
-            "macos-x64" -> macosX64()
-            "macos-arm64" -> macosArm64()
-            else -> throw GradleException("Host OS is not supported yet")
+        macosX64() {
+            configureToLaunchFromXcode()
         }
-        targets.add(nativeHostTarget)
-
-        targets.add(iosX64())
-        targets.add(iosArm64())
-
-        ios {
-            binaries {
-                framework {
-                    baseName = "shared"
-                    freeCompilerArgs += listOf(
-                        "-linker-option", "-framework", "-linker-option", "Metal",
-                        "-linker-option", "-framework", "-linker-option", "CoreText",
-                        "-linker-option", "-framework", "-linker-option", "CoreGraphics"
-                    )
-                }
-            }
+        macosArm64() {
+            configureToLaunchFromXcode()
+        }
+        ios() {
+            configureToLaunchFromAppCode()
+            configureToLaunchFromXcode()
+        }
+        iosSimulatorArm64() {
+            configureToLaunchFromAppCode()
+            configureToLaunchFromXcode()
         }
     }
 
@@ -97,21 +89,6 @@ kotlin {
     js(IR) {
         browser()
         binaries.executable()
-    }
-
-    targets.forEach {
-        it.apply {
-            binaries {
-                executable {
-                    entryPoint = "org.jetbrains.skiko.sample.main"
-                    freeCompilerArgs += listOf(
-                        "-linker-option", "-framework", "-linker-option", "Metal",
-                        "-linker-option", "-framework", "-linker-option", "CoreText",
-                        "-linker-option", "-framework", "-linker-option", "CoreGraphics"
-                    )
-                }
-            }
-        }
     }
 
     sourceSets {
@@ -148,28 +125,16 @@ kotlin {
         }
 
         if (hostOs == "macos") {
-            val archTargetMain = when (host) {
-                "macos-x64" -> {
-                    val macosX64Main by getting {
-                        dependsOn(macosMain)
-                    }
-                    macosX64Main
-                }
-                "macos-arm64" -> {
-                    val macosArm64Main by getting {
-                        dependsOn(macosMain)
-                    }
-                    macosArm64Main
-                }
-                else -> throw GradleException("Host OS is not supported")
+            val macosX64Main by getting {
+                dependsOn(macosMain)
+            }
+            val macosArm64Main by getting {
+                dependsOn(macosMain)
             }
             val iosMain by getting {
                 dependsOn(darwinMain)
             }
-            val iosX64Main by getting {
-                dependsOn(iosMain)
-            }
-            val iosArm64Main by getting {
+            val iosSimulatorArm64Main by getting {
                 dependsOn(iosMain)
             }
         }
@@ -180,7 +145,12 @@ if (hostOs == "macos") {
     project.tasks.register<Exec>("runIosSim") {
         val device = "iPhone 11"
         workingDir = project.buildDir
-        val binTask = project.tasks.named("linkReleaseExecutableIosX64")
+        val linkExecutableTaskName = when (host) {
+            "macos-x64" -> "linkReleaseExecutableIosX64"
+            "macos-arm64" -> "linkReleaseExecutableIosSimulatorArm64"
+            else -> throw GradleException("Host OS is not supported")
+        }
+        val binTask = project.tasks.named(linkExecutableTaskName)
         dependsOn(binTask)
         commandLine = listOf(
             "xcrun",
@@ -234,7 +204,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().configureEach 
 
 enum class Target(val simulator: Boolean, val key: String) {
     WATCHOS_X86(true, "watchos"), WATCHOS_ARM64(false, "watchos"),
-    IOS_X64(true, "iosX64"), IOS_ARM64(false, "iosArm64")
+    IOS_X64(true, "iosX64"), IOS_ARM64(false, "iosArm64"), IOS_SIMULATOR_ARM64(true, "iosSimulatorArm64")
 }
 
 
@@ -245,10 +215,13 @@ if (hostOs == "macos") {
     val target = sdkName.orEmpty().let {
         when {
             it.startsWith("iphoneos") -> Target.IOS_ARM64
-            it.startsWith("iphonesimulator") -> Target.IOS_X64
             it.startsWith("watchos") -> Target.WATCHOS_ARM64
             it.startsWith("watchsimulator") -> Target.WATCHOS_X86
-            else -> Target.IOS_X64
+            else -> when (host) {
+                "macos-x64" -> Target.IOS_X64
+                "macos-arm64" -> Target.IOS_SIMULATOR_ARM64
+                else -> throw GradleException("Host OS is not supported")
+            }
         }
     }
 
@@ -302,6 +275,32 @@ apple {
         sceneDelegateClass = "SceneDelegate"
         dependencies {
             implementation(project(":"))
+        }
+    }
+}
+
+fun KotlinNativeTarget.configureToLaunchFromAppCode() {
+    binaries {
+        framework {
+            baseName = "shared"
+            freeCompilerArgs += listOf(
+                "-linker-option", "-framework", "-linker-option", "Metal",
+                "-linker-option", "-framework", "-linker-option", "CoreText",
+                "-linker-option", "-framework", "-linker-option", "CoreGraphics"
+            )
+        }
+    }
+}
+
+fun KotlinNativeTarget.configureToLaunchFromXcode() {
+    binaries {
+        executable {
+            entryPoint = "org.jetbrains.skiko.sample.main"
+            freeCompilerArgs += listOf(
+                "-linker-option", "-framework", "-linker-option", "Metal",
+                "-linker-option", "-framework", "-linker-option", "CoreText",
+                "-linker-option", "-framework", "-linker-option", "CoreGraphics"
+            )
         }
     }
 }

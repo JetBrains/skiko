@@ -1,7 +1,6 @@
 # Skia multiplatform samples
 
 ## run iOS with Xcode
- - Works only on Mac with Intel CPU (for now)
  - Install xcodegen
  - run `xcodegen`
  - run `open SkikoSample.xcodeproj`
