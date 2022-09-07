@@ -47,7 +47,7 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
         val watchFillHover = Paint().apply { color = 0xFFE4FF01.toInt() }
         for (x in 0 .. width - 50 step 50) {
             for (y in 30 + platformYOffset.toInt() .. height - 50 step 50) {
-                val hover = 
+                val hover =
                     (xpos - xOffset) / scale > x &&
                     (xpos - xOffset) / scale < x + 50 &&
                     (ypos - yOffset) / scale > y &&
