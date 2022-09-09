@@ -10,7 +10,7 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.PI
 
-class Clocks(private val layer: SkiaLayer): SkikoView {
+abstract class Clocks(private val layer: SkiaLayer): SkikoView {
     private val cursorManager = CursorManager()
     private val withFps = true
     private val fpsCounter = FPSCounter()
@@ -26,7 +26,9 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
     private val fontCollection = FontCollection()
         .setDefaultFontManager(FontMgr.default)
     private val style = ParagraphStyle()
-    private var inputText = ""
+
+    abstract val inputText:String
+    abstract fun handleBackspace()
 
     override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
         if (withFps) fpsCounter.tick()
@@ -159,12 +161,6 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
         }
     }
 
-    override fun onInputEvent(event: SkikoInputEvent) {
-        if (event.input != "\b") {
-            inputText += event.input
-        }
-    }
-
     override fun onKeyboardEvent(event: SkikoKeyboardEvent) {
         if (event.kind == SkikoKeyboardEventKind.DOWN) {
             when (event.key) {
@@ -200,9 +196,7 @@ class Clocks(private val layer: SkiaLayer): SkikoView {
                 SkikoKey.KEY_DOWN -> yOffset += 5.0
                 SkikoKey.KEY_SPACE -> { reset() }
                 SkikoKey.KEY_BACKSPACE -> {
-                    if (inputText.isNotEmpty()) {
-                        inputText = inputText.dropLast(1)
-                    }
+                    handleBackspace()
                 }
                 else -> {}
             }
