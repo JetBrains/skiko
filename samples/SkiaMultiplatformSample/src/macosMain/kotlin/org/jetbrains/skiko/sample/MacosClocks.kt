@@ -3,7 +3,7 @@ package org.jetbrains.skiko.sample
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkikoInputEvent
 
-class MacOsClocks(layer: SkiaLayer): Clocks(layer) {
+class MacosClocks(layer: SkiaLayer): Clocks(layer) {
     override var inputText: String = ""
 
     override fun handleBackspace() {
