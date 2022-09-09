@@ -6,7 +6,7 @@ import org.jetbrains.skiko.sample.*
 import platform.Foundation.*
 import platform.UIKit.*
 
-fun makeApp(skiaLayer: SkiaLayer) = Clocks(skiaLayer)
+fun makeApp(skiaLayer: SkiaLayer) = IosClocks(skiaLayer)
 
 fun getSkikoViewContoller(): UIViewController = SkikoViewController(
     SkikoUIView(

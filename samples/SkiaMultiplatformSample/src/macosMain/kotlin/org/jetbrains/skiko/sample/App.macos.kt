@@ -7,7 +7,7 @@ import platform.Foundation.NSMakeRect
 import platform.Foundation.NSSelectorFromString
 import platform.darwin.NSObject
 
-fun makeApp(skiaLayer: SkiaLayer) = Clocks(skiaLayer)
+fun makeApp(skiaLayer: SkiaLayer) = MacOsClocks(skiaLayer)
 
 fun main() {
     val app = NSApplication.sharedApplication()
