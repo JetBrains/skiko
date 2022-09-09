@@ -254,7 +254,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextPaste
      * Attention! position may be null
      */
     override fun positionFromPosition(position: UITextPosition, offset: NSInteger): UITextPosition? {
-        val p = (position as? IntermediateTextPosition)?.position ?: 0
+        val p = (position as? IntermediateTextPosition)?.position ?: return null
         val endOfDocument = skiaLayer?.skikoView?.input?.endOfDocument()
         return if (endOfDocument != null) {
             IntermediateTextPosition(max(min(p + offset, endOfDocument), 0))
