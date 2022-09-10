@@ -55,6 +55,21 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         reachabilityBarrier(bitmap)
     }
 
+    /**
+     * Sometimes a canvas is owned by a surface.
+     * If it is, [surface] will return that surface, else this will null.
+     *
+     * @return the surface this canvas is owned by, or null if it is not owned by any surface.
+     */
+    val surface: Surface?
+        get() = try {
+            Stats.onNativeCall()
+            val ptr = _nGetSurface(_ptr)
+            if (ptr == NullPointer) null else Surface(ptr)
+        } finally {
+            reachabilityBarrier(this)
+        }
+
     fun drawPoint(x: Float, y: Float, paint: Paint): Canvas {
         Stats.onNativeCall()
         _nDrawPoint(_ptr, x, y, getPtr(paint))
@@ -1240,6 +1255,9 @@ private external fun Canvas_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nMakeFromBitmap")
 private external fun _nMakeFromBitmap(bitmapPtr: NativePointer, flags: Int, pixelGeometry: Int): NativePointer
+
+@ExternalSymbolName("org_jetbrains_skia_Canvas__1nGetSurface")
+private external fun _nGetSurface(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawPoint")
 private external fun _nDrawPoint(ptr: NativePointer, x: Float, y: Float, paintPtr: NativePointer)
