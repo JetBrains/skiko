@@ -266,11 +266,11 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeSurfaceI
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_Surface__1nDraw
-  (KNativePointer ptr, KNativePointer canvasPtr, KFloat x, KFloat y, KNativePointer paintPtr) {
+  (KNativePointer ptr, KNativePointer canvasPtr, KFloat x, KFloat y, KInt samplingModeValue1, KInt samplingModeValue2, KNativePointer paintPtr) {
     SkSurface* surface = reinterpret_cast<SkSurface*>((ptr));
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>((canvasPtr));
     SkPaint* paint = reinterpret_cast<SkPaint*>((paintPtr));
-    surface->draw(canvas, x, y, paint);
+    surface->draw(canvas, x, y, skija::SamplingMode::unpackFrom2Ints(samplingModeValue1, samplingModeValue2), paint);
 }
 
 SKIKO_EXPORT KBoolean org_jetbrains_skia_Surface__1nPeekPixels
