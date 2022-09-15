@@ -3,7 +3,7 @@ package org.jetbrains.skia.impl
 import java.util.concurrent.ConcurrentHashMap
 
 actual object Stats {
-    var enabled = false
+    var enabled = System.getProperty("skiko.collect.stat")?.toBoolean() ?: false
     var nativeCalls: Long = 0
     var allocated: MutableMap<String, Int> = ConcurrentHashMap()
     actual fun onNativeCall() {
