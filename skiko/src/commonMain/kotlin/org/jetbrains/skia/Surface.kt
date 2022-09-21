@@ -780,9 +780,27 @@ class Surface : RefCnt {
      * @see [https://fiddle.skia.org/c/@Surface_draw](https://fiddle.skia.org/c/@Surface_draw)
      */
     fun draw(canvas: Canvas?, x: Int, y: Int, paint: Paint?) {
+        draw(canvas, x, y, SamplingMode.DEFAULT, paint)
+    }
+
+    /**
+     *
+     * Draws Surface contents to canvas, with its top-left corner at (x, y).
+     *
+     *
+     * If Paint paint is not null, apply ColorFilter, alpha, ImageFilter, and BlendMode.
+     *
+     * @param canvas Canvas drawn into
+     * @param x      horizontal offset in Canvas
+     * @param y      vertical offset in Canvas
+     * @param sampling	what technique to use when sampling the surface pixels
+     * @param paint  Paint containing BlendMode, ColorFilter, ImageFilter, and so on; or null
+     * @see [https://fiddle.skia.org/c/@Surface_draw](https://fiddle.skia.org/c/@Surface_draw)
+     */
+    fun draw(canvas: Canvas?, x: Int, y: Int, samplingMode: SamplingMode, paint: Paint?) {
         try {
             Stats.onNativeCall()
-            _nDraw(_ptr, getPtr(canvas), x.toFloat(), y.toFloat(), getPtr(paint))
+            _nDraw(_ptr, getPtr(canvas), x.toFloat(), y.toFloat(), samplingMode._packedInt1(), samplingMode._packedInt2(), getPtr(paint))
         } finally {
             reachabilityBarrier(this)
             reachabilityBarrier(canvas)
@@ -1116,7 +1134,7 @@ private external fun _nMakeImageSnapshot(ptr: NativePointer): NativePointer
 private external fun _nMakeImageSnapshotR(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nDraw")
-private external fun _nDraw(ptr: NativePointer, canvasPtr: NativePointer, x: Float, y: Float, paintPtr: NativePointer)
+private external fun _nDraw(ptr: NativePointer, canvasPtr: NativePointer, x: Float, y: Float, samplingModeValue1: Int, samplingModeValue2: Int, paintPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nPeekPixels")
 private external fun _nPeekPixels(ptr: NativePointer, pixmapPtr: NativePointer): Boolean

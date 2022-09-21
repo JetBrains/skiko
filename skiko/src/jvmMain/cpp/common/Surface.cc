@@ -255,11 +255,11 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_SurfaceKt__1nMakeSurf
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_SurfaceKt__1nDraw
-  (JNIEnv* env, jclass jclass, jlong ptr, jlong canvasPtr, jfloat x, jfloat y, jlong paintPtr) {
+  (JNIEnv* env, jclass jclass, jlong ptr, jlong canvasPtr, jfloat x, jfloat y, jint samplingModeVal1, jint samplingModeVal2, jlong paintPtr) {
     SkSurface* surface = reinterpret_cast<SkSurface*>(static_cast<uintptr_t>(ptr));
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(canvasPtr));
     SkPaint* paint = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(paintPtr));
-    surface->draw(canvas, x, y, paint);
+    surface->draw(canvas, x, y, skija::SamplingMode::unpackFrom2Ints(env, samplingModeVal1, samplingModeVal2), paint);
 }
 
 extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_SurfaceKt__1nPeekPixels
