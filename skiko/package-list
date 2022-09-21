@@ -2249,6 +2249,7 @@ $dokka.location:org.jetbrains.skia/Surface.Companion/makeRenderTarget/#org.jetbr
 $dokka.location:org.jetbrains.skia/Surface///PointingToDeclaration/skiko/org.jetbrains.skia/-surface/index.html
 $dokka.location:org.jetbrains.skia/Surface/canvas/#/PointingToDeclaration/skiko/org.jetbrains.skia/-surface/canvas.html
 $dokka.location:org.jetbrains.skia/Surface/draw/#org.jetbrains.skia.Canvas?#kotlin.Int#kotlin.Int#org.jetbrains.skia.Paint?/PointingToDeclaration/skiko/org.jetbrains.skia/-surface/draw.html
+$dokka.location:org.jetbrains.skia/Surface/draw/#org.jetbrains.skia.Canvas?#kotlin.Int#kotlin.Int#org.jetbrains.skia.SamplingMode#org.jetbrains.skia.Paint?/PointingToDeclaration/skiko/org.jetbrains.skia/-surface/draw.html
 $dokka.location:org.jetbrains.skia/Surface/flush/#/PointingToDeclaration/skiko/org.jetbrains.skia/-surface/flush.html
 $dokka.location:org.jetbrains.skia/Surface/flushAndSubmit/#/PointingToDeclaration/skiko/org.jetbrains.skia/-surface/flush-and-submit.html
 $dokka.location:org.jetbrains.skia/Surface/flushAndSubmit/#kotlin.Boolean/PointingToDeclaration/skiko/org.jetbrains.skia/-surface/flush-and-submit.html
