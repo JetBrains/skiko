@@ -143,6 +143,37 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_paragraph_Paragrap
     return instance->hintingIsOn();
 }
 
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_ParagraphStyleKt__1nSetFontRasterSettings
+  (JNIEnv* env, jclass jclass, jlong ptr, jint edging, jint hinting, jboolean subpixel) {
+    ParagraphStyle* instance = reinterpret_cast<ParagraphStyle*>(static_cast<uintptr_t>(ptr));
+    FontRastrSettings fontRastrSettings;
+    fontRastrSettings.fEdging = static_cast<SkFont::Edging>(edging);
+    fontRastrSettings.fHinting = static_cast<SkFontHinting>(hinting);
+    fontRastrSettings.fSubpixel = subpixel;
+    instance->setFontRastrSettings(fontRastrSettings);
+}
+
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_paragraph_ParagraphStyleKt__1nGetEdging
+  (JNIEnv* env, jclass jclass, jlong ptr) {
+    ParagraphStyle* instance = reinterpret_cast<ParagraphStyle*>(static_cast<uintptr_t>(ptr));
+    FontRastrSettings fontRastrSettings = instance->getFontRastrSettings();
+    return static_cast<jint>(fontRastrSettings.fEdging);
+}
+
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_paragraph_ParagraphStyleKt__1nGetHinting
+  (JNIEnv* env, jclass jclass, jlong ptr) {
+    ParagraphStyle* instance = reinterpret_cast<ParagraphStyle*>(static_cast<uintptr_t>(ptr));
+    FontRastrSettings fontRastrSettings = instance->getFontRastrSettings();
+    return static_cast<jint>(fontRastrSettings.fHinting);
+}
+
+extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_paragraph_ParagraphStyleKt__1nGetSubpixel
+  (JNIEnv* env, jclass jclass, jlong ptr) {
+    ParagraphStyle* instance = reinterpret_cast<ParagraphStyle*>(static_cast<uintptr_t>(ptr));
+    FontRastrSettings fontRastrSettings = instance->getFontRastrSettings();
+    return fontRastrSettings.fSubpixel;
+}
+
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_ParagraphStyleKt__1nDisableHinting
   (JNIEnv* env, jclass jclass, jlong ptr) {
     ParagraphStyle* instance = reinterpret_cast<ParagraphStyle*>(static_cast<uintptr_t>(ptr));
