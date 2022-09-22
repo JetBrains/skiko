@@ -143,7 +143,7 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_jetbrains_skia_paragraph_Paragrap
     return instance->hintingIsOn();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_ParagraphStyleKt__1nSetFontRasterSettings
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_paragraph_ParagraphStyleKt__1nSetFontRastrSettings
   (JNIEnv* env, jclass jclass, jlong ptr, jint edging, jint hinting, jboolean subpixel) {
     ParagraphStyle* instance = reinterpret_cast<ParagraphStyle*>(static_cast<uintptr_t>(ptr));
     FontRastrSettings fontRastrSettings;

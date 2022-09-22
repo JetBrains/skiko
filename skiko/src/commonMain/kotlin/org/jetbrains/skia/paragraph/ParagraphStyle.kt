@@ -169,7 +169,7 @@ class ParagraphStyle : Managed(ParagraphStyle_nMake(), _FinalizerHolder.PTR) {
         return this
     }
 
-    var fontRasterSettings: FontRasterSettings
+    var fontRastrSettings: FontRastrSettings
         get() = try {
             Stats.onNativeCall()
             val edging = FontEdging.values()[_nGetEdging(_ptr)]
@@ -177,13 +177,13 @@ class ParagraphStyle : Managed(ParagraphStyle_nMake(), _FinalizerHolder.PTR) {
             val hinting = FontHinting.values()[_nGetHinting(_ptr)]
             Stats.onNativeCall()
             val subpixel = _nGetSubpixel(_ptr);
-            FontRasterSettings(edging, hinting, subpixel)
+            FontRastrSettings(edging, hinting, subpixel)
         } finally {
             reachabilityBarrier(this)
         }
         set(value) = try {
             Stats.onNativeCall()
-            _nSetFontRasterSettings(_ptr, value.edging.ordinal, value.hinting.ordinal, value.subpixel)
+            _nSetFontRastrSettings(_ptr, value.edging.ordinal, value.hinting.ordinal, value.subpixel)
         } finally {
             reachabilityBarrier(this)
         }
@@ -281,8 +281,8 @@ private external fun _nIsHintingEnabled(ptr: NativePointer): Boolean
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nDisableHinting")
 private external fun _nDisableHinting(ptr: NativePointer)
 
-@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetFontRasterSettings")
-private external fun _nSetFontRasterSettings(ptr: NativePointer, edging: Int, hinting: Int, subpixel: Boolean)
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetFontRastrSettings")
+private external fun _nSetFontRastrSettings(ptr: NativePointer, edging: Int, hinting: Int, subpixel: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetEdging")
 private external fun _nGetEdging(ptr: NativePointer): Int

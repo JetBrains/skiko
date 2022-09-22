@@ -3,7 +3,7 @@ package org.jetbrains.skiko.paragraph
 import org.jetbrains.skia.FontEdging
 import org.jetbrains.skia.FontHinting
 import org.jetbrains.skia.impl.use
-import org.jetbrains.skia.paragraph.FontRasterSettings
+import org.jetbrains.skia.paragraph.FontRastrSettings
 import org.jetbrains.skia.paragraph.ParagraphStyle
 import org.jetbrains.skia.paragraph.TextIndent
 import kotlin.test.Test
@@ -37,22 +37,22 @@ class ParagraphStyleTests {
     }
 
     @Test
-    fun paragraphStyleFontRasterSettingsTests() {
+    fun paragraphStyleFontRastrSettingsTests() {
         ParagraphStyle().use { paragraphStyle ->
-            val poorRasterSettings = FontRasterSettings(
+            val poorRasterSettings = FontRastrSettings(
                 edging = FontEdging.ALIAS,
                 hinting = FontHinting.NONE,
                 subpixel = false)
-            paragraphStyle.fontRasterSettings = poorRasterSettings
-            assertEquals(poorRasterSettings, paragraphStyle.fontRasterSettings)
+            paragraphStyle.fontRastrSettings = poorRasterSettings
+            assertEquals(poorRasterSettings, paragraphStyle.fontRastrSettings)
 
-            val gloriousRasterSettings = FontRasterSettings(
+            val gloriousRasterSettings = FontRastrSettings(
                 edging = FontEdging.SUBPIXEL_ANTI_ALIAS,
                 hinting = FontHinting.FULL,
                 subpixel = true)
 
-            paragraphStyle.fontRasterSettings = gloriousRasterSettings
-            assertEquals(gloriousRasterSettings, paragraphStyle.fontRasterSettings)
+            paragraphStyle.fontRastrSettings = gloriousRasterSettings
+            assertEquals(gloriousRasterSettings, paragraphStyle.fontRastrSettings)
         }
     }
 }

@@ -146,7 +146,7 @@ SKIKO_EXPORT void org_jetbrains_skia_paragraph_ParagraphStyle__1nDisableHinting
     instance->turnHintingOff();
 }
 
-SKIKO_EXPORT void org_jetbrains_skia_paragraph_ParagraphStyleKt__1nSetFontRasterSettings
+SKIKO_EXPORT void org_jetbrains_skia_paragraph_ParagraphStyleKt__1nSetFontRastrSettings
   (KNativePointer ptr, KInt edging, KInt hinting, KInt, KBoolean subpixel) {
     ParagraphStyle* instance = reinterpret_cast<ParagraphStyle*>(ptr);
     FontRastrSettings fontRastrSettings;
