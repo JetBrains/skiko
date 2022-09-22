@@ -1,6 +1,9 @@
 package org.jetbrains.skiko.paragraph
 
+import org.jetbrains.skia.FontEdging
+import org.jetbrains.skia.FontHinting
 import org.jetbrains.skia.impl.use
+import org.jetbrains.skia.paragraph.FontRasterSettings
 import org.jetbrains.skia.paragraph.ParagraphStyle
 import org.jetbrains.skia.paragraph.TextIndent
 import kotlin.test.Test
@@ -30,6 +33,26 @@ class ParagraphStyleTests {
             val indent2 = TextIndent(-20f, -10f)
             paragraphStyle.textIndent = indent2
             assertEquals(indent2, paragraphStyle.textIndent)
+        }
+    }
+
+    @Test
+    fun paragraphStyleFontRasterSettingsTests() {
+        ParagraphStyle().use { paragraphStyle ->
+            val poorRasterSettings = FontRasterSettings(
+                edging = FontEdging.ALIAS,
+                hinting = FontHinting.NONE,
+                subpixel = false)
+            paragraphStyle.fontRasterSettings = poorRasterSettings
+            assertEquals(poorRasterSettings, paragraphStyle.fontRasterSettings)
+
+            val gloriousRasterSettings = FontRasterSettings(
+                edging = FontEdging.SUBPIXEL_ANTI_ALIAS,
+                hinting = FontHinting.FULL,
+                subpixel = true)
+
+            paragraphStyle.fontRasterSettings = gloriousRasterSettings
+            assertEquals(gloriousRasterSettings, paragraphStyle.fontRasterSettings)
         }
     }
 }
