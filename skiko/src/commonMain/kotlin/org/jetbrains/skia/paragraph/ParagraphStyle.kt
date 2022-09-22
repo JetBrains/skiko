@@ -176,7 +176,9 @@ class ParagraphStyle : Managed(ParagraphStyle_nMake(), _FinalizerHolder.PTR) {
             Stats.onNativeCall()
             val hinting = FontHinting.values()[_nGetHinting(_ptr)]
             Stats.onNativeCall()
-            val subpixel = _nGetSubpixel(_ptr);
+            // by some obscure reason kotlinjs makes difference between number encoded booleans returned from `_nGetSubpixel` and regular booleans
+            // AssertionError: Expected <FontRastrSettings(edging=ALIAS, hinting=NONE, subpixel=false)>, actual <FontRastrSettings(edging=ALIAS, hinting=NONE, subpixel=0)>
+            val subpixel = _nGetSubpixel(_ptr).not().not()
             FontRastrSettings(edging, hinting, subpixel)
         } finally {
             reachabilityBarrier(this)
