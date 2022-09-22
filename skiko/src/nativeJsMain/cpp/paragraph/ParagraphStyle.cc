@@ -146,8 +146,8 @@ SKIKO_EXPORT void org_jetbrains_skia_paragraph_ParagraphStyle__1nDisableHinting
     instance->turnHintingOff();
 }
 
-SKIKO_EXPORT void org_jetbrains_skia_paragraph_ParagraphStyleKt__1nSetFontRastrSettings
-  (KNativePointer ptr, KInt edging, KInt hinting, KInt, KBoolean subpixel) {
+SKIKO_EXPORT void org_jetbrains_skia_paragraph_ParagraphStyle__1nSetFontRastrSettings
+  (KNativePointer ptr, KInt edging, KInt hinting, KBoolean subpixel) {
     ParagraphStyle* instance = reinterpret_cast<ParagraphStyle*>(ptr);
     FontRastrSettings fontRastrSettings;
     fontRastrSettings.fEdging = static_cast<SkFont::Edging>(edging);
@@ -156,21 +156,21 @@ SKIKO_EXPORT void org_jetbrains_skia_paragraph_ParagraphStyleKt__1nSetFontRastrS
     instance->setFontRastrSettings(fontRastrSettings);
 }
 
-SKIKO_EXPORT KInt org_jetbrains_skia_paragraph_ParagraphStyleKt__1nGetEdging
+SKIKO_EXPORT KInt org_jetbrains_skia_paragraph_ParagraphStyle__1nGetEdging
   (KNativePointer ptr) {
     ParagraphStyle* instance = reinterpret_cast<ParagraphStyle*>(ptr);
     FontRastrSettings fontRastrSettings = instance->getFontRastrSettings();
     return static_cast<KInt>(fontRastrSettings.fEdging);
 }
 
-SKIKO_EXPORT KInt org_jetbrains_skia_paragraph_ParagraphStyleKt__1nGetHinting
+SKIKO_EXPORT KInt org_jetbrains_skia_paragraph_ParagraphStyle__1nGetHinting
   (KNativePointer ptr) {
     ParagraphStyle* instance = reinterpret_cast<ParagraphStyle*>(ptr);
     FontRastrSettings fontRastrSettings = instance->getFontRastrSettings();
     return static_cast<KInt>(fontRastrSettings.fHinting);
 }
 
-SKIKO_EXPORT KBoolean org_jetbrains_skia_paragraph_ParagraphStyleKt__1nGetSubpixel
+SKIKO_EXPORT KBoolean org_jetbrains_skia_paragraph_ParagraphStyle__1nGetSubpixel
   (KNativePointer  ptr) {
     ParagraphStyle* instance = reinterpret_cast<ParagraphStyle*>(ptr);
     FontRastrSettings fontRastrSettings = instance->getFontRastrSettings();
