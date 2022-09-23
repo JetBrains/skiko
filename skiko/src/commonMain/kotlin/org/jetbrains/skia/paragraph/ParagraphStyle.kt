@@ -2,6 +2,8 @@ package org.jetbrains.skia.paragraph
 
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.FontEdging
+import org.jetbrains.skia.FontHinting
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.getPtr
 import org.jetbrains.skia.impl.interopScope
@@ -167,6 +169,28 @@ class ParagraphStyle : Managed(ParagraphStyle_nMake(), _FinalizerHolder.PTR) {
         return this
     }
 
+    var fontRastrSettings: FontRastrSettings
+        get() = try {
+            Stats.onNativeCall()
+            val edging = FontEdging.values()[_nGetEdging(_ptr)]
+            Stats.onNativeCall()
+            val hinting = FontHinting.values()[_nGetHinting(_ptr)]
+            Stats.onNativeCall()
+            // by some obscure reason kotlinjs makes difference between number encoded booleans returned from `_nGetSubpixel` and regular booleans
+            // AssertionError: Expected <FontRastrSettings(edging=ALIAS, hinting=NONE, subpixel=false)>, actual <FontRastrSettings(edging=ALIAS, hinting=NONE, subpixel=0)>
+            val subpixel = _nGetSubpixel(_ptr).not().not()
+            FontRastrSettings(edging, hinting, subpixel)
+        } finally {
+            reachabilityBarrier(this)
+        }
+        set(value) = try {
+            Stats.onNativeCall()
+            _nSetFontRastrSettings(_ptr, value.edging.ordinal, value.hinting.ordinal, value.subpixel)
+        } finally {
+            reachabilityBarrier(this)
+        }
+
+
     var textIndent: TextIndent
         get() = try {
             Stats.onNativeCall()
@@ -258,6 +282,18 @@ private external fun _nIsHintingEnabled(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nDisableHinting")
 private external fun _nDisableHinting(ptr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetFontRastrSettings")
+private external fun _nSetFontRastrSettings(ptr: NativePointer, edging: Int, hinting: Int, subpixel: Boolean)
+
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetEdging")
+private external fun _nGetEdging(ptr: NativePointer): Int
+
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetHinting")
+private external fun _nGetHinting(ptr: NativePointer): Int
+
+@ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetSubpixel")
+private external fun _nGetSubpixel(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetTextIndent")
 private external fun _nSetTextIndent(ptr: NativePointer, firstLine: Float, restLine: Float)
