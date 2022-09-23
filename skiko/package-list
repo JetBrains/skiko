@@ -130,6 +130,11 @@ $dokka.location:org.jetbrains.skia.paragraph/FontCollection/setDefaultFontManage
 $dokka.location:org.jetbrains.skia.paragraph/FontCollection/setDynamicFontManager/#org.jetbrains.skia.FontMgr?/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-font-collection/set-dynamic-font-manager.html
 $dokka.location:org.jetbrains.skia.paragraph/FontCollection/setEnableFallback/#kotlin.Boolean/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-font-collection/set-enable-fallback.html
 $dokka.location:org.jetbrains.skia.paragraph/FontCollection/setTestFontManager/#org.jetbrains.skia.FontMgr?/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-font-collection/set-test-font-manager.html
+$dokka.location:org.jetbrains.skia.paragraph/FontRastrSettings///PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-font-rastr-settings/index.html
+$dokka.location:org.jetbrains.skia.paragraph/FontRastrSettings/FontRastrSettings/#org.jetbrains.skia.FontEdging#org.jetbrains.skia.FontHinting#kotlin.Boolean/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-font-rastr-settings/-font-rastr-settings.html
+$dokka.location:org.jetbrains.skia.paragraph/FontRastrSettings/edging/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-font-rastr-settings/edging.html
+$dokka.location:org.jetbrains.skia.paragraph/FontRastrSettings/hinting/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-font-rastr-settings/hinting.html
+$dokka.location:org.jetbrains.skia.paragraph/FontRastrSettings/subpixel/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-font-rastr-settings/subpixel.html
 $dokka.location:org.jetbrains.skia.paragraph/HeightMode.ALL///PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-height-mode/-a-l-l/index.html
 $dokka.location:org.jetbrains.skia.paragraph/HeightMode.DISABLE_ALL///PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-height-mode/-d-i-s-a-b-l-e_-a-l-l/index.html
 $dokka.location:org.jetbrains.skia.paragraph/HeightMode.DISABLE_FIRST_ASCENT///PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-height-mode/-d-i-s-a-b-l-e_-f-i-r-s-t_-a-s-c-e-n-t/index.html
@@ -206,6 +211,7 @@ $dokka.location:org.jetbrains.skia.paragraph/ParagraphStyle/direction/#/Pointing
 $dokka.location:org.jetbrains.skia.paragraph/ParagraphStyle/disableHinting/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph-style/disable-hinting.html
 $dokka.location:org.jetbrains.skia.paragraph/ParagraphStyle/effectiveAlignment/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph-style/effective-alignment.html
 $dokka.location:org.jetbrains.skia.paragraph/ParagraphStyle/ellipsis/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph-style/ellipsis.html
+$dokka.location:org.jetbrains.skia.paragraph/ParagraphStyle/fontRastrSettings/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph-style/font-rastr-settings.html
 $dokka.location:org.jetbrains.skia.paragraph/ParagraphStyle/height/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph-style/height.html
 $dokka.location:org.jetbrains.skia.paragraph/ParagraphStyle/heightMode/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph-style/height-mode.html
 $dokka.location:org.jetbrains.skia.paragraph/ParagraphStyle/isHintingEnabled/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-paragraph-style/is-hinting-enabled.html
