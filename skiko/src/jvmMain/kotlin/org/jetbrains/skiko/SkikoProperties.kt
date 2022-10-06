@@ -50,7 +50,8 @@ object SkikoProperties {
     internal fun parseRenderApi(text: String?): GraphicsApi {
         when(text) {
             "SOFTWARE_COMPAT" -> return GraphicsApi.SOFTWARE_COMPAT
-            "SOFTWARE_FAST", "DIRECT_SOFTWARE", "SOFTWARE" -> return GraphicsApi.SOFTWARE_FAST
+            "SOFTWARE_FAST", "DIRECT_SOFTWARE" -> return GraphicsApi.SOFTWARE_FAST
+            "SOFTWARE" -> return if (hostOs == OS.MacOS) GraphicsApi.SOFTWARE_COMPAT else GraphicsApi.SOFTWARE_FAST
             "OPENGL" -> return GraphicsApi.OPENGL
             "DIRECT3D" -> {
                 return if (hostOs == OS.Windows) GraphicsApi.DIRECT3D
