@@ -1,6 +1,7 @@
 package org.jetbrains.skiko.context
 
 import org.jetbrains.skia.Surface
+import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.impl.getPtr
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.redrawer.Direct3DRedrawer
@@ -61,7 +62,7 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : JvmContextHandler(laye
                     surfaces[bufferIndex] = directXRedrawer.makeSurface(getPtr(context!!), w, h, bufferIndex)
                 }
             } finally {
-                Reference.reachabilityFence(context!!)
+                reachabilityBarrier(context!!)
             }
 
             if (!isD3DInited) {
@@ -80,8 +81,8 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : JvmContextHandler(laye
                 getPtr(surface!!)
             )
         } finally {
-            Reference.reachabilityFence(context!!)
-            Reference.reachabilityFence(surface!!)
+            reachabilityBarrier(context!!)
+            reachabilityBarrier(surface!!)
         }
     }
 

@@ -22,8 +22,8 @@ actual abstract class Native actual constructor(ptr: NativePointer) {
             val nOther = other as Native
             if (_ptr == nOther._ptr) true else nativeEquals(nOther)
         } finally {
-            Reference.reachabilityFence(this)
-            Reference.reachabilityFence(other)
+            reachabilityBarrier(this)
+            reachabilityBarrier(other)
         }
     }
 
@@ -42,8 +42,12 @@ actual abstract class Native actual constructor(ptr: NativePointer) {
     }
 }
 
+private val isJava8 = System.getProperty("java.version").startsWith("1.8")
+
 internal actual fun reachabilityBarrier(obj: Any?) {
-    Reference.reachabilityFence(obj)
+    if (!isJava8) {
+        Reference.reachabilityFence(obj)
+    }
 }
 
 actual typealias NativePointer = Long
