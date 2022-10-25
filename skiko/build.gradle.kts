@@ -25,7 +25,7 @@ val skiko = SkikoProperties(rootProject)
 val buildType = skiko.buildType
 
 allprojects {
-    group = "org.jetbrains.skiko"
+    group = SkikoArtifacts.groupId
     version = skiko.deployVersion
 }
 
@@ -1077,9 +1077,9 @@ fun skikoJvmRuntimeJarTask(
     awtJar: TaskProvider<Jar>,
     nativeFiles: List<Provider<File>>
 ) = project.registerSkikoTask<Jar>("skikoJvmRuntimeJar", targetOs, targetArch) {
+    dependsOn(awtJar)
     val target = targetId(targetOs, targetArch)
     archiveBaseName.set("skiko-$target")
-    from(awtJar.map { zipTree(it.archiveFile) })
     nativeFiles.forEach {  provider -> from(provider) }
 }
 
@@ -1187,7 +1187,7 @@ publishing {
         }
         configureEach {
             this as MavenPublication
-            groupId = "org.jetbrains.skiko"
+            groupId = SkikoArtifacts.groupId
 
             // Necessary for publishing to Maven Central
             artifact(emptyJavadocJar)
@@ -1226,16 +1226,16 @@ publishing {
                 artifactId = SkikoArtifacts.jvmRuntimeArtifactIdFor(os, arch)
                 afterEvaluate {
                     artifact(entry.value.map { it.archiveFile.get() })
-                    var jvmSourcesArtifact: Any? = null
-                    // todo: use correct sources jar for each jvm source set
-                    kotlin.jvm(if (os == OS.Android) "android" else "awt").mavenPublication {
-                        jvmSourcesArtifact = artifacts.find { it.classifier == "sources" }
-                    }
-                    if (jvmSourcesArtifact == null) {
-                        error("Could not find sources jar artifact for JVM target")
-                    } else {
-                        artifact(jvmSourcesArtifact)
-                    }
+                    artifact(emptySourcesJar)
+                }
+                pom.withXml {
+                    asNode().appendNode("dependencies")
+                        .appendNode("dependency").apply {
+                            appendNode("groupId", SkikoArtifacts.groupId)
+                            appendNode("artifactId", SkikoArtifacts.jvmArtifactId)
+                            appendNode("version", skiko.deployVersion)
+                            appendNode("scope", "compile")
+                        }
                 }
             }
         }
