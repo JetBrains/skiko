@@ -216,7 +216,7 @@ class AwtFontManager(fontPaths: Array<String> = emptyArray()) {
         val file = File.createTempFile("tmp", ".ttf")
         file.deleteOnExit()
         FileOutputStream(file).use { out ->
-            out.write(res.readAllBytes())
+            out.write(res.readBytes())
         }
         return addFontFromFile(file).also {
             if (it)

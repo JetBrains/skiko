@@ -2,8 +2,11 @@ package org.jetbrains.skiko
 
 import java.io.File
 import java.text.SimpleDateFormat
+import java.lang.management.ManagementFactory
+import java.lang.StringBuffer
 import java.util.Date
 import kotlin.jvm.JvmStatic
+import org.jetbrains.skia.impl.isJava8
 
 internal class RenderExceptionsHandler {
     companion object {
@@ -12,7 +15,9 @@ internal class RenderExceptionsHandler {
         fun logAndThrow(message: String) {
             if (output == null) {
                 output = File(
-                    "${Library.cacheRoot}/skiko-render-exception-${ProcessHandle.current().pid()}.log"
+                    "${Library.cacheRoot}/skiko-render-exception-${if(isJava8) {
+                        ManagementFactory.getRuntimeMXBean().getName().let { it.substring(0, it.indexOf('@')) }
+                    } else { ProcessHandle.current().pid().toString() } }.log"
                 )
             }
             val exception = RenderException(message)

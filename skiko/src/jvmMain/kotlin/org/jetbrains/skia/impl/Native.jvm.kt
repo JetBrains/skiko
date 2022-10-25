@@ -42,7 +42,7 @@ actual abstract class Native actual constructor(ptr: NativePointer) {
     }
 }
 
-private val isJava8 = System.getProperty("java.version").startsWith("1.8")
+internal val isJava8 = System.getProperty("java.version").startsWith("1.8")
 
 internal actual fun reachabilityBarrier(obj: Any?) {
     if (!isJava8) {
