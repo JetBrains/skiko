@@ -32,11 +32,7 @@ object SkikoProperties {
     val renderApi: GraphicsApi get() {
         val environment = System.getenv("SKIKO_RENDER_API")
         val property = getProperty("skiko.renderApi")
-        return if (environment != null) {
-            parseRenderApi(environment)
-        } else {
-            parseRenderApi(property)
-        }
+        return parseRenderApi(environment ?: property)
     }
 
     val gpuPriority: GpuPriority get() {
