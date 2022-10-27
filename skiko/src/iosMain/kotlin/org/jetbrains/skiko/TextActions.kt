@@ -1,26 +1,23 @@
 package org.jetbrains.skiko
 
-import org.jetbrains.skia.Rect
-
-class TextMenuArguments(
-    /**
-     * Rectangle of selected text area
-     */
-    val targetRect: Rect,
+interface TextActions {
     /**
      * Copy action. If null, then copy is not possible in current context
      */
-    val onCopyRequested: (() -> Unit)?,
+    val copy: (() -> Unit)?
+
     /**
      * Paste action. If null, then paste is not possible in current context
      */
-    val onPasteRequested: (() -> Unit)?,
+    val paste: (() -> Unit)?
+
     /**
      * Cut action. If null, then cut is not possible in current context
      */
-    val onCutRequested: (() -> Unit)?,
+    val cut: (() -> Unit)?
+
     /**
      * SelectAll action. If null, then select all is not possible in current context
      */
-    val onSelectAllRequested: (() -> Unit)?
-)
+    val selectAll: (() -> Unit)?
+}

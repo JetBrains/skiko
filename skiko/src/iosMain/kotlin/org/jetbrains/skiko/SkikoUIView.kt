@@ -1,6 +1,7 @@
 package org.jetbrains.skiko
 
 import kotlinx.cinterop.*
+import org.jetbrains.skia.Rect
 import platform.CoreGraphics.*
 import platform.Foundation.*
 import platform.UIKit.*
@@ -19,52 +20,56 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
 
     private var skiaLayer: SkiaLayer? = null
     private var _inputDelegate: UITextInputDelegateProtocol? = null
-    private var _currentTextMenu:TextMenuArguments? = null
+    private var _currentTextMenuActions: TextActions? = null
 
     constructor(skiaLayer: SkiaLayer, frame: CValue<CGRect> = CGRectNull.readValue()) : super(frame) {
         this.skiaLayer = skiaLayer
     }
 
-    fun showTextMenu(textMenu: TextMenuArguments) {
-        _currentTextMenu = textMenu
+    /**
+     * Show copy/paste text menu
+     * @param targetRect - rectangle of selected text area
+     * @param textActions -
+     */
+    fun showTextMenu(targetRect: Rect, textActions: TextActions) {
+        _currentTextMenuActions = textActions
         val menu: UIMenuController = UIMenuController.sharedMenuController()
         if (menu.isMenuVisible()) {
             menu.hideMenu()
         }
-        val rect  = textMenu.targetRect
         val cgRect = CGRectMake(
-            x = rect.left.toDouble(),
-            y = rect.top.toDouble(),
-            width = rect.width.toDouble(),
-            height = rect.height.toDouble()
+            x = targetRect.left.toDouble(),
+            y = targetRect.top.toDouble(),
+            width = targetRect.width.toDouble(),
+            height = targetRect.height.toDouble()
         )
         menu.showMenuFromView(this, cgRect)
     }
 
     fun hideTextMenu() {
-        _currentTextMenu = null
+        _currentTextMenuActions = null
         val menu: UIMenuController = UIMenuController.sharedMenuController()
         menu.hideMenu()
     }
 
     fun isTextMenuShown():Boolean {
-        return _currentTextMenu != null
+        return _currentTextMenuActions != null
     }
 
     override fun copy(sender: Any?) {
-        _currentTextMenu?.onCopyRequested?.invoke()
+        _currentTextMenuActions?.copy?.invoke()
     }
 
     override fun paste(sender: Any?) {
-        _currentTextMenu?.onPasteRequested?.invoke()
+        _currentTextMenuActions?.paste?.invoke()
     }
 
     override fun cut(sender: Any?) {
-        _currentTextMenu?.onCutRequested?.invoke()
+        _currentTextMenuActions?.cut?.invoke()
     }
 
     override fun selectAll(sender: Any?) {
-        _currentTextMenu?.onSelectAllRequested?.invoke()
+        _currentTextMenuActions?.selectAll?.invoke()
     }
 
     fun detach() = skiaLayer?.detach()
@@ -390,20 +395,18 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
         return this
     }
 
-    override fun canPerformAction(action: COpaquePointer?, withSender: Any?): Boolean {
-        //todo context menu with actions
-        return when (action) {
+    override fun canPerformAction(action: COpaquePointer?, withSender: Any?): Boolean =
+        when (action) {
             NSSelectorFromString(UIResponderStandardEditActionsProtocol::copy.name + ":") ->
-                _currentTextMenu?.onCopyRequested != null
+                _currentTextMenuActions?.copy != null
             NSSelectorFromString(UIResponderStandardEditActionsProtocol::cut.name + ":") ->
-                _currentTextMenu?.onCutRequested != null
+                _currentTextMenuActions?.cut != null
             NSSelectorFromString(UIResponderStandardEditActionsProtocol::paste.name + ":") ->
-                _currentTextMenu?.onPasteRequested != null
+                _currentTextMenuActions?.paste != null
             NSSelectorFromString(UIResponderStandardEditActionsProtocol::selectAll.name + ":") ->
-                _currentTextMenu?.onSelectAllRequested != null
+                _currentTextMenuActions?.selectAll != null
             else -> false
         }
-    }
 
     override fun keyboardType(): UIKeyboardType {
         return UIKeyboardTypeDefault //todo keyboardType
