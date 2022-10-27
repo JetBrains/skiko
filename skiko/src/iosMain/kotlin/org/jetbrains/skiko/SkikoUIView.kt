@@ -29,7 +29,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
     /**
      * Show copy/paste text menu
      * @param targetRect - rectangle of selected text area
-     * @param textActions -
+     * @param textActions - available (not null) actions in text menu
      */
     fun showTextMenu(targetRect: Rect, textActions: TextActions) {
         _currentTextMenuActions = textActions
