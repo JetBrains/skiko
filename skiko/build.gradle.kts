@@ -25,7 +25,7 @@ val skiko = SkikoProperties(rootProject)
 val buildType = skiko.buildType
 
 allprojects {
-    group = "org.jetbrains.skiko"
+    group = SkikoArtifacts.groupId
     version = skiko.deployVersion
 }
 
@@ -621,7 +621,8 @@ val skikoAwtJar by project.tasks.registering(Jar::class) {
     from(kotlin.jvm("awt").compilations["main"].output.allOutputs)
 }
 val skikoAwtRuntimeJar = createSkikoJvmJarTask(hostOs, hostArch, skikoAwtJar)
-val skikoRuntimeDirForTests = skikoRuntimeDirForTestsTask(hostOs, hostArch, skikoAwtRuntimeJar)
+val skikoRuntimeDirForTests = skikoRuntimeDirForTestsTask(hostOs, hostArch, skikoAwtJar, skikoAwtRuntimeJar)
+val skikoJarForTests = skikoJarForTestsTask(skikoRuntimeDirForTests)
 
 if (supportAndroid) {
     val os = OS.Android
@@ -1077,34 +1078,40 @@ fun skikoJvmRuntimeJarTask(
     awtJar: TaskProvider<Jar>,
     nativeFiles: List<Provider<File>>
 ) = project.registerSkikoTask<Jar>("skikoJvmRuntimeJar", targetOs, targetArch) {
+    dependsOn(awtJar)
     val target = targetId(targetOs, targetArch)
     archiveBaseName.set("skiko-$target")
-    from(awtJar.map { zipTree(it.archiveFile) })
     nativeFiles.forEach {  provider -> from(provider) }
 }
 
 fun skikoRuntimeDirForTestsTask(
     targetOs: OS,
     targetArch: Arch,
+    skikoJvmJar: Provider<Jar>,
     skikoJvmRuntimeJar: Provider<Jar>
 ) = project.registerSkikoTask<Copy>("skikoRuntimeDirForTests", targetOs, targetArch) {
-    dependsOn(skikoJvmRuntimeJar)
-    from(zipTree(skikoJvmRuntimeJar.flatMap { it.archiveFile })) {
-        include("*.so")
-        include("*.dylib")
-        include("*.dll")
-        include("icudtl.dat")
-    }
+    dependsOn(skikoJvmJar, skikoJvmRuntimeJar)
+    from(zipTree(skikoJvmJar.flatMap { it.archiveFile }))
+    from(zipTree(skikoJvmRuntimeJar.flatMap { it.archiveFile }))
+    duplicatesStrategy = DuplicatesStrategy.WARN
     destinationDir = project.buildDir.resolve("skiko-runtime-for-tests")
+}
+
+fun skikoJarForTestsTask(
+    runtimeDirForTestsTask: Provider<Copy>
+) = project.registerSkikoTask<Jar>("skikoJvmJarForTests") {
+    dependsOn(runtimeDirForTestsTask)
+    from(runtimeDirForTestsTask.map { it.destinationDir })
+    archiveFileName.set("skiko-runtime-for-tests.jar")
 }
 
 tasks.withType<Test>().configureEach {
     dependsOn(skikoRuntimeDirForTests)
-    dependsOn(skikoAwtRuntimeJar)
+    dependsOn(skikoJarForTests)
     options {
         val dir = skikoRuntimeDirForTests.map { it.destinationDir }.get()
         systemProperty("skiko.library.path", dir)
-        val jar = skikoAwtRuntimeJar.get().outputs.files.files.single { it.name.endsWith(".jar")}
+        val jar = skikoJarForTests.get().outputs.files.files.single { it.name.endsWith(".jar")}
         systemProperty("skiko.jar.path", jar.absolutePath)
 
         systemProperty("skiko.test.screenshots.dir", File(project.projectDir, "src/jvmTest/screenshots").absolutePath)
@@ -1187,7 +1194,7 @@ publishing {
         }
         configureEach {
             this as MavenPublication
-            groupId = "org.jetbrains.skiko"
+            groupId = SkikoArtifacts.groupId
 
             // Necessary for publishing to Maven Central
             artifact(emptyJavadocJar)
@@ -1226,16 +1233,16 @@ publishing {
                 artifactId = SkikoArtifacts.jvmRuntimeArtifactIdFor(os, arch)
                 afterEvaluate {
                     artifact(entry.value.map { it.archiveFile.get() })
-                    var jvmSourcesArtifact: Any? = null
-                    // todo: use correct sources jar for each jvm source set
-                    kotlin.jvm(if (os == OS.Android) "android" else "awt").mavenPublication {
-                        jvmSourcesArtifact = artifacts.find { it.classifier == "sources" }
-                    }
-                    if (jvmSourcesArtifact == null) {
-                        error("Could not find sources jar artifact for JVM target")
-                    } else {
-                        artifact(jvmSourcesArtifact)
-                    }
+                    artifact(emptySourcesJar)
+                }
+                pom.withXml {
+                    asNode().appendNode("dependencies")
+                        .appendNode("dependency").apply {
+                            appendNode("groupId", SkikoArtifacts.groupId)
+                            appendNode("artifactId", SkikoArtifacts.jvmArtifactId)
+                            appendNode("version", skiko.deployVersion)
+                            appendNode("scope", "compile")
+                        }
                 }
             }
         }
