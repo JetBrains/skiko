@@ -1,6 +1,7 @@
 package org.jetbrains.skiko
 
 import kotlinx.cinterop.*
+import org.jetbrains.skia.Rect
 import platform.CoreGraphics.*
 import platform.Foundation.*
 import platform.UIKit.*
@@ -10,7 +11,7 @@ import kotlin.math.min
 
 @Suppress("CONFLICTING_OVERLOADS")
 @ExportObjCClass
-class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextPasteConfigurationSupportingProtocol {
+class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
     @OverrideInit
     constructor(frame: CValue<CGRect>) : super(frame)
 
@@ -19,15 +20,56 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextPaste
 
     private var skiaLayer: SkiaLayer? = null
     private var _inputDelegate: UITextInputDelegateProtocol? = null
-    private var _pasteConfiguration: UIPasteConfiguration? = null
-    private var _pasteDelegate: UITextPasteDelegateProtocol? = null
+    private var _currentTextMenuActions: TextActions? = null
 
     constructor(skiaLayer: SkiaLayer, frame: CValue<CGRect> = CGRectNull.readValue()) : super(frame) {
         this.skiaLayer = skiaLayer
     }
 
+    /**
+     * Show copy/paste text menu
+     * @param targetRect - rectangle of selected text area
+     * @param textActions - available (not null) actions in text menu
+     */
+    fun showTextMenu(targetRect: Rect, textActions: TextActions) {
+        _currentTextMenuActions = textActions
+        val menu: UIMenuController = UIMenuController.sharedMenuController()
+        if (menu.isMenuVisible()) {
+            menu.hideMenu()
+        }
+        val cgRect = CGRectMake(
+            x = targetRect.left.toDouble(),
+            y = targetRect.top.toDouble(),
+            width = targetRect.width.toDouble(),
+            height = targetRect.height.toDouble()
+        )
+        menu.showMenuFromView(this, cgRect)
+    }
+
+    fun hideTextMenu() {
+        _currentTextMenuActions = null
+        val menu: UIMenuController = UIMenuController.sharedMenuController()
+        menu.hideMenu()
+    }
+
+    fun isTextMenuShown():Boolean {
+        return _currentTextMenuActions != null
+    }
+
+    override fun copy(sender: Any?) {
+        _currentTextMenuActions?.copy?.invoke()
+    }
+
+    override fun paste(sender: Any?) {
+        _currentTextMenuActions?.paste?.invoke()
+    }
+
+    override fun cut(sender: Any?) {
+        _currentTextMenuActions?.cut?.invoke()
+    }
+
     override fun selectAll(sender: Any?) {
-        skiaLayer?.skikoView?.input?.selectAll()
+        _currentTextMenuActions?.selectAll?.invoke()
     }
 
     fun detach() = skiaLayer?.detach()
@@ -159,7 +201,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextPaste
      * Replaces the text in a document that is in the specified range.
      * https://developer.apple.com/documentation/uikit/uitextinput/1614558-replace
      * @param range A range of text in a document.
-     * @param text A string to replace the text in range.
+     * @param withText A string to replace the text in range.
      */
     override fun replaceRange(range: UITextRange, withText: String) {
         skiaLayer?.skikoView?.input?.replaceRange(range.toIntRange(), withText)
@@ -353,31 +395,18 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, UITextPaste
         return this
     }
 
-    override fun canPerformAction(action: COpaquePointer?, withSender: Any?): Boolean {
-        //todo context menu with actions
-        return true
-    }
-
-    override fun pasteConfiguration(): UIPasteConfiguration? {
-        //https://developer.apple.com/documentation/uikit/uitextpasteconfigurationsupporting
-        //todo uikit copy/paste
-        return _pasteConfiguration
-    }
-
-    override fun setPasteConfiguration(pasteConfiguration: UIPasteConfiguration?) {
-        //todo uikit copy/paste
-        _pasteConfiguration = pasteConfiguration
-    }
-
-    override fun pasteDelegate(): UITextPasteDelegateProtocol? {
-        //todo uikit copy/paste
-        return _pasteDelegate
-    }
-
-    override fun setPasteDelegate(pasteDelegate: UITextPasteDelegateProtocol?) {
-        //todo uikit copy/paste
-        _pasteDelegate = pasteDelegate
-    }
+    override fun canPerformAction(action: COpaquePointer?, withSender: Any?): Boolean =
+        when (action) {
+            NSSelectorFromString(UIResponderStandardEditActionsProtocol::copy.name + ":") ->
+                _currentTextMenuActions?.copy != null
+            NSSelectorFromString(UIResponderStandardEditActionsProtocol::cut.name + ":") ->
+                _currentTextMenuActions?.cut != null
+            NSSelectorFromString(UIResponderStandardEditActionsProtocol::paste.name + ":") ->
+                _currentTextMenuActions?.paste != null
+            NSSelectorFromString(UIResponderStandardEditActionsProtocol::selectAll.name + ":") ->
+                _currentTextMenuActions?.selectAll != null
+            else -> false
+        }
 
     override fun keyboardType(): UIKeyboardType {
         return UIKeyboardTypeDefault //todo keyboardType
