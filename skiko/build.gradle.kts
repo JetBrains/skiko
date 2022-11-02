@@ -623,7 +623,7 @@ val skikoAwtJar by project.tasks.registering(Jar::class) {
     from(kotlin.jvm("awt").compilations["main"].output.allOutputs)
 }
 val skikoAwtRuntimeJar = createSkikoJvmJarTask(targetOs, targetArch, skikoAwtJar)
-val skikoRuntimeDirForTests = skikoRuntimeDirForTestsTask(targetOs, targetArch, skikoAwtRuntimeJar)
+val skikoRuntimeDirForTests = skikoRuntimeDirForTestsTask(targetOs, targetArch, skikoAwtJar, skikoAwtRuntimeJar)
 val skikoJarForTests = skikoJarForTestsTask(skikoRuntimeDirForTests)
 
 if (supportAndroid) {
