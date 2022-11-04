@@ -68,7 +68,8 @@ internal class MacOSOpenGLContextHandler(layer: SkiaLayer) : ContextHandler(laye
                     renderTarget!!,
                     SurfaceOrigin.BOTTOM_LEFT,
                     SurfaceColorFormat.RGBA_8888,
-                    ColorSpace.sRGB
+                    ColorSpace.sRGB,
+                    SurfaceProps(pixelGeometry = layer.pixelGeometry)
                 ) ?: throw RenderException("Cannot create surface")
 
             canvas = surface?.canvas

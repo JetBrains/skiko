@@ -2,6 +2,7 @@ package org.jetbrains.skiko
 
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.Picture
+import org.jetbrains.skia.PixelGeometry
 
 /**
  * Generic layer for Skiko rendering.
@@ -16,6 +17,11 @@ expect open class SkiaLayer {
      * Current content scale.
      */
     val contentScale: Float
+
+    /**
+     * Pixel geometry corresponding to graphics device which renders this layer
+     */
+    val pixelGeometry: PixelGeometry
 
     /**
      * If rendering is full screen.

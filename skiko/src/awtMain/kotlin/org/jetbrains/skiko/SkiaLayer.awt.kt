@@ -21,6 +21,7 @@ actual open class SkiaLayer internal constructor(
     private val properties: SkiaLayerProperties,
     private val renderFactory: RenderFactory = RenderFactory.Default,
     private val analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
+    actual val pixelGeometry: PixelGeometry = PixelGeometry.UNKNOWN,
 ) : JPanel() {
 
     internal companion object {
@@ -53,7 +54,8 @@ actual open class SkiaLayer internal constructor(
         isVsyncEnabled: Boolean = SkikoProperties.vsyncEnabled,
         isVsyncFramelimitFallbackEnabled: Boolean = SkikoProperties.vsyncFramelimitFallbackEnabled,
         renderApi: GraphicsApi = SkikoProperties.renderApi,
-        analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty
+        analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
+        pixelGeometry: PixelGeometry = PixelGeometry.UNKNOWN,
     ) : this(
         externalAccessibleFactory,
         SkiaLayerProperties(
@@ -63,6 +65,7 @@ actual open class SkiaLayer internal constructor(
         ),
         RenderFactory.Default,
         analytics,
+        pixelGeometry
     )
 
     val canvas: java.awt.Canvas

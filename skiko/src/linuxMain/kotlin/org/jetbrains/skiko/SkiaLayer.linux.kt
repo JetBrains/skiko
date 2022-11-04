@@ -1,6 +1,7 @@
 package org.jetbrains.skiko
 
 import org.jetbrains.skia.Canvas
+import org.jetbrains.skia.PixelGeometry
 
 actual open class SkiaLayer  {
     actual var renderApi: GraphicsApi
@@ -31,6 +32,8 @@ actual open class SkiaLayer  {
     }
 
     actual var skikoView: SkikoView? = null
+    actual val pixelGeometry: PixelGeometry
+        get() = TODO("Not yet implemented")
 }
 
 // TODO: do properly

@@ -281,6 +281,9 @@ actual open class SkiaLayer {
             canvas.drawPicture(it.instance)
         }
     }
+
+    actual val pixelGeometry: PixelGeometry
+        get() = PixelGeometry.UNKNOWN
 }
 
 // TODO: do properly

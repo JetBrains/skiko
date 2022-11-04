@@ -1,10 +1,7 @@
 package org.jetbrains.skiko.context
 
 import kotlinx.cinterop.useContents
-import org.jetbrains.skia.ColorSpace
-import org.jetbrains.skia.Surface
-import org.jetbrains.skia.SurfaceColorFormat
-import org.jetbrains.skia.SurfaceOrigin
+import org.jetbrains.skia.*
 import org.jetbrains.skiko.RenderException
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.redrawer.MetalRedrawer
@@ -55,7 +52,8 @@ internal class MetalContextHandler(layer: SkiaLayer) : ContextHandler(layer, lay
                 renderTarget!!,
                 SurfaceOrigin.TOP_LEFT,
                 SurfaceColorFormat.BGRA_8888,
-                ColorSpace.sRGB
+                ColorSpace.sRGB,
+                SurfaceProps(pixelGeometry = layer.pixelGeometry)
             ) ?: throw RenderException("Cannot create surface")
 
             canvas = surface!!.canvas

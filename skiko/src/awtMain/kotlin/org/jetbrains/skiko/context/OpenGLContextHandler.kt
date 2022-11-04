@@ -1,10 +1,6 @@
 package org.jetbrains.skiko.context
 
-import org.jetbrains.skia.ColorSpace
-import org.jetbrains.skia.FramebufferFormat
-import org.jetbrains.skia.Surface
-import org.jetbrains.skia.SurfaceColorFormat
-import org.jetbrains.skia.SurfaceOrigin
+import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
 
 internal class OpenGLContextHandler(layer: SkiaLayer) : JvmContextHandler(layer) {
@@ -56,7 +52,8 @@ internal class OpenGLContextHandler(layer: SkiaLayer) : JvmContextHandler(layer)
                 renderTarget!!,
                 SurfaceOrigin.BOTTOM_LEFT,
                 SurfaceColorFormat.RGBA_8888,
-                ColorSpace.sRGB
+                ColorSpace.sRGB,
+                SurfaceProps(pixelGeometry = layer.pixelGeometry)
             ) ?: throw RenderException("Cannot create surface")
         }
 

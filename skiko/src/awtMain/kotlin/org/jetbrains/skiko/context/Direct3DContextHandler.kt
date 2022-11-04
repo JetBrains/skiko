@@ -1,6 +1,7 @@
 package org.jetbrains.skiko.context
 
 import org.jetbrains.skia.Surface
+import org.jetbrains.skia.SurfaceProps
 import org.jetbrains.skia.impl.getPtr
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.redrawer.Direct3DRedrawer
@@ -45,6 +46,7 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : JvmContextHandler(laye
         val scale = layer.contentScale
         val w = (layer.width * scale).toInt().coerceAtLeast(0)
         val h = (layer.height * scale).toInt().coerceAtLeast(0)
+        val surfaceProps = SurfaceProps(pixelGeometry = layer.pixelGeometry)
 
         if (isSizeChanged(w, h) || isSurfacesNull()) {
             disposeCanvas()
@@ -58,7 +60,7 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : JvmContextHandler(laye
             
             try {
                 for (bufferIndex in 0..bufferCount - 1) {
-                    surfaces[bufferIndex] = directXRedrawer.makeSurface(getPtr(context!!), w, h, bufferIndex)
+                    surfaces[bufferIndex] = directXRedrawer.makeSurface(getPtr(context!!), w, h, surfaceProps, bufferIndex)
                 }
             } finally {
                 Reference.reachabilityFence(context!!)
