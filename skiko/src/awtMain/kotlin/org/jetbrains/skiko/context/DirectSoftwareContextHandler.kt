@@ -2,6 +2,7 @@ package org.jetbrains.skiko.context
 
 import org.jetbrains.skia.impl.getPtr
 import org.jetbrains.skiko.SkiaLayer
+import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skiko.redrawer.AbstractDirectSoftwareRedrawer
 import java.lang.ref.Reference
 
@@ -55,7 +56,7 @@ internal class DirectSoftwareContextHandler(layer: SkiaLayer) : JvmContextHandle
             try {
                 softwareRedrawer.finishFrame(getPtr(surface))
             } finally {
-                Reference.reachabilityFence(surface)
+                reachabilityBarrier(surface)
             }
         }
     }

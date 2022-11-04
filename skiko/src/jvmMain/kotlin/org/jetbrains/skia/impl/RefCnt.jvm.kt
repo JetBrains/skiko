@@ -11,7 +11,7 @@ actual abstract class RefCnt : Managed {
             Stats.onNativeCall()
             _nGetRefCount(_ptr)
         } finally {
-            Reference.reachabilityFence(this)
+            reachabilityBarrier(this)
         }
 
     override fun toString(): String {

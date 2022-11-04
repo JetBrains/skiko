@@ -2,7 +2,9 @@ package org.jetbrains.skia.impl
 
 import java.lang.ref.PhantomReference
 import java.lang.ref.ReferenceQueue
+import org.jetbrains.skia.impl.reachabilityBarrier
 import kotlin.concurrent.thread
+import org.jetbrains.skia.impl.isJava8
 
 // Android doesn't have Cleaner API, so use explicit phantom references + finalization queue.
 // Consider using this on all JVM platforms eventually.
@@ -72,13 +74,15 @@ private class CleanableImpl(managed: Managed, action: Runnable, cleaner: Cleaner
 
     init {
         insert()
-        reachabilityFence(managed)
-        reachabilityFence(cleaner)
+        reachabilityBarrier(managed)
+        reachabilityBarrier(cleaner)
     }
 
     override fun clean() {
         if (remove()) {
-            super.clear()
+            if (!isJava8) {
+                super.clear()
+            }
             action.run()
         }
     }

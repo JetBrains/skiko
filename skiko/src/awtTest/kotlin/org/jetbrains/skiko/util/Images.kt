@@ -66,4 +66,4 @@ fun openResource(resourcePath: String): InputStream {
 }
 
 fun loadImage(inputStream: InputStream): Image =
-    Image.makeFromEncoded(inputStream.readAllBytes())
+    Image.makeFromEncoded(inputStream.readBytes())
