@@ -23,6 +23,8 @@ fun targetSuffix(os: OS, arch: Arch): String {
 
 val skiko = SkikoProperties(rootProject)
 val buildType = skiko.buildType
+val targetOs = hostOs
+val targetArch = skiko.targetArch
 
 allprojects {
     group = SkikoArtifacts.groupId
@@ -34,7 +36,7 @@ repositories {
 }
 
 val windowsSdkPaths: WindowsSdkPaths by lazy {
-    findWindowsSdkPathsForCurrentOS(gradle)
+    findWindowsSdkPaths(gradle, targetArch)
 }
 
 fun KotlinTarget.isIosSimArm64() =
@@ -221,7 +223,7 @@ kotlin {
         compilations.all {
             kotlinOptions.jvmTarget = "1.8"
         }
-        generateVersion(hostOs, hostArch)
+        generateVersion(targetOs, targetArch)
     }
 
     if (supportAndroid) {
@@ -620,8 +622,8 @@ val skikoAwtJar by project.tasks.registering(Jar::class) {
     archiveBaseName.set("skiko-awt")
     from(kotlin.jvm("awt").compilations["main"].output.allOutputs)
 }
-val skikoAwtRuntimeJar = createSkikoJvmJarTask(hostOs, hostArch, skikoAwtJar)
-val skikoRuntimeDirForTests = skikoRuntimeDirForTestsTask(hostOs, hostArch, skikoAwtJar, skikoAwtRuntimeJar)
+val skikoAwtRuntimeJar = createSkikoJvmJarTask(targetOs, targetArch, skikoAwtJar)
+val skikoRuntimeDirForTests = skikoRuntimeDirForTestsTask(targetOs, targetArch, skikoAwtJar, skikoAwtRuntimeJar)
 val skikoJarForTests = skikoJarForTestsTask(skikoRuntimeDirForTests)
 
 if (supportAndroid) {

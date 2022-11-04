@@ -58,7 +58,11 @@ val OS.dynamicLibExt: String
 enum class Arch(val id: String) {
     X64("x64"),
     Arm64("arm64"),
-    Wasm("wasm")
+    Wasm("wasm");
+
+    companion object {
+        fun byName(name: String) = Arch.values().find { it.id == name }
+    }
 }
 
 enum class SkiaBuildType(
@@ -127,6 +131,9 @@ class SkikoProperties(private val myProject: Project) {
     val buildType: SkiaBuildType
         get() = if (myProject.findProperty("skiko.debug") == "true") SkiaBuildType.DEBUG else SkiaBuildType.RELEASE
 
+    val targetArch: Arch
+        get() = myProject.findProperty("skiko.arch")?.toString()?.let(Arch::byName) ?: hostArch
+
     val includeTestHelpers: Boolean
         get() = !isRelease
 
@@ -148,8 +155,11 @@ class SkikoProperties(private val myProject: Project) {
 
     // todo: make compatible with the configuration cache
     val skiaDir: File?
-        get() = (System.getenv()["SKIA_DIR"] ?: System.getProperty("skia.dir"))?.let { File(it) }
-            ?.takeIf { it.isDirectory }
+        get() = (
+                System.getenv()["SKIA_DIR"]
+                ?: System.getProperty("skia.dir")
+                ?: myProject.findProperty("skia.dir")?.toString()
+            )?.let { File(it) }?.takeIf { it.isDirectory }
 
     val composeRepoUrl: String
         get() = System.getenv("COMPOSE_REPO_URL") ?: "https://maven.pkg.jetbrains.space/public/p/compose/dev"

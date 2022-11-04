@@ -109,7 +109,7 @@ fun createWindow(title: String, exitOnClose: Boolean) = SwingUtilities.invokeLat
 
     // Window transparency
     if (System.getProperty("skiko.transparency") == "true") {
-        window.setUndecorated(true)
+        window.isUndecorated = true
         // On Windows we don't set transparent background to avoid event input issues (JDK specific)
         if (hostOs != OS.Windows) {
             window.background = Color(0, 0, 0, 0)

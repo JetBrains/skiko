@@ -5,6 +5,7 @@ import org.gradle.nativeplatform.platform.internal.NativePlatformInternal
 import org.gradle.nativeplatform.toolchain.internal.SystemLibraries
 import org.gradle.nativeplatform.toolchain.internal.msvcpp.*
 import java.io.File
+import kotlin.math.abs
 
 data class WindowsSdkPaths(
     val compiler: File,
@@ -17,26 +18,30 @@ private const val ENV_SKIKO_VSBT_PATH = "SKIKO_VSBT_PATH"
 private const val ENV_SKIKO_VSBT_VERSION = "SKIKO_VSBT_VERSION"
 private const val ENV_SKIKO_WINDOWS_SDK_VERSION = "SKIKO_WINDOWS_SDK_VERSION"
 
-fun findWindowsSdkPathsForCurrentOS(gradle: Gradle): WindowsSdkPaths {
+fun findWindowsSdkPaths(gradle: Gradle, arch: Arch): WindowsSdkPaths {
     check(hostOs.isWindows) { "Unexpected host os: $hostOs, expected: ${OS.Windows}" }
 
     val hostPlatform = host()
-    val finder = GradleWindowsComponentFinderWrapper(gradle, hostPlatform)
+    val finder = GradleWindowsComponentFinderWrapper(gradle, hostPlatform, arch)
     val visualCpp = finder.findVisualCpp()
     val windowsSdk = finder.findWindowsSdk()
     val ucrt = finder.findUcrt()
     val systemLibraries = listOf(visualCpp, windowsSdk, ucrt)
     return WindowsSdkPaths(
-        compiler = visualCpp.compilerExecutable,
-        linker = visualCpp.linkerExecutable,
-        includeDirs = systemLibraries.flatMap { it.includeDirs },
-        libDirs = systemLibraries.flatMap { it.libDirs }
+        compiler = visualCpp.compilerExecutable.fixPathFor(arch),
+        linker = visualCpp.linkerExecutable.fixPathFor(arch),
+        includeDirs = systemLibraries.flatMap { it.includeDirs }.map { it.fixPathFor(arch) },
+        libDirs = systemLibraries.flatMap { it.libDirs }.map { it.fixPathFor(arch) },
     )
 }
 
+// workaround until https://github.com/gradle/gradle/pull/21780 is merged
+private fun File.fixPathFor(arch: Arch) = File(absolutePath.replace("x64", arch.id))
+
 private class GradleWindowsComponentFinderWrapper(
     private val gradle: Gradle,
-    private val hostPlatform: NativePlatformInternal
+    private val hostPlatform: NativePlatformInternal,
+    private val arch: Arch,
 ) {
     fun findVisualCpp(): VisualCpp {
         val skikoVsbtPath = System.getenv(ENV_SKIKO_VSBT_PATH)

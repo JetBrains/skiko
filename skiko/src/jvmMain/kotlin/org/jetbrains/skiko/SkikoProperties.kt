@@ -48,7 +48,10 @@ object SkikoProperties {
             "SOFTWARE_COMPAT" -> return GraphicsApi.SOFTWARE_COMPAT
             "SOFTWARE_FAST", "DIRECT_SOFTWARE" -> return GraphicsApi.SOFTWARE_FAST
             "SOFTWARE" -> return if (hostOs == OS.MacOS) GraphicsApi.SOFTWARE_COMPAT else GraphicsApi.SOFTWARE_FAST
-            "OPENGL" -> return GraphicsApi.OPENGL
+            "OPENGL" ->
+                // Skia isn't properly tested on OpenGL and Windows ARM (https://groups.google.com/g/skia-discuss/c/McoclAhLpvg?pli=1)
+                return if (hostOs != OS.Windows || hostArch != Arch.Arm64) GraphicsApi.OPENGL
+                    else throw Exception("$hostOs-$hostArch does not support OpenGL rendering API.")
             "DIRECT3D" -> {
                 return if (hostOs == OS.Windows) GraphicsApi.DIRECT3D
                     else throw Exception("$hostOs does not support DirectX rendering API.")
@@ -75,7 +78,11 @@ object SkikoProperties {
         var fallbackApis = when (hostOs) {
             OS.Linux -> listOf(GraphicsApi.OPENGL, GraphicsApi.SOFTWARE_FAST, GraphicsApi.SOFTWARE_COMPAT)
             OS.MacOS -> listOf(GraphicsApi.METAL, GraphicsApi.SOFTWARE_COMPAT)
-            OS.Windows -> listOf(GraphicsApi.DIRECT3D, GraphicsApi.OPENGL, GraphicsApi.SOFTWARE_FAST, GraphicsApi.SOFTWARE_COMPAT)
+            OS.Windows -> when (hostArch) {
+                // Skia isn't properly tested on OpenGL and Windows ARM (https://groups.google.com/g/skia-discuss/c/McoclAhLpvg?pli=1)
+                Arch.Arm64 -> listOf(GraphicsApi.DIRECT3D, GraphicsApi.SOFTWARE_FAST, GraphicsApi.SOFTWARE_COMPAT)
+                else -> listOf(GraphicsApi.DIRECT3D, GraphicsApi.OPENGL, GraphicsApi.SOFTWARE_FAST, GraphicsApi.SOFTWARE_COMPAT)
+            }
             OS.Android -> return listOf(GraphicsApi.OPENGL)
             OS.JS, OS.Ios -> TODO("commonize me")
         }
