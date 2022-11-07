@@ -10,6 +10,7 @@ val skikoArtifactIds: List<String> =
         SkikoArtifacts.commonArtifactId,
         SkikoArtifacts.jvmArtifactId,
         SkikoArtifacts.jvmRuntimeArtifactIdFor(OS.Windows, Arch.X64),
+        SkikoArtifacts.jvmRuntimeArtifactIdFor(OS.Windows, Arch.Arm64),
         SkikoArtifacts.jvmRuntimeArtifactIdFor(OS.Linux, Arch.X64),
         SkikoArtifacts.jvmRuntimeArtifactIdFor(OS.Linux, Arch.Arm64),
         SkikoArtifacts.jvmRuntimeArtifactIdFor(OS.MacOS, Arch.X64),
