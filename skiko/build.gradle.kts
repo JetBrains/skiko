@@ -599,7 +599,6 @@ fun skiaStaticLibraries(skiaDir: String, targetString: String): List<String> {
         "libskottie.a",
         "libsvg.a",
         "libpng.a",
-        "libfreetype2.a",
         "libwebp_sse41.a",
         "libsksg.a",
         "libskunicode.a",
