@@ -2,6 +2,7 @@ package org.jetbrains.skiko
 
 import kotlinx.browser.window
 import org.jetbrains.skia.Canvas
+import org.jetbrains.skia.PixelGeometry
 import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.events.InputEvent
 import org.w3c.dom.events.KeyboardEvent
@@ -95,14 +96,13 @@ actual open class SkiaLayer {
         htmlCanvas.style.width = "${desiredWidth}px"
         htmlCanvas.style.height = "${desiredHeight}px"
         setOnChangeScaleNotifier()
-
         state = object: CanvasRenderer(htmlCanvas) {
             override fun drawFrame(currentTimestamp: Double) {
                 // currentTimestamp is in milliseconds.
                 val currentNanos = currentTimestamp * 1_000_000
                 skikoView?.onRender(canvas!!, width, height, currentNanos.toLong())
             }
-        }.apply { initCanvas(desiredWidth, desiredHeight, contentScale) }
+        }.apply { initCanvas(desiredWidth, desiredHeight, contentScale, pixelGeometry) }
         // See https://www.w3schools.com/jsref/dom_obj_event.asp
         // https://developer.mozilla.org/en-US/docs/Web/API/Pointer_events
         htmlCanvas.addEventListener("mousedown", { event ->
@@ -145,7 +145,7 @@ actual open class SkiaLayer {
     }
 
     private fun setOnChangeScaleNotifier() {
-        state?.initCanvas(desiredWidth, desiredHeight, contentScale)
+        state?.initCanvas(desiredWidth, desiredHeight, contentScale, this.pixelGeometry)
         window.matchMedia("(resolution: ${contentScale}dppx)").addEventListener("change", { setOnChangeScaleNotifier() }, true)
         onContentScaleChanged?.invoke(contentScale)
     }
@@ -153,6 +153,9 @@ actual open class SkiaLayer {
     internal actual fun draw(canvas: Canvas) {
         skikoView?.onRender(canvas, state!!.width, state!!.height, currentNanoTime())
     }
+
+    actual val pixelGeometry: PixelGeometry
+        get() = PixelGeometry.UNKNOWN
 }
 
 var onContentScaleChanged: ((Float) -> Unit)? = null

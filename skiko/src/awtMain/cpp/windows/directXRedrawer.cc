@@ -10,6 +10,7 @@
 #include "GrBackendSurface.h"
 #include "GrDirectContext.h"
 #include "SkSurface.h"
+#include "../common/interop.hh"
 
 #include "d3d/GrD3DTypes.h"
 #include <d3d12sdklayers.h>
@@ -353,7 +354,7 @@ extern "C"
     }
 
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_makeDirectXSurface(
-        JNIEnv *env, jobject redrawer, jlong devicePtr, jlong contextPtr, jint width, jint height, jint index)
+        JNIEnv *env, jobject redrawer, jlong devicePtr, jlong contextPtr, jint width, jint height, jobject surfacePropsObj, jint index)
     {
         DirectXDevice *d3dDevice = fromJavaPointer<DirectXDevice *>(devicePtr);
         GrDirectContext *context = fromJavaPointer<GrDirectContext *>(contextPtr);
@@ -368,11 +369,11 @@ extern "C"
 
         info.fResource = d3dDevice->buffers[index];
 
-        SkSurfaceProps surfaceProps(0, kRGB_H_SkPixelGeometry);
+        std::unique_ptr<SkSurfaceProps> surfaceProps = skija::SurfaceProps::toSkSurfaceProps(env, surfacePropsObj);
         GrBackendTexture backendTexture((int)d3dDevice->buffers[index]->GetDesc().Width, (int)d3dDevice->buffers[index]->GetDesc().Height, info);
         auto result = SkSurface::MakeFromBackendTexture(
                                  context, backendTexture, kTopLeft_GrSurfaceOrigin, 0,
-                                 kRGBA_8888_SkColorType, SkColorSpace::MakeSRGB(), &surfaceProps)
+                                 kRGBA_8888_SkColorType, SkColorSpace::MakeSRGB(), surfaceProps.get())
                                  .release();
         return toJavaPointer(result);
     }

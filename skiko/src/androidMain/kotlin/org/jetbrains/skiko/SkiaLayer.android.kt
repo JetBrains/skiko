@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import org.jetbrains.skia.Canvas
+import org.jetbrains.skia.PixelGeometry
 
 actual typealias SkikoGesturePlatformEvent = MotionEvent
 actual typealias SkikoPlatformPointerEvent = MotionEvent
@@ -108,6 +109,9 @@ actual open class SkiaLayer {
             scheduleFrame()
         }
     }
+
+    actual val pixelGeometry: PixelGeometry
+        get() = PixelGeometry.UNKNOWN
 
     actual val component: Any?
         get() = this.container

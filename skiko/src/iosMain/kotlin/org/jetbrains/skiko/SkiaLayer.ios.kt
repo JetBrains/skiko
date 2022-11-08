@@ -2,6 +2,7 @@ package org.jetbrains.skiko
 
 import kotlinx.cinterop.useContents
 import org.jetbrains.skia.Canvas
+import org.jetbrains.skia.PixelGeometry
 import org.jetbrains.skiko.context.MetalContextHandler
 import org.jetbrains.skiko.redrawer.MetalRedrawer
 import platform.UIKit.*
@@ -106,6 +107,9 @@ actual open class SkiaLayer {
 
         skikoView?.onRender(canvas, pictureWidth.toInt(), pictureHeight.toInt(), getTimeNanos())
     }
+
+    actual val pixelGeometry: PixelGeometry
+        get() = PixelGeometry.UNKNOWN
 }
 
 // TODO: do properly

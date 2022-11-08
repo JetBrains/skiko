@@ -1,13 +1,7 @@
 package org.jetbrains.skiko
 
 import kotlinx.browser.window
-import org.jetbrains.skia.BackendRenderTarget
-import org.jetbrains.skia.Canvas
-import org.jetbrains.skia.ColorSpace
-import org.jetbrains.skia.DirectContext
-import org.jetbrains.skia.Surface
-import org.jetbrains.skia.SurfaceColorFormat
-import org.jetbrains.skia.SurfaceOrigin
+import org.jetbrains.skia.*
 import org.jetbrains.skiko.wasm.createWebGLContext
 import org.jetbrains.skiko.wasm.GL
 import org.w3c.dom.HTMLCanvasElement
@@ -57,7 +51,7 @@ abstract class CanvasRenderer constructor(val htmlCanvas: HTMLCanvasElement) {
      * @param scale - a value to adjust the canvas' size
      * (https://developer.mozilla.org/en-US/docs/Web/API/Window/devicePixelRatio)
      */
-    fun initCanvas(desiredWidth: Int, desiredHeight: Int, scale: Float) {
+    fun initCanvas(desiredWidth: Int, desiredHeight: Int, scale: Float, pixelGeometry: PixelGeometry) {
         disposeCanvas()
         htmlCanvas.width = (desiredWidth * scale).toInt()
         htmlCanvas.height = (desiredHeight * scale).toInt()
@@ -67,7 +61,8 @@ abstract class CanvasRenderer constructor(val htmlCanvas: HTMLCanvasElement) {
             renderTarget!!,
             SurfaceOrigin.BOTTOM_LEFT,
             SurfaceColorFormat.RGBA_8888,
-            ColorSpace.sRGB
+            ColorSpace.sRGB,
+            SurfaceProps(pixelGeometry = pixelGeometry)
         ) ?: throw RenderException("Cannot create surface")
         canvas = surface!!.canvas
     }
