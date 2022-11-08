@@ -2473,7 +2473,7 @@ $dokka.location:org.jetbrains.skiko/CanvasRenderer/CanvasRenderer/#org.w3c.dom.H
 $dokka.location:org.jetbrains.skiko/CanvasRenderer/drawFrame/#kotlin.Double/PointingToDeclaration/skiko/org.jetbrains.skiko/-canvas-renderer/draw-frame.html
 $dokka.location:org.jetbrains.skiko/CanvasRenderer/height/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-canvas-renderer/height.html
 $dokka.location:org.jetbrains.skiko/CanvasRenderer/htmlCanvas/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-canvas-renderer/html-canvas.html
-$dokka.location:org.jetbrains.skiko/CanvasRenderer/initCanvas/#kotlin.Int#kotlin.Int#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skiko/-canvas-renderer/init-canvas.html
+$dokka.location:org.jetbrains.skiko/CanvasRenderer/initCanvas/#kotlin.Int#kotlin.Int#kotlin.Float#org.jetbrains.skia.PixelGeometry/PointingToDeclaration/skiko/org.jetbrains.skiko/-canvas-renderer/init-canvas.html
 $dokka.location:org.jetbrains.skiko/CanvasRenderer/needRedraw/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-canvas-renderer/need-redraw.html
 $dokka.location:org.jetbrains.skiko/CanvasRenderer/width/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-canvas-renderer/width.html
 $dokka.location:org.jetbrains.skiko/ClipComponent///PointingToDeclaration/skiko/org.jetbrains.skiko/-clip-component/index.html
@@ -2608,6 +2608,7 @@ $dokka.location:org.jetbrains.skiko/SkiaLayer/isScreenKeyboardOpen/#/PointingToD
 $dokka.location:org.jetbrains.skiko/SkiaLayer/isShowing/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/[macos]is-showing.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/needRedraw/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/need-redraw.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/nsView/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/ns-view.html
+$dokka.location:org.jetbrains.skiko/SkiaLayer/pixelGeometry/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/pixel-geometry.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/renderApi/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/render-api.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/showScreenKeyboard/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/show-screen-keyboard.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/skikoView/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/skiko-view.html
