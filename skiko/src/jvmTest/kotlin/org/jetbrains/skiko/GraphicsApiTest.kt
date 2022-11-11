@@ -18,6 +18,7 @@ class GraphicsApiTest {
     fun `device is not supported by pattern`() {
         assertFalse { isVideoCardSupported(GraphicsApi.OPENGL, OS.Linux, "llvmpipe") }
         assertFalse { isVideoCardSupported(GraphicsApi.OPENGL, OS.Linux, "llvmpipe (LLVM 5.0 256 bits)") }
+        assertFalse { isVideoCardSupported(GraphicsApi.OPENGL, OS.Linux, "virgl (Apple M1 Max (Compat))") }
         assertTrue { isVideoCardSupported(GraphicsApi.OPENGL, OS.Linux, "Intel llvmpipe") }
     }
 
