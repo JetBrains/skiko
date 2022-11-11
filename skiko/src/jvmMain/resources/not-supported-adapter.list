@@ -6,4 +6,4 @@ windows:directx:NVIDIA GeForce GTX 960M
 windows:directx:NVIDIA Quadro M2000M
 windows:opengl:Intel(R) HD Graphics 2000
 windows:opengl:Intel(R) HD Graphics 3000
-linux:opengl:llvmpipe
+linux:opengl:llvmpipe.*

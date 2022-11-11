@@ -5,7 +5,7 @@ private val linePattern = Regex("(.*):(.*):(.*)")
 internal data class NotSupportedAdapter(
     val os: OS,
     val api: GraphicsApi,
-    val name: String
+    val pattern: Regex
 )
 
 internal fun parseNotSupportedAdapter(line: String): NotSupportedAdapter? {
@@ -24,8 +24,8 @@ internal fun parseNotSupportedAdapter(line: String): NotSupportedAdapter? {
         "opengl" -> GraphicsApi.OPENGL
         else -> return null
     }
-    val name = groups[3]?.value ?: return null
-    return NotSupportedAdapter(platform, api, name)
+    val pattern = groups[3]?.value ?: return null
+    return NotSupportedAdapter(platform, api, Regex(pattern))
 }
 
 private val notSupportedAdapters: Set<NotSupportedAdapter> by lazy {
@@ -37,6 +37,6 @@ private val notSupportedAdapters: Set<NotSupportedAdapter> by lazy {
 
 internal fun isVideoCardSupported(api: GraphicsApi, hostOs: OS, name: String): Boolean {
     return notSupportedAdapters.any { entry ->
-        entry.os == hostOs && entry.api == api && entry.name == name
+        entry.os == hostOs && entry.api == api && entry.pattern.matches(name)
     }.not()
 }

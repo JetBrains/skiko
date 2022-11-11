@@ -1,27 +1,31 @@
 package org.jetbrains.skiko
 
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 
 class GraphicsApiTest {
     @Test
-    fun `check that device is supported`() {
+    fun `device is supported test`() {
         assertTrue { isVideoCardSupported(GraphicsApi.METAL, OS.MacOS, "AMD Radeon Pro 5500M") }
     }
 
     @Test
-    fun `check that device is not supported`() {
+    fun `device is not supported test`() {
         assertFalse { isVideoCardSupported(GraphicsApi.DIRECT3D, OS.Windows, "NVIDIA Quadro M2000M") }
     }
 
     @Test
+    fun `device is not supported by pattern`() {
+        assertFalse { isVideoCardSupported(GraphicsApi.OPENGL, OS.Linux, "llvmpipe") }
+        assertFalse { isVideoCardSupported(GraphicsApi.OPENGL, OS.Linux, "llvmpipe (LLVM 5.0 256 bits)") }
+        assertTrue { isVideoCardSupported(GraphicsApi.OPENGL, OS.Linux, "Intel llvmpipe") }
+    }
+
+    @Test
     fun `parseNotSupportedAdapter test`() {
-        assertEquals(NotSupportedAdapter(os = OS.Windows,
-                                         api = GraphicsApi.OPENGL,
-                                         name = "Intel(R) HD Graphics 2000"),
-                     parseNotSupportedAdapter("windows:opengl:Intel(R) HD Graphics 2000"))
+        val entry = assertNotNull(parseNotSupportedAdapter("windows:opengl:Intel(R) HD Graphics 2000"))
+        assertEquals(OS.Windows, entry.os)
+        assertEquals(GraphicsApi.OPENGL, entry.api)
+        assertEquals("Intel(R) HD Graphics 2000", entry.pattern.pattern)
     }
 }
