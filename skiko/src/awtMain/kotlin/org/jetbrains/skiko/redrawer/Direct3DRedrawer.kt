@@ -97,7 +97,7 @@ internal class Direct3DRedrawer(
     fun initFence() = initFence(device)
 
     // Called from native code
-    private fun isAdapterSupported(name: String) = isVideoCardSupported(GraphicsApi.DIRECT3D, name)
+    private fun isAdapterSupported(name: String) = isVideoCardSupported(GraphicsApi.DIRECT3D, hostOs, name)
 
     private external fun chooseAdapter(adapterPriority: Int): Long
     private external fun createDirectXDevice(adapter: Long, contentHandle: Long, transparency: Boolean): Long

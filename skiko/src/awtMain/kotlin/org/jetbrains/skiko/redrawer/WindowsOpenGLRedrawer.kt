@@ -20,8 +20,10 @@ internal class WindowsOpenGLRedrawer(
             throw RenderException("Cannot create Windows GL context")
         }
         makeCurrent(device, it)
-        if (!isVideoCardSupported(GraphicsApi.OPENGL, adapterName)) {
-            throw RenderException("Cannot create Windows GL context")
+        adapterName.also { adapterName ->
+            if (adapterName != null && !isVideoCardSupported(GraphicsApi.OPENGL, hostOs, adapterName)) {
+                throw RenderException("Cannot create Windows GL context")
+            }
         }
         onDeviceChosen(adapterName)
     }

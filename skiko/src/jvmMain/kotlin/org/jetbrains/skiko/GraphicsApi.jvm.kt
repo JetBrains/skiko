@@ -1,25 +1,42 @@
 package org.jetbrains.skiko
 
-private val notSupportedAdapters: Set<NotSupportedAdapter> by lazy {
-    val resource = SkiaLayer::class.java.getResource("/not-supported-adapter.list")?.readText().orEmpty()
-    resource.splitToSequence(";").map { it.trim() }.mapNotNullTo(mutableSetOf()) {
-        val splits = it.split(":")
-        val api = when (splits.getOrNull(0)) {
-            "directx" -> GraphicsApi.DIRECT3D
-            "opengl" -> GraphicsApi.OPENGL
-            else -> return@mapNotNullTo null
-        }
-        val name = splits.getOrNull(1) ?: return@mapNotNullTo null
-        NotSupportedAdapter(api, name)
-    }
-}
+private val linePattern = Regex("(.*):(.*):(.*)")
 
-internal fun isVideoCardSupported(
-    api: GraphicsApi,
-    name: String?
-): Boolean = name == null || !notSupportedAdapters.contains(NotSupportedAdapter(api, name))
-
-private data class NotSupportedAdapter(
+internal data class NotSupportedAdapter(
+    val os: OS,
     val api: GraphicsApi,
     val name: String
 )
+
+internal fun parseNotSupportedAdapter(line: String): NotSupportedAdapter? {
+    val match = linePattern.matchEntire(line) ?: return null
+    val groups = match.groups
+    val platform = groups[1]?.value?.let { platformName ->
+        when (platformName) {
+            "windows" -> OS.Windows
+            "linux" -> OS.Linux
+            "macos" -> OS.MacOS
+            else -> null
+        }
+    } ?: return null
+    val api = when (groups[2]?.value) {
+        "directx" -> GraphicsApi.DIRECT3D
+        "opengl" -> GraphicsApi.OPENGL
+        else -> return null
+    }
+    val name = groups[3]?.value ?: return null
+    return NotSupportedAdapter(platform, api, name)
+}
+
+private val notSupportedAdapters: Set<NotSupportedAdapter> by lazy {
+    val resource = SkiaLayer::class.java.getResourceAsStream("/not-supported-adapter.list")?.bufferedReader()?.lineSequence().orEmpty()
+    resource.map { it.trim() }.mapNotNullTo(mutableSetOf()) { line ->
+        parseNotSupportedAdapter(line)
+    }
+}
+
+internal fun isVideoCardSupported(api: GraphicsApi, hostOs: OS, name: String): Boolean {
+    return notSupportedAdapters.any { entry ->
+        entry.os == hostOs && entry.api == api && entry.name == name
+    }.not()
+}

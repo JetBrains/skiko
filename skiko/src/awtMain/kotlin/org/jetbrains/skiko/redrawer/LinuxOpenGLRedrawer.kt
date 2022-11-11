@@ -22,8 +22,10 @@ internal class LinuxOpenGLRedrawer(
                 throw RenderException("Cannot create Linux GL context")
             }
             it.makeCurrent(context)
-            if (!isVideoCardSupported(GraphicsApi.OPENGL, adapterName)) {
-                throw RenderException("Cannot create Linux GL context")
+            adapterName.also { adapterName ->
+                if (adapterName != null && !isVideoCardSupported(GraphicsApi.OPENGL, hostOs, adapterName)) {
+                    throw RenderException("Cannot create Linux GL context")
+                }
             }
             onDeviceChosen(adapterName)
             it.setSwapInterval(swapInterval)
