@@ -1,41 +1,72 @@
+<!DOCTYPE html>
 <html>
-  <head>
+<head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>makeFromBackendRenderTarget</title>
-<link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../../";</script>    <script>const storage = localStorage.getItem("dokka-dark-mode")
-const savedDarkMode = storage ? JSON.parse(storage) : false
-if(savedDarkMode === true){
-    document.getElementsByTagName("html")[0].classList.add("theme-dark")
-}</script>
-<script type="text/javascript" src="../../../../scripts/sourceset_dependencies.js" async="async"></script><link href="../../../../styles/style.css" rel="Stylesheet"><link href="../../../../styles/jetbrains-mono.css" rel="Stylesheet"><link href="../../../../styles/main.css" rel="Stylesheet"><link href="../../../../styles/prism.css" rel="Stylesheet"><link href="../../../../styles/logo-styles.css" rel="Stylesheet"><script type="text/javascript" src="../../../../scripts/clipboard.js" async="async"></script><script type="text/javascript" src="../../../../scripts/navigation-loader.js" async="async"></script><script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async="async"></script><script type="text/javascript" src="../../../../scripts/main.js" defer="defer"></script><script type="text/javascript" src="../../../../scripts/prism.js" async="async"></script>  </head>
-  <body>
-    <div class="navigation-wrapper" id="navigation-wrapper">
-      <div id="leftToggler"><span class="icon-toggler"></span></div>
-      <div class="library-name"><a href="../../../../index.html">skiko</a></div>
-      <div>0.0.0-SNAPSHOT</div>
-      <div class="pull-right d-flex">
-        <div class="filter-section" id="filter-section"><button class="platform-tag platform-selector common-like" data-active="" data-filter=":dokkaHtml/commonMain">common</button></div>
-<button id="theme-toggle-button"><span id="theme-toggle"></span></button>
-        <div id="searchBar"></div>
-      </div>
+    <link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "../../../../";</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="../../../../scripts/sourceset_dependencies.js" async="async"></script>
+<link href="../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../styles/jetbrains-mono.css" rel="Stylesheet">
+<link href="../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../styles/logo-styles.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../scripts/clipboard.js" async="async"></script>
+<script type="text/javascript" src="../../../../scripts/navigation-loader.js" async="async"></script>
+<script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async="async"></script>
+<script type="text/javascript" src="../../../../scripts/main.js" defer="defer"></script>
+<script type="text/javascript" src="../../../../scripts/prism.js" async="async"></script>
+<script type="text/javascript" src="../../../../scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
+</head>
+<body>
+<div class="navigation-wrapper" id="navigation-wrapper">
+    <div id="leftToggler"><span class="icon-toggler"></span></div>
+    <div class="library-name">
+            <a href="../../../../index.html">
+                    <span>skiko</span>
+            </a>
     </div>
-    <div id="container">
-      <div id="leftColumn">
-        <div id="sideMenu"></div>
-      </div>
-      <div id="main">
-        <div class="main-content" id="content" pageIds="skiko::org.jetbrains.skia/Surface.Companion/makeFromBackendRenderTarget/#org.jetbrains.skia.DirectContext#org.jetbrains.skia.BackendRenderTarget#org.jetbrains.skia.SurfaceOrigin#org.jetbrains.skia.SurfaceColorFormat#org.jetbrains.skia.ColorSpace?#org.jetbrains.skia.SurfaceProps?/PointingToDeclaration//788909594">
-          <div class="breadcrumbs"><a href="../../../../index.html">skiko</a>/<a href="../../index.html">org.jetbrains.skia</a>/<a href="../index.html">Surface</a>/<a href="index.html">Companion</a>/<a href="make-from-backend-render-target.html">makeFromBackendRenderTarget</a></div>
-          <div class="cover ">
-            <h1 class="cover"><span>make</span><wbr></wbr><span>From</span><wbr></wbr><span>Backend</span><wbr></wbr><span>Render</span><wbr></wbr><span><span>Target</span></span></h1>
-          </div>
-          <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-            <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark common-like" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain" data-active="" data-toggle=":dokkaHtml/commonMain">common</button></div>
-<div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="make-from-backend-render-target.html"><span class="token function">makeFromBackendRenderTarget</span></a><span class="token punctuation">(</span>context<span class="token operator">: </span><a href="../../-direct-context/index.html">DirectContext</a><span class="token punctuation">, </span>rt<span class="token operator">: </span><a href="../../-backend-render-target/index.html">BackendRenderTarget</a><span class="token punctuation">, </span>origin<span class="token operator">: </span><a href="../../-surface-origin/index.html">SurfaceOrigin</a><span class="token punctuation">, </span>colorFormat<span class="token operator">: </span><a href="../../-surface-color-format/index.html">SurfaceColorFormat</a><span class="token punctuation">, </span>colorSpace<span class="token operator">: </span><a href="../../-color-space/index.html">ColorSpace</a><span class="token operator">?</span><span class="token punctuation">, </span>surfaceProps<span class="token operator">: </span><a href="../../-surface-props/index.html">SurfaceProps</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">Surface</a><span class="token operator">?</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">Wraps a GPU-backed buffer into <a href="../index.html">Surface</a>.</p><p class="paragraph">Caller must ensure backendRenderTarget is valid for the lifetime of returned <a href="../index.html">Surface</a>.</p><p class="paragraph"><a href="../index.html">Surface</a> is returned if all parameters are valid. backendRenderTarget is valid if its pixel configuration agrees with colorSpace and context; for instance, if backendRenderTarget has an sRGB configuration, then context must support sRGB, and colorSpace must be present. Further, backendRenderTarget width and height must not exceed context capabilities, and the context must be able to support back-end render targets.</p><h4 class="">Return</h4><p class="paragraph">Surface if all parameters are valid; otherwise, null</p><h2 class="">See also</h2><div data-togglable="See also"><div class="table" data-togglable="See also"><div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><div></div></span></div><div><div class="title"><div data-togglable="See also"><p class="paragraph"><a href="https://fiddle.skia.org/c/@Surface_MakeFromBackendTexture">https://fiddle.skia.org/c/@Surface_MakeFromBackendTexture</a></p></div></div></div></div></div></div></div><h2 class="">Parameters</h2><div data-togglable="Parameters"><div class="table" data-togglable="Parameters"><div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><div><span><span>context</span></span></div></span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">GPU context</p></div></div></div></div></div><div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><div><span><span>rt</span></span></div></span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">texture residing on GPU</p></div></div></div></div></div><div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><div><span><span>origin</span></span></div></span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">surfaceOrigin pins either the top-left or the bottom-left corner to the origin.</p></div></div></div></div></div><div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><div><span>color</span><wbr></wbr><span><span>Format</span></span></div></span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">color format</p></div></div></div></div></div><div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><div><span>color</span><wbr></wbr><span><span>Space</span></span></div></span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">range of colors; may be null</p></div></div></div></div></div></div></div></div>          </div>
+    <div>
+0.0.0-SNAPSHOT    </div>
+    <div class="pull-right d-flex">
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":dokkaHtml/commonMain">common</button>
         </div>
-        <div class="footer"><span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2022 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span></div>
+        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+    </div>
+</div>
+<div id="container">
+    <div id="leftColumn">
+        <div id="sideMenu"></div>
+    </div>
+    <div id="main">
+<div class="main-content" id="content" pageIds="skiko::org.jetbrains.skia/Surface.Companion/makeFromBackendRenderTarget/#org.jetbrains.skia.DirectContext#org.jetbrains.skia.BackendRenderTarget#org.jetbrains.skia.SurfaceOrigin#org.jetbrains.skia.SurfaceColorFormat#org.jetbrains.skia.ColorSpace?#org.jetbrains.skia.SurfaceProps?/PointingToDeclaration//788909594">
+  <div class="breadcrumbs"><a href="../../../../index.html">skiko</a><span class="delimiter">/</span><a href="../../index.html">org.jetbrains.skia</a><span class="delimiter">/</span><a href="../index.html">Surface</a><span class="delimiter">/</span><a href="index.html">Companion</a><span class="delimiter">/</span><span class="current">makeFromBackendRenderTarget</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>make</span><wbr></wbr><span>From</span><wbr></wbr><span>Backend</span><wbr></wbr><span>Render</span><wbr></wbr><span><span>Target</span></span></h1>
+  </div>
+  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="make-from-backend-render-target.html"><span class="token function">makeFromBackendRenderTarget</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">context<span class="token operator">: </span><a href="../../-direct-context/index.html">DirectContext</a><span class="token punctuation">, </span></span><span class="parameter ">rt<span class="token operator">: </span><a href="../../-backend-render-target/index.html">BackendRenderTarget</a><span class="token punctuation">, </span></span><span class="parameter ">origin<span class="token operator">: </span><a href="../../-surface-origin/index.html">SurfaceOrigin</a><span class="token punctuation">, </span></span><span class="parameter ">colorFormat<span class="token operator">: </span><a href="../../-surface-color-format/index.html">SurfaceColorFormat</a><span class="token punctuation">, </span></span><span class="parameter ">colorSpace<span class="token operator">: </span><a href="../../-color-space/index.html">ColorSpace</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">surfaceProps<span class="token operator">: </span><a href="../../-surface-props/index.html">SurfaceProps</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">Surface</a><span class="token operator">?</span></div><p class="paragraph">Wraps a GPU-backed buffer into <a href="../index.html">Surface</a>.</p><p class="paragraph">Caller must ensure backendRenderTarget is valid for the lifetime of returned <a href="../index.html">Surface</a>.</p><p class="paragraph"><a href="../index.html">Surface</a> is returned if all parameters are valid. backendRenderTarget is valid if its pixel configuration agrees with colorSpace and context; for instance, if backendRenderTarget has an sRGB configuration, then context must support sRGB, and colorSpace must be present. Further, backendRenderTarget width and height must not exceed context capabilities, and the context must be able to support back-end render targets.</p><span class="kdoc-tag"><h4 class="">Return</h4><p class="paragraph">Surface if all parameters are valid; otherwise, null</p></span><h4 class="">See also</h4><div data-togglable="See also"><div class="table" data-togglable="See also"><div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><div></div></span></div><div><div class="title"><div data-togglable="See also"><p class="paragraph"><a href="https://fiddle.skia.org/c/@Surface_MakeFromBackendTexture">https://fiddle.skia.org/c/@Surface_MakeFromBackendTexture</a></p></div></div></div></div></div></div></div><h4 class="">Parameters</h4><div data-togglable="Parameters"><div class="table" data-togglable="Parameters"><div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><div><u><span><span>context</span></span></u></div></span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">GPU context</p></div></div></div></div></div><div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><div><u><span><span>rt</span></span></u></div></span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">texture residing on GPU</p></div></div></div></div></div><div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><div><u><span><span>origin</span></span></u></div></span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">surfaceOrigin pins either the top-left or the bottom-left corner to the origin.</p></div></div></div></div></div><div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><div><u><span>color</span><wbr></wbr><span><span>Format</span></span></u></div></span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">color format</p></div></div></div></div></div><div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><div><u><span>color</span><wbr></wbr><span><span>Space</span></span></u></div></span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">range of colors; may be null</p></div></div></div></div></div></div></div></div></div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2022 Copyright</span><span
+                class="pull-right"><span>Generated by </span><a
+                href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
       </div>
     </div>
-  </body>
+</div>
+</body>
 </html>
-

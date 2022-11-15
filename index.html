@@ -1,221 +1,264 @@
+<!DOCTYPE html>
 <html>
-  <head>
+<head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>skiko</title>
-<link href="images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "";</script>    <script>const storage = localStorage.getItem("dokka-dark-mode")
-const savedDarkMode = storage ? JSON.parse(storage) : false
-if(savedDarkMode === true){
-    document.getElementsByTagName("html")[0].classList.add("theme-dark")
-}</script>
-<script type="text/javascript" src="scripts/sourceset_dependencies.js" async="async"></script><link href="styles/style.css" rel="Stylesheet"><link href="styles/jetbrains-mono.css" rel="Stylesheet"><link href="styles/main.css" rel="Stylesheet"><link href="styles/prism.css" rel="Stylesheet"><link href="styles/logo-styles.css" rel="Stylesheet"><script type="text/javascript" src="scripts/clipboard.js" async="async"></script><script type="text/javascript" src="scripts/navigation-loader.js" async="async"></script><script type="text/javascript" src="scripts/platform-content-handler.js" async="async"></script><script type="text/javascript" src="scripts/main.js" defer="defer"></script><script type="text/javascript" src="scripts/prism.js" async="async"></script>  </head>
-  <body>
-    <div class="navigation-wrapper" id="navigation-wrapper">
-      <div id="leftToggler"><span class="icon-toggler"></span></div>
-      <div class="library-name"><a href="index.html">skiko</a></div>
-      <div>0.0.0-SNAPSHOT</div>
-      <div class="pull-right d-flex">
-        <div class="filter-section" id="filter-section"><button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":dokkaHtml/androidMain">android</button><button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":dokkaHtml/awtMain">awt</button><button class="platform-tag platform-selector common-like" data-active="" data-filter=":dokkaHtml/commonMain">common</button><button class="platform-tag platform-selector native-like" data-active="" data-filter=":dokkaHtml/darwinMain">darwin</button><button class="platform-tag platform-selector native-like" data-active="" data-filter=":dokkaHtml/iosMain">ios</button><button class="platform-tag platform-selector js-like" data-active="" data-filter=":dokkaHtml/jsMain">js</button><button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":dokkaHtml/jvmMain">jvm</button><button class="platform-tag platform-selector native-like" data-active="" data-filter=":dokkaHtml/linuxMain">linux</button><button class="platform-tag platform-selector native-like" data-active="" data-filter=":dokkaHtml/macosMain">macos</button><button class="platform-tag platform-selector common-like" data-active="" data-filter=":dokkaHtml/nativeJsMain">nativeJs</button><button class="platform-tag platform-selector native-like" data-active="" data-filter=":dokkaHtml/nativeMain">native</button></div>
-<button id="theme-toggle-button"><span id="theme-toggle"></span></button>
-        <div id="searchBar"></div>
-      </div>
+    <link href="images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "";</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="scripts/sourceset_dependencies.js" async="async"></script>
+<link href="styles/style.css" rel="Stylesheet">
+<link href="styles/jetbrains-mono.css" rel="Stylesheet">
+<link href="styles/main.css" rel="Stylesheet">
+<link href="styles/prism.css" rel="Stylesheet">
+<link href="styles/logo-styles.css" rel="Stylesheet">
+<script type="text/javascript" src="scripts/clipboard.js" async="async"></script>
+<script type="text/javascript" src="scripts/navigation-loader.js" async="async"></script>
+<script type="text/javascript" src="scripts/platform-content-handler.js" async="async"></script>
+<script type="text/javascript" src="scripts/main.js" defer="defer"></script>
+<script type="text/javascript" src="scripts/prism.js" async="async"></script>
+<script type="text/javascript" src="scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
+</head>
+<body>
+<div class="navigation-wrapper" id="navigation-wrapper">
+    <div id="leftToggler"><span class="icon-toggler"></span></div>
+    <div class="library-name">
+            <a href="index.html">
+                    <span>skiko</span>
+            </a>
     </div>
-    <div id="container">
-      <div id="leftColumn">
+    <div>
+0.0.0-SNAPSHOT    </div>
+    <div class="pull-right d-flex">
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":dokkaHtml/androidMain">android</button>
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":dokkaHtml/awtMain">awt</button>
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":dokkaHtml/commonMain">common</button>
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":dokkaHtml/darwinMain">darwin</button>
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":dokkaHtml/iosMain">ios</button>
+                <button class="platform-tag platform-selector js-like" data-active="" data-filter=":dokkaHtml/jsMain">js</button>
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":dokkaHtml/jvmMain">jvm</button>
+                <button class="platform-tag platform-selector native-like" data-active="" data-filter=":dokkaHtml/linuxMain">linux</button>
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":dokkaHtml/macosMain">macos</button>
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":dokkaHtml/nativeJsMain">nativeJs</button>
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":dokkaHtml/nativeMain">native</button>
+        </div>
+        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+    </div>
+</div>
+<div id="container">
+    <div id="leftColumn">
         <div id="sideMenu"></div>
-      </div>
-      <div id="main">
-        <div class="main-content" id="content" pageIds="skiko::////PointingToDeclaration//904950546">
-          <div class="breadcrumbs"></div>
-          <div class="cover ">
-            <h1 class="cover"><span><span>skiko</span></span></h1>
-          </div>
-          <h2 class="">Packages</h2>
-          <div class="table"><a data-name="1112968948%2FPackages%2F1481200572" anchor-label="org.jetbrains.skia" id="1112968948%2FPackages%2F1481200572" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain"></a>
-            <div class="table-row" data-filterable-current=":dokkaHtml/commonMain :dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain">
-              <div>
-                <div class="main-subrow ">
-                  <div class=""><span class="inline-flex">
-                      <div><a href="skiko/org.jetbrains.skia/index.html">org.jetbrains.skia</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1112968948%2FPackages%2F1481200572"></span>
-                        <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                      </span></span></div>
-                  <div class="pull-right">
-                    <div class="platform-tags no-gutters">
-                      <div class="platform-tag common-like">common</div>
-                      <div class="platform-tag js-like">js</div>
-                      <div class="platform-tag jvm-like">jvm</div>
-                      <div class="platform-tag native-like">native</div>
-                    </div>
-                  </div>
-                </div>
-                <div></div>
-              </div>
-            </div>
-<a data-name="178033630%2FPackages%2F1481200572" anchor-label="org.jetbrains.skia.impl" id="178033630%2FPackages%2F1481200572" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain"></a>
-            <div class="table-row" data-filterable-current=":dokkaHtml/commonMain :dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain">
-              <div>
-                <div class="main-subrow ">
-                  <div class=""><span class="inline-flex">
-                      <div><a href="skiko/org.jetbrains.skia.impl/index.html">org.jetbrains.skia.impl</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="178033630%2FPackages%2F1481200572"></span>
-                        <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                      </span></span></div>
-                  <div class="pull-right">
-                    <div class="platform-tags no-gutters">
-                      <div class="platform-tag common-like">common</div>
-                      <div class="platform-tag js-like">js</div>
-                      <div class="platform-tag jvm-like">jvm</div>
-                      <div class="platform-tag native-like">native</div>
-                    </div>
-                  </div>
-                </div>
-                <div></div>
-              </div>
-            </div>
-<a data-name="-843612812%2FPackages%2F788909594" anchor-label="org.jetbrains.skia.paragraph" id="-843612812%2FPackages%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-            <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-              <div>
-                <div class="main-subrow ">
-                  <div class=""><span class="inline-flex">
-                      <div><a href="skiko/org.jetbrains.skia.paragraph/index.html">org.jetbrains.skia.paragraph</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-843612812%2FPackages%2F788909594"></span>
-                        <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                      </span></span></div>
-                  <div class="pull-right">
-                    <div class="platform-tags no-gutters">
-                      <div class="platform-tag common-like">common</div>
-                    </div>
-                  </div>
-                </div>
-                <div></div>
-              </div>
-            </div>
-<a data-name="-728548241%2FPackages%2F1476459868" anchor-label="org.jetbrains.skia.shaper" id="-728548241%2FPackages%2F1476459868" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/jvmMain :dokkaHtml/nativeJsMain"></a>
-            <div class="table-row" data-filterable-current=":dokkaHtml/commonMain :dokkaHtml/jvmMain :dokkaHtml/nativeJsMain" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/jvmMain :dokkaHtml/nativeJsMain">
-              <div>
-                <div class="main-subrow ">
-                  <div class=""><span class="inline-flex">
-                      <div><a href="skiko/org.jetbrains.skia.shaper/index.html">org.jetbrains.skia.shaper</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-728548241%2FPackages%2F1476459868"></span>
-                        <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                      </span></span></div>
-                  <div class="pull-right">
-                    <div class="platform-tags no-gutters">
-                      <div class="platform-tag common-like">common</div>
-                      <div class="platform-tag jvm-like">jvm</div>
-                      <div class="platform-tag common-like">nativeJs</div>
-                    </div>
-                  </div>
-                </div>
-                <div></div>
-              </div>
-            </div>
-<a data-name="112297465%2FPackages%2F-1097707760" anchor-label="org.jetbrains.skia.skottie" id="112297465%2FPackages%2F-1097707760" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain"></a>
-            <div class="table-row" data-filterable-current=":dokkaHtml/commonMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain">
-              <div>
-                <div class="main-subrow ">
-                  <div class=""><span class="inline-flex">
-                      <div><a href="skiko/org.jetbrains.skia.skottie/index.html">org.jetbrains.skia.skottie</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="112297465%2FPackages%2F-1097707760"></span>
-                        <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                      </span></span></div>
-                  <div class="pull-right">
-                    <div class="platform-tags no-gutters">
-                      <div class="platform-tag common-like">common</div>
-                      <div class="platform-tag jvm-like">jvm</div>
-                      <div class="platform-tag native-like">native</div>
-                    </div>
-                  </div>
-                </div>
-                <div></div>
-              </div>
-            </div>
-<a data-name="1922646378%2FPackages%2F788909594" anchor-label="org.jetbrains.skia.sksg" id="1922646378%2FPackages%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-            <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-              <div>
-                <div class="main-subrow ">
-                  <div class=""><span class="inline-flex">
-                      <div><a href="skiko/org.jetbrains.skia.sksg/index.html">org.jetbrains.skia.sksg</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1922646378%2FPackages%2F788909594"></span>
-                        <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                      </span></span></div>
-                  <div class="pull-right">
-                    <div class="platform-tags no-gutters">
-                      <div class="platform-tag common-like">common</div>
-                    </div>
-                  </div>
-                </div>
-                <div></div>
-              </div>
-            </div>
-<a data-name="1095423466%2FPackages%2F788909594" anchor-label="org.jetbrains.skia.svg" id="1095423466%2FPackages%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-            <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-              <div>
-                <div class="main-subrow ">
-                  <div class=""><span class="inline-flex">
-                      <div><a href="skiko/org.jetbrains.skia.svg/index.html">org.jetbrains.skia.svg</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1095423466%2FPackages%2F788909594"></span>
-                        <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                      </span></span></div>
-                  <div class="pull-right">
-                    <div class="platform-tags no-gutters">
-                      <div class="platform-tag common-like">common</div>
-                    </div>
-                  </div>
-                </div>
-                <div></div>
-              </div>
-            </div>
-<a data-name="1113191029%2FPackages%2F462322076" anchor-label="org.jetbrains.skiko" id="1113191029%2FPackages%2F462322076" data-filterable-set=":dokkaHtml/androidMain :dokkaHtml/awtMain :dokkaHtml/commonMain :dokkaHtml/darwinMain :dokkaHtml/iosMain :dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/linuxMain :dokkaHtml/macosMain :dokkaHtml/nativeMain"></a>
-            <div class="table-row" data-filterable-current=":dokkaHtml/androidMain :dokkaHtml/awtMain :dokkaHtml/commonMain :dokkaHtml/darwinMain :dokkaHtml/iosMain :dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/linuxMain :dokkaHtml/macosMain :dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/androidMain :dokkaHtml/awtMain :dokkaHtml/commonMain :dokkaHtml/darwinMain :dokkaHtml/iosMain :dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/linuxMain :dokkaHtml/macosMain :dokkaHtml/nativeMain">
-              <div>
-                <div class="main-subrow ">
-                  <div class=""><span class="inline-flex">
-                      <div><a href="skiko/org.jetbrains.skiko/index.html">org.jetbrains.skiko</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1113191029%2FPackages%2F462322076"></span>
-                        <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                      </span></span></div>
-                  <div class="pull-right">
-                    <div class="platform-tags no-gutters">
-                      <div class="platform-tag jvm-like">android</div>
-                      <div class="platform-tag jvm-like">awt</div>
-                      <div class="platform-tag common-like">common</div>
-                      <div class="platform-tag native-like">darwin</div>
-                      <div class="platform-tag native-like">ios</div>
-                      <div class="platform-tag js-like">js</div>
-                      <div class="platform-tag jvm-like">jvm</div>
-                      <div class="platform-tag native-like">linux</div>
-                      <div class="platform-tag native-like">macos</div>
-                      <div class="platform-tag native-like">native</div>
-                    </div>
-                  </div>
-                </div>
-                <div></div>
-              </div>
-            </div>
-<a data-name="-2049504127%2FPackages%2F371682492" anchor-label="org.jetbrains.skiko.wasm" id="-2049504127%2FPackages%2F371682492" data-filterable-set=":dokkaHtml/jsMain"></a>
-            <div class="table-row" data-filterable-current=":dokkaHtml/jsMain" data-filterable-set=":dokkaHtml/jsMain">
-              <div>
-                <div class="main-subrow ">
-                  <div class=""><span class="inline-flex">
-                      <div><a href="skiko/org.jetbrains.skiko.wasm/index.html">org.jetbrains.skiko.wasm</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2049504127%2FPackages%2F371682492"></span>
-                        <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                      </span></span></div>
-                  <div class="pull-right">
-                    <div class="platform-tags no-gutters">
-                      <div class="platform-tag js-like">js</div>
-                    </div>
-                  </div>
-                </div>
-                <div></div>
-              </div>
+    </div>
+    <div id="main">
+<div class="main-content" id="content" pageIds="skiko::////PointingToDeclaration//-7506710">
+  <div class="breadcrumbs"></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>skiko</span></span></h1>
+  </div>
+  <h2 class="">Packages</h2>
+  <div class="table"><a data-name="1112968948%2FPackages%2F703050856" anchor-label="org.jetbrains.skia" id="1112968948%2FPackages%2F703050856" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain"></a>
+    <div class="table-row" data-filterable-current=":dokkaHtml/commonMain :dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="skiko/org.jetbrains.skia/index.html">org.jetbrains.skia</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1112968948%2FPackages%2F703050856"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag common-like">common</div>
+              <div class="platform-tag js-like">js</div>
+              <div class="platform-tag jvm-like">jvm</div>
+              <div class="platform-tag common-like">native</div>
             </div>
           </div>
         </div>
-        <div class="footer"><span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2022 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span></div>
+        <div></div>
       </div>
     </div>
-  </body>
+<a data-name="178033630%2FPackages%2F703050856" anchor-label="org.jetbrains.skia.impl" id="178033630%2FPackages%2F703050856" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain"></a>
+    <div class="table-row" data-filterable-current=":dokkaHtml/commonMain :dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="skiko/org.jetbrains.skia.impl/index.html">org.jetbrains.skia.impl</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="178033630%2FPackages%2F703050856"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag common-like">common</div>
+              <div class="platform-tag js-like">js</div>
+              <div class="platform-tag jvm-like">jvm</div>
+              <div class="platform-tag common-like">native</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-843612812%2FPackages%2F788909594" anchor-label="org.jetbrains.skia.paragraph" id="-843612812%2FPackages%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
+    <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="skiko/org.jetbrains.skia.paragraph/index.html">org.jetbrains.skia.paragraph</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-843612812%2FPackages%2F788909594"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag common-like">common</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-728548241%2FPackages%2F1476459868" anchor-label="org.jetbrains.skia.shaper" id="-728548241%2FPackages%2F1476459868" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/jvmMain :dokkaHtml/nativeJsMain"></a>
+    <div class="table-row" data-filterable-current=":dokkaHtml/commonMain :dokkaHtml/jvmMain :dokkaHtml/nativeJsMain" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/jvmMain :dokkaHtml/nativeJsMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="skiko/org.jetbrains.skia.shaper/index.html">org.jetbrains.skia.shaper</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-728548241%2FPackages%2F1476459868"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag common-like">common</div>
+              <div class="platform-tag jvm-like">jvm</div>
+              <div class="platform-tag common-like">nativeJs</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="112297465%2FPackages%2F-1875857476" anchor-label="org.jetbrains.skia.skottie" id="112297465%2FPackages%2F-1875857476" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain"></a>
+    <div class="table-row" data-filterable-current=":dokkaHtml/commonMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="skiko/org.jetbrains.skia.skottie/index.html">org.jetbrains.skia.skottie</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="112297465%2FPackages%2F-1875857476"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag common-like">common</div>
+              <div class="platform-tag jvm-like">jvm</div>
+              <div class="platform-tag common-like">native</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="1922646378%2FPackages%2F788909594" anchor-label="org.jetbrains.skia.sksg" id="1922646378%2FPackages%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
+    <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="skiko/org.jetbrains.skia.sksg/index.html">org.jetbrains.skia.sksg</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1922646378%2FPackages%2F788909594"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag common-like">common</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="1095423466%2FPackages%2F788909594" anchor-label="org.jetbrains.skia.svg" id="1095423466%2FPackages%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
+    <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="skiko/org.jetbrains.skia.svg/index.html">org.jetbrains.skia.svg</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1095423466%2FPackages%2F788909594"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag common-like">common</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="1113191029%2FPackages%2F1090785180" anchor-label="org.jetbrains.skiko" id="1113191029%2FPackages%2F1090785180" data-filterable-set=":dokkaHtml/androidMain :dokkaHtml/awtMain :dokkaHtml/commonMain :dokkaHtml/darwinMain :dokkaHtml/iosMain :dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/linuxMain :dokkaHtml/macosMain :dokkaHtml/nativeMain"></a>
+    <div class="table-row" data-filterable-current=":dokkaHtml/androidMain :dokkaHtml/awtMain :dokkaHtml/commonMain :dokkaHtml/darwinMain :dokkaHtml/iosMain :dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/linuxMain :dokkaHtml/macosMain :dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/androidMain :dokkaHtml/awtMain :dokkaHtml/commonMain :dokkaHtml/darwinMain :dokkaHtml/iosMain :dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/linuxMain :dokkaHtml/macosMain :dokkaHtml/nativeMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="skiko/org.jetbrains.skiko/index.html">org.jetbrains.skiko</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1113191029%2FPackages%2F1090785180"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">android</div>
+              <div class="platform-tag jvm-like">awt</div>
+              <div class="platform-tag common-like">common</div>
+              <div class="platform-tag common-like">darwin</div>
+              <div class="platform-tag common-like">ios</div>
+              <div class="platform-tag js-like">js</div>
+              <div class="platform-tag jvm-like">jvm</div>
+              <div class="platform-tag native-like">linux</div>
+              <div class="platform-tag common-like">macos</div>
+              <div class="platform-tag common-like">native</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-2049504127%2FPackages%2F371682492" anchor-label="org.jetbrains.skiko.wasm" id="-2049504127%2FPackages%2F371682492" data-filterable-set=":dokkaHtml/jsMain"></a>
+    <div class="table-row" data-filterable-current=":dokkaHtml/jsMain" data-filterable-set=":dokkaHtml/jsMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="skiko/org.jetbrains.skiko.wasm/index.html">org.jetbrains.skiko.wasm</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2049504127%2FPackages%2F371682492"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag js-like">js</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2022 Copyright</span><span
+                class="pull-right"><span>Generated by </span><a
+                href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+    </div>
+</div>
+</body>
 </html>
-
