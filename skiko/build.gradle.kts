@@ -5,10 +5,11 @@ import org.jetbrains.compose.internal.publishing.MavenCentralProperties
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompileTool
 
 plugins {
-    kotlin("multiplatform") version "1.7.10"
-    id("org.jetbrains.dokka") version "1.7.10"
+    kotlin("multiplatform") version "1.7.20"
+    id("org.jetbrains.dokka") version "1.7.20"
     `maven-publish`
     signing
     id("org.gradle.crypto.checksum") version "1.1.0"
@@ -1027,7 +1028,7 @@ fun KotlinTarget.generateVersion(
     val compilation = compilations["main"] ?: error("Could not find 'main' compilation for target '$this'")
     compilation.compileKotlinTaskProvider.configure {
         dependsOn(generateVersionTask)
-        (this as org.jetbrains.kotlin.gradle.tasks.KotlinCompileTool).source(generatedDir.get().asFile)
+        (this as KotlinCompileTool).source(generatedDir.get().asFile)
     }
 }
 
