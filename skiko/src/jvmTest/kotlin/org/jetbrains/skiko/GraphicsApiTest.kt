@@ -21,12 +21,4 @@ class GraphicsApiTest {
         assertFalse { isVideoCardSupported(GraphicsApi.OPENGL, OS.Linux, "virgl (Apple M1 Max (Compat))") }
         assertTrue { isVideoCardSupported(GraphicsApi.OPENGL, OS.Linux, "Intel llvmpipe") }
     }
-
-    @Test
-    fun `parseNotSupportedAdapter test`() {
-        val entry = assertNotNull(parseNotSupportedAdapter("windows:opengl:Intel(R) HD Graphics 2000"))
-        assertEquals(OS.Windows, entry.os)
-        assertEquals(GraphicsApi.OPENGL, entry.api)
-        assertEquals("Intel(R) HD Graphics 2000", entry.pattern.pattern)
-    }
 }

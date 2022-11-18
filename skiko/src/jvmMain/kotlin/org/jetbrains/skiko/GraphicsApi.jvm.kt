@@ -1,6 +1,8 @@
 package org.jetbrains.skiko
 
-private val linePattern = Regex("(.*):(.*):(.*)")
+import kotlin.system.measureNanoTime
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.nanoseconds
 
 internal data class NotSupportedAdapter(
     val os: OS,
@@ -8,31 +10,22 @@ internal data class NotSupportedAdapter(
     val pattern: Regex
 )
 
-internal fun parseNotSupportedAdapter(line: String): NotSupportedAdapter? {
-    val match = linePattern.matchEntire(line) ?: return null
-    val groups = match.groups
-    val platform = groups[1]?.value?.let { platformName ->
-        when (platformName) {
-            "windows" -> OS.Windows
-            "linux" -> OS.Linux
-            "macos" -> OS.MacOS
-            else -> null
-        }
-    } ?: return null
-    val api = when (groups[2]?.value) {
-        "directx" -> GraphicsApi.DIRECT3D
-        "opengl" -> GraphicsApi.OPENGL
-        else -> return null
-    }
-    val pattern = groups[3]?.value ?: return null
-    return NotSupportedAdapter(platform, api, Regex(pattern))
-}
+private val notSupportedAdapters: List<NotSupportedAdapter> by lazy {
+    listOf(
+            NotSupportedAdapter(os = OS.Windows, api = GraphicsApi.DIRECT3D, pattern = Regex("Intel(R) HD Graphics 520")),
+            NotSupportedAdapter(os = OS.Windows, api = GraphicsApi.DIRECT3D, pattern = Regex("Intel(R) HD Graphics 530")),
+            NotSupportedAdapter(os = OS.Windows, api = GraphicsApi.DIRECT3D, pattern = Regex("Intel(R) HD Graphics 4400")),
 
-private val notSupportedAdapters: Set<NotSupportedAdapter> by lazy {
-    val resource = SkiaLayer::class.java.getResourceAsStream("/not-supported-adapter.list")?.bufferedReader()?.lineSequence().orEmpty()
-    resource.map { it.trim() }.mapNotNullTo(mutableSetOf()) { line ->
-        parseNotSupportedAdapter(line)
-    }
+            NotSupportedAdapter(os = OS.Windows, api = GraphicsApi.DIRECT3D, pattern = Regex("NVIDIA GeForce GTX 750 Ti")),
+            NotSupportedAdapter(os = OS.Windows, api = GraphicsApi.DIRECT3D, pattern = Regex("NVIDIA GeForce GTX 960M")),
+            NotSupportedAdapter(os = OS.Windows, api = GraphicsApi.DIRECT3D, pattern = Regex("NVIDIA Quadro M2000M")),
+
+            NotSupportedAdapter(os = OS.Windows, api = GraphicsApi.OPENGL, pattern = Regex("Intel(R) HD Graphics 2000")),
+            NotSupportedAdapter(os = OS.Windows, api = GraphicsApi.OPENGL, pattern = Regex("Intel(R) HD Graphics 3000")),
+
+            NotSupportedAdapter(os = OS.Linux, api = GraphicsApi.OPENGL, pattern = Regex("llvmpipe.*")),
+            NotSupportedAdapter(os = OS.Linux, api = GraphicsApi.OPENGL, pattern = Regex("virgl.*"))
+    )
 }
 
 internal fun isVideoCardSupported(api: GraphicsApi, hostOs: OS, name: String): Boolean {
