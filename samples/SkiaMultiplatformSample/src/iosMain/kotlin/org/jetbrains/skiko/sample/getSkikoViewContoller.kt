@@ -8,11 +8,14 @@ import platform.UIKit.*
 
 fun makeApp(skiaLayer: SkiaLayer) = IosClocks(skiaLayer)
 
-fun getSkikoViewContoller(): UIViewController = SkikoViewController(
-    SkikoUIView(
+fun getSkikoViewContoller(): UIViewController {
+    val view = SkikoUIView(
         SkiaLayer().apply {
             gesturesToListen = SkikoGestureEventKind.values()
             skikoView = GenericSkikoView(this, makeApp(this))
         }
     )
-)
+    //view.currentKeyboardType = UIKeyboardTypePhonePad
+    //view.currentReturnKeyType = UIReturnKeyType.UIReturnKeyDone
+    return SkikoViewController(view)
+}

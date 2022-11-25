@@ -21,6 +21,14 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
     private var skiaLayer: SkiaLayer? = null
     private var _inputDelegate: UITextInputDelegateProtocol? = null
     private var _currentTextMenuActions: TextActions? = null
+    var currentKeyboardType: UIKeyboardType = UIKeyboardTypeDefault
+    var currentKeyboardAppearance: UIKeyboardAppearance = UIKeyboardAppearanceDefault
+    var currentReturnKeyType: UIReturnKeyType = UIReturnKeyType.UIReturnKeyDefault
+    var currentTextContentType: UITextContentType? = null
+    var currentIsSecureTextEntry: Boolean = false
+    var currentEnablesReturnKeyAutomatically: Boolean = false
+    var currentAutocapitalizationType: UITextAutocapitalizationType = UITextAutocapitalizationType.UITextAutocapitalizationTypeSentences
+    var currentAutocorrectionType: UITextAutocorrectionType = UITextAutocorrectionType.UITextAutocorrectionTypeYes
 
     constructor(skiaLayer: SkiaLayer, frame: CValue<CGRect> = CGRectNull.readValue()) : super(frame) {
         this.skiaLayer = skiaLayer
@@ -409,20 +417,35 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
         }
 
     override fun keyboardType(): UIKeyboardType {
-        return UIKeyboardTypeDefault //todo keyboardType
+        return currentKeyboardType
+    }
+
+    override fun keyboardAppearance(): UIKeyboardAppearance {
+        return currentKeyboardAppearance
+    }
+
+    override fun returnKeyType(): UIReturnKeyType {
+        return currentReturnKeyType
+    }
+
+    override fun textContentType(): UITextContentType? {
+        return currentTextContentType
     }
 
     override fun isSecureTextEntry(): Boolean {
-        return false //todo secure text to prevent copy
+        return currentIsSecureTextEntry //todo secure text to prevent copy
+    }
+
+    override fun enablesReturnKeyAutomatically(): Boolean {
+        return currentEnablesReturnKeyAutomatically
     }
 
     override fun autocapitalizationType(): UITextAutocapitalizationType {
-        return UITextAutocapitalizationType.UITextAutocapitalizationTypeSentences
-//        return UITextAutocapitalizationType.UITextAutocapitalizationTypeAllCharacters
+        return currentAutocapitalizationType
     }
 
     override fun autocorrectionType(): UITextAutocorrectionType {
-        return UITextAutocorrectionType.UITextAutocorrectionTypeYes
+        return currentAutocorrectionType
     }
 
     override fun dictationRecognitionFailed() {
