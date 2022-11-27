@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="SkijaAwtSample (software)" type="GradleRunConfiguration" factoryName="Gradle">
+  <configuration default="false" name="SkiaAwtSample (software)" type="GradleRunConfiguration" factoryName="Gradle">
     <ExternalSystemSettings>
       <option name="executionName" />
       <option name="externalProjectPath" value="$PROJECT_DIR$/samples/SkiaAwtSample" />
