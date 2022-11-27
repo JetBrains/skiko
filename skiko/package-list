@@ -3049,11 +3049,20 @@ $dokka.location:org.jetbrains.skiko/SkikoUIView/closestPositionToPoint/#kotlinx.
 $dokka.location:org.jetbrains.skiko/SkikoUIView/closestPositionToPoint/#kotlinx.cinterop.CValue[[Error type: Unresolved type for CGPoint]]/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/closest-position-to-point.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/comparePosition/#[Error type: Unresolved type for UITextPosition]#[Error type: Unresolved type for UITextPosition]/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/compare-position.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/copy/#kotlin.Any?/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/copy.html
+$dokka.location:org.jetbrains.skiko/SkikoUIView/currentAutocapitalizationType/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/current-autocapitalization-type.html
+$dokka.location:org.jetbrains.skiko/SkikoUIView/currentAutocorrectionType/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/current-autocorrection-type.html
+$dokka.location:org.jetbrains.skiko/SkikoUIView/currentEnablesReturnKeyAutomatically/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/current-enables-return-key-automatically.html
+$dokka.location:org.jetbrains.skiko/SkikoUIView/currentIsSecureTextEntry/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/current-is-secure-text-entry.html
+$dokka.location:org.jetbrains.skiko/SkikoUIView/currentKeyboardAppearance/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/current-keyboard-appearance.html
+$dokka.location:org.jetbrains.skiko/SkikoUIView/currentKeyboardType/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/current-keyboard-type.html
+$dokka.location:org.jetbrains.skiko/SkikoUIView/currentReturnKeyType/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/current-return-key-type.html
+$dokka.location:org.jetbrains.skiko/SkikoUIView/currentTextContentType/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/current-text-content-type.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/cut/#kotlin.Any?/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/cut.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/deleteBackward/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/delete-backward.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/detach/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/detach.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/dictationRecognitionFailed/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/dictation-recognition-failed.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/dictationRecordingDidEnd/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/dictation-recording-did-end.html
+$dokka.location:org.jetbrains.skiko/SkikoUIView/enablesReturnKeyAutomatically/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/enables-return-key-automatically.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/endOfDocument/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/end-of-document.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/firstRectForRange/#[Error type: Unresolved type for UITextRange]/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/first-rect-for-range.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/hasText/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/has-text.html
@@ -3064,6 +3073,7 @@ $dokka.location:org.jetbrains.skiko/SkikoUIView/insertText/#kotlin.String/Pointi
 $dokka.location:org.jetbrains.skiko/SkikoUIView/isScreenKeyboardOpen/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/is-screen-keyboard-open.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/isSecureTextEntry/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/is-secure-text-entry.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/isTextMenuShown/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/is-text-menu-shown.html
+$dokka.location:org.jetbrains.skiko/SkikoUIView/keyboardAppearance/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/keyboard-appearance.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/keyboardType/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/keyboard-type.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/load/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/load.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/markedTextRange/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/marked-text-range.html
@@ -3077,6 +3087,7 @@ $dokka.location:org.jetbrains.skiko/SkikoUIView/positionWithinRange/#[Error type
 $dokka.location:org.jetbrains.skiko/SkikoUIView/pressesBegan/#kotlin.collections.Set[*]#[Error type: Unresolved type for UIPressesEvent]?/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/presses-began.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/pressesEnded/#kotlin.collections.Set[*]#[Error type: Unresolved type for UIPressesEvent]?/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/presses-ended.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/replaceRange/#[Error type: Unresolved type for UITextRange]#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/replace-range.html
+$dokka.location:org.jetbrains.skiko/SkikoUIView/returnKeyType/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/return-key-type.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/selectAll/#kotlin.Any?/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/select-all.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/selectedTextRange/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/selected-text-range.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/selectionDidChange/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/selection-did-change.html
@@ -3090,6 +3101,7 @@ $dokka.location:org.jetbrains.skiko/SkikoUIView/setSelectedTextRange/#[Error typ
 $dokka.location:org.jetbrains.skiko/SkikoUIView/shouldChangeTextInRange/#[Error type: Unresolved type for UITextRange]#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/should-change-text-in-range.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/showScreenKeyboard/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/show-screen-keyboard.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/showTextMenu/#[Error type: Unresolved type for Rect]#org.jetbrains.skiko.TextActions/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/show-text-menu.html
+$dokka.location:org.jetbrains.skiko/SkikoUIView/textContentType/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/text-content-type.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/textDidChange/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/text-did-change.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/textInRange/#[Error type: Unresolved type for UITextRange]/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/text-in-range.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/textInputView/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/text-input-view.html
