@@ -78,7 +78,7 @@ Don't run any background tasks, click mouse, or press keys during the tests. Oth
 ```
 
 ### samples/SkiaJsSample with mavenLocal
-If page in Browser will empty - just reload page.
+If page in browser will be empty, try to reload it.
 ```bash
 ./gradlew publishToMavenLocal -p skiko -Pskiko.native.enabled=true -Pskiko.wasm.enabled=true &&\
 ./gradlew jsBrowserDevelopmentRun -p samples/SkiaJsSample -Pskiko.version=0.0.0-SNAPSHOT
@@ -92,7 +92,7 @@ It means: includeBuild("skiko") with dependency substitution. It compiles faster
 ```
 
 ### samples/SkiaMultiplatformSample JVM, Native and JS
-If page in Browser will empty - just reload page.  
+If page in browser will be empty, try to reload it.  
 ```bash
 ./gradlew publishToMavenLocal -p skiko -Pskiko.native.enabled=true -Pskiko.wasm.enabled=true &&\
 ./gradlew runAwt runNative jsBrowserDevelopmentRun -p samples/SkiaMultiplatformSample -Pskiko.version=0.0.0-SNAPSHOT
@@ -103,7 +103,7 @@ If page in Browser will empty - just reload page.
 
 ### samples/SkiaMultiplatformSample JVM, Native and JS with skikoCompositeBuild=true
 It means: includeBuild("skiko") with dependency substitution. It compiles faster.  
-If page in Browser will empty - just reload page.  
+If page in browser will be empty, try to reload it.  
 ```bash
 ./gradlew publishAllSkikoJvmRuntimeToMavenLocal publishSkikoWasmRuntimePublicationToMavenLocal -p skiko -Pskiko.native.enabled=true -Pskiko.wasm.enabled=true &&\
 ./gradlew runAwt runNative jsBrowserDevelopmentRun -p samples/SkiaMultiplatformSample -Pskiko.native.enabled=true -Pskiko.wasm.enabled=true -DskikoCompositeBuild=true -Pskiko.version=0.0.0-SNAPSHOT
