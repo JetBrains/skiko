@@ -1,4 +1,14 @@
-# Skia multiplatform samples
+# Skiko multiplatform sample
+
+## run on browser:
+If page in Browser will empty - just reload page.  
+- `./gradlew jsBrowserRun`
+
+## run desktop awt:
+- `./gradlew runAwt`
+
+## run desktop on native MacOS
+- `./gradlew runNative`
 
 ## run iOS with Xcode
  - Install xcodegen
@@ -15,11 +25,5 @@ Choose "Open as Project".
 ![ios-run-in-appcode.png](ios-run-in-appcode.png)
  - Now you may use breakpoints in common and native Kotlin code
 
-## run on browser:
- - `./gradlew jsBrowserRun`
-
-## run desktop awt:
- - `./gradlew runAwt`
-
-## run desktop on native MacOS
- - `./gradlew runNative`
+## Advanced run for contributors
+Described here: [DEVELOPMENT.md](../../DEVELOPMENT.md)

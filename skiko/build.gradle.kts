@@ -1331,3 +1331,11 @@ rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJ
         nodeExtension.download = false
     }
 }
+
+tasks.register("publishAllSkikoJvmRuntimeToMavenLocal") {
+    allJvmRuntimeJars.forEach { entry ->
+        val os = entry.key.first
+        val arch = entry.key.second
+        dependsOn("publishSkikoJvmRuntime${toTitleCase(os.id)}${toTitleCase(arch.id)}PublicationToMavenLocal")
+    }
+}

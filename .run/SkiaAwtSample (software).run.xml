@@ -1,10 +1,10 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="SkijaInjectSample (show long frames) " type="GradleRunConfiguration" factoryName="Gradle">
+  <configuration default="false" name="SkijaAwtSample (software)" type="GradleRunConfiguration" factoryName="Gradle">
     <ExternalSystemSettings>
       <option name="executionName" />
-      <option name="externalProjectPath" value="$PROJECT_DIR$/samples/SkijaInjectSample" />
+      <option name="externalProjectPath" value="$PROJECT_DIR$/samples/SkiaAwtSample" />
       <option name="externalSystemIdString" value="GRADLE" />
-      <option name="scriptParameters" value="-Dskiko.fps.longFrames.show=true" />
+      <option name="scriptParameters" value="-Dskiko.renderApi=SOFTWARE" />
       <option name="taskDescriptions">
         <list />
       </option>
@@ -19,7 +19,7 @@
     <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
     <DebugAllEnabled>false</DebugAllEnabled>
     <method v="2">
-      <option name="Gradle.BeforeRunTask" enabled="false" tasks="publishToMavenLocal" externalProjectPath="$PROJECT_DIR$/skiko" vmOptions="" scriptParameters="" />
+      <option name="Gradle.BeforeRunTask" enabled="true" tasks=":skiko:publishAllSkikoJvmRuntimeToMavenLocal" externalProjectPath="$PROJECT_DIR$" vmOptions="" scriptParameters="" />
     </method>
   </configuration>
 </component>

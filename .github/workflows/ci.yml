@@ -31,7 +31,7 @@ jobs:
           ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Pskiko.test.onci=true :skiko:awtTest
           ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Pskiko.test.onci=true :skiko:macosX64Test
           ./gradlew --stacktrace --info -Pskiko.native.enabled=true :skiko:publishToMavenLocal
-          ./gradlew --stacktrace --info :SkiaAwtSample:installDist # check AWT sample works
+          ./gradlew --stacktrace --info :SkiaAwtSample:installDist -Pskiko.version=0.0.0-SNAPSHOT # check AWT sample works
       - uses: actions/upload-artifact@v2
         with:
           name: test-reports-macos
@@ -96,8 +96,8 @@ jobs:
           sudo Xvfb :0 -screen 0 1280x720x24 &
           export DISPLAY=:0
           ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Pkotlin.native.cacheKind.linuxX64=none -Pskiko.test.onci=true :skiko:linuxX64Test :skiko:awtTest
-          ./gradlew --stacktrace --info -Pkotlin.native.cacheKind.linuxX64=none :skiko:publishToMavenLocal
-          ./gradlew --stacktrace --info :SkiaAwtSample:installDist # check jvm sample works
+          ./gradlew --stacktrace --info -Pkotlin.native.cacheKind.linuxX64=none :skiko:publishToMavenLocal -Pdeploy.version=0.0.0
+          ./gradlew --stacktrace --info :SkiaAwtSample:installDist -Pskiko.version=0.0.0-SNAPSHOT # check jvm sample works
           ./gradlew -Pskiko.android.enabled=true :skiko:publishSkikoJvmRuntimeAndroidX64PublicationToMavenLocal :skiko:publishSkikoJvmRuntimeAndroidArm64PublicationToMavenLocal :skiko:publishAndroidPublicationToMavenLocal
       - uses: actions/upload-artifact@v2
         with:
@@ -156,7 +156,7 @@ jobs:
         run: |
           ./gradlew --stacktrace --info -Pskiko.test.onci=true :skiko:awtTest
           ./gradlew --stacktrace --info :skiko:publishToMavenLocal
-          ./gradlew --stacktrace --info :SkiaAwtSample:installDist # check jvm sample works
+          ./gradlew --stacktrace --info :SkiaAwtSample:installDist -Pskiko.version=0.0.0-SNAPSHOT # check jvm sample works
       - uses: actions/upload-artifact@v2
         with:
           name: test-reports-windows
