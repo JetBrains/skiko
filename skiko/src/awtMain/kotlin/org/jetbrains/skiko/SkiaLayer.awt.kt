@@ -368,13 +368,13 @@ actual open class SkiaLayer internal constructor(
 
     /*
     In AWT there is no a change DPI event; so we should call this function when we expect that DPI maybe changed
-    We hope that call it on AWT/SWING `paint` is enough
+    We hope that call it on AWT/SWING `paint` and our update is enough
      */
     private fun checkContentScale() {
         if (backedLayer.checkContentScale()) {
             notifyChange(PropertyKind.ContentScale)
+            redrawer?.syncSize() // setBounds not always called (for example when we change density on Linux
         }
-        redrawer?.syncSize() // setBounds not always called (for example when we change density on Linux
     }
 
     // We need to delegate all event listeners to the Canvas (so and focus/input)
@@ -501,6 +501,8 @@ actual open class SkiaLayer internal constructor(
     internal fun update(nanoTime: Long) {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         check(!isDisposed) { "SkiaLayer is disposed" }
+
+        checkContentScale()
 
         FrameWatcher.nextFrame()
         fpsCounter?.tick()
