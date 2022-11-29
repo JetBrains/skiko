@@ -404,15 +404,19 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUniqueId")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Typeface__1nGetUniqueId']")
 private external fun Typeface_nGetUniqueId(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nEquals")
-private external fun Typeface_nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
+@ExternalCode("Module['asm']['org_jetbrains_skia_Typeface__1nEquals']")
+private external fun Typeface_nEquals(ptr: NativePointer, otherPtr: NativePointer): @InteropType Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeDefault")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Typeface__1nMakeDefault']")
 private external fun Typeface_nMakeDefault(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUTF32Glyphs")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Typeface__1nGetUTF32Glyphs']")
 private external fun Typeface_nGetUTF32Glyphs(
     ptr: NativePointer,
     uni: InteropPointer,
@@ -421,39 +425,52 @@ private external fun Typeface_nGetUTF32Glyphs(
 )
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUTF32Glyph")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Typeface__1nGetUTF32Glyph']")
 private external fun Typeface_nGetUTF32Glyph(ptr: NativePointer, unichar: Int): Short
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetBounds")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Typeface__1nGetBounds']")
 private external fun Typeface_nGetBounds(ptr: NativePointer, bounds: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetFontStyle")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Typeface__1nGetFontStyle']")
 private external fun _nGetFontStyle(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nIsFixedPitch")
-private external fun _nIsFixedPitch(ptr: NativePointer): Boolean
+@ExternalCode("Module['asm']['org_jetbrains_skia_Typeface__1nIsFixedPitch']")
+private external fun _nIsFixedPitch(ptr: NativePointer): @InteropType Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetVariationsCount")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Typeface__1nGetVariationsCount']")
 private external fun _nGetVariationsCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetVariations")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Typeface__1nGetVariations']")
 private external fun _nGetVariations(ptr: NativePointer, variations: InteropPointer, count: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetVariationAxesCount")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Typeface__1nGetVariationAxesCount']")
 private external fun _nGetVariationAxesCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetVariationAxes")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Typeface__1nGetVariationAxes']")
 private external fun _nGetVariationAxes(ptr: NativePointer, axisData: InteropPointer, axisCount: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeFromName")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Typeface__1nMakeFromName']")
 private external fun _nMakeFromName(name: InteropPointer, fontStyle: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeFromFile")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Typeface__1nMakeFromFile']")
+
 internal external fun _nMakeFromFile(path: InteropPointer, index: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeFromData")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Typeface__1nMakeFromData']")
 private external fun _nMakeFromData(dataPtr: NativePointer, index: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeClone")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Typeface__1nMakeClone']")
 private external fun _nMakeClone(
     ptr: NativePointer,
     variations: InteropPointer,
@@ -462,36 +479,46 @@ private external fun _nMakeClone(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetGlyphsCount")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Typeface__1nGetGlyphsCount']")
 private external fun _nGetGlyphsCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetTablesCount")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Typeface__1nGetTablesCount']")
 private external fun _nGetTablesCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetTableTagsCount")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Typeface__1nGetTableTagsCount']")
 private external fun _nGetTableTagsCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetTableTags")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Typeface__1nGetTableTags']")
 private external fun _nGetTableTags(ptr: NativePointer, tags: InteropPointer, count: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetTableSize")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Typeface__1nGetTableSize']")
 private external fun _nGetTableSize(ptr: NativePointer, tag: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetTableData")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Typeface__1nGetTableData']")
 private external fun _nGetTableData(ptr: NativePointer, tag: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUnitsPerEm")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Typeface__1nGetUnitsPerEm']")
 private external fun _nGetUnitsPerEm(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetKerningPairAdjustments")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Typeface__1nGetKerningPairAdjustments']")
 private external fun _nGetKerningPairAdjustments(
     ptr: NativePointer,
     glyphs: InteropPointer,
     count: Int,
     adjustments: InteropPointer
-): Boolean
+): @InteropType Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetFamilyNames")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Typeface__1nGetFamilyNames']")
 private external fun _nGetFamilyNames(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetFamilyName")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Typeface__1nGetFamilyName']")
 private external fun _nGetFamilyName(ptr: NativePointer): NativePointer

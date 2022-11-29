@@ -18,6 +18,8 @@ internal actual fun InteropScope.allocateBytesForPixels(size: Int): NativePointe
 
 actual annotation class SkipJsTarget
 
+actual annotation class SkipWasmTarget
+
 actual typealias SkipJvmTarget = org.junit.Ignore
 
 actual annotation class SkipNativeTarget

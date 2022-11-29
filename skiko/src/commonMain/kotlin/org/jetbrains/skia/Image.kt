@@ -383,15 +383,19 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
 }
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nGetImageInfo")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Image__1nGetImageInfo']")
 private external fun Image_nGetImageInfo(ptr: NativePointer, imageInfo: InteropPointer, colorSpacePtrs: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeShader")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Image__1nMakeShader']")
 private external fun Image_nMakeShader(ptr: NativePointer, tmx: Int, tmy: Int, samplingModeVal1: Int, samplingModeVal2: Int, localMatrix: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nPeekPixels")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Image__1nPeekPixels']")
 private external fun Image_nPeekPixels(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeRaster")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Image__1nMakeRaster']")
 private external fun _nMakeRaster(
     width: Int,
     height: Int,
@@ -404,6 +408,7 @@ private external fun _nMakeRaster(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeRasterData")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Image__1nMakeRasterData']")
 private external fun _nMakeRasterData(
     width: Int,
     height: Int,
@@ -416,33 +421,41 @@ private external fun _nMakeRasterData(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeFromBitmap")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Image__1nMakeFromBitmap']")
 private external fun _nMakeFromBitmap(bitmapPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeFromPixmap")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Image__1nMakeFromPixmap']")
 private external fun _nMakeFromPixmap(pixmapPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeFromEncoded")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Image__1nMakeFromEncoded']")
 private external fun _nMakeFromEncoded(bytes: InteropPointer, encodedLength: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nEncodeToData")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Image__1nEncodeToData']")
 private external fun _nEncodeToData(ptr: NativePointer, format: Int, quality: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nPeekPixelsToPixmap")
-private external fun _nPeekPixelsToPixmap(ptr: NativePointer, pixmapPtr: NativePointer): Boolean
+@ExternalCode("Module['asm']['org_jetbrains_skia_Image__1nPeekPixelsToPixmap']")
+private external fun _nPeekPixelsToPixmap(ptr: NativePointer, pixmapPtr: NativePointer): @InteropType Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nScalePixels")
-private external fun _nScalePixels(ptr: NativePointer, pixmapPtr: NativePointer, samplingOptionsVal1: Int, samplingOptionsVal2: Int, cache: Boolean): Boolean
+@ExternalCode("Module['asm']['org_jetbrains_skia_Image__1nScalePixels']")
+private external fun _nScalePixels(ptr: NativePointer, pixmapPtr: NativePointer, samplingOptionsVal1: Int, samplingOptionsVal2: Int, cache: @InteropType Boolean): @InteropType Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nReadPixelsBitmap")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Image__1nReadPixelsBitmap']")
 private external fun _nReadPixelsBitmap(
     ptr: NativePointer,
     contextPtr: NativePointer,
     bitmapPtr: NativePointer,
     srcX: Int,
     srcY: Int,
-    cache: Boolean
+    cache: @InteropType Boolean
 ): Boolean
 
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nReadPixelsPixmap")
-private external fun _nReadPixelsPixmap(ptr: NativePointer, pixmapPtr: NativePointer, srcX: Int, srcY: Int, cache: Boolean): Boolean
+@ExternalCode("Module['asm']['org_jetbrains_skia_Image__1nReadPixelsPixmap']")
+private external fun _nReadPixelsPixmap(ptr: NativePointer, pixmapPtr: NativePointer, srcX: Int, srcY: Int, cache: @InteropType Boolean): @InteropType Boolean

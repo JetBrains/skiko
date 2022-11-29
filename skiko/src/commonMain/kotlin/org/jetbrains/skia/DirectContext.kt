@@ -114,22 +114,29 @@ fun <R> DirectContext.useContext(block: (ctx: DirectContext) -> R): R = use {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nFlush")
+@ExternalCode("Module['asm']['org_jetbrains_skia_DirectContext__1nFlush']")
 private external fun DirectContext_nFlush(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeGL")
+@ExternalCode("Module['asm']['org_jetbrains_skia_DirectContext__1nMakeGL']")
 private external fun _nMakeGL(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeMetal")
+@ExternalCode("Module['asm']['org_jetbrains_skia_DirectContext__1nMakeMetal'] ?? function(){ throw 'Not loaded' }")
 private external fun _nMakeMetal(devicePtr: NativePointer, queuePtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeDirect3D")
+@ExternalCode("Module['asm']['org_jetbrains_skia_DirectContext__1nMakeDirect3D']")
 private external fun _nMakeDirect3D(adapterPtr: NativePointer, devicePtr: NativePointer, queuePtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nSubmit")
-private external fun _nSubmit(ptr: NativePointer, syncCpu: Boolean)
+@ExternalCode("Module['asm']['org_jetbrains_skia_DirectContext__1nSubmit']")
+private external fun _nSubmit(ptr: NativePointer, syncCpu: @InteropType Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nReset")
+@ExternalCode("Module['asm']['org_jetbrains_skia_DirectContext__1nReset']")
 private external fun _nReset(ptr: NativePointer, flags: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nAbandon")
+@ExternalCode("Module['asm']['org_jetbrains_skia_DirectContext__1nAbandon']")
 private external fun _nAbandon(ptr: NativePointer, flags: Int)

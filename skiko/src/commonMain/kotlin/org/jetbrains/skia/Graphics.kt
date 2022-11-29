@@ -130,43 +130,57 @@ class Graphics {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nGetFontCacheLimit")
+@ExternalCode("Module['asm']['org_jetbrains_skia_GraphicsKt__1nGetFontCacheLimit']")
 private external fun _nGetFontCacheLimit(): Int
 
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nSetFontCacheLimit")
+@ExternalCode("Module['asm']['org_jetbrains_skia_GraphicsKt__1nSetFontCacheLimit']")
 private external fun _nSetFontCacheLimit(bytes: Int): Int
 
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nGetFontCacheUsed")
+@ExternalCode("Module['asm']['org_jetbrains_skia_GraphicsKt__1nGetFontCacheUsed']")
 private external fun _nGetFontCacheUsed(): Int
 
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nGetFontCacheCountLimit")
+@ExternalCode("Module['asm']['org_jetbrains_skia_GraphicsKt__1nGetFontCacheCountLimit']")
 private external fun _nGetFontCacheCountLimit(): Int
 
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nSetFontCacheCountLimit")
+@ExternalCode("Module['asm']['org_jetbrains_skia_GraphicsKt__1nSetFontCacheCountLimit']")
 private external fun _nSetFontCacheCountLimit(count: Int): Int
 
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nGetFontCacheCountUsed")
+@ExternalCode("Module['asm']['org_jetbrains_skia_GraphicsKt__1nGetFontCacheCountUsed']")
 private external fun _nGetFontCacheCountUsed(): Int
 
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nGetResourceCacheTotalByteLimit")
+@ExternalCode("Module['asm']['org_jetbrains_skia_GraphicsKt__1nGetResourceCacheTotalByteLimit']")
 private external fun _nGetResourceCacheTotalByteLimit(): Int
 
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nSetResourceCacheTotalByteLimit")
+@ExternalCode("Module['asm']['org_jetbrains_skia_GraphicsKt__1nSetResourceCacheTotalByteLimit']")
 private external fun _nSetResourceCacheTotalByteLimit(bytes: Int): Int
 
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nGetResourceCacheSingleAllocationByteLimit")
+@ExternalCode("Module['asm']['org_jetbrains_skia_GraphicsKt__1nGetResourceCacheSingleAllocationByteLimit']")
 private external fun _nGetResourceCacheSingleAllocationByteLimit(): Int
 
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nSetResourceCacheSingleAllocationByteLimit")
+@ExternalCode("Module['asm']['org_jetbrains_skia_GraphicsKt__1nSetResourceCacheSingleAllocationByteLimit']")
 private external fun _nSetResourceCacheSingleAllocationByteLimit(bytes: Int): Int
 
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nGetResourceCacheTotalBytesUsed")
+@ExternalCode("Module['asm']['org_jetbrains_skia_GraphicsKt__1nGetResourceCacheTotalBytesUsed']")
 private external fun _nGetResourceCacheTotalBytesUsed(): Int
 
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nPurgeFontCache")
+@ExternalCode("Module['asm']['org_jetbrains_skia_GraphicsKt__1nPurgeFontCache']")
 private external fun _nPurgeFontCache()
 
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nPurgeResourceCache")
+@ExternalCode("Module['asm']['org_jetbrains_skia_GraphicsKt__1nPurgeResourceCache']")
 private external fun _nPurgeResourceCache()
 
 @ExternalSymbolName("org_jetbrains_skia_GraphicsKt__1nPurgeAllCaches")
+@ExternalCode("Module['asm']['org_jetbrains_skia_GraphicsKt__1nPurgeAllCaches']")
 private external fun _nPurgeAllCaches()

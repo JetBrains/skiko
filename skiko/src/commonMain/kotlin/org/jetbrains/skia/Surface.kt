@@ -1017,24 +1017,31 @@ class Surface : RefCnt {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nGetWidth")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Surface__1nGetWidth']")
 private external fun Surface_nGetWidth(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nGetHeight")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Surface__1nGetHeight']")
 private external fun Surface_nGetHeight(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nGetImageInfo")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Surface__1nGetImageInfo']")
 private external fun Surface_nGetImageInfo(ptr: NativePointer, imageInfo: InteropPointer, colorSpacePtrs: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nReadPixels")
-private external fun Surface_nReadPixels(ptr: NativePointer, bitmapPtr: NativePointer, srcX: Int, srcY: Int): Boolean
+@ExternalCode("Module['asm']['org_jetbrains_skia_Surface__1nReadPixels']")
+private external fun Surface_nReadPixels(ptr: NativePointer, bitmapPtr: NativePointer, srcX: Int, srcY: Int): @InteropType Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nWritePixels")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Surface__1nWritePixels']")
 private external fun Surface_nWritePixels(ptr: NativePointer, bitmapPtr: NativePointer, x: Int, y: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nFlush")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Surface__1nFlush']")
 private external fun Surface_nFlush(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeRasterDirect")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Surface__1nMakeRasterDirect']")
 private external fun _nMakeRasterDirect(
     width: Int,
     height: Int,
@@ -1048,9 +1055,11 @@ private external fun _nMakeRasterDirect(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeRasterDirectWithPixmap")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Surface__1nMakeRasterDirectWithPixmap']")
 private external fun _nMakeRasterDirectWithPixmap(pixmapPtr: NativePointer, surfaceProps: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeRaster")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Surface__1nMakeRaster']")
 private external fun _nMakeRaster(
     width: Int,
     height: Int,
@@ -1063,9 +1072,11 @@ private external fun _nMakeRaster(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeRasterN32Premul")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Surface__1nMakeRasterN32Premul']")
 private external fun _nMakeRasterN32Premul(width: Int, height: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeFromBackendRenderTarget")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Surface__1nMakeFromBackendRenderTarget']")
 private external fun _nMakeFromBackendRenderTarget(
     pContext: NativePointer,
     pBackendRenderTarget: NativePointer,
@@ -1076,6 +1087,7 @@ private external fun _nMakeFromBackendRenderTarget(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeFromMTKView")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Surface__1nMakeFromMTKView']")
 private external fun _nMakeFromMTKView(
     contextPtr: NativePointer,
     mtkViewPtr: NativePointer,
@@ -1087,9 +1099,10 @@ private external fun _nMakeFromMTKView(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeRenderTarget")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Surface__1nMakeRenderTarget']")
 private external fun _nMakeRenderTarget(
     contextPtr: NativePointer,
-    budgeted: Boolean,
+    budgeted: @InteropType Boolean,
     width: Int,
     height: Int,
     colorType: Int,
@@ -1098,26 +1111,32 @@ private external fun _nMakeRenderTarget(
     sampleCount: Int,
     surfaceOrigin: Int,
     surfaceProps: InteropPointer,
-    shouldCreateWithMips: Boolean
+    shouldCreateWithMips: @InteropType Boolean
 ): NativePointer
 
 
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeNull")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Surface__1nMakeNull']")
 private external fun _nMakeNull(width: Int, height: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nGenerationId")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Surface__1nGenerationId']")
 private external fun _nGenerationId(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nNotifyContentWillChange")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Surface__1nNotifyContentWillChange']")
 private external fun _nNotifyContentWillChange(ptr: NativePointer, mode: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nGetRecordingContext")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Surface__1nGetRecordingContext']")
 private external fun _nGetRecordingContext(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nGetCanvas")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Surface__1nGetCanvas']")
 private external fun _nGetCanvas(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeSurfaceI")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Surface__1nMakeSurfaceI']")
 private external fun _nMakeSurfaceI(
     ptr: NativePointer,
     width: Int,
@@ -1129,28 +1148,37 @@ private external fun _nMakeSurfaceI(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeSurface")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Surface__1nMakeSurface']")
 private external fun _nMakeSurface(ptr: NativePointer, width: Int, height: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeImageSnapshot")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Surface__1nMakeImageSnapshot']")
 private external fun _nMakeImageSnapshot(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeImageSnapshotR")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Surface__1nMakeImageSnapshotR']")
 private external fun _nMakeImageSnapshotR(ptr: NativePointer, left: Int, top: Int, right: Int, bottom: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nDraw")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Surface__1nDraw']")
 private external fun _nDraw(ptr: NativePointer, canvasPtr: NativePointer, x: Float, y: Float, samplingModeValue1: Int, samplingModeValue2: Int, paintPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nPeekPixels")
-private external fun _nPeekPixels(ptr: NativePointer, pixmapPtr: NativePointer): Boolean
+@ExternalCode("Module['asm']['org_jetbrains_skia_Surface__1nPeekPixels']")
+private external fun _nPeekPixels(ptr: NativePointer, pixmapPtr: NativePointer): @InteropType Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nReadPixelsToPixmap")
-private external fun _nReadPixelsToPixmap(ptr: NativePointer, pixmapPtr: NativePointer, srcX: Int, srcY: Int): Boolean
+@ExternalCode("Module['asm']['org_jetbrains_skia_Surface__1nReadPixelsToPixmap']")
+private external fun _nReadPixelsToPixmap(ptr: NativePointer, pixmapPtr: NativePointer, srcX: Int, srcY: Int): @InteropType Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nWritePixelsFromPixmap")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Surface__1nWritePixelsFromPixmap']")
 private external fun _nWritePixelsFromPixmap(ptr: NativePointer, pixmapPtr: NativePointer, x: Int, y: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nFlushAndSubmit")
-private external fun _nFlushAndSubmit(ptr: NativePointer, syncCpu: Boolean)
+@ExternalCode("Module['asm']['org_jetbrains_skia_Surface__1nFlushAndSubmit']")
+private external fun _nFlushAndSubmit(ptr: NativePointer, syncCpu: @InteropType Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nUnique")
-private external fun _nUnique(ptr: NativePointer): Boolean
+@ExternalCode("Module['asm']['org_jetbrains_skia_Surface__1nUnique']")
+private external fun _nUnique(ptr: NativePointer): @InteropType Boolean

@@ -117,46 +117,61 @@ class RuntimeShaderBuilder internal constructor(ptr: NativePointer) : Managed(pt
 }
 
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nMakeFromRuntimeEffect")
+@ExternalCode("Module['asm']['org_jetbrains_skia_RuntimeShaderBuilder__1nMakeFromRuntimeEffect']")
 private external fun _nMakeFromRuntimeEffect(effectPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nGetFinalizer")
+@ExternalCode("Module['asm']['org_jetbrains_skia_RuntimeShaderBuilder__1nGetFinalizer']")
 private external fun RuntimeShaderBuilder_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformInt")
+@ExternalCode("Module['asm']['org_jetbrains_skia_RuntimeShaderBuilder__1nUniformInt']")
 private external fun _nUniformInt(builderPtr: NativePointer, uniformName: InteropPointer, uniformValue: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformInt2")
+@ExternalCode("Module['asm']['org_jetbrains_skia_RuntimeShaderBuilder__1nUniformInt2']")
 private external fun _nUniformInt2(builderPtr: NativePointer, uniformName: InteropPointer, uniformValue1: Int, uniformValue2: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformInt3")
+@ExternalCode("Module['asm']['org_jetbrains_skia_RuntimeShaderBuilder__1nUniformInt3']")
 private external fun _nUniformInt3(builderPtr: NativePointer, uniformName: InteropPointer, uniformValue1: Int, uniformValue2: Int, uniformValue3: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformInt4")
+@ExternalCode("Module['asm']['org_jetbrains_skia_RuntimeShaderBuilder__1nUniformInt4']")
 private external fun _nUniformInt4(builderPtr: NativePointer, uniformName: InteropPointer, uniformValue1: Int, uniformValue2: Int, uniformValue3: Int, uniformValue4: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloat")
+@ExternalCode("Module['asm']['org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloat']")
 private external fun _nUniformFloat(builderPtr: NativePointer, uniformName: InteropPointer, uniformValue: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloat2")
+@ExternalCode("Module['asm']['org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloat2']")
 private external fun _nUniformFloat2(builderPtr: NativePointer, uniformName: InteropPointer, uniformValue1: Float, uniformValue2: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloat3")
+@ExternalCode("Module['asm']['org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloat3']")
 private external fun _nUniformFloat3(builderPtr: NativePointer, uniformName: InteropPointer, uniformValue1: Float, uniformValue2: Float, uniformValue3: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloat4")
+@ExternalCode("Module['asm']['org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloat4']")
 private external fun _nUniformFloat4(builderPtr: NativePointer, uniformName: InteropPointer, uniformValue1: Float, uniformValue2: Float, uniformValue3: Float, uniformValue4: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloatMatrix22")
+@ExternalCode("Module['asm']['org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloatMatrix22']")
 private external fun _nUniformFloatMatrix22(builderPtr: NativePointer, uniformName: InteropPointer, uniformMatrix22: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloatMatrix33")
+@ExternalCode("Module['asm']['org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloatMatrix33']")
 private external fun _nUniformFloatMatrix33(builderPtr: NativePointer, uniformName: InteropPointer, uniformMatrix33: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloatMatrix44")
+@ExternalCode("Module['asm']['org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloatMatrix44']")
 private external fun _nUniformFloatMatrix44(builderPtr: NativePointer, uniformName: InteropPointer, uniformMatrix44: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nChildShader")
+@ExternalCode("Module['asm']['org_jetbrains_skia_RuntimeShaderBuilder__1nChildShader']")
 private external fun _nChildShader(builderPtr: NativePointer, uniformName: InteropPointer, shaderPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nChildColorFilter")
+@ExternalCode("Module['asm']['org_jetbrains_skia_RuntimeShaderBuilder__1nChildColorFilter']")
 private external fun _nChildColorFilter(builderPtr: NativePointer, uniformName: InteropPointer, colorFilterPtr: NativePointer)

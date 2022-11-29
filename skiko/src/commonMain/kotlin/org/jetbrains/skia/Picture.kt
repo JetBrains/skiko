@@ -232,34 +232,42 @@ class Picture internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nMakeFromData")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Picture__1nMakeFromData']")
 private external fun Picture_nMakeFromData(dataPtr: NativePointer /*, SkDeserialProcs */): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nGetCullRect")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Picture__1nGetCullRect']")
 private external fun _nGetCullRect(ptr: NativePointer, ltrb: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nGetUniqueId")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Picture__1nGetUniqueId']")
 private external fun _nGetUniqueId(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nSerializeToData")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Picture__1nSerializeToData']")
 private external fun _nSerializeToData(ptr: NativePointer /*, SkSerialProcs */): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nMakePlaceholder")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Picture__1nMakePlaceholder']")
 private external fun _nMakePlaceholder(left: Float, top: Float, right: Float, bottom: Float): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nGetApproximateOpCount")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Picture__1nGetApproximateOpCount']")
 private external fun _nGetApproximateOpCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nGetApproximateBytesUsed")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Picture__1nGetApproximateBytesUsed']")
 private external fun _nGetApproximateBytesUsed(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nMakeShader")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Picture__1nMakeShader']")
 private external fun _nMakeShader(
     ptr: NativePointer,
     tmx: Int,
     tmy: Int,
     filterMode: Int,
     localMatrix: InteropPointer,
-    hasTile: Boolean,
+    hasTile: @InteropType Boolean,
     tileL: Float,
     tileT: Float,
     tileR: Float,
@@ -267,4 +275,5 @@ private external fun _nMakeShader(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Picture__1nPlayback")
+@ExternalCode("Module['asm']['org_jetbrains_skia_Picture__1nPlayback']")
 private external fun _nPlayback(ptr: NativePointer, canvasPtr: NativePointer, data: InteropPointer)

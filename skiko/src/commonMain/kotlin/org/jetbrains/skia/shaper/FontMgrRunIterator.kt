@@ -2,6 +2,8 @@
 package org.jetbrains.skia.shaper
 
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.ExternalCode
+import org.jetbrains.skia.InteropType
 import org.jetbrains.skia.Font
 import org.jetbrains.skia.FontMgr
 import org.jetbrains.skia.ManagedString
@@ -49,7 +51,9 @@ class FontMgrRunIterator(text: ManagedString, manageText: Boolean, font: Font, o
 }
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_FontMgrRunIterator__1nMake")
+@ExternalCode("Module['asm']['org_jetbrains_skia_shaper_FontMgrRunIterator__1nMake']")
 private external fun _nMake(textPtr: NativePointer, fontPtr: NativePointer, fontMgrPtr: NativePointer, optsBooleanProps: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_FontMgrRunIterator__1nGetCurrentFont")
+@ExternalCode("Module['asm']['org_jetbrains_skia_shaper_FontMgrRunIterator__1nGetCurrentFont']")
 private external fun _nGetCurrentFont(ptr: NativePointer): NativePointer

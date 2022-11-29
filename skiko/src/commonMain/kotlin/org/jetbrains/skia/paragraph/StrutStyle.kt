@@ -7,6 +7,8 @@ import org.jetbrains.skia.impl.Native
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.ExternalCode
+import org.jetbrains.skia.InteropType
 import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
@@ -199,64 +201,85 @@ class StrutStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finali
 
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nGetFinalizer")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_StrutStyle__1nGetFinalizer']")
 private external fun StrutStyle_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nMake")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_StrutStyle__1nMake']")
 private external fun StrutStyle_nMake(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nEquals")
-private external fun StrutStyle_nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_StrutStyle__1nEquals']")
+private external fun StrutStyle_nEquals(ptr: NativePointer, otherPtr: NativePointer): @InteropType Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nGetHeight")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_StrutStyle__1nGetHeight']")
 private external fun StrutStyle_nGetHeight(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetHeight")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_StrutStyle__1nSetHeight']")
 private external fun StrutStyle_nSetHeight(ptr: NativePointer, value: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetEnabled")
-private external fun StrutStyle_nSetEnabled(ptr: NativePointer, value: Boolean)
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_StrutStyle__1nSetEnabled']")
+private external fun StrutStyle_nSetEnabled(ptr: NativePointer, value: @InteropType Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nGetFontFamilies")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_StrutStyle__1nGetFontFamilies']")
 private external fun _nGetFontFamilies(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetFontFamilies")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_StrutStyle__1nSetFontFamilies']")
 private external fun StrutStyle_nSetFontFamilies(ptr: NativePointer, families: InteropPointer, familiesCount: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nGetFontStyle")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_StrutStyle__1nGetFontStyle']")
 private external fun _nGetFontStyle(ptr: NativePointer, fontStyleData: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetFontStyle")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_StrutStyle__1nSetFontStyle']")
 private external fun _nSetFontStyle(ptr: NativePointer, value: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nGetFontSize")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_StrutStyle__1nGetFontSize']")
 private external fun _nGetFontSize(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetFontSize")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_StrutStyle__1nSetFontSize']")
 private external fun _nSetFontSize(ptr: NativePointer, value: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nGetLeading")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_StrutStyle__1nGetLeading']")
 private external fun _nGetLeading(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetLeading")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_StrutStyle__1nSetLeading']")
 private external fun _nSetLeading(ptr: NativePointer, value: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nIsEnabled")
-private external fun _nIsEnabled(ptr: NativePointer): Boolean
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_StrutStyle__1nIsEnabled']")
+private external fun _nIsEnabled(ptr: NativePointer): @InteropType Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nIsHeightForced")
-private external fun _nIsHeightForced(ptr: NativePointer): Boolean
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_StrutStyle__1nIsHeightForced']")
+private external fun _nIsHeightForced(ptr: NativePointer): @InteropType Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetHeightForced")
-private external fun _nSetHeightForced(ptr: NativePointer, value: Boolean)
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_StrutStyle__1nSetHeightForced']")
+private external fun _nSetHeightForced(ptr: NativePointer, value: @InteropType Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nIsHeightOverridden")
-private external fun _nIsHeightOverridden(ptr: NativePointer): Boolean
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_StrutStyle__1nIsHeightOverridden']")
+private external fun _nIsHeightOverridden(ptr: NativePointer): @InteropType Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetHeightOverridden")
-private external fun _nSetHeightOverridden(ptr: NativePointer, value: Boolean)
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_StrutStyle__1nSetHeightOverridden']")
+private external fun _nSetHeightOverridden(ptr: NativePointer, value: @InteropType Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nIsHalfLeading")
-private external fun _nIsHalfLeading(ptr: NativePointer): Boolean
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_StrutStyle__1nIsHalfLeading']")
+private external fun _nIsHalfLeading(ptr: NativePointer): @InteropType Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetHalfLeading")
-private external fun _nSetHalfLeading(ptr: NativePointer, value: Boolean)
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_StrutStyle__1nSetHalfLeading']")
+private external fun _nSetHalfLeading(ptr: NativePointer, value: @InteropType Boolean)

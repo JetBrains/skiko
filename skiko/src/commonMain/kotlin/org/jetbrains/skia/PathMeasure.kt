@@ -205,50 +205,62 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
 }
 
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetFinalizer")
+@ExternalCode("Module['asm']['org_jetbrains_skia_PathMeasure__1nGetFinalizer']")
 private external fun PathMeasure_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nMake")
+@ExternalCode("Module['asm']['org_jetbrains_skia_PathMeasure__1nMake']")
 private external fun PathMeasure_nMake(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nMakePath")
-private external fun _nMakePath(pathPtr: NativePointer, forceClosed: Boolean, resScale: Float): NativePointer
+@ExternalCode("Module['asm']['org_jetbrains_skia_PathMeasure__1nMakePath']")
+private external fun _nMakePath(pathPtr: NativePointer, forceClosed: @InteropType Boolean, resScale: Float): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nSetPath")
-private external fun _nSetPath(ptr: NativePointer, pathPtr: NativePointer, forceClosed: Boolean)
+@ExternalCode("Module['asm']['org_jetbrains_skia_PathMeasure__1nSetPath']")
+private external fun _nSetPath(ptr: NativePointer, pathPtr: NativePointer, forceClosed: @InteropType Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetLength")
+@ExternalCode("Module['asm']['org_jetbrains_skia_PathMeasure__1nGetLength']")
 private external fun _nGetLength(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetPosition")
-private external fun _nGetPosition(ptr: NativePointer, distance: Float, data: InteropPointer): Boolean
+@ExternalCode("Module['asm']['org_jetbrains_skia_PathMeasure__1nGetPosition']")
+private external fun _nGetPosition(ptr: NativePointer, distance: Float, data: InteropPointer): @InteropType Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetTangent")
-private external fun _nGetTangent(ptr: NativePointer, distance: Float, data: InteropPointer): Boolean
+@ExternalCode("Module['asm']['org_jetbrains_skia_PathMeasure__1nGetTangent']")
+private external fun _nGetTangent(ptr: NativePointer, distance: Float, data: InteropPointer): @InteropType Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetRSXform")
-private external fun _nGetRSXform(ptr: NativePointer, distance: Float, data: InteropPointer): Boolean
+@ExternalCode("Module['asm']['org_jetbrains_skia_PathMeasure__1nGetRSXform']")
+private external fun _nGetRSXform(ptr: NativePointer, distance: Float, data: InteropPointer): @InteropType Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetMatrix")
+@ExternalCode("Module['asm']['org_jetbrains_skia_PathMeasure__1nGetMatrix']")
 private external fun _nGetMatrix(
     ptr: NativePointer,
     distance: Float,
-    getPosition: Boolean,
-    getTangent: Boolean,
+    getPosition: @InteropType Boolean,
+    getTangent: @InteropType Boolean,
     data: InteropPointer
-): Boolean
+): @InteropType Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nGetSegment")
+@ExternalCode("Module['asm']['org_jetbrains_skia_PathMeasure__1nGetSegment']")
 private external fun _nGetSegment(
     ptr: NativePointer,
     startD: Float,
     endD: Float,
     dstPtr: NativePointer,
-    startWithMoveTo: Boolean
-): Boolean
+    startWithMoveTo: @InteropType Boolean
+): @InteropType Boolean
 
 
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nIsClosed")
-private external fun _nIsClosed(ptr: NativePointer): Boolean
+@ExternalCode("Module['asm']['org_jetbrains_skia_PathMeasure__1nIsClosed']")
+private external fun _nIsClosed(ptr: NativePointer): @InteropType Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_PathMeasure__1nNextContour")
-private external fun _nNextContour(ptr: NativePointer): Boolean
+@ExternalCode("Module['asm']['org_jetbrains_skia_PathMeasure__1nNextContour']")
+private external fun _nNextContour(ptr: NativePointer): @InteropType Boolean

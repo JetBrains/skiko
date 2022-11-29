@@ -436,145 +436,190 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
 }
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetFinalizer")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nGetFinalizer']")
 private external fun TextStyle_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nMake")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nMake']")
 private external fun TextStyle_nMake(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nEquals")
-private external fun TextStyle_nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nEquals']")
+private external fun TextStyle_nEquals(ptr: NativePointer, otherPtr: NativePointer): @InteropType Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetFontStyle")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nGetFontStyle']")
 private external fun TextStyle_nGetFontStyle(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetFontStyle")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nSetFontStyle']")
 private external fun TextStyle_nSetFontStyle(ptr: NativePointer, fontStyle: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetFontSize")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nGetFontSize']")
 private external fun TextStyle_nGetFontSize(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetFontSize")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nSetFontSize']")
 private external fun TextStyle_nSetFontSize(ptr: NativePointer, size: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetFontFamilies")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nGetFontFamilies']")
 private external fun TextStyle_nGetFontFamilies(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetHeight")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nGetHeight']")
 private external fun TextStyle_nGetHeight(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetHeight")
-private external fun TextStyle_nSetHeight(ptr: NativePointer, override: Boolean, height: Float)
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nSetHeight']")
+private external fun TextStyle_nSetHeight(ptr: NativePointer, override: @InteropType Boolean, height: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetHalfLeading")
-private external fun TextStyle_nGetHalfLeading(ptr: NativePointer): Boolean
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nGetHalfLeading']")
+private external fun TextStyle_nGetHalfLeading(ptr: NativePointer): @InteropType Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetHalfLeading")
-private external fun TextStyle_nSetHalfLeading(ptr: NativePointer, value: Boolean)
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nSetHalfLeading']")
+private external fun TextStyle_nSetHalfLeading(ptr: NativePointer, value: @InteropType Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetBaselineShift")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nGetBaselineShift']")
 private external fun TextStyle_nGetBaselineShift(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetBaselineShift")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nSetBaselineShift']")
 private external fun TextStyle_nSetBaselineShift(ptr: NativePointer, baselineShift: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nAttributeEquals")
-private external fun _nAttributeEquals(ptr: NativePointer, attribute: Int, otherPtr: NativePointer): Boolean
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nAttributeEquals']")
+private external fun _nAttributeEquals(ptr: NativePointer, attribute: Int, otherPtr: NativePointer): @InteropType Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetColor")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nGetColor']")
 private external fun _nGetColor(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetColor")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nSetColor']")
 private external fun _nSetColor(ptr: NativePointer, color: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetForeground")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nGetForeground']")
 private external fun _nGetForeground(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetForeground")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nSetForeground']")
 private external fun _nSetForeground(ptr: NativePointer, paintPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetBackground")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nGetBackground']")
 private external fun _nGetBackground(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetBackground")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nSetBackground']")
 private external fun _nSetBackground(ptr: NativePointer, paintPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetDecorationStyle")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nGetDecorationStyle']")
 private external fun _nGetDecorationStyle(ptr: NativePointer, decorationStyle: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetDecorationStyle")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nSetDecorationStyle']")
 private external fun _nSetDecorationStyle(
     ptr: NativePointer,
-    underline: Boolean,
-    overline: Boolean,
-    lineThrough: Boolean,
-    gaps: Boolean,
+    underline: @InteropType Boolean,
+    overline: @InteropType Boolean,
+    lineThrough: @InteropType Boolean,
+    gaps: @InteropType Boolean,
     color: Int,
     style: Int,
     thicknessMultiplier: Float
 )
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetShadowsCount")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nGetShadowsCount']")
 private external fun _nGetShadowsCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetShadows")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nGetShadows']")
 private external fun _nGetShadows(ptr: NativePointer, res: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nAddShadow")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nAddShadow']")
 private external fun _nAddShadow(ptr: NativePointer, color: Int, offsetX: Float, offsetY: Float, blurSigma: Double)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nClearShadows")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nClearShadows']")
 private external fun _nClearShadows(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetFontFeatures")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nGetFontFeatures']")
 private external fun _nGetFontFeatures(ptr: NativePointer, resultIntsArray: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetFontFeaturesSize")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nGetFontFeaturesSize']")
 private external fun _nGetFontFeaturesSize(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nAddFontFeature")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nAddFontFeature']")
 private external fun _nAddFontFeature(ptr: NativePointer, name: InteropPointer, value: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nClearFontFeatures")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nClearFontFeatures']")
 private external fun _nClearFontFeatures(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetFontFamilies")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nSetFontFamilies']")
 private external fun _nSetFontFamilies(ptr: NativePointer, families: InteropPointer, familiesSize: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetLetterSpacing")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nGetLetterSpacing']")
 private external fun _nGetLetterSpacing(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetLetterSpacing")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nSetLetterSpacing']")
 private external fun _nSetLetterSpacing(ptr: NativePointer, letterSpacing: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetWordSpacing")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nGetWordSpacing']")
 private external fun _nGetWordSpacing(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetWordSpacing")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nSetWordSpacing']")
 private external fun _nSetWordSpacing(ptr: NativePointer, wordSpacing: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetTypeface")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nGetTypeface']")
 private external fun _nGetTypeface(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetTypeface")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nSetTypeface']")
 private external fun _nSetTypeface(ptr: NativePointer, typefacePtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetLocale")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nGetLocale']")
 private external fun _nGetLocale(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetLocale")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nSetLocale']")
 private external fun _nSetLocale(ptr: NativePointer, locale: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetBaselineMode")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nGetBaselineMode']")
 private external fun _nGetBaselineMode(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetBaselineMode")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nSetBaselineMode']")
 private external fun _nSetBaselineMode(ptr: NativePointer, mode: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetFontMetrics")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nGetFontMetrics']")
 private external fun _nGetFontMetrics(ptr: NativePointer, fontMetrics: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nIsPlaceholder")
-private external fun _nIsPlaceholder(ptr: NativePointer): Boolean
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nIsPlaceholder']")
+private external fun _nIsPlaceholder(ptr: NativePointer): @InteropType Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetPlaceholder")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextStyle__1nSetPlaceholder']")
 private external fun _nSetPlaceholder(ptr: NativePointer)

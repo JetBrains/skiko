@@ -16,6 +16,8 @@ internal actual fun InteropScope.allocateBytesForPixels(size: Int): NativePointe
 
 actual annotation class SkipJsTarget
 
+actual annotation class SkipWasmTarget
+
 actual annotation class SkipJvmTarget
 
 actual typealias SkipNativeTarget = kotlin.test.Ignore

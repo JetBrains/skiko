@@ -174,21 +174,27 @@ open class FontMgr : RefCnt {
 
 
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nGetFamiliesCount")
+@ExternalCode("Module['asm']['org_jetbrains_skia_FontMgr__1nGetFamiliesCount']")
 private external fun _nGetFamiliesCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nGetFamilyName")
+@ExternalCode("Module['asm']['org_jetbrains_skia_FontMgr__1nGetFamilyName']")
 private external fun _nGetFamilyName(ptr: NativePointer, index: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMakeStyleSet")
+@ExternalCode("Module['asm']['org_jetbrains_skia_FontMgr__1nMakeStyleSet']")
 private external fun _nMakeStyleSet(ptr: NativePointer, index: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMatchFamily")
+@ExternalCode("Module['asm']['org_jetbrains_skia_FontMgr__1nMatchFamily']")
 private external fun _nMatchFamily(ptr: NativePointer, familyName: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMatchFamilyStyle")
+@ExternalCode("Module['asm']['org_jetbrains_skia_FontMgr__1nMatchFamilyStyle']")
 private external fun _nMatchFamilyStyle(ptr: NativePointer, familyName: InteropPointer, fontStyle: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMatchFamilyStyleCharacter")
+@ExternalCode("Module['asm']['org_jetbrains_skia_FontMgr__1nMatchFamilyStyleCharacter']")
 private external fun _nMatchFamilyStyleCharacter(
     ptr: NativePointer,
     familyName: InteropPointer,
@@ -199,7 +205,9 @@ private external fun _nMatchFamilyStyleCharacter(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMakeFromData")
+@ExternalCode("Module['asm']['org_jetbrains_skia_FontMgr__1nMakeFromData']")
 private external fun _nMakeFromData(ptr: NativePointer, dataPtr: NativePointer, ttcIndex: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nDefault")
+@ExternalCode("Module['asm']['org_jetbrains_skia_FontMgr__1nDefault']")
 private external fun _nDefault(): NativePointer

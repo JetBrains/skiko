@@ -3,6 +3,8 @@ package org.jetbrains.skia.svg
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.*
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.ExternalCode
+import org.jetbrains.skia.InteropType
 import org.jetbrains.skia.impl.*
 
 class SVGDOM internal constructor(ptr: NativePointer) : RefCnt(ptr) {
@@ -60,16 +62,21 @@ class SVGDOM internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nMakeFromData")
+@ExternalCode("Module['asm']['org_jetbrains_skia_svg_SVGDOM__1nMakeFromData']")
 private external fun SVGDOM_nMakeFromData(dataPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nGetRoot")
+@ExternalCode("Module['asm']['org_jetbrains_skia_svg_SVGDOM__1nGetRoot']")
 private external fun SVGDOM_nGetRoot(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nGetContainerSize")
+@ExternalCode("Module['asm']['org_jetbrains_skia_svg_SVGDOM__1nGetContainerSize']")
 private external fun SVGDOM_nGetContainerSize(ptr: NativePointer, dst: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nSetContainerSize")
+@ExternalCode("Module['asm']['org_jetbrains_skia_svg_SVGDOM__1nSetContainerSize']")
 private external fun SVGDOM_nSetContainerSize(ptr: NativePointer, width: Float, height: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nRender")
+@ExternalCode("Module['asm']['org_jetbrains_skia_svg_SVGDOM__1nRender']")
 private external fun SVGDOM_nRender(ptr: NativePointer, canvasPtr: NativePointer)

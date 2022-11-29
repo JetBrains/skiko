@@ -125,21 +125,27 @@ class PictureRecorder internal constructor(ptr: NativePointer) : Managed(ptr, _F
 
 
 @ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nMake")
+@ExternalCode("Module['asm']['org_jetbrains_skia_PictureRecorder__1nMake']")
 private external fun PictureRecorder_nMake(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nGetFinalizer")
+@ExternalCode("Module['asm']['org_jetbrains_skia_PictureRecorder__1nGetFinalizer']")
 private external fun PictureRecorder_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nBeginRecording")
+@ExternalCode("Module['asm']['org_jetbrains_skia_PictureRecorder__1nBeginRecording']")
 private external fun _nBeginRecording(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nGetRecordingCanvas")
+@ExternalCode("Module['asm']['org_jetbrains_skia_PictureRecorder__1nGetRecordingCanvas']")
 private external fun _nGetRecordingCanvas(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nFinishRecordingAsPicture")
+@ExternalCode("Module['asm']['org_jetbrains_skia_PictureRecorder__1nFinishRecordingAsPicture']")
 private external fun _nFinishRecordingAsPicture(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nFinishRecordingAsPictureWithCull")
+@ExternalCode("Module['asm']['org_jetbrains_skia_PictureRecorder__1nFinishRecordingAsPictureWithCull']")
 private external fun _nFinishRecordingAsPictureWithCull(
     ptr: NativePointer,
     left: Float,
@@ -150,5 +156,6 @@ private external fun _nFinishRecordingAsPictureWithCull(
 
 
 @ExternalSymbolName("org_jetbrains_skia_PictureRecorder__1nFinishRecordingAsDrawable")
+@ExternalCode("Module['asm']['org_jetbrains_skia_PictureRecorder__1nFinishRecordingAsDrawable']")
 private external fun _nFinishRecordingAsDrawable(ptr: NativePointer): NativePointer
 

@@ -8,7 +8,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompileTool
 
 plugins {
-    kotlin("multiplatform") version "1.7.20"
+    kotlin("multiplatform") version "1.8.255-SNAPSHOT"
     id("org.jetbrains.dokka") version "1.7.20"
     `maven-publish`
     signing
@@ -16,7 +16,7 @@ plugins {
     id("de.undercouch.download") version "4.1.2"
 }
 
-val coroutinesVersion = "1.5.2"
+val coroutinesVersion = "1.6.4-SNAPSHOT"
 
 fun targetSuffix(os: OS, arch: Arch): String {
     return "${os.id}_${arch.id}"
@@ -33,6 +33,7 @@ allprojects {
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
@@ -59,11 +60,12 @@ if (supportWasm) {
         buildTargetArch.set(osArch.second)
         buildVariant.set(buildType)
 
-        val srcDirs = projectDirs("src/commonMain/cpp/common", "src/jsMain/cpp", "src/nativeJsMain/cpp") +
+        val srcDirs = projectDirs("src/commonMain/cpp/common", "src/jsWasmMain/cpp", "src/nativeJsMain/cpp") +
                 if (skiko.includeTestHelpers) projectDirs("src/nativeJsTest/cpp") else emptyList()
         sourceRoots.set(srcDirs)
 
         includeHeadersNonRecursive(projectDir.resolve("src/nativeJsMain/cpp"))
+        includeHeadersNonRecursive(projectDir.resolve("src/jsWasmMain/cpp"))
         includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp/common/include"))
         includeHeadersNonRecursive(skiaHeadersDirs(skiaWasmDir.get()))
 
@@ -71,8 +73,8 @@ if (supportWasm) {
             *skiaPreprocessorFlags(OS.Wasm),
             *buildType.clangFlags,
             "-fno-rtti",
-            "-fno-exceptions"
-        ))
+            "-fno-exceptions",
+            ))
     }
 
     val linkWasm by tasks.registering(LinkSkikoWasmTask::class) {
@@ -95,7 +97,7 @@ if (supportWasm) {
         libOutputFileName.set("skiko.wasm")
         jsOutputFileName.set("skiko.js")
 
-        skikoJsPrefix.set(project.layout.projectDirectory.file("src/jsMain/resources/setup.js"))
+        skikoJsPrefix.set(project.layout.projectDirectory.file("src/jsWasmMain/resources/setup.js"))
 
         flags.set(listOf(
             "-l", "GL",
@@ -214,7 +216,7 @@ val Project.supportNative: Boolean
    get() = findProperty("skiko.native.enabled") == "true" || isInIdea
 
 val Project.supportWasm: Boolean
-    get() = findProperty("skiko.wasm.enabled") == "true" || isInIdea
+    get() = true//findProperty("skiko.wasm.enabled") == "true" || isInIdea
 
 val Project.supportAndroid: Boolean
     get() = findProperty("skiko.android.enabled") == "true" // || isInIdea
@@ -255,6 +257,19 @@ kotlin {
             binaries.executable()
             generateVersion(OS.Wasm, Arch.Wasm)
         }
+
+        wasm {
+            moduleName = "skiko-kjs" // override the name to avoid name collision with a different skiko.js file
+            browser {
+                testTask {
+                    dependsOn("linkWasm")
+                    useKarma {
+                        useChromeHeadless()
+                    }
+                }
+            }
+            generateVersion(OS.Wasm, Arch.Wasm)
+        }
     }
 
     if (supportNative) {
@@ -271,6 +286,7 @@ kotlin {
             dependencies {
                 implementation(kotlin("stdlib"))
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
+                implementation("org.jetbrains.kotlinx:atomicfu:0.18.3-SNAPSHOT")
             }
         }
         val commonTest by getting {
@@ -330,16 +346,38 @@ kotlin {
             }
 
             if (supportWasm) {
-                val jsMain by getting {
+                val jsWasmMain by creating {
                     dependsOn(nativeJsMain)
                 }
 
-                val jsTest by getting {
+                val jsMain by getting {
+                    dependsOn(jsWasmMain)
+                    dependencies {
+                        implementation(kotlin("stdlib-js"))
+                    }
+                }
+
+                val wasmMain by getting {
+                    dependsOn(jsWasmMain)
+                    dependencies {
+                        implementation(kotlin("stdlib-wasm"))
+                    }
+                }
+
+                val jsWasmTest by creating {
                     dependsOn(nativeJsTest)
                     dependencies {
                         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
-                        implementation(kotlin("test-js"))
+                        implementation(kotlin("test"))
                     }
+                }
+
+                val jsTest by getting {
+                    dependsOn(jsWasmTest)
+                }
+
+                val wasmTest by getting {
+                    dependsOn(jsWasmTest)
                 }
             }
 

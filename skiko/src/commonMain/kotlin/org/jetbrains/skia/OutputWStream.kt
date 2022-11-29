@@ -24,7 +24,9 @@ class OutputWStream(out: OutputStream?) : WStream(_nMake(out), _FinalizerHolder.
 
 
 @ExternalSymbolName("org_jetbrains_skia_OutputWStream__1nGetFinalizer")
+@ExternalCode("Module['asm']['org_jetbrains_skia_OutputWStream__1nGetFinalizer']")
 private external fun OutputWStream_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_OutputWStream__1nMake")
+@ExternalCode("Module['asm']['org_jetbrains_skia_OutputWStream__1nMake']")
 private external fun _nMake(out: OutputStream?): NativePointer

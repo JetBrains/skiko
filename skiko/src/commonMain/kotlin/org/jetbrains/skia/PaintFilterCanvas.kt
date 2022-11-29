@@ -43,12 +43,15 @@ abstract class PaintFilterCanvas(private val canvas: Canvas, unrollDrawable: Boo
 internal expect fun PaintFilterCanvas.doInit(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_PaintFilterCanvas__1nMake")
-private external fun PaintFilterCanvas_nMake(canvasPtr: NativePointer, unrollDrawable: Boolean): NativePointer
+@ExternalCode("Module['asm']['org_jetbrains_skia_PaintFilterCanvas__1nMake']")
+private external fun PaintFilterCanvas_nMake(canvasPtr: NativePointer, unrollDrawable: @InteropType Boolean): NativePointer
 
 // Native/JS only
 
 @ExternalSymbolName("org_jetbrains_skia_PaintFilterCanvas__1nInit")
+@ExternalCode("Module['asm']['org_jetbrains_skia_PaintFilterCanvas__1nInit']")
 internal external fun PaintFilterCanvas_nInit(ptr: NativePointer, onFilter: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_PaintFilterCanvas__1nGetOnFilterPaint")
+@ExternalCode("Module['asm']['org_jetbrains_skia_PaintFilterCanvas__1nGetOnFilterPaint']")
 internal external fun PaintFilterCanvas_nGetOnFilterPaint(ptr: NativePointer): NativePointer

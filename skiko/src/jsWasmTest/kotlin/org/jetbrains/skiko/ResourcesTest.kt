@@ -49,10 +49,10 @@ class ResourcesTest {
         ), loadFont("Regular"))
     }
 
-    @Test
-    fun typedArrayCastTest() {
-        val data = Int8Array(byteArrayOf(1, 2, 3, 4, 5).toTypedArray())
-        val casted = data.unsafeCast<ByteArray>()
-        assertContentEquals(byteArrayOf(1, 2, 3, 4, 5), casted)
-    }
+//    @Test
+//    fun typedArrayCastTest() {
+//        val data = Int8Array(byteArrayOf(1, 2, 3, 4, 5).toTypedArray())
+//        val casted = data.unsafeCast<ByteArray>()
+//        assertContentEquals(byteArrayOf(1, 2, 3, 4, 5), casted)
+//    }
 }

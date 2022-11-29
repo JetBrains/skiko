@@ -40,7 +40,7 @@ fun compilerForTarget(os: OS, arch: Arch): String =
         OS.Android -> "clang++"
         OS.Windows -> "cl.exe"
         OS.MacOS, OS.IOS -> "clang++"
-        OS.Wasm -> "emcc"
+        OS.Wasm -> "/Users/Igor.Yakovlev/Projects/emsdk/upstream/emscripten/emcc"
     }
 
 fun linkerForTarget(os: OS, arch: Arch): String =
@@ -129,7 +129,7 @@ class SkikoProperties(private val myProject: Project) {
         get() = myProject.findProperty("deploy.release") == "true"
 
     val buildType: SkiaBuildType
-        get() = if (myProject.findProperty("skiko.debug") == "true") SkiaBuildType.DEBUG else SkiaBuildType.RELEASE
+        get() = SkiaBuildType.RELEASE//if (myProject.findProperty("skiko.debug") == "true") SkiaBuildType.DEBUG else SkiaBuildType.RELEASE
 
     val targetArch: Arch
         get() = myProject.findProperty("skiko.arch")?.toString()?.let(Arch::byName) ?: hostArch

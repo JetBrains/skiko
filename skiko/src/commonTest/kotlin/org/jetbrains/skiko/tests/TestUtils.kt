@@ -12,6 +12,8 @@ expect annotation class SkipNativeTarget
 
 expect annotation class SkipJsTarget
 
+expect annotation class SkipWasmTarget
+
 expect annotation class SkipJvmTarget
 
 expect fun makeFromFileName(path: String?): Data

@@ -138,6 +138,7 @@ abstract class CompileSkikoCppTask() : AbstractSkikoNativeToolTask() {
         logArgs("Compiler args", args, commonArgsFile)
 
         for ((sourceFile, outputFile) in sourceOutputPairs) {
+            println(sourceFile.absolutePath)
             val workId = "Compiling '${sourceFile.absolutePath}'"
             submittedWorks.add(workId)
 
@@ -185,7 +186,7 @@ abstract class CompileSkikoCppTask() : AbstractSkikoNativeToolTask() {
         val compilerFile = File(compilerName)
         if (compilerFile.isFile) return compilerFile
 
-        val paths = System.getenv("PATH").split(File.pathSeparator)
+        val paths = System.getenv("PATH").split(File.pathSeparator) + "/Users/Igor.Yakovlev/Projects/emsdk/upstream/emscripten"
         for (path in paths) {
             val file = File(path).resolve(compilerName)
             if (file.isFile) return file

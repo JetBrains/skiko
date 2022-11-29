@@ -3,12 +3,15 @@ package org.jetbrains.skia
 import org.jetbrains.skia.impl.NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_StdVectorDecoder__1nGetArraySize")
+@ExternalCode("Module['asm']['org_jetbrains_skia_StdVectorDecoder__1nGetArraySize']")
 private external fun StdVectorDecoder_nGetArraySize(array: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_StdVectorDecoder__1nDisposeArray")
+@ExternalCode("Module['asm']['org_jetbrains_skia_StdVectorDecoder__1nDisposeArray']")
 private external fun StdVectorDecoder_nDisposeArray(array: NativePointer, disposePtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_StdVectorDecoder__1nReleaseElement")
+@ExternalCode("Module['asm']['org_jetbrains_skia_StdVectorDecoder__1nReleaseElement']")
 private external fun StdVectorDecoder_nReleaseElement(array: NativePointer, index: Int): NativePointer
 
 

@@ -24,3 +24,13 @@ internal expect fun compilePattern(regex: String): Pattern
 @OptIn(ExperimentalMultiplatform::class)
 @OptionalExpectation
 expect annotation class ExternalSymbolName(val name: String)
+
+@OptIn(ExperimentalMultiplatform::class)
+@OptionalExpectation
+expect annotation class ExternalCode(val code: String)
+
+@OptIn(ExperimentalMultiplatform::class)
+@OptionalExpectation
+@Target(AnnotationTarget.TYPE)
+@Retention(AnnotationRetention.BINARY)
+expect annotation class InteropType()

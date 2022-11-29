@@ -3,6 +3,8 @@ package org.jetbrains.skia.paragraph
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.*
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.ExternalCode
+import org.jetbrains.skia.InteropType
 import org.jetbrains.skia.impl.*
 
 class FontCollection internal constructor(ptr: NativePointer) : RefCnt(ptr) {
@@ -138,37 +140,49 @@ class FontCollection internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nMake")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_FontCollection__1nMake']")
 private external fun _nMake(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nGetFontManagersCount")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_FontCollection__1nGetFontManagersCount']")
 private external fun _nGetFontManagersCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nSetAssetFontManager")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_FontCollection__1nSetAssetFontManager']")
 private external fun _nSetAssetFontManager(ptr: NativePointer, fontManagerPtr: NativePointer, defaultFamilyNameStr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nSetDynamicFontManager")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_FontCollection__1nSetDynamicFontManager']")
 private external fun _nSetDynamicFontManager(ptr: NativePointer, fontManagerPtr: NativePointer, defaultFamilyNameStr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nSetTestFontManager")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_FontCollection__1nSetTestFontManager']")
 private external fun _nSetTestFontManager(ptr: NativePointer, fontManagerPtr: NativePointer, defaultFamilyNameStr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nSetDefaultFontManager")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_FontCollection__1nSetDefaultFontManager']")
 private external fun _nSetDefaultFontManager(ptr: NativePointer, fontManagerPtr: NativePointer, defaultFamilyName: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nGetFallbackManager")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_FontCollection__1nGetFallbackManager']")
 private external fun _nGetFallbackManager(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nFindTypefaces")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_FontCollection__1nFindTypefaces']")
 private external fun _nFindTypefaces(ptr: NativePointer, familyNames: InteropPointer, len: Int, fontStyle: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nDefaultFallbackChar")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_FontCollection__1nDefaultFallbackChar']")
 private external fun _nDefaultFallbackChar(ptr: NativePointer, unicode: Int, fontStyle: Int, locale: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nDefaultFallback")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_FontCollection__1nDefaultFallback']")
 private external fun _nDefaultFallback(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nSetEnableFallback")
-private external fun _nSetEnableFallback(ptr: NativePointer, value: Boolean)
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_FontCollection__1nSetEnableFallback']")
+private external fun _nSetEnableFallback(ptr: NativePointer, value: @InteropType Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nGetParagraphCache")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_FontCollection__1nGetParagraphCache']")
 private external fun _nGetParagraphCache(ptr: NativePointer): NativePointer

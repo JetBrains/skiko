@@ -6,6 +6,8 @@ import org.jetbrains.skia.FontMgr
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.ExternalCode
+import org.jetbrains.skia.InteropType
 import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
@@ -41,7 +43,9 @@ class TypefaceFontProvider : FontMgr(TypefaceFontProvider_nMake()) {
 
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TypefaceFontProvider__1nMake")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TypefaceFontProvider__1nMake']")
 private external fun TypefaceFontProvider_nMake(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TypefaceFontProvider__1nRegisterTypeface")
-private external fun _nRegisterTypeface(ptr: NativePointer, typefacePtr: NativePointer, alias: InteropPointer): NativePointer
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TypefaceFontProvider__1nRegisterTypeface']")
+private external fun _nRegisterTypeface(ptr: NativePointer, typefacePtr: NativePointer, alias: InteropPointer)

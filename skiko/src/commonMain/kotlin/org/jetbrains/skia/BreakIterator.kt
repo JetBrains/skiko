@@ -544,43 +544,57 @@ private fun withErrorGuard(message: String, block: InteropScope.(InteropPointer)
 }
 
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nGetFinalizer")
+@ExternalCode("Module['asm']['org_jetbrains_skia_BreakIterator__1nGetFinalizer']")
 private external fun BreakIterator_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nMake")
+@ExternalCode("Module['asm']['org_jetbrains_skia_BreakIterator__1nMake']")
 private external fun _nMake(type: Int, locale: InteropPointer, errorCode: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nClone")
+@ExternalCode("Module['asm']['org_jetbrains_skia_BreakIterator__1nClone']")
 private external fun _nClone(ptr: NativePointer, errorCode: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nCurrent")
+@ExternalCode("Module['asm']['org_jetbrains_skia_BreakIterator__1nCurrent']")
 private external fun _nCurrent(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nNext")
+@ExternalCode("Module['asm']['org_jetbrains_skia_BreakIterator__1nNext']")
 private external fun _nNext(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nPrevious")
+@ExternalCode("Module['asm']['org_jetbrains_skia_BreakIterator__1nPrevious']")
 private external fun _nPrevious(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nFirst")
+@ExternalCode("Module['asm']['org_jetbrains_skia_BreakIterator__1nFirst']")
 private external fun _nFirst(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nLast")
+@ExternalCode("Module['asm']['org_jetbrains_skia_BreakIterator__1nLast']")
 private external fun _nLast(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nPreceding")
+@ExternalCode("Module['asm']['org_jetbrains_skia_BreakIterator__1nPreceding']")
 private external fun _nPreceding(ptr: NativePointer, offset: Int): Int
 
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nFollowing")
+@ExternalCode("Module['asm']['org_jetbrains_skia_BreakIterator__1nFollowing']")
 private external fun _nFollowing(ptr: NativePointer, offset: Int): Int
 
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nIsBoundary")
-private external fun _nIsBoundary(ptr: NativePointer, offset: Int): Boolean
+@ExternalCode("Module['asm']['org_jetbrains_skia_BreakIterator__1nIsBoundary']")
+private external fun _nIsBoundary(ptr: NativePointer, offset: Int): @InteropType Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nGetRuleStatus")
+@ExternalCode("Module['asm']['org_jetbrains_skia_BreakIterator__1nGetRuleStatus']")
 private external fun _nGetRuleStatus(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nGetRuleStatuses")
+@ExternalCode("Module['asm']['org_jetbrains_skia_BreakIterator__1nGetRuleStatuses']")
 private external fun _nGetRuleStatuses(ptr: NativePointer): IntArray
 
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nSetText")
+@ExternalCode("Module['asm']['org_jetbrains_skia_BreakIterator__1nSetText']")
 private external fun _nSetText(ptr: NativePointer, textStr: InteropPointer, len: Int, errorCode: InteropPointer): NativePointer

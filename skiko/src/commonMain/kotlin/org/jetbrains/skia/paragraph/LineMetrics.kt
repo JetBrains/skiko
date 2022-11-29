@@ -1,6 +1,8 @@
 package org.jetbrains.skia.paragraph
 
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.ExternalCode
+import org.jetbrains.skia.InteropType
 import org.jetbrains.skia.impl.*
 
 class LineMetrics(
@@ -167,8 +169,11 @@ class LineMetrics(
 }
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_LineMetrics__1nGetArraySize")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_LineMetrics__1nGetArraySize']")
 private external fun LineMetrics_nGetArraySize(array: InteropPointer): Int
 @ExternalSymbolName("org_jetbrains_skia_paragraph_LineMetrics__1nDisposeArray")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_LineMetrics__1nDisposeArray']")
 private external fun LineMetrics_nDisposeArray(array: InteropPointer)
 @ExternalSymbolName("org_jetbrains_skia_paragraph_LineMetrics__1nGetArrayElement")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_LineMetrics__1nGetArrayElement']")
 private external fun LineMetrics_nGetArrayElement(array: InteropPointer, index: Int, longArgs: InteropPointer, doubleArgs: InteropPointer)

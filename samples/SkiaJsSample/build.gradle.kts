@@ -1,5 +1,5 @@
 plugins {
-    kotlin("multiplatform") version "1.6.10"
+    kotlin("multiplatform") version "1.8.255-SNAPSHOT"
 }
 
 repositories {
@@ -37,17 +37,41 @@ kotlin {
         binaries.executable()
     }
 
+    wasm() {
+        browser()
+        binaries.executable()
+    }
+
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation("org.jetbrains.skiko:skiko:$version")
+//                implementation("org.jetbrains.skiko:skiko:$version")
             }
+        }
+
+        val jsWasmMain by creating {
+            dependsOn(commonMain)
+            resources.setSrcDirs(resources.srcDirs)
+            resources.srcDirs(unzipTask.map { it.destinationDir })
         }
 
         val jsMain by getting {
             dependsOn(commonMain)
-            resources.setSrcDirs(resources.srcDirs)
-            resources.srcDirs(unzipTask.map { it.destinationDir })
+            dependsOn(jsWasmMain)
+            dependencies {
+                implementation("org.jetbrains.skiko:skiko-js:$version")
+                implementation(kotlin("stdlib-js"))
+            }
+        }
+
+
+        val wasmMain by getting {
+            dependsOn(commonMain)
+            dependsOn(jsWasmMain)
+            dependencies {
+                implementation("org.jetbrains.skiko:skiko-wasm:$version")
+                implementation(kotlin("stdlib-wasm"))
+            }
         }
     }
 }

@@ -3,6 +3,8 @@ package org.jetbrains.skia.paragraph
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.ManagedString
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.ExternalCode
+import org.jetbrains.skia.InteropType
 import org.jetbrains.skia.impl.*
 
 class ParagraphBuilder(style: ParagraphStyle?, fc: FontCollection?) :
@@ -75,21 +77,27 @@ class ParagraphBuilder(style: ParagraphStyle?, fc: FontCollection?) :
 }
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nGetFinalizer")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_ParagraphBuilder__1nGetFinalizer']")
 private external fun ParagraphBuilder_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nMake")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_ParagraphBuilder__1nMake']")
 private external fun _nMake(paragraphStylePtr: NativePointer, fontCollectionPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nPushStyle")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_ParagraphBuilder__1nPushStyle']")
 private external fun _nPushStyle(ptr: NativePointer, textStylePtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nPopStyle")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_ParagraphBuilder__1nPopStyle']")
 private external fun _nPopStyle(ptr: NativePointer, textStylePtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nAddText")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_ParagraphBuilder__1nAddText']")
 private external fun _nAddText(ptr: NativePointer, text: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nAddPlaceholder")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_ParagraphBuilder__1nAddPlaceholder']")
 private external fun _nAddPlaceholder(
     ptr: NativePointer,
     width: Float,
@@ -100,4 +108,5 @@ private external fun _nAddPlaceholder(
 )
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nBuild")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_ParagraphBuilder__1nBuild']")
 private external fun _nBuild(ptr: NativePointer): NativePointer

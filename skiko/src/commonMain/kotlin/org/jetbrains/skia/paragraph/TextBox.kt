@@ -1,6 +1,8 @@
 package org.jetbrains.skia.paragraph
 
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.ExternalCode
+import org.jetbrains.skia.InteropType
 import org.jetbrains.skia.Rect
 import org.jetbrains.skia.impl.ArrayInteropDecoder
 import org.jetbrains.skia.impl.InteropPointer
@@ -59,8 +61,11 @@ class TextBox(val rect: Rect, direction: Direction) {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextBox__1nGetArraySize")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextBox__1nGetArraySize']")
 private external fun TextBox_nGetArraySize(array: InteropPointer): Int
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextBox__1nDisposeArray")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextBox__1nDisposeArray']")
 private external fun TextBox_nDisposeArray(array: InteropPointer)
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextBox__1nGetArrayElement")
+@ExternalCode("Module['asm']['org_jetbrains_skia_paragraph_TextBox__1nGetArrayElement']")
 private external fun TextBox_nGetArrayElement(array: InteropPointer, index: Int, rectArray: InteropPointer, directionArray: InteropPointer)

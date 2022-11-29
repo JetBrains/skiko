@@ -126,10 +126,13 @@ private fun pathSegmentFromIntArray(points: IntArray): PathSegment {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_PathSegmentIterator__1nGetFinalizer")
+@ExternalCode("Module['asm']['org_jetbrains_skia_PathSegmentIterator__1nGetFinalizer']")
 private external fun PathSegmentIterator_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_PathSegmentIterator__1nNext")
+@ExternalCode("Module['asm']['org_jetbrains_skia_PathSegmentIterator__1nNext']")
 private external fun PathSegmentIterator_nNext(ptr: NativePointer, points: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_PathSegmentIterator__1nMake")
-private external fun _nMake(pathPtr: NativePointer, forceClose: Boolean): NativePointer
+@ExternalCode("Module['asm']['org_jetbrains_skia_PathSegmentIterator__1nMake']")
+private external fun _nMake(pathPtr: NativePointer, forceClose: @InteropType Boolean): NativePointer

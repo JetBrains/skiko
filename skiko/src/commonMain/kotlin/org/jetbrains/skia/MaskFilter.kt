@@ -47,16 +47,21 @@ class MaskFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_MaskFilter__1nMakeTable")
+@ExternalCode("Module['asm']['org_jetbrains_skia_MaskFilter__1nMakeTable']")
 private external fun MaskFilter_nMakeTable(table: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_MaskFilter__1nMakeBlur")
-private external fun _nMakeBlur(mode: Int, sigma: Float, respectCTM: Boolean): NativePointer
+@ExternalCode("Module['asm']['org_jetbrains_skia_MaskFilter__1nMakeBlur']")
+private external fun _nMakeBlur(mode: Int, sigma: Float, respectCTM: @InteropType Boolean): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_MaskFilter__1nMakeShader")
+@ExternalCode("Module['asm']['org_jetbrains_skia_MaskFilter__1nMakeShader']")
 private external fun _nMakeShader(shaderPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_MaskFilter__1nMakeGamma")
+@ExternalCode("Module['asm']['org_jetbrains_skia_MaskFilter__1nMakeGamma']")
 private external fun _nMakeGamma(gamma: Float): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_MaskFilter__1nMakeClip")
+@ExternalCode("Module['asm']['org_jetbrains_skia_MaskFilter__1nMakeClip']")
 private external fun _nMakeClip(min: Byte, max: Byte): NativePointer

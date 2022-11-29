@@ -25,7 +25,7 @@ private class DemoApp: SkikoView {
 
 fun main() {
     onWasmReady {
-        for (index in 1 .. 3) {
+        for (index in 1 .. 1) {
             val skiaLayer = SkiaLayer()
             val canvas = document.getElementById("c$index") as HTMLCanvasElement
             val app = if (index == 3) {

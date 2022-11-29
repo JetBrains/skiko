@@ -3,6 +3,8 @@ package org.jetbrains.skia.svg
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.*
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.ExternalCode
+import org.jetbrains.skia.InteropType
 import org.jetbrains.skia.impl.*
 
 class SVGSVG internal constructor(ptr: NativePointer) : SVGContainer(ptr) {
@@ -115,40 +117,53 @@ class SVGSVG internal constructor(ptr: NativePointer) : SVGContainer(ptr) {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nGetX")
+@ExternalCode("Module['asm']['org_jetbrains_skia_svg_SVGSVG__1nGetX']")
 private external fun SVGSVG_nGetX(ptr: NativePointer, result: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nGetY")
+@ExternalCode("Module['asm']['org_jetbrains_skia_svg_SVGSVG__1nGetY']")
 private external fun SVGSVG_nGetY(ptr: NativePointer, result: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nGetWidth")
+@ExternalCode("Module['asm']['org_jetbrains_skia_svg_SVGSVG__1nGetWidth']")
 private external fun SVGSVG_nGetWidth(ptr: NativePointer, result: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nGetHeight")
+@ExternalCode("Module['asm']['org_jetbrains_skia_svg_SVGSVG__1nGetHeight']")
 private external fun SVGSVG_nGetHeight(ptr: NativePointer, result: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nGetPreserveAspectRatio")
+@ExternalCode("Module['asm']['org_jetbrains_skia_svg_SVGSVG__1nGetPreserveAspectRatio']")
 private external fun SVGSVG_nGetPreserveAspectRatio(ptr: NativePointer, result: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nGetViewBox")
-private external fun SVGSVG_nGetViewBox(ptr: NativePointer, result: InteropPointer): Boolean
+@ExternalCode("Module['asm']['org_jetbrains_skia_svg_SVGSVG__1nGetViewBox']")
+private external fun SVGSVG_nGetViewBox(ptr: NativePointer, result: InteropPointer): @InteropType Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nGetIntrinsicSize")
+@ExternalCode("Module['asm']['org_jetbrains_skia_svg_SVGSVG__1nGetIntrinsicSize']")
 private external fun SVGSVG_nGetIntrinsicSize(ptr: NativePointer, width: Float, height: Float, dpi: Float, result: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nSetX")
+@ExternalCode("Module['asm']['org_jetbrains_skia_svg_SVGSVG__1nSetX']")
 private external fun SVGSVG_nSetX(ptr: NativePointer, value: Float, unit: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nSetY")
+@ExternalCode("Module['asm']['org_jetbrains_skia_svg_SVGSVG__1nSetY']")
 private external fun SVGSVG_nSetY(ptr: NativePointer, value: Float, unit: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nSetWidth")
+@ExternalCode("Module['asm']['org_jetbrains_skia_svg_SVGSVG__1nSetWidth']")
 private external fun SVGSVG_nSetWidth(ptr: NativePointer, value: Float, unit: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nSetHeight")
+@ExternalCode("Module['asm']['org_jetbrains_skia_svg_SVGSVG__1nSetHeight']")
 private external fun SVGSVG_nSetHeight(ptr: NativePointer, value: Float, unit: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nSetPreserveAspectRatio")
+@ExternalCode("Module['asm']['org_jetbrains_skia_svg_SVGSVG__1nSetPreserveAspectRatio']")
 private external fun SVGSVG_nSetPreserveAspectRatio(ptr: NativePointer, align: Int, scale: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGSVG__1nSetViewBox")
+@ExternalCode("Module['asm']['org_jetbrains_skia_svg_SVGSVG__1nSetViewBox']")
 private external fun SVGSVG_nSetViewBox(ptr: NativePointer, l: Float, t: Float, r: Float, b: Float)
