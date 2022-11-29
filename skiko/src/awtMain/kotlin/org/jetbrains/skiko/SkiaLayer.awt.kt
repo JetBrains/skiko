@@ -373,7 +373,7 @@ actual open class SkiaLayer internal constructor(
     private fun checkContentScale() {
         if (backedLayer.checkContentScale()) {
             notifyChange(PropertyKind.ContentScale)
-            redrawer?.syncSize() // setBounds not always called (for example when we change density on Linux
+            redrawer?.syncSize()
         }
     }
 
