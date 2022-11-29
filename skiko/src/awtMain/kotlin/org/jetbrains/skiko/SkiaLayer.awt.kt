@@ -83,6 +83,7 @@ actual open class SkiaLayer internal constructor(
                 //    For example, on macOs when we resize window or change DPI
                 //
                 // 3. to avoid double paint in one single frame, use needRedraw instead of redrawImmediately
+                this@SkiaLayer.checkContentScale()
                 redrawer?.needRedraw()
             }
 
@@ -351,11 +352,7 @@ actual open class SkiaLayer internal constructor(
 
     override fun paint(g: java.awt.Graphics) {
         super.paint(g)
-        if (backedLayer.checkContentScale()) {
-            notifyChange(PropertyKind.ContentScale)
-        }
-        redrawer?.syncSize() // setBounds not always called (for example when we change density on Linux
-
+        checkContentScale()
         // `paint` can be called when we already inside `draw` method.
         //
         // For example if we call some AWT function inside renderer.onRender,
@@ -366,6 +363,17 @@ actual open class SkiaLayer internal constructor(
             redrawer?.needRedraw()
         } else {
             redrawer?.redrawImmediately()
+        }
+    }
+
+    /*
+    In AWT there is no a change DPI event; so we should call this function when we expect that DPI maybe changed
+    We hope that call it on AWT/SWING `paint` and our update is enough
+     */
+    private fun checkContentScale() {
+        if (backedLayer.checkContentScale()) {
+            notifyChange(PropertyKind.ContentScale)
+            redrawer?.syncSize()
         }
     }
 
@@ -493,6 +501,8 @@ actual open class SkiaLayer internal constructor(
     internal fun update(nanoTime: Long) {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         check(!isDisposed) { "SkiaLayer is disposed" }
+
+        checkContentScale()
 
         FrameWatcher.nextFrame()
         fpsCounter?.tick()
