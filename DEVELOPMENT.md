@@ -78,21 +78,24 @@ Don't run any background tasks, click mouse, or press keys during the tests. Oth
 ```
 
 ### samples/SkiaJsSample with mavenLocal
-If page in browser will be empty, try to reload it.
+If the page in the browser is empty, try to reload it.
 ```bash
 ./gradlew publishToMavenLocal -p skiko -Pskiko.native.enabled=true -Pskiko.wasm.enabled=true &&\
 ./gradlew jsBrowserDevelopmentRun -p samples/SkiaJsSample -Pskiko.version=0.0.0-SNAPSHOT
 ```
 
 ### samples/SkiaJsSample with skikoCompositeBuild=true
-It means: includeBuild("skiko") with dependency substitution. It compiles faster.
+When you add `-DskikoCompositeBuild=true`, Skiko from [sources](https://github.com/JetBrains/skiko/tree/master/skiko) is
+used (without this property the maven artifact is used).
+Every time you change sources, they are automatically applied when you run `jsBrowserDevelopmentRun`.
+
 ```bash
 ./gradlew publishSkikoWasmRuntimePublicationToMavenLocal -p skiko -Pskiko.native.enabled=true -Pskiko.wasm.enabled=true &&\
 ./gradlew jsBrowserDevelopmentRun -p samples/SkiaJsSample -Pskiko.wasm.enabled=true -DskikoCompositeBuild=true -Pskiko.version=0.0.0-SNAPSHOT
 ```
 
 ### samples/SkiaMultiplatformSample JVM, Native and JS
-If page in browser will be empty, try to reload it.  
+If the page in the browser is empty, try to reload it.  
 ```bash
 ./gradlew publishToMavenLocal -p skiko -Pskiko.native.enabled=true -Pskiko.wasm.enabled=true &&\
 ./gradlew runAwt runNative jsBrowserDevelopmentRun -p samples/SkiaMultiplatformSample -Pskiko.version=0.0.0-SNAPSHOT
@@ -102,8 +105,11 @@ If page in browser will be empty, try to reload it.
 - Run iOS on simulator
 
 ### samples/SkiaMultiplatformSample JVM, Native and JS with skikoCompositeBuild=true
-It means: includeBuild("skiko") with dependency substitution. It compiles faster.  
-If page in browser will be empty, try to reload it.  
+When you add `-DskikoCompositeBuild=true`, Skiko from [sources](https://github.com/JetBrains/skiko/tree/master/skiko) is
+used (without this property the maven artifact is used).
+Every time you change sources, they are automatically applied when you run `runAwt runNative jsBrowserDevelopmentRun`.
+  
+If the page in the browser is empty, try to reload it.  
 ```bash
 ./gradlew publishAllSkikoJvmRuntimeToMavenLocal publishSkikoWasmRuntimePublicationToMavenLocal -p skiko -Pskiko.native.enabled=true -Pskiko.wasm.enabled=true &&\
 ./gradlew runAwt runNative jsBrowserDevelopmentRun -p samples/SkiaMultiplatformSample -Pskiko.native.enabled=true -Pskiko.wasm.enabled=true -DskikoCompositeBuild=true -Pskiko.version=0.0.0-SNAPSHOT

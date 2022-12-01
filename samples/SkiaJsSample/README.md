@@ -2,7 +2,7 @@
 
 ## Simple run
 
-If page in browser will be empty, try to reload it.  
+If the page in the browser is empty, try to reload it.  
 `./gradlew jsBrowserRun`
 
 ## Advanced run for contributors
