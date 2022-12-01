@@ -223,7 +223,7 @@ private external fun _nGetFontFamilies(ptr: NativePointer): NativePointer
 private external fun StrutStyle_nSetFontFamilies(ptr: NativePointer, families: InteropPointer, familiesCount: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nGetFontStyle")
-private external fun _nGetFontStyle(ptr: NativePointer, fontStyleData: InteropPointer): Int
+private external fun _nGetFontStyle(ptr: NativePointer, fontStyleData: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetFontStyle")
 private external fun _nSetFontStyle(ptr: NativePointer, value: Int)

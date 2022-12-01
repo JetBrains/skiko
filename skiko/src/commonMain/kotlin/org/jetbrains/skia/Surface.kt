@@ -277,14 +277,16 @@ class Surface : RefCnt {
         ): Surface? {
             return try {
                 Stats.onNativeCall()
-                val ptr = _nMakeFromBackendRenderTarget(
-                    getPtr(context),
-                    getPtr(rt),
-                    origin.ordinal,
-                    colorFormat.ordinal,
-                    getPtr(colorSpace),
-                    surfaceProps
-                )
+                val ptr = interopScope {
+                    _nMakeFromBackendRenderTarget(
+                        getPtr(context),
+                        getPtr(rt),
+                        origin.ordinal,
+                        colorFormat.ordinal,
+                        getPtr(colorSpace),
+                        toInterop(surfaceProps?.packToIntArray())
+                    )
+                }
                 if (ptr == NullPointer)
                     null
                 else
@@ -307,15 +309,17 @@ class Surface : RefCnt {
         ): Surface {
             return try {
                 Stats.onNativeCall()
-                val ptr = _nMakeFromMTKView(
-                    getPtr(context),
-                    mtkViewPtr,
-                    origin.ordinal,
-                    sampleCount,
-                    colorFormat.ordinal,
-                    getPtr(colorSpace),
-                    surfaceProps
-                )
+                val ptr = interopScope {
+                    _nMakeFromMTKView(
+                        getPtr(context),
+                        mtkViewPtr,
+                        origin.ordinal,
+                        sampleCount,
+                        colorFormat.ordinal,
+                        getPtr(colorSpace),
+                        toInterop(surfaceProps?.packToIntArray())
+                    )
+                }
                 require(ptr != NullPointer) {
                     "Failed Surface.makeFromMTKView($context, $mtkViewPtr $origin, $colorFormat, $surfaceProps)"
                 }
@@ -489,19 +493,21 @@ class Surface : RefCnt {
         ): Surface {
             return try {
                 Stats.onNativeCall()
-                val ptr = _nMakeRenderTarget(
-                    getPtr(context),
-                    budgeted,
-                    imageInfo.width,
-                    imageInfo.height,
-                    imageInfo.colorInfo.colorType.ordinal,
-                    imageInfo.colorInfo.alphaType.ordinal,
-                    getPtr(imageInfo.colorInfo.colorSpace),
-                    sampleCount,
-                    origin.ordinal,
-                    surfaceProps,
-                    shouldCreateWithMips
-                )
+                val ptr = interopScope {
+                    _nMakeRenderTarget(
+                        getPtr(context),
+                        budgeted,
+                        imageInfo.width,
+                        imageInfo.height,
+                        imageInfo.colorInfo.colorType.ordinal,
+                        imageInfo.colorInfo.alphaType.ordinal,
+                        getPtr(imageInfo.colorInfo.colorSpace),
+                        sampleCount,
+                        origin.ordinal,
+                        toInterop(surfaceProps?.packToIntArray()),
+                        shouldCreateWithMips
+                    )
+                }
                 require(ptr != NullPointer) {
                     "Failed Surface.makeRenderTarget($context, $budgeted, $imageInfo, $sampleCount, $origin, $surfaceProps, $shouldCreateWithMips)"
                 }
@@ -1066,9 +1072,8 @@ private external fun _nMakeFromBackendRenderTarget(
     surfaceOrigin: Int,
     colorType: Int,
     colorSpacePtr: NativePointer,
-    surfaceProps: SurfaceProps?
+    surfaceProps: InteropPointer
 ): NativePointer
-
 
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeFromMTKView")
 private external fun _nMakeFromMTKView(
@@ -1078,9 +1083,8 @@ private external fun _nMakeFromMTKView(
     sampleCount: Int,
     colorType: Int,
     colorSpacePtr: NativePointer,
-    surfaceProps: SurfaceProps?
+    surfaceProps: InteropPointer
 ): NativePointer
-
 
 @ExternalSymbolName("org_jetbrains_skia_Surface__1nMakeRenderTarget")
 private external fun _nMakeRenderTarget(
@@ -1093,7 +1097,7 @@ private external fun _nMakeRenderTarget(
     colorSpacePtr: NativePointer,
     sampleCount: Int,
     surfaceOrigin: Int,
-    surfaceProps: SurfaceProps?,
+    surfaceProps: InteropPointer,
     shouldCreateWithMips: Boolean
 ): NativePointer
 

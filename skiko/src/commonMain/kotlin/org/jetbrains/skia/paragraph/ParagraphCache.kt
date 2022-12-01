@@ -61,7 +61,7 @@ class ParagraphCache internal constructor(owner: FontCollection, ptr: NativePoin
         try {
             _validate()
             Stats.onNativeCall()
-            _nPrintStatistics(_ptr)
+            _nPrintStatistics(_ptr, NullPointer)
         } finally {
             reachabilityBarrier(this)
         }
@@ -113,7 +113,7 @@ private external fun _nUpdateParagraph(ptr: NativePointer, paragraphPtr: NativeP
 private external fun _nFindParagraph(ptr: NativePointer, paragraphPtr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphCache__1nPrintStatistics")
-private external fun _nPrintStatistics(ptr: NativePointer)
+private external fun _nPrintStatistics(ptr: NativePointer, paragraphPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphCache__1nSetEnabled")
 private external fun _nSetEnabled(ptr: NativePointer, value: Boolean)

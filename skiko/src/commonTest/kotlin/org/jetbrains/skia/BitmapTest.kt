@@ -70,6 +70,7 @@ class BitmapTest {
         assertTrue(bitmap.rowBytes > 0)
         assertEquals(5 * bitmap.rowBytes, result.size)
     }
+
     @Test
     fun canPeekPixels() = runTest {
         val bitmap = Bitmap()
@@ -129,5 +130,20 @@ class BitmapTest {
         setArray.forEachIndexed { ix, value ->
             assertEquals(value, dataBytes[ix])
         }
+    }
+
+    @Test
+    fun canSetOrGetPixelRefOrigin() = runTest {
+        val source = Bitmap()
+        source.allocPixels(ImageInfo.makeS32(15, 15, ColorAlphaType.OPAQUE))
+        val subset = Bitmap()
+        source.extractSubset(subset, IRect.makeXYWH(5, 5, 10, 10))
+        val sourceOrigin = source.pixelRefOrigin
+        val subsetOrigin = subset.pixelRefOrigin
+
+        assertEquals(sourceOrigin.x, 0)
+        assertEquals(sourceOrigin.y, 0)
+        assertEquals(subsetOrigin.x, 5)
+        assertEquals(subsetOrigin.y, 5)
     }
 }

@@ -161,11 +161,18 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BitmapKt__1nGetPixelR
     return reinterpret_cast<jlong>(pixelRef);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_BitmapKt__1nGetPixelRefOrigin
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BitmapKt__1nGetPixelRefOriginX
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(ptr));
     SkIPoint origin = instance->pixelRefOrigin();
-    return packIPoint(origin);
+    return origin.x();
+}
+
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_BitmapKt__1nGetPixelRefOriginY
+  (JNIEnv* env, jclass jclass, jlong ptr) {
+    SkBitmap* instance = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(ptr));
+    SkIPoint origin = instance->pixelRefOrigin();
+    return origin.y();
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_BitmapKt__1nSetPixelRef

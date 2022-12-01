@@ -93,9 +93,7 @@ class CanvasTest {
     private suspend fun fontInter36() =
         Font(Typeface.makeFromResource("./fonts/Inter-Hinted-Regular.ttf"), 36f)
 
-    // TODO(karpovich): enable for all platforms
-    // native and js don't work: resulting image has no changed pixels (typeface implementations required)
-    @Test @SkipNativeTarget @SkipJsTarget
+    @Test
     fun drawString() = runTest {
         val surface = Surface.makeRasterN32Premul(100, 100)
 

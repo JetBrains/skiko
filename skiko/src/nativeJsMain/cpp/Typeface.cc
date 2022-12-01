@@ -177,7 +177,7 @@ SKIKO_EXPORT KInt org_jetbrains_skia_Typeface__1nGetUnitsPerEm
 
 
 SKIKO_EXPORT bool org_jetbrains_skia_Typeface__1nGetKerningPairAdjustments
-  (KNativePointer ptr, KShort* glyphs, KInt count, KInt* res) {
+  (KNativePointer ptr, KInteropPointer glyphs, KInt count, KInt* res) {
   SkTypeface* instance = reinterpret_cast<SkTypeface*>(ptr);
   if (count > 0) {
       std::vector<int> adjustments(count);

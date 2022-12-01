@@ -243,7 +243,7 @@ SKIKO_EXPORT void org_jetbrains_skia_paragraph_TextStyle__1nSetHeight
     instance->setHeight(height);
 }
 
-SKIKO_EXPORT KFloat org_jetbrains_skia_paragraph_TextStyle__1nGetHalfLeading
+SKIKO_EXPORT KBoolean org_jetbrains_skia_paragraph_TextStyle__1nGetHalfLeading
   (KNativePointer ptr) {
     TextStyle* instance = reinterpret_cast<TextStyle*>(ptr);
     return instance->getHalfLeading();

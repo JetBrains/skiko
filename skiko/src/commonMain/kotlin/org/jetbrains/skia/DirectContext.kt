@@ -102,7 +102,7 @@ class DirectContext internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     fun abandon() {
         try {
             Stats.onNativeCall()
-            _nAbandon(_ptr)
+            _nAbandon(_ptr, 0)
         } finally {
             reachabilityBarrier(this)
         }
@@ -114,7 +114,7 @@ fun <R> DirectContext.useContext(block: (ctx: DirectContext) -> R): R = use {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nFlush")
-private external fun DirectContext_nFlush(ptr: NativePointer): NativePointer
+private external fun DirectContext_nFlush(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeGL")
 private external fun _nMakeGL(): NativePointer
@@ -126,10 +126,10 @@ private external fun _nMakeMetal(devicePtr: NativePointer, queuePtr: NativePoint
 private external fun _nMakeDirect3D(adapterPtr: NativePointer, devicePtr: NativePointer, queuePtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nSubmit")
-private external fun _nSubmit(ptr: NativePointer, syncCpu: Boolean): NativePointer
+private external fun _nSubmit(ptr: NativePointer, syncCpu: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nReset")
 private external fun _nReset(ptr: NativePointer, flags: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nAbandon")
-private external fun _nAbandon(ptr: NativePointer)
+private external fun _nAbandon(ptr: NativePointer, flags: Int)

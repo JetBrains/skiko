@@ -786,18 +786,25 @@ private external fun _nMakeMatrixConvolution(
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMatrixTransform")
 private external fun _nMakeMatrixTransform(matrix: InteropPointer, samplingModeVal1: Int, samplingModeVal2: Int, input: NativePointer): NativePointer
+
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMerge")
 private external fun _nMakeMerge(filters: InteropPointer, filtersLength: Int, crop: InteropPointer): NativePointer
+
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeOffset")
 private external fun _nMakeOffset(dx: Float, dy: Float, input: NativePointer, crop: InteropPointer): NativePointer
+
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakePaint")
 private external fun _nMakePaint(paint: NativePointer, crop: InteropPointer): NativePointer
+
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakePicture")
 private external fun _nMakePicture(picture: NativePointer, l: Float, t: Float, r: Float, b: Float): NativePointer
+
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeRuntimeShader")
 private external fun _nMakeRuntimeShader(runtimeShaderBuilderPtr: NativePointer, childShaderName: InteropPointer, input: NativePointer): NativePointer
+
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeRuntimeShaderFromArray")
 private external fun _nMakeRuntimeShaderFromArray(runtimeShaderBuilderPtr: NativePointer, childShaderNames: InteropPointer, inputs: InteropPointer, inputLength: Int): NativePointer
+
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeTile")
 private external fun _nMakeTile(
     l0: Float,
@@ -813,8 +820,10 @@ private external fun _nMakeTile(
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDilate")
 private external fun _nMakeDilate(rx: Float, ry: Float, input: NativePointer, crop: InteropPointer): NativePointer
+
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeErode")
 private external fun _nMakeErode(rx: Float, ry: Float, input: NativePointer, crop: InteropPointer): NativePointer
+
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDistantLitDiffuse")
 private external fun _nMakeDistantLitDiffuse(
     x: Float,

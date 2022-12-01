@@ -83,7 +83,7 @@ open class FontMgr : RefCnt {
     fun matchFamilyStyle(familyName: String?, style: FontStyle): Typeface? {
         return try {
             Stats.onNativeCall()
-            val ptr = _nMatchFamilyStyle(_ptr, familyName, style._value)
+            val ptr = interopScope { _nMatchFamilyStyle(_ptr, toInterop(familyName), style._value) }
             if (ptr == NullPointer) null else Typeface(ptr)
         } finally {
             reachabilityBarrier(this)
@@ -116,12 +116,21 @@ open class FontMgr : RefCnt {
     fun matchFamilyStyleCharacter(
         familyName: String?,
         style: FontStyle,
-        bcp47: Array<String?>?,
+        bcp47: Array<String>?,
         character: Int
     ): Typeface? {
         return try {
             Stats.onNativeCall()
-            val ptr = _nMatchFamilyStyleCharacter(_ptr, familyName, style._value, bcp47, bcp47?.size ?: 0, character)
+            val ptr = interopScope {
+                _nMatchFamilyStyleCharacter(
+                    _ptr,
+                    toInterop(familyName),
+                    style._value,
+                    toInterop(bcp47 ?: emptyArray()),
+                    bcp47?.size ?: 0,
+                    character
+                )
+            }
             if (ptr == NullPointer) null else Typeface(ptr)
         } finally {
             reachabilityBarrier(this)
@@ -131,7 +140,7 @@ open class FontMgr : RefCnt {
     fun matchFamiliesStyleCharacter(
         families: Array<String?>,
         style: FontStyle,
-        bcp47: Array<String?>?,
+        bcp47: Array<String>?,
         character: Int
     ): Typeface? {
         for (family in families) {
@@ -177,14 +186,14 @@ private external fun _nMakeStyleSet(ptr: NativePointer, index: Int): NativePoint
 private external fun _nMatchFamily(ptr: NativePointer, familyName: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMatchFamilyStyle")
-private external fun _nMatchFamilyStyle(ptr: NativePointer, familyName: String?, fontStyle: Int): NativePointer
+private external fun _nMatchFamilyStyle(ptr: NativePointer, familyName: InteropPointer, fontStyle: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_FontMgr__1nMatchFamilyStyleCharacter")
 private external fun _nMatchFamilyStyleCharacter(
     ptr: NativePointer,
-    familyName: String?,
+    familyName: InteropPointer,
     fontStyle: Int,
-    bcp47: Array<String?>?,
+    bcp47: InteropPointer,
     bcp47size: Int,
     character: Int
 ): NativePointer

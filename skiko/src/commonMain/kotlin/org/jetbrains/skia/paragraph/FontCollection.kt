@@ -27,7 +27,7 @@ class FontCollection internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     fun setAssetFontManager(fontMgr: FontMgr?): FontCollection {
         return try {
             Stats.onNativeCall()
-            _nSetAssetFontManager(_ptr, getPtr(fontMgr))
+            _nSetAssetFontManager(_ptr, getPtr(fontMgr), NullPointer)
             this
         } finally {
             reachabilityBarrier(fontMgr)
@@ -39,7 +39,8 @@ class FontCollection internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             Stats.onNativeCall()
             _nSetDynamicFontManager(
                 _ptr,
-                getPtr(fontMgr)
+                getPtr(fontMgr),
+                NullPointer
             )
             this
         } finally {
@@ -50,7 +51,7 @@ class FontCollection internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     fun setTestFontManager(fontMgr: FontMgr?): FontCollection {
         return try {
             Stats.onNativeCall()
-            _nSetTestFontManager(_ptr, getPtr(fontMgr))
+            _nSetTestFontManager(_ptr, getPtr(fontMgr), NullPointer)
             this
         } finally {
             reachabilityBarrier(fontMgr)
@@ -143,16 +144,16 @@ private external fun _nMake(): NativePointer
 private external fun _nGetFontManagersCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nSetAssetFontManager")
-private external fun _nSetAssetFontManager(ptr: NativePointer, fontManagerPtr: NativePointer): NativePointer
+private external fun _nSetAssetFontManager(ptr: NativePointer, fontManagerPtr: NativePointer, defaultFamilyNameStr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nSetDynamicFontManager")
-private external fun _nSetDynamicFontManager(ptr: NativePointer, fontManagerPtr: NativePointer): NativePointer
+private external fun _nSetDynamicFontManager(ptr: NativePointer, fontManagerPtr: NativePointer, defaultFamilyNameStr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nSetTestFontManager")
-private external fun _nSetTestFontManager(ptr: NativePointer, fontManagerPtr: NativePointer): NativePointer
+private external fun _nSetTestFontManager(ptr: NativePointer, fontManagerPtr: NativePointer, defaultFamilyNameStr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nSetDefaultFontManager")
-private external fun _nSetDefaultFontManager(ptr: NativePointer, fontManagerPtr: NativePointer, defaultFamilyName: InteropPointer): NativePointer
+private external fun _nSetDefaultFontManager(ptr: NativePointer, fontManagerPtr: NativePointer, defaultFamilyName: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nGetFallbackManager")
 private external fun _nGetFallbackManager(ptr: NativePointer): NativePointer
@@ -167,7 +168,7 @@ private external fun _nDefaultFallbackChar(ptr: NativePointer, unicode: Int, fon
 private external fun _nDefaultFallback(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nSetEnableFallback")
-private external fun _nSetEnableFallback(ptr: NativePointer, value: Boolean): NativePointer
+private external fun _nSetEnableFallback(ptr: NativePointer, value: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_FontCollection__1nGetParagraphCache")
 private external fun _nGetParagraphCache(ptr: NativePointer): NativePointer

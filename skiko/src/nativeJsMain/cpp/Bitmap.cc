@@ -173,11 +173,18 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Bitmap__1nGetPixelRef
     return reinterpret_cast<KNativePointer>(pixelRef);
 }
 
-SKIKO_EXPORT KLong org_jetbrains_skia_Bitmap__1nGetPixelRefOrigin
+SKIKO_EXPORT KInt org_jetbrains_skia_Bitmap__1nGetPixelRefOriginX
   (KNativePointer ptr) {
     SkBitmap* instance = reinterpret_cast<SkBitmap*>((ptr));
     SkIPoint origin = instance->pixelRefOrigin();
-    return packIPoint(origin);
+    return origin.x();
+}
+
+SKIKO_EXPORT KInt org_jetbrains_skia_Bitmap__1nGetPixelRefOriginY
+  (KNativePointer ptr) {
+    SkBitmap* instance = reinterpret_cast<SkBitmap*>((ptr));
+    SkIPoint origin = instance->pixelRefOrigin();
+    return origin.y();
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_Bitmap__1nSetPixelRef
