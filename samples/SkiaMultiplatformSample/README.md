@@ -1,7 +1,6 @@
 # Skiko multiplatform sample
 
-## run on browser:
-If the page in the browser is empty, try to reload it.  
+## run on browser: 
 - `./gradlew jsBrowserRun`
 
 ## run desktop awt:
