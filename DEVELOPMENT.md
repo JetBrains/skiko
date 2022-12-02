@@ -1,7 +1,8 @@
 ## Building JVM bindings
 
 * Set JAVA_HOME to location of JDK, at least version 11
-* If you have **Apple silicon CPU (M1)**, better to use **X86** JDK architecture to compile JS target.
+* If you have **Apple silicon CPU (M1)**, and error with JS occurs `failed to install yarn`, 
+then you can try to use JDK with **X86** architecture.
 * `./gradlew :skiko:publishToMavenLocal` will build the artifact and publish it to local Maven repo
 
 To build with debug symbols and debug Skia build use `-Pskiko.debug=true` Gradle argument.
