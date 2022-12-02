@@ -40,7 +40,6 @@ class RuntimeEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 
 internal expect fun RuntimeEffect.Companion.makeFromResultPtr(ptr: NativePointer): RuntimeEffect
 
-
 @ExternalSymbolName("org_jetbrains_skia_RuntimeEffect__1nMakeShader")
 private external fun _nMakeShader(
     runtimeEffectPtr: NativePointer, uniformPtr: NativePointer, childrenPtrs: InteropPointer,

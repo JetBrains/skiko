@@ -469,7 +469,9 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
 
     fun drawString(s: String, x: Float, y: Float, font: Font?, paint: Paint): Canvas {
         Stats.onNativeCall()
-        _nDrawString(_ptr, s, x, y, getPtr(font), getPtr(paint))
+        interopScope {
+            _nDrawString(_ptr, toInterop(s), x, y, getPtr(font), getPtr(paint))
+        }
         reachabilityBarrier(font)
         reachabilityBarrier(paint)
         return this
@@ -1345,14 +1347,13 @@ private external fun _nDrawImageNine(
 private external fun _nDrawRegion(ptr: NativePointer, nativeRegion: NativePointer, paintPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawString")
-private external fun _nDrawString(ptr: NativePointer, string: String?, x: Float, y: Float, font: NativePointer, paint: NativePointer)
+private external fun _nDrawString(ptr: NativePointer, string: InteropPointer, x: Float, y: Float, font: NativePointer, paint: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawTextBlob")
 private external fun _nDrawTextBlob(ptr: NativePointer, blob: NativePointer, x: Float, y: Float, paint: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawPicture")
 private external fun _nDrawPicture(ptr: NativePointer, picturePtr: NativePointer, matrix: InteropPointer, paintPtr: NativePointer)
-
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawVertices")
 private external fun _nDrawVertices(
@@ -1408,7 +1409,6 @@ private external fun _nClipRect(
     mode: Int,
     antiAlias: Boolean
 )
-
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nClipRRect")
 private external fun _nClipRRect(

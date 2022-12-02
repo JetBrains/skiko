@@ -572,7 +572,7 @@ class Font : Managed {
     val spacing: Float
         get() = try {
             Stats.onNativeCall()
-            _nGetSpacing(_ptr)
+            _nGetSpacing(_ptr, NullPointer)
         } finally {
             reachabilityBarrier(this)
         }
@@ -716,4 +716,4 @@ private external fun _nGetPaths(ptr: NativePointer, glyphs: InteropPointer, coun
 private external fun _nGetMetrics(ptr: NativePointer, metrics: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetSpacing")
-private external fun _nGetSpacing(ptr: NativePointer): Float
+private external fun _nGetSpacing(ptr: NativePointer, glyphsArr: NativePointer): Float

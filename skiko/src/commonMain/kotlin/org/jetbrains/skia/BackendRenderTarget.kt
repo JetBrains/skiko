@@ -77,7 +77,7 @@ private external fun _nMakeGL(width: Int, height: Int, sampleCnt: Int, stencilBi
 @ExternalSymbolName("BackendRenderTarget_nMakeMetal")
 private external fun _nMakeMetal(width: Int, height: Int, texturePtr: NativePointer): NativePointer
 
-@ExternalSymbolName("BackendRenderTarget_nMakeDirect3D")
+@ExternalSymbolName("BackendRenderTarget_MakeDirect3D")
 private external fun _nMakeDirect3D(
     width: Int,
     height: Int,

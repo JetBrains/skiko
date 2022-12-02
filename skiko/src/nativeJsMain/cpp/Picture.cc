@@ -70,10 +70,10 @@ SKIKO_EXPORT KInt org_jetbrains_skia_Picture__1nGetApproximateOpCount
     return instance->approximateOpCount();
 }
 
-SKIKO_EXPORT KLong org_jetbrains_skia_Picture__1nGetApproximateBytesUsed
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_Picture__1nGetApproximateBytesUsed
   (KNativePointer ptr) {
     SkPicture* instance = reinterpret_cast<SkPicture*>((ptr));
-    return instance->approximateBytesUsed();
+    return reinterpret_cast<KNativePointer>(instance->approximateBytesUsed());
 }
 
 

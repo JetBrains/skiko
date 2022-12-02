@@ -26,7 +26,7 @@ class ParagraphBuilder(style: ParagraphStyle?, fc: FontCollection?) :
 
     fun popStyle(): ParagraphBuilder {
         Stats.onNativeCall()
-        _nPopStyle(_ptr)
+        _nPopStyle(_ptr, NullPointer)
         return this
     }
 
@@ -84,7 +84,7 @@ private external fun _nMake(paragraphStylePtr: NativePointer, fontCollectionPtr:
 private external fun _nPushStyle(ptr: NativePointer, textStylePtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nPopStyle")
-private external fun _nPopStyle(ptr: NativePointer)
+private external fun _nPopStyle(ptr: NativePointer, textStylePtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nAddText")
 private external fun _nAddText(ptr: NativePointer, text: InteropPointer)

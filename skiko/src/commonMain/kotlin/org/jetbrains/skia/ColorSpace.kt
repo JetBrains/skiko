@@ -94,8 +94,7 @@ class ColorSpace : Managed {
 private external fun ColorSpace_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ColorSpace__nConvert")
-private external fun _nConvert(
-    fromPtr: NativePointer, toPtr: NativePointer, r: Float, g: Float, b: Float, a: Float, result: InteropPointer)
+private external fun _nConvert(fromPtr: NativePointer, toPtr: NativePointer, r: Float, g: Float, b: Float, a: Float, result: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nMakeSRGB")
 private external fun _nMakeSRGB(): NativePointer

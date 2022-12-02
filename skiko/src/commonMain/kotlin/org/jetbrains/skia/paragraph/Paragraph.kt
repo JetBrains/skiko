@@ -306,7 +306,7 @@ private external fun _nDidExceedMaxLines(ptr: NativePointer): Boolean
 private external fun _nLayout(ptr: NativePointer, width: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nPaint")
-private external fun _nPaint(ptr: NativePointer, canvasPtr: NativePointer, x: Float, y: Float): NativePointer
+private external fun _nPaint(ptr: NativePointer, canvasPtr: NativePointer, x: Float, y: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_Paragraph__1nGetRectsForRange")
 private external fun _nGetRectsForRange(

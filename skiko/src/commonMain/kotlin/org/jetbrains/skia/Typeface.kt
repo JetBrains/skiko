@@ -342,7 +342,7 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             if (glyphs != null) {
                 if (glyphs.size > 0) {
                     withNullableResult(IntArray(glyphs.size)) {
-                        _nGetKerningPairAdjustments(_ptr, glyphs, glyphs.size, it)
+                        _nGetKerningPairAdjustments(_ptr, toInterop(glyphs), glyphs.size, it)
                     }
                 } else null
             } else null
@@ -485,7 +485,7 @@ private external fun _nGetUnitsPerEm(ptr: NativePointer): Int
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetKerningPairAdjustments")
 private external fun _nGetKerningPairAdjustments(
     ptr: NativePointer,
-    glyphs: ShortArray,
+    glyphs: InteropPointer,
     count: Int,
     adjustments: InteropPointer
 ): Boolean

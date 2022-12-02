@@ -647,8 +647,9 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
     val pixelRefOrigin: IPoint
         get() = try {
             Stats.onNativeCall()
-            val res = _nGetPixelRefOrigin(_ptr)
-            toIPoint(res)
+            val resX = _nGetPixelRefOriginX(_ptr)
+            val resY = _nGetPixelRefOriginY(_ptr)
+            IPoint(resX, resY)
         } finally {
             reachabilityBarrier(this)
         }
@@ -1154,8 +1155,11 @@ private external fun _nAllocPixels(ptr: NativePointer): Boolean
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetPixelRef")
 private external fun _nGetPixelRef(ptr: NativePointer): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetPixelRefOrigin")
-private external fun _nGetPixelRefOrigin(ptr: NativePointer): Long
+@ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetPixelRefOriginX")
+private external fun _nGetPixelRefOriginX(ptr: NativePointer): Int
+
+@ExternalSymbolName("org_jetbrains_skia_Bitmap__1nGetPixelRefOriginY")
+private external fun _nGetPixelRefOriginY(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nSetPixelRef")
 private external fun _nSetPixelRef(ptr: NativePointer, pixelRefPtr: NativePointer, dx: Int, dy: Int)

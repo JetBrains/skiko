@@ -277,7 +277,7 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
     var isHalfLeading: Boolean
         get() = try {
             Stats.onNativeCall()
-            TextStyle_nIsHalfLeading(_ptr)
+            TextStyle_nGetHalfLeading(_ptr)
         } finally {
             reachabilityBarrier(this)
         }
@@ -465,8 +465,8 @@ private external fun TextStyle_nGetHeight(ptr: NativePointer): Float
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetHeight")
 private external fun TextStyle_nSetHeight(ptr: NativePointer, override: Boolean, height: Float)
 
-@ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nIsHalfLeading")
-private external fun TextStyle_nIsHalfLeading(ptr: NativePointer): Boolean
+@ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nGetHalfLeading")
+private external fun TextStyle_nGetHalfLeading(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextStyle__1nSetHalfLeading")
 private external fun TextStyle_nSetHalfLeading(ptr: NativePointer, value: Boolean)
