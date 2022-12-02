@@ -44,7 +44,7 @@ i.e. something like this
         else -> error("Unsupported arch: $osArch")
     }
 
-    val version = "0.5.3"
+    val version = "0.7.41"
     val target = "${targetOs}-${targetArch}"
     dependencies {
         implementation("org.jetbrains.skiko:skiko-awt-runtime-$target:$version")
@@ -126,6 +126,3 @@ class SkikoAppDelegate : UIResponder, UIApplicationDelegateProtocol {
 }
 ```
 See this [sample](/samples/SkiaMultiplatformSample) for complete example.
-
-To use latest development snapshot use version `0.0.0-SNAPSHOT`.
-

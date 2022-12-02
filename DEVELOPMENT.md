@@ -1,6 +1,8 @@
 ## Building JVM bindings
 
 * Set JAVA_HOME to location of JDK, at least version 11
+* If you have **Apple silicon CPU (M1)**, and error with JS occurs `failed to install yarn`, 
+then you can try to use JDK with **X86** architecture.
 * `./gradlew :skiko:publishToMavenLocal` will build the artifact and publish it to local Maven repo
 
 To build with debug symbols and debug Skia build use `-Pskiko.debug=true` Gradle argument.
@@ -43,6 +45,81 @@ For example, if we want to include UI tests when we test JVM target, call this:
 ```
 Don't run any background tasks, click mouse, or press keys during the tests. Otherwise, they probably fail.
 
-#### Run samples
-- First follow the instruction here: [Building JVM bindings](#building-jvm-bindings)
-- `./gradlew :SkiaAwtSample:run`
+## Run samples
+* First follow the instruction here: [Building JVM bindings](#building-jvm-bindings)
+### samples/SkiaAwtSample
+```bash
+./gradlew :skiko:publishAllSkikoJvmRuntimeToMavenLocal &&\
+./gradlew :SkiaAwtSample:run -Pskiko.version=0.0.0-SNAPSHOT
+```
+ - skiko.fps.longFrames.show=true
+```bash
+./gradlew :skiko:publishAllSkikoJvmRuntimeToMavenLocal &&\
+./gradlew :SkiaAwtSample:run -Dskiko.fps.longFrames.show=true -Pskiko.version=0.0.0-SNAPSHOT
+```
+ - skiko.renderApi=SOFTWARE
+```bash
+./gradlew :skiko:publishAllSkikoJvmRuntimeToMavenLocal &&\
+./gradlew :SkiaAwtSample:run -Dskiko.renderApi=SOFTWARE -Pskiko.version=0.0.0-SNAPSHOT
+```
+ - skiko.vsync.enabled=false
+```bash
+./gradlew :skiko:publishAllSkikoJvmRuntimeToMavenLocal &&\
+./gradlew :SkiaAwtSample:run -Dskiko.vsync.enabled=false -Pskiko.version=0.0.0-SNAPSHOT
+```
+ - skiko.transparency=true
+```bash
+./gradlew :skiko:publishAllSkikoJvmRuntimeToMavenLocal &&\
+./gradlew :SkiaAwtSample:run -Dskiko.transparency=true -Pskiko.version=0.0.0-SNAPSHOT
+```
+ - skiko.swing.interop=true
+```bash
+./gradlew :skiko:publishAllSkikoJvmRuntimeToMavenLocal &&\
+./gradlew :SkiaAwtSample:run -Dskiko.swing.interop=true -Pskiko.version=0.0.0-SNAPSHOT
+```
+
+### samples/SkiaJsSample with mavenLocal
+```bash
+./gradlew publishToMavenLocal -p skiko -Pskiko.native.enabled=true -Pskiko.wasm.enabled=true &&\
+./gradlew jsBrowserDevelopmentRun -p samples/SkiaJsSample -Pskiko.version=0.0.0-SNAPSHOT
+```
+
+### samples/SkiaJsSample with skikoCompositeBuild=true
+When you add `-DskikoCompositeBuild=true`, Skiko from [sources](https://github.com/JetBrains/skiko/tree/master/skiko) is
+used (without this property the maven artifact is used).
+Every time you change sources, they are automatically applied when you run `jsBrowserDevelopmentRun`.
+
+```bash
+./gradlew publishSkikoWasmRuntimePublicationToMavenLocal -p skiko -Pskiko.native.enabled=true -Pskiko.wasm.enabled=true &&\
+./gradlew jsBrowserDevelopmentRun -p samples/SkiaJsSample -Pskiko.wasm.enabled=true -DskikoCompositeBuild=true -Pskiko.version=0.0.0-SNAPSHOT
+```
+
+### samples/SkiaMultiplatformSample JVM, Native and JS 
+```bash
+./gradlew publishToMavenLocal -p skiko -Pskiko.native.enabled=true -Pskiko.wasm.enabled=true &&\
+./gradlew runAwt runNative jsBrowserDevelopmentRun -p samples/SkiaMultiplatformSample -Pskiko.version=0.0.0-SNAPSHOT
+```
+#### Run iOS
+- Open SkiaMultiplatformSample project in AppCode with KMM plugin.
+- Run iOS on simulator
+
+### samples/SkiaMultiplatformSample JVM, Native and JS with skikoCompositeBuild=true
+When you add `-DskikoCompositeBuild=true`, Skiko from [sources](https://github.com/JetBrains/skiko/tree/master/skiko) is
+used (without this property the maven artifact is used).
+Every time you change sources, they are automatically applied when you run `runAwt runNative jsBrowserDevelopmentRun`.
+   
+```bash
+./gradlew publishAllSkikoJvmRuntimeToMavenLocal publishSkikoWasmRuntimePublicationToMavenLocal -p skiko -Pskiko.native.enabled=true -Pskiko.wasm.enabled=true &&\
+./gradlew runAwt runNative jsBrowserDevelopmentRun -p samples/SkiaMultiplatformSample -Pskiko.native.enabled=true -Pskiko.wasm.enabled=true -DskikoCompositeBuild=true -Pskiko.version=0.0.0-SNAPSHOT
+```
+
+### samples/SkiaAndroidSample
+ - Download Android NDK (Side by side)  
+![install-android-ndk.png](install-android-ndk.png)
+ - Add local.properties with key `sdk.dir=...`
+ - Connect Android device or emulator
+```bash
+./gradlew publishToMavenLocal -p skiko -Pskiko.android.enabled=true &&\
+./gradlew installDebug -p samples/SkiaAndroidSample -Pskiko.android.enabled=true -Pskiko.version=0.0.0-SNAPSHOT ||\
+./gradlew assembleDebug -p samples/SkiaAndroidSample -Pskiko.android.enabled=true -Pskiko.version=0.0.0-SNAPSHOT
+```

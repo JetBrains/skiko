@@ -1,16 +1,16 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="test" type="GradleRunConfiguration" factoryName="Gradle">
+  <configuration default="false" name="SkiaAwtSample (without vsync)" type="GradleRunConfiguration" factoryName="Gradle">
     <ExternalSystemSettings>
       <option name="executionName" />
       <option name="externalProjectPath" value="$PROJECT_DIR$/samples/SkiaAwtSample" />
       <option name="externalSystemIdString" value="GRADLE" />
-      <option name="scriptParameters" value="" />
+      <option name="scriptParameters" value="-Dskiko.vsync.enabled=false" />
       <option name="taskDescriptions">
         <list />
       </option>
       <option name="taskNames">
         <list>
-          <option value="test" />
+          <option value="run" />
         </list>
       </option>
       <option name="vmOptions" value="" />
