@@ -103,24 +103,26 @@ jobs:
       - run: |
           # Test Linux AWT
           printJstackInBackground() {
+            #TODO Remove when the issue https://github.com/JetBrains/skiko/issues/629 is fixed
             # Temp function to print jstack stacktrace every 60 seconds
             # Pay attention to org.jetbrains.skiko.redrawer.LinuxSoftwareRedrawer.dispose(LinuxSoftwareRedrawer.kt:27)
             while [ 0 ]
               do
+                sleep 60
                 echo "--------------------------------------------------------------------------"
+                echo "--------------------------jstack result:----------------------------------"
                 echo "ps aux | grep java, result:"
                 ps aux | grep java
                 ps aux | grep java | grep jdk -i | awk '{print $2}' | while read pid; do
                    jstack $pid
                 done
                 echo "--------------------------------------------------------------------------"
-                sleep 60
               done
           }
           printJstackInBackground &
           export DISPLAY=:0
           ./gradlew --no-daemon --stacktrace --info -Pskiko.native.enabled=true -Pkotlin.native.cacheKind.linuxX64=none -Pskiko.test.onci=true :skiko:awtTest
-        timeout-minutes: 15
+        timeout-minutes: 25
       - env:
           ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
         run: |
