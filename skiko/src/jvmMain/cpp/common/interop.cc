@@ -861,27 +861,6 @@ namespace skija {
     }
 
     namespace SurfaceProps {
-        jmethodID _getFlags;
-        jmethodID _getPixelGeometryOrdinal;
-
-        void onLoad(JNIEnv* env) {
-            jclass cls = env->FindClass("org/jetbrains/skia/SurfaceProps");
-            _getFlags = env->GetMethodID(cls, "_getFlags", "()I");
-            _getPixelGeometryOrdinal = env->GetMethodID(cls, "_getPixelGeometryOrdinal", "()I");
-        }
-
-        std::unique_ptr<SkSurfaceProps> toSkSurfaceProps(JNIEnv* env, jobject surfacePropsObj) {
-            if (surfacePropsObj == nullptr)
-                return std::unique_ptr<SkSurfaceProps>(nullptr);
-            uint32_t flags = static_cast<uint32_t>(env->CallIntMethod(surfacePropsObj, _getFlags));
-            if (java::lang::Throwable::exceptionThrown(env))
-                std::unique_ptr<SkSurfaceProps>(nullptr);
-            SkPixelGeometry geom = static_cast<SkPixelGeometry>(env->CallIntMethod(surfacePropsObj, _getPixelGeometryOrdinal));
-            if (java::lang::Throwable::exceptionThrown(env))
-                std::unique_ptr<SkSurfaceProps>(nullptr);
-            return std::make_unique<SkSurfaceProps>(flags, geom);
-        }
-
         std::unique_ptr<SkSurfaceProps> toSkSurfaceProps(JNIEnv* env, jintArray surfacePropsInts) {
             if (surfacePropsInts == nullptr) {
                 return std::unique_ptr<SkSurfaceProps>(nullptr);
@@ -932,7 +911,6 @@ namespace skija {
         Rect::onLoad(env);
         RRect::onLoad(env);
         RSXform::onLoad(env);
-        SurfaceProps::onLoad(env);
 
         impl::Native::onLoad(env);
     }

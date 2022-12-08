@@ -315,10 +315,6 @@ namespace skija {
     }
 
     namespace SurfaceProps {
-        extern jmethodID _getFlags;
-        extern jmethodID _getPixelGeometryOrdinal;
-        void onLoad(JNIEnv* env);
-        std::unique_ptr<SkSurfaceProps> toSkSurfaceProps(JNIEnv* env, jobject surfacePropsObj);
         std::unique_ptr<SkSurfaceProps> toSkSurfaceProps(JNIEnv* env, jintArray surfacePropsInts);
     }
 
