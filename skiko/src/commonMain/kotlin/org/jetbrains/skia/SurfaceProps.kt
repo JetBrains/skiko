@@ -6,7 +6,6 @@ class SurfaceProps constructor(
 ) {
     constructor(geo: PixelGeometry) : this(false, geo)
 
-    // Used from JNI code.
     private fun _getPixelGeometryOrdinal(): Int {
         return pixelGeometry.ordinal
     }
