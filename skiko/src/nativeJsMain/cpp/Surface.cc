@@ -75,14 +75,14 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeRasterN32Premul
 
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeFromBackendRenderTarget
-  (KNativePointer pContext, KNativePointer pBackendRenderTarget, KInt surfaceOrigin, KInt colorType, KNativePointer colorSpacePtr, KInteropPointer surfacePropsObj) {
+  (KNativePointer pContext, KNativePointer pBackendRenderTarget, KInt surfaceOrigin, KInt colorType, KNativePointer colorSpacePtr, KInteropPointer surfacePropsInts) {
     GrDirectContext* context = reinterpret_cast<GrDirectContext*>((pContext));
     GrBackendRenderTarget* backendRenderTarget = reinterpret_cast<GrBackendRenderTarget*>((pBackendRenderTarget));
     GrSurfaceOrigin grSurfaceOrigin = static_cast<GrSurfaceOrigin>(surfaceOrigin);
     SkColorType skColorType = static_cast<SkColorType>(colorType);
     sk_sp<SkColorSpace> colorSpace = sk_ref_sp<SkColorSpace>(reinterpret_cast<SkColorSpace*>((colorSpacePtr)));
 
-    // std::unique_ptr<SkSurfaceProps> surfaceProps = skija::SurfaceProps::toSkSurfaceProps(surfacePropsObj);
+    std::unique_ptr<SkSurfaceProps> surfaceProps = skija::SurfaceProps::toSkSurfaceProps(surfacePropsInts);
 
     sk_sp<SkSurface> surface = SkSurface::MakeFromBackendRenderTarget(
         static_cast<GrRecordingContext*>(context),
@@ -90,9 +90,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeFromBackendRenderT
         grSurfaceOrigin,
         skColorType,
         colorSpace,
-        // "TODO: we silently ignore the surfacePropsObj arg for now.
-        // surfaceProps,
-        nullptr,
+        surfaceProps.get(),
         /* RenderTargetReleaseProc */ nullptr,
         /* ReleaseContext */ nullptr
     );
@@ -100,14 +98,14 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeFromBackendRenderT
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeFromMTKView
-  (KNativePointer contextPtr, KNativePointer mtkViewPtr, KInt surfaceOrigin, KInt sampleCount, KInt colorType, KNativePointer colorSpacePtr, KInteropPointer surfacePropsObj) {
+  (KNativePointer contextPtr, KNativePointer mtkViewPtr, KInt surfaceOrigin, KInt sampleCount, KInt colorType, KNativePointer colorSpacePtr, KInteropPointer surfacePropsInts) {
 #ifdef SK_METAL
     GrDirectContext* context = reinterpret_cast<GrDirectContext*>((contextPtr));
     GrMTLHandle* mtkView = reinterpret_cast<GrMTLHandle*>((mtkViewPtr));
     GrSurfaceOrigin grSurfaceOrigin = static_cast<GrSurfaceOrigin>(surfaceOrigin);
     SkColorType skColorType = static_cast<SkColorType>(colorType);
     sk_sp<SkColorSpace> colorSpace = sk_ref_sp<SkColorSpace>(reinterpret_cast<SkColorSpace*>((colorSpacePtr)));
-    std::unique_ptr<SkSurfaceProps> surfaceProps = skija::SurfaceProps::toSkSurfaceProps(surfacePropsObj);
+    std::unique_ptr<SkSurfaceProps> surfaceProps = skija::SurfaceProps::toSkSurfaceProps(surfacePropsInts);
 
     sk_sp<SkSurface> surface = SkSurface::MakeFromMTKView(
         static_cast<GrRecordingContext*>(context),
@@ -127,7 +125,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeRenderTarget
   (KNativePointer contextPtr, KBoolean budgeted,
     KInt width, KInt height, KInt colorType, KInt alphaType, KNativePointer colorSpacePtr,
     KInt sampleCount, KInt surfaceOrigin,
-    KInteropPointer surfacePropsObj,
+    KInteropPointer surfacePropsInts,
     KBoolean shouldCreateWithMips)
 {
     GrDirectContext* context = reinterpret_cast<GrDirectContext*>((contextPtr));
@@ -137,7 +135,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeRenderTarget
                                               static_cast<SkColorType>(colorType),
                                               static_cast<SkAlphaType>(alphaType),
                                               sk_ref_sp<SkColorSpace>(colorSpace));
-    std::unique_ptr<SkSurfaceProps> surfaceProps = skija::SurfaceProps::toSkSurfaceProps(surfacePropsObj);
+    std::unique_ptr<SkSurfaceProps> surfaceProps = skija::SurfaceProps::toSkSurfaceProps(surfacePropsInts);
 
     sk_sp<SkSurface> instance = SkSurface::MakeRenderTarget(
       context, budgeted ? SkBudgeted::kYes : SkBudgeted::kNo,
