@@ -439,6 +439,14 @@ fun configureNativeTarget(os: OS, arch: Arch, target: KotlinNativeTarget) {
     val bridgesLibrary = "$buildDir/nativeBridges/static/$targetString/skiko-native-bridges-$targetString.a"
     val allLibraries = skiaStaticLibraries(skiaDir, targetString) + bridgesLibrary
 
+    if (os == OS.IOS) {
+        target.compilations.getByName("main") {
+            val uikit by cinterops.creating {
+                defFile("src/iosInterop/cinterop/ios.def")
+//                    includeDirs()
+            }
+        }
+    }
     target.compilations.all {
         val skiaBinDir = "$skiaDir/out/${buildType.id}-$targetString"
         this.

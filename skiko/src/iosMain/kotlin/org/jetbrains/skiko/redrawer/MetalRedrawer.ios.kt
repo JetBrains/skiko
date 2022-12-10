@@ -129,7 +129,7 @@ internal class MetalLayer : CAMetalLayer {
             this.backgroundColor =
                 CGColorCreate(CGColorSpaceCreateDeviceRGB(), it.addressOf(0))
         }
-        this.opaque = true
+        this.opaque = false
         skiaLayer.view?.let {
             this.frame = it.frame
             it.layer.addSublayer(this)

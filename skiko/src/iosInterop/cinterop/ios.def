@@ -1,0 +1,11 @@
+package = org.jetbrains.skiko.objc
+language = Objective-C
+---
+
+#import <Foundation/Foundation.h>
+#import <UIKit/UIView.h>
+
+// This protocol helps to override ObjC UIView extensions in Kotlin
+@protocol UIViewExtension
+- (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event;
+@end

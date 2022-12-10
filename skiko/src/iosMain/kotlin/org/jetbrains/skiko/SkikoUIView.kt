@@ -1,6 +1,7 @@
 package org.jetbrains.skiko
 
 import kotlinx.cinterop.*
+import org.jetbrains.skia.Point
 import org.jetbrains.skia.Rect
 import platform.CoreGraphics.*
 import platform.Foundation.*
@@ -11,14 +12,15 @@ import kotlin.math.min
 
 @Suppress("CONFLICTING_OVERLOADS")
 @ExportObjCClass
-class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
+class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, org.jetbrains.skiko.objc.UIViewExtensionProtocol {
     @OverrideInit
     constructor(frame: CValue<CGRect>) : super(frame)
 
     @OverrideInit
     constructor(coder: NSCoder) : super(coder)
 
-    private var skiaLayer: SkiaLayer? = null
+    private var skiaLayer: SkiaLayer? = null //todo lateinit
+    private lateinit var hitTest: (Point, UIEvent?) -> Boolean
     private var _inputDelegate: UITextInputDelegateProtocol? = null
     private var _currentTextMenuActions: TextActions? = null
     var currentKeyboardType: UIKeyboardType = UIKeyboardTypeDefault
@@ -30,8 +32,13 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
     var currentAutocapitalizationType: UITextAutocapitalizationType = UITextAutocapitalizationType.UITextAutocapitalizationTypeSentences
     var currentAutocorrectionType: UITextAutocorrectionType = UITextAutocorrectionType.UITextAutocorrectionTypeYes
 
-    constructor(skiaLayer: SkiaLayer, frame: CValue<CGRect> = CGRectNull.readValue()) : super(frame) {
+    constructor(
+        skiaLayer: SkiaLayer,
+        frame: CValue<CGRect> = CGRectNull.readValue(),
+        hitTest: (Point, UIEvent?) -> Boolean = {_,_-> true }
+    ) : super(frame) {
         this.skiaLayer = skiaLayer
+        this.hitTest = hitTest
     }
 
     /**
@@ -155,6 +162,11 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
             }
         }
         super.pressesEnded(presses, withEvent)
+    }
+
+    override fun pointInside(point: CValue<org.jetbrains.skiko.objc.CGPoint>, withEvent: UIEvent?): Boolean {
+        val skiaPoint:Point = point.useContents { Point(x.toFloat(), y.toFloat()) }
+        return hitTest(skiaPoint, withEvent)
     }
 
     override fun touchesBegan(touches: Set<*>, withEvent: UIEvent?) {
