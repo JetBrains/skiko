@@ -164,6 +164,9 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, org.jetbrai
         super.pressesEnded(presses, withEvent)
     }
 
+    /**
+     * https://developer.apple.com/documentation/uikit/uiview/1622533-point
+     */
     override fun pointInside(point: CValue<org.jetbrains.skiko.objc.CGPoint>, withEvent: UIEvent?): Boolean {
         val skiaPoint:Point = point.useContents { Point(x.toFloat(), y.toFloat()) }
         return hitTest(skiaPoint, withEvent)
