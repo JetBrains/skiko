@@ -193,18 +193,20 @@ class Shaper internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
     fun shapeLine(text: String?, font: Font?, opts: ShapingOptions): TextLine {
         return try {
             Stats.onNativeCall()
-            val managedString = ManagedString(text)
-            interopScope {
-                TextLine(
-                    _nShapeLine(
-                        _ptr,
-                        managedString._ptr,
-                        getPtr(font),
-                        optsFeaturesLen = opts.features?.size ?: 0,
-                        optsFeatures = arrayOfFontFeaturesToInterop(opts.features),
-                        optsBooleanProps = opts._booleanPropsToInt()
+            ManagedString(text).use { managedString ->
+                interopScope {
+                    TextLine(
+                        _nShapeLine(
+                            _ptr,
+                            managedString._ptr,
+                            getPtr(font),
+                            optsFeaturesLen = opts.features?.size ?: 0,
+                            optsFeatures = arrayOfFontFeaturesToInterop(opts.features),
+                            optsBooleanProps = opts._booleanPropsToInt()
+                        )
                     )
-                )
+                }
+
             }
         } finally {
             reachabilityBarrier(this)
