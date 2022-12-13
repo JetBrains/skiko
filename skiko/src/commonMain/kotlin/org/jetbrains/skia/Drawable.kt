@@ -58,6 +58,7 @@ abstract class Drawable : Managed(Drawable_nMake(), _FinalizerHolder.PTR) {
             }
             this
         } finally {
+            reachabilityBarrier(this)
             reachabilityBarrier(canvas)
         }
     }

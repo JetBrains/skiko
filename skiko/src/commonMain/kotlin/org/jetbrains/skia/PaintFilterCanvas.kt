@@ -7,7 +7,7 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
  * A utility proxy base class for implementing draw/paint filters.
  */
 abstract class PaintFilterCanvas(private val canvas: Canvas, unrollDrawable: Boolean) :
-    Canvas(PaintFilterCanvas_nMake(getPtr(canvas), unrollDrawable), true, canvas) {
+    Canvas(makePaintFilterCanvas(canvas, unrollDrawable), true, canvas) {
     companion object {
         init {
             staticLoad()
@@ -34,8 +34,19 @@ abstract class PaintFilterCanvas(private val canvas: Canvas, unrollDrawable: Boo
      */
     init {
         Stats.onNativeCall()
-        doInit(_ptr)
-        Stats.onNativeCall()
+        try {
+            doInit(_ptr)
+        } finally {
+            reachabilityBarrier(this)
+        }
+    }
+}
+
+private fun makePaintFilterCanvas(canvas: Canvas, unrollDrawable: Boolean): NativePointer {
+    Stats.onNativeCall()
+    return try {
+        PaintFilterCanvas_nMake(getPtr(canvas), unrollDrawable)
+    } finally {
         reachabilityBarrier(canvas)
     }
 }

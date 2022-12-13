@@ -91,6 +91,7 @@ class Paragraph internal constructor(ptr: NativePointer, text: ManagedString?) :
             _nPaint(_ptr, getPtr(canvas), x, y)
             this
         } finally {
+            reachabilityBarrier(this)
             reachabilityBarrier(canvas)
         }
     }
@@ -213,6 +214,7 @@ class Paragraph internal constructor(ptr: NativePointer, text: ManagedString?) :
             }
             this
         } finally {
+            reachabilityBarrier(this)
             reachabilityBarrier(_text)
         }
     }
@@ -231,6 +233,7 @@ class Paragraph internal constructor(ptr: NativePointer, text: ManagedString?) :
             }
             this
         } finally {
+            reachabilityBarrier(this)
             reachabilityBarrier(paint)
             reachabilityBarrier(_text)
         }
@@ -250,6 +253,7 @@ class Paragraph internal constructor(ptr: NativePointer, text: ManagedString?) :
             }
             this
         } finally {
+            reachabilityBarrier(this)
             reachabilityBarrier(paint)
             reachabilityBarrier(_text)
         }

@@ -9,8 +9,18 @@ import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.getPtr
 import org.jetbrains.skia.impl.reachabilityBarrier
 
+private fun makeIcuBidiRunIterator(text: ManagedString, bidiLevel: Int): NativePointer {
+    Stats.onNativeCall()
+    return try {
+        _nMake(getPtr(text), bidiLevel)
+    } finally {
+        reachabilityBarrier(text)
+    }
+}
+
+
 class IcuBidiRunIterator(text: ManagedString, manageText: Boolean, bidiLevel: Int) : ManagedRunIterator<BidiRun?>(
-    _nMake(getPtr(text), bidiLevel), text, manageText
+    makeIcuBidiRunIterator(text, bidiLevel), text, manageText
 ) {
     companion object {
         init {
@@ -27,11 +37,6 @@ class IcuBidiRunIterator(text: ManagedString, manageText: Boolean, bidiLevel: In
         } finally {
             reachabilityBarrier(this)
         }
-    }
-
-    init {
-        Stats.onNativeCall()
-        reachabilityBarrier(text)
     }
 
     override fun remove() {

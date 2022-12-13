@@ -39,6 +39,7 @@ class AnimationBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _
             _nSetFontManager(_ptr, getPtr(fontMgr))
             this
         } finally {
+            reachabilityBarrier(this)
             reachabilityBarrier(fontMgr)
         }
     }
@@ -53,6 +54,7 @@ class AnimationBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _
             _nSetLogger(_ptr, getPtr(logger))
             this
         } finally {
+            reachabilityBarrier(this)
             reachabilityBarrier(logger)
         }
     }
@@ -76,6 +78,7 @@ class AnimationBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _
             require(ptr != NullPointer) { "Failed to create Animation from data" }
             Animation(ptr)
         } finally {
+            reachabilityBarrier(data)
             reachabilityBarrier(this)
         }
     }

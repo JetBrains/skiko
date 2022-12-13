@@ -315,6 +315,7 @@ class Font : Managed {
             )
             this
         } finally {
+            reachabilityBarrier(this)
             reachabilityBarrier(typeface)
         }
     }

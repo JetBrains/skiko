@@ -128,9 +128,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                 Stats.onNativeCall()
                 ImageFilter(
                     _nMakeCompose(
-                        getPtr(
-                            outer
-                        ), getPtr(inner)
+                        getPtr(outer), getPtr(inner)
                     )
                 )
             } finally {

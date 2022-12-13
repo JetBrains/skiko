@@ -80,6 +80,7 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
             )
             this
         } finally {
+            reachabilityBarrier(this)
             reachabilityBarrier(paint)
         }
     }
@@ -105,6 +106,7 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
             )
             this
         } finally {
+            reachabilityBarrier(this)
             reachabilityBarrier(paint)
         }
     }
@@ -363,6 +365,7 @@ class TextStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
             )
             this
         } finally {
+            reachabilityBarrier(this)
             reachabilityBarrier(typeface)
         }
     }

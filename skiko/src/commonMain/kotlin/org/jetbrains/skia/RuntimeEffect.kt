@@ -32,8 +32,14 @@ class RuntimeEffect internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         val childrenPtrs = NativePointerArray(childCount)
         for (i in 0 until childCount) childrenPtrs[i] = getPtr(children!![i])
         val matrix = localMatrix?.mat
-        return interopScope {
-            Shader(_nMakeShader(_ptr, getPtr(uniforms), toInterop(childrenPtrs), childCount, toInterop(matrix)))
+        return try {
+            interopScope {
+                Shader(_nMakeShader(_ptr, getPtr(uniforms), toInterop(childrenPtrs), childCount, toInterop(matrix)))
+            }
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(uniforms)
+            reachabilityBarrier(children)
         }
     }
 }

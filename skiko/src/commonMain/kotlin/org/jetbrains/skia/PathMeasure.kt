@@ -3,6 +3,20 @@ package org.jetbrains.skia
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 
+private fun makePath(
+    path: Path?,
+    forceClosed: Boolean,
+    resScale: Float
+): NativePointer {
+    Stats.onNativeCall()
+    return try {
+        _nMakePath(getPtr(path), forceClosed, resScale)
+    } finally {
+        Stats.onNativeCall()
+        reachabilityBarrier(path)
+    }
+}
+
 class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
     companion object {
         init {
@@ -10,9 +24,7 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
         }
     }
 
-    constructor() : this(PathMeasure_nMake()) {
-        Stats.onNativeCall()
-    }
+    constructor() : this(PathMeasure_nMake())
     /**
      *
      * Initialize the pathmeasure with the specified path. The parts of the path that are needed
@@ -34,10 +46,7 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
         path: Path?,
         forceClosed: Boolean = false,
         resScale: Float = 1f
-    ) : this(_nMakePath(getPtr(path), forceClosed, resScale)) {
-        Stats.onNativeCall()
-        reachabilityBarrier(path)
-    }
+    ) : this(makePath(path, forceClosed, resScale))
 
     /**
      * Reset the pathmeasure with the specified path. The parts of the path that are needed
@@ -49,6 +58,7 @@ class PathMeasure internal constructor(ptr: NativePointer) : Managed(ptr, _Final
             _nSetPath(_ptr, getPtr(path), forceClosed)
             this
         } finally {
+            reachabilityBarrier(this)
             reachabilityBarrier(path)
         }
     }
