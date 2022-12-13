@@ -70,27 +70,27 @@ class ImageTest {
         val image = Image.makeRaster(imageInfo, bytes, 5)
     }
 
-    @Test
-    fun canPeekPixels() = runTest {
-        val bytes = intArrayOf(
-            0xCA, 0xDA, 0xCA, 0xC9, 0xA3,
-            0xAC, 0xA8, 0x89, 0xA7, 0x87,
-            0x9B, 0xB5, 0xE5, 0x95, 0x46,
-            0x90, 0x81, 0xC5, 0x71, 0x33,
-            0x75, 0x55, 0x44, 0x40, 0x30
-        ).map { it.toByte() }.toByteArray()
-
-        val imageInfo = ImageInfo(
-            width = 5, height = 5,
-            colorType = ColorType.GRAY_8,
-            alphaType = ColorAlphaType.OPAQUE
-        )
-
-        val image = Image.makeRaster(imageInfo, bytes, 5)
-        val pixels = image.peekPixels()!!.buffer.bytes
-
-        assertContentEquals(bytes, pixels)
-    }
+//    @Test
+//    fun canPeekPixels() = runTest {
+//        val bytes = intArrayOf(
+//            0xCA, 0xDA, 0xCA, 0xC9, 0xA3,
+//            0xAC, 0xA8, 0x89, 0xA7, 0x87,
+//            0x9B, 0xB5, 0xE5, 0x95, 0x46,
+//            0x90, 0x81, 0xC5, 0x71, 0x33,
+//            0x75, 0x55, 0x44, 0x40, 0x30
+//        ).map { it.toByte() }.toByteArray()
+//
+//        val imageInfo = ImageInfo(
+//            width = 5, height = 5,
+//            colorType = ColorType.GRAY_8,
+//            alphaType = ColorAlphaType.OPAQUE
+//        )
+//
+//        val image = Image.makeRaster(imageInfo, bytes, 5)
+//        val pixels = image.peekPixels()!!.buffer.bytes
+//
+//        assertContentEquals(bytes, pixels)
+//    }
 
     private fun <T> imageUnderTest(block: (Image) -> T): T {
         return Surface.makeRasterN32Premul(100, 100).use { surface ->

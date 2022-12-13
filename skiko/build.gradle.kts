@@ -16,7 +16,7 @@ plugins {
     id("de.undercouch.download") version "4.1.2"
 }
 
-val coroutinesVersion = "1.6.4-SNAPSHOT"
+val coroutinesVersion = "1.6.4-wasm0"
 
 fun targetSuffix(os: OS, arch: Arch): String {
     return "${os.id}_${arch.id}"
@@ -35,6 +35,8 @@ allprojects {
 repositories {
     mavenLocal()
     mavenCentral()
+    maven("https://maven.pkg.jetbrains.space/kotlin/p/wasm/experimental")
+    maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
 }
 
 val windowsSdkPaths: WindowsSdkPaths by lazy {
@@ -108,7 +110,7 @@ if (supportWasm) {
         ))
 
         doLast {
-            // skiko.js file is directly referenced in karma.config.d/wasm.js
+            // skiko.js file is directly referenced in karma.config.d/*/config.js
             // so symbols must be replaced right after linking
             val jsFiles = outDir.asFile.get().walk()
                 .filter { it.isFile && it.name.endsWith(".js") }
@@ -251,6 +253,7 @@ kotlin {
                     dependsOn("linkWasm")
                     useKarma {
                         useChromeHeadless()
+                        useConfigDirectory(project.projectDir.resolve("karma.config.d").resolve("js"))
                     }
                 }
             }
@@ -259,12 +262,14 @@ kotlin {
         }
 
         wasm {
-            moduleName = "skiko-kjs" // override the name to avoid name collision with a different skiko.js file
+            moduleName = "skiko-kjs-wasm" // override the name to avoid name collision with a different skiko.js file
             browser {
                 testTask {
                     dependsOn("linkWasm")
                     useKarma {
-                        useChromeHeadless()
+                        this.webpackConfig.experiments.add("topLevelAwait")
+                        useChromeCanaryHeadless()
+                        useConfigDirectory(project.projectDir.resolve("karma.config.d").resolve("wasm"))
                     }
                 }
             }
@@ -286,7 +291,7 @@ kotlin {
             dependencies {
                 implementation(kotlin("stdlib"))
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
-                implementation("org.jetbrains.kotlinx:atomicfu:0.18.3-SNAPSHOT")
+                implementation("org.jetbrains.kotlinx:atomicfu:0.18.5-wasm0")
             }
         }
         val commonTest by getting {
@@ -1369,3 +1374,10 @@ rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJ
         nodeExtension.download = false
     }
 }
+
+project.tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().configureEach {
+    kotlinOptions.freeCompilerArgs += listOf(
+        "-Xwasm-enable-array-range-checks"
+    )
+}
+

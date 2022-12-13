@@ -1,5 +1,6 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skiko.tests.SkipWasmTarget
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

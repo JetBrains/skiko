@@ -1,6 +1,7 @@
 package org.jetbrains.skia
 
 import org.jetbrains.skia.tests.assertCloseEnough
+import org.jetbrains.skiko.tests.SkipWasmTarget
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

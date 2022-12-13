@@ -9,6 +9,8 @@ pluginManagement {
             mavenCentral()
             maven("https://maven.pkg.jetbrains.space/public/p/compose/internal")
             maven("https://maven.pkg.jetbrains.space/public/p/space/maven")
+            maven("https://maven.pkg.jetbrains.space/kotlin/p/wasm/experimental")
+            maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
         }
         dependencies {
             classpath("org.jetbrains.compose.internal.build-helpers:publishing:0.1.3")

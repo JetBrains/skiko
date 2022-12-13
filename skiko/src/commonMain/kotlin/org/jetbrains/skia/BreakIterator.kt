@@ -1,14 +1,12 @@
 package org.jetbrains.skia
 
-import org.jetbrains.skia.impl.InteropPointer
+import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.InteropScope
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.Native.Companion.NullPointer
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.interopScope
 import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.impl.withResult
 
 /**
  *
@@ -496,7 +494,10 @@ class BreakIterator internal constructor(ptr: NativePointer) : Managed(ptr, _Fin
     val ruleStatuses: IntArray
         get() = try {
             Stats.onNativeCall()
-            _nGetRuleStatuses(_ptr)
+            val arrayLen = _nGetRuleStatusesLen(_ptr)
+            withResult(IntArray(arrayLen)) { result ->
+                _nGetRuleStatuses(_ptr, result, arrayLen)
+            }
         } finally {
             reachabilityBarrier(this)
         }
@@ -591,9 +592,13 @@ private external fun _nIsBoundary(ptr: NativePointer, offset: Int): @InteropType
 @ExternalCode("Module['asm']['org_jetbrains_skia_BreakIterator__1nGetRuleStatus']")
 private external fun _nGetRuleStatus(ptr: NativePointer): Int
 
+@ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nGetRuleStatusesLen")
+@ExternalCode("Module['asm']['org_jetbrains_skia_BreakIterator__1nGetRuleStatusesLen']")
+private external fun _nGetRuleStatusesLen(ptr: NativePointer): Int
+
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nGetRuleStatuses")
 @ExternalCode("Module['asm']['org_jetbrains_skia_BreakIterator__1nGetRuleStatuses']")
-private external fun _nGetRuleStatuses(ptr: NativePointer): IntArray
+private external fun _nGetRuleStatuses(ptr: NativePointer, result: InteropPointer, len: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_BreakIterator__1nSetText")
 @ExternalCode("Module['asm']['org_jetbrains_skia_BreakIterator__1nSetText']")

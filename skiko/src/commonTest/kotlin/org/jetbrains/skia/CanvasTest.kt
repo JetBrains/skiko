@@ -5,6 +5,7 @@ import org.jetbrains.skia.util.assertContentSame
 import org.jetbrains.skia.util.imageFromIntArray
 import org.jetbrains.skiko.tests.SkipJsTarget
 import org.jetbrains.skiko.tests.SkipNativeTarget
+import org.jetbrains.skiko.tests.SkipWasmTarget
 import org.jetbrains.skiko.tests.runTest
 import kotlin.test.Test
 import kotlin.test.assertContentEquals

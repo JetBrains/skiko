@@ -15,6 +15,9 @@ class CodecTest {
         assertEquals(1, codec.frameCount)
         assertEquals(8, codec.imageInfo.width)
         assertEquals(8, codec.imageInfo.height)
+        assertEquals(8, codec.size.x)
+        assertEquals(8, codec.size.y)
+
         assertEquals(EncodedImageFormat.PNG, codec.encodedImageFormat)
 
         val pixels = codec.readPixels()
@@ -27,6 +30,8 @@ class CodecTest {
         assertEquals(5, codec.frameCount)
         assertEquals(8, codec.imageInfo.width)
         assertEquals(8, codec.imageInfo.height)
+        assertEquals(8, codec.size.x)
+        assertEquals(8, codec.size.y)
         assertEquals(EncodedImageFormat.GIF, codec.encodedImageFormat)
 
         val palette = intArrayOf(Color.BLACK, Color.RED, Color.GREEN, Color.BLUE, Color.WHITE)

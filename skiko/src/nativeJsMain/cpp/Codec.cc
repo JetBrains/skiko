@@ -26,10 +26,16 @@ SKIKO_EXPORT void org_jetbrains_skia_Codec__1nGetImageInfo
     skija::ImageInfo::writeImageInfoForInterop(imageInfo, imageInfoResult, colorSpacePtrsArray);
 }
 
-SKIKO_EXPORT KInt org_jetbrains_skia_Codec__1nGetSize
+SKIKO_EXPORT KInt org_jetbrains_skia_Codec__1nGetSizeWidth
   (KNativePointer ptr) {
     SkCodec* instance = reinterpret_cast<SkCodec*>((ptr));
-    return packISize(instance->dimensions());
+    return instance->dimensions().fWidth;
+}
+
+SKIKO_EXPORT KInt org_jetbrains_skia_Codec__1nGetSizeHeight
+  (KNativePointer ptr) {
+    SkCodec* instance = reinterpret_cast<SkCodec*>((ptr));
+    return instance->dimensions().fHeight;
 }
 
 SKIKO_EXPORT KInt org_jetbrains_skia_Codec__1nGetEncodedOrigin

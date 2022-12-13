@@ -234,18 +234,33 @@ internal actual class InteropScope actual constructor() {
         return toInterop(interopPointers.toIntArray())
     }
 
-    private fun <T> callbackImpl(callback: (() -> T)?): InteropPointer {
+    actual fun booleanCallback(callback: (() -> Boolean)?): NativePointer {
         if (callback == null) { return 0 }
         initCallbacks()
-
-        val data = CallbackData<T>(null)
+        val data = js("({})") as CallbackDataBoolean
         return _registerCallback({ data.value = callback() }, data, global = false)
     }
 
-    actual fun booleanCallback(callback: (() -> Boolean)?) = callbackImpl(callback)
-    actual fun intCallback(callback: (() -> Int)?) = callbackImpl(callback)
-    actual fun nativePointerCallback(callback: (() -> NativePointer)?) = callbackImpl(callback)
-    actual fun interopPointerCallback(callback: (() -> InteropPointer)?) = callbackImpl(callback)
+    actual fun intCallback(callback: (() -> Int)?): NativePointer {
+        if (callback == null) { return 0 }
+        initCallbacks()
+        val data = js("({})") as CallbackDataInt
+        return _registerCallback({ data.value = callback() }, data, global = false)
+    }
+
+    actual fun nativePointerCallback(callback: (() -> NativePointer)?): NativePointer {
+        if (callback == null) { return 0 }
+        initCallbacks()
+        val data = js("({})") as CallbackDataNativePointer
+        return _registerCallback({ data.value = callback() }, data, global = false)
+    }
+
+    actual fun interopPointerCallback(callback: (() -> InteropPointer)?): NativePointer {
+        if (callback == null) { return 0 }
+        initCallbacks()
+        val data = js("({})") as CallbackDataInteropPointer
+        return _registerCallback({ data.value = callback() }, data, global = false)
+    }
 
     actual fun callback(callback: (() -> Unit)?): InteropPointer {
         if (callback == null) { return 0 }
@@ -254,19 +269,29 @@ internal actual class InteropScope actual constructor() {
         return _registerCallback({ callback() }, null, global = false)
     }
 
-    private fun <T> virtualImpl(method: () -> T): InteropPointer {
-        val data = CallbackData<T>(null)
-        return _registerCallback({ data.value = method() }, data, global = true)
-    }
-
     actual fun virtual(method: () -> Unit): InteropPointer {
         return _registerCallback({ method() }, null, global = true)
     }
 
-    actual fun virtualBoolean(method: () -> Boolean) = virtualImpl(method)
-    actual fun virtualInt(method: () -> Int) = virtualImpl(method)
-    actual fun virtualNativePointer(method: () -> NativePointer) = virtualImpl(method)
-    actual fun virtualInteropPointer(method: () -> InteropPointer) = virtualImpl(method)
+    actual fun virtualBoolean(method: () -> Boolean): InteropPointer {
+        val data = js("({})") as CallbackDataBoolean
+        return _registerCallback({ data.value = method() }, data, global = true)
+    }
+
+    actual fun virtualInt(method: () -> Int): InteropPointer {
+        val data = js("({})") as CallbackDataInt
+        return _registerCallback({ data.value = method() }, data, global = true)
+    }
+
+    actual fun virtualNativePointer(method: () -> NativePointer): InteropPointer {
+        val data = js("({})") as CallbackDataNativePointer
+        return _registerCallback({ data.value = method() }, data, global = true)
+    }
+
+    actual fun virtualInteropPointer(method: () -> InteropPointer): InteropPointer {
+        val data = js("({})") as CallbackDataInteropPointer
+        return _registerCallback({ data.value = method() }, data, global = true)
+    }
 
     actual fun release()  {
         elements.forEach {
@@ -292,7 +317,10 @@ internal actual class InteropScope actual constructor() {
 }
 
 // Callbacks
-private class CallbackData<T>(@JsName("value") var value: T?)
+internal external interface CallbackDataBoolean { @JsName("value") var value: Boolean? }
+internal external interface CallbackDataInt { @JsName("value") var value: Int? }
+internal external interface CallbackDataNativePointer { @JsName("value") var value: NativePointer? }
+internal external interface CallbackDataInteropPointer { @JsName("value") var value: InteropPointer? }
 
 // See `setup.js`
 private external fun _registerCallback(cb: () -> Unit, data: Any?, global: Boolean): Int

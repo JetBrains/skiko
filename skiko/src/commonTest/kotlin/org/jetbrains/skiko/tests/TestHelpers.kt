@@ -80,46 +80,57 @@ class TestHelpers {
 
 @Suppress("OPTIONAL_DECLARATION_USAGE_IN_NON_COMMON_SOURCE") // See KT-44014
 @ExternalSymbolName("org_jetbrains_skiko_tests_TestHelpers__1nFillByteArrayOf5")
+@ExternalCode("Module['asm']['org_jetbrains_skiko_tests_TestHelpers__1nFillByteArrayOf5']")
 private external fun _nFillByteArrayOf5(interopPointer: InteropPointer)
 
 @Suppress("OPTIONAL_DECLARATION_USAGE_IN_NON_COMMON_SOURCE") // See KT-44014
 @ExternalSymbolName("org_jetbrains_skiko_tests_TestHelpers__1nFillFloatArrayOf5")
+@ExternalCode("Module['asm']['org_jetbrains_skiko_tests_TestHelpers__1nFillFloatArrayOf5']")
 private external fun _nFillFloatArrayOf5(interopPointer: InteropPointer)
 
 @Suppress("OPTIONAL_DECLARATION_USAGE_IN_NON_COMMON_SOURCE") // See KT-44014
 @ExternalSymbolName("org_jetbrains_skiko_tests_TestHelpers__1nFillShortArrayOf5")
+@ExternalCode("Module['asm']['org_jetbrains_skiko_tests_TestHelpers__1nFillShortArrayOf5']")
 private external fun _nFillShortArrayOf5(interopPointer: InteropPointer)
 
 @Suppress("OPTIONAL_DECLARATION_USAGE_IN_NON_COMMON_SOURCE") // See KT-44014
 @ExternalSymbolName("org_jetbrains_skiko_tests_TestHelpers__1nFillIntArrayOf5")
+@ExternalCode("Module['asm']['org_jetbrains_skiko_tests_TestHelpers__1nFillIntArrayOf5']")
 private external fun _nFillIntArrayOf5(interopPointer: InteropPointer)
 
 @Suppress("OPTIONAL_DECLARATION_USAGE_IN_NON_COMMON_SOURCE") // See KT-44014
 @ExternalSymbolName("org_jetbrains_skiko_tests_TestHelpers__1nFillDoubleArrayOf5")
+@ExternalCode("Module['asm']['org_jetbrains_skiko_tests_TestHelpers__1nFillDoubleArrayOf5']")
 private external fun _nFillDoubleArrayOf5(interopPointer: InteropPointer)
 
 @Suppress("OPTIONAL_DECLARATION_USAGE_IN_NON_COMMON_SOURCE") // See KT-44014
 @ExternalSymbolName("org_jetbrains_skiko_tests_TestHelpers__1nWriteArraysOfInts")
+@ExternalCode("Module['asm']['org_jetbrains_skiko_tests_TestHelpers__1nWriteArraysOfInts']")
 private external fun _nWriteArraysOfInts(interopPointer: InteropPointer): NativePointer
 
 @Suppress("OPTIONAL_DECLARATION_USAGE_IN_NON_COMMON_SOURCE") // See KT-44014
 @ExternalSymbolName("org_jetbrains_skiko_tests_TestHelpers__nStringByIndex")
+@ExternalCode("Module['asm']['org_jetbrains_skiko_tests_TestHelpers__nStringByIndex']")
 private external fun _nStringByIndex(index: Int): NativePointer
 
 internal fun nativeStringByIndex(index: Int): NativePointer = _nStringByIndex(index)
 
 @Suppress("OPTIONAL_DECLARATION_USAGE_IN_NON_COMMON_SOURCE") // See KT-44014
 @ExternalSymbolName("org_jetbrains_skiko_tests_TestHelpers__1nCreateTestGlContext")
+@ExternalCode("Module['asm']['org_jetbrains_skiko_tests_TestHelpers__1nCreateTestGlContext']")
 private external fun TestGlContext_nCreate(): NativePointer
 
 @Suppress("OPTIONAL_DECLARATION_USAGE_IN_NON_COMMON_SOURCE") // See KT-44014
 @ExternalSymbolName("org_jetbrains_skiko_tests_TestHelpers__1nGlContextGetFinalizer")
+@ExternalCode("Module['asm']['org_jetbrains_skiko_tests_TestHelpers__1nGlContextGetFinalizer']")
 private external fun TestGlContext_nGetFinalizer(): NativePointer
 
 @Suppress("OPTIONAL_DECLARATION_USAGE_IN_NON_COMMON_SOURCE") // See KT-44014
 @ExternalSymbolName("org_jetbrains_skiko_tests_TestHelpers__1nMakeGlContextCurrent")
+@ExternalCode("Module['asm']['org_jetbrains_skiko_tests_TestHelpers__1nMakeGlContextCurrent']")
 private external fun TestGlContext_nMakeCurrent(ptr: NativePointer)
 
 @Suppress("OPTIONAL_DECLARATION_USAGE_IN_NON_COMMON_SOURCE") // See KT-44014
 @ExternalSymbolName("org_jetbrains_skiko_tests_TestHelpers__1nGlContextSwapBuffers")
+@ExternalCode("Module['asm']['org_jetbrains_skiko_tests_TestHelpers__1nGlContextSwapBuffers']")
 private external fun TestGlContext_nSwapBuffers(ptr: NativePointer)
