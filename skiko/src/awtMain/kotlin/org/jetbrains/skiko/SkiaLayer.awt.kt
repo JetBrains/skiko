@@ -130,6 +130,7 @@ actual open class SkiaLayer internal constructor(
         val window = SwingUtilities.getRoot(this) as Window
         window.addComponentListener(fullscreenAdapter)
         backedLayer.defineContentScale()
+        checkContentScale()
         checkShowing()
         init(isInited)
     }
@@ -145,6 +146,7 @@ actual open class SkiaLayer internal constructor(
     private fun checkShowing() {
         isShowingCached = super.isShowing()
         if (isShowing) {
+            redrawer?.syncSize()
             repaint()
         }
     }
