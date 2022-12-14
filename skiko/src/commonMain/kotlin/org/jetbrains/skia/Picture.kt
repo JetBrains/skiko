@@ -81,6 +81,7 @@ class Picture internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
             this
         } finally {
+            reachabilityBarrier(this)
             reachabilityBarrier(canvas)
         }
     }

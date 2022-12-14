@@ -4,6 +4,7 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.reachabilityBarrier
 
 object ShadowUtils {
     /**
@@ -39,20 +40,25 @@ object ShadowUtils {
         var flags = 0
         if (transparentOccluder) flags = flags or 1
         if (geometricOnly) flags = flags or 2
-        _nDrawShadow(
-            getPtr(canvas),
-            getPtr(path),
-            zPlaneParams.x,
-            zPlaneParams.y,
-            zPlaneParams.z,
-            lightPos.x,
-            lightPos.y,
-            lightPos.z,
-            lightRadius,
-            ambientColor,
-            spotColor,
-            flags
-        )
+        try {
+            _nDrawShadow(
+                getPtr(canvas),
+                getPtr(path),
+                zPlaneParams.x,
+                zPlaneParams.y,
+                zPlaneParams.z,
+                lightPos.x,
+                lightPos.y,
+                lightPos.z,
+                lightRadius,
+                ambientColor,
+                spotColor,
+                flags
+            )
+        } finally {
+            reachabilityBarrier(canvas)
+            reachabilityBarrier(path)
+        }
     }
 
     /**

@@ -110,8 +110,7 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
         fun makeFromBitmap(bitmap: Bitmap): Image {
             return try {
                 Stats.onNativeCall()
-                val ptr =
-                    _nMakeFromBitmap(getPtr(bitmap))
+                val ptr = _nMakeFromBitmap(getPtr(bitmap))
                 if (ptr == NullPointer) throw RuntimeException("Failed to Image::makeFromBitmap $bitmap")
                 Image(ptr)
             } finally {
@@ -122,8 +121,7 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
         fun makeFromPixmap(pixmap: Pixmap): Image {
             return try {
                 Stats.onNativeCall()
-                val ptr =
-                    _nMakeFromPixmap(getPtr(pixmap))
+                val ptr = _nMakeFromPixmap(getPtr(pixmap))
                 if (ptr == NullPointer) throw RuntimeException("Failed to Image::makeFromRaster $pixmap")
                 Image(ptr)
             } finally {

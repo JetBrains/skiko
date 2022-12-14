@@ -11,9 +11,24 @@ import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.getPtr
 import org.jetbrains.skia.impl.reachabilityBarrier
 
+private fun makeHbIcuScriptRunIterator(
+    text: ManagedString,
+    font: Font,
+    opts: ShapingOptions
+): NativePointer {
+    Stats.onNativeCall()
+    return try {
+        _nMake(getPtr(text), getPtr(font), getPtr(opts.fontMgr), opts._booleanPropsToInt())
+    } finally {
+        reachabilityBarrier(text)
+        reachabilityBarrier(font)
+        reachabilityBarrier(opts.fontMgr)
+    }
+}
+
 class FontMgrRunIterator(text: ManagedString, manageText: Boolean, font: Font, opts: ShapingOptions) :
     ManagedRunIterator<FontRun?>(
-        _nMake(getPtr(text), getPtr(font), getPtr(opts.fontMgr), opts._booleanPropsToInt()), text, manageText
+        makeHbIcuScriptRunIterator(text, font, opts), text, manageText
     ) {
     companion object {
         init {
@@ -34,13 +49,6 @@ class FontMgrRunIterator(text: ManagedString, manageText: Boolean, font: Font, o
         } finally {
             reachabilityBarrier(this)
         }
-    }
-
-    init {
-        Stats.onNativeCall()
-        reachabilityBarrier(text)
-        reachabilityBarrier(font)
-        reachabilityBarrier(opts)
     }
 
     override fun remove() {

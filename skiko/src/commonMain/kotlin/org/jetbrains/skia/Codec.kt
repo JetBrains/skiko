@@ -141,6 +141,7 @@ class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHo
             )
             this
         } finally {
+            reachabilityBarrier(this)
             reachabilityBarrier(bitmap)
         }
     }
@@ -198,6 +199,7 @@ class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHo
             )
             this
         } finally {
+            reachabilityBarrier(this)
             reachabilityBarrier(bitmap)
         }
     }
@@ -256,6 +258,7 @@ class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHo
             )
             this
         } finally {
+            reachabilityBarrier(this)
             reachabilityBarrier(bitmap)
         }
     }

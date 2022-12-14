@@ -6,7 +6,7 @@ import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.*
 
 class ParagraphBuilder(style: ParagraphStyle?, fc: FontCollection?) :
-    Managed(_nMake(getPtr(style), getPtr(fc)), _FinalizerHolder.PTR) {
+    Managed(makeParagraphBuilder(style, fc), _FinalizerHolder.PTR) {
     companion object {
         init {
             staticLoad()
@@ -26,14 +26,22 @@ class ParagraphBuilder(style: ParagraphStyle?, fc: FontCollection?) :
 
     fun popStyle(): ParagraphBuilder {
         Stats.onNativeCall()
-        _nPopStyle(_ptr, NullPointer)
+        try {
+            _nPopStyle(_ptr, NullPointer)
+        } finally {
+            reachabilityBarrier(this)
+        }
         return this
     }
 
     fun addText(text: String): ParagraphBuilder {
         Stats.onNativeCall()
-        interopScope {
-            _nAddText(_ptr, toInterop(text))
+        try {
+            interopScope {
+                _nAddText(_ptr, toInterop(text))
+            }
+        } finally {
+            reachabilityBarrier(this)
         }
         if (_text == null) _text = ManagedString(text) else _text!!.append(text)
         return this
@@ -66,9 +74,16 @@ class ParagraphBuilder(style: ParagraphStyle?, fc: FontCollection?) :
     internal object _FinalizerHolder {
         val PTR = ParagraphBuilder_nGetFinalizer()
     }
+}
 
-    init {
-        Stats.onNativeCall()
+private fun makeParagraphBuilder(
+    style: ParagraphStyle?,
+    fc: FontCollection?
+): NativePointer {
+    Stats.onNativeCall()
+    return try {
+        _nMake(getPtr(style), getPtr(fc))
+    } finally {
         reachabilityBarrier(style)
         reachabilityBarrier(fc)
     }

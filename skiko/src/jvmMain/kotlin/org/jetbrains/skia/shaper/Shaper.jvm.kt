@@ -5,6 +5,7 @@ import org.jetbrains.skia.ManagedString
 import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.getPtr
 import org.jetbrains.skia.impl.interopScope
+import org.jetbrains.skia.impl.reachabilityBarrier
 
 internal actual fun Shaper.doShape(
     textUtf8: ManagedString,
@@ -16,19 +17,24 @@ internal actual fun Shaper.doShape(
     width: Float,
     runHandler: RunHandler
 ) {
-    interopScope {
-        Shaper_nShape(
-            _ptr,
-            getPtr(textUtf8),
-            fontIter as InteropPointer,
-            bidiIter as InteropPointer,
-            scriptIter as InteropPointer,
-            langIter as InteropPointer,
-            optsFeaturesLen = opts.features?.size ?: 0,
-            optsFeaturesIntArray = arrayOfFontFeaturesToInterop(opts.features),
-            optsBooleanProps = opts._booleanPropsToInt(),
-            width = width,
-            runHandler = runHandler as InteropPointer
-        )
+    try {
+        interopScope {
+            Shaper_nShape(
+                _ptr,
+                getPtr(textUtf8),
+                fontIter as InteropPointer,
+                bidiIter as InteropPointer,
+                scriptIter as InteropPointer,
+                langIter as InteropPointer,
+                optsFeaturesLen = opts.features?.size ?: 0,
+                optsFeaturesIntArray = arrayOfFontFeaturesToInterop(opts.features),
+                optsBooleanProps = opts._booleanPropsToInt(),
+                width = width,
+                runHandler = runHandler as InteropPointer
+            )
+        }
+    } finally {
+        reachabilityBarrier(this)
+        reachabilityBarrier(textUtf8)
     }
 }

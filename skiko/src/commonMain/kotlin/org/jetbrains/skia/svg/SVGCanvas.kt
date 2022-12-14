@@ -6,6 +6,7 @@ import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.reachabilityBarrier
 
 object SVGCanvas {
     /**
@@ -40,14 +41,18 @@ object SVGCanvas {
      */
     fun make(bounds: Rect, out: WStream, convertTextToPaths: Boolean, prettyXML: Boolean): Canvas {
         Stats.onNativeCall()
-        val ptr = SVGCanvas_nMake(
-            bounds.left,
-            bounds.top,
-            bounds.right,
-            bounds.bottom,
-            getPtr(out),
-            0 or (if (convertTextToPaths) 1 else 0) or if (prettyXML) 0 else 2
-        )
+        val ptr = try {
+            SVGCanvas_nMake(
+                bounds.left,
+                bounds.top,
+                bounds.right,
+                bounds.bottom,
+                getPtr(out),
+                0 or (if (convertTextToPaths) 1 else 0) or if (prettyXML) 0 else 2
+            )
+        } finally {
+            reachabilityBarrier(out)
+        }
         return Canvas(ptr, true, out)
     }
 

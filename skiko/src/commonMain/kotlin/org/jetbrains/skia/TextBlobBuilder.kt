@@ -91,6 +91,7 @@ class TextBlobBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _F
             }
             this
         } finally {
+            reachabilityBarrier(this)
             reachabilityBarrier(font)
         }
     }
@@ -143,6 +144,7 @@ class TextBlobBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _F
             }
             this
         } finally {
+            reachabilityBarrier(this)
             reachabilityBarrier(font)
         }
     }
@@ -191,6 +193,7 @@ class TextBlobBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _F
             }
             this
         } finally {
+            reachabilityBarrier(this)
             reachabilityBarrier(font)
         }
     }
@@ -217,6 +220,7 @@ class TextBlobBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _F
             }
             this
         } finally {
+            reachabilityBarrier(this)
             reachabilityBarrier(font)
         }
     }

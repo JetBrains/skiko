@@ -30,6 +30,7 @@ class TypefaceFontProvider : FontMgr(TypefaceFontProvider_nMake()) {
             }
             this
         } finally {
+            reachabilityBarrier(this)
             reachabilityBarrier(typeface)
         }
     }

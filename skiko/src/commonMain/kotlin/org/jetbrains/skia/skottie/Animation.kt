@@ -20,7 +20,11 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
 
         fun makeFromData(data: Data): Animation {
             Stats.onNativeCall()
-            val ptr = _nMakeFromData(getPtr(data))
+            val ptr = try {
+                _nMakeFromData(getPtr(data))
+            } finally {
+                reachabilityBarrier(data)
+            }
             require(ptr != NullPointer) { "Failed to create Animation from data." }
             return Animation(ptr)
         }
@@ -103,6 +107,7 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
             _nRender(_ptr, getPtr(canvas), dst.left, dst.top, dst.right, dst.bottom, flags)
             this
         } finally {
+            reachabilityBarrier(this)
             reachabilityBarrier(canvas)
         }
     }
@@ -132,6 +137,7 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
             _nSeek(_ptr, t, getPtr(ic))
             this
         } finally {
+            reachabilityBarrier(this)
             reachabilityBarrier(ic)
         }
     }
@@ -171,6 +177,7 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
             _nSeekFrame(_ptr, t, getPtr(ic))
             this
         } finally {
+            reachabilityBarrier(this)
             reachabilityBarrier(ic)
         }
     }
@@ -202,6 +209,7 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
             _nSeekFrameTime(_ptr, t, getPtr(ic))
             this
         } finally {
+            reachabilityBarrier(this)
             reachabilityBarrier(ic)
         }
     }

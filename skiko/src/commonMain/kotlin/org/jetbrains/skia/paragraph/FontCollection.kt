@@ -30,6 +30,7 @@ class FontCollection internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             _nSetAssetFontManager(_ptr, getPtr(fontMgr), NullPointer)
             this
         } finally {
+            reachabilityBarrier(this)
             reachabilityBarrier(fontMgr)
         }
     }
@@ -44,6 +45,7 @@ class FontCollection internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             )
             this
         } finally {
+            reachabilityBarrier(this)
             reachabilityBarrier(fontMgr)
         }
     }
@@ -54,6 +56,7 @@ class FontCollection internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             _nSetTestFontManager(_ptr, getPtr(fontMgr), NullPointer)
             this
         } finally {
+            reachabilityBarrier(this)
             reachabilityBarrier(fontMgr)
         }
     }
@@ -74,6 +77,7 @@ class FontCollection internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
             this
         } finally {
+            reachabilityBarrier(this)
             reachabilityBarrier(fontMgr)
         }
     }

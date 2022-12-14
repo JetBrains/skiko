@@ -57,8 +57,12 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
 
     fun drawPoint(x: Float, y: Float, paint: Paint): Canvas {
         Stats.onNativeCall()
-        _nDrawPoint(_ptr, x, y, getPtr(paint))
-        reachabilityBarrier(paint)
+        try {
+            _nDrawPoint(_ptr, x, y, getPtr(paint))
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(paint)
+        }
         return this
     }
 
@@ -118,10 +122,14 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
      */
     fun drawPoints(coords: FloatArray, paint: Paint): Canvas {
         Stats.onNativeCall()
-        interopScope {
-            _nDrawPoints(_ptr, 0 /* SkCanvas::PointMode::kPoints_PointMode */, coords.size, toInterop(coords), getPtr(paint))
+        try {
+            interopScope {
+                _nDrawPoints(_ptr, 0 /* SkCanvas::PointMode::kPoints_PointMode */, coords.size, toInterop(coords), getPtr(paint))
+            }
+        } finally {
+            reachabilityBarrier(paint)
+            reachabilityBarrier(this)
         }
-        reachabilityBarrier(paint)
         return this
     }
 
@@ -177,10 +185,14 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
      */
     fun drawLines(coords: FloatArray, paint: Paint): Canvas {
         Stats.onNativeCall()
-        interopScope {
-            _nDrawPoints(_ptr, 1 /* SkCanvas::PointMode::kLines_PointMode */, coords.size, toInterop(coords),getPtr(paint))
+        try {
+            interopScope {
+                _nDrawPoints(_ptr, 1 /* SkCanvas::PointMode::kLines_PointMode */, coords.size, toInterop(coords),getPtr(paint))
+            }
+        } finally {
+            reachabilityBarrier(paint)
+            reachabilityBarrier(this)
         }
-        reachabilityBarrier(paint)
         return this
     }
 
@@ -234,17 +246,25 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
      */
     fun drawPolygon(coords: FloatArray, paint: Paint): Canvas {
         Stats.onNativeCall()
-        interopScope {
-            _nDrawPoints(_ptr, 2 /* SkCanvas::PointMode::kPolygon_PointMode */, coords.size, toInterop(coords), getPtr(paint))
+        try {
+            interopScope {
+                _nDrawPoints(_ptr, 2 /* SkCanvas::PointMode::kPolygon_PointMode */, coords.size, toInterop(coords), getPtr(paint))
+            }
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(paint)
         }
-        reachabilityBarrier(paint)
         return this
     }
 
     fun drawLine(x0: Float, y0: Float, x1: Float, y1: Float, paint: Paint): Canvas {
         Stats.onNativeCall()
-        _nDrawLine(_ptr, x0, y0, x1, y1, getPtr(paint))
-        reachabilityBarrier(paint)
+        try {
+            _nDrawLine(_ptr, x0, y0, x1, y1, getPtr(paint))
+        } finally {
+            reachabilityBarrier(paint)
+            reachabilityBarrier(this)
+        }
         return this
     }
 
@@ -259,62 +279,86 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         paint: Paint
     ): Canvas {
         Stats.onNativeCall()
-        _nDrawArc(_ptr, left, top, right, bottom, startAngle, sweepAngle, includeCenter, getPtr(paint))
-        reachabilityBarrier(paint)
+        try {
+            _nDrawArc(_ptr, left, top, right, bottom, startAngle, sweepAngle, includeCenter, getPtr(paint))
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(paint)
+        }
         return this
     }
 
     fun drawRect(r: Rect, paint: Paint): Canvas {
         Stats.onNativeCall()
-        _nDrawRect(_ptr, r.left, r.top, r.right, r.bottom, getPtr(paint))
-        reachabilityBarrier(paint)
+        try {
+            _nDrawRect(_ptr, r.left, r.top, r.right, r.bottom, getPtr(paint))
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(paint)
+        }
         return this
     }
 
     fun drawOval(r: Rect, paint: Paint): Canvas {
         Stats.onNativeCall()
-        _nDrawOval(_ptr, r.left, r.top, r.right, r.bottom, getPtr(paint))
-        reachabilityBarrier(paint)
+        try {
+            _nDrawOval(_ptr, r.left, r.top, r.right, r.bottom, getPtr(paint))
+        } finally {
+            reachabilityBarrier(paint)
+            reachabilityBarrier(this)
+        }
         return this
     }
 
     fun drawCircle(x: Float, y: Float, radius: Float, paint: Paint): Canvas {
         Stats.onNativeCall()
-        _nDrawOval(_ptr, x - radius, y - radius, x + radius, y + radius, getPtr(paint))
-        reachabilityBarrier(paint)
+        try {
+            _nDrawOval(_ptr, x - radius, y - radius, x + radius, y + radius, getPtr(paint))
+        } finally {
+            reachabilityBarrier(paint)
+            reachabilityBarrier(this)
+        }
         return this
     }
 
     fun drawRRect(r: RRect, paint: Paint): Canvas {
         Stats.onNativeCall()
-        interopScope {
-            _nDrawRRect(_ptr, r.left, r.top, r.right, r.bottom, toInterop(r.radii), r.radii.size, getPtr(paint))
+        try {
+            interopScope {
+                _nDrawRRect(_ptr, r.left, r.top, r.right, r.bottom, toInterop(r.radii), r.radii.size, getPtr(paint))
+            }
+        } finally {
+            reachabilityBarrier(paint)
+            reachabilityBarrier(this)
         }
-        reachabilityBarrier(paint)
         return this
     }
 
     fun drawDRRect(outer: RRect, inner: RRect, paint: Paint): Canvas {
         Stats.onNativeCall()
-        interopScope {
-            _nDrawDRRect(
-                _ptr,
-                outer.left,
-                outer.top,
-                outer.right,
-                outer.bottom,
-                toInterop(outer.radii),
-                outer.radii.size,
-                inner.left,
-                inner.top,
-                inner.right,
-                inner.bottom,
-                toInterop(inner.radii),
-                inner.radii.size,
-                getPtr(paint)
-            )
+        try {
+            interopScope {
+                _nDrawDRRect(
+                    _ptr,
+                    outer.left,
+                    outer.top,
+                    outer.right,
+                    outer.bottom,
+                    toInterop(outer.radii),
+                    outer.radii.size,
+                    inner.left,
+                    inner.top,
+                    inner.right,
+                    inner.bottom,
+                    toInterop(inner.radii),
+                    inner.radii.size,
+                    getPtr(paint)
+                )
+            }
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(paint)
         }
-        reachabilityBarrier(paint)
         return this
     }
 
@@ -346,9 +390,13 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
 
     fun drawPath(path: Path, paint: Paint): Canvas {
         Stats.onNativeCall()
-        _nDrawPath(_ptr, getPtr(path), getPtr(paint))
-        reachabilityBarrier(path)
-        reachabilityBarrier(paint)
+        try {
+            _nDrawPath(_ptr, getPtr(path), getPtr(paint))
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(path)
+            reachabilityBarrier(paint)
+        }
         return this
     }
 
@@ -417,71 +465,91 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         strict: Boolean
     ): Canvas {
         Stats.onNativeCall()
-        _nDrawImageRect(
-            _ptr,
-            getPtr(image),
-            src.left,
-            src.top,
-            src.right,
-            src.bottom,
-            dst.left,
-            dst.top,
-            dst.right,
-            dst.bottom,
-            samplingMode._packedInt1(),
-            samplingMode._packedInt2(),
-            getPtr(paint),
-            strict
-        )
-        reachabilityBarrier(image)
-        reachabilityBarrier(paint)
+        try {
+            _nDrawImageRect(
+                _ptr,
+                getPtr(image),
+                src.left,
+                src.top,
+                src.right,
+                src.bottom,
+                dst.left,
+                dst.top,
+                dst.right,
+                dst.bottom,
+                samplingMode._packedInt1(),
+                samplingMode._packedInt2(),
+                getPtr(paint),
+                strict
+            )
+        } finally {
+            reachabilityBarrier(image)
+            reachabilityBarrier(paint)
+            reachabilityBarrier(this)
+        }
         return this
     }
 
     fun drawImageNine(image: Image, center: IRect, dst: Rect, filterMode: FilterMode, paint: Paint?): Canvas {
         Stats.onNativeCall()
-        _nDrawImageNine(
-            _ptr,
-            getPtr(image),
-            center.left,
-            center.top,
-            center.right,
-            center.bottom,
-            dst.left,
-            dst.top,
-            dst.right,
-            dst.bottom,
-            filterMode.ordinal,
-            getPtr(paint)
-        )
-        reachabilityBarrier(image)
-        reachabilityBarrier(paint)
+        try {
+            _nDrawImageNine(
+                _ptr,
+                getPtr(image),
+                center.left,
+                center.top,
+                center.right,
+                center.bottom,
+                dst.left,
+                dst.top,
+                dst.right,
+                dst.bottom,
+                filterMode.ordinal,
+                getPtr(paint)
+            )
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(image)
+            reachabilityBarrier(paint)
+        }
         return this
     }
 
     fun drawRegion(r: Region, paint: Paint): Canvas {
         Stats.onNativeCall()
-        _nDrawRegion(_ptr, getPtr(r), getPtr(paint))
-        reachabilityBarrier(r)
-        reachabilityBarrier(paint)
+        try {
+            _nDrawRegion(_ptr, getPtr(r), getPtr(paint))
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(r)
+            reachabilityBarrier(paint)
+        }
         return this
     }
 
     fun drawString(s: String, x: Float, y: Float, font: Font?, paint: Paint): Canvas {
         Stats.onNativeCall()
-        interopScope {
-            _nDrawString(_ptr, toInterop(s), x, y, getPtr(font), getPtr(paint))
+        try {
+            interopScope {
+                _nDrawString(_ptr, toInterop(s), x, y, getPtr(font), getPtr(paint))
+            }
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(font)
+            reachabilityBarrier(paint)
         }
-        reachabilityBarrier(font)
-        reachabilityBarrier(paint)
         return this
     }
 
     fun drawTextBlob(blob: TextBlob, x: Float, y: Float, paint: Paint): Canvas {
         Stats.onNativeCall()
-        _nDrawTextBlob(_ptr, getPtr(blob), x, y, getPtr(paint))
-        reachabilityBarrier(blob)
-        reachabilityBarrier(paint)
+        try {
+            _nDrawTextBlob(_ptr, getPtr(blob), x, y, getPtr(paint))
+        } finally {
+            reachabilityBarrier(blob)
+            reachabilityBarrier(paint)
+            reachabilityBarrier(this)
+        }
         return this
     }
 
@@ -492,8 +560,12 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
 
     fun drawPicture(picture: Picture, matrix: Matrix33? = null, paint: Paint? = null): Canvas {
         Stats.onNativeCall()
-        interopScope {
-            _nDrawPicture(_ptr, getPtr(picture), toInterop(matrix?.mat), getPtr(paint))
+        try {
+            interopScope {
+                _nDrawPicture(_ptr, getPtr(picture), toInterop(matrix?.mat), getPtr(paint))
+            }
+        } finally {
+            reachabilityBarrier(this)
             reachabilityBarrier(picture)
             reachabilityBarrier(paint)
         }
@@ -535,21 +607,25 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         require(colors == null || colors.size == positions.size) { "Expected colors.length == positions.length, got: " + colors!!.size + " != " + positions.size }
         require(texCoords == null || texCoords.size == positions.size) { "Expected texCoords.length == positions.length, got: " + texCoords!!.size + " != " + positions.size }
         Stats.onNativeCall()
-        interopScope {
-            _nDrawVertices(
-                _ptr,
-                0 /* kTriangles_VertexMode */,
-                positions.size,
-                toInterop(Point.flattenArray(positions)),
-                toInterop(colors),
-                toInterop(Point.flattenArray(texCoords)),
-                indices?.size ?: 0,
-                toInterop(indices),
-                blendMode.ordinal,
-                getPtr(paint)
-            )
+        try {
+            interopScope {
+                _nDrawVertices(
+                    _ptr,
+                    0 /* kTriangles_VertexMode */,
+                    positions.size,
+                    toInterop(Point.flattenArray(positions)),
+                    toInterop(colors),
+                    toInterop(Point.flattenArray(texCoords)),
+                    indices?.size ?: 0,
+                    toInterop(indices),
+                    blendMode.ordinal,
+                    getPtr(paint)
+                )
+            }
+        } finally {
+            reachabilityBarrier(paint)
+            reachabilityBarrier(this)
         }
-        reachabilityBarrier(paint)
         return this
     }
 
@@ -587,21 +663,25 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         require(colors == null || colors.size == positions.size) { "Expected colors.length == positions.length, got: " + colors!!.size + " != " + positions.size }
         require(texCoords == null || texCoords.size == positions.size) { "Expected texCoords.length == positions.length, got: " + texCoords!!.size + " != " + positions.size }
         Stats.onNativeCall()
-        interopScope {
-            _nDrawVertices(
-                _ptr,
-                1 /* kTriangleStrip_VertexMode */,
-                positions.size,
-                toInterop(Point.flattenArray(positions)),
-                toInterop(colors),
-                toInterop(Point.flattenArray(texCoords)),
-                indices?.size ?: 0,
-                toInterop(indices),
-                blendMode.ordinal,
-                getPtr(paint)
-            )
+        try {
+            interopScope {
+                _nDrawVertices(
+                    _ptr,
+                    1 /* kTriangleStrip_VertexMode */,
+                    positions.size,
+                    toInterop(Point.flattenArray(positions)),
+                    toInterop(colors),
+                    toInterop(Point.flattenArray(texCoords)),
+                    indices?.size ?: 0,
+                    toInterop(indices),
+                    blendMode.ordinal,
+                    getPtr(paint)
+                )
+            }
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(paint)
         }
-        reachabilityBarrier(paint)
         return this
     }
 
@@ -639,21 +719,25 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         require(colors == null || colors.size == positions.size) { "Expected colors.length == positions.length, got: " + colors!!.size + " != " + positions.size }
         require(texCoords == null || texCoords.size == positions.size) { "Expected texCoords.length == positions.length, got: " + texCoords!!.size + " != " + positions.size }
         Stats.onNativeCall()
-        interopScope {
-            _nDrawVertices(
-                _ptr,
-                2 /* kTriangleFan_VertexMode */,
-                positions.size,
-                toInterop(Point.flattenArray(positions)),
-                toInterop(colors),
-                toInterop(Point.flattenArray(texCoords)),
-                indices?.size ?: 0,
-                toInterop(indices),
-                blendMode.ordinal,
-                getPtr(paint)
-            )
+        try {
+            interopScope {
+                _nDrawVertices(
+                    _ptr,
+                    2 /* kTriangleFan_VertexMode */,
+                    positions.size,
+                    toInterop(Point.flattenArray(positions)),
+                    toInterop(colors),
+                    toInterop(Point.flattenArray(texCoords)),
+                    indices?.size ?: 0,
+                    toInterop(indices),
+                    blendMode.ordinal,
+                    getPtr(paint)
+                )
+            }
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(paint)
         }
-        reachabilityBarrier(paint)
         return this
     }
 
@@ -702,21 +786,25 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
             "Expected texCoords.length == positions.length, got: " + texCoords!!.size + " != " + positions.size
         }
         Stats.onNativeCall()
-        interopScope {
-            _nDrawVertices(
-                _ptr,
-                vertexMode.ordinal,
-                points,
-                toInterop(positions),
-                toInterop(colors),
-                toInterop(texCoords),
-                indices?.size ?: 0,
-                toInterop(indices),
-                blendMode.ordinal,
-                getPtr(paint)
-            )
+        try {
+            interopScope {
+                _nDrawVertices(
+                    _ptr,
+                    vertexMode.ordinal,
+                    points,
+                    toInterop(positions),
+                    toInterop(colors),
+                    toInterop(texCoords),
+                    indices?.size ?: 0,
+                    toInterop(indices),
+                    blendMode.ordinal,
+                    getPtr(paint)
+                )
+            }
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(paint)
         }
-        reachabilityBarrier(paint)
         return this
     }
 
@@ -766,17 +854,21 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         require(colors.size == 4) { "Expected colors.length == 4, got: " + colors.size }
         require(texCoords == null || texCoords.size == 4) { "Expected texCoords.length == 4, got: " + texCoords!!.size }
         Stats.onNativeCall()
-        interopScope {
-            _nDrawPatch(
-                _ptr,
-                toInterop(Point.flattenArray(cubics)),
-                toInterop(colors),
-                toInterop(Point.flattenArray(texCoords)),
-                blendMode.ordinal,
-                getPtr(paint)
-            )
+        try {
+            interopScope {
+                _nDrawPatch(
+                    _ptr,
+                    toInterop(Point.flattenArray(cubics)),
+                    toInterop(colors),
+                    toInterop(Point.flattenArray(texCoords)),
+                    blendMode.ordinal,
+                    getPtr(paint)
+                )
+            }
+        } finally {
+            reachabilityBarrier(paint)
+            reachabilityBarrier(this)
         }
-        reachabilityBarrier(paint)
         return this
     }
 
@@ -837,23 +929,35 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
      */
     fun drawDrawable(drawable: Drawable, matrix: Matrix33?): Canvas {
         Stats.onNativeCall()
-        interopScope {
-            _nDrawDrawable(_ptr, getPtr(drawable), toInterop(matrix?.mat))
+        try {
+            interopScope {
+                _nDrawDrawable(_ptr, getPtr(drawable), toInterop(matrix?.mat))
+            }
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(drawable)
         }
-        reachabilityBarrier(drawable)
         return this
     }
 
     fun clear(color: Int): Canvas {
         Stats.onNativeCall()
-        _nClear(_ptr, color)
+        try {
+            _nClear(_ptr, color)
+        } finally {
+            reachabilityBarrier(this)
+        }
         return this
     }
 
     fun drawPaint(paint: Paint): Canvas {
         Stats.onNativeCall()
-        _nDrawPaint(_ptr, getPtr(paint))
-        reachabilityBarrier(paint)
+        try {
+            _nDrawPaint(_ptr, getPtr(paint))
+        } finally {
+            reachabilityBarrier(paint)
+            reachabilityBarrier(this)
+        }
         return this
     }
 
@@ -939,8 +1043,12 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
 
     fun clipPath(p: Path, mode: ClipMode, antiAlias: Boolean): Canvas {
         Stats.onNativeCall()
-        _nClipPath(_ptr, getPtr(p), mode.ordinal, antiAlias)
-        reachabilityBarrier(p)
+        try {
+            _nClipPath(_ptr, getPtr(p), mode.ordinal, antiAlias)
+        } finally {
+            reachabilityBarrier(p)
+            reachabilityBarrier(this)
+        }
         return this
     }
 
@@ -958,8 +1066,12 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
 
     fun clipRegion(r: Region, mode: ClipMode): Canvas {
         Stats.onNativeCall()
-        _nClipRegion(_ptr, getPtr(r), mode.ordinal)
-        reachabilityBarrier(r)
+        try {
+            _nClipRegion(_ptr, getPtr(r), mode.ordinal)
+        } finally {
+            reachabilityBarrier(r)
+            reachabilityBarrier(this)
+        }
         return this
     }
 

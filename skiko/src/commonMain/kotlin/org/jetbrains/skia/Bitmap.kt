@@ -70,10 +70,13 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
      */
     fun swap(other: Bitmap) {
         Stats.onNativeCall()
-        _nSwap(_ptr, getPtr(other))
-        _imageInfo = null
-        reachabilityBarrier(this)
-        reachabilityBarrier(other)
+        try {
+            _nSwap(_ptr, getPtr(other))
+            _imageInfo = null
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(other)
+        }
     }
 
     override val imageInfo: ImageInfo
@@ -685,6 +688,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
             )
             this
         } finally {
+            reachabilityBarrier(this)
             reachabilityBarrier(pixelRef)
         }
     }
