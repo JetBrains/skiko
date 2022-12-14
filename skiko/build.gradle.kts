@@ -458,6 +458,7 @@ fun configureNativeTarget(os: OS, arch: Arch, target: KotlinNativeTarget) {
                     "-linker-option", "-lfontconfig",
                     "-linker-option", "-lGL",
                     // TODO: an ugly hack, Linux linker searches only unresolved symbols.
+                    "-linker-option", "$skiaBinDir/libsksg.a",
                     "-linker-option", "$skiaBinDir/libskshaper.a",
                     "-linker-option", "$skiaBinDir/libskunicode.a",
                     "-linker-option", "$skiaBinDir/libskia.a"
