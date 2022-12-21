@@ -5,6 +5,7 @@ import org.jetbrains.skiko.hostOs
 import org.jetbrains.skiko.tests.SkipJsTarget
 import org.jetbrains.skiko.tests.SkipJvmTarget
 import org.jetbrains.skiko.tests.SkipNativeTarget
+import org.jetbrains.skiko.tests.SkipWasmTarget
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
@@ -18,6 +19,7 @@ class BreakIteratorTests {
 
     @Test
     @SkipJsTarget
+    @SkipWasmTarget
     fun breakIteratorWordInstanceTest() {
         // Wasm and iOS builds of Skia do not include required data to implement those iterators,
         // see `third_party/externals/icu/flutter/README.md`.
@@ -51,6 +53,7 @@ class BreakIteratorTests {
 
     @Test
     @SkipJsTarget
+    @SkipWasmTarget
     fun breakIteratorSentenceInstanceTest() {
         // Wasm and iOS builds of Skia do not include required data to implement those iterators,
         // see `third_party/externals/icu/flutter/README.md`.
