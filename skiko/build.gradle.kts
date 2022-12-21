@@ -16,7 +16,8 @@ plugins {
     id("de.undercouch.download") version "4.1.2"
 }
 
-val coroutinesVersion = "1.6.4-wasm0"
+val coroutinesVersion = "1.6.4"
+val atomicFuVersion = "0.18.5"
 
 fun targetSuffix(os: OS, arch: Arch): String {
     return "${os.id}_${arch.id}"
@@ -290,8 +291,6 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(kotlin("stdlib"))
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
-                implementation("org.jetbrains.kotlinx:atomicfu:0.18.5-wasm0")
             }
         }
         val commonTest by getting {
@@ -359,6 +358,8 @@ kotlin {
                     dependsOn(jsWasmMain)
                     dependencies {
                         implementation(kotlin("stdlib-js"))
+                        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
+                        implementation("org.jetbrains.kotlinx:atomicfu:$atomicFuVersion")
                     }
                 }
 
@@ -366,13 +367,14 @@ kotlin {
                     dependsOn(jsWasmMain)
                     dependencies {
                         implementation(kotlin("stdlib-wasm"))
+                        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion-wasm0")
+                        implementation("org.jetbrains.kotlinx:atomicfu:$atomicFuVersion-wasm0")
                     }
                 }
 
                 val jsWasmTest by creating {
                     dependsOn(nativeJsTest)
                     dependencies {
-                        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
                         implementation(kotlin("test"))
                     }
                 }
