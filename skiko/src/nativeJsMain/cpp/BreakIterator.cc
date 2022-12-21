@@ -98,23 +98,22 @@ SKIKO_EXPORT KInt org_jetbrains_skia_BreakIterator__1nGetRuleStatus
 }
 
 
-
-#if 0
-SKIKO_EXPORT KInt* org_jetbrains_skia_BreakIterator__1nGetRuleStatuses
+SKIKO_EXPORT KInt org_jetbrains_skia_BreakIterator__1nGetRuleStatusesLen
   (KNativePointer ptr) {
     UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(ptr);
     UErrorCode status = U_ZERO_ERROR;
     int32_t len = ubrk_getRuleStatusVec(instance, nullptr, 0, &status);
-    if (U_FAILURE(status))
-      env->ThrowNew(java::lang::RuntimeException::cls, u_errorName(status));
-    std::vector<KInt> vec(len);
-    ubrk_getRuleStatusVec(instance, reinterpret_cast<int32_t*>(vec.data()), len, &status);
-    if (U_FAILURE(status))
-      env->ThrowNew(java::lang::RuntimeException::cls, u_errorName(status));
-    return javaIntArray(env, vec);
+    SKIKO_ASSERT(status == U_BUFFER_OVERFLOW_ERROR || !U_FAILURE(status), "Failed to get rule statuses");
+    return len;
 }
-#endif
 
+SKIKO_EXPORT void org_jetbrains_skia_BreakIterator__1nGetRuleStatuses
+  (KNativePointer ptr, KInteropPointer result, KInt len) {
+    UBreakIterator* instance = reinterpret_cast<UBreakIterator*>(ptr);
+    UErrorCode status = U_ZERO_ERROR;
+    ubrk_getRuleStatusVec(instance, reinterpret_cast<int32_t*>(result), len, &status);
+    SKIKO_ASSERT(!U_FAILURE(status), "Failed to get rule statuses");
+}
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_BreakIterator__1nSetText
   (KNativePointer ptr, KChar* textArr, KInt len, KInt* errorCode) {

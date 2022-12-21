@@ -57,7 +57,7 @@ class Codec internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHo
     val size: IPoint
         get() = try {
             Stats.onNativeCall()
-            toIPoint(_nGetSize(_ptr))
+            IPoint(_nGetSizeWidth(_ptr), _nGetSizeHeight(_ptr))
         } finally {
             reachabilityBarrier(this)
         }
@@ -372,8 +372,11 @@ private external fun Codec_nReadPixels(ptr: NativePointer, bitmapPtr: NativePoin
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nMakeFromData")
 private external fun _nMakeFromData(dataPtr: NativePointer): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_Codec__1nGetSize")
-private external fun _nGetSize(ptr: NativePointer): Long
+@ExternalSymbolName("org_jetbrains_skia_Codec__1nGetSizeWidth")
+private external fun _nGetSizeWidth(ptr: NativePointer): Int
+
+@ExternalSymbolName("org_jetbrains_skia_Codec__1nGetSizeHeight")
+private external fun _nGetSizeHeight(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Codec__1nGetEncodedOrigin")
 private external fun _nGetEncodedOrigin(ptr: NativePointer): Int
