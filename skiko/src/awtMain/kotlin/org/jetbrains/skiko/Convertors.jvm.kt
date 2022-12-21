@@ -100,7 +100,7 @@ fun toSkikoEvent(event: MouseEvent): SkikoPointerEvent {
 }
 
 fun toSkikoEvent(event: MouseWheelEvent): SkikoPointerEvent {
-    val scrollAmount = event.getPreciseWheelRotation()
+    val scrollAmount = event.preciseWheelRotation
     val modifiers = toSkikoModifiers(event.modifiersEx)
     val isShiftPressed = modifiers.has(SkikoInputModifiers.SHIFT)
     val deltaX = if (isShiftPressed) scrollAmount else 0.0
@@ -127,8 +127,8 @@ fun toSkikoEvent(event: KeyEvent): SkikoKeyboardEvent {
         SkikoKey.valueOf(toSkikoKey(event)),
         toSkikoModifiers(event.modifiersEx),
         when(event.id) {
-            KeyEvent.KEY_PRESSED -> SkikoKeyboardEventKind.DOWN
-            KeyEvent.KEY_RELEASED -> SkikoKeyboardEventKind.UP
+            KEY_PRESSED -> SkikoKeyboardEventKind.DOWN
+            KEY_RELEASED -> SkikoKeyboardEventKind.UP
             else -> SkikoKeyboardEventKind.UNKNOWN
         },
         event.`when`,
@@ -176,7 +176,7 @@ private fun toSkikoPressedMouseButtons(event: MouseEvent): SkikoMouseButtons {
     // see: https://youtrack.jetbrains.com/issue/COMPOSE-36
     if (mask and InputEvent.BUTTON1_DOWN_MASK != 0
         || (event.id == MouseEvent.MOUSE_PRESSED && event.button == MouseEvent.BUTTON1)) {
-        result = result.or(SkikoMouseButtons.LEFT.value)
+        result = SkikoMouseButtons.LEFT.value
     }
     if (mask and InputEvent.BUTTON2_DOWN_MASK != 0
         || (event.id == MouseEvent.MOUSE_PRESSED && event.button == MouseEvent.BUTTON2)) {
@@ -211,7 +211,7 @@ private fun toSkikoMouseButton(event: MouseEvent): SkikoMouseButtons {
 private fun toSkikoModifiers(modifiers: Int): SkikoInputModifiers {
     var result = 0
     if (modifiers and InputEvent.ALT_DOWN_MASK != 0) {
-        result = result.or(SkikoInputModifiers.ALT.value)
+        result = SkikoInputModifiers.ALT.value
     }
     if (modifiers and InputEvent.SHIFT_DOWN_MASK != 0) {
         result = result.or(SkikoInputModifiers.SHIFT.value)
@@ -227,14 +227,15 @@ private fun toSkikoModifiers(modifiers: Int): SkikoInputModifiers {
 
 private fun toSkikoKey(event: KeyEvent): Int {
     var key = event.keyCode
-    val side = event.getKeyLocation()
+    val side = event.keyLocation
     if (side == KEY_LOCATION_RIGHT) {
         if (
             key == SkikoKey.KEY_LEFT_CONTROL.platformKeyCode ||
             key == SkikoKey.KEY_LEFT_SHIFT.platformKeyCode ||
             key == SkikoKey.KEY_LEFT_META.platformKeyCode
-        )
-        key = key.or(0x80000000.toInt())
+        ) {
+            key = key.or(0x80000000.toInt())
+        }
     }
     if (side == KEY_LOCATION_NUMPAD) {
         if (key == SkikoKey.KEY_ENTER.platformKeyCode) {
