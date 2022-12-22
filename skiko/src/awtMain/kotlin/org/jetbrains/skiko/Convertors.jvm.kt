@@ -1,5 +1,7 @@
 package org.jetbrains.skiko
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.BufferUtil
 import java.awt.Transparency
@@ -7,12 +9,14 @@ import java.awt.color.ColorSpace
 import java.awt.image.*
 import java.awt.event.*
 import java.awt.event.KeyEvent.*
+import java.awt.font.TextAttribute
 import java.nio.ByteBuffer
 
-private class DirectDataBuffer(val backing: ByteBuffer): DataBuffer(TYPE_BYTE, backing.limit()) {
+private class DirectDataBuffer(val backing: ByteBuffer) : DataBuffer(TYPE_BYTE, backing.limit()) {
     override fun getElem(bank: Int, index: Int): Int {
         return backing[index].toInt()
     }
+
     override fun setElem(bank: Int, index: Int, value: Int) {
         throw UnsupportedOperationException("no write access")
     }
@@ -43,7 +47,7 @@ fun Bitmap.toBufferedImage(): BufferedImage {
         Transparency.TRANSLUCENT,
         DataBuffer.TYPE_BYTE
     )
-   return BufferedImage(colorModel, raster!!, false, null)
+    return BufferedImage(colorModel, raster!!, false, null)
 }
 
 fun BufferedImage.toBitmap(): Bitmap {
@@ -85,7 +89,7 @@ fun toSkikoEvent(event: MouseEvent): SkikoPointerEvent {
         pressedButtons = toSkikoPressedMouseButtons(event),
         button = toSkikoMouseButton(event),
         modifiers = toSkikoModifiers(event.modifiersEx),
-        kind = when(event.id) {
+        kind = when (event.id) {
             MouseEvent.MOUSE_PRESSED -> SkikoPointerEventKind.DOWN
             MouseEvent.MOUSE_RELEASED -> SkikoPointerEventKind.UP
             MouseEvent.MOUSE_DRAGGED -> SkikoPointerEventKind.DRAG
@@ -113,8 +117,8 @@ fun toSkikoEvent(event: MouseWheelEvent): SkikoPointerEvent {
         pressedButtons = toSkikoPressedMouseButtons(event),
         button = toSkikoMouseButton(event),
         modifiers = modifiers,
-        kind = when(event.id) {
-            MouseEvent.MOUSE_WHEEL-> SkikoPointerEventKind.SCROLL
+        kind = when (event.id) {
+            MouseEvent.MOUSE_WHEEL -> SkikoPointerEventKind.SCROLL
             else -> SkikoPointerEventKind.UNKNOWN
         },
         timestamp = event.`when`,
@@ -126,7 +130,7 @@ fun toSkikoEvent(event: KeyEvent): SkikoKeyboardEvent {
     return SkikoKeyboardEvent(
         SkikoKey.valueOf(toSkikoKey(event)),
         toSkikoModifiers(event.modifiersEx),
-        when(event.id) {
+        when (event.id) {
             KEY_PRESSED -> SkikoKeyboardEventKind.DOWN
             KEY_RELEASED -> SkikoKeyboardEventKind.UP
             else -> SkikoKeyboardEventKind.UNKNOWN
@@ -175,23 +179,28 @@ private fun toSkikoPressedMouseButtons(event: MouseEvent): SkikoMouseButtons {
     // info about the pressed mouse button when using touchpad on MacOS 12 (AWT only)
     // see: https://youtrack.jetbrains.com/issue/COMPOSE-36
     if (mask and InputEvent.BUTTON1_DOWN_MASK != 0
-        || (event.id == MouseEvent.MOUSE_PRESSED && event.button == MouseEvent.BUTTON1)) {
+        || (event.id == MouseEvent.MOUSE_PRESSED && event.button == MouseEvent.BUTTON1)
+    ) {
         result = SkikoMouseButtons.LEFT.value
     }
     if (mask and InputEvent.BUTTON2_DOWN_MASK != 0
-        || (event.id == MouseEvent.MOUSE_PRESSED && event.button == MouseEvent.BUTTON2)) {
+        || (event.id == MouseEvent.MOUSE_PRESSED && event.button == MouseEvent.BUTTON2)
+    ) {
         result = result.or(SkikoMouseButtons.MIDDLE.value)
     }
     if (mask and InputEvent.BUTTON3_DOWN_MASK != 0
-        || (event.id == MouseEvent.MOUSE_PRESSED && event.button == MouseEvent.BUTTON3)) {
+        || (event.id == MouseEvent.MOUSE_PRESSED && event.button == MouseEvent.BUTTON3)
+    ) {
         result = result.or(SkikoMouseButtons.RIGHT.value)
     }
     if (mask and MouseEvent.getMaskForButton(MouseEventButton4) != 0
-        || (event.id == MouseEvent.MOUSE_PRESSED && event.button == MouseEventButton4)) {
+        || (event.id == MouseEvent.MOUSE_PRESSED && event.button == MouseEventButton4)
+    ) {
         result = result.or(SkikoMouseButtons.BUTTON_4.value)
     }
     if (mask and MouseEvent.getMaskForButton(MouseEventButton5) != 0
-        || (event.id == MouseEvent.MOUSE_PRESSED && event.button == MouseEventButton5)) {
+        || (event.id == MouseEvent.MOUSE_PRESSED && event.button == MouseEventButton5)
+    ) {
         result = result.or(SkikoMouseButtons.BUTTON_5.value)
     }
     return SkikoMouseButtons(result)
@@ -245,7 +254,83 @@ private fun toSkikoKey(event: KeyEvent): Int {
     return key
 }
 
-suspend fun java.awt.Font.toSkikoTypeface(fontManager: AwtFontManager = AwtFontManager.DEFAULT): Typeface? {
-    val file = fontManager.findFontFile(this) ?: return null
-    return Typeface.makeFromData(Data.makeFromFileName(file.absolutePath))
+suspend fun java.awt.Font.toSkikoTypeface() = withContext(Dispatchers.Default) {
+    val fontStyle = FontStyle(
+        weight = toSkikoWeight(weight),
+        width = toSkikoWidth(width),
+        slant = toSkikoSlant(posture)
+    )
+
+    AwtFontManager.getTypefaceOrNull(this@toSkikoTypeface.family, fontStyle)
 }
+
+/**
+ * Makes a best-effort conversion from the AWT [Font] [TextAttribute.WEIGHT] values
+ * to the [FontWeight] values that Skia uses. Those match CSS font-weight values.
+ *
+ * Note that AWT calls their constants in a different way from what Skia does; don't
+ * expect they will be matching the corresponding constants, as the intent is to map
+ * to the relative weight scale.
+ */
+private fun toSkikoWeight(weight: Float) =
+    when {
+        weight <= .01f -> FontWeight.INVISIBLE // Imprecise match
+        weight <= TextAttribute.WEIGHT_EXTRA_LIGHT -> FontWeight.THIN // Imprecise match
+        weight <= TextAttribute.WEIGHT_LIGHT -> FontWeight.EXTRA_LIGHT // Imprecise match
+        weight <= TextAttribute.WEIGHT_DEMILIGHT -> FontWeight.LIGHT // Imprecise match
+        weight <= TextAttribute.WEIGHT_REGULAR -> FontWeight.NORMAL
+        weight <= TextAttribute.WEIGHT_MEDIUM -> FontWeight.MEDIUM
+        weight <= TextAttribute.WEIGHT_DEMIBOLD -> FontWeight.SEMI_BOLD
+        weight <= TextAttribute.WEIGHT_BOLD -> FontWeight.BOLD
+        weight <= TextAttribute.WEIGHT_HEAVY -> FontWeight.EXTRA_BOLD // Imprecise match
+        weight <= TextAttribute.WEIGHT_EXTRABOLD -> FontWeight.BLACK // Imprecise match
+        else -> FontWeight.EXTRA_BLACK // Imprecise match
+    }
+
+/**
+ * Makes a best-effort conversion from the AWT [Font] [TextAttribute.WIDTH] values
+ * to the [FontWidth] values that Skia uses.
+ *
+ * AWT's understanding of widths is pretty limited, compared to Skia's, so the
+ * conversion is necessarily lossy here. Values below [TextAttribute.WIDTH_CONDENSED]
+ * are all translated to [FontWidth.CONDENSED], and values above [TextAttribute.WIDTH_EXTENDED]
+ * are all translated to [FontWidth.EXPANDED]. This means that we cannot correctly assign
+ * widths of [FontWidth.ULTRA_CONDENSED], [FontWidth.EXTRA_CONDENSED], [FontWidth.EXTRA_EXPANDED],
+ * and [FontWidth.ULTRA_EXPANDED].
+ */
+private fun toSkikoWidth(width: Float) =
+    when {
+        width <= TextAttribute.WIDTH_CONDENSED -> FontWidth.CONDENSED
+        width <= TextAttribute.WIDTH_SEMI_CONDENSED -> FontWidth.SEMI_CONDENSED
+        width <= TextAttribute.WIDTH_REGULAR -> FontWidth.NORMAL
+        width <= TextAttribute.WIDTH_SEMI_EXTENDED -> FontWidth.SEMI_EXPANDED
+        else -> FontWidth.EXPANDED
+    }
+
+/**
+ * Makes a best-effort conversion from the AWT [Font] [TextAttribute.POSTURE] values
+ * to the [FontSlant] values that Skia uses.
+ *
+ * AWT's understanding of slant is pretty limited, compared to Skia's, so the
+ * conversion is necessarily lossy here. Since AWT doesn't know the difference
+ * between _italic_ (a font designed as slanted) and _oblique_ (a regular font,
+ * artificially slanted to look italic), we map all values bigger than
+ * [TextAttribute.POSTURE_REGULAR] as italic.
+ *
+ * This is even more confusing, since AWT calls [TextAttribute.POSTURE_OBLIQUE]
+ * the value that corresponds to [java.awt.Font.ITALIC].
+ */
+private fun toSkikoSlant(posture: Float) =
+    when {
+        posture <= TextAttribute.POSTURE_REGULAR -> FontSlant.UPRIGHT
+        else -> FontSlant.ITALIC
+    }
+
+internal val java.awt.Font.weight
+    get() = attributes[TextAttribute.WEIGHT] as Float
+
+internal val java.awt.Font.width
+    get() = attributes[TextAttribute.WIDTH] as Float
+
+internal val java.awt.Font.posture
+    get() = attributes[TextAttribute.POSTURE] as Float
