@@ -1,111 +1,92 @@
 package org.jetbrains.skiko
 
-import org.jetbrains.skiko.tests.runTest
-import org.junit.Assert.assertTrue
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runBlockingTest
+import org.jetbrains.skia.FontStyle
 import org.junit.Assume
+import org.junit.Before
 import org.junit.Test
-import java.awt.Font
 import java.awt.GraphicsEnvironment
+import kotlin.test.*
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class AwtFontInteropTest {
-    private val fontManager = AwtFontManager()
+    private val fontManager = AwtFontManager
 
-    private fun assumeOk() {
+    @Before
+    fun assumeOk() {
         Assume.assumeFalse(GraphicsEnvironment.isHeadless())
         Assume.assumeTrue(hostOs != OS.Linux)
     }
 
-    @OptIn(DelicateSkikoApi::class)
     @Test
-    fun canFindAvailableFont() = fontManager.whenAllFontsCachedBlocking {
-        assumeOk()
-        val font = Font("Verdana", Font.BOLD, 12)
-        val path = fontManager.findAvailableFontFile(font)
-        assertTrue("Font must be found", path != null)
-        path!!
-        assertTrue("Font must be file", path.exists() && path.isFile)
+    fun canFindRegularFont() = runBlockingTest {
+        val typeface = fontManager.getTypefaceOrNull("Verdana", FontStyle.NORMAL)
+        assertNotNull(typeface, "Font must exist")
+        assertEquals("Verdana", typeface.familyName, "Font family name must match")
+        assertFalse(typeface.isBold, "Font must not be bold")
+        assertFalse(typeface.isItalic, "Font must not be italic")
     }
 
     @Test
-    fun canFindFont() {
-        runTest {
-            assumeOk()
-            val font = Font("Verdana", Font.BOLD, 12)
-            val path = fontManager.findFontFile(font)
-            assertTrue("Font must be found", path != null)
-            path!!
-            assertTrue("Font must be file", path.exists() && path.isFile)
-        }
+    fun canFindBoldFont() = runBlockingTest {
+        val typeface = fontManager.getTypefaceOrNull("Verdana", FontStyle.BOLD)
+        assertNotNull(typeface, "Font must exist")
+        assertEquals("Verdana", typeface.familyName, "Font family name must match")
+        assertTrue(typeface.isBold, "Font must be bold")
+        assertFalse(typeface.isItalic, "Font must not be italic")
     }
 
     @Test
-    fun canFindFamily() {
-        runTest {
-            assumeOk()
-            val path = fontManager.findFontFamilyFile("Verdana")
-            assertTrue("Font must be found", path != null)
-            path!!
-            assertTrue("Font must be file", path.exists() && path.isFile)
-        }
-    }
-
-    @OptIn(DelicateSkikoApi::class)
-    @Test
-    fun nonExistentFont() = fontManager.whenAllFontsCachedBlocking {
-        assumeOk()
-        val font = Font("XXXYYY745", Font.BOLD, 12)
-        val path = fontManager.findAvailableFontFile(font)
-        assertTrue("Font must not be found", path == null)
+    fun canFindItalicFont() = runBlockingTest {
+        val typeface = fontManager.getTypefaceOrNull("Verdana", FontStyle.ITALIC)
+        assertNotNull(typeface, "Font must exist")
+        assertEquals("Verdana", typeface.familyName, "Font family name must match")
+        assertFalse(typeface.isBold, "Font must not be bold")
+        assertTrue(typeface.isItalic, "Font must be italic")
     }
 
     @Test
-    fun makeSkikoTypeface() {
-        runTest {
-            assumeOk()
-            Assume.assumeFalse(GraphicsEnvironment.isHeadless())
-            val font = Font("Verdana", Font.BOLD, 12)
-            val skikoTypeface = font.toSkikoTypeface()
-            assertTrue("Skiko typeface must work", skikoTypeface != null)
-            skikoTypeface!!
-            assertTrue("Skiko typeface name is incorrect: ${skikoTypeface.familyName}", skikoTypeface.familyName == "Verdana")
-        }
+    fun canFindBoldItalicFont() = runBlockingTest {
+        val typeface = fontManager.getTypefaceOrNull("Verdana", FontStyle.BOLD_ITALIC)
+        assertNotNull(typeface, "Font must exist")
+        assertEquals("Verdana", typeface.familyName, "Font family name must match")
+        assertTrue(typeface.isBold, "Font must be bold")
+        assertTrue(typeface.isItalic, "Font must be italic")
     }
 
     @Test
-    fun listAllFonts() {
-        runTest {
-            assumeOk()
-            val fontFiles = fontManager.listFontFiles()
-            assertTrue("There must be fonts", fontFiles.isNotEmpty())
-        }
+    fun cantFindNonExistentFont() = runBlockingTest {
+        val typeface = fontManager.getTypefaceOrNull("XXXYYY745", FontStyle.NORMAL)
+        assertNull(typeface, "Font must not match (doesn't exist!)")
     }
 
     @Test
-    fun addCustomPath() {
-        runTest {
-            assumeOk()
-            val resDir = System.getProperty("skiko.test.font.dir")!!
-            fontManager.addCustomPath(resDir)
-            fontManager.invalidate()
-            val path = fontManager.findFontFamilyFile("JetBrains Mono")
-            assertTrue("Custom font must be found", path != null)
-            path!!
-            assertTrue("Font must be file", path.exists() && path.isFile)
-        }
+    fun canRegisterFontFromClasspath() = runBlockingTest {
+        assertNull(
+            fontManager.getTypefaceOrNull("Libre Barcode 39", FontStyle.NORMAL),
+            "The font we're trying to add must not already be loaded"
+        )
+
+        fontManager.addResourceFont("LibreBarcode39-Regular.ttf")
+
+        val typeface = fontManager.getTypefaceOrNull("Libre Barcode 39", FontStyle.NORMAL)
+        assertNotNull(typeface, "Font must have been loaded from resources")
+        assertEquals("Libre Barcode 39", typeface.familyName, "Font family name must match")
+        assertFalse(typeface.isBold, "Font must not be bold")
+        assertFalse(typeface.isItalic, "Font must not be italic")
     }
 
-    // This test is disabled due to convoluted setup of tests.
-    // @Test
-    fun addCustomResource() {
-        runTest {
-            assumeOk()
-            val fontManager = AwtFontManager()
-            assertTrue("Custom resource must be found",
-                fontManager.addResourceFont("/fonts/JetBrainsMono-Bold.ttf", Library.javaClass.classLoader))
-            val path = fontManager.findFontFamilyFile("JetBrains Mono")
-            assertTrue("Custom font must be found", path != null)
-            path!!
-            assertTrue("Font must be file", path.exists() && path.isFile)
-        }
+    @Test
+    fun listAllFonts() = runBlockingTest {
+        val families = fontManager.availableFontFamilies
+        assertTrue(families.isNotEmpty(), "Available font families must not be empty")
+
+        println("Enumerated font families:")
+        println(families.sorted().joinToString("\n") { " * $it" })
+
+        val systemFont = fontManager.getTypefaceOrNull("System font", FontStyle.NORMAL)
+        assertNotNull(systemFont, "System font must be loaded")
+        println(systemFont.familyNames.joinToString(", ", "System font families: "))
     }
 }
