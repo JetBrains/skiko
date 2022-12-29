@@ -1,10 +1,9 @@
 import de.undercouch.gradle.tasks.download.Download
-import org.gradle.crypto.checksum.Checksum
-import org.gradle.api.tasks.testing.AbstractTestTask
-import org.jetbrains.compose.internal.publishing.MavenCentralProperties
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.crypto.checksum.Checksum
+import org.jetbrains.compose.internal.publishing.MavenCentralProperties
+import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompileTool
 import org.jetbrains.kotlin.konan.target.KonanTarget
 
@@ -17,7 +16,7 @@ plugins {
     id("de.undercouch.download") version "5.4.0"
 }
 
-val coroutinesVersion = "1.5.2"
+val coroutinesVersion = "1.6.4"
 
 fun targetSuffix(os: OS, arch: Arch): String {
     return "${os.id}_${arch.id}"
@@ -311,6 +310,7 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
                 implementation(kotlin("test-junit"))
                 implementation(kotlin("test"))
+                implementation("pl.pragmatists:JUnitParams:1.1.1")
             }
         }
 

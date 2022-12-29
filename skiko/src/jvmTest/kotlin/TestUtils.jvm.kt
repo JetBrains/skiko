@@ -1,6 +1,6 @@
 package org.jetbrains.skiko.tests
 
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.jetbrains.skia.Data
 import org.jetbrains.skia.impl.BufferUtil
 import org.jetbrains.skia.impl.InteropScope
@@ -8,9 +8,8 @@ import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.makeFromFileName
 import java.nio.ByteBuffer
 
-actual fun runTest(block: suspend () -> Unit) {
-    runBlocking { block() }
-}
+@OptIn(ExperimentalCoroutinesApi::class)
+actual fun runTest(block: suspend () -> Unit) = kotlinx.coroutines.test.runTest { block() }
 
 internal actual fun InteropScope.allocateBytesForPixels(size: Int): NativePointer {
     return BufferUtil.getPointerFromByteBuffer(ByteBuffer.allocateDirect(size))

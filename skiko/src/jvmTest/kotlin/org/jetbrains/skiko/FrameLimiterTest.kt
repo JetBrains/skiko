@@ -1,15 +1,13 @@
 package org.jetbrains.skiko
 
 import kotlinx.coroutines.*
-import kotlinx.coroutines.test.DelayController
-import kotlinx.coroutines.test.TestCoroutineDispatcher
-import kotlinx.coroutines.test.TestCoroutineScope
-import kotlinx.coroutines.test.runBlockingTest
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
+import kotlinx.coroutines.test.*
 import org.junit.Test
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.ceil
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class FrameLimiterTest {
@@ -155,11 +153,10 @@ class FrameLimiterTest {
     fun `cancel scope before awaitNextFrame`() = runBlockingTest {
         pauseDispatcher()
         val scope = CoroutineScope(coroutineContext + Job())
-        val frameLimiter = FrameLimiter(scope, { 10 }, nanoTime = { currentTime * 1_000_000 })
+        val frameLimiter = FrameLimiter(scope, { 10 }, nanoTime = { currentTime.milliseconds.inWholeNanoseconds })
 
         scope.cancel()
-
-        assertThrow<kotlin.coroutines.cancellation.CancellationException> {
+        assertFailsWith(CancellationException::class) {
             frameLimiter.awaitNextFrame()
         }
     }
@@ -169,13 +166,13 @@ class FrameLimiterTest {
         pauseDispatcher()
         val scope = CoroutineScope(coroutineContext + Job())
 
-        val frameLimiter = FrameLimiter(scope, { 10 }, nanoTime = { currentTime * 1_000_000 })
+        val frameLimiter = FrameLimiter(scope, { 10 }, nanoTime = { currentTime.milliseconds.inWholeNanoseconds })
 
         launch {
             scope.cancel()
         }
 
-        assertThrow<kotlin.coroutines.cancellation.CancellationException> {
+        assertFailsWith(CancellationException::class) {
             frameLimiter.awaitNextFrame()
         }
     }
@@ -215,53 +212,35 @@ class FrameLimiterTest {
         scope.cancel()
     }
 
-    private inline fun <reified T : Throwable> assertThrow(body: () -> Unit) {
-        var actualE: Throwable? = null
-        try {
-            body()
-        } catch (e: Throwable) {
-            actualE = e
-        }
-        assertTrue("Actual ${actualE?.javaClass}, expected ${T::class.java}", actualE is T)
-    }
-
     private fun frameLimiterTest(
         frameLimitMillis: Long,
         delayPrecisionMillis: Long,
         block: suspend TestCoroutineScope.(FrameLimiter) -> Unit
     ) {
-        runFrameTest(
-            delayPrecisionMillis = delayPrecisionMillis
-        ) {
-            val scope = CoroutineScope(coroutineContext + Job())
-            val limiter = FrameLimiter(
-                this,
-                frameMillis = { frameLimitMillis },
-                nanoTime = { currentTime * 1_000_000 }
+        runBlockingTest(context = CoroutineName("runBlockingTest")) {
+            val dispatcher = NonpreciseTestCoroutineDispatcher(
+                delayPrecisionMillis = delayPrecisionMillis,
+                scheduler = testScheduler
             )
-            block(limiter)
-            scope.cancel()
+            withContext(dispatcher) {
+                val scope = CoroutineScope(coroutineContext + CoroutineName("frameLimiterTest") + Job())
+                val limiter = FrameLimiter(
+                    scope,
+                    frameMillis = { frameLimitMillis },
+                    nanoTime = { currentTime.milliseconds.inWholeNanoseconds }
+                )
+                block(limiter)
+                scope.cancel()
+            }
         }
-    }
-
-    private fun runFrameTest(
-        delayPrecisionMillis: Long,
-        block: suspend TestCoroutineScope.() -> Unit
-    ) = runBlockingTest{
-        val dispatcher = NonpreciseTestCoroutineDispatcher(delayPrecisionMillis)
-        dispatcher.pauseDispatcher()
-        val scope = TestCoroutineScope(dispatcher)
-        scope.launch {
-            scope.block()
-        }
-        dispatcher.advanceUntilIdle()
     }
 
     @OptIn(InternalCoroutinesApi::class)
     private class NonpreciseTestCoroutineDispatcher(
         private val delayPrecisionMillis: Long,
-        private val original: TestCoroutineDispatcher = TestCoroutineDispatcher()
-    ) : CoroutineDispatcher(), Delay, DelayController by original {
+        scheduler: TestCoroutineScheduler,
+        private val original: TestCoroutineDispatcher = TestCoroutineDispatcher(scheduler)
+    ) : CoroutineDispatcher(), Delay {
         override fun dispatch(context: CoroutineContext, block: Runnable) {
             original.dispatch(context, block)
         }

@@ -1,7 +1,7 @@
 package org.jetbrains.skiko
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.jetbrains.skia.FontStyle
 import org.junit.Assume
 import org.junit.Before
@@ -10,7 +10,7 @@ import java.awt.GraphicsEnvironment
 import kotlin.test.*
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class AwtFontInteropTest {
+class AwtFontManagerTest {
     private val fontManager = AwtFontManager
 
     @Before
@@ -20,7 +20,7 @@ class AwtFontInteropTest {
     }
 
     @Test
-    fun canFindRegularFont() = runBlockingTest {
+    fun canFindRegularFont() = runTest {
         val typeface = fontManager.getTypefaceOrNull("Verdana", FontStyle.NORMAL)
         assertNotNull(typeface, "Font must exist")
         assertEquals("Verdana", typeface.familyName, "Font family name must match")
@@ -29,7 +29,7 @@ class AwtFontInteropTest {
     }
 
     @Test
-    fun canFindBoldFont() = runBlockingTest {
+    fun canFindBoldFont() = runTest {
         val typeface = fontManager.getTypefaceOrNull("Verdana", FontStyle.BOLD)
         assertNotNull(typeface, "Font must exist")
         assertEquals("Verdana", typeface.familyName, "Font family name must match")
@@ -38,7 +38,7 @@ class AwtFontInteropTest {
     }
 
     @Test
-    fun canFindItalicFont() = runBlockingTest {
+    fun canFindItalicFont() = runTest {
         val typeface = fontManager.getTypefaceOrNull("Verdana", FontStyle.ITALIC)
         assertNotNull(typeface, "Font must exist")
         assertEquals("Verdana", typeface.familyName, "Font family name must match")
@@ -47,7 +47,7 @@ class AwtFontInteropTest {
     }
 
     @Test
-    fun canFindBoldItalicFont() = runBlockingTest {
+    fun canFindBoldItalicFont() = runTest {
         val typeface = fontManager.getTypefaceOrNull("Verdana", FontStyle.BOLD_ITALIC)
         assertNotNull(typeface, "Font must exist")
         assertEquals("Verdana", typeface.familyName, "Font family name must match")
@@ -56,13 +56,13 @@ class AwtFontInteropTest {
     }
 
     @Test
-    fun cantFindNonExistentFont() = runBlockingTest {
+    fun cantFindNonExistentFont() = runTest {
         val typeface = fontManager.getTypefaceOrNull("XXXYYY745", FontStyle.NORMAL)
         assertNull(typeface, "Font must not match (doesn't exist!)")
     }
 
     @Test
-    fun canRegisterFontFromClasspath() = runBlockingTest {
+    fun canRegisterFontFromClasspath() = runTest {
         assertNull(
             fontManager.getTypefaceOrNull("Libre Barcode 39", FontStyle.NORMAL),
             "The font we're trying to add must not already be loaded"
@@ -78,7 +78,7 @@ class AwtFontInteropTest {
     }
 
     @Test
-    fun listAllFonts() = runBlockingTest {
+    fun listAllFonts() = runTest {
         val families = fontManager.availableFontFamilies
         assertTrue(families.isNotEmpty(), "Available font families must not be empty")
 
