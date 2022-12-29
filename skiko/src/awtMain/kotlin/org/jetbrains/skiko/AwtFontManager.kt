@@ -3,7 +3,6 @@ package org.jetbrains.skiko
 import kotlinx.coroutines.*
 import org.jetbrains.skia.*
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.CountDownLatch
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 
@@ -15,20 +14,6 @@ object AwtFontManager {
     private val waitChannel = RendezvousBroadcastChannel<Unit>()
     private var cacheJob: Job? = null
 
-    private var cachingDoneLatch: LoggingLatch? = null
-
-    class LoggingLatch : CountDownLatch(1) {
-        override fun countDown() {
-            super.countDown()
-            println("Countdown! Count is now $count")
-        }
-
-        override fun await() {
-            super.await()
-            println("Await! Count is now $count")
-        }
-    }
-
     init {
         invalidate()
     }
@@ -39,22 +24,19 @@ object AwtFontManager {
      */
     @OptIn(DelicateCoroutinesApi::class, ExperimentalTime::class)
     fun invalidate() {
-//        cacheJob?.cancel()
-        cachingDoneLatch?.countDown()
-        cachingDoneLatch = LoggingLatch()
+        cacheJob?.cancel()
 
         allFontsCachedImpl = false
-        GlobalScope.launch {
+        cacheJob = GlobalScope.launch {
             println("Starting font caching...")
             val elapsed = measureTime { cacheAllFonts() }
             println("Font caching DONE. Took: $elapsed")
             allFontsCachedImpl = true
-//            waitChannel.sendAll(Unit)
-            cachingDoneLatch!!.countDown()
+            waitChannel.sendAll(Unit)
         }
     }
 
-    private fun cacheAllFonts() {
+    private suspend fun cacheAllFonts() {
         fontCache.clear()
 
         val fontManager = FontMgr.default
@@ -69,7 +51,7 @@ object AwtFontManager {
         println(" Got typefaces")
         for ((fontFamily, typefaces) in typefacesByFamily) {
             fontCache[fontFamily] = FontFamily(typefaces)
-//            yield()
+            yield()
         }
 
         println(" Font cache filled")
@@ -80,7 +62,7 @@ object AwtFontManager {
      *
      * @return true, if font was found and identified, and false otherwise
      */
-    fun addResourceFont(resource: String, loader: ClassLoader = Thread.currentThread().contextClassLoader) {
+    suspend fun addResourceFont(resource: String, loader: ClassLoader = Thread.currentThread().contextClassLoader) {
         ensureAllFontsCached()
 
         val res = loader.getResourceAsStream(resource)
@@ -88,7 +70,9 @@ object AwtFontManager {
             ?: error("Unable to access the resources from the provided classloader")
 
         println("Got resources")
-        val resourceBytes = res.readAllBytes()
+        val resourceBytes = withContext(Dispatchers.IO) {
+            res.readAllBytes()
+        }
         println("Read resource")
         val typeface = Typeface.makeFromData(Data.makeFromBytes(resourceBytes))
         val existingTypefaces = fontCache[typeface.familyName]?.availableTypefaces ?: emptySet()
@@ -104,11 +88,10 @@ object AwtFontManager {
         return fontFamily[fontStyle]
     }
 
-    private fun ensureAllFontsCached() {
+    private suspend fun ensureAllFontsCached() {
         if (!allFontsCachedImpl) {
             println("Waiting for fonts to be cached...")
-//            waitChannel.receive()
-            cachingDoneLatch!!.await()
+            waitChannel.receive()
             println("Fonts are now cached")
         }
     }

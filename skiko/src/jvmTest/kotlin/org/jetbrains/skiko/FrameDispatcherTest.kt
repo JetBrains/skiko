@@ -1,29 +1,28 @@
 package org.jetbrains.skiko
 
 import kotlinx.coroutines.*
-import kotlinx.coroutines.test.TestCoroutineScope
-import kotlinx.coroutines.test.runBlockingTest
-import org.junit.Assert.assertEquals
+import kotlinx.coroutines.test.*
 import org.junit.Test
-import java.util.concurrent.Executors
+import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class FrameDispatcherTest {
     private var frameCount = 0
 
     @Test
-    fun `shouldn't call onFrame after the creating`() = test {
-        FrameDispatcher(scope = this) {
+    fun `shouldn't call onFrame after the creating`() = runTest {
+        val frameDispatcher = FrameDispatcher(scope = this) {
             frameCount++
         }
 
         advanceUntilIdle()
 
+        frameDispatcher.cancel()
         assertEquals(0, frameCount)
     }
 
     @Test
-    fun `scheduleFrame after creating`() = test {
+    fun `scheduleFrame after creating`() = runTest {
         val frameDispatcher = FrameDispatcher(scope = this) {
             frameCount++
         }
@@ -31,11 +30,12 @@ class FrameDispatcherTest {
         frameDispatcher.scheduleFrame()
         advanceUntilIdle()
 
+        frameDispatcher.cancel()
         assertEquals(1, frameCount)
     }
 
     @Test
-    fun `scheduleFrame multiple times after creating`() = test {
+    fun `scheduleFrame multiple times after creating`() = runTest {
         val frameDispatcher = FrameDispatcher(scope = this) {
             frameCount++
         }
@@ -46,11 +46,12 @@ class FrameDispatcherTest {
         frameDispatcher.scheduleFrame()
         advanceUntilIdle()
 
+        frameDispatcher.cancel()
         assertEquals(1, frameCount)
     }
 
     @Test
-    fun `scheduleFrame second time after first onFrame`() = test {
+    fun `scheduleFrame second time after first onFrame`() = runTest {
         val frameDispatcher = FrameDispatcher(scope = this) {
             frameCount++
         }
@@ -60,11 +61,13 @@ class FrameDispatcherTest {
 
         frameDispatcher.scheduleFrame()
         advanceUntilIdle()
+
+        frameDispatcher.cancel()
         assertEquals(2, frameCount)
     }
 
     @Test
-    fun `scheduleFrame second time twice after first onFrame`() = test {
+    fun `scheduleFrame second time twice after first onFrame`() = runTest {
         val frameDispatcher = FrameDispatcher(scope = this) {
             frameCount++
         }
@@ -75,11 +78,13 @@ class FrameDispatcherTest {
         frameDispatcher.scheduleFrame()
         frameDispatcher.scheduleFrame()
         advanceUntilIdle()
+
+        frameDispatcher.cancel()
         assertEquals(2, frameCount)
     }
 
     @Test
-    fun `scheduleFrame during onFrame`() = test {
+    fun `scheduleFrame during onFrame`() = runTest {
         lateinit var frameDispatcher: FrameDispatcher
         frameDispatcher = FrameDispatcher(scope = this) {
             frameCount++
@@ -98,10 +103,12 @@ class FrameDispatcherTest {
 
         yield()
         assertEquals(4, frameCount)
+
+        frameDispatcher.cancel()
     }
 
     @Test
-    fun `scheduleFrame multiple times during onFrame`() = test {
+    fun `scheduleFrame multiple times during onFrame`() = runTest {
         lateinit var frameDispatcher: FrameDispatcher
         frameDispatcher = FrameDispatcher(scope = this) {
             frameCount++
@@ -122,14 +129,14 @@ class FrameDispatcherTest {
 
         yield()
         assertEquals(4, frameCount)
+
+        frameDispatcher.cancel()
     }
 
     @Test
-    fun `cancel coroutine scope`() = test {
-        val scope = CoroutineScope(coroutineContext)
-
+    fun `cancel coroutine scope`() = runTest {
         lateinit var frameDispatcher: FrameDispatcher
-        frameDispatcher = FrameDispatcher(scope) {
+        frameDispatcher = FrameDispatcher(coroutineContext) {
             frameCount++
             frameDispatcher.scheduleFrame()
         }
@@ -144,53 +151,42 @@ class FrameDispatcherTest {
         yield()
         assertEquals(3, frameCount)
 
-        scope.cancel()
+        frameDispatcher.cancel()
         yield()
         assertEquals(3, frameCount)
 
         advanceUntilIdle()
         assertEquals(3, frameCount)
+
     }
 
     @Test
-    fun `perform tasks scheduled in the frame after the frame`() {
-        val dispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
+    fun `perform tasks scheduled in the frame after the frame`() = runTest {
         val history = mutableListOf<String>()
 
-        runBlocking(dispatcher) {
-            val job = launch {
-                val scope = this
+        val job = launch {
+            val jobScope = this
 
-                lateinit var frameDispatcher: FrameDispatcher
-                frameDispatcher = FrameDispatcher(scope = scope) {
-                    history.add("frame$frameCount")
-                    if (frameCount == 0) {
-                        scope.launch {
-                            history.add("task")
-                        }
-                        frameDispatcher.scheduleFrame()
+            lateinit var frameDispatcher: FrameDispatcher
+            frameDispatcher = FrameDispatcher(scope = jobScope) {
+                history.add("frame$frameCount")
+                if (frameCount == 0) {
+                    jobScope.launch {
+                        history.add("task")
                     }
-                    frameCount++
+                    frameDispatcher.scheduleFrame()
                 }
-                frameDispatcher.scheduleFrame()
+                frameCount++
             }
-
-            repeat(20) {
-                yield()
-            }
-
-            job.cancel()
+            frameDispatcher.scheduleFrame()
         }
 
-        assertEquals(listOf("frame0", "task", "frame1"), history)
-    }
+        repeat(20) {
+            yield()
+        }
 
-    private fun test(
-        block: suspend TestCoroutineScope.() -> Unit
-    ) = runBlockingTest {
-        pauseDispatcher()
-        val job = Job()
-        TestCoroutineScope(coroutineContext + job).block()
         job.cancel()
+
+        assertEquals(listOf("frame0", "task", "frame1"), history)
     }
 }
