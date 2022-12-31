@@ -4,10 +4,8 @@ import org.jetbrains.skia.impl.use
 import org.jetbrains.skia.tests.assertCloseEnough
 import org.jetbrains.skia.tests.assertContentCloseEnough
 import org.jetbrains.skia.tests.makeFromResource
-import org.jetbrains.skiko.KotlinBackend
 import org.jetbrains.skiko.OS
 import org.jetbrains.skiko.hostOs
-import org.jetbrains.skiko.kotlinBackend
 import org.jetbrains.skiko.tests.runTest
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
