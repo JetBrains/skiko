@@ -16,8 +16,14 @@ plugins {
     id("de.undercouch.download") version "4.1.2"
 }
 
-val coroutinesVersion = "1.6.4"
-val atomicFuVersion = "0.18.5"
+val Project.supportWasm: Boolean
+    get() = findProperty("skiko.wasm.enabled") == "true" || isInIdea
+
+val Project.supportJs: Boolean
+    get() = findProperty("skiko.js.enabled") == "true" || isInIdea
+
+val coroutinesVersion = if (supportWasm) "1.6.4-wasm0" else "1.6.4"
+val atomicFuVersion = if (supportWasm) "0.18.5-wasm0" else "0.18.5"
 
 fun targetSuffix(os: OS, arch: Arch): String {
     return "${os.id}_${arch.id}"
@@ -36,7 +42,9 @@ allprojects {
 repositories {
     mavenLocal()
     mavenCentral()
-    maven("https://maven.pkg.jetbrains.space/kotlin/p/wasm/experimental")
+    if (supportWasm) {
+        maven("https://maven.pkg.jetbrains.space/kotlin/p/wasm/experimental")
+    }
     maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
 }
 
@@ -50,7 +58,7 @@ fun KotlinTarget.isIosSimArm64() =
 fun String.withSuffix(isIosSim: Boolean = false) =
     this + if (isIosSim) "Sim" else ""
 
-if (supportWasm) {
+if (supportJs || supportWasm) {
     val skiaWasmDir = registerOrGetSkiaDirProvider(OS.Wasm, Arch.Wasm)
 
     val compileWasm by tasks.registering(CompileSkikoCppTask::class) {
@@ -218,9 +226,6 @@ internal val Project.isInIdea: Boolean
 val Project.supportNative: Boolean
    get() = findProperty("skiko.native.enabled") == "true" || isInIdea
 
-val Project.supportWasm: Boolean
-    get() = true //findProperty("skiko.wasm.enabled") == "true" || isInIdea
-
 val Project.supportAndroid: Boolean
     get() = findProperty("skiko.android.enabled") == "true" // || isInIdea
 
@@ -246,7 +251,7 @@ kotlin {
         }
     }
 
-    if (supportWasm) {
+    if (supportJs) {
         js(IR) {
             moduleName = "skiko-kjs" // override the name to avoid name collision with a different skiko.js file
             browser {
@@ -261,7 +266,9 @@ kotlin {
             binaries.executable()
             generateVersion(OS.Wasm, Arch.Wasm)
         }
+    }
 
+    if (supportWasm) {
         wasm {
             moduleName = "skiko-kjs-wasm" // override the name to avoid name collision with a different skiko.js file
             browser {
@@ -291,6 +298,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(kotlin("stdlib"))
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
             }
         }
         val commonTest by getting {
@@ -340,7 +348,7 @@ kotlin {
             }
         }
 
-        if (supportWasm || supportNative) {
+        if (supportJs || supportWasm || supportNative) {
             val nativeJsMain by creating {
                 dependsOn(commonMain)
             }
@@ -349,27 +357,9 @@ kotlin {
                 dependsOn(commonTest)
             }
 
-            if (supportWasm) {
+            if (supportJs || supportWasm) {
                 val jsWasmMain by creating {
                     dependsOn(nativeJsMain)
-                }
-
-                val jsMain by getting {
-                    dependsOn(jsWasmMain)
-                    dependencies {
-                        implementation(kotlin("stdlib-js"))
-                        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
-                        implementation("org.jetbrains.kotlinx:atomicfu:$atomicFuVersion")
-                    }
-                }
-
-                val wasmMain by getting {
-                    dependsOn(jsWasmMain)
-                    dependencies {
-                        implementation(kotlin("stdlib-wasm"))
-                        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion-wasm0")
-                        implementation("org.jetbrains.kotlinx:atomicfu:$atomicFuVersion-wasm0")
-                    }
                 }
 
                 val jsWasmTest by creating {
@@ -379,12 +369,34 @@ kotlin {
                     }
                 }
 
-                val jsTest by getting {
-                    dependsOn(jsWasmTest)
+                if (supportJs) {
+                    val jsMain by getting {
+                        dependsOn(jsWasmMain)
+                        dependencies {
+                            implementation(kotlin("stdlib-js"))
+                            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
+                            implementation("org.jetbrains.kotlinx:atomicfu:$atomicFuVersion")
+                        }
+                    }
+
+                    val jsTest by getting {
+                        dependsOn(jsWasmTest)
+                    }
                 }
 
-                val wasmTest by getting {
-                    dependsOn(jsWasmTest)
+                if (supportWasm) {
+                    val wasmMain by getting {
+                        dependsOn(jsWasmMain)
+                        dependencies {
+                            implementation(kotlin("stdlib-wasm"))
+                            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
+                            implementation("org.jetbrains.kotlinx:atomicfu:$atomicFuVersion")
+                        }
+                    }
+
+                    val wasmTest by getting {
+                        dependsOn(jsWasmTest)
+                    }
                 }
             }
 
@@ -1297,7 +1309,7 @@ publishing {
             }
         }
 
-        if (supportWasm) {
+        if (supportJs || supportWasm) {
             create<MavenPublication>("skikoWasmRuntime") {
                 pomNameForPublication[name] = "Skiko WASM Runtime"
                 artifactId = SkikoArtifacts.jsWasmArtifactId
@@ -1383,4 +1395,3 @@ project.tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().config
         "-Xwasm-enable-array-range-checks", "-Xir-dce=true"
     )
 }
-
