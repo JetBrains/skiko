@@ -21,10 +21,12 @@ import java.io.File
  * In order to free up memory, you should remove custom fonts you don't
  * need anymore.
  */
-class AwtFontManager(
-    private val systemFontProvider: SystemFontProvider = SystemFontProvider.default,
-    private val customTypefaceCache: TypefaceCache = TypefaceCache.inMemory()
+class AwtFontManager @InternalSkikoApi constructor(
+    private val systemFontProvider: SystemFontProvider,
+    private val customTypefaceCache: TypefaceCache
 ) {
+
+    constructor() : this(SystemFontProvider.default, TypefaceCache.inMemory())
 
     /**
      * Invalidate the system font cache, causing the list of font families available

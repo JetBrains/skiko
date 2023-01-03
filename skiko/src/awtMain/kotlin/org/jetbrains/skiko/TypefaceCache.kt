@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap
  * A generic typeface cache. An instance of the default in-memory
  * implementation can be created with the [inMemory] factory function.
  */
+@InternalSkikoApi
 interface TypefaceCache {
 
     /**
@@ -84,11 +85,11 @@ interface TypefaceCache {
     fun getTypefaceOrNull(familyName: String, fontStyle: FontStyle): Typeface?
 
     /**
-     * Get a [SkikoFontFamily] by family name, if it exists.
+     * Get a [FontFamily] by family name, if it exists.
      *
      * Font family names are matched case-insensitively.
      */
-    fun getFontFamilyOrNull(familyName: String): SkikoFontFamily?
+    fun getFontFamilyOrNull(familyName: String): FontFamily?
 
     /**
      * List the font families for all registered entries.
@@ -110,7 +111,7 @@ interface TypefaceCache {
 }
 
 private class InMemoryTypefaceCache private constructor(
-    private val fontFamiliesCache: ConcurrentHashMap<FontFamilyKey, SkikoFontFamily>
+    private val fontFamiliesCache: ConcurrentHashMap<FontFamilyKey, FontFamily>
 ) : TypefaceCache {
 
     constructor() : this(ConcurrentHashMap())
@@ -142,7 +143,7 @@ private class InMemoryTypefaceCache private constructor(
 
     override fun addTypeface(typeface: Typeface) {
         val key = FontFamilyKey(typeface.familyName)
-        val fontFamily = fontFamiliesCache.getOrPut(key) { SkikoFontFamily(typeface.familyName) }
+        val fontFamily = fontFamiliesCache.getOrPut(key) { FontFamily(typeface.familyName) }
         fontFamily += typeface
         familyNamesCache += typeface.familyName
     }

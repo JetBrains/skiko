@@ -12,7 +12,7 @@ import org.jetbrains.skia.Typeface
  *
  * @see AwtFontManager
  */
-class SkikoFontFamily(
+class FontFamily(
     val familyName: String,
     private val typefacesByStyle: MutableMap<FontStyle, Typeface> = mutableMapOf()
 ) : Map<FontStyle, Typeface> by typefacesByStyle {
@@ -34,13 +34,13 @@ class SkikoFontFamily(
         get() = typefacesByStyle.values.toSet()
 
     operator fun plus(typeface: Typeface) =
-        SkikoFontFamily(familyName, typefacesByStyle.toMutableMap())
+        FontFamily(familyName, typefacesByStyle.toMutableMap())
             .apply { addTypeface(typeface) }
 
     operator fun plusAssign(typeface: Typeface) = addTypeface(typeface)
 
     /**
-     * Adds the specified [typeface] to this [SkikoFontFamily].
+     * Adds the specified [typeface] to this [FontFamily].
      *
      * If the font family already contains a [Typeface] with the same [FontStyle],
      * this **will replace** the previous value.
@@ -57,13 +57,13 @@ class SkikoFontFamily(
     operator fun minusAssign(typeface: Typeface) = removeTypeface(typeface)
 
     operator fun minus(typeface: Typeface) =
-        SkikoFontFamily(familyName, typefacesByStyle.toMutableMap())
+        FontFamily(familyName, typefacesByStyle.toMutableMap())
             .apply { removeTypeface(typeface) }
 
     operator fun minusAssign(style: FontStyle) = removeTypefaceByStyle(style)
 
     operator fun minus(style: FontStyle) =
-        SkikoFontFamily(familyName, typefacesByStyle.toMutableMap())
+        FontFamily(familyName, typefacesByStyle.toMutableMap())
             .apply { removeTypefaceByStyle(style) }
 
     /**
@@ -98,7 +98,7 @@ class SkikoFontFamily(
     companion object {
 
         /**
-         * Creates a new [SkikoFontFamily] instance, comprised of the provided [typefaces].
+         * Creates a new [FontFamily] instance, comprised of the provided [typefaces].
          *
          * All provided [Typeface]s **must** have the same [Typeface.familyName] and
          * [Typeface.familyNames], or this function will throw an exception.
@@ -108,8 +108,8 @@ class SkikoFontFamily(
         fun fromTypefaces(
             familyName: String,
             vararg typefaces: Typeface,
-        ): SkikoFontFamily {
-            if (typefaces.isEmpty()) return SkikoFontFamily(familyName)
+        ): FontFamily {
+            if (typefaces.isEmpty()) return FontFamily(familyName)
 
             val map = HashMap<FontStyle, Typeface>(typefaces.size)
             for (typeface in typefaces) {
@@ -124,7 +124,7 @@ class SkikoFontFamily(
 
                 map[typeface.fontStyle] = typeface
             }
-            return SkikoFontFamily(familyName, map)
+            return FontFamily(familyName, map)
         }
     }
 }
