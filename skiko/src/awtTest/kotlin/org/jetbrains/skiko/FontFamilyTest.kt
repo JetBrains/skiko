@@ -9,10 +9,11 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
-class FontFamilyInfoTest {
+class FontFamilyTest {
 
-    private val aFontFamilyInfo = runBlocking {
-        FontFamilyInfo.fromTypefaces(
+    private val aFontFamily = runBlocking {
+        SkikoFontFamily.fromTypefaces(
+            "JetBrains Mono",
             Typeface.makeFromResource("./fonts/JetBrainsMono-Regular.ttf"),
             Typeface.makeFromResource("./fonts/JetBrainsMono-Italic.ttf"),
             Typeface.makeFromResource("./fonts/JetBrainsMono-Bold.ttf")
@@ -27,16 +28,27 @@ class FontFamilyInfoTest {
         )
     }
 
-    private val emptyFontFamilyInfo = FontFamilyInfo.fromTypefaces()
+    @Test
+    fun `should throw IllegalArgumentException when constructed with a blank family name`() {
+        assertFailsWith<IllegalArgumentException> {
+            SkikoFontFamily("")
+        }
+        assertFailsWith<IllegalArgumentException> {
+            SkikoFontFamily(" ")
+        }
+        assertFailsWith<IllegalArgumentException> {
+            SkikoFontFamily("\t")
+        }
+    }
 
     @Test
     fun `should list all available styles provided`() {
-        assertEquals(expectedFontMap.keys, aFontFamilyInfo.availableStyles)
+        assertEquals(expectedFontMap.keys, aFontFamily.availableStyles)
     }
 
     @Test
     fun `should list all available typefaces provided`() {
-        assertTrue(expectedFontMap.values.equalsLogically(aFontFamilyInfo.availableTypefaces))
+        assertTrue(expectedFontMap.values.equalsLogically(aFontFamily.availableTypefaces))
     }
 
     @Test
@@ -44,7 +56,7 @@ class FontFamilyInfoTest {
         val loadedTypeface = runBlocking {
             Typeface.makeFromResource("fonts/JetBrainsMono-Regular.ttf")
         }
-        val newFontFamilyInfo = emptyFontFamilyInfo + loadedTypeface
+        val newFontFamilyInfo = SkikoFontFamily("JetBrains Mono") + loadedTypeface
         assertEquals(setOf(loadedTypeface.fontStyle), newFontFamilyInfo.availableStyles)
     }
 
@@ -53,8 +65,8 @@ class FontFamilyInfoTest {
         val loadedTypeface = runBlocking {
             Typeface.makeFromResource("fonts/JetBrainsMono-Regular.ttf")
         }
-        val oldTypeface = aFontFamilyInfo[loadedTypeface.fontStyle]!!
-        val newFontFamilyInfo = aFontFamilyInfo + loadedTypeface
+        val oldTypeface = aFontFamily[loadedTypeface.fontStyle]!!
+        val newFontFamilyInfo = aFontFamily + loadedTypeface
         assertEquals(expectedFontMap.keys, newFontFamilyInfo.availableStyles)
         assertNotEquals(oldTypeface, loadedTypeface)
     }
@@ -63,52 +75,52 @@ class FontFamilyInfoTest {
     fun `should throw when adding new, incompatible typeface`() {
         val incompatibleFont = runBlocking { Typeface.makeFromResource("fonts/Inter-V.ttf") }
         assertFailsWith(IllegalArgumentException::class) {
-            aFontFamilyInfo + incompatibleFont
+            aFontFamily + incompatibleFont
         }
     }
 
     @Test
     fun `should remove available style`() {
         val removedStyle = expectedFontMap.keys.last()
-        val fontFamilyInfo = aFontFamilyInfo - removedStyle
-        assertEquals(expectedFontMap.keys - removedStyle, fontFamilyInfo.availableStyles)
+        val fontFamilyCache = aFontFamily - removedStyle
+        assertEquals(expectedFontMap.keys - removedStyle, fontFamilyCache.availableStyles)
     }
 
     @Test
     fun `should remove available typeface`() {
         val removedTypeface = expectedFontMap.values.last()
-        val fontFamilyInfo = aFontFamilyInfo - removedTypeface
+        val fontFamilyCache = aFontFamily - removedTypeface
         val removedStyle = removedTypeface.fontStyle
-        assertTrue(fontFamilyInfo.availableTypefaces.equalsLogically((expectedFontMap - removedStyle).values))
+        assertTrue(fontFamilyCache.availableTypefaces.equalsLogically((expectedFontMap - removedStyle).values))
     }
 
     @Test
     fun `should do nothing when removing any style from an empty family info`() {
         val anyStyle = FontStyle.BOLD
-        val fontFamilyInfo = emptyFontFamilyInfo - anyStyle
-        assertTrue(fontFamilyInfo.isEmpty())
+        val fontFamily = SkikoFontFamily("Anything") - anyStyle
+        assertTrue(fontFamily.isEmpty())
     }
 
     @Test
     fun `should do nothing when removing typeface from an empty family info`() {
         val anyTypeface = expectedFontMap.values.first()
-        val fontFamilyInfo = emptyFontFamilyInfo - anyTypeface
-        assertTrue(fontFamilyInfo.isEmpty())
+        val fontFamily = SkikoFontFamily("Anything") - anyTypeface
+        assertTrue(fontFamily.isEmpty())
     }
 
     @Test
     fun `should do nothing when removing any non-existing style`() {
         val anyStyle = FontStyle(weight = 1000, FontWidth.EXTRA_CONDENSED, FontSlant.OBLIQUE)
-        val fontFamilyInfo = aFontFamilyInfo - anyStyle
-        assertEquals(aFontFamilyInfo.availableStyles, fontFamilyInfo.availableStyles)
+        val fontFamilyCache = aFontFamily - anyStyle
+        assertEquals(aFontFamily.availableStyles, fontFamilyCache.availableStyles)
     }
 
     @Test
     fun `should do nothing when removing any non-existing typeface`() {
         val anyTypeface = runBlocking { Typeface.makeFromResource("fonts/Inter-V.ttf") }
 
-        val fontFamilyInfo = emptyFontFamilyInfo - anyTypeface
-        assertTrue(fontFamilyInfo.isEmpty())
+        val fontFamily = SkikoFontFamily("Anything") - anyTypeface
+        assertTrue(fontFamily.isEmpty())
     }
 
     @Test
@@ -116,7 +128,7 @@ class FontFamilyInfoTest {
         val incompatibleTypeface = runBlocking { Typeface.makeFromResource("fonts/Inter-V.ttf") }
 
         assertFailsWith(IllegalArgumentException::class) {
-            aFontFamilyInfo - incompatibleTypeface
+            aFontFamily - incompatibleTypeface
         }
     }
 }

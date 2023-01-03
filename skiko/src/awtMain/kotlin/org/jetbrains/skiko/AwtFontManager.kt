@@ -1,138 +1,139 @@
 package org.jetbrains.skiko
 
-import kotlinx.coroutines.*
-import org.jetbrains.skia.*
+import org.jetbrains.skia.FontStyle
+import org.jetbrains.skia.Typeface
 import java.io.File
-import java.util.concurrent.ConcurrentHashMap
-import kotlin.time.ExperimentalTime
 
-object AwtFontManager {
-    private val systemFontCache = ConcurrentHashMap<String, FontFamilyInfo>()
-    private val customFontCache = ConcurrentHashMap<String, FontFamilyInfo>()
+/**
+ * Manages available fonts, both at the system level and custom ones.
+ *
+ * The main entry point is [getTypefaceOrNull]:
+ *
+ * ```kotlin
+ * val fontManager = AwtFontManager()
+ * val myTypeface = fontManager.getTypefaceOrNull("My Font")
+ * ```
+ *
+ * While system fonts represent global state and are shared across all
+ * instances, custom fonts are only available on the instance(s) on
+ * which they have been registered.
+ *
+ * In order to free up memory, you should remove custom fonts you don't
+ * need anymore.
+ */
+class AwtFontManager(
+    private val systemFontProvider: SystemFontProvider = SystemFontProvider.default,
+    private val customTypefaceCache: TypefaceCache = TypefaceCache.inMemory()
+) {
 
-    @Volatile
-    private var allFontsCachedImpl = false
-    private val waitChannel = RendezvousBroadcastChannel<Unit>()
-    private var cacheJob: Job? = null
-
-    init {
-        invalidateSystemFontsCache()
+    /**
+     * Invalidate the system font cache, causing the list of font families available
+     * at the system level to be refreshed.
+     *
+     * The system fonts cache is **global** and shared across all [AwtFontManager]
+     * instances. Calling this will impact all [AwtFontManager]'s behaviour.
+     *
+     * Various functions of this class will not be able to proceed until the
+     * caching is completed.
+     */
+    fun invalidateSystemFontCache() {
+        systemFontProvider.invalidate()
     }
 
     /**
-     * Invalidate cache and start caching again. Maybe useful to re-read fonts
-     * when changed.
+     * Get a [Typeface] by family name and style, if it exists.
+     *
+     * Custom fonts take precedence over system fonts.
      */
-    @OptIn(DelicateCoroutinesApi::class, ExperimentalTime::class)
-    fun invalidateSystemFontsCache() {
-        cacheJob?.cancel()
+    suspend fun getTypefaceOrNull(familyName: String, fontStyle: FontStyle): Typeface? {
+        val customTypeface = customTypefaceCache.getTypefaceOrNull(familyName, fontStyle)
+        if (customTypeface != null) return customTypeface
 
-        allFontsCachedImpl = false
-        cacheJob = GlobalScope.launch {
-            cacheAllSystemFonts()
-            allFontsCachedImpl = true
-            waitChannel.sendAll(Unit)
-        }
-    }
-
-    private suspend fun cacheAllSystemFonts() {
-        systemFontCache.clear()
-
-        val fontManager = FontMgr.default
-        val typefacesByFamily = (0 until fontManager.familiesCount)
-            .map { i -> fontManager.getFamilyName(i) }
-            .let { it + "System font" }
-            .associateWith { familyName -> fontManager.matchFamily(familyName).takeIf { it.count() > 0 } }
-            .filterValues { it != null }
-            .mapValues { (_, value) -> value as FontStyleSet }
-
-        for ((fontFamily, typefaces) in typefacesByFamily) {
-            systemFontCache[fontFamily.lowercase()] = FontFamilyInfo(typefaces)
-            yield()
-        }
-
-        // Since macOS pretends the San Francisco font doesn't exist, we force-load it into
-        // our cache, and store both as "System font" and as ".AppleSystemUIFont".
-        // The latter is done for Swing/AWT interop reasons, since AWT loads it as
-        // ".AppleSystemUIFont" (at least on the JetBrains Runtime).
-        // Note that the AWT default font, on macOS, is not SF but rather Helvetica Neue.
-        if (hostOs == OS.MacOS) {
-            val systemFontStyleSet = fontManager.matchFamily("System font")
-            if (systemFontStyleSet.count() > 0) {
-                val fontFamilyInfo = FontFamilyInfo(systemFontStyleSet)
-                systemFontCache["system font"] = fontFamilyInfo
-                systemFontCache[".applesystemuifont"] = fontFamilyInfo
-            }
-        }
+        if (!systemFontProvider.contains(familyName)) return null
+        return systemFontProvider.getTypefaceOrNull(familyName, fontStyle)
     }
 
     /**
-     * Add a resource entry as a custom font known to this font manager.
-     *
-     * Note that custom fonts aren't impacted by calls to [invalidateSystemFontsCache].
-     *
-     * @see removeCustomFont
+     * List all known font family names, including both system fonts, and
+     * custom fonts added to this instance.
      */
-    suspend fun addResourceFont(resource: String, loader: ClassLoader = Thread.currentThread().contextClassLoader) {
-        val res = loader.getResourceAsStream(resource)
-            ?: ClassLoader.getSystemResourceAsStream(resource)
-            ?: error("Unable to access the resources from the provided classloader")
-
-        val resourceBytes = withContext(Dispatchers.IO) {
-            res.readAllBytes()
-        }
-        val typeface = Typeface.makeFromData(Data.makeFromBytes(resourceBytes))
-        val existingTypefaces = customFontCache[typeface.familyName]?.availableTypefaces ?: emptySet()
-        val fontFamilyInfo = FontFamilyInfo.fromTypefaces(*existingTypefaces.toTypedArray(), typeface)
-
-        customFontCache[typeface.familyName.lowercase()] = fontFamilyInfo   // TODO check if system already has it!
-    }
+    suspend fun familyNames(): Set<String> =
+        systemFamilyNames() + customFamilyNames()
 
     /**
-     * Add a file as a custom font known to this font manager.
+     * Lists all known system font family names.
      *
-     * Note that custom fonts aren't impacted by calls to [invalidateSystemFontsCache].
-     *
-     * @see removeCustomFont
+     * @see getTypefaceOrNull
      */
-    fun addFontFile(file: File) {
-        val typeface = Typeface.makeFromFile(file.absolutePath)
-        val existingTypefaces = customFontCache[typeface.familyName]?.availableTypefaces ?: emptySet()
-        val fontFamilyInfo = FontFamilyInfo.fromTypefaces(*existingTypefaces.toTypedArray(), typeface)
+    suspend fun systemFamilyNames() = systemFontProvider.familyNames()
 
-        customFontCache[typeface.familyName.lowercase()] = fontFamilyInfo
-    }
+    /**
+     * List the font families for all registered custom fonts.
+     *
+     * @see getTypefaceOrNull
+     */
+    fun customFamilyNames() = customTypefaceCache.familyNames()
+
+    /**
+     * Add a classpath resource as a custom font.
+     *
+     * [AwtFontManager]s don't have knowledge of custom fonts added to other
+     * instances.
+     *
+     * Don't forget to remove custom fonts when you don't need them anymore.
+     *
+     * @see removeCustomFontFamily
+     */
+    suspend fun addCustomFontResource(
+        resource: String,
+        loader: ClassLoader = Thread.currentThread().contextClassLoader
+    ) = customTypefaceCache.addResource(resource, loader)
+
+    /**
+     * Add a [File] as a custom font.
+     *
+     * [AwtFontManager]s don't have knowledge of custom fonts added to other
+     * instances.
+     *
+     * Don't forget to remove custom fonts when you don't need them anymore.
+     *
+     * @see removeCustomFontFamily
+     */
+    fun addCustomFontFile(file: File) = customTypefaceCache.addFile(file)
+
+    /**
+     * Add a [Typeface] as a custom font.
+     *
+     * [AwtFontManager]s don't have knowledge of custom fonts added to other
+     * instances.
+     *
+     * Don't forget to remove custom fonts when you don't need them anymore.
+     *
+     * @see removeCustomFontFamily
+     */
+    fun addCustomFontTypeface(typeface: Typeface) =
+        customTypefaceCache.addTypeface(typeface)
 
     /**
      * Remove a custom font by family name, if it exists.
      *
-     * @see addFontFile
-     * @see addResourceFont
+     * This will not impact other instances of [AwtFontManager]; if a custom
+     * font is registered on multiple instances, it needs to be removed from
+     * all of them.
+     *
+     * @see addCustomFontFile
+     * @see addCustomFontResource
+     * @see addCustomFontTypeface
      */
-    fun removeCustomFont(familyName: String) {
-        customFontCache -= familyName.lowercase()
-    }
+    fun removeCustomFontFamily(familyName: String) =
+        customTypefaceCache.removeFontFamily(familyName)
 
     /**
-     * Gets a typeface from the cache, if it exists.
+     * Remove all custom fonts added to this instance.
      *
-     * Custom fonts have the precedence over system fonts.
+     * This will not impact other instances of [AwtFontManager]; if a custom
+     * font is registered on multiple instances, it needs to be removed from
+     * all of them.
      */
-    suspend fun getTypefaceOrNull(familyName: String, fontStyle: FontStyle): Typeface? {
-        ensureAllFontsCached()
-
-        val fontFamily = customFontCache[familyName.lowercase()]
-            ?: systemFontCache[familyName.lowercase()]
-            ?: return null
-        return fontFamily[fontStyle]
-    }
-
-    private suspend fun ensureAllFontsCached() {
-        if (!allFontsCachedImpl) {
-            waitChannel.receive()
-        }
-    }
-
-    val availableFontFamilies
-        get() = systemFontCache.keys + customFontCache.keys
+    fun clearCustomFonts() = customTypefaceCache.clear()
 }

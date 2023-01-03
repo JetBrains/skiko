@@ -6,10 +6,13 @@ import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.BufferUtil
 import java.awt.Transparency
 import java.awt.color.ColorSpace
-import java.awt.image.*
 import java.awt.event.*
 import java.awt.event.KeyEvent.*
 import java.awt.font.TextAttribute
+import java.awt.image.BufferedImage
+import java.awt.image.ComponentColorModel
+import java.awt.image.DataBuffer
+import java.awt.image.Raster
 import java.nio.ByteBuffer
 
 private class DirectDataBuffer(val backing: ByteBuffer) : DataBuffer(TYPE_BYTE, backing.limit()) {
@@ -254,14 +257,14 @@ private fun toSkikoKey(event: KeyEvent): Int {
     return key
 }
 
-suspend fun java.awt.Font.toSkikoTypeface() = withContext(Dispatchers.Default) {
+suspend fun java.awt.Font.toSkikoTypeface(fontManager: AwtFontManager) = withContext(Dispatchers.Default) {
     val fontStyle = FontStyle(
         weight = toSkikoWeight(weight),
         width = toSkikoWidth(width),
         slant = toSkikoSlant(posture)
     )
 
-    AwtFontManager.getTypefaceOrNull(this@toSkikoTypeface.family, fontStyle)
+    fontManager.getTypefaceOrNull(this@toSkikoTypeface.family, fontStyle)
 }
 
 /**
