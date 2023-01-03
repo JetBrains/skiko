@@ -10,7 +10,7 @@ import java.io.File
 
 internal class TestTypefaceCache : TypefaceCache {
 
-    val families = mutableMapOf<FontFamilyKey, SkikoFontFamily>()
+    val families = mutableMapOf<FontFamilyKey, FontFamily>()
 
     var lastGetName: String? = null
         private set
@@ -40,7 +40,7 @@ internal class TestTypefaceCache : TypefaceCache {
 
     override fun addTypeface(typeface: Typeface) {
         val key = FontFamilyKey(typeface.familyName)
-        val fontFamily = families.getOrPut(key) { SkikoFontFamily(typeface.familyName) }
+        val fontFamily = families.getOrPut(key) { FontFamily(typeface.familyName) }
         fontFamily += typeface
     }
 
@@ -59,7 +59,7 @@ internal class TestTypefaceCache : TypefaceCache {
         return family[fontStyle]
     }
 
-    override fun getFontFamilyOrNull(familyName: String): SkikoFontFamily? {
+    override fun getFontFamilyOrNull(familyName: String): FontFamily? {
         lastGetName = familyName
         return families[FontFamilyKey(familyName)]
     }

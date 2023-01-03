@@ -222,7 +222,7 @@ val Project.supportAndroid: Boolean
 kotlin {
     jvm("awt") {
         compilations.all {
-            kotlinOptions.jvmTarget = "1.8"
+            kotlinOptions.jvmTarget = "17"
         }
         generateVersion(targetOs, targetArch)
     }
@@ -290,6 +290,7 @@ kotlin {
 
         val awtMain by getting {
             dependsOn(jvmMain)
+            languageSettings.optIn("org.jetbrains.skiko.InternalSkikoApi")
         }
 
         if (supportAndroid) {
@@ -313,6 +314,7 @@ kotlin {
 
         val awtTest by getting {
             dependsOn(jvmTest)
+            languageSettings.optIn("org.jetbrains.skiko.InternalSkikoApi")
         }
 
         if (supportAndroid) {
@@ -1025,7 +1027,7 @@ fun KotlinTarget.generateVersion(
                 package org.jetbrains.skiko
                 object Version {
                   val skiko = "${skiko.deployVersion}"
-                  val skia = "${skiaTag}"
+                  val skia = "$skiaTag"
                 }
                 """.trimIndent()
             )

@@ -12,7 +12,7 @@ import kotlin.test.assertTrue
 class FontFamilyTest {
 
     private val aFontFamily = runBlocking {
-        SkikoFontFamily.fromTypefaces(
+        FontFamily.fromTypefaces(
             "JetBrains Mono",
             Typeface.makeFromResource("./fonts/JetBrainsMono-Regular.ttf"),
             Typeface.makeFromResource("./fonts/JetBrainsMono-Italic.ttf"),
@@ -31,13 +31,13 @@ class FontFamilyTest {
     @Test
     fun `should throw IllegalArgumentException when constructed with a blank family name`() {
         assertFailsWith<IllegalArgumentException> {
-            SkikoFontFamily("")
+            FontFamily("")
         }
         assertFailsWith<IllegalArgumentException> {
-            SkikoFontFamily(" ")
+            FontFamily(" ")
         }
         assertFailsWith<IllegalArgumentException> {
-            SkikoFontFamily("\t")
+            FontFamily("\t")
         }
     }
 
@@ -56,7 +56,7 @@ class FontFamilyTest {
         val loadedTypeface = runBlocking {
             Typeface.makeFromResource("fonts/JetBrainsMono-Regular.ttf")
         }
-        val newFontFamilyInfo = SkikoFontFamily("JetBrains Mono") + loadedTypeface
+        val newFontFamilyInfo = FontFamily("JetBrains Mono") + loadedTypeface
         assertEquals(setOf(loadedTypeface.fontStyle), newFontFamilyInfo.availableStyles)
     }
 
@@ -97,14 +97,14 @@ class FontFamilyTest {
     @Test
     fun `should do nothing when removing any style from an empty family info`() {
         val anyStyle = FontStyle.BOLD
-        val fontFamily = SkikoFontFamily("Anything") - anyStyle
+        val fontFamily = FontFamily("Anything") - anyStyle
         assertTrue(fontFamily.isEmpty())
     }
 
     @Test
     fun `should do nothing when removing typeface from an empty family info`() {
         val anyTypeface = expectedFontMap.values.first()
-        val fontFamily = SkikoFontFamily("Anything") - anyTypeface
+        val fontFamily = FontFamily("Anything") - anyTypeface
         assertTrue(fontFamily.isEmpty())
     }
 
@@ -119,7 +119,7 @@ class FontFamilyTest {
     fun `should do nothing when removing any non-existing typeface`() {
         val anyTypeface = runBlocking { Typeface.makeFromResource("fonts/Inter-V.ttf") }
 
-        val fontFamily = SkikoFontFamily("Anything") - anyTypeface
+        val fontFamily = FontFamily("Anything") - anyTypeface
         assertTrue(fontFamily.isEmpty())
     }
 

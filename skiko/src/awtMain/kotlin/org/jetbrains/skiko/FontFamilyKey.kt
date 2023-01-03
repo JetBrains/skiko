@@ -4,6 +4,7 @@ package org.jetbrains.skiko
  * Used to transparently provide non-case-sensitive font family name matching,
  * as Skia will match font family names regardless of casing.
  */
+@InternalSkikoApi
 class FontFamilyKey(val familyName: String) : Comparable<String> {
 
     val identifier = familyName.lowercase()

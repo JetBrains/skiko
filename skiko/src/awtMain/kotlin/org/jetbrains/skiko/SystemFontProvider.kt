@@ -13,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap
  *
  * You can get the default, global implementation from [default].
  */
+@InternalSkikoApi
 interface SystemFontProvider {
 
     /**
@@ -48,9 +49,9 @@ interface SystemFontProvider {
     suspend fun getTypefaceOrNull(familyName: String, fontStyle: FontStyle): Typeface?
 
     /**
-     * Load a [SkikoFontFamily] from the system, given a [familyName].
+     * Load a [FontFamily] from the system, given a [familyName].
      */
-    suspend fun getFontFamilyOrNull(familyName: String): SkikoFontFamily?
+    suspend fun getFontFamilyOrNull(familyName: String): FontFamily?
 
     companion object {
 
@@ -164,7 +165,7 @@ private object SkiaSystemFontProvider : SystemFontProvider {
         return FontMgr.default.matchFamilyStyle(familyName, fontStyle)
     }
 
-    override suspend fun getFontFamilyOrNull(familyName: String): SkikoFontFamily? {
+    override suspend fun getFontFamilyOrNull(familyName: String): FontFamily? {
         val key = FontFamilyKey(familyName)
 
         if (isAppleSystemFont(key)) {
@@ -181,10 +182,10 @@ private object SkiaSystemFontProvider : SystemFontProvider {
             .use { it.toFontFamilyOrNull(familyName) }
     }
 
-    private fun FontStyleSet.toFontFamilyOrNull(familyName: String): SkikoFontFamily? {
+    private fun FontStyleSet.toFontFamilyOrNull(familyName: String): FontFamily? {
         if (count() < 1) return null
 
-        return SkikoFontFamily.fromTypefaces(familyName).apply {
+        return FontFamily.fromTypefaces(familyName).apply {
             for (i in 0 until count()) {
                 addTypeface(getTypeface(i)!!)
             }
