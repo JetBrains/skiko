@@ -1395,3 +1395,12 @@ project.tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().config
         "-Xwasm-enable-array-range-checks", "-Xir-dce=true"
     )
 }
+
+if (supportJs && supportWasm) {
+    project.afterEvaluate {
+        //Disable jsWasmMain intermediate sourceset publication
+        tasks.named("compileJsWasmMainKotlinMetadata") {
+            enabled = false
+        }
+    }
+}
