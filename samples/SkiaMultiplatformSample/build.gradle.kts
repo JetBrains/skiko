@@ -100,7 +100,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                //implementation("org.jetbrains.skiko:skiko:$version")
+                implementation("org.jetbrains.skiko:skiko:$version")
             }
         }
 

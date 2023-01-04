@@ -45,7 +45,9 @@ kotlin {
 
     sourceSets {
         val commonMain by getting {
-            //implementation("org.jetbrains.skiko:skiko:$version")
+            dependencies {
+                implementation("org.jetbrains.skiko:skiko:$version")
+            }
         }
 
         val jsWasmMain by creating {
