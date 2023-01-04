@@ -19,8 +19,6 @@ plugins {
     id("org.jetbrains.gradle.apple.applePlugin") version "222.3345.143-0.16"
 }
 
-val coroutinesVersion = "1.6.4"
-
 repositories {
     mavenLocal()
     google()
@@ -123,18 +121,10 @@ kotlin {
 
         val jsMain by getting {
             dependsOn(jsWasmMain)
-            dependencies {
-                implementation("org.jetbrains.skiko:skiko-js:$version")
-                implementation(kotlin("stdlib-js"))
-            }
         }
 
         val wasmMain by getting {
             dependsOn(jsWasmMain)
-            dependencies {
-                implementation("org.jetbrains.skiko:skiko-wasm:$version")
-                implementation(kotlin("stdlib-wasm"))
-            }
         }
 
         val darwinMain by creating {

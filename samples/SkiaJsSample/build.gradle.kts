@@ -58,19 +58,11 @@ kotlin {
 
         val jsMain by getting {
             dependsOn(jsWasmMain)
-            dependencies {
-                implementation("org.jetbrains.skiko:skiko-js:$version")
-                implementation(kotlin("stdlib-js"))
-            }
         }
 
 
         val wasmMain by getting {
             dependsOn(jsWasmMain)
-            dependencies {
-                implementation("org.jetbrains.skiko:skiko-wasm:$version")
-                implementation(kotlin("stdlib-wasm"))
-            }
         }
     }
 }
