@@ -6,13 +6,11 @@ import org.jetbrains.skiko.util.UiTestScope
 import org.jetbrains.skiko.util.UiTestWindow
 import org.jetbrains.skiko.util.uiTest
 import org.junit.Assume.assumeTrue
+import org.junit.Ignore
 import org.junit.Test
 import java.awt.Point
 import javax.swing.WindowConstants
-import kotlin.math.abs
-import kotlin.math.log2
-import kotlin.math.roundToInt
-import kotlin.math.sqrt
+import kotlin.math.*
 
 @Suppress("BlockingMethodInNonBlockingContext", "SameParameterValue")
 class SkiaLayerPerformanceTest {
@@ -24,6 +22,7 @@ class SkiaLayerPerformanceTest {
     }
 
     private fun UiTestScope.performanceHelper(
+        scene: (canvas: Canvas, width: Int, height: Int, nanoTime: Long) -> Unit,
         width: Int,
         height: Int,
         frameCount: Int,
@@ -53,6 +52,7 @@ class SkiaLayerPerformanceTest {
             window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
             window.layer.skikoView = object : SkikoView {
                 override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+                    scene(canvas, width, height, nanoTime)
                     if (canCollect && frameTimes.size < frameCount) {
                         frameTimes.add(System.nanoTime()) // we check the real time, not the time provided by the argument
                     }
@@ -127,14 +127,93 @@ class SkiaLayerPerformanceTest {
         }
     }
 
+    private val emptyScene = { canvas: Canvas, width: Int, height: Int, nanoTime: Long -> }
+
+    private val clocksScene = { canvas: Canvas, width: Int, height: Int, nanoTime: Long ->
+        val watchFill = Paint().apply { color = 0xFFFFFFFF.toInt() }
+        val watchStroke = Paint().apply {
+            color = 0xFF000000.toInt()
+            mode = PaintMode.STROKE
+            strokeWidth = 1f
+        }
+        val watchStrokeAA = Paint().apply {
+            color = 0xFF000000.toInt()
+            mode = PaintMode.STROKE
+            strokeWidth = 1f
+        }
+        for (x in 0 .. (width - 50) step 50) {
+            for (y in 20 .. (height - 50) step 50) {
+                val stroke = if (x > width / 2) watchStrokeAA else watchStroke
+                canvas.drawOval(Rect.makeXYWH(x + 5f, y + 5f, 40f, 40f), watchFill)
+                canvas.drawOval(Rect.makeXYWH(x + 5f, y + 5f, 40f, 40f), stroke)
+                var angle = 0f
+                while (angle < 2f * PI) {
+                    canvas.drawLine(
+                        (x + 25 - 17 * sin(angle)),
+                        (y + 25 + 17 * cos(angle)),
+                        (x + 25 - 20 * sin(angle)),
+                        (y + 25 + 20 * cos(angle)),
+                        stroke
+                    )
+                    angle += (2.0 * PI / 12.0).toFloat()
+                }
+                val time = (nanoTime / 1E6) % 60000 +
+                        (x.toFloat() / width * 5000).toLong() +
+                        (y.toFloat() / width * 5000).toLong()
+
+                val angle1 = (time.toFloat() / 5000 * 2f * PI).toFloat()
+                canvas.drawLine(x + 25f, y + 25f,
+                    x + 25f - 15f * sin(angle1),
+                    y + 25f + 15 * cos(angle1),
+                    stroke)
+
+                val angle2 = (time / 60000 * 2f * PI).toFloat()
+                canvas.drawLine(x + 25f, y + 25f,
+                    x + 25f - 10f * sin(angle2),
+                    y + 25f + 10f * cos(angle2),
+                    stroke)
+            }
+        }
+    }
+
     @Test
     fun `FPS is near display refresh rate (multiple windows)`() = uiTest {
         assumeTrue(System.getProperty("skiko.test.performance.enabled", "true") == "true")
 
         val helpers = (1..3).map { index ->
-            performanceHelper(width = 40, height = 20, frameCount = 300, deviatedTerminalCount = 20).apply {
+            performanceHelper(scene = emptyScene,
+                              width = 40,
+                              height = 20,
+                              frameCount = 300,
+                              deviatedTerminalCount = 20).apply {
                 window.toFront()
                 window.location = Point((index + 1) * 200, 200)
+            }
+        }
+        delay(1000)
+        try {
+            helpers.forEach { it.startCollect() }
+            awaitFrameCollection(helpers)
+            helpers.forEach { it.printInfo() }
+        } finally {
+            helpers.forEach { it.window.dispose() }
+        }
+    }
+
+    @Ignore("Doesn't pass with SOFTWARE API on macOS")
+    @Test
+    fun `FPS is near display refresh rate (multiple windows with clocks)`() = uiTest {
+        assumeTrue(System.getProperty("skiko.test.performance.enabled", "true") == "true")
+        val helpers = (1..3).map { index ->
+            performanceHelper(
+                scene = clocksScene,
+                width = 300,
+                height = 300,
+                frameCount = 300,
+                deviatedTerminalCount = 20
+            ).apply {
+                window.toFront()
+                window.location = Point(index * 300, 200)
             }
         }
         delay(1000)
