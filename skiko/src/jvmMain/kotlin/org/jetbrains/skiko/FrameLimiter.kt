@@ -14,7 +14,6 @@ private const val NanosecondsPerMillisecond = 1_000_000L
  * (Windows has ~15ms precision by default, Linux/macOs ~2ms).
  * FrameLimiter will try to delay frames as close as possible to [frameMillis], but not greater
  */
-@OptIn(ExperimentalTime::class)
 class FrameLimiter(
     private val coroutineScope: CoroutineScope,
     private val frameMillis: () -> Long,

@@ -36,8 +36,8 @@ internal class LinuxOpenGLRedrawer(
     private val frameJob = Job()
     @Volatile
     private var frameLimit = 0.0
-    private val frameLimiter = FrameLimiter(
-        CoroutineScope(Dispatchers.IO + frameJob),
+    private val frameLimiter = layerFrameLimiter(
+        CoroutineScope(frameJob),
         layer.backedLayer,
         onNewFrameLimit = { frameLimit = it }
     )
@@ -55,15 +55,13 @@ internal class LinuxOpenGLRedrawer(
 
     override fun dispose() {
         check(!isDisposed) { "LinuxOpenGLRedrawer is disposed" }
+        frameJob.cancel()
         layer.backedLayer.lockLinuxDrawingSurface {
             // makeCurrent is mandatory to destroy context, otherwise, OpenGL will destroy wrong context (from another window).
             // see the official example: https://www.khronos.org/opengl/wiki/Tutorial:_OpenGL_3.0_Context_Creation_(GLX)
             it.makeCurrent(context)
             contextHandler.dispose()
             it.destroyContext(context)
-        }
-        runBlocking {
-            frameJob.cancelAndJoin()
         }
         super.dispose()
     }
