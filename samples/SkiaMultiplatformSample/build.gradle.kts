@@ -10,12 +10,12 @@ buildscript {
 
     dependencies {
         // __KOTLIN_COMPOSE_VERSION__
-        classpath(kotlin("gradle-plugin", version = "1.7.20"))
+        classpath(kotlin("gradle-plugin", version = "1.8.0"))
     }
 }
 
 plugins {
-    kotlin("multiplatform") version "1.7.20"
+    kotlin("multiplatform") version "1.8.0"
     id("org.jetbrains.gradle.apple.applePlugin") version "222.3345.143-0.16"
 }
 
