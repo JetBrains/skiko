@@ -8,7 +8,6 @@ import java.awt.event.InputMethodEvent
 import java.beans.PropertyChangeEvent
 import javax.accessibility.Accessible
 import javax.accessibility.AccessibleContext
-import kotlin.time.ExperimentalTime
 
 internal open class HardwareLayer(
     externalAccessibleFactory: ((Component) -> Accessible)? = null
@@ -128,21 +127,7 @@ internal open class HardwareLayer(
     }
 }
 
-/**
- * HardwareLayer should not dispose native resources while [scope] is active.
- *
- * So wait for scope cancellation in dispose method:
- * ```
- *  runBlocking {
- *      frameJob.cancelAndJoin()
- *  }
- * ```
- *
- * Can be accessed from multiple threads.
- */
-@OptIn(ExperimentalTime::class)
-@Suppress("UNUSED_PARAMETER")
-internal fun FrameLimiter(
+internal fun layerFrameLimiter(
     scope: CoroutineScope,
     component: HardwareLayer,
     onNewFrameLimit: (frameLimit: Double) -> Unit = {}
@@ -155,11 +140,12 @@ internal fun FrameLimiter(
     val frames = Channel<Unit>(Channel.CONFLATED)
     frames.trySend(Unit)
 
-    scope.launch {
+    // Use UI thread, because getDisplayRefreshRate uses UI lock anyway, and there is no point to call it in
+    // a separate thread. Besides that, if we call it in a separate thread, we can have deadlocks
+    scope.launch(MainUIDispatcher) {
         while (true) {
             frames.receive()
-            // TODO will lockLinuxDrawingSurface inside getDisplayRefreshRate can cause draw lock too?
-            // it takes 2ms on my machine on Linux (0.01ms on macOs, 0.1ms on Windows)
+            //  on my machine it takes 0.2ms on Linux, 0.01ms on macOs, 0.1ms on Windows
             state.frameLimit = component.getDisplayRefreshRate()
             onNewFrameLimit(state.frameLimit)
             delay(1000)
@@ -167,7 +153,7 @@ internal fun FrameLimiter(
     }
 
     return FrameLimiter(
-        scope,
+        scope + Dispatchers.IO,
         frameMillis = {
             frames.trySend(Unit)
             (1000 / state.frameLimit).toLong()
