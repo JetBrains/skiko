@@ -25,7 +25,7 @@ jobs:
       - uses: actions/setup-java@v2
         with:
           distribution: 'adopt'
-          java-version: '11'
+          java-version: '17'
       - shell: bash
         run: |
           ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Pskiko.test.onci=true :skiko:awtTest
@@ -49,7 +49,7 @@ jobs:
       - uses: actions/setup-java@v2
         with:
           distribution: 'adopt'
-          java-version: '11'
+          java-version: '17'
       - shell: bash
         run: |
           ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Pskiko.test.onci=true :skiko:iosX64Test
@@ -73,7 +73,7 @@ jobs:
       - uses: actions/setup-java@v2
         with:
           distribution: 'adopt'
-          java-version: '11'
+          java-version: '17'
       - uses: nttld/setup-ndk@v1
         id: setup-ndk
         with:
@@ -128,7 +128,7 @@ jobs:
        - uses: actions/setup-java@v2
          with:
            distribution: 'adopt'
-           java-version: '11'
+           java-version: '17'
        # Runs a set of commands using the runners shell
        - shell: bash
          run: |
@@ -166,7 +166,7 @@ jobs:
       - uses: actions/setup-java@v2
         with:
           distribution: 'adopt'
-          java-version: '11'
+          java-version: '17'
       - shell: bash
         run: |
           ./gradlew --stacktrace --info -Pskiko.test.onci=true :skiko:awtTest
@@ -178,4 +178,3 @@ jobs:
           name: test-reports-windows
           path: ./skiko/build/reports/tests
           retention-days: 5
-
