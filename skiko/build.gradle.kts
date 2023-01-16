@@ -223,10 +223,9 @@ val Project.supportAndroid: Boolean
     get() = findProperty("skiko.android.enabled") == "true" // || isInIdea
 
 kotlin {
+    jvmToolchain(17)
+
     jvm("awt") {
-        compilations.all {
-            kotlinOptions.jvmTarget = "17"
-        }
         generateVersion(targetOs, targetArch)
     }
 
