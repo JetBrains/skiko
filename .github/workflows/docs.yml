@@ -22,6 +22,7 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: '17'
+          cache: 'gradle'
 
       - name: 'Build Dokka documentation'
         run: bash -c 'JAVA_OPTS="-Xmx4g" ./gradlew --no-daemon -Pskiko.native.enabled=true -Pskiko.wasm.enabled=true -Pskiko.android.enabled=true :skiko:dokkaHtml'

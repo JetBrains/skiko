@@ -22,6 +22,7 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: '17'
+          cache: 'gradle'
 
       - shell: bash
         name: 'Compile and run AWT tests'
@@ -62,6 +63,7 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: '17'
+          cache: 'gradle'
 
       - shell: bash
         name: 'Compile and run iOS x64 tests'
@@ -102,6 +104,7 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: '17'
+          cache: 'gradle'
 
       - uses: nttld/setup-ndk@v1
         name: 'Set up Android NDK'
@@ -177,6 +180,7 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: '17'
+          cache: 'gradle'
 
       - shell: bash
         name: 'Set up JS build environment'
@@ -233,6 +237,7 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: '17'
+          cache: 'gradle'
 
       - shell: bash
         name: 'Compile and run AWT tests'
