@@ -199,10 +199,10 @@ jobs:
           cd ..
       - shell: bash
         name: 'Compile and run JS tests'
-        run: ./gradlew --stacktrace --info -Pskiko.wasm.enabled=true -Pskiko.test.onci=true jsTest
+        run: ./gradlew --stacktrace --info -Pskiko.wasm.enabled=true -Pskiko.test.onci=true :skiko:jsTest
       - shell: bash
         name: 'Publish WASM runtime to Maven Local'
-        run: ./gradlew --stacktrace --info -Pskiko.wasm.enabled=true publishSkikoWasmRuntimePublicationToMavenLocal
+        run: ./gradlew --stacktrace --info -Pskiko.wasm.enabled=true :skiko:publishSkikoWasmRuntimePublicationToMavenLocal
 
       - uses: actions/upload-artifact@v3
         name: 'Save test results as artifact'
