@@ -26,7 +26,7 @@ class AwtFontManager @InternalSkikoApi constructor(
     private val customTypefaceCache: TypefaceCache
 ) {
 
-    constructor() : this(SystemFontProvider.default, TypefaceCache.inMemory())
+    constructor() : this(SystemFontProvider.skia, TypefaceCache.inMemory())
 
     /**
      * Invalidate the system font cache, causing the list of font families available
@@ -60,21 +60,25 @@ class AwtFontManager @InternalSkikoApi constructor(
      * custom fonts added to this instance.
      */
     suspend fun familyNames(): Set<String> =
-        systemFamilyNames() + customFamilyNames()
+        sortedSetOf<String>()
+            .also {
+                it.addAll(systemFamilyNames())
+                it.addAll(customFamilyNames())
+            }
 
     /**
      * Lists all known system font family names.
      *
      * @see getTypefaceOrNull
      */
-    suspend fun systemFamilyNames() = systemFontProvider.familyNames()
+    suspend fun systemFamilyNames() = systemFontProvider.familyNames().toSortedSet()
 
     /**
      * List the font families for all registered custom fonts.
      *
      * @see getTypefaceOrNull
      */
-    fun customFamilyNames() = customTypefaceCache.familyNames()
+    fun customFamilyNames() = customTypefaceCache.familyNames().toSortedSet()
 
     /**
      * Add a classpath resource as a custom font.

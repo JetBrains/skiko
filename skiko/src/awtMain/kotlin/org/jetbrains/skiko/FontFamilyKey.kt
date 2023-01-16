@@ -39,6 +39,6 @@ class FontFamilyKey(val familyName: String) : Comparable<String> {
         val Dialog = FontFamilyKey("Dialog")
         val DialogInput = FontFamilyKey("DialogInput")
 
-        val awtVirtualFonts = setOf(Serif, SansSerif, Monospaced, Dialog, DialogInput)
+        val awtLogicalFonts = setOf(Serif, SansSerif, Monospaced, Dialog, DialogInput)
     }
 }

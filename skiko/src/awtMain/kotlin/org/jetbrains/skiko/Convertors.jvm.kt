@@ -4,6 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.BufferUtil
+import org.jetbrains.skiko.AwtFontUtils.fontFamilyName
 import java.awt.Transparency
 import java.awt.color.ColorSpace
 import java.awt.event.*
@@ -264,7 +265,7 @@ suspend fun java.awt.Font.toSkikoTypeface(fontManager: AwtFontManager) = withCon
         slant = toSkikoSlant(posture)
     )
 
-    fontManager.getTypefaceOrNull(this@toSkikoTypeface.family, fontStyle)
+    fontManager.getTypefaceOrNull(this@toSkikoTypeface.fontFamilyName, fontStyle)
 }
 
 /**

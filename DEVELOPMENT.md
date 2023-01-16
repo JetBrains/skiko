@@ -1,6 +1,6 @@
 ## Building JVM bindings
 
-* Set JAVA_HOME to location of JDK, at least version 11
+* Set JAVA_HOME to location of JDK, at least version 17
 * `./gradlew :skiko:publishToMavenLocal` will build the artifact and publish it to local Maven repo
 
 To build with debug symbols and debug Skia build use `-Pskiko.debug=true` Gradle argument.

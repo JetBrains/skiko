@@ -229,4 +229,4 @@ class AwtFontManagerTest {
 }
 
 private fun Array<String>.ignoreVirtualAwtFontFamilies() =
-    filterNot { FontFamilyKey(it) in FontFamilyKey.Awt.awtVirtualFonts }
+    filterNot { FontFamilyKey(it) in FontFamilyKey.Awt.awtLogicalFonts }

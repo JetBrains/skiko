@@ -1,3 +1,5 @@
+@file:Suppress("JAVA_MODULE_DOES_NOT_EXPORT_PACKAGE")
+
 package org.jetbrains.skiko
 
 import kotlinx.coroutines.*
@@ -5,13 +7,14 @@ import org.jetbrains.skia.FontMgr
 import org.jetbrains.skia.FontStyle
 import org.jetbrains.skia.FontStyleSet
 import org.jetbrains.skia.Typeface
-import org.jetbrains.skiko.SystemFontProvider.Companion.default
+import org.jetbrains.skiko.SystemFontProvider.Companion.skia
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 /**
  * A cache of font family names available in the system.
  *
- * You can get the default, global implementation from [default].
+ * You can get the default, global implementation from [skia].
  */
 @InternalSkikoApi
 interface SystemFontProvider {
@@ -59,7 +62,7 @@ interface SystemFontProvider {
          * The default, global implementation of the interface.
          * Uses Skia APIs to enumerate available font families.
          */
-        val default: SystemFontProvider
+        val skia: SystemFontProvider
             get() = SkiaSystemFontProvider
     }
 }
@@ -68,6 +71,8 @@ private object SkiaSystemFontProvider : SystemFontProvider {
 
     private val familyNamesCache: MutableSet<FontFamilyKey> = ConcurrentHashMap.newKeySet(FontMgr.default.familiesCount)
     private val _familyNames: MutableSet<String> = ConcurrentHashMap.newKeySet(FontMgr.default.familiesCount)
+    private val awtLogicalFamilyNames: MutableMap<FontFamilyKey, String> =
+        ConcurrentHashMap(FontFamilyKey.Awt.awtLogicalFonts.size)
 
     @Volatile
     private var allFontsCachedImpl = false
@@ -85,6 +90,7 @@ private object SkiaSystemFontProvider : SystemFontProvider {
         allFontsCachedImpl = false
         cacheJob = GlobalScope.launch {
             cacheAllSystemFonts()
+            cacheAwtLogicalFonts()
             allFontsCachedImpl = true
             waitChannel.sendAll(Unit)
         }
@@ -131,6 +137,22 @@ private object SkiaSystemFontProvider : SystemFontProvider {
     }
 
     /**
+     * AWT logical fonts are found in [FontFamilyKey.Awt.awtLogicalFonts];
+     * these fonts are just aliases for other, physical system fonts.
+     */
+    private fun cacheAwtLogicalFonts() {
+        try {
+            for (logicalFont in FontFamilyKey.Awt.awtLogicalFonts) {
+                val physicalFontFamilyName = AwtFontUtils.resolvePhysicalFontName(logicalFont.familyName)
+                    ?: continue
+
+                awtLogicalFamilyNames += logicalFont to physicalFontFamilyName
+            }
+        } catch (ignored: Throwable) {
+        }
+    }
+
+    /**
      * Suspend execution until the font family names caching has
      * been completed.
      */
@@ -160,10 +182,18 @@ private object SkiaSystemFontProvider : SystemFontProvider {
             return FontMgr.default.matchFamilyStyle(FontFamilyKey.Apple.SystemFont.familyName, fontStyle)
         }
 
+        if (isAwtLogicalFont(key)) {
+            val physicalFontName = awtLogicalFamilyNames[key]
+            return FontMgr.default.matchFamilyStyle(physicalFontName, fontStyle)
+        }
+
         if (!familyNamesCache.contains(key)) return null
 
         return FontMgr.default.matchFamilyStyle(familyName, fontStyle)
     }
+
+    private fun isAwtLogicalFont(key: FontFamilyKey) =
+        awtLogicalFamilyNames.containsKey(key)
 
     override suspend fun getFontFamilyOrNull(familyName: String): FontFamily? {
         val key = FontFamilyKey(familyName)

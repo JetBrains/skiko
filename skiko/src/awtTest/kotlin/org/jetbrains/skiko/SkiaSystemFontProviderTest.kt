@@ -4,12 +4,12 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assume
 import org.junit.Test
-import java.awt.GraphicsEnvironment
 import kotlin.test.*
 
+
 @OptIn(ExperimentalCoroutinesApi::class)
-class SystemFontProviderTest {
-    private val provider = SystemFontProvider.default
+class SkiaSystemFontProviderTest {
+    private val provider = SystemFontProvider.skia
 
     @Test
     fun `should contain at least some font families`() = runTest {
@@ -36,8 +36,11 @@ class SystemFontProviderTest {
 
     @Test
     fun `should provide all the system fonts also available via AWT`() = runTest {
-        val awtFamilies = GraphicsEnvironment.getLocalGraphicsEnvironment()
-            .availableFontFamilyNames
+        // Listing of font family names is broken on non-macOS JVM implementations,
+        // except when running on the JetBrains Runtime.
+        Assume.assumeTrue(isRunningOnJetBrainsRuntime() || hostOs == OS.MacOS)
+
+        val awtFamilies = AwtFontUtils.fontFamilyNames()
             .ignoreVirtualAwtFontFamilies()
             .toSet()
 
@@ -57,5 +60,9 @@ class SystemFontProviderTest {
     }
 }
 
-private fun Array<String>.ignoreVirtualAwtFontFamilies() =
-    filterNot { FontFamilyKey(it) in FontFamilyKey.Awt.awtVirtualFonts }
+private fun Iterable<String>.ignoreVirtualAwtFontFamilies() =
+    filterNot { FontFamilyKey(it) in FontFamilyKey.Awt.awtLogicalFonts }
+
+private fun isRunningOnJetBrainsRuntime() =
+    System.getProperty("java.vendor")
+        .equals("JetBrains s.r.o.", ignoreCase = true)
