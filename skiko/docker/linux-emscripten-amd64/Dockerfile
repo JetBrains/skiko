@@ -5,7 +5,7 @@ RUN apt-get update -y && \
     apt-get install binutils build-essential software-properties-common -y && \
     apt-get install git curl wget -y && \
     apt-get install python -y && \
-    apt-get install openjdk-11-jdk -y
+    apt-get install openjdk-17-jdk -y
 ENV EMSDK_DIR=/usr/emsdk
 ENV EMSDK_VER=2.0.29
 RUN git clone https://github.com/emscripten-core/emsdk.git $EMSDK_DIR && \
