@@ -14,12 +14,19 @@ import kotlin.test.*
 @OptIn(ExperimentalCoroutinesApi::class)
 class AwtFontManagerTest {
 
+    // Since Arial is not available on Linux, we need a substitute that
+    // works at least on Ubuntu
+    private val aFontName = when (hostOs) {
+        OS.Linux -> "Liberation Sans"
+        else -> "Arial"
+    }
+
     private val systemFontProvider = FakeSystemFontProvider().apply {
-        addEmptyFontFamily("Arial").also {
-            it.addTypeface(Typeface.makeFromName("Arial", FontStyle.NORMAL))
-            it.addTypeface(Typeface.makeFromName("Arial", FontStyle.ITALIC))
-            it.addTypeface(Typeface.makeFromName("Arial", FontStyle.BOLD))
-            it.addTypeface(Typeface.makeFromName("Arial", FontStyle.BOLD_ITALIC))
+        addEmptyFontFamily(aFontName).also {
+            it.addTypeface(Typeface.makeFromName(aFontName, FontStyle.NORMAL))
+            it.addTypeface(Typeface.makeFromName(aFontName, FontStyle.ITALIC))
+            it.addTypeface(Typeface.makeFromName(aFontName, FontStyle.BOLD))
+            it.addTypeface(Typeface.makeFromName(aFontName, FontStyle.BOLD_ITALIC))
         }
         addEmptyFontFamily("Potato Sans")
         addEmptyFontFamily("Walrus Display")
@@ -31,36 +38,36 @@ class AwtFontManagerTest {
 
     @Test
     fun `should be able to find regular fonts`() = runTest {
-        val typeface = fontManager.getTypefaceOrNull("Arial", FontStyle.NORMAL)
+        val typeface = fontManager.getTypefaceOrNull(aFontName, FontStyle.NORMAL)
         assertNotNull(typeface, "Font must exist")
-        assertEquals("Arial", typeface.familyName, "Font family name must match")
+        assertEquals(aFontName, typeface.familyName, "Font family name must match")
         assertFalse(typeface.isBold, "Font must not be bold")
         assertFalse(typeface.isItalic, "Font must not be italic")
     }
 
     @Test
     fun `should be able to find bold fonts`() = runTest {
-        val typeface = fontManager.getTypefaceOrNull("Arial", FontStyle.BOLD)
+        val typeface = fontManager.getTypefaceOrNull(aFontName, FontStyle.BOLD)
         assertNotNull(typeface, "Font must exist")
-        assertEquals("Arial", typeface.familyName, "Font family name must match")
+        assertEquals(aFontName, typeface.familyName, "Font family name must match")
         assertTrue(typeface.isBold, "Font must be bold")
         assertFalse(typeface.isItalic, "Font must not be italic")
     }
 
     @Test
     fun `should be able to find italic fonts`() = runTest {
-        val typeface = fontManager.getTypefaceOrNull("Arial", FontStyle.ITALIC)
+        val typeface = fontManager.getTypefaceOrNull(aFontName, FontStyle.ITALIC)
         assertNotNull(typeface, "Font must exist")
-        assertEquals("Arial", typeface.familyName, "Font family name must match")
+        assertEquals(aFontName, typeface.familyName, "Font family name must match")
         assertFalse(typeface.isBold, "Font must not be bold")
         assertTrue(typeface.isItalic, "Font must be italic")
     }
 
     @Test
     fun `should be able to find bold italic fonts`() = runTest {
-        val typeface = fontManager.getTypefaceOrNull("Arial", FontStyle.BOLD_ITALIC)
+        val typeface = fontManager.getTypefaceOrNull(aFontName, FontStyle.BOLD_ITALIC)
         assertNotNull(typeface, "Font must exist")
-        assertEquals("Arial", typeface.familyName, "Font family name must match")
+        assertEquals(aFontName, typeface.familyName, "Font family name must match")
         assertTrue(typeface.isBold, "Font must be bold")
         assertTrue(typeface.isItalic, "Font must be italic")
     }
@@ -205,11 +212,11 @@ class AwtFontManagerTest {
 
     @Test
     fun `should prefer custom to system fonts when existing`() = runTest {
-        fontManager.addCustomFontTypeface(Typeface.makeFromName("Arial", FontStyle.NORMAL))
+        fontManager.addCustomFontTypeface(Typeface.makeFromName(aFontName, FontStyle.NORMAL))
 
-        val typeface = fontManager.getTypefaceOrNull("Arial", FontStyle.NORMAL)
+        val typeface = fontManager.getTypefaceOrNull(aFontName, FontStyle.NORMAL)
         assertNotNull(typeface, "Should find typeface")
-        assertEquals("Arial", customTypefaceCache.lastGetName)
+        assertEquals(aFontName, customTypefaceCache.lastGetName)
         assertNull(systemFontProvider.lastContainsName, "Should not get system fonts")
         assertNull(systemFontProvider.lastGetName, "Should not get system fonts")
     }
@@ -226,6 +233,7 @@ class AwtFontManagerTest {
         assertEquals("JetBrains Mono", systemFontProvider.lastContainsName)
         assertEquals("JetBrains Mono", systemFontProvider.lastGetName)
     }
+
 }
 
 private fun Array<String>.ignoreVirtualAwtFontFamilies() =
