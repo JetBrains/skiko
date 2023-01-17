@@ -199,7 +199,7 @@ jobs:
           fi
           ./emsdk install 2.0.29
           ./emsdk activate 2.0.29
-          source ./emsdk_env.sh
+          echo "source \"$(pwd)/emsdk_env.sh\"" >> $HOME/.bash_profile
           cd ..
       - shell: bash
         name: 'Compile and run JS tests'
