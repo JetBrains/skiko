@@ -199,14 +199,16 @@ jobs:
           fi
           ./emsdk install 2.0.29
           ./emsdk activate 2.0.29
-          echo "source \"$(pwd)/emsdk_env.sh\"" >> $HOME/.bash_profile
-          cd ..
       - shell: bash
         name: 'Compile and run JS tests'
-        run: ./gradlew --stacktrace --info -Pskiko.wasm.enabled=true -Pskiko.test.onci=true :skiko:jsTest
+        run: |
+          source "$(pwd)/skiko/emsdk/emsdk_env.sh"
+          ./gradlew --stacktrace --info -Pskiko.wasm.enabled=true -Pskiko.test.onci=true :skiko:jsTest
       - shell: bash
         name: 'Publish WASM runtime to Maven Local'
-        run: ./gradlew --stacktrace --info -Pskiko.wasm.enabled=true :skiko:publishSkikoWasmRuntimePublicationToMavenLocal
+        run: |
+          source "$(pwd)/skiko/emsdk/emsdk_env.sh"
+          ./gradlew --stacktrace --info -Pskiko.wasm.enabled=true :skiko:publishSkikoWasmRuntimePublicationToMavenLocal
 
       - uses: actions/upload-artifact@v3
         name: 'Save test results as artifact'
