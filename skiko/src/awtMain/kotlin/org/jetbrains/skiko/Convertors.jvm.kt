@@ -258,14 +258,26 @@ private fun toSkikoKey(event: KeyEvent): Int {
     return key
 }
 
-suspend fun java.awt.Font.toSkikoTypeface(fontManager: AwtFontManager) = withContext(Dispatchers.Default) {
+/**
+ * Try to obtain the equivalent [Typeface] for this instance of [Font].
+ * This currently only works if running on the JetBrains Runtime; it
+ * will return `null` on all other JVM implementations, due to the lack
+ * of APIs required to make this work.
+ *
+ * @return The corresponding [Typeface] if it exists, or `null` if no
+ * match is found or the current JVM is not supported.
+ *
+ * @see AwtFontManager.isAbleToResolveFamilyNames
+ */
+suspend fun java.awt.Font.toSkikoTypefaceOrNull(fontManager: AwtFontManager) = withContext(Dispatchers.Default) {
     val fontStyle = FontStyle(
         weight = toSkikoWeight(weight),
         width = toSkikoWidth(width),
         slant = toSkikoSlant(posture)
     )
 
-    fontManager.getTypefaceOrNull(this@toSkikoTypeface.fontFamilyName, fontStyle)
+    val familyName = fontFamilyName ?: return@withContext null
+    fontManager.getTypefaceOrNull(familyName, fontStyle)
 }
 
 /**

@@ -142,4 +142,33 @@ class AwtFontManager @InternalSkikoApi constructor(
      * all of them.
      */
     fun clearCustomFonts() = customTypefaceCache.clear()
+
+    /**
+     * Indicate whether the current JVM is able to resolve font family names
+     * accurately or not.
+     *
+     * This value will be `true` if using the JetBrains Runtime. It will be
+     * `false` otherwise, indicating that this class is not able to return
+     * valid values.
+     *
+     * If the return value is `false`, you should assume we are unable to
+     * obtain the actual font family names, and font resolving might fail.
+     * In particular, this is important when we need the actual family name
+     * to match an AWT [Font] to a [Typeface].
+     *
+     * On other JVMs running on Windows and Linux, the AWT implementation is
+     * not enumerating font families correctly. E.g., you may have these entries
+     * for JetBrains Mono, instead of a single entry: _JetBrains Mono, JetBrains
+     * Mono Bold, JetBrains Mono ExtraBold, JetBrains Mono ExtraLight, JetBrains
+     * Mono Light, JetBrains Mono Medium, JetBrains Mono SemiBold, JetBrains
+     * Mono Thin_.
+     *
+     * On the JetBrains Runtime, there are additional APIs that provide the
+     * necessary information needed to list the actual font families as single
+     * entries, as one would expect.
+     *
+     * @see toSkikoTypefaceOrNull
+     */
+    val isAbleToResolveFamilyNames
+        get() = AwtFontUtils.isAbleToResolveFontFamilyNames
 }

@@ -60,7 +60,7 @@ interface SystemFontProvider {
 
         /**
          * The default, global implementation of the interface.
-         * Uses Skia APIs to enumerate available font families.
+         * It uses Skia APIs to enumerate available font families.
          */
         val skia: SystemFontProvider
             get() = SkiaSystemFontProvider
@@ -143,7 +143,7 @@ private object SkiaSystemFontProvider : SystemFontProvider {
     private fun cacheAwtLogicalFonts() {
         try {
             for (logicalFont in FontFamilyKey.Awt.awtLogicalFonts) {
-                val physicalFontFamilyName = AwtFontUtils.resolvePhysicalFontName(logicalFont.familyName)
+                val physicalFontFamilyName = AwtFontUtils.resolvePhysicalFontNameOrNull(logicalFont.familyName)
                     ?: continue
 
                 awtLogicalFamilyNames += logicalFont to physicalFontFamilyName
