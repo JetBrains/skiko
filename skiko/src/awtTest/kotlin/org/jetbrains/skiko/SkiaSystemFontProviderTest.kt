@@ -37,10 +37,11 @@ class SkiaSystemFontProviderTest {
     @Test
     fun `should provide all the system fonts also available via AWT`() = runTest {
         // Listing of font family names is broken on non-macOS JVM implementations,
-        // except when running on the JetBrains Runtime.
-        Assume.assumeTrue(isRunningOnJetBrainsRuntime() || hostOs == OS.MacOS)
+        // except when running on the JetBrains Runtime. Our matching logic only
+        // works on the JetBrains Runtime.
+        Assume.assumeTrue(isRunningOnJetBrainsRuntime())
 
-        val awtFamilies = AwtFontUtils.fontFamilyNames()
+        val awtFamilies = AwtFontUtils.fontFamilyNamesOrNull()!!
             .ignoreVirtualAwtFontFamilies()
             .toSet()
 

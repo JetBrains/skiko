@@ -54,11 +54,15 @@ object AwtFontUtils {
     private val font2DHandlesCache = ConcurrentHashMap<Font, Any>()
 
     /**
-     * Indicate whether the current OS and JVM combination is able to provide
-     * a usable set of available font family names. This value will be `true`
-     * if running on macOS, or if using the JetBrains Runtime. It will be
-     * `false` otherwise, indicating that the [fontFamilyNames] result and
-     * other APIs will have to fallback on the broken AWT implementation.
+     * Indicate whether the current JVM is able to resolve font family names
+     * accurately or not.
+     *
+     * This value will be `true` if using the JetBrains Runtime. It will be
+     * `false` otherwise, indicating that this class is not able to return
+     * valid values.
+     *
+     * If the return value is `false`, you should assume all APIs in this class
+     * will return `null` as we can't obtain the necessary information.
      *
      * On other JVMs running on Windows and Linux, the AWT implementation is
      * not enumerating font families correctly. E.g., you may have these entries
@@ -71,14 +75,30 @@ object AwtFontUtils {
      * necessary information needed to list the actual font families as single
      * entries, as one would expect.
      */
-    val isProvidingUsableFontFamilyNames: Boolean
-        get() = hostOs == OS.MacOS ||
-                Font2D_getTypographicFamilyNameMethod != null
+    val isAbleToResolveFontFamilyNames: Boolean
+        get() = Font2D_getTypographicFamilyNameMethod != null
 
-    internal fun resolvePhysicalFontName(
+    /**
+     * Try to resolve a font family name, that could be a logical font
+     * face (e.g., [Font.DIALOG]), to the actual physical font family
+     * it is an alias for.
+     *
+     * @param fontName The name of the font face
+     * @param style The desired font name; must be one of the styles
+     * supported by the AWT [Font]. It is [Font.PLAIN] by default.
+     *
+     * @return The resolved physical font name, or `null` if it can't
+     * be resolved (either it's unknown, or the system doesn't
+     * support resolving font family names)
+     *
+     * @see isAbleToResolveFontFamilyNames
+     */
+    internal fun resolvePhysicalFontNameOrNull(
         fontName: String,
         style: Int = Font.PLAIN
     ): String? {
+        if (!isAbleToResolveFontFamilyNames) return null
+
         val fontManager = awtFontManager()
         val font2D =
             checkNotNull(FontManager_findFont2DMethod) { "FontManager#findFont2DMethod() is not available" }
@@ -97,11 +117,13 @@ object AwtFontUtils {
                 getFont2DMethodOrNull("getFamilyName", Locale::class.java)
                     ?.invoke(physicalFontObject, Locale.getDefault()) as String?
             }
+
             "sun.font.CFont" -> {
                 // For macOS
                 val clazz = Class.forName("sun.font.CFont")
                 getFieldValueOrNull(clazz, font2D, String::class.java, "nativeFontName")
             }
+
             else -> error("Unsupported Font2D subclass: ${font2D.javaClass.name}")
         }
     }
@@ -111,15 +133,21 @@ object AwtFontUtils {
      * be used instead of the one provided by [GraphicsEnvironment.getAvailableFontFamilyNames]
      * since it will provide consistent results across platforms.
      *
+     * Will return `null` if [isAbleToResolveFontFamilyNames] is `false`.
+     *
      * See [fontFamilyName] for further details.
      *
      * @see fontFamilyName
+     * @see isAbleToResolveFontFamilyNames
      */
-    fun fontFamilyNames(
+    fun fontFamilyNamesOrNull(
         graphicsEnvironment: GraphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment()
-    ): Set<String> =
-        graphicsEnvironment.allFonts.map { font -> font.fontFamilyName }
+    ): SortedSet<String>? {
+        if (!isAbleToResolveFontFamilyNames) return null
+
+        return graphicsEnvironment.allFonts.map { font -> font.fontFamilyName!! }
             .toSortedSet()
+    }
 
     /**
      * The preferred font family name, which should be used instead of the
@@ -131,29 +159,21 @@ object AwtFontUtils {
      * AWT fonts with Skia typefaces, and if used for listing font families,
      * will result in multiple entries being present in the list.
      *
-     * You can use [fontFamilyNames] to enumerate the actual family names
+     * You can use [fontFamilyNamesOrNull] to enumerate the actual family names
      * available via AWT.
      *
-     * @see fontFamilyNames
+     * @see fontFamilyNamesOrNull
      */
-    val Font.fontFamilyName: String
+    val Font.fontFamilyName: String?
         get() {
-            if (Font2D_getTypographicFamilyNameMethod == null) {
-                // Graceful fallback for when we're not running on the JetBrains Runtime.
-                // This is fundamentally broken on Windows and Linux, but we can't help it.
-                // The required API and information simply doesn't exist on other JRTs.
-                return family
-            }
-
-            InternalSunApiOpener.ensureAccessToSunFontPackage()
+            if (!isAbleToResolveFontFamilyNames) return null
 
             val font2D = obtainFont2D()
-            return Font2D_getTypographicFamilyNameMethod.invoke(font2D) as String
+            return checkNotNull(Font2D_getTypographicFamilyNameMethod) { "Font2D#getTypographicFamilyName() is not available" }
+                .invoke(font2D) as String
         }
 
     private fun Font.obtainFont2D(): Any {
-        InternalSunApiOpener.ensureAccessToSunFontPackage()
-
         // Don't store the Font2D instance directly, in case the handle may be changed
         // later on. Logic adopted from java.awt.Font#getFont2D()
         val handle = font2DHandlesCache.getOrPut(this) {
@@ -169,12 +189,9 @@ object AwtFontUtils {
             .get(handle)
     }
 
-    private fun awtFontManager(): Any {
-        InternalSunApiOpener.ensureAccessToSunFontPackage()
-
-        return checkNotNull(FontManagerFactory_getInstanceMethod) { "FontManagerFactory#getInstanceMethod() not available" }
+    private fun awtFontManager() =
+        checkNotNull(FontManagerFactory_getInstanceMethod) { "FontManagerFactory#getInstanceMethod() not available" }
             .invoke(null)
-    }
 
     private fun getFont2DMethodOrNull(
         methodName: String,
