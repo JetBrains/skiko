@@ -3,10 +3,7 @@ package org.jetbrains.skia
 import org.jetbrains.skia.impl.use
 import org.jetbrains.skia.paragraph.TypefaceFontProvider
 import org.jetbrains.skia.tests.makeFromResource
-import org.jetbrains.skiko.tests.SkipJsTarget
-import org.jetbrains.skiko.tests.SkipNativeTarget
-import org.jetbrains.skiko.tests.makeFromFileName
-import org.jetbrains.skiko.tests.runTest
+import org.jetbrains.skiko.tests.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -95,6 +92,7 @@ class FontMgrTest {
 
     @Test
     @SkipJsTarget
+    @SkipWasmTarget
     @SkipNativeTarget
     fun makeFromDataTest() {
         makeFromFileName("src/commonTest/resources/fonts/JetBrainsMono-Italic.ttf").use { data ->

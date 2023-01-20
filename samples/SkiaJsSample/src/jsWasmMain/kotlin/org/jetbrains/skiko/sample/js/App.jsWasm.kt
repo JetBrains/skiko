@@ -7,7 +7,6 @@ import org.jetbrains.skia.Rect
 import org.jetbrains.skiko.GenericSkikoView
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkikoView
-import org.jetbrains.skiko.wasm.onWasmReady
 import org.w3c.dom.HTMLCanvasElement
 
 private class DemoApp: SkikoView {
@@ -23,19 +22,17 @@ private class DemoApp: SkikoView {
     }
 }
 
-fun main() {
-    onWasmReady {
-        for (index in 1 .. 3) {
-            val skiaLayer = SkiaLayer()
-            val canvas = document.getElementById("c$index") as HTMLCanvasElement
-            val app = if (index == 3) {
-                DemoApp()
-            } else {
-                BouncingBalls()
-            }
-            skiaLayer.skikoView = GenericSkikoView(skiaLayer, app)
-            skiaLayer.attachTo(canvas)
-            skiaLayer.needRedraw()
+internal fun runApp() {
+    for (index in 1 .. 3) {
+        val skiaLayer = SkiaLayer()
+        val canvas = document.getElementById("c$index") as HTMLCanvasElement
+        val app = if (index == 3) {
+            DemoApp()
+        } else {
+            BouncingBalls()
         }
+        skiaLayer.skikoView = GenericSkikoView(skiaLayer, app)
+        skiaLayer.attachTo(canvas)
+        skiaLayer.needRedraw()
     }
 }
