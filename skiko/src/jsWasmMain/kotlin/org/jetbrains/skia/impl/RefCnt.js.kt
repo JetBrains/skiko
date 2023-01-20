@@ -1,5 +1,6 @@
 package org.jetbrains.skia.impl
 
+import org.jetbrains.skia.ModuleImport
 import org.jetbrains.skia.ExternalSymbolName
 
 actual abstract class RefCnt : Managed {
@@ -23,6 +24,9 @@ private object _FinalizerHolder {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_impl_RefCnt__getFinalizer")
+@ModuleImport("skia", "org_jetbrains_skia_impl_RefCnt__getFinalizer")
 internal actual external fun RefCnt_nGetFinalizer(): NativePointer
+
 @ExternalSymbolName("org_jetbrains_skia_impl_RefCnt__getRefCount")
+@ModuleImport("skia", "org_jetbrains_skia_impl_RefCnt__getRefCount")
 private external fun _nGetRefCount(ptr: NativePointer): Int

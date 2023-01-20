@@ -146,7 +146,7 @@ actual open class SkiaLayer {
 
     private fun setOnChangeScaleNotifier() {
         state?.initCanvas(desiredWidth, desiredHeight, contentScale, this.pixelGeometry)
-        window.matchMedia("(resolution: ${contentScale}dppx)").addEventListener("change", { setOnChangeScaleNotifier() }, true)
+        //window.matchMedia("(resolution: ${contentScale}dppx)").addEventListener("change", { setOnChangeScaleNotifier() }, true)
         onContentScaleChanged?.invoke(contentScale)
     }
 

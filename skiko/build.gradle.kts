@@ -16,7 +16,14 @@ plugins {
     id("de.undercouch.download") version "5.4.0"
 }
 
-val coroutinesVersion = "1.7.3"
+val Project.supportWasm: Boolean
+    get() = findProperty("skiko.wasm.enabled") == "true" || isInIdea
+
+val Project.supportJs: Boolean
+    get() = findProperty("skiko.js.enabled") == "true" || isInIdea
+
+val coroutinesVersion = if (supportWasm) "1.6.4-wasm0" else "1.6.4"
+val atomicFuVersion = if (supportWasm) "0.18.5-wasm0" else "0.18.5"
 
 fun targetSuffix(os: OS, arch: Arch): String {
     return "${os.id}_${arch.id}"
@@ -33,7 +40,12 @@ allprojects {
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
+    if (supportWasm) {
+        maven("https://maven.pkg.jetbrains.space/kotlin/p/wasm/experimental")
+    }
+    maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
 }
 
 val windowsSdkPaths: WindowsSdkPaths by lazy {
@@ -46,7 +58,7 @@ fun KotlinTarget.isIosSimArm64() =
 fun String.withSuffix(isIosSim: Boolean = false) =
     this + if (isIosSim) "Sim" else ""
 
-if (supportWasm) {
+if (supportJs || supportWasm) {
     val skiaWasmDir = registerOrGetSkiaDirProvider(OS.Wasm, Arch.Wasm)
 
     val compileWasm by tasks.registering(CompileSkikoCppTask::class) {
@@ -59,11 +71,12 @@ if (supportWasm) {
         buildTargetArch.set(osArch.second)
         buildVariant.set(buildType)
 
-        val srcDirs = projectDirs("src/commonMain/cpp/common", "src/jsMain/cpp", "src/nativeJsMain/cpp") +
+        val srcDirs = projectDirs("src/commonMain/cpp/common", "src/jsWasmMain/cpp", "src/nativeJsMain/cpp") +
                 if (skiko.includeTestHelpers) projectDirs("src/nativeJsTest/cpp") else emptyList()
         sourceRoots.set(srcDirs)
 
         includeHeadersNonRecursive(projectDir.resolve("src/nativeJsMain/cpp"))
+        includeHeadersNonRecursive(projectDir.resolve("src/jsWasmMain/cpp"))
         includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp/common/include"))
         includeHeadersNonRecursive(skiaHeadersDirs(skiaWasmDir.get()))
 
@@ -71,8 +84,8 @@ if (supportWasm) {
             *skiaPreprocessorFlags(OS.Wasm),
             *buildType.clangFlags,
             "-fno-rtti",
-            "-fno-exceptions"
-        ))
+            "-fno-exceptions",
+            ))
     }
 
     val linkWasm by tasks.registering(LinkSkikoWasmTask::class) {
@@ -95,7 +108,7 @@ if (supportWasm) {
         libOutputFileName.set("skiko.wasm")
         jsOutputFileName.set("skiko.js")
 
-        skikoJsPrefix.set(project.layout.projectDirectory.file("src/jsMain/resources/setup.js"))
+        skikoJsPrefix.set(project.layout.projectDirectory.file("src/jsWasmMain/resources/setup.js"))
 
         flags.set(listOf(
             "-l", "GL",
@@ -106,7 +119,7 @@ if (supportWasm) {
         ))
 
         doLast {
-            // skiko.js file is directly referenced in karma.config.d/wasm.js
+            // skiko.js file is directly referenced in karma.config.d/*/config.js
             // so symbols must be replaced right after linking
             val jsFiles = outDir.asFile.get().walk()
                 .filter { it.isFile && it.name.endsWith(".js") }
@@ -216,9 +229,6 @@ internal val Project.isInIdea: Boolean
 val Project.supportNative: Boolean
     get() = findProperty("skiko.native.enabled") == "true" || isInIdea
 
-val Project.supportWasm: Boolean
-    get() = findProperty("skiko.wasm.enabled") == "true" || isInIdea
-
 val Project.supportAndroid: Boolean
     get() = findProperty("skiko.android.enabled") == "true" // || isInIdea
 
@@ -245,7 +255,7 @@ kotlin {
         }
     }
 
-    if (supportWasm) {
+    if (supportJs) {
         js(IR) {
             moduleName = "skiko-kjs" // override the name to avoid name collision with a different skiko.js file
             browser {
@@ -253,10 +263,28 @@ kotlin {
                     dependsOn("linkWasm")
                     useKarma {
                         useChromeHeadless()
+                        useConfigDirectory(project.projectDir.resolve("karma.config.d").resolve("js"))
                     }
                 }
             }
             binaries.executable()
+            generateVersion(OS.Wasm, Arch.Wasm)
+        }
+    }
+
+    if (supportWasm) {
+        wasm {
+            moduleName = "skiko-kjs-wasm" // override the name to avoid name collision with a different skiko.js file
+            browser {
+                testTask {
+                    dependsOn("linkWasm")
+                    useKarma {
+                        this.webpackConfig.experiments.add("topLevelAwait")
+                        useChromeCanaryHeadless()
+                        useConfigDirectory(project.projectDir.resolve("karma.config.d").resolve("wasm"))
+                    }
+                }
+            }
             generateVersion(OS.Wasm, Arch.Wasm)
         }
     }
@@ -324,7 +352,7 @@ kotlin {
             }
         }
 
-        if (supportWasm || supportNative) {
+        if (supportJs || supportWasm || supportNative) {
             val nativeJsMain by creating {
                 dependsOn(commonMain)
             }
@@ -333,16 +361,45 @@ kotlin {
                 dependsOn(commonTest)
             }
 
-            if (supportWasm) {
-                val jsMain by getting {
+            if (supportJs || supportWasm) {
+                val jsWasmMain by creating {
                     dependsOn(nativeJsMain)
                 }
 
-                val jsTest by getting {
+                val jsWasmTest by creating {
                     dependsOn(nativeJsTest)
                     dependencies {
-                        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
-                        implementation(kotlin("test-js"))
+                        implementation(kotlin("test"))
+                    }
+                }
+
+                if (supportJs) {
+                    val jsMain by getting {
+                        dependsOn(jsWasmMain)
+                        dependencies {
+                            implementation(kotlin("stdlib-js"))
+                            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
+                            implementation("org.jetbrains.kotlinx:atomicfu:$atomicFuVersion")
+                        }
+                    }
+
+                    val jsTest by getting {
+                        dependsOn(jsWasmTest)
+                    }
+                }
+
+                if (supportWasm) {
+                    val wasmMain by getting {
+                        dependsOn(jsWasmMain)
+                        dependencies {
+                            implementation(kotlin("stdlib-wasm"))
+                            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
+                            implementation("org.jetbrains.kotlinx:atomicfu:$atomicFuVersion")
+                        }
+                    }
+
+                    val wasmTest by getting {
+                        dependsOn(jsWasmTest)
                     }
                 }
             }
@@ -1341,7 +1398,7 @@ publishing {
             }
         }
 
-        if (supportWasm) {
+        if (supportJs || supportWasm) {
             create<MavenPublication>("skikoWasmRuntime") {
                 pomNameForPublication[name] = "Skiko WASM Runtime"
                 artifactId = SkikoArtifacts.jsWasmArtifactId
@@ -1473,4 +1530,19 @@ tasks.withType<JavaCompile> {
     // Workaround to configure Java sources on Android (src/androidMain/java)
     targetCompatibility = "1.8"
     sourceCompatibility = "1.8"
+}
+
+project.tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().configureEach {
+    kotlinOptions.freeCompilerArgs += listOf(
+        "-Xwasm-enable-array-range-checks", "-Xir-dce=true"
+    )
+}
+
+if (supportJs && supportWasm) {
+    project.afterEvaluate {
+        //Disable jsWasmMain intermediate sourceset publication
+        tasks.named("compileJsWasmMainKotlinMetadata") {
+            enabled = false
+        }
+    }
 }

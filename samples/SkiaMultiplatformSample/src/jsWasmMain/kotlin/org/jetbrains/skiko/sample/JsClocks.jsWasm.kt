@@ -4,8 +4,10 @@ import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkikoInput
 import org.jetbrains.skiko.SkikoInputEvent
 
+expect val greetings: String
+
 class JsClocks(layer: SkiaLayer) : Clocks(layer) {
-    override var inputText: String = "Hello, JsClocks"
+    override var inputText: String = greetings
 
     override fun handleBackspace() {
         if (inputText.isNotEmpty()) {

@@ -337,4 +337,5 @@ enum class ColorType {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_ColorType__1nIsAlwaysOpaque")
+@ModuleImport("skia", "org_jetbrains_skia_ColorType__1nIsAlwaysOpaque")
 private external fun _nIsAlwaysOpaque(value: Int): Boolean

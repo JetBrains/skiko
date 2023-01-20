@@ -7,6 +7,7 @@ import org.jetbrains.skia.tests.assertContentCloseEnough
 import org.jetbrains.skia.tests.makeFromResource
 import org.jetbrains.skiko.tests.SkipJsTarget
 import org.jetbrains.skiko.tests.SkipNativeTarget
+import org.jetbrains.skiko.tests.SkipWasmTarget
 import org.jetbrains.skiko.tests.runTest
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
@@ -30,6 +31,7 @@ class ParagraphTest {
 
     @Test
     @SkipJsTarget
+    @SkipWasmTarget
     @SkipNativeTarget
     fun findTypefaces() = runTest {
         fontCollection().findTypefaces(emptyArray(), FontStyle.NORMAL)
@@ -48,6 +50,7 @@ class ParagraphTest {
 
     @Test
     @SkipJsTarget
+    @SkipWasmTarget
     @SkipNativeTarget
     fun layoutParagraph() = runTest {
         singleLineMetrics("aa").let { lineMetrics -> // latin
