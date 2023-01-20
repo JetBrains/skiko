@@ -25,10 +25,12 @@ import platform.Foundation.addObserver
 import platform.darwin.NSObject
 import platform.CoreGraphics.CGRectMake
 
+
 /**
  * SkiaLayer implementation for macOS.
  * Supports only [GraphicsApi.METAL]
  */
+
 actual open class SkiaLayer {
     fun isShowing(): Boolean {
         return true

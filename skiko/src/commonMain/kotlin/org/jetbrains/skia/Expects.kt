@@ -6,8 +6,6 @@ internal expect fun String.intCodePoints(): IntArray
 
 internal expect fun defaultLanguageTag(): String
 
-expect abstract class OutputStream
-
 expect class Pattern {
     fun split(input: CharSequence): Array<String>
     fun matcher(input: CharSequence): Matcher
@@ -24,3 +22,11 @@ internal expect fun compilePattern(regex: String): Pattern
 @OptIn(ExperimentalMultiplatform::class)
 @OptionalExpectation
 expect annotation class ExternalSymbolName(val name: String)
+
+@OptIn(ExperimentalMultiplatform::class)
+@OptionalExpectation
+@Target(AnnotationTarget.FUNCTION)
+expect annotation class ModuleImport(
+    val module: String,
+    val name: String
+)

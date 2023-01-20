@@ -48,6 +48,7 @@ internal actual fun reachabilityBarrier(obj: Any?) {
 
 actual typealias NativePointer = Long
 
+@Suppress("ACTUAL_TYPE_ALIAS_TO_NULLABLE_TYPE")
 actual typealias InteropPointer = Any?
 
 internal object theScope: InteropScope()

@@ -6,26 +6,28 @@ buildscript {
         google()
         mavenCentral()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
     }
 
     dependencies {
         // __KOTLIN_COMPOSE_VERSION__
-        classpath(kotlin("gradle-plugin", version = "1.8.20"))
+        val kotlinVersion = project.property("kotlin.version") as String
+        classpath(kotlin("gradle-plugin", version = kotlinVersion))
     }
 }
 
 plugins {
-    kotlin("multiplatform") version "1.8.20"
+    kotlin("multiplatform")
     id("org.jetbrains.gradle.apple.applePlugin") version "222.3345.143-0.16"
 }
-
-val coroutinesVersion = "1.5.2"
 
 repositories {
     mavenLocal()
     google()
     mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    maven("https://maven.pkg.jetbrains.space/kotlin/p/wasm/experimental")
+    maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
 }
 
 val osName = System.getProperty("os.name")
@@ -91,11 +93,15 @@ kotlin {
         binaries.executable()
     }
 
+    wasm {
+        browser()
+        binaries.executable()
+    }
+
     sourceSets {
         val commonMain by getting {
             dependencies {
                 implementation("org.jetbrains.skiko:skiko:$version")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
             }
         }
 
@@ -110,10 +116,18 @@ kotlin {
             }
         }
 
-        val jsMain by getting {
+        val jsWasmMain by creating {
             dependsOn(commonMain)
             resources.setSrcDirs(resources.srcDirs)
             resources.srcDirs(unzipTask.map { it.destinationDir })
+        }
+
+        val jsMain by getting {
+            dependsOn(jsWasmMain)
+        }
+
+        val wasmMain by getting {
+            dependsOn(jsWasmMain)
         }
 
         val darwinMain by creating {
@@ -301,6 +315,17 @@ fun KotlinNativeTarget.configureToLaunchFromXcode() {
                 "-linker-option", "-framework", "-linker-option", "CoreText",
                 "-linker-option", "-framework", "-linker-option", "CoreGraphics"
             )
+        }
+    }
+}
+
+// HACK: some dependencies (coroutines -wasm0 and atomicfu -wasm0) reference deleted *-dev libs
+configurations.all {
+    val conf = this
+    resolutionStrategy.eachDependency {
+        if (requested.version == "1.8.20-dev-3308") {
+            println("Substitute deleted version ${requested.module}:${requested.version} for ${conf.name}")
+            useVersion(project.properties["kotlin.version"] as String)
         }
     }
 }
