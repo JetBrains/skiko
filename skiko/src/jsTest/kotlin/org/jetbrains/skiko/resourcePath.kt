@@ -1,6 +1,4 @@
 package org.jetbrains.skiko
 
-import org.jetbrains.skia.ExternalSymbolName
-
-@ExternalSymbolName("require")
+@JsName("require")
 actual external fun resourcePath(resourceId: String): String

@@ -682,6 +682,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeAlphaThreshold")
+@ModuleImport("skia", "org_jetbrains_skia_ImageFilter__1nMakeAlphaThreshold")
 private external fun _nMakeAlphaThreshold(
     regionPtr: NativePointer,
     innerMin: Float,
@@ -691,6 +692,7 @@ private external fun _nMakeAlphaThreshold(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeArithmetic")
+@ModuleImport("skia", "org_jetbrains_skia_ImageFilter__1nMakeArithmetic")
 private external fun _nMakeArithmetic(
     k1: Float,
     k2: Float,
@@ -703,14 +705,19 @@ private external fun _nMakeArithmetic(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeBlend")
+@ModuleImport("skia", "org_jetbrains_skia_ImageFilter__1nMakeBlend")
 private external fun _nMakeBlend(blendMode: Int, bg: NativePointer, fg: NativePointer, crop: InteropPointer): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeBlur")
+@ModuleImport("skia", "org_jetbrains_skia_ImageFilter__1nMakeBlur")
 private external fun _nMakeBlur(sigmaX: Float, sigmaY: Float, tileMode: Int, input: NativePointer, crop: InteropPointer): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeColorFilter")
+@ModuleImport("skia", "org_jetbrains_skia_ImageFilter__1nMakeColorFilter")
 private external fun _nMakeColorFilter(colorFilterPtr: NativePointer, input: NativePointer, crop: InteropPointer): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeCompose")
+@ModuleImport("skia", "org_jetbrains_skia_ImageFilter__1nMakeCompose")
 private external fun _nMakeCompose(outer: NativePointer, inner: NativePointer): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDisplacementMap")
+@ModuleImport("skia", "org_jetbrains_skia_ImageFilter__1nMakeDisplacementMap")
 private external fun _nMakeDisplacementMap(
     xChan: Int,
     yChan: Int,
@@ -721,6 +728,7 @@ private external fun _nMakeDisplacementMap(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDropShadow")
+@ModuleImport("skia", "org_jetbrains_skia_ImageFilter__1nMakeDropShadow")
 private external fun _nMakeDropShadow(
     dx: Float,
     dy: Float,
@@ -732,6 +740,7 @@ private external fun _nMakeDropShadow(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDropShadowOnly")
+@ModuleImport("skia", "org_jetbrains_skia_ImageFilter__1nMakeDropShadowOnly")
 private external fun _nMakeDropShadowOnly(
     dx: Float,
     dy: Float,
@@ -743,6 +752,7 @@ private external fun _nMakeDropShadowOnly(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeImage")
+@ModuleImport("skia", "org_jetbrains_skia_ImageFilter__1nMakeImage")
 private external fun _nMakeImage(
     image: NativePointer,
     l0: Float,
@@ -758,6 +768,7 @@ private external fun _nMakeImage(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMagnifier")
+@ModuleImport("skia", "org_jetbrains_skia_ImageFilter__1nMakeMagnifier")
 private external fun _nMakeMagnifier(
     l: Float,
     t: Float,
@@ -769,6 +780,7 @@ private external fun _nMakeMagnifier(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMatrixConvolution")
+@ModuleImport("skia", "org_jetbrains_skia_ImageFilter__1nMakeMatrixConvolution")
 private external fun _nMakeMatrixConvolution(
     kernelW: Int,
     kernelH: Int,
@@ -784,27 +796,35 @@ private external fun _nMakeMatrixConvolution(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMatrixTransform")
+@ModuleImport("skia", "org_jetbrains_skia_ImageFilter__1nMakeMatrixTransform")
 private external fun _nMakeMatrixTransform(matrix: InteropPointer, samplingModeVal1: Int, samplingModeVal2: Int, input: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeMerge")
+@ModuleImport("skia", "org_jetbrains_skia_ImageFilter__1nMakeMerge")
 private external fun _nMakeMerge(filters: InteropPointer, filtersLength: Int, crop: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeOffset")
+@ModuleImport("skia", "org_jetbrains_skia_ImageFilter__1nMakeOffset")
 private external fun _nMakeOffset(dx: Float, dy: Float, input: NativePointer, crop: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeShader")
+@ModuleImport("skia", "org_jetbrains_skia_ImageFilter__1nMakeShader")
 private external fun _nMakeShader(shader: NativePointer, dither: Boolean, crop: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakePicture")
+@ModuleImport("skia", "org_jetbrains_skia_ImageFilter__1nMakePicture")
 private external fun _nMakePicture(picture: NativePointer, l: Float, t: Float, r: Float, b: Float): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeRuntimeShader")
+@ModuleImport("skia", "org_jetbrains_skia_ImageFilter__1nMakeRuntimeShader")
 private external fun _nMakeRuntimeShader(runtimeShaderBuilderPtr: NativePointer, childShaderName: InteropPointer, input: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeRuntimeShaderFromArray")
+@ModuleImport("skia", "org_jetbrains_skia_ImageFilter__1nMakeRuntimeShaderFromArray")
 private external fun _nMakeRuntimeShaderFromArray(runtimeShaderBuilderPtr: NativePointer, childShaderNames: InteropPointer, inputs: InteropPointer, inputLength: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeTile")
+@ModuleImport("skia", "org_jetbrains_skia_ImageFilter__1nMakeTile")
 private external fun _nMakeTile(
     l0: Float,
     t0: Float,
@@ -818,12 +838,15 @@ private external fun _nMakeTile(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDilate")
+@ModuleImport("skia", "org_jetbrains_skia_ImageFilter__1nMakeDilate")
 private external fun _nMakeDilate(rx: Float, ry: Float, input: NativePointer, crop: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeErode")
+@ModuleImport("skia", "org_jetbrains_skia_ImageFilter__1nMakeErode")
 private external fun _nMakeErode(rx: Float, ry: Float, input: NativePointer, crop: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDistantLitDiffuse")
+@ModuleImport("skia", "org_jetbrains_skia_ImageFilter__1nMakeDistantLitDiffuse")
 private external fun _nMakeDistantLitDiffuse(
     x: Float,
     y: Float,
@@ -836,6 +859,7 @@ private external fun _nMakeDistantLitDiffuse(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakePointLitDiffuse")
+@ModuleImport("skia", "org_jetbrains_skia_ImageFilter__1nMakePointLitDiffuse")
 private external fun _nMakePointLitDiffuse(
     x: Float,
     y: Float,
@@ -848,6 +872,7 @@ private external fun _nMakePointLitDiffuse(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeSpotLitDiffuse")
+@ModuleImport("skia", "org_jetbrains_skia_ImageFilter__1nMakeSpotLitDiffuse")
 private external fun _nMakeSpotLitDiffuse(
     x0: Float,
     y0: Float,
@@ -865,6 +890,7 @@ private external fun _nMakeSpotLitDiffuse(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeDistantLitSpecular")
+@ModuleImport("skia", "org_jetbrains_skia_ImageFilter__1nMakeDistantLitSpecular")
 private external fun _nMakeDistantLitSpecular(
     x: Float,
     y: Float,
@@ -878,6 +904,7 @@ private external fun _nMakeDistantLitSpecular(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakePointLitSpecular")
+@ModuleImport("skia", "org_jetbrains_skia_ImageFilter__1nMakePointLitSpecular")
 private external fun _nMakePointLitSpecular(
     x: Float,
     y: Float,
@@ -891,6 +918,7 @@ private external fun _nMakePointLitSpecular(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeSpotLitSpecular")
+@ModuleImport("skia", "org_jetbrains_skia_ImageFilter__1nMakeSpotLitSpecular")
 private external fun _nMakeSpotLitSpecular(
     x0: Float,
     y0: Float,

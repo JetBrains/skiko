@@ -1,11 +1,12 @@
 plugins {
-    kotlin("multiplatform") version "1.8.0"
+    kotlin("multiplatform") version "1.8.255-SNAPSHOT"
 }
 
 repositories {
     mavenLocal()
     mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    maven("https://maven.pkg.jetbrains.space/kotlin/p/wasm/experimental")
 }
 
 var version = "0.0.0-SNAPSHOT"
@@ -37,6 +38,11 @@ kotlin {
         binaries.executable()
     }
 
+    wasm() {
+        browser()
+        binaries.executable()
+    }
+
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -44,10 +50,19 @@ kotlin {
             }
         }
 
-        val jsMain by getting {
+        val jsWasmMain by creating {
             dependsOn(commonMain)
             resources.setSrcDirs(resources.srcDirs)
             resources.srcDirs(unzipTask.map { it.destinationDir })
+        }
+
+        val jsMain by getting {
+            dependsOn(jsWasmMain)
+        }
+
+
+        val wasmMain by getting {
+            dependsOn(jsWasmMain)
         }
     }
 }

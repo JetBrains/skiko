@@ -92,6 +92,7 @@ object ShadowUtils {
 
 
 @ExternalSymbolName("org_jetbrains_skia_ShadowUtils__1nDrawShadow")
+@ModuleImport("skia", "org_jetbrains_skia_ShadowUtils__1nDrawShadow")
 private external fun _nDrawShadow(
     canvasPtr: NativePointer,
     pathPtr: NativePointer,
@@ -109,7 +110,9 @@ private external fun _nDrawShadow(
 
 
 @ExternalSymbolName("org_jetbrains_skia_ShadowUtils__1nComputeTonalAmbientColor")
+@ModuleImport("skia", "org_jetbrains_skia_ShadowUtils__1nComputeTonalAmbientColor")
 private external fun _nComputeTonalAmbientColor(ambientColor: Int, spotColor: Int): Int
 
 @ExternalSymbolName("org_jetbrains_skia_ShadowUtils__1nComputeTonalSpotColor")
+@ModuleImport("skia", "org_jetbrains_skia_ShadowUtils__1nComputeTonalSpotColor")
 private external fun _nComputeTonalSpotColor(ambientColor: Int, spotColor: Int): Int
