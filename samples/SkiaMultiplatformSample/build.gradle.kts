@@ -10,22 +10,21 @@ buildscript {
 
     dependencies {
         // __KOTLIN_COMPOSE_VERSION__
-        classpath(kotlin("gradle-plugin", version = "1.8.0"))
+        classpath(kotlin("gradle-plugin", version = "1.8.255-SNAPSHOT"))
     }
 }
 
 plugins {
-    kotlin("multiplatform") version "1.8.0"
+    kotlin("multiplatform") version "1.8.255-SNAPSHOT"
     id("org.jetbrains.gradle.apple.applePlugin") version "222.3345.143-0.16"
 }
-
-val coroutinesVersion = "1.5.2"
 
 repositories {
     mavenLocal()
     google()
     mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    maven("https://maven.pkg.jetbrains.space/kotlin/p/wasm/experimental")
 }
 
 val osName = System.getProperty("os.name")
@@ -91,11 +90,15 @@ kotlin {
         binaries.executable()
     }
 
+    wasm {
+        browser()
+        binaries.executable()
+    }
+
     sourceSets {
         val commonMain by getting {
             dependencies {
                 implementation("org.jetbrains.skiko:skiko:$version")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
             }
         }
 
@@ -110,10 +113,18 @@ kotlin {
             }
         }
 
-        val jsMain by getting {
+        val jsWasmMain by creating {
             dependsOn(commonMain)
             resources.setSrcDirs(resources.srcDirs)
             resources.srcDirs(unzipTask.map { it.destinationDir })
+        }
+
+        val jsMain by getting {
+            dependsOn(jsWasmMain)
+        }
+
+        val wasmMain by getting {
+            dependsOn(jsWasmMain)
         }
 
         val darwinMain by creating {
