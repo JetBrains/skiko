@@ -6,16 +6,18 @@ buildscript {
         google()
         mavenCentral()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
     }
 
     dependencies {
         // __KOTLIN_COMPOSE_VERSION__
-        classpath(kotlin("gradle-plugin", version = "1.8.255-SNAPSHOT"))
+        val kotlinVersion = project.property("kotlin.version") as String
+        classpath(kotlin("gradle-plugin", version = kotlinVersion))
     }
 }
 
 plugins {
-    kotlin("multiplatform") version "1.8.255-SNAPSHOT"
+    kotlin("multiplatform")
     id("org.jetbrains.gradle.apple.applePlugin") version "222.3345.143-0.16"
 }
 
@@ -25,6 +27,7 @@ repositories {
     mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     maven("https://maven.pkg.jetbrains.space/kotlin/p/wasm/experimental")
+    maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
 }
 
 val osName = System.getProperty("os.name")

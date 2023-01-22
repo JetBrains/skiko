@@ -2,6 +2,7 @@ package org.jetbrains.skiko
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.TestCoroutineScope
+import kotlinx.coroutines.test.pauseDispatcher
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -194,3 +195,17 @@ class FrameDispatcherTest {
         job.cancel()
     }
 }
+
+@OptIn(ExperimentalCoroutinesApi::class)
+internal fun TestCoroutineScope.advanceUntilIdle() {
+    testScheduler.advanceUntilIdle()
+}
+
+@OptIn(ExperimentalCoroutinesApi::class)
+internal fun TestCoroutineScope.advanceTimeBy(ms: Long) {
+    testScheduler.advanceTimeBy(ms)
+}
+
+@OptIn(ExperimentalCoroutinesApi::class)
+internal val TestCoroutineScope.currentTime: Long
+    get() = testScheduler.currentTime

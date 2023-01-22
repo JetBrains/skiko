@@ -9,7 +9,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompileTool
 import org.jetbrains.kotlin.konan.target.KonanTarget
 
 plugins {
-    kotlin("multiplatform") version "1.8.255-SNAPSHOT"
+    kotlin("multiplatform")
     id("org.jetbrains.dokka") version "1.7.20"
     `maven-publish`
     signing
@@ -18,10 +18,10 @@ plugins {
 }
 
 val Project.supportWasm: Boolean
-    get() = findProperty("skiko.wasm.enabled") == "true" || isInIdea
+    get() = findProperty("skiko.wasm.enabled") == "true" //|| isInIdea
 
 val Project.supportJs: Boolean
-    get() = findProperty("skiko.js.enabled") == "true" || isInIdea
+    get() = findProperty("skiko.js.enabled") == "true" //|| isInIdea
 
 val coroutinesVersion = if (supportWasm) "1.6.4-wasm0" else "1.6.4"
 val atomicFuVersion = if (supportWasm) "0.18.5-wasm0" else "0.18.5"
@@ -225,7 +225,7 @@ internal val Project.isInIdea: Boolean
     }
 
 val Project.supportNative: Boolean
-   get() = findProperty("skiko.native.enabled") == "true" || isInIdea
+   get() = findProperty("skiko.native.enabled") == "true" //|| isInIdea
 
 val Project.supportAndroid: Boolean
     get() = findProperty("skiko.android.enabled") == "true" // || isInIdea
@@ -1407,6 +1407,17 @@ if (supportJs && supportWasm) {
         //Disable jsWasmMain intermediate sourceset publication
         tasks.named("compileJsWasmMainKotlinMetadata") {
             enabled = false
+        }
+    }
+}
+
+// HACK: some dependencies (coroutines -wasm0 and atomicfu -wasm0) reference deleted *-dev libs
+configurations.all {
+    val conf = this
+    resolutionStrategy.eachDependency {
+        if (requested.version == "1.8.20-dev-3308") {
+            println("Substitute deleted version ${requested.module}:${requested.version} for ${conf.name}")
+            useVersion(project.properties["kotlin.version"] as String)
         }
     }
 }

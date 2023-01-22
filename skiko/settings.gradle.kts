@@ -2,6 +2,7 @@ pluginManagement {
     repositories {
         mavenLocal()
         gradlePluginPortal()
+        maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
     }
     buildscript {
         repositories {
@@ -16,6 +17,12 @@ pluginManagement {
             classpath("org.jetbrains.compose.internal.build-helpers:publishing:0.1.3")
             classpath("org.kohsuke:github-api:1.116")
         }
+    }
+
+    plugins {
+        val kotlinVersion = extra["kotlin.version"] as String
+        kotlin("jvm").version(kotlinVersion)
+        kotlin("multiplatform").version(kotlinVersion)
     }
 }
 rootProject.name = "skiko"
