@@ -119,6 +119,18 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
             }
         }
 
+        fun makeFromBackendTexture(canvas: Canvas, backendTexture: GrBackendTexture): Image {
+            return try {
+                Stats.onNativeCall()
+                val ptr =
+                    _nMakeFromBackendTexture(getPtr(singletonDirectContext), getPtr(backendTexture))
+                if (ptr == NullPointer) throw RuntimeException("Failed to Image::makeFromBackendTexture ")//todo print args
+                Image(ptr)
+            } finally {
+//                reachabilityBarrier(context)//todo
+            }
+        }
+
         fun makeFromPixmap(pixmap: Pixmap): Image {
             return try {
                 Stats.onNativeCall()
@@ -421,6 +433,9 @@ private external fun _nMakeFromBitmap(bitmapPtr: NativePointer): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeFromPixmap")
 private external fun _nMakeFromPixmap(pixmapPtr: NativePointer): NativePointer
 
+@ExternalSymbolName("org_jetbrains_skia_Image__1nMakeFromBackendTexture2")
+private external fun _nMakeFromBackendTexture(directContext: NativePointer, backendTexture: NativePointer): NativePointer
+
 @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeFromEncoded")
 private external fun _nMakeFromEncoded(bytes: InteropPointer, encodedLength: Int): NativePointer
 
@@ -446,3 +461,5 @@ private external fun _nReadPixelsBitmap(
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nReadPixelsPixmap")
 private external fun _nReadPixelsPixmap(ptr: NativePointer, pixmapPtr: NativePointer, srcX: Int, srcY: Int, cache: Boolean): Boolean
+
+var singletonDirectContext: DirectContext? = null//todo simplify
