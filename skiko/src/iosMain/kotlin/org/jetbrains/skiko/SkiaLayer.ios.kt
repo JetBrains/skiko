@@ -7,6 +7,7 @@ import org.jetbrains.skiko.context.MetalContextHandler
 import org.jetbrains.skiko.redrawer.MetalRedrawer
 import platform.UIKit.*
 import kotlin.system.getTimeNanos
+import org.jetbrains.skia.*
 
 actual open class SkiaLayer {
 
@@ -110,6 +111,10 @@ actual open class SkiaLayer {
 
     actual val pixelGeometry: PixelGeometry
         get() = PixelGeometry.UNKNOWN
+
+    fun backendTextureToImage(texture: GrBackendTexture): Image? {
+        return redrawer?.contextHandler?.backendTextureToImage(texture)
+    }
 }
 
 // TODO: do properly

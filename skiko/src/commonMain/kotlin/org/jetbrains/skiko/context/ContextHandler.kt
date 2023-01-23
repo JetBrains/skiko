@@ -1,10 +1,6 @@
 package org.jetbrains.skiko.context
 
-import org.jetbrains.skia.BackendRenderTarget
-import org.jetbrains.skia.Canvas
-import org.jetbrains.skia.DirectContext
-import org.jetbrains.skia.Picture
-import org.jetbrains.skia.Surface
+import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.RenderException
 
@@ -52,5 +48,11 @@ internal abstract class ContextHandler(
             drawContent()
         }
         flush()
+    }
+
+    fun backendTextureToImage(texture: GrBackendTexture): Image? {
+        return context?.let {
+            org.jetbrains.skia.Image.Companion.makeFromBackendTexture(it, texture)
+        }
     }
 }

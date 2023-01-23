@@ -7,7 +7,6 @@ import kotlinx.cinterop.usePinned
 import kotlinx.cinterop.useContents
 import org.jetbrains.skia.BackendRenderTarget
 import org.jetbrains.skia.DirectContext
-import org.jetbrains.skia.singletonDirectContext
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.context.ContextHandler
 import org.jetbrains.skiko.context.MetalContextHandler
@@ -20,12 +19,13 @@ import platform.Metal.MTLPixelFormatBGRA8Unorm
 import platform.QuartzCore.CAMetalDrawableProtocol
 import platform.QuartzCore.CAMetalLayer
 import platform.QuartzCore.kCAGravityTopLeft
+import kotlin.system.getTimeNanos
 import platform.CoreGraphics.CGSizeMake
 
 internal class MetalRedrawer(
     private val layer: SkiaLayer
 ) : Redrawer {
-    private val contextHandler = MetalContextHandler(layer)
+    internal val contextHandler = MetalContextHandler(layer)
     override val renderInfo: String get() = contextHandler.rendererInfo()
 
     private var isDisposed = false
@@ -44,11 +44,7 @@ internal class MetalRedrawer(
         }
     }
 
-    fun makeContext(): DirectContext {
-        val makeMetal = DirectContext.makeMetal(device.objcPtr(), queue.objcPtr())
-        singletonDirectContext = makeMetal
-        return makeMetal
-    }
+    fun makeContext() = DirectContext.makeMetal(device.objcPtr(), queue.objcPtr())
 
     fun makeRenderTarget(width: Int, height: Int): BackendRenderTarget {
         currentDrawable = metalLayer.nextDrawable()!!

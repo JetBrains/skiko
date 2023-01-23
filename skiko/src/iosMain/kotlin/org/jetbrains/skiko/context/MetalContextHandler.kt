@@ -34,6 +34,7 @@ internal class MetalContextHandler(layer: SkiaLayer) : ContextHandler(layer, lay
     }
 
     override fun initCanvas() {
+        //todo calls every frame on scrolling
         disposeCanvas()
         val scale = layer.contentScale
         val (w, h) = layer.view!!.frame.useContents {
