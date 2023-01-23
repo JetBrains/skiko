@@ -1421,3 +1421,6 @@ configurations.all {
         }
     }
 }
+
+tasks.getByName("publishSkikoWasmRuntimePublicationToComposeRepoRepository")
+    .dependsOn("publishWasmPublicationToComposeRepoRepository")
