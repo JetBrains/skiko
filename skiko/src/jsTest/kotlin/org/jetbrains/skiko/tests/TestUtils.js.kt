@@ -19,7 +19,11 @@ private suspend fun <T> Promise<T>.await(): T = suspendCoroutine { cont ->
 /**
  * Awaits for `wasmSetup` and then runs the [block] in a coroutine.
  */
-actual fun runTest(block: suspend () -> Unit): dynamic = MainScope().promise {
+actual fun <T> runTest(block: suspend () -> Unit): dynamic = MainScope().promise {
+    error("It's a fake actual. Not expected to be called")
+}
+
+fun runTest(block: suspend () -> Unit): dynamic = MainScope().promise {
     wasmSetup.await()
     block()
 }
