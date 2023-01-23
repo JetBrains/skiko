@@ -4,3 +4,6 @@ build
 local.properties
 .DS_Store
 dependencies/
+
+# Screenshot test actual files
+**/src/**/screenshots/*_actual.png
