@@ -183,28 +183,23 @@ private fun toSkikoPressedMouseButtons(event: MouseEvent): SkikoMouseButtons {
     // info about the pressed mouse button when using touchpad on MacOS 12 (AWT only)
     // see: https://youtrack.jetbrains.com/issue/COMPOSE-36
     if (mask and InputEvent.BUTTON1_DOWN_MASK != 0
-        || (event.id == MouseEvent.MOUSE_PRESSED && event.button == MouseEvent.BUTTON1)
-    ) {
-        result = SkikoMouseButtons.LEFT.value
+        || (event.id == MouseEvent.MOUSE_PRESSED && event.button == MouseEvent.BUTTON1)) {
+        result = result.or(SkikoMouseButtons.LEFT.value)
     }
     if (mask and InputEvent.BUTTON2_DOWN_MASK != 0
-        || (event.id == MouseEvent.MOUSE_PRESSED && event.button == MouseEvent.BUTTON2)
-    ) {
+        || (event.id == MouseEvent.MOUSE_PRESSED && event.button == MouseEvent.BUTTON2)) {
         result = result.or(SkikoMouseButtons.MIDDLE.value)
     }
     if (mask and InputEvent.BUTTON3_DOWN_MASK != 0
-        || (event.id == MouseEvent.MOUSE_PRESSED && event.button == MouseEvent.BUTTON3)
-    ) {
+        || (event.id == MouseEvent.MOUSE_PRESSED && event.button == MouseEvent.BUTTON3)) {
         result = result.or(SkikoMouseButtons.RIGHT.value)
     }
     if (mask and MouseEvent.getMaskForButton(MouseEventButton4) != 0
-        || (event.id == MouseEvent.MOUSE_PRESSED && event.button == MouseEventButton4)
-    ) {
+        || (event.id == MouseEvent.MOUSE_PRESSED && event.button == MouseEventButton4)) {
         result = result.or(SkikoMouseButtons.BUTTON_4.value)
     }
     if (mask and MouseEvent.getMaskForButton(MouseEventButton5) != 0
-        || (event.id == MouseEvent.MOUSE_PRESSED && event.button == MouseEventButton5)
-    ) {
+        || (event.id == MouseEvent.MOUSE_PRESSED && event.button == MouseEventButton5)) {
         result = result.or(SkikoMouseButtons.BUTTON_5.value)
     }
     return SkikoMouseButtons(result)
