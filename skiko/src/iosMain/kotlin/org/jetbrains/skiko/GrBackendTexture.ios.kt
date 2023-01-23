@@ -24,18 +24,18 @@ import org.jetbrains.skia.Pixmap
 import org.jetbrains.skia.impl.*
 import platform.Metal.MTLTextureProtocol
 
-fun GrBackendTexture.Companion.createFromMetalTexture(mtlTexture: MTLTextureProtocol): GrBackendTexture {
+fun GrBackendTexture.Companion.createFromMetalTexture(mtlTexture: MTLTextureProtocol, width:Int, height: Int): GrBackendTexture {
     return try {
         Stats.onNativeCall()
 //        val ptr =
 //            _nMakeFromPixmap(getPtr(pixmap))
         val ptr = mtlTexture.objcPtr()
         if (ptr == Native.NullPointer) throw RuntimeException("Failed to GrBackendTexture.Companion.createFromMetalTexture")//todo log args
-        GrBackendTexture(_nCreateFromMetalTexture(ptr))
+        GrBackendTexture(_nCreateFromMetalTexture(ptr, width, height))
     } finally {
 //        reachabilityBarrier(pixmap)//todo?
     }
 }
 
 @ExternalSymbolName("org_jetbrains_skia_GrBackendTexture__1nCreateFromMetalTexture")
-private external fun _nCreateFromMetalTexture(mtlTexturePtr: NativePointer): NativePointer
+private external fun _nCreateFromMetalTexture(mtlTexturePtr: NativePointer, width: Int, height: Int): NativePointer

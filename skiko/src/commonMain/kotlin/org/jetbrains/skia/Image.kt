@@ -433,7 +433,7 @@ private external fun _nMakeFromBitmap(bitmapPtr: NativePointer): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeFromPixmap")
 private external fun _nMakeFromPixmap(pixmapPtr: NativePointer): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_Image__1nMakeFromBackendTexture2")
+@ExternalSymbolName("org_jetbrains_skia_Image__1nMakeFromBackendTexture3")
 private external fun _nMakeFromBackendTexture(directContext: NativePointer, backendTexture: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeFromEncoded")
