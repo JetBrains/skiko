@@ -6,6 +6,7 @@ import org.jetbrains.skia.Data
 import org.jetbrains.skia.FontStyle
 import org.jetbrains.skia.Typeface
 import org.jetbrains.skia.tests.makeFromResource
+import org.junit.Assume
 import org.junit.Test
 import kotlin.io.path.createTempFile
 import kotlin.io.path.writeBytes
@@ -232,5 +233,19 @@ class AwtFontManagerTest {
         assertNull(typeface, "System typeface should be missing in this test")
         assertEquals("JetBrains Mono", systemFontProvider.lastContainsName)
         assertEquals("JetBrains Mono", systemFontProvider.lastGetName)
+    }
+
+    @Test
+    fun `should return false from isAbleToResolveFamilyNames when not running on JBR`() {
+        Assume.assumeFalse(System.getProperty("java.vendor") == "JetBrains s.r.o.")
+
+        assertFalse(fontManager.isAbleToResolveFamilyNames)
+    }
+
+    @Test
+    fun `should return true from isAbleToResolveFamilyNames when running on JBR`() {
+        Assume.assumeTrue(System.getProperty("java.vendor") == "JetBrains s.r.o.")
+
+        assertTrue(fontManager.isAbleToResolveFamilyNames)
     }
 }
