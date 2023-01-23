@@ -1,5 +1,5 @@
 plugins {
-    kotlin("multiplatform") version "1.8.255-SNAPSHOT"
+    kotlin("multiplatform")
 }
 
 repositories {
@@ -7,6 +7,7 @@ repositories {
     mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     maven("https://maven.pkg.jetbrains.space/kotlin/p/wasm/experimental")
+    maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
 }
 
 var version = "0.0.0-SNAPSHOT"
@@ -69,4 +70,15 @@ kotlin {
 
 rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin> {
    rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>().nodeVersion = "16.0.0"
+}
+
+// HACK: some dependencies (coroutines -wasm0 and atomicfu -wasm0) reference deleted *-dev libs
+configurations.all {
+    val conf = this
+    resolutionStrategy.eachDependency {
+        if (requested.version == "1.8.20-dev-3308") {
+            println("Substitute deleted version ${requested.module}:${requested.version} for ${conf.name}")
+            useVersion(project.properties["kotlin.version"] as String)
+        }
+    }
 }

@@ -6,7 +6,11 @@ import org.jetbrains.skia.impl.InteropScope
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.makeFromFileName
 
-actual fun runTest(block: suspend () -> Unit): Any {
+actual fun <T> runTest(block: suspend () -> Unit): T {
+    error("It's a fake actual. Not expected to be called")
+}
+
+fun runTest(block: suspend () -> Unit): Unit {
     return runBlocking { block() }
 }
 
