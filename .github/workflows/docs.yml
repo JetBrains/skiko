@@ -18,10 +18,10 @@ jobs:
         name: 'Check out code'
 
       - uses: actions/setup-java@v3
-        name: 'Set up JDK 17'
+        name: 'Set up JDK 11'
         with:
           distribution: 'adopt'
-          java-version: '17'
+          java-version: '11'
           cache: 'gradle'
 
       - name: 'Build Dokka documentation'

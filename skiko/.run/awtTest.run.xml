@@ -10,7 +10,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value=":skiko:awtTest" />
+          <option value=":awtTest" />
         </list>
       </option>
       <option name="vmOptions" />
