@@ -71,14 +71,14 @@ class AwtFontManager @InternalSkikoApi constructor(
      *
      * @see getTypefaceOrNull
      */
-    suspend fun systemFamilyNames() = systemFontProvider.familyNames().toSortedSet()
+    suspend fun systemFamilyNames(): Set<String> = systemFontProvider.familyNames().toSortedSet()
 
     /**
      * List the font families for all registered custom fonts.
      *
      * @see getTypefaceOrNull
      */
-    fun customFamilyNames() = customTypefaceCache.familyNames().toSortedSet()
+    fun customFamilyNames(): Set<String> = customTypefaceCache.familyNames().toSortedSet()
 
     /**
      * Add a classpath resource as a custom font.
