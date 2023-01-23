@@ -269,6 +269,7 @@ private fun toSkikoKey(event: KeyEvent): Int {
  *
  * @see AwtFontManager.isAbleToResolveFamilyNames
  */
+@DependsOnJBR
 suspend fun java.awt.Font.toSkikoTypefaceOrNull(fontManager: AwtFontManager) = withContext(Dispatchers.Default) {
     val fontStyle = FontStyle(
         weight = toSkikoWeight(weight),

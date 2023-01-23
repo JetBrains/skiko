@@ -233,8 +233,4 @@ class AwtFontManagerTest {
         assertEquals("JetBrains Mono", systemFontProvider.lastContainsName)
         assertEquals("JetBrains Mono", systemFontProvider.lastGetName)
     }
-
 }
-
-private fun Array<String>.ignoreVirtualAwtFontFamilies() =
-    filterNot { FontFamilyKey(it) in FontFamilyKey.Awt.awtLogicalFonts }

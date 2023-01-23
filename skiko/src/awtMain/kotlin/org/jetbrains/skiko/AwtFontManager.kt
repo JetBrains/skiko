@@ -169,6 +169,7 @@ class AwtFontManager @InternalSkikoApi constructor(
      *
      * @see toSkikoTypefaceOrNull
      */
+    @DependsOnJBR
     val isAbleToResolveFamilyNames
         get() = AwtFontUtils.isAbleToResolveFontFamilyNames
 }

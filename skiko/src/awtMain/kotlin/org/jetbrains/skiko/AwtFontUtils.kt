@@ -75,6 +75,7 @@ object AwtFontUtils {
      * necessary information needed to list the actual font families as single
      * entries, as one would expect.
      */
+    @DependsOnJBR
     val isAbleToResolveFontFamilyNames: Boolean
         get() = Font2D_getTypographicFamilyNameMethod != null
 
