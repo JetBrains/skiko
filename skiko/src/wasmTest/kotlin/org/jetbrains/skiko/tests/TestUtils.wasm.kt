@@ -13,7 +13,11 @@ private external fun jsRef(): Dynamic
 /**
  * Runs the [block] in a coroutine.
  */
-actual fun runTest(block: suspend () -> Unit): Any = MainScope().promise {
+actual fun <T> runTest(block: suspend () -> Unit): T {
+    error("It's a fake actual. Not expected to be called")
+}
+
+fun runTest(block: suspend () -> Unit): Any = MainScope().promise {
     block()
     jsRef()
 }

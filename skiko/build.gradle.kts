@@ -8,7 +8,7 @@ import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompileTool
 
 plugins {
-    kotlin("multiplatform") version "1.8.20"
+    kotlin("multiplatform")
     id("org.jetbrains.dokka") version "1.7.20"
     `maven-publish`
     signing
@@ -1546,3 +1546,17 @@ if (supportJs && supportWasm) {
         }
     }
 }
+
+// HACK: some dependencies (coroutines -wasm0 and atomicfu -wasm0) reference deleted *-dev libs
+configurations.all {
+    val conf = this
+    resolutionStrategy.eachDependency {
+        if (requested.version == "1.8.20-dev-3308") {
+            println("Substitute deleted version ${requested.module}:${requested.version} for ${conf.name}")
+            useVersion(project.properties["kotlin.version"] as String)
+        }
+    }
+}
+
+tasks.getByName("publishSkikoWasmRuntimePublicationToComposeRepoRepository")
+    .dependsOn("publishWasmPublicationToComposeRepoRepository")
