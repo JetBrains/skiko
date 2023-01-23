@@ -18,10 +18,10 @@ plugins {
 }
 
 val Project.supportWasm: Boolean
-    get() = findProperty("skiko.wasm.enabled") == "true" //|| isInIdea
+    get() = findProperty("skiko.wasm.enabled") == "true" || isInIdea
 
 val Project.supportJs: Boolean
-    get() = findProperty("skiko.js.enabled") == "true" //|| isInIdea
+    get() = findProperty("skiko.js.enabled") == "true" || isInIdea
 
 val coroutinesVersion = if (supportWasm) "1.6.4-wasm0" else "1.6.4"
 val atomicFuVersion = if (supportWasm) "0.18.5-wasm0" else "0.18.5"
@@ -225,7 +225,7 @@ internal val Project.isInIdea: Boolean
     }
 
 val Project.supportNative: Boolean
-   get() = findProperty("skiko.native.enabled") == "true" //|| isInIdea
+   get() = findProperty("skiko.native.enabled") == "true" || isInIdea
 
 val Project.supportAndroid: Boolean
     get() = findProperty("skiko.android.enabled") == "true" // || isInIdea
