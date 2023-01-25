@@ -6,19 +6,18 @@
 
 #ifdef SK_METAL
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_GrBackendTexture__1nCreateFromMetalTexture
-  (long mtlTexturePtr, int width, int height) {
+  (long mtlTexturePtr, int width, int height) {//todo get width and height from mtlTexturePtr
     GrMtlTextureInfo mtlInfo;
-    GrMTLHandle mtlTexture = reinterpret_cast<GrMTLHandle>((mtlTexturePtr));
+//    MTLTexture* mtlTexture = reinterpret_cast<MTLTexture*>(mtlTexturePtr);
+    GrMTLHandle mtlTexture = reinterpret_cast<GrMTLHandle>(mtlTexturePtr);
     mtlInfo.fTexture.retain(mtlTexture);
-    GrBackendTexture* backendTexture = new GrBackendTexture(width, height, GrMipmapped::kNo, mtlInfo, "Metal to Skia texture");
+    GrBackendTexture* backendTexture = new GrBackendTexture(
+            width,
+            height,
+            GrMipmapped::kNo,
+            mtlInfo,
+            "Metal to Skia texture"
+        );
     return reinterpret_cast<KNativePointer>(backendTexture);
-
-//    GrMtlBackendContext backendContext = {};
-//    GrMTLHandle device = reinterpret_cast<GrMTLHandle>((devicePtr));
-//    GrMTLHandle queue = reinterpret_cast<GrMTLHandle>((queuePtr));
-//    backendContext.fDevice.retain(device);
-//    backendContext.fQueue.retain(queue);
-//    sk_sp<GrDirectContext> instance = GrDirectContext::MakeMetal(backendContext);
-//    return reinterpret_cast<KNativePointer>(instance.release());
 }
 #endif // SK_METAL
