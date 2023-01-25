@@ -70,10 +70,13 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
      */
     fun swap(other: Bitmap) {
         Stats.onNativeCall()
-        _nSwap(_ptr, getPtr(other))
-        _imageInfo = null
-        reachabilityBarrier(this)
-        reachabilityBarrier(other)
+        try {
+            _nSwap(_ptr, getPtr(other))
+            _imageInfo = null
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(other)
+        }
     }
 
     override val imageInfo: ImageInfo
@@ -201,7 +204,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
      *
      * @return  size in bytes of image buffer
      */
-    fun computeByteSize(): NativePointer {
+    fun computeByteSize(): Int {
         return try {
             Stats.onNativeCall()
             _nComputeByteSize(_ptr)
@@ -685,6 +688,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
             )
             this
         } finally {
+            reachabilityBarrier(this)
             reachabilityBarrier(pixelRef)
         }
     }
@@ -1079,7 +1083,7 @@ private external fun _nGetRowBytes(ptr: NativePointer): Int
 private external fun _nSetAlphaType(ptr: NativePointer, alphaType: Int): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nComputeByteSize")
-private external fun _nComputeByteSize(ptr: NativePointer): NativePointer
+private external fun _nComputeByteSize(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Bitmap__1nIsImmutable")
 private external fun _nIsImmutable(ptr: NativePointer): Boolean

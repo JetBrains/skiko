@@ -33,6 +33,7 @@ jobs:
           ./gradlew --stacktrace --info -Pskiko.native.enabled=true :skiko:publishToMavenLocal
           ./gradlew --stacktrace --info :SkiaAwtSample:installDist # check AWT sample works
       - uses: actions/upload-artifact@v2
+        if: always()
         with:
           name: test-reports-macos
           path: ./skiko/build/reports/tests
@@ -57,6 +58,7 @@ jobs:
           ./gradlew --stacktrace --info -Pskiko.native.enabled=true :skiko:publishToMavenLocal
           # TODO run iOS specific tests on iPhone simulator
       - uses: actions/upload-artifact@v2
+        if: always()
         with:
           name: test-reports-macos
           path: ./skiko/build/reports/tests
@@ -94,12 +96,24 @@ jobs:
           sudo update-alternatives --config gcc
           sudo apt-get install ninja-build fontconfig libfontconfig1-dev libglu1-mesa-dev libxrandr-dev libdbus-1-dev zip xvfb -y
           sudo Xvfb :0 -screen 0 1280x720x24 &
+      - run: |
+          # Test Linux native
           export DISPLAY=:0
-          ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Pkotlin.native.cacheKind.linuxX64=none -Pskiko.test.onci=true :skiko:linuxX64Test :skiko:awtTest
-          ./gradlew --stacktrace --info -Pkotlin.native.cacheKind.linuxX64=none :skiko:publishToMavenLocal
-          ./gradlew --stacktrace --info :SkiaAwtSample:installDist # check jvm sample works
-          ./gradlew -Pskiko.android.enabled=true :skiko:publishSkikoJvmRuntimeAndroidX64PublicationToMavenLocal :skiko:publishSkikoJvmRuntimeAndroidArm64PublicationToMavenLocal :skiko:publishAndroidPublicationToMavenLocal
+          ./gradlew --no-daemon --stacktrace --info -Pskiko.native.enabled=true -Pkotlin.native.cacheKind.linuxX64=none -Pskiko.test.onci=true :skiko:linuxX64Test
+      - run: |
+          # Test Linux AWT
+          export DISPLAY=:0
+          ./gradlew --no-daemon --stacktrace --info -Pskiko.native.enabled=true -Pkotlin.native.cacheKind.linuxX64=none -Pskiko.test.onci=true :skiko:awtTest
+        timeout-minutes: 25
+      - env:
+          ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+        run: |
+          # Test publishToMavenLocal
+          ./gradlew --no-daemon --stacktrace --info -Pkotlin.native.cacheKind.linuxX64=none :skiko:publishToMavenLocal
+          ./gradlew --no-daemon --stacktrace --info :SkiaAwtSample:installDist # check jvm sample works
+          ./gradlew --no-daemon -Pskiko.android.enabled=true :skiko:publishSkikoJvmRuntimeAndroidX64PublicationToMavenLocal :skiko:publishSkikoJvmRuntimeAndroidArm64PublicationToMavenLocal :skiko:publishAndroidPublicationToMavenLocal
       - uses: actions/upload-artifact@v2
+        if: always()
         with:
           name: test-reports-linux
           path: ./skiko/build/reports/tests
@@ -137,6 +151,7 @@ jobs:
            ./gradlew --stacktrace --info -Pskiko.wasm.enabled=true -Pskiko.test.onci=true jsTest
            ./gradlew --stacktrace --info -Pskiko.wasm.enabled=true publishSkikoWasmRuntimePublicationToMavenLocal
        - uses: actions/upload-artifact@v2
+         if: always()
          with:
            name: test-reports-js
            path: ./skiko/build/reports/tests
@@ -158,6 +173,7 @@ jobs:
           ./gradlew --stacktrace --info :skiko:publishToMavenLocal
           ./gradlew --stacktrace --info :SkiaAwtSample:installDist # check jvm sample works
       - uses: actions/upload-artifact@v2
+        if: always()
         with:
           name: test-reports-windows
           path: ./skiko/build/reports/tests

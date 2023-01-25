@@ -689,6 +689,7 @@ class Surface : RefCnt {
             Surface(ptr)
         } finally {
             reachabilityBarrier(this)
+            reachabilityBarrier(imageInfo.colorInfo.colorSpace)
         }
     }
 

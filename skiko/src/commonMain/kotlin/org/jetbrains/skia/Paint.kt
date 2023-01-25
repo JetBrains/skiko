@@ -215,6 +215,7 @@ class Paint : Managed {
             )
             this
         } finally {
+            reachabilityBarrier(this)
             reachabilityBarrier(colorSpace)
         }
     }

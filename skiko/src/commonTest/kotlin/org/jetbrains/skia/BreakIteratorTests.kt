@@ -66,4 +66,13 @@ class BreakIteratorTests {
 
         assertContentEquals(listOf(167, 287), boundary.asSequence().toList())
     }
+
+    @Test
+    fun breakRuleStatusesTest() {
+        val boundary = BreakIterator.makeWordInstance()
+        boundary.setText("Hello world!")
+        boundary.next()
+        assertEquals(boundary.ruleStatus, 200)
+        assertContentEquals(listOf(200), boundary.ruleStatuses.toList())
+    }
 }

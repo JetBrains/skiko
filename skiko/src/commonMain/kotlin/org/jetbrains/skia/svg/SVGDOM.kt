@@ -5,6 +5,15 @@ import org.jetbrains.skia.*
 import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.*
 
+private fun makeSVGDOM(data: Data): NativePointer {
+    Stats.onNativeCall()
+    return try {
+        SVGDOM_nMakeFromData(getPtr(data))
+    } finally {
+        reachabilityBarrier(data)
+    }
+}
+
 class SVGDOM internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
         init {
@@ -12,10 +21,7 @@ class SVGDOM internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         }
     }
 
-    constructor(data: Data) : this(SVGDOM_nMakeFromData(getPtr(data))) {
-        Stats.onNativeCall()
-        reachabilityBarrier(data)
-    }
+    constructor(data: Data) : this(makeSVGDOM(data))
 
     val root: SVGSVG?
         get() = try {
@@ -54,6 +60,7 @@ class SVGDOM internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             SVGDOM_nRender(_ptr, getPtr(canvas))
             this
         } finally {
+            reachabilityBarrier(this)
             reachabilityBarrier(canvas)
         }
     }

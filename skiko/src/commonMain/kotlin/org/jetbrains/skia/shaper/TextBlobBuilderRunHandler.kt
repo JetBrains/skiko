@@ -73,6 +73,7 @@ class TextBlobBuilderRunHandler<T> internal constructor(
     }
 
     init {
+        // TODO [pavel.sergeev] what `manageText` == false is actually mean?
         _text = if (manageText) text else null
         reachabilityBarrier(text)
     }

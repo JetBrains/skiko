@@ -27,10 +27,16 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CodecKt_Codec_1nGetIma
     skija::ImageInfo::writeImageInfoForInterop(env, imageInfo, imageInfoResult, colorSpaceResultPtr);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_CodecKt__1nGetSize
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CodecKt__1nGetSizeWidth
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkCodec* instance = reinterpret_cast<SkCodec*>(static_cast<uintptr_t>(ptr));
-    return packISize(instance->dimensions());
+    return instance->dimensions().fWidth;
+}
+
+extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CodecKt__1nGetSizeHeight
+  (JNIEnv* env, jclass jclass, jlong ptr) {
+    SkCodec* instance = reinterpret_cast<SkCodec*>(static_cast<uintptr_t>(ptr));
+    return instance->dimensions().fHeight;
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_CodecKt__1nGetEncodedOrigin

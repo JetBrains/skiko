@@ -6,9 +6,10 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompileTool
+import org.jetbrains.kotlin.konan.target.KonanTarget
 
 plugins {
-    kotlin("multiplatform") version "1.7.20"
+    kotlin("multiplatform") version "1.8.0"
     id("org.jetbrains.dokka") version "1.7.20"
     `maven-publish`
     signing
@@ -447,41 +448,46 @@ fun configureNativeTarget(os: OS, arch: Arch, target: KotlinNativeTarget) {
             }
         }
     }
+    val skiaBinDir = "$skiaDir/out/${buildType.id}-$targetString"
+    val linkerFlags = when (os) {
+        OS.MacOS -> mutableListOf("-linker-option", "-framework", "-linker-option", "Metal",
+            "-linker-option", "-framework", "-linker-option", "CoreGraphics",
+            "-linker-option", "-framework", "-linker-option", "CoreText",
+            "-linker-option", "-framework", "-linker-option", "CoreServices"
+        )
+        OS.IOS -> mutableListOf("-linker-option", "-framework", "-linker-option", "Metal",
+            "-linker-option", "-framework", "-linker-option", "CoreGraphics",
+            "-linker-option", "-framework", "-linker-option", "UIKit",
+            "-linker-option", "-framework", "-linker-option", "CoreText")
+        OS.Linux -> mutableListOf(
+            "-linker-option", "-L/usr/lib/x86_64-linux-gnu",
+            "-linker-option", "-lfontconfig",
+            "-linker-option", "-lGL",
+            // TODO: an ugly hack, Linux linker searches only unresolved symbols.
+            "-linker-option", "$skiaBinDir/libsksg.a",
+            "-linker-option", "$skiaBinDir/libskshaper.a",
+            "-linker-option", "$skiaBinDir/libskunicode.a",
+            "-linker-option", "$skiaBinDir/libskia.a"
+        )
+        else -> mutableListOf()
+    }
+    if (skiko.includeTestHelpers) {
+        linkerFlags.addAll(when (os) {
+            OS.Linux -> listOf(
+                "-linker-option", "-lX11",
+                "-linker-option", "-lGLX",
+            )
+            else -> emptyList()
+        })
+    }
+
+    // For some reason since 1.8.0 we need to set freeCompilerArgs for binaries AND for compilations
+    target.binaries.all {
+        freeCompilerArgs += allLibraries.map { listOf("-include-binary", it) }.flatten() + linkerFlags
+    }
     target.compilations.all {
-        val skiaBinDir = "$skiaDir/out/${buildType.id}-$targetString"
-        this.
         kotlinOptions {
-            val linkerFlags = when (os) {
-                OS.MacOS -> mutableListOf("-linker-option", "-framework", "-linker-option", "Metal",
-                    "-linker-option", "-framework", "-linker-option", "CoreGraphics",
-                    "-linker-option", "-framework", "-linker-option", "CoreText",
-                    "-linker-option", "-framework", "-linker-option", "CoreServices"
-                )
-                OS.IOS -> mutableListOf("-linker-option", "-framework", "-linker-option", "Metal",
-                    "-linker-option", "-framework", "-linker-option", "CoreGraphics",
-                    "-linker-option", "-framework", "-linker-option", "UIKit",
-                    "-linker-option", "-framework", "-linker-option", "CoreText")
-                OS.Linux -> mutableListOf(
-                    "-linker-option", "-L/usr/lib/x86_64-linux-gnu",
-                    "-linker-option", "-lfontconfig",
-                    "-linker-option", "-lGL",
-                    // TODO: an ugly hack, Linux linker searches only unresolved symbols.
-                    "-linker-option", "$skiaBinDir/libskshaper.a",
-                    "-linker-option", "$skiaBinDir/libskunicode.a",
-                    "-linker-option", "$skiaBinDir/libskia.a"
-                )
-                else -> mutableListOf()
-            }
-            if (skiko.includeTestHelpers) {
-                linkerFlags.addAll(when (os) {
-                    OS.Linux -> listOf(
-                        "-linker-option", "-lX11",
-                        "-linker-option", "-lGLX",
-                    )
-                    else -> emptyList()
-                })
-            }
-            freeCompilerArgs = allLibraries.map { listOf("-include-binary", it) }.flatten() + linkerFlags
+            freeCompilerArgs += allLibraries.map { listOf("-include-binary", it) }.flatten() + linkerFlags
         }
     }
 
@@ -515,7 +521,7 @@ fun configureNativeTarget(os: OS, arch: Arch, target: KotlinNativeTarget) {
         outputs.dir(outDir)
     }
     target.compilations.all {
-        compileKotlinTaskProvider.configure {
+        compileTaskProvider.configure {
             dependsOn(linkTask)
         }
     }

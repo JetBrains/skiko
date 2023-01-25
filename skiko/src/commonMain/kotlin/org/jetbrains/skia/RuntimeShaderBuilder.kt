@@ -103,15 +103,25 @@ class RuntimeShaderBuilder internal constructor(ptr: NativePointer) : Managed(pt
 
     fun child(name: String, shader: Shader) {
         Stats.onNativeCall()
-        interopScope {
-            _nChildShader(_ptr, toInterop(name), getPtr(shader))
+        try {
+            interopScope {
+                _nChildShader(_ptr, toInterop(name), getPtr(shader))
+            }
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(shader)
         }
     }
 
     fun child(name: String, colorFilter: ColorFilter) {
         Stats.onNativeCall()
-        interopScope {
-            _nChildColorFilter(_ptr, toInterop(name), getPtr(colorFilter))
+        try {
+            interopScope {
+                _nChildColorFilter(_ptr, toInterop(name), getPtr(colorFilter))
+            }
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(colorFilter)
         }
     }
 }

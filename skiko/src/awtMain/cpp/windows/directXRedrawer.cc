@@ -354,7 +354,7 @@ extern "C"
     }
 
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_makeDirectXSurface(
-        JNIEnv *env, jobject redrawer, jlong devicePtr, jlong contextPtr, jint width, jint height, jobject surfacePropsObj, jint index)
+        JNIEnv *env, jobject redrawer, jlong devicePtr, jlong contextPtr, jint width, jint height, jintArray surfacePropsInts, jint index)
     {
         DirectXDevice *d3dDevice = fromJavaPointer<DirectXDevice *>(devicePtr);
         GrDirectContext *context = fromJavaPointer<GrDirectContext *>(contextPtr);
@@ -369,7 +369,7 @@ extern "C"
 
         info.fResource = d3dDevice->buffers[index];
 
-        std::unique_ptr<SkSurfaceProps> surfaceProps = skija::SurfaceProps::toSkSurfaceProps(env, surfacePropsObj);
+        std::unique_ptr<SkSurfaceProps> surfaceProps = skija::SurfaceProps::toSkSurfaceProps(env, surfacePropsInts);
         GrBackendTexture backendTexture((int)d3dDevice->buffers[index]->GetDesc().Width, (int)d3dDevice->buffers[index]->GetDesc().Height, info);
         auto result = SkSurface::MakeFromBackendTexture(
                                  context, backendTexture, kTopLeft_GrSurfaceOrigin, 0,

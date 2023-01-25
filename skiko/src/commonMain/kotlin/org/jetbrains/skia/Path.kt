@@ -724,6 +724,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
             Path_nSwap(_ptr, getPtr(other))
             this
         } finally {
+            reachabilityBarrier(this)
             reachabilityBarrier(other)
         }
     }
@@ -1751,6 +1752,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
             )
             this
         } finally {
+            reachabilityBarrier(this)
             reachabilityBarrier(src)
         }
     }
@@ -1794,6 +1796,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
             )
             this
         } finally {
+            reachabilityBarrier(this)
             reachabilityBarrier(src)
         }
     }
@@ -1838,6 +1841,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
             }
             this
         } finally {
+            reachabilityBarrier(this)
             reachabilityBarrier(src)
         }
     }
@@ -1857,6 +1861,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
             _nReverseAddPath(_ptr, getPtr(src))
             this
         } finally {
+            reachabilityBarrier(this)
             reachabilityBarrier(src)
         }
     }
@@ -1884,6 +1889,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
             _nOffset(_ptr, dx, dy, getPtr(dst))
             this
         } finally {
+            reachabilityBarrier(this)
             reachabilityBarrier(dst)
         }
     }
@@ -1946,6 +1952,7 @@ class Path internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
             }
             this
         } finally {
+            reachabilityBarrier(this)
             reachabilityBarrier(dst)
         }
     }

@@ -40,6 +40,8 @@ class BitmapTest {
         assertFalse(bitmap.isNull)
         assertTrue(bitmap.isReadyToDraw)
 
+        assertEquals(84, bitmap.computeByteSize())
+
         bitmap.generationId
     }
 
