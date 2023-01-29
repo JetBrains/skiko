@@ -779,6 +779,9 @@ fun Project.androidJar(askedVersion: String = ""): Provider<File> =
             val platformsDir = androidHome.resolve("platforms")
             val versions = platformsDir.list().orEmpty()
             versions.maxByOrNull { name ->
+                println("TODO1")
+                println(name)
+                println("-----------------------")
                 name.removePrefix("android-").toInt()
             } ?: error(
                 buildString {
