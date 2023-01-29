@@ -108,9 +108,17 @@ jobs:
       - env:
           ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
         run: |
-          # Test publishToMavenLocal
+          # Test publishToMavenLocal 1
           ./gradlew --no-daemon --stacktrace --info -Pkotlin.native.cacheKind.linuxX64=none :skiko:publishToMavenLocal
+      - env:
+          ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+        run: |
+          # Test publishToMavenLocal 2
           ./gradlew --no-daemon --stacktrace --info :SkiaAwtSample:installDist # check jvm sample works
+      - env:
+          ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+        run: |
+          # Test publishToMavenLocal 3
           ./gradlew --no-daemon -Pskiko.android.enabled=true :skiko:publishSkikoJvmRuntimeAndroidX64PublicationToMavenLocal :skiko:publishSkikoJvmRuntimeAndroidArm64PublicationToMavenLocal :skiko:publishAndroidPublicationToMavenLocal
       - uses: actions/upload-artifact@v2
         if: always()
