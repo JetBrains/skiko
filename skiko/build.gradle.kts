@@ -23,7 +23,7 @@ val Project.supportWasm: Boolean
 val Project.supportJs: Boolean
     get() = findProperty("skiko.js.enabled") == "true" || isInIdea
 
-val coroutinesVersion = if (supportWasm) "1.6.4-wasm0" else "1.6.4"
+val coroutinesVersion = if (supportWasm) "1.6.4-wasm3" else "1.6.4"
 val atomicFuVersion = if (supportWasm) "0.18.5-wasm0" else "0.18.5"
 
 fun targetSuffix(os: OS, arch: Arch): String {
@@ -224,8 +224,8 @@ internal val Project.isInIdea: Boolean
         return System.getProperty("idea.active")?.toBoolean() == true
     }
 
-val Project.supportNative: Boolean
-   get() = findProperty("skiko.native.enabled") == "true" || isInIdea
+val Project.supportNative: Boolean // disabled because no coroutines with `*-wasm3` version for now
+   get() = false //findProperty("skiko.native.enabled") == "true" || isInIdea
 
 val Project.supportAndroid: Boolean
     get() = findProperty("skiko.android.enabled") == "true" // || isInIdea
@@ -1412,15 +1412,15 @@ if (supportJs && supportWasm) {
 }
 
 // HACK: some dependencies (coroutines -wasm0 and atomicfu -wasm0) reference deleted *-dev libs
-configurations.all {
-    val conf = this
-    resolutionStrategy.eachDependency {
-        if (requested.version == "1.8.20-dev-3308") {
-            println("Substitute deleted version ${requested.module}:${requested.version} for ${conf.name}")
-            useVersion(project.properties["kotlin.version"] as String)
-        }
-    }
-}
+//configurations.all {
+//    val conf = this
+//    resolutionStrategy.eachDependency {
+//        if (requested.version == "1.8.20-dev-3308") {
+//            println("Substitute deleted version ${requested.module}:${requested.version} for ${conf.name}")
+//            useVersion(project.properties["kotlin.version"] as String)
+//        }
+//    }
+//}
 
 tasks.getByName("publishSkikoWasmRuntimePublicationToComposeRepoRepository")
     .dependsOn("publishWasmPublicationToComposeRepoRepository")
