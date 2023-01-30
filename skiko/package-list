@@ -1310,6 +1310,7 @@ $dokka.location:org.jetbrains.skia/Font/measureTextWidth/#kotlin.String?#org.jet
 $dokka.location:org.jetbrains.skia/Font/measureTextWidth/#kotlin.String?/PointingToDeclaration/skiko/org.jetbrains.skia/-font/measure-text-width.html
 $dokka.location:org.jetbrains.skia/Font/metrics/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font/metrics.html
 $dokka.location:org.jetbrains.skia/Font/scaleX/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font/scale-x.html
+$dokka.location:org.jetbrains.skia/Font/setBitmapsEmbedded/#kotlin.Boolean/PointingToDeclaration/skiko/org.jetbrains.skia/-font/set-bitmaps-embedded.html
 $dokka.location:org.jetbrains.skia/Font/setTypeface/#org.jetbrains.skia.Typeface?/PointingToDeclaration/skiko/org.jetbrains.skia/-font/set-typeface.html
 $dokka.location:org.jetbrains.skia/Font/size/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font/size.html
 $dokka.location:org.jetbrains.skia/Font/skewX/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font/skew-x.html
