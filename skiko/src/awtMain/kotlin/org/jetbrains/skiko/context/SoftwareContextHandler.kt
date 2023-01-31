@@ -4,6 +4,7 @@ import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.ColorAlphaType
 import org.jetbrains.skia.ImageInfo
+import org.jetbrains.skia.SurfaceProps
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.hostOs
 import org.jetbrains.skiko.OS
@@ -55,7 +56,7 @@ internal class SoftwareContextHandler(layer: SkiaLayer) : JvmContextHandler(laye
             storage.allocPixelsFlags(ImageInfo.makeS32(w, h, ColorAlphaType.PREMUL), false)
         }
 
-        canvas = Canvas(storage)
+        canvas = Canvas(storage, SurfaceProps(pixelGeometry = layer.pixelGeometry))
     }
 
     override fun flush() {

@@ -1,11 +1,13 @@
 package SkiaAwtSample
 
 import kotlinx.coroutines.*
+import org.jetbrains.skia.PixelGeometry
 import org.jetbrains.skiko.*
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.Toolkit
 import java.awt.event.*
+import java.awt.RenderingHints
 import javax.swing.*
 import java.io.File
 import java.nio.file.Files
@@ -22,7 +24,15 @@ fun main(args: Array<String>) {
 }
 
 fun createWindow(title: String, exitOnClose: Boolean) = SwingUtilities.invokeLater {
-    val skiaLayer = SkiaLayer()
+    val renderingHints = Toolkit.getDefaultToolkit().getDesktopProperty("awt.font.desktophints") as RenderingHints
+    val pixelGeometry = when (renderingHints[RenderingHints.KEY_TEXT_ANTIALIASING]) {
+        RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB -> PixelGeometry.RGB_H
+        RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HBGR -> PixelGeometry.BGR_H
+        RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_VRGB -> PixelGeometry.RGB_V
+        RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_VBGR -> PixelGeometry.BGR_V
+        else -> PixelGeometry.UNKNOWN
+    }
+    val skiaLayer = SkiaLayer(pixelGeometry = pixelGeometry)
     val clocks = ClocksAwt(skiaLayer)
 
     val window = JFrame(title)
