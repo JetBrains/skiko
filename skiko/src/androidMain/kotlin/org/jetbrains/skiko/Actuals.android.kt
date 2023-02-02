@@ -68,6 +68,8 @@ internal actual fun ClipboardManager_getText(): String? {
     return clip.getItemAt(0)?.text?.toString()
 }
 
+internal actual fun ClipboardManager_hasText(): Boolean = !ClipboardManager_getText().isNullOrEmpty()
+
 actual typealias Cursor = android.view.PointerIcon
 
 // TODO: not sure if correct.
