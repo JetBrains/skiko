@@ -2592,6 +2592,7 @@ $dokka.location:org.jetbrains.skiko/ClipRectangle/y/#/PointingToDeclaration/ski
 $dokka.location:org.jetbrains.skiko/ClipboardManager///PointingToDeclaration/skiko/org.jetbrains.skiko/-clipboard-manager/index.html
 $dokka.location:org.jetbrains.skiko/ClipboardManager/ClipboardManager/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-clipboard-manager/-clipboard-manager.html
 $dokka.location:org.jetbrains.skiko/ClipboardManager/getText/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-clipboard-manager/get-text.html
+$dokka.location:org.jetbrains.skiko/ClipboardManager/hasText/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-clipboard-manager/has-text.html
 $dokka.location:org.jetbrains.skiko/ClipboardManager/setText/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-clipboard-manager/set-text.html
 $dokka.location:org.jetbrains.skiko/Cursor///PointingToDeclaration/skiko/org.jetbrains.skiko/-cursor/index.html
 $dokka.location:org.jetbrains.skiko/CursorManager///PointingToDeclaration/skiko/org.jetbrains.skiko/-cursor-manager/index.html
