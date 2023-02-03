@@ -24,7 +24,7 @@ fun main(args: Array<String>) {
 }
 
 fun createWindow(title: String, exitOnClose: Boolean) = SwingUtilities.invokeLater {
-    val renderingHints = Toolkit.getDefaultToolkit().getDesktopProperty("awt.font.desktophints") as RenderingHints
+    val renderingHints = Toolkit.getDefaultToolkit().getDesktopProperty("awt.font.desktophints") as Map<Any, Any>
     val pixelGeometry = when (renderingHints[RenderingHints.KEY_TEXT_ANTIALIASING]) {
         RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB -> PixelGeometry.RGB_H
         RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HBGR -> PixelGeometry.BGR_H
