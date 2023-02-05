@@ -68,6 +68,8 @@ internal actual fun ClipboardManager_getText(): String? {
     }
 }
 
+internal actual fun ClipboardManager_hasText(): Boolean = !ClipboardManager_getText().isNullOrEmpty()
+
 actual typealias Cursor = java.awt.Cursor
 
 internal actual fun CursorManager_setCursor(component: Any, cursor: Cursor) {

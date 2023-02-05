@@ -12,6 +12,8 @@ internal actual fun ClipboardManager_getText(): String? {
     TODO("Implement ClipboardManager_getText() on Linux")
 }
 
+internal actual fun ClipboardManager_hasText(): Boolean = !ClipboardManager_getText().isNullOrEmpty()
+
 actual typealias Cursor = Any
 
 internal actual fun CursorManager_setCursor(component: Any, cursor: Cursor) {
