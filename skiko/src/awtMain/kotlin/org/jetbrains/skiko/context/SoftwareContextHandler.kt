@@ -4,6 +4,7 @@ import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.ColorAlphaType
 import org.jetbrains.skia.ImageInfo
+import org.jetbrains.skiko.Logger
 import org.jetbrains.skia.SurfaceProps
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.hostOs
@@ -38,7 +39,7 @@ internal class SoftwareContextHandler(layer: SkiaLayer) : JvmContextHandler(laye
         // Raster does not need context
         if (!isInited) {
             if (System.getProperty("skiko.hardwareInfo.enabled") == "true") {
-                println(rendererInfo())
+                Logger.info("Renderer info:\n ${rendererInfo()}")
             }
             isInited = true
         }

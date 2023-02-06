@@ -291,7 +291,7 @@ actual open class SkiaLayer internal constructor(
                 redrawer = renderFactory.createRedrawer(this, renderApi, analytics, properties)
                 redrawer?.syncSize()
             } catch (e: RenderException) {
-                println(e.message)
+                Logger.warn("Fallback to next API: ${e.message}")
                 thrown = true
             }
         } while (thrown && fallbackRenderApiQueue.isNotEmpty())
@@ -546,7 +546,7 @@ actual open class SkiaLayer internal constructor(
             // ignore
         } catch (e: RenderException) {
             if (!isDisposed) {
-                println(e.message)
+                Logger.warn("Exception in draw scope: ${e.message}")
                 findNextWorkingRenderApi()
                 redrawer?.redrawImmediately()
             }

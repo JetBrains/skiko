@@ -1,6 +1,7 @@
 package org.jetbrains.skiko.context
 
 import org.jetbrains.skia.*
+import org.jetbrains.skiko.Logger
 import org.jetbrains.skiko.RenderException
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.redrawer.MetalRedrawer
@@ -14,11 +15,11 @@ internal class MetalContextHandler(layer: SkiaLayer) : JvmContextHandler(layer) 
             if (context == null) {
                 context = metalRedrawer.makeContext()
                 if (System.getProperty("skiko.hardwareInfo.enabled") == "true") {
-                    println(rendererInfo())
+                    Logger.info("Renderer info:\n ${rendererInfo()}")
                 }
             }
         } catch (e: Exception) {
-            println("${e.message}\nFailed to create Skia Metal context!")
+            Logger.warn("${e.message}\nFailed to create Skia Metal context!")
             return false
         }
         return true
