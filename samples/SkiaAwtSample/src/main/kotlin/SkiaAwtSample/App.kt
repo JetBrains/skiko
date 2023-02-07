@@ -38,9 +38,8 @@ fun createWindow(title: String, exitOnClose: Boolean) = SwingUtilities.invokeLat
     val window = JFrame(title)
     window.defaultCloseOperation =
         if (exitOnClose) WindowConstants.EXIT_ON_CLOSE else WindowConstants.DISPOSE_ON_CLOSE
-    window.title = title
-
-    skiaLayer.attachTo(window.contentPane)
+    window.background = Color.GREEN
+    window.contentPane = skiaLayer
 
     // Create menu.
     val menuBar = JMenuBar()
@@ -126,15 +125,12 @@ fun createWindow(title: String, exitOnClose: Boolean) = SwingUtilities.invokeLat
         }
         skiaLayer.transparency = true
     } else {
-        skiaLayer.background = Color.WHITE
+        skiaLayer.background = Color.RED
     }
 
     // MANDATORY: set window preferred size before calling pack()
     window.preferredSize = Dimension(800, 600)
     window.pack()
-    skiaLayer.disableTitleBar(64f)
-    window.pack()
-    skiaLayer.paint(window.graphics)
     window.isVisible = true
 }
 
