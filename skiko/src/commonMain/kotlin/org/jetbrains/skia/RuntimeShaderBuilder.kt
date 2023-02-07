@@ -124,6 +124,17 @@ class RuntimeShaderBuilder internal constructor(ptr: NativePointer) : Managed(pt
             reachabilityBarrier(colorFilter)
         }
     }
+
+    fun makeShader(localMatrix: Matrix33? = null): Shader {
+        Stats.onNativeCall()
+        return try {
+            interopScope {
+                Shader(_nMakeShader(_ptr, toInterop(localMatrix?.mat)))
+            }
+        } finally {
+            reachabilityBarrier(this)
+        }
+    }
 }
 
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nMakeFromRuntimeEffect")
@@ -170,3 +181,6 @@ private external fun _nChildShader(builderPtr: NativePointer, uniformName: Inter
 
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nChildColorFilter")
 private external fun _nChildColorFilter(builderPtr: NativePointer, uniformName: InteropPointer, colorFilterPtr: NativePointer)
+
+@ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nMakeShader")
+private external fun _nMakeShader(builderPtr: NativePointer, localMatrix: InteropPointer): NativePointer

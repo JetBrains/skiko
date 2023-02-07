@@ -103,3 +103,11 @@ SKIKO_EXPORT void org_jetbrains_skia_RuntimeShaderBuilder__1nChildColorFilter
     sk_sp<SkColorFilter> colorFilter = sk_ref_sp<SkColorFilter>(reinterpret_cast<SkColorFilter*>(childColorFilterPtr));
     runtimeShaderBuilder->child(skString(childName).c_str()) = colorFilter;
 }
+
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_RuntimeShaderBuilder__1nMakeShader
+  (KNativePointer builderPtr, KFloat* localMatrixArr) {
+    SkRuntimeShaderBuilder* runtimeShaderBuilder = reinterpret_cast<SkRuntimeShaderBuilder*>(builderPtr);
+    std::unique_ptr<SkMatrix> localMatrix = skMatrix(localMatrixArr);
+    sk_sp<SkShader> shader = runtimeShaderBuilder->makeShader(localMatrix.get());
+    return reinterpret_cast<KNativePointer>(shader.release());
+}

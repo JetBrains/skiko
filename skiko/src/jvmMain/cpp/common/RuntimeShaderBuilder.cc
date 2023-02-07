@@ -123,3 +123,12 @@ Java_org_jetbrains_skia_RuntimeShaderBuilderKt__1nChildColorFilter
     sk_sp<SkColorFilter> colorFilter = sk_ref_sp<SkColorFilter>(reinterpret_cast<SkColorFilter*>(static_cast<uintptr_t>(childColorFilterPtr)));
     runtimeShaderBuilder->child(skString(env, childName).c_str()) = colorFilter;
 }
+
+extern "C" JNIEXPORT jlong JNICALL
+Java_org_jetbrains_skia_RuntimeShaderBuilderKt__1nMakeShader
+  (JNIEnv* env, jclass jclass, jlong builderPtr, jfloatArray localMatrixArr) {
+    SkRuntimeShaderBuilder* runtimeShaderBuilder = jlongToPtr<SkRuntimeShaderBuilder*>(builderPtr);
+    std::unique_ptr<SkMatrix> localMatrix = skMatrix(env, localMatrixArr);
+    sk_sp<SkShader> shader = runtimeShaderBuilder->makeShader(localMatrix.get());
+    return reinterpret_cast<jlong>(shader.release());
+}
