@@ -12,7 +12,7 @@ import kotlin.math.min
 
 @Suppress("CONFLICTING_OVERLOADS")
 @ExportObjCClass
-class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, org.jetbrains.skiko.objc.UIViewExtensionProtocol {
+class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, org.jetbrains.skiko.objc.UIViewExtensionProtocol {//todo temp
     @OverrideInit
     constructor(frame: CValue<CGRect>) : super(frame)
 
@@ -164,12 +164,12 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, org.jetbrai
         super.pressesEnded(presses, withEvent)
     }
 
+    //todo temp
     /**
      * https://developer.apple.com/documentation/uikit/uiview/1622533-point
      */
-//    @ObjCAction // todo
 //    // see https://youtrack.jetbrains.com/issue/KT-40426/Incorrect-Objective-C-extensions-importing-that-prevents-UIKit-usage#focus=Comments-27-5208687.0-0
-    override fun pointInside(point: CValue<org.jetbrains.skiko.objc.CGPoint>, withEvent: UIEvent?): Boolean {
+    override fun pointInside(point: CValue<CGPoint>, withEvent: UIEvent?): Boolean {
         val skiaPoint:Point = point.useContents { Point(x.toFloat(), y.toFloat()) }
         return hitTest(skiaPoint, withEvent)
     }

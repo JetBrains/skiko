@@ -5,6 +5,9 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skiko.RenderException
 
 class Surface : RefCnt {
+    init {
+//        println("init Surface")
+    }
     companion object {
         fun makeRasterDirect(pixmap: Pixmap): Surface {
             return makeRasterDirect(pixmap, null)
@@ -653,6 +656,7 @@ class Surface : RefCnt {
      */
     val canvas: Canvas
         get() = try {
+//            println("get canvas")
             Stats.onNativeCall()
             val ptr = _nGetCanvas(_ptr)
             if (ptr == NullPointer) throw IllegalArgumentException() else Canvas(ptr, false, this)
