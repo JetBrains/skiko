@@ -84,7 +84,7 @@ class ClocksAwt(private val layer: SkiaLayer) : SkikoView {
         }
         val paragraph = ParagraphBuilder(style, fontCollection)
             .pushStyle(TextStyle().setColor(0xFF000000.toInt()))
-            .addText("Graphics API: ${layer.renderApi} ✿ﾟ $currentSystemTheme")
+            .addText("JRE: ${System.getProperty("java.vendor")}, ${System.getProperty("java.runtime.version")}, Graphics API: ${layer.renderApi} ✿ﾟ $currentSystemTheme")
             .popStyle()
             .build()
         paragraph.layout(Float.POSITIVE_INFINITY)

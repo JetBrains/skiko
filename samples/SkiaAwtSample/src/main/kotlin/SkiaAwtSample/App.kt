@@ -125,7 +125,7 @@ fun createWindow(title: String, exitOnClose: Boolean) = SwingUtilities.invokeLat
         }
         skiaLayer.transparency = true
     } else {
-        skiaLayer.background = Color.RED
+        skiaLayer.background = Color.LIGHT_GRAY
     }
 
     // MANDATORY: set window preferred size before calling pack()

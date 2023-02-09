@@ -1,14 +1,12 @@
 package org.jetbrains.skiko
 
 import org.jetbrains.skia.*
-import org.jetbrains.skia.Canvas
-import org.jetbrains.skiko.hostOs
-import org.jetbrains.skiko.OS
 import org.jetbrains.skiko.redrawer.Redrawer
 import java.awt.Color
 import java.awt.Component
 import java.awt.Window
 import java.awt.event.*
+import java.awt.geom.AffineTransform
 import java.awt.im.InputMethodRequests
 import java.util.concurrent.CancellationException
 import javax.accessibility.Accessible
@@ -360,7 +358,17 @@ actual open class SkiaLayer internal constructor(
         redrawer?.syncSize()
     }
 
+    private var latestPaintedDefaultTransform: AffineTransform? = null
+
     override fun paint(g: java.awt.Graphics) {
+        // Workaround for JBR-5274
+        graphicsConfiguration.defaultTransform.let {
+            if (it != latestPaintedDefaultTransform) {
+                firePropertyChange("graphicsContextScaleTransform",latestPaintedDefaultTransform, it)
+                latestPaintedDefaultTransform = it
+            }
+        }
+
         // `paint` can be called when we already inside `draw` method.
         //
         // For example if we call some AWT function inside renderer.onRender,
