@@ -131,6 +131,9 @@ fun createWindow(title: String, exitOnClose: Boolean) = SwingUtilities.invokeLat
     // MANDATORY: set window preferred size before calling pack()
     window.preferredSize = Dimension(800, 600)
     window.pack()
+    skiaLayer.disableTitleBar(64f)
+    window.pack()
+    skiaLayer.paint(window.graphics)
     window.isVisible = true
 }
 
