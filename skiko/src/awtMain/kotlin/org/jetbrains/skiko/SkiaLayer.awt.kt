@@ -352,8 +352,7 @@ actual open class SkiaLayer internal constructor(
     }
 
     override fun doLayout() {
-        val (roundedWidth, roundedHeight) = if (isInited) roundSize(width) to roundSize(height) else width to height
-        backedLayer.setBounds(0, 0, roundedWidth, roundedHeight)
+        backedLayer.setBounds(0, 0, roundSize(width), roundSize(height))
         backedLayer.validate()
         redrawer?.syncSize()
     }
