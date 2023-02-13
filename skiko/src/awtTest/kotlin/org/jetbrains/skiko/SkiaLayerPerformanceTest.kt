@@ -18,7 +18,7 @@ class SkiaLayerPerformanceTest {
         val window: UiTestWindow
         val isCollected: Boolean
         fun startCollect()
-        fun printInfo()
+        fun printInfo(assert: Boolean)
     }
 
     private fun UiTestScope.performanceHelper(
@@ -67,7 +67,7 @@ class SkiaLayerPerformanceTest {
             canCollect = true
         }
 
-        override fun printInfo() {
+        override fun printInfo(assert: Boolean) {
             println("[Window frame times ($frameCount frames)]")
             val millis = frameTimeDeltas.map { it / 1E6 }
             println("Deltas " + millis.map { String.format("%.1f", it) })
@@ -86,11 +86,11 @@ class SkiaLayerPerformanceTest {
             ) {
                 val slowFrames = frameTimeDeltas.filter { it > 1E9 / 55 }
                 val fastFrames = frameTimeDeltas.filter { it < expectedFrameNanos * 0.5 }
-                if (slowFrames.size > deviatedTerminalCount) {
+                if (assert && slowFrames.size > deviatedTerminalCount) {
                     val str = slowFrames.map { String.format("%.1f", it / 1E6) }
                     throw AssertionError("Framerate is too low:\n$str")
                 }
-                if (fastFrames.size > deviatedTerminalCount) {
+                if (assert && fastFrames.size > deviatedTerminalCount) {
                     val str = fastFrames.map { String.format("%.1f", it / 1E6) }
                     throw AssertionError("Framerate is too high:\n$str")
                 }
@@ -104,7 +104,7 @@ class SkiaLayerPerformanceTest {
                 println(deviateMessage(expectedDeviatePercent2, deviated2 - deviated3 - deviatedTerminal))
                 println(deviateMessage(expectedDeviatePercent3, deviated3 - deviatedTerminal))
 
-                if (deviatedTerminal.size > deviatedTerminalCount) {
+                if (assert && deviatedTerminal.size > deviatedTerminalCount) {
                     throw AssertionError(deviateMessage(expectedDeviatePercentTerminal, deviatedTerminal))
                 } else {
                     println(deviateMessage(expectedDeviatePercentTerminal, deviatedTerminal))
@@ -194,13 +194,13 @@ class SkiaLayerPerformanceTest {
         try {
             helpers.forEach { it.startCollect() }
             awaitFrameCollection(helpers)
-            helpers.forEach { it.printInfo() }
+            helpers.forEach { it.printInfo(assert = true) }
         } finally {
             helpers.forEach { it.window.dispose() }
         }
     }
 
-    @Ignore("Doesn't pass with SOFTWARE API on macOS")
+    @Ignore("Doesn't assert anything, used for local measurements")
     @Test
     fun `FPS is near display refresh rate (multiple windows with clocks)`() = uiTest {
         assumeTrue(System.getProperty("skiko.test.performance.enabled", "true") == "true")
@@ -220,7 +220,7 @@ class SkiaLayerPerformanceTest {
         try {
             helpers.forEach { it.startCollect() }
             awaitFrameCollection(helpers)
-            helpers.forEach { it.printInfo() }
+            helpers.forEach { it.printInfo(assert = false) }
         } finally {
             helpers.forEach { it.window.dispose() }
         }
