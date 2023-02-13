@@ -1,12 +1,14 @@
 package org.jetbrains.skiko
 
 import kotlinx.coroutines.delay
-import org.jetbrains.skia.*
+import org.jetbrains.skia.Canvas
+import org.jetbrains.skia.Paint
+import org.jetbrains.skia.PaintMode
+import org.jetbrains.skia.Rect
 import org.jetbrains.skiko.util.UiTestScope
 import org.jetbrains.skiko.util.UiTestWindow
 import org.jetbrains.skiko.util.uiTest
 import org.junit.Assume.assumeTrue
-import org.junit.Ignore
 import org.junit.Test
 import java.awt.Point
 import javax.swing.WindowConstants
@@ -200,7 +202,6 @@ class SkiaLayerPerformanceTest {
         }
     }
 
-    @Ignore("Doesn't assert anything, used for local measurements")
     @Test
     fun `FPS is near display refresh rate (multiple windows with clocks)`() = uiTest {
         assumeTrue(System.getProperty("skiko.test.performance.enabled", "true") == "true")
