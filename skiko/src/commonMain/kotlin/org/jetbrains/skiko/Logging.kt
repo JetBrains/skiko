@@ -1,6 +1,6 @@
 package org.jetbrains.skiko
 
-object Logger {
+internal object Logger {
     fun info(msg: String) {
         println("[SKIKO] info: $msg")
     }
