@@ -1,1 +1,1 @@
-echo skiko-build-ubuntu-2004-aarch64:latest
+echo skiko-build-ubuntu-1804-aarch64:latest

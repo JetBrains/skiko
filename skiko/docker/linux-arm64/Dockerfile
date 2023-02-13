@@ -1,15 +1,14 @@
-FROM arm64v8/ubuntu:20.04
+FROM arm64v8/ubuntu:18.04
 ARG DEBIAN_FRONTEND=noninteractive
-RUN apt-get update -y
-RUN apt-get install binutils build-essential -y
-RUN apt-get install software-properties-common -y
-RUN apt-get install python git fontconfig libfontconfig1-dev libglu1-mesa-dev libxrandr-dev libdbus-1-dev curl wget -y
-RUN apt-get install openjdk-11-jdk -y
-RUN apt-get install clang-11 -y && \
-    apt-get remove g++ -y && \
-    update-alternatives --install /usr/bin/clang clang /usr/bin/clang-11 100 && \
-    update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-11 100
-RUN apt-get install nodejs -y
+RUN apt-get update && \
+    apt-get install binutils build-essential -y --no-install-recommends && \
+    apt-get install software-properties-common -y --no-install-recommends && \
+    apt-get install fontconfig libfontconfig1-dev libglu1-mesa-dev libxrandr-dev libdbus-1-dev -y --no-install-recommends && \
+    apt-get install python git curl wget -y --no-install-recommends && \
+    apt-get install openjdk-11-jdk -y --no-install-recommends && \
+    apt-get install clang-9 -y --no-install-recommends && \
+    update-alternatives --install /usr/bin/clang clang /usr/bin/clang-9 100 && \
+    update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-9 100
 
 # Install libs & tools
 ENV DEPOT_TOOLS=/usr/depot_tools
