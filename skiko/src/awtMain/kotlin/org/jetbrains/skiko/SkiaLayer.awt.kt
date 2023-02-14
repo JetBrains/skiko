@@ -15,6 +15,9 @@ import javax.swing.JPanel
 import javax.swing.SwingUtilities
 import javax.swing.SwingUtilities.isEventDispatchThread
 import javax.swing.UIManager
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 actual open class SkiaLayer internal constructor(
     externalAccessibleFactory: ((Component) -> Accessible)? = null,
@@ -71,6 +74,8 @@ actual open class SkiaLayer internal constructor(
     val canvas: java.awt.Canvas
         get() = backedLayer
 
+    var peerBufferSizeFixJob: Job? = null
+
     init {
         isOpaque = false
         layout = null
@@ -121,7 +126,8 @@ actual open class SkiaLayer internal constructor(
 
             // Workaround for JBR-5259
             if (hostOs == OS.Windows) {
-                SwingUtilities.invokeLater {
+                peerBufferSizeFixJob?.cancel()
+                peerBufferSizeFixJob = GlobalScope.launch(MainUIDispatcher) {
                     backedLayer.setLocation(1, 0)
                     backedLayer.setLocation(0, 0)
                 }
@@ -347,6 +353,7 @@ actual open class SkiaLayer internal constructor(
             pictureRecorder?.close()
             pictureRecorder = null
             backedLayer.dispose()
+            peerBufferSizeFixJob?.cancel()
             isDisposed = true
         }
     }
