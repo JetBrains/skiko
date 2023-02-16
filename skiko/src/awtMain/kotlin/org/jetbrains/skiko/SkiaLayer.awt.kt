@@ -81,6 +81,8 @@ actual open class SkiaLayer internal constructor(
         layout = null
         backedLayer = object : HardwareLayer(externalAccessibleFactory) {
             override fun paint(g: java.awt.Graphics) {
+                checkContentScale()
+
                 // 1. JPanel.paint is not always called (in rare cases).
                 //    For example if we call 'jframe.isResizable = false` on Ubuntu
                 //
@@ -364,16 +366,9 @@ actual open class SkiaLayer internal constructor(
         redrawer?.syncSize()
     }
 
-    private var latestPaintedDefaultTransform: AffineTransform? = null
 
     override fun paint(g: java.awt.Graphics) {
-        // Workaround for JBR-5274
-        graphicsConfiguration.defaultTransform.let {
-            if (it != latestPaintedDefaultTransform) {
-                firePropertyChange("graphicsContextScaleTransform",latestPaintedDefaultTransform, it)
-                latestPaintedDefaultTransform = it
-            }
-        }
+        checkContentScale()
 
         // `paint` can be called when we already inside `draw` method.
         //
@@ -385,6 +380,18 @@ actual open class SkiaLayer internal constructor(
             redrawer?.needRedraw()
         } else {
             redrawer?.redrawImmediately()
+        }
+    }
+
+    private var latestCheckedDefaultTransform: AffineTransform? = null
+
+    // Workaround for JBR-5274 and JBR-5305
+    fun checkContentScale() {
+        graphicsConfiguration.defaultTransform.let {
+            if (it != latestCheckedDefaultTransform) {
+                firePropertyChange("graphicsContextScaleTransform", latestCheckedDefaultTransform, it)
+                latestCheckedDefaultTransform = it
+            }
         }
     }
 
