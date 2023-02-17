@@ -39,6 +39,31 @@ allprojects {
     version = skiko.deployVersion
 }
 
+configurations.all {
+    // TODO: remove these HACKS when possible
+    val conf = this
+    conf.resolutionStrategy.eachDependency {
+        if (requested.module.name.contains("kotlin-stdlib")) {
+            val kotlinVersion = extra["kotlin.version"] as String
+            useVersion(kotlinVersion)
+        }
+
+        val isWasm = conf.name.contains("wasm", true)
+
+        if (requested.module.group == "org.jetbrains.kotlinx" &&
+            requested.module.name.contains("kotlinx-coroutines", true)
+        ) {
+            if (!isWasm) useVersion("1.6.4")
+        }
+
+        if (requested.module.group == "org.jetbrains.kotlinx" &&
+            requested.module.name.contains("atomicfu", true)
+        ) {
+            if (!isWasm) useVersion("0.18.5")
+        }
+    }
+}
+
 repositories {
     mavenLocal()
     mavenCentral()
