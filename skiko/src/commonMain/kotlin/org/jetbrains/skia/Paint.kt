@@ -371,51 +371,6 @@ class Paint : Managed {
         }
 
     /**
-     * Returns the filled equivalent of the stroked path.
-     *
-     * @param src       Path read to create a filled version
-     * @return          resulting Path
-     */
-    fun getFillPath(src: Path): Path {
-        return getFillPath(src, null, 1f)
-    }
-
-    /**
-     * Returns the filled equivalent of the stroked path.
-     *
-     * @param src       Path read to create a filled version
-     * @param cull      Optional limit passed to PathEffect
-     * @param resScale  if &gt; 1, increase precision, else if (0 &lt; resScale &lt; 1) reduce precision
-     * to favor speed and size
-     * @return          resulting Path
-     */
-    fun getFillPath(src: Path, cull: Rect?, resScale: Float): Path {
-        return try {
-            Stats.onNativeCall()
-            if (cull == null) org.jetbrains.skia.Path(
-                _nGetFillPath(
-                    _ptr,
-                    getPtr(src),
-                    resScale
-                )
-            ) else org.jetbrains.skia.Path(
-                _nGetFillPathCull(
-                    _ptr,
-                    getPtr(src),
-                    cull.left,
-                    cull.top,
-                    cull.right,
-                    cull.bottom,
-                    resScale
-                )
-            )
-        } finally {
-            reachabilityBarrier(this)
-            reachabilityBarrier(src)
-        }
-    }
-
-    /**
      * @param shader  how geometry is filled with color; if null, color is used instead
      *
      * @see [https://fiddle.skia.org/c/@Color_Filter_Methods](https://fiddle.skia.org/c/@Color_Filter_Methods)
@@ -673,21 +628,6 @@ private external fun _nGetStrokeJoin(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nSetStrokeJoin")
 private external fun _nSetStrokeJoin(ptr: NativePointer, value: Int)
-
-@ExternalSymbolName("org_jetbrains_skia_Paint__1nGetFillPath")
-private external fun _nGetFillPath(ptr: NativePointer, path: NativePointer, resScale: Float): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Paint__1nGetFillPathCull")
-private external fun _nGetFillPathCull(
-    ptr: NativePointer,
-    path: NativePointer,
-    left: Float,
-    top: Float,
-    right: Float,
-    bottom: Float,
-    resScale: Float
-): NativePointer
-
 
 @ExternalSymbolName("org_jetbrains_skia_Paint__1nGetShader")
 private external fun _nGetShader(ptr: NativePointer): NativePointer
