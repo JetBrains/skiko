@@ -78,8 +78,8 @@ internal class MetalRedrawer(
         inDrawScope {
             setVSyncEnabled(device, enabled = false)
             update(System.nanoTime())
-            performDraw()
-            if (!isDisposed) {
+            if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
+                performDraw()
                 setVSyncEnabled(device, properties.isVsyncEnabled)
             }
         }
