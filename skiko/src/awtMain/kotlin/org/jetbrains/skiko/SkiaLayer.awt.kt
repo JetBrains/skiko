@@ -74,7 +74,7 @@ actual open class SkiaLayer internal constructor(
     val canvas: java.awt.Canvas
         get() = backedLayer
 
-    var peerBufferSizeFixJob: Job? = null
+    private var peerBufferSizeFixJob: Job? = null
 
     init {
         isOpaque = false
