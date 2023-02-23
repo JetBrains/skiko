@@ -1,13 +1,11 @@
 package org.jetbrains.skiko.sample.js
 
-import org.jetbrains.skia.Canvas
-import org.jetbrains.skia.Color4f
-import org.jetbrains.skia.Paint
-import org.jetbrains.skia.PaintMode
+import org.jetbrains.skia.*
 import org.jetbrains.skiko.SkikoView
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
+import kotlin.random.Random
 
 class BouncingBalls: SkikoView {
     private data class Circle(var x: Float, var y: Float, var r: Float)
@@ -46,7 +44,8 @@ class BouncingBalls: SkikoView {
     private class BouncingBall(
         val circle: Circle,
         val velocity: Float,
-        var angle: Double
+        var angle: Double,
+        val colorPaint: Paint
     ) {
         fun recalculate(width: Int, height: Int, dt: Float) {
             val position = calculatePosition(circle, width, height)
@@ -73,27 +72,45 @@ class BouncingBalls: SkikoView {
         isAntiAlias = true
     }
 
-    private val data = listOf(
-        BouncingBall(Circle(200f, 50f, 25f), 172f, PI / 4),
-        BouncingBall(Circle(100f, 100f, 10f), 162f, -PI / 3),
-        BouncingBall(Circle(150f, 120f, 30f), 168f, 3 * PI / 4),
-        BouncingBall(Circle(100f, 10f, 25f), 208f, -PI / 6),
-        BouncingBall(Circle(120f, 100f, 40f), 120f, -1.1 * PI)
-    ).zip(listOf(
-        Color4f(0f, 1f, 0f, 0.8f).asPaint(),
-        Color4f(0f, 0f, 1f, 0.8f).asPaint(),
-        Color4f(1f, 0f, 0f, 0.8f).asPaint(),
-        Color4f(1f, 0f, 1f, 0.8f).asPaint(),
-        Color4f(0f, 1f, 1f, 0.8f).asPaint()
-    ))
+    private fun createBouncingBall(offset: Pair<Float, Float> = randomOffset()): BouncingBall {
+        return BouncingBall(
+            circle = Circle(x = offset.first, y = offset.second, r = random.nextInt(1, 20).toFloat()),
+            velocity = random.nextInt(100, 200).toFloat(),
+            angle = angles.random(),
+            colorPaint = colors.random().asPaint()
+        )
+    }
+
+    private val data = (0..1000).map {
+        createBouncingBall()
+    }
 
     override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
         val dtime = (nanoTime - prevTimestamp)
         prevTimestamp = nanoTime
 
-        data.forEach { (ball, paint) ->
+        data.forEach {ball ->
             ball.recalculate(width, height, dtime.toFloat())
-            canvas.drawCircle(ball.circle.x, ball.circle.y, ball.circle.r, paint)
+            canvas.drawCircle(ball.circle.x, ball.circle.y, ball.circle.r, ball.colorPaint)
         }
     }
+}
+
+private val random = Random(100)
+private val angles = listOf(PI / 4, -PI / 3, 3 * PI / 4, -PI / 6, -1.1 * PI)
+private val colors = listOf(Color4f(0f, 1f, 0f, 0.8f),
+    Color4f(0f, 0f, 1f, 0.8f),
+    Color4f(1f, 0f, 0f, 0.8f),
+    Color4f(1f, 0f, 1f, 0.8f),
+    Color4f(0f, 1f, 1f, 0.8f),
+    Color4f(0f, 1f, 0f, 0.8f),
+    Color4f(0f, 0f, 1f, 0.8f),
+    Color4f(1f, 0f, 0f, 0.8f),
+    Color4f(1f, 0f, 1f, 0.8f),
+    Color4f(0f, 1f, 1f, 0.8f)
+)
+
+private fun randomOffset(): Pair<Float, Float> {
+    return random.nextInt(10, 200).toFloat() to
+            random.nextInt(10, 200).toFloat()
 }

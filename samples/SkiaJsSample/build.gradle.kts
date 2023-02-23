@@ -1,5 +1,5 @@
 plugins {
-    kotlin("multiplatform") version "1.8.255-SNAPSHOT"
+    kotlin("multiplatform") version "1.8.20-Beta"
 }
 
 repositories {
@@ -69,4 +69,12 @@ kotlin {
 
 rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin> {
    rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>().nodeVersion = "16.0.0"
+}
+
+project.configurations.forEach { conf ->
+    conf.resolutionStrategy.eachDependency {
+        if (requested.module.name.contains("kotlin-stdlib")) {
+            useVersion("1.8.20-Beta")
+        }
+    }
 }
