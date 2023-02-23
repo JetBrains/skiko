@@ -25,7 +25,11 @@ internal class MetalRedrawer(
     }
     private var drawLock = Any()
 
-    private val device: Long
+    private var device: Long
+        get() {
+            check(field != 0L) { "Device is not initialized" }
+            return field
+        }
     val adapterName: String
     val adapterMemorySize: Long
 
@@ -60,6 +64,7 @@ internal class MetalRedrawer(
         frameDispatcher.cancel()
         contextHandler.dispose()
         disposeDevice(device)
+        device = 0
         super.dispose()
     }
 
@@ -73,8 +78,10 @@ internal class MetalRedrawer(
         inDrawScope {
             setVSyncEnabled(device, enabled = false)
             update(System.nanoTime())
-            performDraw()
-            setVSyncEnabled(device, properties.isVsyncEnabled)
+            if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
+                performDraw()
+                setVSyncEnabled(device, properties.isVsyncEnabled)
+            }
         }
     }
 
