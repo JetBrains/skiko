@@ -1,7 +1,6 @@
 package org.jetbrains.skiko
 
 import kotlinx.cinterop.*
-import org.jetbrains.skia.Point
 import org.jetbrains.skia.Rect
 import platform.CoreGraphics.*
 import platform.Foundation.*
@@ -12,15 +11,14 @@ import kotlin.math.min
 
 @Suppress("CONFLICTING_OVERLOADS")
 @ExportObjCClass
-class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, org.jetbrains.skiko.objc.UIViewExtensionProtocol {//todo temp
+class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
     @OverrideInit
     constructor(frame: CValue<CGRect>) : super(frame)
 
     @OverrideInit
     constructor(coder: NSCoder) : super(coder)
 
-    private var skiaLayer: SkiaLayer? = null //todo lateinit
-    private lateinit var hitTest: (Point, UIEvent?) -> Boolean
+    private var skiaLayer: SkiaLayer? = null
     private var _inputDelegate: UITextInputDelegateProtocol? = null
     private var _currentTextMenuActions: TextActions? = null
     var currentKeyboardType: UIKeyboardType = UIKeyboardTypeDefault
@@ -32,13 +30,8 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, org.jetbrai
     var currentAutocapitalizationType: UITextAutocapitalizationType = UITextAutocapitalizationType.UITextAutocapitalizationTypeSentences
     var currentAutocorrectionType: UITextAutocorrectionType = UITextAutocorrectionType.UITextAutocorrectionTypeYes
 
-    constructor(
-        skiaLayer: SkiaLayer,
-        frame: CValue<CGRect> = CGRectNull.readValue(),
-        hitTest: (Point, UIEvent?) -> Boolean = {_,_-> true }
-    ) : super(frame) {
+    constructor(skiaLayer: SkiaLayer, frame: CValue<CGRect> = CGRectNull.readValue()) : super(frame) {
         this.skiaLayer = skiaLayer
-        this.hitTest = hitTest
     }
 
     /**
@@ -162,16 +155,6 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, org.jetbrai
             }
         }
         super.pressesEnded(presses, withEvent)
-    }
-
-    //todo temp
-    /**
-     * https://developer.apple.com/documentation/uikit/uiview/1622533-point
-     */
-//    // see https://youtrack.jetbrains.com/issue/KT-40426/Incorrect-Objective-C-extensions-importing-that-prevents-UIKit-usage#focus=Comments-27-5208687.0-0
-    override fun pointInside(point: CValue<CGPoint>, withEvent: UIEvent?): Boolean {
-        val skiaPoint:Point = point.useContents { Point(x.toFloat(), y.toFloat()) }
-        return hitTest(skiaPoint, withEvent)
     }
 
     override fun touchesBegan(touches: Set<*>, withEvent: UIEvent?) {

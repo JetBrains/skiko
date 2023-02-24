@@ -128,14 +128,13 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_Image__1nScalePixels
     return instance->scalePixels(*pixmap, skija::SamplingMode::unpackFrom2Ints(samplingOptionsVal1, samplingOptionsVal2), cachingHint);
 }
 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nMakeFromBackendTexture3
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nMakeFromBackendTexture
         (KNativePointer directContextPtr, KNativePointer backendTexturePtr) {
     GrRecordingContext *dContext = reinterpret_cast<GrRecordingContext *>((directContextPtr));
     GrBackendTexture *backendTexture = reinterpret_cast<GrBackendTexture *>((backendTexturePtr));
-//    return reinterpret_cast<KNativePointer>(canvas->recordingContext());//todo null
     sk_sp<SkImage> image = SkImage::MakeFromTexture(dContext,
             *backendTexture,
-            kBottomLeft_GrSurfaceOrigin/*kTopLeft_GrSurfaceOrigin*/,
+            kBottomLeft_GrSurfaceOrigin,//also possible value is kTopLeft_GrSurfaceOrigin
             kRGBA_8888_SkColorType,
             kOpaque_SkAlphaType,
             nullptr);

@@ -1,26 +1,25 @@
 package org.jetbrains.skiko.sample
 
-import org.jetbrains.skia.*
-import org.jetbrains.skiko.*
+import org.jetbrains.skiko.SkiaLayer
+import org.jetbrains.skiko.SkikoUIView
+import org.jetbrains.skiko.SkikoInput
 
+class IosClocks(layer: SkiaLayer) : Clocks(layer) {
+    override var inputText: String = "Hello, IosClocks"
 
-class IosClocks(val layer: SkiaLayer) : SkikoView {
-
-//    val backendTexture = GrBackendTexture.Companion.createFromMetalTexture(TODO("todo ios metal texture"))
-
-    override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
-        canvas.drawCircle(50f, 50f, 50f, Paint().apply {
-            color = CLR
-            blendMode = BLEND
-        })
-        canvas.drawRect(Rect(50f, 0f, 200f, 200f), Paint().apply {
-            color = 0xccff0000.toInt()
-        })
-//        canvas.drawCircle(50f, 50f, 50f, Paint().apply {
-//            color = CLR
-//            blendMode = BLEND
-//        })
-        canvas.resetMatrix()
+    override fun handleBackspace() {
+        if (inputText.isNotEmpty()) {
+            inputText = inputText.dropLast(1)
+        }
     }
 
+    override val input: SkikoInput = object : SkikoInput by SkikoInput.Empty {
+        override fun insertText(text: String) {
+            inputText += text
+        }
+
+        override fun deleteBackward() {
+            handleBackspace()
+        }
+    }
 }

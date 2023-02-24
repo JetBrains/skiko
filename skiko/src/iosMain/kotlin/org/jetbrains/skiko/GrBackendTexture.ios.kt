@@ -19,21 +19,23 @@ package org.jetbrains.skiko
 import kotlinx.cinterop.objcPtr
 import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.GrBackendTexture
-import org.jetbrains.skia.Image
-import org.jetbrains.skia.Pixmap
 import org.jetbrains.skia.impl.*
 import platform.Metal.MTLTextureProtocol
 
-fun GrBackendTexture.Companion.createFromMetalTexture(mtlTexture: MTLTextureProtocol, width:Int, height: Int): GrBackendTexture {
+fun GrBackendTexture.Companion.createFromMetalTexture(
+    mtlTexture: MTLTextureProtocol,
+    width: Int,
+    height: Int
+): GrBackendTexture {
     return try {
         Stats.onNativeCall()
-//        val ptr =
-//            _nMakeFromPixmap(getPtr(pixmap))
         val ptr = mtlTexture.objcPtr()
-        if (ptr == Native.NullPointer) throw RuntimeException("Failed to GrBackendTexture.Companion.createFromMetalTexture")//todo log args
+        if (ptr == Native.NullPointer) {
+            throw RuntimeException("Failed to GrBackendTexture::createFromMetalTexture($mtlTexture, $width, $height")
+        }
         GrBackendTexture(_nCreateFromMetalTexture(ptr, width, height))
     } finally {
-//        reachabilityBarrier(pixmap)//todo?
+        reachabilityBarrier(mtlTexture)
     }
 }
 

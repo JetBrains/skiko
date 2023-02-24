@@ -52,7 +52,7 @@ internal abstract class ContextHandler(
 
     fun backendTextureToImage(texture: GrBackendTexture): Image? {
         return context?.let {
-            org.jetbrains.skia.Image.Companion.makeFromBackendTexture(it, texture)
+            Image.makeFromBackendTexture(it, texture)
         }
     }
 }

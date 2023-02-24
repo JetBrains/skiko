@@ -3,23 +3,22 @@ package org.jetbrains.skiko.redrawer
 import kotlinx.cinterop.*
 import org.jetbrains.skia.BackendRenderTarget
 import org.jetbrains.skia.DirectContext
-import org.jetbrains.skiko.*
+import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.context.ContextHandler
 import org.jetbrains.skiko.context.MetalContextHandler
 import platform.CoreGraphics.CGColorCreate
 import platform.CoreGraphics.CGColorSpaceCreateDeviceRGB
 import platform.CoreGraphics.CGContextRef
-import platform.Metal.MTLCreateSystemDefaultDevice
-import platform.Metal.MTLDeviceProtocol
-import platform.Metal.MTLPixelFormatBGRA8Unorm
-import platform.QuartzCore.CAMetalDrawableProtocol
-import platform.QuartzCore.CAMetalLayer
-import platform.QuartzCore.kCAGravityTopLeft
-import kotlin.system.getTimeNanos
 import platform.CoreGraphics.CGSizeMake
 import platform.Foundation.NSRunLoop
 import platform.Foundation.NSSelectorFromString
+import platform.Metal.MTLCreateSystemDefaultDevice
+import platform.Metal.MTLDeviceProtocol
+import platform.Metal.MTLPixelFormatBGRA8Unorm
 import platform.QuartzCore.CADisplayLink
+import platform.QuartzCore.CAMetalDrawableProtocol
+import platform.QuartzCore.CAMetalLayer
+import platform.QuartzCore.kCAGravityTopLeft
 import platform.darwin.NSObject
 
 internal class MetalRedrawer(
@@ -128,9 +127,10 @@ internal class MetalLayer : CAMetalLayer {
     private lateinit var contextHandler: ContextHandler
 
     @OverrideInit
-    constructor(): super()
+    constructor() : super()
+
     @OverrideInit
-    constructor(layer: Any): super(layer)
+    constructor(layer: Any) : super(layer)
 
     fun init(
         skiaLayer: SkiaLayer,
@@ -149,7 +149,7 @@ internal class MetalLayer : CAMetalLayer {
             this.backgroundColor =
                 CGColorCreate(CGColorSpaceCreateDeviceRGB(), it.addressOf(0))
         }
-        this.opaque = false
+        this.opaque = false // For UIKit interop through a "Hole"
         skiaLayer.view?.let {
             this.frame = it.frame
             it.layer.addSublayer(this)
