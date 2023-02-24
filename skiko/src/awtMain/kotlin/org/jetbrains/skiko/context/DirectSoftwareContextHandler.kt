@@ -1,6 +1,7 @@
 package org.jetbrains.skiko.context
 
 import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skiko.Logger
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.redrawer.AbstractDirectSoftwareRedrawer
 import java.lang.ref.Reference
@@ -25,7 +26,7 @@ internal class DirectSoftwareContextHandler(layer: SkiaLayer) : JvmContextHandle
     override fun initContext(): Boolean {
         if (!isInited) {
             if (System.getProperty("skiko.hardwareInfo.enabled") == "true") {
-                println(rendererInfo())
+                Logger.info("Renderer info:\n ${rendererInfo()}")
             }
             isInited = true
         }

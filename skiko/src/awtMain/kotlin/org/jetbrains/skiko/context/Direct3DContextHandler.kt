@@ -3,6 +3,7 @@ package org.jetbrains.skiko.context
 import org.jetbrains.skia.Surface
 import org.jetbrains.skia.SurfaceProps
 import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skiko.Logger
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.redrawer.Direct3DRedrawer
 import java.lang.ref.Reference
@@ -20,11 +21,11 @@ internal class Direct3DContextHandler(layer: SkiaLayer) : JvmContextHandler(laye
             if (context == null) {
                 context = directXRedrawer.makeContext()
                 if (System.getProperty("skiko.hardwareInfo.enabled") == "true") {
-                    println(rendererInfo())
+                    Logger.info("Renderer info:\n ${rendererInfo()}")
                 }
             }
         } catch (e: Exception) {
-            println("${e.message}\nFailed to create Skia Direct3D context!")
+            Logger.warn("${e.message}\n Failed to create Skia Direct3D context!")
             return false
         }
         return true

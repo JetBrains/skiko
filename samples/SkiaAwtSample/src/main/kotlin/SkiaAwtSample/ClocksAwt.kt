@@ -2,17 +2,17 @@ package SkiaAwtSample
 
 import org.jetbrains.skiko.*
 import org.jetbrains.skia.*
-import org.jetbrains.skia.paragraph.FontCollection
-import org.jetbrains.skia.paragraph.ParagraphBuilder
-import org.jetbrains.skia.paragraph.ParagraphStyle
-import org.jetbrains.skia.paragraph.TextStyle
+import org.jetbrains.skia.paragraph.*
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.PI
 
-class ClocksAwt(private val layer: SkiaLayer): SkikoView {
+class ClocksAwt(private val layer: SkiaLayer) : SkikoView {
     private val typeface = Typeface.makeFromFile("fonts/JetBrainsMono-Regular.ttf")
-    private val font = Font(typeface, 40f)
+    private val font = Font(typeface, 13f).apply {
+        edging = FontEdging.SUBPIXEL_ANTI_ALIAS
+        hinting = FontHinting.SLIGHT
+    }
     private val paint = Paint().apply {
             color = 0xff9BC730L.toInt()
             mode = PaintMode.FILL
@@ -75,16 +75,20 @@ class ClocksAwt(private val layer: SkiaLayer): SkikoView {
         }
 
         val text = "Frames: ${frame++}!"
-        canvas.drawString(text, xpos.toFloat(), ypos.toFloat(), font, paint)
-        
-        val style = ParagraphStyle()
-        val renderInfo = ParagraphBuilder(style, fontCollection)
+        val x = xpos.toFloat()
+        val y = ypos.toFloat()
+        canvas.drawString(text, x, y, font, paint)
+
+        val style = ParagraphStyle().apply {
+            fontRastrSettings = FontRastrSettings(FontEdging.SUBPIXEL_ANTI_ALIAS, FontHinting.SLIGHT, true)
+        }
+        val paragraph = ParagraphBuilder(style, fontCollection)
             .pushStyle(TextStyle().setColor(0xFF000000.toInt()))
-            .addText("Graphics API: ${layer.renderApi} ✿ﾟ $currentSystemTheme")
+            .addText("JRE: ${System.getProperty("java.vendor")}, ${System.getProperty("java.runtime.version")}, Graphics API: ${layer.renderApi} ✿ﾟ $currentSystemTheme")
             .popStyle()
             .build()
-        renderInfo.layout(Float.POSITIVE_INFINITY)
-        renderInfo.paint(canvas, 5f, 5f)
+        paragraph.layout(Float.POSITIVE_INFINITY)
+        paragraph.paint(canvas, 5f, 5f)
 
         // Alpha layers test
         val rectW = 100f

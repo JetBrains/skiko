@@ -1,11 +1,13 @@
 package SkiaAwtSample
 
 import kotlinx.coroutines.*
+import org.jetbrains.skia.PixelGeometry
 import org.jetbrains.skiko.*
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.Toolkit
 import java.awt.event.*
+import java.awt.RenderingHints
 import javax.swing.*
 import java.io.File
 import java.nio.file.Files
@@ -22,15 +24,22 @@ fun main(args: Array<String>) {
 }
 
 fun createWindow(title: String, exitOnClose: Boolean) = SwingUtilities.invokeLater {
-    val skiaLayer = SkiaLayer()
+    val renderingHints = Toolkit.getDefaultToolkit().getDesktopProperty("awt.font.desktophints") as Map<Any, Any>
+    val pixelGeometry = when (renderingHints[RenderingHints.KEY_TEXT_ANTIALIASING]) {
+        RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB -> PixelGeometry.RGB_H
+        RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HBGR -> PixelGeometry.BGR_H
+        RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_VRGB -> PixelGeometry.RGB_V
+        RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_VBGR -> PixelGeometry.BGR_V
+        else -> PixelGeometry.UNKNOWN
+    }
+    val skiaLayer = SkiaLayer(pixelGeometry = pixelGeometry)
     val clocks = ClocksAwt(skiaLayer)
 
     val window = JFrame(title)
     window.defaultCloseOperation =
         if (exitOnClose) WindowConstants.EXIT_ON_CLOSE else WindowConstants.DISPOSE_ON_CLOSE
-    window.title = title
-
-    skiaLayer.attachTo(window.contentPane)
+    window.background = Color.GREEN
+    window.contentPane = skiaLayer
 
     // Create menu.
     val menuBar = JMenuBar()
@@ -116,7 +125,7 @@ fun createWindow(title: String, exitOnClose: Boolean) = SwingUtilities.invokeLat
         }
         skiaLayer.transparency = true
     } else {
-        skiaLayer.background = Color.WHITE
+        skiaLayer.background = Color.LIGHT_GRAY
     }
 
     // MANDATORY: set window preferred size before calling pack()

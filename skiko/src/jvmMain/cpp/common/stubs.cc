@@ -15,12 +15,6 @@ void skikoUnimplemented(const char* message) {
 // we put here stubs for all OS specific native methods.
 
 #ifndef SK_BUILD_FOR_LINUX
-JNIEXPORT jfloat JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_linuxGetDpiScaleNative(
-    JNIEnv *env, jobject properties, jlong platformInfoPtr) {
-    skikoUnimplemented("Java_org_jetbrains_skiko_PlatformOperationsKt_linuxGetDpiScaleNative");
-    return 0;
-}
-
 JNIEXPORT jfloat JNICALL Java_org_jetbrains_skiko_SetupKt_linuxGetSystemDpiScale(JNIEnv *env, jobject layer) {
     skikoUnimplemented("Java_org_jetbrains_skiko_SetupKt_linuxGetSystemDpiScale");
     return 0;

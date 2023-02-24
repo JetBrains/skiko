@@ -5,6 +5,8 @@ import kotlinx.coroutines.withContext
 import org.jetbrains.skia.DirectContext
 import org.jetbrains.skia.Surface
 import org.jetbrains.skia.SurfaceProps
+import org.jetbrains.skia.impl.interopScope
+import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.context.Direct3DContextHandler
 
@@ -86,9 +88,11 @@ internal class Direct3DRedrawer(
         makeDirectXContext(device)
     )
 
-    fun makeSurface(context: Long, width: Int, height: Int, surfaceProps: SurfaceProps, index: Int) = Surface(
-        makeDirectXSurface(device, context, width, height, surfaceProps, index)
-    )
+    fun makeSurface(context: Long, width: Int, height: Int, surfaceProps: SurfaceProps, index: Int): Surface {
+        return interopScope {
+            Surface(makeDirectXSurface(device, context, width, height, toInterop(surfaceProps.packToIntArray()), index))
+        }
+    }
 
     fun resizeBuffers(width: Int, height: Int) = resizeBuffers(device, width, height)
 
@@ -102,7 +106,7 @@ internal class Direct3DRedrawer(
     private external fun chooseAdapter(adapterPriority: Int): Long
     private external fun createDirectXDevice(adapter: Long, contentHandle: Long, transparency: Boolean): Long
     private external fun makeDirectXContext(device: Long): Long
-    private external fun makeDirectXSurface(device: Long, context: Long, width: Int, height: Int, surfaceProps: SurfaceProps, index: Int): Long
+    private external fun makeDirectXSurface(device: Long, context: Long, width: Int, height: Int, surfacePropsIntArray: InteropPointer, index: Int): Long
     private external fun resizeBuffers(device: Long, width: Int, height: Int)
     private external fun swap(device: Long, isVsyncEnabled: Boolean)
     private external fun disposeDevice(device: Long)

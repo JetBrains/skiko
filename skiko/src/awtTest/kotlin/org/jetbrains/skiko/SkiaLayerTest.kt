@@ -26,6 +26,7 @@ import java.awt.Dimension
 import java.awt.event.WindowEvent
 import javax.swing.JFrame
 import javax.swing.JLayeredPane
+import javax.swing.SwingUtilities
 import javax.swing.WindowConstants
 import kotlin.random.Random
 import kotlin.test.assertNotNull
@@ -506,6 +507,34 @@ class SkiaLayerTest {
         } finally {
             window.close()
         }
+    }
+
+    @Test
+    fun `frame disposed inside of immediate repaint`() = uiTest {
+        val onDrawCompleted = CompletableDeferred<Unit>()
+        val window = UiTestWindow(
+            properties = SkiaLayerProperties(
+                isVsyncEnabled = true,
+                isVsyncFramelimitFallbackEnabled = true
+            )
+        )
+        try {
+            window.setLocation(200, 200)
+            window.setSize(400, 400)
+            window.layer.skikoView = object : SkikoView {
+                override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+                    window.dispose()
+                    SwingUtilities.invokeLater {
+                        onDrawCompleted.complete(Unit)
+                    }
+                }
+            }
+            window.isVisible = true
+            onDrawCompleted.await()
+        } finally {
+            window.dispose()
+        }
+
     }
 
     @Test
