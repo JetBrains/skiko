@@ -1,10 +1,6 @@
 package org.jetbrains.skiko.redrawer
 
-import kotlinx.cinterop.addressOf
-import kotlinx.cinterop.autoreleasepool
-import kotlinx.cinterop.objcPtr
-import kotlinx.cinterop.usePinned
-import kotlinx.cinterop.useContents
+import kotlinx.cinterop.*
 import org.jetbrains.skia.BackendRenderTarget
 import org.jetbrains.skia.DirectContext
 import org.jetbrains.skiko.*
@@ -21,6 +17,10 @@ import platform.QuartzCore.CAMetalLayer
 import platform.QuartzCore.kCAGravityTopLeft
 import kotlin.system.getTimeNanos
 import platform.CoreGraphics.CGSizeMake
+import platform.Foundation.NSRunLoop
+import platform.Foundation.NSSelectorFromString
+import platform.QuartzCore.CADisplayLink
+import platform.darwin.NSObject
 
 internal class MetalRedrawer(
     private val layer: SkiaLayer
@@ -33,14 +33,33 @@ internal class MetalRedrawer(
     private val queue = device.newCommandQueue()!!
     private var currentDrawable: CAMetalDrawableProtocol? = null
     private val metalLayer = MetalLayer()
+    private val activeFrameSubscription: Boolean = false
+    private val frameListener = object : NSObject() {
+        @ObjCAction
+        fun onDisplayLinkTick() {
+            if (layer.isShowing()) {
+                draw()
+            }
+        }
+    }
+    private val caDisplayLink = CADisplayLink.displayLinkWithTarget(
+        target = frameListener,
+        selector = NSSelectorFromString(frameListener::onDisplayLinkTick.name)
+    )
 
     init {
         metalLayer.init(this.layer, contextHandler, device)
     }
 
-    private val frameDispatcher = FrameDispatcher(SkikoDispatchers.Main) {
-        if (layer.isShowing()) {
-            draw()
+    private inline fun addFrameSubscription() {
+        if (!activeFrameSubscription) {
+            caDisplayLink.addToRunLoop(NSRunLoop.mainRunLoop, NSRunLoop.mainRunLoop.currentMode)
+        }
+    }
+
+    private inline fun removeFrameSubscription() {
+        if (activeFrameSubscription) {
+            caDisplayLink.removeFromRunLoop(NSRunLoop.mainRunLoop, NSRunLoop.mainRunLoop.currentMode)
         }
     }
 
@@ -53,7 +72,7 @@ internal class MetalRedrawer(
 
     override fun dispose() {
         if (!isDisposed) {
-            frameDispatcher.cancel()
+            removeFrameSubscription()
             contextHandler.dispose()
             metalLayer.dispose()
             isDisposed = true
@@ -73,7 +92,7 @@ internal class MetalRedrawer(
 
     override fun needRedraw() {
         check(!isDisposed) { "MetalRedrawer is disposed" }
-        frameDispatcher.scheduleFrame()
+        addFrameSubscription()
     }
 
     override fun redrawImmediately() {
@@ -83,7 +102,7 @@ internal class MetalRedrawer(
 
     private fun draw() {
         // TODO: maybe make flush async as in JVM version.
-        autoreleasepool {
+        autoreleasepool { //todo maybe autoreleasepool is redundant, make measurements and talk with Kotlin Native team
             if (!isDisposed) {
                 contextHandler.draw()
             }
@@ -91,6 +110,7 @@ internal class MetalRedrawer(
     }
 
     fun finishFrame() {
+        removeFrameSubscription()
         autoreleasepool {
             currentDrawable?.let {
                 val commandBuffer = queue.commandBuffer()!!
