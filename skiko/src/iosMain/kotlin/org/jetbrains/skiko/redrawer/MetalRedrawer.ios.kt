@@ -52,6 +52,7 @@ internal class MetalRedrawer(
 
     private inline fun addFrameSubscription() {
         if (!activeFrameSubscription) {
+            activeFrameSubscription = true
             caDisplayLink.addToRunLoop(NSRunLoop.mainRunLoop, NSRunLoop.mainRunLoop.currentMode)
         }
     }
