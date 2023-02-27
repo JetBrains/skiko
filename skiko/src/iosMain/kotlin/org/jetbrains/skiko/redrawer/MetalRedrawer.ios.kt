@@ -32,7 +32,7 @@ internal class MetalRedrawer(
     private val queue = device.newCommandQueue()!!
     private var currentDrawable: CAMetalDrawableProtocol? = null
     private val metalLayer = MetalLayer()
-    private val activeFrameSubscription: Boolean = false
+    private var activeFrameSubscription: Boolean = false
     private val frameListener = object : NSObject() {
         @ObjCAction
         fun onDisplayLinkTick() {
