@@ -103,7 +103,7 @@ internal class MetalRedrawer(
 
     private fun draw() {
         // TODO: maybe make flush async as in JVM version.
-        autoreleasepool { //todo maybe autoreleasepool is redundant, make measurements and talk with Kotlin Native team
+        autoreleasepool { //todo measure performance without autoreleasepool
             if (!isDisposed) {
                 contextHandler.draw()
             }
