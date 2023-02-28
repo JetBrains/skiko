@@ -1,5 +1,7 @@
 package org.jetbrains.skiko.redrawer
 
+import kotlinx.atomicfu.AtomicBoolean
+import kotlinx.atomicfu.atomic
 import kotlinx.cinterop.*
 import org.jetbrains.skia.BackendRenderTarget
 import org.jetbrains.skia.DirectContext
@@ -59,6 +61,7 @@ internal class MetalRedrawer(
 
     private inline fun removeFrameSubscription() {
         if (activeFrameSubscription) {
+            activeFrameSubscription = false
             caDisplayLink.removeFromRunLoop(NSRunLoop.mainRunLoop, NSRunLoop.mainRunLoop.currentMode)
         }
     }
