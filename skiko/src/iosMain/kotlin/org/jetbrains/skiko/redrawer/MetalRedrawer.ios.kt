@@ -34,7 +34,7 @@ internal class MetalRedrawer(
     private val queue = device.newCommandQueue()!!
     private var currentDrawable: CAMetalDrawableProtocol? = null
     private val metalLayer = MetalLayer()
-    private var activeFrameSubscription: Boolean = false
+    private var activeFrameSubscription: AtomicBoolean = atomic(false)
     private val frameListener = object : NSObject() {
         @ObjCAction
         fun onDisplayLinkTick() {
@@ -53,15 +53,13 @@ internal class MetalRedrawer(
     }
 
     private inline fun addFrameSubscription() {
-        if (!activeFrameSubscription) {
-            activeFrameSubscription = true
+        if (activeFrameSubscription.compareAndSet(expect = false, update = true)) {
             caDisplayLink.addToRunLoop(NSRunLoop.mainRunLoop, NSRunLoop.mainRunLoop.currentMode)
         }
     }
 
     private inline fun removeFrameSubscription() {
-        if (activeFrameSubscription) {
-            activeFrameSubscription = false
+        if (activeFrameSubscription.compareAndSet(expect = true, update = false)) {
             caDisplayLink.removeFromRunLoop(NSRunLoop.mainRunLoop, NSRunLoop.mainRunLoop.currentMode)
         }
     }
