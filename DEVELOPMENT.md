@@ -1,5 +1,7 @@
 ## Building JVM bindings
 
+* Install Xcode Command Line Tools
+* Install Emscripten
 * Set JAVA_HOME to location of JDK, at least version 11
 * `./gradlew :skiko:publishToMavenLocal` will build the artifact and publish it to local Maven repo
 
