@@ -1,6 +1,8 @@
-## Building JVM bindings
+### Building JVM bindings
 
-* Set JAVA_HOME to location of JDK, at least version 11
+* Install Xcode Command Line Tools (macOS only)
+* Install Emscripten
+* Set `JAVA_HOME` to location of JDK, at least version 11
 * `./gradlew :skiko:publishToMavenLocal` will build the artifact and publish it to local Maven repo
 
 To build with debug symbols and debug Skia build use `-Pskiko.debug=true` Gradle argument.
