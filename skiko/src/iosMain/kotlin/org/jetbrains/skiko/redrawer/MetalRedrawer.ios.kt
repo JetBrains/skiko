@@ -1,7 +1,5 @@
 package org.jetbrains.skiko.redrawer
 
-import kotlinx.atomicfu.AtomicBoolean
-import kotlinx.atomicfu.atomic
 import kotlinx.cinterop.*
 import org.jetbrains.skia.BackendRenderTarget
 import org.jetbrains.skia.DirectContext
@@ -34,35 +32,21 @@ internal class MetalRedrawer(
     private val queue = device.newCommandQueue()!!
     private var currentDrawable: CAMetalDrawableProtocol? = null
     private val metalLayer = MetalLayer()
-    private var activeFrameSubscription: AtomicBoolean = atomic(false)
-    private val frameListener = object : NSObject() {
-        @ObjCAction
-        fun onDisplayLinkTick() {
-            if (layer.isShowing()) {
-                draw()
-            }
-            removeFrameSubscription()
+    private val frameListener: NSObject = FrameTickListener {
+        if (layer.isShowing()) {
+            draw()
         }
+        caDisplayLink.setPaused(true)
     }
     private val caDisplayLink = CADisplayLink.displayLinkWithTarget(
         target = frameListener,
-        selector = NSSelectorFromString(frameListener::onDisplayLinkTick.name)
+        selector = NSSelectorFromString(FrameTickListener::onDisplayLinkTick.name)
     )
 
     init {
         metalLayer.init(this.layer, contextHandler, device)
-    }
-
-    private inline fun addFrameSubscription() {
-        if (activeFrameSubscription.compareAndSet(expect = false, update = true)) {
-            caDisplayLink.addToRunLoop(NSRunLoop.mainRunLoop, NSRunLoop.mainRunLoop.currentMode)
-        }
-    }
-
-    private inline fun removeFrameSubscription() {
-        if (activeFrameSubscription.compareAndSet(expect = true, update = false)) {
-            caDisplayLink.removeFromRunLoop(NSRunLoop.mainRunLoop, NSRunLoop.mainRunLoop.currentMode)
-        }
+        caDisplayLink.setPaused(true)
+        caDisplayLink.addToRunLoop(NSRunLoop.mainRunLoop, NSRunLoop.mainRunLoop.currentMode)
     }
 
     fun makeContext() = DirectContext.makeMetal(device.objcPtr(), queue.objcPtr())
@@ -74,7 +58,7 @@ internal class MetalRedrawer(
 
     override fun dispose() {
         if (!isDisposed) {
-            removeFrameSubscription()
+            caDisplayLink.invalidate()
             contextHandler.dispose()
             metalLayer.dispose()
             isDisposed = true
@@ -94,7 +78,7 @@ internal class MetalRedrawer(
 
     override fun needRedraw() {
         check(!isDisposed) { "MetalRedrawer is disposed" }
-        addFrameSubscription()
+        caDisplayLink.setPaused(false)
     }
 
     override fun redrawImmediately() {
@@ -166,5 +150,12 @@ internal class MetalLayer : CAMetalLayer {
     override fun drawInContext(ctx: CGContextRef?) {
         contextHandler.draw()
         super.drawInContext(ctx)
+    }
+}
+
+private class FrameTickListener(val onFrameTick: () -> Unit) : NSObject() {
+    @ObjCAction
+    fun onDisplayLinkTick() {
+        onFrameTick()
     }
 }
