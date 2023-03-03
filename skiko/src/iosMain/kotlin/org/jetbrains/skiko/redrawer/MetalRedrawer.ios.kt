@@ -41,6 +41,7 @@ internal class MetalRedrawer(
             if (layer.isShowing()) {
                 draw()
             }
+            removeFrameSubscription()
         }
     }
     private val caDisplayLink = CADisplayLink.displayLinkWithTarget(
@@ -111,7 +112,6 @@ internal class MetalRedrawer(
     }
 
     fun finishFrame() {
-        removeFrameSubscription()
         autoreleasepool {
             currentDrawable?.let {
                 val commandBuffer = queue.commandBuffer()!!
