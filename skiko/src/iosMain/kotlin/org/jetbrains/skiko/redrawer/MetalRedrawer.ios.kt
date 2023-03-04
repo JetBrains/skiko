@@ -33,10 +33,10 @@ internal class MetalRedrawer(
     private var currentDrawable: CAMetalDrawableProtocol? = null
     private val metalLayer = MetalLayer()
     private val frameListener: NSObject = FrameTickListener {
+        caDisplayLink.setPaused(true)
         if (layer.isShowing()) {
             draw()
         }
-        caDisplayLink.setPaused(true)
     }
     private val caDisplayLink = CADisplayLink.displayLinkWithTarget(
         target = frameListener,
