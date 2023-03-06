@@ -1,26 +1,25 @@
 package org.jetbrains.skiko.redrawer
 
-import kotlinx.cinterop.addressOf
-import kotlinx.cinterop.autoreleasepool
-import kotlinx.cinterop.objcPtr
-import kotlinx.cinterop.usePinned
-import kotlinx.cinterop.useContents
+import kotlinx.cinterop.*
 import org.jetbrains.skia.BackendRenderTarget
 import org.jetbrains.skia.DirectContext
-import org.jetbrains.skiko.*
+import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.context.ContextHandler
 import org.jetbrains.skiko.context.MetalContextHandler
 import platform.CoreGraphics.CGColorCreate
 import platform.CoreGraphics.CGColorSpaceCreateDeviceRGB
 import platform.CoreGraphics.CGContextRef
+import platform.CoreGraphics.CGSizeMake
+import platform.Foundation.NSRunLoop
+import platform.Foundation.NSSelectorFromString
 import platform.Metal.MTLCreateSystemDefaultDevice
 import platform.Metal.MTLDeviceProtocol
 import platform.Metal.MTLPixelFormatBGRA8Unorm
+import platform.QuartzCore.CADisplayLink
 import platform.QuartzCore.CAMetalDrawableProtocol
 import platform.QuartzCore.CAMetalLayer
 import platform.QuartzCore.kCAGravityTopLeft
-import kotlin.system.getTimeNanos
-import platform.CoreGraphics.CGSizeMake
+import platform.darwin.NSObject
 
 internal class MetalRedrawer(
     private val layer: SkiaLayer
@@ -33,15 +32,21 @@ internal class MetalRedrawer(
     private val queue = device.newCommandQueue()!!
     private var currentDrawable: CAMetalDrawableProtocol? = null
     private val metalLayer = MetalLayer()
-
-    init {
-        metalLayer.init(this.layer, contextHandler, device)
-    }
-
-    private val frameDispatcher = FrameDispatcher(SkikoDispatchers.Main) {
+    private val frameListener: NSObject = FrameTickListener {
+        caDisplayLink.setPaused(true)
         if (layer.isShowing()) {
             draw()
         }
+    }
+    private val caDisplayLink = CADisplayLink.displayLinkWithTarget(
+        target = frameListener,
+        selector = NSSelectorFromString(FrameTickListener::onDisplayLinkTick.name)
+    )
+
+    init {
+        metalLayer.init(this.layer, contextHandler, device)
+        caDisplayLink.setPaused(true)
+        caDisplayLink.addToRunLoop(NSRunLoop.mainRunLoop, NSRunLoop.mainRunLoop.currentMode)
     }
 
     fun makeContext() = DirectContext.makeMetal(device.objcPtr(), queue.objcPtr())
@@ -53,7 +58,7 @@ internal class MetalRedrawer(
 
     override fun dispose() {
         if (!isDisposed) {
-            frameDispatcher.cancel()
+            caDisplayLink.invalidate()
             contextHandler.dispose()
             metalLayer.dispose()
             isDisposed = true
@@ -73,7 +78,7 @@ internal class MetalRedrawer(
 
     override fun needRedraw() {
         check(!isDisposed) { "MetalRedrawer is disposed" }
-        frameDispatcher.scheduleFrame()
+        caDisplayLink.setPaused(false)
     }
 
     override fun redrawImmediately() {
@@ -83,7 +88,7 @@ internal class MetalRedrawer(
 
     private fun draw() {
         // TODO: maybe make flush async as in JVM version.
-        autoreleasepool {
+        autoreleasepool { //todo measure performance without autoreleasepool
             if (!isDisposed) {
                 contextHandler.draw()
             }
@@ -108,9 +113,10 @@ internal class MetalLayer : CAMetalLayer {
     private lateinit var contextHandler: ContextHandler
 
     @OverrideInit
-    constructor(): super()
+    constructor() : super()
+
     @OverrideInit
-    constructor(layer: Any): super(layer)
+    constructor(layer: Any) : super(layer)
 
     fun init(
         skiaLayer: SkiaLayer,
@@ -129,7 +135,7 @@ internal class MetalLayer : CAMetalLayer {
             this.backgroundColor =
                 CGColorCreate(CGColorSpaceCreateDeviceRGB(), it.addressOf(0))
         }
-        this.opaque = true
+        this.opaque = false // For UIKit interop through a "Hole"
         skiaLayer.view?.let {
             this.frame = it.frame
             it.layer.addSublayer(this)
@@ -144,5 +150,12 @@ internal class MetalLayer : CAMetalLayer {
     override fun drawInContext(ctx: CGContextRef?) {
         contextHandler.draw()
         super.drawInContext(ctx)
+    }
+}
+
+private class FrameTickListener(val onFrameTick: () -> Unit) : NSObject() {
+    @ObjCAction
+    fun onDisplayLinkTick() {
+        onFrameTick()
     }
 }
