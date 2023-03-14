@@ -1,107 +1,139 @@
 package org.jetbrains.skia.impl
 
-@JsFun("(dest, index, value) => dest[index] = value")
-private external fun set(dest: HEAP<ByteArray>, index: Int, value: Byte)
-@JsFun("(dest, index, value) => dest[index] = value")
-private external fun set(dest: HEAP<ShortArray>, index: Int, value: Char)
-@JsFun("(dest, index, value) => dest[index] = value")
-private external fun set(dest: HEAP<ShortArray>, index: Int, value: Short)
-@JsFun("(dest, index, value) => dest[index] = value")
-private external fun set(dest: HEAP<IntArray>, index: Int, value: Int)
-@JsFun("(dest, index, value) => dest[index] = value")
-private external fun set(dest: HEAP<FloatArray>, index: Int, value: Float)
-@JsFun("(dest, index, value) => dest[index] = value")
-private external fun set(dest: HEAP<DoubleArray>, index: Int, value: Double)
+@kotlin.wasm.WasmImport("skia", "skia_memSetByte")
+external fun skia_memSetByte(address: NativePointer, value: Byte)
+
+@kotlin.wasm.WasmImport("skia", "skia_memGetByte")
+external fun skia_memGetByte(address: NativePointer): Byte
+
+@kotlin.wasm.WasmImport("skia", "skia_memSetChar")
+external fun skia_memSetChar(address: NativePointer, value: Char)
+
+@kotlin.wasm.WasmImport("skia", "skia_memGetChar")
+external fun skia_memGetChar(address: NativePointer): Char
+
+@kotlin.wasm.WasmImport("skia", "skia_memSetShort")
+external fun skia_memSetShort(address: NativePointer, value: Short)
+
+@kotlin.wasm.WasmImport("skia", "skia_memGetShort")
+external fun skia_memGetShort(address: NativePointer): Short
+
+@kotlin.wasm.WasmImport("skia", "skia_memSetInt")
+external fun skia_memSetInt(address: NativePointer, value: Int)
+
+@kotlin.wasm.WasmImport("skia", "skia_memGetInt")
+external fun skia_memGetInt(address: NativePointer): Int
+
+@kotlin.wasm.WasmImport("skia", "skia_memSetFloat")
+external fun skia_memSetFloat(address: NativePointer, value: Float)
+
+@kotlin.wasm.WasmImport("skia", "skia_memGetFloat")
+external fun skia_memGetFloat(address: NativePointer): Float
+
+@kotlin.wasm.WasmImport("skia", "skia_memSetDouble")
+external fun skia_memSetDouble(address: NativePointer, value: Double)
+
+@kotlin.wasm.WasmImport("skia", "skia_memGetDouble")
+external fun skia_memGetDouble(address: NativePointer): Double
 
 internal actual fun toWasm(dest: NativePointer, src: ByteArray) {
-    var index = dest / Byte.SIZE_BYTES
+    var address = dest
     for (value in src) {
-        set(HEAPU8, index, value)
-        index++
+        skia_memSetByte(address, value)
+        address += Byte.SIZE_BYTES
     }
 }
 
 internal actual fun toWasm(dest: NativePointer, src: ShortArray) {
-    var index = dest / Short.SIZE_BYTES
+    var address = dest
     for (value in src) {
-        set(HEAPU16, index, value)
-        index++
+        skia_memSetShort(address, value)
+        address += Short.SIZE_BYTES
     }
 }
+
 internal actual fun toWasm(dest: NativePointer, src: CharArray) {
-    var index = dest / Char.SIZE_BYTES
+    var address = dest
     for (value in src) {
-        set(HEAPU16, index, value.code.toShort())
-        index++
+        skia_memSetChar(address, value)
+        address += Char.SIZE_BYTES
     }
 }
 
 internal actual fun toWasm(dest: NativePointer, src: IntArray) {
-    var index = dest / Int.SIZE_BYTES
+    var address = dest
     for (value in src) {
-        set(HEAPU32, index, value)
-        index++
+        skia_memSetInt(address, value)
+        address += Int.SIZE_BYTES
     }
 }
 
 internal actual fun toWasm(dest: NativePointer, src: FloatArray) {
-    var index = dest / Float.SIZE_BYTES
+    var address = dest
     for (value in src) {
-        set(HEAPF32, index, value)
-        index++
+        skia_memSetFloat(address, value)
+        address += Float.SIZE_BYTES
     }
 }
 
 internal actual fun toWasm(dest: NativePointer, src: DoubleArray) {
-    var index = dest / Double.SIZE_BYTES
+    var address = dest
     for (value in src) {
-        set(HEAPF64, index, value)
-        index++
+        skia_memSetDouble(address, value)
+        address += Double.SIZE_BYTES
     }
 }
 
-@JsFun("(dest, index) => dest[index]")
-private external fun get(dest: HEAP<ByteArray>, index: Int): Byte
-@JsFun("(dest, index) => dest[index]")
-private external fun get(dest: HEAP<ShortArray>, index: Int): Short
-@JsFun("(dest, index) => dest[index]")
-private external fun get(dest: HEAP<IntArray>, index: Int): Int
-@JsFun("(dest, index) => dest[index]")
-private external fun get(dest: HEAP<FloatArray>, index: Int): Float
-@JsFun("(dest, index) => dest[index]")
-private external fun get(dest: HEAP<DoubleArray>, index: Int): Double
-
 internal actual fun fromWasm(src: NativePointer, result: ByteArray) {
-    val index = src / Byte.SIZE_BYTES
-    for (i in result.indices) {
-        result[i] = get(HEAPU8, index + i)
+    var address = src
+    for (index in result.indices) {
+        result[index] = skia_memGetByte(address)
+        address += Byte.SIZE_BYTES
     }
 }
 
 internal actual fun fromWasm(src: NativePointer, result: ShortArray) {
-    val index = src / Short.SIZE_BYTES
-    for (i in result.indices) {
-        result[i] = get(HEAPU16, index + i)
+    var address = src
+    for (index in result.indices) {
+        result[index] = skia_memGetShort(address)
+        address += Short.SIZE_BYTES
     }
 }
 
 internal actual fun fromWasm(src: NativePointer, result: IntArray) {
-    val index = src / Int.SIZE_BYTES
-    for (i in result.indices) {
-        result[i] = get(HEAPU32, index + i)
+    var address = src
+    for (index in result.indices) {
+        result[index] = skia_memGetInt(address)
+        address += Int.SIZE_BYTES
     }
 }
 
 internal actual fun fromWasm(src: NativePointer, result: FloatArray) {
-    val index = src / Float.SIZE_BYTES
-    for (i in result.indices) {
-        result[i] = get(HEAPF32, index + i)
+    var address = src
+    for (index in result.indices) {
+        result[index] = skia_memGetFloat(address)
+        address += Float.SIZE_BYTES
     }
 }
 
 internal actual fun fromWasm(src: NativePointer, result: DoubleArray) {
-    val index = src / Double.SIZE_BYTES
-    for (i in result.indices) {
-        result[i] = get(HEAPF64, index + i)
+    var address = src
+    for (index in result.indices) {
+        result[index] = skia_memGetDouble(address)
+        address += Double.SIZE_BYTES
     }
+}
+
+internal actual fun stringToUTF8(str: String, outPtr: NativePointer, maxBytesToWrite: Int) {
+    if (maxBytesToWrite <= 0) return
+
+    val utf8 = str.encodeToByteArray()
+    val lastIndex = minOf(maxBytesToWrite - 1, utf8.size)
+
+    var index = 0
+    while (index < lastIndex) {
+        skia_memSetByte(outPtr + index, utf8[index])
+        index++
+    }
+    skia_memSetByte(outPtr + index, 0)
 }
