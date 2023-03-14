@@ -216,14 +216,16 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
         device.layer.pixelFormat = MTLPixelFormatBGRA8Unorm;
         device.layer.contentsGravity = kCAGravityTopLeft;
 
-        CGFloat transparent[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-        device.layer.backgroundColor = CGColorCreate(CGColorSpaceCreateDeviceRGB(), transparent);
-        device.layer.opaque = NO;
+        NSWindow* window = (__bridge NSWindow*) (void *) windowPtr;
 
+        device.layer.opaque = NO;
         if (transparency)
         {
-            NSWindow* window = (__bridge NSWindow*) (void *) windowPtr;
+            CGFloat transparent[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+            device.layer.backgroundColor = CGColorCreate(CGColorSpaceCreateDeviceRGB(), transparent);
             window.hasShadow = NO;
+        } else {
+            device.layer.backgroundColor = window.backgroundColor.CGColor;
         }
 
         return (jlong) (__bridge_retained void *) device;
