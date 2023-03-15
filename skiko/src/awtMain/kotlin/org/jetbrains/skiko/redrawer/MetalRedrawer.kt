@@ -136,6 +136,10 @@ internal class MetalRedrawer(
         )
     }
 
+    override fun setVisible(isVisible: Boolean) {
+        setLayerVisible(device, isVisible)
+    }
+
     fun makeContext() = DirectContext(
         makeMetalContext(device)
     )
@@ -153,6 +157,7 @@ internal class MetalRedrawer(
     private external fun disposeDevice(device: Long)
     private external fun finishFrame(device: Long)
     private external fun resizeLayers(device: Long, x: Int, y: Int, width: Int, height: Int)
+    private external fun setLayerVisible(device: Long, isVisible: Boolean)
     private external fun setContentScale(device: Long, contentScale: Float)
     private external fun setVSyncEnabled(device: Long, enabled: Boolean)
     private external fun isOccluded(window: Long): Boolean
