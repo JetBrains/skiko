@@ -534,6 +534,35 @@ class SkiaLayerTest {
         } finally {
             window.dispose()
         }
+    }
+
+    @Test
+    fun `hiding parent stops drawing layer`() = uiTest {
+        val window = UiTestWindow()
+        try {
+            window.setLocation(200, 200)
+            window.setSize(400, 200)
+            window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+            val app = RectRenderer(window.layer, 200, 100, Color.RED)
+            window.layer.skikoView = app
+            window.isUndecorated = true
+            window.isVisible = true
+
+            // Force the layered pane to draw itself with a specific color so that the test doesn't depend on the
+            // default window background, which could be different on different platforms.
+            window.layeredPane.background = Color.BLUE
+            window.layeredPane.isOpaque = true
+
+            delay(1000)
+            screenshots.assert(window.bounds, "visible_parent")
+
+            window.contentPane.isVisible = false
+
+            delay(1000)
+            screenshots.assert(window.bounds, "hidden_parent")
+        } finally {
+            window.close()
+        }
 
     }
 
