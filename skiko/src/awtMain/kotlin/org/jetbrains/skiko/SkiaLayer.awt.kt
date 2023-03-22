@@ -524,6 +524,8 @@ actual open class SkiaLayer internal constructor(
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         check(!isDisposed) { "SkiaLayer is disposed" }
 
+        checkContentScale()
+
         FrameWatcher.nextFrame()
         fpsCounter?.tick()
 
