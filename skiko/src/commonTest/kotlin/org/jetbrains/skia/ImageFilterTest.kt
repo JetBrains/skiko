@@ -216,11 +216,9 @@ class ImageFilterTest {
     }
 
     @Test
-    fun makePaint() = imageFilterTest {
-        ImageFilter.makePaint(
-            paint = Paint().setStroke(false).setColor4f(Color4f(Color.RED), colorSpace = null),
-            crop = null
-        )
+    fun makeShader() = imageFilterTest {
+        val shader = Shader.makeColor(Color.RED)
+        ImageFilter.makeShader(shader = shader, crop = null)
     }
 
     @Test

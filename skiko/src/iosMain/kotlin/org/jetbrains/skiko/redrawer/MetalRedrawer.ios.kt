@@ -3,29 +3,28 @@ package org.jetbrains.skiko.redrawer
 import kotlinx.cinterop.*
 import org.jetbrains.skia.BackendRenderTarget
 import org.jetbrains.skia.DirectContext
-import org.jetbrains.skiko.*
+import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.context.ContextHandler
 import org.jetbrains.skiko.context.MetalContextHandler
 import platform.CoreGraphics.CGColorCreate
 import platform.CoreGraphics.CGColorSpaceCreateDeviceRGB
 import platform.CoreGraphics.CGContextRef
-import platform.Metal.MTLCreateSystemDefaultDevice
-import platform.Metal.MTLDeviceProtocol
-import platform.Metal.MTLPixelFormatBGRA8Unorm
-import platform.QuartzCore.CAMetalDrawableProtocol
-import platform.QuartzCore.CAMetalLayer
-import platform.QuartzCore.kCAGravityTopLeft
-import kotlin.system.getTimeNanos
 import platform.CoreGraphics.CGSizeMake
 import platform.Foundation.NSRunLoop
 import platform.Foundation.NSSelectorFromString
+import platform.Metal.MTLCreateSystemDefaultDevice
+import platform.Metal.MTLDeviceProtocol
+import platform.Metal.MTLPixelFormatBGRA8Unorm
 import platform.QuartzCore.CADisplayLink
+import platform.QuartzCore.CAMetalDrawableProtocol
+import platform.QuartzCore.CAMetalLayer
+import platform.QuartzCore.kCAGravityTopLeft
 import platform.darwin.NSObject
 
 internal class MetalRedrawer(
     private val layer: SkiaLayer
 ) : Redrawer {
-    internal val contextHandler = MetalContextHandler(layer)
+    private val contextHandler = MetalContextHandler(layer)
     override val renderInfo: String get() = contextHandler.rendererInfo()
 
     private var isDisposed = false
@@ -33,34 +32,21 @@ internal class MetalRedrawer(
     private val queue = device.newCommandQueue()!!
     private var currentDrawable: CAMetalDrawableProtocol? = null
     private val metalLayer = MetalLayer()
-    private val activeFrameSubscription: Boolean = false
-    private val frameListener = object : NSObject() {
-        @ObjCAction
-        fun onDisplayLinkTick() {
-            if (layer.isShowing()) {
-                draw()
-            }
+    private val frameListener: NSObject = FrameTickListener {
+        caDisplayLink.setPaused(true)
+        if (layer.isShowing()) {
+            draw()
         }
     }
     private val caDisplayLink = CADisplayLink.displayLinkWithTarget(
         target = frameListener,
-        selector = NSSelectorFromString(frameListener::onDisplayLinkTick.name)
+        selector = NSSelectorFromString(FrameTickListener::onDisplayLinkTick.name)
     )
 
     init {
         metalLayer.init(this.layer, contextHandler, device)
-    }
-
-    private inline fun addFrameSubscription() {
-        if (!activeFrameSubscription) {
-            caDisplayLink.addToRunLoop(NSRunLoop.mainRunLoop, NSRunLoop.mainRunLoop.currentMode)
-        }
-    }
-
-    private inline fun removeFrameSubscription() {
-        if (activeFrameSubscription) {
-            caDisplayLink.removeFromRunLoop(NSRunLoop.mainRunLoop, NSRunLoop.mainRunLoop.currentMode)
-        }
+        caDisplayLink.setPaused(true)
+        caDisplayLink.addToRunLoop(NSRunLoop.mainRunLoop, NSRunLoop.mainRunLoop.currentMode)
     }
 
     fun makeContext() = DirectContext.makeMetal(device.objcPtr(), queue.objcPtr())
@@ -72,7 +58,7 @@ internal class MetalRedrawer(
 
     override fun dispose() {
         if (!isDisposed) {
-            removeFrameSubscription()
+            caDisplayLink.invalidate()
             contextHandler.dispose()
             metalLayer.dispose()
             isDisposed = true
@@ -92,7 +78,7 @@ internal class MetalRedrawer(
 
     override fun needRedraw() {
         check(!isDisposed) { "MetalRedrawer is disposed" }
-        addFrameSubscription()
+        caDisplayLink.setPaused(false)
     }
 
     override fun redrawImmediately() {
@@ -102,7 +88,7 @@ internal class MetalRedrawer(
 
     private fun draw() {
         // TODO: maybe make flush async as in JVM version.
-        autoreleasepool { //todo maybe autoreleasepool is redundant, make measurements and talk with Kotlin Native team
+        autoreleasepool { //todo measure performance without autoreleasepool
             if (!isDisposed) {
                 contextHandler.draw()
             }
@@ -110,7 +96,6 @@ internal class MetalRedrawer(
     }
 
     fun finishFrame() {
-        removeFrameSubscription()
         autoreleasepool {
             currentDrawable?.let {
                 val commandBuffer = queue.commandBuffer()!!
@@ -128,9 +113,10 @@ internal class MetalLayer : CAMetalLayer {
     private lateinit var contextHandler: ContextHandler
 
     @OverrideInit
-    constructor(): super()
+    constructor() : super()
+
     @OverrideInit
-    constructor(layer: Any): super(layer)
+    constructor(layer: Any) : super(layer)
 
     fun init(
         skiaLayer: SkiaLayer,
@@ -149,7 +135,7 @@ internal class MetalLayer : CAMetalLayer {
             this.backgroundColor =
                 CGColorCreate(CGColorSpaceCreateDeviceRGB(), it.addressOf(0))
         }
-        this.opaque = false
+        this.opaque = false // For UIKit interop through a "Hole"
         skiaLayer.view?.let {
             this.frame = it.frame
             it.layer.addSublayer(this)
@@ -164,5 +150,12 @@ internal class MetalLayer : CAMetalLayer {
     override fun drawInContext(ctx: CGContextRef?) {
         contextHandler.draw()
         super.drawInContext(ctx)
+    }
+}
+
+private class FrameTickListener(val onFrameTick: () -> Unit) : NSObject() {
+    @ObjCAction
+    fun onDisplayLinkTick() {
+        onFrameTick()
     }
 }

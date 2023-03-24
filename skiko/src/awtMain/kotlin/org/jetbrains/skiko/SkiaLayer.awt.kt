@@ -163,7 +163,11 @@ actual open class SkiaLayer internal constructor(
     private var isRendering = false
 
     private fun checkShowing() {
+        val wasShowing = isShowingCached
         isShowingCached = super.isShowing()
+        if (wasShowing != isShowing) {
+            redrawer?.setVisible(isShowing)
+        }
         if (isShowing) {
             redrawer?.syncSize()
             repaint()

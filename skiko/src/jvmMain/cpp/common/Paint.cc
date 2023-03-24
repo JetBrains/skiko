@@ -155,25 +155,6 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_PaintKt__1nSetStrokeJo
     instance->setStrokeJoin(static_cast<SkPaint::Join>(join));
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PaintKt__1nGetFillPath
-  (JNIEnv* env, jclass jclass, jlong ptr, jlong srcPtr, jfloat resScale) {
-    SkPaint* instance = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(ptr));
-    SkPath* src = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(srcPtr));
-    SkPath* dst = new SkPath();
-    instance->getFillPath(*src, dst, nullptr, resScale);
-    return reinterpret_cast<jlong>(dst);
-}
-
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PaintKt__1nGetFillPathCull
-  (JNIEnv* env, jclass jclass, jlong ptr, jlong srcPtr, jfloat left, jfloat top, jfloat right, jfloat bottom, jfloat resScale) {
-    SkPaint* instance = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(ptr));
-    SkPath* src = reinterpret_cast<SkPath*>(static_cast<uintptr_t>(srcPtr));
-    SkPath* dst = new SkPath();
-    SkRect cull {left, top, right, bottom};
-    instance->getFillPath(*src, dst, &cull, resScale);
-    return reinterpret_cast<jlong>(dst);
-}
-
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_PaintKt__1nGetMaskFilter
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkPaint* instance = reinterpret_cast<SkPaint*>(static_cast<uintptr_t>(ptr));

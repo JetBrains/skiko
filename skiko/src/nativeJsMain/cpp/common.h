@@ -91,7 +91,7 @@ namespace skija {
             std::vector<SkShaper::Feature> getFeaturesFromIntsArray(KInt* featuresArray, KInt featuresLen);
         }
 
-        using ICUUText = std::unique_ptr<UText, SkFunctionWrapper<decltype(utext_close), utext_close>>;
+        using ICUUText = std::unique_ptr<UText, SkFunctionObject<utext_close>>;
         std::shared_ptr<UBreakIterator> graphemeBreakIterator(SkString& text);
     }
 
