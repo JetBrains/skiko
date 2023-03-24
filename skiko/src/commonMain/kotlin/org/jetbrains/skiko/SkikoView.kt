@@ -10,7 +10,6 @@ interface SkikoView {
     @Deprecated("This method will be removed. Use override val input: SkikoInput")
     fun onInputEvent(event: SkikoInputEvent) = Unit
     val input: SkikoInput get() = SkikoInput.Empty
-    fun onTouchEvent(events: Array<SkikoTouchEvent>) = Unit
     fun onGestureEvent(event: SkikoGestureEvent) = Unit
 
     // Rendering
@@ -42,10 +41,6 @@ open class GenericSkikoView(
 
     override fun onPointerEvent(event: SkikoPointerEvent) {
         app.onPointerEvent(event)
-    }
-
-    override fun onTouchEvent(events: Array<SkikoTouchEvent>) {
-        app.onTouchEvent(events)
     }
 
     override fun onGestureEvent(event: SkikoGestureEvent) {

@@ -8,7 +8,6 @@ import org.jetbrains.skia.PixelGeometry
 
 actual typealias SkikoGesturePlatformEvent = MotionEvent
 actual typealias SkikoPlatformPointerEvent = MotionEvent
-actual typealias SkikoTouchPlatformEvent = MotionEvent
 actual typealias SkikoPlatformInputEvent = KeyEvent
 actual typealias SkikoPlatformKeyboardEvent = KeyEvent
 

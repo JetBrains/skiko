@@ -18,6 +18,10 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
     @OverrideInit
     constructor(coder: NSCoder) : super(coder)
 
+    init {
+        multipleTouchEnabled = true
+    }
+
     private var skiaLayer: SkiaLayer? = null
     private var _inputDelegate: UITextInputDelegateProtocol? = null
     private var _currentTextMenuActions: TextActions? = null
@@ -159,32 +163,53 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
 
     override fun touchesBegan(touches: Set<*>, withEvent: UIEvent?) {
         super.touchesBegan(touches, withEvent)
-        sendTouchEventToSkikoView(touches, SkikoTouchEventKind.STARTED)
+        sendTouchEventToSkikoView(withEvent!!, SkikoPointerEventKind.DOWN)
     }
 
     override fun touchesEnded(touches: Set<*>, withEvent: UIEvent?) {
         super.touchesEnded(touches, withEvent)
-        sendTouchEventToSkikoView(touches, SkikoTouchEventKind.ENDED)
+        sendTouchEventToSkikoView(withEvent!!, SkikoPointerEventKind.UP)
     }
 
     override fun touchesMoved(touches: Set<*>, withEvent: UIEvent?) {
         super.touchesMoved(touches, withEvent)
-        sendTouchEventToSkikoView(touches, SkikoTouchEventKind.MOVED)
+        sendTouchEventToSkikoView(withEvent!!, SkikoPointerEventKind.MOVE)
     }
 
     override fun touchesCancelled(touches: Set<*>, withEvent: UIEvent?) {
         super.touchesCancelled(touches, withEvent)
-        sendTouchEventToSkikoView(touches, SkikoTouchEventKind.CANCELLED)
+        sendTouchEventToSkikoView(withEvent!!, SkikoPointerEventKind.UP)
     }
 
-    private fun sendTouchEventToSkikoView(touches: Set<*>, kind: SkikoTouchEventKind) {
-        val events = touches.map {
-            val event = it as UITouch
-            val (x, y) = event.locationInView(null).useContents { x to y }
-            val timestamp = (event.timestamp * 1_000).toLong()
-            SkikoTouchEvent(x, y, kind, timestamp, event)
-        }.toTypedArray()
-        skiaLayer?.skikoView?.onTouchEvent(events)
+    private fun sendTouchEventToSkikoView(event: UIEvent, kind: SkikoPointerEventKind) {
+        val pointers = event.touchesForView(this).orEmpty().map {
+            val touch = it as UITouch
+            val (x, y) = touch.locationInView(null).useContents { x to y }
+            SkikoPointer(
+                x = x,
+                y = y,
+                pressed = touch.phase != UITouchPhase.UITouchPhaseEnded &&
+                        touch.phase != UITouchPhase.UITouchPhaseCancelled,
+                device = SkikoPointerDevice.TOUCH,
+                id = touch.hashCode().toLong(),
+                pressure = touch.force
+            )
+        }
+
+        val x = pointers.asSequence().map { it.x }.average()
+        val y = pointers.asSequence().map { it.y }.average()
+        skiaLayer?.skikoView?.onPointerEvent(
+            SkikoPointerEvent(
+                x = x,
+                y = y,
+                kind = kind,
+                deltaX = 0.0,
+                deltaY = 0.0,
+                timestamp = (event.timestamp * 1_000).toLong(),
+                pointers = pointers,
+                platform = event
+            )
+        )
     }
 
     override fun inputDelegate(): UITextInputDelegateProtocol? {

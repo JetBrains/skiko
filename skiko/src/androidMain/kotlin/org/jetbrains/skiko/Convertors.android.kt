@@ -48,21 +48,37 @@ private fun toSkikoModifiers(event: KeyEvent): SkikoInputModifiers {
     return SkikoInputModifiers(result)
 }
 
-fun toSkikoTouchEvent(event: MotionEvent, index: Int, density: Float): SkikoTouchEvent {
-    return SkikoTouchEvent(
-        x = (event.getX(index) / density).toDouble(),
-        y = (event.getY(index) / density).toDouble(),
-        timestamp = event.getEventTime(),
-        kind = toSkikoTouchEventKind(event),
-        platform = event
-    )
-}
+fun toSkikoPointerEvent(event: MotionEvent, density: Float): SkikoPointerEvent {
+    val upIndex = when (event.action) {
+        MotionEvent.ACTION_UP -> 0
+        MotionEvent.ACTION_POINTER_UP -> event.actionIndex
+        else -> -1
+    }
 
-fun toSkikoGestureEvent(event: MotionEvent, density: Float): SkikoGestureEvent {
-    return SkikoGestureEvent(
-        x = (event.x / density).toDouble(),
-        y = (event.y / density).toDouble(),
-        kind = toSkikoGestureEventKind(event),
+    val pointers = (0 until event.pointerCount).map {
+        SkikoPointer(
+            x = event.getX(it).toDouble() / density,
+            y = event.getY(it).toDouble() / density,
+            // Same as in Jetpack Compose for Android
+            // https://github.com/androidx/androidx/blob/58597f0eba31b89f57b6605b7ed4977cd48ed38d/compose/ui/ui/src/androidMain/kotlin/androidx/compose/ui/input/pointer/MotionEventAdapter.android.kt#L126
+            // (we don't support Mouse for Android yet, so we don't check hover)
+            pressed = it != upIndex,
+            device = SkikoPointerDevice.TOUCH,
+            id = event.getPointerId(it).toLong(),
+            pressure = event.getPressure(it).toDouble()
+        )
+    }
+
+    val x = pointers.asSequence().map { it.x }.average()
+    val y = pointers.asSequence().map { it.y }.average()
+    return SkikoPointerEvent(
+        x = x,
+        y = y,
+        kind = toSkikoPointerEventKind(event),
+        deltaX = 0.0,
+        deltaY = 0.0,
+        timestamp = event.eventTime,
+        pointers = pointers,
         platform = event
     )
 }
@@ -114,14 +130,14 @@ internal fun toSkikoGestureDirection(
     return SkikoGestureEventDirection.UNKNOWN
 }
 
-private fun toSkikoTouchEventKind(event: MotionEvent): SkikoTouchEventKind {
+internal fun toSkikoPointerEventKind(event: MotionEvent): SkikoPointerEventKind {
     return when (event.action) {
         MotionEvent.ACTION_POINTER_DOWN,
-        MotionEvent.ACTION_DOWN -> SkikoTouchEventKind.STARTED
+        MotionEvent.ACTION_DOWN -> SkikoPointerEventKind.DOWN
         MotionEvent.ACTION_POINTER_UP,
-        MotionEvent.ACTION_UP -> SkikoTouchEventKind.ENDED
-        MotionEvent.ACTION_MOVE -> SkikoTouchEventKind.MOVED
-        else -> SkikoTouchEventKind.UNKNOWN
+        MotionEvent.ACTION_UP -> SkikoPointerEventKind.UP
+        MotionEvent.ACTION_MOVE -> SkikoPointerEventKind.MOVE
+        else -> SkikoPointerEventKind.UNKNOWN
     }
 }
 

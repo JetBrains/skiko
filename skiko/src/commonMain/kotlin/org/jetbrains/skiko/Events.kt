@@ -116,18 +116,6 @@ data class SkikoGestureEvent(
     val platform: SkikoGesturePlatformEvent? = null
 )
 
-enum class SkikoTouchEventKind {
-    STARTED, ENDED, MOVED, CANCELLED, UNKNOWN
-}
-expect class SkikoTouchPlatformEvent
-data class SkikoTouchEvent(
-    val x: Double,
-    val y: Double,
-    val kind: SkikoTouchEventKind = SkikoTouchEventKind.UNKNOWN,
-    val timestamp: Long = 0,
-    val platform: SkikoTouchPlatformEvent? = null
-)
-
 expect class SkikoPlatformInputEvent
 data class SkikoInputEvent(
     val input: String,
@@ -154,17 +142,37 @@ enum class SkikoPointerEventKind {
 }
 
 expect class SkikoPlatformPointerEvent
+
+// TODO(https://github.com/JetBrains/skiko/issues/680) refactor API
 data class SkikoPointerEvent(
+    /**
+     * X position in points (scaled pixels that depend on the scale factor of the current display)
+     */
     val x: Double,
+    /**
+     * Y position in points (scaled pixels that depend on the scale factor of the current display)
+     */
     val y: Double,
+    val kind: SkikoPointerEventKind,
+    /**
+     * Scroll delta along the X axis
+     */
     val deltaX: Double = 0.0,
+    /**
+     * Scroll delta along the Y axis
+     */
     val deltaY: Double = 0.0,
     val pressedButtons: SkikoMouseButtons = SkikoMouseButtons.NONE,
     val button: SkikoMouseButtons = SkikoMouseButtons.NONE,
     val modifiers: SkikoInputModifiers = SkikoInputModifiers.EMPTY,
-    val kind: SkikoPointerEventKind,
+    /**
+     * Timestamp in milliseconds
+     */
     val timestamp: Long = 0,
-    val platform: SkikoPlatformPointerEvent?
+    val pointers: List<SkikoPointer> = listOf(
+        SkikoPointer(x, y, pressedButtons.has(SkikoMouseButtons.LEFT))
+    ),
+    val platform: SkikoPlatformPointerEvent? = null
 )
 
 val SkikoPointerEvent.isLeftClick: Boolean
@@ -176,3 +184,48 @@ val SkikoPointerEvent.isRightClick: Boolean
 val SkikoPointerEvent.isMiddleClick: Boolean
     get() = button.has(SkikoMouseButtons.MIDDLE) && (kind == SkikoPointerEventKind.UP)
 
+/**
+ * The device type that produces pointer events, such as a mouse or stylus.
+ */
+enum class SkikoPointerDevice {
+    MOUSE, TOUCH, UNKNOWN
+}
+
+/**
+ * Represents pointer such as mouse cursor, or touch/stylus press.
+ * There can be multiple pointers on the screen at the same time.
+ */
+data class SkikoPointer(
+    /**
+     * X position in points (scaled pixels that depend on the scale factor of the current display)
+     */
+    val x: Double,
+    /**
+     * Y position in points (scaled pixels that depend on the scale factor of the current display)
+     */
+    val y: Double,
+
+    /**
+     * `true` if the pointer event is considered "pressed." For example, finger
+     *  touching the screen or a mouse button is pressed [pressed] would be `true`.
+     *  During the up event, pointer is considered not pressed.
+     */
+    val pressed: Boolean,
+
+    /**
+     * The device type associated with the pointer, such as [mouse][SkikoPointerDevice.MOUSE],
+     * or [touch][SkikoPointerDevice.TOUCH].
+     */
+    val device: SkikoPointerDevice = SkikoPointerDevice.MOUSE,
+
+    /**
+     * Unique id associated with the pointer. Used to distinguish between multiple pointers that can exist
+     * at the same time (i.e. multiple pressed touches).
+     */
+    val id: Long = 0,
+
+    /**
+     * Pressure of the pointer. 0.0 - no pressure, 1.0 - average pressure
+     */
+    val pressure: Double = 1.0,
+)

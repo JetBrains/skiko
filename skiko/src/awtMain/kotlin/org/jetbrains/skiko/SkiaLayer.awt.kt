@@ -664,7 +664,6 @@ internal fun defaultFPSCounter(
 }
 
 // InputEvent is abstract, so we wrap to match modality.
-actual typealias SkikoTouchPlatformEvent = Any
 actual typealias SkikoGesturePlatformEvent = Any
 actual typealias SkikoPlatformInputEvent = Any
 actual typealias SkikoPlatformKeyboardEvent = KeyEvent
