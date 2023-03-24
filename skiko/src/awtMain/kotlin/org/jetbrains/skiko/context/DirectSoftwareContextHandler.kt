@@ -26,7 +26,7 @@ internal class DirectSoftwareContextHandler(layer: SkiaLayer) : JvmContextHandle
     override fun initContext(): Boolean {
         if (!isInited) {
             if (System.getProperty("skiko.hardwareInfo.enabled") == "true") {
-                Logger.info("Renderer info:\n ${rendererInfo()}")
+                Logger.info { "Renderer info:\n ${rendererInfo()}" }
             }
             isInited = true
         }

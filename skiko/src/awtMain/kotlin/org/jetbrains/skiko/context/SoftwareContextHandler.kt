@@ -39,7 +39,7 @@ internal class SoftwareContextHandler(layer: SkiaLayer) : JvmContextHandler(laye
         // Raster does not need context
         if (!isInited) {
             if (System.getProperty("skiko.hardwareInfo.enabled") == "true") {
-                Logger.info("Renderer info:\n ${rendererInfo()}")
+                Logger.info { "Renderer info:\n ${rendererInfo()}" }
             }
             isInited = true
         }

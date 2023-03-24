@@ -15,11 +15,11 @@ internal class MetalContextHandler(layer: SkiaLayer) : JvmContextHandler(layer) 
             if (context == null) {
                 context = metalRedrawer.makeContext()
                 if (System.getProperty("skiko.hardwareInfo.enabled") == "true") {
-                    Logger.info("Renderer info:\n ${rendererInfo()}")
+                    Logger.info { "Renderer info:\n ${rendererInfo()}" }
                 }
             }
         } catch (e: Exception) {
-            Logger.warn("${e.message}\nFailed to create Skia Metal context!")
+            Logger.warn(e) { "Failed to create Skia Metal context!" }
             return false
         }
         return true
