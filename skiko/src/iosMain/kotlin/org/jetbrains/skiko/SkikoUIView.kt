@@ -170,6 +170,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol, org.jetbrai
      */
 //    // see https://youtrack.jetbrains.com/issue/KT-40426/Incorrect-Objective-C-extensions-importing-that-prevents-UIKit-usage#focus=Comments-27-5208687.0-0
     override fun pointInside(point: CValue<CGPoint>, withEvent: UIEvent?): Boolean {
+        println("SkikoUIView pointInside")
         val skiaPoint:Point = point.useContents { Point(x.toFloat(), y.toFloat()) }
         return hitTest(skiaPoint, withEvent)
     }

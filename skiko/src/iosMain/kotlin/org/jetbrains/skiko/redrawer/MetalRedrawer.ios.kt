@@ -24,7 +24,7 @@ import platform.darwin.NSObject
 internal class MetalRedrawer(
     private val layer: SkiaLayer
 ) : Redrawer {
-    private val contextHandler = MetalContextHandler(layer)
+    internal val contextHandler = MetalContextHandler(layer)
     override val renderInfo: String get() = contextHandler.rendererInfo()
 
     private var isDisposed = false
