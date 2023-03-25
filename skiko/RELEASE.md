@@ -19,9 +19,14 @@ build configuration.
 
 ## Publishing
 
-##### Publish to Maven local
+##### Publish JVM target to Maven local
 ```
 ./gradlew publishToMavenLocal
+```
+
+##### Publish all targets to Maven Local
+```
+./gradlew publishToMavenLocal -Pskiko.native.enabled=true -Pskiko.wasm.enabled=true -Pskiko.android.enabled=true
 ```
 
 ##### Publish to `build/repo` directory

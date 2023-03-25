@@ -443,9 +443,8 @@ fun configureNativeTarget(os: OS, arch: Arch, target: KotlinNativeTarget) {
     if (os == OS.IOS) { //todo temp
         target.compilations.getByName("main") {
             val uikit by cinterops.creating {
-                defFile("src/iosInterop/cinterop/ios.def")
+                defFile("src/iosMain/objc/ios.def")
                 packageName("org.jetbrains.skiko.objc")
-//                    includeDirs()
             }
         }
     }
