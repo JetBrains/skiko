@@ -111,7 +111,6 @@ actual open class SkiaLayer {
 
     actual val pixelGeometry: PixelGeometry
         get() = PixelGeometry.UNKNOWN
-
 }
 
 // TODO: do properly
