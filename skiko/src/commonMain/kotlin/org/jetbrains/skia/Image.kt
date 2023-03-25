@@ -118,18 +118,6 @@ class Image internal constructor(ptr: NativePointer) : RefCnt(ptr), IHasImageInf
             }
         }
 
-        fun makeFromBackendTexture(context: DirectContext, backendTexture: GrBackendTexture): Image {
-            return try {
-                Stats.onNativeCall()
-                val ptr =
-                    _nMakeFromBackendTexture(getPtr(context), getPtr(backendTexture))
-                if (ptr == NullPointer) throw RuntimeException("Failed to Image::makeFromBackendTexture ")//todo print args
-                Image(ptr)
-            } finally {
-//                reachabilityBarrier(context)//todo
-            }
-        }
-
         fun makeFromPixmap(pixmap: Pixmap): Image {
             return try {
                 Stats.onNativeCall()
@@ -430,9 +418,6 @@ private external fun _nMakeFromBitmap(bitmapPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeFromPixmap")
 private external fun _nMakeFromPixmap(pixmapPtr: NativePointer): NativePointer
-
-@ExternalSymbolName("org_jetbrains_skia_Image__1nMakeFromBackendTexture3")
-private external fun _nMakeFromBackendTexture(directContext: NativePointer, backendTexture: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Image__1nMakeFromEncoded")
 private external fun _nMakeFromEncoded(bytes: InteropPointer, encodedLength: Int): NativePointer

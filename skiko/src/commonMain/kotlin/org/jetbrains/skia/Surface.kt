@@ -5,9 +5,6 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skiko.RenderException
 
 class Surface : RefCnt {
-    init {
-//        println("init Surface")
-    }
     companion object {
         fun makeRasterDirect(pixmap: Pixmap): Surface {
             return makeRasterDirect(pixmap, null)

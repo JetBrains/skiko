@@ -1,8 +1,6 @@
 #include <iostream>
 #include "SkData.h"
 #include "SkImage.h"
-#include "GrBackendSurface.h"
-#include "SkCanvas.h"
 #include "SkBitmap.h"
 #include "common.h"
 
@@ -126,18 +124,4 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_Image__1nScalePixels
     SkPixmap* pixmap = reinterpret_cast<SkPixmap*>((pixmapPtr));
     auto cachingHint = cache ? SkImage::CachingHint::kAllow_CachingHint : SkImage::CachingHint::kDisallow_CachingHint;
     return instance->scalePixels(*pixmap, skija::SamplingMode::unpackFrom2Ints(samplingOptionsVal1, samplingOptionsVal2), cachingHint);
-}
-
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nMakeFromBackendTexture3
-        (KNativePointer directContextPtr, KNativePointer backendTexturePtr) {
-    GrRecordingContext *dContext = reinterpret_cast<GrRecordingContext *>((directContextPtr));
-    GrBackendTexture *backendTexture = reinterpret_cast<GrBackendTexture *>((backendTexturePtr));
-//    return reinterpret_cast<KNativePointer>(canvas->recordingContext());//todo null
-    sk_sp<SkImage> image = SkImage::MakeFromTexture(dContext,
-            *backendTexture,
-            kBottomLeft_GrSurfaceOrigin/*kTopLeft_GrSurfaceOrigin*/,
-            kRGBA_8888_SkColorType,
-            kOpaque_SkAlphaType,
-            nullptr);
-    return reinterpret_cast<KNativePointer>(image.release());
 }
