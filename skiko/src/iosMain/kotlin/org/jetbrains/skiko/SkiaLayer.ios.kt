@@ -112,9 +112,6 @@ actual open class SkiaLayer {
     actual val pixelGeometry: PixelGeometry
         get() = PixelGeometry.UNKNOWN
 
-    fun backendTextureToImage(texture: GrBackendTexture): Image? {
-        return redrawer?.contextHandler?.backendTextureToImage(texture)
-    }
 }
 
 // TODO: do properly

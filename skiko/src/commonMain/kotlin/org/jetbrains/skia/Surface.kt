@@ -653,7 +653,6 @@ class Surface : RefCnt {
      */
     val canvas: Canvas
         get() = try {
-//            println("get canvas")
             Stats.onNativeCall()
             val ptr = _nGetCanvas(_ptr)
             if (ptr == NullPointer) throw IllegalArgumentException() else Canvas(ptr, false, this)
