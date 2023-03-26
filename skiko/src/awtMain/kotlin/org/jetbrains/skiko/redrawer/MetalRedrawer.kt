@@ -127,16 +127,16 @@ internal class MetalRedrawer(
         val rootPane = getRootPane(layer)
         val globalPosition = convertPoint(layer, layer.x, layer.y, rootPane)
         setContentScale(device, layer.contentScale)
-        resizeLayers(
-            device,
-            globalPosition.x,
-            rootPane.height - globalPosition.y - layer.height,
-            layer.width.coerceAtLeast(0),
-            layer.height.coerceAtLeast(0)
-        )
+        val x = globalPosition.x
+        val y = rootPane.height - globalPosition.y - layer.height
+        val width = layer.width.coerceAtLeast(0)
+        val height = layer.height.coerceAtLeast(0)
+        Logger.debug { "MetalRedrawer#resizeLayers $this $x $y $width $height" }
+        resizeLayers(device, x, y, width, height)
     }
 
     override fun setVisible(isVisible: Boolean) {
+        Logger.debug { "MetalRedrawer#setVisible $this $isVisible" }
         setLayerVisible(device, isVisible)
     }
 
