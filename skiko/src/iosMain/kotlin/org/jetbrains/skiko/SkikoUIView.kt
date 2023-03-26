@@ -11,7 +11,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 /*
-todo remove org.jetbrains.skiko.objc.UIViewExtensionProtocol after Kotlin 1.8.20
+ TODO: remove org.jetbrains.skiko.objc.UIViewExtensionProtocol after Kotlin 1.8.20
  https://youtrack.jetbrains.com/issue/KT-40426
 */
 @Suppress("CONFLICTING_OVERLOADS")
@@ -173,7 +173,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
      * https://developer.apple.com/documentation/uikit/uiview/1622533-point
      */
     override fun pointInside(point: CValue<CGPoint>, withEvent: UIEvent?): Boolean {
-        val skiaPoint:Point = point.useContents { Point(x.toFloat(), y.toFloat()) }
+        val skiaPoint: Point = point.useContents { Point(x.toFloat(), y.toFloat()) }
         return _pointInside(skiaPoint, withEvent)
     }
 
