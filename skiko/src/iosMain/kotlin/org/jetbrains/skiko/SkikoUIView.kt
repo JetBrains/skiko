@@ -18,11 +18,14 @@ import kotlin.math.min
 @ExportObjCClass
 class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
     org.jetbrains.skiko.objc.UIViewExtensionProtocol {
+
+    @Deprecated("use SkikoUIView constructor with skiaLayer", level = DeprecationLevel.ERROR)
     @OverrideInit
     constructor(frame: CValue<CGRect>) {
         error("use SkikoUIView constructor with skiaLayer")
     }
 
+    @Deprecated("use SkikoUIView constructor with skiaLayer", level = DeprecationLevel.ERROR)
     @OverrideInit
     constructor(coder: NSCoder) {
         error("use SkikoUIView constructor with skiaLayer")
