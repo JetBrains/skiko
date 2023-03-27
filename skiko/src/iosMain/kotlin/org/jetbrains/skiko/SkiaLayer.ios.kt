@@ -7,6 +7,7 @@ import org.jetbrains.skiko.context.MetalContextHandler
 import org.jetbrains.skiko.redrawer.MetalRedrawer
 import platform.UIKit.*
 import kotlin.system.getTimeNanos
+import org.jetbrains.skia.*
 
 actual open class SkiaLayer {
 

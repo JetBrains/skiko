@@ -1,6 +1,7 @@
 package org.jetbrains.skiko
 
 import kotlinx.cinterop.*
+import org.jetbrains.skia.Point
 import org.jetbrains.skia.Rect
 import platform.CoreGraphics.*
 import platform.Foundation.*
@@ -9,9 +10,14 @@ import platform.darwin.NSInteger
 import kotlin.math.max
 import kotlin.math.min
 
+/*
+ TODO: remove org.jetbrains.skiko.objc.UIViewExtensionProtocol after Kotlin 1.8.20
+ https://youtrack.jetbrains.com/issue/KT-40426
+*/
 @Suppress("CONFLICTING_OVERLOADS")
 @ExportObjCClass
-class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
+class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
+    org.jetbrains.skiko.objc.UIViewExtensionProtocol {
     @OverrideInit
     constructor(frame: CValue<CGRect>) : super(frame)
 
@@ -19,6 +25,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
     constructor(coder: NSCoder) : super(coder)
 
     private var skiaLayer: SkiaLayer? = null
+    private lateinit var _pointInside: (Point, UIEvent?) -> Boolean
     private var _inputDelegate: UITextInputDelegateProtocol? = null
     private var _currentTextMenuActions: TextActions? = null
     var currentKeyboardType: UIKeyboardType = UIKeyboardTypeDefault
@@ -30,8 +37,13 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
     var currentAutocapitalizationType: UITextAutocapitalizationType = UITextAutocapitalizationType.UITextAutocapitalizationTypeSentences
     var currentAutocorrectionType: UITextAutocorrectionType = UITextAutocorrectionType.UITextAutocorrectionTypeYes
 
-    constructor(skiaLayer: SkiaLayer, frame: CValue<CGRect> = CGRectNull.readValue()) : super(frame) {
+    constructor(
+        skiaLayer: SkiaLayer,
+        frame: CValue<CGRect> = CGRectNull.readValue(),
+        pointInside: (Point, UIEvent?) -> Boolean = {_,_-> true }
+    ) : super(frame) {
         this.skiaLayer = skiaLayer
+        _pointInside = pointInside
     }
 
     /**
@@ -155,6 +167,14 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
             }
         }
         super.pressesEnded(presses, withEvent)
+    }
+
+    /**
+     * https://developer.apple.com/documentation/uikit/uiview/1622533-point
+     */
+    override fun pointInside(point: CValue<CGPoint>, withEvent: UIEvent?): Boolean {
+        val skiaPoint: Point = point.useContents { Point(x.toFloat(), y.toFloat()) }
+        return _pointInside(skiaPoint, withEvent)
     }
 
     override fun touchesBegan(touches: Set<*>, withEvent: UIEvent?) {
