@@ -6,9 +6,12 @@ import org.jetbrains.skia.util.imageFromIntArray
 import org.jetbrains.skiko.tests.SkipJsTarget
 import org.jetbrains.skiko.tests.SkipNativeTarget
 import org.jetbrains.skiko.tests.runTest
+import org.jetbrains.skiko.util.IMAGE_COLORS_8X8
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertTrue
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTime
 
 class CanvasTest {
     @Test
@@ -188,5 +191,20 @@ class CanvasTest {
         )
 
         assertContentSame(expected = expected, got = surface.makeImageSnapshot(), sensitivity = 0.25)
+    }
+
+    @OptIn(ExperimentalTime::class)
+    @Test
+    fun drawImage() = runTest {
+        val raw = Data.makeFromResource("./k2.png")
+        assertTrue(raw.bytes.isNotEmpty())
+        val img = Image.makeFromEncoded(raw.bytes)
+        println("H = ${img.height}, W = ${img.width}")
+        val surface = Surface.makeRasterN32Premul(1200, 700)
+        measureTime {
+            surface.canvas.drawImage(img, 0f, 0f)
+        }.also {
+            println("\ndrawImage took ${it.inWholeMilliseconds}ms")
+        }
     }
 }
