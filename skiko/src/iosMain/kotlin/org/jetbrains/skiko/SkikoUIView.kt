@@ -188,8 +188,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
             SkikoPointer(
                 x = x,
                 y = y,
-                pressed = touch.phase != UITouchPhase.UITouchPhaseEnded &&
-                        touch.phase != UITouchPhase.UITouchPhaseCancelled,
+                pressed = touch.isPressed,
                 device = SkikoPointerDevice.TOUCH,
                 id = touch.hashCode().toLong(),
                 pressure = touch.force
@@ -203,14 +202,16 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
                 x = x,
                 y = y,
                 kind = kind,
-                deltaX = 0.0,
-                deltaY = 0.0,
                 timestamp = (event.timestamp * 1_000).toLong(),
                 pointers = pointers,
                 platform = event
             )
         )
     }
+
+    private val UITouch.isPressed get() =
+        phase != UITouchPhase.UITouchPhaseEnded &&
+            phase != UITouchPhase.UITouchPhaseCancelled
 
     override fun inputDelegate(): UITextInputDelegateProtocol? {
         return _inputDelegate

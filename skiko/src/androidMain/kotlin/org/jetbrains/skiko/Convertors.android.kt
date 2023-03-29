@@ -2,6 +2,7 @@ package org.jetbrains.skiko
 
 import android.view.MotionEvent
 import android.view.KeyEvent
+import org.jetbrains.skia.Point
 import kotlin.math.abs
 
 fun toSkikoKeyboardEvent(
@@ -61,7 +62,7 @@ fun toSkikoPointerEvent(event: MotionEvent, density: Float): SkikoPointerEvent {
             y = event.getY(it).toDouble() / density,
             // Same as in Jetpack Compose for Android
             // https://github.com/androidx/androidx/blob/58597f0eba31b89f57b6605b7ed4977cd48ed38d/compose/ui/ui/src/androidMain/kotlin/androidx/compose/ui/input/pointer/MotionEventAdapter.android.kt#L126
-            // (we don't support Mouse for Android yet, so we don't check hover)
+            // (Mouse isn't supported for Android yet, so hover cannot be checked)
             pressed = it != upIndex,
             device = SkikoPointerDevice.TOUCH,
             id = event.getPointerId(it).toLong(),
@@ -75,8 +76,6 @@ fun toSkikoPointerEvent(event: MotionEvent, density: Float): SkikoPointerEvent {
         x = x,
         y = y,
         kind = toSkikoPointerEventKind(event),
-        deltaX = 0.0,
-        deltaY = 0.0,
         timestamp = event.eventTime,
         pointers = pointers,
         platform = event

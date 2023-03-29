@@ -95,13 +95,13 @@ value class SkikoInputModifiers(val value: Int) {
 }
 
 enum class SkikoGestureEventKind {
-    TAP, DOUBLETAP, LONGPRESS, PAN, PINCH, ROTATION, SWIPE, UNKNOWN
+    UNKNOWN, TAP, DOUBLETAP, LONGPRESS, PAN, PINCH, ROTATION, SWIPE
 }
 enum class SkikoGestureEventDirection {
-    UP, DOWN, LEFT, RIGHT, UNKNOWN
+    UNKNOWN, UP, DOWN, LEFT, RIGHT
 }
 enum class SkikoGestureEventState {
-    PRESSED, STARTED, CHANGED, ENDED, UNKNOWN
+    UNKNOWN, PRESSED, STARTED, CHANGED, ENDED
 }
 expect class SkikoGesturePlatformEvent
 data class SkikoGestureEvent(
@@ -126,7 +126,7 @@ data class SkikoInputEvent(
 )
 
 enum class SkikoKeyboardEventKind {
-    UP, DOWN, TYPE, UNKNOWN
+    UNKNOWN, UP, DOWN, TYPE
 }
 expect class SkikoPlatformKeyboardEvent
 data class SkikoKeyboardEvent(
@@ -138,7 +138,7 @@ data class SkikoKeyboardEvent(
 )
 
 enum class SkikoPointerEventKind {
-    UP, DOWN, MOVE, DRAG, SCROLL, ENTER, EXIT, UNKNOWN
+    UNKNOWN, UP, DOWN, MOVE, DRAG, SCROLL, ENTER, EXIT
 }
 
 expect class SkikoPlatformPointerEvent
@@ -146,11 +146,15 @@ expect class SkikoPlatformPointerEvent
 // TODO(https://github.com/JetBrains/skiko/issues/680) refactor API
 data class SkikoPointerEvent(
     /**
-     * X position in points (scaled pixels that depend on the scale factor of the current display)
+     * X position in points (scaled pixels that depend on the scale factor of the current display).
+     *
+     * If the event contains multiple pointers, it represents the center of all pointers.
      */
     val x: Double,
     /**
      * Y position in points (scaled pixels that depend on the scale factor of the current display)
+     *
+     * If the event contains multiple pointers, it represents the center of all pointers.
      */
     val y: Double,
     val kind: SkikoPointerEventKind,
@@ -188,7 +192,7 @@ val SkikoPointerEvent.isMiddleClick: Boolean
  * The device type that produces pointer events, such as a mouse or stylus.
  */
 enum class SkikoPointerDevice {
-    MOUSE, TOUCH, UNKNOWN
+    UNKNOWN, MOUSE, TOUCH
 }
 
 /**
@@ -221,6 +225,9 @@ data class SkikoPointer(
     /**
      * Unique id associated with the pointer. Used to distinguish between multiple pointers that can exist
      * at the same time (i.e. multiple pressed touches).
+     *
+     * If there is only on pointer in the system (for example, one mouse), it should always
+     * have the same id across multiple events.
      */
     val id: Long = 0,
 
