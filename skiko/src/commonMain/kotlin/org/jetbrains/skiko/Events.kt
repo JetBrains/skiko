@@ -201,6 +201,15 @@ enum class SkikoPointerDevice {
  */
 data class SkikoPointer(
     /**
+     * Unique id associated with the pointer. Used to distinguish between multiple pointers that can exist
+     * at the same time (i.e. multiple pressed touches).
+     *
+     * If there is only on pointer in the system (for example, one mouse), it should always
+     * have the same id across multiple events.
+     */
+    val id: Long,
+
+    /**
      * X position in points (scaled pixels that depend on the scale factor of the current display)
      */
     val x: Double,
@@ -221,15 +230,6 @@ data class SkikoPointer(
      * or [touch][SkikoPointerDevice.TOUCH].
      */
     val device: SkikoPointerDevice = SkikoPointerDevice.MOUSE,
-
-    /**
-     * Unique id associated with the pointer. Used to distinguish between multiple pointers that can exist
-     * at the same time (i.e. multiple pressed touches).
-     *
-     * If there is only on pointer in the system (for example, one mouse), it should always
-     * have the same id across multiple events.
-     */
-    val id: Long = 0,
 
     /**
      * Pressure of the pointer. 0.0 - no pressure, 1.0 - average pressure
