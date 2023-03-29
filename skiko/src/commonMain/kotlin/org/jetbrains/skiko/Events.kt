@@ -174,7 +174,7 @@ data class SkikoPointerEvent(
      */
     val timestamp: Long = 0,
     val pointers: List<SkikoPointer> = listOf(
-        SkikoPointer(x, y, pressedButtons.has(SkikoMouseButtons.LEFT))
+        SkikoPointer(0, x, y, pressedButtons.has(SkikoMouseButtons.LEFT))
     ),
     val platform: SkikoPlatformPointerEvent? = null
 )
