@@ -114,7 +114,6 @@ actual open class SkiaLayer {
 }
 
 // TODO: do properly
-actual typealias SkikoTouchPlatformEvent = UITouch
 actual typealias SkikoGesturePlatformEvent = UIEvent
 actual typealias SkikoPlatformInputEvent = UIPress
 actual typealias SkikoPlatformKeyboardEvent = UIPress

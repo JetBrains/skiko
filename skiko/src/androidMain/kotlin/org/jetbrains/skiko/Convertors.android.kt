@@ -13,7 +13,7 @@ fun toSkikoKeyboardEvent(
         key = SkikoKey.valueOf(keyCode),
         modifiers = toSkikoModifiers(event),
         kind = kind,
-        timestamp = event.getEventTime(),
+        timestamp = event.eventTime,
         platform = event
     )
 }
@@ -48,21 +48,33 @@ private fun toSkikoModifiers(event: KeyEvent): SkikoInputModifiers {
     return SkikoInputModifiers(result)
 }
 
-fun toSkikoTouchEvent(event: MotionEvent, index: Int, density: Float): SkikoTouchEvent {
-    return SkikoTouchEvent(
-        x = (event.getX(index) / density).toDouble(),
-        y = (event.getY(index) / density).toDouble(),
-        timestamp = event.getEventTime(),
-        kind = toSkikoTouchEventKind(event),
-        platform = event
-    )
-}
+fun toSkikoPointerEvent(event: MotionEvent, density: Float): SkikoPointerEvent {
+    val upIndex = when (event.action) {
+        MotionEvent.ACTION_UP -> 0
+        MotionEvent.ACTION_POINTER_UP -> event.actionIndex
+        else -> -1
+    }
 
-fun toSkikoGestureEvent(event: MotionEvent, density: Float): SkikoGestureEvent {
-    return SkikoGestureEvent(
-        x = (event.x / density).toDouble(),
-        y = (event.y / density).toDouble(),
-        kind = toSkikoGestureEventKind(event),
+    val pointers = (0 until event.pointerCount).map {
+        SkikoPointer(
+            x = event.getX(it).toDouble() / density,
+            y = event.getY(it).toDouble() / density,
+            // Same as in Jetpack Compose for Android
+            // https://github.com/androidx/androidx/blob/58597f0eba31b89f57b6605b7ed4977cd48ed38d/compose/ui/ui/src/androidMain/kotlin/androidx/compose/ui/input/pointer/MotionEventAdapter.android.kt#L126
+            // (Mouse isn't supported for Android yet, so hover cannot be checked)
+            pressed = it != upIndex,
+            device = SkikoPointerDevice.TOUCH,
+            id = event.getPointerId(it).toLong(),
+            pressure = event.getPressure(it).toDouble()
+        )
+    }
+
+    return SkikoPointerEvent(
+        x = pointers.centroidX,
+        y = pointers.centroidY,
+        kind = toSkikoPointerEventKind(event),
+        timestamp = event.eventTime,
+        pointers = pointers,
         platform = event
     )
 }
@@ -114,14 +126,14 @@ internal fun toSkikoGestureDirection(
     return SkikoGestureEventDirection.UNKNOWN
 }
 
-private fun toSkikoTouchEventKind(event: MotionEvent): SkikoTouchEventKind {
+internal fun toSkikoPointerEventKind(event: MotionEvent): SkikoPointerEventKind {
     return when (event.action) {
         MotionEvent.ACTION_POINTER_DOWN,
-        MotionEvent.ACTION_DOWN -> SkikoTouchEventKind.STARTED
+        MotionEvent.ACTION_DOWN -> SkikoPointerEventKind.DOWN
         MotionEvent.ACTION_POINTER_UP,
-        MotionEvent.ACTION_UP -> SkikoTouchEventKind.ENDED
-        MotionEvent.ACTION_MOVE -> SkikoTouchEventKind.MOVED
-        else -> SkikoTouchEventKind.UNKNOWN
+        MotionEvent.ACTION_UP -> SkikoPointerEventKind.UP
+        MotionEvent.ACTION_MOVE -> SkikoPointerEventKind.MOVE
+        else -> SkikoPointerEventKind.UNKNOWN
     }
 }
 
