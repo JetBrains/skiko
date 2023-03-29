@@ -2,7 +2,6 @@ package org.jetbrains.skiko
 
 import android.view.MotionEvent
 import android.view.KeyEvent
-import org.jetbrains.skia.Point
 import kotlin.math.abs
 
 fun toSkikoKeyboardEvent(
@@ -14,7 +13,7 @@ fun toSkikoKeyboardEvent(
         key = SkikoKey.valueOf(keyCode),
         modifiers = toSkikoModifiers(event),
         kind = kind,
-        timestamp = event.getEventTime(),
+        timestamp = event.eventTime,
         platform = event
     )
 }
@@ -70,11 +69,9 @@ fun toSkikoPointerEvent(event: MotionEvent, density: Float): SkikoPointerEvent {
         )
     }
 
-    val x = pointers.asSequence().map { it.x }.average()
-    val y = pointers.asSequence().map { it.y }.average()
     return SkikoPointerEvent(
-        x = x,
-        y = y,
+        x = pointers.centroidX,
+        y = pointers.centroidY,
         kind = toSkikoPointerEventKind(event),
         timestamp = event.eventTime,
         pointers = pointers,

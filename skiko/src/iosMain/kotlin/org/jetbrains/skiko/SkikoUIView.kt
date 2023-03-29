@@ -195,12 +195,10 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
             )
         }
 
-        val x = pointers.asSequence().map { it.x }.average()
-        val y = pointers.asSequence().map { it.y }.average()
         skiaLayer?.skikoView?.onPointerEvent(
             SkikoPointerEvent(
-                x = x,
-                y = y,
+                x = pointers.centroidX,
+                y = pointers.centroidY,
                 kind = kind,
                 timestamp = (event.timestamp * 1_000).toLong(),
                 pointers = pointers,
