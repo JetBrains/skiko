@@ -81,6 +81,7 @@ actual open class SkiaLayer internal constructor(
         layout = null
         backedLayer = object : HardwareLayer(externalAccessibleFactory) {
             override fun paint(g: java.awt.Graphics) {
+                Logger.debug { "Paint called on $this" }
                 checkContentScale()
 
                 // 1. JPanel.paint is not always called (in rare cases).
@@ -123,6 +124,7 @@ actual open class SkiaLayer internal constructor(
         }
 
         addPropertyChangeListener("graphicsContextScaleTransform") {
+            Logger.debug { "graphicsContextScaleTransform changed for $this" }
             redrawer?.syncSize()
             notifyChange(PropertyKind.ContentScale)
 
@@ -140,6 +142,7 @@ actual open class SkiaLayer internal constructor(
     private var fullscreenAdapter = FullscreenAdapter(backedLayer)
 
     override fun removeNotify() {
+        Logger.debug { "SkiaLayer.awt#removeNotify $this" }
         val window = SwingUtilities.getRoot(this) as Window
         window.removeComponentListener(fullscreenAdapter)
         dispose()
@@ -147,6 +150,7 @@ actual open class SkiaLayer internal constructor(
     }
 
     override fun addNotify() {
+        Logger.debug { "SkiaLayer.awt#addNotify $this" }
         super.addNotify()
         val window = SwingUtilities.getRoot(this) as Window
         window.addComponentListener(fullscreenAdapter)
@@ -314,7 +318,7 @@ actual open class SkiaLayer internal constructor(
                 redrawer = renderFactory.createRedrawer(this, renderApi, analytics, properties)
                 redrawer?.syncSize()
             } catch (e: RenderException) {
-                Logger.warn("Fallback to next API: ${e.message}")
+                Logger.warn(e) { "Fallback to next API" }
                 thrown = true
             }
         } while (thrown && fallbackRenderApiQueue.isNotEmpty())
@@ -365,6 +369,7 @@ actual open class SkiaLayer internal constructor(
     }
 
     override fun doLayout() {
+        Logger.debug { "doLayout on $this" }
         backedLayer.setBounds(0, 0, roundSize(width), roundSize(height))
         backedLayer.validate()
         redrawer?.syncSize()
@@ -372,6 +377,7 @@ actual open class SkiaLayer internal constructor(
 
 
     override fun paint(g: java.awt.Graphics) {
+        Logger.debug { "Paint called on: $this" }
         checkContentScale()
 
         // `paint` can be called when we already inside `draw` method.
@@ -524,6 +530,8 @@ actual open class SkiaLayer internal constructor(
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         check(!isDisposed) { "SkiaLayer is disposed" }
 
+        checkContentScale()
+
         FrameWatcher.nextFrame()
         fpsCounter?.tick()
 
@@ -566,7 +574,7 @@ actual open class SkiaLayer internal constructor(
             // ignore
         } catch (e: RenderException) {
             if (!isDisposed) {
-                Logger.warn("Exception in draw scope: ${e.message}")
+                Logger.warn(e) { "Exception in draw scope" }
                 findNextWorkingRenderApi()
                 redrawer?.redrawImmediately()
             }
