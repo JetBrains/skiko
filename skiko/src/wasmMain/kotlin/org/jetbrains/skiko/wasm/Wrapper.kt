@@ -18,7 +18,7 @@ import kotlin.js.*
         enableExtensionsByDefault: 1,
         explicitSwapControl: 0,
         renderViaOffscreenBackBuffer: 0,
-        majorVersion: 1,
+        majorVersion: 2,
     }
 }
 """)
