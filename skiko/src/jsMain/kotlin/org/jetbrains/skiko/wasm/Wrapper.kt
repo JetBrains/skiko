@@ -44,7 +44,7 @@ internal actual fun createWebGLContext(canvas: HTMLCanvasElement, attr: ContextA
         override val enableExtensionsByDefault = attr?.enableExtensionsByDefault ?: 1
         override val explicitSwapControl = attr?.explicitSwapControl ?: 0
         override val renderViaOffscreenBackBuffer = attr?.renderViaOffscreenBackBuffer ?: 0
-        override val majorVersion = attr?.majorVersion ?: 1
+        override val majorVersion = attr?.majorVersion ?: 2
     }
 
     return GL.createContext(canvas, contextAttributes.asJsObject())
