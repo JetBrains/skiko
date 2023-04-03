@@ -186,8 +186,28 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_chooseAd
     }
 }
 
+CGColorRef decodeColor(int color) {
+    CGFloat alpha = ((color >> 24) & 0xFF) / 255.0;
+    CGFloat red   = ((color >> 16) & 0xFF) / 255.0;
+    CGFloat green = ((color >> 8) & 0xFF) / 255.0;
+    CGFloat blue  = (color & 0xFF) / 255.0;
+
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    CGFloat components[] = {red, green, blue, alpha};
+    CGColorRef result = CGColorCreate(colorSpace, components);
+    CGColorSpaceRelease(colorSpace);
+
+    return result;
+}
+
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMetalDevice(
-    JNIEnv *env, jobject redrawer, jlong windowPtr, jboolean transparency, jlong adapterPtr, jlong platformInfoPtr)
+    JNIEnv *env,
+    jobject redrawer,
+    jlong windowPtr,
+    jboolean transparency,
+    jint backgroundColor,
+    jlong adapterPtr,
+    jlong platformInfoPtr)
 {
     @autoreleasepool {
         id<MTLDevice> adapter = (__bridge_transfer id<MTLDevice>) (void *) adapterPtr;
@@ -225,7 +245,7 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
             device.layer.backgroundColor = CGColorCreate(CGColorSpaceCreateDeviceRGB(), transparent);
             window.hasShadow = NO;
         } else {
-            device.layer.backgroundColor = window.backgroundColor.CGColor;
+            device.layer.backgroundColor = decodeColor(backgroundColor);
         }
 
         return (jlong) (__bridge_retained void *) device;
@@ -267,6 +287,18 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_setLayerV
         device.layer.hidden = hidden;
         [CATransaction commit];
         [CATransaction flush];
+    }
+}
+
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_setLayerBackground(
+    JNIEnv *env, jobject redrawer, jlong devicePtr, jint color)
+{
+    @autoreleasepool {
+        MetalDevice *device = (__bridge MetalDevice *) (void *) devicePtr;
+        if (!device || !device.layer) {
+            return;
+        }
+        device.layer.backgroundColor = decodeColor(color);
     }
 }
 

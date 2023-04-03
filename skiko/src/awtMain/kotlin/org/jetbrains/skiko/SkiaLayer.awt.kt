@@ -135,6 +135,13 @@ actual open class SkiaLayer internal constructor(
                 }
             }
         }
+
+        addPropertyChangeListener("background") { evt ->
+            val color = (evt.newValue as Color).let { color ->
+                org.jetbrains.skia.Color.makeARGB(color.alpha, color.red, color.green, color.blue)
+            }
+            redrawer?.setLayerBackground(color)
+        }
     }
 
     private var fullscreenAdapter = FullscreenAdapter(backedLayer)
