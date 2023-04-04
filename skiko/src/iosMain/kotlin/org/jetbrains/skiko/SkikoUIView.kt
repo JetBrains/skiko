@@ -220,7 +220,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
                 x = pointers.centroidX,
                 y = pointers.centroidY,
                 kind = kind,
-                timestamp = event.timestamp.toLong() * 1_000,
+                timestamp = (event.timestamp * 1_000).toLong(),
                 pointers = pointers,
                 platform = event
             )
