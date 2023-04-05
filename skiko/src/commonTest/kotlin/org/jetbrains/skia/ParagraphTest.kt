@@ -35,11 +35,15 @@ class ParagraphTest {
         fontCollection().findTypefaces(emptyArray(), FontStyle.NORMAL)
     }
 
-    private suspend fun singleLineMetrics(text: String): LineMetrics {
+    private suspend fun layoutParagraph(text: String): Paragraph {
         return ParagraphBuilder(style, fontCollection()).use {
             it.addText(text)
             it.build()
-        }.layout(Float.POSITIVE_INFINITY).lineMetrics.first()
+        }.layout(Float.POSITIVE_INFINITY)
+    }
+
+    private suspend fun singleLineMetrics(text: String): LineMetrics {
+        return layoutParagraph(text).lineMetrics.first()
     }
 
     @Test
@@ -58,6 +62,14 @@ class ParagraphTest {
             assertEquals(2, lineMetrics.endIncludingNewline)
             assertEquals(2, lineMetrics.endExcludingWhitespaces)
         }
+    }
+    @Test
+    fun invalidUnicode() = runTest {
+        val invalidUnicodeText = "🦊".subSequence(0, 1).toString()
+
+        val paragraph = layoutParagraph(invalidUnicodeText)
+        assertEquals(invalidUnicodeText, paragraph.getText())
+        assertEquals(1, paragraph.lineNumber)
     }
 
     @Test
