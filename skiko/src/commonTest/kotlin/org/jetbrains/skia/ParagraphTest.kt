@@ -64,11 +64,14 @@ class ParagraphTest {
         }
     }
     @Test
+    @SkipJsTarget // FIXME Emscripten's stringToUTF8 function does not correctly handle invalid unicode symbols.
     fun invalidUnicode() = runTest {
-        val invalidUnicodeText = "🦊".subSequence(0, 1).toString()
+        val invalidUnicodeText = "🦊qwerty".substring(1)
 
         val paragraph = layoutParagraph(invalidUnicodeText)
-        assertEquals(invalidUnicodeText, paragraph.getText())
+
+        // There is an intermediate conversation to UTF-8, so U+FFFD is expected instead of the invalid one.
+        assertEquals("�qwerty", paragraph.getText())
         assertEquals(1, paragraph.lineNumber)
     }
 
