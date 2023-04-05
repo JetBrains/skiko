@@ -960,20 +960,85 @@ std::unique_ptr<SkM44> skM44(JNIEnv* env, jfloatArray matrixArray) {
     }
 }
 
+static constexpr inline bool utf16_is_surrogate(uint16_t c) { return (c - 0xD800U) < 2048U; }
+static constexpr inline bool utf16_is_high_surrogate(uint16_t c) { return (c & 0xFC00) == 0xD800; }
+static constexpr inline bool utf16_is_low_surrogate(uint16_t c) { return (c & 0xFC00) == 0xDC00; }
+
+// U+FFFD REPLACEMENT CHARACTER used to replace an unknown, unrecognized, or unrepresentable character.
+#define REPLACEMENT_CHARACTER 0xFFFD
+
+// Replacement of SkUTF::NextUTF16 to carefully handle invalid unicode characters.
+static SkUnichar NextUTF16(const uint16_t** ptr, const uint16_t* end) {
+    const uint16_t* src = *ptr;
+    if (!src || src + 1 > end) {
+        return -1;
+    }
+    uint16_t c = *src++;
+    SkUnichar result = REPLACEMENT_CHARACTER;
+     if (!utf16_is_surrogate(c)) {
+       result = c;
+    } else if (utf16_is_high_surrogate(c) && src < end) {
+        uint16_t low = *src++;
+        if (utf16_is_low_surrogate(low)) {
+            result = (c << 10) + low - 0x35FDC00;
+        }
+    }
+    *ptr = src;
+    return result;
+}
+
+// Replacement of SkUTF::UTF16ToUTF8 to carefully handle invalid unicode strings.
+// The only difference here is calling of replaced NextUTF16 function.
+static int UTF16ToUTF8(char dst[], int dstCapacity, const uint16_t src[], size_t srcLength) {
+   if (!dst) {
+       dstCapacity = 0;
+   }
+
+   int dstLength = 0;
+   const char* endDst = dst + dstCapacity;
+   const uint16_t* endSrc = src + srcLength;
+   while (src < endSrc) {
+       SkUnichar uni = NextUTF16(&src, endSrc);
+       if (uni < 0) {
+           return -1;
+       }
+
+       char utf8[SkUTF::kMaxBytesInUTF8Sequence];
+       size_t count = SkUTF::ToUTF8(uni, utf8);
+       if (count == 0) {
+           return -1;
+       }
+       dstLength += count;
+
+       if (dst) {
+           const char* elems = utf8;
+           while (dst < endDst && count > 0) {
+               *dst++ = *elems++;
+               count -= 1;
+           }
+       }
+   }
+   return dstLength;
+}
+
 SkString skString(JNIEnv* env, jstring str) {
     if (str == nullptr) {
         return SkString();
     } else {
         // Avoid usage GetStringUTF* functions since they use modified UTF-8.
         // See https://docs.oracle.com/javase/1.5.0/docs/guide/jni/spec/types.html#wp16542
+        // Instead, get data as-is (UTF-16) and convert to UTF-8 ourselves.
         jsize utf16Units = env->GetStringLength(str);
         jboolean isCopy;
         const jchar *utf16 = env->GetStringChars(str, &isCopy);
-        int utf8Units = SkUTF::UTF16ToUTF8(nullptr, 0, utf16, utf16Units);
+
+        // SkUTF::UTF16ToUTF8 returns empty string if there is invalid unicode characters.
+        // Use our replacement that carefully handles invalid unicode strings.
+        int utf8Units = UTF16ToUTF8(nullptr, 0, utf16, utf16Units);
         SkString result;
         if (utf8Units > 0) {
             result.resize(utf8Units);
-            SkUTF::UTF16ToUTF8(result.data(), utf8Units, utf16, utf16Units);
+            UTF16ToUTF8(result.data(), utf8Units, utf16, utf16Units);
         }
         if (isCopy == JNI_TRUE) {
             env->ReleaseStringChars(str, utf16);
