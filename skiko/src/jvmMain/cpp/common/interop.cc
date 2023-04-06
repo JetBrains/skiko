@@ -968,6 +968,9 @@ static constexpr inline bool utf16_is_low_surrogate(uint16_t c) { return (c & 0x
 #define REPLACEMENT_CHARACTER 0xFFFD
 
 // Replacement of SkUTF::NextUTF16 to carefully handle invalid unicode characters.
+// Given a sequence of aligned UTF-16 characters in machine-endian form, return the first unicode codepoint.
+// The pointer will be incremented to point at the next codepoint's start.
+// If invalid UTF-16 is encountered, return U+FFFD REPLACEMENT_CHARACTER.
 static SkUnichar NextUTF16(const uint16_t** ptr, const uint16_t* end) {
     const uint16_t* src = *ptr;
     if (!src || src + 1 > end) {
@@ -975,12 +978,12 @@ static SkUnichar NextUTF16(const uint16_t** ptr, const uint16_t* end) {
     }
     uint16_t c = *src++;
     SkUnichar result = REPLACEMENT_CHARACTER;
-     if (!utf16_is_surrogate(c)) {
-       result = c;
-    } else if (utf16_is_high_surrogate(c) && src < end) {
+    if (!utf16_is_surrogate(c)) { // It's single code point, use it as-is
+        result = c;
+    } else if (utf16_is_high_surrogate(c) && src < end) { // If it's valid start of surrogate range (high surrogate)
         uint16_t low = *src++;
-        if (utf16_is_low_surrogate(low)) {
-            result = (c << 10) + low - 0x35FDC00;
+        if (utf16_is_low_surrogate(low)) { // If it's valid end of surrogate range (low surrogate)
+            result = (c << 10) + low - 0x35FDC00; // Combine high and low surrogates
         }
     }
     *ptr = src;
@@ -990,35 +993,35 @@ static SkUnichar NextUTF16(const uint16_t** ptr, const uint16_t* end) {
 // Replacement of SkUTF::UTF16ToUTF8 to carefully handle invalid unicode strings.
 // The only difference here is calling of replaced NextUTF16 function.
 static int UTF16ToUTF8(char dst[], int dstCapacity, const uint16_t src[], size_t srcLength) {
-   if (!dst) {
-       dstCapacity = 0;
-   }
+    if (!dst) {
+        dstCapacity = 0;
+    }
 
-   int dstLength = 0;
-   const char* endDst = dst + dstCapacity;
-   const uint16_t* endSrc = src + srcLength;
-   while (src < endSrc) {
-       SkUnichar uni = NextUTF16(&src, endSrc);
-       if (uni < 0) {
-           return -1;
-       }
+    int dstLength = 0;
+    const char* endDst = dst + dstCapacity;
+    const uint16_t* endSrc = src + srcLength;
+    while (src < endSrc) {
+        SkUnichar uni = NextUTF16(&src, endSrc);
+        if (uni < 0) {
+            return -1;
+        }
 
-       char utf8[SkUTF::kMaxBytesInUTF8Sequence];
-       size_t count = SkUTF::ToUTF8(uni, utf8);
-       if (count == 0) {
-           return -1;
-       }
-       dstLength += count;
+        char utf8[SkUTF::kMaxBytesInUTF8Sequence];
+        size_t count = SkUTF::ToUTF8(uni, utf8);
+        if (count == 0) {
+            return -1;
+        }
+        dstLength += count;
 
-       if (dst) {
-           const char* elems = utf8;
-           while (dst < endDst && count > 0) {
-               *dst++ = *elems++;
-               count -= 1;
-           }
-       }
-   }
-   return dstLength;
+        if (dst) {
+            const char* elems = utf8;
+            while (dst < endDst && count > 0) {
+                *dst++ = *elems++;
+                count -= 1;
+            }
+        }
+    }
+    return dstLength;
 }
 
 SkString skString(JNIEnv* env, jstring str) {
