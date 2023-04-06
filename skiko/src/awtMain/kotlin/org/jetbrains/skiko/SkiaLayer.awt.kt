@@ -75,6 +75,7 @@ actual open class SkiaLayer internal constructor(
         get() = backedLayer
 
     private var peerBufferSizeFixJob: Job? = null
+    private var latestReceivedGraphicsContextScaleTransform: AffineTransform? = null
 
     init {
         isOpaque = false
@@ -123,8 +124,10 @@ actual open class SkiaLayer internal constructor(
             }
         }
 
+
         addPropertyChangeListener("graphicsContextScaleTransform") {
             Logger.debug { "graphicsContextScaleTransform changed for $this" }
+            latestReceivedGraphicsContextScaleTransform = it.newValue as AffineTransform
             redrawer?.syncSize()
             notifyChange(PropertyKind.ContentScale)
 
@@ -234,12 +237,15 @@ actual open class SkiaLayer internal constructor(
             override fun mousePressed(e: MouseEvent) {
                 skikoView?.onPointerEvent(toSkikoEvent(e))
             }
+
             override fun mouseReleased(e: MouseEvent) {
                 skikoView?.onPointerEvent(toSkikoEvent(e))
             }
+
             override fun mouseEntered(e: MouseEvent) {
                 skikoView?.onPointerEvent(toSkikoEvent(e))
             }
+
             override fun mouseExited(e: MouseEvent) {
                 skikoView?.onPointerEvent(toSkikoEvent(e))
             }
@@ -249,6 +255,7 @@ actual open class SkiaLayer internal constructor(
             override fun mouseDragged(e: MouseEvent) {
                 skikoView?.onPointerEvent(toSkikoEvent(e))
             }
+
             override fun mouseMoved(e: MouseEvent) {
                 skikoView?.onPointerEvent(toSkikoEvent(e))
             }
@@ -265,10 +272,12 @@ actual open class SkiaLayer internal constructor(
                 keyEvent = e
                 skikoView?.onKeyboardEvent(toSkikoEvent(e))
             }
+
             override fun keyReleased(e: KeyEvent) {
                 keyEvent = e
                 skikoView?.onKeyboardEvent(toSkikoEvent(e))
             }
+
             override fun keyTyped(e: KeyEvent) {
                 skikoView?.onInputEvent(toSkikoTypeEvent(e, keyEvent))
             }
@@ -278,6 +287,7 @@ actual open class SkiaLayer internal constructor(
             override fun caretPositionChanged(e: InputMethodEvent) {
                 skikoView?.onInputEvent(toSkikoTypeEvent(e, keyEvent))
             }
+
             override fun inputMethodTextChanged(e: InputMethodEvent) {
                 skikoView?.onInputEvent(toSkikoTypeEvent(e, keyEvent))
             }
@@ -393,15 +403,15 @@ actual open class SkiaLayer internal constructor(
         }
     }
 
-    private var latestCheckedDefaultTransform: AffineTransform? = null
-
     // Workaround for JBR-5274 and JBR-5305
     fun checkContentScale() {
-        graphicsConfiguration.defaultTransform.let {
-            if (it != latestCheckedDefaultTransform) {
-                firePropertyChange("graphicsContextScaleTransform", latestCheckedDefaultTransform, it)
-                latestCheckedDefaultTransform = it
-            }
+        val currentGraphicsContextScaleTransform = graphicsConfiguration.defaultTransform
+        if (currentGraphicsContextScaleTransform != latestReceivedGraphicsContextScaleTransform) {
+            firePropertyChange(
+                "graphicsContextScaleTransform",
+                latestReceivedGraphicsContextScaleTransform,
+                currentGraphicsContextScaleTransform
+            )
         }
     }
 
@@ -605,7 +615,8 @@ actual open class SkiaLayer internal constructor(
         return lockPicture { picture ->
             val store = Bitmap()
             val ci = ColorInfo(
-                ColorType.BGRA_8888, ColorAlphaType.OPAQUE, ColorSpace.sRGB)
+                ColorType.BGRA_8888, ColorAlphaType.OPAQUE, ColorSpace.sRGB
+            )
             store.setImageInfo(ImageInfo(ci, picture.width, picture.height))
             store.allocN32Pixels(picture.width, picture.height)
             val canvas = Canvas(store)
