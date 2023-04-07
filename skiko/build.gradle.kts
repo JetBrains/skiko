@@ -1160,6 +1160,8 @@ tasks.withType<Test>().configureEach {
             systemProperty("sun.java2d.uiScale", "1")
         }
     }
+
+    jvmArgs!!.add("--add-exports java.desktop/sun.font=ALL-UNNAMED")
 }
 
 afterEvaluate {

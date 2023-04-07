@@ -35,7 +35,8 @@ internal object InternalSunApiChecker {
 
             // Try to obtain the proper font family from an AWT Font (will fail if not running on JBR)
             with(AwtFontUtils) {
-                Font(Font.DIALOG, 10, Font.PLAIN).fontFamilyName
+                val font = Font(Font.DIALOG, 10, Font.PLAIN)
+                if (font.fontFamilyName == null) return false
             }
 
             return true

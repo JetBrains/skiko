@@ -4,7 +4,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assume
 import org.junit.Test
-import kotlin.test.*
+import kotlin.test.assertContains
+import kotlin.test.assertTrue
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -31,6 +32,30 @@ class SkiaSystemFontProviderTest {
             iterable = systemFamilies,
             element = FontFamilyKey.Apple.SystemFont.familyName,
             message = "System Font not found in system families"
+        )
+    }
+
+    @Test
+    fun `should provide embedded fonts when running on JetBrains Runtime`() = runTest {
+        Assume.assumeTrue(isRunningOnJetBrainsRuntime())
+        
+        assertOpensAreSet()
+        val embeddedFamilies = AwtFontUtils.fontFamilyNamesOrNull()!!
+            .onlyEmbeddedFamilies()
+            .toSet()
+
+        val skiaFamilies = provider.familyNames()
+
+        val missingEmbeddedFamilies = mutableSetOf<String>()
+        for (awtFamily in embeddedFamilies) {
+            if (awtFamily !in skiaFamilies) {
+                missingEmbeddedFamilies += awtFamily
+            }
+        }
+
+        assertTrue(
+            missingEmbeddedFamilies.isEmpty(),
+            "These embedded font families are missing:\n${missingEmbeddedFamilies.joinToString("\n") { " * $it" }}"
         )
     }
 
@@ -64,6 +89,13 @@ class SkiaSystemFontProviderTest {
 private fun Iterable<String>.ignoreVirtualAwtFontFamilies() =
     filterNot { FontFamilyKey(it) in FontFamilyKey.Awt.awtLogicalFonts }
 
+private fun Iterable<String>.onlyEmbeddedFamilies() =
+    filterNot { FontFamilyKey(it) in FontFamilyKey.Awt.awtLogicalFonts }
+
 private fun isRunningOnJetBrainsRuntime() =
     System.getProperty("java.vendor")
         .equals("JetBrains s.r.o.", ignoreCase = true)
+
+private fun assertOpensAreSet() {
+    assertTrue(InternalSunApiChecker.isSunFontApiAccessible(), "The --add-opens statement is missing!")
+}

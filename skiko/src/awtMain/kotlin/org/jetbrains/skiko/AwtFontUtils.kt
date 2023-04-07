@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NonNls
 import java.awt.Font
 import java.awt.GraphicsEnvironment
 import java.lang.reflect.Field
+import java.lang.reflect.InaccessibleObjectException
 import java.lang.reflect.Method
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -18,18 +19,21 @@ object AwtFontUtils {
         InternalSunApiChecker.isSunFontApiAccessible()
     }
 
-    private val fontManagerFactoryClass = Class.forName("sun.font.FontManagerFactory")
+    private val FontManagerFactoryClass = Class.forName("sun.font.FontManagerFactory")
 
-    private val fontManagerClass = Class.forName("sun.font.FontManager")
-    private val font2DClass = Class.forName("sun.font.Font2D")
+    private val FontManagerClass = Class.forName("sun.font.FontManager")
+    private val Font2DClass = Class.forName("sun.font.Font2D")
+    private val FileFontClass = Class.forName("sun.font.FileFont")
+    private val CompositeFontClass = Class.forName("sun.font.CompositeFont")
+    private val CFontClass = Class.forName("sun.font.CFont")
 
     // FontManagerFactory methods
     private val FontManagerFactory_getInstanceMethod =
-        getDeclaredMethodOrNull(fontManagerFactoryClass, "getInstance")
+        getDeclaredMethodOrNull(FontManagerFactoryClass, "getInstance")
 
     // FontManager methods and fields
     private val FontManager_findFont2DMethod = getDeclaredMethodOrNull(
-        fontManagerClass,
+        FontManagerClass,
         "findFont2D",
         String::class.java, // Font name
         Int::class.javaPrimitiveType!!, // Font style (e.g., Font.BOLD)
@@ -39,8 +43,10 @@ object AwtFontUtils {
     // Font2D methods and fields
     private val Font2D_getTypographicFamilyNameMethod =
         getFont2DMethodOrNull("getTypographicFamilyName")
+    private val Font2D_getFamilyNameMethod =
+        getFont2DMethodOrNull("getFamilyName", Locale::class.java)
     private val Font2D_handleField =
-        findFieldInHierarchy(font2DClass) { it.name == "handle" }
+        findFieldInHierarchy(Font2DClass) { it.name == "handle" }
 
     // Font2DHandle fields
     private val Font2DHandle_font2DField =
@@ -48,13 +54,21 @@ object AwtFontUtils {
             it.name == "font2D"
         }
 
+    // FileFont methods
+    private val FileFont_getPublicFileNameMethod =
+        getDeclaredMethodOrNull(clazz = FileFontClass, name = "getPublicFileNameMethod")
+
+    // CompositeFont methods
+    private val CompositeFont_getSlotFontMethod =
+        getDeclaredMethodOrNull(clazz = CompositeFontClass, name = "getSlotFont", Int::class.javaPrimitiveType!!)
+
     // Copy of FontManager.LOGICAL_FALLBACK
     private const val LOGICAL_FALLBACK = 2
 
     private val font2DHandlesCache = ConcurrentHashMap<Font, Any>()
 
     /**
-     * Indicate whether the current JVM is able to resolve font family names
+     * Indicate whether the current JVM is able to resolve font properties
      * accurately or not.
      *
      * This value will be `true` if using the JetBrains Runtime. It will be
@@ -75,7 +89,7 @@ object AwtFontUtils {
      * necessary information needed to list the actual font families as single
      * entries, as one would expect.
      */
-    val isAbleToResolveFontFamilyNames: Boolean
+    val isAbleToResolveFontProperties: Boolean
         get() = Font2D_getTypographicFamilyNameMethod != null
 
     /**
@@ -88,37 +102,30 @@ object AwtFontUtils {
      * supported by the AWT [Font]. It is [Font.PLAIN] by default.
      *
      * @return The resolved physical font name, or `null` if it can't
-     * be resolved (either it's unknown, or the system doesn't
-     * support resolving font family names)
+     * be resolved (either it's unknown, or [isAbleToResolveFontProperties]
+     * is false)
      *
-     * @see isAbleToResolveFontFamilyNames
+     * @see isAbleToResolveFontProperties
      */
     internal fun resolvePhysicalFontNameOrNull(
         fontName: String,
         style: Int = Font.PLAIN
     ): String? {
-        if (!isAbleToResolveFontFamilyNames) return null
+        if (!isAbleToResolveFontProperties) return null
 
         val fontManager = awtFontManager()
         val font2D =
             checkNotNull(FontManager_findFont2DMethod) { "FontManager#findFont2DMethod() is not available" }
                 .invoke(fontManager, fontName, style, LOGICAL_FALLBACK)
 
-        return when (font2D.javaClass.name) {
-            "sun.font.CompositeFont" -> {
+        return when {
+            CompositeFontClass.isInstance(font2D) -> {
                 // For Windows and Linux
-                val physicalFontObject =
-                    getDeclaredMethodOrNull(
-                        clazz = Class.forName("sun.font.CompositeFont"),
-                        name = "getSlotFont",
-                        Int::class.javaPrimitiveType!!
-                    )?.invoke(font2D, 0)
-
-                getFont2DMethodOrNull("getFamilyName", Locale::class.java)
-                    ?.invoke(physicalFontObject, Locale.getDefault()) as String?
+                val physicalFontObject = CompositeFont_getSlotFontMethod?.invoke(font2D, 0)
+                Font2D_getFamilyNameMethod?.invoke(physicalFontObject, Locale.getDefault()) as String?
             }
 
-            "sun.font.CFont" -> {
+            CFontClass.isInstance(font2D) -> {
                 // For macOS
                 val clazz = Class.forName("sun.font.CFont")
                 getFieldValueOrNull(clazz, font2D, String::class.java, "nativeFontName")
@@ -133,17 +140,17 @@ object AwtFontUtils {
      * be used instead of the one provided by [GraphicsEnvironment.getAvailableFontFamilyNames]
      * since it will provide consistent results across platforms.
      *
-     * Will return `null` if [isAbleToResolveFontFamilyNames] is `false`.
+     * Will return `null` if [isAbleToResolveFontProperties] is `false`.
      *
      * See [fontFamilyName] for further details.
      *
      * @see fontFamilyName
-     * @see isAbleToResolveFontFamilyNames
+     * @see isAbleToResolveFontProperties
      */
     fun fontFamilyNamesOrNull(
         graphicsEnvironment: GraphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment()
     ): SortedSet<String>? {
-        if (!isAbleToResolveFontFamilyNames) return null
+        if (!isAbleToResolveFontProperties) return null
 
         return graphicsEnvironment.allFonts.map { font -> font.fontFamilyName!! }
             .toSortedSet()
@@ -151,7 +158,8 @@ object AwtFontUtils {
 
     /**
      * The preferred font family name, which should be used instead of the
-     * [Font.getFamily] and `Font2D.familyName`.
+     * [Font.getFamily] and `Font2D.familyName`. It will be `null` if
+     * [isAbleToResolveFontProperties] is `false`.
      *
      * On Windows, and potentially in other cases, the family name as reported
      * by AWT can contain the style and weight of the [Font] in addition to the
@@ -163,13 +171,33 @@ object AwtFontUtils {
      * available via AWT.
      *
      * @see fontFamilyNamesOrNull
+     * @see isAbleToResolveFontProperties
      */
     val Font.fontFamilyName: String?
         get() {
-            if (!isAbleToResolveFontFamilyNames) return null
+            if (!isAbleToResolveFontProperties) return null
 
             val font2D = obtainFont2D()
             return checkNotNull(Font2D_getTypographicFamilyNameMethod) { "Font2D#getTypographicFamilyName() is not available" }
+                .invoke(font2D) as String
+        }
+
+    /**
+     * The file that a [Font] is loaded from; it will be `null`
+     * if [isAbleToResolveFontProperties] is `false`, or if the
+     * font is not backed by a [sun.font.FileFont].
+     *
+     * @see fontFamilyNamesOrNull
+     * @see isAbleToResolveFontProperties
+     */
+    val Font.fontFileName: String?
+        get() {
+            if (!isAbleToResolveFontProperties) return null
+
+            val font2D = obtainFont2D()
+            if (!FileFontClass.isInstance(font2D)) return null
+
+            return checkNotNull(FileFont_getPublicFileNameMethod) { "FileFont#getPublicFileName() is not available" }
                 .invoke(font2D) as String
         }
 
@@ -193,15 +221,8 @@ object AwtFontUtils {
         checkNotNull(FontManagerFactory_getInstanceMethod) { "FontManagerFactory#getInstanceMethod() not available" }
             .invoke(null)
 
-    private fun getFont2DMethodOrNull(
-        methodName: String,
-        vararg parameters: Class<*>
-    ): Method? =
-        try {
-            getDeclaredMethodOrNull(font2DClass, methodName, *parameters)
-        } catch (e: Throwable) {
-            null
-        }
+    private fun getFont2DMethodOrNull(methodName: String, vararg parameters: Class<*>): Method? =
+        getDeclaredMethodOrNull(Font2DClass, methodName, *parameters)
 
     private fun getDeclaredMethodOrNull(
         clazz: Class<*>,
@@ -212,6 +233,8 @@ object AwtFontUtils {
             clazz.getDeclaredMethod(name, *parameters)
                 .apply { isAccessible = true }
         } catch (e: NoSuchMethodException) {
+            null
+        } catch (e: InaccessibleObjectException) {
             null
         }
 
@@ -251,14 +274,19 @@ object AwtFontUtils {
         checker: Predicate<in Field>
     ): Field? {
         var aClass: Class<*>? = rootClass
-        while (aClass != null) {
-            for (field in aClass.declaredFields) {
-                if (checker.test(field)) {
-                    field.isAccessible = true
-                    return field
+
+        try {
+            while (aClass != null) {
+                for (field in aClass.declaredFields) {
+                    if (checker.test(field)) {
+                        field.isAccessible = true
+                        return field
+                    }
                 }
+                aClass = aClass.superclass
             }
-            aClass = aClass.superclass
+        } catch (e: InaccessibleObjectException) {
+            return null
         }
 
         return processInterfaces(rootClass.interfaces, HashSet(), checker)

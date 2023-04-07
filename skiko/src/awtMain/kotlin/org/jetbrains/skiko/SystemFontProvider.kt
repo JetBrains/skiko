@@ -7,9 +7,15 @@ import org.jetbrains.skia.FontMgr
 import org.jetbrains.skia.FontStyle
 import org.jetbrains.skia.FontStyleSet
 import org.jetbrains.skia.Typeface
+import org.jetbrains.skiko.AwtFontUtils.fontFileName
 import org.jetbrains.skiko.SystemFontProvider.Companion.skia
-import java.util.*
+import java.awt.GraphicsEnvironment
+import java.io.IOException
+import java.nio.file.Files
+import java.nio.file.Path
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.io.path.Path
+import kotlin.io.path.absolute
 
 /**
  * A cache of font family names available in the system.
@@ -73,6 +79,7 @@ private object SkiaSystemFontProvider : SystemFontProvider {
     private val _familyNames: MutableSet<String> = ConcurrentHashMap.newKeySet(FontMgr.default.familiesCount)
     private val awtLogicalFamilyNames: MutableMap<FontFamilyKey, String> =
         ConcurrentHashMap(FontFamilyKey.Awt.awtLogicalFonts.size)
+    private val embeddedFamilyNames: MutableMap<FontFamilyKey, String> = ConcurrentHashMap()
 
     @Volatile
     private var allFontsCachedImpl = false
@@ -91,6 +98,7 @@ private object SkiaSystemFontProvider : SystemFontProvider {
         cacheJob = GlobalScope.launch {
             cacheAllSystemFonts()
             cacheAwtLogicalFonts()
+            cacheEmbeddedFonts()
             allFontsCachedImpl = true
             waitChannel.sendAll(Unit)
         }
@@ -151,6 +159,45 @@ private object SkiaSystemFontProvider : SystemFontProvider {
         } catch (ignored: Throwable) {
         }
     }
+
+    /**
+     * Embedded fonts are bundled with the Java Runtime; AWT picks them
+     * up automatically, but Skia can't. We need to explicitly add them.
+     */
+    private fun cacheEmbeddedFonts() {
+        try {
+            val javaHome = Path(System.getProperty("java.home"))
+            GraphicsEnvironment.getLocalGraphicsEnvironment().allFonts
+                .filter {
+                    val fontFileName = it.fontFileName ?: return@filter false
+                    javaHome.isParentOf(Path(fontFileName))
+                }
+                .forEach {
+                    embeddedFamilyNames += FontFamilyKey(it.fontName) to it.fontName
+                }
+
+        } catch (ignored: Throwable) {
+        }
+    }
+
+    private fun Path.isParentOf(other: Path): Boolean {
+        val parent = absolute().normalize()
+        val child = other.absolute().normalize()
+
+        if (parent.nameCount >= other.nameCount) return false
+
+        val childParent = child.parent ?: return false
+        return parent.isSameFileAs(childParent) || parent.isParentOf(childParent)
+    }
+
+    private fun Path.isSameFileAs(other: Path): Boolean =
+        try {
+            // Try to use Files.isSameFile() as it also follows symlinks
+            Files.isSameFile(this, other)
+        } catch (e: IOException) {
+            // Fall back on simple path equivalence
+            absolute().normalize() == other.absolute().normalize()
+        }
 
     /**
      * Suspend execution until the font family names caching has
