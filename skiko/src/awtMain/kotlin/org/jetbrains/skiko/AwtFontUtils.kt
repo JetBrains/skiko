@@ -15,7 +15,7 @@ import java.util.function.Predicate
 object AwtFontUtils {
 
     init {
-        InternalSunApiOpener.ensureAccessToSunFontPackage()
+        InternalSunApiChecker.isSunFontApiAccessible()
     }
 
     private val fontManagerFactoryClass = Class.forName("sun.font.FontManagerFactory")
