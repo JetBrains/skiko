@@ -52,7 +52,7 @@ internal object InternalSunApiChecker {
             For Skiko to run optimally, you should add the following argument
             to the command for this program:
             
-            --add-opens=java.desktop/sun.font=ALL-UNNAMED 
+            --add-opens java.desktop/sun.font=ALL-UNNAMED 
             
             This is required to be able to properly match the Skia fonts with
             the AWT fonts and access private JDK APIs used for some advanced

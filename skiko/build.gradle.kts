@@ -1161,7 +1161,7 @@ tasks.withType<Test>().configureEach {
         }
     }
 
-    jvmArgs!!.add("--add-exports java.desktop/sun.font=ALL-UNNAMED")
+    jvmArgs!!.add("--add-opens java.desktop/sun.font=ALL-UNNAMED")
 }
 
 afterEvaluate {
