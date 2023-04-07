@@ -222,8 +222,6 @@ val Project.supportAndroid: Boolean
     get() = findProperty("skiko.android.enabled") == "true" // || isInIdea
 
 kotlin {
-    jvmToolchain(11)
-
     jvm("awt") {
         generateVersion(targetOs, targetArch)
     }
@@ -292,10 +290,6 @@ kotlin {
         val awtMain by getting {
             dependsOn(jvmMain)
             languageSettings.optIn("org.jetbrains.skiko.InternalSkikoApi")
-
-            dependencies {
-                implementation("net.bytebuddy:byte-buddy-agent:1.12.22")
-            }
         }
 
         if (supportAndroid) {

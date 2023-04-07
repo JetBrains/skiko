@@ -4,7 +4,7 @@ RUN apt-get update -y
 RUN apt-get install binutils build-essential -y
 RUN apt-get install software-properties-common -y
 RUN apt-get install python git fontconfig libfontconfig1-dev libglu1-mesa-dev libxrandr-dev libdbus-1-dev curl wget -y
-RUN apt-get install openjdk-17-jdk -y
+RUN apt-get install openjdk-11-jdk -y
 RUN apt-get install clang-11 -y && \
     apt-get remove g++ -y && \
     update-alternatives --install /usr/bin/clang clang /usr/bin/clang-11 100 && \

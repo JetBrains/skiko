@@ -5,7 +5,7 @@ RUN apt-get update -y && \
     apt-get install binutils build-essential software-properties-common -y && \
     apt-get install git curl wget unzip -y && \
     apt-get install python -y && \
-    apt-get install openjdk-17-jdk -y && \
+    apt-get install openjdk-11-jdk -y && \
     rm -rf /var/lib/apt/lists/*
 ENV ANDROID_SDK_ROOT=/android/sdk
 ARG CMD_TOOLS_VERSION=6858069
