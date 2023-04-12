@@ -43,7 +43,7 @@ object SVGCanvas {
     fun make(bounds: Rect, out: WStream, convertTextToPaths: Boolean, prettyXML: Boolean): Canvas {
         Stats.onNativeCall()
         val ptr = try {
-            SVGCanvas_nMake(
+            _nMake(
                 bounds.left,
                 bounds.top,
                 bounds.right,
@@ -62,6 +62,7 @@ object SVGCanvas {
     }
 }
 
-@ExternalSymbolName("org_jetbrains_skia_svg_SVGCanvas__1nMake")
-@ModuleImport("skia", "org_jetbrains_skia_svg_SVGCanvas__1nMake")
-private external fun SVGCanvas_nMake(left: Float, top: Float, right: Float, bottom: Float, wstreamPtr: NativePointer, flags: Int): NativePointer
+@ExternalSymbolName("org_jetbrains_skia_svg_SVGCanvasKt__1nMake")
+@ModuleImport("skia", "org_jetbrains_skia_svg_SVGCanvasKt__1nMake")
+private external fun _nMake(left: Float, top: Float, right: Float, bottom: Float, wstreamPtr: NativePointer, flags: Int): NativePointer
+

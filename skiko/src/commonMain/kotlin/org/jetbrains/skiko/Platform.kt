@@ -26,10 +26,16 @@ open class ClipboardManager {
      * Get current system clipboard content as text.
      */
     open fun getText(): String? = ClipboardManager_getText()
+
+    /**
+     * Returns true, if clipboard contains text
+     */
+    open fun hasText(): Boolean = ClipboardManager_hasText()
 }
 
 internal expect fun ClipboardManager_setText(text: String)
 internal expect fun ClipboardManager_getText(): String?
+internal expect fun ClipboardManager_hasText(): Boolean
 
 /**
  * Manager to control cursor per native component.

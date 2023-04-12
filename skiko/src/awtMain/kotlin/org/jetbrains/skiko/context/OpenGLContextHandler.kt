@@ -9,11 +9,11 @@ internal class OpenGLContextHandler(layer: SkiaLayer) : JvmContextHandler(layer)
             if (context == null) {
                 context = makeGLContext()
                 if (System.getProperty("skiko.hardwareInfo.enabled") == "true") {
-                    println(rendererInfo())
+                    Logger.info { "Renderer info:\n ${rendererInfo()}" }
                 }
             }
         } catch (e: Exception) {
-            println("Failed to create Skia OpenGL context!")
+            Logger.warn(e) { "Failed to create Skia OpenGL context!" }
             return false
         }
         return true

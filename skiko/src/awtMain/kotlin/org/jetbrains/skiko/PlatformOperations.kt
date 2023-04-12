@@ -41,7 +41,6 @@ internal interface PlatformOperations {
     fun setFullscreen(component: Component, value: Boolean)
     fun disableTitleBar(component: Component, headerHeight: Float)
     fun orderEmojiAndSymbolsPopup()
-    fun getDpiScale(component: Component): Float
 }
 
 internal val platformOperations: PlatformOperations by lazy {
@@ -54,10 +53,6 @@ internal val platformOperations: PlatformOperations by lazy {
 
                 override fun setFullscreen(component: Component, value: Boolean) {
                     osxSetFullscreenNative(component, value)
-                }
-
-                override fun getDpiScale(component: Component): Float {
-                    return component.graphicsConfiguration.defaultTransform.scaleX.toFloat()
                 }
 
                 override fun disableTitleBar(component: Component, headerHeight: Float) {
@@ -88,10 +83,6 @@ internal val platformOperations: PlatformOperations by lazy {
 
                 override fun orderEmojiAndSymbolsPopup() {
                 }
-
-                override fun getDpiScale(component: Component): Float {
-                    return component.graphicsConfiguration.defaultTransform.scaleX.toFloat()
-                }
             }
         }
         OS.Linux -> {
@@ -113,10 +104,6 @@ internal val platformOperations: PlatformOperations by lazy {
 
                 override fun orderEmojiAndSymbolsPopup() {
                 }
-
-                override fun getDpiScale(component: Component): Float {
-                    return component.graphicsConfiguration.defaultTransform.scaleX.toFloat()
-                }
             }
         }
         OS.Android -> TODO()
@@ -131,6 +118,3 @@ external private fun osxIsFullscreenNative(component: Component): Boolean
 external private fun osxSetFullscreenNative(component: Component, value: Boolean)
 external private fun osxDisableTitleBar(component: Component, headerHeight: Float)
 external private fun osxOrderEmojiAndSymbolsPopup()
-
-// Linux
-external private fun linuxGetDpiScaleNative(platformInfo: Long): Float

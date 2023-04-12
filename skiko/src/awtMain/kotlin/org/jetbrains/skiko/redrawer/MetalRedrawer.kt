@@ -25,7 +25,11 @@ internal class MetalRedrawer(
     }
     private var drawLock = Any()
 
-    private val device: Long
+    private var device: Long
+        get() {
+            check(field != 0L) { "Device is not initialized" }
+            return field
+        }
     val adapterName: String
     val adapterMemorySize: Long
 
@@ -60,6 +64,7 @@ internal class MetalRedrawer(
         frameDispatcher.cancel()
         contextHandler.dispose()
         disposeDevice(device)
+        device = 0
         super.dispose()
     }
 
@@ -73,8 +78,10 @@ internal class MetalRedrawer(
         inDrawScope {
             setVSyncEnabled(device, enabled = false)
             update(System.nanoTime())
-            performDraw()
-            setVSyncEnabled(device, properties.isVsyncEnabled)
+            if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
+                performDraw()
+                setVSyncEnabled(device, properties.isVsyncEnabled)
+            }
         }
     }
 
@@ -120,13 +127,17 @@ internal class MetalRedrawer(
         val rootPane = getRootPane(layer)
         val globalPosition = convertPoint(layer, layer.x, layer.y, rootPane)
         setContentScale(device, layer.contentScale)
-        resizeLayers(
-            device,
-            globalPosition.x,
-            rootPane.height - globalPosition.y - layer.height,
-            layer.width.coerceAtLeast(0),
-            layer.height.coerceAtLeast(0)
-        )
+        val x = globalPosition.x
+        val y = rootPane.height - globalPosition.y - layer.height
+        val width = layer.width.coerceAtLeast(0)
+        val height = layer.height.coerceAtLeast(0)
+        Logger.debug { "MetalRedrawer#resizeLayers $this $x $y $width $height" }
+        resizeLayers(device, x, y, width, height)
+    }
+
+    override fun setVisible(isVisible: Boolean) {
+        Logger.debug { "MetalRedrawer#setVisible $this $isVisible" }
+        setLayerVisible(device, isVisible)
     }
 
     fun makeContext() = DirectContext(
@@ -146,6 +157,7 @@ internal class MetalRedrawer(
     private external fun disposeDevice(device: Long)
     private external fun finishFrame(device: Long)
     private external fun resizeLayers(device: Long, x: Int, y: Int, width: Int, height: Int)
+    private external fun setLayerVisible(device: Long, isVisible: Boolean)
     private external fun setContentScale(device: Long, contentScale: Float)
     private external fun setVSyncEnabled(device: Long, enabled: Boolean)
     private external fun isOccluded(window: Long): Boolean

@@ -1,6 +1,7 @@
 package org.jetbrains.skiko
 
 import kotlinx.cinterop.*
+import org.jetbrains.skia.Point
 import org.jetbrains.skia.Rect
 import platform.CoreGraphics.*
 import platform.Foundation.*
@@ -9,16 +10,26 @@ import platform.darwin.NSInteger
 import kotlin.math.max
 import kotlin.math.min
 
+/*
+ TODO: remove org.jetbrains.skiko.objc.UIViewExtensionProtocol after Kotlin 1.8.20
+ https://youtrack.jetbrains.com/issue/KT-40426
+*/
 @Suppress("CONFLICTING_OVERLOADS")
 @ExportObjCClass
-class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
+class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
+    org.jetbrains.skiko.objc.UIViewExtensionProtocol {
     @OverrideInit
     constructor(frame: CValue<CGRect>) : super(frame)
 
     @OverrideInit
     constructor(coder: NSCoder) : super(coder)
 
+    init {
+        multipleTouchEnabled = true
+    }
+
     private var skiaLayer: SkiaLayer? = null
+    private lateinit var _pointInside: (Point, UIEvent?) -> Boolean
     private var _inputDelegate: UITextInputDelegateProtocol? = null
     private var _currentTextMenuActions: TextActions? = null
     var currentKeyboardType: UIKeyboardType = UIKeyboardTypeDefault
@@ -30,8 +41,13 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
     var currentAutocapitalizationType: UITextAutocapitalizationType = UITextAutocapitalizationType.UITextAutocapitalizationTypeSentences
     var currentAutocorrectionType: UITextAutocorrectionType = UITextAutocorrectionType.UITextAutocorrectionTypeYes
 
-    constructor(skiaLayer: SkiaLayer, frame: CValue<CGRect> = CGRectNull.readValue()) : super(frame) {
+    constructor(
+        skiaLayer: SkiaLayer,
+        frame: CValue<CGRect> = CGRectNull.readValue(),
+        pointInside: (Point, UIEvent?) -> Boolean = {_,_-> true }
+    ) : super(frame) {
         this.skiaLayer = skiaLayer
+        _pointInside = pointInside
     }
 
     /**
@@ -157,35 +173,63 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
         super.pressesEnded(presses, withEvent)
     }
 
+    /**
+     * https://developer.apple.com/documentation/uikit/uiview/1622533-point
+     */
+    override fun pointInside(point: CValue<CGPoint>, withEvent: UIEvent?): Boolean {
+        val skiaPoint: Point = point.useContents { Point(x.toFloat(), y.toFloat()) }
+        return _pointInside(skiaPoint, withEvent)
+    }
+
     override fun touchesBegan(touches: Set<*>, withEvent: UIEvent?) {
         super.touchesBegan(touches, withEvent)
-        sendTouchEventToSkikoView(touches, SkikoTouchEventKind.STARTED)
+        sendTouchEventToSkikoView(withEvent!!, SkikoPointerEventKind.DOWN)
     }
 
     override fun touchesEnded(touches: Set<*>, withEvent: UIEvent?) {
         super.touchesEnded(touches, withEvent)
-        sendTouchEventToSkikoView(touches, SkikoTouchEventKind.ENDED)
+        sendTouchEventToSkikoView(withEvent!!, SkikoPointerEventKind.UP)
     }
 
     override fun touchesMoved(touches: Set<*>, withEvent: UIEvent?) {
         super.touchesMoved(touches, withEvent)
-        sendTouchEventToSkikoView(touches, SkikoTouchEventKind.MOVED)
+        sendTouchEventToSkikoView(withEvent!!, SkikoPointerEventKind.MOVE)
     }
 
     override fun touchesCancelled(touches: Set<*>, withEvent: UIEvent?) {
         super.touchesCancelled(touches, withEvent)
-        sendTouchEventToSkikoView(touches, SkikoTouchEventKind.CANCELLED)
+        sendTouchEventToSkikoView(withEvent!!, SkikoPointerEventKind.UP)
     }
 
-    private fun sendTouchEventToSkikoView(touches: Set<*>, kind: SkikoTouchEventKind) {
-        val events = touches.map {
-            val event = it as UITouch
-            val (x, y) = event.locationInView(null).useContents { x to y }
-            val timestamp = (event.timestamp * 1_000).toLong()
-            SkikoTouchEvent(x, y, kind, timestamp, event)
-        }.toTypedArray()
-        skiaLayer?.skikoView?.onTouchEvent(events)
+    private fun sendTouchEventToSkikoView(event: UIEvent, kind: SkikoPointerEventKind) {
+        val pointers = event.touchesForView(this).orEmpty().map {
+            val touch = it as UITouch
+            val (x, y) = touch.locationInView(null).useContents { x to y }
+            SkikoPointer(
+                x = x,
+                y = y,
+                pressed = touch.isPressed,
+                device = SkikoPointerDevice.TOUCH,
+                id = touch.hashCode().toLong(),
+                pressure = touch.force
+            )
+        }
+
+        skiaLayer?.skikoView?.onPointerEvent(
+            SkikoPointerEvent(
+                x = pointers.centroidX,
+                y = pointers.centroidY,
+                kind = kind,
+                timestamp = (event.timestamp * 1_000).toLong(),
+                pointers = pointers,
+                platform = event
+            )
+        )
     }
+
+    private val UITouch.isPressed get() =
+        phase != UITouchPhase.UITouchPhaseEnded &&
+            phase != UITouchPhase.UITouchPhaseCancelled
 
     override fun inputDelegate(): UITextInputDelegateProtocol? {
         return _inputDelegate

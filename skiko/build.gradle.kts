@@ -523,6 +523,14 @@ fun configureNativeTarget(os: OS, arch: Arch, target: KotlinNativeTarget) {
     val allLibraries = skiaStaticLibraries(skiaDir, targetString) + bridgesLibrary
 
 
+    if (os == OS.IOS) {
+        target.compilations.getByName("main") {
+            val uikit by cinterops.creating {
+                defFile("src/iosMain/objc/ios.def")
+                packageName("org.jetbrains.skiko.objc")
+            }
+        }
+    }
     val skiaBinDir = "$skiaDir/out/${buildType.id}-$targetString"
     val linkerFlags = when (os) {
         OS.MacOS -> mutableListOf("-linker-option", "-framework", "-linker-option", "Metal",
@@ -860,8 +868,8 @@ fun Project.androidJar(askedVersion: String = ""): Provider<File> =
         val version = if (askedVersion.isEmpty()) {
             val platformsDir = androidHome.resolve("platforms")
             val versions = platformsDir.list().orEmpty()
-            versions.maxByOrNull { name ->
-                name.removePrefix("android-").toInt()
+            versions.maxByOrNull { name -> // possible name: "android-32", "android-33-ext4"
+                name.split("-").getOrNull(1)?.toInt() ?: 0
             } ?: error(
                 buildString {
                     appendLine("'$platformsDir' does not contain any directories matching expected 'android-NUMBER' format: ${versions}")

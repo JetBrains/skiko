@@ -7,12 +7,14 @@
 #include "SkColorSpace.h"
 #include "SkSurface.h"
 #include "src/core/SkAutoMalloc.h"
+#include "../common/interop.hh"
 
 class SoftwareDevice
 {
 public:
     HWND window;
     RECT clientRect;
+    std::unique_ptr<SkSurfaceProps> surfaceProps;
     SkAutoMalloc surfaceMemory;
     sk_sp<SkSurface> surface;
 
@@ -22,10 +24,11 @@ public:
 extern "C"
 {
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_WindowsSoftwareRedrawer_createDevice(
-        JNIEnv *env, jobject redrawer, jlong contentHandle, jboolean transparency)
+        JNIEnv *env, jobject redrawer, jlong contentHandle, jintArray surfacePropsInts, jboolean transparency)
     {
         SoftwareDevice *device = new SoftwareDevice();
         device->window = (HWND)contentHandle;
+        device->surfaceProps = skija::SurfaceProps::toSkSurfaceProps(env, surfacePropsInts);
         if (transparency)
         {
             HWND parent = GetAncestor(device->window, GA_PARENT);
@@ -56,7 +59,7 @@ extern "C"
             SkImageInfo info = SkImageInfo::Make(
                 width, height, kBGRA_8888_SkColorType, kPremul_SkAlphaType,
                 SkColorSpace::MakeSRGB());
-            device->surface = SkSurface::MakeRasterDirect(info, pixels, sizeof(uint32_t) * width);
+            device->surface = SkSurface::MakeRasterDirect(info, pixels, sizeof(uint32_t) * width, device->surfaceProps.get());
             GetClientRect(device->window, &device->clientRect);
         }
         __except(EXCEPTION_EXECUTE_HANDLER) {

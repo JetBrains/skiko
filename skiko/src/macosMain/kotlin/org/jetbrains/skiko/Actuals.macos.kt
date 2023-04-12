@@ -16,6 +16,8 @@ internal actual fun ClipboardManager_getText(): String? {
     return NSPasteboard.generalPasteboard.stringForType(dataType = NSPasteboardTypeString)
 }
 
+internal actual fun ClipboardManager_hasText(): Boolean = !ClipboardManager_getText().isNullOrEmpty()
+
 actual typealias Cursor = NSCursor
 
 // TODO: not sure if it is correct.

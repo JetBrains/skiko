@@ -15,12 +15,6 @@ void skikoUnimplemented(const char* message) {
 // we put here stubs for all OS specific native methods.
 
 #ifndef SK_BUILD_FOR_LINUX
-JNIEXPORT jfloat JNICALL Java_org_jetbrains_skiko_PlatformOperationsKt_linuxGetDpiScaleNative(
-    JNIEnv *env, jobject properties, jlong platformInfoPtr) {
-    skikoUnimplemented("Java_org_jetbrains_skiko_PlatformOperationsKt_linuxGetDpiScaleNative");
-    return 0;
-}
-
 JNIEXPORT jfloat JNICALL Java_org_jetbrains_skiko_SetupKt_linuxGetSystemDpiScale(JNIEnv *env, jobject layer) {
     skikoUnimplemented("Java_org_jetbrains_skiko_SetupKt_linuxGetSystemDpiScale");
     return 0;
@@ -136,6 +130,12 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_resizeLay
     JNIEnv *env, jobject redrawer, jlong devicePtr, jint x, jint y, jint width, jint height)
 {
     skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_MetalRedrawer_resizeLayers");
+}
+
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_setLayerVisible(
+    JNIEnv *env, jobject redrawer, jlong devicePtr, jboolean isVisible)
+{
+    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_MetalRedrawer_setLayerVisible");
 }
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_setContentScale(JNIEnv *env, jobject obj, jlong devicePtr, jfloat contentScale)

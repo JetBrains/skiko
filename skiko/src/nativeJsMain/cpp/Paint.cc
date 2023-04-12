@@ -158,25 +158,6 @@ SKIKO_EXPORT void org_jetbrains_skia_Paint__1nSetStrokeJoin
     instance->setStrokeJoin(static_cast<SkPaint::Join>(join));
 }
 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_Paint__1nGetFillPath
-  (KNativePointer ptr, KNativePointer srcPtr, KFloat resScale) {
-    SkPaint* instance = reinterpret_cast<SkPaint*>((ptr));
-    SkPath* src = reinterpret_cast<SkPath*>((srcPtr));
-    SkPath* dst = new SkPath();
-    instance->getFillPath(*src, dst, nullptr, resScale);
-    return reinterpret_cast<KNativePointer>(dst);
-}
-
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_Paint__1nGetFillPathCull
-  (KNativePointer ptr, KNativePointer srcPtr, KFloat left, KFloat top, KFloat right, KFloat bottom, KFloat resScale) {
-    SkPaint* instance = reinterpret_cast<SkPaint*>((ptr));
-    SkPath* src = reinterpret_cast<SkPath*>((srcPtr));
-    SkPath* dst = new SkPath();
-    SkRect cull {left, top, right, bottom};
-    instance->getFillPath(*src, dst, &cull, resScale);
-    return reinterpret_cast<KNativePointer>(dst);
-}
-
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Paint__1nGetMaskFilter
   (KNativePointer ptr) {
     SkPaint* instance = reinterpret_cast<SkPaint*>((ptr));

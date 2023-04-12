@@ -1,5 +1,8 @@
 package org.jetbrains.skiko.redrawer
 
+import org.jetbrains.skia.impl.interopScope
+import org.jetbrains.skia.impl.InteropPointer
+import org.jetbrains.skia.SurfaceProps
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaLayerProperties
 import org.jetbrains.skiko.RenderException
@@ -13,13 +16,15 @@ internal class WindowsSoftwareRedrawer(
 
     init {
         onDeviceChosen("Software")
-        device = createDevice(layer.contentHandle, layer.transparency).also {
-            if (it == 0L) {
-                throw RenderException("Failed to create Software device")
+        device = interopScope {
+            createDevice(layer.contentHandle, toInterop(SurfaceProps(pixelGeometry = layer.pixelGeometry).packToIntArray()), layer.transparency).also {
+                if (it == 0L) {
+                    throw RenderException("Failed to create Software device")
+                }
             }
         }
         onContextInit()
     }
 
-    private external fun createDevice(contentHandle: Long, transparency: Boolean): Long
+    private external fun createDevice(contentHandle: Long, surfacePropsIntArray: InteropPointer, transparency: Boolean): Long
 }

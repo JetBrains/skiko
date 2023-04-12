@@ -363,19 +363,20 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
-        fun makePaint(paint: Paint?, crop: IRect?): ImageFilter {
+        fun makeShader(shader: Shader, dither: Boolean = false, crop: IRect?): ImageFilter {
             return try {
                 Stats.onNativeCall()
                 interopScope {
                     ImageFilter(
-                        _nMakePaint(
-                            paint = getPtr(paint),
+                        _nMakeShader(
+                            shader = getPtr(shader),
+                            dither = dither,
                             crop = toInterop(crop?.serializeToIntArray())
                         )
                     )
                 }
             } finally {
-                reachabilityBarrier(paint)
+                reachabilityBarrier(shader)
             }
         }
 
@@ -806,9 +807,9 @@ private external fun _nMakeMerge(filters: InteropPointer, filtersLength: Int, cr
 @ModuleImport("skia", "org_jetbrains_skia_ImageFilter__1nMakeOffset")
 private external fun _nMakeOffset(dx: Float, dy: Float, input: NativePointer, crop: InteropPointer): NativePointer
 
-@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakePaint")
+@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeShader")
 @ModuleImport("skia", "org_jetbrains_skia_ImageFilter__1nMakePaint")
-private external fun _nMakePaint(paint: NativePointer, crop: InteropPointer): NativePointer
+private external fun _nMakeShader(shader: NativePointer, dither: Boolean, crop: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakePicture")
 @ModuleImport("skia", "org_jetbrains_skia_ImageFilter__1nMakePicture")

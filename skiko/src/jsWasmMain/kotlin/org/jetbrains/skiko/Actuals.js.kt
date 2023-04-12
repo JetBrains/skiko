@@ -21,6 +21,8 @@ internal actual fun ClipboardManager_getText(): String? {
     return null
 }
 
+internal actual fun ClipboardManager_hasText(): Boolean = !ClipboardManager_getText().isNullOrEmpty()
+
 actual typealias Cursor = String
 
 internal actual fun CursorManager_setCursor(component: Any, cursor: Cursor) {

@@ -47,12 +47,7 @@ class SkikoSurfaceView(context: Context, val layer: SkiaLayer) : GLSurfaceView(c
     internal val gesturesDetector = SkikoGesturesDetector(context, layer)
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        val events: MutableList<SkikoTouchEvent> = mutableListOf()
-        val count = event.pointerCount
-        for (index in 0 until count) {
-            events.add(toSkikoTouchEvent(event, index, layer.contentScale))
-        }
-        layer.skikoView?.onTouchEvent(events.toTypedArray())
+        layer.skikoView?.onPointerEvent(toSkikoPointerEvent(event, layer.contentScale))
         return true
     }
 

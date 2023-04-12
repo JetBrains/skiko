@@ -141,14 +141,14 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeOffset
     return reinterpret_cast<KNativePointer>(ptr);
 }
 
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakePaint
-  (KNativePointer paintPtr, KInt* cropRectInts) {
-    SkPaint* paint = reinterpret_cast<SkPaint*>((paintPtr));
+SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeShader
+  (KNativePointer shaderPtr, KBoolean ditherBoolean, KInt* cropRectInts) {
+    SkShader* shader = reinterpret_cast<SkShader*>((shaderPtr));
     std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(cropRectInts);
-    SkImageFilter* ptr = SkImageFilters::Paint(*paint, crop.get()).release();
+    SkImageFilters::Dither dither = ditherBoolean ? SkImageFilters::Dither::kYes : SkImageFilters::Dither::kNo;
+    SkImageFilter* ptr = SkImageFilters::Shader(sk_ref_sp(shader), dither, crop.get()).release();
     return reinterpret_cast<KNativePointer>(ptr);
 }
-
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakePicture
   (KNativePointer picturePtr, KFloat l, KFloat t, KFloat r, KFloat b) {

@@ -5,5 +5,6 @@ internal interface Redrawer {
     fun needRedraw()
     fun redrawImmediately()
     fun syncSize() = Unit
+    fun setVisible(isVisible: Boolean) = Unit
     val renderInfo: String
 }

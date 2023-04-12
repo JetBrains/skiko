@@ -119,6 +119,18 @@ class Font : Managed {
     }
 
     /**
+     * If true, requests, but does not require, to use bitmaps in fonts instead of outlines.
+     */
+    fun setBitmapsEmbedded(value: Boolean) {
+        try {
+            Stats.onNativeCall()
+            _nSetBitmapsEmbedded(_ptr, value)
+        } finally {
+            reachabilityBarrier(this)
+        }
+    }
+
+    /**
      * @return  true if glyphs may be drawn at sub-pixel offsets
      */
     var isSubpixel: Boolean

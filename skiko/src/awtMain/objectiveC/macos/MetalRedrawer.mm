@@ -251,6 +251,23 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_resizeLay
     }
 }
 
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_setLayerVisible(
+    JNIEnv *env, jobject redrawer, jlong devicePtr, jboolean isVisible)
+{
+    @autoreleasepool {
+        MetalDevice *device = (__bridge MetalDevice *) (void *) devicePtr;
+        BOOL hidden = !isVisible;
+        if (!device || !device.layer || device.layer.hidden == hidden) {
+            return;
+        }
+        [CATransaction begin];
+        [CATransaction setValue:(id)kCFBooleanTrue forKey:kCATransactionDisableActions];
+        device.layer.hidden = hidden;
+        [CATransaction commit];
+        [CATransaction flush];
+    }
+}
+
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_setContentScale(JNIEnv *env, jobject obj, jlong devicePtr, jfloat contentScale)
 {
     @autoreleasepool {
