@@ -808,7 +808,7 @@ private external fun _nMakeMerge(filters: InteropPointer, filtersLength: Int, cr
 private external fun _nMakeOffset(dx: Float, dy: Float, input: NativePointer, crop: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeShader")
-@ModuleImport("skia", "org_jetbrains_skia_ImageFilter__1nMakePaint")
+@ModuleImport("skia", "org_jetbrains_skia_ImageFilter__1nMakeShader")
 private external fun _nMakeShader(shader: NativePointer, dither: Boolean, crop: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakePicture")
