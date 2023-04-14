@@ -4,7 +4,6 @@ import org.jetbrains.skia.*
 import org.jetbrains.skiko.redrawer.Redrawer
 import java.awt.Color
 import java.awt.Component
-import java.awt.Window
 import java.awt.event.*
 import java.awt.geom.AffineTransform
 import java.awt.im.InputMethodRequests
@@ -146,7 +145,7 @@ actual open class SkiaLayer internal constructor(
 
     override fun removeNotify() {
         Logger.debug { "SkiaLayer.awt#removeNotify $this" }
-        val window = SwingUtilities.getRoot(this) as Window
+        val window = SwingUtilities.getWindowAncestor(this)
         window.removeComponentListener(fullscreenAdapter)
         dispose()
         super.removeNotify()
@@ -155,7 +154,7 @@ actual open class SkiaLayer internal constructor(
     override fun addNotify() {
         Logger.debug { "SkiaLayer.awt#addNotify $this" }
         super.addNotify()
-        val window = SwingUtilities.getRoot(this) as Window
+        val window = SwingUtilities.getWindowAncestor(this)
         window.addComponentListener(fullscreenAdapter)
         checkShowing()
         init(isInited)

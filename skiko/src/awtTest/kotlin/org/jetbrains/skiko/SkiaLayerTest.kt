@@ -23,6 +23,8 @@ import org.junit.Rule
 import org.junit.Test
 import java.awt.Color
 import java.awt.Dimension
+import java.awt.event.ComponentAdapter
+import java.awt.event.ComponentEvent
 import java.awt.event.WindowEvent
 import javax.swing.JFrame
 import javax.swing.JLayeredPane
@@ -241,6 +243,34 @@ class SkiaLayerTest {
             window1.close()
             window2.close()
             window3.close()
+        }
+    }
+
+    @Test
+    fun `window fullscreen state in componentResized`() = uiTest {
+        val window = UiTestWindow()
+        try {
+            window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+            window.layer.fullscreen = true
+            var stateRemainsFullscreen = true
+            window.addComponentListener(object: ComponentAdapter(){
+                override fun componentResized(e: ComponentEvent?) {
+                    if (!window.layer.fullscreen)
+                        stateRemainsFullscreen = false
+                }
+            })
+            window.isVisible = true
+
+            delay(1000)
+            assertEquals(true, stateRemainsFullscreen)
+        } finally {
+            window.close()
+
+            // Delay before starting next test to let the window animation to complete, and allow the next window
+            // to become fullscreen
+            if (hostOs == OS.MacOS) {
+                delay(1000)
+            }
         }
     }
 
