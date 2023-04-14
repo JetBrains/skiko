@@ -198,4 +198,5 @@ private external fun _nChildShader(builderPtr: NativePointer, uniformName: Inter
 private external fun _nChildColorFilter(builderPtr: NativePointer, uniformName: InteropPointer, colorFilterPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_RuntimeShaderBuilder__1nMakeShader")
+@ModuleImport("skia", "org_jetbrains_skia_RuntimeShaderBuilder__1nMakeShader")
 private external fun _nMakeShader(builderPtr: NativePointer, localMatrix: InteropPointer): NativePointer
