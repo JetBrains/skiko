@@ -19,10 +19,10 @@ debug(`karma basePath: ${basePath}`);
 debug(`karma wasmPath: ${wasmPath}`);
 debug(`karma generatedAssetsPath: ${generatedAssetsPath}`);
 
-config.browsers = ["ChromeCanaryHeadlessWasmGC"];
+config.browsers = ["ChromeHeadlessWasmGc"];
 config.customLaunchers = {
-    ChromeCanaryHeadlessWasmGC: {
-        base: 'ChromeCanaryHeadless',
+    ChromeHeadlessWasmGc: {
+        base: 'ChromeHeadless',
         flags: ['--js-flags=--experimental-wasm-gc']
     }
 };

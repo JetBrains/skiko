@@ -305,7 +305,8 @@ kotlin {
                     dependsOn("linkWasm")
                     useKarma {
                         this.webpackConfig.experiments.add("topLevelAwait")
-                        useChromeCanaryHeadless()
+                        useChromeHeadless()
+//                        useChromeCanaryHeadless()
                         useConfigDirectory(project.projectDir.resolve("karma.config.d").resolve("wasm"))
                     }
                 }
