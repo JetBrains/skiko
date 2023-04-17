@@ -16,9 +16,13 @@ internal actual fun ClipboardManager_setText(text: String) {
 }
 
 internal actual fun ClipboardManager_getText(): String? {
-    // TODO("implement ClipboardManager_getText")
-    // kotlinx.browser.window.navigator.clipboard.readText()
-    return null
+    var clipboardText: String? = null
+    kotlinx.browser.window.navigator.clipboard.readText().then {
+        clipboardText = it
+    }.catch {
+        clipboardText = null
+    }
+    return clipboardText
 }
 
 internal actual fun ClipboardManager_hasText(): Boolean = !ClipboardManager_getText().isNullOrEmpty()
