@@ -6,6 +6,10 @@ import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import javax.swing.SwingUtilities
 
+/**
+ * A proxy between [SkiaLayer] and [HardwareLayer] that keeps the assigned "fullscreen" state while the layer doesn't
+ * exist, and applies it once it does.
+ */
 internal class FullscreenAdapter(
     val backedLayer: HardwareLayer
 ): ComponentAdapter() {
