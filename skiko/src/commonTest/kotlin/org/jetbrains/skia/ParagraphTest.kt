@@ -35,11 +35,15 @@ class ParagraphTest {
         fontCollection().findTypefaces(emptyArray(), FontStyle.NORMAL)
     }
 
-    private suspend fun singleLineMetrics(text: String): LineMetrics {
+    private suspend fun layoutParagraph(text: String): Paragraph {
         return ParagraphBuilder(style, fontCollection()).use {
             it.addText(text)
             it.build()
-        }.layout(Float.POSITIVE_INFINITY).lineMetrics.first()
+        }.layout(Float.POSITIVE_INFINITY)
+    }
+
+    private suspend fun singleLineMetrics(text: String): LineMetrics {
+        return layoutParagraph(text).lineMetrics.first()
     }
 
     @Test
@@ -58,6 +62,17 @@ class ParagraphTest {
             assertEquals(2, lineMetrics.endIncludingNewline)
             assertEquals(2, lineMetrics.endExcludingWhitespaces)
         }
+    }
+    @Test
+    @SkipJsTarget // FIXME Emscripten's stringToUTF8 function does not correctly handle invalid unicode symbols.
+    fun invalidUnicode() = runTest {
+        val invalidUnicodeText = "🦊qwerty".substring(1)
+
+        val paragraph = layoutParagraph(invalidUnicodeText)
+
+        // There is an intermediate conversation to UTF-8, so U+FFFD is expected instead of the invalid one.
+        assertEquals("�qwerty", paragraph.getText())
+        assertEquals(1, paragraph.lineNumber)
     }
 
     @Test
