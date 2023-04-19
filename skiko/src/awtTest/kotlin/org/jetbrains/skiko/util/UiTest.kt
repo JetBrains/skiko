@@ -9,11 +9,12 @@ import java.awt.GraphicsEnvironment
 import javax.swing.JFrame
 
 internal fun uiTest(block: suspend UiTestScope.() -> Unit) {
-    assumeFalse(GraphicsEnvironment.isHeadless())
-    assumeTrue(System.getProperty("skiko.test.ui.enabled", "false") == "true")
+//    assumeFalse(GraphicsEnvironment.isHeadless())
+//    assumeTrue(System.getProperty("skiko.test.ui.enabled", "false") == "true")
 
-    val renderApi = System.getProperty("skiko.test.ui.renderApi", "all")
+//    val renderApi = System.getProperty("skiko.test.ui.renderApi", "all")
 
+    val renderApi = "METAL"
     runBlocking(MainUIDispatcher) {
         if (renderApi == "all") {
             SkikoProperties.fallbackRenderApiQueue(SkikoProperties.renderApi).forEach {

@@ -132,6 +132,9 @@ internal class MetalRedrawer(
         val width = layer.backedLayer.width.coerceAtLeast(0)
         val height = layer.backedLayer.height.coerceAtLeast(0)
         Logger.debug { "MetalRedrawer#resizeLayers $this {x: $x y: $y width: $width height: $height} rootPane: ${rootPane.size}" }
+        if (width != rootPane.width || height != rootPane.height || x != 0 || y != 0) {
+            throw Error("MetalRedrawer#resizeLayers $this {x: $x y: $y width: $width height: $height} rootPane: ${rootPane.size}")
+        }
         resizeLayers(device, x, y, width, height)
     }
 

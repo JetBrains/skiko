@@ -23,6 +23,7 @@ import org.junit.Rule
 import org.junit.Test
 import java.awt.Color
 import java.awt.Dimension
+import java.awt.Frame
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import java.awt.event.WindowEvent
@@ -33,6 +34,8 @@ import javax.swing.WindowConstants
 import kotlin.random.Random
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
 
 @Suppress("BlockingMethodInNonBlockingContext", "SameParameterValue")
 class SkiaLayerTest {
@@ -243,6 +246,45 @@ class SkiaLayerTest {
             window1.close()
             window2.close()
             window3.close()
+        }
+    }
+
+    @Test
+    fun `hide and show multiple windows`() = uiTest {
+        fun window(offset: Int, color: Color) = UiTestWindow().apply {
+            setLocation(offset, 200)
+            setSize(500, 500)
+            defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+            val width = Random.nextInt(0, 500)
+            val height = Random.nextInt(0, 500)
+            layer.skikoView = RectRenderer(layer, width, height, color, Color.BLUE)
+            isUndecorated = true
+            isVisible = true
+        }
+
+        val windows: MutableList<UiTestWindow> = mutableListOf()
+        try {
+            repeat(10) {
+                val window = window(100, Color.GREEN)
+                windows.add(window)
+            }
+            repeat(100) {
+                SwingUtilities.invokeLater {
+                    windows.random().toFront()
+                }
+                SwingUtilities.invokeLater {
+                    windows.random().state = Frame.ICONIFIED
+                }
+                SwingUtilities.invokeLater {
+                    windows.random().state = Frame.NORMAL
+                }
+            }
+            delay(10.seconds.toLong(DurationUnit.MILLISECONDS))
+
+        } finally {
+            windows.forEach {
+                it.close()
+            }
         }
     }
 
@@ -767,12 +809,13 @@ class SkiaLayerTest {
         private val layer: SkiaLayer,
         var rectWidth: Int,
         var rectHeight: Int,
-        private val rectColor: Color
+        private val rectColor: Color,
+        private val backgroundColor: Color = Color.WHITE,
     ) : SkikoView {
         override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
             val dpi = layer.contentScale
             canvas.drawRect(Rect(0f, 0f, width.toFloat(), height.toFloat()), Paint().apply {
-                color = Color.WHITE.rgb
+                color = backgroundColor.rgb
             })
             canvas.drawRect(Rect(0f, 0f, rectWidth * dpi, rectHeight * dpi), Paint().apply {
                 color = rectColor.rgb
