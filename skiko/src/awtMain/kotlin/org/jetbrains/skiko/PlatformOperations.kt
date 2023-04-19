@@ -6,34 +6,52 @@ import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import javax.swing.SwingUtilities
 
-internal open class FullscreenAdapter(
+/**
+ * A proxy between [SkiaLayer] and [HardwareLayer] that keeps the assigned "fullscreen" state while the layer doesn't
+ * exist, and applies it once it does.
+ */
+internal class FullscreenAdapter(
     val backedLayer: HardwareLayer
 ): ComponentAdapter() {
-    private var _isFullscreenDispatched = false
-    private var _isFullscreen: Boolean = false
+
+    // Keep a `localFullscreen` flag which stores the virtual fullscreen state when the window is not actually
+    // visible, and apply it when the window does become visible.
+    private var localFullscreen = false
+
+    // Additionally, keep an `isWindowShown` flag that says whether `backedLayer` or `localFullscreen` is currently
+    // the source of truth. This flag must be used, rather than the real state (e.g. with `window.isVisible)
+    // because otherwise the code becomes dependent on the order of listener calls. For example, `componentResized`
+    // can be called when the window is already visible but before `componentShown` has been called. If the test
+    // in `componentResized` was on `window.isVisible`, it would reset the value of `localFullscreen` before it had
+    // applied in `componentShown`.
+    private var isWindowShown = false
+
     var fullscreen: Boolean
-        get() = _isFullscreen
+        // If window is shown, return backedLayer.fullscreen; localFullscreen may not have updated yet
+        get() = if (isWindowShown) backedLayer.fullscreen else localFullscreen
         set(value) {
-            _isFullscreen = value
-            val window = SwingUtilities.getRoot(backedLayer)
-            if ( window == null || !window.isVisible) {
-                _isFullscreenDispatched = value
-            } else {
+            localFullscreen = value
+            if (isWindowShown) {
                 backedLayer.fullscreen = value
             }
         }
 
     override fun componentShown(e: ComponentEvent) {
-        backedLayer.fullscreen = _isFullscreenDispatched
+        isWindowShown = true
+        backedLayer.fullscreen = localFullscreen
     }
 
-    override fun componentHidden(e: ComponentEvent) {
-        _isFullscreenDispatched = _isFullscreen
+    override fun componentHidden(e: ComponentEvent?) {
+        isWindowShown = false
+        localFullscreen = backedLayer.fullscreen
     }
 
     override fun componentResized(e: ComponentEvent) {
-        _isFullscreen = backedLayer.fullscreen
+        if (isWindowShown) {
+            localFullscreen = backedLayer.fullscreen
+        }
     }
+
 }
 
 internal interface PlatformOperations {
