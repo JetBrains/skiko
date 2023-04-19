@@ -29,11 +29,11 @@ internal class MetalContextHandler(layer: SkiaLayer) : JvmContextHandler(layer) 
         disposeCanvas()
 
         val scale = layer.contentScale
-        val w = (layer.width * scale).toInt().coerceAtLeast(0)
-        val h = (layer.height * scale).toInt().coerceAtLeast(0)
+        val width = (layer.backedLayer.width * scale).toInt().coerceAtLeast(0)
+        val height = (layer.backedLayer.height * scale).toInt().coerceAtLeast(0)
 
-        if (w > 0 && h > 0) {
-            renderTarget = metalRedrawer.makeRenderTarget(w, h)
+        if (width > 0 && height > 0) {
+            renderTarget = metalRedrawer.makeRenderTarget(width, height)
 
             surface = Surface.makeFromBackendRenderTarget(
                 context!!,
