@@ -24,17 +24,36 @@ fun setupSkikoLoggerFactory(createLogger: () -> SkikoLoggerInterface) {
     Logger.loggerFactory = createLogger
 }
 
-internal object DefaultConsoleLogger: SkikoLoggerInterface {
-    override val isTraceEnabled: Boolean
-        get() = false
-    override val isDebugEnabled: Boolean
-        get() = false
-    override val isInfoEnabled: Boolean
-        get() = true
-    override val isWarnEnabled: Boolean
-        get() = true
-    override val isErrorEnabled: Boolean
-        get() = true
+internal enum class LogLevel {
+    TRACE,
+    DEBUG,
+    INFO,
+    WARN,
+    ERROR;
+
+    fun noMoreVerboseThan(other: LogLevel): Boolean {
+        return this.ordinal >= other.ordinal
+    }
+}
+
+class DefaultConsoleLogger(override val isTraceEnabled: Boolean = false,
+                           override val isDebugEnabled: Boolean = false,
+                           override val isInfoEnabled: Boolean = true,
+                           override val isWarnEnabled: Boolean = true,
+                           override val isErrorEnabled: Boolean = true): SkikoLoggerInterface {
+
+    companion object {
+        fun fromLevel(level: String): DefaultConsoleLogger {
+            val logLevel = LogLevel.values().filter { it.name == level }.firstOrNull() ?: LogLevel.INFO
+            return DefaultConsoleLogger(
+                isTraceEnabled = LogLevel.TRACE.noMoreVerboseThan(logLevel),
+                isDebugEnabled = LogLevel.DEBUG.noMoreVerboseThan(logLevel),
+                isInfoEnabled = LogLevel.INFO.noMoreVerboseThan(logLevel),
+                isWarnEnabled = LogLevel.WARN.noMoreVerboseThan(logLevel),
+                isErrorEnabled = LogLevel.ERROR.noMoreVerboseThan(logLevel)
+            )
+        }
+    }
 
     override fun trace(message: String) {
         println("[SKIKO] trace: $message")
@@ -83,7 +102,7 @@ internal object DefaultConsoleLogger: SkikoLoggerInterface {
 }
 
 internal object Logger {
-    var loggerFactory: () -> SkikoLoggerInterface = { DefaultConsoleLogger }
+    var loggerFactory: () -> SkikoLoggerInterface = { DefaultConsoleLogger() }
 
     val loggerImpl by lazy {
         loggerFactory()
