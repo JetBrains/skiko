@@ -125,13 +125,13 @@ internal class MetalRedrawer(
     override fun syncSize() = synchronized(drawLock) {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         val rootPane = getRootPane(layer)
-        val globalPosition = convertPoint(layer, layer.x, layer.y, rootPane)
+        val globalPosition = convertPoint(layer.backedLayer, 0, 0, rootPane)
         setContentScale(device, layer.contentScale)
         val x = globalPosition.x
         val y = rootPane.height - globalPosition.y - layer.height
-        val width = layer.width.coerceAtLeast(0)
-        val height = layer.height.coerceAtLeast(0)
-        Logger.debug { "MetalRedrawer#resizeLayers $this $x $y $width $height" }
+        val width = layer.backedLayer.width.coerceAtLeast(0)
+        val height = layer.backedLayer.height.coerceAtLeast(0)
+        Logger.debug { "MetalRedrawer#resizeLayers $this {x: $x y: $y width: $width height: $height} rootPane: ${rootPane.size}" }
         resizeLayers(device, x, y, width, height)
     }
 

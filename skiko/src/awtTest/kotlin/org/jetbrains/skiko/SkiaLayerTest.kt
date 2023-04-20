@@ -21,6 +21,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assume.assumeTrue
 import org.junit.Rule
 import org.junit.Test
+import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.event.ComponentAdapter
@@ -28,6 +29,7 @@ import java.awt.event.ComponentEvent
 import java.awt.event.WindowEvent
 import javax.swing.JFrame
 import javax.swing.JLayeredPane
+import javax.swing.JPanel
 import javax.swing.SwingUtilities
 import javax.swing.WindowConstants
 import kotlin.random.Random
@@ -594,6 +596,31 @@ class SkiaLayerTest {
             window.close()
         }
 
+    }
+
+    @Test
+    fun `non zero layer origin`() = uiTest {
+        val window = UiTestWindow(setupContent = {
+            isUndecorated = true
+            setLocation(200, 200)
+            setSize(300, 100)
+
+            val panel = JPanel()
+            panel.preferredSize = Dimension(100, 100)
+            panel.background = Color.GREEN
+            contentPane.add(panel, BorderLayout.WEST)
+
+            layer.skikoView = RectRenderer(layer, 100, 100, Color.RED)
+            contentPane.add(layer, BorderLayout.CENTER)
+        })
+        try {
+            window.isUndecorated = true
+            window.isVisible = true
+            delay(1000)
+            screenshots.assert(window.bounds, "frame")
+        } finally {
+            window.close()
+        }
     }
 
     @Test
