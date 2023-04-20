@@ -3,6 +3,13 @@ package org.jetbrains.skia.icu
 import org.jetbrains.skia.ExternalSymbolName
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 
+/**
+ * CharDirection represents Bidi_Class Unicode character property.
+ * Numeric constant values match to ICU's UCharDirection enum.
+ *
+ * See https://unicode-org.github.io/icu-docs/apidoc/dev/icu4c/uchar_8h.html
+ * See https://www.unicode.org/reports/tr9/
+ */
 object CharDirection {
     init {
         staticLoad()
