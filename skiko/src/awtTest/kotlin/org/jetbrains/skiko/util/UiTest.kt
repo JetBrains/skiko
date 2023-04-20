@@ -34,7 +34,8 @@ internal class UiTestScope(
     fun UiTestWindow(
         properties: SkiaLayerProperties = SkiaLayerProperties(),
         analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
-        renderFactory: RenderFactory = RenderFactory.Default
+        renderFactory: RenderFactory = RenderFactory.Default,
+        setupContent: UiTestWindow.() -> Unit = { contentPane.add(layer) }
     ) = object : UiTestWindow() {
         override val layer: SkiaLayer = SkiaLayer(
             properties = properties.copy(renderApi = renderApi),
@@ -43,7 +44,7 @@ internal class UiTestScope(
         )
 
         init {
-            contentPane.add(layer)
+            setupContent()
         }
 
         override fun dispose() {
