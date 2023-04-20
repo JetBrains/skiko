@@ -1,5 +1,31 @@
 $dokka.format:html-v1
 $dokka.linkExtension:html
+$dokka.location:org.jetbrains.skia.icu////PointingToDeclaration/skiko/org.jetbrains.skia.icu/index.html
+$dokka.location:org.jetbrains.skia.icu/CharDirection///PointingToDeclaration/skiko/org.jetbrains.skia.icu/-char-direction/index.html
+$dokka.location:org.jetbrains.skia.icu/CharDirection/ARABIC_NUMBER/#/PointingToDeclaration/skiko/org.jetbrains.skia.icu/-char-direction/-a-r-a-b-i-c_-n-u-m-b-e-r.html
+$dokka.location:org.jetbrains.skia.icu/CharDirection/BLOCK_SEPARATOR/#/PointingToDeclaration/skiko/org.jetbrains.skia.icu/-char-direction/-b-l-o-c-k_-s-e-p-a-r-a-t-o-r.html
+$dokka.location:org.jetbrains.skia.icu/CharDirection/BOUNDARY_NEUTRAL/#/PointingToDeclaration/skiko/org.jetbrains.skia.icu/-char-direction/-b-o-u-n-d-a-r-y_-n-e-u-t-r-a-l.html
+$dokka.location:org.jetbrains.skia.icu/CharDirection/COMMON_NUMBER_SEPARATOR/#/PointingToDeclaration/skiko/org.jetbrains.skia.icu/-char-direction/-c-o-m-m-o-n_-n-u-m-b-e-r_-s-e-p-a-r-a-t-o-r.html
+$dokka.location:org.jetbrains.skia.icu/CharDirection/DIR_NON_SPACING_MARK/#/PointingToDeclaration/skiko/org.jetbrains.skia.icu/-char-direction/-d-i-r_-n-o-n_-s-p-a-c-i-n-g_-m-a-r-k.html
+$dokka.location:org.jetbrains.skia.icu/CharDirection/EUROPEAN_NUMBER/#/PointingToDeclaration/skiko/org.jetbrains.skia.icu/-char-direction/-e-u-r-o-p-e-a-n_-n-u-m-b-e-r.html
+$dokka.location:org.jetbrains.skia.icu/CharDirection/EUROPEAN_NUMBER_SEPARATOR/#/PointingToDeclaration/skiko/org.jetbrains.skia.icu/-char-direction/-e-u-r-o-p-e-a-n_-n-u-m-b-e-r_-s-e-p-a-r-a-t-o-r.html
+$dokka.location:org.jetbrains.skia.icu/CharDirection/EUROPEAN_NUMBER_TERMINATOR/#/PointingToDeclaration/skiko/org.jetbrains.skia.icu/-char-direction/-e-u-r-o-p-e-a-n_-n-u-m-b-e-r_-t-e-r-m-i-n-a-t-o-r.html
+$dokka.location:org.jetbrains.skia.icu/CharDirection/FIRST_STRONG_ISOLATE/#/PointingToDeclaration/skiko/org.jetbrains.skia.icu/-char-direction/-f-i-r-s-t_-s-t-r-o-n-g_-i-s-o-l-a-t-e.html
+$dokka.location:org.jetbrains.skia.icu/CharDirection/LEFT_TO_RIGHT/#/PointingToDeclaration/skiko/org.jetbrains.skia.icu/-char-direction/-l-e-f-t_-t-o_-r-i-g-h-t.html
+$dokka.location:org.jetbrains.skia.icu/CharDirection/LEFT_TO_RIGHT_EMBEDDING/#/PointingToDeclaration/skiko/org.jetbrains.skia.icu/-char-direction/-l-e-f-t_-t-o_-r-i-g-h-t_-e-m-b-e-d-d-i-n-g.html
+$dokka.location:org.jetbrains.skia.icu/CharDirection/LEFT_TO_RIGHT_ISOLATE/#/PointingToDeclaration/skiko/org.jetbrains.skia.icu/-char-direction/-l-e-f-t_-t-o_-r-i-g-h-t_-i-s-o-l-a-t-e.html
+$dokka.location:org.jetbrains.skia.icu/CharDirection/LEFT_TO_RIGHT_OVERRIDE/#/PointingToDeclaration/skiko/org.jetbrains.skia.icu/-char-direction/-l-e-f-t_-t-o_-r-i-g-h-t_-o-v-e-r-r-i-d-e.html
+$dokka.location:org.jetbrains.skia.icu/CharDirection/OTHER_NEUTRAL/#/PointingToDeclaration/skiko/org.jetbrains.skia.icu/-char-direction/-o-t-h-e-r_-n-e-u-t-r-a-l.html
+$dokka.location:org.jetbrains.skia.icu/CharDirection/POP_DIRECTIONAL_FORMAT/#/PointingToDeclaration/skiko/org.jetbrains.skia.icu/-char-direction/-p-o-p_-d-i-r-e-c-t-i-o-n-a-l_-f-o-r-m-a-t.html
+$dokka.location:org.jetbrains.skia.icu/CharDirection/POP_DIRECTIONAL_ISOLATE/#/PointingToDeclaration/skiko/org.jetbrains.skia.icu/-char-direction/-p-o-p_-d-i-r-e-c-t-i-o-n-a-l_-i-s-o-l-a-t-e.html
+$dokka.location:org.jetbrains.skia.icu/CharDirection/RIGHT_TO_LEFT/#/PointingToDeclaration/skiko/org.jetbrains.skia.icu/-char-direction/-r-i-g-h-t_-t-o_-l-e-f-t.html
+$dokka.location:org.jetbrains.skia.icu/CharDirection/RIGHT_TO_LEFT_ARABIC/#/PointingToDeclaration/skiko/org.jetbrains.skia.icu/-char-direction/-r-i-g-h-t_-t-o_-l-e-f-t_-a-r-a-b-i-c.html
+$dokka.location:org.jetbrains.skia.icu/CharDirection/RIGHT_TO_LEFT_EMBEDDING/#/PointingToDeclaration/skiko/org.jetbrains.skia.icu/-char-direction/-r-i-g-h-t_-t-o_-l-e-f-t_-e-m-b-e-d-d-i-n-g.html
+$dokka.location:org.jetbrains.skia.icu/CharDirection/RIGHT_TO_LEFT_ISOLATE/#/PointingToDeclaration/skiko/org.jetbrains.skia.icu/-char-direction/-r-i-g-h-t_-t-o_-l-e-f-t_-i-s-o-l-a-t-e.html
+$dokka.location:org.jetbrains.skia.icu/CharDirection/RIGHT_TO_LEFT_OVERRIDE/#/PointingToDeclaration/skiko/org.jetbrains.skia.icu/-char-direction/-r-i-g-h-t_-t-o_-l-e-f-t_-o-v-e-r-r-i-d-e.html
+$dokka.location:org.jetbrains.skia.icu/CharDirection/SEGMENT_SEPARATOR/#/PointingToDeclaration/skiko/org.jetbrains.skia.icu/-char-direction/-s-e-g-m-e-n-t_-s-e-p-a-r-a-t-o-r.html
+$dokka.location:org.jetbrains.skia.icu/CharDirection/WHITE_SPACE_NEUTRAL/#/PointingToDeclaration/skiko/org.jetbrains.skia.icu/-char-direction/-w-h-i-t-e_-s-p-a-c-e_-n-e-u-t-r-a-l.html
+$dokka.location:org.jetbrains.skia.icu/CharDirection/of/#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia.icu/-char-direction/of.html
 $dokka.location:org.jetbrains.skia.impl////PointingToDeclaration/skiko/org.jetbrains.skia.impl/index.html
 $dokka.location:org.jetbrains.skia.impl//use/TypeParam(bounds=[org.jetbrains.skia.impl.Managed])#kotlin.Function1[TypeParam(bounds=[org.jetbrains.skia.impl.Managed]),TypeParam(bounds=[kotlin.Any?])]/PointingToDeclaration/skiko/org.jetbrains.skia.impl/use.html
 $dokka.location:org.jetbrains.skia.impl/BufferUtil///PointingToDeclaration/skiko/org.jetbrains.skia.impl/-buffer-util/index.html
@@ -3159,6 +3185,7 @@ $dokka.location:org.jetbrains.skiko/URIManager///PointingToDeclaration/skiko/or
 $dokka.location:org.jetbrains.skiko/URIManager/URIManager/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-u-r-i-manager/-u-r-i-manager.html
 $dokka.location:org.jetbrains.skiko/URIManager/openUri/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-u-r-i-manager/open-uri.html
 org.jetbrains.skia
+org.jetbrains.skia.icu
 org.jetbrains.skia.impl
 org.jetbrains.skia.paragraph
 org.jetbrains.skia.shaper
