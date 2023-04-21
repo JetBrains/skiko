@@ -20,7 +20,14 @@ internal class Direct3DRedrawer(
 
     private var drawLock = Any()
 
-    private val device: Long
+    private var device: Long = 0L
+        get() {
+            if (field == 0L) {
+                throw RenderException("DirectX12 device is not initialized or already disposed")
+            }
+            return field
+        }
+
     val adapterName: String
     val adapterMemorySize: Long
 
@@ -33,9 +40,7 @@ internal class Direct3DRedrawer(
         adapterMemorySize = getAdapterMemorySize(adapter)
         onDeviceChosen(adapterName)
         device = createDirectXDevice(adapter, layer.contentHandle, layer.transparency)
-        if (device == 0L) {
-            throw RenderException("Failed to create DirectX12 device.")
-        }
+            .takeIf { it != 0L } ?: throw RenderException("Failed to create DirectX12 device.")
     }
 
     private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
@@ -53,6 +58,7 @@ internal class Direct3DRedrawer(
         frameDispatcher.cancel()
         contextHandler.dispose()
         disposeDevice(device)
+        device = 0L
         super.dispose()
     }
 
