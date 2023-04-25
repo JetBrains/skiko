@@ -1,9 +1,6 @@
 package org.jetbrains.skiko
 
-import org.w3c.dom.events.MouseEvent
-import org.w3c.dom.events.KeyboardEvent
-import org.w3c.dom.events.WheelEvent
-import org.w3c.dom.events.InputEvent
+import org.w3c.dom.events.*
 
 private val SPECIAL_KEYS = setOf(
     "Unidentified",
@@ -59,6 +56,8 @@ private val SPECIAL_KEYS = setOf(
     "Clear"
 )
 
+internal expect fun getEventTimestamp(e: UIEvent): Long
+
 fun toSkikoEvent(
     event: MouseEvent,
     kind: SkikoPointerEventKind
@@ -70,7 +69,7 @@ fun toSkikoEvent(
         button = toSkikoMouseButton(event),
         modifiers = toSkikoModifiers(event),
         kind = kind,
-        timestamp = event.timeStamp.toLong(),
+        timestamp = getEventTimestamp(event),
         platform = event
     )
 }
@@ -85,7 +84,7 @@ fun toSkikoDragEvent(
         button = toSkikoMouseButton(event),
         modifiers = toSkikoModifiers(event),
         kind = SkikoPointerEventKind.DRAG,
-        timestamp = event.timeStamp.toLong(),
+        timestamp = getEventTimestamp(event),
         platform = event
     )
 }
@@ -123,7 +122,7 @@ fun toSkikoEvent(
         SkikoKey.valueOf(toSkikoKey(event)),
         toSkikoModifiers(event),
         kind,
-        event.timeStamp.toLong(),
+        getEventTimestamp(event),
         event
     )
 }
@@ -140,7 +139,7 @@ fun toSkikoScrollEvent(
         button = SkikoMouseButtons.NONE,
         modifiers = toSkikoModifiers(event),
         kind = SkikoPointerEventKind.SCROLL,
-        timestamp = event.timeStamp.toLong(),
+        timestamp = getEventTimestamp(event),
         platform = event
     )
 }

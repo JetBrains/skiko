@@ -8,7 +8,7 @@ actual annotation class SkipJsTarget
 actual typealias SkipWasmTarget = kotlin.test.Ignore
 
 @JsFun("() => ''")
-private external fun jsRef(): Dynamic
+private external fun jsRef(): JsAny
 
 /**
  * Runs the [block] in a coroutine.

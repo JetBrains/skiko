@@ -5,8 +5,6 @@ import kotlinx.cinterop.CPointer
 import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.withResult
 
-actual abstract class OutputStream
-
 internal actual fun <R> commonSynchronized(lock: Any, block: () -> R) {
     block()
 }

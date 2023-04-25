@@ -23,8 +23,8 @@ val Project.supportWasm: Boolean
 val Project.supportJs: Boolean
     get() = findProperty("skiko.js.enabled") == "true" || isInIdea
 
-val coroutinesVersion = if (supportWasm) "1.7.0-Beta-wasm0" else "1.7.0-Beta"
-val atomicFuVersion = if (supportWasm) "0.18.5-wasm0" else "0.18.5"
+val coroutinesVersion = if (supportWasm) "1.7.0-RC-wasm0" else "1.7.0-RC"
+val atomicFuVersion = if (supportWasm) "0.20.2-wasm0" else "0.20.2"
 
 fun targetSuffix(os: OS, arch: Arch): String {
     return "${os.id}_${arch.id}"
@@ -1432,16 +1432,16 @@ rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJ
 
 project.tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().configureEach {
     kotlinOptions.freeCompilerArgs += listOf(
-        "-Xwasm-enable-array-range-checks", "-Xir-dce=true"
+        "-Xwasm-enable-array-range-checks", "-Xir-dce=true", "-Xskip-prerelease-check",
     )
 }
 
 if (supportJs && supportWasm) {
     project.afterEvaluate {
         //Disable jsWasmMain intermediate sourceset publication
-        tasks.named("compileJsWasmMainKotlinMetadata") {
-            enabled = false
-        }
+//        tasks.named("compileJsWasmMainKotlinMetadata") {
+//            enabled = false
+//        }
     }
 }
 

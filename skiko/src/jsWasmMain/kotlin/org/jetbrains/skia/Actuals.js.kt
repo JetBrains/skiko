@@ -2,8 +2,6 @@ package org.jetbrains.skia
 
 import kotlinx.browser.window
 
-actual abstract class OutputStream
-
 internal actual fun <R> commonSynchronized(lock: Any, block: () -> R) {
     block()
 }
