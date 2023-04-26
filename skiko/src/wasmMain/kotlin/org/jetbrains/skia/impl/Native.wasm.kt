@@ -319,52 +319,60 @@ internal actual class InteropScope actual constructor() {
     actual fun booleanCallback(callback: (() -> Boolean)?): NativePointer {
         if (callback == null) { return 0 }
         initCallbacks()
-        TODO("booleanCallback")
+        val data = crateCallbackObj() as CallbackDataBoolean
+        return _registerCallback({ data.value = callback() }, data, global = false)
     }
 
     actual fun intCallback(callback: (() -> Int)?): NativePointer {
         if (callback == null) { return 0 }
         initCallbacks()
-        TODO("intCallback")
+        val data = crateCallbackObj() as CallbackDataInt
+        return _registerCallback({ data.value = callback() }, data, global = false)
     }
 
     actual fun nativePointerCallback(callback: (() -> NativePointer)?): NativePointer {
         if (callback == null) { return 0 }
         initCallbacks()
-        TODO("nativePointerCallback")
+        val data = crateCallbackObj() as CallbackDataNativePointer
+        return _registerCallback({ data.value = callback() }, data, global = false)
     }
 
     actual fun interopPointerCallback(callback: (() -> InteropPointer)?): NativePointer {
         if (callback == null) { return 0 }
         initCallbacks()
-        TODO("interopPointerCallback")
+        val data = crateCallbackObj() as CallbackDataInteropPointer
+        return _registerCallback({ data.value = callback() }, data, global = false)
     }
 
     actual fun callback(callback: (() -> Unit)?): InteropPointer {
         if (callback == null) { return 0 }
         initCallbacks()
 
-        TODO("callback")
+        return _registerCallback({ callback() }, null, global = false)
     }
 
     actual fun virtual(method: () -> Unit): InteropPointer {
-        TODO("virtual")
+        return _registerCallback({ method() }, null, global = true)
     }
 
     actual fun virtualBoolean(method: () -> Boolean): InteropPointer {
-        TODO("virtualBoolean")
+        val data = crateCallbackObj() as CallbackDataBoolean
+        return _registerCallback({ data.value = method() }, data, global = true)
     }
 
     actual fun virtualInt(method: () -> Int): InteropPointer {
-        TODO("virtualInt")
+        val data = crateCallbackObj() as CallbackDataInt
+        return _registerCallback({ data.value = method() }, data, global = true)
     }
 
     actual fun virtualNativePointer(method: () -> NativePointer): InteropPointer {
-        TODO("virtualNativePointer")
+        val data = crateCallbackObj() as CallbackDataNativePointer
+        return _registerCallback({ data.value = method() }, data, global = true)
     }
 
     actual fun virtualInteropPointer(method: () -> InteropPointer): InteropPointer {
-        TODO("virtualInteropPointer")
+        val data = crateCallbackObj() as CallbackDataInteropPointer
+        return _registerCallback({ data.value = method() }, data, global = true)
     }
 
     actual fun release()  {
@@ -377,15 +385,29 @@ internal actual class InteropScope actual constructor() {
 
     private inline fun initCallbacks() {
         if (!callbacksInitialized) {
-            // TODO: _createLocalCallbackScope()
+            _createLocalCallbackScope()
             callbacksInitialized = true
         }
     }
 
     private inline fun releaseCallbacks() {
         if (callbacksInitialized) {
-            // TODO: _releaseLocalCallbackScope()
+            _releaseLocalCallbackScope()
             callbacksInitialized = false
         }
     }
 }
+
+@JsFun("() => { return {} }")
+private external fun crateCallbackObj(): JsAny
+
+// Callbacks
+internal external interface CallbackDataBoolean : JsAny { @JsName("value") var value: Boolean? }
+internal external interface CallbackDataInt : JsAny { @JsName("value") var value: Int? }
+internal external interface CallbackDataNativePointer : JsAny { @JsName("value") var value: NativePointer? }
+internal external interface CallbackDataInteropPointer: JsAny { @JsName("value") var value: InteropPointer? }
+
+// See `setup.js`
+private external fun _registerCallback(cb: () -> Unit, data: JsAny?, global: Boolean): Int
+private external fun _createLocalCallbackScope()
+private external fun _releaseLocalCallbackScope()
