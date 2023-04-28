@@ -5,6 +5,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import org.jetbrains.skia.BackendRenderTarget
+import org.jetbrains.skia.Color
 import org.jetbrains.skia.DirectContext
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.context.MetalContextHandler
@@ -39,7 +40,10 @@ internal class MetalRedrawer(
         adapterMemorySize = getAdapterMemorySize(adapter)
         onDeviceChosen(adapterName)
         device = layer.backedLayer.useDrawingSurfacePlatformInfo {
-            createMetalDevice(layer.windowHandle, layer.transparency, adapter, it)
+            val color = layer.background.let { color ->
+                Color.makeARGB(color.alpha, color.red, color.green, color.blue)
+            }
+            createMetalDevice(layer.windowHandle, layer.transparency, color, adapter, it)
         }
     }
 
@@ -140,6 +144,10 @@ internal class MetalRedrawer(
         setLayerVisible(device, isVisible)
     }
 
+    override fun setLayerBackground(color: Int) {
+        setLayerBackground(device, color)
+    }
+
     fun makeContext() = DirectContext(
         makeMetalContext(device)
     )
@@ -151,13 +159,14 @@ internal class MetalRedrawer(
     fun finishFrame() = finishFrame(device)
 
     private external fun chooseAdapter(adapterPriority: Int): Long
-    private external fun createMetalDevice(window:Long, transparency: Boolean, adapter: Long, platformInfo: Long): Long
+    private external fun createMetalDevice(window:Long, transparency: Boolean, color: Int, adapter: Long, platformInfo: Long): Long
     private external fun makeMetalContext(device: Long): Long
     private external fun makeMetalRenderTarget(device: Long, width: Int, height: Int): Long
     private external fun disposeDevice(device: Long)
     private external fun finishFrame(device: Long)
     private external fun resizeLayers(device: Long, x: Int, y: Int, width: Int, height: Int)
     private external fun setLayerVisible(device: Long, isVisible: Boolean)
+    private external fun setLayerBackground(device: Long, color: Int)
     private external fun setContentScale(device: Long, contentScale: Float)
     private external fun setVSyncEnabled(device: Long, enabled: Boolean)
     private external fun isOccluded(window: Long): Boolean

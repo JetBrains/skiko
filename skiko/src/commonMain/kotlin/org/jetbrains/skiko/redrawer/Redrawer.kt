@@ -6,5 +6,7 @@ internal interface Redrawer {
     fun redrawImmediately()
     fun syncSize() = Unit
     fun setVisible(isVisible: Boolean) = Unit
+    // ARGB encoded as in org.jetbrains.skia.Color
+    fun setLayerBackground(color: Int) = Unit
     val renderInfo: String
 }
