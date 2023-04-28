@@ -12,6 +12,7 @@ expect open class SkiaLayer {
      * Current graphics API used for rendering.
      */
     var renderApi: GraphicsApi
+        private set
 
     /**
      * Current content scale.
