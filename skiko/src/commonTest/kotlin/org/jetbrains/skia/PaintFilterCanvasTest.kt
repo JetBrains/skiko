@@ -1,12 +1,13 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skiko.tests.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class PaintFilterCanvasTest {
     @Test
-    fun canFilter() {
+    fun canFilter() = runTest {
         val surface = Surface.makeRasterN32Premul(16, 16)
         val canvas = surface.canvas
         var called = false

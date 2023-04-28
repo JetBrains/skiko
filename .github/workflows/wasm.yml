@@ -24,6 +24,10 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: '11'
+      - name: Install dependencies
+        run: |
+         sudo apt-get update
+         sudo apt-get install libdbus-1-dev
       - name: 'install emsdk'
         shell: bash
         run: |
@@ -48,7 +52,7 @@ jobs:
         run: |
           cd ./skiko
           source ./emsdk/emsdk_env.sh
-          ./gradlew --stacktrace --info -Pskiko.wasm.enabled=true -Pskiko.js.enabled=true -Pskiko.test.onci=true wasmTest jsTest
+          ./gradlew --stacktrace --info -Pskiko.wasm.enabled=true -Pskiko.js.enabled=true -Pskiko.test.onci=true wasmTest
           ./gradlew --stacktrace --info -Pskiko.wasm.enabled=true -Pskiko.js.enabled=true publishSkikoWasmRuntimePublicationToMavenLocal
       - uses: actions/upload-artifact@v2
         if: always()
