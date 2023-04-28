@@ -24,6 +24,10 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: '11'
+      - name: Install dependencies
+        run: |
+         sudo apt-get update
+         sudo apt-get install libdbus-1-dev
       - name: 'install emsdk'
         shell: bash
         run: |
