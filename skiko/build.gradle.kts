@@ -22,8 +22,8 @@ val Project.supportWasm: Boolean
 val Project.supportJs: Boolean
     get() = findProperty("skiko.js.enabled") == "true" || isInIdea
 
-val coroutinesVersion = if (supportWasm) "1.7.0-Beta-wasm0" else "1.7.0-Beta"
-val atomicFuVersion = if (supportWasm) "0.18.5-wasm0" else "0.18.5"
+val coroutinesVersion = if (supportWasm) "1.7.0-RC-wasm0" else "1.7.0-RC"
+val atomicFuVersion = if (supportWasm) "0.20.2-wasm0" else "0.20.2"
 
 fun targetSuffix(os: OS, arch: Arch): String {
     return "${os.id}_${arch.id}"
@@ -53,13 +53,13 @@ configurations.all {
         if (requested.module.group == "org.jetbrains.kotlinx" &&
             requested.module.name.contains("kotlinx-coroutines", true)
         ) {
-            if (!isWasm) useVersion("1.7.0-Beta")
+            if (!isWasm) useVersion("1.7.0-RC")
         }
 
         if (requested.module.group == "org.jetbrains.kotlinx" &&
             requested.module.name.contains("atomicfu", true)
         ) {
-            if (!isWasm) useVersion("0.18.5")
+            if (!isWasm) useVersion("0.20.2")
         }
     }
 }
@@ -1560,29 +1560,29 @@ tasks.withType<JavaCompile> {
 
 project.tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().configureEach {
     kotlinOptions.freeCompilerArgs += listOf(
-        "-Xwasm-enable-array-range-checks", "-Xir-dce=true"
+        "-Xwasm-enable-array-range-checks", "-Xir-dce=true", "-Xskip-prerelease-check",
     )
 }
 
 if (supportJs && supportWasm) {
-    project.afterEvaluate {
-        //Disable jsWasmMain intermediate sourceset publication
-        tasks.named("compileJsWasmMainKotlinMetadata") {
+//    project.afterEvaluate {
+//        //Disable jsWasmMain intermediate sourceset publication
+//        tasks.named("compileJsWasmMainKotlinMetadata") {
+//            enabled = false
+//        }
+//    }
+    project.tasks.whenTaskAdded {
+        if (name == "compileJsWasmMainKotlinMetadata") {
             enabled = false
         }
     }
 }
 
-// HACK: some dependencies (coroutines -wasm0 and atomicfu -wasm0) reference deleted *-dev libs
-//configurations.all {
-//    val conf = this
-//    resolutionStrategy.eachDependency {
-//        if (requested.version == "1.8.20-dev-3308") {
-//            println("Substitute deleted version ${requested.module}:${requested.version} for ${conf.name}")
-//            useVersion(project.properties["kotlin.version"] as String)
-//        }
-//    }
-//}
-
 tasks.getByName("publishSkikoWasmRuntimePublicationToComposeRepoRepository")
     .dependsOn("publishWasmPublicationToComposeRepoRepository")
+
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile>().configureEach {
+    // https://youtrack.jetbrains.com/issue/KT-56583
+    compilerOptions.freeCompilerArgs.add("-XXLanguage:+ImplicitSignedToUnsignedIntegerConversion")
+}
