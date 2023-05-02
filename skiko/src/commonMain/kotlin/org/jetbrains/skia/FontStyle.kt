@@ -4,7 +4,9 @@ class FontStyle {
     val _value: Int
 
     constructor(weight: Int, width: Int, slant: FontSlant) {
-        _value = weight and 65535 or (width and 255 shl 16) or (slant.ordinal shl 24)
+        _value = (weight and 0xFFFF) or
+                 ((width and 0xFF) shl 16) or
+                 ((slant.ordinal and 0xFF) shl 24)
     }
 
     internal constructor(value: Int) {
@@ -12,21 +14,21 @@ class FontStyle {
     }
 
     val weight: Int
-        get() = _value and 65535
+        get() = _value and 0xFFFF
 
     fun withWeight(weight: Int): FontStyle {
         return FontStyle(weight, width, slant)
     }
 
     val width: Int
-        get() = _value shr 16 and 255
+        get() = (_value shr 16) and 0xFF
 
     fun withWidth(width: Int): FontStyle {
         return FontStyle(weight, width, slant)
     }
 
     val slant: FontSlant
-        get() = FontSlant.values()[_value shr 24 and 255]
+        get() = FontSlant.values()[(_value shr 24) and 0xFF]
 
     fun withSlant(slant: FontSlant): FontStyle {
         return FontStyle(weight, width, slant)
@@ -43,10 +45,7 @@ class FontStyle {
     }
 
     override fun hashCode(): Int {
-        val PRIME = 59
-        var result = 1
-        result = result * PRIME + _value
-        return result
+        return _value
     }
 
     companion object {
