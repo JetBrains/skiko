@@ -8,6 +8,9 @@ import org.jetbrains.skiko.*
 import org.jetbrains.skiko.context.MetalContextHandler
 import javax.swing.SwingUtilities.*
 
+@JvmInline
+internal value class MetalDevice(val ptr: Long)
+
 internal class MetalRedrawer(
     private val layer: SkiaLayer,
     analytics: SkiaLayerAnalytics,
@@ -22,9 +25,9 @@ internal class MetalRedrawer(
     }
     private var drawLock = Any()
 
-    private var device: Long
+    private var device: MetalDevice
         get() {
-            check(field != 0L) { "Device is not initialized" }
+            check(field.ptr != 0L) { "Device is not initialized" }
             return field
         }
 
@@ -34,7 +37,7 @@ internal class MetalRedrawer(
         val adapterMemorySize = getAdapterMemorySize(adapter)
         onDeviceChosen(adapterName)
         device = layer.backedLayer.useDrawingSurfacePlatformInfo {
-            createMetalDevice(layer.windowHandle, layer.transparency, adapter, it)
+            MetalDevice(createMetalDevice(layer.windowHandle, layer.transparency, adapter, it))
         }
         contextHandler =
             MetalContextHandler(layer, device, MetalContextHandler.AdapterInfo(adapterName, adapterMemorySize))
@@ -45,7 +48,7 @@ internal class MetalRedrawer(
     private val windowHandle = layer.windowHandle
 
     init {
-        setVSyncEnabled(device, properties.isVsyncEnabled)
+        setVSyncEnabled(device.ptr, properties.isVsyncEnabled)
     }
 
     private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
@@ -62,8 +65,8 @@ internal class MetalRedrawer(
     override fun dispose() = synchronized(drawLock) {
         frameDispatcher.cancel()
         contextHandler.dispose()
-        disposeDevice(device)
-        device = 0
+        disposeDevice(device.ptr)
+        device = MetalDevice(0)
         super.dispose()
     }
 
@@ -75,11 +78,11 @@ internal class MetalRedrawer(
     override fun redrawImmediately() {
         check(!isDisposed) { "MetalRedrawer is disposed" }
         inDrawScope {
-            setVSyncEnabled(device, enabled = false)
+            setVSyncEnabled(device.ptr, enabled = false)
             update(System.nanoTime())
             if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
                 performDraw()
-                setVSyncEnabled(device, properties.isVsyncEnabled)
+                setVSyncEnabled(device.ptr, properties.isVsyncEnabled)
             }
         }
     }
@@ -125,20 +128,19 @@ internal class MetalRedrawer(
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         val rootPane = getRootPane(layer)
         val globalPosition = convertPoint(layer.backedLayer, 0, 0, rootPane)
-        setContentScale(device, layer.contentScale)
+        setContentScale(device.ptr, layer.contentScale)
         val x = globalPosition.x
         val y = rootPane.height - globalPosition.y - layer.height
         val width = layer.backedLayer.width.coerceAtLeast(0)
         val height = layer.backedLayer.height.coerceAtLeast(0)
         Logger.debug { "MetalRedrawer#resizeLayers $this {x: $x y: $y width: $width height: $height} rootPane: ${rootPane.size}" }
-        resizeLayers(device, x, y, width, height)
+        resizeLayers(device.ptr, x, y, width, height)
     }
 
     override fun setVisible(isVisible: Boolean) {
         Logger.debug { "MetalRedrawer#setVisible $this $isVisible" }
-        setLayerVisible(device, isVisible)
+        setLayerVisible(device.ptr, isVisible)
     }
-
 
     private external fun chooseAdapter(adapterPriority: Int): Long
     private external fun createMetalDevice(window:Long, transparency: Boolean, adapter: Long, platformInfo: Long): Long

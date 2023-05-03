@@ -4,10 +4,11 @@ import org.jetbrains.skia.*
 import org.jetbrains.skiko.Logger
 import org.jetbrains.skiko.RenderException
 import org.jetbrains.skiko.SkiaLayer
+import org.jetbrains.skiko.redrawer.MetalDevice
 
 internal class MetalContextHandler(
     layer: SkiaLayer,
-    private val device: Long,
+    private val device: MetalDevice,
     private val adapterInfo: AdapterInfo? = null
 ) : JvmContextHandler(layer) {
     override fun initContext(): Boolean {
@@ -68,14 +69,14 @@ internal class MetalContextHandler(
     }
 
     private fun makeRenderTarget(width: Int, height: Int) = BackendRenderTarget(
-        makeMetalRenderTarget(device, width, height)
+        makeMetalRenderTarget(device.ptr, width, height)
     )
 
     private fun makeContext() = DirectContext(
-        makeMetalContext(device)
+        makeMetalContext(device.ptr)
     )
 
-    private fun finishFrame() = finishFrame(device)
+    private fun finishFrame() = finishFrame(device.ptr)
 
     private external fun makeMetalContext(device: Long): Long
     private external fun makeMetalRenderTarget(device: Long, width: Int, height: Int): Long
