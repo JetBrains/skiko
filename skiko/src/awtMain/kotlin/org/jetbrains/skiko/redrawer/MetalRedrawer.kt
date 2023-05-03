@@ -4,8 +4,6 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
-import org.jetbrains.skia.BackendRenderTarget
-import org.jetbrains.skia.DirectContext
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.context.MetalContextHandler
 import javax.swing.SwingUtilities.*
@@ -15,8 +13,7 @@ internal class MetalRedrawer(
     analytics: SkiaLayerAnalytics,
     private val properties: SkiaLayerProperties
 ) : AWTRedrawer(layer, analytics, GraphicsApi.METAL) {
-    private val contextHandler = MetalContextHandler(layer)
-    override val renderInfo: String get() = contextHandler.rendererInfo()
+    private val contextHandler: MetalContextHandler
 
     companion object {
         init {
@@ -30,18 +27,20 @@ internal class MetalRedrawer(
             check(field != 0L) { "Device is not initialized" }
             return field
         }
-    val adapterName: String
-    val adapterMemorySize: Long
 
     init {
         val adapter = chooseAdapter(properties.adapterPriority.ordinal)
-        adapterName = getAdapterName(adapter)
-        adapterMemorySize = getAdapterMemorySize(adapter)
+        val adapterName = getAdapterName(adapter)
+        val adapterMemorySize = getAdapterMemorySize(adapter)
         onDeviceChosen(adapterName)
         device = layer.backedLayer.useDrawingSurfacePlatformInfo {
             createMetalDevice(layer.windowHandle, layer.transparency, adapter, it)
         }
+        contextHandler =
+            MetalContextHandler(layer, device, MetalContextHandler.AdapterInfo(adapterName, adapterMemorySize))
     }
+
+    override val renderInfo: String get() = contextHandler.rendererInfo()
 
     private val windowHandle = layer.windowHandle
 
@@ -140,22 +139,10 @@ internal class MetalRedrawer(
         setLayerVisible(device, isVisible)
     }
 
-    fun makeContext() = DirectContext(
-        makeMetalContext(device)
-    )
-
-    fun makeRenderTarget(width: Int, height: Int) = BackendRenderTarget(
-        makeMetalRenderTarget(device, width, height)
-    )
-
-    fun finishFrame() = finishFrame(device)
 
     private external fun chooseAdapter(adapterPriority: Int): Long
     private external fun createMetalDevice(window:Long, transparency: Boolean, adapter: Long, platformInfo: Long): Long
-    private external fun makeMetalContext(device: Long): Long
-    private external fun makeMetalRenderTarget(device: Long, width: Int, height: Int): Long
     private external fun disposeDevice(device: Long)
-    private external fun finishFrame(device: Long)
     private external fun resizeLayers(device: Long, x: Int, y: Int, width: Int, height: Int)
     private external fun setLayerVisible(device: Long, isVisible: Boolean)
     private external fun setContentScale(device: Long, contentScale: Float)
