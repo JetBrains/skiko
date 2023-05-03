@@ -13,6 +13,8 @@
 #import <mtl/GrMtlBackendContext.h>
 #import <mtl/GrMtlTypes.h>
 
+#import "MetalDevice.h"
+
 #define MuxGraphicsCard 7
 #define kOpen 0
 #define kGetMuxState 3
@@ -20,22 +22,6 @@
 #define AdpapterPriorityAuto 0
 #define AdpapterPriorityIntegrated 1
 #define AdpapterPriorityDiscrete 2
-
-@interface AWTMetalLayer : CAMetalLayer
-
-@property jobject javaRef;
-
-@end
-
-@interface MetalDevice : NSObject
-
-@property (weak) CALayer *container;
-@property (retain, strong) AWTMetalLayer *layer;
-@property (retain, strong) id<MTLDevice> adapter;
-@property (retain, strong) id<MTLCommandQueue> queue;
-@property (retain, strong) id<CAMetalDrawable> drawableHandle;
-
-@end
 
 @implementation AWTMetalLayer
 
