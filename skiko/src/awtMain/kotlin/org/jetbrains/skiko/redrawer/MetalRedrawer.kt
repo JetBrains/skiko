@@ -21,6 +21,14 @@ import javax.swing.SwingUtilities.*
 @JvmInline
 internal value class MetalDevice(val ptr: Long)
 
+/**
+ * Provides a way to request draws on Skia canvas created in [layer] bounds using Metal GPU acceleration.
+ *
+ * Content to draw is provided by [SkiaLayer.draw].
+ *
+ * @see MetalContextHandler
+ * @see FrameDispatcher
+ */
 internal class MetalRedrawer(
     private val layer: SkiaLayer,
     analytics: SkiaLayerAnalytics,
@@ -33,6 +41,7 @@ internal class MetalRedrawer(
             Library.load()
         }
     }
+
     private var drawLock = Any()
 
     private var device: MetalDevice

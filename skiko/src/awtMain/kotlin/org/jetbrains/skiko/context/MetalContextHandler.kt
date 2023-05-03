@@ -6,6 +6,14 @@ import org.jetbrains.skiko.RenderException
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.redrawer.MetalDevice
 
+/**
+ * Provides a way to draw on Skia canvas created in [layer] bounds using Metal GPU acceleration.
+ *
+ * For each [ContextHandler.draw] request it initializes Skia Canvas with Metal context and
+ * draws [SkiaLayer.draw] content in this canvas.
+ *
+ * @see "src/awtMain/objectiveC/macos/MetalContextHandler.mm" -- native implementation
+ */
 internal class MetalContextHandler(
     layer: SkiaLayer,
     private val device: MetalDevice,
