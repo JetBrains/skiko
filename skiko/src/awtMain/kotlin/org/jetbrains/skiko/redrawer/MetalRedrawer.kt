@@ -8,6 +8,16 @@ import org.jetbrains.skiko.*
 import org.jetbrains.skiko.context.MetalContextHandler
 import javax.swing.SwingUtilities.*
 
+/**
+ * Holder for pointer on MetalDevice described in "MetalDevice.h"
+ *
+ * Naturally [MetalDevice] is just a holder for native objects required for drawing such as:
+ *   * [CAMetalLayer](https://developer.apple.com/documentation/quartzcore/cametallayer)
+ *   * [MTLDevice](https://developer.apple.com/documentation/metal/mtldevice)
+ *   * etc.
+ *
+ * @see "src/awtMain/objectiveC/macos/MetalDevice.h"
+ */
 @JvmInline
 internal value class MetalDevice(val ptr: Long)
 
