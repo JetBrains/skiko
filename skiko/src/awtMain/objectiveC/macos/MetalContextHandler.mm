@@ -26,7 +26,7 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_mak
 }
 
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_makeMetalRenderTarget(
-    JNIEnv * env, jobject contextHandler, jlong devicePtr, jint width, jint height)
+    JNIEnv* env, jobject contextHandler, jlong devicePtr, jint width, jint height)
 {
     @autoreleasepool {
         MetalDevice *device = (__bridge MetalDevice *) (void *) devicePtr;
