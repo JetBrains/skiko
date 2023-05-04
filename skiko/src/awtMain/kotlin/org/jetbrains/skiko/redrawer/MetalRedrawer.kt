@@ -4,50 +4,76 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
-import org.jetbrains.skia.BackendRenderTarget
-import org.jetbrains.skia.DirectContext
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.context.MetalContextHandler
 import javax.swing.SwingUtilities.*
 
+/**
+ * Holder for pointer on MetalDevice described in "MetalDevice.h"
+ *
+ * Naturally [MetalDevice] is just a holder for native objects required for drawing such as:
+ *   * [CAMetalLayer](https://developer.apple.com/documentation/quartzcore/cametallayer)
+ *   * [MTLDevice](https://developer.apple.com/documentation/metal/mtldevice)
+ *   * etc.
+ *
+ * @see "src/awtMain/objectiveC/macos/MetalDevice.h"
+ */
+@JvmInline
+internal value class MetalDevice(val ptr: Long)
+
+/**
+ * Provides a way to request draws on Skia canvas created in [layer] bounds using Metal GPU acceleration.
+ *
+ * Content to draw is provided by [SkiaLayer.draw].
+ *
+ * @see MetalContextHandler
+ * @see FrameDispatcher
+ */
 internal class MetalRedrawer(
     private val layer: SkiaLayer,
     analytics: SkiaLayerAnalytics,
     private val properties: SkiaLayerProperties
 ) : AWTRedrawer(layer, analytics, GraphicsApi.METAL) {
-    private val contextHandler = MetalContextHandler(layer)
-    override val renderInfo: String get() = contextHandler.rendererInfo()
+    private val contextHandler: MetalContextHandler
 
     companion object {
         init {
             Library.load()
         }
     }
+
     private var drawLock = Any()
 
-    private var device: Long
+    /**
+     * [MetalDevice] initialized for given [layer] or null if [MetalRedrawer] is disposed,
+     * so future calls of [device] will throw exception
+     */
+    private var _device: MetalDevice?
+
+    private val device: MetalDevice
         get() {
-            check(field != 0L) { "Device is not initialized" }
-            return field
+            val currentDevice = _device
+            require(currentDevice != null) { "Device is disposed" }
+            return currentDevice
         }
-    val adapterName: String
-    val adapterMemorySize: Long
 
     init {
         val adapter = chooseAdapter(properties.adapterPriority.ordinal)
-        adapterName = getAdapterName(adapter)
-        adapterMemorySize = getAdapterMemorySize(adapter)
+        val adapterName = getAdapterName(adapter)
+        val adapterMemorySize = getAdapterMemorySize(adapter)
         onDeviceChosen(adapterName)
-        device = layer.backedLayer.useDrawingSurfacePlatformInfo {
-            createMetalDevice(layer.windowHandle, layer.transparency, adapter, it)
+        val initDevice = layer.backedLayer.useDrawingSurfacePlatformInfo {
+            MetalDevice(createMetalDevice(layer.windowHandle, layer.transparency, adapter, it))
         }
+        _device = initDevice
+        contextHandler =
+            MetalContextHandler(layer, initDevice, MetalContextHandler.AdapterInfo(adapterName, adapterMemorySize))
+        setVSyncEnabled(initDevice.ptr, properties.isVsyncEnabled)
     }
+
+    override val renderInfo: String get() = contextHandler.rendererInfo()
 
     private val windowHandle = layer.windowHandle
-
-    init {
-        setVSyncEnabled(device, properties.isVsyncEnabled)
-    }
 
     private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
         if (layer.isShowing) {
@@ -63,8 +89,8 @@ internal class MetalRedrawer(
     override fun dispose() = synchronized(drawLock) {
         frameDispatcher.cancel()
         contextHandler.dispose()
-        disposeDevice(device)
-        device = 0
+        disposeDevice(device.ptr)
+        _device = null
         super.dispose()
     }
 
@@ -76,11 +102,11 @@ internal class MetalRedrawer(
     override fun redrawImmediately() {
         check(!isDisposed) { "MetalRedrawer is disposed" }
         inDrawScope {
-            setVSyncEnabled(device, enabled = false)
+            setVSyncEnabled(device.ptr, enabled = false)
             update(System.nanoTime())
             if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
                 performDraw()
-                setVSyncEnabled(device, properties.isVsyncEnabled)
+                setVSyncEnabled(device.ptr, properties.isVsyncEnabled)
             }
         }
     }
@@ -126,36 +152,23 @@ internal class MetalRedrawer(
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         val rootPane = getRootPane(layer)
         val globalPosition = convertPoint(layer.backedLayer, 0, 0, rootPane)
-        setContentScale(device, layer.contentScale)
+        setContentScale(device.ptr, layer.contentScale)
         val x = globalPosition.x
         val y = rootPane.height - globalPosition.y - layer.height
         val width = layer.backedLayer.width.coerceAtLeast(0)
         val height = layer.backedLayer.height.coerceAtLeast(0)
         Logger.debug { "MetalRedrawer#resizeLayers $this {x: $x y: $y width: $width height: $height} rootPane: ${rootPane.size}" }
-        resizeLayers(device, x, y, width, height)
+        resizeLayers(device.ptr, x, y, width, height)
     }
 
     override fun setVisible(isVisible: Boolean) {
         Logger.debug { "MetalRedrawer#setVisible $this $isVisible" }
-        setLayerVisible(device, isVisible)
+        setLayerVisible(device.ptr, isVisible)
     }
-
-    fun makeContext() = DirectContext(
-        makeMetalContext(device)
-    )
-
-    fun makeRenderTarget(width: Int, height: Int) = BackendRenderTarget(
-        makeMetalRenderTarget(device, width, height)
-    )
-
-    fun finishFrame() = finishFrame(device)
 
     private external fun chooseAdapter(adapterPriority: Int): Long
     private external fun createMetalDevice(window:Long, transparency: Boolean, adapter: Long, platformInfo: Long): Long
-    private external fun makeMetalContext(device: Long): Long
-    private external fun makeMetalRenderTarget(device: Long, width: Int, height: Int): Long
     private external fun disposeDevice(device: Long)
-    private external fun finishFrame(device: Long)
     private external fun resizeLayers(device: Long, x: Int, y: Int, width: Int, height: Int)
     private external fun setLayerVisible(device: Long, isVisible: Boolean)
     private external fun setContentScale(device: Long, contentScale: Float)

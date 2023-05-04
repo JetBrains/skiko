@@ -4,16 +4,25 @@ import org.jetbrains.skia.*
 import org.jetbrains.skiko.Logger
 import org.jetbrains.skiko.RenderException
 import org.jetbrains.skiko.SkiaLayer
-import org.jetbrains.skiko.redrawer.MetalRedrawer
+import org.jetbrains.skiko.redrawer.MetalDevice
 
-internal class MetalContextHandler(layer: SkiaLayer) : JvmContextHandler(layer) {
-    val metalRedrawer: MetalRedrawer
-        get() = layer.redrawer!! as MetalRedrawer
-
+/**
+ * Provides a way to draw on Skia canvas created in [layer] bounds using Metal GPU acceleration.
+ *
+ * For each [ContextHandler.draw] request it initializes Skia Canvas with Metal context and
+ * draws [SkiaLayer.draw] content in this canvas.
+ *
+ * @see "src/awtMain/objectiveC/macos/MetalContextHandler.mm" -- native implementation
+ */
+internal class MetalContextHandler(
+    layer: SkiaLayer,
+    private val device: MetalDevice,
+    private val adapterInfo: AdapterInfo? = null
+) : JvmContextHandler(layer) {
     override fun initContext(): Boolean {
         try {
             if (context == null) {
-                context = metalRedrawer.makeContext()
+                context = makeContext()
                 if (System.getProperty("skiko.hardwareInfo.enabled") == "true") {
                     Logger.info { "Renderer info:\n ${rendererInfo()}" }
                 }
@@ -33,7 +42,7 @@ internal class MetalContextHandler(layer: SkiaLayer) : JvmContextHandler(layer) 
         val height = (layer.backedLayer.height * scale).toInt().coerceAtLeast(0)
 
         if (width > 0 && height > 0) {
-            renderTarget = metalRedrawer.makeRenderTarget(width, height)
+            renderTarget = makeRenderTarget(width, height)
 
             surface = Surface.makeFromBackendRenderTarget(
                 context!!,
@@ -55,12 +64,31 @@ internal class MetalContextHandler(layer: SkiaLayer) : JvmContextHandler(layer) 
     override fun flush() {
         super.flush()
         surface?.flushAndSubmit()
-        metalRedrawer.finishFrame()
+        finishFrame()
     }
 
     override fun rendererInfo(): String {
         return super.rendererInfo() +
-            "Video card: ${metalRedrawer.adapterName}\n" +
-            "Total VRAM: ${metalRedrawer.adapterMemorySize / 1024 / 1024} MB\n"
+                if (adapterInfo != null) {
+                    "Video card: ${adapterInfo.adapterName}\n" + "Total VRAM: ${adapterInfo.adapterMemorySize / 1024 / 1024} MB\n"
+                } else {
+                    ""
+                }
     }
+
+    private fun makeRenderTarget(width: Int, height: Int) = BackendRenderTarget(
+        makeMetalRenderTarget(device.ptr, width, height)
+    )
+
+    private fun makeContext() = DirectContext(
+        makeMetalContext(device.ptr)
+    )
+
+    private fun finishFrame() = finishFrame(device.ptr)
+
+    private external fun makeMetalContext(device: Long): Long
+    private external fun makeMetalRenderTarget(device: Long, width: Int, height: Int): Long
+    private external fun finishFrame(device: Long)
+
+    data class AdapterInfo(val adapterName: String, val adapterMemorySize: Long)
 }
