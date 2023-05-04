@@ -44,10 +44,17 @@ internal class MetalRedrawer(
 
     private var drawLock = Any()
 
-    private var device: MetalDevice
+    /**
+     * [MetalDevice] initialized for given [layer] or null if [MetalRedrawer] is disposed,
+     * so future calls of [device] will throw exception
+     */
+    private var _device: MetalDevice?
+
+    private val device: MetalDevice
         get() {
-            check(field.ptr != 0L) { "Device is not initialized" }
-            return field
+            val currentDevice = _device
+            require(currentDevice != null) { "Device is disposed" }
+            return currentDevice
         }
 
     init {
@@ -55,20 +62,18 @@ internal class MetalRedrawer(
         val adapterName = getAdapterName(adapter)
         val adapterMemorySize = getAdapterMemorySize(adapter)
         onDeviceChosen(adapterName)
-        device = layer.backedLayer.useDrawingSurfacePlatformInfo {
+        val initDevice = layer.backedLayer.useDrawingSurfacePlatformInfo {
             MetalDevice(createMetalDevice(layer.windowHandle, layer.transparency, adapter, it))
         }
+        _device = initDevice
         contextHandler =
-            MetalContextHandler(layer, device, MetalContextHandler.AdapterInfo(adapterName, adapterMemorySize))
+            MetalContextHandler(layer, initDevice, MetalContextHandler.AdapterInfo(adapterName, adapterMemorySize))
+        setVSyncEnabled(initDevice.ptr, properties.isVsyncEnabled)
     }
 
     override val renderInfo: String get() = contextHandler.rendererInfo()
 
     private val windowHandle = layer.windowHandle
-
-    init {
-        setVSyncEnabled(device.ptr, properties.isVsyncEnabled)
-    }
 
     private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
         if (layer.isShowing) {
@@ -85,7 +90,7 @@ internal class MetalRedrawer(
         frameDispatcher.cancel()
         contextHandler.dispose()
         disposeDevice(device.ptr)
-        device = MetalDevice(0)
+        _device = null
         super.dispose()
     }
 
