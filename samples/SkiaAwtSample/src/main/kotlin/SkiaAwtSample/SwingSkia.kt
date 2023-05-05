@@ -1,12 +1,12 @@
 package SkiaAwtSample
 
+import org.jetbrains.skiko.GenericSkikoView
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import javax.swing.*
-import org.jetbrains.skiko.GenericSkikoView
 
 fun makeButton(
     text: String,
@@ -57,7 +57,8 @@ fun swingSkia() = SwingUtilities.invokeLater {
         ),
         BorderLayout.EAST
     )
-    window.contentPane.add(
+    val southButtonsPanel = JPanel(BorderLayout())
+    southButtonsPanel.add(
         makeButton(
             text = "New Window",
             action = {
@@ -66,6 +67,16 @@ fun swingSkia() = SwingUtilities.invokeLater {
         ),
         BorderLayout.SOUTH
     )
+    southButtonsPanel.add(
+        makeButton(
+            text = "Resize test window",
+            action = {
+                swingSkiaResize(isStatic = true, offScreenRendering = true)
+            }
+        ),
+        BorderLayout.CENTER
+    )
+    window.contentPane.add(southButtonsPanel, BorderLayout.SOUTH)
     window.contentPane.add(panel, BorderLayout.CENTER)
 
     window.setSize(800, 600)

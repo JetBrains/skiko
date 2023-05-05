@@ -24,6 +24,10 @@ internal value class MetalDevice(val ptr: Long)
 /**
  * Provides a way to request draws on Skia canvas created in [layer] bounds using Metal GPU acceleration.
  *
+ * This [MetalRedrawer] draws content on-screen for maximum efficiency,
+ * but it may prevent for using it in embedded components (such as interop with Swing).
+ * For off-screen implementation see [MetalOffScreenRedrawer]
+ *
  * Content to draw is provided by [SkiaLayer.draw].
  *
  * @see MetalContextHandler
@@ -58,16 +62,13 @@ internal class MetalRedrawer(
         }
 
     init {
-        val adapter = chooseAdapter(properties.adapterPriority.ordinal)
-        val adapterName = getAdapterName(adapter)
-        val adapterMemorySize = getAdapterMemorySize(adapter)
-        onDeviceChosen(adapterName)
+        val adapter = chooseMetalAdapter(properties.adapterPriority)
+        onDeviceChosen(adapter.name)
         val initDevice = layer.backedLayer.useDrawingSurfacePlatformInfo {
-            MetalDevice(createMetalDevice(layer.windowHandle, layer.transparency, adapter, it))
+            MetalDevice(createMetalDevice(layer.windowHandle, layer.transparency, adapter.ptr, it))
         }
         _device = initDevice
-        contextHandler =
-            MetalContextHandler(layer, initDevice, MetalContextHandler.AdapterInfo(adapterName, adapterMemorySize))
+        contextHandler = MetalContextHandler(layer, initDevice, adapter)
         setVSyncEnabled(initDevice.ptr, properties.isVsyncEnabled)
     }
 
@@ -166,16 +167,13 @@ internal class MetalRedrawer(
         setLayerVisible(device.ptr, isVisible)
     }
 
-    private external fun chooseAdapter(adapterPriority: Int): Long
-    private external fun createMetalDevice(window:Long, transparency: Boolean, adapter: Long, platformInfo: Long): Long
+    private external fun createMetalDevice(window: Long, transparency: Boolean, adapter: Long, platformInfo: Long): Long
     private external fun disposeDevice(device: Long)
     private external fun resizeLayers(device: Long, x: Int, y: Int, width: Int, height: Int)
     private external fun setLayerVisible(device: Long, isVisible: Boolean)
     private external fun setContentScale(device: Long, contentScale: Float)
     private external fun setVSyncEnabled(device: Long, enabled: Boolean)
     private external fun isOccluded(window: Long): Boolean
-    private external fun getAdapterName(adapter: Long): String
-    private external fun getAdapterMemorySize(adapter: Long): Long
     private external fun startRendering(): Long
     private external fun endRendering(handle: Long)
 }

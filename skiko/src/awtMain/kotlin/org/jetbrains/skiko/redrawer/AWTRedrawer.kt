@@ -9,10 +9,17 @@ import org.jetbrains.skiko.SkiaLayerAnalytics.DeviceAnalytics
  */
 @OptIn(ExperimentalSkikoApi::class)
 internal abstract class AWTRedrawer(
-    private val layer: SkiaLayer,
     private val analytics: SkiaLayerAnalytics,
     private val graphicsApi: GraphicsApi,
+    private val _update: (Long) -> Unit,
+    private val _inDrawScope: (body: () -> Unit) -> Unit
 ) : Redrawer {
+    constructor(
+        layer: SkiaLayer,
+        analytics: SkiaLayerAnalytics,
+        graphicsApi: GraphicsApi
+    ) : this(analytics, graphicsApi, layer::update, layer::inDrawScope)
+
     private var isFirstFrameRendered = false
 
     private val rendererAnalytics = analytics.renderer(Version.skiko, hostOs, graphicsApi)
@@ -51,16 +58,17 @@ internal abstract class AWTRedrawer(
 
     protected fun update(nanoTime: Long) {
         require(!isDisposed) { "$javaClass is disposed" }
-        layer.update(nanoTime)
+        _update(nanoTime)
     }
 
-    protected inline fun inDrawScope(body: () -> Unit) {
+
+    protected fun inDrawScope(body: () -> Unit) {
         requireNotNull(deviceAnalytics) { "deviceAnalytics is not null. Call onDeviceChosen after choosing the drawing device" }
         if (!isDisposed) {
             if (!isFirstFrameRendered) {
                 deviceAnalytics?.beforeFirstFrameRender()
             }
-            layer.inDrawScope(body)
+            _inDrawScope(body)
             if (!isFirstFrameRendered && !isDisposed) {
                 deviceAnalytics?.afterFirstFrameRender()
             }
