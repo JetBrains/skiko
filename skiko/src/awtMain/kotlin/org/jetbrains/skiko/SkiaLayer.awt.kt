@@ -1,5 +1,8 @@
 package org.jetbrains.skiko
 
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.redrawer.Redrawer
 import java.awt.Color
@@ -14,9 +17,6 @@ import javax.swing.JPanel
 import javax.swing.SwingUtilities
 import javax.swing.SwingUtilities.isEventDispatchThread
 import javax.swing.UIManager
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 
 actual open class SkiaLayer internal constructor(
     externalAccessibleFactory: ((Component) -> Accessible)? = null,
@@ -66,6 +66,27 @@ actual open class SkiaLayer internal constructor(
             renderApi
         ),
         RenderFactory.Default,
+        analytics,
+        pixelGeometry
+    )
+
+    @ExperimentalSkikoApi
+    constructor(
+        externalAccessibleFactory: ((Component) -> Accessible)? = null,
+        isVsyncEnabled: Boolean = SkikoProperties.vsyncEnabled,
+        isVsyncFramelimitFallbackEnabled: Boolean = SkikoProperties.vsyncFramelimitFallbackEnabled,
+        renderApi: GraphicsApi = SkikoProperties.renderApi,
+        analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
+        pixelGeometry: PixelGeometry = PixelGeometry.UNKNOWN,
+        offScreenRendering: Boolean
+    ) : this(
+        externalAccessibleFactory,
+        SkiaLayerProperties(
+            isVsyncEnabled,
+            isVsyncFramelimitFallbackEnabled,
+            renderApi
+        ),
+        if (offScreenRendering) DefaultOffScreenRendererFactory else RenderFactory.Default,
         analytics,
         pixelGeometry
     )
