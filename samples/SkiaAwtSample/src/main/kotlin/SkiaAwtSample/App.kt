@@ -14,6 +14,7 @@ import java.nio.file.Files
 import javax.imageio.ImageIO
 
 fun main(args: Array<String>) {
+    setupSkikoLoggerFactory { DefaultConsoleLogger.fromLevel(System.getProperty("skiko.log.level", "INFO")) }
     val windows = parseArgs(args)
     repeat(windows) {
         when (System.getProperty("skiko.swing.interop")) {

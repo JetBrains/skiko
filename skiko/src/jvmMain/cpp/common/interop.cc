@@ -960,116 +960,93 @@ std::unique_ptr<SkM44> skM44(JNIEnv* env, jfloatArray matrixArray) {
     }
 }
 
-// bytes  range             bits  byte 1      byte 2      byte 3      byte 4      byte 5      byte 6
-//
-// Normal UTF-8:
-//
-// 1      U+     0..    7F  7     0xxxxxxx
-// 2      U+    80..   7FF  11    110xxxxx    10xxxxxx
-// 3      U+   800..  FFFF  16    1110xxxx    10xxxxxx    10xxxxxx
-// 4      U+ 10000..10FFFF  21    11110xxx    10xxxxxx    10xxxxxx    10xxxxxx
-//
-// Modified UTF-8 (Java):
-//
-// 1      U+     1..    7F  7     0xxxxxxx
-// 2      U+     0                11000000    10000000
-// 2      U+    80..   7FF  11    110xxxxx    10xxxxxx
-// 3      U+   800..  FFFF  16    1110xxxx    10xxxxxx    10xxxxxx
-// 6      U+ 10000..10FFFF  20    11101101    1010xxxx    10xxxxxx    11101101    1011xxxx    10xxxxxx  (+ 0x10000)
+static constexpr inline bool utf16_is_surrogate(uint16_t c) { return (c - 0xD800U) < 2048U; }
+static constexpr inline bool utf16_is_high_surrogate(uint16_t c) { return (c & 0xFC00) == 0xD800; }
+static constexpr inline bool utf16_is_low_surrogate(uint16_t c) { return (c & 0xFC00) == 0xDC00; }
 
-size_t utfToUtf8(unsigned char *data, size_t len) {
-    size_t read_offset = 0;
-    size_t write_offset = 0;
-    while (read_offset < len) {
-        unsigned char byte1 = data[read_offset];
+// U+FFFD REPLACEMENT CHARACTER used to replace an unknown, unrecognized, or unrepresentable character.
+#define REPLACEMENT_CHARACTER 0xFFFD
 
-        // single-byte U+0001..007F
-        if ((byte1 & 0b10000000) == 0) {
-            data[write_offset] = byte1;
-            read_offset += 1;
-            write_offset += 1;
-            continue;
-        }
-
-        SkASSERT(read_offset + 1 < len);
-        unsigned char byte2 = data[read_offset + 1];
-
-        // two-byte U+0000
-        if (byte1 == 0b11000000 && byte2 == 0b10000000) {
-            data[write_offset] = 0;
-            read_offset += 2;
-            write_offset += 1;
-            continue;
-        }
-
-        // two-byte U+0080..07FF
-        if ((byte1 & 0b11100000) == 0b11000000) {
-            SkASSERT((byte2 & 0b11000000) == 0b10000000);
-            data[write_offset] = byte1;
-            data[write_offset + 1] = byte2;
-            read_offset += 2;
-            write_offset += 2;
-            continue;
-        }
-
-        SkASSERT(read_offset + 2 < len);
-        unsigned char byte3 = data[read_offset + 2];
-
-        // Six-byte modified UTF-8
-        // 11101101    1010xxxx    10xxxxxx    11101101    1011xxxx    10xxxxxx
-        if (byte1 == 0b11101101 && (byte2 & 0b11110000) == 0b10100000) {
-            SkASSERT(read_offset + 5 < len);
-            unsigned char byte4 = data[read_offset + 3];
-            unsigned char byte5 = data[read_offset + 4];
-            unsigned char byte6 = data[read_offset + 5];
-            SkASSERT((byte3 & 0b11000000) == 0b10000000);
-            SkASSERT(byte4 == 0b11101101);
-            SkASSERT((byte5 & 0b11110000) == 0b10110000);
-            SkASSERT((byte6 & 0b11000000) == 0b10000000);
-            uint32_t codepoint = (((byte2 & 0b00001111) << 16) |
-                                  ((byte3 & 0b00111111) << 10) |
-                                  ((byte5 & 0b00001111) << 6) |
-                                   (byte6 & 0b00111111))
-                                 + 0x10000;
-            // Four-byte UTF-8
-            // 11110xxx    10xxxxxx    10xxxxxx    10xxxxxx
-            data[write_offset]     = 0b11110000 | ((codepoint >> 18) & 0b00000111);
-            data[write_offset + 1] = 0b10000000 | ((codepoint >> 12) & 0b00111111);
-            data[write_offset + 2] = 0b10000000 | ((codepoint >> 6) & 0b00111111);
-            data[write_offset + 3] = 0b10000000 | (codepoint & 0b00111111);
-
-            read_offset += 6;
-            write_offset += 4;
-            continue;
-        }
-
-        // three-byte U+0800..FFFF
-        if ((byte1 & 0b11110000) == 0b11100000) {
-            SkASSERT((byte2 & 0b11000000) == 0b10000000);
-            SkASSERT((byte3 & 0b11000000) == 0b10000000);
-            data[write_offset] = byte1;
-            data[write_offset + 1] = byte2;
-            data[write_offset + 2] = byte3;
-            read_offset += 3;
-            write_offset += 3;
-            continue;
+// Replacement of SkUTF::NextUTF16 to carefully handle invalid unicode characters.
+// Given a sequence of aligned UTF-16 characters in machine-endian form, return the first unicode codepoint.
+// The pointer will be incremented to point at the next codepoint's start.
+// If invalid UTF-16 is encountered, return U+FFFD REPLACEMENT_CHARACTER.
+static SkUnichar NextUTF16(const uint16_t** ptr, const uint16_t* end) {
+    const uint16_t* src = *ptr;
+    if (!src || src + 1 > end) {
+        return -1;
+    }
+    uint16_t c = *src++;
+    SkUnichar result = REPLACEMENT_CHARACTER;
+    if (!utf16_is_surrogate(c)) { // It's single code point, use it as-is
+        result = c;
+    } else if (utf16_is_high_surrogate(c) && src < end) { // If it's valid start of surrogate range (high surrogate)
+        uint16_t low = *src++;
+        if (utf16_is_low_surrogate(low)) { // If it's valid end of surrogate range (low surrogate)
+            result = (c << 10) + low - 0x35FDC00; // Combine high and low surrogates
         }
     }
-
-    return write_offset;
+    *ptr = src;
+    return result;
 }
 
-SkString skString(JNIEnv* env, jstring s) {
-    if (s == nullptr) {
+// Replacement of SkUTF::UTF16ToUTF8 to carefully handle invalid unicode strings.
+// The only difference here is calling of replaced NextUTF16 function.
+static int UTF16ToUTF8(char dst[], int dstCapacity, const uint16_t src[], size_t srcLength) {
+    if (!dst) {
+        dstCapacity = 0;
+    }
+
+    int dstLength = 0;
+    const char* endDst = dst + dstCapacity;
+    const uint16_t* endSrc = src + srcLength;
+    while (src < endSrc) {
+        SkUnichar uni = NextUTF16(&src, endSrc);
+        if (uni < 0) {
+            return -1;
+        }
+
+        char utf8[SkUTF::kMaxBytesInUTF8Sequence];
+        size_t count = SkUTF::ToUTF8(uni, utf8);
+        if (count == 0) {
+            return -1;
+        }
+        dstLength += count;
+
+        if (dst) {
+            const char* elems = utf8;
+            while (dst < endDst && count > 0) {
+                *dst++ = *elems++;
+                count -= 1;
+            }
+        }
+    }
+    return dstLength;
+}
+
+SkString skString(JNIEnv* env, jstring str) {
+    if (str == nullptr) {
         return SkString();
     } else {
-        jsize utfUnits = env->GetStringUTFLength(s);
-        jsize utf16Units = env->GetStringLength(s);
-        SkString res(utfUnits);
-        env->GetStringUTFRegion(s, 0, utf16Units, res.data());
-        size_t utf8Units = utfToUtf8((unsigned char *) res.data(), utfUnits);
-        res.resize(utf8Units);
-        return res;
+        // Avoid usage GetStringUTF* functions since they use modified UTF-8.
+        // See https://docs.oracle.com/javase/1.5.0/docs/guide/jni/spec/types.html#wp16542
+        // Instead, get data as-is (UTF-16) and convert to UTF-8 ourselves.
+        jsize utf16Units = env->GetStringLength(str);
+        jboolean isCopy;
+        const jchar *utf16 = env->GetStringChars(str, &isCopy);
+
+        // SkUTF::UTF16ToUTF8 returns empty string if there is invalid unicode characters.
+        // Use our replacement that carefully handles invalid unicode strings.
+        int utf8Units = UTF16ToUTF8(nullptr, 0, utf16, utf16Units);
+        SkString result;
+        if (utf8Units > 0) {
+            result.resize(utf8Units);
+            UTF16ToUTF8(result.data(), utf8Units, utf16, utf16Units);
+        }
+        if (isCopy == JNI_TRUE) {
+            env->ReleaseStringChars(str, utf16);
+        }
+        return result;
     }
 }
 

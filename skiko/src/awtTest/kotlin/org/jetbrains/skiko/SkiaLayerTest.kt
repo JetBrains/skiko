@@ -21,11 +21,15 @@ import org.junit.Assert.assertEquals
 import org.junit.Assume.assumeTrue
 import org.junit.Rule
 import org.junit.Test
+import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
+import java.awt.event.ComponentAdapter
+import java.awt.event.ComponentEvent
 import java.awt.event.WindowEvent
 import javax.swing.JFrame
 import javax.swing.JLayeredPane
+import javax.swing.JPanel
 import javax.swing.SwingUtilities
 import javax.swing.WindowConstants
 import kotlin.random.Random
@@ -241,6 +245,34 @@ class SkiaLayerTest {
             window1.close()
             window2.close()
             window3.close()
+        }
+    }
+
+    @Test
+    fun `window fullscreen state in componentResized`() = uiTest {
+        val window = UiTestWindow()
+        try {
+            window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+            window.layer.fullscreen = true
+            var stateRemainsFullscreen = true
+            window.addComponentListener(object: ComponentAdapter(){
+                override fun componentResized(e: ComponentEvent?) {
+                    if (!window.layer.fullscreen)
+                        stateRemainsFullscreen = false
+                }
+            })
+            window.isVisible = true
+
+            delay(1000)
+            assertEquals(true, stateRemainsFullscreen)
+        } finally {
+            window.close()
+
+            // Delay before starting next test to let the window animation to complete, and allow the next window
+            // to become fullscreen
+            if (hostOs == OS.MacOS) {
+                delay(1000)
+            }
         }
     }
 
@@ -564,6 +596,31 @@ class SkiaLayerTest {
             window.close()
         }
 
+    }
+
+    @Test
+    fun `non zero layer origin`() = uiTest {
+        val window = UiTestWindow(setupContent = {
+            isUndecorated = true
+            setLocation(200, 200)
+            setSize(300, 100)
+
+            val panel = JPanel()
+            panel.preferredSize = Dimension(100, 100)
+            panel.background = Color.GREEN
+            contentPane.add(panel, BorderLayout.WEST)
+
+            layer.skikoView = RectRenderer(layer, 100, 100, Color.RED)
+            contentPane.add(layer, BorderLayout.CENTER)
+        })
+        try {
+            window.isUndecorated = true
+            window.isVisible = true
+            delay(1000)
+            screenshots.assert(window.bounds, "frame")
+        } finally {
+            window.close()
+        }
     }
 
     @Test
