@@ -1,6 +1,7 @@
 package org.jetbrains.skia.icu
 
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.ModuleImport
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
 
 /**
@@ -47,4 +48,5 @@ object CharDirection {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_icu_Unicode_charDirection")
+@ModuleImport("skia", "org_jetbrains_skia_icu_Unicode_charDirection")
 private external fun charDirection(codePoint: Int): Int
