@@ -24,6 +24,10 @@ internal value class MetalDevice(val ptr: Long)
 /**
  * Provides a way to request draws on Skia canvas created in [layer] bounds using Metal GPU acceleration.
  *
+ * This [MetalRedrawer] draws content on-screen for maximum efficiency,
+ * but it may prevent for using it in embedded components (such as interop with Swing).
+ * For off-screen implementation see [MetalOffScreenRedrawer]
+ *
  * Content to draw is provided by [SkiaLayer.draw].
  *
  * @see MetalContextHandler

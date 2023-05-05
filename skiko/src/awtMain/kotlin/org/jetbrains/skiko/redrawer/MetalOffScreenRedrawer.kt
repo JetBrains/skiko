@@ -5,6 +5,22 @@ import kotlinx.coroutines.Job
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.context.MetalOffScreenContextHandler
 
+/**
+ * Experimental API that provides a way to draw on Skia canvas rendered off-screen with Metal GPU acceleration
+ * and then passed to [layer] [java.awt.Graphics2D].
+ * It provides better interoperability with Swing, but it is less efficient.
+ *
+ * For now, it uses drawing to [java.awt.image.BufferedImage] that cause VRAM <-> RAM memory transfer and so increased CPU usage.
+ * Because of that frames are limited by [FrameDispatcher].
+ *
+ * For on-screen rendering see [MetalRedrawer].
+ *
+ * Content to draw is provided by [SkiaLayer.draw].
+ *
+ * @see MetalOffScreenContextHandler
+ * @see FrameDispatcher
+ */
+@ExperimentalSkikoApi
 internal class MetalOffScreenRedrawer(
     private val layer: SkiaLayer,
     analytics: SkiaLayerAnalytics,

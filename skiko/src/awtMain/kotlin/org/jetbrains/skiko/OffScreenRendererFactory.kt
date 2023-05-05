@@ -10,8 +10,10 @@ import org.jetbrains.skiko.redrawer.Redrawer
  *
  * For now, only MacOs is supported, other OSes fallbacked to [RenderFactory.Default]
  */
+@ExperimentalSkikoApi
 internal val DefaultOffScreenRendererFactory: RenderFactory = makeOffScreenRendererFactory()
 
+@ExperimentalSkikoApi
 private fun makeOffScreenRendererFactory(): RenderFactory {
     val defaultRenderFactory = RenderFactory.Default
     return object : RenderFactory {
