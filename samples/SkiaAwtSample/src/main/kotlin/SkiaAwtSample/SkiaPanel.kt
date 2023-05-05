@@ -1,17 +1,19 @@
 package SkiaAwtSample
 
 import org.jetbrains.skiko.ClipComponent
+import org.jetbrains.skiko.ExperimentalSkikoApi
 import org.jetbrains.skiko.SkiaLayer
 import java.awt.Color
 import java.awt.Component
 import javax.swing.JLayeredPane
 
-open class SkiaPanel: JLayeredPane {
-    val layer = SkiaLayer()
+class SkiaPanel(offScreenRendering: Boolean = false) : JLayeredPane() {
+    @OptIn(ExperimentalSkikoApi::class)
+    val layer = SkiaLayer(offScreenRendering = offScreenRendering)
 
-    constructor() : super() {
-        setLayout(null)
-        setBackground(Color.white)
+    init {
+        layout = null
+        background = Color.white
     }
 
     override fun add(component: Component): Component {
