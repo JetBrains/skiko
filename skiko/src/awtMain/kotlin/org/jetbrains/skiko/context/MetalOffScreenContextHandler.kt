@@ -1,8 +1,10 @@
 package org.jetbrains.skiko.context
 
 import org.jetbrains.skia.*
-import org.jetbrains.skiko.*
-import java.awt.Color
+import org.jetbrains.skiko.Logger
+import org.jetbrains.skiko.MetalAdapter
+import org.jetbrains.skiko.RenderException
+import org.jetbrains.skiko.SkiaLayer
 import java.awt.Transparency
 import java.awt.color.ColorSpace
 import java.awt.image.*
@@ -88,10 +90,7 @@ internal class MetalOffScreenContextHandler(
             val g = layer.backedLayer.graphics
             if (g != null) {
                 try {
-                    if (!layer.fullscreen && layer.transparency && hostOs == OS.MacOS) {
-                        g.color = Color(0, 0, 0, 0)
-                        g.clearRect(0, 0, w, h)
-                    }
+                    g.clearRect(0, 0, w, h)
                     // TODO: a lot of CPU spend for scaling
                     g.drawImage(image, 0, 0, layer.width, layer.height, null)
                 } finally {
