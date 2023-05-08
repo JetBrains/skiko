@@ -59,23 +59,23 @@ internal class MetalOffScreenContextHandler(
         super.flush()
         surface!!.flushAndSubmit(syncCpu = true)
 
-        val w = surface!!.width
-        val h = surface!!.height
+        val width = surface!!.width
+        val height = surface!!.height
 
         val storage = Bitmap()
-        storage.setImageInfo(ImageInfo.makeN32Premul(w, h))
+        storage.setImageInfo(ImageInfo.makeN32Premul(width, height))
         storage.allocPixels()
         // TODO: it copies pixels from GPU to CPU, so it is really slow
         surface!!.readPixels(storage, 0, 0)
 
-        val bytes = storage.readPixels(storage.imageInfo, (w * 4), 0, 0)
+        val bytes = storage.readPixels(storage.imageInfo, (width * 4), 0, 0)
         if (bytes != null) {
             val buffer = DataBufferByte(bytes, bytes.size)
             val raster = Raster.createInterleavedRaster(
                 buffer,
-                w,
-                h,
-                w * 4, 4,
+                width,
+                height,
+                width * 4, 4,
                 intArrayOf(2, 1, 0, 3), // BGRA order
                 null
             )
@@ -90,7 +90,7 @@ internal class MetalOffScreenContextHandler(
             val g = layer.backedLayer.graphics
             if (g != null) {
                 try {
-                    g.clearRect(0, 0, w, h)
+                    g.clearRect(0, 0, width, height)
                     // TODO: a lot of CPU spend for scaling
                     g.drawImage(image, 0, 0, layer.width, layer.height, null)
                 } finally {
