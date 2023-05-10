@@ -39,8 +39,8 @@ internal class MacOsMetalRedrawer(
     override val renderInfo: String get() = contextHandler.rendererInfo()
 
     private var isDisposed = false
-    internal val device = MTLCreateSystemDefaultDevice()!!
-    private val queue = device.newCommandQueue()!!
+    internal val device = MTLCreateSystemDefaultDevice() ?: throw IllegalStateException("Metal is not supported on this system")
+    private val queue = device.newCommandQueue() ?: throw IllegalStateException("Couldn't create Metal command queue")
     private var currentDrawable: CAMetalDrawableProtocol? = null
     private val metalLayer = MetalLayer()
 
