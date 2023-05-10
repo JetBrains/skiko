@@ -12,7 +12,6 @@ import platform.CoreGraphics.CGContextRef
 import platform.CoreGraphics.CGSizeMake
 import platform.Foundation.NSRunLoop
 import platform.Foundation.NSSelectorFromString
-import platform.Metal.MTLCommandQueueProtocol
 import platform.Metal.MTLCreateSystemDefaultDevice
 import platform.Metal.MTLDeviceProtocol
 import platform.Metal.MTLPixelFormatBGRA8Unorm

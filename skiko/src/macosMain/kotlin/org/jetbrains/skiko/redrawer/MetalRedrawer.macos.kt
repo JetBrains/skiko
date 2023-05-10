@@ -26,7 +26,6 @@ import platform.QuartzCore.kCALayerHeightSizable
 import platform.QuartzCore.kCALayerWidthSizable
 import kotlin.system.getTimeNanos
 import platform.CoreGraphics.CGSizeMake
-import platform.Metal.MTLCommandQueueProtocol
 
 /**
  * Metal [Redrawer] implementation for MacOs.
