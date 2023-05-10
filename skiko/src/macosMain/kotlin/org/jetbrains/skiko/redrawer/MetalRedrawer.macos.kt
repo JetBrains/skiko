@@ -26,6 +26,7 @@ import platform.QuartzCore.kCALayerHeightSizable
 import platform.QuartzCore.kCALayerWidthSizable
 import kotlin.system.getTimeNanos
 import platform.CoreGraphics.CGSizeMake
+import platform.Metal.MTLCommandQueueProtocol
 
 /**
  * Metal [Redrawer] implementation for MacOs.
@@ -39,12 +40,21 @@ internal class MacOsMetalRedrawer(
     override val renderInfo: String get() = contextHandler.rendererInfo()
 
     private var isDisposed = false
-    internal val device = MTLCreateSystemDefaultDevice()!!
-    private val queue = device.newCommandQueue()!!
+    internal val device: MTLDeviceProtocol
+    private val queue: MTLCommandQueueProtocol
     private var currentDrawable: CAMetalDrawableProtocol? = null
     private val metalLayer = MetalLayer()
 
     init {
+        val device =
+            MTLCreateSystemDefaultDevice() ?: throw IllegalStateException("Metal is not supported on this system")
+
+        val queue =
+            device.newCommandQueue() ?: throw IllegalStateException("Couldn't create Metal command queue")
+
+        this.device = device
+        this.queue = queue
+
         metalLayer.init(skiaLayer, contextHandler, device)
     }
 
