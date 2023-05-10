@@ -46,15 +46,6 @@ internal class MacOsMetalRedrawer(
     private val metalLayer = MetalLayer()
 
     init {
-        val device =
-            MTLCreateSystemDefaultDevice() ?: throw IllegalStateException("Metal is not supported on this system")
-
-        val queue =
-            device.newCommandQueue() ?: throw IllegalStateException("Couldn't create Metal command queue")
-
-        this.device = device
-        this.queue = queue
-
         metalLayer.init(skiaLayer, contextHandler, device)
     }
 
