@@ -45,7 +45,7 @@ internal class MetalRedrawer(
     )
 
     init {
-        metalLayer.init(this.layer, contextHandler, this.device)
+        metalLayer.init(this.layer, contextHandler, device)
         caDisplayLink.setPaused(true)
         caDisplayLink.addToRunLoop(NSRunLoop.mainRunLoop, NSRunLoop.mainRunLoop.currentMode)
     }
