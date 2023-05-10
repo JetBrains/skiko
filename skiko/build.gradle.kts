@@ -160,11 +160,11 @@ fun compileNativeBridgesTask(os: OS, arch: Arch, isArm64Simulator: Boolean): Tas
                     Arch.Arm64 -> arrayOf(
                         "-target", if (isArm64Simulator) "arm64-apple-ios-simulator" else "arm64-apple-ios",
                         "-isysroot", if (isArm64Simulator) iphoneSimSdk else iphoneOsSdk,
-                        "-miphoneos-version-min=11.0"
+                        "-miphoneos-version-min=12.0"
                     )
                     Arch.X64 -> arrayOf(
                         "-target", "x86_64-apple-ios-simulator",
-                        "-mios-version-min=11.0",
+                        "-mios-version-min=12.0",
                         "-isysroot", iphoneSimSdk
                     )
                     else -> throw GradleException("Unsupported arch: $arch")
