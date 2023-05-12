@@ -7,6 +7,7 @@ import kotlinx.coroutines.withContext
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.context.MetalContextHandler
 import javax.swing.SwingUtilities.*
+import java.util.concurrent.Semaphore
 
 /**
  * Holder for pointer on MetalDevice described in "MetalDevice.h"
@@ -57,6 +58,11 @@ internal class MetalRedrawer(
             return currentDevice
         }
 
+    /**
+     * Semaphore that will allow only one [drawSync] dispatched during VSync
+     */
+    private val drawSyncSemaphore = Semaphore(1)
+
     init {
         val adapter = chooseAdapter(properties.adapterPriority.ordinal)
         val adapterName = getAdapterName(adapter)
@@ -77,6 +83,7 @@ internal class MetalRedrawer(
 
     private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
         if (layer.isShowing) {
+            println(System.nanoTime())
             update(System.nanoTime())
             draw()
         }
@@ -87,8 +94,7 @@ internal class MetalRedrawer(
     }
 
     fun drawSync() {
-        layer.update(System.nanoTime())
-        performDraw()
+        frameDispatcher.scheduleFrame()
     }
 
     override fun dispose() = synchronized(drawLock) {
