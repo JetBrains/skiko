@@ -86,6 +86,11 @@ internal class MetalRedrawer(
         onContextInit()
     }
 
+    fun drawSync() {
+        layer.update(System.nanoTime())
+        performDraw()
+    }
+
     override fun dispose() = synchronized(drawLock) {
         frameDispatcher.cancel()
         contextHandler.dispose()
