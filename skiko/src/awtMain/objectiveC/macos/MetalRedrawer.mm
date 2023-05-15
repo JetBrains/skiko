@@ -62,8 +62,8 @@
 extern "C"
 {
 
-extern "C" void* objc_autoreleasePoolPush(void);
-extern "C" void objc_autoreleasePoolPop(void*);
+void* objc_autoreleasePoolPush(void);
+void objc_autoreleasePoolPop(void*);
 
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_startRendering(
     JNIEnv * env, jobject redrawer)
