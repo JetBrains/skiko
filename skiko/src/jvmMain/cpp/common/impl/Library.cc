@@ -5,7 +5,19 @@
 #include "../paragraph/interop.hh"
 #include "../svg/interop.hh"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+    JavaVM* jvm;
+
+#ifdef __cplusplus
+};
+#endif
+
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
+    jvm = vm;
+
     JNIEnv* env;
     if (vm->GetEnv(reinterpret_cast<void**>(&env), SKIKO_JNI_VERSION) != JNI_OK)
         return JNI_ERR;

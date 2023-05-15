@@ -28,6 +28,8 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_mak
 {
     @autoreleasepool {
         MetalDevice *device = (__bridge MetalDevice *) (void *) devicePtr;
+        [device recreateDisplayLinkIfNeeded];
+
         GrBackendRenderTarget* renderTarget = NULL;
 
         id<CAMetalDrawable> currentDrawable = [device.layer nextDrawable];

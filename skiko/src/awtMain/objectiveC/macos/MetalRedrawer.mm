@@ -103,7 +103,7 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_chooseAd
 }
 
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMetalDevice(
-    JNIEnv *env, jobject redrawer, jlong windowPtr, jboolean transparency, jlong adapterPtr, jlong platformInfoPtr)
+    JNIEnv *env, jobject redrawer, jlong windowPtr, jboolean transparency, jlong adapterPtr, jlong platformInfoPtr, jobject displayLinkCallback)
 {
     @autoreleasepool {
         id<MTLDevice> adapter = (__bridge_transfer id<MTLDevice>) (void *) adapterPtr;
@@ -112,7 +112,7 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
 
         CALayer *container = [dsi_mac windowLayer];
 
-        MetalDevice *device = [[MetalDevice alloc] initWithContainer:container adapter:adapter window:window];
+        MetalDevice *device = [[MetalDevice alloc] initWithContainer:container adapter:adapter window:window env:env displayLinkCallback:displayLinkCallback];
 
         device.layer.javaRef = env->NewGlobalRef(redrawer);
 
