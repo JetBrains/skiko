@@ -87,7 +87,8 @@ internal class MetalRedrawer(
     }
 
     fun drawSync() {
-        frameDispatcher.scheduleFrame()
+        layer.update(System.nanoTime())
+        performDraw()
     }
 
     override fun dispose() = synchronized(drawLock) {
