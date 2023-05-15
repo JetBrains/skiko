@@ -75,6 +75,12 @@ fun skiaPreprocessorFlags(os: OS, buildType: SkiaBuildType): Array<String> {
             "-DSK_SHAPER_CORETEXT_AVAILABLE",
             "-DSK_METAL"
         )
+        OS.TVOS -> listOf(
+            "-DSK_BUILD_FOR_IOS",
+            "-DSK_BUILD_FOR_TVOS",
+            "-DSK_SHAPER_CORETEXT_AVAILABLE",
+            "-DSK_METAL"
+        )
         OS.Windows -> listOf(
             "-DSK_BUILD_FOR_WIN",
             "-D_CRT_SECURE_NO_WARNINGS",
@@ -155,10 +161,10 @@ fun KotlinTarget.generateVersion(
     skikoProperties: SkikoProperties
 ) {
     val targetName = this.name
-    val isArm64Simulator = isIosSimArm64()
+    val isUikitSim = isUikitSimulator()
     val generatedDir = project.layout.buildDirectory.dir("generated/$targetName")
     val generateVersionTask = project.registerSkikoTask<DefaultTask>(
-        "generateVersion${toTitleCase(platformType.name)}".withSuffix(isIosSim = isArm64Simulator),
+        "generateVersion${toTitleCase(platformType.name)}".withSuffix(isUikitSim = isUikitSim),
         targetOs,
         targetArch
     ) {

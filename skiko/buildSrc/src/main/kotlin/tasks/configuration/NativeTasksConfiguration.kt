@@ -5,43 +5,38 @@ import CompileSkikoCppTask
 import OS
 import SkiaBuildType
 import SkikoProjectContext
-import SkikoProperties
 import WriteCInteropDefFile
 import compilerForTarget
 import isCompatibleWithHost
 import joinToTitleCamelCase
 import listOfFrameworks
 import mutableListOfLinkerOptions
-import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.tasks.Exec
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.getByName
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompileTool
 import projectDirs
 import registerOrGetSkiaDirProvider
 import registerSkikoTask
-import toTitleCase
 import java.io.File
 
-fun String.withSuffix(isIosSim: Boolean = false) =
-    this + if (isIosSim) "Sim" else ""
+fun String.withSuffix(isUikitSim: Boolean = false) =
+    this + if (isUikitSim) "Sim" else ""
 
-fun KotlinTarget.isIosSimArm64() =
-    name.contains("iosSimulatorArm64", ignoreCase = true)
+fun KotlinTarget.isUikitSimulator() =
+    name.contains("Simulator", ignoreCase = true) || name == "tvosX64" // x64 tvOS is implicitly a simulator
 
 fun SkikoProjectContext.compileNativeBridgesTask(
-    os: OS, arch: Arch, isArm64Simulator: Boolean
+    os: OS, arch: Arch, isUikitSim: Boolean
 ): TaskProvider<CompileSkikoCppTask> = with (this.project) {
-    val skiaNativeDir = registerOrGetSkiaDirProvider(os, arch, isIosSim = isArm64Simulator)
+    val skiaNativeDir = registerOrGetSkiaDirProvider(os, arch, isUikitSim = isUikitSim)
 
-    val actionName = "compileNativeBridges".withSuffix(isIosSim = isArm64Simulator)
+    val actionName = "compileNativeBridges".withSuffix(isUikitSim = isUikitSim)
 
     return project.registerSkikoTask<CompileSkikoCppTask>(actionName, os, arch) {
         dependsOn(skiaNativeDir)
@@ -49,7 +44,7 @@ fun SkikoProjectContext.compileNativeBridgesTask(
 
         compiler.set(compilerForTarget(os, arch))
         buildTargetOS.set(os)
-        if (isArm64Simulator) {
+        if (isUikitSim) {
             buildSuffix.set("sim")
         }
         buildTargetArch.set(arch)
@@ -62,8 +57,8 @@ fun SkikoProjectContext.compileNativeBridgesTask(
                 val iphoneSimSdk = "$sdkRoot/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk"
                 val iosArchFlags = when (arch) {
                     Arch.Arm64 -> arrayOf(
-                        "-target", if (isArm64Simulator) "arm64-apple-ios-simulator" else "arm64-apple-ios",
-                        "-isysroot", if (isArm64Simulator) iphoneSimSdk else iphoneOsSdk,
+                        "-target", if (isUikitSim) "arm64-apple-ios-simulator" else "arm64-apple-ios",
+                        "-isysroot", if (isUikitSim) iphoneSimSdk else iphoneOsSdk,
                         "-miphoneos-version-min=12.0"
                     )
                     Arch.X64 -> arrayOf(
@@ -78,6 +73,30 @@ fun SkikoProjectContext.compileNativeBridgesTask(
                     *buildType.clangFlags,
                     "-stdlib=libc++",
                     *skiaPreprocessorFlags(OS.IOS, buildType),
+                ))
+            }
+            OS.TVOS -> {
+                val sdkRoot = "/Applications/Xcode.app/Contents/Developer/Platforms"
+                val tvOsSdk = "$sdkRoot/AppleTVOS.platform/Developer/SDKs/AppleTVOS.sdk"
+                val tvSimSdk = "$sdkRoot/AppleTVSimulator.platform/Developer/SDKs/AppleTVSimulator.sdk"
+                val tvosArchFlags = when (arch) {
+                    Arch.Arm64 -> arrayOf(
+                        "-target", if (isUikitSim) "arm64-apple-tvos-simulator" else "arm64-apple-tvos",
+                        if (isUikitSim) "-mappletvsimulator-version-min=12.0" else "-mappletvos-version-min=12.0" ,
+                        "-isysroot", if (isUikitSim) tvSimSdk else tvOsSdk,
+                    )
+                    Arch.X64 -> arrayOf(
+                        "-target", "x86_64-apple-tvos-simulator",
+                        "-mappletvsimulator-version-min=12.0",
+                        "-isysroot", tvSimSdk
+                    )
+                    else -> throw GradleException("Unsupported arch: $arch")
+                }
+                flags.set(listOf(
+                    *tvosArchFlags,
+                    *buildType.clangFlags,
+                    "-stdlib=libc++",
+                    *skiaPreprocessorFlags(OS.TVOS, buildType),
                 ))
             }
             OS.MacOS -> {
@@ -120,7 +139,7 @@ fun configureCinterop(
     linkerOpts: List<String>,
 ) {
     val tasks = target.project.tasks
-    val taskNameSuffix = joinToTitleCamelCase(os.idWithSuffix(isIosSim = target.isIosSimArm64()), arch.id)
+    val taskNameSuffix = joinToTitleCamelCase(os.idWithSuffix(isUikitSim = target.isUikitSimulator()), arch.id)
     val writeCInteropDef = tasks.register("writeCInteropDef$taskNameSuffix", WriteCInteropDefFile::class.java) {
         this.linkerOpts.set(linkerOpts)
         outputFile.set(project.layout.buildDirectory.file("cinterop/$targetString/skiko.def"))
@@ -167,11 +186,11 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
     if (!os.isCompatibleWithHost) return
 
     target.generateVersion(os, arch, skiko)
-    val isArm64Simulator = target.isIosSimArm64()
+    val isUikitSim = target.isUikitSimulator()
 
-    val targetString = "${os.idWithSuffix(isIosSim = isArm64Simulator)}-${arch.id}"
+    val targetString = "${os.idWithSuffix(isUikitSim = isUikitSim)}-${arch.id}"
 
-    val unzipper = registerOrGetSkiaDirProvider(os, arch, isArm64Simulator)
+    val unzipper = registerOrGetSkiaDirProvider(os, arch, isUikitSim)
     val unpackedSkia = unzipper.get()
     val skiaDir = unpackedSkia.absolutePath
 
@@ -193,6 +212,11 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
             // for projects depending on older Compose/Skiko transitively https://youtrack.jetbrains.com/issue/KT-60399
             configureCinterop("uikit", os, arch, target, targetString, iosFrameworks)
             mutableListOfLinkerOptions(iosFrameworks)
+        }
+        OS.TVOS -> {
+            val tvosFrameworks = listOfFrameworks("Metal", "CoreGraphics", "CoreText", "UIKit")
+            configureCinterop("uikit", os, arch, target, targetString, tvosFrameworks)
+            mutableListOfLinkerOptions(tvosFrameworks)
         }
         OS.Linux -> mutableListOfLinkerOptions(
             "-L/usr/lib/x86_64-linux-gnu",
@@ -226,10 +250,10 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
         }
     }
 
-    val crossCompileTask = compileNativeBridgesTask(os, arch, isArm64Simulator = isArm64Simulator)
+    val crossCompileTask = compileNativeBridgesTask(os, arch, isUikitSim = isUikitSim)
 
     // TODO: move to LinkSkikoTask.
-    val actionName = "linkNativeBridges".withSuffix(isIosSim = isArm64Simulator)
+    val actionName = "linkNativeBridges".withSuffix(isUikitSim = isUikitSim)
     val linkTask = project.registerSkikoTask<Exec>(actionName, os, arch) {
         dependsOn(crossCompileTask)
         val objectFilesDir = crossCompileTask.map { it.outDir.get() }
@@ -245,7 +269,7 @@ fun SkikoProjectContext.configureNativeTarget(os: OS, arch: Arch, target: Kotlin
                 executable = "ar"
                 argumentProviders.add { listOf("-crs", staticLib) }
             }
-            OS.MacOS, OS.IOS -> {
+            OS.MacOS, OS.IOS, OS.TVOS -> {
                 executable = "libtool"
                 argumentProviders.add { listOf("-static", "-o", staticLib) }
             }

@@ -2,16 +2,16 @@ package org.jetbrains.skiko
 
 import platform.UIKit.*
 
+// tvOS doesn't have support for clipboard
 internal actual fun ClipboardManager_setText(text: String) {
-    UIPasteboard.generalPasteboard.string = text
-}
-internal actual fun ClipboardManager_getText(): String? {
-    return UIPasteboard.generalPasteboard.string
 }
 
-internal actual fun ClipboardManager_hasText(): Boolean = UIPasteboard.generalPasteboard.hasStrings()
+internal actual fun ClipboardManager_getText(): String? {
+    return null
+}
+
+internal actual fun ClipboardManager_hasText(): Boolean = false
 
 internal actual fun UIView.skikoInitializeUIView() {
-    multipleTouchEnabled = true
     userInteractionEnabled = true
 }
