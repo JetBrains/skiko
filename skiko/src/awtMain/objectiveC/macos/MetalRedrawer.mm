@@ -4,6 +4,7 @@
 #import <jawt_md.h>
 
 #import <Cocoa/Cocoa.h>
+#import <AppKit/AppKit.h>
 #import <QuartzCore/QuartzCore.h>
 #import <Metal/Metal.h>
 #import <QuartzCore/CAMetalLayer.h>
@@ -177,9 +178,11 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
         device.layer.backgroundColor = CGColorCreate(CGColorSpaceCreateDeviceRGB(), transparent);
         device.layer.opaque = NO;
 
+        NSWindow* window = (__bridge NSWindow*) (void *) windowPtr;
+//        device.window = window;
+
         if (transparency)
         {
-            NSWindow* window = (__bridge NSWindow*) (void *) windowPtr;
             window.hasShadow = NO;
         }
 
