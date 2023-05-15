@@ -1,26 +1,21 @@
 #ifdef SK_METAL
 
-@interface AWTMetalLayer : CAMetalLayer
+#import <QuartzCore/QuartzCore.h>
+#import <AppKit/AppKit.h>
+#import <Metal/Metal.h>
 
-@property jobject javaRef;
-
-@end
-
-// Forward declarations for dependent implementation files not to depend on non-relevant types header inclusion.
-@class NSWindow;
-@class CALayer;
-@protocol MTLDevice;
-@protocol MTLCommandQueue;
-@protocol CAMetalDrawable;
+#import "AWTMetalLayer.h"
 
 @interface MetalDevice : NSObject
 
 @property (weak) CALayer *container;
-@property (weak) NSWindow *window;
-@property (retain, strong) AWTMetalLayer *layer;
-@property (retain, strong) id<MTLDevice> adapter;
-@property (retain, strong) id<MTLCommandQueue> queue;
-@property (retain, strong) id<CAMetalDrawable> drawableHandle;
+@property (strong) NSWindow *window;
+@property (strong) AWTMetalLayer *layer;
+@property (strong) id<MTLDevice> adapter;
+@property (strong) id<MTLCommandQueue> queue;
+@property (strong) id<CAMetalDrawable> drawableHandle;
+
+- (instancetype)initWithContainer:(CALayer *)container adapter:(id<MTLDevice>)adapter window:(NSWindow *)window;
 
 @end
 

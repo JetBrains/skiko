@@ -3,8 +3,6 @@
 #import <jawt.h>
 #import <jawt_md.h>
 
-#import <QuartzCore/CAMetalLayer.h>
-#import <Metal/Metal.h>
 #import <GrDirectContext.h>
 #import <mtl/GrMtlBackendContext.h>
 #import <mtl/GrMtlTypes.h>
