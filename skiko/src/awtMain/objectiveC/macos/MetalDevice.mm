@@ -1,4 +1,5 @@
 #import "MetalDevice.h"
+#import <stdatomic.h>
 
 static CVReturn MetalDeviceDisplayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeStamp *now, const CVTimeStamp *outputTime, CVOptionFlags flagsIn, CVOptionFlags *flagsOut, void *displayLinkContext) {
     MetalDevice *device = (__bridge MetalDevice *)displayLinkContext;
@@ -14,6 +15,7 @@ static CVReturn MetalDeviceDisplayLinkCallback(CVDisplayLinkRef displayLink, con
 
     dispatch_semaphore_t _presentingBuffersExhaustionSemaphore;
     NSConditionLock *_vsyncConditionLock;
+    volatile atomic_bool _displayLinkOk;
 }
 
 - (instancetype)initWithContainer:(CALayer *)container adapter:(id<MTLDevice>)adapter window:(NSWindow *)window {
@@ -44,6 +46,8 @@ static CVReturn MetalDeviceDisplayLinkCallback(CVDisplayLinkRef displayLink, con
         _presentingBuffersExhaustionSemaphore = dispatch_semaphore_create(3);
 
         _vsyncConditionLock = [[NSConditionLock alloc] initWithCondition: 1];
+
+        atomic_store(&_displayLinkOk, true);
     }
 
     return self;
@@ -51,6 +55,15 @@ static CVReturn MetalDeviceDisplayLinkCallback(CVDisplayLinkRef displayLink, con
 
 - (void)dealloc {
     [self invalidateDisplayLink];
+}
+
+- (void)handleDisplayLinkSetupFailure {
+    atomic_store(&_displayLinkOk, false);
+
+    /// Next line is here to tackle edge case where displayLink reconstruction failed
+    /// but someone is already waiting at `waitUntilVsync`
+    /// It's quite improbable scenario anyway
+    [self handleDisplayLinkFired];
 }
 
 - (void)recreateDisplayLinkIfNeeded {
@@ -70,15 +83,29 @@ static CVReturn MetalDeviceDisplayLinkCallback(CVDisplayLinkRef displayLink, con
 
     CVDisplayLinkRef displayLink;
     result = CVDisplayLinkCreateWithCGDisplay([screenID unsignedIntValue], &displayLink);
-    assert(result == kCVReturnSuccess);
+
+    if (result != kCVReturnSuccess) {
+        [self handleDisplayLinkSetupFailure];
+        return;
+    }
 
     result = CVDisplayLinkSetOutputCallback(displayLink, &MetalDeviceDisplayLinkCallback, (__bridge void *)(self));
-    assert(result == kCVReturnSuccess);
+
+    if (result != kCVReturnSuccess) {
+        [self handleDisplayLinkSetupFailure];
+        return;
+    }
 
     _displayLink = displayLink;
 
     result = CVDisplayLinkStart(displayLink);
-    assert(result == kCVReturnSuccess);
+
+    if (result != kCVReturnSuccess) {
+        [self handleDisplayLinkSetupFailure];
+        return;
+    }
+
+    atomic_store(&_displayLinkOk, true);
 
     NSLog(@"DisplayLink launched for screen with ID: %@", screenID);
 }
@@ -89,6 +116,13 @@ static CVReturn MetalDeviceDisplayLinkCallback(CVDisplayLinkRef displayLink, con
 }
 
 - (void)waitUntilVsync {
+    bool displayLinkOk = atomic_load(&_displayLinkOk);
+
+    /// If display link construction was corrupted, don't perform any waiting
+    if (!displayLinkOk) {
+        return;
+    }
+
     [_vsyncConditionLock lockWhenCondition:1];
     [_vsyncConditionLock unlockWithCondition:0];
 }

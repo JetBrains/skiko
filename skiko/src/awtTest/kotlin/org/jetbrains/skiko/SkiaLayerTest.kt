@@ -23,6 +23,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assume.assumeTrue
 import org.junit.Rule
 import org.junit.Test
+import org.junit.Ignore
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
@@ -58,7 +59,44 @@ class SkiaLayerTest {
     @get:Rule
     val screenshots = ScreenshotTestRule()
 
+    @Test
+    fun `should not leak native windows`() = uiTest {
+        assumeTrue(hostOs.isMacOS)
+
+        suspend fun createAndDisposeWindow() {
+            val layer = SkiaLayer()
+            val frame = JFrame()
+            frame.contentPane.add(layer)
+            frame.size = Dimension(200, 200)
+            frame.isVisible = true
+            delay(30)
+            layer.dispose()
+            frame.dispose()
+        }
+
+        // warm caches
+        repeat(8) {
+            createAndDisposeWindow()
+        }
+
+        delay(1000)
+        val initialWindowCount = getApplicationWindowCount()
+
+        repeat(32) {
+            createAndDisposeWindow()
+        }
+
+        delay(1000)
+        val actualWindowCount = getApplicationWindowCount()
+
+        assertTrue(
+            initialWindowCount >= actualWindowCount,
+            "initialWindowCount=$initialWindowCount, actualWindowCount=$actualWindowCount"
+        )
+    }
+
     @OptIn(ExperimentalTime::class)
+//    @Ignore
     @Test
     fun `frame is rendered immediately`() = uiTest {
         val window = UiTestWindow(
@@ -118,42 +156,6 @@ class SkiaLayerTest {
         } finally {
             window.close()
         }
-    }
-
-    @Test
-    fun `should not leak native windows`() = uiTest {
-        assumeTrue(hostOs.isMacOS)
-
-        suspend fun createAndDisposeWindow() {
-            val layer = SkiaLayer()
-            val frame = JFrame()
-            frame.contentPane.add(layer)
-            frame.size = Dimension(200, 200)
-            frame.isVisible = true
-            delay(30)
-            layer.dispose()
-            frame.dispose()
-        }
-
-        // warm caches
-        repeat(8) {
-            createAndDisposeWindow()
-        }
-
-        delay(1000)
-        val initialWindowCount = getApplicationWindowCount()
-
-        repeat(32) {
-            createAndDisposeWindow()
-        }
-
-        delay(1000)
-        val actualWindowCount = getApplicationWindowCount()
-
-        assertTrue(
-            initialWindowCount >= actualWindowCount,
-            "initialWindowCount=$initialWindowCount, actualWindowCount=$actualWindowCount"
-        )
     }
 
     @Test
