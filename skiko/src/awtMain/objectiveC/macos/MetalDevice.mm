@@ -110,7 +110,7 @@ static CVReturn MetalDeviceDisplayLinkCallback(CVDisplayLinkRef displayLink, con
 
 - (void)waitForQueueSlot {
     /// In case we receive more encoded command buffers, than gpu can handle (GPU bottleneck),
-    /// we need to throttle it down and start a new frame only when the last one is finished
+    /// we need to throttle it down and start a new frame only when one currently run is finished
     ///
     /// see call place of `freeQueueSlot`
     dispatch_semaphore_wait(_presentingBuffersExhaustionSemaphore, DISPATCH_TIME_FOREVER);
