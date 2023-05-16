@@ -11,6 +11,7 @@
 
 extern "C"
 {
+
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_makeMetalContext(
     JNIEnv* env, jobject contextHandler, jlong devicePtr)
 {
@@ -27,6 +28,13 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_mak
     JNIEnv* env, jobject contextHandler, jlong devicePtr, jint width, jint height)
 {
     @autoreleasepool {
+        static double prevTime = CACurrentMediaTime();
+
+        double newTime = CACurrentMediaTime();
+        NSLog(@"Frame time: %f", newTime - prevTime);
+
+        prevTime = newTime;
+
         MetalDevice *device = (__bridge MetalDevice *) (void *) devicePtr;
         [device recreateDisplayLinkIfNeeded];
         [device waitUntilVsync];
