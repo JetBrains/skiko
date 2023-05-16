@@ -1,3 +1,5 @@
+#ifdef SK_METAL
+
 #ifndef SK_AWT_METAL_LAYER_H
 #define SK_AWT_METAL_LAYER_H
 
@@ -10,4 +12,6 @@
 
 @end
 
-#endif //SK_AWT_METAL_LAYER_H
+#endif // SK_AWT_METAL_LAYER_H
+
+#endif // SK_METAL
