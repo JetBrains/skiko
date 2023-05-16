@@ -139,6 +139,9 @@ internal class MetalRedrawer(
             delay(300)
     }
 
+    /**
+     * Avoid calling this method on main thread, it will sleep before next vsync happens if invoked multiple times.
+     */
     private fun performDraw() = synchronized(drawLock) {
         if (!isDisposed) {
             val handle = startRendering()
