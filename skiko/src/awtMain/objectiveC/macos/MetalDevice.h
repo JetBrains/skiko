@@ -1,5 +1,8 @@
 #ifdef SK_METAL
 
+#ifndef SK_METAL_DEVICE_H
+#define SK_METAL_DEVICE_H
+
 #import <QuartzCore/QuartzCore.h>
 #import <AppKit/AppKit.h>
 #import <Metal/Metal.h>
@@ -24,4 +27,6 @@
 
 @end
 
-#endif
+#endif // SK_AWT_METAL_DEVICE_H
+
+#endif // SK_METAL

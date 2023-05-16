@@ -1,3 +1,6 @@
+#ifndef SK_AWT_METAL_LAYER_H
+#define SK_AWT_METAL_LAYER_H
+
 #import <QuartzCore/CAMetalLayer.h>
 #import <jni.h>
 
@@ -6,3 +9,5 @@
 @property jobject javaRef;
 
 @end
+
+#endif //SK_AWT_METAL_LAYER_H
