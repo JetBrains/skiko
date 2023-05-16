@@ -60,33 +60,33 @@ static CVReturn MetalDeviceDisplayLinkCallback(CVDisplayLinkRef displayLink, con
 }
 
 - (void)recreateDisplayLinkIfNeeded {
-
-    /// Check if last _displayLinkScreen is the same as current NSWindow one. If not, invalidate current displayLink and create a new one.
-    if (![self.window.screen isEqualTo: _displayLinkScreen]) {
-        [self invalidateDisplayLink];
-
-        _displayLinkScreen = self.window.screen;
-
-        NSDictionary* screenDescription = [_displayLinkScreen deviceDescription];
-        NSNumber* screenID = [screenDescription objectForKey:@"NSScreenNumber"];
-
-        /// TODO: create fallback for any possible failure
-        CVReturn result;
-
-        CVDisplayLinkRef displayLink;
-        result = CVDisplayLinkCreateWithCGDisplay([screenID unsignedIntValue], &displayLink);
-        assert(result == kCVReturnSuccess);
-
-        result = CVDisplayLinkSetOutputCallback(displayLink, &MetalDeviceDisplayLinkCallback, (__bridge void *)(self));
-        assert(result == kCVReturnSuccess);
-
-        _displayLink = displayLink;
-
-        result = CVDisplayLinkStart(displayLink);
-        assert(result == kCVReturnSuccess);
-
-        NSLog(@"DisplayLink launched for screen with ID: %@", screenID);
+    if ([self.window.screen isEqualTo: _displayLinkScreen]) {
+        return;
     }
+
+    [self invalidateDisplayLink];
+
+    _displayLinkScreen = self.window.screen;
+
+    NSDictionary* screenDescription = [_displayLinkScreen deviceDescription];
+    NSNumber* screenID = [screenDescription objectForKey:@"NSScreenNumber"];
+
+    /// TODO: create fallback for any possible failure
+    CVReturn result;
+
+    CVDisplayLinkRef displayLink;
+    result = CVDisplayLinkCreateWithCGDisplay([screenID unsignedIntValue], &displayLink);
+    assert(result == kCVReturnSuccess);
+
+    result = CVDisplayLinkSetOutputCallback(displayLink, &MetalDeviceDisplayLinkCallback, (__bridge void *)(self));
+    assert(result == kCVReturnSuccess);
+
+    _displayLink = displayLink;
+
+    result = CVDisplayLinkStart(displayLink);
+    assert(result == kCVReturnSuccess);
+
+    NSLog(@"DisplayLink launched for screen with ID: %@", screenID);
 }
 
 - (void)handleDisplayLinkFired {
