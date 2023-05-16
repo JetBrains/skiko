@@ -16,7 +16,10 @@ import platform.Metal.MTLCreateSystemDefaultDevice
 import platform.Metal.MTLDeviceProtocol
 import platform.Metal.MTLPixelFormatBGRA8Unorm
 import platform.QuartzCore.*
+import platform.UIKit.UIScreen
 import platform.UIKit.UIView
+import platform.UIKit.window
+import platform.darwin.NSInteger
 import platform.darwin.NSObject
 
 internal class MetalRedrawer(
@@ -40,24 +43,6 @@ internal class MetalRedrawer(
         target = frameListener,
         selector = NSSelectorFromString(FrameTickListener::onDisplayLinkTick.name)
     )
-
-    private val layerView: UIView?
-        get() {
-            var layer: CALayer? = metalLayer
-
-            while (layer != null) {
-                val delegate = layer.delegate
-
-                if (delegate is UIView) {
-                    return delegate
-                }
-
-                layer = layer.superlayer
-            }
-
-            return null
-        }
-
     init {
         metalLayer.init(this.layer, contextHandler, device)
         caDisplayLink.setPaused(true)
@@ -89,6 +74,10 @@ internal class MetalRedrawer(
         metalLayer.frame = osView.frame
         metalLayer.init(layer, contextHandler, device)
         metalLayer.drawableSize = CGSizeMake(w * metalLayer.contentsScale, h * metalLayer.contentsScale)
+
+        osView.window?.screen?.maximumFramesPerSecond?.run {
+            caDisplayLink.preferredFramesPerSecond = this
+        }
     }
 
     override fun needRedraw() {
