@@ -15,10 +15,8 @@ import platform.Foundation.NSSelectorFromString
 import platform.Metal.MTLCreateSystemDefaultDevice
 import platform.Metal.MTLDeviceProtocol
 import platform.Metal.MTLPixelFormatBGRA8Unorm
-import platform.QuartzCore.CADisplayLink
-import platform.QuartzCore.CAMetalDrawableProtocol
-import platform.QuartzCore.CAMetalLayer
-import platform.QuartzCore.kCAGravityTopLeft
+import platform.QuartzCore.*
+import platform.UIKit.UIView
 import platform.darwin.NSObject
 
 internal class MetalRedrawer(
@@ -42,6 +40,23 @@ internal class MetalRedrawer(
         target = frameListener,
         selector = NSSelectorFromString(FrameTickListener::onDisplayLinkTick.name)
     )
+
+    private val layerView: UIView?
+        get() {
+            var layer: CALayer? = metalLayer
+
+            while (layer != null) {
+                val delegate = layer.delegate
+
+                if (delegate is UIView) {
+                    return delegate
+                }
+
+                layer = layer.superlayer
+            }
+
+            return null
+        }
 
     init {
         metalLayer.init(this.layer, contextHandler, device)
