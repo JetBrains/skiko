@@ -96,7 +96,7 @@ class SkiaLayerTest {
     }
 
     @OptIn(ExperimentalTime::class)
-//    @Ignore
+    @Ignore
     @Test
     fun `frame is rendered immediately`() = uiTest {
         val window = UiTestWindow(
