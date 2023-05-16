@@ -22,10 +22,6 @@ import javax.swing.SwingUtilities.*
 @JvmInline
 internal value class MetalDevice(val ptr: Long)
 
-internal interface DisplayLinkCallback {
-    fun invoke()
-}
-
 /**
  * Provides a way to request draws on Skia canvas created in [layer] bounds using Metal GPU acceleration.
  *
