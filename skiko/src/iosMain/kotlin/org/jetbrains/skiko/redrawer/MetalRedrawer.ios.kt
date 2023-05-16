@@ -75,8 +75,8 @@ internal class MetalRedrawer(
         metalLayer.init(layer, contextHandler, device)
         metalLayer.drawableSize = CGSizeMake(w * metalLayer.contentsScale, h * metalLayer.contentsScale)
 
-        osView.window?.screen?.maximumFramesPerSecond?.run {
-            caDisplayLink.preferredFramesPerSecond = this
+        osView.window?.screen?.maximumFramesPerSecond?.let {
+            caDisplayLink.preferredFramesPerSecond = it
         }
     }
 
