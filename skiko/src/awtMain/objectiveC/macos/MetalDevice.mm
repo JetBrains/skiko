@@ -1,7 +1,5 @@
 #import "MetalDevice.h"
 
-extern JavaVM* jvm;
-
 static CVReturn MetalDeviceDisplayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeStamp *now, const CVTimeStamp *outputTime, CVOptionFlags flagsIn, CVOptionFlags *flagsOut, void *displayLinkContext) {
     MetalDevice *device = (__bridge MetalDevice *)displayLinkContext;
 
@@ -13,11 +11,12 @@ static CVReturn MetalDeviceDisplayLinkCallback(CVDisplayLinkRef displayLink, con
 @implementation MetalDevice {
     NSScreen *_displayLinkScreen;
     CVDisplayLinkRef _displayLink;
-    jobject _displayLinkCallbackObject;
-    jmethodID _displayLinkCallbackMethod;
+
+    dispatch_semaphore_t _displayLinkSemaphore;
+    dispatch_semaphore_t _presentingBuffersExhaustionSemaphore;
 }
 
-- (instancetype)initWithContainer:(CALayer *)container adapter:(id<MTLDevice>)adapter window:(NSWindow *)window env:(JNIEnv *)env displayLinkCallback:(jobject)displayLinkCallback
+- (instancetype)initWithContainer:(CALayer *)container adapter:(id<MTLDevice>)adapter window:(NSWindow *)window
 {
     self = [super init];
 
@@ -44,20 +43,15 @@ static CVReturn MetalDeviceDisplayLinkCallback(CVDisplayLinkRef displayLink, con
 
         [container addSublayer: self.layer];
 
-        // TODO: Release global ref
-
-        /// Make Kotlin callback object global and store handles to call its `invoke` method
-        _displayLinkCallbackObject = env->NewGlobalRef(displayLinkCallback);
-        assert(_displayLinkCallbackObject);
-
-        jclass displayLinkCallbackClass = env->GetObjectClass(_displayLinkCallbackObject);
-        assert(displayLinkCallbackClass);
-
-        _displayLinkCallbackMethod = env->GetMethodID(displayLinkCallbackClass, "invoke", "()V");
-        assert(_displayLinkCallbackMethod);
+        _displayLinkSemaphore = dispatch_semaphore_create(1);
+        _presentingBuffersExhaustionSemaphore = dispatch_semaphore_create(3);
     }
 
     return self;
+}
+
+- (void)dealloc {
+    [self invalidateDisplayLink];
 }
 
 - (void)recreateDisplayLinkIfNeeded {
@@ -91,21 +85,19 @@ static CVReturn MetalDeviceDisplayLinkCallback(CVDisplayLinkRef displayLink, con
 }
 
 - (void)handleDisplayLinkFired {
-    JNIEnv* env = NULL;
+    dispatch_semaphore_signal(_displayLinkSemaphore);
+}
 
-    jint result = jvm->GetEnv((void **)&env, JNI_VERSION_1_6);
+- (void)waitUntilVsync {
+    dispatch_semaphore_wait(_displayLinkSemaphore, DISPATCH_TIME_FOREVER);
+}
 
-    if (result == JNI_EDETACHED) {
-        /// If the current thread is not attached to the JVM, attach it
-        /// TODO: do research on whether it can cause issues
-        if (jvm->AttachCurrentThread((void **)&env, NULL) != 0) {
-            env = NULL;
-        }
-    }
+- (void)waitForQueueSlot {
+    dispatch_semaphore_wait(_presentingBuffersExhaustionSemaphore, DISPATCH_TIME_FOREVER);
+}
 
-    if (env) {
-        env->CallVoidMethod(_displayLinkCallbackObject, _displayLinkCallbackMethod);
-    }
+- (void)freeQueueSlot {
+    dispatch_semaphore_signal(_presentingBuffersExhaustionSemaphore);
 }
 
 - (void)invalidateDisplayLink {

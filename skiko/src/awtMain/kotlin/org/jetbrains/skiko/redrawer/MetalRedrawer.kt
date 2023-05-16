@@ -55,21 +55,6 @@ internal class MetalRedrawer(
      */
     private var _device: MetalDevice?
 
-    private val displayLinkCallback = object : DisplayLinkCallback {
-        var time = System.nanoTime()
-
-        override fun invoke() {
-            val newTime = System.nanoTime()
-            val delta = newTime - time
-
-            println("Hi from DisplayLink ${delta}")
-
-            time = newTime
-
-            frameDispatcher.handleDisplayLinkFired()
-        }
-    }
-
     private val device: MetalDevice
         get() {
             val currentDevice = _device
@@ -83,7 +68,7 @@ internal class MetalRedrawer(
         val adapterMemorySize = getAdapterMemorySize(adapter)
         onDeviceChosen(adapterName)
         val initDevice = layer.backedLayer.useDrawingSurfacePlatformInfo {
-            MetalDevice(createMetalDevice(layer.windowHandle, layer.transparency, adapter, it, displayLinkCallback))
+            MetalDevice(createMetalDevice(layer.windowHandle, layer.transparency, adapter, it))
         }
         _device = initDevice
         contextHandler =
@@ -93,7 +78,7 @@ internal class MetalRedrawer(
 
     override val renderInfo: String get() = contextHandler.rendererInfo()
 
-    private val frameDispatcher = FrameDispatcher(MainUIDispatcher, true) {
+    private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
         if (layer.isShowing) {
             update(System.nanoTime())
             draw()
@@ -191,7 +176,7 @@ internal class MetalRedrawer(
     private fun isOccluded() = isOccluded(device.ptr)
 
     private external fun chooseAdapter(adapterPriority: Int): Long
-    private external fun createMetalDevice(window:Long, transparency: Boolean, adapter: Long, platformInfo: Long, displayLinkCallback: DisplayLinkCallback): Long
+    private external fun createMetalDevice(window:Long, transparency: Boolean, adapter: Long, platformInfo: Long): Long
     private external fun disposeDevice(device: Long)
     private external fun resizeLayers(device: Long, x: Int, y: Int, width: Int, height: Int)
     private external fun setLayerVisible(device: Long, isVisible: Boolean)

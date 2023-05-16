@@ -13,35 +13,23 @@ import kotlin.coroutines.CoroutineContext
  */
 class FrameDispatcher(
     scope: CoroutineScope,
-    private val displayLinkLocked: Boolean,
     private val onFrame: suspend () -> Unit,
 ) {
-    constructor(scope: CoroutineScope, onFrame: suspend () -> Unit) : this(scope, false, onFrame)
-
     constructor(
         context: CoroutineContext,
-        displayLinkLocked: Boolean = false,
         onFrame: suspend () -> Unit,
     ) : this(
         CoroutineScope(context),
-        displayLinkLocked,
         onFrame
     )
 
     private val frameChannel = Channel<Unit>(Channel.CONFLATED)
     private var frameScheduled = false
 
-    private val displayLinkChannel: Channel<Unit>? =
-        if (displayLinkLocked) Channel(Channel.CONFLATED)
-        else null
-
     private val job = scope.launch {
         while (true) {
             /// Await for draw request
             frameChannel.receive()
-
-            /// Await for displayLink vsync if needed
-            displayLinkChannel?.receive()
 
             frameScheduled = false
             onFrame()
@@ -53,12 +41,6 @@ class FrameDispatcher(
             // What means for Swing dispatcher we'll process all pending events and resume renderer.
             yield()
         }
-    }
-
-    fun handleDisplayLinkFired() {
-        require(displayLinkLocked)
-
-        displayLinkChannel?.trySend(Unit)
     }
 
     fun cancel() {

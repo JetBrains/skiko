@@ -15,9 +15,12 @@
 @property (strong) id<MTLCommandQueue> queue;
 @property (strong) id<CAMetalDrawable> drawableHandle;
 
-- (instancetype)initWithContainer:(CALayer *)container adapter:(id<MTLDevice>)adapter window:(NSWindow *)window env:(JNIEnv *)env displayLinkCallback:(jobject)displayLinkCallback;
+- (instancetype)initWithContainer:(CALayer *)container adapter:(id<MTLDevice>)adapter window:(NSWindow *)window;
 - (void)recreateDisplayLinkIfNeeded;
 - (void)handleDisplayLinkFired;
+- (void)waitUntilVsync;
+- (void)waitForQueueSlot;
+- (void)freeQueueSlot;
 
 @end
 
