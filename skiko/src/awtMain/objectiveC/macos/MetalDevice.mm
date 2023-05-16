@@ -1,8 +1,5 @@
 #import "MetalDevice.h"
 
-#include <mutex>
-#include <condition_variable>
-
 static CVReturn MetalDeviceDisplayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeStamp *now, const CVTimeStamp *outputTime, CVOptionFlags flagsIn, CVOptionFlags *flagsOut, void *displayLinkContext) {
     MetalDevice *device = (__bridge MetalDevice *)displayLinkContext;
 
@@ -16,9 +13,7 @@ static CVReturn MetalDeviceDisplayLinkCallback(CVDisplayLinkRef displayLink, con
     CVDisplayLinkRef _displayLink;
 
     dispatch_semaphore_t _presentingBuffersExhaustionSemaphore;
-    std::mutex _vsyncMutex;
-    std::condition_variable _vsyncConditionVariable;
-    bool _vsyncReady;
+    NSConditionLock *_vsyncConditionLock;
 }
 
 - (instancetype)initWithContainer:(CALayer *)container adapter:(id<MTLDevice>)adapter window:(NSWindow *)window {
@@ -47,7 +42,8 @@ static CVReturn MetalDeviceDisplayLinkCallback(CVDisplayLinkRef displayLink, con
         [container addSublayer: self.layer];
 
         _presentingBuffersExhaustionSemaphore = dispatch_semaphore_create(3);
-        _vsyncReady = true;
+
+        _vsyncConditionLock = [[NSConditionLock alloc] initWithCondition: 1];
     }
 
     return self;
@@ -88,22 +84,13 @@ static CVReturn MetalDeviceDisplayLinkCallback(CVDisplayLinkRef displayLink, con
 }
 
 - (void)handleDisplayLinkFired {
-    std::unique_lock<std::mutex> lock(_vsyncMutex);
-
-    _vsyncReady = true;
-
-    _vsyncConditionVariable.notify_one();
+    [_vsyncConditionLock lock];
+    [_vsyncConditionLock unlockWithCondition:1];
 }
 
 - (void)waitUntilVsync {
-    std::unique_lock<std::mutex> lock(_vsyncMutex);
-
-    /// `while` instead of `if` due to possibility of https://en.wikipedia.org/wiki/Spurious_wakeup
-    while (!_vsyncReady) {
-        _vsyncConditionVariable.wait(lock);
-    }
-
-    _vsyncReady = false;
+    [_vsyncConditionLock lockWhenCondition:1];
+    [_vsyncConditionLock unlockWithCondition:0];
 }
 
 - (void)waitForQueueSlot {
