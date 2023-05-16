@@ -28,7 +28,7 @@ class FrameDispatcher(
 
     private val job = scope.launch {
         while (true) {
-            /// Await for draw request
+            // Await for draw request
             frameChannel.receive()
 
             frameScheduled = false
