@@ -100,6 +100,7 @@ static CVReturn MetalDeviceDisplayLinkCallback(CVDisplayLinkRef displayLink, con
 - (void)waitUntilVsync {
     std::unique_lock<std::mutex> lock(_vsyncMutex);
 
+    /// `while` instead of `if` due to possibility of https://en.wikipedia.org/wiki/Spurious_wakeup
     while (!_vsyncReady) {
         _vsyncConditionVariable.wait(lock);
     }
