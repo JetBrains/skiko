@@ -21,8 +21,8 @@
 extern "C"
 {
 
-void* objc_autoreleasePoolPush(void);
-void objc_autoreleasePoolPop(void*);
+void *objc_autoreleasePoolPush(void);
+void objc_autoreleasePoolPop(void *);
 
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_startRendering(
     JNIEnv * env, jobject redrawer)
@@ -31,9 +31,9 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_startRen
 }
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_endRendering(
-    JNIEnv * env, jobject redrawer, jlong handle)
+    JNIEnv *env, jobject redrawer, jlong handle)
 {
-    objc_autoreleasePoolPop((void*)handle);
+    objc_autoreleasePoolPop((void *)handle);
 }
 
 BOOL isUsingIntegratedGPU() {
@@ -108,7 +108,7 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
     @autoreleasepool {
         id<MTLDevice> adapter = (__bridge_transfer id<MTLDevice>) (void *) adapterPtr;
         NSObject<JAWT_SurfaceLayers>* dsi_mac = (__bridge NSObject<JAWT_SurfaceLayers> *) (void*) platformInfoPtr;
-        NSWindow* window = (__bridge NSWindow*) (void *) windowPtr;
+        NSWindow *window = (__bridge NSWindow *) (void *) windowPtr;
 
         CALayer *container = [dsi_mac windowLayer];
 
