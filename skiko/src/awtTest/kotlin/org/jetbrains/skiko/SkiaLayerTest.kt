@@ -96,7 +96,6 @@ class SkiaLayerTest {
     }
 
     @OptIn(ExperimentalTime::class)
-    @Ignore
     @Test
     fun `frame is rendered immediately`() = uiTest {
         val window = UiTestWindow(
@@ -133,9 +132,8 @@ class SkiaLayerTest {
             }
             window.isVisible = true
 
-            val redrawer = window.layer.redrawer as MetalRedrawer
-
             repeat(colors.size * 10) {
+                val redrawer = window.layer.redrawer as MetalRedrawer
                 redrawer.drawSync()
                 counter1 += 1
                 redrawer.drawSync()
@@ -143,10 +141,9 @@ class SkiaLayerTest {
                 redrawer.drawSync()
             }
 
-            delay(1000)
-
             screenshots.assert(window.bounds)
 
+            delay(Duration.INFINITE)
         } finally {
             window.close()
         }
