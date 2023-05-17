@@ -73,8 +73,6 @@ internal class MetalRedrawer(
 
     override val renderInfo: String get() = contextHandler.rendererInfo()
 
-    private val windowHandle = layer.windowHandle
-
     private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
         if (layer.isShowing) {
             update(System.nanoTime())
@@ -84,6 +82,10 @@ internal class MetalRedrawer(
 
     init {
         onContextInit()
+    }
+
+    fun drawSync() {
+        frameDispatcher.scheduleFrame()
     }
 
     override fun dispose() = synchronized(drawLock) {
@@ -133,10 +135,13 @@ internal class MetalRedrawer(
         // When window is not visible - it doesn't make sense to redraw fast to avoid battery drain.
         // In theory, we could be more precise, and just suspend rendering in
         // `NSWindowDidChangeOcclusionStateNotification`, but current approach seems to work as well in practise.
-        if (isOccluded(windowHandle))
+        if (isOccluded())
             delay(300)
     }
 
+    /**
+     * Avoid calling this method on main thread, it will sleep before next vsync happens if invoked multiple times.
+     */
     private fun performDraw() = synchronized(drawLock) {
         if (!isDisposed) {
             val handle = startRendering()
@@ -166,6 +171,8 @@ internal class MetalRedrawer(
         setLayerVisible(device.ptr, isVisible)
     }
 
+    private fun isOccluded() = isOccluded(device.ptr)
+
     private external fun chooseAdapter(adapterPriority: Int): Long
     private external fun createMetalDevice(window:Long, transparency: Boolean, adapter: Long, platformInfo: Long): Long
     private external fun disposeDevice(device: Long)
@@ -173,7 +180,7 @@ internal class MetalRedrawer(
     private external fun setLayerVisible(device: Long, isVisible: Boolean)
     private external fun setContentScale(device: Long, contentScale: Float)
     private external fun setVSyncEnabled(device: Long, enabled: Boolean)
-    private external fun isOccluded(window: Long): Boolean
+    private external fun isOccluded(device: Long): Boolean
     private external fun getAdapterName(adapter: Long): String
     private external fun getAdapterMemorySize(adapter: Long): Long
     private external fun startRendering(): Long
