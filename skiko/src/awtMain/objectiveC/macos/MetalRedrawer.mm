@@ -3,11 +3,6 @@
 #import <jawt.h>
 #import <jawt_md.h>
 
-#import <Cocoa/Cocoa.h>
-#import <QuartzCore/QuartzCore.h>
-#import <Metal/Metal.h>
-#import <QuartzCore/CAMetalLayer.h>
-
 #import <GrBackendSurface.h>
 #import <GrDirectContext.h>
 #import <mtl/GrMtlBackendContext.h>
@@ -23,47 +18,11 @@
 #define AdpapterPriorityIntegrated 1
 #define AdpapterPriorityDiscrete 2
 
-@implementation AWTMetalLayer
-
-- (id)init
-{
-    self = [super init];
-
-    assert(self != NULL);
-
-    [self removeAllAnimations];
-    [self setAutoresizingMask: (kCALayerWidthSizable|kCALayerHeightSizable)];
-    [self setNeedsDisplayOnBoundsChange: YES];
-
-    return self;
-}
-
-@end
-
-@implementation MetalDevice
-
-- (id) init
-{
-    self = [super init];
-
-    if (self)
-    {
-        self.layer = nil;
-        self.adapter = nil;
-        self.queue = nil;
-        self.drawableHandle = nil;
-    }
-
-    return self;
-}
-
-@end
-
 extern "C"
 {
 
-extern "C" void* objc_autoreleasePoolPush(void);
-extern "C" void objc_autoreleasePoolPop(void*);
+void *objc_autoreleasePoolPush(void);
+void objc_autoreleasePoolPop(void *);
 
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_startRendering(
     JNIEnv * env, jobject redrawer)
@@ -72,9 +31,9 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_startRen
 }
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_endRendering(
-    JNIEnv * env, jobject redrawer, jlong handle)
+    JNIEnv *env, jobject redrawer, jlong handle)
 {
-    objc_autoreleasePoolPop((void*)handle);
+    objc_autoreleasePoolPop((void *)handle);
 }
 
 BOOL isUsingIntegratedGPU() {
@@ -148,38 +107,17 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
 {
     @autoreleasepool {
         id<MTLDevice> adapter = (__bridge_transfer id<MTLDevice>) (void *) adapterPtr;
-
-        MetalDevice *device = [MetalDevice new];
-
         NSObject<JAWT_SurfaceLayers>* dsi_mac = (__bridge NSObject<JAWT_SurfaceLayers> *) (void*) platformInfoPtr;
+        NSWindow *window = (__bridge NSWindow *) (void *) windowPtr;
 
         CALayer *container = [dsi_mac windowLayer];
-        [container removeAllAnimations];
-        [container setAutoresizingMask: (kCALayerWidthSizable|kCALayerHeightSizable)];
-        [container setNeedsDisplayOnBoundsChange: YES];
 
-        AWTMetalLayer *layer = [AWTMetalLayer new];
-        [container addSublayer: layer];
-        layer.javaRef = env->NewGlobalRef(redrawer);
+        MetalDevice *device = [[MetalDevice alloc] initWithContainer:container adapter:adapter window:window];
 
-        id<MTLCommandQueue> fQueue = [adapter newCommandQueue];
-
-        device.container = container;
-        device.layer = layer;
-        device.adapter = adapter;
-        device.queue = fQueue;
-
-        device.layer.device = device.adapter;
-        device.layer.pixelFormat = MTLPixelFormatBGRA8Unorm;
-        device.layer.contentsGravity = kCAGravityTopLeft;
-
-        CGFloat transparent[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-        device.layer.backgroundColor = CGColorCreate(CGColorSpaceCreateDeviceRGB(), transparent);
-        device.layer.opaque = NO;
+        device.layer.javaRef = env->NewGlobalRef(redrawer);
 
         if (transparency)
         {
-            NSWindow* window = (__bridge NSWindow*) (void *) windowPtr;
             window.hasShadow = NO;
         }
 
@@ -282,10 +220,11 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_getAdapt
 }
 
 JNIEXPORT jboolean JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_isOccluded(
-    JNIEnv *env, jobject redrawer, jlong windowPtr) {
+    JNIEnv *env, jobject redrawer, jlong devicePtr) {
     @autoreleasepool {
-        NSWindow* window = (__bridge NSWindow*) (void *) windowPtr;
-        return ([window occlusionState] & NSWindowOcclusionStateVisible) == 0;
+        MetalDevice *device = (__bridge MetalDevice *)(void *)devicePtr;
+
+        return ([device.window occlusionState] & NSWindowOcclusionStateVisible) == 0;
     }
 }
 
