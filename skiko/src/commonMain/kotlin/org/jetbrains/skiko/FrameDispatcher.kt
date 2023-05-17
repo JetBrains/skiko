@@ -13,11 +13,11 @@ import kotlin.coroutines.CoroutineContext
  */
 class FrameDispatcher(
     scope: CoroutineScope,
-    private val onFrame: suspend () -> Unit,
+    private val onFrame: suspend () -> Unit
 ) {
     constructor(
         context: CoroutineContext,
-        onFrame: suspend () -> Unit,
+        onFrame: suspend () -> Unit
     ) : this(
         CoroutineScope(context),
         onFrame
@@ -28,9 +28,7 @@ class FrameDispatcher(
 
     private val job = scope.launch {
         while (true) {
-            // Await for draw request
             frameChannel.receive()
-
             frameScheduled = false
             onFrame()
             // As per `yield()` documentation:
