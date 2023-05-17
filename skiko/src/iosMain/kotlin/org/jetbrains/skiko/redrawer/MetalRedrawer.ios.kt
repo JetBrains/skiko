@@ -15,10 +15,11 @@ import platform.Foundation.NSSelectorFromString
 import platform.Metal.MTLCreateSystemDefaultDevice
 import platform.Metal.MTLDeviceProtocol
 import platform.Metal.MTLPixelFormatBGRA8Unorm
-import platform.QuartzCore.CADisplayLink
-import platform.QuartzCore.CAMetalDrawableProtocol
-import platform.QuartzCore.CAMetalLayer
-import platform.QuartzCore.kCAGravityTopLeft
+import platform.QuartzCore.*
+import platform.UIKit.UIScreen
+import platform.UIKit.UIView
+import platform.UIKit.window
+import platform.darwin.NSInteger
 import platform.darwin.NSObject
 
 internal class MetalRedrawer(
@@ -42,7 +43,6 @@ internal class MetalRedrawer(
         target = frameListener,
         selector = NSSelectorFromString(FrameTickListener::onDisplayLinkTick.name)
     )
-
     init {
         metalLayer.init(this.layer, contextHandler, device)
         caDisplayLink.setPaused(true)
@@ -74,6 +74,10 @@ internal class MetalRedrawer(
         metalLayer.frame = osView.frame
         metalLayer.init(layer, contextHandler, device)
         metalLayer.drawableSize = CGSizeMake(w * metalLayer.contentsScale, h * metalLayer.contentsScale)
+
+        osView.window?.screen?.maximumFramesPerSecond?.let {
+            caDisplayLink.preferredFramesPerSecond = it
+        }
     }
 
     override fun needRedraw() {
