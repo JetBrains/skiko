@@ -133,26 +133,20 @@ class SkiaLayerTest {
             }
             window.isVisible = true
 
-            window.addKeyListener(object : KeyAdapter() {
-                override fun keyTyped(e: KeyEvent?) {
-                    launch {
-                        val redrawer = window.layer.redrawer as MetalRedrawer
-                        redrawer.drawSync()
-                        counter1 += 1
-                        redrawer.drawSync()
-                        counter2 += 1
-                        redrawer.drawSync()
-                    }
-                }
-            });
+            val redrawer = window.layer.redrawer as MetalRedrawer
 
-            window.addWindowListener(object : WindowAdapter() {
-                override fun windowActivated(e: WindowEvent?) {
-                    window.requestFocus()
-                }
-            })
+            repeat(colors.size * 10) {
+                redrawer.drawSync()
+                counter1 += 1
+                redrawer.drawSync()
+                counter2 += 1
+                redrawer.drawSync()
+            }
 
-            delay(Duration.INFINITE)
+            delay(1000)
+
+            screenshots.assert(window.bounds)
+
         } finally {
             window.close()
         }
