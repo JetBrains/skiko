@@ -96,9 +96,8 @@ class SkiaLayerTest {
     }
 
     @OptIn(ExperimentalTime::class)
-    @Ignore
     @Test
-    fun `frame is rendered immediately`() = uiTest {
+    fun `no drawable presentations are discarded`() = uiTest {
         val window = UiTestWindow(
             properties = SkiaLayerProperties(
                 isVsyncEnabled = true
@@ -131,20 +130,8 @@ class SkiaLayerTest {
                     canvas.drawRect(Rect(0f, height / 2f, width.toFloat(), height.toFloat()), paint)
                 }
             }
+            window.isUndecorated = true
             window.isVisible = true
-
-            window.addKeyListener(object : KeyAdapter() {
-                override fun keyTyped(e: KeyEvent?) {
-                    launch {
-                        val redrawer = window.layer.redrawer as MetalRedrawer
-                        redrawer.drawSync()
-                        counter1 += 1
-                        redrawer.drawSync()
-                        counter2 += 1
-                        redrawer.drawSync()
-                    }
-                }
-            });
 
             window.addWindowListener(object : WindowAdapter() {
                 override fun windowActivated(e: WindowEvent?) {
@@ -152,7 +139,19 @@ class SkiaLayerTest {
                 }
             })
 
-            delay(Duration.INFINITE)
+            val redrawer = window.layer.redrawer as MetalRedrawer
+
+            repeat(colors.size * 10) {
+                redrawer.drawSync()
+                counter1 += 1
+                redrawer.drawSync()
+                counter2 += 1
+                redrawer.drawSync()
+            }
+
+            delay(1000)
+
+            screenshots.assert(window.bounds)
         } finally {
             window.close()
         }
