@@ -95,7 +95,6 @@ class SkiaLayerTest {
         )
     }
 
-    @OptIn(ExperimentalTime::class)
     @Test
     fun `no drawable presentations are discarded`() = uiTest {
         val window = UiTestWindow(
@@ -152,6 +151,9 @@ class SkiaLayerTest {
             delay(1000)
 
             screenshots.assert(window.bounds)
+
+            // function above throws AssertionError if something is not right
+            assert(true)
         } finally {
             window.close()
         }
