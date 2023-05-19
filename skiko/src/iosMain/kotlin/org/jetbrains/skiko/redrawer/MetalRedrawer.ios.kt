@@ -33,8 +33,29 @@ internal class MetalRedrawer(
     private val queue = device.newCommandQueue() ?: throw IllegalStateException("Couldn't create Metal command queue")
     private var currentDrawable: CAMetalDrawableProtocol? = null
     private val metalLayer = MetalLayer()
+
+    /**
+     * Property used for bookkeeping at least certain amount of frames (set in [topUpRundownCounter]) scheduled
+     * after last [needRedraw] to avoid reentry situation where two frames were asked to be drawn and
+     * scheduled in the frame _after_ next and merge into one causing no frame scheduled for next vsync
+     * during current vsync window, tick for which could happen slighly before input processing handling and corresponding
+     * [needRedraw] call
+     *
+     * TODO: still needs a little investigation regarding current problem
+     *       being a symptom caused by an anomaly of redraw callback
+     *       being dispatched *strictly* after next vsync + some time after
+     *
+     **/
+    private var rundownCounter = 0
+
     private val frameListener: NSObject = FrameTickListener {
-        caDisplayLink.setPaused(true)
+        rundownCounter -= 1
+
+        if (rundownCounter <= 0) {
+            rundownCounter = 0
+            caDisplayLink.setPaused(true)
+        }
+
         if (layer.isShowing()) {
             draw()
         }
@@ -80,8 +101,15 @@ internal class MetalRedrawer(
         }
     }
 
+    private fun topUpRundownCounter() {
+        rundownCounter = 3
+    }
+
     override fun needRedraw() {
         check(!isDisposed) { "MetalRedrawer is disposed" }
+
+        topUpRundownCounter()
+
         caDisplayLink.setPaused(false)
     }
 
