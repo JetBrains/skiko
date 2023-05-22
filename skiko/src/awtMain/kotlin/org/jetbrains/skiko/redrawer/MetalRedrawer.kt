@@ -29,6 +29,17 @@ internal value class MetalDevice(val ptr: Long)
  * @see MetalContextHandler
  * @see FrameDispatcher
  */
+
+/**
+ * Interface for abstracting a set of callbacks which are called in order to throttle rendering to be passed via JNI
+ */
+private interface FrameDispatcherBarriersCallbacks {
+    fun signalVsync()
+    fun signalFrameCompletion()
+    fun enableVsyncBarrier()
+    fun disableVsyncBarrier()
+}
+
 internal class MetalRedrawer(
     private val layer: SkiaLayer,
     analytics: SkiaLayerAnalytics,
@@ -49,6 +60,8 @@ internal class MetalRedrawer(
      * so future calls of [device] will throw exception
      */
     private var _device: MetalDevice?
+    private val vsyncBarrier = VsyncBarrier()
+    private val overCommitmentBarrier = OverCommitmentBarrier()
 
     private val device: MetalDevice
         get() {
@@ -62,8 +75,27 @@ internal class MetalRedrawer(
         val adapterName = getAdapterName(adapter)
         val adapterMemorySize = getAdapterMemorySize(adapter)
         onDeviceChosen(adapterName)
+
+        val callbacks = object : FrameDispatcherBarriersCallbacks {
+            override fun signalVsync() {
+                vsyncBarrier.signal()
+            }
+
+            override fun signalFrameCompletion() {
+                overCommitmentBarrier.signal()
+            }
+
+            override fun enableVsyncBarrier() {
+                vsyncBarrier.enable()
+            }
+
+            override fun disableVsyncBarrier() {
+                vsyncBarrier.disable()
+            }
+        }
+
         val initDevice = layer.backedLayer.useDrawingSurfacePlatformInfo {
-            MetalDevice(createMetalDevice(layer.windowHandle, layer.transparency, adapter, it))
+            MetalDevice(createMetalDevice(layer.windowHandle, layer.transparency, adapter, it, callbacks))
         }
         _device = initDevice
         contextHandler =
@@ -175,7 +207,7 @@ internal class MetalRedrawer(
     private fun isOccluded() = isOccluded(device.ptr)
 
     private external fun chooseAdapter(adapterPriority: Int): Long
-    private external fun createMetalDevice(window:Long, transparency: Boolean, adapter: Long, platformInfo: Long): Long
+    private external fun createMetalDevice(window:Long, transparency: Boolean, adapter: Long, platformInfo: Long, callbacks: FrameDispatcherBarriersCallbacks): Long
     private external fun disposeDevice(device: Long)
     private external fun resizeLayers(device: Long, x: Int, y: Int, width: Int, height: Int)
     private external fun setLayerVisible(device: Long, isVisible: Boolean)

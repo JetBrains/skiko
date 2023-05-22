@@ -1,5 +1,25 @@
 #import "MetalDevice.h"
-#import <stdatomic.h>
+
+#include <assert.h>
+
+/// TODO: extract SKIKO_JNI_VERSION to a separate header?
+#include "../../../jvmMain/cpp/common/interop.hh"
+
+/// Linked from skiko/src/jvmMain/cpp/common/impl/Library.cc
+extern JavaVM *jvm;
+
+static JNIEnv *resolveJNIEnvForCurrentThread() {
+    JNIEnv *env;
+    int envStat = jvm->GetEnv((void **)&env, SKIKO_JNI_VERSION);
+
+    if (envStat == JNI_EDETACHED) {
+        jvm->AttachCurrentThread((void **) &env, NULL);
+    }
+
+    assert(env);
+
+    return env;
+}
 
 static CVReturn MetalDeviceDisplayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeStamp *now, const CVTimeStamp *outputTime, CVOptionFlags flagsIn, CVOptionFlags *flagsOut, void *displayLinkContext) {
     MetalDevice *device = (__bridge MetalDevice *)displayLinkContext;
@@ -13,12 +33,18 @@ static CVReturn MetalDeviceDisplayLinkCallback(CVDisplayLinkRef displayLink, con
     NSScreen *_displayLinkScreen;
     CVDisplayLinkRef _displayLink;
 
-    dispatch_semaphore_t _presentingBuffersExhaustionSemaphore;
-    NSConditionLock *_vsyncConditionLock;
-    volatile atomic_bool _displayLinkOk;
+    BOOL _vsyncBarrierEnabled;
+
+    jobject _callbacks;
+
+    /// Corresponding to FrameDispatcherBarriersCallbacks
+    jmethodID _signalVsync;
+    jmethodID _signalFrameCompletion;
+    jmethodID _enableVsyncBarrier;
+    jmethodID _disableVsyncBarrier;
 }
 
-- (instancetype)initWithContainer:(CALayer *)container adapter:(id<MTLDevice>)adapter window:(NSWindow *)window {
+- (instancetype)initWithContainer:(CALayer *)container adapter:(id<MTLDevice>)adapter window:(NSWindow *)window env:(JNIEnv *)env redrawer:(jobject)redrawer callbacks:(jobject)callbacks {
     self = [super init];
 
     if (self) {
@@ -27,8 +53,10 @@ static CVReturn MetalDeviceDisplayLinkCallback(CVDisplayLinkRef displayLink, con
         self.queue = [adapter newCommandQueue];
         self.window = window;
         self.layer = [AWTMetalLayer new];
+        _vsyncBarrierEnabled = NO;
 
         _displayLinkScreen = nil;
+        _callbacks = env->NewGlobalRef(callbacks);
 
         [container removeAllAnimations];
         [container setAutoresizingMask: (kCALayerWidthSizable|kCALayerHeightSizable)];
@@ -40,14 +68,16 @@ static CVReturn MetalDeviceDisplayLinkCallback(CVDisplayLinkRef displayLink, con
         CGFloat transparent[] = { 0.0f, 0.0f, 0.0f, 0.0f };
         self.layer.backgroundColor = CGColorCreate(CGColorSpaceCreateDeviceRGB(), transparent);
         self.layer.opaque = NO;
+        self.layer.javaRef = env->NewGlobalRef(redrawer);
 
         [container addSublayer: self.layer];
 
-        _presentingBuffersExhaustionSemaphore = dispatch_semaphore_create(3);
+        jclass callbacksClass = env->GetObjectClass(_callbacks);
 
-        _vsyncConditionLock = [[NSConditionLock alloc] initWithCondition: 1];
-
-        atomic_store(&_displayLinkOk, true);
+        _signalVsync = env->GetMethodID(callbacksClass, "signalVsync", "()V");
+        _signalFrameCompletion = env->GetMethodID(callbacksClass, "signalFrameCompletion", "()V");
+        _enableVsyncBarrier = env->GetMethodID(callbacksClass, "enableVsyncBarrier", "()V");
+        _disableVsyncBarrier = env->GetMethodID(callbacksClass, "disableVsyncBarrier", "()V");
     }
 
     return self;
@@ -57,16 +87,26 @@ static CVReturn MetalDeviceDisplayLinkCallback(CVDisplayLinkRef displayLink, con
     [self invalidateDisplayLink];
 }
 
-- (void)handleDisplayLinkSetupFailure {
-    atomic_store(&_displayLinkOk, false);
+- (void)disposeWithEnv:(JNIEnv *)env {
+    env->DeleteGlobalRef(_callbacks);
+    env->DeleteGlobalRef(self.layer.javaRef);
 
-    /// Next line is here to tackle edge case where displayLink reconstruction failed
-    /// but someone is already waiting at `waitUntilVsync`
-    /// It's quite improbable scenario anyway
-    [self handleDisplayLinkFired];
+    [self.layer removeFromSuperlayer];
 }
 
-- (void)recreateDisplayLinkIfNeeded {
+- (void)setVsyncBarrierEnabled:(BOOL)enabled env:(JNIEnv *)env {
+    if (_vsyncBarrierEnabled == enabled) {
+        return;
+    }
+
+    _vsyncBarrierEnabled = enabled;
+
+    jmethodID invokedMethodID = enabled ? _enableVsyncBarrier : _disableVsyncBarrier;
+
+    env->CallVoidMethod(_callbacks, invokedMethodID);
+}
+
+- (void)recreateDisplayLinkIfNeededWithEnv:(JNIEnv *)env {
     if ([self.window.screen isEqualTo: _displayLinkScreen]) {
         return;
     }
@@ -78,65 +118,51 @@ static CVReturn MetalDeviceDisplayLinkCallback(CVDisplayLinkRef displayLink, con
     NSDictionary* screenDescription = [_displayLinkScreen deviceDescription];
     NSNumber* screenID = [screenDescription objectForKey:@"NSScreenNumber"];
 
-    /// TODO: create fallback for any possible failure
     CVReturn result;
 
-    CVDisplayLinkRef displayLink;
-    result = CVDisplayLinkCreateWithCGDisplay([screenID unsignedIntValue], &displayLink);
+    result = CVDisplayLinkCreateWithCGDisplay([screenID unsignedIntValue], &_displayLink);
 
     if (result != kCVReturnSuccess) {
-        [self handleDisplayLinkSetupFailure];
+        _displayLink = nil;
+        [self setVsyncBarrierEnabled:NO env:env];
         return;
     }
 
-    result = CVDisplayLinkSetOutputCallback(displayLink, &MetalDeviceDisplayLinkCallback, (__bridge void *)(self));
+    result = CVDisplayLinkSetOutputCallback(_displayLink, &MetalDeviceDisplayLinkCallback, (__bridge void *)(self));
 
     if (result != kCVReturnSuccess) {
-        [self handleDisplayLinkSetupFailure];
+        CVDisplayLinkRelease(_displayLink);
+        _displayLink = nil;
+        [self setVsyncBarrierEnabled:NO env:env];
         return;
     }
 
-    _displayLink = displayLink;
-
-    result = CVDisplayLinkStart(displayLink);
+    result = CVDisplayLinkStart(_displayLink);
 
     if (result != kCVReturnSuccess) {
-        [self handleDisplayLinkSetupFailure];
+        CVDisplayLinkRelease(_displayLink);
+        _displayLink = nil;
+        [self setVsyncBarrierEnabled:NO env:env];
         return;
     }
 
-    atomic_store(&_displayLinkOk, true);
-
-    NSLog(@"DisplayLink launched for screen with ID: %@", screenID);
+    [self setVsyncBarrierEnabled:YES env:env];
 }
 
 - (void)handleDisplayLinkFired {
-    [_vsyncConditionLock lock];
-    [_vsyncConditionLock unlockWithCondition:1];
+    JNIEnv *env = resolveJNIEnvForCurrentThread();
+
+    env->CallVoidMethod(_callbacks, _signalVsync);
 }
 
-- (void)waitUntilVsync {
-    bool displayLinkOk = atomic_load(&_displayLinkOk);
-
-    /// If display link construction was corrupted, don't perform any waiting
-    if (!displayLinkOk) {
-        return;
+- (void)signalFrameCompletionWithEnv:(JNIEnv *)env {
+    /// When dispatched from `MTLCommandBuffer` completion handler
+    /// the thread is managed by Metal, so we need to resolve it dynamically
+    if (!env) {
+        env = resolveJNIEnvForCurrentThread();
     }
 
-    [_vsyncConditionLock lockWhenCondition:1];
-    [_vsyncConditionLock unlockWithCondition:0];
-}
-
-- (void)waitForQueueSlot {
-    /// In case we receive more encoded command buffers, than gpu can handle (GPU bottleneck),
-    /// we need to throttle it down and start a new frame only when one currently run is finished
-    ///
-    /// see call place of `freeQueueSlot`
-    dispatch_semaphore_wait(_presentingBuffersExhaustionSemaphore, DISPATCH_TIME_FOREVER);
-}
-
-- (void)freeQueueSlot {
-    dispatch_semaphore_signal(_presentingBuffersExhaustionSemaphore);
+    env->CallVoidMethod(_callbacks, _signalFrameCompletion);
 }
 
 - (void)invalidateDisplayLink {

@@ -9,14 +9,14 @@
 extern "C" {
 #endif
 
-    static JavaVM* javaVm;
+    static JavaVM *jvm = NULL;
 
 #ifdef __cplusplus
 }
 #endif
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
-    javaVm = vm;
+    jvm = vm;
 
     JNIEnv* env;
     if (vm->GetEnv(reinterpret_cast<void**>(&env), SKIKO_JNI_VERSION) != JNI_OK)

@@ -103,18 +103,23 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_chooseAd
 }
 
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMetalDevice(
-    JNIEnv *env, jobject redrawer, jlong windowPtr, jboolean transparency, jlong adapterPtr, jlong platformInfoPtr)
+    JNIEnv *env, jobject redrawer, jlong windowPtr, jboolean transparency, jlong adapterPtr, jlong platformInfoPtr, jobject callbacks)
 {
     @autoreleasepool {
         id<MTLDevice> adapter = (__bridge_transfer id<MTLDevice>) (void *) adapterPtr;
-        NSObject<JAWT_SurfaceLayers>* dsi_mac = (__bridge NSObject<JAWT_SurfaceLayers> *) (void*) platformInfoPtr;
+        NSObject<JAWT_SurfaceLayers>* dsi_mac = (__bridge NSObject<JAWT_SurfaceLayers> *) (void *) platformInfoPtr;
         NSWindow *window = (__bridge NSWindow *) (void *) windowPtr;
 
         CALayer *container = [dsi_mac windowLayer];
 
-        MetalDevice *device = [[MetalDevice alloc] initWithContainer:container adapter:adapter window:window];
-
-        device.layer.javaRef = env->NewGlobalRef(redrawer);
+        MetalDevice *device = [[MetalDevice alloc]
+            initWithContainer:container
+            adapter:adapter
+            window:window
+            env:env
+            redrawer:redrawer
+            callbacks:callbacks
+        ];
 
         if (transparency)
         {
@@ -193,8 +198,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_disposeDe
 {
     @autoreleasepool {
         MetalDevice *device = (__bridge_transfer MetalDevice *) (void *) devicePtr;
-        env->DeleteGlobalRef(device.layer.javaRef);
-        [device.layer removeFromSuperlayer];
+        [device disposeWithEnv:env];
         [CATransaction flush];
     }
 }
