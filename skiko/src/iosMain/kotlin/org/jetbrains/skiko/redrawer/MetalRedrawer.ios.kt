@@ -51,8 +51,7 @@ internal class MetalRedrawer(
     private val frameListener: NSObject = FrameTickListener {
         rundownCounter -= 1
 
-        if (rundownCounter <= 0) {
-            rundownCounter = 0
+        if (rundownCounter == 0) {
             caDisplayLink.setPaused(true)
         }
 
