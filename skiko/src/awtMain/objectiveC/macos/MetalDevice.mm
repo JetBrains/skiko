@@ -6,6 +6,7 @@
 #include "../../../jvmMain/cpp/common/interop.hh"
 
 /// Linked from skiko/src/jvmMain/cpp/common/impl/Library.cc
+/// clang treats extern symbol declarations as C in Objective-C++(.mm) and doesn't mangle them
 extern JavaVM *jvm;
 
 static JNIEnv *resolveJNIEnvForCurrentThread() {

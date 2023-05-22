@@ -5,15 +5,7 @@
 #include "../paragraph/interop.hh"
 #include "../svg/interop.hh"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-    static JavaVM *jvm = NULL;
-
-#ifdef __cplusplus
-}
-#endif
+extern "C" JavaVM *jvm = NULL;
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     jvm = vm;

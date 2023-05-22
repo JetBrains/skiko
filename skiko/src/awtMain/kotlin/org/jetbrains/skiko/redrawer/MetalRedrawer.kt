@@ -105,7 +105,7 @@ internal class MetalRedrawer(
 
     override val renderInfo: String get() = contextHandler.rendererInfo()
 
-    private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
+    private val frameDispatcher = FrameDispatcher(MainUIDispatcher, vsyncBarrier, overCommitmentBarrier) {
         if (layer.isShowing) {
             update(System.nanoTime())
             draw()
