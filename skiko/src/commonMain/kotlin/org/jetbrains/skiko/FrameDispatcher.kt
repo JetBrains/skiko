@@ -13,13 +13,19 @@ import kotlin.coroutines.CoroutineContext
  */
 class FrameDispatcher(
     scope: CoroutineScope,
+    val vsyncBarrier: VsyncBarrier?,
+    val overCommitmentBarrier: OverCommitmentBarrier?,
     private val onFrame: suspend () -> Unit,
 ) {
     constructor(
         context: CoroutineContext,
+        vsyncBarrier: VsyncBarrier? = null,
+        overCommitmentBarrier: OverCommitmentBarrier? = null,
         onFrame: suspend () -> Unit,
     ) : this(
         CoroutineScope(context),
+        vsyncBarrier,
+        overCommitmentBarrier,
         onFrame
     )
 
@@ -30,6 +36,12 @@ class FrameDispatcher(
         while (true) {
             // Await for draw request
             frameChannel.receive()
+
+            // Await for vsync
+            vsyncBarrier?.await()
+
+            // Await for available slot for commiting new command
+            overCommitmentBarrier?.await()
 
             frameScheduled = false
             onFrame()
