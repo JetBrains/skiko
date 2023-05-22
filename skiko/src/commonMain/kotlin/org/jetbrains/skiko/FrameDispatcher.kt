@@ -13,15 +13,15 @@ import kotlin.coroutines.CoroutineContext
  */
 class FrameDispatcher(
     scope: CoroutineScope,
-    val vsyncBarrier: VsyncBarrier?,
-    val overCommitmentBarrier: OverCommitmentBarrier?,
-    private val onFrame: suspend () -> Unit,
+    private val vsyncBarrier: VsyncBarrier? = null,
+    private val overCommitmentBarrier: OverCommitmentBarrier? = null,
+    private val onFrame: suspend () -> Unit
 ) {
     constructor(
         context: CoroutineContext,
         vsyncBarrier: VsyncBarrier? = null,
         overCommitmentBarrier: OverCommitmentBarrier? = null,
-        onFrame: suspend () -> Unit,
+        onFrame: suspend () -> Unit
     ) : this(
         CoroutineScope(context),
         vsyncBarrier,
