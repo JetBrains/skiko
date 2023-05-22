@@ -1,9 +1,6 @@
 package org.jetbrains.skiko.redrawer
 
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.context.MetalContextHandler
 import javax.swing.SwingUtilities.*
@@ -116,11 +113,6 @@ internal class MetalRedrawer(
         onContextInit()
     }
 
-    fun drawSync() {
-        layer.update(System.nanoTime())
-        performDraw()
-    }
-
     override fun dispose() = synchronized(drawLock) {
         frameDispatcher.cancel()
         contextHandler.dispose()
@@ -136,12 +128,17 @@ internal class MetalRedrawer(
 
     override fun redrawImmediately() {
         check(!isDisposed) { "MetalRedrawer is disposed" }
-        inDrawScope {
-            setVSyncEnabled(device.ptr, enabled = false)
-            update(System.nanoTime())
-            if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
-                performDraw()
-                setVSyncEnabled(device.ptr, properties.isVsyncEnabled)
+
+        runBlocking {
+            frameDispatcher.waitForBarriers()
+
+            inDrawScope {
+                setVSyncEnabled(device.ptr, enabled = false)
+                update(System.nanoTime())
+                if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
+                    performDraw()
+                    setVSyncEnabled(device.ptr, properties.isVsyncEnabled)
+                }
             }
         }
     }

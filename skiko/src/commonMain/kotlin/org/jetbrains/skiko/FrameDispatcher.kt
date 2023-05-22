@@ -37,11 +37,8 @@ class FrameDispatcher(
             // Await for draw request
             frameChannel.receive()
 
-            // Await for vsync
-            vsyncBarrier?.await()
-
-            // Await for available slot for commiting new command
-            overCommitmentBarrier?.await()
+            // Await for barriers if any
+            waitForBarriers()
 
             frameScheduled = false
             onFrame()
@@ -53,6 +50,14 @@ class FrameDispatcher(
             // What means for Swing dispatcher we'll process all pending events and resume renderer.
             yield()
         }
+    }
+
+    suspend fun waitForBarriers() {
+        // Await for vsync
+        vsyncBarrier?.await()
+
+        // Await for available slot for commiting new command
+        overCommitmentBarrier?.await()
     }
 
     fun cancel() {

@@ -141,11 +141,11 @@ class SkiaLayerTest {
             val redrawer = window.layer.redrawer as MetalRedrawer
 
             repeat(colors.size * 10) {
-                redrawer.drawSync()
+                redrawer.redrawImmediately()
                 counter1 += 1
-                redrawer.drawSync()
+                redrawer.redrawImmediately()
                 counter2 += 1
-                redrawer.drawSync()
+                redrawer.redrawImmediately()
             }
 
             delay(1000)
