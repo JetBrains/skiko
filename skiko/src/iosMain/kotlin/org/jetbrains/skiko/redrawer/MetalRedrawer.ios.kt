@@ -16,10 +16,7 @@ import platform.Metal.MTLCreateSystemDefaultDevice
 import platform.Metal.MTLDeviceProtocol
 import platform.Metal.MTLPixelFormatBGRA8Unorm
 import platform.QuartzCore.*
-import platform.UIKit.UIScreen
-import platform.UIKit.UIView
 import platform.UIKit.window
-import platform.darwin.NSInteger
 import platform.darwin.NSObject
 
 internal class MetalRedrawer(
@@ -101,7 +98,7 @@ internal class MetalRedrawer(
     }
 
     private fun topUpRundownCounter() {
-        rundownCounter = 3
+        rundownCounter = RUNDOWN_COUNTER_TOP_VALUE
     }
 
     override fun needRedraw() {
@@ -136,6 +133,16 @@ internal class MetalRedrawer(
                 currentDrawable = null
             }
         }
+    }
+
+    companion object {
+        /**
+         * This value indicates how many frames CADisplayLink will continue to draw after the last [needRedraw] call
+         * until it pauses itself. The value is arbitrarily chosen. Must be at least 2 to avoid incorrect scheduling.
+         * It doesn't affect correctness, and the actual optimal value (if this machinery is needed at all)
+         * will be set once [rundownCounter] _todo_ investigation is finished.
+         */
+        private const val RUNDOWN_COUNTER_TOP_VALUE = 3
     }
 }
 
