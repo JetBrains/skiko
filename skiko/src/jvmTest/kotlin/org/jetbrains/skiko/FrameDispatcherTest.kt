@@ -4,12 +4,99 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.test.TestCoroutineScope
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.util.concurrent.Executors
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class FrameDispatcherTest {
     private var frameCount = 0
+
+    @Test
+    fun `test both barriers`() = test {
+        val vsyncBarrier = VsyncBarrier()
+        val overCommitmentBarrier = OverCommitmentBarrier()
+
+        vsyncBarrier.enable()
+
+        var maxInflightCommands = 0
+        var inflightCommands = 0
+        var framesRendered = 0
+
+        val frameDispatcher = FrameDispatcher(scope = this, vsyncBarrier, overCommitmentBarrier) {
+            inflightCommands += 1
+            maxInflightCommands = maxOf(maxInflightCommands, inflightCommands)
+
+            framesRendered += 1
+
+            launch {
+                delay(40)
+                inflightCommands -= 1
+                overCommitmentBarrier.signal()
+            }
+        }
+
+        val vsyncsCount = 50
+
+        launch {
+            repeat(vsyncsCount) {
+                vsyncBarrier.signal()
+                delay(20)
+            }
+        }
+
+        launch {
+            repeat(500) {
+                frameDispatcher.scheduleFrame()
+                frameDispatcher.scheduleFrame()
+
+                delay(5)
+            }
+        }
+
+        advanceUntilIdle()
+
+        assertTrue(framesRendered <= vsyncsCount)
+        assertTrue(maxInflightCommands <= OverCommitmentBarrier.MAX_INFLIGHT_COMMAND_BUFFERS)
+    }
+
+    @Test
+    fun `test vsync barrier`() = test {
+        val vsyncBarrier = VsyncBarrier()
+
+        vsyncBarrier.enable()
+
+        var framesRendered = 0
+
+        val frameDispatcher = FrameDispatcher(scope = this, vsyncBarrier) {
+            framesRendered += 1
+        }
+
+        val vsyncsCount = 50
+
+        launch {
+            repeat(vsyncsCount) {
+                vsyncBarrier.signal()
+                delay(20)
+            }
+        }
+
+        launch {
+            repeat(500) {
+                frameDispatcher.scheduleFrame()
+                frameDispatcher.scheduleFrame()
+                frameDispatcher.scheduleFrame()
+                frameDispatcher.scheduleFrame()
+
+
+                delay(5)
+            }
+        }
+
+        advanceUntilIdle()
+
+        assertTrue(framesRendered <= vsyncsCount)
+    }
 
     @Test
     fun `shouldn't call onFrame after the creating`() = test {

@@ -25,6 +25,6 @@ class OverCommitmentBarrier {
     }
 
     companion object {
-        private val MAX_INFLIGHT_COMMAND_BUFFERS = 3
+        const val MAX_INFLIGHT_COMMAND_BUFFERS = 3
     }
 }
