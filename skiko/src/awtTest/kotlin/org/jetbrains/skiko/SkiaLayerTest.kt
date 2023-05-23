@@ -97,6 +97,9 @@ class SkiaLayerTest {
 
     @Test
     fun `no drawable presentations are discarded`() = uiTest {
+        assumeTrue(hostOs.isMacOS)
+        assumeTrue(System.getProperty("skiko.test.ui.renderApi", "all") == "metal")
+
         val window = UiTestWindow(
             properties = SkiaLayerProperties(
                 isVsyncEnabled = true
