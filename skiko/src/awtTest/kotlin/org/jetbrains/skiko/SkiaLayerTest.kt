@@ -151,9 +151,6 @@ class SkiaLayerTest {
             delay(1000)
 
             screenshots.assert(window.bounds)
-
-            // function above throws AssertionError if something is not right
-            assert(true)
         } finally {
             window.close()
         }
