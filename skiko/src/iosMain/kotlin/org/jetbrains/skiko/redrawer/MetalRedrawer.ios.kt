@@ -31,26 +31,8 @@ internal class MetalRedrawer(
     private var currentDrawable: CAMetalDrawableProtocol? = null
     private val metalLayer = MetalLayer()
 
-    /**
-     * Property used for bookkeeping at least certain amount of frames (set in [topUpRundownCounter]) scheduled
-     * after last [needRedraw] to avoid reentry situation where two frames were asked to be drawn and
-     * scheduled in the frame _after_ next and merge into one causing no frame scheduled for next vsync
-     * during current vsync window, tick for which could happen slighly before input processing handling and corresponding
-     * [needRedraw] call
-     *
-     * TODO: still needs a little investigation regarding current problem
-     *       being a symptom caused by an anomaly of redraw callback
-     *       being dispatched *strictly* after next vsync + some time after
-     *
-     **/
-    private var rundownCounter = 0
-
     private val frameListener: NSObject = FrameTickListener {
-        rundownCounter -= 1
-
-        if (rundownCounter == 0) {
-            caDisplayLink.setPaused(true)
-        }
+        caDisplayLink.setPaused(true)
 
         if (layer.isShowing()) {
             draw()
@@ -97,14 +79,8 @@ internal class MetalRedrawer(
         }
     }
 
-    private fun topUpRundownCounter() {
-        rundownCounter = RUNDOWN_COUNTER_TOP_VALUE
-    }
-
     override fun needRedraw() {
         check(!isDisposed) { "MetalRedrawer is disposed" }
-
-        topUpRundownCounter()
 
         caDisplayLink.setPaused(false)
     }
@@ -133,16 +109,6 @@ internal class MetalRedrawer(
                 currentDrawable = null
             }
         }
-    }
-
-    companion object {
-        /**
-         * This value indicates how many frames CADisplayLink will continue to draw after the last [needRedraw] call
-         * until it pauses itself. The value is arbitrarily chosen. Must be at least 2 to avoid incorrect scheduling.
-         * It doesn't affect correctness, and the actual optimal value (if this machinery is needed at all)
-         * will be set once [rundownCounter] _todo_ investigation is finished.
-         */
-        private const val RUNDOWN_COUNTER_TOP_VALUE = 3
     }
 }
 
