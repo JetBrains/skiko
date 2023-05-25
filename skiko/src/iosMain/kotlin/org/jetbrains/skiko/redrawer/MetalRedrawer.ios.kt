@@ -36,6 +36,10 @@ internal class MetalRedrawer(
     private var currentDrawable: CAMetalDrawableProtocol? = null
     private val metalLayer = MetalLayer()
 
+    /**
+     * Indicates whether draw was already dispatched during current vsync interval,
+     * so any extra work should be scheduled on next frame
+     */
     private var canDrawOnCurrentVsync = false
 
     /**
