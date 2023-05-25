@@ -64,6 +64,9 @@ internal class MetalRedrawer(
             }
         }
 
+    /**
+     * Indicates that there is update that needs redraw, which will be executed once new vsync is coming
+     */
     private var hasScheduledDrawForNextVsync = false
 
     private val frameListener: NSObject = FrameTickListener {
