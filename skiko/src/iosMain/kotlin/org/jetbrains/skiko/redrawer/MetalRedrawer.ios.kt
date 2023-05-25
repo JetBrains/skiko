@@ -74,11 +74,13 @@ internal class MetalRedrawer(
         if (hasScheduledDrawForNextVsync) {
             if (drawIfNeededDuringCurrentVsyncInterval()) {
                 logEventTime("dispatch draw")
+
+                hasScheduledDrawForNextVsync = false
             } else {
                 logEventTime("discard draw")
-            }
 
-            hasScheduledDrawForNextVsync = false
+                caDisplayLink.setPaused(false)
+            }
         } else {
             logEventTime("skip")
         }
