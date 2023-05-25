@@ -73,8 +73,6 @@ internal class MetalRedrawer(
 
         if (hasScheduledDrawForNextVsync) {
             if (drawIfNeededDuringCurrentVsyncInterval()) {
-                logEventTime("dispatch draw")
-
                 hasScheduledDrawForNextVsync = false
             } else {
                 logEventTime("discard draw")
@@ -142,8 +140,6 @@ internal class MetalRedrawer(
             hasScheduledDrawForNextVsync = true
 
             caDisplayLink.setPaused(false)
-        } else {
-            logEventTime("dispatch immediately")
         }
     }
 
@@ -158,6 +154,8 @@ internal class MetalRedrawer(
      */
     private fun drawIfNeededDuringCurrentVsyncInterval(): Boolean {
         if (canDrawOnCurrentVsync) {
+            logEventTime("dispatch draw")
+
             if (layer.isShowing()) {
                 draw()
             }
