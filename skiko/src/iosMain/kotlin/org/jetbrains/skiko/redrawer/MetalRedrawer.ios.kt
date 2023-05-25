@@ -12,12 +12,17 @@ import platform.CoreGraphics.CGContextRef
 import platform.CoreGraphics.CGSizeMake
 import platform.Foundation.NSRunLoop
 import platform.Foundation.NSSelectorFromString
+import platform.Foundation.NSThread
 import platform.Metal.MTLCreateSystemDefaultDevice
 import platform.Metal.MTLDeviceProtocol
 import platform.Metal.MTLPixelFormatBGRA8Unorm
 import platform.QuartzCore.*
 import platform.UIKit.window
 import platform.darwin.NSObject
+
+fun logEventTime(eventName: String) {
+    println("$eventName : ${CACurrentMediaTime()}")
+}
 
 internal class MetalRedrawer(
     private val layer: SkiaLayer
@@ -31,13 +36,54 @@ internal class MetalRedrawer(
     private var currentDrawable: CAMetalDrawableProtocol? = null
     private val metalLayer = MetalLayer()
 
-    private val frameListener: NSObject = FrameTickListener {
-        caDisplayLink.setPaused(true)
+    private var canDrawOnCurrentVsync = false
 
-        if (layer.isShowing()) {
-            draw()
+    /**
+     * UITouch events are dispatched right before next CADisplayLink callback by iOS.
+     * It's too late to encode any work for this frame after this happens.
+     * Any work dispatched before the next CADisplayLink callback should be scheduled after that callback.
+     */
+    fun preventDrawDispatchDuringCurrentVsync() {
+        canDrawOnCurrentVsync = false
+    }
+
+    /**
+     * Needs scheduling displayLink for forcing UITouch events to come at the fastest possible cadence.
+     * Otherwise touch events will come on 60hz rate
+     */
+    var needsProactiveDisplayLink = false
+        set(value) {
+            field = value
+
+            if (value) {
+                caDisplayLink.setPaused(false)
+            }
+        }
+
+    private var hasScheduledDrawForNextVsync = false
+
+    private val frameListener: NSObject = FrameTickListener {
+        logEventTime("displayLink callback")
+
+        canDrawOnCurrentVsync = true
+
+        if (!needsProactiveDisplayLink) {
+            caDisplayLink.setPaused(true)
+        }
+
+        if (hasScheduledDrawForNextVsync) {
+            if (drawIfNeededDuringCurrentVsyncInterval()) {
+                logEventTime("dispatch draw")
+            } else {
+                logEventTime("discard draw")
+            }
+
+            hasScheduledDrawForNextVsync = false
+        } else {
+            logEventTime("skip")
         }
     }
+
     private val caDisplayLink = CADisplayLink.displayLinkWithTarget(
         target = frameListener,
         selector = NSSelectorFromString(FrameTickListener::onDisplayLinkTick.name)
@@ -82,12 +128,44 @@ internal class MetalRedrawer(
     override fun needRedraw() {
         check(!isDisposed) { "MetalRedrawer is disposed" }
 
-        caDisplayLink.setPaused(false)
+        logEventTime("needRedraw ${NSThread.currentThread}")
+
+        /**
+         * If we can't perform redraw during current vsync,
+         * displayLink will fire at least one time more after this vsync
+         */
+        if (!drawIfNeededDuringCurrentVsyncInterval()) {
+            logEventTime("schedule for next frame")
+
+            hasScheduledDrawForNextVsync = true
+
+            caDisplayLink.setPaused(false)
+        } else {
+            logEventTime("dispatch immediately")
+        }
     }
 
     override fun redrawImmediately() {
         check(!isDisposed) { "MetalRedrawer is disposed" }
         draw()
+    }
+
+    /**
+     * Dispatch redraw immediately during current vsync, if no frames were previously dispatched during it.
+     * Returns true if dispatch can happen, false otherwise.
+     */
+    private fun drawIfNeededDuringCurrentVsyncInterval(): Boolean {
+        if (canDrawOnCurrentVsync) {
+            if (layer.isShowing()) {
+                draw()
+            }
+
+            canDrawOnCurrentVsync = false
+
+            return true
+        }
+
+        return false
     }
 
     private fun draw() {
