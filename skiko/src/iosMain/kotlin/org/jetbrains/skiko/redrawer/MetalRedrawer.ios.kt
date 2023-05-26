@@ -16,11 +16,14 @@ import platform.Metal.MTLCreateSystemDefaultDevice
 import platform.Metal.MTLDeviceProtocol
 import platform.Metal.MTLPixelFormatBGRA8Unorm
 import platform.QuartzCore.*
-import platform.UIKit.UIScreen
-import platform.UIKit.UIView
 import platform.UIKit.window
-import platform.darwin.NSInteger
 import platform.darwin.NSObject
+
+private enum class DrawSchedulingState {
+    AVAILABLE_ON_NEXT_FRAME,
+    AVAILABLE_ON_CURRENT_FRAME,
+    SCHEDULED_ON_NEXT_FRAME
+}
 
 internal class MetalRedrawer(
     private val layer: SkiaLayer
@@ -33,12 +36,62 @@ internal class MetalRedrawer(
     private val queue = device.newCommandQueue() ?: throw IllegalStateException("Couldn't create Metal command queue")
     private var currentDrawable: CAMetalDrawableProtocol? = null
     private val metalLayer = MetalLayer()
-    private val frameListener: NSObject = FrameTickListener {
-        caDisplayLink.setPaused(true)
-        if (layer.isShowing()) {
-            draw()
+
+    /*
+     * Initial value is [DrawSchedulingState.AVAILABLE_ON_NEXT_FRAME] because voluntarily dispatching a frame
+     * disregarding CADisplayLink timing (which is not accessible while it's paused) can cause frame drifting in worst
+     * cases adding one frame latency due to presentation mechanism, if followed by steady draw dispatch
+     * (which is often the case).
+     * TODO: look closer to what happens after blank frames leave it in AVAILABLE_ON_CURRENT_FRAME. Touch driven events sequence negate that problem.
+     */
+    private var drawSchedulingState = DrawSchedulingState.AVAILABLE_ON_NEXT_FRAME
+
+    /**
+     * UITouch events are dispatched right before next CADisplayLink callback by iOS.
+     * It's too late to encode any work for this frame after this happens.
+     * Any work dispatched before the next CADisplayLink callback should be scheduled after that callback.
+     */
+    fun preventDrawDispatchDuringCurrentFrame() {
+        if (drawSchedulingState == DrawSchedulingState.AVAILABLE_ON_CURRENT_FRAME) {
+            drawSchedulingState = DrawSchedulingState.AVAILABLE_ON_NEXT_FRAME
         }
     }
+
+    /**
+     * Needs scheduling displayLink for forcing UITouch events to come at the fastest possible cadence.
+     * Otherwise, touch events can come at rate lower than actual display refresh rate.
+     */
+    var needsProactiveDisplayLink = false
+        set(value) {
+            field = value
+
+            if (value) {
+                caDisplayLink.setPaused(false)
+            }
+        }
+
+    private val frameListener: NSObject = FrameTickListener {
+        when (drawSchedulingState) {
+            DrawSchedulingState.AVAILABLE_ON_NEXT_FRAME -> {
+                drawSchedulingState = DrawSchedulingState.AVAILABLE_ON_CURRENT_FRAME
+            }
+
+            DrawSchedulingState.SCHEDULED_ON_NEXT_FRAME -> {
+                drawIfLayerIsShowing()
+
+                drawSchedulingState = DrawSchedulingState.AVAILABLE_ON_NEXT_FRAME
+            }
+
+            DrawSchedulingState.AVAILABLE_ON_CURRENT_FRAME -> {
+                // still available, do nothing
+            }
+        }
+
+        if (!needsProactiveDisplayLink) {
+            caDisplayLink.setPaused(true)
+        }
+    }
+
     private val caDisplayLink = CADisplayLink.displayLinkWithTarget(
         target = frameListener,
         selector = NSSelectorFromString(FrameTickListener::onDisplayLinkTick.name)
@@ -82,12 +135,44 @@ internal class MetalRedrawer(
 
     override fun needRedraw() {
         check(!isDisposed) { "MetalRedrawer is disposed" }
-        caDisplayLink.setPaused(false)
+
+        drawImmediatelyIfPossible()
+
+        if (drawSchedulingState == DrawSchedulingState.SCHEDULED_ON_NEXT_FRAME) {
+            caDisplayLink.setPaused(false)
+        }
     }
 
     override fun redrawImmediately() {
         check(!isDisposed) { "MetalRedrawer is disposed" }
         draw()
+    }
+
+    /*
+     * Dispatch redraw immediately during current frame if possible and updates [drawSchedulingState] to relevant value
+     */
+    private fun drawImmediatelyIfPossible() {
+        when (drawSchedulingState) {
+            DrawSchedulingState.AVAILABLE_ON_NEXT_FRAME -> {
+                drawSchedulingState = DrawSchedulingState.SCHEDULED_ON_NEXT_FRAME
+            }
+
+            DrawSchedulingState.AVAILABLE_ON_CURRENT_FRAME -> {
+                drawIfLayerIsShowing()
+
+                drawSchedulingState = DrawSchedulingState.AVAILABLE_ON_NEXT_FRAME
+            }
+
+            DrawSchedulingState.SCHEDULED_ON_NEXT_FRAME -> {
+                // already scheduled, do nothing
+            }
+        }
+    }
+
+    private fun drawIfLayerIsShowing() {
+        if (layer.isShowing()) {
+            draw()
+        }
     }
 
     private fun draw() {

@@ -181,13 +181,32 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
         return _pointInside(skiaPoint, withEvent)
     }
 
+    /*
+     * When there at least one tracked touch, we need notify redrawer about it. It should schedule CADisplayLink which
+     * affects frequency of polling UITouch events on high frequency display and forces it to match display refresh rate.
+     */
+    private var touchesCount = 0
+        set(value) {
+            field = value
+
+            val needHighFrequencyPolling = value > 0
+
+            skiaLayer?.redrawer?.needsProactiveDisplayLink = needHighFrequencyPolling
+        }
+
     override fun touchesBegan(touches: Set<*>, withEvent: UIEvent?) {
         super.touchesBegan(touches, withEvent)
+
+        touchesCount += touches.size
+
         sendTouchEventToSkikoView(withEvent!!, SkikoPointerEventKind.DOWN)
     }
 
     override fun touchesEnded(touches: Set<*>, withEvent: UIEvent?) {
         super.touchesEnded(touches, withEvent)
+
+        touchesCount -= touches.size
+
         sendTouchEventToSkikoView(withEvent!!, SkikoPointerEventKind.UP)
     }
 
@@ -198,6 +217,9 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
 
     override fun touchesCancelled(touches: Set<*>, withEvent: UIEvent?) {
         super.touchesCancelled(touches, withEvent)
+
+        touchesCount -= touches.size
+
         sendTouchEventToSkikoView(withEvent!!, SkikoPointerEventKind.UP)
     }
 
@@ -225,6 +247,8 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
                 platform = event
             )
         )
+         // If invalidation doesn't happen while onPointerEvent is processed, it's too late to schedule any work for this frame.
+        skiaLayer?.redrawer?.preventDrawDispatchDuringCurrentFrame()
     }
 
     private val UITouch.isPressed get() =
