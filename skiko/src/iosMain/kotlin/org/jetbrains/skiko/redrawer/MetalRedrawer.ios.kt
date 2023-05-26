@@ -37,6 +37,13 @@ internal class MetalRedrawer(
     private var currentDrawable: CAMetalDrawableProtocol? = null
     private val metalLayer = MetalLayer()
 
+    /*
+     * Initial value is [DrawSchedulingState.AVAILABLE_ON_NEXT_FRAME] because voluntarily dispatching a frame
+     * disregarding CADisplayLink timing (which is not accessible while it's paused) can cause frame drifting in worst
+     * cases adding one frame latency due to presentation mechanism, if followed by steady draw dispatch
+     * (which is often the case).
+     * TODO: look closer to what happens after blank frames leave it in AVAILABLE_ON_CURRENT_FRAME. Touch driven events sequence negate that problem.
+     */
     private var drawSchedulingState = DrawSchedulingState.AVAILABLE_ON_NEXT_FRAME
 
     /**
