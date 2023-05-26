@@ -19,7 +19,7 @@ import platform.QuartzCore.*
 import platform.UIKit.window
 import platform.darwin.NSObject
 
-internal enum class DrawSchedulingState {
+private enum class DrawSchedulingState {
     AVAILABLE_ON_NEXT_FRAME,
     AVAILABLE_ON_CURRENT_FRAME,
     SCHEDULED_ON_NEXT_FRAME
@@ -141,7 +141,7 @@ internal class MetalRedrawer(
         draw()
     }
 
-    /**
+    /*
      * Dispatch redraw immediately during current frame if possible and updates [drawSchedulingState] to relevant value
      */
     private fun drawImmediatelyIfPossible() {
