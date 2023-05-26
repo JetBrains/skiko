@@ -75,7 +75,7 @@ internal class MetalRedrawer(
                 drawSchedulingState = DrawSchedulingState.AVAILABLE_ON_NEXT_FRAME
             }
 
-            DrawSchedulingState.AVAILABLE_ON_CURRENT_FRAME -> Unit /** nothing changes, still available */
+            DrawSchedulingState.AVAILABLE_ON_CURRENT_FRAME -> { /** nothing changes, still available */ }
         }
 
         if (!needsProactiveDisplayLink) {
@@ -154,7 +154,7 @@ internal class MetalRedrawer(
                 drawSchedulingState = DrawSchedulingState.AVAILABLE_ON_NEXT_FRAME
             }
 
-            DrawSchedulingState.SCHEDULED_ON_NEXT_FRAME -> Unit /** already scheduled, do nothing */
+            DrawSchedulingState.SCHEDULED_ON_NEXT_FRAME -> { /** already scheduled, do nothing */ }
         }
     }
 
