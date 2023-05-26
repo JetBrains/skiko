@@ -12,13 +12,18 @@ import platform.CoreGraphics.CGContextRef
 import platform.CoreGraphics.CGSizeMake
 import platform.Foundation.NSRunLoop
 import platform.Foundation.NSSelectorFromString
-import platform.Foundation.NSThread
 import platform.Metal.MTLCreateSystemDefaultDevice
 import platform.Metal.MTLDeviceProtocol
 import platform.Metal.MTLPixelFormatBGRA8Unorm
 import platform.QuartzCore.*
 import platform.UIKit.window
 import platform.darwin.NSObject
+
+internal enum class DrawSchedulingState(val canDrawNow: Boolean, val hasDrawScheduledForNextFrame: Boolean) {
+    AVAILABLE_ON_NEXT_FRAME(false, false),
+    AVAILABLE_ON_CURRENT_FRAME(true, false),
+    SCHEDULED_ON_NEXT_FRAME(false, true)
+}
 
 internal class MetalRedrawer(
     private val layer: SkiaLayer
@@ -32,19 +37,17 @@ internal class MetalRedrawer(
     private var currentDrawable: CAMetalDrawableProtocol? = null
     private val metalLayer = MetalLayer()
 
-    /**
-     * Indicates whether draw was already dispatched during current vsync interval,
-     * so any extra work should be scheduled on next frame
-     */
-    private var canDrawOnCurrentVsync = false
+    private var drawSchedulingState = DrawSchedulingState.AVAILABLE_ON_NEXT_FRAME
 
     /**
      * UITouch events are dispatched right before next CADisplayLink callback by iOS.
      * It's too late to encode any work for this frame after this happens.
      * Any work dispatched before the next CADisplayLink callback should be scheduled after that callback.
      */
-    fun preventDrawDispatchDuringCurrentVsync() {
-        canDrawOnCurrentVsync = false
+    fun preventDrawDispatchDuringCurrentFrame() {
+        if (drawSchedulingState == DrawSchedulingState.AVAILABLE_ON_CURRENT_FRAME) {
+            drawSchedulingState = DrawSchedulingState.AVAILABLE_ON_NEXT_FRAME
+        }
     }
 
     /**
@@ -60,19 +63,22 @@ internal class MetalRedrawer(
             }
         }
 
-    /**
-     * Indicates that there is update that needs redraw, which will be executed once new vsync is coming
-     */
-    private var hasScheduledDrawForNextVsync = false
-
     private val frameListener: NSObject = FrameTickListener {
-        canDrawOnCurrentVsync = true
+        when (drawSchedulingState) {
+            DrawSchedulingState.AVAILABLE_ON_NEXT_FRAME -> {
+                drawSchedulingState = DrawSchedulingState.AVAILABLE_ON_CURRENT_FRAME
+            }
 
-        if (hasScheduledDrawForNextVsync && drawIfNeededDuringCurrentVsyncInterval()) {
-            hasScheduledDrawForNextVsync = false
+            DrawSchedulingState.SCHEDULED_ON_NEXT_FRAME -> {
+                drawIfLayerIsShowing()
+
+                drawSchedulingState = DrawSchedulingState.AVAILABLE_ON_NEXT_FRAME
+            }
+
+            DrawSchedulingState.AVAILABLE_ON_CURRENT_FRAME -> Unit /** nothing changes, still available */
         }
 
-        if (!hasScheduledDrawForNextVsync && !needsProactiveDisplayLink) {
+        if (!needsProactiveDisplayLink) {
             caDisplayLink.setPaused(true)
         }
     }
@@ -121,13 +127,9 @@ internal class MetalRedrawer(
     override fun needRedraw() {
         check(!isDisposed) { "MetalRedrawer is disposed" }
 
-        /**
-         * If we can't perform redraw during current vsync,
-         * displayLink will fire at least one time more after this vsync
-         */
-        if (!drawIfNeededDuringCurrentVsyncInterval()) {
-            hasScheduledDrawForNextVsync = true
+        drawImmediatelyIfPossible()
 
+        if (drawSchedulingState.hasDrawScheduledForNextFrame) {
             caDisplayLink.setPaused(false)
         }
     }
@@ -138,18 +140,27 @@ internal class MetalRedrawer(
     }
 
     /**
-     * Dispatch redraw immediately during current vsync, if no frames were previously dispatched during it.
-     * Returns true if dispatch can happen, false otherwise.
+     * Dispatch redraw immediately during current frame if possible
      */
-    private fun drawIfNeededDuringCurrentVsyncInterval(): Boolean {
-        return canDrawOnCurrentVsync.also {
-            if (!it) return@also
-
-            if (layer.isShowing()) {
-                draw()
+    private fun drawImmediatelyIfPossible() {
+        when (drawSchedulingState) {
+            DrawSchedulingState.AVAILABLE_ON_NEXT_FRAME -> {
+                drawSchedulingState = DrawSchedulingState.SCHEDULED_ON_NEXT_FRAME
             }
 
-            canDrawOnCurrentVsync = false
+            DrawSchedulingState.AVAILABLE_ON_CURRENT_FRAME -> {
+                drawIfLayerIsShowing()
+
+                drawSchedulingState = DrawSchedulingState.AVAILABLE_ON_NEXT_FRAME
+            }
+
+            DrawSchedulingState.SCHEDULED_ON_NEXT_FRAME -> Unit /** already scheduled, do nothing */
+        }
+    }
+
+    private fun drawIfLayerIsShowing() {
+        if (layer.isShowing()) {
+            draw()
         }
     }
 
