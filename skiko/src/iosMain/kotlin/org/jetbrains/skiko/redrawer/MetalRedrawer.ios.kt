@@ -19,10 +19,10 @@ import platform.QuartzCore.*
 import platform.UIKit.window
 import platform.darwin.NSObject
 
-internal enum class DrawSchedulingState(val canDrawNow: Boolean, val hasDrawScheduledForNextFrame: Boolean) {
-    AVAILABLE_ON_NEXT_FRAME(false, false),
-    AVAILABLE_ON_CURRENT_FRAME(true, false),
-    SCHEDULED_ON_NEXT_FRAME(false, true)
+internal enum class DrawSchedulingState {
+    AVAILABLE_ON_NEXT_FRAME,
+    AVAILABLE_ON_CURRENT_FRAME,
+    SCHEDULED_ON_NEXT_FRAME
 }
 
 internal class MetalRedrawer(
@@ -129,7 +129,7 @@ internal class MetalRedrawer(
 
         drawImmediatelyIfPossible()
 
-        if (drawSchedulingState.hasDrawScheduledForNextFrame) {
+        if (drawSchedulingState == DrawSchedulingState.SCHEDULED_ON_NEXT_FRAME) {
             caDisplayLink.setPaused(false)
         }
     }
@@ -140,7 +140,7 @@ internal class MetalRedrawer(
     }
 
     /**
-     * Dispatch redraw immediately during current frame if possible
+     * Dispatch redraw immediately during current frame if possible and updates [drawSchedulingState] to relevant value
      */
     private fun drawImmediatelyIfPossible() {
         when (drawSchedulingState) {
