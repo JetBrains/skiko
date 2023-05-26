@@ -160,7 +160,9 @@ internal class MetalRedrawer(
      * Returns true if dispatch can happen, false otherwise.
      */
     private fun drawIfNeededDuringCurrentVsyncInterval(): Boolean {
-        if (canDrawOnCurrentVsync) {
+        return canDrawOnCurrentVsync.also {
+            if (!it) return@also
+
             logEventTime("dispatch draw")
 
             if (layer.isShowing()) {
@@ -168,11 +170,7 @@ internal class MetalRedrawer(
             }
 
             canDrawOnCurrentVsync = false
-
-            return true
         }
-
-        return false
     }
 
     private fun draw() {
