@@ -3,7 +3,6 @@ package org.jetbrains.skiko
 import kotlinx.cinterop.*
 import org.jetbrains.skia.Point
 import org.jetbrains.skia.Rect
-import org.jetbrains.skiko.redrawer.logEventTime
 import platform.CoreGraphics.*
 import platform.Foundation.*
 import platform.UIKit.*
@@ -238,7 +237,6 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
             )
         }
 
-        logEventTime("Start processing pointer event ${NSThread.currentThread}")
         skiaLayer?.skikoView?.onPointerEvent(
             SkikoPointerEvent(
                 x = pointers.centroidX,
@@ -253,7 +251,6 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
          * If invalidation doesn't happen while onPointerEvent is processed, it's too late to schedule any work for this frame.
          */
         skiaLayer?.redrawer?.preventDrawDispatchDuringCurrentVsync()
-        logEventTime("Finish processing pointer event")
     }
 
     private val UITouch.isPressed get() =

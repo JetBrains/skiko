@@ -20,10 +20,6 @@ import platform.QuartzCore.*
 import platform.UIKit.window
 import platform.darwin.NSObject
 
-fun logEventTime(eventName: String) {
-    println("$eventName : ${CACurrentMediaTime()}")
-}
-
 internal class MetalRedrawer(
     private val layer: SkiaLayer
 ) : Redrawer {
@@ -53,7 +49,7 @@ internal class MetalRedrawer(
 
     /**
      * Needs scheduling displayLink for forcing UITouch events to come at the fastest possible cadence.
-     * Otherwise touch events can come at rate lower than actual display refresh rate.
+     * Otherwise, touch events can come at rate lower than actual display refresh rate.
      */
     var needsProactiveDisplayLink = false
         set(value) {
@@ -70,24 +66,14 @@ internal class MetalRedrawer(
     private var hasScheduledDrawForNextVsync = false
 
     private val frameListener: NSObject = FrameTickListener {
-        logEventTime("displayLink callback")
-
         canDrawOnCurrentVsync = true
 
-        if (!needsProactiveDisplayLink) {
-            caDisplayLink.setPaused(true)
+        if (hasScheduledDrawForNextVsync && drawIfNeededDuringCurrentVsyncInterval()) {
+            hasScheduledDrawForNextVsync = false
         }
 
-        if (hasScheduledDrawForNextVsync) {
-            if (drawIfNeededDuringCurrentVsyncInterval()) {
-                hasScheduledDrawForNextVsync = false
-            } else {
-                logEventTime("discard draw")
-
-                caDisplayLink.setPaused(false)
-            }
-        } else {
-            logEventTime("skip")
+        if (!hasScheduledDrawForNextVsync && !needsProactiveDisplayLink) {
+            caDisplayLink.setPaused(true)
         }
     }
 
@@ -135,15 +121,11 @@ internal class MetalRedrawer(
     override fun needRedraw() {
         check(!isDisposed) { "MetalRedrawer is disposed" }
 
-        logEventTime("needRedraw ${NSThread.currentThread}")
-
         /**
          * If we can't perform redraw during current vsync,
          * displayLink will fire at least one time more after this vsync
          */
         if (!drawIfNeededDuringCurrentVsyncInterval()) {
-            logEventTime("schedule for next frame")
-
             hasScheduledDrawForNextVsync = true
 
             caDisplayLink.setPaused(false)
@@ -162,8 +144,6 @@ internal class MetalRedrawer(
     private fun drawIfNeededDuringCurrentVsyncInterval(): Boolean {
         return canDrawOnCurrentVsync.also {
             if (!it) return@also
-
-            logEventTime("dispatch draw")
 
             if (layer.isShowing()) {
                 draw()
