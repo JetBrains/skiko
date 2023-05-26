@@ -53,7 +53,7 @@ internal class MetalRedrawer(
 
     /**
      * Needs scheduling displayLink for forcing UITouch events to come at the fastest possible cadence.
-     * Otherwise touch events will come on 60hz rate
+     * Otherwise touch events can come at rate lower than actual display refresh rate.
      */
     var needsProactiveDisplayLink = false
         set(value) {

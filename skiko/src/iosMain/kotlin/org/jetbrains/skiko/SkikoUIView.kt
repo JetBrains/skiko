@@ -182,11 +182,17 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
         return _pointInside(skiaPoint, withEvent)
     }
 
+    /**
+     * When there at least one tracked touch, we need notify redrawer about it. It should schedule CADisplayLink which
+     * affects frequency of polling UITouch events on high frequency display and forces it to match display refresh rate.
+     */
     private var touchesCount = 0
         set(value) {
             field = value
 
-            skiaLayer?.redrawer?.needsProactiveDisplayLink = value != 0
+            val needHighFrequencyPolling = value > 0
+
+            skiaLayer?.redrawer?.needsProactiveDisplayLink = needHighFrequencyPolling
         }
 
     override fun touchesBegan(touches: Set<*>, withEvent: UIEvent?) {
