@@ -116,9 +116,7 @@ actual open class SkiaLayer {
                 updateTrackingAreas()
             }
 
-            @ObjCAction // override
-            // see https://youtrack.jetbrains.com/issue/KT-40426/Incorrect-Objective-C-extensions-importing-that-prevents-UIKit-usage#focus=Comments-27-5208687.0-0
-            fun updateTrackingAreas() {
+            override fun updateTrackingAreas() {
                 trackingArea?.let { removeTrackingArea(it) }
                 trackingArea = NSTrackingArea(
                     rect = bounds,
