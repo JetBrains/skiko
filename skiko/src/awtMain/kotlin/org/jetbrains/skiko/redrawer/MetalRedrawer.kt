@@ -68,17 +68,25 @@ internal class MetalRedrawer(
         _device = initDevice
         contextHandler =
             MetalContextHandler(layer, initDevice, MetalContextHandler.AdapterInfo(adapterName, adapterMemorySize))
-        setVSyncEnabled(initDevice.ptr, properties.isVsyncEnabled)
+        setVSyncEnabled(initDevice.ptr, false)
     }
 
     override val renderInfo: String get() = contextHandler.rendererInfo()
 
     private val windowHandle = layer.windowHandle
 
+    private var time: Long = 0
+
+    fun getFakeTime(): Long {
+        time += 10 * 1000000
+        return time
+    }
+
     private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
         if (layer.isShowing) {
-            update(System.nanoTime())
+            update(getFakeTime()) //remove time
             draw()
+            // needRedraw()
         }
     }
 
@@ -102,11 +110,11 @@ internal class MetalRedrawer(
     override fun redrawImmediately() {
         check(!isDisposed) { "MetalRedrawer is disposed" }
         inDrawScope {
-            setVSyncEnabled(device.ptr, enabled = false)
-            update(System.nanoTime())
+//            setVSyncEnabled(device.ptr, enabled = false)
+            update(getFakeTime())
             if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
                 performDraw()
-                setVSyncEnabled(device.ptr, properties.isVsyncEnabled)
+//                setVSyncEnabled(device.ptr, properties.isVsyncEnabled)
             }
         }
     }
@@ -141,7 +149,8 @@ internal class MetalRedrawer(
         if (!isDisposed) {
             val handle = startRendering()
             try {
-                contextHandler.draw()
+//                needRedraw()
+//                contextHandler.draw()
             } finally {
                 endRendering(handle)
             }

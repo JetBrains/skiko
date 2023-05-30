@@ -122,8 +122,9 @@ internal class MacOsMetalRedrawer(
         // TODO: maybe make flush async as in JVM version.
         autoreleasepool {
             if (!isDisposed) {
-                skiaLayer.update(getTimeNanos())
-                contextHandler.draw()
+                skiaLayer.update(getFakeTime()) //remove time
+//                needRedraw()
+//                contextHandler.draw()
             }
         }
     }
@@ -139,6 +140,13 @@ internal class MacOsMetalRedrawer(
             }
         }
     }
+}
+
+private var time: Long = 0
+
+fun getFakeTime(): Long {
+    time += 10 * 1000000
+    return time
 }
 
 internal class MetalLayer : CAMetalLayer {
@@ -170,14 +178,17 @@ internal class MetalLayer : CAMetalLayer {
         skiaLayer.nsView.layer = this
         skiaLayer.nsView.wantsLayer = true
         this.contentsGravity = kCAGravityTopLeft;
+        this.displaySyncEnabled = false
     }
 
     fun dispose() {
         this.removeFromSuperlayer()
     }
 
+
     override fun drawInContext(ctx: CGContextRef?) {
-        skiaLayer.update(getTimeNanos())
-        contextHandler.draw()
+        // TODO: comment body
+        skiaLayer.update(getFakeTime())
+//        contextHandler.draw()
     }
 }
