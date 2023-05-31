@@ -150,7 +150,7 @@ internal class MetalRedrawer(
             val handle = startRendering()
             try {
 //                needRedraw()
-//                contextHandler.draw()
+                contextHandler.draw()
             } finally {
                 endRendering(handle)
             }

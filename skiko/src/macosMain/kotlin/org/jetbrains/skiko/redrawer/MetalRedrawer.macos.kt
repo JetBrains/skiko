@@ -124,7 +124,7 @@ internal class MacOsMetalRedrawer(
             if (!isDisposed) {
                 skiaLayer.update(getFakeTime()) //remove time
 //                needRedraw()
-//                contextHandler.draw()
+                contextHandler.draw()
             }
         }
     }
@@ -189,6 +189,6 @@ internal class MetalLayer : CAMetalLayer {
     override fun drawInContext(ctx: CGContextRef?) {
         // TODO: comment body
         skiaLayer.update(getFakeTime())
-//        contextHandler.draw()
+        contextHandler.draw()
     }
 }
