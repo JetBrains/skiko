@@ -12,6 +12,7 @@ class FontFamilyKey(val familyName: String) : Comparable<String> {
     override fun compareTo(other: String) =
         identifier.compareTo(other.lowercase())
 
+    @Suppress("RedundantIf") // Auto-generated
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -25,6 +26,9 @@ class FontFamilyKey(val familyName: String) : Comparable<String> {
 
     override fun hashCode() = identifier.hashCode()
 
+    override fun toString(): String = "FontFamilyKey(familyName='$familyName')"
+
+
     object Apple {
         val SystemFont = FontFamilyKey("System Font")
         val AppleSystemUiFont = FontFamilyKey(".AppleSystemUIFont")
@@ -32,6 +36,7 @@ class FontFamilyKey(val familyName: String) : Comparable<String> {
         val hiddenSystemFontNames = setOf(SystemFont, AppleSystemUiFont)
     }
 
+    @Suppress("MemberVisibilityCanBePrivate")
     object Awt {
         val Serif = FontFamilyKey("Serif")
         val SansSerif = FontFamilyKey("SansSerif")

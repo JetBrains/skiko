@@ -1,11 +1,14 @@
 package org.jetbrains.skiko
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withContext
 import org.jetbrains.skia.Data
 import org.jetbrains.skia.FontStyle
 import org.jetbrains.skia.Typeface
 import org.jetbrains.skia.tests.makeFromResource
+import org.jetbrains.skiko.context.isRunningOnJetBrainsRuntime
 import org.junit.Assume
 import org.junit.Test
 import kotlin.io.path.createTempFile
@@ -22,7 +25,18 @@ class AwtFontManagerTest {
         else -> "Arial"
     }
 
-    private val systemFontProvider = FakeSystemFontProvider().apply {
+    private val systemFontProvider = FakeFontProvider().apply {
+        addEmptyFontFamily(aFontName).also {
+            it.addTypeface(Typeface.makeFromName(aFontName, FontStyle.NORMAL))
+            it.addTypeface(Typeface.makeFromName(aFontName, FontStyle.ITALIC))
+            it.addTypeface(Typeface.makeFromName(aFontName, FontStyle.BOLD))
+            it.addTypeface(Typeface.makeFromName(aFontName, FontStyle.BOLD_ITALIC))
+        }
+        addEmptyFontFamily("Potato Sans")
+        addEmptyFontFamily("Walrus Display")
+    }
+
+    private val embeddedFontProvider = FakeFontProvider().apply {
         addEmptyFontFamily(aFontName).also {
             it.addTypeface(Typeface.makeFromName(aFontName, FontStyle.NORMAL))
             it.addTypeface(Typeface.makeFromName(aFontName, FontStyle.ITALIC))
@@ -35,7 +49,7 @@ class AwtFontManagerTest {
 
     private val customTypefaceCache = TestTypefaceCache()
 
-    private val fontManager = AwtFontManager(systemFontProvider, customTypefaceCache)
+    private val fontManager = AwtFontManager(systemFontProvider, embeddedFontProvider, customTypefaceCache)
 
     @Test
     fun `should be able to find regular fonts`() = runTest {
@@ -208,43 +222,55 @@ class AwtFontManagerTest {
     @Test
     fun `should contain at least the system font families`() = runTest {
         val families = fontManager.familyNames()
-        assertEquals(families.size, 3, "Missing some system families")
+        assertEquals(3, families.size, "Missing some system families")
     }
 
     @Test
-    fun `should prefer custom to system fonts when existing`() = runTest {
+    fun `should prefer custom to embedded and system fonts when existing`() = runTest {
         fontManager.addCustomFontTypeface(Typeface.makeFromName(aFontName, FontStyle.NORMAL))
 
         val typeface = fontManager.getTypefaceOrNull(aFontName, FontStyle.NORMAL)
         assertNotNull(typeface, "Should find typeface")
         assertEquals(aFontName, customTypefaceCache.lastGetName)
+        assertNull(embeddedFontProvider.lastContainsName, "Should not get embedded fonts")
+        assertNull(embeddedFontProvider.lastGetName, "Should not get embedded fonts")
         assertNull(systemFontProvider.lastContainsName, "Should not get system fonts")
         assertNull(systemFontProvider.lastGetName, "Should not get system fonts")
     }
 
     @Test
-    fun `should fall back to system fonts when existing custom fonts are missing the requested style`() = runTest {
+    fun `should prefer embedded to system fonts when existing and no matching custom font`() = runTest {
+        val typeface = fontManager.getTypefaceOrNull(aFontName, FontStyle.NORMAL)
+        assertNotNull(typeface, "Should find typeface")
+        assertEquals(aFontName, customTypefaceCache.lastGetName)
+        assertEquals(aFontName, embeddedFontProvider.lastGetName)
+        assertNull(systemFontProvider.lastContainsName, "Should not get system fonts")
+        assertNull(systemFontProvider.lastGetName, "Should not get system fonts")
+    }
+
+    @Test
+    fun `should return null when existing fonts are missing the requested style`() = runTest {
         systemFontProvider.addEmptyFontFamily("JetBrains Mono")
         fontManager.addCustomFontResource("./fonts/JetBrainsMono-Regular.ttf")
 
         val typeface = fontManager.getTypefaceOrNull("JetBrains Mono", FontStyle.BOLD)
-        assertEquals("JetBrains Mono", customTypefaceCache.lastGetName)
+        assertNull(typeface, "Embedded typeface should be missing in this test")
 
-        assertNull(typeface, "System typeface should be missing in this test")
-        assertEquals("JetBrains Mono", systemFontProvider.lastContainsName)
+        assertEquals("JetBrains Mono", customTypefaceCache.lastGetName)
+        assertEquals("JetBrains Mono", embeddedFontProvider.lastGetName)
         assertEquals("JetBrains Mono", systemFontProvider.lastGetName)
     }
 
     @Test
     fun `should return false from isAbleToResolveFamilyNames when not running on JBR`() {
-        Assume.assumeFalse(System.getProperty("java.vendor") == "JetBrains s.r.o.")
+        Assume.assumeFalse("Running on the JetBrains Runtime", isRunningOnJetBrainsRuntime())
 
         assertFalse(fontManager.isAbleToResolveFamilyNames)
     }
 
     @Test
     fun `should return true from isAbleToResolveFamilyNames when running on JBR`() {
-        Assume.assumeTrue(System.getProperty("java.vendor") == "JetBrains s.r.o.")
+        Assume.assumeTrue("Not running on the JetBrains Runtime", isRunningOnJetBrainsRuntime())
 
         assertTrue(fontManager.isAbleToResolveFamilyNames)
     }

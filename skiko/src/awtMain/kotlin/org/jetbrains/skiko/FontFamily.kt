@@ -14,6 +14,7 @@ import org.jetbrains.skia.Typeface
  */
 class FontFamily(
     val familyName: String,
+    val source: FontFamilySource,
     private val typefacesByStyle: MutableMap<FontStyle, Typeface> = mutableMapOf()
 ) : Map<FontStyle, Typeface> by typefacesByStyle {
 
@@ -34,7 +35,7 @@ class FontFamily(
         get() = typefacesByStyle.values.toSet()
 
     operator fun plus(typeface: Typeface) =
-        FontFamily(familyName, typefacesByStyle.toMutableMap())
+        FontFamily(familyName, source, typefacesByStyle.toMutableMap())
             .apply { addTypeface(typeface) }
 
     operator fun plusAssign(typeface: Typeface) = addTypeface(typeface)
@@ -57,13 +58,13 @@ class FontFamily(
     operator fun minusAssign(typeface: Typeface) = removeTypeface(typeface)
 
     operator fun minus(typeface: Typeface) =
-        FontFamily(familyName, typefacesByStyle.toMutableMap())
+        FontFamily(familyName, source, typefacesByStyle.toMutableMap())
             .apply { removeTypeface(typeface) }
 
     operator fun minusAssign(style: FontStyle) = removeTypefaceByStyle(style)
 
     operator fun minus(style: FontStyle) =
-        FontFamily(familyName, typefacesByStyle.toMutableMap())
+        FontFamily(familyName, source, typefacesByStyle.toMutableMap())
             .apply { removeTypefaceByStyle(style) }
 
     /**
@@ -95,6 +96,12 @@ class FontFamily(
         typefacesByStyle -= style
     }
 
+    enum class FontFamilySource {
+        System,
+        JvmEmbedded,
+        Custom
+    }
+
     companion object {
 
         /**
@@ -107,9 +114,10 @@ class FontFamily(
          */
         fun fromTypefaces(
             familyName: String,
+            source: FontFamilySource,
             vararg typefaces: Typeface,
         ): FontFamily {
-            if (typefaces.isEmpty()) return FontFamily(familyName)
+            if (typefaces.isEmpty()) return FontFamily(familyName, source)
 
             val map = HashMap<FontStyle, Typeface>(typefaces.size)
             for (typeface in typefaces) {
@@ -124,7 +132,7 @@ class FontFamily(
 
                 map[typeface.fontStyle] = typeface
             }
-            return FontFamily(familyName, map)
+            return FontFamily(familyName, source, map)
         }
     }
 }

@@ -1,5 +1,3 @@
-@file:Suppress("JAVA_MODULE_DOES_NOT_EXPORT_PACKAGE")
-
 package org.jetbrains.skiko
 
 import kotlinx.coroutines.*
@@ -7,79 +5,14 @@ import org.jetbrains.skia.FontMgr
 import org.jetbrains.skia.FontStyle
 import org.jetbrains.skia.FontStyleSet
 import org.jetbrains.skia.Typeface
-import org.jetbrains.skiko.AwtFontUtils.fontFileName
-import org.jetbrains.skiko.SystemFontProvider.Companion.skia
-import java.awt.GraphicsEnvironment
-import java.io.IOException
-import java.nio.file.Files
-import java.nio.file.Path
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.io.path.Path
-import kotlin.io.path.absolute
 
-/**
- * A cache of font family names available in the system.
- *
- * You can get the default, global implementation from [skia].
- */
-@InternalSkikoApi
-interface SystemFontProvider {
-
-    /**
-     * Invalidate the system font cache, causing the list of font families available
-     * at the system level to be refreshed.
-     */
-    fun invalidate()
-
-    /**
-     * List all known system font family names.
-     *
-     * You can call [invalidate] if you need to refresh this list.
-     * This function will suspend until the caching is complete.
-     *
-     * @see invalidate
-     */
-    suspend fun familyNames(): Set<String>
-
-
-    /**
-     * Check if the given [familyName] exists in the system.
-     *
-     * This function will suspend until the caching is complete.
-     *
-     * @see invalidate
-     * @see familyNames
-     */
-    suspend fun contains(familyName: String): Boolean
-
-    /**
-     * Load a [Typeface] from the system, given a [familyName] and a [fontStyle].
-     */
-    suspend fun getTypefaceOrNull(familyName: String, fontStyle: FontStyle): Typeface?
-
-    /**
-     * Load a [FontFamily] from the system, given a [familyName].
-     */
-    suspend fun getFontFamilyOrNull(familyName: String): FontFamily?
-
-    companion object {
-
-        /**
-         * The default, global implementation of the interface.
-         * It uses Skia APIs to enumerate available font families.
-         */
-        val skia: SystemFontProvider
-            get() = SkiaSystemFontProvider
-    }
-}
-
-private object SkiaSystemFontProvider : SystemFontProvider {
+internal object SkiaFontProvider : FontProvider {
 
     private val familyNamesCache: MutableSet<FontFamilyKey> = ConcurrentHashMap.newKeySet(FontMgr.default.familiesCount)
     private val _familyNames: MutableSet<String> = ConcurrentHashMap.newKeySet(FontMgr.default.familiesCount)
     private val awtLogicalFamilyNames: MutableMap<FontFamilyKey, String> =
         ConcurrentHashMap(FontFamilyKey.Awt.awtLogicalFonts.size)
-    private val embeddedFamilyNames: MutableMap<FontFamilyKey, String> = ConcurrentHashMap()
 
     @Volatile
     private var allFontsCachedImpl = false
@@ -98,7 +31,6 @@ private object SkiaSystemFontProvider : SystemFontProvider {
         cacheJob = GlobalScope.launch {
             cacheAllSystemFonts()
             cacheAwtLogicalFonts()
-            cacheEmbeddedFonts()
             allFontsCachedImpl = true
             waitChannel.sendAll(Unit)
         }
@@ -161,49 +93,10 @@ private object SkiaSystemFontProvider : SystemFontProvider {
     }
 
     /**
-     * Embedded fonts are bundled with the Java Runtime; AWT picks them
-     * up automatically, but Skia can't. We need to explicitly add them.
-     */
-    private fun cacheEmbeddedFonts() {
-        try {
-            val javaHome = Path(System.getProperty("java.home"))
-            GraphicsEnvironment.getLocalGraphicsEnvironment().allFonts
-                .filter {
-                    val fontFileName = it.fontFileName ?: return@filter false
-                    javaHome.isParentOf(Path(fontFileName))
-                }
-                .forEach {
-                    embeddedFamilyNames += FontFamilyKey(it.fontName) to it.fontName
-                }
-
-        } catch (ignored: Throwable) {
-        }
-    }
-
-    private fun Path.isParentOf(other: Path): Boolean {
-        val parent = absolute().normalize()
-        val child = other.absolute().normalize()
-
-        if (parent.nameCount >= other.nameCount) return false
-
-        val childParent = child.parent ?: return false
-        return parent.isSameFileAs(childParent) || parent.isParentOf(childParent)
-    }
-
-    private fun Path.isSameFileAs(other: Path): Boolean =
-        try {
-            // Try to use Files.isSameFile() as it also follows symlinks
-            Files.isSameFile(this, other)
-        } catch (e: IOException) {
-            // Fall back on simple path equivalence
-            absolute().normalize() == other.absolute().normalize()
-        }
-
-    /**
      * Suspend execution until the font family names caching has
      * been completed.
      */
-    suspend fun ensureSystemFontsCached() {
+    private suspend fun ensureSystemFontsCached() {
         if (!allFontsCachedImpl) {
             waitChannel.receive()
         }
@@ -220,6 +113,8 @@ private object SkiaSystemFontProvider : SystemFontProvider {
     }
 
     override suspend fun getTypefaceOrNull(familyName: String, fontStyle: FontStyle): Typeface? {
+        ensureSystemFontsCached()
+
         val key = FontFamilyKey(familyName)
 
         if (isAppleSystemFont(key)) {
@@ -243,6 +138,8 @@ private object SkiaSystemFontProvider : SystemFontProvider {
         awtLogicalFamilyNames.containsKey(key)
 
     override suspend fun getFontFamilyOrNull(familyName: String): FontFamily? {
+        ensureSystemFontsCached()
+
         val key = FontFamilyKey(familyName)
 
         if (isAppleSystemFont(key)) {
@@ -250,19 +147,19 @@ private object SkiaSystemFontProvider : SystemFontProvider {
             // They are the same, hidden San Francisco font, but we need to do this
             // for AWT compatibility reasons.
             return FontMgr.default.matchFamily(FontFamilyKey.Apple.SystemFont.familyName)
-                .use { it.toFontFamilyOrNull(familyName) }
+                .use { it.toFontFamilyOrNull(familyName, FontFamily.FontFamilySource.System) }
         }
 
         if (!familyNamesCache.contains(key)) return null
 
         return FontMgr.default.matchFamily(familyName)
-            .use { it.toFontFamilyOrNull(familyName) }
+            .use { it.toFontFamilyOrNull(familyName, FontFamily.FontFamilySource.System) }
     }
 
-    private fun FontStyleSet.toFontFamilyOrNull(familyName: String): FontFamily? {
+    private fun FontStyleSet.toFontFamilyOrNull(familyName: String, source: FontFamily.FontFamilySource): FontFamily? {
         if (count() < 1) return null
 
-        return FontFamily.fromTypefaces(familyName).apply {
+        return FontFamily(familyName, source).apply {
             for (i in 0 until count()) {
                 addTypeface(getTypeface(i)!!)
             }
@@ -275,7 +172,7 @@ private object SkiaSystemFontProvider : SystemFontProvider {
     }
 
     /**
-     * Check if the given [key] exists in the system.
+     * Check if the given [key] exists.
      *
      * This function will suspend until the caching is complete.
      *

@@ -1,7 +1,10 @@
 package org.jetbrains.skiko
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import org.jetbrains.skiko.context.isRunningOnJetBrainsRuntime
+import org.jetbrains.skiko.util.assertOpensAreSet
 import org.junit.Assume
 import org.junit.Test
 import kotlin.test.assertContains
@@ -9,8 +12,8 @@ import kotlin.test.assertTrue
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class SkiaSystemFontProviderTest {
-    private val provider = SystemFontProvider.skia
+class SkiaFontProviderTest {
+    private val provider = FontProvider.Skia
 
     @Test
     fun `should contain at least some font families`() = runTest {
@@ -36,26 +39,26 @@ class SkiaSystemFontProviderTest {
     }
 
     @Test
-    fun `should provide embedded fonts when running on JetBrains Runtime`() = runTest {
+    fun `should be able to resolve logical fonts when running on JetBrains Runtime`() = runTest {
         Assume.assumeTrue(isRunningOnJetBrainsRuntime())
-        
+
         assertOpensAreSet()
-        val embeddedFamilies = AwtFontUtils.fontFamilyNamesOrNull()!!
-            .onlyEmbeddedFamilies()
+        val logicalFamilies = AwtFontUtils.fontFamilyNamesOrNull()!!
+            .onlyAwtLogicalFamilies()
             .toSet()
 
-        val skiaFamilies = provider.familyNames()
-
-        val missingEmbeddedFamilies = mutableSetOf<String>()
-        for (awtFamily in embeddedFamilies) {
-            if (awtFamily !in skiaFamilies) {
-                missingEmbeddedFamilies += awtFamily
+        val missingLogicalFamilies = mutableSetOf<String>()
+        for (logicalFamily in logicalFamilies) {
+            val resolved = AwtFontUtils.resolvePhysicalFontNameOrNull(logicalFamily)
+            if (resolved == null) {
+                missingLogicalFamilies += logicalFamily
             }
         }
 
         assertTrue(
-            missingEmbeddedFamilies.isEmpty(),
-            "These embedded font families are missing:\n${missingEmbeddedFamilies.joinToString("\n") { " * $it" }}"
+            actual = missingLogicalFamilies.isEmpty(),
+            message = "These logical font families can't be resolved:\n" +
+                    missingLogicalFamilies.joinToString("\n") { " * $it" }
         )
     }
 
@@ -64,10 +67,11 @@ class SkiaSystemFontProviderTest {
         // Listing of font family names is broken on non-macOS JVM implementations,
         // except when running on the JetBrains Runtime. Our matching logic only
         // works on the JetBrains Runtime.
-        Assume.assumeTrue(isRunningOnJetBrainsRuntime())
+        Assume.assumeTrue("Not running on the JetBrains Runtime", isRunningOnJetBrainsRuntime())
 
         val awtFamilies = AwtFontUtils.fontFamilyNamesOrNull()!!
             .ignoreVirtualAwtFontFamilies()
+            .ignoreEmbeddedFontFamilies()
             .toSet()
 
         val skiaFamilies = provider.familyNames()
@@ -89,13 +93,15 @@ class SkiaSystemFontProviderTest {
 private fun Iterable<String>.ignoreVirtualAwtFontFamilies() =
     filterNot { FontFamilyKey(it) in FontFamilyKey.Awt.awtLogicalFonts }
 
-private fun Iterable<String>.onlyEmbeddedFamilies() =
-    filterNot { FontFamilyKey(it) in FontFamilyKey.Awt.awtLogicalFonts }
+private fun Iterable<String>.ignoreEmbeddedFontFamilies(): List<String> {
+    val embeddedFamilyKeys = runBlocking { JvmEmbeddedFontProvider.familyNames() }
+        .map { FontFamilyKey(it) }
+    val embeddedMappedFamilyKeys = runBlocking { JvmEmbeddedFontProvider.embeddedFontFamilyMap() }
+        .map { FontFamilyKey(it.value) }
 
-private fun isRunningOnJetBrainsRuntime() =
-    System.getProperty("java.vendor")
-        .equals("JetBrains s.r.o.", ignoreCase = true)
-
-private fun assertOpensAreSet() {
-    assertTrue(InternalSunApiChecker.isSunFontApiAccessible(), "The --add-opens statement is missing!")
+    return filterNot { FontFamilyKey(it) in embeddedFamilyKeys }
+        .filterNot { FontFamilyKey(it) in embeddedMappedFamilyKeys }
 }
+
+private fun Iterable<String>.onlyAwtLogicalFamilies() =
+    filter { FontFamilyKey(it) in FontFamilyKey.Awt.awtLogicalFonts }

@@ -22,11 +22,12 @@ import java.io.File
  * need anymore.
  */
 class AwtFontManager @InternalSkikoApi constructor(
-    private val systemFontProvider: SystemFontProvider,
+    private val systemFontProvider: FontProvider,
+    private val embeddedFontProvider: FontProvider,
     private val customTypefaceCache: TypefaceCache
 ) {
 
-    constructor() : this(SystemFontProvider.skia, TypefaceCache.inMemory())
+    constructor() : this(FontProvider.Skia, FontProvider.JvmEmbedded, TypefaceCache.inMemory())
 
     /**
      * Invalidate the system font cache, causing the list of font families available
@@ -51,8 +52,8 @@ class AwtFontManager @InternalSkikoApi constructor(
         val customTypeface = customTypefaceCache.getTypefaceOrNull(familyName, fontStyle)
         if (customTypeface != null) return customTypeface
 
-        if (!systemFontProvider.contains(familyName)) return null
-        return systemFontProvider.getTypefaceOrNull(familyName, fontStyle)
+        return embeddedFontProvider.getTypefaceOrNull(familyName, fontStyle)
+            ?: systemFontProvider.getTypefaceOrNull(familyName, fontStyle)
     }
 
     /**
@@ -63,6 +64,7 @@ class AwtFontManager @InternalSkikoApi constructor(
         sortedSetOf<String>()
             .also {
                 it.addAll(systemFamilyNames())
+                it.addAll(embeddedFamilyNames())
                 it.addAll(customFamilyNames())
             }
 
@@ -72,6 +74,13 @@ class AwtFontManager @InternalSkikoApi constructor(
      * @see getTypefaceOrNull
      */
     suspend fun systemFamilyNames(): Set<String> = systemFontProvider.familyNames().toSortedSet()
+
+    /**
+     * Lists all known embedded font family names.
+     *
+     * @see getTypefaceOrNull
+     */
+    suspend fun embeddedFamilyNames(): Set<String> = embeddedFontProvider.familyNames().toSortedSet()
 
     /**
      * List the font families for all registered custom fonts.

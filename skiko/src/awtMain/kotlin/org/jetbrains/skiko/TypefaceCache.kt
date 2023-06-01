@@ -143,8 +143,8 @@ private class InMemoryTypefaceCache private constructor(
 
     override fun addTypeface(typeface: Typeface) {
         val key = FontFamilyKey(typeface.familyName)
-        val fontFamily = fontFamiliesCache.getOrPut(key) { FontFamily(typeface.familyName) }
-        fontFamily += typeface
+        val fontFamily = FontFamily.fromTypefaces(typeface.familyName, FontFamily.FontFamilySource.Custom, typeface)
+        fontFamiliesCache.getOrPut(key) { fontFamily }
         familyNamesCache += typeface.familyName
     }
 

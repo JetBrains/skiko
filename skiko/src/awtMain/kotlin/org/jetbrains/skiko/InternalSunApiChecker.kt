@@ -1,5 +1,6 @@
 package org.jetbrains.skiko
 
+import org.jetbrains.skiko.context.isRunningOnJetBrainsRuntime
 import java.awt.Font
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -10,6 +11,10 @@ internal object InternalSunApiChecker {
 
     fun isSunFontApiAccessible(): Boolean {
         if (hasCheckedAccess.get()) return isSunFontAccessible.get()
+
+        if (!isRunningOnJetBrainsRuntime()) {
+            logJbrWarning()
+        }
 
         val canAccess = canAccessSunFontApi()
         if (!canAccess) {
@@ -39,27 +44,39 @@ internal object InternalSunApiChecker {
                 if (font.fontFamilyName == null) return false
             }
 
+            println("Sun Font APIs are accessible, advanced font features are available")
             return true
         } catch (e: Throwable) {
             return false
         }
     }
 
+    private fun logJbrWarning() {
+        println(
+            """
+            |The Java Runtime in use may not support all advanced Skiko features.
+            |It is recommended that you run this app on the JetBrains Runtime for
+            |best results.
+            """.trimMargin()
+        )
+    }
+
     private fun logInstructions() {
         System.err.println(
             """
-            !!! WARNING !!!
-            For Skiko to run optimally, you should add the following argument
-            to the command for this program:
-            
-            --add-opens java.desktop/sun.font=ALL-UNNAMED 
-            
-            This is required to be able to properly match the Skia fonts with
-            the AWT fonts and access private JDK APIs used for some advanced
-            features. It is also recommended to use the JetBrains Runtime, to
-            take advantage of several UI fixes, including HiDPI support and
-            font handling and rendering.
-        """.trimIndent()
+            |
+            |!!! WARNING !!!
+            |For Skiko to run optimally, you should add the following argument
+            |to the command for this program:
+            |
+            |--add-opens java.desktop/sun.font=ALL-UNNAMED 
+            |
+            |This is required to be able to properly match the Skia fonts with
+            |the AWT fonts and access private JDK APIs used for some advanced
+            |features. It is also recommended to use the JetBrains Runtime, to
+            |take advantage of several UI fixes, including HiDPI support and
+            |font handling and rendering.
+            """.trimMargin()
         )
     }
 }

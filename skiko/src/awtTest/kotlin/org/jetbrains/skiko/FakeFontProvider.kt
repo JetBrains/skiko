@@ -2,10 +2,11 @@ package org.jetbrains.skiko
 
 import org.jetbrains.skia.FontStyle
 import org.jetbrains.skia.Typeface
+import org.jetbrains.skiko.FontFamily.FontFamilySource
 
-internal class FakeSystemFontProvider(
-    val families: MutableMap<FontFamilyKey, FontFamily> = mutableMapOf()
-) : SystemFontProvider {
+internal class FakeFontProvider(
+    private val families: MutableMap<FontFamilyKey, FontFamily> = mutableMapOf()
+) : FontProvider {
 
     var lastGetName: String? = null
         private set
@@ -43,9 +44,9 @@ internal class FakeSystemFontProvider(
         return families[key]
     }
 
-    fun addEmptyFontFamily(familyName: String): FontFamily {
+    fun addEmptyFontFamily(familyName: String, source: FontFamilySource = FontFamilySource.Custom): FontFamily {
         val key = FontFamilyKey(familyName)
-        val family = FontFamily(familyName)
+        val family = FontFamily(familyName, source)
         families += key to family
         return family
     }

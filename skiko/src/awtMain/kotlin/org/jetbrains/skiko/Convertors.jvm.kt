@@ -284,7 +284,7 @@ suspend fun java.awt.Font.toSkikoTypefaceOrNull(fontManager: AwtFontManager) = w
  * expect they will be matching the corresponding constants, as the intent is to map
  * to the relative weight scale.
  */
-private fun toSkikoWeight(weight: Float) =
+internal fun toSkikoWeight(weight: Float) =
     when {
         weight <= .01f -> FontWeight.INVISIBLE // Imprecise match
         weight <= TextAttribute.WEIGHT_EXTRA_LIGHT -> FontWeight.THIN // Imprecise match
@@ -310,7 +310,7 @@ private fun toSkikoWeight(weight: Float) =
  * widths of [FontWidth.ULTRA_CONDENSED], [FontWidth.EXTRA_CONDENSED], [FontWidth.EXTRA_EXPANDED],
  * and [FontWidth.ULTRA_EXPANDED].
  */
-private fun toSkikoWidth(width: Float) =
+internal fun toSkikoWidth(width: Float) =
     when {
         width <= TextAttribute.WIDTH_CONDENSED -> FontWidth.CONDENSED
         width <= TextAttribute.WIDTH_SEMI_CONDENSED -> FontWidth.SEMI_CONDENSED
@@ -332,7 +332,7 @@ private fun toSkikoWidth(width: Float) =
  * This is even more confusing, since AWT calls [TextAttribute.POSTURE_OBLIQUE]
  * the value that corresponds to [java.awt.Font.ITALIC].
  */
-private fun toSkikoSlant(posture: Float) =
+internal fun toSkikoSlant(posture: Float) =
     when {
         posture <= TextAttribute.POSTURE_REGULAR -> FontSlant.UPRIGHT
         else -> FontSlant.ITALIC

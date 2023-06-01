@@ -2,15 +2,14 @@
 
 package org.jetbrains.skiko
 
-import org.jetbrains.annotations.NonNls
+import org.jetbrains.skiko.ReflectionUtil.findFieldInHierarchy
+import org.jetbrains.skiko.ReflectionUtil.getDeclaredMethodOrNull
+import org.jetbrains.skiko.ReflectionUtil.getFieldValueOrNull
 import java.awt.Font
 import java.awt.GraphicsEnvironment
-import java.lang.reflect.Field
-import java.lang.reflect.InaccessibleObjectException
 import java.lang.reflect.Method
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import java.util.function.Predicate
 
 @InternalSkikoApi
 object AwtFontUtils {
@@ -223,103 +222,4 @@ object AwtFontUtils {
 
     private fun getFont2DMethodOrNull(methodName: String, vararg parameters: Class<*>): Method? =
         getDeclaredMethodOrNull(Font2DClass, methodName, *parameters)
-
-    private fun getDeclaredMethodOrNull(
-        clazz: Class<*>,
-        name: String,
-        vararg parameters: Class<*>
-    ): Method? =
-        try {
-            clazz.getDeclaredMethod(name, *parameters)
-                .apply { isAccessible = true }
-        } catch (e: NoSuchMethodException) {
-            null
-        } catch (e: InaccessibleObjectException) {
-            null
-        }
-
-    private fun <T> getFieldValueOrNull(
-        objectClass: Class<*>,
-        `object`: Any?,
-        fieldType: Class<T>?,
-        fieldName: String
-    ): T? =
-        try {
-            val field: Field = findAssignableField(objectClass, fieldType, fieldName)
-            getFieldValue<T>(field, `object`)
-        } catch (e: NoSuchFieldException) {
-            null
-        }
-
-    private fun findAssignableField(
-        clazz: Class<*>,
-        fieldType: Class<*>?,
-        @NonNls fieldName: String
-    ): Field {
-        val result = findFieldInHierarchy(
-            clazz
-        ) { field: Field ->
-            fieldName == field.name && (fieldType == null || fieldType.isAssignableFrom(
-                field.type
-            ))
-        }
-        if (result != null) {
-            return result
-        }
-        throw NoSuchFieldException("Class: $clazz fieldName: $fieldName fieldType: $fieldType")
-    }
-
-    private fun findFieldInHierarchy(
-        rootClass: Class<*>,
-        checker: Predicate<in Field>
-    ): Field? {
-        var aClass: Class<*>? = rootClass
-
-        try {
-            while (aClass != null) {
-                for (field in aClass.declaredFields) {
-                    if (checker.test(field)) {
-                        field.isAccessible = true
-                        return field
-                    }
-                }
-                aClass = aClass.superclass
-            }
-        } catch (e: InaccessibleObjectException) {
-            return null
-        }
-
-        return processInterfaces(rootClass.interfaces, HashSet(), checker)
-    }
-
-    private fun processInterfaces(
-        interfaces: Array<Class<*>>,
-        visited: MutableSet<in Class<*>>,
-        checker: Predicate<in Field>
-    ): Field? {
-        for (anInterface in interfaces) {
-            if (!visited.add(anInterface)) {
-                continue
-            }
-            for (field in anInterface.declaredFields) {
-                if (checker.test(field)) {
-                    field.isAccessible = true
-                    return field
-                }
-            }
-            val field = processInterfaces(anInterface.interfaces, visited, checker)
-            if (field != null) {
-                return field
-            }
-        }
-        return null
-    }
-
-    private fun <T> getFieldValue(field: Field, instance: Any?): T? =
-        try {
-            @Suppress("UNCHECKED_CAST")
-            field[instance] as T
-        } catch (e: IllegalAccessException) {
-            null
-        }
 }

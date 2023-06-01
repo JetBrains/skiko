@@ -40,7 +40,7 @@ internal class TestTypefaceCache : TypefaceCache {
 
     override fun addTypeface(typeface: Typeface) {
         val key = FontFamilyKey(typeface.familyName)
-        val fontFamily = families.getOrPut(key) { FontFamily(typeface.familyName) }
+        val fontFamily = families.getOrPut(key) { FontFamily(typeface.familyName, FontFamily.FontFamilySource.Custom) }
         fontFamily += typeface
     }
 
