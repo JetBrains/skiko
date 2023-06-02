@@ -53,7 +53,7 @@ internal class MetalContextHandler(
     }
 
     // throws RenderException if initialization of graphic context was not successful
-    fun draw() {
+    fun draw(drawable: Long) {
         if (!initContext()) {
             throw RenderException("Cannot init graphic context")
         }
@@ -62,7 +62,7 @@ internal class MetalContextHandler(
         val height = (layer.backedLayer.height * scale).toInt().coerceAtLeast(0)
 
         if (width > 0 && height > 0) {
-            BackendRenderTarget(makeMetalRenderTarget(device.ptr, width, height)).use { renderTarget ->
+            BackendRenderTarget(makeMetalRenderTarget(device.ptr, drawable, width, height)).use { renderTarget ->
                 val surface = Surface.makeFromBackendRenderTarget(
                     context!!,
                     renderTarget,
@@ -76,21 +76,15 @@ internal class MetalContextHandler(
                     val canvas = surface.canvas
                     canvas.clear(0)
                     layer.draw(canvas)
-
                     context?.flush()
                     surface.flushAndSubmit()
-                    finishFrame(device.ptr)
                 }
             }
-        } else {
-            context?.flush()
-            finishFrame(device.ptr)
         }
     }
 
     private external fun makeMetalContext(device: Long): Long
-    private external fun makeMetalRenderTarget(device: Long, width: Int, height: Int): Long
-    private external fun finishFrame(device: Long)
+    private external fun makeMetalRenderTarget(device: Long, drawable: Long, width: Int, height: Int): Long
 
     data class AdapterInfo(val adapterName: String, val adapterMemorySize: Long)
 }

@@ -289,5 +289,28 @@ JNIEXPORT jboolean JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_isOcc
     }
 }
 
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_nextDrawable(
+    JNIEnv* env, jobject contextHandler, jlong devicePtr)
+{
+    MetalDevice *device = (__bridge MetalDevice *) (void *) devicePtr;
+    return (jlong) (__bridge_retained void *) [device.layer nextDrawable]
+}
+
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_commitDrawable(
+    JNIEnv *env, jobject contextHandler, jlong devicePtr, jlong drawablePtr)
+{
+    @autoreleasepool {
+        MetalDevice *device = (__bridge MetalDevice *) (void *) devicePtr;
+        id<CAMetalDrawable> drawable = (__bridge_transfer id<CAMetalDrawable>) (void *) drawablePtr;
+
+        if (currentDrawable) {
+            id<MTLCommandBuffer> commandBuffer = [device.queue commandBuffer];
+            commandBuffer.label = @"Present";
+            [commandBuffer presentDrawable:drawable];
+            [commandBuffer commit];
+        }
+    }
+}
+
 } // extern C
 #endif

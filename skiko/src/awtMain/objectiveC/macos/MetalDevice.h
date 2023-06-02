@@ -12,7 +12,6 @@
 @property (retain, strong) AWTMetalLayer *layer;
 @property (retain, strong) id<MTLDevice> adapter;
 @property (retain, strong) id<MTLCommandQueue> queue;
-@property (retain, strong) id<CAMetalDrawable> drawableHandle;
 
 @end
 

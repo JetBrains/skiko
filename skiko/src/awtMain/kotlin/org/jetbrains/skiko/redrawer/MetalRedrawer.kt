@@ -140,9 +140,11 @@ internal class MetalRedrawer(
     private fun performDraw() = synchronized(drawLock) {
         if (!isDisposed) {
             val handle = startRendering()
+            val drawable = nextDrawable(device.ptr)
             try {
-                contextHandler.draw()
+                contextHandler.draw(drawable)
             } finally {
+                commitDrawable(device.ptr, drawable)
                 endRendering(handle)
             }
         }
@@ -178,4 +180,7 @@ internal class MetalRedrawer(
     private external fun getAdapterMemorySize(adapter: Long): Long
     private external fun startRendering(): Long
     private external fun endRendering(handle: Long)
+
+    private external fun nextDrawable(device: Long): Long
+    private external fun commitDrawable(device: Long, drawable: Long)
 }
