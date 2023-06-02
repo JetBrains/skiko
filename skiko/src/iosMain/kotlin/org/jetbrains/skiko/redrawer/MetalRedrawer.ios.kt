@@ -18,6 +18,8 @@ import platform.Metal.MTLPixelFormatBGRA8Unorm
 import platform.QuartzCore.*
 import platform.UIKit.window
 import platform.darwin.NSObject
+import kotlin.native.ref.WeakReference
+import kotlinx.cinterop.internal.resetAssociatedObject
 
 private enum class DrawSchedulingState {
     AVAILABLE_ON_NEXT_FRAME,
@@ -34,7 +36,7 @@ internal class MetalRedrawer(
     private var isDisposed = false
     internal val device = MTLCreateSystemDefaultDevice() ?: throw IllegalStateException("Metal is not supported on this system")
     private val queue = device.newCommandQueue() ?: throw IllegalStateException("Couldn't create Metal command queue")
-    private var currentDrawable: CAMetalDrawableProtocol? = null
+    private var currentDrawable: Pair<WeakReference<CAMetalDrawableProtocol>, CAMetalDrawableProtocol>? = null
     private val metalLayer = MetalLayer()
 
     /*
@@ -105,8 +107,11 @@ internal class MetalRedrawer(
     fun makeContext() = DirectContext.makeMetal(device.objcPtr(), queue.objcPtr())
 
     fun makeRenderTarget(width: Int, height: Int): BackendRenderTarget {
-        currentDrawable = metalLayer.nextDrawable()!!
-        return BackendRenderTarget.makeMetal(width, height, currentDrawable!!.texture.objcPtr())
+        val drawable = metalLayer.nextDrawable()!!
+
+        currentDrawable = WeakReference(drawable) to drawable
+
+        return BackendRenderTarget.makeMetal(width, height, drawable.texture.objcPtr())
     }
 
     override fun dispose() {
@@ -189,8 +194,9 @@ internal class MetalRedrawer(
             currentDrawable?.let {
                 val commandBuffer = queue.commandBuffer()!!
                 commandBuffer.label = "Present"
-                commandBuffer.presentDrawable(it)
+                commandBuffer.presentDrawable(it.second)
                 commandBuffer.commit()
+                it.first.resetAssociatedObject()
                 currentDrawable = null
             }
         }
