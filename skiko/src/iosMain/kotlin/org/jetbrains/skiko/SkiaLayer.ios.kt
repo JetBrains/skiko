@@ -8,13 +8,9 @@ import org.jetbrains.skiko.redrawer.MetalRedrawer
 import platform.UIKit.*
 import kotlin.system.getTimeNanos
 import org.jetbrains.skia.*
+import platform.QuartzCore.CAMetalLayer
 
 actual open class SkiaLayer {
-
-    fun isShowing(): Boolean {
-        return true
-    }
-
     fun showScreenKeyboard() {
         view?.becomeFirstResponder()
     }
@@ -71,14 +67,16 @@ actual open class SkiaLayer {
     }
 
     actual fun attachTo(container: Any) {
-        attachTo(container as UIView)
+        val view = container as SkikoUIView
+
+        attachTo(view, view.metalLayer)
     }
 
-    fun attachTo(view: UIView) {
+    fun attachTo(view: SkikoUIView, metalLayer: CAMetalLayer) {
         this.view = view
         contextHandler = MetalContextHandler(this)
         // TODO: maybe add observer for view.viewDidDisappear() to detach us?
-        redrawer = MetalRedrawer(this).apply {
+        redrawer = MetalRedrawer(this, metalLayer).apply {
             needRedraw()
         }
     }

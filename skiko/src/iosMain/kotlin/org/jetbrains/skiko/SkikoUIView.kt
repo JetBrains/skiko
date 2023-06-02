@@ -5,6 +5,8 @@ import org.jetbrains.skia.Point
 import org.jetbrains.skia.Rect
 import platform.CoreGraphics.*
 import platform.Foundation.*
+import platform.Metal.MTLPixelFormatBGRA8Unorm
+import platform.QuartzCore.CAMetalLayer
 import platform.UIKit.*
 import platform.darwin.NSInteger
 import kotlin.math.max
@@ -18,6 +20,11 @@ import kotlin.math.min
 @ExportObjCClass
 class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
     org.jetbrains.skiko.objc.UIViewExtensionProtocol {
+
+    companion object : UIViewMeta() {
+        override fun layerClass() = CAMetalLayer
+    }
+
     @OverrideInit
     constructor(frame: CValue<CGRect>) : super(frame)
 
@@ -26,12 +33,30 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
 
     init {
         multipleTouchEnabled = true
+
+        metalLayer.apply {
+            pixelFormat = MTLPixelFormatBGRA8Unorm
+
+            doubleArrayOf(0.0, 0.0, 0.0, 0.0).usePinned {
+                backgroundColor =
+                        CGColorCreate(CGColorSpaceCreateDeviceRGB(), it.addressOf(0))
+            }
+
+            opaque = false
+        }
+
+        layer.actions = listOf(
+                "onOrderIn", "onOrderOut", "sublayers", "contents", "position", "bounds"
+        ).associateWith { NSNull.`null`() }
     }
 
     private var skiaLayer: SkiaLayer? = null
     private lateinit var _pointInside: (Point, UIEvent?) -> Boolean
     private var _inputDelegate: UITextInputDelegateProtocol? = null
     private var _currentTextMenuActions: TextActions? = null
+    val metalLayer: CAMetalLayer
+        get() = layer as CAMetalLayer
+
     var currentKeyboardType: UIKeyboardType = UIKeyboardTypeDefault
     var currentKeyboardAppearance: UIKeyboardAppearance = UIKeyboardAppearanceDefault
     var currentReturnKeyType: UIReturnKeyType = UIReturnKeyType.UIReturnKeyDefault

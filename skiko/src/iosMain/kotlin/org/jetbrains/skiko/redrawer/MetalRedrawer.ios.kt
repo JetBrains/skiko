@@ -26,7 +26,8 @@ private enum class DrawSchedulingState {
 }
 
 internal class MetalRedrawer(
-    private val layer: SkiaLayer
+    private val layer: SkiaLayer,
+    private val metalLayer: CAMetalLayer
 ) : Redrawer {
     private val contextHandler = MetalContextHandler(layer)
     override val renderInfo: String get() = contextHandler.rendererInfo()
@@ -35,7 +36,6 @@ internal class MetalRedrawer(
     internal val device = MTLCreateSystemDefaultDevice() ?: throw IllegalStateException("Metal is not supported on this system")
     private val queue = device.newCommandQueue() ?: throw IllegalStateException("Couldn't create Metal command queue")
     private var currentDrawable: CAMetalDrawableProtocol? = null
-    private val metalLayer = MetalLayer()
 
     /*
      * Initial value is [DrawSchedulingState.AVAILABLE_ON_NEXT_FRAME] because voluntarily dispatching a frame
@@ -77,7 +77,7 @@ internal class MetalRedrawer(
             }
 
             DrawSchedulingState.SCHEDULED_ON_NEXT_FRAME -> {
-                drawIfLayerIsShowing()
+                draw()
 
                 drawSchedulingState = DrawSchedulingState.AVAILABLE_ON_NEXT_FRAME
             }
@@ -97,9 +97,10 @@ internal class MetalRedrawer(
         selector = NSSelectorFromString(FrameTickListener::onDisplayLinkTick.name)
     )
     init {
-        metalLayer.init(this.layer, contextHandler, device)
         caDisplayLink.setPaused(true)
         caDisplayLink.addToRunLoop(NSRunLoop.mainRunLoop, NSRunLoop.mainRunLoop.currentMode)
+
+        metalLayer.device = device as objcnames.protocols.MTLDeviceProtocol?
     }
 
     fun makeContext() = DirectContext.makeMetal(device.objcPtr(), queue.objcPtr())
@@ -113,7 +114,6 @@ internal class MetalRedrawer(
         if (!isDisposed) {
             caDisplayLink.invalidate()
             contextHandler.dispose()
-            metalLayer.dispose()
             isDisposed = true
         }
     }
@@ -121,12 +121,10 @@ internal class MetalRedrawer(
     override fun syncSize() {
         metalLayer.contentsScale = layer.contentScale.toDouble()
         val osView = layer.view!!
-        val (w, h) = osView.frame.useContents {
-            size.width to size.height
+
+        metalLayer.bounds.useContents {
+            metalLayer.drawableSize = CGSizeMake(size.width * metalLayer.contentsScale, size.height * metalLayer.contentsScale)
         }
-        metalLayer.frame = osView.frame
-        metalLayer.init(layer, contextHandler, device)
-        metalLayer.drawableSize = CGSizeMake(w * metalLayer.contentsScale, h * metalLayer.contentsScale)
 
         osView.window?.screen?.maximumFramesPerSecond?.let {
             caDisplayLink.preferredFramesPerSecond = it
@@ -145,6 +143,7 @@ internal class MetalRedrawer(
 
     override fun redrawImmediately() {
         check(!isDisposed) { "MetalRedrawer is disposed" }
+
         draw()
     }
 
@@ -158,7 +157,7 @@ internal class MetalRedrawer(
             }
 
             DrawSchedulingState.AVAILABLE_ON_CURRENT_FRAME -> {
-                drawIfLayerIsShowing()
+                draw()
 
                 drawSchedulingState = DrawSchedulingState.AVAILABLE_ON_NEXT_FRAME
             }
@@ -166,12 +165,6 @@ internal class MetalRedrawer(
             DrawSchedulingState.SCHEDULED_ON_NEXT_FRAME -> {
                 // already scheduled, do nothing
             }
-        }
-    }
-
-    private fun drawIfLayerIsShowing() {
-        if (layer.isShowing()) {
-            draw()
         }
     }
 
@@ -197,50 +190,50 @@ internal class MetalRedrawer(
     }
 }
 
-internal class MetalLayer : CAMetalLayer {
-    private lateinit var skiaLayer: SkiaLayer
-    private lateinit var contextHandler: ContextHandler
-
-    @OverrideInit
-    constructor() : super()
-
-    @OverrideInit
-    constructor(layer: Any) : super(layer)
-
-    fun init(
-        skiaLayer: SkiaLayer,
-        contextHandler: ContextHandler,
-        theDevice: MTLDeviceProtocol
-    ) {
-        this.skiaLayer = skiaLayer
-        this.contextHandler = contextHandler
-        this.setNeedsDisplayOnBoundsChange(true)
-        this.removeAllAnimations()
-        // TODO: looks like a bug in K/N interop.
-        this.device = theDevice as objcnames.protocols.MTLDeviceProtocol?
-        this.pixelFormat = MTLPixelFormatBGRA8Unorm
-        this.contentsGravity = kCAGravityTopLeft
-        doubleArrayOf(0.0, 0.0, 0.0, 0.0).usePinned {
-            this.backgroundColor =
-                CGColorCreate(CGColorSpaceCreateDeviceRGB(), it.addressOf(0))
-        }
-        this.opaque = false // For UIKit interop through a "Hole"
-        skiaLayer.view?.let {
-            this.frame = it.frame
-            it.layer.addSublayer(this)
-        }
-    }
-
-    fun dispose() {
-        this.removeFromSuperlayer()
-        // TODO: anything else to dispose the layer?
-    }
-
-    override fun drawInContext(ctx: CGContextRef?) {
-        contextHandler.draw()
-        super.drawInContext(ctx)
-    }
-}
+//internal class MetalLayer : CAMetalLayer {
+//    private lateinit var skiaLayer: SkiaLayer
+//    private lateinit var contextHandler: ContextHandler
+//
+//    @OverrideInit
+//    constructor() : super()
+//
+//    @OverrideInit
+//    constructor(layer: Any) : super(layer)
+//
+//    fun init(
+//        skiaLayer: SkiaLayer,
+//        contextHandler: ContextHandler,
+//        theDevice: MTLDeviceProtocol
+//    ) {
+//        this.skiaLayer = skiaLayer
+//        this.contextHandler = contextHandler
+//        this.setNeedsDisplayOnBoundsChange(true)
+//        this.removeAllAnimations()
+//        // TODO: looks like a bug in K/N interop.
+//        this.device = theDevice as objcnames.protocols.MTLDeviceProtocol?
+//        this.pixelFormat = MTLPixelFormatBGRA8Unorm
+//        this.contentsGravity = kCAGravityTopLeft
+//        doubleArrayOf(0.0, 0.0, 0.0, 0.0).usePinned {
+//            this.backgroundColor =
+//                CGColorCreate(CGColorSpaceCreateDeviceRGB(), it.addressOf(0))
+//        }
+//        this.opaque = false // For UIKit interop through a "Hole"
+//        skiaLayer.view?.let {
+//            this.frame = it.frame
+//            it.layer.addSublayer(this)
+//        }
+//    }
+//
+//    fun dispose() {
+//        this.removeFromSuperlayer()
+//        // TODO: anything else to dispose the layer?
+//    }
+//
+//    override fun drawInContext(ctx: CGContextRef?) {
+//        contextHandler.draw()
+//        super.drawInContext(ctx)
+//    }
+//}
 
 private class FrameTickListener(val onFrameTick: () -> Unit) : NSObject() {
     @ObjCAction
