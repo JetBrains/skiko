@@ -6,7 +6,6 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompileTool
-import org.jetbrains.kotlin.konan.target.KonanTarget
 
 plugins {
     kotlin("multiplatform") version "1.8.20"
@@ -68,12 +67,14 @@ if (supportWasm) {
         includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp/common/include"))
         includeHeadersNonRecursive(skiaHeadersDirs(skiaWasmDir.get()))
 
-        flags.set(listOf(
-            *skiaPreprocessorFlags(OS.Wasm),
-            *buildType.clangFlags,
-            "-fno-rtti",
-            "-fno-exceptions"
-        ))
+        flags.set(
+            listOf(
+                *skiaPreprocessorFlags(OS.Wasm),
+                *buildType.clangFlags,
+                "-fno-rtti",
+                "-fno-exceptions"
+            )
+        )
     }
 
     val linkWasm by tasks.registering(LinkSkikoWasmTask::class) {
@@ -88,7 +89,7 @@ if (supportWasm) {
         buildTargetArch.set(osArch.second)
         buildVariant.set(buildType)
 
-        libFiles = project.fileTree(unpackedSkia)  { include("**/*.a") }
+        libFiles = project.fileTree(unpackedSkia) { include("**/*.a") }
         objectFiles = project.fileTree(compileWasm.map { it.outDir.get() }) {
             include("**/*.o")
         }
@@ -98,13 +99,15 @@ if (supportWasm) {
 
         skikoJsPrefix.set(project.layout.projectDirectory.file("src/jsMain/resources/setup.js"))
 
-        flags.set(listOf(
-            "-l", "GL",
-            "-s", "USE_WEBGL2=1",
-            "-s", "OFFSCREEN_FRAMEBUFFER=1",
-            "-s", "ALLOW_MEMORY_GROWTH=1", // TODO: Is there a better way? Should we use `-s INITIAL_MEMORY=X`?
-            "--bind",
-        ))
+        flags.set(
+            listOf(
+                "-l", "GL",
+                "-s", "USE_WEBGL2=1",
+                "-s", "OFFSCREEN_FRAMEBUFFER=1",
+                "-s", "ALLOW_MEMORY_GROWTH=1", // TODO: Is there a better way? Should we use `-s INITIAL_MEMORY=X`?
+                "--bind",
+            )
+        )
 
         doLast {
             // skiko.js file is directly referenced in karma.config.d/wasm.js
@@ -151,7 +154,7 @@ fun compileNativeBridgesTask(os: OS, arch: Arch, isArm64Simulator: Boolean): Tas
         buildTargetArch.set(arch)
         buildVariant.set(buildType)
 
-        when (os)  {
+        when (os) {
             OS.IOS -> {
                 val sdkRoot = "/Applications/Xcode.app/Contents/Developer/Platforms"
                 val iphoneOsSdk = "$sdkRoot/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk"
@@ -162,37 +165,48 @@ fun compileNativeBridgesTask(os: OS, arch: Arch, isArm64Simulator: Boolean): Tas
                         "-isysroot", if (isArm64Simulator) iphoneSimSdk else iphoneOsSdk,
                         "-miphoneos-version-min=12.0"
                     )
+
                     Arch.X64 -> arrayOf(
                         "-target", "x86_64-apple-ios-simulator",
                         "-mios-version-min=12.0",
                         "-isysroot", iphoneSimSdk
                     )
+
                     else -> throw GradleException("Unsupported arch: $arch")
                 }
-                flags.set(listOf(
-                    *iosArchFlags,
-                    *buildType.clangFlags,
-                    "-stdlib=libc++",
-                    *skiaPreprocessorFlags(OS.IOS),
-                ))
+                flags.set(
+                    listOf(
+                        *iosArchFlags,
+                        *buildType.clangFlags,
+                        "-stdlib=libc++",
+                        *skiaPreprocessorFlags(OS.IOS),
+                    )
+                )
             }
+
             OS.MacOS -> {
-                flags.set(listOf(
-                    *buildType.clangFlags,
-                    *skiaPreprocessorFlags(OS.MacOS)
-                ))
+                flags.set(
+                    listOf(
+                        *buildType.clangFlags,
+                        *skiaPreprocessorFlags(OS.MacOS)
+                    )
+                )
             }
+
             OS.Linux -> {
-                flags.set(listOf(
-                    *buildType.clangFlags,
-                    "-fno-rtti",
-                    "-fno-exceptions",
-                    "-fvisibility=hidden",
-                    "-fvisibility-inlines-hidden",
-                    "-D_GLIBCXX_USE_CXX11_ABI=0",
-                    *skiaPreprocessorFlags(OS.Linux)
-                ))
+                flags.set(
+                    listOf(
+                        *buildType.clangFlags,
+                        "-fno-rtti",
+                        "-fno-exceptions",
+                        "-fvisibility=hidden",
+                        "-fvisibility-inlines-hidden",
+                        "-D_GLIBCXX_USE_CXX11_ABI=0",
+                        *skiaPreprocessorFlags(OS.Linux)
+                    )
+                )
             }
+
             else -> throw GradleException("$os not yet supported")
         }
 
@@ -212,7 +226,7 @@ internal val Project.isInIdea: Boolean
     }
 
 val Project.supportNative: Boolean
-   get() = findProperty("skiko.native.enabled") == "true" || isInIdea
+    get() = findProperty("skiko.native.enabled") == "true" || isInIdea
 
 val Project.supportWasm: Boolean
     get() = findProperty("skiko.wasm.enabled") == "true" || isInIdea
@@ -451,15 +465,20 @@ fun configureNativeTarget(os: OS, arch: Arch, target: KotlinNativeTarget) {
     }
     val skiaBinDir = "$skiaDir/out/${buildType.id}-$targetString"
     val linkerFlags = when (os) {
-        OS.MacOS -> mutableListOf("-linker-option", "-framework", "-linker-option", "Metal",
+        OS.MacOS -> mutableListOf(
+            "-linker-option", "-framework", "-linker-option", "Metal",
             "-linker-option", "-framework", "-linker-option", "CoreGraphics",
             "-linker-option", "-framework", "-linker-option", "CoreText",
             "-linker-option", "-framework", "-linker-option", "CoreServices"
         )
-        OS.IOS -> mutableListOf("-linker-option", "-framework", "-linker-option", "Metal",
+
+        OS.IOS -> mutableListOf(
+            "-linker-option", "-framework", "-linker-option", "Metal",
             "-linker-option", "-framework", "-linker-option", "CoreGraphics",
             "-linker-option", "-framework", "-linker-option", "UIKit",
-            "-linker-option", "-framework", "-linker-option", "CoreText")
+            "-linker-option", "-framework", "-linker-option", "CoreText"
+        )
+
         OS.Linux -> mutableListOf(
             "-linker-option", "-L/usr/lib/x86_64-linux-gnu",
             "-linker-option", "-lfontconfig",
@@ -470,16 +489,20 @@ fun configureNativeTarget(os: OS, arch: Arch, target: KotlinNativeTarget) {
             "-linker-option", "$skiaBinDir/libskunicode.a",
             "-linker-option", "$skiaBinDir/libskia.a"
         )
+
         else -> mutableListOf()
     }
     if (skiko.includeTestHelpers) {
-        linkerFlags.addAll(when (os) {
-            OS.Linux -> listOf(
-                "-linker-option", "-lX11",
-                "-linker-option", "-lGLX",
-            )
-            else -> emptyList()
-        })
+        linkerFlags.addAll(
+            when (os) {
+                OS.Linux -> listOf(
+                    "-linker-option", "-lX11",
+                    "-linker-option", "-lGLX",
+                )
+
+                else -> emptyList()
+            }
+        )
     }
 
     // For some reason since 1.8.0 we need to set freeCompilerArgs for binaries AND for compilations
@@ -511,10 +534,12 @@ fun configureNativeTarget(os: OS, arch: Arch, target: KotlinNativeTarget) {
                 executable = "ar"
                 argumentProviders.add { listOf("-crs", staticLib) }
             }
+
             OS.MacOS, OS.IOS -> {
                 executable = "libtool"
                 argumentProviders.add { listOf("-static", "-o", staticLib) }
             }
+
             else -> error("Unexpected OS for native bridges linking: $os")
         }
         argumentProviders.add { objectFiles.files.map { it.absolutePath } }
@@ -576,11 +601,13 @@ fun skiaPreprocessorFlags(os: OS): Array<String> {
             "-DSK_BUILD_FOR_MAC",
             "-DSK_METAL"
         )
+
         OS.IOS -> listOf(
             "-DSK_BUILD_FOR_IOS",
             "-DSK_SHAPER_CORETEXT_AVAILABLE",
             "-DSK_METAL"
         )
+
         OS.Windows -> listOf(
             "-DSK_BUILD_FOR_WIN",
             "-D_CRT_SECURE_NO_WARNINGS",
@@ -590,16 +617,20 @@ fun skiaPreprocessorFlags(os: OS): Array<String> {
             "-DSK_GAMMA_APPLY_TO_A8",
             "-DSK_DIRECT3D"
         )
+
         OS.Linux -> listOf(
             "-DSK_BUILD_FOR_LINUX",
             "-D_GLIBCXX_USE_CXX11_ABI=0"
         )
+
         OS.Wasm -> listOf(
             "-DSKIKO_WASM"
         )
+
         OS.Android -> listOf(
             "-DSK_BUILD_FOR_ANDROID"
         )
+
         else -> TODO("unsupported $os")
     }
 
@@ -628,7 +659,7 @@ fun skiaStaticLibraries(skiaDir: String, targetString: String): List<String> {
         "libzlib.a",
         "libjpeg.a",
         "libskshaper.a"
-    ).map{
+    ).map {
         "$skiaBinSubdir/$it"
     }
 }
@@ -780,22 +811,46 @@ fun Project.androidClangFor(targetArch: Arch, version: String = "30"): Provider<
 fun Provider<String>.orEmpty(): Provider<String> =
     orElse("")
 
-fun Project.androidJar(askedVersion: String = ""): Provider<File> =
+data class AndroidPlatformVersion(val major: Int, val ext: Int? = null) : Comparable<AndroidPlatformVersion> {
+    companion object {
+
+        val regex = Regex("android-(\\d*)(-ext(\\d*))?")
+        fun fromString(string: String) = regex.matchEntire(string)
+            ?.groupValues
+            ?.let { AndroidPlatformVersion(it[1].toInt(), it.getOrNull(3)?.takeIf { it.isNotBlank() }?.toInt()) }
+    }
+
+    override fun compareTo(other: AndroidPlatformVersion): Int = when {
+        major > other.major -> -1
+        major < other.major -> 1
+        else -> when {
+            ext != null && other.ext == null -> -1
+            ext == null && other.ext != null -> 1
+            else -> ext!!.compareTo(other.ext!!)
+        }
+    }
+
+    val folderName
+        get() = buildString {
+            append("android-$major")
+            if (ext != null) append("-ext$ext")
+        }
+}
+
+fun Project.androidJar(askedVersion: String? = null): Provider<File> =
     androidHomePath().map { androidHomePath ->
         val androidHome = File(androidHomePath)
-        val version = if (askedVersion.isEmpty()) {
-            val platformsDir = androidHome.resolve("platforms")
-            val versions = platformsDir.list().orEmpty()
-            versions.maxByOrNull { name -> // possible name: "android-32", "android-33-ext4"
-                name.split("-").getOrNull(1)?.toInt() ?: 0
-            } ?: error(
-                buildString {
-                    appendLine("'$platformsDir' does not contain any directories matching expected 'android-NUMBER' format: ${versions}")
-                }
+        val version = askedVersion?.let { "android-$it" }
+            ?: androidHome.resolve("platforms")
+                .listFiles()
+                ?.mapNotNull { AndroidPlatformVersion.fromString(it.name) }
+                ?.maxOrNull()
+                ?.folderName
+            ?: error(
+                "No platform tools available in directory " +
+                        "'\"'${androidHome.resolve("platforms").absolutePath}'\"' that matches " +
+                        "regex '${AndroidPlatformVersion.regex.pattern}'"
             )
-        } else {
-            "android-$askedVersion"
-        }
         androidHome.resolve("platforms/$version/android.jar")
     }
 
@@ -807,8 +862,10 @@ fun createCompileJvmBindingsTask(
     // Prefer 'java.home' system property to simplify overriding from Intellij.
     // When used from command-line, it is effectively equal to JAVA_HOME.
     if (JavaVersion.current() < JavaVersion.VERSION_11) {
-        error("JDK 11+ is required, but Gradle JVM is ${JavaVersion.current()}. " +
-                "Check JAVA_HOME (CLI) or Gradle settings (Intellij).")
+        error(
+            "JDK 11+ is required, but Gradle JVM is ${JavaVersion.current()}. " +
+                    "Check JAVA_HOME (CLI) or Gradle settings (Intellij)."
+        )
     }
     val jdkHome = File(System.getProperty("java.home") ?: error("'java.home' is null"))
     dependsOn(skiaJvmBindingsDir)
@@ -846,6 +903,7 @@ fun createCompileJvmBindingsTask(
                 "-fvisibility-inlines-hidden"
             )
         }
+
         OS.Linux -> {
             includeHeadersNonRecursive(jdkHome.resolve("include/linux"))
             includeHeadersNonRecursive(runPkgConfig("dbus-1"))
@@ -858,6 +916,7 @@ fun createCompileJvmBindingsTask(
                 "-fvisibility-inlines-hidden"
             )
         }
+
         OS.Windows -> {
             compiler.set(windowsSdkPaths.compiler.absolutePath)
             includeHeadersNonRecursive(windowsSdkPaths.includeDirs)
@@ -874,6 +933,7 @@ fun createCompileJvmBindingsTask(
                 // "-DSK_ANGLE",
             )
         }
+
         OS.Android -> {
             compiler.set(androidClangFor(targetArch))
             osFlags = arrayOf(
@@ -884,6 +944,7 @@ fun createCompileJvmBindingsTask(
                 "-fPIC"
             )
         }
+
         OS.Wasm, OS.IOS -> error("Should not reach here")
     }
 
@@ -902,79 +963,82 @@ fun createLinkJvmBindings(
     compileTask: TaskProvider<CompileSkikoCppTask>,
     objcCompileTask: TaskProvider<CompileSkikoObjCTask>?
 ) = project.registerSkikoTask<LinkSkikoTask>("linkJvmBindings", targetOs, targetArch) {
-        val target = targetId(targetOs, targetArch)
-        val skiaBinSubdir = "out/${buildType.id}-$target"
-        val skiaBinDir = skiaJvmBindingsDir.get().absolutePath + "/" + skiaBinSubdir
-        val osFlags: Array<String>
+    val target = targetId(targetOs, targetArch)
+    val skiaBinSubdir = "out/${buildType.id}-$target"
+    val skiaBinDir = skiaJvmBindingsDir.get().absolutePath + "/" + skiaBinSubdir
+    val osFlags: Array<String>
 
-        libFiles = fileTree(skiaJvmBindingsDir.map { it.resolve(skiaBinSubdir)}) {
-            include(if (targetOs.isWindows) "*.lib" else "*.a")
+    libFiles = fileTree(skiaJvmBindingsDir.map { it.resolve(skiaBinSubdir) }) {
+        include(if (targetOs.isWindows) "*.lib" else "*.a")
+    }
+
+    dependsOn(compileTask)
+    objectFiles = fileTree(compileTask.map { it.outDir.get() }) {
+        include("**/*.o")
+    }
+    val libNamePrefix = if (targetOs.isWindows) "skiko" else "libskiko"
+    libOutputFileName.set("$libNamePrefix-${targetOs.id}-${targetArch.id}${targetOs.dynamicLibExt}")
+    buildTargetOS.set(targetOs)
+    buildTargetArch.set(targetArch)
+    buildVariant.set(buildType)
+    linker.set(linkerForTarget(targetOs, targetArch))
+
+    when (targetOs) {
+        OS.MacOS -> {
+            dependsOn(objcCompileTask!!)
+            objectFiles += fileTree(objcCompileTask.map { it.outDir.get() }) {
+                include("**/*.o")
+            }
+            osFlags = arrayOf(
+                *targetOs.clangFlags,
+                "-arch", if (targetArch == Arch.Arm64) "arm64" else "x86_64",
+                "-shared",
+                "-dead_strip",
+                "-lobjc",
+                "-install_name", "./${libOutputFileName.get()}",
+                "-current_version", skiko.planeDeployVersion,
+                "-framework", "AppKit",
+                "-framework", "CoreFoundation",
+                "-framework", "CoreGraphics",
+                "-framework", "CoreServices",
+                "-framework", "CoreText",
+                "-framework", "Foundation",
+                "-framework", "IOKit",
+                "-framework", "Metal",
+                "-framework", "OpenGL",
+                "-framework", "QuartzCore" // for CoreAnimation
+            )
         }
 
-        dependsOn(compileTask)
-        objectFiles = fileTree(compileTask.map { it.outDir.get() }) {
-            include("**/*.o")
+        OS.Linux -> {
+            osFlags = arrayOf(
+                "-shared",
+                "-static-libstdc++",
+                "-static-libgcc",
+                "-lGL",
+                "-lX11",
+                "-lfontconfig",
+                // A fix for https://github.com/JetBrains/compose-jb/issues/413.
+                // Dynamic position independent linking uses PLT thunks relying on jump targets in GOT (Global Offsets Table).
+                // GOT entries marked as (for example) R_X86_64_JUMP_SLOT in the relocation table. So, if there's code loading
+                // platform libstdc++.so, lazy resolve code will resolve GOT entries to platform libstdc++.so on first invocation,
+                // and so further execution will break, as those two libstdc++ are not compatible.
+                // To fix it we enforce resolve of all GOT entries at library load time, and make it read-only afterwards.
+                "-Wl,-z,relro,-z,now",
+                // Hack to fix problem with linker not always finding certain declarations.
+                "$skiaBinDir/libsksg.a",
+                "$skiaBinDir/libskia.a",
+                "$skiaBinDir/libskunicode.a"
+            )
         }
-        val libNamePrefix = if (targetOs.isWindows) "skiko" else "libskiko"
-        libOutputFileName.set("$libNamePrefix-${targetOs.id}-${targetArch.id}${targetOs.dynamicLibExt}")
-        buildTargetOS.set(targetOs)
-        buildTargetArch.set(targetArch)
-        buildVariant.set(buildType)
-        linker.set(linkerForTarget(targetOs, targetArch))
 
-        when (targetOs) {
-            OS.MacOS -> {
-                dependsOn(objcCompileTask!!)
-                objectFiles += fileTree(objcCompileTask.map { it.outDir.get() }) {
-                    include("**/*.o")
-                }
-                osFlags = arrayOf(
-                    *targetOs.clangFlags,
-                    "-arch", if (targetArch == Arch.Arm64) "arm64" else "x86_64",
-                    "-shared",
-                    "-dead_strip",
-                    "-lobjc",
-                    "-install_name", "./${libOutputFileName.get()}",
-                    "-current_version", skiko.planeDeployVersion,
-                    "-framework", "AppKit",
-                    "-framework", "CoreFoundation",
-                    "-framework", "CoreGraphics",
-                    "-framework", "CoreServices",
-                    "-framework", "CoreText",
-                    "-framework", "Foundation",
-                    "-framework", "IOKit",
-                    "-framework", "Metal",
-                    "-framework", "OpenGL",
-                    "-framework", "QuartzCore" // for CoreAnimation
-                )
-            }
-            OS.Linux -> {
-                osFlags = arrayOf(
-                    "-shared",
-                    "-static-libstdc++",
-                    "-static-libgcc",
-                    "-lGL",
-                    "-lX11",
-                    "-lfontconfig",
-                    // A fix for https://github.com/JetBrains/compose-jb/issues/413.
-                    // Dynamic position independent linking uses PLT thunks relying on jump targets in GOT (Global Offsets Table).
-                    // GOT entries marked as (for example) R_X86_64_JUMP_SLOT in the relocation table. So, if there's code loading
-                    // platform libstdc++.so, lazy resolve code will resolve GOT entries to platform libstdc++.so on first invocation,
-                    // and so further execution will break, as those two libstdc++ are not compatible.
-                    // To fix it we enforce resolve of all GOT entries at library load time, and make it read-only afterwards.
-                    "-Wl,-z,relro,-z,now",
-                    // Hack to fix problem with linker not always finding certain declarations.
-                    "$skiaBinDir/libsksg.a",
-                    "$skiaBinDir/libskia.a",
-                    "$skiaBinDir/libskunicode.a"
-                )
-            }
-            OS.Windows -> {
-                linker.set(windowsSdkPaths.linker.absolutePath)
-                libDirs.set(windowsSdkPaths.libDirs)
-                osFlags = mutableListOf<String>().apply {
-                    addAll(buildType.msvcLinkerFlags)
-                    addAll(arrayOf(
+        OS.Windows -> {
+            linker.set(windowsSdkPaths.linker.absolutePath)
+            libDirs.set(windowsSdkPaths.libDirs)
+            osFlags = mutableListOf<String>().apply {
+                addAll(buildType.msvcLinkerFlags)
+                addAll(
+                    arrayOf(
                         "/NOLOGO",
                         "/DLL",
                         "Advapi32.lib",
@@ -983,29 +1047,32 @@ fun createLinkJvmBindings(
                         "opengl32.lib",
                         "shcore.lib",
                         "user32.lib",
-                    ))
-                    if (buildType == SkiaBuildType.DEBUG) add("dxgi.lib")
-                }.toTypedArray()
-            }
-            OS.Android -> {
-                osFlags = arrayOf(
-                    "-shared",
-                    "-static-libstdc++",
-                    "-lGLESv3",
-                    "-lEGL",
-                    "-llog",
-                    "-landroid",
-                    // Hack to fix problem with linker not always finding certain declarations.
-                    "$skiaBinDir/libskia.a",
+                    )
                 )
-                linker.set(androidClangFor(targetArch))
-            }
-            OS.Wasm, OS.IOS -> {
-                throw GradleException("This task shalln't be used with $targetOs")
-            }
+                if (buildType == SkiaBuildType.DEBUG) add("dxgi.lib")
+            }.toTypedArray()
         }
-        flags.set(listOf(*osFlags))
+
+        OS.Android -> {
+            osFlags = arrayOf(
+                "-shared",
+                "-static-libstdc++",
+                "-lGLESv3",
+                "-lEGL",
+                "-llog",
+                "-landroid",
+                // Hack to fix problem with linker not always finding certain declarations.
+                "$skiaBinDir/libskia.a",
+            )
+            linker.set(androidClangFor(targetArch))
+        }
+
+        OS.Wasm, OS.IOS -> {
+            throw GradleException("This task shalln't be used with $targetOs")
+        }
     }
+    flags.set(listOf(*osFlags))
+}
 
 fun KotlinTarget.generateVersion(
     targetOs: OS,
@@ -1029,11 +1096,12 @@ fun KotlinTarget.generateVersion(
 
             val target = "${targetOs.id}-${targetArch.id}"
             val skiaTag = project.property("dependencies.skia.$target") as String
-            File(out).writeText("""
+            File(out).writeText(
+                """
                 package org.jetbrains.skiko
                 object Version {
                   val skiko = "${skiko.deployVersion}"
-                  val skia = "${skiaTag}"
+                  val skia = "$skiaTag"
                 }
                 """.trimIndent()
             )
@@ -1100,7 +1168,7 @@ fun skikoJvmRuntimeJarTask(
     dependsOn(awtJar)
     val target = targetId(targetOs, targetArch)
     archiveBaseName.set("skiko-$target")
-    nativeFiles.forEach {  provider -> from(provider) }
+    nativeFiles.forEach { provider -> from(provider) }
 }
 
 fun skikoRuntimeDirForTestsTask(
@@ -1124,13 +1192,13 @@ fun skikoJarForTestsTask(
     archiveFileName.set("skiko-runtime-for-tests.jar")
 }
 
-tasks.withType<Test>().configureEach {
+tasks.withType<Test> {
     dependsOn(skikoRuntimeDirForTests)
     dependsOn(skikoJarForTests)
     options {
         val dir = skikoRuntimeDirForTests.map { it.destinationDir }.get()
         systemProperty("skiko.library.path", dir)
-        val jar = skikoJarForTests.get().outputs.files.files.single { it.name.endsWith(".jar")}
+        val jar = skikoJarForTests.get().outputs.files.files.single { it.name.endsWith(".jar") }
         systemProperty("skiko.jar.path", jar.absolutePath)
 
         systemProperty("skiko.test.screenshots.dir", File(project.projectDir, "src/jvmTest/screenshots").absolutePath)
@@ -1139,7 +1207,10 @@ tasks.withType<Test>().configureEach {
         val testingOnCI = System.getProperty("skiko.test.onci", "false").toBoolean()
         val canRunPerformanceTests = testingOnCI
         val canRunUiTests = testingOnCI || System.getProperty("os.name") != "Mac OS X"
-        systemProperty("skiko.test.performance.enabled", System.getProperty("skiko.test.performance.enabled", canRunPerformanceTests.toString()))
+        systemProperty(
+            "skiko.test.performance.enabled",
+            System.getProperty("skiko.test.performance.enabled", canRunPerformanceTests.toString())
+        )
         systemProperty("skiko.test.ui.enabled", System.getProperty("skiko.test.ui.enabled", canRunUiTests.toString()))
         systemProperty("skiko.test.ui.renderApi", System.getProperty("skiko.test.ui.renderApi", "all"))
 
