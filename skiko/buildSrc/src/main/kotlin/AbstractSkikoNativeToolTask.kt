@@ -23,6 +23,9 @@ abstract class AbstractSkikoNativeToolTask : DefaultTask() {
     @get:Input
     abstract val buildTargetOS: Property<OS>
 
+    @get:Input @get:Optional
+    abstract val buildSuffix: Property<String>
+
     @get:Input
     abstract val buildTargetArch: Property<Arch>
 
@@ -42,8 +45,9 @@ abstract class AbstractSkikoNativeToolTask : DefaultTask() {
         project.objects.directoryProperty().apply {
             set(
                 project.layout.buildDirectory.map {
-                    val suffix = "${buildVariant.get().id}-${buildTargetOS.get().id}-${buildTargetArch.get().id}"
-                    it.dir("out/$outDirNameForTool/$suffix")
+                    val suffix = if (buildSuffix.orNull != null) "-${buildSuffix.get()}" else ""
+                    val folder = "${buildVariant.get().id}-${buildTargetOS.get().id}$suffix-${buildTargetArch.get().id}"
+                    it.dir("out/$outDirNameForTool/$folder")
                 }
             )
         }
