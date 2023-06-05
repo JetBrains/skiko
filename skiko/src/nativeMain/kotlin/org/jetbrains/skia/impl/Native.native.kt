@@ -51,7 +51,7 @@ actual typealias NativePointer = NativePtr
 actual typealias InteropPointer = NativePtr
 
 internal actual fun reachabilityBarrier(obj: Any?) {
-    /* TODO:
+    /* TODO: when Kotlin Native runtime gets smarter
      *   implement native barrier to avoid garbage collection and finalizing of an object containing native pointer
      *   which is still in use due to runtime being smart and marking objects which are not used after a certain point
      *   but still on a stack frame as unreachable and hence eligible for GC (similar to JVM Reference.reachabilityFence).
