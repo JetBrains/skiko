@@ -1,4 +1,4 @@
-package org.jetbrains.skiko.redrawer
+package org.jetbrains.skiko.swing
 
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.SkiaLayerAnalytics.DeviceAnalytics
@@ -8,11 +8,11 @@ import org.jetbrains.skiko.SkiaLayerAnalytics.DeviceAnalytics
  * Don't forget to call [onDeviceChosen] and [onContextInit] to send necessary analytics.
  */
 @OptIn(ExperimentalSkikoApi::class)
-internal abstract class AWTRedrawer(
-    private val layer: SkiaLayer,
+internal abstract class SwingRedrawerBase(
+    private val layer: SkiaSwingLayer,
     private val analytics: SkiaLayerAnalytics,
     private val graphicsApi: GraphicsApi,
-) : Redrawer {
+) : SwingRedrawer {
     private var isFirstFrameRendered = false
 
     private val rendererAnalytics = analytics.renderer(Version.skiko, hostOs, graphicsApi)

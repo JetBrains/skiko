@@ -1,22 +1,7 @@
 package org.jetbrains.skiko.swing
 
 import org.jetbrains.skiko.*
-import org.jetbrains.skiko.redrawer.AWTRedrawer
 import java.awt.Graphics2D
-
-@OptIn(ExperimentalSkikoApi::class)
-internal fun MetalSwingRedrawer(
-    layer: SkiaSwingLayer,
-    analytics: SkiaLayerAnalytics,
-    properties: SkiaLayerProperties
-): MetalSwingRedrawer =
-    MetalSwingRedrawerImpl(layer, analytics, properties)
-
-internal interface MetalSwingRedrawer {
-    fun dispose()
-
-    fun redraw(graphics: Graphics2D)
-}
 
 /**
  * Experimental API that provides a way to draw on Skia canvas rendered off-screen with Metal GPU acceleration
@@ -34,13 +19,11 @@ internal interface MetalSwingRedrawer {
  * @see FrameDispatcher
  */
 @ExperimentalSkikoApi
-private class MetalSwingRedrawerImpl(
-    private val skiaSwingLayer: SkiaSwingLayer,
+internal class MetalSwingRedrawer(
+    skiaSwingLayer: SkiaSwingLayer,
     analytics: SkiaLayerAnalytics,
     properties: SkiaLayerProperties
-    // TODO: what to do with SkiaLayer???
-) : AWTRedrawer(analytics, GraphicsApi.METAL, skiaSwingLayer::update, skiaSwingLayer::inDrawScope),
-    MetalSwingRedrawer {
+) : SwingRedrawerBase(skiaSwingLayer, analytics, GraphicsApi.METAL) {
     companion object {
         init {
             Library.load()
@@ -55,25 +38,15 @@ private class MetalSwingRedrawerImpl(
         onContextInit()
     }
 
-    override val renderInfo: String get() = contextHandler.rendererInfo()
-
     override fun dispose() {
         contextHandler.dispose()
         super.dispose()
     }
 
-    override fun redraw(graphics: Graphics2D) {
+    override fun redraw(g: Graphics2D) {
         update(System.nanoTime())
         inDrawScope {
-            contextHandler.draw(graphics)
+            contextHandler.draw(g)
         }
-    }
-
-    override fun needRedraw() {
-        throw IllegalStateException("Shouldn't be called")
-    }
-
-    override fun redrawImmediately() {
-        throw IllegalStateException("Shouldn't be called")
     }
 }
