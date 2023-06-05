@@ -7,8 +7,6 @@ internal abstract class ContextHandler(
     protected val layer: SkiaLayer,
     private val drawContent: Canvas.() -> Unit
 ) {
-    // TODO can we simplify clearColor logic? is there a reason why SoftwareContextHandler has opposite logic?
-    protected open val clearColor = if (layer.transparency || hostOs == OS.MacOS) Color.TRANSPARENT else Color.WHITE
     protected var context: DirectContext? = null
     protected var renderTarget: BackendRenderTarget? = null
     protected var surface: Surface? = null
@@ -43,9 +41,22 @@ internal abstract class ContextHandler(
         }
         initCanvas()
         canvas?.apply {
-            clear(if (layer.fullscreen && hostOs != OS.MacOS) Color.WHITE else clearColor)
+            clear(if (isTransparentBackground()) Color.TRANSPARENT else Color.WHITE)
             drawContent()
         }
         flush()
+    }
+
+    protected open fun isTransparentBackground(): Boolean {
+        if (hostOs == OS.MacOS) {
+            // MacOS transparency is always supported
+            return true
+        }
+        if (layer.fullscreen) {
+            // for non-MacOS in fullscreen transparency is not supported
+            return false
+        }
+        // for non-MacOS in non-fullscreen transparency provided by [layer]
+        return layer.transparency
     }
 }
