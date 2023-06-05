@@ -3,7 +3,6 @@ package org.jetbrains.skiko.redrawer
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.context.MetalOffScreenContextHandler
 import java.awt.Graphics2D
-import javax.swing.JComponent
 
 @OptIn(ExperimentalSkikoApi::class)
 internal fun MetalOffScreenRedrawer(
@@ -14,12 +13,6 @@ internal fun MetalOffScreenRedrawer(
     MetalOffScreenRedrawerImpl(layer, analytics, properties)
 
 internal interface MetalOffScreenRedrawer {
-    val clipComponents: MutableList<ClipRectangle>
-
-    var skikoView: SkikoView?
-
-    val renderInfo: String
-
     fun dispose()
 
     fun redraw(graphics: Graphics2D)
@@ -44,7 +37,7 @@ internal interface MetalOffScreenRedrawer {
 private class MetalOffScreenRedrawerImpl(
     private val skiaSwingLayer: SkiaSwingLayer,
     analytics: SkiaLayerAnalytics,
-    private val properties: SkiaLayerProperties
+    properties: SkiaLayerProperties
     // TODO: what to do with SkiaLayer???
 ) : AWTRedrawer(analytics, GraphicsApi.METAL, skiaSwingLayer::update, skiaSwingLayer::inDrawScope),
     MetalOffScreenRedrawer {
@@ -53,15 +46,6 @@ private class MetalOffScreenRedrawerImpl(
             Library.load()
         }
     }
-
-    override val clipComponents: MutableList<ClipRectangle>
-        get() = skiaSwingLayer.clipComponents
-
-    override var skikoView: SkikoView?
-        get() = skiaSwingLayer.skikoView
-        set(value) {
-            skiaSwingLayer.skikoView = value
-        }
 
     private val adapter: MetalAdapter = chooseMetalAdapter(properties.adapterPriority).also {
         onDeviceChosen(it.name)
