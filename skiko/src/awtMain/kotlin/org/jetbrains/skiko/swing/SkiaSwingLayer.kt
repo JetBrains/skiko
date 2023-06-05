@@ -1,25 +1,14 @@
-package org.jetbrains.skiko
+package org.jetbrains.skiko.swing
 
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.ClipMode
 import org.jetbrains.skia.PictureRecorder
 import org.jetbrains.skia.Rect
-import org.jetbrains.skiko.redrawer.MetalOffScreenRedrawer
+import org.jetbrains.skiko.*
 import java.awt.Graphics2D
 import java.util.concurrent.CancellationException
 import javax.accessibility.Accessible
-import javax.swing.JComponent
 import javax.swing.SwingUtilities.isEventDispatchThread
-
-abstract class SkiaSwingLayerComponent : JComponent() {
-    abstract val clipComponents: MutableList<ClipRectangle>
-
-    abstract val renderApi: GraphicsApi
-
-    abstract fun dispose()
-
-    abstract fun requestNativeFocusOnAccessible(accessible: Accessible?)
-}
 
 open class SkiaSwingLayer internal constructor(
     private val skikoView: SkikoView,
@@ -42,6 +31,7 @@ open class SkiaSwingLayer internal constructor(
 
     @Volatile
     private var isDisposed = false
+
     // TODO: extract OffscreenRedrawer factory like it is done for common Redrawer
     internal var redrawer: MetalOffScreenRedrawer? = null
     private val fallbackRenderApiQueue = SkikoProperties.fallbackRenderApiQueue(properties.renderApi).toMutableList()

@@ -1,7 +1,8 @@
-package org.jetbrains.skiko.context
+package org.jetbrains.skiko.swing
 
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
+import org.jetbrains.skiko.context.ContextHandler
 import java.awt.Graphics2D
 import java.awt.Transparency
 import java.awt.color.ColorSpace

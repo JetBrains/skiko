@@ -1,7 +1,7 @@
-package org.jetbrains.skiko.redrawer
+package org.jetbrains.skiko.swing
 
 import org.jetbrains.skiko.*
-import org.jetbrains.skiko.context.MetalOffScreenContextHandler
+import org.jetbrains.skiko.redrawer.AWTRedrawer
 import java.awt.Graphics2D
 
 @OptIn(ExperimentalSkikoApi::class)
