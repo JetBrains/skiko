@@ -286,6 +286,11 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
         preventDrawDispatchDuringCurrentFrame()
     }
 
+    /**
+     * Notifies redrawer that no draw can be dispatched during current vsync:
+     * - It's either too early (some syncing with UIKit rendering after UIView hierarchy change happens, and it needs to be delayed to next frame)
+     * - Or too late (invalidation will possibly come after, didn't come during onPointerEvent execution, but before next vsync calls back)
+     */
     fun preventDrawDispatchDuringCurrentFrame() {
         skiaLayer?.redrawer?.preventDrawDispatchDuringCurrentFrame()
     }
