@@ -1,9 +1,6 @@
 package org.jetbrains.skiko.swing
 
-import org.jetbrains.skia.Canvas
-import org.jetbrains.skia.ClipMode
-import org.jetbrains.skia.PictureRecorder
-import org.jetbrains.skia.Rect
+import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
 import java.awt.Graphics2D
 import java.util.concurrent.CancellationException
@@ -14,6 +11,7 @@ open class SkiaSwingLayer internal constructor(
     private val skikoView: SkikoView,
     private val properties: SkiaLayerProperties,
     private val analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
+    override val pixelGeometry: PixelGeometry = PixelGeometry.UNKNOWN,
 ) : SkiaSwingLayerComponent() {
     internal companion object {
         init {
@@ -53,6 +51,7 @@ open class SkiaSwingLayer internal constructor(
         isVsyncFramelimitFallbackEnabled: Boolean = SkikoProperties.vsyncFramelimitFallbackEnabled,
         renderApi: GraphicsApi = SkikoProperties.renderApi,
         analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
+        pixelGeometry: PixelGeometry = PixelGeometry.UNKNOWN
     ) : this(
         skikoView,
         SkiaLayerProperties(
@@ -61,6 +60,7 @@ open class SkiaSwingLayer internal constructor(
             renderApi
         ),
         analytics,
+        pixelGeometry
     )
 
     init {

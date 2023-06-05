@@ -1,12 +1,17 @@
 package org.jetbrains.skiko.context
 
 import org.jetbrains.skia.*
-import org.jetbrains.skiko.*
+import org.jetbrains.skiko.GraphicsApi
+import org.jetbrains.skiko.RenderException
+import org.jetbrains.skiko.hostArch
+import org.jetbrains.skiko.hostOs
 
 internal abstract class ContextHandler(
-    protected val layer: SkiaLayer,
     private val drawContent: Canvas.() -> Unit
 ) {
+    abstract val renderApi: GraphicsApi
+    protected abstract fun isTransparentBackground(): Boolean
+
     protected var context: DirectContext? = null
     protected var renderTarget: BackendRenderTarget? = null
     protected var surface: Surface? = null
@@ -30,7 +35,7 @@ internal abstract class ContextHandler(
     }
 
     open fun rendererInfo(): String {
-        return "GraphicsApi: ${layer.renderApi}\n" +
+        return "GraphicsApi: ${renderApi}\n" +
                 "OS: ${hostOs.id} ${hostArch.id}\n"
     }
 
@@ -45,18 +50,5 @@ internal abstract class ContextHandler(
             drawContent()
         }
         flush()
-    }
-
-    protected open fun isTransparentBackground(): Boolean {
-        if (hostOs == OS.MacOS) {
-            // MacOS transparency is always supported
-            return true
-        }
-        if (layer.fullscreen) {
-            // for non-MacOS in fullscreen transparency is not supported
-            return false
-        }
-        // for non-MacOS in non-fullscreen transparency provided by [layer]
-        return layer.transparency
     }
 }

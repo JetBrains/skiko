@@ -1,7 +1,10 @@
 package org.jetbrains.skiko.swing
 
 import org.jetbrains.skia.*
-import org.jetbrains.skiko.*
+import org.jetbrains.skiko.GraphicsApi
+import org.jetbrains.skiko.Logger
+import org.jetbrains.skiko.MetalAdapter
+import org.jetbrains.skiko.RenderException
 import org.jetbrains.skiko.context.ContextHandler
 import java.awt.Graphics2D
 import java.awt.Transparency
@@ -11,9 +14,12 @@ import java.awt.image.*
 internal class MetalSwingContextHandler(
     private val skiaSwingLayer: SkiaSwingLayer,
     private val adapter: MetalAdapter
-    // TODO: what to do with layer??
-) : ContextHandler(SkiaLayer(), skiaSwingLayer::draw) {
+) : ContextHandler(skiaSwingLayer::draw) {
     private var graphics: Graphics2D? = null
+    override val renderApi: GraphicsApi
+        get() = skiaSwingLayer.renderApi
+
+    override fun isTransparentBackground(): Boolean = true
 
     override fun initContext(): Boolean {
         try {
@@ -54,7 +60,7 @@ internal class MetalSwingContextHandler(
                 SurfaceOrigin.TOP_LEFT,
                 SurfaceColorFormat.BGRA_8888,
                 org.jetbrains.skia.ColorSpace.sRGB,
-                SurfaceProps(pixelGeometry = layer.pixelGeometry)
+                SurfaceProps(pixelGeometry = skiaSwingLayer.pixelGeometry)
             ) ?: throw RenderException("Cannot create surface")
 
             canvas = surface!!.canvas
