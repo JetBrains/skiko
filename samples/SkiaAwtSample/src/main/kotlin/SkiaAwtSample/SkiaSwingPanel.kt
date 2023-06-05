@@ -1,17 +1,18 @@
 package SkiaAwtSample
 
 import org.jetbrains.skiko.ClipComponent
-import org.jetbrains.skiko.SkiaLayer
+import org.jetbrains.skiko.SkikoView
+import org.jetbrains.skiko.swing.SkiaSwingLayer
 import java.awt.Color
 import java.awt.Component
 import javax.swing.JLayeredPane
 
-open class SkiaPanel: JLayeredPane {
-    val layer = SkiaLayer()
+class SkiaSwingPanel(skikoView: SkikoView) : JLayeredPane() {
+    val layer = SkiaSwingLayer(skikoView)
 
-    constructor() : super() {
-        setLayout(null)
-        setBackground(Color.white)
+    init {
+        layout = null
+        background = Color.white
     }
 
     override fun add(component: Component): Component {
@@ -28,8 +29,8 @@ open class SkiaPanel: JLayeredPane {
         super.add(layer, Integer.valueOf(10))
     }
 
-     override fun removeNotify() {
+    override fun removeNotify() {
         layer.dispose()
         super.removeNotify()
-     }
+    }
 }

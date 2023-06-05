@@ -71,7 +71,7 @@ fun swingSkia() = SwingUtilities.invokeLater {
         makeButton(
             text = "Resize test window",
             action = {
-                swingSkiaResize(isStatic = true, offScreenRendering = true)
+                swingSkiaResize()
             }
         ),
         BorderLayout.CENTER
