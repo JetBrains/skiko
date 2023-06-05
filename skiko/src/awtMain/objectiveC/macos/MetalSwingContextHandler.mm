@@ -14,7 +14,7 @@
 extern "C"
 {
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_context_MetalOffScreenContextHandler_makeMetalContext(
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_MetalSwingContextHandler_makeMetalContext(
         JNIEnv *env, jobject contextHandler, jlong adapterPtr) {
     @autoreleasepool {
         id <MTLDevice> adapter = (__bridge id <MTLDevice>) (void *) adapterPtr;
@@ -26,7 +26,7 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_context_MetalOffScreenContextHa
     }
 }
 
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_context_MetalOffScreenContextHandler_makeMetalRenderTargetOffScreen(
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_MetalSwingContextHandler_makeMetalRenderTargetOffScreen(
         JNIEnv *env, jobject contextHandler, jlong adapterPtr, jint width, jint height) {
     @autoreleasepool {
         id <MTLDevice> adapter = (__bridge id <MTLDevice>) (void *) adapterPtr;
