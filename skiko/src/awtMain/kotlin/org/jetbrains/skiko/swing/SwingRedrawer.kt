@@ -1,8 +1,6 @@
 package org.jetbrains.skiko.swing
 
-import org.jetbrains.skiko.ExperimentalSkikoApi
-import org.jetbrains.skiko.SkiaLayerAnalytics
-import org.jetbrains.skiko.SkiaLayerProperties
+import org.jetbrains.skiko.*
 import java.awt.Graphics2D
 
 internal interface SwingRedrawer {
@@ -14,6 +12,16 @@ internal interface SwingRedrawer {
 @OptIn(ExperimentalSkikoApi::class)
 internal fun createDefaultSwingRedrawer(
     layer: SkiaSwingLayer,
+    renderApi: GraphicsApi,
     analytics: SkiaLayerAnalytics,
     properties: SkiaLayerProperties
-): SwingRedrawer = MetalSwingRedrawer(layer, analytics, properties)
+): SwingRedrawer {
+    return when (hostOs) {
+        OS.MacOS -> when (renderApi) {
+            GraphicsApi.SOFTWARE_COMPAT, GraphicsApi.SOFTWARE_FAST -> SoftwareSwingRedrawer(layer, analytics)
+            else -> MetalSwingRedrawer(layer, analytics, properties)
+        }
+
+        else -> SoftwareSwingRedrawer(layer, analytics)
+    }
+}

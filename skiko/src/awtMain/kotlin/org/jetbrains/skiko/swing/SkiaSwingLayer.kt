@@ -87,7 +87,7 @@ open class SkiaSwingLayer internal constructor(
             try {
                 _renderApi = fallbackRenderApiQueue.removeAt(0)
                 redrawer?.dispose()
-                redrawer = createDefaultSwingRedrawer(this@SkiaSwingLayer, analytics, properties)
+                redrawer = createDefaultSwingRedrawer(this@SkiaSwingLayer, _renderApi, analytics, properties)
             } catch (e: RenderException) {
                 Logger.warn(e) { "Fallback to next API" }
                 thrown = true
