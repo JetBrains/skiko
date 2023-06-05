@@ -8,7 +8,7 @@ import java.awt.Transparency
 import java.awt.color.ColorSpace
 import java.awt.image.*
 
-internal class MetalOffScreenContextHandler(
+internal class MetalSwingContextHandler(
     private val skiaSwingLayer: SkiaSwingLayer,
     private val adapter: MetalAdapter
     // TODO: what to do with layer??

@@ -33,7 +33,7 @@ open class SkiaSwingLayer internal constructor(
     private var isDisposed = false
 
     // TODO: extract OffscreenRedrawer factory like it is done for common Redrawer
-    internal var redrawer: MetalOffScreenRedrawer? = null
+    internal var redrawer: MetalSwingRedrawer? = null
     private val fallbackRenderApiQueue = SkikoProperties.fallbackRenderApiQueue(properties.renderApi).toMutableList()
     private var _renderApi = fallbackRenderApiQueue[0]
 
@@ -88,7 +88,7 @@ open class SkiaSwingLayer internal constructor(
             try {
                 _renderApi = fallbackRenderApiQueue.removeAt(0)
                 redrawer?.dispose()
-                redrawer = MetalOffScreenRedrawer(this@SkiaSwingLayer, analytics, properties)
+                redrawer = MetalSwingRedrawer(this@SkiaSwingLayer, analytics, properties)
             } catch (e: RenderException) {
                 Logger.warn(e) { "Fallback to next API" }
                 thrown = true

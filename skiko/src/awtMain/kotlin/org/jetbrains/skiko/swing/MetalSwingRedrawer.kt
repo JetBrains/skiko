@@ -5,14 +5,14 @@ import org.jetbrains.skiko.redrawer.AWTRedrawer
 import java.awt.Graphics2D
 
 @OptIn(ExperimentalSkikoApi::class)
-internal fun MetalOffScreenRedrawer(
+internal fun MetalSwingRedrawer(
     layer: SkiaSwingLayer,
     analytics: SkiaLayerAnalytics,
     properties: SkiaLayerProperties
-): MetalOffScreenRedrawer =
-    MetalOffScreenRedrawerImpl(layer, analytics, properties)
+): MetalSwingRedrawer =
+    MetalSwingRedrawerImpl(layer, analytics, properties)
 
-internal interface MetalOffScreenRedrawer {
+internal interface MetalSwingRedrawer {
     fun dispose()
 
     fun redraw(graphics: Graphics2D)
@@ -30,17 +30,17 @@ internal interface MetalOffScreenRedrawer {
  *
  * Content to draw is provided by [SkiaLayer.draw].
  *
- * @see MetalOffScreenContextHandler
+ * @see MetalSwingContextHandler
  * @see FrameDispatcher
  */
 @ExperimentalSkikoApi
-private class MetalOffScreenRedrawerImpl(
+private class MetalSwingRedrawerImpl(
     private val skiaSwingLayer: SkiaSwingLayer,
     analytics: SkiaLayerAnalytics,
     properties: SkiaLayerProperties
     // TODO: what to do with SkiaLayer???
 ) : AWTRedrawer(analytics, GraphicsApi.METAL, skiaSwingLayer::update, skiaSwingLayer::inDrawScope),
-    MetalOffScreenRedrawer {
+    MetalSwingRedrawer {
     companion object {
         init {
             Library.load()
@@ -51,7 +51,7 @@ private class MetalOffScreenRedrawerImpl(
         onDeviceChosen(it.name)
     }
 
-    private val contextHandler = MetalOffScreenContextHandler(skiaSwingLayer, adapter).also {
+    private val contextHandler = MetalSwingContextHandler(skiaSwingLayer, adapter).also {
         onContextInit()
     }
 
