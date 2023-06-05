@@ -11,6 +11,7 @@ import platform.UIKit.*
 import platform.darwin.NSInteger
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.roundToInt
 
 /*
  TODO: remove org.jetbrains.skiko.objc.UIViewExtensionProtocol after Kotlin 1.8.20
@@ -54,6 +55,13 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
     private lateinit var _pointInside: (Point, UIEvent?) -> Boolean
     private var _inputDelegate: UITextInputDelegateProtocol? = null
     private var _currentTextMenuActions: TextActions? = null
+
+    /**
+     * Callback called when SkikoUIView performs layout
+     * and adjusts drawableSize of metalLayer to width and height, which are passed as arguments to this closure
+     */
+    private lateinit var onLayout: (Int, Int) -> Unit
+
     val metalLayer: CAMetalLayer
         get() = layer as CAMetalLayer
 
@@ -69,10 +77,12 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
     constructor(
         skiaLayer: SkiaLayer,
         frame: CValue<CGRect> = CGRectNull.readValue(),
-        pointInside: (Point, UIEvent?) -> Boolean = {_,_-> true }
+        pointInside: (Point, UIEvent?) -> Boolean = {_,_-> true },
+        onLayout: (Int, Int) -> Unit,
     ) : super(frame) {
         this.skiaLayer = skiaLayer
         _pointInside = pointInside
+        this.onLayout = onLayout
     }
 
     /**
@@ -273,6 +283,10 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
             )
         )
          // If invalidation doesn't happen while onPointerEvent is processed, it's too late to schedule any work for this frame.
+        preventDrawDispatchDuringCurrentFrame()
+    }
+
+    fun preventDrawDispatchDuringCurrentFrame() {
         skiaLayer?.redrawer?.preventDrawDispatchDuringCurrentFrame()
     }
 
@@ -404,6 +418,21 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
         } else {
             null
         }
+    }
+
+    override fun layoutSubviews() {
+        super.layoutSubviews()
+
+        val (width, height) = metalLayer.bounds.useContents {
+            val width = size.width * metalLayer.contentsScale
+            val height = size.height * metalLayer.contentsScale
+
+            metalLayer.drawableSize = CGSizeMake(width, height)
+
+            return@useContents width.roundToInt() to height.roundToInt()
+        }
+
+        onLayout(width, height)
     }
 
     override fun positionFromPosition(

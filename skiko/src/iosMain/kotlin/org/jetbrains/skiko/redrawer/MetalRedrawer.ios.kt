@@ -118,13 +118,9 @@ internal class MetalRedrawer(
         }
     }
 
+    // TODO: inverse this logic and move it to view
     override fun syncSize() {
-        metalLayer.contentsScale = layer.contentScale.toDouble()
         val osView = layer.view!!
-
-        metalLayer.bounds.useContents {
-            metalLayer.drawableSize = CGSizeMake(size.width * metalLayer.contentsScale, size.height * metalLayer.contentsScale)
-        }
 
         osView.window?.screen?.maximumFramesPerSecond?.let {
             caDisplayLink.preferredFramesPerSecond = it
