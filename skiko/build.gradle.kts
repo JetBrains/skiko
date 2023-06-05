@@ -13,8 +13,8 @@ plugins {
     id("org.jetbrains.dokka") version "1.7.20"
     `maven-publish`
     signing
-    id("org.gradle.crypto.checksum") version "1.1.0"
-    id("de.undercouch.download") version "4.1.2"
+    id("org.gradle.crypto.checksum") version "1.4.0"
+    id("de.undercouch.download") version "5.4.0"
 }
 
 val coroutinesVersion = "1.5.2"
@@ -148,6 +148,9 @@ fun compileNativeBridgesTask(os: OS, arch: Arch, isArm64Simulator: Boolean): Tas
 
         compiler.set(compilerForTarget(os, arch))
         buildTargetOS.set(os)
+        if (isArm64Simulator) {
+            buildSuffix.set("sim")
+        }
         buildTargetArch.set(arch)
         buildVariant.set(buildType)
 
@@ -635,12 +638,12 @@ fun skiaStaticLibraries(skiaDir: String, targetString: String): List<String> {
 
 val allJvmRuntimeJars = mutableMapOf<Pair<OS, Arch>, TaskProvider<Jar>>()
 
-val skikoAwtJar by project.tasks.registering(Jar::class) {
-    archiveBaseName.set("skiko-awt")
+val skikoAwtJarForTests by project.tasks.registering(Jar::class) {
+    archiveBaseName.set("skiko-awt-test")
     from(kotlin.jvm("awt").compilations["main"].output.allOutputs)
 }
-val skikoAwtRuntimeJar = createSkikoJvmJarTask(targetOs, targetArch, skikoAwtJar)
-val skikoRuntimeDirForTests = skikoRuntimeDirForTestsTask(targetOs, targetArch, skikoAwtJar, skikoAwtRuntimeJar)
+val skikoAwtRuntimeJarForTests = createSkikoJvmJarTask(targetOs, targetArch, skikoAwtJarForTests)
+val skikoRuntimeDirForTests = skikoRuntimeDirForTestsTask(targetOs, targetArch, skikoAwtJarForTests, skikoAwtRuntimeJarForTests)
 val skikoJarForTests = skikoJarForTestsTask(skikoRuntimeDirForTests)
 
 if (supportAndroid) {
@@ -814,6 +817,7 @@ fun createCompileJvmBindingsTask(
     dependsOn(skiaJvmBindingsDir)
     buildTargetOS.set(targetOs)
     buildTargetArch.set(targetArch)
+    buildSuffix.set("jvm")
     buildVariant.set(buildType)
 
     val srcDirs = projectDirs(
@@ -918,6 +922,7 @@ fun createLinkJvmBindings(
         val libNamePrefix = if (targetOs.isWindows) "skiko" else "libskiko"
         libOutputFileName.set("$libNamePrefix-${targetOs.id}-${targetArch.id}${targetOs.dynamicLibExt}")
         buildTargetOS.set(targetOs)
+        buildSuffix.set("jvm")
         buildTargetArch.set(targetArch)
         buildVariant.set(buildType)
         linker.set(linkerForTarget(targetOs, targetArch))
