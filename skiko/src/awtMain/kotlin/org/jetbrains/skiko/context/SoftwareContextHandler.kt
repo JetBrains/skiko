@@ -20,7 +20,7 @@ import java.awt.image.Raster
 import java.awt.image.WritableRaster
 
 internal class SoftwareContextHandler(layer: SkiaLayer) : JvmContextHandler(layer) {
-    override val clearColor = if (layer.transparency && hostOs == OS.MacOS) 0 else -1
+    override val clearColor = if (layer.transparency && hostOs == OS.MacOS) org.jetbrains.skia.Color.TRANSPARENT else org.jetbrains.skia.Color.WHITE
 
     val colorModel = ComponentColorModel(
         ColorSpace.getInstance(ColorSpace.CS_sRGB),
