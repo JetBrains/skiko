@@ -5,7 +5,7 @@ import org.jetbrains.skiko.Logger
 import org.jetbrains.skiko.RenderException
 import org.jetbrains.skiko.SkikoProperties
 
-internal class RedrawerProvider<R>(
+internal class RedrawerManager<R>(
     defaultRenderApi: GraphicsApi,
     private val redrawerFactory: (renderApi: GraphicsApi, oldRedrawer: R?) -> R
 ) {

@@ -3,7 +3,7 @@ package org.jetbrains.skiko
 import org.jetbrains.skia.*
 import javax.swing.SwingUtilities
 
-internal class SkiaLayerRenderer(
+internal class SkiaDrawingManager(
     private val fpsCounter: FPSCounter?
 ) {
     private var _isRendering = false

@@ -2,7 +2,7 @@ package org.jetbrains.skiko.swing
 
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
-import org.jetbrains.skiko.redrawer.RedrawerProvider
+import org.jetbrains.skiko.redrawer.RedrawerManager
 import java.awt.Graphics2D
 import java.util.concurrent.CancellationException
 import javax.accessibility.Accessible
@@ -27,23 +27,23 @@ open class SkiaSwingLayer internal constructor(
     @Volatile
     private var isDisposed = false
 
-    private val redrawerProvider = RedrawerProvider<SwingRedrawer>(properties.renderApi) { renderApi, oldRedrawer ->
+    private val redrawerManager = RedrawerManager<SwingRedrawer>(properties.renderApi) { renderApi, oldRedrawer ->
         oldRedrawer?.dispose()
         createDefaultSwingRedrawer(this@SkiaSwingLayer, renderApi, analytics, properties)
     }
 
     private val redrawer: SwingRedrawer?
-        get() = redrawerProvider.redrawer
+        get() = redrawerManager.redrawer
 
     override val renderApi: GraphicsApi
-        get() = redrawerProvider.renderApi
+        get() = redrawerManager.renderApi
 
     @Suppress("LeakingThis")
     private val fpsCounter = defaultFPSCounter(this)
 
-    private val skiaLayerRenderer = SkiaLayerRenderer(fpsCounter)
+    private val skiaDrawingManager = SkiaDrawingManager(fpsCounter)
 
-    override val clipComponents: MutableList<ClipRectangle> get() = skiaLayerRenderer.clipComponents
+    override val clipComponents: MutableList<ClipRectangle> get() = skiaDrawingManager.clipComponents
 
     @Suppress("unused") // used in Compose Multiplatform
     constructor(
@@ -83,8 +83,8 @@ open class SkiaSwingLayer internal constructor(
 
     private fun init(recreation: Boolean = false) {
         isDisposed = false
-        skiaLayerRenderer.init()
-        redrawerProvider.findNextWorkingRenderApi(recreation)
+        skiaDrawingManager.init()
+        redrawerManager.findNextWorkingRenderApi(recreation)
         isInited = true
     }
 
@@ -93,8 +93,8 @@ open class SkiaSwingLayer internal constructor(
         if (isInited && !isDisposed) {
             // we should dispose redrawer first (to cancel `draw` in rendering thread)
             redrawer?.dispose()
-            redrawerProvider.dispose()
-            skiaLayerRenderer.dispose()
+            redrawerManager.dispose()
+            skiaDrawingManager.dispose()
             isDisposed = true
         }
     }
@@ -107,7 +107,7 @@ open class SkiaSwingLayer internal constructor(
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         check(!isDisposed) { "SkiaLayer is disposed" }
 
-        skiaLayerRenderer.update(nanoTime, width, height, contentScale, skikoView)
+        skiaDrawingManager.update(nanoTime, width, height, contentScale, skikoView)
     }
 
     internal inline fun inDrawScope(body: () -> Unit) {
@@ -120,14 +120,14 @@ open class SkiaSwingLayer internal constructor(
         } catch (e: RenderException) {
             if (!isDisposed) {
                 Logger.warn(e) { "Exception in draw scope" }
-                redrawerProvider.findNextWorkingRenderApi()
+                redrawerManager.findNextWorkingRenderApi()
                 repaint()
             }
         }
     }
 
     internal fun draw(canvas: Canvas) {
-        skiaLayerRenderer.draw(canvas)
+        skiaDrawingManager.draw(canvas)
     }
 
     override fun requestNativeFocusOnAccessible(accessible: Accessible?) {

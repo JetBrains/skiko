@@ -7,7 +7,7 @@ import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.PixelGeometry
 import org.jetbrains.skiko.redrawer.Redrawer
-import org.jetbrains.skiko.redrawer.RedrawerProvider
+import org.jetbrains.skiko.redrawer.RedrawerManager
 import java.awt.Color
 import java.awt.Component
 import java.awt.event.*
@@ -298,7 +298,7 @@ actual open class SkiaLayer internal constructor(
     @Volatile
     private var isDisposed = false
 
-    private val redrawerProvider = RedrawerProvider<Redrawer>(properties.renderApi) { renderApi, oldRedrawer ->
+    private val redrawerManager = RedrawerManager<Redrawer>(properties.renderApi) { renderApi, oldRedrawer ->
         oldRedrawer?.dispose()
         val newRedrawer = renderFactory.createRedrawer(this, renderApi, analytics, properties)
         newRedrawer.syncSize()
@@ -306,12 +306,12 @@ actual open class SkiaLayer internal constructor(
     }
 
     internal val redrawer: Redrawer?
-        get() = redrawerProvider.redrawer
+        get() = redrawerManager.redrawer
 
     actual var renderApi: GraphicsApi
-        get() = redrawerProvider.renderApi
+        get() = redrawerManager.renderApi
         set(value) {
-            redrawerProvider.forceRenderApi(value)
+            redrawerManager.forceRenderApi(value)
             notifyChange(PropertyKind.Renderer)
         }
 
@@ -324,8 +324,8 @@ actual open class SkiaLayer internal constructor(
     private fun init(recreation: Boolean = false) {
         isDisposed = false
         backedLayer.init()
-        skiaLayerRenderer.init()
-        redrawerProvider.findNextWorkingRenderApi(recreation)
+        skiaDrawingManager.init()
+        redrawerManager.findNextWorkingRenderApi(recreation)
         isInited = true
     }
 
@@ -347,8 +347,8 @@ actual open class SkiaLayer internal constructor(
         if (isInited && !isDisposed) {
             // we should dispose redrawer first (to cancel `draw` in rendering thread)
             redrawer?.dispose()
-            redrawerProvider.dispose()
-            skiaLayerRenderer.dispose()
+            redrawerManager.dispose()
+            skiaDrawingManager.dispose()
             backedLayer.dispose()
             peerBufferSizeFixJob?.cancel()
             isDisposed = true
@@ -513,12 +513,12 @@ actual open class SkiaLayer internal constructor(
     @Suppress("LeakingThis")
     private val fpsCounter = defaultFPSCounter(this)
 
-    private val skiaLayerRenderer = SkiaLayerRenderer(fpsCounter)
+    private val skiaDrawingManager = SkiaDrawingManager(fpsCounter)
 
-    private val isRendering: Boolean get() = skiaLayerRenderer.isRendering
+    private val isRendering: Boolean get() = skiaDrawingManager.isRendering
 
     @Suppress("unused") // used externally
-    val clipComponents: MutableList<ClipRectangle> get() = skiaLayerRenderer.clipComponents
+    val clipComponents: MutableList<ClipRectangle> get() = skiaDrawingManager.clipComponents
 
     internal fun update(nanoTime: Long) {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
@@ -526,7 +526,7 @@ actual open class SkiaLayer internal constructor(
 
         checkContentScale()
 
-        skiaLayerRenderer.update(nanoTime, width, height, contentScale, skikoView)
+        skiaDrawingManager.update(nanoTime, width, height, contentScale, skikoView)
     }
 
     internal inline fun inDrawScope(body: () -> Unit) {
@@ -539,20 +539,20 @@ actual open class SkiaLayer internal constructor(
         } catch (e: RenderException) {
             if (!isDisposed) {
                 Logger.warn(e) { "Exception in draw scope" }
-                redrawerProvider.findNextWorkingRenderApi()
+                redrawerManager.findNextWorkingRenderApi()
                 redrawer?.redrawImmediately()
             }
         }
     }
 
     internal actual fun draw(canvas: Canvas) {
-        skiaLayerRenderer.draw(canvas)
+        skiaDrawingManager.draw(canvas)
     }
 
     // Captures current layer as bitmap.
     @Suppress("unused") // used externally
     fun screenshot(): Bitmap? {
-        return skiaLayerRenderer.screenshot()
+        return skiaDrawingManager.screenshot()
     }
 
     private fun roundSize(value: Int): Int {
