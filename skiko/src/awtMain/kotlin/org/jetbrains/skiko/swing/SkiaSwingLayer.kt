@@ -21,12 +21,8 @@ open class SkiaSwingLayer internal constructor(
     }
 
     private var isInited = false
-    private var isRendering = false
-
     private val contentScale: Float
         get() = graphicsConfiguration.defaultTransform.scaleX.toFloat()
-
-    override val clipComponents = mutableListOf<ClipRectangle>()
 
     @Volatile
     private var isDisposed = false
@@ -42,13 +38,12 @@ open class SkiaSwingLayer internal constructor(
     override val renderApi: GraphicsApi
         get() = redrawerProvider.renderApi
 
-    @Volatile
-    private var picture: PictureHolder? = null
-    private var pictureRecorder: PictureRecorder? = null
-    private val pictureLock = Any()
-
     @Suppress("LeakingThis")
     private val fpsCounter = defaultFPSCounter(this)
+
+    private val skiaLayerRenderer = SkiaLayerRenderer(fpsCounter)
+
+    override val clipComponents: MutableList<ClipRectangle> get() = skiaLayerRenderer.clipComponents
 
     @Suppress("unused") // used in Compose Multiplatform
     constructor(
@@ -88,7 +83,7 @@ open class SkiaSwingLayer internal constructor(
 
     private fun init(recreation: Boolean = false) {
         isDisposed = false
-        pictureRecorder = PictureRecorder()
+        skiaLayerRenderer.init()
         redrawerProvider.findNextWorkingRenderApi(recreation)
         isInited = true
     }
@@ -99,10 +94,7 @@ open class SkiaSwingLayer internal constructor(
             // we should dispose redrawer first (to cancel `draw` in rendering thread)
             redrawer?.dispose()
             redrawerProvider.dispose()
-            picture?.instance?.close()
-            picture = null
-            pictureRecorder?.close()
-            pictureRecorder = null
+            skiaLayerRenderer.dispose()
             isDisposed = true
         }
     }
@@ -115,37 +107,7 @@ open class SkiaSwingLayer internal constructor(
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         check(!isDisposed) { "SkiaLayer is disposed" }
 
-        FrameWatcher.nextFrame()
-        fpsCounter?.tick()
-
-        val pictureWidth = (width * contentScale).toInt().coerceAtLeast(0)
-        val pictureHeight = (height * contentScale).toInt().coerceAtLeast(0)
-
-        val bounds = Rect.makeWH(pictureWidth.toFloat(), pictureHeight.toFloat())
-        val pictureRecorder = pictureRecorder!!
-        val canvas = pictureRecorder.beginRecording(bounds)
-
-        // clipping
-        for (component in clipComponents) {
-            canvas.clipRectBy(component)
-        }
-
-        try {
-            isRendering = true
-            skikoView.onRender(canvas, pictureWidth, pictureHeight, nanoTime)
-        } finally {
-            isRendering = false
-        }
-
-        // we can dispose layer during onRender
-        // or even dispose it and pack it again
-        if (!isDisposed && !pictureRecorder.isClosed) {
-            synchronized(pictureLock) {
-                picture?.instance?.close()
-                val picture = pictureRecorder.finishRecordingAsPicture()
-                this.picture = PictureHolder(picture, pictureWidth, pictureHeight)
-            }
-        }
+        skiaLayerRenderer.update(nanoTime, width, height, contentScale, skikoView)
     }
 
     internal inline fun inDrawScope(body: () -> Unit) {
@@ -165,35 +127,7 @@ open class SkiaSwingLayer internal constructor(
     }
 
     internal fun draw(canvas: Canvas) {
-        check(!isDisposed) { "SkiaLayer is disposed" }
-        lockPicture {
-            canvas.drawPicture(it.instance)
-        }
-    }
-
-    private fun <T : Any> lockPicture(action: (PictureHolder) -> T): T? {
-        return synchronized(pictureLock) {
-            val picture = picture
-            if (picture != null) {
-                action(picture)
-            } else {
-                null
-            }
-        }
-    }
-
-    private fun Canvas.clipRectBy(rectangle: ClipRectangle) {
-        val dpi = contentScale
-        clipRect(
-            Rect.makeLTRB(
-                rectangle.x * dpi,
-                rectangle.y * dpi,
-                (rectangle.x + rectangle.width) * dpi,
-                (rectangle.y + rectangle.height) * dpi
-            ),
-            ClipMode.DIFFERENCE,
-            true
-        )
+        skiaLayerRenderer.draw(canvas)
     }
 
     override fun requestNativeFocusOnAccessible(accessible: Accessible?) {
