@@ -208,7 +208,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
     }
 
     /*
-     * When there at least one tracked touch, we need notify redrawer about it. It should schedule CADisplayLink which
+     * When there is at least one tracked touch, we need notify redrawer about it. It should schedule CADisplayLink which
      * affects frequency of polling UITouch events on high frequency display and forces it to match display refresh rate.
      */
     private var touchesCount = 0

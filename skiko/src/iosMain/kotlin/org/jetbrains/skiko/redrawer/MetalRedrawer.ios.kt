@@ -127,12 +127,6 @@ internal class MetalRedrawer(
         }
     }
 
-    override fun redrawImmediately() {
-        check(!isDisposed) { "MetalRedrawer is disposed" }
-
-        draw()
-    }
-
     /*
      * Dispatch redraw immediately during current frame if possible and updates [drawSchedulingState] to relevant value
      */
@@ -168,8 +162,30 @@ internal class MetalRedrawer(
             currentDrawable?.let {
                 val commandBuffer = queue.commandBuffer()!!
                 commandBuffer.label = "Present"
-                commandBuffer.presentDrawable(it)
+
+                // logic behind presentation of drawable synchronization with CATransaction is described here:
+                // as per https://developer.apple.com/documentation/quartzcore/cametallayer/1478157-presentswithtransaction?language=objc
+
+                if (!metalLayer.presentsWithTransaction) {
+                    // Present ASAP, when buffer completes
+                    commandBuffer.presentDrawable(it)
+                }
+
                 commandBuffer.commit()
+
+                if (metalLayer.presentsWithTransaction) {
+                    // Wait until CATransactionStart, which happens right before command buffer is scheduled
+                    // Check documentation link above
+                    commandBuffer.waitUntilScheduled()
+                    it.present()
+                }
+
+                /* TODO: explicitly release currentDrawable using this API when it arrives in Kotlin 1.9.0(or later?)
+                 *  val obj = NSObject()
+                 *  val ref = WeakReference(obj)
+                 *  println(obj)
+                 *  obj.resetAssociatedObject()
+                 */
                 currentDrawable = null
             }
         }
