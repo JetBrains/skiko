@@ -2,6 +2,7 @@ package org.jetbrains.skiko.swing
 
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
+import org.jetbrains.skiko.redrawer.RedrawerProvider
 import java.awt.Graphics2D
 import java.util.concurrent.CancellationException
 import javax.accessibility.Accessible
@@ -30,11 +31,16 @@ open class SkiaSwingLayer internal constructor(
     @Volatile
     private var isDisposed = false
 
-    internal var redrawer: SwingRedrawer? = null
-    private val fallbackRenderApiQueue = SkikoProperties.fallbackRenderApiQueue(properties.renderApi).toMutableList()
-    private var _renderApi = fallbackRenderApiQueue[0]
+    private val redrawerProvider = RedrawerProvider<SwingRedrawer>(properties.renderApi) { renderApi, oldRedrawer ->
+        oldRedrawer?.dispose()
+        createDefaultSwingRedrawer(this@SkiaSwingLayer, renderApi, analytics, properties)
+    }
 
-    override val renderApi: GraphicsApi = _renderApi
+    private val redrawer: SwingRedrawer?
+        get() = redrawerProvider.redrawer
+
+    override val renderApi: GraphicsApi
+        get() = redrawerProvider.renderApi
 
     @Volatile
     private var picture: PictureHolder? = null
@@ -80,32 +86,10 @@ open class SkiaSwingLayer internal constructor(
         init(isInited)
     }
 
-    private fun findNextWorkingRenderApi() {
-        var thrown: Boolean
-        do {
-            thrown = false
-            try {
-                _renderApi = fallbackRenderApiQueue.removeAt(0)
-                redrawer?.dispose()
-                redrawer = createDefaultSwingRedrawer(this@SkiaSwingLayer, _renderApi, analytics, properties)
-            } catch (e: RenderException) {
-                Logger.warn(e) { "Fallback to next API" }
-                thrown = true
-            }
-        } while (thrown && fallbackRenderApiQueue.isNotEmpty())
-
-        if (thrown && fallbackRenderApiQueue.isEmpty()) {
-            throw RenderException("Cannot fallback to any render API")
-        }
-    }
-
     private fun init(recreation: Boolean = false) {
         isDisposed = false
         pictureRecorder = PictureRecorder()
-        if (recreation) {
-            fallbackRenderApiQueue.add(0, renderApi)
-        }
-        findNextWorkingRenderApi()
+        redrawerProvider.findNextWorkingRenderApi(recreation)
         isInited = true
     }
 
@@ -114,7 +98,7 @@ open class SkiaSwingLayer internal constructor(
         if (isInited && !isDisposed) {
             // we should dispose redrawer first (to cancel `draw` in rendering thread)
             redrawer?.dispose()
-            redrawer = null
+            redrawerProvider.dispose()
             picture?.instance?.close()
             picture = null
             pictureRecorder?.close()
@@ -174,7 +158,7 @@ open class SkiaSwingLayer internal constructor(
         } catch (e: RenderException) {
             if (!isDisposed) {
                 Logger.warn(e) { "Exception in draw scope" }
-                findNextWorkingRenderApi()
+                redrawerProvider.findNextWorkingRenderApi()
                 repaint()
             }
         }
