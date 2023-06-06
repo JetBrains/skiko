@@ -9,6 +9,7 @@ import platform.Foundation.NSRunLoop
 import platform.Foundation.NSSelectorFromString
 import platform.Metal.MTLCreateSystemDefaultDevice
 import platform.QuartzCore.*
+import platform.darwin.NSInteger
 import platform.darwin.NSObject
 
 private enum class DrawSchedulingState {
@@ -84,6 +85,12 @@ internal class MetalRedrawer(
         }
     }
 
+    var preferredFramesPerSecond: NSInteger
+        get() = caDisplayLink.preferredFramesPerSecond
+        set(value) {
+            caDisplayLink.preferredFramesPerSecond = value
+        }
+
     private val caDisplayLink = CADisplayLink.displayLinkWithTarget(
         target = frameListener,
         selector = NSSelectorFromString(FrameTickListener::onDisplayLinkTick.name)
@@ -107,15 +114,6 @@ internal class MetalRedrawer(
             caDisplayLink.invalidate()
             contextHandler.dispose()
             isDisposed = true
-        }
-    }
-
-    // TODO: inverse this logic and move it to view
-    override fun syncSize() {
-        val osView = layer.view!!
-
-        osView.window?.screen?.maximumFramesPerSecond?.let {
-            caDisplayLink.preferredFramesPerSecond = it
         }
     }
 

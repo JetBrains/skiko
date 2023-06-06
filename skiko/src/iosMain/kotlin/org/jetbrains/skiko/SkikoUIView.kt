@@ -280,7 +280,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
     /**
      * Notifies redrawer that no draw can be dispatched during current vsync:
      * - It's either too early (some syncing with UIKit rendering after UIView hierarchy change happens, and it needs to be delayed to next frame)
-     * - Or too late (invalidation will possibly come after, didn't come during onPointerEvent execution, but before next vsync calls back)
+     * - Or too late (invalidation will possibly come after, didn't come during onPointerEvent execution, don't draw until next vsync calls back)
      */
     fun preventDrawDispatchDuringCurrentFrame() {
         skiaLayer?.redrawer?.preventDrawDispatchDuringCurrentFrame()
@@ -416,12 +416,22 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
         }
     }
 
+    override fun didMoveToWindow() {
+        super.didMoveToWindow()
+
+        window?.screen?.let {
+            contentScaleFactor = it.scale
+
+            skiaLayer?.redrawer?.preferredFramesPerSecond = it.maximumFramesPerSecond
+        }
+    }
+
     override fun layoutSubviews() {
         super.layoutSubviews()
 
         val (width, height) = metalLayer.bounds.useContents {
-            val width = size.width * metalLayer.contentsScale
-            val height = size.height * metalLayer.contentsScale
+            val width = size.width * contentScaleFactor
+            val height = size.height * contentScaleFactor
 
             metalLayer.drawableSize = CGSizeMake(width, height)
 
