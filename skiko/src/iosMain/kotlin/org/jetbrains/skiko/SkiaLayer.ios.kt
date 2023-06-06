@@ -76,9 +76,7 @@ actual open class SkiaLayer {
         this.view = view
         contextHandler = MetalContextHandler(this)
         // TODO: maybe add observer for view.viewDidDisappear() to detach us?
-        redrawer = MetalRedrawer(this, metalLayer).apply {
-            needRedraw()
-        }
+        redrawer = MetalRedrawer(this, metalLayer)
     }
 
     private var isDisposed = false

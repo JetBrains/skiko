@@ -45,10 +45,6 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
 
             opaque = false
         }
-
-        layer.actions = listOf(
-                "onOrderIn", "onOrderOut", "sublayers", "contents", "position", "bounds"
-        ).associateWith { NSNull.`null`() }
     }
 
     private var skiaLayer: SkiaLayer? = null
@@ -134,11 +130,6 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
     fun detach() = skiaLayer?.detach()
 
     fun load(): SkikoUIView {
-        val (width, height) = UIScreen.mainScreen.bounds.useContents {
-            this.size.width to this.size.height
-        }
-        setFrame(CGRectMake(0.0, 0.0, width, height))
-        contentScaleFactor = UIScreen.mainScreen.scale
         skiaLayer?.let { layer ->
             layer.attachTo(this)
             layer.initGestures()

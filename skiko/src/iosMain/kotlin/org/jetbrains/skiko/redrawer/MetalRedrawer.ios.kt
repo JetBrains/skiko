@@ -4,19 +4,11 @@ import kotlinx.cinterop.*
 import org.jetbrains.skia.BackendRenderTarget
 import org.jetbrains.skia.DirectContext
 import org.jetbrains.skiko.SkiaLayer
-import org.jetbrains.skiko.context.ContextHandler
 import org.jetbrains.skiko.context.MetalContextHandler
-import platform.CoreGraphics.CGColorCreate
-import platform.CoreGraphics.CGColorSpaceCreateDeviceRGB
-import platform.CoreGraphics.CGContextRef
-import platform.CoreGraphics.CGSizeMake
 import platform.Foundation.NSRunLoop
 import platform.Foundation.NSSelectorFromString
 import platform.Metal.MTLCreateSystemDefaultDevice
-import platform.Metal.MTLDeviceProtocol
-import platform.Metal.MTLPixelFormatBGRA8Unorm
 import platform.QuartzCore.*
-import platform.UIKit.window
 import platform.darwin.NSObject
 
 private enum class DrawSchedulingState {
@@ -185,51 +177,6 @@ internal class MetalRedrawer(
         }
     }
 }
-
-//internal class MetalLayer : CAMetalLayer {
-//    private lateinit var skiaLayer: SkiaLayer
-//    private lateinit var contextHandler: ContextHandler
-//
-//    @OverrideInit
-//    constructor() : super()
-//
-//    @OverrideInit
-//    constructor(layer: Any) : super(layer)
-//
-//    fun init(
-//        skiaLayer: SkiaLayer,
-//        contextHandler: ContextHandler,
-//        theDevice: MTLDeviceProtocol
-//    ) {
-//        this.skiaLayer = skiaLayer
-//        this.contextHandler = contextHandler
-//        this.setNeedsDisplayOnBoundsChange(true)
-//        this.removeAllAnimations()
-//        // TODO: looks like a bug in K/N interop.
-//        this.device = theDevice as objcnames.protocols.MTLDeviceProtocol?
-//        this.pixelFormat = MTLPixelFormatBGRA8Unorm
-//        this.contentsGravity = kCAGravityTopLeft
-//        doubleArrayOf(0.0, 0.0, 0.0, 0.0).usePinned {
-//            this.backgroundColor =
-//                CGColorCreate(CGColorSpaceCreateDeviceRGB(), it.addressOf(0))
-//        }
-//        this.opaque = false // For UIKit interop through a "Hole"
-//        skiaLayer.view?.let {
-//            this.frame = it.frame
-//            it.layer.addSublayer(this)
-//        }
-//    }
-//
-//    fun dispose() {
-//        this.removeFromSuperlayer()
-//        // TODO: anything else to dispose the layer?
-//    }
-//
-//    override fun drawInContext(ctx: CGContextRef?) {
-//        contextHandler.draw()
-//        super.drawInContext(ctx)
-//    }
-//}
 
 private class FrameTickListener(val onFrameTick: () -> Unit) : NSObject() {
     @ObjCAction
