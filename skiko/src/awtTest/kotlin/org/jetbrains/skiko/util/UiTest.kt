@@ -8,9 +8,12 @@ import org.junit.Assume.assumeTrue
 import java.awt.GraphicsEnvironment
 import javax.swing.JFrame
 
+internal val isUITestsEnabled get() =
+    !GraphicsEnvironment.isHeadless() &&
+            System.getProperty("skiko.test.ui.enabled", "false") == "true"
+
 internal fun uiTest(block: suspend UiTestScope.() -> Unit) {
-    assumeFalse(GraphicsEnvironment.isHeadless())
-    assumeTrue(System.getProperty("skiko.test.ui.enabled", "false") == "true")
+    assumeTrue(isUITestsEnabled)
 
     val renderApi = System.getProperty("skiko.test.ui.renderApi", "all")
 
