@@ -9,7 +9,7 @@ import org.jetbrains.skiko.redrawer.MacOsMetalRedrawer
 /**
  * Metal ContextHandler implementation for MacOs.
  */
-internal class MacOsMetalContextHandler(layer: SkiaLayer) : ContextHandler(layer, layer::draw) {
+internal class MacOsMetalContextHandler(layer: SkiaLayer) : SkiaLayerContextHandler(layer, layer::draw) {
     private val metalRedrawer: MacOsMetalRedrawer
         get() = layer.redrawer!! as MacOsMetalRedrawer
 
