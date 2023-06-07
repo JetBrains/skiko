@@ -13,8 +13,9 @@ import java.awt.image.*
 
 internal class MetalSwingContextHandler(
     private val skiaSwingLayer: SkiaSwingLayer,
-    private val adapter: MetalAdapter
-) : ContextHandler(skiaSwingLayer::draw) {
+    private val adapter: MetalAdapter,
+    drawContent: Canvas.() -> Unit
+) : ContextHandler(drawContent) {
     private var graphics: Graphics2D? = null
     override val renderApi: GraphicsApi
         get() = skiaSwingLayer.renderApi

@@ -513,12 +513,12 @@ actual open class SkiaLayer internal constructor(
     @Suppress("LeakingThis")
     private val fpsCounter = defaultFPSCounter(this)
 
-    private val skiaDrawingManager = SkiaDrawingManager(fpsCounter)
-
     private val isRendering: Boolean get() = skiaDrawingManager.isRendering
 
     @Suppress("unused") // used externally
-    val clipComponents: MutableList<ClipRectangle> get() = skiaDrawingManager.clipComponents
+    val clipComponents: MutableList<ClipRectangle> = mutableListOf()
+
+    private val skiaDrawingManager = SkiaDrawingManager(fpsCounter, clipComponents)
 
     internal fun update(nanoTime: Long) {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }

@@ -11,8 +11,9 @@ import java.awt.color.ColorSpace
 import java.awt.image.*
 
 internal class SoftwareSwingContextHandler(
-    private val skiaSwingLayer: SkiaSwingLayer
-) : ContextHandler(skiaSwingLayer::draw) {
+    private val skiaSwingLayer: SkiaSwingLayer,
+    drawContent: Canvas.() -> Unit
+) : ContextHandler(drawContent) {
     private var graphics: Graphics2D? = null
     override val renderApi: GraphicsApi
         get() = skiaSwingLayer.renderApi

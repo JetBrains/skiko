@@ -4,13 +4,12 @@ import org.jetbrains.skia.*
 import javax.swing.SwingUtilities
 
 internal class SkiaDrawingManager(
-    private val fpsCounter: FPSCounter?
+    private val fpsCounter: FPSCounter?,
+    private val clipComponents: MutableList<ClipRectangle>
 ) {
     private var _isRendering = false
     val isRendering: Boolean
         get() = _isRendering
-
-    val clipComponents = mutableListOf<ClipRectangle>()
 
     @Volatile
     private var isDisposed = false

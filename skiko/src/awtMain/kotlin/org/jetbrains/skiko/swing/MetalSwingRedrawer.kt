@@ -21,9 +21,12 @@ import java.awt.Graphics2D
 @ExperimentalSkikoApi
 internal class MetalSwingRedrawer(
     skiaSwingLayer: SkiaSwingLayer,
+    skikoView: SkikoView,
     analytics: SkiaLayerAnalytics,
-    properties: SkiaLayerProperties
-) : SwingRedrawerBase(skiaSwingLayer, analytics, GraphicsApi.METAL) {
+    properties: SkiaLayerProperties,
+    clipComponents: MutableList<ClipRectangle>,
+    renderExceptionHandler: (e: RenderException) -> Unit,
+) : SwingRedrawerBase(skiaSwingLayer, skikoView, analytics, GraphicsApi.METAL, clipComponents, renderExceptionHandler) {
     companion object {
         init {
             Library.load()
@@ -34,7 +37,7 @@ internal class MetalSwingRedrawer(
         onDeviceChosen(it.name)
     }
 
-    private val contextHandler = MetalSwingContextHandler(skiaSwingLayer, adapter).also {
+    private val contextHandler = MetalSwingContextHandler(skiaSwingLayer, adapter, this::draw).also {
         onContextInit()
     }
 

@@ -1,18 +1,27 @@
 package org.jetbrains.skiko.swing
 
-import org.jetbrains.skiko.GraphicsApi
-import org.jetbrains.skiko.SkiaLayerAnalytics
+import org.jetbrains.skiko.*
 import java.awt.Graphics2D
 
 internal class SoftwareSwingRedrawer(
     skiaSwingLayer: SkiaSwingLayer,
-    analytics: SkiaLayerAnalytics
-) : SwingRedrawerBase(skiaSwingLayer, analytics, GraphicsApi.SOFTWARE_FAST) {
+    skikoView: SkikoView,
+    analytics: SkiaLayerAnalytics,
+    clipComponents: MutableList<ClipRectangle>,
+    renderExceptionHandler: (e: RenderException) -> Unit,
+) : SwingRedrawerBase(
+    skiaSwingLayer,
+    skikoView,
+    analytics,
+    GraphicsApi.SOFTWARE_FAST,
+    clipComponents,
+    renderExceptionHandler
+) {
     init {
         onDeviceChosen("Software")
     }
 
-    private val contextHandler = SoftwareSwingContextHandler(skiaSwingLayer).also {
+    private val contextHandler = SoftwareSwingContextHandler(skiaSwingLayer, this::draw).also {
         onContextInit()
     }
 

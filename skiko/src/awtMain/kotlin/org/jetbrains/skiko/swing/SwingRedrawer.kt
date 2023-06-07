@@ -12,16 +12,26 @@ internal interface SwingRedrawer {
 @OptIn(ExperimentalSkikoApi::class)
 internal fun createDefaultSwingRedrawer(
     layer: SkiaSwingLayer,
+    skikoView: SkikoView,
     renderApi: GraphicsApi,
     analytics: SkiaLayerAnalytics,
-    properties: SkiaLayerProperties
+    properties: SkiaLayerProperties,
+    clipComponents: MutableList<ClipRectangle>,
+    renderExceptionsHandler: (e: RenderException) -> Unit
 ): SwingRedrawer {
     return when (hostOs) {
         OS.MacOS -> when (renderApi) {
-            GraphicsApi.SOFTWARE_COMPAT, GraphicsApi.SOFTWARE_FAST -> SoftwareSwingRedrawer(layer, analytics)
-            else -> MetalSwingRedrawer(layer, analytics, properties)
+            GraphicsApi.SOFTWARE_COMPAT, GraphicsApi.SOFTWARE_FAST -> SoftwareSwingRedrawer(
+                layer,
+                skikoView,
+                analytics,
+                clipComponents,
+                renderExceptionsHandler
+            )
+
+            else -> MetalSwingRedrawer(layer, skikoView, analytics, properties, clipComponents, renderExceptionsHandler)
         }
 
-        else -> SoftwareSwingRedrawer(layer, analytics)
+        else -> SoftwareSwingRedrawer(layer, skikoView, analytics, clipComponents, renderExceptionsHandler)
     }
 }

@@ -2,17 +2,26 @@ package org.jetbrains.skiko.swing
 
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.SkiaLayerAnalytics.DeviceAnalytics
+import java.awt.Canvas
+import java.util.concurrent.CancellationException
+import javax.swing.JComponent
+import javax.swing.SwingUtilities
 
-/**
- * Common class for all AWT redrawers.
- * Don't forget to call [onDeviceChosen] and [onContextInit] to send necessary analytics.
- */
 @OptIn(ExperimentalSkikoApi::class)
 internal abstract class SwingRedrawerBase(
-    private val layer: SkiaSwingLayer,
+    private val component: JComponent,
+    private val skikoView: SkikoView,
     private val analytics: SkiaLayerAnalytics,
     private val graphicsApi: GraphicsApi,
+    clipComponents: MutableList<ClipRectangle>,
+    private val renderExceptionHandler: (e: RenderException) -> Unit
 ) : SwingRedrawer {
+    private val fpsCounter = defaultFPSCounter(component)
+    private val skiaDrawingManager = SkiaDrawingManager(fpsCounter, clipComponents).also {
+        // TODO: should we init it later? not on creation
+        it.init()
+    }
+
     private var isFirstFrameRendered = false
 
     private val rendererAnalytics = analytics.renderer(Version.skiko, hostOs, graphicsApi)
@@ -26,6 +35,7 @@ internal abstract class SwingRedrawerBase(
 
     override fun dispose() {
         require(!isDisposed) { "$javaClass is disposed" }
+        skiaDrawingManager.dispose()
         isDisposed = true
     }
 
@@ -51,20 +61,34 @@ internal abstract class SwingRedrawerBase(
 
     protected fun update(nanoTime: Long) {
         require(!isDisposed) { "$javaClass is disposed" }
-        layer.update(nanoTime)
+        val contentScale = component.graphicsConfiguration.defaultTransform.scaleX.toFloat()
+        skiaDrawingManager.update(nanoTime, component.width, component.height, contentScale, skikoView)
     }
 
     protected inline fun inDrawScope(body: () -> Unit) {
+        check(SwingUtilities.isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         requireNotNull(deviceAnalytics) { "deviceAnalytics is not null. Call onDeviceChosen after choosing the drawing device" }
         if (!isDisposed) {
             if (!isFirstFrameRendered) {
                 deviceAnalytics?.beforeFirstFrameRender()
             }
-            layer.inDrawScope(body)
+            try {
+                body()
+            } catch (e: CancellationException) {
+                // ignore
+            } catch (e: RenderException) {
+                if (!isDisposed) {
+                    renderExceptionHandler(e)
+                }
+            }
             if (!isFirstFrameRendered && !isDisposed) {
                 deviceAnalytics?.afterFirstFrameRender()
             }
             isFirstFrameRendered = true
         }
+    }
+
+    protected fun draw(canvas: org.jetbrains.skia.Canvas) {
+        skiaDrawingManager.draw(canvas)
     }
 }
