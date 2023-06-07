@@ -21,19 +21,7 @@ internal class SoftwareSwingRedrawer(
         onDeviceChosen("Software")
     }
 
-    private val contextHandler = SoftwareSwingContextHandler(skiaSwingLayer, this::draw).also {
+    override val contextHandler = SoftwareSwingContextHandler(skiaSwingLayer, this::draw).also {
         onContextInit()
-    }
-
-    override fun dispose() {
-        contextHandler.dispose()
-        super.dispose()
-    }
-
-    override fun redraw(g: Graphics2D) {
-        update(System.nanoTime())
-        inDrawScope {
-            contextHandler.draw(g)
-        }
     }
 }

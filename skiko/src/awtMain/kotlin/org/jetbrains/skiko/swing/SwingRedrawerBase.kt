@@ -3,6 +3,7 @@ package org.jetbrains.skiko.swing
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.SkiaLayerAnalytics.DeviceAnalytics
 import java.awt.Canvas
+import java.awt.Graphics2D
 import java.util.concurrent.CancellationException
 import javax.swing.JComponent
 import javax.swing.SwingUtilities
@@ -29,14 +30,27 @@ internal abstract class SwingRedrawerBase(
     protected var isDisposed = false
         private set
 
+    protected abstract val contextHandler: SwingContextHandler
+
     init {
         rendererAnalytics.init()
     }
 
-    override fun dispose() {
+    final override fun dispose() {
         require(!isDisposed) { "$javaClass is disposed" }
         skiaDrawingManager.dispose()
         isDisposed = true
+    }
+
+    final override fun redraw(g: Graphics2D) {
+        update(System.nanoTime())
+        inDrawScope {
+            contextHandler.draw(g)
+        }
+    }
+
+    protected fun draw(canvas: org.jetbrains.skia.Canvas) {
+        skiaDrawingManager.draw(canvas)
     }
 
     /**
@@ -59,13 +73,13 @@ internal abstract class SwingRedrawerBase(
         deviceAnalytics?.contextInit()
     }
 
-    protected fun update(nanoTime: Long) {
+    private fun update(nanoTime: Long) {
         require(!isDisposed) { "$javaClass is disposed" }
         val contentScale = component.graphicsConfiguration.defaultTransform.scaleX.toFloat()
         skiaDrawingManager.update(nanoTime, component.width, component.height, contentScale, skikoView)
     }
 
-    protected inline fun inDrawScope(body: () -> Unit) {
+    private inline fun inDrawScope(body: () -> Unit) {
         check(SwingUtilities.isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         requireNotNull(deviceAnalytics) { "deviceAnalytics is not null. Call onDeviceChosen after choosing the drawing device" }
         if (!isDisposed) {
@@ -86,9 +100,5 @@ internal abstract class SwingRedrawerBase(
             }
             isFirstFrameRendered = true
         }
-    }
-
-    protected fun draw(canvas: org.jetbrains.skia.Canvas) {
-        skiaDrawingManager.draw(canvas)
     }
 }

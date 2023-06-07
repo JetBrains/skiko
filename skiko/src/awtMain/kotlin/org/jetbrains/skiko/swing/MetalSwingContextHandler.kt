@@ -15,8 +15,7 @@ internal class MetalSwingContextHandler(
     private val skiaSwingLayer: SkiaSwingLayer,
     private val adapter: MetalAdapter,
     drawContent: Canvas.() -> Unit
-) : ContextHandler(drawContent) {
-    private var graphics: Graphics2D? = null
+) : SwingContextHandler(drawContent) {
     override val renderApi: GraphicsApi
         get() = skiaSwingLayer.renderApi
 
@@ -115,12 +114,6 @@ internal class MetalSwingContextHandler(
                 }
             }
         }
-    }
-
-    fun draw(graphics: Graphics2D) {
-        this.graphics = graphics
-        draw()
-        this.graphics = null
     }
 
     override fun rendererInfo(): String {

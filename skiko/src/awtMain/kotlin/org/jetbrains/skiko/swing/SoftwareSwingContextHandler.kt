@@ -13,8 +13,7 @@ import java.awt.image.*
 internal class SoftwareSwingContextHandler(
     private val skiaSwingLayer: SkiaSwingLayer,
     drawContent: Canvas.() -> Unit
-) : ContextHandler(drawContent) {
-    private var graphics: Graphics2D? = null
+) : SwingContextHandler(drawContent) {
     override val renderApi: GraphicsApi
         get() = skiaSwingLayer.renderApi
 
@@ -81,11 +80,5 @@ internal class SoftwareSwingContextHandler(
             g.clearRect(0, 0, w, h)
             g.drawImage(image!!, 0, 0, skiaSwingLayer.width, skiaSwingLayer.height, null)
         }
-    }
-
-    fun draw(graphics: Graphics2D) {
-        this.graphics = graphics
-        draw()
-        this.graphics = null
     }
 }

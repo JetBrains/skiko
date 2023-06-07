@@ -37,19 +37,7 @@ internal class MetalSwingRedrawer(
         onDeviceChosen(it.name)
     }
 
-    private val contextHandler = MetalSwingContextHandler(skiaSwingLayer, adapter, this::draw).also {
+    override val contextHandler = MetalSwingContextHandler(skiaSwingLayer, adapter, this::draw).also {
         onContextInit()
-    }
-
-    override fun dispose() {
-        contextHandler.dispose()
-        super.dispose()
-    }
-
-    override fun redraw(g: Graphics2D) {
-        update(System.nanoTime())
-        inDrawScope {
-            contextHandler.draw(g)
-        }
     }
 }
