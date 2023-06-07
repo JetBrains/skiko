@@ -264,6 +264,8 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
             )
         }
 
+        println("onPointerEvent start")
+
         skiaLayer?.skikoView?.onPointerEvent(
             SkikoPointerEvent(
                 x = pointers.centroidX,
@@ -274,17 +276,8 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
                 platform = event
             )
         )
-         // If invalidation doesn't happen while onPointerEvent is processed, it's too late to schedule any work for this frame.
-        preventDrawDispatchDuringCurrentFrame()
-    }
 
-    /**
-     * Notifies redrawer that no draw can be dispatched during current vsync:
-     * - It's either too early (some syncing with UIKit rendering after UIView hierarchy change happens, and it needs to be delayed to next frame)
-     * - Or too late (invalidation will possibly come after, didn't come during onPointerEvent execution, don't draw until next vsync calls back)
-     */
-    fun preventDrawDispatchDuringCurrentFrame() {
-        skiaLayer?.redrawer?.preventDrawDispatchDuringCurrentFrame()
+        println("onPointerEvent end")
     }
 
     private val UITouch.isPressed get() =

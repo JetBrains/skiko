@@ -40,17 +40,6 @@ internal class MetalRedrawer(
     private var drawSchedulingState = DrawSchedulingState.AVAILABLE_ON_NEXT_FRAME
 
     /**
-     * UITouch events are dispatched right before next CADisplayLink callback by iOS.
-     * It's too late to encode any work for this frame after this happens.
-     * Any work dispatched before the next CADisplayLink callback should be scheduled after that callback.
-     */
-    fun preventDrawDispatchDuringCurrentFrame() {
-        if (drawSchedulingState == DrawSchedulingState.AVAILABLE_ON_CURRENT_FRAME) {
-            drawSchedulingState = DrawSchedulingState.AVAILABLE_ON_NEXT_FRAME
-        }
-    }
-
-    /**
      * Needs scheduling displayLink for forcing UITouch events to come at the fastest possible cadence.
      * Otherwise, touch events can come at rate lower than actual display refresh rate.
      */
@@ -118,6 +107,8 @@ internal class MetalRedrawer(
     }
 
     override fun needRedraw() {
+        println("needRedraw")
+
         check(!isDisposed) { "MetalRedrawer is disposed" }
 
         drawImmediatelyIfPossible()
