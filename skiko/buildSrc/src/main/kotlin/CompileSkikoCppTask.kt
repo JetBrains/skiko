@@ -11,6 +11,8 @@ import org.gradle.work.InputChanges
 import org.gradle.workers.WorkerExecutionException
 
 import java.io.File
+import java.nio.file.Files
+import java.nio.file.Path
 import java.util.*
 import java.util.concurrent.Callable
 import kotlin.collections.HashSet
@@ -145,6 +147,9 @@ abstract class CompileSkikoCppTask() : AbstractSkikoNativeToolTask() {
                 // Replace slash for Windows paths
                 arg("-o", outputFile.absolutePath.replace("\\", "/"))
                 arg(value = sourceFile.absolutePath.replace("\\", "/"))
+                if (compiler.get().startsWith("clang")) {
+                    arg("-MJ", outputFile.absolutePath + ".json")
+                }
             }
 
             val argFile = run {
@@ -177,6 +182,17 @@ abstract class CompileSkikoCppTask() : AbstractSkikoNativeToolTask() {
             for (work in submittedWorks) {
                 RunExternalProcessWork.workResults.remove(work)
             }
+        }
+
+        if (compiler.get().startsWith("clang")) {
+            val compileCommands = buildString {
+                appendLine("[")
+                append(sourceOutputPairs.joinToString(",\n") { (_, outputFile) ->
+                    Files.readString(Path.of(outputFile.absolutePath + ".json")).trim().removeSuffix(",")
+                })
+                appendLine("]")
+            }
+            Files.writeString(outDir.toPath().resolve("compile_commands.json"), compileCommands)
         }
     }
 
