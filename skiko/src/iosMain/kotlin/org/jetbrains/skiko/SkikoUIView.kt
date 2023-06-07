@@ -37,6 +37,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
 
         metalLayer.apply {
             pixelFormat = MTLPixelFormatBGRA8Unorm
+            framebufferOnly = true
 
             doubleArrayOf(0.0, 0.0, 0.0, 0.0).usePinned {
                 backgroundColor =
