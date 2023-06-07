@@ -107,7 +107,6 @@ internal class MetalSwingContextHandler(
             val g = graphics
             if (g != null) {
                 try {
-                    g.clearRect(0, 0, width, height)
                     // TODO: a lot of CPU spend for scaling
                     g.drawImage(image, 0, 0, skiaSwingLayer.width, skiaSwingLayer.height, null)
                 } finally {
