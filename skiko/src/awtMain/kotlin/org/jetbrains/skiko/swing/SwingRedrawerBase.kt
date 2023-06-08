@@ -2,7 +2,6 @@ package org.jetbrains.skiko.swing
 
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.SkiaLayerAnalytics.DeviceAnalytics
-import java.awt.Canvas
 import java.awt.Graphics2D
 import java.util.concurrent.CancellationException
 import javax.swing.JComponent
@@ -14,15 +13,9 @@ internal abstract class SwingRedrawerBase(
     private val skikoView: SkikoView,
     private val analytics: SkiaLayerAnalytics,
     private val graphicsApi: GraphicsApi,
-    clipComponents: MutableList<ClipRectangle>,
+    private val clipComponents: MutableList<ClipRectangle>,
     private val renderExceptionHandler: (e: RenderException) -> Unit
 ) : SwingRedrawer {
-    private val fpsCounter = defaultFPSCounter(component)
-    private val skiaDrawingManager = SkiaDrawingManager(fpsCounter, clipComponents).also {
-        // TODO: should we init it later? not on creation
-        it.init()
-    }
-
     private var isFirstFrameRendered = false
 
     private val rendererAnalytics = analytics.renderer(Version.skiko, hostOs, graphicsApi)
@@ -38,19 +31,26 @@ internal abstract class SwingRedrawerBase(
 
     final override fun dispose() {
         require(!isDisposed) { "$javaClass is disposed" }
-        skiaDrawingManager.dispose()
         isDisposed = true
     }
 
     final override fun redraw(g: Graphics2D) {
-        update(System.nanoTime())
         inDrawScope {
             contextHandler.draw(g)
         }
     }
 
     protected fun draw(canvas: org.jetbrains.skia.Canvas) {
-        skiaDrawingManager.draw(canvas)
+        val scale = component.graphicsConfiguration.defaultTransform.scaleX.toFloat()
+        val width = (component.width * scale).toInt().coerceAtLeast(0)
+        val height = (component.height * scale).toInt().coerceAtLeast(0)
+
+        // clipping
+        for (component in clipComponents) {
+            canvas.clipRectBy(component, scale)
+        }
+
+        skikoView.onRender(canvas, width, height, System.nanoTime())
     }
 
     /**
@@ -71,12 +71,6 @@ internal abstract class SwingRedrawerBase(
         require(!isDisposed) { "$javaClass is disposed" }
         requireNotNull(deviceAnalytics) { "deviceAnalytics is not null. Call onDeviceChosen after choosing the drawing device" }
         deviceAnalytics?.contextInit()
-    }
-
-    private fun update(nanoTime: Long) {
-        require(!isDisposed) { "$javaClass is disposed" }
-        val contentScale = component.graphicsConfiguration.defaultTransform.scaleX.toFloat()
-        skiaDrawingManager.update(nanoTime, component.width, component.height, contentScale, skikoView)
     }
 
     private inline fun inDrawScope(body: () -> Unit) {

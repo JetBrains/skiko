@@ -109,18 +109,18 @@ internal class SkiaDrawingManager(
             }
         }
     }
+}
 
-    private fun Canvas.clipRectBy(rectangle: ClipRectangle, contentScale: Float) {
-        val dpi = contentScale
-        clipRect(
-            Rect.makeLTRB(
-                rectangle.x * dpi,
-                rectangle.y * dpi,
-                (rectangle.x + rectangle.width) * dpi,
-                (rectangle.y + rectangle.height) * dpi
-            ),
-            ClipMode.DIFFERENCE,
-            true
-        )
-    }
+internal fun Canvas.clipRectBy(rectangle: ClipRectangle, contentScale: Float) {
+    val dpi = contentScale
+    clipRect(
+        Rect.makeLTRB(
+            rectangle.x * dpi,
+            rectangle.y * dpi,
+            (rectangle.x + rectangle.width) * dpi,
+            (rectangle.y + rectangle.height) * dpi
+        ),
+        ClipMode.DIFFERENCE,
+        true
+    )
 }
