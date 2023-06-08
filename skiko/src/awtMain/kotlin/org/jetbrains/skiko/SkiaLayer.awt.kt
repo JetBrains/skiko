@@ -3,9 +3,7 @@ package org.jetbrains.skiko
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import org.jetbrains.skia.Bitmap
-import org.jetbrains.skia.Canvas
-import org.jetbrains.skia.PixelGeometry
+import org.jetbrains.skia.*
 import org.jetbrains.skiko.redrawer.Redrawer
 import org.jetbrains.skiko.redrawer.RedrawerManager
 import java.awt.Color
@@ -169,6 +167,7 @@ actual open class SkiaLayer internal constructor(
     }
 
     private var isInited = false
+    private var isRendering = false
 
     private fun checkShowing() {
         val wasShowing = isShowingCached
@@ -295,6 +294,8 @@ actual open class SkiaLayer internal constructor(
         })
     }
 
+    val clipComponents = mutableListOf<ClipRectangle>()
+
     @Volatile
     private var isDisposed = false
 
@@ -321,10 +322,15 @@ actual open class SkiaLayer internal constructor(
         else
             redrawer!!.renderInfo
 
+    @Volatile
+    private var picture: PictureHolder? = null
+    private var pictureRecorder: PictureRecorder? = null
+    private val pictureLock = Any()
+
     private fun init(recreation: Boolean = false) {
         isDisposed = false
         backedLayer.init()
-        skiaDrawingManager.init()
+        pictureRecorder = PictureRecorder()
         redrawerManager.findNextWorkingRenderApi(recreation)
         isInited = true
     }
@@ -348,7 +354,10 @@ actual open class SkiaLayer internal constructor(
             // we should dispose redrawer first (to cancel `draw` in rendering thread)
             redrawer?.dispose()
             redrawerManager.dispose()
-            skiaDrawingManager.dispose()
+            picture?.instance?.close()
+            picture = null
+            pictureRecorder?.close()
+            pictureRecorder = null
             backedLayer.dispose()
             peerBufferSizeFixJob?.cancel()
             isDisposed = true
@@ -513,20 +522,43 @@ actual open class SkiaLayer internal constructor(
     @Suppress("LeakingThis")
     private val fpsCounter = defaultFPSCounter(this)
 
-    private val isRendering: Boolean get() = skiaDrawingManager.isRendering
-
-    @Suppress("unused") // used externally
-    val clipComponents: MutableList<ClipRectangle> = mutableListOf()
-
-    private val skiaDrawingManager = SkiaDrawingManager(fpsCounter, clipComponents)
-
     internal fun update(nanoTime: Long) {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         check(!isDisposed) { "SkiaLayer is disposed" }
 
         checkContentScale()
 
-        skiaDrawingManager.update(nanoTime, width, height, contentScale, skikoView)
+        FrameWatcher.nextFrame()
+        fpsCounter?.tick()
+
+        val pictureWidth = (width * contentScale).toInt().coerceAtLeast(0)
+        val pictureHeight = (height * contentScale).toInt().coerceAtLeast(0)
+
+        val bounds = Rect.makeWH(pictureWidth.toFloat(), pictureHeight.toFloat())
+        val pictureRecorder = pictureRecorder!!
+        val canvas = pictureRecorder.beginRecording(bounds)
+
+        // clipping
+        for (component in clipComponents) {
+            canvas.clipRectBy(component)
+        }
+
+        try {
+            isRendering = true
+            skikoView?.onRender(canvas, pictureWidth, pictureHeight, nanoTime)
+        } finally {
+            isRendering = false
+        }
+
+        // we can dispose layer during onRender
+        // or even dispose it and pack it again
+        if (!isDisposed && !pictureRecorder.isClosed) {
+            synchronized(pictureLock) {
+                picture?.instance?.close()
+                val picture = pictureRecorder.finishRecordingAsPicture()
+                this.picture = PictureHolder(picture, pictureWidth, pictureHeight)
+            }
+        }
     }
 
     internal inline fun inDrawScope(body: () -> Unit) {
@@ -545,14 +577,53 @@ actual open class SkiaLayer internal constructor(
         }
     }
 
-    internal actual fun draw(canvas: Canvas) {
-        skiaDrawingManager.draw(canvas)
+    actual internal fun draw(canvas: Canvas) {
+        check(!isDisposed) { "SkiaLayer is disposed" }
+        lockPicture {
+            canvas.drawPicture(it.instance)
+        }
+    }
+
+    private fun <T : Any> lockPicture(action: (PictureHolder) -> T): T? {
+        return synchronized(pictureLock) {
+            val picture = picture
+            if (picture != null) {
+                action(picture)
+            } else {
+                null
+            }
+        }
     }
 
     // Captures current layer as bitmap.
-    @Suppress("unused") // used externally
     fun screenshot(): Bitmap? {
-        return skiaDrawingManager.screenshot()
+        check(!isDisposed) { "SkiaLayer is disposed" }
+        return lockPicture { picture ->
+            val store = Bitmap()
+            val ci = ColorInfo(
+                ColorType.BGRA_8888, ColorAlphaType.OPAQUE, ColorSpace.sRGB
+            )
+            store.setImageInfo(ImageInfo(ci, picture.width, picture.height))
+            store.allocN32Pixels(picture.width, picture.height)
+            val canvas = Canvas(store)
+            canvas.drawPicture(picture.instance)
+            store.setImmutable()
+            store
+        }
+    }
+
+    private fun Canvas.clipRectBy(rectangle: ClipRectangle) {
+        val dpi = contentScale
+        clipRect(
+            Rect.makeLTRB(
+                rectangle.x * dpi,
+                rectangle.y * dpi,
+                (rectangle.x + rectangle.width) * dpi,
+                (rectangle.y + rectangle.height) * dpi
+            ),
+            ClipMode.DIFFERENCE,
+            true
+        )
     }
 
     private fun roundSize(value: Int): Int {

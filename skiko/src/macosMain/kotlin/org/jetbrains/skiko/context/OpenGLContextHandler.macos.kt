@@ -14,7 +14,7 @@ import platform.OpenGLCommon.GLenum
  * Not used anymore, unless corresponding [GraphicsApi] is hardcoded in [SkiaLayer].
  * See [MacOsMetalContextHandler] instead.
  */
-internal class MacOSOpenGLContextHandler(layer: SkiaLayer) : SkiaLayerContextHandler(layer, layer::draw) {
+internal class MacOSOpenGLContextHandler(layer: SkiaLayer) : ContextHandler(layer, layer::draw) {
     override fun initContext(): Boolean {
         try {
             if (context == null) {
