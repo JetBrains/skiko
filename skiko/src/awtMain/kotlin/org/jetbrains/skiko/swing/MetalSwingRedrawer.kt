@@ -1,7 +1,9 @@
 package org.jetbrains.skiko.swing
 
+import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
 import java.awt.Graphics2D
+import java.awt.image.*
 
 /**
  * Experimental API that provides a way to draw on Skia canvas rendered off-screen with Metal GPU acceleration
@@ -20,7 +22,7 @@ import java.awt.Graphics2D
  */
 @ExperimentalSkikoApi
 internal class MetalSwingRedrawer(
-    skiaSwingLayer: SkiaSwingLayer,
+    private val skiaSwingLayer: SkiaSwingLayer,
     skikoView: SkikoView,
     analytics: SkiaLayerAnalytics,
     properties: SkiaLayerProperties,
@@ -37,7 +39,75 @@ internal class MetalSwingRedrawer(
         onDeviceChosen(it.name)
     }
 
-    override val contextHandler = MetalSwingContextHandler(skiaSwingLayer, adapter, this::draw).also {
-        onContextInit()
+    private val swingOffscreenDrawer = SwingOffscreenDrawer(skiaSwingLayer)
+
+    override fun createDirectContext(): DirectContext {
+        return makeMetalContext()
     }
+
+    override fun initCanvas(context: DirectContext?): DrawingSurfaceData {
+        context ?: error("Context should be initialized")
+
+        val scale = skiaSwingLayer.graphicsConfiguration.defaultTransform.scaleX.toFloat()
+        val width = (skiaSwingLayer.width * scale).toInt().coerceAtLeast(0)
+        val height = (skiaSwingLayer.height * scale).toInt().coerceAtLeast(0)
+
+        if (width == 0 || height == 0) {
+            return DrawingSurfaceData(renderTarget = null, surface = null, canvas = null)
+        }
+
+        val renderTarget = makeRenderTarget(width, height)
+
+        val surface = Surface.makeFromBackendRenderTarget(
+            context,
+            renderTarget,
+            SurfaceOrigin.TOP_LEFT,
+            SurfaceColorFormat.BGRA_8888,
+            ColorSpace.sRGB,
+            SurfaceProps(pixelGeometry = skiaSwingLayer.pixelGeometry)
+        ) ?: throw RenderException("Cannot create surface")
+
+        return DrawingSurfaceData(renderTarget, surface, surface.canvas)
+    }
+
+    override fun flush(drawingSurfaceData: DrawingSurfaceData, g: Graphics2D) {
+        val surface = drawingSurfaceData.surface ?: error("Surface should be initialized")
+        surface.flushAndSubmit(syncCpu = true)
+
+        val width = surface.width
+        val height = surface.height
+
+        val storage = Bitmap()
+        storage.setImageInfo(ImageInfo.makeN32Premul(width, height))
+        storage.allocPixels()
+        // TODO: it copies pixels from GPU to CPU, so it is really slow
+        surface.readPixels(storage, 0, 0)
+
+        val bytes = storage.readPixels(storage.imageInfo, (width * 4), 0, 0)
+        if (bytes != null) {
+            try {
+                swingOffscreenDrawer.draw(g, bytes, width, height)
+            } finally {
+                g.dispose()
+            }
+        }
+    }
+
+    override fun rendererInfo(): String {
+        return super.rendererInfo() +
+                "Video card: ${adapter.name}\n" +
+                "Total VRAM: ${adapter.memorySize / 1024 / 1024} MB\n"
+    }
+
+    private fun makeRenderTarget(width: Int, height: Int) = BackendRenderTarget(
+        makeMetalRenderTargetOffScreen(adapter.ptr, width, height)
+    )
+
+    private fun makeMetalContext(): DirectContext = DirectContext(
+        makeMetalContext(adapter.ptr)
+    )
+
+    private external fun makeMetalContext(adapter: Long): Long
+
+    private external fun makeMetalRenderTargetOffScreen(adapter: Long, width: Int, height: Int): Long
 }

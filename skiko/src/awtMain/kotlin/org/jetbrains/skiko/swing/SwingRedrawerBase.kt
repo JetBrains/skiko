@@ -1,5 +1,6 @@
 package org.jetbrains.skiko.swing
 
+import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.SkiaLayerAnalytics.DeviceAnalytics
 import java.awt.Graphics2D
@@ -20,37 +21,52 @@ internal abstract class SwingRedrawerBase(
 
     private val rendererAnalytics = analytics.renderer(Version.skiko, hostOs, graphicsApi)
     private var deviceAnalytics: DeviceAnalytics? = null
-    protected var isDisposed = false
-        private set
+    private var isDisposed = false
 
-    protected abstract val contextHandler: SwingContextHandler
+    private var context: DirectContext? = null
 
     init {
         rendererAnalytics.init()
     }
 
+    protected abstract fun createDirectContext(): DirectContext?
+
+    protected abstract fun initCanvas(context: DirectContext?): DrawingSurfaceData
+
+    protected abstract fun flush(drawingSurfaceData: DrawingSurfaceData, g: Graphics2D)
+
     final override fun dispose() {
         require(!isDisposed) { "$javaClass is disposed" }
+        context?.close()
         isDisposed = true
     }
 
     final override fun redraw(g: Graphics2D) {
+        require(!isDisposed) { "$javaClass is disposed" }
+
         inDrawScope {
-            contextHandler.draw(g)
+            if (!initDirectContext()) {
+                throw RenderException("Cannot init graphic context")
+            }
+            val drawingSurfaceData = initCanvas(context)
+
+            val scale = component.graphicsConfiguration.defaultTransform.scaleX.toFloat()
+            val width = (component.width * scale).toInt().coerceAtLeast(0)
+            val height = (component.height * scale).toInt().coerceAtLeast(0)
+
+            drawingSurfaceData.canvas?.apply {
+                clear(Color.TRANSPARENT)
+                // clipping
+                for (component in clipComponents) {
+                    clipRectBy(component, scale)
+                }
+                skikoView.onRender(this, width, height, System.nanoTime())
+            }
+
+            flush(drawingSurfaceData, g)
+            drawingSurfaceData.surface?.close()
+            drawingSurfaceData.renderTarget?.close()
         }
-    }
-
-    protected fun draw(canvas: org.jetbrains.skia.Canvas) {
-        val scale = component.graphicsConfiguration.defaultTransform.scaleX.toFloat()
-        val width = (component.width * scale).toInt().coerceAtLeast(0)
-        val height = (component.height * scale).toInt().coerceAtLeast(0)
-
-        // clipping
-        for (component in clipComponents) {
-            canvas.clipRectBy(component, scale)
-        }
-
-        skikoView.onRender(canvas, width, height, System.nanoTime())
     }
 
     /**
@@ -64,10 +80,28 @@ internal abstract class SwingRedrawerBase(
         deviceAnalytics?.init()
     }
 
-    /**
-     * Should be called when initialization of graphic context is ended. Only call it after [onDeviceChosen]
-     */
-    protected fun onContextInit() {
+    protected open fun rendererInfo(): String {
+        return "GraphicsApi: ${graphicsApi}\n" +
+                "OS: ${hostOs.id} ${hostArch.id}\n"
+    }
+
+    private fun initDirectContext(): Boolean {
+        try {
+            if (context == null) {
+                context = createDirectContext()
+                onContextInit()
+                if (System.getProperty("skiko.hardwareInfo.enabled") == "true") {
+                    Logger.info { "Renderer info:\n ${rendererInfo()}" }
+                }
+            }
+        } catch (e: Exception) {
+            Logger.warn(e) { "Failed to create Skia Metal context!" }
+            return false
+        }
+        return true
+    }
+
+    private fun onContextInit() {
         require(!isDisposed) { "$javaClass is disposed" }
         requireNotNull(deviceAnalytics) { "deviceAnalytics is not null. Call onDeviceChosen after choosing the drawing device" }
         deviceAnalytics?.contextInit()
@@ -95,4 +129,10 @@ internal abstract class SwingRedrawerBase(
             isFirstFrameRendered = true
         }
     }
+
+    protected class DrawingSurfaceData(
+        val renderTarget: BackendRenderTarget?,
+        val surface: Surface?,
+        val canvas: Canvas?
+    )
 }
