@@ -540,7 +540,7 @@ actual open class SkiaLayer internal constructor(
 
         // clipping
         for (component in clipComponents) {
-            canvas.clipRectBy(component)
+            canvas.clipRectBy(component, contentScale)
         }
 
         try {
@@ -612,20 +612,6 @@ actual open class SkiaLayer internal constructor(
         }
     }
 
-    private fun Canvas.clipRectBy(rectangle: ClipRectangle) {
-        val dpi = contentScale
-        clipRect(
-            Rect.makeLTRB(
-                rectangle.x * dpi,
-                rectangle.y * dpi,
-                (rectangle.x + rectangle.width) * dpi,
-                (rectangle.y + rectangle.height) * dpi
-            ),
-            ClipMode.DIFFERENCE,
-            true
-        )
-    }
-
     private fun roundSize(value: Int): Int {
         var rounded = value * contentScale
         val diff = rounded - rounded.toInt()
@@ -669,6 +655,19 @@ internal fun defaultFPSCounter(
         showLongFrames = fpsLongFramesShow,
         getLongFrameMillis = { fpsLongFramesMillis ?: (1.5 * 1000 / refreshRate) },
         logOnTick = true
+    )
+}
+
+internal fun Canvas.clipRectBy(rectangle: ClipRectangle, scale: Float) {
+    clipRect(
+        Rect.makeLTRB(
+            rectangle.x * scale,
+            rectangle.y * scale,
+            (rectangle.x + rectangle.width) * scale,
+            (rectangle.y + rectangle.height) * scale
+        ),
+        ClipMode.DIFFERENCE,
+        true
     )
 }
 
