@@ -85,11 +85,7 @@ internal class MetalSwingRedrawer(
 
         val bytes = storage.readPixels(storage.imageInfo, (width * 4), 0, 0)
         if (bytes != null) {
-            try {
-                swingOffscreenDrawer.draw(g, bytes, width, height)
-            } finally {
-                g.dispose()
-            }
+            swingOffscreenDrawer.draw(g, bytes, width, height)
         }
     }
 
