@@ -40,7 +40,7 @@ open class SkiaSwingLayer internal constructor(
 
     private val redrawerManager = RedrawerManager<SwingRedrawer>(properties.renderApi) { renderApi, oldRedrawer ->
         oldRedrawer?.dispose()
-        createDefaultSwingRedrawer(
+        createSwingRedrawer(
             this@SkiaSwingLayer, skikoViewWithClipping,
             renderApi, analytics, properties
         )

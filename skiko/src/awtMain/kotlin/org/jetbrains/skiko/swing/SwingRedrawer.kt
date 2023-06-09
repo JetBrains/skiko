@@ -10,7 +10,7 @@ internal interface SwingRedrawer {
 }
 
 @OptIn(ExperimentalSkikoApi::class)
-internal fun createDefaultSwingRedrawer(
+internal fun createSwingRedrawer(
     layer: SkiaSwingLayer,
     skikoView: SkikoView,
     renderApi: GraphicsApi,
