@@ -7,6 +7,17 @@ import java.awt.Graphics2D
 import java.util.concurrent.CancellationException
 import javax.swing.SwingUtilities
 
+/**
+ * Provides a base implementation of drawing [SkikoView] content on [java.awt.Graphics2D]
+ *
+ * Each [redraw] request is handled in a following way:
+ *   1. For the first request initialize native GPU context using [createDirectContext]
+ *   2. Create [org.jetbrains.skia.Canvas] where content should be drawn using [initCanvas]
+ *   3. Acquire drawing "commands" using [SkikoView]
+ *   4. Flush these commands on [java.awt.Graphics2D] using [flush]
+ *
+ * All the steps are performed synchronously on EDT.
+ */
 @OptIn(ExperimentalSkikoApi::class)
 internal abstract class SwingRedrawerBase(
     private val swingLayerProperties: SwingLayerProperties,

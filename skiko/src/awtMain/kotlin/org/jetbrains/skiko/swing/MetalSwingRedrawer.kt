@@ -3,24 +3,20 @@ package org.jetbrains.skiko.swing
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
 import java.awt.Graphics2D
-import java.awt.image.*
 
 /**
- * Experimental API that provides a way to draw on Skia canvas rendered off-screen with Metal GPU acceleration
- * and then passed to [layer] [java.awt.Graphics2D].
- * It provides better interoperability with Swing, but it is less efficient.
+ * Provides a way to draw on Skia canvas rendered off-screen with Metal GPU acceleration and then pass it to [java.awt.Graphics2D].
+ * It provides better interoperability with Swing, but it is less efficient than on-screen rendering.
  *
  * For now, it uses drawing to [java.awt.image.BufferedImage] that cause VRAM <-> RAM memory transfer and so increased CPU usage.
- * Because of that frames are limited by [FrameDispatcher].
  *
- * For on-screen rendering see [MetalRedrawer].
+ * Content to draw is provided by [SkikoView].
  *
- * Content to draw is provided by [SkiaLayer.draw].
+ * For on-screen rendering see [org.jetbrains.skiko.redrawer.MetalRedrawer].
  *
- * @see MetalSwingContextHandler
- * @see FrameDispatcher
+ * @see SwingRedrawerBase
+ * @see SwingOffscreenDrawer
  */
-@ExperimentalSkikoApi
 internal class MetalSwingRedrawer(
     private val swingLayerProperties: SwingLayerProperties,
     skikoView: SkikoView,

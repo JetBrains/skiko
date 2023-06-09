@@ -8,17 +8,29 @@ import java.awt.GraphicsConfiguration
 import javax.accessibility.Accessible
 import javax.swing.SwingUtilities.isEventDispatchThread
 
+/**
+ * Swing component that draws content provided by [skikoView] with GPU acceleration using Skia engine.
+ *
+ * Drawn content can be clipped by providing [ClipRectangle] to [clipComponents].
+ *
+ * This component can be used for better interop with Swing,
+ * so all Swing functionality like z-ordering, double-buffering etc. will be taken into account during rendering.
+ *
+ * But if no interop with Swing is needed, it is better to use [SkiaLayer] instead.
+ */
 @Suppress("unused") // used in Compose Multiplatform
-open class SkiaSwingLayer internal constructor(
+@ExperimentalSkikoApi
+open class SkiaSwingLayer(
     skikoView: SkikoView,
-    private val properties: SkiaLayerProperties,
-    private val analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty
+    analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
 ) : SkiaSwingLayerComponent() {
     internal companion object {
         init {
             Library.load()
         }
     }
+
+    private val properties = SkiaLayerProperties()
 
     private var isInited = false
 
@@ -59,12 +71,6 @@ open class SkiaSwingLayer internal constructor(
 
     override val renderApi: GraphicsApi
         get() = redrawerManager.renderApi
-
-    @Suppress("unused") // used in Compose Multiplatform
-    constructor(
-        skikoView: SkikoView,
-        analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
-    ) : this(skikoView, SkiaLayerProperties(), analytics)
 
     init {
         isOpaque = false

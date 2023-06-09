@@ -6,6 +6,14 @@ import org.jetbrains.skiko.SkiaLayerAnalytics
 import org.jetbrains.skiko.SkikoView
 import java.awt.Graphics2D
 
+/**
+ * Provides a way to draw on Skia canvas using software rendering without GPU acceleration and then draw it on [java.awt.Graphics2D].
+ *
+ * Content to draw is provided by [SkikoView].
+ *
+ * @see SwingRedrawerBase
+ * @see SwingOffscreenDrawer
+ */
 internal class SoftwareSwingRedrawer(
     private val swingLayerProperties: SwingLayerProperties,
     skikoView: SkikoView,
