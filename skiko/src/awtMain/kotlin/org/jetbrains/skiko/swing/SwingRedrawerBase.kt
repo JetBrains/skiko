@@ -14,8 +14,7 @@ internal abstract class SwingRedrawerBase(
     private val skikoView: SkikoView,
     private val analytics: SkiaLayerAnalytics,
     private val graphicsApi: GraphicsApi,
-    private val clipComponents: MutableList<ClipRectangle>,
-    private val renderExceptionHandler: (e: RenderException) -> Unit
+    private val clipComponents: MutableList<ClipRectangle>
 ) : SwingRedrawer {
     private var isFirstFrameRendered = false
 
@@ -118,10 +117,6 @@ internal abstract class SwingRedrawerBase(
                 body()
             } catch (e: CancellationException) {
                 // ignore
-            } catch (e: RenderException) {
-                if (!isDisposed) {
-                    renderExceptionHandler(e)
-                }
             }
             if (!isFirstFrameRendered && !isDisposed) {
                 deviceAnalytics?.afterFirstFrameRender()

@@ -30,11 +30,7 @@ open class SkiaSwingLayer internal constructor(
         oldRedrawer?.dispose()
         createDefaultSwingRedrawer(
             this@SkiaSwingLayer, skikoView,
-            renderApi, analytics, properties, clipComponents,
-            renderExceptionsHandler = { e ->
-                // TODO: it should be inside RedrawerManager
-                handleRenderException(e)
-            }
+            renderApi, analytics, properties, clipComponents
         )
     }
 
@@ -97,15 +93,16 @@ open class SkiaSwingLayer internal constructor(
     }
 
     override fun paint(g: java.awt.Graphics) {
-        redrawer?.redraw(g as Graphics2D)
+        try {
+            redrawer?.redraw(g as Graphics2D)
+        } catch (e: RenderException) {
+            if (!isDisposed) {
+                Logger.warn(e) { "Exception in draw scope" }
+                redrawerManager.findNextWorkingRenderApi()
+                repaint()
+            }
+        }
     }
-
-    private fun handleRenderException(e: RenderException) {
-        Logger.warn(e) { "Exception in draw scope" }
-        redrawerManager.findNextWorkingRenderApi()
-        repaint()
-    }
-
     override fun requestNativeFocusOnAccessible(accessible: Accessible?) {
         // TODO: support accessibility
     }

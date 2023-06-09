@@ -16,8 +16,7 @@ internal fun createDefaultSwingRedrawer(
     renderApi: GraphicsApi,
     analytics: SkiaLayerAnalytics,
     properties: SkiaLayerProperties,
-    clipComponents: MutableList<ClipRectangle>,
-    renderExceptionsHandler: (e: RenderException) -> Unit
+    clipComponents: MutableList<ClipRectangle>
 ): SwingRedrawer {
     return when (hostOs) {
         OS.MacOS -> when (renderApi) {
@@ -25,13 +24,12 @@ internal fun createDefaultSwingRedrawer(
                 layer,
                 skikoView,
                 analytics,
-                clipComponents,
-                renderExceptionsHandler
+                clipComponents
             )
 
-            else -> MetalSwingRedrawer(layer, skikoView, analytics, properties, clipComponents, renderExceptionsHandler)
+            else -> MetalSwingRedrawer(layer, skikoView, analytics, properties, clipComponents)
         }
 
-        else -> SoftwareSwingRedrawer(layer, skikoView, analytics, clipComponents, renderExceptionsHandler)
+        else -> SoftwareSwingRedrawer(layer, skikoView, analytics, clipComponents)
     }
 }

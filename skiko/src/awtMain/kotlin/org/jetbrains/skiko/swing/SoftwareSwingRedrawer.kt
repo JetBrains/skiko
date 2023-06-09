@@ -8,15 +8,13 @@ internal class SoftwareSwingRedrawer(
     private val skiaSwingLayer: SkiaSwingLayer,
     skikoView: SkikoView,
     analytics: SkiaLayerAnalytics,
-    clipComponents: MutableList<ClipRectangle>,
-    renderExceptionHandler: (e: RenderException) -> Unit,
+    clipComponents: MutableList<ClipRectangle>
 ) : SwingRedrawerBase(
     skiaSwingLayer,
     skikoView,
     analytics,
     GraphicsApi.SOFTWARE_FAST,
-    clipComponents,
-    renderExceptionHandler
+    clipComponents
 ) {
     init {
         onDeviceChosen("Software")

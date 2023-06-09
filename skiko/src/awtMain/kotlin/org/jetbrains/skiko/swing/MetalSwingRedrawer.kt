@@ -26,9 +26,8 @@ internal class MetalSwingRedrawer(
     skikoView: SkikoView,
     analytics: SkiaLayerAnalytics,
     properties: SkiaLayerProperties,
-    clipComponents: MutableList<ClipRectangle>,
-    renderExceptionHandler: (e: RenderException) -> Unit,
-) : SwingRedrawerBase(skiaSwingLayer, skikoView, analytics, GraphicsApi.METAL, clipComponents, renderExceptionHandler) {
+    clipComponents: MutableList<ClipRectangle>
+) : SwingRedrawerBase(skiaSwingLayer, skikoView, analytics, GraphicsApi.METAL, clipComponents) {
     companion object {
         init {
             Library.load()
