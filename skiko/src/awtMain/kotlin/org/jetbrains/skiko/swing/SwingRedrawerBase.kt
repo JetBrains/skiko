@@ -13,8 +13,7 @@ internal abstract class SwingRedrawerBase(
     private val component: JComponent,
     private val skikoView: SkikoView,
     private val analytics: SkiaLayerAnalytics,
-    private val graphicsApi: GraphicsApi,
-    private val clipComponents: MutableList<ClipRectangle>
+    private val graphicsApi: GraphicsApi
 ) : SwingRedrawer {
     private var isFirstFrameRendered = false
 
@@ -55,10 +54,6 @@ internal abstract class SwingRedrawerBase(
 
             drawingSurfaceData.canvas?.apply {
                 clear(Color.TRANSPARENT)
-                // clipping
-                for (component in clipComponents) {
-                    clipRectBy(component, scale)
-                }
                 skikoView.onRender(this, width, height, System.nanoTime())
             }
 

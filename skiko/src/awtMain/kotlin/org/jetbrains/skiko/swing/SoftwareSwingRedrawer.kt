@@ -7,14 +7,12 @@ import java.awt.Graphics2D
 internal class SoftwareSwingRedrawer(
     private val skiaSwingLayer: SkiaSwingLayer,
     skikoView: SkikoView,
-    analytics: SkiaLayerAnalytics,
-    clipComponents: MutableList<ClipRectangle>
+    analytics: SkiaLayerAnalytics
 ) : SwingRedrawerBase(
     skiaSwingLayer,
     skikoView,
     analytics,
-    GraphicsApi.SOFTWARE_FAST,
-    clipComponents
+    GraphicsApi.SOFTWARE_FAST
 ) {
     init {
         onDeviceChosen("Software")

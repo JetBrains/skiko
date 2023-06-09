@@ -1,5 +1,6 @@
 package org.jetbrains.skiko.swing
 
+import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.PixelGeometry
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.redrawer.RedrawerManager
@@ -8,7 +9,7 @@ import javax.accessibility.Accessible
 import javax.swing.SwingUtilities.isEventDispatchThread
 
 open class SkiaSwingLayer internal constructor(
-    private val skikoView: SkikoView,
+    skikoView: SkikoView,
     private val properties: SkiaLayerProperties,
     private val analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
     override val pixelGeometry: PixelGeometry = PixelGeometry.UNKNOWN,
@@ -26,11 +27,22 @@ open class SkiaSwingLayer internal constructor(
 
     override val clipComponents: MutableList<ClipRectangle> get() = mutableListOf()
 
+    private val skikoViewWithClipping = object : SkikoView by skikoView {
+        override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+            val scale = graphicsConfiguration.defaultTransform.scaleX.toFloat()
+            // clipping
+            for (component in clipComponents) {
+                canvas.clipRectBy(component, scale)
+            }
+            skikoView.onRender(canvas, width, height, nanoTime)
+        }
+    }
+
     private val redrawerManager = RedrawerManager<SwingRedrawer>(properties.renderApi) { renderApi, oldRedrawer ->
         oldRedrawer?.dispose()
         createDefaultSwingRedrawer(
-            this@SkiaSwingLayer, skikoView,
-            renderApi, analytics, properties, clipComponents
+            this@SkiaSwingLayer, skikoViewWithClipping,
+            renderApi, analytics, properties
         )
     }
 

@@ -25,9 +25,8 @@ internal class MetalSwingRedrawer(
     private val skiaSwingLayer: SkiaSwingLayer,
     skikoView: SkikoView,
     analytics: SkiaLayerAnalytics,
-    properties: SkiaLayerProperties,
-    clipComponents: MutableList<ClipRectangle>
-) : SwingRedrawerBase(skiaSwingLayer, skikoView, analytics, GraphicsApi.METAL, clipComponents) {
+    properties: SkiaLayerProperties
+) : SwingRedrawerBase(skiaSwingLayer, skikoView, analytics, GraphicsApi.METAL) {
     companion object {
         init {
             Library.load()
