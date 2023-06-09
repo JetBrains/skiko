@@ -11,23 +11,22 @@ internal interface SwingRedrawer {
 
 @OptIn(ExperimentalSkikoApi::class)
 internal fun createSwingRedrawer(
-    layer: SkiaSwingLayer,
+    swingLayerProperties: SwingLayerProperties,
     skikoView: SkikoView,
     renderApi: GraphicsApi,
     analytics: SkiaLayerAnalytics,
-    properties: SkiaLayerProperties
 ): SwingRedrawer {
     return when (hostOs) {
         OS.MacOS -> when (renderApi) {
             GraphicsApi.SOFTWARE_COMPAT, GraphicsApi.SOFTWARE_FAST -> SoftwareSwingRedrawer(
-                layer,
+                swingLayerProperties,
                 skikoView,
                 analytics
             )
 
-            else -> MetalSwingRedrawer(layer, skikoView, analytics, properties)
+            else -> MetalSwingRedrawer(swingLayerProperties, skikoView, analytics)
         }
 
-        else -> SoftwareSwingRedrawer(layer, skikoView, analytics)
+        else -> SoftwareSwingRedrawer(swingLayerProperties, skikoView, analytics)
     }
 }

@@ -5,12 +5,11 @@ import org.jetbrains.skiko.*
 import org.jetbrains.skiko.SkiaLayerAnalytics.DeviceAnalytics
 import java.awt.Graphics2D
 import java.util.concurrent.CancellationException
-import javax.swing.JComponent
 import javax.swing.SwingUtilities
 
 @OptIn(ExperimentalSkikoApi::class)
 internal abstract class SwingRedrawerBase(
-    private val component: JComponent,
+    private val swingLayerProperties: SwingLayerProperties,
     private val skikoView: SkikoView,
     private val analytics: SkiaLayerAnalytics,
     private val graphicsApi: GraphicsApi
@@ -48,9 +47,9 @@ internal abstract class SwingRedrawerBase(
             }
             val drawingSurfaceData = initCanvas(context)
 
-            val scale = component.graphicsConfiguration.defaultTransform.scaleX.toFloat()
-            val width = (component.width * scale).toInt().coerceAtLeast(0)
-            val height = (component.height * scale).toInt().coerceAtLeast(0)
+            val scale = swingLayerProperties.scale
+            val width = (swingLayerProperties.width * scale).toInt().coerceAtLeast(0)
+            val height = (swingLayerProperties.height * scale).toInt().coerceAtLeast(0)
 
             drawingSurfaceData.canvas?.apply {
                 clear(Color.TRANSPARENT)

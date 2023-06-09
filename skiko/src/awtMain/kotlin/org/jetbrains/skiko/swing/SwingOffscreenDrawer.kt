@@ -6,13 +6,12 @@ import java.awt.image.*
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.IntBuffer
-import javax.swing.JComponent
 import kotlin.math.*
 
 // TODO: extract this code to a library and share it with JCEF implementation in IntelliJ
 //  since this code is mostly taken from intellij repository with some small changes
 internal class SwingOffscreenDrawer(
-    private val component: JComponent
+    private val swingLayerProperties: SwingLayerProperties
 ) {
     @Volatile
     private var volatileImage: VolatileImage? = null
@@ -33,11 +32,11 @@ internal class SwingOffscreenDrawer(
         var vi = volatileImage
 
         do {
-            if (vi == null || vi.width != component.width || vi.height != component.height) {
+            if (vi == null || vi.width != swingLayerProperties.width || vi.height != swingLayerProperties.height) {
                 vi = createVolatileImage(image)
             }
             drawVolatileImage(vi, image)
-            when (vi.validate(component.graphicsConfiguration)) {
+            when (vi.validate(swingLayerProperties.graphicsConfiguration)) {
                 VolatileImage.IMAGE_RESTORED -> drawVolatileImage(vi, image)
                 VolatileImage.IMAGE_INCOMPATIBLE -> vi = createVolatileImage(image)
             }
@@ -79,9 +78,9 @@ internal class SwingOffscreenDrawer(
     }
 
     private fun createVolatileImage(image: BufferedImage): VolatileImage {
-        val vi = component.graphicsConfiguration.createCompatibleVolatileImage(
-            component.width,
-            component.height,
+        val vi = swingLayerProperties.graphicsConfiguration.createCompatibleVolatileImage(
+            swingLayerProperties.width,
+            swingLayerProperties.height,
             Transparency.TRANSLUCENT
         )
         drawVolatileImage(vi, image)
@@ -93,7 +92,7 @@ internal class SwingOffscreenDrawer(
         try {
             g.background = Color(0, 0, 0, 0)
             g.composite = AlphaComposite.Src
-            g.clearRect(0, 0, component.width, component.height)
+            g.clearRect(0, 0, swingLayerProperties.width, swingLayerProperties.height)
             drawImage(g, image)
         } finally {
             g.dispose()
@@ -112,12 +111,11 @@ internal class SwingOffscreenDrawer(
         observer: ImageObserver? = null
     ) {
         val hasDestinationSize = dw >= 0 && dh >= 0
-        val scale = component.graphicsConfiguration.defaultTransform.scaleX
         doDrawHiDpi(
-            userWidth = component.width,
-            userHeight = component.height,
+            userWidth = swingLayerProperties.width,
+            userHeight = swingLayerProperties.height,
             g = g,
-            scale = scale,
+            scale = swingLayerProperties.scale.toDouble(),
             dx = x,
             dy = y,
             dw = dw,

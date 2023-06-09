@@ -1,18 +1,18 @@
 package org.jetbrains.skiko.swing
 
 import org.jetbrains.skia.Canvas
-import org.jetbrains.skia.PixelGeometry
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.redrawer.RedrawerManager
 import java.awt.Graphics2D
+import java.awt.GraphicsConfiguration
 import javax.accessibility.Accessible
 import javax.swing.SwingUtilities.isEventDispatchThread
 
+@Suppress("unused") // used in Compose Multiplatform
 open class SkiaSwingLayer internal constructor(
     skikoView: SkikoView,
     private val properties: SkiaLayerProperties,
-    private val analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
-    internal val pixelGeometry: PixelGeometry = PixelGeometry.UNKNOWN,
+    private val analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty
 ) : SkiaSwingLayerComponent() {
     internal companion object {
         init {
@@ -38,12 +38,20 @@ open class SkiaSwingLayer internal constructor(
         }
     }
 
+    private val swingLayerProperties = object : SwingLayerProperties {
+        override val width: Int
+            get() = this@SkiaSwingLayer.width
+        override val height: Int
+            get() = this@SkiaSwingLayer.height
+        override val graphicsConfiguration: GraphicsConfiguration
+            get() = this@SkiaSwingLayer.graphicsConfiguration
+        override val adapterPriority: GpuPriority
+            get() = this@SkiaSwingLayer.properties.adapterPriority
+    }
+
     private val redrawerManager = RedrawerManager<SwingRedrawer>(properties.renderApi) { renderApi, oldRedrawer ->
         oldRedrawer?.dispose()
-        createSwingRedrawer(
-            this@SkiaSwingLayer, skikoViewWithClipping,
-            renderApi, analytics, properties
-        )
+        createSwingRedrawer(swingLayerProperties, skikoViewWithClipping, renderApi, analytics)
     }
 
     private val redrawer: SwingRedrawer?
@@ -55,21 +63,8 @@ open class SkiaSwingLayer internal constructor(
     @Suppress("unused") // used in Compose Multiplatform
     constructor(
         skikoView: SkikoView,
-        isVsyncEnabled: Boolean = SkikoProperties.vsyncEnabled,
-        isVsyncFramelimitFallbackEnabled: Boolean = SkikoProperties.vsyncFramelimitFallbackEnabled,
-        renderApi: GraphicsApi = SkikoProperties.renderApi,
         analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
-        pixelGeometry: PixelGeometry = PixelGeometry.UNKNOWN
-    ) : this(
-        skikoView,
-        SkiaLayerProperties(
-            isVsyncEnabled,
-            isVsyncFramelimitFallbackEnabled,
-            renderApi
-        ),
-        analytics,
-        pixelGeometry
-    )
+    ) : this(skikoView, SkiaLayerProperties(), analytics)
 
     init {
         isOpaque = false
@@ -115,6 +110,7 @@ open class SkiaSwingLayer internal constructor(
             }
         }
     }
+
     override fun requestNativeFocusOnAccessible(accessible: Accessible?) {
         // TODO: support accessibility
     }

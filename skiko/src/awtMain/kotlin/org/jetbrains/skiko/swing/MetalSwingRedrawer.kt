@@ -22,22 +22,21 @@ import java.awt.image.*
  */
 @ExperimentalSkikoApi
 internal class MetalSwingRedrawer(
-    private val skiaSwingLayer: SkiaSwingLayer,
+    private val swingLayerProperties: SwingLayerProperties,
     skikoView: SkikoView,
-    analytics: SkiaLayerAnalytics,
-    properties: SkiaLayerProperties
-) : SwingRedrawerBase(skiaSwingLayer, skikoView, analytics, GraphicsApi.METAL) {
+    analytics: SkiaLayerAnalytics
+) : SwingRedrawerBase(swingLayerProperties, skikoView, analytics, GraphicsApi.METAL) {
     companion object {
         init {
             Library.load()
         }
     }
 
-    private val adapter: MetalAdapter = chooseMetalAdapter(properties.adapterPriority).also {
+    private val adapter: MetalAdapter = chooseMetalAdapter(swingLayerProperties.adapterPriority).also {
         onDeviceChosen(it.name)
     }
 
-    private val swingOffscreenDrawer = SwingOffscreenDrawer(skiaSwingLayer)
+    private val swingOffscreenDrawer = SwingOffscreenDrawer(swingLayerProperties)
 
     override fun createDirectContext(): DirectContext {
         return makeMetalContext()
@@ -46,9 +45,9 @@ internal class MetalSwingRedrawer(
     override fun initCanvas(context: DirectContext?): DrawingSurfaceData {
         context ?: error("Context should be initialized")
 
-        val scale = skiaSwingLayer.graphicsConfiguration.defaultTransform.scaleX.toFloat()
-        val width = (skiaSwingLayer.width * scale).toInt().coerceAtLeast(0)
-        val height = (skiaSwingLayer.height * scale).toInt().coerceAtLeast(0)
+        val scale = swingLayerProperties.graphicsConfiguration.defaultTransform.scaleX.toFloat()
+        val width = (swingLayerProperties.width * scale).toInt().coerceAtLeast(0)
+        val height = (swingLayerProperties.height * scale).toInt().coerceAtLeast(0)
 
         if (width == 0 || height == 0) {
             return DrawingSurfaceData(renderTarget = null, surface = null, canvas = null)
@@ -62,7 +61,7 @@ internal class MetalSwingRedrawer(
             SurfaceOrigin.TOP_LEFT,
             SurfaceColorFormat.BGRA_8888,
             ColorSpace.sRGB,
-            SurfaceProps(pixelGeometry = skiaSwingLayer.pixelGeometry)
+            SurfaceProps(pixelGeometry = PixelGeometry.UNKNOWN)
         ) ?: throw RenderException("Cannot create surface")
 
         return DrawingSurfaceData(renderTarget, surface, surface.canvas)

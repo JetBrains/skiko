@@ -1,6 +1,5 @@
 package org.jetbrains.skiko.swing
 
-import org.jetbrains.skia.PixelGeometry
 import org.jetbrains.skiko.ClipRectangle
 import org.jetbrains.skiko.GraphicsApi
 import javax.accessibility.Accessible

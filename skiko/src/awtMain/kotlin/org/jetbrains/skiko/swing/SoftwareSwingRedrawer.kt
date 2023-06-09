@@ -1,15 +1,17 @@
 package org.jetbrains.skiko.swing
 
 import org.jetbrains.skia.*
-import org.jetbrains.skiko.*
+import org.jetbrains.skiko.GraphicsApi
+import org.jetbrains.skiko.SkiaLayerAnalytics
+import org.jetbrains.skiko.SkikoView
 import java.awt.Graphics2D
 
 internal class SoftwareSwingRedrawer(
-    private val skiaSwingLayer: SkiaSwingLayer,
+    private val swingLayerProperties: SwingLayerProperties,
     skikoView: SkikoView,
     analytics: SkiaLayerAnalytics
 ) : SwingRedrawerBase(
-    skiaSwingLayer,
+    swingLayerProperties,
     skikoView,
     analytics,
     GraphicsApi.SOFTWARE_FAST
@@ -18,7 +20,7 @@ internal class SoftwareSwingRedrawer(
         onDeviceChosen("Software")
     }
 
-    private val swingOffscreenDrawer = SwingOffscreenDrawer(skiaSwingLayer)
+    private val swingOffscreenDrawer = SwingOffscreenDrawer(swingLayerProperties)
 
     private val storage = Bitmap()
 
@@ -28,15 +30,15 @@ internal class SoftwareSwingRedrawer(
     }
 
     override fun initCanvas(context: DirectContext?): DrawingSurfaceData {
-        val scale = skiaSwingLayer.graphicsConfiguration.defaultTransform.scaleX.toFloat()
-        val w = (skiaSwingLayer.width * scale).toInt().coerceAtLeast(0)
-        val h = (skiaSwingLayer.height * scale).toInt().coerceAtLeast(0)
+        val scale = swingLayerProperties.scale
+        val w = (swingLayerProperties.width * scale).toInt().coerceAtLeast(0)
+        val h = (swingLayerProperties.height * scale).toInt().coerceAtLeast(0)
 
         if (storage.width != w || storage.height != h) {
             storage.allocPixelsFlags(ImageInfo.makeS32(w, h, ColorAlphaType.PREMUL), false)
         }
 
-        val canvas = Canvas(storage, SurfaceProps(pixelGeometry = skiaSwingLayer.pixelGeometry))
+        val canvas = Canvas(storage, SurfaceProps(pixelGeometry = PixelGeometry.UNKNOWN))
 
         return DrawingSurfaceData(renderTarget = null, surface = null, canvas = canvas)
     }
