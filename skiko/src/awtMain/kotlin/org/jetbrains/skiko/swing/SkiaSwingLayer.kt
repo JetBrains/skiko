@@ -12,7 +12,7 @@ open class SkiaSwingLayer internal constructor(
     skikoView: SkikoView,
     private val properties: SkiaLayerProperties,
     private val analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
-    override val pixelGeometry: PixelGeometry = PixelGeometry.UNKNOWN,
+    internal val pixelGeometry: PixelGeometry = PixelGeometry.UNKNOWN,
 ) : SkiaSwingLayerComponent() {
     internal companion object {
         init {

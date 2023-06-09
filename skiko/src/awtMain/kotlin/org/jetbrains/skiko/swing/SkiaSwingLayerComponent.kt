@@ -11,8 +11,6 @@ abstract class SkiaSwingLayerComponent : JComponent() {
 
     abstract val renderApi: GraphicsApi
 
-    abstract val pixelGeometry: PixelGeometry
-
     abstract fun dispose()
 
     abstract fun requestNativeFocusOnAccessible(accessible: Accessible?)
