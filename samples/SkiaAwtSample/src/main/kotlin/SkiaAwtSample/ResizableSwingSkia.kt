@@ -1,9 +1,7 @@
 package SkiaAwtSample
 
 import org.jetbrains.skia.Canvas
-import org.jetbrains.skia.Paint
-import org.jetbrains.skia.Rect
-import org.jetbrains.skiko.SkikoView
+import org.jetbrains.skiko.FPSCounter
 import java.awt.BorderLayout
 import java.awt.Color
 import javax.swing.*
@@ -13,14 +11,18 @@ fun swingSkiaResize() = SwingUtilities.invokeLater {
     window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
     window.title = "Swing Window with Compose"
 
-    val skikoView = object : SkikoView {
+    var skiaPanel: SkiaSwingPanel? = null
+    val fpsCounter = FPSCounter(logOnTick = true)
+
+    val skikoView = object : ClocksAwt({ skiaPanel!!.graphicsConfiguration.defaultTransform.scaleX.toFloat() }) {
         override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
-            val paint = Paint().apply { color = Color.GRAY.rgb }
-            canvas.drawRect(Rect(0f, 0f, width.toFloat(), height.toFloat()), paint)
+            fpsCounter.tick()
+            super.onRender(canvas, width, height, nanoTime)
+            skiaPanel!!.repaint()
         }
     }
 
-    val skiaPanel = SkiaSwingPanel(skikoView)
+    skiaPanel = SkiaSwingPanel(skikoView)
 
     val leftPanel = JPanel().apply {
         background = Color.CYAN
