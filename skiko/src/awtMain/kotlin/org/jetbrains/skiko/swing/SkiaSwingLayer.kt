@@ -32,7 +32,7 @@ open class SkiaSwingLayer(
 
     private val properties = SkiaLayerProperties()
 
-    private var isInited = false
+    private var isInitialized = false
 
     @Volatile
     private var isDisposed = false
@@ -86,18 +86,18 @@ open class SkiaSwingLayer(
     override fun addNotify() {
         Logger.debug { "SkiaSwingLayer.awt#addNotify $this" }
         super.addNotify()
-        init(isInited)
+        init(isInitialized)
     }
 
     private fun init(recreation: Boolean = false) {
         isDisposed = false
         redrawerManager.findNextWorkingRenderApi(recreation)
-        isInited = true
+        isInitialized = true
     }
 
     override fun dispose() {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
-        if (isInited && !isDisposed) {
+        if (isInitialized && !isDisposed) {
             // we should dispose redrawer first (to cancel `draw` in rendering thread)
             redrawer?.dispose()
             redrawerManager.dispose()
