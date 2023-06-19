@@ -38,15 +38,9 @@ internal object InternalSunApiChecker {
             val fontManagerClass = Class.forName("sun.font.FontManagerFactory")
             fontManagerClass.getDeclaredMethod("getInstance").invoke(null)
 
-            // Try to obtain the proper font family from an AWT Font (will fail if not running on JBR)
-            with(AwtFontUtils) {
-                val font = Font(Font.DIALOG, 10, Font.PLAIN)
-                if (font.fontFamilyName == null) return false
-            }
-
             println("Sun Font APIs are accessible, advanced font features are available")
             return true
-        } catch (e: Throwable) {
+        } catch (ignored: Throwable) {
             return false
         }
     }
@@ -73,9 +67,7 @@ internal object InternalSunApiChecker {
             |
             |This is required to be able to properly match the Skia fonts with
             |the AWT fonts and access private JDK APIs used for some advanced
-            |features. It is also recommended to use the JetBrains Runtime, to
-            |take advantage of several UI fixes, including HiDPI support and
-            |font handling and rendering.
+            |features.
             """.trimMargin()
         )
     }
