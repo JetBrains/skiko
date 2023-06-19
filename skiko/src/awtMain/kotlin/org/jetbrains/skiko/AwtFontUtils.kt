@@ -24,7 +24,7 @@ object AwtFontUtils {
     private val Font2DClass = Class.forName("sun.font.Font2D")
     private val FileFontClass = Class.forName("sun.font.FileFont")
     private val CompositeFontClass = Class.forName("sun.font.CompositeFont")
-    private val CFontClass = Class.forName("sun.font.CFont")
+    private val CFontClass = if (hostOs.isMacOS) Class.forName("sun.font.CFont") else null
 
     // FontManagerFactory methods
     private val FontManagerFactory_getInstanceMethod =
@@ -124,7 +124,10 @@ object AwtFontUtils {
                 Font2D_getFamilyNameMethod?.invoke(physicalFontObject, Locale.getDefault()) as String?
             }
 
-            CFontClass.isInstance(font2D) -> {
+            CFontClass?.isInstance(font2D) == true -> {
+                // For macOS
+                getFieldValueOrNull(CFontClass, font2D, String::class.java, "nativeFontName")
+            }
                 // For macOS
                 val clazz = Class.forName("sun.font.CFont")
                 getFieldValueOrNull(clazz, font2D, String::class.java, "nativeFontName")
