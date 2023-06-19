@@ -1080,11 +1080,19 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
     }
 
     fun translate(dx: Float, dy: Float): Canvas {
-        return concat(Matrix33.makeTranslate(dx, dy))
+        interopScope {
+            Stats.onNativeCall()
+            _nTranslate(_ptr, dx, dy)
+        }
+        return this
     }
 
     fun scale(sx: Float, sy: Float): Canvas {
-        return concat(Matrix33.makeScale(sx, sy))
+        interopScope {
+            Stats.onNativeCall()
+            _nScale(_ptr, sx, sy)
+        }
+        return this
     }
 
     /**
@@ -1092,15 +1100,27 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
      * @return     this
      */
     fun rotate(deg: Float): Canvas {
-        return concat(Matrix33.makeRotate(deg))
+        interopScope {
+            Stats.onNativeCall()
+            _nRotate(_ptr, deg, 0f, 0f)
+        }
+        return this
     }
 
     fun rotate(deg: Float, x: Float, y: Float): Canvas {
-        return concat(Matrix33.makeRotate(deg, x, y))
+        interopScope {
+            Stats.onNativeCall()
+            _nRotate(_ptr, deg, x, y)
+        }
+        return this
     }
 
     fun skew(sx: Float, sy: Float): Canvas {
-        return concat(Matrix33.makeSkew(sx, sy))
+        interopScope {
+            Stats.onNativeCall()
+            _nSkew(_ptr, sx, sy)
+        }
+        return this
     }
 
     fun concat(matrix: Matrix33): Canvas {
@@ -1542,13 +1562,23 @@ private external fun _nClipPath(ptr: NativePointer, nativePath: NativePointer, m
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nClipRegion")
 private external fun _nClipRegion(ptr: NativePointer, nativeRegion: NativePointer, mode: Int)
 
+@ExternalSymbolName("org_jetbrains_skia_Canvas__1nTranslate")
+private external fun _nTranslate(ptr: NativePointer, dx: Float, dy: Float)
+
+@ExternalSymbolName("org_jetbrains_skia_Canvas__1nScale")
+private external fun _nScale(ptr: NativePointer, sx: Float, sy: Float)
+
+@ExternalSymbolName("org_jetbrains_skia_Canvas__1nRotate")
+private external fun _nRotate(ptr: NativePointer, deg: Float, x: Float, y: Float)
+
+@ExternalSymbolName("org_jetbrains_skia_Canvas__1nSkew")
+private external fun _nSkew(ptr: NativePointer, sx: Float, sy: Float)
+
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nConcat")
 private external fun _nConcat(ptr: NativePointer, matrix: InteropPointer)
 
-
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nConcat44")
 private external fun _nConcat44(ptr: NativePointer, matrix: InteropPointer)
-
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nReadPixels")
 private external fun _nReadPixels(ptr: NativePointer, bitmapPtr: NativePointer, srcX: Int, srcY: Int): Boolean
