@@ -922,7 +922,8 @@ fun createLinkJvmBindings(
     val libNamePrefix = if (targetOs.isWindows) "skiko" else "libskiko"
     libOutputFileName.set("$libNamePrefix-${targetOs.id}-${targetArch.id}${targetOs.dynamicLibExt}")
     buildTargetOS.set(targetOs)
-    buildSuffix.set("jvm")buildTargetArch.set(targetArch)
+    buildSuffix.set("jvm")
+    buildTargetArch.set(targetArch)
     buildVariant.set(buildType)
     linker.set(linkerForTarget(targetOs, targetArch))
 
