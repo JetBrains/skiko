@@ -855,6 +855,7 @@ fun createCompileJvmBindingsTask(
             includeHeadersNonRecursive(runPkgConfig("dbus-1"))
             osFlags = arrayOf(
                 *buildType.clangFlags,
+                "-DGL_GLEXT_PROTOTYPES",
                 "-fPIC",
                 "-fno-rtti",
                 "-fno-exceptions",

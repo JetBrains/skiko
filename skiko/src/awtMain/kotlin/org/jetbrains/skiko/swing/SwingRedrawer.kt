@@ -40,6 +40,14 @@ internal fun createSwingRedrawer(
 
             else -> MetalSwingRedrawer(swingLayerProperties, skikoView, analytics)
         }
+        OS.Linux -> when (renderApi) {
+            GraphicsApi.SOFTWARE_COMPAT, GraphicsApi.SOFTWARE_FAST -> SoftwareSwingRedrawer(
+                swingLayerProperties,
+                skikoView,
+                analytics
+            )
+            else -> LinuxOpenGLSwingRedrawer(swingLayerProperties, skikoView, analytics)
+        }
 
         else -> SoftwareSwingRedrawer(swingLayerProperties, skikoView, analytics)
     }
