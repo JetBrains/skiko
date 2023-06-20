@@ -40,6 +40,7 @@ internal fun createSwingRedrawer(
     return when (hostOs) {
         OS.MacOS -> MetalSwingRedrawer(swingLayerProperties, skikoView, analytics)
         OS.Windows -> Direct3DSwingRedrawer(swingLayerProperties, skikoView, analytics)
+        OS.Linux -> LinuxOpenGLSwingRedrawer(swingLayerProperties, skikoView, analytics)
         else -> SoftwareSwingRedrawer(swingLayerProperties, skikoView, analytics)
     }
 }
