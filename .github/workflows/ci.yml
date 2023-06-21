@@ -39,7 +39,7 @@ jobs:
           path: ./skiko/build/reports/tests
           retention-days: 5
 
-   ios:
+   iOS:
     # The type of runner that the job will run on
     runs-on: macos-11
     # Steps represent a sequence of tasks that will be executed as part of the job
@@ -55,8 +55,30 @@ jobs:
           ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Pskiko.test.onci=true :skiko:iosX64Test
           # iosSimulatorArm64Test will build the binary but the tests will be skipped due to X64 host machine
           ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Pskiko.test.onci=true :skiko:iosSimulatorArm64Test
-          ./gradlew --stacktrace --info -Pskiko.native.enabled=true :skiko:publishToMavenLocal
           # TODO run iOS specific tests on iPhone simulator
+      - uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: test-reports-macos
+          path: ./skiko/build/reports/tests
+          retention-days: 5
+
+   tvOS:
+    # TVOS requires macos 13 
+    runs-on: macos-13
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '11'
+      - shell: bash
+        run: |
+          ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Pskiko.test.onci=true :skiko:tvosX64Test
+          # tvosSimulatorArm64Test will build the binary but the tests will be skipped due to X64 host machine
+          ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Pskiko.test.onci=true :skiko:tvosSimulatorArm64Test
       - uses: actions/upload-artifact@v2
         if: always()
         with:

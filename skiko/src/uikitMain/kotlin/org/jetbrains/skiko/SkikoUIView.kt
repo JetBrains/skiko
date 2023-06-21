@@ -10,6 +10,10 @@ import platform.darwin.NSInteger
 import kotlin.math.max
 import kotlin.math.min
 
+internal expect fun SkikoUIView.skikoInitializeUIView(): Unit
+internal expect fun SkikoUIView.skikoShowTextMenu(targetRect: Rect): Unit
+internal expect fun SkikoUIView.skikoHideTextMenu(): Unit
+
 /*
  TODO: remove org.jetbrains.skiko.objc.UIViewExtensionProtocol after Kotlin 1.8.20
  https://youtrack.jetbrains.com/issue/KT-40426
@@ -25,7 +29,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
     constructor(coder: NSCoder) : super(coder)
 
     init {
-        multipleTouchEnabled = true
+        skikoInitializeUIView()
     }
 
     private var skiaLayer: SkiaLayer? = null
@@ -57,23 +61,12 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
      */
     fun showTextMenu(targetRect: Rect, textActions: TextActions) {
         _currentTextMenuActions = textActions
-        val menu: UIMenuController = UIMenuController.sharedMenuController()
-        if (menu.isMenuVisible()) {
-            menu.hideMenu()
-        }
-        val cgRect = CGRectMake(
-            x = targetRect.left.toDouble(),
-            y = targetRect.top.toDouble(),
-            width = targetRect.width.toDouble(),
-            height = targetRect.height.toDouble()
-        )
-        menu.showMenuFromView(this, cgRect)
+        skikoShowTextMenu(targetRect)
     }
 
     fun hideTextMenu() {
         _currentTextMenuActions = null
-        val menu: UIMenuController = UIMenuController.sharedMenuController()
-        menu.hideMenu()
+        skikoHideTextMenu()
     }
 
     fun isTextMenuShown():Boolean {
@@ -144,33 +137,42 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
     }
 
     override fun canBecomeFirstResponder() = true
+    override fun canBecomeFocused(): Boolean = true
 
     override fun pressesBegan(presses: Set<*>, withEvent: UIPressesEvent?) {
-        if (withEvent != null) {
-            for (press in withEvent.allPresses) {
-                val uiPress = press as? UIPress
-                if (uiPress != null) {
-                    skiaLayer?.skikoView?.onKeyboardEvent(
-                        toSkikoKeyboardEvent(press, SkikoKeyboardEventKind.DOWN)
-                    )
-                }
-            }
-        }
+        handlePress(withEvent, SkikoKeyboardEventKind.DOWN)
         super.pressesBegan(presses, withEvent)
     }
 
     override fun pressesEnded(presses: Set<*>, withEvent: UIPressesEvent?) {
+        handlePress(withEvent, SkikoKeyboardEventKind.UP)
+        super.pressesEnded(presses, withEvent)
+    }
+
+    private fun handlePress(withEvent: UIPressesEvent?, eventKind: SkikoKeyboardEventKind) {
         if (withEvent != null) {
             for (press in withEvent.allPresses) {
                 val uiPress = press as? UIPress
-                if (uiPress != null) {
-                    skiaLayer?.skikoView?.onKeyboardEvent(
-                        toSkikoKeyboardEvent(press, SkikoKeyboardEventKind.UP)
-                    )
+                when {
+                    // This property is nil when the press event isn’t from a keyboard; for example, a button press on an Apple TV remote.
+                    uiPress?.key != null -> {
+                        val key = SkikoKey.valueOf(press.key?.keyCode ?: 0)
+                        // println("Press/key $eventKind: $key")
+                        skiaLayer?.skikoView?.onKeyboardEvent(
+                            toSkikoKeyboardEvent(press, eventKind, key)
+                        )
+                    }
+
+                    uiPress?.type != null -> {
+                        val key = SkikoKey.fromPressType(uiPress.type)
+                        // println("Press/type $eventKind: $key")
+                        skiaLayer?.skikoView?.onKeyboardEvent(
+                            toSkikoKeyboardEvent(press, eventKind, key)
+                        )
+                    }
                 }
             }
         }
-        super.pressesEnded(presses, withEvent)
     }
 
     /**

@@ -70,7 +70,7 @@ object SkikoProperties {
             OS.Linux -> return GraphicsApi.OPENGL
             OS.Windows -> return GraphicsApi.DIRECT3D
             OS.Android -> return GraphicsApi.OPENGL
-            OS.JS, OS.Ios -> TODO("commonize me")
+            OS.JS, OS.Ios, OS.Tvos -> TODO("commonize me")
         }
     }
 
@@ -84,7 +84,7 @@ object SkikoProperties {
                 else -> listOf(GraphicsApi.DIRECT3D, GraphicsApi.OPENGL, GraphicsApi.SOFTWARE_FAST, GraphicsApi.SOFTWARE_COMPAT)
             }
             OS.Android -> return listOf(GraphicsApi.OPENGL)
-            OS.JS, OS.Ios -> TODO("commonize me")
+            OS.JS, OS.Ios, OS.Tvos -> TODO("commonize me")
         }
 
         val indexOfInitialApi = fallbackApis.indexOf(initialApi)

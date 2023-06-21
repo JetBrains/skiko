@@ -36,7 +36,7 @@ internal actual fun makeDefaultRenderFactory(): RenderFactory {
                 GraphicsApi.SOFTWARE_FAST -> LinuxSoftwareRedrawer(layer, analytics, properties)
                 else -> LinuxOpenGLRedrawer(layer, analytics, properties)
             }
-            OS.Android, OS.JS, OS.Ios -> throw UnsupportedOperationException("The awt target doesn't support $hostOs")
+            OS.Android, OS.JS, OS.Ios, OS.Tvos -> throw UnsupportedOperationException("The awt target doesn't support $hostOs")
         }
     }
 }

@@ -7,7 +7,6 @@ import org.jetbrains.skiko.context.MetalContextHandler
 import org.jetbrains.skiko.redrawer.MetalRedrawer
 import platform.UIKit.*
 import kotlin.system.getTimeNanos
-import org.jetbrains.skia.*
 
 actual open class SkiaLayer {
 
@@ -59,7 +58,8 @@ actual open class SkiaLayer {
 
     internal var view: UIView? = null
     // We need to keep reference to gesturesDetector as Objective-C will only keep weak reference here.
-    internal var gesturesDetector = SkikoGesturesDetector(this)
+    private var gesturesDetectors = skikoCreateGesturesDetectors(this)
+    
     var gesturesToListen: Array<SkikoGestureEventKind>? = null
         set(value) {
             field = value
@@ -67,7 +67,28 @@ actual open class SkiaLayer {
         }
 
     internal fun initGestures() {
-        gesturesDetector.setGesturesToListen(gesturesToListen)
+        gesturesDetectors.forEach { setGesturesToListen(it(), gesturesToListen) }
+    }
+
+    fun setGesturesToListen(
+        gestureRecognizers: Map<SkikoGestureEventKind, List<UIGestureRecognizer>>,
+        gestures: Array<SkikoGestureEventKind>?
+    ) {
+        clearGesturesToListen(gestureRecognizers)
+        if (!gestures.isNullOrEmpty()) {
+            for (gesture in gestures) {
+                val recognizers = gestureRecognizers.get(gesture)
+                if (!recognizers.isNullOrEmpty()) {
+                    recognizers.forEach { view?.addGestureRecognizer(it) }
+                }
+            }
+        }
+    }
+
+    private fun clearGesturesToListen(gestureRecognizers: Map<SkikoGestureEventKind, List<UIGestureRecognizer>>) {
+        for ((_, recognizers) in gestureRecognizers) {
+            recognizers.forEach { view?.removeGestureRecognizer(it) }
+        }
     }
 
     actual fun attachTo(container: Any) {

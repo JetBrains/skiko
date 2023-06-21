@@ -6,6 +6,7 @@ enum class OS(val id: String) {
     Windows("windows"),
     MacOS("macos"),
     Ios("ios"),
+    Tvos("tvos"),
     JS("js")
     ;
 

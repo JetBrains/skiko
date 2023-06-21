@@ -1,4 +1,4 @@
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.*
 
 buildscript {
     repositories {
@@ -78,6 +78,24 @@ kotlin {
             configureToLaunchFromAppCode()
             configureToLaunchFromXcode()
         }
+        tvosX64() {
+            configureToLaunchFromAppCode()
+            configureToLaunchFromXcode {
+                linkerOpts += listOf("-tvos_simulator_version_min", "14.0")
+            }
+        }
+        tvosArm64() {
+            configureToLaunchFromAppCode()
+            configureToLaunchFromXcode {
+                linkerOpts += listOf("-tvos_version_min", "14.0")
+            }
+        }
+        tvosSimulatorArm64() {
+            configureToLaunchFromAppCode()
+            configureToLaunchFromXcode {
+                linkerOpts += listOf("-tvos_simulator_version_min", "14.0")
+            }
+        }
     }
 
     jvm("awt") {
@@ -131,11 +149,23 @@ kotlin {
             val macosArm64Main by getting {
                 dependsOn(macosMain)
             }
-            val iosMain by getting {
+            val uikitMain by creating {
                 dependsOn(darwinMain)
             }
+            val iosMain by getting {
+                dependsOn(uikitMain)
+            }
             val iosSimulatorArm64Main by getting {
-                dependsOn(iosMain)
+                dependsOn(uikitMain)
+            }
+            val tvosX64Main by getting {
+                dependsOn(uikitMain)
+            }
+            val tvosArm64Main by getting {
+                dependsOn(uikitMain)
+            }
+            val tvosSimulatorArm64Main by getting {
+                dependsOn(uikitMain)
             }
         }
     }
@@ -179,7 +209,7 @@ if (hostOs == "macos") {
 }
 
 project.tasks.register<JavaExec>("runAwt") {
-    val kotlinTask =  project.tasks.named("compileKotlinAwt")
+    val kotlinTask = project.tasks.named("compileKotlinAwt")
     dependsOn(kotlinTask)
     systemProperty("skiko.fps.enabled", "true")
     systemProperty("skiko.linux.autodpi", "true")
@@ -203,8 +233,14 @@ tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().configureEach 
 }
 
 enum class Target(val simulator: Boolean, val key: String) {
-    WATCHOS_X86(true, "watchos"), WATCHOS_ARM64(false, "watchos"),
-    IOS_X64(true, "iosX64"), IOS_ARM64(false, "iosArm64"), IOS_SIMULATOR_ARM64(true, "iosSimulatorArm64")
+    WATCHOS_X86(true, "watchos"), 
+    WATCHOS_ARM64(false, "watchos"),
+    IOS_X64(true, "iosX64"),
+    IOS_ARM64(false, "iosArm64"), 
+    IOS_SIMULATOR_ARM64(true, "iosSimulatorArm64"),
+    TVOS_X64(true, "tvosX64"),
+    TVOS_ARM64(true, "tvosArm64"),
+    TVOS_SIMULATOR_ARM64(true, "tvosSimulatorArm64"),
 }
 
 
@@ -212,9 +248,16 @@ if (hostOs == "macos") {
 // Create Xcode integration tasks.
     val sdkName: String? = System.getenv("SDK_NAME")
 
+    println("Configuring XCode for $sdkName")
     val target = sdkName.orEmpty().let {
         when {
             it.startsWith("iphoneos") -> Target.IOS_ARM64
+            it.startsWith("appletvsimulator") -> when (host) {
+                "macos-x64" -> Target.TVOS_X64
+                "macos-arm64" -> Target.TVOS_SIMULATOR_ARM64
+                else -> throw GradleException("Host OS is not supported")
+            }
+            it.startsWith("appletvos") -> Target.TVOS_ARM64
             it.startsWith("watchos") -> Target.WATCHOS_ARM64
             it.startsWith("watchsimulator") -> Target.WATCHOS_X86
             else -> when (host) {
@@ -245,6 +288,8 @@ if (hostOs == "macos") {
         // Otherwise copy the executable into the Xcode output directory.
         tasks.create("packForXCode", Copy::class.java) {
             dependsOn(kotlinBinary.linkTask)
+            
+            println("Packing for XCode: ${kotlinBinary.target}")
 
             destinationDir = file(targetBuildDir)
 
@@ -292,7 +337,7 @@ fun KotlinNativeTarget.configureToLaunchFromAppCode() {
     }
 }
 
-fun KotlinNativeTarget.configureToLaunchFromXcode() {
+fun KotlinNativeTarget.configureToLaunchFromXcode(configure: Executable.()->Unit = {}) {
     binaries {
         executable {
             entryPoint = "org.jetbrains.skiko.sample.main"
@@ -301,6 +346,7 @@ fun KotlinNativeTarget.configureToLaunchFromXcode() {
                 "-linker-option", "-framework", "-linker-option", "CoreText",
                 "-linker-option", "-framework", "-linker-option", "CoreGraphics"
             )
+            configure()
         }
     }
 }

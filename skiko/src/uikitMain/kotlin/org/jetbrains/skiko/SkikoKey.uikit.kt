@@ -123,7 +123,20 @@ actual enum class SkikoKey(val value: UIKeyboardHIDUsage) {
                 error("iOS SkikoKey, valueOf value = $value > Int.MAX_VALUE")
             }
             val key = SkikoKey.values().firstOrNull { it.value == value }
-            return key ?: SkikoKey.KEY_UNKNOWN
+            return key ?: KEY_UNKNOWN
+        }
+        
+        fun fromPressType(value: UIPressType): SkikoKey = when (value) {
+            UIPressTypeSelect -> KEY_ENTER
+            UIPressTypeUpArrow -> KEY_UP
+            UIPressTypeDownArrow -> KEY_DOWN
+            UIPressTypeLeftArrow -> KEY_LEFT
+            UIPressTypeRightArrow -> KEY_RIGHT
+            UIPressTypeMenu -> KEY_MENU
+            UIPressTypePlayPause -> KEY_PAUSE
+            UIPressTypePageUp -> KEY_PGUP
+            UIPressTypePageDown -> KEY_PGDOWN
+            else -> KEY_UNKNOWN
         }
     }
 }
