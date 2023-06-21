@@ -128,10 +128,6 @@ object AwtFontUtils {
                 // For macOS
                 getFieldValueOrNull(CFontClass, font2D, String::class.java, "nativeFontName")
             }
-                // For macOS
-                val clazz = Class.forName("sun.font.CFont")
-                getFieldValueOrNull(clazz, font2D, String::class.java, "nativeFontName")
-            }
 
             else -> error("Unsupported Font2D subclass: ${font2D.javaClass.name}")
         }
