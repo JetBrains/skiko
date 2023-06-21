@@ -1,21 +1,19 @@
 package org.jetbrains.skiko
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import org.jetbrains.skia.Data
 import org.jetbrains.skia.FontStyle
 import org.jetbrains.skia.Typeface
 import org.jetbrains.skia.tests.makeFromResource
 import org.jetbrains.skiko.context.isRunningOnJetBrainsRuntime
+import org.jetbrains.skiko.tests.runTest
 import org.junit.Assume
 import org.junit.Test
 import kotlin.io.path.createTempFile
 import kotlin.io.path.writeBytes
 import kotlin.test.*
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class AwtFontManagerTest {
 
     // Since Arial is not available on Linux, we need a substitute that

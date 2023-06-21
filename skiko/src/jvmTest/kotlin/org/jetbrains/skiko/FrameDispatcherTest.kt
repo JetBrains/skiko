@@ -1,28 +1,29 @@
 package org.jetbrains.skiko
 
 import kotlinx.coroutines.*
-import kotlinx.coroutines.test.*
+import kotlinx.coroutines.test.TestCoroutineScope
+import kotlinx.coroutines.test.runBlockingTest
+import org.junit.Assert.assertEquals
 import org.junit.Test
-import kotlin.test.assertEquals
+import java.util.concurrent.Executors
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class FrameDispatcherTest {
     private var frameCount = 0
 
     @Test
-    fun `shouldn't call onFrame after the creating`() = runTest {
-        val frameDispatcher = FrameDispatcher(scope = this) {
+    fun `shouldn't call onFrame after the creating`() = test {
+        FrameDispatcher(scope = this) {
             frameCount++
         }
 
         advanceUntilIdle()
 
-        frameDispatcher.cancel()
         assertEquals(0, frameCount)
     }
 
     @Test
-    fun `scheduleFrame after creating`() = runTest {
+    fun `scheduleFrame after creating`() = test {
         val frameDispatcher = FrameDispatcher(scope = this) {
             frameCount++
         }
@@ -30,12 +31,11 @@ class FrameDispatcherTest {
         frameDispatcher.scheduleFrame()
         advanceUntilIdle()
 
-        frameDispatcher.cancel()
         assertEquals(1, frameCount)
     }
 
     @Test
-    fun `scheduleFrame multiple times after creating`() = runTest {
+    fun `scheduleFrame multiple times after creating`() = test {
         val frameDispatcher = FrameDispatcher(scope = this) {
             frameCount++
         }
@@ -46,12 +46,11 @@ class FrameDispatcherTest {
         frameDispatcher.scheduleFrame()
         advanceUntilIdle()
 
-        frameDispatcher.cancel()
         assertEquals(1, frameCount)
     }
 
     @Test
-    fun `scheduleFrame second time after first onFrame`() = runTest {
+    fun `scheduleFrame second time after first onFrame`() = test {
         val frameDispatcher = FrameDispatcher(scope = this) {
             frameCount++
         }
@@ -61,13 +60,11 @@ class FrameDispatcherTest {
 
         frameDispatcher.scheduleFrame()
         advanceUntilIdle()
-
-        frameDispatcher.cancel()
         assertEquals(2, frameCount)
     }
 
     @Test
-    fun `scheduleFrame second time twice after first onFrame`() = runTest {
+    fun `scheduleFrame second time twice after first onFrame`() = test {
         val frameDispatcher = FrameDispatcher(scope = this) {
             frameCount++
         }
@@ -78,13 +75,11 @@ class FrameDispatcherTest {
         frameDispatcher.scheduleFrame()
         frameDispatcher.scheduleFrame()
         advanceUntilIdle()
-
-        frameDispatcher.cancel()
         assertEquals(2, frameCount)
     }
 
     @Test
-    fun `scheduleFrame during onFrame`() = runTest {
+    fun `scheduleFrame during onFrame`() = test {
         lateinit var frameDispatcher: FrameDispatcher
         frameDispatcher = FrameDispatcher(scope = this) {
             frameCount++
@@ -103,12 +98,10 @@ class FrameDispatcherTest {
 
         yield()
         assertEquals(4, frameCount)
-
-        frameDispatcher.cancel()
     }
 
     @Test
-    fun `scheduleFrame multiple times during onFrame`() = runTest {
+    fun `scheduleFrame multiple times during onFrame`() = test {
         lateinit var frameDispatcher: FrameDispatcher
         frameDispatcher = FrameDispatcher(scope = this) {
             frameCount++
@@ -129,14 +122,14 @@ class FrameDispatcherTest {
 
         yield()
         assertEquals(4, frameCount)
-
-        frameDispatcher.cancel()
     }
 
     @Test
-    fun `cancel coroutine scope`() = runTest {
+    fun `cancel coroutine scope`() = test {
+        val scope = CoroutineScope(coroutineContext)
+
         lateinit var frameDispatcher: FrameDispatcher
-        frameDispatcher = FrameDispatcher(coroutineContext) {
+        frameDispatcher = FrameDispatcher(scope) {
             frameCount++
             frameDispatcher.scheduleFrame()
         }
@@ -151,42 +144,53 @@ class FrameDispatcherTest {
         yield()
         assertEquals(3, frameCount)
 
-        frameDispatcher.cancel()
+        scope.cancel()
         yield()
         assertEquals(3, frameCount)
 
         advanceUntilIdle()
         assertEquals(3, frameCount)
-
     }
 
     @Test
-    fun `perform tasks scheduled in the frame after the frame`() = runTest {
+    fun `perform tasks scheduled in the frame after the frame`() {
+        val dispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
         val history = mutableListOf<String>()
 
-        val job = launch {
-            val jobScope = this
+        runBlocking(dispatcher) {
+            val job = launch {
+                val scope = this
 
-            lateinit var frameDispatcher: FrameDispatcher
-            frameDispatcher = FrameDispatcher(scope = jobScope) {
-                history.add("frame$frameCount")
-                if (frameCount == 0) {
-                    jobScope.launch {
-                        history.add("task")
+                lateinit var frameDispatcher: FrameDispatcher
+                frameDispatcher = FrameDispatcher(scope = scope) {
+                    history.add("frame$frameCount")
+                    if (frameCount == 0) {
+                        scope.launch {
+                            history.add("task")
+                        }
+                        frameDispatcher.scheduleFrame()
                     }
-                    frameDispatcher.scheduleFrame()
+                    frameCount++
                 }
-                frameCount++
+                frameDispatcher.scheduleFrame()
             }
-            frameDispatcher.scheduleFrame()
-        }
 
-        repeat(20) {
-            yield()
-        }
+            repeat(20) {
+                yield()
+            }
 
-        job.cancel()
+            job.cancel()
+        }
 
         assertEquals(listOf("frame0", "task", "frame1"), history)
+    }
+
+    private fun test(
+        block: suspend TestCoroutineScope.() -> Unit
+    ) = runBlockingTest {
+        pauseDispatcher()
+        val job = Job()
+        TestCoroutineScope(coroutineContext + job).block()
+        job.cancel()
     }
 }

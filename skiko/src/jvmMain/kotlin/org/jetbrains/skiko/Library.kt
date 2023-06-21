@@ -122,3 +122,11 @@ object Library {
         }
     }
 }
+
+// We have to keep this tiny class in Skiko for testing purposes.
+internal class LibraryTestImpl() {
+    fun run(): Long {
+        val bitmap = Bitmap()
+        return bitmap._ptr
+    }
+}

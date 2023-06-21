@@ -1,17 +1,14 @@
 package org.jetbrains.skiko
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runTest
 import org.jetbrains.skiko.context.isRunningOnJetBrainsRuntime
+import org.jetbrains.skiko.tests.runTest
 import org.jetbrains.skiko.util.assertOpensAreSet
 import org.junit.Assume
 import org.junit.Test
 import kotlin.test.assertContains
 import kotlin.test.assertTrue
 
-
-@OptIn(ExperimentalCoroutinesApi::class)
 class SkiaFontProviderTest {
     private val provider = FontProvider.Skia
 

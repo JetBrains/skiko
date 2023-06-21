@@ -1,8 +1,16 @@
 package org.jetbrains.skiko
 
-import kotlinx.coroutines.*
-import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.TestCoroutineScope
+import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.yield
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Ignore
@@ -14,7 +22,7 @@ import kotlin.random.Random
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class TaskTest {
     @Test
-    fun `runAndAwait with finish`() = runTest {
+    fun `runAndAwait with finish`() = test {
         val task = Task()
 
         val job = launch {
@@ -29,9 +37,8 @@ internal class TaskTest {
         assertTrue(job.isCompleted)
     }
 
-    @Ignore // TODO Sorry Igor, this is also broken now
     @Test
-    fun `runAndAwait without finish`() = runTest {
+    fun `runAndAwait without finish`() = test {
         val task = Task()
 
         val job = launch {
@@ -43,7 +50,7 @@ internal class TaskTest {
     }
 
     @Test
-    fun `finish inside runAndAwait`() = runTest {
+    fun `finish inside runAndAwait`() = test {
         val task = Task()
 
         val job = launch {
@@ -56,9 +63,8 @@ internal class TaskTest {
         assertTrue(job.isCompleted)
     }
 
-    @Ignore // TODO Sorry Igor, this is also broken now
     @Test
-    fun `finish before runAndAwait`() = runTest {
+    fun `finish before runAndAwait`() = test {
         val task = Task()
 
         val job = launch {
@@ -186,5 +192,14 @@ internal class TaskTest {
         fun setNeedsDisplay() {
             needsDisplay.set(true)
         }
+    }
+
+    private fun test(
+        block: suspend TestCoroutineScope.() -> Unit
+    ) = runBlockingTest {
+        pauseDispatcher()
+        val job = Job()
+        TestCoroutineScope(coroutineContext + job).block()
+        job.cancel()
     }
 }

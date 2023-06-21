@@ -15,7 +15,7 @@ plugins {
     id("de.undercouch.download") version "5.4.0"
 }
 
-val coroutinesVersion = "1.6.4"
+val coroutinesVersion = "1.5.2"
 
 fun targetSuffix(os: OS, arch: Arch): String {
     return "${os.id}_${arch.id}"
@@ -223,6 +223,9 @@ val Project.supportAndroid: Boolean
 
 kotlin {
     jvm("awt") {
+        compilations.all {
+            kotlinOptions.jvmTarget = "1.8"
+        }
         generateVersion(targetOs, targetArch)
     }
 

@@ -1,6 +1,5 @@
 package org.jetbrains.skiko
 
-import org.junit.Ignore
 import org.junit.Test
 import java.net.URL
 import java.net.URLClassLoader
@@ -70,15 +69,12 @@ private fun newInstance(loader: ClassLoader, fqName: String, vararg args: Any): 
 }
 
 class SeveralClassloadersTest {
-
-    @Ignore("For Igor to fix")
     @Test
     fun `load skiko in several classloaders (with skiko path)`()  {
         check(skikoLibraryPath != null)
         doTest()
     }
 
-    @Ignore("For Igor to fix")
     @Test
     fun `load skiko in several classloaders (without skiko path)`()  {
         val oldValue = skikoLibraryPath!!

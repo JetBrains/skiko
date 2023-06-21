@@ -1,8 +1,8 @@
 package org.jetbrains.skiko
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runTest
 import org.jetbrains.skiko.context.isRunningOnJetBrainsRuntime
+import org.jetbrains.skiko.tests.runTest
 import org.junit.Assume
 import org.junit.Test
 import java.nio.file.Files
@@ -15,7 +15,6 @@ import kotlin.streams.asSequence
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class JvmEmbeddedFontProviderTest {
     private val provider = JvmEmbeddedFontProvider
 
