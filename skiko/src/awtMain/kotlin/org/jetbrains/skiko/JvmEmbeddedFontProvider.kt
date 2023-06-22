@@ -198,6 +198,7 @@ internal object JvmEmbeddedFontProvider : FontProvider {
         val fontFamily = getFontFamilyOrNull(familyName) ?: return null
 
         return fontFamily[fontStyle]
+            ?: FontFamily.closestStyle(fontFamily.availableStyles, fontStyle)?.let(fontFamily::get)
     }
 
     override suspend fun getFontFamilyOrNull(familyName: String): FontFamily? {

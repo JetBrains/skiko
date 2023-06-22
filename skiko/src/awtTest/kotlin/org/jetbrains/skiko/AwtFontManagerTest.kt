@@ -6,10 +6,13 @@ import org.jetbrains.skia.Data
 import org.jetbrains.skia.FontStyle
 import org.jetbrains.skia.Typeface
 import org.jetbrains.skia.tests.makeFromResource
+import org.jetbrains.skiko.AwtFontUtils.fontFamilyName
+import org.jetbrains.skiko.AwtFontUtils.resolvePhysicalFontNameOrNull
 import org.jetbrains.skiko.context.isRunningOnJetBrainsRuntime
 import org.jetbrains.skiko.tests.runTest
 import org.junit.Assume
 import org.junit.Test
+import java.awt.GraphicsEnvironment
 import kotlin.io.path.createTempFile
 import kotlin.io.path.writeBytes
 import kotlin.test.*
@@ -56,6 +59,43 @@ class AwtFontManagerTest {
         assertEquals(aFontName, typeface.familyName, "Font family name must match")
         assertFalse(typeface.isBold, "Font must not be bold")
         assertFalse(typeface.isItalic, "Font must not be italic")
+    }
+
+    @OptIn(DependsOnJBR::class)
+    @Test
+    fun `should be able to convert all default AWT fonts`() = runTest {
+        // Listing of font family names is broken on non-macOS JVM implementations,
+        // except when running on the JetBrains Runtime. Our matching logic only
+        // works on the JetBrains Runtime.
+        Assume.assumeTrue("Not running on the JetBrains Runtime", isRunningOnJetBrainsRuntime())
+
+        val fontManager = AwtFontManager()
+
+        val awtFonts = GraphicsEnvironment.getLocalGraphicsEnvironment().allFonts
+        val skiaFonts = awtFonts.map { it.toSkikoTypefaceOrNull(fontManager) }
+
+        fun String.resolveFontFamily() = if (FontFamilyKey(this) in FontFamilyKey.Awt.awtLogicalFonts) {
+            resolvePhysicalFontNameOrNull(this) ?: this
+        } else {
+            this
+        }
+
+        val awtFamilies = awtFonts.map { it.fontFamilyName!!.resolveFontFamily() }
+        val skiaFamilies = skiaFonts.map { it?.familyName }
+
+        val wrongConversions = mutableSetOf<String>()
+        for (i in awtFamilies.indices) {
+            val awtFamily = awtFamilies[i]
+            val skiaFamily = skiaFamilies[i]
+            if (awtFamily != skiaFamily) {
+                wrongConversions.add("$awtFamily -> $skiaFamily")
+            }
+        }
+
+        assertTrue(
+            wrongConversions.isEmpty(),
+            "These AWT fonts were wrongly converted:\n${wrongConversions.joinToString("\n") { " * $it" }}"
+        )
     }
 
     @Test

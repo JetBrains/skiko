@@ -1,7 +1,6 @@
 package org.jetbrains.skiko
 
-import org.jetbrains.skia.FontStyle
-import org.jetbrains.skia.Typeface
+import org.jetbrains.skia.*
 
 /**
  * Holds info about a font family. Intended to be used as a cache entry,
@@ -133,6 +132,27 @@ class FontFamily(
                 map[typeface.fontStyle] = typeface
             }
             return FontFamily(familyName, source, map)
+        }
+
+        /**
+         * Find the closest typeface by style
+         */
+        fun closestStyle(iterable: Iterable<FontStyle>, style: FontStyle): FontStyle? {
+            val keys = iterable.toMutableList()
+
+            keys.sortBy { it.weight }
+            val closeByWight = keys.find { it.weight >= style.weight } ?: keys.lastOrNull()
+            keys.retainAll { it.weight == closeByWight?.weight }
+
+            keys.sortBy { it.width }
+            val closeByWidth = keys.find { it.width >= style.width } ?: keys.lastOrNull()
+            keys.retainAll { it.width == closeByWidth?.width }
+
+            keys.sortBy { it.slant }
+            val closeBySlant = keys.find { it.slant >= style.slant } ?: keys.lastOrNull()
+            keys.retainAll { it.slant == closeBySlant?.slant }
+
+            return keys.firstOrNull()
         }
     }
 }

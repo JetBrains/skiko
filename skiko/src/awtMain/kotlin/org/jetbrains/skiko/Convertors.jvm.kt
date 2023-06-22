@@ -339,10 +339,10 @@ internal fun toSkikoSlant(posture: Float) =
     }
 
 internal val java.awt.Font.weight
-    get() = attributes[TextAttribute.WEIGHT] as Float
+    get() = (attributes[TextAttribute.WEIGHT] as? Float) ?: TextAttribute.WEIGHT_REGULAR
 
 internal val java.awt.Font.width
-    get() = attributes[TextAttribute.WIDTH] as Float
+    get() = (attributes[TextAttribute.WIDTH] as? Float) ?: TextAttribute.WIDTH_REGULAR
 
 internal val java.awt.Font.posture
-    get() = attributes[TextAttribute.POSTURE] as Float
+    get() = (attributes[TextAttribute.POSTURE] as? Float) ?: TextAttribute.POSTURE_REGULAR

@@ -118,6 +118,75 @@ class FontFamilyTest {
     }
 
     @Test
+    fun `find closest style weight`() {
+        val styles = setOf(
+            FontStyle(weight = 400, width = 5, slant = FontSlant.UPRIGHT),
+            FontStyle(weight = 400, width = 7, slant = FontSlant.ITALIC),
+            FontStyle(weight = 400, width = 5, slant = FontSlant.ITALIC),
+            FontStyle(weight = 700, width = 5, slant = FontSlant.UPRIGHT),
+        )
+
+        fun closestStyle(weight: Int, width: Int, slant: FontSlant) =
+            FontFamily.closestStyle(styles, FontStyle(weight, width, slant))
+
+        assertEquals(
+            FontStyle(weight = 400, width = 5, slant = FontSlant.UPRIGHT),
+            closestStyle(weight = 300, width = 5, slant = FontSlant.UPRIGHT)
+        )
+        assertEquals(
+            FontStyle(weight = 400, width = 5, slant = FontSlant.UPRIGHT),
+            closestStyle(weight = 400, width = 5, slant = FontSlant.UPRIGHT)
+        )
+        assertEquals(
+            FontStyle(weight = 700, width = 5, slant = FontSlant.UPRIGHT),
+            closestStyle(weight = 500, width = 5, slant = FontSlant.UPRIGHT)
+        )
+        assertEquals(
+            FontStyle(weight = 700, width = 5, slant = FontSlant.UPRIGHT),
+            closestStyle(weight = 700, width = 5, slant = FontSlant.UPRIGHT)
+        )
+        assertEquals(
+            FontStyle(weight = 700, width = 5, slant = FontSlant.UPRIGHT),
+            closestStyle(weight = 800, width = 5, slant = FontSlant.UPRIGHT)
+        )
+    }
+
+    @Test
+    fun `find closest style width`() {
+        val styles = setOf(
+            FontStyle(weight = 400, width = 5, slant = FontSlant.UPRIGHT),
+            FontStyle(weight = 400, width = 7, slant = FontSlant.ITALIC),
+            FontStyle(weight = 400, width = 5, slant = FontSlant.ITALIC),
+            FontStyle(weight = 700, width = 5, slant = FontSlant.UPRIGHT),
+        )
+
+        fun closestStyle(weight: Int, width: Int, slant: FontSlant) =
+            FontFamily.closestStyle(styles, FontStyle(weight, width, slant))
+
+        assertEquals(
+            FontStyle(weight = 400, width = 5, slant = FontSlant.UPRIGHT),
+            closestStyle(weight = 300, width = 3, slant = FontSlant.UPRIGHT)
+        )
+        assertEquals(
+            FontStyle(weight = 400, width = 5, slant = FontSlant.UPRIGHT),
+            closestStyle(weight = 300, width = 5, slant = FontSlant.UPRIGHT)
+        )
+        assertEquals(
+            FontStyle(weight = 400, width = 7, slant = FontSlant.ITALIC),
+            closestStyle(weight = 300, width = 6, slant = FontSlant.UPRIGHT)
+        )
+        assertEquals(
+            FontStyle(weight = 400, width = 7, slant = FontSlant.ITALIC),
+            closestStyle(weight = 300, width = 7, slant = FontSlant.UPRIGHT)
+        )
+
+        assertEquals(
+            FontStyle(weight = 700, width = 5, slant = FontSlant.UPRIGHT),
+            closestStyle(weight = 700, width = 7, slant = FontSlant.UPRIGHT)
+        )
+    }
+
+    @Test
     fun `should do nothing when removing any non-existing typeface`() {
         val anyTypeface = runBlocking { Typeface.makeFromResource("fonts/Inter-V.ttf") }
 
