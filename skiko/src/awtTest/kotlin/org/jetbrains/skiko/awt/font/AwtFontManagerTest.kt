@@ -8,11 +8,13 @@ import org.jetbrains.skia.Typeface
 import org.jetbrains.skia.tests.makeFromResource
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.awt.font.AwtFontUtils.fontFamilyName
+import org.jetbrains.skiko.awt.font.AwtFontUtils.resolvePhysicalFontNameOrNull
 import org.jetbrains.skiko.isRunningOnJetBrainsRuntime
 import org.jetbrains.skiko.tests.runTest
 import org.junit.Assume
 import org.junit.Test
 import java.awt.GraphicsEnvironment
+import kotlin.io.path.createTempFile
 import kotlin.io.path.writeBytes
 import kotlin.test.*
 
@@ -81,7 +83,7 @@ class AwtFontManagerTest {
         val skiaFonts = awtFonts.map { it.toSkikoTypefaceOrNull(fontManager) }
 
         fun String.resolveFontFamily() = if (FontFamilyKey(this) in FontFamilyKey.Awt.awtLogicalFonts) {
-            AwtFontUtils.resolvePhysicalFontNameOrNull(this) ?: this
+            resolvePhysicalFontNameOrNull(this) ?: this
         } else {
             this
         }
@@ -172,7 +174,7 @@ class AwtFontManagerTest {
             "The font we're trying to add must not already be loaded"
         )
 
-        val fontFile = kotlin.io.path.createTempFile("awtfontmanagertest", "testfont")
+        val fontFile = createTempFile("awtfontmanagertest", "testfont")
         withContext(Dispatchers.IO) {
             val fontBytes = Thread.currentThread()
                 .contextClassLoader
@@ -239,7 +241,7 @@ class AwtFontManagerTest {
         fontManager.addCustomFontTypeface(Typeface.makeFromResource("./fonts/JetBrainsMono-Regular.ttf"))
         fontManager.addCustomFontResource("./fonts/JetBrainsMono-Italic.ttf")
 
-        val fontFile = kotlin.io.path.createTempFile("awtfontmanagertest", "testfont")
+        val fontFile = createTempFile("awtfontmanagertest", "testfont")
         withContext(Dispatchers.IO) {
             val fontBytes = Thread.currentThread()
                 .contextClassLoader
