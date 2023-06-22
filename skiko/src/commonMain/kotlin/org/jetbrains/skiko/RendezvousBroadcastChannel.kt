@@ -6,8 +6,8 @@ import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 
 /**
- * Behaves as `Channel<Unit>(Channel.RENDEZVOUS)`, but with ability to send a value to all current consumers
- * (which will await on `receive` method).
+ * Behaves as Channel<Unit>(Channel.RENDEZVOUS), but with ability to send value to all current consumers
+ * (which await on `receive` method).
  */
 internal class RendezvousBroadcastChannel<T> {
     private val onRequest = Channel<Unit>(Channel.CONFLATED)
@@ -32,7 +32,7 @@ internal class RendezvousBroadcastChannel<T> {
     }
 
     /**
-     * Wait until the producer sends a value, and returns it.
+     * Wait when the producer will send a value and return it.
      *
      * Can be called concurrently from multiple threads.
      */

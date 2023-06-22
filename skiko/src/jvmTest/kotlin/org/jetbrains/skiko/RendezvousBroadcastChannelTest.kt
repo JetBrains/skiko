@@ -1,8 +1,7 @@
 package org.jetbrains.skiko
 
 import kotlinx.coroutines.*
-import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import kotlin.random.Random
@@ -175,7 +174,9 @@ class RendezvousBroadcastChannelTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `produce values, consume from multiple coroutines`() = runTest {
+    fun `produce values, consume from multiple coroutines`() = runBlockingTest {
+        pauseDispatcher()
+
         val frames1 = mutableListOf<Int>()
         val frames2 = mutableListOf<Int>()
         val frames3 = mutableListOf<Int>()

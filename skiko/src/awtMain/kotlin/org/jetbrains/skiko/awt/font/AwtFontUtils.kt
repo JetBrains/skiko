@@ -1,18 +1,19 @@
 @file:Suppress("PrivatePropertyName") // Reflection-based properties have more meaningful names
 
-package org.jetbrains.skiko
+package org.jetbrains.skiko.awt.font
 
+import org.jetbrains.skiko.InternalSunApiChecker
 import org.jetbrains.skiko.ReflectionUtil.findFieldInHierarchy
 import org.jetbrains.skiko.ReflectionUtil.getDeclaredMethodOrNull
 import org.jetbrains.skiko.ReflectionUtil.getFieldValueOrNull
+import org.jetbrains.skiko.hostOs
 import java.awt.Font
 import java.awt.GraphicsEnvironment
 import java.lang.reflect.Method
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
-@InternalSkikoApi
-object AwtFontUtils {
+internal object AwtFontUtils {
 
     init {
         InternalSunApiChecker.isSunFontApiAccessible()
@@ -127,10 +128,6 @@ object AwtFontUtils {
             CFontClass?.isInstance(font2D) == true -> {
                 // For macOS
                 getFieldValueOrNull(CFontClass, font2D, String::class.java, "nativeFontName")
-            }
-                // For macOS
-                val clazz = Class.forName("sun.font.CFont")
-                getFieldValueOrNull(clazz, font2D, String::class.java, "nativeFontName")
             }
 
             else -> error("Unsupported Font2D subclass: ${font2D.javaClass.name}")

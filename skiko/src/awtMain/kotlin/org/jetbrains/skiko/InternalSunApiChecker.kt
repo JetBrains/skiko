@@ -1,7 +1,5 @@
 package org.jetbrains.skiko
 
-import org.jetbrains.skiko.context.isRunningOnJetBrainsRuntime
-import java.awt.Font
 import java.util.concurrent.atomic.AtomicBoolean
 
 internal object InternalSunApiChecker {
@@ -38,7 +36,7 @@ internal object InternalSunApiChecker {
             val fontManagerClass = Class.forName("sun.font.FontManagerFactory")
             fontManagerClass.getDeclaredMethod("getInstance").invoke(null)
 
-            println("Sun Font APIs are accessible, advanced font features are available")
+            Logger.debug { "Sun Font APIs are accessible, advanced font features are available" }
             return true
         } catch (ignored: Throwable) {
             return false
@@ -46,17 +44,17 @@ internal object InternalSunApiChecker {
     }
 
     private fun logJbrWarning() {
-        println(
+        Logger.warn {
             """
-            |The Java Runtime in use may not support all advanced Skiko features.
-            |It is recommended that you run this app on the JetBrains Runtime for
-            |best results.
-            """.trimMargin()
-        )
+                |The Java Runtime in use may not support all advanced Skiko features.
+                |It is recommended that you run this app on the JetBrains Runtime for
+                |best results.
+                """.trimMargin()
+        }
     }
 
     private fun logInstructions() {
-        System.err.println(
+        Logger.error {
             """
             |
             |!!! WARNING !!!
@@ -69,6 +67,6 @@ internal object InternalSunApiChecker {
             |the AWT fonts and access private JDK APIs used for some advanced
             |features.
             """.trimMargin()
-        )
+        }
     }
 }

@@ -1,7 +1,17 @@
 package org.jetbrains.skia
 
-import org.jetbrains.skia.impl.*
+import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skia.impl.Native
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.RefCnt
+import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.interopScope
+import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.impl.withNullableResult
+import org.jetbrains.skia.impl.withResult
+import org.jetbrains.skia.impl.withStringResult
 
 class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
@@ -391,8 +401,6 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
         } finally {
             reachabilityBarrier(this)
         }
-
-    override fun toString() = "Typeface(familyName='$familyName', fontStyle=$fontStyle, uniqueId=$uniqueId)"
 }
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUniqueId")

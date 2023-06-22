@@ -1,10 +1,13 @@
-package org.jetbrains.skiko
+package org.jetbrains.skiko.awt.font
 
 import kotlinx.coroutines.*
 import org.jetbrains.skia.FontMgr
 import org.jetbrains.skia.FontStyle
 import org.jetbrains.skia.FontStyleSet
 import org.jetbrains.skia.Typeface
+import org.jetbrains.skiko.OS
+import org.jetbrains.skiko.RendezvousBroadcastChannel
+import org.jetbrains.skiko.hostOs
 import java.util.concurrent.ConcurrentHashMap
 
 internal object SkiaFontProvider : FontProvider {

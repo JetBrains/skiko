@@ -27,15 +27,3 @@ annotation class DelicateSkikoApi
             "and can have bugs."
 )
 annotation class ExperimentalSkikoApi
-
-/**
- * Marks declarations that are Skiko internals and shouldn't be used outside
- * Skiko itself. There are no guarantees about API stability, availability,
- * and compatibility with future and past versions of Skiko.
- */
-@Retention(value = AnnotationRetention.BINARY)
-@RequiresOptIn(
-    level = RequiresOptIn.Level.ERROR,
-    message = "This is an internal Skiko API and should not be used."
-)
-annotation class InternalSkikoApi

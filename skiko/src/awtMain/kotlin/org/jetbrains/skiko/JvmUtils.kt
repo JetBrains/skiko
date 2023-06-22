@@ -1,4 +1,4 @@
-package org.jetbrains.skiko.context
+package org.jetbrains.skiko
 
 internal fun isRunningOnJetBrainsRuntime() =
     System.getProperty("java.vendor")

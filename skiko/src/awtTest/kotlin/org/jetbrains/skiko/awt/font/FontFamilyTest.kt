@@ -1,9 +1,9 @@
-package org.jetbrains.skiko
+package org.jetbrains.skiko.awt.font
 
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.skia.*
 import org.jetbrains.skia.tests.makeFromResource
-import org.jetbrains.skiko.FontFamily.FontFamilySource
+import org.jetbrains.skiko.awt.font.FontFamily.FontFamilySource
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -115,6 +115,75 @@ class FontFamilyTest {
         val anyStyle = FontStyle(weight = 1000, FontWidth.EXTRA_CONDENSED, FontSlant.OBLIQUE)
         val fontFamilyCache = aFontFamily - anyStyle
         assertEquals(aFontFamily.availableStyles, fontFamilyCache.availableStyles)
+    }
+
+    @Test
+    fun `find closest style weight`() {
+        val styles = setOf(
+            FontStyle(weight = 400, width = 5, slant = FontSlant.UPRIGHT),
+            FontStyle(weight = 400, width = 7, slant = FontSlant.ITALIC),
+            FontStyle(weight = 400, width = 5, slant = FontSlant.ITALIC),
+            FontStyle(weight = 700, width = 5, slant = FontSlant.UPRIGHT),
+        )
+
+        fun closestStyle(weight: Int, width: Int, slant: FontSlant) =
+            FontFamily.closestStyle(styles, FontStyle(weight, width, slant))
+
+        assertEquals(
+            FontStyle(weight = 400, width = 5, slant = FontSlant.UPRIGHT),
+            closestStyle(weight = 300, width = 5, slant = FontSlant.UPRIGHT)
+        )
+        assertEquals(
+            FontStyle(weight = 400, width = 5, slant = FontSlant.UPRIGHT),
+            closestStyle(weight = 400, width = 5, slant = FontSlant.UPRIGHT)
+        )
+        assertEquals(
+            FontStyle(weight = 700, width = 5, slant = FontSlant.UPRIGHT),
+            closestStyle(weight = 500, width = 5, slant = FontSlant.UPRIGHT)
+        )
+        assertEquals(
+            FontStyle(weight = 700, width = 5, slant = FontSlant.UPRIGHT),
+            closestStyle(weight = 700, width = 5, slant = FontSlant.UPRIGHT)
+        )
+        assertEquals(
+            FontStyle(weight = 700, width = 5, slant = FontSlant.UPRIGHT),
+            closestStyle(weight = 800, width = 5, slant = FontSlant.UPRIGHT)
+        )
+    }
+
+    @Test
+    fun `find closest style width`() {
+        val styles = setOf(
+            FontStyle(weight = 400, width = 5, slant = FontSlant.UPRIGHT),
+            FontStyle(weight = 400, width = 7, slant = FontSlant.ITALIC),
+            FontStyle(weight = 400, width = 5, slant = FontSlant.ITALIC),
+            FontStyle(weight = 700, width = 5, slant = FontSlant.UPRIGHT),
+        )
+
+        fun closestStyle(weight: Int, width: Int, slant: FontSlant) =
+            FontFamily.closestStyle(styles, FontStyle(weight, width, slant))
+
+        assertEquals(
+            FontStyle(weight = 400, width = 5, slant = FontSlant.UPRIGHT),
+            closestStyle(weight = 300, width = 3, slant = FontSlant.UPRIGHT)
+        )
+        assertEquals(
+            FontStyle(weight = 400, width = 5, slant = FontSlant.UPRIGHT),
+            closestStyle(weight = 300, width = 5, slant = FontSlant.UPRIGHT)
+        )
+        assertEquals(
+            FontStyle(weight = 400, width = 7, slant = FontSlant.ITALIC),
+            closestStyle(weight = 300, width = 6, slant = FontSlant.UPRIGHT)
+        )
+        assertEquals(
+            FontStyle(weight = 400, width = 7, slant = FontSlant.ITALIC),
+            closestStyle(weight = 300, width = 7, slant = FontSlant.UPRIGHT)
+        )
+
+        assertEquals(
+            FontStyle(weight = 700, width = 5, slant = FontSlant.UPRIGHT),
+            closestStyle(weight = 700, width = 7, slant = FontSlant.UPRIGHT)
+        )
     }
 
     @Test
