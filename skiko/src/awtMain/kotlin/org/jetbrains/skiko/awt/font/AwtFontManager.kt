@@ -1,7 +1,8 @@
-package org.jetbrains.skiko
+package org.jetbrains.skiko.awt.font
 
 import org.jetbrains.skia.FontStyle
 import org.jetbrains.skia.Typeface
+import org.jetbrains.skiko.InternalSkikoApi
 import java.io.File
 
 /**

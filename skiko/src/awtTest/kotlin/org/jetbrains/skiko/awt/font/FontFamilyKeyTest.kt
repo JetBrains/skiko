@@ -1,4 +1,4 @@
-package org.jetbrains.skiko
+package org.jetbrains.skiko.awt.font
 
 import org.junit.Test
 import kotlin.test.assertEquals

@@ -1,7 +1,5 @@
 package org.jetbrains.skiko
 
-import org.jetbrains.skiko.context.isRunningOnJetBrainsRuntime
-import java.awt.Font
 import java.util.concurrent.atomic.AtomicBoolean
 
 internal object InternalSunApiChecker {

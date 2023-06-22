@@ -1,4 +1,6 @@
-package org.jetbrains.skiko
+package org.jetbrains.skiko.awt.font
+
+import org.jetbrains.skiko.InternalSkikoApi
 
 /**
  * Used to transparently provide non-case-sensitive font family name matching,

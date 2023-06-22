@@ -1,10 +1,11 @@
 @file:Suppress("JAVA_MODULE_DOES_NOT_EXPORT_PACKAGE")
 
-package org.jetbrains.skiko
+package org.jetbrains.skiko.awt.font
 
 import org.jetbrains.skia.FontStyle
 import org.jetbrains.skia.Typeface
-import org.jetbrains.skiko.FontProvider.Companion.Skia
+import org.jetbrains.skiko.InternalSkikoApi
+import org.jetbrains.skiko.awt.font.FontProvider.Companion.Skia
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path

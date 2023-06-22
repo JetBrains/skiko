@@ -1,7 +1,6 @@
-package org.jetbrains.skiko
+package org.jetbrains.skiko.awt.font
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import org.jetbrains.skiko.context.isRunningOnJetBrainsRuntime
+import org.jetbrains.skiko.isRunningOnJetBrainsRuntime
 import org.jetbrains.skiko.tests.runTest
 import org.junit.Assume
 import org.junit.Test
@@ -21,13 +20,13 @@ class JvmEmbeddedFontProviderTest {
     @Test
     fun `should be able to access JBR features when running on JBR`() = runTest {
         Assume.assumeTrue(isRunningOnJetBrainsRuntime())
-        assertTrue(provider.canUseJetBrainsRuntimeFeatures, "JBR features should be available")
+        assertTrue(JvmEmbeddedFontProvider.canUseJetBrainsRuntimeFeatures, "JBR features should be available")
     }
 
     @Test
     fun `should not be able to access JBR features when not running on JBR`() = runTest {
         Assume.assumeFalse(isRunningOnJetBrainsRuntime())
-        assertFalse(provider.canUseJetBrainsRuntimeFeatures, "JBR features should not be available")
+        assertFalse(JvmEmbeddedFontProvider.canUseJetBrainsRuntimeFeatures, "JBR features should not be available")
     }
 
     @Test
@@ -36,7 +35,7 @@ class JvmEmbeddedFontProviderTest {
 
         val expectedFontFamilyMap = mapOf("Roboto-Light" to "Roboto Light", "Roboto-Thin" to "Roboto Thin")
 
-        val detected = provider.embeddedFontFamilyMap()
+        val detected = JvmEmbeddedFontProvider.embeddedFontFamilyMap()
         val missingMapEntries = mutableSetOf<Map.Entry<String, String>>()
         val badMapEntries = mutableMapOf<Map.Entry<String, String>, String>()
         for (familyMapEntry in expectedFontFamilyMap) {
@@ -71,7 +70,7 @@ class JvmEmbeddedFontProviderTest {
         val jbrFontPaths = getJbrEmbeddedFontPaths()
         assertTrue(jbrFontPaths.isNotEmpty(), "JBR embeds fonts but none was picked up by the test code")
 
-        val detected = provider.embeddedFontFilePaths()
+        val detected = JvmEmbeddedFontProvider.embeddedFontFilePaths()
         val missingEmbeddedFiles = mutableSetOf<String>()
         for (jbrFontPath in jbrFontPaths) {
             if (!detected.contains(jbrFontPath)) {
@@ -93,7 +92,7 @@ class JvmEmbeddedFontProviderTest {
         val embeddedFontPaths = getNonJbrEmbeddedFontPaths()
         Assume.assumeTrue("This JVM has no embedded fonts", embeddedFontPaths.isNotEmpty())
 
-        val detected = provider.embeddedFontFilePaths()
+        val detected = JvmEmbeddedFontProvider.embeddedFontFilePaths()
         val missingEmbeddedFiles = mutableSetOf<String>()
         for (jbrFontPath in embeddedFontPaths) {
             if (!detected.contains(jbrFontPath)) {

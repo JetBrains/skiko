@@ -1,4 +1,4 @@
-package org.jetbrains.skiko
+package org.jetbrains.skiko.awt.font
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -6,7 +6,8 @@ import org.jetbrains.skia.Data
 import org.jetbrains.skia.FontStyle
 import org.jetbrains.skia.Typeface
 import org.jetbrains.skia.makeFromFile
-import org.jetbrains.skiko.TypefaceCache.Companion.inMemory
+import org.jetbrains.skiko.InternalSkikoApi
+import org.jetbrains.skiko.awt.font.TypefaceCache.Companion.inMemory
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 

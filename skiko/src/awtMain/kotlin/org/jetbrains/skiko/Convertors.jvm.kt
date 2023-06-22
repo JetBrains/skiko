@@ -4,7 +4,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.BufferUtil
-import org.jetbrains.skiko.AwtFontUtils.fontFamilyName
+import org.jetbrains.skiko.awt.font.AwtFontUtils.fontFamilyName
+import org.jetbrains.skiko.awt.font.AwtFontManager
 import java.awt.Transparency
 import java.awt.color.ColorSpace
 import java.awt.event.*

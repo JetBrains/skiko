@@ -1,10 +1,13 @@
 @file:Suppress("PrivatePropertyName") // Reflection-based properties have more meaningful names
 
-package org.jetbrains.skiko
+package org.jetbrains.skiko.awt.font
 
+import org.jetbrains.skiko.InternalSkikoApi
+import org.jetbrains.skiko.InternalSunApiChecker
 import org.jetbrains.skiko.ReflectionUtil.findFieldInHierarchy
 import org.jetbrains.skiko.ReflectionUtil.getDeclaredMethodOrNull
 import org.jetbrains.skiko.ReflectionUtil.getFieldValueOrNull
+import org.jetbrains.skiko.hostOs
 import java.awt.Font
 import java.awt.GraphicsEnvironment
 import java.lang.reflect.Method

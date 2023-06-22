@@ -1,8 +1,8 @@
-package org.jetbrains.skiko
+package org.jetbrains.skiko.awt.font
 
 import org.jetbrains.skia.FontStyle
 import org.jetbrains.skia.Typeface
-import org.jetbrains.skiko.FontFamily.FontFamilySource
+import org.jetbrains.skiko.awt.font.FontFamily.FontFamilySource
 
 internal class FakeFontProvider(
     private val families: MutableMap<FontFamilyKey, FontFamily> = mutableMapOf()

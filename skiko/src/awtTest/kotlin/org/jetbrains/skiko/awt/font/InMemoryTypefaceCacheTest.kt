@@ -1,4 +1,4 @@
-package org.jetbrains.skiko
+package org.jetbrains.skiko.awt.font
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -8,7 +8,6 @@ import org.jetbrains.skia.Typeface
 import org.jetbrains.skia.tests.makeFromResource
 import org.jetbrains.skiko.tests.runTest
 import org.junit.Test
-import kotlin.io.path.createTempFile
 import kotlin.io.path.writeBytes
 import kotlin.test.*
 
@@ -40,7 +39,7 @@ class InMemoryTypefaceCacheTest {
             "The font we're trying to add must not already be loaded"
         )
 
-        val fontFile = createTempFile("awtfontmanagertest", "testfont")
+        val fontFile = kotlin.io.path.createTempFile("awtfontmanagertest", "testfont")
         withContext(Dispatchers.IO) {
             val fontBytes = Thread.currentThread()
                 .contextClassLoader
@@ -107,7 +106,7 @@ class InMemoryTypefaceCacheTest {
         cache.addTypeface(Typeface.makeFromResource("./fonts/JetBrainsMono-Regular.ttf"))
         cache.addResource("./fonts/JetBrainsMono-Italic.ttf")
 
-        val fontFile = createTempFile("awtfontmanagertest", "testfont")
+        val fontFile = kotlin.io.path.createTempFile("awtfontmanagertest", "testfont")
         withContext(Dispatchers.IO) {
             val fontBytes = Thread.currentThread()
                 .contextClassLoader

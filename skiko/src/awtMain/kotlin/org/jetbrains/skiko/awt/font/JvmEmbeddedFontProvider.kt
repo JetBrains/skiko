@@ -1,4 +1,4 @@
-package org.jetbrains.skiko
+package org.jetbrains.skiko.awt.font
 
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -7,9 +7,11 @@ import kotlinx.coroutines.launch
 import org.jetbrains.skia.FontStyle
 import org.jetbrains.skia.Typeface
 import org.jetbrains.skia.makeFromFile
-import org.jetbrains.skiko.AwtFontUtils.fontFamilyName
-import org.jetbrains.skiko.AwtFontUtils.fontFileName
-import org.jetbrains.skiko.context.isRunningOnJetBrainsRuntime
+import org.jetbrains.skiko.ReflectionUtil
+import org.jetbrains.skiko.RendezvousBroadcastChannel
+import org.jetbrains.skiko.awt.font.AwtFontUtils.fontFamilyName
+import org.jetbrains.skiko.awt.font.AwtFontUtils.fontFileName
+import org.jetbrains.skiko.isRunningOnJetBrainsRuntime
 import java.awt.GraphicsEnvironment
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.io.path.Path
