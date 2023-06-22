@@ -1264,7 +1264,7 @@ publishing {
                         .appendNode("dependency").apply {
                             appendNode("groupId", SkikoArtifacts.groupId)
                             appendNode("artifactId", SkikoArtifacts.jvmArtifactId)
-                            appendNode("version", skiko.deployVersion)
+                            appendNode("version", "[${skiko.deployVersion}]")
                             appendNode("scope", "compile")
                         }
                 }
