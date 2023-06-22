@@ -12,8 +12,8 @@ object Library {
     private val skikoLibraryPath = System.getProperty(SKIKO_LIBRARY_PATH_PROPERTY)
     private var copyDir: File? = null
 
-    // A native library cannot be loaded in several classloaders, so we have to clone
-    // the native library to allow Skiko loading to work properly in complex cases, i.e.,
+    // Same native library cannot be loaded in several classloaders, so we have to clone
+    // native library to allow Skiko loading to work properly in complex cases, i.e.
     // several IDEA plugins.
     private fun loadLibraryOrCopy(library: File) {
         try {
@@ -49,8 +49,8 @@ object Library {
 
     // This function does the following: on request to load given resource,
     // it checks if resource with given name is found in content-derived directory
-    // in Skiko's home, and if not - unpacks it. It could also load additional
-    // localization resources, on platforms where it is needed.
+    // in Skiko's home, and if not - unpacks it. Also, it could load additional
+    // localization resource on platforms where it is needed.
     @Synchronized
     fun load() {
         if (!loaded.compareAndSet(false, true)) return

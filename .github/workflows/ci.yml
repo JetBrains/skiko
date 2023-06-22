@@ -1,122 +1,86 @@
 # Default Skiko CI
 name: CI
 
+# Controls when the action will run.
 on:
+  # Triggers the workflow on push or pull request events but only for the master branch
   push:
     branches: [ master ]
   # TODO: temporary for faster tests, restore!
   pull_request:
     branches: [ master ]
 
+  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  macos:
+   macos:
+    # The type of runner that the job will run on
     runs-on: macos-11
+    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - uses: actions/checkout@v3
-        name: 'Check out code'
-
-      - uses: actions/setup-java@v3
-        name: 'Set up JDK 11'
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v2
         with:
           distribution: 'adopt'
           java-version: '11'
-          cache: 'gradle'
-
       - shell: bash
-        name: 'Compile and run AWT tests'
-        run: ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Pskiko.test.onci=true :skiko:awtTest
-
-      - shell: bash
-        name: 'Compile and run macOS x64 tests'
-        run: ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Pskiko.test.onci=true :skiko:macosX64Test
-
-      - shell: bash
-        name: 'Publish to Maven Local, check AWT sample'
         run: |
+          ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Pskiko.test.onci=true :skiko:awtTest
+          ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Pskiko.test.onci=true :skiko:macosX64Test
           ./gradlew --stacktrace --info -Pskiko.native.enabled=true :skiko:publishToMavenLocal
-          ./gradlew --stacktrace --info :SkiaAwtSample:installDist
-
-      - uses: actions/upload-artifact@v3
-        name: 'Save test results as artifact'
+          ./gradlew --stacktrace --info :SkiaAwtSample:installDist # check AWT sample works
+      - uses: actions/upload-artifact@v2
         if: always()
         with:
           name: test-reports-macos
           path: ./skiko/build/reports/tests
           retention-days: 5
 
-      - name: 'Publish Test Report'
-        uses: mikepenz/action-junit-report@v3
-        if: always() # always run even if the previous step fails
-        with:
-          report_paths: '**/build/test-results/*/TEST-*.xml'
-
-  ios:
+   ios:
+    # The type of runner that the job will run on
     runs-on: macos-11
+    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - uses: actions/checkout@v3
-        name: 'Check out code'
-
-      - uses: actions/setup-java@v3
-        name: 'Set up JDK 11'
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v2
         with:
           distribution: 'adopt'
           java-version: '11'
-          cache: 'gradle'
-
       - shell: bash
-        name: 'Compile and run iOS x64 tests'
-        run: ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Pskiko.test.onci=true :skiko:iosX64Test
-
-      # iosSimulatorArm64Test will build the binary but the tests will be skipped due to X64 host machine
-      - shell: bash
-        name: 'Compile iOS arm64 tests'
-        run: ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Pskiko.test.onci=true :skiko:iosSimulatorArm64Test
-
-      # TODO run iOS specific tests on iPhone simulator
-      - shell: bash
-        name: 'Publish to Maven Local'
-        run: ./gradlew --stacktrace --info -Pskiko.native.enabled=true :skiko:publishToMavenLocal
-
-      - uses: actions/upload-artifact@v3
-        name: 'Save test results as artifact'
+        run: |
+          ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Pskiko.test.onci=true :skiko:iosX64Test
+          # iosSimulatorArm64Test will build the binary but the tests will be skipped due to X64 host machine
+          ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Pskiko.test.onci=true :skiko:iosSimulatorArm64Test
+          ./gradlew --stacktrace --info -Pskiko.native.enabled=true :skiko:publishToMavenLocal
+          # TODO run iOS specific tests on iPhone simulator
+      - uses: actions/upload-artifact@v2
         if: always()
         with:
           name: test-reports-macos
           path: ./skiko/build/reports/tests
           retention-days: 5
 
-      - name: 'Publish Test Report'
-        uses: mikepenz/action-junit-report@v3
-        if: always() # always run even if the previous step fails
-        with:
-          report_paths: '**/build/test-results/*/TEST-*.xml'
-
-  linux:
+   linux:
     runs-on: ubuntu-20.04
+    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - uses: actions/checkout@v3
-        name: 'Check out code'
-
-      - uses: actions/setup-java@v3
-        name: 'Set up JDK 11'
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v2
         with:
           distribution: 'adopt'
           java-version: '11'
-          cache: 'gradle'
-
       - uses: nttld/setup-ndk@v1
-        name: 'Set up Android NDK'
         id: setup-ndk
         with:
           ndk-version: r21e
-
       - uses: android-actions/setup-android@v2
-        name: 'Set up Android SDK'
-
+      # Runs a set of commands using the runners shell
       - shell: bash
-        name: 'Set up Linux build environment'
         env:
           ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
         run: |
@@ -132,135 +96,86 @@ jobs:
           sudo update-alternatives --config gcc
           sudo apt-get install ninja-build fontconfig libfontconfig1-dev libglu1-mesa-dev libxrandr-dev libdbus-1-dev zip xvfb -y
           sudo Xvfb :0 -screen 0 1280x720x24 &
-
-      - shell: bash
-        name: 'Compile and run Linux x64 tests'
-        run: |
+      - run: |
+          # Test Linux native
           export DISPLAY=:0
           ./gradlew --no-daemon --stacktrace --info -Pskiko.native.enabled=true -Pkotlin.native.cacheKind.linuxX64=none -Pskiko.test.onci=true :skiko:linuxX64Test
-
-      - shell: bash
-        name: 'Compile and run AWT tests'
-        run: |
+      - run: |
+          # Test Linux AWT
           export DISPLAY=:0
           ./gradlew --no-daemon --stacktrace --info -Pskiko.native.enabled=true -Pkotlin.native.cacheKind.linuxX64=none -Pskiko.test.onci=true :skiko:awtTest
         timeout-minutes: 25
-
-      - shell: bash
-        name: 'Publish to Maven Local, check AWT sample'
-        env:
+      - env:
           ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
         run: |
+          # Test publishToMavenLocal
           ./gradlew --no-daemon --stacktrace --info -Pkotlin.native.cacheKind.linuxX64=none :skiko:publishToMavenLocal
-          ./gradlew --no-daemon --stacktrace --info :SkiaAwtSample:installDist
+          ./gradlew --no-daemon --stacktrace --info :SkiaAwtSample:installDist # check jvm sample works
           ./gradlew --no-daemon -Pskiko.android.enabled=true :skiko:publishSkikoJvmRuntimeAndroidX64PublicationToMavenLocal :skiko:publishSkikoJvmRuntimeAndroidArm64PublicationToMavenLocal :skiko:publishAndroidPublicationToMavenLocal
-
-      - uses: actions/upload-artifact@v3
-        name: 'Save test results as artifact'
+      - uses: actions/upload-artifact@v2
         if: always()
         with:
           name: test-reports-linux
           path: ./skiko/build/reports/tests
           retention-days: 5
 
-      - name: 'Publish Test Report'
-        uses: mikepenz/action-junit-report@v3
-        if: always() # always run even if the previous step fails
-        with:
-          report_paths: '**/build/test-results/*/TEST-*.xml'
+   js:
+     runs-on: ubuntu-20.04
+     # Steps represent a sequence of tasks that will be executed as part of the job
+     steps:
+       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+       - uses: actions/checkout@v2
+       - uses: actions/setup-java@v2
+         with:
+           distribution: 'adopt'
+           java-version: '11'
+       # Runs a set of commands using the runners shell
+       - shell: bash
+         run: |
+           cd ./skiko
+           sudo apt-get update -y
+           sudo apt-get install binutils build-essential -y
+           sudo apt-get install software-properties-common -y
+           sudo apt-get install python git curl wget -y
+           if [ -d ./emsdk ]; then
+             cd ./emsdk
+             git pull
+           else
+             git clone https://github.com/emscripten-core/emsdk.git
+             cd ./emsdk
+           fi
+           ./emsdk install 2.0.29
+           ./emsdk activate 2.0.29
+           source ./emsdk_env.sh
+           cd ..
+           ./gradlew --stacktrace --info -Pskiko.wasm.enabled=true -Pskiko.test.onci=true jsTest
+           ./gradlew --stacktrace --info -Pskiko.wasm.enabled=true publishSkikoWasmRuntimePublicationToMavenLocal
+       - uses: actions/upload-artifact@v2
+         if: always()
+         with:
+           name: test-reports-js
+           path: ./skiko/build/reports/tests
+           retention-days: 5
 
-  js:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3
-        name: 'Check out code'
-
-      - uses: actions/setup-java@v3
-        name: 'Set up JDK 11'
-        with:
-          distribution: 'adopt'
-          java-version: '11'
-          cache: 'gradle'
-
-      - shell: bash
-        name: 'Set up JS build environment'
-        run: |
-          cd ./skiko
-          sudo apt-get update -y
-          sudo apt-get install binutils build-essential -y
-          sudo apt-get install software-properties-common -y
-          sudo apt-get install python git curl wget -y
-          if [ -d ./emsdk ]; then
-            cd ./emsdk
-            git pull
-          else
-            git clone https://github.com/emscripten-core/emsdk.git
-            cd ./emsdk
-          fi
-          ./emsdk install 2.0.29
-          ./emsdk activate 2.0.29
-      - shell: bash
-        name: 'Compile and run JS tests'
-        run: |
-          source "$(pwd)/skiko/emsdk/emsdk_env.sh"
-          ./gradlew --stacktrace --info -Pskiko.wasm.enabled=true -Pskiko.test.onci=true :skiko:jsTest
-      - shell: bash
-        name: 'Publish WASM runtime to Maven Local'
-        run: |
-          source "$(pwd)/skiko/emsdk/emsdk_env.sh"
-          ./gradlew --stacktrace --info -Pskiko.wasm.enabled=true :skiko:publishSkikoWasmRuntimePublicationToMavenLocal
-
-      - uses: actions/upload-artifact@v3
-        name: 'Save test results as artifact'
-        if: always()
-        with:
-          name: test-reports-js
-          path: ./skiko/build/reports/tests
-          retention-days: 5
-
-      - name: 'Publish Test Report'
-        uses: mikepenz/action-junit-report@v3
-        if: always() # always run even if the previous step fails
-        with:
-          report_paths: '**/build/test-results/*/TEST-*.xml'
-
-  windows:
+   windows:
     runs-on: windows-2019
     steps:
-      - uses: actions/checkout@v3
-        name: 'Check out code'
-
+      - uses: actions/checkout@v2
       - uses: microsoft/setup-msbuild@v1
-
       - uses: ilammy/msvc-dev-cmd@v1
-
-      - uses: actions/setup-java@v3
-        name: 'Set up JDK 11'
+      - uses: actions/setup-java@v2
         with:
           distribution: 'adopt'
           java-version: '11'
-          cache: 'gradle'
-
       - shell: bash
-        name: 'Compile and run AWT tests'
-        run: ./gradlew --stacktrace --info -Pskiko.test.onci=true :skiko:awtTest
-
-      - shell: bash
-        name: 'Publish to Maven Local, check AWT sample'
         run: |
+          ./gradlew --stacktrace --info -Pskiko.test.onci=true :skiko:awtTest
           ./gradlew --stacktrace --info :skiko:publishToMavenLocal
-          ./gradlew --stacktrace --info :SkiaAwtSample:installDist
-
-      - uses: actions/upload-artifact@v3
-        name: 'Save test results as artifact'
+          ./gradlew --stacktrace --info :SkiaAwtSample:installDist # check jvm sample works
+      - uses: actions/upload-artifact@v2
         if: always()
         with:
           name: test-reports-windows
           path: ./skiko/build/reports/tests
           retention-days: 5
 
-      - name: 'Publish Test Report'
-        uses: mikepenz/action-junit-report@v3
-        if: always() # always run even if the previous step fails
-        with:
-          report_paths: '**/build/test-results/*/TEST-*.xml'
