@@ -2,7 +2,6 @@
 
 package org.jetbrains.skiko.awt.font
 
-import org.jetbrains.skiko.InternalSkikoApi
 import org.jetbrains.skiko.InternalSunApiChecker
 import org.jetbrains.skiko.ReflectionUtil.findFieldInHierarchy
 import org.jetbrains.skiko.ReflectionUtil.getDeclaredMethodOrNull
@@ -14,8 +13,7 @@ import java.lang.reflect.Method
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
-@InternalSkikoApi
-object AwtFontUtils {
+internal object AwtFontUtils {
 
     init {
         InternalSunApiChecker.isSunFontApiAccessible()

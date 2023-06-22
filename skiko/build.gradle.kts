@@ -294,7 +294,6 @@ kotlin {
 
         val awtMain by getting {
             dependsOn(jvmMain)
-            languageSettings.optIn("org.jetbrains.skiko.InternalSkikoApi")
         }
 
         if (supportAndroid) {
@@ -317,7 +316,6 @@ kotlin {
 
         val awtTest by getting {
             dependsOn(jvmTest)
-            languageSettings.optIn("org.jetbrains.skiko.InternalSkikoApi")
         }
 
         if (supportAndroid) {

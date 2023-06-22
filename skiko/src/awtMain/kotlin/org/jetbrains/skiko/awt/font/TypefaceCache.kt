@@ -6,7 +6,6 @@ import org.jetbrains.skia.Data
 import org.jetbrains.skia.FontStyle
 import org.jetbrains.skia.Typeface
 import org.jetbrains.skia.makeFromFile
-import org.jetbrains.skiko.InternalSkikoApi
 import org.jetbrains.skiko.awt.font.TypefaceCache.Companion.inMemory
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
@@ -15,8 +14,7 @@ import java.util.concurrent.ConcurrentHashMap
  * A generic typeface cache. An instance of the default in-memory
  * implementation can be created with the [inMemory] factory function.
  */
-@InternalSkikoApi
-interface TypefaceCache {
+internal interface TypefaceCache {
 
     /**
      * Add a classpath resource to this cache.

@@ -15,8 +15,6 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class JvmEmbeddedFontProviderTest {
-    private val provider = JvmEmbeddedFontProvider
-
     @Test
     fun `should be able to access JBR features when running on JBR`() = runTest {
         Assume.assumeTrue(isRunningOnJetBrainsRuntime())

@@ -2,7 +2,7 @@ package org.jetbrains.skiko.awt.font
 
 import org.jetbrains.skia.FontStyle
 import org.jetbrains.skia.Typeface
-import org.jetbrains.skiko.InternalSkikoApi
+import org.jetbrains.skiko.DependsOnJBR
 import java.io.File
 
 /**
@@ -22,7 +22,8 @@ import java.io.File
  * In order to free up memory, you should remove custom fonts you don't
  * need anymore.
  */
-class AwtFontManager @InternalSkikoApi constructor(
+@DependsOnJBR
+class AwtFontManager internal constructor(
     private val systemFontProvider: FontProvider,
     private val embeddedFontProvider: FontProvider,
     private val customTypefaceCache: TypefaceCache
