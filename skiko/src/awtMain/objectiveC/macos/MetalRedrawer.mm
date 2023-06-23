@@ -176,6 +176,7 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
         CGFloat transparent[] = { 0.0f, 0.0f, 0.0f, 0.0f };
         device.layer.backgroundColor = CGColorCreate(CGColorSpaceCreateDeviceRGB(), transparent);
         device.layer.opaque = NO;
+        device.layer.framebufferOnly = NO;
 
         if (transparency)
         {
