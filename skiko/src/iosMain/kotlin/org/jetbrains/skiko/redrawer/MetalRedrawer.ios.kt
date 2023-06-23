@@ -224,6 +224,7 @@ internal class MetalLayer : CAMetalLayer {
             this.backgroundColor =
                 CGColorCreate(CGColorSpaceCreateDeviceRGB(), it.addressOf(0))
         }
+        this.framebufferOnly = false
         this.opaque = false // For UIKit interop through a "Hole"
         skiaLayer.view?.let {
             this.frame = it.frame
