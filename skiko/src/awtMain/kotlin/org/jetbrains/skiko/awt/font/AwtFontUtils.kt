@@ -127,7 +127,9 @@ internal object AwtFontUtils {
 
             CFontClass?.isInstance(font2D) == true -> {
                 // For macOS
-                getFieldValueOrNull(CFontClass, font2D, String::class.java, "nativeFontName")
+                val nativeFontName =
+                    getFieldValueOrNull(CFontClass, font2D, String::class.java, "nativeFontName")
+                Font(nativeFontName, Font.PLAIN, 10).fontFamilyName
             }
 
             else -> error("Unsupported Font2D subclass: ${font2D.javaClass.name}")

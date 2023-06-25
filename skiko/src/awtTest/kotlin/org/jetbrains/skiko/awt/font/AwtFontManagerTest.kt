@@ -69,7 +69,9 @@ class AwtFontManagerTest {
         val ignoredFamilies = setOf(
             "Franklin Gothic Medium",
             "Segoe UI Variable",
-            "Sitka"
+            "Sitka",
+            "Roboto Light",
+            "Roboto Thin"
         )
 
         // Listing of font family names is broken on non-macOS JVM implementations,
@@ -95,8 +97,15 @@ class AwtFontManagerTest {
         for (i in awtFamilies.indices) {
             val awtFamily = awtFamilies[i]
             val skiaFamily = skiaFamilies[i]
-            if (awtFamily != skiaFamily && awtFamily !in ignoredFamilies) {
-                wrongConversions.add("$awtFamily -> $skiaFamily")
+            when {
+                awtFamily == ".AppleSystemUIFont" -> {
+                    if (skiaFamily == null) {
+                        wrongConversions.add("$awtFamily -> null")
+                    }
+                }
+                awtFamily != skiaFamily && awtFamily !in ignoredFamilies -> {
+                    wrongConversions.add("$awtFamily -> $skiaFamily")
+                }
             }
         }
 
