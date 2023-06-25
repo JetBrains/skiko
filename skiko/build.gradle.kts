@@ -309,7 +309,6 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
                 implementation(kotlin("test-junit"))
                 implementation(kotlin("test"))
-                implementation("pl.pragmatists:JUnitParams:1.1.1")
             }
         }
 
