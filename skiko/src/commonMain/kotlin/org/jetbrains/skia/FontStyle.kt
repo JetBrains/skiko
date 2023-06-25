@@ -32,9 +32,7 @@ class FontStyle {
         return FontStyle(weight, width, slant)
     }
 
-    override fun toString(): String {
-        return "FontStyle(weight=$weight, width=$width, slant=$slant)"
-    }
+    override fun toString(): String = "FontStyle(weight=$weight, width=$width, slant=$slant)"
 
     override fun equals(other: Any?): Boolean {
         if (other === this) return true
