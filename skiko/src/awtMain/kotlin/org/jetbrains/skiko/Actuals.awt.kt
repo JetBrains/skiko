@@ -13,8 +13,8 @@ import javax.swing.UIManager
 
 actual fun setSystemLookAndFeel() = UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
 
-internal actual fun makeDefaultRenderFactory(): RenderFactory {
-    return object : RenderFactory {
+internal actual fun makeDefaultRenderFactory(): RenderFactory =
+    object : RenderFactory {
         override fun createRedrawer(
             layer: SkiaLayer,
             renderApi: GraphicsApi,
@@ -36,10 +36,9 @@ internal actual fun makeDefaultRenderFactory(): RenderFactory {
                 GraphicsApi.SOFTWARE_FAST -> LinuxSoftwareRedrawer(layer, analytics, properties)
                 else -> LinuxOpenGLRedrawer(layer, analytics, properties)
             }
-            OS.Android, OS.JS, OS.Ios -> throw UnsupportedOperationException("The awt target doesn't support $hostOs")
+            OS.Android, OS.JS, OS.Ios -> throw UnsupportedOperationException("The AWT target doesn't support $hostOs")
         }
     }
-}
 
 internal actual fun URIHandler_openUri(uri: String) {
     Desktop.getDesktop().browse(URI(uri))
@@ -56,6 +55,7 @@ private val systemClipboard by lazy {
 internal actual fun ClipboardManager_setText(text: String) {
     systemClipboard?.setContents(StringSelection(text), null)
 }
+
 internal actual fun ClipboardManager_getText(): String? {
     return try {
         systemClipboard?.getData(DataFlavor.stringFlavor) as String?

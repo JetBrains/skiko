@@ -4,16 +4,20 @@
       <option name="executionName" />
       <option name="externalProjectPath" value="$PROJECT_DIR$" />
       <option name="externalSystemIdString" value="GRADLE" />
-      <option name="scriptParameters" value="awtTest -Dskiko.test.ui.enabled=true -Dskiko.test.ui.renderApi=all" />
+      <option name="scriptParameters" value="-Dskiko.test.ui.enabled=true -Dskiko.test.ui.renderApi=all" />
       <option name="taskDescriptions">
         <list />
       </option>
       <option name="taskNames">
-        <list />
+        <list>
+          <option value=":awtTest" />
+        </list>
       </option>
       <option name="vmOptions" />
     </ExternalSystemSettings>
-    <GradleScriptDebugEnabled>true</GradleScriptDebugEnabled>
+    <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+    <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+    <DebugAllEnabled>false</DebugAllEnabled>
     <method v="2" />
   </configuration>
 </component>
