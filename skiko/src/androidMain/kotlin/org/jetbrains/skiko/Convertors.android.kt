@@ -99,11 +99,15 @@ private val swipeThreshold = 100
 private val swipeVelocityThreshold = 100
 
 internal fun toSkikoGestureDirection(
-    event1: MotionEvent, 
+    event1: MotionEvent?,
     event2: MotionEvent, 
     velocityX: Float, 
     velocityY: Float
 ): SkikoGestureEventDirection {
+    if (event1 == null) {
+        return SkikoGestureEventDirection.UNKNOWN
+    }
+
     val dx = event2.x - event1.x
     val dy = event2.y - event1.y
     if (abs(dx) > abs(dy)) {

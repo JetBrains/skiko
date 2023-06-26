@@ -15,7 +15,7 @@ import kotlin.math.ceil
 class FrameLimiterTest {
     private val frameCount = 8
     private val frames = 0 until frameCount
-    
+
     @Test
     fun `limit 10ms, render 0ms`() {
         fun frameTicksOf(delayPrecisionMillis: Long) =

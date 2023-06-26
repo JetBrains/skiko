@@ -79,7 +79,7 @@ internal class SkikoGesturesDetector(
         }
 
         override fun onScroll(
-            event1: MotionEvent,
+            event1: MotionEvent?,
             event2: MotionEvent,
             distanceX: Float,
             distanceY: Float,
@@ -98,7 +98,7 @@ internal class SkikoGesturesDetector(
         }
 
         override fun onFling(
-            event1: MotionEvent, 
+            event1: MotionEvent?,
             event2: MotionEvent, 
             velocityX: Float, 
             velocityY: Float
