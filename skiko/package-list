@@ -2510,6 +2510,7 @@ $dokka.location:org.jetbrains.skia/Typeface/makeClone/#kotlin.Array[org.jetbrain
 $dokka.location:org.jetbrains.skia/Typeface/makeClone/#org.jetbrains.skia.FontVariation/PointingToDeclaration/skiko/org.jetbrains.skia/-typeface/make-clone.html
 $dokka.location:org.jetbrains.skia/Typeface/tableTags/#/PointingToDeclaration/skiko/org.jetbrains.skia/-typeface/table-tags.html
 $dokka.location:org.jetbrains.skia/Typeface/tablesCount/#/PointingToDeclaration/skiko/org.jetbrains.skia/-typeface/tables-count.html
+$dokka.location:org.jetbrains.skia/Typeface/toString/#/PointingToDeclaration/skiko/org.jetbrains.skia/-typeface/to-string.html
 $dokka.location:org.jetbrains.skia/Typeface/uniqueId/#/PointingToDeclaration/skiko/org.jetbrains.skia/-typeface/unique-id.html
 $dokka.location:org.jetbrains.skia/Typeface/unitsPerEm/#/PointingToDeclaration/skiko/org.jetbrains.skia/-typeface/units-per-em.html
 $dokka.location:org.jetbrains.skia/Typeface/variationAxes/#/PointingToDeclaration/skiko/org.jetbrains.skia/-typeface/variation-axes.html
