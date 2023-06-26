@@ -118,7 +118,9 @@ internal object SkiaFontProvider : FontProvider {
     override suspend fun getTypefaceOrNull(familyName: String, fontStyle: FontStyle): Typeface? {
         ensureSystemFontsCached()
 
-        val key = FontFamilyKey(familyName)
+        // trim because we can have spaces on Linux (real example - "Mitra " font family)
+        val fontFamilyFixed = familyName.trim()
+        val key = FontFamilyKey(fontFamilyFixed)
 
         if (isAppleSystemFont(key)) {
             // Rewrite requests for ".AppleSystemUIFont" on macOS to "System font".
@@ -134,7 +136,7 @@ internal object SkiaFontProvider : FontProvider {
 
         if (!familyNamesCache.contains(key)) return null
 
-        return FontMgr.default.matchFamilyStyle(familyName, fontStyle)
+        return FontMgr.default.matchFamilyStyle(fontFamilyFixed, fontStyle)
     }
 
     private fun isAwtLogicalFont(key: FontFamilyKey) =
@@ -143,14 +145,16 @@ internal object SkiaFontProvider : FontProvider {
     override suspend fun getFontFamilyOrNull(familyName: String): FontFamily? {
         ensureSystemFontsCached()
 
-        val key = FontFamilyKey(familyName)
+        // trim because we can have spaces on Linux (real example - "Mitra " font family)
+        val fontFamilyFixed = familyName.trim()
+        val key = FontFamilyKey(fontFamilyFixed)
 
         if (isAppleSystemFont(key)) {
             // Rewrite requests for ".AppleSystemUIFont" on macOS to "System font".
             // They are the same, hidden San Francisco font, but we need to do this
             // for AWT compatibility reasons.
             return FontMgr.default.matchFamily(FontFamilyKey.Apple.SystemFont.familyName)
-                .use { it.toFontFamilyOrNull(familyName, FontFamily.FontFamilySource.System) }
+                .use { it.toFontFamilyOrNull(fontFamilyFixed, FontFamily.FontFamilySource.System) }
         }
 
         if (!familyNamesCache.contains(key)) return null
