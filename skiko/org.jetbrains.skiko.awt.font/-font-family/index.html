@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>FontFamily</title>
+    <link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "../../../";</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/jetbrains-mono.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer="defer"></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
+</head>
+<body>
+<div class="navigation-wrapper" id="navigation-wrapper">
+    <div id="leftToggler"><span class="icon-toggler"></span></div>
+    <div class="library-name">
+            <a href="../../../index.html">
+                    <span>skiko</span>
+            </a>
+    </div>
+    <div>
+0.0.0-SNAPSHOT    </div>
+    <div class="pull-right d-flex">
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":dokkaHtml/awtMain">awt</button>
+        </div>
+        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+    </div>
+</div>
+<div id="container">
+    <div id="leftColumn">
+        <div id="sideMenu"></div>
+    </div>
+    <div id="main">
+<div class="main-content" id="content" pageIds="skiko::org.jetbrains.skiko.awt.font/FontFamily///PointingToDeclaration//1864694178">
+  <div class="breadcrumbs"><a href="../../../index.html">skiko</a><span class="delimiter">/</span><a href="../index.html">org.jetbrains.skiko.awt.font</a><span class="delimiter">/</span><span class="current">FontFamily</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Font</span><wbr></wbr><span><span>Family</span></span></h1>
+    <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+      <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">FontFamily</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>familyName<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>source<span class="token operator">: </span><a href="-font-family-source/index.html">FontFamily.FontFamilySource</a><span class="token punctuation">, </span></span><span class="parameter ">typefacesByStyle<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-map/index.html">MutableMap</a><span class="token operator">&lt;</span><span class="token keyword"></span><span data-unresolved-link="org.jetbrains.skia/FontStyle///PointingToDeclaration/">FontStyle</span><span class="token punctuation">, </span><span class="token keyword"></span><span data-unresolved-link="org.jetbrains.skia/Typeface///PointingToDeclaration/">Typeface</span><span class="token operator">&gt;</span><span class="token operator"> = </span>mutableMapOf()</span></span><span class="token punctuation">)</span> : <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><span class="token keyword"></span><span data-unresolved-link="org.jetbrains.skia/FontStyle///PointingToDeclaration/">FontStyle</span><span class="token punctuation">, </span><span class="token keyword"></span><span data-unresolved-link="org.jetbrains.skia/Typeface///PointingToDeclaration/">Typeface</span><span class="token operator">&gt; </span></div><p class="paragraph">Holds info about a font family. Intended to be used as a cache entry, to which typefaces are lazily loaded as new <span data-unresolved-link="org.jetbrains.skia/Typeface///PointingToDeclaration/">Typeface</span>s are loaded.</p></div>    </div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Types">Types</button><button class="section-tab" data-togglable="Constructors">Constructors</button><button class="section-tab" data-togglable="Functions">Functions</button><button class="section-tab" data-togglable="Properties">Properties</button><button class="section-tab" data-togglable="Parameters">Parameters</button><button class="section-tab" data-togglable="See also">See also</button></div>
+    <div class="tabs-section-body">
+      <h4 class="">See also</h4>
+      <div data-togglable="See also">
+        <div class="platform-hinted WithExtraAttributes with-platform-tabs" data-platform-hinted="data-platform-hinted" data-togglable="See also">
+          <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div data-togglable="See also"><div class="table" data-togglable="See also"><div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><div><a href="../-awt-font-manager/index.html"><span>Awt</span><wbr></wbr><span>Font</span><wbr></wbr><span><span>Manager</span></span></a></div></span></div><div></div></div></div></div></div></div>        </div>
+      </div>
+      <h4 class="">Parameters</h4>
+      <div data-togglable="Parameters">
+        <div class="platform-hinted WithExtraAttributes with-platform-tabs" data-platform-hinted="data-platform-hinted" data-togglable="Parameters">
+          <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div data-togglable="Parameters"><div class="table" data-togglable="Parameters"><div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><div><u><span>family</span><wbr></wbr><span><span>Name</span></span></u></div></span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">The primary font family name. Must not be blank.</p></div></div></div></div></div><div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><div><u><span>typefaces</span><wbr></wbr><span>By</span><wbr></wbr><span><span>Style</span></span></u></div></span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">A mutable map of typefaces, organised by their style.</p></div></div></div></div></div></div></div></div>        </div>
+      </div>
+      <h2 class="tabbedcontent">Constructors</h2>
+      <div class="table" data-togglable="Constructors"><a data-name="-1641268453%2FConstructors%2F1864694178" anchor-label="FontFamily" id="-1641268453%2FConstructors%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
+        <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
+          <div class="main-subrow keyValue TabbedContent">
+            <div class=""><span class="inline-flex">
+                <div><a href="-font-family.html"><span>Font</span><wbr></wbr><span><span>Family</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1641268453%2FConstructors%2F1864694178"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="-font-family.html"><span class="token function">FontFamily</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">familyName<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">source<span class="token operator">: </span><a href="-font-family-source/index.html">FontFamily.FontFamilySource</a><span class="token punctuation">, </span></span><span class="parameter ">typefacesByStyle<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-map/index.html">MutableMap</a><span class="token operator">&lt;</span><span class="token keyword"></span><span data-unresolved-link="org.jetbrains.skia/FontStyle///PointingToDeclaration/">FontStyle</span><span class="token punctuation">, </span><span class="token keyword"></span><span data-unresolved-link="org.jetbrains.skia/Typeface///PointingToDeclaration/">Typeface</span><span class="token operator">&gt;</span><span class="token operator"> = </span>mutableMapOf()</span></span><span class="token punctuation">)</span></div></div>                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2 class="">Types</h2>
+      <div class="table" data-togglable="Types"><a data-name="-432643061%2FClasslikes%2F1864694178" anchor-label="Companion" id="-432643061%2FClasslikes%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
+        <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="-companion/index.html"><span><span>Companion</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-432643061%2FClasslikes%2F1864694178"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="-companion/index.html">Companion</a></div></div>                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-718073539%2FClasslikes%2F1864694178" anchor-label="FontFamilySource" id="-718073539%2FClasslikes%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
+        <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="-font-family-source/index.html"><span>Font</span><wbr></wbr><span>Family</span><wbr></wbr><span><span>Source</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-718073539%2FClasslikes%2F1864694178"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword">enum </span><a href="-font-family-source/index.html">FontFamilySource</a> : <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-enum/index.html">Enum</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="-font-family-source/index.html">FontFamily.FontFamilySource</a><span class="token operator">&gt; </span></div></div>                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2 class="">Functions</h2>
+      <div class="table" data-togglable="Functions"><a data-name="596806563%2FFunctions%2F1864694178" anchor-label="addTypeface" id="596806563%2FFunctions%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
+        <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="add-typeface.html"><span>add</span><wbr></wbr><span><span>Typeface</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="596806563%2FFunctions%2F1864694178"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="add-typeface.html"><span class="token function">addTypeface</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">typeface<span class="token operator">: </span><span data-unresolved-link="org.jetbrains.skia/Typeface///PointingToDeclaration/">Typeface</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Adds the specified <a href="add-typeface.html">typeface</a> to this <a href="index.html">FontFamily</a>.</p></div></div>                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-27803887%2FFunctions%2F1864694178" anchor-label="containsKey" id="-27803887%2FFunctions%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
+        <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="index.html#-27803887%2FFunctions%2F1864694178"><span>contains</span><wbr></wbr><span><span>Key</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-27803887%2FFunctions%2F1864694178"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="index.html#-27803887%2FFunctions%2F1864694178"><span class="token function">containsKey</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">key<span class="token operator">: </span><span data-unresolved-link="org.jetbrains.skia/FontStyle///PointingToDeclaration/">FontStyle</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div>                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1724844490%2FFunctions%2F1864694178" anchor-label="containsValue" id="1724844490%2FFunctions%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
+        <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="index.html#1724844490%2FFunctions%2F1864694178"><span>contains</span><wbr></wbr><span><span>Value</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1724844490%2FFunctions%2F1864694178"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="index.html#1724844490%2FFunctions%2F1864694178"><span class="token function">containsValue</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">value<span class="token operator">: </span><span data-unresolved-link="org.jetbrains.skia/Typeface///PointingToDeclaration/">Typeface</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div>                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1793973971%2FFunctions%2F1864694178" anchor-label="forEach" id="-1793973971%2FFunctions%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
+        <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="index.html#-1793973971%2FFunctions%2F1864694178"><span>for</span><wbr></wbr><span><span>Each</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1793973971%2FFunctions%2F1864694178"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="index.html#-1793973971%2FFunctions%2F1864694178"><span class="token function">forEach</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">p0<span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/function/BiConsumer.html">BiConsumer</a><span class="token operator">&lt;</span><span class="token keyword">in </span><span data-unresolved-link="org.jetbrains.skia/FontStyle///PointingToDeclaration/">FontStyle</span><span class="token punctuation">, </span><span class="token keyword">in </span><span data-unresolved-link="org.jetbrains.skia/Typeface///PointingToDeclaration/">Typeface</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div></div>                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1890280251%2FFunctions%2F1864694178" anchor-label="get" id="1890280251%2FFunctions%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
+        <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="index.html#1890280251%2FFunctions%2F1864694178"><span><span>get</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1890280251%2FFunctions%2F1864694178"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">operator override </span><span class="token keyword">fun </span><a href="index.html#1890280251%2FFunctions%2F1864694178"><span class="token function">get</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">key<span class="token operator">: </span><span data-unresolved-link="org.jetbrains.skia/FontStyle///PointingToDeclaration/">FontStyle</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="org.jetbrains.skia/Typeface///PointingToDeclaration/">Typeface</span><span class="token operator">?</span></div></div>                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-542327195%2FFunctions%2F1864694178" anchor-label="getOrDefault" id="-542327195%2FFunctions%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
+        <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="index.html#-542327195%2FFunctions%2F1864694178"><span>get</span><wbr></wbr><span>Or</span><wbr></wbr><span><span>Default</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-542327195%2FFunctions%2F1864694178"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="index.html#-542327195%2FFunctions%2F1864694178"><span class="token function">getOrDefault</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">key<span class="token operator">: </span><span data-unresolved-link="org.jetbrains.skia/FontStyle///PointingToDeclaration/">FontStyle</span><span class="token punctuation">, </span></span><span class="parameter ">defaultValue<span class="token operator">: </span><span data-unresolved-link="org.jetbrains.skia/Typeface///PointingToDeclaration/">Typeface</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="org.jetbrains.skia/Typeface///PointingToDeclaration/">Typeface</span></div></div>                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1708477740%2FFunctions%2F1864694178" anchor-label="isEmpty" id="-1708477740%2FFunctions%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
+        <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="index.html#-1708477740%2FFunctions%2F1864694178"><span>is</span><wbr></wbr><span><span>Empty</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1708477740%2FFunctions%2F1864694178"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="index.html#-1708477740%2FFunctions%2F1864694178"><span class="token function">isEmpty</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div>                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1965887065%2FFunctions%2F1864694178" anchor-label="minus" id="1965887065%2FFunctions%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
+        <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="minus.html"><span><span>minus</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1965887065%2FFunctions%2F1864694178"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword">operator </span><span class="token keyword">fun </span><a href="minus.html"><span class="token function">minus</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">style<span class="token operator">: </span><span data-unresolved-link="org.jetbrains.skia/FontStyle///PointingToDeclaration/">FontStyle</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">FontFamily</a></div><div class="symbol monospace"><span class="token keyword">operator </span><span class="token keyword">fun </span><a href="minus.html"><span class="token function">minus</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">typeface<span class="token operator">: </span><span data-unresolved-link="org.jetbrains.skia/Typeface///PointingToDeclaration/">Typeface</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">FontFamily</a></div></div>                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1720887625%2FFunctions%2F1864694178" anchor-label="minusAssign" id="-1720887625%2FFunctions%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
+        <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="minus-assign.html"><span>minus</span><wbr></wbr><span><span>Assign</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1720887625%2FFunctions%2F1864694178"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword">operator </span><span class="token keyword">fun </span><a href="minus-assign.html"><span class="token function">minusAssign</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">style<span class="token operator">: </span><span data-unresolved-link="org.jetbrains.skia/FontStyle///PointingToDeclaration/">FontStyle</span></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">operator </span><span class="token keyword">fun </span><a href="minus-assign.html"><span class="token function">minusAssign</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">typeface<span class="token operator">: </span><span data-unresolved-link="org.jetbrains.skia/Typeface///PointingToDeclaration/">Typeface</span></span></span><span class="token punctuation">)</span></div></div>                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-246467245%2FFunctions%2F1864694178" anchor-label="plus" id="-246467245%2FFunctions%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
+        <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="plus.html"><span><span>plus</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-246467245%2FFunctions%2F1864694178"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword">operator </span><span class="token keyword">fun </span><a href="plus.html"><span class="token function">plus</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">typeface<span class="token operator">: </span><span data-unresolved-link="org.jetbrains.skia/Typeface///PointingToDeclaration/">Typeface</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">FontFamily</a></div></div>                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-22152158%2FFunctions%2F1864694178" anchor-label="plusAssign" id="-22152158%2FFunctions%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
+        <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="plus-assign.html"><span>plus</span><wbr></wbr><span><span>Assign</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-22152158%2FFunctions%2F1864694178"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword">operator </span><span class="token keyword">fun </span><a href="plus-assign.html"><span class="token function">plusAssign</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">typeface<span class="token operator">: </span><span data-unresolved-link="org.jetbrains.skia/Typeface///PointingToDeclaration/">Typeface</span></span></span><span class="token punctuation">)</span></div></div>                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="2112081332%2FFunctions%2F1864694178" anchor-label="removeTypeface" id="2112081332%2FFunctions%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
+        <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="remove-typeface.html"><span>remove</span><wbr></wbr><span><span>Typeface</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2112081332%2FFunctions%2F1864694178"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="remove-typeface.html"><span class="token function">removeTypeface</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">typeface<span class="token operator">: </span><span data-unresolved-link="org.jetbrains.skia/Typeface///PointingToDeclaration/">Typeface</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Removes a typeface from the family if it exists.</p></div></div>                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1034281567%2FFunctions%2F1864694178" anchor-label="removeTypefaceByStyle" id="1034281567%2FFunctions%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
+        <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="remove-typeface-by-style.html"><span>remove</span><wbr></wbr><span>Typeface</span><wbr></wbr><span>By</span><wbr></wbr><span><span>Style</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1034281567%2FFunctions%2F1864694178"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="remove-typeface-by-style.html"><span class="token function">removeTypefaceByStyle</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">style<span class="token operator">: </span><span data-unresolved-link="org.jetbrains.skia/FontStyle///PointingToDeclaration/">FontStyle</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Removes the typeface from the family with the given style if it exists.</p></div></div>                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2 class="">Properties</h2>
+      <div class="table" data-togglable="Properties"><a data-name="248123097%2FProperties%2F1864694178" anchor-label="availableStyles" id="248123097%2FProperties%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
+        <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="available-styles.html"><span>available</span><wbr></wbr><span><span>Styles</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="248123097%2FProperties%2F1864694178"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted" data-togglable="Properties">
+                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><a data-name="248123097%2FProperties%2F1864694178" anchor-label="availableStyles" id="248123097%2FProperties%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="available-styles.html">availableStyles</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-set/index.html">MutableSet</a><span class="token operator">&lt;</span><span class="token keyword"></span><span data-unresolved-link="org.jetbrains.skia/FontStyle///PointingToDeclaration/">FontStyle</span><span class="token operator">&gt;</span></div><div class="brief "><a data-name="248123097%2FProperties%2F1864694178" anchor-label="availableStyles" id="248123097%2FProperties%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a><p class="paragraph">The available styles loaded for the font family.</p></div></div>                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1780298243%2FProperties%2F1864694178" anchor-label="availableTypefaces" id="1780298243%2FProperties%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
+        <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="available-typefaces.html"><span>available</span><wbr></wbr><span><span>Typefaces</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1780298243%2FProperties%2F1864694178"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted" data-togglable="Properties">
+                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><a data-name="1780298243%2FProperties%2F1864694178" anchor-label="availableTypefaces" id="1780298243%2FProperties%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="available-typefaces.html">availableTypefaces</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><span class="token keyword"></span><span data-unresolved-link="org.jetbrains.skia/Typeface///PointingToDeclaration/">Typeface</span><span class="token operator">&gt;</span></div><div class="brief "><a data-name="1780298243%2FProperties%2F1864694178" anchor-label="availableTypefaces" id="1780298243%2FProperties%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a><p class="paragraph">The available typefaces loaded for the font family.</p></div></div>                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="43098407%2FProperties%2F1864694178" anchor-label="entries" id="43098407%2FProperties%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
+        <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="index.html#43098407%2FProperties%2F1864694178"><span><span>entries</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="43098407%2FProperties%2F1864694178"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted" data-togglable="Properties">
+                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><a data-name="43098407%2FProperties%2F1864694178" anchor-label="entries" id="43098407%2FProperties%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="index.html#43098407%2FProperties%2F1864694178">entries</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/-entry/index.html">Map.Entry</a><span class="token operator">&lt;</span><span class="token keyword"></span><span data-unresolved-link="org.jetbrains.skia/FontStyle///PointingToDeclaration/">FontStyle</span><span class="token punctuation">, </span><span class="token keyword"></span><span data-unresolved-link="org.jetbrains.skia/Typeface///PointingToDeclaration/">Typeface</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div></div>                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1847755673%2FProperties%2F1864694178" anchor-label="familyName" id="-1847755673%2FProperties%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
+        <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="family-name.html"><span>family</span><wbr></wbr><span><span>Name</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1847755673%2FProperties%2F1864694178"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted" data-togglable="Properties">
+                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><a data-name="-1847755673%2FProperties%2F1864694178" anchor-label="familyName" id="-1847755673%2FProperties%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="family-name.html">familyName</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div></div>                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-915758449%2FProperties%2F1864694178" anchor-label="keys" id="-915758449%2FProperties%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
+        <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="index.html#-915758449%2FProperties%2F1864694178"><span><span>keys</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-915758449%2FProperties%2F1864694178"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted" data-togglable="Properties">
+                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><a data-name="-915758449%2FProperties%2F1864694178" anchor-label="keys" id="-915758449%2FProperties%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="index.html#-915758449%2FProperties%2F1864694178">keys</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><span class="token keyword"></span><span data-unresolved-link="org.jetbrains.skia/FontStyle///PointingToDeclaration/">FontStyle</span><span class="token operator">&gt;</span></div></div>                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-157521630%2FProperties%2F1864694178" anchor-label="size" id="-157521630%2FProperties%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
+        <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="index.html#-157521630%2FProperties%2F1864694178"><span><span>size</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-157521630%2FProperties%2F1864694178"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted" data-togglable="Properties">
+                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><a data-name="-157521630%2FProperties%2F1864694178" anchor-label="size" id="-157521630%2FProperties%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="index.html#-157521630%2FProperties%2F1864694178">size</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div>                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1908357541%2FProperties%2F1864694178" anchor-label="source" id="-1908357541%2FProperties%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
+        <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="source.html"><span><span>source</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1908357541%2FProperties%2F1864694178"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted" data-togglable="Properties">
+                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><a data-name="-1908357541%2FProperties%2F1864694178" anchor-label="source" id="-1908357541%2FProperties%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="source.html">source</a><span class="token operator">: </span><a href="-font-family-source/index.html">FontFamily.FontFamilySource</a></div></div>                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1310951841%2FProperties%2F1864694178" anchor-label="values" id="1310951841%2FProperties%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
+        <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="index.html#1310951841%2FProperties%2F1864694178"><span><span>values</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1310951841%2FProperties%2F1864694178"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted" data-togglable="Properties">
+                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><a data-name="1310951841%2FProperties%2F1864694178" anchor-label="values" id="1310951841%2FProperties%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="index.html#1310951841%2FProperties%2F1864694178">values</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-collection/index.html">Collection</a><span class="token operator">&lt;</span><span class="token keyword"></span><span data-unresolved-link="org.jetbrains.skia/Typeface///PointingToDeclaration/">Typeface</span><span class="token operator">&gt;</span></div></div>                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2023 Copyright</span><span
+                class="pull-right"><span>Generated by </span><a
+                href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+    </div>
+</div>
+</body>
+</html>

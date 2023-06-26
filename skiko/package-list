@@ -2525,6 +2525,45 @@ $dokka.location:org.jetbrains.skia/VertexMode/values/#/PointingToDeclaration/sk
 $dokka.location:org.jetbrains.skia/WStream///PointingToDeclaration/skiko/org.jetbrains.skia/-w-stream/index.html
 $dokka.location:org.jetbrains.skia/WStream/WStream/#org.jetbrains.skia.impl.NativePointer#org.jetbrains.skia.impl.NativePointer#kotlin.Boolean/PointingToDeclaration/skiko/org.jetbrains.skia/-w-stream/-w-stream.html
 $dokka.location:org.jetbrains.skia/WStream/WStream/#org.jetbrains.skia.impl.NativePointer#org.jetbrains.skia.impl.NativePointer/PointingToDeclaration/skiko/org.jetbrains.skia/-w-stream/-w-stream.html
+$dokka.location:org.jetbrains.skiko.awt.font////PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/index.html
+$dokka.location:org.jetbrains.skiko.awt.font/AwtFontManager///PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-awt-font-manager/index.html
+$dokka.location:org.jetbrains.skiko.awt.font/AwtFontManager/AwtFontManager/#/PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-awt-font-manager/-awt-font-manager.html
+$dokka.location:org.jetbrains.skiko.awt.font/AwtFontManager/addCustomFontFile/#java.io.File/PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-awt-font-manager/add-custom-font-file.html
+$dokka.location:org.jetbrains.skiko.awt.font/AwtFontManager/addCustomFontResource/#kotlin.String#java.lang.ClassLoader/PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-awt-font-manager/add-custom-font-resource.html
+$dokka.location:org.jetbrains.skiko.awt.font/AwtFontManager/addCustomFontTypeface/#org.jetbrains.skia.Typeface/PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-awt-font-manager/add-custom-font-typeface.html
+$dokka.location:org.jetbrains.skiko.awt.font/AwtFontManager/clearCustomFonts/#/PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-awt-font-manager/clear-custom-fonts.html
+$dokka.location:org.jetbrains.skiko.awt.font/AwtFontManager/customFamilyNames/#/PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-awt-font-manager/custom-family-names.html
+$dokka.location:org.jetbrains.skiko.awt.font/AwtFontManager/embeddedFamilyNames/#/PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-awt-font-manager/embedded-family-names.html
+$dokka.location:org.jetbrains.skiko.awt.font/AwtFontManager/familyNames/#/PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-awt-font-manager/family-names.html
+$dokka.location:org.jetbrains.skiko.awt.font/AwtFontManager/getTypefaceOrNull/#kotlin.String#org.jetbrains.skia.FontStyle/PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-awt-font-manager/get-typeface-or-null.html
+$dokka.location:org.jetbrains.skiko.awt.font/AwtFontManager/invalidateSystemFontCache/#/PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-awt-font-manager/invalidate-system-font-cache.html
+$dokka.location:org.jetbrains.skiko.awt.font/AwtFontManager/isAbleToResolveFamilyNames/#/PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-awt-font-manager/is-able-to-resolve-family-names.html
+$dokka.location:org.jetbrains.skiko.awt.font/AwtFontManager/removeCustomFontFamily/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-awt-font-manager/remove-custom-font-family.html
+$dokka.location:org.jetbrains.skiko.awt.font/AwtFontManager/systemFamilyNames/#/PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-awt-font-manager/system-family-names.html
+$dokka.location:org.jetbrains.skiko.awt.font/FontFamily.Companion///PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-font-family/-companion/index.html
+$dokka.location:org.jetbrains.skiko.awt.font/FontFamily.Companion/closestStyle/#kotlin.collections.Iterable[org.jetbrains.skia.FontStyle]#org.jetbrains.skia.FontStyle/PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-font-family/-companion/closest-style.html
+$dokka.location:org.jetbrains.skiko.awt.font/FontFamily.Companion/fromTypefaces/#kotlin.String#org.jetbrains.skiko.awt.font.FontFamily.FontFamilySource#kotlin.Array[org.jetbrains.skia.Typeface]/PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-font-family/-companion/from-typefaces.html
+$dokka.location:org.jetbrains.skiko.awt.font/FontFamily.FontFamilySource.Custom///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko.awt.font/-font-family/-font-family-source/-custom/index.html
+$dokka.location:org.jetbrains.skiko.awt.font/FontFamily.FontFamilySource.JvmEmbedded///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko.awt.font/-font-family/-font-family-source/-jvm-embedded/index.html
+$dokka.location:org.jetbrains.skiko.awt.font/FontFamily.FontFamilySource.System///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko.awt.font/-font-family/-font-family-source/-system/index.html
+$dokka.location:org.jetbrains.skiko.awt.font/FontFamily.FontFamilySource///PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-font-family/-font-family-source/index.html
+$dokka.location:org.jetbrains.skiko.awt.font/FontFamily.FontFamilySource/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-font-family/-font-family-source/value-of.html
+$dokka.location:org.jetbrains.skiko.awt.font/FontFamily.FontFamilySource/values/#/PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-font-family/-font-family-source/values.html
+$dokka.location:org.jetbrains.skiko.awt.font/FontFamily///PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-font-family/index.html
+$dokka.location:org.jetbrains.skiko.awt.font/FontFamily/FontFamily/#kotlin.String#org.jetbrains.skiko.awt.font.FontFamily.FontFamilySource#kotlin.collections.MutableMap[org.jetbrains.skia.FontStyle,org.jetbrains.skia.Typeface]/PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-font-family/-font-family.html
+$dokka.location:org.jetbrains.skiko.awt.font/FontFamily/addTypeface/#org.jetbrains.skia.Typeface/PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-font-family/add-typeface.html
+$dokka.location:org.jetbrains.skiko.awt.font/FontFamily/availableStyles/#/PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-font-family/available-styles.html
+$dokka.location:org.jetbrains.skiko.awt.font/FontFamily/availableTypefaces/#/PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-font-family/available-typefaces.html
+$dokka.location:org.jetbrains.skiko.awt.font/FontFamily/familyName/#/PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-font-family/family-name.html
+$dokka.location:org.jetbrains.skiko.awt.font/FontFamily/minus/#org.jetbrains.skia.FontStyle/PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-font-family/minus.html
+$dokka.location:org.jetbrains.skiko.awt.font/FontFamily/minus/#org.jetbrains.skia.Typeface/PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-font-family/minus.html
+$dokka.location:org.jetbrains.skiko.awt.font/FontFamily/minusAssign/#org.jetbrains.skia.FontStyle/PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-font-family/minus-assign.html
+$dokka.location:org.jetbrains.skiko.awt.font/FontFamily/minusAssign/#org.jetbrains.skia.Typeface/PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-font-family/minus-assign.html
+$dokka.location:org.jetbrains.skiko.awt.font/FontFamily/plus/#org.jetbrains.skia.Typeface/PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-font-family/plus.html
+$dokka.location:org.jetbrains.skiko.awt.font/FontFamily/plusAssign/#org.jetbrains.skia.Typeface/PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-font-family/plus-assign.html
+$dokka.location:org.jetbrains.skiko.awt.font/FontFamily/removeTypeface/#org.jetbrains.skia.Typeface/PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-font-family/remove-typeface.html
+$dokka.location:org.jetbrains.skiko.awt.font/FontFamily/removeTypefaceByStyle/#org.jetbrains.skia.FontStyle/PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-font-family/remove-typeface-by-style.html
+$dokka.location:org.jetbrains.skiko.awt.font/FontFamily/source/#/PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-font-family/source.html
 $dokka.location:org.jetbrains.skiko.wasm////PointingToDeclaration/skiko/org.jetbrains.skiko.wasm/index.html
 $dokka.location:org.jetbrains.skiko.wasm//onWasmReady/#kotlin.Function0[kotlin.Unit]/PointingToDeclaration/skiko/org.jetbrains.skiko.wasm/on-wasm-ready.html
 $dokka.location:org.jetbrains.skiko////PointingToDeclaration/skiko/org.jetbrains.skiko/index.html
@@ -2571,7 +2610,7 @@ $dokka.location:org.jetbrains.skiko//toSkikoTypeEvent/#java.awt.event.KeyEvent#j
 $dokka.location:org.jetbrains.skiko//toSkikoTypeEvent/#kotlin.String#[Error type: Unresolved type for NSEvent]?/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-type-event.html
 $dokka.location:org.jetbrains.skiko//toSkikoTypeEvent/#kotlin.String#[Error type: Unresolved type for UIPress]?/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-type-event.html
 $dokka.location:org.jetbrains.skiko//toSkikoTypeEvent/#kotlin.String#org.w3c.dom.events.KeyboardEvent?/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-type-event.html
-$dokka.location:org.jetbrains.skiko//toSkikoTypeface/java.awt.Font#org.jetbrains.skiko.AwtFontManager/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-typeface.html
+$dokka.location:org.jetbrains.skiko//toSkikoTypefaceOrNull/java.awt.Font#org.jetbrains.skiko.awt.font.AwtFontManager/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-typeface-or-null.html
 $dokka.location:org.jetbrains.skiko/Arch.Arm64///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-arch/-arm64/index.html
 $dokka.location:org.jetbrains.skiko/Arch.JS///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-arch/-j-s/index.html
 $dokka.location:org.jetbrains.skiko/Arch.WASM///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-arch/-w-a-s-m/index.html
@@ -2580,20 +2619,6 @@ $dokka.location:org.jetbrains.skiko/Arch///PointingToDeclaration/skiko/org.jetb
 $dokka.location:org.jetbrains.skiko/Arch/id/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-arch/id.html
 $dokka.location:org.jetbrains.skiko/Arch/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-arch/value-of.html
 $dokka.location:org.jetbrains.skiko/Arch/values/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-arch/values.html
-$dokka.location:org.jetbrains.skiko/AwtFontManager.Companion///PointingToDeclaration/skiko/org.jetbrains.skiko/-awt-font-manager/-companion/index.html
-$dokka.location:org.jetbrains.skiko/AwtFontManager.Companion/DEFAULT/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-awt-font-manager/-companion/-d-e-f-a-u-l-t.html
-$dokka.location:org.jetbrains.skiko/AwtFontManager///PointingToDeclaration/skiko/org.jetbrains.skiko/-awt-font-manager/index.html
-$dokka.location:org.jetbrains.skiko/AwtFontManager/AwtFontManager/#kotlin.Array[kotlin.String]/PointingToDeclaration/skiko/org.jetbrains.skiko/-awt-font-manager/-awt-font-manager.html
-$dokka.location:org.jetbrains.skiko/AwtFontManager/addCustomPath/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-awt-font-manager/add-custom-path.html
-$dokka.location:org.jetbrains.skiko/AwtFontManager/addResourceFont/#kotlin.String#java.lang.ClassLoader/PointingToDeclaration/skiko/org.jetbrains.skiko/-awt-font-manager/add-resource-font.html
-$dokka.location:org.jetbrains.skiko/AwtFontManager/allFontsCached/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-awt-font-manager/all-fonts-cached.html
-$dokka.location:org.jetbrains.skiko/AwtFontManager/findAvailableFontFile/#java.awt.Font/PointingToDeclaration/skiko/org.jetbrains.skiko/-awt-font-manager/find-available-font-file.html
-$dokka.location:org.jetbrains.skiko/AwtFontManager/findFontFamilyFile/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-awt-font-manager/find-font-family-file.html
-$dokka.location:org.jetbrains.skiko/AwtFontManager/findFontFile/#java.awt.Font/PointingToDeclaration/skiko/org.jetbrains.skiko/-awt-font-manager/find-font-file.html
-$dokka.location:org.jetbrains.skiko/AwtFontManager/invalidate/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-awt-font-manager/invalidate.html
-$dokka.location:org.jetbrains.skiko/AwtFontManager/listAvailableFontFiles/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-awt-font-manager/list-available-font-files.html
-$dokka.location:org.jetbrains.skiko/AwtFontManager/listFontFiles/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-awt-font-manager/list-font-files.html
-$dokka.location:org.jetbrains.skiko/AwtFontManager/whenAllFontsCachedBlocking/#kotlin.Function0[kotlin.Unit]/PointingToDeclaration/skiko/org.jetbrains.skiko/-awt-font-manager/when-all-fonts-cached-blocking.html
 $dokka.location:org.jetbrains.skiko/CanvasRenderer///PointingToDeclaration/skiko/org.jetbrains.skiko/-canvas-renderer/index.html
 $dokka.location:org.jetbrains.skiko/CanvasRenderer/CanvasRenderer/#org.w3c.dom.HTMLCanvasElement/PointingToDeclaration/skiko/org.jetbrains.skiko/-canvas-renderer/-canvas-renderer.html
 $dokka.location:org.jetbrains.skiko/CanvasRenderer/drawFrame/#kotlin.Double/PointingToDeclaration/skiko/org.jetbrains.skiko/-canvas-renderer/draw-frame.html
@@ -2644,6 +2669,7 @@ $dokka.location:org.jetbrains.skiko/DefaultConsoleLogger/trace/#kotlin.Throwable
 $dokka.location:org.jetbrains.skiko/DefaultConsoleLogger/warn/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-default-console-logger/warn.html
 $dokka.location:org.jetbrains.skiko/DefaultConsoleLogger/warn/#kotlin.Throwable#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-default-console-logger/warn.html
 $dokka.location:org.jetbrains.skiko/DelicateSkikoApi///PointingToDeclaration/skiko/org.jetbrains.skiko/-delicate-skiko-api/index.html
+$dokka.location:org.jetbrains.skiko/DependsOnJBR///PointingToDeclaration/skiko/org.jetbrains.skiko/-depends-on-j-b-r/index.html
 $dokka.location:org.jetbrains.skiko/ExperimentalSkikoApi///PointingToDeclaration/skiko/org.jetbrains.skiko/-experimental-skiko-api/index.html
 $dokka.location:org.jetbrains.skiko/FPSCounter///PointingToDeclaration/skiko/org.jetbrains.skiko/-f-p-s-counter/index.html
 $dokka.location:org.jetbrains.skiko/FPSCounter/FPSCounter/#kotlin.Double#kotlin.Boolean#kotlin.Function0[kotlin.Double]#kotlin.Boolean/PointingToDeclaration/skiko/org.jetbrains.skiko/-f-p-s-counter/-f-p-s-counter.html
@@ -3212,5 +3238,6 @@ org.jetbrains.skia.skottie
 org.jetbrains.skia.sksg
 org.jetbrains.skia.svg
 org.jetbrains.skiko
+org.jetbrains.skiko.awt.font
 org.jetbrains.skiko.wasm
 
