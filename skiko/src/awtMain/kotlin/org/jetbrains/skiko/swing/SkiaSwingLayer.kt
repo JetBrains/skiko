@@ -6,6 +6,7 @@ import org.jetbrains.skiko.redrawer.RedrawerManager
 import java.awt.Graphics2D
 import java.awt.GraphicsConfiguration
 import javax.accessibility.Accessible
+import javax.swing.JComponent
 import javax.swing.SwingUtilities.isEventDispatchThread
 
 /**
@@ -23,7 +24,7 @@ import javax.swing.SwingUtilities.isEventDispatchThread
 open class SkiaSwingLayer(
     skikoView: SkikoView,
     analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
-) : SkiaSwingLayerComponent() {
+) : JComponent() {
     internal companion object {
         init {
             Library.load()
@@ -37,7 +38,7 @@ open class SkiaSwingLayer(
     @Volatile
     private var isDisposed = false
 
-    override val clipComponents: MutableList<ClipRectangle> get() = mutableListOf()
+    val clipComponents: MutableList<ClipRectangle> get() = mutableListOf()
 
     private val skikoViewWithClipping = object : SkikoView by skikoView {
         override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
@@ -69,7 +70,7 @@ open class SkiaSwingLayer(
     private val redrawer: SwingRedrawer?
         get() = redrawerManager.redrawer
 
-    override val renderApi: GraphicsApi
+    val renderApi: GraphicsApi
         get() = redrawerManager.renderApi
 
     init {
@@ -95,7 +96,7 @@ open class SkiaSwingLayer(
         isInitialized = true
     }
 
-    override fun dispose() {
+    fun dispose() {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         if (isInitialized && !isDisposed) {
             // we should dispose redrawer first (to cancel `draw` in rendering thread)
@@ -117,7 +118,7 @@ open class SkiaSwingLayer(
         }
     }
 
-    override fun requestNativeFocusOnAccessible(accessible: Accessible?) {
+    fun requestNativeFocusOnAccessible(accessible: Accessible?) {
         // TODO: support accessibility
     }
 }
