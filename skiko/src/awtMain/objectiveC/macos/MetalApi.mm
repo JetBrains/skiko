@@ -92,6 +92,14 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_MetalApiKt_chooseAdapter(
     }
 }
 
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_MetalApiKt_disposeAdapter(
+    JNIEnv *env, jobject obj, jlong adapterPtr)
+{
+    @autoreleasepool {
+        id<MTLDevice> adapter = (__bridge_transfer id<MTLDevice>) (void *) adapterPtr;
+    }
+}
+
 JNIEXPORT jstring JNICALL Java_org_jetbrains_skiko_MetalApiKt_getAdapterName(
     JNIEnv *env, jobject obj, jlong adapterPtr)
 {

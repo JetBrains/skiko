@@ -34,6 +34,11 @@ internal class MetalSwingRedrawer(
 
     private val swingOffscreenDrawer = SwingOffscreenDrawer(swingLayerProperties)
 
+    override fun dispose() {
+        adapter.dispose()
+        super.dispose()
+    }
+
     override fun createDirectContext(): DirectContext {
         return makeMetalContext()
     }

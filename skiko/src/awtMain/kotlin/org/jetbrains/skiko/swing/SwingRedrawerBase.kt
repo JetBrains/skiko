@@ -43,7 +43,7 @@ internal abstract class SwingRedrawerBase(
 
     protected abstract fun flush(drawingSurfaceData: DrawingSurfaceData, g: Graphics2D)
 
-    final override fun dispose() {
+    override fun dispose() {
         require(!isDisposed) { "$javaClass is disposed" }
         context?.close()
         isDisposed = true

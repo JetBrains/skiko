@@ -21,6 +21,11 @@ internal fun chooseMetalAdapter(adapterPriority: GpuPriority): MetalAdapter {
  */
 internal data class MetalAdapter(val ptr: Long, val name: String, val memorySize: Long)
 
+internal fun MetalAdapter.dispose() {
+    disposeAdapter(ptr)
+}
+
 private external fun chooseAdapter(adapterPriority: Int): Long
+private external fun disposeAdapter(adapter: Long)
 private external fun getAdapterName(adapter: Long): String
 private external fun getAdapterMemorySize(adapter: Long): Long

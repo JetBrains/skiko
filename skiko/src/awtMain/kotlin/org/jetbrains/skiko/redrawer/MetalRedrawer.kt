@@ -61,8 +61,9 @@ internal class MetalRedrawer(
             return currentDevice
         }
 
+    private val adapter = chooseMetalAdapter(properties.adapterPriority)
+
     init {
-        val adapter = chooseMetalAdapter(properties.adapterPriority)
         onDeviceChosen(adapter.name)
         val initDevice = layer.backedLayer.useDrawingSurfacePlatformInfo {
             MetalDevice(createMetalDevice(layer.windowHandle, layer.transparency, adapter.ptr, it))
@@ -91,6 +92,7 @@ internal class MetalRedrawer(
         frameDispatcher.cancel()
         contextHandler.dispose()
         disposeDevice(device.ptr)
+        adapter.dispose()
         _device = null
         super.dispose()
     }

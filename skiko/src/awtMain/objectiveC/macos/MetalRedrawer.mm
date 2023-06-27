@@ -73,7 +73,7 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
     JNIEnv *env, jobject redrawer, jlong windowPtr, jboolean transparency, jlong adapterPtr, jlong platformInfoPtr)
 {
     @autoreleasepool {
-        id<MTLDevice> adapter = (__bridge_transfer id<MTLDevice>) (void *) adapterPtr;
+        id<MTLDevice> adapter = (__bridge id<MTLDevice>) (void *) adapterPtr;
 
         MetalDevice *device = [MetalDevice new];
 
