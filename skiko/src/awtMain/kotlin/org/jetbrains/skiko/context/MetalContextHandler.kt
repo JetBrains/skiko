@@ -2,6 +2,7 @@ package org.jetbrains.skiko.context
 
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.Logger
+import org.jetbrains.skiko.MetalAdapter
 import org.jetbrains.skiko.RenderException
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.redrawer.MetalDevice
@@ -17,7 +18,7 @@ import org.jetbrains.skiko.redrawer.MetalDevice
 internal class MetalContextHandler(
     layer: SkiaLayer,
     private val device: MetalDevice,
-    private val adapterInfo: AdapterInfo? = null
+    private val adapter: MetalAdapter
 ) : JvmContextHandler(layer) {
     override fun initContext(): Boolean {
         try {
@@ -69,11 +70,8 @@ internal class MetalContextHandler(
 
     override fun rendererInfo(): String {
         return super.rendererInfo() +
-                if (adapterInfo != null) {
-                    "Video card: ${adapterInfo.adapterName}\n" + "Total VRAM: ${adapterInfo.adapterMemorySize / 1024 / 1024} MB\n"
-                } else {
-                    ""
-                }
+                "Video card: ${adapter.name}\n" +
+                "Total VRAM: ${adapter.memorySize / 1024 / 1024} MB\n"
     }
 
     private fun makeRenderTarget(width: Int, height: Int) = BackendRenderTarget(
@@ -89,6 +87,4 @@ internal class MetalContextHandler(
     private external fun makeMetalContext(device: Long): Long
     private external fun makeMetalRenderTarget(device: Long, width: Int, height: Int): Long
     private external fun finishFrame(device: Long)
-
-    data class AdapterInfo(val adapterName: String, val adapterMemorySize: Long)
 }
