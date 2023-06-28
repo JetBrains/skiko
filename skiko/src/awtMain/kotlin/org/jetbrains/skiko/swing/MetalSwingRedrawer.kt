@@ -18,10 +18,10 @@ import java.awt.Graphics2D
  * @see SwingOffscreenDrawer
  */
 internal class MetalSwingRedrawer(
-    private val swingLayerProperties: SwingLayerProperties,
-    skikoView: SkikoView,
+    swingLayerProperties: SwingLayerProperties,
+    private val skikoView: SkikoView,
     analytics: SkiaLayerAnalytics
-) : SwingRedrawerBase(swingLayerProperties, skikoView, analytics, GraphicsApi.METAL) {
+) : SwingRedrawerBase(swingLayerProperties, analytics, GraphicsApi.METAL) {
     companion object {
         init {
             Library.load()
@@ -31,6 +31,11 @@ internal class MetalSwingRedrawer(
     private val adapter: MetalAdapter = chooseMetalAdapter(swingLayerProperties.adapterPriority).also {
         onDeviceChosen(it.name)
     }
+    private val context: DirectContext = makeMetalContext()
+
+    init {
+        onContextInit()
+    }
 
     private val swingOffscreenDrawer = SwingOffscreenDrawer(swingLayerProperties)
 
@@ -39,23 +44,8 @@ internal class MetalSwingRedrawer(
         super.dispose()
     }
 
-    override fun createDirectContext(): DirectContext {
-        return makeMetalContext()
-    }
-
-    override fun initCanvas(context: DirectContext?): DrawingSurfaceData {
-        context ?: error("Context should be initialized")
-
-        val scale = swingLayerProperties.graphicsConfiguration.defaultTransform.scaleX.toFloat()
-        val width = (swingLayerProperties.width * scale).toInt().coerceAtLeast(0)
-        val height = (swingLayerProperties.height * scale).toInt().coerceAtLeast(0)
-
-        if (width == 0 || height == 0) {
-            return DrawingSurfaceData(renderTarget = null, surface = null, canvas = null)
-        }
-
-        val renderTarget = makeRenderTarget(width, height)
-
+    override fun onRender(g: Graphics2D, width: Int, height: Int, nanoTime: Long) = autoCloseScope {
+        val renderTarget = makeRenderTarget(width, height).autoClose()
         val surface = Surface.makeFromBackendRenderTarget(
             context,
             renderTarget,
@@ -63,13 +53,15 @@ internal class MetalSwingRedrawer(
             SurfaceColorFormat.BGRA_8888,
             ColorSpace.sRGB,
             SurfaceProps(pixelGeometry = PixelGeometry.UNKNOWN)
-        ) ?: throw RenderException("Cannot create surface")
+        )?.autoClose() ?: throw RenderException("Cannot create surface")
 
-        return DrawingSurfaceData(renderTarget, surface, surface.canvas)
+        val canvas = surface.canvas
+        canvas.clear(Color.TRANSPARENT)
+        skikoView.onRender(canvas, width, height, nanoTime)
+        flush(surface, g)
     }
 
-    override fun flush(drawingSurfaceData: DrawingSurfaceData, g: Graphics2D) {
-        val surface = drawingSurfaceData.surface ?: error("Surface should be initialized")
+    private fun flush(surface: Surface, g: Graphics2D) {
         surface.flushAndSubmit(syncCpu = true)
 
         val width = surface.width

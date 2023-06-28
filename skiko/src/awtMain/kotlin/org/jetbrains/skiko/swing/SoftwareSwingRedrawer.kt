@@ -4,6 +4,7 @@ import org.jetbrains.skia.*
 import org.jetbrains.skiko.GraphicsApi
 import org.jetbrains.skiko.SkiaLayerAnalytics
 import org.jetbrains.skiko.SkikoView
+import org.jetbrains.skiko.autoCloseScope
 import java.awt.Graphics2D
 
 /**
@@ -15,12 +16,11 @@ import java.awt.Graphics2D
  * @see SwingOffscreenDrawer
  */
 internal class SoftwareSwingRedrawer(
-    private val swingLayerProperties: SwingLayerProperties,
-    skikoView: SkikoView,
+    swingLayerProperties: SwingLayerProperties,
+    private val skikoView: SkikoView,
     analytics: SkiaLayerAnalytics
 ) : SwingRedrawerBase(
     swingLayerProperties,
-    skikoView,
     analytics,
     GraphicsApi.SOFTWARE_FAST
 ) {
@@ -32,26 +32,28 @@ internal class SoftwareSwingRedrawer(
 
     private val storage = Bitmap()
 
-    override fun createDirectContext(): DirectContext? {
-        // Raster does not need context
-        return null
+    init {
+        onContextInit()
     }
 
-    override fun initCanvas(context: DirectContext?): DrawingSurfaceData {
-        val scale = swingLayerProperties.scale
-        val w = (swingLayerProperties.width * scale).toInt().coerceAtLeast(0)
-        val h = (swingLayerProperties.height * scale).toInt().coerceAtLeast(0)
+    override fun dispose() {
+        super.dispose()
+        storage.close()
+    }
 
-        if (storage.width != w || storage.height != h) {
-            storage.allocPixelsFlags(ImageInfo.makeS32(w, h, ColorAlphaType.PREMUL), false)
+    override fun onRender(g: Graphics2D, width: Int, height: Int, nanoTime: Long) = autoCloseScope {
+        if (storage.width != width || storage.height != height) {
+            storage.allocPixelsFlags(ImageInfo.makeS32(width, height, ColorAlphaType.PREMUL), false)
         }
 
-        val canvas = Canvas(storage, SurfaceProps(pixelGeometry = PixelGeometry.UNKNOWN))
+        val canvas = Canvas(storage, SurfaceProps(pixelGeometry = PixelGeometry.UNKNOWN)).autoClose()
+        canvas.clear(Color.TRANSPARENT)
+        skikoView.onRender(canvas, width, height, nanoTime)
 
-        return DrawingSurfaceData(renderTarget = null, surface = null, canvas = canvas)
+        flush(g)
     }
 
-    override fun flush(drawingSurfaceData: DrawingSurfaceData, g: Graphics2D) {
+    private fun flush(g: Graphics2D) {
         val width = storage.width
         val height = storage.height
         val bytes = storage.readPixels(storage.imageInfo, (width * 4), 0, 0)

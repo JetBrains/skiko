@@ -21,7 +21,6 @@ import javax.swing.SwingUtilities
 @OptIn(ExperimentalSkikoApi::class)
 internal abstract class SwingRedrawerBase(
     private val swingLayerProperties: SwingLayerProperties,
-    private val skikoView: SkikoView,
     private val analytics: SkiaLayerAnalytics,
     private val graphicsApi: GraphicsApi
 ) : SwingRedrawer {
@@ -31,21 +30,14 @@ internal abstract class SwingRedrawerBase(
     private var deviceAnalytics: DeviceAnalytics? = null
     private var isDisposed = false
 
-    private var context: DirectContext? = null
-
     init {
         rendererAnalytics.init()
     }
 
-    protected abstract fun createDirectContext(): DirectContext?
-
-    protected abstract fun initCanvas(context: DirectContext?): DrawingSurfaceData
-
-    protected abstract fun flush(drawingSurfaceData: DrawingSurfaceData, g: Graphics2D)
+    protected abstract fun onRender(g: Graphics2D, width: Int, height: Int, nanoTime: Long)
 
     override fun dispose() {
         require(!isDisposed) { "$javaClass is disposed" }
-        context?.close()
         isDisposed = true
     }
 
@@ -53,23 +45,10 @@ internal abstract class SwingRedrawerBase(
         require(!isDisposed) { "$javaClass is disposed" }
 
         inDrawScope {
-            if (!initDirectContext()) {
-                throw RenderException("Cannot init graphic context")
-            }
-            val drawingSurfaceData = initCanvas(context)
-
             val scale = swingLayerProperties.scale
             val width = (swingLayerProperties.width * scale).toInt().coerceAtLeast(0)
             val height = (swingLayerProperties.height * scale).toInt().coerceAtLeast(0)
-
-            drawingSurfaceData.canvas?.apply {
-                clear(Color.TRANSPARENT)
-                skikoView.onRender(this, width, height, System.nanoTime())
-            }
-
-            flush(drawingSurfaceData, g)
-            drawingSurfaceData.surface?.close()
-            drawingSurfaceData.renderTarget?.close()
+            onRender(g, width, height, System.nanoTime())
         }
     }
 
@@ -89,25 +68,12 @@ internal abstract class SwingRedrawerBase(
                 "OS: ${hostOs.id} ${hostArch.id}\n"
     }
 
-    private fun initDirectContext(): Boolean {
-        try {
-            if (context == null) {
-                context = createDirectContext()
-                onContextInit()
-                if (System.getProperty("skiko.hardwareInfo.enabled") == "true") {
-                    Logger.info { "Renderer info:\n ${rendererInfo()}" }
-                }
-            }
-        } catch (e: Exception) {
-            Logger.warn(e) { "Failed to create Skia Metal context!" }
-            return false
-        }
-        return true
-    }
-
-    private fun onContextInit() {
+    protected fun onContextInit() {
         require(!isDisposed) { "$javaClass is disposed" }
         requireNotNull(deviceAnalytics) { "deviceAnalytics is not null. Call onDeviceChosen after choosing the drawing device" }
+        if (System.getProperty("skiko.hardwareInfo.enabled") == "true") {
+            Logger.info { "Renderer info:\n ${rendererInfo()}" }
+        }
         deviceAnalytics?.contextInit()
     }
 
@@ -129,10 +95,4 @@ internal abstract class SwingRedrawerBase(
             isFirstFrameRendered = true
         }
     }
-
-    protected class DrawingSurfaceData(
-        val renderTarget: BackendRenderTarget?,
-        val surface: Surface?,
-        val canvas: Canvas?
-    )
 }
