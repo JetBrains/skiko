@@ -2565,6 +2565,16 @@ $dokka.location:org.jetbrains.skiko.awt.font/FontFamily/plusAssign/#org.jetbrain
 $dokka.location:org.jetbrains.skiko.awt.font/FontFamily/removeTypeface/#org.jetbrains.skia.Typeface/PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-font-family/remove-typeface.html
 $dokka.location:org.jetbrains.skiko.awt.font/FontFamily/removeTypefaceByStyle/#org.jetbrains.skia.FontStyle/PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-font-family/remove-typeface-by-style.html
 $dokka.location:org.jetbrains.skiko.awt.font/FontFamily/source/#/PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-font-family/source.html
+$dokka.location:org.jetbrains.skiko.swing////PointingToDeclaration/skiko/org.jetbrains.skiko.swing/index.html
+$dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer///PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/index.html
+$dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/SkiaSwingLayer/#org.jetbrains.skiko.SkikoView#org.jetbrains.skiko.SkiaLayerAnalytics/PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/-skia-swing-layer.html
+$dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/addNotify/#/PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/add-notify.html
+$dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/clipComponents/#/PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/clip-components.html
+$dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/dispose/#/PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/dispose.html
+$dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/paint/#java.awt.Graphics/PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/paint.html
+$dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/removeNotify/#/PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/remove-notify.html
+$dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/renderApi/#/PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/render-api.html
+$dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/requestNativeFocusOnAccessible/#javax.accessibility.Accessible?/PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/request-native-focus-on-accessible.html
 $dokka.location:org.jetbrains.skiko.wasm////PointingToDeclaration/skiko/org.jetbrains.skiko.wasm/index.html
 $dokka.location:org.jetbrains.skiko.wasm//onWasmReady/#kotlin.Function0[kotlin.Unit]/PointingToDeclaration/skiko/org.jetbrains.skiko.wasm/on-wasm-ready.html
 $dokka.location:org.jetbrains.skiko////PointingToDeclaration/skiko/org.jetbrains.skiko/index.html
@@ -3240,5 +3250,6 @@ org.jetbrains.skia.sksg
 org.jetbrains.skia.svg
 org.jetbrains.skiko
 org.jetbrains.skiko.awt.font
+org.jetbrains.skiko.swing
 org.jetbrains.skiko.wasm
 
