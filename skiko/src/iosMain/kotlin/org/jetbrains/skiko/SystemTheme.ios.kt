@@ -1,12 +1,16 @@
 package org.jetbrains.skiko
 
-import kotlinx.cinterop.useContents
-import platform.Foundation.NSProcessInfo
-import platform.UIKit.*
-import platform.UIKit.UIUserInterfaceStyle.*
+import platform.UIKit.UITraitCollection
+import platform.UIKit.UIUserInterfaceStyle.UIUserInterfaceStyleDark
+import platform.UIKit.UIUserInterfaceStyle.UIUserInterfaceStyleLight
+import platform.UIKit.currentTraitCollection
 
 actual val currentSystemTheme: SystemTheme
-    get() = if (supportsCurrentTraitCollectionApi) {
+    get() = if (available(OS.Ios to OSVersion(13))) {
+        /*
+         * Getting trait collection for the current execution context supports only on iOS 13.0+
+         * https://developer.apple.com/documentation/uikit/uitraitcollection/3238080-currenttraitcollection?language=objc
+         */
         when (UITraitCollection.currentTraitCollection.userInterfaceStyle) {
             UIUserInterfaceStyleDark -> SystemTheme.DARK
             UIUserInterfaceStyleLight -> SystemTheme.LIGHT
@@ -15,11 +19,3 @@ actual val currentSystemTheme: SystemTheme
     } else {
         SystemTheme.LIGHT
     }
-
-/*
- * Getting trait collection for the current execution context supports only on iOS 13.0+
- * https://developer.apple.com/documentation/uikit/uitraitcollection/3238080-currenttraitcollection?language=objc
- */
-private val supportsCurrentTraitCollectionApi get() = NSProcessInfo.processInfo.operatingSystemVersion.useContents {
-    majorVersion >= 13
-}
