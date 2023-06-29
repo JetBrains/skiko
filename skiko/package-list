@@ -2579,11 +2579,13 @@ $dokka.location:org.jetbrains.skiko.wasm////PointingToDeclaration/skiko/org.jet
 $dokka.location:org.jetbrains.skiko.wasm//onWasmReady/#kotlin.Function0[kotlin.Unit]/PointingToDeclaration/skiko/org.jetbrains.skiko.wasm/on-wasm-ready.html
 $dokka.location:org.jetbrains.skiko////PointingToDeclaration/skiko/org.jetbrains.skiko/index.html
 $dokka.location:org.jetbrains.skiko//MainUIDispatcher/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-main-u-i-dispatcher.html
+$dokka.location:org.jetbrains.skiko//available/#kotlin.Array[kotlin.Pair[org.jetbrains.skiko.OS,org.jetbrains.skiko.OSVersion]]/PointingToDeclaration/skiko/org.jetbrains.skiko/available.html
 $dokka.location:org.jetbrains.skiko//currentNanoTime/#/PointingToDeclaration/skiko/org.jetbrains.skiko/current-nano-time.html
 $dokka.location:org.jetbrains.skiko//currentSystemTheme/#/PointingToDeclaration/skiko/org.jetbrains.skiko/current-system-theme.html
 $dokka.location:org.jetbrains.skiko//disableTitleBar/org.jetbrains.skiko.SkiaLayer#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skiko/disable-title-bar.html
 $dokka.location:org.jetbrains.skiko//hostArch/#/PointingToDeclaration/skiko/org.jetbrains.skiko/host-arch.html
 $dokka.location:org.jetbrains.skiko//hostId/#/PointingToDeclaration/skiko/org.jetbrains.skiko/host-id.html
+$dokka.location:org.jetbrains.skiko//hostOSVersion/#/PointingToDeclaration/skiko/org.jetbrains.skiko/host-o-s-version.html
 $dokka.location:org.jetbrains.skiko//hostOs/#/PointingToDeclaration/skiko/org.jetbrains.skiko/host-os.html
 $dokka.location:org.jetbrains.skiko//isLeftClick/org.jetbrains.skiko.SkikoPointerEvent#/PointingToDeclaration/skiko/org.jetbrains.skiko/is-left-click.html
 $dokka.location:org.jetbrains.skiko//isMiddleClick/org.jetbrains.skiko.SkikoPointerEvent#/PointingToDeclaration/skiko/org.jetbrains.skiko/is-middle-click.html
@@ -2751,6 +2753,13 @@ $dokka.location:org.jetbrains.skiko/OS/isMacOS/#/PointingToDeclaration/skiko/or
 $dokka.location:org.jetbrains.skiko/OS/isWindows/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-o-s/is-windows.html
 $dokka.location:org.jetbrains.skiko/OS/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-o-s/value-of.html
 $dokka.location:org.jetbrains.skiko/OS/values/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-o-s/values.html
+$dokka.location:org.jetbrains.skiko/OSVersion///PointingToDeclaration/skiko/org.jetbrains.skiko/-o-s-version/index.html
+$dokka.location:org.jetbrains.skiko/OSVersion/OSVersion/#kotlin.Int#kotlin.Int#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skiko/-o-s-version/-o-s-version.html
+$dokka.location:org.jetbrains.skiko/OSVersion/compareTo/#org.jetbrains.skiko.OSVersion/PointingToDeclaration/skiko/org.jetbrains.skiko/-o-s-version/compare-to.html
+$dokka.location:org.jetbrains.skiko/OSVersion/major/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-o-s-version/major.html
+$dokka.location:org.jetbrains.skiko/OSVersion/minor/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-o-s-version/minor.html
+$dokka.location:org.jetbrains.skiko/OSVersion/patch/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-o-s-version/patch.html
+$dokka.location:org.jetbrains.skiko/OSVersion/toString/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-o-s-version/to-string.html
 $dokka.location:org.jetbrains.skiko/OpenGLApi.Companion///PointingToDeclaration/skiko/org.jetbrains.skiko/-open-g-l-api/-companion/index.html
 $dokka.location:org.jetbrains.skiko/OpenGLApi.Companion/instance/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-open-g-l-api/-companion/instance.html
 $dokka.location:org.jetbrains.skiko/OpenGLApi///PointingToDeclaration/skiko/org.jetbrains.skiko/-open-g-l-api/index.html
