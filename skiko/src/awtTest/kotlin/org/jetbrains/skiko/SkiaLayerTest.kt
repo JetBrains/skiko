@@ -835,4 +835,4 @@ class SkiaLayerTest {
     }
 }
 
-private fun JFrame.close() = dispatchEvent(WindowEvent(this, WindowEvent.WINDOW_CLOSING))
+internal fun JFrame.close() = dispatchEvent(WindowEvent(this, WindowEvent.WINDOW_CLOSING))
