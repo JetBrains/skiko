@@ -1303,6 +1303,53 @@ if (skiko.isCIBuild || mavenCentral.signArtifacts) {
         sign(publishing.publications)
         useInMemoryPgpKeys(mavenCentral.signArtifactsKey.get(), mavenCentral.signArtifactsPassword.get())
     }
+    configureSignAndPublishDependencies()
+}
+
+
+fun configureSignAndPublishDependencies() {
+    if (supportWasm) {
+        tasks.forEach { task ->
+            val name = task.name
+            val publishJs = "publishJsPublicationTo"
+            val publishWasm = "publishSkikoWasmRuntimePublicationTo"
+            val signWasm = "signSkikoWasmRuntimePublication"
+            val signJs = "signJsPublication"
+
+            when {
+                name.startsWith(publishJs) -> task.dependsOn(signWasm)
+                name.startsWith(publishWasm) -> task.dependsOn(signJs)
+            }
+        }
+    }
+    if (supportAndroid) {
+        tasks.forEach { task ->
+            val name = task.name
+            val signAndroid = "signAndroidPublication"
+            val generateMetadata = "generateMetadataFileForAndroidPublication"
+            val publishAndroid = "publishAndroidPublicationTo"
+            val publishX64 = "publishSkikoJvmRuntimeAndroidX64PublicationTo"
+            val publishArm64 = "publishSkikoJvmRuntimeAndroidArm64PublicationTo"
+            val signX64 = "signSkikoJvmRuntimeAndroidX64Publication"
+            val signArm64 = "signSkikoJvmRuntimeAndroidArm64Publication"
+            val skikoAndroidJar = "skikoAndroidJar"
+
+            when {
+                name.startsWith(signAndroid) || name.startsWith(generateMetadata) -> {
+                    task.dependsOn(skikoAndroidJar)
+                }
+                name.startsWith(publishAndroid) -> {
+                    task.dependsOn(signX64, signArm64)
+                }
+                name.startsWith(publishX64) -> {
+                    task.dependsOn(signAndroid, signArm64)
+                }
+                name.startsWith(publishArm64) -> {
+                    task.dependsOn(signX64, signAndroid)
+                }
+            }
+        }
+    }
 }
 
 /**
@@ -1357,3 +1404,4 @@ rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJ
         nodeExtension.download = false
     }
 }
+
