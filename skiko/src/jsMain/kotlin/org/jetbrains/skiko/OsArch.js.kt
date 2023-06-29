@@ -2,9 +2,7 @@ package org.jetbrains.skiko
 
 import kotlinx.browser.window
 
-actual val hostOs: OS by lazy {
-    detectHostOs()
-}
+actual val hostOs: OS = detectHostOs()
 
 actual val hostArch: Arch = Arch.JS
 
