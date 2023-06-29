@@ -58,16 +58,24 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
     fun showTextMenu(targetRect: Rect, textActions: TextActions) {
         _currentTextMenuActions = textActions
         val menu: UIMenuController = UIMenuController.sharedMenuController()
-        if (menu.isMenuVisible()) {
-            menu.hideMenu()
-        }
         val cgRect = CGRectMake(
             x = targetRect.left.toDouble(),
             y = targetRect.top.toDouble(),
             width = targetRect.width.toDouble(),
             height = targetRect.height.toDouble()
         )
-        menu.showMenuFromView(this, cgRect)
+        val isTargetVisible = CGRectIntersectsRect(bounds, cgRect)
+        if (isTargetVisible) {
+            if (menu.isMenuVisible()) {
+                menu.setTargetRect(cgRect, this)
+            } else {
+                menu.showMenuFromView(this, cgRect)
+            }
+        } else {
+            if (menu.isMenuVisible()) {
+                menu.hideMenu()
+            }
+        }
     }
 
     fun hideTextMenu() {
