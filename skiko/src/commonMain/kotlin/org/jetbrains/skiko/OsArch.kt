@@ -30,6 +30,7 @@ enum class KotlinBackend(val id: String) {
     JVM("jvm"),
     JS("js"),
     Native("native"),
+    WASM("wasm"),
     ;
 
     fun isNotJs() = this != JS
