@@ -2626,6 +2626,7 @@ $dokka.location:org.jetbrains.skiko//toSkikoTypeEvent/#kotlin.String#org.w3c.dom
 $dokka.location:org.jetbrains.skiko//toSkikoTypefaceOrNull/java.awt.Font#org.jetbrains.skiko.awt.font.AwtFontManager/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-typeface-or-null.html
 $dokka.location:org.jetbrains.skiko/Arch.Arm64///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-arch/-arm64/index.html
 $dokka.location:org.jetbrains.skiko/Arch.JS///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-arch/-j-s/index.html
+$dokka.location:org.jetbrains.skiko/Arch.Unknown///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-arch/-unknown/index.html
 $dokka.location:org.jetbrains.skiko/Arch.WASM///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-arch/-w-a-s-m/index.html
 $dokka.location:org.jetbrains.skiko/Arch.X64///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-arch/-x64/index.html
 $dokka.location:org.jetbrains.skiko/Arch///PointingToDeclaration/skiko/org.jetbrains.skiko/-arch/index.html
@@ -2731,6 +2732,7 @@ $dokka.location:org.jetbrains.skiko/GraphicsApi/values/#/PointingToDeclaration/
 $dokka.location:org.jetbrains.skiko/KotlinBackend.JS///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-kotlin-backend/-j-s/index.html
 $dokka.location:org.jetbrains.skiko/KotlinBackend.JVM///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-kotlin-backend/-j-v-m/index.html
 $dokka.location:org.jetbrains.skiko/KotlinBackend.Native///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-kotlin-backend/-native/index.html
+$dokka.location:org.jetbrains.skiko/KotlinBackend.WASM///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-kotlin-backend/-w-a-s-m/index.html
 $dokka.location:org.jetbrains.skiko/KotlinBackend///PointingToDeclaration/skiko/org.jetbrains.skiko/-kotlin-backend/index.html
 $dokka.location:org.jetbrains.skiko/KotlinBackend/id/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-kotlin-backend/id.html
 $dokka.location:org.jetbrains.skiko/KotlinBackend/isNotJs/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-kotlin-backend/is-not-js.html
@@ -2745,6 +2747,7 @@ $dokka.location:org.jetbrains.skiko/OS.Ios///PointingToDeclaration/{"org.jetbrai
 $dokka.location:org.jetbrains.skiko/OS.JS///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-o-s/-j-s/index.html
 $dokka.location:org.jetbrains.skiko/OS.Linux///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-o-s/-linux/index.html
 $dokka.location:org.jetbrains.skiko/OS.MacOS///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-o-s/-mac-o-s/index.html
+$dokka.location:org.jetbrains.skiko/OS.Unknown///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-o-s/-unknown/index.html
 $dokka.location:org.jetbrains.skiko/OS.Windows///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-o-s/-windows/index.html
 $dokka.location:org.jetbrains.skiko/OS///PointingToDeclaration/skiko/org.jetbrains.skiko/-o-s/index.html
 $dokka.location:org.jetbrains.skiko/OS/id/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-o-s/id.html
