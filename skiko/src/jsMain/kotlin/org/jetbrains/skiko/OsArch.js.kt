@@ -4,7 +4,7 @@ import kotlinx.browser.window
 
 actual val hostOs: OS = detectHostOs()
 
-actual val hostArch: Arch = Arch.JS
+actual val hostArch: Arch = Arch.Unknown
 
 actual val hostId by lazy {
     "${hostOs.id}-${hostArch.id}"

@@ -25,8 +25,12 @@ enum class OS(val id: String) {
 enum class Arch(val id: String) {
     X64("x64"),
     Arm64("arm64"),
+    @Deprecated("JS is not valid Arch value")
     JS("js"),
-    WASM("wasm")
+    @Deprecated("WASM is not valid Arch value")
+    WASM("wasm"),
+    Unknown("unknown"),
+    ;
 }
 
 enum class KotlinBackend(val id: String) {
