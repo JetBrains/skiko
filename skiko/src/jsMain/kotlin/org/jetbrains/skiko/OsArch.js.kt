@@ -47,6 +47,6 @@ internal fun detectHostOs(): OS {
         platformInfo.contains("Linux", true) -> OS.Linux
         platformInfo.contains("Mac", true) -> OS.MacOS
         platformInfo.contains("Win", true) -> OS.Windows
-        else -> OS.JS
+        else -> OS.Unknown
     }
 }

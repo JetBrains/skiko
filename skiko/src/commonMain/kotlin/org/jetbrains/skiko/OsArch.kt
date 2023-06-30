@@ -6,7 +6,10 @@ enum class OS(val id: String) {
     Windows("windows"),
     MacOS("macos"),
     Ios("ios"),
-    JS("js")
+
+    @Deprecated("JS is invalid host OS name. Consider using enum KotlinBackend to detect JS.")
+    JS("js"),
+    Unknown("unknown")
     ;
 
     val isLinux

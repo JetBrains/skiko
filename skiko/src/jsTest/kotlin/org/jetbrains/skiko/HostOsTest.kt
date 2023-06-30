@@ -45,9 +45,9 @@ class HostOsTest {
 
 
     @Test
-    fun fallbackToJs() {
+    fun fallbackToUnknown() {
         spoofUserAgentData("somerandomedata")
-        assertEquals(OS.JS, detectHostOs())
+        assertEquals(OS.Unknown, detectHostOs())
     }
 }
 
