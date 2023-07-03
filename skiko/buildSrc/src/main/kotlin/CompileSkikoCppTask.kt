@@ -104,6 +104,7 @@ abstract class CompileSkikoCppTask() : AbstractSkikoNativeToolTask() {
 
     override fun createArgBuilder(): ArgBuilder =
         if (buildTargetOS.get().isWindows) VisualCppCompilerArgBuilder()
+        else if(hostOs.isWindows && buildTargetOS.get() == OS.Wasm) WindowsSanitizedPathsArgBuilder()
         else super.createArgBuilder()
 
     override fun execute(mode: ToolMode, args: ArgBuilder) {
@@ -157,6 +158,7 @@ abstract class CompileSkikoCppTask() : AbstractSkikoNativeToolTask() {
                 executable = compilerExecutablePath
                 workingDir = outDir
                 this.args = listOf(workArgs.createArgFile(argFile))
+                print("")
             }
         }
 
