@@ -3,6 +3,7 @@ package org.jetbrains.skiko
 import kotlinx.cinterop.*
 import org.jetbrains.skia.Point
 import org.jetbrains.skia.Rect
+import org.jetbrains.skiko.ios.UIKitKeyboardOptions
 import platform.CoreGraphics.*
 import platform.Foundation.*
 import platform.UIKit.*
@@ -29,25 +30,20 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
     }
 
     private var skiaLayer: SkiaLayer? = null
-    private lateinit var _pointInside: (Point, UIEvent?) -> Boolean
+    private var _pointInside: (Point, UIEvent?) -> Boolean = { _, _ -> true }
+    private var _keyboardOptions: UIKitKeyboardOptions = object : UIKitKeyboardOptions {}
     private var _inputDelegate: UITextInputDelegateProtocol? = null
     private var _currentTextMenuActions: TextActions? = null
-    var currentKeyboardType: UIKeyboardType = UIKeyboardTypeDefault
-    var currentKeyboardAppearance: UIKeyboardAppearance = UIKeyboardAppearanceDefault
-    var currentReturnKeyType: UIReturnKeyType = UIReturnKeyType.UIReturnKeyDefault
-    var currentTextContentType: UITextContentType? = null
-    var currentIsSecureTextEntry: Boolean = false
-    var currentEnablesReturnKeyAutomatically: Boolean = false
-    var currentAutocapitalizationType: UITextAutocapitalizationType = UITextAutocapitalizationType.UITextAutocapitalizationTypeSentences
-    var currentAutocorrectionType: UITextAutocorrectionType = UITextAutocorrectionType.UITextAutocorrectionTypeYes
 
     constructor(
         skiaLayer: SkiaLayer,
         frame: CValue<CGRect> = CGRectNull.readValue(),
-        pointInside: (Point, UIEvent?) -> Boolean = {_,_-> true }
+        pointInside: (Point, UIEvent?) -> Boolean = {_,_-> true },
+        keyboardOptions: UIKitKeyboardOptions = object : UIKitKeyboardOptions {},
     ) : super(frame) {
         this.skiaLayer = skiaLayer
         _pointInside = pointInside
+        _keyboardOptions = keyboardOptions
     }
 
     /**
@@ -492,37 +488,14 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
             else -> false
         }
 
-    override fun keyboardType(): UIKeyboardType {
-        return currentKeyboardType
-    }
-
-    override fun keyboardAppearance(): UIKeyboardAppearance {
-        return currentKeyboardAppearance
-    }
-
-    override fun returnKeyType(): UIReturnKeyType {
-        return currentReturnKeyType
-    }
-
-    override fun textContentType(): UITextContentType? {
-        return currentTextContentType
-    }
-
-    override fun isSecureTextEntry(): Boolean {
-        return currentIsSecureTextEntry //todo secure text to prevent copy
-    }
-
-    override fun enablesReturnKeyAutomatically(): Boolean {
-        return currentEnablesReturnKeyAutomatically
-    }
-
-    override fun autocapitalizationType(): UITextAutocapitalizationType {
-        return currentAutocapitalizationType
-    }
-
-    override fun autocorrectionType(): UITextAutocorrectionType {
-        return currentAutocorrectionType
-    }
+    override fun keyboardType(): UIKeyboardType = _keyboardOptions.keyboardType()
+    override fun keyboardAppearance(): UIKeyboardAppearance = _keyboardOptions.keyboardAppearance()
+    override fun returnKeyType(): UIReturnKeyType = _keyboardOptions.returnKeyType()
+    override fun textContentType(): UITextContentType? = _keyboardOptions.textContentType()
+    override fun isSecureTextEntry(): Boolean = _keyboardOptions.isSecureTextEntry()
+    override fun enablesReturnKeyAutomatically(): Boolean = _keyboardOptions.enablesReturnKeyAutomatically()
+    override fun autocapitalizationType(): UITextAutocapitalizationType = _keyboardOptions.autocapitalizationType()
+    override fun autocorrectionType(): UITextAutocorrectionType = _keyboardOptions.autocorrectionType()
 
     override fun dictationRecognitionFailed() {
         //todo may be useful
