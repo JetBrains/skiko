@@ -30,8 +30,8 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
     }
 
     private var skiaLayer: SkiaLayer? = null
-    private lateinit var _pointInside: (Point, UIEvent?) -> Boolean
-    private lateinit var _keyboardOptions: UIKitKeyboardOptions
+    private var _pointInside: (Point, UIEvent?) -> Boolean = { _, _ -> true }
+    private var _keyboardOptions: UIKitKeyboardOptions = object : UIKitKeyboardOptions {}
     private var _inputDelegate: UITextInputDelegateProtocol? = null
     private var _currentTextMenuActions: TextActions? = null
 
