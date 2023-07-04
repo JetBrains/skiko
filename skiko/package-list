@@ -2565,6 +2565,16 @@ $dokka.location:org.jetbrains.skiko.awt.font/FontFamily/plusAssign/#org.jetbrain
 $dokka.location:org.jetbrains.skiko.awt.font/FontFamily/removeTypeface/#org.jetbrains.skia.Typeface/PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-font-family/remove-typeface.html
 $dokka.location:org.jetbrains.skiko.awt.font/FontFamily/removeTypefaceByStyle/#org.jetbrains.skia.FontStyle/PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-font-family/remove-typeface-by-style.html
 $dokka.location:org.jetbrains.skiko.awt.font/FontFamily/source/#/PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-font-family/source.html
+$dokka.location:org.jetbrains.skiko.ios////PointingToDeclaration/skiko/org.jetbrains.skiko.ios/index.html
+$dokka.location:org.jetbrains.skiko.ios/UIKitKeyboardOptions///PointingToDeclaration/skiko/org.jetbrains.skiko.ios/-u-i-kit-keyboard-options/index.html
+$dokka.location:org.jetbrains.skiko.ios/UIKitKeyboardOptions/autocapitalizationType/#/PointingToDeclaration/skiko/org.jetbrains.skiko.ios/-u-i-kit-keyboard-options/autocapitalization-type.html
+$dokka.location:org.jetbrains.skiko.ios/UIKitKeyboardOptions/autocorrectionType/#/PointingToDeclaration/skiko/org.jetbrains.skiko.ios/-u-i-kit-keyboard-options/autocorrection-type.html
+$dokka.location:org.jetbrains.skiko.ios/UIKitKeyboardOptions/enablesReturnKeyAutomatically/#/PointingToDeclaration/skiko/org.jetbrains.skiko.ios/-u-i-kit-keyboard-options/enables-return-key-automatically.html
+$dokka.location:org.jetbrains.skiko.ios/UIKitKeyboardOptions/isSecureTextEntry/#/PointingToDeclaration/skiko/org.jetbrains.skiko.ios/-u-i-kit-keyboard-options/is-secure-text-entry.html
+$dokka.location:org.jetbrains.skiko.ios/UIKitKeyboardOptions/keyboardAppearance/#/PointingToDeclaration/skiko/org.jetbrains.skiko.ios/-u-i-kit-keyboard-options/keyboard-appearance.html
+$dokka.location:org.jetbrains.skiko.ios/UIKitKeyboardOptions/keyboardType/#/PointingToDeclaration/skiko/org.jetbrains.skiko.ios/-u-i-kit-keyboard-options/keyboard-type.html
+$dokka.location:org.jetbrains.skiko.ios/UIKitKeyboardOptions/returnKeyType/#/PointingToDeclaration/skiko/org.jetbrains.skiko.ios/-u-i-kit-keyboard-options/return-key-type.html
+$dokka.location:org.jetbrains.skiko.ios/UIKitKeyboardOptions/textContentType/#/PointingToDeclaration/skiko/org.jetbrains.skiko.ios/-u-i-kit-keyboard-options/text-content-type.html
 $dokka.location:org.jetbrains.skiko.swing////PointingToDeclaration/skiko/org.jetbrains.skiko.swing/index.html
 $dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer///PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/index.html
 $dokka.location:org.jetbrains.skiko.swing/SkiaSwingLayer/SkiaSwingLayer/#org.jetbrains.skiko.SkikoView#org.jetbrains.skiko.SkiaLayerAnalytics/PointingToDeclaration/skiko/org.jetbrains.skiko.swing/-skia-swing-layer/-skia-swing-layer.html
@@ -3143,7 +3153,7 @@ $dokka.location:org.jetbrains.skiko/SkikoSurfaceView/scheduleFrame/#/PointingToD
 $dokka.location:org.jetbrains.skiko/SkikoUIView///PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/index.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/SkikoUIView/#[Error type: Unresolved type for NSCoder]/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/-skiko-u-i-view.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/SkikoUIView/#kotlinx.cinterop.CValue[[Error type: Unresolved type for CGRect]]/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/-skiko-u-i-view.html
-$dokka.location:org.jetbrains.skiko/SkikoUIView/SkikoUIView/#org.jetbrains.skiko.SkiaLayer#kotlinx.cinterop.CValue[[Error type: Unresolved type for CGRect]]#kotlin.Function2[[Error type: Unresolved type for Point],[Error type: Unresolved type for UIEvent]?,kotlin.Boolean]/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/-skiko-u-i-view.html
+$dokka.location:org.jetbrains.skiko/SkikoUIView/SkikoUIView/#org.jetbrains.skiko.SkiaLayer#kotlinx.cinterop.CValue[[Error type: Unresolved type for CGRect]]#kotlin.Function2[[Error type: Unresolved type for Point],[Error type: Unresolved type for UIEvent]?,kotlin.Boolean]#org.jetbrains.skiko.ios.UIKitKeyboardOptions/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/-skiko-u-i-view.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/autocapitalizationType/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/autocapitalization-type.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/autocorrectionType/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/autocorrection-type.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/baseWritingDirectionForPosition/#[Error type: Unresolved type for UITextPosition]#[Error type: Unresolved type for UITextStorageDirection]/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/base-writing-direction-for-position.html
@@ -3158,14 +3168,6 @@ $dokka.location:org.jetbrains.skiko/SkikoUIView/closestPositionToPoint/#kotlinx.
 $dokka.location:org.jetbrains.skiko/SkikoUIView/closestPositionToPoint/#kotlinx.cinterop.CValue[[Error type: Unresolved type for CGPoint]]/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/closest-position-to-point.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/comparePosition/#[Error type: Unresolved type for UITextPosition]#[Error type: Unresolved type for UITextPosition]/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/compare-position.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/copy/#kotlin.Any?/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/copy.html
-$dokka.location:org.jetbrains.skiko/SkikoUIView/currentAutocapitalizationType/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/current-autocapitalization-type.html
-$dokka.location:org.jetbrains.skiko/SkikoUIView/currentAutocorrectionType/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/current-autocorrection-type.html
-$dokka.location:org.jetbrains.skiko/SkikoUIView/currentEnablesReturnKeyAutomatically/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/current-enables-return-key-automatically.html
-$dokka.location:org.jetbrains.skiko/SkikoUIView/currentIsSecureTextEntry/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/current-is-secure-text-entry.html
-$dokka.location:org.jetbrains.skiko/SkikoUIView/currentKeyboardAppearance/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/current-keyboard-appearance.html
-$dokka.location:org.jetbrains.skiko/SkikoUIView/currentKeyboardType/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/current-keyboard-type.html
-$dokka.location:org.jetbrains.skiko/SkikoUIView/currentReturnKeyType/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/current-return-key-type.html
-$dokka.location:org.jetbrains.skiko/SkikoUIView/currentTextContentType/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/current-text-content-type.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/cut/#kotlin.Any?/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/cut.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/deleteBackward/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/delete-backward.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/detach/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/detach.html
@@ -3262,6 +3264,7 @@ org.jetbrains.skia.sksg
 org.jetbrains.skia.svg
 org.jetbrains.skiko
 org.jetbrains.skiko.awt.font
+org.jetbrains.skiko.ios
 org.jetbrains.skiko.swing
 org.jetbrains.skiko.wasm
 
