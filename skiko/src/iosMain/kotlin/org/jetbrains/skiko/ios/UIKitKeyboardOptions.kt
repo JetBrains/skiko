@@ -2,6 +2,10 @@ package org.jetbrains.skiko.ios
 
 import platform.UIKit.*
 
+/**
+* Represents a part of UITextInputTraits protocol. Needs to control onscreen keyboard features.
+* @see https://developer.apple.com/documentation/uikit/uitextinputtraits?language=objc
+*/
 interface UIKitKeyboardOptions {
 
     fun keyboardType(): UIKeyboardType =
