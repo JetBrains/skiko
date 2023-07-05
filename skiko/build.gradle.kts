@@ -231,6 +231,7 @@ kotlin {
 
     if (supportAndroid) {
         jvm("android") {
+            withJava() // This line needs to add Java sources in src/androidMain/java
             compilations.all {
                 kotlinOptions.jvmTarget = "1.8"
             }
@@ -653,6 +654,14 @@ if (supportAndroid) {
     for (arch in arrayOf(Arch.X64, Arch.Arm64)) {
         createSkikoJvmJarTask(os, arch, skikoAndroidJar)
     }
+    tasks.getByName("publishAndroidPublicationToMavenLocal") {
+        // It needs to be compatible with Gradle 8.1
+        dependsOn(skikoAndroidJar)
+    }
+    tasks.getByName("generateMetadataFileForAndroidPublication") {
+        // It needs to be compatible with Gradle 8.1
+        dependsOn(skikoAndroidJar)
+    }
 }
 
 fun createSkikoJvmJarTask(os: OS, arch: Arch, commonJar: TaskProvider<Jar>): TaskProvider<Jar> {
@@ -797,7 +806,9 @@ fun Project.androidJar(askedVersion: String = ""): Provider<File> =
         } else {
             "android-$askedVersion"
         }
-        androidHome.resolve("platforms/$version/android.jar")
+        androidHome.resolve("platforms/$version/android.jar").also {
+            println("Skiko task androidJar uses android SDK in $it")
+        }
     }
 
 fun createCompileJvmBindingsTask(
@@ -1405,3 +1416,8 @@ rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJ
     }
 }
 
+tasks.withType<JavaCompile> {
+    // Workaround to configure Java sources on Android (src/androidMain/java)
+    targetCompatibility = "1.8"
+    sourceCompatibility = "1.8"
+}
