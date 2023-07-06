@@ -68,12 +68,12 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
         skiaLayer: SkiaLayer,
         frame: CValue<CGRect> = CGRectNull.readValue(),
         pointInside: (Point, UIEvent?) -> Boolean = {_,_-> true },
-        onMetalLayerDrawablesizeUpdate: (Int, Int) -> Unit,
+        onMetalLayerDrawableSizeUpdate: (Int, Int) -> Unit,
         keyboardOptions: UIKitKeyboardOptions = object : UIKitKeyboardOptions {},
     ) : super(frame) {
         this.skiaLayer = skiaLayer
         _pointInside = pointInside
-        _onMetalLayerDrawableSizeUpdate = onMetalLayerDrawablesizeUpdate
+        _onMetalLayerDrawableSizeUpdate = onMetalLayerDrawableSizeUpdate
         _keyboardOptions = keyboardOptions
     }
 
