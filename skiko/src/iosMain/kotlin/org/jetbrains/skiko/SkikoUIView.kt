@@ -11,14 +11,9 @@ import platform.darwin.NSInteger
 import kotlin.math.max
 import kotlin.math.min
 
-/*
- TODO: remove org.jetbrains.skiko.objc.UIViewExtensionProtocol after Kotlin 1.8.20
- https://youtrack.jetbrains.com/issue/KT-40426
-*/
 @Suppress("CONFLICTING_OVERLOADS")
 @ExportObjCClass
-class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
-    org.jetbrains.skiko.objc.UIViewExtensionProtocol {
+class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
     @OverrideInit
     constructor(frame: CValue<CGRect>) : super(frame)
 
