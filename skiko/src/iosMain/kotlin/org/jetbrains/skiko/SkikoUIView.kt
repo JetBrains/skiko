@@ -51,6 +51,10 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
         }
     }
 
+    /**
+     * If set to true, command buffer synchronizes drawable presentation with CATransaction
+     * If set to false, drawable is presented ASAP
+     */
     var synchronizesRenderingWithCATransaction: Boolean
         get() = metalLayer.presentsWithTransaction
         set(value) {
