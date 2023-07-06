@@ -69,11 +69,12 @@ actual open class SkiaLayer {
     actual fun attachTo(container: Any) {
         val view = container as SkikoUIView
 
-        attachTo(view, view.metalLayer)
+        this.view = view
+
+        setupMetalRendering(view.metalLayer)
     }
 
-    fun attachTo(view: SkikoUIView, metalLayer: CAMetalLayer) {
-        this.view = view
+    private fun setupMetalRendering(metalLayer: CAMetalLayer) {
         contextHandler = MetalContextHandler(this)
         // TODO: maybe add observer for view.viewDidDisappear() to detach us?
         redrawer = MetalRedrawer(this, metalLayer)

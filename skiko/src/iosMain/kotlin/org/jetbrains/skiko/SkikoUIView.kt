@@ -18,6 +18,11 @@ import kotlin.math.roundToInt
  TODO: remove org.jetbrains.skiko.objc.UIViewExtensionProtocol after Kotlin 1.8.20
  https://youtrack.jetbrains.com/issue/KT-40426
 */
+
+enum class SkikoUIViewRenderingMode {
+    DEFAULT, CA_TRANSACTION_SYNCHRONIZED
+}
+
 @Suppress("CONFLICTING_OVERLOADS")
 @ExportObjCClass
 class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
@@ -55,7 +60,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
      */
     private var _onMetalLayerDrawableSizeUpdate: (Int, Int) -> Unit = { _, _ -> }
 
-    val metalLayer: CAMetalLayer
+    internal val metalLayer: CAMetalLayer
         get() = layer as CAMetalLayer
 
     private var skiaLayer: SkiaLayer? = null
