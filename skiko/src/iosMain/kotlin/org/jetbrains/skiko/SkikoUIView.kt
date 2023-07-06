@@ -53,7 +53,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
      * Callback called when SkikoUIView performs layout
      * and adjusts drawableSize of metalLayer to width and height, which are passed as arguments to this closure
      */
-    private lateinit var onLayout: (Int, Int) -> Unit
+    private var _onMetalLayerDrawableSizeUpdate: (Int, Int) -> Unit = { _, _ -> }
 
     val metalLayer: CAMetalLayer
         get() = layer as CAMetalLayer
@@ -68,12 +68,12 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
         skiaLayer: SkiaLayer,
         frame: CValue<CGRect> = CGRectNull.readValue(),
         pointInside: (Point, UIEvent?) -> Boolean = {_,_-> true },
-        onLayout: (Int, Int) -> Unit,
+        onMetalLayerDrawablesizeUpdate: (Int, Int) -> Unit,
         keyboardOptions: UIKitKeyboardOptions = object : UIKitKeyboardOptions {},
     ) : super(frame) {
         this.skiaLayer = skiaLayer
         _pointInside = pointInside
-        this.onLayout = onLayout
+        _onMetalLayerDrawableSizeUpdate = onMetalLayerDrawablesizeUpdate
         _keyboardOptions = keyboardOptions
     }
 
@@ -431,7 +431,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
             return@useContents width.roundToInt() to height.roundToInt()
         }
 
-        onLayout(width, height)
+        _onMetalLayerDrawableSizeUpdate(width, height)
     }
 
     override fun positionFromPosition(

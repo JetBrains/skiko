@@ -19,7 +19,7 @@ private enum class DrawSchedulingState {
 }
 
 internal class MetalRedrawer(
-    private val layer: SkiaLayer,
+    layer: SkiaLayer,
     private val metalLayer: CAMetalLayer
 ) : Redrawer {
     private val contextHandler = MetalContextHandler(layer)
@@ -107,8 +107,6 @@ internal class MetalRedrawer(
     }
 
     override fun needRedraw() {
-        println("needRedraw")
-
         check(!isDisposed) { "MetalRedrawer is disposed" }
 
         drawImmediatelyIfPossible()
