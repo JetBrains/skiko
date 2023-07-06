@@ -19,10 +19,6 @@ import kotlin.math.roundToInt
  https://youtrack.jetbrains.com/issue/KT-40426
 */
 
-enum class MetalRenderingSynchronizationMode {
-    NONE, CA_TRANSACTION
-}
-
 @Suppress("CONFLICTING_OVERLOADS")
 @ExportObjCClass
 class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
@@ -55,14 +51,10 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
         }
     }
 
-    var metalRenderingSynchronizationMode = MetalRenderingSynchronizationMode.NONE
+    var synchronizesRenderingWithCATransaction: Boolean
+        get() = metalLayer.presentsWithTransaction
         set(value) {
-            field = value
-
-            metalLayer.presentsWithTransaction = when (value) {
-                MetalRenderingSynchronizationMode.NONE -> false
-                MetalRenderingSynchronizationMode.CA_TRANSACTION -> true
-            }
+            metalLayer.presentsWithTransaction = value
         }
     /*
      * Callback called when SkikoUIView performs layout
