@@ -3,9 +3,12 @@ package org.jetbrains.skiko;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 
+import org.jetbrains.annotations.Nullable;
+
 /**
  * This workaround needs to support both Android SDK 33 (or lower) and SDK 34 (or higher)
  */
+@SuppressWarnings("NullableProblems")
 public abstract class WorkaroundSimpleOnGestureListener extends GestureDetector.SimpleOnGestureListener {
 
     @Override
@@ -19,13 +22,13 @@ public abstract class WorkaroundSimpleOnGestureListener extends GestureDetector.
     }
 
     /**
-     * This workaround helps to support Nullable and NonNullable first argument
+     * This workaround helps to support @Nullable and @NonNull first argument
      */
-    abstract boolean onScrollWorkaround(MotionEvent event1, MotionEvent event2, float distanceX, float distanceY);
+    abstract boolean onScrollWorkaround(@Nullable MotionEvent event1, MotionEvent event2, float distanceX, float distanceY);
 
     /**
-     * This workaround helps to support Nullable and NonNullable first argument
+     * This workaround helps to support @Nullable and @NonNull first argument
      */
-    abstract boolean onFlingWorkaround(MotionEvent event1, MotionEvent event2, float distanceX, float distanceY);
+    abstract boolean onFlingWorkaround(@Nullable MotionEvent event1, MotionEvent event2, float distanceX, float distanceY);
 
 }
