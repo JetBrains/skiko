@@ -264,8 +264,6 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
             )
         }
 
-        println("onPointerEvent start")
-
         skiaLayer?.skikoView?.onPointerEvent(
             SkikoPointerEvent(
                 x = pointers.centroidX,
@@ -276,8 +274,6 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
                 platform = event
             )
         )
-
-        println("onPointerEvent end")
     }
 
     private val UITouch.isPressed get() =
