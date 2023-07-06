@@ -3,10 +3,11 @@ package org.jetbrains.skiko
 import kotlinx.cinterop.*
 import org.jetbrains.skia.Point
 import org.jetbrains.skia.Rect
+import org.jetbrains.skiko.ios.UIKitKeyboardOptions
 import platform.CoreGraphics.*
 import platform.Foundation.*
-import platform.Metal.MTLPixelFormatBGRA8Unorm
 import platform.QuartzCore.CAMetalLayer
+import platform.Metal.MTLPixelFormatBGRA8Unorm
 import platform.UIKit.*
 import platform.darwin.NSInteger
 import kotlin.math.max
@@ -37,7 +38,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
 
         metalLayer.apply {
             pixelFormat = MTLPixelFormatBGRA8Unorm
-            framebufferOnly = true
+            framebufferOnly = false
 
             doubleArrayOf(0.0, 0.0, 0.0, 0.0).usePinned {
                 backgroundColor =
@@ -48,12 +49,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
         }
     }
 
-    private var skiaLayer: SkiaLayer? = null
-    private lateinit var _pointInside: (Point, UIEvent?) -> Boolean
-    private var _inputDelegate: UITextInputDelegateProtocol? = null
-    private var _currentTextMenuActions: TextActions? = null
-
-    /**
+    /*
      * Callback called when SkikoUIView performs layout
      * and adjusts drawableSize of metalLayer to width and height, which are passed as arguments to this closure
      */
@@ -62,24 +58,23 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
     val metalLayer: CAMetalLayer
         get() = layer as CAMetalLayer
 
-    var currentKeyboardType: UIKeyboardType = UIKeyboardTypeDefault
-    var currentKeyboardAppearance: UIKeyboardAppearance = UIKeyboardAppearanceDefault
-    var currentReturnKeyType: UIReturnKeyType = UIReturnKeyType.UIReturnKeyDefault
-    var currentTextContentType: UITextContentType? = null
-    var currentIsSecureTextEntry: Boolean = false
-    var currentEnablesReturnKeyAutomatically: Boolean = false
-    var currentAutocapitalizationType: UITextAutocapitalizationType = UITextAutocapitalizationType.UITextAutocapitalizationTypeSentences
-    var currentAutocorrectionType: UITextAutocorrectionType = UITextAutocorrectionType.UITextAutocorrectionTypeYes
+    private var skiaLayer: SkiaLayer? = null
+    private var _pointInside: (Point, UIEvent?) -> Boolean = { _, _ -> true }
+    private var _keyboardOptions: UIKitKeyboardOptions = object : UIKitKeyboardOptions {}
+    private var _inputDelegate: UITextInputDelegateProtocol? = null
+    private var _currentTextMenuActions: TextActions? = null
 
     constructor(
         skiaLayer: SkiaLayer,
         frame: CValue<CGRect> = CGRectNull.readValue(),
         pointInside: (Point, UIEvent?) -> Boolean = {_,_-> true },
         onLayout: (Int, Int) -> Unit,
+        keyboardOptions: UIKitKeyboardOptions = object : UIKitKeyboardOptions {},
     ) : super(frame) {
         this.skiaLayer = skiaLayer
         _pointInside = pointInside
         this.onLayout = onLayout
+        _keyboardOptions = keyboardOptions
     }
 
     /**
@@ -90,16 +85,24 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
     fun showTextMenu(targetRect: Rect, textActions: TextActions) {
         _currentTextMenuActions = textActions
         val menu: UIMenuController = UIMenuController.sharedMenuController()
-        if (menu.isMenuVisible()) {
-            menu.hideMenu()
-        }
         val cgRect = CGRectMake(
             x = targetRect.left.toDouble(),
             y = targetRect.top.toDouble(),
             width = targetRect.width.toDouble(),
             height = targetRect.height.toDouble()
         )
-        menu.showMenuFromView(this, cgRect)
+        val isTargetVisible = CGRectIntersectsRect(bounds, cgRect)
+        if (isTargetVisible) {
+            if (menu.isMenuVisible()) {
+                menu.setTargetRect(cgRect, this)
+            } else {
+                menu.showMenuFromView(this, cgRect)
+            }
+        } else {
+            if (menu.isMenuVisible()) {
+                menu.hideMenu()
+            }
+        }
     }
 
     fun hideTextMenu() {
@@ -534,37 +537,14 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
             else -> false
         }
 
-    override fun keyboardType(): UIKeyboardType {
-        return currentKeyboardType
-    }
-
-    override fun keyboardAppearance(): UIKeyboardAppearance {
-        return currentKeyboardAppearance
-    }
-
-    override fun returnKeyType(): UIReturnKeyType {
-        return currentReturnKeyType
-    }
-
-    override fun textContentType(): UITextContentType? {
-        return currentTextContentType
-    }
-
-    override fun isSecureTextEntry(): Boolean {
-        return currentIsSecureTextEntry //todo secure text to prevent copy
-    }
-
-    override fun enablesReturnKeyAutomatically(): Boolean {
-        return currentEnablesReturnKeyAutomatically
-    }
-
-    override fun autocapitalizationType(): UITextAutocapitalizationType {
-        return currentAutocapitalizationType
-    }
-
-    override fun autocorrectionType(): UITextAutocorrectionType {
-        return currentAutocorrectionType
-    }
+    override fun keyboardType(): UIKeyboardType = _keyboardOptions.keyboardType()
+    override fun keyboardAppearance(): UIKeyboardAppearance = _keyboardOptions.keyboardAppearance()
+    override fun returnKeyType(): UIReturnKeyType = _keyboardOptions.returnKeyType()
+    override fun textContentType(): UITextContentType? = _keyboardOptions.textContentType()
+    override fun isSecureTextEntry(): Boolean = _keyboardOptions.isSecureTextEntry()
+    override fun enablesReturnKeyAutomatically(): Boolean = _keyboardOptions.enablesReturnKeyAutomatically()
+    override fun autocapitalizationType(): UITextAutocapitalizationType = _keyboardOptions.autocapitalizationType()
+    override fun autocorrectionType(): UITextAutocorrectionType = _keyboardOptions.autocorrectionType()
 
     override fun dictationRecognitionFailed() {
         //todo may be useful

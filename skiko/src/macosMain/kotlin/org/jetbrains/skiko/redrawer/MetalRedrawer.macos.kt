@@ -167,6 +167,7 @@ internal class MetalLayer : CAMetalLayer {
             this.backgroundColor =
                 CGColorCreate(CGColorSpaceCreateDeviceRGB(), it.addressOf(0))
         }
+        this.framebufferOnly = false
         skiaLayer.nsView.layer = this
         skiaLayer.nsView.wantsLayer = true
         this.contentsGravity = kCAGravityTopLeft;

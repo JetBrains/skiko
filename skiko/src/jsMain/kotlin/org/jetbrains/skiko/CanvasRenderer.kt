@@ -95,7 +95,7 @@ abstract class CanvasRenderer constructor(val htmlCanvas: HTMLCanvasElement) {
             redrawScheduled = false
             GL.makeContextCurrent(contextPointer)
             // `clear` and `resetMatrix` make canvas not accumulate previous effects
-            canvas?.clear(-1)
+            canvas?.clear(Color.WHITE)
             canvas?.resetMatrix()
             drawFrame(timestamp)
             surface?.flushAndSubmit()

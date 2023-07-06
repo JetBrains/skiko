@@ -20,33 +20,33 @@ build configuration.
 ## Publishing
 
 ##### Publish JVM target to Maven local
-```
+```bash
 ./gradlew publishToMavenLocal
 ```
 
 ##### Publish all targets to Maven Local
-```
+```bash
 ./gradlew publishToMavenLocal -Pskiko.native.enabled=true -Pskiko.wasm.enabled=true -Pskiko.android.enabled=true
 ```
 
 ##### Publish to `build/repo` directory
-```
+```bash
 ./gradlew publishToBuildRepo
 ```
 
 ##### Publish to Compose repo
 Set up environment variables `COMPOSE_REPO_USERNAME` and `COMPOSE_REPO_KEY`.
-```
+```bash
 ./gradlew publishToComposeRepo
 ```
 
 ##### Publish to all repositories
-```
+```bash
 ./gradlew publish
 ```
 
 ##### Publish local version
-```
+```bash
 ./gradlew <PUBLISH_TASK> -Pdeploy.version=0.2.0 -Pdeploy.release=true
 ```
 
@@ -54,7 +54,7 @@ Set up environment variables `COMPOSE_REPO_USERNAME` and `COMPOSE_REPO_KEY`.
 
 macOS for Apple Silicon builds aimed for distribution require mandatory code signing,
 so use command like
-```
+```bash
 ./gradlew -Psigner="Apple Distribution: Nikolay Igotti (N462MKSJ7M)" <PUBLISH_TASK>
 ```
 to codesign the JNI library.
