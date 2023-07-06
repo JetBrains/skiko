@@ -19,7 +19,7 @@ import kotlin.math.roundToInt
  https://youtrack.jetbrains.com/issue/KT-40426
 */
 
-enum class SkikoUIViewRenderingMode {
+enum class SkikoUIViewMetalDrawablePresentationMode {
     DEFAULT, CA_TRANSACTION_SYNCHRONIZED
 }
 
@@ -44,6 +44,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
         metalLayer.apply {
             pixelFormat = MTLPixelFormatBGRA8Unorm
             framebufferOnly = false
+            presentsWithTransaction = false
 
             doubleArrayOf(0.0, 0.0, 0.0, 0.0).usePinned {
                 backgroundColor =
@@ -54,6 +55,15 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
         }
     }
 
+    var metalDrawablePresentationMode = SkikoUIViewMetalDrawablePresentationMode.DEFAULT
+        set(value) {
+            field = value
+
+            metalLayer.presentsWithTransaction = when (value) {
+                SkikoUIViewMetalDrawablePresentationMode.DEFAULT -> false
+                SkikoUIViewMetalDrawablePresentationMode.CA_TRANSACTION_SYNCHRONIZED -> true
+            }
+        }
     /*
      * Callback called when SkikoUIView performs layout
      * and adjusts drawableSize of metalLayer to width and height, which are passed as arguments to this closure
