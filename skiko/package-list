@@ -3258,6 +3258,9 @@ $dokka.location:org.jetbrains.skiko/TextActions/selectAll/#/PointingToDeclaratio
 $dokka.location:org.jetbrains.skiko/URIManager///PointingToDeclaration/skiko/org.jetbrains.skiko/-u-r-i-manager/index.html
 $dokka.location:org.jetbrains.skiko/URIManager/URIManager/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-u-r-i-manager/-u-r-i-manager.html
 $dokka.location:org.jetbrains.skiko/URIManager/openUri/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-u-r-i-manager/open-uri.html
+$dokka.location:org.jetbrains.skiko/WorkaroundSimpleOnGestureListener///PointingToDeclaration/skiko/org.jetbrains.skiko/-workaround-simple-on-gesture-listener/index.html
+$dokka.location:org.jetbrains.skiko/WorkaroundSimpleOnGestureListener/onFling/#android.view.MotionEvent#android.view.MotionEvent#float#float/PointingToDeclaration/skiko/org.jetbrains.skiko/-workaround-simple-on-gesture-listener/on-fling.html
+$dokka.location:org.jetbrains.skiko/WorkaroundSimpleOnGestureListener/onScroll/#android.view.MotionEvent#android.view.MotionEvent#float#float/PointingToDeclaration/skiko/org.jetbrains.skiko/-workaround-simple-on-gesture-listener/on-scroll.html
 org.jetbrains.skia
 org.jetbrains.skia.icu
 org.jetbrains.skia.impl
