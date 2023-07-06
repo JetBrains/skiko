@@ -3,10 +3,10 @@ package org.jetbrains.skiko.ios
 import platform.UIKit.*
 
 /**
-* Represents a part of UITextInputTraits protocol. Needs to control onscreen keyboard features.
-* @see https://developer.apple.com/documentation/uikit/uitextinputtraits?language=objc
-*/
-interface UIKitKeyboardOptions {
+ * Represents a part of UITextInputTraits protocol. Needs to control onscreen keyboard features.
+ * https://developer.apple.com/documentation/uikit/uitextinputtraits?language=objc
+ */
+interface SkikoUITextInputTraits {
 
     fun keyboardType(): UIKeyboardType =
         UIKeyboardTypeDefault
@@ -31,5 +31,17 @@ interface UIKitKeyboardOptions {
 
     fun autocorrectionType(): UITextAutocorrectionType =
         UITextAutocorrectionType.UITextAutocorrectionTypeYes
+
+    fun spellCheckingType(): UITextSpellCheckingType =
+        UITextSpellCheckingType.UITextSpellCheckingTypeDefault
+
+    fun smartQuotesType(): UITextSmartQuotesType =
+        UITextSmartQuotesType.UITextSmartQuotesTypeDefault
+
+    fun smartDashesType(): UITextSmartDashesType =
+        UITextSmartDashesType.UITextSmartDashesTypeDefault
+
+    fun smartInsertDeleteType(): UITextSmartInsertDeleteType =
+        UITextSmartInsertDeleteType.UITextSmartInsertDeleteTypeDefault
 
 }

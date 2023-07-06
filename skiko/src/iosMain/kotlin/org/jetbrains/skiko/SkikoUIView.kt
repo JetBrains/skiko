@@ -3,7 +3,7 @@ package org.jetbrains.skiko
 import kotlinx.cinterop.*
 import org.jetbrains.skia.Point
 import org.jetbrains.skia.Rect
-import org.jetbrains.skiko.ios.UIKitKeyboardOptions
+import org.jetbrains.skiko.ios.SkikoUITextInputTraits
 import platform.CoreGraphics.*
 import platform.Foundation.*
 import platform.UIKit.*
@@ -31,7 +31,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
 
     private var skiaLayer: SkiaLayer? = null
     private var _pointInside: (Point, UIEvent?) -> Boolean = { _, _ -> true }
-    private var _keyboardOptions: UIKitKeyboardOptions = object : UIKitKeyboardOptions {}
+    private var _keyboardOptions: SkikoUITextInputTraits = object : SkikoUITextInputTraits {}
     private var _inputDelegate: UITextInputDelegateProtocol? = null
     private var _currentTextMenuActions: TextActions? = null
 
@@ -39,7 +39,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
         skiaLayer: SkiaLayer,
         frame: CValue<CGRect> = CGRectNull.readValue(),
         pointInside: (Point, UIEvent?) -> Boolean = {_,_-> true },
-        keyboardOptions: UIKitKeyboardOptions = object : UIKitKeyboardOptions {},
+        keyboardOptions: SkikoUITextInputTraits = object : SkikoUITextInputTraits {},
     ) : super(frame) {
         this.skiaLayer = skiaLayer
         _pointInside = pointInside
