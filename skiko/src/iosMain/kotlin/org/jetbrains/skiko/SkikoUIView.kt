@@ -77,9 +77,9 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
 
     constructor(
         skiaLayer: SkiaLayer,
+        onMetalLayerDrawableSizeUpdate: (Int, Int) -> Unit,
         frame: CValue<CGRect> = CGRectNull.readValue(),
         pointInside: (Point, UIEvent?) -> Boolean = {_,_-> true },
-        onMetalLayerDrawableSizeUpdate: (Int, Int) -> Unit,
         keyboardOptions: UIKitKeyboardOptions = object : UIKitKeyboardOptions {},
     ) : super(frame) {
         this.skiaLayer = skiaLayer
