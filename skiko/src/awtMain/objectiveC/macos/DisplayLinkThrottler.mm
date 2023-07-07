@@ -24,7 +24,6 @@ static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
     NSScreen *_displayLinkScreen;
     CVDisplayLinkRef _displayLink;
     NSConditionLock *_vsyncConditionLock;
-    volatile atomic_bool _displayLinkOk;
 }
 
 - (instancetype)init {
@@ -34,7 +33,6 @@ static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
         _displayLinkScreen = nil;
         _displayLink = nil;
         _vsyncConditionLock = [[NSConditionLock alloc] initWithCondition: 1];
-        atomic_store(&_displayLinkOk, true);
     }
 
     return self;
@@ -47,10 +45,8 @@ static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
 }
 
 - (void)waitVSync {
-    bool displayLinkOk = atomic_load(&_displayLinkOk);
-
     /// If display link construction was corrupted, don't perform any waiting
-    if (!displayLinkOk) {
+    if (!_displayLink) {
         return;
     }
 
@@ -65,15 +61,6 @@ static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
         CVDisplayLinkRelease(_displayLink);
         _displayLink = nil;
     }
-}
-
-- (void)handleDisplayLinkSetupFailure {
-    atomic_store(&_displayLinkOk, false);
-
-    /// Next line is here to tackle edge case where displayLink reconstruction failed
-    /// but someone is already waiting at `waitUntilVsync`
-    /// It's quite improbable scenario anyway
-    [self onVSync];
 }
 
 - (void)setupDisplayLinkForWindow:(NSWindow *)window {
@@ -101,8 +88,7 @@ static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
 
     if (result != kCVReturnSuccess) {
         CVDisplayLinkRelease(displayLink);
-
-        [self handleDisplayLinkSetupFailure];
+        _displayLink = nil
         return;
     }
 
@@ -110,8 +96,7 @@ static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
 
     if (result != kCVReturnSuccess) {
         CVDisplayLinkRelease(displayLink);
-
-        [self handleDisplayLinkSetupFailure];
+        _displayLink = nil
         return;
     }
 
@@ -119,15 +104,12 @@ static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
 
     if (result != kCVReturnSuccess) {
         CVDisplayLinkRelease(displayLink);
-
-        [self handleDisplayLinkSetupFailure];
+        _displayLink = nil
         return;
     }
 
     _displayLink = displayLink;
     _displayLinkScreen = screen;
-
-    atomic_store(&_displayLinkOk, true);
 }
 
 - (void)dealloc {

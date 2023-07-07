@@ -149,6 +149,9 @@ internal class MetalRedrawer(
 
     private fun performDraw() = synchronized(drawLock) {
         if (!isDisposed) {
+            // Wait for vsync because:
+            // - macOS drops the second/next drawables if they are sent in the same vsync
+            // - it makes frames consistent and limits FPS
             displayLinkThrottler.waitVSync(windowPtr = layer.windowHandle)
 
             val handle = startRendering()
