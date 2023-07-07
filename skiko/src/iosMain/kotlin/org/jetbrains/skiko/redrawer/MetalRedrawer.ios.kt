@@ -36,6 +36,8 @@ internal class MetalRedrawer(
     private val queue = device.newCommandQueue() ?: throw IllegalStateException("Couldn't create Metal command queue")
     private var currentDrawable: CAMetalDrawableProtocol? = null
     private val metalLayer = MetalLayer()
+
+    // Semaphore for preventing command buffers count more than swapchain size to be scheduled/executed at the same time
     private val inflightSemaphore = dispatch_semaphore_create(metalLayer.maximumDrawableCount.toLong())
 
     /*
@@ -106,6 +108,8 @@ internal class MetalRedrawer(
     fun makeContext() = DirectContext.makeMetal(device.objcPtr(), queue.objcPtr())
 
     fun makeRenderTarget(width: Int, height: Int): BackendRenderTarget {
+        // If more than swapchain size count of command buffers are inflight
+        // wait until one finishes work
         dispatch_semaphore_wait(inflightSemaphore, DISPATCH_TIME_FOREVER)
         currentDrawable = metalLayer.nextDrawable()!!
         return BackendRenderTarget.makeMetal(width, height, currentDrawable!!.texture.objcPtr())
@@ -193,6 +197,7 @@ internal class MetalRedrawer(
                 commandBuffer.label = "Present"
                 commandBuffer.presentDrawable(it)
                 commandBuffer.addCompletedHandler {
+                    // Signal work finish, allow a new command buffer to be scheduled
                     dispatch_semaphore_signal(inflightSemaphore)
                 }
                 commandBuffer.commit()
