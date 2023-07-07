@@ -91,7 +91,7 @@ static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
 
     [self invalidateDisplayLink];
 
-    NSDictionary* screenDescription = [_displayLinkScreen deviceDescription];
+    NSDictionary* screenDescription = [screen deviceDescription];
     NSNumber* screenID = [screenDescription objectForKey:@"NSScreenNumber"];
 
     CVReturn result;
