@@ -62,7 +62,7 @@ class SkiaLayerTest {
     @OptIn(ExperimentalTime::class)
     @Ignore
     @Test
-    fun `frame is rendered immediately`() = uiTest {
+    fun `metal drawables not lost`() = uiTest {
         val window = UiTestWindow(
             properties = SkiaLayerProperties(
                 isVsyncEnabled = true
