@@ -32,7 +32,7 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_mak
         MetalDevice *device = (__bridge MetalDevice *) (void *) devicePtr;
         GrBackendRenderTarget* renderTarget = NULL;
 
-        /// If we have more than 3 command buffers inflight, wait until one of them finishes work.
+        /// If we have more than `maximumDrawableCount` command buffers inflight, wait until one of them finishes work.
         dispatch_semaphore_wait(device.inflightSemaphore, DISPATCH_TIME_FOREVER);
 
         id<CAMetalDrawable> currentDrawable = [device.layer nextDrawable];
