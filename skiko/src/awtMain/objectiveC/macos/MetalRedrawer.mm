@@ -104,6 +104,9 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
         device.layer.opaque = NO;
         device.layer.framebufferOnly = NO;
 
+        /// 3 is for triple buffering = max inflight command buffers to avoid overcommitment
+        device.inflightSemaphore = dispatch_semaphore_create(3);
+
         if (transparency)
         {
             NSWindow* window = (__bridge NSWindow*) (void *) windowPtr;
