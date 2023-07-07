@@ -62,6 +62,7 @@ internal class MetalRedrawer(
         }
 
     private val adapter = chooseMetalAdapter(properties.adapterPriority)
+    private val displayLinkThrottler = DisplayLinkThrottler()
 
     init {
         onDeviceChosen(adapter.name)
@@ -98,6 +99,7 @@ internal class MetalRedrawer(
         contextHandler.dispose()
         disposeDevice(device.ptr)
         adapter.dispose()
+        displayLinkThrottler.dispose()
         _device = null
         super.dispose()
     }
@@ -147,6 +149,8 @@ internal class MetalRedrawer(
 
     private fun performDraw() = synchronized(drawLock) {
         if (!isDisposed) {
+            displayLinkThrottler.waitVSync(windowPtr = layer.windowHandle)
+
             val handle = startRendering()
             try {
                 contextHandler.draw()
