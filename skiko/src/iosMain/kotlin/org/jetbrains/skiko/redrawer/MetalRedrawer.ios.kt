@@ -17,7 +17,7 @@ import platform.Metal.MTLDeviceProtocol
 import platform.Metal.MTLPixelFormatBGRA8Unorm
 import platform.QuartzCore.*
 import platform.UIKit.window
-import platform.darwin.NSObject
+import platform.darwin.*
 
 private enum class DrawSchedulingState {
     AVAILABLE_ON_NEXT_FRAME,
@@ -36,6 +36,7 @@ internal class MetalRedrawer(
     private val queue = device.newCommandQueue() ?: throw IllegalStateException("Couldn't create Metal command queue")
     private var currentDrawable: CAMetalDrawableProtocol? = null
     private val metalLayer = MetalLayer()
+    private val inflightSemaphore = dispatch_semaphore_create(metalLayer.maximumDrawableCount.toLong())
 
     /*
      * Initial value is [DrawSchedulingState.AVAILABLE_ON_NEXT_FRAME] because voluntarily dispatching a frame
@@ -105,6 +106,7 @@ internal class MetalRedrawer(
     fun makeContext() = DirectContext.makeMetal(device.objcPtr(), queue.objcPtr())
 
     fun makeRenderTarget(width: Int, height: Int): BackendRenderTarget {
+        dispatch_semaphore_wait(inflightSemaphore, DISPATCH_TIME_FOREVER)
         currentDrawable = metalLayer.nextDrawable()!!
         return BackendRenderTarget.makeMetal(width, height, currentDrawable!!.texture.objcPtr())
     }
@@ -190,6 +192,9 @@ internal class MetalRedrawer(
                 val commandBuffer = queue.commandBuffer()!!
                 commandBuffer.label = "Present"
                 commandBuffer.presentDrawable(it)
+                commandBuffer.addCompletedHandler {
+                    dispatch_semaphore_signal(inflightSemaphore)
+                }
                 commandBuffer.commit()
                 currentDrawable = null
             }
