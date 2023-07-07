@@ -130,4 +130,27 @@ static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
 
 @end
 
+extern "C" {
+
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_DisplayLinkThrottler_create(JNIEnv *env, jobject obj) {
+    DisplayLinkThrottler *throttler = [[DisplayLinkThrottler alloc] init];
+
+    return (jlong) (__bridge_retained void *) throttler;
+}
+
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_DisplayLinkThrottler_dispose(JNIEnv *env, jobject obj, jlong throttlerPtr) {
+    DisplayLinkThrottler *throttler = (__bridge_transfer DisplayLinkThrottler *) (void *) throttlerPtr;
+    /// throttler will be released by ARC and deallocated in the end of this scope.
+}
+
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_DisplayLinkThrottler_waitVSync(JNIEnv *env, jobject obj, jlong throttlerPtr, jlong windowPtr) {
+    DisplayLinkThrottler *throttler = (__bridge DisplayLinkThrottler *) (void *) throttlerPtr;
+    NSWindow *window = (__bridge NSWindow *) (void *) windowPtr;
+
+    [throttler setupDisplayLinkForWindow:window];
+    [throttler waitVSync];
+}
+
+}
+
 #endif // SK_METAL
