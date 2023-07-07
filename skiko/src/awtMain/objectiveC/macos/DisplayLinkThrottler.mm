@@ -85,7 +85,7 @@ static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
     }
 
     if ([screen isEqualTo: _displayLinkScreen]) {
-        /// display link is already active for current window, do nothing
+        /// display link is already active for this screen, do nothing
         return;
     }
 
@@ -100,6 +100,8 @@ static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
     result = CVDisplayLinkCreateWithCGDisplay([screenID unsignedIntValue], &displayLink);
 
     if (result != kCVReturnSuccess) {
+        CVDisplayLinkRelease(displayLink);
+
         [self handleDisplayLinkSetupFailure];
         return;
     }
@@ -107,6 +109,8 @@ static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
     result = CVDisplayLinkSetOutputCallback(displayLink, &displayLinkCallback, (__bridge void *)(self));
 
     if (result != kCVReturnSuccess) {
+        CVDisplayLinkRelease(displayLink);
+
         [self handleDisplayLinkSetupFailure];
         return;
     }
@@ -114,6 +118,8 @@ static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
     result = CVDisplayLinkStart(displayLink);
 
     if (result != kCVReturnSuccess) {
+        CVDisplayLinkRelease(displayLink);
+
         [self handleDisplayLinkSetupFailure];
         return;
     }
