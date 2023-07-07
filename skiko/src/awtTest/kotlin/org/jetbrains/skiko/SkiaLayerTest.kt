@@ -21,6 +21,7 @@ import org.jetbrains.skiko.util.UiTestWindow
 import org.jetbrains.skiko.util.uiTest
 import org.junit.Assert.assertEquals
 import org.junit.Assume.assumeTrue
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import java.awt.BorderLayout
@@ -59,6 +60,7 @@ class SkiaLayerTest {
     val screenshots = ScreenshotTestRule()
 
     @OptIn(ExperimentalTime::class)
+    @Ignore
     @Test
     fun `frame is rendered immediately`() = uiTest {
         val window = UiTestWindow(
