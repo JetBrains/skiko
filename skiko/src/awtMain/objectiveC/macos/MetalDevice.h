@@ -9,10 +9,10 @@
 @interface MetalDevice : NSObject
 
 @property (weak) CALayer *container;
-@property (retain, strong) AWTMetalLayer *layer;
-@property (retain, strong) id<MTLDevice> adapter;
-@property (retain, strong) id<MTLCommandQueue> queue;
-@property (retain, strong) id<CAMetalDrawable> drawableHandle;
+@property (strong) AWTMetalLayer *layer;
+@property (strong) id<MTLDevice> adapter;
+@property (strong) id<MTLCommandQueue> queue;
+@property (strong) id<CAMetalDrawable> drawableHandle;
 
 @end
 
