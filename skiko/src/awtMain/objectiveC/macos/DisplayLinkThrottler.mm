@@ -60,6 +60,7 @@ static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
         CVDisplayLinkStop(_displayLink);
         CVDisplayLinkRelease(_displayLink);
         _displayLink = nil;
+        _displayLinkScreen = nil
     }
 }
 
@@ -81,35 +82,35 @@ static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
     NSDictionary* screenDescription = [screen deviceDescription];
     NSNumber* screenID = [screenDescription objectForKey:@"NSScreenNumber"];
 
-    CVReturn result;
+    _displayLink = createDisplayLinkForScreen(screenID);
+    _displayLinkScreen = screen;
+}
 
+- (CVDisplayLinkRef)createDisplayLinkForScreen:(NSNumber *)screenID {
+    CVReturn result;
     CVDisplayLinkRef displayLink;
+
     result = CVDisplayLinkCreateWithCGDisplay([screenID unsignedIntValue], &displayLink);
 
     if (result != kCVReturnSuccess) {
-        CVDisplayLinkRelease(displayLink);
-        _displayLink = nil
-        return;
+        return nil;
     }
 
     result = CVDisplayLinkSetOutputCallback(displayLink, &displayLinkCallback, (__bridge void *)(self));
 
     if (result != kCVReturnSuccess) {
         CVDisplayLinkRelease(displayLink);
-        _displayLink = nil
-        return;
+        return nil;
     }
 
     result = CVDisplayLinkStart(displayLink);
 
     if (result != kCVReturnSuccess) {
         CVDisplayLinkRelease(displayLink);
-        _displayLink = nil
-        return;
+        return nil;
     }
 
-    _displayLink = displayLink;
-    _displayLinkScreen = screen;
+    return displayLink;
 }
 
 - (void)dealloc {
