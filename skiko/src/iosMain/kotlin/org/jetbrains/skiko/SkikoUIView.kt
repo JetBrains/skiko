@@ -13,6 +13,7 @@ import kotlin.math.min
 
 @Suppress("CONFLICTING_OVERLOADS")
 @ExportObjCClass
+@OptIn(InternalSkikoApi::class)
 class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
     @OverrideInit
     constructor(frame: CValue<CGRect>) : super(frame)
