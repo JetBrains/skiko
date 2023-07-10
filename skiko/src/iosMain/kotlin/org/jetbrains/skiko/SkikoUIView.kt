@@ -3,6 +3,7 @@ package org.jetbrains.skiko
 import kotlinx.cinterop.*
 import org.jetbrains.skia.Point
 import org.jetbrains.skia.Rect
+import org.jetbrains.skiko.ios.SkikoUITextInputTraits
 import platform.CoreGraphics.*
 import platform.Foundation.*
 import platform.UIKit.*
@@ -10,14 +11,9 @@ import platform.darwin.NSInteger
 import kotlin.math.max
 import kotlin.math.min
 
-/*
- TODO: remove org.jetbrains.skiko.objc.UIViewExtensionProtocol after Kotlin 1.8.20
- https://youtrack.jetbrains.com/issue/KT-40426
-*/
 @Suppress("CONFLICTING_OVERLOADS")
 @ExportObjCClass
-class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
-    org.jetbrains.skiko.objc.UIViewExtensionProtocol {
+class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
     @OverrideInit
     constructor(frame: CValue<CGRect>) : super(frame)
 
@@ -29,25 +25,20 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
     }
 
     private var skiaLayer: SkiaLayer? = null
-    private lateinit var _pointInside: (Point, UIEvent?) -> Boolean
+    private var _pointInside: (Point, UIEvent?) -> Boolean = { _, _ -> true }
+    private var _skikoUITextInputTrains: SkikoUITextInputTraits = object : SkikoUITextInputTraits {}
     private var _inputDelegate: UITextInputDelegateProtocol? = null
     private var _currentTextMenuActions: TextActions? = null
-    var currentKeyboardType: UIKeyboardType = UIKeyboardTypeDefault
-    var currentKeyboardAppearance: UIKeyboardAppearance = UIKeyboardAppearanceDefault
-    var currentReturnKeyType: UIReturnKeyType = UIReturnKeyType.UIReturnKeyDefault
-    var currentTextContentType: UITextContentType? = null
-    var currentIsSecureTextEntry: Boolean = false
-    var currentEnablesReturnKeyAutomatically: Boolean = false
-    var currentAutocapitalizationType: UITextAutocapitalizationType = UITextAutocapitalizationType.UITextAutocapitalizationTypeSentences
-    var currentAutocorrectionType: UITextAutocorrectionType = UITextAutocorrectionType.UITextAutocorrectionTypeYes
 
     constructor(
         skiaLayer: SkiaLayer,
         frame: CValue<CGRect> = CGRectNull.readValue(),
-        pointInside: (Point, UIEvent?) -> Boolean = {_,_-> true }
+        pointInside: (Point, UIEvent?) -> Boolean = {_,_-> true },
+        skikoUITextInputTrains: SkikoUITextInputTraits = object : SkikoUITextInputTraits {},
     ) : super(frame) {
         this.skiaLayer = skiaLayer
         _pointInside = pointInside
+        _skikoUITextInputTrains = skikoUITextInputTrains
     }
 
     /**
@@ -58,16 +49,24 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
     fun showTextMenu(targetRect: Rect, textActions: TextActions) {
         _currentTextMenuActions = textActions
         val menu: UIMenuController = UIMenuController.sharedMenuController()
-        if (menu.isMenuVisible()) {
-            menu.hideMenu()
-        }
         val cgRect = CGRectMake(
             x = targetRect.left.toDouble(),
             y = targetRect.top.toDouble(),
             width = targetRect.width.toDouble(),
             height = targetRect.height.toDouble()
         )
-        menu.showMenuFromView(this, cgRect)
+        val isTargetVisible = CGRectIntersectsRect(bounds, cgRect)
+        if (isTargetVisible) {
+            if (menu.isMenuVisible()) {
+                menu.setTargetRect(cgRect, this)
+            } else {
+                menu.showMenuFromView(this, cgRect)
+            }
+        } else {
+            if (menu.isMenuVisible()) {
+                menu.hideMenu()
+            }
+        }
     }
 
     fun hideTextMenu() {
@@ -181,13 +180,32 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
         return _pointInside(skiaPoint, withEvent)
     }
 
+    /*
+     * When there at least one tracked touch, we need notify redrawer about it. It should schedule CADisplayLink which
+     * affects frequency of polling UITouch events on high frequency display and forces it to match display refresh rate.
+     */
+    private var touchesCount = 0
+        set(value) {
+            field = value
+
+            val needHighFrequencyPolling = value > 0
+
+            skiaLayer?.redrawer?.needsProactiveDisplayLink = needHighFrequencyPolling
+        }
+
     override fun touchesBegan(touches: Set<*>, withEvent: UIEvent?) {
         super.touchesBegan(touches, withEvent)
+
+        touchesCount += touches.size
+
         sendTouchEventToSkikoView(withEvent!!, SkikoPointerEventKind.DOWN)
     }
 
     override fun touchesEnded(touches: Set<*>, withEvent: UIEvent?) {
         super.touchesEnded(touches, withEvent)
+
+        touchesCount -= touches.size
+
         sendTouchEventToSkikoView(withEvent!!, SkikoPointerEventKind.UP)
     }
 
@@ -198,6 +216,9 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
 
     override fun touchesCancelled(touches: Set<*>, withEvent: UIEvent?) {
         super.touchesCancelled(touches, withEvent)
+
+        touchesCount -= touches.size
+
         sendTouchEventToSkikoView(withEvent!!, SkikoPointerEventKind.UP)
     }
 
@@ -225,6 +246,8 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
                 platform = event
             )
         )
+         // If invalidation doesn't happen while onPointerEvent is processed, it's too late to schedule any work for this frame.
+        skiaLayer?.redrawer?.preventDrawDispatchDuringCurrentFrame()
     }
 
     private val UITouch.isPressed get() =
@@ -460,37 +483,14 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol,
             else -> false
         }
 
-    override fun keyboardType(): UIKeyboardType {
-        return currentKeyboardType
-    }
-
-    override fun keyboardAppearance(): UIKeyboardAppearance {
-        return currentKeyboardAppearance
-    }
-
-    override fun returnKeyType(): UIReturnKeyType {
-        return currentReturnKeyType
-    }
-
-    override fun textContentType(): UITextContentType? {
-        return currentTextContentType
-    }
-
-    override fun isSecureTextEntry(): Boolean {
-        return currentIsSecureTextEntry //todo secure text to prevent copy
-    }
-
-    override fun enablesReturnKeyAutomatically(): Boolean {
-        return currentEnablesReturnKeyAutomatically
-    }
-
-    override fun autocapitalizationType(): UITextAutocapitalizationType {
-        return currentAutocapitalizationType
-    }
-
-    override fun autocorrectionType(): UITextAutocorrectionType {
-        return currentAutocorrectionType
-    }
+    override fun keyboardType(): UIKeyboardType = _skikoUITextInputTrains.keyboardType()
+    override fun keyboardAppearance(): UIKeyboardAppearance = _skikoUITextInputTrains.keyboardAppearance()
+    override fun returnKeyType(): UIReturnKeyType = _skikoUITextInputTrains.returnKeyType()
+    override fun textContentType(): UITextContentType? = _skikoUITextInputTrains.textContentType()
+    override fun isSecureTextEntry(): Boolean = _skikoUITextInputTrains.isSecureTextEntry()
+    override fun enablesReturnKeyAutomatically(): Boolean = _skikoUITextInputTrains.enablesReturnKeyAutomatically()
+    override fun autocapitalizationType(): UITextAutocapitalizationType = _skikoUITextInputTrains.autocapitalizationType()
+    override fun autocorrectionType(): UITextAutocorrectionType = _skikoUITextInputTrains.autocorrectionType()
 
     override fun dictationRecognitionFailed() {
         //todo may be useful

@@ -11,13 +11,12 @@ buildscript {
 
     dependencies {
         // __KOTLIN_COMPOSE_VERSION__
-        val kotlinVersion = project.property("kotlin.version") as String
-        classpath(kotlin("gradle-plugin", version = kotlinVersion))
+        classpath(kotlin("gradle-plugin", version = "1.8.20"))
     }
 }
 
 plugins {
-    kotlin("multiplatform")
+    kotlin("multiplatform") version "1.8.20"
     id("org.jetbrains.gradle.apple.applePlugin") version "222.3345.143-0.16"
 }
 

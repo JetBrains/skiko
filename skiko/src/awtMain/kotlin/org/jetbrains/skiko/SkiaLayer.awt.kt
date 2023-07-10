@@ -1,7 +1,11 @@
 package org.jetbrains.skiko
 
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.redrawer.Redrawer
+import org.jetbrains.skiko.redrawer.RedrawerManager
 import java.awt.Color
 import java.awt.Component
 import java.awt.event.*
@@ -14,9 +18,6 @@ import javax.swing.JPanel
 import javax.swing.SwingUtilities
 import javax.swing.SwingUtilities.isEventDispatchThread
 import javax.swing.UIManager
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 
 actual open class SkiaLayer internal constructor(
     externalAccessibleFactory: ((Component) -> Accessible)? = null,
@@ -297,15 +298,24 @@ actual open class SkiaLayer internal constructor(
 
     @Volatile
     private var isDisposed = false
-    internal var redrawer: Redrawer? = null
-    private val fallbackRenderApiQueue = SkikoProperties.fallbackRenderApiQueue(properties.renderApi).toMutableList()
-    private var renderApi_ = fallbackRenderApiQueue[0]
+
+    private val redrawerManager = RedrawerManager<Redrawer>(properties.renderApi) { renderApi, oldRedrawer ->
+        oldRedrawer?.dispose()
+        val newRedrawer = renderFactory.createRedrawer(this, renderApi, analytics, properties)
+        newRedrawer.syncSize()
+        newRedrawer
+    }
+
+    internal val redrawer: Redrawer?
+        get() = redrawerManager.redrawer
+
     actual var renderApi: GraphicsApi
-        get() = renderApi_
-        private set(value) {
-            this.renderApi_ = value
+        get() = redrawerManager.renderApi
+        set(value) {
+            redrawerManager.forceRenderApi(value)
             notifyChange(PropertyKind.Renderer)
         }
+
     val renderInfo: String
         get() = if (redrawer == null)
             "SkiaLayer isn't initialized yet"
@@ -317,34 +327,11 @@ actual open class SkiaLayer internal constructor(
     private var pictureRecorder: PictureRecorder? = null
     private val pictureLock = Any()
 
-    private fun findNextWorkingRenderApi() {
-        var thrown: Boolean
-        do {
-            thrown = false
-            try {
-                renderApi = fallbackRenderApiQueue.removeAt(0)
-                redrawer?.dispose()
-                redrawer = renderFactory.createRedrawer(this, renderApi, analytics, properties)
-                redrawer?.syncSize()
-            } catch (e: RenderException) {
-                Logger.warn(e) { "Fallback to next API" }
-                thrown = true
-            }
-        } while (thrown && fallbackRenderApiQueue.isNotEmpty())
-
-        if (thrown && fallbackRenderApiQueue.isEmpty()) {
-            throw RenderException("Cannot fallback to any render API")
-        }
-    }
-
     private fun init(recreation: Boolean = false) {
         isDisposed = false
         backedLayer.init()
         pictureRecorder = PictureRecorder()
-        if (recreation) {
-            fallbackRenderApiQueue.add(0, renderApi)
-        }
-        findNextWorkingRenderApi()
+        redrawerManager.findNextWorkingRenderApi(recreation)
         isInited = true
     }
 
@@ -366,7 +353,7 @@ actual open class SkiaLayer internal constructor(
         if (isInited && !isDisposed) {
             // we should dispose redrawer first (to cancel `draw` in rendering thread)
             redrawer?.dispose()
-            redrawer = null
+            redrawerManager.dispose()
             picture?.instance?.close()
             picture = null
             pictureRecorder?.close()
@@ -553,7 +540,7 @@ actual open class SkiaLayer internal constructor(
 
         // clipping
         for (component in clipComponents) {
-            canvas.clipRectBy(component)
+            canvas.clipRectBy(component, contentScale)
         }
 
         try {
@@ -584,7 +571,7 @@ actual open class SkiaLayer internal constructor(
         } catch (e: RenderException) {
             if (!isDisposed) {
                 Logger.warn(e) { "Exception in draw scope" }
-                findNextWorkingRenderApi()
+                redrawerManager.findNextWorkingRenderApi()
                 redrawer?.redrawImmediately()
             }
         }
@@ -623,20 +610,6 @@ actual open class SkiaLayer internal constructor(
             store.setImmutable()
             store
         }
-    }
-
-    private fun Canvas.clipRectBy(rectangle: ClipRectangle) {
-        val dpi = contentScale
-        clipRect(
-            Rect.makeLTRB(
-                rectangle.x * dpi,
-                rectangle.y * dpi,
-                (rectangle.x + rectangle.width) * dpi,
-                (rectangle.y + rectangle.height) * dpi
-            ),
-            ClipMode.DIFFERENCE,
-            true
-        )
     }
 
     private fun roundSize(value: Int): Int {
@@ -682,6 +655,19 @@ internal fun defaultFPSCounter(
         showLongFrames = fpsLongFramesShow,
         getLongFrameMillis = { fpsLongFramesMillis ?: (1.5 * 1000 / refreshRate) },
         logOnTick = true
+    )
+}
+
+internal fun Canvas.clipRectBy(rectangle: ClipRectangle, scale: Float) {
+    clipRect(
+        Rect.makeLTRB(
+            rectangle.x * scale,
+            rectangle.y * scale,
+            (rectangle.x + rectangle.width) * scale,
+            (rectangle.y + rectangle.height) * scale
+        ),
+        ClipMode.DIFFERENCE,
+        true
     )
 }
 

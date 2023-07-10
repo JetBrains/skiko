@@ -36,7 +36,7 @@ internal class SkikoGesturesDetector(
         return simpleGestures.onTouchEvent(event)
     }
 
-    private val simpleGestures = GestureDetector(context, object: SimpleOnGestureListener() {
+    private val simpleGestures = GestureDetector(context, object: WorkaroundSimpleOnGestureListener() {
         override fun onSingleTapUp(event: MotionEvent): Boolean {
             if (!containsGesture(SkikoGestureEventKind.TAP)) return false
             val density = layer.contentScale
@@ -78,8 +78,8 @@ internal class SkikoGesturesDetector(
             )
         }
 
-        override fun onScroll(
-            event1: MotionEvent,
+        override fun onScrollWorkaround(
+            event1: MotionEvent?,
             event2: MotionEvent,
             distanceX: Float,
             distanceY: Float,
@@ -97,8 +97,8 @@ internal class SkikoGesturesDetector(
             return true
         }
 
-        override fun onFling(
-            event1: MotionEvent, 
+        override fun onFlingWorkaround(
+            event1: MotionEvent?,
             event2: MotionEvent, 
             velocityX: Float, 
             velocityY: Float
@@ -277,3 +277,5 @@ internal class SkikoGesturesDetector(
         }
     }
 }
+
+typealias MotionEventNullableOrNo = MotionEvent?

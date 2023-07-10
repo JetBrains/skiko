@@ -278,6 +278,30 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nConcat44
     canvas->concat(*m);
 }
 
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nTranslate
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloat dx, jfloat dy) {
+    SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(ptr));
+    canvas->translate(dx, dy);
+}
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nScale
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloat sx, jfloat sy) {
+    SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(ptr));
+    canvas->scale(sx, sy);
+}
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nRotate
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloat deg, jfloat x, jfloat y) {
+    SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(ptr));
+    canvas->rotate(deg, x, y);
+}
+
+extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_CanvasKt__1nSkew
+  (JNIEnv* env, jclass jclass, jlong ptr, jfloat sx, jfloat sy) {
+    SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(ptr));
+    canvas->skew(sx, sy);
+}
+
 extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_CanvasKt__1nReadPixels
   (JNIEnv* env, jclass jclass, jlong ptr, jlong bitmapPtr, jint srcX, jint srcY) {
     SkCanvas* canvas = reinterpret_cast<SkCanvas*>(static_cast<uintptr_t>(ptr));

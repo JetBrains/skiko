@@ -32,7 +32,7 @@ internal object Setup {
         }
 
         if (automateGC) {
-           FrameWatcher.start()
+            FrameWatcher.start()
         }
     }
 }

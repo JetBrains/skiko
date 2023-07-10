@@ -1,13 +1,15 @@
 package SkiaAwtSample
 
-import org.jetbrains.skiko.*
 import org.jetbrains.skia.*
 import org.jetbrains.skia.paragraph.*
+import org.jetbrains.skiko.*
+import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
-import kotlin.math.PI
 
-class ClocksAwt(private val layer: SkiaLayer) : SkikoView {
+open class ClocksAwt(private val scaleProvider: () -> Float) : SkikoView {
+    constructor(layer: SkiaLayer) : this({ layer.contentScale })
+
     private val typeface = Typeface.makeFromFile("fonts/JetBrainsMono-Regular.ttf")
     private val font = Font(typeface, 13f).apply {
         edging = FontEdging.SUBPIXEL_ANTI_ALIAS
@@ -84,7 +86,7 @@ class ClocksAwt(private val layer: SkiaLayer) : SkikoView {
         }
         val paragraph = ParagraphBuilder(style, fontCollection)
             .pushStyle(TextStyle().setColor(0xFF000000.toInt()))
-            .addText("JRE: ${System.getProperty("java.vendor")}, ${System.getProperty("java.runtime.version")}, Graphics API: ${layer.renderApi} ✿ﾟ $currentSystemTheme")
+            .addText("JRE: ${System.getProperty("java.vendor")}, ${System.getProperty("java.runtime.version")} $currentSystemTheme")
             .popStyle()
             .build()
         paragraph.layout(Float.POSITIVE_INFINITY)
@@ -93,8 +95,9 @@ class ClocksAwt(private val layer: SkiaLayer) : SkikoView {
         // Alpha layers test
         val rectW = 100f
         val rectH = 100f
-        val left = (width / layer.contentScale - rectW) / 2f
-        val top = (height / layer.contentScale - rectH) / 2f
+        val scale = scaleProvider()
+        val left = (width / scale - rectW) / 2f
+        val top = (height / scale - rectH) / 2f
         val pictureRecorder = PictureRecorder()
         val pictureCanvas = pictureRecorder.beginRecording(
             Rect.makeLTRB(left, top, left + rectW, top + rectH)

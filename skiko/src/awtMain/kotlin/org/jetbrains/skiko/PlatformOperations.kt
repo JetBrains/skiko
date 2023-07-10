@@ -125,7 +125,7 @@ internal val platformOperations: PlatformOperations by lazy {
             }
         }
         OS.Android -> TODO()
-        OS.JS, OS.Ios -> {
+        OS.JS, OS.Ios, OS.Unknown -> {
             TODO("Commonize me")
         }
     }

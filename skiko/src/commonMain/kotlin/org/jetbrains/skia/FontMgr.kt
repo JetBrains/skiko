@@ -1,14 +1,7 @@
 package org.jetbrains.skia
 
-import org.jetbrains.skia.impl.InteropPointer
+import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.impl.Library.Companion.staticLoad
-import org.jetbrains.skia.impl.NativePointer
-import org.jetbrains.skia.impl.RefCnt
-import org.jetbrains.skia.impl.Stats
-import org.jetbrains.skia.impl.getPtr
-import org.jetbrains.skia.impl.interopScope
-import org.jetbrains.skia.impl.reachabilityBarrier
-import org.jetbrains.skia.impl.withStringResult
 
 open class FontMgr : RefCnt {
     companion object {
@@ -27,8 +20,8 @@ open class FontMgr : RefCnt {
             reachabilityBarrier(this)
         }
 
-    fun getFamilyName(index: Int): String {
-        return try {
+    fun getFamilyName(index: Int): String =
+        try {
             Stats.onNativeCall()
             withStringResult {
                 _nGetFamilyName(_ptr, index)
@@ -36,59 +29,55 @@ open class FontMgr : RefCnt {
         } finally {
             reachabilityBarrier(this)
         }
-    }
 
-    fun makeStyleSet(index: Int): FontStyleSet? {
-        return try {
+    fun makeStyleSet(index: Int): FontStyleSet? =
+        try {
             Stats.onNativeCall()
             val ptr = _nMakeStyleSet(_ptr, index)
             if (ptr == NullPointer) null else FontStyleSet(ptr)
         } finally {
             reachabilityBarrier(this)
         }
-    }
 
     /**
-     * The caller must call [.close] on the returned object.
-     * Never returns null; will return an empty set if the name is not found.
+     * The caller must call [close] on the returned object.
+     * Never returns `null`; will return an empty set if the name is not found.
      *
-     * Passing null as the parameter will return the default system family.
-     * Note that most systems don't have a default system family, so passing null will often
-     * result in the empty set.
+     * Passing `null` as the parameter will return the default system family.
+     * Note that most systems don't have a default system family, so passing
+     * `null` will often result in the empty set.
      *
      * It is possible that this will return a style set not accessible from
-     * [.makeStyleSet] due to hidden or auto-activated fonts.
+     * [makeStyleSet] due to hidden or auto-activated fonts.
      */
-    fun matchFamily(familyName: String?): FontStyleSet {
-        return try {
+    fun matchFamily(familyName: String?): FontStyleSet =
+        try {
             Stats.onNativeCall()
-            interopScope { FontStyleSet(_nMatchFamily(_ptr, toInterop(familyName)))  }
+            interopScope { FontStyleSet(_nMatchFamily(_ptr, toInterop(familyName))) }
         } finally {
             reachabilityBarrier(this)
         }
-    }
 
     /**
-     * Find the closest matching typeface to the specified familyName and style
-     * and return a ref to it. The caller must call [.close] on the returned
-     * object. Will return null if no 'good' match is found.
+     * Find the closest matching typeface to the specified [familyName] and [style]
+     * and return it. The caller must call [close] on the returned
+     * object. Will return `null` if no 'good' match is found.
      *
-     * Passing null as the parameter for `familyName` will return the
+     * Passing `null` as the value for [familyName] will return the
      * default system font.
      *
      * It is possible that this will return a style set not accessible from
-     * [.makeStyleSet] or [.matchFamily] due to hidden or
+     * [makeStyleSet] or [matchFamily] due to hidden or
      * auto-activated fonts.
      */
-    fun matchFamilyStyle(familyName: String?, style: FontStyle): Typeface? {
-        return try {
+    fun matchFamilyStyle(familyName: String?, style: FontStyle): Typeface? =
+        try {
             Stats.onNativeCall()
             val ptr = interopScope { _nMatchFamilyStyle(_ptr, toInterop(familyName), style._value) }
             if (ptr == NullPointer) null else Typeface(ptr)
         } finally {
             reachabilityBarrier(this)
         }
-    }
 
     fun matchFamiliesStyle(families: Array<String?>, style: FontStyle): Typeface? {
         for (family in families) {
@@ -103,13 +92,13 @@ open class FontMgr : RefCnt {
      * Note that bcp47 is a combination of ISO 639, 15924, and 3166-1 codes,
      * so it is fine to just pass a ISO 639 here.
      *
-     * Will return null if no family can be found for the character
+     * Will return `null` if no family can be found for the character
      * in the system fallback.
      *
-     * Passing `null` as the parameter for `familyName` will return the
+     * Passing `null` as the value for [familyName] will return the
      * default system font.
      *
-     * bcp47[0] is the least significant fallback, bcp47[bcp47.length-1] is the
+     * `bcp47[0]` is the least significant fallback, `bcp47[bcp47.length-1]` is the
      * most significant. If no specified bcp47 codes match, any font with the
      * requested character will be matched.
      */
@@ -118,8 +107,8 @@ open class FontMgr : RefCnt {
         style: FontStyle,
         bcp47: Array<String>?,
         character: Int
-    ): Typeface? {
-        return try {
+    ): Typeface? =
+        try {
             Stats.onNativeCall()
             val ptr = interopScope {
                 _nMatchFamilyStyleCharacter(
@@ -135,7 +124,6 @@ open class FontMgr : RefCnt {
         } finally {
             reachabilityBarrier(this)
         }
-    }
 
     fun matchFamiliesStyleCharacter(
         families: Array<String?>,
@@ -152,11 +140,11 @@ open class FontMgr : RefCnt {
 
     /**
      * Create a typeface for the specified data and TTC index (pass 0 for none)
-     * or null if the data is not recognized. The caller must call [.close] on
+     * or null if the data is not recognized. The caller must call [close] on
      * the returned object if it is not null.
      */
-    fun makeFromData(data: Data?, ttcIndex: Int = 0): Typeface? {
-        return try {
+    fun makeFromData(data: Data?, ttcIndex: Int = 0): Typeface? =
+        try {
             Stats.onNativeCall()
             val ptr =
                 _nMakeFromData(_ptr, getPtr(data), ttcIndex)
@@ -165,7 +153,6 @@ open class FontMgr : RefCnt {
             reachabilityBarrier(this)
             reachabilityBarrier(data)
         }
-    }
 
     internal constructor(ptr: NativePointer) : super(ptr)
 

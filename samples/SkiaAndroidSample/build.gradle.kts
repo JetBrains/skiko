@@ -88,3 +88,8 @@ tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompile>().configureEach
     dependsOn(unzipTaskX64)
     dependsOn(unzipTaskArm64)
 }
+
+tasks.withType<Copy> {
+    // This line needs to properly merge MANIFEST files from jars into dex
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
