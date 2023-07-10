@@ -22,8 +22,8 @@ val Project.supportWasm: Boolean
 val Project.supportJs: Boolean
     get() = findProperty("skiko.js.enabled") == "true" || isInIdea
 
-val coroutinesVersion = if (supportWasm) "1.7.0-RC-wasm0" else "1.7.0-RC"
-val atomicFuVersion = if (supportWasm) "0.20.2-wasm0" else "0.20.2"
+val coroutinesVersion = if (supportWasm) "1.7.2-wasm0" else "1.7.2"
+val atomicFuVersion = if (supportWasm) "0.21.0-wasm0" else "0.21.0"
 
 fun targetSuffix(os: OS, arch: Arch): String {
     return "${os.id}_${arch.id}"
@@ -53,13 +53,13 @@ configurations.all {
         if (requested.module.group == "org.jetbrains.kotlinx" &&
             requested.module.name.contains("kotlinx-coroutines", true)
         ) {
-            if (!isWasm) useVersion("1.7.0-RC")
+            if (!isWasm) useVersion("1.7.2")
         }
 
         if (requested.module.group == "org.jetbrains.kotlinx" &&
             requested.module.name.contains("atomicfu", true)
         ) {
-            if (!isWasm) useVersion("0.20.2")
+            if (!isWasm) useVersion("0.21.0")
         }
     }
 }
