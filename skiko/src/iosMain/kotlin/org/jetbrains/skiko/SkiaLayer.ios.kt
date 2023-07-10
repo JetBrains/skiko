@@ -66,7 +66,7 @@ actual open class SkiaLayer {
             initGestures()
         }
 
-    internal fun initGestures() {
+    fun initGestures() {
         gesturesDetector.setGesturesToListen(gesturesToListen)
     }
 
@@ -95,7 +95,7 @@ actual open class SkiaLayer {
     }
     actual var skikoView: SkikoView? = null
 
-    internal var redrawer: MetalRedrawer? = null
+    var redrawer: MetalRedrawer? = null
     private var contextHandler: MetalContextHandler? = null
 
     internal actual fun draw(canvas: Canvas) {

@@ -32,8 +32,14 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_mak
         MetalDevice *device = (__bridge MetalDevice *) (void *) devicePtr;
         GrBackendRenderTarget* renderTarget = NULL;
 
+        /// If we have more than `maximumDrawableCount` command buffers inflight, wait until one of them finishes work.
+        dispatch_semaphore_wait(device.inflightSemaphore, DISPATCH_TIME_FOREVER);
+
         id<CAMetalDrawable> currentDrawable = [device.layer nextDrawable];
         if (!currentDrawable) {
+            /// Signal semaphore immediately, no command buffer will be commited
+            dispatch_semaphore_signal(device.inflightSemaphore);
+
             return NULL;
         }
         device.drawableHandle = currentDrawable;
@@ -56,6 +62,10 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_fini
             id<MTLCommandBuffer> commandBuffer = [device.queue commandBuffer];
             commandBuffer.label = @"Present";
             [commandBuffer presentDrawable:currentDrawable];
+            [commandBuffer addCompletedHandler:^(id<MTLCommandBuffer> buffer) {
+                /// commands have completed, allow next waiting (if any) to start encoding new work to gpu
+                dispatch_semaphore_signal(device.inflightSemaphore);
+            }];
             [commandBuffer commit];
             device.drawableHandle = nil;
         }

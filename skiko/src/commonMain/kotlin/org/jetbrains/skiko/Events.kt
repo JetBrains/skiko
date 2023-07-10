@@ -239,4 +239,6 @@ data class SkikoPointer(
 
 @DelicateSkikoApi
 val Iterable<SkikoPointer>.centroidX get() = asSequence().map { it.x }.average()
-internal val Iterable<SkikoPointer>.centroidY get() = asSequence().map { it.y }.average()
+
+@DelicateSkikoApi
+val Iterable<SkikoPointer>.centroidY get() = asSequence().map { it.y }.average()

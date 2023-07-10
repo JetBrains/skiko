@@ -25,7 +25,7 @@ private enum class DrawSchedulingState {
     SCHEDULED_ON_NEXT_FRAME
 }
 
-internal class MetalRedrawer(
+class MetalRedrawer(
     private val layer: SkiaLayer
 ) : Redrawer {
     private val contextHandler = MetalContextHandler(layer)
