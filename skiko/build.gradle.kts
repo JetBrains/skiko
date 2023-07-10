@@ -1407,6 +1407,7 @@ fun configureSignAndPublishDependencies() {
                 name.startsWith(publishJs) -> task.dependsOn(signWasm, signWasmPub)
                 name.startsWith(publishWasm) -> task.dependsOn(signJs)
                 name.startsWith(publishWasmPub) -> task.dependsOn(signJs)
+                name.startsWith(signWasmPub) -> task.dependsOn(signWasm)
             }
         }
     }
