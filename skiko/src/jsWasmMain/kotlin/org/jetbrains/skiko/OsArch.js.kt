@@ -23,7 +23,7 @@ actual val kotlinBackend: KotlinBackend
  * but not supported in all browsers
  */
 private fun getNavigatorInfo(): String =
-    js("navigator.userAgentData ? navigator.userAgentData.platform : navigator.platform") as String
+    js("navigator.userAgentData ? navigator.userAgentData.platform : navigator.platform") //as String // k/wasm requires only 1 expression in a function calling `js`
 
 
 /**
