@@ -1455,9 +1455,10 @@ fun configureSignAndPublishDependencies() {
             val publishWasm = "publishSkikoWasmRuntimePublicationTo"
             val signWasm = "signSkikoWasmRuntimePublication"
             val signJs = "signJsPublication"
+            val signWasmPub = "signWasmPublication"
 
             when {
-                name.startsWith(publishJs) -> task.dependsOn(signWasm)
+                name.startsWith(publishJs) -> task.dependsOn(signWasm, signWasmPub)
                 name.startsWith(publishWasm) -> task.dependsOn(signJs)
             }
         }
@@ -1579,3 +1580,15 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile>().configur
     // https://youtrack.jetbrains.com/issue/KT-56583
     compilerOptions.freeCompilerArgs.add("-XXLanguage:+ImplicitSignedToUnsignedIntegerConversion")
 }
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile>().configureEach {
+    kotlinOptions {
+        freeCompilerArgs += "-Xopt-in=kotlinx.cinterop.ExperimentalForeignApi"
+    }
+}
+
+//tasks.withType(KotlinCompile::class.java).configureEach {
+//    kotlinOptions {
+//        freeCompilerArgs += "-Xopt-in=kotlinx.cinterop.ExperimentalForeignApi"
+//    }
+//}
