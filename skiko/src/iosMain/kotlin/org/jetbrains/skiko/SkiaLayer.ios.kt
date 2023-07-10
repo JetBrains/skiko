@@ -7,8 +7,8 @@ import org.jetbrains.skiko.context.MetalContextHandler
 import org.jetbrains.skiko.redrawer.MetalRedrawer
 import platform.UIKit.*
 import kotlin.system.getTimeNanos
-import org.jetbrains.skia.*
 
+@OptIn(InternalSkikoApi::class)
 actual open class SkiaLayer {
 
     fun isShowing(): Boolean {
@@ -60,12 +60,14 @@ actual open class SkiaLayer {
     internal var view: UIView? = null
     // We need to keep reference to gesturesDetector as Objective-C will only keep weak reference here.
     internal var gesturesDetector = SkikoGesturesDetector(this)
+
     var gesturesToListen: Array<SkikoGestureEventKind>? = null
         set(value) {
             field = value
             initGestures()
         }
 
+    @InternalSkikoApi
     fun initGestures() {
         gesturesDetector.setGesturesToListen(gesturesToListen)
     }
@@ -84,6 +86,7 @@ actual open class SkiaLayer {
     }
 
     private var isDisposed = false
+
     actual fun detach() {
         if (!isDisposed) {
             redrawer?.dispose()
@@ -95,6 +98,7 @@ actual open class SkiaLayer {
     }
     actual var skikoView: SkikoView? = null
 
+    @InternalSkikoApi
     var redrawer: MetalRedrawer? = null
     private var contextHandler: MetalContextHandler? = null
 

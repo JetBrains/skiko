@@ -35,4 +35,4 @@ annotation class ExperimentalSkikoApi
     level = RequiresOptIn.Level.WARNING,
     message = "This is an internal API. Please don't use it."
 )
-annotation class SkikoInternalApi
+annotation class InternalSkikoApi
