@@ -237,5 +237,6 @@ data class SkikoPointer(
     val pressure: Double = 1.0,
 )
 
-internal val Iterable<SkikoPointer>.centroidX get() = asSequence().map { it.x }.average()
+@DelicateSkikoApi
+val Iterable<SkikoPointer>.centroidX get() = asSequence().map { it.x }.average()
 internal val Iterable<SkikoPointer>.centroidY get() = asSequence().map { it.y }.average()
