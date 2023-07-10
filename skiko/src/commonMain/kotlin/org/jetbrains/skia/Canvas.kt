@@ -1589,15 +1589,19 @@ private external fun _nClipPath(ptr: NativePointer, nativePath: NativePointer, m
 private external fun _nClipRegion(ptr: NativePointer, nativeRegion: NativePointer, mode: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nTranslate")
+@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nTranslate")
 private external fun _nTranslate(ptr: NativePointer, dx: Float, dy: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nScale")
+@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nScale")
 private external fun _nScale(ptr: NativePointer, sx: Float, sy: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nRotate")
+@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nRotate")
 private external fun _nRotate(ptr: NativePointer, deg: Float, x: Float, y: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nSkew")
+@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nSkew")
 private external fun _nSkew(ptr: NativePointer, sx: Float, sy: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nConcat")
