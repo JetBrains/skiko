@@ -27,3 +27,12 @@ annotation class DelicateSkikoApi
             "and can have bugs."
 )
 annotation class ExperimentalSkikoApi
+
+/**
+ * Marks declarations that we did not intend to make public.
+ */
+@RequiresOptIn(
+    level = RequiresOptIn.Level.WARNING,
+    message = "This is an internal API. Please don't use it."
+)
+annotation class SkikoInternalApi
