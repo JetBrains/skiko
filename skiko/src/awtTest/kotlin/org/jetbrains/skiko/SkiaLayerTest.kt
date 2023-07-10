@@ -2,6 +2,7 @@ package org.jetbrains.skiko
 
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.FontMgr
@@ -12,6 +13,7 @@ import org.jetbrains.skia.paragraph.ParagraphBuilder
 import org.jetbrains.skia.paragraph.ParagraphStyle
 import org.jetbrains.skia.paragraph.TextStyle
 import org.jetbrains.skiko.context.JvmContextHandler
+import org.jetbrains.skiko.redrawer.MetalRedrawer
 import org.jetbrains.skiko.redrawer.Redrawer
 import org.jetbrains.skiko.util.ScreenshotTestRule
 import org.jetbrains.skiko.util.UiTestScope
@@ -19,14 +21,13 @@ import org.jetbrains.skiko.util.UiTestWindow
 import org.jetbrains.skiko.util.uiTest
 import org.junit.Assert.assertEquals
 import org.junit.Assume.assumeTrue
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
-import java.awt.event.ComponentAdapter
-import java.awt.event.ComponentEvent
-import java.awt.event.WindowEvent
+import java.awt.event.*
 import javax.swing.JFrame
 import javax.swing.JLayeredPane
 import javax.swing.JPanel
@@ -35,6 +36,8 @@ import javax.swing.WindowConstants
 import kotlin.random.Random
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
+import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
 
 @Suppress("BlockingMethodInNonBlockingContext", "SameParameterValue")
 class SkiaLayerTest {
@@ -55,6 +58,69 @@ class SkiaLayerTest {
 
     @get:Rule
     val screenshots = ScreenshotTestRule()
+
+    @OptIn(ExperimentalTime::class)
+    @Ignore
+    @Test
+    fun `metal drawables not lost`() = uiTest {
+        val window = UiTestWindow(
+            properties = SkiaLayerProperties(
+                isVsyncEnabled = true
+            )
+        )
+        val colors = arrayOf(
+            Color.RED,
+            Color.GREEN,
+            Color.BLUE,
+            Color.YELLOW
+        )
+
+        var counter1 = 0
+        var counter2 = 0
+        val paint = Paint()
+
+        try {
+            window.setLocation(200, 200)
+            window.setSize(400, 600)
+            window.defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
+            window.layer.skikoView = object : SkikoView {
+                override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+                    val c1 = counter1
+                    val c2 = counter2
+
+                    paint.color = colors[c1.mod(colors.size)].rgb
+                    canvas.drawRect(Rect(0f, 0f, width.toFloat(), height / 2f), paint)
+
+                    paint.color = colors[c2.mod(colors.size)].rgb
+                    canvas.drawRect(Rect(0f, height / 2f, width.toFloat(), height.toFloat()), paint)
+                }
+            }
+            window.isVisible = true
+
+            window.addKeyListener(object : KeyAdapter() {
+                override fun keyTyped(e: KeyEvent?) {
+                    launch {
+                        val redrawer = window.layer.redrawer as MetalRedrawer
+                        redrawer.drawSync()
+                        counter1 += 1
+                        redrawer.drawSync()
+                        counter2 += 1
+                        redrawer.drawSync()
+                    }
+                }
+            });
+
+            window.addWindowListener(object : WindowAdapter() {
+                override fun windowActivated(e: WindowEvent?) {
+                    window.requestFocus()
+                }
+            })
+
+            delay(Duration.INFINITE)
+        } finally {
+            window.close()
+        }
+    }
 
     @Test
     fun `should not leak native windows`() = uiTest {

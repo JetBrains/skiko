@@ -104,6 +104,9 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
         device.layer.opaque = NO;
         device.layer.framebufferOnly = NO;
 
+        /// max inflight command buffers count matches swapchain size to avoid overcommitment
+        device.inflightSemaphore = dispatch_semaphore_create(device.layer.maximumDrawableCount);
+
         if (transparency)
         {
             NSWindow* window = (__bridge NSWindow*) (void *) windowPtr;

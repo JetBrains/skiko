@@ -62,6 +62,7 @@ internal class MetalRedrawer(
         }
 
     private val adapter = chooseMetalAdapter(properties.adapterPriority)
+    private val displayLinkThrottler = DisplayLinkThrottler()
 
     init {
         onDeviceChosen(adapter.name)
@@ -88,11 +89,17 @@ internal class MetalRedrawer(
         onContextInit()
     }
 
+    fun drawSync() {
+        layer.update(System.nanoTime())
+        performDraw()
+    }
+
     override fun dispose() = synchronized(drawLock) {
         frameDispatcher.cancel()
         contextHandler.dispose()
         disposeDevice(device.ptr)
         adapter.dispose()
+        displayLinkThrottler.dispose()
         _device = null
         super.dispose()
     }
@@ -142,6 +149,11 @@ internal class MetalRedrawer(
 
     private fun performDraw() = synchronized(drawLock) {
         if (!isDisposed) {
+            // Wait for vsync because:
+            // - macOS drops the second/next drawables if they are sent in the same vsync
+            // - it makes frames consistent and limits FPS
+            displayLinkThrottler.waitVSync(windowPtr = layer.windowHandle)
+
             val handle = startRendering()
             try {
                 contextHandler.draw()
