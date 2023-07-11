@@ -3,14 +3,17 @@ package org.jetbrains.skiko
 import kotlinx.cinterop.useContents
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.PixelGeometry
-import org.jetbrains.skiko.context.MetalContextHandler
-import org.jetbrains.skiko.redrawer.MetalRedrawer
 import platform.UIKit.*
 import kotlin.system.getTimeNanos
 import org.jetbrains.skia.*
 
 @OptIn(InternalSkikoApi::class)
 actual open class SkiaLayer {
+
+    @InternalSkikoApi
+    var needRedrawCallback: () -> Unit = {  }
+    @InternalSkikoApi
+    var detachCallback: () -> Unit = {}
 
     fun isShowing(): Boolean {
         return true
@@ -78,15 +81,6 @@ actual open class SkiaLayer {
         TODO("redundant for iOS")
     }
 
-    fun attachTo(view: UIView) {
-        this.view = view
-        contextHandler = MetalContextHandler(this)
-        // TODO: maybe add observer for view.viewDidDisappear() to detach us?
-        redrawer = MetalRedrawer(this).apply {
-            needRedraw()
-        }
-    }
-
     private var isDisposed = false
 
     actual fun detach() {
@@ -96,19 +90,6 @@ actual open class SkiaLayer {
         }
     }
     actual var skikoView: SkikoView? = null
-
-    internal var redrawer: MetalRedrawer? = null
-    private var contextHandler: MetalContextHandler? = null
-
-    @InternalSkikoApi
-    var needRedrawCallback: () -> Unit = { redrawer?.needRedraw() }
-    @InternalSkikoApi
-    var detachCallback: () -> Unit = {
-        redrawer?.dispose()
-        redrawer = null
-        contextHandler?.dispose()
-        contextHandler = null
-    }
 
     @InternalSkikoApi
     actual fun draw(canvas: Canvas) {
