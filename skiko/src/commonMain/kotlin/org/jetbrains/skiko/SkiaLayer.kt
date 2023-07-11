@@ -4,10 +4,16 @@ import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.Picture
 import org.jetbrains.skia.PixelGeometry
 
+interface SkiaLayerInterface {
+    var skikoView: SkikoView?
+    fun needRedraw()
+    fun detach()
+}
+
 /**
  * Generic layer for Skiko rendering.
  */
-expect open class SkiaLayer {
+expect open class SkiaLayer: SkiaLayerInterface {
     /**
      * Current graphics API used for rendering.
      */
@@ -40,7 +46,7 @@ expect open class SkiaLayer {
     /**
      * Current view used for rendering.
      */
-    var skikoView: SkikoView?
+    override var skikoView: SkikoView?
 
     /**
      * Attach this SkikoView to platform container.
@@ -51,18 +57,17 @@ expect open class SkiaLayer {
     /**
      * Detach this SkikoView from platform container.
      */
-    fun detach()
+    override fun detach()
 
     /**
      * Force redraw.
      */
-    fun needRedraw()
+    override fun needRedraw()
 
     /**
      * Drawing function.
      */
-    @InternalSkikoApi
-    fun draw(canvas: Canvas)
+    internal fun draw(canvas: Canvas)
 }
 
 

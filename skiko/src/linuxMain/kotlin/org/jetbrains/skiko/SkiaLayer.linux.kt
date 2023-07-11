@@ -3,7 +3,7 @@ package org.jetbrains.skiko
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.PixelGeometry
 
-actual open class SkiaLayer  {
+actual open class SkiaLayer : SkiaLayerInterface  {
     actual var renderApi: GraphicsApi
         get() = TODO("Not yet implemented")
         set(value) {}
@@ -17,13 +17,13 @@ actual open class SkiaLayer  {
         set(value) {}
     actual val component: Any?
         get() = TODO("Not yet implemented")
-    actual fun needRedraw() {
+    actual override fun needRedraw() {
         TODO("unimplemented")
     }
     actual fun attachTo(container: Any) {
         TODO("unimplemented")
     }
-    actual fun detach() {
+    actual override fun detach() {
         TODO("unimplemented")
     }
 
@@ -32,7 +32,7 @@ actual open class SkiaLayer  {
         TODO("unimplemented")
     }
 
-    actual var skikoView: SkikoView? = null
+    actual override var skikoView: SkikoView? = null
     actual val pixelGeometry: PixelGeometry
         get() = TODO("Not yet implemented")
 }

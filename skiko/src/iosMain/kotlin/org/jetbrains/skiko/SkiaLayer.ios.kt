@@ -8,7 +8,7 @@ import kotlin.system.getTimeNanos
 import org.jetbrains.skia.*
 
 @OptIn(InternalSkikoApi::class)
-actual open class SkiaLayer {
+actual open class SkiaLayer : SkiaLayerInterface {
 
     @InternalSkikoApi
     var needRedrawCallback: () -> Unit = {  }
@@ -44,7 +44,7 @@ actual open class SkiaLayer {
         get() = false
         set(value) { throw UnsupportedOperationException() }
 
-    actual fun needRedraw() {
+    actual override fun needRedraw() {
         needRedrawCallback()
     }
 
@@ -83,13 +83,13 @@ actual open class SkiaLayer {
 
     private var isDisposed = false
 
-    actual fun detach() {
+    actual override fun detach() {
         if (!isDisposed) {
             detachCallback()
             isDisposed = true
         }
     }
-    actual var skikoView: SkikoView? = null
+    actual override var skikoView: SkikoView? = null
 
     @InternalSkikoApi
     actual fun draw(canvas: Canvas) {

@@ -16,7 +16,7 @@ import org.w3c.dom.events.WheelEvent
  * SkikoLayer needs to be initialized with [HTMLCanvasElement] instance
  * using [attachTo] method.
  */
-actual open class SkiaLayer {
+actual open class SkiaLayer : SkiaLayerInterface {
     private var state: CanvasRenderer? = null
 
     /**
@@ -51,7 +51,7 @@ actual open class SkiaLayer {
     /**
      * Schedules a drawFrame to the appropriate moment.
      */
-    actual fun needRedraw() {
+    actual override fun needRedraw() {
         state?.needRedraw()
     }
 
@@ -59,7 +59,7 @@ actual open class SkiaLayer {
      * An implementation of SkikoView with content rendering and
      * event processing logic.
      */
-    actual var skikoView: SkikoView? = null
+    actual override var skikoView: SkikoView? = null
 
     /**
      * @param container - should be an instance of [HTMLCanvasElement]
@@ -68,7 +68,7 @@ actual open class SkiaLayer {
         attachTo(container as HTMLCanvasElement, false)
     }
 
-    actual fun detach() {
+    actual override fun detach() {
         // TODO: when switch to the frame dispatcher - stop it here.
     }
 

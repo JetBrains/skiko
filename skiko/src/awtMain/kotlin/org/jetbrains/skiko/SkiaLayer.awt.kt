@@ -25,7 +25,7 @@ actual open class SkiaLayer internal constructor(
     private val renderFactory: RenderFactory = RenderFactory.Default,
     private val analytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty,
     actual val pixelGeometry: PixelGeometry = PixelGeometry.UNKNOWN,
-) : JPanel() {
+) : JPanel(), SkiaLayerInterface {
 
     internal companion object {
         init {
@@ -162,7 +162,7 @@ actual open class SkiaLayer internal constructor(
     }
 
 
-    actual fun detach() {
+    actual override fun detach() {
         dispose()
     }
 
@@ -219,7 +219,7 @@ actual open class SkiaLayer internal constructor(
     actual val component: Any?
         get() = backedLayer
 
-    actual var skikoView: SkikoView? = null
+    actual override var skikoView: SkikoView? = null
 
     actual fun attachTo(container: Any) {
         attachTo(container as JComponent)
@@ -513,7 +513,7 @@ actual open class SkiaLayer internal constructor(
     /**
      * Redraw on the next animation Frame (on vsync signal if vsync is enabled).
      */
-    actual fun needRedraw() {
+    actual override fun needRedraw() {
         check(isEventDispatchThread()) { "Method should be called from AWT event dispatch thread" }
         check(!isDisposed) { "SkiaLayer is disposed" }
         redrawer?.needRedraw()
