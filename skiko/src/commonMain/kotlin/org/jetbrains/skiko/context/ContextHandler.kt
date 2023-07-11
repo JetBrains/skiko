@@ -3,8 +3,7 @@ package org.jetbrains.skiko.context
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
 
-@InternalSkikoApi
-abstract class ContextHandler(
+internal abstract class ContextHandler(
     protected val layer: SkiaLayer,
     private val drawContent: Canvas.() -> Unit
 ) {
