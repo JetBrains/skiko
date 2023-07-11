@@ -1,9 +1,6 @@
 package org.jetbrains.skiko.redrawer
 
-import org.jetbrains.skiko.InternalSkikoApi
-
-@InternalSkikoApi
-interface Redrawer {
+internal interface Redrawer {
     fun dispose()
     fun needRedraw()
     fun redrawImmediately()
