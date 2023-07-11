@@ -61,7 +61,8 @@ expect open class SkiaLayer {
     /**
      * Drawing function.
      */
-    internal fun draw(canvas: Canvas)
+    @InternalSkikoApi
+    fun draw(canvas: Canvas)
 }
 
 

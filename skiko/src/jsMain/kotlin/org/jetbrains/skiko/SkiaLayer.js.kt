@@ -150,7 +150,8 @@ actual open class SkiaLayer {
         onContentScaleChanged?.invoke(contentScale)
     }
 
-    internal actual fun draw(canvas: Canvas) {
+    @InternalSkikoApi
+    actual fun draw(canvas: Canvas) {
         skikoView?.onRender(canvas, state!!.width, state!!.height, currentNanoTime())
     }
 

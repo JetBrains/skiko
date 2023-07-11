@@ -3,7 +3,6 @@ package org.jetbrains.skiko.redrawer
 import kotlinx.cinterop.*
 import org.jetbrains.skia.BackendRenderTarget
 import org.jetbrains.skia.DirectContext
-import org.jetbrains.skiko.InternalSkikoApi
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.context.ContextHandler
 import org.jetbrains.skiko.context.MetalContextHandler
@@ -26,8 +25,7 @@ private enum class DrawSchedulingState {
     SCHEDULED_ON_NEXT_FRAME
 }
 
-@InternalSkikoApi
-class MetalRedrawer(
+internal class MetalRedrawer(
     private val layer: SkiaLayer
 ) : Redrawer {
     private val contextHandler = MetalContextHandler(layer)

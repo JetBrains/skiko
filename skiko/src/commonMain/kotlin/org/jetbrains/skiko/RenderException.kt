@@ -1,6 +1,7 @@
 package org.jetbrains.skiko
 
-internal class RenderException(
+@InternalSkikoApi
+class RenderException(
     message: String? = null,
     cause: Throwable? = null
 ) : RuntimeException(message, cause)

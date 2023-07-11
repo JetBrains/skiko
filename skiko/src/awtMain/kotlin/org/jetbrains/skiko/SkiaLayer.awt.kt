@@ -577,7 +577,8 @@ actual open class SkiaLayer internal constructor(
         }
     }
 
-    actual internal fun draw(canvas: Canvas) {
+    @InternalSkikoApi
+    actual fun draw(canvas: Canvas) {
         check(!isDisposed) { "SkiaLayer is disposed" }
         lockPicture {
             canvas.drawPicture(it.instance)
