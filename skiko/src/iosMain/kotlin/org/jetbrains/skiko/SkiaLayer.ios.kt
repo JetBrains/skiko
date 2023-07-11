@@ -3,13 +3,17 @@ package org.jetbrains.skiko
 import kotlinx.cinterop.useContents
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.PixelGeometry
-import org.jetbrains.skiko.context.MetalContextHandler
-import org.jetbrains.skiko.redrawer.MetalRedrawer
 import platform.UIKit.*
 import kotlin.system.getTimeNanos
+import org.jetbrains.skia.*
 
 @OptIn(InternalSkikoApi::class)
-actual open class SkiaLayer {
+actual open class SkiaLayer : SkiaLayerInterface {
+
+    @InternalSkikoApi
+    var needRedrawCallback: () -> Unit = {  }
+    @InternalSkikoApi
+    var detachCallback: () -> Unit = {}
 
     fun isShowing(): Boolean {
         return true
@@ -40,8 +44,8 @@ actual open class SkiaLayer {
         get() = false
         set(value) { throw UnsupportedOperationException() }
 
-    actual fun needRedraw() {
-        redrawer?.needRedraw()
+    actual override fun needRedraw() {
+        needRedrawCallback()
     }
 
     actual val component: Any?
@@ -57,7 +61,8 @@ actual open class SkiaLayer {
             return@useContents size.height.toFloat()
         }
 
-    internal var view: UIView? = null
+    @InternalSkikoApi
+    var view: UIView? = null
     // We need to keep reference to gesturesDetector as Objective-C will only keep weak reference here.
     internal var gesturesDetector = SkikoGesturesDetector(this)
 
@@ -73,36 +78,21 @@ actual open class SkiaLayer {
     }
 
     actual fun attachTo(container: Any) {
-        attachTo(container as UIView)
-    }
-
-    fun attachTo(view: UIView) {
-        this.view = view
-        contextHandler = MetalContextHandler(this)
-        // TODO: maybe add observer for view.viewDidDisappear() to detach us?
-        redrawer = MetalRedrawer(this).apply {
-            needRedraw()
-        }
+        TODO("redundant for iOS")
     }
 
     private var isDisposed = false
 
-    actual fun detach() {
+    actual override fun detach() {
         if (!isDisposed) {
-            redrawer?.dispose()
-            redrawer = null
-            contextHandler?.dispose()
-            contextHandler = null
+            detachCallback()
             isDisposed = true
         }
     }
-    actual var skikoView: SkikoView? = null
+    actual override var skikoView: SkikoView? = null
 
     @InternalSkikoApi
-    var redrawer: MetalRedrawer? = null
-    private var contextHandler: MetalContextHandler? = null
-
-    internal actual fun draw(canvas: Canvas) {
+    actual fun draw(canvas: Canvas) {
         check(!isDisposed) { "SkiaLayer is disposed" }
         val (w, h) = view!!.frame.useContents {
             size.width to size.height

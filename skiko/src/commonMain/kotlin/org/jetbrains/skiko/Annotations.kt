@@ -33,6 +33,6 @@ annotation class ExperimentalSkikoApi
  */
 @RequiresOptIn(
     level = RequiresOptIn.Level.WARNING,
-    message = "This is an internal API. Please don't use it."
+    message = "This is an internal API. Please don't use it outside of Skiko"
 )
 annotation class InternalSkikoApi

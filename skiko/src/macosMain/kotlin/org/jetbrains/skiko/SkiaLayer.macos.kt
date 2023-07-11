@@ -29,7 +29,7 @@ import platform.CoreGraphics.CGRectMake
  * SkiaLayer implementation for macOS.
  * Supports only [GraphicsApi.METAL]
  */
-actual open class SkiaLayer {
+actual open class SkiaLayer : SkiaLayerInterface {
     fun isShowing(): Boolean {
         return true
     }
@@ -82,7 +82,7 @@ actual open class SkiaLayer {
     /**
      * Implements rendering logic and events processing.
      */
-    actual var skikoView: SkikoView? = null
+    actual override var skikoView: SkikoView? = null
 
     internal var redrawer: Redrawer? = null
 
@@ -247,7 +247,7 @@ actual open class SkiaLayer {
         }
     }
 
-    actual fun detach() {
+    actual override fun detach() {
         redrawer?.dispose()
         redrawer = null
     }
@@ -255,7 +255,7 @@ actual open class SkiaLayer {
     /**
      * Schedules a frame to an appropriate moment.
      */
-    actual fun needRedraw() {
+    actual override fun needRedraw() {
         redrawer?.needRedraw()
     }
 
@@ -277,7 +277,8 @@ actual open class SkiaLayer {
         this.picture = PictureHolder(picture, pictureWidth.toInt(), pictureHeight.toInt())
     }
 
-    internal actual fun draw(canvas: Canvas) {
+    @InternalSkikoApi
+    actual fun draw(canvas: Canvas) {
         picture?.also {
             canvas.drawPicture(it.instance)
         }
