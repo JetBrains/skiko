@@ -1,8 +1,14 @@
 package org.jetbrains.skiko.swing
 
 import org.jetbrains.skia.*
+import org.jetbrains.skia.impl.*
+import org.jetbrains.skia.impl.getPtr
+import org.jetbrains.skia.impl.reachabilityBarrier
+import org.jetbrains.skia.impl.withNullableResult
 import org.jetbrains.skiko.*
+import org.jetbrains.skiko.Library
 import java.awt.Graphics2D
+import kotlin.math.min
 
 /**
  * Provides a way to draw on Skia canvas rendered off-screen with Metal GPU acceleration and then pass it to [java.awt.Graphics2D].
@@ -31,7 +37,14 @@ internal class MetalSwingRedrawer(
     private val adapter: MetalAdapter = chooseMetalAdapter(swingLayerProperties.adapterPriority).also {
         onDeviceChosen(it.name)
     }
+
+    private val commandQueue = createCommandQueue(adapter.ptr)
     private val context: DirectContext = makeMetalContext()
+
+    private var texturePtr: Long = 0
+
+    private val storage = Bitmap()
+    private var byteArray = ByteArray(0)
 
     init {
         onContextInit()
@@ -41,11 +54,13 @@ internal class MetalSwingRedrawer(
 
     override fun dispose() {
         adapter.dispose()
+        disposeMetalTexture(texturePtr)
         super.dispose()
     }
 
     override fun onRender(g: Graphics2D, width: Int, height: Int, nanoTime: Long) = autoCloseScope {
-        val renderTarget = makeRenderTarget(width, height).autoClose()
+        texturePtr = makeMetalTexture(adapter.ptr, texturePtr, width, height)
+        val renderTarget = makeRenderTarget().autoClose()
         val surface = Surface.makeFromBackendRenderTarget(
             context,
             renderTarget,
@@ -67,16 +82,19 @@ internal class MetalSwingRedrawer(
         val width = surface.width
         val height = surface.height
 
-        val storage = Bitmap()
-        storage.setImageInfo(ImageInfo.makeN32Premul(width, height))
-        storage.allocPixels()
-        // TODO: it copies pixels from GPU to CPU, so it is really slow
-        surface.readPixels(storage, 0, 0)
-
-        val bytes = storage.readPixels(storage.imageInfo, (width * 4), 0, 0)
-        if (bytes != null) {
-            swingOffscreenDrawer.draw(g, bytes, width, height)
+        if (storage.width != width || storage.height != height) {
+            storage.allocPixelsFlags(ImageInfo.makeS32(width, height, ColorAlphaType.PREMUL), false)
+            val size = min(storage.imageInfo.height, height) * storage.rowBytes
+            byteArray = ByteArray(size)
+            println("Allocate $size")
         }
+//        // TODO: it copies pixels from GPU to CPU, so it is really slow
+//        surface.readPixels(storage, 0, 0)
+//
+//        storage.readPixels(byteArray, storage.imageInfo, (width * 4), 0, 0)
+
+        readPixelsFromTexture(texturePtr, byteArray)
+        swingOffscreenDrawer.draw(g, byteArray, width, height)
     }
 
     override fun rendererInfo(): String {
@@ -85,15 +103,34 @@ internal class MetalSwingRedrawer(
                 "Total VRAM: ${adapter.memorySize / 1024 / 1024} MB\n"
     }
 
-    private fun makeRenderTarget(width: Int, height: Int) = BackendRenderTarget(
-        makeMetalRenderTargetOffScreen(adapter.ptr, width, height)
+    private fun makeRenderTarget() = BackendRenderTarget(
+        makeMetalRenderTargetOffScreen(texturePtr)
     )
 
     private fun makeMetalContext(): DirectContext = DirectContext(
-        makeMetalContext(adapter.ptr)
+        makeMetalContext(adapter.ptr, commandQueue)
     )
 
-    private external fun makeMetalContext(adapter: Long): Long
+    private external fun makeMetalContext(adapter: Long, commandQueue: Long): Long
 
-    private external fun makeMetalRenderTargetOffScreen(adapter: Long, width: Int, height: Int): Long
+    private external fun createCommandQueue(adapter: Long): Long
+
+    private external fun makeMetalRenderTargetOffScreen(texture: Long): Long
+
+    private external fun makeMetalTexture(adapter: Long, oldTexture: Long, width: Int, height: Int): Long
+    private external fun disposeMetalTexture(texture: Long): Long
+
+    private fun readPixelsFromTexture(texture: Long, bytes: ByteArray) {
+        try {
+            Stats.onNativeCall()
+            withNullableResult(bytes) {
+                readPixelsFromTexture(texture, it, commandQueue)
+                true
+            }
+        } finally {
+            reachabilityBarrier(bytes)
+        }
+    }
+
+    private external fun readPixelsFromTexture(texture: Long, bytes: InteropPointer, commandQueue: Long)
 }
