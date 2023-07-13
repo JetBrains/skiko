@@ -33,6 +33,8 @@ internal class MetalSwingRedrawer(
     }
     private val context: DirectContext = makeMetalContext()
 
+    private var texturePtr: Long = 0
+
     init {
         onContextInit()
     }
@@ -41,13 +43,15 @@ internal class MetalSwingRedrawer(
 
     override fun dispose() {
         adapter.dispose()
+        disposeMetalTexture(texturePtr)
         super.dispose()
     }
 
     override fun onRender(g: Graphics2D, width: Int, height: Int, nanoTime: Long) {
         autoreleasepool {
             autoCloseScope {
-                val renderTarget = makeRenderTarget(width, height).autoClose()
+                texturePtr = makeMetalTexture(adapter.ptr, texturePtr, width, height)
+                val renderTarget = makeRenderTarget().autoClose()
                 val surface = Surface.makeFromBackendRenderTarget(
                     context,
                     renderTarget,
@@ -89,8 +93,8 @@ internal class MetalSwingRedrawer(
                 "Total VRAM: ${adapter.memorySize / 1024 / 1024} MB\n"
     }
 
-    private fun makeRenderTarget(width: Int, height: Int) = BackendRenderTarget(
-        makeMetalRenderTargetOffScreen(adapter.ptr, width, height)
+    private fun makeRenderTarget() = BackendRenderTarget(
+        makeMetalRenderTargetOffScreen(texturePtr)
     )
 
     private fun makeMetalContext(): DirectContext = DirectContext(
@@ -99,5 +103,13 @@ internal class MetalSwingRedrawer(
 
     private external fun makeMetalContext(adapter: Long): Long
 
-    private external fun makeMetalRenderTargetOffScreen(adapter: Long, width: Int, height: Int): Long
+    private external fun makeMetalRenderTargetOffScreen(texture: Long): Long
+
+    /**
+     * Provides Metal texture taking given [oldTexture] into account
+     * since it can be reused if width and height are not changed,
+     * or the new one will be created.
+     */
+    private external fun makeMetalTexture(adapter: Long, oldTexture: Long, width: Int, height: Int): Long
+    private external fun disposeMetalTexture(texture: Long): Long
 }
