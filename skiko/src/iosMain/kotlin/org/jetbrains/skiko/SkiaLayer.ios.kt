@@ -77,8 +77,7 @@ actual open class SkiaLayer : SkiaLayerInterface {
         gesturesDetector.setGesturesToListen(gesturesToListen)
     }
 
-    actual fun attachTo(container: Any) {
-        TODO("redundant for iOS")
+    actual override fun attachTo(container: SkiaLayerContainer) {
     }
 
     private var isDisposed = false
@@ -112,3 +111,5 @@ actual typealias SkikoGesturePlatformEvent = UIEvent
 actual typealias SkikoPlatformInputEvent = UIPress
 actual typealias SkikoPlatformKeyboardEvent = UIPress
 actual typealias SkikoPlatformPointerEvent = UIEvent
+
+actual typealias SkiaLayerContainer = Nothing

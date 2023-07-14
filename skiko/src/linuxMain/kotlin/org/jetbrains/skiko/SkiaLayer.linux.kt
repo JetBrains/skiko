@@ -20,7 +20,7 @@ actual open class SkiaLayer : SkiaLayerInterface  {
     actual override fun needRedraw() {
         TODO("unimplemented")
     }
-    actual fun attachTo(container: Any) {
+    actual override fun attachTo(container: SkiaLayerContainer) {
         TODO("unimplemented")
     }
     actual override fun detach() {
@@ -45,3 +45,5 @@ actual typealias SkikoPlatformPointerEvent = Any
 
 actual val currentSystemTheme: SystemTheme
     get() = SystemTheme.UNKNOWN
+
+actual typealias SkiaLayerContainer = Any

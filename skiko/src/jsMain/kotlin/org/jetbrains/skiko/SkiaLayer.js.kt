@@ -166,3 +166,5 @@ actual typealias SkikoPlatformInputEvent = KeyboardEvent
 actual typealias SkikoPlatformKeyboardEvent = KeyboardEvent
 //  MouseEvent is base class of PointerEvent
 actual typealias SkikoPlatformPointerEvent = MouseEvent
+
+actual class SkiaLayerContainer

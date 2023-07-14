@@ -94,17 +94,11 @@ actual open class SkiaLayer : SkiaLayerInterface {
     private val pictureRecorder = PictureRecorder()
 
     /**
-     * @param container - should be an instance of [NSWindow]
-     */
-    actual fun attachTo(container: Any) {
-        attachTo(container as NSWindow)
-    }
-
-    /**
      * Initializes the [nsView] then adds it to [window]. Initializes events listeners.
      * Delegates events processing to [skikoView].
      */
-    fun attachTo(window: NSWindow) {
+    actual override fun attachTo(container: SkiaLayerContainer /* NSWindow */) {
+        val window = container
         val (width, height) = window.contentLayoutRect.useContents {
             this.size.width to this.size.height
         }
@@ -173,14 +167,14 @@ actual open class SkiaLayer : SkiaLayerInterface {
 
             private var keyEvent: NSEvent? = null
             private var markedText: String = ""
-            private val kEmptyRange = NSMakeRange(NSNotFound.convert(), 0)
+            private val kEmptyRange = NSMakeRange(NSNotFound.convert(), 0u)
             override fun attributedSubstringForProposedRange(range: CValue<NSRange>, actualRange: NSRangePointer?) = null
             override fun hasMarkedText(): Boolean {
                 return markedText.length > 0
             }
             override fun markedRange(): CValue<NSRange> {
                 if (markedText.length > 0) {
-                    return NSMakeRange(0, (markedText.length - 1).convert())
+                    return NSMakeRange(0u, (markedText.length - 1).convert())
                 }
                 return kEmptyRange
             }
@@ -293,3 +287,5 @@ actual typealias SkikoGesturePlatformEvent = NSEvent
 actual typealias SkikoPlatformInputEvent = NSEvent
 actual typealias SkikoPlatformKeyboardEvent = NSEvent
 actual typealias SkikoPlatformPointerEvent = NSEvent
+
+actual typealias SkiaLayerContainer = NSWindow

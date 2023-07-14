@@ -4,16 +4,19 @@ import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.Picture
 import org.jetbrains.skia.PixelGeometry
 
+expect class SkiaLayerContainer
+
 interface SkiaLayerInterface {
     var skikoView: SkikoView?
     fun needRedraw()
+    fun attachTo(container: SkiaLayerContainer)
     fun detach()
 }
 
 /**
  * Generic layer for Skiko rendering.
  */
-expect open class SkiaLayer: SkiaLayerInterface {
+expect class SkiaLayer: SkiaLayerInterface {
     /**
      * Current graphics API used for rendering.
      */
@@ -52,7 +55,7 @@ expect open class SkiaLayer: SkiaLayerInterface {
      * Attach this SkikoView to platform container.
      * Actual type of attach container is platform-specific.
      */
-    fun attachTo(container: Any)
+    override fun attachTo(container: SkiaLayerContainer)
 
     /**
      * Detach this SkikoView from platform container.

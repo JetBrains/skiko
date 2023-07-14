@@ -221,12 +221,8 @@ actual open class SkiaLayer internal constructor(
 
     actual override var skikoView: SkikoView? = null
 
-    actual fun attachTo(container: Any) {
-        attachTo(container as JComponent)
-    }
-
-    fun attachTo(jComponent: JComponent) {
-        jComponent.add(this)
+    actual override fun attachTo(container: SkiaLayerContainer) {
+        container.add(this)
     }
 
     private var keyEvent: KeyEvent? = null
