@@ -8,6 +8,7 @@ import org.jetbrains.skia.impl.withNullableResult
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.Library
 import java.awt.Graphics2D
+import javax.swing.SwingUtilities
 import kotlin.math.min
 
 /**
@@ -72,8 +73,11 @@ internal class MetalSwingRedrawer(
 
         val canvas = surface.canvas
         canvas.clear(Color.TRANSPARENT)
-        skikoView.onRender(canvas, width, height, nanoTime)
-        flush(surface, g)
+        SwingUtilities.invokeLater {
+            redraw(g)
+        }
+//        skikoView.onRender(canvas, width, height, nanoTime)
+//        flush(surface, g)
     }
 
     private fun flush(surface: Surface, g: Graphics2D) {
