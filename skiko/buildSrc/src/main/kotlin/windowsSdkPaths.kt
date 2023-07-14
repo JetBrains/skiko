@@ -10,6 +10,7 @@ import kotlin.math.abs
 data class WindowsSdkPaths(
     val compiler: File,
     val linker: File,
+    val archiver: File,
     val includeDirs: Collection<File>,
     val libDirs: Collection<File>,
 )
@@ -30,6 +31,7 @@ fun findWindowsSdkPaths(gradle: Gradle, arch: Arch): WindowsSdkPaths {
     return WindowsSdkPaths(
         compiler = visualCpp.compilerExecutable.fixPathFor(arch),
         linker = visualCpp.linkerExecutable.fixPathFor(arch),
+        archiver = visualCpp.archiverExecutable.fixPathFor(arch),
         includeDirs = systemLibraries.flatMap { it.includeDirs }.map { it.fixPathFor(arch) },
         libDirs = systemLibraries.flatMap { it.libDirs }.map { it.fixPathFor(arch) },
     )

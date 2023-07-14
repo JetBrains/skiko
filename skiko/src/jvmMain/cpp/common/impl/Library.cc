@@ -5,7 +5,7 @@
 #include "../paragraph/interop.hh"
 #include "../svg/interop.hh"
 
-JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
+extern "C" JNIEXPORT jint JNICALL JNI_OnLoad_skiko(JavaVM* vm, void* reserved) {
     JNIEnv* env;
     if (vm->GetEnv(reinterpret_cast<void**>(&env), SKIKO_JNI_VERSION) != JNI_OK)
         return JNI_ERR;
@@ -25,7 +25,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_impl_Library__1nAfterL
     skija::svg::onLoad(env);
 }
 
-JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
+extern "C" JNIEXPORT void JNICALL JNI_OnUnload_skiko(JavaVM* vm, void* reserved) {
     JNIEnv* env;
     if (vm->GetEnv(reinterpret_cast<void**>(&env), SKIKO_JNI_VERSION) != JNI_OK)
         return;

@@ -46,6 +46,18 @@ fun compilerForTarget(os: OS, arch: Arch): String =
 fun linkerForTarget(os: OS, arch: Arch): String =
     if (os.isWindows) "link.exe" else compilerForTarget(os, arch)
 
+val OS.archiver: String
+    get() = when (this) {
+        OS.Windows -> "lib.exe"
+        else -> "ar"
+    }
+
+val OS.libNamePrefix: String
+    get() = when(this) {
+        OS.Windows -> ""
+        else -> "lib"
+    }
+
 val OS.dynamicLibExt: String
     get() = when (this) {
         OS.Linux, OS.Android -> ".so"
@@ -54,6 +66,11 @@ val OS.dynamicLibExt: String
         OS.Wasm -> ".wasm"
     }
 
+val OS.staticLibExt: String
+    get() = when (this) {
+        OS.Windows -> ".lib"
+        else -> ".a"
+    }
 
 enum class Arch(val id: String) {
     X64("x64"),

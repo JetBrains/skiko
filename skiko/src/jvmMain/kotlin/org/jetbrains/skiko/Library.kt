@@ -55,8 +55,9 @@ object Library {
     fun load() {
         if (!loaded.compareAndSet(false, true)) return
 
+        System.loadLibrary("skiko")
         // Find/unpack a usable copy of the native library.
-        findAndLoad()
+//        findAndLoad()
 
         // TODO move properties to SkikoProperties
         Setup.init()
@@ -75,7 +76,7 @@ object Library {
         val icu = if (hostOs.isWindows) "icudtl.dat" else null
 
         if (hostOs == OS.Android) {
-            System.loadLibrary("skiko-$hostId")
+            System.loadLibrary(name)
             return
         }
 

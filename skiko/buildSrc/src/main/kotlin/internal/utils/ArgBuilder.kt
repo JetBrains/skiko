@@ -134,3 +134,23 @@ internal class VisualCppLinkerArgBuilder : BaseVisualStudioBuildToolsArgBuilder(
         }
     }
 }
+
+internal class VisualCppArchiverArgBuilder : BaseVisualStudioBuildToolsArgBuilder() {
+    private val outArg = "/OUT"
+
+    override fun newSelfInstance(): ArgBuilder = VisualCppArchiverArgBuilder()
+
+    override fun transformName(argName: String?): String? =
+        when (argName) {
+            null -> outArg
+            else -> super.transformName(argName)
+        }
+
+    override fun addTransformedArgs(argName: String?, value: String?) {
+        if (argName == outArg) {
+            args.add("$argName:$value")
+        } else {
+            super.addTransformedArgs(argName, value)
+        }
+    }
+}

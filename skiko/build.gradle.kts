@@ -658,6 +658,7 @@ fun createSkikoJvmJarTask(os: OS, arch: Arch, commonJar: TaskProvider<Jar>): Tas
     val skiaBindingsDir = registerOrGetSkiaDirProvider(os, arch)
     val compileBindings = createCompileJvmBindingsTask(os, arch, skiaBindingsDir)
     val objcCompile = if (os == OS.MacOS) createObjcCompileTask(os, arch, skiaBindingsDir) else null
+    createArchiveJvmBindings(targetOs, targetArch, compileBindings, objcCompile)
     val linkBindings =
         createLinkJvmBindings(os, arch, skiaBindingsDir, compileBindings, objcCompile)
     val maybeSign = maybeSignOrSealTask(os, arch, linkBindings)
@@ -678,6 +679,7 @@ fun createSkikoJvmJarTask(os: OS, arch: Arch, commonJar: TaskProvider<Jar>): Tas
         val skiaBindingsDir2 = registerOrGetSkiaDirProvider(os, altArch)
         val compileBindings2 = createCompileJvmBindingsTask(os, altArch, skiaBindingsDir2)
         val objcCompile2 = createObjcCompileTask(os, altArch, skiaBindingsDir2)
+        createArchiveJvmBindings(targetOs, altArch, compileBindings2, objcCompile2)
         val linkBindings2 =
             createLinkJvmBindings(os, altArch, skiaBindingsDir2, compileBindings2, objcCompile2)
         val maybeSign2 = maybeSignOrSealTask(os, altArch, linkBindings2)
@@ -915,8 +917,7 @@ fun createLinkJvmBindings(
         objectFiles = fileTree(compileTask.map { it.outDir.get() }) {
             include("**/*.o")
         }
-        val libNamePrefix = if (targetOs.isWindows) "skiko" else "libskiko"
-        libOutputFileName.set("$libNamePrefix-${targetOs.id}-${targetArch.id}${targetOs.dynamicLibExt}")
+        libOutputFileName.set("${targetOs.libNamePrefix}skiko-${targetOs.id}-${targetArch.id}${targetOs.dynamicLibExt}")
         buildTargetOS.set(targetOs)
         buildTargetArch.set(targetArch)
         buildVariant.set(buildType)
@@ -1006,6 +1007,47 @@ fun createLinkJvmBindings(
         }
         flags.set(listOf(*osFlags))
     }
+
+fun createArchiveJvmBindings(
+    targetOs: OS,
+    targetArch: Arch,
+    compileTask: TaskProvider<CompileSkikoCppTask>,
+    objcCompileTask: TaskProvider<CompileSkikoObjCTask>?
+) = project.registerSkikoTask<ArchiveSkikoTask>("archiveJvmBindings", targetOs, targetArch) {
+    val osFlags: Array<String>
+
+    dependsOn(compileTask)
+    objectFiles = fileTree(compileTask.map { it.outDir.get() }) {
+        include("**/*.o")
+    }
+    libOutputFileName.set("${targetOs.libNamePrefix}skiko${targetOs.staticLibExt}")
+    buildTargetOS.set(targetOs)
+    buildTargetArch.set(targetArch)
+    buildVariant.set(buildType)
+    archiver.set(targetOs.archiver)
+
+    when (targetOs) {
+        OS.MacOS -> {
+            dependsOn(objcCompileTask!!)
+            objectFiles += fileTree(objcCompileTask.map { it.outDir.get() }) {
+                include("**/*.o")
+            }
+            osFlags = arrayOf("-rcs")
+        }
+        OS.Windows -> {
+            archiver.set(windowsSdkPaths.archiver.absolutePath)
+            osFlags = emptyArray()
+        }
+        OS.Linux,
+        OS.Android -> {
+            osFlags = arrayOf("-rcs")
+        }
+        OS.Wasm, OS.IOS -> {
+            throw GradleException("This task shalln't be used with $targetOs")
+        }
+    }
+    flags.set(listOf(*osFlags))
+}
 
 fun KotlinTarget.generateVersion(
     targetOs: OS,
