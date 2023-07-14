@@ -38,12 +38,11 @@ internal class MetalSwingRedrawer(
         onDeviceChosen(it.name)
     }
 
-    private val commandQueue = createCommandQueue(adapter.ptr)
+    private val commandQueue: Long = createCommandQueue(adapter.ptr)
     private val context: DirectContext = makeMetalContext()
 
     private var texturePtr: Long = 0
 
-    private val storage = Bitmap()
     private var byteArray = ByteArray(0)
 
     init {
@@ -55,6 +54,7 @@ internal class MetalSwingRedrawer(
     override fun dispose() {
         adapter.dispose()
         disposeMetalTexture(texturePtr)
+        disposeCommandQueue(commandQueue)
         super.dispose()
     }
 
@@ -82,16 +82,10 @@ internal class MetalSwingRedrawer(
         val width = surface.width
         val height = surface.height
 
-        if (storage.width != width || storage.height != height) {
-            storage.allocPixelsFlags(ImageInfo.makeS32(width, height, ColorAlphaType.PREMUL), false)
-            val size = min(storage.imageInfo.height, height) * storage.rowBytes
+        val size = height * width * 4
+        if (byteArray.size != size) {
             byteArray = ByteArray(size)
-            println("Allocate $size")
         }
-//        // TODO: it copies pixels from GPU to CPU, so it is really slow
-//        surface.readPixels(storage, 0, 0)
-//
-//        storage.readPixels(byteArray, storage.imageInfo, (width * 4), 0, 0)
 
         readPixelsFromTexture(texturePtr, byteArray)
         swingOffscreenDrawer.draw(g, byteArray, width, height)
@@ -114,6 +108,7 @@ internal class MetalSwingRedrawer(
     private external fun makeMetalContext(adapter: Long, commandQueue: Long): Long
 
     private external fun createCommandQueue(adapter: Long): Long
+    private external fun disposeCommandQueue(commandQueue: Long)
 
     private external fun makeMetalRenderTargetOffScreen(texture: Long): Long
 
@@ -122,7 +117,6 @@ internal class MetalSwingRedrawer(
 
     private fun readPixelsFromTexture(texture: Long, bytes: ByteArray) {
         try {
-            Stats.onNativeCall()
             withNullableResult(bytes) {
                 readPixelsFromTexture(texture, it, commandQueue)
                 true

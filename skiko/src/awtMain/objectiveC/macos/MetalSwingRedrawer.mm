@@ -35,6 +35,13 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_MetalSwingRedrawer_create
     }
 }
 
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_swing_MetalSwingRedrawer_disposeCommandQueue(
+        JNIEnv *env, jobject contextHandler, jlong commandQueuePtr) {
+    @autoreleasepool {
+        id <MTLCommandQueue> commandQueue = (__bridge_transfer id <MTLCommandQueue>) (void *) commandQueuePtr;
+    }
+}
+
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_MetalSwingRedrawer_makeMetalTexture(
         JNIEnv *env, jobject contextHandler, jlong adapterPtr, jlong oldTexturePtr, jint width, jint height
 ) {
