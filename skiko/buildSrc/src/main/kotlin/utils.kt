@@ -43,3 +43,17 @@ fun Task.projectDirs(vararg relativePaths: String): List<Directory> {
     val projectDir = project.layout.projectDirectory
     return relativePaths.map { path -> projectDir.dir(path) }
 }
+
+fun listOfFrameworks(vararg frameworks: String): List<String> =
+    frameworks.flatMap { listOf("-framework", it) }
+
+fun mutableListOfLinkerOptions(options: Collection<String>): MutableList<String> =
+    ArrayList<String>(options.size * 2).also { result ->
+        options.forEach { option ->
+            result.add("-linker-option")
+            result.add(option)
+        }
+    }
+
+fun mutableListOfLinkerOptions(vararg options: String): MutableList<String> =
+    mutableListOfLinkerOptions(options.toList())

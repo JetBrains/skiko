@@ -4,6 +4,7 @@ import org.gradle.crypto.checksum.Checksum
 import org.jetbrains.compose.internal.publishing.MavenCentralProperties
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompileTool
 
 plugins {
@@ -427,6 +428,32 @@ kotlin {
     }
 }
 
+fun configureCinterop(
+    cinteropName: String,
+    os: OS,
+    arch: Arch,
+    target: KotlinNativeTarget,
+    targetString: String,
+    linkerOpts: List<String>,
+) {
+    val tasks = target.project.tasks
+    val taskNameSuffix = joinToTitleCamelCase(os.idWithSuffix(isIosSim = target.isIosSimArm64()), arch.id)
+    val writeCInteropDef = tasks.register("writeCInteropDef$taskNameSuffix", WriteCInteropDefFile::class.java) {
+        this.linkerOpts.set(linkerOpts)
+        outputFile.set(project.layout.buildDirectory.file("cinterop/$targetString/skiko.def"))
+    }
+    tasks.withType(CInteropProcess::class.java).configureEach {
+        if (konanTarget == target.konanTarget) {
+            dependsOn(writeCInteropDef)
+        }
+    }
+    target.compilations.getByName("main") {
+        cinterops.create(cinteropName).apply {
+            defFileProperty.set(writeCInteropDef.map { it.outputFile.get().asFile })
+        }
+    }
+}
+
 fun configureNativeTarget(os: OS, arch: Arch, target: KotlinNativeTarget) {
     if (!os.isCompatibleWithHost) return
 
@@ -444,24 +471,27 @@ fun configureNativeTarget(os: OS, arch: Arch, target: KotlinNativeTarget) {
 
     val skiaBinDir = "$skiaDir/out/${buildType.id}-$targetString"
     val linkerFlags = when (os) {
-        OS.MacOS -> mutableListOf("-linker-option", "-framework", "-linker-option", "Metal",
-            "-linker-option", "-framework", "-linker-option", "CoreGraphics",
-            "-linker-option", "-framework", "-linker-option", "CoreText",
-            "-linker-option", "-framework", "-linker-option", "CoreServices"
+        OS.MacOS -> mutableListOfLinkerOptions(
+            listOfFrameworks("Metal", "CoreGraphics", "CoreText", "CoreServices")
         )
-        OS.IOS -> mutableListOf("-linker-option", "-framework", "-linker-option", "Metal",
-            "-linker-option", "-framework", "-linker-option", "CoreGraphics",
-            "-linker-option", "-framework", "-linker-option", "UIKit",
-            "-linker-option", "-framework", "-linker-option", "CoreText")
-        OS.Linux -> mutableListOf(
-            "-linker-option", "-L/usr/lib/x86_64-linux-gnu",
-            "-linker-option", "-lfontconfig",
-            "-linker-option", "-lGL",
+        OS.IOS -> {
+            val iosFrameworks = listOfFrameworks("Metal", "CoreGraphics", "CoreText", "UIKit")
+            // list of linker options to be included into klib, which are needed for skiko consumers
+            // https://github.com/JetBrains/compose-multiplatform/issues/3178
+            // Important! Removing or renaming cinterop-uikit publication might cause compile error
+            // for projects depending on older Compose/Skiko transitively https://youtrack.jetbrains.com/issue/KT-60399
+            configureCinterop("uikit", os, arch, target, targetString, iosFrameworks)
+            mutableListOfLinkerOptions(iosFrameworks)
+        }
+        OS.Linux -> mutableListOfLinkerOptions(
+            "-L/usr/lib/x86_64-linux-gnu",
+            "-lfontconfig",
+            "-lGL",
             // TODO: an ugly hack, Linux linker searches only unresolved symbols.
-            "-linker-option", "$skiaBinDir/libsksg.a",
-            "-linker-option", "$skiaBinDir/libskshaper.a",
-            "-linker-option", "$skiaBinDir/libskunicode.a",
-            "-linker-option", "$skiaBinDir/libskia.a"
+            "$skiaBinDir/libsksg.a",
+            "$skiaBinDir/libskshaper.a",
+            "$skiaBinDir/libskunicode.a",
+            "$skiaBinDir/libskia.a"
         )
         else -> mutableListOf()
     }
