@@ -225,7 +225,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
     private fun sendTouchEventToSkikoView(event: UIEvent, kind: SkikoPointerEventKind) {
         val pointers = event.touchesForView(this).orEmpty().map {
             val touch = it as UITouch
-            val (x, y) = touch.locationInView(null).useContents { x to y }
+            val (x, y) = touch.locationInView(this).useContents { x to y }
             SkikoPointer(
                 x = x,
                 y = y,
