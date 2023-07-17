@@ -658,7 +658,7 @@ fun createSkikoJvmJarTask(os: OS, arch: Arch, commonJar: TaskProvider<Jar>): Tas
     val skiaBindingsDir = registerOrGetSkiaDirProvider(os, arch)
     val compileBindings = createCompileJvmBindingsTask(os, arch, skiaBindingsDir)
     val objcCompile = if (os == OS.MacOS) createObjcCompileTask(os, arch, skiaBindingsDir) else null
-    createArchiveJvmBindings(targetOs, targetArch, compileBindings, objcCompile)
+    createArchiveJvmBindings(os, arch, compileBindings, objcCompile)
     val linkBindings =
         createLinkJvmBindings(os, arch, skiaBindingsDir, compileBindings, objcCompile)
     val maybeSign = maybeSignOrSealTask(os, arch, linkBindings)
@@ -679,7 +679,7 @@ fun createSkikoJvmJarTask(os: OS, arch: Arch, commonJar: TaskProvider<Jar>): Tas
         val skiaBindingsDir2 = registerOrGetSkiaDirProvider(os, altArch)
         val compileBindings2 = createCompileJvmBindingsTask(os, altArch, skiaBindingsDir2)
         val objcCompile2 = createObjcCompileTask(os, altArch, skiaBindingsDir2)
-        createArchiveJvmBindings(targetOs, altArch, compileBindings2, objcCompile2)
+        createArchiveJvmBindings(os, altArch, compileBindings2, objcCompile2)
         val linkBindings2 =
             createLinkJvmBindings(os, altArch, skiaBindingsDir2, compileBindings2, objcCompile2)
         val maybeSign2 = maybeSignOrSealTask(os, altArch, linkBindings2)
