@@ -11,6 +11,10 @@ import platform.darwin.NSInteger
 import kotlin.math.max
 import kotlin.math.min
 
+/*
+ TODO: remove org.jetbrains.skiko.objc.UIViewExtensionProtocol after Kotlin 1.8.20
+ https://youtrack.jetbrains.com/issue/KT-40426
+*/
 @Suppress("CONFLICTING_OVERLOADS")
 @ExportObjCClass
 class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
@@ -30,11 +34,20 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
     private var _inputDelegate: UITextInputDelegateProtocol? = null
     private var _currentTextMenuActions: TextActions? = null
 
+    // merging two constructors might cause a binary incompatibility, which will result in a unclear linking error,
+    // if a project using newer compose depends on an older compose transitively
+    // https://youtrack.jetbrains.com/issue/KT-60399
+    constructor(
+        skiaLayer: SkiaLayer,
+        frame: CValue<CGRect> = CGRectNull.readValue(),
+        pointInside: (Point, UIEvent?) -> Boolean = {_,_-> true }
+    ) : this(skiaLayer, frame, pointInside, skikoUITextInputTrains = object : SkikoUITextInputTraits {})
+
     constructor(
         skiaLayer: SkiaLayer,
         frame: CValue<CGRect> = CGRectNull.readValue(),
         pointInside: (Point, UIEvent?) -> Boolean = {_,_-> true },
-        skikoUITextInputTrains: SkikoUITextInputTraits = object : SkikoUITextInputTraits {},
+        skikoUITextInputTrains: SkikoUITextInputTraits
     ) : super(frame) {
         this.skiaLayer = skiaLayer
         _pointInside = pointInside

@@ -6,6 +6,7 @@ import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.register
 import java.util.*
+import kotlin.collections.ArrayList
 
 // Utils, that are not needed in scripts can be placed to internal/utils
 
@@ -43,3 +44,15 @@ fun Task.projectDirs(vararg relativePaths: String): List<Directory> {
     val projectDir = project.layout.projectDirectory
     return relativePaths.map { path -> projectDir.dir(path) }
 }
+
+fun listOfFrameworks(vararg frameworks: String): List<String> =
+    frameworks.toList().addElementBeforeEach("-framework")
+
+fun mutableListOfLinkerOptions(options: Collection<String>): MutableList<String> =
+    options.addElementBeforeEach("-linker-option")
+
+fun mutableListOfLinkerOptions(vararg options: String): MutableList<String> =
+    mutableListOfLinkerOptions(options.toList())
+
+private fun <T> Collection<T>.addElementBeforeEach(element: T): MutableList<T> =
+    flatMapTo(ArrayList(size * 2)) { listOf(element, it) }
