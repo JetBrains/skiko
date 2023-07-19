@@ -154,11 +154,8 @@ internal class MetalRedrawer(
             // - it makes frames consistent and limits FPS
             displayLinkThrottler.waitVSync(windowPtr = layer.windowHandle)
 
-            val handle = startRendering()
-            try {
+            autoreleasepool {
                 contextHandler.draw()
-            } finally {
-                endRendering(handle)
             }
         }
     }
@@ -188,6 +185,4 @@ internal class MetalRedrawer(
     private external fun setContentScale(device: Long, contentScale: Float)
     private external fun setVSyncEnabled(device: Long, enabled: Boolean)
     private external fun isOccluded(window: Long): Boolean
-    private external fun startRendering(): Long
-    private external fun endRendering(handle: Long)
 }
