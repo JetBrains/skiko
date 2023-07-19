@@ -918,11 +918,30 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
         srcX: Int = 0,
         srcY: Int = 0
     ): ByteArray? {
-        return try {
-            val size = min(dstInfo.height, height - srcY) * dstRowBytes
+        val size = getReadPixelsArraySize(dstInfo, dstRowBytes, srcY)
+        val bitmapPixels = ByteArray(size)
+        val successfulRead = readPixels(bitmapPixels, dstInfo, dstRowBytes, srcX, srcY)
+        return bitmapPixels.takeIf { successfulRead }
+    }
 
+    /**
+     * See documentation for [readPixels]
+     *
+     * @param byteArray array where pixels will be read.
+     */
+    internal fun readPixels(
+        byteArray: ByteArray,
+        dstInfo: ImageInfo = imageInfo,
+        dstRowBytes: Int = rowBytes,
+        srcX: Int = 0,
+        srcY: Int = 0
+    ): Boolean {
+        check(byteArray.size == getReadPixelsArraySize(dstInfo, dstRowBytes, srcY)) {
+            "byteArray is not properly allocated. Use readPixelsArraySize"
+        }
+        try {
             Stats.onNativeCall()
-            withNullableResult(ByteArray(size)) {
+            return interopScope {
                 _nReadPixels(
                     _ptr,
                     dstInfo.width,
@@ -933,7 +952,7 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
                     dstRowBytes,
                     srcX,
                     srcY,
-                    it
+                    toInterop(byteArray)
                 )
             }
         } finally {
@@ -941,6 +960,12 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
             reachabilityBarrier(dstInfo.colorInfo.colorSpace)
         }
     }
+
+    internal fun getReadPixelsArraySize(
+        dstInfo: ImageInfo = imageInfo,
+        dstRowBytes: Int = rowBytes,
+        srcY: Int = 0
+    ): Int = min(dstInfo.height, height - srcY) * dstRowBytes
 
     /**
      *

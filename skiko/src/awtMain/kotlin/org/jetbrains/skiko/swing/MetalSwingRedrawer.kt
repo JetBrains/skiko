@@ -37,6 +37,8 @@ internal class MetalSwingRedrawer(
 
     private val storage = Bitmap()
 
+    private var bytesToDraw = ByteArray(0)
+
     init {
         onContextInit()
     }
@@ -78,15 +80,17 @@ internal class MetalSwingRedrawer(
         val width = surface.width
         val height = surface.height
 
+        val dstRowBytes = width * 4
         if (storage.width != width || storage.height != height) {
             storage.allocPixelsFlags(ImageInfo.makeS32(width, height, ColorAlphaType.PREMUL), false)
+            bytesToDraw = ByteArray(storage.getReadPixelsArraySize(dstRowBytes = dstRowBytes))
         }
         // TODO: it copies pixels from GPU to CPU, so it is really slow
         surface.readPixels(storage, 0, 0)
 
-        val bytes = storage.readPixels(storage.imageInfo, (width * 4), 0, 0)
-        if (bytes != null) {
-            swingOffscreenDrawer.draw(g, bytes, width, height)
+        val successfulRead = storage.readPixels(bytesToDraw, dstRowBytes = dstRowBytes)
+        if (successfulRead) {
+            swingOffscreenDrawer.draw(g, bytesToDraw, width, height)
         }
     }
 
