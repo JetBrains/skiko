@@ -25,7 +25,26 @@ internal fun MetalAdapter.dispose() {
     disposeAdapter(ptr)
 }
 
+/**
+ * [@autoreleasepool](https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/MemoryMgmt/Articles/mmAutoreleasePools.html)
+ */
+@Suppress("SpellCheckingInspection")
+internal inline fun <R> autoreleasepool(block: () -> R): R {
+    val handle = openAutoreleasepool()
+    return try {
+        block()
+    } finally {
+        closeAutoreleasepool(handle)
+    }
+}
+
 private external fun chooseAdapter(adapterPriority: Int): Long
 private external fun disposeAdapter(adapter: Long)
 private external fun getAdapterName(adapter: Long): String
 private external fun getAdapterMemorySize(adapter: Long): Long
+
+@Suppress("SpellCheckingInspection")
+private external fun openAutoreleasepool(): Long
+
+@Suppress("SpellCheckingInspection")
+private external fun closeAutoreleasepool(handle: Long)

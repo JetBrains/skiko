@@ -26,6 +26,21 @@
 extern "C"
 {
 
+extern "C" void* objc_autoreleasePoolPush(void);
+extern "C" void objc_autoreleasePoolPop(void*);
+
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_MetalApiKt_openAutoreleasepool(
+    JNIEnv * env, jobject redrawer)
+{
+    return (jlong)objc_autoreleasePoolPush();
+}
+
+JNIEXPORT void JNICALL Java_org_jetbrains_skiko_MetalApiKt_closeAutoreleasepool(
+    JNIEnv * env, jobject redrawer, jlong handle)
+{
+    objc_autoreleasePoolPop((void*)handle);
+}
+
 BOOL isUsingIntegratedGPU() {
     kern_return_t kernResult = 0;
     io_iterator_t iterator = IO_OBJECT_NULL;

@@ -54,21 +54,6 @@
 extern "C"
 {
 
-extern "C" void* objc_autoreleasePoolPush(void);
-extern "C" void objc_autoreleasePoolPop(void*);
-
-JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_startRendering(
-    JNIEnv * env, jobject redrawer)
-{
-    return (jlong)objc_autoreleasePoolPush();
-}
-
-JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_endRendering(
-    JNIEnv * env, jobject redrawer, jlong handle)
-{
-    objc_autoreleasePoolPop((void*)handle);
-}
-
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMetalDevice(
     JNIEnv *env, jobject redrawer, jlong windowPtr, jboolean transparency, jlong adapterPtr, jlong platformInfoPtr)
 {

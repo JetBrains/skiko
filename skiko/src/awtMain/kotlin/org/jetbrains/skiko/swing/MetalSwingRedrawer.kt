@@ -44,21 +44,25 @@ internal class MetalSwingRedrawer(
         super.dispose()
     }
 
-    override fun onRender(g: Graphics2D, width: Int, height: Int, nanoTime: Long) = autoCloseScope {
-        val renderTarget = makeRenderTarget(width, height).autoClose()
-        val surface = Surface.makeFromBackendRenderTarget(
-            context,
-            renderTarget,
-            SurfaceOrigin.TOP_LEFT,
-            SurfaceColorFormat.BGRA_8888,
-            ColorSpace.sRGB,
-            SurfaceProps(pixelGeometry = PixelGeometry.UNKNOWN)
-        )?.autoClose() ?: throw RenderException("Cannot create surface")
+    override fun onRender(g: Graphics2D, width: Int, height: Int, nanoTime: Long) {
+        autoreleasepool {
+            autoCloseScope {
+                val renderTarget = makeRenderTarget(width, height).autoClose()
+                val surface = Surface.makeFromBackendRenderTarget(
+                    context,
+                    renderTarget,
+                    SurfaceOrigin.TOP_LEFT,
+                    SurfaceColorFormat.BGRA_8888,
+                    ColorSpace.sRGB,
+                    SurfaceProps(pixelGeometry = PixelGeometry.UNKNOWN)
+                )?.autoClose() ?: throw RenderException("Cannot create surface")
 
-        val canvas = surface.canvas
-        canvas.clear(Color.TRANSPARENT)
-        skikoView.onRender(canvas, width, height, nanoTime)
-        flush(surface, g)
+                val canvas = surface.canvas
+                canvas.clear(Color.TRANSPARENT)
+                skikoView.onRender(canvas, width, height, nanoTime)
+                flush(surface, g)
+            }
+        }
     }
 
     private fun flush(surface: Surface, g: Graphics2D) {
