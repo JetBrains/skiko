@@ -46,6 +46,7 @@ internal class MetalSwingRedrawer(
     private val swingOffscreenDrawer = SwingOffscreenDrawer(swingLayerProperties)
 
     override fun dispose() {
+        bytesToDraw = ByteArray(0)
         storage.close()
         disposeMetalTexture(texturePtr)
         adapter.dispose()
