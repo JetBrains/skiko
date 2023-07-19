@@ -35,6 +35,8 @@ internal class MetalSwingRedrawer(
 
     private var texturePtr: Long = 0
 
+    private val storage = Bitmap()
+
     init {
         onContextInit()
     }
@@ -42,8 +44,9 @@ internal class MetalSwingRedrawer(
     private val swingOffscreenDrawer = SwingOffscreenDrawer(swingLayerProperties)
 
     override fun dispose() {
-        adapter.dispose()
+        storage.close()
         disposeMetalTexture(texturePtr)
+        adapter.dispose()
         super.dispose()
     }
 
@@ -75,9 +78,9 @@ internal class MetalSwingRedrawer(
         val width = surface.width
         val height = surface.height
 
-        val storage = Bitmap()
-        storage.setImageInfo(ImageInfo.makeN32Premul(width, height))
-        storage.allocPixels()
+        if (storage.width != width || storage.height != height) {
+            storage.allocPixelsFlags(ImageInfo.makeS32(width, height, ColorAlphaType.PREMUL), false)
+        }
         // TODO: it copies pixels from GPU to CPU, so it is really slow
         surface.readPixels(storage, 0, 0)
 
