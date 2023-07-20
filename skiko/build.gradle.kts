@@ -471,9 +471,11 @@ fun configureNativeTarget(os: OS, arch: Arch, target: KotlinNativeTarget) {
 
     val skiaBinDir = "$skiaDir/out/${buildType.id}-$targetString"
     val linkerFlags = when (os) {
-        OS.MacOS -> mutableListOfLinkerOptions(
-            listOfFrameworks("Metal", "CoreGraphics", "CoreText", "CoreServices")
-        )
+        OS.MacOS -> {
+            val macFrameworks = listOfFrameworks("Metal", "CoreGraphics", "CoreText", "CoreServices")
+            configureCinterop("skiko", os, arch, target, targetString, macFrameworks)
+            mutableListOfLinkerOptions(macFrameworks)
+        }
         OS.IOS -> {
             val iosFrameworks = listOfFrameworks("Metal", "CoreGraphics", "CoreText", "UIKit")
             // list of linker options to be included into klib, which are needed for skiko consumers
