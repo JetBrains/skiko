@@ -941,8 +941,9 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
         }
         try {
             Stats.onNativeCall()
-            return interopScope {
-                _nReadPixels(
+            interopScope {
+                val byteArrayHandle = toInteropForResult(byteArray)
+                val successfulRead = _nReadPixels(
                     _ptr,
                     dstInfo.width,
                     dstInfo.height,
@@ -952,8 +953,12 @@ class Bitmap internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerH
                     dstRowBytes,
                     srcX,
                     srcY,
-                    toInterop(byteArray)
+                    byteArrayHandle
                 )
+                if (successfulRead) {
+                    byteArrayHandle.fromInterop(byteArray)
+                }
+                return successfulRead
             }
         } finally {
             reachabilityBarrier(this)
