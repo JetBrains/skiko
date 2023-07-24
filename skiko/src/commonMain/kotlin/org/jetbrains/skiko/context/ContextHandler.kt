@@ -40,15 +40,11 @@ internal abstract class ContextHandler(
             throw RenderException("Cannot init graphic context")
         }
         initCanvas()
-
-        try {
-            canvas?.apply {
-                clear(if (isTransparentBackground()) Color.TRANSPARENT else Color.WHITE)
-                drawContent()
-            }
-        } finally {
-            flush()
+        canvas?.apply {
+            clear(if (isTransparentBackground()) Color.TRANSPARENT else Color.WHITE)
+            drawContent()
         }
+        flush()
     }
 
     protected open fun isTransparentBackground(): Boolean {
