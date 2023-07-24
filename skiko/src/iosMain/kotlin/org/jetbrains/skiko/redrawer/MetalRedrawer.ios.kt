@@ -80,9 +80,9 @@ internal class MetalRedrawer(
             }
 
             DrawSchedulingState.SCHEDULED_ON_NEXT_FRAME -> {
-                drawIfLayerIsShowing()
-
                 drawSchedulingState = DrawSchedulingState.AVAILABLE_ON_NEXT_FRAME
+
+                drawIfLayerIsShowing()
             }
 
             DrawSchedulingState.AVAILABLE_ON_CURRENT_FRAME -> {
@@ -164,9 +164,9 @@ internal class MetalRedrawer(
             }
 
             DrawSchedulingState.AVAILABLE_ON_CURRENT_FRAME -> {
-                drawIfLayerIsShowing()
-
                 drawSchedulingState = DrawSchedulingState.AVAILABLE_ON_NEXT_FRAME
+
+                drawIfLayerIsShowing()
             }
 
             DrawSchedulingState.SCHEDULED_ON_NEXT_FRAME -> {
