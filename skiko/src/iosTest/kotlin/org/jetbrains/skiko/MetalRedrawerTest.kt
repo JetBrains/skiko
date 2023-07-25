@@ -13,6 +13,11 @@ private val nsRunLoopMock = object {
 class MetalRedrawerTest {
     @OptIn(ExperimentalStdlibApi::class)
     private fun createAndForgetSkiaLayer(disposeCallback: () -> Unit) {
+        // Current reference cycle looks like that
+        // skiaLayer -> skikoView -> redrawer -> skiaLayer
+        // redrawer creates CADisplayLink which is stored in global object (NSRunLoop) and used to strongly capture
+        // an object referencing redrawer, creating a memory leak
+
         val skiaLayer = object : SkiaLayer() {
             // createCleaner can't capture anything
             // so we need to proxy call to disposeCallback via the cleaned object itself
