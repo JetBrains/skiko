@@ -12,7 +12,7 @@ class ColorSpace : Managed {
 
         val sRGB = ColorSpace(_nMakeSRGB(), false)
         val sRGBLinear = ColorSpace(_nMakeSRGBLinear(), false)
-        val displayP3: ColorSpace = makeRGB(TransferFunction.sRGB, Matrix33.displayP3ToXYZD50)!!
+        val displayP3: ColorSpace = requireNotNull(makeRGB(TransferFunction.sRGB, Matrix33.displayP3ToXYZD50))
 
         /**
          * Creates a color space from a transfer function and a 3x3 transformation to XYZ D50.

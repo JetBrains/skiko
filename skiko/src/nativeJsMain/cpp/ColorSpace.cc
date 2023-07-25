@@ -85,7 +85,7 @@ SKIKO_EXPORT void org_jetbrains_skia_ColorSpace__1nGetToXYZD50
   (KNativePointer ptr, KFloat* result) {
     SkColorSpace* instance = reinterpret_cast<SkColorSpace*>((ptr));
     skcms_Matrix3x3 toXYZ;
-    instance->toXYZD50(&matrix);
+    instance->toXYZD50(&toXYZ);
     result[0] = toXYZ.vals[0][0];
     result[1] = toXYZ.vals[0][1];
     result[2] = toXYZ.vals[0][2];

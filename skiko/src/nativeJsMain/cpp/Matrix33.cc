@@ -16,35 +16,35 @@ static void copySkcmsMatrix3x3ToKFloatArray(const skcms_Matrix3x3& matrix, KFloa
 
 SKIKO_EXPORT void org_jetbrains_skia_Matrix33__1nGetSRGB
   (KFloat* result) {
-    copySkcmsMatrix3x3ToKFloatArray(env, SkNamedGamut::kSRGB, result);
+    copySkcmsMatrix3x3ToKFloatArray(SkNamedGamut::kSRGB, result);
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_Matrix33__1nGetAdobeRGB
   (KFloat* result) {
-    copySkcmsMatrix3x3ToKFloatArray(env, SkNamedGamut::kAdobeRGB, result);
+    copySkcmsMatrix3x3ToKFloatArray(SkNamedGamut::kAdobeRGB, result);
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_Matrix33__1nGetDisplayP3
   (KFloat* result) {
-    copySkcmsMatrix3x3ToKFloatArray(env, SkNamedGamut::kDisplayP3, result);
+    copySkcmsMatrix3x3ToKFloatArray(SkNamedGamut::kDisplayP3, result);
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_Matrix33__1nGetRec2020
   (KFloat* result) {
-    copySkcmsMatrix3x3ToKFloatArray(env, SkNamedGamut::kRec2020, result);
+    copySkcmsMatrix3x3ToKFloatArray(SkNamedGamut::kRec2020, result);
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_Matrix33__1nGetXYZ
   (KFloat* result) {
-    copySkcmsMatrix3x3ToKFloatArray(env, SkNamedGamut::kXYZ, result);
+    copySkcmsMatrix3x3ToKFloatArray(SkNamedGamut::kXYZ, result);
 }
 
 SKIKO_EXPORT KBoolean org_jetbrains_skia_Matrix33__1nAdaptToXYZD50
   (KFloat wx, KFloat wy, KFloat* result) {
     skcms_Matrix3x3 toXYZD50;
-    bool success = skcms_AdaptToXYZD50(wx, wy, &toXYZD50)
+    bool success = skcms_AdaptToXYZD50(wx, wy, &toXYZD50);
     if (success)
-        copySkcmsMatrix3x3ToKFloatArray(env, toXYZD50, result);
+        copySkcmsMatrix3x3ToKFloatArray(toXYZD50, result);
     return success;
 }
 
@@ -53,6 +53,6 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_Matrix33__1nPrimariesToXYZD50
     skcms_Matrix3x3 toXYZD50;
     bool success = skcms_PrimariesToXYZD50(rx, ry, gx, gy, bx, by, wx, wy, &toXYZD50);
     if (success)
-        copySkcmsMatrix3x3ToKFloatArray(env, toXYZD50, result);
+        copySkcmsMatrix3x3ToKFloatArray(toXYZD50, result);
     return success;
 }

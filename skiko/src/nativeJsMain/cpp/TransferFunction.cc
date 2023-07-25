@@ -18,32 +18,32 @@ static void copyKFloatArrayToSkcmsTransferFunction(KFloat* tf, skcms_TransferFun
 
 SKIKO_EXPORT void org_jetbrains_skia_TransferFunction__1nGetSRGB
   (KFloat* result) {
-    copySkcmsTransferFunctionToKFloatArray(env, SkNamedTransferFn::kSRGB, result);
+    copySkcmsTransferFunctionToKFloatArray(SkNamedTransferFn::kSRGB, result);
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_TransferFunction__1nGetGamma2Dot2
   (KFloat* result) {
-    copySkcmsTransferFunctionToKFloatArray(env, SkNamedTransferFn::k2Dot2, result);
+    copySkcmsTransferFunctionToKFloatArray(SkNamedTransferFn::k2Dot2, result);
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_TransferFunction__1nGetLinear
   (KFloat* result) {
-    copySkcmsTransferFunctionToKFloatArray(env, SkNamedTransferFn::kLinear, result);
+    copySkcmsTransferFunctionToKFloatArray(SkNamedTransferFn::kLinear, result);
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_TransferFunction__1nGetRec2020
   (KFloat* result) {
-    copySkcmsTransferFunctionToKFloatArray(env, SkNamedTransferFn::kRec2020, result);
+    copySkcmsTransferFunctionToKFloatArray(SkNamedTransferFn::kRec2020, result);
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_TransferFunction__1nGetPQ
   (KFloat* result) {
-    copySkcmsTransferFunctionToKFloatArray(env, SkNamedTransferFn::kPQ, result);
+    copySkcmsTransferFunctionToKFloatArray(SkNamedTransferFn::kPQ, result);
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_TransferFunction__1nGetHLG
   (KFloat* result) {
-    copySkcmsTransferFunctionToKFloatArray(env, SkNamedTransferFn::kHLG, result);
+    copySkcmsTransferFunctionToKFloatArray(SkNamedTransferFn::kHLG, result);
 }
 
 SKIKO_EXPORT KBoolean org_jetbrains_skia_TransferFunction__1nMakePQish
@@ -51,7 +51,7 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_TransferFunction__1nMakePQish
     skcms_TransferFunction transferFn;
     bool success = skcms_TransferFunction_makePQish(&transferFn, A, B, C, D, E, F);
     if (success)
-        copySkcmsTransferFunctionToKFloatArray(env, transferFn, result);
+        copySkcmsTransferFunctionToKFloatArray(transferFn, result);
     return success;
 }
 
@@ -60,21 +60,21 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_TransferFunction__1nMakeScaledHLGish
     skcms_TransferFunction transferFn;
     bool success = skcms_TransferFunction_makeScaledHLGish(&transferFn, K, R, G, a, b, c);
     if (success)
-        copySkcmsTransferFunctionToKFloatArray(env, transferFn, result);
+        copySkcmsTransferFunctionToKFloatArray(transferFn, result);
     return success;
 }
 
 SKIKO_EXPORT KInt org_jetbrains_skia_TransferFunction__1nGetType
   (KFloat* transferFunction) {
     skcms_TransferFunction transferFn;
-    copyKFloatArrayToSkcmsTransferFunction(env, transferFunction, &transferFn);
+    copyKFloatArrayToSkcmsTransferFunction(transferFunction, &transferFn);
     return static_cast<KInt>(skcms_TransferFunction_getType(&transferFn));
 }
 
 SKIKO_EXPORT KInt org_jetbrains_skia_TransferFunction__1nEval
   (KFloat* transferFunction, KFloat x) {
     skcms_TransferFunction transferFn;
-    copyKFloatArrayToSkcmsTransferFunction(env, transferFunction, &transferFn);
+    copyKFloatArrayToSkcmsTransferFunction(transferFunction, &transferFn);
     return skcms_TransferFunction_eval(&transferFn, x);
 }
 
@@ -82,9 +82,9 @@ SKIKO_EXPORT KBoolean org_jetbrains_skia_TransferFunction__1nInvert
   (KFloat* transferFunction, KFloat* result) {
     skcms_TransferFunction transferFn;
     skcms_TransferFunction resultTransferFn;
-    copyKFloatArrayToSkcmsTransferFunction(env, transferFunction, &transferFn);
+    copyKFloatArrayToSkcmsTransferFunction(transferFunction, &transferFn);
     bool success = skcms_TransferFunction_invert(&transferFn, &resultTransferFn);
     if (success)
-        copySkcmsTransferFunctionToKFloatArray(env, resultTransferFn, result);
+        copySkcmsTransferFunctionToKFloatArray(resultTransferFn, result);
     return success;
 }
