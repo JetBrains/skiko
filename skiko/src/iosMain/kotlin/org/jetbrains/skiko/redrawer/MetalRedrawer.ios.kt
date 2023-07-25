@@ -20,7 +20,9 @@ import platform.darwin.*
 import kotlin.native.ref.WeakReference
 
 internal class MetalRedrawer(
-    private val layer: SkiaLayer
+    private val layer: SkiaLayer,
+    // Used for tests, access to NSRunLoop crashes in test environment
+    addDisplayLinkToRunLoop: ((CADisplayLink) -> Unit)? = null
 ) : Redrawer {
     private val contextHandler = MetalContextHandler(layer)
     override val renderInfo: String get() = contextHandler.rendererInfo()
@@ -60,7 +62,11 @@ internal class MetalRedrawer(
     init {
         metalLayer.init(this.layer, contextHandler, device)
         caDisplayLink.setPaused(true)
-        caDisplayLink.addToRunLoop(NSRunLoop.mainRunLoop, NSRunLoop.mainRunLoop.currentMode)
+        if (addDisplayLinkToRunLoop == null) {
+            caDisplayLink.addToRunLoop(NSRunLoop.mainRunLoop, NSRunLoop.mainRunLoop.currentMode)
+        } else {
+            addDisplayLinkToRunLoop.invoke(caDisplayLink)
+        }
     }
 
     fun makeContext() = DirectContext.makeMetal(device.objcPtr(), queue.objcPtr())
