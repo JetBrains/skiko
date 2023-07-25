@@ -1,5 +1,10 @@
 package org.jetbrains.skia
 
+import org.jetbrains.skia.impl.InteropPointer
+import org.jetbrains.skia.impl.Library.Companion.staticLoad
+import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.impl.withNullableResult
+import org.jetbrains.skia.impl.withResult
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.cos
@@ -13,9 +18,8 @@ internal fun Float.toRadians(): Double = this.toDouble() / 180 * PI
  * Point and vectors with translation, scaling, skewing, rotation, and
  * perspective.
  *
- *
- * Matrix includes a hidden variable that classifies the type of matrix to
- * improve performance. Matrix is not thread safe unless getType() is called first.
+ * 3x3 matrices are also used to characterize the gamut of a color space in the form
+ * of a conversion matrix to XYZ D50. We call this a toXYZD50 matrix for short.
  *
  * @see [https://fiddle.skia.org/c/@Matrix_063](https://fiddle.skia.org/c/@Matrix_063)
  */
@@ -264,6 +268,58 @@ class Matrix33(vararg mat: Float) {
         fun makeSkew(sx: Float, sy: Float): Matrix33 {
             return Matrix33(1f, sx, 0f, sy, 1f, 0f, 0f, 0f, 1f)
         }
+
+        init {
+            staticLoad()
+        }
+
+        // We defensively copy the preset arrays, as otherwise, Matrix33 would expose them to potential mutation:
+
+        /** A toXYZD50 matrix to convert sRGB color into XYZ adapted to D50. Use it to create a color space. */
+        val sRGBToXYZD50 get() = Matrix33(*_sRGBToXYZD50)
+
+        /** A toXYZD50 matrix to convert Adobe RGB color into XYZ adapted to D50. Use it to create a color space. */
+        val adobeRGBToXYZD50 get() = Matrix33(*_adobeRGBToXYZD50)
+
+        /** A toXYZD50 matrix to convert Display P3 color into XYZ adapted to D50. Use it to create a color space. */
+        val displayP3ToXYZD50 get() = Matrix33(*_displayP3ToXYZD50)
+
+        /** A toXYZD50 matrix to convert Rec.2020 color into XYZ adapted to D50. Use it to create a color space. */
+        val rec2020ToXYZD50 get() = Matrix33(*_rec2020ToXYZD50)
+
+        /** A toXYZD50 identity matrix. Use it to create a color space. */
+        val xyzD50ToXYZD50 get() = Matrix33(*_xyzD50ToXYZD50)
+
+        private val _sRGBToXYZD50 = withResult(FloatArray(9)) { _nGetSRGB(it) }
+        private val _adobeRGBToXYZD50 = withResult(FloatArray(9)) { _nGetAdobeRGB(it) }
+        private val _displayP3ToXYZD50 = withResult(FloatArray(9)) { _nGetDisplayP3(it) }
+        private val _rec2020ToXYZD50 = withResult(FloatArray(9)) { _nGetRec2020(it) }
+        private val _xyzD50ToXYZD50 = withResult(FloatArray(9)) { _nGetXYZ(it) }
+
+        /**
+         * Returns a toXYZD50 matrix to adapt XYZ color from given the whitepoint to D50.
+         * Use it to create a color space.
+         */
+        fun makeXYZToXYZD50(wx: Float, wy: Float): Matrix33? {
+            Stats.onNativeCall()
+            return withNullableResult(FloatArray(9)) {
+                _nAdaptToXYZD50(wx, wy, it)
+            }?.let { Matrix33(*it) }
+        }
+
+        /**
+         * Returns a toXYZD50 matrix to convert RGB color into XYZ adapted to D50,
+         * given the primaries and whitepoint of the RGB model.
+         * Use it to create a color space.
+         */
+        fun makePrimariesToXYZD50(
+            rx: Float, ry: Float, gx: Float, gy: Float, bx: Float, by: Float, wx: Float, wy: Float
+        ): Matrix33? {
+            Stats.onNativeCall()
+            return withNullableResult(FloatArray(9)) {
+                _nPrimariesToXYZD50(rx, ry, gx, gy, bx, by, wx, wy, it)
+            }?.let { Matrix33(*it) }
+        }
     }
 
     init {
@@ -271,3 +327,26 @@ class Matrix33(vararg mat: Float) {
         this.mat = mat
     }
 }
+
+@ExternalSymbolName("org_jetbrains_skia_Matrix33__1nGetSRGB")
+private external fun _nGetSRGB(result: InteropPointer)
+
+@ExternalSymbolName("org_jetbrains_skia_Matrix33__1nGetAdobeRGB")
+private external fun _nGetAdobeRGB(result: InteropPointer)
+
+@ExternalSymbolName("org_jetbrains_skia_Matrix33__1nGetDisplayP3")
+private external fun _nGetDisplayP3(result: InteropPointer)
+
+@ExternalSymbolName("org_jetbrains_skia_Matrix33__1nGetRec2020")
+private external fun _nGetRec2020(result: InteropPointer)
+
+@ExternalSymbolName("org_jetbrains_skia_Matrix33__1nGetXYZ")
+private external fun _nGetXYZ(result: InteropPointer)
+
+@ExternalSymbolName("org_jetbrains_skia_Matrix33__1nAdaptToXYZD50")
+private external fun _nAdaptToXYZD50(wx: Float, wy: Float, result: InteropPointer): Boolean
+
+@ExternalSymbolName("org_jetbrains_skia_Matrix33__1nPrimariesToXYZD50")
+private external fun _nPrimariesToXYZD50(
+    rx: Float, ry: Float, gx: Float, gy: Float, bx: Float, by: Float, wx: Float, wy: Float, result: InteropPointer
+): Boolean
