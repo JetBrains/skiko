@@ -48,6 +48,7 @@ class MetalRedrawerTest {
         createAndForgetSkiaLayer { isDisposed = true }
 
         // GC can't sweep Objc-Kotlin objects in one pass due to different lifetime models
+        // Two passes do not guarantee it either, this test can break in future
         kotlin.native.internal.GC.collect()
         kotlin.native.internal.GC.collect()
 
