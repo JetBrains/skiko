@@ -12,8 +12,10 @@ private val nsRunLoopMock = object {
 }
 class MetalRedrawerTest {
     @OptIn(ExperimentalStdlibApi::class)
-    private fun createAndForgetRedrawer(disposeCallback: () -> Unit) {
+    private fun createAndForgetSkiaLayer(disposeCallback: () -> Unit) {
         val skiaLayer = object : SkiaLayer() {
+            // createCleaner can't capture anything
+            // so we need to proxy call to disposeCallback via the cleaned object itself
             val disposeCallbackProxy = object {
                 fun dispose() {
                     disposeCallback()
@@ -35,17 +37,14 @@ class MetalRedrawerTest {
     }
 
     @Test
-    fun `check redrawer is disposed`() {
+    fun `check skia layer is disposed`() {
         var isDisposed = false
 
-        createAndForgetRedrawer { isDisposed = true }
+        createAndForgetSkiaLayer { isDisposed = true }
 
         // GC can't sweep Objc-Kotlin objects in one pass due to different lifetime models
         kotlin.native.internal.GC.collect()
         kotlin.native.internal.GC.collect()
-
-        // not needed yet
-        // reachabilityBarrier(globalDisplayLinksStorageMimickingRunLoop)
 
         assertEquals(true, isDisposed)
     }
