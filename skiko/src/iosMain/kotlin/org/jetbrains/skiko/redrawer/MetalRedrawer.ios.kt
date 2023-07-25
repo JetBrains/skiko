@@ -17,6 +17,7 @@ import platform.Metal.MTLDeviceProtocol
 import platform.Metal.MTLPixelFormatBGRA8Unorm
 import platform.QuartzCore.*
 import platform.darwin.*
+import kotlin.native.ref.WeakReference
 
 internal class MetalRedrawer(
     private val layer: SkiaLayer
@@ -51,22 +52,11 @@ internal class MetalRedrawer(
             }
         }
 
-    private val frameListener: NSObject = FrameTickListener {
-        if (hasScheduledDrawOnNextVSync) {
-            hasScheduledDrawOnNextVSync = false
-
-            drawIfLayerIsShowing()
-        }
-
-        if (!needsProactiveDisplayLink) {
-            caDisplayLink.setPaused(true)
-        }
-    }
-
     private val caDisplayLink = CADisplayLink.displayLinkWithTarget(
-        target = frameListener,
-        selector = NSSelectorFromString(FrameTickListener::onDisplayLinkTick.name)
+        target = DisplayLinkProxy(WeakReference(this)),
+        selector = NSSelectorFromString(DisplayLinkProxy::handleDisplayLinkTick.name)
     )
+
     init {
         metalLayer.init(this.layer, contextHandler, device)
         caDisplayLink.setPaused(true)
@@ -104,6 +94,18 @@ internal class MetalRedrawer(
 
         osView.window?.screen?.maximumFramesPerSecond?.let {
             caDisplayLink.preferredFramesPerSecond = it
+        }
+    }
+
+    internal fun handleDisplayLinkTick() {
+        if (hasScheduledDrawOnNextVSync) {
+            hasScheduledDrawOnNextVSync = false
+
+            drawIfLayerIsShowing()
+        }
+
+        if (!needsProactiveDisplayLink) {
+            caDisplayLink.setPaused(true)
         }
     }
 
@@ -199,9 +201,12 @@ internal class MetalLayer : CAMetalLayer {
     }
 }
 
-private class FrameTickListener(val onFrameTick: () -> Unit) : NSObject() {
+private class DisplayLinkProxy(
+    private val redrawer: WeakReference<MetalRedrawer>
+) : NSObject() {
+
     @ObjCAction
-    fun onDisplayLinkTick() {
-        onFrameTick()
+    fun handleDisplayLinkTick() {
+        redrawer.get()?.handleDisplayLinkTick()
     }
 }

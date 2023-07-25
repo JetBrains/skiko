@@ -34,7 +34,6 @@ internal class MetalContextHandler(layer: SkiaLayer) : ContextHandler(layer, lay
     }
 
     override fun initCanvas() {
-        disposeCanvas()
         val scale = layer.contentScale
         val (w, h) = layer.view!!.frame.useContents {
             (size.width * scale).toInt().coerceAtLeast(0) to (size.height * scale).toInt().coerceAtLeast(0)
@@ -69,6 +68,8 @@ internal class MetalContextHandler(layer: SkiaLayer) : ContextHandler(layer, lay
         super.flush()
         surface?.flushAndSubmit()
         metalRedrawer.finishFrame()
+
+        disposeCanvas()
     }
 
    override fun rendererInfo(): String {
