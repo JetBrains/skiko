@@ -16,6 +16,7 @@ class ShaderTest {
         Shader.makeLinearGradient(start, end, colors)
         Shader.makeLinearGradient(start, end, colors, positions)
         Shader.makeLinearGradient(start, end, colors, positions, style = GradientStyle.DEFAULT)
+        Shader.makeLinearGradient(start, end, colorsF, colorSpace, null, GradientStyle.DEFAULT)
         Shader.makeLinearGradient(start, end, colorsF, colorSpace, positions, GradientStyle.DEFAULT)
     }
 
@@ -32,6 +33,7 @@ class ShaderTest {
         Shader.makeRadialGradient(center, radius, colors)
         Shader.makeRadialGradient(center, radius, colors, positions)
         Shader.makeRadialGradient(center, radius, colors, positions, style = GradientStyle.DEFAULT)
+        Shader.makeRadialGradient(center, radius, colorsF, colorSpace, null, GradientStyle.DEFAULT)
         Shader.makeRadialGradient(center, radius, colorsF, colorSpace, positions, GradientStyle.DEFAULT)
     }
 
@@ -50,6 +52,7 @@ class ShaderTest {
         Shader.makeTwoPointConicalGradient(start, startRadius, end, endRadius, colors)
         Shader.makeTwoPointConicalGradient(start, startRadius, end, endRadius, colors, positions)
         Shader.makeTwoPointConicalGradient(start, startRadius, end, endRadius, colors, positions, style = GradientStyle.DEFAULT)
+        Shader.makeTwoPointConicalGradient(start, startRadius, end, endRadius, colorsF, colorSpace, null, GradientStyle.DEFAULT)
         Shader.makeTwoPointConicalGradient(start, startRadius, end, endRadius, colorsF, colorSpace, positions, GradientStyle.DEFAULT)
     }
 
@@ -67,6 +70,7 @@ class ShaderTest {
         Shader.makeSweepGradient(center, colors, positions)
         Shader.makeSweepGradient(center, colors, positions, style = GradientStyle.DEFAULT)
         Shader.makeSweepGradient(center, startAngle, endAngle, colors, positions, GradientStyle.DEFAULT)
+        Shader.makeSweepGradient(center, startAngle, endAngle, colorsF, colorSpace, null, GradientStyle.DEFAULT)
         Shader.makeSweepGradient(center, startAngle, endAngle, colorsF, colorSpace, positions, GradientStyle.DEFAULT)
     }
 
