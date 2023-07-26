@@ -4,6 +4,7 @@ import org.jetbrains.skia.Canvas
 import org.jetbrains.skiko.redrawer.MetalRedrawer
 import platform.QuartzCore.CADisplayLink
 import kotlin.native.internal.createCleaner
+import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -42,6 +43,7 @@ class MetalRedrawerTest {
     }
 
     @Test
+    @Ignore // TODO: fails on CI due to Metal not supported, solve by extracting DisplayLink dispatch mechanism to separate class
     fun `check skia layer is disposed`() {
         var isDisposed = false
 
