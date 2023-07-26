@@ -5,10 +5,10 @@ import org.jetbrains.skiko.*
 import java.awt.Graphics2D
 
 internal class Direct3DSwingRedrawer(
-        private val swingLayerProperties: SwingLayerProperties,
-        skikoView: SkikoView,
-        analytics: SkiaLayerAnalytics
-) : SwingRedrawerBase(swingLayerProperties, skikoView, analytics, GraphicsApi.DIRECT3D) {
+    swingLayerProperties: SwingLayerProperties,
+    private val skikoView: SkikoView,
+    analytics: SkiaLayerAnalytics
+) : SwingRedrawerBase(swingLayerProperties, analytics, GraphicsApi.DIRECT3D) {
     companion object {
         init {
             Library.load()
@@ -23,67 +23,82 @@ internal class Direct3DSwingRedrawer(
 
     private val swingOffscreenDrawer = SwingOffscreenDrawer(swingLayerProperties)
 
+    private val context = DirectContext(
+        makeDirectXContext(device)
+    )
+
+    private val storage = Bitmap()
+
+    private var bytesToDraw = ByteArray(0)
+
+    init {
+        onContextInit()
+    }
+
     override fun dispose() {
+        bytesToDraw = ByteArray(0)
+        storage.close()
+        context.close()
         disposeDevice(device)
         super.dispose()
     }
 
-    override fun createDirectContext(): DirectContext {
-        return DirectContext(
-                makeDirectXContext(device)
-        )
-    }
-
-    override fun initCanvas(context: DirectContext?): DrawingSurfaceData {
-        context ?: error("DirectContext should be initialized")
-
-        val scale = swingLayerProperties.graphicsConfiguration.defaultTransform.scaleX.toFloat()
-        val width = (swingLayerProperties.width * scale).toInt().coerceAtLeast(0)
-        val height = (swingLayerProperties.height * scale).toInt().coerceAtLeast(0)
-
-        val renderTarget = createBackendRenderTarget(width, height)
-
-        val surface = Surface.makeFromBackendRenderTarget(
+    override fun onRender(g: Graphics2D, width: Int, height: Int, nanoTime: Long) {
+        autoCloseScope {
+            val renderTarget = createBackendRenderTarget(width, height).autoClose()
+            val surface = Surface.makeFromBackendRenderTarget(
                 context,
                 renderTarget,
                 SurfaceOrigin.TOP_LEFT,
                 SurfaceColorFormat.RGBA_8888,
                 ColorSpace.sRGB,
                 SurfaceProps(pixelGeometry = PixelGeometry.UNKNOWN)
-        ) ?: throw RenderException("Cannot create surface")
+            )?.autoClose() ?: throw RenderException("Cannot create surface")
 
-        return DrawingSurfaceData(renderTarget, surface, surface.canvas)
+            val canvas = surface.canvas
+            canvas.clear(Color.TRANSPARENT)
+            skikoView.onRender(canvas, width, height, nanoTime)
+            flush(surface, g)
+        }
     }
 
-    override fun flush(drawingSurfaceData: DrawingSurfaceData, g: Graphics2D) {
-        val surface = drawingSurfaceData.surface ?: error("Surface should be initialized")
+    fun flush(surface: Surface, g: Graphics2D) {
         surface.flushAndSubmit(syncCpu = false)
 
         val width = surface.width
         val height = surface.height
 
-        val storage = Bitmap()
-        storage.setImageInfo(ImageInfo.makeN32Premul(width, height))
-        storage.allocPixels()
+        val dstRowBytes = width * 4
+        if (storage.width != width || storage.height != height) {
+            storage.allocPixelsFlags(ImageInfo.makeS32(width, height, ColorAlphaType.PREMUL), false)
+            bytesToDraw = ByteArray(storage.getReadPixelsArraySize(dstRowBytes = dstRowBytes))
+        }
         // TODO: it copies pixels from GPU to CPU, so it is really slow
         surface.readPixels(storage, 0, 0)
 
-        val bytes = storage.readPixels(storage.imageInfo, (width * 4), 0, 0)
-        if (bytes != null) {
-            swingOffscreenDrawer.draw(g, bytes, width, height)
+        val successfulRead = storage.readPixels(bytesToDraw, dstRowBytes = dstRowBytes)
+        if (successfulRead) {
+            swingOffscreenDrawer.draw(g, bytesToDraw, width, height)
         }
     }
 
     // TODO: memory leak for texture?
     // TODO: create native method that creates backendRenderTarget?
     private fun createBackendRenderTarget(
-            width: Int,
-            height: Int
+        width: Int,
+        height: Int
     ): BackendRenderTarget {
         val format = 28 // DXGI_FORMAT_R8G8B8A8_UNORM
         val sampleCnt = 1
         val levelCnt = 1
-        return BackendRenderTarget.makeDirect3D(width, height, createDirectXTexture(device, width, height), format, sampleCnt, levelCnt)
+        return BackendRenderTarget.makeDirect3D(
+            width,
+            height,
+            createDirectXTexture(device, width, height),
+            format,
+            sampleCnt,
+            levelCnt
+        )
     }
 
     // Called from native code
