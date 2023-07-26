@@ -6,7 +6,7 @@ import platform.QuartzCore.CADisplayLink
 import kotlin.native.internal.createCleaner
 import kotlin.test.Ignore
 import kotlin.test.Test
-import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 private val nsRunLoopMock = object {
     val displayLinks = mutableListOf<CADisplayLink>()
@@ -54,6 +54,6 @@ class MetalRedrawerTest {
         kotlin.native.internal.GC.collect()
         kotlin.native.internal.GC.collect()
 
-        assertEquals(true, isDisposed)
+        assertTrue(isDisposed)
     }
 }
