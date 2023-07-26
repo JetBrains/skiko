@@ -17,17 +17,17 @@ class ColorSpace : Managed {
         /**
          * Creates a color space from a transfer function and a 3x3 transformation to XYZ D50.
          * Matrix33 offers various factories for obtaining a toXYZD50 matrix.
+         *
+         * @throws IllegalArgumentException If the transfer function is invalid.
          */
-        fun makeRGB(transferFunction: TransferFunction, toXYZD50: Matrix33): ColorSpace? {
+        fun makeRGB(transferFunction: TransferFunction, toXYZD50: Matrix33): ColorSpace {
             return try {
                 Stats.onNativeCall()
                 val ptr = interopScope {
                     _nMakeRGB(toInterop(transferFunction.asArray()), toInterop(toXYZD50.mat))
                 }
-                if (ptr == NullPointer)
-                    null
-                else
-                    ColorSpace(ptr)
+                require(ptr != NullPointer) { "Invalid transfer function" }
+                ColorSpace(ptr)
             } finally {
                 reachabilityBarrier(transferFunction)
                 reachabilityBarrier(toXYZD50)

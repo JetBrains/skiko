@@ -299,26 +299,34 @@ class Matrix33(vararg mat: Float) {
         /**
          * Returns a toXYZD50 matrix to adapt XYZ color from given the whitepoint to D50.
          * Use it to create a color space.
+         *
+         * @throws IllegalArgumentException If the white point is invalid.
          */
-        fun makeXYZToXYZD50(wx: Float, wy: Float): Matrix33? {
+        fun makeXYZToXYZD50(wx: Float, wy: Float): Matrix33 {
             Stats.onNativeCall()
-            return withNullableResult(FloatArray(9)) {
+            val array = withNullableResult(FloatArray(9)) {
                 _nAdaptToXYZD50(wx, wy, it)
-            }?.let { Matrix33(*it) }
+            }
+            requireNotNull(array) { "Cannot find transformation from the white point to D50" }
+            return Matrix33(*array)
         }
 
         /**
          * Returns a toXYZD50 matrix to convert RGB color into XYZ adapted to D50,
          * given the primaries and whitepoint of the RGB model.
          * Use it to create a color space.
+         *
+         * @throws IllegalArgumentException If the primaries or white point are invalid.
          */
         fun makePrimariesToXYZD50(
             rx: Float, ry: Float, gx: Float, gy: Float, bx: Float, by: Float, wx: Float, wy: Float
-        ): Matrix33? {
+        ): Matrix33 {
             Stats.onNativeCall()
-            return withNullableResult(FloatArray(9)) {
+            val array = withNullableResult(FloatArray(9)) {
                 _nPrimariesToXYZD50(rx, ry, gx, gy, bx, by, wx, wy, it)
-            }?.let { Matrix33(*it) }
+            }
+            requireNotNull(array) { "Cannot find transformation from the primaries and white point to XYZ D50" }
+            return Matrix33(*array)
         }
     }
 
