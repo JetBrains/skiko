@@ -259,8 +259,6 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
                 platform = event
             )
         )
-         // If invalidation doesn't happen while onPointerEvent is processed, it's too late to schedule any work for this frame.
-        skiaLayer?.redrawer?.preventDrawDispatchDuringCurrentFrame()
     }
 
     private val UITouch.isPressed get() =
