@@ -240,9 +240,14 @@ extern "C"
 
         return toJavaPointer(device->texture);
     }
+    bool dbgReadPixels = false;
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_swing_Direct3DSwingRedrawer_readPixels(
             JNIEnv *env, jobject redrawer, jlong devicePtr, jbyteArray byteArray) {
+        if (dbgReadPixels) {
+            return;
+        }
+        std::cout << "readPixels" << std::endl;
         jbyte *bytesPtr = env->GetByteArrayElements(byteArray, nullptr);
 
         DirectXOffscreenDevice *device = fromJavaPointer<DirectXOffscreenDevice *>(devicePtr);
@@ -264,23 +269,23 @@ extern "C"
 
         commandList->Close();
 
-        //device->backendContext.fQueue->ExecuteCommandLists(1, reinterpret_cast<ID3D12CommandList**>(&commandList));
+        device->backendContext.fQueue->ExecuteCommandLists(1, reinterpret_cast<ID3D12CommandList**>(&commandList));
 
         // create fence
 //        ID3D12Fence* fence;
 //        device->backendContext.fDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
 //        fence->Release();
 
-//        jlong rangeLength = device->readbackBufferDesc.Width * device->readbackBufferDesc.Height * 4;
-//        D3D12_RANGE readbackBufferRange{ 0, rangeLength };
-//
-//        jbyte* readbackBufferBytesPtr = nullptr;
+        jlong rangeLength = device->readbackBufferDesc.Width;
+        D3D12_RANGE readbackBufferRange{ 0, rangeLength };
+
+        jbyte* readbackBufferBytesPtr = nullptr;
 //        device->readbackBuffer->Map(
 //            0,
 //            &readbackBufferRange,
 //            reinterpret_cast<void**>(&readbackBufferBytesPtr)
 //        );
-//
+
 //        memcpy(bytesPtr, readbackBufferBytesPtr, rangeLength);
 //
 //        D3D12_RANGE emptyRange{ 0, 0 };
@@ -291,6 +296,8 @@ extern "C"
 //        );
 
         env->ReleaseByteArrayElements(byteArray, bytesPtr, 0);
+
+        dbgReadPixels = true;
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_swing_Direct3DSwingRedrawer_disposeDevice(
