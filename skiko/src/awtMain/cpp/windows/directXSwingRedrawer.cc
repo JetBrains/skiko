@@ -33,6 +33,8 @@ public:
     D3D12_HEAP_PROPERTIES readbackHeapProperties;
     ID3D12Resource* readbackBuffer;
 
+    ID3D12CommandAllocator* commandAllocator;
+
     ~DirectXOffscreenDevice()
     {
         if (texture) {
@@ -41,6 +43,10 @@ public:
 
         if (readbackBuffer) {
             readbackBuffer->Release();
+        }
+
+        if (commandAllocator) {
+            commandAllocator->Release();
         }
 
         backendContext.fQueue.reset(nullptr);
@@ -142,9 +148,15 @@ extern "C"
             return 0;
         }
 
+        ID3D12CommandAllocator* commandAllocator;
+        if (!SUCCEEDED(device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocator)))) {
+            return 0;
+        }
+
         DirectXOffscreenDevice *d3dDevice = new DirectXOffscreenDevice();
         d3dDevice->texture = nullptr;
         d3dDevice->readbackBuffer = nullptr;
+        d3dDevice->commandAllocator = commandAllocator;
         d3dDevice->backendContext.fAdapter = adapter;
         d3dDevice->backendContext.fDevice = device;
         d3dDevice->backendContext.fQueue = queue;
@@ -231,11 +243,54 @@ extern "C"
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_swing_Direct3DSwingRedrawer_readPixels(
             JNIEnv *env, jobject redrawer, jlong devicePtr, jbyteArray byteArray) {
-//        jbyte *bytesPtr = env->GetByteArrayElements(byteArray, nullptr);
+        jbyte *bytesPtr = env->GetByteArrayElements(byteArray, nullptr);
+
+        DirectXOffscreenDevice *device = fromJavaPointer<DirectXOffscreenDevice *>(devicePtr);
+
+        ID3D12GraphicsCommandList* commandList;
+        device->backendContext.fDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, device->commandAllocator, nullptr, IID_PPV_ARGS(&commandList));
+
+        D3D12_RESOURCE_BARRIER textureResourceBarrier;
+        textureResourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+        textureResourceBarrier.Transition.pResource = device->readbackBuffer;
+        textureResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+        textureResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_SOURCE;
+        textureResourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+        textureResourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+
+        commandList->ResourceBarrier(1, &textureResourceBarrier);
+
+        commandList->CopyResource(device->readbackBuffer, device->texture);
+
+        commandList->Close();
+
+        //device->backendContext.fQueue->ExecuteCommandLists(1, reinterpret_cast<ID3D12CommandList**>(&commandList));
+
+        // create fence
+//        ID3D12Fence* fence;
+//        device->backendContext.fDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
+//        fence->Release();
+
+//        jlong rangeLength = device->readbackBufferDesc.Width * device->readbackBufferDesc.Height * 4;
+//        D3D12_RANGE readbackBufferRange{ 0, rangeLength };
 //
-//        exit(0);
+//        jbyte* readbackBufferBytesPtr = nullptr;
+//        device->readbackBuffer->Map(
+//            0,
+//            &readbackBufferRange,
+//            reinterpret_cast<void**>(&readbackBufferBytesPtr)
+//        );
 //
-//        env->ReleaseByteArrayElements(byteArray, bytesPtr, 0);
+//        memcpy(bytesPtr, readbackBufferBytesPtr, rangeLength);
+//
+//        D3D12_RANGE emptyRange{ 0, 0 };
+//        device->readbackBuffer->Unmap
+//        (
+//            0,
+//            &emptyRange
+//        );
+
+        env->ReleaseByteArrayElements(byteArray, bytesPtr, 0);
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_swing_Direct3DSwingRedrawer_disposeDevice(

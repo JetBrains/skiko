@@ -80,7 +80,7 @@ internal class Direct3DSwingRedrawer(
         val surface = surface ?: throw RenderException("surface is null")
 
         val canvas = surface.canvas
-        canvas.clear(Color.TRANSPARENT)
+        canvas.clear(Color.BLUE)
         skikoView.onRender(canvas, width, height, nanoTime)
         flush(surface, g)
     }
@@ -88,38 +88,14 @@ internal class Direct3DSwingRedrawer(
     fun flush(surface: Surface, g: Graphics2D) {
         surface.flushAndSubmit(syncCpu = true)
 
-        val width = surface.width
-        val height = surface.height
-
-        val dstRowBytes = width * 4
-        if (storage.width != width || storage.height != height) {
-            storage.allocPixelsFlags(ImageInfo.makeS32(width, height, ColorAlphaType.PREMUL), false)
-            bytesToDraw = ByteArray(storage.getReadPixelsArraySize(dstRowBytes = dstRowBytes))
+        val expectedSize = surface.width * surface.height * 4
+        if (bytesToDraw.size != expectedSize) {
+            bytesToDraw = ByteArray(expectedSize)
         }
         // TODO: it copies pixels from GPU to CPU, so it is really slow
-//        surface.readPixels(storage, 0, 0)
-//        storage.readPixels(bytesToDraw, dstRowBytes = dstRowBytes)
+        readPixels(device, bytesToDraw)
 
-        swingOffscreenDrawer.draw(g, bytesToDraw, width, height)
-    }
-
-    // TODO: memory leak for texture?
-    // TODO: create native method that creates backendRenderTarget?
-    private fun createBackendRenderTarget(
-        width: Int,
-        height: Int
-    ): BackendRenderTarget {
-        val format = 28 // DXGI_FORMAT_R8G8B8A8_UNORM
-        val sampleCnt = 1
-        val levelCnt = 1
-        return BackendRenderTarget.makeDirect3D(
-            width,
-            height,
-            getRenderTargetTexture(device, width, height),
-            format,
-            sampleCnt,
-            levelCnt
-        )
+        swingOffscreenDrawer.draw(g, bytesToDraw, surface.width, surface.height)
     }
 
     // Called from native code
@@ -128,6 +104,8 @@ internal class Direct3DSwingRedrawer(
     private external fun chooseAdapter(adapterPriority: Int): Long
     private external fun createDirectXOffscreenDevice(adapter: Long): Long
     private external fun makeDirectXContext(device: Long): Long
+
+    private external fun readPixels(device: Long, byteArray: ByteArray)
 
     // creates ID3D12Resource
     private external fun getRenderTargetTexture(device: Long, width: Int, height: Int): Long
