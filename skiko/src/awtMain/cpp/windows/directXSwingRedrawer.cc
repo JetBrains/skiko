@@ -175,9 +175,6 @@ extern "C"
             return 0;
         }
 
-        ID3D12Fence* fence;
-        device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
-
         HANDLE fenceEvent = CreateEventEx(nullptr, false, false, EVENT_ALL_ACCESS);
 
         DirectXOffscreenDevice *d3dDevice = new DirectXOffscreenDevice();
@@ -185,7 +182,7 @@ extern "C"
         d3dDevice->readbackBuffer = nullptr;
         d3dDevice->commandAllocator = commandAllocator;
         d3dDevice->commandList = commandList;
-        d3dDevice->fence = fence;
+        d3dDevice->fence = nullptr;
         d3dDevice->fenceEvent = fenceEvent;
         d3dDevice->backendContext.fAdapter = adapter;
         d3dDevice->backendContext.fDevice = device;
@@ -231,6 +228,7 @@ extern "C"
         readbackHeapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
         readbackHeapProperties.CreationNodeMask = 1;
         readbackHeapProperties.VisibleNodeMask = 1;
+
 
         return toJavaPointer(d3dDevice);
     }
@@ -278,6 +276,11 @@ extern "C"
 
         DirectXOffscreenDevice *device = fromJavaPointer<DirectXOffscreenDevice *>(devicePtr);
 
+        // if fence is not created, make it
+        if (!device->fence) {
+            device->backendContext.fDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&device->fence));
+        }
+
         auto commandAllocator = device->commandAllocator;
         auto commandList = device->commandList;
 
@@ -286,10 +289,10 @@ extern "C"
 
         D3D12_RESOURCE_BARRIER textureResourceBarrier;
         textureResourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-        textureResourceBarrier.Transition.pResource = device->readbackBuffer;
+        textureResourceBarrier.Transition.pResource = device->texture;
         textureResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
         textureResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_SOURCE;
-        textureResourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+        textureResourceBarrier.Transition.Subresource = 0;
         textureResourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 
         commandList->ResourceBarrier(1, &textureResourceBarrier);
@@ -300,19 +303,14 @@ extern "C"
 
         ID3D12CommandList* commandLists[] = { commandList };
         device->backendContext.fQueue->ExecuteCommandLists(_countof(commandLists), commandLists);
-
-        // print pointer of readbackBuffer and texture
-//        std::cout << "readbackBuffer: " << device->readbackBuffer << std::endl;
-//        std::cout << "texture: " << device->texture << std::endl;
-
         // Wait for the command list to finish executing; the readback buffer will be ready to read
 
         auto fence = device->fence;
         auto fenceEvent = device->fenceEvent;
         auto& fenceValue = device->fenceValue;
 
-        device->backendContext.fQueue->Signal(fence, fenceValue);
         fenceValue += 1;
+        device->backendContext.fQueue->Signal(fence, fenceValue);
 
         if (fence->GetCompletedValue() < fenceValue) {
             fence->SetEventOnCompletion(fenceValue, fenceEvent);
@@ -322,16 +320,19 @@ extern "C"
         jlong rangeLength = device->readbackBufferDesc.Width;
         D3D12_RANGE readbackBufferRange{ 0, rangeLength };
 
-        void* readbackBufferBytesPtr = nullptr;
+        void *readbackBufferBytesPtr = nullptr;
         device->readbackBuffer->Map(
             0,
             &readbackBufferRange,
             &readbackBufferBytesPtr
         );
 
-        printf("readbackBufferBytesPtr: %p\n", readbackBufferBytesPtr);
+        if (!readbackBufferBytesPtr) {
+            std::cout << "Couldn't map readback buffer" << std::endl;
+            exit(1);
+        }
 
-//        memcpy(bytesPtr, readbackBufferBytesPtr, rangeLength);
+        memcpy(bytesPtr, readbackBufferBytesPtr, rangeLength);
 
         D3D12_RANGE emptyRange{ 0, 0 };
         device->readbackBuffer->Unmap
@@ -341,8 +342,6 @@ extern "C"
         );
 
         env->ReleaseByteArrayElements(byteArray, bytesPtr, 0);
-
-        //dbgReadPixels = true;
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_swing_Direct3DSwingRedrawer_disposeDevice(

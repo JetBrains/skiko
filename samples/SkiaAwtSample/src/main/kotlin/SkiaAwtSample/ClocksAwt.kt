@@ -28,8 +28,6 @@ open class ClocksAwt(private val scaleProvider: () -> Float) : SkikoView {
         .setDefaultFontManager(FontMgr.default)
 
     override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
-        return
-
         val watchFill = Paint().apply { color = 0xFFFFFFFF.toInt() }
         val watchStroke = Paint().apply {
                color = 0xFF000000.toInt()
