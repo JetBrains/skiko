@@ -271,10 +271,18 @@ extern "C"
 
         device->backendContext.fQueue->ExecuteCommandLists(1, reinterpret_cast<ID3D12CommandList**>(&commandList));
 
-        // create fence
-//        ID3D12Fence* fence;
-//        device->backendContext.fDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
-//        fence->Release();
+        // Wait for the command list to finish executing; the readback buffer will be ready to read
+        ID3D12Fence* fence;
+        device->backendContext.fDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
+        HANDLE eventHandle = CreateEventEx(nullptr, false, false, EVENT_ALL_ACCESS);
+        const UINT64 fenceValue = 1;
+        device->backendContext.fQueue->Signal(fence, fenceValue);
+        if (fence->GetCompletedValue() < fenceValue) {
+            fence->SetEventOnCompletion(fenceValue, eventHandle);
+            WaitForSingleObject(eventHandle, INFINITE);
+        }
+        CloseHandle(eventHandle);
+        fence->Release();
 
         jlong rangeLength = device->readbackBufferDesc.Width;
         D3D12_RANGE readbackBufferRange{ 0, rangeLength };
