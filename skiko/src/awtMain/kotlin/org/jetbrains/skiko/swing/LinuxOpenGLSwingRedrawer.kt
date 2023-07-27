@@ -15,9 +15,9 @@ internal class LinuxOpenGLSwingRedrawer(
 
     private val swingOffscreenDrawer = SwingOffscreenDrawer(swingLayerProperties)
 
-    private val offScreenContextPtr = makeOffScreenContext()
+    private val offScreenContextPtr: Long = makeOffScreenContext()
 
-    private var offScreenBuffer: Long = 0L
+    private var offScreenBufferPtr: Long = 0L
 
     private val storage = Bitmap()
 
@@ -30,14 +30,14 @@ internal class LinuxOpenGLSwingRedrawer(
     override fun dispose() {
         bytesToDraw = ByteArray(0)
         storage.close()
-        disposeOffScreenBuffer(offScreenBuffer)
+        disposeOffScreenBuffer(offScreenBufferPtr)
         disposeOffScreenContext(offScreenContextPtr)
         super.dispose()
     }
 
     override fun onRender(g: Graphics2D, width: Int, height: Int, nanoTime: Long) {
-        offScreenBuffer = makeOffScreenBuffer(offScreenContextPtr, offScreenBuffer, width, height)
-        startRendering(offScreenContextPtr, offScreenBuffer)
+        offScreenBufferPtr = makeOffScreenBuffer(offScreenContextPtr, offScreenBufferPtr, width, height)
+        startRendering(offScreenContextPtr, offScreenBufferPtr)
         try {
             autoCloseScope {
                 // TODO: reuse texture
@@ -53,8 +53,9 @@ internal class LinuxOpenGLSwingRedrawer(
                 ).autoClose()
 
                 // TODO: may be it is possible to reuse [makeGLContext]
+                val directContext = makeGLContext().autoClose()
                 val surface = Surface.makeFromBackendRenderTarget(
-                    makeGLContext().autoClose(),
+                    directContext,
                     renderTarget,
                     SurfaceOrigin.TOP_LEFT,
                     SurfaceColorFormat.BGRA_8888,
@@ -93,12 +94,33 @@ internal class LinuxOpenGLSwingRedrawer(
         }
     }
 
+    /**
+     * Creates new OpenGL context and opens X11 connection.
+     * This context can be used together with buffer ([makeOffScreenBuffer]) for offscreen rendering.
+     *
+     * Should be manually disposed using [disposeOffScreenContext] when no longer needed.
+     */
     private external fun makeOffScreenContext(): Long
     private external fun disposeOffScreenContext(contextPtr: Long): Long
 
+    /**
+     * Provides offscreen pixels GPU buffer.
+     * If size of [oldBufferPtr] same as [width] and [height], it will be reused
+     * or created new one otherwise ([oldBufferPtr] will be disposed in this case automatically).
+     *
+     * Should be manually disposed using [disposeOffScreenBuffer] when no longer needed.
+     *
+     * @see [makeOffScreenContext]
+     */
     private external fun makeOffScreenBuffer(contextPtr: Long, oldBufferPtr: Long, width: Int, height: Int): Long
     private external fun disposeOffScreenBuffer(bufferPtr: Long)
 
+    /**
+     * Sets current OpenGL context to [contextPtr] and [bufferPtr],
+     * so OpenGL will render into offscreen texture not on screen.
+     *
+     * Make sure to call [finishRendering] to reset context and wait for all Open GL commands to apply.
+     */
     private external fun startRendering(contextPtr: Long, bufferPtr: Long)
     private external fun finishRendering(contextPtr: Long)
 
