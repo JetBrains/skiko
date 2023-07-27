@@ -1,37 +1,22 @@
 #include <jawt_md.h>
-#include <GL/gl.h>
-#include <GL/glx.h>
-#include <X11/X.h>
-#include <X11/Xlib.h>
-#include <X11/Xresource.h>
+// #include <GL/gl.h>
+// #include <GL/glx.h>
+// #include <X11/X.h>
+// #include <X11/Xlib.h>
+// #include <X11/Xresource.h>
 #include <cstdlib>
 #include <unistd.h>
 #include <stdio.h>
 #include "jni_helpers.h"
 
-class TextureHolder
+class OffScreenContext
 {
 public:
-    GLuint tex;
-    GLuint fbo;
     Display* display;
-    GLXPbuffer pbuffer;
     GLXContext context;
+    GLXFBConfig* fbConfigs;
 
-    ~TextureHolder() {
-        glDeleteFramebuffers(1, &fbo);
-        glDeleteTextures(1, &tex);
-        glXDestroyContext(display, context);
-        glXDestroyPbuffer(display, pbuffer);
-        XCloseDisplay(display);
-    }
-};
-
-extern "C"
-{
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_LinuxOpenGLSwingRedrawer_createAndBindFrameBuffer(
-        JNIEnv *env, jobject redrawer, jint width, jint height)
-    {
+    OffScreenContext() {
         const int glxContextAttribs[] {
             GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
             GLX_RENDER_TYPE, GLX_RGBA_BIT,
@@ -42,27 +27,126 @@ extern "C"
             None
         };
 
-        Display* display = XOpenDisplay(nullptr);
+        display = XOpenDisplay(nullptr);
 
         int numConfigs = 0;
-        GLXFBConfig* fbConfigs = glXChooseFBConfig(display, DefaultScreen(display), glxContextAttribs, &numConfigs);
+        fbConfigs = glXChooseFBConfig(display, DefaultScreen(display), glxContextAttribs, &numConfigs);
 
+        XVisualInfo* visual = glXGetVisualFromFBConfig(display, fbConfigs[0]);
+
+        context = glXCreateContext(display, visual, nullptr, True);
+
+        XFree(visual);
+    }
+
+    ~OffScreenContext() {
+        XFree(fbConfigs);
+        glXDestroyContext(display, context);
+        XCloseDisplay(display);
+    }
+};
+
+class OffScreenBuffer
+{
+public:
+    GLXPbuffer pbuffer;
+    int width;
+    int height;
+
+    OffScreenBuffer(OffScreenContext* context, int _width, int _height) {
         int pbufferAttribs[] = {
             GLX_PBUFFER_WIDTH, width,
             GLX_PBUFFER_HEIGHT, height,
             None  
         };
 
-        GLXPbuffer pbuffer = glXCreatePbuffer(display, fbConfigs[0], pbufferAttribs);
+        width = _width;
+        height = _height;
 
-        XVisualInfo* visual = glXGetVisualFromFBConfig(display, fbConfigs[0]);
+        pbuffer = glXCreatePbuffer(context->display, context->fbConfigs[0], pbufferAttribs);
+    }
 
-        GLXContext context = glXCreateContext(display, visual, nullptr, True);
-        glXMakeCurrent(display, pbuffer, context);
+    ~OffScreenBuffer() {
+        glXDestroyPbuffer(display, pbuffer);
+    }
+};
 
-        XFree(visual);
-        XFree(fbConfigs);
+class OffScreenTexture
+{
+public:
+    GLuint tex;
+    GLuint fbo;
 
+    ~OffScreenTexture() {
+        glDeleteFramebuffers(1, &fbo);
+        glDeleteTextures(1, &tex);
+    }
+};
+
+extern "C"
+{
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_LinuxOpenGLSwingRedrawer_makeOffScreenContext(
+        JNIEnv *env, jobject redrawer)
+    {
+        OffScreenContext* context = new OffScreenContext();
+        return toJavaPointer(context);
+    }
+
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_swing_LinuxOpenGLSwingRedrawer_disposeOffScreenContext(
+        JNIEnv *env, jobject redrawer, jlong contextPtr)
+    {
+        OffScreenContext* context = fromJavaPointer<OffScreenContext *>(contextPtr);
+        delete context;
+    }
+
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_LinuxOpenGLSwingRedrawer_makeOffScreenBuffer(
+        JNIEnv *env, jobject redrawer, jlong contextPtr, jlong oldBufferPtr, jint width, jint height)
+    {
+        OffScreenContext* context = fromJavaPointer<OffScreenContext *>(contextPtr);
+        OffScreenBuffer* oldBuffer = fromJavaPointer<OffScreenBuffer *>(oldBufferPtr);
+        
+        OffScreenBuffer* buffer;
+        if (oldBuffer == nullptr || oldBuffer->width != width || oldBuffer->height != height) {
+            if (oldBuffer != nullptr) {
+                delete oldBuffer;
+            }
+            buffer = new OffScreenBuffer(context, width, height);
+        } else {
+            buffer = oldBuffer;
+        }
+
+        return toJavaPointer(buffer);
+    }
+
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_swing_LinuxOpenGLSwingRedrawer_disposeOffScreenBuffer(
+        JNIEnv *env, jobject redrawer, jlong bufferPtr)
+    {
+        OffScreenBuffer* buffer = fromJavaPointer<OffScreenBuffer *>(bufferPtr);
+        delete buffer;
+    }
+
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_swing_LinuxOpenGLSwingRedrawer_startRendering(
+        JNIEnv *env, jobject redrawer, jlong contextPtr, jlong bufferPtr)
+    {
+        OffScreenContext* context = fromJavaPointer<OffScreenContext *>(contextPtr);
+        OffScreenBuffer* buffer = fromJavaPointer<OffScreenBuffer *>(bufferPtr);
+
+        glXMakeCurrent(context->display, buffer->pbuffer, context->context);
+    }
+
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_swing_LinuxOpenGLSwingRedrawer_finishRendering(
+        JNIEnv *env, jobject redrawer, jlong contextPtr)
+    {
+        OffScreenContext* context = fromJavaPointer<OffScreenContext *>(contextPtr);
+        glFinish();
+        glXMakeCurrent(context->display, None, nullptr);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_LinuxOpenGLSwingRedrawer_createTexture(
+        JNIEnv *env, jobject redrawer, jint width, jint height)
+    {
         GLuint tex;
         glGenTextures(1, &tex);
         glBindTexture(GL_TEXTURE_2D, tex);
@@ -74,40 +158,26 @@ extern "C"
 
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, 0);
 
-        TextureHolder *holder = new TextureHolder();
-        holder->display = display;
-        holder->context = context;
-        holder->pbuffer=pbuffer;
-        holder->tex = tex;
-        holder->fbo = fbo;
+        OffScreenTexture *texture = new OffScreenTexture();
+        texture->tex = tex;
+        texture->fbo = fbo;
 
-        return toJavaPointer(holder);
+        return toJavaPointer(texture);
     }
 
     JNIEXPORT GLuint JNICALL Java_org_jetbrains_skiko_swing_LinuxOpenGLSwingRedrawer_getFboId(
-        JNIEnv *env, jobject redrawer, jlong holderPtr)
+        JNIEnv *env, jobject redrawer, jlong texturePtr)
     {
-        TextureHolder *d3dDevice = fromJavaPointer<TextureHolder *>(holderPtr);
+        OffScreenTexture *texture = fromJavaPointer<OffScreenTexture *>(texturePtr);
 
-        return d3dDevice->fbo;
+        return texture->fbo;
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_swing_LinuxOpenGLSwingRedrawer_disposeTexture(
-        JNIEnv *env, jobject redrawer, jlong holderPtr)
+        JNIEnv *env, jobject redrawer, jlong texturePtr)
     {
-        TextureHolder *d3dDevice = fromJavaPointer<TextureHolder *>(holderPtr);
+        OffScreenTexture *texture = fromJavaPointer<OffScreenTexture *>(texturePtr);
 
-        delete d3dDevice;
-    }
-
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_swing_LinuxOpenGLSwingRedrawer_finishRendering(
-        JNIEnv *env, jobject redrawer, jlong holderPtr)
-    {
-        TextureHolder *d3dDevice = fromJavaPointer<TextureHolder *>(holderPtr);
-        glFinish();
-        glXMakeCurrent(d3dDevice->display, None, nullptr);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glBindTexture(GL_TEXTURE_2D, 0);
-        glFinish();
+        delete texture;
     }
 } // extern "C"
