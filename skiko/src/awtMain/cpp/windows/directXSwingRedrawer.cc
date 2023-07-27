@@ -215,15 +215,15 @@ extern "C"
             readbackBufferDesc.Width = width * height * 4; // 4 bytes per pixel in R8G8B8A8_UNORM format
 
             if (device->texture) {
-                //device->texture->Release();
+                device->texture->Release();
             }
 
             if (device->readbackBuffer) {
-                //device->readbackBuffer->Release();
+                device->readbackBuffer->Release();
             }
 
-            device->backendContext.fDevice->CreateCommittedResource(&device->readbackHeapProperties, D3D12_HEAP_FLAG_NONE, &textureDesc, D3D12_RESOURCE_STATE_RENDER_TARGET, nullptr, IID_PPV_ARGS(&device->texture));
-            //device->backendContext.fDevice->CreateCommittedResource(&device->readbackHeapProperties, D3D12_HEAP_FLAG_NONE, &readbackBufferDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&device->readbackBuffer));
+            device->backendContext.fDevice->CreateCommittedResource(&device->textureHeapProperties, D3D12_HEAP_FLAG_NONE, &textureDesc, D3D12_RESOURCE_STATE_RENDER_TARGET, nullptr, IID_PPV_ARGS(&device->texture));
+            device->backendContext.fDevice->CreateCommittedResource(&device->readbackHeapProperties, D3D12_HEAP_FLAG_NONE, &readbackBufferDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&device->readbackBuffer));
         }
 
         return toJavaPointer(device->texture);
