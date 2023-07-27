@@ -49,6 +49,7 @@ public:
 class OffScreenBuffer
 {
 public:
+    Display* display;
     GLXPbuffer pbuffer;
     int width;
     int height;
@@ -62,6 +63,7 @@ public:
 
         width = _width;
         height = _height;
+        display = context->display;
 
         pbuffer = glXCreatePbuffer(context->display, context->fbConfigs[0], pbufferAttribs);
     }
