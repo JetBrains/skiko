@@ -1,6 +1,8 @@
 package org.jetbrains.skiko.swing
 
 import org.jetbrains.skia.*
+import org.jetbrains.skia.impl.interopScope
+import org.jetbrains.skia.impl.withResult
 import org.jetbrains.skiko.*
 import java.awt.Graphics2D
 
@@ -27,7 +29,7 @@ internal class Direct3DSwingRedrawer(
         makeDirectXContext(device)
     )
 
-    private val storage = Bitmap()
+    //private val storage = Bitmap()
 
     private var bytesToDraw = ByteArray(0)
 
@@ -37,7 +39,6 @@ internal class Direct3DSwingRedrawer(
 
     override fun dispose() {
         bytesToDraw = ByteArray(0)
-        storage.close()
         context.close()
         disposeDevice(device)
         super.dispose()
@@ -63,23 +64,17 @@ internal class Direct3DSwingRedrawer(
     }
 
     fun flush(surface: Surface, g: Graphics2D) {
-        surface.flushAndSubmit(syncCpu = false)
+        surface.flushAndSubmit(syncCpu = true)
 
-        val width = surface.width
-        val height = surface.height
-
-        val dstRowBytes = width * 4
-        if (storage.width != width || storage.height != height) {
-            storage.allocPixelsFlags(ImageInfo.makeS32(width, height, ColorAlphaType.PREMUL), false)
-            bytesToDraw = ByteArray(storage.getReadPixelsArraySize(dstRowBytes = dstRowBytes))
+        val expectedSize = surface.width * surface.height * 4
+        if (bytesToDraw.size != expectedSize) {
+            bytesToDraw = ByteArray(expectedSize)
         }
-        // TODO: it copies pixels from GPU to CPU, so it is really slow
-        surface.readPixels(storage, 0, 0)
+//        surface.readPixels(storage, 0, 0)
+//        val successfulRead = storage.readPixels(bytesToDraw, dstRowBytes = dstRowBytes)
+        readPixels(device, bytesToDraw)
 
-        val successfulRead = storage.readPixels(bytesToDraw, dstRowBytes = dstRowBytes)
-        if (successfulRead) {
-            swingOffscreenDrawer.draw(g, bytesToDraw, width, height)
-        }
+        swingOffscreenDrawer.draw(g, bytesToDraw, surface.width, surface.height)
     }
 
     // TODO: memory leak for texture?
@@ -107,6 +102,8 @@ internal class Direct3DSwingRedrawer(
     private external fun chooseAdapter(adapterPriority: Int): Long
     private external fun createDirectXOffscreenDevice(adapter: Long): Long
     private external fun makeDirectXContext(device: Long): Long
+
+    private external fun readPixels(device: Long, byteArray: ByteArray)
 
     // creates ID3D12Resource
     private external fun getRenderTargetTexture(device: Long, width: Int, height: Int): Long

@@ -26,15 +26,21 @@ public:
     GrD3DBackendContext backendContext;
 
     D3D12_RESOURCE_DESC textureDesc;
+    D3D12_HEAP_PROPERTIES textureHeapProperties;
     ID3D12Resource* texture;
 
     D3D12_RESOURCE_DESC readbackBufferDesc;
     D3D12_HEAP_PROPERTIES readbackHeapProperties;
+    ID3D12Resource* readbackBuffer;
 
     ~DirectXOffscreenDevice()
     {
         if (texture) {
-            delete texture;
+            texture->Release();
+        }
+
+        if (readbackBuffer) {
+            readbackBuffer->Release();
         }
 
         backendContext.fQueue.reset(nullptr);
@@ -137,6 +143,8 @@ extern "C"
         }
 
         DirectXOffscreenDevice *d3dDevice = new DirectXOffscreenDevice();
+        d3dDevice->texture = nullptr;
+        d3dDevice->readbackBuffer = nullptr;
         d3dDevice->backendContext.fAdapter = adapter;
         d3dDevice->backendContext.fDevice = device;
         d3dDevice->backendContext.fQueue = queue;
@@ -154,6 +162,26 @@ extern "C"
         textureDesc.SampleDesc.Quality = 0;
         textureDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
         textureDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+
+        auto& readbackBufferDesc = d3dDevice->readbackBufferDesc;
+        readbackBufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+        readbackBufferDesc.Alignment = 0;
+        readbackBufferDesc.Width = 0;
+        readbackBufferDesc.Height = 1;
+        readbackBufferDesc.DepthOrArraySize = 1;
+        readbackBufferDesc.MipLevels = 1;
+        readbackBufferDesc.Format = DXGI_FORMAT_UNKNOWN;
+        readbackBufferDesc.SampleDesc.Count = 1;
+        readbackBufferDesc.SampleDesc.Quality = 0;
+        readbackBufferDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+        readbackBufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+        auto& textureHeapProperties = d3dDevice->textureHeapProperties;
+        textureHeapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+        textureHeapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+        textureHeapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+        textureHeapProperties.CreationNodeMask = 1;
+        textureHeapProperties.VisibleNodeMask = 1;
 
         auto& readbackHeapProperties = d3dDevice->readbackHeapProperties;
         readbackHeapProperties.Type = D3D12_HEAP_TYPE_READBACK;
@@ -183,17 +211,37 @@ extern "C"
             textureDesc.Width = width;
             textureDesc.Height = height;
 
+            auto& readbackBufferDesc = device->readbackBufferDesc;
+            readbackBufferDesc.Width = width * height * 4; // 4 bytes per pixel in R8G8B8A8_UNORM format
+
+            if (device->texture) {
+                //device->texture->Release();
+            }
+
+            if (device->readbackBuffer) {
+                //device->readbackBuffer->Release();
+            }
+
             device->backendContext.fDevice->CreateCommittedResource(&device->readbackHeapProperties, D3D12_HEAP_FLAG_NONE, &textureDesc, D3D12_RESOURCE_STATE_RENDER_TARGET, nullptr, IID_PPV_ARGS(&device->texture));
+            //device->backendContext.fDevice->CreateCommittedResource(&device->readbackHeapProperties, D3D12_HEAP_FLAG_NONE, &readbackBufferDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&device->readbackBuffer));
         }
 
         return toJavaPointer(device->texture);
     }
 
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_swing_Direct3DSwingRedrawer_readPixels(
+            JNIEnv *env, jobject redrawer, jlong devicePtr, jbyteArray byteArray) {
+//        jbyte *bytesPtr = env->GetByteArrayElements(byteArray, nullptr);
+//
+//        exit(0);
+//
+//        env->ReleaseByteArrayElements(byteArray, bytesPtr, 0);
+    }
+
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_swing_Direct3DSwingRedrawer_disposeDevice(
-        JNIEnv *env, jobject redrawer, jlong devicePtr)
-    {
-        DirectXOffscreenDevice *d3dDevice = fromJavaPointer<DirectXOffscreenDevice *>(devicePtr);
-        delete d3dDevice;
+        JNIEnv *env, jobject redrawer, jlong devicePtr) {
+        DirectXOffscreenDevice *device = fromJavaPointer<DirectXOffscreenDevice *>(devicePtr);
+        delete device;
     }
 } // extern "C"
 
