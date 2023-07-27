@@ -25,10 +25,21 @@ class DirectXOffscreenDevice
 public:
     GrD3DBackendContext backendContext;
 
+    D3D12_RESOURCE_DESC textureDesc;
+    ID3D12Resource* texture;
+
+    D3D12_RESOURCE_DESC readbackBufferDesc;
+    D3D12_HEAP_PROPERTIES readbackHeapProperties;
+
     ~DirectXOffscreenDevice()
     {
+        if (texture) {
+            delete texture;
+        }
+
         backendContext.fQueue.reset(nullptr);
         backendContext.fDevice.reset(nullptr);
+        backendContext.fAdapter.reset(nullptr);
     }
 };
 
@@ -131,6 +142,26 @@ extern "C"
         d3dDevice->backendContext.fQueue = queue;
         d3dDevice->backendContext.fProtectedContext = GrProtected::kNo;
 
+        auto& textureDesc = d3dDevice->textureDesc;
+        textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+        textureDesc.Alignment = 0;
+        textureDesc.Width = 0;
+        textureDesc.Height = 0;
+        textureDesc.DepthOrArraySize = 1;
+        textureDesc.MipLevels = 1;
+        textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        textureDesc.SampleDesc.Count = 1;
+        textureDesc.SampleDesc.Quality = 0;
+        textureDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+        textureDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+
+        auto& readbackHeapProperties = d3dDevice->readbackHeapProperties;
+        readbackHeapProperties.Type = D3D12_HEAP_TYPE_READBACK;
+        readbackHeapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+        readbackHeapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+        readbackHeapProperties.CreationNodeMask = 1;
+        readbackHeapProperties.VisibleNodeMask = 1;
+
         return toJavaPointer(d3dDevice);
     }
 
@@ -142,35 +173,20 @@ extern "C"
         return toJavaPointer(GrDirectContext::MakeDirect3D(backendContext).release());
     }
 
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_Direct3DSwingRedrawer_createDirectXTexture(
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_Direct3DSwingRedrawer_getRenderTargetTexture(
         JNIEnv *env, jobject redrawer, jlong devicePtr, jint width, jint height) {
-        DirectXOffscreenDevice *d3dDevice = fromJavaPointer<DirectXOffscreenDevice *>(devicePtr);
-        
-        // TODO: use CD3DX12_RESOURCE_DESC and CD3DX12_HEAP_PROPERTIES
-        D3D12_RESOURCE_DESC resourceDesc = {};
-        resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-        resourceDesc.Alignment = 0;
-        resourceDesc.Width = width;
-        resourceDesc.Height = height;
-        resourceDesc.DepthOrArraySize = 1;
-        resourceDesc.MipLevels = 1;
-        resourceDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-        resourceDesc.SampleDesc.Count = 1;
-        resourceDesc.SampleDesc.Quality = 0;
-        resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-        resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+        DirectXOffscreenDevice *device = fromJavaPointer<DirectXOffscreenDevice *>(devicePtr);
 
-        D3D12_HEAP_PROPERTIES heapProps = {};
-        heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
-        heapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-        heapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-        heapProps.CreationNodeMask = 1;
-        heapProps.VisibleNodeMask = 1;
+        auto& textureDesc = device->textureDesc;
 
-        ID3D12Resource* textureResource;
-        d3dDevice->backendContext.fDevice->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_RENDER_TARGET, nullptr, IID_PPV_ARGS(&textureResource));
+        if (textureDesc.Width != width || textureDesc.Height != height) {
+            textureDesc.Width = width;
+            textureDesc.Height = height;
 
-        return toJavaPointer(textureResource);
+            device->backendContext.fDevice->CreateCommittedResource(&device->readbackHeapProperties, D3D12_HEAP_FLAG_NONE, &textureDesc, D3D12_RESOURCE_STATE_RENDER_TARGET, nullptr, IID_PPV_ARGS(&device->texture));
+        }
+
+        return toJavaPointer(device->texture);
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_swing_Direct3DSwingRedrawer_disposeDevice(

@@ -94,7 +94,7 @@ internal class Direct3DSwingRedrawer(
         return BackendRenderTarget.makeDirect3D(
             width,
             height,
-            createDirectXTexture(device, width, height),
+            getRenderTargetTexture(device, width, height),
             format,
             sampleCnt,
             levelCnt
@@ -109,7 +109,7 @@ internal class Direct3DSwingRedrawer(
     private external fun makeDirectXContext(device: Long): Long
 
     // creates ID3D12Resource
-    private external fun createDirectXTexture(device: Long, width: Int, height: Int): Long
+    private external fun getRenderTargetTexture(device: Long, width: Int, height: Int): Long
 
     private external fun disposeDevice(device: Long)
 }
