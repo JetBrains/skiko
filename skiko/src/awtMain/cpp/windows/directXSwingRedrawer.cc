@@ -130,7 +130,6 @@ extern "C"
         return 0;
     }
 
-    // TODO: extract common code with directXRedrawer
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_Direct3DSwingRedrawer_createDirectXOffscreenDevice(
         JNIEnv *env, jobject redrawer, jlong adapterPtr) {
 
@@ -348,8 +347,13 @@ extern "C"
             WaitForSingleObject(fenceEvent, INFINITE);
         }
 
-        jlong rangeLength = device->readbackBufferDesc.Width;
+        auto rangeLength = device->readbackBufferDesc.Width;
         D3D12_RANGE readbackBufferRange{ 0, rangeLength };
+
+        // TODO: memcpy from unaligned texture is not supported, line by line copy is very slow, write compute shader to copy texture to readback buffer
+        if (rangeLength != device->textureDesc.Width * device->textureDesc.Height * 4) {
+            return;
+        }
 
         void *readbackBufferBytesPtr = nullptr;
         device->readbackBuffer->Map(
@@ -359,13 +363,8 @@ extern "C"
         );
 
         if (!readbackBufferBytesPtr) {
-            std::cout << "Couldn't map readback buffer" << std::endl;
-            exit(1);
-        }
-
-        if (rangeLength != device->textureDesc.Width * device->textureDesc.Height * 4) {
-            std::cout << "Unaligned blit is not supported" << std::endl;
-            exit(1);
+            // Couldn't map readback buffer
+            return;
         }
 
         memcpy(bytesPtr, readbackBufferBytesPtr, rangeLength);
@@ -393,4 +392,4 @@ extern "C"
 
 } // extern "C"
 
-#endif
+#endif // SK_DIRECT3D
