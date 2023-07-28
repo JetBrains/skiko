@@ -72,6 +72,12 @@ public:
     }
 };
 
+UINT calculateRowPitch(UINT width) {
+    UINT rowPitch = width * 4; // 4 bytes per pixel for DXGI_FORMAT_R8G8B8A8_UNORM
+    rowPitch = (rowPitch + (D3D12_TEXTURE_DATA_PITCH_ALIGNMENT - 1)) & ~(D3D12_TEXTURE_DATA_PITCH_ALIGNMENT - 1);
+    return rowPitch;
+}
+
 
 extern "C"
 {
@@ -127,6 +133,7 @@ extern "C"
     // TODO: extract common code with directXRedrawer
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_Direct3DSwingRedrawer_createDirectXOffscreenDevice(
         JNIEnv *env, jobject redrawer, jlong adapterPtr) {
+
         gr_cp<IDXGIFactory4> deviceFactory;
         if (!SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&deviceFactory)))) {
             return 0;
@@ -252,7 +259,7 @@ extern "C"
             textureDesc.Height = height;
 
             auto& readbackBufferDesc = device->readbackBufferDesc;
-            readbackBufferDesc.Width = width * height * 4; // 4 bytes per pixel in R8G8B8A8_UNORM format
+            readbackBufferDesc.Width = calculateRowPitch(width) * height;
 
             if (device->texture) {
                 device->texture->Release();
@@ -292,12 +299,32 @@ extern "C"
         textureResourceBarrier.Transition.pResource = device->texture;
         textureResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
         textureResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_SOURCE;
-        textureResourceBarrier.Transition.Subresource = 0;
+        textureResourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES ;
         textureResourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 
         commandList->ResourceBarrier(1, &textureResourceBarrier);
 
-        commandList->CopyResource(device->readbackBuffer, device->texture);
+        D3D12_TEXTURE_COPY_LOCATION src = {};
+        src.pResource = device->texture; // This should be obj#43 in your debug output.
+        src.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+        src.SubresourceIndex = 0;
+
+        D3D12_TEXTURE_COPY_LOCATION dst = {};
+        dst.pResource = device->readbackBuffer; // This should be obj#60 in your debug output.
+        dst.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
+        dst.PlacedFootprint.Offset = 0;
+        dst.PlacedFootprint.Footprint.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        dst.PlacedFootprint.Footprint.Width = device->textureDesc.Width;
+        dst.PlacedFootprint.Footprint.Height = device->textureDesc.Height;
+        dst.PlacedFootprint.Footprint.Depth = 1;
+        auto rowPitch = calculateRowPitch(device->textureDesc.Width);
+        dst.PlacedFootprint.Footprint.RowPitch = rowPitch;
+
+        D3D12_BOX srcBox = {0, 0, 0, device->textureDesc.Width, device->textureDesc.Height, 1};
+
+        commandList->CopyTextureRegion(&dst, 0, 0, 0, &src, &srcBox);
+
+        //commandList->CopyResource(device->readbackBuffer, device->texture);
 
         commandList->Close();
 
@@ -332,7 +359,11 @@ extern "C"
             exit(1);
         }
 
-        memcpy(bytesPtr, readbackBufferBytesPtr, rangeLength);
+        for (int y = 0; y < device->textureDesc.Height / 2; y++) {
+            memcpy(bytesPtr + y * device->textureDesc.Width * 4, (uint8_t *)readbackBufferBytesPtr + y * rowPitch, y * device->textureDesc.Width * 4);
+        }
+
+//        memcpy(bytesPtr, readbackBufferBytesPtr, rangeLength / 2);
 
         D3D12_RANGE emptyRange{ 0, 0 };
         device->readbackBuffer->Unmap

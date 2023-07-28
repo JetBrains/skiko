@@ -89,21 +89,21 @@ internal class Direct3DSwingRedrawer(
         surface.flushAndSubmit(syncCpu = true)
         context.flush()
 
-        val expectedSize = surface.width * surface.height * 4
-        if (bytesToDraw.size != expectedSize) {
-            bytesToDraw = ByteArray(expectedSize)
+//        val expectedSize = surface.width * surface.height * 4
+//        if (bytesToDraw.size != expectedSize) {
+//            bytesToDraw = ByteArray(expectedSize)
+//        }
+
+        val dstRowBytes = surface.width * 4
+        if (storage.width != surface.width || storage.height != surface.height) {
+            storage.allocPixelsFlags(ImageInfo.makeS32(surface.width, surface.height, ColorAlphaType.PREMUL), false)
+            bytesToDraw = ByteArray(storage.getReadPixelsArraySize(dstRowBytes = dstRowBytes))
         }
 
-        readPixels(device, bytesToDraw)
-
-//        val dstRowBytes = surface.width * 4
-//        if (storage.width != surface.width || storage.height != surface.height) {
-//            storage.allocPixelsFlags(ImageInfo.makeS32(surface.width, surface.height, ColorAlphaType.PREMUL), false)
-//            bytesToDraw = ByteArray(storage.getReadPixelsArraySize(dstRowBytes = dstRowBytes))
-//        }
-//
 //        surface.readPixels(storage, 0, 0)
 //        storage.readPixels(bytesToDraw, dstRowBytes = dstRowBytes)
+
+        readPixels(device, bytesToDraw)
 
         swingOffscreenDrawer.draw(g, bytesToDraw, surface.width, surface.height)
     }
