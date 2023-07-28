@@ -80,7 +80,7 @@ internal class Direct3DSwingRedrawer(
         val surface = surface ?: throw RenderException("surface is null")
 
         val canvas = surface.canvas
-        canvas.clear(Color.BLUE)
+        canvas.clear(Color.TRANSPARENT)
         skikoView.onRender(canvas, width, height, nanoTime)
         flush(surface, g)
     }
@@ -93,8 +93,17 @@ internal class Direct3DSwingRedrawer(
         if (bytesToDraw.size != expectedSize) {
             bytesToDraw = ByteArray(expectedSize)
         }
-        // TODO: it copies pixels from GPU to CPU, so it is really slow
+
         readPixels(device, bytesToDraw)
+
+//        val dstRowBytes = surface.width * 4
+//        if (storage.width != surface.width || storage.height != surface.height) {
+//            storage.allocPixelsFlags(ImageInfo.makeS32(surface.width, surface.height, ColorAlphaType.PREMUL), false)
+//            bytesToDraw = ByteArray(storage.getReadPixelsArraySize(dstRowBytes = dstRowBytes))
+//        }
+//
+//        surface.readPixels(storage, 0, 0)
+//        storage.readPixels(bytesToDraw, dstRowBytes = dstRowBytes)
 
         swingOffscreenDrawer.draw(g, bytesToDraw, surface.width, surface.height)
     }

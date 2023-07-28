@@ -290,7 +290,7 @@ extern "C"
         D3D12_RESOURCE_BARRIER textureResourceBarrier;
         textureResourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
         textureResourceBarrier.Transition.pResource = device->texture;
-        textureResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+        textureResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
         textureResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_SOURCE;
         textureResourceBarrier.Transition.Subresource = 0;
         textureResourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
@@ -303,8 +303,8 @@ extern "C"
 
         ID3D12CommandList* commandLists[] = { commandList };
         device->backendContext.fQueue->ExecuteCommandLists(_countof(commandLists), commandLists);
-        // Wait for the command list to finish executing; the readback buffer will be ready to read
 
+        // Wait for the command list to finish executing; the readback buffer will be ready to read
         auto fence = device->fence;
         auto fenceEvent = device->fenceEvent;
         auto& fenceValue = device->fenceValue;
