@@ -291,7 +291,6 @@ extern "C"
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_swing_Direct3DSwingRedrawer_readPixels(
             JNIEnv *env, jobject redrawer, jlong devicePtr, jbyteArray byteArray) {
-//        std::cout << "readPixels" << std::endl;
         jbyte *bytesPtr = env->GetByteArrayElements(byteArray, nullptr);
 
         DirectXOffscreenDevice *device = fromJavaPointer<DirectXOffscreenDevice *>(devicePtr);
@@ -313,26 +312,23 @@ extern "C"
         commandList->ResourceBarrier(1, &textureResourceBarrier);
 
         D3D12_TEXTURE_COPY_LOCATION src = {};
-        src.pResource = device->texture; // This should be obj#43 in your debug output.
+        src.pResource = device->texture;
         src.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
         src.SubresourceIndex = 0;
 
         D3D12_TEXTURE_COPY_LOCATION dst = {};
-        dst.pResource = device->readbackBuffer; // This should be obj#60 in your debug output.
+        dst.pResource = device->readbackBuffer;
         dst.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
         dst.PlacedFootprint.Offset = 0;
         dst.PlacedFootprint.Footprint.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
         dst.PlacedFootprint.Footprint.Width = device->textureDesc.Width;
         dst.PlacedFootprint.Footprint.Height = device->textureDesc.Height;
         dst.PlacedFootprint.Footprint.Depth = 1;
-        auto rowPitch = calculateRowPitch(device->textureDesc.Width);
-        dst.PlacedFootprint.Footprint.RowPitch = rowPitch;
+        dst.PlacedFootprint.Footprint.RowPitch = calculateRowPitch(device->textureDesc.Width);
 
         D3D12_BOX srcBox = {0, 0, 0, device->textureDesc.Width, device->textureDesc.Height, 1};
 
         commandList->CopyTextureRegion(&dst, 0, 0, 0, &src, &srcBox);
-
-        //commandList->CopyResource(device->readbackBuffer, device->texture);
 
         commandList->Close();
 
