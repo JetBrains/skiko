@@ -349,8 +349,11 @@ extern "C"
         auto rangeLength = device->readbackBufferDesc.Width;
         D3D12_RANGE readbackBufferRange{ 0, rangeLength };
 
-        // TODO: memcpy from unaligned texture is not supported, line by line copy is very slow,
-        //       write compute shader to copy texture to readback buffer to support arbitary texture size
+        /*
+         * TODO: memcpy from unaligned texture is not supported, line by line copy is very slow,
+         *       write compute shader to copy texture to readback buffer with no RowPitch padding
+         *       to support arbitary texture size
+         */
         if (rangeLength != device->textureDesc.Width * device->textureDesc.Height * 4) {
             return false;
         }
