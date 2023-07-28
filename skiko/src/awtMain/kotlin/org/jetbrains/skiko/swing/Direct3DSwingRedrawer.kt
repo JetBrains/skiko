@@ -92,8 +92,7 @@ internal class Direct3DSwingRedrawer(
     }
 
     fun flush(surface: Surface, g: Graphics2D) {
-        surface.flushAndSubmit(syncCpu = true)
-        context.flush()
+        surface.flushAndSubmit(syncCpu = false)
 
         val bytesArraySize = surface.width * surface.height * 4
         if (bytesToDraw.size != bytesArraySize) {
