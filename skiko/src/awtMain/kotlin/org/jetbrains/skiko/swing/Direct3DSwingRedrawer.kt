@@ -103,7 +103,9 @@ internal class Direct3DSwingRedrawer(
             bytesToDraw = ByteArray(bytesArraySize)
         }
 
-        readPixels(device, bytesToDraw)
+        if(!readPixels(device, bytesToDraw)) {
+            throw RenderException("Couldn't read pixels")
+        }
 
         swingOffscreenDrawer.draw(g, bytesToDraw, surface.width, surface.height)
     }
@@ -115,7 +117,7 @@ internal class Direct3DSwingRedrawer(
     private external fun createDirectXOffscreenDevice(adapter: Long): Long
     private external fun makeDirectXContext(device: Long): Long
 
-    private external fun readPixels(device: Long, byteArray: ByteArray)
+    private external fun readPixels(device: Long, byteArray: ByteArray): Boolean
 
     private external fun getAlignment(): Long
 

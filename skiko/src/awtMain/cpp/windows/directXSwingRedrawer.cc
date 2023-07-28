@@ -287,7 +287,7 @@ extern "C"
         return toJavaPointer(device->texture);
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_swing_Direct3DSwingRedrawer_readPixels(
+    JNIEXPORT jboolean JNICALL Java_org_jetbrains_skiko_swing_Direct3DSwingRedrawer_readPixels(
             JNIEnv *env, jobject redrawer, jlong devicePtr, jbyteArray byteArray) {
         jbyte *bytesPtr = env->GetByteArrayElements(byteArray, nullptr);
 
@@ -349,9 +349,10 @@ extern "C"
         auto rangeLength = device->readbackBufferDesc.Width;
         D3D12_RANGE readbackBufferRange{ 0, rangeLength };
 
-        // TODO: memcpy from unaligned texture is not supported, line by line copy is very slow, write compute shader to copy texture to readback buffer
+        // TODO: memcpy from unaligned texture is not supported, line by line copy is very slow,
+        //       write compute shader to copy texture to readback buffer to support arbitary texture size
         if (rangeLength != device->textureDesc.Width * device->textureDesc.Height * 4) {
-            return;
+            return false;
         }
 
         void *readbackBufferBytesPtr = nullptr;
@@ -363,7 +364,7 @@ extern "C"
 
         if (!readbackBufferBytesPtr) {
             // Couldn't map readback buffer
-            return;
+            return false;
         }
 
         memcpy(bytesPtr, readbackBufferBytesPtr, rangeLength);
@@ -376,6 +377,8 @@ extern "C"
         );
 
         env->ReleaseByteArrayElements(byteArray, bytesPtr, 0);
+
+        return true;
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_swing_Direct3DSwingRedrawer_disposeDevice(
