@@ -182,6 +182,12 @@ extern "C"
             return 0;
         }
 
+        // Fence
+        ID3D12Fence* fence;
+        if (!SUCCEEDED(device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence)))) {
+            return 0;
+        }
+
         HANDLE fenceEvent = CreateEventEx(nullptr, false, false, EVENT_ALL_ACCESS);
 
         DirectXOffscreenDevice *d3dDevice = new DirectXOffscreenDevice();
@@ -189,7 +195,7 @@ extern "C"
         d3dDevice->readbackBuffer = nullptr;
         d3dDevice->commandAllocator = commandAllocator;
         d3dDevice->commandList = commandList;
-        d3dDevice->fence = nullptr;
+        d3dDevice->fence = fence;
         d3dDevice->fenceEvent = fenceEvent;
         d3dDevice->backendContext.fAdapter = adapter;
         d3dDevice->backendContext.fDevice = device;
@@ -282,11 +288,6 @@ extern "C"
         jbyte *bytesPtr = env->GetByteArrayElements(byteArray, nullptr);
 
         DirectXOffscreenDevice *device = fromJavaPointer<DirectXOffscreenDevice *>(devicePtr);
-
-        // if fence is not created, make it
-        if (!device->fence) {
-            device->backendContext.fDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&device->fence));
-        }
 
         auto commandAllocator = device->commandAllocator;
         auto commandList = device->commandList;
