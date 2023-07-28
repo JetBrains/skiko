@@ -91,7 +91,7 @@ internal class Direct3DSwingRedrawer(
 
         val canvas = surface.canvas
         canvas.clear(Color.TRANSPARENT)
-        skikoView.onRender(canvas, surface.width, surface.height, nanoTime)
+        skikoView.onRender(canvas, width, height, nanoTime)
         flush(surface, g)
     }
 
