@@ -181,7 +181,6 @@ extern "C"
             return 0;
         }
 
-        // Fence
         ID3D12Fence* fence;
         if (!SUCCEEDED(device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence)))) {
             return 0;
