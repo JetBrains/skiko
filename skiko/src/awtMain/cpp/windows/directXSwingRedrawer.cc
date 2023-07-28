@@ -189,6 +189,9 @@ extern "C"
         }
 
         HANDLE fenceEvent = CreateEventEx(nullptr, false, false, EVENT_ALL_ACCESS);
+        if (!fenceEvent) {
+            return 0;
+        }
 
         DirectXOffscreenDevice *d3dDevice = new DirectXOffscreenDevice();
         d3dDevice->texture = nullptr;
@@ -277,6 +280,10 @@ extern "C"
 
             device->backendContext.fDevice->CreateCommittedResource(&device->textureHeapProperties, D3D12_HEAP_FLAG_NONE, &textureDesc, D3D12_RESOURCE_STATE_RENDER_TARGET, nullptr, IID_PPV_ARGS(&device->texture));
             device->backendContext.fDevice->CreateCommittedResource(&device->readbackHeapProperties, D3D12_HEAP_FLAG_NONE, &readbackBufferDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&device->readbackBuffer));
+
+            if (device->texture == nullptr || device->readbackBuffer == nullptr) {
+                return 0;
+            }
         }
 
         return toJavaPointer(device->texture);

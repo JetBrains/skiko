@@ -58,8 +58,7 @@ internal class Direct3DSwingRedrawer(
         val newTexturePtr = getRenderTargetTexture(device, alignedWidth, height)
 
         if (newTexturePtr == 0.toLong()) {
-            // Failed to allocate texture
-            throw RenderException("Can't allocate DirectX texture resource")
+            throw RenderException("Can't allocate DirectX resources")
         }
 
         if (newTexturePtr != texturePtr) {
