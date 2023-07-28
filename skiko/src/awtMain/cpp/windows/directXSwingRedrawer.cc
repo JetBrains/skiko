@@ -359,11 +359,12 @@ extern "C"
             exit(1);
         }
 
-        for (int y = 0; y < device->textureDesc.Height / 2; y++) {
-            memcpy(bytesPtr + y * device->textureDesc.Width * 4, (uint8_t *)readbackBufferBytesPtr + y * rowPitch, y * device->textureDesc.Width * 4);
+        if (rangeLength != device->textureDesc.Width * device->textureDesc.Height * 4) {
+            std::cout << "Unaligned blit is not supported" << std::endl;
+            exit(1);
         }
 
-//        memcpy(bytesPtr, readbackBufferBytesPtr, rangeLength / 2);
+        memcpy(bytesPtr, readbackBufferBytesPtr, rangeLength);
 
         D3D12_RANGE emptyRange{ 0, 0 };
         device->readbackBuffer->Unmap
@@ -380,6 +381,12 @@ extern "C"
         DirectXOffscreenDevice *device = fromJavaPointer<DirectXOffscreenDevice *>(devicePtr);
         delete device;
     }
+
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_Direct3DSwingRedrawer_getAlignment(
+            JNIEnv *env, jobject redrawer) {
+        return D3D12_TEXTURE_DATA_PITCH_ALIGNMENT;
+    }
+
 } // extern "C"
 
 #endif

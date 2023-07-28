@@ -27,12 +27,13 @@ internal class Direct3DSwingRedrawer(
         makeDirectXContext(device)
     )
 
-    private val storage = Bitmap()
     private var texturePtr: Long = 0
     private var renderTarget: BackendRenderTarget? = null
     private var surface: Surface? = null
 
     private var bytesToDraw = ByteArray(0)
+    private val rowBytesAlignment = getAlignment().toInt()
+    private val widthSizeAlignment = rowBytesAlignment / 4
 
     init {
         onContextInit()
@@ -42,14 +43,19 @@ internal class Direct3DSwingRedrawer(
         surface?.close()
         renderTarget?.close()
         bytesToDraw = ByteArray(0)
-        storage.close()
         context.close()
         disposeDevice(device)
         super.dispose()
     }
 
     override fun onRender(g: Graphics2D, width: Int, height: Int, nanoTime: Long) {
-        val newTexturePtr = getRenderTargetTexture(device, width, height)
+        val alignedWidth = if (width % widthSizeAlignment != 0) {
+            width + widthSizeAlignment - (width % widthSizeAlignment);
+        } else {
+            width
+        }
+
+        val newTexturePtr = getRenderTargetTexture(device, alignedWidth, height)
 
         if (newTexturePtr != texturePtr) {
             texturePtr = newTexturePtr
@@ -59,7 +65,7 @@ internal class Direct3DSwingRedrawer(
             val levelCnt = 1
 
             renderTarget = BackendRenderTarget.makeDirect3D(
-                width,
+                alignedWidth,
                 height,
                 texturePtr,
                 format,
@@ -81,7 +87,7 @@ internal class Direct3DSwingRedrawer(
 
         val canvas = surface.canvas
         canvas.clear(Color.TRANSPARENT)
-        skikoView.onRender(canvas, width, height, nanoTime)
+        skikoView.onRender(canvas, surface.width, surface.height, nanoTime)
         flush(surface, g)
     }
 
@@ -89,19 +95,10 @@ internal class Direct3DSwingRedrawer(
         surface.flushAndSubmit(syncCpu = true)
         context.flush()
 
-//        val expectedSize = surface.width * surface.height * 4
-//        if (bytesToDraw.size != expectedSize) {
-//            bytesToDraw = ByteArray(expectedSize)
-//        }
-
-        val dstRowBytes = surface.width * 4
-        if (storage.width != surface.width || storage.height != surface.height) {
-            storage.allocPixelsFlags(ImageInfo.makeS32(surface.width, surface.height, ColorAlphaType.PREMUL), false)
-            bytesToDraw = ByteArray(storage.getReadPixelsArraySize(dstRowBytes = dstRowBytes))
+        val bytesArraySize = surface.width * surface.height * 4
+        if (bytesToDraw.size != bytesArraySize) {
+            bytesToDraw = ByteArray(bytesArraySize)
         }
-
-//        surface.readPixels(storage, 0, 0)
-//        storage.readPixels(bytesToDraw, dstRowBytes = dstRowBytes)
 
         readPixels(device, bytesToDraw)
 
@@ -116,6 +113,8 @@ internal class Direct3DSwingRedrawer(
     private external fun makeDirectXContext(device: Long): Long
 
     private external fun readPixels(device: Long, byteArray: ByteArray)
+
+    private external fun getAlignment(): Long
 
     // creates ID3D12Resource
     private external fun getRenderTargetTexture(device: Long, width: Int, height: Int): Long
