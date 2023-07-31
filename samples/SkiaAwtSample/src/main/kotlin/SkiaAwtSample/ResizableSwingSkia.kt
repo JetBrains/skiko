@@ -11,7 +11,6 @@ fun swingSkiaResize() = SwingUtilities.invokeLater {
     window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
     window.title = "Swing Window with Compose"
 
-//    var skiaPanel: SkiaPanel? = null
     var skiaPanel: SkiaSwingPanel? = null
     val fpsCounter = FPSCounter(logOnTick = true)
 
@@ -22,10 +21,6 @@ fun swingSkiaResize() = SwingUtilities.invokeLater {
             skiaPanel!!.repaint()
         }
     }
-
-//    skiaPanel = SkiaPanel().also {
-//        it.layer.skikoView = skikoView
-//    }
 
     skiaPanel = SkiaSwingPanel(skikoView)
 
