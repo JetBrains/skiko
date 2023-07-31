@@ -28,8 +28,6 @@ internal class Direct3DSwingRedrawer(
     )
 
     private var texturePtr: Long = 0
-    private var renderTarget: BackendRenderTarget? = null
-    private var surface: Surface? = null
 
     private var bytesToDraw = ByteArray(0)
     private val rowBytesAlignment = getAlignment().toInt()
@@ -40,8 +38,6 @@ internal class Direct3DSwingRedrawer(
     }
 
     override fun dispose() {
-        surface?.close()
-        renderTarget?.close()
         bytesToDraw = ByteArray(0)
         context.close()
         disposeDevice(device)
@@ -121,7 +117,12 @@ internal class Direct3DSwingRedrawer(
 
     private external fun getAlignment(): Long
 
-    // creates ID3D12Resource
+    /**
+     * Provides current ID3D12Resource held by [device].
+     * If width or height is changed, then a new texture will be created and the old one will be disposed.
+     *
+     * Texture will be disposed with [device] dispose or with the next [getRenderTargetTexture] call.
+     */
     private external fun getRenderTargetTexture(device: Long, width: Int, height: Int): Long
 
     private external fun disposeDevice(device: Long)
