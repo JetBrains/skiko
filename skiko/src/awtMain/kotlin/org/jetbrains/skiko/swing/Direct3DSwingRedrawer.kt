@@ -94,7 +94,6 @@ internal class Direct3DSwingRedrawer(
     // Called from native code
     private fun isAdapterSupported(name: String) = isVideoCardSupported(GraphicsApi.DIRECT3D, hostOs, name)
 
-    private external fun makeDirectXRenderTargetOffScreen(device: Long): Long
     private external fun chooseAdapter(adapterPriority: Int): Long
     private external fun createDirectXOffscreenDevice(adapter: Long): Long
     private external fun makeDirectXContext(device: Long): Long
@@ -104,12 +103,14 @@ internal class Direct3DSwingRedrawer(
     private external fun getAlignment(): Long
 
     /**
-     * Provides current ID3D12Resource held by [device].
-     * If width or height is changed, then a new texture will be created and the old one will be disposed.
-     *
-     * Texture will be disposed with [device] dispose or with the next [getRenderTargetTexture] call.
+     * Provides ID3D12Resource texture taking given [oldTexturePtr] into account
+     * since it can be reused if width and height are not changed,
+     * or the new one will be created.
      */
-    private external fun getRenderTargetTexture(device: Long, width: Int, height: Int): Long
+    private external fun makeDirectXTexture(device: Long, oldTexturePtr: Long, width: Int, height: Int): Long
+    private external fun disposeDirectXTexture(texturePtr: Long)
+
+    private external fun makeDirectXRenderTargetOffScreen(texturePtr: Long): Long
 
     private external fun disposeDevice(device: Long)
 }

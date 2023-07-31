@@ -25,14 +25,6 @@ class DirectXOffscreenDevice
 public:
     GrD3DBackendContext backendContext;
 
-    D3D12_RESOURCE_DESC textureDesc;
-    D3D12_HEAP_PROPERTIES textureHeapProperties;
-    ID3D12Resource* texture;
-
-    D3D12_RESOURCE_DESC readbackBufferDesc;
-    D3D12_HEAP_PROPERTIES readbackHeapProperties;
-    ID3D12Resource* readbackBuffer;
-
     ID3D12CommandAllocator* commandAllocator;
     ID3D12GraphicsCommandList* commandList;
 
@@ -48,14 +40,6 @@ public:
 
         if (fence) {
             fence->Release();
-        }
-
-        if (texture) {
-            texture->Release();
-        }
-
-        if (readbackBuffer) {
-            readbackBuffer->Release();
         }
 
         if (commandList) {
@@ -77,6 +61,79 @@ UINT calculateRowPitch(UINT width) {
     rowPitch = (rowPitch + (D3D12_TEXTURE_DATA_PITCH_ALIGNMENT - 1)) & ~(D3D12_TEXTURE_DATA_PITCH_ALIGNMENT - 1);
     return rowPitch;
 }
+
+class DirectXOffScreenTexture {
+public:
+    int width;
+    int height;
+    ID3D12Resource* resource;
+    ID3D12Resource* readbackBufferResource;
+    
+    DirectXOffScreenTexture(DirectXOffscreenDevice* device, int _width, int _height) {
+        width = _width;
+        height = _height;
+        D3D12_RESOURCE_DESC textureDesc;
+        textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+        textureDesc.Alignment = 0;
+        textureDesc.Width = _width;
+        textureDesc.Height = _height;
+        textureDesc.DepthOrArraySize = 1;
+        textureDesc.MipLevels = 1;
+        textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        textureDesc.SampleDesc.Count = 1;
+        textureDesc.SampleDesc.Quality = 0;
+        textureDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+        textureDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+
+        D3D12_HEAP_PROPERTIES textureHeapProperties;
+        textureHeapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+        textureHeapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+        textureHeapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+        textureHeapProperties.CreationNodeMask = 1;
+        textureHeapProperties.VisibleNodeMask = 1;
+
+        D3D12_RESOURCE_DESC readbackBufferDesc;
+        readbackBufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+        readbackBufferDesc.Alignment = 0;
+        readbackBufferDesc.Width = readbackBufferWidth(_width, _height);
+        readbackBufferDesc.Height = 1;
+        readbackBufferDesc.DepthOrArraySize = 1;
+        readbackBufferDesc.MipLevels = 1;
+        readbackBufferDesc.Format = DXGI_FORMAT_UNKNOWN;
+        readbackBufferDesc.SampleDesc.Count = 1;
+        readbackBufferDesc.SampleDesc.Quality = 0;
+        readbackBufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+        readbackBufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+        D3D12_HEAP_PROPERTIES readbackHeapProperties;
+        readbackHeapProperties.Type = D3D12_HEAP_TYPE_READBACK;
+        readbackHeapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+        readbackHeapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+        readbackHeapProperties.CreationNodeMask = 1;
+        readbackHeapProperties.VisibleNodeMask = 1;
+
+        device->backendContext.fDevice->CreateCommittedResource(&textureHeapProperties, D3D12_HEAP_FLAG_NONE, &textureDesc, D3D12_RESOURCE_STATE_RENDER_TARGET, nullptr, IID_PPV_ARGS(&resource));
+        device->backendContext.fDevice->CreateCommittedResource(&readbackHeapProperties, D3D12_HEAP_FLAG_NONE, &readbackBufferDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&readbackBufferResource));
+    }
+
+    ~DirectXOffScreenTexture() {
+        if (resource) {
+            resource->Release();
+        }
+
+        if (readbackBufferResource) {
+            readbackBufferResource->Release();
+        }
+    }
+
+    int readbackBufferWidth() {
+        return readbackBufferWidth(width, height);
+    }
+private: 
+    static int readbackBufferWidth(int width, int height) {
+         return calculateRowPitch(width) * height;
+    }
+};
 
 
 extern "C"
@@ -192,8 +249,6 @@ extern "C"
         }
 
         DirectXOffscreenDevice *d3dDevice = new DirectXOffscreenDevice();
-        d3dDevice->texture = nullptr;
-        d3dDevice->readbackBuffer = nullptr;
         d3dDevice->commandAllocator = commandAllocator;
         d3dDevice->commandList = commandList;
         d3dDevice->fence = fence;
@@ -203,56 +258,13 @@ extern "C"
         d3dDevice->backendContext.fQueue = queue;
         d3dDevice->backendContext.fProtectedContext = GrProtected::kNo;
 
-        auto& textureDesc = d3dDevice->textureDesc;
-        textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-        textureDesc.Alignment = 0;
-        textureDesc.Width = 0;
-        textureDesc.Height = 0;
-        textureDesc.DepthOrArraySize = 1;
-        textureDesc.MipLevels = 1;
-        textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-        textureDesc.SampleDesc.Count = 1;
-        textureDesc.SampleDesc.Quality = 0;
-        textureDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-        textureDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
-
-        auto& readbackBufferDesc = d3dDevice->readbackBufferDesc;
-        readbackBufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-        readbackBufferDesc.Alignment = 0;
-        readbackBufferDesc.Width = 0;
-        readbackBufferDesc.Height = 1;
-        readbackBufferDesc.DepthOrArraySize = 1;
-        readbackBufferDesc.MipLevels = 1;
-        readbackBufferDesc.Format = DXGI_FORMAT_UNKNOWN;
-        readbackBufferDesc.SampleDesc.Count = 1;
-        readbackBufferDesc.SampleDesc.Quality = 0;
-        readbackBufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-        readbackBufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-
-        auto& textureHeapProperties = d3dDevice->textureHeapProperties;
-        textureHeapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
-        textureHeapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-        textureHeapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-        textureHeapProperties.CreationNodeMask = 1;
-        textureHeapProperties.VisibleNodeMask = 1;
-
-        auto& readbackHeapProperties = d3dDevice->readbackHeapProperties;
-        readbackHeapProperties.Type = D3D12_HEAP_TYPE_READBACK;
-        readbackHeapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-        readbackHeapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-        readbackHeapProperties.CreationNodeMask = 1;
-        readbackHeapProperties.VisibleNodeMask = 1;
-
-
         return toJavaPointer(d3dDevice);
     }
 
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_Direct3DSwingRedrawer_makeDirectXRenderTargetOffScreen(
-            JNIEnv *env, jobject redrawer, jlong devicePtr) {
-        DirectXOffscreenDevice *device = fromJavaPointer<DirectXOffscreenDevice *>(devicePtr);
-        ID3D12Resource* resource = device->texture;
-        int width = device->textureDesc.Width;
-        int height = device->textureDesc.Height;
+            JNIEnv *env, jobject redrawer, jlong texturePtr) {
+        DirectXOffScreenTexture *texture = fromJavaPointer<DirectXOffScreenTexture *>(texturePtr);
+        ID3D12Resource* resource = texture->resource;
 
         GrD3DTextureResourceInfo texResInfo = {};
         texResInfo.fResource.retain(resource);
@@ -260,7 +272,7 @@ extern "C"
         texResInfo.fFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
         texResInfo.fSampleCount = 1;
         texResInfo.fLevelCount = 1;
-        GrBackendRenderTarget* renderTarget = new GrBackendRenderTarget(width, height, texResInfo);
+        GrBackendRenderTarget* renderTarget = new GrBackendRenderTarget(texture->width, texture->height, texResInfo);
         return reinterpret_cast<jlong>(renderTarget);
     }
 
@@ -272,43 +284,40 @@ extern "C"
         return toJavaPointer(GrDirectContext::MakeDirect3D(backendContext).release());
     }
 
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_Direct3DSwingRedrawer_getRenderTargetTexture(
-        JNIEnv *env, jobject redrawer, jlong devicePtr, jint width, jint height) {
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_Direct3DSwingRedrawer_makeDirectXTexture(
+        JNIEnv *env, jobject redrawer, jlong devicePtr, jlong oldTexturePtr, jint width, jint height) {
         DirectXOffscreenDevice *device = fromJavaPointer<DirectXOffscreenDevice *>(devicePtr);
+        DirectXOffScreenTexture *oldTexture = fromJavaPointer<DirectXOffScreenTexture *>(oldTexturePtr);
 
-        auto& textureDesc = device->textureDesc;
+        DirectXOffScreenTexture *texture;
 
-        if (textureDesc.Width != width || textureDesc.Height != height) {
-            textureDesc.Width = width;
-            textureDesc.Height = height;
+        if (oldTexture == nullptr || oldTexture->width != width || oldTexture->height != height) {
+            texture = new DirectXOffScreenTexture(device, width, height);
 
-            auto& readbackBufferDesc = device->readbackBufferDesc;
-            readbackBufferDesc.Width = calculateRowPitch(width) * height;
-
-            if (device->texture) {
-                device->texture->Release();
-            }
-
-            if (device->readbackBuffer) {
-                device->readbackBuffer->Release();
-            }
-
-            device->backendContext.fDevice->CreateCommittedResource(&device->textureHeapProperties, D3D12_HEAP_FLAG_NONE, &textureDesc, D3D12_RESOURCE_STATE_RENDER_TARGET, nullptr, IID_PPV_ARGS(&device->texture));
-            device->backendContext.fDevice->CreateCommittedResource(&device->readbackHeapProperties, D3D12_HEAP_FLAG_NONE, &readbackBufferDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&device->readbackBuffer));
-
-            if (device->texture == nullptr || device->readbackBuffer == nullptr) {
+            if (texture->resource == nullptr || texture->readbackBufferResource == nullptr) {
+                delete texture;
                 return 0;
             }
+        } else {
+            texture = oldTexture;
         }
 
-        return toJavaPointer(device->texture);
+        return toJavaPointer(texture);
+    }
+
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_swing_Direct3DSwingRedrawer_disposeDirectXTexture(
+        JNIEnv *env, jobject redrawer, jlong texturePtr) {
+        DirectXOffScreenTexture *texture = fromJavaPointer<DirectXOffScreenTexture *>(texturePtr);
+        delete texture;
     }
 
     JNIEXPORT jboolean JNICALL Java_org_jetbrains_skiko_swing_Direct3DSwingRedrawer_readPixels(
-            JNIEnv *env, jobject redrawer, jlong devicePtr, jbyteArray byteArray) {
+            JNIEnv *env, jobject redrawer, jlong devicePtr, jlong texturePtr, jbyteArray byteArray) {
         jbyte *bytesPtr = env->GetByteArrayElements(byteArray, nullptr);
 
         DirectXOffscreenDevice *device = fromJavaPointer<DirectXOffscreenDevice *>(devicePtr);
+
+        DirectXOffScreenTexture *texture = fromJavaPointer<DirectXOffScreenTexture *>(texturePtr);
 
         auto commandAllocator = device->commandAllocator;
         auto commandList = device->commandList;
@@ -318,7 +327,7 @@ extern "C"
 
         D3D12_RESOURCE_BARRIER textureResourceBarrier;
         textureResourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-        textureResourceBarrier.Transition.pResource = device->texture;
+        textureResourceBarrier.Transition.pResource = texture->resource;
         textureResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
         textureResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_SOURCE;
         textureResourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES ;
@@ -327,21 +336,21 @@ extern "C"
         commandList->ResourceBarrier(1, &textureResourceBarrier);
 
         D3D12_TEXTURE_COPY_LOCATION src = {};
-        src.pResource = device->texture;
+        src.pResource = texture->resource;
         src.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
         src.SubresourceIndex = 0;
 
         D3D12_TEXTURE_COPY_LOCATION dst = {};
-        dst.pResource = device->readbackBuffer;
+        dst.pResource = texture->readbackBufferResource;
         dst.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
         dst.PlacedFootprint.Offset = 0;
         dst.PlacedFootprint.Footprint.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-        dst.PlacedFootprint.Footprint.Width = device->textureDesc.Width;
-        dst.PlacedFootprint.Footprint.Height = device->textureDesc.Height;
+        dst.PlacedFootprint.Footprint.Width = texture->width;
+        dst.PlacedFootprint.Footprint.Height = texture->height;
         dst.PlacedFootprint.Footprint.Depth = 1;
-        dst.PlacedFootprint.Footprint.RowPitch = calculateRowPitch(device->textureDesc.Width);
+        dst.PlacedFootprint.Footprint.RowPitch = calculateRowPitch(texture->width);
 
-        D3D12_BOX srcBox = {0, 0, 0, device->textureDesc.Width, device->textureDesc.Height, 1};
+        D3D12_BOX srcBox = {0, 0, 0, texture->width, texture->height, 1};
 
         commandList->CopyTextureRegion(&dst, 0, 0, 0, &src, &srcBox);
 
@@ -363,7 +372,7 @@ extern "C"
             WaitForSingleObject(fenceEvent, INFINITE);
         }
 
-        auto rangeLength = device->readbackBufferDesc.Width;
+        auto rangeLength = texture->readbackBufferWidth();
         D3D12_RANGE readbackBufferRange{ 0, rangeLength };
 
         /*
@@ -371,12 +380,12 @@ extern "C"
          *       write compute shader to copy texture to readback buffer with no RowPitch padding
          *       to support arbitary texture size
          */
-        if (rangeLength != device->textureDesc.Width * device->textureDesc.Height * 4) {
+        if (rangeLength != texture->width * texture->height * 4) {
             return false;
         }
 
         void *readbackBufferBytesPtr = nullptr;
-        device->readbackBuffer->Map(
+        texture->readbackBufferResource->Map(
             0,
             &readbackBufferRange,
             &readbackBufferBytesPtr
@@ -390,7 +399,7 @@ extern "C"
         memcpy(bytesPtr, readbackBufferBytesPtr, rangeLength);
 
         D3D12_RANGE emptyRange{ 0, 0 };
-        device->readbackBuffer->Unmap(0, &emptyRange);
+        texture->readbackBufferResource->Unmap(0, &emptyRange);
 
         env->ReleaseByteArrayElements(byteArray, bytesPtr, 0);
 
