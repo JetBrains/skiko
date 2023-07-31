@@ -71,10 +71,10 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_fini
                 int drawableWidth = currentDrawable.texture.width;
                 int drawableHeight = currentDrawable.texture.height;
 
-                //device.layer.drawableSize.width, device.layer.drawableSize.height
                 int layerWidth = device.layer.drawableSize.width;
                 int layerHeight = device.layer.drawableSize.height;
 
+                /// Avoid presenting drawable on layer that has already changed size by the moment it was scheduled
                 if (drawableWidth == layerWidth && drawableHeight == layerHeight) {
                     [currentDrawable present];
                 }
