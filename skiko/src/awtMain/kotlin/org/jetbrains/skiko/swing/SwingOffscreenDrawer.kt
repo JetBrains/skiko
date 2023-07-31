@@ -17,7 +17,10 @@ internal class SwingOffscreenDrawer(
     private var volatileImage: VolatileImage? = null
 
     /**
-     * Draws rendered image that is represented by [bytes] on [g]
+     * Draws rendered image that is represented by [bytes] on [g].
+     *
+     * If size of the rendered image is bigger than size from [swingLayerProperties]
+     * then only part of the image will be drawn on [g].
      *
      * @param g graphics where rendered picture given in [bytes] should be drawn
      * @param bytes bytes of rendered picture in little endian order
@@ -93,7 +96,8 @@ internal class SwingOffscreenDrawer(
             g.background = Color(0, 0, 0, 0)
             g.composite = AlphaComposite.Src
             g.clearRect(0, 0, swingLayerProperties.width, swingLayerProperties.height)
-            drawImage(g, image)
+            val imageClipRectangle = Rectangle(0, 0, swingLayerProperties.width, swingLayerProperties.height)
+            drawImage(g, image, sourceBounds = imageClipRectangle)
         } finally {
             g.dispose()
         }
