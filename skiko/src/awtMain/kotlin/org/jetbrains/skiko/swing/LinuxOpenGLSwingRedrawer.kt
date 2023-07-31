@@ -41,7 +41,7 @@ internal class LinuxOpenGLSwingRedrawer(
         try {
             autoCloseScope {
                 // TODO: reuse texture
-                val texturePtr = createTexture(width, height)
+                val texturePtr = createAndBindTexture(width, height)
                 val fbId = getFboId(texturePtr)
                 val renderTarget = makeGLRenderTarget(
                     width,
@@ -67,7 +67,7 @@ internal class LinuxOpenGLSwingRedrawer(
                 canvas.clear(Color.TRANSPARENT)
                 skikoView.onRender(canvas, width, height, nanoTime)
                 flush(surface, g)
-                disposeTexture(texturePtr)
+                unbindAndDisposeTexture(texturePtr)
             }
         } finally {
             finishRendering(offScreenContextPtr)
@@ -124,7 +124,7 @@ internal class LinuxOpenGLSwingRedrawer(
     private external fun startRendering(contextPtr: Long, bufferPtr: Long)
     private external fun finishRendering(contextPtr: Long)
 
-    private external fun createTexture(width: Int, height: Int): Long
+    private external fun createAndBindTexture(width: Int, height: Int): Long
     private external fun getFboId(texturePtr: Long): Int
-    private external fun disposeTexture(texturePtr: Long)
+    private external fun unbindAndDisposeTexture(texturePtr: Long)
 }

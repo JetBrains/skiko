@@ -79,6 +79,11 @@ public:
     GLuint tex;
     GLuint fbo;
 
+    OffScreenTexture(GLuint _tex, GLuint _fbo) {
+        tex = _tex;
+        fbo = _fbo;
+    }
+
     ~OffScreenTexture() {
         glDeleteFramebuffers(1, &fbo);
         glDeleteTextures(1, &tex);
@@ -143,7 +148,7 @@ extern "C"
         glXMakeCurrent(context->display, None, nullptr);
     }
 
-    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_LinuxOpenGLSwingRedrawer_createTexture(
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_LinuxOpenGLSwingRedrawer_createAndBindTexture(
         JNIEnv *env, jobject redrawer, jint width, jint height)
     {
         GLuint tex;
@@ -157,9 +162,7 @@ extern "C"
 
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, 0);
 
-        OffScreenTexture *texture = new OffScreenTexture();
-        texture->tex = tex;
-        texture->fbo = fbo;
+        OffScreenTexture *texture = new OffScreenTexture(tex, fbo);
 
         return toJavaPointer(texture);
     }
@@ -172,7 +175,7 @@ extern "C"
         return texture->fbo;
     }
 
-    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_swing_LinuxOpenGLSwingRedrawer_disposeTexture(
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_swing_LinuxOpenGLSwingRedrawer_unbindAndDisposeTexture(
         JNIEnv *env, jobject redrawer, jlong texturePtr)
     {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
