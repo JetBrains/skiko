@@ -141,8 +141,6 @@ extern "C"
     {
         OffScreenContext* context = fromJavaPointer<OffScreenContext *>(contextPtr);
         glXMakeCurrent(context->display, None, nullptr);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glBindTexture(GL_TEXTURE_2D, 0);
     }
 
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_LinuxOpenGLSwingRedrawer_createTexture(
@@ -177,6 +175,8 @@ extern "C"
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_swing_LinuxOpenGLSwingRedrawer_disposeTexture(
         JNIEnv *env, jobject redrawer, jlong texturePtr)
     {
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glBindTexture(GL_TEXTURE_2D, 0);
         OffScreenTexture *texture = fromJavaPointer<OffScreenTexture *>(texturePtr);
 
         delete texture;
