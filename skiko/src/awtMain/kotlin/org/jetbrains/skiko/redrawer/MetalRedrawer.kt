@@ -112,11 +112,9 @@ internal class MetalRedrawer(
     override fun redrawImmediately() {
         check(!isDisposed) { "MetalRedrawer is disposed" }
         inDrawScope {
-            setVSyncEnabled(device.ptr, enabled = false)
             update(System.nanoTime())
             if (!isDisposed) { // Redrawer may be disposed in user code, during `update`
                 performDraw()
-                setVSyncEnabled(device.ptr, properties.isVsyncEnabled)
             }
         }
     }
