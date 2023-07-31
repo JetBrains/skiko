@@ -37,11 +37,17 @@ internal class LinuxOpenGLSwingRedrawer(
 
     override fun onRender(g: Graphics2D, width: Int, height: Int, nanoTime: Long) {
         offScreenBufferPtr = makeOffScreenBuffer(offScreenContextPtr, offScreenBufferPtr, width, height)
+        if (offScreenBufferPtr == 0L) {
+            throw RenderException("Cannot create offScreen OpenGL buffer")
+        }
         startRendering(offScreenContextPtr, offScreenBufferPtr)
         try {
             autoCloseScope {
                 // TODO: reuse texture
                 val texturePtr = createAndBindTexture(width, height)
+                if (texturePtr == 0L) {
+                    throw RenderException("Cannot create offScreen OpenGL texture")
+                }
                 val fbId = getFboId(texturePtr)
                 val renderTarget = makeGLRenderTarget(
                     width,

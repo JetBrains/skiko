@@ -16,7 +16,19 @@ public:
     GLXContext context;
     GLXFBConfig* fbConfigs;
 
-    OffScreenContext() {
+    OffScreenContext(Display* _display, GLXContext _context, GLXFBConfig* _fbConfigs) {
+        display = _display;
+        context = _context;
+        fbConfigs = _fbConfigs;
+    }
+
+    ~OffScreenContext() {
+        XFree(fbConfigs);
+        glXDestroyContext(display, context);
+        XCloseDisplay(display);
+    }
+
+    static OffScreenContext* create() {
         const int glxContextAttribs[] {
             GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
             GLX_RENDER_TYPE, GLX_RGBA_BIT,
@@ -27,22 +39,39 @@ public:
             None
         };
 
-        display = XOpenDisplay(nullptr);
+        Display* display = XOpenDisplay(nullptr);
+
+        if (!display) {
+            return nullptr;
+        }
 
         int numConfigs = 0;
-        fbConfigs = glXChooseFBConfig(display, DefaultScreen(display), glxContextAttribs, &numConfigs);
+        GLXFBConfig* fbConfigs = glXChooseFBConfig(display, DefaultScreen(display), glxContextAttribs, &numConfigs);
+
+        if (!fbConfigs) {
+            XCloseDisplay(display);
+            return nullptr;
+        }
 
         XVisualInfo* visual = glXGetVisualFromFBConfig(display, fbConfigs[0]);
 
-        context = glXCreateContext(display, visual, nullptr, True);
+        if (!visual) {
+            XFree(fbConfigs);
+            XCloseDisplay(display);
+            return nullptr;
+        }
+
+        GLXContext context = glXCreateContext(display, visual, nullptr, True);
 
         XFree(visual);
-    }
 
-    ~OffScreenContext() {
-        XFree(fbConfigs);
-        glXDestroyContext(display, context);
-        XCloseDisplay(display);
+        if (!context) {
+            XFree(fbConfigs);
+            XCloseDisplay(display);
+            return nullptr;
+        }
+
+        return new OffScreenContext(display, context, fbConfigs);
     }
 };
 
@@ -54,22 +83,31 @@ public:
     int width;
     int height;
 
-    OffScreenBuffer(OffScreenContext* context, int _width, int _height) {
+    OffScreenBuffer(Display* _display, GLXPbuffer _pbuffer, int _width, int _height) {
+        display = _display;
+        pbuffer = _pbuffer;
+        width = _width;
+        height = _height; 
+    }
+
+    ~OffScreenBuffer() {
+        glXDestroyPbuffer(display, pbuffer);
+    }
+
+    static OffScreenBuffer* create(OffScreenContext* context, int width, int height) {
         int pbufferAttribs[] = {
             GLX_PBUFFER_WIDTH, width,
             GLX_PBUFFER_HEIGHT, height,
             None  
         };
 
-        width = _width;
-        height = _height;
-        display = context->display;
+        GLXPbuffer pbuffer = glXCreatePbuffer(context->display, context->fbConfigs[0], pbufferAttribs);
 
-        pbuffer = glXCreatePbuffer(context->display, context->fbConfigs[0], pbufferAttribs);
-    }
+        if (!pbuffer) {
+            return nullptr; 
+        }
 
-    ~OffScreenBuffer() {
-        glXDestroyPbuffer(display, pbuffer);
+        return new OffScreenBuffer(context->display, pbuffer, width, height);
     }
 };
 
@@ -95,7 +133,7 @@ extern "C"
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_LinuxOpenGLSwingRedrawer_makeOffScreenContext(
         JNIEnv *env, jobject redrawer)
     {
-        OffScreenContext* context = new OffScreenContext();
+        OffScreenContext* context = OffScreenContext::create();
         return toJavaPointer(context);
     }
 
@@ -103,7 +141,10 @@ extern "C"
         JNIEnv *env, jobject redrawer, jlong contextPtr)
     {
         OffScreenContext* context = fromJavaPointer<OffScreenContext *>(contextPtr);
-        delete context;
+
+        if (context) {
+            delete context;
+        }
     }
 
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_LinuxOpenGLSwingRedrawer_makeOffScreenBuffer(
@@ -117,7 +158,7 @@ extern "C"
             if (oldBuffer != nullptr) {
                 delete oldBuffer;
             }
-            buffer = new OffScreenBuffer(context, width, height);
+            buffer = OffScreenBuffer::create(context, width, height);
         } else {
             buffer = oldBuffer;
         }
@@ -129,7 +170,9 @@ extern "C"
         JNIEnv *env, jobject redrawer, jlong bufferPtr)
     {
         OffScreenBuffer* buffer = fromJavaPointer<OffScreenBuffer *>(bufferPtr);
-        delete buffer;
+        if (buffer) {
+            delete buffer;
+        }
     }
 
     JNIEXPORT void JNICALL Java_org_jetbrains_skiko_swing_LinuxOpenGLSwingRedrawer_startRendering(
@@ -182,6 +225,8 @@ extern "C"
         glBindTexture(GL_TEXTURE_2D, 0);
         OffScreenTexture *texture = fromJavaPointer<OffScreenTexture *>(texturePtr);
 
-        delete texture;
+        if (texture) {
+            delete texture;
+        }
     }
 } // extern "C"
