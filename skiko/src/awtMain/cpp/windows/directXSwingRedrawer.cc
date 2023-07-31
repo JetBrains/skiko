@@ -3,6 +3,10 @@
 #include <locale>
 #include <Windows.h>
 #include <jawt_md.h>
+#include <d3d12sdklayers.h>
+#include <d3d12.h>
+#include <dxgi1_4.h>
+#include <dxgi1_6.h>
 #include "jni_helpers.h"
 #include "exceptions_handler.h"
 #include "window_util.h"
@@ -14,11 +18,7 @@
 #include "../common/interop.hh"
 
 #include "d3d/GrD3DTypes.h"
-#include <d3d12sdklayers.h>
 #include "d3d/GrD3DBackendContext.h"
-#include <d3d12.h>
-#include <dxgi1_4.h>
-#include <dxgi1_6.h>
 
 class DirectXOffscreenDevice
 {
