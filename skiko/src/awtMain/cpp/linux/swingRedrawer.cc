@@ -140,7 +140,6 @@ extern "C"
         JNIEnv *env, jobject redrawer, jlong contextPtr)
     {
         OffScreenContext* context = fromJavaPointer<OffScreenContext *>(contextPtr);
-        glFinish();
         glXMakeCurrent(context->display, None, nullptr);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glBindTexture(GL_TEXTURE_2D, 0);
