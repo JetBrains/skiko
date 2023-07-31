@@ -61,11 +61,27 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_context_MetalContextHandler_fini
         if (currentDrawable) {
             id<MTLCommandBuffer> commandBuffer = [device.queue commandBuffer];
             commandBuffer.label = @"Present";
-            [commandBuffer presentDrawable:currentDrawable];
+            // [commandBuffer presentDrawable:currentDrawable];
             [commandBuffer addCompletedHandler:^(id<MTLCommandBuffer> buffer) {
                 /// commands have completed, allow next waiting (if any) to start encoding new work to gpu
                 dispatch_semaphore_signal(device.inflightSemaphore);
             }];
+
+            [commandBuffer waitUntilScheduled];
+
+            [commandBuffer addScheduledHandler:^(id<MTLCommandBuffer> buffer) {
+                int drawableWidth = currentDrawable.texture.width;
+                int drawableHeight = currentDrawable.texture.height;
+
+                //device.layer.drawableSize.width, device.layer.drawableSize.height
+                int layerWidth = device.layer.drawableSize.width;
+                int layerHeight = device.layer.drawableSize.height;
+
+                if (drawableWidth == layerWidth && drawableHeight == layerHeight) {
+                    [currentDrawable present];
+                }
+            }];
+
             [commandBuffer commit];
             device.drawableHandle = nil;
         }
