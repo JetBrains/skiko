@@ -82,7 +82,7 @@ internal class Direct3DSwingRedrawer(
             bytesToDraw = ByteArray(bytesArraySize)
         }
 
-        if(!readPixels(device, bytesToDraw)) {
+        if(!readPixels(device, texturePtr, bytesToDraw)) {
             throw RenderException("Couldn't read pixels")
         }
 
@@ -100,7 +100,7 @@ internal class Direct3DSwingRedrawer(
     private external fun createDirectXOffscreenDevice(adapter: Long): Long
     private external fun makeDirectXContext(device: Long): Long
 
-    private external fun readPixels(device: Long, byteArray: ByteArray): Boolean
+    private external fun readPixels(device: Long, texturePtr: Long, byteArray: ByteArray): Boolean
 
     private external fun getAlignment(): Long
 
