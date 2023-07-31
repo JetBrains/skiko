@@ -247,6 +247,23 @@ extern "C"
         return toJavaPointer(d3dDevice);
     }
 
+    JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_Direct3DSwingRedrawer_makeDirectXRenderTargetOffScreen(
+            JNIEnv *env, jobject redrawer, jlong devicePtr) {
+        DirectXOffscreenDevice *device = fromJavaPointer<DirectXOffscreenDevice *>(devicePtr);
+        ID3D12Resource* resource = device->texture;
+        int width = device->textureDesc.Width;
+        int height = device->textureDesc.Height;
+
+        GrD3DTextureResourceInfo texResInfo = {};
+        texResInfo.fResource.retain(resource);
+        texResInfo.fResourceState = D3D12_RESOURCE_STATE_COMMON;
+        texResInfo.fFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+        texResInfo.fSampleCount = 1;
+        texResInfo.fLevelCount = 1;
+        GrBackendRenderTarget* renderTarget = new GrBackendRenderTarget(width, height, texResInfo);
+        return reinterpret_cast<jlong>(renderTarget);
+    }
+
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_swing_Direct3DSwingRedrawer_makeDirectXContext(
         JNIEnv *env, jobject redrawer, jlong devicePtr)
     {

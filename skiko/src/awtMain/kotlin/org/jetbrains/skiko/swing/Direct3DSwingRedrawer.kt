@@ -54,19 +54,7 @@ internal class Direct3DSwingRedrawer(
             if (texturePtr == 0L) {
                 throw RenderException("Can't allocate DirectX resources")
             }
-
-            val format = 28 // DXGI_FORMAT_R8G8B8A8_UNORM
-            val sampleCnt = 1
-            val levelCnt = 1
-
-            val renderTarget = BackendRenderTarget.makeDirect3D(
-                alignedWidth,
-                height,
-                texturePtr,
-                format,
-                sampleCnt,
-                levelCnt
-            ).autoClose()
+            val renderTarget = makeRenderTarget().autoClose()
 
             val surface = Surface.makeFromBackendRenderTarget(
                 context,
@@ -99,9 +87,14 @@ internal class Direct3DSwingRedrawer(
         swingOffscreenDrawer.draw(g, bytesToDraw, surface.width, surface.height)
     }
 
+    private fun makeRenderTarget() = BackendRenderTarget(
+        makeDirectXRenderTargetOffScreen(device)
+    )
+
     // Called from native code
     private fun isAdapterSupported(name: String) = isVideoCardSupported(GraphicsApi.DIRECT3D, hostOs, name)
 
+    private external fun makeDirectXRenderTargetOffScreen(device: Long): Long
     private external fun chooseAdapter(adapterPriority: Int): Long
     private external fun createDirectXOffscreenDevice(adapter: Long): Long
     private external fun makeDirectXContext(device: Long): Long
