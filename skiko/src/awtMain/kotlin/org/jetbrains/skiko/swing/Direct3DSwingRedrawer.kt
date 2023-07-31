@@ -27,8 +27,6 @@ internal class Direct3DSwingRedrawer(
         makeDirectXContext(device)
     )
 
-    private var texturePtr: Long = 0
-
     private var bytesToDraw = ByteArray(0)
     private val rowBytesAlignment = getAlignment().toInt()
     private val widthSizeAlignment = rowBytesAlignment / 4
@@ -45,50 +43,45 @@ internal class Direct3DSwingRedrawer(
     }
 
     override fun onRender(g: Graphics2D, width: Int, height: Int, nanoTime: Long) {
-        val alignedWidth = if (width % widthSizeAlignment != 0) {
-            width + widthSizeAlignment - (width % widthSizeAlignment);
-        } else {
-            width
-        }
+        autoCloseScope {
+            val alignedWidth = if (width % widthSizeAlignment != 0) {
+                width + widthSizeAlignment - (width % widthSizeAlignment);
+            } else {
+                width
+            }
 
-        val newTexturePtr = getRenderTargetTexture(device, alignedWidth, height)
-
-        if (newTexturePtr == 0L) {
-            throw RenderException("Can't allocate DirectX resources")
-        }
-
-        if (newTexturePtr != texturePtr) {
-            texturePtr = newTexturePtr
+            val texturePtr = getRenderTargetTexture(device, alignedWidth, height)
+            if (texturePtr == 0L) {
+                throw RenderException("Can't allocate DirectX resources")
+            }
 
             val format = 28 // DXGI_FORMAT_R8G8B8A8_UNORM
             val sampleCnt = 1
             val levelCnt = 1
 
-            renderTarget = BackendRenderTarget.makeDirect3D(
+            val renderTarget = BackendRenderTarget.makeDirect3D(
                 alignedWidth,
                 height,
                 texturePtr,
                 format,
                 sampleCnt,
                 levelCnt
-            )
+            ).autoClose()
 
-            surface = Surface.makeFromBackendRenderTarget(
+            val surface = Surface.makeFromBackendRenderTarget(
                 context,
-                renderTarget ?: throw RenderException("renderTarget is null"),
+                renderTarget,
                 SurfaceOrigin.TOP_LEFT,
                 SurfaceColorFormat.RGBA_8888,
                 ColorSpace.sRGB,
                 SurfaceProps(pixelGeometry = PixelGeometry.UNKNOWN)
-            )
+            )?.autoClose() ?: throw RenderException("Cannot create surface")
+
+            val canvas = surface.canvas
+            canvas.clear(Color.TRANSPARENT)
+            skikoView.onRender(canvas, width, height, nanoTime)
+            flush(surface, g)
         }
-
-        val surface = surface ?: throw RenderException("surface is null")
-
-        val canvas = surface.canvas
-        canvas.clear(Color.TRANSPARENT)
-        skikoView.onRender(canvas, width, height, nanoTime)
-        flush(surface, g)
     }
 
     fun flush(surface: Surface, g: Graphics2D) {
