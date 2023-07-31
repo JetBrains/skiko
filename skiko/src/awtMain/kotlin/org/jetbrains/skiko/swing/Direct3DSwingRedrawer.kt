@@ -27,6 +27,7 @@ internal class Direct3DSwingRedrawer(
         makeDirectXContext(device)
     )
 
+    private var texturePtr: Long = 0
     private var bytesToDraw = ByteArray(0)
     private val rowBytesAlignment = getAlignment().toInt()
     private val widthSizeAlignment = rowBytesAlignment / 4
@@ -38,6 +39,7 @@ internal class Direct3DSwingRedrawer(
     override fun dispose() {
         bytesToDraw = ByteArray(0)
         context.close()
+        disposeDirectXTexture(texturePtr)
         disposeDevice(device)
         super.dispose()
     }
@@ -50,7 +52,7 @@ internal class Direct3DSwingRedrawer(
                 width
             }
 
-            val texturePtr = getRenderTargetTexture(device, alignedWidth, height)
+            texturePtr = makeDirectXTexture(device, texturePtr, alignedWidth, height)
             if (texturePtr == 0L) {
                 throw RenderException("Can't allocate DirectX resources")
             }
@@ -88,7 +90,7 @@ internal class Direct3DSwingRedrawer(
     }
 
     private fun makeRenderTarget() = BackendRenderTarget(
-        makeDirectXRenderTargetOffScreen(device)
+        makeDirectXRenderTargetOffScreen(texturePtr)
     )
 
     // Called from native code
