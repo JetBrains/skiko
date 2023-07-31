@@ -292,6 +292,9 @@ extern "C"
         DirectXOffScreenTexture *texture;
 
         if (oldTexture == nullptr || oldTexture->width != width || oldTexture->height != height) {
+            if (oldTexture != nullptr) {
+                delete oldTexture;
+            }
             texture = new DirectXOffScreenTexture(device, width, height);
 
             if (texture->resource == nullptr || texture->readbackBufferResource == nullptr) {
