@@ -373,11 +373,7 @@ extern "C"
         memcpy(bytesPtr, readbackBufferBytesPtr, rangeLength);
 
         D3D12_RANGE emptyRange{ 0, 0 };
-        device->readbackBuffer->Unmap
-        (
-            0,
-            &emptyRange
-        );
+        device->readbackBuffer->Unmap(0, &emptyRange);
 
         env->ReleaseByteArrayElements(byteArray, bytesPtr, 0);
 
