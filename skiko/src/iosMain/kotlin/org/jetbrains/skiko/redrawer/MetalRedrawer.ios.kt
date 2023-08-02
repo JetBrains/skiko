@@ -2,6 +2,7 @@ package org.jetbrains.skiko.redrawer
 
 import kotlinx.cinterop.*
 import org.jetbrains.skia.*
+import org.jetbrains.skiko.Logger
 import platform.Foundation.NSRunLoop
 import platform.Foundation.NSSelectorFromString
 import platform.QuartzCore.*
@@ -106,6 +107,7 @@ internal class MetalRedrawer(
             val metalDrawable = metalLayer.nextDrawable()
 
             if (metalDrawable == null) {
+                Logger.warn { "'metalLayer.nextDrawable()' returned null. 'metalLayer.allowsNextDrawableTimeout' should be set to false. Skipping the frame." }
                 dispatch_semaphore_signal(inflightSemaphore)
                 return@autoreleasepool
             }
@@ -122,6 +124,7 @@ internal class MetalRedrawer(
             )
 
             if (surface == null) {
+                Logger.warn { "'Surface.makeFromBackendRenderTarget' returned null. Skipping the frame." }
                 renderTarget.close()
                 // TODO: manually release metalDrawable when K/N API arrives
                 dispatch_semaphore_signal(inflightSemaphore)
