@@ -43,24 +43,9 @@ actual open class SkiaLayer {
         }
 
     internal var view: SkikoUIView? = null
-    // We need to keep reference to gesturesDetector as Objective-C will only keep weak reference here.
-    internal var gesturesDetector = SkikoGesturesDetector(this)
-    var gesturesToListen: Array<SkikoGestureEventKind>? = null
-        set(value) {
-            field = value
-            initGestures()
-        }
-
-    internal fun initGestures() {
-        gesturesDetector.setGesturesToListen(gesturesToListen)
-    }
 
     actual fun attachTo(container: Any) {
-        attachTo(container as SkikoUIView)
-    }
-
-    fun attachTo(view: SkikoUIView) {
-        this.view = view
+        view = container as SkikoUIView
     }
 
     actual fun detach() {
@@ -70,7 +55,7 @@ actual open class SkiaLayer {
     actual var skikoView: SkikoView? = null
 
     internal actual fun draw(canvas: Canvas) {
-        throw NotImplementedError("Don't call it")
+        throw UnsupportedOperationException("Don't call it, artifact of wrong abstraction")
     }
 
     internal fun draw(surface: Surface) {

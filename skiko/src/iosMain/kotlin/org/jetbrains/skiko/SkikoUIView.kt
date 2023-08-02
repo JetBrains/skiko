@@ -103,7 +103,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
         }
 
         skiaLayer.needRedrawCallback = _redrawer::needRedraw
-        skiaLayer.attachTo(this)
+        skiaLayer.view = this
     }
 
     /**
