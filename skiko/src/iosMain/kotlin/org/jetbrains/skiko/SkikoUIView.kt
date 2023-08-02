@@ -42,10 +42,6 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
     private var _inputDelegate: UITextInputDelegateProtocol? = null
     private var _currentTextMenuActions: TextActions? = null
     private lateinit var _redrawer: MetalRedrawer
-    private val UITouch.isPressed
-        get() =
-            phase != UITouchPhase.UITouchPhaseEnded &&
-                    phase != UITouchPhase.UITouchPhaseCancelled
 
     /*
      * When there at least one tracked touch, we need notify redrawer about it. It should schedule CADisplayLink which
@@ -627,3 +623,8 @@ private fun NSWritingDirection.directionToStr() =
         UITextLayoutDirectionDown -> "Down"
         else -> "unknown direction"
     }
+
+private val UITouch.isPressed
+    get() =
+        phase != UITouchPhase.UITouchPhaseEnded &&
+                phase != UITouchPhase.UITouchPhaseCancelled
