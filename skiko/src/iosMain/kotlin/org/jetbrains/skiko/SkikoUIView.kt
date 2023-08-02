@@ -181,9 +181,8 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
     override fun layoutSubviews() {
         super.layoutSubviews()
 
-        val scale = window?.screen?.scale ?: 1.0
         val scaledSize = bounds.useContents {
-            CGSizeMake(size.width * scale, size.height * scale)
+            CGSizeMake(size.width * contentScaleFactor, size.height * contentScaleFactor)
         }
 
         _metalLayer.drawableSize = scaledSize
