@@ -94,7 +94,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
         pointInside: (Point, UIEvent?) -> Boolean = { _, _ -> true },
         skikoUITextInputTrains: SkikoUITextInputTraits
     ) : super(frame) {
-        this._skiaLayer = skiaLayer
+        _skiaLayer = skiaLayer
         _pointInside = pointInside
         _skikoUITextInputTrains = skikoUITextInputTrains
 
@@ -103,6 +103,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
         }
 
         skiaLayer.needRedrawCallback = _redrawer::needRedraw
+        skiaLayer.attachTo(this)
     }
 
     /**
@@ -164,8 +165,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
     }
 
     fun load(): SkikoUIView {
-        _skiaLayer?.attachTo(this)
-
+        // TODO: redundant, remove in next refactor pass
         return this
     }
 
