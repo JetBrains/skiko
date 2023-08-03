@@ -2810,23 +2810,18 @@ $dokka.location:org.jetbrains.skiko/PredefinedCursorsId/values/#/PointingToDecla
 $dokka.location:org.jetbrains.skiko/SkiaLayer///PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/index.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/SkiaLayer/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/-skia-layer.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/attachTo/#[Error type: Unresolved type for NSWindow]/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/attach-to.html
-$dokka.location:org.jetbrains.skiko/SkiaLayer/attachTo/#[Error type: Unresolved type for UIView]/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/attach-to.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/attachTo/#kotlin.Any/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/attach-to.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/attachTo/#org.w3c.dom.HTMLCanvasElement#kotlin.Boolean/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/attach-to.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/component/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/component.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/contentScale/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/content-scale.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/detach/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/detach.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/fullscreen/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/fullscreen.html
-$dokka.location:org.jetbrains.skiko/SkiaLayer/gesturesToListen/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/gestures-to-listen.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/height/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/height.html
-$dokka.location:org.jetbrains.skiko/SkiaLayer/hideScreenKeyboard/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/hide-screen-keyboard.html
-$dokka.location:org.jetbrains.skiko/SkiaLayer/isScreenKeyboardOpen/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/is-screen-keyboard-open.html
-$dokka.location:org.jetbrains.skiko/SkiaLayer/isShowing/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/[macos]is-showing.html
+$dokka.location:org.jetbrains.skiko/SkiaLayer/isShowing/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/is-showing.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/needRedraw/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/need-redraw.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/nsView/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/ns-view.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/pixelGeometry/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/pixel-geometry.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/renderApi/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/render-api.html
-$dokka.location:org.jetbrains.skiko/SkiaLayer/showScreenKeyboard/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/show-screen-keyboard.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/skikoView/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/skiko-view.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/transparency/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/transparency.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/width/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/width.html
@@ -3154,9 +3149,10 @@ $dokka.location:org.jetbrains.skiko/SkikoSurfaceView/onKeyDown/#kotlin.Int#andro
 $dokka.location:org.jetbrains.skiko/SkikoSurfaceView/onKeyUp/#kotlin.Int#android.view.KeyEvent/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-surface-view/on-key-up.html
 $dokka.location:org.jetbrains.skiko/SkikoSurfaceView/onTouchEvent/#android.view.MotionEvent/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-surface-view/on-touch-event.html
 $dokka.location:org.jetbrains.skiko/SkikoSurfaceView/scheduleFrame/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-surface-view/schedule-frame.html
+$dokka.location:org.jetbrains.skiko/SkikoUIView.Companion///PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/-companion/index.html
+$dokka.location:org.jetbrains.skiko/SkikoUIView.Companion/layerClass/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/-companion/layer-class.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView///PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/index.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/SkikoUIView/#[Error type: Unresolved type for NSCoder]/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/-skiko-u-i-view.html
-$dokka.location:org.jetbrains.skiko/SkikoUIView/SkikoUIView/#kotlinx.cinterop.CValue[[Error type: Unresolved type for CGRect]]/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/-skiko-u-i-view.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/SkikoUIView/#org.jetbrains.skiko.SkiaLayer#kotlinx.cinterop.CValue[[Error type: Unresolved type for CGRect]]#kotlin.Function2[[Error type: Unresolved type for Point],[Error type: Unresolved type for UIEvent]?,kotlin.Boolean]#org.jetbrains.skiko.ios.SkikoUITextInputTraits/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/-skiko-u-i-view.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/SkikoUIView/#org.jetbrains.skiko.SkiaLayer#kotlinx.cinterop.CValue[[Error type: Unresolved type for CGRect]]#kotlin.Function2[[Error type: Unresolved type for Point],[Error type: Unresolved type for UIEvent]?,kotlin.Boolean]/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/-skiko-u-i-view.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/autocapitalizationType/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/autocapitalization-type.html
@@ -3175,9 +3171,9 @@ $dokka.location:org.jetbrains.skiko/SkikoUIView/comparePosition/#[Error type: Un
 $dokka.location:org.jetbrains.skiko/SkikoUIView/copy/#kotlin.Any?/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/copy.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/cut/#kotlin.Any?/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/cut.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/deleteBackward/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/delete-backward.html
-$dokka.location:org.jetbrains.skiko/SkikoUIView/detach/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/detach.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/dictationRecognitionFailed/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/dictation-recognition-failed.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/dictationRecordingDidEnd/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/dictation-recording-did-end.html
+$dokka.location:org.jetbrains.skiko/SkikoUIView/didMoveToWindow/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/did-move-to-window.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/enablesReturnKeyAutomatically/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/enables-return-key-automatically.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/endOfDocument/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/end-of-document.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/firstRectForRange/#[Error type: Unresolved type for UITextRange]/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/first-rect-for-range.html
@@ -3191,6 +3187,7 @@ $dokka.location:org.jetbrains.skiko/SkikoUIView/isSecureTextEntry/#/PointingToDe
 $dokka.location:org.jetbrains.skiko/SkikoUIView/isTextMenuShown/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/is-text-menu-shown.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/keyboardAppearance/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/keyboard-appearance.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/keyboardType/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/keyboard-type.html
+$dokka.location:org.jetbrains.skiko/SkikoUIView/layoutSubviews/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/layout-subviews.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/load/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/load.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/markedTextRange/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/marked-text-range.html
 $dokka.location:org.jetbrains.skiko/SkikoUIView/markedTextStyle/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-u-i-view/marked-text-style.html
@@ -3238,13 +3235,6 @@ $dokka.location:org.jetbrains.skiko/SkikoView/onInputEvent/#org.jetbrains.skiko.
 $dokka.location:org.jetbrains.skiko/SkikoView/onKeyboardEvent/#org.jetbrains.skiko.SkikoKeyboardEvent/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-view/on-keyboard-event.html
 $dokka.location:org.jetbrains.skiko/SkikoView/onPointerEvent/#org.jetbrains.skiko.SkikoPointerEvent/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-view/on-pointer-event.html
 $dokka.location:org.jetbrains.skiko/SkikoView/onRender/#org.jetbrains.skia.Canvas#kotlin.Int#kotlin.Int#kotlin.Long/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-view/on-render.html
-$dokka.location:org.jetbrains.skiko/SkikoViewController///PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-view-controller/index.html
-$dokka.location:org.jetbrains.skiko/SkikoViewController/SkikoViewController/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-view-controller/-skiko-view-controller.html
-$dokka.location:org.jetbrains.skiko/SkikoViewController/SkikoViewController/#[Error type: Unresolved type for NSCoder]/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-view-controller/-skiko-view-controller.html
-$dokka.location:org.jetbrains.skiko/SkikoViewController/SkikoViewController/#org.jetbrains.skiko.SkikoUIView/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-view-controller/-skiko-view-controller.html
-$dokka.location:org.jetbrains.skiko/SkikoViewController/loadView/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-view-controller/load-view.html
-$dokka.location:org.jetbrains.skiko/SkikoViewController/viewDidDisappear/#kotlin.Boolean/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-view-controller/view-did-disappear.html
-$dokka.location:org.jetbrains.skiko/SkikoViewController/viewDidLoad/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-view-controller/view-did-load.html
 $dokka.location:org.jetbrains.skiko/SystemTheme.DARK///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-system-theme/-d-a-r-k/index.html
 $dokka.location:org.jetbrains.skiko/SystemTheme.LIGHT///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-system-theme/-l-i-g-h-t/index.html
 $dokka.location:org.jetbrains.skiko/SystemTheme.UNKNOWN///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-system-theme/-u-n-k-n-o-w-n/index.html
