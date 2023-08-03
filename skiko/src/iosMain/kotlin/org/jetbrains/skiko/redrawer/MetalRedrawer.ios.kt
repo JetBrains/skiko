@@ -78,6 +78,9 @@ internal class MetalRedrawer(
         disposeCallback(this)
         caDisplayLink?.invalidate()
         caDisplayLink = null
+
+        context.flush()
+        context.close()
     }
 
     internal fun needRedraw() {
