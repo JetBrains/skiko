@@ -1,9 +1,9 @@
 package org.jetbrains.skiko
 
-import org.jetbrains.skia.Canvas
+import org.jetbrains.skia.Surface
 import org.jetbrains.skiko.redrawer.MetalRedrawer
-import platform.Metal.MTLCreateSystemDefaultDevice
 import platform.QuartzCore.CADisplayLink
+import platform.QuartzCore.CAMetalLayer
 import kotlin.native.internal.createCleaner
 import kotlin.test.Ignore
 import kotlin.test.Test
@@ -14,16 +14,17 @@ private val nsRunLoopMock = object {
 }
 class MetalRedrawerTest {
     @OptIn(ExperimentalStdlibApi::class)
-    private fun createAndForgetSkiaLayer(disposeCallback: () -> Unit) {
-        // Current reference cycle looks like that
-        // skiaLayer -> skikoView -> redrawer -> skiaLayer
-        // redrawer creates CADisplayLink which is stored in global object (NSRunLoop) and used to strongly capture
-        // an object referencing redrawer, creating a memory leak
-
-        val skiaLayer = object : SkiaLayer() {
-            // createCleaner can't capture anything
-            // so we need to proxy call to disposeCallback via the cleaned object itself
+    @Suppress("UNUSED_VARIABLE", "UNUSED", "UNUSED_PARAMETER")
+    private fun createAndForgetMetalRedrawerOwner(disposeCallback: () -> Unit) {
+        val metalRedrawerOwner = object {
+            /*
+             * [createCleaner] can't capture anything so we need to proxy call to [disposeCallback]
+             * via the cleaned object itself.
+             */
             val disposeCallbackProxy = object {
+                /*
+                 * It will be cleaned as soon, as [metalRedrawerOwner] is GCed.
+                 */
                 fun dispose() {
                     disposeCallback()
                 }
@@ -32,27 +33,28 @@ class MetalRedrawerTest {
             val cleaner = createCleaner(disposeCallbackProxy) {
                 it.dispose()
             }
-        }
 
-        skiaLayer.skikoView = object : SkikoView {
-            val redrawer = MetalRedrawer(skiaLayer) {
-                nsRunLoopMock.displayLinks.add(it)
+            val redrawer = MetalRedrawer(
+                CAMetalLayer(),
+                addDisplayLinkToRunLoop = {
+                    nsRunLoopMock.displayLinks.add(it)
+                }
+            ) {
+                // Cross-reference metalRedrawerOwner<->metalRedrawer, metalRedrawer is captured strongly by global object [nsRunLoopMock]
+                this.drawIntoSurface(it)
             }
 
-            override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) = Unit
+            fun drawIntoSurface(surface: Surface) = Unit
         }
     }
 
     @Test
-    fun `check skia layer is disposed`() {
-        // TODO: fails on CI due to Metal not supported, solve by extracting DisplayLink dispatch mechanism to separate class
-        if (MTLCreateSystemDefaultDevice() == null) {
-            return
-        }
-
+    // TODO: uncomment @Ignore when gradle test creating environment without Metal support is fixed
+    // @Ignore
+    fun `check metal redrawer is disposed`() {
         var isDisposed = false
 
-        createAndForgetSkiaLayer { isDisposed = true }
+        createAndForgetMetalRedrawerOwner { isDisposed = true }
 
         // GC can't sweep Objc-Kotlin objects in one pass due to different lifetime models
         // Two passes do not guarantee it either, this test can break in future
