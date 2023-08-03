@@ -28,8 +28,6 @@ internal class MetalRedrawer(
     addDisplayLinkToRunLoop: ((CADisplayLink) -> Unit)? = null,
     private val onDispose: () -> Unit = { }
 ) {
-    private var isDisposed = false
-
     // Workaround for KN compiler bug
     // Type mismatch: inferred type is objcnames.protocols.MTLDeviceProtocol but platform.Metal.MTLDeviceProtocol was expected
     @Suppress("USELESS_CAST")
@@ -41,10 +39,10 @@ internal class MetalRedrawer(
     // Semaphore for preventing command buffers count more than swapchain size to be scheduled/executed at the same time
     private val inflightSemaphore = dispatch_semaphore_create(metalLayer.maximumDrawableCount.toLong())
 
-    var maximumFramesPerSecond: NSInteger
-        get() = caDisplayLink.preferredFramesPerSecond
+    internal var maximumFramesPerSecond: NSInteger
+        get() = caDisplayLink?.preferredFramesPerSecond ?: 0
         set(value) {
-            caDisplayLink.preferredFramesPerSecond = value
+            caDisplayLink?.preferredFramesPerSecond = value
         }
 
     /*
@@ -61,16 +59,17 @@ internal class MetalRedrawer(
             field = value
 
             if (value) {
-                caDisplayLink.setPaused(false)
+                caDisplayLink?.setPaused(false)
             }
         }
 
-    private val caDisplayLink = CADisplayLink.displayLinkWithTarget(
+    private var caDisplayLink: CADisplayLink? = CADisplayLink.displayLinkWithTarget(
         target = DisplayLinkProxy(WeakReference(this)),
         selector = NSSelectorFromString(DisplayLinkProxy::handleDisplayLinkTick.name)
     )
 
     init {
+        val caDisplayLink = caDisplayLink ?: throw IllegalStateException("caDisplayLink is null during redrawer init")
         caDisplayLink.setPaused(true)
         if (addDisplayLinkToRunLoop == null) {
             caDisplayLink.addToRunLoop(NSRunLoop.mainRunLoop, NSRunLoop.mainRunLoop.currentMode)
@@ -80,22 +79,20 @@ internal class MetalRedrawer(
     }
 
     internal fun dispose() {
-        if (!isDisposed) {
-            onDispose.invoke()
-            caDisplayLink.invalidate()
-            isDisposed = true
+        if (caDisplayLink == null) {
+            throw IllegalStateException("MetalRedrawer.dispose() was called more than once")
         }
+
+        onDispose.invoke()
+        caDisplayLink?.invalidate()
+        caDisplayLink = null
     }
 
     internal fun needRedraw() {
-        if (isDisposed) {
-            return
-        }
-
         hasScheduledDrawOnNextVSync = true
 
         // If caDisplayLink is proactive (touches tracking), this does nothing (already unpaused)
-        caDisplayLink.setPaused(false)
+        caDisplayLink?.setPaused(false)
     }
 
     internal fun handleDisplayLinkTick() {
@@ -106,15 +103,11 @@ internal class MetalRedrawer(
         }
 
         if (!needsProactiveDisplayLink) {
-            caDisplayLink.setPaused(true)
+            caDisplayLink?.setPaused(true)
         }
     }
 
     private fun draw() {
-        if (isDisposed) {
-            return
-        }
-
         val surfaceDrawer = surfaceDrawer.get() ?: return
 
         autoreleasepool {
