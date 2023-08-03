@@ -3,8 +3,10 @@ package org.jetbrains.skiko
 import kotlinx.cinterop.*
 import org.jetbrains.skia.Point
 import org.jetbrains.skia.Rect
+import org.jetbrains.skia.Surface
 import org.jetbrains.skiko.ios.SkikoUITextInputTraits
 import org.jetbrains.skiko.redrawer.MetalRedrawer
+import org.jetbrains.skiko.redrawer.SurfaceDrawer
 import platform.CoreGraphics.*
 import platform.Foundation.*
 import platform.Metal.MTLCreateSystemDefaultDevice
@@ -15,6 +17,7 @@ import platform.UIKit.*
 import platform.darwin.NSInteger
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.native.ref.WeakReference
 
 /*
  TODO: remove org.jetbrains.skiko.objc.UIViewExtensionProtocol after Kotlin 1.8.20
@@ -94,9 +97,16 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
         _pointInside = pointInside
         _skikoUITextInputTrains = skikoUITextInputTrains
 
-        _redrawer = MetalRedrawer(_metalLayer) { surface ->
-            skiaLayer.draw(surface)
-        }
+        _redrawer = MetalRedrawer(
+            _metalLayer,
+            surfaceDrawer = WeakReference(
+                object : SurfaceDrawer {
+                    override fun draw(surface: Surface) {
+                        skiaLayer.draw(surface)
+                    }
+                }
+            )
+        )
 
         skiaLayer.needRedrawCallback = _redrawer::needRedraw
         skiaLayer.view = this

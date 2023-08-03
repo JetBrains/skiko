@@ -10,11 +10,17 @@ import platform.darwin.*
 import kotlin.math.roundToInt
 import kotlin.native.ref.WeakReference
 
+internal interface SurfaceDrawer {
+    fun draw(surface: Surface)
+}
+
 internal class MetalRedrawer(
     private val metalLayer: CAMetalLayer,
+    private val surfaceDrawer: WeakReference<SurfaceDrawer>,
+
     // Used for tests, access to NSRunLoop crashes in test environment
     addDisplayLinkToRunLoop: ((CADisplayLink) -> Unit)? = null,
-    private val drawIntoSurfaceCallback: (Surface) -> Unit
+    private val onDispose: () -> Unit = { }
 ) {
     private var isDisposed = false
 
@@ -54,7 +60,7 @@ internal class MetalRedrawer(
         }
 
     private val caDisplayLink = CADisplayLink.displayLinkWithTarget(
-        target = DisplayLinkProxy(WeakReference(this)),
+        target = DisplayLinkProxy(::handleDisplayLinkTick),
         selector = NSSelectorFromString(DisplayLinkProxy::handleDisplayLinkTick.name)
     )
 
@@ -69,13 +75,16 @@ internal class MetalRedrawer(
 
     internal fun dispose() {
         if (!isDisposed) {
+            onDispose.invoke()
             caDisplayLink.invalidate()
             isDisposed = true
         }
     }
 
     internal fun needRedraw() {
-        check(!isDisposed) { "MetalRedrawer is disposed" }
+        if (isDisposed) {
+            return
+        }
 
         hasScheduledDrawOnNextVSync = true
 
@@ -83,7 +92,7 @@ internal class MetalRedrawer(
         caDisplayLink.setPaused(false)
     }
 
-    internal fun handleDisplayLinkTick() {
+    private fun handleDisplayLinkTick() {
         if (hasScheduledDrawOnNextVSync) {
             hasScheduledDrawOnNextVSync = false
 
@@ -99,6 +108,8 @@ internal class MetalRedrawer(
         if (isDisposed) {
             return
         }
+
+        val surfaceDrawer = surfaceDrawer.get() ?: return
 
         autoreleasepool {
             val (width, height) = metalLayer.drawableSize.useContents {
@@ -139,7 +150,7 @@ internal class MetalRedrawer(
             }
 
             surface.canvas.clear(Color.WHITE)
-            drawIntoSurfaceCallback(surface)
+            surfaceDrawer.draw(surface)
             surface.flushAndSubmit()
 
             val commandBuffer = queue.commandBuffer()!!
@@ -159,11 +170,10 @@ internal class MetalRedrawer(
 }
 
 private class DisplayLinkProxy(
-    private val redrawer: WeakReference<MetalRedrawer>
+    private val callback: () -> Unit
 ) : NSObject() {
-
     @ObjCAction
     fun handleDisplayLinkTick() {
-        redrawer.get()?.handleDisplayLinkTick()
+        callback()
     }
 }
