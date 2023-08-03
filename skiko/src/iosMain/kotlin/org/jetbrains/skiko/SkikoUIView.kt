@@ -4,8 +4,13 @@ import kotlinx.cinterop.*
 import org.jetbrains.skia.Point
 import org.jetbrains.skia.Rect
 import org.jetbrains.skiko.ios.SkikoUITextInputTraits
+import org.jetbrains.skiko.redrawer.MetalRedrawer
 import platform.CoreGraphics.*
 import platform.Foundation.*
+import platform.Metal.MTLCreateSystemDefaultDevice
+import platform.Metal.MTLDeviceProtocol
+import platform.Metal.MTLPixelFormatBGRA8Unorm
+import platform.QuartzCore.CAMetalLayer
 import platform.UIKit.*
 import platform.darwin.NSInteger
 import kotlin.math.max
@@ -18,40 +23,83 @@ import kotlin.math.min
 @Suppress("CONFLICTING_OVERLOADS")
 @ExportObjCClass
 class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
-    @OverrideInit
-    constructor(frame: CValue<CGRect>) : super(frame)
-
-    @OverrideInit
-    constructor(coder: NSCoder) : super(coder)
-
-    init {
-        multipleTouchEnabled = true
+    companion object : UIViewMeta() {
+        override fun layerClass() = CAMetalLayer
     }
 
-    private var skiaLayer: SkiaLayer? = null
+    @Suppress("UNUSED") // required by Objective-C runtime
+    @OverrideInit
+    constructor(coder: NSCoder) : super(coder) {
+        throw UnsupportedOperationException("init(coder: NSCoder) is not supported for SkikoUIView")
+    }
+
+    private val _device: MTLDeviceProtocol =
+        MTLCreateSystemDefaultDevice() ?: throw IllegalStateException("Metal is not supported on this system")
+    private val _metalLayer: CAMetalLayer get() = layer as CAMetalLayer
+    private var _skiaLayer: SkiaLayer? = null
     private var _pointInside: (Point, UIEvent?) -> Boolean = { _, _ -> true }
     private var _skikoUITextInputTrains: SkikoUITextInputTraits = object : SkikoUITextInputTraits {}
     private var _inputDelegate: UITextInputDelegateProtocol? = null
     private var _currentTextMenuActions: TextActions? = null
+    private lateinit var _redrawer: MetalRedrawer
+
+    /*
+     * When there at least one tracked touch, we need notify redrawer about it. It should schedule CADisplayLink which
+     * affects frequency of polling UITouch events on high frequency display and forces it to match display refresh rate.
+     */
+    private var _touchesCount = 0
+        set(value) {
+            field = value
+
+            val needHighFrequencyPolling = value > 0
+
+            _redrawer.needsProactiveDisplayLink = needHighFrequencyPolling
+        }
+
+    init {
+        multipleTouchEnabled = true
+        opaque = false // For UIKit interop through a "Hole"
+
+        _metalLayer.also {
+            // Workaround for KN compiler bug
+            // Type mismatch: inferred type is platform.Metal.MTLDeviceProtocol but objcnames.protocols.MTLDeviceProtocol? was expected
+            @Suppress("USELESS_CAST")
+            it.device = _device as objcnames.protocols.MTLDeviceProtocol?
+
+            it.pixelFormat = MTLPixelFormatBGRA8Unorm
+            doubleArrayOf(0.0, 0.0, 0.0, 0.0).usePinned { pinned ->
+                it.backgroundColor = CGColorCreate(CGColorSpaceCreateDeviceRGB(), pinned.addressOf(0))
+            }
+            it.framebufferOnly = false
+        }
+    }
 
     // merging two constructors might cause a binary incompatibility, which will result in a unclear linking error,
     // if a project using newer compose depends on an older compose transitively
     // https://youtrack.jetbrains.com/issue/KT-60399
+    @Suppress("UNUSED") // public API
     constructor(
         skiaLayer: SkiaLayer,
         frame: CValue<CGRect> = CGRectNull.readValue(),
-        pointInside: (Point, UIEvent?) -> Boolean = {_,_-> true }
+        pointInside: (Point, UIEvent?) -> Boolean = { _, _ -> true }
     ) : this(skiaLayer, frame, pointInside, skikoUITextInputTrains = object : SkikoUITextInputTraits {})
 
     constructor(
         skiaLayer: SkiaLayer,
         frame: CValue<CGRect> = CGRectNull.readValue(),
-        pointInside: (Point, UIEvent?) -> Boolean = {_,_-> true },
+        pointInside: (Point, UIEvent?) -> Boolean = { _, _ -> true },
         skikoUITextInputTrains: SkikoUITextInputTraits
     ) : super(frame) {
-        this.skiaLayer = skiaLayer
+        _skiaLayer = skiaLayer
         _pointInside = pointInside
         _skikoUITextInputTrains = skikoUITextInputTrains
+
+        _redrawer = MetalRedrawer(_metalLayer) { surface ->
+            skiaLayer.draw(surface)
+        }
+
+        skiaLayer.needRedrawCallback = _redrawer::needRedraw
+        skiaLayer.view = this
     }
 
     /**
@@ -88,7 +136,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
         menu.hideMenu()
     }
 
-    fun isTextMenuShown():Boolean {
+    fun isTextMenuShown(): Boolean {
         return _currentTextMenuActions != null
     }
 
@@ -108,20 +156,32 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
         _currentTextMenuActions?.selectAll?.invoke()
     }
 
-    fun detach() = skiaLayer?.detach()
+    internal fun detach() {
+        _redrawer.dispose()
+    }
 
     fun load(): SkikoUIView {
-        val (width, height) = UIScreen.mainScreen.bounds.useContents {
-            this.size.width to this.size.height
+        // TODO: redundant, remove in next refactor pass
+        return this
+    }
+
+    override fun didMoveToWindow() {
+        super.didMoveToWindow()
+
+        window?.screen?.let {
+            contentScaleFactor = it.scale
+            _redrawer.maximumFramesPerSecond = it.maximumFramesPerSecond
         }
-        setFrame(CGRectMake(0.0, 0.0, width, height))
-        contentScaleFactor = UIScreen.mainScreen.scale
-        skiaLayer?.let { layer ->
-            layer.attachTo(this)
-            layer.initGestures()
+    }
+
+    override fun layoutSubviews() {
+        super.layoutSubviews()
+
+        val scaledSize = bounds.useContents {
+            CGSizeMake(size.width * contentScaleFactor, size.height * contentScaleFactor)
         }
 
-        return this
+        _metalLayer.drawableSize = scaledSize
     }
 
     fun showScreenKeyboard() = becomeFirstResponder()
@@ -133,7 +193,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
      * https://developer.apple.com/documentation/uikit/uikeyinput/1614457-hastext
      */
     override fun hasText(): Boolean {
-        return skiaLayer?.skikoView?.input?.hasText() ?: false
+        return _skiaLayer?.skikoView?.input?.hasText() ?: false
     }
 
     /**
@@ -143,7 +203,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
      * @param text A string object representing the character typed on the system keyboard.
      */
     override fun insertText(text: String) {
-        skiaLayer?.skikoView?.input?.insertText(text)
+        _skiaLayer?.skikoView?.input?.insertText(text)
     }
 
     /**
@@ -152,7 +212,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
      * https://developer.apple.com/documentation/uikit/uikeyinput/1614572-deletebackward
      */
     override fun deleteBackward() {
-        skiaLayer?.skikoView?.input?.deleteBackward()
+        _skiaLayer?.skikoView?.input?.deleteBackward()
     }
 
     override fun canBecomeFirstResponder() = true
@@ -162,7 +222,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
             for (press in withEvent.allPresses) {
                 val uiPress = press as? UIPress
                 if (uiPress != null) {
-                    skiaLayer?.skikoView?.onKeyboardEvent(
+                    _skiaLayer?.skikoView?.onKeyboardEvent(
                         toSkikoKeyboardEvent(press, SkikoKeyboardEventKind.DOWN)
                     )
                 }
@@ -176,7 +236,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
             for (press in withEvent.allPresses) {
                 val uiPress = press as? UIPress
                 if (uiPress != null) {
-                    skiaLayer?.skikoView?.onKeyboardEvent(
+                    _skiaLayer?.skikoView?.onKeyboardEvent(
                         toSkikoKeyboardEvent(press, SkikoKeyboardEventKind.UP)
                     )
                 }
@@ -193,23 +253,10 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
         return _pointInside(skiaPoint, withEvent)
     }
 
-    /*
-     * When there at least one tracked touch, we need notify redrawer about it. It should schedule CADisplayLink which
-     * affects frequency of polling UITouch events on high frequency display and forces it to match display refresh rate.
-     */
-    private var touchesCount = 0
-        set(value) {
-            field = value
-
-            val needHighFrequencyPolling = value > 0
-
-            skiaLayer?.redrawer?.needsProactiveDisplayLink = needHighFrequencyPolling
-        }
-
     override fun touchesBegan(touches: Set<*>, withEvent: UIEvent?) {
         super.touchesBegan(touches, withEvent)
 
-        touchesCount += touches.size
+        _touchesCount += touches.size
 
         sendTouchEventToSkikoView(withEvent!!, SkikoPointerEventKind.DOWN)
     }
@@ -217,7 +264,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
     override fun touchesEnded(touches: Set<*>, withEvent: UIEvent?) {
         super.touchesEnded(touches, withEvent)
 
-        touchesCount -= touches.size
+        _touchesCount -= touches.size
 
         sendTouchEventToSkikoView(withEvent!!, SkikoPointerEventKind.UP)
     }
@@ -230,7 +277,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
     override fun touchesCancelled(touches: Set<*>, withEvent: UIEvent?) {
         super.touchesCancelled(touches, withEvent)
 
-        touchesCount -= touches.size
+        _touchesCount -= touches.size
 
         sendTouchEventToSkikoView(withEvent!!, SkikoPointerEventKind.UP)
     }
@@ -249,7 +296,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
             )
         }
 
-        skiaLayer?.skikoView?.onPointerEvent(
+        _skiaLayer?.skikoView?.onPointerEvent(
             SkikoPointerEvent(
                 x = pointers.centroidX,
                 y = pointers.centroidY,
@@ -260,10 +307,6 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
             )
         )
     }
-
-    private val UITouch.isPressed get() =
-        phase != UITouchPhase.UITouchPhaseEnded &&
-            phase != UITouchPhase.UITouchPhaseCancelled
 
     override fun inputDelegate(): UITextInputDelegateProtocol? {
         return _inputDelegate
@@ -280,7 +323,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
      * @return A substring of a document that falls within the specified range.
      */
     override fun textInRange(range: UITextRange): String? {
-        return skiaLayer?.skikoView?.input?.textInRange(range.toIntRange())
+        return _skiaLayer?.skikoView?.input?.textInRange(range.toIntRange())
     }
 
     /**
@@ -290,11 +333,11 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
      * @param withText A string to replace the text in range.
      */
     override fun replaceRange(range: UITextRange, withText: String) {
-        skiaLayer?.skikoView?.input?.replaceRange(range.toIntRange(), withText)
+        _skiaLayer?.skikoView?.input?.replaceRange(range.toIntRange(), withText)
     }
 
     override fun setSelectedTextRange(selectedTextRange: UITextRange?) {
-        skiaLayer?.skikoView?.input?.setSelectedTextRange(selectedTextRange?.toIntRange())
+        _skiaLayer?.skikoView?.input?.setSelectedTextRange(selectedTextRange?.toIntRange())
     }
 
     /**
@@ -305,7 +348,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
      * https://developer.apple.com/documentation/uikit/uitextinput/1614541-selectedtextrange
      */
     override fun selectedTextRange(): UITextRange? {
-        return skiaLayer?.skikoView?.input?.getSelectedTextRange()?.toUITextRange()
+        return _skiaLayer?.skikoView?.input?.getSelectedTextRange()?.toUITextRange()
     }
 
     /**
@@ -317,7 +360,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
      * https://developer.apple.com/documentation/uikit/uitextinput/1614489-markedtextrange
      */
     override fun markedTextRange(): UITextRange? {
-        return skiaLayer?.skikoView?.input?.markedTextRange()?.toUITextRange()
+        return _skiaLayer?.skikoView?.input?.markedTextRange()?.toUITextRange()
     }
 
     override fun setMarkedTextStyle(markedTextStyle: Map<Any?, *>?) {
@@ -342,7 +385,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
             location.toInt() to length.toInt()
         }
         val relativeTextRange = locationRelative until locationRelative + lengthRelative
-        skiaLayer?.skikoView?.input?.setMarkedText(markedText, relativeTextRange)
+        _skiaLayer?.skikoView?.input?.setMarkedText(markedText, relativeTextRange)
     }
 
     /**
@@ -351,7 +394,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
      * https://developer.apple.com/documentation/uikit/uitextinput/1614512-unmarktext
      */
     override fun unmarkText() {
-        skiaLayer?.skikoView?.input?.unmarkText()
+        _skiaLayer?.skikoView?.input?.unmarkText()
     }
 
     override fun beginningOfDocument(): UITextPosition {
@@ -363,7 +406,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
      * https://developer.apple.com/documentation/uikit/uitextinput/1614555-endofdocument
      */
     override fun endOfDocument(): UITextPosition {
-        return IntermediateTextPosition(skiaLayer?.skikoView?.input?.endOfDocument() ?: 0)
+        return IntermediateTextPosition(_skiaLayer?.skikoView?.input?.endOfDocument() ?: 0)
     }
 
     /**
@@ -383,7 +426,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
      */
     override fun positionFromPosition(position: UITextPosition, offset: NSInteger): UITextPosition? {
         val p = (position as? IntermediateTextPosition)?.position ?: return null
-        val endOfDocument = skiaLayer?.skikoView?.input?.endOfDocument()
+        val endOfDocument = _skiaLayer?.skikoView?.input?.endOfDocument()
         return if (endOfDocument != null) {
             IntermediateTextPosition(max(min(p + offset, endOfDocument), 0))
         } else {
@@ -485,12 +528,16 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
         when (action) {
             NSSelectorFromString(UIResponderStandardEditActionsProtocol::copy.name + ":") ->
                 _currentTextMenuActions?.copy != null
+
             NSSelectorFromString(UIResponderStandardEditActionsProtocol::cut.name + ":") ->
                 _currentTextMenuActions?.cut != null
+
             NSSelectorFromString(UIResponderStandardEditActionsProtocol::paste.name + ":") ->
                 _currentTextMenuActions?.paste != null
+
             NSSelectorFromString(UIResponderStandardEditActionsProtocol::selectAll.name + ":") ->
                 _currentTextMenuActions?.selectAll != null
+
             else -> false
         }
 
@@ -500,7 +547,9 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
     override fun textContentType(): UITextContentType? = _skikoUITextInputTrains.textContentType()
     override fun isSecureTextEntry(): Boolean = _skikoUITextInputTrains.isSecureTextEntry()
     override fun enablesReturnKeyAutomatically(): Boolean = _skikoUITextInputTrains.enablesReturnKeyAutomatically()
-    override fun autocapitalizationType(): UITextAutocapitalizationType = _skikoUITextInputTrains.autocapitalizationType()
+    override fun autocapitalizationType(): UITextAutocapitalizationType =
+        _skikoUITextInputTrains.autocapitalizationType()
+
     override fun autocorrectionType(): UITextAutocorrectionType = _skikoUITextInputTrains.autocorrectionType()
 
     override fun dictationRecognitionFailed() {
@@ -574,3 +623,8 @@ private fun NSWritingDirection.directionToStr() =
         UITextLayoutDirectionDown -> "Down"
         else -> "unknown direction"
     }
+
+private val UITouch.isPressed
+    get() =
+        phase != UITouchPhase.UITouchPhaseEnded &&
+                phase != UITouchPhase.UITouchPhaseCancelled

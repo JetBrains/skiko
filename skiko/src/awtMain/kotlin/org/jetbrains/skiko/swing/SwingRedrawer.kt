@@ -30,17 +30,17 @@ internal fun createSwingRedrawer(
     renderApi: GraphicsApi,
     analytics: SkiaLayerAnalytics,
 ): SwingRedrawer {
+    if (renderApi == GraphicsApi.SOFTWARE_COMPAT || renderApi == GraphicsApi.SOFTWARE_FAST) {
+        return SoftwareSwingRedrawer(
+            swingLayerProperties,
+            skikoView,
+            analytics
+        )
+    }
     return when (hostOs) {
-        OS.MacOS -> when (renderApi) {
-            GraphicsApi.SOFTWARE_COMPAT, GraphicsApi.SOFTWARE_FAST -> SoftwareSwingRedrawer(
-                swingLayerProperties,
-                skikoView,
-                analytics
-            )
-
-            else -> MetalSwingRedrawer(swingLayerProperties, skikoView, analytics)
-        }
-
+        OS.MacOS -> MetalSwingRedrawer(swingLayerProperties, skikoView, analytics)
+        OS.Windows -> Direct3DSwingRedrawer(swingLayerProperties, skikoView, analytics)
+        OS.Linux -> LinuxOpenGLSwingRedrawer(swingLayerProperties, skikoView, analytics)
         else -> SoftwareSwingRedrawer(swingLayerProperties, skikoView, analytics)
     }
 }
