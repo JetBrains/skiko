@@ -18,7 +18,7 @@ internal class MetalRedrawer(
     private val metalLayer: CAMetalLayer,
 
     /*
-     * Provider and of [surfaceDrawer] is responsible for
+     * Provider of [surfaceDrawer] is responsible for
      * - having a strong reference to it
      * - calling [dispose] on [MetalRedrawer]
      */
@@ -66,7 +66,7 @@ internal class MetalRedrawer(
         }
 
     private val caDisplayLink = CADisplayLink.displayLinkWithTarget(
-        target = DisplayLinkProxy(::handleDisplayLinkTick),
+        target = DisplayLinkProxy(WeakReference(this)),
         selector = NSSelectorFromString(DisplayLinkProxy::handleDisplayLinkTick.name)
     )
 
@@ -98,7 +98,7 @@ internal class MetalRedrawer(
         caDisplayLink.setPaused(false)
     }
 
-    private fun handleDisplayLinkTick() {
+    internal fun handleDisplayLinkTick() {
         if (hasScheduledDrawOnNextVSync) {
             hasScheduledDrawOnNextVSync = false
 
@@ -176,10 +176,10 @@ internal class MetalRedrawer(
 }
 
 private class DisplayLinkProxy(
-    private val callback: () -> Unit
+    private val redrawer: WeakReference<MetalRedrawer>,
 ) : NSObject() {
     @ObjCAction
     fun handleDisplayLinkTick() {
-        callback()
+        redrawer.get()?.handleDisplayLinkTick()
     }
 }
