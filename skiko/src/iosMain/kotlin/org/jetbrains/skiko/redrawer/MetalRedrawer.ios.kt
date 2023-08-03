@@ -16,6 +16,12 @@ internal interface SurfaceDrawer {
 
 internal class MetalRedrawer(
     private val metalLayer: CAMetalLayer,
+
+    /*
+     * Provider and of [surfaceDrawer] is responsible for
+     * - having a strong reference to it
+     * - calling [dispose] on [MetalRedrawer]
+     */
     private val surfaceDrawer: WeakReference<SurfaceDrawer>,
 
     // Used for tests, access to NSRunLoop crashes in test environment
