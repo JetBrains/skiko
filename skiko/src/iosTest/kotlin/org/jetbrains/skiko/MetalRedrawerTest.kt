@@ -2,7 +2,6 @@ package org.jetbrains.skiko
 
 import org.jetbrains.skia.Surface
 import org.jetbrains.skiko.redrawer.MetalRedrawer
-import org.jetbrains.skiko.redrawer.SurfaceDrawer
 import platform.QuartzCore.CADisplayLink
 import platform.QuartzCore.CAMetalLayer
 import kotlin.native.internal.createCleaner
@@ -11,26 +10,34 @@ import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
-private val nsRunLoopMock = object {
+class MockNSRunLoop {
     val displayLinks = mutableListOf<CADisplayLink>()
 }
+
 class MetalRedrawerTest {
     @Suppress("UNUSED", "UNUSED_PARAMETER")
-    private class MetalRedrawerOwner(disposeCallback: () -> Unit) {
-        private val redrawer = MetalRedrawer(
-            CAMetalLayer(),
-            WeakReference(object : SurfaceDrawer {
-                override fun draw(surface: Surface) {
-                    this@MetalRedrawerOwner.draw(surface)
+    private class MetalRedrawerOwner(
+        mockNSRunLoop: MockNSRunLoop
+    ) {
+        private val redrawer: MetalRedrawer
+
+        init {
+            val weakThis = WeakReference(this)
+
+            redrawer = MetalRedrawer(
+                CAMetalLayer(),
+                drawCallback = { surface ->
+                    weakThis.get()?.draw(surface)
+                },
+                addDisplayLinkToRunLoop = {
+                    mockNSRunLoop.displayLinks.add(it)
+                },
+                disposeCallback = {
+                    assertTrue(mockNSRunLoop.displayLinks.isNotEmpty(), "mockNSRunLoop.displayLinks must contain a displayLink")
+                    assertTrue(mockNSRunLoop.displayLinks.remove(it.caDisplayLink))
                 }
-            }),
-            addDisplayLinkToRunLoop = {
-                nsRunLoopMock.displayLinks.add(it)
-            },
-            onDispose = {
-                disposeCallback()
-            }
-        )
+            )
+        }
 
         @OptIn(ExperimentalStdlibApi::class)
         private val redrawerCleaner = createCleaner(redrawer) {
@@ -41,25 +48,23 @@ class MetalRedrawerTest {
     }
 
     @Suppress("UNUSED_VARIABLE", "UNUSED")
-    private fun createAndForgetMetalRedrawerOwner(disposeCallback: () -> Unit) {
-        val owner = MetalRedrawerOwner(disposeCallback)
+    private fun createAndForgetMetalRedrawerOwner(mockNSRunLoop: MockNSRunLoop) {
+        val owner = MetalRedrawerOwner(mockNSRunLoop)
     }
 
     @Test
     // TODO: remove @Ignore when gradle creating test environment without Metal support is fixed
     @Ignore
     fun `check metal redrawer is disposed`() {
-        var isDisposed = false
+        val mockNSRunLoop = MockNSRunLoop()
 
-        createAndForgetMetalRedrawerOwner { isDisposed = true }
+        createAndForgetMetalRedrawerOwner(mockNSRunLoop)
 
         // GC can't sweep Objc-Kotlin objects in one pass due to different lifetime models
         // Two passes do not guarantee it either, this test can break in future
         kotlin.native.internal.GC.collect()
         kotlin.native.internal.GC.collect()
-        kotlin.native.internal.GC.collect()
-        kotlin.native.internal.GC.collect()
 
-        assertTrue(isDisposed)
+        assertTrue(mockNSRunLoop.displayLinks.isEmpty(), "displayLinks must be empty after MetalRedrawer is disposed. This test can be flaky and depends on assumptions about GC implementation.")
     }
 }

@@ -3,10 +3,8 @@ package org.jetbrains.skiko
 import kotlinx.cinterop.*
 import org.jetbrains.skia.Point
 import org.jetbrains.skia.Rect
-import org.jetbrains.skia.Surface
 import org.jetbrains.skiko.ios.SkikoUITextInputTraits
 import org.jetbrains.skiko.redrawer.MetalRedrawer
-import org.jetbrains.skiko.redrawer.SurfaceDrawer
 import platform.CoreGraphics.*
 import platform.Foundation.*
 import platform.Metal.MTLCreateSystemDefaultDevice
@@ -97,15 +95,13 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
         _pointInside = pointInside
         _skikoUITextInputTrains = skikoUITextInputTrains
 
+        val weakSkiaLayer = WeakReference(skiaLayer)
+
         _redrawer = MetalRedrawer(
             _metalLayer,
-            surfaceDrawer = WeakReference(
-                object : SurfaceDrawer {
-                    override fun draw(surface: Surface) {
-                        skiaLayer.draw(surface)
-                    }
-                }
-            )
+            drawCallback = { surface ->
+                weakSkiaLayer.get()?.draw(surface)
+            }
         )
 
         skiaLayer.needRedrawCallback = _redrawer::needRedraw
