@@ -1,5 +1,4 @@
 import de.undercouch.gradle.tasks.download.Download
-import internal.SimulatorTestsTask
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.crypto.checksum.Checksum
 import org.jetbrains.compose.internal.publishing.MavenCentralProperties
@@ -429,13 +428,6 @@ kotlin {
             }
         }
     }
-    val testBinary = kotlin.targets.getByName<KotlinNativeTarget>("iosX64").binaries.getTest("DEBUG")
-    val runSimIosTests by project.tasks.creating(SimulatorTestsTask::class) {
-        dependsOn(testBinary.linkTask)
-        testExecutable.set(testBinary.outputFile)
-        simulatorId.set("DF194D71-0AD1-456A-B965-7C43C7C6C433")
-    }
-//    project.tasks["check"].dependsOn(runIosTests)
 }
 
 tasks.withType<KotlinNativeSimulatorTest> {
