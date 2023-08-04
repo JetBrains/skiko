@@ -47,7 +47,7 @@ jobs:
 #          retention-days: 5
 
   ios:
-    runs-on: macos-11
+    runs-on: macos-13
     steps:
       - uses: actions/checkout@v3
         name: 'Check out code'
@@ -61,7 +61,7 @@ jobs:
 
       - uses: futureware-tech/simulator-action@v2
         with:
-          model: 'iPhone 8'
+          model: 'iPhone 14'
           udid: 'ABCD-EFGH'
       - shell: bash
         name: 'Compile and run iOS x64 tests'
