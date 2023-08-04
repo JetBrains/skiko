@@ -61,7 +61,7 @@ jobs:
 
       - uses: futureware-tech/simulator-action@v2
         with:
-          model: 'iPhone 12'
+          model: 'iPhone 8'
           udid: 'ABCD-EFGH'
       - shell: bash
         name: 'Compile and run iOS x64 tests'
