@@ -441,8 +441,9 @@ kotlin {
 tasks.withType<KotlinNativeSimulatorTest> {
     //debugMode = true
     standalone.set(false)
-    device.set("ABCD-EFGH")
-//    device.set("DF194D71-0AD1-456A-B965-7C43C7C6C433")
+    System.getProperty("skiko.iosSimulatorUUID", null)?.let {
+        device.set(it)
+    }
 }
 
 tasks.withType<KotlinCompilationTask<*>> {
