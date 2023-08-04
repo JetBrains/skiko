@@ -68,12 +68,7 @@ jobs:
           udid: "${{ env.IOS_SIM_UUID }}"
       - shell: bash
         name: 'Compile and run iOS x64 tests'
-        run: |
-          ./gradlew --stacktrace --info \ 
-          -Pskiko.native.enabled=true \
-          -Pskiko.test.onci=true \
-          -Pskiko.iosSimulatorUUID="${{ env.IOS_SIM_UUID }}" \
-          :skiko:iosX64Test
+        run: ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Pskiko.test.onci=true -Pskiko.iosSimulatorUUID="${{ env.IOS_SIM_UUID }}" :skiko:iosX64Test
 
       # iosSimulatorArm64Test will build the binary but the tests will be skipped due to X64 host machine
       - shell: bash
