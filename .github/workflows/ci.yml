@@ -64,7 +64,6 @@ jobs:
 
       - uses: futureware-tech/simulator-action@v2
         with:
-          model: 'iPhone 14'
           udid: "${{ env.IOS_SIM_UUID }}"
       - shell: bash
         name: 'Compile and run iOS x64 tests'
