@@ -2,6 +2,7 @@ package org.jetbrains.skiko
 
 import org.jetbrains.skia.Surface
 import org.jetbrains.skiko.redrawer.MetalRedrawer
+import platform.Metal.MTLCreateSystemDefaultDevice
 import platform.QuartzCore.CADisplayLink
 import platform.QuartzCore.CAMetalLayer
 import kotlin.native.internal.createCleaner
@@ -53,15 +54,18 @@ class MetalRedrawerTest {
     }
 
     @Test
-    // TODO: remove @Ignore when gradle creating test environment without Metal support is fixed
-    @Ignore
     fun `check metal redrawer is disposed`() {
+        if (false && MTLCreateSystemDefaultDevice() == null) {
+            // ./gradlew --info -Pskiko.native.enabled=true -Pskiko.test.onci=true :skiko:iosSimulatorArm64Test
+            return
+        }
         val mockNSRunLoop = MockNSRunLoop()
 
         createAndForgetMetalRedrawerOwner(mockNSRunLoop)
 
         // GC can't sweep Objc-Kotlin objects in one pass due to different lifetime models
         // Two passes do not guarantee it either, this test can break in future
+        kotlin.native.internal.GC.collect()
         kotlin.native.internal.GC.collect()
         kotlin.native.internal.GC.collect()
 

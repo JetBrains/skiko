@@ -59,6 +59,10 @@ jobs:
           java-version: '11'
           cache: 'gradle'
 
+      - uses: futureware-tech/simulator-action@v2
+        with:
+          model: 'iPhone 14'
+          udid: 'IOS-SIM-1'
       - shell: bash
         name: 'Compile and run iOS x64 tests'
         run: ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Pskiko.test.onci=true :skiko:iosX64Test
