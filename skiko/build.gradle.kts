@@ -431,7 +431,6 @@ kotlin {
 }
 
 tasks.withType<KotlinNativeSimulatorTest> {
-    //debugMode = true
     standalone.set(false)
     findProperty("skiko.iosSimulatorUUID")?.let {
         println("skiko.iosSimulatorUUID: $it")
