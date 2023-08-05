@@ -68,7 +68,7 @@ jobs:
       - name: 'Compile and run iOS x64 tests'
         uses: nick-fields/retry@v2
         with:
-          max_attempts: 5
+          max_attempts: 10
           timeout_minutes: 60
           shell: bash
           command: ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Pskiko.test.onci=true -Pskiko.iosSimulatorUUID="${{ env.IOS_SIM_UUID }}" :skiko:iosX64Test
