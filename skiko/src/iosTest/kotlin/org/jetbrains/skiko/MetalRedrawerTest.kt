@@ -55,11 +55,6 @@ class MetalRedrawerTest {
 
     @Test
     fun `check metal redrawer is disposed`() {
-
-        if (false && MTLCreateSystemDefaultDevice() == null) {
-            // ./gradlew --info -Pskiko.native.enabled=true -Pskiko.test.onci=true :skiko:iosSimulatorArm64Test
-            return
-        }
         val mockNSRunLoop = MockNSRunLoop()
 
         createAndForgetMetalRedrawerOwner(mockNSRunLoop)

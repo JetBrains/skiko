@@ -440,19 +440,6 @@ kotlin {
     }
 }
 
-//tasks.withType<KotlinNativeSimulatorTest> {
-// need Kotlin 1.9.0
-//    standalone.set(false)
-//    findProperty("skiko.iosSimulatorUUID")?.let {
-//        println("skiko.iosSimulatorUUID: $it")
-//        device.set(it.toString())
-//    }
-//}
-
-tasks.withType<KotlinCompilationTask<*>> {
-    compilerOptions.freeCompilerArgs.add("-opt-in=kotlinx.cinterop.ExperimentalForeignApi")
-}
-
 fun configureCinterop(
     cinteropName: String,
     os: OS,
