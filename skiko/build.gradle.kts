@@ -428,6 +428,16 @@ kotlin {
             }
         }
     }
+
+    val testBinary = kotlin.targets.getByName<KotlinNativeTarget>("iosX64").binaries.getTest("DEBUG")
+    val testMetalIosX64 by project.tasks.creating(SimulatorTestsTask::class) {
+        dependsOn(testBinary.linkTask)
+        testExecutable.set(testBinary.outputFile)
+        findProperty("skiko.iosSimulatorUUID")?.let {
+            println("skiko.iosSimulatorUUID: $it")
+            simulatorId.set(it.toString())
+        }
+    }
 }
 
 tasks.withType<KotlinNativeSimulatorTest> {
