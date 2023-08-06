@@ -4,9 +4,7 @@ import org.gradle.crypto.checksum.Checksum
 import org.jetbrains.compose.internal.publishing.MavenCentralProperties
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-import org.jetbrains.kotlin.gradle.targets.native.tasks.KotlinNativeSimulatorTest
 import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompileTool
 
 plugins {
@@ -429,13 +427,23 @@ kotlin {
         }
     }
 
-    val testBinary = kotlin.targets.getByName<KotlinNativeTarget>("iosX64").binaries.getTest("DEBUG")
-    val testMetalIosX64 by project.tasks.creating(SimulatorTestsTask::class) {
-        dependsOn(testBinary.linkTask)
-        testExecutable.set(testBinary.outputFile)
-        findProperty("skiko.iosSimulatorUUID")?.let {
-            println("skiko.iosSimulatorUUID: $it")
-            simulatorId.set(it.toString())
+    val metalTestTargets = listOf("iosX64", "iosSimulatorArm64")
+    metalTestTargets.forEach { target: String ->
+        val testBinary = kotlin.targets.getByName<KotlinNativeTarget>(target).binaries.getTest("DEBUG")
+        project.tasks.create(target + "TestWithMetal") {
+            dependsOn(testBinary.linkTask)
+            doLast {
+                val simulatorIdPropertyKey = "skiko.iosSimulatorUUID"
+                val simulatorId = findProperty(simulatorIdPropertyKey)?.toString()
+                    ?: error("Property '$simulatorIdPropertyKey' not found. Pass it with -P$simulatorIdPropertyKey=...")
+
+                project.exec { commandLine("xcrun", "simctl", "boot", simulatorId) }
+                try {
+                    project.exec { commandLine("xcrun", "simctl", "spawn", simulatorId, testBinary.outputFile) }
+                } finally {
+                    project.exec { commandLine("xcrun", "simctl", "shutdown", simulatorId) }
+                }
+            }
         }
     }
 }
