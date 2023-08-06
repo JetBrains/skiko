@@ -70,5 +70,6 @@ class MetalRedrawerTest {
         kotlin.native.internal.GC.collect()
 
         assertTrue(mockNSRunLoop.displayLinks.isEmpty(), "displayLinks must be empty after MetalRedrawer is disposed. This test can be flaky and depends on assumptions about GC implementation.")
+        TODO("TEMP FAIL ------------------------------------")
     }
 }
