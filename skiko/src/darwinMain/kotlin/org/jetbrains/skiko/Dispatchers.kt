@@ -20,7 +20,7 @@ object SkikoDispatchers {
     val Main: CoroutineDispatcher = NsQueueDispatcher(dispatch_get_main_queue())
     val IO: CoroutineDispatcher = NsQueueDispatcher(
         dispatch_get_global_queue(
-            QOS_CLASS_BACKGROUND.toLong(), 0u)
+            QOS_CLASS_BACKGROUND.toLong(), 0)
     )
 }
 
