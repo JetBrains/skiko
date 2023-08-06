@@ -55,6 +55,7 @@ class MetalRedrawerTest {
 
     @Test
     fun `check metal redrawer is disposed`() {
+        TODO()
         if (false && MTLCreateSystemDefaultDevice() == null) {
             // ./gradlew --info -Pskiko.native.enabled=true -Pskiko.test.onci=true :skiko:iosSimulatorArm64Test
             return
