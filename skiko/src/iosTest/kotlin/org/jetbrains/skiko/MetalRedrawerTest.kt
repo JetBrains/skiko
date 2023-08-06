@@ -2,7 +2,6 @@ package org.jetbrains.skiko
 
 import org.jetbrains.skia.Surface
 import org.jetbrains.skiko.redrawer.MetalRedrawer
-import platform.Metal.MTLCreateSystemDefaultDevice
 import platform.QuartzCore.CADisplayLink
 import platform.QuartzCore.CAMetalLayer
 import kotlin.native.internal.createCleaner
