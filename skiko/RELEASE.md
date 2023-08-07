@@ -2,7 +2,7 @@
 
 ## Teamcity
 
-Trigger a new deployment in [Publish release](https://buildserver.labs.intellij.net/buildConfiguration/Skiko_PublishRelease?mode=builds)
+Trigger a new deployment in [Publish release](https://buildserver.labs.intellij.net/buildConfiguration/Skiko_PublishRelease)
 build configuration.
     1. Click "Deploy" button.
     2. Specify the desired version in "Skiko Release Version" text field on the "Parameters" tab.
