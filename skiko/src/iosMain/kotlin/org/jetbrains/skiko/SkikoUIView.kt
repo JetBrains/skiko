@@ -15,6 +15,7 @@ import platform.UIKit.*
 import platform.darwin.NSInteger
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.native.ref.WeakReference
 
 /*
  TODO: remove org.jetbrains.skiko.objc.UIViewExtensionProtocol after Kotlin 1.8.20
@@ -94,9 +95,14 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
         _pointInside = pointInside
         _skikoUITextInputTrains = skikoUITextInputTrains
 
-        _redrawer = MetalRedrawer(_metalLayer) { surface ->
-            skiaLayer.draw(surface)
-        }
+        val weakSkiaLayer = WeakReference(skiaLayer)
+
+        _redrawer = MetalRedrawer(
+            _metalLayer,
+            drawCallback = { surface ->
+                weakSkiaLayer.get()?.draw(surface)
+            }
+        )
 
         skiaLayer.needRedrawCallback = _redrawer::needRedraw
         skiaLayer.view = this

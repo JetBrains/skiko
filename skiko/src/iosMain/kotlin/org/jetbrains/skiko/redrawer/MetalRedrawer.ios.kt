@@ -8,13 +8,16 @@ import platform.Foundation.NSSelectorFromString
 import platform.QuartzCore.*
 import platform.darwin.*
 import kotlin.math.roundToInt
+import kotlin.native.ref.WeakReference
 
 internal class MetalRedrawer(
     private val metalLayer: CAMetalLayer,
-    private val drawIntoSurfaceCallback: (Surface) -> Unit
-) {
-    private var isDisposed = false
+    private val drawCallback: (Surface) -> Unit,
 
+    // Used for tests, access to NSRunLoop crashes in test environment
+    addDisplayLinkToRunLoop: ((CADisplayLink) -> Unit)? = null,
+    private val disposeCallback: (MetalRedrawer) -> Unit = { }
+) {
     // Workaround for KN compiler bug
     // Type mismatch: inferred type is objcnames.protocols.MTLDeviceProtocol but platform.Metal.MTLDeviceProtocol was expected
     @Suppress("USELESS_CAST")
@@ -26,10 +29,10 @@ internal class MetalRedrawer(
     // Semaphore for preventing command buffers count more than swapchain size to be scheduled/executed at the same time
     private val inflightSemaphore = dispatch_semaphore_create(metalLayer.maximumDrawableCount.toLong())
 
-    var maximumFramesPerSecond: NSInteger
-        get() = caDisplayLink.preferredFramesPerSecond
+    internal var maximumFramesPerSecond: NSInteger
+        get() = caDisplayLink?.preferredFramesPerSecond ?: 0
         set(value) {
-            caDisplayLink.preferredFramesPerSecond = value
+            caDisplayLink?.preferredFramesPerSecond = value
         }
 
     /*
@@ -46,11 +49,46 @@ internal class MetalRedrawer(
             field = value
 
             if (value) {
-                caDisplayLink.setPaused(false)
+                caDisplayLink?.setPaused(false)
             }
         }
 
-    private val frameListener: NSObject = FrameTickListener {
+    internal var caDisplayLink: CADisplayLink? = CADisplayLink.displayLinkWithTarget(
+        target = DisplayLinkProxy {
+            this.handleDisplayLinkTick()
+        },
+        selector = NSSelectorFromString(DisplayLinkProxy::handleDisplayLinkTick.name)
+    )
+
+    init {
+        val caDisplayLink = caDisplayLink ?: throw IllegalStateException("caDisplayLink is null during redrawer init")
+        caDisplayLink.setPaused(true)
+        if (addDisplayLinkToRunLoop == null) {
+            caDisplayLink.addToRunLoop(NSRunLoop.mainRunLoop, NSRunLoop.mainRunLoop.currentMode)
+        } else {
+            addDisplayLinkToRunLoop.invoke(caDisplayLink)
+        }
+    }
+
+    internal fun dispose() {
+        check(caDisplayLink != null, { "MetalRedrawer.dispose() was called more than once" } )
+
+        disposeCallback(this)
+        caDisplayLink?.invalidate()
+        caDisplayLink = null
+
+        context.flush()
+        context.close()
+    }
+
+    internal fun needRedraw() {
+        hasScheduledDrawOnNextVSync = true
+
+        // If caDisplayLink is proactive (touches tracking), this does nothing (already unpaused)
+        caDisplayLink?.setPaused(false)
+    }
+
+    private fun handleDisplayLinkTick() {
         if (hasScheduledDrawOnNextVSync) {
             hasScheduledDrawOnNextVSync = false
 
@@ -58,41 +96,11 @@ internal class MetalRedrawer(
         }
 
         if (!needsProactiveDisplayLink) {
-            caDisplayLink.setPaused(true)
+            caDisplayLink?.setPaused(true)
         }
-    }
-
-    private val caDisplayLink = CADisplayLink.displayLinkWithTarget(
-        target = frameListener,
-        selector = NSSelectorFromString(FrameTickListener::onDisplayLinkTick.name)
-    )
-
-    init {
-        caDisplayLink.setPaused(true)
-        caDisplayLink.addToRunLoop(NSRunLoop.mainRunLoop, NSRunLoop.mainRunLoop.currentMode)
-    }
-
-    internal fun dispose() {
-        if (!isDisposed) {
-            caDisplayLink.invalidate()
-            isDisposed = true
-        }
-    }
-
-    internal fun needRedraw() {
-        check(!isDisposed) { "MetalRedrawer is disposed" }
-
-        hasScheduledDrawOnNextVSync = true
-
-        // If caDisplayLink is proactive (touches tracking), this does nothing (already unpaused)
-        caDisplayLink.setPaused(false)
     }
 
     private fun draw() {
-        if (isDisposed) {
-            return
-        }
-
         autoreleasepool {
             val (width, height) = metalLayer.drawableSize.useContents {
                 width.roundToInt() to height.roundToInt()
@@ -132,7 +140,7 @@ internal class MetalRedrawer(
             }
 
             surface.canvas.clear(Color.WHITE)
-            drawIntoSurfaceCallback(surface)
+            drawCallback(surface)
             surface.flushAndSubmit()
 
             val commandBuffer = queue.commandBuffer()!!
@@ -151,9 +159,11 @@ internal class MetalRedrawer(
     }
 }
 
-private class FrameTickListener(val onFrameTick: () -> Unit) : NSObject() {
+private class DisplayLinkProxy(
+    private val callback: () -> Unit
+) : NSObject() {
     @ObjCAction
-    fun onDisplayLinkTick() {
-        onFrameTick()
+    fun handleDisplayLinkTick() {
+        callback()
     }
 }

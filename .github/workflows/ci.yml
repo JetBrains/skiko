@@ -1,6 +1,9 @@
 # Default Skiko CI
 name: CI
 
+env:
+  IOS_SIM_UUID: '9C58D5E8-9AE8-4595-A262-35CA4871E886' # https://github.com/futureware-tech/simulator-action/wiki/Devices-macos-13
+
 on:
   push:
     branches: [ master ]
@@ -47,7 +50,7 @@ jobs:
           retention-days: 5
 
   ios:
-    runs-on: macos-11
+    runs-on: macos-13
     steps:
       - uses: actions/checkout@v3
         name: 'Check out code'
@@ -59,9 +62,13 @@ jobs:
           java-version: '11'
           cache: 'gradle'
 
-      - shell: bash
-        name: 'Compile and run iOS x64 tests'
-        run: ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Pskiko.test.onci=true :skiko:iosX64Test
+      - name: 'Compile and run iOS x64 tests'
+        uses: nick-fields/retry@v2
+        with:
+          max_attempts: 10
+          timeout_minutes: 60
+          shell: bash
+          command: ./gradlew --stacktrace --info -Pskiko.native.enabled=true -Pskiko.test.onci=true -Pskiko.iosSimulatorUUID="${{ env.IOS_SIM_UUID }}" :skiko:iosX64TestWithMetal
 
       # iosSimulatorArm64Test will build the binary but the tests will be skipped due to X64 host machine
       - shell: bash
