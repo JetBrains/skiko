@@ -427,9 +427,9 @@ kotlin {
         }
     }
 
-    if (hostOs == OS.MacOS) {
-        val metalTestTargets = listOf("iosX64", "iosSimulatorArm64")
-        metalTestTargets.forEach { target: String ->
+    val metalTestTargets = listOf("iosX64", "iosSimulatorArm64")
+    metalTestTargets.forEach { target: String ->
+        if (kotlin.targets.names.contains(target)) {
             val testBinary = kotlin.targets.getByName<KotlinNativeTarget>(target).binaries.getTest("DEBUG")
             project.tasks.create(target + "TestWithMetal") {
                 dependsOn(testBinary.linkTask)
