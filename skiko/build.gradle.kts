@@ -426,6 +426,26 @@ kotlin {
             }
         }
     }
+
+    val metalTestTargets = listOf("iosX64", "iosSimulatorArm64")
+    metalTestTargets.forEach { target: String ->
+        val testBinary = kotlin.targets.getByName<KotlinNativeTarget>(target).binaries.getTest("DEBUG")
+        project.tasks.create(target + "TestWithMetal") {
+            dependsOn(testBinary.linkTask)
+            doLast {
+                val simulatorIdPropertyKey = "skiko.iosSimulatorUUID"
+                val simulatorId = findProperty(simulatorIdPropertyKey)?.toString()
+                    ?: error("Property '$simulatorIdPropertyKey' not found. Pass it with -P$simulatorIdPropertyKey=...")
+
+                project.exec { commandLine("xcrun", "simctl", "boot", simulatorId) }
+                try {
+                    project.exec { commandLine("xcrun", "simctl", "spawn", simulatorId, testBinary.outputFile) }
+                } finally {
+                    project.exec { commandLine("xcrun", "simctl", "shutdown", simulatorId) }
+                }
+            }
+        }
+    }
 }
 
 fun configureCinterop(

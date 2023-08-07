@@ -53,8 +53,6 @@ class MetalRedrawerTest {
     }
 
     @Test
-    // TODO: remove @Ignore when gradle creating test environment without Metal support is fixed
-    @Ignore
     fun `check metal redrawer is disposed`() {
         val mockNSRunLoop = MockNSRunLoop()
 
