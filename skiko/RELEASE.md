@@ -1,15 +1,8 @@
 # Release processes
 
-## Tagging
-
-```bash
-git tag -a v0.X.Y <commit hash> -m "Version 0.X.Y"
-git push origin v0.X.Y 
-```
-
 ## Teamcity
 
-Trigger a new deployment in [Publish release](https://teamcity.jetbrains.com/buildConfiguration/JetBrainsPublicProjects_Skija_Skiko_PublishRelease)
+Trigger a new deployment in [Publish release](https://buildserver.labs.intellij.net/buildConfiguration/Skiko_PublishRelease)
 build configuration.
     1. Click "Deploy" button.
     2. Specify the desired version in "Skiko Release Version" text field on the "Parameters" tab.
