@@ -19,9 +19,9 @@
 #define kOpen 0
 #define kGetMuxState 3
 #define kDriverClassName "AppleGraphicsControl"
-#define AdpapterPriorityAuto 0
-#define AdpapterPriorityIntegrated 1
-#define AdpapterPriorityDiscrete 2
+#define AdapterPriorityAuto 0
+#define AdapterPriorityIntegrated 1
+#define AdapterPriorityDiscrete 2
 
 extern "C" {
 
@@ -69,30 +69,30 @@ static BOOL isUsingIntegratedGPU() {
     return output != 0;
 }
 
-static id<MTLDevice> createIntegratedMTLDevice(int adapterPriority) {
-    BOOL isIntegratedGPU = NO;
-
-    if (adapterPriority == AdpapterPriorityAuto) {
-        isIntegratedGPU = isUsingIntegratedGPU();
-    } else if (adapterPriority == AdpapterPriorityIntegrated) {
-        isIntegratedGPU = YES;
+static BOOL preferLowPowerGPU(int adapterPriority) {
+    switch (adapterPriority) {
+        case AdapterPriorityAuto:
+            return isUsingIntegratedGPU();
+            
+        case AdapterPriorityIntegrated:
+            return YES;             
+            
+        default: // AdapterPriorityDiscrete or invalid adapterPriority
+            return NO;
     }
+}
 
-    id<MTLDevice> gpu = nil;
-
-    if (isIntegratedGPU) {
+static id<MTLDevice> createIntegratedMTLDevice(int adapterPriority) {
+    if (preferLowPowerGPU(adapterPriority)) {
         NSArray<id<MTLDevice>> *devices = MTLCopyAllDevices();
         for (id<MTLDevice> device in devices) {
             if (device.isLowPower) {
-                gpu = device;
-                break;
+                return device;
             }
         }
     }
-    if (gpu == nil) {
-        gpu = MTLCreateSystemDefaultDevice();
-    }
-    return gpu;
+
+    return MTLCreateSystemDefaultDevice();
 }
 
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_MetalApiKt_chooseAdapter(
