@@ -19,29 +19,26 @@
 #define kOpen 0
 #define kGetMuxState 3
 #define kDriverClassName "AppleGraphicsControl"
-#define AdpapterPriorityAuto 0
-#define AdpapterPriorityIntegrated 1
-#define AdpapterPriorityDiscrete 2
+#define AdapterPriorityAuto 0
+#define AdapterPriorityIntegrated 1
+#define AdapterPriorityDiscrete 2
 
-extern "C"
-{
+extern "C" {
 
-extern "C" void* objc_autoreleasePoolPush(void);
-extern "C" void objc_autoreleasePoolPop(void*);
+void *objc_autoreleasePoolPush(void);
+void objc_autoreleasePoolPop(void *);
 
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_MetalApiKt_openAutoreleasepool(
-    JNIEnv * env, jobject redrawer)
-{
+    JNIEnv *env, jobject redrawer) {
     return (jlong)objc_autoreleasePoolPush();
 }
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_MetalApiKt_closeAutoreleasepool(
-    JNIEnv * env, jobject redrawer, jlong handle)
-{
-    objc_autoreleasePoolPop((void*)handle);
+    JNIEnv *env, jobject redrawer, jlong handle) {
+    objc_autoreleasePoolPop((void *)handle);
 }
 
-BOOL isUsingIntegratedGPU() {
+static BOOL isUsingIntegratedGPU() {
     kern_return_t kernResult = 0;
     io_iterator_t iterator = IO_OBJECT_NULL;
     io_service_t service = IO_OBJECT_NULL;
@@ -72,62 +69,69 @@ BOOL isUsingIntegratedGPU() {
     return output != 0;
 }
 
-id<MTLDevice> MTLCreateIntegratedDevice(int adapterPriority) {
-    BOOL isIntegratedGPU = NO;
-
-    if (adapterPriority == AdpapterPriorityAuto) {
-        isIntegratedGPU = isUsingIntegratedGPU();
-    } else if (adapterPriority == AdpapterPriorityIntegrated) {
-        isIntegratedGPU = YES;
+static BOOL preferLowPowerGPU(int adapterPriority) {
+    switch (adapterPriority) {
+        case AdapterPriorityAuto:
+            return isUsingIntegratedGPU();
+            
+        case AdapterPriorityIntegrated:
+            return YES;             
+            
+        default: // AdapterPriorityDiscrete or invalid adapterPriority
+            return NO;
     }
+}
 
-    id<MTLDevice> gpu = nil;
-
-    if (isIntegratedGPU) {
+static id<MTLDevice> createIntegratedMTLDevice(int adapterPriority) {
+    if (preferLowPowerGPU(adapterPriority)) {
         NSArray<id<MTLDevice>> *devices = MTLCopyAllDevices();
         for (id<MTLDevice> device in devices) {
             if (device.isLowPower) {
-                gpu = device;
-                break;
+                return device;
             }
         }
     }
-    if (gpu == nil) {
-        gpu = MTLCreateSystemDefaultDevice();
-    }
-    return gpu;
+
+    return MTLCreateSystemDefaultDevice();
 }
 
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_MetalApiKt_chooseAdapter(
-    JNIEnv *env, jobject obj, jlong adapterPriority)
-{
+    JNIEnv *env, jobject obj, jlong adapterPriority) {
     @autoreleasepool {
-        id<MTLDevice> adapter = MTLCreateIntegratedDevice(adapterPriority);
-        return (jlong) (__bridge_retained void *) adapter;
+        id<MTLDevice> adapter = createIntegratedMTLDevice(adapterPriority);
+
+        if (adapter) {
+            return (jlong) (__bridge_retained void *) adapter;
+        } else {
+            return 0;
+        }
     }
 }
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_MetalApiKt_disposeAdapter(
-    JNIEnv *env, jobject obj, jlong adapterPtr)
-{
+    JNIEnv *env, jobject obj, jlong adapterPtr) {
     @autoreleasepool {
         id<MTLDevice> adapter = (__bridge_transfer id<MTLDevice>) (void *) adapterPtr;
     }
 }
 
 JNIEXPORT jstring JNICALL Java_org_jetbrains_skiko_MetalApiKt_getAdapterName(
-    JNIEnv *env, jobject obj, jlong adapterPtr)
-{
+    JNIEnv *env, jobject obj, jlong adapterPtr) {
     @autoreleasepool {
         id<MTLDevice> adapter = (__bridge id<MTLDevice>) (void *) adapterPtr;
-        const char *currentAdapterName = [[adapter name] cStringUsingEncoding:NSASCIIStringEncoding];
-        return env->NewStringUTF(currentAdapterName);
+
+        const char *currentAdapterName = [[adapter name] cStringUsingEncoding:NSUTF8StringEncoding];
+
+        if (currentAdapterName) {
+            return env->NewStringUTF(currentAdapterName);
+        } else {
+            return env->NewStringUTF("Unknown Metal adapter");
+        }
     }
 }
 
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_MetalApiKt_getAdapterMemorySize(
-    JNIEnv *env, jobject obj, jlong adapterPtr)
-{
+    JNIEnv *env, jobject obj, jlong adapterPtr) {
     @autoreleasepool {
         id<MTLDevice> adapter = (__bridge id<MTLDevice>) (void *) adapterPtr;
         uint64_t totalMemory = [adapter recommendedMaxWorkingSetSize];
@@ -135,5 +139,6 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_MetalApiKt_getAdapterMemorySize
     }
 }
 
-} // extern C
-#endif
+} // extern "C"
+
+#endif // SK_METAL

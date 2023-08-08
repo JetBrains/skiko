@@ -8,6 +8,11 @@ package org.jetbrains.skiko
  */
 internal fun chooseMetalAdapter(adapterPriority: GpuPriority): MetalAdapter {
     val adapter = chooseAdapter(adapterPriority.ordinal)
+
+    if (adapter == 0L) {
+        throw RenderException("MetalApi.chooseAdapter returned null")
+    }
+
     val adapterName = getAdapterName(adapter)
     val adapterMemorySize = getAdapterMemorySize(adapter)
 
