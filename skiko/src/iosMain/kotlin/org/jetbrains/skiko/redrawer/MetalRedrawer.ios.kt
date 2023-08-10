@@ -73,6 +73,8 @@ internal class MetalRedrawer(
     internal fun dispose() {
         check(caDisplayLink != null, { "MetalRedrawer.dispose() was called more than once" } )
 
+        println("MetalRedrawer disposed")
+
         disposeCallback(this)
         caDisplayLink?.invalidate()
         caDisplayLink = null

@@ -16,12 +16,20 @@ import platform.darwin.NSInteger
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.native.ref.WeakReference
+import kotlin.native.internal.Cleaner
+import kotlin.native.internal.createCleaner
 
 @Suppress("CONFLICTING_OVERLOADS")
 @ExportObjCClass
 class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
     companion object : UIViewMeta() {
         override fun layerClass() = CAMetalLayer
+    }
+
+    val marker = Any()
+    @OptIn(kotlin.ExperimentalStdlibApi::class)
+    val markerCleaner = createCleaner(marker) {
+        println("SkikoUIView disposed")
     }
 
     @Suppress("UNUSED") // required by Objective-C runtime
