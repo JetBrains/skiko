@@ -541,6 +541,9 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         return this
     }
 
+    /**
+     * Draw a text [blob] with baseline starting at [x] [y] with [paint]
+     */
     fun drawTextBlob(blob: TextBlob, x: Float, y: Float, paint: Paint): Canvas {
         Stats.onNativeCall()
         try {
@@ -553,6 +556,9 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         return this
     }
 
+    /**
+     * Draw a text [line] with baseline starting at [x] [y] with [paint]
+     */
     fun drawTextLine(line: TextLine, x: Float, y: Float, paint: Paint): Canvas {
         line.textBlob?.use { blob -> blob.let { drawTextBlob(it, x, y, paint) } }
         return this
