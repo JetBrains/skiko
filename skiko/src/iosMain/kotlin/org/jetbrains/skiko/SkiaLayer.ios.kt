@@ -50,6 +50,10 @@ actual open class SkiaLayer {
 
     actual fun detach() {
         view?.detach()
+
+        // GC bug? fixes leak on iOS
+        view = null
+        skikoView = null
     }
 
     actual var skikoView: SkikoView? = null
