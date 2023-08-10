@@ -22,6 +22,9 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
         val PTR = TextLine_nGetFinalizer()
     }
 
+    /**
+     * distance to reserve above baseline, typically negative
+     */
     val ascent: Float
         get() {
             Stats.onNativeCall()
@@ -32,6 +35,9 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
             }
         }
 
+    /**
+     * height of an upper-case letter, zero if unknown, typically negative
+     */
     val capHeight: Float
         get() {
             Stats.onNativeCall()
@@ -42,6 +48,9 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
             }
         }
 
+    /**
+     * height of lower-case 'x', zero if unknown, typically negative
+     */
     val xHeight: Float
         get() {
             Stats.onNativeCall()
@@ -52,6 +61,9 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
             }
         }
 
+    /**
+     * distance to reserve below baseline, typically positive
+     */
     val descent: Float
         get() {
             Stats.onNativeCall()
@@ -62,6 +74,9 @@ class TextLine internal constructor(ptr: NativePointer) : Managed(ptr, _Finalize
             }
         }
 
+    /**
+     * distance to add between lines, typically positive or zero
+     */
     val leading: Float
         get() {
             Stats.onNativeCall()
