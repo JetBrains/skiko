@@ -3,12 +3,92 @@ package org.jetbrains.skiko.redrawer
 import kotlinx.cinterop.*
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.Logger
+import platform.Foundation.NSNotificationCenter
 import platform.Foundation.NSRunLoop
 import platform.Foundation.NSSelectorFromString
 import platform.QuartzCore.*
+import platform.UIKit.UIApplicationDidEnterBackgroundNotification
+import platform.UIKit.UIApplicationWillEnterForegroundNotification
 import platform.darwin.*
 import kotlin.math.roundToInt
-import kotlin.native.ref.WeakReference
+
+private class DisplayLinkConditions(
+    val setPausedCallback: (Boolean) -> Unit
+) {
+    var needsToBeProactive: Boolean = false
+        set(value) {
+            field = value
+
+            update()
+        }
+
+    /**
+     * Indicates that scene is invalidated and next display link callback will draw
+     */
+    var needsRedrawOnNextVsync: Boolean = false
+        set(value) {
+            field = value
+
+            update()
+        }
+
+    var isApplicationActive: Boolean = true
+        set(value) {
+            field = value
+
+            update()
+        }
+
+    private fun update() {
+        val isUnpaused = isApplicationActive && (needsToBeProactive || needsRedrawOnNextVsync)
+        setPausedCallback(!isUnpaused)
+    }
+}
+
+private class ApplicationStateListener(
+    /**
+     * Callback which will be called with `true` when the app becomes active, and `false` when the app goes background
+     */
+    private val callback: (Boolean) -> Unit
+) : NSObject() {
+    init {
+        val notificationCenter = NSNotificationCenter.defaultCenter
+
+        notificationCenter.addObserver(
+            this,
+            NSSelectorFromString(::applicationWillEnterForeground.name),
+            UIApplicationWillEnterForegroundNotification,
+            null
+        )
+
+        notificationCenter.addObserver(
+            this,
+            NSSelectorFromString(::applicationDidEnterBackground.name),
+            UIApplicationDidEnterBackgroundNotification,
+            null
+        )
+    }
+
+    @ObjCAction
+    fun applicationWillEnterForeground() {
+        callback(true)
+    }
+
+    @ObjCAction
+    fun applicationDidEnterBackground() {
+        callback(false)
+    }
+
+    /**
+     * Deregister from [NSNotificationCenter]
+     */
+    fun dispose() {
+        val notificationCenter = NSNotificationCenter.defaultCenter
+
+        notificationCenter.removeObserver(this, UIApplicationWillEnterForegroundNotification, null)
+        notificationCenter.removeObserver(this, UIApplicationDidEnterBackgroundNotification, null)
+    }
+}
 
 internal class MetalRedrawer(
     private val metalLayer: CAMetalLayer,
@@ -35,22 +115,14 @@ internal class MetalRedrawer(
             caDisplayLink?.preferredFramesPerSecond = value
         }
 
-    /*
-     * Indicates that scene is invalidated and next display link callback will draw
-     */
-    private var hasScheduledDrawOnNextVSync = false
-
     /**
      * Needs scheduling displayLink for forcing UITouch events to come at the fastest possible cadence.
      * Otherwise, touch events can come at rate lower than actual display refresh rate.
      */
-    var needsProactiveDisplayLink = false
+    var needsProactiveDisplayLink: Boolean
+        get() = displayLinkConditions.needsToBeProactive
         set(value) {
-            field = value
-
-            if (value) {
-                caDisplayLink?.setPaused(false)
-            }
+            displayLinkConditions.needsToBeProactive = value
         }
 
     internal var caDisplayLink: CADisplayLink? = CADisplayLink.displayLinkWithTarget(
@@ -59,6 +131,14 @@ internal class MetalRedrawer(
         },
         selector = NSSelectorFromString(DisplayLinkProxy::handleDisplayLinkTick.name)
     )
+
+    private val displayLinkConditions = DisplayLinkConditions { paused ->
+        caDisplayLink?.setPaused(paused)
+    }
+
+    private val applicationStateListener = ApplicationStateListener { isApplicationActive ->
+        displayLinkConditions.isApplicationActive = isApplicationActive
+    }
 
     init {
         val caDisplayLink = caDisplayLink ?: throw IllegalStateException("caDisplayLink is null during redrawer init")
@@ -71,9 +151,12 @@ internal class MetalRedrawer(
     }
 
     internal fun dispose() {
-        check(caDisplayLink != null, { "MetalRedrawer.dispose() was called more than once" } )
+        check(caDisplayLink != null, { "MetalRedrawer.dispose() was called more than once" })
 
         disposeCallback(this)
+
+        applicationStateListener.dispose()
+
         caDisplayLink?.invalidate()
         caDisplayLink = null
 
@@ -82,27 +165,20 @@ internal class MetalRedrawer(
     }
 
     internal fun needRedraw() {
-        hasScheduledDrawOnNextVSync = true
-
-        // If caDisplayLink is proactive (touches tracking), this does nothing (already unpaused)
-        caDisplayLink?.setPaused(false)
+        displayLinkConditions.needsRedrawOnNextVsync = true
     }
 
     private fun handleDisplayLinkTick() {
-        if (hasScheduledDrawOnNextVSync) {
-            hasScheduledDrawOnNextVSync = false
+        if (displayLinkConditions.needsRedrawOnNextVsync) {
+            displayLinkConditions.needsRedrawOnNextVsync = false
 
             draw()
-        }
-
-        if (!needsProactiveDisplayLink) {
-            caDisplayLink?.setPaused(true)
         }
     }
 
     private fun draw() {
         if (caDisplayLink == null) {
-            Logger.warn { "caDisplayLink callback called after it was invalidated "}
+            Logger.warn { "caDisplayLink callback called after it was invalidated " }
             return
         }
 
