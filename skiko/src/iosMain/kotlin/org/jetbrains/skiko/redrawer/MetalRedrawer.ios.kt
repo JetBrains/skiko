@@ -101,6 +101,11 @@ internal class MetalRedrawer(
     }
 
     private fun draw() {
+        if (caDisplayLink == null) {
+            Logger.warn { "caDisplayLink callback called after it was invalidated "}
+            return
+        }
+
         autoreleasepool {
             val (width, height) = metalLayer.drawableSize.useContents {
                 width.roundToInt() to height.roundToInt()
