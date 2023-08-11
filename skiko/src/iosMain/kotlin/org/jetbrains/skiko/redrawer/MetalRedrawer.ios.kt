@@ -102,6 +102,7 @@ internal class MetalRedrawer(
 
     private fun draw() {
         if (caDisplayLink == null) {
+            Logger.warn { "caDisplayLink callback called after it was invalidated "}
             return
         }
 
