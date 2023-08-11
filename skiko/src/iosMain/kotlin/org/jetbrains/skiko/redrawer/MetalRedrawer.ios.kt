@@ -101,6 +101,10 @@ internal class MetalRedrawer(
     }
 
     private fun draw() {
+        if (caDisplayLink == null) {
+            return
+        }
+
         autoreleasepool {
             val (width, height) = metalLayer.drawableSize.useContents {
                 width.roundToInt() to height.roundToInt()
