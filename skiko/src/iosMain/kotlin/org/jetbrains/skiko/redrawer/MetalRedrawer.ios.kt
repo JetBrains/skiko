@@ -254,6 +254,7 @@ internal class MetalRedrawer(
             renderTarget.close()
             // TODO manually release metalDrawable when K/N API arrives
 
+            // Track current inflight command buffers to synchronously wait for their schedule in case app goes background
             if (inflightCommandBuffers.size == metalLayer.maximumDrawableCount.toInt()) {
                 inflightCommandBuffers.removeAt(0)
             }
