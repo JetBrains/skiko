@@ -6,6 +6,7 @@ import org.jetbrains.skiko.Logger
 import platform.Foundation.NSNotificationCenter
 import platform.Foundation.NSRunLoop
 import platform.Foundation.NSSelectorFromString
+import platform.Metal.MTLCommandBufferProtocol
 import platform.QuartzCore.*
 import platform.UIKit.UIApplicationDidEnterBackgroundNotification
 import platform.UIKit.UIApplicationWillEnterForegroundNotification
@@ -111,6 +112,7 @@ internal class MetalRedrawer(
         ?: throw IllegalStateException("CAMetalLayer.device can not be null")
     private val queue = device.newCommandQueue() ?: throw IllegalStateException("Couldn't create Metal command queue")
     private val context = DirectContext.makeMetal(device.objcPtr(), queue.objcPtr())
+    private val inflightCommandBuffers = mutableListOf<MTLCommandBufferProtocol>()
 
     // Semaphore for preventing command buffers count more than swapchain size to be scheduled/executed at the same time
     private val inflightSemaphore = dispatch_semaphore_create(metalLayer.maximumDrawableCount.toLong())
@@ -144,6 +146,15 @@ internal class MetalRedrawer(
 
     private val applicationStateListener = ApplicationStateListener { isApplicationActive ->
         displayLinkConditions.isApplicationActive = isApplicationActive
+
+        if (!isApplicationActive) {
+            // If application goes background, synchronously schedule all inflightCommandBuffers, as per
+            // https://developer.apple.com/documentation/metal/gpu_devices_and_work_submission/preparing_your_metal_app_to_run_in_the_background?language=objc
+            inflightCommandBuffers.forEach {
+                // Will immediately return for MTLCommandBuffer's which are not in `Commited` status
+                it.waitUntilScheduled()
+            }
+        }
     }
 
     init {
@@ -242,6 +253,12 @@ internal class MetalRedrawer(
             surface.close()
             renderTarget.close()
             // TODO manually release metalDrawable when K/N API arrives
+
+            if (inflightCommandBuffers.size == metalLayer.maximumDrawableCount.toInt()) {
+                inflightCommandBuffers.removeAt(0)
+            }
+
+            inflightCommandBuffers.add(commandBuffer)
         }
     }
 }
