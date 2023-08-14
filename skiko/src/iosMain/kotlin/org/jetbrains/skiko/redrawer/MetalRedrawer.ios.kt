@@ -15,6 +15,9 @@ import kotlin.math.roundToInt
 private class DisplayLinkConditions(
     val setPausedCallback: (Boolean) -> Unit
 ) {
+    /**
+     * see [MetalRedrawer.needsProactiveDisplayLink]
+     */
     var needsToBeProactive: Boolean = false
         set(value) {
             field = value
@@ -32,6 +35,9 @@ private class DisplayLinkConditions(
             update()
         }
 
+    /**
+     * Indicates that application is running foreground now
+     */
     var isApplicationActive: Boolean = true
         set(value) {
             field = value
