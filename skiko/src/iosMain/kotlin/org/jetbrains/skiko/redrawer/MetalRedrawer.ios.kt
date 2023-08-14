@@ -8,7 +8,9 @@ import platform.Foundation.NSRunLoop
 import platform.Foundation.NSSelectorFromString
 import platform.Metal.MTLCommandBufferProtocol
 import platform.QuartzCore.*
+import platform.UIKit.UIApplication
 import platform.UIKit.UIApplicationDidEnterBackgroundNotification
+import platform.UIKit.UIApplicationState
 import platform.UIKit.UIApplicationWillEnterForegroundNotification
 import platform.darwin.*
 import kotlin.math.roundToInt
@@ -39,7 +41,7 @@ private class DisplayLinkConditions(
     /**
      * Indicates that application is running foreground now
      */
-    var isApplicationActive: Boolean = true
+    var isApplicationActive: Boolean = false
         set(value) {
             field = value
 
@@ -159,7 +161,12 @@ internal class MetalRedrawer(
 
     init {
         val caDisplayLink = caDisplayLink ?: throw IllegalStateException("caDisplayLink is null during redrawer init")
-        caDisplayLink.setPaused(true)
+
+        // UIApplication can be in UIApplicationStateInactive state (during app launch before it gives control back to run loop)
+        // and won't receive UIApplicationWillEnterForegroundNotification
+        // so we compare the state with UIApplicationStateBackground instead of UIApplicationStateActive
+        displayLinkConditions.isApplicationActive = UIApplication.sharedApplication.applicationState != UIApplicationState.UIApplicationStateBackground
+
         if (addDisplayLinkToRunLoop == null) {
             caDisplayLink.addToRunLoop(NSRunLoop.mainRunLoop, NSRunLoop.mainRunLoop.currentMode)
         } else {
