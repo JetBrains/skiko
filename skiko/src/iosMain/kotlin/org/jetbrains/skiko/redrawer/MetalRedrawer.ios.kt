@@ -2,6 +2,7 @@ package org.jetbrains.skiko.redrawer
 
 import kotlinx.cinterop.*
 import org.jetbrains.skia.*
+import org.jetbrains.skiko.*
 import org.jetbrains.skiko.Logger
 import platform.Foundation.NSNotificationCenter
 import platform.Foundation.NSRunLoop
@@ -118,6 +119,7 @@ internal class MetalRedrawer(
 
     // Semaphore for preventing command buffers count more than swapchain size to be scheduled/executed at the same time
     private val inflightSemaphore = dispatch_semaphore_create(metalLayer.maximumDrawableCount.toLong())
+    private val signposter = Signposter("org.jetbrains.skiko", "MetalRedrawer")
 
     internal var maximumFramesPerSecond: NSInteger
         get() = caDisplayLink?.preferredFramesPerSecond ?: 0
@@ -196,14 +198,18 @@ internal class MetalRedrawer(
         if (displayLinkConditions.needsRedrawOnNextVsync) {
             displayLinkConditions.needsRedrawOnNextVsync = false
 
-            draw()
+            draw(nextFrameId())
         }
     }
 
-    private fun draw() {
+
+    private fun draw(frameId: Int) = signposter.traceInterval("draw") {
+        val caDisplayLink = caDisplayLink
+
         if (caDisplayLink == null) {
             Logger.warn { "caDisplayLink callback called after it was invalidated " }
-            return
+
+            return@traceInterval
         }
 
         autoreleasepool {
@@ -244,16 +250,34 @@ internal class MetalRedrawer(
                 return@autoreleasepool
             }
 
+            var gpuTraceIntervalEndCallback: SignpostIntervalEndCallback? = null
+
             surface.canvas.clear(Color.WHITE)
-            drawCallback(surface)
-            surface.flushAndSubmit()
+
+            signposter.traceInterval("drawCompose") {
+                drawCallback(surface)
+            }
+
+            signposter.traceInterval("flushAndSubmit") {
+                surface.flushAndSubmit()
+            }
+
+            queue.commandBuffer()!!.also {
+                it.label = "Track scheduling $frameId"
+                it.addScheduledHandler {
+                    gpuTraceIntervalEndCallback = signposter.startTrace("GPU work")
+                }
+                it.commit()
+            }
 
             val commandBuffer = queue.commandBuffer()!!
-            commandBuffer.label = "Present"
+            commandBuffer.label = "Present $frameId"
             commandBuffer.presentDrawable(metalDrawable)
             commandBuffer.addCompletedHandler {
                 // Signal work finish, allow a new command buffer to be scheduled
                 dispatch_semaphore_signal(inflightSemaphore)
+
+                gpuTraceIntervalEndCallback?.invoke()
             }
             commandBuffer.commit()
 
@@ -267,6 +291,16 @@ internal class MetalRedrawer(
             }
 
             inflightCommandBuffers.add(commandBuffer)
+        }
+    }
+
+    companion object {
+        private var frameId = 0
+
+        fun nextFrameId(): Int {
+            frameId++
+
+            return frameId
         }
     }
 }
