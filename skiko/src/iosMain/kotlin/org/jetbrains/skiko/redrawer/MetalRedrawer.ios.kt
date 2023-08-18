@@ -15,6 +15,7 @@ import platform.UIKit.UIApplicationWillEnterForegroundNotification
 import platform.darwin.*
 import kotlin.math.roundToInt
 
+// TODO: REMOVE
 private class DisplayLinkConditions(
     val setPausedCallback: (Boolean) -> Unit
 ) {

@@ -1,5 +1,6 @@
 package org.jetbrains.skiko
 
+// TODO: REMOVE
 interface TextActions {
     /**
      * Copy action. If null, then copy is not possible in current context

@@ -34,6 +34,7 @@ fun toSkikoTypeEvent(character: String, event: UIPress?): SkikoInputEvent {
     )
 }
 
+// TODO: REMOVE
 fun toSkikoKeyboardEvent(
     event: UIPress,
     kind: SkikoKeyboardEventKind
@@ -48,6 +49,7 @@ fun toSkikoKeyboardEvent(
     )
 }
 
+// TODO: REMOVE
 private fun toSkikoModifiers(event: UIPress): SkikoInputModifiers {
     var result = 0
     val modifiers = event.key!!.modifierFlags

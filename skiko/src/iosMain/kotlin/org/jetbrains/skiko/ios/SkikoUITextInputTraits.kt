@@ -6,6 +6,7 @@ import platform.UIKit.*
  * Represents a part of UITextInputTraits protocol. Needs to control onscreen keyboard features.
  * https://developer.apple.com/documentation/uikit/uitextinputtraits?language=objc
  */
+// TODO: REMOVE
 interface SkikoUITextInputTraits {
 
     fun keyboardType(): UIKeyboardType =
