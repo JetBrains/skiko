@@ -140,7 +140,7 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_MetalApiKt_getAdapterMemorySize
 }
 
 JNIEXPORT void JNICALL Java_org_jetbrains_skiko_MetalApiKt_initializeCAccessible(
-    JNIEnv *env, jobject obj, jlong accessible)
+    JNIEnv *env, jobject obj, jobject accessible)
 {
     @autoreleasepool {
         jclass accClass = env->FindClass("sun/lwawt/macosx/CAccessible");
