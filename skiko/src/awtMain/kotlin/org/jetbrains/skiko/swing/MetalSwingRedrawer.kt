@@ -49,6 +49,7 @@ internal class MetalSwingRedrawer(
         bytesToDraw = ByteArray(0)
         storage.close()
         disposeMetalTexture(texturePtr)
+        context.close()
         adapter.dispose()
         super.dispose()
     }
