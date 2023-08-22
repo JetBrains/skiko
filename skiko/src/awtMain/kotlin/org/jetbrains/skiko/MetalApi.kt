@@ -1,5 +1,7 @@
 package org.jetbrains.skiko
 
+import javax.accessibility.Accessible
+
 /**
  * Provides [MetalAdapter] that holds pointer to native [MTLDevice](https://developer.apple.com/documentation/metal/mtldevice)
  * chosen using [adapterPriority]
@@ -53,3 +55,5 @@ private external fun openAutoreleasepool(): Long
 
 @Suppress("SpellCheckingInspection")
 private external fun closeAutoreleasepool(handle: Long)
+
+internal external fun initializeCAccessible(accessible: Accessible)
