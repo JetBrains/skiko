@@ -2,6 +2,7 @@ package org.jetbrains.skiko.redrawer
 
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.withContext
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.context.OpenGLContextHandler
@@ -73,6 +74,8 @@ internal class WindowsOpenGLRedrawer(
     private fun swapBuffers() = swapBuffers(device)
 
     companion object {
+        @OptIn(ExperimentalCoroutinesApi::class)
+        private val dispatcherToBlockOn = Dispatchers.IO.limitedParallelism(64)
         private val toRedraw = mutableSetOf<WindowsOpenGLRedrawer>()
         private val toRedrawCopy = mutableSetOf<WindowsOpenGLRedrawer>()
         private val toRedrawVisible = toRedrawCopy
@@ -110,7 +113,7 @@ internal class WindowsOpenGLRedrawer(
 
             val isVsyncEnabled = toRedrawVisible.all { it.properties.isVsyncEnabled }
             if (isVsyncEnabled) {
-                withContext(Dispatchers.IO) {
+                withContext(dispatcherToBlockOn) {
                     dwmFlush() // wait for vsync
                 }
             }

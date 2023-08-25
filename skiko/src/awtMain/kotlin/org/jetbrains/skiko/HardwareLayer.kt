@@ -130,7 +130,7 @@ internal fun layerFrameLimiter(
     }
 
     return FrameLimiter(
-        scope + Dispatchers.IO,
+        scope,
         frameMillis = {
             frames.trySend(Unit)
             (1000 / state.frameLimit).toLong()

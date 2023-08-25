@@ -1,6 +1,7 @@
 package org.jetbrains.skiko.redrawer
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.withContext
 import org.jetbrains.skia.DirectContext
 import org.jetbrains.skia.Surface
@@ -15,6 +16,12 @@ internal class Direct3DRedrawer(
     analytics: SkiaLayerAnalytics,
     private val properties: SkiaLayerProperties
 ) : AWTRedrawer(layer, analytics, GraphicsApi.DIRECT3D) {
+
+    companion object {
+        @OptIn(ExperimentalCoroutinesApi::class)
+        private val dispatcherToBlockOn = Dispatchers.IO.limitedParallelism(64)
+    }
+
     private val contextHandler = Direct3DContextHandler(layer)
     override val renderInfo: String get() = contextHandler.rendererInfo()
 
@@ -77,7 +84,7 @@ internal class Direct3DRedrawer(
 
     private suspend fun draw() {
         inDrawScope {
-            withContext(Dispatchers.IO) {
+            withContext(dispatcherToBlockOn) {
                 drawAndSwap(withVsync = properties.isVsyncEnabled)
             }
         }
