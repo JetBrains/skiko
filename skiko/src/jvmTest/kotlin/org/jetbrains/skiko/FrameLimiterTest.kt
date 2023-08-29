@@ -176,7 +176,11 @@ class FrameLimiterTest {
     @Test
     fun `cancel scope before awaitNextFrame`() = runTest {
         val scope = CoroutineScope(coroutineContext + Job())
-        val frameLimiter = FrameLimiter(scope, { 10 }, timeSource = testTimeSource)
+        val frameLimiter = FrameLimiter(
+            scope,
+            frameMillis = { 10 },
+            dispatcherToBlockOn = StandardTestDispatcher(testScheduler),
+            timeSource = testTimeSource)
 
         scope.cancel()
 
@@ -189,7 +193,11 @@ class FrameLimiterTest {
     fun `cancel scope after awaitNextFrame`() = runTest {
         val scope = CoroutineScope(coroutineContext + Job())
 
-        val frameLimiter = FrameLimiter(scope, { 10 }, timeSource = testTimeSource)
+        val frameLimiter = FrameLimiter(
+            scope,
+            frameMillis = { 10 },
+            dispatcherToBlockOn = StandardTestDispatcher(testScheduler),
+            timeSource = testTimeSource)
 
         launch {
             scope.cancel()
