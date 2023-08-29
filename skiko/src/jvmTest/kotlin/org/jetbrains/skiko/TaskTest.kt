@@ -8,8 +8,7 @@ import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.TestCoroutineScope
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.*
 import kotlinx.coroutines.yield
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -22,7 +21,7 @@ import kotlin.random.Random
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class TaskTest {
     @Test
-    fun `runAndAwait with finish`() = test {
+    fun `runAndAwait with finish`() = runTest {
         val task = Task()
 
         val job = launch {
@@ -38,7 +37,7 @@ internal class TaskTest {
     }
 
     @Test
-    fun `runAndAwait without finish`() = test {
+    fun `runAndAwait without finish`() = runTest {
         val task = Task()
 
         val job = launch {
@@ -47,10 +46,11 @@ internal class TaskTest {
 
         advanceUntilIdle()
         assertFalse(job.isCompleted)
+        job.cancel()
     }
 
     @Test
-    fun `finish inside runAndAwait`() = test {
+    fun `finish inside runAndAwait`() = runTest {
         val task = Task()
 
         val job = launch {
@@ -64,7 +64,7 @@ internal class TaskTest {
     }
 
     @Test
-    fun `finish before runAndAwait`() = test {
+    fun `finish before runAndAwait`() = runTest {
         val task = Task()
 
         val job = launch {
@@ -74,6 +74,7 @@ internal class TaskTest {
 
         advanceUntilIdle()
         assertFalse(job.isCompleted)
+        job.cancel()
     }
 
     @Test(timeout = 5000)
@@ -192,14 +193,5 @@ internal class TaskTest {
         fun setNeedsDisplay() {
             needsDisplay.set(true)
         }
-    }
-
-    private fun test(
-        block: suspend TestCoroutineScope.() -> Unit
-    ) = runBlockingTest {
-        pauseDispatcher()
-        val job = Job()
-        TestCoroutineScope(coroutineContext + job).block()
-        job.cancel()
     }
 }

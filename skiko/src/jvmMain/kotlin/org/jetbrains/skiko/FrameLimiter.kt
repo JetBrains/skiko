@@ -1,12 +1,9 @@
 package org.jetbrains.skiko
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.ExperimentalTime
-
-private const val NanosecondsPerMillisecond = 1_000_000L
+import kotlin.time.TimeSource
 
 /**
  * Limit the duration of the frames (to avoid high CPU usage) to [frameMillis].
@@ -14,15 +11,18 @@ private const val NanosecondsPerMillisecond = 1_000_000L
  * (Windows has ~15ms precision by default, Linux/macOs ~2ms).
  * FrameLimiter will try to delay frames as close as possible to [frameMillis], but not greater
  */
+@OptIn(ExperimentalTime::class, ExperimentalCoroutinesApi::class)
 class FrameLimiter(
     private val coroutineScope: CoroutineScope,
     private val frameMillis: () -> Long,
-    private val nanoTime: () -> Long = System::nanoTime
+    private val dispatcherToBlockOn: CoroutineDispatcher = Dispatchers.IO.limitedParallelism(64),
+    private val unpreciseDelay: suspend (Long) -> Unit = ::delay,
+    private val timeSource: TimeSource = TimeSource.Monotonic
 ) {
     private val channel = RendezvousBroadcastChannel<Unit>()
 
     init {
-        coroutineScope.launch {
+        coroutineScope.launch(dispatcherToBlockOn) {
             while (true) {
                 channel.sendAll(Unit)
                 preciseDelay(frameMillis())
@@ -31,15 +31,15 @@ class FrameLimiter(
     }
 
     private suspend fun preciseDelay(millis: Long) {
-        val start = nanoTime()
+        val start = timeSource.markNow()
         // delay aren't precise, so we should measure what is the actual precision of delay is,
         // so we don't wait longer than we need
-        var actual1msDelay = 1L
+        var actual1msDelay = 1.milliseconds
 
-        while (nanoTime() - start <= millis * NanosecondsPerMillisecond - actual1msDelay) {
-            val beforeDelay = nanoTime()
-            delay(1) // TODO do multiple delays instead of the single one consume more energy? Test it
-            actual1msDelay = maxOf(actual1msDelay, nanoTime() - beforeDelay)
+        while (start.elapsedNow() <= millis.milliseconds - actual1msDelay) {
+            val beforeDelay = timeSource.markNow()
+            unpreciseDelay(1) // TODO do multiple delays instead of the single one consume more energy? Test it
+            actual1msDelay = maxOf(actual1msDelay, beforeDelay.elapsedNow())
         }
     }
 
@@ -48,7 +48,7 @@ class FrameLimiter(
      * was called less than [frameMillis] ago)
      */
     suspend fun awaitNextFrame() {
-        withContext(coroutineScope.coroutineContext) {
+        withContext(coroutineScope.coroutineContext + dispatcherToBlockOn) {
             channel.receive()
         }
     }
