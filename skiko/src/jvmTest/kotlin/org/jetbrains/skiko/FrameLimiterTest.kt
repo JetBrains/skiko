@@ -159,7 +159,7 @@ class FrameLimiterTest {
                 frameMillis = { frameLimitMillis },
                 dispatcherToBlockOn = StandardTestDispatcher(testScheduler),
                 timeSource = testTimeSource,
-                unpreciseDelay = { timeMillis ->
+                impreciseDelay = { timeMillis ->
                     val ms = ceil(timeMillis.toDouble() / delayPrecisionMillis).toInt() * delayPrecisionMillis
                     delay(ms)
                 }

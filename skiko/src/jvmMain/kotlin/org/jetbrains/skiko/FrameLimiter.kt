@@ -16,7 +16,7 @@ class FrameLimiter(
     private val coroutineScope: CoroutineScope,
     private val frameMillis: () -> Long,
     private val dispatcherToBlockOn: CoroutineDispatcher = Dispatchers.IO.limitedParallelism(64),
-    private val unpreciseDelay: suspend (Long) -> Unit = ::delay,
+    private val impreciseDelay: suspend (Long) -> Unit = ::delay,
     private val timeSource: TimeSource = TimeSource.Monotonic
 ) {
     private val channel = RendezvousBroadcastChannel<Unit>()
@@ -38,7 +38,7 @@ class FrameLimiter(
 
         while (start.elapsedNow() <= millis.milliseconds - actual1msDelay) {
             val beforeDelay = timeSource.markNow()
-            unpreciseDelay(1) // TODO do multiple delays instead of the single one consume more energy? Test it
+            impreciseDelay(1) // TODO do multiple delays instead of the single one consume more energy? Test it
             actual1msDelay = maxOf(actual1msDelay, beforeDelay.elapsedNow())
         }
     }
