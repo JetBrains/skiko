@@ -1,5 +1,7 @@
 package org.jetbrains.skiko
 
+import javax.accessibility.Accessible
+
 /**
  * Provides [MetalAdapter] that holds pointer to native [MTLDevice](https://developer.apple.com/documentation/metal/mtldevice)
  * chosen using [adapterPriority]
