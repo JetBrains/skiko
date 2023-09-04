@@ -2606,6 +2606,7 @@ $dokka.location:org.jetbrains.skiko//isMiddleClick/org.jetbrains.skiko.SkikoPoin
 $dokka.location:org.jetbrains.skiko//isRightClick/org.jetbrains.skiko.SkikoPointerEvent#/PointingToDeclaration/skiko/org.jetbrains.skiko/is-right-click.html
 $dokka.location:org.jetbrains.skiko//kotlinBackend/#/PointingToDeclaration/skiko/org.jetbrains.skiko/kotlin-backend.html
 $dokka.location:org.jetbrains.skiko//loadBytesFromPath/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/load-bytes-from-path.html
+$dokka.location:org.jetbrains.skiko//nativeInitializeAccessible/#javax.accessibility.Accessible/PointingToDeclaration/skiko/org.jetbrains.skiko/native-initialize-accessible.html
 $dokka.location:org.jetbrains.skiko//onContentScaleChanged/#/PointingToDeclaration/skiko/org.jetbrains.skiko/on-content-scale-changed.html
 $dokka.location:org.jetbrains.skiko//orderEmojiAndSymbolsPopup/#/PointingToDeclaration/skiko/org.jetbrains.skiko/order-emoji-and-symbols-popup.html
 $dokka.location:org.jetbrains.skiko//setSystemLookAndFeel/#/PointingToDeclaration/skiko/org.jetbrains.skiko/set-system-look-and-feel.html
