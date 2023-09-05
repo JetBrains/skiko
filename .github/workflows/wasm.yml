@@ -52,7 +52,7 @@ jobs:
         run: |
           cd ./skiko
           source ./emsdk/emsdk_env.sh
-          ./gradlew --stacktrace --info -Pskiko.wasm.enabled=true -Pskiko.js.enabled=true -Pskiko.test.onci=true wasmTest
+          ./gradlew --stacktrace --info -Pskiko.wasm.enabled=true -Pskiko.js.enabled=true -Pskiko.test.onci=true wasmJsTest
           ./gradlew --stacktrace --info -Pskiko.wasm.enabled=true -Pskiko.js.enabled=true publishSkikoWasmRuntimePublicationToMavenLocal
       - uses: actions/upload-artifact@v2
         if: always()
