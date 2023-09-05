@@ -10,6 +10,7 @@ const projectPath = path.resolve(basePath, "..", "..", "..", "..", "..");
 const wasmPath = path.resolve(projectPath, "build", "out", "link", "Release-wasm-wasm")
 const generatedAssetsPath = path.resolve(projectPath, "build", "karma-webpack-out")
 const wasmTestsMjs = path.resolve(basePath, "..", "kotlin", "skiko-kjs-wasm-test.mjs")
+const staticLoadMJs = path.resolve(basePath, "..", "static", "load.mjs")
 const wasmTestsWasm = path.resolve(basePath, "..", "kotlin", "skiko-kjs-wasm-test.wasm")
 const wasmTestsLoaderWasm = path.resolve(basePath, "..", "kotlin", "load-test.mjs")
 
@@ -37,6 +38,7 @@ config.proxies = {
 config.preprocessors[wasmTestsLoaderWasm] = ["webpack"];
 
 config.files = config.files.filter((x) => x !== wasmTestsMjs);
+config.files = config.files.filter((x) => x !== staticLoadMJs);
 
 config.files = [
     path.resolve(wasmPath, "skiko.js"),
