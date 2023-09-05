@@ -1,5 +1,7 @@
 package org.jetbrains.skiko
 
+@OptIn(kotlin.ExperimentalMultiplatform::class)
+@AllowDifferentMembersInActual
 actual interface SkikoInput {
     fun onInputEvent(event: SkikoInputEvent)
 
