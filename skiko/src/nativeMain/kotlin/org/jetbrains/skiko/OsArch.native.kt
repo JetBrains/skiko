@@ -1,5 +1,8 @@
 package org.jetbrains.skiko
 
+import kotlin.experimental.ExperimentalNativeApi
+
+@OptIn(ExperimentalNativeApi::class)
 actual val hostOs: OS by lazy {
     when (Platform.osFamily) {
         OsFamily.MACOSX -> OS.MacOS
@@ -10,6 +13,7 @@ actual val hostOs: OS by lazy {
     }
 }
 
+@OptIn(ExperimentalNativeApi::class)
 actual val hostArch: Arch by lazy {
     when (Platform.cpuArchitecture) {
         CpuArchitecture.X64 -> Arch.X64
