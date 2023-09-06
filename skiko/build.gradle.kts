@@ -1575,7 +1575,7 @@ if (supportJs && supportWasm) {
 }
 
 tasks.getByName("publishSkikoWasmRuntimePublicationToComposeRepoRepository")
-    .dependsOn("publishWasmPublicationToComposeRepoRepository")
+    .dependsOn("publishWasmJsPublicationToComposeRepoRepository")
 
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile>().configureEach {
