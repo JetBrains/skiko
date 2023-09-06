@@ -9,7 +9,7 @@ import platform.darwin.dispatch_get_main_queue
 import platform.darwin.dispatch_queue_t
 import platform.posix.QOS_CLASS_BACKGROUND
 import kotlin.coroutines.CoroutineContext
-import kotlin.native.concurrent.AtomicNativePtr
+import kotlin.concurrent.AtomicNativePtr
 import kotlin.native.concurrent.freeze
 import kotlin.native.internal.NativePtr
 

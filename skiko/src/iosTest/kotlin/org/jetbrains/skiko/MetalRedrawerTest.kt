@@ -14,6 +14,7 @@ class MockNSRunLoop {
     val displayLinks = mutableListOf<CADisplayLink>()
 }
 
+@OptIn(kotlin.experimental.ExperimentalNativeApi::class)
 class MetalRedrawerTest {
     @Suppress("UNUSED", "UNUSED_PARAMETER")
     private class MetalRedrawerOwner(
