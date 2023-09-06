@@ -1452,10 +1452,10 @@ fun configureSignAndPublishDependencies() {
             val name = task.name
             val publishJs = "publishJsPublicationTo"
             val publishWasm = "publishSkikoWasmRuntimePublicationTo"
-            val publishWasmPub = "publishWasmPublicationTo"
+            val publishWasmPub = "publishWasmJsPublicationTo"
             val signWasm = "signSkikoWasmRuntimePublication"
             val signJs = "signJsPublication"
-            val signWasmPub = "signWasmPublication"
+            val signWasmPub = "signWasmJsPublication"
 
             when {
                 name.startsWith(publishJs) -> task.dependsOn(signWasm, signWasmPub)
