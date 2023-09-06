@@ -81,6 +81,7 @@ class SkikoUIView : UIView, UIKeyInputProtocol, UITextInputProtocol {
         pointInside: (Point, UIEvent?) -> Boolean = { _, _ -> true }
     ) : this(skiaLayer, frame, pointInside, skikoUITextInputTrains = object : SkikoUITextInputTraits {})
 
+    @OptIn(kotlin.experimental.ExperimentalNativeApi::class)
     constructor(
         skiaLayer: SkiaLayer,
         frame: CValue<CGRect> = CGRectNull.readValue(),
