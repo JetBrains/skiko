@@ -1,6 +1,6 @@
 package org.jetbrains.skia.impl
 
-import kotlin.native.concurrent.AtomicLong
+import kotlin.concurrent.AtomicLong
 
 actual object Stats {
     val enabled = false
@@ -8,19 +8,19 @@ actual object Stats {
     val allocated = AtomicLong(0)
 
     actual fun onNativeCall() {
-        if (enabled) nativeCalls.increment()
+        if (enabled) nativeCalls.incrementAndGet()
     }
 
     actual fun onAllocated(className: String) {
         if (enabled) {
-            allocated.increment()
+            allocated.incrementAndGet()
             println("AFTER ALLOC: $allocated")
         }
     }
 
     actual fun onDeallocated(className: String) {
         if (enabled) {
-            allocated.decrement()
+            allocated.decrementAndGet()
             println("AFTER DEALLOC: $allocated")
         }
     }
