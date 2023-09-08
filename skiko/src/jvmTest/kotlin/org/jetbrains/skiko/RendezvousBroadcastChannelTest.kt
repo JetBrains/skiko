@@ -175,7 +175,6 @@ class RendezvousBroadcastChannelTest {
         assertEquals(true, isExceptionThrown)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `produce values, consume from multiple coroutines`() = runTest {
 
@@ -213,7 +212,7 @@ class RendezvousBroadcastChannelTest {
             }
         }
 
-        advanceUntilIdle()
+        testScheduler.advanceUntilIdle()
         produceJob.cancel()
 
         assertEquals((0 until 1000).toList(), frames1)

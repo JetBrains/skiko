@@ -6,7 +6,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.util.concurrent.Executors
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class FrameDispatcherTest {
     private var frameCount = 0
 
@@ -16,7 +15,7 @@ class FrameDispatcherTest {
             frameCount++
         }
 
-        advanceUntilIdle()
+        testScheduler.advanceUntilIdle()
 
         assertEquals(0, frameCount)
         frameDispatcher.cancel()
@@ -29,7 +28,7 @@ class FrameDispatcherTest {
         }
 
         frameDispatcher.scheduleFrame()
-        advanceUntilIdle()
+        testScheduler.advanceUntilIdle()
 
         assertEquals(1, frameCount)
         frameDispatcher.cancel()
@@ -45,7 +44,7 @@ class FrameDispatcherTest {
         frameDispatcher.scheduleFrame()
         frameDispatcher.scheduleFrame()
         frameDispatcher.scheduleFrame()
-        advanceUntilIdle()
+        testScheduler.advanceUntilIdle()
 
         assertEquals(1, frameCount)
         frameDispatcher.cancel()
@@ -58,10 +57,10 @@ class FrameDispatcherTest {
         }
 
         frameDispatcher.scheduleFrame()
-        advanceUntilIdle()
+        testScheduler.advanceUntilIdle()
 
         frameDispatcher.scheduleFrame()
-        advanceUntilIdle()
+        testScheduler.advanceUntilIdle()
         assertEquals(2, frameCount)
         frameDispatcher.cancel()
     }
@@ -73,11 +72,11 @@ class FrameDispatcherTest {
         }
 
         frameDispatcher.scheduleFrame()
-        advanceUntilIdle()
+        testScheduler.advanceUntilIdle()
 
         frameDispatcher.scheduleFrame()
         frameDispatcher.scheduleFrame()
-        advanceUntilIdle()
+        testScheduler.advanceUntilIdle()
         assertEquals(2, frameCount)
         frameDispatcher.cancel()
     }
@@ -153,7 +152,7 @@ class FrameDispatcherTest {
         yield()
         assertEquals(3, frameCount)
 
-        advanceUntilIdle()
+        testScheduler.advanceUntilIdle()
         assertEquals(3, frameCount)
     }
 

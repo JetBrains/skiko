@@ -3,6 +3,7 @@ package org.jetbrains.skiko.redrawer
 import kotlinx.coroutines.*
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.context.MetalContextHandler
+import java.util.concurrent.Executors
 import javax.swing.SwingUtilities.*
 
 /**
@@ -38,8 +39,7 @@ internal class MetalRedrawer(
     private val contextHandler: MetalContextHandler
 
     companion object {
-        @OptIn(ExperimentalCoroutinesApi::class)
-        private val dispatcherToBlockOn = Dispatchers.IO.limitedParallelism(64)
+        private val dispatcherToBlockOn = Executors.newCachedThreadPool().asCoroutineDispatcher()
         init {
             Library.load()
         }

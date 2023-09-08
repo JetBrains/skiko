@@ -1,6 +1,7 @@
 package org.jetbrains.skiko
 
 import kotlinx.coroutines.*
+import java.util.concurrent.Executors
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.ExperimentalTime
 import kotlin.time.TimeSource
@@ -11,11 +12,11 @@ import kotlin.time.TimeSource
  * (Windows has ~15ms precision by default, Linux/macOs ~2ms).
  * FrameLimiter will try to delay frames as close as possible to [frameMillis], but not greater
  */
-@OptIn(ExperimentalTime::class, ExperimentalCoroutinesApi::class)
-class FrameLimiter(
+@OptIn(ExperimentalTime::class)
+internal class FrameLimiter(
     private val coroutineScope: CoroutineScope,
     private val frameMillis: () -> Long,
-    private val dispatcherToBlockOn: CoroutineDispatcher = Dispatchers.IO.limitedParallelism(64),
+    dispatcherToBlockOn: CoroutineDispatcher = Executors.newCachedThreadPool().asCoroutineDispatcher(),
     private val impreciseDelay: suspend (Long) -> Unit = ::delay,
     private val timeSource: TimeSource = TimeSource.Monotonic
 ) {
@@ -48,7 +49,7 @@ class FrameLimiter(
      * was called less than [frameMillis] ago)
      */
     suspend fun awaitNextFrame() {
-        withContext(coroutineScope.coroutineContext + dispatcherToBlockOn) {
+        withContext(coroutineScope.coroutineContext) {
             channel.receive()
         }
     }

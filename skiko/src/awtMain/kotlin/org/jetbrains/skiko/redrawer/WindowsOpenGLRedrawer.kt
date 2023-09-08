@@ -1,11 +1,9 @@
 package org.jetbrains.skiko.redrawer
 
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.context.OpenGLContextHandler
+import java.util.concurrent.Executors
 
 internal class WindowsOpenGLRedrawer(
     private val layer: SkiaLayer,
@@ -74,8 +72,7 @@ internal class WindowsOpenGLRedrawer(
     private fun swapBuffers() = swapBuffers(device)
 
     companion object {
-        @OptIn(ExperimentalCoroutinesApi::class)
-        private val dispatcherToBlockOn = Dispatchers.IO.limitedParallelism(64)
+        private val dispatcherToBlockOn = Executors.newCachedThreadPool().asCoroutineDispatcher()
         private val toRedraw = mutableSetOf<WindowsOpenGLRedrawer>()
         private val toRedrawCopy = mutableSetOf<WindowsOpenGLRedrawer>()
         private val toRedrawVisible = toRedrawCopy

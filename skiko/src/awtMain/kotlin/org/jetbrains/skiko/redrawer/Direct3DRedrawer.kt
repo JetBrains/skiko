@@ -1,7 +1,6 @@
 package org.jetbrains.skiko.redrawer
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.withContext
 import org.jetbrains.skia.DirectContext
 import org.jetbrains.skia.Surface
@@ -10,6 +9,7 @@ import org.jetbrains.skia.impl.interopScope
 import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.context.Direct3DContextHandler
+import java.util.concurrent.Executors
 
 internal class Direct3DRedrawer(
     private val layer: SkiaLayer,
@@ -18,8 +18,7 @@ internal class Direct3DRedrawer(
 ) : AWTRedrawer(layer, analytics, GraphicsApi.DIRECT3D) {
 
     companion object {
-        @OptIn(ExperimentalCoroutinesApi::class)
-        private val dispatcherToBlockOn = Dispatchers.IO.limitedParallelism(64)
+        private val dispatcherToBlockOn = Executors.newCachedThreadPool().asCoroutineDispatcher()
     }
 
     private val contextHandler = Direct3DContextHandler(layer)

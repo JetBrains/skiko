@@ -2,7 +2,6 @@ package org.jetbrains.skiko
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.isActive
@@ -18,7 +17,6 @@ import java.util.concurrent.Executors.newSingleThreadExecutor
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.random.Random
 
-@OptIn(ExperimentalCoroutinesApi::class)
 internal class TaskTest {
     @Test
     fun `runAndAwait with finish`() = runTest {
@@ -28,10 +26,10 @@ internal class TaskTest {
             task.runAndAwait {}
         }
 
-        advanceUntilIdle()
+        testScheduler.advanceUntilIdle()
 
         task.finish()
-        advanceUntilIdle()
+        testScheduler.advanceUntilIdle()
 
         assertTrue(job.isCompleted)
     }
@@ -44,7 +42,7 @@ internal class TaskTest {
             task.runAndAwait {}
         }
 
-        advanceUntilIdle()
+        testScheduler.advanceUntilIdle()
         assertFalse(job.isCompleted)
         job.cancel()
     }
@@ -59,7 +57,7 @@ internal class TaskTest {
             }
         }
 
-        advanceUntilIdle()
+        testScheduler.advanceUntilIdle()
         assertTrue(job.isCompleted)
     }
 
@@ -72,7 +70,7 @@ internal class TaskTest {
             task.runAndAwait {}
         }
 
-        advanceUntilIdle()
+        testScheduler.advanceUntilIdle()
         assertFalse(job.isCompleted)
         job.cancel()
     }
