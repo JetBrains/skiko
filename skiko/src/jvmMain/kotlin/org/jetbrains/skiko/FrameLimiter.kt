@@ -2,8 +2,9 @@ package org.jetbrains.skiko
 
 import kotlinx.coroutines.*
 import java.util.concurrent.Executors
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.ExperimentalTime
+import kotlin.time.Duration.Companion.nanoseconds
 import kotlin.time.TimeSource
 
 /**
@@ -12,13 +13,12 @@ import kotlin.time.TimeSource
  * (Windows has ~15ms precision by default, Linux/macOs ~2ms).
  * FrameLimiter will try to delay frames as close as possible to [frameMillis], but not greater
  */
-@OptIn(ExperimentalTime::class)
 internal class FrameLimiter(
     private val coroutineScope: CoroutineScope,
     private val frameMillis: () -> Long,
     dispatcherToBlockOn: CoroutineDispatcher = Executors.newCachedThreadPool().asCoroutineDispatcher(),
     private val impreciseDelay: suspend (Long) -> Unit = ::delay,
-    private val timeSource: TimeSource = TimeSource.Monotonic
+    private val currentTime: () -> Duration = { System.nanoTime().nanoseconds }
 ) {
     private val channel = RendezvousBroadcastChannel<Unit>()
 
@@ -32,15 +32,15 @@ internal class FrameLimiter(
     }
 
     private suspend fun preciseDelay(millis: Long) {
-        val start = timeSource.markNow()
+        val start = currentTime()
         // delay aren't precise, so we should measure what is the actual precision of delay is,
         // so we don't wait longer than we need
         var actual1msDelay = 1.milliseconds
 
-        while (start.elapsedNow() <= millis.milliseconds - actual1msDelay) {
-            val beforeDelay = timeSource.markNow()
+        while (currentTime() - start <= millis.milliseconds - actual1msDelay) {
+            val beforeDelay = currentTime()
             impreciseDelay(1) // TODO do multiple delays instead of the single one consume more energy? Test it
-            actual1msDelay = maxOf(actual1msDelay, beforeDelay.elapsedNow())
+            actual1msDelay = maxOf(actual1msDelay, currentTime() - beforeDelay)
         }
     }
 

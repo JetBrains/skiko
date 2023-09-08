@@ -6,9 +6,9 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import kotlin.math.ceil
-import kotlin.time.ExperimentalTime
+import kotlin.time.Duration.Companion.milliseconds
 
-@OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class FrameLimiterTest {
     private val frameCount = 8
     private val frames = 0 until frameCount
@@ -158,7 +158,7 @@ class FrameLimiterTest {
                 backgroundScope,
                 frameMillis = { frameLimitMillis },
                 dispatcherToBlockOn = StandardTestDispatcher(testScheduler),
-                timeSource = testTimeSource,
+                currentTime = { testScheduler.currentTime.milliseconds },
                 impreciseDelay = { timeMillis ->
                     val ms = ceil(timeMillis.toDouble() / delayPrecisionMillis).toInt() * delayPrecisionMillis
                     delay(ms)
@@ -180,7 +180,7 @@ class FrameLimiterTest {
             scope,
             frameMillis = { 10 },
             dispatcherToBlockOn = StandardTestDispatcher(testScheduler),
-            timeSource = testTimeSource)
+            currentTime = { testScheduler.currentTime.milliseconds })
 
         scope.cancel()
 
@@ -197,7 +197,7 @@ class FrameLimiterTest {
             scope,
             frameMillis = { 10 },
             dispatcherToBlockOn = StandardTestDispatcher(testScheduler),
-            timeSource = testTimeSource)
+            currentTime = { testScheduler.currentTime.milliseconds })
 
         launch {
             scope.cancel()
