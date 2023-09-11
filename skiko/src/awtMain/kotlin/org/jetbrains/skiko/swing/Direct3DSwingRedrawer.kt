@@ -66,7 +66,7 @@ internal class Direct3DSwingRedrawer(
                 context,
                 renderTarget,
                 SurfaceOrigin.TOP_LEFT,
-                SurfaceColorFormat.RGBA_8888,
+                SurfaceColorFormat.BGRA_8888,
                 ColorSpace.sRGB,
                 SurfaceProps(pixelGeometry = PixelGeometry.UNKNOWN)
             )?.autoClose() ?: throw RenderException("Cannot create surface")

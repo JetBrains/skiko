@@ -30,7 +30,7 @@ open class ClocksAwt(private val scaleProvider: () -> Float) : SkikoView {
     override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
         val watchFill = Paint().apply { color = 0xFFFFFFFF.toInt() }
         val watchStroke = Paint().apply {
-               color = 0xFF000000.toInt()
+               color = Color.RED
                mode = PaintMode.STROKE
                strokeWidth = 1f
         }

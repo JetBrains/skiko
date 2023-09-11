@@ -57,7 +57,7 @@ public:
 };
 
 UINT calculateRowPitch(UINT width) {
-    UINT rowPitch = width * 4; // 4 bytes per pixel for DXGI_FORMAT_R8G8B8A8_UNORM
+    UINT rowPitch = width * 4; // 4 bytes per pixel for DXGI_FORMAT_B8G8R8A8_UNORM
     rowPitch = (rowPitch + (D3D12_TEXTURE_DATA_PITCH_ALIGNMENT - 1)) & ~(D3D12_TEXTURE_DATA_PITCH_ALIGNMENT - 1);
     return rowPitch;
 }
@@ -79,7 +79,7 @@ public:
         textureDesc.Height = _height;
         textureDesc.DepthOrArraySize = 1;
         textureDesc.MipLevels = 1;
-        textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        textureDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
         textureDesc.SampleDesc.Count = 1;
         textureDesc.SampleDesc.Quality = 0;
         textureDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
@@ -268,7 +268,7 @@ extern "C"
         GrD3DTextureResourceInfo texResInfo = {};
         texResInfo.fResource.retain(resource);
         texResInfo.fResourceState = D3D12_RESOURCE_STATE_COMMON;
-        texResInfo.fFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+        texResInfo.fFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
         texResInfo.fSampleCount = 1;
         texResInfo.fLevelCount = 1;
         GrBackendRenderTarget* renderTarget = new GrBackendRenderTarget(texture->width, texture->height, texResInfo);
@@ -346,7 +346,7 @@ extern "C"
         dst.pResource = texture->readbackBufferResource;
         dst.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
         dst.PlacedFootprint.Offset = 0;
-        dst.PlacedFootprint.Footprint.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        dst.PlacedFootprint.Footprint.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
         dst.PlacedFootprint.Footprint.Width = texture->width;
         dst.PlacedFootprint.Footprint.Height = texture->height;
         dst.PlacedFootprint.Footprint.Depth = 1;
