@@ -16,14 +16,13 @@ import kotlin.time.TimeSource
 internal class FrameLimiter(
     private val coroutineScope: CoroutineScope,
     private val frameMillis: () -> Long,
-    dispatcherToBlockOn: CoroutineDispatcher = Executors.newCachedThreadPool().asCoroutineDispatcher(),
     private val impreciseDelay: suspend (Long) -> Unit = ::delay,
     private val currentTime: () -> Duration = { System.nanoTime().nanoseconds }
 ) {
     private val channel = RendezvousBroadcastChannel<Unit>()
 
     init {
-        coroutineScope.launch(dispatcherToBlockOn) {
+        coroutineScope.launch {
             while (true) {
                 channel.sendAll(Unit)
                 preciseDelay(frameMillis())

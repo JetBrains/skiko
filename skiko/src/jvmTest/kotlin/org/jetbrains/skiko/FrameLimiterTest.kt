@@ -157,7 +157,6 @@ class FrameLimiterTest {
             val limiter = FrameLimiter(
                 backgroundScope,
                 frameMillis = { frameLimitMillis },
-                dispatcherToBlockOn = StandardTestDispatcher(testScheduler),
                 currentTime = { testScheduler.currentTime.milliseconds },
                 impreciseDelay = { timeMillis ->
                     val ms = ceil(timeMillis.toDouble() / delayPrecisionMillis).toInt() * delayPrecisionMillis
@@ -179,7 +178,6 @@ class FrameLimiterTest {
         val frameLimiter = FrameLimiter(
             scope,
             frameMillis = { 10 },
-            dispatcherToBlockOn = StandardTestDispatcher(testScheduler),
             currentTime = { testScheduler.currentTime.milliseconds })
 
         scope.cancel()
@@ -196,7 +194,6 @@ class FrameLimiterTest {
         val frameLimiter = FrameLimiter(
             scope,
             frameMillis = { 10 },
-            dispatcherToBlockOn = StandardTestDispatcher(testScheduler),
             currentTime = { testScheduler.currentTime.milliseconds })
 
         launch {
