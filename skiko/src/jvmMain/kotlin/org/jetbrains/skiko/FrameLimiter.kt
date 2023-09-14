@@ -48,8 +48,6 @@ internal class FrameLimiter(
      * was called less than [frameMillis] ago)
      */
     suspend fun awaitNextFrame() {
-        withContext(coroutineScope.coroutineContext) {
-            channel.receive()
-        }
+        channel.receive()
     }
 }
