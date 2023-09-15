@@ -39,7 +39,6 @@ internal class MetalRedrawer(
     private val contextHandler: MetalContextHandler
 
     companion object {
-        private val dispatcherToBlockOn = Executors.newCachedThreadPool().asCoroutineDispatcher()
         init {
             Library.load()
         }

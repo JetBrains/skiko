@@ -72,7 +72,6 @@ internal class WindowsOpenGLRedrawer(
     private fun swapBuffers() = swapBuffers(device)
 
     companion object {
-        private val dispatcherToBlockOn = Executors.newCachedThreadPool().asCoroutineDispatcher()
         private val toRedraw = mutableSetOf<WindowsOpenGLRedrawer>()
         private val toRedrawCopy = mutableSetOf<WindowsOpenGLRedrawer>()
         private val toRedrawVisible = toRedrawCopy

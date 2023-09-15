@@ -9,17 +9,12 @@ import org.jetbrains.skia.impl.interopScope
 import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.context.Direct3DContextHandler
-import java.util.concurrent.Executors
 
 internal class Direct3DRedrawer(
     private val layer: SkiaLayer,
     analytics: SkiaLayerAnalytics,
     private val properties: SkiaLayerProperties
 ) : AWTRedrawer(layer, analytics, GraphicsApi.DIRECT3D) {
-
-    companion object {
-        private val dispatcherToBlockOn = Executors.newCachedThreadPool().asCoroutineDispatcher()
-    }
 
     private val contextHandler = Direct3DContextHandler(layer)
     override val renderInfo: String get() = contextHandler.rendererInfo()
