@@ -1,12 +1,11 @@
 package org.jetbrains.skiko
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import kotlin.time.ExperimentalTime
-
-private const val NanosecondsPerMillisecond = 1_000_000L
+import kotlinx.coroutines.*
+import java.util.concurrent.Executors
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.nanoseconds
+import kotlin.time.TimeSource
 
 /**
  * Limit the duration of the frames (to avoid high CPU usage) to [frameMillis].
@@ -17,7 +16,8 @@ private const val NanosecondsPerMillisecond = 1_000_000L
 class FrameLimiter(
     private val coroutineScope: CoroutineScope,
     private val frameMillis: () -> Long,
-    private val nanoTime: () -> Long = System::nanoTime
+    private val impreciseDelay: suspend (Long) -> Unit = ::delay,
+    private val currentTime: () -> Duration = { System.nanoTime().nanoseconds }
 ) {
     private val channel = RendezvousBroadcastChannel<Unit>()
 
@@ -31,15 +31,15 @@ class FrameLimiter(
     }
 
     private suspend fun preciseDelay(millis: Long) {
-        val start = nanoTime()
+        val start = currentTime()
         // delay aren't precise, so we should measure what is the actual precision of delay is,
         // so we don't wait longer than we need
-        var actual1msDelay = 1L
+        var actual1msDelay = 1.milliseconds
 
-        while (nanoTime() - start <= millis * NanosecondsPerMillisecond - actual1msDelay) {
-            val beforeDelay = nanoTime()
-            delay(1) // TODO do multiple delays instead of the single one consume more energy? Test it
-            actual1msDelay = maxOf(actual1msDelay, nanoTime() - beforeDelay)
+        while (currentTime() - start <= millis.milliseconds - actual1msDelay) {
+            val beforeDelay = currentTime()
+            impreciseDelay(1) // TODO do multiple delays instead of the single one consume more energy? Test it
+            actual1msDelay = maxOf(actual1msDelay, currentTime() - beforeDelay)
         }
     }
 

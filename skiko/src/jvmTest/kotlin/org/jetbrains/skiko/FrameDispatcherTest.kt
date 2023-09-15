@@ -1,41 +1,41 @@
 package org.jetbrains.skiko
 
 import kotlinx.coroutines.*
-import kotlinx.coroutines.test.TestCoroutineScope
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.*
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.util.concurrent.Executors
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class FrameDispatcherTest {
     private var frameCount = 0
 
     @Test
-    fun `shouldn't call onFrame after the creating`() = test {
-        FrameDispatcher(scope = this) {
+    fun `shouldn't call onFrame after the creating`() = runTest {
+        val frameDispatcher = FrameDispatcher(scope = this) {
             frameCount++
         }
 
-        advanceUntilIdle()
+        testScheduler.advanceUntilIdle()
 
         assertEquals(0, frameCount)
+        frameDispatcher.cancel()
     }
 
     @Test
-    fun `scheduleFrame after creating`() = test {
+    fun `scheduleFrame after creating`() = runTest {
         val frameDispatcher = FrameDispatcher(scope = this) {
             frameCount++
         }
 
         frameDispatcher.scheduleFrame()
-        advanceUntilIdle()
+        testScheduler.advanceUntilIdle()
 
         assertEquals(1, frameCount)
+        frameDispatcher.cancel()
     }
 
     @Test
-    fun `scheduleFrame multiple times after creating`() = test {
+    fun `scheduleFrame multiple times after creating`() = runTest {
         val frameDispatcher = FrameDispatcher(scope = this) {
             frameCount++
         }
@@ -44,42 +44,45 @@ class FrameDispatcherTest {
         frameDispatcher.scheduleFrame()
         frameDispatcher.scheduleFrame()
         frameDispatcher.scheduleFrame()
-        advanceUntilIdle()
+        testScheduler.advanceUntilIdle()
 
         assertEquals(1, frameCount)
+        frameDispatcher.cancel()
     }
 
     @Test
-    fun `scheduleFrame second time after first onFrame`() = test {
+    fun `scheduleFrame second time after first onFrame`() = runTest {
         val frameDispatcher = FrameDispatcher(scope = this) {
             frameCount++
         }
 
         frameDispatcher.scheduleFrame()
-        advanceUntilIdle()
+        testScheduler.advanceUntilIdle()
 
         frameDispatcher.scheduleFrame()
-        advanceUntilIdle()
+        testScheduler.advanceUntilIdle()
         assertEquals(2, frameCount)
+        frameDispatcher.cancel()
     }
 
     @Test
-    fun `scheduleFrame second time twice after first onFrame`() = test {
+    fun `scheduleFrame second time twice after first onFrame`() = runTest {
         val frameDispatcher = FrameDispatcher(scope = this) {
             frameCount++
         }
 
         frameDispatcher.scheduleFrame()
-        advanceUntilIdle()
+        testScheduler.advanceUntilIdle()
 
         frameDispatcher.scheduleFrame()
         frameDispatcher.scheduleFrame()
-        advanceUntilIdle()
+        testScheduler.advanceUntilIdle()
         assertEquals(2, frameCount)
+        frameDispatcher.cancel()
     }
 
     @Test
-    fun `scheduleFrame during onFrame`() = test {
+    fun `scheduleFrame during onFrame`() = runTest {
         lateinit var frameDispatcher: FrameDispatcher
         frameDispatcher = FrameDispatcher(scope = this) {
             frameCount++
@@ -98,10 +101,11 @@ class FrameDispatcherTest {
 
         yield()
         assertEquals(4, frameCount)
+        frameDispatcher.cancel()
     }
 
     @Test
-    fun `scheduleFrame multiple times during onFrame`() = test {
+    fun `scheduleFrame multiple times during onFrame`() = runTest {
         lateinit var frameDispatcher: FrameDispatcher
         frameDispatcher = FrameDispatcher(scope = this) {
             frameCount++
@@ -122,13 +126,13 @@ class FrameDispatcherTest {
 
         yield()
         assertEquals(4, frameCount)
+        frameDispatcher.cancel()
     }
 
     @Test
-    fun `cancel coroutine scope`() = test {
-        val scope = CoroutineScope(coroutineContext)
-
+    fun `cancel coroutine scope`() = runTest {
         lateinit var frameDispatcher: FrameDispatcher
+        val scope = CoroutineScope(coroutineContext + Job())
         frameDispatcher = FrameDispatcher(scope) {
             frameCount++
             frameDispatcher.scheduleFrame()
@@ -148,7 +152,7 @@ class FrameDispatcherTest {
         yield()
         assertEquals(3, frameCount)
 
-        advanceUntilIdle()
+        testScheduler.advanceUntilIdle()
         assertEquals(3, frameCount)
     }
 
@@ -183,14 +187,5 @@ class FrameDispatcherTest {
         }
 
         assertEquals(listOf("frame0", "task", "frame1"), history)
-    }
-
-    private fun test(
-        block: suspend TestCoroutineScope.() -> Unit
-    ) = runBlockingTest {
-        pauseDispatcher()
-        val job = Job()
-        TestCoroutineScope(coroutineContext + job).block()
-        job.cancel()
     }
 }

@@ -1,11 +1,9 @@
 package org.jetbrains.skiko.redrawer
 
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.context.MetalContextHandler
+import java.util.concurrent.Executors
 import javax.swing.SwingUtilities.*
 
 /**
@@ -132,7 +130,7 @@ internal class MetalRedrawer(
         // Executors.newSingleThreadExecutor().asCoroutineDispatcher(): 50 FPS, 150% CPU
         // Dispatchers.IO: 50 FPS, 200% CPU
         inDrawScope {
-            withContext(Dispatchers.IO) {
+            withContext(dispatcherToBlockOn) {
                 performDraw()
             }
         }
