@@ -2712,7 +2712,7 @@ $dokka.location:org.jetbrains.skiko/FrameDispatcher/FrameDispatcher/#kotlinx.cor
 $dokka.location:org.jetbrains.skiko/FrameDispatcher/cancel/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-frame-dispatcher/cancel.html
 $dokka.location:org.jetbrains.skiko/FrameDispatcher/scheduleFrame/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-frame-dispatcher/schedule-frame.html
 $dokka.location:org.jetbrains.skiko/FrameLimiter///PointingToDeclaration/skiko/org.jetbrains.skiko/-frame-limiter/index.html
-$dokka.location:org.jetbrains.skiko/FrameLimiter/FrameLimiter/#[Error type: Unresolved type for CoroutineScope]#kotlin.Function0[kotlin.Long]#kotlin.Function0[kotlin.Long]/PointingToDeclaration/skiko/org.jetbrains.skiko/-frame-limiter/-frame-limiter.html
+$dokka.location:org.jetbrains.skiko/FrameLimiter/FrameLimiter/#[Error type: Unresolved type for CoroutineScope]#kotlin.Function0[kotlin.Long]#kotlin.coroutines.SuspendFunction1[kotlin.Long,kotlin.Unit]#kotlin.Function0[kotlin.time.Duration]/PointingToDeclaration/skiko/org.jetbrains.skiko/-frame-limiter/-frame-limiter.html
 $dokka.location:org.jetbrains.skiko/FrameLimiter/awaitNextFrame/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-frame-limiter/await-next-frame.html
 $dokka.location:org.jetbrains.skiko/GenericSkikoView///PointingToDeclaration/skiko/org.jetbrains.skiko/-generic-skiko-view/index.html
 $dokka.location:org.jetbrains.skiko/GenericSkikoView/GenericSkikoView/#org.jetbrains.skiko.SkiaLayer#org.jetbrains.skiko.SkikoView/PointingToDeclaration/skiko/org.jetbrains.skiko/-generic-skiko-view/-generic-skiko-view.html
