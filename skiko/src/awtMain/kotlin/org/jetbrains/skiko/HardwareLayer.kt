@@ -2,6 +2,7 @@ package org.jetbrains.skiko
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
+import org.jetbrains.skiko.redrawer.dispatcherToBlockOn
 import java.awt.Canvas
 import java.awt.Component
 import java.awt.Graphics
@@ -130,7 +131,7 @@ internal fun layerFrameLimiter(
     }
 
     return FrameLimiter(
-        scope,
+        scope + dispatcherToBlockOn,
         frameMillis = {
             frames.trySend(Unit)
             (1000 / state.frameLimit).toLong()

@@ -13,7 +13,7 @@ import kotlin.time.TimeSource
  * (Windows has ~15ms precision by default, Linux/macOs ~2ms).
  * FrameLimiter will try to delay frames as close as possible to [frameMillis], but not greater
  */
-internal class FrameLimiter(
+class FrameLimiter(
     private val coroutineScope: CoroutineScope,
     private val frameMillis: () -> Long,
     private val impreciseDelay: suspend (Long) -> Unit = ::delay,
@@ -48,6 +48,8 @@ internal class FrameLimiter(
      * was called less than [frameMillis] ago)
      */
     suspend fun awaitNextFrame() {
-        channel.receive()
+        withContext(coroutineScope.coroutineContext) {
+            channel.receive()
+        }
     }
 }
