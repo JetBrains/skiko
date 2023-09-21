@@ -1334,6 +1334,34 @@ publishing {
             }
         }
 
+        // task for publishing skiko-runtime-all that is needed for easier setup in IntelliJ and plugins
+        val allPossibleJvmRuntimeLibs = listOf(
+            OS.Windows to Arch.X64,
+            OS.Windows to Arch.Arm64,
+            OS.Linux to Arch.X64,
+            OS.Linux to Arch.Arm64,
+            OS.MacOS to Arch.X64,
+            OS.MacOS to Arch.Arm64,
+        ).map { (os, arch) ->
+            SkikoArtifacts.jvmRuntimeArtifactIdFor(os, arch)
+        }
+
+        create<MavenPublication>("skikoJvmRuntimeAll") {
+            pomNameForPublication[name] = "Composition of all Skiko JVM Runtimes"
+            artifactId = "skiko-awt-runtime-all"
+            pom.withXml {
+                val dependenciesNode = asNode().appendNode("dependencies")
+                for (runtimeLib in allPossibleJvmRuntimeLibs) {
+                    dependenciesNode.appendNode("dependency").apply {
+                        appendNode("groupId", SkikoArtifacts.groupId)
+                        appendNode("artifactId", runtimeLib)
+                        appendNode("version", skiko.deployVersion)
+                        appendNode("scope", "compile")
+                    }
+                }
+            }
+        }
+
         if (supportWasm) {
             create<MavenPublication>("skikoWasmRuntime") {
                 pomNameForPublication[name] = "Skiko WASM Runtime"
