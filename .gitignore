@@ -10,3 +10,4 @@ deploy.bat
 *.xcodeproj
 skiko/src/jvmMain/java
 .cache
+.clangd
