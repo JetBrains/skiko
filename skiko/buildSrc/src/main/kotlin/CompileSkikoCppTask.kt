@@ -184,6 +184,7 @@ abstract class CompileSkikoCppTask() : AbstractSkikoNativeToolTask() {
             }
         }
 
+        // Create compile_commands.json to be able to open the project in Fleet. It is CLang convention (https://clang.llvm.org/docs/JSONCompilationDatabase.html#build-system-integration)
         if (compiler.get().startsWith("clang")) {
             val compileCommands = buildString {
                 appendLine("[")
