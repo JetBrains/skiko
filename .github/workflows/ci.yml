@@ -2,7 +2,7 @@
 name: CI
 
 env:
-  IOS_SIM_UUID: '9C58D5E8-9AE8-4595-A262-35CA4871E886' # https://github.com/futureware-tech/simulator-action/wiki/Devices-macos-13
+  IOS_SIM_UUID: '856515E5-1A3B-4E89-93E4-421B21D79892' # take a look at `xcrun simctl list devices` at GitHub Actions log
 
 on:
   push:
@@ -61,6 +61,8 @@ jobs:
           distribution: 'adopt'
           java-version: '11'
           cache: 'gradle'
+
+      - run: xcrun simctl list devices # Look here to get device ids
 
       - name: 'Compile and run iOS x64 tests'
         uses: nick-fields/retry@v2
