@@ -2,7 +2,7 @@
 name: CI
 
 env:
-  IOS_SIM_UUID: '9C58D5E8-9AE8-4595-A262-35CA4871E886' # https://github.com/futureware-tech/simulator-action/wiki/Devices-macos-13
+  IOS_SIM_UUID: '7C3DDFD9-0477-41D8-BD66-E17FFA85D3A1' # https://github.com/futureware-tech/simulator-action/wiki/Devices-macos-13
 
 on:
   push:
