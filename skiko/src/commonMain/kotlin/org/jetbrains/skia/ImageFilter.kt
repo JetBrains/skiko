@@ -5,31 +5,6 @@ import org.jetbrains.skia.impl.*
 
 class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     companion object {
-        fun makeAlphaThreshold(
-            r: Region?,
-            innerMin: Float,
-            outerMax: Float,
-            input: ImageFilter?,
-            crop: IRect?
-        ): ImageFilter {
-            return try {
-                Stats.onNativeCall()
-                interopScope {
-                    ImageFilter(
-                        _nMakeAlphaThreshold(
-                            getPtr(r),
-                            innerMin, outerMax, getPtr(input),
-                            toInterop(crop?.serializeToIntArray())
-                        )
-                    )
-                }
-
-            } finally {
-                reachabilityBarrier(r)
-                reachabilityBarrier(input)
-            }
-        }
-
         fun makeArithmetic(
             k1: Float,
             k2: Float,
@@ -251,7 +226,7 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
             }
         }
 
-        fun makeMagnifier(r: Rect, inset: Float, input: ImageFilter?, crop: IRect?): ImageFilter {
+        fun makeMagnifier(r: Rect, zoomAmount: Float, inset: Float, samplingMode: SamplingMode, input: ImageFilter?, crop: IRect?): ImageFilter {
             return try {
                 Stats.onNativeCall()
                 interopScope {
@@ -261,7 +236,10 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
                             r.top,
                             r.right,
                             r.bottom,
+                            zoomAmount,
                             inset,
+                            samplingMode._packedInt1(),
+                            samplingMode._packedInt2(),
                             getPtr(input),
                             toInterop(crop?.serializeToIntArray())
                         )
@@ -681,15 +659,6 @@ class ImageFilter internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     }
 }
 
-@ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeAlphaThreshold")
-private external fun _nMakeAlphaThreshold(
-    regionPtr: NativePointer,
-    innerMin: Float,
-    outerMax: Float,
-    input: NativePointer,
-    crop: InteropPointer
-): NativePointer
-
 @ExternalSymbolName("org_jetbrains_skia_ImageFilter__1nMakeArithmetic")
 private external fun _nMakeArithmetic(
     k1: Float,
@@ -763,7 +732,10 @@ private external fun _nMakeMagnifier(
     t: Float,
     r: Float,
     b: Float,
+    zoomAmount: Float,
     inset: Float,
+    samplingModeVal1: Int,
+    samplingModeVal2: Int,
     input: NativePointer,
     crop: InteropPointer
 ): NativePointer

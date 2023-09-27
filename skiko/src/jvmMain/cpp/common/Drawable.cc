@@ -1,5 +1,6 @@
 #include <iostream>
 #include <jni.h>
+#include "SkPicture.h"
 #include "SkDrawable.h"
 #include "interop.hh"
 
@@ -68,7 +69,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_DrawableKt__1nDraw
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_DrawableKt__1nMakePictureSnapshot
   (JNIEnv* env, jclass jclass, jlong ptr) {
     SkijaDrawableImpl* instance = reinterpret_cast<SkijaDrawableImpl*>(static_cast<uintptr_t>(ptr));
-    return reinterpret_cast<jlong>(instance->newPictureSnapshot());
+    return reinterpret_cast<jlong>(instance->makePictureSnapshot().release());
 }
 
 extern "C" JNIEXPORT jint JNICALL Java_org_jetbrains_skia_DrawableKt_Drawable_1nGetGenerationId

@@ -22,7 +22,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrKt__1nGetFamil
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrKt__1nMakeStyleSet
   (JNIEnv* env, jclass jclass, jlong ptr, jint index) {
     SkFontMgr* instance = reinterpret_cast<SkFontMgr*>(static_cast<uintptr_t>(ptr));
-    SkFontStyleSet* styleSet = instance->createStyleSet(index);
+    SkFontStyleSet* styleSet = instance->createStyleSet(index).release();
     return reinterpret_cast<jlong>(styleSet);
 }
 
@@ -30,7 +30,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrKt__1nMatchFam
   (JNIEnv* env, jclass jclass, jlong ptr, jstring familyNameStr) {
     SkFontMgr* instance = reinterpret_cast<SkFontMgr*>(static_cast<uintptr_t>(ptr));
     SkString familyName = skString(env, familyNameStr);
-    SkFontStyleSet* styleSet = instance->matchFamily(familyName.c_str());
+    SkFontStyleSet* styleSet = instance->matchFamily(familyName.c_str()).release();
     return reinterpret_cast<jlong>(styleSet);
 }
 
@@ -38,7 +38,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrKt__1nMatchFam
   (JNIEnv* env, jclass jclass, jlong ptr, jstring familyNameStr, jint fontStyle) {
     SkFontMgr* instance = reinterpret_cast<SkFontMgr*>(static_cast<uintptr_t>(ptr));
     SkString familyName = skString(env, familyNameStr);
-    SkTypeface* typeface = instance->matchFamilyStyle(familyName.c_str(), skija::FontStyle::fromJava(fontStyle));
+    SkTypeface* typeface = instance->matchFamilyStyle(familyName.c_str(), skija::FontStyle::fromJava(fontStyle)).release();
     return reinterpret_cast<jlong>(typeface);
 }
 
@@ -53,7 +53,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_FontMgrKt__1nMatchFam
     for (int i = 0; i < bcp47.size(); ++i)
         bcp47[i] = bcp47Strings[i].c_str();
     
-    SkTypeface* typeface = instance->matchFamilyStyleCharacter(familyName.c_str(), skija::FontStyle::fromJava(fontStyle), bcp47.data(), (int) bcp47.size(), character);
+    SkTypeface* typeface = instance->matchFamilyStyleCharacter(familyName.c_str(), skija::FontStyle::fromJava(fontStyle), bcp47.data(), (int) bcp47.size(), character).release();
     
     return reinterpret_cast<jlong>(typeface);
 }

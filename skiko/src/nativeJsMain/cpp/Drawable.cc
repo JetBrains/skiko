@@ -1,4 +1,5 @@
 #include <iostream>
+#include "SkPicture.h"
 #include "SkDrawable.h"
 #include "common.h"
 
@@ -80,7 +81,7 @@ SKIKO_EXPORT void org_jetbrains_skia_Drawable__1nDraw
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Drawable__1nMakePictureSnapshot
   (KNativePointer ptr) {
     SkikoDrawable* instance = reinterpret_cast<SkikoDrawable*>((ptr));
-    return reinterpret_cast<KNativePointer>(instance->newPictureSnapshot());
+    return reinterpret_cast<KNativePointer>(instance->makePictureSnapshot().release());
 }
 
 SKIKO_EXPORT KInt org_jetbrains_skia_Drawable__1nGetGenerationId

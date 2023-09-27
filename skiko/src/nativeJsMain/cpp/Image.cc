@@ -2,6 +2,11 @@
 #include "SkData.h"
 #include "SkImage.h"
 #include "SkBitmap.h"
+#include "SkShader.h"
+#include "SkEncodedImageFormat.h"
+#include "encode/SkPngEncoder.h"
+#include "encode/SkJpegEncoder.h"
+#include "encode/SkWebpEncoder.h"
 #include "common.h"
 
 
@@ -13,7 +18,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nMakeRaster
                                               static_cast<SkColorType>(colorType),
                                               static_cast<SkAlphaType>(alphaType),
                                               sk_ref_sp<SkColorSpace>(colorSpace));
-    sk_sp<SkImage> image = SkImage::MakeRasterCopy(SkPixmap(imageInfo, bytesArr, rowBytes));
+    sk_sp<SkImage> image = SkImages::RasterFromPixmapCopy(SkPixmap(imageInfo, bytesArr, rowBytes));
     return reinterpret_cast<KNativePointer>(image.release());
 }
 
@@ -27,21 +32,21 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nMakeRasterData
                                               static_cast<SkAlphaType>(alphaType),
                                               sk_ref_sp<SkColorSpace>(colorSpace));
     SkData* data = reinterpret_cast<SkData*>((dataPtr));
-    sk_sp<SkImage> image = SkImage::MakeRasterData(imageInfo, sk_ref_sp(data), rowBytes);
+    sk_sp<SkImage> image = SkImages::RasterFromData(imageInfo, sk_ref_sp(data), rowBytes);
     return reinterpret_cast<KNativePointer>(image.release());
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nMakeFromBitmap
   (KNativePointer bitmapPtr) {
     SkBitmap* bitmap = reinterpret_cast<SkBitmap*>((bitmapPtr));
-    sk_sp<SkImage> image = SkImage::MakeFromBitmap(*bitmap);
+    sk_sp<SkImage> image = SkImages::RasterFromBitmap(*bitmap);
     return reinterpret_cast<KNativePointer>(image.release());
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nMakeFromPixmap
   (KNativePointer pixmapPtr) {
     SkPixmap* pixmap = reinterpret_cast<SkPixmap*>((pixmapPtr));
-    sk_sp<SkImage> image = SkImage::MakeFromRaster(*pixmap, nullptr, nullptr);
+    sk_sp<SkImage> image = SkImages::RasterFromPixmap(*pixmap, nullptr, nullptr);
     return reinterpret_cast<KNativePointer>(image.release());
 }
 
@@ -49,7 +54,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nMakeFromPixmap
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nMakeFromEncoded
   (KByte* encodedArray, KInt encodedLen) {
     sk_sp<SkData> encodedData = SkData::MakeWithCopy(encodedArray, encodedLen);
-    sk_sp<SkImage> image = SkImage::MakeFromEncoded(encodedData);
+    sk_sp<SkImage> image = SkImages::DeferredFromEncodedData(encodedData);
     return reinterpret_cast<KNativePointer>(image.release());
 }
 
@@ -64,8 +69,32 @@ SKIKO_EXPORT void org_jetbrains_skia_Image__1nGetImageInfo
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nEncodeToData
   (KNativePointer ptr, KInt format, KInt quality) {
     SkImage* instance = reinterpret_cast<SkImage*>((ptr));
-    SkData* data = instance->encodeToData(static_cast<SkEncodedImageFormat>(format), quality).release();
-    return reinterpret_cast<KNativePointer>(data);
+    SkEncodedImageFormat skFormat = static_cast<SkEncodedImageFormat>(format);
+    if (!instance->isTextureBacked()) {
+       switch (skFormat) {
+         case SkEncodedImageFormat::kPNG: {
+           SkPngEncoder::Options options = SkPngEncoder::Options();
+           options.fZLibLevel = std::max(quality / 10, 9);
+           SkData* data = SkPngEncoder::Encode(nullptr, instance, options).release();
+           return reinterpret_cast<KNativePointer>(data);
+         }
+         case SkEncodedImageFormat::kJPEG: {
+           SkJpegEncoder::Options options = SkJpegEncoder::Options();
+           options.fQuality = quality;
+           SkData* data = SkJpegEncoder::Encode(nullptr, instance, options).release();
+           return reinterpret_cast<KNativePointer>(data);
+         }
+         case SkEncodedImageFormat::kWEBP: {
+           SkWebpEncoder::Options options = SkWebpEncoder::Options();
+           options.fQuality = quality;
+           SkData* data = SkWebpEncoder::Encode(nullptr, instance, options).release();
+           return reinterpret_cast<KNativePointer>(data);
+         }
+       default:
+         break;
+       }
+    }
+    return reinterpret_cast<KNativePointer>(0);
 }
 
 

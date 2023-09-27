@@ -22,7 +22,7 @@ SKIKO_EXPORT KInteropPointer org_jetbrains_skia_FontMgr__1nGetFamilyName
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_FontMgr__1nMakeStyleSet
   (KNativePointer ptr, KInt index) {
     SkFontMgr* instance = reinterpret_cast<SkFontMgr*>(ptr);
-    SkFontStyleSet* styleSet = instance->createStyleSet(index);
+    SkFontStyleSet* styleSet = instance->createStyleSet(index).release();
 
     return reinterpret_cast<KNativePointer>(styleSet);
 }
@@ -31,7 +31,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_FontMgr__1nMakeStyleSet
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_FontMgr__1nMatchFamily
   (KNativePointer ptr, KInteropPointer familyNameStr) {
     SkFontMgr* instance = reinterpret_cast<SkFontMgr*>(ptr);
-    SkFontStyleSet* styleSet = instance->matchFamily(reinterpret_cast<char *>(familyNameStr));
+    SkFontStyleSet* styleSet = instance->matchFamily(reinterpret_cast<char *>(familyNameStr)).release();
     return reinterpret_cast<KNativePointer>(styleSet);
 }
 
@@ -39,7 +39,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_FontMgr__1nMatchFamilyStyle
   (KNativePointer ptr, KInteropPointer familyNameStr, KInt fontStyle) {
     SkFontMgr* instance = reinterpret_cast<SkFontMgr*>(ptr);
     SkString familyName = skString(familyNameStr);
-    SkTypeface* typeface = instance->matchFamilyStyle(familyName.c_str(), skija::FontStyle::fromKotlin(fontStyle));
+    SkTypeface* typeface = instance->matchFamilyStyle(familyName.c_str(), skija::FontStyle::fromKotlin(fontStyle)).release();
     return reinterpret_cast<KNativePointer>(typeface);
 }
 
@@ -54,7 +54,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_FontMgr__1nMatchFamilyStyleCharac
     for (int i = 0; i < bcp47.size(); ++i)
         bcp47[i] = bcp47Strings[i].c_str();
 
-    SkTypeface* typeface = instance->matchFamilyStyleCharacter(familyName.c_str(), skija::FontStyle::fromKotlin(fontStyle), bcp47.data(), (int) bcp47.size(), character);
+    SkTypeface* typeface = instance->matchFamilyStyleCharacter(familyName.c_str(), skija::FontStyle::fromKotlin(fontStyle), bcp47.data(), (int) bcp47.size(), character).release();
 
     return reinterpret_cast<KNativePointer>(typeface);
 }

@@ -1,9 +1,11 @@
 #include <iostream>
 #include "GrDirectContext.h"
 #include "SkSurface.h"
+#include "include/gpu/ganesh/SkSurfaceGanesh.h"
 #include "common.h"
 
 #ifdef SK_METAL
+#include "include/gpu/ganesh/mtl/SkSurfaceMetal.h"
 #include "include/gpu/mtl/GrMtlTypes.h"
 #endif
 
@@ -21,7 +23,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeRasterDirect
                                               sk_ref_sp<SkColorSpace>(colorSpace));
     std::unique_ptr<SkSurfaceProps> surfaceProps = skija::SurfaceProps::toSkSurfaceProps(surfacePropsInts);
 
-    sk_sp<SkSurface> instance = SkSurface::MakeRasterDirect(
+    sk_sp<SkSurface> instance = SkSurfaces::WrapPixels(
       imageInfo,
       reinterpret_cast<void*>(pixelsPtr),
       rowBytes,
@@ -37,7 +39,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeRasterDirectWithPi
     SkPixmap* pixmap = reinterpret_cast<SkPixmap*>(pixmapPtr);
     std::unique_ptr<SkSurfaceProps> surfaceProps = skija::SurfaceProps::toSkSurfaceProps(surfacePropsInts);
 
-    sk_sp<SkSurface> instance = SkSurface::MakeRasterDirect(*pixmap, surfaceProps.get());
+    sk_sp<SkSurface> instance = SkSurfaces::WrapPixels(*pixmap, surfaceProps.get());
     return reinterpret_cast<KNativePointer>(instance.release());
 }
 
@@ -56,7 +58,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeRaster
                                               sk_ref_sp<SkColorSpace>(colorSpace));
     std::unique_ptr<SkSurfaceProps> surfaceProps = skija::SurfaceProps::toSkSurfaceProps(surfacePropsInts);
 
-    sk_sp<SkSurface> instance = SkSurface::MakeRaster(
+    sk_sp<SkSurface> instance = SkSurfaces::Raster(
       imageInfo,
       rowBytes,
       surfaceProps.get());
@@ -66,10 +68,8 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeRaster
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeRasterN32Premul
   (KInt width, KInt height) {
-    sk_sp<SkSurface> surface = SkSurface::MakeRasterN32Premul(
-        width, height,
-        /* const SkSurfaceProps* */ nullptr
-    );
+    SkImageInfo imageInfo = SkImageInfo::MakeN32Premul(width, height);
+    sk_sp<SkSurface> surface = SkSurfaces::Raster(imageInfo);
     return reinterpret_cast<KNativePointer>(surface.release());
 }
 
@@ -84,7 +84,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeFromBackendRenderT
 
     std::unique_ptr<SkSurfaceProps> surfaceProps = skija::SurfaceProps::toSkSurfaceProps(surfacePropsInts);
 
-    sk_sp<SkSurface> surface = SkSurface::MakeFromBackendRenderTarget(
+    sk_sp<SkSurface> surface = SkSurfaces::WrapBackendRenderTarget(
         static_cast<GrRecordingContext*>(context),
         *backendRenderTarget,
         grSurfaceOrigin,
@@ -107,7 +107,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeFromMTKView
     sk_sp<SkColorSpace> colorSpace = sk_ref_sp<SkColorSpace>(reinterpret_cast<SkColorSpace*>((colorSpacePtr)));
     std::unique_ptr<SkSurfaceProps> surfaceProps = skija::SurfaceProps::toSkSurfaceProps(surfacePropsInts);
 
-    sk_sp<SkSurface> surface = SkSurface::MakeFromMTKView(
+    sk_sp<SkSurface> surface = SkSurfaces::WrapMTKView(
         static_cast<GrRecordingContext*>(context),
         mtkView,
         grSurfaceOrigin,
@@ -137,8 +137,8 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeRenderTarget
                                               sk_ref_sp<SkColorSpace>(colorSpace));
     std::unique_ptr<SkSurfaceProps> surfaceProps = skija::SurfaceProps::toSkSurfaceProps(surfacePropsInts);
 
-    sk_sp<SkSurface> instance = SkSurface::MakeRenderTarget(
-      context, budgeted ? SkBudgeted::kYes : SkBudgeted::kNo,
+    sk_sp<SkSurface> instance = SkSurfaces::RenderTarget(
+      context, budgeted ? skgpu::Budgeted::kYes : skgpu::Budgeted::kNo,
       imageInfo,
       sampleCount, static_cast<GrSurfaceOrigin>(surfaceOrigin),
       surfaceProps.get(),
@@ -148,7 +148,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeRenderTarget
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Surface__1nMakeNull
   (KInt width, KInt height) {
-  sk_sp<SkSurface> instance = SkSurface::MakeNull(width, height);
+  sk_sp<SkSurface> instance = SkSurfaces::Null(width, height);
   return reinterpret_cast<KNativePointer>(instance.release());
 }
 
