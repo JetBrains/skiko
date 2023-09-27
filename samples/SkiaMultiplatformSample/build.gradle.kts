@@ -7,6 +7,7 @@ buildscript {
         mavenCentral()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
         maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
+        maven("https://maven.pkg.jetbrains.space/kotlin/p/wasm/experimental")
     }
 
     dependencies {
@@ -126,7 +127,7 @@ kotlin {
             dependsOn(jsWasmMain)
         }
 
-        val wasmMain by getting {
+        val wasmJsMain by getting {
             dependsOn(jsWasmMain)
         }
 
@@ -322,10 +323,15 @@ fun KotlinNativeTarget.configureToLaunchFromXcode() {
 // HACK: some dependencies (coroutines -wasm0 and atomicfu -wasm0) reference deleted *-dev libs
 configurations.all {
     val conf = this
+    val isWasm = conf.name.contains("wasm", true)
+
     resolutionStrategy.eachDependency {
-        if (requested.version == "1.8.20-dev-3308") {
-            println("Substitute deleted version ${requested.module}:${requested.version} for ${conf.name}")
-            useVersion(project.properties["kotlin.version"] as String)
+        if (requested.module.name.startsWith("kotlin-stdlib")) {
+            val kotlinVersion = project.property("kotlin.version") as String
+            useVersion(kotlinVersion)
+        }
+        if (requested.module.name == "kotlinx-atomicfu-runtime") {
+            useVersion("1.9.20-Beta2")
         }
     }
 }
