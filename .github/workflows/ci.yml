@@ -2,7 +2,7 @@
 name: CI
 
 env:
-  IOS_SIM_UUID: 'BF8B95EE-B3F0-40C0-A3DB-052E385F4EE7' # xcrun simctl list devices
+  IOS_SIM_UUID: '856515E5-1A3B-4E89-93E4-421B21D79892' # take a look at `xcrun simctl list devices` at GitHub Actions log
 
 on:
   push:
