@@ -182,17 +182,18 @@ abstract class CompileSkikoCppTask() : AbstractSkikoNativeToolTask() {
             for (work in submittedWorks) {
                 RunExternalProcessWork.workResults.remove(work)
             }
-        }
 
-        if (compiler.get().startsWith("clang")) {
-            val compileCommands = buildString {
-                appendLine("[")
-                append(sourceOutputPairs.joinToString(",\n") { (_, outputFile) ->
-                    Files.readString(Path.of(outputFile.absolutePath + ".json")).trim().removeSuffix(",")
-                })
-                appendLine("]")
+            // Create compile_commands.json to be able to open the project in Fleet. It is CLang convention (https://clang.llvm.org/docs/JSONCompilationDatabase.html#build-system-integration)
+            if (compiler.get().startsWith("clang")) {
+                val compileCommands = buildString {
+                    appendLine("[")
+                    append(sourceOutputPairs.joinToString(",\n") { (_, outputFile) ->
+                        Files.readString(Path.of(outputFile.absolutePath + ".json")).trim().removeSuffix(",")
+                    })
+                    appendLine("]")
+                }
+                Files.writeString(outDir.toPath().resolve("compile_commands.json"), compileCommands)
             }
-            Files.writeString(outDir.toPath().resolve("compile_commands.json"), compileCommands)
         }
     }
 
