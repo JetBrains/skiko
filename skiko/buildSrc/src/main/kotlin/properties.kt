@@ -140,8 +140,7 @@ class SkikoProperties(private val myProject: Project) {
     fun skiaReleaseFor(os: OS, arch: Arch, buildType: SkiaBuildType, isIosSim: Boolean = false): String {
         val target = "${os.idWithSuffix(isIosSim = isIosSim)}-${arch.id}"
         val tag = myProject.property("dependencies.skia.$target") as String
-        val suffix = if (os == OS.Linux && arch == Arch.X64) "-ubuntu18" else ""
-        return "${tag}/Skia-${tag}-${os.idWithSuffix(isIosSim = isIosSim)}-${buildType.id}-${arch.id}$suffix"
+        return "${tag}/Skia-${tag}-${os.idWithSuffix(isIosSim = isIosSim)}-${buildType.id}-${arch.id}"
     }
 
     val releaseGithubVersion: String
