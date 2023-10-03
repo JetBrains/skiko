@@ -15,6 +15,7 @@ import kotlin.test.assertEquals
 
 private fun isMac() = (hostOs == OS.MacOS)
 private fun isIos() = (hostOs == OS.Ios)
+private fun isLinux() = (hostOs == OS.Linux)
 private fun isJs() = (kotlinBackend == KotlinBackend.JS)
 private val COARSE_EPSILON = 2.4f
 
@@ -88,7 +89,7 @@ class FontTests {
                 assertCloseEnough(expected, actual, COARSE_EPSILON)
             }
 
-            assertEquals(24, firstGlyphPath.pointsCount)
+            assertEquals(if (isLinux() || isJs()) 26 else 24, firstGlyphPath.pointsCount)
 
             assertCloseEnough(FontMetrics(
                 top = -11.64f,

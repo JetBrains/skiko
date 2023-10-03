@@ -5,8 +5,11 @@
 #include "interop.hh"
 
 #include "include/gpu/ganesh/SkSurfaceGanesh.h"
+
+#ifdef SK_METAL
 #include "include/gpu/ganesh/mtl/SkSurfaceMetal.h"
 #include "include/gpu/mtl/GrMtlTypes.h"
+#endif
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_SurfaceKt__1nMakeRasterDirect
   (JNIEnv* env, jclass jclass,
