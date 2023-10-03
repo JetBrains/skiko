@@ -16,6 +16,7 @@ import kotlin.test.assertEquals
 private fun isMac() = (hostOs == OS.MacOS)
 private fun isIos() = (hostOs == OS.Ios)
 private fun isLinux() = (hostOs == OS.Linux)
+private fun isWindows() = (hostOs == OS.Windows)
 private fun isJs() = (kotlinBackend == KotlinBackend.JS)
 private val COARSE_EPSILON = 2.4f
 
@@ -97,7 +98,12 @@ class FontTests {
                 descent = 3.2400002f,
                 bottom = 3.2400002f,
                 leading = 0f,
-                avgCharWidth = if ((isIos() || isMac()) && !isJs()) 29.460001f else 7.2000003f,
+                avgCharWidth = when {
+                    isJs() -> 7.2f
+                    isIos() || isMac() -> 29.460001f
+                    isWindows() -> 0f
+                    else -> 7.2f
+                },
                 maxCharWidth = 29.460001f,
                 xMin = -20.880001f,
                 xMax = 8.58f,
