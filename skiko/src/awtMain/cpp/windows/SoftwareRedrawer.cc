@@ -59,7 +59,7 @@ extern "C"
             SkImageInfo info = SkImageInfo::Make(
                 width, height, kBGRA_8888_SkColorType, kPremul_SkAlphaType,
                 SkColorSpace::MakeSRGB());
-            device->surface = SkSurface::MakeRasterDirect(info, pixels, sizeof(uint32_t) * width, device->surfaceProps.get());
+            device->surface = SkSurfaces::WrapPixels(info, pixels, sizeof(uint32_t) * width, device->surfaceProps.get());
             GetClientRect(device->window, &device->clientRect);
         }
         __except(EXCEPTION_EXECUTE_HANDLER) {
