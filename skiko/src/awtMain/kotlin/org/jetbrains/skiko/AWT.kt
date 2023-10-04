@@ -69,7 +69,7 @@ internal class DrawingSurfaceInfo(
         get() {
             check(ptr != 0L) { "DrawingSurfaceInfo.ptr is 0L. DrawingSurfaceInfo might've been closed." }
             return getPlatformInfo(ptr).also {
-                check(it != 0L) { "Can't get getPlatformInfo" }
+                check(it != 0L) { "Can't get platformInfo" }
             }
         }
 
