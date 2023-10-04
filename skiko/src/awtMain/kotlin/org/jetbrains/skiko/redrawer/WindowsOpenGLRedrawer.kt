@@ -3,13 +3,18 @@ package org.jetbrains.skiko.redrawer
 import kotlinx.coroutines.*
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.context.OpenGLContextHandler
-import java.util.concurrent.Executors
 
 internal class WindowsOpenGLRedrawer(
     private val layer: SkiaLayer,
     analytics: SkiaLayerAnalytics,
     private val properties: SkiaLayerProperties
 ) : AWTRedrawer(layer, analytics, GraphicsApi.OPENGL) {
+    init {
+        if (!loadOpenGLLibrary()) {
+            throw RenderException("Cannot load OpenGL library")
+        }
+    }
+
     private val contextHandler = OpenGLContextHandler(layer)
     override val renderInfo: String get() = contextHandler.rendererInfo()
 
