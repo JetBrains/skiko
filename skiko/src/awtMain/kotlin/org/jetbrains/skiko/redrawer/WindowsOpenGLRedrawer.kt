@@ -15,7 +15,7 @@ internal class WindowsOpenGLRedrawer(
 
     private val device: Long = layer.backedLayer.useDrawingSurfacePlatformInfo {
         getDevice(it).also { devicePtr ->
-            check(devicePtr != 0L) { "Can't get getDevice" }
+            check(devicePtr != 0L) { "Can't get device" }
         }
     }
 
