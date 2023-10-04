@@ -45,7 +45,10 @@ internal class DrawingSurface(
         }
     }
 
-    fun getInfo() = DrawingSurfaceInfo(ptr)
+    fun getInfo(): DrawingSurfaceInfo {
+        check(ptr != 0L) { "DrawingSurface.ptr is 0L. DrawingSurface might've been closed." }
+        return DrawingSurfaceInfo(ptr)
+    }
 
     override fun close() {
         freeDrawingSurface(awt, ptr)
@@ -62,7 +65,13 @@ internal class DrawingSurfaceInfo(
         }
         private set
 
-    val platformInfo: Long get() = getPlatformInfo(ptr)
+    val platformInfo: Long
+        get() {
+            check(ptr != 0L) { "DrawingSurfaceInfo.ptr is 0L. DrawingSurfaceInfo might've been closed." }
+            return getPlatformInfo(ptr).also {
+                check(it != 0L) { "Can't get getPlatformInfo" }
+            }
+        }
 
     override fun close() {
         freeDrawingSurfaceInfo(drawingSurface, ptr)
