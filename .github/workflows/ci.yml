@@ -60,13 +60,17 @@ jobs:
           java-version: '11'
           cache: 'gradle'
 
+      - name: 'Print devices'
+        run: xcrun simctl list devices available --json
+
       # install jq - cli tool for json querying
       # retrieve the device .udid to use in tests and store it in env var
       - name: 'Set Up Simulator UUID'
         run: |
           brew install jq &&
           IOS_SIM_UUID=$(xcrun simctl list devices available --json | jq -r '.devices."com.apple.CoreSimulator.SimRuntime.iOS-17-0"[] | select(.name == "iPhone 15") | .udid') &&
-          echo "IOS_SIM_UUID=$IOS_SIM_UUID" >> $GITHUB_ENV
+          echo "IOS_SIM_UUID=$IOS_SIM_UUID" >> $GITHUB_ENV &&
+          echo $IOS_SIM_UUID
 
       - name: 'Compile and run iOS x64 tests'
         uses: nick-fields/retry@v2
