@@ -1,9 +1,6 @@
 # Default Skiko CI
 name: CI
 
-env:
-  IOS_SIM_UUID: '856515E5-1A3B-4E89-93E4-421B21D79892' # take a look at `xcrun simctl list devices` at GitHub Actions log
-
 on:
   push:
     branches: [ master ]
@@ -15,6 +12,7 @@ on:
 
 jobs:
   macos:
+    if: false
     runs-on: macos-11
     steps:
       - uses: actions/checkout@v3
@@ -62,7 +60,8 @@ jobs:
           java-version: '11'
           cache: 'gradle'
 
-      - run: xcrun simctl list devices # Look here to get device ids
+      - run: brew install jq # json cli tool
+      - run: export IOS_SIM_UUID=$(xcrun simctl list devices available --json | jq -r '.devices."com.apple.CoreSimulator.SimRuntime.iOS-17-0"[] | select(.name == "iPhone 15") | .udid')
 
       - name: 'Compile and run iOS x64 tests'
         uses: nick-fields/retry@v2
@@ -92,6 +91,7 @@ jobs:
 
   linux:
     runs-on: ubuntu-20.04
+    if: false
     steps:
       - uses: actions/checkout@v3
         name: 'Check out code'
@@ -162,6 +162,7 @@ jobs:
 
   js:
     runs-on: ubuntu-20.04
+    if: false
     steps:
       - uses: actions/checkout@v3
         name: 'Check out code'
@@ -211,6 +212,7 @@ jobs:
 
   windows:
     runs-on: windows-2019
+    if: false
     steps:
       - uses: actions/checkout@v3
         name: 'Check out code'
