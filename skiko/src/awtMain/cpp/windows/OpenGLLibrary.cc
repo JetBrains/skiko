@@ -24,6 +24,9 @@ namespace OpenGL32Library {
     PROC_wglMakeCurrent wglMakeCurrent;
     PROC_wglGetCurrentContext wglGetCurrentContext;
 
+    // Loads the opengl32.dll into memory
+    // If loading isn't successful, skip loading the next time
+    // Isn't thread safe, call it in synchronized block
     void load() {
         if (!isLoaded) {
             isLoaded = true;
@@ -42,8 +45,7 @@ namespace OpenGL32Library {
     }
 };
 
-extern "C"
-{
+extern "C" {
     void glFinish(void) {
         OpenGL32Library::glFinish();
     }
