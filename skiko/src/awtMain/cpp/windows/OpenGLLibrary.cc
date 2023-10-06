@@ -1,85 +1,64 @@
 #include <windows.h>
 #include <gl/GL.h>
 #include <jawt_md.h>
+#include "exceptions_handler.h"
 
-namespace OpenGL32Library {
-    typedef void (*PROC_glFinish) (void);
-    typedef void (*PROC_glGetIntegerv) (GLenum pname, GLint *data);
-    typedef const GLubyte *(*PROC_glGetString) (GLenum name);
-    typedef HGLRC (WINAPI * PROC_wglCreateContext) (HDC hDc);
-    typedef BOOL (WINAPI * PROC_wglDeleteContext) (HGLRC oldContext);
-    typedef PROC (WINAPI * PROC_wglGetProcAddress) (LPCSTR lpszProc);
-    typedef BOOL (WINAPI * PROC_wglMakeCurrent) (HDC hDc, HGLRC newContext);
-    typedef HGLRC (WINAPI * PROC_wglGetCurrentContext) (void);
-
-    bool isLoaded = false;
-    HINSTANCE lib = 0;
-
-    PROC_glFinish glFinish;
-    PROC_glGetIntegerv glGetIntegerv;
-    PROC_glGetString glGetString;
-    PROC_wglCreateContext wglCreateContext;
-    PROC_wglDeleteContext wglDeleteContext;
-    PROC_wglGetProcAddress wglGetProcAddress;
-    PROC_wglMakeCurrent wglMakeCurrent;
-    PROC_wglGetCurrentContext wglGetCurrentContext;
-
-    // Loads the opengl32.dll into memory
-    // If loading isn't successful, skip loading the next time
-    // Isn't thread safe, call it in synchronized block
-    void load() {
-        if (!isLoaded) {
-            isLoaded = true;
-            lib = LoadLibrary("opengl32.dll");
-            if (lib) {
-                glFinish = (PROC_glFinish) GetProcAddress(lib, "glFinish");
-                glGetIntegerv = (PROC_glGetIntegerv) GetProcAddress(lib, "glGetIntegerv");
-                glGetString = (PROC_glGetString) GetProcAddress(lib, "glGetString");
-                wglCreateContext = (PROC_wglCreateContext) GetProcAddress(lib, "wglCreateContext");
-                wglDeleteContext = (PROC_wglDeleteContext) GetProcAddress(lib, "wglDeleteContext");
-                wglGetProcAddress = (PROC_wglGetProcAddress) GetProcAddress(lib, "wglGetProcAddress");
-                wglMakeCurrent = (PROC_wglMakeCurrent) GetProcAddress(lib, "wglMakeCurrent");
-                wglGetCurrentContext = (PROC_wglGetCurrentContext) GetProcAddress(lib, "wglGetCurrentContext");
-            }
-        }
-    }
-};
+static HINSTANCE OpenGL32Library = nullptr;
 
 extern "C" {
     void glFinish(void) {
-        OpenGL32Library::glFinish();
+        typedef void (*PROC_glFinish) (void);
+        static auto glFinish = (PROC_glFinish) GetProcAddress(OpenGL32Library, "glFinish");
+        glFinish();
     }
 
     void glGetIntegerv(GLenum pname, GLint *data) {
-        OpenGL32Library::glGetIntegerv(pname, data);
+        typedef void (*PROC_glGetIntegerv) (GLenum pname, GLint *data);
+        static auto glGetIntegerv = (PROC_glGetIntegerv) GetProcAddress(OpenGL32Library, "glGetIntegerv");
+        glGetIntegerv(pname, data);
     }
 
     const GLubyte * glGetString(GLenum name) {
-        return OpenGL32Library::glGetString(name);
+        typedef const GLubyte *(*PROC_glGetString) (GLenum name);
+        static auto glGetString = (PROC_glGetString) GetProcAddress(OpenGL32Library, "glGetString");
+        return glGetString(name);
     }
 
     HGLRC WINAPI wglCreateContext(HDC hDc) {
-        return OpenGL32Library::wglCreateContext(hDc);
+        typedef HGLRC (WINAPI * PROC_wglCreateContext) (HDC hDc);
+        static auto wglCreateContext = (PROC_wglCreateContext) GetProcAddress(OpenGL32Library, "wglCreateContext");
+        return wglCreateContext(hDc);
     }
 
     BOOL WINAPI wglDeleteContext(HGLRC oldContext) {
-        return OpenGL32Library::wglDeleteContext(oldContext);
+        typedef BOOL (WINAPI * PROC_wglDeleteContext) (HGLRC oldContext);
+        static auto wglDeleteContext = (PROC_wglDeleteContext) GetProcAddress(OpenGL32Library, "wglDeleteContext");
+        return wglDeleteContext(oldContext);
     }
 
     PROC WINAPI wglGetProcAddress(LPCSTR lpszProc) {
-        return OpenGL32Library::wglGetProcAddress(lpszProc);
+        typedef PROC (WINAPI * PROC_wglGetProcAddress) (LPCSTR lpszProc);
+        static auto wglGetProcAddress = (PROC_wglGetProcAddress) GetProcAddress(OpenGL32Library, "wglGetProcAddress");
+        return wglGetProcAddress(lpszProc);
     }
 
     BOOL WINAPI wglMakeCurrent(HDC hDc, HGLRC newContext) {
-        return OpenGL32Library::wglMakeCurrent(hDc, newContext);
+        typedef BOOL (WINAPI * PROC_wglMakeCurrent) (HDC hDc, HGLRC newContext);
+        static auto wglMakeCurrent = (PROC_wglMakeCurrent) GetProcAddress(OpenGL32Library, "wglMakeCurrent");
+        return wglMakeCurrent(hDc, newContext);
     }
 
     HGLRC WINAPI wglGetCurrentContext() {
-        return OpenGL32Library::wglGetCurrentContext();
+        typedef HGLRC (WINAPI * PROC_wglGetCurrentContext) (void);
+        static auto wglGetCurrentContext = (PROC_wglGetCurrentContext) GetProcAddress(OpenGL32Library, "wglGetCurrentContext");
+        return wglGetCurrentContext();
     }
 
-    JNIEXPORT jboolean JNICALL Java_org_jetbrains_skiko_OpenGLLibraryKt_loadOpenGLLibraryWindows(JNIEnv *env, jobject obj) {
-        OpenGL32Library::load();
-        return OpenGL32Library::lib != 0;
+    JNIEXPORT void JNICALL Java_org_jetbrains_skiko_OpenGLLibraryKt_loadOpenGLLibraryWindows(JNIEnv *env, jobject obj) {
+        OpenGL32Library = LoadLibrary("opengl32.dll");
+        if (OpenGL32Library == nullptr) {
+            auto code = GetLastError();
+            throwJavaRenderException(env, __FUNCTION__, code);
+        }
     }
 }

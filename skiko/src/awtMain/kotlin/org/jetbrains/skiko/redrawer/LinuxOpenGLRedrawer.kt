@@ -10,9 +10,7 @@ internal class LinuxOpenGLRedrawer(
     private val properties: SkiaLayerProperties
 ) : AWTRedrawer(layer, analytics, GraphicsApi.OPENGL) {
     init {
-        if (!loadOpenGLLibrary()) {
-            throw RenderException("Cannot load OpenGL library")
-        }
+        loadOpenGLLibrary()
     }
 
     private val contextHandler = OpenGLContextHandler(layer)

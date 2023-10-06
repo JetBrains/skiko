@@ -9,15 +9,15 @@ package org.jetbrains.skiko
  *
  * Some Windows machines don't have OpenGL (usually CI machines), so we'll fallback to other renderers on them.
  *
- * @return false if there is no OpenGL library in the system.
+ * Throws [RenderException] if OpenGL library can't be loaded.
  */
-internal fun loadOpenGLLibrary(): Boolean {
-    return if (hostOs.isWindows) {
+internal fun loadOpenGLLibrary() {
+    if (hostOs.isWindows) {
         loadOpenGLLibraryWindows()
     } else {
-        true
+        // do nothing, the library should be already available
     }
 }
 
 @Synchronized
-private external fun loadOpenGLLibraryWindows(): Boolean
+private external fun loadOpenGLLibraryWindows()
