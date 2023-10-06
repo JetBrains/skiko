@@ -58,7 +58,7 @@ extern "C" {
         OpenGL32Library = LoadLibrary("opengl32.dll");
         if (OpenGL32Library == nullptr) {
             auto code = GetLastError();
-            throwJavaRenderException(env, __FUNCTION__, code);
+            throwJavaRenderExceptionByErrorCode(env, __FUNCTION__, code);
         }
     }
 }
