@@ -9,7 +9,7 @@ internal class RenderExceptionsHandler {
     companion object {
         private var output: File? = null
         @JvmStatic
-        fun logAndThrow(message: String) {
+        fun throwException(message: String) {
             if (output == null) {
                 output = File(
                     "${Library.cacheRoot}/skiko-render-exception-${ProcessHandle.current().pid()}.log"

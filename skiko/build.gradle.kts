@@ -1036,12 +1036,18 @@ fun createLinkJvmBindings(
                 addAll(buildType.msvcLinkerFlags)
                 addAll(
                     arrayOf(
+                        // ignore https://learn.microsoft.com/en-us/cpp/error-messages/tool-errors/linker-tools-warning-lnk4217
+                        // because we link OpenGl dynamically, defining functions in our own file in OpenGLLibrary.cc
+                        "/ignore:4217"
+                    )
+                )
+                addAll(
+                    arrayOf(
                         "/NOLOGO",
                         "/DLL",
                         "Advapi32.lib",
                         "gdi32.lib",
                         "Dwmapi.lib",
-                        "opengl32.lib",
                         "shcore.lib",
                         "user32.lib",
                     )

@@ -4,6 +4,7 @@
 #include <windows.h>
 #include <stdio.h>
 
-void throwJavaException(JNIEnv *env, const char * function, DWORD sehCode);
+void throwJavaRenderExceptionByExceptionCode(JNIEnv *env, const char * function, DWORD code);
+void throwJavaRenderExceptionByErrorCode(JNIEnv *env, const char * function, DWORD code);
 
 #endif
