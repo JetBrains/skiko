@@ -13,7 +13,12 @@ internal class WindowsOpenGLRedrawer(
     private val contextHandler = OpenGLContextHandler(layer)
     override val renderInfo: String get() = contextHandler.rendererInfo()
 
-    private val device = layer.backedLayer.useDrawingSurfacePlatformInfo(::getDevice)
+    private val device: Long = layer.backedLayer.useDrawingSurfacePlatformInfo {
+        getDevice(it).also { devicePtr ->
+            check(devicePtr != 0L) { "Can't get device" }
+        }
+    }
+
     private val context = createContext(device, layer.contentHandle, layer.transparency).also {
         if (it == 0L) {
             throw RenderException("Cannot create Windows GL context")
