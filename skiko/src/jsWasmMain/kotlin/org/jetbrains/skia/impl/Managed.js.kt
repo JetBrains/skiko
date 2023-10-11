@@ -46,5 +46,5 @@ actual abstract class Managed actual constructor(ptr: NativePointer, finalizer: 
 }
 
 @ExternalSymbolName("org_jetbrains_skia_impl_Managed__invokeFinalizer")
-@ModuleImport("skia", "org_jetbrains_skia_impl_Managed__invokeFinalizer")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_impl_Managed__invokeFinalizer")
 private external fun _nInvokeFinalizer(finalizer: NativePointer, obj: NativePointer)

@@ -56,17 +56,17 @@ class InvalidationController internal constructor(ptr: NativePointer) : Managed(
 }
 
 @ExternalSymbolName("org_jetbrains_skia_sksg_InvalidationController_nGetFinalizer")
-@ModuleImport("skia", "org_jetbrains_skia_sksg_InvalidationController_nGetFinalizer")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_sksg_InvalidationController_nGetFinalizer")
 private external fun InvalidationController_nGetFinalizer(): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_sksg_InvalidationController_nMake")
-@ModuleImport("skia", "org_jetbrains_skia_sksg_InvalidationController_nMake")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_sksg_InvalidationController_nMake")
 private external fun InvalidationController_nMake(): NativePointer
 @ExternalSymbolName("org_jetbrains_skia_sksg_InvalidationController_nInvalidate")
-@ModuleImport("skia", "org_jetbrains_skia_sksg_InvalidationController_nInvalidate")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_sksg_InvalidationController_nInvalidate")
 private external fun InvalidationController_nInvalidate(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float, matrix: InteropPointer)
 @ExternalSymbolName("org_jetbrains_skia_sksg_InvalidationController_nGetBounds")
-@ModuleImport("skia", "org_jetbrains_skia_sksg_InvalidationController_nGetBounds")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_sksg_InvalidationController_nGetBounds")
 private external fun InvalidationController_nGetBounds(ptr: NativePointer, result: InteropPointer)
 @ExternalSymbolName("org_jetbrains_skia_sksg_InvalidationController_nReset")
-@ModuleImport("skia", "org_jetbrains_skia_sksg_InvalidationController_nReset")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_sksg_InvalidationController_nReset")
 private external fun InvalidationController_nReset(ptr: NativePointer)

@@ -110,55 +110,55 @@ class ColorFilter : RefCnt {
 
 
 @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeComposed")
-@ModuleImport("skia", "org_jetbrains_skia_ColorFilter__1nMakeComposed")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ColorFilter__1nMakeComposed")
 private external fun _nMakeComposed(outer: NativePointer, inner: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeBlend")
-@ModuleImport("skia", "org_jetbrains_skia_ColorFilter__1nMakeBlend")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ColorFilter__1nMakeBlend")
 private external fun _nMakeBlend(color: Int, blendMode: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeMatrix")
-@ModuleImport("skia", "org_jetbrains_skia_ColorFilter__1nMakeMatrix")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ColorFilter__1nMakeMatrix")
 private external fun _nMakeMatrix(rowMajor: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeHSLAMatrix")
-@ModuleImport("skia", "org_jetbrains_skia_ColorFilter__1nMakeHSLAMatrix")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ColorFilter__1nMakeHSLAMatrix")
 private external fun _nMakeHSLAMatrix(rowMajor: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nGetLinearToSRGBGamma")
-@ModuleImport("skia", "org_jetbrains_skia_ColorFilter__1nGetLinearToSRGBGamma")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ColorFilter__1nGetLinearToSRGBGamma")
 private external fun _nGetLinearToSRGBGamma(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nGetSRGBToLinearGamma")
-@ModuleImport("skia", "org_jetbrains_skia_ColorFilter__1nGetSRGBToLinearGamma")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ColorFilter__1nGetSRGBToLinearGamma")
 private external fun _nGetSRGBToLinearGamma(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeLerp")
-@ModuleImport("skia", "org_jetbrains_skia_ColorFilter__1nMakeLerp")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ColorFilter__1nMakeLerp")
 private external fun _nMakeLerp(t: Float, dstPtr: NativePointer, srcPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeLighting")
-@ModuleImport("skia", "org_jetbrains_skia_ColorFilter__1nMakeLighting")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ColorFilter__1nMakeLighting")
 private external fun _nMakeLighting(colorMul: Int, colorAdd: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeHighContrast")
-@ModuleImport("skia", "org_jetbrains_skia_ColorFilter__1nMakeHighContrast")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ColorFilter__1nMakeHighContrast")
 private external fun _nMakeHighContrast(grayscale: Boolean, inversionMode: Int, contrast: Float): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeTable")
-@ModuleImport("skia", "org_jetbrains_skia_ColorFilter__1nMakeTable")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ColorFilter__1nMakeTable")
 private external fun _nMakeTable(table: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeOverdraw")
-@ModuleImport("skia", "org_jetbrains_skia_ColorFilter__1nMakeOverdraw")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ColorFilter__1nMakeOverdraw")
 private external fun _nMakeOverdraw(c0: Int, c1: Int, c2: Int, c3: Int, c4: Int, c5: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nGetLuma")
-@ModuleImport("skia", "org_jetbrains_skia_ColorFilter__1nGetLuma")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ColorFilter__1nGetLuma")
 private external fun _nGetLuma(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ColorFilter__1nMakeTableARGB")
-@ModuleImport("skia", "org_jetbrains_skia_ColorFilter__1nMakeTableARGB")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ColorFilter__1nMakeTableARGB")
 private external fun _nMakeTableARGB(
     a: InteropPointer,
     r: InteropPointer,

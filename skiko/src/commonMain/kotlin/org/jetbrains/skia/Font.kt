@@ -597,181 +597,181 @@ class Font : Managed {
 
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetFinalizer")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nGetFinalizer")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nGetFinalizer")
 private external fun Font_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nMakeClone")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nMakeClone")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nMakeClone")
 private external fun Font_nMakeClone(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nEquals")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nEquals")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nEquals")
 private external fun Font_nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetSize")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nGetSize")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nGetSize")
 private external fun Font_nGetSize(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nMakeDefault")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nMakeDefault")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nMakeDefault")
 private external fun _nMakeDefault(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nMakeTypeface")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nMakeTypeface")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nMakeTypeface")
 private external fun _nMakeTypeface(typefacePtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nMakeTypefaceSize")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nMakeTypefaceSize")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nMakeTypefaceSize")
 private external fun _nMakeTypefaceSize(typefacePtr: NativePointer, size: Float): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nMakeTypefaceSizeScaleSkew")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nMakeTypefaceSizeScaleSkew")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nMakeTypefaceSizeScaleSkew")
 private external fun _nMakeTypefaceSizeScaleSkew(typefacePtr: NativePointer, size: Float, scaleX: Float, skewX: Float): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nIsAutoHintingForced")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nIsAutoHintingForced")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nIsAutoHintingForced")
 private external fun _nIsAutoHintingForced(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nAreBitmapsEmbedded")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nAreBitmapsEmbedded")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nAreBitmapsEmbedded")
 private external fun _nAreBitmapsEmbedded(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nIsSubpixel")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nIsSubpixel")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nIsSubpixel")
 private external fun _nIsSubpixel(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nAreMetricsLinear")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nAreMetricsLinear")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nAreMetricsLinear")
 private external fun _nAreMetricsLinear(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nIsEmboldened")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nIsEmboldened")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nIsEmboldened")
 private external fun _nIsEmboldened(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nIsBaselineSnapped")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nIsBaselineSnapped")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nIsBaselineSnapped")
 private external fun _nIsBaselineSnapped(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nSetAutoHintingForced")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nSetAutoHintingForced")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nSetAutoHintingForced")
 private external fun _nSetAutoHintingForced(ptr: NativePointer, value: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nSetBitmapsEmbedded")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nSetBitmapsEmbedded")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nSetBitmapsEmbedded")
 private external fun _nSetBitmapsEmbedded(ptr: NativePointer, value: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nSetSubpixel")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nSetSubpixel")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nSetSubpixel")
 private external fun _nSetSubpixel(ptr: NativePointer, value: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nSetMetricsLinear")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nSetMetricsLinear")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nSetMetricsLinear")
 private external fun _nSetMetricsLinear(ptr: NativePointer, value: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nSetEmboldened")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nSetEmboldened")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nSetEmboldened")
 private external fun _nSetEmboldened(ptr: NativePointer, value: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nSetBaselineSnapped")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nSetBaselineSnapped")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nSetBaselineSnapped")
 private external fun _nSetBaselineSnapped(ptr: NativePointer, value: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetEdging")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nGetEdging")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nGetEdging")
 private external fun _nGetEdging(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nSetEdging")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nSetEdging")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nSetEdging")
 private external fun _nSetEdging(ptr: NativePointer, value: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetHinting")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nGetHinting")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nGetHinting")
 private external fun _nGetHinting(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nSetHinting")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nSetHinting")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nSetHinting")
 private external fun _nSetHinting(ptr: NativePointer, value: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetTypeface")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nGetTypeface")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nGetTypeface")
 private external fun _nGetTypeface(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetTypefaceOrDefault")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nGetTypefaceOrDefault")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nGetTypefaceOrDefault")
 private external fun _nGetTypefaceOrDefault(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetScaleX")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nGetScaleX")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nGetScaleX")
 private external fun _nGetScaleX(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetSkewX")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nGetSkewX")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nGetSkewX")
 private external fun _nGetSkewX(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nSetTypeface")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nSetTypeface")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nSetTypeface")
 private external fun _nSetTypeface(ptr: NativePointer, typefacePtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nSetSize")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nSetSize")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nSetSize")
 private external fun _nSetSize(ptr: NativePointer, value: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nSetScaleX")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nSetScaleX")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nSetScaleX")
 private external fun _nSetScaleX(ptr: NativePointer, value: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nSetSkewX")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nSetSkewX")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nSetSkewX")
 private external fun _nSetSkewX(ptr: NativePointer, value: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetUTF32Glyph")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nGetUTF32Glyph")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nGetUTF32Glyph")
 private external fun _nGetUTF32Glyph(ptr: NativePointer, uni: Int): Short
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetUTF32Glyphs")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nGetUTF32Glyphs")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nGetUTF32Glyphs")
 private external fun _nGetUTF32Glyphs(ptr: NativePointer, uni: InteropPointer, uniArrLen: Int, resultGlyphs: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetStringGlyphsCount")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nGetStringGlyphsCount")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nGetStringGlyphsCount")
 private external fun _nGetStringGlyphsCount(ptr: NativePointer, str: InteropPointer, len: Int): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nMeasureText")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nMeasureText")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nMeasureText")
 private external fun _nMeasureText(ptr: NativePointer, str: InteropPointer, len: Int, paintPtr: NativePointer, rect: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nMeasureTextWidth")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nMeasureTextWidth")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nMeasureTextWidth")
 private external fun _nMeasureTextWidth(ptr: NativePointer, str: InteropPointer, len: Int, paintPtr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetWidths")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nGetWidths")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nGetWidths")
 private external fun _nGetWidths(ptr: NativePointer, glyphs: InteropPointer, count: Int, width: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetBounds")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nGetBounds")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nGetBounds")
 private external fun _nGetBounds(ptr: NativePointer, glyphs: InteropPointer, count: Int, paintPtr: NativePointer, bounds: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetPositions")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nGetPositions")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nGetPositions")
 private external fun _nGetPositions(ptr: NativePointer, glyphs: InteropPointer, count: Int, x: Float, y: Float, positions: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetXPositions")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nGetXPositions")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nGetXPositions")
 private external fun _nGetXPositions(ptr: NativePointer, glyphs: InteropPointer, x: Float, count: Int, positions: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetPath")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nGetPath")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nGetPath")
 private external fun _nGetPath(ptr: NativePointer, glyph: Short): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetPaths")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nGetPaths")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nGetPaths")
 private external fun _nGetPaths(ptr: NativePointer, glyphs: InteropPointer, count: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetMetrics")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nGetMetrics")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nGetMetrics")
 private external fun _nGetMetrics(ptr: NativePointer, metrics: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Font__1nGetSpacing")
-@ModuleImport("skia", "org_jetbrains_skia_Font__1nGetSpacing")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Font__1nGetSpacing")
 private external fun _nGetSpacing(ptr: NativePointer, glyphsArr: NativePointer): Float

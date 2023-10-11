@@ -45,9 +45,9 @@ private fun makeHbIcuScriptRunIterator(text: ManagedString): NativePointer {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_HbIcuScriptRunIterator__1nMake")
-@ModuleImport("skia", "org_jetbrains_skia_shaper_HbIcuScriptRunIterator__1nMake")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_shaper_HbIcuScriptRunIterator__1nMake")
 private external fun _nMake(textPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_HbIcuScriptRunIterator__1nGetCurrentScriptTag")
-@ModuleImport("skia", "org_jetbrains_skia_shaper_HbIcuScriptRunIterator__1nGetCurrentScriptTag")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_shaper_HbIcuScriptRunIterator__1nGetCurrentScriptTag")
 private external fun _nGetCurrentScriptTag(ptr: NativePointer): Int

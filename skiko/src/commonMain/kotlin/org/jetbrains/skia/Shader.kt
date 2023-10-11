@@ -518,15 +518,15 @@ class Shader internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeEmpty")
-@ModuleImport("skia", "org_jetbrains_skia_Shader__1nMakeEmpty")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Shader__1nMakeEmpty")
 private external fun Shader_nMakeEmpty(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeWithColorFilter")
-@ModuleImport("skia", "org_jetbrains_skia_Shader__1nMakeWithColorFilter")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Shader__1nMakeWithColorFilter")
 private external fun _nMakeWithColorFilter(ptr: NativePointer, colorFilterPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeLinearGradient")
-@ModuleImport("skia", "org_jetbrains_skia_Shader__1nMakeLinearGradient")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Shader__1nMakeLinearGradient")
 private external fun _nMakeLinearGradient(
     x0: Float,
     y0: Float,
@@ -542,7 +542,7 @@ private external fun _nMakeLinearGradient(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeLinearGradientCS")
-@ModuleImport("skia", "org_jetbrains_skia_Shader__1nMakeLinearGradientCS")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Shader__1nMakeLinearGradientCS")
 private external fun _nMakeLinearGradientCS(
     x0: Float,
     y0: Float,
@@ -559,7 +559,7 @@ private external fun _nMakeLinearGradientCS(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeRadialGradient")
-@ModuleImport("skia", "org_jetbrains_skia_Shader__1nMakeRadialGradient")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Shader__1nMakeRadialGradient")
 private external fun _nMakeRadialGradient(
     x: Float,
     y: Float,
@@ -574,7 +574,7 @@ private external fun _nMakeRadialGradient(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeRadialGradientCS")
-@ModuleImport("skia", "org_jetbrains_skia_Shader__1nMakeRadialGradientCS")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Shader__1nMakeRadialGradientCS")
 private external fun _nMakeRadialGradientCS(
     x: Float,
     y: Float,
@@ -590,7 +590,7 @@ private external fun _nMakeRadialGradientCS(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeTwoPointConicalGradient")
-@ModuleImport("skia", "org_jetbrains_skia_Shader__1nMakeTwoPointConicalGradient")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Shader__1nMakeTwoPointConicalGradient")
 private external fun _nMakeTwoPointConicalGradient(
     x0: Float,
     y0: Float,
@@ -608,7 +608,7 @@ private external fun _nMakeTwoPointConicalGradient(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeTwoPointConicalGradientCS")
-@ModuleImport("skia", "org_jetbrains_skia_Shader__1nMakeTwoPointConicalGradientCS")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Shader__1nMakeTwoPointConicalGradientCS")
 private external fun _nMakeTwoPointConicalGradientCS(
     x0: Float,
     y0: Float,
@@ -627,7 +627,7 @@ private external fun _nMakeTwoPointConicalGradientCS(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeSweepGradient")
-@ModuleImport("skia", "org_jetbrains_skia_Shader__1nMakeSweepGradient")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Shader__1nMakeSweepGradient")
 private external fun _nMakeSweepGradient(
     x: Float,
     y: Float,
@@ -643,7 +643,7 @@ private external fun _nMakeSweepGradient(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeSweepGradientCS")
-@ModuleImport("skia", "org_jetbrains_skia_Shader__1nMakeSweepGradientCS")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Shader__1nMakeSweepGradientCS")
 private external fun _nMakeSweepGradientCS(
     x: Float,
     y: Float,
@@ -660,7 +660,7 @@ private external fun _nMakeSweepGradientCS(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeFractalNoise")
-@ModuleImport("skia", "org_jetbrains_skia_Shader__1nMakeFractalNoise")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Shader__1nMakeFractalNoise")
 private external fun _nMakeFractalNoise(
     baseFrequencyX: Float,
     baseFrequencyY: Float,
@@ -672,7 +672,7 @@ private external fun _nMakeFractalNoise(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeTurbulence")
-@ModuleImport("skia", "org_jetbrains_skia_Shader__1nMakeTurbulence")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Shader__1nMakeTurbulence")
 private external fun _nMakeTurbulence(
     baseFrequencyX: Float,
     baseFrequencyY: Float,
@@ -683,13 +683,13 @@ private external fun _nMakeTurbulence(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeColor")
-@ModuleImport("skia", "org_jetbrains_skia_Shader__1nMakeColor")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Shader__1nMakeColor")
 private external fun _nMakeColor(color: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeColorCS")
-@ModuleImport("skia", "org_jetbrains_skia_Shader__1nMakeColorCS")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Shader__1nMakeColorCS")
 private external fun _nMakeColorCS(r: Float, g: Float, b: Float, a: Float, colorSpacePtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Shader__1nMakeBlend")
-@ModuleImport("skia", "org_jetbrains_skia_Shader__1nMakeBlend")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Shader__1nMakeBlend")
 private external fun _nMakeBlend(blendMode: Int, dst: NativePointer, src: NativePointer): NativePointer

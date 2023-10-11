@@ -114,29 +114,29 @@ fun <R> DirectContext.useContext(block: (ctx: DirectContext) -> R): R = use {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nFlush")
-@ModuleImport("skia", "org_jetbrains_skia_DirectContext__1nFlush")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_DirectContext__1nFlush")
 private external fun DirectContext_nFlush(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeGL")
-@ModuleImport("skia", "org_jetbrains_skia_DirectContext__1nMakeGL")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_DirectContext__1nMakeGL")
 private external fun _nMakeGL(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeMetal")
-@ModuleImport("skia", "org_jetbrains_skia_DirectContext__1nMakeMetal")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_DirectContext__1nMakeMetal")
 private external fun _nMakeMetal(devicePtr: NativePointer, queuePtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nMakeDirect3D")
-@ModuleImport("skia", "org_jetbrains_skia_DirectContext__1nMakeDirect3D")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_DirectContext__1nMakeDirect3D")
 private external fun _nMakeDirect3D(adapterPtr: NativePointer, devicePtr: NativePointer, queuePtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nSubmit")
-@ModuleImport("skia", "org_jetbrains_skia_DirectContext__1nSubmit")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_DirectContext__1nSubmit")
 private external fun _nSubmit(ptr: NativePointer, syncCpu: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nReset")
-@ModuleImport("skia", "org_jetbrains_skia_DirectContext__1nReset")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_DirectContext__1nReset")
 private external fun _nReset(ptr: NativePointer, flags: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_DirectContext__1nAbandon")
-@ModuleImport("skia", "org_jetbrains_skia_DirectContext__1nAbandon")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_DirectContext__1nAbandon")
 private external fun _nAbandon(ptr: NativePointer, flags: Int)

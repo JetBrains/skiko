@@ -81,13 +81,13 @@ class TextBlobBuilderRunHandler<T> internal constructor(
 }
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilderRunHandler__1nGetFinalizer")
-@ModuleImport("skia", "org_jetbrains_skia_TextBlobBuilderRunHandler__1nGetFinalizer")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextBlobBuilderRunHandler__1nGetFinalizer")
 private external fun TextBlobBuilderRunHandler_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilderRunHandler__1nMake")
-@ModuleImport("skia", "org_jetbrains_skia_TextBlobBuilderRunHandler__1nMake")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextBlobBuilderRunHandler__1nMake")
 private external fun TextBlobBuilderRunHandler_nMake(textPtr: NativePointer, offsetX: Float, offsetY: Float): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_TextBlobBuilderRunHandler__1nMakeBlob")
-@ModuleImport("skia", "org_jetbrains_skia_TextBlobBuilderRunHandler__1nMakeBlob")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_TextBlobBuilderRunHandler__1nMakeBlob")
 private external fun _nMakeBlob(ptr: NativePointer): NativePointer
