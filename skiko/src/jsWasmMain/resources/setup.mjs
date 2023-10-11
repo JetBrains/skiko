@@ -69,3 +69,15 @@ export var {_callCallback, _registerCallback, _releaseCallback, _createLocalCall
         },
     }
 })();
+
+window._callCallback = _callCallback;
+window._registerCallback = _registerCallback;
+window._releaseCallback = _releaseCallback;
+window._createLocalCallbackScope = _createLocalCallbackScope;
+window._releaseLocalCallbackScope = _releaseLocalCallbackScope;
+
+export async function loadAndInitSkikoWasm() {
+    const skikoWasm = await loadSkikoWASM();
+    window.GL = skikoWasm.GL;
+    return skikoWasm;
+}

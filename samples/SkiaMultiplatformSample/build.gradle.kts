@@ -349,8 +349,9 @@ configurations.all {
 
 
 // TODO: workaround webpack compilation issue (it tries to find 'skia' module, but we provide it manually via imports)
-project.tasks.getByName("wasmJsDevelopmentExecutableCompileSync").doLast {
-    val f = project.buildDir.resolve("./js/packages/clocks-wasm/kotlin/clocks-wasm.uninstantiated.mjs").normalize()
-    val t = f.readText().replace("'skia': imports['skia'] ?? await import('skia'),", "'skia': imports['skia'],")
-    f.writeText(t)
-}
+// An alternative workaround was added in webpack.config.d/wasm/config.js
+//project.tasks.getByName("wasmJsDevelopmentExecutableCompileSync").doLast {
+//    val f = project.buildDir.resolve("./js/packages/clocks-wasm/kotlin/clocks-wasm.uninstantiated.mjs").normalize()
+//    val t = f.readText().replace("'skia': imports['skia'] ?? await import('skia'),", "'skia': imports['skia'],")
+//    f.writeText(t)
+//}
