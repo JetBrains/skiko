@@ -24,9 +24,9 @@ class OutputWStream(out: OutputStream?) : WStream(_nMake(out), _FinalizerHolder.
 }
 
 @ExternalSymbolName("org_jetbrains_skia_OutputWStream__1nGetFinalizer")
-@ModuleImport("skia", "org_jetbrains_skia_OutputWStream__1nGetFinalizer")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_OutputWStream__1nGetFinalizer")
 private external fun OutputWStream_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_OutputWStream__1nMake")
-@ModuleImport("skia", "org_jetbrains_skia_OutputWStream__1nMake")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_OutputWStream__1nMake")
 private external fun _nMake(out: OutputStream?): NativePointer

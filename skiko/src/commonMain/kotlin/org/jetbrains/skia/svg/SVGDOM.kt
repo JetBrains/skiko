@@ -68,21 +68,21 @@ class SVGDOM internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nMakeFromData")
-@ModuleImport("skia", "org_jetbrains_skia_svg_SVGDOM__1nMakeFromData")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_svg_SVGDOM__1nMakeFromData")
 private external fun SVGDOM_nMakeFromData(dataPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nGetRoot")
-@ModuleImport("skia", "org_jetbrains_skia_svg_SVGDOM__1nGetRoot")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_svg_SVGDOM__1nGetRoot")
 private external fun SVGDOM_nGetRoot(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nGetContainerSize")
-@ModuleImport("skia", "org_jetbrains_skia_svg_SVGDOM__1nGetContainerSize")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_svg_SVGDOM__1nGetContainerSize")
 private external fun SVGDOM_nGetContainerSize(ptr: NativePointer, dst: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nSetContainerSize")
-@ModuleImport("skia", "org_jetbrains_skia_svg_SVGDOM__1nSetContainerSize")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_svg_SVGDOM__1nSetContainerSize")
 private external fun SVGDOM_nSetContainerSize(ptr: NativePointer, width: Float, height: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGDOM__1nRender")
-@ModuleImport("skia", "org_jetbrains_skia_svg_SVGDOM__1nRender")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_svg_SVGDOM__1nRender")
 private external fun SVGDOM_nRender(ptr: NativePointer, canvasPtr: NativePointer)

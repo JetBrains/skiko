@@ -396,19 +396,19 @@ class Typeface internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUniqueId")
-@ModuleImport("skia", "org_jetbrains_skia_Typeface__1nGetUniqueId")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nGetUniqueId")
 private external fun Typeface_nGetUniqueId(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nEquals")
-@ModuleImport("skia", "org_jetbrains_skia_Typeface__1nEquals")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nEquals")
 private external fun Typeface_nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeDefault")
-@ModuleImport("skia", "org_jetbrains_skia_Typeface__1nMakeDefault")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nMakeDefault")
 private external fun Typeface_nMakeDefault(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUTF32Glyphs")
-@ModuleImport("skia", "org_jetbrains_skia_Typeface__1nGetUTF32Glyphs")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nGetUTF32Glyphs")
 private external fun Typeface_nGetUTF32Glyphs(
     ptr: NativePointer,
     uni: InteropPointer,
@@ -417,51 +417,51 @@ private external fun Typeface_nGetUTF32Glyphs(
 )
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUTF32Glyph")
-@ModuleImport("skia", "org_jetbrains_skia_Typeface__1nGetUTF32Glyph")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nGetUTF32Glyph")
 private external fun Typeface_nGetUTF32Glyph(ptr: NativePointer, unichar: Int): Short
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetBounds")
-@ModuleImport("skia", "org_jetbrains_skia_Typeface__1nGetBounds")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nGetBounds")
 private external fun Typeface_nGetBounds(ptr: NativePointer, bounds: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetFontStyle")
-@ModuleImport("skia", "org_jetbrains_skia_Typeface__1nGetFontStyle")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nGetFontStyle")
 private external fun _nGetFontStyle(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nIsFixedPitch")
-@ModuleImport("skia", "org_jetbrains_skia_Typeface__1nIsFixedPitch")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nIsFixedPitch")
 private external fun _nIsFixedPitch(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetVariationsCount")
-@ModuleImport("skia", "org_jetbrains_skia_Typeface__1nGetVariationsCount")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nGetVariationsCount")
 private external fun _nGetVariationsCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetVariations")
-@ModuleImport("skia", "org_jetbrains_skia_Typeface__1nGetVariations")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nGetVariations")
 private external fun _nGetVariations(ptr: NativePointer, variations: InteropPointer, count: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetVariationAxesCount")
-@ModuleImport("skia", "org_jetbrains_skia_Typeface__1nGetVariationAxesCount")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nGetVariationAxesCount")
 private external fun _nGetVariationAxesCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetVariationAxes")
-@ModuleImport("skia", "org_jetbrains_skia_Typeface__1nGetVariationAxes")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nGetVariationAxes")
 private external fun _nGetVariationAxes(ptr: NativePointer, axisData: InteropPointer, axisCount: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeFromName")
-@ModuleImport("skia", "org_jetbrains_skia_Typeface__1nMakeFromName")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nMakeFromName")
 private external fun _nMakeFromName(name: InteropPointer, fontStyle: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeFromFile")
-@ModuleImport("skia", "org_jetbrains_skia_Typeface__1nMakeFromFile")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nMakeFromFile")
 internal external fun _nMakeFromFile(path: InteropPointer, index: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeFromData")
-@ModuleImport("skia", "org_jetbrains_skia_Typeface__1nMakeFromData")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nMakeFromData")
 private external fun _nMakeFromData(dataPtr: NativePointer, index: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nMakeClone")
-@ModuleImport("skia", "org_jetbrains_skia_Typeface__1nMakeClone")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nMakeClone")
 private external fun _nMakeClone(
     ptr: NativePointer,
     variations: InteropPointer,
@@ -470,35 +470,35 @@ private external fun _nMakeClone(
 ): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetGlyphsCount")
-@ModuleImport("skia", "org_jetbrains_skia_Typeface__1nGetGlyphsCount")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nGetGlyphsCount")
 private external fun _nGetGlyphsCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetTablesCount")
-@ModuleImport("skia", "org_jetbrains_skia_Typeface__1nGetTablesCount")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nGetTablesCount")
 private external fun _nGetTablesCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetTableTagsCount")
-@ModuleImport("skia", "org_jetbrains_skia_Typeface__1nGetTableTagsCount")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nGetTableTagsCount")
 private external fun _nGetTableTagsCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetTableTags")
-@ModuleImport("skia", "org_jetbrains_skia_Typeface__1nGetTableTags")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nGetTableTags")
 private external fun _nGetTableTags(ptr: NativePointer, tags: InteropPointer, count: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetTableSize")
-@ModuleImport("skia", "org_jetbrains_skia_Typeface__1nGetTableSize")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nGetTableSize")
 private external fun _nGetTableSize(ptr: NativePointer, tag: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetTableData")
-@ModuleImport("skia", "org_jetbrains_skia_Typeface__1nGetTableData")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nGetTableData")
 private external fun _nGetTableData(ptr: NativePointer, tag: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetUnitsPerEm")
-@ModuleImport("skia", "org_jetbrains_skia_Typeface__1nGetUnitsPerEm")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nGetUnitsPerEm")
 private external fun _nGetUnitsPerEm(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetKerningPairAdjustments")
-@ModuleImport("skia", "org_jetbrains_skia_Typeface__1nGetKerningPairAdjustments")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nGetKerningPairAdjustments")
 private external fun _nGetKerningPairAdjustments(
     ptr: NativePointer,
     glyphs: InteropPointer,
@@ -507,9 +507,9 @@ private external fun _nGetKerningPairAdjustments(
 ): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetFamilyNames")
-@ModuleImport("skia", "org_jetbrains_skia_Typeface__1nGetFamilyNames")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nGetFamilyNames")
 private external fun _nGetFamilyNames(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Typeface__1nGetFamilyName")
-@ModuleImport("skia", "org_jetbrains_skia_Typeface__1nGetFamilyName")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Typeface__1nGetFamilyName")
 private external fun _nGetFamilyName(ptr: NativePointer): NativePointer

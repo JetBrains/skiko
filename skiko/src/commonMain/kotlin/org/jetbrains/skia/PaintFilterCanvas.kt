@@ -54,15 +54,15 @@ private fun makePaintFilterCanvas(canvas: Canvas, unrollDrawable: Boolean): Nati
 internal expect fun PaintFilterCanvas.doInit(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_PaintFilterCanvas__1nMake")
-@ModuleImport("skia", "org_jetbrains_skia_PaintFilterCanvas__1nMake")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_PaintFilterCanvas__1nMake")
 private external fun PaintFilterCanvas_nMake(canvasPtr: NativePointer, unrollDrawable: Boolean): NativePointer
 
 // Native/JS only
 
 @ExternalSymbolName("org_jetbrains_skia_PaintFilterCanvas__1nInit")
-@ModuleImport("skia", "org_jetbrains_skia_PaintFilterCanvas__1nInit")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_PaintFilterCanvas__1nInit")
 internal external fun PaintFilterCanvas_nInit(ptr: NativePointer, onFilter: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_PaintFilterCanvas__1nGetOnFilterPaint")
-@ModuleImport("skia", "org_jetbrains_skia_PaintFilterCanvas__1nGetOnFilterPaint")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_PaintFilterCanvas__1nGetOnFilterPaint")
 internal external fun PaintFilterCanvas_nGetOnFilterPaint(ptr: NativePointer): NativePointer

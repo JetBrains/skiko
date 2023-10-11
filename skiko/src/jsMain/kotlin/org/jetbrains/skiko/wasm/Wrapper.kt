@@ -30,6 +30,16 @@ internal fun ContextAttributes.asJsObject(): dynamic {
     return jsObject
 }
 
+private external interface GLInterface {
+    fun createContext(context: HTMLCanvasElement, contextAttributes: ContextAttributes): NativePointer;
+    fun makeContextCurrent(contextPointer: NativePointer): Boolean;
+}
+
+internal external object GL : GLInterface {
+    override fun createContext(context: HTMLCanvasElement, contextAttributes: ContextAttributes): Int = definedExternally
+    override fun makeContextCurrent(contextPointer: NativePointer): Boolean = definedExternally
+}
+
 
 internal actual fun createWebGLContext(canvas: HTMLCanvasElement, attr: ContextAttributes?): NativePointer {
     val contextAttributes = object : ContextAttributes {

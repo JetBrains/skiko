@@ -200,85 +200,85 @@ class StrutStyle internal constructor(ptr: NativePointer) : Managed(ptr, _Finali
 
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nGetFinalizer")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_StrutStyle__1nGetFinalizer")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_StrutStyle__1nGetFinalizer")
 private external fun StrutStyle_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nMake")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_StrutStyle__1nMake")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_StrutStyle__1nMake")
 private external fun StrutStyle_nMake(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nEquals")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_StrutStyle__1nEquals")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_StrutStyle__1nEquals")
 private external fun StrutStyle_nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nGetHeight")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_StrutStyle__1nGetHeight")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_StrutStyle__1nGetHeight")
 private external fun StrutStyle_nGetHeight(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetHeight")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_StrutStyle__1nSetHeight")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_StrutStyle__1nSetHeight")
 private external fun StrutStyle_nSetHeight(ptr: NativePointer, value: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetEnabled")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_StrutStyle__1nSetEnabled")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_StrutStyle__1nSetEnabled")
 private external fun StrutStyle_nSetEnabled(ptr: NativePointer, value: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nGetFontFamilies")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_StrutStyle__1nGetFontFamilies")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_StrutStyle__1nGetFontFamilies")
 private external fun _nGetFontFamilies(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetFontFamilies")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_StrutStyle__1nSetFontFamilies")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_StrutStyle__1nSetFontFamilies")
 private external fun StrutStyle_nSetFontFamilies(ptr: NativePointer, families: InteropPointer, familiesCount: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nGetFontStyle")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_StrutStyle__1nGetFontStyle")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_StrutStyle__1nGetFontStyle")
 private external fun _nGetFontStyle(ptr: NativePointer, fontStyleData: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetFontStyle")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_StrutStyle__1nSetFontStyle")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_StrutStyle__1nSetFontStyle")
 private external fun _nSetFontStyle(ptr: NativePointer, value: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nGetFontSize")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_StrutStyle__1nGetFontSize")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_StrutStyle__1nGetFontSize")
 private external fun _nGetFontSize(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetFontSize")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_StrutStyle__1nSetFontSize")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_StrutStyle__1nSetFontSize")
 private external fun _nSetFontSize(ptr: NativePointer, value: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nGetLeading")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_StrutStyle__1nGetLeading")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_StrutStyle__1nGetLeading")
 private external fun _nGetLeading(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetLeading")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_StrutStyle__1nSetLeading")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_StrutStyle__1nSetLeading")
 private external fun _nSetLeading(ptr: NativePointer, value: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nIsEnabled")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_StrutStyle__1nIsEnabled")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_StrutStyle__1nIsEnabled")
 private external fun _nIsEnabled(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nIsHeightForced")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_StrutStyle__1nIsHeightForced")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_StrutStyle__1nIsHeightForced")
 private external fun _nIsHeightForced(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetHeightForced")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_StrutStyle__1nSetHeightForced")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_StrutStyle__1nSetHeightForced")
 private external fun _nSetHeightForced(ptr: NativePointer, value: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nIsHeightOverridden")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_StrutStyle__1nIsHeightOverridden")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_StrutStyle__1nIsHeightOverridden")
 private external fun _nIsHeightOverridden(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetHeightOverridden")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_StrutStyle__1nSetHeightOverridden")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_StrutStyle__1nSetHeightOverridden")
 private external fun _nSetHeightOverridden(ptr: NativePointer, value: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nIsHalfLeading")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_StrutStyle__1nIsHalfLeading")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_StrutStyle__1nIsHalfLeading")
 private external fun _nIsHalfLeading(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_StrutStyle__1nSetHalfLeading")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_StrutStyle__1nSetHalfLeading")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_StrutStyle__1nSetHalfLeading")
 private external fun _nSetHalfLeading(ptr: NativePointer, value: Boolean)

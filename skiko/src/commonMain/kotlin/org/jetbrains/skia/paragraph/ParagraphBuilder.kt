@@ -91,27 +91,27 @@ private fun makeParagraphBuilder(
 }
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nGetFinalizer")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_ParagraphBuilder__1nGetFinalizer")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphBuilder__1nGetFinalizer")
 private external fun ParagraphBuilder_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nMake")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_ParagraphBuilder__1nMake")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphBuilder__1nMake")
 private external fun _nMake(paragraphStylePtr: NativePointer, fontCollectionPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nPushStyle")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_ParagraphBuilder__1nPushStyle")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphBuilder__1nPushStyle")
 private external fun _nPushStyle(ptr: NativePointer, textStylePtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nPopStyle")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_ParagraphBuilder__1nPopStyle")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphBuilder__1nPopStyle")
 private external fun _nPopStyle(ptr: NativePointer, textStylePtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nAddText")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_ParagraphBuilder__1nAddText")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphBuilder__1nAddText")
 private external fun _nAddText(ptr: NativePointer, text: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nAddPlaceholder")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_ParagraphBuilder__1nAddPlaceholder")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphBuilder__1nAddPlaceholder")
 private external fun _nAddPlaceholder(
     ptr: NativePointer,
     width: Float,
@@ -122,5 +122,5 @@ private external fun _nAddPlaceholder(
 )
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphBuilder__1nBuild")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_ParagraphBuilder__1nBuild")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphBuilder__1nBuild")
 private external fun _nBuild(ptr: NativePointer): NativePointer

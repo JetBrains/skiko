@@ -86,29 +86,29 @@ class AnimationBuilder internal constructor(ptr: NativePointer) : Managed(ptr, _
 }
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nGetFinalizer")
-@ModuleImport("skia", "org_jetbrains_skia_skottie_AnimationBuilder__1nGetFinalizer")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_skottie_AnimationBuilder__1nGetFinalizer")
 private external fun AnimationBuilder_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nMake")
-@ModuleImport("skia", "org_jetbrains_skia_skottie_AnimationBuilder__1nMake")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_skottie_AnimationBuilder__1nMake")
 private external fun AnimationBuilder_nMake(flags: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nSetFontManager")
-@ModuleImport("skia", "org_jetbrains_skia_skottie_AnimationBuilder__1nSetFontManager")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_skottie_AnimationBuilder__1nSetFontManager")
 private external fun _nSetFontManager(ptr: NativePointer, fontMgrPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nSetLogger")
-@ModuleImport("skia", "org_jetbrains_skia_skottie_AnimationBuilder__1nSetLogger")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_skottie_AnimationBuilder__1nSetLogger")
 private external fun _nSetLogger(ptr: NativePointer, loggerPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromString")
-@ModuleImport("skia", "org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromString")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromString")
 private external fun _nBuildFromString(ptr: NativePointer, data: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromFile")
-@ModuleImport("skia", "org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromFile")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromFile")
 internal external fun _nBuildFromFile(ptr: NativePointer, path: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromData")
-@ModuleImport("skia", "org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromData")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_skottie_AnimationBuilder__1nBuildFromData")
 private external fun _nBuildFromData(ptr: NativePointer, dataPtr: NativePointer): NativePointer
