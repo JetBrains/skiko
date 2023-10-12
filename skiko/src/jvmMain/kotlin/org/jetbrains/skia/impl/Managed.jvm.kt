@@ -1,5 +1,6 @@
 package org.jetbrains.skia.impl
 
+import org.jetbrains.skiko.Logger
 import java.lang.ref.PhantomReference
 import java.lang.ref.ReferenceQueue
 import kotlin.concurrent.thread
@@ -27,7 +28,7 @@ actual abstract class Managed actual constructor(
 
     class CleanerThunk(var className: String, var ptr: Long, var finalizerPtr: Long) : Runnable {
         override fun run() {
-            Log.trace { "Cleaning $className ${java.lang.Long.toString(ptr, 16)}" }
+            Logger.trace { "Cleaning $className ${ptr.toString(16)}" }
             Stats.onDeallocated(className)
             Stats.onNativeCall()
             _nInvokeFinalizer(finalizerPtr, ptr)
