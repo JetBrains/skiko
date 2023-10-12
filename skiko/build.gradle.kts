@@ -144,7 +144,10 @@ if (supportJs || supportWasm) {
         }
         libOutputFileName.set(wasmFileName) // emcc ignores this, it names .wasm file identically to js output
         jsOutputFileName.set(jsFileName) // this determines the name .wasm file too
-        skikoJsPrefix.set(
+
+        skikoJsPrefix.from(
+            // the order matters
+            project.layout.projectDirectory.file("src/jsWasmMain/resources/skikoCallbacks.js"),
             project.layout.projectDirectory.file("src/jsWasmMain/resources/setup.$jsFileExtension")
         )
 

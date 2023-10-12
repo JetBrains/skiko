@@ -346,35 +346,35 @@ void disposeCallback(KInteropPointer cb) {
 
 KBoolean callBooleanCallback(KInteropPointer cb) {
     int value = EM_ASM_INT({
-        return _callCallback($0).value ? 1 : 0;
+        return _SkikoCallbacks._callCallback($0).value ? 1 : 0;
     }, cb);
     return static_cast<KBoolean>(value);
 }
 
 KInt callIntCallback(KInteropPointer cb) {
     int value = EM_ASM_INT({
-        return _callCallback($0).value;
+        return _SkikoCallbacks._callCallback($0).value;
     }, cb);
     return static_cast<KInt>(value);
 }
 
 KNativePointer callNativePointerCallback(KInteropPointer cb) {
     int value = EM_ASM_INT({
-        return _callCallback($0).value;
+        return _SkikoCallbacks._callCallback($0).value;
     }, cb);
     return reinterpret_cast<KNativePointer>(value);
 }
 
 KInteropPointer callInteropPointerCallback(KInteropPointer cb) {
     int value = EM_ASM_INT({
-        return _callCallback($0).value;
+        return _SkikoCallbacks._callCallback($0).value;
     }, cb);
     return reinterpret_cast<KInteropPointer>(value);
 }
 
 void callVoidCallback(KInteropPointer cb) {
     EM_ASM({
-        _callCallback($0);
+        _SkikoCallbacks._callCallback($0);
     }, cb);
 }
 
