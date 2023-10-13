@@ -22,8 +22,8 @@ val Project.supportWasm: Boolean
 val Project.supportJs: Boolean
     get() = findProperty("skiko.js.enabled") == "true" || isInIdea
 
-val coroutinesVersion = if (supportWasm) "1.7.2-wasm1" else "1.7.2"
-val atomicFuVersion = if (supportWasm) "0.22.0-wasm0" else "0.22.0"
+val coroutinesVersion = if (supportWasm) "1.7.2-wasm2" else "1.7.2"
+val atomicFuVersion = if (supportWasm) "0.22.0-wasm1" else "0.22.0"
 
 fun targetSuffix(os: OS, arch: Arch): String {
     return "${os.id}_${arch.id}"
@@ -59,7 +59,7 @@ configurations.all {
         if (requested.module.group == "org.jetbrains.kotlinx" &&
             requested.module.name.contains("atomicfu", true)
         ) {
-            if (!isWasm) useVersion("0.21.0")
+            if (!isWasm) useVersion("0.22.0")
         }
     }
 }
@@ -298,15 +298,15 @@ kotlin {
     }
 
     if (supportWasm) {
-        wasm {
+        wasmJs {
             moduleName = "skiko-kjs-wasm" // override the name to avoid name collision with a different skiko.js file
             browser {
                 testTask {
                     dependsOn("linkWasm")
                     useKarma {
                         this.webpackConfig.experiments.add("topLevelAwait")
-                        useChromeHeadless()
-//                        useChromeCanaryHeadless()
+//                        useChromeHeadless()
+                        useChromeCanaryHeadless()
                         useConfigDirectory(project.projectDir.resolve("karma.config.d").resolve("wasm"))
                     }
                 }
