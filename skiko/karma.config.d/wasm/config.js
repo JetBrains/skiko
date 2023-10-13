@@ -20,13 +20,18 @@ debug(`karma basePath: ${basePath}`);
 debug(`karma wasmPath: ${wasmPath}`);
 debug(`karma generatedAssetsPath: ${generatedAssetsPath}`);
 
-config.browsers = ["ChromeHeadlessWasmGc"];
-config.customLaunchers = {
-    ChromeHeadlessWasmGc: {
-        base: 'ChromeHeadless',
-        flags: ['--js-flags=--experimental-wasm-gc']
-    }
-};
+// config.browsers = ["ChromeDev"];
+// config.customLaunchers = {
+//     ChromeHeadlessWasmGc: {
+//         base: 'ChromeHeadless',
+//         flags: ['--js-flags=--experimental-wasm-gc']
+//     },
+//     ChromeDev: {
+//         base: 'ChromeHeadless',
+//         flags: ['--js-flags=--experimental-wasm-gc'],
+//         chromeDataDir: path.resolve(__dirname, '.google-chrome-unstable')
+//     }
+// };
 
 config.proxies = {
     "/wasm/": wasmPath,
