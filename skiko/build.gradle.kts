@@ -83,7 +83,7 @@ fun KotlinTarget.isIosSimArm64() =
 fun String.withSuffix(isIosSim: Boolean = false) =
     this + if (isIosSim) "Sim" else ""
 
-if (supportJs || supportWasm) {
+val linkWasm = if (supportJs || supportWasm) {
     val skiaWasmDir = registerOrGetSkiaDirProvider(OS.Wasm, Arch.Wasm)
 
     val compileWasm by tasks.registering(CompileSkikoCppTask::class) {
@@ -105,15 +105,17 @@ if (supportJs || supportWasm) {
         includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp/common/include"))
         includeHeadersNonRecursive(skiaHeadersDirs(skiaWasmDir.get()))
 
-        flags.set(listOf(
-            *skiaPreprocessorFlags(OS.Wasm),
-            *buildType.clangFlags,
-            "-fno-rtti",
-            "-fno-exceptions",
-            ))
+        flags.set(
+            listOf(
+                *skiaPreprocessorFlags(OS.Wasm),
+                *buildType.clangFlags,
+                "-fno-rtti",
+                "-fno-exceptions",
+            )
+        )
     }
 
-    fun LinkSkikoWasmTask.configureCommon(outputES6: Boolean = true) {
+    val configureCommon: LinkSkikoWasmTask.(outputES6: Boolean) -> Unit = { outputES6 ->
         val osArch = OS.Wasm to Arch.Wasm
 
         dependsOn(compileWasm)
@@ -167,7 +169,7 @@ if (supportJs || supportWasm) {
                         "-s", "EXPORT_ES6=1",
                         "-s", "MODULARIZE=1",
                         "-s", "EXPORT_NAME=loadSkikoWASM",
-                        "-s", "EXPORTED_RUNTIME_METHODS=\"[GL]\"",
+                        "-s", "EXPORTED_RUNTIME_METHODS=\"[GL, wasmExports]\"",
                         // "-s", "EXPORT_ALL=1",
                     )
                 )
@@ -200,12 +202,12 @@ if (supportJs || supportWasm) {
     }
 
     val linkWasmWithES6 by tasks.registering(LinkSkikoWasmTask::class) {
-        configureCommon(outputES6 = true)
+        configureCommon(true)
     }
 
     val linkWasm by tasks.registering(LinkSkikoWasmTask::class) {
         dependsOn(linkWasmWithES6)
-        configureCommon(outputES6 = false)
+        configureCommon(false)
     }
 
 
@@ -229,7 +231,9 @@ if (supportJs || supportWasm) {
             println("Wasm and JS at: ${archiveFile.get().asFile.absolutePath}")
         }
     }
-}
+
+    Pair(linkWasm, linkWasmWithES6)
+} else Pair(null, null)
 
 fun compileNativeBridgesTask(os: OS, arch: Arch, isArm64Simulator: Boolean): TaskProvider<CompileSkikoCppTask> {
     val skiaNativeDir = registerOrGetSkiaDirProvider(os, arch, isIosSim = isArm64Simulator)
@@ -362,13 +366,24 @@ kotlin {
                     dependsOn("linkWasm")
                     useKarma {
                         this.webpackConfig.experiments.add("topLevelAwait")
-                        useChromeHeadless()
+                        useChromeHeadlessWasmGc()
 //                        useChromeCanaryHeadless()
                         useConfigDirectory(project.projectDir.resolve("karma.config.d").resolve("wasm"))
                     }
                 }
             }
             generateVersion(OS.Wasm, Arch.Wasm)
+
+            val test by compilations.getting
+            project.tasks.named<Copy>(test.processResourcesTaskName) {
+                from(linkWasm.first!!) {
+                    include("*.wasm")
+                }
+
+                from(linkWasm.second!!) {
+                    include("*.mjs")
+                }
+            }
         }
     }
 

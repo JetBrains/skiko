@@ -9,6 +9,7 @@ private external interface GLInterface {
     fun makeContextCurrent(contextPointer: NativePointer): Boolean;
 }
 
+@JsModule("GL")
 internal external object GL : GLInterface {
     override fun createContext(context: HTMLCanvasElement, contextAttributes: ContextAttributes): Int = definedExternally
     override fun makeContextCurrent(contextPointer: NativePointer): Boolean = definedExternally

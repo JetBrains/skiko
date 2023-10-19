@@ -407,7 +407,7 @@ internal external interface CallbackDataInt : JsAny { @JsName("value") var value
 internal external interface CallbackDataNativePointer : JsAny { @JsName("value") var value: NativePointer? }
 internal external interface CallbackDataInteropPointer: JsAny { @JsName("value") var value: InteropPointer? }
 
-@JsName("_SkikoCallbacks")
+@JsModule("SkikoCallbacks")
 private external object SkikoCallbacks {
     // See `setup.mjs`
     fun _registerCallback(cb: () -> Unit, data: JsAny?, global: Boolean): Int
