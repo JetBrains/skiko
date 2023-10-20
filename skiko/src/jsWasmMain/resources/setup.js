@@ -1,5 +1,9 @@
 // This file is merged with skiko.js by emcc
 
+const SkikoCallbacks = {
+    _callCallback, _registerCallback, _releaseCallback, _createLocalCallbackScope, _releaseLocalCallbackScope
+}
+
 var wasmSetup = new Promise(function(resolve, reject) {
     Module['onRuntimeInitialized'] = _ => {
         resolve(Module);

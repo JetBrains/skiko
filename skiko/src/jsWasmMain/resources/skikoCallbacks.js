@@ -73,7 +73,3 @@ const { _callCallback, _registerCallback, _releaseCallback, _createLocalCallback
         },
     }
 })();
-
-export const SkikoCallbacks = {
-    _callCallback, _registerCallback, _releaseCallback, _createLocalCallbackScope, _releaseLocalCallbackScope
-}

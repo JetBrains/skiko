@@ -5,5 +5,5 @@ import { instantiate } from './skiko-kjs-wasm-test.uninstantiated.mjs';
 
 import { loadAndInitSkikoWasm, SkikoCallbacks }  from './skiko.mjs';
 const skikoWasm = await loadAndInitSkikoWasm();
-(await instantiate({ skia: skikoWasm.wasmExports, GL: skikoWasm.GL, SkikoCallbacks: SkikoCallbacks })).exports.startUnitTests()
+(await instantiate({ skia: skikoWasm.asm, GL: skikoWasm.GL, SkikoCallbacks: SkikoCallbacks })).exports.startUnitTests()
 karmaLoaded();
