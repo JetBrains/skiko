@@ -22,7 +22,7 @@ private class FinalizationThunk(private val finalizer: NativePointer, val classN
 }
 
 actual abstract class Managed actual constructor(
-        ptr: NativePointer, finalizer: NativePointer, managed: Boolean) : Native(ptr) {
+        ptr: NativePointer, finalizer: NativePointer, managed: Boolean) : Native() {
 
     private val thunk: FinalizationThunk? = if (managed) {
         require(ptr != NullPointer) { "Managed ptr is nullptr" }
@@ -39,23 +39,35 @@ actual abstract class Managed actual constructor(
         }
     } else null
 
+    private var __ptr: NativePointer = ptr.also {
+        require(it != NullPointer) {
+            "Can't wrap NullPointer"
+        }
+    }
+
+    actual override val _ptr: NativePointer get() = __ptr.also {
+        check(__ptr != NullPointer) {
+            "Object already closed: ${this::class.simpleName}"
+        }
+    }
+
     actual open fun close() {
-        require(_ptr != NullPointer) {
-            "Object already closed: ${this::class.simpleName}, _ptr=$_ptr"
+        check(__ptr != NullPointer) {
+            "Object already closed: ${this::class.simpleName}"
         }
-        requireNotNull(thunk) {
-            "Object is not managed in K/N runtime, can't close(): ${this::class.simpleName}, _ptr=$_ptr"
+        checkNotNull(thunk) {
+            "Object is not managed in K/N runtime, can't close(): ${this::class.simpleName}, _ptr=$__ptr"
         }
-        require(thunk.isActive) {
-            "Object is closed already, can't close(): ${this::class.simpleName}, _ptr=$_ptr"
+        check(thunk.isActive) {
+            "Object is closed already, can't close(): ${this::class.simpleName}, _ptr=$__ptr"
         }
 
         thunk.clean()
-        _ptr = NullPointer
+        __ptr = NullPointer
     }
 
     actual open val isClosed: Boolean
-        get() = _ptr == NullPointer
+        get() = __ptr == NullPointer
 }
 
 @ExternalSymbolName("org_jetbrains_skia_impl_Managed__invokeFinalizer")

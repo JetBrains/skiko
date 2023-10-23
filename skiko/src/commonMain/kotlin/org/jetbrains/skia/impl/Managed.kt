@@ -4,6 +4,8 @@ package org.jetbrains.skia.impl
  * Peer for a native object.
  */
 expect abstract class Managed(ptr: NativePointer, finalizer: NativePointer, managed: Boolean = true) : Native {
+    override val _ptr: NativePointer
+
     /**
      * Free underlying native resource, peer is useless afterwards.
      */
