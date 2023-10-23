@@ -18,7 +18,7 @@ class PathUtilsTest {
 
         val fillPath = PathUtils.fillPathWithPaint(path, paint)
 
-        assertEquals(true, fillPath.isLastContourClosed)
+        assertTrue(fillPath.isLastContourClosed)
         assertTrue(fillPath.pointsCount > path.pointsCount)
         assertTrue(fillPath.verbsCount > path.verbsCount)
     }
