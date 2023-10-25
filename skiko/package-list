@@ -2076,6 +2076,10 @@ $dokka.location:org.jetbrains.skia/PathSegmentMask.Companion/CUBIC/#/PointingToD
 $dokka.location:org.jetbrains.skia/PathSegmentMask.Companion/LINE/#/PointingToDeclaration/skiko/org.jetbrains.skia/-path-segment-mask/-companion/-l-i-n-e.html
 $dokka.location:org.jetbrains.skia/PathSegmentMask.Companion/QUAD/#/PointingToDeclaration/skiko/org.jetbrains.skia/-path-segment-mask/-companion/-q-u-a-d.html
 $dokka.location:org.jetbrains.skia/PathSegmentMask///PointingToDeclaration/skiko/org.jetbrains.skia/-path-segment-mask/index.html
+$dokka.location:org.jetbrains.skia/PathUtils///PointingToDeclaration/skiko/org.jetbrains.skia/-path-utils/index.html
+$dokka.location:org.jetbrains.skia/PathUtils/fillPathWithPaint/#org.jetbrains.skia.Path#org.jetbrains.skia.Paint#org.jetbrains.skia.Rect?#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skia/-path-utils/fill-path-with-paint.html
+$dokka.location:org.jetbrains.skia/PathUtils/fillPathWithPaint/#org.jetbrains.skia.Path#org.jetbrains.skia.Paint#org.jetbrains.skia.Rect?#org.jetbrains.skia.Matrix33/PointingToDeclaration/skiko/org.jetbrains.skia/-path-utils/fill-path-with-paint.html
+$dokka.location:org.jetbrains.skia/PathUtils/fillPathWithPaint/#org.jetbrains.skia.Path#org.jetbrains.skia.Paint/PointingToDeclaration/skiko/org.jetbrains.skia/-path-utils/fill-path-with-paint.html
 $dokka.location:org.jetbrains.skia/PathVerb.CLOSE///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-path-verb/-c-l-o-s-e/index.html
 $dokka.location:org.jetbrains.skia/PathVerb.CONIC///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-path-verb/-c-o-n-i-c/index.html
 $dokka.location:org.jetbrains.skia/PathVerb.CUBIC///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-path-verb/-c-u-b-i-c/index.html
