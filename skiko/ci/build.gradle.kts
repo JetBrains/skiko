@@ -16,6 +16,7 @@ val skikoArtifactIds: List<String> =
         SkikoArtifacts.jvmRuntimeArtifactIdFor(OS.MacOS, Arch.X64),
         SkikoArtifacts.jvmRuntimeArtifactIdFor(OS.MacOS, Arch.Arm64),
         SkikoArtifacts.jsWasmArtifactId,
+        SkikoArtifacts.jsArtifactId,
         SkikoArtifacts.nativeArtifactIdFor(OS.Linux, Arch.X64),
         SkikoArtifacts.nativeArtifactIdFor(OS.MacOS, Arch.Arm64),
         SkikoArtifacts.nativeArtifactIdFor(OS.MacOS, Arch.X64),
