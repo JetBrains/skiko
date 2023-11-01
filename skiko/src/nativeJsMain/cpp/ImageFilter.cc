@@ -6,16 +6,6 @@
 #include "SkRect.h"
 #include "common.h"
 
-
-SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeAlphaThreshold
-  (KNativePointer regionPtr, KFloat innerMin, KFloat outerMax, KNativePointer inputPtr, KInt* cropInts) {
-    SkRegion* region = reinterpret_cast<SkRegion*>((regionPtr));
-    SkImageFilter* input = reinterpret_cast<SkImageFilter*>((inputPtr));
-    std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(cropInts);
-    SkImageFilter* ptr = SkImageFilters::AlphaThreshold(*region, innerMin, outerMax, sk_ref_sp(input), crop.get()).release();
-    return reinterpret_cast<KNativePointer>(ptr);
-}
-
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeArithmetic
   (KFloat k1, KFloat k2, KFloat k3, KFloat k4, KBoolean enforcePMColor, KNativePointer bgPtr, KNativePointer fgPtr, KInt* cropInts) {
     SkImageFilter* bg = reinterpret_cast<SkImageFilter*>((bgPtr));
@@ -97,10 +87,11 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeImage
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ImageFilter__1nMakeMagnifier
-  (KFloat l, KFloat t, KFloat r, KFloat b, KFloat inset, KNativePointer inputPtr, KInt* cropRectInts) {
+  (KFloat l, KFloat t, KFloat r, KFloat b, KFloat zoomAmount, KFloat inset, KInt samplingModeVal1, KInt samplingModeVal2, KNativePointer inputPtr, KInt* cropRectInts) {
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>((inputPtr));
     std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(cropRectInts);
-    SkImageFilter* ptr = SkImageFilters::Magnifier(SkRect{l, t, r, b}, inset, sk_ref_sp(input), crop.get()).release();
+    SkSamplingOptions sampling = skija::SamplingMode::unpackFrom2Ints(samplingModeVal1, samplingModeVal2);
+    SkImageFilter* ptr = SkImageFilters::Magnifier(SkRect{l, t, r, b}, zoomAmount, inset, sampling, sk_ref_sp(input), crop.get()).release();
     return reinterpret_cast<KNativePointer>(ptr);
 }
 

@@ -20,7 +20,7 @@ extern "C"
             GrDirectContext *context = fromJavaPointer<GrDirectContext *>(contextPtr);
             surface->flushAndSubmit(true);
             surface->flush(SkSurface::BackendSurfaceAccess::kPresent, GrFlushInfo());
-            context->flush({});
+            context->flush();
             context->submit(true);
         }
         __except(EXCEPTION_EXECUTE_HANDLER) {

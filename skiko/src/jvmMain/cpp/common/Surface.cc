@@ -4,6 +4,13 @@
 #include "SkSurface.h"
 #include "interop.hh"
 
+#include "include/gpu/ganesh/SkSurfaceGanesh.h"
+
+#ifdef SK_METAL
+#include "include/gpu/ganesh/mtl/SkSurfaceMetal.h"
+#include "include/gpu/mtl/GrMtlTypes.h"
+#endif
+
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_SurfaceKt__1nMakeRasterDirect
   (JNIEnv* env, jclass jclass,
     jint width, jint height, jint colorType, jint alphaType, jlong colorSpacePtr,
@@ -18,7 +25,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_SurfaceKt__1nMakeRast
                                               sk_ref_sp<SkColorSpace>(colorSpace));
     std::unique_ptr<SkSurfaceProps> surfaceProps = skija::SurfaceProps::toSkSurfaceProps(env, surfacePropsInts);
 
-    sk_sp<SkSurface> instance = SkSurface::MakeRasterDirect(
+    sk_sp<SkSurface> instance = SkSurfaces::WrapPixels(
       imageInfo,
       reinterpret_cast<void*>(static_cast<uintptr_t>(pixelsPtr)),
       rowBytes,
@@ -33,7 +40,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_SurfaceKt__1nMakeRast
     SkPixmap* pixmap = reinterpret_cast<SkPixmap*>(static_cast<uintptr_t>(pixmapPtr));
     std::unique_ptr<SkSurfaceProps> surfaceProps = skija::SurfaceProps::toSkSurfaceProps(env, surfacePropsInts);
 
-    sk_sp<SkSurface> instance = SkSurface::MakeRasterDirect(*pixmap, surfaceProps.get());
+    sk_sp<SkSurface> instance = SkSurfaces::WrapPixels(*pixmap, surfaceProps.get());
     return reinterpret_cast<jlong>(instance.release());
 }
 
@@ -51,7 +58,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_SurfaceKt__1nMakeRast
                                               sk_ref_sp<SkColorSpace>(colorSpace));
     std::unique_ptr<SkSurfaceProps> surfaceProps = skija::SurfaceProps::toSkSurfaceProps(env, surfacePropsInts);
 
-    sk_sp<SkSurface> instance = SkSurface::MakeRaster(
+    sk_sp<SkSurface> instance = SkSurfaces::Raster(
       imageInfo,
       rowBytes,
       surfaceProps.get());
@@ -60,10 +67,9 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_SurfaceKt__1nMakeRast
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_SurfaceKt__1nMakeRasterN32Premul
   (JNIEnv* env, jclass jclass, jint width, jint height) {
-    sk_sp<SkSurface> surface = SkSurface::MakeRasterN32Premul(
-        width, height,
-        /* const SkSurfaceProps* */ nullptr
-    );
+  // todo rename kotlin methods accordingly
+    SkImageInfo imageInfo = SkImageInfo::MakeN32Premul(width, height);
+    sk_sp<SkSurface> surface = SkSurfaces::Raster(imageInfo);
     return reinterpret_cast<jlong>(surface.release());
 }
 
@@ -76,7 +82,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_SurfaceKt__1nMakeFrom
     sk_sp<SkColorSpace> colorSpace = sk_ref_sp<SkColorSpace>(reinterpret_cast<SkColorSpace*>(static_cast<uintptr_t>(colorSpacePtr)));
     std::unique_ptr<SkSurfaceProps> surfaceProps = skija::SurfaceProps::toSkSurfaceProps(env, surfacePropsInts);
 
-    sk_sp<SkSurface> surface = SkSurface::MakeFromBackendRenderTarget(
+    sk_sp<SkSurface> surface = SkSurfaces::WrapBackendRenderTarget(
         static_cast<GrRecordingContext*>(context),
         *backendRenderTarget,
         grSurfaceOrigin,
@@ -99,7 +105,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_SurfaceKt__1nMakeFrom
     sk_sp<SkColorSpace> colorSpace = sk_ref_sp<SkColorSpace>(reinterpret_cast<SkColorSpace*>(static_cast<uintptr_t>(colorSpacePtr)));
     std::unique_ptr<SkSurfaceProps> surfaceProps = skija::SurfaceProps::toSkSurfaceProps(env, surfacePropsInts);
 
-    sk_sp<SkSurface> surface = SkSurface::MakeFromMTKView(
+    sk_sp<SkSurface> surface = SkSurfaces::WrapMTKView(
         static_cast<GrRecordingContext*>(context),
         mtkView,
         grSurfaceOrigin,
@@ -127,8 +133,8 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_SurfaceKt__1nMakeRend
                                               sk_ref_sp<SkColorSpace>(colorSpace));
     std::unique_ptr<SkSurfaceProps> surfaceProps = skija::SurfaceProps::toSkSurfaceProps(env, surfacePropsInts);
 
-    sk_sp<SkSurface> instance = SkSurface::MakeRenderTarget(
-      context, budgeted ? SkBudgeted::kYes : SkBudgeted::kNo,
+    sk_sp<SkSurface> instance = SkSurfaces::RenderTarget(
+      context, budgeted ? skgpu::Budgeted::kYes : skgpu::Budgeted::kNo,
       imageInfo,
       sampleCount, static_cast<GrSurfaceOrigin>(surfaceOrigin),
       surfaceProps.get(),
@@ -138,7 +144,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_SurfaceKt__1nMakeRend
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_SurfaceKt__1nMakeNull
   (JNIEnv* env, jclass jclass, jint width, jint height) {
-  sk_sp<SkSurface> instance = SkSurface::MakeNull(width, height);
+  sk_sp<SkSurface> instance = SkSurfaces::Null(width, height);
   return reinterpret_cast<jlong>(instance.release());
 }
 

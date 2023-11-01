@@ -10,6 +10,7 @@
 #include "GrBackendSurface.h"
 #include "GrDirectContext.h"
 #include "SkSurface.h"
+#include "include/gpu/ganesh/SkSurfaceGanesh.h"
 #include "../common/interop.hh"
 
 #include "d3d/GrD3DTypes.h"
@@ -371,7 +372,7 @@ extern "C"
 
         std::unique_ptr<SkSurfaceProps> surfaceProps = skija::SurfaceProps::toSkSurfaceProps(env, surfacePropsInts);
         GrBackendTexture backendTexture((int)d3dDevice->buffers[index]->GetDesc().Width, (int)d3dDevice->buffers[index]->GetDesc().Height, info);
-        auto result = SkSurface::MakeFromBackendTexture(
+        auto result = SkSurfaces::WrapBackendTexture(
                                  context, backendTexture, kTopLeft_GrSurfaceOrigin, 0,
                                  kRGBA_8888_SkColorType, SkColorSpace::MakeSRGB(), surfaceProps.get())
                                  .release();

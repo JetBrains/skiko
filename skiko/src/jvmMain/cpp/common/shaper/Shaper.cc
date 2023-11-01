@@ -4,7 +4,8 @@
 #include "interop.hh"
 #include "FontRunIterator.hh"
 #include "SkShaper.h"
-#include "src/utils/SkUTF.h"
+#include "SkUnicode.h"
+#include "src/base/SkUTF.h"
 #include "TextLineRunHandler.hh"
 #include "unicode/ubidi.h"
 
@@ -37,7 +38,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nMa
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nMakeShapeDontWrapOrReorder
   (JNIEnv* env, jclass jclass, jlong fontMgrPtr) {
     SkFontMgr* fontMgr = reinterpret_cast<SkFontMgr*>(static_cast<uintptr_t>(fontMgrPtr));
-    return reinterpret_cast<jlong>(SkShaper::MakeShapeDontWrapOrReorder(sk_ref_sp(fontMgr)).release());
+    return reinterpret_cast<jlong>(SkShaper::MakeShapeDontWrapOrReorder(SkUnicode::Make(), sk_ref_sp(fontMgr)).release());
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_shaper_ShaperKt__1nMakeCoreText

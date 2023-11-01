@@ -4,15 +4,20 @@ import org.jetbrains.skia.impl.use
 import org.jetbrains.skia.tests.assertCloseEnough
 import org.jetbrains.skia.tests.assertContentCloseEnough
 import org.jetbrains.skia.tests.makeFromResource
+import org.jetbrains.skiko.KotlinBackend
 import org.jetbrains.skiko.OS
 import org.jetbrains.skiko.hostOs
+import org.jetbrains.skiko.kotlinBackend
 import org.jetbrains.skiko.tests.runTest
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 
-private fun isLinuxOrJs() = (hostOs == OS.Linux) || (hostOs == OS.JS)
-private fun isWin() = (hostOs == OS.Windows)
+private fun isMac() = (hostOs == OS.MacOS)
+private fun isIos() = (hostOs == OS.Ios)
+private fun isLinux() = (hostOs == OS.Linux)
+private fun isWindows() = (hostOs == OS.Windows)
+private fun isJs() = (kotlinBackend == KotlinBackend.JS)
 private val COARSE_EPSILON = 2.4f
 
 class FontTests {
@@ -85,51 +90,30 @@ class FontTests {
                 assertCloseEnough(expected, actual, COARSE_EPSILON)
             }
 
+            assertEquals(if (isLinux() || isJs()) 26 else 24, firstGlyphPath.pointsCount)
 
-            if (isLinuxOrJs()) {
-                assertEquals(26, firstGlyphPath.pointsCount)
-
-                assertCloseEnough(FontMetrics(
-                    -11.64f,
-                    -11.64f,
-                    3.2400002f,
-                    3.2400002f,
-                    0f,
-                    7.2000003f,
-                    29.460001f,
-                    -20.880001f,
-                    8.58f,
-                    6.6000004f,
-                    8.64f,
-                    0.54f,
-                    1.4399999f,
-                    0.54f,
-                    -3.8999999f
-                ), font.metrics, 10e-3f)
-            } else {
-                assertEquals(24, firstGlyphPath.pointsCount)
-
-                // TODO: this cross-platform differences look very suspicious and need to be addressed separately
-
-                assertCloseEnough(FontMetrics(
-                    -11.64f,
-                    -11.64f,
-                    3.2400002f,
-                    3.2400002f,
-                    0f,
-                    if (isWin()) 0f else 29.460001f,
-                    29.460001f,
-                    -20.880001f,
-                    8.58f,
-                    6.6000004f,
-                    8.64f,
-                    0.54f,
-                    1.4399999f,
-                    if (isWin()) 0.54f else null,
-                    if (isWin()) -3.8999999f else null
-                ), font.metrics, 10e-3f)
-
-            }
+            assertCloseEnough(FontMetrics(
+                top = -11.64f,
+                ascent = -11.64f,
+                descent = 3.2400002f,
+                bottom = 3.2400002f,
+                leading = 0f,
+                avgCharWidth = when {
+                    isJs() -> 7.2f
+                    isIos() || isMac() -> 29.460001f
+                    isWindows() -> 0f
+                    else -> 7.2f
+                },
+                maxCharWidth = 29.460001f,
+                xMin = -20.880001f,
+                xMax = 8.58f,
+                xHeight = 6.6000004f,
+                capHeight = 8.64f,
+                underlineThickness = 0.54f,
+                underlinePosition = 1.4399999f,
+                strikeoutThickness = 0.54f,
+                strikeoutPosition = -3.8999999f
+            ), font.metrics, 10e-3f)
 
 //            assertEquals(Rect(1f, -12f, 21f, 0f), font.measureText("ЕЁЫ"))
 

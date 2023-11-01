@@ -5,7 +5,6 @@
 #include "SkHighContrastFilter.h"
 #include "SkLumaColorFilter.h"
 #include "SkOverdrawColorFilter.h"
-#include "SkTableColorFilter.h"
 #include "interop.hh"
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilterKt__1nMakeComposed
@@ -76,7 +75,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilterKt__1nMake
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilterKt__1nMakeTable
   (JNIEnv* env, jclass jclass, jbyteArray tableArray) {
     jbyte* table = env->GetByteArrayElements(tableArray, 0);
-    SkColorFilter* ptr = SkTableColorFilter::Make(reinterpret_cast<uint8_t*>(table)).release();
+    SkColorFilter* ptr = SkColorFilters::Table(reinterpret_cast<uint8_t*>(table)).release();
     env->ReleaseByteArrayElements(tableArray, table, 0);
     return reinterpret_cast<jlong>(ptr);
 }
@@ -93,7 +92,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ColorFilterKt__1nMake
     jbyte* g = arrayG ? env->GetByteArrayElements(arrayG, 0) : nullptr;
     jbyte* b = arrayB ? env->GetByteArrayElements(arrayB, 0) : nullptr;
 
-    SkColorFilter* ptr = SkTableColorFilter::MakeARGB(
+    SkColorFilter* ptr = SkColorFilters::TableARGB(
         reinterpret_cast<uint8_t*>(a),
         reinterpret_cast<uint8_t*>(r),
         reinterpret_cast<uint8_t*>(g),

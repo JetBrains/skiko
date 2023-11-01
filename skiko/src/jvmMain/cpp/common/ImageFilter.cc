@@ -1,5 +1,6 @@
 #include <iostream>
 #include <jni.h>
+#include "SkSamplingOptions.h"
 #include "interop.hh"
 #include "SkColorFilter.h"
 #include "SkImageFilter.h"
@@ -7,15 +8,6 @@
 #include "SkPoint3.h"
 #include "SkRect.h"
 #include "interop.hh"
-
-extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilterKt__1nMakeAlphaThreshold
-  (JNIEnv* env, jclass jclass, jlong regionPtr, jfloat innerMin, jfloat outerMax, jlong inputPtr, jintArray cropInts) {
-    SkRegion* region = reinterpret_cast<SkRegion*>(static_cast<uintptr_t>(regionPtr));
-    SkImageFilter* input = reinterpret_cast<SkImageFilter*>(static_cast<uintptr_t>(inputPtr));
-    std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropInts);
-    SkImageFilter* ptr = SkImageFilters::AlphaThreshold(*region, innerMin, outerMax, sk_ref_sp(input), crop.get()).release();
-    return reinterpret_cast<jlong>(ptr);
-}
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilterKt__1nMakeArithmetic
   (JNIEnv* env, jclass jclass, jfloat k1, jfloat k2, jfloat k3, jfloat k4, jboolean enforcePMColor, jlong bgPtr, jlong fgPtr, jintArray cropInts) {
@@ -97,10 +89,11 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilterKt__1nMake
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageFilterKt__1nMakeMagnifier
-  (JNIEnv* env, jclass jclass, jfloat l, jfloat t, jfloat r, jfloat b, jfloat inset, jlong inputPtr, jintArray cropInts) {
+  (JNIEnv* env, jclass jclass, jfloat l, jfloat t, jfloat r, jfloat b, jfloat zoomAmount, jfloat inset, jint samplingModeVal1, jint samplingModeVal2, jlong inputPtr, jintArray cropInts) {
     SkImageFilter* input = reinterpret_cast<SkImageFilter*>(static_cast<uintptr_t>(inputPtr));
     std::unique_ptr<SkIRect> crop = skija::IRect::toSkIRect(env, cropInts);
-    SkImageFilter* ptr = SkImageFilters::Magnifier(SkRect{l, t, r, b}, inset, sk_ref_sp(input), crop.get()).release();
+    SkSamplingOptions sampling = skija::SamplingMode::unpackFrom2Ints(env, samplingModeVal1, samplingModeVal2);
+    SkImageFilter* ptr = SkImageFilters::Magnifier(SkRect{l, t, r, b}, zoomAmount, inset, sampling, sk_ref_sp(input), crop.get()).release();
     return reinterpret_cast<jlong>(ptr);
 }
 

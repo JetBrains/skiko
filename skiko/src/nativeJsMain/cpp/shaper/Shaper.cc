@@ -1,10 +1,10 @@
 #include <iostream>
 #include "SkShaper.h"
-#include "src/utils/SkUTF.h"
+#include "SkUnicode.h"
+#include "src/base/SkUTF.h"
 #include "unicode/ubidi.h"
 #include "common.h"
 #include "FontRunIterator.hh"
-#include "src/utils/SkUTF.h"
 #include "TextLineRunHandler.hh"
 
 static void deleteShaper(SkShaper* instance) {
@@ -36,7 +36,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nMakeShapeThenWra
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nMakeShapeDontWrapOrReorder
   (KNativePointer fontMgrPtr) {
     SkFontMgr* fontMgr = reinterpret_cast<SkFontMgr*>((fontMgrPtr));
-    return reinterpret_cast<KNativePointer>(SkShaper::MakeShapeDontWrapOrReorder(sk_ref_sp(fontMgr)).release());
+    return reinterpret_cast<KNativePointer>(SkShaper::MakeShapeDontWrapOrReorder(SkUnicode::Make(), sk_ref_sp(fontMgr)).release());
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_shaper_Shaper__1nMakeCoreText() {

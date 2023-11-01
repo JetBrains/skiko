@@ -1,5 +1,5 @@
 #include "common.h"
-#include "src/utils/SkUTF.h"
+#include "src/base/SkUTF.h"
 #include "include/core/SkImageInfo.h"
 #include "TextStyle.h"
 #include <stdio.h>

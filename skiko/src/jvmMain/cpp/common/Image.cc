@@ -3,6 +3,11 @@
 #include "SkData.h"
 #include "SkImage.h"
 #include "SkBitmap.h"
+#include "SkShader.h"
+#include "SkEncodedImageFormat.h"
+#include "encode/SkPngEncoder.h"
+#include "encode/SkJpegEncoder.h"
+#include "encode/SkWebpEncoder.h"
 #include "interop.hh"
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nMakeRaster
@@ -14,7 +19,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nMakeRaster
                                               static_cast<SkAlphaType>(alphaType),
                                               sk_ref_sp<SkColorSpace>(colorSpace));
     void* bytes = env->GetPrimitiveArrayCritical(bytesArr, 0);
-    sk_sp<SkImage> image = SkImage::MakeRasterCopy(SkPixmap(imageInfo, bytes, rowBytes));
+    sk_sp<SkImage> image = SkImages::RasterFromPixmapCopy(SkPixmap(imageInfo, bytes, rowBytes));
     env->ReleasePrimitiveArrayCritical(bytesArr, bytes, 0);
     return reinterpret_cast<jlong>(image.release());
 }
@@ -28,21 +33,21 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nMakeRaster
                                               static_cast<SkAlphaType>(alphaType),
                                               sk_ref_sp<SkColorSpace>(colorSpace));
     SkData* data = reinterpret_cast<SkData*>(static_cast<uintptr_t>(dataPtr));
-    sk_sp<SkImage> image = SkImage::MakeRasterData(imageInfo, sk_ref_sp(data), rowBytes);
+    sk_sp<SkImage> image = SkImages::RasterFromData(imageInfo, sk_ref_sp(data), rowBytes);
     return reinterpret_cast<jlong>(image.release());
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nMakeFromBitmap
   (JNIEnv* env, jclass jclass, jlong bitmapPtr) {
     SkBitmap* bitmap = reinterpret_cast<SkBitmap*>(static_cast<uintptr_t>(bitmapPtr));
-    sk_sp<SkImage> image = SkImage::MakeFromBitmap(*bitmap);
+    sk_sp<SkImage> image = SkImages::RasterFromBitmap(*bitmap);
     return reinterpret_cast<jlong>(image.release());
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nMakeFromPixmap
   (JNIEnv* env, jclass jclass, jlong pixmapPtr) {
     SkPixmap* pixmap = reinterpret_cast<SkPixmap*>(static_cast<uintptr_t>(pixmapPtr));
-    sk_sp<SkImage> image = SkImage::MakeFromRaster(*pixmap, nullptr, nullptr);
+    sk_sp<SkImage> image = SkImages::RasterFromPixmap(*pixmap, nullptr, nullptr);
     return reinterpret_cast<jlong>(image.release());
 }
 
@@ -52,7 +57,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nMakeFromEn
     sk_sp<SkData> encodedData = SkData::MakeWithCopy(encoded, encodedLen);
     env->ReleaseByteArrayElements(encodedArray, encoded, 0);
 
-    sk_sp<SkImage> image = SkImage::MakeFromEncoded(encodedData);
+    sk_sp<SkImage> image = SkImages::DeferredFromEncodedData(encodedData);
 
     return reinterpret_cast<jlong>(image.release());
 }
@@ -70,8 +75,35 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_ImageKt_Image_1nGetIma
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nEncodeToData
   (JNIEnv* env, jclass jclass, jlong ptr, jint format, jint quality) {
     SkImage* instance = reinterpret_cast<SkImage*>(static_cast<uintptr_t>(ptr));
-    SkData* data = instance->encodeToData(static_cast<SkEncodedImageFormat>(format), quality).release();
-    return reinterpret_cast<jlong>(data);
+    SkEncodedImageFormat skFormat = static_cast<SkEncodedImageFormat>(format);
+    if (!instance->isTextureBacked()) {
+      switch (skFormat) {
+        case SkEncodedImageFormat::kPNG: {
+          SkPngEncoder::Options options = SkPngEncoder::Options();
+          options.fZLibLevel = std::max((int)(quality / 10), 9);
+          SkData* data = SkPngEncoder::Encode(nullptr, instance, options).release();
+          return reinterpret_cast<jlong>(data);
+        }
+        case SkEncodedImageFormat::kJPEG: {
+          SkJpegEncoder::Options options = SkJpegEncoder::Options();
+          options.fQuality = quality;
+          SkData* data = SkJpegEncoder::Encode(nullptr, instance, options).release();
+          return reinterpret_cast<jlong>(data);
+        }
+        case SkEncodedImageFormat::kWEBP: {
+          SkWebpEncoder::Options options = SkWebpEncoder::Options();
+          options.fQuality = quality;
+          SkData* data = SkWebpEncoder::Encode(nullptr, instance, options).release();
+          return reinterpret_cast<jlong>(data);
+        }
+      default:
+        env->ThrowNew(java::lang::RuntimeException::cls, "Only PNG, JPEG and WEBP formats are supported");
+        break;
+      }
+    } else {
+      env->ThrowNew(java::lang::RuntimeException::cls, "Textture backed images is not supported yet");
+    }
+    return 0;
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt_Image_1nMakeShader
