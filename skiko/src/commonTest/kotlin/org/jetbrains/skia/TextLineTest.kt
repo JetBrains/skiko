@@ -1,10 +1,8 @@
 package org.jetbrains.skiko
 
-import org.jetbrains.skia.Font
-import org.jetbrains.skia.ManagedString
-import org.jetbrains.skia.TextLine
-import org.jetbrains.skia.Typeface
+import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.use
+import org.jetbrains.skia.shaper.ShapingOptions
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
@@ -226,5 +224,13 @@ class TextLineTest {
         assertCloseEnough(expected = 26.0f, actual = textLine.getCoordAtOffset(1), epsilon = eps)
         assertCloseEnough(expected = 48.0f, actual = textLine.getCoordAtOffset(2), epsilon = eps)
         assertCloseEnough(expected = 69.0f, actual = textLine.getCoordAtOffset(3), epsilon = eps)
+    }
+
+    @Test
+    fun dontCrashOnStringsWithoutGlyphs() = runTest {
+        val failedOn = "\uFE0F" // Variation Selector-16
+        val textLine = TextLine.make(failedOn, jbMono36(), ShapingOptions.DEFAULT)
+        assertCloseEnough(expected = 0f, actual = textLine.width)
+        assertEquals(expected = 0, actual = textLine.glyphsLength)
     }
 }
