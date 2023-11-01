@@ -5,7 +5,7 @@
 
 #include "SkColorSpace.h"
 #include "SkSurface.h"
-#include "src/core/SkAutoMalloc.h"
+#include "src/base/SkAutoMalloc.h"
 
 class SoftwareDevice
 {
@@ -64,7 +64,7 @@ extern "C"
         SkImageInfo info = SkImageInfo::Make(
             width, height, device->colorSpace, kPremul_SkAlphaType,
             SkColorSpace::MakeSRGB());
-        device->surface = SkSurface::MakeRaster(info);
+        device->surface = SkSurfaces::Raster(info);
 
         return toJavaPointer(device);
     }
@@ -77,7 +77,7 @@ extern "C"
         SkImageInfo info = SkImageInfo::Make(
             width, height, device->colorSpace, kPremul_SkAlphaType,
             SkColorSpace::MakeSRGB());
-        device->surface = SkSurface::MakeRaster(info);
+        device->surface = SkSurfaces::Raster(info);
     }
 
     JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_AbstractDirectSoftwareRedrawer_acquireSurface(

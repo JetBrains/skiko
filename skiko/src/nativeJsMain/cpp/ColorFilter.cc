@@ -4,7 +4,6 @@
 #include "SkHighContrastFilter.h"
 #include "SkLumaColorFilter.h"
 #include "SkOverdrawColorFilter.h"
-#include "SkTableColorFilter.h"
 #include "common.h"
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorFilter__1nMakeComposed
@@ -73,7 +72,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorFilter__1nMakeHighContrast
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorFilter__1nMakeTable
   (KByte* table) {
-    SkColorFilter* ptr = SkTableColorFilter::Make(reinterpret_cast<uint8_t*>(table)).release();
+    SkColorFilter* ptr = SkColorFilters::Table(reinterpret_cast<uint8_t*>(table)).release();
     return reinterpret_cast<KNativePointer>(ptr);
 }
 
@@ -82,7 +81,7 @@ typedef void* KInteropPointer;
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_ColorFilter__1nMakeTableARGB
   (KByte* a, KByte* r, KByte* g, KByte* b) {
-    SkColorFilter* ptr = SkTableColorFilter::MakeARGB(
+    SkColorFilter* ptr = SkColorFilters::TableARGB(
         reinterpret_cast<uint8_t*>(a),
         reinterpret_cast<uint8_t*>(r),
         reinterpret_cast<uint8_t*>(g),

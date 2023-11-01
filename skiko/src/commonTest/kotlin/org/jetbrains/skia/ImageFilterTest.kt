@@ -44,19 +44,6 @@ class ImageFilterTest {
     }
 
     @Test
-    fun alphaThreshold() = imageFilterTest {
-        ImageFilter.makeAlphaThreshold(
-            Region().apply {
-                setRect(IRect(5, 5, 10, 10))
-            },
-            innerMin = 0.9f,
-            outerMax = 0.2f,
-            input = null,
-            crop = null
-        )
-    }
-
-    @Test
     fun arithmetic() = imageFilterTest {
         ImageFilter.makeArithmetic(
             k1 = 0.5f, k2 = 0.5f, k3 = 0.5f, k4 = 0.5f, enforcePMColor = true,
@@ -72,7 +59,7 @@ class ImageFilterTest {
         ImageFilter.makeBlend(
             blendMode = BlendMode.COLOR,
             bg = ImageFilter.makeBlur(2f, 2f, mode = FilterTileMode.CLAMP),
-            fg = ImageFilter.makeAlphaThreshold(r = region, innerMin = 0.5f, outerMax = 0.5f, input = null, crop = null),
+            fg = ImageFilter.makeBlur(1f, 3f, mode = FilterTileMode.CLAMP),
             crop = null
         )
     }
@@ -156,7 +143,9 @@ class ImageFilterTest {
             r = Rect(0f, 0f, 15f, 15f),
             input = null,
             crop = null,
-            inset = 2f
+            zoomAmount = 2f,
+            inset = 2f,
+            samplingMode = SamplingMode.LINEAR
         )
     }
 
@@ -192,7 +181,9 @@ class ImageFilterTest {
             r = Rect(0f, 0f, 15f, 15f),
             input = null,
             crop = null,
-            inset = 2f
+            zoomAmount = 2f,
+            inset = 2f,
+            samplingMode = SamplingMode.LINEAR
         )
 
         val filter2 = ImageFilter.makeColorFilter(

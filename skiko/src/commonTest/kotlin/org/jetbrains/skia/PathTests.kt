@@ -209,9 +209,9 @@ class PathTests {
         assertContentCloseEnough(
             arrayOf(
                 Point(0f, 20f),
-                Point(3.0940108f, 16.905989f),
-                Point(8.452994f, 15.119661f),
-                Point(13.811978f, 13.333334f)
+                Point(3.0940108f, 16.90599f),
+                Point(8.4529950f, 15.119661f),
+                Point(13.811979f, 13.333334f)
             ),
             Path.convertConicToQuads(Point(0f, 20f), Point(20f, 0f), Point(40f, 20f), 0.5f, 2)
         )

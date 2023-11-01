@@ -61,6 +61,11 @@ enum class ColorType {
     BGR_101010X,
 
     /**
+     * Pixel with 10 bits each for blue, green, red; in 32-bit word, extended range
+     */
+    BGR_101010X_XR,
+
+    /**
      * Pixel with grayscale level in 8-bit byte
      */
     GRAY_8,
@@ -130,6 +135,7 @@ enum class ColorType {
                 RGB_101010X -> 4
                 BGRA_1010102 -> 4
                 BGR_101010X -> 4
+                BGR_101010X_XR -> 4
                 GRAY_8 -> 1
                 RGBA_F16NORM -> 8
                 RGBA_F16 -> 8
@@ -156,6 +162,7 @@ enum class ColorType {
                 RGB_101010X -> 2
                 BGRA_1010102 -> 2
                 BGR_101010X -> 2
+                BGR_101010X_XR -> 2
                 GRAY_8 -> 0
                 RGBA_F16NORM -> 3
                 RGBA_F16 -> 3
@@ -192,7 +199,7 @@ enum class ColorType {
             ARGB_4444, RGBA_8888, BGRA_8888, RGBA_1010102, BGRA_1010102, RGBA_F16NORM, RGBA_F16, RGBA_F32, R16G16B16A16_UNORM ->
                 if (ColorAlphaType.UNKNOWN == alphaType) null
                 else alphaType
-            GRAY_8, R8G8_UNORM, R16G16_UNORM, R16G16_FLOAT, RGB_565, RGB_888X, RGB_101010X, BGR_101010X ->
+            GRAY_8, R8G8_UNORM, R16G16_UNORM, R16G16_FLOAT, RGB_565, RGB_888X, RGB_101010X, BGR_101010X, BGR_101010X_XR ->
                 ColorAlphaType.OPAQUE
         }
     }

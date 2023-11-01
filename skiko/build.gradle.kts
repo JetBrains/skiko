@@ -589,6 +589,7 @@ fun skiaHeadersDirs(skiaDir: File): List<File> =
         skiaDir.resolve("modules/skottie/include"),
         skiaDir.resolve("modules/skparagraph/include"),
         skiaDir.resolve("modules/skshaper/include"),
+        skiaDir.resolve("modules/skunicode/include"),
         skiaDir.resolve("modules/sksg/include"),
         skiaDir.resolve("modules/svg/include"),
         skiaDir.resolve("third_party/externals/harfbuzz/src"),
@@ -607,6 +608,7 @@ fun skiaPreprocessorFlags(os: OS): Array<String> {
         "-DSK_GAMMA_SRGB",
         "-DSK_SCALAR_TO_FLOAT_EXCLUDED",
         "-DSK_SUPPORT_GPU=1",
+        "-DSK_GANESH",
         "-DSK_GL",
         "-DSK_SHAPER_HARFBUZZ_AVAILABLE",
         "-DSK_UNICODE_AVAILABLE",
@@ -657,7 +659,6 @@ fun skiaStaticLibraries(skiaDir: String, targetString: String): List<String> {
     val skiaBinSubdir = "$skiaDir/out/${buildType.id}-$targetString"
     return listOf(
         "libskresources.a",
-        "libparticles.a",
         "libskparagraph.a",
         "libskia.a",
         "libicu.a",

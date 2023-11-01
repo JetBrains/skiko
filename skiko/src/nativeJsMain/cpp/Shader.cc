@@ -135,13 +135,13 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Shader__1nMakeBlend(KInt blendMod
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Shader__1nMakeFractalNoise
   (KFloat baseFrequencyX, KFloat baseFrequencyY, KInt numOctaves, KFloat seed, KInt tileW, KInt tileH) {
     const SkISize tileSize = SkISize::Make(tileW, tileH);
-    SkShader* ptr = SkPerlinNoiseShader::MakeFractalNoise(baseFrequencyX, baseFrequencyY, numOctaves, seed, &tileSize).release();
+    SkShader* ptr = SkShaders::MakeFractalNoise(baseFrequencyX, baseFrequencyY, numOctaves, seed, &tileSize).release();
     return reinterpret_cast<KNativePointer>(ptr);
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_Shader__1nMakeTurbulence
   (KFloat baseFrequencyX, KFloat baseFrequencyY, KInt numOctaves, KFloat seed, KInt tileW, KInt tileH) {
     const SkISize tileSize = SkISize::Make(tileW, tileH);
-    SkShader* ptr = SkPerlinNoiseShader::MakeTurbulence(baseFrequencyX, baseFrequencyY, numOctaves, seed, &tileSize).release();
+    SkShader* ptr = SkShaders::MakeTurbulence(baseFrequencyX, baseFrequencyY, numOctaves, seed, &tileSize).release();
     return reinterpret_cast<KNativePointer>(ptr);
 }

@@ -6,6 +6,7 @@
 #import <QuartzCore/CAMetalLayer.h>
 #import <Metal/Metal.h>
 #import <GrDirectContext.h>
+#import <gpu/GrBackendSurface.h>
 #import <mtl/GrMtlBackendContext.h>
 #import <mtl/GrMtlTypes.h>
 

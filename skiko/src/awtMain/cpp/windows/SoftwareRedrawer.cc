@@ -6,7 +6,7 @@
 
 #include "SkColorSpace.h"
 #include "SkSurface.h"
-#include "src/core/SkAutoMalloc.h"
+#include "src/base/SkAutoMalloc.h"
 #include "../common/interop.hh"
 
 class SoftwareDevice
@@ -59,7 +59,7 @@ extern "C"
             SkImageInfo info = SkImageInfo::Make(
                 width, height, kBGRA_8888_SkColorType, kPremul_SkAlphaType,
                 SkColorSpace::MakeSRGB());
-            device->surface = SkSurface::MakeRasterDirect(info, pixels, sizeof(uint32_t) * width, device->surfaceProps.get());
+            device->surface = SkSurfaces::WrapPixels(info, pixels, sizeof(uint32_t) * width, device->surfaceProps.get());
             GetClientRect(device->window, &device->clientRect);
         }
         __except(EXCEPTION_EXECUTE_HANDLER) {

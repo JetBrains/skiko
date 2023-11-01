@@ -5,7 +5,7 @@
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_FontStyleSet__1nMakeEmpty
   () {
-    SkFontStyleSet* instance = SkFontStyleSet::CreateEmpty();
+    SkFontStyleSet* instance = SkFontStyleSet::CreateEmpty().release();
     return reinterpret_cast<KNativePointer>(instance);
 }
 
@@ -35,13 +35,13 @@ SKIKO_EXPORT KInteropPointer org_jetbrains_skia_FontStyleSet__1nGetStyleName
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_FontStyleSet__1nGetTypeface
   (KNativePointer ptr, KInt index) {
     SkFontStyleSet* instance = reinterpret_cast<SkFontStyleSet*>((ptr));
-    SkTypeface* typeface = instance->createTypeface(index);
+    SkTypeface* typeface = instance->createTypeface(index).release();
     return reinterpret_cast<KNativePointer>(typeface);
 }
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_FontStyleSet__1nMatchStyle
   (KNativePointer ptr, KInt fontStyle) {
     SkFontStyleSet* instance = reinterpret_cast<SkFontStyleSet*>((ptr));
-    SkTypeface* typeface = instance->matchStyle(skija::FontStyle::fromKotlin(fontStyle));
+    SkTypeface* typeface = instance->matchStyle(skija::FontStyle::fromKotlin(fontStyle)).release();
     return reinterpret_cast<KNativePointer>(typeface);
 }
