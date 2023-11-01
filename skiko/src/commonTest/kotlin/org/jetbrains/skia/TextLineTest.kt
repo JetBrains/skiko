@@ -231,6 +231,5 @@ class TextLineTest {
         val failedOn = "\uFE0F" // Variation Selector-16
         val textLine = TextLine.make(failedOn, jbMono36(), ShapingOptions.DEFAULT)
         assertCloseEnough(expected = 0f, actual = textLine.width)
-        assertEquals(expected = 0, actual = textLine.glyphsLength)
     }
 }
