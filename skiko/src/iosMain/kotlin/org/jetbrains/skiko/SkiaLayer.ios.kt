@@ -8,8 +8,7 @@ import platform.UIKit.*
 import kotlin.AllowDifferentMembersInActual
 import kotlin.system.getTimeNanos
 
-@OptIn(kotlin.ExperimentalMultiplatform::class)
-@AllowDifferentMembersInActual
+
 actual open class SkiaLayer {
     internal var needRedrawCallback: () -> Unit = {}
 

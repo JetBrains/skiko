@@ -2,8 +2,7 @@ package org.jetbrains.skiko
 
 import kotlin.AllowDifferentMembersInActual
 
-@OptIn(kotlin.ExperimentalMultiplatform::class)
-@AllowDifferentMembersInActual
+
 actual interface SkikoInput {
 
     /**

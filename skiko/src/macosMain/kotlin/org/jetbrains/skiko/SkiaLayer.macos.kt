@@ -30,8 +30,7 @@ import kotlin.AllowDifferentMembersInActual
  * SkiaLayer implementation for macOS.
  * Supports only [GraphicsApi.METAL]
  */
-@OptIn(kotlin.ExperimentalMultiplatform::class)
-@AllowDifferentMembersInActual
+
 actual open class SkiaLayer {
     fun isShowing(): Boolean {
         return true

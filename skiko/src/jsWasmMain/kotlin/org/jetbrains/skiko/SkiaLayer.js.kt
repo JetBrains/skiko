@@ -16,8 +16,6 @@ import org.w3c.dom.events.WheelEvent
  * SkikoLayer needs to be initialized with [HTMLCanvasElement] instance
  * using [attachTo] method.
  */
-@OptIn(kotlin.ExperimentalMultiplatform::class)
-@AllowDifferentMembersInActual
 actual open class SkiaLayer {
     private var state: CanvasRenderer? = null
 

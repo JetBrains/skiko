@@ -19,8 +19,7 @@ import javax.swing.SwingUtilities
 import javax.swing.SwingUtilities.isEventDispatchThread
 import javax.swing.UIManager
 
-@OptIn(kotlin.ExperimentalMultiplatform::class)
-@AllowDifferentMembersInActual
+
 actual open class SkiaLayer internal constructor(
     externalAccessibleFactory: ((Component) -> Accessible)? = null,
     private val properties: SkiaLayerProperties,

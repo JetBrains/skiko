@@ -22,8 +22,8 @@ val Project.supportWasm: Boolean
 val Project.supportJs: Boolean
     get() = findProperty("skiko.js.enabled") == "true" || isInIdea
 
-val coroutinesVersion = if (supportWasm) "1.7.2-wasm2" else "1.7.2"
-val atomicFuVersion = if (supportWasm) "0.22.0-wasm1" else "0.22.0"
+val coroutinesVersion = if (supportWasm) "1.7.2-wasm3" else "1.7.2"
+val atomicFuVersion = if (supportWasm) "0.22.0-wasm2" else "0.22.0"
 
 fun targetSuffix(os: OS, arch: Arch): String {
     return "${os.id}_${arch.id}"

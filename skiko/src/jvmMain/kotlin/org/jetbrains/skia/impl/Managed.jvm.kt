@@ -7,8 +7,7 @@ import kotlin.concurrent.thread
 
 // Android doesn't have Cleaner API, so use explicit phantom references + finalization queue.
 // Consider using this on all JVM platforms eventually.
-@OptIn(kotlin.ExperimentalMultiplatform::class)
-@AllowDifferentMembersInActual
+
 actual abstract class Managed actual constructor(
     ptr: Long, finalizer: Long, managed: Boolean
 ) : Native(ptr), AutoCloseable {
