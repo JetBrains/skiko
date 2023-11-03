@@ -5,7 +5,7 @@ const path = require("path");
 config.browserConsoleLogOptions.level = "debug";
 
 const basePath = config.basePath;
-const projectPath = path.resolve(basePath, "..", "..", "..", "..", "..");
+const projectPath = path.resolve(basePath, "..", "..", "..", "..");
 const wasmPath = path.resolve(projectPath, "build", "out", "link", "Release-wasm-wasm")
 const generatedAssetsPath = path.resolve(projectPath, "build", "karma-webpack-out")
 
