@@ -24,7 +24,7 @@ import platform.Foundation.NSSelectorFromString
 import platform.Foundation.addObserver
 import platform.darwin.NSObject
 import platform.CoreGraphics.CGRectMake
-import kotlin.AllowDifferentMembersInActual
+
 
 /**
  * SkiaLayer implementation for macOS.
