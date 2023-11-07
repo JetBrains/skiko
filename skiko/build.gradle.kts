@@ -1169,7 +1169,8 @@ fun skikoJvmRuntimeJarTask(
 ) = project.registerSkikoTask<Jar>("skikoJvmRuntimeJar", targetOs, targetArch) {
     dependsOn(awtJar)
     val target = targetId(targetOs, targetArch)
-    archiveBaseName.set("skiko-$target")
+    archiveBaseName.set("skiko")
+    archiveClassifier.set(target)
     nativeFiles.forEach { provider -> from(provider) }
 }
 
