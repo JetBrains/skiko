@@ -122,14 +122,15 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
         jclass redrawerClass = env->GetObjectClass(redrawer);
         jmethodID onOcclusionStateChanged = env->GetMethodID(redrawerClass, "onOcclusionStateChanged", "(Z)V");
 
-        [[NSNotificationCenter defaultCenter] addObserverForName:NSWindowDidChangeOcclusionStateNotification
-                                                          object:window
-                                                           queue:[NSOperationQueue mainQueue]
-                                                      usingBlock:^(NSNotification * _Nonnull note) {
-            BOOL isOccluded = ([window occlusionState] & NSWindowOcclusionStateVisible) == 0;
-            JNIEnv *jniEnv = resolveJNIEnvForCurrentThread();
-            jniEnv->CallObjectMethod(layer.javaRef, onOcclusionStateChanged, isOccluded);
-        }];
+        device.occlusionObserver =
+            [[NSNotificationCenter defaultCenter] addObserverForName:NSWindowDidChangeOcclusionStateNotification
+                                                              object:window
+                                                               queue:[NSOperationQueue mainQueue]
+                                                          usingBlock:^(NSNotification * _Nonnull note) {
+                BOOL isOccluded = ([window occlusionState] & NSWindowOcclusionStateVisible) == 0;
+                JNIEnv *jniEnv = resolveJNIEnvForCurrentThread();
+                jniEnv->CallObjectMethod(layer.javaRef, onOcclusionStateChanged, isOccluded);
+            }];
 
         return (jlong) (__bridge_retained void *) device;
     }
@@ -204,6 +205,7 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_disposeDe
     @autoreleasepool {
         MetalDevice *device = (__bridge_transfer MetalDevice *) (void *) devicePtr;
         env->DeleteGlobalRef(device.layer.javaRef);
+        [[NSNotificationCenter defaultCenter] removeObserver:device.occlusionObserver];
         [device.layer removeFromSuperlayer];
         [CATransaction flush];
     }

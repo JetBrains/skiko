@@ -719,7 +719,7 @@ class SkiaLayerTest {
                 renderTimes.clear()
             }
         } finally {
-            window.close()
+            window.dispose()
         }
     }
 

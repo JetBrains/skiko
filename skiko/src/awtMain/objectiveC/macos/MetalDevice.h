@@ -14,6 +14,7 @@
 @property (strong) id<MTLCommandQueue> queue;
 @property (strong) id<CAMetalDrawable> drawableHandle;
 @property (strong) dispatch_semaphore_t inflightSemaphore;
+@property (strong) id<NSObject> occlusionObserver;
 
 @end
 
