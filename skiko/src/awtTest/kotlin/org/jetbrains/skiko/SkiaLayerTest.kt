@@ -37,9 +37,8 @@ import kotlin.random.Random
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
 
-@Suppress("BlockingMethodInNonBlockingContext", "SameParameterValue")
+@Suppress("SameParameterValue")
 class SkiaLayerTest {
     private val fontCollection = FontCollection()
         .setDefaultFontManager(FontMgr.default)
@@ -59,7 +58,6 @@ class SkiaLayerTest {
     @get:Rule
     val screenshots = ScreenshotTestRule()
 
-    @OptIn(ExperimentalTime::class)
     @Ignore
     @Test
     fun `metal drawables not lost`() = uiTest {
@@ -108,7 +106,7 @@ class SkiaLayerTest {
                         redrawer.drawSync()
                     }
                 }
-            });
+            })
 
             window.addWindowListener(object : WindowAdapter() {
                 override fun windowActivated(e: WindowEvent?) {
@@ -684,6 +682,42 @@ class SkiaLayerTest {
             window.isVisible = true
             delay(1000)
             screenshots.assert(window.bounds, "frame")
+        } finally {
+            window.close()
+        }
+    }
+
+    @Test
+    fun `second frame drawn without delay in metal`() = uiTest(
+        // SOFTWARE_COMPAT fails because it's just too slow
+        excludeRenderApis = listOf(GraphicsApi.SOFTWARE_COMPAT)
+    ) {
+        val renderTimes = mutableListOf<Long>()
+        val renderer = object: SkikoView {
+            override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
+                renderTimes.add(System.currentTimeMillis())
+            }
+        }
+        val window = UiTestWindow {
+            layer.skikoView = renderer
+            contentPane.add(layer, BorderLayout.CENTER)
+        }
+        try {
+            window.size = Dimension(800, 800)
+            repeat(10) {
+                window.isVisible = true
+                delay(16)
+                window.layer.needRedraw()
+                delay(500)
+                window.isVisible = false
+
+                val dt = renderTimes.last() - renderTimes.first()
+                assertTrue(
+                    actual = dt < 100,
+                    message = "2nd frame drawn ${dt}ms after 1st"
+                )
+                renderTimes.clear()
+            }
         } finally {
             window.close()
         }
