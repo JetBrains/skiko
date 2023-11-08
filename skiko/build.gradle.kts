@@ -765,6 +765,7 @@ fun createObjcCompileTask(
     includeHeadersNonRecursive(skiaHeadersDirs(skiaJvmBindingsDir.get()))
     includeHeadersNonRecursive(projectDir.resolve("src/awtMain/cpp/include"))
     includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp/common/include"))
+    includeHeadersNonRecursive(projectDir.resolve("src/jvmMain/cpp"))
 
     compiler.set("clang")
     buildVariant.set(buildType)

@@ -17,7 +17,7 @@
 
 #include <assert.h>
 
-#include "../../../jvmMain/cpp/common/interop.hh"
+#include "common/interop.hh"
 
 @implementation AWTMetalLayer
 
