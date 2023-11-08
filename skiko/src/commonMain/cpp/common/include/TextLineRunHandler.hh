@@ -56,32 +56,34 @@ public:
 
     void commitRunBuffer(const RunInfo& info) override {
         TextLine::Run& run = fLine->fRuns.back();
-        int32_t glyph = 0;
-        int32_t graphemesInGlyph = 1;
-        SkScalar glyphLeft = run.fPos[glyph].fX;
-        run.fBreakOffsets.reserve(info.utf8Range.size() + 1);
-        run.fBreakPositions.reserve(info.utf8Range.size() + 1);
+        if (0 < info.glyphCount) {
+            int32_t glyph = 0;
+            int32_t graphemesInGlyph = 1;
+            SkScalar glyphLeft = run.fPos[glyph].fX;
+            run.fBreakOffsets.reserve(info.utf8Range.size() + 1);
+            run.fBreakPositions.reserve(info.utf8Range.size() + 1);
 
-        // Only record grapheme clusters boundaries
-        for (int32_t offset = fGlyphOffsets[0]; offset <= info.utf8Range.end(); offset = ubrk_following(fGraphemeIter.get(), offset)) {
-            run.fBreakOffsets.push_back(conv.from8To16(offset));
+            // Only record grapheme clusters boundaries
+            for (int32_t offset = fGlyphOffsets[0]; offset <= info.utf8Range.end(); offset = ubrk_following(fGraphemeIter.get(), offset)) {
+                run.fBreakOffsets.push_back(conv.from8To16(offset));
 
-            // if grapheme clusters includes multiple glyphs, skip over them
-            while (glyph < info.glyphCount && fGlyphOffsets[glyph] < offset)
-                ++glyph;
+                // if grapheme clusters includes multiple glyphs, skip over them
+                while (glyph < info.glyphCount && fGlyphOffsets[glyph] < offset)
+                    ++glyph;
 
-            // if one glyph includes multiple grapheme clusters (ligature, e.g. <->), accumulate
-            if ((glyph < info.glyphCount ? fGlyphOffsets[glyph] : info.utf8Range.end()) > offset)
-                ++graphemesInGlyph;
+                // if one glyph includes multiple grapheme clusters (ligature, e.g. <->), accumulate
+                if ((glyph < info.glyphCount ? fGlyphOffsets[glyph] : info.utf8Range.end()) > offset)
+                    ++graphemesInGlyph;
 
-            // when boundaries meet, distribute break positions evenly inside glyph
-            else {
-                SkScalar glyphRight = glyph < info.glyphCount ? run.fPos[glyph].fX : fPosition + info.fAdvance.fX;
-                SkScalar step = (glyphRight - glyphLeft) / graphemesInGlyph;
-                for (int i = 0; i < graphemesInGlyph; ++i)
-                    run.fBreakPositions.push_back(glyphLeft + step * (i + 1));
-                graphemesInGlyph = 1;
-                glyphLeft = glyphRight;
+                // when boundaries meet, distribute break positions evenly inside glyph
+                else {
+                    SkScalar glyphRight = glyph < info.glyphCount ? run.fPos[glyph].fX : fPosition + info.fAdvance.fX;
+                    SkScalar step = (glyphRight - glyphLeft) / graphemesInGlyph;
+                    for (int i = 0; i < graphemesInGlyph; ++i)
+                        run.fBreakPositions.push_back(glyphLeft + step * (i + 1));
+                    graphemesInGlyph = 1;
+                    glyphLeft = glyphRight;
+                }
             }
         }
         fPosition += info.fAdvance.fX;
