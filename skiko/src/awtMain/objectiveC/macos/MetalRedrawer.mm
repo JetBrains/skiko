@@ -72,6 +72,15 @@ static JNIEnv *resolveJNIEnvForCurrentThread() {
     return env;
 }
 
+static jmethodID getOnOcclusionStateChangedMethodID(JNIEnv *env, jobject redrawer) {
+    static jmethodID onOcclusionStateChanged = NULL;
+    if (onOcclusionStateChanged == NULL) {
+        jclass redrawerClass = env->GetObjectClass(redrawer);
+        onOcclusionStateChanged = env->GetMethodID(redrawerClass, "onOcclusionStateChanged", "(Z)V");
+    }
+    return onOcclusionStateChanged;
+}
+
 extern "C"
 {
 
@@ -119,9 +128,7 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
             window.hasShadow = NO;
         }
 
-        jclass redrawerClass = env->GetObjectClass(redrawer);
-        jmethodID onOcclusionStateChanged = env->GetMethodID(redrawerClass, "onOcclusionStateChanged", "(Z)V");
-
+        jmethodID onOcclusionStateChanged = getOnOcclusionStateChangedMethodID(env, redrawer);
         device.occlusionObserver =
             [[NSNotificationCenter defaultCenter] addObserverForName:NSWindowDidChangeOcclusionStateNotification
                                                               object:window
