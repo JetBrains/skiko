@@ -15,6 +15,10 @@
 
 #import "MetalDevice.h"
 
+#include <assert.h>
+
+#include "common/interop.hh"
+
 @implementation AWTMetalLayer
 
 - (id)init
@@ -50,6 +54,32 @@
 }
 
 @end
+
+/// Linked from skiko/src/jvmMain/cpp/common/impl/Library.cc
+/// clang treats extern symbol declarations as C in Objective-C++(.mm) and doesn't mangle them
+extern JavaVM *jvm;
+
+static JNIEnv *resolveJNIEnvForCurrentThread() {
+    JNIEnv *env;
+    int envStat = jvm->GetEnv((void **)&env, SKIKO_JNI_VERSION);
+
+    if (envStat == JNI_EDETACHED) {
+        jvm->AttachCurrentThread((void **) &env, NULL);
+    }
+
+    assert(env);
+
+    return env;
+}
+
+static jmethodID getOnOcclusionStateChangedMethodID(JNIEnv *env, jobject redrawer) {
+    static jmethodID onOcclusionStateChanged = NULL;
+    if (onOcclusionStateChanged == NULL) {
+        jclass redrawerClass = env->GetObjectClass(redrawer);
+        onOcclusionStateChanged = env->GetMethodID(redrawerClass, "onOcclusionStateChanged", "(Z)V");
+    }
+    return onOcclusionStateChanged;
+}
 
 extern "C"
 {
@@ -92,11 +122,22 @@ JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_createMe
         /// max inflight command buffers count matches swapchain size to avoid overcommitment
         device.inflightSemaphore = dispatch_semaphore_create(device.layer.maximumDrawableCount);
 
-        if (transparency)
-        {
-            NSWindow* window = (__bridge NSWindow*) (void *) windowPtr;
+        NSWindow* window = (__bridge NSWindow*) (void *) windowPtr;
+
+        if (transparency) {
             window.hasShadow = NO;
         }
+
+        jmethodID onOcclusionStateChanged = getOnOcclusionStateChangedMethodID(env, redrawer);
+        device.occlusionObserver =
+            [[NSNotificationCenter defaultCenter] addObserverForName:NSWindowDidChangeOcclusionStateNotification
+                                                              object:window
+                                                               queue:[NSOperationQueue mainQueue]
+                                                          usingBlock:^(NSNotification * _Nonnull note) {
+                BOOL isOccluded = ([window occlusionState] & NSWindowOcclusionStateVisible) == 0;
+                JNIEnv *jniEnv = resolveJNIEnvForCurrentThread();
+                jniEnv->CallObjectMethod(layer.javaRef, onOcclusionStateChanged, isOccluded);
+            }];
 
         return (jlong) (__bridge_retained void *) device;
     }
@@ -171,16 +212,9 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_disposeDe
     @autoreleasepool {
         MetalDevice *device = (__bridge_transfer MetalDevice *) (void *) devicePtr;
         env->DeleteGlobalRef(device.layer.javaRef);
+        [[NSNotificationCenter defaultCenter] removeObserver:device.occlusionObserver];
         [device.layer removeFromSuperlayer];
         [CATransaction flush];
-    }
-}
-
-JNIEXPORT jboolean JNICALL Java_org_jetbrains_skiko_redrawer_MetalRedrawer_isOccluded(
-    JNIEnv *env, jobject redrawer, jlong windowPtr) {
-    @autoreleasepool {
-        NSWindow* window = (__bridge NSWindow*) (void *) windowPtr;
-        return ([window occlusionState] & NSWindowOcclusionStateVisible) == 0;
     }
 }
 

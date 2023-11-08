@@ -1,9 +1,9 @@
 package org.jetbrains.skiko.redrawer
 
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.context.MetalContextHandler
-import java.util.concurrent.Executors
 import javax.swing.SwingUtilities.*
 
 /**
@@ -62,6 +62,9 @@ internal class MetalRedrawer(
     private val adapter = chooseMetalAdapter(properties.adapterPriority)
     private val displayLinkThrottler = DisplayLinkThrottler()
 
+    private val windowOcclusionStateChannel = Channel<Boolean>(Channel.CONFLATED)
+    @Volatile private var isWindowOccluded = false
+
     init {
         onDeviceChosen(adapter.name)
         val initDevice = layer.backedLayer.useDrawingSurfacePlatformInfo {
@@ -73,8 +76,6 @@ internal class MetalRedrawer(
     }
 
     override val renderInfo: String get() = contextHandler.rendererInfo()
-
-    private val windowHandle = layer.windowHandle
 
     private val frameDispatcher = FrameDispatcher(MainUIDispatcher) {
         if (layer.isShowing) {
@@ -137,10 +138,20 @@ internal class MetalRedrawer(
         if (isDisposed) throw CancellationException()
 
         // When window is not visible - it doesn't make sense to redraw fast to avoid battery drain.
-        // In theory, we could be more precise, and just suspend rendering in
-        // `NSWindowDidChangeOcclusionStateNotification`, but current approach seems to work as well in practise.
-        if (isOccluded(windowHandle))
-            delay(300)
+        if (isWindowOccluded) {
+            withTimeoutOrNull(300) {
+                // If the window becomes non-occluded, stop waiting immediately
+                @Suppress("ControlFlowWithEmptyBody")
+                while (windowOcclusionStateChannel.receive()) { }
+            }
+        }
+    }
+
+    // Called from MetalRedrawer.mm
+    @Suppress("unused")
+    fun onOcclusionStateChanged(isOccluded: Boolean) {
+        isWindowOccluded = isOccluded
+        windowOcclusionStateChannel.trySend(isOccluded)
     }
 
     private fun performDraw() = synchronized(drawLock) {
@@ -180,5 +191,4 @@ internal class MetalRedrawer(
     private external fun setLayerVisible(device: Long, isVisible: Boolean)
     private external fun setContentScale(device: Long, contentScale: Float)
     private external fun setVSyncEnabled(device: Long, enabled: Boolean)
-    private external fun isOccluded(window: Long): Boolean
 }
