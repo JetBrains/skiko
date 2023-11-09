@@ -46,7 +46,7 @@ internal actual fun URIHandler_openUri(uri: String) {
         desktop.browse(URI(uri))
     } else when (hostOs) {
         OS.Linux -> {
-            Runtime.getRuntime().exec(arrayOf("xdg-open", uri))
+            Runtime.getRuntime().exec(arrayOf("xdg-open", URI(uri).toString()))
         }
         OS.Android, OS.Windows, OS.MacOS, OS.Ios, OS.JS, OS.Unknown -> {
             throw UnsupportedOperationException("AWT does not support the BROWSE action on this platform")
