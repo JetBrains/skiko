@@ -21,6 +21,7 @@ build configuration.
 ```bash
 ./gradlew publishToMavenLocal -Pskiko.native.enabled=true -Pskiko.wasm.enabled=true -Pskiko.android.enabled=true
 ```
+Use flag `-Pskiko.debug=true` to build with debug build type.
 
 ##### Publish to `build/repo` directory
 ```bash

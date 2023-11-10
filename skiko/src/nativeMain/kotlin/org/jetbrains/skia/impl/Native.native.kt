@@ -66,10 +66,7 @@ internal actual inline fun <T> interopScope(block: InteropScope.() -> T): T {
 internal actual class InteropScope actual constructor() {
     actual fun toInterop(string: String?): InteropPointer {
         return if (string != null) {
-            // encodeToByteArray encodes to utf8
-            val utf8 = string.encodeToByteArray()
-            // TODO Remove array copy, use `skString(data, length)` instead of `skString(data)`
-            val pinned = utf8.copyOf(utf8.size + 1).pin()
+            val pinned = convertToZeroTerminatedString(string).pin()
             elements.add(pinned)
             val result = pinned.addressOf(0).rawValue
             result
@@ -186,7 +183,7 @@ internal actual class InteropScope actual constructor() {
         if (stringArray == null || stringArray.isEmpty()) return NativePtr.NULL
 
         val pins = stringArray.toList()
-            .map { it.encodeToByteArray().pin() }
+            .map { convertToZeroTerminatedString(it).pin() }
 
         val nativePointerArray = NativePointerArray(stringArray.size)
         pins.forEachIndexed { index, pin ->
@@ -284,3 +281,13 @@ private external fun initCallbacks(
     callVoid: COpaquePointer,
     dispose: COpaquePointer
 )
+
+/**
+ * C++ needs char* with zero byte at the end. So, we need to increase original string and write 0 at end.
+ */
+private fun convertToZeroTerminatedString(string: String): ByteArray {
+    // encodeToByteArray encodes to utf8
+    val utf8 = string.encodeToByteArray()
+    // TODO Remove array copy, use `skString(data, length)` instead of `skString(data)`
+    return utf8.copyOf(utf8.size + 1)
+}
