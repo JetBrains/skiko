@@ -282,9 +282,6 @@ private external fun initCallbacks(
     dispose: COpaquePointer
 )
 
-/**
- * C++ needs char* with zero byte at the end. So, we need to increase original string and write 0 at end.
- */
 private fun convertToZeroTerminatedString(string: String): ByteArray {
     // encodeToByteArray encodes to utf8
     val utf8 = string.encodeToByteArray()
