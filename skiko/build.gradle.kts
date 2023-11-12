@@ -213,8 +213,36 @@ internal val Project.isInIdea: Boolean
         return System.getProperty("idea.active")?.toBoolean() == true
     }
 
-val Project.supportNative: Boolean
+val Project.supportAwt: Boolean
+    get() = findProperty("skiko.awt.enabled") == "true" || isInIdea
+
+val Project.supportAllNative: Boolean
     get() = findProperty("skiko.native.enabled") == "true" || isInIdea
+
+val Project.supportAllNativeIos: Boolean
+    get() = supportAllNative || findProperty("skiko.native.ios.enabled") == "true" || isInIdea
+
+val Project.supportNativeIosArm64: Boolean
+    get() = supportAllNativeIos || findProperty("skiko.native.ios.arm64.enabled") == "true" || isInIdea
+
+val Project.supportNativeIosSimulatorArm64: Boolean
+    get() = supportAllNativeIos || findProperty("skiko.native.ios.simulatorArm64.enabled") == "true" || isInIdea
+
+val Project.supportNativeIosX64: Boolean
+    get() = supportAllNativeIos || findProperty("skiko.native.ios.x64.enabled") == "true" || isInIdea
+
+val Project.supportAnyNativeIos: Boolean
+    get() = supportAllNativeIos || supportNativeIosArm64 || supportNativeIosSimulatorArm64 || supportNativeIosX64
+
+val Project.supportNativeMac: Boolean
+    get() = supportAllNative || findProperty("skiko.native.mac.enabled") == "true" || isInIdea
+
+val Project.supportNativeLinux: Boolean
+    get() = supportAllNative || findProperty("skiko.native.linux.enabled") == "true" || isInIdea
+
+val Project.supportAnyNative: Boolean
+    get() = supportAllNative || supportAnyNativeIos || supportNativeMac || supportNativeLinux
+
 
 val Project.supportWasm: Boolean
     get() = findProperty("skiko.wasm.enabled") == "true" || isInIdea
@@ -223,11 +251,13 @@ val Project.supportAndroid: Boolean
     get() = findProperty("skiko.android.enabled") == "true" // || isInIdea
 
 kotlin {
-    jvm("awt") {
-        compilations.all {
-            kotlinOptions.jvmTarget = "1.8"
+    if (supportAwt) {
+        jvm("awt") {
+            compilations.all {
+                kotlinOptions.jvmTarget = "1.8"
+            }
+            generateVersion(targetOs, targetArch)
         }
-        generateVersion(targetOs, targetArch)
     }
 
     if (supportAndroid) {
@@ -261,13 +291,21 @@ kotlin {
         }
     }
 
-    if (supportNative) {
+    if (supportNativeMac) {
         configureNativeTarget(OS.MacOS, Arch.X64, macosX64())
         configureNativeTarget(OS.MacOS, Arch.Arm64, macosArm64())
+    }
+    if (supportNativeLinux) {
         configureNativeTarget(OS.Linux, Arch.X64, linuxX64())
+    }
+    if (supportNativeIosArm64) {
         configureNativeTarget(OS.IOS, Arch.Arm64, iosArm64())
-        configureNativeTarget(OS.IOS, Arch.X64, iosX64())
+    }
+    if (supportNativeIosSimulatorArm64) {
         configureNativeTarget(OS.IOS, Arch.Arm64, iosSimulatorArm64())
+    }
+    if (supportNativeIosX64) {
+        configureNativeTarget(OS.IOS, Arch.X64, iosX64())
     }
 
     sourceSets {
@@ -291,9 +329,10 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:$coroutinesVersion")
             }
         }
-
-        val awtMain by getting {
-            dependsOn(jvmMain)
+        if (supportAwt) {
+            val awtMain by getting {
+                dependsOn(jvmMain)
+            }
         }
 
         if (supportAndroid) {
@@ -314,8 +353,10 @@ kotlin {
             }
         }
 
-        val awtTest by getting {
-            dependsOn(jvmTest)
+        if (supportAwt) {
+            val awtTest by getting {
+                dependsOn(jvmTest)
+            }
         }
 
         if (supportAndroid) {
@@ -324,7 +365,7 @@ kotlin {
             }
         }
 
-        if (supportWasm || supportNative) {
+        if (supportWasm || supportAnyNative) {
             val nativeJsMain by creating {
                 dependsOn(commonMain)
             }
@@ -347,7 +388,7 @@ kotlin {
                 }
             }
 
-            if (supportNative) {
+            if (supportAnyNative) {
                 all {
                     // Really ugly, see https://youtrack.jetbrains.com/issue/KT-46649 why it is required,
                     // note that setting it per source set still keeps it unset in commonized source sets.
@@ -363,65 +404,79 @@ kotlin {
                 val nativeTest by creating {
                     dependsOn(nativeJsTest)
                 }
-                val linuxMain by creating {
-                    dependsOn(nativeMain)
+                if (supportNativeLinux) {
+                    val linuxMain by creating {
+                        dependsOn(nativeMain)
+                    }
+                    val linuxTest by creating {
+                        dependsOn(nativeTest)
+                    }
+                    val linuxX64Main by getting {
+                        dependsOn(linuxMain)
+                    }
+                    val linuxX64Test by getting {
+                        dependsOn(linuxTest)
+                    }
                 }
-                val linuxTest by creating {
-                    dependsOn(nativeTest)
-                }
-                val linuxX64Main by getting {
-                    dependsOn(linuxMain)
-                }
-                val linuxX64Test by getting {
-                    dependsOn(linuxTest)
-                }
-                val darwinMain by creating {
-                    dependsOn(nativeMain)
-                }
-                val darwinTest by creating {
-                    dependsOn(nativeTest)
-                }
-                val macosMain by creating {
-                    dependsOn(darwinMain)
-                }
-                val macosTest by creating {
-                    dependsOn(darwinTest)
-                }
-                val iosMain by creating {
-                    dependsOn(darwinMain)
-                }
-                val iosTest by creating {
-                    dependsOn(darwinTest)
-                }
-                val macosX64Main by getting {
-                    dependsOn(macosMain)
-                }
-                val macosX64Test by getting {
-                    dependsOn(macosTest)
-                }
-                val macosArm64Main by getting {
-                    dependsOn(macosMain)
-                }
-                val macosArm64Test by getting {
-                    dependsOn(macosTest)
-                }
-                val iosX64Main by getting {
-                    dependsOn(iosMain)
-                }
-                val iosX64Test by getting {
-                    dependsOn(iosTest)
-                }
-                val iosArm64Main by getting {
-                    dependsOn(iosMain)
-                }
-                val iosArm64Test by getting {
-                    dependsOn(iosTest)
-                }
-                val iosSimulatorArm64Main by getting {
-                    dependsOn(iosMain)
-                }
-                val iosSimulatorArm64Test by getting {
-                    dependsOn(iosTest)
+                if (supportAnyNativeIos || supportNativeMac) {
+                    val darwinMain by creating {
+                        dependsOn(nativeMain)
+                    }
+                    val darwinTest by creating {
+                        dependsOn(nativeTest)
+                    }
+                    if (supportNativeMac) {
+                        val macosMain by creating {
+                            dependsOn(darwinMain)
+                        }
+                        val macosTest by creating {
+                            dependsOn(darwinTest)
+                        }
+                        val macosX64Main by getting {
+                            dependsOn(macosMain)
+                        }
+                        val macosX64Test by getting {
+                            dependsOn(macosTest)
+                        }
+                        val macosArm64Main by getting {
+                            dependsOn(macosMain)
+                        }
+                        val macosArm64Test by getting {
+                            dependsOn(macosTest)
+                        }
+                    }
+                    if (supportAnyNativeIos) {
+                        val iosMain by creating {
+                            dependsOn(darwinMain)
+                        }
+                        val iosTest by creating {
+                            dependsOn(darwinTest)
+                        }
+                        if (supportNativeIosArm64) {
+                            val iosArm64Main by getting {
+                                dependsOn(iosMain)
+                            }
+                            val iosArm64Test by getting {
+                                dependsOn(iosTest)
+                            }
+                        }
+                        if (supportNativeIosSimulatorArm64) {
+                            val iosSimulatorArm64Main by getting {
+                                dependsOn(iosMain)
+                            }
+                            val iosSimulatorArm64Test by getting {
+                                dependsOn(iosTest)
+                            }
+                        }
+                        if (supportNativeIosX64) {
+                            val iosX64Main by getting {
+                                dependsOn(iosMain)
+                            }
+                            val iosX64Test by getting {
+                                dependsOn(iosTest)
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -682,14 +737,6 @@ fun skiaStaticLibraries(skiaDir: String, targetString: String): List<String> {
 }
 
 val allJvmRuntimeJars = mutableMapOf<Pair<OS, Arch>, TaskProvider<Jar>>()
-
-val skikoAwtJarForTests by project.tasks.registering(Jar::class) {
-    archiveBaseName.set("skiko-awt-test")
-    from(kotlin.jvm("awt").compilations["main"].output.allOutputs)
-}
-val skikoAwtRuntimeJarForTests = createSkikoJvmJarTask(targetOs, targetArch, skikoAwtJarForTests)
-val skikoRuntimeDirForTests = skikoRuntimeDirForTestsTask(targetOs, targetArch, skikoAwtJarForTests, skikoAwtRuntimeJarForTests)
-val skikoJarForTests = skikoJarForTestsTask(skikoRuntimeDirForTests)
 
 if (supportAndroid) {
     val os = OS.Android
@@ -1196,37 +1243,47 @@ fun skikoJarForTestsTask(
     archiveFileName.set("skiko-runtime-for-tests.jar")
 }
 
-tasks.withType<Test>().configureEach {
-    dependsOn(skikoRuntimeDirForTests)
-    dependsOn(skikoJarForTests)
-    options {
-        val dir = skikoRuntimeDirForTests.map { it.destinationDir }.get()
-        systemProperty("skiko.library.path", dir)
-        val jar = skikoJarForTests.get().outputs.files.files.single { it.name.endsWith(".jar") }
-        systemProperty("skiko.jar.path", jar.absolutePath)
-
-        systemProperty("skiko.test.screenshots.dir", File(project.projectDir, "src/jvmTest/screenshots").absolutePath)
-        systemProperty("skiko.test.font.dir", File(project.projectDir, "src/commonTest/resources/fonts").absolutePath)
-
-        val testingOnCI = System.getProperty("skiko.test.onci", "false").toBoolean()
-        val canRunPerformanceTests = testingOnCI
-        val canRunUiTests = testingOnCI || System.getProperty("os.name") != "Mac OS X"
-        systemProperty(
-            "skiko.test.performance.enabled",
-            System.getProperty("skiko.test.performance.enabled", canRunPerformanceTests.toString())
-        )
-        systemProperty("skiko.test.ui.enabled", System.getProperty("skiko.test.ui.enabled", canRunUiTests.toString()))
-        systemProperty("skiko.test.ui.renderApi", System.getProperty("skiko.test.ui.renderApi", "all"))
-
-        // Tests should be deterministic, so disable scaling.
-        // On MacOs we need the actual scale, otherwise we will have aliased screenshots because of scaling.
-        if (System.getProperty("os.name") != "Mac OS X") {
-            systemProperty("sun.java2d.dpiaware", "false")
-            systemProperty("sun.java2d.uiScale", "1")
-        }
+if (supportAwt) {
+    val skikoAwtJarForTests by project.tasks.registering(Jar::class) {
+        archiveBaseName.set("skiko-awt-test")
+        from(kotlin.jvm("awt").compilations["main"].output.allOutputs)
     }
+    val skikoAwtRuntimeJarForTests = createSkikoJvmJarTask(targetOs, targetArch, skikoAwtJarForTests)
+    val skikoRuntimeDirForTests = skikoRuntimeDirForTestsTask(targetOs, targetArch, skikoAwtJarForTests, skikoAwtRuntimeJarForTests)
+    val skikoJarForTests = skikoJarForTestsTask(skikoRuntimeDirForTests)
 
-    jvmArgs = listOf("--add-opens", "java.desktop/sun.font=ALL-UNNAMED")
+    tasks.withType<Test>().configureEach {
+        dependsOn(skikoRuntimeDirForTests)
+        dependsOn(skikoJarForTests)
+        options {
+            val dir = skikoRuntimeDirForTests.map { it.destinationDir }.get()
+            systemProperty("skiko.library.path", dir)
+            val jar = skikoJarForTests.get().outputs.files.files.single { it.name.endsWith(".jar") }
+            systemProperty("skiko.jar.path", jar.absolutePath)
+
+            systemProperty("skiko.test.screenshots.dir", File(project.projectDir, "src/jvmTest/screenshots").absolutePath)
+            systemProperty("skiko.test.font.dir", File(project.projectDir, "src/commonTest/resources/fonts").absolutePath)
+
+            val testingOnCI = System.getProperty("skiko.test.onci", "false").toBoolean()
+            val canRunPerformanceTests = testingOnCI
+            val canRunUiTests = testingOnCI || System.getProperty("os.name") != "Mac OS X"
+            systemProperty(
+                "skiko.test.performance.enabled",
+                System.getProperty("skiko.test.performance.enabled", canRunPerformanceTests.toString())
+            )
+            systemProperty("skiko.test.ui.enabled", System.getProperty("skiko.test.ui.enabled", canRunUiTests.toString()))
+            systemProperty("skiko.test.ui.renderApi", System.getProperty("skiko.test.ui.renderApi", "all"))
+
+            // Tests should be deterministic, so disable scaling.
+            // On MacOs we need the actual scale, otherwise we will have aliased screenshots because of scaling.
+            if (System.getProperty("os.name") != "Mac OS X") {
+                systemProperty("sun.java2d.dpiaware", "false")
+                systemProperty("sun.java2d.uiScale", "1")
+            }
+        }
+
+        jvmArgs = listOf("--add-opens", "java.desktop/sun.font=ALL-UNNAMED")
+    }
 }
 
 afterEvaluate {

@@ -7,3 +7,5 @@ dependencies/
 
 # Screenshot test actual files
 **/src/**/screenshots/*_actual.png
+
+skia-pack
