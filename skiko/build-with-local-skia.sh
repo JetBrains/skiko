@@ -69,7 +69,7 @@ cd "$(dirname "$0")"
 
 git clone https://github.com/JetBrains/skia-pack.git || echo "skia-pack exists. You can remove it or update by hands with git pull"
 cd skia-pack
-python3 script/checkout.py --version "$VERSION" --reset=False
+([ ! -d "skia" ] && python3 script/checkout.py --version "$VERSION") || echo "skip checkout, because directory skia-pack/skia already exists"
 for skikoMachine in ${skikoMachines[@]}; do
   python3 script/build.py --target "$TARGET" --machine "$skikoMachine" --build-type $skikoBuildType
   python3 script/archive.py --version "$VERSION" --target "$TARGET" --machine "$skikoMachine" --build-type $skikoBuildType
