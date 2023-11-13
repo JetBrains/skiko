@@ -2,7 +2,7 @@
 ###### Variables you can edit to change build config ######
 VERSION="m116-51072f3-1" # Version of Skia m###-commit-sha-#. This commit sha will be cloned from repository https://github.com/JetBrains/skia
 DEBUG_MODE="false"
-TARGET="wasm" # possible values: "ios", "iosSim", "macos", "windows", "linux", "wasm", "android", "tvos", "tvosSim"
+TARGET="ios" # possible values: "ios", "iosSim", "macos", "windows", "linux", "wasm", "android", "tvos", "tvosSim"
 SKIKO_TARGET_FLAGS="-Pskiko.native.ios.simulatorArm64.enabled=true -Pskiko.awt.enabled=false"
 ###########################################################
 
@@ -69,7 +69,8 @@ cd "$(dirname "$0")"
 
 git clone https://github.com/JetBrains/skia-pack.git || echo "skia-pack exists. You can remove it or update by hands with git pull"
 cd skia-pack
-([ ! -d "skia" ] && python3 script/checkout.py --version "$VERSION") || echo "skip checkout, because directory skia-pack/skia already exists"
+[ -d "skia" ] && echo "skip cript/checkout.py, because directory skia-pack/skia already exists"
+[ ! -d "skia" ] && python3 script/checkout.py --version "$VERSION"
 for skikoMachine in ${skikoMachines[@]}; do
   python3 script/build.py --target "$TARGET" --machine "$skikoMachine" --build-type $skikoBuildType
   python3 script/archive.py --version "$VERSION" --target "$TARGET" --machine "$skikoMachine" --build-type $skikoBuildType
