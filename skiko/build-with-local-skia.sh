@@ -2,7 +2,7 @@
 ###### Variables you can edit to change build config ######
 VERSION="m116-51072f3-1" # Version of Skia m###-commit-sha-#. This commit sha will be cloned from repository https://github.com/JetBrains/skia
 DEBUG_MODE="false"
-TARGET="ios" # possible values: "ios", "iosSim", "macos", "windows", "linux", "wasm", "android", "tvos", "tvosSim"
+TARGET="iosSim" # possible values: "ios", "iosSim", "macos", "windows", "linux", "wasm", "android", "tvos", "tvosSim"
 SKIKO_TARGET_FLAGS="-Pskiko.native.ios.simulatorArm64.enabled=true -Pskiko.awt.enabled=false"
 ###########################################################
 
