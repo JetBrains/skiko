@@ -66,6 +66,7 @@ esac
 set -e # fail fast
 set -x # print all commands
 cd "$(dirname "$0")"
+SCRIPT_DIR="$(pwd)"
 
 git clone https://github.com/JetBrains/skia-pack.git || echo "skia-pack exists. You can remove it or update by hands with git pull"
 cd skia-pack
@@ -75,7 +76,7 @@ for skikoMachine in ${skikoMachines[@]}; do
   python3 script/build.py --target "$TARGET" --machine "$skikoMachine" --build-type $skikoBuildType
   python3 script/archive.py --version "$VERSION" --target "$TARGET" --machine "$skikoMachine" --build-type $skikoBuildType
 done
-cd "$(dirname "$0")"
+cd "$SCRIPT_DIR"
 
 rm -rf build/classes/kotlin/* # We need to drop old cache. We can do it with ./gradlew clean as well, but it tooks longer time to redownload dependencies dir.
 
