@@ -3,6 +3,7 @@
 VERSION="m116-51072f3-1" # Version of Skia m###-commit-sha-#. This commit sha will be cloned from repository https://github.com/JetBrains/skia
 DEBUG_MODE="false"
 TARGET="iosSim" # possible values: "ios", "iosSim", "macos", "windows", "linux", "wasm", "android", "tvos", "tvosSim"
+# For Intel Mac - use "ios" target to build for iOS x64 simulator.
 SKIKO_TARGET_FLAGS="-Pskiko.native.ios.simulatorArm64.enabled=true -Pskiko.awt.enabled=false"
 ###########################################################
 
@@ -14,8 +15,13 @@ fi
 
 case $TARGET in
   "ios")
-    SKIKO_TARGET_FLAGS="-Pskiko.native.ios.arm64.enabled=true -Pskiko.awt.enabled=false"
-    skikoMachines=("arm64")
+    if [[ $(uname -m) == 'arm64' ]]; then
+      SKIKO_TARGET_FLAGS="-Pskiko.native.ios.arm64.enabled=true -Pskiko.awt.enabled=false"
+      skikoMachines=("arm64")
+    else
+      SKIKO_TARGET_FLAGS="-Pskiko.native.ios.x64.enabled=true -Pskiko.awt.enabled=false"
+      skikoMachines=("x64")
+    fi
     ;;
   "iosSim")
     if [[ $(uname -m) == 'arm64' ]]; then
