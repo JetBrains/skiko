@@ -52,7 +52,7 @@ internal actual fun URIHandler_openUri(uri: String) {
             try {
                 Runtime.getRuntime().exec(arrayOf("xdg-open", URL(uri).toString()))
             } catch (e: MalformedURLException) {
-                throw UnsupportedOperationException("AWT does not support the BROWSE action on this platform. Cannot fallback to xdg-open as this URI is not a valid URL.", e)
+                throw IllegalArgumentException("URI is not a valid URL", e)
             }
         }
         OS.Android, OS.Windows, OS.MacOS, OS.Ios, OS.JS, OS.Unknown -> {
