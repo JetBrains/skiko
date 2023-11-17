@@ -43,9 +43,9 @@ class TypefaceFontProvider : FontMgr(TypefaceFontProvider_nMake()) {
 
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TypefaceFontProvider__1nMake")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_TypefaceFontProvider__1nMake")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_TypefaceFontProvider__1nMake")
 private external fun TypefaceFontProvider_nMake(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TypefaceFontProvider__1nRegisterTypeface")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_TypefaceFontProvider__1nRegisterTypeface")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_TypefaceFontProvider__1nRegisterTypeface")
 private external fun _nRegisterTypeface(ptr: NativePointer, typefacePtr: NativePointer, alias: InteropPointer)

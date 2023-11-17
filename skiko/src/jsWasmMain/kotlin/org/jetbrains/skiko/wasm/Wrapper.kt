@@ -4,15 +4,6 @@ import org.jetbrains.skia.impl.NativePointer
 import org.w3c.dom.HTMLCanvasElement
 import kotlin.js.*
 
-private external interface GLInterface {
-    fun createContext(context: HTMLCanvasElement, contextAttributes: ContextAttributes): NativePointer;
-    fun makeContextCurrent(contextPointer: NativePointer): Boolean;
-}
-
-internal external object GL : GLInterface {
-    override fun createContext(context: HTMLCanvasElement, contextAttributes: ContextAttributes): Int = definedExternally
-    override fun makeContextCurrent(contextPointer: NativePointer): Boolean = definedExternally
-}
 
 internal external interface ContextAttributes {
     val alpha: Int?

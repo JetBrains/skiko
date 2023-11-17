@@ -25,5 +25,5 @@ abstract class SVGNode internal constructor(ptr: NativePointer) : RefCnt(ptr) {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_svg_SVGNode__1nGetTag")
-@ModuleImport("skia", "org_jetbrains_skia_svg_SVGNode__1nGetTag")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_svg_SVGNode__1nGetTag")
 private external fun SVGNode_nGetTag(ptr: NativePointer): Int

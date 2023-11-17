@@ -60,11 +60,11 @@ class TextBox(val rect: Rect, direction: Direction) {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextBox__1nGetArraySize")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_TextBox__1nGetArraySize")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_TextBox__1nGetArraySize")
 private external fun TextBox_nGetArraySize(array: InteropPointer): Int
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextBox__1nDisposeArray")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_TextBox__1nDisposeArray")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_TextBox__1nDisposeArray")
 private external fun TextBox_nDisposeArray(array: InteropPointer)
 @ExternalSymbolName("org_jetbrains_skia_paragraph_TextBox__1nGetArrayElement")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_TextBox__1nGetArrayElement")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_TextBox__1nGetArrayElement")
 private external fun TextBox_nGetArrayElement(array: InteropPointer, index: Int, rectArray: InteropPointer, directionArray: InteropPointer)

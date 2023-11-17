@@ -46,9 +46,9 @@ class IcuBidiRunIterator(text: ManagedString, manageText: Boolean, bidiLevel: In
 }
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_IcuBidiRunIterator__1nMake")
-@ModuleImport("skia", "org_jetbrains_skia_shaper_IcuBidiRunIterator__1nMake")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_shaper_IcuBidiRunIterator__1nMake")
 private external fun _nMake(textPtr: NativePointer, bidiLevel: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_IcuBidiRunIterator__1nGetCurrentLevel")
-@ModuleImport("skia", "org_jetbrains_skia_shaper_IcuBidiRunIterator__1nGetCurrentLevel")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_shaper_IcuBidiRunIterator__1nGetCurrentLevel")
 private external fun _nGetCurrentLevel(ptr: NativePointer): Int

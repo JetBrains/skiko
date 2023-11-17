@@ -58,9 +58,9 @@ class FontMgrRunIterator(text: ManagedString, manageText: Boolean, font: Font, o
 }
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_FontMgrRunIterator__1nMake")
-@ModuleImport("skia", "org_jetbrains_skia_shaper_FontMgrRunIterator__1nMake")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_shaper_FontMgrRunIterator__1nMake")
 private external fun _nMake(textPtr: NativePointer, fontPtr: NativePointer, fontMgrPtr: NativePointer, optsBooleanProps: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_shaper_FontMgrRunIterator__1nGetCurrentFont")
-@ModuleImport("skia", "org_jetbrains_skia_shaper_FontMgrRunIterator__1nGetCurrentFont")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_shaper_FontMgrRunIterator__1nGetCurrentFont")
 private external fun _nGetCurrentFont(ptr: NativePointer): NativePointer

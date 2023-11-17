@@ -219,113 +219,113 @@ class ParagraphStyle : Managed(ParagraphStyle_nMake(), _FinalizerHolder.PTR) {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetFinalizer")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_ParagraphStyle__1nGetFinalizer")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphStyle__1nGetFinalizer")
 private external fun ParagraphStyle_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nMake")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_ParagraphStyle__1nMake")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphStyle__1nMake")
 private external fun ParagraphStyle_nMake(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetHeight")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_ParagraphStyle__1nGetHeight")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphStyle__1nGetHeight")
 private external fun ParagraphStyle_nGetHeight(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nEquals")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_ParagraphStyle__1nEquals")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphStyle__1nEquals")
 private external fun _nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetStrutStyle")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_ParagraphStyle__1nGetStrutStyle")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphStyle__1nGetStrutStyle")
 private external fun _nGetStrutStyle(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetStrutStyle")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_ParagraphStyle__1nSetStrutStyle")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphStyle__1nSetStrutStyle")
 private external fun _nSetStrutStyle(ptr: NativePointer, stylePtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetTextStyle")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_ParagraphStyle__1nGetTextStyle")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphStyle__1nGetTextStyle")
 private external fun _nGetTextStyle(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetTextStyle")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_ParagraphStyle__1nSetTextStyle")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphStyle__1nSetTextStyle")
 private external fun _nSetTextStyle(ptr: NativePointer, textStylePtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetDirection")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_ParagraphStyle__1nGetDirection")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphStyle__1nGetDirection")
 private external fun _nGetDirection(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetDirection")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_ParagraphStyle__1nSetDirection")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphStyle__1nSetDirection")
 private external fun _nSetDirection(ptr: NativePointer, direction: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetAlignment")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_ParagraphStyle__1nGetAlignment")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphStyle__1nGetAlignment")
 private external fun _nGetAlignment(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetAlignment")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_ParagraphStyle__1nSetAlignment")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphStyle__1nSetAlignment")
 private external fun _nSetAlignment(ptr: NativePointer, align: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetMaxLinesCount")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_ParagraphStyle__1nGetMaxLinesCount")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphStyle__1nGetMaxLinesCount")
 private external fun _nGetMaxLinesCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetMaxLinesCount")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_ParagraphStyle__1nSetMaxLinesCount")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphStyle__1nSetMaxLinesCount")
 private external fun _nSetMaxLinesCount(ptr: NativePointer, maxLines: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetEllipsis")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_ParagraphStyle__1nGetEllipsis")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphStyle__1nGetEllipsis")
 private external fun _nGetEllipsis(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetEllipsis")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_ParagraphStyle__1nSetEllipsis")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphStyle__1nSetEllipsis")
 private external fun _nSetEllipsis(ptr: NativePointer, ellipsis: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetHeight")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_ParagraphStyle__1nSetHeight")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphStyle__1nSetHeight")
 private external fun _nSetHeight(ptr: NativePointer, height: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetHeightMode")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_ParagraphStyle__1nGetHeightMode")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphStyle__1nGetHeightMode")
 private external fun _nGetHeightMode(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetHeightMode")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_ParagraphStyle__1nSetHeightMode")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphStyle__1nSetHeightMode")
 private external fun _nSetHeightMode(ptr: NativePointer, v: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetEffectiveAlignment")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_ParagraphStyle__1nGetEffectiveAlignment")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphStyle__1nGetEffectiveAlignment")
 private external fun _nGetEffectiveAlignment(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nIsHintingEnabled")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_ParagraphStyle__1nIsHintingEnabled")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphStyle__1nIsHintingEnabled")
 private external fun _nIsHintingEnabled(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nDisableHinting")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_ParagraphStyle__1nDisableHinting")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphStyle__1nDisableHinting")
 private external fun _nDisableHinting(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetFontRastrSettings")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_ParagraphStyle__1nSetFontRastrSettings")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphStyle__1nSetFontRastrSettings")
 private external fun _nSetFontRastrSettings(ptr: NativePointer, edging: Int, hinting: Int, subpixel: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetEdging")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_ParagraphStyle__1nGetEdging")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphStyle__1nGetEdging")
 private external fun _nGetEdging(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetHinting")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_ParagraphStyle__1nGetHinting")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphStyle__1nGetHinting")
 private external fun _nGetHinting(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetSubpixel")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_ParagraphStyle__1nGetSubpixel")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphStyle__1nGetSubpixel")
 private external fun _nGetSubpixel(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nSetTextIndent")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_ParagraphStyle__1nSetTextIndent")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphStyle__1nSetTextIndent")
 private external fun _nSetTextIndent(ptr: NativePointer, firstLine: Float, restLine: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_paragraph_ParagraphStyle__1nGetTextIndent")
-@ModuleImport("skia", "org_jetbrains_skia_paragraph_ParagraphStyle__1nGetTextIndent")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_ParagraphStyle__1nGetTextIndent")
 private external fun _nGetTextIndent(ptr: NativePointer, result: InteropPointer)

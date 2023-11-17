@@ -1,39 +1,39 @@
 package org.jetbrains.skia.impl
 
-@kotlin.wasm.WasmImport("skia", "skia_memSetByte")
+@kotlin.wasm.WasmImport("./skiko.mjs", "skia_memSetByte")
 external fun skia_memSetByte(address: NativePointer, value: Byte)
 
-@kotlin.wasm.WasmImport("skia", "skia_memGetByte")
+@kotlin.wasm.WasmImport("./skiko.mjs", "skia_memGetByte")
 external fun skia_memGetByte(address: NativePointer): Byte
 
-@kotlin.wasm.WasmImport("skia", "skia_memSetChar")
+@kotlin.wasm.WasmImport("./skiko.mjs", "skia_memSetChar")
 external fun skia_memSetChar(address: NativePointer, value: Char)
 
-@kotlin.wasm.WasmImport("skia", "skia_memGetChar")
+@kotlin.wasm.WasmImport("./skiko.mjs", "skia_memGetChar")
 external fun skia_memGetChar(address: NativePointer): Char
 
-@kotlin.wasm.WasmImport("skia", "skia_memSetShort")
+@kotlin.wasm.WasmImport("./skiko.mjs", "skia_memSetShort")
 external fun skia_memSetShort(address: NativePointer, value: Short)
 
-@kotlin.wasm.WasmImport("skia", "skia_memGetShort")
+@kotlin.wasm.WasmImport("./skiko.mjs", "skia_memGetShort")
 external fun skia_memGetShort(address: NativePointer): Short
 
-@kotlin.wasm.WasmImport("skia", "skia_memSetInt")
+@kotlin.wasm.WasmImport("./skiko.mjs", "skia_memSetInt")
 external fun skia_memSetInt(address: NativePointer, value: Int)
 
-@kotlin.wasm.WasmImport("skia", "skia_memGetInt")
+@kotlin.wasm.WasmImport("./skiko.mjs", "skia_memGetInt")
 external fun skia_memGetInt(address: NativePointer): Int
 
-@kotlin.wasm.WasmImport("skia", "skia_memSetFloat")
+@kotlin.wasm.WasmImport("./skiko.mjs", "skia_memSetFloat")
 external fun skia_memSetFloat(address: NativePointer, value: Float)
 
-@kotlin.wasm.WasmImport("skia", "skia_memGetFloat")
+@kotlin.wasm.WasmImport("./skiko.mjs", "skia_memGetFloat")
 external fun skia_memGetFloat(address: NativePointer): Float
 
-@kotlin.wasm.WasmImport("skia", "skia_memSetDouble")
+@kotlin.wasm.WasmImport("./skiko.mjs", "skia_memSetDouble")
 external fun skia_memSetDouble(address: NativePointer, value: Double)
 
-@kotlin.wasm.WasmImport("skia", "skia_memGetDouble")
+@kotlin.wasm.WasmImport("./skiko.mjs", "skia_memGetDouble")
 external fun skia_memGetDouble(address: NativePointer): Double
 
 internal actual fun toWasm(dest: NativePointer, src: ByteArray) {
@@ -406,8 +406,3 @@ internal external interface CallbackDataBoolean : JsAny { @JsName("value") var v
 internal external interface CallbackDataInt : JsAny { @JsName("value") var value: Int? }
 internal external interface CallbackDataNativePointer : JsAny { @JsName("value") var value: NativePointer? }
 internal external interface CallbackDataInteropPointer: JsAny { @JsName("value") var value: InteropPointer? }
-
-// See `setup.js`
-private external fun _registerCallback(cb: () -> Unit, data: JsAny?, global: Boolean): Int
-private external fun _createLocalCallbackScope()
-private external fun _releaseLocalCallbackScope()

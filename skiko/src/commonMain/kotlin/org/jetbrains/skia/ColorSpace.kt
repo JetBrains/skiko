@@ -91,33 +91,33 @@ class ColorSpace : Managed {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nGetFinalizer")
-@ModuleImport("skia", "org_jetbrains_skia_ColorSpace__1nGetFinalizer")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ColorSpace__1nGetFinalizer")
 private external fun ColorSpace_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ColorSpace__nConvert")
-@ModuleImport("skia", "org_jetbrains_skia_ColorSpace__nConvert")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ColorSpace__nConvert")
 private external fun _nConvert(fromPtr: NativePointer, toPtr: NativePointer, r: Float, g: Float, b: Float, a: Float, result: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nMakeSRGB")
-@ModuleImport("skia", "org_jetbrains_skia_ColorSpace__1nMakeSRGB")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ColorSpace__1nMakeSRGB")
 private external fun _nMakeSRGB(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nMakeDisplayP3")
-@ModuleImport("skia", "org_jetbrains_skia_ColorSpace__1nMakeDisplayP3")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ColorSpace__1nMakeDisplayP3")
 private external fun _nMakeDisplayP3(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nMakeSRGBLinear")
-@ModuleImport("skia", "org_jetbrains_skia_ColorSpace__1nMakeSRGBLinear")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ColorSpace__1nMakeSRGBLinear")
 private external fun _nMakeSRGBLinear(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nIsGammaCloseToSRGB")
-@ModuleImport("skia", "org_jetbrains_skia_ColorSpace__1nIsGammaCloseToSRGB")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ColorSpace__1nIsGammaCloseToSRGB")
 private external fun _nIsGammaCloseToSRGB(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nIsGammaLinear")
-@ModuleImport("skia", "org_jetbrains_skia_ColorSpace__1nIsGammaLinear")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ColorSpace__1nIsGammaLinear")
 private external fun _nIsGammaLinear(ptr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_ColorSpace__1nIsSRGB")
-@ModuleImport("skia", "org_jetbrains_skia_ColorSpace__1nIsSRGB")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_ColorSpace__1nIsSRGB")
 private external fun _nIsSRGB(ptr: NativePointer): Boolean

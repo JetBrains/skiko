@@ -141,45 +141,45 @@ class Data internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHol
 }
 
 @ExternalSymbolName("org_jetbrains_skia_Data__1nGetFinalizer")
-@ModuleImport("skia", "org_jetbrains_skia_Data__1nGetFinalizer")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Data__1nGetFinalizer")
 private external fun Data_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Data__1nSize")
-@ModuleImport("skia", "org_jetbrains_skia_Data__1nSize")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Data__1nSize")
 private external fun _nSize(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Data__1nBytes")
-@ModuleImport("skia", "org_jetbrains_skia_Data__1nBytes")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Data__1nBytes")
 private external fun _nBytes(ptr: NativePointer, offset: Int, length: Int, destBytes: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Data__1nEquals")
-@ModuleImport("skia", "org_jetbrains_skia_Data__1nEquals")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Data__1nEquals")
 private external fun _nEquals(ptr: NativePointer, otherPtr: NativePointer): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Data__1nMakeFromBytes")
-@ModuleImport("skia", "org_jetbrains_skia_Data__1nMakeFromBytes")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Data__1nMakeFromBytes")
 private external fun _nMakeFromBytes(bytes: InteropPointer, offset: Int, length: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Data__1nMakeWithoutCopy")
-@ModuleImport("skia", "org_jetbrains_skia_Data__1nMakeWithoutCopy")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Data__1nMakeWithoutCopy")
 private external fun _nMakeWithoutCopy(memoryAddr: NativePointer, length: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Data__1nMakeFromFileName")
-@ModuleImport("skia", "org_jetbrains_skia_Data__1nMakeFromFileName")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Data__1nMakeFromFileName")
 internal external fun _nMakeFromFileName(path: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Data__1nMakeSubset")
-@ModuleImport("skia", "org_jetbrains_skia_Data__1nMakeSubset")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Data__1nMakeSubset")
 private external fun _nMakeSubset(ptr: NativePointer, offset: Int, length: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Data__1nMakeEmpty")
-@ModuleImport("skia", "org_jetbrains_skia_Data__1nMakeEmpty")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Data__1nMakeEmpty")
 private external fun _nMakeEmpty(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Data__1nMakeUninitialized")
-@ModuleImport("skia", "org_jetbrains_skia_Data__1nMakeUninitialized")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Data__1nMakeUninitialized")
 private external fun _nMakeUninitialized(length: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Data__1nWritableData")
-@ModuleImport("skia", "org_jetbrains_skia_Data__1nWritableData")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Data__1nWritableData")
 private external fun _nWritableData(dataPtr: NativePointer): NativePointer

@@ -48,5 +48,5 @@ object CharDirection {
 }
 
 @ExternalSymbolName("org_jetbrains_skia_icu_Unicode_charDirection")
-@ModuleImport("skia", "org_jetbrains_skia_icu_Unicode_charDirection")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_icu_Unicode_charDirection")
 private external fun charDirection(codePoint: Int): Int

@@ -1376,27 +1376,27 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
 
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nGetFinalizer")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nGetFinalizer")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nGetFinalizer")
 private external fun Canvas_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nMakeFromBitmap")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nMakeFromBitmap")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nMakeFromBitmap")
 private external fun _nMakeFromBitmap(bitmapPtr: NativePointer, flags: Int, pixelGeometry: Int): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawPoint")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nDrawPoint")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nDrawPoint")
 private external fun _nDrawPoint(ptr: NativePointer, x: Float, y: Float, paintPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawPoints")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nDrawPoints")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nDrawPoints")
 private external fun _nDrawPoints(ptr: NativePointer, mode: Int, coordsCount: Int, coords: InteropPointer, paintPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawLine")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nDrawLine")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nDrawLine")
 private external fun _nDrawLine(ptr: NativePointer, x0: Float, y0: Float, x1: Float, y1: Float, paintPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawArc")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nDrawArc")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nDrawArc")
 private external fun _nDrawArc(
     ptr: NativePointer,
     left: Float,
@@ -1410,15 +1410,15 @@ private external fun _nDrawArc(
 )
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawRect")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nDrawRect")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nDrawRect")
 private external fun _nDrawRect(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float, paintPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawOval")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nDrawOval")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nDrawOval")
 private external fun _nDrawOval(ptr: NativePointer, left: Float, top: Float, right: Float, bottom: Float, paint: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawRRect")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nDrawRRect")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nDrawRRect")
 private external fun _nDrawRRect(
     ptr: NativePointer,
     left: Float,
@@ -1432,7 +1432,7 @@ private external fun _nDrawRRect(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawDRRect")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nDrawDRRect")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nDrawDRRect")
 private external fun _nDrawDRRect(
     ptr: NativePointer,
     ol: Float,
@@ -1452,11 +1452,11 @@ private external fun _nDrawDRRect(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawPath")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nDrawPath")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nDrawPath")
 private external fun _nDrawPath(ptr: NativePointer, nativePath: NativePointer, paintPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawImageRect")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nDrawImageRect")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nDrawImageRect")
 private external fun _nDrawImageRect(
     ptr: NativePointer,
     nativeImage: NativePointer,
@@ -1475,7 +1475,7 @@ private external fun _nDrawImageRect(
 )
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawImageNine")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nDrawImageNine")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nDrawImageNine")
 private external fun _nDrawImageNine(
     ptr: NativePointer,
     nativeImage: NativePointer,
@@ -1492,23 +1492,23 @@ private external fun _nDrawImageNine(
 )
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawRegion")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nDrawRegion")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nDrawRegion")
 private external fun _nDrawRegion(ptr: NativePointer, nativeRegion: NativePointer, paintPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawString")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nDrawString")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nDrawString")
 private external fun _nDrawString(ptr: NativePointer, string: InteropPointer, x: Float, y: Float, font: NativePointer, paint: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawTextBlob")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nDrawTextBlob")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nDrawTextBlob")
 private external fun _nDrawTextBlob(ptr: NativePointer, blob: NativePointer, x: Float, y: Float, paint: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawPicture")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nDrawPicture")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nDrawPicture")
 private external fun _nDrawPicture(ptr: NativePointer, picturePtr: NativePointer, matrix: InteropPointer, paintPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawVertices")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nDrawVertices")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nDrawVertices")
 private external fun _nDrawVertices(
     ptr: NativePointer,
     verticesMode: Int,
@@ -1524,7 +1524,7 @@ private external fun _nDrawVertices(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawPatch")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nDrawPatch")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nDrawPatch")
 private external fun _nDrawPatch(
     ptr: NativePointer,
     cubics: InteropPointer,
@@ -1536,31 +1536,31 @@ private external fun _nDrawPatch(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawDrawable")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nDrawDrawable")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nDrawDrawable")
 private external fun _nDrawDrawable(ptr: NativePointer, drawablePrt: NativePointer, matrix: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nClear")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nClear")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nClear")
 private external fun _nClear(ptr: NativePointer, color: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nDrawPaint")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nDrawPaint")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nDrawPaint")
 private external fun _nDrawPaint(ptr: NativePointer, paintPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nSetMatrix")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nSetMatrix")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nSetMatrix")
 private external fun _nSetMatrix(ptr: NativePointer, matrix: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nGetLocalToDevice")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nGetLocalToDevice")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nGetLocalToDevice")
 private external fun _nGetLocalToDevice(ptr: NativePointer, resultFloats: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nResetMatrix")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nResetMatrix")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nResetMatrix")
 private external fun _nResetMatrix(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nClipRect")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nClipRect")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nClipRect")
 private external fun _nClipRect(
     ptr: NativePointer,
     left: Float,
@@ -1572,7 +1572,7 @@ private external fun _nClipRect(
 )
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nClipRRect")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nClipRRect")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nClipRRect")
 private external fun _nClipRRect(
     ptr: NativePointer,
     left: Float,
@@ -1587,55 +1587,55 @@ private external fun _nClipRRect(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nClipPath")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nClipPath")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nClipPath")
 private external fun _nClipPath(ptr: NativePointer, nativePath: NativePointer, mode: Int, antiAlias: Boolean)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nClipRegion")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nClipRegion")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nClipRegion")
 private external fun _nClipRegion(ptr: NativePointer, nativeRegion: NativePointer, mode: Int)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nTranslate")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nTranslate")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nTranslate")
 private external fun _nTranslate(ptr: NativePointer, dx: Float, dy: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nScale")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nScale")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nScale")
 private external fun _nScale(ptr: NativePointer, sx: Float, sy: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nRotate")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nRotate")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nRotate")
 private external fun _nRotate(ptr: NativePointer, deg: Float, x: Float, y: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nSkew")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nSkew")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nSkew")
 private external fun _nSkew(ptr: NativePointer, sx: Float, sy: Float)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nConcat")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nConcat")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nConcat")
 private external fun _nConcat(ptr: NativePointer, matrix: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nConcat44")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nConcat44")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nConcat44")
 private external fun _nConcat44(ptr: NativePointer, matrix: InteropPointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nReadPixels")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nReadPixels")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nReadPixels")
 private external fun _nReadPixels(ptr: NativePointer, bitmapPtr: NativePointer, srcX: Int, srcY: Int): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nWritePixels")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nWritePixels")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nWritePixels")
 private external fun _nWritePixels(ptr: NativePointer, bitmapPtr: NativePointer, x: Int, y: Int): Boolean
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nSave")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nSave")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nSave")
 private external fun _nSave(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nSaveLayer")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nSaveLayer")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nSaveLayer")
 private external fun _nSaveLayer(ptr: NativePointer, paintPtr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nSaveLayerRect")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nSaveLayerRect")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nSaveLayerRect")
 private external fun _nSaveLayerRect(
     ptr: NativePointer,
     left: Float,
@@ -1647,13 +1647,13 @@ private external fun _nSaveLayerRect(
 
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nGetSaveCount")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nGetSaveCount")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nGetSaveCount")
 private external fun _nGetSaveCount(ptr: NativePointer): Int
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nRestore")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nRestore")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nRestore")
 private external fun _nRestore(ptr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_Canvas__1nRestoreToCount")
-@ModuleImport("skia", "org_jetbrains_skia_Canvas__1nRestoreToCount")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_Canvas__1nRestoreToCount")
 private external fun _nRestoreToCount(ptr: NativePointer, saveCount: Int)
