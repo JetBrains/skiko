@@ -49,11 +49,7 @@ internal actual fun URIHandler_openUri(uri: String) {
     } else when (hostOs) {
         OS.Linux -> {
             URI(uri) // Validate URI
-            try {
-                Runtime.getRuntime().exec(arrayOf("xdg-open", URL(uri).toString()))
-            } catch (e: MalformedURLException) {
-                throw IllegalArgumentException("URI is not a valid URL", e)
-            }
+            Runtime.getRuntime().exec(arrayOf("xdg-open", URL(uri).toString()))
         }
         OS.Android, OS.Windows, OS.MacOS, OS.Ios, OS.JS, OS.Unknown -> {
             throw UnsupportedOperationException("AWT does not support the BROWSE action on this platform")
