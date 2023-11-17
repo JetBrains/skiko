@@ -2,7 +2,6 @@ package org.jetbrains.skiko.wasm
 
 import org.jetbrains.skia.impl.NativePointer
 import org.w3c.dom.HTMLCanvasElement
-import kotlin.js.*
 
 @JsFun(
 """() => {
