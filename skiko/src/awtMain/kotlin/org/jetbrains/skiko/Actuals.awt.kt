@@ -48,7 +48,7 @@ internal actual fun URIHandler_openUri(uri: String) {
         desktop.browse(URI(uri))
     } else when (hostOs) {
         OS.Linux -> {
-            URI(uri) // Validate URI
+            URI(uri) // Validate URI for exception behavior consistent with the Desktop.browse() case (throwing URISyntaxException)
             Runtime.getRuntime().exec(arrayOf("xdg-open", URL(uri).toString()))
         }
         OS.Android, OS.Windows, OS.MacOS, OS.Ios, OS.JS, OS.Unknown -> {
