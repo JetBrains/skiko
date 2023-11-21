@@ -382,7 +382,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_jetbrains_skia_FontKt__1nGetMetrics
 }
 
 extern "C" JNIEXPORT jfloat JNICALL Java_org_jetbrains_skia_FontKt__1nGetSpacing
-  (JNIEnv* env, jclass jclass, jlong ptr, jshortArray glyphsArr) {
+  (JNIEnv* env, jclass jclass, jlong ptr) {
     SkFont* instance = reinterpret_cast<SkFont*>(static_cast<uintptr_t>(ptr));
     return instance->getSpacing();
 }
