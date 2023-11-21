@@ -916,6 +916,20 @@ open class Canvas internal constructor(ptr: NativePointer, managed: Boolean, int
         return drawDrawable(drawable, Matrix33.makeTranslate(x, y))
     }
 
+    fun drawDrawable(drawable: DrawableImpl): Canvas {
+        Stats.onNativeCall()
+        try {
+            interopScope {
+                _nDrawDrawable(_ptr, getPtr(drawable), toInterop(null as FloatArray?))
+            }
+        } finally {
+            reachabilityBarrier(this)
+            reachabilityBarrier(drawable)
+        }
+        return this
+    }
+
+
     /**
      *
      * Draws Drawable drawable using clip and matrix, concatenated with

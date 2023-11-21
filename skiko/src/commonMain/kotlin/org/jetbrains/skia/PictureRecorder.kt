@@ -95,6 +95,17 @@ class PictureRecorder internal constructor(ptr: NativePointer) : Managed(ptr, _F
         }
     }
 
+    fun finishRecordingAsDrawable(): DrawableImpl {
+        return try {
+            Stats.onNativeCall()
+            DrawableImpl(
+                _nFinishRecordingAsDrawable(_ptr)
+            )
+        } finally {
+            reachabilityBarrier(this)
+        }
+    }
+
     /**
      * Signal that the caller is done recording, and update the cull rect to use for bounding
      * box hierarchy (BBH) generation. The behavior is the same as calling
