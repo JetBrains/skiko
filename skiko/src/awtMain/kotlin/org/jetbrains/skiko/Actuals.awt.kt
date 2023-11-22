@@ -8,7 +8,9 @@ import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection
 import java.awt.datatransfer.UnsupportedFlavorException
 import java.io.IOException
+import java.net.MalformedURLException
 import java.net.URI
+import java.net.URL
 import javax.swing.UIManager
 
 actual fun setSystemLookAndFeel() = UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
@@ -41,7 +43,18 @@ internal actual fun makeDefaultRenderFactory(): RenderFactory =
     }
 
 internal actual fun URIHandler_openUri(uri: String) {
-    Desktop.getDesktop().browse(URI(uri))
+    val desktop = Desktop.getDesktop()
+    if (desktop.isSupported(Desktop.Action.BROWSE)) {
+        desktop.browse(URI(uri))
+    } else when (hostOs) {
+        OS.Linux -> {
+            URI(uri) // Validate URI for exception behavior consistent with the Desktop.browse() case (throwing URISyntaxException)
+            Runtime.getRuntime().exec(arrayOf("xdg-open", URL(uri).toString()))
+        }
+        OS.Android, OS.Windows, OS.MacOS, OS.Ios, OS.JS, OS.Unknown -> {
+            throw UnsupportedOperationException("AWT does not support the BROWSE action on this platform")
+        }
+    }
 }
 
 private val systemClipboard by lazy {
