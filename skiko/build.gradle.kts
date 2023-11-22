@@ -130,10 +130,14 @@ val linkWasm = if (supportJs || supportWasm) {
             addAll(
                 listOf(
                     "-l", "GL",
-                    "-s", "USE_WEBGL2=1",
+                    "-s", "MAX_WEBGL_VERSION=2",
+                    "-s", "MIN_WEBGL_VERSION=2",
                     "-s", "OFFSCREEN_FRAMEBUFFER=1",
                     "-s", "ALLOW_MEMORY_GROWTH=1", // TODO: Is there a better way? Should we use `-s INITIAL_MEMORY=X`?
-                    "--bind"
+                    "--bind",
+                    // -O2 saves 800kB for the output file, and ~100kB for transferred size.
+                    // -O3 breaks the exports in js/mjs files. skiko.wasm size is the same though
+                    "-O2"
                 )
             )
             if (outputES6) {
@@ -159,7 +163,7 @@ val linkWasm = if (supportJs || supportWasm) {
                 val originalContent = jsFile.readText()
                 val newContent = originalContent.replace("_org_jetbrains", "org_jetbrains")
                     .replace("skikomjs.wasm", "skiko.wasm")
-                    .replace("if (ENVIRONMENT_IS_NODE) {", "if (false) {") // to make webpack erase this part
+                    .replace("if(ENVIRONMENT_IS_NODE){", "if (false) {") // to make webpack erase this part
                 jsFile.writeText(newContent)
 
                 if (outputES6) {

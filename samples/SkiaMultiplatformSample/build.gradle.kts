@@ -118,7 +118,7 @@ kotlin {
         browser {
             commonWebpackConfig {
                 outputFileName = "clocks-wasm.js"
-                configDirectory = configDirectory?.resolve("wasm")
+                // configDirectory = configDirectory?.resolve("wasm")
             }
         }
         binaries.executable()
