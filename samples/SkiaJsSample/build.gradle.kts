@@ -19,13 +19,26 @@ val resourcesDir = "$buildDir/resources/"
 
 val skikoWasm by configurations.creating
 
+val isCompositeBuild = extra.properties.getOrDefault("SKIKO_COMPOSITE_BUILD", "") == "1"
+
 dependencies {
-    skikoWasm("org.jetbrains.skiko:skiko-js-wasm-runtime:$version")
+    if (isCompositeBuild) {
+        val filePath = gradle.includedBuild("skiko").projectDir
+            .resolve("./build/libs/skiko-wasm-0.0.0-SNAPSHOT.jar")
+        skikoWasm(files(filePath))
+    } else {
+        skikoWasm("org.jetbrains.skiko:skiko-js-wasm-runtime:$version")
+    }
 }
 
 val unzipTask = tasks.register("unzipWasm", Copy::class) {
     destinationDir = file(resourcesDir)
     from(skikoWasm.map { zipTree(it) })
+
+    if (isCompositeBuild) {
+        val skikoWasmJarTask = gradle.includedBuild("skiko").task(":skikoWasmJar")
+        dependsOn(skikoWasmJarTask)
+    }
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().configureEach {
@@ -35,12 +48,22 @@ tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().configureEach 
 kotlin {
 
     js(IR) {
-        browser()
+        moduleName = "jsApp"
+        browser {
+            commonWebpackConfig {
+                outputFileName = "jsApp.js"
+            }
+        }
         binaries.executable()
     }
 
-    wasm() {
-        browser()
+    wasmJs() {
+        moduleName = "wasmApp"
+        browser {
+            commonWebpackConfig {
+                outputFileName = "wasmApp.js"
+            }
+        }
         binaries.executable()
     }
 
@@ -62,7 +85,7 @@ kotlin {
         }
 
 
-        val wasmMain by getting {
+        val wasmJsMain by getting {
             dependsOn(jsWasmMain)
         }
     }
@@ -71,14 +94,3 @@ kotlin {
 rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin> {
    rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>().nodeVersion = "16.0.0"
 }
-
-// HACK: some dependencies (coroutines -wasm0 and atomicfu -wasm0) reference deleted *-dev libs
-//configurations.all {
-//    val conf = this
-//    resolutionStrategy.eachDependency {
-//        if (requested.version == "1.8.20-dev-3308") {
-//            println("Substitute deleted version ${requested.module}:${requested.version} for ${conf.name}")
-//            useVersion(project.properties["kotlin.version"] as String)
-//        }
-//    }
-//}
