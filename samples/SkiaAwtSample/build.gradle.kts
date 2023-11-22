@@ -9,6 +9,9 @@ repositories {
     mavenLocal()
     mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+
+    // TODO: delete after we have all libs in mavenCentral
+    maven("https://maven.pkg.jetbrains.space/kotlin/p/wasm/experimental")
 }
 
 val osName = System.getProperty("os.name")
