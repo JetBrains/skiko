@@ -56,14 +56,29 @@ if (project.hasProperty("skiko.version")) {
 val resourcesDir = "$buildDir/resources"
 val skikoWasm by configurations.creating
 
-dependencies {
-    skikoWasm("org.jetbrains.skiko:skiko-js-wasm-runtime:$version")
-}
+val isCompositeBuild = extra.properties.getOrDefault("SKIKO_COMPOSITE_BUILD", "") == "1"
 
 val unzipTask = tasks.register("unzipWasm", Copy::class) {
     destinationDir = file(resourcesDir)
     from(skikoWasm.map { zipTree(it) })
+
+    if (isCompositeBuild) {
+        val skikoWasmJarTask = gradle.includedBuild("skiko").task(":skikoWasmJar")
+        dependsOn(skikoWasmJarTask)
+    }
 }
+
+dependencies {
+    if (isCompositeBuild) {
+        val filePath = gradle.includedBuild("skiko").projectDir
+            .resolve("./build/libs/skiko-wasm-0.0.0-SNAPSHOT.jar")
+        skikoWasm(files(filePath))
+    } else {
+        skikoWasm("org.jetbrains.skiko:skiko-js-wasm-runtime:$version")
+    }
+}
+
+
 
 kotlin {
     if (hostOs == "macos") {
@@ -331,27 +346,9 @@ fun KotlinNativeTarget.configureToLaunchFromXcode() {
     }
 }
 
-// HACK: some dependencies (coroutines -wasm0 and atomicfu -wasm0) reference deleted *-dev libs
-configurations.all {
-    val conf = this
-    val isWasm = conf.name.contains("wasm", true)
 
-    resolutionStrategy.eachDependency {
-        if (requested.module.name.startsWith("kotlin-stdlib")) {
-            val kotlinVersion = project.property("kotlin.version") as String
-            useVersion(kotlinVersion)
-        }
-        if (requested.module.name == "kotlinx-atomicfu-runtime") {
-            useVersion("1.9.20-Beta2")
-        }
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile>().configureEach {
+    kotlinOptions {
+        freeCompilerArgs += "-Xopt-in=kotlinx.cinterop.ExperimentalForeignApi"
     }
 }
-
-
-// TODO: workaround webpack compilation issue (it tries to find 'skia' module, but we provide it manually via imports)
-// An alternative workaround was added in webpack.config.d/wasm/config.js
-//project.tasks.getByName("wasmJsDevelopmentExecutableCompileSync").doLast {
-//    val f = project.buildDir.resolve("./js/packages/clocks-wasm/kotlin/clocks-wasm.uninstantiated.mjs").normalize()
-//    val t = f.readText().replace("'skia': imports['skia'] ?? await import('skia'),", "'skia': imports['skia'],")
-//    f.writeText(t)
-//}

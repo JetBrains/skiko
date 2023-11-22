@@ -127,6 +127,7 @@ val linkWasm = if (supportJs || supportWasm) {
             project.layout.projectDirectory.file("src/jsWasmMain/resources/setup.$jsFileExtension")
         )
 
+        @OptIn(kotlin.ExperimentalStdlibApi::class)
         flags.set(buildList {
             addAll(
                 listOf(
