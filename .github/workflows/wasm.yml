@@ -3,9 +3,9 @@ name: CIForWasm
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
-    branches: [ wasm-main ]
+    branches: [ wasm-main, master ]
   pull_request:
-    branches: [ wasm-main ]
+    branches: [ wasm-main, master ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -43,8 +43,8 @@ jobs:
             git clone https://github.com/emscripten-core/emsdk.git
             cd ./emsdk
           fi
-          ./emsdk install 2.0.29
-          ./emsdk activate 2.0.29
+          ./emsdk install 3.1.49
+          ./emsdk activate 3.1.49
           source ./emsdk_env.sh
           cd ..
       - name: 'run tests'
