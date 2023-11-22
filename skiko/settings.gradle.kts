@@ -9,7 +9,6 @@ pluginManagement {
     }
     buildscript {
         repositories {
-            mavenLocal()
             mavenCentral()
             maven("https://maven.pkg.jetbrains.space/public/p/compose/internal")
             maven("https://maven.pkg.jetbrains.space/public/p/space/maven")

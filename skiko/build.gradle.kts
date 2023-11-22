@@ -41,10 +41,8 @@ allprojects {
 repositories {
     mavenLocal()
     mavenCentral()
-    if (supportWasm) {
-        maven("https://maven.pkg.jetbrains.space/kotlin/p/wasm/experimental")
-    }
-    maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
+    // TODO: delete when we have all libs published in mavenCentral
+    maven("https://maven.pkg.jetbrains.space/kotlin/p/wasm/experimental")
 }
 
 val windowsSdkPaths: WindowsSdkPaths by lazy {
@@ -1671,17 +1669,12 @@ if (supportJs && supportWasm) {
     }
 }
 
-tasks.getByName("publishSkikoWasmRuntimePublicationToComposeRepoRepository")
-    .dependsOn("publishWasmJsPublicationToComposeRepoRepository")
+tasks.findByName("publishSkikoWasmRuntimePublicationToComposeRepoRepository")
+    ?.dependsOn("publishWasmJsPublicationToComposeRepoRepository")
 
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile>().configureEach {
     // https://youtrack.jetbrains.com/issue/KT-56583
     compilerOptions.freeCompilerArgs.add("-XXLanguage:+ImplicitSignedToUnsignedIntegerConversion")
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile>().configureEach {
-    kotlinOptions {
-        freeCompilerArgs += "-Xopt-in=kotlinx.cinterop.ExperimentalForeignApi"
-    }
+    kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlinx.cinterop.ExperimentalForeignApi"
 }
