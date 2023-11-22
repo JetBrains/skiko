@@ -22,8 +22,7 @@ val Project.supportWasm: Boolean
 val Project.supportJs: Boolean
     get() = findProperty("skiko.js.enabled") == "true" || isInIdea
 
-val coroutinesVersion = if (supportWasm) "1.7.2-wasm3" else "1.7.2"
-val atomicFuVersion = if (supportWasm) "0.22.0-wasm2" else "0.22.0"
+val coroutinesVersion = "1.7.2-wasm3"
 
 fun targetSuffix(os: OS, arch: Arch): String {
     return "${os.id}_${arch.id}"
@@ -37,31 +36,6 @@ val targetArch = skiko.targetArch
 allprojects {
     group = SkikoArtifacts.groupId
     version = skiko.deployVersion
-}
-
-configurations.all {
-    // TODO: remove these HACKS when possible
-    val conf = this
-    conf.resolutionStrategy.eachDependency {
-        if (requested.module.name.contains("kotlin-stdlib")) {
-            val kotlinVersion = extra["kotlin.version"] as String
-            useVersion(kotlinVersion)
-        }
-
-        val isWasm = conf.name.contains("wasm", true)
-
-        if (requested.module.group == "org.jetbrains.kotlinx" &&
-            requested.module.name.contains("kotlinx-coroutines", true)
-        ) {
-            if (!isWasm) useVersion("1.7.2")
-        }
-
-        if (requested.module.group == "org.jetbrains.kotlinx" &&
-            requested.module.name.contains("atomicfu", true)
-        ) {
-            if (!isWasm) useVersion("0.22.0")
-        }
-    }
 }
 
 repositories {
@@ -517,11 +491,6 @@ kotlin {
                 if (supportJs) {
                     val jsMain by getting {
                         dependsOn(jsWasmMain)
-                        dependencies {
-                            implementation(kotlin("stdlib-js"))
-                            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
-                            implementation("org.jetbrains.kotlinx:atomicfu:$atomicFuVersion")
-                        }
                     }
 
                     val jsTest by getting {
@@ -532,11 +501,6 @@ kotlin {
                 if (supportWasm) {
                     val wasmJsMain by getting {
                         dependsOn(jsWasmMain)
-                        dependencies {
-//                            implementation(kotlin("stdlib-wasm"))
-                            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
-                            implementation("org.jetbrains.kotlinx:atomicfu:$atomicFuVersion")
-                        }
                     }
                     val wasmJsTest by getting {
                         dependsOn(jsWasmTest)
@@ -553,9 +517,6 @@ kotlin {
                 // See https://kotlinlang.org/docs/mpp-share-on-platforms.html#configure-the-hierarchical-structure-manually
                 val nativeMain by creating {
                     dependsOn(nativeJsMain)
-                    dependencies {
-                        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
-                    }
                 }
                 val nativeTest by creating {
                     dependsOn(nativeJsTest)
@@ -1702,12 +1663,6 @@ project.tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().config
 }
 
 if (supportJs && supportWasm) {
-//    project.afterEvaluate {
-//        //Disable jsWasmMain intermediate sourceset publication
-//        tasks.named("compileJsWasmMainKotlinMetadata") {
-//            enabled = false
-//        }
-//    }
     project.tasks.whenTaskAdded {
         if (name == "compileJsWasmMainKotlinMetadata") {
             enabled = false
@@ -1729,9 +1684,3 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile>().configur
         freeCompilerArgs += "-Xopt-in=kotlinx.cinterop.ExperimentalForeignApi"
     }
 }
-
-//tasks.withType(KotlinCompile::class.java).configureEach {
-//    kotlinOptions {
-//        freeCompilerArgs += "-Xopt-in=kotlinx.cinterop.ExperimentalForeignApi"
-//    }
-//}
