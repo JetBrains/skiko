@@ -80,7 +80,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_org_jetbrains_skia_ImageKt__1nEncodeToDa
       switch (skFormat) {
         case SkEncodedImageFormat::kPNG: {
           SkPngEncoder::Options options = SkPngEncoder::Options();
-          options.fZLibLevel = std::max((int)(quality / 10), 9);
+          options.fZLibLevel = std::max(0, std::min((int)(quality / 10), 9));
           SkData* data = SkPngEncoder::Encode(nullptr, instance, options).release();
           return reinterpret_cast<jlong>(data);
         }
