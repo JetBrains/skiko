@@ -1,9 +1,11 @@
+import Build_gradle.ImportGeneratorCompilerPluginSupportPlugin.Companion.wasmImports
 import de.undercouch.gradle.tasks.download.Download
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.crypto.checksum.Checksum
 import org.jetbrains.compose.internal.publishing.MavenCentralProperties
 import org.jetbrains.kotlin.gradle.plugin.*
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrCompilation
 import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompileTool
 
@@ -119,7 +121,7 @@ val linkWasm = if (supportJs || supportWasm) {
         )
     }
 
-    val configureCommon: LinkSkikoWasmTask.(outputES6: Boolean) -> Unit = { outputES6 ->
+    val configureCommon: LinkSkikoWasmTask.(outputES6: Boolean, prefixPath: String) -> Unit = { outputES6, prefixPath ->
         val osArch = OS.Wasm to Arch.Wasm
 
         dependsOn(compileWasm)
@@ -137,7 +139,6 @@ val linkWasm = if (supportJs || supportWasm) {
             include("**/*.o")
         }
 
-        val jsFileExtension = if (outputES6) "mjs" else "js"
         val wasmFileName = if (outputES6) {
             "skikomjs.wasm"
         } else {
@@ -154,7 +155,7 @@ val linkWasm = if (supportJs || supportWasm) {
         skikoJsPrefix.from(
             // the order matters
             project.layout.projectDirectory.file("src/jsWasmMain/resources/skikoCallbacks.js"),
-            project.layout.projectDirectory.file("src/jsWasmMain/resources/setup.$jsFileExtension")
+            project.layout.projectDirectory.file(prefixPath)
         )
 
         flags.set(buildList {
@@ -206,12 +207,15 @@ val linkWasm = if (supportJs || supportWasm) {
     }
 
     val linkWasmWithES6 by tasks.registering(LinkSkikoWasmTask::class) {
-        configureCommon(true)
+        val wasmJsTarget = kotlin.wasmJs()
+        val main by wasmJsTarget.compilations
+        dependsOn(main.compileTaskProvider)
+        configureCommon(true, wasmImports.resolve("setup.mjs").normalize().absolutePath)
     }
 
     val linkWasm by tasks.registering(LinkSkikoWasmTask::class) {
         dependsOn(linkWasmWithES6)
-        configureCommon(false)
+        configureCommon(false, "src/jsWasmMain/resources/setup.js")
     }
 
 
@@ -1689,7 +1693,9 @@ class ImportGeneratorCompilerPluginSupportPlugin : KotlinCompilerPluginSupportPl
     override fun applyToCompilation(kotlinCompilation: KotlinCompilation<*>): Provider<List<SubpluginOption>> {
         val project = kotlinCompilation.target.project
 
-        val outputDir = project.buildDir.resolve("imports")
+        val outputDir = project.wasmImports
+
+        (kotlinCompilation is KotlinJsIrCompilation)
 
         return project.provider {
             listOf(SubpluginOption("path", outputDir.normalize().absolutePath))
@@ -1703,5 +1709,10 @@ class ImportGeneratorCompilerPluginSupportPlugin : KotlinCompilerPluginSupportPl
 
     override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean {
         return kotlinCompilation.platformType == KotlinPlatformType.wasm && kotlinCompilation.name == "main"
+    }
+
+    companion object {
+        val Project.wasmImports
+            get() = buildDir.resolve("imports")
     }
 }
