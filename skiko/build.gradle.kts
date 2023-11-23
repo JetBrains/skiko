@@ -1,3 +1,4 @@
+import Build_gradle.ImportGeneratorCompilerPluginSupportPlugin.Companion.wasmImports
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.crypto.checksum.Checksum
 import org.jetbrains.compose.internal.publishing.MavenCentralProperties
@@ -570,7 +571,9 @@ class ImportGeneratorCompilerPluginSupportPlugin : KotlinCompilerPluginSupportPl
     override fun applyToCompilation(kotlinCompilation: KotlinCompilation<*>): Provider<List<SubpluginOption>> {
         val project = kotlinCompilation.target.project
 
-        val outputDir = project.buildDir.resolve("imports")
+        val outputDir = project.wasmImports
+
+        (kotlinCompilation is KotlinJsIrCompilation)
 
         return project.provider {
             listOf(SubpluginOption("path", outputDir.normalize().absolutePath))
@@ -584,5 +587,10 @@ class ImportGeneratorCompilerPluginSupportPlugin : KotlinCompilerPluginSupportPl
 
     override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean {
         return kotlinCompilation.platformType == KotlinPlatformType.wasm && kotlinCompilation.name == "main"
+    }
+
+    companion object {
+        val Project.wasmImports
+            get() = buildDir.resolve("imports")
     }
 }
