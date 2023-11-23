@@ -2,7 +2,7 @@ import de.undercouch.gradle.tasks.download.Download
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.crypto.checksum.Checksum
 import org.jetbrains.compose.internal.publishing.MavenCentralProperties
-import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
+import org.jetbrains.kotlin.gradle.plugin.*
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompileTool
@@ -15,6 +15,8 @@ plugins {
     id("org.gradle.crypto.checksum") version "1.4.0"
     id("de.undercouch.download") version "5.4.0"
 }
+
+apply<ImportGeneratorCompilerPluginSupportPlugin>()
 
 val Project.supportWasm: Boolean
     get() = findProperty("skiko.wasm.enabled") == "true" || isInIdea
@@ -64,13 +66,15 @@ configurations.all {
     }
 }
 
-repositories {
-    mavenLocal()
-    mavenCentral()
-    if (supportWasm) {
-        maven("https://maven.pkg.jetbrains.space/kotlin/p/wasm/experimental")
+allprojects {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        if (supportWasm) {
+            maven("https://maven.pkg.jetbrains.space/kotlin/p/wasm/experimental")
+        }
+        maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
     }
-    maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
 }
 
 val windowsSdkPaths: WindowsSdkPaths by lazy {
@@ -374,6 +378,13 @@ kotlin {
             }
             generateVersion(OS.Wasm, Arch.Wasm)
 
+            val main by compilations.getting
+
+            main.configurations.pluginConfiguration.resolutionStrategy.dependencySubstitution {
+                substitute(module("${SkikoArtifacts.groupId}:import-generator"))
+                    .using(project(":import-generator"))
+            }
+
             val test by compilations.getting
             project.tasks.named<Copy>(test.processResourcesTaskName) {
                 from(linkWasm.first!!) {
@@ -490,7 +501,7 @@ kotlin {
                     val wasmJsMain by getting {
                         dependsOn(jsWasmMain)
                         dependencies {
-//                            implementation(kotlin("stdlib-wasm"))
+                            implementation(kotlin("stdlib-wasm-js"))
                             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
                             implementation("org.jetbrains.kotlinx:atomicfu:$atomicFuVersion")
                         }
@@ -1673,3 +1684,24 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile>().configur
 //        freeCompilerArgs += "-Xopt-in=kotlinx.cinterop.ExperimentalForeignApi"
 //    }
 //}
+
+class ImportGeneratorCompilerPluginSupportPlugin : KotlinCompilerPluginSupportPlugin {
+    override fun applyToCompilation(kotlinCompilation: KotlinCompilation<*>): Provider<List<SubpluginOption>> {
+        val project = kotlinCompilation.target.project
+
+        val outputDir = project.buildDir.resolve("imports")
+
+        return project.provider {
+            listOf(SubpluginOption("path", outputDir.normalize().absolutePath))
+        }
+    }
+
+    override fun getCompilerPluginId() = "org.jetbrains.skia.import.generator"
+
+    override fun getPluginArtifact(): SubpluginArtifact =
+        SubpluginArtifact(SkikoArtifacts.groupId, "import-generator")
+
+    override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean {
+        return kotlinCompilation.platformType == KotlinPlatformType.wasm && kotlinCompilation.name == "main"
+    }
+}
