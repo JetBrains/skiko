@@ -2,7 +2,6 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 buildscript {
     repositories {
-        mavenLocal()
         google()
         mavenCentral()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
@@ -22,7 +21,6 @@ plugins {
 }
 
 repositories {
-    mavenLocal()
     google()
     mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
