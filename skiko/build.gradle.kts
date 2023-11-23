@@ -2,6 +2,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.crypto.checksum.Checksum
 import org.jetbrains.compose.internal.publishing.MavenCentralProperties
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.plugin.*
 import tasks.configuration.*
 
 plugins {
@@ -11,6 +12,8 @@ plugins {
     signing
     id("org.gradle.crypto.checksum") version "1.4.0"
 }
+
+apply<ImportGeneratorCompilerPluginSupportPlugin>()
 
 val coroutinesVersion = "1.8.0-RC"
 val atomicfuVersion = "0.23.1"
@@ -98,6 +101,13 @@ kotlin {
                 }
             }
             generateVersion(OS.Wasm, Arch.Wasm, skiko)
+
+            val main by compilations.getting
+
+            main.configurations.pluginConfiguration.resolutionStrategy.dependencySubstitution {
+                substitute(module("${SkikoArtifacts.groupId}:import-generator"))
+                    .using(project(":import-generator"))
+            }
 
             val test by compilations.getting
             val linkWasmTasks = skikoProjectContext.createWasmLinkTasks()
@@ -554,4 +564,25 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile>().configur
 
 tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>>().configureEach {
     kotlinOptions.freeCompilerArgs += "-Xexpect-actual-classes"
+}
+
+class ImportGeneratorCompilerPluginSupportPlugin : KotlinCompilerPluginSupportPlugin {
+    override fun applyToCompilation(kotlinCompilation: KotlinCompilation<*>): Provider<List<SubpluginOption>> {
+        val project = kotlinCompilation.target.project
+
+        val outputDir = project.buildDir.resolve("imports")
+
+        return project.provider {
+            listOf(SubpluginOption("path", outputDir.normalize().absolutePath))
+        }
+    }
+
+    override fun getCompilerPluginId() = "org.jetbrains.skia.import.generator"
+
+    override fun getPluginArtifact(): SubpluginArtifact =
+        SubpluginArtifact(SkikoArtifacts.groupId, "import-generator")
+
+    override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean {
+        return kotlinCompilation.platformType == KotlinPlatformType.wasm && kotlinCompilation.name == "main"
+    }
 }
