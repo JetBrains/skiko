@@ -116,15 +116,11 @@ class SkikoProperties(private val myProject: Project) {
     val isCIBuild: Boolean
         get() = myProject.hasProperty("teamcity")
 
-    val addWasmPostfix: String?
-        get() = myProject.properties["skiko.addWasmPostfix"] as String?
-
     val planeDeployVersion: String = myProject.property("deploy.version") as String
 
     val deployVersion: String
         get() {
-            val version = planeDeployVersion + if (addWasmPostfix != null) addWasmPostfix else ""
-            val main = if (isRelease) version else "$version-SNAPSHOT"
+            val main = if (isRelease) planeDeployVersion else "$planeDeployVersion-SNAPSHOT"
             val metadata = if (buildType == SkiaBuildType.DEBUG) "+debug" else ""
             return main + metadata
         }

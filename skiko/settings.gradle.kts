@@ -1,7 +1,6 @@
 pluginManagement {
     repositories {
         mavenCentral()
-        mavenLocal()
         gradlePluginPortal()
 
         // TODO: delete when we have all libs in mavenCentral

@@ -189,17 +189,3 @@ class FrameDispatcherTest {
         assertEquals(listOf("frame0", "task", "frame1"), history)
     }
 }
-
-@OptIn(ExperimentalCoroutinesApi::class)
-internal fun TestCoroutineScope.advanceUntilIdle() {
-    testScheduler.advanceUntilIdle()
-}
-
-@OptIn(ExperimentalCoroutinesApi::class)
-internal fun TestCoroutineScope.advanceTimeBy(ms: Long) {
-    testScheduler.advanceTimeBy(ms)
-}
-
-@OptIn(ExperimentalCoroutinesApi::class)
-internal val TestCoroutineScope.currentTime: Long
-    get() = testScheduler.currentTime

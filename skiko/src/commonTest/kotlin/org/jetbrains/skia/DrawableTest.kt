@@ -1,13 +1,12 @@
 package org.jetbrains.skia
 
 import org.jetbrains.skia.tests.assertCloseEnough
-import org.jetbrains.skiko.tests.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class DrawableTest {
     @Test
-    fun canDrawDrawable() = runTest {
+    fun canDrawDrawable() {
         val cross = object : Drawable() {
             override fun onDraw(canvas: Canvas?) {
                 val paint = Paint().apply { color = Color.RED }

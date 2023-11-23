@@ -1,7 +1,6 @@
 package org.jetbrains.skia
 
 import org.jetbrains.skia.tests.assertCloseEnough
-import org.jetbrains.skiko.tests.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -40,7 +39,7 @@ class PictureTest {
 
 
     @Test
-    fun canReplayWithCallback() = runTest {
+    fun canReplayWithCallback() {
         val size = Rect(0.0f, 0.0f, 32.0f, 32.0f)
         val recorder = PictureRecorder()
         val canvas = recorder.beginRecording(size)

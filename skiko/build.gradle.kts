@@ -16,6 +16,52 @@ plugins {
     id("de.undercouch.download") version "5.4.0"
 }
 
+internal val Project.isInIdea: Boolean
+    get() {
+        return System.getProperty("idea.active")?.toBoolean() == true
+    }
+
+val Project.supportAndroid: Boolean
+    get() = findProperty("skiko.android.enabled") == "true" // || isInIdea
+
+val Project.supportAwt: Boolean
+    get() = findProperty("skiko.awt.enabled") == "true" || isInIdea
+
+val Project.supportAllNative: Boolean
+    get() = findProperty("skiko.native.enabled") == "true" || isInIdea
+
+val Project.supportAllNativeIos: Boolean
+    get() = supportAllNative || findProperty("skiko.native.ios.enabled") == "true" || isInIdea
+
+val Project.supportNativeIosArm64: Boolean
+    get() = supportAllNativeIos || findProperty("skiko.native.ios.arm64.enabled") == "true" || isInIdea
+
+val Project.supportNativeIosSimulatorArm64: Boolean
+    get() = supportAllNativeIos || findProperty("skiko.native.ios.simulatorArm64.enabled") == "true" || isInIdea
+
+val Project.supportNativeIosX64: Boolean
+    get() = supportAllNativeIos || findProperty("skiko.native.ios.x64.enabled") == "true" || isInIdea
+
+val Project.supportAnyNativeIos: Boolean
+    get() = supportAllNativeIos || supportNativeIosArm64 || supportNativeIosSimulatorArm64 || supportNativeIosX64
+
+val Project.supportNativeMac: Boolean
+    get() = supportAllNative || findProperty("skiko.native.mac.enabled") == "true" || isInIdea
+
+val Project.supportNativeLinux: Boolean
+    get() = supportAllNative || findProperty("skiko.native.linux.enabled") == "true" || isInIdea
+
+val Project.supportAnyNative: Boolean
+    get() = supportAllNative || supportAnyNativeIos || supportNativeMac || supportNativeLinux
+
+
+val Project.supportWasm: Boolean
+    get() = findProperty("skiko.wasm.enabled") == "true" || isInIdea
+
+val Project.supportAndroid: Boolean
+    get() = findProperty("skiko.android.enabled") == "true" // || isInIdea
+
+
 val Project.supportWasm: Boolean
     get() = findProperty("skiko.wasm.enabled") == "true" || isInIdea
 
@@ -39,7 +85,6 @@ allprojects {
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
     // TODO: delete when we have all libs published in mavenCentral
     maven("https://maven.pkg.jetbrains.space/kotlin/p/wasm/experimental")
@@ -175,7 +220,6 @@ val linkWasm = if (supportJs || supportWasm) {
                 }
             }
         }
-
     }
 
     val linkWasmWithES6 by tasks.registering(LinkSkikoWasmTask::class) {
@@ -283,48 +327,6 @@ fun compileNativeBridgesTask(os: OS, arch: Arch, isArm64Simulator: Boolean): Tas
         includeHeadersNonRecursive(skiaHeadersDirs(unpackedSkia))
     }
 }
-
-internal val Project.isInIdea: Boolean
-    get() {
-        return System.getProperty("idea.active")?.toBoolean() == true
-    }
-
-val Project.supportAwt: Boolean
-    get() = findProperty("skiko.awt.enabled") == "true" || isInIdea
-
-val Project.supportAllNative: Boolean
-    get() = findProperty("skiko.native.enabled") == "true" || isInIdea
-
-val Project.supportAllNativeIos: Boolean
-    get() = supportAllNative || findProperty("skiko.native.ios.enabled") == "true" || isInIdea
-
-val Project.supportNativeIosArm64: Boolean
-    get() = supportAllNativeIos || findProperty("skiko.native.ios.arm64.enabled") == "true" || isInIdea
-
-val Project.supportNativeIosSimulatorArm64: Boolean
-    get() = supportAllNativeIos || findProperty("skiko.native.ios.simulatorArm64.enabled") == "true" || isInIdea
-
-val Project.supportNativeIosX64: Boolean
-    get() = supportAllNativeIos || findProperty("skiko.native.ios.x64.enabled") == "true" || isInIdea
-
-val Project.supportAnyNativeIos: Boolean
-    get() = supportAllNativeIos || supportNativeIosArm64 || supportNativeIosSimulatorArm64 || supportNativeIosX64
-
-val Project.supportNativeMac: Boolean
-    get() = supportAllNative || findProperty("skiko.native.mac.enabled") == "true" || isInIdea
-
-val Project.supportNativeLinux: Boolean
-    get() = supportAllNative || findProperty("skiko.native.linux.enabled") == "true" || isInIdea
-
-val Project.supportAnyNative: Boolean
-    get() = supportAllNative || supportAnyNativeIos || supportNativeMac || supportNativeLinux
-
-
-val Project.supportWasm: Boolean
-    get() = findProperty("skiko.wasm.enabled") == "true" || isInIdea
-
-val Project.supportAndroid: Boolean
-    get() = findProperty("skiko.android.enabled") == "true" // || isInIdea
 
 kotlin {
     if (supportAwt) {

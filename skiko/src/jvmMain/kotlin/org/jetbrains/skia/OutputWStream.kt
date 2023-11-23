@@ -1,14 +1,14 @@
 package org.jetbrains.skia
 
-import org.jetbrains.skia.impl.Library
-import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.impl.Stats
+import org.jetbrains.skia.impl.NativePointer
 import java.io.OutputStream
 
 class OutputWStream(out: OutputStream?) : WStream(_nMake(out), _FinalizerHolder.PTR) {
     companion object {
         init {
-            Library.staticLoad()
+            staticLoad()
         }
     }
 
@@ -23,10 +23,9 @@ class OutputWStream(out: OutputStream?) : WStream(_nMake(out), _FinalizerHolder.
     }
 }
 
+
 @ExternalSymbolName("org_jetbrains_skia_OutputWStream__1nGetFinalizer")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_OutputWStream__1nGetFinalizer")
 private external fun OutputWStream_nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_OutputWStream__1nMake")
-@ModuleImport("./skiko.mjs", "org_jetbrains_skia_OutputWStream__1nMake")
 private external fun _nMake(out: OutputStream?): NativePointer
