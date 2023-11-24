@@ -3,9 +3,7 @@ package org.jetbrains.skia
 import org.jetbrains.skia.impl.reachabilityBarrier
 import org.jetbrains.skiko.OS
 import org.jetbrains.skiko.hostOs
-import org.jetbrains.skiko.tests.SkipJsTarget
-import org.jetbrains.skiko.tests.SkipJvmTarget
-import org.jetbrains.skiko.tests.SkipNativeTarget
+import org.jetbrains.skiko.tests.*
 import kotlin.test.*
 
 private fun BreakIterator.asSequence() = generateSequence { next().let { n -> if (n == -1) null else n } }
@@ -34,13 +32,15 @@ class BreakIteratorTests {
         assertEquals(40, boundary.last())
     }
 
-    @Ignore // todo [pavel.sergeev] boundary.clone lead to crash in debug mode
     @Test
     fun breakIteratorCloneTest() {
         // Wasm and iOS builds of Skia do not include required data to implement those iterators,
         // see `third_party/externals/icu/flutter/README.md`.
         if (hostOs == OS.Ios)
             return
+
+        if (isDebugModeOnJvm)
+            throw Error("This test is usually crashes in DEBUG mode")
 
         val boundary = BreakIterator.makeWordInstance()
 

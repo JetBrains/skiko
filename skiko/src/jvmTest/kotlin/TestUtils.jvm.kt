@@ -23,3 +23,8 @@ actual typealias SkipJvmTarget = org.junit.Ignore
 actual annotation class SkipNativeTarget
 
 actual fun makeFromFileName(path: String?): Data = Data.Companion.makeFromFileName(path)
+
+actual val isDebugModeOnJvm: Boolean
+    get() {
+        return System.getProperty("skiko.test.debug") == "true"
+    }
