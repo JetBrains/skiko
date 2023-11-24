@@ -12,6 +12,11 @@ class ImportGeneratorRegistrar : CompilerPluginRegistrar() {
     override fun ExtensionStorage.registerExtensions(
         configuration: CompilerConfiguration,
     ) {
-        IrGenerationExtension.registerExtension(ImportGeneratorExtension(configuration.get(ImportGeneratorConfigurationKeys.PATH)!!))
+        IrGenerationExtension.registerExtension(
+            ImportGeneratorExtension(
+                configuration.get(ImportGeneratorConfigurationKeys.PATH)!!,
+                configuration.get(ImportGeneratorConfigurationKeys.PREFIX)
+            )
+        )
     }
 }
