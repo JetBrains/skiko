@@ -15,6 +15,7 @@ plugins {
 }
 
 apply<ImportGeneratorCompilerPluginSupportPlugin>()
+apply<ImportGeneratorForTestCompilerPluginSupportPlugin>()
 
 val coroutinesVersion = "1.8.0-RC"
 val atomicfuVersion = "0.23.1"
@@ -104,13 +105,23 @@ kotlin {
             generateVersion(OS.Wasm, Arch.Wasm, skiko)
 
             val main by compilations.getting
+            val test by compilations.getting
 
-            main.configurations.pluginConfiguration.resolutionStrategy.dependencySubstitution {
-                substitute(module("${SkikoArtifacts.groupId}:import-generator"))
-                    .using(project(":import-generator"))
+            main.compileTaskProvider.configure {
+                outputs.file(setupMjs)
             }
 
-            val test by compilations.getting
+            test.compileTaskProvider.configure {
+                outputs.file(skikoTestMjs)
+            }
+
+            listOf(main, test).forEach {
+                it.configurations.pluginConfiguration.resolutionStrategy.dependencySubstitution {
+                    substitute(module("${SkikoArtifacts.groupId}:$IMPORT_GENERATOR"))
+                        .using(project(":import-generator"))
+                }
+            }
+
             val linkWasmTasks = skikoProjectContext.createWasmLinkTasks()
             project.tasks.named<Copy>(test.processResourcesTaskName) {
                 from(linkWasmTasks.linkWasm!!) {
@@ -120,6 +131,9 @@ kotlin {
                 from(linkWasmTasks.linkWasmWithES6!!) {
                     include("*.mjs")
                 }
+
+                from(skikoTestMjs)
+                dependsOn(test.compileTaskProvider)
             }
         }
     }
@@ -235,6 +249,10 @@ kotlin {
                     }
                     val wasmJsTest by getting {
                         dependsOn(jsWasmTest)
+
+                        dependencies {
+                            implementation(kotlin("test-wasm-js"))
+                        }
                     }
                 }
             }
@@ -567,30 +585,43 @@ tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>>().configureEach
     kotlinOptions.freeCompilerArgs += "-Xexpect-actual-classes"
 }
 
-class ImportGeneratorCompilerPluginSupportPlugin : KotlinCompilerPluginSupportPlugin {
+abstract class AbstractImportGeneratorCompilerPluginSupportPlugin(
+    val compilationName: String,
+    val outputFileProvider: (Project) -> File,
+    val prefixFileProvider: (Project) -> File
+) : KotlinCompilerPluginSupportPlugin {
     override fun applyToCompilation(kotlinCompilation: KotlinCompilation<*>): Provider<List<SubpluginOption>> {
         val project = kotlinCompilation.target.project
 
-        val outputDir = project.wasmImports
-
-        (kotlinCompilation is KotlinJsIrCompilation)
+        val outputFile = outputFileProvider(project)
+        val prefixFile = prefixFileProvider(project)
 
         return project.provider {
-            listOf(SubpluginOption("path", outputDir.normalize().absolutePath))
+            listOf(
+                SubpluginOption("import-generator-path", outputFile.normalize().absolutePath),
+                SubpluginOption("import-generator-prefix", prefixFile.normalize().absolutePath)
+            )
         }
     }
 
     override fun getCompilerPluginId() = "org.jetbrains.skia.import.generator"
 
     override fun getPluginArtifact(): SubpluginArtifact =
-        SubpluginArtifact(SkikoArtifacts.groupId, "import-generator")
+        SubpluginArtifact(SkikoArtifacts.groupId, IMPORT_GENERATOR)
 
     override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean {
-        return kotlinCompilation.platformType == KotlinPlatformType.wasm && kotlinCompilation.name == "main"
-    }
-
-    companion object {
-        val Project.wasmImports
-            get() = buildDir.resolve("imports")
+        return kotlinCompilation.platformType == KotlinPlatformType.wasm && kotlinCompilation.name == compilationName
     }
 }
+
+class ImportGeneratorCompilerPluginSupportPlugin : AbstractImportGeneratorCompilerPluginSupportPlugin(
+    MAIN_COMPILATION_NAME,
+    { it.setupMjs },
+    { it.projectDir.resolve("src/jsWasmMain/resources/pre-setup.mjs") }
+)
+
+class ImportGeneratorForTestCompilerPluginSupportPlugin : AbstractImportGeneratorCompilerPluginSupportPlugin(
+    TEST_COMPILATION_NAME,
+    { it.skikoTestMjs },
+    { it.projectDir.resolve("src/jsWasmMain/resources/pre-skiko-test.mjs") }
+)

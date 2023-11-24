@@ -5,23 +5,19 @@ import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import java.io.File
 
-internal class ImportGeneratorExtension(private val path: String) : IrGenerationExtension {
+internal class ImportGeneratorExtension(
+    private val path: String,
+    private val prefix: String?
+) : IrGenerationExtension {
     override fun generate(
         moduleFragment: IrModuleFragment,
         pluginContext: IrPluginContext,
     ) {
-        val outputDir = File(path)
-        outputDir.mkdir()
-        val outputFile = outputDir.resolve("setup.mjs")
+        val outputFile = File(path)
+        outputFile.parentFile.mkdirs()
+        val prefixFile = prefix?.let { File(it) }
         outputFile.writer().use { writer ->
-            writer.appendLine("// This file is merged with skiko.mjs by emcc")
-            writer.appendLine()
-            writer.appendLine("export const { _callCallback, _registerCallback, _releaseCallback, _createLocalCallbackScope, _releaseLocalCallbackScope } = SkikoCallbacks;")
-            writer.appendLine()
-            writer.appendLine("const loadedWasm = await loadSkikoWASM()")
-            writer.appendLine()
-            writer.appendLine("export const { GL } = loadedWasm;")
-            writer.appendLine()
+            prefixFile?.let { writer.appendLine(it.readText()) }
             writer.appendLine("export const {")
             moduleFragment.transformChildren(ImportGeneratorTransformer(), writer)
             writer.appendLine("} = loadedWasm.wasmExports;")
