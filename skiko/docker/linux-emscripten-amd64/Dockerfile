@@ -10,7 +10,7 @@ RUN apt-get update -y && \
 RUN apt-get install git python wget -y && \
     apt-get install fontconfig libfontconfig1-dev libglu1-mesa-dev libxrandr-dev libdbus-1-dev curl zip -y
 ENV EMSDK_DIR=/usr/emsdk
-ENV EMSDK_VER=3.1.35
+ENV EMSDK_VER=3.1.49
 RUN git clone https://github.com/emscripten-core/emsdk.git $EMSDK_DIR && \
     $EMSDK_DIR/emsdk install $EMSDK_VER && \
     $EMSDK_DIR/emsdk activate $EMSDK_VER
