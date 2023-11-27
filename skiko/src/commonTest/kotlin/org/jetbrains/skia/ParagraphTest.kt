@@ -104,9 +104,9 @@ class ParagraphTest {
         ), paragraph.getRectsForRange(8, 21, RectHeightMode.TIGHT, RectWidthMode.TIGHT),0.01f)
 
         paragraph = paragraph
-            .updateFontSize(8, 21, 48.0f)
-            .updateForegroundPaint(8, 21, Paint().apply { color = Color.RED })
-            .updateBackgroundPaint(8, 21, Paint().apply { color = Color.BLACK })
+            .updateFontSize(0, text.length, 48.0f)
+            .updateForegroundPaint(0, text.length, Paint().apply { color = Color.RED })
+            .updateBackgroundPaint(0, text.length, Paint().apply { color = Color.BLACK })
             .updateAlignment(Alignment.RIGHT)
             .markDirty()
 

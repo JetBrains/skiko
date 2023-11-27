@@ -97,7 +97,7 @@ Java_org_jetbrains_skia_RuntimeShaderBuilderKt__1nUniformFloatMatrix33
   (JNIEnv* env, jclass jclass, jlong builderPtr, jstring uniformName, jfloatArray uniformMatrix33) {
     SkRuntimeShaderBuilder* runtimeShaderBuilder = jlongToPtr<SkRuntimeShaderBuilder*>(builderPtr);
     std::unique_ptr<SkMatrix> matrix33 = skMatrix(env, uniformMatrix33);
-    runtimeShaderBuilder->uniform(skString(env, uniformName).c_str()) = matrix33.get();
+    runtimeShaderBuilder->uniform(skString(env, uniformName).c_str()) = *matrix33;
 }
 
 extern "C" JNIEXPORT void JNICALL
@@ -105,7 +105,7 @@ Java_org_jetbrains_skia_RuntimeShaderBuilderKt__1nUniformFloatMatrix44
   (JNIEnv* env, jclass jclass, jlong builderPtr, jstring uniformName, jfloatArray uniformMatrix44) {
     SkRuntimeShaderBuilder* runtimeShaderBuilder = jlongToPtr<SkRuntimeShaderBuilder*>(builderPtr);
     std::unique_ptr<SkM44> matrix44 = skM44(env, uniformMatrix44);
-    runtimeShaderBuilder->uniform(skString(env, uniformName).c_str()) = matrix44.get();
+    runtimeShaderBuilder->uniform(skString(env, uniformName).c_str()) = *matrix44;
 }
 
 extern "C" JNIEXPORT void JNICALL

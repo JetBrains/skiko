@@ -34,3 +34,5 @@ actual annotation class SkipJvmTarget
 actual annotation class SkipNativeTarget
 
 actual fun makeFromFileName(path: String?): Data = Data(0)
+
+actual val isDebugModeOnJvm: Boolean = false

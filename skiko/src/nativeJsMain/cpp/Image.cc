@@ -74,7 +74,7 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_Image__1nEncodeToData
        switch (skFormat) {
          case SkEncodedImageFormat::kPNG: {
            SkPngEncoder::Options options = SkPngEncoder::Options();
-           options.fZLibLevel = std::max(quality / 10, 9);
+           options.fZLibLevel = std::max(0, std::min(quality / 10, 9));
            SkData* data = SkPngEncoder::Encode(nullptr, instance, options).release();
            return reinterpret_cast<KNativePointer>(data);
          }

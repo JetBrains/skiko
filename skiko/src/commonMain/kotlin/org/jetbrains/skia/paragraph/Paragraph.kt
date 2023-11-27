@@ -200,6 +200,12 @@ class Paragraph internal constructor(ptr: NativePointer, text: ManagedString?) :
     //     // TODO: update _text
     //     return this;
     // }
+
+    /**
+     * `from` and `to` are ignored by skia
+     * and change applies to the whole paragraph text
+     * see: https://github.com/JetBrains/skia/blob/51072f3e6d263eeffed4c3038655ab1bf9cf8439/modules/skparagraph/src/ParagraphImpl.cpp#L1069
+     */
     fun updateFontSize(from: Int, to: Int, size: Float): Paragraph {
         return try {
             if (_text != null) {
@@ -219,6 +225,10 @@ class Paragraph internal constructor(ptr: NativePointer, text: ManagedString?) :
         }
     }
 
+    /**
+     * `from` and `to` are ignored by skia
+     * and change applies to the whole paragraph text
+     */
     fun updateForegroundPaint(from: Int, to: Int, paint: Paint?): Paragraph {
         return try {
             if (_text != null) {
@@ -239,6 +249,10 @@ class Paragraph internal constructor(ptr: NativePointer, text: ManagedString?) :
         }
     }
 
+    /**
+     * `from` and `to` are ignored by skia
+     * and change applies to the whole paragraph text
+     */
     fun updateBackgroundPaint(from: Int, to: Int, paint: Paint?): Paragraph {
         return try {
             if (_text != null) {

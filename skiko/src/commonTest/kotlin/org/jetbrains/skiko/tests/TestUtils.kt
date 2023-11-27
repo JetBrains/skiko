@@ -15,3 +15,5 @@ expect annotation class SkipJsTarget
 expect annotation class SkipJvmTarget
 
 expect fun makeFromFileName(path: String?): Data
+
+expect val isDebugModeOnJvm: Boolean

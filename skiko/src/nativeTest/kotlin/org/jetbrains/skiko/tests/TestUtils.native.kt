@@ -21,3 +21,5 @@ actual annotation class SkipJvmTarget
 actual typealias SkipNativeTarget = kotlin.test.Ignore
 
 actual fun makeFromFileName(path: String?): Data = Data.Companion.makeFromFileName(path)
+
+actual val isDebugModeOnJvm: Boolean = false
