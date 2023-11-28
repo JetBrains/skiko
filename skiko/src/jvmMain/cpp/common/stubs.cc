@@ -59,6 +59,11 @@ JNIEXPORT void JNICALL Java_org_jetbrains_skiko_context_Direct3DContextHandler_f
     skikoUnimplemented("Java_org_jetbrains_skiko_context_Direct3DContextHandler_flush");
 }
 
+JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_chooseAdapter(JNIEnv *env, jobject redrawer, jint adapterPriority) {
+    skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_chooseAdapter");
+    return 0;
+}
+
 JNIEXPORT jlong JNICALL Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_createDirectXDevice(
         JNIEnv *env, jobject redrawer, jint adapterPriority, jlong contentHandle, jboolean transparency) {
     skikoUnimplemented("Java_org_jetbrains_skiko_redrawer_Direct3DRedrawer_createDirectXDevice");
