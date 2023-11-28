@@ -1,16 +1,11 @@
 package org.jetbrains.skiko
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.BufferUtil
-import org.jetbrains.skiko.awt.font.AwtFontUtils.fontFamilyName
-import org.jetbrains.skiko.awt.font.AwtFontManager
 import java.awt.Transparency
 import java.awt.color.ColorSpace
 import java.awt.event.*
 import java.awt.event.KeyEvent.*
-import java.awt.font.TextAttribute
 import java.awt.image.BufferedImage
 import java.awt.image.ComponentColorModel
 import java.awt.image.DataBuffer
@@ -253,97 +248,3 @@ private fun toSkikoKey(event: KeyEvent): Int {
     }
     return key
 }
-
-/**
- * Try to obtain the equivalent [Typeface] for this instance of [Font].
- * This currently only works if running on the JetBrains Runtime; it
- * will return `null` on all other JVM implementations, due to the lack
- * of APIs required to make this work.
- *
- * @return The corresponding [Typeface] if it exists, or `null` if no
- * match is found or the current JVM is not supported.
- *
- * @see AwtFontManager.isAbleToResolveFamilyNames
- */
-@DependsOnJBR
-suspend fun java.awt.Font.toSkikoTypefaceOrNull(fontManager: AwtFontManager) = withContext(Dispatchers.Default) {
-    val fontStyle = FontStyle(
-        weight = toSkikoWeight(weight),
-        width = toSkikoWidth(width),
-        slant = toSkikoSlant(posture)
-    )
-
-    val familyName = fontFamilyName ?: return@withContext null
-    fontManager.getTypefaceOrNull(familyName, fontStyle)
-}
-
-/**
- * Makes a best-effort conversion from the AWT [Font] [TextAttribute.WEIGHT] values
- * to the [FontWeight] values that Skia uses. Those match CSS font-weight values.
- *
- * Note that AWT calls their constants in a different way from what Skia does; don't
- * expect they will be matching the corresponding constants, as the intent is to map
- * to the relative weight scale.
- */
-internal fun toSkikoWeight(weight: Float) =
-    when {
-        weight <= .01f -> FontWeight.INVISIBLE // Imprecise match
-        weight <= TextAttribute.WEIGHT_EXTRA_LIGHT -> FontWeight.THIN // Imprecise match
-        weight <= TextAttribute.WEIGHT_LIGHT -> FontWeight.EXTRA_LIGHT // Imprecise match
-        weight <= TextAttribute.WEIGHT_DEMILIGHT -> FontWeight.LIGHT // Imprecise match
-        weight <= TextAttribute.WEIGHT_REGULAR -> FontWeight.NORMAL
-        weight <= TextAttribute.WEIGHT_MEDIUM -> FontWeight.MEDIUM
-        weight <= TextAttribute.WEIGHT_DEMIBOLD -> FontWeight.SEMI_BOLD
-        weight <= TextAttribute.WEIGHT_BOLD -> FontWeight.BOLD
-        weight <= TextAttribute.WEIGHT_HEAVY -> FontWeight.EXTRA_BOLD // Imprecise match
-        weight <= TextAttribute.WEIGHT_EXTRABOLD -> FontWeight.BLACK // Imprecise match
-        else -> FontWeight.EXTRA_BLACK // Imprecise match
-    }
-
-/**
- * Makes a best-effort conversion from the AWT [Font] [TextAttribute.WIDTH] values
- * to the [FontWidth] values that Skia uses.
- *
- * AWT's understanding of widths is pretty limited, compared to Skia's, so the
- * conversion is necessarily lossy here. Values below [TextAttribute.WIDTH_CONDENSED]
- * are all translated to [FontWidth.CONDENSED], and values above [TextAttribute.WIDTH_EXTENDED]
- * are all translated to [FontWidth.EXPANDED]. This means that we cannot correctly assign
- * widths of [FontWidth.ULTRA_CONDENSED], [FontWidth.EXTRA_CONDENSED], [FontWidth.EXTRA_EXPANDED],
- * and [FontWidth.ULTRA_EXPANDED].
- */
-internal fun toSkikoWidth(width: Float) =
-    when {
-        width <= TextAttribute.WIDTH_CONDENSED -> FontWidth.CONDENSED
-        width <= TextAttribute.WIDTH_SEMI_CONDENSED -> FontWidth.SEMI_CONDENSED
-        width <= TextAttribute.WIDTH_REGULAR -> FontWidth.NORMAL
-        width <= TextAttribute.WIDTH_SEMI_EXTENDED -> FontWidth.SEMI_EXPANDED
-        else -> FontWidth.EXPANDED
-    }
-
-/**
- * Makes a best-effort conversion from the AWT [Font] [TextAttribute.POSTURE] values
- * to the [FontSlant] values that Skia uses.
- *
- * AWT's understanding of slant is pretty limited, compared to Skia's, so the
- * conversion is necessarily lossy here. Since AWT doesn't know the difference
- * between _italic_ (a font designed as slanted) and _oblique_ (a regular font,
- * artificially slanted to look italic), we map all values bigger than
- * [TextAttribute.POSTURE_REGULAR] as italic.
- *
- * This is even more confusing, since AWT calls [TextAttribute.POSTURE_OBLIQUE]
- * the value that corresponds to [java.awt.Font.ITALIC].
- */
-internal fun toSkikoSlant(posture: Float) =
-    when {
-        posture <= TextAttribute.POSTURE_REGULAR -> FontSlant.UPRIGHT
-        else -> FontSlant.ITALIC
-    }
-
-internal val java.awt.Font.weight
-    get() = (attributes[TextAttribute.WEIGHT] as? Float) ?: TextAttribute.WEIGHT_REGULAR
-
-internal val java.awt.Font.width
-    get() = (attributes[TextAttribute.WIDTH] as? Float) ?: TextAttribute.WIDTH_REGULAR
-
-internal val java.awt.Font.posture
-    get() = (attributes[TextAttribute.POSTURE] as? Float) ?: TextAttribute.POSTURE_REGULAR
