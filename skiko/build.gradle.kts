@@ -66,7 +66,7 @@ val Project.supportWasm: Boolean
     get() = findProperty("skiko.wasm.enabled") == "true" || isInIdea
 
 val Project.supportJs: Boolean
-    get() = findProperty("skiko.js.enabled") == "true" || isInIdea
+    get() = findProperty("skiko.js.enabled") == "true" || supportWasm || isInIdea
 
 val coroutinesVersion = "1.7.2-wasm3"
 
