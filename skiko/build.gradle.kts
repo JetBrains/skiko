@@ -16,6 +16,18 @@ plugins {
     id("de.undercouch.download") version "5.4.0"
 }
 
+// TODO: remove this once coroutines are rebuilt with kotlin 1.9.21 and published
+configurations.all {
+    val isWasm = this.name.contains("wasm", true)
+    resolutionStrategy.eachDependency {
+        if (requested.module.group == "org.jetbrains.kotlinx" &&
+            requested.module.name.contains("kotlinx-coroutines", true)
+        ) {
+            if (!isWasm) useVersion("1.7.2")
+        }
+    }
+}
+
 internal val Project.isInIdea: Boolean
     get() {
         return System.getProperty("idea.active")?.toBoolean() == true
