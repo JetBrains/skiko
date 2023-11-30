@@ -6,7 +6,7 @@
  - run `open SkikoSample.xcodeproj`
 
 ## run iOS with debug in AppCode
- - If you need to debug skiko sources without publish to maven local, then set environment variable `export SKIKO_COMPOSITE_BUILD=1` (on MacOS in ~/.zshrc)
+ - If you need to debug skiko sources without publish to maven local, then set a gradle property `skiko.composite.build=1` (see gradle.properties)
  - Install KMM plugin for AppCode
  - In AppCode open samples/SkiaMultiplatformSample (File -> Open).
 Choose "Open as Project".

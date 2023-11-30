@@ -53,7 +53,7 @@ if (project.hasProperty("skiko.version")) {
 val resourcesDir = "$buildDir/resources"
 val skikoWasm by configurations.creating
 
-val isCompositeBuild = extra.properties.getOrDefault("SKIKO_COMPOSITE_BUILD", "") == "1"
+val isCompositeBuild = extra.properties.getOrDefault("skiko.composite.build", "") == "1"
 
 val unzipTask = tasks.register("unzipWasm", Copy::class) {
     destinationDir = file(resourcesDir)
@@ -68,7 +68,7 @@ val unzipTask = tasks.register("unzipWasm", Copy::class) {
 dependencies {
     if (isCompositeBuild) {
         val filePath = gradle.includedBuild("skiko").projectDir
-            .resolve("./build/libs/skiko-wasm-0.0.0-SNAPSHOT.jar")
+            .resolve("./build/libs/skiko-wasm-$version.jar")
         skikoWasm(files(filePath))
     } else {
         skikoWasm("org.jetbrains.skiko:skiko-js-wasm-runtime:$version")
