@@ -16,18 +16,6 @@ plugins {
     id("de.undercouch.download") version "5.4.0"
 }
 
-// TODO: remove this once coroutines are rebuilt with kotlin 1.9.21 and published
-configurations.all {
-    val isWasm = this.name.contains("wasm", true)
-    resolutionStrategy.eachDependency {
-        if (requested.module.group == "org.jetbrains.kotlinx" &&
-            requested.module.name.contains("kotlinx-coroutines", true)
-        ) {
-            if (!isWasm) useVersion("1.7.2")
-        }
-    }
-}
-
 internal val Project.isInIdea: Boolean
     get() {
         return System.getProperty("idea.active")?.toBoolean() == true
@@ -80,7 +68,7 @@ val Project.supportWasm: Boolean
 val Project.supportJs: Boolean
     get() = findProperty("skiko.js.enabled") == "true" || supportWasm || isInIdea
 
-val coroutinesVersion = "1.7.2-wasm3"
+val coroutinesVersion = "1.8.0-RC"
 
 fun targetSuffix(os: OS, arch: Arch): String {
     return "${os.id}_${arch.id}"
