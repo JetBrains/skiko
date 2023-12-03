@@ -36,7 +36,7 @@ case $SKIA_TARGET in
   "macos")
     SKIKO_TARGET_FLAGS="-Pskiko.awt.enabled=true"
     if [[ $(uname -m) == 'arm64' ]]; then
-      skikoMachines=("x64", "arm64") # order matters
+      skikoMachines=("arm64" , "x64") # spaces around comma matters
     else
       skikoMachines=("x64")
     fi
