@@ -1,5 +1,6 @@
 #include <iostream>
 #include "SkRuntimeEffect.h"
+#include "SkMatrix.h"
 #include "common.h"
 
 static void deleteRuntimeShaderBuilder(SkRuntimeShaderBuilder* builder) {
@@ -81,13 +82,15 @@ SKIKO_EXPORT void org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloatMatrix2
 SKIKO_EXPORT void org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloatMatrix33
   (KNativePointer builderPtr, KInteropPointer uniformName, KFloat* uniformMatrix33) {
     SkRuntimeShaderBuilder* runtimeShaderBuilder = reinterpret_cast<SkRuntimeShaderBuilder*>(builderPtr);
-    runtimeShaderBuilder->uniform(skString(uniformName).c_str()) = uniformMatrix33;
+    std::unique_ptr<SkMatrix> matrix33 = skMatrix(uniformMatrix33);
+    runtimeShaderBuilder->uniform(skString(uniformName).c_str()) = *matrix33;
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_RuntimeShaderBuilder__1nUniformFloatMatrix44
   (KNativePointer builderPtr, KInteropPointer uniformName, KFloat* uniformMatrix44) {
     SkRuntimeShaderBuilder* runtimeShaderBuilder = reinterpret_cast<SkRuntimeShaderBuilder*>(builderPtr);
-    runtimeShaderBuilder->uniform(skString(uniformName).c_str()) = uniformMatrix44;
+    std::unique_ptr<SkM44> matrix44 = skM44(uniformMatrix44);
+    runtimeShaderBuilder->uniform(skString(uniformName).c_str()) = *matrix44;
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_RuntimeShaderBuilder__1nChildShader

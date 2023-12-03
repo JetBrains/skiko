@@ -521,19 +521,6 @@ namespace skija {
             return java::lang::Throwable::exceptionThrown(env) ? nullptr : res;
         }
 
-        std::unique_ptr<SkIRect> toSkIRect(JNIEnv* env, jobject obj) {
-            if (obj == nullptr)
-                return std::unique_ptr<SkIRect>(nullptr);
-            else {
-                return std::unique_ptr<SkIRect>(new SkIRect{
-                    env->GetIntField(obj, left),
-                    env->GetIntField(obj, top),
-                    env->GetIntField(obj, right),
-                    env->GetIntField(obj, bottom)
-                });
-            }
-        }
-
         std::unique_ptr<SkIRect> toSkIRect(JNIEnv* env, jintArray rectInts) {
             if (rectInts == nullptr)
                 return std::unique_ptr<SkIRect>(nullptr);

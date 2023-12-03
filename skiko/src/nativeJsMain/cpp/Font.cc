@@ -360,7 +360,7 @@ SKIKO_EXPORT void org_jetbrains_skia_Font__1nGetMetrics
 
 
 SKIKO_EXPORT KFloat org_jetbrains_skia_Font__1nGetSpacing
-  (KNativePointer ptr, KShort* glyphsArr) {
+  (KNativePointer ptr) {
     SkFont* instance = reinterpret_cast<SkFont*>(ptr);
     return instance->getSpacing();
 }

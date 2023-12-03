@@ -1273,6 +1273,7 @@ if (supportAwt) {
             )
             systemProperty("skiko.test.ui.enabled", System.getProperty("skiko.test.ui.enabled", canRunUiTests.toString()))
             systemProperty("skiko.test.ui.renderApi", System.getProperty("skiko.test.ui.renderApi", "all"))
+            systemProperty("skiko.test.debug", buildType == SkiaBuildType.DEBUG)
 
             // Tests should be deterministic, so disable scaling.
             // On MacOs we need the actual scale, otherwise we will have aliased screenshots because of scaling.

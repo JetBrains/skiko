@@ -75,7 +75,7 @@ enum class SkiaBuildType(
     DEBUG(
         "Debug",
         flags = arrayOf("-DSK_DEBUG"),
-        clangFlags = arrayOf("-std=c++17", "-g"),
+        clangFlags = arrayOf("-std=c++17", "-g", "-DSK_TRIVIAL_ABI=[[clang::trivial_abi]]"),
         msvcCompilerFlags = arrayOf("/Zi /std:c++17"),
         msvcLinkerFlags = arrayOf("/DEBUG"),
     ),
