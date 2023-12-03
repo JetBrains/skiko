@@ -16,6 +16,9 @@ enum class OS(
     val isWindows
         get() = this == Windows
 
+    val isMacOs
+        get() = this == MacOS
+
     fun idWithSuffix(isIosSim: Boolean = false): String {
         return id + if (isIosSim) "Sim" else ""
     }
@@ -75,7 +78,7 @@ enum class SkiaBuildType(
     DEBUG(
         "Debug",
         flags = arrayOf("-DSK_DEBUG"),
-        clangFlags = arrayOf("-std=c++17", "-g"),
+        clangFlags = arrayOf("-std=c++17", "-g", "-DSK_TRIVIAL_ABI=[[clang::trivial_abi]]"),
         msvcCompilerFlags = arrayOf("/Zi /std:c++17"),
         msvcLinkerFlags = arrayOf("/DEBUG"),
     ),
@@ -113,7 +116,7 @@ fun targetId(os: OS, arch: Arch) = "${os.id}-${arch.id}"
 val jdkHome = System.getProperty("java.home") ?: error("'java.home' is null")
 
 class SkikoProperties(private val myProject: Project) {
-    val isCIBuild: Boolean
+    val isTeamcityCIBuild: Boolean
         get() = myProject.hasProperty("teamcity")
 
     val planeDeployVersion: String = myProject.property("deploy.version") as String
@@ -140,8 +143,7 @@ class SkikoProperties(private val myProject: Project) {
     fun skiaReleaseFor(os: OS, arch: Arch, buildType: SkiaBuildType, isIosSim: Boolean = false): String {
         val target = "${os.idWithSuffix(isIosSim = isIosSim)}-${arch.id}"
         val tag = myProject.property("dependencies.skia.$target") as String
-        val suffix = if (os == OS.Linux && arch == Arch.X64) "-ubuntu18" else ""
-        return "${tag}/Skia-${tag}-${os.idWithSuffix(isIosSim = isIosSim)}-${buildType.id}-${arch.id}$suffix"
+        return "${tag}/Skia-${tag}-${os.idWithSuffix(isIosSim = isIosSim)}-${buildType.id}-${arch.id}"
     }
 
     val releaseGithubVersion: String
@@ -191,7 +193,11 @@ object SkikoArtifacts {
     // names are also used in samples, e.g. samples/SkijaInjectSample/build.gradle
     val commonArtifactId = "skiko"
     val jvmArtifactId = "skiko-awt"
+    // an artifact (klib) for k/js targets
     val jsArtifactId = "skiko-js"
+    // an artifact (klib) for k/wasm targets
+    val wasmArtifactId = "skiko-wasm-js"
+    // an artifact with skiko.wasm and supporting js code - jar
     val jsWasmArtifactId = "skiko-js-wasm-runtime"
     fun jvmRuntimeArtifactIdFor(os: OS, arch: Arch) =
         if (os == OS.Android)
