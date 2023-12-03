@@ -36,7 +36,7 @@ case $SKIA_TARGET in
   "macos")
     SKIKO_TARGET_FLAGS="-Pskiko.awt.enabled=true"
     if [[ $(uname -m) == 'arm64' ]]; then
-      skikoMachines=("arm64", "x64")
+      skikoMachines=("x64", "arm64") # order matters
     else
       skikoMachines=("x64")
     fi
@@ -80,8 +80,8 @@ cd skia-pack
 [ -d "skia" ] && echo "skip cript/checkout.py, because directory skia-pack/skia already exists"
 [ ! -d "skia" ] && python3 script/checkout.py --version "$SKIA_VERSION"
 for skikoMachine in ${skikoMachines[@]}; do
-  python3 script/build.py --target "$SKIA_TARGET" --machine "$skikoMachine" --build-type $skikoBuildType
-  python3 script/archive.py --version "$SKIA_VERSION" --target "$SKIA_TARGET" --machine "$skikoMachine" --build-type $skikoBuildType
+  python3 script/build.py --target "$SKIA_TARGET" --machine "$skikoMachine" --build-type "$skikoBuildType"
+  python3 script/archive.py --version "$SKIA_VERSION" --target "$SKIA_TARGET" --machine "$skikoMachine" --build-type "$skikoBuildType"
 done
 cd "$SCRIPT_DIR"
 
