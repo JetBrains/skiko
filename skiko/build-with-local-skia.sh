@@ -36,7 +36,7 @@ case $SKIA_TARGET in
   "macos")
     SKIKO_TARGET_FLAGS="-Pskiko.awt.enabled=true"
     if [[ $(uname -m) == 'arm64' ]]; then
-      skikoMachines=("arm64" , "x64") # spaces around comma matters
+      skikoMachines=("arm64" "x64") # bash arrays split elements by spaces
     else
       skikoMachines=("x64")
     fi
