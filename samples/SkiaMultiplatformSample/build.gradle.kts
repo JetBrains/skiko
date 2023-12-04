@@ -5,11 +5,9 @@ buildscript {
         google()
         mavenCentral()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-        maven("https://maven.pkg.jetbrains.space/kotlin/p/wasm/experimental")
     }
 
     dependencies {
-        // __KOTLIN_COMPOSE_VERSION__
         val kotlinVersion = project.property("kotlin.version") as String
         classpath(kotlin("gradle-plugin", version = kotlinVersion))
     }
@@ -24,8 +22,6 @@ repositories {
     google()
     mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-    maven("https://maven.pkg.jetbrains.space/kotlin/p/wasm/experimental")
-    maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
 }
 
 val osName = System.getProperty("os.name")
