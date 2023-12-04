@@ -58,13 +58,6 @@ val Project.supportAnyNative: Boolean
 val Project.supportWasm: Boolean
     get() = findProperty("skiko.wasm.enabled") == "true" || isInIdea
 
-val Project.supportAndroid: Boolean
-    get() = findProperty("skiko.android.enabled") == "true" // || isInIdea
-
-
-val Project.supportWasm: Boolean
-    get() = findProperty("skiko.wasm.enabled") == "true" || isInIdea
-
 val Project.supportJs: Boolean
     get() = findProperty("skiko.js.enabled") == "true" || supportWasm || isInIdea
 
