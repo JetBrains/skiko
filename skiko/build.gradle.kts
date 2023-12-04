@@ -522,6 +522,9 @@ kotlin {
                 // See https://kotlinlang.org/docs/mpp-share-on-platforms.html#configure-the-hierarchical-structure-manually
                 val nativeMain by creating {
                     dependsOn(nativeJsMain)
+                    dependencies {
+                        implementation("org.jetbrains.kotlinx:atomicfu:0.23.1")
+                    }
                 }
                 val nativeTest by creating {
                     dependsOn(nativeJsTest)
