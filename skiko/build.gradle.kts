@@ -54,7 +54,6 @@ val Project.supportNativeLinux: Boolean
 val Project.supportAnyNative: Boolean
     get() = supportAllNative || supportAnyNativeIos || supportNativeMac || supportNativeLinux
 
-
 val Project.supportWasm: Boolean
     get() = findProperty("skiko.wasm.enabled") == "true" || isInIdea
 
@@ -62,6 +61,7 @@ val Project.supportJs: Boolean
     get() = findProperty("skiko.js.enabled") == "true" || supportWasm || isInIdea
 
 val coroutinesVersion = "1.8.0-RC"
+val atomicfuVersion = "0.23.1"
 
 fun targetSuffix(os: OS, arch: Arch): String {
     return "${os.id}_${arch.id}"
@@ -79,8 +79,6 @@ allprojects {
 
 repositories {
     mavenCentral()
-    // TODO: delete when we have all libs published in mavenCentral
-    maven("https://maven.pkg.jetbrains.space/kotlin/p/wasm/experimental")
 }
 
 val windowsSdkPaths: WindowsSdkPaths by lazy {
@@ -516,7 +514,9 @@ kotlin {
                 val nativeMain by creating {
                     dependsOn(nativeJsMain)
                     dependencies {
-                        implementation("org.jetbrains.kotlinx:atomicfu:0.23.1")
+                        // TODO: remove this explicit dependency on atomicfu
+                        // after this is fixed https://jetbrains.slack.com/archives/C3TNY2MM5/p1701462109621819
+                        implementation("org.jetbrains.kotlinx:atomicfu:$atomicfuVersion")
                     }
                 }
                 val nativeTest by creating {
