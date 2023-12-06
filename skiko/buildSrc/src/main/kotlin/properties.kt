@@ -190,7 +190,11 @@ object SkikoArtifacts {
     // names are also used in samples, e.g. samples/SkijaInjectSample/build.gradle
     val commonArtifactId = "skiko"
     val jvmArtifactId = "skiko-awt"
+    // an artifact (klib) for k/js targets
     val jsArtifactId = "skiko-js"
+    // an artifact (klib) for k/wasm targets
+    val wasmArtifactId = "skiko-wasm-js"
+    // an artifact with skiko.wasm and supporting js code - jar
     val jsWasmArtifactId = "skiko-js-wasm-runtime"
     fun jvmRuntimeArtifactIdFor(os: OS, arch: Arch) =
         if (os == OS.Android)
