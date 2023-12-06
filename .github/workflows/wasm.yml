@@ -1,0 +1,62 @@
+name: WebTarget
+
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ wasm-main, master ]
+  pull_request:
+    branches: [ wasm-main, master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+
+jobs:
+  web:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
+        id: setup-chrome
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '11'
+      - name: Install dependencies
+        run: |
+         sudo apt-get update
+         sudo apt-get install libdbus-1-dev
+      - name: 'install emsdk'
+        shell: bash
+        run: |
+          cd ./skiko
+          sudo apt-get update -y
+          sudo apt-get install binutils build-essential -y
+          sudo apt-get install software-properties-common -y
+          sudo apt-get install python git curl wget -y
+          if [ -d ./emsdk ]; then
+            cd ./emsdk
+            git pull
+          else
+            git clone https://github.com/emscripten-core/emsdk.git
+            cd ./emsdk
+          fi
+          ./emsdk install 3.1.49
+          ./emsdk activate 3.1.49
+          source ./emsdk_env.sh
+          cd ..
+      - name: 'run tests'
+        shell: bash
+        run: |
+          cd ./skiko
+          source ./emsdk/emsdk_env.sh
+          ./gradlew --stacktrace --info -Pskiko.wasm.enabled=true -Pskiko.js.enabled=true -Pskiko.test.onci=true wasmJsTest
+          ./gradlew --stacktrace --info -Pskiko.wasm.enabled=true -Pskiko.js.enabled=true publishSkikoWasmRuntimePublicationToMavenLocal
+      - uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: test-reports-wasm
+          path: ./skiko/build/reports/tests
+          retention-days: 5

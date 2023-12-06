@@ -21,9 +21,9 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeGLWithInterf
     return reinterpret_cast<KNativePointer>(GrDirectContext::MakeGL(iface).release());
 }
 
-#ifdef SK_METAL
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeMetal
-  (long devicePtr, long queuePtr) {
+  (KNativePointer devicePtr, KNativePointer queuePtr) {
+#ifdef SK_METAL
     GrMtlBackendContext backendContext = {};
     GrMTLHandle device = reinterpret_cast<GrMTLHandle>((devicePtr));
     GrMTLHandle queue = reinterpret_cast<GrMTLHandle>((queuePtr));
@@ -31,8 +31,10 @@ SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeMetal
     backendContext.fQueue.retain(queue);
     sk_sp<GrDirectContext> instance = GrDirectContext::MakeMetal(backendContext);
     return reinterpret_cast<KNativePointer>(instance.release());
-}
+#else
+    return nullptr;
 #endif // SK_METAL
+}
 
 SKIKO_EXPORT KNativePointer org_jetbrains_skia_DirectContext__1nMakeDirect3D
   (KNativePointer adapterPtr, KNativePointer devicePtr, KNativePointer queuePtr) {

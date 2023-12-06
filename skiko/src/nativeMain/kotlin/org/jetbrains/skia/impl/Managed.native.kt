@@ -2,7 +2,7 @@ package org.jetbrains.skia.impl
 
 import kotlinx.cinterop.nativeNullPtr
 import org.jetbrains.skia.ExternalSymbolName
-import kotlin.native.concurrent.AtomicNativePtr
+import kotlin.concurrent.AtomicNativePtr
 import kotlin.native.concurrent.freeze
 import kotlin.native.internal.createCleaner
 

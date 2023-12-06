@@ -5,6 +5,7 @@ import org.jetbrains.skia.impl.Library.Companion.staticLoad
 import org.jetbrains.skia.sksg.InvalidationController
 import org.jetbrains.skia.*
 import org.jetbrains.skia.ExternalSymbolName
+import org.jetbrains.skia.ModuleImport
 import org.jetbrains.skia.impl.*
 
 class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _FinalizerHolder.PTR) {
@@ -281,18 +282,23 @@ class Animation internal constructor(ptr: NativePointer) : Managed(ptr, _Finaliz
 
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetFinalizer")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_skottie_Animation__1nGetFinalizer")
 private external fun _nGetFinalizer(): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nMakeFromString")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_skottie_Animation__1nMakeFromString")
 private external fun _nMakeFromString(data: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nMakeFromFile")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_skottie_Animation__1nMakeFromFile")
 internal external fun _nMakeFromFile(path: InteropPointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nMakeFromData")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_skottie_Animation__1nMakeFromData")
 private external fun _nMakeFromData(dataPtr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nRender")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_skottie_Animation__1nRender")
 private external fun _nRender(
     ptr: NativePointer,
     canvasPtr: NativePointer,
@@ -305,28 +311,37 @@ private external fun _nRender(
 
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nSeek")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_skottie_Animation__1nSeek")
 private external fun _nSeek(ptr: NativePointer, t: Float, icPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nSeekFrame")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_skottie_Animation__1nSeekFrame")
 private external fun _nSeekFrame(ptr: NativePointer, t: Float, icPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nSeekFrameTime")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_skottie_Animation__1nSeekFrameTime")
 private external fun _nSeekFrameTime(ptr: NativePointer, t: Float, icPtr: NativePointer)
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetDuration")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_skottie_Animation__1nGetDuration")
 private external fun _nGetDuration(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetFPS")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_skottie_Animation__1nGetFPS")
 private external fun _nGetFPS(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetInPoint")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_skottie_Animation__1nGetInPoint")
 private external fun _nGetInPoint(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetOutPoint")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_skottie_Animation__1nGetOutPoint")
 private external fun _nGetOutPoint(ptr: NativePointer): Float
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetVersion")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_skottie_Animation__1nGetVersion")
 private external fun _nGetVersion(ptr: NativePointer): NativePointer
 
 @ExternalSymbolName("org_jetbrains_skia_skottie_Animation__1nGetSize")
+@ModuleImport("./skiko.mjs", "org_jetbrains_skia_skottie_Animation__1nGetSize")
 private external fun _nGetSize(ptr: NativePointer, dst: InteropPointer)

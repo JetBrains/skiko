@@ -2,27 +2,23 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 buildscript {
     repositories {
-        mavenLocal()
         google()
         mavenCentral()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
 
     dependencies {
-        // __KOTLIN_COMPOSE_VERSION__
-        classpath(kotlin("gradle-plugin", version = "1.8.20"))
+        val kotlinVersion = project.property("kotlin.version") as String
+        classpath(kotlin("gradle-plugin", version = kotlinVersion))
     }
 }
 
 plugins {
-    kotlin("multiplatform") version "1.8.20"
+    kotlin("multiplatform")
     id("org.jetbrains.gradle.apple.applePlugin") version "222.3345.143-0.16"
 }
 
-val coroutinesVersion = "1.5.2"
-
 repositories {
-    mavenLocal()
     google()
     mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
@@ -53,14 +49,29 @@ if (project.hasProperty("skiko.version")) {
 val resourcesDir = "$buildDir/resources"
 val skikoWasm by configurations.creating
 
-dependencies {
-    skikoWasm("org.jetbrains.skiko:skiko-js-wasm-runtime:$version")
-}
+val isCompositeBuild = extra.properties.getOrDefault("skiko.composite.build", "") == "1"
 
 val unzipTask = tasks.register("unzipWasm", Copy::class) {
     destinationDir = file(resourcesDir)
     from(skikoWasm.map { zipTree(it) })
+
+    if (isCompositeBuild) {
+        val skikoWasmJarTask = gradle.includedBuild("skiko").task(":skikoWasmJar")
+        dependsOn(skikoWasmJarTask)
+    }
 }
+
+dependencies {
+    if (isCompositeBuild) {
+        val filePath = gradle.includedBuild("skiko").projectDir
+            .resolve("./build/libs/skiko-wasm-$version.jar")
+        skikoWasm(files(filePath))
+    } else {
+        skikoWasm("org.jetbrains.skiko:skiko-js-wasm-runtime:$version")
+    }
+}
+
+
 
 kotlin {
     if (hostOs == "macos") {
@@ -87,7 +98,22 @@ kotlin {
     }
 
     js(IR) {
-        browser()
+        moduleName = "clocks-js"
+        browser {
+            commonWebpackConfig {
+                outputFileName = "clocks-js.js"
+            }
+        }
+        binaries.executable()
+    }
+
+    wasmJs {
+        moduleName = "clocks-wasm"
+        browser {
+            commonWebpackConfig {
+                outputFileName = "clocks-wasm.js"
+            }
+        }
         binaries.executable()
     }
 
@@ -95,7 +121,6 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation("org.jetbrains.skiko:skiko:$version")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
             }
         }
 
@@ -110,10 +135,18 @@ kotlin {
             }
         }
 
-        val jsMain by getting {
+        val jsWasmMain by creating {
             dependsOn(commonMain)
             resources.setSrcDirs(resources.srcDirs)
             resources.srcDirs(unzipTask.map { it.destinationDir })
+        }
+
+        val jsMain by getting {
+            dependsOn(jsWasmMain)
+        }
+
+        val wasmJsMain by getting {
+            dependsOn(jsWasmMain)
         }
 
         val darwinMain by creating {
@@ -302,5 +335,12 @@ fun KotlinNativeTarget.configureToLaunchFromXcode() {
                 "-linker-option", "-framework", "-linker-option", "CoreGraphics"
             )
         }
+    }
+}
+
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile>().configureEach {
+    kotlinOptions {
+        freeCompilerArgs += "-Xopt-in=kotlinx.cinterop.ExperimentalForeignApi"
     }
 }

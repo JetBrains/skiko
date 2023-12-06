@@ -2,7 +2,7 @@ package org.jetbrains.skiko.wasm
 
 import org.jetbrains.skia.impl.NativePointer
 import org.w3c.dom.HTMLCanvasElement
-import kotlin.js.Promise
+import kotlin.js.*
 
 /**
  * Invokes a callback [onReady] as soon as onRuntimeInitialized happens.
@@ -12,31 +12,6 @@ import kotlin.js.Promise
 external fun onWasmReady(onReady: () -> Unit)
 
 internal external val wasmSetup: Promise<Boolean>
-
-private external interface GLInterface {
-    fun createContext(context: HTMLCanvasElement, contextAttributes: dynamic): NativePointer;
-    fun makeContextCurrent(contextPointer: NativePointer): Boolean;
-}
-
-internal external object GL : GLInterface {
-    override fun createContext(context: HTMLCanvasElement, contextAttributes: dynamic): Int = definedExternally
-    override fun makeContextCurrent(contextPointer: NativePointer): Boolean = definedExternally
-}
-
-internal external interface ContextAttributes {
-    val alpha: Int?
-    val depth: Int?
-    val stencil: Int?
-    val antialias: Int?
-    val premultipliedAlpha: Int?
-    val preserveDrawingBuffer: Int?
-    val preferLowPowerToHighPerformance: Int?
-    val failIfMajorPerformanceCaveat: Int?
-    val enableExtensionsByDefault: Int?
-    val explicitSwapControl: Int?
-    val renderViaOffscreenBackBuffer: Int?
-    val majorVersion: Int?
-}
 
 internal fun ContextAttributes.asJsObject(): dynamic {
     val jsObject = js("{}")
@@ -55,8 +30,18 @@ internal fun ContextAttributes.asJsObject(): dynamic {
     return jsObject
 }
 
+private external interface GLInterface {
+    fun createContext(context: HTMLCanvasElement, contextAttributes: ContextAttributes): NativePointer;
+    fun makeContextCurrent(contextPointer: NativePointer): Boolean;
+}
 
-internal fun createWebGLContext(canvas: HTMLCanvasElement, attr: ContextAttributes? = null): NativePointer {
+internal external object GL : GLInterface {
+    override fun createContext(context: HTMLCanvasElement, contextAttributes: ContextAttributes): Int = definedExternally
+    override fun makeContextCurrent(contextPointer: NativePointer): Boolean = definedExternally
+}
+
+
+internal actual fun createWebGLContext(canvas: HTMLCanvasElement, attr: ContextAttributes?): NativePointer {
     val contextAttributes = object : ContextAttributes {
         override val alpha = attr?.alpha ?: 1
         override val depth = attr?.depth ?: 1
@@ -69,7 +54,7 @@ internal fun createWebGLContext(canvas: HTMLCanvasElement, attr: ContextAttribut
         override val enableExtensionsByDefault = attr?.enableExtensionsByDefault ?: 1
         override val explicitSwapControl = attr?.explicitSwapControl ?: 0
         override val renderViaOffscreenBackBuffer = attr?.renderViaOffscreenBackBuffer ?: 0
-        override val majorVersion = attr?.majorVersion ?: 1
+        override val majorVersion = attr?.majorVersion ?: 2
     }
 
     return GL.createContext(canvas, contextAttributes.asJsObject())

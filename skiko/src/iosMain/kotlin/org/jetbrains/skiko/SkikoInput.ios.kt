@@ -1,7 +1,7 @@
 package org.jetbrains.skiko
 
 actual interface SkikoInput {
-    
+
     /**
      * A Boolean value that indicates whether the text-entry object has any text.
      * https://developer.apple.com/documentation/uikit/uikeyinput/1614457-hastext

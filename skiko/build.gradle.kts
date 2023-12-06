@@ -8,7 +8,7 @@ import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompileTool
 
 plugins {
-    kotlin("multiplatform") version "1.8.20"
+    kotlin("multiplatform")
     id("org.jetbrains.dokka") version "1.7.20"
     `maven-publish`
     signing
@@ -16,7 +16,52 @@ plugins {
     id("de.undercouch.download") version "5.4.0"
 }
 
-val coroutinesVersion = "1.7.3"
+internal val Project.isInIdea: Boolean
+    get() {
+        return System.getProperty("idea.active")?.toBoolean() == true
+    }
+
+val Project.supportAndroid: Boolean
+    get() = findProperty("skiko.android.enabled") == "true" // || isInIdea
+
+val Project.supportAwt: Boolean
+    get() = findProperty("skiko.awt.enabled") == "true" || isInIdea
+
+val Project.supportAllNative: Boolean
+    get() = findProperty("skiko.native.enabled") == "true" || isInIdea
+
+val Project.supportAllNativeIos: Boolean
+    get() = supportAllNative || findProperty("skiko.native.ios.enabled") == "true" || isInIdea
+
+val Project.supportNativeIosArm64: Boolean
+    get() = supportAllNativeIos || findProperty("skiko.native.ios.arm64.enabled") == "true" || isInIdea
+
+val Project.supportNativeIosSimulatorArm64: Boolean
+    get() = supportAllNativeIos || findProperty("skiko.native.ios.simulatorArm64.enabled") == "true" || isInIdea
+
+val Project.supportNativeIosX64: Boolean
+    get() = supportAllNativeIos || findProperty("skiko.native.ios.x64.enabled") == "true" || isInIdea
+
+val Project.supportAnyNativeIos: Boolean
+    get() = supportAllNativeIos || supportNativeIosArm64 || supportNativeIosSimulatorArm64 || supportNativeIosX64
+
+val Project.supportNativeMac: Boolean
+    get() = supportAllNative || findProperty("skiko.native.mac.enabled") == "true" || isInIdea
+
+val Project.supportNativeLinux: Boolean
+    get() = supportAllNative || findProperty("skiko.native.linux.enabled") == "true" || isInIdea
+
+val Project.supportAnyNative: Boolean
+    get() = supportAllNative || supportAnyNativeIos || supportNativeMac || supportNativeLinux
+
+val Project.supportWasm: Boolean
+    get() = findProperty("skiko.wasm.enabled") == "true" || isInIdea
+
+val Project.supportJs: Boolean
+    get() = findProperty("skiko.js.enabled") == "true" || supportWasm || isInIdea
+
+val coroutinesVersion = "1.8.0-RC"
+val atomicfuVersion = "0.23.1"
 
 fun targetSuffix(os: OS, arch: Arch): String {
     return "${os.id}_${arch.id}"
@@ -46,7 +91,7 @@ fun KotlinTarget.isIosSimArm64() =
 fun String.withSuffix(isIosSim: Boolean = false) =
     this + if (isIosSim) "Sim" else ""
 
-if (supportWasm) {
+val linkWasm = if (supportJs || supportWasm) {
     val skiaWasmDir = registerOrGetSkiaDirProvider(OS.Wasm, Arch.Wasm)
 
     val compileWasm by tasks.registering(CompileSkikoCppTask::class) {
@@ -59,23 +104,26 @@ if (supportWasm) {
         buildTargetArch.set(osArch.second)
         buildVariant.set(buildType)
 
-        val srcDirs = projectDirs("src/commonMain/cpp/common", "src/jsMain/cpp", "src/nativeJsMain/cpp") +
+        val srcDirs = projectDirs("src/commonMain/cpp/common", "src/jsWasmMain/cpp", "src/nativeJsMain/cpp") +
                 if (skiko.includeTestHelpers) projectDirs("src/nativeJsTest/cpp") else emptyList()
         sourceRoots.set(srcDirs)
 
         includeHeadersNonRecursive(projectDir.resolve("src/nativeJsMain/cpp"))
+        includeHeadersNonRecursive(projectDir.resolve("src/jsWasmMain/cpp"))
         includeHeadersNonRecursive(projectDir.resolve("src/commonMain/cpp/common/include"))
         includeHeadersNonRecursive(skiaHeadersDirs(skiaWasmDir.get()))
 
-        flags.set(listOf(
-            *skiaPreprocessorFlags(OS.Wasm),
-            *buildType.clangFlags,
-            "-fno-rtti",
-            "-fno-exceptions"
-        ))
+        flags.set(
+            listOf(
+                *skiaPreprocessorFlags(OS.Wasm),
+                *buildType.clangFlags,
+                "-fno-rtti",
+                "-fno-exceptions",
+            )
+        )
     }
 
-    val linkWasm by tasks.registering(LinkSkikoWasmTask::class) {
+    val configureCommon: LinkSkikoWasmTask.(outputES6: Boolean) -> Unit = { outputES6 ->
         val osArch = OS.Wasm to Arch.Wasm
 
         dependsOn(compileWasm)
@@ -86,47 +134,108 @@ if (supportWasm) {
         buildTargetOS.set(osArch.first)
         buildTargetArch.set(osArch.second)
         buildVariant.set(buildType)
+        if (outputES6) buildSuffix.set("es6")
 
         libFiles = project.fileTree(unpackedSkia) { include("**/*.a") }
         objectFiles = project.fileTree(compileWasm.map { it.outDir.get() }) {
             include("**/*.o")
         }
 
-        libOutputFileName.set("skiko.wasm")
-        jsOutputFileName.set("skiko.js")
+        val jsFileExtension = if (outputES6) "mjs" else "js"
+        val wasmFileName = if (outputES6) {
+            "skikomjs.wasm"
+        } else {
+            "skiko.wasm" // to keep it compatible with older apps
+        }
+        val jsFileName = if (outputES6) {
+            "skikomjs.mjs"
+        } else {
+            "skiko.js" // to keep it compatible with older apps
+        }
+        libOutputFileName.set(wasmFileName) // emcc ignores this, it names .wasm file identically to js output
+        jsOutputFileName.set(jsFileName) // this determines the name .wasm file too
 
-        skikoJsPrefix.set(project.layout.projectDirectory.file("src/jsMain/resources/setup.js"))
+        skikoJsPrefix.from(
+            // the order matters
+            project.layout.projectDirectory.file("src/jsWasmMain/resources/skikoCallbacks.js"),
+            project.layout.projectDirectory.file("src/jsWasmMain/resources/setup.$jsFileExtension")
+        )
 
-        flags.set(listOf(
-            "-l", "GL",
-            "-s", "USE_WEBGL2=1",
-            "-s", "OFFSCREEN_FRAMEBUFFER=1",
-            "-s", "ALLOW_MEMORY_GROWTH=1", // TODO: Is there a better way? Should we use `-s INITIAL_MEMORY=X`?
-            "--bind",
-        ))
+        @OptIn(kotlin.ExperimentalStdlibApi::class)
+        flags.set(buildList {
+            addAll(
+                listOf(
+                    "-l", "GL",
+                    "-s", "MAX_WEBGL_VERSION=2",
+                    "-s", "MIN_WEBGL_VERSION=2",
+                    "-s", "OFFSCREEN_FRAMEBUFFER=1",
+                    "-s", "ALLOW_MEMORY_GROWTH=1", // TODO: Is there a better way? Should we use `-s INITIAL_MEMORY=X`?
+                    "--bind",
+                    // -O2 saves 800kB for the output file, and ~100kB for transferred size.
+                    // -O3 breaks the exports in js/mjs files. skiko.wasm size is the same though
+                    "-O2"
+                )
+            )
+            if (outputES6) {
+                addAll(
+                    listOf(
+                        "-s", "EXPORT_ES6=1",
+                        "-s", "MODULARIZE=1",
+                        "-s", "EXPORT_NAME=loadSkikoWASM",
+                        "-s", "EXPORTED_RUNTIME_METHODS=\"[GL, wasmExports]\"",
+                        // "-s", "EXPORT_ALL=1",
+                    )
+                )
+            }
+        })
 
         doLast {
-            // skiko.js file is directly referenced in karma.config.d/wasm.js
+            // skiko.js (and skiko.mjs) files are directly referenced in karma.config.d/*/config.js
             // so symbols must be replaced right after linking
             val jsFiles = outDir.asFile.get().walk()
-                .filter { it.isFile && it.name.endsWith(".js") }
+                .filter { it.isFile && (it.name.endsWith(".js") || it.name.endsWith(".mjs")) }
 
             for (jsFile in jsFiles) {
                 val originalContent = jsFile.readText()
                 val newContent = originalContent.replace("_org_jetbrains", "org_jetbrains")
+                    .replace("skikomjs.wasm", "skiko.wasm")
+                    .replace("if(ENVIRONMENT_IS_NODE){", "if (false) {") // to make webpack erase this part
                 jsFile.writeText(newContent)
+
+                if (outputES6) {
+                    // delete this file as its presence can be confusing.
+                    // It's identical to skiko.wasm and we use skiko.wasm in `skikoWasmJar`task
+                    outDir.file(wasmFileName).get().asFile.delete()
+
+                    outDir.file(jsFileName).get().asFile.renameTo(outDir.asFile.get().resolve("skiko.mjs"))
+                }
             }
         }
     }
+
+    val linkWasmWithES6 by tasks.registering(LinkSkikoWasmTask::class) {
+        configureCommon(true)
+    }
+
+    val linkWasm by tasks.registering(LinkSkikoWasmTask::class) {
+        dependsOn(linkWasmWithES6)
+        configureCommon(false)
+    }
+
 
     val skikoWasmJar by project.tasks.registering(Jar::class) {
         dependsOn(linkWasm)
         // We produce jar that contains .js of wrapper/bindings and .wasm with Skia + bindings.
         val wasmOutDir = linkWasm.map { it.outDir }
+        val wasmEsOutDir = linkWasmWithES6.map { it.outDir }
 
         from(wasmOutDir) {
             include("*.wasm")
             include("*.js")
+            include("*.mjs")
+        }
+        from(wasmEsOutDir) {
+            include("*.mjs")
         }
 
         archiveBaseName.set("skiko-wasm")
@@ -134,7 +243,9 @@ if (supportWasm) {
             println("Wasm and JS at: ${archiveFile.get().asFile.absolutePath}")
         }
     }
-}
+
+    Pair(linkWasm, linkWasmWithES6)
+} else Pair(null, null)
 
 fun compileNativeBridgesTask(os: OS, arch: Arch, isArm64Simulator: Boolean): TaskProvider<CompileSkikoCppTask> {
     val skiaNativeDir = registerOrGetSkiaDirProvider(os, arch, isIosSim = isArm64Simulator)
@@ -208,48 +319,6 @@ fun compileNativeBridgesTask(os: OS, arch: Arch, isArm64Simulator: Boolean): Tas
     }
 }
 
-internal val Project.isInIdea: Boolean
-    get() {
-        return System.getProperty("idea.active")?.toBoolean() == true
-    }
-
-val Project.supportAwt: Boolean
-    get() = findProperty("skiko.awt.enabled") == "true" || isInIdea
-
-val Project.supportAllNative: Boolean
-    get() = findProperty("skiko.native.enabled") == "true" || isInIdea
-
-val Project.supportAllNativeIos: Boolean
-    get() = supportAllNative || findProperty("skiko.native.ios.enabled") == "true" || isInIdea
-
-val Project.supportNativeIosArm64: Boolean
-    get() = supportAllNativeIos || findProperty("skiko.native.ios.arm64.enabled") == "true" || isInIdea
-
-val Project.supportNativeIosSimulatorArm64: Boolean
-    get() = supportAllNativeIos || findProperty("skiko.native.ios.simulatorArm64.enabled") == "true" || isInIdea
-
-val Project.supportNativeIosX64: Boolean
-    get() = supportAllNativeIos || findProperty("skiko.native.ios.x64.enabled") == "true" || isInIdea
-
-val Project.supportAnyNativeIos: Boolean
-    get() = supportAllNativeIos || supportNativeIosArm64 || supportNativeIosSimulatorArm64 || supportNativeIosX64
-
-val Project.supportNativeMac: Boolean
-    get() = supportAllNative || findProperty("skiko.native.mac.enabled") == "true" || isInIdea
-
-val Project.supportNativeLinux: Boolean
-    get() = supportAllNative || findProperty("skiko.native.linux.enabled") == "true" || isInIdea
-
-val Project.supportAnyNative: Boolean
-    get() = supportAllNative || supportAnyNativeIos || supportNativeMac || supportNativeLinux
-
-
-val Project.supportWasm: Boolean
-    get() = findProperty("skiko.wasm.enabled") == "true" || isInIdea
-
-val Project.supportAndroid: Boolean
-    get() = findProperty("skiko.android.enabled") == "true" // || isInIdea
-
 kotlin {
     if (supportAwt) {
         jvm("awt") {
@@ -275,7 +344,7 @@ kotlin {
         }
     }
 
-    if (supportWasm) {
+    if (supportJs) {
         js(IR) {
             moduleName = "skiko-kjs" // override the name to avoid name collision with a different skiko.js file
             browser {
@@ -283,11 +352,40 @@ kotlin {
                     dependsOn("linkWasm")
                     useKarma {
                         useChromeHeadless()
+                        useConfigDirectory(project.projectDir.resolve("karma.config.d").resolve("js"))
                     }
                 }
             }
             binaries.executable()
             generateVersion(OS.Wasm, Arch.Wasm)
+        }
+    }
+
+    if (supportWasm) {
+        wasmJs {
+            moduleName = "skiko-kjs-wasm" // override the name to avoid name collision with a different skiko.js file
+            browser {
+                testTask {
+                    dependsOn("linkWasm")
+                    useKarma {
+                        this.webpackConfig.experiments.add("topLevelAwait")
+                        useChromeHeadless()
+                        useConfigDirectory(project.projectDir.resolve("karma.config.d").resolve("wasm"))
+                    }
+                }
+            }
+            generateVersion(OS.Wasm, Arch.Wasm)
+
+            val test by compilations.getting
+            project.tasks.named<Copy>(test.processResourcesTaskName) {
+                from(linkWasm.first!!) {
+                    include("*.wasm")
+                }
+
+                from(linkWasm.second!!) {
+                    include("*.mjs")
+                }
+            }
         }
     }
 
@@ -365,7 +463,7 @@ kotlin {
             }
         }
 
-        if (supportWasm || supportAnyNative) {
+        if (supportJs || supportWasm || supportAnyNative) {
             val nativeJsMain by creating {
                 dependsOn(commonMain)
             }
@@ -374,16 +472,34 @@ kotlin {
                 dependsOn(commonTest)
             }
 
-            if (supportWasm) {
-                val jsMain by getting {
+            if (supportJs || supportWasm) {
+                val jsWasmMain by creating {
                     dependsOn(nativeJsMain)
                 }
 
-                val jsTest by getting {
+                val jsWasmTest by creating {
                     dependsOn(nativeJsTest)
                     dependencies {
-                        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
-                        implementation(kotlin("test-js"))
+                        implementation(kotlin("test"))
+                    }
+                }
+
+                if (supportJs) {
+                    val jsMain by getting {
+                        dependsOn(jsWasmMain)
+                    }
+
+                    val jsTest by getting {
+                        dependsOn(jsWasmTest)
+                    }
+                }
+
+                if (supportWasm) {
+                    val wasmJsMain by getting {
+                        dependsOn(jsWasmMain)
+                    }
+                    val wasmJsTest by getting {
+                        dependsOn(jsWasmTest)
                     }
                 }
             }
@@ -398,7 +514,9 @@ kotlin {
                 val nativeMain by creating {
                     dependsOn(nativeJsMain)
                     dependencies {
-                        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
+                        // TODO: remove this explicit dependency on atomicfu
+                        // after this is fixed https://jetbrains.slack.com/archives/C3TNY2MM5/p1701462109621819
+                        implementation("org.jetbrains.kotlinx:atomicfu:$atomicfuVersion")
                     }
                 }
                 val nativeTest by creating {
@@ -1401,7 +1519,7 @@ publishing {
             }
         }
 
-        if (supportWasm) {
+        if (supportJs || supportWasm) {
             create<MavenPublication>("skikoWasmRuntime") {
                 pomNameForPublication[name] = "Skiko WASM Runtime"
                 artifactId = SkikoArtifacts.jsWasmArtifactId
@@ -1437,12 +1555,16 @@ fun configureSignAndPublishDependencies() {
             val name = task.name
             val publishJs = "publishJsPublicationTo"
             val publishWasm = "publishSkikoWasmRuntimePublicationTo"
+            val publishWasmPub = "publishWasmJsPublicationTo"
             val signWasm = "signSkikoWasmRuntimePublication"
             val signJs = "signJsPublication"
+            val signWasmPub = "signWasmJsPublication"
 
             when {
-                name.startsWith(publishJs) -> task.dependsOn(signWasm)
+                name.startsWith(publishJs) -> task.dependsOn(signWasm, signWasmPub)
                 name.startsWith(publishWasm) -> task.dependsOn(signJs)
+                name.startsWith(publishWasmPub) -> task.dependsOn(signJs)
+                name.startsWith(signWasmPub) -> task.dependsOn(signWasm)
             }
         }
     }
@@ -1533,4 +1655,28 @@ tasks.withType<JavaCompile> {
     // Workaround to configure Java sources on Android (src/androidMain/java)
     targetCompatibility = "1.8"
     sourceCompatibility = "1.8"
+}
+
+project.tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().configureEach {
+    kotlinOptions.freeCompilerArgs += listOf(
+        "-Xwasm-enable-array-range-checks", "-Xir-dce=true", "-Xskip-prerelease-check",
+    )
+}
+
+if (supportJs && supportWasm) {
+    project.tasks.whenTaskAdded {
+        if (name == "compileJsWasmMainKotlinMetadata") {
+            enabled = false
+        }
+    }
+}
+
+tasks.findByName("publishSkikoWasmRuntimePublicationToComposeRepoRepository")
+    ?.dependsOn("publishWasmJsPublicationToComposeRepoRepository")
+
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile>().configureEach {
+    // https://youtrack.jetbrains.com/issue/KT-56583
+    compilerOptions.freeCompilerArgs.add("-XXLanguage:+ImplicitSignedToUnsignedIntegerConversion")
+    kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlinx.cinterop.ExperimentalForeignApi"
 }

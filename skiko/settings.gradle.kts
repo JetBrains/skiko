@@ -14,6 +14,12 @@ pluginManagement {
             classpath("org.kohsuke:github-api:1.116")
         }
     }
+
+    plugins {
+        val kotlinVersion = extra["kotlin.version"] as String
+        kotlin("jvm").version(kotlinVersion)
+        kotlin("multiplatform").version(kotlinVersion)
+    }
 }
 rootProject.name = "skiko"
 include("ci")

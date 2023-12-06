@@ -171,6 +171,7 @@ jobs:
 
   js:
     runs-on: ubuntu-20.04
+    if: false # see wasm.yml
     steps:
       - uses: actions/checkout@v3
         name: 'Check out code'
@@ -197,8 +198,8 @@ jobs:
             git clone https://github.com/emscripten-core/emsdk.git
             cd ./emsdk
           fi
-          ./emsdk install 2.0.29
-          ./emsdk activate 2.0.29
+          ./emsdk install 3.1.49
+          ./emsdk activate 3.1.49
       - shell: bash
         name: 'Compile and run JS tests'
         run: |
