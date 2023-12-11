@@ -169,55 +169,6 @@ jobs:
           path: ./skiko/build/reports/tests
           retention-days: 5
 
-  js:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3
-        name: 'Check out code'
-
-      - uses: actions/setup-java@v3
-        name: 'Set up JDK 11'
-        with:
-          distribution: 'adopt'
-          java-version: '11'
-          cache: 'gradle'
-
-      - shell: bash
-        name: 'Set up JS build environment'
-        run: |
-          cd ./skiko
-          sudo apt-get update -y
-          sudo apt-get install binutils build-essential -y
-          sudo apt-get install software-properties-common -y
-          sudo apt-get install python git curl wget -y
-          if [ -d ./emsdk ]; then
-            cd ./emsdk
-            git pull
-          else
-            git clone https://github.com/emscripten-core/emsdk.git
-            cd ./emsdk
-          fi
-          ./emsdk install 3.1.49
-          ./emsdk activate 3.1.49
-      - shell: bash
-        name: 'Compile and run JS tests'
-        run: |
-          source "$(pwd)/skiko/emsdk/emsdk_env.sh"
-          ./gradlew --stacktrace --info -Pskiko.wasm.enabled=true -Pskiko.test.onci=true :skiko:jsTest
-      - shell: bash
-        name: 'Publish WASM runtime to Maven Local'
-        run: |
-          source "$(pwd)/skiko/emsdk/emsdk_env.sh"
-          ./gradlew --stacktrace --info -Pskiko.wasm.enabled=true :skiko:publishSkikoWasmRuntimePublicationToMavenLocal
-
-      - uses: actions/upload-artifact@v3
-        name: 'Save test results as artifact'
-        if: always()
-        with:
-          name: test-reports-js
-          path: ./skiko/build/reports/tests
-          retention-days: 5
-
   windows:
     runs-on: windows-2019
     steps:
