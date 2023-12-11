@@ -8,11 +8,9 @@ import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.makeFromFileName
 import java.nio.ByteBuffer
 
-actual fun <T> runTest(block: suspend () -> Unit): T {
-    error("It's a fake actual. Not expected to be called")
-}
+actual typealias TestReturnType = Unit
 
-fun runTest(block: suspend () -> Unit): Unit {
+actual fun runTest(block: suspend () -> Unit): TestReturnType {
     return runBlocking { block() }
 }
 
