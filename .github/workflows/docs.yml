@@ -24,6 +24,22 @@ jobs:
           java-version: '11'
           cache: 'gradle'
 
+      - shell: bash
+        name: 'Set up Linux build environment'
+        run: |
+          # TODO: simplify installation of compilers.
+          sudo apt-get update -y
+          sudo apt-get install build-essential software-properties-common -y
+          sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+          sudo apt-get update -y
+          sudo apt-get install build-essential software-properties-common -y
+          sudo apt-get update
+          sudo apt-get install gcc-9 g++-9 -y
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 60 --slave /usr/bin/g++ g++ /usr/bin/g++-9
+          sudo update-alternatives --config gcc
+          sudo apt-get install ninja-build fontconfig libfontconfig1-dev libglu1-mesa-dev libxrandr-dev libdbus-1-dev zip xvfb -y
+          sudo Xvfb :0 -screen 0 1280x720x24 &
+
       - name: 'Build Dokka documentation'
         run: bash -c 'JAVA_OPTS="-Xmx4g" ./gradlew --no-daemon -Pskiko.native.enabled=true -Pskiko.wasm.enabled=true -Pskiko.android.enabled=true :skiko:dokkaHtml'
 
