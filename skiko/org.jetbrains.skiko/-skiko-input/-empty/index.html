@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html class="no-js">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>Empty</title>
     <link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg">
     <script>var pathToRoot = "../../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
     <script>const storage = localStorage.getItem("dokka-dark-mode")
     if (storage == null) {
         const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
@@ -18,12 +19,13 @@
         }
     }
     </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async="async"></script>
 <script type="text/javascript" src="../../../../scripts/sourceset_dependencies.js" async="async"></script>
 <link href="../../../../styles/style.css" rel="Stylesheet">
-<link href="../../../../styles/jetbrains-mono.css" rel="Stylesheet">
 <link href="../../../../styles/main.css" rel="Stylesheet">
 <link href="../../../../styles/prism.css" rel="Stylesheet">
 <link href="../../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
 <script type="text/javascript" src="../../../../scripts/clipboard.js" async="async"></script>
 <script type="text/javascript" src="../../../../scripts/navigation-loader.js" async="async"></script>
 <script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async="async"></script>
@@ -32,261 +34,268 @@
 <script type="text/javascript" src="../../../../scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
 </head>
 <body>
-<div class="navigation-wrapper" id="navigation-wrapper">
-    <div id="leftToggler"><span class="icon-toggler"></span></div>
-    <div class="library-name">
-            <a href="../../../../index.html">
-                    <span>skiko</span>
-            </a>
-    </div>
-    <div>
-0.0.0-SNAPSHOT    </div>
-    <div class="pull-right d-flex">
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+                    <a class="library-name--link" href="../../../../index.html">
+                            skiko
+                    </a>
+            </div>
+            <div class="library-version">
+0.0.0-SNAPSHOT            </div>
+        </div>
         <div class="filter-section" id="filter-section">
                 <button class="platform-tag platform-selector common-like" data-active="" data-filter=":dokkaHtml/commonMain">common</button>
                 <button class="platform-tag platform-selector common-like" data-active="" data-filter=":dokkaHtml/iosMain">ios</button>
-                <button class="platform-tag platform-selector js-like" data-active="" data-filter=":dokkaHtml/jsMain">js</button>
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":dokkaHtml/jsWasmMain">jsWasm</button>
                 <button class="platform-tag platform-selector native-like" data-active="" data-filter=":dokkaHtml/linuxMain">linux</button>
                 <button class="platform-tag platform-selector common-like" data-active="" data-filter=":dokkaHtml/macosMain">macos</button>
         </div>
-        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
-        <div id="searchBar"></div>
     </div>
-</div>
-<div id="container">
-    <div id="leftColumn">
-        <div id="sideMenu"></div>
+    <div class="navigation-controls">
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
     </div>
-    <div id="main">
-<div class="main-content" id="content" pageIds="skiko::org.jetbrains.skiko/SkikoInput.Empty///PointingToDeclaration//246964478">
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageIds="skiko::org.jetbrains.skiko/SkikoInput.Empty///PointingToDeclaration//1758118044">
   <div class="breadcrumbs"><a href="../../../../index.html">skiko</a><span class="delimiter">/</span><a href="../../index.html">org.jetbrains.skiko</a><span class="delimiter">/</span><a href="../index.html">SkikoInput</a><span class="delimiter">/</span><span class="current">Empty</span></div>
   <div class="cover ">
     <h1 class="cover"><span><span>Empty</span></span></h1>
     <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-      <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain" data-active="" data-toggle=":dokkaHtml/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-toggle=":dokkaHtml/iosMain">ios</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jsMain" data-filterable-set=":dokkaHtml/jsMain" data-toggle=":dokkaHtml/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/linuxMain" data-filterable-set=":dokkaHtml/linuxMain" data-toggle=":dokkaHtml/linuxMain">linux</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/macosMain" data-filterable-set=":dokkaHtml/macosMain" data-toggle=":dokkaHtml/macosMain">macos</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">object </span><a href="index.html">Empty</a> : <a href="../index.html">SkikoInput</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">object </span><a href="index.html">Empty</a> : <a href="../index.html">SkikoInput</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">object </span><a href="index.html">Empty</a> : <a href="../index.html">SkikoInput</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/linuxMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">object </span><a href="index.html">Empty</a> : <a href="../index.html">SkikoInput</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/macosMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">object </span><a href="index.html">Empty</a> : <a href="../index.html">SkikoInput</a></div></div>    </div>
+      <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain" data-active="" data-toggle=":dokkaHtml/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-toggle=":dokkaHtml/iosMain">ios</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jsWasmMain" data-filterable-set=":dokkaHtml/jsWasmMain" data-toggle=":dokkaHtml/jsWasmMain">jsWasm</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/linuxMain" data-filterable-set=":dokkaHtml/linuxMain" data-toggle=":dokkaHtml/linuxMain">linux</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/macosMain" data-filterable-set=":dokkaHtml/macosMain" data-toggle=":dokkaHtml/macosMain">macos</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">object </span><a href="index.html">Empty</a> : <a href="../index.html">SkikoInput</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">object </span><a href="index.html">Empty</a> : <a href="../index.html">SkikoInput</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jsWasmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">object </span><a href="index.html">Empty</a> : <a href="../index.html">SkikoInput</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/linuxMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">object </span><a href="index.html">Empty</a> : <a href="../index.html">SkikoInput</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/macosMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">object </span><a href="index.html">Empty</a> : <a href="../index.html">SkikoInput</a></div></div>    </div>
   </div>
   <div class="tabbedcontent">
-    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Functions">Functions</button></div>
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
     <div class="tabs-section-body">
-      <h2 class="">Functions</h2>
-      <div class="table" data-togglable="Functions"><a data-name="1822511536%2FFunctions%2F1882441730" anchor-label="deleteBackward" id="1822511536%2FFunctions%2F1882441730" data-filterable-set=":dokkaHtml/iosMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="delete-backward.html"><span>delete</span><wbr></wbr><span><span>Backward</span></span></a></div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="1822511536%2FFunctions%2F1882441730" anchor-label="deleteBackward" id="1822511536%2FFunctions%2F1882441730" data-filterable-set=":dokkaHtml/iosMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="delete-backward.html"><span>delete</span><wbr></wbr><span><span>Backward</span></span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1822511536%2FFunctions%2F1882441730"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-active="" data-toggle=":dokkaHtml/iosMain">ios</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="delete-backward.html"><span class="token function">deleteBackward</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Deletes a character from the displayed text. Remove the character just before the cursor from your class’s backing store and redisplay the text. https://developer.apple.com/documentation/uikit/uikeyinput/1614572-deletebackward</p></div></div>                </div>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-active="" data-toggle=":dokkaHtml/iosMain">ios</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="delete-backward.html"><span class="token function">deleteBackward</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Deletes a character from the displayed text. Remove the character just before the cursor from your class’s backing store and redisplay the text. https://developer.apple.com/documentation/uikit/uikeyinput/1614572-deletebackward</p></div></div>                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 <a data-name="1482313743%2FFunctions%2F1882441730" anchor-label="endOfDocument" id="1482313743%2FFunctions%2F1882441730" data-filterable-set=":dokkaHtml/iosMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="end-of-document.html"><span>end</span><wbr></wbr><span>Of</span><wbr></wbr><span><span>Document</span></span></a></div>
+          <div class="table-row" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="end-of-document.html"><span>end</span><wbr></wbr><span>Of</span><wbr></wbr><span><span>Document</span></span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1482313743%2FFunctions%2F1882441730"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-active="" data-toggle=":dokkaHtml/iosMain">ios</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="end-of-document.html"><span class="token function">endOfDocument</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></div><div class="brief "><p class="paragraph">The text position for the end of a document. https://developer.apple.com/documentation/uikit/uitextinput/1614555-endofdocument</p></div></div>                </div>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-active="" data-toggle=":dokkaHtml/iosMain">ios</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="end-of-document.html"><span class="token function">endOfDocument</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></div><div class="brief "><p class="paragraph">The text position for the end of a document. https://developer.apple.com/documentation/uikit/uitextinput/1614555-endofdocument</p></div></div>                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 <a data-name="-914431553%2FFunctions%2F1882441730" anchor-label="getSelectedTextRange" id="-914431553%2FFunctions%2F1882441730" data-filterable-set=":dokkaHtml/iosMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="get-selected-text-range.html"><span>get</span><wbr></wbr><span>Selected</span><wbr></wbr><span>Text</span><wbr></wbr><span><span>Range</span></span></a></div>
+          <div class="table-row" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-selected-text-range.html"><span>get</span><wbr></wbr><span>Selected</span><wbr></wbr><span>Text</span><wbr></wbr><span><span>Range</span></span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-914431553%2FFunctions%2F1882441730"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-active="" data-toggle=":dokkaHtml/iosMain">ios</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="get-selected-text-range.html"><span class="token function">getSelectedTextRange</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.ranges/-int-range/index.html">IntRange</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The range of selected text in a document. If the text range has a length, it indicates the currently selected text. If it has zero length, it indicates the caret (insertion point). If the text-range object is nil, it indicates that there is no current selection. https://developer.apple.com/documentation/uikit/uitextinput/1614541-selectedtextrange</p></div></div>                </div>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-active="" data-toggle=":dokkaHtml/iosMain">ios</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="get-selected-text-range.html"><span class="token function">getSelectedTextRange</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.ranges/-int-range/index.html">IntRange</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The range of selected text in a document. If the text range has a length, it indicates the currently selected text. If it has zero length, it indicates the caret (insertion point). If the text-range object is nil, it indicates that there is no current selection. https://developer.apple.com/documentation/uikit/uitextinput/1614541-selectedtextrange</p></div></div>                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 <a data-name="865859829%2FFunctions%2F1882441730" anchor-label="hasText" id="865859829%2FFunctions%2F1882441730" data-filterable-set=":dokkaHtml/iosMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="has-text.html"><span>has</span><wbr></wbr><span><span>Text</span></span></a></div>
+          <div class="table-row" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="has-text.html"><span>has</span><wbr></wbr><span><span>Text</span></span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="865859829%2FFunctions%2F1882441730"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-active="" data-toggle=":dokkaHtml/iosMain">ios</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="has-text.html"><span class="token function">hasText</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">A Boolean value that indicates whether the text-entry object has any text. https://developer.apple.com/documentation/uikit/uikeyinput/1614457-hastext</p></div></div>                </div>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-active="" data-toggle=":dokkaHtml/iosMain">ios</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="has-text.html"><span class="token function">hasText</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">A Boolean value that indicates whether the text-entry object has any text. https://developer.apple.com/documentation/uikit/uikeyinput/1614457-hastext</p></div></div>                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 <a data-name="940601260%2FFunctions%2F1882441730" anchor-label="insertText" id="940601260%2FFunctions%2F1882441730" data-filterable-set=":dokkaHtml/iosMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="insert-text.html"><span>insert</span><wbr></wbr><span><span>Text</span></span></a></div>
+          <div class="table-row" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="insert-text.html"><span>insert</span><wbr></wbr><span><span>Text</span></span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="940601260%2FFunctions%2F1882441730"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-active="" data-toggle=":dokkaHtml/iosMain">ios</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="insert-text.html"><span class="token function">insertText</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">text<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Inserts a character into the displayed text. Add the character text to your class’s backing store at the index corresponding to the cursor and redisplay the text. https://developer.apple.com/documentation/uikit/uikeyinput/1614543-inserttext</p></div></div>                </div>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-active="" data-toggle=":dokkaHtml/iosMain">ios</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="insert-text.html"><span class="token function">insertText</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">text<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Inserts a character into the displayed text. Add the character text to your class’s backing store at the index corresponding to the cursor and redisplay the text. https://developer.apple.com/documentation/uikit/uikeyinput/1614543-inserttext</p></div></div>                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 <a data-name="-640289224%2FFunctions%2F1882441730" anchor-label="markedTextRange" id="-640289224%2FFunctions%2F1882441730" data-filterable-set=":dokkaHtml/iosMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="marked-text-range.html"><span>marked</span><wbr></wbr><span>Text</span><wbr></wbr><span><span>Range</span></span></a></div>
+          <div class="table-row" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="marked-text-range.html"><span>marked</span><wbr></wbr><span>Text</span><wbr></wbr><span><span>Range</span></span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-640289224%2FFunctions%2F1882441730"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-active="" data-toggle=":dokkaHtml/iosMain">ios</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="marked-text-range.html"><span class="token function">markedTextRange</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.ranges/-int-range/index.html">IntRange</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The range of currently marked text in a document. If there is no marked text, the value of the property is nil. Marked text is provisionally inserted text that requires user confirmation; it occurs in multistage text input. The current selection, which can be a caret or an extended range, always occurs within the marked text. https://developer.apple.com/documentation/uikit/uitextinput/1614489-markedtextrange</p></div></div>                </div>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-active="" data-toggle=":dokkaHtml/iosMain">ios</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="marked-text-range.html"><span class="token function">markedTextRange</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.ranges/-int-range/index.html">IntRange</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The range of currently marked text in a document. If there is no marked text, the value of the property is nil. Marked text is provisionally inserted text that requires user confirmation; it occurs in multistage text input. The current selection, which can be a caret or an extended range, always occurs within the marked text. https://developer.apple.com/documentation/uikit/uitextinput/1614489-markedtextrange</p></div></div>                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-<a data-name="-306699191%2FFunctions%2F371682492" anchor-label="onInputEvent" id="-306699191%2FFunctions%2F371682492" data-filterable-set=":dokkaHtml/jsMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/jsMain" data-filterable-set=":dokkaHtml/jsMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="on-input-event.html"><span>on</span><wbr></wbr><span>Input</span><wbr></wbr><span><span>Event</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-306699191%2FFunctions%2F371682492"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jsMain" data-filterable-set=":dokkaHtml/jsMain" data-active="" data-toggle=":dokkaHtml/jsMain">js</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/jsMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="on-input-event.html"><span class="token function">onInputEvent</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">event<span class="token operator">: </span><span data-unresolved-link="org.jetbrains.skiko/SkikoInputEvent///PointingToDeclaration/">SkikoInputEvent</span></span></span><span class="token punctuation">)</span></div></div>                </div>
+<a data-name="-306699191%2FFunctions%2F-537942310" anchor-label="onInputEvent" id="-306699191%2FFunctions%2F-537942310" data-filterable-set=":dokkaHtml/jsWasmMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/jsWasmMain" data-filterable-set=":dokkaHtml/jsWasmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="on-input-event.html"><span>on</span><wbr></wbr><span>Input</span><wbr></wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-306699191%2FFunctions%2F-537942310"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jsWasmMain" data-filterable-set=":dokkaHtml/jsWasmMain" data-active="" data-toggle=":dokkaHtml/jsWasmMain">jsWasm</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/jsWasmMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="on-input-event.html"><span class="token function">onInputEvent</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">event<span class="token operator">: </span><span data-unresolved-link="org.jetbrains.skiko/SkikoInputEvent///PointingToDeclaration/">SkikoInputEvent</span></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 <a data-name="-1693387007%2FFunctions%2F1882441730" anchor-label="replaceRange" id="-1693387007%2FFunctions%2F1882441730" data-filterable-set=":dokkaHtml/iosMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="replace-range.html"><span>replace</span><wbr></wbr><span><span>Range</span></span></a></div>
+          <div class="table-row" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="replace-range.html"><span>replace</span><wbr></wbr><span><span>Range</span></span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1693387007%2FFunctions%2F1882441730"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-active="" data-toggle=":dokkaHtml/iosMain">ios</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="replace-range.html"><span class="token function">replaceRange</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">range<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.ranges/-int-range/index.html">IntRange</a><span class="token punctuation">, </span></span><span class="parameter ">text<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Replaces the text in a document that is in the specified range. https://developer.apple.com/documentation/uikit/uitextinput/1614558-replace</p></div></div>                </div>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-active="" data-toggle=":dokkaHtml/iosMain">ios</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="replace-range.html"><span class="token function">replaceRange</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">range<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.ranges/-int-range/index.html">IntRange</a><span class="token punctuation">, </span></span><span class="parameter ">text<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Replaces the text in a document that is in the specified range. https://developer.apple.com/documentation/uikit/uitextinput/1614558-replace</p></div></div>                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 <a data-name="1801467607%2FFunctions%2F1882441730" anchor-label="selectAll" id="1801467607%2FFunctions%2F1882441730" data-filterable-set=":dokkaHtml/iosMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="select-all.html"><span>select</span><wbr></wbr><span><span>All</span></span></a></div>
+          <div class="table-row" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="select-all.html"><span>select</span><wbr></wbr><span><span>All</span></span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1801467607%2FFunctions%2F1882441730"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-active="" data-toggle=":dokkaHtml/iosMain">ios</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="select-all.html"><span class="token function">selectAll</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div>                </div>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-active="" data-toggle=":dokkaHtml/iosMain">ios</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="select-all.html"><span class="token function">selectAll</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 <a data-name="1020821958%2FFunctions%2F1882441730" anchor-label="setMarkedText" id="1020821958%2FFunctions%2F1882441730" data-filterable-set=":dokkaHtml/iosMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="set-marked-text.html"><span>set</span><wbr></wbr><span>Marked</span><wbr></wbr><span><span>Text</span></span></a></div>
+          <div class="table-row" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-marked-text.html"><span>set</span><wbr></wbr><span>Marked</span><wbr></wbr><span><span>Text</span></span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1020821958%2FFunctions%2F1882441730"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-active="" data-toggle=":dokkaHtml/iosMain">ios</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="set-marked-text.html"><span class="token function">setMarkedText</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">markedText<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">selectedRange<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.ranges/-int-range/index.html">IntRange</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Inserts the provided text and marks it to indicate that it is part of an active input session. Setting marked text either replaces the existing marked text or, if none is present, inserts it in place of the current selection. https://developer.apple.com/documentation/uikit/uitextinput/1614465-setmarkedtext</p></div></div>                </div>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-active="" data-toggle=":dokkaHtml/iosMain">ios</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="set-marked-text.html"><span class="token function">setMarkedText</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">markedText<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">selectedRange<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.ranges/-int-range/index.html">IntRange</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Inserts the provided text and marks it to indicate that it is part of an active input session. Setting marked text either replaces the existing marked text or, if none is present, inserts it in place of the current selection. https://developer.apple.com/documentation/uikit/uitextinput/1614465-setmarkedtext</p></div></div>                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 <a data-name="207694033%2FFunctions%2F1882441730" anchor-label="setSelectedTextRange" id="207694033%2FFunctions%2F1882441730" data-filterable-set=":dokkaHtml/iosMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="set-selected-text-range.html"><span>set</span><wbr></wbr><span>Selected</span><wbr></wbr><span>Text</span><wbr></wbr><span><span>Range</span></span></a></div>
+          <div class="table-row" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-selected-text-range.html"><span>set</span><wbr></wbr><span>Selected</span><wbr></wbr><span>Text</span><wbr></wbr><span><span>Range</span></span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="207694033%2FFunctions%2F1882441730"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-active="" data-toggle=":dokkaHtml/iosMain">ios</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="set-selected-text-range.html"><span class="token function">setSelectedTextRange</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">range<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.ranges/-int-range/index.html">IntRange</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span></div></div>                </div>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-active="" data-toggle=":dokkaHtml/iosMain">ios</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="set-selected-text-range.html"><span class="token function">setSelectedTextRange</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">range<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.ranges/-int-range/index.html">IntRange</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 <a data-name="1040034744%2FFunctions%2F1882441730" anchor-label="textInRange" id="1040034744%2FFunctions%2F1882441730" data-filterable-set=":dokkaHtml/iosMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="text-in-range.html"><span>text</span><wbr></wbr><span>In</span><wbr></wbr><span><span>Range</span></span></a></div>
+          <div class="table-row" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="text-in-range.html"><span>text</span><wbr></wbr><span>In</span><wbr></wbr><span><span>Range</span></span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1040034744%2FFunctions%2F1882441730"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-active="" data-toggle=":dokkaHtml/iosMain">ios</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="text-in-range.html"><span class="token function">textInRange</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">range<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.ranges/-int-range/index.html">IntRange</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div><div class="brief "><p class="paragraph">Returns the text in the specified range. https://developer.apple.com/documentation/uikit/uitextinput/1614527-text</p></div></div>                </div>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-active="" data-toggle=":dokkaHtml/iosMain">ios</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="text-in-range.html"><span class="token function">textInRange</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">range<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.ranges/-int-range/index.html">IntRange</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div><div class="brief "><p class="paragraph">Returns the text in the specified range. https://developer.apple.com/documentation/uikit/uitextinput/1614527-text</p></div></div>                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 <a data-name="257326411%2FFunctions%2F1882441730" anchor-label="unmarkText" id="257326411%2FFunctions%2F1882441730" data-filterable-set=":dokkaHtml/iosMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="unmark-text.html"><span>unmark</span><wbr></wbr><span><span>Text</span></span></a></div>
+          <div class="table-row" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="unmark-text.html"><span>unmark</span><wbr></wbr><span><span>Text</span></span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="257326411%2FFunctions%2F1882441730"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-active="" data-toggle=":dokkaHtml/iosMain">ios</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="unmark-text.html"><span class="token function">unmarkText</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Unmarks the currently marked text. After this method is called, the value of markedTextRange is nil. https://developer.apple.com/documentation/uikit/uitextinput/1614512-unmarktext</p></div></div>                </div>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-active="" data-toggle=":dokkaHtml/iosMain">ios</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="unmark-text.html"><span class="token function">unmarkText</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Unmarks the currently marked text. After this method is called, the value of markedTextRange is nil. https://developer.apple.com/documentation/uikit/uitextinput/1614512-unmarktext</p></div></div>                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -300,7 +309,8 @@
                 class="pull-right"><span>Generated by </span><a
                 href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
       </div>
+            </div>
+        </div>
     </div>
-</div>
 </body>
 </html>

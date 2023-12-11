@@ -27,6 +27,18 @@ $dokka.location:org.jetbrains.skia.icu/CharDirection/SEGMENT_SEPARATOR/#/Pointin
 $dokka.location:org.jetbrains.skia.icu/CharDirection/WHITE_SPACE_NEUTRAL/#/PointingToDeclaration/skiko/org.jetbrains.skia.icu/-char-direction/-w-h-i-t-e_-s-p-a-c-e_-n-e-u-t-r-a-l.html
 $dokka.location:org.jetbrains.skia.icu/CharDirection/of/#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia.icu/-char-direction/of.html
 $dokka.location:org.jetbrains.skia.impl////PointingToDeclaration/skiko/org.jetbrains.skia.impl/index.html
+$dokka.location:org.jetbrains.skia.impl//skia_memGetByte/#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia.impl/skia_mem-get-byte.html
+$dokka.location:org.jetbrains.skia.impl//skia_memGetChar/#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia.impl/skia_mem-get-char.html
+$dokka.location:org.jetbrains.skia.impl//skia_memGetDouble/#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia.impl/skia_mem-get-double.html
+$dokka.location:org.jetbrains.skia.impl//skia_memGetFloat/#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia.impl/skia_mem-get-float.html
+$dokka.location:org.jetbrains.skia.impl//skia_memGetInt/#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia.impl/skia_mem-get-int.html
+$dokka.location:org.jetbrains.skia.impl//skia_memGetShort/#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia.impl/skia_mem-get-short.html
+$dokka.location:org.jetbrains.skia.impl//skia_memSetByte/#kotlin.Int#kotlin.Byte/PointingToDeclaration/skiko/org.jetbrains.skia.impl/skia_mem-set-byte.html
+$dokka.location:org.jetbrains.skia.impl//skia_memSetChar/#kotlin.Int#kotlin.Char/PointingToDeclaration/skiko/org.jetbrains.skia.impl/skia_mem-set-char.html
+$dokka.location:org.jetbrains.skia.impl//skia_memSetDouble/#kotlin.Int#kotlin.Double/PointingToDeclaration/skiko/org.jetbrains.skia.impl/skia_mem-set-double.html
+$dokka.location:org.jetbrains.skia.impl//skia_memSetFloat/#kotlin.Int#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skia.impl/skia_mem-set-float.html
+$dokka.location:org.jetbrains.skia.impl//skia_memSetInt/#kotlin.Int#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia.impl/skia_mem-set-int.html
+$dokka.location:org.jetbrains.skia.impl//skia_memSetShort/#kotlin.Int#kotlin.Short/PointingToDeclaration/skiko/org.jetbrains.skia.impl/skia_mem-set-short.html
 $dokka.location:org.jetbrains.skia.impl//use/TypeParam(bounds=[org.jetbrains.skia.impl.Managed])#kotlin.Function1[TypeParam(bounds=[org.jetbrains.skia.impl.Managed]),TypeParam(bounds=[kotlin.Any?])]/PointingToDeclaration/skiko/org.jetbrains.skia.impl/use.html
 $dokka.location:org.jetbrains.skia.impl/BufferUtil///PointingToDeclaration/skiko/org.jetbrains.skia.impl/-buffer-util/index.html
 $dokka.location:org.jetbrains.skia.impl/BufferUtil/getByteBufferFromPointer/#kotlin.Long#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia.impl/-buffer-util/get-byte-buffer-from-pointer.html
@@ -82,6 +94,7 @@ $dokka.location:org.jetbrains.skia.paragraph////PointingToDeclaration/skiko/org
 $dokka.location:org.jetbrains.skia.paragraph/Affinity.DOWNSTREAM///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.paragraph/-affinity/-d-o-w-n-s-t-r-e-a-m/index.html
 $dokka.location:org.jetbrains.skia.paragraph/Affinity.UPSTREAM///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.paragraph/-affinity/-u-p-s-t-r-e-a-m/index.html
 $dokka.location:org.jetbrains.skia.paragraph/Affinity///PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-affinity/index.html
+$dokka.location:org.jetbrains.skia.paragraph/Affinity/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-affinity/entries.html
 $dokka.location:org.jetbrains.skia.paragraph/Affinity/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-affinity/value-of.html
 $dokka.location:org.jetbrains.skia.paragraph/Affinity/values/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-affinity/values.html
 $dokka.location:org.jetbrains.skia.paragraph/Alignment.CENTER///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.paragraph/-alignment/-c-e-n-t-e-r/index.html
@@ -91,11 +104,13 @@ $dokka.location:org.jetbrains.skia.paragraph/Alignment.LEFT///PointingToDeclarat
 $dokka.location:org.jetbrains.skia.paragraph/Alignment.RIGHT///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.paragraph/-alignment/-r-i-g-h-t/index.html
 $dokka.location:org.jetbrains.skia.paragraph/Alignment.START///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.paragraph/-alignment/-s-t-a-r-t/index.html
 $dokka.location:org.jetbrains.skia.paragraph/Alignment///PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-alignment/index.html
+$dokka.location:org.jetbrains.skia.paragraph/Alignment/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-alignment/entries.html
 $dokka.location:org.jetbrains.skia.paragraph/Alignment/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-alignment/value-of.html
 $dokka.location:org.jetbrains.skia.paragraph/Alignment/values/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-alignment/values.html
 $dokka.location:org.jetbrains.skia.paragraph/BaselineMode.ALPHABETIC///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.paragraph/-baseline-mode/-a-l-p-h-a-b-e-t-i-c/index.html
 $dokka.location:org.jetbrains.skia.paragraph/BaselineMode.IDEOGRAPHIC///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.paragraph/-baseline-mode/-i-d-e-o-g-r-a-p-h-i-c/index.html
 $dokka.location:org.jetbrains.skia.paragraph/BaselineMode///PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-baseline-mode/index.html
+$dokka.location:org.jetbrains.skia.paragraph/BaselineMode/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-baseline-mode/entries.html
 $dokka.location:org.jetbrains.skia.paragraph/BaselineMode/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-baseline-mode/value-of.html
 $dokka.location:org.jetbrains.skia.paragraph/BaselineMode/values/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-baseline-mode/values.html
 $dokka.location:org.jetbrains.skia.paragraph/DecorationLineStyle.DASHED///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.paragraph/-decoration-line-style/-d-a-s-h-e-d/index.html
@@ -104,6 +119,7 @@ $dokka.location:org.jetbrains.skia.paragraph/DecorationLineStyle.DOUBLE///Pointi
 $dokka.location:org.jetbrains.skia.paragraph/DecorationLineStyle.SOLID///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.paragraph/-decoration-line-style/-s-o-l-i-d/index.html
 $dokka.location:org.jetbrains.skia.paragraph/DecorationLineStyle.WAVY///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.paragraph/-decoration-line-style/-w-a-v-y/index.html
 $dokka.location:org.jetbrains.skia.paragraph/DecorationLineStyle///PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-decoration-line-style/index.html
+$dokka.location:org.jetbrains.skia.paragraph/DecorationLineStyle/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-decoration-line-style/entries.html
 $dokka.location:org.jetbrains.skia.paragraph/DecorationLineStyle/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-decoration-line-style/value-of.html
 $dokka.location:org.jetbrains.skia.paragraph/DecorationLineStyle/values/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-decoration-line-style/values.html
 $dokka.location:org.jetbrains.skia.paragraph/DecorationStyle.Companion///PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-decoration-style/-companion/index.html
@@ -135,6 +151,7 @@ $dokka.location:org.jetbrains.skia.paragraph/DecorationStyle/withUnderline/#kotl
 $dokka.location:org.jetbrains.skia.paragraph/Direction.LTR///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.paragraph/-direction/-l-t-r/index.html
 $dokka.location:org.jetbrains.skia.paragraph/Direction.RTL///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.paragraph/-direction/-r-t-l/index.html
 $dokka.location:org.jetbrains.skia.paragraph/Direction///PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-direction/index.html
+$dokka.location:org.jetbrains.skia.paragraph/Direction/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-direction/entries.html
 $dokka.location:org.jetbrains.skia.paragraph/Direction/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-direction/value-of.html
 $dokka.location:org.jetbrains.skia.paragraph/Direction/values/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-direction/values.html
 $dokka.location:org.jetbrains.skia.paragraph/FontCollection.Companion///PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-font-collection/-companion/index.html
@@ -162,6 +179,7 @@ $dokka.location:org.jetbrains.skia.paragraph/HeightMode.DISABLE_ALL///PointingTo
 $dokka.location:org.jetbrains.skia.paragraph/HeightMode.DISABLE_FIRST_ASCENT///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.paragraph/-height-mode/-d-i-s-a-b-l-e_-f-i-r-s-t_-a-s-c-e-n-t/index.html
 $dokka.location:org.jetbrains.skia.paragraph/HeightMode.DISABLE_LAST_DESCENT///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.paragraph/-height-mode/-d-i-s-a-b-l-e_-l-a-s-t_-d-e-s-c-e-n-t/index.html
 $dokka.location:org.jetbrains.skia.paragraph/HeightMode///PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-height-mode/index.html
+$dokka.location:org.jetbrains.skia.paragraph/HeightMode/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-height-mode/entries.html
 $dokka.location:org.jetbrains.skia.paragraph/HeightMode/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-height-mode/value-of.html
 $dokka.location:org.jetbrains.skia.paragraph/HeightMode/values/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-height-mode/values.html
 $dokka.location:org.jetbrains.skia.paragraph/LineMetrics///PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-line-metrics/index.html
@@ -250,6 +268,7 @@ $dokka.location:org.jetbrains.skia.paragraph/PlaceholderAlignment.BOTTOM///Point
 $dokka.location:org.jetbrains.skia.paragraph/PlaceholderAlignment.MIDDLE///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.paragraph/-placeholder-alignment/-m-i-d-d-l-e/index.html
 $dokka.location:org.jetbrains.skia.paragraph/PlaceholderAlignment.TOP///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.paragraph/-placeholder-alignment/-t-o-p/index.html
 $dokka.location:org.jetbrains.skia.paragraph/PlaceholderAlignment///PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-placeholder-alignment/index.html
+$dokka.location:org.jetbrains.skia.paragraph/PlaceholderAlignment/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-placeholder-alignment/entries.html
 $dokka.location:org.jetbrains.skia.paragraph/PlaceholderAlignment/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-placeholder-alignment/value-of.html
 $dokka.location:org.jetbrains.skia.paragraph/PlaceholderAlignment/values/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-placeholder-alignment/values.html
 $dokka.location:org.jetbrains.skia.paragraph/PlaceholderStyle///PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-placeholder-style/index.html
@@ -279,11 +298,13 @@ $dokka.location:org.jetbrains.skia.paragraph/RectHeightMode.MAX///PointingToDecl
 $dokka.location:org.jetbrains.skia.paragraph/RectHeightMode.STRUT///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.paragraph/-rect-height-mode/-s-t-r-u-t/index.html
 $dokka.location:org.jetbrains.skia.paragraph/RectHeightMode.TIGHT///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.paragraph/-rect-height-mode/-t-i-g-h-t/index.html
 $dokka.location:org.jetbrains.skia.paragraph/RectHeightMode///PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-rect-height-mode/index.html
+$dokka.location:org.jetbrains.skia.paragraph/RectHeightMode/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-rect-height-mode/entries.html
 $dokka.location:org.jetbrains.skia.paragraph/RectHeightMode/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-rect-height-mode/value-of.html
 $dokka.location:org.jetbrains.skia.paragraph/RectHeightMode/values/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-rect-height-mode/values.html
 $dokka.location:org.jetbrains.skia.paragraph/RectWidthMode.MAX///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.paragraph/-rect-width-mode/-m-a-x/index.html
 $dokka.location:org.jetbrains.skia.paragraph/RectWidthMode.TIGHT///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.paragraph/-rect-width-mode/-t-i-g-h-t/index.html
 $dokka.location:org.jetbrains.skia.paragraph/RectWidthMode///PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-rect-width-mode/index.html
+$dokka.location:org.jetbrains.skia.paragraph/RectWidthMode/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-rect-width-mode/entries.html
 $dokka.location:org.jetbrains.skia.paragraph/RectWidthMode/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-rect-width-mode/value-of.html
 $dokka.location:org.jetbrains.skia.paragraph/RectWidthMode/values/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-rect-width-mode/values.html
 $dokka.location:org.jetbrains.skia.paragraph/Shadow.Companion///PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-shadow/-companion/index.html
@@ -397,6 +418,7 @@ $dokka.location:org.jetbrains.skia.paragraph/TextStyleAttribute.NONE///PointingT
 $dokka.location:org.jetbrains.skia.paragraph/TextStyleAttribute.SHADOW///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.paragraph/-text-style-attribute/-s-h-a-d-o-w/index.html
 $dokka.location:org.jetbrains.skia.paragraph/TextStyleAttribute.WORD_SPACING///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.paragraph/-text-style-attribute/-w-o-r-d_-s-p-a-c-i-n-g/index.html
 $dokka.location:org.jetbrains.skia.paragraph/TextStyleAttribute///PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-style-attribute/index.html
+$dokka.location:org.jetbrains.skia.paragraph/TextStyleAttribute/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-style-attribute/entries.html
 $dokka.location:org.jetbrains.skia.paragraph/TextStyleAttribute/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-style-attribute/value-of.html
 $dokka.location:org.jetbrains.skia.paragraph/TextStyleAttribute/values/#/PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-text-style-attribute/values.html
 $dokka.location:org.jetbrains.skia.paragraph/TypefaceFontProvider.Companion///PointingToDeclaration/skiko/org.jetbrains.skia.paragraph/-typeface-font-provider/-companion/index.html
@@ -599,11 +621,13 @@ $dokka.location:org.jetbrains.skia.skottie/AnimationBuilderFlag.DEFER_IMAGE_LOAD
 $dokka.location:org.jetbrains.skia.skottie/AnimationBuilderFlag.PREFER_EMBEDDED_FONTS///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.skottie/-animation-builder-flag/-p-r-e-f-e-r_-e-m-b-e-d-d-e-d_-f-o-n-t-s/index.html
 $dokka.location:org.jetbrains.skia.skottie/AnimationBuilderFlag///PointingToDeclaration/skiko/org.jetbrains.skia.skottie/-animation-builder-flag/index.html
 $dokka.location:org.jetbrains.skia.skottie/AnimationBuilderFlag/_flag/#/PointingToDeclaration/skiko/org.jetbrains.skia.skottie/-animation-builder-flag/_flag.html
+$dokka.location:org.jetbrains.skia.skottie/AnimationBuilderFlag/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia.skottie/-animation-builder-flag/entries.html
 $dokka.location:org.jetbrains.skia.skottie/AnimationBuilderFlag/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia.skottie/-animation-builder-flag/value-of.html
 $dokka.location:org.jetbrains.skia.skottie/AnimationBuilderFlag/values/#/PointingToDeclaration/skiko/org.jetbrains.skia.skottie/-animation-builder-flag/values.html
 $dokka.location:org.jetbrains.skia.skottie/LogLevel.ERROR///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.skottie/-log-level/-e-r-r-o-r/index.html
 $dokka.location:org.jetbrains.skia.skottie/LogLevel.WARNING///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.skottie/-log-level/-w-a-r-n-i-n-g/index.html
 $dokka.location:org.jetbrains.skia.skottie/LogLevel///PointingToDeclaration/skiko/org.jetbrains.skia.skottie/-log-level/index.html
+$dokka.location:org.jetbrains.skia.skottie/LogLevel/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia.skottie/-log-level/entries.html
 $dokka.location:org.jetbrains.skia.skottie/LogLevel/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia.skottie/-log-level/value-of.html
 $dokka.location:org.jetbrains.skia.skottie/LogLevel/values/#/PointingToDeclaration/skiko/org.jetbrains.skia.skottie/-log-level/values.html
 $dokka.location:org.jetbrains.skia.skottie/Logger.Companion///PointingToDeclaration/skiko/org.jetbrains.skia.skottie/-logger/-companion/index.html
@@ -614,6 +638,7 @@ $dokka.location:org.jetbrains.skia.skottie/RenderFlag.DISABLE_TOP_LEVEL_CLIPPING
 $dokka.location:org.jetbrains.skia.skottie/RenderFlag.SKIP_TOP_LEVEL_ISOLATION///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.skottie/-render-flag/-s-k-i-p_-t-o-p_-l-e-v-e-l_-i-s-o-l-a-t-i-o-n/index.html
 $dokka.location:org.jetbrains.skia.skottie/RenderFlag///PointingToDeclaration/skiko/org.jetbrains.skia.skottie/-render-flag/index.html
 $dokka.location:org.jetbrains.skia.skottie/RenderFlag/_flag/#/PointingToDeclaration/skiko/org.jetbrains.skia.skottie/-render-flag/_flag.html
+$dokka.location:org.jetbrains.skia.skottie/RenderFlag/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia.skottie/-render-flag/entries.html
 $dokka.location:org.jetbrains.skia.skottie/RenderFlag/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia.skottie/-render-flag/value-of.html
 $dokka.location:org.jetbrains.skia.skottie/RenderFlag/values/#/PointingToDeclaration/skiko/org.jetbrains.skia.skottie/-render-flag/values.html
 $dokka.location:org.jetbrains.skia.sksg////PointingToDeclaration/skiko/org.jetbrains.skia.sksg/index.html
@@ -666,6 +691,7 @@ $dokka.location:org.jetbrains.skia.svg/SVGLengthType.HORIZONTAL///PointingToDecl
 $dokka.location:org.jetbrains.skia.svg/SVGLengthType.OTHER///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.svg/-s-v-g-length-type/-o-t-h-e-r/index.html
 $dokka.location:org.jetbrains.skia.svg/SVGLengthType.VERTICAL///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.svg/-s-v-g-length-type/-v-e-r-t-i-c-a-l/index.html
 $dokka.location:org.jetbrains.skia.svg/SVGLengthType///PointingToDeclaration/skiko/org.jetbrains.skia.svg/-s-v-g-length-type/index.html
+$dokka.location:org.jetbrains.skia.svg/SVGLengthType/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia.svg/-s-v-g-length-type/entries.html
 $dokka.location:org.jetbrains.skia.svg/SVGLengthType/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia.svg/-s-v-g-length-type/value-of.html
 $dokka.location:org.jetbrains.skia.svg/SVGLengthType/values/#/PointingToDeclaration/skiko/org.jetbrains.skia.svg/-s-v-g-length-type/values.html
 $dokka.location:org.jetbrains.skia.svg/SVGLengthUnit.CM///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.svg/-s-v-g-length-unit/-c-m/index.html
@@ -680,6 +706,7 @@ $dokka.location:org.jetbrains.skia.svg/SVGLengthUnit.PT///PointingToDeclaration/
 $dokka.location:org.jetbrains.skia.svg/SVGLengthUnit.PX///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.svg/-s-v-g-length-unit/-p-x/index.html
 $dokka.location:org.jetbrains.skia.svg/SVGLengthUnit.UNKNOWN///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.svg/-s-v-g-length-unit/-u-n-k-n-o-w-n/index.html
 $dokka.location:org.jetbrains.skia.svg/SVGLengthUnit///PointingToDeclaration/skiko/org.jetbrains.skia.svg/-s-v-g-length-unit/index.html
+$dokka.location:org.jetbrains.skia.svg/SVGLengthUnit/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia.svg/-s-v-g-length-unit/entries.html
 $dokka.location:org.jetbrains.skia.svg/SVGLengthUnit/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia.svg/-s-v-g-length-unit/value-of.html
 $dokka.location:org.jetbrains.skia.svg/SVGLengthUnit/values/#/PointingToDeclaration/skiko/org.jetbrains.skia.svg/-s-v-g-length-unit/values.html
 $dokka.location:org.jetbrains.skia.svg/SVGNode.Companion///PointingToDeclaration/skiko/org.jetbrains.skia.svg/-s-v-g-node/-companion/index.html
@@ -710,11 +737,13 @@ $dokka.location:org.jetbrains.skia.svg/SVGPreserveAspectRatioAlign.XMIN_YMAX///P
 $dokka.location:org.jetbrains.skia.svg/SVGPreserveAspectRatioAlign.XMIN_YMID///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.svg/-s-v-g-preserve-aspect-ratio-align/-x-m-i-n_-y-m-i-d/index.html
 $dokka.location:org.jetbrains.skia.svg/SVGPreserveAspectRatioAlign.XMIN_YMIN///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.svg/-s-v-g-preserve-aspect-ratio-align/-x-m-i-n_-y-m-i-n/index.html
 $dokka.location:org.jetbrains.skia.svg/SVGPreserveAspectRatioAlign///PointingToDeclaration/skiko/org.jetbrains.skia.svg/-s-v-g-preserve-aspect-ratio-align/index.html
+$dokka.location:org.jetbrains.skia.svg/SVGPreserveAspectRatioAlign/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia.svg/-s-v-g-preserve-aspect-ratio-align/entries.html
 $dokka.location:org.jetbrains.skia.svg/SVGPreserveAspectRatioAlign/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia.svg/-s-v-g-preserve-aspect-ratio-align/value-of.html
 $dokka.location:org.jetbrains.skia.svg/SVGPreserveAspectRatioAlign/values/#/PointingToDeclaration/skiko/org.jetbrains.skia.svg/-s-v-g-preserve-aspect-ratio-align/values.html
 $dokka.location:org.jetbrains.skia.svg/SVGPreserveAspectRatioScale.MEET///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.svg/-s-v-g-preserve-aspect-ratio-scale/-m-e-e-t/index.html
 $dokka.location:org.jetbrains.skia.svg/SVGPreserveAspectRatioScale.SLICE///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.svg/-s-v-g-preserve-aspect-ratio-scale/-s-l-i-c-e/index.html
 $dokka.location:org.jetbrains.skia.svg/SVGPreserveAspectRatioScale///PointingToDeclaration/skiko/org.jetbrains.skia.svg/-s-v-g-preserve-aspect-ratio-scale/index.html
+$dokka.location:org.jetbrains.skia.svg/SVGPreserveAspectRatioScale/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia.svg/-s-v-g-preserve-aspect-ratio-scale/entries.html
 $dokka.location:org.jetbrains.skia.svg/SVGPreserveAspectRatioScale/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia.svg/-s-v-g-preserve-aspect-ratio-scale/value-of.html
 $dokka.location:org.jetbrains.skia.svg/SVGPreserveAspectRatioScale/values/#/PointingToDeclaration/skiko/org.jetbrains.skia.svg/-s-v-g-preserve-aspect-ratio-scale/values.html
 $dokka.location:org.jetbrains.skia.svg/SVGSVG.Companion///PointingToDeclaration/skiko/org.jetbrains.skia.svg/-s-v-g-s-v-g/-companion/index.html
@@ -766,6 +795,7 @@ $dokka.location:org.jetbrains.skia.svg/SVGTag.TEXT_LITERAL///PointingToDeclarati
 $dokka.location:org.jetbrains.skia.svg/SVGTag.TSPAN///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.svg/-s-v-g-tag/-t-s-p-a-n/index.html
 $dokka.location:org.jetbrains.skia.svg/SVGTag.USE///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia.svg/-s-v-g-tag/-u-s-e/index.html
 $dokka.location:org.jetbrains.skia.svg/SVGTag///PointingToDeclaration/skiko/org.jetbrains.skia.svg/-s-v-g-tag/index.html
+$dokka.location:org.jetbrains.skia.svg/SVGTag/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia.svg/-s-v-g-tag/entries.html
 $dokka.location:org.jetbrains.skia.svg/SVGTag/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia.svg/-s-v-g-tag/value-of.html
 $dokka.location:org.jetbrains.skia.svg/SVGTag/values/#/PointingToDeclaration/skiko/org.jetbrains.skia.svg/-s-v-g-tag/values.html
 $dokka.location:org.jetbrains.skia.svg/SVGTransformableNode.Companion///PointingToDeclaration/skiko/org.jetbrains.skia.svg/-s-v-g-transformable-node/-companion/index.html
@@ -781,6 +811,7 @@ $dokka.location:org.jetbrains.skia/AnimationDisposalMethod.RESTORE_BG_COLOR///Po
 $dokka.location:org.jetbrains.skia/AnimationDisposalMethod.RESTORE_PREVIOUS///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-animation-disposal-method/-r-e-s-t-o-r-e_-p-r-e-v-i-o-u-s/index.html
 $dokka.location:org.jetbrains.skia/AnimationDisposalMethod.UNUSED///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-animation-disposal-method/-u-n-u-s-e-d/index.html
 $dokka.location:org.jetbrains.skia/AnimationDisposalMethod///PointingToDeclaration/skiko/org.jetbrains.skia/-animation-disposal-method/index.html
+$dokka.location:org.jetbrains.skia/AnimationDisposalMethod/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia/-animation-disposal-method/entries.html
 $dokka.location:org.jetbrains.skia/AnimationDisposalMethod/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-animation-disposal-method/value-of.html
 $dokka.location:org.jetbrains.skia/AnimationDisposalMethod/values/#/PointingToDeclaration/skiko/org.jetbrains.skia/-animation-disposal-method/values.html
 $dokka.location:org.jetbrains.skia/AnimationDisposalMode.KEEP///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-animation-disposal-mode/-k-e-e-p/index.html
@@ -788,6 +819,7 @@ $dokka.location:org.jetbrains.skia/AnimationDisposalMode.RESTORE_BG_COLOR///Poin
 $dokka.location:org.jetbrains.skia/AnimationDisposalMode.RESTORE_PREVIOUS///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-animation-disposal-mode/-r-e-s-t-o-r-e_-p-r-e-v-i-o-u-s/index.html
 $dokka.location:org.jetbrains.skia/AnimationDisposalMode.UNUSED///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-animation-disposal-mode/-u-n-u-s-e-d/index.html
 $dokka.location:org.jetbrains.skia/AnimationDisposalMode///PointingToDeclaration/skiko/org.jetbrains.skia/-animation-disposal-mode/index.html
+$dokka.location:org.jetbrains.skia/AnimationDisposalMode/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia/-animation-disposal-mode/entries.html
 $dokka.location:org.jetbrains.skia/AnimationDisposalMode/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-animation-disposal-mode/value-of.html
 $dokka.location:org.jetbrains.skia/AnimationDisposalMode/values/#/PointingToDeclaration/skiko/org.jetbrains.skia/-animation-disposal-mode/values.html
 $dokka.location:org.jetbrains.skia/AnimationFrameInfo.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-animation-frame-info/-companion/index.html
@@ -898,6 +930,7 @@ $dokka.location:org.jetbrains.skia/BlendMode.SRC_OUT///PointingToDeclaration/{"o
 $dokka.location:org.jetbrains.skia/BlendMode.SRC_OVER///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-blend-mode/-s-r-c_-o-v-e-r/index.html
 $dokka.location:org.jetbrains.skia/BlendMode.XOR///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-blend-mode/-x-o-r/index.html
 $dokka.location:org.jetbrains.skia/BlendMode///PointingToDeclaration/skiko/org.jetbrains.skia/-blend-mode/index.html
+$dokka.location:org.jetbrains.skia/BlendMode/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia/-blend-mode/entries.html
 $dokka.location:org.jetbrains.skia/BlendMode/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-blend-mode/value-of.html
 $dokka.location:org.jetbrains.skia/BlendMode/values/#/PointingToDeclaration/skiko/org.jetbrains.skia/-blend-mode/values.html
 $dokka.location:org.jetbrains.skia/BreakIterator.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-break-iterator/-companion/index.html
@@ -1012,6 +1045,7 @@ $dokka.location:org.jetbrains.skia/Canvas/writePixels/#org.jetbrains.skia.Bitmap
 $dokka.location:org.jetbrains.skia/ClipMode.DIFFERENCE///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-clip-mode/-d-i-f-f-e-r-e-n-c-e/index.html
 $dokka.location:org.jetbrains.skia/ClipMode.INTERSECT///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-clip-mode/-i-n-t-e-r-s-e-c-t/index.html
 $dokka.location:org.jetbrains.skia/ClipMode///PointingToDeclaration/skiko/org.jetbrains.skia/-clip-mode/index.html
+$dokka.location:org.jetbrains.skia/ClipMode/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia/-clip-mode/entries.html
 $dokka.location:org.jetbrains.skia/ClipMode/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-clip-mode/value-of.html
 $dokka.location:org.jetbrains.skia/ClipMode/values/#/PointingToDeclaration/skiko/org.jetbrains.skia/-clip-mode/values.html
 $dokka.location:org.jetbrains.skia/Codec.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-codec/-companion/index.html
@@ -1075,6 +1109,7 @@ $dokka.location:org.jetbrains.skia/ColorAlphaType.PREMUL///PointingToDeclaration
 $dokka.location:org.jetbrains.skia/ColorAlphaType.UNKNOWN///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-color-alpha-type/-u-n-k-n-o-w-n/index.html
 $dokka.location:org.jetbrains.skia/ColorAlphaType.UNPREMUL///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-color-alpha-type/-u-n-p-r-e-m-u-l/index.html
 $dokka.location:org.jetbrains.skia/ColorAlphaType///PointingToDeclaration/skiko/org.jetbrains.skia/-color-alpha-type/index.html
+$dokka.location:org.jetbrains.skia/ColorAlphaType/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia/-color-alpha-type/entries.html
 $dokka.location:org.jetbrains.skia/ColorAlphaType/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-color-alpha-type/value-of.html
 $dokka.location:org.jetbrains.skia/ColorAlphaType/values/#/PointingToDeclaration/skiko/org.jetbrains.skia/-color-alpha-type/values.html
 $dokka.location:org.jetbrains.skia/ColorChannel.A///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-color-channel/-a/index.html
@@ -1082,6 +1117,7 @@ $dokka.location:org.jetbrains.skia/ColorChannel.B///PointingToDeclaration/{"org.
 $dokka.location:org.jetbrains.skia/ColorChannel.G///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-color-channel/-g/index.html
 $dokka.location:org.jetbrains.skia/ColorChannel.R///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-color-channel/-r/index.html
 $dokka.location:org.jetbrains.skia/ColorChannel///PointingToDeclaration/skiko/org.jetbrains.skia/-color-channel/index.html
+$dokka.location:org.jetbrains.skia/ColorChannel/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia/-color-channel/entries.html
 $dokka.location:org.jetbrains.skia/ColorChannel/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-color-channel/value-of.html
 $dokka.location:org.jetbrains.skia/ColorChannel/values/#/PointingToDeclaration/skiko/org.jetbrains.skia/-color-channel/values.html
 $dokka.location:org.jetbrains.skia/ColorFilter.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-color-filter/-companion/index.html
@@ -1157,6 +1193,7 @@ $dokka.location:org.jetbrains.skia/ColorType.UNKNOWN///PointingToDeclaration/{"o
 $dokka.location:org.jetbrains.skia/ColorType///PointingToDeclaration/skiko/org.jetbrains.skia/-color-type/index.html
 $dokka.location:org.jetbrains.skia/ColorType/bytesPerPixel/#/PointingToDeclaration/skiko/org.jetbrains.skia/-color-type/bytes-per-pixel.html
 $dokka.location:org.jetbrains.skia/ColorType/computeOffset/#kotlin.Int#kotlin.Int#kotlin.Long/PointingToDeclaration/skiko/org.jetbrains.skia/-color-type/compute-offset.html
+$dokka.location:org.jetbrains.skia/ColorType/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia/-color-type/entries.html
 $dokka.location:org.jetbrains.skia/ColorType/getA/#kotlin.Byte/PointingToDeclaration/skiko/org.jetbrains.skia/-color-type/get-a.html
 $dokka.location:org.jetbrains.skia/ColorType/getA/#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia/-color-type/get-a.html
 $dokka.location:org.jetbrains.skia/ColorType/getA/#kotlin.Short/PointingToDeclaration/skiko/org.jetbrains.skia/-color-type/get-a.html
@@ -1177,6 +1214,7 @@ $dokka.location:org.jetbrains.skia/ColorType/values/#/PointingToDeclaration/ski
 $dokka.location:org.jetbrains.skia/ContentChangeMode.DISCARD///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-content-change-mode/-d-i-s-c-a-r-d/index.html
 $dokka.location:org.jetbrains.skia/ContentChangeMode.RETAIN///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-content-change-mode/-r-e-t-a-i-n/index.html
 $dokka.location:org.jetbrains.skia/ContentChangeMode///PointingToDeclaration/skiko/org.jetbrains.skia/-content-change-mode/index.html
+$dokka.location:org.jetbrains.skia/ContentChangeMode/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia/-content-change-mode/entries.html
 $dokka.location:org.jetbrains.skia/ContentChangeMode/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-content-change-mode/value-of.html
 $dokka.location:org.jetbrains.skia/ContentChangeMode/values/#/PointingToDeclaration/skiko/org.jetbrains.skia/-content-change-mode/values.html
 $dokka.location:org.jetbrains.skia/CubicResampler///PointingToDeclaration/skiko/org.jetbrains.skia/-cubic-resampler/index.html
@@ -1238,6 +1276,7 @@ $dokka.location:org.jetbrains.skia/EncodedImageFormat.PNG///PointingToDeclaratio
 $dokka.location:org.jetbrains.skia/EncodedImageFormat.WBMP///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-encoded-image-format/-w-b-m-p/index.html
 $dokka.location:org.jetbrains.skia/EncodedImageFormat.WEBP///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-encoded-image-format/-w-e-b-p/index.html
 $dokka.location:org.jetbrains.skia/EncodedImageFormat///PointingToDeclaration/skiko/org.jetbrains.skia/-encoded-image-format/index.html
+$dokka.location:org.jetbrains.skia/EncodedImageFormat/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia/-encoded-image-format/entries.html
 $dokka.location:org.jetbrains.skia/EncodedImageFormat/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-encoded-image-format/value-of.html
 $dokka.location:org.jetbrains.skia/EncodedImageFormat/values/#/PointingToDeclaration/skiko/org.jetbrains.skia/-encoded-image-format/values.html
 $dokka.location:org.jetbrains.skia/EncodedOrigin.BOTTOM_LEFT///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-encoded-origin/-b-o-t-t-o-m_-l-e-f-t/index.html
@@ -1250,6 +1289,7 @@ $dokka.location:org.jetbrains.skia/EncodedOrigin.TOP_LEFT///PointingToDeclaratio
 $dokka.location:org.jetbrains.skia/EncodedOrigin.TOP_RIGHT///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-encoded-origin/-t-o-p_-r-i-g-h-t/index.html
 $dokka.location:org.jetbrains.skia/EncodedOrigin.UNUSED///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-encoded-origin/-u-n-u-s-e-d/index.html
 $dokka.location:org.jetbrains.skia/EncodedOrigin///PointingToDeclaration/skiko/org.jetbrains.skia/-encoded-origin/index.html
+$dokka.location:org.jetbrains.skia/EncodedOrigin/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia/-encoded-origin/entries.html
 $dokka.location:org.jetbrains.skia/EncodedOrigin/swapsWidthHeight/#/PointingToDeclaration/skiko/org.jetbrains.skia/-encoded-origin/swaps-width-height.html
 $dokka.location:org.jetbrains.skia/EncodedOrigin/toMatrix/#kotlin.Int#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skia/-encoded-origin/to-matrix.html
 $dokka.location:org.jetbrains.skia/EncodedOrigin/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-encoded-origin/value-of.html
@@ -1261,6 +1301,7 @@ $dokka.location:org.jetbrains.skia/FilterBlurMode.NORMAL///PointingToDeclaration
 $dokka.location:org.jetbrains.skia/FilterBlurMode.OUTER///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-filter-blur-mode/-o-u-t-e-r/index.html
 $dokka.location:org.jetbrains.skia/FilterBlurMode.SOLID///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-filter-blur-mode/-s-o-l-i-d/index.html
 $dokka.location:org.jetbrains.skia/FilterBlurMode///PointingToDeclaration/skiko/org.jetbrains.skia/-filter-blur-mode/index.html
+$dokka.location:org.jetbrains.skia/FilterBlurMode/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia/-filter-blur-mode/entries.html
 $dokka.location:org.jetbrains.skia/FilterBlurMode/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-filter-blur-mode/value-of.html
 $dokka.location:org.jetbrains.skia/FilterBlurMode/values/#/PointingToDeclaration/skiko/org.jetbrains.skia/-filter-blur-mode/values.html
 $dokka.location:org.jetbrains.skia/FilterMipmap///PointingToDeclaration/skiko/org.jetbrains.skia/-filter-mipmap/index.html
@@ -1274,6 +1315,7 @@ $dokka.location:org.jetbrains.skia/FilterMipmap/toString/#/PointingToDeclaration
 $dokka.location:org.jetbrains.skia/FilterMode.LINEAR///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-filter-mode/-l-i-n-e-a-r/index.html
 $dokka.location:org.jetbrains.skia/FilterMode.NEAREST///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-filter-mode/-n-e-a-r-e-s-t/index.html
 $dokka.location:org.jetbrains.skia/FilterMode///PointingToDeclaration/skiko/org.jetbrains.skia/-filter-mode/index.html
+$dokka.location:org.jetbrains.skia/FilterMode/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia/-filter-mode/entries.html
 $dokka.location:org.jetbrains.skia/FilterMode/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-filter-mode/value-of.html
 $dokka.location:org.jetbrains.skia/FilterMode/values/#/PointingToDeclaration/skiko/org.jetbrains.skia/-filter-mode/values.html
 $dokka.location:org.jetbrains.skia/FilterQuality.HIGH///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-filter-quality/-h-i-g-h/index.html
@@ -1281,6 +1323,7 @@ $dokka.location:org.jetbrains.skia/FilterQuality.LOW///PointingToDeclaration/{"o
 $dokka.location:org.jetbrains.skia/FilterQuality.MEDIUM///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-filter-quality/-m-e-d-i-u-m/index.html
 $dokka.location:org.jetbrains.skia/FilterQuality.NONE///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-filter-quality/-n-o-n-e/index.html
 $dokka.location:org.jetbrains.skia/FilterQuality///PointingToDeclaration/skiko/org.jetbrains.skia/-filter-quality/index.html
+$dokka.location:org.jetbrains.skia/FilterQuality/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia/-filter-quality/entries.html
 $dokka.location:org.jetbrains.skia/FilterQuality/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-filter-quality/value-of.html
 $dokka.location:org.jetbrains.skia/FilterQuality/values/#/PointingToDeclaration/skiko/org.jetbrains.skia/-filter-quality/values.html
 $dokka.location:org.jetbrains.skia/FilterTileMode.CLAMP///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-filter-tile-mode/-c-l-a-m-p/index.html
@@ -1288,6 +1331,7 @@ $dokka.location:org.jetbrains.skia/FilterTileMode.DECAL///PointingToDeclaration/
 $dokka.location:org.jetbrains.skia/FilterTileMode.MIRROR///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-filter-tile-mode/-m-i-r-r-o-r/index.html
 $dokka.location:org.jetbrains.skia/FilterTileMode.REPEAT///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-filter-tile-mode/-r-e-p-e-a-t/index.html
 $dokka.location:org.jetbrains.skia/FilterTileMode///PointingToDeclaration/skiko/org.jetbrains.skia/-filter-tile-mode/index.html
+$dokka.location:org.jetbrains.skia/FilterTileMode/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia/-filter-tile-mode/entries.html
 $dokka.location:org.jetbrains.skia/FilterTileMode/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-filter-tile-mode/value-of.html
 $dokka.location:org.jetbrains.skia/FilterTileMode/values/#/PointingToDeclaration/skiko/org.jetbrains.skia/-filter-tile-mode/values.html
 $dokka.location:org.jetbrains.skia/Font.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-font/-companion/index.html
@@ -1334,6 +1378,7 @@ $dokka.location:org.jetbrains.skia/FontEdging.ALIAS///PointingToDeclaration/{"or
 $dokka.location:org.jetbrains.skia/FontEdging.ANTI_ALIAS///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-font-edging/-a-n-t-i_-a-l-i-a-s/index.html
 $dokka.location:org.jetbrains.skia/FontEdging.SUBPIXEL_ANTI_ALIAS///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-font-edging/-s-u-b-p-i-x-e-l_-a-n-t-i_-a-l-i-a-s/index.html
 $dokka.location:org.jetbrains.skia/FontEdging///PointingToDeclaration/skiko/org.jetbrains.skia/-font-edging/index.html
+$dokka.location:org.jetbrains.skia/FontEdging/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font-edging/entries.html
 $dokka.location:org.jetbrains.skia/FontEdging/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-font-edging/value-of.html
 $dokka.location:org.jetbrains.skia/FontEdging/values/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font-edging/values.html
 $dokka.location:org.jetbrains.skia/FontExtents///PointingToDeclaration/skiko/org.jetbrains.skia/-font-extents/index.html
@@ -1381,6 +1426,7 @@ $dokka.location:org.jetbrains.skia/FontHinting.NONE///PointingToDeclaration/{"or
 $dokka.location:org.jetbrains.skia/FontHinting.NORMAL///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-font-hinting/-n-o-r-m-a-l/index.html
 $dokka.location:org.jetbrains.skia/FontHinting.SLIGHT///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-font-hinting/-s-l-i-g-h-t/index.html
 $dokka.location:org.jetbrains.skia/FontHinting///PointingToDeclaration/skiko/org.jetbrains.skia/-font-hinting/index.html
+$dokka.location:org.jetbrains.skia/FontHinting/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font-hinting/entries.html
 $dokka.location:org.jetbrains.skia/FontHinting/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-font-hinting/value-of.html
 $dokka.location:org.jetbrains.skia/FontHinting/values/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font-hinting/values.html
 $dokka.location:org.jetbrains.skia/FontMetrics.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-font-metrics/-companion/index.html
@@ -1421,6 +1467,7 @@ $dokka.location:org.jetbrains.skia/FontSlant.ITALIC///PointingToDeclaration/{"or
 $dokka.location:org.jetbrains.skia/FontSlant.OBLIQUE///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-font-slant/-o-b-l-i-q-u-e/index.html
 $dokka.location:org.jetbrains.skia/FontSlant.UPRIGHT///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-font-slant/-u-p-r-i-g-h-t/index.html
 $dokka.location:org.jetbrains.skia/FontSlant///PointingToDeclaration/skiko/org.jetbrains.skia/-font-slant/index.html
+$dokka.location:org.jetbrains.skia/FontSlant/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font-slant/entries.html
 $dokka.location:org.jetbrains.skia/FontSlant/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-font-slant/value-of.html
 $dokka.location:org.jetbrains.skia/FontSlant/values/#/PointingToDeclaration/skiko/org.jetbrains.skia/-font-slant/values.html
 $dokka.location:org.jetbrains.skia/FontStyle.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-font-style/-companion/index.html
@@ -1598,6 +1645,7 @@ $dokka.location:org.jetbrains.skia/GLBackendState.TEXTURE_BINDING///PointingToDe
 $dokka.location:org.jetbrains.skia/GLBackendState.VERTEX///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-g-l-backend-state/-v-e-r-t-e-x/index.html
 $dokka.location:org.jetbrains.skia/GLBackendState.VIEW///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-g-l-backend-state/-v-i-e-w/index.html
 $dokka.location:org.jetbrains.skia/GLBackendState///PointingToDeclaration/skiko/org.jetbrains.skia/-g-l-backend-state/index.html
+$dokka.location:org.jetbrains.skia/GLBackendState/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia/-g-l-backend-state/entries.html
 $dokka.location:org.jetbrains.skia/GLBackendState/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-g-l-backend-state/value-of.html
 $dokka.location:org.jetbrains.skia/GLBackendState/values/#/PointingToDeclaration/skiko/org.jetbrains.skia/-g-l-backend-state/values.html
 $dokka.location:org.jetbrains.skia/GradientStyle.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-gradient-style/-companion/index.html
@@ -1783,6 +1831,7 @@ $dokka.location:org.jetbrains.skia/InversionMode.BRIGHTNESS///PointingToDeclarat
 $dokka.location:org.jetbrains.skia/InversionMode.LIGHTNESS///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-inversion-mode/-l-i-g-h-t-n-e-s-s/index.html
 $dokka.location:org.jetbrains.skia/InversionMode.NO///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-inversion-mode/-n-o/index.html
 $dokka.location:org.jetbrains.skia/InversionMode///PointingToDeclaration/skiko/org.jetbrains.skia/-inversion-mode/index.html
+$dokka.location:org.jetbrains.skia/InversionMode/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia/-inversion-mode/entries.html
 $dokka.location:org.jetbrains.skia/InversionMode/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-inversion-mode/value-of.html
 $dokka.location:org.jetbrains.skia/InversionMode/values/#/PointingToDeclaration/skiko/org.jetbrains.skia/-inversion-mode/values.html
 $dokka.location:org.jetbrains.skia/ManagedString.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-managed-string/-companion/index.html
@@ -1843,13 +1892,15 @@ $dokka.location:org.jetbrains.skia/MipmapMode.LINEAR///PointingToDeclaration/{"o
 $dokka.location:org.jetbrains.skia/MipmapMode.NEAREST///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-mipmap-mode/-n-e-a-r-e-s-t/index.html
 $dokka.location:org.jetbrains.skia/MipmapMode.NONE///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-mipmap-mode/-n-o-n-e/index.html
 $dokka.location:org.jetbrains.skia/MipmapMode///PointingToDeclaration/skiko/org.jetbrains.skia/-mipmap-mode/index.html
+$dokka.location:org.jetbrains.skia/MipmapMode/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia/-mipmap-mode/entries.html
 $dokka.location:org.jetbrains.skia/MipmapMode/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-mipmap-mode/value-of.html
 $dokka.location:org.jetbrains.skia/MipmapMode/values/#/PointingToDeclaration/skiko/org.jetbrains.skia/-mipmap-mode/values.html
-$dokka.location:org.jetbrains.skia/OutputStream///PointingToDeclaration/skiko/org.jetbrains.skia/-output-stream/index.html
-$dokka.location:org.jetbrains.skia/OutputStream/OutputStream/#/PointingToDeclaration/skiko/org.jetbrains.skia/-output-stream/-output-stream.html
+$dokka.location:org.jetbrains.skia/ModuleImport///PointingToDeclaration/skiko/org.jetbrains.skia/-module-import/index.html
+$dokka.location:org.jetbrains.skia/ModuleImport/module/#/PointingToDeclaration/skiko/org.jetbrains.skia/-module-import/module.html
+$dokka.location:org.jetbrains.skia/ModuleImport/name/#/PointingToDeclaration/skiko/org.jetbrains.skia/-module-import/name.html
 $dokka.location:org.jetbrains.skia/OutputWStream.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-output-w-stream/-companion/index.html
 $dokka.location:org.jetbrains.skia/OutputWStream///PointingToDeclaration/skiko/org.jetbrains.skia/-output-w-stream/index.html
-$dokka.location:org.jetbrains.skia/OutputWStream/OutputWStream/#org.jetbrains.skia.OutputStream?/PointingToDeclaration/skiko/org.jetbrains.skia/-output-w-stream/-output-w-stream.html
+$dokka.location:org.jetbrains.skia/OutputWStream/OutputWStream/#java.io.OutputStream?/PointingToDeclaration/skiko/org.jetbrains.skia/-output-w-stream/-output-w-stream.html
 $dokka.location:org.jetbrains.skia/Paint.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-paint/-companion/index.html
 $dokka.location:org.jetbrains.skia/Paint///PointingToDeclaration/skiko/org.jetbrains.skia/-paint/index.html
 $dokka.location:org.jetbrains.skia/Paint/Paint/#/PointingToDeclaration/skiko/org.jetbrains.skia/-paint/-paint.html
@@ -1887,18 +1938,21 @@ $dokka.location:org.jetbrains.skia/PaintMode.FILL///PointingToDeclaration/{"org.
 $dokka.location:org.jetbrains.skia/PaintMode.STROKE///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-paint-mode/-s-t-r-o-k-e/index.html
 $dokka.location:org.jetbrains.skia/PaintMode.STROKE_AND_FILL///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-paint-mode/-s-t-r-o-k-e_-a-n-d_-f-i-l-l/index.html
 $dokka.location:org.jetbrains.skia/PaintMode///PointingToDeclaration/skiko/org.jetbrains.skia/-paint-mode/index.html
+$dokka.location:org.jetbrains.skia/PaintMode/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia/-paint-mode/entries.html
 $dokka.location:org.jetbrains.skia/PaintMode/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-paint-mode/value-of.html
 $dokka.location:org.jetbrains.skia/PaintMode/values/#/PointingToDeclaration/skiko/org.jetbrains.skia/-paint-mode/values.html
 $dokka.location:org.jetbrains.skia/PaintStrokeCap.BUTT///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-paint-stroke-cap/-b-u-t-t/index.html
 $dokka.location:org.jetbrains.skia/PaintStrokeCap.ROUND///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-paint-stroke-cap/-r-o-u-n-d/index.html
 $dokka.location:org.jetbrains.skia/PaintStrokeCap.SQUARE///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-paint-stroke-cap/-s-q-u-a-r-e/index.html
 $dokka.location:org.jetbrains.skia/PaintStrokeCap///PointingToDeclaration/skiko/org.jetbrains.skia/-paint-stroke-cap/index.html
+$dokka.location:org.jetbrains.skia/PaintStrokeCap/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia/-paint-stroke-cap/entries.html
 $dokka.location:org.jetbrains.skia/PaintStrokeCap/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-paint-stroke-cap/value-of.html
 $dokka.location:org.jetbrains.skia/PaintStrokeCap/values/#/PointingToDeclaration/skiko/org.jetbrains.skia/-paint-stroke-cap/values.html
 $dokka.location:org.jetbrains.skia/PaintStrokeJoin.BEVEL///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-paint-stroke-join/-b-e-v-e-l/index.html
 $dokka.location:org.jetbrains.skia/PaintStrokeJoin.MITER///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-paint-stroke-join/-m-i-t-e-r/index.html
 $dokka.location:org.jetbrains.skia/PaintStrokeJoin.ROUND///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-paint-stroke-join/-r-o-u-n-d/index.html
 $dokka.location:org.jetbrains.skia/PaintStrokeJoin///PointingToDeclaration/skiko/org.jetbrains.skia/-paint-stroke-join/index.html
+$dokka.location:org.jetbrains.skia/PaintStrokeJoin/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia/-paint-stroke-join/entries.html
 $dokka.location:org.jetbrains.skia/PaintStrokeJoin/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-paint-stroke-join/value-of.html
 $dokka.location:org.jetbrains.skia/PaintStrokeJoin/values/#/PointingToDeclaration/skiko/org.jetbrains.skia/-paint-stroke-join/values.html
 $dokka.location:org.jetbrains.skia/Path.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-path/-companion/index.html
@@ -1991,6 +2045,7 @@ $dokka.location:org.jetbrains.skia/Path/verbsCount/#/PointingToDeclaration/skik
 $dokka.location:org.jetbrains.skia/PathDirection.CLOCKWISE///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-path-direction/-c-l-o-c-k-w-i-s-e/index.html
 $dokka.location:org.jetbrains.skia/PathDirection.COUNTER_CLOCKWISE///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-path-direction/-c-o-u-n-t-e-r_-c-l-o-c-k-w-i-s-e/index.html
 $dokka.location:org.jetbrains.skia/PathDirection///PointingToDeclaration/skiko/org.jetbrains.skia/-path-direction/index.html
+$dokka.location:org.jetbrains.skia/PathDirection/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia/-path-direction/entries.html
 $dokka.location:org.jetbrains.skia/PathDirection/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-path-direction/value-of.html
 $dokka.location:org.jetbrains.skia/PathDirection/values/#/PointingToDeclaration/skiko/org.jetbrains.skia/-path-direction/values.html
 $dokka.location:org.jetbrains.skia/PathEffect.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-path-effect/-companion/index.html
@@ -2004,6 +2059,7 @@ $dokka.location:org.jetbrains.skia/PathEffect.Style.MORPH///PointingToDeclaratio
 $dokka.location:org.jetbrains.skia/PathEffect.Style.ROTATE///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-path-effect/-style/-r-o-t-a-t-e/index.html
 $dokka.location:org.jetbrains.skia/PathEffect.Style.TRANSLATE///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-path-effect/-style/-t-r-a-n-s-l-a-t-e/index.html
 $dokka.location:org.jetbrains.skia/PathEffect.Style///PointingToDeclaration/skiko/org.jetbrains.skia/-path-effect/-style/index.html
+$dokka.location:org.jetbrains.skia/PathEffect.Style/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia/-path-effect/-style/entries.html
 $dokka.location:org.jetbrains.skia/PathEffect.Style/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-path-effect/-style/value-of.html
 $dokka.location:org.jetbrains.skia/PathEffect.Style/values/#/PointingToDeclaration/skiko/org.jetbrains.skia/-path-effect/-style/values.html
 $dokka.location:org.jetbrains.skia/PathEffect///PointingToDeclaration/skiko/org.jetbrains.skia/-path-effect/index.html
@@ -2012,6 +2068,7 @@ $dokka.location:org.jetbrains.skia/PathEffect/makeSum/#org.jetbrains.skia.PathEf
 $dokka.location:org.jetbrains.skia/PathEllipseArc.LARGER///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-path-ellipse-arc/-l-a-r-g-e-r/index.html
 $dokka.location:org.jetbrains.skia/PathEllipseArc.SMALLER///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-path-ellipse-arc/-s-m-a-l-l-e-r/index.html
 $dokka.location:org.jetbrains.skia/PathEllipseArc///PointingToDeclaration/skiko/org.jetbrains.skia/-path-ellipse-arc/index.html
+$dokka.location:org.jetbrains.skia/PathEllipseArc/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia/-path-ellipse-arc/entries.html
 $dokka.location:org.jetbrains.skia/PathEllipseArc/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-path-ellipse-arc/value-of.html
 $dokka.location:org.jetbrains.skia/PathEllipseArc/values/#/PointingToDeclaration/skiko/org.jetbrains.skia/-path-ellipse-arc/values.html
 $dokka.location:org.jetbrains.skia/PathFillMode.EVEN_ODD///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-path-fill-mode/-e-v-e-n_-o-d-d/index.html
@@ -2019,6 +2076,7 @@ $dokka.location:org.jetbrains.skia/PathFillMode.INVERSE_EVEN_ODD///PointingToDec
 $dokka.location:org.jetbrains.skia/PathFillMode.INVERSE_WINDING///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-path-fill-mode/-i-n-v-e-r-s-e_-w-i-n-d-i-n-g/index.html
 $dokka.location:org.jetbrains.skia/PathFillMode.WINDING///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-path-fill-mode/-w-i-n-d-i-n-g/index.html
 $dokka.location:org.jetbrains.skia/PathFillMode///PointingToDeclaration/skiko/org.jetbrains.skia/-path-fill-mode/index.html
+$dokka.location:org.jetbrains.skia/PathFillMode/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia/-path-fill-mode/entries.html
 $dokka.location:org.jetbrains.skia/PathFillMode/inverse/#/PointingToDeclaration/skiko/org.jetbrains.skia/-path-fill-mode/inverse.html
 $dokka.location:org.jetbrains.skia/PathFillMode/isInverse/#/PointingToDeclaration/skiko/org.jetbrains.skia/-path-fill-mode/is-inverse.html
 $dokka.location:org.jetbrains.skia/PathFillMode/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-path-fill-mode/value-of.html
@@ -2042,6 +2100,7 @@ $dokka.location:org.jetbrains.skia/PathOp.REVERSE_DIFFERENCE///PointingToDeclara
 $dokka.location:org.jetbrains.skia/PathOp.UNION///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-path-op/-u-n-i-o-n/index.html
 $dokka.location:org.jetbrains.skia/PathOp.XOR///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-path-op/-x-o-r/index.html
 $dokka.location:org.jetbrains.skia/PathOp///PointingToDeclaration/skiko/org.jetbrains.skia/-path-op/index.html
+$dokka.location:org.jetbrains.skia/PathOp/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia/-path-op/entries.html
 $dokka.location:org.jetbrains.skia/PathOp/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-path-op/value-of.html
 $dokka.location:org.jetbrains.skia/PathOp/values/#/PointingToDeclaration/skiko/org.jetbrains.skia/-path-op/values.html
 $dokka.location:org.jetbrains.skia/PathSegment///PointingToDeclaration/skiko/org.jetbrains.skia/-path-segment/index.html
@@ -2088,6 +2147,7 @@ $dokka.location:org.jetbrains.skia/PathVerb.LINE///PointingToDeclaration/{"org.j
 $dokka.location:org.jetbrains.skia/PathVerb.MOVE///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-path-verb/-m-o-v-e/index.html
 $dokka.location:org.jetbrains.skia/PathVerb.QUAD///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-path-verb/-q-u-a-d/index.html
 $dokka.location:org.jetbrains.skia/PathVerb///PointingToDeclaration/skiko/org.jetbrains.skia/-path-verb/index.html
+$dokka.location:org.jetbrains.skia/PathVerb/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia/-path-verb/entries.html
 $dokka.location:org.jetbrains.skia/PathVerb/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-path-verb/value-of.html
 $dokka.location:org.jetbrains.skia/PathVerb/values/#/PointingToDeclaration/skiko/org.jetbrains.skia/-path-verb/values.html
 $dokka.location:org.jetbrains.skia/Pattern///PointingToDeclaration/skiko/org.jetbrains.skia/-pattern/index.html
@@ -2118,6 +2178,7 @@ $dokka.location:org.jetbrains.skia/PixelGeometry.RGB_H///PointingToDeclaration/{
 $dokka.location:org.jetbrains.skia/PixelGeometry.RGB_V///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-pixel-geometry/-r-g-b_-v/index.html
 $dokka.location:org.jetbrains.skia/PixelGeometry.UNKNOWN///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-pixel-geometry/-u-n-k-n-o-w-n/index.html
 $dokka.location:org.jetbrains.skia/PixelGeometry///PointingToDeclaration/skiko/org.jetbrains.skia/-pixel-geometry/index.html
+$dokka.location:org.jetbrains.skia/PixelGeometry/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia/-pixel-geometry/entries.html
 $dokka.location:org.jetbrains.skia/PixelGeometry/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-pixel-geometry/value-of.html
 $dokka.location:org.jetbrains.skia/PixelGeometry/values/#/PointingToDeclaration/skiko/org.jetbrains.skia/-pixel-geometry/values.html
 $dokka.location:org.jetbrains.skia/PixelRef.Companion///PointingToDeclaration/skiko/org.jetbrains.skia/-pixel-ref/-companion/index.html
@@ -2242,6 +2303,7 @@ $dokka.location:org.jetbrains.skia/Region.Op.REVERSE_DIFFERENCE///PointingToDecl
 $dokka.location:org.jetbrains.skia/Region.Op.UNION///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-region/-op/-u-n-i-o-n/index.html
 $dokka.location:org.jetbrains.skia/Region.Op.XOR///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-region/-op/-x-o-r/index.html
 $dokka.location:org.jetbrains.skia/Region.Op///PointingToDeclaration/skiko/org.jetbrains.skia/-region/-op/index.html
+$dokka.location:org.jetbrains.skia/Region.Op/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia/-region/-op/entries.html
 $dokka.location:org.jetbrains.skia/Region.Op/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-region/-op/value-of.html
 $dokka.location:org.jetbrains.skia/Region.Op/values/#/PointingToDeclaration/skiko/org.jetbrains.skia/-region/-op/values.html
 $dokka.location:org.jetbrains.skia/Region///PointingToDeclaration/skiko/org.jetbrains.skia/-region/index.html
@@ -2403,11 +2465,13 @@ $dokka.location:org.jetbrains.skia/SurfaceColorFormat.RGB_565///PointingToDeclar
 $dokka.location:org.jetbrains.skia/SurfaceColorFormat.RGB_888x///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-surface-color-format/-r-g-b_888x/index.html
 $dokka.location:org.jetbrains.skia/SurfaceColorFormat.UNKNOWN///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-surface-color-format/-u-n-k-n-o-w-n/index.html
 $dokka.location:org.jetbrains.skia/SurfaceColorFormat///PointingToDeclaration/skiko/org.jetbrains.skia/-surface-color-format/index.html
+$dokka.location:org.jetbrains.skia/SurfaceColorFormat/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia/-surface-color-format/entries.html
 $dokka.location:org.jetbrains.skia/SurfaceColorFormat/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-surface-color-format/value-of.html
 $dokka.location:org.jetbrains.skia/SurfaceColorFormat/values/#/PointingToDeclaration/skiko/org.jetbrains.skia/-surface-color-format/values.html
 $dokka.location:org.jetbrains.skia/SurfaceOrigin.BOTTOM_LEFT///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-surface-origin/-b-o-t-t-o-m_-l-e-f-t/index.html
 $dokka.location:org.jetbrains.skia/SurfaceOrigin.TOP_LEFT///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-surface-origin/-t-o-p_-l-e-f-t/index.html
 $dokka.location:org.jetbrains.skia/SurfaceOrigin///PointingToDeclaration/skiko/org.jetbrains.skia/-surface-origin/index.html
+$dokka.location:org.jetbrains.skia/SurfaceOrigin/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia/-surface-origin/entries.html
 $dokka.location:org.jetbrains.skia/SurfaceOrigin/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-surface-origin/value-of.html
 $dokka.location:org.jetbrains.skia/SurfaceOrigin/values/#/PointingToDeclaration/skiko/org.jetbrains.skia/-surface-origin/values.html
 $dokka.location:org.jetbrains.skia/SurfaceProps///PointingToDeclaration/skiko/org.jetbrains.skia/-surface-props/index.html
@@ -2511,6 +2575,7 @@ $dokka.location:org.jetbrains.skia/VertexMode.TRIANGLES///PointingToDeclaration/
 $dokka.location:org.jetbrains.skia/VertexMode.TRIANGLE_FAN///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-vertex-mode/-t-r-i-a-n-g-l-e_-f-a-n/index.html
 $dokka.location:org.jetbrains.skia/VertexMode.TRIANGLE_STRIP///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skia/-vertex-mode/-t-r-i-a-n-g-l-e_-s-t-r-i-p/index.html
 $dokka.location:org.jetbrains.skia/VertexMode///PointingToDeclaration/skiko/org.jetbrains.skia/-vertex-mode/index.html
+$dokka.location:org.jetbrains.skia/VertexMode/entries/#/PointingToDeclaration/skiko/org.jetbrains.skia/-vertex-mode/entries.html
 $dokka.location:org.jetbrains.skia/VertexMode/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skia/-vertex-mode/value-of.html
 $dokka.location:org.jetbrains.skia/VertexMode/values/#/PointingToDeclaration/skiko/org.jetbrains.skia/-vertex-mode/values.html
 $dokka.location:org.jetbrains.skia/WStream///PointingToDeclaration/skiko/org.jetbrains.skia/-w-stream/index.html
@@ -2538,6 +2603,7 @@ $dokka.location:org.jetbrains.skiko.awt.font/FontFamily.FontFamilySource.Custom/
 $dokka.location:org.jetbrains.skiko.awt.font/FontFamily.FontFamilySource.JvmEmbedded///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko.awt.font/-font-family/-font-family-source/-jvm-embedded/index.html
 $dokka.location:org.jetbrains.skiko.awt.font/FontFamily.FontFamilySource.System///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko.awt.font/-font-family/-font-family-source/-system/index.html
 $dokka.location:org.jetbrains.skiko.awt.font/FontFamily.FontFamilySource///PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-font-family/-font-family-source/index.html
+$dokka.location:org.jetbrains.skiko.awt.font/FontFamily.FontFamilySource/entries/#/PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-font-family/-font-family-source/entries.html
 $dokka.location:org.jetbrains.skiko.awt.font/FontFamily.FontFamilySource/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-font-family/-font-family-source/value-of.html
 $dokka.location:org.jetbrains.skiko.awt.font/FontFamily.FontFamilySource/values/#/PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-font-family/-font-family-source/values.html
 $dokka.location:org.jetbrains.skiko.awt.font/FontFamily///PointingToDeclaration/skiko/org.jetbrains.skiko.awt.font/-font-family/index.html
@@ -2604,7 +2670,9 @@ $dokka.location:org.jetbrains.skiko//setupSkikoLoggerFactory/#kotlin.Function0[o
 $dokka.location:org.jetbrains.skiko//toBitmap/java.awt.image.BufferedImage#/PointingToDeclaration/skiko/org.jetbrains.skiko/to-bitmap.html
 $dokka.location:org.jetbrains.skiko//toBufferedImage/org.jetbrains.skia.Bitmap#/PointingToDeclaration/skiko/org.jetbrains.skiko/to-buffered-image.html
 $dokka.location:org.jetbrains.skiko//toImage/java.awt.image.BufferedImage#/PointingToDeclaration/skiko/org.jetbrains.skiko/to-image.html
-$dokka.location:org.jetbrains.skiko//toSkikoDragEvent/#org.w3c.dom.events.MouseEvent/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-drag-event.html
+$dokka.location:org.jetbrains.skiko//toSkikoDragEvent/#[Error type: Unresolved type for MouseEvent]/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-drag-event.html
+$dokka.location:org.jetbrains.skiko//toSkikoEvent/#[Error type: Unresolved type for KeyboardEvent]#org.jetbrains.skiko.SkikoKeyboardEventKind/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-event.html
+$dokka.location:org.jetbrains.skiko//toSkikoEvent/#[Error type: Unresolved type for MouseEvent]#org.jetbrains.skiko.SkikoPointerEventKind/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-event.html
 $dokka.location:org.jetbrains.skiko//toSkikoEvent/#[Error type: Unresolved type for NSEvent]#[Error type: Unresolved type for SkikoKeyboardEventKind]/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-event.html
 $dokka.location:org.jetbrains.skiko//toSkikoEvent/#[Error type: Unresolved type for NSEvent]#[Error type: Unresolved type for SkikoMouseButtons]#[Error type: Unresolved type for SkikoPointerEventKind]#[Error type: Unresolved type for NSView]/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-event.html
 $dokka.location:org.jetbrains.skiko//toSkikoEvent/#[Error type: Unresolved type for NSEvent]#[Error type: Unresolved type for SkikoPointerEventKind]#[Error type: Unresolved type for NSView]/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-event.html
@@ -2612,8 +2680,6 @@ $dokka.location:org.jetbrains.skiko//toSkikoEvent/#[Error type: Unresolved type 
 $dokka.location:org.jetbrains.skiko//toSkikoEvent/#java.awt.event.KeyEvent/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-event.html
 $dokka.location:org.jetbrains.skiko//toSkikoEvent/#java.awt.event.MouseEvent/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-event.html
 $dokka.location:org.jetbrains.skiko//toSkikoEvent/#java.awt.event.MouseWheelEvent/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-event.html
-$dokka.location:org.jetbrains.skiko//toSkikoEvent/#org.w3c.dom.events.KeyboardEvent#org.jetbrains.skiko.SkikoKeyboardEventKind/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-event.html
-$dokka.location:org.jetbrains.skiko//toSkikoEvent/#org.w3c.dom.events.MouseEvent#org.jetbrains.skiko.SkikoPointerEventKind/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-event.html
 $dokka.location:org.jetbrains.skiko//toSkikoGestureDirection/#[Error type: Unresolved type for UISwipeGestureRecognizerDirection]/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-gesture-direction.html
 $dokka.location:org.jetbrains.skiko//toSkikoGestureState/#[Error type: Unresolved type for UIGestureRecognizerState]/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-gesture-state.html
 $dokka.location:org.jetbrains.skiko//toSkikoKeyboardEvent/#[Error type: Unresolved type for UIPress]#[Error type: Unresolved type for SkikoKeyboardEventKind]/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-keyboard-event.html
@@ -2621,13 +2687,13 @@ $dokka.location:org.jetbrains.skiko//toSkikoKeyboardEvent/#android.view.KeyEvent
 $dokka.location:org.jetbrains.skiko//toSkikoPointerEvent/#android.view.MotionEvent#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-pointer-event.html
 $dokka.location:org.jetbrains.skiko//toSkikoScaleGestureEvent/#android.view.MotionEvent#kotlin.Double#org.jetbrains.skiko.SkikoGestureEventState#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-scale-gesture-event.html
 $dokka.location:org.jetbrains.skiko//toSkikoScrollEvent/#[Error type: Unresolved type for NSEvent]#[Error type: Unresolved type for NSView]/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-scroll-event.html
-$dokka.location:org.jetbrains.skiko//toSkikoScrollEvent/#org.w3c.dom.events.WheelEvent/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-scroll-event.html
+$dokka.location:org.jetbrains.skiko//toSkikoScrollEvent/#[Error type: Unresolved type for WheelEvent]/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-scroll-event.html
 $dokka.location:org.jetbrains.skiko//toSkikoTypeEvent/#android.view.KeyEvent#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-type-event.html
 $dokka.location:org.jetbrains.skiko//toSkikoTypeEvent/#java.awt.event.InputMethodEvent#java.awt.event.KeyEvent?/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-type-event.html
 $dokka.location:org.jetbrains.skiko//toSkikoTypeEvent/#java.awt.event.KeyEvent#java.awt.event.KeyEvent?/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-type-event.html
+$dokka.location:org.jetbrains.skiko//toSkikoTypeEvent/#kotlin.String#[Error type: Unresolved type for KeyboardEvent]?/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-type-event.html
 $dokka.location:org.jetbrains.skiko//toSkikoTypeEvent/#kotlin.String#[Error type: Unresolved type for NSEvent]?/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-type-event.html
 $dokka.location:org.jetbrains.skiko//toSkikoTypeEvent/#kotlin.String#[Error type: Unresolved type for UIPress]?/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-type-event.html
-$dokka.location:org.jetbrains.skiko//toSkikoTypeEvent/#kotlin.String#org.w3c.dom.events.KeyboardEvent?/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-type-event.html
 $dokka.location:org.jetbrains.skiko//toSkikoTypefaceOrNull/java.awt.Font#org.jetbrains.skiko.awt.font.AwtFontManager/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-typeface-or-null.html
 $dokka.location:org.jetbrains.skiko/Arch.Arm64///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-arch/-arm64/index.html
 $dokka.location:org.jetbrains.skiko/Arch.JS///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-arch/-j-s/index.html
@@ -2635,11 +2701,12 @@ $dokka.location:org.jetbrains.skiko/Arch.Unknown///PointingToDeclaration/{"org.j
 $dokka.location:org.jetbrains.skiko/Arch.WASM///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-arch/-w-a-s-m/index.html
 $dokka.location:org.jetbrains.skiko/Arch.X64///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-arch/-x64/index.html
 $dokka.location:org.jetbrains.skiko/Arch///PointingToDeclaration/skiko/org.jetbrains.skiko/-arch/index.html
+$dokka.location:org.jetbrains.skiko/Arch/entries/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-arch/entries.html
 $dokka.location:org.jetbrains.skiko/Arch/id/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-arch/id.html
 $dokka.location:org.jetbrains.skiko/Arch/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-arch/value-of.html
 $dokka.location:org.jetbrains.skiko/Arch/values/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-arch/values.html
 $dokka.location:org.jetbrains.skiko/CanvasRenderer///PointingToDeclaration/skiko/org.jetbrains.skiko/-canvas-renderer/index.html
-$dokka.location:org.jetbrains.skiko/CanvasRenderer/CanvasRenderer/#org.w3c.dom.HTMLCanvasElement/PointingToDeclaration/skiko/org.jetbrains.skiko/-canvas-renderer/-canvas-renderer.html
+$dokka.location:org.jetbrains.skiko/CanvasRenderer/CanvasRenderer/#[Error type: Unresolved type for HTMLCanvasElement]/PointingToDeclaration/skiko/org.jetbrains.skiko/-canvas-renderer/-canvas-renderer.html
 $dokka.location:org.jetbrains.skiko/CanvasRenderer/drawFrame/#kotlin.Double/PointingToDeclaration/skiko/org.jetbrains.skiko/-canvas-renderer/draw-frame.html
 $dokka.location:org.jetbrains.skiko/CanvasRenderer/height/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-canvas-renderer/height.html
 $dokka.location:org.jetbrains.skiko/CanvasRenderer/htmlCanvas/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-canvas-renderer/html-canvas.html
@@ -2702,7 +2769,7 @@ $dokka.location:org.jetbrains.skiko/FrameDispatcher/FrameDispatcher/#kotlinx.cor
 $dokka.location:org.jetbrains.skiko/FrameDispatcher/cancel/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-frame-dispatcher/cancel.html
 $dokka.location:org.jetbrains.skiko/FrameDispatcher/scheduleFrame/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-frame-dispatcher/schedule-frame.html
 $dokka.location:org.jetbrains.skiko/FrameLimiter///PointingToDeclaration/skiko/org.jetbrains.skiko/-frame-limiter/index.html
-$dokka.location:org.jetbrains.skiko/FrameLimiter/FrameLimiter/#[Error type: Unresolved type for CoroutineScope]#kotlin.Function0[kotlin.Long]#kotlin.coroutines.SuspendFunction1[kotlin.Long,kotlin.Unit]#kotlin.Function0[kotlin.time.Duration]/PointingToDeclaration/skiko/org.jetbrains.skiko/-frame-limiter/-frame-limiter.html
+$dokka.location:org.jetbrains.skiko/FrameLimiter/FrameLimiter/#[Error type: Unresolved type for CoroutineScope]#kotlin.Function0[kotlin.Long]#kotlin.coroutines.SuspendFunction1[kotlin.Long,kotlin.Unit]#kotlin.Function0[[Error type: Unresolved type for Duration]]/PointingToDeclaration/skiko/org.jetbrains.skiko/-frame-limiter/-frame-limiter.html
 $dokka.location:org.jetbrains.skiko/FrameLimiter/awaitNextFrame/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-frame-limiter/await-next-frame.html
 $dokka.location:org.jetbrains.skiko/GenericSkikoView///PointingToDeclaration/skiko/org.jetbrains.skiko/-generic-skiko-view/index.html
 $dokka.location:org.jetbrains.skiko/GenericSkikoView/GenericSkikoView/#org.jetbrains.skiko.SkiaLayer#org.jetbrains.skiko.SkikoView/PointingToDeclaration/skiko/org.jetbrains.skiko/-generic-skiko-view/-generic-skiko-view.html
@@ -2720,6 +2787,7 @@ $dokka.location:org.jetbrains.skiko/GpuPriority.Companion/parseOrNull/#kotlin.St
 $dokka.location:org.jetbrains.skiko/GpuPriority.Discrete///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-gpu-priority/-discrete/index.html
 $dokka.location:org.jetbrains.skiko/GpuPriority.Integrated///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-gpu-priority/-integrated/index.html
 $dokka.location:org.jetbrains.skiko/GpuPriority///PointingToDeclaration/skiko/org.jetbrains.skiko/-gpu-priority/index.html
+$dokka.location:org.jetbrains.skiko/GpuPriority/entries/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-gpu-priority/entries.html
 $dokka.location:org.jetbrains.skiko/GpuPriority/value/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-gpu-priority/value.html
 $dokka.location:org.jetbrains.skiko/GpuPriority/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-gpu-priority/value-of.html
 $dokka.location:org.jetbrains.skiko/GpuPriority/values/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-gpu-priority/values.html
@@ -2732,6 +2800,7 @@ $dokka.location:org.jetbrains.skiko/GraphicsApi.UNKNOWN///PointingToDeclaration/
 $dokka.location:org.jetbrains.skiko/GraphicsApi.VULKAN///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-graphics-api/-v-u-l-k-a-n/index.html
 $dokka.location:org.jetbrains.skiko/GraphicsApi.WEBGL///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-graphics-api/-w-e-b-g-l/index.html
 $dokka.location:org.jetbrains.skiko/GraphicsApi///PointingToDeclaration/skiko/org.jetbrains.skiko/-graphics-api/index.html
+$dokka.location:org.jetbrains.skiko/GraphicsApi/entries/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-graphics-api/entries.html
 $dokka.location:org.jetbrains.skiko/GraphicsApi/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-graphics-api/value-of.html
 $dokka.location:org.jetbrains.skiko/GraphicsApi/values/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-graphics-api/values.html
 $dokka.location:org.jetbrains.skiko/KotlinBackend.JS///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-kotlin-backend/-j-s/index.html
@@ -2739,6 +2808,7 @@ $dokka.location:org.jetbrains.skiko/KotlinBackend.JVM///PointingToDeclaration/{"
 $dokka.location:org.jetbrains.skiko/KotlinBackend.Native///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-kotlin-backend/-native/index.html
 $dokka.location:org.jetbrains.skiko/KotlinBackend.WASM///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-kotlin-backend/-w-a-s-m/index.html
 $dokka.location:org.jetbrains.skiko/KotlinBackend///PointingToDeclaration/skiko/org.jetbrains.skiko/-kotlin-backend/index.html
+$dokka.location:org.jetbrains.skiko/KotlinBackend/entries/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-kotlin-backend/entries.html
 $dokka.location:org.jetbrains.skiko/KotlinBackend/id/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-kotlin-backend/id.html
 $dokka.location:org.jetbrains.skiko/KotlinBackend/isNotJs/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-kotlin-backend/is-not-js.html
 $dokka.location:org.jetbrains.skiko/KotlinBackend/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-kotlin-backend/value-of.html
@@ -2747,6 +2817,7 @@ $dokka.location:org.jetbrains.skiko/Library///PointingToDeclaration/skiko/org.j
 $dokka.location:org.jetbrains.skiko/Library/load/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-library/load.html
 $dokka.location:org.jetbrains.skiko/LibraryLoadException///PointingToDeclaration/skiko/org.jetbrains.skiko/-library-load-exception/index.html
 $dokka.location:org.jetbrains.skiko/LibraryLoadException/LibraryLoadException/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-library-load-exception/-library-load-exception.html
+$dokka.location:org.jetbrains.skiko/MotionEventNullableOrNo///PointingToDeclaration/skiko/org.jetbrains.skiko/-motion-event-nullable-or-no/index.html
 $dokka.location:org.jetbrains.skiko/OS.Android///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-o-s/-android/index.html
 $dokka.location:org.jetbrains.skiko/OS.Ios///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-o-s/-ios/index.html
 $dokka.location:org.jetbrains.skiko/OS.JS///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-o-s/-j-s/index.html
@@ -2755,6 +2826,7 @@ $dokka.location:org.jetbrains.skiko/OS.MacOS///PointingToDeclaration/{"org.jetbr
 $dokka.location:org.jetbrains.skiko/OS.Unknown///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-o-s/-unknown/index.html
 $dokka.location:org.jetbrains.skiko/OS.Windows///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-o-s/-windows/index.html
 $dokka.location:org.jetbrains.skiko/OS///PointingToDeclaration/skiko/org.jetbrains.skiko/-o-s/index.html
+$dokka.location:org.jetbrains.skiko/OS/entries/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-o-s/entries.html
 $dokka.location:org.jetbrains.skiko/OS/id/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-o-s/id.html
 $dokka.location:org.jetbrains.skiko/OS/isLinux/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-o-s/is-linux.html
 $dokka.location:org.jetbrains.skiko/OS/isMacOS/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-o-s/is-mac-o-s.html
@@ -2778,13 +2850,14 @@ $dokka.location:org.jetbrains.skiko/PredefinedCursorsId.DEFAULT///PointingToDecl
 $dokka.location:org.jetbrains.skiko/PredefinedCursorsId.HAND///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-predefined-cursors-id/-h-a-n-d/index.html
 $dokka.location:org.jetbrains.skiko/PredefinedCursorsId.TEXT///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-predefined-cursors-id/-t-e-x-t/index.html
 $dokka.location:org.jetbrains.skiko/PredefinedCursorsId///PointingToDeclaration/skiko/org.jetbrains.skiko/-predefined-cursors-id/index.html
+$dokka.location:org.jetbrains.skiko/PredefinedCursorsId/entries/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-predefined-cursors-id/entries.html
 $dokka.location:org.jetbrains.skiko/PredefinedCursorsId/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-predefined-cursors-id/value-of.html
 $dokka.location:org.jetbrains.skiko/PredefinedCursorsId/values/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-predefined-cursors-id/values.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer///PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/index.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/SkiaLayer/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/-skia-layer.html
+$dokka.location:org.jetbrains.skiko/SkiaLayer/attachTo/#[Error type: Unresolved type for HTMLCanvasElement]#kotlin.Boolean/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/attach-to.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/attachTo/#[Error type: Unresolved type for NSWindow]/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/attach-to.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/attachTo/#kotlin.Any/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/attach-to.html
-$dokka.location:org.jetbrains.skiko/SkiaLayer/attachTo/#org.w3c.dom.HTMLCanvasElement#kotlin.Boolean/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/attach-to.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/component/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/component.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/contentScale/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/content-scale.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/detach/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/detach.html
@@ -2835,6 +2908,7 @@ $dokka.location:org.jetbrains.skiko/SkikoGestureEventDirection.RIGHT///PointingT
 $dokka.location:org.jetbrains.skiko/SkikoGestureEventDirection.UNKNOWN///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-skiko-gesture-event-direction/-u-n-k-n-o-w-n/index.html
 $dokka.location:org.jetbrains.skiko/SkikoGestureEventDirection.UP///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-skiko-gesture-event-direction/-u-p/index.html
 $dokka.location:org.jetbrains.skiko/SkikoGestureEventDirection///PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-gesture-event-direction/index.html
+$dokka.location:org.jetbrains.skiko/SkikoGestureEventDirection/entries/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-gesture-event-direction/entries.html
 $dokka.location:org.jetbrains.skiko/SkikoGestureEventDirection/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-gesture-event-direction/value-of.html
 $dokka.location:org.jetbrains.skiko/SkikoGestureEventDirection/values/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-gesture-event-direction/values.html
 $dokka.location:org.jetbrains.skiko/SkikoGestureEventKind.DOUBLETAP///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-skiko-gesture-event-kind/-d-o-u-b-l-e-t-a-p/index.html
@@ -2846,6 +2920,7 @@ $dokka.location:org.jetbrains.skiko/SkikoGestureEventKind.SWIPE///PointingToDecl
 $dokka.location:org.jetbrains.skiko/SkikoGestureEventKind.TAP///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-skiko-gesture-event-kind/-t-a-p/index.html
 $dokka.location:org.jetbrains.skiko/SkikoGestureEventKind.UNKNOWN///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-skiko-gesture-event-kind/-u-n-k-n-o-w-n/index.html
 $dokka.location:org.jetbrains.skiko/SkikoGestureEventKind///PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-gesture-event-kind/index.html
+$dokka.location:org.jetbrains.skiko/SkikoGestureEventKind/entries/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-gesture-event-kind/entries.html
 $dokka.location:org.jetbrains.skiko/SkikoGestureEventKind/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-gesture-event-kind/value-of.html
 $dokka.location:org.jetbrains.skiko/SkikoGestureEventKind/values/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-gesture-event-kind/values.html
 $dokka.location:org.jetbrains.skiko/SkikoGestureEventState.CHANGED///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-skiko-gesture-event-state/-c-h-a-n-g-e-d/index.html
@@ -2854,6 +2929,7 @@ $dokka.location:org.jetbrains.skiko/SkikoGestureEventState.PRESSED///PointingToD
 $dokka.location:org.jetbrains.skiko/SkikoGestureEventState.STARTED///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-skiko-gesture-event-state/-s-t-a-r-t-e-d/index.html
 $dokka.location:org.jetbrains.skiko/SkikoGestureEventState.UNKNOWN///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-skiko-gesture-event-state/-u-n-k-n-o-w-n/index.html
 $dokka.location:org.jetbrains.skiko/SkikoGestureEventState///PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-gesture-event-state/index.html
+$dokka.location:org.jetbrains.skiko/SkikoGestureEventState/entries/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-gesture-event-state/entries.html
 $dokka.location:org.jetbrains.skiko/SkikoGestureEventState/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-gesture-event-state/value-of.html
 $dokka.location:org.jetbrains.skiko/SkikoGestureEventState/values/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-gesture-event-state/values.html
 $dokka.location:org.jetbrains.skiko/SkikoGesturePlatformEvent///PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-gesture-platform-event/index.html
@@ -3012,6 +3088,7 @@ $dokka.location:org.jetbrains.skiko/SkikoKey.KEY_X///PointingToDeclaration/{"org
 $dokka.location:org.jetbrains.skiko/SkikoKey.KEY_Y///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-skiko-key/-k-e-y_-y/index.html
 $dokka.location:org.jetbrains.skiko/SkikoKey.KEY_Z///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-skiko-key/-k-e-y_-z/index.html
 $dokka.location:org.jetbrains.skiko/SkikoKey///PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-key/index.html
+$dokka.location:org.jetbrains.skiko/SkikoKey/entries/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-key/[macos]entries.html
 $dokka.location:org.jetbrains.skiko/SkikoKey/platformKeyCode/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-key/platform-key-code.html
 $dokka.location:org.jetbrains.skiko/SkikoKey/value/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-key/value.html
 $dokka.location:org.jetbrains.skiko/SkikoKey/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-key/[macos]value-of.html
@@ -3028,6 +3105,7 @@ $dokka.location:org.jetbrains.skiko/SkikoKeyboardEventKind.TYPE///PointingToDecl
 $dokka.location:org.jetbrains.skiko/SkikoKeyboardEventKind.UNKNOWN///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-skiko-keyboard-event-kind/-u-n-k-n-o-w-n/index.html
 $dokka.location:org.jetbrains.skiko/SkikoKeyboardEventKind.UP///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-skiko-keyboard-event-kind/-u-p/index.html
 $dokka.location:org.jetbrains.skiko/SkikoKeyboardEventKind///PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-keyboard-event-kind/index.html
+$dokka.location:org.jetbrains.skiko/SkikoKeyboardEventKind/entries/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-keyboard-event-kind/entries.html
 $dokka.location:org.jetbrains.skiko/SkikoKeyboardEventKind/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-keyboard-event-kind/value-of.html
 $dokka.location:org.jetbrains.skiko/SkikoKeyboardEventKind/values/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-keyboard-event-kind/values.html
 $dokka.location:org.jetbrains.skiko/SkikoLoggerInterface///PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-logger-interface/index.html
@@ -3079,6 +3157,7 @@ $dokka.location:org.jetbrains.skiko/SkikoPointerDevice.MOUSE///PointingToDeclara
 $dokka.location:org.jetbrains.skiko/SkikoPointerDevice.TOUCH///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-skiko-pointer-device/-t-o-u-c-h/index.html
 $dokka.location:org.jetbrains.skiko/SkikoPointerDevice.UNKNOWN///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-skiko-pointer-device/-u-n-k-n-o-w-n/index.html
 $dokka.location:org.jetbrains.skiko/SkikoPointerDevice///PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-pointer-device/index.html
+$dokka.location:org.jetbrains.skiko/SkikoPointerDevice/entries/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-pointer-device/entries.html
 $dokka.location:org.jetbrains.skiko/SkikoPointerDevice/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-pointer-device/value-of.html
 $dokka.location:org.jetbrains.skiko/SkikoPointerDevice/values/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-pointer-device/values.html
 $dokka.location:org.jetbrains.skiko/SkikoPointerEvent///PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-pointer-event/index.html
@@ -3103,6 +3182,7 @@ $dokka.location:org.jetbrains.skiko/SkikoPointerEventKind.SCROLL///PointingToDec
 $dokka.location:org.jetbrains.skiko/SkikoPointerEventKind.UNKNOWN///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-skiko-pointer-event-kind/-u-n-k-n-o-w-n/index.html
 $dokka.location:org.jetbrains.skiko/SkikoPointerEventKind.UP///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-skiko-pointer-event-kind/-u-p/index.html
 $dokka.location:org.jetbrains.skiko/SkikoPointerEventKind///PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-pointer-event-kind/index.html
+$dokka.location:org.jetbrains.skiko/SkikoPointerEventKind/entries/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-pointer-event-kind/entries.html
 $dokka.location:org.jetbrains.skiko/SkikoPointerEventKind/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-pointer-event-kind/value-of.html
 $dokka.location:org.jetbrains.skiko/SkikoPointerEventKind/values/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-pointer-event-kind/values.html
 $dokka.location:org.jetbrains.skiko/SkikoProperties///PointingToDeclaration/skiko/org.jetbrains.skiko/-skiko-properties/index.html
@@ -3212,6 +3292,7 @@ $dokka.location:org.jetbrains.skiko/SystemTheme.DARK///PointingToDeclaration/{"o
 $dokka.location:org.jetbrains.skiko/SystemTheme.LIGHT///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-system-theme/-l-i-g-h-t/index.html
 $dokka.location:org.jetbrains.skiko/SystemTheme.UNKNOWN///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}skiko/org.jetbrains.skiko/-system-theme/-u-n-k-n-o-w-n/index.html
 $dokka.location:org.jetbrains.skiko/SystemTheme///PointingToDeclaration/skiko/org.jetbrains.skiko/-system-theme/index.html
+$dokka.location:org.jetbrains.skiko/SystemTheme/entries/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-system-theme/entries.html
 $dokka.location:org.jetbrains.skiko/SystemTheme/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-system-theme/value-of.html
 $dokka.location:org.jetbrains.skiko/SystemTheme/values/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-system-theme/values.html
 $dokka.location:org.jetbrains.skiko/TextActions///PointingToDeclaration/skiko/org.jetbrains.skiko/-text-actions/index.html
@@ -3223,6 +3304,7 @@ $dokka.location:org.jetbrains.skiko/URIManager///PointingToDeclaration/skiko/or
 $dokka.location:org.jetbrains.skiko/URIManager/URIManager/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-u-r-i-manager/-u-r-i-manager.html
 $dokka.location:org.jetbrains.skiko/URIManager/openUri/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-u-r-i-manager/open-uri.html
 $dokka.location:org.jetbrains.skiko/WorkaroundSimpleOnGestureListener///PointingToDeclaration/skiko/org.jetbrains.skiko/-workaround-simple-on-gesture-listener/index.html
+$dokka.location:org.jetbrains.skiko/WorkaroundSimpleOnGestureListener/WorkaroundSimpleOnGestureListener/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-workaround-simple-on-gesture-listener/-workaround-simple-on-gesture-listener.html
 $dokka.location:org.jetbrains.skiko/WorkaroundSimpleOnGestureListener/onFling/#android.view.MotionEvent#android.view.MotionEvent#float#float/PointingToDeclaration/skiko/org.jetbrains.skiko/-workaround-simple-on-gesture-listener/on-fling.html
 $dokka.location:org.jetbrains.skiko/WorkaroundSimpleOnGestureListener/onScroll/#android.view.MotionEvent#android.view.MotionEvent#float#float/PointingToDeclaration/skiko/org.jetbrains.skiko/-workaround-simple-on-gesture-listener/on-scroll.html
 org.jetbrains.skia

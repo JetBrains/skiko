@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html class="no-js">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>KEY_RIGHT_CONTROL</title>
     <link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg">
     <script>var pathToRoot = "../../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
     <script>const storage = localStorage.getItem("dokka-dark-mode")
     if (storage == null) {
         const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
@@ -18,12 +19,13 @@
         }
     }
     </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async="async"></script>
 <script type="text/javascript" src="../../../../scripts/sourceset_dependencies.js" async="async"></script>
 <link href="../../../../styles/style.css" rel="Stylesheet">
-<link href="../../../../styles/jetbrains-mono.css" rel="Stylesheet">
 <link href="../../../../styles/main.css" rel="Stylesheet">
 <link href="../../../../styles/prism.css" rel="Stylesheet">
 <link href="../../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
 <script type="text/javascript" src="../../../../scripts/clipboard.js" async="async"></script>
 <script type="text/javascript" src="../../../../scripts/navigation-loader.js" async="async"></script>
 <script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async="async"></script>
@@ -32,108 +34,115 @@
 <script type="text/javascript" src="../../../../scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
 </head>
 <body>
-<div class="navigation-wrapper" id="navigation-wrapper">
-    <div id="leftToggler"><span class="icon-toggler"></span></div>
-    <div class="library-name">
-            <a href="../../../../index.html">
-                    <span>skiko</span>
-            </a>
-    </div>
-    <div>
-0.0.0-SNAPSHOT    </div>
-    <div class="pull-right d-flex">
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+                    <a class="library-name--link" href="../../../../index.html">
+                            skiko
+                    </a>
+            </div>
+            <div class="library-version">
+0.0.0-SNAPSHOT            </div>
+        </div>
         <div class="filter-section" id="filter-section">
                 <button class="platform-tag platform-selector common-like" data-active="" data-filter=":dokkaHtml/commonMain">common</button>
                 <button class="platform-tag platform-selector common-like" data-active="" data-filter=":dokkaHtml/iosMain">ios</button>
-                <button class="platform-tag platform-selector js-like" data-active="" data-filter=":dokkaHtml/jsMain">js</button>
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":dokkaHtml/jsWasmMain">jsWasm</button>
                 <button class="platform-tag platform-selector native-like" data-active="" data-filter=":dokkaHtml/linuxMain">linux</button>
                 <button class="platform-tag platform-selector common-like" data-active="" data-filter=":dokkaHtml/macosMain">macos</button>
         </div>
-        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
-        <div id="searchBar"></div>
     </div>
-</div>
-<div id="container">
-    <div id="leftColumn">
-        <div id="sideMenu"></div>
+    <div class="navigation-controls">
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
     </div>
-    <div id="main">
-<div class="main-content" id="content" pageIds="skiko::org.jetbrains.skiko/SkikoKey.KEY_RIGHT_CONTROL///PointingToDeclaration/{&quot;org.jetbrains.dokka.links.EnumEntryDRIExtra&quot;:{&quot;key&quot;:&quot;org.jetbrains.dokka.links.EnumEntryDRIExtra&quot;}}/246964478">
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageIds="skiko::org.jetbrains.skiko/SkikoKey.KEY_RIGHT_CONTROL///PointingToDeclaration/{&quot;org.jetbrains.dokka.links.EnumEntryDRIExtra&quot;:{&quot;key&quot;:&quot;org.jetbrains.dokka.links.EnumEntryDRIExtra&quot;}}/1758118044">
   <div class="breadcrumbs"><a href="../../../../index.html">skiko</a><span class="delimiter">/</span><a href="../../index.html">org.jetbrains.skiko</a><span class="delimiter">/</span><a href="../index.html">SkikoKey</a><span class="delimiter">/</span><span class="current">KEY_RIGHT_CONTROL</span></div>
   <div class="cover ">
     <h1 class="cover"><span><span>KEY_RIGHT_CONTROL</span></span></h1>
     <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-      <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain" data-active="" data-toggle=":dokkaHtml/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-toggle=":dokkaHtml/iosMain">ios</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jsMain" data-filterable-set=":dokkaHtml/jsMain" data-toggle=":dokkaHtml/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/linuxMain" data-filterable-set=":dokkaHtml/linuxMain" data-toggle=":dokkaHtml/linuxMain">linux</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/macosMain" data-filterable-set=":dokkaHtml/macosMain" data-toggle=":dokkaHtml/macosMain">macos</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><div class="block"><a href="index.html">KEY_RIGHT_CONTROL</a></div></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><div class="block"><a href="index.html">KEY_RIGHT_CONTROL</a></div></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jsMain"><div class="symbol monospace"><div class="block"><a href="index.html">KEY_RIGHT_CONTROL</a></div></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/linuxMain"><div class="symbol monospace"><div class="block"><a href="index.html">KEY_RIGHT_CONTROL</a></div></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/macosMain"><div class="symbol monospace"><div class="block"><a href="index.html">KEY_RIGHT_CONTROL</a></div></div></div>    </div>
+      <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain" data-active="" data-toggle=":dokkaHtml/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-toggle=":dokkaHtml/iosMain">ios</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jsWasmMain" data-filterable-set=":dokkaHtml/jsWasmMain" data-toggle=":dokkaHtml/jsWasmMain">jsWasm</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/linuxMain" data-filterable-set=":dokkaHtml/linuxMain" data-toggle=":dokkaHtml/linuxMain">linux</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/macosMain" data-filterable-set=":dokkaHtml/macosMain" data-toggle=":dokkaHtml/macosMain">macos</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><div class="block"><a href="index.html">KEY_RIGHT_CONTROL</a></div></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><div class="block"><a href="index.html">KEY_RIGHT_CONTROL</a></div></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jsWasmMain"><div class="symbol monospace"><div class="block"><a href="index.html">KEY_RIGHT_CONTROL</a></div></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/linuxMain"><div class="symbol monospace"><div class="block"><a href="index.html">KEY_RIGHT_CONTROL</a></div></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/macosMain"><div class="symbol monospace"><div class="block"><a href="index.html">KEY_RIGHT_CONTROL</a></div></div></div>    </div>
   </div>
   <div class="tabbedcontent">
-    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Properties">Properties</button></div>
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
     <div class="tabs-section-body">
-      <h2 class="">Properties</h2>
-      <div class="table" data-togglable="Properties"><a data-name="-372974862%2FProperties%2F246964478" anchor-label="name" id="-372974862%2FProperties%2F246964478" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/iosMain :dokkaHtml/jsMain :dokkaHtml/linuxMain :dokkaHtml/macosMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain :dokkaHtml/iosMain :dokkaHtml/jsMain :dokkaHtml/linuxMain :dokkaHtml/macosMain" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/iosMain :dokkaHtml/jsMain :dokkaHtml/linuxMain :dokkaHtml/macosMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><span data-unresolved-link="kotlin/Enum/name/#/PointingToDeclaration/"><span><span>name</span></span></span></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-372974862%2FProperties%2F246964478"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted" data-togglable="Properties">
-                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain" data-active="" data-toggle=":dokkaHtml/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-toggle=":dokkaHtml/iosMain">ios</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jsMain" data-filterable-set=":dokkaHtml/jsMain" data-toggle=":dokkaHtml/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/linuxMain" data-filterable-set=":dokkaHtml/linuxMain" data-toggle=":dokkaHtml/linuxMain">linux</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/macosMain" data-filterable-set=":dokkaHtml/macosMain" data-toggle=":dokkaHtml/macosMain">macos</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><a data-name="-372974862%2FProperties%2F246964478" anchor-label="name" id="-372974862%2FProperties%2F246964478" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/iosMain :dokkaHtml/jsMain :dokkaHtml/linuxMain :dokkaHtml/macosMain"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="../../../org.jetbrains.skia.svg/-s-v-g-tag/-u-s-e/index.html#-372974862%2FProperties%2F788909594">name</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/iosMain"><a data-name="-372974862%2FProperties%2F246964478" anchor-label="name" id="-372974862%2FProperties%2F246964478" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/iosMain :dokkaHtml/jsMain :dokkaHtml/linuxMain :dokkaHtml/macosMain"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="../-k-e-y_-n-u-m-p-a-d_-d-e-c-i-m-a-l/index.html#-372974862%2FProperties%2F1882441730">name</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jsMain"><a data-name="-372974862%2FProperties%2F246964478" anchor-label="name" id="-372974862%2FProperties%2F246964478" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/iosMain :dokkaHtml/jsMain :dokkaHtml/linuxMain :dokkaHtml/macosMain"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="../-k-e-y_-n-u-m-p-a-d_-d-e-c-i-m-a-l/index.html#-372974862%2FProperties%2F371682492">name</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/linuxMain"><a data-name="-372974862%2FProperties%2F246964478" anchor-label="name" id="-372974862%2FProperties%2F246964478" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/iosMain :dokkaHtml/jsMain :dokkaHtml/linuxMain :dokkaHtml/macosMain"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="../-k-e-y_-n-u-m-p-a-d_-d-e-c-i-m-a-l/index.html#-372974862%2FProperties%2F1463616612">name</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/macosMain"><a data-name="-372974862%2FProperties%2F246964478" anchor-label="name" id="-372974862%2FProperties%2F246964478" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/iosMain :dokkaHtml/jsMain :dokkaHtml/linuxMain :dokkaHtml/macosMain"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="../-k-e-y_-n-u-m-p-a-d_-d-e-c-i-m-a-l/index.html#-372974862%2FProperties%2F-929241906">name</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div></div>                </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="">Properties</h2>
+        <div class="table"><a data-name="-372974862%2FProperties%2F1758118044" anchor-label="name" id="-372974862%2FProperties%2F1758118044" data-filterable-set=":dokkaHtml/commonMain,:dokkaHtml/iosMain,:dokkaHtml/jsWasmMain,:dokkaHtml/linuxMain,:dokkaHtml/macosMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain,:dokkaHtml/iosMain,:dokkaHtml/jsWasmMain,:dokkaHtml/linuxMain,:dokkaHtml/macosMain" data-filterable-set=":dokkaHtml/commonMain,:dokkaHtml/iosMain,:dokkaHtml/jsWasmMain,:dokkaHtml/linuxMain,:dokkaHtml/macosMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><span data-unresolved-link="kotlin/Enum/name/#/PointingToDeclaration/"><span><span>name</span></span></span></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-372974862%2FProperties%2F1758118044"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain" data-active="" data-toggle=":dokkaHtml/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-toggle=":dokkaHtml/iosMain">ios</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jsWasmMain" data-filterable-set=":dokkaHtml/jsWasmMain" data-toggle=":dokkaHtml/jsWasmMain">jsWasm</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/linuxMain" data-filterable-set=":dokkaHtml/linuxMain" data-toggle=":dokkaHtml/linuxMain">linux</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/macosMain" data-filterable-set=":dokkaHtml/macosMain" data-toggle=":dokkaHtml/macosMain">macos</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="../../../org.jetbrains.skia.svg/-s-v-g-tag/-u-s-e/index.html#-372974862%2FProperties%2F788909594">name</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="../-k-e-y_-n-u-m-p-a-d_-d-e-c-i-m-a-l/index.html#-372974862%2FProperties%2F1882441730">name</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jsWasmMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="../-k-e-y_-n-u-m-p-a-d_-d-e-c-i-m-a-l/index.html#-372974862%2FProperties%2F-537942310">name</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/linuxMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="../-k-e-y_-n-u-m-p-a-d_-d-e-c-i-m-a-l/index.html#-372974862%2FProperties%2F1463616612">name</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/macosMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="../-k-e-y_-n-u-m-p-a-d_-d-e-c-i-m-a-l/index.html#-372974862%2FProperties%2F-929241906">name</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div></div>                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-<a data-name="-739389684%2FProperties%2F246964478" anchor-label="ordinal" id="-739389684%2FProperties%2F246964478" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/iosMain :dokkaHtml/jsMain :dokkaHtml/linuxMain :dokkaHtml/macosMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain :dokkaHtml/iosMain :dokkaHtml/jsMain :dokkaHtml/linuxMain :dokkaHtml/macosMain" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/iosMain :dokkaHtml/jsMain :dokkaHtml/linuxMain :dokkaHtml/macosMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><span data-unresolved-link="kotlin/Enum/ordinal/#/PointingToDeclaration/"><span><span>ordinal</span></span></span></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-739389684%2FProperties%2F246964478"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted" data-togglable="Properties">
-                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain" data-active="" data-toggle=":dokkaHtml/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-toggle=":dokkaHtml/iosMain">ios</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jsMain" data-filterable-set=":dokkaHtml/jsMain" data-toggle=":dokkaHtml/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/linuxMain" data-filterable-set=":dokkaHtml/linuxMain" data-toggle=":dokkaHtml/linuxMain">linux</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/macosMain" data-filterable-set=":dokkaHtml/macosMain" data-toggle=":dokkaHtml/macosMain">macos</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><a data-name="-739389684%2FProperties%2F246964478" anchor-label="ordinal" id="-739389684%2FProperties%2F246964478" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/iosMain :dokkaHtml/jsMain :dokkaHtml/linuxMain :dokkaHtml/macosMain"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="../../../org.jetbrains.skia.svg/-s-v-g-tag/-u-s-e/index.html#-739389684%2FProperties%2F788909594">ordinal</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/iosMain"><a data-name="-739389684%2FProperties%2F246964478" anchor-label="ordinal" id="-739389684%2FProperties%2F246964478" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/iosMain :dokkaHtml/jsMain :dokkaHtml/linuxMain :dokkaHtml/macosMain"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="../-k-e-y_-n-u-m-p-a-d_-d-e-c-i-m-a-l/index.html#-739389684%2FProperties%2F1882441730">ordinal</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jsMain"><a data-name="-739389684%2FProperties%2F246964478" anchor-label="ordinal" id="-739389684%2FProperties%2F246964478" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/iosMain :dokkaHtml/jsMain :dokkaHtml/linuxMain :dokkaHtml/macosMain"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="../-k-e-y_-n-u-m-p-a-d_-d-e-c-i-m-a-l/index.html#-739389684%2FProperties%2F371682492">ordinal</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/linuxMain"><a data-name="-739389684%2FProperties%2F246964478" anchor-label="ordinal" id="-739389684%2FProperties%2F246964478" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/iosMain :dokkaHtml/jsMain :dokkaHtml/linuxMain :dokkaHtml/macosMain"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="../-k-e-y_-n-u-m-p-a-d_-d-e-c-i-m-a-l/index.html#-739389684%2FProperties%2F1463616612">ordinal</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/macosMain"><a data-name="-739389684%2FProperties%2F246964478" anchor-label="ordinal" id="-739389684%2FProperties%2F246964478" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/iosMain :dokkaHtml/jsMain :dokkaHtml/linuxMain :dokkaHtml/macosMain"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="../-k-e-y_-n-u-m-p-a-d_-d-e-c-i-m-a-l/index.html#-739389684%2FProperties%2F-929241906">ordinal</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div>                </div>
+<a data-name="-739389684%2FProperties%2F1758118044" anchor-label="ordinal" id="-739389684%2FProperties%2F1758118044" data-filterable-set=":dokkaHtml/commonMain,:dokkaHtml/iosMain,:dokkaHtml/jsWasmMain,:dokkaHtml/linuxMain,:dokkaHtml/macosMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain,:dokkaHtml/iosMain,:dokkaHtml/jsWasmMain,:dokkaHtml/linuxMain,:dokkaHtml/macosMain" data-filterable-set=":dokkaHtml/commonMain,:dokkaHtml/iosMain,:dokkaHtml/jsWasmMain,:dokkaHtml/linuxMain,:dokkaHtml/macosMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><span data-unresolved-link="kotlin/Enum/ordinal/#/PointingToDeclaration/"><span><span>ordinal</span></span></span></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-739389684%2FProperties%2F1758118044"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain" data-active="" data-toggle=":dokkaHtml/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-toggle=":dokkaHtml/iosMain">ios</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jsWasmMain" data-filterable-set=":dokkaHtml/jsWasmMain" data-toggle=":dokkaHtml/jsWasmMain">jsWasm</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/linuxMain" data-filterable-set=":dokkaHtml/linuxMain" data-toggle=":dokkaHtml/linuxMain">linux</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/macosMain" data-filterable-set=":dokkaHtml/macosMain" data-toggle=":dokkaHtml/macosMain">macos</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="../../../org.jetbrains.skia.svg/-s-v-g-tag/-u-s-e/index.html#-739389684%2FProperties%2F788909594">ordinal</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="../-k-e-y_-n-u-m-p-a-d_-d-e-c-i-m-a-l/index.html#-739389684%2FProperties%2F1882441730">ordinal</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jsWasmMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="../-k-e-y_-n-u-m-p-a-d_-d-e-c-i-m-a-l/index.html#-739389684%2FProperties%2F-537942310">ordinal</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/linuxMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="../-k-e-y_-n-u-m-p-a-d_-d-e-c-i-m-a-l/index.html#-739389684%2FProperties%2F1463616612">ordinal</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/macosMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="../-k-e-y_-n-u-m-p-a-d_-d-e-c-i-m-a-l/index.html#-739389684%2FProperties%2F-929241906">ordinal</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div>                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-<a data-name="956243341%2FProperties%2F246964478" anchor-label="platformKeyCode" id="956243341%2FProperties%2F246964478" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/iosMain :dokkaHtml/jsMain :dokkaHtml/linuxMain :dokkaHtml/macosMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain :dokkaHtml/iosMain :dokkaHtml/jsMain :dokkaHtml/linuxMain :dokkaHtml/macosMain" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/iosMain :dokkaHtml/jsMain :dokkaHtml/linuxMain :dokkaHtml/macosMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="../platform-key-code.html"><span>platform</span><wbr></wbr><span>Key</span><wbr></wbr><span><span>Code</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="956243341%2FProperties%2F246964478"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted" data-togglable="Properties">
-                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain" data-active="" data-toggle=":dokkaHtml/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-toggle=":dokkaHtml/iosMain">ios</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jsMain" data-filterable-set=":dokkaHtml/jsMain" data-toggle=":dokkaHtml/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/linuxMain" data-filterable-set=":dokkaHtml/linuxMain" data-toggle=":dokkaHtml/linuxMain">linux</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/macosMain" data-filterable-set=":dokkaHtml/macosMain" data-toggle=":dokkaHtml/macosMain">macos</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><a data-name="956243341%2FProperties%2F246964478" anchor-label="platformKeyCode" id="956243341%2FProperties%2F246964478" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/iosMain :dokkaHtml/jsMain :dokkaHtml/linuxMain :dokkaHtml/macosMain"></a><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword"></span><span class="token keyword">val </span><a href="../platform-key-code.html">platformKeyCode</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/iosMain"><a data-name="956243341%2FProperties%2F246964478" anchor-label="platformKeyCode" id="956243341%2FProperties%2F246964478" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/iosMain :dokkaHtml/jsMain :dokkaHtml/linuxMain :dokkaHtml/macosMain"></a><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword"></span><span class="token keyword">val </span><a href="../platform-key-code.html">platformKeyCode</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jsMain"><a data-name="956243341%2FProperties%2F246964478" anchor-label="platformKeyCode" id="956243341%2FProperties%2F246964478" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/iosMain :dokkaHtml/jsMain :dokkaHtml/linuxMain :dokkaHtml/macosMain"></a><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword"></span><span class="token keyword">val </span><a href="../platform-key-code.html">platformKeyCode</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/linuxMain"><a data-name="956243341%2FProperties%2F246964478" anchor-label="platformKeyCode" id="956243341%2FProperties%2F246964478" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/iosMain :dokkaHtml/jsMain :dokkaHtml/linuxMain :dokkaHtml/macosMain"></a><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword"></span><span class="token keyword">val </span><a href="../platform-key-code.html">platformKeyCode</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/macosMain"><a data-name="956243341%2FProperties%2F246964478" anchor-label="platformKeyCode" id="956243341%2FProperties%2F246964478" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/iosMain :dokkaHtml/jsMain :dokkaHtml/linuxMain :dokkaHtml/macosMain"></a><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword"></span><span class="token keyword">val </span><a href="../platform-key-code.html">platformKeyCode</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div>                </div>
+<a data-name="956243341%2FProperties%2F1758118044" anchor-label="platformKeyCode" id="956243341%2FProperties%2F1758118044" data-filterable-set=":dokkaHtml/commonMain,:dokkaHtml/iosMain,:dokkaHtml/jsWasmMain,:dokkaHtml/linuxMain,:dokkaHtml/macosMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain,:dokkaHtml/iosMain,:dokkaHtml/jsWasmMain,:dokkaHtml/linuxMain,:dokkaHtml/macosMain" data-filterable-set=":dokkaHtml/commonMain,:dokkaHtml/iosMain,:dokkaHtml/jsWasmMain,:dokkaHtml/linuxMain,:dokkaHtml/macosMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../platform-key-code.html"><span>platform</span><wbr></wbr><span>Key</span><wbr></wbr><span><span>Code</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="956243341%2FProperties%2F1758118044"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain" data-active="" data-toggle=":dokkaHtml/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-toggle=":dokkaHtml/iosMain">ios</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jsWasmMain" data-filterable-set=":dokkaHtml/jsWasmMain" data-toggle=":dokkaHtml/jsWasmMain">jsWasm</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/linuxMain" data-filterable-set=":dokkaHtml/linuxMain" data-toggle=":dokkaHtml/linuxMain">linux</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/macosMain" data-filterable-set=":dokkaHtml/macosMain" data-toggle=":dokkaHtml/macosMain">macos</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword"></span><span class="token keyword">val </span><a href="../platform-key-code.html">platformKeyCode</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword"></span><span class="token keyword">val </span><a href="../platform-key-code.html">platformKeyCode</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jsWasmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword"></span><span class="token keyword">val </span><a href="../platform-key-code.html">platformKeyCode</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/linuxMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword"></span><span class="token keyword">val </span><a href="../platform-key-code.html">platformKeyCode</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/macosMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword"></span><span class="token keyword">val </span><a href="../platform-key-code.html">platformKeyCode</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div>                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 <a data-name="1844470613%2FProperties%2F1882441730" anchor-label="value" id="1844470613%2FProperties%2F1882441730" data-filterable-set=":dokkaHtml/iosMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="../value.html"><span><span>value</span></span></a></div>
+          <div class="table-row" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../value.html"><span><span>value</span></span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1844470613%2FProperties%2F1882441730"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted" data-togglable="Properties">
-                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-active="" data-toggle=":dokkaHtml/iosMain">ios</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/iosMain"><a data-name="1844470613%2FProperties%2F1882441730" anchor-label="value" id="1844470613%2FProperties%2F1882441730" data-filterable-set=":dokkaHtml/iosMain"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="../value.html">value</a><span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div>                </div>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/iosMain" data-filterable-set=":dokkaHtml/iosMain" data-active="" data-toggle=":dokkaHtml/iosMain">ios</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/iosMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="../value.html">value</a><span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div>                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -147,7 +156,8 @@
                 class="pull-right"><span>Generated by </span><a
                 href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
       </div>
+            </div>
+        </div>
     </div>
-</div>
 </body>
 </html>

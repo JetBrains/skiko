@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html class="no-js">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>CharDirection</title>
     <link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">
     <script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
     <script>const storage = localStorage.getItem("dokka-dark-mode")
     if (storage == null) {
         const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
@@ -18,12 +19,13 @@
         }
     }
     </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async="async"></script>
 <script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script>
 <link href="../../../styles/style.css" rel="Stylesheet">
-<link href="../../../styles/jetbrains-mono.css" rel="Stylesheet">
 <link href="../../../styles/main.css" rel="Stylesheet">
 <link href="../../../styles/prism.css" rel="Stylesheet">
 <link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
 <script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script>
 <script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script>
 <script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script>
@@ -32,396 +34,405 @@
 <script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
 </head>
 <body>
-<div class="navigation-wrapper" id="navigation-wrapper">
-    <div id="leftToggler"><span class="icon-toggler"></span></div>
-    <div class="library-name">
-            <a href="../../../index.html">
-                    <span>skiko</span>
-            </a>
-    </div>
-    <div>
-0.0.0-SNAPSHOT    </div>
-    <div class="pull-right d-flex">
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+                    <a class="library-name--link" href="../../../index.html">
+                            skiko
+                    </a>
+            </div>
+            <div class="library-version">
+0.0.0-SNAPSHOT            </div>
+        </div>
         <div class="filter-section" id="filter-section">
                 <button class="platform-tag platform-selector common-like" data-active="" data-filter=":dokkaHtml/commonMain">common</button>
         </div>
-        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
-        <div id="searchBar"></div>
     </div>
-</div>
-<div id="container">
-    <div id="leftColumn">
-        <div id="sideMenu"></div>
+    <div class="navigation-controls">
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
     </div>
-    <div id="main">
-<div class="main-content" id="content" pageIds="skiko::org.jetbrains.skia.icu/CharDirection///PointingToDeclaration//788909594">
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageIds="skiko::org.jetbrains.skia.icu/CharDirection///PointingToDeclaration//788909594">
   <div class="breadcrumbs"><a href="../../../index.html">skiko</a><span class="delimiter">/</span><a href="../index.html">org.jetbrains.skia.icu</a><span class="delimiter">/</span><span class="current">CharDirection</span></div>
   <div class="cover ">
     <h1 class="cover"><span>Char</span><wbr></wbr><span><span>Direction</span></span></h1>
     <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="index.html">CharDirection</a></div><p class="paragraph">CharDirection represents Bidi_Class Unicode character property. Numeric constant values match to ICU's UCharDirection enum.</p><p class="paragraph">See https://unicode-org.github.io/icu-docs/apidoc/dev/icu4c/uchar_8h.html See https://www.unicode.org/reports/tr9/</p></div></div>
   </div>
   <div class="tabbedcontent">
-    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Functions">Functions</button><button class="section-tab" data-togglable="Properties">Properties</button></div>
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
     <div class="tabs-section-body">
-      <h2 class="">Functions</h2>
-      <div class="table" data-togglable="Functions"><a data-name="-310971346%2FFunctions%2F788909594" anchor-label="of" id="-310971346%2FFunctions%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="of.html"><span><span>of</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-310971346%2FFunctions%2F788909594"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="of.html"><span class="token function">of</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">codePoint<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div><div class="brief "><p class="paragraph">Returns the bidirectional category value for the code point. Same as java.lang.Character.getDirectionality()</p></div></div></div>
+      <div data-togglable="PROPERTY">
+        <h2 class="">Properties</h2>
+        <div class="table"><a data-name="1618286071%2FProperties%2F788909594" anchor-label="ARABIC_NUMBER" id="1618286071%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-r-a-b-i-c_-n-u-m-b-e-r.html"><span><span>ARABIC_NUMBER</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1618286071%2FProperties%2F788909594"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-a-r-a-b-i-c_-n-u-m-b-e-r.html">ARABIC_NUMBER</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">5</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-12978912%2FProperties%2F788909594" anchor-label="BLOCK_SEPARATOR" id="-12978912%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-b-l-o-c-k_-s-e-p-a-r-a-t-o-r.html"><span><span>BLOCK_SEPARATOR</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-12978912%2FProperties%2F788909594"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-b-l-o-c-k_-s-e-p-a-r-a-t-o-r.html">BLOCK_SEPARATOR</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">7</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1772563637%2FProperties%2F788909594" anchor-label="BOUNDARY_NEUTRAL" id="1772563637%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-b-o-u-n-d-a-r-y_-n-e-u-t-r-a-l.html"><span><span>BOUNDARY_NEUTRAL</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1772563637%2FProperties%2F788909594"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-b-o-u-n-d-a-r-y_-n-e-u-t-r-a-l.html">BOUNDARY_NEUTRAL</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">18</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1367175824%2FProperties%2F788909594" anchor-label="COMMON_NUMBER_SEPARATOR" id="-1367175824%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-c-o-m-m-o-n_-n-u-m-b-e-r_-s-e-p-a-r-a-t-o-r.html"><span><span>COMMON_NUMBER_SEPARATOR</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1367175824%2FProperties%2F788909594"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-c-o-m-m-o-n_-n-u-m-b-e-r_-s-e-p-a-r-a-t-o-r.html">COMMON_NUMBER_SEPARATOR</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">6</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-624669862%2FProperties%2F788909594" anchor-label="DIR_NON_SPACING_MARK" id="-624669862%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-d-i-r_-n-o-n_-s-p-a-c-i-n-g_-m-a-r-k.html"><span><span>DIR_NON_SPACING_MARK</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-624669862%2FProperties%2F788909594"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-d-i-r_-n-o-n_-s-p-a-c-i-n-g_-m-a-r-k.html">DIR_NON_SPACING_MARK</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">17</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-376299238%2FProperties%2F788909594" anchor-label="EUROPEAN_NUMBER" id="-376299238%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-e-u-r-o-p-e-a-n_-n-u-m-b-e-r.html"><span><span>EUROPEAN_NUMBER</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-376299238%2FProperties%2F788909594"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-e-u-r-o-p-e-a-n_-n-u-m-b-e-r.html">EUROPEAN_NUMBER</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">2</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1857143212%2FProperties%2F788909594" anchor-label="EUROPEAN_NUMBER_SEPARATOR" id="-1857143212%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-e-u-r-o-p-e-a-n_-n-u-m-b-e-r_-s-e-p-a-r-a-t-o-r.html"><span><span>EUROPEAN_NUMBER_SEPARATOR</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1857143212%2FProperties%2F788909594"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-e-u-r-o-p-e-a-n_-n-u-m-b-e-r_-s-e-p-a-r-a-t-o-r.html">EUROPEAN_NUMBER_SEPARATOR</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">3</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1050289158%2FProperties%2F788909594" anchor-label="EUROPEAN_NUMBER_TERMINATOR" id="-1050289158%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-e-u-r-o-p-e-a-n_-n-u-m-b-e-r_-t-e-r-m-i-n-a-t-o-r.html"><span><span>EUROPEAN_NUMBER_TERMINATOR</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1050289158%2FProperties%2F788909594"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-e-u-r-o-p-e-a-n_-n-u-m-b-e-r_-t-e-r-m-i-n-a-t-o-r.html">EUROPEAN_NUMBER_TERMINATOR</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">4</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="787159509%2FProperties%2F788909594" anchor-label="FIRST_STRONG_ISOLATE" id="787159509%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-f-i-r-s-t_-s-t-r-o-n-g_-i-s-o-l-a-t-e.html"><span><span>FIRST_STRONG_ISOLATE</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="787159509%2FProperties%2F788909594"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-f-i-r-s-t_-s-t-r-o-n-g_-i-s-o-l-a-t-e.html">FIRST_STRONG_ISOLATE</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">19</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1223341635%2FProperties%2F788909594" anchor-label="LEFT_TO_RIGHT" id="1223341635%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-l-e-f-t_-t-o_-r-i-g-h-t.html"><span><span>LEFT_TO_RIGHT</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1223341635%2FProperties%2F788909594"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-l-e-f-t_-t-o_-r-i-g-h-t.html">LEFT_TO_RIGHT</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">0</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-617786357%2FProperties%2F788909594" anchor-label="LEFT_TO_RIGHT_EMBEDDING" id="-617786357%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-l-e-f-t_-t-o_-r-i-g-h-t_-e-m-b-e-d-d-i-n-g.html"><span><span>LEFT_TO_RIGHT_EMBEDDING</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-617786357%2FProperties%2F788909594"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-l-e-f-t_-t-o_-r-i-g-h-t_-e-m-b-e-d-d-i-n-g.html">LEFT_TO_RIGHT_EMBEDDING</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">11</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="773147255%2FProperties%2F788909594" anchor-label="LEFT_TO_RIGHT_ISOLATE" id="773147255%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-l-e-f-t_-t-o_-r-i-g-h-t_-i-s-o-l-a-t-e.html"><span><span>LEFT_TO_RIGHT_ISOLATE</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="773147255%2FProperties%2F788909594"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-l-e-f-t_-t-o_-r-i-g-h-t_-i-s-o-l-a-t-e.html">LEFT_TO_RIGHT_ISOLATE</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">20</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2022219476%2FProperties%2F788909594" anchor-label="LEFT_TO_RIGHT_OVERRIDE" id="-2022219476%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-l-e-f-t_-t-o_-r-i-g-h-t_-o-v-e-r-r-i-d-e.html"><span><span>LEFT_TO_RIGHT_OVERRIDE</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2022219476%2FProperties%2F788909594"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-l-e-f-t_-t-o_-r-i-g-h-t_-o-v-e-r-r-i-d-e.html">LEFT_TO_RIGHT_OVERRIDE</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">12</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1664826277%2FProperties%2F788909594" anchor-label="OTHER_NEUTRAL" id="-1664826277%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-o-t-h-e-r_-n-e-u-t-r-a-l.html"><span><span>OTHER_NEUTRAL</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1664826277%2FProperties%2F788909594"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-o-t-h-e-r_-n-e-u-t-r-a-l.html">OTHER_NEUTRAL</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">10</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="333923821%2FProperties%2F788909594" anchor-label="POP_DIRECTIONAL_FORMAT" id="333923821%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-p-o-p_-d-i-r-e-c-t-i-o-n-a-l_-f-o-r-m-a-t.html"><span><span>POP_DIRECTIONAL_FORMAT</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="333923821%2FProperties%2F788909594"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-p-o-p_-d-i-r-e-c-t-i-o-n-a-l_-f-o-r-m-a-t.html">POP_DIRECTIONAL_FORMAT</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">16</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="841852971%2FProperties%2F788909594" anchor-label="POP_DIRECTIONAL_ISOLATE" id="841852971%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-p-o-p_-d-i-r-e-c-t-i-o-n-a-l_-i-s-o-l-a-t-e.html"><span><span>POP_DIRECTIONAL_ISOLATE</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="841852971%2FProperties%2F788909594"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-p-o-p_-d-i-r-e-c-t-i-o-n-a-l_-i-s-o-l-a-t-e.html">POP_DIRECTIONAL_ISOLATE</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">22</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-733183573%2FProperties%2F788909594" anchor-label="RIGHT_TO_LEFT" id="-733183573%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-r-i-g-h-t_-t-o_-l-e-f-t.html"><span><span>RIGHT_TO_LEFT</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-733183573%2FProperties%2F788909594"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-r-i-g-h-t_-t-o_-l-e-f-t.html">RIGHT_TO_LEFT</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">1</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1937036964%2FProperties%2F788909594" anchor-label="RIGHT_TO_LEFT_ARABIC" id="1937036964%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-r-i-g-h-t_-t-o_-l-e-f-t_-a-r-a-b-i-c.html"><span><span>RIGHT_TO_LEFT_ARABIC</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1937036964%2FProperties%2F788909594"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-r-i-g-h-t_-t-o_-l-e-f-t_-a-r-a-b-i-c.html">RIGHT_TO_LEFT_ARABIC</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">13</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="938868083%2FProperties%2F788909594" anchor-label="RIGHT_TO_LEFT_EMBEDDING" id="938868083%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-r-i-g-h-t_-t-o_-l-e-f-t_-e-m-b-e-d-d-i-n-g.html"><span><span>RIGHT_TO_LEFT_EMBEDDING</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="938868083%2FProperties%2F788909594"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-r-i-g-h-t_-t-o_-l-e-f-t_-e-m-b-e-d-d-i-n-g.html">RIGHT_TO_LEFT_EMBEDDING</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">14</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1212755423%2FProperties%2F788909594" anchor-label="RIGHT_TO_LEFT_ISOLATE" id="1212755423%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-r-i-g-h-t_-t-o_-l-e-f-t_-i-s-o-l-a-t-e.html"><span><span>RIGHT_TO_LEFT_ISOLATE</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1212755423%2FProperties%2F788909594"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-r-i-g-h-t_-t-o_-l-e-f-t_-i-s-o-l-a-t-e.html">RIGHT_TO_LEFT_ISOLATE</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">21</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1279268156%2FProperties%2F788909594" anchor-label="RIGHT_TO_LEFT_OVERRIDE" id="-1279268156%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-r-i-g-h-t_-t-o_-l-e-f-t_-o-v-e-r-r-i-d-e.html"><span><span>RIGHT_TO_LEFT_OVERRIDE</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1279268156%2FProperties%2F788909594"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-r-i-g-h-t_-t-o_-l-e-f-t_-o-v-e-r-r-i-d-e.html">RIGHT_TO_LEFT_OVERRIDE</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">15</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-898408646%2FProperties%2F788909594" anchor-label="SEGMENT_SEPARATOR" id="-898408646%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-s-e-g-m-e-n-t_-s-e-p-a-r-a-t-o-r.html"><span><span>SEGMENT_SEPARATOR</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-898408646%2FProperties%2F788909594"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-s-e-g-m-e-n-t_-s-e-p-a-r-a-t-o-r.html">SEGMENT_SEPARATOR</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">8</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-956580453%2FProperties%2F788909594" anchor-label="WHITE_SPACE_NEUTRAL" id="-956580453%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-w-h-i-t-e_-s-p-a-c-e_-n-e-u-t-r-a-l.html"><span><span>WHITE_SPACE_NEUTRAL</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-956580453%2FProperties%2F788909594"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-w-h-i-t-e_-s-p-a-c-e_-n-e-u-t-r-a-l.html">WHITE_SPACE_NEUTRAL</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">9</span></div></div></div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <h2 class="">Properties</h2>
-      <div class="table" data-togglable="Properties"><a data-name="1618286071%2FProperties%2F788909594" anchor-label="ARABIC_NUMBER" id="1618286071%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="-a-r-a-b-i-c_-n-u-m-b-e-r.html"><span><span>ARABIC_NUMBER</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1618286071%2FProperties%2F788909594"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><a data-name="1618286071%2FProperties%2F788909594" anchor-label="ARABIC_NUMBER" id="1618286071%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-a-r-a-b-i-c_-n-u-m-b-e-r.html">ARABIC_NUMBER</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">5</span></div></div></div>
-              </div>
-            </div>
-          </div>
-        </div>
-<a data-name="-12978912%2FProperties%2F788909594" anchor-label="BLOCK_SEPARATOR" id="-12978912%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="-b-l-o-c-k_-s-e-p-a-r-a-t-o-r.html"><span><span>BLOCK_SEPARATOR</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-12978912%2FProperties%2F788909594"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><a data-name="-12978912%2FProperties%2F788909594" anchor-label="BLOCK_SEPARATOR" id="-12978912%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-b-l-o-c-k_-s-e-p-a-r-a-t-o-r.html">BLOCK_SEPARATOR</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">7</span></div></div></div>
-              </div>
-            </div>
-          </div>
-        </div>
-<a data-name="1772563637%2FProperties%2F788909594" anchor-label="BOUNDARY_NEUTRAL" id="1772563637%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="-b-o-u-n-d-a-r-y_-n-e-u-t-r-a-l.html"><span><span>BOUNDARY_NEUTRAL</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1772563637%2FProperties%2F788909594"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><a data-name="1772563637%2FProperties%2F788909594" anchor-label="BOUNDARY_NEUTRAL" id="1772563637%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-b-o-u-n-d-a-r-y_-n-e-u-t-r-a-l.html">BOUNDARY_NEUTRAL</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">18</span></div></div></div>
-              </div>
-            </div>
-          </div>
-        </div>
-<a data-name="-1367175824%2FProperties%2F788909594" anchor-label="COMMON_NUMBER_SEPARATOR" id="-1367175824%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="-c-o-m-m-o-n_-n-u-m-b-e-r_-s-e-p-a-r-a-t-o-r.html"><span><span>COMMON_NUMBER_SEPARATOR</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1367175824%2FProperties%2F788909594"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><a data-name="-1367175824%2FProperties%2F788909594" anchor-label="COMMON_NUMBER_SEPARATOR" id="-1367175824%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-c-o-m-m-o-n_-n-u-m-b-e-r_-s-e-p-a-r-a-t-o-r.html">COMMON_NUMBER_SEPARATOR</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">6</span></div></div></div>
-              </div>
-            </div>
-          </div>
-        </div>
-<a data-name="-624669862%2FProperties%2F788909594" anchor-label="DIR_NON_SPACING_MARK" id="-624669862%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="-d-i-r_-n-o-n_-s-p-a-c-i-n-g_-m-a-r-k.html"><span><span>DIR_NON_SPACING_MARK</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-624669862%2FProperties%2F788909594"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><a data-name="-624669862%2FProperties%2F788909594" anchor-label="DIR_NON_SPACING_MARK" id="-624669862%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-d-i-r_-n-o-n_-s-p-a-c-i-n-g_-m-a-r-k.html">DIR_NON_SPACING_MARK</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">17</span></div></div></div>
-              </div>
-            </div>
-          </div>
-        </div>
-<a data-name="-376299238%2FProperties%2F788909594" anchor-label="EUROPEAN_NUMBER" id="-376299238%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="-e-u-r-o-p-e-a-n_-n-u-m-b-e-r.html"><span><span>EUROPEAN_NUMBER</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-376299238%2FProperties%2F788909594"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><a data-name="-376299238%2FProperties%2F788909594" anchor-label="EUROPEAN_NUMBER" id="-376299238%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-e-u-r-o-p-e-a-n_-n-u-m-b-e-r.html">EUROPEAN_NUMBER</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">2</span></div></div></div>
-              </div>
-            </div>
-          </div>
-        </div>
-<a data-name="-1857143212%2FProperties%2F788909594" anchor-label="EUROPEAN_NUMBER_SEPARATOR" id="-1857143212%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="-e-u-r-o-p-e-a-n_-n-u-m-b-e-r_-s-e-p-a-r-a-t-o-r.html"><span><span>EUROPEAN_NUMBER_SEPARATOR</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1857143212%2FProperties%2F788909594"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><a data-name="-1857143212%2FProperties%2F788909594" anchor-label="EUROPEAN_NUMBER_SEPARATOR" id="-1857143212%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-e-u-r-o-p-e-a-n_-n-u-m-b-e-r_-s-e-p-a-r-a-t-o-r.html">EUROPEAN_NUMBER_SEPARATOR</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">3</span></div></div></div>
-              </div>
-            </div>
-          </div>
-        </div>
-<a data-name="-1050289158%2FProperties%2F788909594" anchor-label="EUROPEAN_NUMBER_TERMINATOR" id="-1050289158%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="-e-u-r-o-p-e-a-n_-n-u-m-b-e-r_-t-e-r-m-i-n-a-t-o-r.html"><span><span>EUROPEAN_NUMBER_TERMINATOR</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1050289158%2FProperties%2F788909594"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><a data-name="-1050289158%2FProperties%2F788909594" anchor-label="EUROPEAN_NUMBER_TERMINATOR" id="-1050289158%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-e-u-r-o-p-e-a-n_-n-u-m-b-e-r_-t-e-r-m-i-n-a-t-o-r.html">EUROPEAN_NUMBER_TERMINATOR</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">4</span></div></div></div>
-              </div>
-            </div>
-          </div>
-        </div>
-<a data-name="787159509%2FProperties%2F788909594" anchor-label="FIRST_STRONG_ISOLATE" id="787159509%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="-f-i-r-s-t_-s-t-r-o-n-g_-i-s-o-l-a-t-e.html"><span><span>FIRST_STRONG_ISOLATE</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="787159509%2FProperties%2F788909594"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><a data-name="787159509%2FProperties%2F788909594" anchor-label="FIRST_STRONG_ISOLATE" id="787159509%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-f-i-r-s-t_-s-t-r-o-n-g_-i-s-o-l-a-t-e.html">FIRST_STRONG_ISOLATE</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">19</span></div></div></div>
-              </div>
-            </div>
-          </div>
-        </div>
-<a data-name="1223341635%2FProperties%2F788909594" anchor-label="LEFT_TO_RIGHT" id="1223341635%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="-l-e-f-t_-t-o_-r-i-g-h-t.html"><span><span>LEFT_TO_RIGHT</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1223341635%2FProperties%2F788909594"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><a data-name="1223341635%2FProperties%2F788909594" anchor-label="LEFT_TO_RIGHT" id="1223341635%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-l-e-f-t_-t-o_-r-i-g-h-t.html">LEFT_TO_RIGHT</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">0</span></div></div></div>
-              </div>
-            </div>
-          </div>
-        </div>
-<a data-name="-617786357%2FProperties%2F788909594" anchor-label="LEFT_TO_RIGHT_EMBEDDING" id="-617786357%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="-l-e-f-t_-t-o_-r-i-g-h-t_-e-m-b-e-d-d-i-n-g.html"><span><span>LEFT_TO_RIGHT_EMBEDDING</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-617786357%2FProperties%2F788909594"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><a data-name="-617786357%2FProperties%2F788909594" anchor-label="LEFT_TO_RIGHT_EMBEDDING" id="-617786357%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-l-e-f-t_-t-o_-r-i-g-h-t_-e-m-b-e-d-d-i-n-g.html">LEFT_TO_RIGHT_EMBEDDING</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">11</span></div></div></div>
-              </div>
-            </div>
-          </div>
-        </div>
-<a data-name="773147255%2FProperties%2F788909594" anchor-label="LEFT_TO_RIGHT_ISOLATE" id="773147255%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="-l-e-f-t_-t-o_-r-i-g-h-t_-i-s-o-l-a-t-e.html"><span><span>LEFT_TO_RIGHT_ISOLATE</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="773147255%2FProperties%2F788909594"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><a data-name="773147255%2FProperties%2F788909594" anchor-label="LEFT_TO_RIGHT_ISOLATE" id="773147255%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-l-e-f-t_-t-o_-r-i-g-h-t_-i-s-o-l-a-t-e.html">LEFT_TO_RIGHT_ISOLATE</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">20</span></div></div></div>
-              </div>
-            </div>
-          </div>
-        </div>
-<a data-name="-2022219476%2FProperties%2F788909594" anchor-label="LEFT_TO_RIGHT_OVERRIDE" id="-2022219476%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="-l-e-f-t_-t-o_-r-i-g-h-t_-o-v-e-r-r-i-d-e.html"><span><span>LEFT_TO_RIGHT_OVERRIDE</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2022219476%2FProperties%2F788909594"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><a data-name="-2022219476%2FProperties%2F788909594" anchor-label="LEFT_TO_RIGHT_OVERRIDE" id="-2022219476%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-l-e-f-t_-t-o_-r-i-g-h-t_-o-v-e-r-r-i-d-e.html">LEFT_TO_RIGHT_OVERRIDE</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">12</span></div></div></div>
-              </div>
-            </div>
-          </div>
-        </div>
-<a data-name="-1664826277%2FProperties%2F788909594" anchor-label="OTHER_NEUTRAL" id="-1664826277%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="-o-t-h-e-r_-n-e-u-t-r-a-l.html"><span><span>OTHER_NEUTRAL</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1664826277%2FProperties%2F788909594"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><a data-name="-1664826277%2FProperties%2F788909594" anchor-label="OTHER_NEUTRAL" id="-1664826277%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-o-t-h-e-r_-n-e-u-t-r-a-l.html">OTHER_NEUTRAL</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">10</span></div></div></div>
-              </div>
-            </div>
-          </div>
-        </div>
-<a data-name="333923821%2FProperties%2F788909594" anchor-label="POP_DIRECTIONAL_FORMAT" id="333923821%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="-p-o-p_-d-i-r-e-c-t-i-o-n-a-l_-f-o-r-m-a-t.html"><span><span>POP_DIRECTIONAL_FORMAT</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="333923821%2FProperties%2F788909594"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><a data-name="333923821%2FProperties%2F788909594" anchor-label="POP_DIRECTIONAL_FORMAT" id="333923821%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-p-o-p_-d-i-r-e-c-t-i-o-n-a-l_-f-o-r-m-a-t.html">POP_DIRECTIONAL_FORMAT</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">16</span></div></div></div>
-              </div>
-            </div>
-          </div>
-        </div>
-<a data-name="841852971%2FProperties%2F788909594" anchor-label="POP_DIRECTIONAL_ISOLATE" id="841852971%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="-p-o-p_-d-i-r-e-c-t-i-o-n-a-l_-i-s-o-l-a-t-e.html"><span><span>POP_DIRECTIONAL_ISOLATE</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="841852971%2FProperties%2F788909594"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><a data-name="841852971%2FProperties%2F788909594" anchor-label="POP_DIRECTIONAL_ISOLATE" id="841852971%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-p-o-p_-d-i-r-e-c-t-i-o-n-a-l_-i-s-o-l-a-t-e.html">POP_DIRECTIONAL_ISOLATE</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">22</span></div></div></div>
-              </div>
-            </div>
-          </div>
-        </div>
-<a data-name="-733183573%2FProperties%2F788909594" anchor-label="RIGHT_TO_LEFT" id="-733183573%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="-r-i-g-h-t_-t-o_-l-e-f-t.html"><span><span>RIGHT_TO_LEFT</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-733183573%2FProperties%2F788909594"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><a data-name="-733183573%2FProperties%2F788909594" anchor-label="RIGHT_TO_LEFT" id="-733183573%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-r-i-g-h-t_-t-o_-l-e-f-t.html">RIGHT_TO_LEFT</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">1</span></div></div></div>
-              </div>
-            </div>
-          </div>
-        </div>
-<a data-name="1937036964%2FProperties%2F788909594" anchor-label="RIGHT_TO_LEFT_ARABIC" id="1937036964%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="-r-i-g-h-t_-t-o_-l-e-f-t_-a-r-a-b-i-c.html"><span><span>RIGHT_TO_LEFT_ARABIC</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1937036964%2FProperties%2F788909594"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><a data-name="1937036964%2FProperties%2F788909594" anchor-label="RIGHT_TO_LEFT_ARABIC" id="1937036964%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-r-i-g-h-t_-t-o_-l-e-f-t_-a-r-a-b-i-c.html">RIGHT_TO_LEFT_ARABIC</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">13</span></div></div></div>
-              </div>
-            </div>
-          </div>
-        </div>
-<a data-name="938868083%2FProperties%2F788909594" anchor-label="RIGHT_TO_LEFT_EMBEDDING" id="938868083%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="-r-i-g-h-t_-t-o_-l-e-f-t_-e-m-b-e-d-d-i-n-g.html"><span><span>RIGHT_TO_LEFT_EMBEDDING</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="938868083%2FProperties%2F788909594"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><a data-name="938868083%2FProperties%2F788909594" anchor-label="RIGHT_TO_LEFT_EMBEDDING" id="938868083%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-r-i-g-h-t_-t-o_-l-e-f-t_-e-m-b-e-d-d-i-n-g.html">RIGHT_TO_LEFT_EMBEDDING</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">14</span></div></div></div>
-              </div>
-            </div>
-          </div>
-        </div>
-<a data-name="1212755423%2FProperties%2F788909594" anchor-label="RIGHT_TO_LEFT_ISOLATE" id="1212755423%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="-r-i-g-h-t_-t-o_-l-e-f-t_-i-s-o-l-a-t-e.html"><span><span>RIGHT_TO_LEFT_ISOLATE</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1212755423%2FProperties%2F788909594"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><a data-name="1212755423%2FProperties%2F788909594" anchor-label="RIGHT_TO_LEFT_ISOLATE" id="1212755423%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-r-i-g-h-t_-t-o_-l-e-f-t_-i-s-o-l-a-t-e.html">RIGHT_TO_LEFT_ISOLATE</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">21</span></div></div></div>
-              </div>
-            </div>
-          </div>
-        </div>
-<a data-name="-1279268156%2FProperties%2F788909594" anchor-label="RIGHT_TO_LEFT_OVERRIDE" id="-1279268156%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="-r-i-g-h-t_-t-o_-l-e-f-t_-o-v-e-r-r-i-d-e.html"><span><span>RIGHT_TO_LEFT_OVERRIDE</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1279268156%2FProperties%2F788909594"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><a data-name="-1279268156%2FProperties%2F788909594" anchor-label="RIGHT_TO_LEFT_OVERRIDE" id="-1279268156%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-r-i-g-h-t_-t-o_-l-e-f-t_-o-v-e-r-r-i-d-e.html">RIGHT_TO_LEFT_OVERRIDE</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">15</span></div></div></div>
-              </div>
-            </div>
-          </div>
-        </div>
-<a data-name="-898408646%2FProperties%2F788909594" anchor-label="SEGMENT_SEPARATOR" id="-898408646%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="-s-e-g-m-e-n-t_-s-e-p-a-r-a-t-o-r.html"><span><span>SEGMENT_SEPARATOR</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-898408646%2FProperties%2F788909594"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><a data-name="-898408646%2FProperties%2F788909594" anchor-label="SEGMENT_SEPARATOR" id="-898408646%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-s-e-g-m-e-n-t_-s-e-p-a-r-a-t-o-r.html">SEGMENT_SEPARATOR</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">8</span></div></div></div>
-              </div>
-            </div>
-          </div>
-        </div>
-<a data-name="-956580453%2FProperties%2F788909594" anchor-label="WHITE_SPACE_NEUTRAL" id="-956580453%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="-w-h-i-t-e_-s-p-a-c-e_-n-e-u-t-r-a-l.html"><span><span>WHITE_SPACE_NEUTRAL</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-956580453%2FProperties%2F788909594"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><a data-name="-956580453%2FProperties%2F788909594" anchor-label="WHITE_SPACE_NEUTRAL" id="-956580453%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-w-h-i-t-e_-s-p-a-c-e_-n-e-u-t-r-a-l.html">WHITE_SPACE_NEUTRAL</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">9</span></div></div></div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="-310971346%2FFunctions%2F788909594" anchor-label="of" id="-310971346%2FFunctions%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="of.html"><span><span>of</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-310971346%2FFunctions%2F788909594"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="of.html"><span class="token function">of</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">codePoint<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div><div class="brief "><p class="paragraph">Returns the bidirectional category value for the code point. Same as java.lang.Character.getDirectionality()</p></div></div></div>
+                </div>
               </div>
             </div>
           </div>
@@ -435,7 +446,8 @@
                 class="pull-right"><span>Generated by </span><a
                 href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
       </div>
+            </div>
+        </div>
     </div>
-</div>
 </body>
 </html>

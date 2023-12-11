@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html class="no-js">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>RefCnt</title>
     <link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">
     <script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
     <script>const storage = localStorage.getItem("dokka-dark-mode")
     if (storage == null) {
         const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
@@ -18,12 +19,13 @@
         }
     }
     </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async="async"></script>
 <script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script>
 <link href="../../../styles/style.css" rel="Stylesheet">
-<link href="../../../styles/jetbrains-mono.css" rel="Stylesheet">
 <link href="../../../styles/main.css" rel="Stylesheet">
 <link href="../../../styles/prism.css" rel="Stylesheet">
 <link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
 <script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script>
 <script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script>
 <script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script>
@@ -32,364 +34,175 @@
 <script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
 </head>
 <body>
-<div class="navigation-wrapper" id="navigation-wrapper">
-    <div id="leftToggler"><span class="icon-toggler"></span></div>
-    <div class="library-name">
-            <a href="../../../index.html">
-                    <span>skiko</span>
-            </a>
-    </div>
-    <div>
-0.0.0-SNAPSHOT    </div>
-    <div class="pull-right d-flex">
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+                    <a class="library-name--link" href="../../../index.html">
+                            skiko
+                    </a>
+            </div>
+            <div class="library-version">
+0.0.0-SNAPSHOT            </div>
+        </div>
         <div class="filter-section" id="filter-section">
                 <button class="platform-tag platform-selector common-like" data-active="" data-filter=":dokkaHtml/commonMain">common</button>
-                <button class="platform-tag platform-selector js-like" data-active="" data-filter=":dokkaHtml/jsMain">js</button>
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":dokkaHtml/jsWasmMain">jsWasm</button>
                 <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":dokkaHtml/jvmMain">jvm</button>
                 <button class="platform-tag platform-selector common-like" data-active="" data-filter=":dokkaHtml/nativeMain">native</button>
         </div>
-        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
-        <div id="searchBar"></div>
     </div>
-</div>
-<div id="container">
-    <div id="leftColumn">
-        <div id="sideMenu"></div>
+    <div class="navigation-controls">
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
     </div>
-    <div id="main">
-<div class="main-content" id="content" pageIds="skiko::org.jetbrains.skia.impl/RefCnt///PointingToDeclaration//703050856">
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageIds="skiko::org.jetbrains.skia.impl/RefCnt///PointingToDeclaration//-1314037494">
   <div class="breadcrumbs"><a href="../../../index.html">skiko</a><span class="delimiter">/</span><a href="../index.html">org.jetbrains.skia.impl</a><span class="delimiter">/</span><span class="current">RefCnt</span></div>
   <div class="cover ">
     <h1 class="cover"><span>Ref</span><wbr></wbr><span><span>Cnt</span></span></h1>
     <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-      <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain" data-active="" data-toggle=":dokkaHtml/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jsMain" data-filterable-set=":dokkaHtml/jsMain" data-toggle=":dokkaHtml/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain" data-toggle=":dokkaHtml/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/nativeMain" data-toggle=":dokkaHtml/nativeMain">native</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="index.html">RefCnt</a> : <a href="../-managed/index.html">Managed</a></div><p class="paragraph">Peer for reference counted native object.</p></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="index.html">RefCnt</a> : <a href="../-managed/index.html">Managed</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="index.html">RefCnt</a> : <a href="../-managed/index.html">Managed</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="index.html">RefCnt</a> : <a href="../-managed/index.html">Managed</a></div></div>    </div>
+      <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain" data-active="" data-toggle=":dokkaHtml/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jsWasmMain" data-filterable-set=":dokkaHtml/jsWasmMain" data-toggle=":dokkaHtml/jsWasmMain">jsWasm</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain" data-toggle=":dokkaHtml/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/nativeMain" data-toggle=":dokkaHtml/nativeMain">native</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="index.html">RefCnt</a> : <a href="../-managed/index.html">Managed</a></div><p class="paragraph">Peer for reference counted native object.</p><h4 class="">Inheritors</h4><div class="table"><div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../../org.jetbrains.skia/-color-filter/index.html">ColorFilter</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../../org.jetbrains.skia/-direct-context/index.html">DirectContext</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../../org.jetbrains.skia/-font-mgr/index.html">FontMgr</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../../org.jetbrains.skia/-font-style-set/index.html">FontStyleSet</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../../org.jetbrains.skia/-image/index.html">Image</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../../org.jetbrains.skia/-image-filter/index.html">ImageFilter</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../../org.jetbrains.skia/-mask-filter/index.html">MaskFilter</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../../org.jetbrains.skia/-path-effect/index.html">PathEffect</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../../org.jetbrains.skia/-picture/index.html">Picture</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../../org.jetbrains.skia/-pixel-ref/index.html">PixelRef</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../../org.jetbrains.skia/-runtime-effect/index.html">RuntimeEffect</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../../org.jetbrains.skia/-shader/index.html">Shader</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../../org.jetbrains.skia/-surface/index.html">Surface</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../../org.jetbrains.skia/-typeface/index.html">Typeface</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../../org.jetbrains.skia.paragraph/-font-collection/index.html">FontCollection</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../../org.jetbrains.skia.skottie/-logger/index.html">Logger</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../../org.jetbrains.skia.svg/-s-v-g-d-o-m/index.html">SVGDOM</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../../org.jetbrains.skia.svg/-s-v-g-node/index.html">SVGNode</a></div></span></div><div></div></div></div></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jsWasmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="index.html">RefCnt</a> : <a href="../-managed/index.html">Managed</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="index.html">RefCnt</a> : <a href="../-managed/index.html">Managed</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="index.html">RefCnt</a> : <a href="../-managed/index.html">Managed</a></div></div>    </div>
   </div>
   <div class="tabbedcontent">
-    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Types">Types</button><button class="section-tab" data-togglable="Functions">Functions</button><button class="section-tab" data-togglable="Properties">Properties</button><button class="section-tab" data-togglable="Inheritors">Inheritors</button></div>
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
     <div class="tabs-section-body">
-      <h2 class="">Types</h2>
-      <div class="table" data-togglable="Types"><a data-name="358918506%2FClasslikes%2F-879532132" anchor-label="Companion" id="358918506%2FClasslikes%2F-879532132" data-filterable-set=":dokkaHtml/jvmMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="-companion/index.html"><span><span>Companion</span></span></a></div>
+      <div data-togglable="TYPE">
+        <h2 class="">Types</h2>
+        <div class="table"><a data-name="358918506%2FClasslikes%2F-879532132" anchor-label="Companion" id="358918506%2FClasslikes%2F-879532132" data-filterable-set=":dokkaHtml/jvmMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-companion/index.html"><span><span>Companion</span></span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="358918506%2FClasslikes%2F-879532132"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain" data-active="" data-toggle=":dokkaHtml/jvmMain">jvm</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/jvmMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="-companion/index.html">Companion</a></div></div>                </div>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain" data-active="" data-toggle=":dokkaHtml/jvmMain">jvm</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/jvmMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="-companion/index.html">Companion</a></div></div>                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <h2 class="">Functions</h2>
-      <div class="table" data-togglable="Functions"><a data-name="-1228079928%2FFunctions%2F703050856" anchor-label="close" id="-1228079928%2FFunctions%2F703050856" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain :dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="../-managed/close.html"><span><span>close</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1228079928%2FFunctions%2F703050856"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain" data-active="" data-toggle=":dokkaHtml/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jsMain" data-filterable-set=":dokkaHtml/jsMain" data-toggle=":dokkaHtml/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain" data-toggle=":dokkaHtml/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/nativeMain" data-toggle=":dokkaHtml/nativeMain">native</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="../-managed/close.html"><span class="token function">close</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Free underlying native resource, peer is useless afterwards.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="../-managed/close.html"><span class="token function">close</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="../-managed/close.html"><span class="token function">close</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="../-managed/close.html"><span class="token function">close</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div>                </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="">Properties</h2>
+        <div class="table"><a data-name="1170671204%2FProperties%2F-1314037494" anchor-label="isClosed" id="1170671204%2FProperties%2F-1314037494" data-filterable-set=":dokkaHtml/commonMain,:dokkaHtml/jsWasmMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain,:dokkaHtml/jsWasmMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/commonMain,:dokkaHtml/jsWasmMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-managed/is-closed.html"><span>is</span><wbr></wbr><span><span>Closed</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1170671204%2FProperties%2F-1314037494"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain" data-active="" data-toggle=":dokkaHtml/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jsWasmMain" data-filterable-set=":dokkaHtml/jsWasmMain" data-toggle=":dokkaHtml/jsWasmMain">jsWasm</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain" data-toggle=":dokkaHtml/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/nativeMain" data-toggle=":dokkaHtml/nativeMain">native</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">val </span><a href="../-managed/is-closed.html">isClosed</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Check if underlying resource is closed.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jsWasmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">val </span><a href="../-managed/is-closed.html">isClosed</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">val </span><a href="../-managed/is-closed.html">isClosed</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">val </span><a href="../-managed/is-closed.html">isClosed</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div>                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-<a data-name="1104883689%2FFunctions%2F337714522" anchor-label="equals" id="1104883689%2FFunctions%2F337714522" data-filterable-set=":dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><span data-unresolved-link="org.jetbrains.skia.impl/Native/equals/#kotlin.Any?/PointingToDeclaration/"><span><span>equals</span></span></span></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1104883689%2FFunctions%2F337714522"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jsMain" data-filterable-set=":dokkaHtml/jsMain" data-active="" data-toggle=":dokkaHtml/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain" data-toggle=":dokkaHtml/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/nativeMain" data-toggle=":dokkaHtml/nativeMain">native</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/jsMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">operator override </span><span class="token keyword">fun </span><a href="../-native/[js]equals.html"><span class="token function">equals</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">other<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jvmMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">operator override </span><span class="token keyword">fun </span><a href="../-native/[jvm]equals.html"><span class="token function">equals</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">other<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/nativeMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">operator override </span><span class="token keyword">fun </span><a href="../-native/[native]equals.html"><span class="token function">equals</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">other<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div>                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-<a data-name="-47399203%2FFunctions%2F337714522" anchor-label="hashCode" id="-47399203%2FFunctions%2F337714522" data-filterable-set=":dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><span data-unresolved-link="org.jetbrains.skia.impl/Native/hashCode/#/PointingToDeclaration/"><span>hash</span><wbr></wbr><span><span>Code</span></span></span></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-47399203%2FFunctions%2F337714522"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jsMain" data-filterable-set=":dokkaHtml/jsMain" data-active="" data-toggle=":dokkaHtml/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain" data-toggle=":dokkaHtml/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/nativeMain" data-toggle=":dokkaHtml/nativeMain">native</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/jsMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="../-native/[js]hash-code.html"><span class="token function">hashCode</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jvmMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="../-native/[jvm]hash-code.html"><span class="token function">hashCode</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/nativeMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="../-native/[native]hash-code.html"><span class="token function">hashCode</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div>                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-<a data-name="1180678603%2FFunctions%2F703050856" anchor-label="toString" id="1180678603%2FFunctions%2F703050856" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain :dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="../-native/to-string.html"><span>to</span><wbr></wbr><span><span>String</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1180678603%2FFunctions%2F703050856"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain" data-active="" data-toggle=":dokkaHtml/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jsMain" data-filterable-set=":dokkaHtml/jsMain" data-toggle=":dokkaHtml/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain" data-toggle=":dokkaHtml/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/nativeMain" data-toggle=":dokkaHtml/nativeMain">native</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="../-native/to-string.html"><span class="token function">toString</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jsMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="[js]to-string.html"><span class="token function">toString</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jvmMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="[jvm]to-string.html"><span class="token function">toString</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/nativeMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="[native]to-string.html"><span class="token function">toString</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div></div>                </div>
+<a data-name="-1629275685%2FProperties%2F-1314037494" anchor-label="refCount" id="-1629275685%2FProperties%2F-1314037494" data-filterable-set=":dokkaHtml/commonMain,:dokkaHtml/jsWasmMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain,:dokkaHtml/jsWasmMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/commonMain,:dokkaHtml/jsWasmMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="ref-count.html"><span>ref</span><wbr></wbr><span><span>Count</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1629275685%2FProperties%2F-1314037494"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain" data-active="" data-toggle=":dokkaHtml/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jsWasmMain" data-filterable-set=":dokkaHtml/jsWasmMain" data-toggle=":dokkaHtml/jsWasmMain">jsWasm</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain" data-toggle=":dokkaHtml/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/nativeMain" data-toggle=":dokkaHtml/nativeMain">native</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword"></span><span class="token keyword">val </span><a href="ref-count.html">refCount</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div><div class="brief "><p class="paragraph">Number of references on underlying native object.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jsWasmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword"></span><span class="token keyword">val </span><a href="ref-count.html">refCount</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword"></span><span class="token keyword">val </span><a href="ref-count.html">refCount</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword"></span><span class="token keyword">val </span><a href="ref-count.html">refCount</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div>                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <h2 class="">Properties</h2>
-      <div class="table" data-togglable="Properties"><a data-name="1170671204%2FProperties%2F703050856" anchor-label="isClosed" id="1170671204%2FProperties%2F703050856" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain :dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="../-managed/is-closed.html"><span>is</span><wbr></wbr><span><span>Closed</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1170671204%2FProperties%2F703050856"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted" data-togglable="Properties">
-                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain" data-active="" data-toggle=":dokkaHtml/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jsMain" data-filterable-set=":dokkaHtml/jsMain" data-toggle=":dokkaHtml/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain" data-toggle=":dokkaHtml/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/nativeMain" data-toggle=":dokkaHtml/nativeMain">native</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><a data-name="1170671204%2FProperties%2F703050856" anchor-label="isClosed" id="1170671204%2FProperties%2F703050856" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain"></a><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">val </span><a href="../-managed/is-closed.html">isClosed</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><a data-name="1170671204%2FProperties%2F788909594" anchor-label="isClosed" id="1170671204%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a><p class="paragraph">Check if underlying resource is closed.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jsMain"><a data-name="1170671204%2FProperties%2F703050856" anchor-label="isClosed" id="1170671204%2FProperties%2F703050856" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain"></a><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">val </span><a href="../-managed/is-closed.html">isClosed</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jvmMain"><a data-name="1170671204%2FProperties%2F703050856" anchor-label="isClosed" id="1170671204%2FProperties%2F703050856" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain"></a><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">val </span><a href="../-managed/is-closed.html">isClosed</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/nativeMain"><a data-name="1170671204%2FProperties%2F703050856" anchor-label="isClosed" id="1170671204%2FProperties%2F703050856" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain"></a><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">val </span><a href="../-managed/is-closed.html">isClosed</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div>                </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="-1228079928%2FFunctions%2F-1314037494" anchor-label="close" id="-1228079928%2FFunctions%2F-1314037494" data-filterable-set=":dokkaHtml/commonMain,:dokkaHtml/jsWasmMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain,:dokkaHtml/jsWasmMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/commonMain,:dokkaHtml/jsWasmMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-managed/close.html"><span><span>close</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1228079928%2FFunctions%2F-1314037494"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain" data-active="" data-toggle=":dokkaHtml/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jsWasmMain" data-filterable-set=":dokkaHtml/jsWasmMain" data-toggle=":dokkaHtml/jsWasmMain">jsWasm</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain" data-toggle=":dokkaHtml/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/nativeMain" data-toggle=":dokkaHtml/nativeMain">native</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="../-managed/close.html"><span class="token function">close</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Free underlying native resource, peer is useless afterwards.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jsWasmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="../-managed/close.html"><span class="token function">close</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="../-managed/close.html"><span class="token function">close</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="../-managed/close.html"><span class="token function">close</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-<a data-name="-1629275685%2FProperties%2F703050856" anchor-label="refCount" id="-1629275685%2FProperties%2F703050856" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain :dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="ref-count.html"><span>ref</span><wbr></wbr><span><span>Count</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1629275685%2FProperties%2F703050856"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted" data-togglable="Properties">
-                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain" data-active="" data-toggle=":dokkaHtml/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jsMain" data-filterable-set=":dokkaHtml/jsMain" data-toggle=":dokkaHtml/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain" data-toggle=":dokkaHtml/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/nativeMain" data-toggle=":dokkaHtml/nativeMain">native</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><a data-name="-1629275685%2FProperties%2F703050856" anchor-label="refCount" id="-1629275685%2FProperties%2F703050856" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain"></a><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword"></span><span class="token keyword">val </span><a href="ref-count.html">refCount</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div><div class="brief "><a data-name="-1629275685%2FProperties%2F788909594" anchor-label="refCount" id="-1629275685%2FProperties%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a><p class="paragraph">Number of references on underlying native object.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jsMain"><a data-name="-1629275685%2FProperties%2F703050856" anchor-label="refCount" id="-1629275685%2FProperties%2F703050856" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain"></a><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword"></span><span class="token keyword">val </span><a href="ref-count.html">refCount</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jvmMain"><a data-name="-1629275685%2FProperties%2F703050856" anchor-label="refCount" id="-1629275685%2FProperties%2F703050856" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain"></a><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword"></span><span class="token keyword">val </span><a href="ref-count.html">refCount</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/nativeMain"><a data-name="-1629275685%2FProperties%2F703050856" anchor-label="refCount" id="-1629275685%2FProperties%2F703050856" data-filterable-set=":dokkaHtml/commonMain :dokkaHtml/jsMain :dokkaHtml/jvmMain :dokkaHtml/nativeMain"></a><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword"></span><span class="token keyword">val </span><a href="ref-count.html">refCount</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div>                </div>
+<a data-name="1104883689%2FFunctions%2F-1058607364" anchor-label="equals" id="1104883689%2FFunctions%2F-1058607364" data-filterable-set=":dokkaHtml/jsWasmMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/jsWasmMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/jsWasmMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><span data-unresolved-link="org.jetbrains.skia.impl/Native/equals/#kotlin.Any?/PointingToDeclaration/"><span><span>equals</span></span></span></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1104883689%2FFunctions%2F-1058607364"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jsWasmMain" data-filterable-set=":dokkaHtml/jsWasmMain" data-active="" data-toggle=":dokkaHtml/jsWasmMain">jsWasm</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain" data-toggle=":dokkaHtml/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/nativeMain" data-toggle=":dokkaHtml/nativeMain">native</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/jsWasmMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">operator override </span><span class="token keyword">fun </span><a href="../-native/[js-wasm]equals.html"><span class="token function">equals</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">other<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jvmMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">operator override </span><span class="token keyword">fun </span><a href="../-native/[jvm]equals.html"><span class="token function">equals</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">other<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/nativeMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">operator override </span><span class="token keyword">fun </span><a href="../-native/[native]equals.html"><span class="token function">equals</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">other<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div>                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
-      <h2 class="">Inheritors</h2>
-      <div class="table" data-togglable="Inheritors"><a data-name="-1659358893%2FInheritors%2F788909594" anchor-label="ColorFilter" id="-1659358893%2FInheritors%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="../../org.jetbrains.skia/-color-filter/index.html">ColorFilter</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1659358893%2FInheritors%2F788909594"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div></div>
+<a data-name="-47399203%2FFunctions%2F-1058607364" anchor-label="hashCode" id="-47399203%2FFunctions%2F-1058607364" data-filterable-set=":dokkaHtml/jsWasmMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/jsWasmMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/jsWasmMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><span data-unresolved-link="org.jetbrains.skia.impl/Native/hashCode/#/PointingToDeclaration/"><span>hash</span><wbr></wbr><span><span>Code</span></span></span></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-47399203%2FFunctions%2F-1058607364"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jsWasmMain" data-filterable-set=":dokkaHtml/jsWasmMain" data-active="" data-toggle=":dokkaHtml/jsWasmMain">jsWasm</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain" data-toggle=":dokkaHtml/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/nativeMain" data-toggle=":dokkaHtml/nativeMain">native</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/jsWasmMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="../-native/[js-wasm]hash-code.html"><span class="token function">hashCode</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jvmMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="../-native/[jvm]hash-code.html"><span class="token function">hashCode</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/nativeMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="../-native/[native]hash-code.html"><span class="token function">hashCode</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-<a data-name="443291560%2FInheritors%2F788909594" anchor-label="DirectContext" id="443291560%2FInheritors%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="../../org.jetbrains.skia/-direct-context/index.html">DirectContext</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="443291560%2FInheritors%2F788909594"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div></div>
-          </div>
-        </div>
-<a data-name="337500421%2FInheritors%2F788909594" anchor-label="FontMgr" id="337500421%2FInheritors%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="../../org.jetbrains.skia/-font-mgr/index.html">FontMgr</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="337500421%2FInheritors%2F788909594"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div></div>
-          </div>
-        </div>
-<a data-name="-2083336204%2FInheritors%2F788909594" anchor-label="FontStyleSet" id="-2083336204%2FInheritors%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="../../org.jetbrains.skia/-font-style-set/index.html">FontStyleSet</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2083336204%2FInheritors%2F788909594"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div></div>
-          </div>
-        </div>
-<a data-name="854765171%2FInheritors%2F788909594" anchor-label="Image" id="854765171%2FInheritors%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="../../org.jetbrains.skia/-image/index.html">Image</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="854765171%2FInheritors%2F788909594"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div></div>
-          </div>
-        </div>
-<a data-name="257128539%2FInheritors%2F788909594" anchor-label="ImageFilter" id="257128539%2FInheritors%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="../../org.jetbrains.skia/-image-filter/index.html">ImageFilter</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="257128539%2FInheritors%2F788909594"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div></div>
-          </div>
-        </div>
-<a data-name="-1550098928%2FInheritors%2F788909594" anchor-label="MaskFilter" id="-1550098928%2FInheritors%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="../../org.jetbrains.skia/-mask-filter/index.html">MaskFilter</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1550098928%2FInheritors%2F788909594"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div></div>
-          </div>
-        </div>
-<a data-name="594512318%2FInheritors%2F788909594" anchor-label="PathEffect" id="594512318%2FInheritors%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="../../org.jetbrains.skia/-path-effect/index.html">PathEffect</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="594512318%2FInheritors%2F788909594"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div></div>
-          </div>
-        </div>
-<a data-name="-532943632%2FInheritors%2F788909594" anchor-label="Picture" id="-532943632%2FInheritors%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="../../org.jetbrains.skia/-picture/index.html">Picture</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-532943632%2FInheritors%2F788909594"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div></div>
-          </div>
-        </div>
-<a data-name="695017543%2FInheritors%2F788909594" anchor-label="PixelRef" id="695017543%2FInheritors%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="../../org.jetbrains.skia/-pixel-ref/index.html">PixelRef</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="695017543%2FInheritors%2F788909594"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div></div>
-          </div>
-        </div>
-<a data-name="959104773%2FInheritors%2F788909594" anchor-label="RuntimeEffect" id="959104773%2FInheritors%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="../../org.jetbrains.skia/-runtime-effect/index.html">RuntimeEffect</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="959104773%2FInheritors%2F788909594"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div></div>
-          </div>
-        </div>
-<a data-name="536439887%2FInheritors%2F788909594" anchor-label="Shader" id="536439887%2FInheritors%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="../../org.jetbrains.skia/-shader/index.html">Shader</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="536439887%2FInheritors%2F788909594"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div></div>
-          </div>
-        </div>
-<a data-name="258019361%2FInheritors%2F788909594" anchor-label="Surface" id="258019361%2FInheritors%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="../../org.jetbrains.skia/-surface/index.html">Surface</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="258019361%2FInheritors%2F788909594"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div></div>
-          </div>
-        </div>
-<a data-name="-1402049763%2FInheritors%2F788909594" anchor-label="Typeface" id="-1402049763%2FInheritors%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="../../org.jetbrains.skia/-typeface/index.html">Typeface</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1402049763%2FInheritors%2F788909594"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div></div>
-          </div>
-        </div>
-<a data-name="2036294759%2FInheritors%2F788909594" anchor-label="FontCollection" id="2036294759%2FInheritors%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="../../org.jetbrains.skia.paragraph/-font-collection/index.html">FontCollection</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2036294759%2FInheritors%2F788909594"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div></div>
-          </div>
-        </div>
-<a data-name="556528713%2FInheritors%2F788909594" anchor-label="Logger" id="556528713%2FInheritors%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="../../org.jetbrains.skia.skottie/-logger/index.html">Logger</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="556528713%2FInheritors%2F788909594"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div></div>
-          </div>
-        </div>
-<a data-name="1469807756%2FInheritors%2F788909594" anchor-label="SVGDOM" id="1469807756%2FInheritors%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="../../org.jetbrains.skia.svg/-s-v-g-d-o-m/index.html">SVGDOM</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1469807756%2FInheritors%2F788909594"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div></div>
-          </div>
-        </div>
-<a data-name="1520705714%2FInheritors%2F788909594" anchor-label="SVGNode" id="1520705714%2FInheritors%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="../../org.jetbrains.skia.svg/-s-v-g-node/index.html">SVGNode</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1520705714%2FInheritors%2F788909594"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div></div>
+<a data-name="1180678603%2FFunctions%2F-1314037494" anchor-label="toString" id="1180678603%2FFunctions%2F-1314037494" data-filterable-set=":dokkaHtml/commonMain,:dokkaHtml/jsWasmMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/commonMain,:dokkaHtml/jsWasmMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/commonMain,:dokkaHtml/jsWasmMain,:dokkaHtml/jvmMain,:dokkaHtml/nativeMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-native/to-string.html"><span>to</span><wbr></wbr><span><span>String</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1180678603%2FFunctions%2F-1314037494"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain" data-active="" data-toggle=":dokkaHtml/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jsWasmMain" data-filterable-set=":dokkaHtml/jsWasmMain" data-toggle=":dokkaHtml/jsWasmMain">jsWasm</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/jvmMain" data-filterable-set=":dokkaHtml/jvmMain" data-toggle=":dokkaHtml/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":dokkaHtml/nativeMain" data-filterable-set=":dokkaHtml/nativeMain" data-toggle=":dokkaHtml/nativeMain">native</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="../-native/to-string.html"><span class="token function">toString</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jsWasmMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="[js-wasm]to-string.html"><span class="token function">toString</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/jvmMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="[jvm]to-string.html"><span class="token function">toString</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div></div><div class="content sourceset-dependent-content" data-togglable=":dokkaHtml/nativeMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="[native]to-string.html"><span class="token function">toString</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -401,7 +214,8 @@
                 class="pull-right"><span>Generated by </span><a
                 href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
       </div>
+            </div>
+        </div>
     </div>
-</div>
 </body>
 </html>

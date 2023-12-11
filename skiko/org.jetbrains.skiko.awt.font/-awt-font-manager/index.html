@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html class="no-js">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>AwtFontManager</title>
     <link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">
     <script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
     <script>const storage = localStorage.getItem("dokka-dark-mode")
     if (storage == null) {
         const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
@@ -18,12 +19,13 @@
         }
     }
     </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async="async"></script>
 <script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script>
 <link href="../../../styles/style.css" rel="Stylesheet">
-<link href="../../../styles/jetbrains-mono.css" rel="Stylesheet">
 <link href="../../../styles/main.css" rel="Stylesheet">
 <link href="../../../styles/prism.css" rel="Stylesheet">
 <link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
 <script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script>
 <script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script>
 <script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script>
@@ -32,29 +34,34 @@
 <script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
 </head>
 <body>
-<div class="navigation-wrapper" id="navigation-wrapper">
-    <div id="leftToggler"><span class="icon-toggler"></span></div>
-    <div class="library-name">
-            <a href="../../../index.html">
-                    <span>skiko</span>
-            </a>
-    </div>
-    <div>
-0.0.0-SNAPSHOT    </div>
-    <div class="pull-right d-flex">
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+                    <a class="library-name--link" href="../../../index.html">
+                            skiko
+                    </a>
+            </div>
+            <div class="library-version">
+0.0.0-SNAPSHOT            </div>
+        </div>
         <div class="filter-section" id="filter-section">
                 <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":dokkaHtml/awtMain">awt</button>
         </div>
-        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
-        <div id="searchBar"></div>
     </div>
-</div>
-<div id="container">
-    <div id="leftColumn">
-        <div id="sideMenu"></div>
+    <div class="navigation-controls">
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
     </div>
-    <div id="main">
-<div class="main-content" id="content" pageIds="skiko::org.jetbrains.skiko.awt.font/AwtFontManager///PointingToDeclaration//1864694178">
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageIds="skiko::org.jetbrains.skiko.awt.font/AwtFontManager///PointingToDeclaration//1864694178">
   <div class="breadcrumbs"><a href="../../../index.html">skiko</a><span class="delimiter">/</span><a href="../index.html">org.jetbrains.skiko.awt.font</a><span class="delimiter">/</span><span class="current">AwtFontManager</span></div>
   <div class="cover ">
     <h1 class="cover"><span>Awt</span><wbr></wbr><span>Font</span><wbr></wbr><span><span>Manager</span></span></h1>
@@ -63,230 +70,236 @@
 <div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">AwtFontManager</a></div><p class="paragraph">Manages available fonts, both at the system level and custom ones.</p><p class="paragraph">The main entry point is <a href="get-typeface-or-null.html">getTypefaceOrNull</a>:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">val fontManager = AwtFontManager()<br>val myTypeface = fontManager.getTypefaceOrNull(&quot;My Font&quot;)</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">While system fonts represent global state and are shared across all instances, custom fonts are only available on the instance(s) on which they have been registered.</p><p class="paragraph">In order to free up memory, you should remove custom fonts you don't need anymore.</p></div>    </div>
   </div>
   <div class="tabbedcontent">
-    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Constructors">Constructors</button><button class="section-tab" data-togglable="Functions">Functions</button><button class="section-tab" data-togglable="Properties">Properties</button></div>
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
     <div class="tabs-section-body">
-      <h2 class="tabbedcontent">Constructors</h2>
-      <div class="table" data-togglable="Constructors"><a data-name="-284612381%2FConstructors%2F1864694178" anchor-label="AwtFontManager" id="-284612381%2FConstructors%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
-          <div class="main-subrow keyValue TabbedContent">
-            <div class=""><span class="inline-flex">
-                <div><a href="-awt-font-manager.html"><span>Awt</span><wbr></wbr><span>Font</span><wbr></wbr><span><span>Manager</span></span></a></div>
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="">Constructors</h2>
+        <div class="table"><a data-name="-284612381%2FConstructors%2F1864694178" anchor-label="AwtFontManager" id="-284612381%2FConstructors%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
+          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-awt-font-manager.html"><span>Awt</span><wbr></wbr><span>Font</span><wbr></wbr><span><span>Manager</span></span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-284612381%2FConstructors%2F1864694178"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="-awt-font-manager.html"><span class="token function">AwtFontManager</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div>                </div>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <h2 class="">Functions</h2>
-      <div class="table" data-togglable="Functions"><a data-name="-232229182%2FFunctions%2F1864694178" anchor-label="addCustomFontFile" id="-232229182%2FFunctions%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="add-custom-font-file.html"><span>add</span><wbr></wbr><span>Custom</span><wbr></wbr><span>Font</span><wbr></wbr><span><span>File</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-232229182%2FFunctions%2F1864694178"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="add-custom-font-file.html"><span class="token function">addCustomFontFile</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">file<span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/io/File.html">File</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Add a <a href="https://docs.oracle.com/javase/8/docs/api/java/io/File.html">File</a> as a custom font.</p></div></div>                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-<a data-name="556537256%2FFunctions%2F1864694178" anchor-label="addCustomFontResource" id="556537256%2FFunctions%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="add-custom-font-resource.html"><span>add</span><wbr></wbr><span>Custom</span><wbr></wbr><span>Font</span><wbr></wbr><span><span>Resource</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="556537256%2FFunctions%2F1864694178"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="add-custom-font-resource.html"><span class="token function">addCustomFontResource</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">resource<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">loader<span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/ClassLoader.html">ClassLoader</a><span class="token operator"> = </span>Thread.currentThread().contextClassLoader</span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Add a classpath resource as a custom font.</p></div></div>                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-<a data-name="-1251058224%2FFunctions%2F1864694178" anchor-label="addCustomFontTypeface" id="-1251058224%2FFunctions%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="add-custom-font-typeface.html"><span>add</span><wbr></wbr><span>Custom</span><wbr></wbr><span>Font</span><wbr></wbr><span><span>Typeface</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1251058224%2FFunctions%2F1864694178"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="add-custom-font-typeface.html"><span class="token function">addCustomFontTypeface</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">typeface<span class="token operator">: </span><span data-unresolved-link="org.jetbrains.skia/Typeface///PointingToDeclaration/">Typeface</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Add a <span data-unresolved-link="org.jetbrains.skia/Typeface///PointingToDeclaration/">Typeface</span> as a custom font.</p></div></div>                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-<a data-name="1834676285%2FFunctions%2F1864694178" anchor-label="clearCustomFonts" id="1834676285%2FFunctions%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="clear-custom-fonts.html"><span>clear</span><wbr></wbr><span>Custom</span><wbr></wbr><span><span>Fonts</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1834676285%2FFunctions%2F1864694178"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="clear-custom-fonts.html"><span class="token function">clearCustomFonts</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Remove all custom fonts added to this instance.</p></div></div>                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-<a data-name="-633776252%2FFunctions%2F1864694178" anchor-label="customFamilyNames" id="-633776252%2FFunctions%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="custom-family-names.html"><span>custom</span><wbr></wbr><span>Family</span><wbr></wbr><span><span>Names</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-633776252%2FFunctions%2F1864694178"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="custom-family-names.html"><span class="token function">customFamilyNames</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">List the font families for all registered custom fonts.</p></div></div>                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-<a data-name="-1892132963%2FFunctions%2F1864694178" anchor-label="embeddedFamilyNames" id="-1892132963%2FFunctions%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="embedded-family-names.html"><span>embedded</span><wbr></wbr><span>Family</span><wbr></wbr><span><span>Names</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1892132963%2FFunctions%2F1864694178"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="embedded-family-names.html"><span class="token function">embeddedFamilyNames</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Lists all known embedded font family names.</p></div></div>                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-<a data-name="1115807731%2FFunctions%2F1864694178" anchor-label="familyNames" id="1115807731%2FFunctions%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="family-names.html"><span>family</span><wbr></wbr><span><span>Names</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1115807731%2FFunctions%2F1864694178"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="family-names.html"><span class="token function">familyNames</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">List all known font family names, including both system fonts, and custom fonts added to this instance.</p></div></div>                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-<a data-name="1451973557%2FFunctions%2F1864694178" anchor-label="getTypefaceOrNull" id="1451973557%2FFunctions%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="get-typeface-or-null.html"><span>get</span><wbr></wbr><span>Typeface</span><wbr></wbr><span>Or</span><wbr></wbr><span><span>Null</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1451973557%2FFunctions%2F1864694178"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="get-typeface-or-null.html"><span class="token function">getTypefaceOrNull</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">familyName<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">fontStyle<span class="token operator">: </span><span data-unresolved-link="org.jetbrains.skia/FontStyle///PointingToDeclaration/">FontStyle</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="org.jetbrains.skia/Typeface///PointingToDeclaration/">Typeface</span><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Get a <span data-unresolved-link="org.jetbrains.skia/Typeface///PointingToDeclaration/">Typeface</span> by family name and style, if it exists.</p></div></div>                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-<a data-name="1258685454%2FFunctions%2F1864694178" anchor-label="invalidateSystemFontCache" id="1258685454%2FFunctions%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="invalidate-system-font-cache.html"><span>invalidate</span><wbr></wbr><span>System</span><wbr></wbr><span>Font</span><wbr></wbr><span><span>Cache</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1258685454%2FFunctions%2F1864694178"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="invalidate-system-font-cache.html"><span class="token function">invalidateSystemFontCache</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Invalidate the system font cache, causing the list of font families available at the system level to be refreshed.</p></div></div>                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-<a data-name="-802798103%2FFunctions%2F1864694178" anchor-label="removeCustomFontFamily" id="-802798103%2FFunctions%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="remove-custom-font-family.html"><span>remove</span><wbr></wbr><span>Custom</span><wbr></wbr><span>Font</span><wbr></wbr><span><span>Family</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-802798103%2FFunctions%2F1864694178"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="remove-custom-font-family.html"><span class="token function">removeCustomFontFamily</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">familyName<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Remove a custom font by family name, if it exists.</p></div></div>                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-<a data-name="-1244448958%2FFunctions%2F1864694178" anchor-label="systemFamilyNames" id="-1244448958%2FFunctions%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="system-family-names.html"><span>system</span><wbr></wbr><span>Family</span><wbr></wbr><span><span>Names</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1244448958%2FFunctions%2F1864694178"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="system-family-names.html"><span class="token function">systemFamilyNames</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Lists all known system font family names.</p></div></div>                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <h2 class="">Properties</h2>
-      <div class="table" data-togglable="Properties"><a data-name="1149242380%2FProperties%2F1864694178" anchor-label="isAbleToResolveFamilyNames" id="1149242380%2FProperties%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
-        <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="is-able-to-resolve-family-names.html"><span>is</span><wbr></wbr><span>Able</span><wbr></wbr><span>To</span><wbr></wbr><span>Resolve</span><wbr></wbr><span>Family</span><wbr></wbr><span><span>Names</span></span></a></div>
+      <div data-togglable="PROPERTY">
+        <h2 class="">Properties</h2>
+        <div class="table"><a data-name="1149242380%2FProperties%2F1864694178" anchor-label="isAbleToResolveFamilyNames" id="1149242380%2FProperties%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="is-able-to-resolve-family-names.html"><span>is</span><wbr></wbr><span>Able</span><wbr></wbr><span>To</span><wbr></wbr><span>Resolve</span><wbr></wbr><span>Family</span><wbr></wbr><span><span>Names</span></span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1149242380%2FProperties%2F1864694178"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted" data-togglable="Properties">
-                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><a data-name="1149242380%2FProperties%2F1864694178" anchor-label="isAbleToResolveFamilyNames" id="1149242380%2FProperties%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="is-able-to-resolve-family-names.html">isAbleToResolveFamilyNames</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><a data-name="1149242380%2FProperties%2F1864694178" anchor-label="isAbleToResolveFamilyNames" id="1149242380%2FProperties%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a><p class="paragraph">Indicate whether the current JVM is able to resolve font family names accurately or not.</p></div></div>                </div>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="is-able-to-resolve-family-names.html">isAbleToResolveFamilyNames</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Indicate whether the current JVM is able to resolve font family names accurately or not.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="-232229182%2FFunctions%2F1864694178" anchor-label="addCustomFontFile" id="-232229182%2FFunctions%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="add-custom-font-file.html"><span>add</span><wbr></wbr><span>Custom</span><wbr></wbr><span>Font</span><wbr></wbr><span><span>File</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-232229182%2FFunctions%2F1864694178"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="add-custom-font-file.html"><span class="token function">addCustomFontFile</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">file<span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/io/File.html">File</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Add a <a href="https://docs.oracle.com/javase/8/docs/api/java/io/File.html">File</a> as a custom font.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="556537256%2FFunctions%2F1864694178" anchor-label="addCustomFontResource" id="556537256%2FFunctions%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="add-custom-font-resource.html"><span>add</span><wbr></wbr><span>Custom</span><wbr></wbr><span>Font</span><wbr></wbr><span><span>Resource</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="556537256%2FFunctions%2F1864694178"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="add-custom-font-resource.html"><span class="token function">addCustomFontResource</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">resource<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">loader<span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/ClassLoader.html">ClassLoader</a><span class="token operator"> = </span>Thread.currentThread().contextClassLoader</span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Add a classpath resource as a custom font.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1251058224%2FFunctions%2F1864694178" anchor-label="addCustomFontTypeface" id="-1251058224%2FFunctions%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="add-custom-font-typeface.html"><span>add</span><wbr></wbr><span>Custom</span><wbr></wbr><span>Font</span><wbr></wbr><span><span>Typeface</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1251058224%2FFunctions%2F1864694178"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="add-custom-font-typeface.html"><span class="token function">addCustomFontTypeface</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">typeface<span class="token operator">: </span><a href="../../org.jetbrains.skia/-typeface/index.html">Typeface</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Add a <a href="../../org.jetbrains.skia/-typeface/index.html">Typeface</a> as a custom font.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1834676285%2FFunctions%2F1864694178" anchor-label="clearCustomFonts" id="1834676285%2FFunctions%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="clear-custom-fonts.html"><span>clear</span><wbr></wbr><span>Custom</span><wbr></wbr><span><span>Fonts</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1834676285%2FFunctions%2F1864694178"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="clear-custom-fonts.html"><span class="token function">clearCustomFonts</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Remove all custom fonts added to this instance.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-633776252%2FFunctions%2F1864694178" anchor-label="customFamilyNames" id="-633776252%2FFunctions%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="custom-family-names.html"><span>custom</span><wbr></wbr><span>Family</span><wbr></wbr><span><span>Names</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-633776252%2FFunctions%2F1864694178"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="custom-family-names.html"><span class="token function">customFamilyNames</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">List the font families for all registered custom fonts.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1892132963%2FFunctions%2F1864694178" anchor-label="embeddedFamilyNames" id="-1892132963%2FFunctions%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="embedded-family-names.html"><span>embedded</span><wbr></wbr><span>Family</span><wbr></wbr><span><span>Names</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1892132963%2FFunctions%2F1864694178"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="embedded-family-names.html"><span class="token function">embeddedFamilyNames</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Lists all known embedded font family names.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1115807731%2FFunctions%2F1864694178" anchor-label="familyNames" id="1115807731%2FFunctions%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="family-names.html"><span>family</span><wbr></wbr><span><span>Names</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1115807731%2FFunctions%2F1864694178"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="family-names.html"><span class="token function">familyNames</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">List all known font family names, including both system fonts, and custom fonts added to this instance.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1451973557%2FFunctions%2F1864694178" anchor-label="getTypefaceOrNull" id="1451973557%2FFunctions%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-typeface-or-null.html"><span>get</span><wbr></wbr><span>Typeface</span><wbr></wbr><span>Or</span><wbr></wbr><span><span>Null</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1451973557%2FFunctions%2F1864694178"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="get-typeface-or-null.html"><span class="token function">getTypefaceOrNull</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">familyName<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">fontStyle<span class="token operator">: </span><a href="../../org.jetbrains.skia/-font-style/index.html">FontStyle</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../org.jetbrains.skia/-typeface/index.html">Typeface</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Get a <a href="../../org.jetbrains.skia/-typeface/index.html">Typeface</a> by family name and style, if it exists.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1258685454%2FFunctions%2F1864694178" anchor-label="invalidateSystemFontCache" id="1258685454%2FFunctions%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="invalidate-system-font-cache.html"><span>invalidate</span><wbr></wbr><span>System</span><wbr></wbr><span>Font</span><wbr></wbr><span><span>Cache</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1258685454%2FFunctions%2F1864694178"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="invalidate-system-font-cache.html"><span class="token function">invalidateSystemFontCache</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Invalidate the system font cache, causing the list of font families available at the system level to be refreshed.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-802798103%2FFunctions%2F1864694178" anchor-label="removeCustomFontFamily" id="-802798103%2FFunctions%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="remove-custom-font-family.html"><span>remove</span><wbr></wbr><span>Custom</span><wbr></wbr><span>Font</span><wbr></wbr><span><span>Family</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-802798103%2FFunctions%2F1864694178"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="remove-custom-font-family.html"><span class="token function">removeCustomFontFamily</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">familyName<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Remove a custom font by family name, if it exists.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1244448958%2FFunctions%2F1864694178" anchor-label="systemFamilyNames" id="-1244448958%2FFunctions%2F1864694178" data-filterable-set=":dokkaHtml/awtMain"></a>
+          <div class="table-row" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="system-family-names.html"><span>system</span><wbr></wbr><span>Family</span><wbr></wbr><span><span>Names</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1244448958%2FFunctions%2F1864694178"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":dokkaHtml/awtMain" data-filterable-set=":dokkaHtml/awtMain" data-active="" data-toggle=":dokkaHtml/awtMain">awt</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":dokkaHtml/awtMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="system-family-names.html"><span class="token function">systemFamilyNames</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Lists all known system font family names.</p></div></div>                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -300,7 +313,8 @@
                 class="pull-right"><span>Generated by </span><a
                 href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
       </div>
+            </div>
+        </div>
     </div>
-</div>
 </body>
 </html>
