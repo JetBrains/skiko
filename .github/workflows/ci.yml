@@ -171,7 +171,6 @@ jobs:
 
   js:
     runs-on: ubuntu-20.04
-    if: false # see wasm.yml
     steps:
       - uses: actions/checkout@v3
         name: 'Check out code'

@@ -16,7 +16,8 @@ debug(`karma wasmPath: ${wasmPath}`);
 debug(`karma generatedAssetsPath: ${generatedAssetsPath}`);
 
 config.proxies = {
-    "/wasm/": wasmPath
+    "/wasm/": wasmPath,
+    "/resources": path.resolve(basePath, "kotlin"),
 }
 
 config.webpack.output = Object.assign(config.webpack.output || {}, {
@@ -42,4 +43,9 @@ config.files = [
     path.resolve(wasmPath, "skiko.js"),
     {pattern: path.resolve(wasmPath, "skiko.wasm"), included: false, served: true, watched: false},
     {pattern: path.resolve(generatedAssetsPath, "**/*"), included: false, served: true, watched: false},
+    {pattern: path.resolve(basePath, "kotlin", "**/*.png"), included: false, served: true, watched: false},
+    {pattern: path.resolve(basePath, "kotlin", "**/*.gif"), included: false, served: true, watched: false},
+    {pattern: path.resolve(basePath, "kotlin", "**/*.ttf"), included: false, served: true, watched: false},
+    {pattern: path.resolve(basePath, "kotlin", "**/*.txt"), included: false, served: true, watched: false},
+    {pattern: path.resolve(basePath, "kotlin", "**/*.json"), included: false, served: true, watched: false},
 ].concat(config.files);
