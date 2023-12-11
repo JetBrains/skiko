@@ -9,7 +9,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompileTool
 
 plugins {
     kotlin("multiplatform")
-    id("org.jetbrains.dokka") version "1.7.20"
+    id("org.jetbrains.dokka") version "1.9.10"
     `maven-publish`
     signing
     id("org.gradle.crypto.checksum") version "1.4.0"
