@@ -10,14 +10,12 @@ actual typealias SkipWasmTarget = kotlin.test.Ignore
 @JsFun("() => ''")
 private external fun jsRef(): JsAny
 
+
+actual typealias TestReturnType = Any
 /**
  * Runs the [block] in a coroutine.
  */
-actual fun <T> runTest(block: suspend () -> Unit): T {
-    error("It's a fake actual. Not expected to be called")
-}
-
-fun runTest(block: suspend () -> Unit): Any = MainScope().promise {
+actual fun runTest(block: suspend () -> Unit): TestReturnType = MainScope().promise {
     block()
     jsRef()
 }

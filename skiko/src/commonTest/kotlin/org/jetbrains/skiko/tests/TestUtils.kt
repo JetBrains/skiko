@@ -4,7 +4,9 @@ import org.jetbrains.skia.Data
 import org.jetbrains.skia.impl.InteropScope
 import org.jetbrains.skia.impl.NativePointer
 
-expect fun <T> runTest(block: suspend () -> Unit): T
+expect class TestReturnType
+
+expect fun runTest(block: suspend () -> Unit): TestReturnType
 
 internal expect fun InteropScope.allocateBytesForPixels(size: Int): NativePointer
 
