@@ -1,13 +1,11 @@
 package org.jetbrains.skiko.sample.js
 
-import kotlinx.browser.document
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.Paint
 import org.jetbrains.skia.Rect
 import org.jetbrains.skiko.GenericSkikoView
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkikoView
-import org.w3c.dom.HTMLCanvasElement
 
 private class DemoApp: SkikoView {
     private val paint = Paint()
@@ -25,7 +23,7 @@ private class DemoApp: SkikoView {
 internal fun runApp() {
     for (index in 1 .. 3) {
         val skiaLayer = SkiaLayer()
-        val canvas = document.getElementById("c$index") as HTMLCanvasElement
+        val canvas = findHTMLCanvasElementById("c$index")
         val app = if (index == 3) {
             DemoApp()
         } else {
@@ -36,3 +34,8 @@ internal fun runApp() {
         skiaLayer.needRedraw()
     }
 }
+
+
+// Note: despite the actual implementation looks identical, it can't be common - there is no W3C common API
+// return type is Any because k/js and k/wasm don't have a common type for HTML elements
+expect fun findHTMLCanvasElementById(id: String): Any

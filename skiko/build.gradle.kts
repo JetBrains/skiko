@@ -1663,14 +1663,6 @@ project.tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().config
     )
 }
 
-if (supportJs && supportWasm) {
-    project.tasks.whenTaskAdded {
-        if (name == "compileJsWasmMainKotlinMetadata") {
-            enabled = false
-        }
-    }
-}
-
 tasks.findByName("publishSkikoWasmRuntimePublicationToComposeRepoRepository")
     ?.dependsOn("publishWasmJsPublicationToComposeRepoRepository")
 

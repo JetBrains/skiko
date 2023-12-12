@@ -1,10 +1,10 @@
 package org.jetbrains.skiko
 
-import kotlinx.browser.window
 import org.jetbrains.skia.*
+import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skiko.w3c.HTMLCanvasElement
+import org.jetbrains.skiko.w3c.window
 import org.jetbrains.skiko.wasm.createWebGLContext
-import org.jetbrains.skiko.wasm.GL
-import org.w3c.dom.HTMLCanvasElement
 
 /**
  * CanvasRenderer takes an [HTMLCanvasElement] instance and initializes
@@ -13,7 +13,9 @@ import org.w3c.dom.HTMLCanvasElement
  * After initialization [needRedraw] can be used to schedule a call to [drawFrame].
  * [drawFrame] has to be implemented to perform the actual drawing on [canvas].
  */
-abstract class CanvasRenderer constructor(val htmlCanvas: HTMLCanvasElement) {
+internal abstract class CanvasRenderer(
+    private val htmlCanvas: HTMLCanvasElement
+) {
     private val contextPointer = createWebGLContext(htmlCanvas)
     private val context: DirectContext
     private var surface: Surface? = null
@@ -39,7 +41,7 @@ abstract class CanvasRenderer constructor(val htmlCanvas: HTMLCanvasElement) {
         get() = htmlCanvas.height
 
     init {
-        GL.makeContextCurrent(contextPointer)
+        makeGLContextCurrent(contextPointer)
         context = DirectContext.makeGL()
     }
 
@@ -93,7 +95,7 @@ abstract class CanvasRenderer constructor(val htmlCanvas: HTMLCanvasElement) {
         redrawScheduled = true
         window.requestAnimationFrame { timestamp ->
             redrawScheduled = false
-            GL.makeContextCurrent(contextPointer)
+            makeGLContextCurrent(contextPointer)
             // `clear` and `resetMatrix` make canvas not accumulate previous effects
             canvas?.clear(Color.WHITE)
             canvas?.resetMatrix()
@@ -103,3 +105,5 @@ abstract class CanvasRenderer constructor(val htmlCanvas: HTMLCanvasElement) {
         }
     }
 }
+
+internal expect fun makeGLContextCurrent(contextPointer: NativePointer)

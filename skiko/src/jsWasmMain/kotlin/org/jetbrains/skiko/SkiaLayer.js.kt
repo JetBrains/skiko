@@ -1,13 +1,9 @@
 package org.jetbrains.skiko
 
-import kotlinx.browser.window
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.PixelGeometry
-import org.w3c.dom.HTMLCanvasElement
-import org.w3c.dom.events.InputEvent
-import org.w3c.dom.events.KeyboardEvent
-import org.w3c.dom.events.MouseEvent
-import org.w3c.dom.events.WheelEvent
+import org.jetbrains.skiko.w3c.HTMLCanvasElement
+import org.jetbrains.skiko.w3c.window
 
 /**
  * Provides a way to render the content and to receive the input events.
@@ -17,7 +13,7 @@ import org.w3c.dom.events.WheelEvent
  * using [attachTo] method.
  */
 actual open class SkiaLayer {
-    private var state: CanvasRenderer? = null
+    internal var state: CanvasRenderer? = null
 
     /**
      * [GraphicsApi.WEBGL] is the only supported renderApi for k/js (browser).
@@ -72,10 +68,10 @@ actual open class SkiaLayer {
         // TODO: when switch to the frame dispatcher - stop it here.
     }
 
-    private var isPointerPressed = false
+    internal var isPointerPressed = false
 
-    private var desiredWidth = 0
-    private var desiredHeight = 0
+    internal var desiredWidth = 0
+    internal var desiredHeight = 0
 
     actual val component: Any?
         get() = this.htmlCanvas
@@ -86,7 +82,7 @@ actual open class SkiaLayer {
      * Initializes the [CanvasRenderer] and events listeners.
      * Delegates rendering and events processing to [skikoView].
      */
-    fun attachTo(htmlCanvas: HTMLCanvasElement, autoDetach: Boolean = true) {
+    private fun attachTo(htmlCanvas: HTMLCanvasElement, autoDetach: Boolean = true) {
         this.htmlCanvas = htmlCanvas
 
         // Scale canvas to allow high DPI rendering as suggested in
@@ -105,49 +101,7 @@ actual open class SkiaLayer {
         }.apply { initCanvas(desiredWidth, desiredHeight, contentScale, pixelGeometry) }
         // See https://www.w3schools.com/jsref/dom_obj_event.asp
         // https://developer.mozilla.org/en-US/docs/Web/API/Pointer_events
-        htmlCanvas.addEventListener("mousedown", { event ->
-            event as MouseEvent
-            isPointerPressed = true
-            skikoView?.onPointerEvent(toSkikoEvent(event, SkikoPointerEventKind.DOWN))
-        })
-        htmlCanvas.addEventListener("mouseup", { event ->
-            event as MouseEvent
-            isPointerPressed = false
-            skikoView?.onPointerEvent(toSkikoEvent(event, SkikoPointerEventKind.UP))
-        })
-        htmlCanvas.addEventListener("mousemove", { event ->
-            event as MouseEvent
-            if (isPointerPressed) {
-                skikoView?.onPointerEvent(toSkikoDragEvent(event))
-            } else {
-                skikoView?.onPointerEvent(toSkikoEvent(event, SkikoPointerEventKind.MOVE))
-            }
-        })
-        htmlCanvas.addEventListener("wheel", { event ->
-            event as WheelEvent
-            skikoView?.onPointerEvent(toSkikoScrollEvent(event))
-        })
-        htmlCanvas.addEventListener("contextmenu", { event ->
-            event.preventDefault()
-        })
-        htmlCanvas.addEventListener("keydown", { event ->
-            event as KeyboardEvent
-            skikoView?.onKeyboardEvent(toSkikoEvent(event, SkikoKeyboardEventKind.DOWN))
-
-            toSkikoTypeEvent(event.key, event)?.let { inputEvent ->
-                skikoView?.input?.onInputEvent(inputEvent)
-            }
-        })
-        htmlCanvas.addEventListener("keyup", { event ->
-            event as KeyboardEvent
-            skikoView?.onKeyboardEvent(toSkikoEvent(event, SkikoKeyboardEventKind.UP))
-        })
-    }
-
-    private fun setOnChangeScaleNotifier() {
-        state?.initCanvas(desiredWidth, desiredHeight, contentScale, this.pixelGeometry)
-        window.matchMedia("(resolution: ${contentScale}dppx)").addEventListener("change", { setOnChangeScaleNotifier() }, true)
-        onContentScaleChanged?.invoke(contentScale)
+        bindCanvasEventsToSkikoView(htmlCanvas)
     }
 
     internal actual fun draw(canvas: Canvas) {
@@ -156,12 +110,10 @@ actual open class SkiaLayer {
 
     actual val pixelGeometry: PixelGeometry
         get() = PixelGeometry.UNKNOWN
+
+    var onContentScaleChanged: ((Float) -> Unit)? = null
 }
 
-var onContentScaleChanged: ((Float) -> Unit)? = null
 
-actual typealias SkikoGesturePlatformEvent = Any
-actual typealias SkikoPlatformInputEvent = KeyboardEvent
-actual typealias SkikoPlatformKeyboardEvent = KeyboardEvent
-//  MouseEvent is base class of PointerEvent
-actual typealias SkikoPlatformPointerEvent = MouseEvent
+internal expect fun SkiaLayer.bindCanvasEventsToSkikoView(canvas: HTMLCanvasElement)
+internal expect fun SkiaLayer.setOnChangeScaleNotifier()

@@ -1,62 +1,8 @@
 package org.jetbrains.skiko
 
-import org.w3c.dom.events.*
-
-private val SPECIAL_KEYS = setOf(
-    "Unidentified",
-    "Alt",
-    "AltGraph",
-    "Backspace",
-    "CapsLock",
-    "Control",
-    "Fn",
-    "FnLock",
-    "Hyper",
-    "Meta",
-    "NumLock",
-    "ScrollLock",
-    "Shift",
-    "Super",
-    "Symbol",
-    "SymbolLock",
-    "F1",
-    "F2",
-    "F3",
-    "F4",
-    "F5",
-    "F6",
-    "F7",
-    "F8",
-    "F9",
-    "F10",
-    "F11",
-    "F12",
-    "F13",
-    "F14",
-    "F15",
-    "F16",
-    "F17",
-    "F18",
-    "F19",
-    "F20",
-    "F21",
-    "F22",
-    "ArrowLeft",
-    "ArrowUp",
-    "ArrowRight",
-    "ArrowDown",
-    "Help",
-    "Home",
-    "Delete",
-    "End",
-    "PageUp",
-    "PageDown",
-    "Escape",
-    "Clear",
-    "Clear"
-)
-
-internal expect fun getEventTimestamp(e: UIEvent): Long
+import org.w3c.dom.events.KeyboardEvent
+import org.w3c.dom.events.MouseEvent
+import org.w3c.dom.events.WheelEvent
 
 fun toSkikoEvent(
     event: MouseEvent,
@@ -217,7 +163,7 @@ private fun toSkikoKey(event: KeyboardEvent): Int {
             key == SkikoKey.KEY_LEFT_SHIFT.platformKeyCode ||
             key == SkikoKey.KEY_LEFT_META.platformKeyCode
         )
-        key = key.or(0x80000000.toInt())
+            key = key.or(0x80000000.toInt())
     }
     return key
 }
