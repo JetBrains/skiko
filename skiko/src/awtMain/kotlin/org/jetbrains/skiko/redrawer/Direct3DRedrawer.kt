@@ -1,12 +1,11 @@
 package org.jetbrains.skiko.redrawer
 
-import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.withContext
 import org.jetbrains.skia.DirectContext
 import org.jetbrains.skia.Surface
 import org.jetbrains.skia.SurfaceProps
-import org.jetbrains.skia.impl.interopScope
 import org.jetbrains.skia.impl.InteropPointer
+import org.jetbrains.skia.impl.interopScope
 import org.jetbrains.skiko.*
 import org.jetbrains.skiko.context.Direct3DContextHandler
 

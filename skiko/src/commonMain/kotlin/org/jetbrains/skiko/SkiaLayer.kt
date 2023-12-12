@@ -27,6 +27,7 @@ expect open class SkiaLayer {
      * If rendering is full screen.
      */
     var fullscreen: Boolean
+
     /**
      * If transparency is enabled.
      */
