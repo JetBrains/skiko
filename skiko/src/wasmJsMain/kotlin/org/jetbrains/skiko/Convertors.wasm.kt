@@ -4,7 +4,7 @@ import org.w3c.dom.events.KeyboardEvent
 import org.w3c.dom.events.MouseEvent
 import org.w3c.dom.events.WheelEvent
 
-fun toSkikoEvent(
+internal fun toSkikoEvent(
     event: MouseEvent,
     kind: SkikoPointerEventKind
 ): SkikoPointerEvent {
@@ -20,7 +20,7 @@ fun toSkikoEvent(
     )
 }
 
-fun toSkikoDragEvent(
+internal fun toSkikoDragEvent(
     event: MouseEvent
 ): SkikoPointerEvent {
     return SkikoPointerEvent(
@@ -35,7 +35,7 @@ fun toSkikoDragEvent(
     )
 }
 
-fun toSkikoTypeEvent(
+internal fun toSkikoTypeEvent(
     character: String,
     event: KeyboardEvent?,
 ): SkikoInputEvent? {
@@ -60,7 +60,7 @@ fun toSkikoTypeEvent(
 }
 
 
-fun toSkikoEvent(
+internal fun toSkikoEvent(
     event: KeyboardEvent,
     kind: SkikoKeyboardEventKind
 ): SkikoKeyboardEvent {
@@ -73,7 +73,7 @@ fun toSkikoEvent(
     )
 }
 
-fun toSkikoScrollEvent(
+internal fun toSkikoScrollEvent(
     event: WheelEvent,
 ): SkikoPointerEvent {
     return SkikoPointerEvent(
