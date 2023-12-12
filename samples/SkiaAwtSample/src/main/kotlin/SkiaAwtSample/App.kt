@@ -40,7 +40,7 @@ fun createWindow(title: String, exitOnClose: Boolean) = SwingUtilities.invokeLat
     window.defaultCloseOperation =
         if (exitOnClose) WindowConstants.EXIT_ON_CLOSE else WindowConstants.DISPOSE_ON_CLOSE
     window.background = Color.GREEN
-    window.contentPane = skiaLayer
+    window.contentPane.add(skiaLayer)
 
     // Create menu.
     val menuBar = JMenuBar()
@@ -120,11 +120,33 @@ fun createWindow(title: String, exitOnClose: Boolean) = SwingUtilities.invokeLat
     // Window transparency
     if (System.getProperty("skiko.transparency") == "true") {
         window.isUndecorated = true
-        // On Windows we don't set transparent background to avoid event input issues (JDK specific)
-        if (hostOs != OS.Windows) {
+
+        /**
+         * There is a hack inside skiko OpenGL and Software redrawers for Windows that makes current
+         * window transparent without setting `background` to JDK's window. It's done by getting native
+         * component parent and calling `DwmEnableBlurBehindWindow`.
+         *
+         * FIXME: Make OpenGL work inside transparent window (background == Color(0, 0, 0, 0)) without this hack.
+         *
+         * See `enableTransparentWindow` (skiko/src/awtMain/cpp/windows/window_util.cc)
+         */
+        if (hostOs != OS.Windows || skiaLayer.renderApi == GraphicsApi.DIRECT3D) {
             window.background = Color(0, 0, 0, 0)
         }
         skiaLayer.transparency = true
+
+        /*
+         * Windows makes clicks on transparent pixels fall through, but it doesn't work
+         * with GPU accelerated rendering since this check requires having access to pixels from CPU.
+         *
+         * JVM doesn't allow override this behaviour with low-level windows methods, so hack this in this way.
+         * Based on tests, it doesn't affect resulting pixel color.
+         */
+        if (hostOs == OS.Windows) {
+            val contentPane = window.contentPane as JComponent
+            contentPane.background = Color(0, 0, 0, 1)
+            contentPane.isOpaque = true
+        }
     } else {
         skiaLayer.background = Color.LIGHT_GRAY
     }
