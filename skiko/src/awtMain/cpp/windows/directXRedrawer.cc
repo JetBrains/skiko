@@ -35,6 +35,9 @@ public:
     gr_cp<ID3D12CommandQueue> queue;
     gr_cp<ID3D12Resource> buffers[BuffersCount];
     gr_cp<ID3D12Fence> fence;
+    gr_cp<IDCompositionDevice> dcDevice;
+    gr_cp<IDCompositionTarget> dcTarget;
+    gr_cp<IDCompositionVisual> dcVisual;
     uint64_t fenceValues[BuffersCount];
     HANDLE fenceEvent = NULL;
     unsigned int bufferIndex;
@@ -77,15 +80,12 @@ public:
         swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_PREMULTIPLIED;
         swapChainFactory4->CreateSwapChainForComposition(queue.get(), &swapChainDesc, nullptr, &swapChain1);
 
-        IDCompositionDevice* g_pdcDevice = nullptr;
-        IDCompositionTarget* g_pdcTarget = nullptr;
-        IDCompositionVisual* g_pdcVisual = nullptr;
-        DCompositionCreateDevice(0, IID_PPV_ARGS(&g_pdcDevice));
-        g_pdcDevice->CreateTargetForHwnd(window, true, &g_pdcTarget);
-        g_pdcDevice->CreateVisual(&g_pdcVisual);
-        g_pdcVisual->SetContent(swapChain1.get());
-        g_pdcTarget->SetRoot(g_pdcVisual);
-        g_pdcDevice->Commit();
+        DCompositionCreateDevice(0, IID_PPV_ARGS(&dcDevice));
+        dcDevice->CreateTargetForHwnd(window, true, &dcTarget);
+        dcDevice->CreateVisual(&dcVisual);
+        dcVisual->SetContent(swapChain1.get());
+        dcTarget->SetRoot(dcVisual.get());
+        dcDevice->Commit();
 
         swapChainFactory4->MakeWindowAssociation(window, DXGI_MWA_NO_ALT_ENTER);
         swapChain1->QueryInterface(IID_PPV_ARGS(&swapChain));
