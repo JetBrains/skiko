@@ -8,17 +8,11 @@ internal fun getEventTimestamp(e: UIEvent): Long {
 }
 
 internal actual fun CursorManager_setCursor(component: Any, cursor: Cursor) {
-    if (component is HTMLElement) {
-        component.style.cursor = cursor
-    }
+    (component as? HTMLElement)?.style?.cursor = cursor
 }
 
 internal actual fun CursorManager_getCursor(component: Any): Cursor? {
-    return if (component is HTMLElement) {
-        component.style.cursor
-    } else {
-        null
-    }
+    return (component as? HTMLElement)?.style?.cursor
 }
 
 internal actual fun getNavigatorInfo(): String =

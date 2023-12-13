@@ -7,4 +7,4 @@ fun main() {
     onWasmReady(::runApp)
 }
 
-actual fun findHTMLCanvasElementById(id: String): Any = document.getElementById(id)!!
+actual fun findElementById(id: String): Any? = document.getElementById(id)

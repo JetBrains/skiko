@@ -23,7 +23,7 @@ private class DemoApp: SkikoView {
 internal fun runApp() {
     for (index in 1 .. 3) {
         val skiaLayer = SkiaLayer()
-        val canvas = findHTMLCanvasElementById("c$index")
+        val canvas = findElementById("c$index")!!
         val app = if (index == 3) {
             DemoApp()
         } else {
@@ -38,4 +38,4 @@ internal fun runApp() {
 
 // Note: despite the actual implementation looks identical, it can't be common - there is no W3C common API
 // return type is Any because k/js and k/wasm don't have a common type for HTML elements
-expect fun findHTMLCanvasElementById(id: String): Any
+expect fun findElementById(id: String): Any?

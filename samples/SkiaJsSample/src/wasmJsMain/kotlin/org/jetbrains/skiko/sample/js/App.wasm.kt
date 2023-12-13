@@ -6,4 +6,4 @@ fun main() {
     runApp()
 }
 
-actual fun findHTMLCanvasElementById(id: String): Any = document.getElementById(id)!!
+actual fun findElementById(id: String): Any? = document.getElementById(id)
