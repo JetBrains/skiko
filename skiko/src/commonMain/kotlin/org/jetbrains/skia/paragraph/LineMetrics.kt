@@ -141,9 +141,13 @@ class LineMetrics(
         override fun getArrayElement(array: InteropPointer, index: Int): LineMetrics {
             val intArray = IntArray(6)
             val doubleArray = DoubleArray(7)
-            interopScope {
-                LineMetrics_nGetArrayElement(array, index, toInterop(intArray), toInterop(doubleArray))
+
+            withResult(intArray) { intArrayInterop ->
+                withResult(doubleArray) { doubleArrayInterop ->
+                    LineMetrics_nGetArrayElement(array, index, intArrayInterop, doubleArrayInterop)
+                }
             }
+
             return LineMetrics(
                 intArray[0],
                 intArray[1],

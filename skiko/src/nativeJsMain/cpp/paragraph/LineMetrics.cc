@@ -18,20 +18,20 @@ SKIKO_EXPORT void org_jetbrains_skia_paragraph_LineMetrics__1nDisposeArray
 }
 
 SKIKO_EXPORT void org_jetbrains_skia_paragraph_LineMetrics__1nGetArrayElement
-    (KNativePointer blob, KInt index, KNativePointer longArgs, KNativePointer doubleArgs) {
+    (KNativePointer blob, KInt index, KNativePointer intArgs, KNativePointer doubleArgs) {
 
     std::vector<LineMetrics>* vect = reinterpret_cast<std::vector<LineMetrics> *>(blob);
-    int* longs = reinterpret_cast<int *>(longArgs);
+    int* ints = reinterpret_cast<int *>(intArgs);
     double* doubles = reinterpret_cast<double *>(doubleArgs);
 
     LineMetrics lm = vect->at(index);
 
-    longs[0] = lm.fStartIndex;
-    longs[1] = lm.fEndIndex;
-    longs[2] = lm.fEndExcludingWhitespaces;
-    longs[3] = lm.fEndIncludingNewline;
-    longs[4] = lm.fHardBreak;
-    longs[5] = lm.fLineNumber;
+    ints[0] = lm.fStartIndex;
+    ints[1] = lm.fEndIndex;
+    ints[2] = lm.fEndExcludingWhitespaces;
+    ints[3] = lm.fEndIncludingNewline;
+    ints[4] = lm.fHardBreak;
+    ints[5] = lm.fLineNumber;
 
     doubles[0] = lm.fAscent;
     doubles[1] = lm.fDescent;

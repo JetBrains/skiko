@@ -5,6 +5,7 @@ import org.jetbrains.skia.FontMetrics
 import org.jetbrains.skia.Matrix33
 import org.jetbrains.skia.Point
 import org.jetbrains.skia.Rect
+import org.jetbrains.skia.paragraph.LineMetrics
 import org.jetbrains.skia.paragraph.Shadow
 import org.jetbrains.skia.paragraph.TextBox
 import org.jetbrains.skiko.KotlinBackend
@@ -15,6 +16,9 @@ import kotlin.test.assertTrue
 private val EPSILON = if (kotlinBackend == KotlinBackend.JS) 0.00001f else 0.00000001f
 
 private inline fun Float?.isCloseEnoughTo(b: Float?, epsilon: Float) =
+    if (this == null) b == null else if (b == null) false else if (epsilon == 0f) this == b else abs(this - b) < epsilon
+
+private inline fun Double?.isCloseEnoughTo(b: Double?, epsilon: Float) =
     if (this == null) b == null else if (b == null) false else if (epsilon == 0f) this == b else abs(this - b) < epsilon
 
 private inline fun Point.isCloseEnoughTo(b: Point, epsilon: Float) =
@@ -47,6 +51,25 @@ private inline fun FontMetrics.isCloseEnoughTo(b: FontMetrics, epsilon: Float) =
         underlinePosition.isCloseEnoughTo(b.underlinePosition, epsilon) &&
         strikeoutThickness.isCloseEnoughTo(b.strikeoutThickness, epsilon) &&
         strikeoutPosition.isCloseEnoughTo(b.strikeoutPosition, epsilon)
+
+private inline fun LineMetrics.isCloseEnoughTo(b: LineMetrics, epsilon: Float): Boolean =
+    startIndex == b.startIndex &&
+    endIndex == b.endIndex &&
+    endExcludingWhitespaces == b.endExcludingWhitespaces &&
+    endIncludingNewline == b.endIncludingNewline &&
+    isHardBreak == b.isHardBreak &&
+    ascent.isCloseEnoughTo(b.ascent, epsilon) &&
+    descent.isCloseEnoughTo(b.descent, epsilon) &&
+    unscaledAscent.isCloseEnoughTo(b.unscaledAscent, epsilon) &&
+    height.isCloseEnoughTo(b.height, epsilon) &&
+    width.isCloseEnoughTo(b.width, epsilon) &&
+    baseline.isCloseEnoughTo(b.baseline, epsilon) &&
+    lineNumber == b.lineNumber
+
+
+
+
+
 
 private inline fun Rect.isCloseEnoughTo(rect: Rect, epsilon: Float): Boolean =
     left.isCloseEnoughTo(rect.left, epsilon) && right.isCloseEnoughTo(rect.right, epsilon)
@@ -84,6 +107,10 @@ internal fun assertCloseEnough(expected: Color4f, actual: Color4f, epsilon: Floa
 }
 
 internal fun assertCloseEnough(expected: Rect, actual: Rect, epsilon: Float = EPSILON) {
+    assertTrue(expected.isCloseEnoughTo(actual, epsilon), message = "expected=$expected, actual=$actual, eps=$epsilon")
+}
+
+internal fun assertCloseEnough(expected: LineMetrics, actual: LineMetrics, epsilon: Float = EPSILON) {
     assertTrue(expected.isCloseEnoughTo(actual, epsilon), message = "expected=$expected, actual=$actual, eps=$epsilon")
 }
 

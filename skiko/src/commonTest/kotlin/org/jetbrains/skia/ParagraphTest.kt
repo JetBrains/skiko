@@ -5,10 +5,7 @@ import org.jetbrains.skia.paragraph.*
 import org.jetbrains.skia.tests.assertCloseEnough
 import org.jetbrains.skia.tests.assertContentCloseEnough
 import org.jetbrains.skia.tests.makeFromResource
-import org.jetbrains.skiko.tests.SkipJsTarget
-import org.jetbrains.skiko.tests.SkipNativeTarget
-import org.jetbrains.skiko.tests.SkipWasmTarget
-import org.jetbrains.skiko.tests.runTest
+import org.jetbrains.skiko.tests.*
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
@@ -49,23 +46,49 @@ class ParagraphTest {
     }
 
     @Test
-    @SkipJsTarget
-    @SkipWasmTarget
     @SkipNativeTarget
-    fun layoutParagraph() = runTest {
-        singleLineMetrics("aa").let { lineMetrics -> // latin
-            assertEquals(0, lineMetrics.startIndex)
-            assertEquals(2, lineMetrics.endIndex)
-            assertEquals(2, lineMetrics.endIncludingNewline)
-            assertEquals(2, lineMetrics.endExcludingWhitespaces)
-        }
-        singleLineMetrics("яя").let { lineMetrics -> // cyrillic
-            assertEquals(0, lineMetrics.startIndex)
-            assertEquals(2, lineMetrics.endIndex)
-            assertEquals(2, lineMetrics.endIncludingNewline)
-            assertEquals(2, lineMetrics.endExcludingWhitespaces)
+    fun layoutParagraph(): TestReturnType {
+        val lineMetricsEpsilon = 0.0001f
+
+        return runTest {
+            assertCloseEnough(
+                singleLineMetrics("aa"), LineMetrics(
+                    startIndex = 0,
+                    endIndex = 2,
+                    endExcludingWhitespaces = 2,
+                    endIncludingNewline = 2,
+                    isHardBreak = true,
+                    ascent = 13.5625,
+                    descent = 3.3806817531585693,
+                    unscaledAscent = 13.5625,
+                    height = 17.0,
+                    width = 15.789999961853027,
+                    left = 0.0,
+                    baseline = 13.619318008422852,
+                    lineNumber = 0
+                ), epsilon = lineMetricsEpsilon
+            )
+
+            assertCloseEnough(
+                singleLineMetrics("яя"), LineMetrics(
+                    startIndex = 0,
+                    endIndex = 2,
+                    endExcludingWhitespaces = 2,
+                    endIncludingNewline = 2,
+                    isHardBreak = true,
+                    ascent = 13.5625,
+                    descent = 3.3806817531585693,
+                    unscaledAscent = 13.5625,
+                    height = 17.0,
+                    width = 15.710000038146973,
+                    left = 0.0,
+                    baseline = 13.619318008422852,
+                    lineNumber = 0
+                ), epsilon = lineMetricsEpsilon
+            )
         }
     }
+
     @Test
     @SkipJsTarget // FIXME Emscripten's stringToUTF8 function does not correctly handle invalid unicode symbols.
     fun invalidUnicode() = runTest {
