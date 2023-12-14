@@ -66,11 +66,6 @@ private inline fun LineMetrics.isCloseEnoughTo(b: LineMetrics, epsilon: Float): 
     baseline.isCloseEnoughTo(b.baseline, epsilon) &&
     lineNumber == b.lineNumber
 
-
-
-
-
-
 private inline fun Rect.isCloseEnoughTo(rect: Rect, epsilon: Float): Boolean =
     left.isCloseEnoughTo(rect.left, epsilon) && right.isCloseEnoughTo(rect.right, epsilon)
             && top.isCloseEnoughTo(rect.top, epsilon) && bottom.isCloseEnoughTo(rect.bottom, epsilon)
