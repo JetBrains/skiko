@@ -47,44 +47,43 @@ class ParagraphTest {
 
     @Test
     fun layoutParagraph() = runTest {
-            val lineMetricsEpsilon = 0.0001f
+        val lineMetricsEpsilon = 0.0001f
 
-            assertCloseEnough(
-                singleLineMetrics("aa"), LineMetrics(
-                    startIndex = 0,
-                    endIndex = 2,
-                    endExcludingWhitespaces = 2,
-                    endIncludingNewline = 2,
-                    isHardBreak = true,
-                    ascent = 13.5625,
-                    descent = 3.3806817531585693,
-                    unscaledAscent = 13.5625,
-                    height = 17.0,
-                    width = 15.789999961853027,
-                    left = 0.0,
-                    baseline = 13.619318008422852,
-                    lineNumber = 0
-                ), epsilon = lineMetricsEpsilon
-            )
+        assertCloseEnough(
+            singleLineMetrics("aa"), LineMetrics(
+                startIndex = 0,
+                endIndex = 2,
+                endExcludingWhitespaces = 2,
+                endIncludingNewline = 2,
+                isHardBreak = true,
+                ascent = 13.5625,
+                descent = 3.3806817531585693,
+                unscaledAscent = 13.5625,
+                height = 17.0,
+                width = 15.789999961853027,
+                left = 0.0,
+                baseline = 13.619318008422852,
+                lineNumber = 0
+            ), epsilon = lineMetricsEpsilon
+        )
 
-            assertCloseEnough(
-                singleLineMetrics("яя"), LineMetrics(
-                    startIndex = 0,
-                    endIndex = 2,
-                    endExcludingWhitespaces = 2,
-                    endIncludingNewline = 2,
-                    isHardBreak = true,
-                    ascent = 13.5625,
-                    descent = 3.3806817531585693,
-                    unscaledAscent = 13.5625,
-                    height = 17.0,
-                    width = 15.710000038146973,
-                    left = 0.0,
-                    baseline = 13.619318008422852,
-                    lineNumber = 0
-                ), epsilon = lineMetricsEpsilon
-            )
-        }
+        assertCloseEnough(
+            singleLineMetrics("яя"), LineMetrics(
+                startIndex = 0,
+                endIndex = 2,
+                endExcludingWhitespaces = 2,
+                endIncludingNewline = 2,
+                isHardBreak = true,
+                ascent = 13.5625,
+                descent = 3.3806817531585693,
+                unscaledAscent = 13.5625,
+                height = 17.0,
+                width = 15.710000038146973,
+                left = 0.0,
+                baseline = 13.619318008422852,
+                lineNumber = 0
+            ), epsilon = lineMetricsEpsilon
+        )
     }
 
     @Test
