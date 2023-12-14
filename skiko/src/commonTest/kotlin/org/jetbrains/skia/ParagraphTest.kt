@@ -46,11 +46,9 @@ class ParagraphTest {
     }
 
     @Test
-    @SkipNativeTarget
-    fun layoutParagraph(): TestReturnType {
-        val lineMetricsEpsilon = 0.0001f
+    fun layoutParagraph() = runTest {
+            val lineMetricsEpsilon = 0.0001f
 
-        return runTest {
             assertCloseEnough(
                 singleLineMetrics("aa"), LineMetrics(
                     startIndex = 0,
