@@ -141,9 +141,13 @@ class LineMetrics(
         override fun getArrayElement(array: InteropPointer, index: Int): LineMetrics {
             val intArray = IntArray(6)
             val doubleArray = DoubleArray(7)
-            interopScope {
-                LineMetrics_nGetArrayElement(array, index, toInterop(intArray), toInterop(doubleArray))
+
+            withResult(intArray) { intArrayInterop ->
+                withResult(doubleArray) { doubleArrayInterop ->
+                    LineMetrics_nGetArrayElement(array, index, intArrayInterop, doubleArrayInterop)
+                }
             }
+
             return LineMetrics(
                 intArray[0],
                 intArray[1],
@@ -175,4 +179,4 @@ private external fun LineMetrics_nGetArraySize(array: InteropPointer): Int
 private external fun LineMetrics_nDisposeArray(array: InteropPointer)
 @ExternalSymbolName("org_jetbrains_skia_paragraph_LineMetrics__1nGetArrayElement")
 @ModuleImport("./skiko.mjs", "org_jetbrains_skia_paragraph_LineMetrics__1nGetArrayElement")
-private external fun LineMetrics_nGetArrayElement(array: InteropPointer, index: Int, longArgs: InteropPointer, doubleArgs: InteropPointer)
+private external fun LineMetrics_nGetArrayElement(array: InteropPointer, index: Int, intArgs: InteropPointer, doubleArgs: InteropPointer)
