@@ -557,5 +557,9 @@ tasks.findByName("publishSkikoWasmRuntimePublicationToComposeRepoRepository")
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile>().configureEach {
     // https://youtrack.jetbrains.com/issue/KT-56583
     compilerOptions.freeCompilerArgs.add("-XXLanguage:+ImplicitSignedToUnsignedIntegerConversion")
-    kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlinx.cinterop.ExperimentalForeignApi"
+    kotlinOptions.freeCompilerArgs += "-opt-in=kotlinx.cinterop.ExperimentalForeignApi"
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>>().configureEach {
+    kotlinOptions.freeCompilerArgs += "-Xexpect-actual-classes"
 }
