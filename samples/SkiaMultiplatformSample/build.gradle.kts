@@ -341,6 +341,6 @@ fun KotlinNativeTarget.configureToLaunchFromXcode() {
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile>().configureEach {
     kotlinOptions {
-        freeCompilerArgs += "-Xopt-in=kotlinx.cinterop.ExperimentalForeignApi"
+        freeCompilerArgs += "-opt-in=kotlinx.cinterop.ExperimentalForeignApi"
     }
 }
