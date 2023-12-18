@@ -2663,16 +2663,12 @@ $dokka.location:org.jetbrains.skiko//isRightClick/org.jetbrains.skiko.SkikoPoint
 $dokka.location:org.jetbrains.skiko//kotlinBackend/#/PointingToDeclaration/skiko/org.jetbrains.skiko/kotlin-backend.html
 $dokka.location:org.jetbrains.skiko//loadBytesFromPath/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/load-bytes-from-path.html
 $dokka.location:org.jetbrains.skiko//nativeInitializeAccessible/#javax.accessibility.Accessible/PointingToDeclaration/skiko/org.jetbrains.skiko/native-initialize-accessible.html
-$dokka.location:org.jetbrains.skiko//onContentScaleChanged/#/PointingToDeclaration/skiko/org.jetbrains.skiko/on-content-scale-changed.html
 $dokka.location:org.jetbrains.skiko//orderEmojiAndSymbolsPopup/#/PointingToDeclaration/skiko/org.jetbrains.skiko/order-emoji-and-symbols-popup.html
 $dokka.location:org.jetbrains.skiko//setSystemLookAndFeel/#/PointingToDeclaration/skiko/org.jetbrains.skiko/set-system-look-and-feel.html
 $dokka.location:org.jetbrains.skiko//setupSkikoLoggerFactory/#kotlin.Function0[org.jetbrains.skiko.SkikoLoggerInterface]/PointingToDeclaration/skiko/org.jetbrains.skiko/setup-skiko-logger-factory.html
 $dokka.location:org.jetbrains.skiko//toBitmap/java.awt.image.BufferedImage#/PointingToDeclaration/skiko/org.jetbrains.skiko/to-bitmap.html
 $dokka.location:org.jetbrains.skiko//toBufferedImage/org.jetbrains.skia.Bitmap#/PointingToDeclaration/skiko/org.jetbrains.skiko/to-buffered-image.html
 $dokka.location:org.jetbrains.skiko//toImage/java.awt.image.BufferedImage#/PointingToDeclaration/skiko/org.jetbrains.skiko/to-image.html
-$dokka.location:org.jetbrains.skiko//toSkikoDragEvent/#[Error type: Unresolved type for MouseEvent]/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-drag-event.html
-$dokka.location:org.jetbrains.skiko//toSkikoEvent/#[Error type: Unresolved type for KeyboardEvent]#org.jetbrains.skiko.SkikoKeyboardEventKind/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-event.html
-$dokka.location:org.jetbrains.skiko//toSkikoEvent/#[Error type: Unresolved type for MouseEvent]#org.jetbrains.skiko.SkikoPointerEventKind/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-event.html
 $dokka.location:org.jetbrains.skiko//toSkikoEvent/#[Error type: Unresolved type for NSEvent]#[Error type: Unresolved type for SkikoKeyboardEventKind]/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-event.html
 $dokka.location:org.jetbrains.skiko//toSkikoEvent/#[Error type: Unresolved type for NSEvent]#[Error type: Unresolved type for SkikoMouseButtons]#[Error type: Unresolved type for SkikoPointerEventKind]#[Error type: Unresolved type for NSView]/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-event.html
 $dokka.location:org.jetbrains.skiko//toSkikoEvent/#[Error type: Unresolved type for NSEvent]#[Error type: Unresolved type for SkikoPointerEventKind]#[Error type: Unresolved type for NSView]/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-event.html
@@ -2687,11 +2683,9 @@ $dokka.location:org.jetbrains.skiko//toSkikoKeyboardEvent/#android.view.KeyEvent
 $dokka.location:org.jetbrains.skiko//toSkikoPointerEvent/#android.view.MotionEvent#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-pointer-event.html
 $dokka.location:org.jetbrains.skiko//toSkikoScaleGestureEvent/#android.view.MotionEvent#kotlin.Double#org.jetbrains.skiko.SkikoGestureEventState#kotlin.Float/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-scale-gesture-event.html
 $dokka.location:org.jetbrains.skiko//toSkikoScrollEvent/#[Error type: Unresolved type for NSEvent]#[Error type: Unresolved type for NSView]/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-scroll-event.html
-$dokka.location:org.jetbrains.skiko//toSkikoScrollEvent/#[Error type: Unresolved type for WheelEvent]/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-scroll-event.html
 $dokka.location:org.jetbrains.skiko//toSkikoTypeEvent/#android.view.KeyEvent#kotlin.Int/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-type-event.html
 $dokka.location:org.jetbrains.skiko//toSkikoTypeEvent/#java.awt.event.InputMethodEvent#java.awt.event.KeyEvent?/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-type-event.html
 $dokka.location:org.jetbrains.skiko//toSkikoTypeEvent/#java.awt.event.KeyEvent#java.awt.event.KeyEvent?/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-type-event.html
-$dokka.location:org.jetbrains.skiko//toSkikoTypeEvent/#kotlin.String#[Error type: Unresolved type for KeyboardEvent]?/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-type-event.html
 $dokka.location:org.jetbrains.skiko//toSkikoTypeEvent/#kotlin.String#[Error type: Unresolved type for NSEvent]?/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-type-event.html
 $dokka.location:org.jetbrains.skiko//toSkikoTypeEvent/#kotlin.String#[Error type: Unresolved type for UIPress]?/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-type-event.html
 $dokka.location:org.jetbrains.skiko//toSkikoTypefaceOrNull/java.awt.Font#org.jetbrains.skiko.awt.font.AwtFontManager/PointingToDeclaration/skiko/org.jetbrains.skiko/to-skiko-typeface-or-null.html
@@ -2705,14 +2699,6 @@ $dokka.location:org.jetbrains.skiko/Arch/entries/#/PointingToDeclaration/skiko/
 $dokka.location:org.jetbrains.skiko/Arch/id/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-arch/id.html
 $dokka.location:org.jetbrains.skiko/Arch/valueOf/#kotlin.String/PointingToDeclaration/skiko/org.jetbrains.skiko/-arch/value-of.html
 $dokka.location:org.jetbrains.skiko/Arch/values/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-arch/values.html
-$dokka.location:org.jetbrains.skiko/CanvasRenderer///PointingToDeclaration/skiko/org.jetbrains.skiko/-canvas-renderer/index.html
-$dokka.location:org.jetbrains.skiko/CanvasRenderer/CanvasRenderer/#[Error type: Unresolved type for HTMLCanvasElement]/PointingToDeclaration/skiko/org.jetbrains.skiko/-canvas-renderer/-canvas-renderer.html
-$dokka.location:org.jetbrains.skiko/CanvasRenderer/drawFrame/#kotlin.Double/PointingToDeclaration/skiko/org.jetbrains.skiko/-canvas-renderer/draw-frame.html
-$dokka.location:org.jetbrains.skiko/CanvasRenderer/height/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-canvas-renderer/height.html
-$dokka.location:org.jetbrains.skiko/CanvasRenderer/htmlCanvas/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-canvas-renderer/html-canvas.html
-$dokka.location:org.jetbrains.skiko/CanvasRenderer/initCanvas/#kotlin.Int#kotlin.Int#kotlin.Float#org.jetbrains.skia.PixelGeometry/PointingToDeclaration/skiko/org.jetbrains.skiko/-canvas-renderer/init-canvas.html
-$dokka.location:org.jetbrains.skiko/CanvasRenderer/needRedraw/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-canvas-renderer/need-redraw.html
-$dokka.location:org.jetbrains.skiko/CanvasRenderer/width/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-canvas-renderer/width.html
 $dokka.location:org.jetbrains.skiko/ClipComponent///PointingToDeclaration/skiko/org.jetbrains.skiko/-clip-component/index.html
 $dokka.location:org.jetbrains.skiko/ClipComponent/ClipComponent/#java.awt.Component/PointingToDeclaration/skiko/org.jetbrains.skiko/-clip-component/-clip-component.html
 $dokka.location:org.jetbrains.skiko/ClipComponent/component/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-clip-component/component.html
@@ -2855,7 +2841,6 @@ $dokka.location:org.jetbrains.skiko/PredefinedCursorsId/valueOf/#kotlin.String/P
 $dokka.location:org.jetbrains.skiko/PredefinedCursorsId/values/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-predefined-cursors-id/values.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer///PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/index.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/SkiaLayer/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/-skia-layer.html
-$dokka.location:org.jetbrains.skiko/SkiaLayer/attachTo/#[Error type: Unresolved type for HTMLCanvasElement]#kotlin.Boolean/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/attach-to.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/attachTo/#[Error type: Unresolved type for NSWindow]/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/attach-to.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/attachTo/#kotlin.Any/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/attach-to.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/component/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/component.html
@@ -2866,6 +2851,7 @@ $dokka.location:org.jetbrains.skiko/SkiaLayer/height/#/PointingToDeclaration/sk
 $dokka.location:org.jetbrains.skiko/SkiaLayer/isShowing/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/is-showing.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/needRedraw/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/need-redraw.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/nsView/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/ns-view.html
+$dokka.location:org.jetbrains.skiko/SkiaLayer/onContentScaleChanged/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/on-content-scale-changed.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/pixelGeometry/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/pixel-geometry.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/renderApi/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/render-api.html
 $dokka.location:org.jetbrains.skiko/SkiaLayer/skikoView/#/PointingToDeclaration/skiko/org.jetbrains.skiko/-skia-layer/skiko-view.html
